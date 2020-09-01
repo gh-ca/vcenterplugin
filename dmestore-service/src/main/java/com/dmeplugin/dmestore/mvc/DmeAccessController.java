@@ -43,7 +43,7 @@ public class DmeAccessController extends BaseController{
     */
     @RequestMapping(value = "/refreshaccess", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseBodyBean accessDme()
+    public ResponseBodyBean refreshDme()
             throws Exception {
         String re = "";
 
