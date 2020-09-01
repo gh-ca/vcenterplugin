@@ -8,6 +8,9 @@ import org.apache.http.conn.ssl.X509HostnameVerifier;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
@@ -37,6 +40,16 @@ public class RestUtils {
 
         requestFactory.setHttpClient(httpClient);
         requestFactory.setReadTimeout(185000);
-        RestTemplate template = new RestTemplate();
+        RestTemplate restTemplate = new RestTemplate(requestFactory);
+
+
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> entity = new HttpEntity<>(null, headers);
+        String re = restTemplate.postForObject("https://10.143.132.231:20886/vsrespoolcommon/getrestypelist"
+                ,entity, String.class);
+        System.out.println(re);
     }
 }
