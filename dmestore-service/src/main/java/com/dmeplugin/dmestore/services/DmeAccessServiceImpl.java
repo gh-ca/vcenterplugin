@@ -78,19 +78,20 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         try {
             //判断与服务器的连接
             ResponseEntity responseEntity = access(REFRES_STATE_URL, HttpMethod.GET, null);
-            if (responseEntity.getStatusCodeValue() == 200) {
-                Map<String, Object> params = new HashMap<>();
-                params.put("hostIp", dmeHostIp);
-                params.put("hostPort", dmeHostPort);
-                remap.put("data", params);
-            } else {
+            if (responseEntity.getStatusCodeValue() != 200) {
                 remap.put("code", 503);
                 remap.put("message", "更新连接状态失败:" + responseEntity.toString());
             }
+
         } catch (Exception e) {
             remap.put("code", 503);
             remap.put("message", "更新连接状态失败:" + e.getMessage());
         }
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("hostIp", dmeHostIp);
+        params.put("hostPort", dmeHostPort);
+        remap.put("data", params);
 
         return remap;
     }
