@@ -1,6 +1,8 @@
 package com.dmeplugin.dmestore.mvc;
 
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
+import com.dmeplugin.dmestore.model.VmfsDataInfo;
+import com.dmeplugin.dmestore.services.VmfsAccessService;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 
@@ -17,7 +20,9 @@ public class VmfsAccessController extends BaseController{
     public static final Logger LOG = LoggerFactory.getLogger(VmfsAccessController.class);
 
     @Autowired
-    private Gson gson;
+    private Gson gson = new Gson();
+    @Autowired
+    private VmfsAccessService vmfsAccessService;
 
     /*
    * Access vmfs
@@ -31,8 +36,16 @@ public class VmfsAccessController extends BaseController{
     public ResponseBodyBean listVmfs()
             throws Exception {
         LOG.info("accessvmfs/listvmfs");
-        String re = "";
-        return success(re);
+        String failureStr = "";
+        try {
+            List<VmfsDataInfo> lists = vmfsAccessService.listVmfs();
+            LOG.info("listvmfs remap==" + gson.toJson(lists));
+            return success(lists);
+        }catch (Exception e){
+            LOG.error("list vmfs failure:"+e);
+            failureStr = e.getMessage();
+        }
+        return failure(failureStr);
     }
 
     /*
@@ -69,8 +82,15 @@ public class VmfsAccessController extends BaseController{
     public ResponseBodyBean createVmfs(@RequestBody Map<String, Object> params)
             throws Exception {
         LOG.info("accessvmfs/createvmfs=="+gson.toJson(params));
-        String re = "";
-        return success(re);
+        String failureStr = "";
+        try {
+            vmfsAccessService.createVmfs(params);
+            return success();
+        }catch (Exception e){
+            LOG.error("create vmfs failure:"+e);
+            failureStr = e.getMessage();
+        }
+        return failure(failureStr);
     }
 
     /*
@@ -87,8 +107,15 @@ public class VmfsAccessController extends BaseController{
     public ResponseBodyBean mountVmfs(@RequestBody Map<String, Object> params)
             throws Exception {
         LOG.info("accessvmfs/mountvmfs=="+gson.toJson(params));
-        String re = "";
-        return success(re);
+        String failureStr = "";
+        try {
+            vmfsAccessService.mountVmfs(params);
+            return success();
+        }catch (Exception e){
+            LOG.error("mount vmfs failure:"+e);
+            failureStr = e.getMessage();
+        }
+        return failure(failureStr);
     }
 
 
