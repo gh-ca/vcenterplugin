@@ -58,6 +58,12 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/spring-core-4.3.24.RELEASE.jar</systemPath>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>4.3.24.RELEASE</version>
+            <scope>test</scope>
+        </dependency>
        <!-- <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>vim25</artifactId>
@@ -114,13 +120,13 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/extlib/log4j-1.2.14.jar</systemPath>
         </dependency>
-        <dependency>
+       <!-- <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.26</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/extlib/slf4j-log4j12-1.7.26.jar</systemPath>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>com.apache</groupId>
             <artifactId>httpclient</artifactId>
@@ -155,6 +161,12 @@
             <version>1.6.1</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/extlib/dom4j-1.6.1.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <version>1.5.21.RELEASE</version>
         </dependency>
     </dependencies>
     <build>
