@@ -41,4 +41,12 @@
           class="com.dmeplugin.dmestore.services.VCenterInfoServiceImpl">
     </bean>
 
+    <bean name="dmeInfoDao" class="com.dmeplugin.dmestore.dao.DmeInfoDao">
+        <property name="url" value="${h2.url}"/>
+    </bean>
+
+    <bean name="dmeAccessService" class="com.dmeplugin.dmestore.services.DmeAccessServiceImpl">
+        <property name="dmeInfoDao" ref="dmeInfoDao"/>
+    </bean>
+
 </beans>
