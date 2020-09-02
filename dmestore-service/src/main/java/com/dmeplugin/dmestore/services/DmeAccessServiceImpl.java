@@ -38,16 +38,22 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         remap.put("message", "连接成功");
         remap.put("data", params);
         try {
-            System.out.println("params==" + (params==null?"null":gson.toJson(params)));
+            System.out.println("params==" + (params==null?"null":params.toString()));
             if (params != null) {
                 //判断与服务器的连接
                 ResponseEntity responseEntity = login(params);
                 if(responseEntity.getStatusCodeValue()==200) {
                     //连接成功后，数据入库
-                    DmeInfo dmeInfo = new Gson().fromJson(gson.toJson(params), DmeInfo.class);
-                    System.out.println("dmeInfo==" + gson.toJson(dmeInfo));
-                    int re = dmeInfoDao.addDmeInfo(dmeInfo);
-                    System.out.println("re==" + re);
+                    try {
+                        Gson tmpgson = new Gson();
+                        DmeInfo dmeInfo = new Gson().fromJson(params.toString(), DmeInfo.class);
+                        System.out.println("dmeInfo==" + tmpgson.toJson(dmeInfo));
+                        int re = dmeInfoDao.addDmeInfo(dmeInfo);
+                        System.out.println("re==" + re);
+                    } catch (Exception ex) {
+                        remap.put("code", 503);
+                        remap.put("message", "连接信息保存失败:" + ex.getMessage());
+                    }
                 }else{
                     remap.put("code", 503);
                     remap.put("message", "连接失败:" + responseEntity.toString());
@@ -77,9 +83,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         RestUtils restUtils = new RestUtils();
         RestTemplate restTemplate = restUtils.getRestTemplate();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpHeaders headers = getHeaders();
 
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
         responseEntity = restTemplate.exchange(dmeHostUrl+url, method, entity, String.class);
@@ -101,21 +105,20 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             RestUtils restUtils = new RestUtils();
             RestTemplate restTemplate = restUtils.getRestTemplate();
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-            headers.setContentType(MediaType.APPLICATION_JSON);
+            HttpHeaders headers = getHeaders();
 
-            JsonObject requestbody = new JsonObject();
-            requestbody.addProperty("grantType","password");
-            requestbody.addProperty("userName",params.get("userName").toString());
-            requestbody.addProperty("value",params.get("password").toString());
+            Map<String,Object> requestbody = new HashMap<>();
+            requestbody.put("grantType","password");
+            requestbody.put("userName",params.get("userName"));
+            requestbody.put("value",params.get("password"));
 
             String loginUrl = "/rest/plat/smapp/v1/sessions";
             String hostUrl = "https://"+params.get("hostIp")+":"+params.get("hostPort");
 
-            HttpEntity<String> entity = new HttpEntity<>(requestbody.getAsString(), headers);
+            HttpEntity<String> entity = new HttpEntity<>(requestbody.toString(), headers);
             responseEntity = restTemplate.exchange(hostUrl+loginUrl
                     , HttpMethod.PUT, entity, String.class);
+
             System.out.println("responseEntity=="+responseEntity);
             if(responseEntity.getStatusCodeValue()==200){
                 JsonArray jsonArray = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonArray();
@@ -132,6 +135,17 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         }
 
         return responseEntity;
+    }
+
+    private HttpHeaders getHeaders() throws Exception{
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        if(dmeToken!=null && !dmeToken.equals("")) {
+            headers.set("X-Auth-Token",dmeToken);
+        }
+        return headers;
     }
 
     public void setDmeInfoDao(DmeInfoDao dmeInfoDao) {
