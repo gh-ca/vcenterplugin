@@ -38,16 +38,16 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         remap.put("message", "连接成功");
         remap.put("data", params);
         try {
-            LOG.info("params==" + (params==null?"null":gson.toJson(params)));
+            System.out.println("params==" + (params==null?"null":gson.toJson(params)));
             if (params != null) {
                 //判断与服务器的连接
                 ResponseEntity responseEntity = login(params);
                 if(responseEntity.getStatusCodeValue()==200) {
                     //连接成功后，数据入库
                     DmeInfo dmeInfo = new Gson().fromJson(gson.toJson(params), DmeInfo.class);
-                    LOG.info("dmeInfo==" + gson.toJson(dmeInfo));
+                    System.out.println("dmeInfo==" + gson.toJson(dmeInfo));
                     int re = dmeInfoDao.addDmeInfo(dmeInfo);
-                    LOG.info("re==" + re);
+                    System.out.println("re==" + re);
                 }else{
                     remap.put("code", 503);
                     remap.put("message", "连接失败:" + responseEntity.toString());
@@ -83,7 +83,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
         responseEntity = restTemplate.exchange(dmeHostUrl+url, method, entity, String.class);
-        LOG.info(url+"==responseEntity=="+responseEntity);
+        System.out.println(url+"==responseEntity=="+responseEntity);
         if(responseEntity.getStatusCodeValue()==403 ||
                 responseEntity.getStatusCodeValue()==401 ){
             //查询数据库
@@ -116,16 +116,16 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             HttpEntity<String> entity = new HttpEntity<>(requestbody.getAsString(), headers);
             responseEntity = restTemplate.exchange(hostUrl+loginUrl
                     , HttpMethod.PUT, entity, String.class);
-            LOG.info("responseEntity=="+responseEntity);
+            System.out.println("responseEntity=="+responseEntity);
             if(responseEntity.getStatusCodeValue()==200){
                 JsonArray jsonArray = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonArray();
-                LOG.info("jsonArray=="+jsonArray);
+                System.out.println("jsonArray=="+jsonArray);
                 JsonObject jsonObject = jsonArray.get(1).getAsJsonObject();
                 if(jsonObject!=null && jsonObject.get("accessSession")!=null){
                     dmeToken = jsonObject.get("accessSession").getAsString();
-                    LOG.info("dmeToken==="+dmeToken);
+                    System.out.println("dmeToken==="+dmeToken);
                     dmeHostUrl = hostUrl;
-                    LOG.info("dmeHostUrl==="+dmeHostUrl);
+                    System.out.println("dmeHostUrl==="+dmeHostUrl);
                 }
             }
 
