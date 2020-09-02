@@ -34,9 +34,9 @@ public class DmeAccessController extends BaseController{
     @ResponseBody
     public ResponseBodyBean accessDme(@RequestBody Map<String, Object> params)
             throws Exception {
-        System.out.println("accessdme/access params==" + params);
+        LOG.info("accessdme/access params==" + params);
         Map<String, Object> remap = dmeAccessService.accessDme(params);
-        System.out.println("accessdme/access remap==" + remap);
+        LOG.info("accessdme/access remap==" + remap);
         if(remap!=null && remap.get("code")!=null && remap.get("code").equals("200")){
             return success(remap);
         }

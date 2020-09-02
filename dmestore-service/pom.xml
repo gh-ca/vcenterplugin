@@ -120,13 +120,13 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/extlib/log4j-1.2.14.jar</systemPath>
         </dependency>
-       <!-- <dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.26</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/extlib/slf4j-log4j12-1.7.26.jar</systemPath>
-        </dependency>-->
+        </dependency>
         <dependency>
             <groupId>com.apache</groupId>
             <artifactId>httpclient</artifactId>
