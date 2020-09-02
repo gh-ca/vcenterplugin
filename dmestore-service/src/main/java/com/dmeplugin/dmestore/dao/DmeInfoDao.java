@@ -2,6 +2,7 @@ package com.dmeplugin.dmestore.dao;
 
 
 import com.dmeplugin.dmestore.entity.DmeInfo;
+import com.dmeplugin.dmestore.exception.DataBaseException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,6 +12,8 @@ import java.sql.SQLException;
 
 public class DmeInfoDao extends H2DataBaseDao {
 
+    private String DME_TABLENAME = "DME_ACCESS_INFO";
+
     public int addDmeInfo(DmeInfo dmeInfo) throws SQLException {
         checkDmeInfo(dmeInfo);
         Connection con = null;
@@ -18,10 +21,8 @@ public class DmeInfoDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            //SqlFileConstant.HW_VCENTER_INFO
-            String tableName = "DME_ACCESS_INFO";
             ps = con.prepareStatement(
-                    "INSERT INTO " + tableName + " (hostIp,hostPort,username,password) " +
+                    "INSERT INTO " + DME_TABLENAME + " (hostIp,hostPort,username,password) " +
                             "VALUES (?,?,?,?)");
             ps.setString(1, dmeInfo.getHostIp());
             ps.setInt(2, dmeInfo.getHostPort());
@@ -39,6 +40,36 @@ public class DmeInfoDao extends H2DataBaseDao {
         } finally {
             closeConnection(con, ps, rs);
         }
+    }
+
+    public DmeInfo getDmeInfo() throws SQLException {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            ps = con.prepareStatement("SELECT * FROM " + DME_TABLENAME
+                    + " WHERE state=1");
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                DmeInfo dmeInfo = new DmeInfo();
+                dmeInfo.setId(rs.getInt("ID"));
+                dmeInfo.setHostIp(rs.getString("HOSTIP"));
+                dmeInfo.setHostPort(rs.getInt("HOSTPORT"));
+                dmeInfo.setUserName(rs.getString("USERNAME"));
+                dmeInfo.setPassword(rs.getString("PASSWORD"));
+                dmeInfo.setCreateTime(rs.getTimestamp("CREATETIME"));
+                dmeInfo.setUpdateTime(rs.getTimestamp("UPDATETIME"));
+                dmeInfo.setState(rs.getInt("STATE"));
+                return dmeInfo;
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("Failed to get dme access info: " + e.getMessage());
+            throw new SQLException(e);
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return null;
     }
 
 

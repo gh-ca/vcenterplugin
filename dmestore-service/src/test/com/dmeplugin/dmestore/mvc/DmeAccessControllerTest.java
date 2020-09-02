@@ -1,7 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
 import com.dmeplugin.dmestore.dao.DmeInfoDao;
-import com.dmeplugin.dmestore.services.DmeAccessService;
 import com.dmeplugin.dmestore.services.DmeAccessServiceImpl;
 import org.junit.Test;
 import org.springframework.http.MediaType;
@@ -12,8 +11,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 public class DmeAccessControllerTest {
 
@@ -39,7 +36,7 @@ public class DmeAccessControllerTest {
     }
 
     @Test
-    public void dmeAccessServiceTest() throws Exception {
+    public void dmeAccessService_accessDme_Test() throws Exception {
         DmeAccessServiceImpl dmeAccessService = new DmeAccessServiceImpl();
         DmeInfoDao dmeInfoDao = new DmeInfoDao();
         dmeAccessService.setDmeInfoDao(dmeInfoDao);
@@ -49,6 +46,15 @@ public class DmeAccessControllerTest {
         params.put("userName", "testadmin001");
         params.put("password", "Pbu421234");
         Map<String, Object> remap = dmeAccessService.accessDme(params);
-        System.out.println("remap=="+remap);
+        System.out.println("remap==" + remap);
+    }
+
+    @Test
+    public void dmeAccessService_refreshDme_Test() throws Exception {
+        DmeAccessServiceImpl dmeAccessService = new DmeAccessServiceImpl();
+        DmeInfoDao dmeInfoDao = new DmeInfoDao();
+        dmeAccessService.setDmeInfoDao(dmeInfoDao);
+        Map<String, Object> remap = dmeAccessService.refreshDme();
+        System.out.println("remap==" + remap);
     }
 }

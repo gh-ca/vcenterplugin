@@ -8,13 +8,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 
 @RestController
 @RequestMapping(value = "/accessdme")
-public class DmeAccessController extends BaseController{
+public class DmeAccessController extends BaseController {
     public static final Logger LOG = LoggerFactory.getLogger(DmeAccessController.class);
 
     @Autowired
@@ -37,12 +36,13 @@ public class DmeAccessController extends BaseController{
         LOG.info("accessdme/access params==" + params);
         Map<String, Object> remap = dmeAccessService.accessDme(params);
         LOG.info("accessdme/access remap==" + remap);
-        if(remap!=null && remap.get("code")!=null && remap.get("code").equals("200")){
+        if (remap != null && remap.get("code") != null && remap.get("code").equals("200")) {
             return success(remap);
         }
 
         return failure(gson.toJson(remap));
     }
+
     /*
     * Refresh connection status
     * return: ResponseBodyBean
@@ -51,9 +51,13 @@ public class DmeAccessController extends BaseController{
     @ResponseBody
     public ResponseBodyBean refreshDme()
             throws Exception {
-        String re = "";
-        System.out.println("accessdme/refreshaccess");
-        return success(re);
+        Map<String, Object> remap = dmeAccessService.refreshDme();
+        LOG.info("accessdme/access remap==" + remap);
+        if (remap != null && remap.get("code") != null && remap.get("code").equals("200")) {
+            return success(remap);
+        }
+
+        return failure(gson.toJson(remap));
     }
 
 
