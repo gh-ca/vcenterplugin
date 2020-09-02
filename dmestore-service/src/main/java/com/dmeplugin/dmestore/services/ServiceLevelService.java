@@ -1,5 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
+import java.util.Map;
+
 /**
  * @Description: TODO
  * @ClassName: ServiceLevelService
@@ -7,5 +9,6 @@ package com.dmeplugin.dmestore.services;
  * @author: liuxh
  * @create: 2020-09-02
  **/
-public class ServiceLevelService {
+public interface ServiceLevelService {
+    Map<String, Object> listServiceLevel(Map<String, Object> params);
 }

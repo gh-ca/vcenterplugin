@@ -12,13 +12,13 @@ import java.util.Map;
 
 /**
  * @Description: TODO
- * @ClassName: ServiceLevelAccessController
+ * @ClassName: ServiceLevelController
  * @Company: GH-CA
  * @author: liuxh
  * @create: 2020-09-02
  **/
 @RestController
-@RequestMapping(value = "/accessservicelevel")
+@RequestMapping(value = "/servicelevel")
 public class ServiceLevelController extends BaseController {
     public static final Logger LOG = LoggerFactory.getLogger(ServiceLevelController.class);
 
@@ -30,7 +30,7 @@ public class ServiceLevelController extends BaseController {
     @RequestMapping(value = "/listservicelevel", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean listServiceLevel(@RequestBody Map<String, Object> params) throws Exception {
-        LOG.info("accessservicelevel/listservicelevel params==" + gson.toJson(params));
+        LOG.info("servicelevel/listservicelevel params==" + gson.toJson(params));
         Map<String, Object> resMap = serviceLevelService.listServiceLevel(params);
         if (null != resMap && null != resMap.get("code") && resMap.get("code").equals("200")) {
             return success(resMap);
