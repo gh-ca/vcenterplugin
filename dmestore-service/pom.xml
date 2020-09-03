@@ -64,13 +64,13 @@
             <version>4.3.24.RELEASE</version>
             <scope>test</scope>
         </dependency>-->
-       <!-- <dependency>
+        <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>vim25</artifactId>
             <version>1.0</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/vim25.jar</systemPath>
-        </dependency>-->
+        </dependency>
         <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>vsphere-client-lib</artifactId>
@@ -78,7 +78,7 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/vsphere-client-lib.jar</systemPath>
         </dependency>
-       <!-- <dependency>
+        <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>samples-core</artifactId>
             <version>1.0</version>
@@ -91,7 +91,7 @@
             <version>1.0</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/wssamples.jar</systemPath>
-        </dependency>-->
+        </dependency>
         <dependency>
             <groupId>com.google</groupId>
             <artifactId>gson</artifactId>
