@@ -1,5 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
+import java.util.Map;
+
 /**
  * @Description: TODO
  * @ClassName: DataSotreStatisticHistroyService
@@ -7,5 +9,6 @@ package com.dmeplugin.dmestore.services;
  * @author: liuxh
  * @create: 2020-09-03
  **/
-public class DataSotreStatisticHistroyService {
+public interface DataSotreStatisticHistroyService {
+    Map<String, Object> queryVmfsStatistic(Map<String, Object> params);
 }
