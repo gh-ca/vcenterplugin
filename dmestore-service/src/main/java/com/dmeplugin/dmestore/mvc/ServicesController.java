@@ -31,11 +31,12 @@ public class ServicesController {
 
    private final EchoService _echoService;
 
-   @Autowired
+   //为了用于springboot ，先暂时去掉
+ /*  @Autowired
    public ServicesController(
          @Qualifier("echoService") EchoService echoService) {
       _echoService = echoService;
-   }
+   }*/
 
    // Empty controller to avoid compiler warnings in dmestore-ui's bundle-context.xml
    // where the bean is declared

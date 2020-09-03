@@ -30,6 +30,10 @@ public class SampleActionServiceImpl implements SampleActionService {
       _vimObjectReferenceService = vimObjectReferenceService;
    }
 
+   public SampleActionServiceImpl() {
+      _vimObjectReferenceService=null;
+   }
+
    public void sampleAction1(Object vmReference) {
       // All vCenter objects sent from the UI are serialized into an internal type.
       // You can use VimObjectReferenceService to get the right information.

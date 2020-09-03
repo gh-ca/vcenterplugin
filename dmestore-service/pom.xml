@@ -37,13 +37,13 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/spring-beans-4.3.24.RELEASE.jar</systemPath>
         </dependency>
-        <dependency>
+      <!--  <dependency>
             <groupId>com.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <version>4.3.24.RELEASE</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/spring-web-4.3.24.RELEASE.jar</systemPath>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>com.springframework</groupId>
             <artifactId>spring-context</artifactId>
@@ -58,12 +58,12 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/spring-core-4.3.24.RELEASE.jar</systemPath>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
             <version>4.3.24.RELEASE</version>
             <scope>test</scope>
-        </dependency>
+        </dependency>-->
        <!-- <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>vim25</artifactId>
@@ -120,13 +120,13 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/extlib/log4j-1.2.14.jar</systemPath>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.26</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/extlib/slf4j-log4j12-1.7.26.jar</systemPath>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>com.apache</groupId>
             <artifactId>httpclient</artifactId>
@@ -167,6 +167,28 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
             <version>1.5.21.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>1.5.21.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <version>1.5.21.RELEASE</version>
+        </dependency>
+
+        <!-- swagger -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.9.2</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.9.2</version>
         </dependency>
     </dependencies>
     <build>

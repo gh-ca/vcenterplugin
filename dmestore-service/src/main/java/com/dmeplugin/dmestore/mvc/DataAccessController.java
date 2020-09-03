@@ -35,14 +35,15 @@ public class DataAccessController {
    private final DataService _dataService;
    private final ObjectReferenceService _objectReferenceService;
 
-   @Autowired
+   //为了用于springboot ，先暂时去掉
+   /*@Autowired
    public DataAccessController(
          DataService dataService,
          @Qualifier("objectReferenceService") ObjectReferenceService objectReferenceService) {
       _dataService = dataService;
       _objectReferenceService = objectReferenceService;
       QueryUtil.setObjectReferenceService(objectReferenceService);
-   }
+   }*/
 
    // Empty controller to avoid warnings in dmestore-ui's bundle-context.xml
    // where the bean is declared

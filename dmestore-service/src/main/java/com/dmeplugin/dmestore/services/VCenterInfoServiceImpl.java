@@ -20,9 +20,14 @@ public class VCenterInfoServiceImpl extends DMEOpenApiService implements VCenter
   @Autowired
   private VCenterInfoDao vCenterInfoDao;
 
+  public VCenterInfoDao getvCenterInfoDao() {
+    return vCenterInfoDao;
+  }
 
-  @Autowired
-  private DMEDao dmeDao;
+  public void setvCenterInfoDao(VCenterInfoDao vCenterInfoDao) {
+    this.vCenterInfoDao = vCenterInfoDao;
+  }
+
 
 
   @Autowired
