@@ -1,10 +1,7 @@
 package com.dmeplugin.dmestore.utils;
 
 
-import com.vmware.vim25.DatastoreInfo;
-import com.vmware.vim25.InvalidPropertyFaultMsg;
-import com.vmware.vim25.ManagedObjectReference;
-import com.vmware.vim25.RuntimeFaultFaultMsg;
+import com.vmware.vim25.*;
 
 import java.util.*;
 
@@ -55,6 +52,17 @@ public class DatastoreVimBase   {
     }
 
     /**
+     * 根据名称获取datastore
+     */
+    public ManagedObjectReference getDatastoreByName(String datastorename)
+            throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
+
+
+        ManagedObjectReference datastore = connectedVimServiceBase.getMOREFs.inFolderByType(connectedVimServiceBase.serviceContent.getRootFolder(),"Datastore").get(datastorename);
+        return datastore;
+    }
+
+    /**
      * 获取所有datastore列表详情,返回datastoreinfo接口，可以根据instance of VmfsDatastoreInfo,NasDatastoreInfo来判断是否是vmfs,或者nfs datstore
      */
     public List<DatastoreInfo> getAllDatastoreInfo() throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
@@ -70,5 +78,19 @@ public class DatastoreVimBase   {
             returndatastoreinfos.add(dsinfo);
         }
         return returndatastoreinfos;
+    }
+
+    /**
+     * 修改datastore名称
+     * @param datastorename  需要修改的datastore名称
+     * @param newdatastorename  修改后的datastore名称
+     * @throws InvalidPropertyFaultMsg
+     * @throws RuntimeFaultFaultMsg
+     * @throws InvalidNameFaultMsg
+     * @throws DuplicateNameFaultMsg
+     */
+    public void renameDatastore(String datastorename,String newdatastorename) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg, InvalidNameFaultMsg, DuplicateNameFaultMsg {
+        ManagedObjectReference datastore=getDatastoreByName(datastorename);
+        connectedVimServiceBase.vimPort.renameDatastore(datastore,newdatastorename);
     }
 }
