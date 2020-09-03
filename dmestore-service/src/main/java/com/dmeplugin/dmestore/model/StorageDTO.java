@@ -1,13 +1,19 @@
-package com.dmeplugin.dmestore.entity;
+package com.dmeplugin.dmestore.model;
+
 
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * @author lianq
+ * @ClassName: StorageDTO
+ * @Company: GH-CA
+ * @create 2020-09-03
+ */
 public class StorageDTO  {
 
     private Storage storage;
     private List<StoragePool> storagePools = new ArrayList<>();
-    private List<Dtree> dtrees = new ArrayList<>();
+    private List<DTree> dtrees = new ArrayList<>();
     private List<FileSystem> fileSystems = new ArrayList<>();
     private List<NfsShare> nfsShares = new ArrayList<>();
     private List<Volume> volumes = new ArrayList<>();
@@ -28,11 +34,11 @@ public class StorageDTO  {
         this.storagePools = storagePools;
     }
 
-    public List<Dtree> getDtrees() {
+    public List<DTree> getDTrees() {
         return dtrees;
     }
 
-    public void setDtrees(List<Dtree> dtrees) {
+    public void setDTrees(List<DTree> dtrees) {
         this.dtrees = dtrees;
     }
 

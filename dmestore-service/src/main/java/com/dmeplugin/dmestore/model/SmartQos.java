@@ -1,20 +1,19 @@
-package com.dmeplugin.dmestore.entity;
-
+package com.dmeplugin.dmestore.model;
+/**
+ * @author lianq
+ * @ClassName: SmartQos
+ * @Company: GH-CA
+ * @create 2020-09-03
+ */
 public class SmartQos {
 
-    //QoS名称
     private String name;
     //控制策略,0：保护IO下限，1：控制IO上限
     private Integer controlPolicy;
-    //时延
     private Integer latency;
-    //最大带宽
     private Integer maxbandwidth;
-    //最大iops
     private Integer maxiops;
-    //最小带宽
     private Integer minbandwidth;
-    //最小iops
     private Integer miniops;
 
     public String getName() {

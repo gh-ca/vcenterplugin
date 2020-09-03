@@ -1,34 +1,32 @@
-package com.dmeplugin.dmestore.entity;
+package com.dmeplugin.dmestore.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * @author lianq
+ * @ClassName: Storage
+ * @Company: GH-CA
+ * @create 2020-09-03
+ */
 public class Storage implements Serializable {
 
     private String id;
-    private String name; //
-    private String ip;  //
-    private String status;//
+    private String name;
+    private String ip;
+    private String status;
     private String synStatus;
-    private String vendor;//
-    private String model; //
-    private Long usedCapacity; //
-    private Long totalCapacity; //
-    //private Long subscription_capacity; //原始容量  ==raw capacity?
-    //已经使用的容量占比  used_capacity/total_capacity
-    //private Long total_pool_capacity;
-    private Long totalEffectiveCapacity;//
-    private Long freeEffectiveCapacity;//
-    //订阅率 字段
-    private Long maxCpuUtilization; //
+    private String vendor;
+    private String model;
+    private Long usedCapacity;
+    private Long totalCapacity;
+    private Long totalEffectiveCapacity;
+    private Long freeEffectiveCapacity;
+    private Long maxCpuUtilization;
     private Long maxIops;
-    //前段界面ops字段没找到
-    private Long maxBandwidth; //
-    private Long maxLatency; //
-    //private String add_time;
-    //private String location;
-    //private String version;
+    private Long maxBandwidth;
+    private Long maxLatency;
+
     private List<String> azIds =new ArrayList<>();//
 
     public String getId() {

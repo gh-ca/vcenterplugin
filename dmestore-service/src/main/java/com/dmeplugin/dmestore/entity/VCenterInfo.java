@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 
-public class VCenter implements Serializable {
+public class VCenterInfo implements Serializable {
 
   private static final long serialVersionUID = 3811172759222907501L;
 

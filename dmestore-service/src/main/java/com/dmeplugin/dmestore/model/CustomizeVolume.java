@@ -1,6 +1,11 @@
-package com.dmeplugin.dmestore.entity;
-
-public class CustomizeVolumeTuning {
+package com.dmeplugin.dmestore.model;
+/**
+ * @author lianq
+ * @ClassName: CustomizeVolumeTuning
+ * @Company: GH-CA
+ * @create 2020-09-03
+ */
+public class CustomizeVolume {
 
     private SmartQos smartQos;
     private Boolean compressionEnabled;
