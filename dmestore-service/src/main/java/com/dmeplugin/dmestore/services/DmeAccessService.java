@@ -23,6 +23,6 @@ public interface DmeAccessService {
     Map<String, Object> refreshDme();
 
 
-    ResponseEntity access(String url, HttpMethod method, String requestBody) throws Exception;
+    ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws Exception;
 
 }

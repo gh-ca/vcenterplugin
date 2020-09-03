@@ -1,6 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.model.VmfsDataInfo;
+import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
 
 import java.util.List;
 import java.util.Map;
@@ -24,5 +25,7 @@ public interface VmfsAccessService {
      * mount vmfs
      */
     void mountVmfs(Map<String, Object> params) throws Exception;
+
+    VmfsDatastoreVolumeDetail volumeDetail(String volume_id) throws Exception;
 
 }

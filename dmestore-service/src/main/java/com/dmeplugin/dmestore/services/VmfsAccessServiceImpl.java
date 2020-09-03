@@ -4,6 +4,7 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.dao.DmeInfoDao;
 import com.dmeplugin.dmestore.entity.DmeInfo;
 import com.dmeplugin.dmestore.model.VmfsDataInfo;
+import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
@@ -33,35 +34,35 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     @Override
     public List<VmfsDataInfo> listVmfs() throws Exception {
         List<VmfsDataInfo> relists = null;
-        try{
+        try {
             //取得vcenter中的所有vmfs存储。
             String listStr = VCSDKUtils.getAllVmfsDataStores();
-            if(!StringUtils.isEmpty(listStr)) {
+            if (!StringUtils.isEmpty(listStr)) {
                 JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
-                if(jsonArray!=null && jsonArray.size()>0) {
+                if (jsonArray != null && jsonArray.size() > 0) {
                     relists = new ArrayList<>();
-                    for(int i=0;i<jsonArray.size();i++) {
+                    for (int i = 0; i < jsonArray.size(); i++) {
                         JsonObject jo = jsonArray.get(i).getAsJsonObject();
-                        LOG.info("jo=="+jo.toString());
+                        LOG.info("jo==" + jo.toString());
 
                         VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
-                        double capacity = getDouble(jo.get("capacity").getAsString())/1024/1024/1024;
-                        double freeSpace = getDouble(jo.get("freeSpace").getAsString())/1024/1024/1024;
-                        double uncommitted = getDouble(jo.get("uncommitted").getAsString())/1024/1024/1024;
+                        double capacity = getDouble(jo.get("capacity").getAsString()) / 1024 / 1024 / 1024;
+                        double freeSpace = getDouble(jo.get("freeSpace").getAsString()) / 1024 / 1024 / 1024;
+                        double uncommitted = getDouble(jo.get("uncommitted").getAsString()) / 1024 / 1024 / 1024;
 
                         vmfsDataInfo.setName(jo.get("name").getAsString());
 
                         vmfsDataInfo.setCapacity(capacity);
                         vmfsDataInfo.setFreeSpace(freeSpace);
-                        vmfsDataInfo.setReserveCapacity(capacity+uncommitted-freeSpace);
+                        vmfsDataInfo.setReserveCapacity(capacity + uncommitted - freeSpace);
 
                         String wwn = jo.get("url").getAsString();
-                        LOG.info("wwn=="+wwn);
+                        LOG.info("wwn==" + wwn);
                         //然后通过vmfs中的url值去DME系统中查询对应wwn的卷信息。
                         ///rest/blockservice/v1/volumes?volume_wwn=wwn
                         //这里由于DME系统中的卷太多。是分页查询，所以需要vmfs一个个的去查DME系统中的卷。
                         //而每次查询DME中的卷都需要调用两次，分别是查卷列表接口，查卷详细接口。
-                        ResponseEntity responseEntity = dmeAccessService.access(LIST_VOLUME_URL+"?volume_wwn="+wwn, HttpMethod.GET, null);
+                        ResponseEntity responseEntity = dmeAccessService.access(LIST_VOLUME_URL + "?volume_wwn=" + wwn, HttpMethod.GET, null);
                         LOG.info("listVmfs responseEntity==" + responseEntity.toString());
                         if (responseEntity.getStatusCodeValue() == 200) {
                             JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -74,7 +75,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
                             String volid = vjson.get("id").getAsString();
                             //通过卷ID再调卷详细接口
-                            responseEntity = dmeAccessService.access(LIST_VOLUME_URL+"/"+volid, HttpMethod.GET, null);
+                            responseEntity = dmeAccessService.access(LIST_VOLUME_URL + "/" + volid, HttpMethod.GET, null);
                             LOG.info("volid responseEntity==" + responseEntity.toString());
                             if (responseEntity.getStatusCodeValue() == 200) {
                                 JsonObject voljson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -95,11 +96,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
             }
             //组装数据。
-        }catch (Exception e){
-            LOG.error("list vmfs error:"+e);
+        } catch (Exception e) {
+            LOG.error("list vmfs error:" + e);
             throw e;
         }
-        LOG.info("relists==="+(relists==null?"null":(relists.size()+"=="+gson.toJson(relists))));
+        LOG.info("relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
         return relists;
     }
 
@@ -113,14 +114,39 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     }
 
-    private double getDouble(String obj){
+    /**
+     * @Author wangxiangyong
+     * @Description /vmfs datastore 卷详情查询
+     * @Date 14:46 2020/9/3
+     * @Param [volume_id]
+     * @Return com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail
+     **/
+    @Override
+    public VmfsDatastoreVolumeDetail volumeDetail(String volume_id) throws Exception {
+        //调用DME接口获取卷详情
+        String url = "/rest/blockservice/v1/volumes/" + volume_id;
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+        if(responseEntity.getStatusCodeValue()/100 != 2){
+            return null;
+        }
+        String responseBody = responseEntity.getBody();
+        JsonObject volume = gson.fromJson(responseBody, JsonObject.class).getAsJsonObject("volume");
+        if(null == volume){
+            return null;
+        }
+        VmfsDatastoreVolumeDetail volumeDetail = new VmfsDatastoreVolumeDetail();
+        volumeDetail.setWwn(volume.get("volume_wwn").getAsString());
+        return volumeDetail;
+    }
+
+    private double getDouble(String obj) {
         double re = 0;
         try {
-            if(!StringUtils.isEmpty(obj)){
+            if (!StringUtils.isEmpty(obj)) {
                 re = Double.parseDouble(obj);
             }
-        }catch (Exception e){
-            LOG.error("error:",e);
+        } catch (Exception e) {
+            LOG.error("error:", e);
         }
         return re;
     }

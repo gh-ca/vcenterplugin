@@ -97,8 +97,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     }
 
     @Override
-    public ResponseEntity access(String url, HttpMethod method, String requestBody) throws Exception {
-        ResponseEntity responseEntity = null;
+    public ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws Exception {
+        ResponseEntity<String> responseEntity = null;
 
         if (dmeToken == null || dmeToken.equals("")) {
             //如果token为空，就自动登录，获取token
