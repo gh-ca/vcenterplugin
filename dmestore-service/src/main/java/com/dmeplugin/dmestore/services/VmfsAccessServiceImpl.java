@@ -1,11 +1,8 @@
 package com.dmeplugin.dmestore.services;
 
 
-import com.dmeplugin.dmestore.dao.DmeInfoDao;
-import com.dmeplugin.dmestore.entity.DmeInfo;
 import com.dmeplugin.dmestore.model.VmfsDataInfo;
 import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
-import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -14,11 +11,13 @@ import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class VmfsAccessServiceImpl implements VmfsAccessService {
 
@@ -124,18 +123,48 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     @Override
     public VmfsDatastoreVolumeDetail volumeDetail(String volume_id) throws Exception {
         //调用DME接口获取卷详情
-        String url = "/rest/blockservice/v1/volumes/" + volume_id;
-        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-        if(responseEntity.getStatusCodeValue()/100 != 2){
+        String url = LIST_VOLUME_URL + "/" + volume_id;
+        ResponseEntity<String> responseEntity;
+        try {
+            responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            if(responseEntity.getStatusCodeValue()/100 != 2){
+                LOG.error("查询卷信息失败！错误信息:{}", responseEntity.getBody());
+                return null;
+            }
+        }catch (Exception ex){
+            LOG.error("查询卷信息异常", ex);
             return null;
         }
+
         String responseBody = responseEntity.getBody();
         JsonObject volume = gson.fromJson(responseBody, JsonObject.class).getAsJsonObject("volume");
-        if(null == volume){
-            return null;
-        }
+
         VmfsDatastoreVolumeDetail volumeDetail = new VmfsDatastoreVolumeDetail();
+        //basic info
         volumeDetail.setWwn(volume.get("volume_wwn").getAsString());
+        volumeDetail.setName(volume.get("name").getAsString());
+        volumeDetail.setServiceLevel(volume.get("service_level_name").getAsString());
+        //TODO
+        volumeDetail.setStorage(volume.get("storage_id").getAsString());
+        volumeDetail.setStoragePool(volume.get("pool_raw_id").getAsString());
+
+        JsonObject tuning = volume.getAsJsonObject("tuning");
+        //SmartTier
+        volumeDetail.setSmartTier(tuning.get("smarttier").getAsString());
+        //Tunning
+        volumeDetail.setDudeplication(tuning.get("dedupe_enabled").getAsBoolean());
+        volumeDetail.setProvisionType(tuning.get("alloctype").getAsString());
+        volumeDetail.setCompression(tuning.get("compression_enabled").getAsBoolean());
+        //TODO
+        volumeDetail.setApplicationType("--");
+
+        JsonObject smartqos = tuning.getAsJsonObject("smartqos");
+        //Qos Policy
+        if(null != smartqos){
+            volumeDetail.setControlPolicy(smartqos.get("control_policy").getAsString());
+            //TODO
+            volumeDetail.setTrafficControl("--");
+        }
         return volumeDetail;
     }
 

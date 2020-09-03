@@ -10,12 +10,35 @@ package com.dmeplugin.dmestore.model;
 public class VmfsDatastoreVolumeDetail {
     private String name;
     private String wwn;
-    private QosPolicy qosPolice;
     private String smartTier;
     private String evolutionaryInfo;
     private String device;
-    private String storePool;
+    private String storagePool;
     private String serviceLevel;
+    private String storage;
+    private boolean dudeplication;
+    private String provisionType;
+    private boolean compression;
+    private String applicationType;
+    private String controlPolicy;
+    private String trafficControl;
+
+
+    public boolean getCompression() {
+        return compression;
+    }
+
+    public void setCompression(boolean compression) {
+        this.compression = compression;
+    }
+
+    public String getProvisionType() {
+        return provisionType;
+    }
+
+    public void setProvisionType(String provisionType) {
+        this.provisionType = provisionType;
+    }
 
     public String getName() {
         return name;
@@ -31,14 +54,6 @@ public class VmfsDatastoreVolumeDetail {
 
     public void setWwn(String wwn) {
         this.wwn = wwn;
-    }
-
-    public QosPolicy getQosPolice() {
-        return qosPolice;
-    }
-
-    public void setQosPolice(QosPolicy qosPolice) {
-        this.qosPolice = qosPolice;
     }
 
     public String getSmartTier() {
@@ -65,12 +80,12 @@ public class VmfsDatastoreVolumeDetail {
         this.device = device;
     }
 
-    public String getStorePool() {
-        return storePool;
+    public String getStoragePool() {
+        return storagePool;
     }
 
-    public void setStorePool(String storePool) {
-        this.storePool = storePool;
+    public void setStoragePool(String storagePool) {
+        this.storagePool = storagePool;
     }
 
     public String getServiceLevel() {
@@ -79,5 +94,53 @@ public class VmfsDatastoreVolumeDetail {
 
     public void setServiceLevel(String serviceLevel) {
         this.serviceLevel = serviceLevel;
+    }
+
+    public String getStorage() {
+        return storage;
+    }
+
+    public void setStorage(String storage) {
+        this.storage = storage;
+    }
+
+    public boolean getDudeplication() {
+        return dudeplication;
+    }
+
+    public void setDudeplication(boolean dudeplication) {
+        this.dudeplication = dudeplication;
+    }
+
+    public boolean isDudeplication() {
+        return dudeplication;
+    }
+
+    public boolean isCompression() {
+        return compression;
+    }
+
+    public String getApplicationType() {
+        return applicationType;
+    }
+
+    public void setApplicationType(String applicationType) {
+        this.applicationType = applicationType;
+    }
+
+    public String getControlPolicy() {
+        return controlPolicy;
+    }
+
+    public void setControlPolicy(String controlPolicy) {
+        this.controlPolicy = controlPolicy;
+    }
+
+    public String getTrafficControl() {
+        return trafficControl;
+    }
+
+    public void setTrafficControl(String trafficControl) {
+        this.trafficControl = trafficControl;
     }
 }
