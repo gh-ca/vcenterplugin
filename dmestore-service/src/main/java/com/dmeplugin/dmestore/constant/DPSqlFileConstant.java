@@ -2,7 +2,8 @@ package com.dmeplugin.dmestore.constant;
 
 public class DPSqlFileConstant {
 
-  public static final String DP_DME_ACCESS_INFO = "DP_DME_ACCESS_INFO";
+  public static final String DP_DME_ACCESS_INFO = "DP_DME_ACCESS_INFO"; //DME访问信息表
+  public static final String DP_DME_VMWARE_RELATION = "DP_DME_VMWARE_RELATION"; //DME与VMWARE对应关系表
 
   public static final String DP_DME_ACCESS_INFO_SQL = "DROP TABLE IF EXISTS \"DP_DME_ACCESS_INFO\";\n" +
           "CREATE TABLE DP_DME_ACCESS_INFO\n" +
@@ -14,7 +15,21 @@ public class DPSqlFileConstant {
           "    password VARCHAR(255),\n" +
           "    createTime datetime DEFAULT NOW(),\n" +
           "    updateTime datetime DEFAULT NOW(),\n" +
-          "    STATE int DEFAULT 1\n" +
+          "    state int DEFAULT 1\n" +
+          ");";
+
+  public static final String DP_DME_VMWARE_RELATION_SQL = "DROP TABLE IF EXISTS \"DP_DME_VMWARE_RELATION\";\n" +
+          "CREATE TABLE DP_DME_VMWARE_RELATION\n" +
+          "(\n" +
+          "    id integer PRIMARY KEY AUTO_INCREMENT NOT NULL,\n" +
+          "    store_id VARCHAR(255),\n" +
+          "    store_name VARCHAR(255),\n" +
+          "    Volume_id VARCHAR(255),\n" +
+          "    Volume_name VARCHAR(255),\n" +
+          "    Volume_wwn VARCHAR(255),\n" +
+          "    createTime datetime DEFAULT NOW(),\n" +
+          "    updateTime datetime DEFAULT NOW(),\n" +
+          "    state int DEFAULT 1\n" +
           ");";
 
 }

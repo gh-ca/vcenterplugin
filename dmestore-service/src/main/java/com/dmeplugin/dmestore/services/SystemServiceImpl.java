@@ -88,6 +88,9 @@ public class SystemServiceImpl implements SystemService {
       // 20200904 add table DP_DME_ACCESS_INFO
       systemDao.checkExistAndCreateTable(DPSqlFileConstant.DP_DME_ACCESS_INFO,
               DPSqlFileConstant.DP_DME_ACCESS_INFO_SQL);
+      // 20200904 add table DP_DME_VMWARE_RELATION
+      systemDao.checkExistAndCreateTable(DPSqlFileConstant.DP_DME_VMWARE_RELATION,
+              DPSqlFileConstant.DP_DME_VMWARE_RELATION_SQL);
 
       LOGGER.info("Removing HA data...");
       vCenterInfoService.deleteHASyncAndDeviceData();
