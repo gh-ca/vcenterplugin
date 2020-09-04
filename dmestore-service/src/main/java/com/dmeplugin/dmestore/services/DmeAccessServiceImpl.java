@@ -103,6 +103,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
         if (dmeToken == null || dmeToken.equals("")) {
             //如果token为空，就自动登录，获取token
+            LOG.info("token为空，自动登录，获取token");
             iniLogin();
         }
 
@@ -119,9 +120,11 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         LOG.info(url + "==responseEntity==" + responseEntity);
         if (responseEntity.getStatusCodeValue() == 403 ||
                 responseEntity.getStatusCodeValue() == 401) {
-            //如果token失败，重新登录
+            //如果token失效，重新登录
+            LOG.info("token失效，重新登录，获取token");
             iniLogin();
             //得到新token后，重新执行上次任务
+            LOG.info("得到新token后，重新执行上次任务，dmeToken=="+dmeToken);
             responseEntity = restTemplate.exchange(dmeHostUrl + url, method, entity, String.class);
         }
         return responseEntity;
