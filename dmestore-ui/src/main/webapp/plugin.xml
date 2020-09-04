@@ -94,6 +94,24 @@
    </extension>
 
 
+
+   <!--datastore summary中的新增portlet -->
+   <extension id="com.dmeplugin.dmestore.datastore.summary">
+      <extendedPoint>vsphere.core.datastore.summarySectionViews</extendedPoint>
+      <object>
+         <name>#{summaryView.title}</name>
+         <contentSpec>
+            <url>/ui/dmestore/resources/mainView.html</url>
+            <dialogTitle>datastore Summary Sample</dialogTitle>
+            <size>
+               <width>1</width>
+               <height>2</height>
+            </size>
+         </contentSpec>
+      </object>
+   </extension>
+
+
    <!-- Main view -->
 
    <extension id="com.dmeplugin.dmestore.mainView">
