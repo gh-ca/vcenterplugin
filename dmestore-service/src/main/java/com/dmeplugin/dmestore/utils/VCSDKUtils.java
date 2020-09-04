@@ -25,7 +25,7 @@ public class VCSDKUtils {
     private final static String STORE_TYPE_VMFS = "VMFS";
     private final static String STORE_TYPE_NFS = "NFS";
 
-    public static String getAllVmfsDataStores(){
+    public static String getAllVmfsDataStores() throws Exception{
         String listStr = "";
         ConnectedVimServiceBase connectedVimServiceBase = null;
         try {
@@ -54,6 +54,8 @@ public class VCSDKUtils {
             }
         }catch (Exception e){
             e.printStackTrace();
+            _logger.error("vmware error:",e);
+            throw e;
         }finally {
             if(connectedVimServiceBase!=null) {
                 connectedVimServiceBase.disconnect();
