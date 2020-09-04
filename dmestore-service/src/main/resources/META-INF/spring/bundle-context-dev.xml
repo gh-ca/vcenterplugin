@@ -60,6 +60,9 @@
     <bean name="vmfsAccessService" class="com.dmeplugin.dmestore.services.VmfsAccessServiceImpl">
     </bean>
 
+    <bean name="DataStoreStatisticHistroyService" class="com.dmeplugin.dmestore.services.DataStoreStatisticHistoryServiceImpl">
+    </bean>
+
 
 
 </beans>

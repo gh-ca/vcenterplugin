@@ -17,8 +17,8 @@ import java.util.*;
  * @author: liuxh
  * @create: 2020-09-03
  **/
-public class DataStoreStatisticHistoryServiceImpl implements DataSotreStatisticHistroyService {
-    private static final Logger log = LoggerFactory.getLogger(DataSotreStatisticHistroyService.class);
+public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticHistroyService {
+    private static final Logger log = LoggerFactory.getLogger(DataStoreStatisticHistroyService.class);
     @Autowired
     private Gson gson;
     private static String dmeHostUrl;
@@ -47,7 +47,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataSotreStatisticH
         ResponseEntity responseEntity;
         Object statisticObj;
         try {
-            responseEntity = queryStstistic(params);
+            responseEntity = queryStatistic(params);
             if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
                 Object body = responseEntity.getBody();
                 JsonObject bodyJson = new JsonParser().parse(body.toString()).getAsJsonObject();
@@ -67,7 +67,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataSotreStatisticH
     }
 
     //query statistic
-    private ResponseEntity queryStstistic(Map<String, Object> params) throws Exception {
+    private ResponseEntity queryStatistic(Map<String, Object> params) throws Exception {
         ResponseEntity responseEntity;
         String apiUrl = "/rest/metrics/v1/data-svc/history-data/action/query";
         String objTypeId = params.get("objTypeId").toString();

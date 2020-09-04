@@ -9,6 +9,6 @@ import java.util.Map;
  * @author: liuxh
  * @create: 2020-09-03
  **/
-public interface DataSotreStatisticHistroyService {
+public interface DataStoreStatisticHistroyService {
     Map<String, Object> queryVmfsStatistic(Map<String, Object> params);
 }
