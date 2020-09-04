@@ -28,6 +28,72 @@
       </object>
    </extension>
 
+<!--入口设置 -->
+   <extension id="com.dmeplugin.dmestore.entryPoint">
+      <extendedPoint>vise.navigator.nodespecs</extendedPoint>
+      <object>
+         <title>dmeplugin</title>
+         <parentUid>vsphere.core.navigator.solutionsCategory</parentUid>
+         <navigationTargetUid>com.dmeplugin.dmestore.mainView</navigationTargetUid>
+         <viewOpenedUponFocus className="com.vmware.ui.objectnavigator.views.CategoryNodeTreeView" />
+      </object>
+   </extension>
+
+   <extension id="com.dmeplugin.dmestore.overview">
+      <extendedPoint>vise.navigator.nodespecs</extendedPoint>
+      <object>
+         <title>Overview</title>
+         <parentUid>com.dmeplugin.dmestore.entryPoint</parentUid>
+         <navigationTargetUid>com.dmeplugin.dmestore.mainView</navigationTargetUid>
+      </object>
+   </extension>
+
+   <extension id="com.dmeplugin.dmestore.storagelist">
+      <extendedPoint>vise.navigator.nodespecs</extendedPoint>
+      <object>
+         <title>Storage Device</title>
+         <parentUid>com.dmeplugin.dmestore.entryPoint</parentUid>
+         <navigationTargetUid>com.dmeplugin.dmestore.mainView</navigationTargetUid>
+      </object>
+   </extension>
+
+   <extension id="com.dmeplugin.dmestore.vmfsdatastorelist">
+      <extendedPoint>vise.navigator.nodespecs</extendedPoint>
+      <object>
+         <title>VMFS Datastore</title>
+         <parentUid>com.dmeplugin.dmestore.entryPoint</parentUid>
+         <navigationTargetUid>com.dmeplugin.dmestore.mainView</navigationTargetUid>
+      </object>
+   </extension>
+
+   <extension id="com.dmeplugin.dmestore.nfsdatastorelist">
+      <extendedPoint>vise.navigator.nodespecs</extendedPoint>
+      <object>
+         <title>NFS Datastore</title>
+         <parentUid>com.dmeplugin.dmestore.entryPoint</parentUid>
+         <navigationTargetUid>com.dmeplugin.dmestore.mainView</navigationTargetUid>
+      </object>
+   </extension>
+
+   <extension id="com.dmeplugin.dmestore.servicelevellist">
+      <extendedPoint>vise.navigator.nodespecs</extendedPoint>
+      <object>
+         <title>Service Level</title>
+         <parentUid>com.dmeplugin.dmestore.entryPoint</parentUid>
+         <navigationTargetUid>com.dmeplugin.dmestore.mainView</navigationTargetUid>
+      </object>
+   </extension>
+
+   <extension id="com.dmeplugin.dmestore.bestpractiselist">
+      <extendedPoint>vise.navigator.nodespecs</extendedPoint>
+      <object>
+         <title>Best Practise</title>
+         <parentUid>com.dmeplugin.dmestore.entryPoint</parentUid>
+         <navigationTargetUid>com.dmeplugin.dmestore.mainView</navigationTargetUid>
+      </object>
+   </extension>
+
+
    <!-- Main view -->
 
    <extension id="com.dmeplugin.dmestore.mainView">
