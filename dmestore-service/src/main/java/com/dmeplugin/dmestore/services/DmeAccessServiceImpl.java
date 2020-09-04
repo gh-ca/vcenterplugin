@@ -178,6 +178,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         if (dmeToken != null && !dmeToken.equals("")) {
             headers.set("X-Auth-Token", dmeToken);
         }
+        LOG.info("headers=="+gson.toJson(headers));
         return headers;
     }
 
@@ -185,14 +186,18 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         //查询数据库
         DmeInfo dmeInfo = dmeInfoDao.getDmeInfo();
         LOG.info("dmeinfo==" + gson.toJson(dmeInfo));
-        Map<String, Object> params = new HashMap<>();
-        params.put("hostIp", dmeInfo.getHostIp());
-        params.put("hostPort", dmeInfo.getHostPort());
-        params.put("userName", dmeInfo.getUserName());
-        params.put("password", dmeInfo.getPassword());
-        LOG.info("params==" + gson.toJson(params));
-        //登录
-        login(params);
+        if(dmeInfo!=null && dmeInfo.getHostIp()!=null) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("hostIp", dmeInfo.getHostIp());
+            params.put("hostPort", dmeInfo.getHostPort());
+            params.put("userName", dmeInfo.getUserName());
+            params.put("password", dmeInfo.getPassword());
+            LOG.info("params==" + gson.toJson(params));
+            //登录
+            login(params);
+        }else{
+            throw new Exception("目前没有DME接入信息");
+        }
     }
 
     public void setDmeInfoDao(DmeInfoDao dmeInfoDao) {
