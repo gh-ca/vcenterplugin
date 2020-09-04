@@ -17,7 +17,7 @@ public class DmeAccessController extends BaseController {
     public static final Logger LOG = LoggerFactory.getLogger(DmeAccessController.class);
 
     @Autowired
-    private Gson gson;
+    private Gson gson = new Gson();
     @Autowired
     private DmeAccessService dmeAccessService;
 
@@ -33,7 +33,7 @@ public class DmeAccessController extends BaseController {
     @ResponseBody
     public ResponseBodyBean accessDme(@RequestBody Map<String, Object> params)
             throws Exception {
-        LOG.info("accessdme/access params==" + params);
+        LOG.info("accessdme/access params==" + gson.toJson(params));
         Map<String, Object> remap = dmeAccessService.accessDme(params);
         LOG.info("accessdme/access remap==" + remap);
         if (remap != null && remap.get("code") != null && remap.get("code").equals("200")) {
