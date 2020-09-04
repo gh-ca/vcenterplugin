@@ -4,6 +4,7 @@ import com.dmeplugin.dmestore.model.NFSDataStoreFSAttr;
 import com.dmeplugin.dmestore.model.NFSDataStorePortAttr;
 import com.dmeplugin.dmestore.model.NFSDataStoreShareAttr;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -40,5 +41,5 @@ import java.util.Map;
      * @Param []
      * @Return com.dmeplugin.dmestore.model.NFSDataStoreFSAttr
      **/
-    NFSDataStoreFSAttr getNFSDatastoreFSAttr(Map<String, String> params) throws Exception;
+    List<NFSDataStoreFSAttr> getNFSDatastoreFSAttr(String storage_id) throws Exception;
 }

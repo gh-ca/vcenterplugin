@@ -11,4 +11,7 @@ public class NFSDataStoreFSAttr {
     //Name、Description、设备、存储池、控制器、Thin、重删、压缩、应用场景
     private String name;
     private String description;
+    private String storageName;
+    private String storagePoolName;
+
 }

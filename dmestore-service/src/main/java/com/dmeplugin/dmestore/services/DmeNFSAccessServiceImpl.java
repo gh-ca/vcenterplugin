@@ -82,7 +82,44 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     @Override
-    public NFSDataStoreFSAttr getNFSDatastoreFSAttr(Map<String, String> params) throws Exception {
+    public List<NFSDataStoreFSAttr> getNFSDatastoreFSAttr(String storage_id) throws Exception {
+        String url = DmeConstants.DME_NFS_FILESERVICE_QUERY_URL;
+        JsonObject queryParam = new JsonObject();
+        int page_no = 0;
+        int page_size = 100;
+        queryParam.addProperty("storage_id", storage_id);
+        queryParam.addProperty("page_size", page_size);
+        boolean loopFlag = true;
+        JsonArray totalArray = new JsonArray();
+        while (loopFlag) {
+            queryParam.addProperty("page_no", page_no++);
+            try {
+                ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, queryParam.toString());
+                if (responseEntity.getStatusCodeValue() / 100 == 2) {
+                    String resBody = responseEntity.getBody();
+                    JsonObject response = gson.fromJson(resBody, JsonObject.class);
+                    JsonArray array = response.getAsJsonArray("data");
+                    totalArray.addAll(array);
+
+                    if (array.size() != page_size) {
+                        loopFlag = false;
+                    }
+                }
+            } catch (Exception ex) {
+                loopFlag = false;
+            }
+        }
+
+        List<NFSDataStoreFSAttr> list = new ArrayList<>();
+        for (int i = 0; i < totalArray.size(); i++) {
+            JsonObject object = totalArray.get(i).getAsJsonObject();
+            NFSDataStoreFSAttr fsAttr = new NFSDataStoreFSAttr();
+
+
+
+            list.add(fsAttr);
+        }
+
         return null;
     }
 }

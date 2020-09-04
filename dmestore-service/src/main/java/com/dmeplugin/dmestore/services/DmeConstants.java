@@ -23,4 +23,9 @@ public class DmeConstants {
      * 查询指定nfs-share下的客户端访问列表
      **/
     public static final String DME_NFS_SHARE_AUTH_CLIENTS_URL = "/rest/fileservice/v1/nfs-shares/#{nfs_share_id}/auth_clients";
+
+    /**
+     * NFS Datastore FileService列表
+     **/
+    public static final String DME_NFS_FILESERVICE_QUERY_URL = "/rest/fileservice/v1/filesystems/query";
 }
