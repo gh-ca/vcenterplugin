@@ -1,6 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
 
+import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
 import com.dmeplugin.dmestore.constant.SqlFileConstant;
 import com.dmeplugin.dmestore.dao.SystemDao;
 import org.slf4j.Logger;
@@ -83,6 +84,10 @@ public class SystemServiceImpl implements SystemService {
           SqlFileConstant.HW_HA_COMPONENT_SQL);
       systemDao.checkExistAndCreateTable(SqlFileConstant.HW_ALARM_RECORD,
           SqlFileConstant.HW_ALARM_RECORD_SQL);
+
+      // 20200904 add table DP_DME_ACCESS_INFO
+      systemDao.checkExistAndCreateTable(DPSqlFileConstant.DP_DME_ACCESS_INFO,
+              DPSqlFileConstant.DP_DME_ACCESS_INFO_SQL);
 
       LOGGER.info("Removing HA data...");
       vCenterInfoService.deleteHASyncAndDeviceData();

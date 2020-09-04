@@ -1,6 +1,7 @@
 package com.dmeplugin.dmestore.dao;
 
 
+import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
 import com.dmeplugin.dmestore.entity.DmeInfo;
 import com.dmeplugin.dmestore.exception.DataBaseException;
 
@@ -12,8 +13,6 @@ import java.sql.SQLException;
 
 public class DmeInfoDao extends H2DataBaseDao {
 
-    private String DME_TABLENAME = "DME_ACCESS_INFO";
-
     public int addDmeInfo(DmeInfo dmeInfo) throws SQLException {
         checkDmeInfo(dmeInfo);
         Connection con = null;
@@ -22,7 +21,7 @@ public class DmeInfoDao extends H2DataBaseDao {
         try {
             con = getConnection();
             ps = con.prepareStatement(
-                    "INSERT INTO " + DME_TABLENAME + " (hostIp,hostPort,username,password) " +
+                    "INSERT INTO " + DPSqlFileConstant.DP_DME_ACCESS_INFO + " (hostIp,hostPort,username,password) " +
                             "VALUES (?,?,?,?)");
             ps.setString(1, dmeInfo.getHostIp());
             ps.setInt(2, dmeInfo.getHostPort());
@@ -48,7 +47,7 @@ public class DmeInfoDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            ps = con.prepareStatement("SELECT * FROM " + DME_TABLENAME
+            ps = con.prepareStatement("SELECT * FROM " + DPSqlFileConstant.DP_DME_ACCESS_INFO
                     + " WHERE state=1");
             rs = ps.executeQuery();
             if (rs.next()) {

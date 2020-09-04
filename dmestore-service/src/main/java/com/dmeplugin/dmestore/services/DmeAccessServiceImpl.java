@@ -42,7 +42,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         remap.put("message", "连接成功");
         remap.put("data", params);
         try {
-            LOG.info("params==" + (params == null ? "null" : params.toString()));
+            LOG.info("params==" + (params == null ? "null" : gson.toJson(params)));
             if (params != null) {
                 //判断与服务器的连接
                 ResponseEntity responseEntity = login(params);
@@ -54,6 +54,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                         int re = dmeInfoDao.addDmeInfo(dmeInfo);
                         LOG.info("re==" + re);
                     } catch (Exception ex) {
+                        ex.printStackTrace();
                         remap.put("code", 503);
                         remap.put("message", "连接信息保存失败:" + ex.getMessage());
                     }
@@ -138,8 +139,10 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             requestbody.put("grantType", "password");
             requestbody.put("userName", params.get("userName"));
             requestbody.put("value", params.get("password"));
+            LOG.info("requestbody=="+gson.toJson(requestbody));
 
             String hostUrl = "https://" + params.get("hostIp") + ":" + params.get("hostPort");
+            LOG.info("hostUrl=="+hostUrl);
 
             HttpEntity<String> entity = new HttpEntity<>(requestbody.toString(), headers);
             responseEntity = restTemplate.exchange(hostUrl + LOGIN_DME_URL
@@ -147,10 +150,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
             LOG.info("responseEntity==" + responseEntity);
             if (responseEntity.getStatusCodeValue() == 200) {
-                JsonArray jsonArray = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonArray();
-                LOG.info("jsonArray==" + jsonArray);
-                JsonObject jsonObject = jsonArray.get(1).getAsJsonObject();
-
+                JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                LOG.info("jsonObject==" + jsonObject);
                 if (jsonObject != null && jsonObject.get("accessSession") != null) {
                     dmeToken = jsonObject.get("accessSession").getAsString();
                     LOG.info("dmeToken===" + dmeToken);

@@ -28,7 +28,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     @Autowired
     private DmeAccessService dmeAccessService;
 
-    private final String LIST_VOLUME_URL = "/rest/blockservice/v1/volumes";
+    public static final String LIST_VOLUME_URL = "/rest/blockservice/v1/volumes";
 
     @Override
     public List<VmfsDataInfo> listVmfs() throws Exception {
