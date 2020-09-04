@@ -7,10 +7,7 @@ import com.dmeplugin.dmestore.model.VmfsDataInfo;
 import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,10 +15,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class VmfsAccessServiceImpl implements VmfsAccessService {
 
@@ -113,14 +107,14 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                             }
                                         }
                                     }
-                                }catch (Exception ex){
-                                    LOG.error("DME link error url:"+detailedVolumeUrl+",error:"+ex.getMessage());
+                                } catch (Exception ex) {
+                                    LOG.error("DME link error url:" + detailedVolumeUrl + ",error:" + ex.getMessage());
                                 }
 
                                 relists.add(vmfsDataInfo);
                             }
-                        }catch (Exception e){
-                            LOG.error("DME link error url:"+volumeUrlByWwn+",error:"+e.getMessage());
+                        } catch (Exception e) {
+                            LOG.error("DME link error url:" + volumeUrlByWwn + ",error:" + e.getMessage());
                         }
 
                     }
@@ -128,7 +122,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
             //组装数据。
         } catch (Exception e) {
-            LOG.error("list vmfs error:",e);
+            LOG.error("list vmfs error:", e);
             throw e;
         }
         LOG.info("relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
@@ -201,33 +195,95 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     @Override
-    public void unmountVmfs(Map<String, Object> params) throws Exception{
-        ResponseEntity responseHostGroupUnmaaping = hostGroupUnmapping(params);
-        ResponseEntity responseHostUnmapping = hostUnmapping(params);
-        if(202 != responseHostGroupUnmaaping.getStatusCodeValue() && 202 != responseHostUnmapping.getStatusCodeValue()){
-            throw new Exception("unmount volume precondition unmount host and hostGroup error!");
+    public void unmountVmfs(Map<String, Object> params) throws Exception {
+        //unmount前的效验 wether attached is ture
+        String volume_id = params.get("{volume_id").toString();
+        ResponseEntity responseVmfs = queryVmfsById(volume_id);
+        if (null != responseVmfs) {
+            Object body = responseVmfs.getBody();
+            JsonObject bodyJson = new JsonParser().parse(body.toString()).getAsJsonObject();
+            JsonObject volumJson = bodyJson.get("volume").getAsJsonObject();
+            boolean attached = volumJson.get("attached").getAsBoolean();
+            if (attached) {
+                JsonArray attachments = volumJson.getAsJsonArray("attachments");
+                for (JsonElement attachment : attachments) {
+                    //String volume_id = attachment.getAsJsonObject().get("volume_id").getAsString();//attachment中的volume_id和param中的volume_id应该是一致的
+                    String host_id = attachment.getAsJsonObject().get("host_id").getAsString();
+                    String hostgroup_id = attachment.getAsJsonObject().get("attached_host_group").getAsString();
+                    List<String> volume_ids = Arrays.asList(volume_id);
+
+                    params.put("volume_ids", volume_ids);
+                    if (!StringUtils.isEmpty(host_id)) {
+                        params.put("host_id", host_id);
+                    }
+                    if (!StringUtils.isEmpty(hostgroup_id)) {
+                        params.put("hostgroup_id", hostgroup_id);
+                    }
+                    break;// break? volume 与host 及hostgroup的关系应该是1:1
+                }
+            }
+            //按需分别卸载host 和 hostgroup
+            boolean unmappingHostFlag = true;
+            boolean unmappingHostgroupFlag = true;
+            if (null != params.get("hostgroup_id")) {
+                ResponseEntity responseHostGroupUnmaaping = hostGroupUnmapping(params);
+                if (202 != responseHostGroupUnmaaping.getStatusCodeValue()) {
+                    unmappingHostgroupFlag = false;
+                }
+            }
+            if (null != params.get("host_id")) {
+                ResponseEntity responseHostUnmapping = hostUnmapping(params);
+                if (202 != responseHostUnmapping.getStatusCodeValue()) {
+                    unmappingHostFlag = false;
+                }
+            }
+            //判断是否卸载成功 ，卸载失败 抛出错误提示
+            if (!(unmappingHostFlag && unmappingHostgroupFlag)) {
+                throw new Exception("unmount volume precondition unmount host and hostGroup error!");
+            }
         }
+
         //vcenter侧卸载
     }
 
     @Override
-    public void deleteVmfs(Map<String, Object> params) throws Exception{
-        ResponseEntity responseHostGroupUnmaaping = hostGroupUnmapping(params);
-        ResponseEntity responseHostUnmapping = hostUnmapping(params);
-        if(202 == responseHostGroupUnmaaping.getStatusCodeValue() && 202 == responseHostUnmapping.getStatusCodeValue()){
-            Object volumeIds = params.get("volumeIds");
-            Map<String, Object> requestbody = new HashMap<>();
-            requestbody.put("volume_ids", volumeIds);
-            ResponseEntity responseEntity = dmeAccessService.access(VOLUME_DELETE, HttpMethod.POST, requestbody.toString());
-            if(202 != responseEntity.getStatusCodeValue()){
-                throw new Exception("delete volume error!");
-            }
-        }else{
+    public void deleteVmfs(Map<String, Object> params) throws Exception {
+        //先调卸载的接口
+        try {
+            unmountVmfs(params);
+        } catch (Exception e) {
+            LOG.error("delete volume precondition unmapping host and hostGroup error!");
             throw new Exception("delete volume precondition unmapping host and hostGroup error!");
+        }
+        //删除vmfs
+        Object volume_ids = params.get("volume_ids");
+        Map<String, Object> requestbody = new HashMap<>();
+        requestbody.put("volume_ids", volume_ids);
+        ResponseEntity responseEntity = dmeAccessService.access(VOLUME_DELETE, HttpMethod.POST, requestbody.toString());
+        if (202 != responseEntity.getStatusCodeValue()) {
+            throw new Exception("delete volume error!");
         }
 
         //vcenter侧删除
     }
+
+    //查询指定vmfs
+    private ResponseEntity queryVmfsById(String volume_id) throws Exception {
+        String url = LIST_VOLUME_URL + "/" + volume_id;
+        ResponseEntity<String> responseEntity;
+        try {
+            responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            if (responseEntity.getStatusCodeValue() / 100 != 2) {
+                LOG.error("查询指定卷信息失败!错误信息:{}", responseEntity.getBody());
+                return null;
+            }
+        } catch (Exception ex) {
+            LOG.error("查询卷信息异常", ex);
+            return null;
+        }
+        return responseEntity;
+    }
+
 
     private ResponseEntity hostUnmapping(Map<String, Object> params) throws Exception {
         String hostId = params.get("hostId").toString();
@@ -240,8 +296,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return responseEntity;
     }
 
-    private ResponseEntity hostGroupUnmapping(Map<String, Object> params) throws Exception{
-        String hostGroupId= params.get("hostGroupId").toString();
+    private ResponseEntity hostGroupUnmapping(Map<String, Object> params) throws Exception {
+        String hostGroupId = params.get("hostGroupId").toString();
         Object volumeIds = params.get("volumeIds");
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("host_id", hostGroupId);
