@@ -96,7 +96,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
             //组装数据。
         } catch (Exception e) {
-            LOG.error("list vmfs error:" + e);
+            LOG.error("list vmfs error:",e);
             throw e;
         }
         LOG.info("relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));

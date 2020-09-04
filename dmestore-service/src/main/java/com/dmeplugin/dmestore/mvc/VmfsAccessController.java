@@ -42,7 +42,7 @@ public class VmfsAccessController extends BaseController{
             LOG.info("listvmfs remap==" + gson.toJson(lists));
             return success(lists);
         }catch (Exception e){
-            LOG.error("list vmfs failure:"+e);
+            LOG.error("list vmfs failure:", e);
             failureStr = e.getMessage();
         }
         return failure(failureStr);
@@ -87,7 +87,7 @@ public class VmfsAccessController extends BaseController{
             vmfsAccessService.createVmfs(params);
             return success();
         }catch (Exception e){
-            LOG.error("create vmfs failure:"+e);
+            LOG.error("create vmfs failure:", e);
             failureStr = e.getMessage();
         }
         return failure(failureStr);
@@ -112,7 +112,7 @@ public class VmfsAccessController extends BaseController{
             vmfsAccessService.mountVmfs(params);
             return success();
         }catch (Exception e){
-            LOG.error("mount vmfs failure:"+e);
+            LOG.error("mount vmfs failure:", e);
             failureStr = e.getMessage();
         }
         return failure(failureStr);
