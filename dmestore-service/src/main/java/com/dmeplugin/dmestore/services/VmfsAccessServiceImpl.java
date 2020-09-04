@@ -105,10 +105,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                                 }
                                             }
                                         }
-
-                                        //通过卷ID再调卷详细接口
-
-
                                     }
                                 }catch (Exception ex){
                                     LOG.error("DME link error url:"+detailedVolumeUrl+",error:"+ex.getMessage());
