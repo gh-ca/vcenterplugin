@@ -186,6 +186,16 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     @Override
+    public void unmountVmfs(Map<String, Object> params) throws Exception{
+        ResponseEntity responseHostGroupUnmaaping = hostGroupUnmapping(params);
+        ResponseEntity responseHostUnmapping = hostUnmapping(params);
+        if(202 != responseHostGroupUnmaaping.getStatusCodeValue() && 202 != responseHostUnmapping.getStatusCodeValue()){
+            throw new Exception("unmount volume precondition unmount host and hostGroup error!");
+        }
+        //vcenter侧卸载
+    }
+
+    @Override
     public void deleteVmfs(Map<String, Object> params) throws Exception{
         ResponseEntity responseHostGroupUnmaaping = hostGroupUnmapping(params);
         ResponseEntity responseHostUnmapping = hostUnmapping(params);
@@ -200,6 +210,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }else{
             throw new Exception("delete volume precondition unmapping host and hostGroup error!");
         }
+
+        //vcenter侧删除
     }
 
     private ResponseEntity hostUnmapping(Map<String, Object> params) throws Exception {

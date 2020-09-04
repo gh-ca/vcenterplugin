@@ -27,6 +27,11 @@ public interface VmfsAccessService {
     void mountVmfs(Map<String, Object> params) throws Exception;
 
     /**
+     * unmounted vmfs
+     */
+    void unmountVmfs(Map<String, Object> params) throws Exception;
+
+    /**
      * delete vmfs
      */
     void deleteVmfs(Map<String, Object> params) throws Exception;
