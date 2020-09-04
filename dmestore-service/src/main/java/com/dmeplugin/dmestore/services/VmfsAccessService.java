@@ -26,6 +26,11 @@ public interface VmfsAccessService {
      */
     void mountVmfs(Map<String, Object> params) throws Exception;
 
+    /**
+     * delete vmfs
+     */
+    void deleteVmfs(Map<String, Object> params) throws Exception;
+
     VmfsDatastoreVolumeDetail volumeDetail(String volume_id) throws Exception;
 
 }

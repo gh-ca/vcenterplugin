@@ -1,12 +1,11 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.utils.RestUtils;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 
 import java.util.*;
 
@@ -17,11 +16,17 @@ import java.util.*;
  * @author: liuxh
  * @create: 2020-09-03
  **/
-public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticHistroyService {
-    private static final Logger log = LoggerFactory.getLogger(DataStoreStatisticHistroyService.class);
+public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticHistoryService {
+    private static final Logger log = LoggerFactory.getLogger(DataStoreStatisticHistoryService.class);
     @Autowired
     private Gson gson;
-    private static String dmeHostUrl;
+    @Autowired
+    private DmeAccessService dmeAccessService;
+
+    private final String STATISTIC_QUERY = "/rest/metrics/v1/data-svc/history-data/action/query";
+    private final String OBJ_TYPES_LIST = "/rest/metrics/v1/mgr-svc/obj-types";
+    private final String INDICATORS_LIST = "/rest/metrics/v1/mgr-svc/indicators";
+    private final String OBJ_TYPE_INDICATORS_QUERY = "/rest/metrics/v1/mgr-svc/obj-types/{obj-type-id}/indicators";
 
     //性能指标 id和name的映射关系
     private static Map<String, String> indicatorNameIdMap = new HashMap<>();
@@ -40,9 +45,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         remap.put("code", 200);
         remap.put("message", "queryStatistic success!");
         remap.put("data", params);
-
-        String hostUrl = "https://" + params.get("hostIp") + ":" + params.get("hostPort");
-        dmeHostUrl = hostUrl;
 
         ResponseEntity responseEntity;
         Object statisticObj;
@@ -69,14 +71,13 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     //query statistic
     private ResponseEntity queryStatistic(Map<String, Object> params) throws Exception {
         ResponseEntity responseEntity;
-        String apiUrl = "/rest/metrics/v1/data-svc/history-data/action/query";
-        String objTypeId = params.get("objTypeId").toString();
-        Object indicatorIds = params.get("indicatorIds");
+        String objTypeId = params.get("obj_type_id").toString();
+        Object indicatorIds = params.get("indicator_ids");
         Object objIds = params.get("obj_ids");
         String interval = params.get("interval").toString();
         String range = params.get("range").toString();
-        String beginTime = params.get("beginTiem").toString();
-        String endTime = params.get("endTime").toString();
+        String beginTime = params.get("begin_time").toString();
+        String endTime = params.get("end_time").toString();
 
         //参数预处理 效验赋值 处理资源对象类型指标 指标id name转换等
         //parseParams(); ......
@@ -90,15 +91,14 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         requestbody.put("begin_time", beginTime);
         requestbody.put("end_time", endTime);
 
-        responseEntity = getApi(apiUrl, HttpMethod.POST, requestbody.toString());
+        responseEntity = dmeAccessService.access(STATISTIC_QUERY, HttpMethod.POST, requestbody.toString());
 
         return responseEntity;
     }
 
     // query obj_types
     private void queryObjtypes() throws Exception {
-        String apiUrl = "/rest/metrics/v1/mgr-svc/obj-types";
-        ResponseEntity responseEntity = getApi(apiUrl, HttpMethod.GET, null);
+        ResponseEntity responseEntity = dmeAccessService.access(OBJ_TYPES_LIST, HttpMethod.GET, null);
         if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
             Object body = responseEntity.getBody();
             JsonObject bodyJson = new JsonParser().parse(body.toString()).getAsJsonObject();
@@ -115,14 +115,14 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     // query obj_type indicators
     private void queryIndicatorsOfObjetype(Map<String, Object> params) throws Exception {
-        String apiUrl = "/rest/metrics/v1/mgr-svc/obj-types/{obj-type-id}/indicators";
+        String apiUrl = OBJ_TYPE_INDICATORS_QUERY;
         String objtypeId = params.get("obj_type_id").toString();
         apiUrl = apiUrl.replace("{obj-type-id}", objtypeId);
         if (apiUrl.indexOf("{obj-type-id}") > 0) {
             log.error("DataStoreStatistic query,the url is error, required \"obj-type-id\"!{}", apiUrl);
             return;
         }
-        ResponseEntity responseEntity = getApi(apiUrl, HttpMethod.GET, null);
+        ResponseEntity responseEntity = dmeAccessService.access(apiUrl, HttpMethod.GET, null);
 
         if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
             Object body = responseEntity.getBody();
@@ -140,9 +140,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     // query indicators
     private void queryIndicators() throws Exception {
-        String apiUrl = "/rest/metrics/v1/mgr-svc/indicators";
-        ResponseEntity responseEntity = getApi(apiUrl, HttpMethod.POST, null);
-
+        ResponseEntity responseEntity = dmeAccessService.access(INDICATORS_LIST, HttpMethod.POST, null);
         if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
             Object body = responseEntity.getBody();
             JsonObject bodyJson = new JsonParser().parse(body.toString()).getAsJsonObject();
@@ -156,21 +154,5 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 indicatorNameIdMap.put(counterName, counterId);
             }
         }
-    }
-
-    private ResponseEntity getApi(String url, HttpMethod method, String requestBody) throws Exception {
-        ResponseEntity responseEntity = null;
-
-        RestUtils restUtils = new RestUtils();
-        RestTemplate restTemplate = restUtils.getRestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
-        responseEntity = restTemplate.exchange(dmeHostUrl + url, method, entity, String.class);
-        log.info("servicelevel url:{},response:{}", url, gson.toJson(responseEntity));
-        return responseEntity;
     }
 }

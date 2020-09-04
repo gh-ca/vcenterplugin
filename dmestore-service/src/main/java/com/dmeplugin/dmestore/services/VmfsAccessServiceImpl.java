@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +29,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     @Autowired
     private DmeAccessService dmeAccessService;
 
-    public static final String LIST_VOLUME_URL = "/rest/blockservice/v1/volumes";
+
+    private final String LIST_VOLUME_URL = "/rest/blockservice/v1/volumes";
+    private final String HOST_UNMAPAPING = "/rest/blockservice/v1/volumes/host-unmapping";
+    private final String HOSTGROUP_UNMAPPING = "/rest/blockservice/v1/volumes/hostgroup-unmapping";
+    private final String VOLUME_DELETE = "/rest/blockservice/v1/volumes/delete";
+
 
     @Override
     public List<VmfsDataInfo> listVmfs() throws Exception {
@@ -137,11 +143,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         ResponseEntity<String> responseEntity;
         try {
             responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            if(responseEntity.getStatusCodeValue()/100 != 2){
+            if (responseEntity.getStatusCodeValue() / 100 != 2) {
                 LOG.error("查询卷信息失败！错误信息:{}", responseEntity.getBody());
                 return null;
             }
-        }catch (Exception ex){
+        } catch (Exception ex) {
             LOG.error("查询卷信息异常", ex);
             return null;
         }
@@ -170,12 +176,51 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
         JsonObject smartqos = tuning.getAsJsonObject("smartqos");
         //Qos Policy
-        if(null != smartqos){
+        if (null != smartqos) {
             volumeDetail.setControlPolicy(smartqos.get("control_policy").getAsString());
             //TODO
             volumeDetail.setTrafficControl("--");
         }
         return volumeDetail;
+    }
+
+    @Override
+    public void deleteVmfs(Map<String, Object> params) throws Exception{
+        ResponseEntity responseHostGroupUnmaaping = hostGroupUnmapping(params);
+        ResponseEntity responseHostUnmapping = hostUnmapping(params);
+        if(202 == responseHostGroupUnmaaping.getStatusCodeValue() && 202 == responseHostUnmapping.getStatusCodeValue()){
+            Object volumeIds = params.get("volumeIds");
+            Map<String, Object> requestbody = new HashMap<>();
+            requestbody.put("volume_ids", volumeIds);
+            ResponseEntity responseEntity = dmeAccessService.access(VOLUME_DELETE, HttpMethod.POST, requestbody.toString());
+            if(202 != responseEntity.getStatusCodeValue()){
+                throw new Exception("delete volume error!");
+            }
+        }else{
+            throw new Exception("delete volume precondition unmapping host and hostGroup error!");
+        }
+    }
+
+    private ResponseEntity hostUnmapping(Map<String, Object> params) throws Exception {
+        String hostId = params.get("hostId").toString();
+        Object volumeIds = params.get("volumeIds");
+
+        Map<String, Object> requestbody = new HashMap<>();
+        requestbody.put("host_id", hostId);
+        requestbody.put("volume_ids", volumeIds);
+        ResponseEntity responseEntity = dmeAccessService.access(HOST_UNMAPAPING, HttpMethod.POST, requestbody.toString());
+        return responseEntity;
+    }
+
+    private ResponseEntity hostGroupUnmapping(Map<String, Object> params) throws Exception{
+        String hostGroupId= params.get("hostGroupId").toString();
+        Object volumeIds = params.get("volumeIds");
+        Map<String, Object> requestbody = new HashMap<>();
+        requestbody.put("host_id", hostGroupId);
+        requestbody.put("volume_ids", volumeIds);
+        ResponseEntity responseEntity = dmeAccessService.access(HOSTGROUP_UNMAPPING, HttpMethod.POST, requestbody.toString());
+        return responseEntity;
+
     }
 
     private double getDouble(String obj) {

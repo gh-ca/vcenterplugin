@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -118,5 +117,28 @@ public class VmfsAccessController extends BaseController{
         return failure(failureStr);
     }
 
-
+    /*
+   * Delete vmfs
+   * param list<str> volume_ids: 卷id列表 必
+   * param str host_id: 主机id 必
+   * param str hostGroup_id: 主机id 必
+   * return: Return execution status and information
+   *         code:Status code 202 or 503
+   *         message:Information
+   *         data: Data，including task_id
+   */
+    @RequestMapping(value = "/deletevmfs", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean deleteVmfs(@RequestBody Map<String, Object> params) throws Exception {
+        LOG.info("accessvmfs/deletevmfs==" + gson.toJson(params));
+        String failureStr = "";
+        try {
+            vmfsAccessService.deleteVmfs(params);
+            return success();
+        } catch (Exception e) {
+            LOG.error("delete vmfs failure:" + e);
+            failureStr = e.getMessage();
+        }
+        return failure(failureStr);
+    }
 }
