@@ -3,6 +3,7 @@ package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.model.VmfsDataInfo;
 import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
+import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -41,7 +42,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         List<VmfsDataInfo> relists = null;
         try {
             //取得vcenter中的所有vmfs存储。
-            String listStr = VCSDKUtils.getAllVmfsDataStores(VCSDKUtils.STORE_TYPE_VMFS);
+            String listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_VMFS);
             LOG.info("Vmfs listStr==" + listStr);
             if (!StringUtils.isEmpty(listStr)) {
                 JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
@@ -52,9 +53,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         //LOG.info("jo==" + jo.toString());
 
                         VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
-                        double capacity = getDouble(jo.get("capacity").getAsString()) / 1024 / 1024 / 1024;
-                        double freeSpace = getDouble(jo.get("freeSpace").getAsString()) / 1024 / 1024 / 1024;
-                        double uncommitted = getDouble(jo.get("uncommitted").getAsString()) / 1024 / 1024 / 1024;
+                        double capacity = ToolUtils.getDouble(jo.get("capacity").getAsString()) / ToolUtils.Gi;
+                        double freeSpace = ToolUtils.getDouble(jo.get("freeSpace").getAsString()) / ToolUtils.Gi;
+                        double uncommitted = ToolUtils.getDouble(jo.get("uncommitted").getAsString()) / ToolUtils.Gi;
 
                         vmfsDataInfo.setName(jo.get("name").getAsString());
 
@@ -221,17 +222,5 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         ResponseEntity responseEntity = dmeAccessService.access(HOSTGROUP_UNMAPPING, HttpMethod.POST, requestbody.toString());
         return responseEntity;
 
-    }
-
-    private double getDouble(String obj) {
-        double re = 0;
-        try {
-            if (!StringUtils.isEmpty(obj)) {
-                re = Double.parseDouble(obj);
-            }
-        } catch (Exception e) {
-            LOG.error("error:", e);
-        }
-        return re;
     }
 }
