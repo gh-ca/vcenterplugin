@@ -117,7 +117,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             url = dmeHostUrl + url;
         }
         responseEntity = restTemplate.exchange(url, method, entity, String.class);
-        LOG.info(url + "==responseEntity==" + responseEntity);
+        LOG.info(url + "==responseEntity==" + (responseEntity==null?"null":responseEntity.getStatusCodeValue()));
         if (responseEntity.getStatusCodeValue() == 403 ||
                 responseEntity.getStatusCodeValue() == 401) {
             //如果token失效，重新登录

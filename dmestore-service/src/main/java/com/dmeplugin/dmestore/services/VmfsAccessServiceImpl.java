@@ -61,35 +61,44 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         ///rest/blockservice/v1/volumes?volume_wwn=wwn
                         //这里由于DME系统中的卷太多。是分页查询，所以需要vmfs一个个的去查DME系统中的卷。
                         //而每次查询DME中的卷都需要调用两次，分别是查卷列表接口，查卷详细接口。
-                        ResponseEntity responseEntity = dmeAccessService.access(LIST_VOLUME_URL + "?volume_wwn=" + wwn, HttpMethod.GET, null);
-                        LOG.info("listVmfs responseEntity==" + responseEntity.toString());
-                        if (responseEntity.getStatusCodeValue() == 200) {
-                            JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
-                            LOG.info("listVmfs jsonObject==" + jsonObject.toString());
-                            JsonObject vjson = jsonObject.getAsJsonArray("volumes").get(0).getAsJsonObject();
-
-                            vmfsDataInfo.setStatus(vjson.get("status").getAsString());
-                            vmfsDataInfo.setServiceLevelName(vjson.get("service_level_name").getAsString());
-                            vmfsDataInfo.setVmfsProtected(vjson.get("protected").getAsBoolean());
-
-                            String volid = vjson.get("id").getAsString();
-                            //通过卷ID再调卷详细接口
-                            responseEntity = dmeAccessService.access(LIST_VOLUME_URL + "/" + volid, HttpMethod.GET, null);
-                            LOG.info("volid responseEntity==" + responseEntity.toString());
+                        String volumeUrlByWwn = LIST_VOLUME_URL + "?volume_wwn=" + wwn;
+                        try {
+                            ResponseEntity responseEntity = dmeAccessService.access(volumeUrlByWwn, HttpMethod.GET, null);
+                            LOG.info("listVmfs responseEntity==" + responseEntity.toString());
                             if (responseEntity.getStatusCodeValue() == 200) {
-                                JsonObject voljson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
-                                LOG.info("volid voljson==" + voljson.toString());
-                                JsonObject vjson2 = voljson.getAsJsonObject("volume");
+                                JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                                //LOG.info("listVmfs jsonObject==" + jsonObject.toString());
+                                JsonObject vjson = jsonObject.getAsJsonArray("volumes").get(0).getAsJsonObject();
 
+                                vmfsDataInfo.setStatus(vjson.get("status").getAsString());
+                                vmfsDataInfo.setServiceLevelName(vjson.get("service_level_name").getAsString());
+                                vmfsDataInfo.setVmfsProtected(vjson.get("protected").getAsBoolean());
 
+                                String volid = vjson.get("id").getAsString();
                                 //通过卷ID再调卷详细接口
+                                String detailedVolumeUrl = LIST_VOLUME_URL + "/" + volid;
+                                try {
+                                    responseEntity = dmeAccessService.access(detailedVolumeUrl, HttpMethod.GET, null);
+                                    LOG.info("volid responseEntity==" + responseEntity.toString());
+                                    if (responseEntity.getStatusCodeValue() == 200) {
+                                        JsonObject voljson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                                        //LOG.info("volid voljson==" + voljson.toString());
+                                        JsonObject vjson2 = voljson.getAsJsonObject("volume");
 
 
+                                        //通过卷ID再调卷详细接口
+
+
+                                    }
+                                }catch (Exception ex){
+                                    LOG.error("DME link error url:"+detailedVolumeUrl+",error:"+ex.getMessage());
+                                }
+
+                                relists.add(vmfsDataInfo);
                             }
-
-
+                        }catch (Exception e){
+                            LOG.error("DME link error url:"+volumeUrlByWwn+",error:"+e.getMessage());
                         }
-                        relists.add(vmfsDataInfo);
 
                     }
                 }
