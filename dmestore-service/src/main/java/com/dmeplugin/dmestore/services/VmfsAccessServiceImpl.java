@@ -1,6 +1,8 @@
 package com.dmeplugin.dmestore.services;
 
 
+import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
+import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.model.VmfsDataInfo;
 import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
 import com.dmeplugin.dmestore.utils.ToolUtils;
@@ -28,6 +30,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     @Autowired
     private Gson gson = new Gson();
     @Autowired
+    private DmeVmwareRalationDao dmeVmwareRalationDao;
+    @Autowired
     private DmeAccessService dmeAccessService;
 
 
@@ -41,6 +45,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     public List<VmfsDataInfo> listVmfs() throws Exception {
         List<VmfsDataInfo> relists = null;
         try {
+            //从关系表中取得DME卷与vcenter存储的对应关系
+            List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_VMFS);
+            LOG.info("dvrlist=="+gson.toJson(dvrlist));
             //取得vcenter中的所有vmfs存储。
             String listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_VMFS);
             LOG.info("Vmfs listStr==" + listStr);
@@ -242,5 +249,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         ResponseEntity responseEntity = dmeAccessService.access(HOSTGROUP_UNMAPPING, HttpMethod.POST, requestbody.toString());
         return responseEntity;
 
+    }
+
+    public void setDmeVmwareRalationDao(DmeVmwareRalationDao dmeVmwareRalationDao) {
+        this.dmeVmwareRalationDao = dmeVmwareRalationDao;
     }
 }

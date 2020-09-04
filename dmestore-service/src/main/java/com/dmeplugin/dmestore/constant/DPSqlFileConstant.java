@@ -24,12 +24,15 @@ public class DPSqlFileConstant {
           "    id integer PRIMARY KEY AUTO_INCREMENT NOT NULL,\n" +
           "    store_id VARCHAR(255),\n" +
           "    store_name VARCHAR(255),\n" +
-          "    Volume_id VARCHAR(255),\n" +
-          "    Volume_name VARCHAR(255),\n" +
-          "    Volume_wwn VARCHAR(255),\n" +
+          "    volume_id VARCHAR(255),\n" +
+          "    volume_name VARCHAR(255),\n" +
+          "    volume_wwn VARCHAR(255),\n" +
+          "    volume_share VARCHAR(255),\n" +
+          "    volume_fs VARCHAR(255),\n" +
+          "    store_type VARCHAR(255),\n" +
           "    createTime datetime DEFAULT NOW(),\n" +
           "    updateTime datetime DEFAULT NOW(),\n" +
-          "    state int DEFAULT 1\n" +
+          "    STATE int DEFAULT 1\n" +
           ");";
 
 }

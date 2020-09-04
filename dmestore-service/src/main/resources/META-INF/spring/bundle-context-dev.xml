@@ -57,7 +57,12 @@
     <bean name="serviceLevelService" class="com.dmeplugin.dmestore.services.ServiceLevelServiceImpl">
     </bean>
 
+    <bean name="dmeVmwareRalationDao" class="com.dmeplugin.dmestore.dao.DmeVmwareRalationDao">
+        <property name="url" value="${h2.url}"/>
+    </bean>
+
     <bean name="vmfsAccessService" class="com.dmeplugin.dmestore.services.VmfsAccessServiceImpl">
+        <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
     </bean>
 
     <bean name="DataStoreStatisticHistoryService" class="com.dmeplugin.dmestore.services.DataStoreStatisticHistoryServiceImpl">

@@ -45,13 +45,14 @@ public class DmeInfoDao extends H2DataBaseDao {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
+        DmeInfo dmeInfo = null;
         try {
             con = getConnection();
             ps = con.prepareStatement("SELECT * FROM " + DPSqlFileConstant.DP_DME_ACCESS_INFO
                     + " WHERE state=1");
             rs = ps.executeQuery();
             if (rs.next()) {
-                DmeInfo dmeInfo = new DmeInfo();
+                dmeInfo = new DmeInfo();
                 dmeInfo.setId(rs.getInt("ID"));
                 dmeInfo.setHostIp(rs.getString("HOSTIP"));
                 dmeInfo.setHostPort(rs.getInt("HOSTPORT"));
@@ -60,7 +61,6 @@ public class DmeInfoDao extends H2DataBaseDao {
                 dmeInfo.setCreateTime(rs.getTimestamp("CREATETIME"));
                 dmeInfo.setUpdateTime(rs.getTimestamp("UPDATETIME"));
                 dmeInfo.setState(rs.getInt("STATE"));
-                return dmeInfo;
             }
         } catch (DataBaseException | SQLException e) {
             LOGGER.error("Failed to get dme access info: " + e.getMessage());
@@ -68,7 +68,7 @@ public class DmeInfoDao extends H2DataBaseDao {
         } finally {
             closeConnection(con, ps, rs);
         }
-        return null;
+        return dmeInfo;
     }
 
 
