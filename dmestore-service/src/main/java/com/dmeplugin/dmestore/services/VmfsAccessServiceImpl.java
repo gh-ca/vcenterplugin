@@ -35,14 +35,15 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         List<VmfsDataInfo> relists = null;
         try {
             //取得vcenter中的所有vmfs存储。
-            String listStr = VCSDKUtils.getAllVmfsDataStores();
+            String listStr = VCSDKUtils.getAllVmfsDataStores(VCSDKUtils.STORE_TYPE_VMFS);
+            LOG.info("Vmfs listStr==" + listStr);
             if (!StringUtils.isEmpty(listStr)) {
                 JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
                 if (jsonArray != null && jsonArray.size() > 0) {
                     relists = new ArrayList<>();
                     for (int i = 0; i < jsonArray.size(); i++) {
                         JsonObject jo = jsonArray.get(i).getAsJsonObject();
-                        LOG.info("jo==" + jo.toString());
+                        //LOG.info("jo==" + jo.toString());
 
                         VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
                         double capacity = getDouble(jo.get("capacity").getAsString()) / 1024 / 1024 / 1024;

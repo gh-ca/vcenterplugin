@@ -13,6 +13,7 @@ import com.vmware.vim25.mo.ManagedEntity;
 import com.vmware.vim25.mo.ServiceInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -22,10 +23,10 @@ public class VCSDKUtils {
 
     private final static Logger _logger = LoggerFactory.getLogger(EchoServiceImpl.class);
 
-    private final static String STORE_TYPE_VMFS = "VMFS";
-    private final static String STORE_TYPE_NFS = "NFS";
+    public final static String STORE_TYPE_VMFS = "VMFS";
+    public final static String STORE_TYPE_NFS = "NFS";
 
-    public static String getAllVmfsDataStores() throws Exception{
+    public static String getAllVmfsDataStores(String storeType) throws Exception{
         String listStr = "";
         ConnectedVimServiceBase connectedVimServiceBase = null;
         try {
@@ -43,7 +44,9 @@ public class VCSDKUtils {
             if(datastoreSummaryList!=null && datastoreSummaryList.size()>0) {
                 List<DatastoreSummary> lists = new ArrayList<>();
                 for (DatastoreSummary datastoreSummary : datastoreSummaryList) {
-                    if(datastoreSummary.getType().equals(STORE_TYPE_VMFS)){
+                    if(StringUtils.isEmpty(storeType)){
+                        lists.add(datastoreSummary);
+                    }else if(datastoreSummary.getType().equals(storeType)){
                         lists.add(datastoreSummary);
                     }
                 }
@@ -65,41 +68,15 @@ public class VCSDKUtils {
     }
 
     public static void main(String[] args) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
-        ConnectedVimServiceBase connectedVimServiceBase=new ConnectedVimServiceBase();
-        Connection connection=new BasicConnection();
-        connection.setUrl("https://10.143.132.248:443/sdk");
-        connection.setUsername("administrator@vsphere.local");
-        connection.setPassword("Pbu4@123");
-        connectedVimServiceBase.setConnection(connection);
-        connectedVimServiceBase.connect();
-        /*Map<String, ManagedObjectReference> mapme= datastoreVimBase.getDatastores();
-        for (String key:mapme.keySet()){
-            System.out.println(key+mapme.get(key));
-        }*/
-
-        DatastoreVimBase datastoreVimBase=new DatastoreVimBase(connectedVimServiceBase);
-
-
-//        List<DatastoreInfo> dslist=datastoreVimBase.getAllDatastoreInfo();
-//
-//        for (DatastoreInfo ds:dslist){
-//            System.out.println(ds.getName());
-//        }
-
-        List<DatastoreSummary> datastoreSummaryList=datastoreVimBase.getAllDatastoreSummary();
-
-        for (DatastoreSummary ds:datastoreSummaryList){
-            System.out.println(ds.getName()+"=="+ds.getType()+"=="+ds.getCapacity());
+        try {
+            String listStr = VCSDKUtils.getAllVmfsDataStores(null);
+            _logger.info("Vmfs listStr==" + listStr);
+            listStr = VCSDKUtils.getAllVmfsDataStores(VCSDKUtils.STORE_TYPE_VMFS);
+            _logger.info("Vmfs listStr==" + listStr);
+            listStr = VCSDKUtils.getAllVmfsDataStores(VCSDKUtils.STORE_TYPE_NFS);
+            _logger.info("Vmfs listStr==" + listStr);
+        }catch (Exception e){
+            e.printStackTrace();
         }
-
-//        HostSystemVimBase hostSystemVimBase=new HostSystemVimBase(connectedVimServiceBase);
-//        List<HostListSummary> hostsummarylist=hostSystemVimBase.getAllHostSummary();
-//
-//        ClusterVimBase clusterVimBase=new ClusterVimBase(connectedVimServiceBase);
-//        List<ComputeResourceSummary> clustersummarylist=clusterVimBase.getAllClusterSummary();
-//
-//        ComputeResourceSummary clustersummary=clusterVimBase.getClusterSummaryByName("pbu4test");
-
-        connectedVimServiceBase.disconnect();
     }
 }
