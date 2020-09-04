@@ -53,11 +53,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         //LOG.info("jo==" + jo.toString());
 
                         VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
-                        double capacity = ToolUtils.getDouble(jo.get("capacity").getAsString()) / ToolUtils.Gi;
-                        double freeSpace = ToolUtils.getDouble(jo.get("freeSpace").getAsString()) / ToolUtils.Gi;
-                        double uncommitted = ToolUtils.getDouble(jo.get("uncommitted").getAsString()) / ToolUtils.Gi;
+                        double capacity = ToolUtils.getDouble(jo.get("capacity")) / ToolUtils.Gi;
+                        double freeSpace = ToolUtils.getDouble(jo.get("freeSpace")) / ToolUtils.Gi;
+                        double uncommitted = ToolUtils.getDouble(jo.get("uncommitted")) / ToolUtils.Gi;
 
-                        vmfsDataInfo.setName(jo.get("name").getAsString());
+                        vmfsDataInfo.setName(ToolUtils.jsonToStr(jo.get("name")));
 
                         vmfsDataInfo.setCapacity(capacity);
                         vmfsDataInfo.setFreeSpace(freeSpace);
@@ -78,11 +78,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                 //LOG.info("listVmfs jsonObject==" + jsonObject.toString());
                                 JsonObject vjson = jsonObject.getAsJsonArray("volumes").get(0).getAsJsonObject();
 
-                                vmfsDataInfo.setStatus(vjson.get("status").getAsString());
-                                vmfsDataInfo.setServiceLevelName(vjson.get("service_level_name").getAsString());
-                                vmfsDataInfo.setVmfsProtected(vjson.get("protected").getAsBoolean());
+                                vmfsDataInfo.setStatus(ToolUtils.jsonToStr(vjson.get("status")));
+                                vmfsDataInfo.setServiceLevelName(ToolUtils.jsonToStr(vjson.get("service_level_name")));
+                                vmfsDataInfo.setVmfsProtected(ToolUtils.jsonToBoo(vjson.get("protected")));
 
-                                String volid = vjson.get("id").getAsString();
+                                String volid = ToolUtils.jsonToStr(vjson.get("id"));
                                 //通过卷ID再调卷详细接口
                                 String detailedVolumeUrl = LIST_VOLUME_URL + "/" + volid;
                                 try {
@@ -92,7 +92,19 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                         JsonObject voljson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                                         //LOG.info("volid voljson==" + voljson.toString());
                                         JsonObject vjson2 = voljson.getAsJsonObject("volume");
-
+                                        if(vjson2!=null && vjson2.get("tuning")!=null) {
+                                            JsonObject tuning = vjson2.getAsJsonObject("tuning");
+                                            if(tuning!=null && tuning.get("smartqos")!=null) {
+                                                JsonObject smartqos = tuning.getAsJsonObject("smartqos");
+                                                if(smartqos!=null) {
+                                                    vmfsDataInfo.setMaxIops(ToolUtils.jsonToInt(smartqos.get("maxiops")));
+                                                    vmfsDataInfo.setMinIops(ToolUtils.jsonToInt(smartqos.get("miniops")));
+                                                    vmfsDataInfo.setMaxBandwidth(ToolUtils.jsonToInt(smartqos.get("maxbandwidth")));;
+                                                    vmfsDataInfo.setMinBandwidth(ToolUtils.jsonToInt(smartqos.get("minbandwidth")));
+                                                    vmfsDataInfo.setLatency(ToolUtils.jsonToInt(smartqos.get("latency")));
+                                                }
+                                            }
+                                        }
 
                                         //通过卷ID再调卷详细接口
 

@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.utils;
 
+import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -20,6 +21,42 @@ public class ToolUtils {
         try {
             if (!StringUtils.isEmpty(obj)) {
                 re = Double.parseDouble(obj.toString());
+            }
+        } catch (Exception e) {
+            LOG.error("error:", e);
+        }
+        return re;
+    }
+
+    public static String jsonToStr(JsonElement obj) {
+        String re = "";
+        try {
+            if (!StringUtils.isEmpty(obj)) {
+                re = obj.getAsString();
+            }
+        } catch (Exception e) {
+            LOG.error("error:", e);
+        }
+        return re;
+    }
+
+    public static int jsonToInt(JsonElement obj) {
+        int re = 0;
+        try {
+            if (!StringUtils.isEmpty(obj)) {
+                re = obj.getAsInt();
+            }
+        } catch (Exception e) {
+            LOG.error("error:", e);
+        }
+        return re;
+    }
+
+    public static boolean jsonToBoo(JsonElement obj) {
+        boolean re = false;
+        try {
+            if (!StringUtils.isEmpty(obj)) {
+                re = obj.getAsBoolean();
             }
         } catch (Exception e) {
             LOG.error("error:", e);
