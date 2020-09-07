@@ -11,4 +11,6 @@ import java.util.Map;
  **/
 public interface DataStoreStatisticHistoryService {
     Map<String, Object> queryVmfsStatistic(Map<String, Object> params);
+
+    Map<String, Object> queryVmfsStatisticCurrent(Map<String, Object> params);
 }
