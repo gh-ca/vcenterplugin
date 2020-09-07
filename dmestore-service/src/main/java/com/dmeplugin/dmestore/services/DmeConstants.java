@@ -28,4 +28,9 @@ public class DmeConstants {
      * NFS Datastore FileService列表
      **/
     public static final String DME_NFS_FILESERVICE_QUERY_URL = "/rest/fileservice/v1/filesystems/query";
+
+    /**
+     * NFS Datastore FileService详情
+     **/
+    public static final String DME_NFS_FILESERVICE_DETAIL_URL = "/rest/fileservice/v1/filesystems/#{file_system_id}";
 }

@@ -114,12 +114,27 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         for (int i = 0; i < totalArray.size(); i++) {
             JsonObject object = totalArray.get(i).getAsJsonObject();
             NFSDataStoreFSAttr fsAttr = new NFSDataStoreFSAttr();
-
-
-
+            fsAttr.setName(object.get("name").getAsString());
+            fsAttr.setProvisionType(object.get("alloc_type").getAsString());
+            fsAttr.setDevice(object.get("storage_name").getAsString());
+            fsAttr.setStoragePoolName(object.get("storage_pool_name").getAsString());
+            //TODO 控制器暂未找到对应的值。
+            fsAttr.setController("--");
+            //查询详情，获取tuning信息
+            String file_system_id = object.get("id").getAsString();
+            url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL,
+                    "file_system_id", file_system_id);
+            ResponseEntity<String> responseTuning = dmeAccessService.access(url, HttpMethod.GET, null);
+            if (responseTuning.getStatusCodeValue() / 100 == 2) {
+                JsonObject fsDetail = gson.fromJson(responseTuning.getBody(), JsonObject.class);
+                JsonObject tuning = fsDetail.getAsJsonObject("tuning");
+                fsAttr.setApplicationScenario(tuning.get("application_scenario").getAsString());
+                fsAttr.setDataDeduplication(tuning.get("deduplication_enabled").getAsBoolean());
+                fsAttr.setDateCompression(tuning.get("compression_enabled").getAsBoolean());
+            }
             list.add(fsAttr);
         }
 
-        return null;
+        return list;
     }
 }
