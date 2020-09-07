@@ -253,34 +253,83 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     public boolean vmfsDatastoreVolumeRelation() throws Exception {
         String listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_VMFS);
         LOG.info("===list vmfs datastore success====\n{}", listStr);
-        if (!StringUtils.isEmpty(listStr)) {
-            JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
-            if (jsonArray != null && jsonArray.size() > 0) {
-                for (int i = 0; i < jsonArray.size(); i++) {
-                    JsonObject vmfsDatastore = jsonArray.get(i).getAsJsonObject();
-                    String store_type = ToolUtils.STORE_TYPE_VMFS;
-                    //TODO 暂时认为是从url中获取到wwn信息
-                    String vmfsDatastoreUrl = vmfsDatastore.get("url").getAsString();
-                    String vmfsDatastoreId = vmfsDatastore.get("id").getAsString();
-                    String vmfsDatastoreName = vmfsDatastore.get("name").getAsString();
-                    //拆分wwn
-                    String wwn = vmfsDatastoreUrl.split("volumes/")[1];
-                    //根据wwn从DME中查询卷信息
-                    String volumeUrlByWwn = LIST_VOLUME_URL + "?volume_wwn=" + wwn;
-                    ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByWwn, HttpMethod.GET, null);
-                    if (responseEntity.getStatusCodeValue() / 100 != 2) {
-                        LOG.info(" Query DME volume failed! errorMsg:{}", responseEntity.toString());
-                        continue;
-                    }
-                    JsonObject jsonObject = gson.fromJson(responseEntity.getBody(), JsonObject.class);
-                    JsonObject volume = jsonObject.getAsJsonArray("volumes").get(0).getAsJsonObject();
-                    String volumeId = volume.get("id").getAsString();
-                    String volumeName = volume.get("name").getAsString();
-                    String volumeWwn  = volume.get("volume_wwn").getAsString();
-                }
+        if (StringUtils.isEmpty(listStr)) {
+            return false;
+        }
+        //TODO
+        JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
+        List<DmeVmwareRelation> relationList = new ArrayList<>();
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JsonObject vmfsDatastore = jsonArray.get(i).getAsJsonObject();
+            String store_type = ToolUtils.STORE_TYPE_VMFS;
+            //TODO 暂时认为是从url中获取到wwn信息
+            String vmfsDatastoreUrl = vmfsDatastore.get("url").getAsString();
+            String vmfsDatastoreId = vmfsDatastore.get("id").getAsString();
+            String vmfsDatastoreName = vmfsDatastore.get("name").getAsString();
+            //拆分wwn
+            String wwn = vmfsDatastoreUrl.split("volumes/")[1];
+            //根据wwn从DME中查询卷信息
+            String volumeUrlByWwn = LIST_VOLUME_URL + "?volume_wwn=" + wwn;
+            ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByWwn, HttpMethod.GET, null);
+            if (responseEntity.getStatusCodeValue() / 100 != 2) {
+                LOG.info(" Query DME volume failed! errorMsg:{}", responseEntity.toString());
+                continue;
+            }
+            JsonObject jsonObject = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+            JsonObject volume = jsonObject.getAsJsonArray("volumes").get(0).getAsJsonObject();
+            String volumeId = volume.get("id").getAsString();
+            String volumeName = volume.get("name").getAsString();
+            String volumeWwn = volume.get("volume_wwn").getAsString();
+
+            DmeVmwareRelation relation = new DmeVmwareRelation();
+            relation.setStoreId(vmfsDatastoreId);
+            relation.setStoreName(vmfsDatastoreName);
+            relation.setVolumeId(volumeId);
+            relation.setVolumeName(volumeName);
+            relation.setVolumeWwn(volumeWwn);
+            relation.setStoreType(store_type);
+            relation.setState(1);
+
+            relationList.add(relation);
+        }
+
+        if (relationList.size() > 0) {
+            //数据库处理
+            return dmeVmwareRelationDBProcess(relationList, ToolUtils.STORE_TYPE_VMFS);
+        }
+        return true;
+    }
+
+    private boolean dmeVmwareRelationDBProcess(List<DmeVmwareRelation> relationList, String storeType) throws Exception {
+        //本地全量查询
+        List<String> localWwns = dmeVmwareRalationDao.getAllWwnByType(storeType);
+        //新增
+        List<DmeVmwareRelation> newList = new ArrayList<>();
+        List<DmeVmwareRelation> upList = new ArrayList<>();
+        for (DmeVmwareRelation o : relationList) {
+            String wwn = o.getVolumeWwn();
+            if (localWwns.contains(wwn)) {
+                upList.add(o);
+                localWwns.remove(wwn);
+            } else {
+                newList.add(o);
             }
         }
-        return false;
+
+        //更新
+        if (!upList.isEmpty()) {
+            dmeVmwareRalationDao.update(upList);
+        }
+
+        //新增
+        if (!newList.isEmpty()) {
+            dmeVmwareRalationDao.save(newList);
+        }
+        //删除
+        if (!localWwns.isEmpty()) {
+            dmeVmwareRalationDao.deleteByWwn(localWwns);
+        }
+        return true;
     }
 
 
