@@ -91,6 +91,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                         vmfsDataInfo.setServiceLevelName(ToolUtils.jsonToStr(vjson.get("service_level_name")));
                                         vmfsDataInfo.setVmfsProtected(ToolUtils.jsonToBoo(vjson.get("protected")));
 
+                                        String storage_id = ToolUtils.jsonToStr(vjson.get("storage_id"));
+                                        vmfsDataInfo.setDeviceId(storage_id);
+                                        vmfsDataInfo.setDevice("");
+
                                         String volid = ToolUtils.jsonToStr(vjson.get("id"));
                                         //通过卷ID再调卷详细接口
                                         String detailedVolumeUrl = LIST_VOLUME_URL + "/" + volid;

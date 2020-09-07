@@ -9,7 +9,8 @@ public class VmfsDataInfo {
     Double freeSpace; //空闲容量 单位GB
     Double reserveCapacity; //置备容量  capacity+uncommitted-freeSpace 单位GB
 
-    String device; //设备
+    String deviceId; //存储设备ID
+    String device; //存储设备名称
     String serviceLevelName;    //服务等级
     Boolean vmfsProtected;  //保护状态
 
@@ -170,5 +171,13 @@ public class VmfsDataInfo {
 
     public void setVolumeId(String volumeId) {
         this.volumeId = volumeId;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 }
