@@ -70,7 +70,8 @@
 
     <bean name="vmwareAccessService" class="com.dmeplugin.dmestore.services.VmwareAccessServiceImpl">
     </bean>
-
+    <bean name="dmeStorageService" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
+    </bean>
 
 
 </beans>
