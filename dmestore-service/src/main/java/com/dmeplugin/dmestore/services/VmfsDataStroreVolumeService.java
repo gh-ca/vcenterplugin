@@ -7,5 +7,6 @@ package com.dmeplugin.dmestore.services;
  * @author: liuxh
  * @create: 2020-09-03
  **/
-public class VmfsDataStroreVolumeService {
+public interface VmfsDataStroreVolumeService {
+
 }

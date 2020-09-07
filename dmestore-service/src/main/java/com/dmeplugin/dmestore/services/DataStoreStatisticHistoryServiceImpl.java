@@ -1,12 +1,12 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.utils.RestUtils;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -17,11 +17,22 @@ import java.util.*;
  * @author: liuxh
  * @create: 2020-09-03
  **/
-public class DataStoreStatisticHistoryServiceImpl implements DataSotreStatisticHistroyService {
-    private static final Logger log = LoggerFactory.getLogger(DataSotreStatisticHistroyService.class);
+public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticHistoryService {
+    private static final Logger log = LoggerFactory.getLogger(DataStoreStatisticHistoryService.class);
     @Autowired
     private Gson gson;
-    private static String dmeHostUrl;
+    @Autowired
+    private DmeAccessService dmeAccessService;
+
+    private final String STATISTIC_QUERY = "/rest/metrics/v1/data-svc/history-data/action/query";
+    private final String OBJ_TYPES_LIST = "/rest/metrics/v1/mgr-svc/obj-types";
+    private final String INDICATORS_LIST = "/rest/metrics/v1/mgr-svc/indicators";
+    private final String OBJ_TYPE_INDICATORS_QUERY = "/rest/metrics/v1/mgr-svc/obj-types/{obj-type-id}/indicators";
+
+    public static final String COUNTER_NAME_IOPS = "throughput";//IOPS指标名称
+    public static final String COUNTER_NAME_BANDWIDTH = "bandwidth";//带宽
+    public static final String COUNTER_NAME_READPESPONSETIME = "readResponseTime";//读响应时间
+    public static final String COUNTER_NAME_WRITERESPONSETIME = "writeResponseTime";//写响应时间
 
     //性能指标 id和name的映射关系
     private static Map<String, String> indicatorNameIdMap = new HashMap<>();
@@ -41,13 +52,10 @@ public class DataStoreStatisticHistoryServiceImpl implements DataSotreStatisticH
         remap.put("message", "queryStatistic success!");
         remap.put("data", params);
 
-        String hostUrl = "https://" + params.get("hostIp") + ":" + params.get("hostPort");
-        dmeHostUrl = hostUrl;
-
         ResponseEntity responseEntity;
         Object statisticObj;
         try {
-            responseEntity = queryStstistic(params);
+            responseEntity = queryStatistic(params);
             if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
                 Object body = responseEntity.getBody();
                 JsonObject bodyJson = new JsonParser().parse(body.toString()).getAsJsonObject();
@@ -66,17 +74,68 @@ public class DataStoreStatisticHistoryServiceImpl implements DataSotreStatisticH
         return remap;
     }
 
+    @Override
+    public Map<String, Object> queryVmfsStatisticCurrent(Map<String, Object> params) {
+        Map<String, Object> remap = new HashMap<>();
+
+        //以下为模拟响应报文的处理
+        Object obj_ids = params.get("obj_ids");
+        if (null != obj_ids) {
+            List<String> volumeIds = (List<String>) obj_ids;
+            JsonObject dataJson = vmfsStatisticCurrentMimic(volumeIds);
+            remap.put("code", 200);
+            remap.put("message", "queryStatistic success!");
+            remap.put("data", dataJson);
+        }
+
+        //以下为实际消息的处理
+       /* params.put("range", " LAST_5_MINUTE");
+        Map<String, Object> currenResMap = queryVmfsStatistic(params);
+        String code = currenResMap.get("code").toString();
+        if("200".equals(code)){
+            Object object = currenResMap.get("data");
+            JsonObject volumeRes = new JsonObject();
+            JsonObject dataJson =  new JsonParser().parse(object.toString()).getAsJsonObject();
+            Set<Map.Entry<String, JsonElement>> volumeSet = dataJson.getAsJsonObject().entrySet();
+            for(Map.Entry<String, JsonElement> volume : volumeSet){
+                JsonObject countRes = new JsonObject();
+                String volume_id = volume.getKey();
+                JsonObject counterObj= volume.getValue().getAsJsonObject();
+                Set<Map.Entry<String, JsonElement>> counterSet = counterObj.getAsJsonObject().entrySet();
+                for(Map.Entry<String, JsonElement> countere : counterSet){
+                    String counter_id = countere.getKey();
+                    JsonObject counterjson = countere.getValue().getAsJsonObject();
+                    JsonArray series = counterjson.getAsJsonArray("series");
+                    for(JsonElement elment : series){
+                        JsonObject serieJson = elment.getAsJsonObject();
+                        Set<Map.Entry<String, JsonElement>> serieJsonSet = serieJson.getAsJsonObject().entrySet();
+                        for(Map.Entry<String, JsonElement> serie : serieJsonSet){
+                            String value = serie.getValue().getAsString();
+                            countRes.addProperty(counter_id,value);
+                            break;
+                        }
+                        break;
+                    }
+                }
+                volumeRes.add(volume_id,countRes);
+            }
+            remap.put("data",volumeRes);
+        }
+        //else 不做处理,原始返回*/
+
+        return remap;
+    }
+
     //query statistic
-    private ResponseEntity queryStstistic(Map<String, Object> params) throws Exception {
+    private ResponseEntity queryStatistic(Map<String, Object> params) throws Exception {
         ResponseEntity responseEntity;
-        String apiUrl = "/rest/metrics/v1/data-svc/history-data/action/query";
-        String objTypeId = params.get("objTypeId").toString();
-        Object indicatorIds = params.get("indicatorIds");
+        String objTypeId = params.get("obj_type_id").toString();
+        Object indicatorIds = params.get("indicator_ids");
         Object objIds = params.get("obj_ids");
         String interval = params.get("interval").toString();
         String range = params.get("range").toString();
-        String beginTime = params.get("beginTiem").toString();
-        String endTime = params.get("endTime").toString();
+        String beginTime = params.get("begin_time").toString();
+        String endTime = params.get("end_time").toString();
 
         //参数预处理 效验赋值 处理资源对象类型指标 指标id name转换等
         //parseParams(); ......
@@ -87,18 +146,18 @@ public class DataStoreStatisticHistoryServiceImpl implements DataSotreStatisticH
         requestbody.put("obj_ids", objIds);
         requestbody.put("interval", interval);
         requestbody.put("range", range);
-        requestbody.put("begin_time", beginTime);
-        requestbody.put("end_time", endTime);
-
-        responseEntity = getApi(apiUrl, HttpMethod.POST, requestbody.toString());
+        if (!StringUtils.isEmpty(range) && "BEGIN_END_TIME".equals(range)) {
+            requestbody.put("begin_time", beginTime);
+            requestbody.put("end_time", endTime);
+        }
+        responseEntity = dmeAccessService.access(STATISTIC_QUERY, HttpMethod.POST, requestbody.toString());
 
         return responseEntity;
     }
 
     // query obj_types
     private void queryObjtypes() throws Exception {
-        String apiUrl = "/rest/metrics/v1/mgr-svc/obj-types";
-        ResponseEntity responseEntity = getApi(apiUrl, HttpMethod.GET, null);
+        ResponseEntity responseEntity = dmeAccessService.access(OBJ_TYPES_LIST, HttpMethod.GET, null);
         if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
             Object body = responseEntity.getBody();
             JsonObject bodyJson = new JsonParser().parse(body.toString()).getAsJsonObject();
@@ -115,14 +174,14 @@ public class DataStoreStatisticHistoryServiceImpl implements DataSotreStatisticH
 
     // query obj_type indicators
     private void queryIndicatorsOfObjetype(Map<String, Object> params) throws Exception {
-        String apiUrl = "/rest/metrics/v1/mgr-svc/obj-types/{obj-type-id}/indicators";
+        String apiUrl = OBJ_TYPE_INDICATORS_QUERY;
         String objtypeId = params.get("obj_type_id").toString();
         apiUrl = apiUrl.replace("{obj-type-id}", objtypeId);
         if (apiUrl.indexOf("{obj-type-id}") > 0) {
             log.error("DataStoreStatistic query,the url is error, required \"obj-type-id\"!{}", apiUrl);
             return;
         }
-        ResponseEntity responseEntity = getApi(apiUrl, HttpMethod.GET, null);
+        ResponseEntity responseEntity = dmeAccessService.access(apiUrl, HttpMethod.GET, null);
 
         if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
             Object body = responseEntity.getBody();
@@ -140,9 +199,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataSotreStatisticH
 
     // query indicators
     private void queryIndicators() throws Exception {
-        String apiUrl = "/rest/metrics/v1/mgr-svc/indicators";
-        ResponseEntity responseEntity = getApi(apiUrl, HttpMethod.POST, null);
-
+        ResponseEntity responseEntity = dmeAccessService.access(INDICATORS_LIST, HttpMethod.POST, null);
         if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
             Object body = responseEntity.getBody();
             JsonObject bodyJson = new JsonParser().parse(body.toString()).getAsJsonObject();
@@ -158,19 +215,22 @@ public class DataStoreStatisticHistoryServiceImpl implements DataSotreStatisticH
         }
     }
 
-    private ResponseEntity getApi(String url, HttpMethod method, String requestBody) throws Exception {
-        ResponseEntity responseEntity = null;
+    //vmfs当前性能数据
+    private JsonObject vmfsStatisticCurrentMimic(List<String> volumeIds) {
+        JsonObject dataObject = new JsonObject();
+        int counterValue_iops = 80;//IOPS指标名称
+        int counterValue_bandwidth = 1000;//带宽
+        int counterValue_readResponseTime = 10;//读响应时间
+        int counterValue_writeResponseTime = 20;//写响应时间
 
-        RestUtils restUtils = new RestUtils();
-        RestTemplate restTemplate = restUtils.getRestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
-        responseEntity = restTemplate.exchange(dmeHostUrl + url, method, entity, String.class);
-        log.info("servicelevel url:{},response:{}", url, gson.toJson(responseEntity));
-        return responseEntity;
+        for (String volumeId : volumeIds) {
+            JsonObject statisticObject = new JsonObject();
+            statisticObject.addProperty(COUNTER_NAME_IOPS, String.valueOf(counterValue_iops++));
+            statisticObject.addProperty(COUNTER_NAME_BANDWIDTH, String.valueOf(counterValue_bandwidth++));
+            statisticObject.addProperty(COUNTER_NAME_READPESPONSETIME, String.valueOf(counterValue_readResponseTime++));
+            statisticObject.addProperty(COUNTER_NAME_WRITERESPONSETIME, String.valueOf(counterValue_writeResponseTime++));
+            dataObject.add(volumeId, statisticObject);
+        }
+        return dataObject;
     }
 }

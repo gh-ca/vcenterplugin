@@ -42,7 +42,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         remap.put("message", "连接成功");
         remap.put("data", params);
         try {
-            LOG.info("params==" + (params == null ? "null" : params.toString()));
+            LOG.info("params==" + (params == null ? "null" : gson.toJson(params)));
             if (params != null) {
                 //判断与服务器的连接
                 ResponseEntity responseEntity = login(params);
@@ -54,6 +54,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                         int re = dmeInfoDao.addDmeInfo(dmeInfo);
                         LOG.info("re==" + re);
                     } catch (Exception ex) {
+                        ex.printStackTrace();
                         remap.put("code", 503);
                         remap.put("message", "连接信息保存失败:" + ex.getMessage());
                     }
@@ -102,6 +103,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
         if (dmeToken == null || dmeToken.equals("")) {
             //如果token为空，就自动登录，获取token
+            LOG.info("token为空，自动登录，获取token");
             iniLogin();
         }
 
@@ -115,12 +117,14 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             url = dmeHostUrl + url;
         }
         responseEntity = restTemplate.exchange(url, method, entity, String.class);
-        LOG.info(url + "==responseEntity==" + responseEntity);
+        LOG.info(url + "==responseEntity==" + (responseEntity==null?"null":responseEntity.getStatusCodeValue()));
         if (responseEntity.getStatusCodeValue() == 403 ||
                 responseEntity.getStatusCodeValue() == 401) {
-            //如果token失败，重新登录
+            //如果token失效，重新登录
+            LOG.info("token失效，重新登录，获取token");
             iniLogin();
             //得到新token后，重新执行上次任务
+            LOG.info("得到新token后，重新执行上次任务，dmeToken=="+dmeToken);
             responseEntity = restTemplate.exchange(dmeHostUrl + url, method, entity, String.class);
         }
         return responseEntity;
@@ -138,8 +142,10 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             requestbody.put("grantType", "password");
             requestbody.put("userName", params.get("userName"));
             requestbody.put("value", params.get("password"));
+            LOG.info("requestbody=="+gson.toJson(requestbody));
 
             String hostUrl = "https://" + params.get("hostIp") + ":" + params.get("hostPort");
+            LOG.info("hostUrl=="+hostUrl);
 
             HttpEntity<String> entity = new HttpEntity<>(requestbody.toString(), headers);
             responseEntity = restTemplate.exchange(hostUrl + LOGIN_DME_URL
@@ -147,10 +153,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
             LOG.info("responseEntity==" + responseEntity);
             if (responseEntity.getStatusCodeValue() == 200) {
-                JsonArray jsonArray = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonArray();
-                LOG.info("jsonArray==" + jsonArray);
-                JsonObject jsonObject = jsonArray.get(1).getAsJsonObject();
-
+                JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                LOG.info("jsonObject==" + jsonObject);
                 if (jsonObject != null && jsonObject.get("accessSession") != null) {
                     dmeToken = jsonObject.get("accessSession").getAsString();
                     LOG.info("dmeToken===" + dmeToken);
@@ -174,6 +178,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         if (dmeToken != null && !dmeToken.equals("")) {
             headers.set("X-Auth-Token", dmeToken);
         }
+        LOG.info("headers=="+gson.toJson(headers));
         return headers;
     }
 
@@ -181,14 +186,18 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         //查询数据库
         DmeInfo dmeInfo = dmeInfoDao.getDmeInfo();
         LOG.info("dmeinfo==" + gson.toJson(dmeInfo));
-        Map<String, Object> params = new HashMap<>();
-        params.put("hostIp", dmeInfo.getHostIp());
-        params.put("hostPort", dmeInfo.getHostPort());
-        params.put("userName", dmeInfo.getUserName());
-        params.put("password", dmeInfo.getPassword());
-        LOG.info("params==" + gson.toJson(params));
-        //登录
-        login(params);
+        if(dmeInfo!=null && dmeInfo.getHostIp()!=null) {
+            Map<String, Object> params = new HashMap<>();
+            params.put("hostIp", dmeInfo.getHostIp());
+            params.put("hostPort", dmeInfo.getHostPort());
+            params.put("userName", dmeInfo.getUserName());
+            params.put("password", dmeInfo.getPassword());
+            LOG.info("params==" + gson.toJson(params));
+            //登录
+            login(params);
+        }else{
+            throw new Exception("目前没有DME接入信息");
+        }
     }
 
     public void setDmeInfoDao(DmeInfoDao dmeInfoDao) {

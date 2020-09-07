@@ -9,17 +9,25 @@ public class VmfsDataInfo {
     Double freeSpace; //空闲容量 单位GB
     Double reserveCapacity; //置备容量  capacity+uncommitted-freeSpace 单位GB
 
-    String device; //设备
+    String deviceId; //存储设备ID
+    String device; //存储设备名称
     String serviceLevelName;    //服务等级
     Boolean vmfsProtected;  //保护状态
 
     //列表字段（性能视图）：
-    int maxIops; //QoS上限
-    int minIops; //QoS下限
-    int maxBandwidth;   //带宽上限 单位MB/s
-    int minBandwidth;   //带宽下限 单位MB/s
+    Integer maxIops; //QoS上限
+    Integer minIops; //QoS下限
+    Integer iops; //iops 性能统计数据
 
-    int latency; //时延 单位ms
+    Integer maxBandwidth;   //带宽上限 单位MB/s
+    Integer minBandwidth;   //带宽下限 单位MB/s
+    Double bandwidth; //bandwidth 性能统计数据
+
+    Integer readResponseTime;   //读响应时间 单位ms  性能统计数据
+    Integer writeResponseTime; //写响应时间 单位ms   性能统计数据
+    Integer latency; //时延 单位ms
+
+    String volumeId; //卷ID
 
     public String getName() {
         return name;
@@ -85,43 +93,91 @@ public class VmfsDataInfo {
         this.vmfsProtected = vmfsProtected;
     }
 
-    public int getMaxIops() {
+    public Integer getMaxIops() {
         return maxIops;
     }
 
-    public void setMaxIops(int maxIops) {
+    public void setMaxIops(Integer maxIops) {
         this.maxIops = maxIops;
     }
 
-    public int getMinIops() {
+    public Integer getMinIops() {
         return minIops;
     }
 
-    public void setMinIops(int minIops) {
+    public void setMinIops(Integer minIops) {
         this.minIops = minIops;
     }
 
-    public int getMaxBandwidth() {
+    public Integer getIops() {
+        return iops;
+    }
+
+    public void setIops(Integer iops) {
+        this.iops = iops;
+    }
+
+    public Integer getMaxBandwidth() {
         return maxBandwidth;
     }
 
-    public void setMaxBandwidth(int maxBandwidth) {
+    public void setMaxBandwidth(Integer maxBandwidth) {
         this.maxBandwidth = maxBandwidth;
     }
 
-    public int getMinBandwidth() {
+    public Integer getMinBandwidth() {
         return minBandwidth;
     }
 
-    public void setMinBandwidth(int minBandwidth) {
+    public void setMinBandwidth(Integer minBandwidth) {
         this.minBandwidth = minBandwidth;
     }
 
-    public int getLatency() {
+    public Double getBandwidth() {
+        return bandwidth;
+    }
+
+    public void setBandwidth(Double bandwidth) {
+        this.bandwidth = bandwidth;
+    }
+
+    public Integer getReadResponseTime() {
+        return readResponseTime;
+    }
+
+    public void setReadResponseTime(Integer readResponseTime) {
+        this.readResponseTime = readResponseTime;
+    }
+
+    public Integer getWriteResponseTime() {
+        return writeResponseTime;
+    }
+
+    public void setWriteResponseTime(Integer writeResponseTime) {
+        this.writeResponseTime = writeResponseTime;
+    }
+
+    public Integer getLatency() {
         return latency;
     }
 
-    public void setLatency(int latency) {
+    public void setLatency(Integer latency) {
         this.latency = latency;
+    }
+
+    public String getVolumeId() {
+        return volumeId;
+    }
+
+    public void setVolumeId(String volumeId) {
+        this.volumeId = volumeId;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 }

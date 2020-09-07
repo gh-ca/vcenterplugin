@@ -93,4 +93,20 @@ public class DatastoreVimBase   {
         ManagedObjectReference datastore=getDatastoreByName(datastorename);
         connectedVimServiceBase.vimPort.renameDatastore(datastore,newdatastorename);
     }
+
+    /**
+     * 获取所有datastore的summary
+     */
+    public List<DatastoreSummary> getAllDatastoreSummary() throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
+        List<DatastoreSummary> datastoreSummaryList=new ArrayList<>();
+        Map<String, ManagedObjectReference> datastores=getDatastores();
+
+        Collection<Map<String, Object>> restcollection=connectedVimServiceBase.getMOREFs.entityProps(new ArrayList<>(datastores.values()),new String[]{"summary"}).values();
+
+        for (Map<String, Object> datastoremap: restcollection){
+            DatastoreSummary datastoreSummary= (DatastoreSummary) datastoremap.get("summary");
+            datastoreSummaryList.add(datastoreSummary);
+        }
+        return datastoreSummaryList;
+    }
 }

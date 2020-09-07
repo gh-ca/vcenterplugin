@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -39,10 +38,34 @@ public class VmfsAccessController extends BaseController{
         String failureStr = "";
         try {
             List<VmfsDataInfo> lists = vmfsAccessService.listVmfs();
-            LOG.info("listvmfs remap==" + gson.toJson(lists));
+            LOG.info("listvmfs lists==" + gson.toJson(lists));
             return success(lists);
         }catch (Exception e){
-            LOG.error("list vmfs failure:"+e);
+            LOG.error("list vmfs failure:", e);
+            failureStr = e.getMessage();
+        }
+        return failure(failureStr);
+    }
+
+    /*
+  * Access vmfs performance"
+  * return: Return execution status and information
+  *         code:Status code 200 or 503
+  *         message:Information
+  *         data: List<VmfsDataInfo>，including vmfs's data infos
+  */
+    @RequestMapping(value = "/listvmfsperformance", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseBodyBean listVmfsPerformance(@RequestParam("volumeIds") List<String> volumeIds)
+            throws Exception {
+        LOG.info("accessvmfs/listvmfsperformance volumeIds=="+gson.toJson(volumeIds));
+        String failureStr = "";
+        try {
+            List<VmfsDataInfo> lists = vmfsAccessService.listVmfsPerformance(volumeIds);
+            LOG.info("listvmfsperformance lists==" + gson.toJson(lists));
+            return success(lists);
+        }catch (Exception e){
+            LOG.error("get vmfs performance failure:", e);
             failureStr = e.getMessage();
         }
         return failure(failureStr);
@@ -87,7 +110,7 @@ public class VmfsAccessController extends BaseController{
             vmfsAccessService.createVmfs(params);
             return success();
         }catch (Exception e){
-            LOG.error("create vmfs failure:"+e);
+            LOG.error("create vmfs failure:", e);
             failureStr = e.getMessage();
         }
         return failure(failureStr);
@@ -112,11 +135,34 @@ public class VmfsAccessController extends BaseController{
             vmfsAccessService.mountVmfs(params);
             return success();
         }catch (Exception e){
-            LOG.error("mount vmfs failure:"+e);
+            LOG.error("mount vmfs failure:", e);
             failureStr = e.getMessage();
         }
         return failure(failureStr);
     }
 
-
+    /*
+   * Delete vmfs
+   * param list<str> volume_ids: 卷id列表 必
+   * param str host_id: 主机id 必
+   * param str hostGroup_id: 主机id 必
+   * return: Return execution status and information
+   *         code:Status code 202 or 503
+   *         message:Information
+   *         data: Data，including task_id
+   */
+    @RequestMapping(value = "/deletevmfs", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean deleteVmfs(@RequestBody Map<String, Object> params) throws Exception {
+        LOG.info("accessvmfs/deletevmfs==" + gson.toJson(params));
+        String failureStr = "";
+        try {
+            vmfsAccessService.deleteVmfs(params);
+            return success();
+        } catch (Exception e) {
+            LOG.error("delete vmfs failure:" + e);
+            failureStr = e.getMessage();
+        }
+        return failure(failureStr);
+    }
 }

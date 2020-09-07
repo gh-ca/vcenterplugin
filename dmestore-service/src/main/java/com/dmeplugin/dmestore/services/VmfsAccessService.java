@@ -17,6 +17,11 @@ public interface VmfsAccessService {
     List<VmfsDataInfo> listVmfs() throws Exception;
 
     /**
+     * vmfs list Performance
+     */
+    List<VmfsDataInfo> listVmfsPerformance(List<String> volumeIds) throws Exception;
+
+    /**
      * create vmfs
      */
     void createVmfs(Map<String, Object> params) throws Exception;
@@ -26,6 +31,19 @@ public interface VmfsAccessService {
      */
     void mountVmfs(Map<String, Object> params) throws Exception;
 
+    /**
+     * unmounted vmfs
+     */
+    void unmountVmfs(Map<String, Object> params) throws Exception;
+
+    /**
+     * delete vmfs
+     */
+    void deleteVmfs(Map<String, Object> params) throws Exception;
+
+    /**
+     * vmfs 指定卷详细信息查询
+     */
     VmfsDatastoreVolumeDetail volumeDetail(String volume_id) throws Exception;
 
 }

@@ -33,10 +33,10 @@ public class DmeAccessController extends BaseController {
     @ResponseBody
     public ResponseBodyBean accessDme(@RequestBody Map<String, Object> params)
             throws Exception {
-        LOG.info("accessdme/access params==" + params);
+        LOG.info("accessdme/access params==" + gson.toJson(params));
         Map<String, Object> remap = dmeAccessService.accessDme(params);
-        LOG.info("accessdme/access remap==" + remap);
-        if (remap != null && remap.get("code") != null && remap.get("code").equals("200")) {
+        LOG.info("accessdme/access remap==" + gson.toJson(remap));
+        if (remap != null && remap.get("code") != null && remap.get("code").toString().equals("200")) {
             return success(remap);
         }
 
@@ -51,9 +51,10 @@ public class DmeAccessController extends BaseController {
     @ResponseBody
     public ResponseBodyBean refreshDme()
             throws Exception {
+        LOG.info("accessdme/refreshaccess==");
         Map<String, Object> remap = dmeAccessService.refreshDme();
-        LOG.info("accessdme/access remap==" + remap);
-        if (remap != null && remap.get("code") != null && remap.get("code").equals("200")) {
+        LOG.info("accessdme/refreshaccess remap==" + gson.toJson(remap));
+        if (remap != null && remap.get("code") != null && remap.get("code").toString().equals("200")) {
             return success(remap);
         }
 

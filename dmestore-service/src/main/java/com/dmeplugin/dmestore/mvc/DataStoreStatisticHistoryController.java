@@ -1,7 +1,7 @@
 package com.dmeplugin.dmestore.mvc;
 
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
-import com.dmeplugin.dmestore.services.DataSotreStatisticHistroyService;
+import com.dmeplugin.dmestore.services.DataStoreStatisticHistoryService;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +25,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     @Autowired
     private Gson gson;
     @Autowired
-    DataSotreStatisticHistroyService dataSotreStatisticHistroyService;
+    DataStoreStatisticHistoryService dataSotreStatisticHistroyService;
 
     @RequestMapping(value = "/vmfsvolume", method = RequestMethod.GET)
     @ResponseBody
