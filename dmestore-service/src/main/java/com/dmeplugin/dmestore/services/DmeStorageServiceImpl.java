@@ -198,6 +198,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             String jsonStorageControllers = gson.toJson(storageControllers.get("data"));
             storageObj.setStorageControllers(jsonStorageControllers);
 
+            Map<String, Object> storageDisks = getStorageDisks();
+            String jsonStorageDisks = gson.toJson(storageDisks.get("data"));
+            storageObj.setStorageDisks(jsonStorageDisks);
+
             resMap.put("data", storageObj);
             return resMap;
         } catch (Exception e) {
@@ -676,17 +680,18 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         String className = "SYS_Controller";
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 200);
-        resMap.put("msg", "list logic ports success!");
+        resMap.put("msg", "list storage controller success!");
         resMap.put("storageId", className);
         List<StorageControllers> resList = new ArrayList<>();
 
         String url = "/rest/resourcedb/v1/instances/"+className;
         try {
             ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
+            Log.info("DmeStorageServiceImpl/getStorageControllers/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
                 resMap.put("code", code);
-                resMap.put("msg", "list logic ports error!");
+                resMap.put("msg", "list storage controller error!");
                 return resMap;
             }
             String object = responseEntity.getBody();
@@ -710,13 +715,61 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             resMap.put("data", resList);
             return resMap;
         } catch (Exception e) {
-            Log.error("list logic ports error!");
+            Log.error("list storage controller error!");
             resMap.put("code", 503);
             resMap.put("msg", e.getMessage());
         }finally {
             return resMap;
         }
 
+
+    }
+
+    private Map<String,Object> getStorageDisks(){
+
+        String className = "SYS_StorageDisk";
+        Map<String, Object> resMap = new HashMap<>();
+        resMap.put("code", 200);
+        resMap.put("msg", "list storage disk success!");
+        resMap.put("storageId", className);
+        List<StorageDisk> resList = new ArrayList<>();
+
+        String url = "/rest/resourcedb/v1/instances/"+className;
+
+        try {
+            ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
+            Log.info("DmeStorageServiceImpl/getStorageDisks/responseEntity==" + responseEntity);
+            int code = responseEntity.getStatusCodeValue();
+            if (code != 200) {
+                resMap.put("code", code);
+                resMap.put("msg", "list storage disk error!");
+                return resMap;
+            }
+            String object = responseEntity.getBody();
+            JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+            JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
+            for (JsonElement jsonElement : jsonArray) {
+                JsonObject element = jsonElement.getAsJsonObject();
+                String name = element.get("name").toString();
+                String status = element.get("status").toString();
+                String capacity = element.get("capacity").toString();
+
+                StorageDisk storageDisk = new StorageDisk();
+                storageDisk.setName(name);
+                storageDisk.setStatus(status);
+                storageDisk.setCapacity(capacity);
+
+                resList.add(storageDisk);
+            }
+            resMap.put("data", resList);
+            return resMap;
+        } catch (Exception e) {
+            Log.error( "list storage disk error!",e);
+            resMap.put("code", 503);
+            resMap.put("msg", e.getMessage());
+        }finally {
+            return resMap;
+        }
 
     }
 

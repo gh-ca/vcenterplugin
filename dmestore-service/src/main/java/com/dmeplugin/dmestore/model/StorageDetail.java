@@ -32,6 +32,7 @@ public class StorageDetail {
     private Object bandPorts;
     private Object logicPorts;
     private Object storageControllers;
+    private Object storageDisks;
 
     public String getId() {
         return id;
@@ -215,5 +216,13 @@ public class StorageDetail {
 
     public void setStorageControllers(Object storageControllers) {
         this.storageControllers = storageControllers;
+    }
+
+    public Object getStorageDisks() {
+        return storageDisks;
+    }
+
+    public void setStorageDisks(Object storageDisks) {
+        this.storageDisks = storageDisks;
     }
 }
