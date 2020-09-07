@@ -102,7 +102,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                                     JsonObject tuning = vjson2.getAsJsonObject("tuning");
                                                     if (tuning != null && tuning.get("smartqos") != null) {
                                                         JsonObject smartqos = tuning.getAsJsonObject("smartqos");
-                                                        smartqos.remove("maxbandwidth");
                                                         if (smartqos != null) {
                                                             vmfsDataInfo.setMaxIops(ToolUtils.jsonToInt(smartqos.get("maxiops"),null));
                                                             vmfsDataInfo.setMinIops(ToolUtils.jsonToInt(smartqos.get("miniops"),null));
