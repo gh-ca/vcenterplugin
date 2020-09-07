@@ -31,8 +31,7 @@ public class VmwareAccessController extends BaseController {
    */
     @RequestMapping(value = "/listhost", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseBodyBean listHosts()
-            throws Exception {
+    public ResponseBodyBean listHosts() throws Exception {
         LOG.info("accessvmware/listhost");
         String failureStr = "";
         try {
@@ -41,6 +40,26 @@ public class VmwareAccessController extends BaseController {
             return success(lists);
         } catch (Exception e) {
             LOG.error("list vmware host failure:", e);
+            failureStr = e.getMessage();
+        }
+        return failure(failureStr);
+    }
+
+    /*
+   * Access cluster
+   * return: cluster info
+   */
+    @RequestMapping(value = "/listcluster", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseBodyBean listClusters() throws Exception {
+        LOG.info("accessvmware/listcluster");
+        String failureStr = "";
+        try {
+            List<Map<String, String>> lists = vmwareAccessService.listClusters();
+            LOG.info("listcluster vmware lists==" + gson.toJson(lists));
+            return success(lists);
+        } catch (Exception e) {
+            LOG.error("list vmware cluster failure:", e);
             failureStr = e.getMessage();
         }
         return failure(failureStr);

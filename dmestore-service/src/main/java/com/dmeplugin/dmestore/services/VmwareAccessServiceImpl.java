@@ -38,4 +38,23 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
         LOG.info("listHosts===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
+
+    @Override
+    public List<Map<String,String>> listClusters() throws Exception{
+        List<Map<String, String>> lists = null;
+        try {
+            //取得vcenter中的所有host。
+            String listStr = VCSDKUtils.getAllClusters();
+            LOG.info("host listClusters==" + listStr);
+            if (!StringUtils.isEmpty(listStr)) {
+                lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
+                }.getType());
+            }
+        } catch (Exception e) {
+            LOG.error("list listClusters error:", e);
+            throw e;
+        }
+        LOG.info("listClusters===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
+        return lists;
+    }
 }
