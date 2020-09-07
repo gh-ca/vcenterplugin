@@ -79,7 +79,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             JsonObject dataJson = vmfsStatisticCurrentMimic(volumeIds);
             remap.put("code", 200);
             remap.put("message", "queryStatistic success!");
-            remap.put("data", params);
+            remap.put("data", dataJson);
         }
 
         //以下为实际消息的处理
