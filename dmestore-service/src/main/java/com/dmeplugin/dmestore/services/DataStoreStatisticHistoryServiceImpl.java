@@ -28,6 +28,11 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private final String INDICATORS_LIST = "/rest/metrics/v1/mgr-svc/indicators";
     private final String OBJ_TYPE_INDICATORS_QUERY = "/rest/metrics/v1/mgr-svc/obj-types/{obj-type-id}/indicators";
 
+    public static final String COUNTER_NAME_IOPS = "throughput";//IOPS指标名称
+    public static final String COUNTER_NAME_BANDWIDTH = "bandwidth";//带宽
+    public static final String COUNTER_NAME_READPESPONSETIME = "readResponseTime";//读响应时间
+    public static final String COUNTER_NAME_WRITERESPONSETIME = "writeResponseTime";//写响应时间
+
     //性能指标 id和name的映射关系
     private static Map<String, String> indicatorNameIdMap = new HashMap<>();
     private static Map<String, String> indicatorIdNameMap = new HashMap<>();
@@ -74,8 +79,8 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
         //以下为模拟响应报文的处理
         Object obj_ids = params.get("obj_ids");
-        if(null != obj_ids){
-            List<String> volumeIds = (List<String>)obj_ids;
+        if (null != obj_ids) {
+            List<String> volumeIds = (List<String>) obj_ids;
             JsonObject dataJson = vmfsStatisticCurrentMimic(volumeIds);
             remap.put("code", 200);
             remap.put("message", "queryStatistic success!");
@@ -179,22 +184,17 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     //vmfs当前性能数据
     private JsonObject vmfsStatisticCurrentMimic(List<String> volumeIds) {
         JsonObject dataObject = new JsonObject();
-        String counterName_iops = "throughput";//IOPS指标名称
-        String counterName_bandwidth = "bandwidth";//带宽
-        String counterName_readResponseTime = "readResponseTime";//读响应时间
-        String counterName_writeResponseTime = "writeResponseTime";//写响应时间
-
         int counterValue_iops = 80;//IOPS指标名称
         int counterValue_bandwidth = 1000;//带宽
         int counterValue_readResponseTime = 10;//读响应时间
         int counterValue_writeResponseTime = 20;//写响应时间
 
-        for(String volumeId : volumeIds){
+        for (String volumeId : volumeIds) {
             JsonObject statisticObject = new JsonObject();
-            statisticObject.addProperty(counterName_iops, String.valueOf(counterValue_iops++));
-            statisticObject.addProperty(counterName_bandwidth, String.valueOf(counterValue_bandwidth++));
-            statisticObject.addProperty(counterName_readResponseTime, String.valueOf(counterValue_readResponseTime++));
-            statisticObject.addProperty(counterName_writeResponseTime, String.valueOf(counterValue_writeResponseTime++));
+            statisticObject.addProperty(COUNTER_NAME_IOPS, String.valueOf(counterValue_iops++));
+            statisticObject.addProperty(COUNTER_NAME_BANDWIDTH, String.valueOf(counterValue_bandwidth++));
+            statisticObject.addProperty(COUNTER_NAME_READPESPONSETIME, String.valueOf(counterValue_readResponseTime++));
+            statisticObject.addProperty(COUNTER_NAME_WRITERESPONSETIME, String.valueOf(counterValue_writeResponseTime++));
             dataObject.add(volumeId, statisticObject);
         }
         return dataObject;
