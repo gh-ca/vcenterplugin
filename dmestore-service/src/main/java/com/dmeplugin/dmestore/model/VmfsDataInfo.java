@@ -26,6 +26,8 @@ public class VmfsDataInfo {
     Integer writeResponseTime; //写响应时间 单位ms   性能统计数据
     Integer latency; //时延 单位ms
 
+    String volumeId; //卷ID
+
     public String getName() {
         return name;
     }
@@ -160,5 +162,13 @@ public class VmfsDataInfo {
 
     public void setLatency(Integer latency) {
         this.latency = latency;
+    }
+
+    public String getVolumeId() {
+        return volumeId;
+    }
+
+    public void setVolumeId(String volumeId) {
+        this.volumeId = volumeId;
     }
 }

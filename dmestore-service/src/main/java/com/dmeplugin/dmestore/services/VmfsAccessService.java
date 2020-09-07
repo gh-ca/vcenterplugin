@@ -17,6 +17,11 @@ public interface VmfsAccessService {
     List<VmfsDataInfo> listVmfs() throws Exception;
 
     /**
+     * vmfs list Performance
+     */
+    List<VmfsDataInfo> listVmfsPerformance(List<String> volumeIds) throws Exception;
+
+    /**
      * create vmfs
      */
     void createVmfs(Map<String, Object> params) throws Exception;

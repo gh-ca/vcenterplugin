@@ -84,6 +84,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                         //LOG.info("listVmfs jsonObject==" + jsonObject.toString());
                                         JsonObject vjson = jsonObject.getAsJsonArray("volumes").get(0).getAsJsonObject();
 
+                                        vmfsDataInfo.setVolumeId(ToolUtils.jsonToStr(vjson.get("id")));
                                         vmfsDataInfo.setStatus(ToolUtils.jsonToStr(vjson.get("status")));
                                         vmfsDataInfo.setServiceLevelName(ToolUtils.jsonToStr(vjson.get("service_level_name")));
                                         vmfsDataInfo.setVmfsProtected(ToolUtils.jsonToBoo(vjson.get("protected")));
@@ -126,12 +127,26 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     }
                 }
             }
-            //组装数据。
         } catch (Exception e) {
             LOG.error("list vmfs error:", e);
             throw e;
         }
         LOG.info("relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        return relists;
+    }
+
+    @Override
+    public List<VmfsDataInfo> listVmfsPerformance(List<String> volumeIds) throws Exception{
+        List<VmfsDataInfo> relists = null;
+        try {
+            if(volumeIds!=null && volumeIds.size()>0){
+
+            }
+        } catch (Exception e) {
+            LOG.error("list vmfs error:", e);
+            throw e;
+        }
+        LOG.info("listVmfsPerformance relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
         return relists;
     }
 
