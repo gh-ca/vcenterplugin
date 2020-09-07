@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -88,7 +89,39 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         }
 
         //以下为实际消息的处理
-
+       /* params.put("range", " LAST_5_MINUTE");
+        Map<String, Object> currenResMap = queryVmfsStatistic(params);
+        String code = currenResMap.get("code").toString();
+        if("200".equals(code)){
+            Object object = currenResMap.get("data");
+            JsonObject volumeRes = new JsonObject();
+            JsonObject dataJson =  new JsonParser().parse(object.toString()).getAsJsonObject();
+            Set<Map.Entry<String, JsonElement>> volumeSet = dataJson.getAsJsonObject().entrySet();
+            for(Map.Entry<String, JsonElement> volume : volumeSet){
+                JsonObject countRes = new JsonObject();
+                String volume_id = volume.getKey();
+                JsonObject counterObj= volume.getValue().getAsJsonObject();
+                Set<Map.Entry<String, JsonElement>> counterSet = counterObj.getAsJsonObject().entrySet();
+                for(Map.Entry<String, JsonElement> countere : counterSet){
+                    String counter_id = countere.getKey();
+                    JsonObject counterjson = countere.getValue().getAsJsonObject();
+                    JsonArray series = counterjson.getAsJsonArray("series");
+                    for(JsonElement elment : series){
+                        JsonObject serieJson = elment.getAsJsonObject();
+                        Set<Map.Entry<String, JsonElement>> serieJsonSet = serieJson.getAsJsonObject().entrySet();
+                        for(Map.Entry<String, JsonElement> serie : serieJsonSet){
+                            String value = serie.getValue().getAsString();
+                            countRes.addProperty(counter_id,value);
+                            break;
+                        }
+                        break;
+                    }
+                }
+                volumeRes.add(volume_id,countRes);
+            }
+            remap.put("data",volumeRes);
+        }
+        //else 不做处理,原始返回*/
 
         return remap;
     }
@@ -113,9 +146,10 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         requestbody.put("obj_ids", objIds);
         requestbody.put("interval", interval);
         requestbody.put("range", range);
-        requestbody.put("begin_time", beginTime);
-        requestbody.put("end_time", endTime);
-
+        if (!StringUtils.isEmpty(range) && "BEGIN_END_TIME".equals(range)) {
+            requestbody.put("begin_time", beginTime);
+            requestbody.put("end_time", endTime);
+        }
         responseEntity = dmeAccessService.access(STATISTIC_QUERY, HttpMethod.POST, requestbody.toString());
 
         return responseEntity;
