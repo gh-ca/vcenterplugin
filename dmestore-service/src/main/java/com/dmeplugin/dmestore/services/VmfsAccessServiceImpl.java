@@ -27,6 +27,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private DmeVmwareRalationDao dmeVmwareRalationDao;
     @Autowired
     private DmeAccessService dmeAccessService;
+    @Autowired
+    private DataStoreStatisticHistoryService dataStoreStatisticHistoryService;
 
 
     private final String LIST_VOLUME_URL = "/rest/blockservice/v1/volumes";
@@ -41,9 +43,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         try {
             //从关系表中取得DME卷与vcenter存储的对应关系
             List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_VMFS);
-            LOG.info("dvrlist=="+gson.toJson(dvrlist));
+            LOG.info("dvrlist==" + gson.toJson(dvrlist));
             //整理数据
-            Map<String,DmeVmwareRelation> dvrMap = getDvrMap(dvrlist);
+            Map<String, DmeVmwareRelation> dvrMap = getDvrMap(dvrlist);
             //取得vcenter中的所有vmfs存储。
             String listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_VMFS);
             LOG.info("Vmfs listStr==" + listStr);
@@ -55,9 +57,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         JsonObject jo = jsonArray.get(i).getAsJsonObject();
                         //LOG.info("jo==" + jo.toString());
                         String vmwareStoreName = ToolUtils.jsonToStr(jo.get("name"));
-                        if(!StringUtils.isEmpty(vmwareStoreName)) {
+                        if (!StringUtils.isEmpty(vmwareStoreName)) {
                             //对比数据库关系表中的数据，只显示关系表中的数据
-                            if(dvrMap!=null && dvrMap.get(vmwareStoreName)!=null) {
+                            if (dvrMap != null && dvrMap.get(vmwareStoreName) != null) {
                                 VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
                                 double capacity = ToolUtils.getDouble(jo.get("capacity")) / ToolUtils.Gi;
                                 double freeSpace = ToolUtils.getDouble(jo.get("freeSpace")) / ToolUtils.Gi;
@@ -104,11 +106,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                                     if (tuning != null && tuning.get("smartqos") != null) {
                                                         JsonObject smartqos = tuning.getAsJsonObject("smartqos");
                                                         if (smartqos != null) {
-                                                            vmfsDataInfo.setMaxIops(ToolUtils.jsonToInt(smartqos.get("maxiops"),null));
-                                                            vmfsDataInfo.setMinIops(ToolUtils.jsonToInt(smartqos.get("miniops"),null));
-                                                            vmfsDataInfo.setMaxBandwidth(ToolUtils.jsonToInt(smartqos.get("maxbandwidth"),null));                                                            ;
-                                                            vmfsDataInfo.setMinBandwidth(ToolUtils.jsonToInt(smartqos.get("minbandwidth"),null));
-                                                            vmfsDataInfo.setLatency(ToolUtils.jsonToInt(smartqos.get("latency"),null));
+                                                            vmfsDataInfo.setMaxIops(ToolUtils.jsonToInt(smartqos.get("maxiops"), null));
+                                                            vmfsDataInfo.setMinIops(ToolUtils.jsonToInt(smartqos.get("miniops"), null));
+                                                            vmfsDataInfo.setMaxBandwidth(ToolUtils.jsonToInt(smartqos.get("maxbandwidth"), null));
+                                                            ;
+                                                            vmfsDataInfo.setMinBandwidth(ToolUtils.jsonToInt(smartqos.get("minbandwidth"), null));
+                                                            vmfsDataInfo.setLatency(ToolUtils.jsonToInt(smartqos.get("latency"), null));
                                                         }
                                                     }
                                                 }
@@ -136,14 +139,36 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     @Override
-    public List<VmfsDataInfo> listVmfsPerformance(List<String> volumeIds) throws Exception{
+    public List<VmfsDataInfo> listVmfsPerformance(List<String> volumeIds) throws Exception {
         List<VmfsDataInfo> relists = null;
         try {
-            if(volumeIds!=null && volumeIds.size()>0){
+            if (volumeIds != null && volumeIds.size() > 0) {
+                Map<String, Object> params = new HashMap<>();
+                params.put("obj_ids", volumeIds);
+                Map<String, Object> remap = dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params);
+                LOG.info("remap===" + gson.toJson(remap));
+                if (remap != null && remap.get("data") != null) {
+                    JsonObject dataJson = (JsonObject) remap.get("data");
+                    if (dataJson != null) {
+                        relists = new ArrayList<>();
+                        for (String volumeId : volumeIds) {
+                            JsonObject statisticObject = dataJson.getAsJsonObject(volumeId);
+                            if (statisticObject != null) {
+                                VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
+                                vmfsDataInfo.setVolumeId(volumeId);
+                                vmfsDataInfo.setIops(ToolUtils.jsonToInt(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_IOPS), null));
+                                vmfsDataInfo.setBandwidth(ToolUtils.jsonToDou(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_BANDWIDTH), null));
+                                vmfsDataInfo.setReadResponseTime(ToolUtils.jsonToInt(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_READPESPONSETIME), null));
+                                vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToInt(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_WRITERESPONSETIME), null));
 
+                                relists.add(vmfsDataInfo);
+                            }
+                        }
+                    }
+                }
             }
         } catch (Exception e) {
-            LOG.error("list vmfs error:", e);
+            LOG.error("list vmfs performance error:", e);
             throw e;
         }
         LOG.info("listVmfsPerformance relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
@@ -329,12 +354,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     //整理关系表数据
-    private Map<String,DmeVmwareRelation> getDvrMap(List<DmeVmwareRelation> dvrlist){
-        Map<String,DmeVmwareRelation> remap = null;
-        if(dvrlist!=null && dvrlist.size()>0){
+    private Map<String, DmeVmwareRelation> getDvrMap(List<DmeVmwareRelation> dvrlist) {
+        Map<String, DmeVmwareRelation> remap = null;
+        if (dvrlist != null && dvrlist.size() > 0) {
             remap = new HashMap<>();
-            for(DmeVmwareRelation dvr:dvrlist){
-                remap.put(dvr.getStoreName(),dvr);
+            for (DmeVmwareRelation dvr : dvrlist) {
+                remap.put(dvr.getStoreName(), dvr);
             }
         }
         return remap;

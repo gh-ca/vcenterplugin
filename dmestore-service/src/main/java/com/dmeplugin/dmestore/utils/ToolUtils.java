@@ -52,6 +52,18 @@ public class ToolUtils {
         return re;
     }
 
+    public static Double jsonToDou(JsonElement obj, Double defaultvalue) {
+        Double re = defaultvalue;
+        try {
+            if (!StringUtils.isEmpty(obj)) {
+                re = obj.getAsDouble();
+            }
+        } catch (Exception e) {
+            LOG.error("error:", e);
+        }
+        return re;
+    }
+
     public static boolean jsonToBoo(JsonElement obj) {
         boolean re = false;
         try {
