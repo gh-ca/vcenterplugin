@@ -1,20 +1,31 @@
 package com.dmeplugin.dmestore.model;
 
-import java.io.Serializable;
 /**
  * @author lianq
  * @ClassName: Volume
  * @Company: GH-CA
  * @create 2020-09-03
  */
-public class Volume implements Serializable {
+public class Volume  {
 
-
+    private String id;
     private String name;
-    private String ownerController;
-    private String prefetchPolicy;
-    private Integer prefetchValue;
-    private CustomizeVolume tuning;
+    private String status;
+    private Boolean attached;
+    private String alloctype;
+    private String service_level_name;
+    private String storage_id;
+    private String pool_raw_id;
+    private String capacity_usage;
+    private Boolean protectionStatus;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -24,46 +35,67 @@ public class Volume implements Serializable {
         this.name = name;
     }
 
-    public String getOwnerController() {
-        return ownerController;
+    public String getStatus() {
+        return status;
     }
 
-    public void setOwnerController(String ownerController) {
-        this.ownerController = ownerController;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
-    public String getPrefetchPolicy() {
-        return prefetchPolicy;
+    public Boolean getAttached() {
+        return attached;
     }
 
-    public void setPrefetchPolicy(String prefetchPolicy) {
-        this.prefetchPolicy = prefetchPolicy;
+    public void setAttached(Boolean attached) {
+        this.attached = attached;
     }
 
-    public Integer getPrefetchValue() {
-        return prefetchValue;
+    public String getAlloctype() {
+        return alloctype;
     }
 
-    public void setPrefetchValue(Integer prefetchValue) {
-        this.prefetchValue = prefetchValue;
+    public void setAlloctype(String alloctype) {
+        this.alloctype = alloctype;
     }
 
-    public CustomizeVolume getTuning() {
-        return tuning;
+    public String getService_level_name() {
+        return service_level_name;
     }
 
-    public void setTuning(CustomizeVolume tuning) {
-        this.tuning = tuning;
+    public void setService_level_name(String service_level_name) {
+        this.service_level_name = service_level_name;
     }
 
-    @Override
-    public String toString() {
-        return "VolumeInfo{" +
-                "name='" + name + '\'' +
-                ", ownerController='" + ownerController + '\'' +
-                ", prefetchPolicy='" + prefetchPolicy + '\'' +
-                ", prefetchValue=" + prefetchValue +
-                ", tuning=" + tuning +
-                '}';
+    public String getStorage_id() {
+        return storage_id;
+    }
+
+    public void setStorage_id(String storage_id) {
+        this.storage_id = storage_id;
+    }
+
+    public String getPool_raw_id() {
+        return pool_raw_id;
+    }
+
+    public void setPool_raw_id(String pool_raw_id) {
+        this.pool_raw_id = pool_raw_id;
+    }
+
+    public String getCapacity_usage() {
+        return capacity_usage;
+    }
+
+    public void setCapacity_usage(String capacity_usage) {
+        this.capacity_usage = capacity_usage;
+    }
+
+    public Boolean getProtectionStatus() {
+        return protectionStatus;
+    }
+
+    public void setProtectionStatus(Boolean protectionStatus) {
+        this.protectionStatus = protectionStatus;
     }
 }

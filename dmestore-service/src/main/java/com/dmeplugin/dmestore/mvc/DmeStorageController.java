@@ -2,6 +2,7 @@ package com.dmeplugin.dmestore.mvc;
 
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.model.Storage;
+import com.dmeplugin.dmestore.services.DmeStorageService;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ import java.util.Map;
 
 /**
  * @author lianq
- * @className DmeStoragesController
+ * @className DmeStorageController
  * @description TODO
  * @date 2020/9/3 17:43
  */
@@ -28,6 +29,9 @@ public class DmeStorageController extends BaseController{
     @Autowired
     private Gson gson;
 
+    @Autowired
+    private DmeStorageService dmeStorageService;
+
     /**
      * query storage list
      * @param params
@@ -39,33 +43,45 @@ public class DmeStorageController extends BaseController{
     public ResponseBodyBean getStorages(@RequestBody Map<String,String> params){
 
         LOG.info("storages ==" + gson.toJson(params) );
-
-        //String url = "/rest/storagemgmt/v1/storages?start="+ start + "&limit=" + limit;
-        HttpHeaders header = new HttpHeaders();
-        header.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        //ResponseEntity<String> stringResponseEntity = HttpRequestUtil.requestWithBody(url, HttpMethod.GET,
-        //header, null, String.class);
-        Storage storage = new Storage();
-        return success(storage);
+        Map<String, Object> resMap = dmeStorageService.getStorages(params);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals("200")) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
     }
 
     /**
-     * search oriented storage
+     * search oriented storage detail
      * @param storage_id required
      * @return
      */
     @GetMapping("/storage")
     @ResponseBody
-    public ResponseBodyBean getStorage(@RequestParam(name = "storage_id") String storage_id){
+    public ResponseBodyBean getStorageDetail(@RequestParam(name = "storageId") String storageId){
 
-        LOG.info("storage_id ==" + storage_id );
-        String url = "/rest/storagemgmt/v1/storages/{ "+ storage_id+ "}/detail";
-        HttpHeaders header = new HttpHeaders();
-        header.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        //ResponseEntity<String> stringResponseEntity = HttpRequestUtil.requestWithBody(url, HttpMethod.GET,
-        //        header, null, String.class);
-        //根据storage_id 分别去查, 池 ,卷 ,fs, dt, shares ,user authentication
+        LOG.info("storage_id ==" + storageId );
+        Map<String,Object> resMap=dmeStorageService.getStorageDetail(storageId);
 
-        return success();
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals("200")) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
+    }
+
+    /**
+     *  list Storage Pool
+     * @param storageId required
+     * @return
+     */
+    @GetMapping("/storagepools")
+    @ResponseBody
+    public ResponseBodyBean getStoragePools(@RequestParam(name = "storageId") String storageId){
+
+        LOG.info("storage_id ==" + storageId );
+        Map<String, Object> resMap = dmeStorageService.getStoragePools(storageId);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals("200")) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
     }
 }

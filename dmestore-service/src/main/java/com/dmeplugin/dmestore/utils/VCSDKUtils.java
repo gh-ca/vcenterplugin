@@ -52,4 +52,12 @@ public class VCSDKUtils {
         }
         return listStr;
     }
+
+    public static void renameDataStore(String newName){
+        //拿到对应的datastore 然后修改名字
+        //如何获取指定的dataStore
+        _logger.info("start rename DataStore");
+
+
+    }
 }

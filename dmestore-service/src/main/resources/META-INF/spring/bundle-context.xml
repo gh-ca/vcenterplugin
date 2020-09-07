@@ -49,4 +49,7 @@
         <property name="dmeInfoDao" ref="dmeInfoDao"/>
     </bean>
 
+    <bean name="dmeStorageServiceImpl" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
+        <property name="dmeAccessService" ref="dmeAccessService" />
+    </bean>
 </beans>

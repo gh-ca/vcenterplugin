@@ -27,6 +27,7 @@
 
    <bean name="actionsController" class="com.dmeplugin.dmestore.mvc.ActionsController" />
 
+   <bean name="dmeAccessController" class="com.dmeplugin.dmestore.mvc.DmeAccessController" />
 
    <!-- OSGI references to platform services used by the controllers -->
 

@@ -1,18 +1,20 @@
 package com.dmeplugin.dmestore.model;
 
+
 /**
  * @author lianq
- * @ClassName: Storage
- * @Company: GH-CA
- * @create 2020-09-03
+ * @className StorageDetail
+ * @description TODO
+ * @date 2020/9/4 10:11
  */
-public class Storage  {
+public class StorageDetail {
 
     private String id;
     private String name;
     private String ip;
     private String status;
     private String synStatus;
+    private String sn;
     private String vendor;
     private String model;
     private String productVersion;
@@ -20,11 +22,16 @@ public class Storage  {
     private Long totalCapacity;
     private Long totalEffectiveCapacity;
     private Long freeEffectiveCapacity;
-    private Long maxCpuUtilization;
-    private Long maxIops;
-    private Long maxBandwidth;
-    private Long maxLatency;
+    private String location;
     private Object azIds;
+    private Object storagePool;
+    private Object volume;
+    private Object fileSystem;
+    private Object dTrees;
+    private Object nfsShares;
+    private Object bandPorts;
+    private Object logicPorts;
+    private Object storageControllers;
 
     public String getId() {
         return id;
@@ -66,6 +73,14 @@ public class Storage  {
         this.synStatus = synStatus;
     }
 
+    public String getSn() {
+        return sn;
+    }
+
+    public void setSn(String sn) {
+        this.sn = sn;
+    }
+
     public String getVendor() {
         return vendor;
     }
@@ -80,6 +95,14 @@ public class Storage  {
 
     public void setModel(String model) {
         this.model = model;
+    }
+
+    public String getProductVersion() {
+        return productVersion;
+    }
+
+    public void setProductVersion(String productVersion) {
+        this.productVersion = productVersion;
     }
 
     public Long getUsedCapacity() {
@@ -114,36 +137,12 @@ public class Storage  {
         this.freeEffectiveCapacity = freeEffectiveCapacity;
     }
 
-    public Long getMaxCpuUtilization() {
-        return maxCpuUtilization;
+    public String getLocation() {
+        return location;
     }
 
-    public void setMaxCpuUtilization(Long maxCpuUtilization) {
-        this.maxCpuUtilization = maxCpuUtilization;
-    }
-
-    public Long getMaxIops() {
-        return maxIops;
-    }
-
-    public void setMaxIops(Long maxIops) {
-        this.maxIops = maxIops;
-    }
-
-    public Long getMaxBandwidth() {
-        return maxBandwidth;
-    }
-
-    public void setMaxBandwidth(Long maxBandwidth) {
-        this.maxBandwidth = maxBandwidth;
-    }
-
-    public Long getMaxLatency() {
-        return maxLatency;
-    }
-
-    public void setMaxLatency(Long maxLatency) {
-        this.maxLatency = maxLatency;
+    public void setLocation(String location) {
+        this.location = location;
     }
 
     public Object getAzIds() {
@@ -154,11 +153,67 @@ public class Storage  {
         this.azIds = azIds;
     }
 
-    public String getProductVersion() {
-        return productVersion;
+    public Object getStoragePool() {
+        return storagePool;
     }
 
-    public void setProductVersion(String productVersion) {
-        this.productVersion = productVersion;
+    public void setStoragePool(Object storagePool) {
+        this.storagePool = storagePool;
+    }
+
+    public Object getVolume() {
+        return volume;
+    }
+
+    public void setVolume(Object volume) {
+        this.volume = volume;
+    }
+
+    public Object getFileSystem() {
+        return fileSystem;
+    }
+
+    public void setFileSystem(Object fileSystem) {
+        this.fileSystem = fileSystem;
+    }
+
+    public Object getdTrees() {
+        return dTrees;
+    }
+
+    public void setdTrees(Object dTrees) {
+        this.dTrees = dTrees;
+    }
+
+    public Object getNfsShares() {
+        return nfsShares;
+    }
+
+    public void setNfsShares(Object nfsShares) {
+        this.nfsShares = nfsShares;
+    }
+
+    public Object getBandPorts() {
+        return bandPorts;
+    }
+
+    public void setBandPorts(Object bandPorts) {
+        this.bandPorts = bandPorts;
+    }
+
+    public Object getLogicPorts() {
+        return logicPorts;
+    }
+
+    public void setLogicPorts(Object logicPorts) {
+        this.logicPorts = logicPorts;
+    }
+
+    public Object getStorageControllers() {
+        return storageControllers;
+    }
+
+    public void setStorageControllers(Object storageControllers) {
+        this.storageControllers = storageControllers;
     }
 }
