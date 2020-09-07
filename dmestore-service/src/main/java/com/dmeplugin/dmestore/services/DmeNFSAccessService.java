@@ -1,11 +1,10 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.model.NFSDataStoreFSAttr;
-import com.dmeplugin.dmestore.model.NFSDataStorePortAttr;
+import com.dmeplugin.dmestore.model.NFSDataStoreLogicPortAttr;
 import com.dmeplugin.dmestore.model.NFSDataStoreShareAttr;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @ClassName DmeNFSAccessService
@@ -32,7 +31,7 @@ import java.util.Map;
      * @Param [params]
      * @Return com.dmeplugin.dmestore.model.NFSDataStorePortAttr
      **/
-    NFSDataStorePortAttr  getNFSDatastoreLogicPortAttr(Map<String, String> params) throws Exception;
+    NFSDataStoreLogicPortAttr getNFSDatastoreLogicPortAttr(String logic_port_id) throws Exception;
 
     /**
      * @Author wangxiangyong

@@ -36,6 +36,9 @@ public interface VmfsAccessService {
      */
     void deleteVmfs(Map<String, Object> params) throws Exception;
 
+    /**
+     * vmfs 指定卷详细信息查询
+     */
     VmfsDatastoreVolumeDetail volumeDetail(String volume_id) throws Exception;
 
 }

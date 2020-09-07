@@ -33,4 +33,9 @@ public class DmeConstants {
      * NFS Datastore FileService详情
      **/
     public static final String DME_NFS_FILESERVICE_DETAIL_URL = "/rest/fileservice/v1/filesystems/#{file_system_id}";
+
+    /**
+     * NFS Datastore 逻辑端口详情
+     **/
+    public static final String DME_NFS_LOGICPORT_DETAIL_URL = "/rest/storagemgmt/v1/storage-port/logic-ports/#{logic_port_id}";
 }

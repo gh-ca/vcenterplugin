@@ -2,7 +2,7 @@ package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.model.AuthClient;
 import com.dmeplugin.dmestore.model.NFSDataStoreFSAttr;
-import com.dmeplugin.dmestore.model.NFSDataStorePortAttr;
+import com.dmeplugin.dmestore.model.NFSDataStoreLogicPortAttr;
 import com.dmeplugin.dmestore.model.NFSDataStoreShareAttr;
 import com.dmeplugin.dmestore.utils.StringUtil;
 import com.google.gson.Gson;
@@ -13,10 +13,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @ClassName DmeNFSAccessServiceImpl
@@ -77,8 +77,28 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     @Override
-    public NFSDataStorePortAttr getNFSDatastoreLogicPortAttr(Map<String, String> params) throws Exception {
-        return null;
+    public NFSDataStoreLogicPortAttr getNFSDatastoreLogicPortAttr(String logic_port_id) throws Exception {
+        String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_LOGICPORT_DETAIL_URL,
+                "logic_port_id", logic_port_id);
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+        if (responseEntity.getStatusCodeValue() / 100 != 2) {
+            LOG.error("NFS 逻辑端口详细信息获取失败！logic_port_id={},返回信息：{}", logic_port_id, responseEntity.getBody());
+            return null;
+        }
+        JsonObject logicPort = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+        NFSDataStoreLogicPortAttr logicPortAttr = new NFSDataStoreLogicPortAttr();
+        logicPortAttr.setName(logicPort.get("name").getAsString());
+        String ipv4 = logicPort.get("mgmt_ip").getAsString();
+        ipv4 = (null == ipv4 ? "" : ipv4.trim());
+        String ipv6 = logicPort.get("mgmt_ipv6").getAsString();
+        logicPortAttr.setIp(!StringUtils.isEmpty(ipv4) ? ipv4 : ipv6);
+        String running_status = logicPort.get("running_status").getAsString();
+        logicPortAttr.setStatus(running_status);
+        logicPortAttr.setRunningStatus(running_status);
+        logicPortAttr.setCurrentPort(logicPort.get("current_port_name").getAsString());
+        logicPortAttr.setActivePort(logicPort.get("home_port_name").getAsString());
+        logicPortAttr.setFailoverGroup("failover_group_name");
+        return logicPortAttr;
     }
 
     @Override
