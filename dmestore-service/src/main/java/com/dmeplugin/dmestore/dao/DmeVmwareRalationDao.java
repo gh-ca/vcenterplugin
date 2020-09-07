@@ -2,7 +2,6 @@ package com.dmeplugin.dmestore.dao;
 
 
 import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
-import com.dmeplugin.dmestore.entity.DmeInfo;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.exception.DataBaseException;
 import org.springframework.util.StringUtils;
@@ -27,13 +26,13 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             con = getConnection();
             String sql = "SELECT * FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION
                     + " WHERE state=1 ";
-            if(!StringUtils.isEmpty(storeType)){
-                sql = sql+" and STORE_TYPE='"+storeType+"'";
+            if (!StringUtils.isEmpty(storeType)) {
+                sql = sql + " and STORE_TYPE='" + storeType + "'";
             }
-            System.out.println(sql);
+
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
-            if (rs.next()) {
+            while (rs.next()) {
                 DmeVmwareRelation dvr = new DmeVmwareRelation();
                 dvr.setId(rs.getInt("ID"));
                 dvr.setStoreId(rs.getString("STORE_ID"));
@@ -57,7 +56,6 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         }
         return lists;
     }
-
 
 
 }

@@ -42,6 +42,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             //从关系表中取得DME卷与vcenter存储的对应关系
             List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_VMFS);
             LOG.info("dvrlist=="+gson.toJson(dvrlist));
+            //整理数据
+            Map<String,DmeVmwareRelation> dvrMap = getDvrMap(dvrlist);
             //取得vcenter中的所有vmfs存储。
             String listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_VMFS);
             LOG.info("Vmfs listStr==" + listStr);
@@ -52,71 +54,76 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     for (int i = 0; i < jsonArray.size(); i++) {
                         JsonObject jo = jsonArray.get(i).getAsJsonObject();
                         //LOG.info("jo==" + jo.toString());
+                        String vmwareStoreName = ToolUtils.jsonToStr(jo.get("name"));
+                        if(!StringUtils.isEmpty(vmwareStoreName)) {
+                            //对比数据库关系表中的数据，只显示关系表中的数据
+                            if(dvrMap!=null && dvrMap.get(vmwareStoreName)!=null) {
+                                VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
+                                double capacity = ToolUtils.getDouble(jo.get("capacity")) / ToolUtils.Gi;
+                                double freeSpace = ToolUtils.getDouble(jo.get("freeSpace")) / ToolUtils.Gi;
+                                double uncommitted = ToolUtils.getDouble(jo.get("uncommitted")) / ToolUtils.Gi;
 
-                        VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
-                        double capacity = ToolUtils.getDouble(jo.get("capacity")) / ToolUtils.Gi;
-                        double freeSpace = ToolUtils.getDouble(jo.get("freeSpace")) / ToolUtils.Gi;
-                        double uncommitted = ToolUtils.getDouble(jo.get("uncommitted")) / ToolUtils.Gi;
+                                vmfsDataInfo.setName(vmwareStoreName);
 
-                        vmfsDataInfo.setName(ToolUtils.jsonToStr(jo.get("name")));
+                                vmfsDataInfo.setCapacity(capacity);
+                                vmfsDataInfo.setFreeSpace(freeSpace);
+                                vmfsDataInfo.setReserveCapacity(capacity + uncommitted - freeSpace);
 
-                        vmfsDataInfo.setCapacity(capacity);
-                        vmfsDataInfo.setFreeSpace(freeSpace);
-                        vmfsDataInfo.setReserveCapacity(capacity + uncommitted - freeSpace);
-
-                        String wwn = jo.get("url").getAsString();
-                        LOG.info("wwn==" + wwn);
-                        //然后通过vmfs中的url值去DME系统中查询对应wwn的卷信息。
-                        ///rest/blockservice/v1/volumes?volume_wwn=wwn
-                        //这里由于DME系统中的卷太多。是分页查询，所以需要vmfs一个个的去查DME系统中的卷。
-                        //而每次查询DME中的卷都需要调用两次，分别是查卷列表接口，查卷详细接口。
-                        String volumeUrlByWwn = LIST_VOLUME_URL + "?volume_wwn=" + wwn;
-                        try {
-                            ResponseEntity responseEntity = dmeAccessService.access(volumeUrlByWwn, HttpMethod.GET, null);
-                            LOG.info("listVmfs responseEntity==" + responseEntity.toString());
-                            if (responseEntity.getStatusCodeValue() == 200) {
-                                JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
-                                //LOG.info("listVmfs jsonObject==" + jsonObject.toString());
-                                JsonObject vjson = jsonObject.getAsJsonArray("volumes").get(0).getAsJsonObject();
-
-                                vmfsDataInfo.setStatus(ToolUtils.jsonToStr(vjson.get("status")));
-                                vmfsDataInfo.setServiceLevelName(ToolUtils.jsonToStr(vjson.get("service_level_name")));
-                                vmfsDataInfo.setVmfsProtected(ToolUtils.jsonToBoo(vjson.get("protected")));
-
-                                String volid = ToolUtils.jsonToStr(vjson.get("id"));
-                                //通过卷ID再调卷详细接口
-                                String detailedVolumeUrl = LIST_VOLUME_URL + "/" + volid;
+                                String wwn = jo.get("url").getAsString();
+                                LOG.info("wwn==" + wwn);
+                                //然后通过vmfs中的url值去DME系统中查询对应wwn的卷信息。
+                                ///rest/blockservice/v1/volumes?volume_wwn=wwn
+                                //这里由于DME系统中的卷太多。是分页查询，所以需要vmfs一个个的去查DME系统中的卷。
+                                //而每次查询DME中的卷都需要调用两次，分别是查卷列表接口，查卷详细接口。
+                                String volumeUrlByWwn = LIST_VOLUME_URL + "?volume_wwn=" + wwn;
                                 try {
-                                    responseEntity = dmeAccessService.access(detailedVolumeUrl, HttpMethod.GET, null);
-                                    LOG.info("volid responseEntity==" + responseEntity.toString());
+                                    ResponseEntity responseEntity = dmeAccessService.access(volumeUrlByWwn, HttpMethod.GET, null);
+                                    LOG.info("listVmfs responseEntity==" + responseEntity.toString());
                                     if (responseEntity.getStatusCodeValue() == 200) {
-                                        JsonObject voljson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
-                                        //LOG.info("volid voljson==" + voljson.toString());
-                                        JsonObject vjson2 = voljson.getAsJsonObject("volume");
-                                        if(vjson2!=null && vjson2.get("tuning")!=null) {
-                                            JsonObject tuning = vjson2.getAsJsonObject("tuning");
-                                            if(tuning!=null && tuning.get("smartqos")!=null) {
-                                                JsonObject smartqos = tuning.getAsJsonObject("smartqos");
-                                                if(smartqos!=null) {
-                                                    vmfsDataInfo.setMaxIops(ToolUtils.jsonToInt(smartqos.get("maxiops")));
-                                                    vmfsDataInfo.setMinIops(ToolUtils.jsonToInt(smartqos.get("miniops")));
-                                                    vmfsDataInfo.setMaxBandwidth(ToolUtils.jsonToInt(smartqos.get("maxbandwidth")));;
-                                                    vmfsDataInfo.setMinBandwidth(ToolUtils.jsonToInt(smartqos.get("minbandwidth")));
-                                                    vmfsDataInfo.setLatency(ToolUtils.jsonToInt(smartqos.get("latency")));
+                                        JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                                        //LOG.info("listVmfs jsonObject==" + jsonObject.toString());
+                                        JsonObject vjson = jsonObject.getAsJsonArray("volumes").get(0).getAsJsonObject();
+
+                                        vmfsDataInfo.setStatus(ToolUtils.jsonToStr(vjson.get("status")));
+                                        vmfsDataInfo.setServiceLevelName(ToolUtils.jsonToStr(vjson.get("service_level_name")));
+                                        vmfsDataInfo.setVmfsProtected(ToolUtils.jsonToBoo(vjson.get("protected")));
+
+                                        String volid = ToolUtils.jsonToStr(vjson.get("id"));
+                                        //通过卷ID再调卷详细接口
+                                        String detailedVolumeUrl = LIST_VOLUME_URL + "/" + volid;
+                                        try {
+                                            responseEntity = dmeAccessService.access(detailedVolumeUrl, HttpMethod.GET, null);
+                                            LOG.info("volid responseEntity==" + responseEntity.toString());
+                                            if (responseEntity.getStatusCodeValue() == 200) {
+                                                JsonObject voljson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                                                //LOG.info("volid voljson==" + voljson.toString());
+                                                JsonObject vjson2 = voljson.getAsJsonObject("volume");
+                                                if (vjson2 != null && vjson2.get("tuning") != null) {
+                                                    JsonObject tuning = vjson2.getAsJsonObject("tuning");
+                                                    if (tuning != null && tuning.get("smartqos") != null) {
+                                                        JsonObject smartqos = tuning.getAsJsonObject("smartqos");
+                                                        if (smartqos != null) {
+                                                            vmfsDataInfo.setMaxIops(ToolUtils.jsonToInt(smartqos.get("maxiops")));
+                                                            vmfsDataInfo.setMinIops(ToolUtils.jsonToInt(smartqos.get("miniops")));
+                                                            vmfsDataInfo.setMaxBandwidth(ToolUtils.jsonToInt(smartqos.get("maxbandwidth")));
+                                                            ;
+                                                            vmfsDataInfo.setMinBandwidth(ToolUtils.jsonToInt(smartqos.get("minbandwidth")));
+                                                            vmfsDataInfo.setLatency(ToolUtils.jsonToInt(smartqos.get("latency")));
+                                                        }
+                                                    }
                                                 }
                                             }
+                                        } catch (Exception ex) {
+                                            LOG.error("DME link error url:" + detailedVolumeUrl + ",error:" + ex.getMessage());
                                         }
+
+                                        relists.add(vmfsDataInfo);
                                     }
-                                } catch (Exception ex) {
-                                    LOG.error("DME link error url:" + detailedVolumeUrl + ",error:" + ex.getMessage());
+                                } catch (Exception e) {
+                                    LOG.error("DME link error url:" + volumeUrlByWwn + ",error:" + e.getMessage());
                                 }
-
-                                relists.add(vmfsDataInfo);
                             }
-                        } catch (Exception e) {
-                            LOG.error("DME link error url:" + volumeUrlByWwn + ",error:" + e.getMessage());
                         }
-
                     }
                 }
             }
@@ -305,6 +312,18 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         ResponseEntity responseEntity = dmeAccessService.access(HOSTGROUP_UNMAPPING, HttpMethod.POST, requestbody.toString());
         return responseEntity;
 
+    }
+
+    //整理关系表数据
+    private Map<String,DmeVmwareRelation> getDvrMap(List<DmeVmwareRelation> dvrlist){
+        Map<String,DmeVmwareRelation> remap = null;
+        if(dvrlist!=null && dvrlist.size()>0){
+            remap = new HashMap<>();
+            for(DmeVmwareRelation dvr:dvrlist){
+                remap.put(dvr.getStoreName(),dvr);
+            }
+        }
+        return remap;
     }
 
     public void setDmeVmwareRalationDao(DmeVmwareRalationDao dmeVmwareRalationDao) {
