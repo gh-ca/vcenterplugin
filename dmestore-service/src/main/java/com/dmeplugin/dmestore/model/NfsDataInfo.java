@@ -14,11 +14,11 @@ public class NfsDataInfo {
     String fs; //fs
 
     //列表字段（性能视图）：
-    int OPS; //OPS
+    Integer OPS; //OPS
     Double bandwidth;   //带宽 单位MB/s
 
-    int readResponseTime;   //读响应时间 单位ms
-    int writeResponseTime; //写响应时间 单位ms
+    Integer readResponseTime;   //读响应时间 单位ms
+    Integer writeResponseTime; //写响应时间 单位ms
 
     public String getName() {
         return name;
@@ -100,11 +100,11 @@ public class NfsDataInfo {
         this.fs = fs;
     }
 
-    public int getOPS() {
+    public Integer getOPS() {
         return OPS;
     }
 
-    public void setOPS(int OPS) {
+    public void setOPS(Integer OPS) {
         this.OPS = OPS;
     }
 
@@ -116,19 +116,19 @@ public class NfsDataInfo {
         this.bandwidth = bandwidth;
     }
 
-    public int getReadResponseTime() {
+    public Integer getReadResponseTime() {
         return readResponseTime;
     }
 
-    public void setReadResponseTime(int readResponseTime) {
+    public void setReadResponseTime(Integer readResponseTime) {
         this.readResponseTime = readResponseTime;
     }
 
-    public int getWriteResponseTime() {
+    public Integer getWriteResponseTime() {
         return writeResponseTime;
     }
 
-    public void setWriteResponseTime(int writeResponseTime) {
+    public void setWriteResponseTime(Integer writeResponseTime) {
         this.writeResponseTime = writeResponseTime;
     }
 }

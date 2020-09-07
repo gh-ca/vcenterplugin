@@ -102,13 +102,13 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                                     JsonObject tuning = vjson2.getAsJsonObject("tuning");
                                                     if (tuning != null && tuning.get("smartqos") != null) {
                                                         JsonObject smartqos = tuning.getAsJsonObject("smartqos");
+                                                        smartqos.remove("maxbandwidth");
                                                         if (smartqos != null) {
-                                                            vmfsDataInfo.setMaxIops(ToolUtils.jsonToInt(smartqos.get("maxiops")));
-                                                            vmfsDataInfo.setMinIops(ToolUtils.jsonToInt(smartqos.get("miniops")));
-                                                            vmfsDataInfo.setMaxBandwidth(ToolUtils.jsonToInt(smartqos.get("maxbandwidth")));
-                                                            ;
-                                                            vmfsDataInfo.setMinBandwidth(ToolUtils.jsonToInt(smartqos.get("minbandwidth")));
-                                                            vmfsDataInfo.setLatency(ToolUtils.jsonToInt(smartqos.get("latency")));
+                                                            vmfsDataInfo.setMaxIops(ToolUtils.jsonToInt(smartqos.get("maxiops"),null));
+                                                            vmfsDataInfo.setMinIops(ToolUtils.jsonToInt(smartqos.get("miniops"),null));
+                                                            vmfsDataInfo.setMaxBandwidth(ToolUtils.jsonToInt(smartqos.get("maxbandwidth"),null));                                                            ;
+                                                            vmfsDataInfo.setMinBandwidth(ToolUtils.jsonToInt(smartqos.get("minbandwidth"),null));
+                                                            vmfsDataInfo.setLatency(ToolUtils.jsonToInt(smartqos.get("latency"),null));
                                                         }
                                                     }
                                                 }

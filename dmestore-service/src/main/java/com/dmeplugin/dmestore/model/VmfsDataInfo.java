@@ -14,17 +14,17 @@ public class VmfsDataInfo {
     Boolean vmfsProtected;  //保护状态
 
     //列表字段（性能视图）：
-    int maxIops; //QoS上限
-    int minIops; //QoS下限
-    int iops; //iops 性能统计数据
+    Integer maxIops; //QoS上限
+    Integer minIops; //QoS下限
+    Integer iops; //iops 性能统计数据
 
-    int maxBandwidth;   //带宽上限 单位MB/s
-    int minBandwidth;   //带宽下限 单位MB/s
+    Integer maxBandwidth;   //带宽上限 单位MB/s
+    Integer minBandwidth;   //带宽下限 单位MB/s
     Double bandwidth; //bandwidth 性能统计数据
 
-    int readResponseTime;   //读响应时间 单位ms  性能统计数据
-    int writeResponseTime; //写响应时间 单位ms   性能统计数据
-    int latency; //时延 单位ms
+    Integer readResponseTime;   //读响应时间 单位ms  性能统计数据
+    Integer writeResponseTime; //写响应时间 单位ms   性能统计数据
+    Integer latency; //时延 单位ms
 
     public String getName() {
         return name;
@@ -90,43 +90,43 @@ public class VmfsDataInfo {
         this.vmfsProtected = vmfsProtected;
     }
 
-    public int getMaxIops() {
+    public Integer getMaxIops() {
         return maxIops;
     }
 
-    public void setMaxIops(int maxIops) {
+    public void setMaxIops(Integer maxIops) {
         this.maxIops = maxIops;
     }
 
-    public int getMinIops() {
+    public Integer getMinIops() {
         return minIops;
     }
 
-    public void setMinIops(int minIops) {
+    public void setMinIops(Integer minIops) {
         this.minIops = minIops;
     }
 
-    public int getIops() {
+    public Integer getIops() {
         return iops;
     }
 
-    public void setIops(int iops) {
+    public void setIops(Integer iops) {
         this.iops = iops;
     }
 
-    public int getMaxBandwidth() {
+    public Integer getMaxBandwidth() {
         return maxBandwidth;
     }
 
-    public void setMaxBandwidth(int maxBandwidth) {
+    public void setMaxBandwidth(Integer maxBandwidth) {
         this.maxBandwidth = maxBandwidth;
     }
 
-    public int getMinBandwidth() {
+    public Integer getMinBandwidth() {
         return minBandwidth;
     }
 
-    public void setMinBandwidth(int minBandwidth) {
+    public void setMinBandwidth(Integer minBandwidth) {
         this.minBandwidth = minBandwidth;
     }
 
@@ -138,27 +138,27 @@ public class VmfsDataInfo {
         this.bandwidth = bandwidth;
     }
 
-    public int getReadResponseTime() {
+    public Integer getReadResponseTime() {
         return readResponseTime;
     }
 
-    public void setReadResponseTime(int readResponseTime) {
+    public void setReadResponseTime(Integer readResponseTime) {
         this.readResponseTime = readResponseTime;
     }
 
-    public int getWriteResponseTime() {
+    public Integer getWriteResponseTime() {
         return writeResponseTime;
     }
 
-    public void setWriteResponseTime(int writeResponseTime) {
+    public void setWriteResponseTime(Integer writeResponseTime) {
         this.writeResponseTime = writeResponseTime;
     }
 
-    public int getLatency() {
+    public Integer getLatency() {
         return latency;
     }
 
-    public void setLatency(int latency) {
+    public void setLatency(Integer latency) {
         this.latency = latency;
     }
 }

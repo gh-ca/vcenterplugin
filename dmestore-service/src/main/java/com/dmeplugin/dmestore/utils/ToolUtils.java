@@ -40,8 +40,8 @@ public class ToolUtils {
         return re;
     }
 
-    public static int jsonToInt(JsonElement obj) {
-        int re = 0;
+    public static Integer jsonToInt(JsonElement obj, Integer defaultvalue) {
+        Integer re = defaultvalue;
         try {
             if (!StringUtils.isEmpty(obj)) {
                 re = obj.getAsInt();
