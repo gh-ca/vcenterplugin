@@ -164,7 +164,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                 vmfsDataInfo.setBandwidth(ToolUtils.jsonToDou(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_BANDWIDTH), null));
                                 vmfsDataInfo.setReadResponseTime(ToolUtils.jsonToInt(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_READPESPONSETIME), null));
                                 vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToInt(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_WRITERESPONSETIME), null));
-
                                 relists.add(vmfsDataInfo);
                             }
                         }
@@ -243,6 +242,47 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return volumeDetail;
     }
+
+    /**
+     * @Author Administrator
+     * @Description 扫描vmfs datastore并和卷建立关系
+     * @Date 16:49 2020/9/7
+     * @Param []
+     * @Return boolean
+     **/
+    public boolean vmfsDatastoreVolumeRelation() throws Exception {
+        String listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_VMFS);
+        LOG.info("===list vmfs datastore success====\n{}", listStr);
+        if (!StringUtils.isEmpty(listStr)) {
+            JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
+            if (jsonArray != null && jsonArray.size() > 0) {
+                for (int i = 0; i < jsonArray.size(); i++) {
+                    JsonObject vmfsDatastore = jsonArray.get(i).getAsJsonObject();
+                    String store_type = ToolUtils.STORE_TYPE_VMFS;
+                    //TODO 暂时认为是从url中获取到wwn信息
+                    String vmfsDatastoreUrl = vmfsDatastore.get("url").getAsString();
+                    String vmfsDatastoreId = vmfsDatastore.get("id").getAsString();
+                    String vmfsDatastoreName = vmfsDatastore.get("name").getAsString();
+                    //拆分wwn
+                    String wwn = vmfsDatastoreUrl.split("volumes/")[1];
+                    //根据wwn从DME中查询卷信息
+                    String volumeUrlByWwn = LIST_VOLUME_URL + "?volume_wwn=" + wwn;
+                    ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByWwn, HttpMethod.GET, null);
+                    if (responseEntity.getStatusCodeValue() / 100 != 2) {
+                        LOG.info(" Query DME volume failed! errorMsg:{}", responseEntity.toString());
+                        continue;
+                    }
+                    JsonObject jsonObject = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+                    JsonObject volume = jsonObject.getAsJsonArray("volumes").get(0).getAsJsonObject();
+                    String volumeId = volume.get("id").getAsString();
+                    String volumeName = volume.get("name").getAsString();
+                    String volumeWwn  = volume.get("volume_wwn").getAsString();
+                }
+            }
+        }
+        return false;
+    }
+
 
     @Override
     public void unmountVmfs(Map<String, Object> params) throws Exception {
