@@ -60,4 +60,7 @@
     <bean name="dmeNFSAccessService" class="com.dmeplugin.dmestore.services.DmeNFSAccessServiceImpl">
     </bean>
 
+    <bean name="vmwareAccessService" class="com.dmeplugin.dmestore.services.VmwareAccessServiceImpl">
+    </bean>
+
 </beans>
