@@ -48,7 +48,7 @@ public class NfsAccessController extends BaseController{
             ndi.setFs("FileSystem02"); //fs
 
             //列表字段（性能视图）：
-            ndi.setOPS(2000D); //OPS
+            ndi.setOPS(2000); //OPS
             ndi.setBandwidth(123.33);   //带宽 单位MB/s
 
             ndi.setReadResponseTime(2);   //读响应时间 单位ms
@@ -67,7 +67,7 @@ public class NfsAccessController extends BaseController{
             ndi.setFs("FileSystem01"); //fs
 
             //列表字段（性能视图）：
-            ndi.setOPS(1000D); //OPS
+            ndi.setOPS(1000); //OPS
             ndi.setBandwidth(23.33);   //带宽 单位MB/s
 
             ndi.setReadResponseTime(2);   //读响应时间 单位ms

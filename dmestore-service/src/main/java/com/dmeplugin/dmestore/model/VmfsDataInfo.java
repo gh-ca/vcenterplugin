@@ -16,9 +16,14 @@ public class VmfsDataInfo {
     //列表字段（性能视图）：
     int maxIops; //QoS上限
     int minIops; //QoS下限
+    int iops; //iops 性能统计数据
+
     int maxBandwidth;   //带宽上限 单位MB/s
     int minBandwidth;   //带宽下限 单位MB/s
+    Double bandwidth; //bandwidth 性能统计数据
 
+    int readResponseTime;   //读响应时间 单位ms  性能统计数据
+    int writeResponseTime; //写响应时间 单位ms   性能统计数据
     int latency; //时延 单位ms
 
     public String getName() {
@@ -101,6 +106,14 @@ public class VmfsDataInfo {
         this.minIops = minIops;
     }
 
+    public int getIops() {
+        return iops;
+    }
+
+    public void setIops(int iops) {
+        this.iops = iops;
+    }
+
     public int getMaxBandwidth() {
         return maxBandwidth;
     }
@@ -115,6 +128,30 @@ public class VmfsDataInfo {
 
     public void setMinBandwidth(int minBandwidth) {
         this.minBandwidth = minBandwidth;
+    }
+
+    public Double getBandwidth() {
+        return bandwidth;
+    }
+
+    public void setBandwidth(Double bandwidth) {
+        this.bandwidth = bandwidth;
+    }
+
+    public int getReadResponseTime() {
+        return readResponseTime;
+    }
+
+    public void setReadResponseTime(int readResponseTime) {
+        this.readResponseTime = readResponseTime;
+    }
+
+    public int getWriteResponseTime() {
+        return writeResponseTime;
+    }
+
+    public void setWriteResponseTime(int writeResponseTime) {
+        this.writeResponseTime = writeResponseTime;
     }
 
     public int getLatency() {

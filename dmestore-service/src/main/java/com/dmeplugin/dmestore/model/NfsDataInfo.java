@@ -14,7 +14,7 @@ public class NfsDataInfo {
     String fs; //fs
 
     //列表字段（性能视图）：
-    Double OPS; //OPS
+    int OPS; //OPS
     Double bandwidth;   //带宽 单位MB/s
 
     int readResponseTime;   //读响应时间 单位ms
@@ -100,11 +100,11 @@ public class NfsDataInfo {
         this.fs = fs;
     }
 
-    public Double getOPS() {
+    public int getOPS() {
         return OPS;
     }
 
-    public void setOPS(Double OPS) {
+    public void setOPS(int OPS) {
         this.OPS = OPS;
     }
 
