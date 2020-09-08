@@ -182,4 +182,16 @@ public class VmfsAccessController extends BaseController{
         }
         return failure(failureStr);
     }
+
+    /**
+     * @Author wangxiangyong
+     * @Description dme卷详细信息查询
+     * @Date 17:20 2020/9/8
+     * @Param [volume_id]
+     * @Return com.dmeplugin.dmestore.model.ResponseBodyBean
+     **/
+    @RequestMapping(value = "/volume/{volume_id}", method = RequestMethod.GET)
+    public ResponseBodyBean volumeDetail(@PathVariable(value = "volume_id") String volume_id) throws Exception {
+        return success(vmfsAccessService.volumeDetail(volume_id));
+    }
 }
