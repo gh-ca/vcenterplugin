@@ -4,6 +4,7 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.dao.DmeInfoDao;
 import com.dmeplugin.dmestore.entity.DmeInfo;
 import com.dmeplugin.dmestore.utils.RestUtils;
+import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -12,11 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class DmeAccessServiceImpl implements DmeAccessService {
 
@@ -34,6 +34,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     private final String LOGIN_DME_URL = "/rest/plat/smapp/v1/sessions";
     private final String REFRES_STATE_URL = "/rest/blockservice/v1/volumes?limit=1";
+    private final String GET_WORKLOADS_URL = "/rest/storagemgmt/v1/storages/{storage_id}/workloads";
 
     @Override
     public Map<String, Object> accessDme(Map<String, Object> params) {
@@ -199,6 +200,50 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             throw new Exception("目前没有DME接入信息");
         }
     }
+
+    @Override
+    public List<Map<String, Object>> getWorkLoads(String storage_id) throws Exception {
+        List<Map<String,Object>> relists = null;
+        try {
+            if (!StringUtils.isEmpty(storage_id)) {
+                String workloads_url = GET_WORKLOADS_URL.replace("{storage_id}",storage_id);
+                LOG.info("workloads_url==="+workloads_url);
+                try {
+                    ResponseEntity responseEntity = access(workloads_url, HttpMethod.GET, null);
+                    LOG.info("getWorkLoads responseEntity==" + responseEntity.toString());
+                    if (responseEntity.getStatusCodeValue() == 200) {
+                        JsonArray jsonArray = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonArray();
+                        if(jsonArray!=null && jsonArray.size()>0) {
+                            relists = new ArrayList<>();
+                            for(int i=0;i<jsonArray.size();i++) {
+                                JsonObject vjson = jsonArray.get(i).getAsJsonObject();
+                                if(vjson!=null) {
+                                    Map<String,Object> map = new HashMap<>();
+                                    map.put("block_size",ToolUtils.jsonToStr(vjson.get("block_size")));
+                                    map.put("create_type",ToolUtils.jsonToStr(vjson.get("create_type")));
+                                    map.put("enable_compress",ToolUtils.jsonToBoo(vjson.get("enable_compress")));
+                                    map.put("enable_dedup",ToolUtils.jsonToBoo(vjson.get("enable_dedup")));
+                                    map.put("id",ToolUtils.jsonToStr(vjson.get("id")));
+                                    map.put("name",ToolUtils.jsonToStr(vjson.get("name")));
+                                    map.put("type",ToolUtils.jsonToStr(vjson.get("type")));
+
+                                    relists.add(map);
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    LOG.error("DME link error url:" + workloads_url + ",error:" + e.getMessage());
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("get WorkLoads error:", e);
+            throw e;
+        }
+        LOG.info("getWorkLoads relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        return relists;
+    }
+
 
     public void setDmeInfoDao(DmeInfoDao dmeInfoDao) {
         this.dmeInfoDao = dmeInfoDao;

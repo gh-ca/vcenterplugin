@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -61,6 +62,29 @@ public class DmeAccessController extends BaseController {
         return failure(gson.toJson(remap));
     }
 
+    /*
+  * Access vmfs performance"
+  * return: Return execution status and information
+  *         code:Status code 200 or 503
+  *         message:Information
+  *         data: List<VmfsDataInfo>，including vmfs's data infos
+  */
+    @RequestMapping(value = "/getworkloads", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseBodyBean getWorkLoads(@RequestParam("storage_id") String storage_id)
+            throws Exception {
+        LOG.info("accessdme/getworkloads storage_id==" + storage_id);
+        String failureStr = "";
+        try {
+            List<Map<String, Object>> lists = dmeAccessService.getWorkLoads(storage_id);
+            LOG.info("getWorkLoads lists==" + gson.toJson(lists));
+            return success(lists);
+        } catch (Exception e) {
+            LOG.error("get WorkLoads failure:", e);
+            failureStr = e.getMessage();
+        }
+        return failure(failureStr);
+    }
 
 
 }

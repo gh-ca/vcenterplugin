@@ -1,10 +1,9 @@
 package com.dmeplugin.dmestore.services;
 
-import com.google.gson.JsonObject;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,5 +23,7 @@ public interface DmeAccessService {
 
 
     ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws Exception;
+
+    List<Map<String, Object>> getWorkLoads(String storage_id) throws Exception;
 
 }
