@@ -39,7 +39,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private final String HOST_UNMAPAPING = "/rest/blockservice/v1/volumes/host-unmapping";
     private final String HOSTGROUP_UNMAPPING = "/rest/blockservice/v1/volumes/hostgroup-unmapping";
     private final String VOLUME_DELETE = "/rest/blockservice/v1/volumes/delete";
-    private final String CREATE_VOLUME = "/rest/blockservice/v1/volumes";
+    private final String CREATE_VOLUME_URL = "/rest/blockservice/v1/volumes";
+    private final String CREATE_VOLUME_UNSERVICE_URL = "/rest/blockservice/v1/volumes";
 
 
 
@@ -206,10 +207,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 String taskId = "";
                 if (params.get("service_level_id") != null) {
                     taskId = createVmfsByServiceLevel(params, objhostid);
-                    LOG.info("taskId====" + taskId);
                 }else{  //非服务化的创建
-
+                    taskId = createVmfsByUNServiceLevel(params, objhostid);
                 }
+                LOG.info("taskId====" + taskId);
                 //查询看创建任务是否完成。
                 //创建vmware中的vmfs存储。
             }
@@ -227,13 +228,13 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 requestbody = new HashMap<>();
                 List<Map<String,Object>> volumes = new ArrayList<>();
                 Map<String,Object> svbp = new HashMap<>();
-                svbp.put("name",params.get("name").toString());
-                svbp.put("capacity",Integer.parseInt(params.get("capacity").toString()));
-                svbp.put("count",Integer.parseInt(params.get("count").toString()));
+                svbp.put("name",ToolUtils.getStr(params.get("volumeName")));
+                svbp.put("capacity",ToolUtils.getInt(params.get("capacity")));
+                svbp.put("count",ToolUtils.getInt(params.get("count")));
                 volumes.add(svbp);
 
                 requestbody.put("volumes", volumes);
-                requestbody.put("service_level_id", params.get("service_level_id").toString());
+                requestbody.put("service_level_id", ToolUtils.getStr(params.get("service_level_id")));
 
                 Map<String,Object> mapping = new HashMap<>();
                 if(!StringUtils.isEmpty(params.get("host"))) {
@@ -245,8 +246,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 LOG.info("ByServiceLevel requestbody=="+gson.toJson(requestbody));
 
 
-                LOG.info("create ByServiceLevel vmfs_url==="+CREATE_VOLUME);
-                ResponseEntity responseEntity = dmeAccessService.access(CREATE_VOLUME, HttpMethod.POST, requestbody.toString());
+                LOG.info("create ByServiceLevel vmfs_url==="+CREATE_VOLUME_URL);
+                ResponseEntity responseEntity = dmeAccessService.access(CREATE_VOLUME_URL, HttpMethod.POST, requestbody.toString());
                 LOG.info("create ByServiceLevel vmfs responseEntity==" + responseEntity.toString());
                 if (responseEntity.getStatusCodeValue() == 202) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -259,6 +260,73 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             //如果主机或主机不存在就创建并得到主机或主机组ID
         }catch (Exception e){
             LOG.error("createVmfsByServiceLevel error:",e);
+        }
+        return taskId;
+    }
+    //返回任务ID
+    private String createVmfsByUNServiceLevel(Map<String, Object> params,String objhostid){
+        String taskId = "";
+        try{
+            if (params!=null && params.get("storage_id") != null) {
+                Map<String, Object> requestbody = null;
+                //判断该集群下有多少主机，如果主机在DME不存在就需要创建
+                requestbody = new HashMap<>();
+                Map<String,Object> cv = new HashMap<>();
+                cv.put("pool_raw_id",ToolUtils.getStr(params.get("pool_raw_id")));
+                cv.put("storage_id",ToolUtils.getStr(params.get("storage_id")));
+
+                Map<String,Object> tuning = new HashMap<>();
+                tuning.put("alloctype",ToolUtils.getStr(params.get("alloctype")));
+                tuning.put("workload_type_id",ToolUtils.getInt(params.get("workload_type_id")));
+
+                Map<String,Object> smartqos = new HashMap<>();
+                smartqos.put("control_policy",ToolUtils.getStr(params.get("control_policy")));
+                smartqos.put("latency",ToolUtils.getInt(params.get("latency")));
+                smartqos.put("maxbandwidth",ToolUtils.getInt(params.get("maxbandwidth")));
+                smartqos.put("maxiops",ToolUtils.getInt(params.get("maxiops")));
+                smartqos.put("minbandwidth",ToolUtils.getInt(params.get("minbandwidth")));
+                smartqos.put("miniops",ToolUtils.getInt(params.get("miniops")));
+                smartqos.put("name",ToolUtils.getStr(params.get("qosname")));
+
+                tuning.put("smartqos",smartqos);
+
+                cv.put("tuning",tuning);
+
+                List<Map<String,Object>> volume_specs = new ArrayList<>();
+                Map<String,Object> vs = new HashMap<>();
+                vs.put("name",ToolUtils.getStr(params.get("volumeName")));
+                vs.put("capacity",ToolUtils.getInt(params.get("capacity")));
+                vs.put("count",ToolUtils.getInt(params.get("count")));
+                volume_specs.add(vs);
+
+                cv.put("volume_specs",volume_specs);
+
+                requestbody.put("customize_volumes", cv);
+
+                Map<String,Object> mapping = new HashMap<>();
+                if(!StringUtils.isEmpty(params.get("host"))) {
+                    mapping.put("host_id", objhostid);
+                }else{
+                    mapping.put("hostgroup_id", objhostid);
+                }
+                requestbody.put("mapping",mapping);
+                LOG.info("ByServiceLevel requestbody=="+gson.toJson(requestbody));
+
+
+                LOG.info("create UNServiceLevel vmfs_url==="+CREATE_VOLUME_UNSERVICE_URL);
+                ResponseEntity responseEntity = dmeAccessService.access(CREATE_VOLUME_UNSERVICE_URL, HttpMethod.POST, requestbody.toString());
+                LOG.info("create UNServiceLevel vmfs responseEntity==" + responseEntity.toString());
+                if (responseEntity.getStatusCodeValue() == 202) {
+                    JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                    if(jsonObject!=null && jsonObject.get("task_id")!=null) {
+                        taskId = ToolUtils.jsonToStr(jsonObject.get("task_id"));
+                        LOG.info("createVmfsUNServiceLevel task_id===="+taskId);
+                    }
+                }
+            }
+            //如果主机或主机不存在就创建并得到主机或主机组ID
+        }catch (Exception e){
+            LOG.error("createVmfsUNServiceLevel error:",e);
         }
         return taskId;
     }
@@ -288,8 +356,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     if (hostmap != null && hostmap.get("id") != null) {
                         objId = hostmap.get("id").toString();
                     }
+                    LOG.info("create host id==" + objId);
                 }
-                LOG.info("create host id==" + objId);
             }
             //如果主机或主机不存在就创建并得到主机或主机组ID
         }catch (Exception e){

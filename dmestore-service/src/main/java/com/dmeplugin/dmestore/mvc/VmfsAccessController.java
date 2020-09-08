@@ -101,17 +101,17 @@ public class VmfsAccessController extends BaseController{
    *
    * param str storage_id 存储设备id
    * param str pool_raw_id 卷所属存储池在存储设备上的id
-   * param str workload_type_id 应用类型id
+   * param integer workload_type_id 应用类型id
    * param str alloctype 卷分配类型，取值范围 thin，thick
    *
    * 卷qos属性
-   * param integer  control_policy 控制策略
+   * param str  control_policy 控制策略
    * param integer  latency 时延，单位ms
    * param integer  maxbandwidth 最大带宽
    * param integer  maxiops 最大iops
    * param integer  minbandwidth 最小带宽
    * param integer  miniops 最小iops
-   * param str name Smart QoS名称
+   * param str qosname Smart QoS名称
    * return: Return execution status and information
    *         code:Status code 200 or 503
    *         message:Information

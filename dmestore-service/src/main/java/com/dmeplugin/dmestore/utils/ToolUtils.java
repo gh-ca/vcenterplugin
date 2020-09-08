@@ -28,6 +28,18 @@ public class ToolUtils {
         return re;
     }
 
+    public static int getInt(Object obj) {
+        int re = 0;
+        try {
+            if (!StringUtils.isEmpty(obj)) {
+                re = Integer.parseInt(obj.toString());
+            }
+        } catch (Exception e) {
+            LOG.error("error:", e);
+        }
+        return re;
+    }
+
     public static double getDouble(Object obj) {
         double re = 0;
         try {
