@@ -190,7 +190,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     @Override
     public void createVmfs(Map<String, Object> params) throws Exception {
-
+        //判断主机或主机组在DME中是否存在
+        //如果主机或主机不存在就创建并得到主机或主机组ID
+        //创建DME卷
+        //查询看创建任务是否完成。
+        //创建vmware中的vmfs存储。
     }
 
     @Override
