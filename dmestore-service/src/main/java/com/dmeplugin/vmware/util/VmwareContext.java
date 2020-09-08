@@ -20,15 +20,11 @@ package com.dmeplugin.vmware.util;
 import com.dmeplugin.dmestore.utils.StringUtil;
 import com.dmeplugin.vmware.mo.DatacenterMO;
 import com.dmeplugin.vmware.mo.DatastoreFile;
-import com.vmware.vim25.ManagedObjectReference;
-import com.vmware.vim25.ObjectContent;
-import com.vmware.vim25.ObjectSpec;
-import com.vmware.vim25.PropertyFilterSpec;
-import com.vmware.vim25.PropertySpec;
-import com.vmware.vim25.ServiceContent;
-import com.vmware.vim25.TaskInfo;
-import com.vmware.vim25.TraversalSpec;
-import com.vmware.vim25.VimPortType;
+import com.vmware.connection.helpers.builders.ObjectSpecBuilder;
+import com.vmware.connection.helpers.builders.PropertyFilterSpecBuilder;
+import com.vmware.connection.helpers.builders.PropertySpecBuilder;
+import com.vmware.connection.helpers.builders.TraversalSpecBuilder;
+import com.vmware.vim25.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,10 +47,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class VmwareContext {
     private static final Logger s_logger = LoggerFactory.getLogger(VmwareContext.class);
@@ -694,5 +687,120 @@ public class VmwareContext {
         public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) throws java.security.cert.CertificateException {
             return;
         }
+    }
+
+    /**
+     * Returns all the MOREFs of the specified type that are present under the
+     * folder
+     *
+     * @param folder    {@link com.vmware.vim25.ManagedObjectReference} of the folder to begin the search
+     *                  from
+     * @param morefType Type of the managed entity that needs to be searched
+     * @return Map of name and MOREF of the managed objects present. If none
+     *         exist then empty Map is returned
+     * @throws com.vmware.vim25.InvalidPropertyFaultMsg
+     *
+     * @throws com.vmware.vim25.RuntimeFaultFaultMsg
+     *
+     */
+    public List<Pair<ManagedObjectReference, String>> inFolderByType(
+            final ManagedObjectReference folder, final String morefType, final RetrieveOptions retrieveOptions
+    ) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+        final PropertyFilterSpec[] propertyFilterSpecs = propertyFilterSpecs(folder, morefType, "name");
+
+        // reuse this property collector again later to scroll through results
+        final ManagedObjectReference propertyCollector = getPropertyCollector();
+
+        RetrieveResult results = getService().retrievePropertiesEx(
+                propertyCollector,
+                Arrays.asList(propertyFilterSpecs),
+                retrieveOptions);
+
+        final List<Pair<ManagedObjectReference, String>> tgtMoref =
+                new ArrayList<>();
+        while(results != null && !results.getObjects().isEmpty()) {
+            resultsToTgtMorefList(results, tgtMoref);
+            final String token = results.getToken();
+            // if we have a token, we can scroll through additional results, else there's nothing to do.
+            results =
+                    (token != null) ?
+                            getService().continueRetrievePropertiesEx(propertyCollector,token) : null;
+        }
+
+        return tgtMoref;
+    }
+
+    public List<Pair<ManagedObjectReference, String>> inFolderByType(ManagedObjectReference folder, String morefType) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+        return inFolderByType(folder,morefType, new RetrieveOptions());
+    }
+
+    private void resultsToTgtMorefMap(RetrieveResult results, Map<String, ManagedObjectReference> tgtMoref) {
+        List<ObjectContent> oCont = (results != null) ? results.getObjects() : null;
+
+        if (oCont != null) {
+            for (ObjectContent oc : oCont) {
+                ManagedObjectReference mr = oc.getObj();
+                String entityNm = null;
+                List<DynamicProperty> dps = oc.getPropSet();
+                if (dps != null) {
+                    for (DynamicProperty dp : dps) {
+                        entityNm = (String) dp.getVal();
+                    }
+                }
+                tgtMoref.put(entityNm, mr);
+            }
+        }
+    }
+
+    private void resultsToTgtMorefList(RetrieveResult results, List<Pair<ManagedObjectReference, String>> tgtMoref) {
+        List<ObjectContent> oCont = (results != null) ? results.getObjects() : null;
+
+        if (oCont != null) {
+            for (ObjectContent oc : oCont) {
+                ManagedObjectReference mr = oc.getObj();
+                String entityNm = null;
+                List<DynamicProperty> dps = oc.getPropSet();
+                if (dps != null) {
+                    for (DynamicProperty dp : dps) {
+                        entityNm = (String) dp.getVal();
+                    }
+                }
+                tgtMoref.add(new Pair<>(mr, entityNm));
+            }
+        }
+    }
+
+    public PropertyFilterSpec[] propertyFilterSpecs(
+            ManagedObjectReference container,
+            String morefType,
+            String... morefProperties
+    ) throws RuntimeFaultFaultMsg {
+
+        ManagedObjectReference viewManager = getServiceContent().getViewManager();
+        ManagedObjectReference containerView =
+                getService().createContainerView(viewManager, container,
+                        Arrays.asList(morefType), true);
+
+        return new PropertyFilterSpec[]{
+                new PropertyFilterSpecBuilder()
+                        .propSet(
+                                new PropertySpecBuilder()
+                                        .all(Boolean.FALSE)
+                                        .type(morefType)
+                                        .pathSet(morefProperties)
+                        )
+                        .objectSet(
+                        new ObjectSpecBuilder()
+                                .obj(containerView)
+                                .skip(Boolean.TRUE)
+                                .selectSet(
+                                        new TraversalSpecBuilder()
+                                                .name("view")
+                                                .path("view")
+                                                .skip(false)
+                                                .type("ContainerView")
+                                )
+                )
+        };
     }
 }
