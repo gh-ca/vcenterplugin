@@ -36,6 +36,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     private final String REFRES_STATE_URL = "/rest/blockservice/v1/volumes?limit=1";
     private final String GET_WORKLOADS_URL = "/rest/storagemgmt/v1/storages/{storage_id}/workloads";
     private final String GET_DME_HOSTS_URL = "/rest/hostmgmt/v1/hosts/summary";
+    private final String GET_DME_HOSTGROUPS_URL = "/rest/hostmgmt/v1/hostgroups/summary";
 
     @Override
     public Map<String, Object> accessDme(Map<String, Object> params) {
@@ -306,6 +307,55 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             throw e;
         }
         LOG.info("getDmeHosts relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        return relists;
+    }
+
+    @Override
+    public List<Map<String, Object>> getDmeHostGroups(String hostGroupName) throws Exception {
+        List<Map<String,Object>> relists = null;
+        try {
+            String gethostgroups_url = GET_DME_HOSTGROUPS_URL;
+            Map<String, Object> requestbody = null;
+            if (!StringUtils.isEmpty(hostGroupName)) {
+                requestbody = new HashMap<>();
+                requestbody.put("name", hostGroupName);
+                LOG.info("requestbody=="+gson.toJson(requestbody));
+            }
+            LOG.info("gethostgroups_url==="+gethostgroups_url);
+            try {
+                ResponseEntity responseEntity = access(gethostgroups_url, HttpMethod.POST, (requestbody==null?null:requestbody.toString()));
+                LOG.info("getDmeHostgroups responseEntity==" + responseEntity.toString());
+                if (responseEntity.getStatusCodeValue() == 200) {
+                    JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                    if(jsonObject!=null && jsonObject.get("hostgroups")!=null) {
+                        JsonArray jsonArray = jsonObject.getAsJsonArray("hostgroups");
+                        if(jsonArray!=null && jsonArray.size()>0) {
+                            relists = new ArrayList<>();
+                            for (int i = 0; i < jsonArray.size(); i++) {
+                                JsonObject vjson = jsonArray.get(i).getAsJsonObject();
+                                if (vjson != null) {
+                                    Map<String, Object> map = new HashMap<>();
+                                    map.put("id", ToolUtils.jsonToStr(vjson.get("id")));
+                                    map.put("name", ToolUtils.jsonToStr(vjson.get("name")));
+                                    map.put("host_count", ToolUtils.jsonToInt(vjson.get("ip"),0));
+                                    map.put("source_type", ToolUtils.jsonToStr(vjson.get("source_type")));
+                                    map.put("managed_status", ToolUtils.jsonToStr(vjson.get("managed_status")));
+                                    map.put("project_id", ToolUtils.jsonToStr(vjson.get("project_id")));
+
+                                    relists.add(map);
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                LOG.error("DME link error url:" + gethostgroups_url + ",error:" + e.getMessage());
+            }
+        } catch (Exception e) {
+            LOG.error("get Dme Hostgroups error:", e);
+            throw e;
+        }
+        LOG.info("getDmeHostgroups relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
         return relists;
     }
 

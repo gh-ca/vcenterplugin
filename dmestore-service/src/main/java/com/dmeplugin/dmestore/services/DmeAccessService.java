@@ -36,4 +36,9 @@ public interface DmeAccessService {
      */
     List<Map<String, Object>> getDmeHosts(String hostIp) throws Exception;
 
+    /**
+     * Query hostgroup
+     */
+    List<Map<String, Object>> getDmeHostGroups(String hostGroupName) throws Exception;
+
 }
