@@ -194,4 +194,9 @@ public class VmfsAccessController extends BaseController{
     public ResponseBodyBean volumeDetail(@PathVariable(value = "volume_id") String volume_id) throws Exception {
         return success(vmfsAccessService.volumeDetail(volume_id));
     }
+
+    @RequestMapping(value = "/scanvmfs", method = RequestMethod.GET)
+    public ResponseBodyBean scanvmfs() throws Exception {
+        return success(vmfsAccessService.scanVmfs());
+    }
 }

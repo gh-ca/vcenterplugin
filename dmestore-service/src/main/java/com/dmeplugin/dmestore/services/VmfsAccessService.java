@@ -46,4 +46,6 @@ public interface VmfsAccessService {
      */
     VmfsDatastoreVolumeDetail volumeDetail(String volume_id) throws Exception;
 
+    boolean scanVmfs() throws Exception;
+
 }
