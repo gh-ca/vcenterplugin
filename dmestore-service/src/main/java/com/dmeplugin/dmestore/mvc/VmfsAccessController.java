@@ -95,11 +95,14 @@ public class VmfsAccessController extends BaseController{
    * param int spaceReclamationGranularity   空间回收粒度 单位K
    * param str spaceReclamationPriority: 空间回收优先权
    * param str host: 主机
+   * param str hostId: 主机
    * param str cluster: 集群
+   * param str clusterId: 集群
    *
    * param str storage_id 存储设备id
    * param str pool_raw_id 卷所属存储池在存储设备上的id
    * param str workload_type_id 应用类型id
+   * param str alloctype 卷分配类型，取值范围 thin，thick
    *
    * 卷qos属性
    * param integer  control_policy 控制策略
