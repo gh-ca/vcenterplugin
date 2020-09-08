@@ -16,6 +16,18 @@ public class ToolUtils {
     public final static int Mi = 1024 * 1024;
     public final static int Gi = 1024 * 1024 * 1024;
 
+    public static String getStr(Object obj) {
+        String re = null;
+        try {
+            if (!StringUtils.isEmpty(obj)) {
+                re = obj.toString();
+            }
+        } catch (Exception e) {
+            LOG.error("error:", e);
+        }
+        return re;
+    }
+
     public static double getDouble(Object obj) {
         double re = 0;
         try {

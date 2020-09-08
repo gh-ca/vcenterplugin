@@ -39,6 +39,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private final String HOST_UNMAPAPING = "/rest/blockservice/v1/volumes/host-unmapping";
     private final String HOSTGROUP_UNMAPPING = "/rest/blockservice/v1/volumes/hostgroup-unmapping";
     private final String VOLUME_DELETE = "/rest/blockservice/v1/volumes/delete";
+    private final String CREATE_VOLUME = "/rest/blockservice/v1/volumes";
+
 
 
     @Override
@@ -52,7 +54,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //整理数据
                 Map<String, DmeVmwareRelation> dvrMap = getDvrMap(dvrlist);
                 //取得所有的存储设备
-                Map<String, Object> storagemap = dmeStorageService.getStorages(null);
+                Map<String, Object> storagemap = dmeStorageService.getStorages();
                 //整理数据
                 Map<String,String> stoNameMap = getStorNameMap(storagemap);
                 LOG.info("stoNameMap==="+gson.toJson(stoNameMap));
@@ -191,18 +193,57 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     @Override
     public void createVmfs(Map<String, Object> params) throws Exception {
-        //param str host: 主机  param str cluster: 集群
-        String objhostid = "";
-        //判断主机或主机组在DME中是否存在
-        //如果主机或主机不存在就创建并得到主机或主机组ID
-        objhostid = checkOrcreateToHostorHostGroup(params);
-        LOG.info("objhostid===="+objhostid);
-        if(!StringUtils.isEmpty(objhostid)) {
-            //创建DME卷
-            //判断服务等级是否存在
-//            if()
-            //查询看创建任务是否完成。
-            //创建vmware中的vmfs存储。
+        if(params!=null) {
+            //param str host: 主机  param str cluster: 集群
+            String objhostid = "";
+            //判断主机或主机组在DME中是否存在
+            //如果主机或主机不存在就创建并得到主机或主机组ID
+            objhostid = checkOrcreateToHostorHostGroup(params);
+            LOG.info("objhostid====" + objhostid);
+            if (!StringUtils.isEmpty(objhostid)) {
+                //创建DME卷
+                //判断服务等级是否存在  service_level_id
+                if (params.get("service_level_id") != null) {
+                    Map<String, Object> requestbody = null;
+                    //判断该集群下有多少主机，如果主机在DME不存在就需要创建
+                    requestbody = new HashMap<>();
+                    List<Map<String,Object>> volumes = new ArrayList<>();
+                    Map<String,Object> svbp = new HashMap<>();
+                    svbp.put("name",params.get("name").toString());
+                    svbp.put("capacity",Integer.parseInt(params.get("capacity").toString()));
+                    svbp.put("count",Integer.parseInt(params.get("count").toString()));
+                    volumes.add(svbp);
+
+                    requestbody.put("volumes", volumes);
+                    requestbody.put("service_level_id", params.get("service_level_id").toString());
+
+                    Map<String,Object> mapping = new HashMap<>();
+                    if(!StringUtils.isEmpty(params.get("host"))) {
+                        mapping.put("host_id", objhostid);
+                    }else{
+                        mapping.put("hostgroup_id", objhostid);
+                    }
+                    requestbody.put("mapping",mapping);
+                    LOG.info("requestbody=="+gson.toJson(requestbody));
+
+
+                    LOG.info("create vmfs_url==="+CREATE_VOLUME);
+                    ResponseEntity responseEntity = dmeAccessService.access(CREATE_VOLUME, HttpMethod.POST, requestbody.toString());
+                    LOG.info("create vmfs responseEntity==" + responseEntity.toString());
+                    if (responseEntity.getStatusCodeValue() == 202) {
+                        JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                        if(jsonObject!=null && jsonObject.get("task_id")!=null) {
+                            LOG.info("task_id===="+jsonObject.get("task_id").getAsString());
+                        }
+                    }
+                }else{  //非服务化的创建
+
+                }
+                //查询看创建任务是否完成。
+                //创建vmware中的vmfs存储。
+            }
+        }else{
+            throw new Exception("Parameter exception:"+params);
         }
     }
 
@@ -222,7 +263,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         }
                     }
                 }
-                LOG.info("objhostid==" + objId);
+                LOG.info("check host id==" + objId);
                 //判断主机或主机组在DME中是否存在
                 if (StringUtils.isEmpty(objId)) {
                     Map<String,Object> params = new HashMap<>();
@@ -232,7 +273,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         objId = hostmap.get("id").toString();
                     }
                 }
-                LOG.info("objhostid==" + objId);
+                LOG.info("create host id==" + objId);
             }
             //如果主机或主机不存在就创建并得到主机或主机组ID
         }catch (Exception e){
@@ -252,13 +293,13 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     for (Map<String, Object> hostgroupmap : hostgrouplist) {
                         if (hostgroupmap != null && hostgroupmap.get("name") != null) {
                             if (clusterName.equals(hostgroupmap.get("name").toString())) {
-                                objId = hostgroupmap.get("id").toString();
+                                objId = ToolUtils.getStr(hostgroupmap.get("id"));
                                 break;
                             }
                         }
                     }
                 }
-                LOG.info("objhostid==" + objId);
+                LOG.info("check host group id==" + objId);
                 //如果主机组不存在就需要创建,创建前要检查集群下的所有主机是否在DME中存在
                 if(StringUtils.isEmpty(objId)) {
                     //取得集群下的所有主机
@@ -271,7 +312,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             List<String> hostlists = new ArrayList<>();
                             for(Map<String, String> hostmap:vmwarehostlists){
                                 LOG.info("checkOrcreateToHost===="+hostmap.get("hostName"));
-                                String tmpHostId = checkOrcreateToHost(hostmap.get("hostName").toString());
+                                String tmpHostId = checkOrcreateToHost(ToolUtils.getStr(hostmap.get("hostName")));
                                 if(!StringUtils.isEmpty(tmpHostId)){
                                     hostlists.add(tmpHostId);
                                 }
@@ -284,11 +325,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                 params.put("hostids",hostlists);
                                 Map<String, Object> hostmap = dmeAccessService.createHostGroup(params);
                                 if (hostmap != null && hostmap.get("id") != null) {
-                                    objId = hostmap.get("id").toString();
+                                    objId = ToolUtils.getStr(hostmap.get("id"));
                                 }
                             }
                         }
                     }
+                    LOG.info("create host group id==" + objId);
                 }
             }
             //如果主机或主机不存在就创建并得到主机或主机组ID
