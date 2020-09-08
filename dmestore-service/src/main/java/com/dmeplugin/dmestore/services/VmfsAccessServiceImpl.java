@@ -4,6 +4,7 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.model.Storage;
+import com.dmeplugin.dmestore.model.TaskDetailInfo;
 import com.dmeplugin.dmestore.model.VmfsDataInfo;
 import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
 import com.dmeplugin.dmestore.utils.ToolUtils;
@@ -33,6 +34,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private DataStoreStatisticHistoryService dataStoreStatisticHistoryService;
     @Autowired
     private DmeStorageService dmeStorageService;
+    @Autowired
+    private TaskService taskService;
 
 
     private final String LIST_VOLUME_URL = "/rest/blockservice/v1/volumes";
@@ -212,6 +215,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
                 LOG.info("taskId====" + taskId);
                 //查询看创建任务是否完成。
+                TaskDetailInfo tdinfo = taskService.queryTaskById(taskId);
+                LOG.info("tdinfo====" + (tdinfo==null?"null":gson.toJson(tdinfo)));
                 //创建vmware中的vmfs存储。
             }
         }else{
