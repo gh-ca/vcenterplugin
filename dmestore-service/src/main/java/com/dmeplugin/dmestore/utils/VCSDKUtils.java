@@ -114,6 +114,49 @@ public class VCSDKUtils {
         return listStr;
     }
 
+    //得到指定集群下的所有主机
+    public static String getHostsOnCluster(String clusterName) throws Exception {
+        String listStr = "";
+        try {
+            VmwareContext vmwareContext= TestVmwareContextFactory.getContext("10.143.132.248","administrator@vsphere.local","Pbu4@123");
+
+            RootFsMO rootFsMO=new RootFsMO(vmwareContext,vmwareContext.getRootFolder());
+
+            List<Pair<ManagedObjectReference, String>> cls = rootFsMO.getAllClusterOnRootFs();
+            if(cls!=null && cls.size()>0) {
+                for (Pair<ManagedObjectReference, String> cl : cls) {
+                    ClusterMO cl1 = new ClusterMO(vmwareContext, cl.first());
+                    if(cl1.getName().equals(clusterName)){
+                        List<Pair<ManagedObjectReference, String>> hosts = cl1.getClusterHosts();
+
+                        if(hosts!=null && hosts.size()>0){
+                            List<Map<String, String>> lists = new ArrayList<>();
+                            for (Pair<ManagedObjectReference, String> host : hosts) {
+                                HostMO host1 = new HostMO(vmwareContext, host.first());
+
+                                Map<String, String> map = new HashMap<>();
+                                map.put("hostId", host1.getMor().getValue());
+                                map.put("hostName", host1.getName());
+                                lists.add(map);
+                            }
+                            if (lists.size() > 0) {
+                                Gson gson = new Gson();
+                                listStr = gson.toJson(lists);
+                            }
+                        }
+
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware error:", e);
+            throw e;
+        }
+        return listStr;
+    }
+
     public static void renameDataStore(String newName) {
         //拿到对应的datastore 然后修改名字
         //如何获取指定的dataStore
@@ -129,7 +172,7 @@ public class VCSDKUtils {
 //            listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_NFS);
 //            _logger.info("Vmfs listStr==" + listStr);
 
-            _logger.info("Vmfs getAllClusters==" + VCSDKUtils.getAllClusters());
+            _logger.info("Vmfs getAllClusters==" + VCSDKUtils.getHostsOnCluster("pbu4test"));
         } catch (Exception e) {
             e.printStackTrace();
         }
