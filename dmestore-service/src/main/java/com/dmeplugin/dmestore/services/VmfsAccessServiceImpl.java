@@ -4,6 +4,7 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.model.Storage;
+import com.dmeplugin.dmestore.model.TaskDetailInfo;
 import com.dmeplugin.dmestore.model.VmfsDataInfo;
 import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
 import com.dmeplugin.dmestore.utils.ToolUtils;
@@ -41,7 +42,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private final String HOST_UNMAPAPING = "/rest/blockservice/v1/volumes/host-unmapping";
     private final String HOSTGROUP_UNMAPPING = "/rest/blockservice/v1/volumes/hostgroup-unmapping";
     private final String VOLUME_DELETE = "/rest/blockservice/v1/volumes/delete";
-    private final String CREATE_VOLUME = "/rest/blockservice/v1/volumes";
+    private final String CREATE_VOLUME_URL = "/rest/blockservice/v1/volumes";
+    private final String CREATE_VOLUME_UNSERVICE_URL = "/rest/blockservice/v1/volumes";
 
 
     @Override
@@ -209,11 +211,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     taskId = createVmfsByServiceLevel(params, objhostid);
                 }else{  //非服务化的创建
                     taskId = createVmfsByUNServiceLevel(params, objhostid);
-                }
-                LOG.info("taskId====" + taskId);
-                } else {  //非服务化的创建
 
                 }
+                LOG.info("taskId====" + taskId);
                 //查询看创建任务是否完成。
                 TaskDetailInfo tdinfo = taskService.queryTaskById(taskId);
                 LOG.info("tdinfo====" + (tdinfo==null?"null":gson.toJson(tdinfo)));
@@ -237,6 +237,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 svbp.put("name",ToolUtils.getStr(params.get("volumeName")));
                 svbp.put("capacity",ToolUtils.getInt(params.get("capacity")));
                 svbp.put("count",ToolUtils.getInt(params.get("count")));
+
                 volumes.add(svbp);
 
                 requestbody.put("volumes", volumes);
@@ -251,9 +252,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 requestbody.put("mapping", mapping);
                 LOG.info("ByServiceLevel requestbody==" + gson.toJson(requestbody));
 
+                LOG.info("create ByServiceLevel vmfs_url==="+CREATE_VOLUME_URL);
+                ResponseEntity responseEntity = dmeAccessService.access(CREATE_VOLUME_URL, HttpMethod.POST, requestbody.toString());
 
-                LOG.info("create ByServiceLevel vmfs_url===" + CREATE_VOLUME);
-                ResponseEntity responseEntity = dmeAccessService.access(CREATE_VOLUME, HttpMethod.POST, requestbody.toString());
                 LOG.info("create ByServiceLevel vmfs responseEntity==" + responseEntity.toString());
                 if (responseEntity.getStatusCodeValue() == 202) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -362,7 +363,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     if (hostmap != null && hostmap.get("id") != null) {
                         objId = hostmap.get("id").toString();
                     }
-                LOG.info("create host id==" + objId);
+                    LOG.info("create host id==" + objId);
+                }
             }
             //如果主机或主机不存在就创建并得到主机或主机组ID
         } catch (Exception e) {
