@@ -72,51 +72,30 @@ public class VCSDKUtils {
         String listStr = "";
         ConnectedVimServiceBase connectedVimServiceBase = null;
         try {
-//            VmwareContext vmwareContext= TestVmwareContextFactory.getContext("10.143.132.248","administrator@vsphere.local","Pbu4@123");
-//
-//            RootFsMO rootFsMO=new RootFsMO(vmwareContext,vmwareContext.getRootFolder());
-//            List<Pair<ManagedObjectReference, String>> dcs = rootFsMO.getAllDatacenterOnRootFs();
-//            if(dcs!=null && dcs.size()>0) {
-//                List<DatastoreSummary> lists = new ArrayList<>();
-//
-//                for (Pair<ManagedObjectReference, String> dc : dcs) {
-//                    DatacenterMO dc1 = new DatacenterMO(vmwareContext, dc.first());
-//                    System.out.println(dc1.getName());
-//
-//                    List<Pair<ManagedObjectReference, String>> dss = dc1.getAllDatastoreOnDatacenter();
-//                    if (dss != null && dss.size() > 0) {
-//                        for (Pair<ManagedObjectReference, String> ds : dss) {
-//                            DatastoreMO ds1 = new DatastoreMO(vmwareContext, ds.first());
-//                            if (StringUtils.isEmpty(storeType)) {
-//                                lists.add(ds1.getSummary());
-//                            } else if (ds1.getSummary().getType().equals(storeType)) {
-//                                lists.add(ds1.getSummary());
-//                            }
-//
-//                        }
-//                    }
-//                }
-//                if (lists.size() > 0) {
-//                    Gson gson = new Gson();
-//                    listStr = gson.toJson(lists);
-//                }
-//            }
-//
-//
-//            List<HostListSummary> hostListSummaryList = hostSystemVimBase.getAllHostSummary();
-//            if (hostListSummaryList != null && hostListSummaryList.size() > 0) {
-//                List<Map<String, String>> lists = new ArrayList<>();
-//                for (HostListSummary hostListSummary : hostListSummaryList) {
-//                    Map<String, String> map = new HashMap<>();
-//                    map.put("hostId", hostListSummary.getHost().getValue());
-//                    map.put("hostName", hostListSummary.getConfig().getName());
-//                    lists.add(map);
-//                }
-//                if (lists.size() > 0) {
-//                    Gson gson = new Gson();
-//                    listStr = gson.toJson(lists);
-//                }
-//            }
+            connectedVimServiceBase = new ConnectedVimServiceBase();
+            Connection connection = new BasicConnection();
+            connection.setUrl("https://10.143.132.248:443/sdk");
+            connection.setUsername("administrator@vsphere.local");
+            connection.setPassword("Pbu4@123");
+            connectedVimServiceBase.setConnection(connection);
+            connectedVimServiceBase.connect();
+
+            HostSystemVimBase hostSystemVimBase = new HostSystemVimBase(connectedVimServiceBase);
+
+            List<HostListSummary> hostListSummaryList = hostSystemVimBase.getAllHostSummary();
+            if (hostListSummaryList != null && hostListSummaryList.size() > 0) {
+                List<Map<String, String>> lists = new ArrayList<>();
+                for (HostListSummary hostListSummary : hostListSummaryList) {
+                    Map<String, String> map = new HashMap<>();
+                    map.put("hostId", hostListSummary.getHost().getValue());
+                    map.put("hostName", hostListSummary.getConfig().getName());
+                    lists.add(map);
+                }
+                if (lists.size() > 0) {
+                    Gson gson = new Gson();
+                    listStr = gson.toJson(lists);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
             _logger.error("vmware error:", e);
