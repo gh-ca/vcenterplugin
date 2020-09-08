@@ -22,7 +22,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/operatevmfs")
-@Api(value = "operation Vmfs Datastore")
+//@Api(value = "operation Vmfs Datastore")
 public class VmfsOperationController extends BaseController{
 
     public static final Logger LOG = LoggerFactory.getLogger(VmfsOperationController.class);
@@ -40,12 +40,12 @@ public class VmfsOperationController extends BaseController{
      */
     @PutMapping("/updatevmfs")
     @ResponseBody
-    @ApiOperation(value = "updatevmfs",httpMethod = "put")
-    public ResponseBodyBean updateVMFS(@ApiParam(name = "volumeId",type = "String",required = true) @RequestParam(value = "volumeId" ) String volumeId,
-                                       @ApiParam(name = "volume",type = "Volume",required = true) @RequestBody Volume volume){
+    //@ApiOperation(value = "updatevmfs",httpMethod = "put")
+    public ResponseBodyBean updateVMFS(@RequestParam(value = "volumeId" ) String volumeId,
+                                       @RequestBody Volume volume){
         String url ="/rest/blockservice/v1/volumes/"+ volumeId;
         LOG.info("updatevmfs==volumeId="+volumeId+"volume=="+gson.toJson(volume));
-        //String taskId="";
+        String taskId="";
         return success();
     }
 
@@ -112,8 +112,8 @@ public class VmfsOperationController extends BaseController{
      */
     @PostMapping("changeservicelevelvmfs")
     @ResponseBody
-    public ResponseBodyBean changeServiceLevelVMFS(@RequestParam(name = "serviceLevelId",required = true) String serviceLevelId,
-                                                   @RequestParam(name = "attributesAutoChange",value = "true",required = false) Boolean attributesAutoChange,
+    public ResponseBodyBean changeServiceLevelVMFS(@RequestParam(name = "serviceLevelId") String serviceLevelId,
+                                                   @RequestParam(name = "attributesAutoChange",defaultValue = "true",required = false) Boolean attributesAutoChange,
                                                    @RequestBody(required = false) String[] volumeIds){
 
         LOG.info("changeservicelevelvmfs=="+serviceLevelId);

@@ -46,6 +46,7 @@
    <osgi:reference id="sampleActionService"
          interface="com.dmeplugin.dmestore.services.SampleActionService" />
 
-
+   <osgi:reference id="dmeStorageService"
+                   interface="com.dmeplugin.dmestore.services.DmeStorageService" />
 </beans>
 

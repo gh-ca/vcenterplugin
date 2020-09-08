@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public interface DmeStorageService {
 
-    Map<String, Object> getStorages(Map<String,String> params);
+    Map<String, Object> getStorages();
 
     Map<String,Object> getStorageDetail(String storageId);
 

@@ -16,15 +16,15 @@ public class Storage  {
     private String vendor;
     private String model;
     private String productVersion;
-    private Long usedCapacity;
-    private Long totalCapacity;
-    private Long totalEffectiveCapacity;
-    private Long freeEffectiveCapacity;
-    private Long maxCpuUtilization;
-    private Long maxIops;
-    private Long maxBandwidth;
-    private Long maxLatency;
-    private Object azIds;
+    private Double usedCapacity;
+    private Double totalCapacity;
+    private Double totalEffectiveCapacity;
+    private Double freeEffectiveCapacity;
+    private Double maxCpuUtilization;
+    private Double maxIops;
+    private Double maxBandwidth;
+    private Double maxLatency;
+    private String[] azIds;
 
     public String getId() {
         return id;
@@ -82,67 +82,67 @@ public class Storage  {
         this.model = model;
     }
 
-    public Long getUsedCapacity() {
+    public Double getUsedCapacity() {
         return usedCapacity;
     }
 
-    public void setUsedCapacity(Long usedCapacity) {
+    public void setUsedCapacity(Double usedCapacity) {
         this.usedCapacity = usedCapacity;
     }
 
-    public Long getTotalCapacity() {
+    public Double getTotalCapacity() {
         return totalCapacity;
     }
 
-    public void setTotalCapacity(Long totalCapacity) {
+    public void setTotalCapacity(Double totalCapacity) {
         this.totalCapacity = totalCapacity;
     }
 
-    public Long getTotalEffectiveCapacity() {
+    public Double getTotalEffectiveCapacity() {
         return totalEffectiveCapacity;
     }
 
-    public void setTotalEffectiveCapacity(Long totalEffectiveCapacity) {
+    public void setTotalEffectiveCapacity(Double totalEffectiveCapacity) {
         this.totalEffectiveCapacity = totalEffectiveCapacity;
     }
 
-    public Long getFreeEffectiveCapacity() {
+    public Double getFreeEffectiveCapacity() {
         return freeEffectiveCapacity;
     }
 
-    public void setFreeEffectiveCapacity(Long freeEffectiveCapacity) {
+    public void setFreeEffectiveCapacity(Double freeEffectiveCapacity) {
         this.freeEffectiveCapacity = freeEffectiveCapacity;
     }
 
-    public Long getMaxCpuUtilization() {
+    public Double getMaxCpuUtilization() {
         return maxCpuUtilization;
     }
 
-    public void setMaxCpuUtilization(Long maxCpuUtilization) {
+    public void setMaxCpuUtilization(Double maxCpuUtilization) {
         this.maxCpuUtilization = maxCpuUtilization;
     }
 
-    public Long getMaxIops() {
+    public Double getMaxIops() {
         return maxIops;
     }
 
-    public void setMaxIops(Long maxIops) {
+    public void setMaxIops(Double maxIops) {
         this.maxIops = maxIops;
     }
 
-    public Long getMaxBandwidth() {
+    public Double getMaxBandwidth() {
         return maxBandwidth;
     }
 
-    public void setMaxBandwidth(Long maxBandwidth) {
+    public void setMaxBandwidth(Double maxBandwidth) {
         this.maxBandwidth = maxBandwidth;
     }
 
-    public Long getMaxLatency() {
+    public Double getMaxLatency() {
         return maxLatency;
     }
 
-    public void setMaxLatency(Long maxLatency) {
+    public void setMaxLatency(Double maxLatency) {
         this.maxLatency = maxLatency;
     }
 
@@ -150,7 +150,7 @@ public class Storage  {
         return azIds;
     }
 
-    public void setAzIds(Object azIds) {
+    public void setAzIds(String[] azIds) {
         this.azIds = azIds;
     }
 

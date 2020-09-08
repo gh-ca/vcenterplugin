@@ -4,6 +4,8 @@ import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.model.Storage;
 import com.dmeplugin.dmestore.services.DmeStorageService;
 import com.google.gson.Gson;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +24,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/dmestorage")
+@Api
 public class DmeStorageController extends BaseController{
 
     public static final Logger LOG = LoggerFactory.getLogger(NfsAccessController.class);
@@ -34,16 +37,16 @@ public class DmeStorageController extends BaseController{
 
     /**
      * query storage list
-     * @param params
+     * @param
      * @return
      */
 
     @GetMapping("/storages")
     @ResponseBody
-    public ResponseBodyBean getStorages(@RequestBody Map<String,String> params){
+    public ResponseBodyBean getStorages(){
 
-        LOG.info("storages ==" + gson.toJson(params) );
-        Map<String, Object> resMap = dmeStorageService.getStorages(params);
+        //LOG.info("storages ==" + gson.toJson(params) );
+        Map<String, Object> resMap = dmeStorageService.getStorages();
         if (null != resMap && null != resMap.get("code") && resMap.get("code").equals("200")) {
             return success(resMap);
         }
@@ -52,7 +55,7 @@ public class DmeStorageController extends BaseController{
 
     /**
      * search oriented storage detail
-     * @param storage_id required
+     * @param storageId required
      * @return
      */
     @GetMapping("/storage")

@@ -49,7 +49,8 @@
         <property name="dmeInfoDao" ref="dmeInfoDao"/>
     </bean>
 
-    <bean name="dmeStorageService" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
+    <bean name="dmeStorageServiceImpl" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
+        <property name="dmeAccessService" ref="dmeAccessService" />
     </bean>
     <bean name="dmeVmwareRalationDao" class="com.dmeplugin.dmestore.dao.DmeVmwareRalationDao">
         <property name="url" value="${h2.url}"/>
