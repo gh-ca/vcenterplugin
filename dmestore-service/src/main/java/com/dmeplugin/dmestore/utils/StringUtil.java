@@ -3,7 +3,9 @@ package com.dmeplugin.dmestore.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,6 +14,30 @@ import java.util.regex.Pattern;
 public class StringUtil {
     private static final Logger logger = LoggerFactory.getLogger(StringUtil.class);
 
+
+    private static Charset preferredACSCharset;
+    private static final String UTF8 = "UTF-8";
+    static {
+        if (isUtf8Supported()) {
+            preferredACSCharset = Charset.forName(UTF8);
+        } else {
+            preferredACSCharset = Charset.defaultCharset();
+        }
+    }
+
+
+    public static boolean isUtf8Supported() {
+        return Charset.isSupported(UTF8);
+    }
+
+    protected static Charset getDefaultCharset() {
+        return Charset.defaultCharset();
+    }
+
+
+    public static Charset getPreferredCharset() {
+        return preferredACSCharset;
+    }
     /**
      * 根据正则表达式、 提取返回正则表达式的内容
      *
@@ -63,4 +89,53 @@ public class StringUtil {
         return stringFormatFromMap(pattern, sourStr, map);
     }
 
+    /**
+     * Returns {@code true} if the given string is null or is the empty string.
+     *
+     * <p>Consider normalizing your string references with {@link #nullToEmpty}.
+     * If you do, you can use {@link String#isEmpty()} instead of this
+     * method, and you won't need special null-safe forms of methods like {@link
+     * String#toUpperCase} either. Or, if you'd like to normalize "in the other
+     * direction," converting empty strings to {@code null}, you can use {@link
+     * #emptyToNull}.
+     *
+     * @param string a string reference to check
+     * @return {@code true} if the string is null or is the empty string
+     */
+    public static boolean isNullOrEmpty( String string) {
+        return string == null || string.length() == 0; // string.isEmpty() in Java 6
+    }
+
+    public static boolean isBlank(String str) {
+        int strLen;
+        if (str == null || (strLen = str.length()) == 0) {
+            return true;
+        }
+        for (int i = 0; i < strLen; i++) {
+            if ((Character.isWhitespace(str.charAt(i)) == false)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isNotBlank(String str) {
+        return !isBlank(str);
+    }
+
+    public static String join(final Iterable<? extends Object> iterable, final String delim) {
+        final StringBuilder sb = new StringBuilder();
+        if (iterable != null) {
+            final Iterator<? extends Object> iter = iterable.iterator();
+            if (iter.hasNext()) {
+                final Object next = iter.next();
+                sb.append(next.toString());
+            }
+            while (iter.hasNext()) {
+                final Object next = iter.next();
+                sb.append(delim + next.toString());
+            }
+        }
+        return sb.toString();
+    }
 }
