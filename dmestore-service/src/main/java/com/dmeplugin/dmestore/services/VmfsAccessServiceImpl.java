@@ -9,6 +9,7 @@ import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -190,11 +191,126 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     @Override
     public void createVmfs(Map<String, Object> params) throws Exception {
+        //param str host: 主机  param str cluster: 集群
+        String objhostid = "";
         //判断主机或主机组在DME中是否存在
         //如果主机或主机不存在就创建并得到主机或主机组ID
-        //创建DME卷
-        //查询看创建任务是否完成。
-        //创建vmware中的vmfs存储。
+        objhostid = checkOrcreateToHostorHostGroup(params);
+        LOG.info("objhostid===="+objhostid);
+        if(!StringUtils.isEmpty(objhostid)) {
+            //创建DME卷
+            //判断服务等级是否存在
+//            if()
+            //查询看创建任务是否完成。
+            //创建vmware中的vmfs存储。
+        }
+    }
+
+    private String checkOrcreateToHost(String hostIp){
+        String objId = "";
+        try{
+            //param str host: 主机  param str cluster: 集群
+            if(!StringUtils.isEmpty(hostIp)) {
+                List<Map<String, Object>> hostlist = dmeAccessService.getDmeHosts(hostIp);
+                if (hostlist != null && hostlist.size() > 0) {
+                    for (Map<String, Object> hostmap : hostlist) {
+                        if (hostmap != null && hostmap.get("ip") != null) {
+                            if (hostIp.equals(hostmap.get("ip").toString())) {
+                                objId = hostmap.get("id").toString();
+                                break;
+                            }
+                        }
+                    }
+                }
+                LOG.info("objhostid==" + objId);
+                //判断主机或主机组在DME中是否存在
+                if (StringUtils.isEmpty(objId)) {
+                    Map<String,Object> params = new HashMap<>();
+                    params.put("host",hostIp);
+                    Map<String, Object> hostmap = dmeAccessService.createHost(params);
+                    if (hostmap != null && hostmap.get("id") != null) {
+                        objId = hostmap.get("id").toString();
+                    }
+                }
+                LOG.info("objhostid==" + objId);
+            }
+            //如果主机或主机不存在就创建并得到主机或主机组ID
+        }catch (Exception e){
+            LOG.error("checkOrcreateToHost error:",e);
+        }
+        return objId;
+    }
+
+    private String checkOrcreateToHostGroup(String clusterName){
+        String objId = "";
+        try{
+            //param str host: 主机  param str cluster: 集群
+            if(!StringUtils.isEmpty(clusterName)) {
+                //检查集群对应的主机组在DME中是否存在
+                List<Map<String, Object>> hostgrouplist = dmeAccessService.getDmeHostGroups(clusterName);
+                if (hostgrouplist != null && hostgrouplist.size() > 0) {
+                    for (Map<String, Object> hostgroupmap : hostgrouplist) {
+                        if (hostgroupmap != null && hostgroupmap.get("name") != null) {
+                            if (clusterName.equals(hostgroupmap.get("name").toString())) {
+                                objId = hostgroupmap.get("id").toString();
+                                break;
+                            }
+                        }
+                    }
+                }
+                LOG.info("objhostid==" + objId);
+                //如果主机组不存在就需要创建,创建前要检查集群下的所有主机是否在DME中存在
+                if(StringUtils.isEmpty(objId)) {
+                    //取得集群下的所有主机
+                    String vmwarehosts = VCSDKUtils.getHostsOnCluster(clusterName);
+                    LOG.info("vmwarehosts==" + vmwarehosts);
+                    if (!StringUtils.isEmpty(vmwarehosts)) {
+                        List<Map<String, String>> vmwarehostlists = gson.fromJson(vmwarehosts, new TypeToken<List<Map<String, String>>>() {}.getType());
+                        if(vmwarehostlists!=null && vmwarehostlists.size()>0){
+                            //分别检查每一个主机是否存在，如果不存在就创建
+                            List<String> hostlists = new ArrayList<>();
+                            for(Map<String, String> hostmap:vmwarehostlists){
+                                LOG.info("checkOrcreateToHost===="+hostmap.get("hostName"));
+                                String tmpHostId = checkOrcreateToHost(hostmap.get("hostName").toString());
+                                if(!StringUtils.isEmpty(tmpHostId)){
+                                    hostlists.add(tmpHostId);
+                                }
+                            }
+                            LOG.info("hostlists===="+hostlists);
+                            //在DME中创建主机组
+                            if(hostlists.size()>0){
+                                Map<String, Object> params = new HashMap<>();
+                                params.put("cluster",clusterName);
+                                params.put("hostids",hostlists);
+                                Map<String, Object> hostmap = dmeAccessService.createHostGroup(params);
+                                if (hostmap != null && hostmap.get("id") != null) {
+                                    objId = hostmap.get("id").toString();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            //如果主机或主机不存在就创建并得到主机或主机组ID
+        }catch (Exception e){
+            LOG.error("checkOrcreateToHostGroup error:",e);
+        }
+        return objId;
+    }
+
+    private String checkOrcreateToHostorHostGroup(Map<String, Object> params){
+        String objId = "";
+        try{
+            //param str host: 主机  param str cluster: 集群
+            if(params!=null && params.get("host")!=null) {
+                objId = checkOrcreateToHost(params.get("host").toString());
+            }else if(params!=null && params.get("cluster")!=null) {
+                objId = checkOrcreateToHostGroup(params.get("cluster").toString());
+            }
+        }catch (Exception e){
+            LOG.error("checkOrcreateToHostorHostGroup error:",e);
+        }
+        return objId;
     }
 
     @Override

@@ -38,6 +38,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     private final String GET_DME_HOSTS_URL = "/rest/hostmgmt/v1/hosts/summary";
     private final String GET_DME_HOSTGROUPS_URL = "/rest/hostmgmt/v1/hostgroups/summary";
     private final String CREATE_DME_HOST_URL = "/rest/hostmgmt/v1/hosts";
+    private final String CREATE_DME_HOSTGROUP_URL = "/rest/hostmgmt/v1/hostgroups";
 
     @Override
     public Map<String, Object> accessDme(Map<String, Object> params) {
@@ -390,6 +391,39 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         }
         LOG.info("createHost hostmap===" + (hostmap == null ? "null" : (hostmap.size() + "==" + gson.toJson(hostmap))));
         return hostmap;
+    }
+
+    @Override
+    public Map<String,Object> createHostGroup(Map<String, Object> params) throws Exception {
+        Map<String,Object> hostgroupmap = null;
+        String createHostGroup_url = CREATE_DME_HOSTGROUP_URL;
+        try {
+            Map<String, Object> requestbody = null;
+            if (params!=null && params.get("cluster")!=null && params.get("hostids")!=null) {
+                //判断该集群下有多少主机，如果主机在DME不存在就需要创建
+                requestbody = new HashMap<>();
+                requestbody.put("name", params.get("cluster").toString());
+                requestbody.put("host_ids", (List<String>)params.get("hostids"));
+                LOG.info("requestbody=="+gson.toJson(requestbody));
+
+                LOG.info("createHostGroup_url==="+createHostGroup_url);
+                ResponseEntity responseEntity = access(createHostGroup_url, HttpMethod.POST, requestbody.toString());
+                LOG.info("getDmeHostgroups responseEntity==" + responseEntity.toString());
+                if (responseEntity.getStatusCodeValue() == 200) {
+                    JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                    if(jsonObject!=null && jsonObject.get("id")!=null) {
+                        hostgroupmap = new HashMap<>();
+                        hostgroupmap.put("id", ToolUtils.jsonToStr(jsonObject.get("id")));
+                        hostgroupmap.put("name", ToolUtils.jsonToStr(jsonObject.get("name")));
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("DME link error url:" + createHostGroup_url + ",error:" + e.getMessage());
+            throw e;
+        }
+        LOG.info("createHostGroup hostmap===" + (hostgroupmap == null ? "null" : (hostgroupmap.size() + "==" + gson.toJson(hostgroupmap))));
+        return hostgroupmap;
     }
 
 

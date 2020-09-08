@@ -46,4 +46,9 @@ public interface DmeAccessService {
      */
     Map<String,Object> createHost(Map<String, Object> params) throws Exception;
 
+    /**
+     * create hostgroup
+     */
+    Map<String,Object> createHostGroup(Map<String, Object> params) throws Exception;
+
 }
