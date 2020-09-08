@@ -44,7 +44,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
         //String apiUrl = "/rest/storagemgmt/v1/storages";
         String apiUrl = "https://localhost:26335/rest/storagemgmt/v1/storages";
-        //String param = HttpRequestUtil.concatParam(params);
         String url = apiUrl ;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
