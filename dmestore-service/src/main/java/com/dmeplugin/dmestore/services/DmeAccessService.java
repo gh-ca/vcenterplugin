@@ -21,9 +21,19 @@ public interface DmeAccessService {
      */
     Map<String, Object> refreshDme();
 
-
+    /**
+     * Rest public method
+     */
     ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws Exception;
 
+    /**
+     * Get WorkLoads
+     */
     List<Map<String, Object>> getWorkLoads(String storage_id) throws Exception;
+
+    /**
+     * Query host
+     */
+    List<Map<String, Object>> getDmeHosts(String hostIp) throws Exception;
 
 }
