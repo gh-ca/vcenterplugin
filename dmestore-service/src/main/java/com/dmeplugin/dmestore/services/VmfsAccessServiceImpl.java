@@ -203,39 +203,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             if (!StringUtils.isEmpty(objhostid)) {
                 //创建DME卷
                 //判断服务等级是否存在  service_level_id
+                String taskId = "";
                 if (params.get("service_level_id") != null) {
-                    Map<String, Object> requestbody = null;
-                    //判断该集群下有多少主机，如果主机在DME不存在就需要创建
-                    requestbody = new HashMap<>();
-                    List<Map<String,Object>> volumes = new ArrayList<>();
-                    Map<String,Object> svbp = new HashMap<>();
-                    svbp.put("name",params.get("name").toString());
-                    svbp.put("capacity",Integer.parseInt(params.get("capacity").toString()));
-                    svbp.put("count",Integer.parseInt(params.get("count").toString()));
-                    volumes.add(svbp);
-
-                    requestbody.put("volumes", volumes);
-                    requestbody.put("service_level_id", params.get("service_level_id").toString());
-
-                    Map<String,Object> mapping = new HashMap<>();
-                    if(!StringUtils.isEmpty(params.get("host"))) {
-                        mapping.put("host_id", objhostid);
-                    }else{
-                        mapping.put("hostgroup_id", objhostid);
-                    }
-                    requestbody.put("mapping",mapping);
-                    LOG.info("requestbody=="+gson.toJson(requestbody));
-
-
-                    LOG.info("create vmfs_url==="+CREATE_VOLUME);
-                    ResponseEntity responseEntity = dmeAccessService.access(CREATE_VOLUME, HttpMethod.POST, requestbody.toString());
-                    LOG.info("create vmfs responseEntity==" + responseEntity.toString());
-                    if (responseEntity.getStatusCodeValue() == 202) {
-                        JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
-                        if(jsonObject!=null && jsonObject.get("task_id")!=null) {
-                            LOG.info("task_id===="+jsonObject.get("task_id").getAsString());
-                        }
-                    }
+                    taskId = createVmfsByServiceLevel(params, objhostid);
+                    LOG.info("taskId====" + taskId);
                 }else{  //非服务化的创建
 
                 }
@@ -245,6 +216,51 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }else{
             throw new Exception("Parameter exception:"+params);
         }
+    }
+    //返回任务ID
+    private String createVmfsByServiceLevel(Map<String, Object> params,String objhostid){
+        String taskId = "";
+        try{
+            if (params!=null && params.get("service_level_id") != null) {
+                Map<String, Object> requestbody = null;
+                //判断该集群下有多少主机，如果主机在DME不存在就需要创建
+                requestbody = new HashMap<>();
+                List<Map<String,Object>> volumes = new ArrayList<>();
+                Map<String,Object> svbp = new HashMap<>();
+                svbp.put("name",params.get("name").toString());
+                svbp.put("capacity",Integer.parseInt(params.get("capacity").toString()));
+                svbp.put("count",Integer.parseInt(params.get("count").toString()));
+                volumes.add(svbp);
+
+                requestbody.put("volumes", volumes);
+                requestbody.put("service_level_id", params.get("service_level_id").toString());
+
+                Map<String,Object> mapping = new HashMap<>();
+                if(!StringUtils.isEmpty(params.get("host"))) {
+                    mapping.put("host_id", objhostid);
+                }else{
+                    mapping.put("hostgroup_id", objhostid);
+                }
+                requestbody.put("mapping",mapping);
+                LOG.info("ByServiceLevel requestbody=="+gson.toJson(requestbody));
+
+
+                LOG.info("create ByServiceLevel vmfs_url==="+CREATE_VOLUME);
+                ResponseEntity responseEntity = dmeAccessService.access(CREATE_VOLUME, HttpMethod.POST, requestbody.toString());
+                LOG.info("create ByServiceLevel vmfs responseEntity==" + responseEntity.toString());
+                if (responseEntity.getStatusCodeValue() == 202) {
+                    JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                    if(jsonObject!=null && jsonObject.get("task_id")!=null) {
+                        taskId = ToolUtils.jsonToStr(jsonObject.get("task_id"));
+                        LOG.info("createVmfsByServiceLevel task_id===="+taskId);
+                    }
+                }
+            }
+            //如果主机或主机不存在就创建并得到主机或主机组ID
+        }catch (Exception e){
+            LOG.error("createVmfsByServiceLevel error:",e);
+        }
+        return taskId;
     }
 
     private String checkOrcreateToHost(String hostIp){
