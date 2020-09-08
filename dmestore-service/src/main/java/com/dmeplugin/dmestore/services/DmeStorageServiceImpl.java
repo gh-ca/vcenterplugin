@@ -1,14 +1,11 @@
 package com.dmeplugin.dmestore.services;
 
-import ch.qos.logback.core.joran.util.beans.BeanUtil;
 import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.utils.HttpRequestUtil;
 import com.dmeplugin.dmestore.utils.RestUtils;
-import com.dmeplugin.dmestore.utils.StringUtil;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.util.StringUtils;
@@ -43,16 +40,16 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         List<Storage> list = new ArrayList<>();
 
         //String apiUrl = "/rest/storagemgmt/v1/storages";
-        String apiUrl = "https://localhost:26335/rest/storagemgmt/v1/storages";
-        String url = apiUrl ;
+        //test url
+        String url = "https://localhost:26335/rest/storagemgmt/v1/storages";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
         try {
             //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
-            //Log.info("DmeStorageServiceImpl/getStorages/responseEntity==" + responseEntity);
             ResponseEntity responseEntity = sendHttpRequest(url, HttpMethod.GET, headers);
+            Log.info("DmeStorageServiceImpl/getStorages/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
                 objMap.put("code", code);
@@ -65,42 +62,31 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 JsonArray storage = jsonObject.get("datas").getAsJsonArray();
                 for (JsonElement jsonElement : storage) {
                     JsonObject jsonObj = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
-                    String id = jsonObj.get("id").getAsString();
-                    String name = jsonObj.get("name").getAsString();
-                    String ip = jsonObj.get("ip").getAsString();
-                    String status = jsonObj.get("status").getAsString();
-                    String synStatus = jsonObj.get("syn_status").getAsString();
-                    String vendor = jsonObj.get("vendor").getAsString();
-                    String model = jsonObj.get("model").getAsString();
-                    Double usedCapacity = Double.valueOf(jsonObj.get("used_capacity").getAsString());
-                    Double totalCapacity = Double.valueOf(jsonObj.get("total_capacity").getAsString());
-                    Double totalEffectiveCapacity = Double.valueOf(jsonObj.get("total_effective_capacity").getAsString());
-                    Double freeEffectiveCapacity = Double.valueOf(jsonObj.get("free_effective_capacity").getAsString());
-                    Double maxCpuUtilization = Double.valueOf(jsonObj.get("max_cpu_utilization").getAsString());
-                    Double maxIops = Double.valueOf(jsonObj.get("max_iops").getAsString());
-                    Double maxBandwidth = Double.valueOf(jsonObj.get("max_bandwidth").getAsString());
-                    Double maxLatency = Double.valueOf(jsonObj.get("max_latency").getAsString());
-                    String zaIds = jsonObj.get("az_ids").getAsString();
-                    String[] az_ids = {zaIds};
-
                     Storage storageObj = new Storage();
-                    storageObj.setId(id);
-                    storageObj.setName(name);
-                    storageObj.setIp(ip);
-                    storageObj.setStatus(status);
-                    storageObj.setSynStatus(synStatus);
-                    storageObj.setVendor(vendor);
-                    storageObj.setModel(model);
-                    storageObj.setUsedCapacity(usedCapacity);
-                    storageObj.setTotalCapacity(totalCapacity);
-                    storageObj.setTotalEffectiveCapacity(totalEffectiveCapacity);
-                    storageObj.setFreeEffectiveCapacity(freeEffectiveCapacity);
-                    storageObj.setMaxCpuUtilization(maxCpuUtilization);
-                    storageObj.setMaxIops(maxIops);
-                    storageObj.setMaxBandwidth(maxBandwidth);
-                    storageObj.setMaxLatency(maxLatency);
-                    storageObj.setAzIds(az_ids);
-
+                    storageObj.setId(jsonObj.get("id").getAsString());
+                    storageObj.setName(jsonObj.get("name").getAsString());
+                    storageObj.setIp(jsonObj.get("ip").getAsString());
+                    storageObj.setStatus(jsonObj.get("status").getAsString());
+                    storageObj.setSynStatus(jsonObj.get("syn_status").getAsString());
+                    storageObj.setVendor(jsonObj.get("vendor").getAsString());
+                    storageObj.setModel(jsonObj.get("model").getAsString());
+                    storageObj.setUsedCapacity(Double.valueOf(jsonObj.get("used_capacity").getAsString()));
+                    storageObj.setTotalCapacity(Double.valueOf(jsonObj.get("total_capacity").getAsString()));
+                    storageObj.setTotalEffectiveCapacity(Double.valueOf(jsonObj.get("total_effective_capacity").getAsString()));
+                    storageObj.setFreeEffectiveCapacity(Double.valueOf(jsonObj.get("free_effective_capacity").getAsString()));
+                    storageObj.setMaxCpuUtilization(Double.valueOf(jsonObj.get("max_cpu_utilization").getAsString()));
+                    storageObj.setMaxIops(Double.valueOf(jsonObj.get("max_iops").getAsString()));
+                    storageObj.setMaxBandwidth(Double.valueOf(jsonObj.get("max_bandwidth").getAsString()));
+                    storageObj.setMaxLatency(Double.valueOf(jsonObj.get("max_latency").getAsString()));
+                    JsonElement jsonAzIds = jsonObj.get("az_ids");
+                    if (jsonAzIds != null) {
+                        String azIds = jsonAzIds.getAsString();
+                        String[] az_ids = {azIds};
+                        storageObj.setAzIds(az_ids);
+                    } else{
+                        String[] az_ids = {};
+                        storageObj.setAzIds(az_ids);
+                    }
                     list.add(storageObj);
                 }
             }
@@ -114,7 +100,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }finally {
             return objMap;
         }
-    //    "description": "Could not write JSON: For input string: \"2f84a672-48e7-4892-a7b4-96c4c9d403c8\"; nested exception is com.fasterxml.jackson.databind.JsonMappingException: For input string: \"2f84a672-48e7-4892-a7b4-96c4c9d403c8\" (through reference chain: com.dmeplugin.dmestore.model.ResponseBodyBean[\"data\"]->java.util.HashMap[\"data\"]->java.util.ArrayList[0]->com.dmeplugin.dmestore.model.Storage[\"azIds\"]->java.util.Arrays$ArrayList[0]->com.google.gson.JsonArray[\"asInt\"])"
     }
 
     @Override
@@ -124,11 +109,15 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("msg", "search oriented storage success");
         resMap.put("data", storageId);
 
-        String url = "/rest/storagemgmt/v1/storages/" + storageId + "/detail";
+        //String url = "/rest/storagemgmt/v1/storages/" + storageId + "/detail";
+        String url = "https://localhost:26335/rest/storagemgmt/v1/storages/storage_id/detail";
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         try {
-            ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
+            //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
+            ResponseEntity responseEntity = sendHttpRequest(url, HttpMethod.GET, headers);
             Log.info("DmeStorageServiceImpl/getStorageDetail/responseEntity==" + responseEntity);
-            //ResponseEntity responseEntity = sendHttpRequest(url, HttpMethod.GET, headers);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
                 resMap.put("code", code);
@@ -138,33 +127,26 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             Object object = responseEntity.getBody();
             if (object != null) {
                 JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
-                String id = jsonObject.get("id").getAsString();
-                String name = jsonObject.get("name").getAsString();
-                String ip = jsonObject.get("ip").getAsString();
-                String status = jsonObject.get("status").getAsString();
-                String synStatus = jsonObject.get("syn_status").getAsString();
-                String vendor = jsonObject.get("vendor").getAsString();
-                String model = jsonObject.get("model").getAsString();
-                Long usedCapacity = Long.valueOf(jsonObject.get("used_capacity").getAsString());
-                Long totalCapacity = Long.valueOf(jsonObject.get("total_capacity").getAsString());
-                Long totalEffectiveCapacity = Long.valueOf(jsonObject.get("total_effective_capacity").getAsString());
-                Long freeEffectiveCapacity = Long.valueOf(jsonObject.get("free_effective_capacity").getAsString());
-                JsonArray azIds = jsonObject.get("azIds").getAsJsonArray();
-                List<JsonArray> jsonArrays = Arrays.asList(azIds);
-
                 StorageDetail storageObj = new StorageDetail();
-                storageObj.setId(id);
-                storageObj.setName(name);
-                storageObj.setIp(ip);
-                storageObj.setStatus(status);
-                storageObj.setSynStatus(synStatus);
-                storageObj.setVendor(vendor);
-                storageObj.setModel(model);
-                storageObj.setUsedCapacity(usedCapacity);
-                storageObj.setTotalCapacity(totalCapacity);
-                storageObj.setTotalEffectiveCapacity(totalEffectiveCapacity);
-                storageObj.setFreeEffectiveCapacity(freeEffectiveCapacity);
-                storageObj.setAzIds(jsonArrays);
+                storageObj.setId(jsonObject.get("id").getAsString());
+                storageObj.setName(jsonObject.get("name").getAsString());
+                storageObj.setIp(jsonObject.get("ip").getAsString());
+                storageObj.setStatus(jsonObject.get("status").getAsString());
+                storageObj.setSynStatus(jsonObject.get("syn_status").getAsString());
+                storageObj.setVendor(jsonObject.get("vendor").getAsString());
+                storageObj.setModel(jsonObject.get("model").getAsString());
+                storageObj.setUsedCapacity(Double.valueOf(jsonObject.get("used_capacity").getAsString()));
+                storageObj.setTotalCapacity(Double.valueOf(jsonObject.get("total_capacity").getAsString()));
+                storageObj.setTotalEffectiveCapacity(Double.valueOf(jsonObject.get("total_effective_capacity").getAsString()));
+                storageObj.setFreeEffectiveCapacity(Double.valueOf(jsonObject.get("free_effective_capacity").getAsString()));
+                JsonArray ids = jsonObject.get("az_ids").getAsJsonArray();
+                if (ids.size() != 0) {
+                    String[] az_ids = {ids.getAsString()};
+                    storageObj.setAzIds(az_ids);
+                } else {
+                    String[] az_ids = {};
+                    storageObj.setAzIds(az_ids);
+                }
 
                 Map<String, Object> storagePool = getStoragePools(storageId);
                 String jsonStoragePool = gson.toJson(storagePool.get("data"));
@@ -223,14 +205,19 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
         List<StoragePool> resList = new ArrayList<>();
 
-        String url = "/rest/storagemgmt/v1/storagepools/query";
+        //String url = "/rest/storagemgmt/v1/storagepools/query";
+        String url = "https://localhost:26335/rest/storagemgmt/v1/storagepools/query";
 
         Map<String, String> params = new HashMap<>();
         params.put("storage_id", storageId);
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+
         try {
-            //ResponseEntity<String> responseEntity = HttpRequestUtil.requestWithBody(url, HttpMethod.POST, headers, gson.toJson(params), String.class);
-            ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.POST, gson.toJson(params));
+            ResponseEntity<String> responseEntity = HttpRequestUtil.requestWithBody(url, HttpMethod.POST, headers, gson.toJson(params), String.class);
+            //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.POST, gson.toJson(params));
             Log.info("DmeStorageServiceImpl/getStoragePools/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code!=200) {
@@ -244,31 +231,18 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 JsonArray jsonArray = jsonObject.get("datas").getAsJsonArray();
                 for (JsonElement jsonElement:jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
-                    String name = element.get("name").getAsString();
-                    Double free_capacity = Double.valueOf(element.get("free_capacity").getAsString());
-                    String health_status = element.get("health_status").getAsString();
-                    Double lun_subscribed_capacity = Double.valueOf(element.get("lun_subscribed_capacity").getAsString());
-                    String parent_type = element.get("parent_type").getAsString();
-                    String running_status = element.get("running_status").getAsString();
-                    Double total_capacity = Double.valueOf(element.get("total_capacity").getAsString());
-                    Double fs_subscribed_capacity = Double.valueOf(element.get("fs_subscribed_capacity").getAsString());
-                    Double consumed_capacity = Double.valueOf(element.get("consumed_capacity").getAsString());
-                    String consumed_capacity_percentage = element.get("consumed_capacity_percentage").getAsString();
-                    String consumed_capacity_threshold = element.get("consumed_capacity_threshold").getAsString();
-
                     StoragePool storagePool = new StoragePool();
-                    storagePool.setName(name);
-                    storagePool.setFree_capacity(free_capacity);
-                    storagePool.setHealth_status(health_status);
-                    storagePool.setLun_subscribed_capacity(lun_subscribed_capacity);
-                    storagePool.setParent_type(parent_type);
-                    storagePool.setRunning_status(running_status);
-                    storagePool.setTotal_capacity(total_capacity);
-                    storagePool.setFs_subscribed_capacity(fs_subscribed_capacity);
-                    storagePool.setConsumed_capacity(consumed_capacity);
-                    storagePool.setConsumed_capacity_percentage(consumed_capacity_percentage);
-                    storagePool.setConsumed_capacity_threshold(consumed_capacity_threshold);
-
+                    storagePool.setName(element.get("name").getAsString());
+                    storagePool.setFree_capacity(Double.valueOf(element.get("free_capacity").getAsString()));
+                    storagePool.setHealth_status(element.get("health_status").getAsString());
+                    storagePool.setLun_subscribed_capacity(Double.valueOf(element.get("lun_subscribed_capacity").getAsString()));
+                    storagePool.setParent_type(element.get("parent_type").getAsString());
+                    storagePool.setRunning_status(element.get("running_status").getAsString());
+                    storagePool.setTotal_capacity(Double.valueOf(element.get("total_capacity").getAsString()));
+                    storagePool.setFs_subscribed_capacity(Double.valueOf(element.get("fs_subscribed_capacity").getAsString()));
+                    storagePool.setConsumed_capacity(Double.valueOf(element.get("consumed_capacity").getAsString()));
+                    storagePool.setConsumed_capacity_percentage(element.get("consumed_capacity_percentage").getAsString());
+                    storagePool.setConsumed_capacity_threshold(element.get("consumed_capacity_threshold").getAsString());
                     resList.add(storagePool);
                 }
                 resMap.put("data", resList);
@@ -292,7 +266,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
         List<Volume> volumes = new ArrayList<>();
 
-        String reqPath = "/rest/blockservice/v1/volumes";
+        //String reqPath = "/rest/blockservice/v1/volumes";
+        String reqPath = "https://localhost:26335/rest/blockservice/v1/volumes";
         String url = reqPath + "? storageId = "+ storageId;
 
         HttpHeaders headers = new HttpHeaders();
@@ -300,8 +275,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
         try {
-            ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
-            //ResponseEntity responseEntity = sendHttpRequest(url, HttpMethod.GET, headers);
+            //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
+            ResponseEntity responseEntity = sendHttpRequest(url, HttpMethod.GET, headers);
             Log.info("DmeStorageServiceImpl/getVolumes/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -315,29 +290,17 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 JsonArray jsonArray = jsonObject.get("volumes").getAsJsonArray();
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
-                    String id = element.get("id").getAsString();
-                    String name = element.get("name").getAsString();
-                    String status = element.get("status").getAsString();
-                    Boolean attached = Boolean.valueOf(element.get("attached").getAsString());
-                    String alloctype = element.get("alloctype").getAsString();
-                    String service_level_name = element.get("service_level_name").getAsString();
-                    String storage_id = element.get("storage_id").getAsString();
-                    String pool_raw_id = element.get("pool_raw_id").getAsString();
-                    String capacity_usage = element.get("capacity_usage").getAsString();
-                    Boolean protectionStatus = Boolean.valueOf(element.get("protectionStatus").getAsString());
-
                     Volume volume = new Volume();
-                    volume.setId(id);
-                    volume.setName(name);
-                    volume.setStatus(status);
-                    volume.setAttached(attached);
-                    volume.setAlloctype(alloctype);
-                    volume.setService_level_name(service_level_name);
-                    volume.setStorage_id(storage_id);
-                    volume.setPool_raw_id(pool_raw_id);
-                    volume.setCapacity_usage(capacity_usage);
-                    volume.setProtectionStatus(protectionStatus);
-
+                    volume.setId(element.get("id").getAsString());
+                    volume.setName( element.get("name").getAsString());
+                    volume.setStatus(element.get("status").getAsString());
+                    volume.setAttached(Boolean.valueOf(element.get("attached").getAsString()));
+                    volume.setAlloctype(element.get("alloctype").getAsString());
+                    volume.setService_level_name(element.get("service_level_name").getAsString());
+                    volume.setStorage_id(element.get("storage_id").getAsString());
+                    volume.setPool_raw_id(element.get("pool_raw_id").getAsString());
+                    volume.setCapacity_usage(element.get("capacity_usage").getAsString());
+                    volume.setProtectionStatus( Boolean.valueOf(element.get("protectionStatus").getAsString()));
                     volumes.add(volume);
                 }
                 resMap.put("data", volumes);
@@ -362,16 +325,20 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         List<FileSystem> fileSystems = new ArrayList<>();
 
         String hostIp = "";
-        String reqPath = "/rest/fileservice/v1/filesystems/query";
+        String reqPath = "https://localhost:26335/rest/fileservice/v1/filesystems/query";
         String url = "https://" + hostIp + reqPath;
 
         Map<String, String> params = new HashMap<>();
         params.put("storage_id", storageId);
         String jsonParams = gson.toJson(params);
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+
         try {
-            //ResponseEntity<String> responseEntity = HttpRequestUtil.requestWithBody(url, HttpMethod.POST, headers, jsonParams, String.class);
-            ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.POST, jsonParams);
+            ResponseEntity<String> responseEntity = HttpRequestUtil.requestWithBody(url, HttpMethod.POST, headers, jsonParams, String.class);
+            //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.POST, jsonParams);
             Log.info("DmeStorageServiceImpl/getFileSystems/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -385,29 +352,17 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 JsonArray jsonArray = jsonObject.get("data").getAsJsonArray();
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
-                    String id = element.get("id").getAsString();
-                    String name = element.get("name").getAsString();
-                    String health_status = element.get("health_status").getAsString();
-                    String alloc_type = element.get("alloc_type").getAsString();
-                    Double capacity = Double.valueOf(element.get("capacity").getAsString());
-                    Integer capacity_usage_ratio = Integer.valueOf(element.get("capacity_usage_ratio").getAsString());
-                    String storage_pool_name = element.get("storage_pool_name").getAsString();
-                    Integer nfs_count = Integer.valueOf(element.get("nfs_count").getAsString());
-                    Integer cifs_count = Integer.valueOf(element.get("cifs_count").getAsString());
-                    Integer dtree_count = Integer.valueOf(element.get("dtree_count").getAsString());
-
                     FileSystem fileSystem = new FileSystem();
-                    fileSystem.setId(id);
-                    fileSystem.setName(name);
-                    fileSystem.setHealth_status(health_status);
-                    fileSystem.setAlloc_type(alloc_type);
-                    fileSystem.setCapacity(capacity);
-                    fileSystem.setCapacity_usage_ratio(capacity_usage_ratio);
-                    fileSystem.setStorage_pool_name(storage_pool_name);
-                    fileSystem.setNfs_count(nfs_count);
-                    fileSystem.setCifs_count(cifs_count);
-                    fileSystem.setDtree_count(dtree_count);
-
+                    fileSystem.setId(element.get("id").getAsString());
+                    fileSystem.setName(element.get("name").getAsString());
+                    fileSystem.setHealth_status(element.get("health_status").getAsString());
+                    fileSystem.setAlloc_type(element.get("alloc_type").getAsString());
+                    fileSystem.setCapacity(Double.valueOf(element.get("capacity").getAsString()));
+                    fileSystem.setCapacity_usage_ratio(Integer.valueOf(element.get("capacity_usage_ratio").getAsString()));
+                    fileSystem.setStorage_pool_name(element.get("storage_pool_name").getAsString());
+                    fileSystem.setNfs_count(Integer.valueOf(element.get("nfs_count").getAsString()));
+                    fileSystem.setCifs_count(Integer.valueOf(element.get("cifs_count").getAsString()));
+                    fileSystem.setDtree_count(Integer.valueOf(element.get("dtree_count").getAsString()));
                     fileSystems.add(fileSystem);
                 }
                 resMap.put("data", fileSystems);
@@ -430,7 +385,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("storageId", storageId);
 
         //String hostIp = "";
-        String url = "/rest/fileservice/v1/dtrees/summary";
+        String url = "https://localhost:26335/rest/fileservice/v1/dtrees/summary";
         //String url = "https://" + hostIp + reqPath;
 
         List<Dtrees> resList = new ArrayList<>();
@@ -438,9 +393,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         params.put("storage_id", storageId);
         String jsonParams = gson.toJson(params);
 
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+
         try {
-            //ResponseEntity<String> responseEntity = HttpRequestUtil.requestWithBody(url, HttpMethod.POST, headers, jsonParams, String.class);
-            ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.POST, jsonParams);
+            ResponseEntity<String> responseEntity = HttpRequestUtil.requestWithBody(url, HttpMethod.POST, headers, jsonParams, String.class);
+            //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.POST, jsonParams);
             Log.info("DmeStorageServiceImpl/getDTrees/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code!=200) {
@@ -453,23 +412,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.get("dtrees").getAsJsonArray();
                 for (JsonElement jsonElement : jsonArray) {
-
                     JsonObject element = jsonElement.getAsJsonObject();
-                    String name = element.get("name").getAsString();
-                    String fs_name = element.get("fs_name").getAsString();
-                    Boolean quota_switch = Boolean.valueOf(element.get("quota_switch").getAsString());
-                    String security_style = element.get("security_style").getAsString();
-                    String tier_name = element.get("tier_name").getAsString();
-                    Integer nfs_count = Integer.valueOf(element.get("nfs_count").getAsString());
-
                     Dtrees dtrees = new Dtrees();
-                    dtrees.setName(name);
-                    dtrees.setFs_name(fs_name);
-                    dtrees.setQuota_switch(quota_switch);
-                    dtrees.setSecurity_style(security_style);
-                    dtrees.setTier_name(tier_name);
-                    dtrees.setNfs_count(nfs_count);
-
+                    dtrees.setName(element.get("name").getAsString());
+                    dtrees.setFs_name(element.get("fs_name").getAsString());
+                    dtrees.setQuota_switch(Boolean.valueOf(element.get("quota_switch").getAsString()));
+                    dtrees.setSecurity_style(element.get("security_style").getAsString());
+                    dtrees.setTier_name(element.get("tier_name").getAsString());
+                    dtrees.setNfs_count(Integer.valueOf(element.get("nfs_count").getAsString()));
                     resList.add(dtrees);
                 }
                 resMap.put("data", resList);
@@ -491,12 +441,15 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("msg", "list nfsshares success!");
         resMap.put("storageId", storageId);
         List<NfsShares> resList = new ArrayList<>();
-
-        String url = "/rest/fileservice/v1/nfs-shares/summary";
+        String url = "https://localhost:26335/rest/fileservice/v1/nfs-shares/summary";
 
         Map<String, String> params = new HashMap<>();
         params.put("storage_id", storageId);
         String jsonParams = gson.toJson(params);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
         try {
             //ResponseEntity<String> responseEntity = HttpRequestUtil.requestWithBody(url, HttpMethod.POST, headers, jsonParams, String.class);
@@ -514,23 +467,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 JsonArray jsonArray = jsonObject.get("nfs_share_info_list").getAsJsonArray();
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
-                    String name = element.get("name").getAsString();
-                    String share_path = element.get("share_path").getAsString();
-                    String storage_id = element.get("storage_id").getAsString();
-                    String tier_name = element.get("tier_name").getAsString();
-                    String owning_dtree_name = element.get("owning_dtree_name").getAsString();
-                    String fs_name = element.get("fs_name").getAsString();
-                    String owning_dtree_id = element.get("owning_dtree_id").getAsString();
-
                     NfsShares nfsShares = new NfsShares();
-                    nfsShares.setName(name);
-                    nfsShares.setShare_path(share_path);
-                    nfsShares.setStorage_id(storage_id);
-                    nfsShares.setTier_name(tier_name);
-                    nfsShares.setOwning_dtree_name(owning_dtree_name);
-                    nfsShares.setOwning_dtree_id(owning_dtree_id);
-                    nfsShares.setFs_name(fs_name);
-
+                    nfsShares.setName(element.get("name").getAsString());
+                    nfsShares.setShare_path(element.get("share_path").getAsString());
+                    nfsShares.setStorage_id(element.get("storage_id").getAsString());
+                    nfsShares.setTier_name(element.get("tier_name").getAsString());
+                    nfsShares.setOwning_dtree_name(element.get("owning_dtree_name").getAsString());
+                    nfsShares.setOwning_dtree_id(element.get("owning_dtree_id").getAsString());
+                    nfsShares.setFs_name(element.get("fs_name").getAsString());
                     resList.add(nfsShares);
                 }
                 resMap.put("data", resList);
@@ -553,7 +497,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("storageId", storageId);
         List<BandPorts> resList = new ArrayList<>();
 
-        String url = "/rest/storagemgmt/v1/storage-port/bond-ports?storage_id"+storageId;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+
+        String url = "https://localhost:26335/rest/storagemgmt/v1/storage-port/bond-ports?storage_id"+storageId;
         try {
             ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
             Log.info("DmeStorageServiceImpl/getBandPorts/responseEntity==" + responseEntity);
@@ -568,19 +516,12 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 JsonArray jsonArray = jsonObject.get("bond_ports").getAsJsonArray();
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
-                    String id = element.get("id").getAsString();
-                    String name = element.get("name").getAsString();
-                    String health_status = element.get("health_status").getAsString();
-                    String running_status = element.get("running_status").getAsString();
-                    String mtu = element.get("mtu").getAsString();
-
                     BandPorts bandPorts = new BandPorts();
-                    bandPorts.setId(id);
-                    bandPorts.setName(name);
-                    bandPorts.setHealth_status(health_status);
-                    bandPorts.setRunning_status(running_status);
-                    bandPorts.setMtu(mtu);
-
+                    bandPorts.setId(element.get("id").getAsString());
+                    bandPorts.setName(element.get("name").getAsString());
+                    bandPorts.setHealth_status(element.get("health_status").getAsString());
+                    bandPorts.setRunning_status(element.get("running_status").getAsString());
+                    bandPorts.setMtu(element.get("mtu").getAsString());
                     resList.add(bandPorts);
                 }
                 resMap.put("data", resList);
@@ -604,7 +545,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("storageId", storageId);
         List<LogicPorts> resList = new ArrayList<>();
 
-        String url = "/rest/storagemgmt/v1/storage-port/logic-ports?storage_id"+storageId;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+
+        String url = "https://localhost:26335/rest/storagemgmt/v1/storage-port/logic-ports?storage_id="+storageId;
         try {
             ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
             Log.info("DmeStorageServiceImpl/getLogicPorts/responseEntity==" + responseEntity);
@@ -619,41 +564,23 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 JsonArray jsonArray = jsonObject.get("logic_ports").getAsJsonArray();
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
-                    String id = element.get("id").getAsString();
-                    String name = element.get("name").getAsString();
-                    String running_status = element.get("running_status").getAsString();
-                    String operational_status = element.get("operational_status").getAsString();
-                    String mgmt_ip = element.get("mgmt_ip").getAsString();
-                    String mgmt_ipv6 = element.get("mgmt_ipv6").getAsString();
-                    String home_port_id = element.get("home_port_id").getAsString();
-                    String home_port_name = element.get("home_port_name").getAsString();
-                    String current_port_id = element.get("current_port_id").getAsString();
-                    String current_port_name = element.get("current_port_name").getAsString();
-                    String role = element.get("role").getAsString();
-                    String ddns_status = element.get("ddns_status").getAsString();
-                    String support_protocol = element.get("support_protocol").getAsString();
-                    String management_access = element.get("management_access").getAsString();
-                    String vstore_id = element.get("vstore_id").getAsString();
-                    String vstore_name = element.get("vstore_name").getAsString();
-
                     LogicPorts logicPorts = new LogicPorts();
-                    logicPorts.setId(id);
-                    logicPorts.setName(name);
-                    logicPorts.setRunning_status(running_status);
-                    logicPorts.setOperational_status(operational_status);
-                    logicPorts.setMgmt_ip(mgmt_ip);
-                    logicPorts.setMgmt_ipv6(mgmt_ipv6);
-                    logicPorts.setHome_port_id(home_port_id);
-                    logicPorts.setHome_port_name(home_port_name);
-                    logicPorts.setRole(role);
-                    logicPorts.setDdns_status(ddns_status);
-                    logicPorts.setCurrent_port_id(current_port_id);
-                    logicPorts.setCurrent_port_name(current_port_name);
-                    logicPorts.setSupport_protocol(support_protocol);
-                    logicPorts.setManagement_access(management_access);
-                    logicPorts.setVstore_id(vstore_id);
-                    logicPorts.setVstore_name(vstore_name);
-
+                    logicPorts.setId(element.get("id").getAsString());
+                    logicPorts.setName(element.get("name").getAsString());
+                    logicPorts.setRunning_status(element.get("running_status").getAsString());
+                    logicPorts.setOperational_status(element.get("operational_status").getAsString());
+                    logicPorts.setMgmt_ip(element.get("mgmt_ip").getAsString());
+                    logicPorts.setMgmt_ipv6(element.get("mgmt_ipv6").getAsString());
+                    logicPorts.setHome_port_id(element.get("home_port_id").getAsString());
+                    logicPorts.setHome_port_name(element.get("home_port_name").getAsString());
+                    logicPorts.setRole(element.get("role").getAsString());
+                    logicPorts.setDdns_status(element.get("ddns_status").getAsString());
+                    logicPorts.setCurrent_port_id(element.get("current_port_id").getAsString());
+                    logicPorts.setCurrent_port_name(element.get("current_port_name").getAsString());
+                    logicPorts.setSupport_protocol(element.get("support_protocol").getAsString());
+                    logicPorts.setManagement_access(element.get("management_access").getAsString());
+                    logicPorts.setVstore_id( element.get("vstore_id").getAsString());
+                    logicPorts.setVstore_name(element.get("vstore_name").getAsString());
                     resList.add(logicPorts);
                 }
                 resMap.put("data", resList);
@@ -678,9 +605,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("storageId", className);
         List<StorageControllers> resList = new ArrayList<>();
 
-        String url = "/rest/resourcedb/v1/instances/"+className;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+
+        String url = "https://localhost:26335/rest/resourcedb/v1/instances/"+className;
         try {
-            ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
+            //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
+            ResponseEntity responseEntity = sendHttpRequest(url, HttpMethod.GET, headers);
             Log.info("DmeStorageServiceImpl/getStorageControllers/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -688,23 +620,17 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 resMap.put("msg", "list storage controller error!");
                 return resMap;
             }
-            String object = responseEntity.getBody();
+            Object object = responseEntity.getBody();
             if (!StringUtils.isEmpty(object)) {
-                JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+                JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
-                    String name = element.get("name").getAsString();
-                    String status = element.get("status").getAsString();
-                    String softVer = element.get("softVer").getAsString();
-                    String cpuInfo = element.get("cpuInfo").getAsString();
-
                     StorageControllers storageControllers = new StorageControllers();
-                    storageControllers.setName(name);
-                    storageControllers.setSoftVer(softVer);
-                    storageControllers.setStatus(status);
-                    storageControllers.setCpuInfo(cpuInfo);
-
+                    storageControllers.setName(element.get("name").getAsString());
+                    storageControllers.setSoftVer(element.get("softVer").getAsString());
+                    storageControllers.setStatus(element.get("status").getAsString());
+                    storageControllers.setCpuInfo( element.get("cpuInfo").getAsString());
                     resList.add(storageControllers);
                 }
                 resMap.put("data", resList);
@@ -730,10 +656,15 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("storageId", className);
         List<StorageDisk> resList = new ArrayList<>();
 
-        String url = "/rest/resourcedb/v1/instances/"+className;
+        String url = "https://localhost:26335/rest/resourcedb/v1/instances/"+className;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
         try {
-            ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
+            //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
+            ResponseEntity responseEntity = sendHttpRequest(url, HttpMethod.GET, headers);
             Log.info("DmeStorageServiceImpl/getStorageDisks/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -741,21 +672,16 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 resMap.put("msg", "list storage disk error!");
                 return resMap;
             }
-            String object = responseEntity.getBody();
+            Object object = responseEntity.getBody();
             if (!StringUtils.isEmpty(object)) {
-                JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+                JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
-                    String name = element.get("name").getAsString();
-                    String status = element.get("status").getAsString();
-                    String capacity = element.get("capacity").getAsString();
-
                     StorageDisk storageDisk = new StorageDisk();
-                    storageDisk.setName(name);
-                    storageDisk.setStatus(status);
-                    storageDisk.setCapacity(capacity);
-
+                    storageDisk.setName(element.get("name").getAsString());
+                    storageDisk.setStatus(element.get("status").getAsString());
+                    storageDisk.setCapacity(element.get("capacity").getAsString());
                     resList.add(storageDisk);
                 }
                 resMap.put("data", resList);

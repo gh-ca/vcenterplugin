@@ -18,12 +18,12 @@ public class StorageDetail {
     private String vendor;
     private String model;
     private String productVersion;
-    private Long usedCapacity;
-    private Long totalCapacity;
-    private Long totalEffectiveCapacity;
-    private Long freeEffectiveCapacity;
+    private Double usedCapacity;
+    private Double totalCapacity;
+    private Double totalEffectiveCapacity;
+    private Double freeEffectiveCapacity;
     private String location;
-    private Object azIds;
+    private String[] azIds;
     private Object storagePool;
     private Object volume;
     private Object fileSystem;
@@ -106,37 +106,6 @@ public class StorageDetail {
         this.productVersion = productVersion;
     }
 
-    public Long getUsedCapacity() {
-        return usedCapacity;
-    }
-
-    public void setUsedCapacity(Long usedCapacity) {
-        this.usedCapacity = usedCapacity;
-    }
-
-    public Long getTotalCapacity() {
-        return totalCapacity;
-    }
-
-    public void setTotalCapacity(Long totalCapacity) {
-        this.totalCapacity = totalCapacity;
-    }
-
-    public Long getTotalEffectiveCapacity() {
-        return totalEffectiveCapacity;
-    }
-
-    public void setTotalEffectiveCapacity(Long totalEffectiveCapacity) {
-        this.totalEffectiveCapacity = totalEffectiveCapacity;
-    }
-
-    public Long getFreeEffectiveCapacity() {
-        return freeEffectiveCapacity;
-    }
-
-    public void setFreeEffectiveCapacity(Long freeEffectiveCapacity) {
-        this.freeEffectiveCapacity = freeEffectiveCapacity;
-    }
 
     public String getLocation() {
         return location;
@@ -146,12 +115,44 @@ public class StorageDetail {
         this.location = location;
     }
 
-    public Object getAzIds() {
+    public String[] getAzIds() {
         return azIds;
     }
 
-    public void setAzIds(Object azIds) {
+    public void setAzIds(String[] azIds) {
         this.azIds = azIds;
+    }
+
+    public Double getUsedCapacity() {
+        return usedCapacity;
+    }
+
+    public void setUsedCapacity(Double usedCapacity) {
+        this.usedCapacity = usedCapacity;
+    }
+
+    public Double getTotalCapacity() {
+        return totalCapacity;
+    }
+
+    public void setTotalCapacity(Double totalCapacity) {
+        this.totalCapacity = totalCapacity;
+    }
+
+    public Double getTotalEffectiveCapacity() {
+        return totalEffectiveCapacity;
+    }
+
+    public void setTotalEffectiveCapacity(Double totalEffectiveCapacity) {
+        this.totalEffectiveCapacity = totalEffectiveCapacity;
+    }
+
+    public Double getFreeEffectiveCapacity() {
+        return freeEffectiveCapacity;
+    }
+
+    public void setFreeEffectiveCapacity(Double freeEffectiveCapacity) {
+        this.freeEffectiveCapacity = freeEffectiveCapacity;
     }
 
     public Object getStoragePool() {
