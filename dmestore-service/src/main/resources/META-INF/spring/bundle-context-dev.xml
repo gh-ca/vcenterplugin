@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xmlns:mvc="http://www.springframework.org/schema/mvc"
-   xmlns:context="http://www.springframework.org/schema/context"
-   xsi:schemaLocation="
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
       http://www.springframework.org/schema/beans
       http://www.springframework.org/schema/beans/spring-beans.xsd
       http://www.springframework.org/schema/mvc
@@ -13,11 +13,11 @@
 
     <context:property-placeholder location="classpath:application.properties"/>
 
-   <bean name="EchoServiceImpl" class="com.dmeplugin.dmestore.services.EchoServiceImpl"/>
+    <bean name="EchoServiceImpl" class="com.dmeplugin.dmestore.services.EchoServiceImpl"/>
 
-   <bean name="SampleActionServiceImpl" class="com.dmeplugin.dmestore.services.SampleActionServiceImpl">
+    <bean name="SampleActionServiceImpl" class="com.dmeplugin.dmestore.services.SampleActionServiceImpl">
 
-   </bean>
+    </bean>
 
     <bean name="h2DataBaseDao" class="com.dmeplugin.dmestore.dao.H2DataBaseDao">
         <property name="url" value="${h2.url}"/>
@@ -65,7 +65,8 @@
         <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
     </bean>
 
-    <bean name="DataStoreStatisticHistoryService" class="com.dmeplugin.dmestore.services.DataStoreStatisticHistoryServiceImpl">
+    <bean name="DataStoreStatisticHistoryService"
+          class="com.dmeplugin.dmestore.services.DataStoreStatisticHistoryServiceImpl">
     </bean>
 
     <bean name="vmwareAccessService" class="com.dmeplugin.dmestore.services.VmwareAccessServiceImpl">
@@ -73,6 +74,8 @@
 
     <bean name="dmeStorageService" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
     </bean>
+
+    <bean name="taskService" class="com.dmeplugin.dmestore.services.TaskServiceImpl"></bean>
 
 
 
