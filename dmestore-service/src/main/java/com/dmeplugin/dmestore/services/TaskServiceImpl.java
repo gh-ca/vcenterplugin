@@ -8,8 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * @Description: TODO
@@ -106,6 +105,58 @@ public class TaskServiceImpl implements TaskService {
             taskDetailInfos.add(taskDetailInfo);
         }
         return taskDetailInfos;
+    }
+
+    /**
+     *
+     * @param taskIds 待查询的任务id集合
+     * @param taskStatusMap 结束任务对应的状态集合
+     * @param timeout 任务查询超时时间 单位ms
+     * @param startTime 任务查询开始时间 单位ms
+     */
+    @Override
+    public void checkTaskStatus(List<String> taskIds, Map<String, Integer> taskStatusMap, int timeout, long startTime) {
+        //没传开始时间或开始时间小于格林威治启用时间,初始话为当前时间
+        if (0 == startTime || startTime < 1392515067621L) {
+            startTime = System.currentTimeMillis();
+        }
+        List<TaskDetailInfo> detailInfos = new ArrayList<>();
+        Set<String> queryTaskIds = new HashSet<>();
+        for (String taskId : taskIds) {
+            try {
+                TaskDetailInfo taskDetailInfo = queryTaskById(taskId);
+                detailInfos.add(taskDetailInfo);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        for (TaskDetailInfo taskInfo : detailInfos) {
+            String taskId = taskInfo.getId();
+            int status = taskInfo.getStatus();
+            int progress = taskInfo.getProgress();
+            if (100 == progress || status > 2) {
+                taskStatusMap.put(taskId, status);
+            } else {
+                queryTaskIds.add(taskId);
+            }
+        }
+        //判断是否超时
+        long currentTime = System.currentTimeMillis();
+        long delta = currentTime - startTime;
+        if (delta > timeout) {
+            return;
+        }
+        //未超时 判断是否还有任务未结束
+        if (queryTaskIds.size() > 0) {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            checkTaskStatus(new ArrayList<>(queryTaskIds), taskStatusMap, timeout, startTime);
+        }else{
+            return;
+        }
     }
 
    /* public static void main(String[] args) {

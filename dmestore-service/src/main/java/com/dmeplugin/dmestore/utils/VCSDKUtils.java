@@ -177,5 +177,9 @@ public class VCSDKUtils {
             e.printStackTrace();
         }
     }
+
+    private static void hostAction(){
+
+    }
 }
 
