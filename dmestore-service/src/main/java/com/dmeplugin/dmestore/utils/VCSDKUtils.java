@@ -6,14 +6,16 @@ import com.dmeplugin.vmware.util.Pair;
 import com.dmeplugin.vmware.util.TestVmwareContextFactory;
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.google.gson.Gson;
-import com.vmware.connection.BasicConnection;
-import com.vmware.connection.Connection;
-import com.vmware.vim25.*;
+import com.vmware.vim25.DatastoreSummary;
+import com.vmware.vim25.ManagedObjectReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class VCSDKUtils {
 
@@ -23,11 +25,11 @@ public class VCSDKUtils {
     public static String getAllVmfsDataStores(String storeType) throws Exception {
         String listStr = "";
         try {
-            VmwareContext vmwareContext= TestVmwareContextFactory.getContext("10.143.132.248","administrator@vsphere.local","Pbu4@123");
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
 
-            RootFsMO rootFsMO=new RootFsMO(vmwareContext,vmwareContext.getRootFolder());
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
             List<Pair<ManagedObjectReference, String>> dss = rootFsMO.getAllDatastoreOnRootFs();
-            if(dss!=null && dss.size()>0) {
+            if (dss != null && dss.size() > 0) {
                 List<DatastoreSummary> lists = new ArrayList<>();
 
                 for (Pair<ManagedObjectReference, String> ds : dss) {
@@ -56,11 +58,11 @@ public class VCSDKUtils {
     public static String getAllHosts() throws Exception {
         String listStr = "";
         try {
-            VmwareContext vmwareContext= TestVmwareContextFactory.getContext("10.143.132.248","administrator@vsphere.local","Pbu4@123");
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
 
-            RootFsMO rootFsMO=new RootFsMO(vmwareContext,vmwareContext.getRootFolder());
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
             List<Pair<ManagedObjectReference, String>> hosts = rootFsMO.getAllHostOnRootFs();
-            if(hosts!=null && hosts.size()>0) {
+            if (hosts != null && hosts.size() > 0) {
                 List<Map<String, String>> lists = new ArrayList<>();
                 for (Pair<ManagedObjectReference, String> host : hosts) {
                     HostMO host1 = new HostMO(vmwareContext, host.first());
@@ -87,11 +89,11 @@ public class VCSDKUtils {
     public static String getAllClusters() throws Exception {
         String listStr = "";
         try {
-            VmwareContext vmwareContext= TestVmwareContextFactory.getContext("10.143.132.248","administrator@vsphere.local","Pbu4@123");
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
 
-            RootFsMO rootFsMO=new RootFsMO(vmwareContext,vmwareContext.getRootFolder());
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
             List<Pair<ManagedObjectReference, String>> cls = rootFsMO.getAllClusterOnRootFs();
-            if(cls!=null && cls.size()>0) {
+            if (cls != null && cls.size() > 0) {
                 List<Map<String, String>> lists = new ArrayList<>();
                 for (Pair<ManagedObjectReference, String> cl : cls) {
                     ClusterMO cl1 = new ClusterMO(vmwareContext, cl.first());
@@ -118,18 +120,18 @@ public class VCSDKUtils {
     public static String getHostsOnCluster(String clusterName) throws Exception {
         String listStr = "";
         try {
-            VmwareContext vmwareContext= TestVmwareContextFactory.getContext("10.143.132.248","administrator@vsphere.local","Pbu4@123");
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
 
-            RootFsMO rootFsMO=new RootFsMO(vmwareContext,vmwareContext.getRootFolder());
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
 
             List<Pair<ManagedObjectReference, String>> cls = rootFsMO.getAllClusterOnRootFs();
-            if(cls!=null && cls.size()>0) {
+            if (cls != null && cls.size() > 0) {
                 for (Pair<ManagedObjectReference, String> cl : cls) {
                     ClusterMO cl1 = new ClusterMO(vmwareContext, cl.first());
-                    if(cl1.getName().equals(clusterName)){
+                    if (cl1.getName().equals(clusterName)) {
                         List<Pair<ManagedObjectReference, String>> hosts = cl1.getClusterHosts();
 
-                        if(hosts!=null && hosts.size()>0){
+                        if (hosts != null && hosts.size() > 0) {
                             List<Map<String, String>> lists = new ArrayList<>();
                             for (Pair<ManagedObjectReference, String> host : hosts) {
                                 HostMO host1 = new HostMO(vmwareContext, host.first());
@@ -163,6 +165,29 @@ public class VCSDKUtils {
         _logger.info("start rename DataStore");
     }
 
+    public static void hostRescanVmfs(String hostIp) throws Exception {
+        try {
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+            List<Pair<ManagedObjectReference, String>> hosts = rootFsMO.getAllHostOnRootFs();
+            if (hosts != null && hosts.size() > 0) {
+                for (Pair<ManagedObjectReference, String> host : hosts) {
+                    HostMO hostMo = new HostMO(vmwareContext, host.first());
+                    String hostName = hostMo.getHostName();
+                    if (hostIp.equals(hostName)) {
+                        HostStorageSystemMO hssMo = hostMo.getHostStorageSystemMO();
+                        hssMo.rescanVmfs();
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware host rescanVmfs error:", e);
+            throw e;
+        }
+    }
+
     public static void main(String[] args) {
         try {
 //            String listStr = VCSDKUtils.getAllVmfsDataStores(null);
@@ -178,8 +203,6 @@ public class VCSDKUtils {
         }
     }
 
-    private static void hostAction(){
 
-    }
 }
 

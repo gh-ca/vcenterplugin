@@ -44,11 +44,16 @@ public interface DmeAccessService {
     /**
      * create host
      */
-    Map<String,Object> createHost(Map<String, Object> params) throws Exception;
+    Map<String, Object> createHost(Map<String, Object> params) throws Exception;
 
     /**
      * create hostgroup
      */
-    Map<String,Object> createHostGroup(Map<String, Object> params) throws Exception;
+    Map<String, Object> createHostGroup(Map<String, Object> params) throws Exception;
+
+    /**
+     * get host
+     */
+    Map<String, Object> getDmeHost(String hostId) throws Exception;
 
 }
