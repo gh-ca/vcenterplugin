@@ -270,6 +270,155 @@ public class VCSDKUtils {
 //
     }
 
+    //得到主机对应的可用LUN
+    public static HostScsiDisk getLunsOnHost(String hostName, int capacity) throws Exception {
+        HostScsiDisk candidateHostScsiDisk = null;
+        String vmwareUrl = "10.143.132.248";
+        String vmwareUserName = "administrator@vsphere.local";
+        String vmwarePassword = "Pbu4@123";
+        try {
+            HostMO hostMo = null;
+
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext(vmwareUrl, vmwareUserName, vmwarePassword);
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+            List<Pair<ManagedObjectReference, String>> hosts = rootFsMO.getAllHostOnRootFs();
+            if (hosts != null && hosts.size() > 0) {
+                for (Pair<ManagedObjectReference, String> host : hosts) {
+                    HostMO host1 = new HostMO(vmwareContext, host.first());
+                    if (host1.getName().equals(hostName)) {
+                        hostMo = host1;
+                        break;
+                    }
+                }
+            }
+
+            if (hostMo != null) {
+                //get available LUN
+                HostDatastoreSystemMO hostDatastoreSystem = hostMo.getHostDatastoreSystemMO();
+                List<HostScsiDisk> hostScsiDisks = hostDatastoreSystem.queryAvailableDisksForVmfs();
+                candidateHostScsiDisk = getObjectLuns(hostScsiDisks, capacity);
+            } else {
+                throw new Exception("host:" + hostName + " non-existent。");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("host:" + hostName + " error:", e);
+            throw e;
+        }
+        return candidateHostScsiDisk;
+//
+    }
+    //得到集群下所有主机对应的可用LUN
+    public static HostScsiDisk getLunsOnCluster(String clusterName, int capacity) throws Exception {
+        HostScsiDisk candidateHostScsiDisk = null;
+        String vmwareUrl = "10.143.132.248";
+        String vmwareUserName = "administrator@vsphere.local";
+        String vmwarePassword = "Pbu4@123";
+        try {
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext(vmwareUrl, vmwareUserName, vmwarePassword);
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+            List<Pair<ManagedObjectReference, String>> cls = rootFsMO.getAllClusterOnRootFs();
+            if (cls != null && cls.size() > 0) {
+                for (Pair<ManagedObjectReference, String> cl : cls) {
+                    ClusterMO cl1 = new ClusterMO(vmwareContext, cl.first());
+                    if (cl1.getName().equals(clusterName)) {
+                        List<Pair<ManagedObjectReference, String>> hosts = cl1.getClusterHosts();
+
+                        if (hosts != null && hosts.size() > 0) {
+                            List<HostScsiDisk> objHostScsiDisks = new ArrayList<>();
+                            List<Map<String, String>> lists = new ArrayList<>();
+                            for (Pair<ManagedObjectReference, String> host : hosts) {
+                                HostMO hostMo = new HostMO(vmwareContext, host.first());
+                                if(hostMo!=null) {
+                                    HostDatastoreSystemMO hostDatastoreSystem = hostMo.getHostDatastoreSystemMO();
+                                    List<HostScsiDisk> hostScsiDisks = hostDatastoreSystem.queryAvailableDisksForVmfs();
+                                    if(hostScsiDisks!=null && hostScsiDisks.size()>0){
+                                        objHostScsiDisks.addAll(hostScsiDisks);
+                                    }
+                                }
+                            }
+
+                            if (objHostScsiDisks.size()>0) {
+                                //get available LUN
+                                candidateHostScsiDisk = getObjectLuns(objHostScsiDisks, capacity);
+                            } else {
+                                throw new Exception("cluster:" + clusterName + " non-existent LUN。");
+                            }
+                        }else {
+                            throw new Exception("cluster:" + clusterName + " non-existent HOST。");
+                        }
+
+                        break;
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("cluster get lun error:", e);
+            throw e;
+        }
+        return candidateHostScsiDisk;
+//
+    }
+    //得到主机对应的可用LUN
+    public static HostScsiDisk getObjectLuns(List<HostScsiDisk> hostScsiDisks, int capacity) throws Exception {
+        HostScsiDisk candidateHostScsiDisk = null;
+        try {
+            if (hostScsiDisks != null && hostScsiDisks.size()>0 && capacity>0) {
+                long oldcapacity = capacity*1L*ToolUtils.Gi;
+                long objcapacity = 0;
+                HostScsiDisk objHostScsiDisk = null;
+                long maxcapacity = 0;
+                HostScsiDisk maxHostScsiDisk = null;
+                for (HostScsiDisk hostScsiDisk : hostScsiDisks) {
+                    long tmpcapacity = hostScsiDisk.getCapacity().getBlockSize()*hostScsiDisk.getCapacity().getBlock();
+                    if(tmpcapacity>oldcapacity){
+//                        _logger.info("tmpcapacity=="+tmpcapacity);
+                        if(objcapacity==0){
+                            objcapacity = tmpcapacity;
+                            objHostScsiDisk = hostScsiDisk;
+                        }else if(tmpcapacity<objcapacity){
+                            objcapacity = tmpcapacity;
+                            objHostScsiDisk = hostScsiDisk;
+                        }
+                    }
+                    //同时也记录一个最大的
+                    if(maxcapacity==0){
+                        maxcapacity = tmpcapacity;
+                        maxHostScsiDisk = hostScsiDisk;
+                    }else if(tmpcapacity>maxcapacity){
+                        maxcapacity = tmpcapacity;
+                        maxHostScsiDisk = hostScsiDisk;
+                    }
+                }
+
+                _logger.info("objcapacity=="+objcapacity+"=="+(objHostScsiDisk==null?"null":objHostScsiDisk.getDevicePath()));
+                _logger.info("maxcapacity=="+maxcapacity+"=="+(maxHostScsiDisk==null?"null":maxHostScsiDisk.getDevicePath()));
+                if(objcapacity>0){
+                    candidateHostScsiDisk = objHostScsiDisk;
+                }else{
+                    candidateHostScsiDisk = maxHostScsiDisk;
+                }
+
+                if (candidateHostScsiDisk != null) {
+                    _logger.info("Create datastore via on disk " + candidateHostScsiDisk.getDevicePath());
+
+                } else {
+                    throw new Exception("host No find available LUN。");
+                }
+            } else {
+                throw new Exception("host No available LUN。");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("get LUN error:", e);
+            throw e;
+        }
+        return candidateHostScsiDisk;
+//
+    }
+
     //创建vmfs存储
     public static String createVmfsDataStore(String hostName, String devicePath, String datastoreName,
                                              int vmfsMajorVersion, int blockSize, long totalSectors,
@@ -429,13 +578,19 @@ public class VCSDKUtils {
 
     public static void main(String[] args) {
         try {
+            Gson gson = new Gson();
 //            String listStr = VCSDKUtils.getAllVmfsDataStores(null);
 //            _logger.info("Vmfs listStr==" + listStr);
 //            listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_VMFS);
 //            _logger.info("Vmfs listStr==" + listStr);
 //            listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_NFS);
 //            _logger.info("Vmfs listStr==" + listStr);
-            _logger.info("Vmfs getAllClusters==" + VCSDKUtils.getLunsOnHost("10.143.133.196"));
+//            _logger.info("Vmfs getAllClusters==" + VCSDKUtils.getLunsOnHost("10.143.133.196"));
+////////////////////////////////////getLunsOnHost//////////////////////////////////////////
+            HostScsiDisk objhsd = getLunsOnCluster("pbu4test",10);
+            if(objhsd!=null) {
+                _logger.info("path==" + objhsd.getDevicePath() + "==" + objhsd.getUuid() + "==" + (gson.toJson(objhsd.getCapacity())));
+            }
 
 ///////////////////////create vmfs/////////////////////////////////////////////////////////
 //            String hostName = "10.143.133.196";
