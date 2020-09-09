@@ -8,6 +8,7 @@ import com.dmeplugin.vmware.util.Pair;
 import com.dmeplugin.vmware.util.TestVmwareContextFactory;
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.vmware.cis.tagging.TagModel;
 import com.vmware.connection.BasicConnection;
 import com.vmware.connection.Connection;
@@ -209,13 +210,13 @@ public class VCSDKUtils {
     //创建vmfs存储
     public static String createVmfsDataStore(String hostName,String devicePath,String datastoreName,
                                              int vmfsMajorVersion, int blockSize, long totalSectors,
-                                             int unmapGranularity, String unmapPriority,
-                                             String serviceLevelName) throws Exception {
+                                             int unmapGranularity, String unmapPriority) throws Exception {
         String dataStoreStr = "";
         String vmwareUrl = "10.143.132.248";
         String vmwareUserName = "administrator@vsphere.local";
         String vmwarePassword = "Pbu4@123";
         try {
+            Gson gson = new Gson();
             HostMO hostMo = null;
 
             VmwareContext vmwareContext= TestVmwareContextFactory.getContext(vmwareUrl,vmwareUserName,vmwarePassword);
@@ -237,7 +238,6 @@ public class VCSDKUtils {
                 List<HostScsiDisk> hostScsiDisks = hostDatastoreSystem.queryAvailableDisksForVmfs();
                 if (hostScsiDisks != null) {
                     HostScsiDisk candidateHostScsiDisk = null;
-                    Gson gson = new Gson();
                     for (HostScsiDisk hostScsiDisk : hostScsiDisks) {
                         if (devicePath.equals(hostScsiDisk.getDevicePath())) {
                             candidateHostScsiDisk = hostScsiDisk;
@@ -263,25 +263,10 @@ public class VCSDKUtils {
                             Map<String, Object> dataStoremap = new HashMap<>();
                             dataStoremap.put("name", dsMo.getName());
                             dataStoremap.put("id", dsMo.getMor().getValue());
+                            dataStoremap.put("type", dsMo.getMor().getType());
                             dataStoremap.put("capacity", dsMo.getSummary().getCapacity());
                             dataStoreStr = gson.toJson(dataStoremap);
                             _logger.info("dataStoreStr===" + dataStoreStr);
-
-                            SessionHelper sessionHelper = new SessionHelper();
-                            sessionHelper.login(vmwareUrl, vmwareUserName, vmwarePassword);
-                            TaggingWorkflow taggingWorkflow = new TaggingWorkflow(sessionHelper);
-
-                            List<String> taglist = taggingWorkflow.listTags();
-                            for (String tagid : taglist) {
-                                TagModel tagModel = taggingWorkflow.getTag(tagid);
-                                if (tagModel.getName().equals(serviceLevelName)) {
-                                    DynamicID objDynamicId = new DynamicID(datastore.getType(), datastore.getValue());
-                                    taggingWorkflow.attachTag(tagid, objDynamicId);
-                                    _logger.info("Service Level:" + serviceLevelName + " Associated");
-                                    break;
-                                }
-                            }
-                            sessionHelper.logout();
                         }
                     }else{
                         throw new Exception("host:" + hostName + ",No find available LUN。");
@@ -301,6 +286,57 @@ public class VCSDKUtils {
 //
     }
 
+    //创建vmfs存储
+    public static String attachTag(String datastoreType,String datastoreId,String serviceLevelName) throws Exception {
+        String attachTagStr = "";
+        String vmwareUrl = "10.143.132.248";
+        String vmwareUserName = "administrator@vsphere.local";
+        String vmwarePassword = "Pbu4@123";
+
+        SessionHelper sessionHelper = null;
+        try {
+            if(StringUtils.isEmpty(datastoreType)){
+                _logger.info("DataStore Type is null,unable tag。");
+                return null;
+            }
+            if(StringUtils.isEmpty(datastoreId)){
+                _logger.info("DataStore Id is null,unable tag。");
+                return null;
+            }
+            if(StringUtils.isEmpty(serviceLevelName)){
+                _logger.info("Service Level Name is null,unable tag。");
+                return null;
+            }
+
+            sessionHelper = new SessionHelper();
+            sessionHelper.login(vmwareUrl, vmwareUserName, vmwarePassword);
+            TaggingWorkflow taggingWorkflow = new TaggingWorkflow(sessionHelper);
+
+            List<String> taglist = taggingWorkflow.listTags();
+            for (String tagid : taglist) {
+                TagModel tagModel = taggingWorkflow.getTag(tagid);
+                if (tagModel.getName().equals(serviceLevelName)) {
+                    DynamicID objDynamicId = new DynamicID(datastoreType, datastoreId);
+                    taggingWorkflow.attachTag(tagid, objDynamicId);
+                    _logger.info("Service Level:" + serviceLevelName + " Associated");
+                    attachTagStr = "Associated";
+                    break;
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("DataStore:"+datastoreId+" error:", e);
+            throw e;
+        }finally {
+            if(sessionHelper!=null){
+                sessionHelper.logout();
+            }
+        }
+        return attachTagStr;
+//
+    }
+
 
     public static void main(String[] args) {
         try {
@@ -314,7 +350,7 @@ public class VCSDKUtils {
 //            _logger.info("Vmfs getAllClusters==" + VCSDKUtils.getHostsOnCluster("pbu4test"));
             String hostName = "10.143.133.196";
             String devicePath = "/vmfs/devices/disks/mpx.vmhba1:C0:T5:L0";
-            String datastoreName = "yytestvfms006";
+            String datastoreName = "yytestvfms007";
             int vmfsMajorVersion = 6;
             int blockSize = 1024;
             long totalSectors = 16777216L;
@@ -322,8 +358,16 @@ public class VCSDKUtils {
             String unmapPriority = "low";
             String serviceLevelName = "dme3333";
             String dataStoreStr = VCSDKUtils.createVmfsDataStore(hostName, devicePath, datastoreName,
-             vmfsMajorVersion,  blockSize,  totalSectors, unmapGranularity, unmapPriority, serviceLevelName);
+             vmfsMajorVersion,  blockSize,  totalSectors, unmapGranularity, unmapPriority);
             _logger.info("Vmfs dataStoreStr==" + dataStoreStr);
+
+            Gson gson = new Gson();
+            Map<String, Object> dsmap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {}.getType());
+            if(dsmap!=null) {
+                String attachTagStr = VCSDKUtils.attachTag(dsmap.get("type").toString(), dsmap.get("id").toString(), serviceLevelName);
+                _logger.info("Vmfs attachTagStr==" + attachTagStr);
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
