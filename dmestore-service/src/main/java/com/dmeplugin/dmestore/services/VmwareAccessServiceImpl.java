@@ -58,22 +58,4 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
         return lists;
     }
 
-    @Override
-    public List<Map<String,String>> getLunsOnHost(String hostName) throws Exception{
-        List<Map<String, String>> lists = null;
-        try {
-            //取得主机下的可用lun
-            String listStr = VCSDKUtils.getLunsOnHost(hostName);
-            LOG.info("getLunsOnHost==" + listStr);
-            if (!StringUtils.isEmpty(listStr)) {
-                lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
-                }.getType());
-            }
-        } catch (Exception e) {
-            LOG.error("getLunsOnHost error:", e);
-            throw e;
-        }
-        LOG.info("getLunsOnHost===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
-        return lists;
-    }
 }

@@ -62,25 +62,5 @@ public class VmwareAccessController extends BaseController {
         return failure(failureStr);
     }
 
-    /*
-   * Access cluster
-   * return: cluster info
-   */
-    @RequestMapping(value = "/getlunsonhost", method = RequestMethod.GET)
-    @ResponseBody
-    public ResponseBodyBean getLunsOnHost(@RequestParam("hostName") String hostName) throws Exception {
-        LOG.info("accessvmware/getlunsonhost");
-        String failureStr = "";
-        try {
-            List<Map<String, String>> lists = vmwareAccessService.getLunsOnHost(hostName);
-            LOG.info("getlunsonhost vmware lists==" + gson.toJson(lists));
-            return success(lists);
-        } catch (Exception e) {
-            LOG.error("get luns failure:", e);
-            failureStr = e.getMessage();
-        }
-        return failure(failureStr);
-    }
-
 
 }
