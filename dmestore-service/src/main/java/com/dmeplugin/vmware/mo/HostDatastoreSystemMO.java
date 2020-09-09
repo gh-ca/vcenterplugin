@@ -163,14 +163,24 @@ public class HostDatastoreSystemMO extends BaseMO {
         return _context.getService().queryAvailableDisksForVmfs(_mor, null);
     }
 
-    public ManagedObjectReference createVmfsDatastore(String datastoreName, HostScsiDisk hostScsiDisk) throws Exception {
+    public ManagedObjectReference createVmfsDatastore(String datastoreName,
+                                                      HostScsiDisk hostScsiDisk,
+                                                      int vmfsMajorVersion,
+                                                      int blockSize,
+                                                      long totalSectors,
+                                                      int unmapGranularity,
+                                                      String unmapPriority) throws Exception {
         // just grab the first instance of VmfsDatastoreOption
-        VmfsDatastoreOption vmfsDatastoreOption = _context.getService().queryVmfsDatastoreCreateOptions(_mor, hostScsiDisk.getDevicePath(), 5).get(0);
+        VmfsDatastoreOption vmfsDatastoreOption = _context.getService().queryVmfsDatastoreCreateOptions(_mor, hostScsiDisk.getDevicePath(), vmfsMajorVersion).get(0);
 
         VmfsDatastoreCreateSpec vmfsDatastoreCreateSpec = (VmfsDatastoreCreateSpec)vmfsDatastoreOption.getSpec();
 
         // set the name of the datastore to be created
         vmfsDatastoreCreateSpec.getVmfs().setVolumeName(datastoreName);
+        vmfsDatastoreCreateSpec.getVmfs().setBlockSize(blockSize);
+        vmfsDatastoreCreateSpec.getVmfs().setUnmapGranularity(unmapGranularity);
+        vmfsDatastoreCreateSpec.getVmfs().setUnmapPriority(unmapPriority);
+        vmfsDatastoreCreateSpec.getPartition().setTotalSectors(totalSectors);
 
         return _context.getService().createVmfsDatastore(_mor, vmfsDatastoreCreateSpec);
     }
