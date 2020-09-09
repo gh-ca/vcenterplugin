@@ -161,10 +161,22 @@ public class VCSDKUtils {
         return listStr;
     }
 
-    public static void renameDataStore(String newName) {
-        //拿到对应的datastore 然后修改名字
-        //如何获取指定的dataStore
-        _logger.info("start rename DataStore");
+    public static String renameDataStore(String oldName,String newName) throws Exception{
+
+        String result = "success";
+        _logger.info("==start rename DataStore==");
+        try {
+            VmwareContext vmwareContext= TestVmwareContextFactory.getContext("10.143.132.248","administrator@vsphere.local","Pbu4@123");
+            DatastoreMO dsMo = new DatastoreMO(vmwareContext, new DatacenterMO(vmwareContext, "Datacenter").findDatastore(oldName));
+            dsMo.renameDatastore(newName);
+            _logger.info("==end rename DataStore==");
+        } catch (Exception e) {
+            result = "failed";
+            _logger.error("vmware error:", e);
+            throw e;
+        }finally {
+            return result;
+        }
     }
 
     public static void hostRescanVmfs(String hostIp) throws Exception {

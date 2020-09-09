@@ -45,7 +45,6 @@ public class DmeStorageController extends BaseController{
     @ResponseBody
     public ResponseBodyBean getStorages(){
 
-        //LOG.info("storages ==" + gson.toJson(params) );
         Map<String, Object> resMap = dmeStorageService.getStorages();
         if (null != resMap && null != resMap.get("code") && resMap.get("code").equals("200")) {
             return success(resMap);

@@ -9,5 +9,5 @@ import java.io.Serializable;
  */
 public class CapabilitiesQos implements Serializable {
 
-    private QosParam qosParam;
+    //private QosParam qosParam;
 }

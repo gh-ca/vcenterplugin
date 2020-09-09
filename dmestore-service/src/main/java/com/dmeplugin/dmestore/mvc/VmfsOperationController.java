@@ -1,12 +1,10 @@
 package com.dmeplugin.dmestore.mvc;
 
 import com.dmeplugin.dmestore.model.SimpleServiceLevel;
-import com.dmeplugin.dmestore.model.Volume;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
+import com.dmeplugin.dmestore.services.VmfsOperationService;
 import com.google.gson.Gson;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,31 +20,32 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/operatevmfs")
-//@Api(value = "operation Vmfs Datastore")
+@Api
 public class VmfsOperationController extends BaseController{
 
     public static final Logger LOG = LoggerFactory.getLogger(VmfsOperationController.class);
 
     @Autowired
     private Gson gson;
+    @Autowired
+    private VmfsOperationService vmfsOperationService;
 
-    //服务化卷和非服务化卷的衡量标准？
-    //修改vmfs名字 调用vcenter接口
     /**
      *
-     * @param volumeId  required
-     * @param volume requestbody  required
+     * @param volume_id  required
+     * @param params  {control_policy,max_iops,max_bandwidth,newVoName,oldDsName,newDsName}
      * @return
      */
     @PutMapping("/updatevmfs")
     @ResponseBody
-    //@ApiOperation(value = "updatevmfs",httpMethod = "put")
-    public ResponseBodyBean updateVMFS(@RequestParam(value = "volumeId" ) String volumeId,
-                                       @RequestBody Volume volume){
-        String url ="/rest/blockservice/v1/volumes/"+ volumeId;
-        LOG.info("updatevmfs==volumeId="+volumeId+"volume=="+gson.toJson(volume));
-        String taskId="";
-        return success();
+    public ResponseBodyBean updateVMFS(@RequestParam(value = "volume_id" ) String volume_id,
+                                       @RequestBody Map<String,Object> params){
+
+        Map<String,Object> resMap = vmfsOperationService.updateVMFS(volume_id,params);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals("200")) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
     }
 
     /**
@@ -121,6 +120,10 @@ public class VmfsOperationController extends BaseController{
 
         String taskId = "";
         return success(taskId);
+    }
+
+    public static void main(String[] args) {
+
     }
 
 }

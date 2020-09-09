@@ -710,4 +710,19 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
         return responseEntity;
     }
+    private ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws Exception {
+
+        RestUtils restUtils = new RestUtils();
+        RestTemplate restTemplate = restUtils.getRestTemplate();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+
+        ResponseEntity<String> responseEntity = restTemplate.exchange(url, method, entity, String.class);
+        LOG.info(url + "==responseEntity==" + (responseEntity==null?"null":responseEntity.getStatusCodeValue()));
+
+        return responseEntity;
+    }
 }

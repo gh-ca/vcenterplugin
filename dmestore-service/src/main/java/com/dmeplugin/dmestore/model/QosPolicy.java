@@ -8,11 +8,15 @@ package com.dmeplugin.dmestore.model;
  * @Version V1.0
  **/
 public class QosPolicy {
+
     private String latency;
-    private String max_bandwidth;
-    private String max_iops;
     private String min_bandwidth;
     private String min_iops;
+
+    private String max_bandwidth;
+    private String max_iops;
+    //for update
+    private Object control_policy;
 
     public String getLatency() {
         return latency;
@@ -52,5 +56,13 @@ public class QosPolicy {
 
     public void setMin_iops(String min_iops) {
         this.min_iops = min_iops;
+    }
+
+    public Object getControl_policy() {
+        return control_policy;
+    }
+
+    public void setControl_policy(Object control_policy) {
+        this.control_policy = control_policy;
     }
 }
