@@ -10,15 +10,18 @@ import com.dmeplugin.vmware.util.VmwareContext;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.vmware.cis.tagging.TagModel;
-import com.vmware.connection.BasicConnection;
-import com.vmware.connection.Connection;
 import com.vmware.vapi.std.DynamicID;
-import com.vmware.vim25.*;
+import com.vmware.vim25.DatastoreSummary;
+import com.vmware.vim25.HostScsiDisk;
+import com.vmware.vim25.ManagedObjectReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class VCSDKUtils {
 
@@ -28,11 +31,11 @@ public class VCSDKUtils {
     public static String getAllVmfsDataStores(String storeType) throws Exception {
         String listStr = "";
         try {
-            VmwareContext vmwareContext= TestVmwareContextFactory.getContext("10.143.132.248","administrator@vsphere.local","Pbu4@123");
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
 
-            RootFsMO rootFsMO=new RootFsMO(vmwareContext,vmwareContext.getRootFolder());
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
             List<Pair<ManagedObjectReference, String>> dss = rootFsMO.getAllDatastoreOnRootFs();
-            if(dss!=null && dss.size()>0) {
+            if (dss != null && dss.size() > 0) {
                 List<DatastoreSummary> lists = new ArrayList<>();
 
                 for (Pair<ManagedObjectReference, String> ds : dss) {
@@ -61,11 +64,11 @@ public class VCSDKUtils {
     public static String getAllHosts() throws Exception {
         String listStr = "";
         try {
-            VmwareContext vmwareContext= TestVmwareContextFactory.getContext("10.143.132.248","administrator@vsphere.local","Pbu4@123");
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
 
-            RootFsMO rootFsMO=new RootFsMO(vmwareContext,vmwareContext.getRootFolder());
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
             List<Pair<ManagedObjectReference, String>> hosts = rootFsMO.getAllHostOnRootFs();
-            if(hosts!=null && hosts.size()>0) {
+            if (hosts != null && hosts.size() > 0) {
                 List<Map<String, String>> lists = new ArrayList<>();
                 for (Pair<ManagedObjectReference, String> host : hosts) {
                     HostMO host1 = new HostMO(vmwareContext, host.first());
@@ -92,11 +95,11 @@ public class VCSDKUtils {
     public static String getAllClusters() throws Exception {
         String listStr = "";
         try {
-            VmwareContext vmwareContext= TestVmwareContextFactory.getContext("10.143.132.248","administrator@vsphere.local","Pbu4@123");
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
 
-            RootFsMO rootFsMO=new RootFsMO(vmwareContext,vmwareContext.getRootFolder());
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
             List<Pair<ManagedObjectReference, String>> cls = rootFsMO.getAllClusterOnRootFs();
-            if(cls!=null && cls.size()>0) {
+            if (cls != null && cls.size() > 0) {
                 List<Map<String, String>> lists = new ArrayList<>();
                 for (Pair<ManagedObjectReference, String> cl : cls) {
                     ClusterMO cl1 = new ClusterMO(vmwareContext, cl.first());
@@ -123,18 +126,18 @@ public class VCSDKUtils {
     public static String getHostsOnCluster(String clusterName) throws Exception {
         String listStr = "";
         try {
-            VmwareContext vmwareContext= TestVmwareContextFactory.getContext("10.143.132.248","administrator@vsphere.local","Pbu4@123");
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
 
-            RootFsMO rootFsMO=new RootFsMO(vmwareContext,vmwareContext.getRootFolder());
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
 
             List<Pair<ManagedObjectReference, String>> cls = rootFsMO.getAllClusterOnRootFs();
-            if(cls!=null && cls.size()>0) {
+            if (cls != null && cls.size() > 0) {
                 for (Pair<ManagedObjectReference, String> cl : cls) {
                     ClusterMO cl1 = new ClusterMO(vmwareContext, cl.first());
-                    if(cl1.getName().equals(clusterName)){
+                    if (cl1.getName().equals(clusterName)) {
                         List<Pair<ManagedObjectReference, String>> hosts = cl1.getClusterHosts();
 
-                        if(hosts!=null && hosts.size()>0){
+                        if (hosts != null && hosts.size() > 0) {
                             List<Map<String, String>> lists = new ArrayList<>();
                             for (Pair<ManagedObjectReference, String> host : hosts) {
                                 HostMO host1 = new HostMO(vmwareContext, host.first());
@@ -162,12 +165,12 @@ public class VCSDKUtils {
         return listStr;
     }
 
-    public static String renameDataStore(String oldName,String newName) throws Exception{
+    public static String renameDataStore(String oldName, String newName) throws Exception {
 
         String result = "success";
         _logger.info("==start rename DataStore==");
         try {
-            VmwareContext vmwareContext= TestVmwareContextFactory.getContext("10.143.132.248","administrator@vsphere.local","Pbu4@123");
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
             DatastoreMO dsMo = new DatastoreMO(vmwareContext, new DatacenterMO(vmwareContext, "Datacenter").findDatastore(oldName));
             dsMo.renameDatastore(newName);
             _logger.info("==end rename DataStore==");
@@ -175,7 +178,7 @@ public class VCSDKUtils {
             result = "failed";
             _logger.error("vmware error:", e);
             throw e;
-        }finally {
+        } finally {
             return result;
         }
     }
@@ -203,12 +206,72 @@ public class VCSDKUtils {
         }
     }
 
-    private static void hostAction(){
+    private static void hostAction() {
 
     }
 
+    //得到主机对应的可用LUN
+    public static String getLunsOnHost(String hostName) throws Exception {
+        String lunStr = "";
+        String vmwareUrl = "10.143.132.248";
+        String vmwareUserName = "administrator@vsphere.local";
+        String vmwarePassword = "Pbu4@123";
+        try {
+            Gson gson = new Gson();
+            HostMO hostMo = null;
+
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext(vmwareUrl, vmwareUserName, vmwarePassword);
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+            List<Pair<ManagedObjectReference, String>> hosts = rootFsMO.getAllHostOnRootFs();
+            if (hosts != null && hosts.size() > 0) {
+                for (Pair<ManagedObjectReference, String> host : hosts) {
+                    HostMO host1 = new HostMO(vmwareContext, host.first());
+                    if (host1.getName().equals(hostName)) {
+                        hostMo = host1;
+                        break;
+                    }
+                }
+            }
+
+            if (hostMo != null) {
+                //get available LUN
+                HostDatastoreSystemMO hostDatastoreSystem = hostMo.getHostDatastoreSystemMO();
+                List<HostScsiDisk> hostScsiDisks = hostDatastoreSystem.queryAvailableDisksForVmfs();
+                if (hostScsiDisks != null) {
+                    List<Map<String, Object>> lunlist = new ArrayList<>();
+                    for (HostScsiDisk hostScsiDisk : hostScsiDisks) {
+                        System.out.println("===Found disk====" + hostScsiDisk.getDevicePath() + "====="
+                                + hostScsiDisk.getUuid() + "===" + gson.toJson(hostScsiDisk.getCapacity()));
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("uuid", hostScsiDisk.getUuid());
+                        map.put("devicePath", hostScsiDisk.getDevicePath());
+                        map.put("block", hostScsiDisk.getCapacity().getBlock());
+                        map.put("blockSize", hostScsiDisk.getCapacity().getBlockSize());
+
+                        lunlist.add(map);
+                    }
+
+                    if (lunlist.size() > 0) {
+                        lunStr = gson.toJson(lunlist);
+                    }
+
+                } else {
+                    throw new Exception("host:" + hostName + ",No available LUN。");
+                }
+            } else {
+                throw new Exception("host:" + hostName + " non-existent。");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("host:" + hostName + " error:", e);
+            throw e;
+        }
+        return lunStr;
+//
+    }
+
     //创建vmfs存储
-    public static String createVmfsDataStore(String hostName,String devicePath,String datastoreName,
+    public static String createVmfsDataStore(String hostName, String devicePath, String datastoreName,
                                              int vmfsMajorVersion, int blockSize, long totalSectors,
                                              int unmapGranularity, String unmapPriority) throws Exception {
         String dataStoreStr = "";
@@ -219,20 +282,20 @@ public class VCSDKUtils {
             Gson gson = new Gson();
             HostMO hostMo = null;
 
-            VmwareContext vmwareContext= TestVmwareContextFactory.getContext(vmwareUrl,vmwareUserName,vmwarePassword);
-            RootFsMO rootFsMO=new RootFsMO(vmwareContext,vmwareContext.getRootFolder());
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext(vmwareUrl, vmwareUserName, vmwarePassword);
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
             List<Pair<ManagedObjectReference, String>> hosts = rootFsMO.getAllHostOnRootFs();
-            if(hosts!=null && hosts.size()>0) {
+            if (hosts != null && hosts.size() > 0) {
                 for (Pair<ManagedObjectReference, String> host : hosts) {
                     HostMO host1 = new HostMO(vmwareContext, host.first());
-                    if(host1.getName().equals(hostName)){
+                    if (host1.getName().equals(hostName)) {
                         hostMo = host1;
                         break;
                     }
                 }
             }
 
-            if(hostMo!=null) {
+            if (hostMo != null) {
                 //get available LUN
                 HostDatastoreSystemMO hostDatastoreSystem = hostMo.getHostDatastoreSystemMO();
                 List<HostScsiDisk> hostScsiDisks = hostDatastoreSystem.queryAvailableDisksForVmfs();
@@ -245,7 +308,7 @@ public class VCSDKUtils {
                         }
                     }
 
-                    if(candidateHostScsiDisk!=null) {
+                    if (candidateHostScsiDisk != null) {
                         _logger.info("Create datastore via host " + hostMo.getName() + " on disk " + devicePath);
                         //create vmfs
                         ManagedObjectReference datastore = null;
@@ -268,18 +331,18 @@ public class VCSDKUtils {
                             dataStoreStr = gson.toJson(dataStoremap);
                             _logger.info("dataStoreStr===" + dataStoreStr);
                         }
-                    }else{
+                    } else {
                         throw new Exception("host:" + hostName + ",No find available LUN。");
                     }
                 } else {
                     throw new Exception("host:" + hostName + ",No available LUN。");
                 }
-            }else{
+            } else {
                 throw new Exception("host:" + hostName + " non-existent。");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            _logger.error("host:"+hostName+" error:", e);
+            _logger.error("host:" + hostName + " error:", e);
             throw e;
         }
         return dataStoreStr;
@@ -287,7 +350,7 @@ public class VCSDKUtils {
     }
 
     //创建vmfs存储
-    public static String attachTag(String datastoreType,String datastoreId,String serviceLevelName) throws Exception {
+    public static String attachTag(String datastoreType, String datastoreId, String serviceLevelName) throws Exception {
         String attachTagStr = "";
         String vmwareUrl = "10.143.132.248";
         String vmwareUserName = "administrator@vsphere.local";
@@ -295,15 +358,15 @@ public class VCSDKUtils {
 
         SessionHelper sessionHelper = null;
         try {
-            if(StringUtils.isEmpty(datastoreType)){
+            if (StringUtils.isEmpty(datastoreType)) {
                 _logger.info("DataStore Type is null,unable tag。");
                 return null;
             }
-            if(StringUtils.isEmpty(datastoreId)){
+            if (StringUtils.isEmpty(datastoreId)) {
                 _logger.info("DataStore Id is null,unable tag。");
                 return null;
             }
-            if(StringUtils.isEmpty(serviceLevelName)){
+            if (StringUtils.isEmpty(serviceLevelName)) {
                 _logger.info("Service Level Name is null,unable tag。");
                 return null;
             }
@@ -326,10 +389,10 @@ public class VCSDKUtils {
 
         } catch (Exception e) {
             e.printStackTrace();
-            _logger.error("DataStore:"+datastoreId+" error:", e);
+            _logger.error("DataStore:" + datastoreId + " error:", e);
             throw e;
-        }finally {
-            if(sessionHelper!=null){
+        } finally {
+            if (sessionHelper != null) {
                 sessionHelper.logout();
             }
         }
@@ -347,26 +410,29 @@ public class VCSDKUtils {
 //            listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_NFS);
 //            _logger.info("Vmfs listStr==" + listStr);
 
-//            _logger.info("Vmfs getAllClusters==" + VCSDKUtils.getHostsOnCluster("pbu4test"));
-            String hostName = "10.143.133.196";
-            String devicePath = "/vmfs/devices/disks/mpx.vmhba1:C0:T5:L0";
-            String datastoreName = "yytestvfms007";
-            int vmfsMajorVersion = 6;
-            int blockSize = 1024;
-            long totalSectors = 16777216L;
-            int unmapGranularity = 1024;
-            String unmapPriority = "low";
-            String serviceLevelName = "dme3333";
-            String dataStoreStr = VCSDKUtils.createVmfsDataStore(hostName, devicePath, datastoreName,
-             vmfsMajorVersion,  blockSize,  totalSectors, unmapGranularity, unmapPriority);
-            _logger.info("Vmfs dataStoreStr==" + dataStoreStr);
+            _logger.info("Vmfs getAllClusters==" + VCSDKUtils.getLunsOnHost("10.143.133.196"));
 
-            Gson gson = new Gson();
-            Map<String, Object> dsmap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {}.getType());
-            if(dsmap!=null) {
-                String attachTagStr = VCSDKUtils.attachTag(dsmap.get("type").toString(), dsmap.get("id").toString(), serviceLevelName);
-                _logger.info("Vmfs attachTagStr==" + attachTagStr);
-            }
+///////////////////////create vmfs/////////////////////////////////////////////////////////
+//            String hostName = "10.143.133.196";
+//            String devicePath = "/vmfs/devices/disks/mpx.vmhba1:C0:T5:L0";
+//            String datastoreName = "yytestvfms007";
+//            int vmfsMajorVersion = 6;
+//            int blockSize = 1024;
+//            long totalSectors = 16777216L;
+//            int unmapGranularity = 1024;
+//            String unmapPriority = "low";
+//            String serviceLevelName = "dme3333";
+//            String dataStoreStr = VCSDKUtils.createVmfsDataStore(hostName, devicePath, datastoreName,
+//                    vmfsMajorVersion, blockSize, totalSectors, unmapGranularity, unmapPriority);
+//            _logger.info("Vmfs dataStoreStr==" + dataStoreStr);
+//
+//            Gson gson = new Gson();
+//            Map<String, Object> dsmap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {
+//            }.getType());
+//            if (dsmap != null) {
+//                String attachTagStr = VCSDKUtils.attachTag(dsmap.get("type").toString(), dsmap.get("id").toString(), serviceLevelName);
+//                _logger.info("Vmfs attachTagStr==" + attachTagStr);
+//            }
 
         } catch (Exception e) {
             e.printStackTrace();
