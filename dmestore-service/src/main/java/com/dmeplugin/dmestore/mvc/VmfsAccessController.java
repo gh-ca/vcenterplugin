@@ -87,17 +87,17 @@ public class VmfsAccessController extends BaseController{
    * param str hostgroup_id: 主机组id，与host_id二选其一，不可同时存在
 
    * param str service_level_id: 服务等级id 若未选择服务等级，可选择存储设备、存储池、设置QoS、Thin、Workload
-   * param str service_level_name; 服务等级名称
+   * param str service_level_name; 服务等级名称  必
    * param str project_id: 业务群组id
    * param str availability_zone: 可用分区id
    *
    * param str version: 版本
-   * param int blockSize: 块大小，单位MB
+   * param int blockSize: 块大小，单位KB
    * param int spaceReclamationGranularity   空间回收粒度 单位K
    * param str spaceReclamationPriority: 空间回收优先权
-   * param str host: 主机
+   * param str host: 主机  必
    * param str hostId: 主机
-   * param str hostlun; 可用的lun
+   * param str hostlun; 可用的lun 必
    * param str cluster: 集群
    * param str clusterId: 集群
    *
