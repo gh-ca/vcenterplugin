@@ -19,5 +19,10 @@ public interface VmwareAccessService {
      */
     List<Map<String,String>> listClusters() throws Exception;
 
+    /**
+     * vmware get Luns On Host
+     */
+    List<Map<String,String>> getLunsOnHost(String hostName) throws Exception;
+
 
 }

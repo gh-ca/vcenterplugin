@@ -6,10 +6,7 @@ import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
@@ -60,6 +57,26 @@ public class VmwareAccessController extends BaseController {
             return success(lists);
         } catch (Exception e) {
             LOG.error("list vmware cluster failure:", e);
+            failureStr = e.getMessage();
+        }
+        return failure(failureStr);
+    }
+
+    /*
+   * Access cluster
+   * return: cluster info
+   */
+    @RequestMapping(value = "/getlunsonhost", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseBodyBean getLunsOnHost(@RequestParam("hostName") String hostName) throws Exception {
+        LOG.info("accessvmware/getlunsonhost");
+        String failureStr = "";
+        try {
+            List<Map<String, String>> lists = vmwareAccessService.getLunsOnHost(hostName);
+            LOG.info("getlunsonhost vmware lists==" + gson.toJson(lists));
+            return success(lists);
+        } catch (Exception e) {
+            LOG.error("get luns failure:", e);
             failureStr = e.getMessage();
         }
         return failure(failureStr);

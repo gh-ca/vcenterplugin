@@ -71,12 +71,12 @@ public class DmeAccessController extends BaseController {
   */
     @RequestMapping(value = "/getworkloads", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseBodyBean getWorkLoads(@RequestParam("storage_id") String storage_id)
+    public ResponseBodyBean getWorkLoads(@RequestParam("storageId") String storageId)
             throws Exception {
-        LOG.info("accessdme/getworkloads storage_id==" + storage_id);
+        LOG.info("accessdme/getworkloads storageId==" + storageId);
         String failureStr = "";
         try {
-            List<Map<String, Object>> lists = dmeAccessService.getWorkLoads(storage_id);
+            List<Map<String, Object>> lists = dmeAccessService.getWorkLoads(storageId);
             LOG.info("getWorkLoads lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {

@@ -207,11 +207,11 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     }
 
     @Override
-    public List<Map<String, Object>> getWorkLoads(String storage_id) throws Exception {
+    public List<Map<String, Object>> getWorkLoads(String storageId) throws Exception {
         List<Map<String, Object>> relists = null;
         try {
-            if (!StringUtils.isEmpty(storage_id)) {
-                String workloads_url = GET_WORKLOADS_URL.replace("{storage_id}", storage_id);
+            if (!StringUtils.isEmpty(storageId)) {
+                String workloads_url = GET_WORKLOADS_URL.replace("{storage_id}", storageId);
                 LOG.info("workloads_url===" + workloads_url);
                 try {
                     ResponseEntity responseEntity = access(workloads_url, HttpMethod.GET, null);

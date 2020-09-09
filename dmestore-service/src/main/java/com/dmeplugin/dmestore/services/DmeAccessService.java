@@ -29,7 +29,7 @@ public interface DmeAccessService {
     /**
      * Get WorkLoads
      */
-    List<Map<String, Object>> getWorkLoads(String storage_id) throws Exception;
+    List<Map<String, Object>> getWorkLoads(String storageId) throws Exception;
 
     /**
      * Query host
