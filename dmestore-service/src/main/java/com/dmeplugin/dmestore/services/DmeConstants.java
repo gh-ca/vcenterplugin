@@ -38,4 +38,21 @@ public class DmeConstants {
      * NFS Datastore 逻辑端口详情
      **/
     public static final String DME_NFS_LOGICPORT_DETAIL_URL = "/rest/storagemgmt/v1/storage-port/logic-ports/#{logic_port_id}";
+
+    /**
+     * DME 磁盘操作基础URL
+     **/
+    public static final String DME_VOLUME_BASE_URL = "/rest/blockservice/v1/volumes";
+
+
+    /**
+     * DME 任务查询URL
+     **/
+    public static final String DME_TASK_BASE_URL = "/rest/taskmgmt/v1/tasks";
+
+
+    /**
+     * DME 卷映射给主机URL
+     **/
+    public static final String DME_HOST_MAPPING_URL = "/rest/blockservice/v1/volumes/host-mapping";
 }

@@ -82,6 +82,8 @@
 
     <bean name="vmfsOperationService" class="com.dmeplugin.dmestore.services.VmfsOperationServiceImpl"/>
 
+    <bean name="vmrdmService" class="com.dmeplugin.dmestore.services.VMRDMServiceImpl"></bean>
+
 
 
 </beans>

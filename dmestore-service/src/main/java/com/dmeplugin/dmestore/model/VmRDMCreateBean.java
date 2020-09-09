@@ -11,11 +11,8 @@ public class VmRDMCreateBean {
     private String name;
     private int size;
     private String count;
+    private String serviceLevelId;
 
-    private String serviceLevel;
-    private String targetStore;
-    private String storePool;
-    private Object policy;
 
     public String getName() {
         return name;
@@ -41,35 +38,11 @@ public class VmRDMCreateBean {
         this.count = count;
     }
 
-    public String getServiceLevel() {
-        return serviceLevel;
+    public String getServiceLevelId() {
+        return serviceLevelId;
     }
 
-    public void setServiceLevel(String serviceLevel) {
-        this.serviceLevel = serviceLevel;
-    }
-
-    public String getTargetStore() {
-        return targetStore;
-    }
-
-    public void setTargetStore(String targetStore) {
-        this.targetStore = targetStore;
-    }
-
-    public String getStorePool() {
-        return storePool;
-    }
-
-    public void setStorePool(String storePool) {
-        this.storePool = storePool;
-    }
-
-    public Object getPolicy() {
-        return policy;
-    }
-
-    public void setPolicy(Object policy) {
-        this.policy = policy;
+    public void setServiceLevelId(String serviceLevelId) {
+        this.serviceLevelId = serviceLevelId;
     }
 }
