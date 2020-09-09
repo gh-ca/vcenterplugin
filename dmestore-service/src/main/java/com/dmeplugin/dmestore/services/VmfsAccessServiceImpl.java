@@ -217,7 +217,30 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //查询看创建任务是否完成。
                 TaskDetailInfo tdinfo = taskService.queryTaskById(taskId);
                 LOG.info("tdinfo====" + (tdinfo == null ? "null" : gson.toJson(tdinfo)));
-                //创建vmware中的vmfs存储。
+                //创建vmware中的vmfs存储。 host name hostlun
+                String hostName = ToolUtils.getStr(params.get("host"));
+                String devicePath = ToolUtils.getStr(params.get("hostlun"));
+                String datastoreName = ToolUtils.getStr(params.get("name"));
+                int vmfsMajorVersion = ToolUtils.getInt(params.get("version"));
+                int blockSize = ToolUtils.getInt(params.get("blockSize"));
+                long totalSectors = ToolUtils.getInt(params.get("capacity")); //capacity GB需要转成B然后/512，算成块数
+                totalSectors = totalSectors*ToolUtils.Gi/512;
+                int unmapGranularity = ToolUtils.getInt(params.get("spaceReclamationGranularity"));
+                String unmapPriority = ToolUtils.getStr(params.get("spaceReclamationPriority"));
+
+                String dataStoreStr = VCSDKUtils.createVmfsDataStore(hostName, devicePath, datastoreName,
+                        vmfsMajorVersion, blockSize, totalSectors, unmapGranularity, unmapPriority);
+                LOG.info("Vmfs dataStoreStr==" + dataStoreStr);
+                //关联服务等级
+                if (params.get("service_level_id") != null) {
+                    String serviceLevelName = ToolUtils.getStr(params.get("service_level_name"));
+                    Map<String, Object> dsmap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {
+                    }.getType());
+                    if (dsmap != null) {
+                        String attachTagStr = VCSDKUtils.attachTag(dsmap.get("type").toString(), dsmap.get("id").toString(), serviceLevelName);
+                        LOG.info("Vmfs attachTagStr==" + attachTagStr);
+                    }
+                }
             }
         } else {
             throw new Exception("Parameter exception:" + params);

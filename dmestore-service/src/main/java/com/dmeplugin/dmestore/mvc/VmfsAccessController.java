@@ -91,7 +91,7 @@ public class VmfsAccessController extends BaseController{
    * param str project_id: 业务群组id
    * param str availability_zone: 可用分区id
    *
-   * param str version: 版本
+   * param int version: 版本
    * param int blockSize: 块大小，单位KB
    * param int spaceReclamationGranularity   空间回收粒度 单位K
    * param str spaceReclamationPriority: 空间回收优先权
