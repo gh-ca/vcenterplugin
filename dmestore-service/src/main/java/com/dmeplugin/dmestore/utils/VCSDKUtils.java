@@ -401,6 +401,32 @@ public class VCSDKUtils {
     }
 
 
+    //删除vmfs存储
+    public static boolean deleteVmfsDataStore(String name) throws Exception {
+        boolean deleteFlag = false;
+        try {
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+            List<Pair<ManagedObjectReference, String>> hosts = rootFsMO.getAllHostOnRootFs();
+            if (hosts != null && hosts.size() > 0) {
+                List<Map<String, String>> lists = new ArrayList<>();
+                for (Pair<ManagedObjectReference, String> host : hosts) {
+                    HostMO host1 = new HostMO(vmwareContext, host.first());
+                    HostDatastoreSystemMO hdsMo = host1.getHostDatastoreSystemMO();
+                    if (null != hdsMo.findDatastore(name)) {
+                        deleteFlag = hdsMo.deleteDatastore(name);
+                        break;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware delete vmfs error:", e);
+            throw e;
+        }
+        return deleteFlag;
+    }
+
     public static void main(String[] args) {
         try {
 //            String listStr = VCSDKUtils.getAllVmfsDataStores(null);
@@ -409,7 +435,6 @@ public class VCSDKUtils {
 //            _logger.info("Vmfs listStr==" + listStr);
 //            listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_NFS);
 //            _logger.info("Vmfs listStr==" + listStr);
-
             _logger.info("Vmfs getAllClusters==" + VCSDKUtils.getLunsOnHost("10.143.133.196"));
 
 ///////////////////////create vmfs/////////////////////////////////////////////////////////
@@ -433,6 +458,7 @@ public class VCSDKUtils {
 //                String attachTagStr = VCSDKUtils.attachTag(dsmap.get("type").toString(), dsmap.get("id").toString(), serviceLevelName);
 //                _logger.info("Vmfs attachTagStr==" + attachTagStr);
 //            }
+
 
         } catch (Exception e) {
             e.printStackTrace();

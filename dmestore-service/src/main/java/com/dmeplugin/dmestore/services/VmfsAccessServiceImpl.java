@@ -45,6 +45,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private final String CREATE_VOLUME_URL = "/rest/blockservice/v1/volumes";
     private final String CREATE_VOLUME_UNSERVICE_URL = "/rest/blockservice/v1/volumes";
 
+    int taskTimeOut = 10 * 60 * 1000;//轮询任务状态的超值时间
 
     @Override
     public List<VmfsDataInfo> listVmfs() throws Exception {
@@ -659,9 +660,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 if (202 != responseHostGroupUnmaaping.getStatusCodeValue()) {
                     unmappingHostgroupFlag = false;
                 } else {
-                    Object hostGroupBody = responseHostGroupUnmaaping.getBody();
-                    JsonObject hostGroupJson = new JsonParser().parse(hostGroupBody.toString()).getAsJsonObject();
-                    String taskId = hostGroupJson.get("task_id").getAsString();
+                    String taskId = getTaskId(responseHostGroupUnmaaping);
                     taskIds.add(taskId);
                 }
             }
@@ -670,9 +669,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 if (202 != responseHostUnmapping.getStatusCodeValue()) {
                     unmappingHostFlag = false;
                 } else {
-                    Object hostGroupBody = responseHostUnmapping.getBody();
-                    JsonObject hostJson = new JsonParser().parse(hostGroupBody.toString()).getAsJsonObject();
-                    String taskId = hostJson.get("task_id").getAsString();
+                    String taskId = getTaskId(responseHostUnmapping);
                     taskIds.add(taskId);
                 }
             }
@@ -685,9 +682,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         // 获取卸载的任务完成后的状态 (默认超时时间10分钟)
         boolean unmountFlag = true;
         Map<String, Integer> taskStatusMap = new HashMap<>();
-        taskService.checkTaskStatus(taskIds, taskStatusMap, 10 * 60 * 1000, System.currentTimeMillis());
+        taskService.checkTaskStatus(taskIds, taskStatusMap, taskTimeOut, System.currentTimeMillis());
         for (Map.Entry<String, Integer> entry : taskStatusMap.entrySet()) {
-            String taskId = entry.getKey();
+            //String taskId = entry.getKey();
             int status = entry.getValue();
             if (3 != status && 4 != status) {
                 unmountFlag = false;
@@ -702,6 +699,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         String hostId = params.get("host_id").toString();
         Map<String, Object> hostInfoMap = dmeAccessService.getDmeHost(hostId);
         String hostIp = hostInfoMap.get("ip").toString();
+        //String hostName = hostInfoMap.get("name").toString(); //使用hostName而不是hostIp?
         VCSDKUtils.hostRescanVmfs(hostIp);
     }
 
@@ -715,15 +713,38 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             throw new Exception("delete volume precondition unmapping host and hostGroup error!");
         }
         //删除vmfs
+        boolean dmeDeleteFlag = true;
+        String taskId;
         Object volume_ids = params.get("volume_ids");
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("volume_ids", volume_ids);
         ResponseEntity responseEntity = dmeAccessService.access(VOLUME_DELETE, HttpMethod.POST, requestbody.toString());
         if (202 != responseEntity.getStatusCodeValue()) {
             throw new Exception("delete volume error!");
+        } else {
+            taskId = getTaskId(responseEntity);
+        }
+        Map<String, Integer> taskStatusMap = new HashMap<>();
+        taskService.checkTaskStatus(Arrays.asList(taskId), taskStatusMap, taskTimeOut, System.currentTimeMillis());
+        for (Map.Entry<String, Integer> entry : taskStatusMap.entrySet()) {
+            //String taskId = entry.getKey();
+            int status = entry.getValue();
+            if (3 != status && 4 != status) {
+                dmeDeleteFlag = false;
+                break;
+            }
+        }
+        if (!dmeDeleteFlag) {
+            throw new Exception("delete volume precondition unmount host and hostGroup error(task status)!");
+        }
+        //vcenter侧删除
+        String dataStoreName = params.get("dataStoreName").toString();
+        boolean deleteFlag = VCSDKUtils.deleteVmfsDataStore(dataStoreName);
+        if (deleteFlag) {
+            LOG.info("delete vmfs:{} success!", dataStoreName);
         }
 
-        //vcenter侧删除
+
     }
 
     //查询指定vmfs
@@ -803,6 +824,13 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     public void setDmeVmwareRalationDao(DmeVmwareRalationDao dmeVmwareRalationDao) {
         this.dmeVmwareRalationDao = dmeVmwareRalationDao;
+    }
+
+    private String getTaskId(ResponseEntity responseEntity) {
+        Object hostGroupBody = responseEntity.getBody();
+        JsonObject hostJson = new JsonParser().parse(hostGroupBody.toString()).getAsJsonObject();
+        String taskId = hostJson.get("task_id").getAsString();
+        return taskId;
     }
 
 
