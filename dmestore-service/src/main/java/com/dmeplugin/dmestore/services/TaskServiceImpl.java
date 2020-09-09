@@ -67,6 +67,28 @@ public class TaskServiceImpl implements TaskService {
         return tasks.get(0);
     }
 
+    @Override
+    public JsonObject queryTaskByIdUntilFinish(String taskId) {
+        String url = QUERY_TASK_URL.replace("{task_id}", taskId);
+        boolean loopFlag = true;
+        while (loopFlag) {
+            try {
+                ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+                JsonObject taskDetail = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+                //任务进度完成100%后处理，否则等待2s后再尝试
+                if (taskDetail.get("progress").getAsInt() == 100) {
+                    return taskDetail;
+                } else {
+                    Thread.sleep(2 * 1000);
+                }
+            } catch (Exception e) {
+                LOG.error("query task error!errMsg:{}", e.getMessage());
+                loopFlag = false;
+            }
+        }
+        return null;
+    }
+
     private List<TaskDetailInfo> converBean(Object object) {
         List<TaskDetailInfo> taskDetailInfos = new ArrayList<>();
 
