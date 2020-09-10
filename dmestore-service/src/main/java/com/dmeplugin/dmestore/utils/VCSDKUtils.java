@@ -592,26 +592,26 @@ public class VCSDKUtils {
             List<Pair<ManagedObjectReference, String>> hosts = null;
             //集群下的所有主机
             if(!StringUtils.isEmpty(clusterName)){
-                _logger.info("clusterName:"+clusterName);
+                _logger.info("object cluster:"+clusterName);
                 ClusterMO clusterMO = rootFsMO.findCluster(clusterName);
                 hosts = clusterMO.getClusterHosts();
-                _logger.info("clusterName hosts:"+(hosts==null?"null":hosts.size()));
+                _logger.info("Number of hosts in cluster:"+(hosts==null?"null":hosts.size()));
             }else if(!StringUtils.isEmpty(hostName)){  //目标主机所在集群下的其它主机
-                _logger.info("hostName:"+hostName);
+                _logger.info("object host:"+hostName);
                 HostMO hostMO = rootFsMO.findHost(hostName);
                 ManagedObjectReference cluster = hostMO.getHyperHostCluster();
-                _logger.info("hostName cluster:"+cluster.getValue());
+                _logger.info("Host cluster id:"+cluster.getValue());
                 if(cluster!=null){
                     ClusterMO clusterMO = new ClusterMO(hostMO.getContext(), cluster);
-                    _logger.info("hostName clusterMO:"+clusterMO.getName());
+                    _logger.info("Host cluster name:"+clusterMO.getName());
                     hosts = clusterMO.getClusterHosts();
                 }
-                _logger.info("hostName hosts:"+(hosts==null?"null":hosts.size()));
+                _logger.info("Number of hosts in cluster:"+(hosts==null?"null":hosts.size()));
             }
             if (hosts != null && hosts.size() > 0) {
                 for (Pair<ManagedObjectReference, String> host : hosts) {
                     HostMO host1 = new HostMO(vmwareContext, host.first());
-                    _logger.info("host1.getName():"+host1.getName());
+                    _logger.info("Host under Cluster: "+host1.getName());
                     //只挂载其它的主机
                     if(host1!=null && !objHostName.equals(host1.getName())){
                         mountVmfs(objDataStoreName,host1);
@@ -635,7 +635,10 @@ public class VCSDKUtils {
                 _logger.info("host is null");
                 return;
             }
-            _logger.info("hostMO.getName():"+hostMO.getName());
+            _logger.info("Hosts that need to be mounted:"+hostMO.getName());
+            //挂载前重新扫描datastore
+            hostMO.getHostStorageSystemMO().rescanVmfs();
+            _logger.info("Rescan datastore before mounting");
             //查询目前未挂载的卷
 //            List<HostUnresolvedVmfsVolume> unvlist = hostMO.getHostStorageSystemMO().queryUnresolvedVmfsVolume();
 //            _logger.info("unvlist========"+(unvlist==null?"null":unvlist.size()));
@@ -688,7 +691,7 @@ public class VCSDKUtils {
             dataStoremap.put("capacity", "aaa");
             dataStoremap.put("hostName", "10.143.133.196");
             String hostName = "10.143.133.196";
-            String clusterName = "pbu4test";
+            String clusterName = "";
             mountVmfsOnCluster(gson.toJson(dataStoremap), clusterName, hostName);
             _logger.info("==================over==========");
 ///////////////////////create vmfs/////////////////////////////////////////////////////////
