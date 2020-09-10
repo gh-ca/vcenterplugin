@@ -229,7 +229,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 int unmapGranularity = ToolUtils.getInt(params.get("spaceReclamationGranularity"));
                 String unmapPriority = ToolUtils.getStr(params.get("spaceReclamationPriority"));
 
-                String dataStoreStr = VCSDKUtils.createVmfsDataStore(hostName, devicePath, datastoreName,
+                String dataStoreStr = VCSDKUtils.createVmfsDataStore(null, datastoreName,
                         vmfsMajorVersion, blockSize, totalSectors, unmapGranularity, unmapPriority);
                 LOG.info("Vmfs dataStoreStr==" + dataStoreStr);
                 //关联服务等级

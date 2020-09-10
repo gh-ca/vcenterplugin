@@ -271,7 +271,8 @@ public class VCSDKUtils {
     }
 
     //得到主机对应的可用LUN
-    public static HostScsiDisk getLunsOnHost(String hostName, int capacity) throws Exception {
+    public static Map<String,Object> getLunsOnHost(String hostName, int capacity) throws Exception {
+        Map<String,Object> remap = null;
         HostScsiDisk candidateHostScsiDisk = null;
         String vmwareUrl = "10.143.132.248";
         String vmwareUserName = "administrator@vsphere.local";
@@ -297,6 +298,9 @@ public class VCSDKUtils {
                 HostDatastoreSystemMO hostDatastoreSystem = hostMo.getHostDatastoreSystemMO();
                 List<HostScsiDisk> hostScsiDisks = hostDatastoreSystem.queryAvailableDisksForVmfs();
                 candidateHostScsiDisk = getObjectLuns(hostScsiDisks, capacity);
+                remap = new HashMap<>();
+                remap.put("host",hostMo);
+                remap.put("hostScsiDisk",candidateHostScsiDisk);
             } else {
                 throw new Exception("host:" + hostName + " non-existent。");
             }
@@ -305,11 +309,12 @@ public class VCSDKUtils {
             _logger.error("host:" + hostName + " error:", e);
             throw e;
         }
-        return candidateHostScsiDisk;
+        return remap;
 //
     }
     //得到集群下所有主机对应的可用LUN
-    public static HostScsiDisk getLunsOnCluster(String clusterName, int capacity) throws Exception {
+    public static Map<String,Object> getLunsOnCluster(String clusterName, int capacity) throws Exception {
+        Map<String,Object> remap = null;
         HostScsiDisk candidateHostScsiDisk = null;
         String vmwareUrl = "10.143.132.248";
         String vmwareUserName = "administrator@vsphere.local";
@@ -325,22 +330,27 @@ public class VCSDKUtils {
                         List<Pair<ManagedObjectReference, String>> hosts = cl1.getClusterHosts();
 
                         if (hosts != null && hosts.size() > 0) {
+                            Map<String,HostMO> hostMap = new HashMap<>();
                             List<HostScsiDisk> objHostScsiDisks = new ArrayList<>();
-                            List<Map<String, String>> lists = new ArrayList<>();
                             for (Pair<ManagedObjectReference, String> host : hosts) {
                                 HostMO hostMo = new HostMO(vmwareContext, host.first());
-                                if(hostMo!=null) {
-                                    HostDatastoreSystemMO hostDatastoreSystem = hostMo.getHostDatastoreSystemMO();
-                                    List<HostScsiDisk> hostScsiDisks = hostDatastoreSystem.queryAvailableDisksForVmfs();
-                                    if(hostScsiDisks!=null && hostScsiDisks.size()>0){
-                                        objHostScsiDisks.addAll(hostScsiDisks);
+                                HostDatastoreSystemMO hostDatastoreSystem = hostMo.getHostDatastoreSystemMO();
+                                List<HostScsiDisk> hostScsiDisks = hostDatastoreSystem.queryAvailableDisksForVmfs();
+                                if(hostScsiDisks!=null && hostScsiDisks.size()>0){
+                                    objHostScsiDisks.addAll(hostScsiDisks);
+                                    for(HostScsiDisk hsd:hostScsiDisks){
+                                        hostMap.put(hsd.getDevicePath(),hostMo);
                                     }
                                 }
+
                             }
 
                             if (objHostScsiDisks.size()>0) {
                                 //get available LUN
                                 candidateHostScsiDisk = getObjectLuns(objHostScsiDisks, capacity);
+                                remap = new HashMap<>();
+                                remap.put("host",hostMap.get(candidateHostScsiDisk.getDevicePath()));
+                                remap.put("hostScsiDisk",candidateHostScsiDisk);
                             } else {
                                 throw new Exception("cluster:" + clusterName + " non-existent LUN。");
                             }
@@ -358,7 +368,7 @@ public class VCSDKUtils {
             _logger.error("cluster get lun error:", e);
             throw e;
         }
-        return candidateHostScsiDisk;
+        return remap;
 //
     }
     //得到主机对应的可用LUN
@@ -420,56 +430,33 @@ public class VCSDKUtils {
     }
 
     //创建vmfs存储
-    public static String createVmfsDataStore(String hostName, String devicePath, String datastoreName,
+    public static String createVmfsDataStore(Map<String,Object> hsdmap, String datastoreName,
                                              int vmfsMajorVersion, int blockSize, long totalSectors,
                                              int unmapGranularity, String unmapPriority) throws Exception {
         String dataStoreStr = "";
-        String vmwareUrl = "10.143.132.248";
-        String vmwareUserName = "administrator@vsphere.local";
-        String vmwarePassword = "Pbu4@123";
         try {
             Gson gson = new Gson();
-            HostMO hostMo = null;
 
-            VmwareContext vmwareContext = TestVmwareContextFactory.getContext(vmwareUrl, vmwareUserName, vmwarePassword);
-            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
-            List<Pair<ManagedObjectReference, String>> hosts = rootFsMO.getAllHostOnRootFs();
-            if (hosts != null && hosts.size() > 0) {
-                for (Pair<ManagedObjectReference, String> host : hosts) {
-                    HostMO host1 = new HostMO(vmwareContext, host.first());
-                    if (host1.getName().equals(hostName)) {
-                        hostMo = host1;
-                        break;
-                    }
-                }
-            }
+            if(hsdmap!=null && hsdmap.get("host")!=null) {
+                HostScsiDisk objhsd = (HostScsiDisk) hsdmap.get("hostScsiDisk");
+                HostMO hostMo = (HostMO) hsdmap.get("host");
 
-            if (hostMo != null) {
-                //get available LUN
-                HostDatastoreSystemMO hostDatastoreSystem = hostMo.getHostDatastoreSystemMO();
-                List<HostScsiDisk> hostScsiDisks = hostDatastoreSystem.queryAvailableDisksForVmfs();
-                if (hostScsiDisks != null) {
-                    HostScsiDisk candidateHostScsiDisk = null;
-                    for (HostScsiDisk hostScsiDisk : hostScsiDisks) {
-                        if (devicePath.equals(hostScsiDisk.getDevicePath())) {
-                            candidateHostScsiDisk = hostScsiDisk;
-                            break;
-                        }
-                    }
+                _logger.info("path==" + objhsd.getDevicePath() + "==" + objhsd.getUuid() + "==" + (gson.toJson(objhsd.getCapacity())));
+                _logger.info("getName==" + hostMo.getName() + "==" + hostMo.getHostDatastoreSystemMO());
 
-                    if (candidateHostScsiDisk != null) {
-                        _logger.info("Create datastore via host " + hostMo.getName() + " on disk " + devicePath);
+                if (hostMo != null) {
+                    if (objhsd != null) {
+                        _logger.info("Create datastore via host " + hostMo.getName() + " on disk " + objhsd.getDevicePath());
                         //create vmfs
                         ManagedObjectReference datastore = null;
                         try {
-                            datastore = hostDatastoreSystem.createVmfsDatastore(datastoreName, candidateHostScsiDisk, vmfsMajorVersion, blockSize, totalSectors, unmapGranularity, unmapPriority);
+                            datastore = hostMo.getHostDatastoreSystemMO().createVmfsDatastore(datastoreName, objhsd, vmfsMajorVersion, blockSize, totalSectors, unmapGranularity, unmapPriority);
                         } catch (Exception e) {
                             e.printStackTrace();
                             throw e;
                         }
                         //set tag
                         if (datastore != null) {
-
                             _logger.info("datastore===" + datastore.getValue());
                             DatastoreMO dsMo = new DatastoreMO(hostMo.getContext(), datastore);
                             Map<String, Object> dataStoremap = new HashMap<>();
@@ -481,17 +468,15 @@ public class VCSDKUtils {
                             _logger.info("dataStoreStr===" + dataStoreStr);
                         }
                     } else {
-                        throw new Exception("host:" + hostName + ",No find available LUN。");
+                        throw new Exception("host:" + hostMo.getName() + ",No find available LUN。");
                     }
                 } else {
-                    throw new Exception("host:" + hostName + ",No available LUN。");
+                    throw new Exception("host:" + hostMo.getName() + " non-existent。");
                 }
-            } else {
-                throw new Exception("host:" + hostName + " non-existent。");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            _logger.error("host:" + hostName + " error:", e);
+            _logger.error("createVmfsDataStore error:", e);
             throw e;
         }
         return dataStoreStr;
@@ -587,33 +572,41 @@ public class VCSDKUtils {
 //            _logger.info("Vmfs listStr==" + listStr);
 //            _logger.info("Vmfs getAllClusters==" + VCSDKUtils.getLunsOnHost("10.143.133.196"));
 ////////////////////////////////////getLunsOnHost//////////////////////////////////////////
-            HostScsiDisk objhsd = getLunsOnCluster("pbu4test",10);
-            if(objhsd!=null) {
-                _logger.info("path==" + objhsd.getDevicePath() + "==" + objhsd.getUuid() + "==" + (gson.toJson(objhsd.getCapacity())));
-            }
-
-///////////////////////create vmfs/////////////////////////////////////////////////////////
-//            String hostName = "10.143.133.196";
-//            String devicePath = "/vmfs/devices/disks/mpx.vmhba1:C0:T5:L0";
-//            String datastoreName = "yytestvfms007";
-//            int vmfsMajorVersion = 6;
-//            int blockSize = 1024;
-//            long totalSectors = 16777216L;
-//            int unmapGranularity = 1024;
-//            String unmapPriority = "low";
-//            String serviceLevelName = "dme3333";
-//            String dataStoreStr = VCSDKUtils.createVmfsDataStore(hostName, devicePath, datastoreName,
-//                    vmfsMajorVersion, blockSize, totalSectors, unmapGranularity, unmapPriority);
-//            _logger.info("Vmfs dataStoreStr==" + dataStoreStr);
-//
-//            Gson gson = new Gson();
-//            Map<String, Object> dsmap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {
-//            }.getType());
-//            if (dsmap != null) {
-//                String attachTagStr = VCSDKUtils.attachTag(dsmap.get("type").toString(), dsmap.get("id").toString(), serviceLevelName);
-//                _logger.info("Vmfs attachTagStr==" + attachTagStr);
+//            Map<String,Object> hsdmap = getLunsOnHost("10.143.133.196",10);
+//            if(hsdmap!=null ) {
+//                HostScsiDisk objhsd = (HostScsiDisk)hsdmap.get("hostScsiDisk");
+//                HostMO hostMO = (HostMO)hsdmap.get("host");
+//                _logger.info("path==" + objhsd.getDevicePath() + "==" + objhsd.getUuid() + "==" + (gson.toJson(objhsd.getCapacity())));
+//                _logger.info("getName==" + hostMO.getName() + "==" + hostMO.getHostDatastoreSystemMO());
 //            }
 
+///////////////////////create vmfs/////////////////////////////////////////////////////////
+            String hostName = "10.143.133.196";
+            int capacity = 10;
+            String datastoreName = "yytestvfms007";
+            int vmfsMajorVersion = 6;
+            int blockSize = 1024;
+            long totalSectors = 16777216L;
+            int unmapGranularity = 1024;
+            String unmapPriority = "low";
+            String serviceLevelName = "dme3333";
+
+            Map<String,Object> hsdmap = getLunsOnHost(hostName,capacity);
+            if(hsdmap!=null && hsdmap.get("host")!=null) {
+                HostScsiDisk objhsd = (HostScsiDisk) hsdmap.get("hostScsiDisk");
+                totalSectors = capacity*1L*ToolUtils.Gi/objhsd.getCapacity().getBlockSize();
+                _logger.info("Vmfs totalSectors==" + totalSectors);
+                String dataStoreStr = VCSDKUtils.createVmfsDataStore(hsdmap, datastoreName,
+                        vmfsMajorVersion, blockSize, totalSectors, unmapGranularity, unmapPriority);
+                _logger.info("Vmfs dataStoreStr==" + dataStoreStr);
+
+                Map<String, Object> dsmap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {
+                }.getType());
+                if (dsmap != null) {
+                    String attachTagStr = VCSDKUtils.attachTag(dsmap.get("type").toString(), dsmap.get("id").toString(), serviceLevelName);
+                    _logger.info("Vmfs attachTagStr==" + attachTagStr);
+                }
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
