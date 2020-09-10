@@ -215,22 +215,29 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
                 LOG.info("taskId====" + taskId);
                 //查询看创建任务是否完成。
-                TaskDetailInfo tdinfo = taskService.queryTaskById(taskId);
-                LOG.info("tdinfo====" + (tdinfo == null ? "null" : gson.toJson(tdinfo)));
-                //创建vmware中的vmfs存储。
-                String dataStoreStr = createVmfsOnVmware(params);
-                LOG.info("Vmfs dataStoreStr==" + dataStoreStr);
+                List<String> taskIds = new ArrayList<>();
+                taskIds.add(taskId);
+                boolean unmountFlag = taskService.checkTaskStatus(taskIds);
+                if (unmountFlag) { //DME创建完成
+                    //创建vmware中的vmfs存储。
+                    String dataStoreStr = createVmfsOnVmware(params);
+                    LOG.info("Vmfs dataStoreStr==" + dataStoreStr);
 
-                //关联服务等级
-                if (params.get("service_level_id") != null) {
-                    String serviceLevelName = ToolUtils.getStr(params.get("service_level_name"));
-                    Map<String, Object> dsmap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {
-                    }.getType());
-                    if (dsmap != null) {
-                        String attachTagStr = VCSDKUtils.attachTag(ToolUtils.getStr(dsmap.get("type")), ToolUtils.getStr(dsmap.get("id")), serviceLevelName);
-                        LOG.info("Vmfs attachTagStr==" + attachTagStr);
+                    //关联服务等级
+                    if (params.get("service_level_id") != null) {
+                        String serviceLevelName = ToolUtils.getStr(params.get("service_level_name"));
+                        Map<String, Object> dsmap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {
+                        }.getType());
+                        if (dsmap != null) {
+                            String attachTagStr = VCSDKUtils.attachTag(ToolUtils.getStr(dsmap.get("type")), ToolUtils.getStr(dsmap.get("id")), serviceLevelName);
+                            LOG.info("Vmfs attachTagStr==" + attachTagStr);
+                        }
                     }
+                }else{
+                    throw new Exception("DME create vmfs volume error(task status)!");
                 }
+            }else{
+                throw new Exception("DME find or create host error!");
             }
         } else {
             throw new Exception("Parameter exception:" + params);
