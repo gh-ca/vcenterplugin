@@ -137,7 +137,7 @@ public class TaskServiceImpl implements TaskService {
      * @param startTime 任务查询开始时间 单位ms
      */
     @Override
-    public void checkTaskStatus(List<String> taskIds, Map<String, Integer> taskStatusMap, int timeout, long startTime) {
+    public void getTaskStatus(List<String> taskIds, Map<String, Integer> taskStatusMap, int timeout, long startTime) {
         //没传开始时间或开始时间小于格林威治启用时间,初始话为当前时间
         if (0 == startTime || startTime < 1392515067621L) {
             startTime = System.currentTimeMillis();
@@ -175,10 +175,26 @@ public class TaskServiceImpl implements TaskService {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            checkTaskStatus(new ArrayList<>(queryTaskIds), taskStatusMap, timeout, startTime);
+            getTaskStatus(new ArrayList<>(queryTaskIds), taskStatusMap, timeout, startTime);
         }else{
             return;
         }
+    }
+
+    @Override
+    public Boolean checkTaskStatus(List<String> taskIds, int timeout, long startTime) {
+        boolean unmountFlag = true;
+        Map<String, Integer> taskStatusMap = new HashMap<>();
+        getTaskStatus(taskIds, taskStatusMap, timeout, startTime);
+        for (Map.Entry<String, Integer> entry : taskStatusMap.entrySet()) {
+            //String taskId = entry.getKey();
+            int status = entry.getValue();
+            if (3 != status && 4 != status) {
+                unmountFlag = false;
+                break;
+            }
+        }
+        return unmountFlag;
     }
 
    /* public static void main(String[] args) {

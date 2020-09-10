@@ -705,17 +705,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
 
         // 获取卸载的任务完成后的状态 (默认超时时间10分钟)
-        boolean unmountFlag = true;
-        Map<String, Integer> taskStatusMap = new HashMap<>();
-        taskService.checkTaskStatus(taskIds, taskStatusMap, taskTimeOut, System.currentTimeMillis());
-        for (Map.Entry<String, Integer> entry : taskStatusMap.entrySet()) {
-            //String taskId = entry.getKey();
-            int status = entry.getValue();
-            if (3 != status && 4 != status) {
-                unmountFlag = false;
-                break;
-            }
-        }
+        boolean unmountFlag = taskService.checkTaskStatus(taskIds, taskTimeOut, System.currentTimeMillis());
+
         if (!unmountFlag) {
             throw new Exception("unmount volume precondition unmount host and hostGroup error(task status)!");
         }
@@ -738,7 +729,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             throw new Exception("delete volume precondition unmapping host and hostGroup error!");
         }
         //删除vmfs
-        boolean dmeDeleteFlag = true;
+
         String taskId;
         Object volume_ids = params.get("volume_ids");
         Map<String, Object> requestbody = new HashMap<>();
@@ -749,16 +740,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         } else {
             taskId = getTaskId(responseEntity);
         }
-        Map<String, Integer> taskStatusMap = new HashMap<>();
-        taskService.checkTaskStatus(Arrays.asList(taskId), taskStatusMap, taskTimeOut, System.currentTimeMillis());
-        for (Map.Entry<String, Integer> entry : taskStatusMap.entrySet()) {
-            //String taskId = entry.getKey();
-            int status = entry.getValue();
-            if (3 != status && 4 != status) {
-                dmeDeleteFlag = false;
-                break;
-            }
-        }
+
+        boolean dmeDeleteFlag = taskService.checkTaskStatus(Arrays.asList(taskId), taskTimeOut, System.currentTimeMillis());
+
         if (!dmeDeleteFlag) {
             throw new Exception("delete volume precondition unmount host and hostGroup error(task status)!");
         }

@@ -19,7 +19,9 @@ public interface TaskService {
 
     TaskDetailInfo queryTaskById(String taskId) throws Exception;
 
-    void checkTaskStatus(List<String> taskIds, Map<String, Integer> taskStatusMap, int timeout, long startTime);
+    void getTaskStatus(List<String> taskIds, Map<String, Integer> taskStatusMap, int timeout, long startTime);
+
+    Boolean checkTaskStatus(List<String> taskIds, int timeout, long startTime);
 
     /**
      * @Author wangxiangyong
