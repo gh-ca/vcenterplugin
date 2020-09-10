@@ -218,28 +218,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //查询看创建任务是否完成。
                 TaskDetailInfo tdinfo = taskService.queryTaskById(taskId);
                 LOG.info("tdinfo====" + (tdinfo == null ? "null" : gson.toJson(tdinfo)));
-                //创建vmware中的vmfs存储。 cluster host
-                String hostName = ToolUtils.getStr(params.get("host"));
-                String clusterName = ToolUtils.getStr(params.get("cluster"));
-                String datastoreName = ToolUtils.getStr(params.get("name"));
-                int vmfsMajorVersion = ToolUtils.getInt(params.get("version"));
-                int blockSize = ToolUtils.getInt(params.get("blockSize"));
-                int unmapGranularity = ToolUtils.getInt(params.get("spaceReclamationGranularity"));
-                String unmapPriority = ToolUtils.getStr(params.get("spaceReclamationPriority"));
-                int capacity = ToolUtils.getInt(params.get("capacity"));
-                //从主机或集群中找出最接近capacity的LUN
-                Map<String,Object> hsdmap = null;
-                if (params != null && params.get("host") != null) {
-                    hsdmap = VCSDKUtils.getLunsOnHost(hostName,capacity);
-                } else if (params != null && params.get("cluster") != null) {
-                    hsdmap = VCSDKUtils.getLunsOnCluster(clusterName,capacity);
-                }
-
-                //创建
-                String dataStoreStr = VCSDKUtils.createVmfsDataStore(hsdmap, capacity, datastoreName,
-                        vmfsMajorVersion, blockSize, unmapGranularity, unmapPriority);
+                //创建vmware中的vmfs存储。
+                String dataStoreStr = createVmfsOnVmware(params);
                 LOG.info("Vmfs dataStoreStr==" + dataStoreStr);
-
                 //如果创建成功，在集群中的其他主机上扫描并挂载datastore
 
 
@@ -259,7 +240,40 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
     }
 
-    //返回任务ID
+    //在vmware创建存储
+    private String createVmfsOnVmware(Map<String, Object> params) {
+        String dataStoreStr = "";
+        try {
+            if (params != null) {
+                //创建vmware中的vmfs存储。 cluster host
+                String hostName = ToolUtils.getStr(params.get("host"));
+                String clusterName = ToolUtils.getStr(params.get("cluster"));
+                String datastoreName = ToolUtils.getStr(params.get("name"));
+                int vmfsMajorVersion = ToolUtils.getInt(params.get("version"));
+                int blockSize = ToolUtils.getInt(params.get("blockSize"));
+                int unmapGranularity = ToolUtils.getInt(params.get("spaceReclamationGranularity"));
+                String unmapPriority = ToolUtils.getStr(params.get("spaceReclamationPriority"));
+                int capacity = ToolUtils.getInt(params.get("capacity"));
+                //从主机或集群中找出最接近capacity的LUN
+                Map<String,Object> hsdmap = null;
+                if (params != null && params.get("host") != null) {
+                    hsdmap = VCSDKUtils.getLunsOnHost(hostName,capacity);
+                } else if (params != null && params.get("cluster") != null) {
+                    hsdmap = VCSDKUtils.getLunsOnCluster(clusterName,capacity);
+                }
+
+                //创建
+                dataStoreStr = VCSDKUtils.createVmfsDataStore(hsdmap, capacity, datastoreName,
+                        vmfsMajorVersion, blockSize, unmapGranularity, unmapPriority);
+            }
+            //如果主机或主机不存在就创建并得到主机或主机组ID
+        } catch (Exception e) {
+            LOG.error("createVmfsByServiceLevel error:", e);
+        }
+        return dataStoreStr;
+    }
+
+    //通过服务等级创建卷，返回任务ID
     private String createVmfsByServiceLevel(Map<String, Object> params, String objhostid) {
         String taskId = "";
         try {
@@ -306,7 +320,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return taskId;
     }
 
-    //返回任务ID
+    //通过非服务化创建卷，返回任务ID
     private String createVmfsByUNServiceLevel(Map<String, Object> params, String objhostid) {
         String taskId = "";
         try {
