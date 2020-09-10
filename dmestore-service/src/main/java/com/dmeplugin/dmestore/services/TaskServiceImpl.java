@@ -188,6 +188,7 @@ public class TaskServiceImpl implements TaskService {
         boolean unmountFlag = true;
         Map<String, Integer> taskStatusMap = new HashMap<>();
         getTaskStatus(taskIds, taskStatusMap, taskTimeOut, System.currentTimeMillis());
+        LOG.info("taskStatusMap==="+(taskStatusMap==null?"null":gson.toJson(taskStatusMap)));
         for (Map.Entry<String, Integer> entry : taskStatusMap.entrySet()) {
             //String taskId = entry.getKey();
             int status = entry.getValue();
