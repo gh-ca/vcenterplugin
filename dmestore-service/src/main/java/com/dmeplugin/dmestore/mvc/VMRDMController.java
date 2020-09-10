@@ -50,11 +50,13 @@ public class VMRDMController extends BaseController {
                                       @RequestBody VmRDMCreateBean createBean) throws Exception {
         String taskId = vmrdmService.createRDM(createBean);
         if (null == taskId) {
-            return failure("Failed to create RDM on DME");
+            LOG.error("Failed to create RDM on DME! taskId is null");
+            return failure("Failed to create RDM on DME!");
         }
         JsonObject taskDetail = taskService.queryTaskByIdUntilFinish(taskId);
         if (null != taskDetail && taskDetail.get("status").getAsInt() != 3) {
-            return failure("Failed to create RDM on DME", taskDetail);
+            LOG.error("Failed to create RDM on DME!taskDetail={}", gson.toJson(taskDetail));
+            return failure("Failed to create RDM on DME");
         }
         List<String> volumeIds = new ArrayList();
         //获取卷资源
@@ -66,12 +68,16 @@ public class VMRDMController extends BaseController {
         }
         //将卷映射给主机
         taskId = vmrdmService.hostMapping(host_id, volumeIds);
+        if (null == taskId) {
+            LOG.error("Disk mapping to host failed! taskId is null");
+            return failure("Disk mapping to host failed!");
+        }
         taskDetail = taskService.queryTaskByIdUntilFinish(taskId);
         if (null != taskDetail && taskDetail.get("status").getAsInt() == 3) {
             LOG.info("Disk mapping to host succeeded!");
         } else {
-            LOG.info("Disk mapping to host failed!");
-            return failure("Disk mapping to host failed!", taskDetail);
+            LOG.error("Disk mapping to host failed!taskDetail={}", gson.toJson(taskDetail));
+            return failure("Disk mapping to host failed!");
         }
 
         //查询主机信息
@@ -97,6 +103,7 @@ public class VMRDMController extends BaseController {
         }
 
         if (!flag) {
+            LOG.error("not find lun, disk mapping to host failed!");
             return failure("Disk mapping to host failed!");
         }
         //调用Vcenter创建磁盘
@@ -107,8 +114,13 @@ public class VMRDMController extends BaseController {
         String rdmdevicename = lunObject.get("deviceName").getAsString();
         String vmdkDatastorePath = dsMo.getDatastorePath(datastore_name);
         int sizeInMb = createBean.getSize();
-        virtualMachineMO.createDisk(vmdkDatastorePath, VirtualDiskType.RDM, VirtualDiskMode.PERSISTENT,
-                rdmdevicename, sizeInMb, dsMo.getMor(), -1);
+        try {
+            virtualMachineMO.createDisk(vmdkDatastorePath, VirtualDiskType.RDM, VirtualDiskMode.PERSISTENT,
+                    rdmdevicename, sizeInMb, dsMo.getMor(), -1);
+        }catch (Exception ex){
+            LOG.error("create vcenter disk rdm failed!errorMsg:{}", ex.getMessage());
+            return failure("Create Vcenter disk RDM failed");
+        }
 
         return success();
     }
