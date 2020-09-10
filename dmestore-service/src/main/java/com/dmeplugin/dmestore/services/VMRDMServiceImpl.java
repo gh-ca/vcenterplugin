@@ -48,8 +48,7 @@ public class VMRDMServiceImpl implements VMRDMService {
                 return null;
             }
             JsonObject task = gson.fromJson(responseEntity.getBody(), JsonObject.class);
-            String taskId = task.get("task_id").getAsString();
-            return taskId;
+            return task.get("task_id").getAsString();
         } catch (Exception ex) {
             LOG.error("create dme rdm error!errorMsg:{}", ex.getMessage());
         }

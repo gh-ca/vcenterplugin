@@ -243,6 +243,8 @@ public class VCSDKUtils {
                         Map<String, Object> map = new HashMap<>();
                         map.put("uuid", hostScsiDisk.getUuid());
                         map.put("devicePath", hostScsiDisk.getDevicePath());
+                        map.put("deviceName", hostScsiDisk.getDeviceName());
+                        map.put("localDisk", hostScsiDisk.isLocalDisk());
                         map.put("block", hostScsiDisk.getCapacity().getBlock());
                         map.put("blockSize", hostScsiDisk.getCapacity().getBlockSize());
 

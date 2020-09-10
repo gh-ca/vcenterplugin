@@ -128,6 +128,15 @@ public class VirtualMachineMO extends BaseMO {
         super(context, morType, morValue);
     }
 
+    public VirtualMachineMO(VmwareContext context, String virtualmachiname) throws Exception {
+        super(context, null);
+
+        _mor = _context.getVimClient().getDecendentMoRef(_context.getRootFolder(), "VirtualMachine", virtualmachiname);
+        if (_mor == null) {
+            s_logger.error("Unable to locate host " + virtualmachiname);
+        }
+    }
+
     public Pair<DatacenterMO, String> getOwnerDatacenter() throws Exception {
         return DatacenterMO.getOwnerDatacenter(getContext(), getMor());
     }

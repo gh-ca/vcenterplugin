@@ -216,6 +216,10 @@ public class BaseController {
     return bodyBean;
   }
 
+  protected ResponseBodyBean failure(String description, Object data) {
+    return failure(CODE_FAILURE, description, data);
+  }
+
   protected ResponseBodyBean listData(List<Map<String, Object>> dataMapList) {
     return listData(dataMapList, "");
   }
