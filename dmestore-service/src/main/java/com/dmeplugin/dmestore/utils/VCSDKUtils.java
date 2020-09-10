@@ -464,6 +464,7 @@ public class VCSDKUtils {
                             dataStoremap.put("id", dsMo.getMor().getValue());
                             dataStoremap.put("type", dsMo.getMor().getType());
                             dataStoremap.put("capacity", dsMo.getSummary().getCapacity());
+                            dataStoremap.put("hostName", hostMo.getName());
                             dataStoreStr = gson.toJson(dataStoremap);
                             _logger.info("dataStoreStr===" + dataStoreStr);
                         }
@@ -563,46 +564,100 @@ public class VCSDKUtils {
         return deleteFlag;
     }
 
-    //挂载存储
-    public static void mountVmfs(String datastoreStr,String hostName) throws Exception {
+    //将存储挂载到集群下其它主机
+    public static void mountVmfsOnCluster(String datastoreStr,String clusterName,String hostName) throws Exception {
         try {
             if (StringUtils.isEmpty(datastoreStr)) {
                 _logger.info("datastore:"+datastoreStr+" is null");
                 return;
             }
-            if (StringUtils.isEmpty(hostName)) {
-                _logger.info("host:"+hostName+" is null");
+            if (StringUtils.isEmpty(hostName) && StringUtils.isEmpty(clusterName)) {
+                _logger.info("host:"+hostName+" and cluster:"+clusterName+" is null");
                 return;
             }
-            //查询目前未挂载的卷
+            Gson gson = new Gson();
+
+            Map<String, Object> dsmap = gson.fromJson(datastoreStr, new TypeToken<Map<String, Object>>() {
+            }.getType());
+            String objHostName = "";
+            String objDataStoreName = "";
+            if (dsmap != null) {
+                objHostName = ToolUtils.getStr(dsmap.get("hostName"));
+                objHostName = objHostName==null?"":objHostName;
+                objDataStoreName = ToolUtils.getStr(dsmap.get("name"));
+            }
+
             VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
             RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
-            HostMO hostMo = rootFsMO.findHost(hostName);
-            List<HostUnresolvedVmfsVolume> unvlist = hostMo.getHostStorageSystemMO().queryUnresolvedVmfsVolume();
-            _logger.info("unvlist========"+(unvlist==null?"null":unvlist.size()));
-            if(unvlist!=null && unvlist.size()>0){
-                for(HostUnresolvedVmfsVolume unv:unvlist){
-                    _logger.info(unv.getVmfsUuid()+"========"+unv.getVmfsLabel());
+            List<Pair<ManagedObjectReference, String>> hosts = null;
+            //集群下的所有主机
+            if(!StringUtils.isEmpty(clusterName)){
+                _logger.info("clusterName:"+clusterName);
+                ClusterMO clusterMO = rootFsMO.findCluster(clusterName);
+                hosts = clusterMO.getClusterHosts();
+                _logger.info("clusterName hosts:"+(hosts==null?"null":hosts.size()));
+            }else if(!StringUtils.isEmpty(hostName)){  //目标主机所在集群下的其它主机
+                _logger.info("hostName:"+hostName);
+                HostMO hostMO = rootFsMO.findHost(hostName);
+                ManagedObjectReference cluster = hostMO.getHyperHostCluster();
+                _logger.info("hostName cluster:"+cluster.getValue());
+                if(cluster!=null){
+                    ClusterMO clusterMO = new ClusterMO(hostMO.getContext(), cluster);
+                    _logger.info("hostName clusterMO:"+clusterMO.getName());
+                    hosts = clusterMO.getClusterHosts();
+                }
+                _logger.info("hostName hosts:"+(hosts==null?"null":hosts.size()));
+            }
+            if (hosts != null && hosts.size() > 0) {
+                for (Pair<ManagedObjectReference, String> host : hosts) {
+                    HostMO host1 = new HostMO(vmwareContext, host.first());
+                    _logger.info("host1.getName():"+host1.getName());
+                    //只挂载其它的主机
+                    if(host1!=null && !objHostName.equals(host1.getName())){
+                        mountVmfs(objDataStoreName,host1);
+                    }
                 }
             }
-
-
-          _logger.info("============================");
-            //查询目前未挂载的卷
-            for (HostFileSystemMountInfo mount : hostMo.getHostStorageSystemMO().getHostFileSystemVolumeInfo().getMountInfo()) {
-                if (mount.getVolume() instanceof HostVmfsVolume) {
-                    HostVmfsVolume volume = (HostVmfsVolume) mount.getVolume();
-                    _logger.info(volume.getName()+"========"+volume.getUuid());
-                }
-
-            }
-          _logger.info("============================");
-            //挂载卷
-//            hostMo.getHostStorageSystemMO().mountVmfsVolume("4d2637f7-29519798-be16-00505684dbd6");
-//
         } catch (Exception e) {
             e.printStackTrace();
             _logger.error("get LUN error:", e);
+            throw e;
+        }
+    }
+    //挂载存储
+    public static void mountVmfs(String datastoreName,HostMO hostMO) throws Exception {
+        try {
+            if (StringUtils.isEmpty(datastoreName)) {
+                _logger.info("datastore Name is null");
+                return;
+            }
+            if (hostMO==null) {
+                _logger.info("host is null");
+                return;
+            }
+            _logger.info("hostMO.getName():"+hostMO.getName());
+            //查询目前未挂载的卷
+//            List<HostUnresolvedVmfsVolume> unvlist = hostMO.getHostStorageSystemMO().queryUnresolvedVmfsVolume();
+//            _logger.info("unvlist========"+(unvlist==null?"null":unvlist.size()));
+//            if(unvlist!=null && unvlist.size()>0){
+//                for(HostUnresolvedVmfsVolume unv:unvlist){
+//                    _logger.info(unv.getVmfsUuid()+"========"+unv.getVmfsLabel());
+//                }
+//            }
+//            _logger.info("============================");
+            //查询目前未挂载的卷
+            for (HostFileSystemMountInfo mount : hostMO.getHostStorageSystemMO().getHostFileSystemVolumeInfo().getMountInfo()) {
+                if (mount.getVolume() instanceof HostVmfsVolume
+                        && datastoreName.equals(mount.getVolume().getName())) {
+                    HostVmfsVolume volume = (HostVmfsVolume) mount.getVolume();
+                    _logger.info(volume.getName() + "========" + volume.getUuid());
+                    //挂载卷
+                    hostMO.getHostStorageSystemMO().mountVmfsVolume(volume.getUuid());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("mount Vmfs Volume error:", e);
             throw e;
         }
     }
@@ -631,8 +686,10 @@ public class VCSDKUtils {
             dataStoremap.put("id", "aaa");
             dataStoremap.put("type", "aaa");
             dataStoremap.put("capacity", "aaa");
+            dataStoremap.put("hostName", "10.143.133.196");
             String hostName = "10.143.133.196";
-            mountVmfs(gson.toJson(dataStoremap),hostName);
+            String clusterName = "pbu4test";
+            mountVmfsOnCluster(gson.toJson(dataStoremap), clusterName, hostName);
             _logger.info("==================over==========");
 ///////////////////////create vmfs/////////////////////////////////////////////////////////
 //            String hostName = "10.143.133.196";

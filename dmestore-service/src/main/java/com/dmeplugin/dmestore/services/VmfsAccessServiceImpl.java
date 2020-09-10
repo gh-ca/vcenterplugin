@@ -221,8 +221,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //创建vmware中的vmfs存储。
                 String dataStoreStr = createVmfsOnVmware(params);
                 LOG.info("Vmfs dataStoreStr==" + dataStoreStr);
-                //如果创建成功，在集群中的其他主机上扫描并挂载datastore
-
 
                 //关联服务等级
                 if (params.get("service_level_id") != null) {
@@ -230,7 +228,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     Map<String, Object> dsmap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {
                     }.getType());
                     if (dsmap != null) {
-                        String attachTagStr = VCSDKUtils.attachTag(dsmap.get("type").toString(), dsmap.get("id").toString(), serviceLevelName);
+                        String attachTagStr = VCSDKUtils.attachTag(ToolUtils.getStr(dsmap.get("type")), ToolUtils.getStr(dsmap.get("id")), serviceLevelName);
                         LOG.info("Vmfs attachTagStr==" + attachTagStr);
                     }
                 }
@@ -265,6 +263,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //创建
                 dataStoreStr = VCSDKUtils.createVmfsDataStore(hsdmap, capacity, datastoreName,
                         vmfsMajorVersion, blockSize, unmapGranularity, unmapPriority);
+
+                //如果创建成功，在集群中的其他主机上扫描并挂载datastore
+                VCSDKUtils.mountVmfsOnCluster(dataStoreStr, clusterName, hostName);
             }
             //如果主机或主机不存在就创建并得到主机或主机组ID
         } catch (Exception e) {
