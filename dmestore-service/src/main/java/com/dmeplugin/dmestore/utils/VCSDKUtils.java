@@ -430,8 +430,8 @@ public class VCSDKUtils {
     }
 
     //创建vmfs存储
-    public static String createVmfsDataStore(Map<String,Object> hsdmap, String datastoreName,
-                                             int vmfsMajorVersion, int blockSize, long totalSectors,
+    public static String createVmfsDataStore(Map<String,Object> hsdmap, int capacity, String datastoreName,
+                                             int vmfsMajorVersion, int blockSize,
                                              int unmapGranularity, String unmapPriority) throws Exception {
         String dataStoreStr = "";
         try {
@@ -447,6 +447,8 @@ public class VCSDKUtils {
                 if (hostMo != null) {
                     if (objhsd != null) {
                         _logger.info("Create datastore via host " + hostMo.getName() + " on disk " + objhsd.getDevicePath());
+                        long totalSectors = capacity*1L*ToolUtils.Gi/objhsd.getCapacity().getBlockSize();
+                        _logger.info("Vmfs totalSectors==" + totalSectors);
                         //create vmfs
                         ManagedObjectReference datastore = null;
                         try {
@@ -582,22 +584,19 @@ public class VCSDKUtils {
 
 ///////////////////////create vmfs/////////////////////////////////////////////////////////
             String hostName = "10.143.133.196";
-            int capacity = 10;
+            int capacity = 10;  //GB
             String datastoreName = "yytestvfms007";
             int vmfsMajorVersion = 6;
             int blockSize = 1024;
-            long totalSectors = 16777216L;
             int unmapGranularity = 1024;
             String unmapPriority = "low";
             String serviceLevelName = "dme3333";
 
             Map<String,Object> hsdmap = getLunsOnHost(hostName,capacity);
             if(hsdmap!=null && hsdmap.get("host")!=null) {
-                HostScsiDisk objhsd = (HostScsiDisk) hsdmap.get("hostScsiDisk");
-                totalSectors = capacity*1L*ToolUtils.Gi/objhsd.getCapacity().getBlockSize();
-                _logger.info("Vmfs totalSectors==" + totalSectors);
-                String dataStoreStr = VCSDKUtils.createVmfsDataStore(hsdmap, datastoreName,
-                        vmfsMajorVersion, blockSize, totalSectors, unmapGranularity, unmapPriority);
+
+                String dataStoreStr = VCSDKUtils.createVmfsDataStore(hsdmap, capacity, datastoreName,
+                        vmfsMajorVersion, blockSize, unmapGranularity, unmapPriority);
                 _logger.info("Vmfs dataStoreStr==" + dataStoreStr);
 
                 Map<String, Object> dsmap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {

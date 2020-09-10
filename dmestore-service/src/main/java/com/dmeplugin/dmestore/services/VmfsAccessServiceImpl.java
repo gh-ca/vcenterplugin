@@ -220,17 +220,24 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 LOG.info("tdinfo====" + (tdinfo == null ? "null" : gson.toJson(tdinfo)));
                 //创建vmware中的vmfs存储。 host name hostlun
                 String hostName = ToolUtils.getStr(params.get("host"));
-                String devicePath = ToolUtils.getStr(params.get("hostlun"));
+//                String devicePath = ToolUtils.getStr(params.get("hostlun"));
                 String datastoreName = ToolUtils.getStr(params.get("name"));
                 int vmfsMajorVersion = ToolUtils.getInt(params.get("version"));
                 int blockSize = ToolUtils.getInt(params.get("blockSize"));
-                long totalSectors = ToolUtils.getInt(params.get("capacity")); //capacity GB需要转成B然后/512，算成块数
-                totalSectors = totalSectors*ToolUtils.Gi/512;
                 int unmapGranularity = ToolUtils.getInt(params.get("spaceReclamationGranularity"));
                 String unmapPriority = ToolUtils.getStr(params.get("spaceReclamationPriority"));
+                int capacity = ToolUtils.getInt(params.get("capacity"));
 
-                String dataStoreStr = VCSDKUtils.createVmfsDataStore(null, datastoreName,
-                        vmfsMajorVersion, blockSize, totalSectors, unmapGranularity, unmapPriority);
+                Map<String,Object> hsdmap = null;
+                if (params != null && params.get("host") != null) {
+                    hsdmap = VCSDKUtils.getLunsOnHost(hostName,capacity);
+                } else if (params != null && params.get("cluster") != null) {
+                    hsdmap = VCSDKUtils.getLunsOnCluster(hostName,capacity);
+                }
+
+
+                String dataStoreStr = VCSDKUtils.createVmfsDataStore(hsdmap, capacity, datastoreName,
+                        vmfsMajorVersion, blockSize, unmapGranularity, unmapPriority);
                 LOG.info("Vmfs dataStoreStr==" + dataStoreStr);
                 //关联服务等级
                 if (params.get("service_level_id") != null) {
