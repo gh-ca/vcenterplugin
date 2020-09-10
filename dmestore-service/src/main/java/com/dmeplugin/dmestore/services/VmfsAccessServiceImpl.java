@@ -45,7 +45,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private final String CREATE_VOLUME_URL = "/rest/blockservice/v1/volumes";
     private final String CREATE_VOLUME_UNSERVICE_URL = "/rest/blockservice/v1/volumes";
 
-    int taskTimeOut = 10 * 60 * 1000;//轮询任务状态的超值时间
 
     @Override
     public List<VmfsDataInfo> listVmfs() throws Exception {
@@ -705,7 +704,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
 
         // 获取卸载的任务完成后的状态 (默认超时时间10分钟)
-        boolean unmountFlag = taskService.checkTaskStatus(taskIds, taskTimeOut, System.currentTimeMillis());
+        boolean unmountFlag = taskService.checkTaskStatus(taskIds);
 
         if (!unmountFlag) {
             throw new Exception("unmount volume precondition unmount host and hostGroup error(task status)!");
@@ -741,7 +740,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             taskId = getTaskId(responseEntity);
         }
 
-        boolean dmeDeleteFlag = taskService.checkTaskStatus(Arrays.asList(taskId), taskTimeOut, System.currentTimeMillis());
+        boolean dmeDeleteFlag = taskService.checkTaskStatus(Arrays.asList(taskId));
 
         if (!dmeDeleteFlag) {
             throw new Exception("delete volume precondition unmount host and hostGroup error(task status)!");

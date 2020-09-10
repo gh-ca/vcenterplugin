@@ -21,7 +21,7 @@ public interface TaskService {
 
     void getTaskStatus(List<String> taskIds, Map<String, Integer> taskStatusMap, int timeout, long startTime);
 
-    Boolean checkTaskStatus(List<String> taskIds, int timeout, long startTime);
+    Boolean checkTaskStatus(List<String> taskIds);
 
     /**
      * @Author wangxiangyong

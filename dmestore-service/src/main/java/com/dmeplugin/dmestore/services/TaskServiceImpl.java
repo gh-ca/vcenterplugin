@@ -26,6 +26,8 @@ public class TaskServiceImpl implements TaskService {
     private final String LIST_TASK_URL = "/rest/taskmgmt/v1/tasks";
     private final String QUERY_TASK_URL = "/rest/taskmgmt/v1/tasks/{task_id}";
 
+    private final int taskTimeOut = 10 * 60 * 1000;//轮询任务状态的超值时间
+
     Gson gson = new Gson();
 
     @Override
@@ -182,10 +184,10 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Boolean checkTaskStatus(List<String> taskIds, int timeout, long startTime) {
+    public Boolean checkTaskStatus(List<String> taskIds) {
         boolean unmountFlag = true;
         Map<String, Integer> taskStatusMap = new HashMap<>();
-        getTaskStatus(taskIds, taskStatusMap, timeout, startTime);
+        getTaskStatus(taskIds, taskStatusMap, taskTimeOut, System.currentTimeMillis());
         for (Map.Entry<String, Integer> entry : taskStatusMap.entrySet()) {
             //String taskId = entry.getKey();
             int status = entry.getValue();
