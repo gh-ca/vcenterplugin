@@ -1,15 +1,17 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.model.ServiceLevelInfo;
-import com.dmeplugin.dmestore.utils.RestUtils;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: TODO
@@ -23,7 +25,10 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
     @Autowired
     private Gson gson;
-    private static String dmeHostUrl;
+    @Autowired
+    private DmeAccessService dmeAccessService;
+
+    private final String LIST_SERVICE_LEVEL_URL = "/rest/service-policy/v1/service-levels";
 
     @Override
     public Map<String, Object> listServiceLevel(Map<String, Object> params) {
@@ -32,14 +37,10 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         remap.put("message", "list serviceLevel success!");
         remap.put("data", params);
 
-        String apiUrl = "/rest/service-policy/v1/service-levels";
-        String hostUrl = "https://" + params.get("hostIp") + ":" + params.get("hostPort");
-        dmeHostUrl = hostUrl;
-
         ResponseEntity responseEntity;
         List<ServiceLevelInfo> slis;
         try {
-            responseEntity = listServiceLevel(apiUrl, HttpMethod.GET);
+            responseEntity = dmeAccessService.access(LIST_SERVICE_LEVEL_URL, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (200 != code) {
                 remap.put("code", 503);
@@ -59,35 +60,13 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return remap;
     }
 
-    private ResponseEntity listServiceLevel(String url, HttpMethod method) throws Exception {
-        ResponseEntity responseEntity = null;
-
-        RestUtils restUtils = new RestUtils();
-        RestTemplate restTemplate = restUtils.getRestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        responseEntity = restTemplate.exchange(dmeHostUrl + url, method, entity, String.class);
-        log.info("servicelevel url:{},response:{}", url, gson.toJson(responseEntity));
-        if (403 == responseEntity.getStatusCodeValue() || 401 == responseEntity.getStatusCodeValue()) {
-            //认证失效,调用登陆接口重新认证,重新执行调用接口
-            //Map<String, Object> params = new HashMap<>();
-            //login(params);
-            responseEntity = restTemplate.exchange(dmeHostUrl + url, method, entity, String.class);
-        }
-        return responseEntity;
-    }
-
     // convert the api responseBody to ServiceLevelInfo Bean list
     private List<ServiceLevelInfo> convertBean(Object object) {
         List<ServiceLevelInfo> slis = new ArrayList<>();
 
         JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
         JsonArray jsonArray = jsonObject.get("service-levels").getAsJsonArray();
-        for(JsonElement jsonElement : jsonArray){
+        for (JsonElement jsonElement : jsonArray) {
             try {
                 JsonObject object1 = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
                 String id = object1.get("id").getAsString();
@@ -114,8 +93,8 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                 sli.setLatencyUnit(latencyUnit);
 
                 slis.add(sli);
-            } catch (Exception e){
-                log.warn("servicelevel convert error:",e);
+            } catch (Exception e) {
+                log.warn("servicelevel convert error:", e);
             }
         }
         return slis;
