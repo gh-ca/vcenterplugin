@@ -41,4 +41,11 @@ import java.util.List;
      * @Return com.dmeplugin.dmestore.model.NFSDataStoreFSAttr
      **/
     List<NFSDataStoreFSAttr> getNFSDatastoreFSAttr(String storage_id) throws Exception;
+
+    /**
+     * 扫描NFS 存储DataSotre 与share fs logicPort的关系
+     * @return
+     * @throws Exception
+     */
+    boolean scanNfs() throws Exception;
 }

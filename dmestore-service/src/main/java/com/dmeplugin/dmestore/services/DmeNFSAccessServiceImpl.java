@@ -1,23 +1,25 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.model.AuthClient;
 import com.dmeplugin.dmestore.model.NFSDataStoreFSAttr;
 import com.dmeplugin.dmestore.model.NFSDataStoreLogicPortAttr;
 import com.dmeplugin.dmestore.model.NFSDataStoreShareAttr;
 import com.dmeplugin.dmestore.utils.StringUtil;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.dmeplugin.dmestore.utils.ToolUtils;
+import com.dmeplugin.dmestore.utils.VCSDKUtils;
+import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName DmeNFSAccessServiceImpl
@@ -158,4 +160,149 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
         return list;
     }
+
+    @Override
+    public boolean scanNfs() throws Exception {
+        // vcenter侧获取nfsStrorge信息列表 (暂通过wwn来与dem(storagetId)发生关联关系)
+        String listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_NFS);
+        LOG.info("===list nfs datastore success====\n{}", listStr);
+        if (StringUtils.isEmpty(listStr)) {
+            return false;
+        }
+        JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
+        List<DmeVmwareRelation> relationList = new ArrayList<>();
+        for (int i = 0; i < jsonArray.size(); i++) {
+            JsonObject nfsDatastore = jsonArray.get(i).getAsJsonObject();
+            String store_type = ToolUtils.STORE_TYPE_VMFS;
+            //TODO 暂时认为是从url中获取到wwn信息
+            String nfsDatastoreUrl = nfsDatastore.get("url").getAsString();
+            String nfsDatastoreId = nfsDatastore.get("id").getAsString();
+            String nfsDatastoreName = nfsDatastore.get("name").getAsString();
+            //拆分wwn
+            String wwn = nfsDatastoreUrl.split("volumes/")[1];
+
+            //获取share信息
+            Map<String, Object> shareInfo = queryShareInfo(wwn);
+            if (null != shareInfo && shareInfo.size() > 0) {
+
+            }
+
+            //获取fs信息
+            Map<String, Object> fsInfo = queryFsInfo(wwn);
+            if (null != fsInfo && fsInfo.size() > 0) {
+
+            }
+
+            //获取logicPort信息
+            Map<String, Object> logicPortInfo = queryLogicPortInfo(wwn);
+            if (null != logicPortInfo && logicPortInfo.size() > 0) {
+
+            }
+        }
+
+        //数据库保存datastorage 与nfs的 share fs logicPort关系信息
+        //dbsave();
+
+
+        return false;
+    }
+
+    //按条件查询share 暂认为 storage与share是一对一的关系
+    private Map<String, Object> queryShareInfo(String storageId) throws Exception {
+        ResponseEntity responseEntity = listShareByStorageId(storageId);
+        if (responseEntity.getStatusCodeValue() / 100 != 2) {
+            Object object = responseEntity.getBody();
+            List<Map<String, Object>> list = converShare(object);
+            if (list.size() > 0) {
+                return list.get(0);
+            }
+        }
+        return null;
+    }
+
+    //通过storageId查询share信息
+    private ResponseEntity listShareByStorageId(String storageId) throws Exception {
+        Map<String, Object> requestbody = new HashMap<>();
+        requestbody.put("storage_id", storageId);
+        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL, HttpMethod.POST, requestbody.toString());
+        return responseEntity;
+    }
+
+    //解析share信息
+    private List<Map<String, Object>> converShare(Object object) {
+        List<Map<String, Object>> shareList = new ArrayList<>();
+        JsonArray jsonArray;
+        String strObject = gson.toJson(object);
+        if (strObject.indexOf("total") > -1 && strObject.indexOf("nfs_share_info_list") > -1) {
+            JsonObject temp = new JsonParser().parse(object.toString()).getAsJsonObject();
+            jsonArray = temp.get("nfs_share_info_list").getAsJsonArray();
+        } else {
+            jsonArray = new JsonParser().parse(object.toString()).getAsJsonArray();
+        }
+        for (JsonElement jsonElement : jsonArray) {
+            Map<String, Object> shareMap = new HashMap<>();
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            shareMap.put("id", jsonObject.get("id").getAsString());
+            shareMap.put("name", jsonObject.get("name").getAsString());
+            shareMap.put("share_path", jsonObject.get("share_path").getAsString());
+            shareMap.put("storage_id", jsonObject.get("storage_id").getAsString());
+            shareMap.put("device_name", jsonObject.get("device_name").getAsString());
+            shareMap.put("owning_dtree_id", jsonObject.get("owning_dtree_id").getAsString());
+            shareMap.put("owning_dtree_name", jsonObject.get("owning_dtree_name").getAsString());
+            shareList.add(shareMap);
+        }
+        return shareList;
+    }
+
+    //按条件查询fs
+    private Map<String, Object> queryFsInfo(String storageId) throws Exception {
+        ResponseEntity responseEntity = listFsByStorageId(storageId);
+        if (responseEntity.getStatusCodeValue() / 100 != 2) {
+            Object object = responseEntity.getBody();
+            List<Map<String, Object>> list = converFs(object);
+            if (list.size() > 0) {
+                return list.get(0);
+            }
+        }
+        return null;
+    }
+
+    //通过storageId查询fs信息
+    private ResponseEntity listFsByStorageId(String storageId) throws Exception {
+        Map<String, Object> requestbody = new HashMap<>();
+        requestbody.put("storage_id", storageId);
+        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_FILESERVICE_QUERY_URL, HttpMethod.POST, requestbody.toString());
+        return responseEntity;
+    }
+
+    //解析fs信息
+    private List<Map<String, Object>> converFs(Object object) {
+        return null;
+    }
+
+    //按条件查询logicPort
+    private Map<String, Object> queryLogicPortInfo(String storageId) throws Exception {
+        ResponseEntity responseEntity = listLogicPortByStorageId(storageId);
+        if (responseEntity.getStatusCodeValue() / 100 != 2) {
+            Object object = responseEntity.getBody();
+            List<Map<String, Object>> list = convertLogicPort(object);
+            if (list.size() > 0) {
+                return list.get(0);
+            }
+        }
+        return null;
+    }
+
+    //通过storageId查询logicPort信息
+    private ResponseEntity listLogicPortByStorageId(String storageId) throws Exception {
+        String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_LOGICPORT_QUERY_URL, "storage_id", storageId);
+        ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+        return responseEntity;
+    }
+
+    //解析logicPort信息
+    private List<Map<String, Object>> convertLogicPort(Object object) {
+        return null;
+    }
+
 }

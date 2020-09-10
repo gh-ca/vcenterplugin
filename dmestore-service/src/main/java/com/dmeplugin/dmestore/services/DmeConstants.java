@@ -55,4 +55,14 @@ public class DmeConstants {
      * DME 卷映射给主机URL
      **/
     public static final String DME_HOST_MAPPING_URL = "/rest/blockservice/v1/volumes/host-mapping";
+
+    /**
+     * NFS share列表 POST
+     */
+    public static final String DME_NFS_SHARE_URL = "/rest/fileservice/v1/nfs-shares/summary";
+
+    /**
+     * NFS logic_port query
+     */
+    public static final String DME_NFS_LOGICPORT_QUERY_URL = "/rest/storagemgmt/v1/storage-port/logic-ports?storage_id=#{storage_id}";
 }

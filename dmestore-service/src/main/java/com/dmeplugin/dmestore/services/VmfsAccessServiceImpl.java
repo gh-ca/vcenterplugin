@@ -4,7 +4,6 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.model.Storage;
-import com.dmeplugin.dmestore.model.TaskDetailInfo;
 import com.dmeplugin.dmestore.model.VmfsDataInfo;
 import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
 import com.dmeplugin.dmestore.utils.ToolUtils;
@@ -654,6 +653,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
 
+    /**
+     *
+     * @param params volume_id host_id hostGroup_id由调用处传递过来，而不是在此处自己查询？
+     * @throws Exception
+     */
     @Override
     public void unmountVmfs(Map<String, Object> params) throws Exception {
         List<String> taskIds = new ArrayList<>();
