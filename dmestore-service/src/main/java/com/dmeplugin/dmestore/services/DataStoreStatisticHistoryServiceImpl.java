@@ -126,6 +126,16 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         return remap;
     }
 
+    @Override
+    public Map<String, Object> queryNfsStatistic(Map<String, Object> params) {
+        return queryVmfsStatistic(params);
+    }
+
+    @Override
+    public Map<String, Object> queryNfsStatisticCurrent(Map<String, Object> params) {
+        return queryVmfsStatisticCurrent(params);
+    }
+
     //query statistic
     private ResponseEntity queryStatistic(Map<String, Object> params) throws Exception {
         ResponseEntity responseEntity;
