@@ -475,6 +475,8 @@ public class VCSDKUtils {
                 } else {
                     throw new Exception("host:" + hostMo.getName() + " non-existent。");
                 }
+            } else {
+                throw new Exception("host and LUN non-existent。");
             }
         } catch (Exception e) {
             e.printStackTrace();

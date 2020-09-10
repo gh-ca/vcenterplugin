@@ -227,7 +227,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 int unmapGranularity = ToolUtils.getInt(params.get("spaceReclamationGranularity"));
                 String unmapPriority = ToolUtils.getStr(params.get("spaceReclamationPriority"));
                 int capacity = ToolUtils.getInt(params.get("capacity"));
-
+                //从主机或集群中找出最接近capacity的LUN
                 Map<String,Object> hsdmap = null;
                 if (params != null && params.get("host") != null) {
                     hsdmap = VCSDKUtils.getLunsOnHost(hostName,capacity);
@@ -235,7 +235,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     hsdmap = VCSDKUtils.getLunsOnCluster(clusterName,capacity);
                 }
 
-
+                //创建
                 String dataStoreStr = VCSDKUtils.createVmfsDataStore(hsdmap, capacity, datastoreName,
                         vmfsMajorVersion, blockSize, unmapGranularity, unmapPriority);
                 LOG.info("Vmfs dataStoreStr==" + dataStoreStr);
