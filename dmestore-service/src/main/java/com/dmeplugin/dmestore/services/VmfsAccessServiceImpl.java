@@ -218,9 +218,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //查询看创建任务是否完成。
                 TaskDetailInfo tdinfo = taskService.queryTaskById(taskId);
                 LOG.info("tdinfo====" + (tdinfo == null ? "null" : gson.toJson(tdinfo)));
-                //创建vmware中的vmfs存储。 host name hostlun
+                //创建vmware中的vmfs存储。 cluster host
                 String hostName = ToolUtils.getStr(params.get("host"));
-//                String devicePath = ToolUtils.getStr(params.get("hostlun"));
+                String clusterName = ToolUtils.getStr(params.get("cluster"));
                 String datastoreName = ToolUtils.getStr(params.get("name"));
                 int vmfsMajorVersion = ToolUtils.getInt(params.get("version"));
                 int blockSize = ToolUtils.getInt(params.get("blockSize"));
@@ -232,7 +232,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 if (params != null && params.get("host") != null) {
                     hsdmap = VCSDKUtils.getLunsOnHost(hostName,capacity);
                 } else if (params != null && params.get("cluster") != null) {
-                    hsdmap = VCSDKUtils.getLunsOnCluster(hostName,capacity);
+                    hsdmap = VCSDKUtils.getLunsOnCluster(clusterName,capacity);
                 }
 
 
