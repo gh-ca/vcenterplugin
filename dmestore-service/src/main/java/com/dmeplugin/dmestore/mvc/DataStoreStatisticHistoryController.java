@@ -27,7 +27,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     @Autowired
     DataStoreStatisticHistoryService dataSotreStatisticHistroyService;
 
-    @RequestMapping(value = "/vmfsvolume", method = RequestMethod.GET)
+    @RequestMapping(value = "/vmfsvolume", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean getVmfsVolumeStatistic(@RequestBody Map<String, Object> params) throws Exception {
         LOG.info("datastorestatistichistrory/vmfsvolume params==" + gson.toJson(params));
@@ -39,7 +39,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
         return failure(gson.toJson(resMap));
     }
 
-    @RequestMapping(value = "/nfsvolume", method = RequestMethod.GET)
+    @RequestMapping(value = "/nfsvolume", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean getNfsVolumeStatistic(@RequestBody Map<String, Object> params) throws Exception {
         LOG.info("datastorestatistichistrory/nfsvolume params==" + gson.toJson(params));
