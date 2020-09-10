@@ -19,10 +19,7 @@ package com.dmeplugin.vmware.mo;
 import java.util.List;
 
 import com.dmeplugin.vmware.util.VmwareContext;
-import com.vmware.vim25.HostInternetScsiHbaStaticTarget;
-import com.vmware.vim25.HostStorageDeviceInfo;
-import com.vmware.vim25.ManagedObjectReference;
-
+import com.vmware.vim25.*;
 
 
 public class HostStorageSystemMO extends BaseMO {
@@ -36,6 +33,10 @@ public class HostStorageSystemMO extends BaseMO {
 
     public HostStorageDeviceInfo getStorageDeviceInfo() throws Exception {
         return (HostStorageDeviceInfo)_context.getVimClient().getDynamicProperty(_mor, "storageDeviceInfo");
+    }
+
+    public HostFileSystemVolumeInfo getHostFileSystemVolumeInfo() throws Exception {
+        return _context.getVimClient().getDynamicProperty(_mor, "fileSystemVolumeInfo");
     }
 
     public void addInternetScsiStaticTargets(String iScsiHbaDevice, List<HostInternetScsiHbaStaticTarget> lstTargets) throws Exception {
@@ -60,5 +61,17 @@ public class HostStorageSystemMO extends BaseMO {
 
     public void unmountVmfsVolume(String datastoreUuid) throws Exception {
         _context.getService().unmountVmfsVolume(_mor, datastoreUuid);
+    }
+
+    public void unmapVmfsVolumeExTask(List<String> vmfsUuids) throws Exception {
+        _context.getService().unmapVmfsVolumeExTask(_mor, vmfsUuids);
+    }
+
+    public void setMultipathLunPolicy(String lunId, HostMultipathInfoLogicalUnitPolicy hostMultipathInfoLogicalUnitPolicy ) throws Exception {
+        _context.getService().setMultipathLunPolicy(_mor, lunId,hostMultipathInfoLogicalUnitPolicy);
+    }
+
+    public List<HostUnresolvedVmfsVolume> queryUnresolvedVmfsVolume() throws Exception {
+        return _context.getService().queryUnresolvedVmfsVolume(_mor);
     }
 }

@@ -239,6 +239,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 String dataStoreStr = VCSDKUtils.createVmfsDataStore(hsdmap, capacity, datastoreName,
                         vmfsMajorVersion, blockSize, unmapGranularity, unmapPriority);
                 LOG.info("Vmfs dataStoreStr==" + dataStoreStr);
+
+                //如果创建成功，在集群中的其他主机上扫描并挂载datastore
+
+
                 //关联服务等级
                 if (params.get("service_level_id") != null) {
                     String serviceLevelName = ToolUtils.getStr(params.get("service_level_name"));

@@ -11,9 +11,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.vmware.cis.tagging.TagModel;
 import com.vmware.vapi.std.DynamicID;
-import com.vmware.vim25.DatastoreSummary;
-import com.vmware.vim25.HostScsiDisk;
-import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -565,6 +563,50 @@ public class VCSDKUtils {
         return deleteFlag;
     }
 
+    //挂载存储
+    public static void mountVmfs(String datastoreStr,String hostName) throws Exception {
+        try {
+            if (StringUtils.isEmpty(datastoreStr)) {
+                _logger.info("datastore:"+datastoreStr+" is null");
+                return;
+            }
+            if (StringUtils.isEmpty(hostName)) {
+                _logger.info("host:"+hostName+" is null");
+                return;
+            }
+            //查询目前未挂载的卷
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+            HostMO hostMo = rootFsMO.findHost(hostName);
+            List<HostUnresolvedVmfsVolume> unvlist = hostMo.getHostStorageSystemMO().queryUnresolvedVmfsVolume();
+            _logger.info("unvlist========"+(unvlist==null?"null":unvlist.size()));
+            if(unvlist!=null && unvlist.size()>0){
+                for(HostUnresolvedVmfsVolume unv:unvlist){
+                    _logger.info(unv.getVmfsUuid()+"========"+unv.getVmfsLabel());
+                }
+            }
+
+
+          _logger.info("============================");
+            //查询目前未挂载的卷
+            for (HostFileSystemMountInfo mount : hostMo.getHostStorageSystemMO().getHostFileSystemVolumeInfo().getMountInfo()) {
+                if (mount.getVolume() instanceof HostVmfsVolume) {
+                    HostVmfsVolume volume = (HostVmfsVolume) mount.getVolume();
+                    _logger.info(volume.getName()+"========"+volume.getUuid());
+                }
+
+            }
+          _logger.info("============================");
+            //挂载卷
+//            hostMo.getHostStorageSystemMO().mountVmfsVolume("4d2637f7-29519798-be16-00505684dbd6");
+//
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("get LUN error:", e);
+            throw e;
+        }
+    }
+
     public static void main(String[] args) {
         try {
             Gson gson = new Gson();
@@ -583,31 +625,39 @@ public class VCSDKUtils {
 //                _logger.info("path==" + objhsd.getDevicePath() + "==" + objhsd.getUuid() + "==" + (gson.toJson(objhsd.getCapacity())));
 //                _logger.info("getName==" + hostMO.getName() + "==" + hostMO.getHostDatastoreSystemMO());
 //            }
-
-///////////////////////create vmfs/////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////
+            Map<String, Object> dataStoremap = new HashMap<>();
+            dataStoremap.put("name", "aaa");
+            dataStoremap.put("id", "aaa");
+            dataStoremap.put("type", "aaa");
+            dataStoremap.put("capacity", "aaa");
             String hostName = "10.143.133.196";
-            int capacity = 10;  //GB
-            String datastoreName = "yytestvfms007";
-            int vmfsMajorVersion = 6;
-            int blockSize = 1024;
-            int unmapGranularity = 1024;
-            String unmapPriority = "low";
-            String serviceLevelName = "dme3333";
-
-            Map<String,Object> hsdmap = getLunsOnHost(hostName,capacity);
-            if(hsdmap!=null && hsdmap.get("host")!=null) {
-
-                String dataStoreStr = VCSDKUtils.createVmfsDataStore(hsdmap, capacity, datastoreName,
-                        vmfsMajorVersion, blockSize, unmapGranularity, unmapPriority);
-                _logger.info("Vmfs dataStoreStr==" + dataStoreStr);
-
-                Map<String, Object> dsmap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {
-                }.getType());
-                if (dsmap != null) {
-                    String attachTagStr = VCSDKUtils.attachTag(dsmap.get("type").toString(), dsmap.get("id").toString(), serviceLevelName);
-                    _logger.info("Vmfs attachTagStr==" + attachTagStr);
-                }
-            }
+            mountVmfs(gson.toJson(dataStoremap),hostName);
+            _logger.info("==================over==========");
+///////////////////////create vmfs/////////////////////////////////////////////////////////
+//            String hostName = "10.143.133.196";
+//            int capacity = 10;  //GB
+//            String datastoreName = "yytestvfms007";
+//            int vmfsMajorVersion = 6;
+//            int blockSize = 1024;
+//            int unmapGranularity = 1024;
+//            String unmapPriority = "low";
+//            String serviceLevelName = "dme3333";
+//
+//            Map<String,Object> hsdmap = getLunsOnHost(hostName,capacity);
+//            if(hsdmap!=null && hsdmap.get("host")!=null) {
+//
+//                String dataStoreStr = VCSDKUtils.createVmfsDataStore(hsdmap, capacity, datastoreName,
+//                        vmfsMajorVersion, blockSize, unmapGranularity, unmapPriority);
+//                _logger.info("Vmfs dataStoreStr==" + dataStoreStr);
+//
+//                Map<String, Object> dsmap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {
+//                }.getType());
+//                if (dsmap != null) {
+//                    String attachTagStr = VCSDKUtils.attachTag(dsmap.get("type").toString(), dsmap.get("id").toString(), serviceLevelName);
+//                    _logger.info("Vmfs attachTagStr==" + attachTagStr);
+//                }
+//            }
 
         } catch (Exception e) {
             e.printStackTrace();
