@@ -267,7 +267,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //如果创建成功，在集群中的其他主机上扫描并挂载datastore
                 VCSDKUtils.mountVmfsOnCluster(dataStoreStr, clusterName, hostName);
             }
-            //如果主机或主机不存在就创建并得到主机或主机组ID
         } catch (Exception e) {
             LOG.error("createVmfsByServiceLevel error:", e);
         }
