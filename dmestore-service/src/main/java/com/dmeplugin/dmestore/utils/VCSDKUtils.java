@@ -121,14 +121,14 @@ public class VCSDKUtils {
     }
 
     //得到所有主机的ID与name 除去已经挂载了当前存储的主机
-    public static String getHostsByDsName(String DataStoreName) throws Exception {
+    public static String getHostsByDsName(String dataStoreName) throws Exception {
         String listStr = "";
         try {
             VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
             RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
             //取得该存储下所有已经挂载的主机ID
             List<String> mounthostids = new ArrayList<>();
-            DatastoreMO dsmo = rootFsMO.findDataStore(DataStoreName);
+            DatastoreMO dsmo = rootFsMO.findDataStore(dataStoreName);
             if(dsmo!=null) {
                 List<DatastoreHostMount> dhms = dsmo.getHostMounts();
                 if (dhms != null && dhms.size() > 0) {
@@ -168,14 +168,14 @@ public class VCSDKUtils {
         return listStr;
     }
     //得到所有集群的ID与name 除去已经挂载了当前存储的集群  扫描集群下所有主机，只要有一个主机没挂当前存储就要显示，只有集群下所有主机都挂载了该存储就不显示
-    public static String getClustersByDsName(String DataStoreName) throws Exception {
+    public static String getClustersByDsName(String dataStoreName) throws Exception {
         String listStr = "";
         try {
             VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
             RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
             //取得该存储下所有已经挂载的主机ID
             List<String> mounthostids = new ArrayList<>();
-            DatastoreMO dsmo = rootFsMO.findDataStore(DataStoreName);
+            DatastoreMO dsmo = rootFsMO.findDataStore(dataStoreName);
             if(dsmo!=null) {
                 List<DatastoreHostMount> dhms = dsmo.getHostMounts();
                 if (dhms != null && dhms.size() > 0) {

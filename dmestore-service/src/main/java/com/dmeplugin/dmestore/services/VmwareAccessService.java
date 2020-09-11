@@ -17,7 +17,17 @@ public interface VmwareAccessService {
     /**
      * vmware host list
      */
+    List<Map<String,String>> getHostsByDsName(String dataStoreName) throws Exception;
+
+    /**
+     * vmware Cluster list
+     */
     List<Map<String,String>> listClusters() throws Exception;
+
+    /**
+     * vmware Cluster list
+     */
+    List<Map<String,String>> getClustersByDsName(String dataStoreName) throws Exception;
 
 
 
