@@ -103,5 +103,46 @@ public class VmwareAccessController extends BaseController {
     }
 
 
+    /*
+   * Access datastore
+   * return: datastore info
+   */
+    @RequestMapping(value = "/getdatastoresbyhostname", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseBodyBean getDataStoresByHostName(@RequestParam("hostName") String hostName) throws Exception {
+        LOG.info("accessvmware/listhostbystoragename");
+        String failureStr = "";
+        try {
+            List<Map<String, String>> lists = vmwareAccessService.getDataStoresByHostName(hostName);
+            LOG.info("getDataStoresByHostName vmware lists==" + gson.toJson(lists));
+            return success(lists);
+        } catch (Exception e) {
+            LOG.error("getDataStoresByHostName vmware host failure:", e);
+            failureStr = e.getMessage();
+        }
+        return failure(failureStr);
+    }
+
+    /*
+   * Access datastore
+   * return: datastore info
+   */
+    @RequestMapping(value = "/getdatastoresbyclustername", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseBodyBean getDataStoresByClusterName(@RequestParam("clusterName") String clusterName) throws Exception {
+        LOG.info("accessvmware/listhostbystoragename");
+        String failureStr = "";
+        try {
+            List<Map<String, String>> lists = vmwareAccessService.getDataStoresByClusterName(clusterName);
+            LOG.info("getDataStoresByClusterName vmware lists==" + gson.toJson(lists));
+            return success(lists);
+        } catch (Exception e) {
+            LOG.error("getDataStoresByClusterName vmware host failure:", e);
+            failureStr = e.getMessage();
+        }
+        return failure(failureStr);
+    }
+
+
 
 }

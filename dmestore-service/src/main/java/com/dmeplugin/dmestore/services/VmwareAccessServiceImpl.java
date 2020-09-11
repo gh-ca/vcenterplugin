@@ -96,4 +96,44 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
         return lists;
     }
 
+    @Override
+    public List<Map<String,String>> getDataStoresByHostName(String hostName) throws Exception {
+        List<Map<String, String>> lists = null;
+        try {
+            //取得vcenter中的所有host。
+            String listStr = VCSDKUtils.getDataStoresByHostName(hostName);
+            LOG.info("host getDataStoresByHostName==" + listStr);
+            if (!StringUtils.isEmpty(listStr)) {
+                lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
+                }.getType());
+            }
+        } catch (Exception e) {
+            LOG.error("get DataStores By HostName error:", e);
+            throw e;
+        }
+        LOG.info("getDataStoresByHostName===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
+        return lists;
+    }
+
+    @Override
+    public List<Map<String,String>> getDataStoresByClusterName(String clusterName) throws Exception {
+        List<Map<String, String>> lists = null;
+        try {
+            //取得vcenter中的所有host。
+            String listStr = VCSDKUtils.getDataStoresByClusterName(clusterName);
+            LOG.info("host getDataStoresByClusterName==" + listStr);
+            if (!StringUtils.isEmpty(listStr)) {
+                lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
+                }.getType());
+            }
+        } catch (Exception e) {
+            LOG.error("get DataStores By ClusterName error:", e);
+            throw e;
+        }
+        LOG.info("getDataStoresByClusterName===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
+        return lists;
+    }
+
+
+
 }
