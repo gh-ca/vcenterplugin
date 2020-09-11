@@ -137,12 +137,13 @@ public class VmfsAccessController extends BaseController{
 
     /*
    * Mount vmfs
-   * param list<str> volume_ids: 卷id列表 必
-   * param str host_id: 主机id 必
+   * param list<str> volumeIds: 卷volumeId列表 必
+   * param str hostName: 主机id 必 （主机与集群二选一）
+   * param str hostgroupName: 集群id 必（主机与集群二选一）
    * return: Return execution status and information
    *         code:Status code 200 or 503
    *         message:Information
-   *         data: Data，including task_id
+   *         data: Data，including task status
    */
     @RequestMapping(value = "/mountvmfs", method = RequestMethod.POST)
     @ResponseBody
