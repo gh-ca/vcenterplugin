@@ -1,7 +1,6 @@
 package com.dmeplugin.dmestore.utils;
 
 import com.dmeplugin.dmestore.exception.VcenterException;
-import com.sun.jna.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.misc.BASE64Decoder;
@@ -47,7 +46,7 @@ public class CipherUtils {
   public static String aesEncode(String sSrc) {
     String key = null;
     try {
-      key = getWorkKey();
+      key = "sdfwesdcsdfww323dfwe3cse3d";//getWorkKey();
     } catch (Exception e) {
       LOGGER.error("Failed to encode AES");
     }
@@ -79,7 +78,7 @@ public class CipherUtils {
   public static String aesDncode(String sSrc) {
     String key = null;
     try {
-      key = getWorkKey();
+      key = "sdfwesdcsdfww323dfwe3cse3d";//getWorkKey();
     } catch (Exception e) {
       LOGGER.error("Failed to decode AES");
     }
@@ -141,26 +140,6 @@ public class CipherUtils {
   }
 
 
-  /**
-   * 生成工作密钥密文
-   *
-   * @param key 明文
-   * @param salt 盐值
-   */
-  public static String getEncryptedKey(String key, String salt)
-      throws NoSuchAlgorithmException, InvalidKeySpecException {
-    Pointer out = new Memory(256);
-    Function function = Function.getFunction(OpenSSLLib.INSTANCE.EVP_sha256());
-
-    int exit = OpenSSLLib.INSTANCE
-        .PKCS5_PBKDF2_HMAC(key, key.length(), salt, salt.length(), PBKDF2_ITERATIONS,
-            function, BIT_SIZE, out);
-    if (exit == 0) {
-      throw new VcenterException("PKCS5_PBKDF2_HMAC error!");
-    }
-    byte[] c = out.getByteArray(0, BIT_SIZE);
-    return toHex(c);
-  }
 
   /**
    *
@@ -179,23 +158,8 @@ public class CipherUtils {
   } 
 
 
-  public static String getBaseKey()
-      throws NoSuchAlgorithmException, InvalidKeySpecException, UnsupportedEncodingException {
-    String XOrKey = getXOrString();
-    return getEncryptedKey(XOrKey, KEY).substring(0, 16);
-  }
 
-  private static String getWorkKey()
-      throws NoSuchAlgorithmException, InvalidKeySpecException, UnsupportedEncodingException {
-    String baseKey = getBaseKey();
-    String workKey = FileUtils.getKey(FileUtils.WORK_FILE_NAME);
-    if (workKey == null) {
-      String key = getSafeRandomToString(KEY_SIZE);
-      workKey = CipherUtils.aesEncode(key, baseKey);
-      FileUtils.saveKey(workKey, FileUtils.WORK_FILE_NAME);
-    }
-    return aesDncode(workKey, baseKey);
-  }
+
 
   private static String getXOrString()
       throws UnsupportedEncodingException, NoSuchAlgorithmException {
@@ -213,24 +177,5 @@ public class CipherUtils {
     return new String(XOrKey, "utf-8");
   }
 
-  public interface OpenSSLLib extends Library {
 
-    OpenSSLLib INSTANCE = (OpenSSLLib) Native
-        .loadLibrary(Platform.isWindows() ? "libeay32" : "crypto", OpenSSLLib.class);//加载动态库文件
-
-
-    int PKCS5_PBKDF2_HMAC_SHA1(String password, int len, String salt, int slatLen, int iter,
-        int keyLen, Pointer out);
-
-    /**
-     * int PKCS5_PBKDF2_HMAC(const char *pass, int passlen, const unsigned char *salt, int saltlen,
-     * int iter, const EVP_MD *digest, int keylen, unsigned char *out);
-     */
-    int PKCS5_PBKDF2_HMAC(String password, int len, String salt, int slatLen, int iter,
-        Function evp, int keyLen,
-        Pointer out);
-
-    Pointer EVP_sha256();
-
-  }
 }

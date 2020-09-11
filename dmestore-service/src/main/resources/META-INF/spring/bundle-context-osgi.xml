@@ -30,5 +30,7 @@
    <osgi:reference id="vimObjectReferenceService"
          interface="com.vmware.vise.vim.data.VimObjectReferenceService" />
 
+   <osgi:reference id="userSessionService"
+                   interface="com.vmware.vise.usersession.UserSessionService"/>
 
 </beans>
