@@ -5,7 +5,6 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.dmeplugin.vmware.mo.HostMO;
 import com.dmeplugin.vmware.mo.RootFsMO;
-import com.dmeplugin.vmware.util.Configuration;
 import com.dmeplugin.vmware.util.Pair;
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.dmeplugin.vmware.util.VmwarePluginContextFactory;
