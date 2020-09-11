@@ -227,27 +227,53 @@ public class VCSDKUtils {
         }
         return listStr;
     }
-    //得到所有主机的ID与name 除去已经挂载了当前存储的主机
+    //得到所有存储 除去已经挂载了当前主机的存储
     public static String getDataStoresByHostName(String hostName) throws Exception {
         String listStr = "";
         try {
             VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
             RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
             //取得该存储下所有已经挂载的主机ID
-            List<String> mounthostids = new ArrayList<>();
             HostMO hostmo = rootFsMO.findHost(hostName);
             String objHostId = null;
             if(hostmo!=null) {
                 objHostId = hostmo.getMor().getValue();
             }
+            _logger.info("objHostId=="+objHostId);
             //取得所有主机，并通过mounthostids进行过滤，过滤掉已经挂载的主机
-            List<Pair<ManagedObjectReference, String>> dss = rootFsMO.getAllDatacenterOnRootFs();
+            List<Pair<ManagedObjectReference, String>> dss = rootFsMO.getAllDatastoreOnRootFs();
             if (dss != null && dss.size() > 0) {
-                List<Map<String, String>> lists = new ArrayList<>();
+                List<Map<String, Object>> lists = new ArrayList<>();
                 for (Pair<ManagedObjectReference, String> ds : dss) {
-                    DatastoreMO datastoreMO = new DatastoreMO(vmwareContext, ds.first());
+                    DatastoreMO dsmo = new DatastoreMO(vmwareContext, ds.first());
+                    if(dsmo!=null) {
+                        _logger.info("dsmo.getName=="+dsmo.getName());
+                        boolean isMount = true;
+                        List<DatastoreHostMount> dhms = dsmo.getHostMounts();
+                        if (dhms != null && dhms.size() > 0) {
+                            for (DatastoreHostMount dhm : dhms) {
+                                if (dhm != null) {
+                                    if (dhm.getMountInfo() != null && dhm.getMountInfo().isMounted() && dhm.getKey().getValue().equals(objHostId)) {
+                                        isMount = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if(isMount){
+                            Map<String, Object> map = new HashMap<>();
+                            map.put("id", dsmo.getMor().getValue());
+                            map.put("name", dsmo.getName());
+                            map.put("status", dsmo.getSummary().isAccessible());
+                            map.put("type", dsmo.getSummary().getType());
+                            map.put("capacity", dsmo.getSummary().getCapacity()/ToolUtils.Gi);
+                            map.put("freeSpace", dsmo.getSummary().getFreeSpace()/ToolUtils.Gi);
 
-                    
+                            lists.add(map);
+                        }
+
+                    }
+
                 }
                 if (lists.size() > 0) {
                     Gson gson = new Gson();
@@ -812,13 +838,13 @@ public class VCSDKUtils {
     public static void main(String[] args) {
         try {
             Gson gson = new Gson();
-            String listStr = VCSDKUtils.getAllVmfsDataStores(null);
-            _logger.info("Vmfs listStr==" + listStr);
+//            String listStr = VCSDKUtils.getAllVmfsDataStores(null);
+//            _logger.info("Vmfs listStr==" + listStr);
 //            listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_VMFS);
 //            _logger.info("Vmfs listStr==" + listStr);
 //            listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_NFS);
 //            _logger.info("Vmfs listStr==" + listStr);
-            _logger.info("Vmfs getAllClusters==" + VCSDKUtils.getClustersByDsName("datastore1"));
+            _logger.info("Vmfs getAllClusters==" + VCSDKUtils.getDataStoresByHostName("10.143.132.17"));
 ////////////////////////////////////getLunsOnHost//////////////////////////////////////////
 //            Map<String,Object> hsdmap = getLunsOnHost("10.143.133.196",10);
 //            if(hsdmap!=null ) {
