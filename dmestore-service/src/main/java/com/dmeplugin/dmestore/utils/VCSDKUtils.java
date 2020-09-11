@@ -287,6 +287,82 @@ public class VCSDKUtils {
         }
         return listStr;
     }
+    //得到所有存储 除去已经挂载了当前集群的存储 扫描集群下所有主机，只要有一个主机没挂当前存储就要显示，只有集群下所有主机都挂载了该存储就不显示
+    public static String getDataStoresByClusterName(String clusterName) throws Exception {
+        String listStr = "";
+        try {
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+            //取得该存储下所有已经挂载的主机ID
+            List<String> hostids = new ArrayList<>();
+            ClusterMO clusterMO = rootFsMO.findCluster(clusterName);
+            String objHostId = null;
+            if(clusterMO!=null) {
+                List<Pair<ManagedObjectReference, String>> hosts = clusterMO.getClusterHosts();
+                if (hosts != null && hosts.size() > 0) {
+                    for (Pair<ManagedObjectReference, String> host : hosts) {
+                        HostMO host1 = new HostMO(vmwareContext, host.first());
+                        hostids.add(host1.getMor().getValue());
+                    }
+                }
+            }
+            _logger.info("objHostId=="+hostids);
+            //取得所有主机，并通过mounthostids进行过滤，过滤掉已经挂载的主机
+            List<Pair<ManagedObjectReference, String>> dss = rootFsMO.getAllDatastoreOnRootFs();
+            if (dss != null && dss.size() > 0) {
+                List<Map<String, Object>> lists = new ArrayList<>();
+                for (Pair<ManagedObjectReference, String> ds : dss) {
+                    DatastoreMO dsmo = new DatastoreMO(vmwareContext, ds.first());
+                    if(dsmo!=null) {
+                        _logger.info("dsmo.getName=="+dsmo.getName());
+                        boolean isMount = false;
+                        List<DatastoreHostMount> dhms = dsmo.getHostMounts();
+                        if (dhms != null && dhms.size() > 0) {
+                            //整理挂载信息
+                            List<String> ds_hostids = new ArrayList<>();
+                            for (DatastoreHostMount dhm : dhms) {
+                                if (dhm != null) {
+                                    if (dhm.getMountInfo().isMounted()) {
+                                        ds_hostids.add(dhm.getKey().getValue());
+                                    }
+                                }
+                            }
+                            _logger.info("dsmo.ds_hostids=="+ds_hostids);
+                            for(String hostid:hostids) {
+                                if(!ds_hostids.contains(hostid)){
+                                    isMount = true;
+                                    break;
+                                }
+                            }
+                            _logger.info("dsmo.isMount=="+isMount);
+                        }
+                        if(isMount){
+                            Map<String, Object> map = new HashMap<>();
+                            map.put("id", dsmo.getMor().getValue());
+                            map.put("name", dsmo.getName());
+                            map.put("status", dsmo.getSummary().isAccessible());
+                            map.put("type", dsmo.getSummary().getType());
+                            map.put("capacity", dsmo.getSummary().getCapacity()/ToolUtils.Gi);
+                            map.put("freeSpace", dsmo.getSummary().getFreeSpace()/ToolUtils.Gi);
+
+                            lists.add(map);
+                        }
+
+                    }
+
+                }
+                if (lists.size() > 0) {
+                    Gson gson = new Gson();
+                    listStr = gson.toJson(lists);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware error:", e);
+            throw e;
+        }
+        return listStr;
+    }
 
     //得到指定集群下的所有主机
     public static String getHostsOnCluster(String clusterName) throws Exception {
@@ -844,7 +920,7 @@ public class VCSDKUtils {
 //            _logger.info("Vmfs listStr==" + listStr);
 //            listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_NFS);
 //            _logger.info("Vmfs listStr==" + listStr);
-            _logger.info("Vmfs getAllClusters==" + VCSDKUtils.getDataStoresByHostName("10.143.132.17"));
+            _logger.info("Vmfs getAllClusters==" + VCSDKUtils.getDataStoresByClusterName("pbu4test"));
 ////////////////////////////////////getLunsOnHost//////////////////////////////////////////
 //            Map<String,Object> hsdmap = getLunsOnHost("10.143.133.196",10);
 //            if(hsdmap!=null ) {
