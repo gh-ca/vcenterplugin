@@ -27,8 +27,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     @Autowired
     private Gson gson = new Gson();
 
-    private static String dmeToken;
-    private static String dmeHostUrl;
+    private static String dmeToken = "asdfasdqwqwqrqr";
+    private static String dmeHostUrl = "https://127.0.0.1:26335";
     private static String dmeHostIp;
     private static Integer dmeHostPort;
 

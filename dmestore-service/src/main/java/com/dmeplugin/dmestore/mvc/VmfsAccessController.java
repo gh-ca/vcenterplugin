@@ -2,6 +2,7 @@ package com.dmeplugin.dmestore.mvc;
 
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.model.VmfsDataInfo;
+import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
 import com.dmeplugin.dmestore.services.VmfsAccessService;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
@@ -195,11 +196,21 @@ public class VmfsAccessController extends BaseController{
      **/
     @RequestMapping(value = "/volume/{volume_id}", method = RequestMethod.GET)
     public ResponseBodyBean volumeDetail(@PathVariable(value = "volume_id") String volume_id) throws Exception {
-        return success(vmfsAccessService.volumeDetail(volume_id));
+        try {
+            VmfsDatastoreVolumeDetail detail = vmfsAccessService.volumeDetail(volume_id);
+            return success(detail);
+        }catch (Exception e){
+            return failure(e.getMessage());
+        }
     }
 
     @RequestMapping(value = "/scanvmfs", method = RequestMethod.GET)
     public ResponseBodyBean scanvmfs() throws Exception {
-        return success(vmfsAccessService.scanVmfs());
+        boolean flag = vmfsAccessService.scanVmfs();
+        if(flag){
+            return success();
+        }
+
+        return failure();
     }
 }

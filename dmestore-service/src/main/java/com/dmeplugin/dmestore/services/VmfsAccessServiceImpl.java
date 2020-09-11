@@ -232,10 +232,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             LOG.info("Vmfs attachTagStr==" + attachTagStr);
                         }
                     }
-                }else{
+                } else {
                     throw new Exception("DME create vmfs volume error(task status)!");
                 }
-            }else{
+            } else {
                 throw new Exception("DME find or create host error!");
             }
         } else {
@@ -258,11 +258,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 String unmapPriority = ToolUtils.getStr(params.get("spaceReclamationPriority"));
                 int capacity = ToolUtils.getInt(params.get("capacity"));
                 //从主机或集群中找出最接近capacity的LUN
-                Map<String,Object> hsdmap = null;
+                Map<String, Object> hsdmap = null;
                 if (params != null && params.get("host") != null) {
-                    hsdmap = VCSDKUtils.getLunsOnHost(hostName,capacity);
+                    hsdmap = VCSDKUtils.getLunsOnHost(hostName, capacity);
                 } else if (params != null && params.get("cluster") != null) {
-                    hsdmap = VCSDKUtils.getLunsOnCluster(clusterName,capacity);
+                    hsdmap = VCSDKUtils.getLunsOnCluster(clusterName, capacity);
                 }
 
                 //创建
@@ -519,15 +519,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         //调用DME接口获取卷详情
         String url = LIST_VOLUME_URL + "/" + volume_id;
         ResponseEntity<String> responseEntity;
-        try {
-            responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            if (responseEntity.getStatusCodeValue() / 100 != 2) {
-                LOG.error("查询卷信息失败！错误信息:{}", responseEntity.getBody());
-                return null;
-            }
-        } catch (Exception ex) {
-            LOG.error("查询卷信息异常", ex);
-            return null;
+        responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+        if (responseEntity.getStatusCodeValue() / 100 != 2) {
+            LOG.error("查询卷信息失败！错误信息:{}", responseEntity.getBody());
+            throw new Exception(responseEntity.getBody());
         }
 
         String responseBody = responseEntity.getBody();
@@ -586,7 +581,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             String vmfsDatastoreUrl = vmfsDatastore.get("url").getAsString();
             String vmfsDatastoreId = vmfsDatastore.get("id").getAsString();
             String vmfsDatastoreName = vmfsDatastore.get("name").getAsString();
-            //拆分wwn
+            //拆分wwn TODO
             String wwn = vmfsDatastoreUrl.split("volumes/")[1];
             //根据wwn从DME中查询卷信息
             String volumeUrlByWwn = LIST_VOLUME_URL + "?volume_wwn=" + wwn;
@@ -654,7 +649,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
 
     /**
-     *
      * @param params volume_id host_id hostGroup_id由调用处传递过来，而不是在此处自己查询？
      * @throws Exception
      */
