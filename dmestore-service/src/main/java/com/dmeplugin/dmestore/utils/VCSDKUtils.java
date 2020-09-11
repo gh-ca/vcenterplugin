@@ -63,8 +63,8 @@ public class VCSDKUtils {
         String listStr = "";
         try {
             VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
-
             RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+
             List<Pair<ManagedObjectReference, String>> hosts = rootFsMO.getAllHostOnRootFs();
             if (hosts != null && hosts.size() > 0) {
                 List<Map<String, String>> lists = new ArrayList<>();
@@ -94,8 +94,8 @@ public class VCSDKUtils {
         String listStr = "";
         try {
             VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
-
             RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+
             List<Pair<ManagedObjectReference, String>> cls = rootFsMO.getAllClusterOnRootFs();
             if (cls != null && cls.size() > 0) {
                 List<Map<String, String>> lists = new ArrayList<>();
@@ -106,6 +106,114 @@ public class VCSDKUtils {
                     map.put("clusterId", cl1.getMor().getValue());
                     map.put("clusterName", cl1.getName());
                     lists.add(map);
+                }
+                if (lists.size() > 0) {
+                    Gson gson = new Gson();
+                    listStr = gson.toJson(lists);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware error:", e);
+            throw e;
+        }
+        return listStr;
+    }
+
+    //得到所有主机的ID与name 除去已经挂载了当前存储的主机
+    public static String getHostsByDsName(String DataStoreName) throws Exception {
+        String listStr = "";
+        try {
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+            //取得该存储下所有已经挂载的主机ID
+            List<String> mounthostids = new ArrayList<>();
+            DatastoreMO dsmo = rootFsMO.findDataStore(DataStoreName);
+            if(dsmo!=null) {
+                List<DatastoreHostMount> dhms = dsmo.getHostMounts();
+                if (dhms != null && dhms.size() > 0) {
+                    for (DatastoreHostMount dhm : dhms) {
+                        if (dhm != null) {
+                            if (dhm.getMountInfo() != null && dhm.getMountInfo().isMounted()) {
+                                mounthostids.add(dhm.getKey().getValue());
+                            }
+                        }
+                    }
+                }
+            }
+            //取得所有主机，并通过mounthostids进行过滤，过滤掉已经挂载的主机
+            List<Pair<ManagedObjectReference, String>> hosts = rootFsMO.getAllHostOnRootFs();
+            if (hosts != null && hosts.size() > 0) {
+                List<Map<String, String>> lists = new ArrayList<>();
+                for (Pair<ManagedObjectReference, String> host : hosts) {
+                    HostMO host1 = new HostMO(vmwareContext, host.first());
+
+                    if(!mounthostids.contains(host1.getMor().getValue())) {
+                        Map<String, String> map = new HashMap<>();
+                        map.put("hostId", host1.getMor().getValue());
+                        map.put("hostName", host1.getName());
+                        lists.add(map);
+                    }
+                }
+                if (lists.size() > 0) {
+                    Gson gson = new Gson();
+                    listStr = gson.toJson(lists);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware error:", e);
+            throw e;
+        }
+        return listStr;
+    }
+    //得到所有集群的ID与name 除去已经挂载了当前存储的集群  扫描集群下所有主机，只要有一个主机没挂当前存储就要显示，只有集群下所有主机都挂载了该存储就不显示
+    public static String getClustersByDsName(String DataStoreName) throws Exception {
+        String listStr = "";
+        try {
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+            //取得该存储下所有已经挂载的主机ID
+            List<String> mounthostids = new ArrayList<>();
+            DatastoreMO dsmo = rootFsMO.findDataStore(DataStoreName);
+            if(dsmo!=null) {
+                List<DatastoreHostMount> dhms = dsmo.getHostMounts();
+                if (dhms != null && dhms.size() > 0) {
+                    for (DatastoreHostMount dhm : dhms) {
+                        if (dhm != null) {
+                            if (dhm.getMountInfo() != null && dhm.getMountInfo().isMounted()) {
+                                mounthostids.add(dhm.getKey().getValue());
+                            }
+                        }
+                    }
+                }
+            }
+            //取得所有集群，并通过mounthostids进行过滤，过滤掉已经挂载的主机
+            //扫描集群下所有主机，只要有一个主机没挂当前存储就要显示，只有集群下所有主机都挂载了该存储就不显示
+            List<Pair<ManagedObjectReference, String>> cls = rootFsMO.getAllClusterOnRootFs();
+            if (cls != null && cls.size() > 0) {
+                List<Map<String, String>> lists = new ArrayList<>();
+                for (Pair<ManagedObjectReference, String> cl : cls) {
+                    boolean isMount = false;
+                    ClusterMO cl1 = new ClusterMO(vmwareContext, cl.first());
+
+                    List<Pair<ManagedObjectReference, String>> hosts = cl1.getClusterHosts();
+                    if (hosts != null && hosts.size() > 0) {
+                        for (Pair<ManagedObjectReference, String> host : hosts) {
+                            HostMO host1 = new HostMO(vmwareContext, host.first());
+                            if(!mounthostids.contains(host1.getMor().getValue())) {
+                                isMount = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(isMount){
+                        Map<String, String> map = new HashMap<>();
+                        map.put("clusterId", cl1.getMor().getValue());
+                        map.put("clusterName", cl1.getName());
+                        lists.add(map);
+                    }
                 }
                 if (lists.size() > 0) {
                     Gson gson = new Gson();
@@ -676,7 +784,7 @@ public class VCSDKUtils {
 //            _logger.info("Vmfs listStr==" + listStr);
 //            listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_NFS);
 //            _logger.info("Vmfs listStr==" + listStr);
-//            _logger.info("Vmfs getAllClusters==" + VCSDKUtils.getLunsOnHost("10.143.133.196"));
+            _logger.info("Vmfs getAllClusters==" + VCSDKUtils.getClustersByDsName("datastore1"));
 ////////////////////////////////////getLunsOnHost//////////////////////////////////////////
 //            Map<String,Object> hsdmap = getLunsOnHost("10.143.133.196",10);
 //            if(hsdmap!=null ) {
@@ -686,16 +794,16 @@ public class VCSDKUtils {
 //                _logger.info("getName==" + hostMO.getName() + "==" + hostMO.getHostDatastoreSystemMO());
 //            }
 //////////////////////////////////////////////////////////////////////////////////////////////
-            Map<String, Object> dataStoremap = new HashMap<>();
-            dataStoremap.put("name", "aaa");
-            dataStoremap.put("id", "aaa");
-            dataStoremap.put("type", "aaa");
-            dataStoremap.put("capacity", "aaa");
-            dataStoremap.put("hostName", "10.143.133.196");
-            String hostName = "10.143.133.196";
-            String clusterName = "";
-            mountVmfsOnCluster(gson.toJson(dataStoremap), clusterName, hostName);
-            _logger.info("==================over==========");
+//            Map<String, Object> dataStoremap = new HashMap<>();
+//            dataStoremap.put("name", "aaa");
+//            dataStoremap.put("id", "aaa");
+//            dataStoremap.put("type", "aaa");
+//            dataStoremap.put("capacity", "aaa");
+//            dataStoremap.put("hostName", "10.143.133.196");
+//            String hostName = "10.143.133.196";
+//            String clusterName = "";
+//            mountVmfsOnCluster(gson.toJson(dataStoremap), clusterName, hostName);
+//            _logger.info("==================over==========");
 ///////////////////////create vmfs/////////////////////////////////////////////////////////
 //            String hostName = "10.143.133.196";
 //            int capacity = 10;  //GB
