@@ -1,10 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
-import com.dmeplugin.dmestore.model.AuthClient;
-import com.dmeplugin.dmestore.model.NFSDataStoreFSAttr;
-import com.dmeplugin.dmestore.model.NFSDataStoreLogicPortAttr;
-import com.dmeplugin.dmestore.model.NFSDataStoreShareAttr;
+import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.utils.StringUtil;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
@@ -36,6 +33,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     @Autowired
     private DmeAccessService dmeAccessService;
+    @Autowired
+    private DmeStorageService dmeStorageService;
 
 
     private VCSDKUtils vcsdkUtils;
@@ -174,12 +173,26 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     @Override
     public boolean scanNfs() throws Exception {
-        // vcenter侧获取nfsStrorge信息列表 (暂通过wwn来与dem(storagetId)发生关联关系)
+        // vcenter侧获取nfsStrorge信息列表 (提取shareIp,sharePath 与dem(ip)发生关联关系)
+        // DEM 获取所有存储设备信息 通过ip过滤提取存储ID storageId
+        // DME logicPort, 通过存储IDstroage id查询逻辑端口 (需求文档说明通过share ip,但API不支持)
+        // DME share, 通过sharePath(可加storageId)查询share 提取fs_name
+        // DME FileService, 通过fs_name和storageId查询fs (需求文档说明是通过share path, 但API不支持)
+
         String listStr = vcsdkUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_NFS);
         LOG.info("===list nfs datastore success====\n{}", listStr);
         if (StringUtils.isEmpty(listStr)) {
             return false;
         }
+        Map<String, Object> storageOriginal = dmeStorageService.getStorages();
+        if (null == storageOriginal || !storageOriginal.get("200").toString().equals("200")) {
+            return false;
+        }
+
+        //将DME的存储设备集合转换为map key:ip value:Storage
+        List<Storage> storages = (List<Storage>) storageOriginal.get("data");
+        Map<String, Storage> storageMap = converStorage(storages);
+
         JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
         List<DmeVmwareRelation> relationList = new ArrayList<>();
         for (int i = 0; i < jsonArray.size(); i++) {
@@ -192,25 +205,46 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             String nfsDatastoreIp = "";//nfsDatastore.get("XXX").getAsString();
             String nfsDataStoreSharePath = "";//nfsDatastore.get("XXX").getAsString();
             //拆分wwn
-            String wwn = nfsDatastoreUrl.split("volumes/")[1];
+            //String wwn = nfsDatastoreUrl.split("volumes/")[1];
+            Storage storageInfo = storageMap.get(nfsDatastoreIp);
+            if (null == storageInfo) {
+                LOG.warn("扫描NFS存储信息,share ip:{} 再DME侧没有找到对应的存储设备!!!", nfsDatastoreIp);
+                continue;
+            }
+            String storage_id = storageInfo.getId();
+            DmeVmwareRelation relation = new DmeVmwareRelation();
+            relation.setStoreId(storage_id);
 
-            //获取share信息
-            Map<String, Object> shareInfo = queryShareInfo(wwn);
+            //获取logicPort信息
+            Map<String, Object> logicPortInfo = queryLogicPortInfo(storage_id);
+            if (null != logicPortInfo && logicPortInfo.size() > 0) {
+                String id = ToolUtils.getStr(logicPortInfo.get("id"));
+                String name = ToolUtils.getStr(logicPortInfo.get("name"));
+                //relation.setLogicPortId(id);
+                //relation.setLogicPortName(name);
+            }
+
+            //获取share信息 (条件:sharePath  可加 storageId)
+            String fsName = "";
+            Map<String, Object> shareInfo = queryShareInfo(nfsDataStoreSharePath);
             if (null != shareInfo && shareInfo.size() > 0) {
-
+                fsName = ToolUtils.getStr(shareInfo.get("fs_name"));
+                String id = ToolUtils.getStr(shareInfo.get("id"));
+                String name = ToolUtils.getStr(shareInfo.get("name"));
+                //relation.setShareId(id);
+                //relation.setShareName(name);
             }
 
             //获取fs信息
-            Map<String, Object> fsInfo = queryFsInfo(wwn);
+            Map<String, Object> fsInfo = queryFsInfo(storage_id, fsName);
             if (null != fsInfo && fsInfo.size() > 0) {
-
+                String id = ToolUtils.getStr(fsInfo.get("id"));
+                String name = ToolUtils.getStr(fsInfo.get("name"));
+                //relation.setfsId(id);
+                //relation.setFsName(name);
             }
 
-            //获取logicPort信息
-            Map<String, Object> logicPortInfo = queryLogicPortInfo(wwn);
-            if (null != logicPortInfo && logicPortInfo.size() > 0) {
-
-            }
+            relationList.add(relation);
         }
 
         //数据库保存datastorage 与nfs的 share fs logicPort关系信息
@@ -221,8 +255,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     //按条件查询share 暂认为 storage与share是一对一的关系
-    private Map<String, Object> queryShareInfo(String storageId) throws Exception {
-        ResponseEntity responseEntity = listShareByStorageId(storageId);
+    private Map<String, Object> queryShareInfo(String sharePath) throws Exception {
+        //ResponseEntity responseEntity = listShareByStorageId(storageId);
+        ResponseEntity responseEntity = listShareBySharePath(sharePath);
         if (responseEntity.getStatusCodeValue() / 100 != 2) {
             Object object = responseEntity.getBody();
             List<Map<String, Object>> list = converShare(object);
@@ -237,6 +272,14 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private ResponseEntity listShareByStorageId(String storageId) throws Exception {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("storage_id", storageId);
+        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL, HttpMethod.POST, requestbody.toString());
+        return responseEntity;
+    }
+
+    //通过share_path查询share信息
+    private ResponseEntity listShareBySharePath(String sharePath) throws Exception {
+        Map<String, Object> requestbody = new HashMap<>();
+        requestbody.put("share_path", sharePath);
         ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL, HttpMethod.POST, requestbody.toString());
         return responseEntity;
     }
@@ -268,8 +311,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     //按条件查询fs
-    private Map<String, Object> queryFsInfo(String storageId) throws Exception {
-        ResponseEntity responseEntity = listFsByStorageId(storageId);
+    private Map<String, Object> queryFsInfo(String storageId, String fsName) throws Exception {
+        ResponseEntity responseEntity = listFsByStorageId(storageId, fsName);
         if (responseEntity.getStatusCodeValue() / 100 != 2) {
             Object object = responseEntity.getBody();
             List<Map<String, Object>> list = converFs(object);
@@ -281,9 +324,12 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     //通过storageId查询fs信息
-    private ResponseEntity listFsByStorageId(String storageId) throws Exception {
+    private ResponseEntity listFsByStorageId(String storageId, String fsName) throws Exception {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("storage_id", storageId);
+        if (!StringUtils.isEmpty(fsName)) {
+            requestbody.put("name", fsName);
+        }
         ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_FILESERVICE_QUERY_URL, HttpMethod.POST, requestbody.toString());
         return responseEntity;
     }
@@ -358,6 +404,16 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             logicPortList.add(logicPortMap);
         }
         return logicPortList;
+    }
+
+    //将storage结合转换为map key:ip
+    private Map<String, Storage> converStorage(List<Storage> storages) {
+        Map<String, Storage> storageMap = new HashMap<>();
+        for (Storage storage : storages) {
+            String ip = storage.getIp();
+            storageMap.put(ip, storage);
+        }
+        return storageMap;
     }
 
 }
