@@ -132,8 +132,8 @@ public class VmfsAccessController extends BaseController{
     /*
    * Mount vmfs
    * param list<str> volumeIds: 卷volumeId列表 必
-   * param str hostName: 主机id 必 （主机与集群二选一）
-   * param str hostgroupName: 集群id 必（主机与集群二选一）
+   * param str host: 主机名称 必 （主机与集群二选一）
+   * param str cluster: 集群名称 必（主机与集群二选一）
    * return: Return ResponseBodyBean
    */
     @RequestMapping(value = "/mountvmfs", method = RequestMethod.POST)
