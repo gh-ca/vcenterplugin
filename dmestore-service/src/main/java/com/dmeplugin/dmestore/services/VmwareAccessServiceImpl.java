@@ -129,7 +129,7 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
         List<Map<String, String>> lists = null;
         try {
             //取得vcenter中的所有host。
-            String listStr = VCSDKUtils.getDataStoresByClusterName(clusterName);
+            String listStr = vcsdkUtils.getDataStoresByClusterName(clusterName);
             LOG.info("host getDataStoresByClusterName==" + listStr);
             if (!StringUtils.isEmpty(listStr)) {
                 lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
