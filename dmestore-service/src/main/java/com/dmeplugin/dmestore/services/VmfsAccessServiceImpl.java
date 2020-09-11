@@ -36,6 +36,15 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     @Autowired
     private TaskService taskService;
 
+    private VCSDKUtils vcsdkUtils;
+
+    public VCSDKUtils getVcsdkUtils() {
+        return vcsdkUtils;
+    }
+
+    public void setVcsdkUtils(VCSDKUtils vcsdkUtils) {
+        this.vcsdkUtils = vcsdkUtils;
+    }
 
     private final String LIST_VOLUME_URL = "/rest/blockservice/v1/volumes";
     private final String HOST_UNMAPAPING = "/rest/blockservice/v1/volumes/host-unmapping";
@@ -61,7 +70,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 Map<String, String> stoNameMap = getStorNameMap(storagemap);
                 LOG.info("stoNameMap===" + gson.toJson(stoNameMap));
                 //取得vcenter中的所有vmfs存储。
-                String listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_VMFS);
+                String listStr = vcsdkUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_VMFS);
                 LOG.info("Vmfs listStr==" + listStr);
                 if (!StringUtils.isEmpty(listStr)) {
                     JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
@@ -228,7 +237,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         Map<String, Object> dsmap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {
                         }.getType());
                         if (dsmap != null) {
-                            String attachTagStr = VCSDKUtils.attachTag(ToolUtils.getStr(dsmap.get("type")), ToolUtils.getStr(dsmap.get("id")), serviceLevelName);
+                            String attachTagStr = vcsdkUtils.attachTag(ToolUtils.getStr(dsmap.get("type")), ToolUtils.getStr(dsmap.get("id")), serviceLevelName);
                             LOG.info("Vmfs attachTagStr==" + attachTagStr);
                         }
                     }
@@ -260,17 +269,17 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //从主机或集群中找出最接近capacity的LUN
                 Map<String, Object> hsdmap = null;
                 if (params != null && params.get("host") != null) {
-                    hsdmap = VCSDKUtils.getLunsOnHost(hostName, capacity);
+                    hsdmap = vcsdkUtils.getLunsOnHost(hostName, capacity);
                 } else if (params != null && params.get("cluster") != null) {
-                    hsdmap = VCSDKUtils.getLunsOnCluster(clusterName, capacity);
+                    hsdmap = vcsdkUtils.getLunsOnCluster(clusterName, capacity);
                 }
 
                 //创建
-                dataStoreStr = VCSDKUtils.createVmfsDataStore(hsdmap, capacity, datastoreName,
+                dataStoreStr = vcsdkUtils.createVmfsDataStore(hsdmap, capacity, datastoreName,
                         vmfsMajorVersion, blockSize, unmapGranularity, unmapPriority);
 
                 //如果创建成功，在集群中的其他主机上扫描并挂载datastore
-                VCSDKUtils.mountVmfsOnCluster(dataStoreStr, clusterName, hostName);
+                vcsdkUtils.mountVmfsOnCluster(dataStoreStr, clusterName, hostName);
             }
         } catch (Exception e) {
             LOG.error("createVmfsByServiceLevel error:", e);
@@ -450,7 +459,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //如果主机组不存在就需要创建,创建前要检查集群下的所有主机是否在DME中存在
                 if (StringUtils.isEmpty(objId)) {
                     //取得集群下的所有主机
-                    String vmwarehosts = VCSDKUtils.getHostsOnCluster(clusterName);
+                    String vmwarehosts = vcsdkUtils.getHostsOnCluster(clusterName);
                     LOG.info("vmwarehosts==" + vmwarehosts);
                     if (!StringUtils.isEmpty(vmwarehosts)) {
                         List<Map<String, String>> vmwarehostlists = gson.fromJson(vmwarehosts, new TypeToken<List<Map<String, String>>>() {
@@ -573,7 +582,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
      **/
     @Override
     public boolean scanVmfs() throws Exception {
-        String listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_VMFS);
+        String listStr = vcsdkUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_VMFS);
         LOG.info("===list vmfs datastore success====\n{}", listStr);
         if (StringUtils.isEmpty(listStr)) {
             return false;
@@ -727,7 +736,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         Map<String, Object> hostInfoMap = dmeAccessService.getDmeHost(hostId);
         String hostIp = hostInfoMap.get("ip").toString();
         //String hostName = hostInfoMap.get("name").toString(); //使用hostName而不是hostIp?
-        VCSDKUtils.hostRescanVmfs(hostIp);
+        vcsdkUtils.hostRescanVmfs(hostIp);
     }
 
     @Override
@@ -759,7 +768,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         //vcenter侧删除
         String dataStoreName = params.get("dataStoreName").toString();
-        boolean deleteFlag = VCSDKUtils.deleteVmfsDataStore(dataStoreName);
+        boolean deleteFlag = vcsdkUtils.deleteVmfsDataStore(dataStoreName);
         if (deleteFlag) {
             LOG.info("delete vmfs:{} success!", dataStoreName);
         }

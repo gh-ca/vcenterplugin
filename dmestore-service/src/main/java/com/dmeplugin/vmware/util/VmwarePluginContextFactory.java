@@ -43,7 +43,7 @@ public class VmwarePluginContextFactory {
         s_pool = new VmwareContextPool();
     }
 
-    public static VmwareContext create(UserSessionService userSessionService, VimObjectReferenceService vimObjectReferenceService, String serverguid) throws Exception {
+    private static VmwareContext create(UserSessionService userSessionService, VimObjectReferenceService vimObjectReferenceService, String serverguid) throws Exception {
 
         VmwareContext context=null;
         ServerInfo[] serverInfoList=userSessionService.getUserSession().serversInfo;

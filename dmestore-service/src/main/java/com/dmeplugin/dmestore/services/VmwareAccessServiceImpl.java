@@ -19,13 +19,22 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
     @Autowired
     private Gson gson = new Gson();
 
+    private VCSDKUtils vcsdkUtils;
+
+    public VCSDKUtils getVcsdkUtils() {
+        return vcsdkUtils;
+    }
+
+    public void setVcsdkUtils(VCSDKUtils vcsdkUtils) {
+        this.vcsdkUtils = vcsdkUtils;
+    }
 
     @Override
     public List<Map<String, String>> listHosts() throws Exception {
         List<Map<String, String>> lists = null;
         try {
             //取得vcenter中的所有host。
-            String listStr = VCSDKUtils.getAllHosts();
+            String listStr = vcsdkUtils.getAllHosts();
             LOG.info("host listStr==" + listStr);
             if (!StringUtils.isEmpty(listStr)) {
                 lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
@@ -44,7 +53,7 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
         List<Map<String, String>> lists = null;
         try {
             //取得vcenter中的所有host。
-            String listStr = VCSDKUtils.getHostsByDsName(dataStoreName);
+            String listStr = vcsdkUtils.getHostsByDsName(dataStoreName);
             LOG.info("host getHostsByDsName==" + listStr);
             if (!StringUtils.isEmpty(listStr)) {
                 lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
@@ -63,7 +72,7 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
         List<Map<String, String>> lists = null;
         try {
             //取得vcenter中的所有host。
-            String listStr = VCSDKUtils.getAllClusters();
+            String listStr = vcsdkUtils.getAllClusters();
             LOG.info("listClusters==" + listStr);
             if (!StringUtils.isEmpty(listStr)) {
                 lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
@@ -82,7 +91,7 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
         List<Map<String, String>> lists = null;
         try {
             //取得vcenter中的所有host。
-            String listStr = VCSDKUtils.getClustersByDsName(dataStoreName);
+            String listStr = vcsdkUtils.getClustersByDsName(dataStoreName);
             LOG.info("host getClustersByDsName==" + listStr);
             if (!StringUtils.isEmpty(listStr)) {
                 lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
@@ -101,7 +110,7 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
         List<Map<String, String>> lists = null;
         try {
             //取得vcenter中的所有host。
-            String listStr = VCSDKUtils.getDataStoresByHostName(hostName);
+            String listStr = vcsdkUtils.getDataStoresByHostName(hostName);
             LOG.info("host getDataStoresByHostName==" + listStr);
             if (!StringUtils.isEmpty(listStr)) {
                 lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {

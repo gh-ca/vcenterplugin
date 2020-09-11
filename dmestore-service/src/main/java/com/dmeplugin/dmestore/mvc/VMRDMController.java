@@ -85,10 +85,10 @@ public class VMRDMController extends BaseController {
         String host_ip = hostMap.get("ip").toString();
         String host_name = hostMap.get("name").toString();
         //调用vcenter扫描卷
-        VCSDKUtils.hostRescanVmfs(host_ip);
+        vmrdmService.hostRescanVmfs(host_ip);
         LOG.info("RescanVmfs successful!");
         //获取卷信息
-        String lunsStr = VCSDKUtils.getLunsOnHost(host_name);
+        String lunsStr = vmrdmService.getLunsOnHost(host_name);
         JsonArray lunArray = gson.fromJson(lunsStr, JsonArray.class);
         JsonObject lunObject = null;
         boolean flag = false;

@@ -33,6 +33,16 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     @Autowired
     private Gson gson;
 
+    private VCSDKUtils vcsdkUtils;
+
+    public VCSDKUtils getVcsdkUtils() {
+        return vcsdkUtils;
+    }
+
+    public void setVcsdkUtils(VCSDKUtils vcsdkUtils) {
+        this.vcsdkUtils = vcsdkUtils;
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(VmfsOperationServiceImpl.class);
 
     @Override
@@ -81,7 +91,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 return resMap;
             }
             //vcenter renameDatastore
-            String result = VCSDKUtils.renameDataStore(oldDsName.toString(), newDsName.toString());
+            String result = vcsdkUtils.renameDataStore(oldDsName.toString(), newDsName.toString());
             //ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, reqBody);
             ResponseEntity<String> responseEntity = access(url, HttpMethod.PUT, reqBody);
             int code = responseEntity.getStatusCodeValue();

@@ -29,4 +29,8 @@ public interface VMRDMService {
      * @Return java.lang.String 返回任务ID
      **/
     String hostMapping(String hostId, List<String> volumeIds);
+
+    public  void hostRescanVmfs(String hostIp) throws Exception;
+
+    public  String getLunsOnHost(String hostName) throws Exception ;
 }

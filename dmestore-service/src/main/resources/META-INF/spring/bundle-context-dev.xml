@@ -63,6 +63,7 @@
 
     <bean name="vmfsAccessService" class="com.dmeplugin.dmestore.services.VmfsAccessServiceImpl">
         <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
+        <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
 
     <bean name="DataStoreStatisticHistoryService"
@@ -85,5 +86,14 @@
     <bean name="vmrdmService" class="com.dmeplugin.dmestore.services.VMRDMServiceImpl"></bean>
 
 
+    <bean name="vCSDKUtils" class="com.dmeplugin.dmestore.utils.VCSDKUtils">
+        <property name="vcConnectionHelper" ref="springBootConnectionHelper"/>
+    </bean>
+
+    <bean name="springBootConnectionHelper" class="com.dmeplugin.vmware.SpringBootConnectionHelper">
+        <property name="serverurl" value="10.143.132.248"/>
+        <property name="username" value="administrator@vsphere.local"/>
+        <property name="password" value="Pbu4@123"/>
+    </bean>
 
 </beans>

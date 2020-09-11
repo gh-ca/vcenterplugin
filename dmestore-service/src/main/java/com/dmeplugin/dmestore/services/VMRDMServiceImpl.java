@@ -1,6 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.model.VmRDMCreateBean;
+import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -28,6 +29,16 @@ public class VMRDMServiceImpl implements VMRDMService {
 
     @Autowired
     private Gson gson = new Gson();
+
+    private VCSDKUtils vcsdkUtils;
+
+    public VCSDKUtils getVcsdkUtils() {
+        return vcsdkUtils;
+    }
+
+    public void setVcsdkUtils(VCSDKUtils vcsdkUtils) {
+        this.vcsdkUtils = vcsdkUtils;
+    }
 
     @Override
     public String createRDM(VmRDMCreateBean vmRDMCreateBean) {
@@ -75,6 +86,16 @@ public class VMRDMServiceImpl implements VMRDMService {
             LOG.error("host mapping error!errorMsg:{}", ex.getMessage());
         }
         return null;
+    }
+
+    @Override
+    public void hostRescanVmfs(String hostIp) throws Exception {
+        vcsdkUtils.hostRescanVmfs(hostIp);
+    }
+
+    @Override
+    public String getLunsOnHost(String hostName) throws Exception {
+        return vcsdkUtils.getLunsOnHost(hostName);
     }
 
 }

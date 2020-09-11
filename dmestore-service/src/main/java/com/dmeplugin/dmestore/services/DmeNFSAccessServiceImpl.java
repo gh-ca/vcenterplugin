@@ -37,6 +37,17 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     @Autowired
     private DmeAccessService dmeAccessService;
 
+
+    private VCSDKUtils vcsdkUtils;
+
+    public VCSDKUtils getVcsdkUtils() {
+        return vcsdkUtils;
+    }
+
+    public void setVcsdkUtils(VCSDKUtils vcsdkUtils) {
+        this.vcsdkUtils = vcsdkUtils;
+    }
+
     @Override
     public NFSDataStoreShareAttr getNFSDatastoreShareAttr(String nfs_share_id) throws Exception {
         String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_SHARE_DETAIL_URL,
@@ -164,7 +175,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     @Override
     public boolean scanNfs() throws Exception {
         // vcenter侧获取nfsStrorge信息列表 (暂通过wwn来与dem(storagetId)发生关联关系)
-        String listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_NFS);
+        String listStr = vcsdkUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_NFS);
         LOG.info("===list nfs datastore success====\n{}", listStr);
         if (StringUtils.isEmpty(listStr)) {
             return false;

@@ -62,6 +62,7 @@
 
     <bean name="vmfsAccessService" class="com.dmeplugin.dmestore.services.VmfsAccessServiceImpl">
         <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
+        <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
 
     <bean name="dmeNFSAccessService" class="com.dmeplugin.dmestore.services.DmeNFSAccessServiceImpl">
@@ -71,6 +72,15 @@
     </bean>
 
     <bean name="vmrdmService" class="com.dmeplugin.dmestore.services.VMRDMServiceImpl">
+    </bean>
+
+    <bean name="vCSDKUtils" class="com.dmeplugin.dmestore.utils.VCSDKUtils">
+        <property name="vcConnectionHelper" ref="vmwarePluginConnectionHelper"/>
+    </bean>
+
+    <bean name="vmwarePluginConnectionHelper" class="com.dmeplugin.vmware.VmwarePluginConnectionHelper">
+        <property name="userSessionService" ref="userSessionService"/>
+        <property name="vimObjectReferenceService" ref="vimObjectReferenceService"/>
     </bean>
 
 </beans>
