@@ -756,7 +756,7 @@ public class VCSDKUtils {
 //
     }
 
-    //创建vmfs存储
+    //vmfs存储打标记
     public  String attachTag(String datastoreType, String datastoreId, String serviceLevelName) throws Exception {
         String attachTagStr = "";
         String vmwareUrl = "10.143.132.248";
