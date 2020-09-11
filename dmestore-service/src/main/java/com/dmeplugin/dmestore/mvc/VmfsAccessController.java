@@ -26,9 +26,7 @@ public class VmfsAccessController extends BaseController{
 
     /*
    * Access vmfs
-   * return: Return execution status and information
-   *         code:Status code 200 or 503
-   *         message:Information
+   * return: Return ResponseBodyBean
    *         data: List<VmfsDataInfo>，including vmfs's data infos
    */
     @RequestMapping(value = "/listvmfs", method = RequestMethod.GET)
@@ -50,9 +48,7 @@ public class VmfsAccessController extends BaseController{
 
     /*
   * Access vmfs performance"
-  * return: Return execution status and information
-  *         code:Status code 200 or 503
-  *         message:Information
+  * return: Return ResponseBodyBean
   *         data: List<VmfsDataInfo>，including vmfs's data infos
   */
     @RequestMapping(value = "/listvmfsperformance", method = RequestMethod.GET)
@@ -115,10 +111,7 @@ public class VmfsAccessController extends BaseController{
    * param integer  minbandwidth 最小带宽
    * param integer  miniops 最小iops
    * param str qosname Smart QoS名称
-   * return: Return execution status and information
-   *         code:Status code 200 or 503
-   *         message:Information
-   *         data: Data，including task_id
+   * return: Return ResponseBodyBean
    */
     @RequestMapping(value = "/createvmfs", method = RequestMethod.POST)
     @ResponseBody
@@ -141,10 +134,7 @@ public class VmfsAccessController extends BaseController{
    * param list<str> volumeIds: 卷volumeId列表 必
    * param str hostName: 主机id 必 （主机与集群二选一）
    * param str hostgroupName: 集群id 必（主机与集群二选一）
-   * return: Return execution status and information
-   *         code:Status code 200 or 503
-   *         message:Information
-   *         data: Data，including task status
+   * return: Return ResponseBodyBean
    */
     @RequestMapping(value = "/mountvmfs", method = RequestMethod.POST)
     @ResponseBody

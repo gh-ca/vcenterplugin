@@ -64,10 +64,8 @@ public class DmeAccessController extends BaseController {
 
     /*
   * Access vmfs performance"
-  * return: Return execution status and information
-  *         code:Status code 200 or 503
-  *         message:Information
-  *         data: List<VmfsDataInfo>，including vmfs's data infos
+  * return: Return ResponseBodyBean
+  *         data: list，including WorkLoad's data infos
   */
     @RequestMapping(value = "/getworkloads", method = RequestMethod.GET)
     @ResponseBody

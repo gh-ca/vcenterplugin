@@ -24,7 +24,7 @@ public class VmwareAccessController extends BaseController {
 
     /*
    * Access hosts
-   * return: host info
+   * return: ResponseBodyBean include host info
    */
     @RequestMapping(value = "/listhost", method = RequestMethod.GET)
     @ResponseBody
@@ -44,7 +44,7 @@ public class VmwareAccessController extends BaseController {
 
     /*
    * Access hosts
-   * return: host info
+   * return: ResponseBodyBean include host info
    */
     @RequestMapping(value = "/gethostsbydsname", method = RequestMethod.GET)
     @ResponseBody
@@ -64,7 +64,7 @@ public class VmwareAccessController extends BaseController {
 
     /*
    * Access cluster
-   * return: cluster info
+   * return: ResponseBodyBean include cluster info
    */
     @RequestMapping(value = "/listcluster", method = RequestMethod.GET)
     @ResponseBody
@@ -84,7 +84,7 @@ public class VmwareAccessController extends BaseController {
 
     /*
    * Access cluster
-   * return: cluster info
+   * return: ResponseBodyBean include cluster info
    */
     @RequestMapping(value = "/getclustersbydsname", method = RequestMethod.GET)
     @ResponseBody
@@ -105,7 +105,7 @@ public class VmwareAccessController extends BaseController {
 
     /*
    * Access datastore
-   * return: datastore info
+   * return: ResponseBodyBean include datastore info
    */
     @RequestMapping(value = "/getdatastoresbyhostname", method = RequestMethod.GET)
     @ResponseBody
@@ -125,7 +125,7 @@ public class VmwareAccessController extends BaseController {
 
     /*
    * Access datastore
-   * return: datastore info
+   * return: ResponseBodyBean include datastore info
    */
     @RequestMapping(value = "/getdatastoresbyclustername", method = RequestMethod.GET)
     @ResponseBody
