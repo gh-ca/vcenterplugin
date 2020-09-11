@@ -17,11 +17,7 @@
 package com.dmeplugin.vmware.util;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -30,6 +26,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.handler.MessageContext;
 
+import com.vmware.vise.usersession.ServerInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
@@ -136,6 +133,32 @@ public class VmwareClient {
      * @throws Exception
      *             the exception
      */
+    public void connect(ServerInfo serverInfo) throws Exception {
+        svcInstRef.setType(SVC_INST_NAME);
+        svcInstRef.setValue(SVC_INST_NAME);
+
+        vimPort = vimService.getVimPort();
+        Map<String, Object> ctxt = ((BindingProvider)vimPort).getRequestContext();
+
+        String sessionCookie=serverInfo.sessionCookie;
+        List<String> values = new ArrayList<>();
+        values.add("vmware_soap_session=" + sessionCookie);
+        Map<String, List<String>> reqHeadrs =
+                new HashMap<>();
+        reqHeadrs.put("Cookie", values);
+        serviceCookie=serverInfo.sessionCookie;
+
+        ctxt.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, serverInfo.serviceUrl);
+        ctxt.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
+        ctxt.put(MessageContext.HTTP_REQUEST_HEADERS, reqHeadrs);
+
+        ctxt.put("com.sun.xml.internal.ws.request.timeout", vCenterSessionTimeout);
+        ctxt.put("com.sun.xml.internal.ws.connect.timeout", vCenterSessionTimeout);
+
+
+        isConnected = true;
+    }
+
     public void connect(String url, String userName, String password) throws Exception {
         svcInstRef.setType(SVC_INST_NAME);
         svcInstRef.setValue(SVC_INST_NAME);
@@ -413,7 +436,7 @@ public class VmwareClient {
      * @throws InvalidCollectorVersionFaultMsg
      */
     private synchronized Object[] waitForValues(ManagedObjectReference objmor, String[] filterProps, String[] endWaitProps, Object[][] expectedVals) throws InvalidPropertyFaultMsg,
-    RuntimeFaultFaultMsg, InvalidCollectorVersionFaultMsg {
+            RuntimeFaultFaultMsg, InvalidCollectorVersionFaultMsg {
         // version string is initially null
         String version = "";
         Object[] endVals = new Object[endWaitProps.length];

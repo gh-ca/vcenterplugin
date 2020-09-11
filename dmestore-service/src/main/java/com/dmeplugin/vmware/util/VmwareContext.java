@@ -25,6 +25,7 @@ import com.vmware.connection.helpers.builders.PropertyFilterSpecBuilder;
 import com.vmware.connection.helpers.builders.PropertySpecBuilder;
 import com.vmware.connection.helpers.builders.TraversalSpecBuilder;
 import com.vmware.vim25.*;
+import com.vmware.vise.usersession.UserSessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +51,7 @@ import java.nio.charset.Charset;
 import java.util.*;
 
 public class VmwareContext {
+
     private static final Logger s_logger = LoggerFactory.getLogger(VmwareContext.class);
 
     private static final int MAX_CONNECT_RETRY = 5;
@@ -64,6 +66,8 @@ public class VmwareContext {
 
     private VmwareContextPool _pool;
     private String _poolKey;
+
+    private UserSessionService _userSessionService;
 
     private static volatile int s_outstandingCount = 0;
 
@@ -97,6 +101,11 @@ public class VmwareContext {
         registerOutstandingContext();
         if (s_logger.isInfoEnabled())
             s_logger.info("New VmwareContext object, current outstanding count: " + getOutstandingContextCount());
+    }
+
+    public VmwareContext() {
+        _vimClient=new VmwareClient("vcentercontext");
+        _serverAddress="";
     }
 
     public boolean validate() {
