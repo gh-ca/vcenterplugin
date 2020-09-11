@@ -227,6 +227,40 @@ public class VCSDKUtils {
         }
         return listStr;
     }
+    //得到所有主机的ID与name 除去已经挂载了当前存储的主机
+    public static String getDataStoresByHostName(String hostName) throws Exception {
+        String listStr = "";
+        try {
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+            //取得该存储下所有已经挂载的主机ID
+            List<String> mounthostids = new ArrayList<>();
+            HostMO hostmo = rootFsMO.findHost(hostName);
+            String objHostId = null;
+            if(hostmo!=null) {
+                objHostId = hostmo.getMor().getValue();
+            }
+            //取得所有主机，并通过mounthostids进行过滤，过滤掉已经挂载的主机
+            List<Pair<ManagedObjectReference, String>> dss = rootFsMO.getAllDatacenterOnRootFs();
+            if (dss != null && dss.size() > 0) {
+                List<Map<String, String>> lists = new ArrayList<>();
+                for (Pair<ManagedObjectReference, String> ds : dss) {
+                    DatastoreMO datastoreMO = new DatastoreMO(vmwareContext, ds.first());
+
+                    
+                }
+                if (lists.size() > 0) {
+                    Gson gson = new Gson();
+                    listStr = gson.toJson(lists);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware error:", e);
+            throw e;
+        }
+        return listStr;
+    }
 
     //得到指定集群下的所有主机
     public static String getHostsOnCluster(String clusterName) throws Exception {
@@ -778,8 +812,8 @@ public class VCSDKUtils {
     public static void main(String[] args) {
         try {
             Gson gson = new Gson();
-//            String listStr = VCSDKUtils.getAllVmfsDataStores(null);
-//            _logger.info("Vmfs listStr==" + listStr);
+            String listStr = VCSDKUtils.getAllVmfsDataStores(null);
+            _logger.info("Vmfs listStr==" + listStr);
 //            listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_VMFS);
 //            _logger.info("Vmfs listStr==" + listStr);
 //            listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_NFS);
