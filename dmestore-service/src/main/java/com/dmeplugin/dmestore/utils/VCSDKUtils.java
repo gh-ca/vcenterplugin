@@ -725,7 +725,7 @@ public class VCSDKUtils {
                             e.printStackTrace();
                             throw e;
                         }
-                        //set tag
+                        //return datastore info
                         if (datastore != null) {
                             _logger.info("datastore===" + datastore.getValue());
                             DatastoreMO dsMo = new DatastoreMO(hostMo.getContext(), datastore);
