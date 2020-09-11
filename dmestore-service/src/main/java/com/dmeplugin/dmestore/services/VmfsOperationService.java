@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,4 +12,6 @@ import java.util.Map;
 public interface VmfsOperationService {
 
     Map<String, Object> updateVMFS(String volume_id, Map<String, Object> params);
+
+    Map<String,Object> expandVMFS(List<Map<String,String>> volumes);
 }

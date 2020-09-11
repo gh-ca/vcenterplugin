@@ -6,6 +6,7 @@ import com.dmeplugin.vmware.autosdk.SessionHelper;
 import com.dmeplugin.vmware.autosdk.TaggingWorkflow;
 import com.dmeplugin.vmware.mo.*;
 import com.dmeplugin.vmware.util.Pair;
+import com.dmeplugin.vmware.util.TestVmwareContextFactory;
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -440,6 +441,80 @@ public class VCSDKUtils {
                 dsMo.renameDatastore(newName);
                 _logger.info("==end rename DataStore==");
             }
+        } catch (Exception e) {
+            result = "failed";
+            _logger.error("vmware error:", e);
+            throw e;
+        } finally {
+            return result;
+        }
+    }
+
+    //get oriented datastore capacity
+    public static Map<String,Object> getCapacityOnVmfs(String dsname){
+        Map<String, Object> resMap = new HashMap<>();
+        resMap.put("msg", "success");
+        _logger.info("==start get oriented datastore capacity==");
+        try {
+            VmwareContext vmwareContext= TestVmwareContextFactory.getContext("10.143.132.248","administrator@vsphere.local","Pbu4@123");
+            DatastoreMO dsMo = new DatastoreMO(vmwareContext, new DatacenterMO(vmwareContext, "Datacenter").findDatastore(dsname));
+            DatastoreSummary summary = dsMo.getSummary();
+            long capacity = summary.getCapacity();
+            _logger.info("==end get oriented datastore capacity==");
+            resMap.put("capacity", capacity);
+            return resMap;
+        } catch (Exception e) {
+            resMap.put("msg", "failed");
+            _logger.error("vmware error:", e);
+            throw e;
+        }finally {
+            return resMap;
+        }
+    }
+
+    //expand oriented datastore capacity
+    public static String expandVmfsDatastore(String dsname,Integer add_capacity) {
+        String result = "success";
+        _logger.info("==start expand DataStore==");
+        try {
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
+            DatastoreMO dsMo = new DatastoreMO(vmwareContext, new DatacenterMO(vmwareContext, "Datacenter").findDatastore(dsname));
+            DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
+            HostMO hostMo = new HostMO(vmwareContext, dcMo.findHost("10.143.132.17").get(0));//10.143.132.17
+
+            //todo get oriented LUN    参数需要调
+            String devicePath = "/vmfs/devices/disks/t10.ATA_____WDC_WD1003FBYX2D01Y7B1________________________WD2DWCAW35431438";
+            Long totalSectors = add_capacity*1L*ToolUtils.Gi;
+            HostScsiDisk candidateHostScsiDisk = null;
+            if (hostMo != null) {
+                HostDatastoreSystemMO hostDatastoreSystemMO = hostMo.getHostDatastoreSystemMO();
+                List<HostScsiDisk> hostScsiDisks = hostDatastoreSystemMO.queryAvailableDisksForVmfs();
+                if (hostScsiDisks != null) {
+                    for (HostScsiDisk hostScsiDisk : hostScsiDisks) {
+                        if (hostScsiDisk.getDevicePath().equals(devicePath)) {
+                            candidateHostScsiDisk = hostScsiDisk;
+                            break;
+                        }
+                    }
+                }
+                List<VmfsDatastoreOption> vmfsDatastoreOptions = hostDatastoreSystemMO.queryVmfsDatastoreExpandOptions(dsMo);
+                if (vmfsDatastoreOptions != null && vmfsDatastoreOptions.size() > 0) {
+                    VmfsDatastoreOption vmfsDatastoreOption = vmfsDatastoreOptions.get(0);
+                    VmfsDatastoreExpandSpec spec = (VmfsDatastoreExpandSpec)vmfsDatastoreOption.getSpec();
+
+                    if (candidateHostScsiDisk != null) {
+                        HostDiskPartitionSpec hostDiskPartitionSpec = new HostDiskPartitionSpec();
+                        hostDiskPartitionSpec.setTotalSectors(totalSectors);
+                        spec.setPartition(hostDiskPartitionSpec);
+                        VmfsDatastoreSpec vmfsDatastoreSpec = new VmfsDatastoreSpec();
+                        vmfsDatastoreSpec.setDiskUuid(candidateHostScsiDisk.getUuid());
+                        vmfsDatastoreOption.setSpec(vmfsDatastoreSpec);
+
+                    }
+                    hostMo.getHostDatastoreSystemMO().expandVmfsDatastore(dsMo, spec);
+                }
+            }
+            _logger.info("==end expand DataStore==");
         } catch (Exception e) {
             result = "failed";
             _logger.error("vmware error:", e);

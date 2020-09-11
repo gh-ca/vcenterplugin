@@ -49,22 +49,20 @@ public class VmfsOperationController extends BaseController{
     }
 
     /**
-     *  入参：
-     *  "volumes" : [ {
-     *     "volume_id" : "02bb989a-7ac2-40cd-852d-c9b26bb2ab5b", 必须
-     *     "added_capacity" : 2 必须
-     *   } ]
-     * @param volumes 批量扩容vmfs
+     * expand vmfs datastore
+     * @param volumes
      * @return
      */
     @PostMapping("expandvmfs")
     @ResponseBody
-    public ResponseBodyBean expandVMFS(@RequestBody List<Map<String,Object>> volumes ){
+    public ResponseBodyBean expandVMFS(@RequestBody List<Map<String,String >> volumes ){
+
         LOG.info("volumes=="+gson.toJson(volumes));
-        String url = "/rest/blockservice/v1/volumes/expand";
-        //调vcenter端口
-        //String taskId="";
-        return success();
+        Map<String, Object> resMap = vmfsOperationService.expandVMFS(volumes);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals("200")) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
     }
 
 
