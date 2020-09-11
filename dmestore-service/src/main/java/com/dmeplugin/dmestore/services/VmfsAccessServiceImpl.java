@@ -52,6 +52,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private final String VOLUME_DELETE = "/rest/blockservice/v1/volumes/delete";
     private final String CREATE_VOLUME_URL = "/rest/blockservice/v1/volumes";
     private final String CREATE_VOLUME_UNSERVICE_URL = "/rest/blockservice/v1/volumes";
+    private final String MOUNT_VOLUME_TO_HOST_URL = "/rest/blockservice/v1/volumes/host-mapping";
+    private final String MOUNT_VOLUME_TO_HOSTGROUP_URL = "/rest/blockservice/v1/volumes/hostgroup-mapping";
 
 
     @Override
@@ -231,6 +233,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     String dataStoreStr = createVmfsOnVmware(params);
                     LOG.info("Vmfs dataStoreStr==" + dataStoreStr);
 
+                    //将DME卷与vmfs的关系保存数据库
+
                     //关联服务等级
                     if (params.get("service_level_id") != null) {
                         String serviceLevelName = ToolUtils.getStr(params.get("service_level_name"));
@@ -327,7 +331,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     }
                 }
             }
-            //如果主机或主机不存在就创建并得到主机或主机组ID
         } catch (Exception e) {
             LOG.error("createVmfsByServiceLevel error:", e);
         }
@@ -395,7 +398,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     }
                 }
             }
-            //如果主机或主机不存在就创建并得到主机或主机组ID
         } catch (Exception e) {
             LOG.error("createVmfsUNServiceLevel error:", e);
         }
@@ -512,16 +514,113 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     /*
-  * Mount vmfs
-  * param list<str> volumeIds: 卷volumeId列表 必
-  * param str hostName: 主机id 必 （主机与集群二选一）
-  * param str hostgroupName: 集群id 必（主机与集群二选一）
-  * return: Return ResponseBodyBean
-  */
+   * Mount vmfs
+   * param list<str> volumeIds: 卷volumeId列表 必
+   * param str host: 主机名称 必 （主机与集群二选一）
+   * param str cluster: 集群名称 必（主机与集群二选一）
+   * return: Return ResponseBodyBean
+   */
     @Override
     public void mountVmfs(Map<String, Object> params) throws Exception {
-
+        if (params != null) {
+            //param str host: 主机  param str cluster: 集群
+            String objhostid = "";
+            //判断主机或主机组在DME中是否存在
+            //如果主机或主机不存在就创建并得到主机或主机组ID
+            objhostid = checkOrcreateToHostorHostGroup(params);
+            LOG.info("objhostid====" + objhostid);
+            if (!StringUtils.isEmpty(objhostid)) {
+                //挂载卷
+                String taskId = "";
+                if (params.get("host") != null) {
+                    //将卷挂载到主机
+                    taskId = mountVmfsToHost(params, objhostid);
+                } else {
+                    //将卷挂载到集群
+                    taskId = mountVmfsToHostGroup(params, objhostid);
+                }
+                LOG.info("taskId====" + taskId);
+                //查询看创建任务是否完成。
+                List<String> taskIds = new ArrayList<>();
+                taskIds.add(taskId);
+                boolean unmountFlag = taskService.checkTaskStatus(taskIds);
+                if (unmountFlag) { //DME创建完成
+                    //调用vCenter在主机上扫描卷和Datastore
+                } else {
+                    throw new Exception("DME mount vmfs volume error(task status)!");
+                }
+            } else {
+                throw new Exception("DME find or create host error!");
+            }
+        } else {
+            throw new Exception("Parameter exception:" + params);
+        }
     }
+    //将卷挂载到主机
+    private String mountVmfsToHost(Map<String, Object> params, String objhostid) {
+        String taskId = "";
+        try {
+            if (params != null && params.get("volumeIds") != null) {
+                Map<String, Object> requestbody = null;
+                //判断该集群下有多少主机，如果主机在DME不存在就需要创建
+                requestbody = new HashMap<>();
+                List<String> volume_ids = (List<String>)params.get("volumeIds");
+
+                requestbody.put("volume_ids", volume_ids);
+                requestbody.put("host_id", objhostid);
+
+                LOG.info("mountVmfsToHost requestbody==" + gson.toJson(requestbody));
+
+                LOG.info("mountVmfsToHost URL===" + MOUNT_VOLUME_TO_HOST_URL);
+                ResponseEntity responseEntity = dmeAccessService.access(MOUNT_VOLUME_TO_HOST_URL, HttpMethod.POST, requestbody.toString());
+
+                LOG.info("mountVmfsToHost vmfs responseEntity==" + responseEntity.toString());
+                if (responseEntity.getStatusCodeValue() == 202) {
+                    JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                    if (jsonObject != null && jsonObject.get("task_id") != null) {
+                        taskId = ToolUtils.jsonToStr(jsonObject.get("task_id"));
+                        LOG.info("mountVmfsToHost task_id====" + taskId);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("mountVmfsToHost error:", e);
+        }
+        return taskId;
+    }
+    //将卷挂载到集群
+    private String mountVmfsToHostGroup(Map<String, Object> params, String objhostid) {
+        String taskId = "";
+        try {
+            if (params != null && params.get("volumeIds") != null) {
+                Map<String, Object> requestbody = null;
+                //判断该集群下有多少主机，如果主机在DME不存在就需要创建
+                requestbody = new HashMap<>();
+                List<String> volume_ids = (List<String>)params.get("volumeIds");
+
+                requestbody.put("volume_ids", volume_ids);
+                requestbody.put("hostgroup_id", objhostid);
+
+                LOG.info("mountVmfsToHostGroup requestbody==" + gson.toJson(requestbody));
+
+                LOG.info("mountVmfsToHostGroup URL===" + MOUNT_VOLUME_TO_HOSTGROUP_URL);
+                ResponseEntity responseEntity = dmeAccessService.access(MOUNT_VOLUME_TO_HOSTGROUP_URL, HttpMethod.POST, requestbody.toString());
+
+                LOG.info("mountVmfsToHostGroup vmfs responseEntity==" + responseEntity.toString());
+                if (responseEntity.getStatusCodeValue() == 202) {
+                    JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                    if (jsonObject != null && jsonObject.get("task_id") != null) {
+                        taskId = ToolUtils.jsonToStr(jsonObject.get("task_id"));
+                        LOG.info("mountVmfsToHostGroup task_id====" + taskId);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("mountVmfsToHostGroup error:", e);
+        }
+        return taskId;
+    }
+
 
     /**
      * @Author wangxiangyong
