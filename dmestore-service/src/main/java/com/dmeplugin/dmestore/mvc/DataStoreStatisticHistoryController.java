@@ -33,7 +33,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
         LOG.info("datastorestatistichistrory/vmfsvolume params==" + gson.toJson(params));
 
         Map<String, Object> resMap = dataSotreStatisticHistroyService.queryVmfsStatistic(params);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals("200")) {
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -45,7 +45,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
         LOG.info("datastorestatistichistrory/nfsvolume params==" + gson.toJson(params));
 
         Map<String, Object> resMap = dataSotreStatisticHistroyService.queryNfsStatistic(params);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals("200")) {
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));

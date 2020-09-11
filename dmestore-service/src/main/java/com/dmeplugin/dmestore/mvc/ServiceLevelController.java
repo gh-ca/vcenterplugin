@@ -32,7 +32,7 @@ public class ServiceLevelController extends BaseController {
     public ResponseBodyBean listServiceLevel(@RequestBody Map<String, Object> params) throws Exception {
         LOG.info("servicelevel/listservicelevel params==" + gson.toJson(params));
         Map<String, Object> resMap = serviceLevelService.listServiceLevel(params);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals("200")) {
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
