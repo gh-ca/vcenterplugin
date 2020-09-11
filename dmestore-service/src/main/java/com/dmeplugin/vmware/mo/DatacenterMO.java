@@ -202,15 +202,21 @@ public class DatacenterMO extends BaseMO {
         return null;
     }
 
-    public ManagedObjectReference findHost(String name) throws Exception {
+    public List<ManagedObjectReference> findHost(String name) throws Exception {
         List<ObjectContent> ocs = getHostPropertiesOnDatacenterHostFolder(new String[] {"name"});
-
         if (ocs != null) {
+            List<ManagedObjectReference> referenceList = new ArrayList<>();
             for (ObjectContent oc : ocs) {
-                if (oc.getPropSet().get(0).getVal().toString().equals(name)) {
-                    return oc.getObj();
+                if(null != name && !name.trim().equals("")){
+                    if (oc.getPropSet().get(0).getVal().toString().equals(name)) {
+                        referenceList.add(oc.getObj());
+                        break;
+                    }
+                }else {
+                    referenceList.add(oc.getObj());
                 }
             }
+            return referenceList;
         }
         return null;
     }
