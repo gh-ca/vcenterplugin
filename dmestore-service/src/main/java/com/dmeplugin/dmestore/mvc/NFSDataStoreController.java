@@ -29,4 +29,9 @@ public class NFSDataStoreController extends BaseController{
     public ResponseBodyBean fsAttr(@PathVariable("storage_id") String storage_id) throws Exception {
         return success(dmeNFSAccessService.getNFSDatastoreFSAttr(storage_id));
     }
+
+    @RequestMapping(value = "/scannfs", method = RequestMethod.GET)
+    public ResponseBodyBean scanvmfs() throws Exception {
+        return success(dmeNFSAccessService.scanNfs());
+    }
 }

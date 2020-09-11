@@ -189,6 +189,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             String nfsDatastoreUrl = nfsDatastore.get("url").getAsString();
             String nfsDatastoreId = nfsDatastore.get("id").getAsString();
             String nfsDatastoreName = nfsDatastore.get("name").getAsString();
+            String nfsDatastoreIp = "";//nfsDatastore.get("XXX").getAsString();
+            String nfsDataStoreSharePath = "";//nfsDatastore.get("XXX").getAsString();
             //拆分wwn
             String wwn = nfsDatastoreUrl.split("volumes/")[1];
 
@@ -253,13 +255,13 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         for (JsonElement jsonElement : jsonArray) {
             Map<String, Object> shareMap = new HashMap<>();
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            shareMap.put("id", jsonObject.get("id").getAsString());
-            shareMap.put("name", jsonObject.get("name").getAsString());
-            shareMap.put("share_path", jsonObject.get("share_path").getAsString());
-            shareMap.put("storage_id", jsonObject.get("storage_id").getAsString());
-            shareMap.put("device_name", jsonObject.get("device_name").getAsString());
-            shareMap.put("owning_dtree_id", jsonObject.get("owning_dtree_id").getAsString());
-            shareMap.put("owning_dtree_name", jsonObject.get("owning_dtree_name").getAsString());
+            shareMap.put("id", ToolUtils.getStr(jsonObject.get("id")));
+            shareMap.put("name", ToolUtils.getStr(jsonObject.get("name")));
+            shareMap.put("share_path", ToolUtils.getStr(jsonObject.get("share_path")));
+            shareMap.put("storage_id", ToolUtils.getStr(jsonObject.get("storage_id")));
+            shareMap.put("device_name", ToolUtils.getStr(jsonObject.get("device_name")));
+            shareMap.put("owning_dtree_id", ToolUtils.getStr(jsonObject.get("owning_dtree_id")));
+            shareMap.put("owning_dtree_name", ToolUtils.getStr(jsonObject.get("owning_dtree_name")));
             shareList.add(shareMap);
         }
         return shareList;
@@ -288,7 +290,28 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     //解析fs信息
     private List<Map<String, Object>> converFs(Object object) {
-        return null;
+        List<Map<String, Object>> fsList = new ArrayList<>();
+        JsonArray jsonArray;
+        String strObject = gson.toJson(object);
+        if (strObject.indexOf("total") > -1 && strObject.indexOf("data") > -1) {
+            JsonObject temp = new JsonParser().parse(object.toString()).getAsJsonObject();
+            jsonArray = temp.get("data").getAsJsonArray();
+        } else {
+            jsonArray = new JsonParser().parse(object.toString()).getAsJsonArray();
+        }
+        for (JsonElement jsonElement : jsonArray) {
+            Map<String, Object> fsMap = new HashMap<>();
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            fsMap.put("id", ToolUtils.getStr(jsonObject.get("id")));
+            fsMap.put("name", ToolUtils.getStr(jsonObject.get("name")));
+            fsMap.put("storage_id", ToolUtils.getStr(jsonObject.get("storage_id")));
+            fsMap.put("storage_name", ToolUtils.getStr(jsonObject.get("storage_name")));
+            fsMap.put("storage_pool_name", ToolUtils.getStr(jsonObject.get("storage_pool_name")));
+            fsMap.put("tier_id", ToolUtils.getStr(jsonObject.get("tier_id")));
+            fsMap.put("tier_name", ToolUtils.getStr(jsonObject.get("tier_name")));
+            fsList.add(fsMap);
+        }
+        return fsList;
     }
 
     //按条件查询logicPort
@@ -296,7 +319,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         ResponseEntity responseEntity = listLogicPortByStorageId(storageId);
         if (responseEntity.getStatusCodeValue() / 100 != 2) {
             Object object = responseEntity.getBody();
-            List<Map<String, Object>> list = convertLogicPort(object);
+            List<Map<String, Object>> list = convertLogicPort(storageId, object);
             if (list.size() > 0) {
                 return list.get(0);
             }
@@ -312,8 +335,29 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     //解析logicPort信息
-    private List<Map<String, Object>> convertLogicPort(Object object) {
-        return null;
+    private List<Map<String, Object>> convertLogicPort(String storageId, Object object) {
+        List<Map<String, Object>> logicPortList = new ArrayList<>();
+        JsonArray jsonArray;
+        String strObject = gson.toJson(object);
+        if (strObject.indexOf("total") > -1 && strObject.indexOf("logic_ports") > -1) {
+            JsonObject temp = new JsonParser().parse(object.toString()).getAsJsonObject();
+            jsonArray = temp.get("logic_ports").getAsJsonArray();
+        } else {
+            jsonArray = new JsonParser().parse(object.toString()).getAsJsonArray();
+        }
+        for (JsonElement jsonElement : jsonArray) {
+            Map<String, Object> logicPortMap = new HashMap<>();
+            JsonObject jsonObject = jsonElement.getAsJsonObject();
+            logicPortMap.put("id", ToolUtils.getStr(jsonObject.get("id")));
+            logicPortMap.put("name", ToolUtils.getStr(jsonObject.get("name")));
+            logicPortMap.put("storage_id", storageId);
+            logicPortMap.put("home_port_id", ToolUtils.getStr(jsonObject.get("home_port_id")));
+            logicPortMap.put("home_port_name", ToolUtils.getStr(jsonObject.get("home_port_name")));
+            logicPortMap.put("current_port_id", ToolUtils.getStr(jsonObject.get("current_port_id")));
+            logicPortMap.put("current_port_id", ToolUtils.getStr(jsonObject.get("current_port_id")));
+            logicPortList.add(logicPortMap);
+        }
+        return logicPortList;
     }
 
 }
