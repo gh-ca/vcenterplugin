@@ -31,9 +31,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     @Autowired
     private Gson gson;
 
-    @Autowired
+    //@Autowired
     private DmeAccessService dmeAccessService;
-    @Autowired
+    //@Autowired
     private DmeStorageService dmeStorageService;
 
 
@@ -45,6 +45,22 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     public void setVcsdkUtils(VCSDKUtils vcsdkUtils) {
         this.vcsdkUtils = vcsdkUtils;
+    }
+
+    public DmeAccessService getDmeAccessService() {
+        return dmeAccessService;
+    }
+
+    public void setDmeAccessService(DmeAccessService dmeAccessService) {
+        this.dmeAccessService = dmeAccessService;
+    }
+
+    public DmeStorageService getDmeStorageService() {
+        return dmeStorageService;
+    }
+
+    public void setDmeStorageService(DmeStorageService dmeStorageService) {
+        this.dmeStorageService = dmeStorageService;
     }
 
     @Override
