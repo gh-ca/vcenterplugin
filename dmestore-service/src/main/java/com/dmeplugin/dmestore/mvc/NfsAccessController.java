@@ -95,16 +95,6 @@ public class NfsAccessController extends BaseController{
     }
 
 
-    /*
-   * Mount nfs
-   * param list<str> dataStoreNames: datastore名称列表 必
-   * param list<str> volumeIds: 卷volumeId列表 必
-   * param str host: 主机名称 必 （主机与集群二选一）
-   * param str cluster: 集群名称 必（主机与集群二选一）
-   * param str logic_port: 逻辑端口
-   * param str mountType: 挂载模式（只读或读写）
-   * return: ResponseBodyBean
-   */
     /**
      * Mount nfs include:
      * list<str> dataStoreNames: datastore名称列表 必
