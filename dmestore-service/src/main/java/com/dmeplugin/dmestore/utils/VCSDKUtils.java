@@ -36,6 +36,8 @@ public class VCSDKUtils {
 
     private final static Logger _logger = LoggerFactory.getLogger(EchoServiceImpl.class);
 
+    private Gson gson = new Gson();
+
     //得到所有存储的Summary
     public  String getAllVmfsDataStores(String storeType) throws Exception {
         String listStr = "";
@@ -57,7 +59,6 @@ public class VCSDKUtils {
 
                     }
                     if (lists.size() > 0) {
-                        Gson gson = new Gson();
                         listStr = gson.toJson(lists);
                     }
                 }
@@ -90,7 +91,6 @@ public class VCSDKUtils {
                         lists.add(map);
                     }
                     if (lists.size() > 0) {
-                        Gson gson = new Gson();
                         listStr = gson.toJson(lists);
                     }
                 }
@@ -122,7 +122,6 @@ public class VCSDKUtils {
                         lists.add(map);
                     }
                     if (lists.size() > 0) {
-                        Gson gson = new Gson();
                         listStr = gson.toJson(lists);
                     }
                 }
@@ -172,7 +171,6 @@ public class VCSDKUtils {
                         }
                     }
                     if (lists.size() > 0) {
-                        Gson gson = new Gson();
                         listStr = gson.toJson(lists);
                     }
                 }
@@ -234,7 +232,6 @@ public class VCSDKUtils {
                         }
                     }
                     if (lists.size() > 0) {
-                        Gson gson = new Gson();
                         listStr = gson.toJson(lists);
                     }
                 }
@@ -296,7 +293,6 @@ public class VCSDKUtils {
 
                     }
                     if (lists.size() > 0) {
-                        Gson gson = new Gson();
                         listStr = gson.toJson(lists);
                     }
                 }
@@ -374,7 +370,6 @@ public class VCSDKUtils {
 
                     }
                     if (lists.size() > 0) {
-                        Gson gson = new Gson();
                         listStr = gson.toJson(lists);
                     }
                 }
@@ -412,7 +407,6 @@ public class VCSDKUtils {
                                     lists.add(map);
                                 }
                                 if (lists.size() > 0) {
-                                    Gson gson = new Gson();
                                     listStr = gson.toJson(lists);
                                 }
                             }
@@ -557,7 +551,6 @@ public class VCSDKUtils {
     public  String getLunsOnHost(String hostName) throws Exception {
         String lunStr = "";
         try {
-            Gson gson = new Gson();
             HostMO hostMo = null;
 
             VmwareContext[] vmwareContexts =vcConnectionHelper.getAllContext();
@@ -778,8 +771,6 @@ public class VCSDKUtils {
                                              int unmapGranularity, String unmapPriority) throws Exception {
         String dataStoreStr = "";
         try {
-            Gson gson = new Gson();
-
             if(hsdmap!=null && hsdmap.get("host")!=null) {
                 HostScsiDisk objhsd = (HostScsiDisk) hsdmap.get("hostScsiDisk");
                 HostMO hostMo = (HostMO) hsdmap.get("host");
@@ -922,7 +913,6 @@ public class VCSDKUtils {
                 _logger.info("host:"+hostName+" and cluster:"+clusterName+" is null");
                 return;
             }
-            Gson gson = new Gson();
 
             Map<String, Object> dsmap = gson.fromJson(datastoreStr, new TypeToken<Map<String, Object>>() {
             }.getType());
