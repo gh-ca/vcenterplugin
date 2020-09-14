@@ -23,8 +23,12 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * Created by yuanqi on 2020/8/31.
- */
+ * @Description: TODO
+ * @ClassName: RestUtils
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 public class RestUtils {
     public final static String RESPONSE_STATE_CODE = "code";
     public final static String RESPONSE_STATE_200 = "200";

@@ -7,9 +7,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by hyuan on 2017/5/10.
- */
-
+ * @Description: TODO
+ * @ClassName: VmfsAccessService
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 public interface VmfsAccessService {
     /**
      * vmfs list

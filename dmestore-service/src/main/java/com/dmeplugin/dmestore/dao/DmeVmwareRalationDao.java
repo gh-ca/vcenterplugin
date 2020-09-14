@@ -13,7 +13,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * @Description: TODO
+ * @ClassName: DmeVmwareRalationDao
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 public class DmeVmwareRalationDao extends H2DataBaseDao {
 
     public List<DmeVmwareRelation> getDmeVmwareRelation(String storeType) throws SQLException {

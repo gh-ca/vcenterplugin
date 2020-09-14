@@ -13,7 +13,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * @Description: TODO
+ * @ClassName: VmfsAccessController
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 @RestController
 @RequestMapping(value = "/accessvmfs")
 public class VmfsAccessController extends BaseController{

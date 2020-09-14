@@ -3,7 +3,13 @@ package com.dmeplugin.dmestore.entity;
 import java.io.Serializable;
 import java.util.Date;
 
-
+/**
+ * @Description: TODO
+ * @ClassName: DmeVmwareRelation
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 public class DmeVmwareRelation implements Serializable {
 
   private int id;
