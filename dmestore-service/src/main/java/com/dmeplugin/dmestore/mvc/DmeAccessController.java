@@ -2,6 +2,7 @@ package com.dmeplugin.dmestore.mvc;
 
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.DmeAccessService;
+import com.dmeplugin.dmestore.utils.RestUtils;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +38,7 @@ public class DmeAccessController extends BaseController {
         LOG.info("accessdme/access params==" + gson.toJson(params));
         Map<String, Object> remap = dmeAccessService.accessDme(params);
         LOG.info("accessdme/access remap==" + gson.toJson(remap));
-        if (remap != null && remap.get("code") != null && "200".equals(remap.get("code").toString())) {
+        if (remap != null && remap.get("code") != null && RestUtils.RESPONSE_STATE_200.equals(remap.get("code").toString())) {
             return success(remap);
         }
 
@@ -55,7 +56,7 @@ public class DmeAccessController extends BaseController {
         LOG.info("accessdme/refreshaccess==");
         Map<String, Object> remap = dmeAccessService.refreshDme();
         LOG.info("accessdme/refreshaccess remap==" + gson.toJson(remap));
-        if (remap != null && remap.get("code") != null && remap.get("code").toString().equals("200")) {
+        if (remap != null && remap.get("code") != null && RestUtils.RESPONSE_STATE_200.equals(remap.get("code").toString())) {
             return success(remap);
         }
 
