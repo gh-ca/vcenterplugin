@@ -506,9 +506,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         try {
             //param str host: 主机  param str cluster: 集群
             if (params != null && params.get("host") != null) {
-                objId = checkOrcreateToHost(params.get("host").toString());
+                objId = checkOrcreateToHost(ToolUtils.getStr(params.get("host")));
             } else if (params != null && params.get("cluster") != null) {
-                objId = checkOrcreateToHostGroup(params.get("cluster").toString());
+                objId = checkOrcreateToHostGroup(ToolUtils.getStr(params.get("cluster")));
             }
         } catch (Exception e) {
             LOG.error("checkOrcreateToHostorHostGroup error:", e);
@@ -606,7 +606,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 boolean mountFlag = taskService.checkTaskStatus(taskIds);
                 if (mountFlag) { //DME创建完成
                     //调用vCenter在主机上扫描卷和Datastore
-
+                    vcsdkUtils.scanDataStore(ToolUtils.getStr(params.get("host")),ToolUtils.getStr(params.get("cluster")));
                 } else {
                     throw new Exception("DME mount vmfs volume error(task status)!");
                 }
