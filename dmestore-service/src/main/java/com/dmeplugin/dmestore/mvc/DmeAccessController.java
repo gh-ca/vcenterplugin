@@ -37,7 +37,7 @@ public class DmeAccessController extends BaseController {
         LOG.info("accessdme/access params==" + gson.toJson(params));
         Map<String, Object> remap = dmeAccessService.accessDme(params);
         LOG.info("accessdme/access remap==" + gson.toJson(remap));
-        if (remap != null && remap.get("code") != null && remap.get("code").toString().equals("200")) {
+        if (remap != null && remap.get("code") != null && "200".equals(remap.get("code").toString())) {
             return success(remap);
         }
 
