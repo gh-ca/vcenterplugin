@@ -227,8 +227,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //查询看创建任务是否完成。
                 List<String> taskIds = new ArrayList<>();
                 taskIds.add(taskId);
-                boolean unmountFlag = taskService.checkTaskStatus(taskIds);
-                if (unmountFlag) { //DME创建完成
+                boolean createFlag = taskService.checkTaskStatus(taskIds);
+                if (createFlag) { //DME创建完成
                     //创建vmware中的vmfs存储。
                     String dataStoreStr = createVmfsOnVmware(params);
                     LOG.info("Vmfs dataStoreStr==" + dataStoreStr);
@@ -603,9 +603,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //查询看创建任务是否完成。
                 List<String> taskIds = new ArrayList<>();
                 taskIds.add(taskId);
-                boolean unmountFlag = taskService.checkTaskStatus(taskIds);
-                if (unmountFlag) { //DME创建完成
+                boolean mountFlag = taskService.checkTaskStatus(taskIds);
+                if (mountFlag) { //DME创建完成
                     //调用vCenter在主机上扫描卷和Datastore
+
                 } else {
                     throw new Exception("DME mount vmfs volume error(task status)!");
                 }
