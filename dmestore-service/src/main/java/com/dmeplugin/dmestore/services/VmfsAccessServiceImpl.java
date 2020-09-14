@@ -606,7 +606,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 boolean mountFlag = taskService.checkTaskStatus(taskIds);
                 if (mountFlag) { //DME创建完成
                     //调用vCenter在主机上扫描卷和Datastore
-                    vcsdkUtils.scanDataStore(ToolUtils.getStr(params.get("host")),ToolUtils.getStr(params.get("cluster")));
+                    vcsdkUtils.scanDataStore(ToolUtils.getStr(params.get("cluster")),ToolUtils.getStr(params.get("host")));
                 } else {
                     throw new Exception("DME mount vmfs volume error(task status)!");
                 }
