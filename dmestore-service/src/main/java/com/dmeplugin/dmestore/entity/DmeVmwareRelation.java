@@ -19,6 +19,13 @@ public class DmeVmwareRelation implements Serializable {
   private Date updateTime;
   private int state;
 
+  private String shareId;
+  private String shareName;
+  private String fsId;
+  private String fsName;
+  private String logicPortId;
+  private String logicPortName;
+
   public int getId() {
     return id;
   }
@@ -113,5 +120,53 @@ public class DmeVmwareRelation implements Serializable {
 
   public void setState(int state) {
     this.state = state;
+  }
+
+  public String getShareId() {
+    return shareId;
+  }
+
+  public void setShareId(String shareId) {
+    this.shareId = shareId;
+  }
+
+  public String getShareName() {
+    return shareName;
+  }
+
+  public void setShareName(String shareName) {
+    this.shareName = shareName;
+  }
+
+  public String getFsId() {
+    return fsId;
+  }
+
+  public void setFsId(String fsId) {
+    this.fsId = fsId;
+  }
+
+  public String getFsName() {
+    return fsName;
+  }
+
+  public void setFsName(String fsName) {
+    this.fsName = fsName;
+  }
+
+  public String getLogicPortId() {
+    return logicPortId;
+  }
+
+  public void setLogicPortId(String logicPortId) {
+    this.logicPortId = logicPortId;
+  }
+
+  public String getLogicPortName() {
+    return logicPortName;
+  }
+
+  public void setLogicPortName(String logicPortName) {
+    this.logicPortName = logicPortName;
   }
 }

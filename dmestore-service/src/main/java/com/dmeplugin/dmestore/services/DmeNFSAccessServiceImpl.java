@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.utils.StringUtil;
@@ -35,6 +36,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private DmeAccessService dmeAccessService;
     @Autowired
     private DmeStorageService dmeStorageService;
+    @Autowired
+    private DmeVmwareRalationDao dmeVmwareRalationDao;
 
 
     private VCSDKUtils vcsdkUtils;
@@ -197,7 +200,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         List<DmeVmwareRelation> relationList = new ArrayList<>();
         for (int i = 0; i < jsonArray.size(); i++) {
             JsonObject nfsDatastore = jsonArray.get(i).getAsJsonObject();
-            String store_type = ToolUtils.STORE_TYPE_VMFS;
+            String store_type = ToolUtils.STORE_TYPE_NFS;
             //TODO 暂时认为是从url中获取到wwn信息
             String nfsDatastoreUrl = nfsDatastore.get("url").getAsString();
             String nfsDatastoreId = nfsDatastore.get("id").getAsString();
@@ -212,16 +215,19 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 continue;
             }
             String storage_id = storageInfo.getId();
+            String storage_name = storageInfo.getName();
             DmeVmwareRelation relation = new DmeVmwareRelation();
             relation.setStoreId(storage_id);
+            relation.setStoreName(storage_name);
+            relation.setStoreType(store_type);
 
             //获取logicPort信息
             Map<String, Object> logicPortInfo = queryLogicPortInfo(storage_id);
             if (null != logicPortInfo && logicPortInfo.size() > 0) {
                 String id = ToolUtils.getStr(logicPortInfo.get("id"));
                 String name = ToolUtils.getStr(logicPortInfo.get("name"));
-                //relation.setLogicPortId(id);
-                //relation.setLogicPortName(name);
+                relation.setLogicPortId(id);
+                relation.setLogicPortName(name);
             }
 
             //获取share信息 (条件:sharePath  可加 storageId)
@@ -231,8 +237,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 fsName = ToolUtils.getStr(shareInfo.get("fs_name"));
                 String id = ToolUtils.getStr(shareInfo.get("id"));
                 String name = ToolUtils.getStr(shareInfo.get("name"));
-                //relation.setShareId(id);
-                //relation.setShareName(name);
+                relation.setShareId(id);
+                relation.setShareName(name);
             }
 
             //获取fs信息
@@ -240,8 +246,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             if (null != fsInfo && fsInfo.size() > 0) {
                 String id = ToolUtils.getStr(fsInfo.get("id"));
                 String name = ToolUtils.getStr(fsInfo.get("name"));
-                //relation.setfsId(id);
-                //relation.setFsName(name);
+                relation.setFsId(id);
+                relation.setFsName(name);
             }
 
             relationList.add(relation);
@@ -249,7 +255,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
         //数据库保存datastorage 与nfs的 share fs logicPort关系信息
         //dbsave();
-
+        dmeVmwareRalationDao.save(relationList);
 
         return false;
     }
