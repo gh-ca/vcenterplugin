@@ -424,6 +424,42 @@ public class VCSDKUtils {
         return listStr;
     }
 
+    //得到指定集群下的所有主机,以及指定主机所属集群下的所有主机
+    public  List<Pair<ManagedObjectReference, String>> getHostsOnCluster(String clusterName,String hostName) throws Exception {
+        List<Pair<ManagedObjectReference, String>> hosts = null;
+        try {
+            VmwareContext[] vmwareContexts=vcConnectionHelper.getAllContext();
+            for (VmwareContext vmwareContext:vmwareContexts) {
+                RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+
+                //集群下的所有主机
+                if (!StringUtils.isEmpty(clusterName)) {
+                    _logger.info("object cluster:" + clusterName);
+                    ClusterMO clusterMO = rootFsMO.findCluster(clusterName);
+                    hosts = clusterMO.getClusterHosts();
+                    _logger.info("Number of hosts in cluster:" + (hosts == null ? "null" : hosts.size()));
+                } else if (!StringUtils.isEmpty(hostName)) {  //目标主机所在集群下的其它主机
+                    _logger.info("object host:" + hostName);
+                    HostMO hostMO = rootFsMO.findHost(hostName);
+                    ManagedObjectReference cluster = hostMO.getHyperHostCluster();
+                    _logger.info("Host cluster id:" + cluster.getValue());
+                    if (cluster != null) {
+                        ClusterMO clusterMO = new ClusterMO(hostMO.getContext(), cluster);
+                        _logger.info("Host cluster name:" + clusterMO.getName());
+                        hosts = clusterMO.getClusterHosts();
+                    }
+                    _logger.info("Number of hosts in cluster:" + (hosts == null ? "null" : hosts.size()));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("get Host On Cluster error:", e);
+            throw e;
+        }
+
+        return hosts;
+    }
+
     public  String renameDataStore(String oldName, String newName) throws Exception {
 
         String result = "success";
@@ -767,8 +803,8 @@ public class VCSDKUtils {
 
     //创建vmfs存储
     public  String createVmfsDataStore(Map<String,Object> hsdmap, int capacity, String datastoreName,
-                                             int vmfsMajorVersion, int blockSize,
-                                             int unmapGranularity, String unmapPriority) throws Exception {
+                                       int vmfsMajorVersion, int blockSize,
+                                       int unmapGranularity, String unmapPriority) throws Exception {
         String dataStoreStr = "";
         try {
             if(hsdmap!=null && hsdmap.get("host")!=null) {
@@ -926,26 +962,9 @@ public class VCSDKUtils {
 
             VmwareContext[] vmwareContexts=vcConnectionHelper.getAllContext();
             for (VmwareContext vmwareContext:vmwareContexts) {
-                RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
-                List<Pair<ManagedObjectReference, String>> hosts = null;
                 //集群下的所有主机
-                if (!StringUtils.isEmpty(clusterName)) {
-                    _logger.info("object cluster:" + clusterName);
-                    ClusterMO clusterMO = rootFsMO.findCluster(clusterName);
-                    hosts = clusterMO.getClusterHosts();
-                    _logger.info("Number of hosts in cluster:" + (hosts == null ? "null" : hosts.size()));
-                } else if (!StringUtils.isEmpty(hostName)) {  //目标主机所在集群下的其它主机
-                    _logger.info("object host:" + hostName);
-                    HostMO hostMO = rootFsMO.findHost(hostName);
-                    ManagedObjectReference cluster = hostMO.getHyperHostCluster();
-                    _logger.info("Host cluster id:" + cluster.getValue());
-                    if (cluster != null) {
-                        ClusterMO clusterMO = new ClusterMO(hostMO.getContext(), cluster);
-                        _logger.info("Host cluster name:" + clusterMO.getName());
-                        hosts = clusterMO.getClusterHosts();
-                    }
-                    _logger.info("Number of hosts in cluster:" + (hosts == null ? "null" : hosts.size()));
-                }
+                List<Pair<ManagedObjectReference, String>> hosts = getHostsOnCluster(clusterName, hostName);
+
                 if (hosts != null && hosts.size() > 0) {
                     for (Pair<ManagedObjectReference, String> host : hosts) {
                         HostMO host1 = new HostMO(vmwareContext, host.first());
@@ -959,12 +978,12 @@ public class VCSDKUtils {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            _logger.error("get LUN error:", e);
+            _logger.error("mount Vmfs On Cluster error:", e);
             throw e;
         }
     }
     //挂载存储
-    public static void mountVmfs(String datastoreName,HostMO hostMO) throws Exception {
+    public void mountVmfs(String datastoreName,HostMO hostMO) throws Exception {
         try {
             if (StringUtils.isEmpty(datastoreName)) {
                 _logger.info("datastore Name is null");
@@ -1004,6 +1023,29 @@ public class VCSDKUtils {
         }
     }
 
+    //在主机上扫描卷和Datastore
+    public void scanDataStore(String clusterName,String hostName) throws Exception {
+        try {
+            VmwareContext[] vmwareContexts=vcConnectionHelper.getAllContext();
+            for (VmwareContext vmwareContext:vmwareContexts) {
+                //集群下的所有主机
+                List<Pair<ManagedObjectReference, String>> hosts = getHostsOnCluster(clusterName, hostName);
+
+                if (hosts != null && hosts.size() > 0) {
+                    for (Pair<ManagedObjectReference, String> host : hosts) {
+                        HostMO host1 = new HostMO(vmwareContext, host.first());
+                        _logger.info("Host under Cluster: " + host1.getName());
+                        host1.getHostStorageSystemMO().rescanVmfs();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("scan Data Store error:", e);
+            throw e;
+        }
+    }
+
     public static void main(String[] args) {
         try {
             Gson gson = new Gson();
@@ -1013,7 +1055,7 @@ public class VCSDKUtils {
 //            _logger.info("Vmfs listStr==" + listStr);
 //            listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_NFS);
 //            _logger.info("Vmfs listStr==" + listStr);
-           // _logger.info("Vmfs getAllClusters==" + VCSDKUtils.getDataStoresByHostName("10.143.132.17"));
+            // _logger.info("Vmfs getAllClusters==" + VCSDKUtils.getDataStoresByHostName("10.143.132.17"));
 ////////////////////////////////////getLunsOnHost//////////////////////////////////////////
 //            Map<String,Object> hsdmap = getLunsOnHost("10.143.133.196",10);
 //            if(hsdmap!=null ) {
