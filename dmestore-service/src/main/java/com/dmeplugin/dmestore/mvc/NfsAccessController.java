@@ -3,6 +3,7 @@ package com.dmeplugin.dmestore.mvc;
 import com.dmeplugin.dmestore.model.NfsDataInfo;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.model.VmfsDataInfo;
+import com.dmeplugin.dmestore.services.DmeNFSAccessService;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * @Description: TODO
+ * @ClassName: NfsAccessController
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 @RestController
 @RequestMapping(value = "/accessnfs")
 public class NfsAccessController extends BaseController{
@@ -22,11 +29,14 @@ public class NfsAccessController extends BaseController{
 
     @Autowired
     private Gson gson;
+    @Autowired
+    private DmeNFSAccessService dmeNFSAccessService;
 
-    /*
-   * Access nfs
-   * return: ResponseBodyBean
-   */
+    /**
+     * Access nfs
+
+     * @return: ResponseBodyBean
+     */
     @RequestMapping(value = "/listnfs", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean listNfs()
@@ -95,6 +105,18 @@ public class NfsAccessController extends BaseController{
    * param str mountType: 挂载模式（只读或读写）
    * return: ResponseBodyBean
    */
+    /**
+     * Mount nfs include:
+     * list<str> dataStoreNames: datastore名称列表 必
+     * list<str> volumeIds: 卷volumeId列表 必
+     * str host: 主机名称 必 （主机与集群二选一）
+     * str cluster: 集群名称 必（主机与集群二选一）
+     * str logic_port: 逻辑端口
+     * str mountType: 挂载模式（只读或读写）
+     *
+     * @param params: include dataStoreNames,volumeIds,host,cluster,logic_port,mountType
+     * @return: ResponseBodyBean
+     */
     @RequestMapping(value = "/mountnfs", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean mountNfs(@RequestBody Map<String, Object> params)
