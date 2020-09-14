@@ -26,7 +26,7 @@
         <property name="url" value="${h2.url}"/>
     </bean>
 
-    <bean name="dmeAccessServiceImpl" class="com.dmeplugin.dmestore.services.DmeAccessServiceImpl">
+    <bean name="dmeAccessService" class="com.dmeplugin.dmestore.services.DmeAccessServiceImpl">
         <property name="dmeInfoDao" ref="dmeInfoDao"/>
     </bean>
 
@@ -62,8 +62,18 @@
 
     <bean name="vmfsAccessService" class="com.dmeplugin.dmestore.services.VmfsAccessServiceImpl">
         <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
+        <property name="dmeAccessService" ref="dmeAccessService"/>
+        <property name="dataStoreStatisticHistoryService" ref="DataStoreStatisticHistoryService"/>
+        <property name="dmeStorageService" ref="dmeStorageService"/>
+        <property name="taskService" ref="taskService"/>
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
+
+    <bean name="DataStoreStatisticHistoryService"
+          class="com.dmeplugin.dmestore.services.DataStoreStatisticHistoryServiceImpl">
+    </bean>
+
+    <bean name="taskService" class="com.dmeplugin.dmestore.services.TaskServiceImpl"></bean>
 
     <bean name="dmeNFSAccessService" class="com.dmeplugin.dmestore.services.DmeNFSAccessServiceImpl">
     </bean>

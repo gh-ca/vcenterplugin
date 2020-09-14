@@ -23,17 +23,16 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     private static final Logger LOG = LoggerFactory.getLogger(VmfsAccessServiceImpl.class);
 
-    @Autowired
     private Gson gson = new Gson();
-    @Autowired
+
     private DmeVmwareRalationDao dmeVmwareRalationDao;
-    @Autowired
+
     private DmeAccessService dmeAccessService;
-    @Autowired
+
     private DataStoreStatisticHistoryService dataStoreStatisticHistoryService;
-    @Autowired
+
     private DmeStorageService dmeStorageService;
-    @Autowired
+
     private TaskService taskService;
 
     private VCSDKUtils vcsdkUtils;
@@ -1026,6 +1025,22 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     public void setDmeVmwareRalationDao(DmeVmwareRalationDao dmeVmwareRalationDao) {
         this.dmeVmwareRalationDao = dmeVmwareRalationDao;
+    }
+
+    public void setDmeAccessService(DmeAccessService dmeAccessService) {
+        this.dmeAccessService = dmeAccessService;
+    }
+
+    public void setDataStoreStatisticHistoryService(DataStoreStatisticHistoryService dataStoreStatisticHistoryService) {
+        this.dataStoreStatisticHistoryService = dataStoreStatisticHistoryService;
+    }
+
+    public void setDmeStorageService(DmeStorageService dmeStorageService) {
+        this.dmeStorageService = dmeStorageService;
+    }
+
+    public void setTaskService(TaskService taskService) {
+        this.taskService = taskService;
     }
 
     private String getTaskId(ResponseEntity responseEntity) {

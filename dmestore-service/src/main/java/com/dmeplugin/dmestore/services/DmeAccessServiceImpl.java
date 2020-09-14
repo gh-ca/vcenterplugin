@@ -24,7 +24,6 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     private DmeInfoDao dmeInfoDao;
 
-    @Autowired
     private Gson gson = new Gson();
 
     private static String dmeToken;
