@@ -44,7 +44,7 @@ public interface VmfsAccessService {
     /**
      * vmfs 指定卷详细信息查询
      */
-    VmfsDatastoreVolumeDetail volumeDetail(String volume_id) throws Exception;
+    VmfsDatastoreVolumeDetail volumeDetail(String volumeId) throws Exception;
 
     boolean scanVmfs() throws Exception;
 

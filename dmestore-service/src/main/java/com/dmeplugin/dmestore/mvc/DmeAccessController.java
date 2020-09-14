@@ -2,6 +2,7 @@ package com.dmeplugin.dmestore.mvc;
 
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.DmeAccessService;
+import com.dmeplugin.dmestore.utils.RestUtils;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author yy
+ */
 
 @RestController
 @RequestMapping(value = "/accessdme")
@@ -22,13 +26,15 @@ public class DmeAccessController extends BaseController {
     @Autowired
     private DmeAccessService dmeAccessService;
 
-    /*
+    /**
     * Access DME
-    * param str hostIp: Access to the IP address of the DME service
-    * param str hostPort: Port to access DME service
-    * param str userName: User name to access the DME service
-    * param str password: Password to access the DME service
-    * return: ResponseBodyBean
+    * params include hostIp: Access to the IP address of the DME service
+    * hostPort: Port to access DME service
+    * userName: User name to access the DME service
+    * password: Password to access the DME service
+    *
+    * @param params: include hostIp,hostPort,userName,password
+    * @return: ResponseBodyBean
     */
     @RequestMapping(value = "/access", method = RequestMethod.POST)
     @ResponseBody
@@ -37,17 +43,20 @@ public class DmeAccessController extends BaseController {
         LOG.info("accessdme/access params==" + gson.toJson(params));
         Map<String, Object> remap = dmeAccessService.accessDme(params);
         LOG.info("accessdme/access remap==" + gson.toJson(remap));
-        if (remap != null && remap.get("code") != null && remap.get("code").toString().equals("200")) {
+        if (remap != null && remap.get(RestUtils.RESPONSE_STATE_CODE) != null
+                && RestUtils.RESPONSE_STATE_200.equals(remap.get(RestUtils.RESPONSE_STATE_CODE).toString())) {
             return success(remap);
         }
 
         return failure(gson.toJson(remap));
     }
 
-    /*
-    * Refresh connection status
-    * return: ResponseBodyBean
-    */
+
+    /**
+     * Refresh connection status
+     *
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/refreshaccess", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean refreshDme()
@@ -55,18 +64,20 @@ public class DmeAccessController extends BaseController {
         LOG.info("accessdme/refreshaccess==");
         Map<String, Object> remap = dmeAccessService.refreshDme();
         LOG.info("accessdme/refreshaccess remap==" + gson.toJson(remap));
-        if (remap != null && remap.get("code") != null && remap.get("code").toString().equals("200")) {
+        if (remap != null && remap.get(RestUtils.RESPONSE_STATE_CODE) != null
+                && RestUtils.RESPONSE_STATE_200.equals(remap.get(RestUtils.RESPONSE_STATE_CODE).toString())) {
             return success(remap);
         }
 
         return failure(gson.toJson(remap));
     }
 
-    /*
-  * Access vmfs performance"
-  * return: Return ResponseBodyBean
-  *         data: list，including WorkLoad's data infos
-  */
+    /**
+     * Access workload info
+     *
+     * @param storageId storage id
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/getworkloads", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean getWorkLoads(@RequestParam("storageId") String storageId)
