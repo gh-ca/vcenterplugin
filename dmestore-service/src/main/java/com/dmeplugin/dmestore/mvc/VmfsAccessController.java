@@ -55,7 +55,8 @@ public class VmfsAccessController extends BaseController{
 
     /**
      * Access vmfs performance
-
+     *
+     * @param  volumeIds volumes id
      * @return: ResponseBodyBean
      */
     @RequestMapping(value = "/listvmfsperformance", method = RequestMethod.GET)
@@ -89,12 +90,10 @@ public class VmfsAccessController extends BaseController{
      * ServiceVolumeMapping对象包含如下属性
      * param str host_id: 主机id，与hostgroup_id二选其一,不可同时存在
      * param str hostgroup_id: 主机组id，与host_id二选其一，不可同时存在
-
      * param str service_level_id: 服务等级id 若未选择服务等级，可选择存储设备、存储池、设置QoS、Thin、Workload
      * param str service_level_name; 服务等级名称  必
      * param str project_id: 业务群组id
      * param str availability_zone: 可用分区id
-     *
      * param int version: 版本
      * param int blockSize: 块大小，单位KB
      * param int spaceReclamationGranularity   空间回收粒度 单位K
@@ -104,12 +103,10 @@ public class VmfsAccessController extends BaseController{
      * param str hostlun; 可用的lun 必
      * param str cluster: 集群
      * param str clusterId: 集群
-     *
      * param str storage_id 存储设备id
      * param str pool_raw_id 卷所属存储池在存储设备上的id
      * param integer workload_type_id 应用类型id
      * param str alloctype 卷分配类型，取值范围 thin，thick
-     *
      * 卷qos属性
      * param str  control_policy 控制策略
      * param integer  latency 时延，单位ms
@@ -118,8 +115,9 @@ public class VmfsAccessController extends BaseController{
      * param integer  minbandwidth 最小带宽
      * param integer  miniops 最小iops
      * param str qosname Smart QoS名称
-     * return: Return ResponseBodyBean
-
+     *
+     * @param params include Parameters above
+     * @return Return ResponseBodyBean
      * @return: ResponseBodyBean
      */
     @RequestMapping(value = "/createvmfs", method = RequestMethod.POST)
