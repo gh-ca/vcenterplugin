@@ -119,6 +119,11 @@ public class SystemServiceImpl implements SystemService {
     }
   }
 
+  public void cleanData() {
+    LOGGER.info("Clean data from all tables...");
+    systemDao.cleanAllData();
+  }
+
   public void setSystemDao(SystemDao systemDao) {
     this.systemDao = systemDao;
   }
