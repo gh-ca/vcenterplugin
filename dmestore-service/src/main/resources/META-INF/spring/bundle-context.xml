@@ -73,6 +73,7 @@
     </bean>
 
     <bean name="vmrdmService" class="com.dmeplugin.dmestore.services.VMRDMServiceImpl">
+        <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
 
     <bean name="vCSDKUtils" class="com.dmeplugin.dmestore.utils.VCSDKUtils">
