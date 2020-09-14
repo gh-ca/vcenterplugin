@@ -90,6 +90,33 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         return lists;
     }
 
+    public List<String> getAllStorageIdByType(String storeType) throws SQLException {
+        List<String> lists = new ArrayList<>();
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            String sql = "SELECT STORE_ID FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION
+                    + " WHERE state=1 ";
+            if (!StringUtils.isEmpty(storeType)) {
+                sql = sql + " and STORE_TYPE='" + storeType + "'";
+            }
+
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                lists.add(rs.getString("STORE_ID"));
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("Failed to get dme store info: " + e.getMessage());
+            throw new SQLException(e);
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return lists;
+    }
+
     public void update(List<DmeVmwareRelation> list) {
 
     }
@@ -170,5 +197,33 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         }
     }
 
+    public void deleteByStorageId(List<String> list) {
+        if (null == list || list.size() == 0) {
+            return;
+        }
+        Connection con = null;
+        PreparedStatement pstm = null;
+        try {
+            con = getConnection();
+            String sql = "delete from DP_DME_VMWARE_RELATION where STORE_ID=?";
+            pstm = con.prepareStatement(sql);
+            con.setAutoCommit(false);
+            for (String wwn : list) {
+                pstm.setString(1, wwn);
+                pstm.addBatch();
+            }
+            pstm.executeBatch();
+            con.commit();
+        } catch (Exception ex) {
+            try {
+                //回滚
+                con.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } finally {
+            closeConnection(con, pstm, null);
+        }
+    }
 
 }
