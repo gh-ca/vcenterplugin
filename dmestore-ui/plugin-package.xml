@@ -31,7 +31,7 @@
          War bundles don't need to be listed, they will be deployed afterward.
          Bundle Ids must match the Bundle-SymbolicName in each bundle's MANIFEST.MF!
       -->
-      <bundle id="com.google.gson" />
+      <bundle id="com.vmware.wsvim25" />
       <bundle id="com.dmeplugin.dmestore.dmestore-service" />
       <bundle id="com.dmeplugin.dmestore.dmestore-ui" />
    </bundlesOrder>
