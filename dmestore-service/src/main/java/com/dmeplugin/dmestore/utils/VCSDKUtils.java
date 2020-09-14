@@ -1046,6 +1046,31 @@ public class VCSDKUtils {
         }
     }
 
+    /**
+     * @Author Administrator
+     * @Description 为指定的虚拟机创建磁盘
+     * @Date 11:41 2020/9/14
+     * @Param [datacenter_name, datastore_name, vm_name, rdmdevicename, size]
+     * @Return void
+     **/
+    public void createDisk(String datacenter_name, String datastore_name, String vm_name, String rdmdevicename, int size) throws Exception{
+        VmwareContext[] vmwareContexts=vcConnectionHelper.getAllContext();
+        for(VmwareContext vmwareContext: vmwareContexts){
+            DatacenterMO dcMo = new DatacenterMO(vmwareContext, datacenter_name);
+            DatastoreMO dsMo = new DatastoreMO(vmwareContext, dcMo.findDatastore(datastore_name));
+            VirtualMachineMO virtualMachineMO = new VirtualMachineMO(vmwareContext, vm_name);
+            String vmdkDatastorePath = dsMo.getDatastorePath(datastore_name);
+            int sizeInMb = size;
+            try {
+                virtualMachineMO.createDisk(vmdkDatastorePath, VirtualDiskType.RDM, VirtualDiskMode.PERSISTENT,
+                        rdmdevicename, sizeInMb, dsMo.getMor(), -1);
+            }catch (Exception ex){
+                _logger.error("create vcenter disk rdm failed!errorMsg:{}", ex.getMessage());
+                throw  new Exception(ex.getMessage());
+            }
+        }
+    }
+
     public static void main(String[] args) {
         try {
             Gson gson = new Gson();
