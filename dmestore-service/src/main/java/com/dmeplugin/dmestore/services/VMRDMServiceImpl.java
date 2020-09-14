@@ -26,10 +26,10 @@ import java.util.Map;
 public class VMRDMServiceImpl implements VMRDMService {
     private static final Logger LOG = LoggerFactory.getLogger(VMRDMServiceImpl.class);
 
-    @Autowired
+    //@Autowired
     private DmeAccessService dmeAccessService;
 
-    @Autowired
+    //@Autowired
     private TaskService taskService;
 
     @Autowired
@@ -43,6 +43,22 @@ public class VMRDMServiceImpl implements VMRDMService {
 
     public void setVcsdkUtils(VCSDKUtils vcsdkUtils) {
         this.vcsdkUtils = vcsdkUtils;
+    }
+
+    public DmeAccessService getDmeAccessService() {
+        return dmeAccessService;
+    }
+
+    public void setDmeAccessService(DmeAccessService dmeAccessService) {
+        this.dmeAccessService = dmeAccessService;
+    }
+
+    public TaskService getTaskService() {
+        return taskService;
+    }
+
+    public void setTaskService(TaskService taskService) {
+        this.taskService = taskService;
     }
 
     @Override

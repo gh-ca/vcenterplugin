@@ -80,12 +80,17 @@
     <bean name="taskService" class="com.dmeplugin.dmestore.services.TaskServiceImpl"></bean>
 
     <bean name="dmeNFSAccessService" class="com.dmeplugin.dmestore.services.DmeNFSAccessServiceImpl">
+        <property name="vcsdkUtils" ref="vCSDKUtils"/>
+        <property name="dmeAccessService" ref="dmeAccessService"/>
+        <property name="dmeStorageService" ref="dmeStorageService"/>
     </bean>
 
     <bean name="vmfsOperationService" class="com.dmeplugin.dmestore.services.VmfsOperationServiceImpl"/>
 
     <bean name="vmrdmService" class="com.dmeplugin.dmestore.services.VMRDMServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
+        <property name="dmeAccessService" ref="dmeAccessService"/>
+        <property name="taskService" ref="taskService"/>
     </bean>
 
 
