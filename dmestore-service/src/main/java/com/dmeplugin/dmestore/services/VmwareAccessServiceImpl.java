@@ -16,7 +16,6 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
 
     private static final Logger LOG = LoggerFactory.getLogger(VmwareAccessServiceImpl.class);
 
-    @Autowired
     private Gson gson = new Gson();
 
     private VCSDKUtils vcsdkUtils;

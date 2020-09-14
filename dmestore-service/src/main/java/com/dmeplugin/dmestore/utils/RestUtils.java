@@ -26,6 +26,9 @@ import java.security.NoSuchAlgorithmException;
  * Created by yuanqi on 2020/8/31.
  */
 public class RestUtils {
+    public final static String RESPONSE_STATE_CODE = "code";
+    public final static String RESPONSE_STATE_200 = "200";
+
     public RestTemplate getRestTemplate() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
         SSLContextBuilder builder = new SSLContextBuilder();
         builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
