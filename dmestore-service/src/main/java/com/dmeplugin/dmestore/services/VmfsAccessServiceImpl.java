@@ -607,6 +607,19 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 if (mountFlag) { //DME创建完成
                     //调用vCenter在主机上扫描卷和Datastore
                     vcsdkUtils.scanDataStore(ToolUtils.getStr(params.get("cluster")),ToolUtils.getStr(params.get("host")));
+                    //如果是需要扫描LUN来挂载，则需要执行下面的方法，dataStoreNames
+//                    {
+//                        List<String> dataStoreNames = (List<String>) params.get("dataStoreNames");
+//                        //
+//                        if (dataStoreNames != null && dataStoreNames.size() > 0) {
+//                            for (String dataStoreName : dataStoreNames) {
+//                                Map<String, Object> dsmap = new HashMap<>();
+//                                dsmap.put("name", dataStoreName);
+//
+//                                vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), ToolUtils.getStr(params.get("cluster")), ToolUtils.getStr(params.get("host")));
+//                            }
+//                        }
+//                    }
                 } else {
                     throw new Exception("DME mount vmfs volume error(task status)!");
                 }
