@@ -232,17 +232,20 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     //创建vmware中的vmfs存储。
                     String dataStoreStr = createVmfsOnVmware(params);
                     LOG.info("Vmfs dataStoreStr==" + dataStoreStr);
-
-                    //将DME卷与vmfs的关系保存数据库
-
-                    //关联服务等级
-                    if (params.get("service_level_id") != null) {
-                        String serviceLevelName = ToolUtils.getStr(params.get("service_level_name"));
-                        Map<String, Object> dsmap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {
+                    if(!StringUtils.isEmpty(dataStoreStr)) {
+                        Map<String, Object> dataStoreMap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {
                         }.getType());
-                        if (dsmap != null) {
-                            String attachTagStr = vcsdkUtils.attachTag(ToolUtils.getStr(dsmap.get("type")), ToolUtils.getStr(dsmap.get("id")), serviceLevelName);
-                            LOG.info("Vmfs attachTagStr==" + attachTagStr);
+                        if (dataStoreMap != null) {
+                            //通过卷的名称去DME查询卷的信息
+                            Map<String, Object> volumeMap = getVolumeByName(ToolUtils.getStr(params.get("volumeName")));
+                            //将DME卷与vmfs的关系保存数据库
+                            saveDmeVmwareRalation(volumeMap,dataStoreMap);
+                            //关联服务等级
+                            if (params.get("service_level_id") != null) {
+                                String serviceLevelName = ToolUtils.getStr(params.get("service_level_name"));
+                                String attachTagStr = vcsdkUtils.attachTag(ToolUtils.getStr(dataStoreMap.get("type")), ToolUtils.getStr(dataStoreMap.get("id")), serviceLevelName);
+                                LOG.info("Vmfs attachTagStr==" + attachTagStr);
+                            }
                         }
                     }
                 } else {
@@ -512,7 +515,64 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return objId;
     }
+    //根据卷名称查询DME卷的信息
+    private Map<String, Object> getVolumeByName(String volumeName) {
+        Map<String, Object> remap = null;
+        String volumeUrlByName = LIST_VOLUME_URL + "?name=" + volumeName;
+        try {
+            ResponseEntity responseEntity = dmeAccessService.access(volumeUrlByName, HttpMethod.GET, null);
+            LOG.info("getVolumeByName responseEntity==" + responseEntity.toString());
+            if (responseEntity.getStatusCodeValue() == 200) {
+                JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                //LOG.info("listVmfs jsonObject==" + jsonObject.toString());
+                if(jsonObject!=null && jsonObject.get("volumes")!=null) {
+                    JsonArray jsonArray = jsonObject.getAsJsonArray("volumes");
+                    for (int i = 0; i < jsonArray.size(); i++) {
+                        JsonObject vjson = jsonArray.get(i).getAsJsonObject();
+                        if (vjson != null && vjson.get("name") != null && ToolUtils.jsonToStr(vjson.get("name")).equals(volumeName)) {
+                            remap = new HashMap<>();
+                            remap.put("volume_id", ToolUtils.jsonToStr(vjson.get("id")));
+                            remap.put("volume_name", ToolUtils.jsonToStr(vjson.get("name")));
+                            remap.put("volume_wwn", ToolUtils.jsonToStr(vjson.get("volume_wwn")));
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("DME link error url:" + volumeUrlByName + ",error:" + e.getMessage());
+        }
+        LOG.info("remap===" + (remap == null ? "null" : (remap.size() + "==" + gson.toJson(remap))));
+        return remap;
+    }
+    //保存卷与vmfs的关联关系
+    private void saveDmeVmwareRalation(Map<String, Object> volumeMap,Map<String, Object> dataStoreMap){
+        try {
+            if(volumeMap==null || volumeMap.get("volume_id")==null){
+                LOG.error("save Dme and Vmware's vmfs Ralation error: volume data is null");
+                return;
+            }
+            if(dataStoreMap==null || dataStoreMap.get("id")==null){
+                LOG.error("save Dme and Vmware's vmfs Ralation error: dataStore data is null");
+                return;
+            }
+            List<DmeVmwareRelation> rallist = new ArrayList<>();
 
+            DmeVmwareRelation dvr = new DmeVmwareRelation();
+            dvr.setStoreId(ToolUtils.getStr(dataStoreMap.get("id")));
+            dvr.setStoreName(ToolUtils.getStr(dataStoreMap.get("name")));
+            dvr.setVolumeId(ToolUtils.getStr(volumeMap.get("volume_id")));
+            dvr.setVolumeName(ToolUtils.getStr(volumeMap.get("volume_name")));
+            dvr.setVolumeWwn(ToolUtils.getStr(volumeMap.get("volume_wwn")));
+            dvr.setStoreType(ToolUtils.STORE_TYPE_VMFS);
+
+            rallist.add(dvr);
+            dmeVmwareRalationDao.save(rallist);
+            LOG.info("save DmeVmwareRalation success");
+        }catch (Exception e){
+            LOG.error("save DmeVmwareRalation error:",e);
+        }
+    }
     /*
    * Mount vmfs
    * param list<str> volumeIds: 卷volumeId列表 必
