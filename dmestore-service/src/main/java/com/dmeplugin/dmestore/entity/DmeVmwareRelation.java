@@ -33,13 +33,6 @@ public class DmeVmwareRelation implements Serializable {
   private Date updateTime;
   private int state;
 
-  private String shareId;
-  private String shareName;
-  private String fsId;
-  private String fsName;
-  private String logicPortId;
-  private String logicPortName;
-
   public int getId() {
     return id;
   }
@@ -104,38 +97,6 @@ public class DmeVmwareRelation implements Serializable {
     this.volumeFs = volumeFs;
   }
 
-  public String getStoreType() {
-    return storeType;
-  }
-
-  public void setStoreType(String storeType) {
-    this.storeType = storeType;
-  }
-
-  public Date getCreateTime() {
-    return createTime;
-  }
-
-  public void setCreateTime(Date createTime) {
-    this.createTime = createTime;
-  }
-
-  public Date getUpdateTime() {
-    return updateTime;
-  }
-
-  public void setUpdateTime(Date updateTime) {
-    this.updateTime = updateTime;
-  }
-
-  public int getState() {
-    return state;
-  }
-
-  public void setState(int state) {
-    this.state = state;
-  }
-
   public String getShareId() {
     return shareId;
   }
@@ -182,5 +143,37 @@ public class DmeVmwareRelation implements Serializable {
 
   public void setLogicPortName(String logicPortName) {
     this.logicPortName = logicPortName;
+  }
+
+  public String getStoreType() {
+    return storeType;
+  }
+
+  public void setStoreType(String storeType) {
+    this.storeType = storeType;
+  }
+
+  public Date getCreateTime() {
+    return createTime;
+  }
+
+  public void setCreateTime(Date createTime) {
+    this.createTime = createTime;
+  }
+
+  public Date getUpdateTime() {
+    return updateTime;
+  }
+
+  public void setUpdateTime(Date updateTime) {
+    this.updateTime = updateTime;
+  }
+
+  public int getState() {
+    return state;
+  }
+
+  public void setState(int state) {
+    this.state = state;
   }
 }

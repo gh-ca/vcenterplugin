@@ -36,8 +36,6 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private DmeAccessService dmeAccessService;
 
     private DmeStorageService dmeStorageService;
-    @Autowired
-    private DmeVmwareRalationDao dmeVmwareRalationDao;
 
     private DataStoreStatisticHistoryService dataStoreStatisticHistoryService;
 

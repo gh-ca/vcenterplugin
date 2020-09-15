@@ -36,12 +36,6 @@ public class DPSqlFileConstant {
           "    logicport_id VARCHAR(255),\n" +
           "    logicport_name VARCHAR(255),\n" +
           "    store_type VARCHAR(255),\n" +
-          "    share_id VARCHAR(255),\n" +
-          "    share_name VARCHAR(255),\n" +
-          "    fs_id VARCHAR(255),\n" +
-          "    fs_name VARCHAR(255),\n" +
-          "    logicport_id VARCHAR(255),\n" +
-          "    logicport_name VARCHAR(255),\n" +
           "    createTime datetime DEFAULT NOW(),\n" +
           "    updateTime datetime DEFAULT NOW(),\n" +
           "    STATE int DEFAULT 1\n" +

@@ -58,11 +58,6 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 dvr.setCreateTime(rs.getTimestamp("CREATETIME"));
                 dvr.setUpdateTime(rs.getTimestamp("UPDATETIME"));
                 dvr.setState(rs.getInt("STATE"));
-                dvr.setShareId(rs.getString("SHARE_ID"));
-                dvr.setFsId(rs.getString("FS_ID"));
-                dvr.setFsName(rs.getString("FS_NAME"));
-                dvr.setLogicPortId(rs.getString("LOGICPORT_ID"));
-                dvr.setLogicPortName(rs.getString("LOGICPORT_NAME"));
                 lists.add(dvr);
             }
         } catch (DataBaseException | SQLException e) {
