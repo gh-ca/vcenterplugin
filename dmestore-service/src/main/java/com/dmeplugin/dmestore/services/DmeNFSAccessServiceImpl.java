@@ -28,13 +28,13 @@ import java.util.Map;
 public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private static final Logger LOG = LoggerFactory.getLogger(DmeNFSAccessServiceImpl.class);
 
-    @Autowired
-    private Gson gson;
+    private Gson gson = new Gson();
 
-    //@Autowired
     private DmeAccessService dmeAccessService;
-    //@Autowired
+
     private DmeStorageService dmeStorageService;
+
+    private DataStoreStatisticHistoryService dataStoreStatisticHistoryService;
 
 
     private VCSDKUtils vcsdkUtils;
@@ -61,6 +61,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     public void setDmeStorageService(DmeStorageService dmeStorageService) {
         this.dmeStorageService = dmeStorageService;
+    }
+
+    public void setDataStoreStatisticHistoryService(DataStoreStatisticHistoryService dataStoreStatisticHistoryService) {
+        this.dataStoreStatisticHistoryService = dataStoreStatisticHistoryService;
     }
 
     @Override
@@ -430,6 +434,155 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             storageMap.put(ip, storage);
         }
         return storageMap;
+    }
+
+
+    @Override
+    public List<NfsDataInfo> listNfs() throws Exception{
+        List<NfsDataInfo> relists = null;
+        try {
+            //从关系表中取得DME卷与vcenter存储的对应关系
+//            List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_VMFS);
+//            LOG.info("dvrlist==" + gson.toJson(dvrlist));
+//            if (dvrlist != null && dvrlist.size() > 0) {
+//                //整理数据
+//                Map<String, DmeVmwareRelation> dvrMap = getDvrMap(dvrlist);
+//                //取得所有的存储设备
+//                Map<String, Object> storagemap = dmeStorageService.getStorages();
+//                //整理数据
+//                Map<String, String> stoNameMap = getStorNameMap(storagemap);
+//                LOG.info("stoNameMap===" + gson.toJson(stoNameMap));
+//                //取得vcenter中的所有vmfs存储。
+//                String listStr = vcsdkUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_VMFS);
+//                LOG.info("Vmfs listStr==" + listStr);
+//                if (!StringUtils.isEmpty(listStr)) {
+//                    JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
+//                    if (jsonArray != null && jsonArray.size() > 0) {
+//                        relists = new ArrayList<>();
+//                        for (int i = 0; i < jsonArray.size(); i++) {
+//                            JsonObject jo = jsonArray.get(i).getAsJsonObject();
+//                            //LOG.info("jo==" + jo.toString());
+//                            String vmwareStoreName = ToolUtils.jsonToStr(jo.get("name"));
+//                            if (!StringUtils.isEmpty(vmwareStoreName)) {
+//                                //对比数据库关系表中的数据，只显示关系表中的数据
+//                                if (dvrMap != null && dvrMap.get(vmwareStoreName) != null) {
+//                                    VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
+//                                    double capacity = ToolUtils.getDouble(jo.get("capacity")) / ToolUtils.Gi;
+//                                    double freeSpace = ToolUtils.getDouble(jo.get("freeSpace")) / ToolUtils.Gi;
+//                                    double uncommitted = ToolUtils.getDouble(jo.get("uncommitted")) / ToolUtils.Gi;
+//
+//                                    vmfsDataInfo.setName(vmwareStoreName);
+//
+//                                    vmfsDataInfo.setCapacity(capacity);
+//                                    vmfsDataInfo.setFreeSpace(freeSpace);
+//                                    vmfsDataInfo.setReserveCapacity(capacity + uncommitted - freeSpace);
+//
+//                                    String wwn = jo.get("url").getAsString();
+//                                    LOG.info("wwn==" + wwn);
+//                                    //然后通过vmfs中的url值去DME系统中查询对应wwn的卷信息。
+//                                    ///rest/blockservice/v1/volumes?volume_wwn=wwn
+//                                    //这里由于DME系统中的卷太多。是分页查询，所以需要vmfs一个个的去查DME系统中的卷。
+//                                    //而每次查询DME中的卷都需要调用两次，分别是查卷列表接口，查卷详细接口。
+//                                    String volumeUrlByWwn = LIST_VOLUME_URL + "?volume_wwn=" + wwn;
+//                                    try {
+//                                        ResponseEntity responseEntity = dmeAccessService.access(volumeUrlByWwn, HttpMethod.GET, null);
+//                                        LOG.info("listVmfs responseEntity==" + responseEntity.toString());
+//                                        if (responseEntity.getStatusCodeValue() == 200) {
+//                                            JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+//                                            //LOG.info("listVmfs jsonObject==" + jsonObject.toString());
+//                                            JsonObject vjson = jsonObject.getAsJsonArray("volumes").get(0).getAsJsonObject();
+//
+//                                            vmfsDataInfo.setVolumeId(ToolUtils.jsonToStr(vjson.get("id")));
+//                                            vmfsDataInfo.setStatus(ToolUtils.jsonToStr(vjson.get("status")));
+//                                            vmfsDataInfo.setServiceLevelName(ToolUtils.jsonToStr(vjson.get("service_level_name")));
+//                                            vmfsDataInfo.setVmfsProtected(ToolUtils.jsonToBoo(vjson.get("protected")));
+//
+//                                            String storageId = ToolUtils.jsonToStr(vjson.get("storage_id"));
+//                                            vmfsDataInfo.setDeviceId(storageId);
+//                                            vmfsDataInfo.setDevice(stoNameMap == null ? "" : stoNameMap.get(storageId));
+//
+//                                            String volid = ToolUtils.jsonToStr(vjson.get("id"));
+//                                            //通过卷ID再调卷详细接口
+//                                            String detailedVolumeUrl = LIST_VOLUME_URL + "/" + volid;
+//                                            try {
+//                                                responseEntity = dmeAccessService.access(detailedVolumeUrl, HttpMethod.GET, null);
+//                                                LOG.info("volid responseEntity==" + responseEntity.toString());
+//                                                if (responseEntity.getStatusCodeValue() == 200) {
+//                                                    JsonObject voljson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+//                                                    //LOG.info("volid voljson==" + voljson.toString());
+//                                                    JsonObject vjson2 = voljson.getAsJsonObject("volume");
+//                                                    if (vjson2 != null && vjson2.get("tuning") != null) {
+//                                                        JsonObject tuning = vjson2.getAsJsonObject("tuning");
+//                                                        if (tuning != null && tuning.get("smartqos") != null) {
+//                                                            JsonObject smartqos = tuning.getAsJsonObject("smartqos");
+//                                                            if (smartqos != null) {
+//                                                                vmfsDataInfo.setMaxIops(ToolUtils.jsonToInt(smartqos.get("maxiops"), null));
+//                                                                vmfsDataInfo.setMinIops(ToolUtils.jsonToInt(smartqos.get("miniops"), null));
+//                                                                vmfsDataInfo.setMaxBandwidth(ToolUtils.jsonToInt(smartqos.get("maxbandwidth"), null));
+//                                                                ;
+//                                                                vmfsDataInfo.setMinBandwidth(ToolUtils.jsonToInt(smartqos.get("minbandwidth"), null));
+//                                                                vmfsDataInfo.setLatency(ToolUtils.jsonToInt(smartqos.get("latency"), null));
+//                                                            }
+//                                                        }
+//                                                    }
+//                                                }
+//                                            } catch (Exception ex) {
+//                                                LOG.error("DME link error url:" + detailedVolumeUrl + ",error:" + ex.getMessage());
+//                                            }
+//
+//                                            relists.add(vmfsDataInfo);
+//                                        }
+//                                    } catch (Exception e) {
+//                                        LOG.error("DME link error url:" + volumeUrlByWwn + ",error:" + e.getMessage());
+//                                    }
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+        } catch (Exception e) {
+            LOG.error("list nfs error:", e);
+            throw e;
+        }
+        LOG.info("relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        return relists;
+    }
+
+    @Override
+    public List<NfsDataInfo> listNfsPerformance(List<String> fsIds) throws Exception{
+        List<NfsDataInfo> relists = null;
+        try {
+            if (fsIds != null && fsIds.size() > 0) {
+                Map<String, Object> params = new HashMap<>();
+                params.put("obj_ids", fsIds);
+                Map<String, Object> remap = dataStoreStatisticHistoryService.queryNfsStatisticCurrent(params);
+                LOG.info("remap===" + gson.toJson(remap));
+                if (remap != null && remap.get("data") != null) {
+                    JsonObject dataJson = (JsonObject) remap.get("data");
+                    if (dataJson != null) {
+                        relists = new ArrayList<>();
+                        for (String fsId : fsIds) {
+                            JsonObject statisticObject = dataJson.getAsJsonObject(fsId);
+                            if (statisticObject != null) {
+                                NfsDataInfo nfsDataInfo = new NfsDataInfo();
+                                nfsDataInfo.setFsId(fsId);
+                                nfsDataInfo.setOPS(ToolUtils.jsonToInt(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_IOPS), null));
+                                nfsDataInfo.setBandwidth(ToolUtils.jsonToDou(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_BANDWIDTH), null));
+                                nfsDataInfo.setReadResponseTime(ToolUtils.jsonToInt(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_READPESPONSETIME), null));
+                                nfsDataInfo.setWriteResponseTime(ToolUtils.jsonToInt(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_WRITERESPONSETIME), null));
+                                relists.add(nfsDataInfo);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("list nfs performance error:", e);
+            throw e;
+        }
+        LOG.info("listNfsPerformance relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        return relists;
     }
 
 }
