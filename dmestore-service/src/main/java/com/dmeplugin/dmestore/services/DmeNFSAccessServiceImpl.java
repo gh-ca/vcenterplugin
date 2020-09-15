@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.utils.StringUtil;
@@ -33,6 +34,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private DmeAccessService dmeAccessService;
 
     private DmeStorageService dmeStorageService;
+    @Autowired
+    private DmeVmwareRalationDao dmeVmwareRalationDao;
 
     private DataStoreStatisticHistoryService dataStoreStatisticHistoryService;
 
@@ -199,7 +202,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         // DME share, 通过sharePath(可加storageId)查询share 提取fs_name
         // DME FileService, 通过fs_name和storageId查询fs (需求文档说明是通过share path, 但API不支持)
 
-        String listStr = vcsdkUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_NFS);
+        String store_type = ToolUtils.STORE_TYPE_NFS;
+        String listStr = vcsdkUtils.getAllVmfsDataStores(store_type);
         LOG.info("===list nfs datastore success====\n{}", listStr);
         if (StringUtils.isEmpty(listStr)) {
             return false;
@@ -217,7 +221,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         List<DmeVmwareRelation> relationList = new ArrayList<>();
         for (int i = 0; i < jsonArray.size(); i++) {
             JsonObject nfsDatastore = jsonArray.get(i).getAsJsonObject();
-            String store_type = ToolUtils.STORE_TYPE_VMFS;
+
             //TODO 暂时认为是从url中获取到wwn信息
             String nfsDatastoreUrl = nfsDatastore.get("url").getAsString();
             String nfsDatastoreId = nfsDatastore.get("id").getAsString();
@@ -232,16 +236,19 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 continue;
             }
             String storage_id = storageInfo.getId();
+            String storage_name = storageInfo.getName();
             DmeVmwareRelation relation = new DmeVmwareRelation();
             relation.setStoreId(storage_id);
+            relation.setStoreName(storage_name);
+            relation.setStoreType(store_type);
 
             //获取logicPort信息
             Map<String, Object> logicPortInfo = queryLogicPortInfo(storage_id);
             if (null != logicPortInfo && logicPortInfo.size() > 0) {
                 String id = ToolUtils.getStr(logicPortInfo.get("id"));
                 String name = ToolUtils.getStr(logicPortInfo.get("name"));
-                //relation.setLogicPortId(id);
-                //relation.setLogicPortName(name);
+                relation.setLogicPortId(id);
+                relation.setLogicPortName(name);
             }
 
             //获取share信息 (条件:sharePath  可加 storageId)
@@ -251,8 +258,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 fsName = ToolUtils.getStr(shareInfo.get("fs_name"));
                 String id = ToolUtils.getStr(shareInfo.get("id"));
                 String name = ToolUtils.getStr(shareInfo.get("name"));
-                //relation.setShareId(id);
-                //relation.setShareName(name);
+                relation.setShareId(id);
+                relation.setShareName(name);
             }
 
             //获取fs信息
@@ -260,18 +267,49 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             if (null != fsInfo && fsInfo.size() > 0) {
                 String id = ToolUtils.getStr(fsInfo.get("id"));
                 String name = ToolUtils.getStr(fsInfo.get("name"));
-                //relation.setfsId(id);
-                //relation.setFsName(name);
+                relation.setFsId(id);
+                relation.setFsName(name);
             }
-
             relationList.add(relation);
         }
 
         //数据库保存datastorage 与nfs的 share fs logicPort关系信息
-        //dbsave();
-
-
+        if (relationList.size() > 0) {
+            return dmeVmwareRelationDBProcess(relationList, store_type);
+        }
         return false;
+    }
+
+    private boolean dmeVmwareRelationDBProcess(List<DmeVmwareRelation> relationList, String storeType) throws Exception {
+        //本地全量查询NFS
+        List<String> storageIds = dmeVmwareRalationDao.getAllStorageIdByType(storeType);
+
+        List<DmeVmwareRelation> newList = new ArrayList<>();
+        List<DmeVmwareRelation> upList = new ArrayList<>();
+        for (DmeVmwareRelation relation : relationList) {
+            String storege_id = relation.getStoreId();
+            if (storageIds.contains(storege_id)) {
+                upList.add(relation);
+                storageIds.remove(storege_id);
+            } else {
+                newList.add(relation);
+            }
+        }
+
+        //更新
+        if (!upList.isEmpty()) {
+            dmeVmwareRalationDao.update(upList);
+        }
+
+        //新增
+        if (!newList.isEmpty()) {
+            dmeVmwareRalationDao.save(newList);
+        }
+        //删除
+        if (!storageIds.isEmpty()) {
+            dmeVmwareRalationDao.deleteByStorageId(storageIds);
+        }
+        return true;
     }
 
     //按条件查询share 暂认为 storage与share是一对一的关系

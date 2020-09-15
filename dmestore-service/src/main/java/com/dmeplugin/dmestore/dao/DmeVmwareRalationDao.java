@@ -52,6 +52,11 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 dvr.setCreateTime(rs.getTimestamp("CREATETIME"));
                 dvr.setUpdateTime(rs.getTimestamp("UPDATETIME"));
                 dvr.setState(rs.getInt("STATE"));
+                dvr.setShareId(rs.getString("SHARE_ID"));
+                dvr.setFsId(rs.getString("FS_ID"));
+                dvr.setFsName(rs.getString("FS_NAME"));
+                dvr.setLogicPortId(rs.getString("LOGICPORT_ID"));
+                dvr.setLogicPortName(rs.getString("LOGICPORT_NAME"));
                 lists.add(dvr);
             }
         } catch (DataBaseException | SQLException e) {
@@ -91,6 +96,33 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         return lists;
     }
 
+    public List<String> getAllStorageIdByType(String storeType) throws SQLException {
+        List<String> lists = new ArrayList<>();
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            String sql = "SELECT STORE_ID FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION
+                    + " WHERE state=1 ";
+            if (!StringUtils.isEmpty(storeType)) {
+                sql = sql + " and STORE_TYPE='" + storeType + "'";
+            }
+
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                lists.add(rs.getString("STORE_ID"));
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("Failed to get dme store info: " + e.getMessage());
+            throw new SQLException(e);
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return lists;
+    }
+
     public void update(List<DmeVmwareRelation> list) {
 
     }
@@ -104,7 +136,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         PreparedStatement pstm = null;
         try {
             con = getConnection();
-            String sql = "insert into DP_DME_VMWARE_RELATION(STORE_ID,STORE_NAME,VOLUME_ID,VOLUME_NAME,VOLUME_WWN,VOLUME_SHARE,VOLUME_FS,STORE_TYPE) values(?,?,?,?,?,?,?,?)";
+            String sql = "insert into DP_DME_VMWARE_RELATION(STORE_ID,STORE_NAME,VOLUME_ID,VOLUME_NAME,VOLUME_WWN,VOLUME_SHARE,VOLUME_FS,STORE_TYPE,SHARE_ID,SHARE_NAME,FS_ID,FS_NAME,LOGICPORT_ID,LOGIC_PORT_NAME) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             pstm = con.prepareStatement(sql);
             //不自动提交
             con.setAutoCommit(false);
@@ -117,7 +149,12 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 pstm.setString(6, relation.getVolumeShare());
                 pstm.setString(7, relation.getVolumeFs());
                 pstm.setString(8, relation.getStoreType());
-
+                pstm.setString(9, relation.getShareId());
+                pstm.setString(10, relation.getShareName());
+                pstm.setString(11, relation.getFsId());
+                pstm.setString(12, relation.getFsName());
+                pstm.setString(13, relation.getLogicPortId());
+                pstm.setString(14, relation.getLogicPortName());
                 pstm.addBatch();
             }
             pstm.executeBatch();
@@ -166,5 +203,33 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         }
     }
 
+    public void deleteByStorageId(List<String> list) {
+        if (null == list || list.size() == 0) {
+            return;
+        }
+        Connection con = null;
+        PreparedStatement pstm = null;
+        try {
+            con = getConnection();
+            String sql = "delete from DP_DME_VMWARE_RELATION where STORE_ID=?";
+            pstm = con.prepareStatement(sql);
+            con.setAutoCommit(false);
+            for (String wwn : list) {
+                pstm.setString(1, wwn);
+                pstm.addBatch();
+            }
+            pstm.executeBatch();
+            con.commit();
+        } catch (Exception ex) {
+            try {
+                //回滚
+                con.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } finally {
+            closeConnection(con, pstm, null);
+        }
+    }
 
 }
