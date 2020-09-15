@@ -65,4 +65,6 @@ public class DmeConstants {
      * NFS logic_port query
      */
     public static final String DME_NFS_LOGICPORT_QUERY_URL = "/rest/storagemgmt/v1/storage-port/logic-ports?storage_id=#{storage_id}";
+
+
 }

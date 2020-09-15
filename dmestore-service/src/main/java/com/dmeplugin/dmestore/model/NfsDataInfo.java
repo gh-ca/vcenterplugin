@@ -7,7 +7,8 @@ public class NfsDataInfo {
     Double capacity;  //总容量 单位GB
     Double freeSpace; //空闲容量 单位GB
     Double reserveCapacity; //置备容量  capacity+uncommitted-freeSpace 单位GB
-    String device; //设备
+    String deviceId; //存储设备ID
+    String device; //存储设备名称
     String logicPort; //逻辑端口
     String logicPortId; //逻辑端口 id
     String shareIp; //share ip
@@ -166,5 +167,13 @@ public class NfsDataInfo {
 
     public void setWriteResponseTime(Integer writeResponseTime) {
         this.writeResponseTime = writeResponseTime;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 }
