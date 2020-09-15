@@ -52,7 +52,6 @@
           class="com.dmeplugin.dmestore.services.VCenterInfoServiceImpl">
     </bean>
 
-    <bean name="taskService" class="com.dmeplugin.dmestore.services.TaskServiceImpl"></bean>
 
     <bean name="dmeStorageService" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
     </bean>
@@ -73,12 +72,16 @@
           class="com.dmeplugin.dmestore.services.DataStoreStatisticHistoryServiceImpl">
     </bean>
 
-    <bean name="taskService" class="com.dmeplugin.dmestore.services.TaskServiceImpl"></bean>
+    <bean name="taskService" class="com.dmeplugin.dmestore.services.TaskServiceImpl">
+        <property name="dmeAccessService" ref="dmeAccessService"/>
+    </bean>
 
     <bean name="dmeNFSAccessService" class="com.dmeplugin.dmestore.services.DmeNFSAccessServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
         <property name="dmeAccessService" ref="dmeAccessService"/>
         <property name="dmeStorageService" ref="dmeStorageService"/>
+        <property name="dataStoreStatisticHistoryService" ref="DataStoreStatisticHistoryService"/>
+        <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
     </bean>
 
     <bean name="vmwareAccessService" class="com.dmeplugin.dmestore.services.VmwareAccessServiceImpl">

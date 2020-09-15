@@ -18,6 +18,13 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
+/**
+ * @Description: TODO
+ * @ClassName: DmeAccessServiceImpl
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 public class DmeAccessServiceImpl implements DmeAccessService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DmeAccessServiceImpl.class);

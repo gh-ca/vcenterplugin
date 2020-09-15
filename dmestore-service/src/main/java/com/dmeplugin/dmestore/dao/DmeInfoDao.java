@@ -10,7 +10,13 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-
+/**
+ * @Description: TODO
+ * @ClassName: DmeInfoDao
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 public class DmeInfoDao extends H2DataBaseDao {
 
     public int addDmeInfo(DmeInfo dmeInfo) throws SQLException {
