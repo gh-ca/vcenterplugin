@@ -90,7 +90,7 @@
         <property name="dmeAccessService" ref="dmeAccessService"/>
         <property name="dmeStorageService" ref="dmeStorageService"/>
         <property name="dataStoreStatisticHistoryService" ref="DataStoreStatisticHistoryService"/>
-
+        <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
     </bean>
 
     <bean name="vmfsOperationService" class="com.dmeplugin.dmestore.services.VmfsOperationServiceImpl"/>

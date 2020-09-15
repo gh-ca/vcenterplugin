@@ -20,6 +20,14 @@ public class DmeVmwareRelation implements Serializable {
   private String volumeWwn;
   private String volumeShare;
   private String volumeFs;
+
+  private String shareId;
+  private String shareName;
+  private String fsId;
+  private String fsName;
+  private String logicPortId;
+  private String logicPortName;
+
   private String storeType;
   private Date createTime;
   private Date updateTime;
