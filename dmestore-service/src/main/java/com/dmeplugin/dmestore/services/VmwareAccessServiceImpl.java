@@ -12,6 +12,13 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @Description: TODO
+ * @ClassName: VmwareAccessServiceImpl
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 public class VmwareAccessServiceImpl implements VmwareAccessService {
 
     private static final Logger LOG = LoggerFactory.getLogger(VmwareAccessServiceImpl.class);
