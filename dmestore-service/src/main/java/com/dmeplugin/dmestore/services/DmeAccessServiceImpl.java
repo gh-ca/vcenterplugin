@@ -18,13 +18,19 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
+/**
+ * @Description: TODO
+ * @ClassName: DmeAccessServiceImpl
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 public class DmeAccessServiceImpl implements DmeAccessService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DmeAccessServiceImpl.class);
 
     private DmeInfoDao dmeInfoDao;
 
-    @Autowired
     private Gson gson = new Gson();
 
     private static String dmeToken;
@@ -107,7 +113,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     public ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws Exception {
         ResponseEntity<String> responseEntity = null;
 
-        if (dmeToken == null || dmeToken.equals("")) {
+        if (StringUtils.isEmpty(dmeToken)) {
             //如果token为空，就自动登录，获取token
             LOG.info("token为空，自动登录，获取token");
             iniLogin();
@@ -181,7 +187,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        if (dmeToken != null && !dmeToken.equals("")) {
+        if (!StringUtils.isEmpty(dmeToken)) {
             headers.set("X-Auth-Token", dmeToken);
         }
         LOG.info("headers==" + gson.toJson(headers));
@@ -211,10 +217,10 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         List<Map<String, Object>> relists = null;
         try {
             if (!StringUtils.isEmpty(storageId)) {
-                String workloads_url = GET_WORKLOADS_URL.replace("{storage_id}", storageId);
-                LOG.info("workloads_url===" + workloads_url);
+                String workloadsUrl = GET_WORKLOADS_URL.replace("{storage_id}", storageId);
+                LOG.info("workloadsUrl===" + workloadsUrl);
                 try {
-                    ResponseEntity responseEntity = access(workloads_url, HttpMethod.GET, null);
+                    ResponseEntity responseEntity = access(workloadsUrl, HttpMethod.GET, null);
                     LOG.info("getWorkLoads responseEntity==" + responseEntity.toString());
                     if (responseEntity.getStatusCodeValue() == 200) {
                         JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -241,7 +247,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                         }
                     }
                 } catch (Exception e) {
-                    LOG.error("DME link error url:" + workloads_url + ",error:" + e.getMessage());
+                    LOG.error("DME link error url:" + workloadsUrl + ",error:" + e.getMessage());
                 }
             }
         } catch (Exception e) {
@@ -255,7 +261,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     @Override
     public List<Map<String, Object>> getDmeHosts(String hostIp) throws Exception {
         List<Map<String, Object>> relists = null;
-        String gethosts_url = GET_DME_HOSTS_URL;
+        String getHostsUrl = GET_DME_HOSTS_URL;
         try {
             Map<String, Object> requestbody = null;
             if (!StringUtils.isEmpty(hostIp)) {
@@ -263,8 +269,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 requestbody.put("ip", hostIp);
                 LOG.info("requestbody==" + gson.toJson(requestbody));
             }
-            LOG.info("getDmeHosts_url===" + gethosts_url);
-            ResponseEntity responseEntity = access(gethosts_url, HttpMethod.POST, (requestbody == null ? null : requestbody.toString()));
+            LOG.info("getDmeHosts_url===" + getHostsUrl);
+            ResponseEntity responseEntity = access(getHostsUrl, HttpMethod.POST, (requestbody == null ? null : requestbody.toString()));
             LOG.info("getDmeHosts responseEntity==" + responseEntity.toString());
             if (responseEntity.getStatusCodeValue() == 200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -305,7 +311,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("DME link error url:" + gethosts_url + ",error:" + e.getMessage());
+            LOG.error("DME link error url:" + getHostsUrl + ",error:" + e.getMessage());
             throw e;
         }
         LOG.info("getDmeHosts relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
@@ -315,7 +321,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     @Override
     public List<Map<String, Object>> getDmeHostGroups(String hostGroupName) throws Exception {
         List<Map<String, Object>> relists = null;
-        String gethostgroups_url = GET_DME_HOSTGROUPS_URL;
+        String getHostGroupsUrl = GET_DME_HOSTGROUPS_URL;
         try {
             Map<String, Object> requestbody = null;
             if (!StringUtils.isEmpty(hostGroupName)) {
@@ -323,8 +329,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 requestbody.put("name", hostGroupName);
                 LOG.info("requestbody==" + gson.toJson(requestbody));
             }
-            LOG.info("gethostgroups_url===" + gethostgroups_url);
-            ResponseEntity responseEntity = access(gethostgroups_url, HttpMethod.POST, (requestbody == null ? null : requestbody.toString()));
+            LOG.info("gethostgroups_url===" + getHostGroupsUrl);
+            ResponseEntity responseEntity = access(getHostGroupsUrl, HttpMethod.POST, (requestbody == null ? null : requestbody.toString()));
             LOG.info("getDmeHostgroups responseEntity==" + responseEntity.toString());
             if (responseEntity.getStatusCodeValue() == 200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -350,7 +356,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("DME link error url:" + gethostgroups_url + ",error:" + e.getMessage());
+            LOG.error("DME link error url:" + getHostGroupsUrl + ",error:" + e.getMessage());
             throw e;
         }
         LOG.info("getDmeHostgroups relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
@@ -360,7 +366,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     @Override
     public Map<String, Object> createHost(Map<String, Object> params) throws Exception {
         Map<String, Object> hostmap = null;
-        String createHost_url = CREATE_DME_HOST_URL;
+        String createHostUrl = CREATE_DME_HOST_URL;
         try {
             Map<String, Object> requestbody = null;
             if (params != null && params.get("host") != null) {
@@ -371,8 +377,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 requestbody.put("host_name", params.get("host"));
                 LOG.info("requestbody==" + gson.toJson(requestbody));
 
-                LOG.info("createHost_url===" + createHost_url);
-                ResponseEntity responseEntity = access(createHost_url, HttpMethod.POST, requestbody.toString());
+                LOG.info("createHost_url===" + createHostUrl);
+                ResponseEntity responseEntity = access(createHostUrl, HttpMethod.POST, requestbody.toString());
                 LOG.info("getDmeHostgroups responseEntity==" + responseEntity.toString());
                 if (responseEntity.getStatusCodeValue() == 200) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -387,7 +393,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("DME link error url:" + createHost_url + ",error:" + e.getMessage());
+            LOG.error("DME link error url:" + createHostUrl + ",error:" + e.getMessage());
             throw e;
         }
         LOG.info("createHost hostmap===" + (hostmap == null ? "null" : (hostmap.size() + "==" + gson.toJson(hostmap))));
@@ -397,7 +403,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     @Override
     public Map<String, Object> createHostGroup(Map<String, Object> params) throws Exception {
         Map<String, Object> hostgroupmap = null;
-        String createHostGroup_url = CREATE_DME_HOSTGROUP_URL;
+        String createHostGroupUrl = CREATE_DME_HOSTGROUP_URL;
         try {
             Map<String, Object> requestbody = null;
             if (params != null && params.get("cluster") != null && params.get("hostids") != null) {
@@ -407,8 +413,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 requestbody.put("host_ids", (List<String>) params.get("hostids"));
                 LOG.info("requestbody==" + gson.toJson(requestbody));
 
-                LOG.info("createHostGroup_url===" + createHostGroup_url);
-                ResponseEntity responseEntity = access(createHostGroup_url, HttpMethod.POST, requestbody.toString());
+                LOG.info("createHostGroup_url===" + createHostGroupUrl);
+                ResponseEntity responseEntity = access(createHostGroupUrl, HttpMethod.POST, requestbody.toString());
                 LOG.info("getDmeHostgroups responseEntity==" + responseEntity.toString());
                 if (responseEntity.getStatusCodeValue() == 200) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -420,7 +426,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("DME link error url:" + createHostGroup_url + ",error:" + e.getMessage());
+            LOG.error("DME link error url:" + createHostGroupUrl + ",error:" + e.getMessage());
             throw e;
         }
         LOG.info("createHostGroup hostmap===" + (hostgroupmap == null ? "null" : (hostgroupmap.size() + "==" + gson.toJson(hostgroupmap))));
@@ -435,11 +441,11 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     @Override
     public Map<String, Object> getDmeHost(String hostId) throws Exception {
         Map<String, Object> map = new HashMap<>();
-        String gethost_url = GET_DME_HOST_URL;
-        gethost_url = gethost_url.replace("{host_id}", hostId);
+        String getHostUrl = GET_DME_HOST_URL;
+        getHostUrl = getHostUrl.replace("{host_id}", hostId);
         try {
-            LOG.info("getDmeHost_url===" + gethost_url);
-            ResponseEntity responseEntity = access(gethost_url, HttpMethod.GET, null);
+            LOG.info("getDmeHost_url===" + getHostUrl);
+            ResponseEntity responseEntity = access(getHostUrl, HttpMethod.GET, null);
             LOG.info("getDmeHost responseEntity==" + responseEntity.toString());
             if (responseEntity.getStatusCodeValue() == 200) {
                 JsonObject vjson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -468,7 +474,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("DME link error url:" + gethost_url + ",error:" + e.getMessage());
+            LOG.error("DME link error url:" + getHostUrl + ",error:" + e.getMessage());
             throw e;
         }
         LOG.info("getDmeHost relists===" + (gson.toJson(map)));

@@ -3,6 +3,7 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.model.NFSDataStoreFSAttr;
 import com.dmeplugin.dmestore.model.NFSDataStoreLogicPortAttr;
 import com.dmeplugin.dmestore.model.NFSDataStoreShareAttr;
+import com.dmeplugin.dmestore.model.NfsDataInfo;
 
 import java.util.List;
 
@@ -48,4 +49,21 @@ import java.util.List;
      * @throws Exception
      */
     boolean scanNfs() throws Exception;
+
+    /**
+     * List nfs
+
+     * @return List<NfsDataInfo>
+     * @throws Exception when error
+     */
+    List<NfsDataInfo> listNfs() throws Exception;
+
+    /**
+     * List nfs Performance
+     *
+     * @param  fsIds fs id
+     * @return List<NfsDataInfo>
+     * @throws Exception when error
+     */
+    List<NfsDataInfo> listNfsPerformance(List<String> fsIds) throws Exception;
 }

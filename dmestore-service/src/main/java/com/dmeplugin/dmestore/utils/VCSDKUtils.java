@@ -503,16 +503,20 @@ public class VCSDKUtils {
     }
 
     //expand oriented datastore capacity
-    public static String expandVmfsDatastore(String dsname,Integer add_capacity) {
+    public String expandVmfsDatastore(String dsname,Integer add_capacity) {
         String result = "success";
         _logger.info("==start expand DataStore==");
         try {
             VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
             DatastoreMO dsMo = new DatastoreMO(vmwareContext, new DatacenterMO(vmwareContext, "Datacenter").findDatastore(dsname));
             DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
-            HostMO hostMo = new HostMO(vmwareContext, dcMo.findHost("10.143.132.17").get(0));//10.143.132.17
-
-            //todo get oriented LUN    参数需要调
+            List<ManagedObjectReference> hosts = dcMo.findHost("10.143.132.17");
+            ManagedObjectReference managedObjectReference = null;
+            if (hosts != null && hosts.size() > 0) {
+                managedObjectReference = hosts.get(0);
+            }
+            HostMO hostMo = new HostMO(vmwareContext, managedObjectReference);
+            //todo get oriented LUN  (参数设置存在问题)
             String devicePath = "/vmfs/devices/disks/t10.ATA_____WDC_WD1003FBYX2D01Y7B1________________________WD2DWCAW35431438";
             Long totalSectors = add_capacity*1L*ToolUtils.Gi;
             HostScsiDisk candidateHostScsiDisk = null;
@@ -527,11 +531,15 @@ public class VCSDKUtils {
                         }
                     }
                 }
+                int blockSize = 0;
+                if (candidateHostScsiDisk != null) {
+                    blockSize = candidateHostScsiDisk.getCapacity().getBlockSize();
+                    totalSectors = totalSectors / blockSize;
+                }
                 List<VmfsDatastoreOption> vmfsDatastoreOptions = hostDatastoreSystemMO.queryVmfsDatastoreExpandOptions(dsMo);
                 if (vmfsDatastoreOptions != null && vmfsDatastoreOptions.size() > 0) {
                     VmfsDatastoreOption vmfsDatastoreOption = vmfsDatastoreOptions.get(0);
                     VmfsDatastoreExpandSpec spec = (VmfsDatastoreExpandSpec)vmfsDatastoreOption.getSpec();
-
                     if (candidateHostScsiDisk != null) {
                         HostDiskPartitionSpec hostDiskPartitionSpec = new HostDiskPartitionSpec();
                         hostDiskPartitionSpec.setTotalSectors(totalSectors);
@@ -552,6 +560,43 @@ public class VCSDKUtils {
         } finally {
             return result;
         }
+    }
+
+    //recycle vmfs datastore capacity
+    public String recycleVmfsCapacity(String dsname) throws Exception {
+
+        String result = "success";
+        List<String> uuids = new ArrayList<>();
+        try {
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
+            DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
+            List<ManagedObjectReference> hosts = dcMo.findHost("10.143.133.196");
+            ManagedObjectReference managedObjectReference = null;
+            if (hosts != null && hosts.size() > 0) {
+                managedObjectReference = hosts.get(0);
+            }
+
+            HostMO hostMo = new HostMO(vmwareContext, managedObjectReference);
+            HostDatastoreSystemMO hostDatastoreSystemMO = hostMo.getHostDatastoreSystemMO();
+            HostStorageSystemMO hostStorageSystemMO = hostMo.getHostStorageSystemMO();
+            List<HostFileSystemMountInfo> mountInfo = hostStorageSystemMO.getHostFileSystemVolumeInfo().getMountInfo();
+            if (mountInfo != null && mountInfo.size() > 0) {
+                for (HostFileSystemMountInfo mount : mountInfo) {
+                    if (mount.getVolume() instanceof HostVmfsVolume
+                            && dsname.equals(mount.getVolume().getName())) {
+                        HostVmfsVolume volume = (HostVmfsVolume) mount.getVolume();
+                        _logger.info(volume.getName() + "========" + volume.getUuid());
+                        uuids.add(volume.getUuid());
+                    }
+                }
+            }
+            hostDatastoreSystemMO.unmapVmfsVolumeExTask(uuids);
+        } catch (Exception e) {
+            result = "error";
+            _logger.error("vmware error:", e);
+            throw e;
+        }
+        return result;
     }
 
     public  void hostRescanVmfs(String hostIp) throws Exception {
@@ -1043,6 +1088,31 @@ public class VCSDKUtils {
             e.printStackTrace();
             _logger.error("scan Data Store error:", e);
             throw e;
+        }
+    }
+
+    /**
+     * @Author Administrator
+     * @Description 为指定的虚拟机创建磁盘
+     * @Date 11:41 2020/9/14
+     * @Param [datacenter_name, datastore_name, vm_name, rdmdevicename, size]
+     * @Return void
+     **/
+    public void createDisk(String datacenter_name, String datastore_name, String vm_name, String rdmdevicename, int size) throws Exception{
+        VmwareContext[] vmwareContexts=vcConnectionHelper.getAllContext();
+        for(VmwareContext vmwareContext: vmwareContexts){
+            DatacenterMO dcMo = new DatacenterMO(vmwareContext, datacenter_name);
+            DatastoreMO dsMo = new DatastoreMO(vmwareContext, dcMo.findDatastore(datastore_name));
+            VirtualMachineMO virtualMachineMO = new VirtualMachineMO(vmwareContext, vm_name);
+            String vmdkDatastorePath = dsMo.getDatastorePath(datastore_name);
+            int sizeInMb = size;
+            try {
+                virtualMachineMO.createDisk(vmdkDatastorePath, VirtualDiskType.RDM, VirtualDiskMode.PERSISTENT,
+                        rdmdevicename, sizeInMb, dsMo.getMor(), -1);
+            }catch (Exception ex){
+                _logger.error("create vcenter disk rdm failed!errorMsg:{}", ex.getMessage());
+                throw  new Exception(ex.getMessage());
+            }
         }
     }
 

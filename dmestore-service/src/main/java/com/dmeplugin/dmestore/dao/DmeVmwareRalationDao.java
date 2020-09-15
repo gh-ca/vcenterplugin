@@ -13,7 +13,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-
+/**
+ * @Description: TODO
+ * @ClassName: DmeVmwareRalationDao
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 public class DmeVmwareRalationDao extends H2DataBaseDao {
 
     public List<DmeVmwareRelation> getDmeVmwareRelation(String storeType) throws SQLException {
@@ -42,15 +48,16 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 dvr.setVolumeWwn(rs.getString("VOLUME_WWN"));
                 dvr.setVolumeShare(rs.getString("VOLUME_SHARE"));
                 dvr.setVolumeFs(rs.getString("VOLUME_FS"));
-                dvr.setStoreType(rs.getString("STORE_TYPE"));
-                dvr.setCreateTime(rs.getTimestamp("CREATETIME"));
-                dvr.setUpdateTime(rs.getTimestamp("UPDATETIME"));
-                dvr.setState(rs.getInt("STATE"));
                 dvr.setShareId(rs.getString("SHARE_ID"));
+                dvr.setShareName(rs.getString("SHARE_NAME"));
                 dvr.setFsId(rs.getString("FS_ID"));
                 dvr.setFsName(rs.getString("FS_NAME"));
                 dvr.setLogicPortId(rs.getString("LOGICPORT_ID"));
                 dvr.setLogicPortName(rs.getString("LOGICPORT_NAME"));
+                dvr.setStoreType(rs.getString("STORE_TYPE"));
+                dvr.setCreateTime(rs.getTimestamp("CREATETIME"));
+                dvr.setUpdateTime(rs.getTimestamp("UPDATETIME"));
+                dvr.setState(rs.getInt("STATE"));
                 lists.add(dvr);
             }
         } catch (DataBaseException | SQLException e) {

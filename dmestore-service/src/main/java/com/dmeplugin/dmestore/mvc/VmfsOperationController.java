@@ -42,7 +42,7 @@ public class VmfsOperationController extends BaseController{
                                        @RequestBody Map<String,Object> params){
 
         Map<String,Object> resMap = vmfsOperationService.updateVMFS(volume_id,params);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals("200")) {
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(202)) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -59,7 +59,7 @@ public class VmfsOperationController extends BaseController{
 
         LOG.info("volumes=="+gson.toJson(volumes));
         Map<String, Object> resMap = vmfsOperationService.expandVMFS(volumes);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals("200")) {
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(202)) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -67,17 +67,15 @@ public class VmfsOperationController extends BaseController{
 
 
 
-    /**
-     * 调用方法不确定
-     * @param volumeId
-     * @return
-     */
     @PostMapping("/recyclevmfs")
     @ResponseBody
-    public ResponseBodyBean recycleVMFS(@RequestParam(value = "volumeId",required = true) String volumeId){
-        LOG.info("recyclevmfs=="+volumeId);
-        //调vcenter方法，回收空间
-        return success();
+    public ResponseBodyBean recycleVMFS(@RequestBody List<String> datastoreName){
+        LOG.info("recyclevmfs=="+gson.toJson(datastoreName));
+        Map<String,Object> resMap = vmfsOperationService.recycleVmfsCapacity(datastoreName);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
     }
 
     /**
