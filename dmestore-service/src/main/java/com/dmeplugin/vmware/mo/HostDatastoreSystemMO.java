@@ -262,4 +262,7 @@ public class HostDatastoreSystemMO extends BaseMO {
 
         return _context.getService().retrieveProperties(_context.getPropertyCollector(), pfSpecArr);
     }
+    public void unmapVmfsVolumeExTask(List<String> vmfsUuids) throws Exception {
+        _context.getService().unmapVmfsVolumeExTask(_mor, vmfsUuids);
+    }
 }
