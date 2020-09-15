@@ -5,6 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+
+/**
+ * @Description: TODO
+ * @ClassName: ToolUtils
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 public class ToolUtils {
 
     private final static Logger LOG = LoggerFactory.getLogger(ToolUtils.class);

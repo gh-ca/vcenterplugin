@@ -7,11 +7,16 @@ public class NfsDataInfo {
     Double capacity;  //总容量 单位GB
     Double freeSpace; //空闲容量 单位GB
     Double reserveCapacity; //置备容量  capacity+uncommitted-freeSpace 单位GB
-    String device; //设备
+    String deviceId; //存储设备ID
+    String device; //存储设备名称
     String logicPort; //逻辑端口
+    String logicPortId; //逻辑端口 id
     String shareIp; //share ip
     String sharePath; //share path
+    String share; //share 名称
+    String shareId; //share id
     String fs; //fs
+    String fsId; //fs id
 
     //列表字段（性能视图）：
     Integer OPS; //OPS
@@ -76,6 +81,14 @@ public class NfsDataInfo {
         this.logicPort = logicPort;
     }
 
+    public String getLogicPortId() {
+        return logicPortId;
+    }
+
+    public void setLogicPortId(String logicPortId) {
+        this.logicPortId = logicPortId;
+    }
+
     public String getShareIp() {
         return shareIp;
     }
@@ -92,12 +105,36 @@ public class NfsDataInfo {
         this.sharePath = sharePath;
     }
 
+    public String getShare() {
+        return share;
+    }
+
+    public void setShare(String share) {
+        this.share = share;
+    }
+
+    public String getShareId() {
+        return shareId;
+    }
+
+    public void setShareId(String shareId) {
+        this.shareId = shareId;
+    }
+
     public String getFs() {
         return fs;
     }
 
     public void setFs(String fs) {
         this.fs = fs;
+    }
+
+    public String getFsId() {
+        return fsId;
+    }
+
+    public void setFsId(String fsId) {
+        this.fsId = fsId;
     }
 
     public Integer getOPS() {
@@ -130,5 +167,13 @@ public class NfsDataInfo {
 
     public void setWriteResponseTime(Integer writeResponseTime) {
         this.writeResponseTime = writeResponseTime;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 }

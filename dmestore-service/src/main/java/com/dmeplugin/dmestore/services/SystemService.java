@@ -24,4 +24,9 @@ public interface SystemService {
      */
     boolean isColumnExists(String tableName, String columnName);
 
+
+    /**
+     * delete data from all tables
+     */
+    void cleanData();
 }

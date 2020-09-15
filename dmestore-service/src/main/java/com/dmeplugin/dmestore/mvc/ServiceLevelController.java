@@ -27,14 +27,17 @@ public class ServiceLevelController extends BaseController {
     @Autowired
     private ServiceLevelService serviceLevelService;
 
-    @RequestMapping(value = "/listservicelevel", method = RequestMethod.GET)
+    @RequestMapping(value = "/listservicelevel", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean listServiceLevel(@RequestBody Map<String, Object> params) throws Exception {
         LOG.info("servicelevel/listservicelevel params==" + gson.toJson(params));
         Map<String, Object> resMap = serviceLevelService.listServiceLevel(params);
         if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
-            return success(resMap);
+            Object data = resMap.get("data");
+            //JsonObject jsonObject = new JsonParser().parse(resMap.get("data").toString()).getAsJsonObject();//先转成json,则调用success()方法返回会报错
+            return success(data);
         }
-        return failure(gson.toJson(resMap));
+        String errMsg = resMap.get("message").toString();
+        return failure(errMsg);
     }
 }

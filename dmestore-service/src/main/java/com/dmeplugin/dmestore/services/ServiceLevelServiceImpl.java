@@ -28,7 +28,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     @Autowired
     private DmeAccessService dmeAccessService;
 
-    private final String LIST_SERVICE_LEVEL_URL = "/rest/service-policy/v1/service-levels";
+    private final String LIST_SERVICE_LEVEL_URL = "https://localhost:26335/rest/service-policy/v1/service-levels";
 
     @Override
     public Map<String, Object> listServiceLevel(Map<String, Object> params) {
@@ -44,12 +44,14 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             int code = responseEntity.getStatusCodeValue();
             if (200 != code) {
                 remap.put("code", 503);
-                remap.put("message", "list serviceLevel error!");
+                remap.put("message", "list serviceLevel response error!");
                 return remap;
             }
             Object object = responseEntity.getBody();
-            slis = convertBean(object);
-            remap.put("data", slis);
+            //JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
+            //slis = convertBean(object);
+            //remap.put("data", slis);
+            remap.put("data", object);
         } catch (Exception e) {
             log.error("list serviceLevel error", e);
             String message = e.getMessage();

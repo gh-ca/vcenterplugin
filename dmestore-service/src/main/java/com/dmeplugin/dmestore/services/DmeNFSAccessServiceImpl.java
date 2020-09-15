@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.utils.StringUtil;
@@ -28,13 +29,15 @@ import java.util.Map;
 public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private static final Logger LOG = LoggerFactory.getLogger(DmeNFSAccessServiceImpl.class);
 
-    @Autowired
-    private Gson gson;
+    private Gson gson = new Gson();
 
-    @Autowired
+    private DmeVmwareRalationDao dmeVmwareRalationDao;
+
     private DmeAccessService dmeAccessService;
-    @Autowired
+
     private DmeStorageService dmeStorageService;
+
+    private DataStoreStatisticHistoryService dataStoreStatisticHistoryService;
 
 
     private VCSDKUtils vcsdkUtils;
@@ -45,6 +48,30 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     public void setVcsdkUtils(VCSDKUtils vcsdkUtils) {
         this.vcsdkUtils = vcsdkUtils;
+    }
+
+    public DmeAccessService getDmeAccessService() {
+        return dmeAccessService;
+    }
+
+    public void setDmeAccessService(DmeAccessService dmeAccessService) {
+        this.dmeAccessService = dmeAccessService;
+    }
+
+    public DmeStorageService getDmeStorageService() {
+        return dmeStorageService;
+    }
+
+    public void setDmeStorageService(DmeStorageService dmeStorageService) {
+        this.dmeStorageService = dmeStorageService;
+    }
+
+    public void setDmeVmwareRalationDao(DmeVmwareRalationDao dmeVmwareRalationDao) {
+        this.dmeVmwareRalationDao = dmeVmwareRalationDao;
+    }
+
+    public void setDataStoreStatisticHistoryService(DataStoreStatisticHistoryService dataStoreStatisticHistoryService) {
+        this.dataStoreStatisticHistoryService = dataStoreStatisticHistoryService;
     }
 
     @Override
@@ -179,7 +206,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         // DME share, 通过sharePath(可加storageId)查询share 提取fs_name
         // DME FileService, 通过fs_name和storageId查询fs (需求文档说明是通过share path, 但API不支持)
 
-        String listStr = vcsdkUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_NFS);
+        String store_type = ToolUtils.STORE_TYPE_NFS;
+        String listStr = vcsdkUtils.getAllVmfsDataStores(store_type);
         LOG.info("===list nfs datastore success====\n{}", listStr);
         if (StringUtils.isEmpty(listStr)) {
             return false;
@@ -197,7 +225,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         List<DmeVmwareRelation> relationList = new ArrayList<>();
         for (int i = 0; i < jsonArray.size(); i++) {
             JsonObject nfsDatastore = jsonArray.get(i).getAsJsonObject();
-            String store_type = ToolUtils.STORE_TYPE_VMFS;
+
             //TODO 暂时认为是从url中获取到wwn信息
             String nfsDatastoreUrl = nfsDatastore.get("url").getAsString();
             String nfsDatastoreId = nfsDatastore.get("id").getAsString();
@@ -212,16 +240,19 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 continue;
             }
             String storage_id = storageInfo.getId();
+            String storage_name = storageInfo.getName();
             DmeVmwareRelation relation = new DmeVmwareRelation();
             relation.setStoreId(storage_id);
+            relation.setStoreName(storage_name);
+            relation.setStoreType(store_type);
 
             //获取logicPort信息
             Map<String, Object> logicPortInfo = queryLogicPortInfo(storage_id);
             if (null != logicPortInfo && logicPortInfo.size() > 0) {
                 String id = ToolUtils.getStr(logicPortInfo.get("id"));
                 String name = ToolUtils.getStr(logicPortInfo.get("name"));
-                //relation.setLogicPortId(id);
-                //relation.setLogicPortName(name);
+                relation.setLogicPortId(id);
+                relation.setLogicPortName(name);
             }
 
             //获取share信息 (条件:sharePath  可加 storageId)
@@ -231,8 +262,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 fsName = ToolUtils.getStr(shareInfo.get("fs_name"));
                 String id = ToolUtils.getStr(shareInfo.get("id"));
                 String name = ToolUtils.getStr(shareInfo.get("name"));
-                //relation.setShareId(id);
-                //relation.setShareName(name);
+                relation.setShareId(id);
+                relation.setShareName(name);
             }
 
             //获取fs信息
@@ -240,18 +271,49 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             if (null != fsInfo && fsInfo.size() > 0) {
                 String id = ToolUtils.getStr(fsInfo.get("id"));
                 String name = ToolUtils.getStr(fsInfo.get("name"));
-                //relation.setfsId(id);
-                //relation.setFsName(name);
+                relation.setFsId(id);
+                relation.setFsName(name);
             }
-
             relationList.add(relation);
         }
 
         //数据库保存datastorage 与nfs的 share fs logicPort关系信息
-        //dbsave();
-
-
+        if (relationList.size() > 0) {
+            return dmeVmwareRelationDBProcess(relationList, store_type);
+        }
         return false;
+    }
+
+    private boolean dmeVmwareRelationDBProcess(List<DmeVmwareRelation> relationList, String storeType) throws Exception {
+        //本地全量查询NFS
+        List<String> storageIds = dmeVmwareRalationDao.getAllStorageIdByType(storeType);
+
+        List<DmeVmwareRelation> newList = new ArrayList<>();
+        List<DmeVmwareRelation> upList = new ArrayList<>();
+        for (DmeVmwareRelation relation : relationList) {
+            String storege_id = relation.getStoreId();
+            if (storageIds.contains(storege_id)) {
+                upList.add(relation);
+                storageIds.remove(storege_id);
+            } else {
+                newList.add(relation);
+            }
+        }
+
+        //更新
+        if (!upList.isEmpty()) {
+            dmeVmwareRalationDao.update(upList);
+        }
+
+        //新增
+        if (!newList.isEmpty()) {
+            dmeVmwareRalationDao.save(newList);
+        }
+        //删除
+        if (!storageIds.isEmpty()) {
+            dmeVmwareRalationDao.deleteByStorageId(storageIds);
+        }
+        return true;
     }
 
     //按条件查询share 暂认为 storage与share是一对一的关系
@@ -414,6 +476,157 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             storageMap.put(ip, storage);
         }
         return storageMap;
+    }
+
+
+    @Override
+    public List<NfsDataInfo> listNfs() throws Exception{
+        List<NfsDataInfo> relists = null;
+        try {
+            //从关系表中取得DME卷与vcenter存储的对应关系
+            List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_NFS);
+            LOG.info("dvrlist==" + gson.toJson(dvrlist));
+            if (dvrlist != null && dvrlist.size() > 0) {
+                //整理数据
+                Map<String, DmeVmwareRelation> dvrMap = getDvrMap(dvrlist);
+                //取得vcenter中的所有nfs存储。
+                String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(ToolUtils.STORE_TYPE_NFS);
+                LOG.info("nfs listStr==" + listStr);
+                if (!StringUtils.isEmpty(listStr)) {
+                    JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
+                    if (jsonArray != null && jsonArray.size() > 0) {
+                        relists = new ArrayList<>();
+                        for (int i = 0; i < jsonArray.size(); i++) {
+                            JsonObject jo = jsonArray.get(i).getAsJsonObject();
+                            //LOG.info("jo==" + jo.toString());
+                            String vmwareStoreName = ToolUtils.jsonToStr(jo.get("name"));
+                            if (!StringUtils.isEmpty(vmwareStoreName)) {
+                                //对比数据库关系表中的数据，只显示关系表中的数据
+                                if (dvrMap != null && dvrMap.get(vmwareStoreName) != null) {
+                                    NfsDataInfo nfsDataInfo = new NfsDataInfo();
+                                    double capacity = ToolUtils.getDouble(jo.get("capacity")) / ToolUtils.Gi;
+                                    double freeSpace = ToolUtils.getDouble(jo.get("freeSpace")) / ToolUtils.Gi;
+                                    double reserveCapacity = (ToolUtils.getDouble(jo.get("capacity")) - ToolUtils.getDouble(jo.get("freeSpace"))) / ToolUtils.Gi;
+
+                                    nfsDataInfo.setName(vmwareStoreName);
+
+                                    nfsDataInfo.setCapacity(capacity);
+                                    nfsDataInfo.setFreeSpace(freeSpace);
+                                    nfsDataInfo.setReserveCapacity(reserveCapacity);
+
+                                    nfsDataInfo.setShareIp(ToolUtils.jsonToStr(jo.get("remoteHost")));
+
+                                    DmeVmwareRelation dvr = dvrMap.get(vmwareStoreName);
+
+                                    nfsDataInfo.setSharePath(dvr.getVolumeShare());
+
+                                    nfsDataInfo.setLogicPort(dvr.getLogicPortName());
+                                    nfsDataInfo.setLogicPortId(dvr.getLogicPortId());
+                                    nfsDataInfo.setShare(dvr.getShareName());
+                                    nfsDataInfo.setShareId(dvr.getShareId());
+                                    nfsDataInfo.setFs(dvr.getFsName());
+                                    nfsDataInfo.setFsId(dvr.getFsId());
+
+                                    String fsUrl = "";
+                                    try {
+                                        fsUrl = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL,
+                                                "file_system_id", dvr.getFsId());
+                                        ResponseEntity<String> responseTuning = dmeAccessService.access(fsUrl, HttpMethod.GET, null);
+                                        if (responseTuning.getStatusCodeValue() / 100 == 2) {
+                                            JsonObject fsDetail = gson.fromJson(responseTuning.getBody(), JsonObject.class);
+
+                                            nfsDataInfo.setStatus(ToolUtils.jsonToStr(fsDetail.get("health_status")));
+                                            nfsDataInfo.setDeviceId(ToolUtils.jsonToStr(fsDetail.get("storage_id")));
+                                            nfsDataInfo.setDevice(ToolUtils.jsonToStr(fsDetail.get("storage_name")));
+                                        }
+                                    } catch (Exception e) {
+                                        LOG.error("DME link error url:" + fsUrl + ",error:" + e.getMessage());
+                                    }
+
+                                    relists.add(nfsDataInfo);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("list nfs error:", e);
+            throw e;
+        }
+        LOG.info("relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        return relists;
+    }
+
+    //整理关系表数据
+    private Map<String, DmeVmwareRelation> getDvrMap(List<DmeVmwareRelation> dvrlist) {
+        Map<String, DmeVmwareRelation> remap = null;
+        try {
+            if (dvrlist != null && dvrlist.size() > 0) {
+                remap = new HashMap<>();
+                for (DmeVmwareRelation dvr : dvrlist) {
+                    remap.put(dvr.getStoreName(), dvr);
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("error:", e);
+        }
+        return remap;
+    }
+
+    //整理存储信息
+    private Map<String, String> getStorNameMap(Map<String, Object> storagemap) {
+        Map<String, String> remap = null;
+        try {
+            if (storagemap != null && storagemap.get("data") != null) {
+                List<Storage> list = (List<Storage>) storagemap.get("data");
+                if (list != null && list.size() > 0) {
+                    remap = new HashMap<>();
+                    for (Storage sr : list) {
+                        remap.put(sr.getId(), sr.getName());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("error:", e);
+        }
+        return remap;
+    }
+
+    @Override
+    public List<NfsDataInfo> listNfsPerformance(List<String> fsIds) throws Exception{
+        List<NfsDataInfo> relists = null;
+        try {
+            if (fsIds != null && fsIds.size() > 0) {
+                Map<String, Object> params = new HashMap<>();
+                params.put("obj_ids", fsIds);
+                Map<String, Object> remap = dataStoreStatisticHistoryService.queryNfsStatisticCurrent(params);
+                LOG.info("remap===" + gson.toJson(remap));
+                if (remap != null && remap.get("data") != null) {
+                    JsonObject dataJson = (JsonObject) remap.get("data");
+                    if (dataJson != null) {
+                        relists = new ArrayList<>();
+                        for (String fsId : fsIds) {
+                            JsonObject statisticObject = dataJson.getAsJsonObject(fsId);
+                            if (statisticObject != null) {
+                                NfsDataInfo nfsDataInfo = new NfsDataInfo();
+                                nfsDataInfo.setFsId(fsId);
+                                nfsDataInfo.setOPS(ToolUtils.jsonToInt(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_IOPS), null));
+                                nfsDataInfo.setBandwidth(ToolUtils.jsonToDou(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_BANDWIDTH), null));
+                                nfsDataInfo.setReadResponseTime(ToolUtils.jsonToInt(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_READPESPONSETIME), null));
+                                nfsDataInfo.setWriteResponseTime(ToolUtils.jsonToInt(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_WRITERESPONSETIME), null));
+                                relists.add(nfsDataInfo);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("list nfs performance error:", e);
+            throw e;
+        }
+        LOG.info("listNfsPerformance relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        return relists;
     }
 
 }
