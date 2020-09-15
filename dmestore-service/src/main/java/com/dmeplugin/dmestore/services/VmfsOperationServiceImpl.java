@@ -133,8 +133,8 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         String url = "/rest/blockservice/v1/volumes/expand";
         try {
             //ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(reqMap));
-            //ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, gson.toJson(reqMap));
-            /*int code = responseEntity.getStatusCodeValue();
+            ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, gson.toJson(reqMap));
+            int code = responseEntity.getStatusCodeValue();
             if (code != 202) {
                 resMap.put("code", code);
                 resMap.put("msg", "expand vmfsDatastore failed !");
@@ -142,22 +142,23 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             }
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-            resMap.put("task_id", jsonObject.get("task_id").getAsString());*/
+            resMap.put("task_id", jsonObject.get("task_id").getAsString());
 
             //scan volume of host
-           /* Map<String, Object> hostMap = getHostIpByVolume(volume_ids);
+            Map<String, Object> hostMap = getHostIpByVolume(volume_ids);
             Integer rescode = Integer.valueOf(hostMap.get("code").toString());
             if (rescode == 200) {
                 List<Object> ips = Arrays.asList(hostMap.get("host_ips"));
-               for (int i = 0; i < ips.size(); i++) {
-                    VCSDKUtils.hostRescanVmfs(ips.get(i).toString());
+                for (int i = 0; i < ips.size(); i++) {
+                    vcsdkUtils.hostRescanVmfs(ips.get(i).toString());
                 }
-             }*/
+            }
             //expand vmfs datastore
             for (int i = 0; i < volumes.size(); i++) {
                 Map<String, String> map = volumes.get(i);
                 String volume_id = map.get("volume_id");
                 String ds_name = map.get("ds_name");
+                String ds_add_capacity = map.get("ds_add_capacity");
                 Map<String, Object> deviceByVolume = getStorageDeviceByVolume(volume_id);
                 int deviceCode = ToolUtils.getInt(deviceByVolume.get("code"));
                 if (deviceCode != 200) {
@@ -166,8 +167,10 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                     return resMap;
                 }
                 Storage storage = (Storage) deviceByVolume.get("data");
-                String result = VCSDKUtils.expandVmfsDatastore(ds_name, 1);
-
+                String result = null;
+                if (!StringUtils.isEmpty(ds_add_capacity)) {
+                    result = vcsdkUtils.expandVmfsDatastore(ds_name, ToolUtils.getInt(ds_add_capacity));
+                }
                 if ("failed".equals(result)) {
                     resMap.put("code", 403);
                     resMap.put("msg", "expand vmfsDatastore failed !");
@@ -181,6 +184,32 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         } finally {
             return resMap;
         }
+    }
+
+    @Override
+    public Map<String, Object> recycleVmfsCapacity(List<String> dsname) {
+        Map<String, Object> resMap = new HashMap<>();
+        resMap.put("code", 200);
+        resMap.put("msg", "recycle vmfsDatastore success !");
+        try {
+            String result = null;
+            VCSDKUtils vcsdkUtils = new VCSDKUtils();
+            if (dsname != null && dsname.size() > 0) {
+                for (int i = 0; i < dsname.size(); i++) {
+                    result = vcsdkUtils.recycleVmfsCapacity(dsname.get(i));
+                }
+            }
+            if (result == null || result.equals("error")) {
+                resMap.put("code", 403);
+                resMap.put("msg", "recycle vmfsDatastore error");
+                return resMap;
+            }
+        } catch (Exception e) {
+            LOG.error("recycle vmfsDatastore error !", e);
+            resMap.put("code", 503);
+            resMap.put("msg", e.getMessage());
+        }
+        return resMap;
     }
 
     private Map<String, Object> getHostIpByVolume(List<String> volume_ids) throws Exception {
