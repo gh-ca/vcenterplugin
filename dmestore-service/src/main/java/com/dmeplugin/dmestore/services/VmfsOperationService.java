@@ -16,4 +16,8 @@ public interface VmfsOperationService {
     Map<String,Object> expandVMFS(List<Map<String,String>> volumes);
 
     Map<String,Object> recycleVmfsCapacity(List<String> vmfsUuids);
+
+    Map<String,Object> updateVmfsServiceLevel(Map<String, Object> params);
+
+    Map<String,Object> listServiceLevelVMFS(Map<String, Object> params);
 }
