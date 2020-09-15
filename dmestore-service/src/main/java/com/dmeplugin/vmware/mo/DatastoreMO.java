@@ -23,20 +23,7 @@ import java.util.List;
 import com.dmeplugin.dmestore.exception.VcenterException;
 import com.dmeplugin.vmware.util.Pair;
 import com.dmeplugin.vmware.util.VmwareContext;
-import com.vmware.vim25.DatastoreHostMount;
-import com.vmware.vim25.DatastoreSummary;
-import com.vmware.vim25.FileInfo;
-import com.vmware.vim25.FileQueryFlags;
-import com.vmware.vim25.HostDatastoreBrowserSearchResults;
-import com.vmware.vim25.HostDatastoreBrowserSearchSpec;
-import com.vmware.vim25.HostMountInfo;
-import com.vmware.vim25.ManagedObjectReference;
-import com.vmware.vim25.ObjectContent;
-import com.vmware.vim25.ObjectSpec;
-import com.vmware.vim25.PropertyFilterSpec;
-import com.vmware.vim25.PropertySpec;
-import com.vmware.vim25.SelectionSpec;
-import com.vmware.vim25.TraversalSpec;
+import com.vmware.vim25.*;
 
 
 import org.slf4j.Logger;
@@ -65,6 +52,19 @@ public class DatastoreMO extends BaseMO {
             _name = _context.getVimClient().getDynamicProperty(_mor, "name");
 
         return _name;
+    }
+
+    public DatastoreMO(VmwareContext context, String dsName) throws Exception {
+        super(context, null);
+
+        _mor = _context.getVimClient().getDecendentMoRef(_context.getRootFolder(), "Datastore", dsName);
+        if (_mor == null) {
+            s_logger.error("Unable to locate ds " + dsName);
+        }
+    }
+
+    public DatastoreInfo getInfo() throws Exception {
+        return (DatastoreInfo)_context.getVimClient().getDynamicProperty(_mor, "info");
     }
 
     public DatastoreSummary getSummary() throws Exception {
@@ -220,7 +220,7 @@ public class DatastoreMO extends BaseMO {
     }
 
     public boolean copyDatastoreFile(String srcFilePath, ManagedObjectReference morSrcDc, ManagedObjectReference morDestDs, String destFilePath,
-            ManagedObjectReference morDestDc, boolean forceOverwrite) throws Exception {
+                                     ManagedObjectReference morDestDc, boolean forceOverwrite) throws Exception {
 
         String srcDsName = getName();
         DatastoreMO destDsMo = new DatastoreMO(_context, morDestDs);
@@ -248,7 +248,7 @@ public class DatastoreMO extends BaseMO {
     }
 
     public boolean moveDatastoreFile(String srcFilePath, ManagedObjectReference morSrcDc, ManagedObjectReference morDestDs, String destFilePath,
-            ManagedObjectReference morDestDc, boolean forceOverwrite) throws Exception {
+                                     ManagedObjectReference morDestDc, boolean forceOverwrite) throws Exception {
 
         String srcDsName = getName();
         DatastoreMO destDsMo = new DatastoreMO(_context, morDestDs);
