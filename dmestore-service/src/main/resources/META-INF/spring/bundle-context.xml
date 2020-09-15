@@ -103,4 +103,7 @@
         <property name="vimObjectReferenceService" ref="vimObjectReferenceService"/>
     </bean>
 
+    <bean name="dmeRelationInstanceService" class="com.dmeplugin.dmestore.services.DmeRelationInstanceServiceImpl">
+    </bean>
+
 </beans>
