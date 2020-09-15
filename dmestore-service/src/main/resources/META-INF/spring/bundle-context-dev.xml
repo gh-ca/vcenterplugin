@@ -89,6 +89,8 @@
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
         <property name="dmeAccessService" ref="dmeAccessService"/>
         <property name="dmeStorageService" ref="dmeStorageService"/>
+        <property name="dataStoreStatisticHistoryService" ref="DataStoreStatisticHistoryService"/>
+
     </bean>
 
     <bean name="vmfsOperationService" class="com.dmeplugin.dmestore.services.VmfsOperationServiceImpl"/>
