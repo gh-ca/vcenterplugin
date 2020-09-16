@@ -301,7 +301,7 @@ public class VCSDKUtils {
     }
 
     //得到所有存储 除去已经挂载了当前主机的存储
-    public String getDataStoresByHostName(String hostName) throws Exception {
+    public String getDataStoresByHostName(String hostName, String dataStoreType) throws Exception {
         String listStr = "";
         try {
             VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
@@ -320,7 +320,7 @@ public class VCSDKUtils {
                     List<Map<String, Object>> lists = new ArrayList<>();
                     for (Pair<ManagedObjectReference, String> ds : dss) {
                         DatastoreMO dsmo = new DatastoreMO(vmwareContext, ds.first());
-                        if (dsmo != null) {
+                        if (dsmo != null && dataStoreType.equals(dsmo.getSummary().getType())) {
                             _logger.info("dsmo.getName==" + dsmo.getName());
                             boolean isMount = true;
                             List<DatastoreHostMount> dhms = dsmo.getHostMounts();
@@ -363,7 +363,7 @@ public class VCSDKUtils {
     }
 
     //得到所有存储 除去已经挂载了当前集群的存储 扫描集群下所有主机，只要有一个主机没挂当前存储就要显示，只有集群下所有主机都挂载了该存储就不显示
-    public String getDataStoresByClusterName(String clusterName) throws Exception {
+    public String getDataStoresByClusterName(String clusterName, String dataStoreType) throws Exception {
         String listStr = "";
         try {
             VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
@@ -389,7 +389,7 @@ public class VCSDKUtils {
                     List<Map<String, Object>> lists = new ArrayList<>();
                     for (Pair<ManagedObjectReference, String> ds : dss) {
                         DatastoreMO dsmo = new DatastoreMO(vmwareContext, ds.first());
-                        if (dsmo != null) {
+                        if (dsmo != null && dataStoreType.equals(dsmo.getSummary().getType())) {
                             _logger.info("dsmo.getName==" + dsmo.getName());
                             boolean isMount = false;
                             List<DatastoreHostMount> dhms = dsmo.getHostMounts();
@@ -653,6 +653,47 @@ public class VCSDKUtils {
             result = "error";
             _logger.error("vmware error:", e);
             throw e;
+        }
+        return result;
+    }
+
+    //create nfs datastore
+    public String createNfsDatastore(String serverHost, Integer logicPort, String exportPath, String nfsName ,String accessMode,String mountHost) {
+        //todo
+        //NfsDataInfo nfsDataInfo = new NfsDataInfo(); 用于详情和列表展示的自定义model
+        //NasDatastoreInfo-->DataStoreInfo-->(aliasOf, containerId, freeSpace, maxFileSize, maxMemoryFileSize, maxVirtualDiskCapacity, name, timestamp, url)
+        //如何拿到DataStoreInfo对象？去设置其中关于指定容量大小的问题
+        //如何让NFS和fs/share/logicport产生关系？（指定的主机上面是否绑定对应的fs/share/logicport列表?）
+        //String accessMode = "";
+        String result = "success";
+        accessMode = StringUtils.isEmpty(accessMode) || accessMode.equals("readWrite") ? "readWrite" : "readOnly";
+        //exportPath = "/volume1/TESTNFS";
+        //需要判断nfs版本，如果是v4.1要将 Kerberos 安全功能与 NFS 4.1 结合使用，请启用 Kerberos 并选择适当的 Kerberos 模型。
+        //nfsName = "lqnfsv3.1";
+        //remoteHostNames equal remoteHost(v3)
+        //serverHost = "10.143.132.187";
+        _logger.info("start creat nfs datastore");
+        //mountHost = "10.143.132.17";
+        //logicPort = 0;
+        try {
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
+            DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
+            List<ManagedObjectReference> hosts = dcMo.findHost(mountHost);
+            ManagedObjectReference managedObjectReference = null;
+            if (hosts != null && hosts.size() > 0) {
+                managedObjectReference = hosts.get(0);
+                HostMO hostMO = new HostMO(vmwareContext, managedObjectReference);
+                HostDatastoreSystemMO hostDatastoreSystemMO = hostMO.getHostDatastoreSystemMO();
+                //todo 存在返回值 需要处理
+                hostDatastoreSystemMO.createNfsDatastore(serverHost, logicPort, exportPath, nfsName,accessMode);
+                _logger.info("end creat nfs datastore");
+            } else {
+                result = "failed";
+                _logger.error("can not find target host!");
+            }
+        } catch (Exception e) {
+            result = "failed";
+            _logger.error("vmware error:", e);
         }
         return result;
     }
