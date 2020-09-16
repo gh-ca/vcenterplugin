@@ -82,6 +82,15 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         super(context, morType, morValue);
     }
 
+    public HostMO(VmwareContext context, String hostName) throws Exception {
+        super(context, null);
+
+        _mor = _context.getVimClient().getDecendentMoRef(_context.getRootFolder(), "HostSystem", hostName);
+        if (_mor == null) {
+            s_logger.error("Unable to locate host " + hostName);
+        }
+    }
+
     public HostHardwareSummary getHostHardwareSummary() throws Exception {
         HostConnectInfo hostInfo = _context.getService().queryHostConnectionInfo(_mor);
         HostHardwareSummary hardwareSummary = hostInfo.getHost().getHardware();
@@ -201,6 +210,11 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
             }
         }
         return null;
+    }
+
+    public HostAdvanceOptionMO getHostAdvanceOptionMO() throws Exception {
+        HostConfigManager configMgr = getHostConfigManager();
+        return new HostAdvanceOptionMO(_context, configMgr.getAdvancedOption());
     }
 
     public HostNetworkSystemMO getHostNetworkSystemMO() throws Exception {

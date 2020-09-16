@@ -92,6 +92,10 @@ public class SystemServiceImpl implements SystemService {
       systemDao.checkExistAndCreateTable(DPSqlFileConstant.DP_DME_VMWARE_RELATION,
               DPSqlFileConstant.DP_DME_VMWARE_RELATION_SQL);
 
+      //20200916 add table HW_BEST_PRACTICE_CHECK
+      systemDao.checkExistAndCreateTable(SqlFileConstant.HW_BEST_PRACTICE_CHECK,
+              SqlFileConstant.HW_BEST_PRACTICE_CHECK_SQL);
+
       LOGGER.info("Removing HA data...");
       vCenterInfoService.deleteHASyncAndDeviceData();
     } catch (Exception e) {

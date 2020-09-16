@@ -75,7 +75,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     @Override
-    public NFSDataStoreShareAttr getNFSDatastoreShareAttr(String nfs_share_id) throws Exception {
+    public NFSDataStoreShareAttr getNFSDatastoreShareAttr(String storage_id) throws Exception {
+        //TODO 根据存储ID 获取逻nfs_share_id
+        String nfs_share_id = null;
         String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_SHARE_DETAIL_URL,
                 "nfs_share_id", nfs_share_id);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
@@ -117,7 +119,11 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     @Override
-    public NFSDataStoreLogicPortAttr getNFSDatastoreLogicPortAttr(String logic_port_id) throws Exception {
+    public NFSDataStoreLogicPortAttr getNFSDatastoreLogicPortAttr(String storage_id) throws Exception {
+        //TODO 根据存储ID 获取逻辑端口ID
+        String logic_port_id = null;
+
+
         String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_LOGICPORT_DETAIL_URL,
                 "logic_port_id", logic_port_id);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);

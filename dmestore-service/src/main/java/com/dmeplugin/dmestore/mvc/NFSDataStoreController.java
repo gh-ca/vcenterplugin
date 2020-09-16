@@ -15,14 +15,14 @@ public class NFSDataStoreController extends BaseController{
     @Autowired
     private DmeNFSAccessService dmeNFSAccessService;
 
-    @RequestMapping(value = "/logicport/{logic_port_id}", method = RequestMethod.GET)
-    public ResponseBodyBean portAttr(@PathVariable("logic_port_id") String logic_port_id) throws Exception {
-        return success(dmeNFSAccessService.getNFSDatastoreLogicPortAttr(logic_port_id));
+    @RequestMapping(value = "/logicport/{storage_id}", method = RequestMethod.GET)
+    public ResponseBodyBean portAttr(@PathVariable("storage_id") String storage_id) throws Exception {
+        return success(dmeNFSAccessService.getNFSDatastoreLogicPortAttr(storage_id));
     }
 
-    @RequestMapping(value = "/share/{nfs_share_id}", method = RequestMethod.GET)
-    public ResponseBodyBean shareAttr(@PathVariable("nfs_share_id") String nfs_share_id) throws Exception {
-        return success(dmeNFSAccessService.getNFSDatastoreShareAttr(nfs_share_id));
+    @RequestMapping(value = "/share/{storage_id}", method = RequestMethod.GET)
+    public ResponseBodyBean shareAttr(@PathVariable("storage_id") String storage_id) throws Exception {
+        return success(dmeNFSAccessService.getNFSDatastoreShareAttr(storage_id));
     }
 
     @RequestMapping(value = "/fileservice/{storage_id}", method = RequestMethod.GET)
