@@ -71,6 +71,47 @@ public class VCSDKUtils {
         return listStr;
     }
 
+    //得到所有存储的info
+    public  String getAllVmfsDataStoreInfos(String storeType) throws Exception {
+        String listStr = "";
+        try {
+            VmwareContext[] vmwareContexts =vcConnectionHelper.getAllContext();
+            for (VmwareContext vmwareContext:vmwareContexts) {
+                RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+                List<Pair<ManagedObjectReference, String>> dss = rootFsMO.getAllDatastoreOnRootFs();
+                if (dss != null && dss.size() > 0) {
+                    List<Map<String,Object>> lists = new ArrayList<>();
+
+                    for (Pair<ManagedObjectReference, String> ds : dss) {
+                        DatastoreMO ds1 = new DatastoreMO(vmwareContext, ds.first());
+                        Map<String,Object> dsmap = gson.fromJson(gson.toJson(ds1.getSummary()), new TypeToken<Map<String,Object>>() {}.getType());
+                        if(storeType.equals(ToolUtils.STORE_TYPE_NFS) &&
+                                ds1.getSummary().getType().equals(ToolUtils.STORE_TYPE_NFS)){
+                            NasDatastoreInfo nasinfo = (NasDatastoreInfo)ds1.getInfo();
+                            dsmap.put("remoteHost",nasinfo.getNas().getRemoteHost());
+                            dsmap.put("remotePath",nasinfo.getNas().getRemotePath());
+                        }
+
+                        if (StringUtils.isEmpty(storeType)) {
+                            lists.add(dsmap);
+                        } else if (ds1.getSummary().getType().equals(storeType)) {
+                            lists.add(dsmap);
+                        }
+
+                    }
+                    if (lists.size() > 0) {
+                        listStr = gson.toJson(lists);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware error:", e);
+            throw e;
+        }
+        return listStr;
+    }
+
     //得到所有主机的ID与name
     public  String getAllHosts() throws Exception {
         String listStr = "";

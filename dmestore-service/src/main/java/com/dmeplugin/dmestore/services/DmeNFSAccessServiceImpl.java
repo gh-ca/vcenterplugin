@@ -490,7 +490,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 //整理数据
                 Map<String, DmeVmwareRelation> dvrMap = getDvrMap(dvrlist);
                 //取得vcenter中的所有nfs存储。
-                String listStr = vcsdkUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_NFS);
+                String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(ToolUtils.STORE_TYPE_NFS);
                 LOG.info("nfs listStr==" + listStr);
                 if (!StringUtils.isEmpty(listStr)) {
                     JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
@@ -506,15 +506,15 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                                     NfsDataInfo nfsDataInfo = new NfsDataInfo();
                                     double capacity = ToolUtils.getDouble(jo.get("capacity")) / ToolUtils.Gi;
                                     double freeSpace = ToolUtils.getDouble(jo.get("freeSpace")) / ToolUtils.Gi;
-                                    double uncommitted = ToolUtils.getDouble(jo.get("uncommitted")) / ToolUtils.Gi;
+                                    double reserveCapacity = (ToolUtils.getDouble(jo.get("capacity")) - ToolUtils.getDouble(jo.get("freeSpace"))) / ToolUtils.Gi;
 
                                     nfsDataInfo.setName(vmwareStoreName);
 
                                     nfsDataInfo.setCapacity(capacity);
                                     nfsDataInfo.setFreeSpace(freeSpace);
-                                    nfsDataInfo.setReserveCapacity(capacity + uncommitted - freeSpace);
+                                    nfsDataInfo.setReserveCapacity(reserveCapacity);
 
-                                    nfsDataInfo.setShareIp("======ShareIp");
+                                    nfsDataInfo.setShareIp(ToolUtils.jsonToStr(jo.get("remoteHost")));
 
                                     DmeVmwareRelation dvr = dvrMap.get(vmwareStoreName);
 

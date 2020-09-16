@@ -38,7 +38,7 @@ public class NfsAccessController extends BaseController {
     @ResponseBody
     public ResponseBodyBean listNfs()
             throws Exception {
-        LOG.info("accessvmfs/listnfs");
+        LOG.info("accessnfs/listnfs");
         String failureStr = "";
         try {
             List<NfsDataInfo> lists = dmeNFSAccessService.listNfs();
@@ -61,7 +61,7 @@ public class NfsAccessController extends BaseController {
     @ResponseBody
     public ResponseBodyBean listNfsPerformance(@RequestParam("fsIds") List<String> fsIds)
             throws Exception {
-        LOG.info("accessvmfs/listnfsperformance fsIds==" + gson.toJson(fsIds));
+        LOG.info("accessnfs/listnfsperformance fsIds==" + gson.toJson(fsIds));
         String failureStr = "";
         try {
             List<NfsDataInfo> lists = dmeNFSAccessService.listNfsPerformance(fsIds);
@@ -91,9 +91,16 @@ public class NfsAccessController extends BaseController {
     @ResponseBody
     public ResponseBodyBean mountNfs(@RequestBody Map<String, Object> params)
             throws Exception {
-        LOG.info("accessnfs/mountnfs==" + gson.toJson(params));
-        String re = "";
-        return success(re);
+        LOG.info("accessnfs/mountvmfs=="+gson.toJson(params));
+        String failureStr = "";
+        try {
+//            dmeNFSAccessService.mountVmfs(params);
+            return success();
+        }catch (Exception e){
+            LOG.error("mount vmfs failure:", e);
+            failureStr = e.getMessage();
+        }
+        return failure(failureStr);
     }
 
 }
