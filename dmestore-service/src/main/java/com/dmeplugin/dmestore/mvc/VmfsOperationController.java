@@ -78,44 +78,38 @@ public class VmfsOperationController extends BaseController{
         return failure(gson.toJson(resMap));
     }
 
-    /**
-     * search service-level
-     * @param params （name，project_id，available_zone_id，storage_array_id，start
-     *               limit，sort_key，sort_dir，type）
-     * @return
-     */
-    @GetMapping("/servicelevelvmfs")
+    @PutMapping("/listvmfsservicelevel")
     @ResponseBody
-    public ResponseBodyBean getServiceLevelVMFS(@RequestBody Map<String,String> params){
+    public ResponseBodyBean listServiceLevelVMFS(@RequestBody(required = false) Map<String,Object> params){
 
-        LOG.info("servicelevelvmfs=="+gson.toJson(params));
-        //遍历参数
-        //请求地址
-        String url="/rest/service-policy/v1/service-levels";
-        //参数拼接url
-        SimpleServiceLevel simpleServiceLevel = new SimpleServiceLevel();
-
-        return success(simpleServiceLevel);
+        LOG.info("recyclevmfs=="+gson.toJson(params));
+        Map<String,Object> resMap =vmfsOperationService.listServiceLevelVMFS(params);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
     }
 
     /**
-     *
-     * @param serviceLevelId required
-     * @param attributesAutoChange  optional
-     * @param volumeIds volume list optional
+     * {
+     *   "service_level_id" : "b1da0725-2456-4d37-9caf-ad0a4644d10e",
+     *   "attributes_auto_change" : true,
+     *   "volume_ids" : [ "a0da0725-2456-4d37-9caf-ad0a4644d10e" ]
+     * }
+     * @param params {service_level_id,attributes_auto_change,volume_ids}
      * @return
      */
-    @PostMapping("changeservicelevelvmfs")
+    @PostMapping("updatevmfsservicelevel")
     @ResponseBody
-    public ResponseBodyBean changeServiceLevelVMFS(@RequestParam(name = "serviceLevelId") String serviceLevelId,
-                                                   @RequestParam(name = "attributesAutoChange",defaultValue = "true",required = false) Boolean attributesAutoChange,
-                                                   @RequestBody(required = false) String[] volumeIds){
+    public ResponseBodyBean updateServiceLevelVMFS(@RequestBody Map<String,Object> params){
 
-        LOG.info("changeservicelevelvmfs=="+serviceLevelId);
-        String url = "/rest/blockservice/v1/volumes/update-service-level";
+        LOG.info("servicelevelvmfs=="+gson.toJson(params));
+        Map<String,Object> resMap = vmfsOperationService.updateVmfsServiceLevel(params);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(202)) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
 
-        String taskId = "";
-        return success(taskId);
     }
 
     public static void main(String[] args) {

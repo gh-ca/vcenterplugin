@@ -640,6 +640,49 @@ public class VCSDKUtils {
         return result;
     }
 
+    //create nfs datastore
+    public String createNfsDatastore(String serverHost, Integer logicPort, String exportPath, String nfsName ,String accessMode,String mountHost) {
+
+        //todo
+        //NfsDataInfo nfsDataInfo = new NfsDataInfo(); 用于详情和列表展示的自定义model
+        //NasDatastoreInfo-->DataStoreInfo-->(aliasOf, containerId, freeSpace, maxFileSize, maxMemoryFileSize, maxVirtualDiskCapacity, name, timestamp, url)
+        //如何拿到DataStoreInfo对象？去设置其中关于指定容量大小的问题
+        //如何让NFS和fs/share/logicport产生关系？（指定的主机上面是否绑定对应的fs/share/logicport列表?）
+        //String accessMode = "";
+        String result = "success";
+        accessMode = StringUtils.isEmpty(accessMode) || accessMode.equals("readWrite") ? "readWrite" : "readOnly";
+        //exportPath = "/volume1/TESTNFS";
+        //需要判断nfs版本，如果是v4.1要将 Kerberos 安全功能与 NFS 4.1 结合使用，请启用 Kerberos 并选择适当的 Kerberos 模型。
+        //nfsName = "lqnfsv3.1";
+        //remoteHostNames equal remoteHost(v3)
+        //serverHost = "10.143.132.187";
+        _logger.info("start creat nfs datastore");
+        //mountHost = "10.143.132.17";
+        //logicPort = 0;
+        try {
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
+            DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
+            List<ManagedObjectReference> hosts = dcMo.findHost(mountHost);
+            ManagedObjectReference managedObjectReference = null;
+            if (hosts != null && hosts.size() > 0) {
+                managedObjectReference = hosts.get(0);
+                HostMO hostMO = new HostMO(vmwareContext, managedObjectReference);
+                HostDatastoreSystemMO hostDatastoreSystemMO = hostMO.getHostDatastoreSystemMO();
+                //todo 存在返回值 需要处理
+                hostDatastoreSystemMO.createNfsDatastore(serverHost, logicPort, exportPath, nfsName,accessMode);
+                _logger.info("end creat nfs datastore");
+            } else {
+                result = "failed";
+                _logger.error("can not find target host!");
+            }
+        } catch (Exception e) {
+            result = "failed";
+            _logger.error("vmware error:", e);
+        }
+        return result;
+    }
+
+
     public  void hostRescanVmfs(String hostIp) throws Exception {
         try {
             VmwareContext[] vmwareContexts =vcConnectionHelper.getAllContext();
@@ -1158,8 +1201,6 @@ public class VCSDKUtils {
     }
 
     public static void main(String[] args) {
-        try {
-            Gson gson = new Gson();
 //            String listStr = VCSDKUtils.getAllVmfsDataStores(null);
 //            _logger.info("Vmfs listStr==" + listStr);
 //            listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_VMFS);
@@ -1210,10 +1251,34 @@ public class VCSDKUtils {
 //                    _logger.info("Vmfs attachTagStr==" + attachTagStr);
 //                }
 //            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+//=========================================================================================================================================
+//            String accessMode = "";
+//            accessMode = StringUtils.isEmpty(accessMode) || accessMode.equals("readWrite") ? "readWrite" : "readOnly";
+//            String exportPath = "/volume1/TESTNFS";
+//            String uuid = "lqnfsv3.1";
+//            String host = "10.143.132.187";
+//            _logger.info("start creat nfs datastore");
+//            Integer port = 0;
+//            try {
+//                VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
+//                DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
+//                List<ManagedObjectReference> hosts = dcMo.findHost("10.143.132.17");
+//                ManagedObjectReference managedObjectReference = null;
+//                if (hosts != null && hosts.size() > 0) {
+//                    managedObjectReference = hosts.get(0);
+//                    HostMO hostMO = new HostMO(vmwareContext, managedObjectReference);
+//                    HostDatastoreSystemMO hostDatastoreSystemMO = hostMO.getHostDatastoreSystemMO();
+//                    ManagedObjectReference nfsDatastore = hostDatastoreSystemMO.createNfsDatastore(host, port, exportPath, uuid,accessMode);
+//
+//                    _logger.info("end creat nfs datastore");
+//                } else {
+//                    _logger.error("can not find target host!");
+//                }
+//
+//
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//            }
     }
 }
 
