@@ -1,5 +1,7 @@
 package com.dmeplugin.dmestore.model;
 
+import java.util.PrimitiveIterator;
+
 /**
  * @author lianq
  * @ClassName: StoragePool
@@ -19,6 +21,15 @@ public class StoragePool   {
     private Double consumed_capacity;
     private String consumed_capacity_percentage;
     private String consumed_capacity_threshold;
+    private String storage_pool_id;
+
+    public String getStorage_pool_id() {
+        return storage_pool_id;
+    }
+
+    public void setStorage_pool_id(String storage_pool_id) {
+        this.storage_pool_id = storage_pool_id;
+    }
 
     public Double getFree_capacity() {
         return free_capacity;
