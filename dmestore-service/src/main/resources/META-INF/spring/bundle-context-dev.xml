@@ -142,5 +142,6 @@
         <property name="username" value="administrator@vsphere.local"/>
         <property name="password" value="Pbu4@123"/>
     </bean>
+    <bean name="nfsOperationService" class="com.dmeplugin.dmestore.services.NfsOperationServiceImpl"/>
 
 </beans>

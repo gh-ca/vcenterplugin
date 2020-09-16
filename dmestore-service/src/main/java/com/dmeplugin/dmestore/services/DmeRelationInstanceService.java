@@ -22,6 +22,14 @@ public interface DmeRelationInstanceService {
     List<RelationInstance> queryRelationByRelationName(String relationName) throws Exception;
 
     /**
+     * 按资源关系类型名称和条件sourceInstanceId查询资源关系实例
+     * @param relationName 资源关系类型名称
+     * @param sourceInstanceId 源实例ID
+     * @return
+     */
+    List<RelationInstance> queryRelationByRelationNameConditionSourceInstanceId(String relationName, String sourceInstanceId) throws Exception;
+
+    /**
      * 按资源关系类型名称和实例ID查询资源关系实例
      * @param relationName enum:M_DjTierContainsLun M_DjTierContainsStoragePool M_DjTierContainsStoragePort
      * @param instanceId uuid

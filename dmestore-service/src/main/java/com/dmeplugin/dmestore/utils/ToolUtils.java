@@ -60,6 +60,18 @@ public class ToolUtils {
         return re;
     }
 
+    public static long getLong(Object obj){
+        long re = 0L;
+        try {
+            if (!StringUtils.isEmpty(obj)) {
+                re = Long.parseLong(obj.toString());
+            }
+        } catch (Exception e) {
+            LOG.error("error:", e);
+        }
+        return re;
+    }
+
     public static String jsonToStr(JsonElement obj) {
         String re = "";
         try {
@@ -107,4 +119,6 @@ public class ToolUtils {
         }
         return re;
     }
+
+
 }

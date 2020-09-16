@@ -9,7 +9,6 @@ import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -213,7 +212,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         // DME FileService, 通过fs_name和storageId查询fs (需求文档说明是通过share path, 但API不支持)
 
         String store_type = ToolUtils.STORE_TYPE_NFS;
-        String listStr = vcsdkUtils.getAllVmfsDataStores(store_type);
+        String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(store_type);
         LOG.info("===list nfs datastore success====\n{}", listStr);
         if (StringUtils.isEmpty(listStr)) {
             return false;
@@ -232,14 +231,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         for (int i = 0; i < jsonArray.size(); i++) {
             JsonObject nfsDatastore = jsonArray.get(i).getAsJsonObject();
 
-            //TODO 暂时认为是从url中获取到wwn信息
-            String nfsDatastoreUrl = nfsDatastore.get("url").getAsString();
-            String nfsDatastoreId = nfsDatastore.get("id").getAsString();
-            String nfsDatastoreName = nfsDatastore.get("name").getAsString();
-            String nfsDatastoreIp = "";//nfsDatastore.get("XXX").getAsString();
-            String nfsDataStoreSharePath = "";//nfsDatastore.get("XXX").getAsString();
-            //拆分wwn
-            //String wwn = nfsDatastoreUrl.split("volumes/")[1];
+            //TODO 从vCenter nfsDataStore信息中提取 ip和path
+            String nfsDatastoreIp = nfsDatastore.get("remoteHost").getAsString();
+            String nfsDataStoreSharePath = nfsDatastore.get("remotePath").getAsString();
             Storage storageInfo = storageMap.get(nfsDatastoreIp);
             if (null == storageInfo) {
                 LOG.warn("扫描NFS存储信息,share ip:{} 再DME侧没有找到对应的存储设备!!!", nfsDatastoreIp);
@@ -259,6 +253,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 String name = ToolUtils.getStr(logicPortInfo.get("name"));
                 relation.setLogicPortId(id);
                 relation.setLogicPortName(name);
+            } else {
+                LOG.warn("NFSDATASTORE id:" + storage_id + " contains logicport is null!");
             }
 
             //获取share信息 (条件:sharePath  可加 storageId)
@@ -270,6 +266,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 String name = ToolUtils.getStr(shareInfo.get("name"));
                 relation.setShareId(id);
                 relation.setShareName(name);
+            }else {
+                LOG.warn("NFSDATASTORE id:" + storage_id + " contains share is null!");
             }
 
             //获取fs信息
@@ -279,7 +277,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 String name = ToolUtils.getStr(fsInfo.get("name"));
                 relation.setFsId(id);
                 relation.setFsName(name);
+            }else {
+                LOG.warn("NFSDATASTORE id:" + storage_id + " contains fs is null!");
             }
+
             relationList.add(relation);
         }
 
@@ -378,7 +379,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return shareList;
     }
 
-    //按条件查询fs
+    //DME按条件获取fs
     private Map<String, Object> queryFsInfo(String storageId, String fsName) throws Exception {
         ResponseEntity responseEntity = listFsByStorageId(storageId, fsName);
         if (responseEntity.getStatusCodeValue() / 100 != 2) {
@@ -391,7 +392,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return null;
     }
 
-    //通过storageId查询fs信息
+    //DME通过storageId获取fs信息
     private ResponseEntity listFsByStorageId(String storageId, String fsName) throws Exception {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("storage_id", storageId);
@@ -486,7 +487,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
 
     @Override
-    public List<NfsDataInfo> listNfs() throws Exception{
+    public List<NfsDataInfo> listNfs() throws Exception {
         List<NfsDataInfo> relists = null;
         try {
             //从关系表中取得DME卷与vcenter存储的对应关系
@@ -600,7 +601,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     @Override
-    public List<NfsDataInfo> listNfsPerformance(List<String> fsIds) throws Exception{
+    public List<NfsDataInfo> listNfsPerformance(List<String> fsIds) throws Exception {
         List<NfsDataInfo> relists = null;
         try {
             if (fsIds != null && fsIds.size() > 0) {
