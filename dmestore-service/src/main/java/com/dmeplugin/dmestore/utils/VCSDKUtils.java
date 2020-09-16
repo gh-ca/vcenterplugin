@@ -285,7 +285,7 @@ public class VCSDKUtils {
         return listStr;
     }
     //得到所有存储 除去已经挂载了当前主机的存储
-    public  String getDataStoresByHostName(String hostName) throws Exception {
+    public  String getDataStoresByHostName(String hostName, String dataStoreType) throws Exception {
         String listStr = "";
         try {
             VmwareContext[] vmwareContexts =vcConnectionHelper.getAllContext();
@@ -304,7 +304,7 @@ public class VCSDKUtils {
                     List<Map<String, Object>> lists = new ArrayList<>();
                     for (Pair<ManagedObjectReference, String> ds : dss) {
                         DatastoreMO dsmo = new DatastoreMO(vmwareContext, ds.first());
-                        if (dsmo != null) {
+                        if (dsmo != null && dataStoreType.equals(dsmo.getSummary().getType())) {
                             _logger.info("dsmo.getName==" + dsmo.getName());
                             boolean isMount = true;
                             List<DatastoreHostMount> dhms = dsmo.getHostMounts();
@@ -346,7 +346,7 @@ public class VCSDKUtils {
         return listStr;
     }
     //得到所有存储 除去已经挂载了当前集群的存储 扫描集群下所有主机，只要有一个主机没挂当前存储就要显示，只有集群下所有主机都挂载了该存储就不显示
-    public String getDataStoresByClusterName(String clusterName) throws Exception {
+    public String getDataStoresByClusterName(String clusterName, String dataStoreType) throws Exception {
         String listStr = "";
         try {
             VmwareContext[] vmwareContexts =vcConnectionHelper.getAllContext();
@@ -372,7 +372,7 @@ public class VCSDKUtils {
                     List<Map<String, Object>> lists = new ArrayList<>();
                     for (Pair<ManagedObjectReference, String> ds : dss) {
                         DatastoreMO dsmo = new DatastoreMO(vmwareContext, ds.first());
-                        if (dsmo != null) {
+                        if (dsmo != null && dataStoreType.equals(dsmo.getSummary().getType())) {
                             _logger.info("dsmo.getName==" + dsmo.getName());
                             boolean isMount = false;
                             List<DatastoreHostMount> dhms = dsmo.getHostMounts();
