@@ -12,6 +12,7 @@ public class SqlFileConstant {
   public static final String HW_ALARM_DEFINITION = "HW_ALARM_DEFINITION";
   public static final String HW_HA_COMPONENT = "HW_HA_COMPONENT";
   public static final String HW_ALARM_RECORD = "HW_ALARM_RECORD";
+  public static final String HW_BEST_PRACTICE_CHECK = "HW_BEST_PRACTICE_CHECK";
   // NOTE: if have new defined tables above, remember to add to ALL_TABLES below
   public static final String[] ALL_TABLES = {SqlFileConstant.HW_ESIGHT_HOST,
       SqlFileConstant.HW_ESIGHT_TASK, SqlFileConstant.HW_ESIGHT_THUMBPRINT,
@@ -168,6 +169,21 @@ public class SqlFileConstant {
       + "  \"CREATE_TIME\"  datetime NOT NULL,\n"
       + "  FOREIGN KEY (ESIGHT_HOST_ID) REFERENCES HW_ESIGHT_HOST (ID) ON DELETE CASCADE\n"
       + ");";
+
+  public static final String HW_BEST_PRACTICE_CHECK_SQL ="DROP TABLE IF EXISTS \"HW_BEST_PRACTICE_CHECK\";\n" +
+          "CREATE TABLE \"HW_BEST_PRACTICE_CHECK\" (\n" +
+          "\"ID\"  integer PRIMARY KEY AUTO_INCREMENT NOT NULL,\n" +
+          "\"HOST_ID\"  nvarchar(255),\n" +
+          "\"HOST_NAME\"  nvarchar(255),\n" +
+          "\"HOST_SETTING\"  nvarchar(255),\n" +
+          "\"RECOMMEND_VALUE\"  nvarchar(50) NOT NULL,\n" +
+          "\"ACTUAL_VALUE\"  nvarchar(50),\n" +
+          "\"HINT_LEVEL\"  nvarchar(20),\n" +
+          "\"NEED_REBOOT\"  nvarchar(10),\n" +
+          "\"AUTO_REPAIR\"  nvarchar(10),\n" +
+          "\"CREATE_TIME\"  datetime\n" +
+          //"\"INDEX\" (HOST_SETTING)\n" +
+          ");";
 
   public static final String HW_ESIGHT_HOST_SYSTEM_ID = "SYSTEM_ID";
   public static final String HW_ESIGHT_HOST_ALTER_SQL = "ALTER TABLE HW_ESIGHT_HOST ADD SYSTEM_ID VARCHAR(50) NULL;";
