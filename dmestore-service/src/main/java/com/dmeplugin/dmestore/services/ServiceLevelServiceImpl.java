@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.model.RelationInstance;
 import com.dmeplugin.dmestore.model.ServiceLevelInfo;
 import com.google.gson.*;
 import org.slf4j.Logger;
@@ -8,10 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @Description: TODO
@@ -27,6 +25,8 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     private Gson gson;
     @Autowired
     private DmeAccessService dmeAccessService;
+    @Autowired
+    private DmeRelationInstanceService dmeRelationInstanceService;
 
     private final String LIST_SERVICE_LEVEL_URL = "https://localhost:26335/rest/service-policy/v1/service-levels";
 
@@ -101,6 +101,42 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         }
         return slis;
     }
+
+    //扫描服务等级 发现服务等级下的存储池,磁盘,(存储端口)
+
+
+    //服务等级 发现服务等级下的存储池 serviceLevelId和sourceInstanceId一样?
+    public List<String> getStoragePoolIdsByServiceLevelId(String serviceLevelId) throws Exception {
+        String relatinName = "M_DjTierContainsStoragePool";
+       return getContainIdsByRelationNameLevelId(relatinName, serviceLevelId);
+    }
+
+    //服务等级 发现服务等级下的卷
+    public List<String> getVolumeIdsByServiceLivelId(String serviceLevelId) throws Exception {
+        String relationName = "M_DjTierContainsLun";
+        return getContainIdsByRelationNameLevelId(relationName, serviceLevelId);
+    }
+
+    private List<String> getContainIdsByRelationNameLevelId(String relationName, String serviceLevelId) throws Exception {
+        Set<String> ids = new HashSet<>();
+        List<RelationInstance> ris = dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(relationName, serviceLevelId);
+        if (null != ris && ris.size() > 0) {
+            for (RelationInstance ri : ris) {
+                ids.add(ri.getTargetInstanceId());
+            }
+        }
+        return new ArrayList<>(ids);
+    }
+
+    //查询服务等级性能
+    public Object getStatisticByServiceLevelId(String serviceLevelId){
+        //1 获取服务等级下的磁盘Id
+
+        //2 获取磁盘性能
+
+        return null;
+    }
+
 
     /*public static void main(String[] args) {
         String str = "{\"service-levels\":[{\"id\": \"UUID\",\"name\": \"service-level_block\",\"description\": \"block service-level for dj\",\"type\":\"BLOCK\",\"protocol\": \"FC\",\"total_capacity\": 200,\"free_capacity\": 200,\"used_capacity\":100,\"capabilities\": {\"resource_type\": \"thin\",\"compression\": true,\"deduplication\": true,\"smarttier\": {\"policy\": \"1\",\"enabled\": true},\"qos\": {\"enabled\": true,\"qos_param\":{\"latency\":\"10\",\"latencyUnit\": \"ms\",\"minBandWidth\": 1000,\"minIOPS\": 1000}}}}]}";

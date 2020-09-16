@@ -4,6 +4,7 @@ package com.dmeplugin.dmestore.dao;
 import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.exception.DataBaseException;
+import com.dmeplugin.dmestore.utils.ToolUtils;
 import org.springframework.util.StringUtils;
 
 import java.sql.Connection;
@@ -232,5 +233,95 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             closeConnection(con, pstm, null);
         }
     }
+
+    /**
+     * 根据存储ID获取fsId
+     */
+    public String getFsIdByStorageId(String storeId) throws SQLException {
+        return getNfsContainId(storeId, "FS_ID");
+    }
+
+    /**
+     * 根据存储ID获取shareId
+     */
+    public String getShareIdByStorageId(String storeId) throws SQLException {
+        return getNfsContainId(storeId, "SHARE_ID");
+    }
+
+    /**
+     * 根据存储ID获取logicportId
+     */
+    public String getLogicPortIdByStorageId(String storeId) throws SQLException {
+        return getNfsContainId(storeId, "LOGICPORT_ID");
+    }
+
+    /**
+     * 根据存储ID获取fsId列表
+     */
+    public List<String> getFsIdsByStorageId(String storeId) throws SQLException {
+        return getNfsContainIds(storeId, "FS_ID");
+    }
+
+    /**
+     * 根据存储ID获取shareId列表
+     */
+    public List<String> getShareIdsByStorageId(String storeId) throws SQLException {
+        return getNfsContainIds(storeId, "SHARE_ID");
+    }
+
+    /**
+     * 根据存储ID获取logicPortId列表
+     */
+    public List<String> getLogicPortIdsByStorageId(String storeId) throws SQLException {
+        return getNfsContainIds(storeId, "LOGICPORT_ID");
+    }
+
+    //NFS存储 获取指定存储下的fileId的一个值
+    private String getNfsContainId(String storeId, String fileId) throws SQLException {
+        String id = "";
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            String sql = "SELECT " + fileId + " FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_TYPE='" + ToolUtils.STORE_TYPE_NFS + " 'and STORE_ID='" + storeId + "'";
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                id = rs.getString(fileId);
+                break;
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("Failed to get dme nfs relation fileId: " + fileId + "," + e.getMessage());
+            throw new SQLException(e);
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return id;
+    }
+
+    //NFS存储 获取指定存储下的fileId的集合
+    private List<String> getNfsContainIds(String storeId, String fileId) throws SQLException {
+        List<String> lists = new ArrayList<>();
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            String sql = "SELECT " + fileId + " FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_TYPE='" + ToolUtils.STORE_TYPE_NFS + " 'and STORE_ID='" + storeId + "'";
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                lists.add(rs.getString(fileId));
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("Failed to get dme nfs relations fileId: " + fileId + "," + e.getMessage());
+            throw new SQLException(e);
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return lists;
+    }
+
 
 }
