@@ -12,33 +12,58 @@ import java.util.Map;
  * @create: 2020-09-02
  **/
 public interface VmwareAccessService {
+
     /**
-     * vmware host list
+     * Access hosts
+     *
+     * @return ResponseBodyBean List<Map<String, String>> include hostId hostName
+     * @throws Exception when error
      */
     List<Map<String,String>> listHosts() throws Exception;
 
     /**
-     * vmware host list
+     * Access hosts
+     *
+     * @param  dataStoreName dataStore Name
+     * @return ResponseBodyBean List<Map<String, String>> include hostId hostName
+     * @throws Exception when error
      */
     List<Map<String,String>> getHostsByDsName(String dataStoreName) throws Exception;
 
     /**
-     * vmware Cluster list
+     * Access clusters
+     *
+     * @return ResponseBodyBean List<Map<String, String>> include clusterId clusterName
+     * @throws Exception when error
      */
     List<Map<String,String>> listClusters() throws Exception;
 
     /**
-     * vmware Cluster list
+     * Access clusters
+     *
+     * @param  dataStoreName dataStore Name
+     * @return ResponseBodyBean List<Map<String, String>> include clusterId clusterName
+     * @throws Exception when error
      */
     List<Map<String,String>> getClustersByDsName(String dataStoreName) throws Exception;
 
     /**
-     * vmware dataStore list
+     * Access datastore
+     *
+     * @param  hostName host Name
+     * @param  dataStoreType dataStore Type
+     * @return ResponseBodyBean List<Map<String, String>> include id name status type capacity freeSpace
+     * @throws Exception when error
      */
     List<Map<String,String>> getDataStoresByHostName(String hostName, String dataStoreType) throws Exception;
 
     /**
-     * vmware dataStore list
+     * Access datastore
+     *
+     * @param  clusterName cluster Name
+     * @param  dataStoreType dataStore Type
+     * @return ResponseBodyBean List<Map<String, String>> include id name status type capacity freeSpace
+     * @throws Exception when error
      */
     List<Map<String,String>> getDataStoresByClusterName(String clusterName, String dataStoreType) throws Exception;
 
