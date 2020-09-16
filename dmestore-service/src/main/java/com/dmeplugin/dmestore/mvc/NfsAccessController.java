@@ -77,14 +77,18 @@ public class NfsAccessController extends BaseController {
 
     /**
      * Mount nfs include:
-     * list<str> dataStoreNames: datastore名称列表 必
-     * list<str> volumeIds: 卷volumeId列表 必
+     * list<Map<String,String>> dataStoreInfos: datastore信息列表 必
+     * Map<String,String>中包含了
+     * dataStoreName: datastore名称  必
+     * fsId: fs id 必
+     * shareId: share Id 必
+     * logicPortId: logicPort Id 必
      * str host: 主机名称 必 （主机与集群二选一）
      * str cluster: 集群名称 必（主机与集群二选一）
      * str logic_port: 逻辑端口
-     * str mountType: 挂载模式（只读或读写）
+     * str mountType: 挂载模式（只读或读写）  readOnly/readWrite
      *
-     * @param params: include dataStoreNames,volumeIds,host,cluster,logic_port,mountType
+     * @param params: include dataStoreInfos,host,cluster,logic_port,mountType
      * @return: ResponseBodyBean
      */
     @RequestMapping(value = "/mountnfs", method = RequestMethod.POST)
