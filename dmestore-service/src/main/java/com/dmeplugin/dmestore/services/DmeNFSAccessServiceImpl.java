@@ -28,8 +28,8 @@ import java.util.Map;
 public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private static final Logger LOG = LoggerFactory.getLogger(DmeNFSAccessServiceImpl.class);
 
-    @Autowired
-    private Gson gson;
+
+    private Gson gson=new Gson();
 
     //@Autowired
     private DmeAccessService dmeAccessService;

@@ -19,8 +19,8 @@ import java.util.*;
  **/
 public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticHistoryService {
     private static final Logger log = LoggerFactory.getLogger(DataStoreStatisticHistoryService.class);
-    @Autowired
-    private Gson gson;
+
+    private Gson gson=new Gson();
     @Autowired
     private DmeAccessService dmeAccessService;
 

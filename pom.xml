@@ -14,6 +14,7 @@
 	<modules>
 		<module>dmestore-service</module>
 		<module>dmestore-ui</module>
+		<module>dmestore-deployer</module>
 	</modules>
 
 

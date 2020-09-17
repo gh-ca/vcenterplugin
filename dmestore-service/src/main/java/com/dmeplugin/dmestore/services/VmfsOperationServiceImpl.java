@@ -28,8 +28,8 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     @Autowired
     private DmeAccessService dmeAccessService;
 
-    @Autowired
-    private Gson gson;
+
+    private Gson gson=new Gson();
 
     private VCSDKUtils vcsdkUtils;
 

@@ -15,8 +15,8 @@ public class NfsOperationController {
 
     public static final Logger LOG = LoggerFactory.getLogger(NfsOperationController.class);
 
-    @Autowired
-    private Gson gson;
+
+    private Gson gson=new Gson();
 
 
 }

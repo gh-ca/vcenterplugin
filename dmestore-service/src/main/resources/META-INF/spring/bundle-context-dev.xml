@@ -19,6 +19,13 @@
 
     </bean>
 
+    <bean name="dmeInfoDao" class="com.dmeplugin.dmestore.dao.DmeInfoDao">
+        <property name="url" value="${h2.url}"/>
+    </bean>
+
+    <bean name="DmeAccessServiceImpl" class="com.dmeplugin.dmestore.services.DmeAccessServiceImpl">
+        <property name="dmeInfoDao" ref="dmeInfoDao"/>
+    </bean>
     <bean name="h2DataBaseDao" class="com.dmeplugin.dmestore.dao.H2DataBaseDao">
         <property name="url" value="${h2.url}"/>
     </bean>
@@ -33,10 +40,10 @@
 
     <bean name="InstantiationBeanServiceImpl"
           class="com.dmeplugin.dmestore.services.InstantiationBeanServiceImpl">
-        <property name="systemService" ref="systemService"/>
+        <property name="systemService" ref="SystemServiceImpl"/>
     </bean>
 
-    <bean name="systemService" class="com.dmeplugin.dmestore.services.SystemServiceImpl">
+    <bean name="SystemServiceImpl" class="com.dmeplugin.dmestore.services.SystemServiceImpl">
         <property name="systemDao" ref="systemDao"/>
         <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
     </bean>
@@ -57,13 +64,17 @@
     <bean name="serviceLevelService" class="com.dmeplugin.dmestore.services.ServiceLevelServiceImpl">
     </bean>
 
+    <bean name="taskService" class="com.dmeplugin.dmestore.services.TaskServiceImpl"></bean>
+
+    <bean name="dmeStorageService" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
+    </bean>
     <bean name="dmeVmwareRalationDao" class="com.dmeplugin.dmestore.dao.DmeVmwareRalationDao">
         <property name="url" value="${h2.url}"/>
     </bean>
 
     <bean name="vmfsAccessService" class="com.dmeplugin.dmestore.services.VmfsAccessServiceImpl">
         <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
-        <property name="dmeAccessService" ref="dmeAccessService"/>
+        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="dataStoreStatisticHistoryService" ref="DataStoreStatisticHistoryService"/>
         <property name="dmeStorageService" ref="dmeStorageService"/>
         <property name="taskService" ref="taskService"/>
@@ -78,22 +89,23 @@
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
 
-    <bean name="dmeStorageService" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
-    </bean>
-
-    <bean name="taskService" class="com.dmeplugin.dmestore.services.TaskServiceImpl"></bean>
 
     <bean name="dmeNFSAccessService" class="com.dmeplugin.dmestore.services.DmeNFSAccessServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
-        <property name="dmeAccessService" ref="dmeAccessService"/>
+        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="dmeStorageService" ref="dmeStorageService"/>
+    </bean>
+
+    <bean name="vmwareAccessService" class="com.dmeplugin.dmestore.services.VmwareAccessServiceImpl">
+        <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
 
     <bean name="vmfsOperationService" class="com.dmeplugin.dmestore.services.VmfsOperationServiceImpl"/>
 
+
     <bean name="vmrdmService" class="com.dmeplugin.dmestore.services.VMRDMServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
-        <property name="dmeAccessService" ref="dmeAccessService"/>
+        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="taskService" ref="taskService"/>
     </bean>
 

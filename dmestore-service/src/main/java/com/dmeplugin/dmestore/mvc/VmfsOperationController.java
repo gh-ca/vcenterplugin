@@ -25,8 +25,8 @@ public class VmfsOperationController extends BaseController{
 
     public static final Logger LOG = LoggerFactory.getLogger(VmfsOperationController.class);
 
-    @Autowired
-    private Gson gson;
+
+    private Gson gson=new Gson();
     @Autowired
     private VmfsOperationService vmfsOperationService;
 

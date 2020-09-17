@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class NfsDataStatisticController extends BaseController {
     public static final Logger LOG = LoggerFactory.getLogger(NfsDataStatisticController.class);
 
-    @Autowired
-    private Gson gson;
+
+    private Gson gson=new Gson();
 
 }

@@ -32,7 +32,7 @@ public class VMRDMServiceImpl implements VMRDMService {
     //@Autowired
     private TaskService taskService;
 
-    @Autowired
+
     private Gson gson = new Gson();
 
     private VCSDKUtils vcsdkUtils;

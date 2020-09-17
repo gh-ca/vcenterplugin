@@ -23,8 +23,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DmeStorageServiceImpl.class);
 
-    @Autowired
-    private Gson gson;
+
+    private Gson gson=new Gson();
 
     @Autowired
     private DmeAccessService dmeAccessServiceImpl;
