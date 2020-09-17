@@ -68,7 +68,7 @@ public abstract class VCConnectionHelper {
      * @return
      * @throws Exception
      */
-    public abstract VmwareContext getServerContext(ManagedObjectReference mor) throws Exception;
+    public abstract VmwareContext getServerContext(String serverguid) throws Exception;
     /**
      * 获取多个context，主要用于获取所有的主机，datastore这种
      * @return
@@ -85,6 +85,15 @@ public abstract class VCConnectionHelper {
         mor.setType(type);
         mor.setValue(value);
         return mor;
+    }
+
+    public  String objectID2Serverguid(String objectid){
+        String[] objectarry=objectid.split(":");
+        String type=objectarry[2];
+        String value=objectarry[3];
+        String serverguid=objectarry[4];
+
+        return serverguid;
     }
 
     public  String MOR2ObjectID(ManagedObjectReference mor,String serverguid){
