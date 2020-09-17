@@ -534,6 +534,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                                     nfsDataInfo.setFs(dvr.getFsName());
                                     nfsDataInfo.setFsId(dvr.getFsId());
 
+                                    nfsDataInfo.setObjectid(ToolUtils.getStr(jo.get("objectid")));
+
                                     String fsUrl = "";
                                     try {
                                         fsUrl = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL,

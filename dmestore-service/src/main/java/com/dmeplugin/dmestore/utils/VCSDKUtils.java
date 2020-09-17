@@ -88,8 +88,10 @@ public class VCSDKUtils {
                         if(storeType.equals(ToolUtils.STORE_TYPE_NFS) &&
                                 ds1.getSummary().getType().equals(ToolUtils.STORE_TYPE_NFS)){
                             NasDatastoreInfo nasinfo = (NasDatastoreInfo)ds1.getInfo();
+                            String objectid=vcConnectionHelper.MOR2ObjectID(ds1.getMor(),vmwareContext.getServerAddress());
                             dsmap.put("remoteHost",nasinfo.getNas().getRemoteHost());
                             dsmap.put("remotePath",nasinfo.getNas().getRemotePath());
+                            dsmap.put("objectid",objectid);
                         }
 
                         if (StringUtils.isEmpty(storeType)) {

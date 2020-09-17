@@ -25,7 +25,7 @@ public class NfsAccessController extends BaseController {
     public static final Logger LOG = LoggerFactory.getLogger(NfsAccessController.class);
 
 
-    private Gson gson;
+    private Gson gson=new Gson();
     @Autowired
     private DmeNFSAccessService dmeNFSAccessService;
 

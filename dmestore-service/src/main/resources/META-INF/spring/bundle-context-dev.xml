@@ -53,14 +53,6 @@
         <property name="vCenterInfoDao" ref="vcenterInfoDao"/>
     </bean>
 
-    <bean name="dmeInfoDao" class="com.dmeplugin.dmestore.dao.DmeInfoDao">
-        <property name="url" value="${h2.url}"/>
-    </bean>
-
-    <bean name="dmeAccessService" class="com.dmeplugin.dmestore.services.DmeAccessServiceImpl">
-        <property name="dmeInfoDao" ref="dmeInfoDao"/>
-    </bean>
-
     <bean name="serviceLevelService" class="com.dmeplugin.dmestore.services.ServiceLevelServiceImpl">
     </bean>
 
@@ -92,7 +84,7 @@
     </bean>
 
     <bean name="taskService" class="com.dmeplugin.dmestore.services.TaskServiceImpl">
-        <property name="dmeAccessService" ref="dmeAccessService"/>
+        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
     </bean>
 
     <bean name="dmeNFSAccessService" class="com.dmeplugin.dmestore.services.DmeNFSAccessServiceImpl">
