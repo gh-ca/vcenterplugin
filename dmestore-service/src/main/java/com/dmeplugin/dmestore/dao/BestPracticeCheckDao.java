@@ -82,6 +82,43 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         return lists;
     }
 
+    public List<BestPracticeBean> getRecordByPage(String hostSetting, int pageNo, int pageSize) throws SQLException{
+        int offset = (pageNo - 1) * pageSize;
+        List<BestPracticeBean> lists = new ArrayList<>();
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            String sql = "SELECT HOST_ID,HOST_NAME,HOST_SETTING,RECOMMEND_VALUE,ACTUAL_VALUE,HINT_LEVEL,NEED_REBOOT,AUTO_REPAIR from HW_BEST_PRACTICE_CHECK where 1=1 ";
+            if (!StringUtils.isEmpty(hostSetting)) {
+                sql = sql + " and HOST_SETTING='" + hostSetting + "'";
+            }
+
+            sql = sql + " OFFSET " + offset + " ROWS FETCH FIRST " + pageSize + " ROWS ONLY";
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                BestPracticeBean bean = new BestPracticeBean();
+                bean.setHostId(rs.getString("HOST_ID"));
+                bean.setHostName(rs.getString("HOST_NAME"));
+                bean.setHostSetting(rs.getString("HOST_SETTING"));
+                bean.setRecommendValue(rs.getString("RECOMMEND_VALUE"));
+                bean.setActualValue(rs.getString("ACTUAL_VALUE"));
+                bean.setLevel(rs.getString("HINT_LEVEL"));
+                bean.setNeedReboot(rs.getString("NEED_REBOOT"));
+                bean.setAutoRepair(rs.getString("AUTO_REPAIR"));
+                lists.add(bean);
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("Failed to get host check info by host_setting! " + e.getMessage());
+            throw new SQLException(e);
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return lists;
+    }
+
     public List<BestPracticeBean> getRecordBeanByHostsetting(String hostSetting) throws SQLException{
         List<BestPracticeBean> lists = new ArrayList<>();
         Connection con = null;

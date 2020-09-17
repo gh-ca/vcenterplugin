@@ -22,14 +22,33 @@ public class BestPracticeController extends BaseController{
         this.bestPracticeProcessService = bestPracticeProcessService;
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @RequestMapping(value = "/check", method = RequestMethod.POST)
     public ResponseBodyBean bestPractice() throws Exception {
-        bestPracticeProcessService.check(null);
-        return success();
+        try {
+            bestPracticeProcessService.check(null);
+            return success();
+        }catch (Exception ex){
+            return failure(ex.getMessage());
+        }
     }
 
-    @RequestMapping(value = "/records", method = RequestMethod.GET)
+    @RequestMapping(value = "/records/all", method = RequestMethod.GET)
     public ResponseBodyBean getBestPracticeRecords() throws Exception {
-        return success(bestPracticeProcessService.getCheckRecord());
+        try {
+            return success(bestPracticeProcessService.getCheckRecord());
+        }catch (Exception ex){
+            return failure(ex.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/records/bypage", method = RequestMethod.GET)
+    public ResponseBodyBean getBySettingAndPage(@RequestParam String hostSetting,
+                                                @RequestParam int pageNo,
+                                                @RequestParam int pageSize) throws Exception {
+        try {
+            return success(bestPracticeProcessService.getCheckRecordBy(hostSetting, pageNo, pageSize));
+        }catch (Exception ex){
+            return failure(ex.getMessage());
+        }
     }
 }
