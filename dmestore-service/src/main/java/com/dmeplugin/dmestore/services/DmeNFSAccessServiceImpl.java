@@ -486,16 +486,16 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                         for (int i = 0; i < jsonArray.size(); i++) {
                             JsonObject jo = jsonArray.get(i).getAsJsonObject();
                             //LOG.info("jo==" + jo.toString());
-                            String vmwareStoreName = ToolUtils.jsonToStr(jo.get("name"));
-                            if (!StringUtils.isEmpty(vmwareStoreName)) {
+                            String vmwareObjectId = ToolUtils.jsonToStr(jo.get("objectid"));
+                            if (!StringUtils.isEmpty(vmwareObjectId)) {
                                 //对比数据库关系表中的数据，只显示关系表中的数据
-                                if (dvrMap != null && dvrMap.get(vmwareStoreName) != null) {
+                                if (dvrMap != null && dvrMap.get(vmwareObjectId) != null) {
                                     NfsDataInfo nfsDataInfo = new NfsDataInfo();
                                     double capacity = ToolUtils.getDouble(jo.get("capacity")) / ToolUtils.Gi;
                                     double freeSpace = ToolUtils.getDouble(jo.get("freeSpace")) / ToolUtils.Gi;
                                     double reserveCapacity = (ToolUtils.getDouble(jo.get("capacity")) - ToolUtils.getDouble(jo.get("freeSpace"))) / ToolUtils.Gi;
 
-                                    nfsDataInfo.setName(vmwareStoreName);
+                                    nfsDataInfo.setName(ToolUtils.jsonToStr(jo.get("name")));
 
                                     nfsDataInfo.setCapacity(capacity);
                                     nfsDataInfo.setFreeSpace(freeSpace);
@@ -503,7 +503,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
                                     nfsDataInfo.setShareIp(ToolUtils.jsonToStr(jo.get("remoteHost")));
 
-                                    DmeVmwareRelation dvr = dvrMap.get(vmwareStoreName);
+                                    DmeVmwareRelation dvr = dvrMap.get(vmwareObjectId);
 
                                     nfsDataInfo.setSharePath(dvr.getVolumeShare());
 
@@ -554,7 +554,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             if (dvrlist != null && dvrlist.size() > 0) {
                 remap = new HashMap<>();
                 for (DmeVmwareRelation dvr : dvrlist) {
-                    remap.put(dvr.getStoreName(), dvr);
+                    remap.put(dvr.getStoreId(), dvr);
                 }
             }
         } catch (Exception e) {
