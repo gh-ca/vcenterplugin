@@ -6,6 +6,7 @@ import com.dmeplugin.dmestore.model.NFSDataStoreShareAttr;
 import com.dmeplugin.dmestore.model.NfsDataInfo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @ClassName DmeNFSAccessService
@@ -14,15 +15,15 @@ import java.util.List;
  * @Date 2020/9/4 10:18
  * @Version V1.0
  **/
- public interface DmeNFSAccessService {
+public interface DmeNFSAccessService {
 
-     /**
-      * @Author wangxiangyong
-      * @Description  NFS DataStore share属性获取
-      * @Date 10:21 2020/9/4
-      * @Param []
-      * @Return com.dmeplugin.dmestore.model.NFSDataStoreShareAttr
-      **/
+    /**
+     * @Author wangxiangyong
+     * @Description NFS DataStore share属性获取
+     * @Date 10:21 2020/9/4
+     * @Param []
+     * @Return com.dmeplugin.dmestore.model.NFSDataStoreShareAttr
+     **/
     NFSDataStoreShareAttr getNFSDatastoreShareAttr(String nfs_share_id) throws Exception;
 
     /**
@@ -45,6 +46,7 @@ import java.util.List;
 
     /**
      * 扫描NFS 存储DataSotre 与share fs logicPort的关系
+     *
      * @return
      * @throws Exception
      */
@@ -52,7 +54,7 @@ import java.util.List;
 
     /**
      * List nfs
-
+     *
      * @return List<NfsDataInfo>
      * @throws Exception when error
      */
@@ -61,9 +63,22 @@ import java.util.List;
     /**
      * List nfs Performance
      *
-     * @param  fsIds fs id
+     * @param fsIds fs id
      * @return List<NfsDataInfo>
      * @throws Exception when error
      */
     List<NfsDataInfo> listNfsPerformance(List<String> fsIds) throws Exception;
+
+    /**
+     * Mount nfs,params中包含了 include:     *
+     * dataStoreName: datastore名称  必
+     * list<str> hosts: 主机名称 必 （主机与集群二选一）
+     * list<str> clusters: 集群名称 必（主机与集群二选一）
+     * str mountType: 挂载模式（只读或读写）  readOnly/readWrite
+     *
+     * @param params: include dataStoreName,hosts,clusters,mountType
+     * @return: ResponseBodyBean
+     * @throws Exception when error
+     */
+    void mountNfs(Map<String, Object> params) throws Exception;
 }

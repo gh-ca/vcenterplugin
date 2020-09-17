@@ -484,6 +484,35 @@ public class VCSDKUtils {
         return listStr;
     }
 
+    //得到集群下所有没有挂载的主机
+    public List<String> getUnmoutHostsOnCluster(String dataStoreName, List<String> clusters) throws Exception {
+        List<String> hostlist = null;
+        try {
+            String unmountHostStr = getHostsByDsName(dataStoreName);
+            List<Map<String, String>> unmountHostlists = gson.fromJson(unmountHostStr, new TypeToken<List<Map<String, String>>>() {}.getType());
+
+            if(clusters!=null && clusters.size()>0){
+                hostlist = new ArrayList<>();
+                for(String clusterName : clusters) {
+                    String hostStr = getHostsOnCluster(clusterName);
+                    List<Map<String, String>> hostStrlists = gson.fromJson(hostStr, new TypeToken<List<Map<String, String>>>() {}.getType());
+                    if(hostStrlists!=null && hostStrlists.size()>0){
+                        for(Map<String, String> hostmap:hostStrlists){
+                            if(unmountHostlists.contains(hostmap)) {
+                                hostlist.add(ToolUtils.getStr(hostmap.get("hostName")));
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware error:", e);
+            throw e;
+        }
+        return hostlist;
+    }
+
     //得到指定集群下的所有主机,以及指定主机所属集群下的所有主机
     public List<Pair<ManagedObjectReference, String>> getHostsOnCluster(String clusterName, String hostName) throws Exception {
         List<Pair<ManagedObjectReference, String>> hosts = null;
@@ -1217,6 +1246,74 @@ public class VCSDKUtils {
                 _logger.error("create vcenter disk rdm failed!errorMsg:{}", ex.getMessage());
                 throw new Exception(ex.getMessage());
             }
+        }
+    }
+
+    //将存储挂载到集群下其它主机
+    public void mountNfsOnCluster(String dataStoreName, List<String> clusters, List<String> hosts, String mountType) throws Exception {
+        try {
+            if (StringUtils.isEmpty(dataStoreName)) {
+                _logger.info("datastore:" + dataStoreName + " is null");
+                return;
+            }
+            if (clusters==null && hosts==null) {
+                _logger.info("host:" + hosts + " and cluster:" + clusters + " is null");
+                return;
+            }
+
+            List<String> hostlist = null;
+            if (hosts!=null) {
+                hostlist = hosts;
+            }else if (clusters!=null) {
+                //取得没有挂载这个存储的所有主机，以方便后面过滤
+                hostlist = getUnmoutHostsOnCluster(dataStoreName, clusters);
+            }
+
+            if(hostlist!=null && hostlist.size()>0) {
+                VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
+                for (VmwareContext vmwareContext : vmwareContexts) {
+                    RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+                    //集群下的所有主机
+                    DatastoreMO dsmo = rootFsMO.findDataStore(dataStoreName);
+
+                    for (String hostName : hostlist) {
+
+                        HostMO hostmo = rootFsMO.findHost(hostName);
+                        _logger.info("Host name: " + hostmo.getName());
+                        //只挂载其它的主机
+                        mountNfs(dsmo, hostmo, mountType);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("mount Vmfs On Cluster error:", e);
+            throw e;
+        }
+    }
+
+    //挂载Nfs存储
+    public void mountNfs(DatastoreMO dsmo, HostMO hostMO,String mountType) throws Exception {
+        try {
+            if (dsmo==null) {
+                _logger.info("datastore is null");
+                return;
+            }
+            if (hostMO == null) {
+                _logger.info("host is null");
+                return;
+            }
+            _logger.info("Hosts that need to be mounted:" + hostMO.getName());
+            //挂载前重新扫描datastore
+            hostMO.getHostStorageSystemMO().rescanVmfs();
+            _logger.info("Rescan datastore before mounting");
+            //挂载NFS
+            NasDatastoreInfo nasdsinfo = (NasDatastoreInfo)dsmo.getInfo();
+            hostMO.getHostDatastoreSystemMO().createNfsDatastore(nasdsinfo.getNas().getRemoteHost(),0,nasdsinfo.getNas().getRemotePath(),dsmo.getMor().getValue(),mountType);
+            _logger.info("mount nfs success:"+hostMO.getName()+":"+dsmo.getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("mount nfs error:", e);
         }
     }
 
