@@ -15,12 +15,15 @@ public class DmeVmwareRelation implements Serializable {
   private int id;
   private String storeId;
   private String storeName;
+
   private String volumeId;
   private String volumeName;
   private String volumeWwn;
+
   private String volumeShare;
   private String volumeFs;
 
+  private String storageDeviceId;
   private String shareId;
   private String shareName;
   private String fsId;
@@ -175,5 +178,13 @@ public class DmeVmwareRelation implements Serializable {
 
   public void setState(int state) {
     this.state = state;
+  }
+
+  public String getStorageDeviceId() {
+    return storageDeviceId;
+  }
+
+  public void setStorageDeviceId(String storageDeviceId) {
+    this.storageDeviceId = storageDeviceId;
   }
 }

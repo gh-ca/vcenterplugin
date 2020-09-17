@@ -59,6 +59,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 dvr.setCreateTime(rs.getTimestamp("CREATETIME"));
                 dvr.setUpdateTime(rs.getTimestamp("UPDATETIME"));
                 dvr.setState(rs.getInt("STATE"));
+                dvr.setStorageDeviceId(rs.getString("STORAGE_DEVICE_ID"));
                 lists.add(dvr);
             }
         } catch (DataBaseException | SQLException e) {
@@ -138,7 +139,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         PreparedStatement pstm = null;
         try {
             con = getConnection();
-            String sql = "insert into DP_DME_VMWARE_RELATION(STORE_ID,STORE_NAME,VOLUME_ID,VOLUME_NAME,VOLUME_WWN,VOLUME_SHARE,VOLUME_FS,STORE_TYPE,SHARE_ID,SHARE_NAME,FS_ID,FS_NAME,LOGICPORT_ID,LOGIC_PORT_NAME) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            String sql = "insert into DP_DME_VMWARE_RELATION(STORE_ID,STORE_NAME,VOLUME_ID,VOLUME_NAME,VOLUME_WWN,VOLUME_SHARE,VOLUME_FS,STORE_TYPE,SHARE_ID,SHARE_NAME,FS_ID,FS_NAME,LOGICPORT_ID,LOGIC_PORT_NAME,STORAGE_DEVICE_ID) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             pstm = con.prepareStatement(sql);
             //不自动提交
             con.setAutoCommit(false);
@@ -157,6 +158,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 pstm.setString(12, relation.getFsName());
                 pstm.setString(13, relation.getLogicPortId());
                 pstm.setString(14, relation.getLogicPortName());
+                pstm.setString(15, relation.getStorageDeviceId());
                 pstm.addBatch();
             }
             pstm.executeBatch();

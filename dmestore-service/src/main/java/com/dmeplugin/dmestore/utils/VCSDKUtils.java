@@ -88,6 +88,7 @@ public class VCSDKUtils {
                         if(storeType.equals(ToolUtils.STORE_TYPE_NFS) &&
                                 ds1.getSummary().getType().equals(ToolUtils.STORE_TYPE_NFS)){
                             NasDatastoreInfo nasinfo = (NasDatastoreInfo)ds1.getInfo();
+                            dsmap.put("nfsStorageId", ds1.getMor().getValue());
                             dsmap.put("remoteHost",nasinfo.getNas().getRemoteHost());
                             dsmap.put("remotePath",nasinfo.getNas().getRemotePath());
                         }
