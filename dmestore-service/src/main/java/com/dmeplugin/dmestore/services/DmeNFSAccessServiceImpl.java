@@ -81,8 +81,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     @Override
     public NFSDataStoreShareAttr getNFSDatastoreShareAttr(String storage_id) throws Exception {
-        //TODO 根据存储ID 获取逻nfs_share_id
-        String nfs_share_id = null;
+        //根据存储ID 获取逻nfs_share_id
+        String nfs_share_id = dmeVmwareRalationDao.getShareIdByStorageId(storage_id);
         String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_SHARE_DETAIL_URL,
                 "nfs_share_id", nfs_share_id);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
@@ -125,9 +125,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     @Override
     public NFSDataStoreLogicPortAttr getNFSDatastoreLogicPortAttr(String storage_id) throws Exception {
-        //TODO 根据存储ID 获取逻辑端口ID
-        String logic_port_id = null;
-
+        //根据存储ID 获取逻辑端口ID
+        String logic_port_id = dmeVmwareRalationDao.getLogicPortIdByStorageId(storage_id);
 
         String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_LOGICPORT_DETAIL_URL,
                 "logic_port_id", logic_port_id);
@@ -154,50 +153,23 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     @Override
     public List<NFSDataStoreFSAttr> getNFSDatastoreFSAttr(String storage_id) throws Exception {
-        String url = DmeConstants.DME_NFS_FILESERVICE_QUERY_URL;
-        JsonObject queryParam = new JsonObject();
-        int page_no = 0;
-        int page_size = 100;
-        queryParam.addProperty("storage_id", storage_id);
-        queryParam.addProperty("page_size", page_size);
-        boolean loopFlag = true;
-        JsonArray totalArray = new JsonArray();
-        while (loopFlag) {
-            queryParam.addProperty("page_no", page_no++);
-            try {
-                ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, queryParam.toString());
-                if (responseEntity.getStatusCodeValue() / 100 == 2) {
-                    String resBody = responseEntity.getBody();
-                    JsonObject response = gson.fromJson(resBody, JsonObject.class);
-                    JsonArray array = response.getAsJsonArray("data");
-                    totalArray.addAll(array);
-
-                    if (array.size() != page_size) {
-                        loopFlag = false;
-                    }
-                }
-            } catch (Exception ex) {
-                loopFlag = false;
-            }
-        }
-
+        //根据存储ID获取fs
+        List<String> fsIds = dmeVmwareRalationDao.getFsIdsByStorageId(storage_id);
         List<NFSDataStoreFSAttr> list = new ArrayList<>();
-        for (int i = 0; i < totalArray.size(); i++) {
-            JsonObject object = totalArray.get(i).getAsJsonObject();
+        for (int i = 0; i < fsIds.size(); i++) {
             NFSDataStoreFSAttr fsAttr = new NFSDataStoreFSAttr();
-            fsAttr.setName(object.get("name").getAsString());
-            fsAttr.setProvisionType(object.get("alloc_type").getAsString());
-            fsAttr.setDevice(object.get("storage_name").getAsString());
-            fsAttr.setStoragePoolName(object.get("storage_pool_name").getAsString());
-            //TODO 控制器暂未找到对应的值。
-            fsAttr.setController("--");
-            //查询详情，获取tuning信息
-            String file_system_id = object.get("id").getAsString();
-            url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL,
+            String file_system_id = fsIds.get(i);
+            String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL,
                     "file_system_id", file_system_id);
             ResponseEntity<String> responseTuning = dmeAccessService.access(url, HttpMethod.GET, null);
             if (responseTuning.getStatusCodeValue() / 100 == 2) {
                 JsonObject fsDetail = gson.fromJson(responseTuning.getBody(), JsonObject.class);
+                fsAttr.setName(fsDetail.get("name").getAsString());
+                fsAttr.setProvisionType(fsDetail.get("alloc_type").getAsString());
+                fsAttr.setDevice(fsDetail.get("storage_name").getAsString());
+                fsAttr.setStoragePoolName(fsDetail.get("storage_pool_name").getAsString());
+                fsAttr.setController(fsDetail.get("owning_controller").getAsString());
+                //查询详情，获取tuning信息
                 JsonObject tuning = fsDetail.getAsJsonObject("tuning");
                 fsAttr.setApplicationScenario(tuning.get("application_scenario").getAsString());
                 fsAttr.setDataDeduplication(tuning.get("deduplication_enabled").getAsBoolean());
