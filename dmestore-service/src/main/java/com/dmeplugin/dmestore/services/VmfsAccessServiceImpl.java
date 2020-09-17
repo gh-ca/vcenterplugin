@@ -78,7 +78,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 Map<String, String> stoNameMap = getStorNameMap(storagemap);
                 LOG.info("stoNameMap===" + gson.toJson(stoNameMap));
                 //取得vcenter中的所有vmfs存储。
-                String listStr = vcsdkUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_VMFS);
+                String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(ToolUtils.STORE_TYPE_VMFS);
                 LOG.info("Vmfs listStr==" + listStr);
                 if (!StringUtils.isEmpty(listStr)) {
                     JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
@@ -101,6 +101,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                     vmfsDataInfo.setCapacity(capacity);
                                     vmfsDataInfo.setFreeSpace(freeSpace);
                                     vmfsDataInfo.setReserveCapacity(capacity + uncommitted - freeSpace);
+
+                                    vmfsDataInfo.setObjectid(ToolUtils.jsonToStr(jo.get("objectid")));
 
                                     String wwn = jo.get("url").getAsString();
                                     LOG.info("wwn==" + wwn);

@@ -2,6 +2,7 @@ package com.dmeplugin.dmestore.model;
 
 public class VmfsDataInfo {
     //列表字段（基本视图）
+    String objectid; //跳转用唯一id
     String name;    //名称
     String status;  //状态
 
@@ -28,6 +29,14 @@ public class VmfsDataInfo {
     Integer latency; //时延 单位ms
 
     String volumeId; //卷ID
+
+    public String getObjectid() {
+        return objectid;
+    }
+
+    public void setObjectid(String objectid) {
+        this.objectid = objectid;
+    }
 
     public String getName() {
         return name;

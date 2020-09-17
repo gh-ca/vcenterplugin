@@ -86,13 +86,14 @@ public class VCSDKUtils {
                         DatastoreMO ds1 = new DatastoreMO(vmwareContext, ds.first());
                         Map<String, Object> dsmap = gson.fromJson(gson.toJson(ds1.getSummary()), new TypeToken<Map<String, Object>>() {
                         }.getType());
+                        String objectid = vcConnectionHelper.MOR2ObjectID(ds1.getMor(), vmwareContext.getServerAddress());
+                        dsmap.put("objectid", objectid);
                         if (storeType.equals(ToolUtils.STORE_TYPE_NFS) &&
                                 ds1.getSummary().getType().equals(ToolUtils.STORE_TYPE_NFS)) {
                             NasDatastoreInfo nasinfo = (NasDatastoreInfo) ds1.getInfo();
-                            String objectid = vcConnectionHelper.MOR2ObjectID(ds1.getMor(), vmwareContext.getServerAddress());
+
                             dsmap.put("remoteHost", nasinfo.getNas().getRemoteHost());
                             dsmap.put("remotePath", nasinfo.getNas().getRemotePath());
-                            dsmap.put("objectid", objectid);
                             dsmap.put("nfsStorageId", ds1.getMor().getValue());
                         }
 
