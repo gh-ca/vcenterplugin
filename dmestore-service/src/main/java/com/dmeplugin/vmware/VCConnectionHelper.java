@@ -76,4 +76,22 @@ public abstract class VCConnectionHelper {
      */
     public abstract VmwareContext[] getAllContext() throws Exception;
 
+    public  ManagedObjectReference objectID2MOR(String objectid){
+        String[] objectarry=objectid.split(":");
+        String type=objectarry[2];
+        String value=objectarry[3];
+        //String serverguid=objectarry[4];
+        ManagedObjectReference mor=new ManagedObjectReference();
+        mor.setType(type);
+        mor.setValue(value);
+        return mor;
+    }
+
+    public  String MOR2ObjectID(ManagedObjectReference mor,String serverguid){
+        String type=mor.getType();
+        String value=mor.getValue();
+        String objectid="urn:vmomi:"+type+":"+value+":"+serverguid;
+        objectid = objectid.replace("/", "%252F");
+        return objectid;
+    }
 }

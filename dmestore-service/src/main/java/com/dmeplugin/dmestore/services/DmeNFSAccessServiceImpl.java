@@ -7,6 +7,7 @@ import com.dmeplugin.dmestore.utils.StringUtil;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
@@ -38,6 +39,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     private DataStoreStatisticHistoryService dataStoreStatisticHistoryService;
 
+    private TaskService taskService;
 
     private VCSDKUtils vcsdkUtils;
 
@@ -71,6 +73,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     public void setDataStoreStatisticHistoryService(DataStoreStatisticHistoryService dataStoreStatisticHistoryService) {
         this.dataStoreStatisticHistoryService = dataStoreStatisticHistoryService;
+    }
+
+    public void setTaskService(TaskService taskService) {
+        this.taskService = taskService;
     }
 
     @Override
@@ -534,6 +540,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                                     nfsDataInfo.setFs(dvr.getFsName());
                                     nfsDataInfo.setFsId(dvr.getFsId());
 
+                                    nfsDataInfo.setObjectid(ToolUtils.getStr(jo.get("objectid")));
+
                                     String fsUrl = "";
                                     try {
                                         fsUrl = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL,
@@ -636,4 +644,120 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return relists;
     }
 
+    /**
+     * Mount nfs,params中包含了 include:     *
+     * dataStoreName: datastore名称  必
+     * list<str> hosts: 主机名称 必 （主机与集群二选一）
+     * list<str> clusters: 集群名称 必（主机与集群二选一）
+     * str mountType: 挂载模式（只读或读写）  readOnly/readWrite
+     *
+     * @param params: include dataStoreName,hosts,clusters,mountType
+     * @return: ResponseBodyBean
+     */
+    @Override
+    public void mountNfs(Map<String, Object> params) throws Exception{
+        if (params != null) {
+            String dataStoreName = ToolUtils.getStr(params.get("dataStoreName"));
+            LOG.info("dataStoreName====" + dataStoreName);
+            if (!StringUtils.isEmpty(dataStoreName)) {
+                //查询数据库，得到对应的nfs信息
+                DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsName(dataStoreName);
+                if(dvr!=null && dvr.getShareId()!=null) {
+                    params.put("shareId",dvr.getShareId());
+                    //挂载卷
+                    String taskId = mountnfsToHost(params);
+                    List<String> taskIds = new ArrayList<>();
+                    taskIds.add(taskId);
+                    LOG.info("taskIds====" + taskIds);
+                    //查询看挂载任务是否完成。
+                    boolean mountFlag = taskService.checkTaskStatus(taskIds);
+                    if (mountFlag) { //DME挂载完成
+                        //调用vCenter在主机上扫描卷和Datastore，并挂载主机
+                        List<String> clusters = null;
+                        List<String> hosts = null;
+                        String mountType = null;
+                        if(params.get("hosts")!=null){
+                            hosts = (List<String>)params.get("hosts");
+                        }
+                        if(params.get("clusters")!=null){
+                            clusters = (List<String>)params.get("clusters");
+                        }
+                        vcsdkUtils.mountNfsOnCluster(dataStoreName,
+                                clusters, hosts, ToolUtils.getStr(params.get("mountType")));
+
+                    } else {
+                        throw new Exception("DME mount nfs error(task status)!");
+                    }
+                }
+            } else {
+                throw new Exception("DME find or create host error!");
+            }
+        } else {
+            throw new Exception("Mount nfs parameter exception:" + params);
+        }
+    }
+
+    //挂载nfs,向share中添加客户端IP
+    private String mountnfsToHost(Map<String, Object> params) {
+        String taskId = "";
+        try {
+            if (params==null) {
+                LOG.info("mount nfs To Host fail: params is null");
+                throw new Exception("mount nfs To Host fail: params is null");
+            }
+            if (StringUtils.isEmpty(params.get("shareId"))) {
+                LOG.info("mount nfs To Host fail: share Id is null");
+                throw new Exception("mount nfs To Host fail: share Id is null");
+            }
+            if (params.get("hosts")==null && params.get("clusters")==null) {
+                LOG.info("mount nfs To Host fail: hosts or clusters is null");
+                throw new Exception("mount nfs To Host fail: hosts or clusters is null");
+            }
+            //取得目标主机
+            List<String> hostlist = null;
+            if (params.get("hosts")!=null) {
+                hostlist = (List<String>)params.get("hosts");
+            }else if (params.get("clusters")!=null) {
+                //取得没有挂载这个存储的所有主机，以方便后面过滤
+                hostlist = vcsdkUtils.getUnmoutHostsOnCluster(ToolUtils.getStr(params.get("dataStoreName")), (List<String>)params.get("clusters"));
+            }
+
+            //修改dme中的share
+            if(hostlist!=null && hostlist.size()>0) {
+                Map<String, Object> requestbody = new HashMap<>();
+                requestbody.put("id", ToolUtils.getStr(params.get("shareId")));
+
+                List<Map<String, Object>> listAddition = new ArrayList<>();
+                for(String hostIp:hostlist) {
+                    Map<String, Object> addition = new HashMap<>();
+                    addition.put("name", hostIp);
+                    addition.put("accessval", ToolUtils.getStr(params.get("mountType")));
+                    addition.put("all_squash", "all_squash");
+                    addition.put("root_squash", "root_squash");
+                    addition.put("sync", "synchronization");
+                    listAddition.add(addition);
+                }
+                requestbody.put("nfs_share_client_addition", listAddition);
+
+                LOG.info("mountnfs requestbody==" + gson.toJson(requestbody));
+
+                String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_SHARE_DETAIL_URL,
+                        "nfs_share_id", ToolUtils.getStr(params.get("shareId")));
+                LOG.info("mountnfs URL===" + url);
+                ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.PUT, requestbody.toString());
+
+                LOG.info("mountnfs responseEntity==" + responseEntity.toString());
+                if (responseEntity.getStatusCodeValue() == 202) {
+                    JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                    if (jsonObject != null && jsonObject.get("task_id") != null) {
+                        taskId = ToolUtils.jsonToStr(jsonObject.get("task_id"));
+                        LOG.info("mountnfs task_id====" + taskId);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("mountnfs error:", e);
+        }
+        return taskId;
+    }
 }

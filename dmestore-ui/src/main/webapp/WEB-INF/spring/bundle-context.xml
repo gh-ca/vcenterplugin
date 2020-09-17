@@ -21,6 +21,8 @@
 
    <!-- Standard controller beans: you can modify them if necessary -->
 
+   <bean name="nfsAccessController" class="com.dmeplugin.dmestore.mvc.NfsAccessController" />
+
    <bean name="servicesController" class="com.dmeplugin.dmestore.mvc.ServicesController" />
 
    <bean name="dataAccessController" class="com.dmeplugin.dmestore.mvc.DataAccessController" />
@@ -53,6 +55,9 @@
 
    <osgi:reference id="systemService"
                    interface="com.dmeplugin.dmestore.services.SystemService" />
+
+   <osgi:reference id="dmeNFSAccessService"
+                   interface="com.dmeplugin.dmestore.services.DmeNFSAccessService" />
 
 </beans>
 
