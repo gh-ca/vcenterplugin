@@ -63,7 +63,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 lists.add(dvr);
             }
         } catch (DataBaseException | SQLException e) {
-            LOGGER.error("Failed to get dme access info: " + e.getMessage());
+            LOGGER.error("Failed to get Dme Vmware Relation: " + e.getMessage());
             throw new SQLException(e);
         } finally {
             closeConnection(con, ps, rs);
@@ -71,6 +71,51 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         return lists;
     }
 
+    public DmeVmwareRelation getDmeVmwareRelationByDsName(String storeName) throws SQLException {
+
+        DmeVmwareRelation dvr = null;
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            String sql = "SELECT * FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION
+                    + " WHERE state=1 ";
+            if (!StringUtils.isEmpty(storeName)) {
+                sql = sql + " and STORE_NAME='" + storeName + "'";
+            }
+
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                dvr = new DmeVmwareRelation();
+                dvr.setId(rs.getInt("ID"));
+                dvr.setStoreId(rs.getString("STORE_ID"));
+                dvr.setStoreName(rs.getString("STORE_NAME"));
+                dvr.setVolumeId(rs.getString("VOLUME_ID"));
+                dvr.setVolumeName(rs.getString("VOLUME_NAME"));
+                dvr.setVolumeWwn(rs.getString("VOLUME_WWN"));
+                dvr.setVolumeShare(rs.getString("VOLUME_SHARE"));
+                dvr.setVolumeFs(rs.getString("VOLUME_FS"));
+                dvr.setShareId(rs.getString("SHARE_ID"));
+                dvr.setShareName(rs.getString("SHARE_NAME"));
+                dvr.setFsId(rs.getString("FS_ID"));
+                dvr.setFsName(rs.getString("FS_NAME"));
+                dvr.setLogicPortId(rs.getString("LOGICPORT_ID"));
+                dvr.setLogicPortName(rs.getString("LOGICPORT_NAME"));
+                dvr.setStoreType(rs.getString("STORE_TYPE"));
+                dvr.setCreateTime(rs.getTimestamp("CREATETIME"));
+                dvr.setUpdateTime(rs.getTimestamp("UPDATETIME"));
+                dvr.setState(rs.getInt("STATE"));
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("Failed to get Dme Vmware Relation: " + e.getMessage());
+            throw new SQLException(e);
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return dvr;
+    }
 
     public List<String> getAllWwnByType(String storeType) throws SQLException {
         List<String> lists = new ArrayList<>();

@@ -22,8 +22,7 @@ import java.util.Map;
 public class DataStoreStatisticHistoryController extends BaseController {
     public static final Logger LOG = LoggerFactory.getLogger(DataStoreStatisticHistoryController.class);
 
-    @Autowired
-    private Gson gson;
+    private Gson gson=new Gson();
     @Autowired
     DataStoreStatisticHistoryService dataSotreStatisticHistroyService;
 

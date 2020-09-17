@@ -29,8 +29,8 @@ public class DmeStorageController extends BaseController{
 
     public static final Logger LOG = LoggerFactory.getLogger(NfsAccessController.class);
 
-    @Autowired
-    private Gson gson;
+
+    private Gson gson=new Gson();
 
     @Autowired
     private DmeStorageService dmeStorageService;

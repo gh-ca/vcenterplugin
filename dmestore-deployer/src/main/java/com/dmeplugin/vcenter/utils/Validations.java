@@ -24,8 +24,7 @@ public class Validations {
 
   protected static final Logger LOGGER = LoggerFactory.getLogger(Validations.class);
 
-  private static final String RESTURL_VCENTERACTION = "https://%s/ui/vcenterpluginui/rest/registerservice/pluginaction";
-  //private static final String RESTURL_UNSUBSCRIBE = "https://%s:9443/ui/vcenterpluginui/rest/registerservice/pluginaction";
+  private static final String RESTURL_VCENTERACTION = "https://%s/ui/dmestore/rest/registerservice/pluginaction";
 
   private static final HttpHeaders HEADERS = new HttpHeaders();
 

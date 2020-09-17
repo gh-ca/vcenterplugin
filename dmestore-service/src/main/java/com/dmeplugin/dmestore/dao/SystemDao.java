@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.dao;
 
+import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
 import com.dmeplugin.dmestore.constant.SqlFileConstant;
 
 import java.io.IOException;
@@ -176,7 +177,7 @@ public class SystemDao extends H2DataBaseDao {
     PreparedStatement ps1 = null;
     try {
       con = getConnection();
-      for (String table : SqlFileConstant.ALL_TABLES) {
+      for (String table : DPSqlFileConstant.ALL_TABLES) {
         try {
           ps1 = con.prepareStatement("DELETE FROM " + table);
           ps1.execute();

@@ -24,8 +24,8 @@ import java.util.Map;
 public class NfsAccessController extends BaseController {
     public static final Logger LOG = LoggerFactory.getLogger(NfsAccessController.class);
 
-    @Autowired
-    private Gson gson;
+
+    private Gson gson=new Gson();
     @Autowired
     private DmeNFSAccessService dmeNFSAccessService;
 
@@ -76,32 +76,26 @@ public class NfsAccessController extends BaseController {
 
 
     /**
-     * Mount nfs include:
-     * list<Map<String,String>> dataStoreInfos: datastore信息列表 必
-     * Map<String,String>中包含了
+     * Mount nfs,params中包含了 include:     *
      * dataStoreName: datastore名称  必
-     * fsId: fs id 必
-     * shareId: share Id 必
-     * logicPortId: logicPort Id 必
-     * str host: 主机名称 必 （主机与集群二选一）
-     * str cluster: 集群名称 必（主机与集群二选一）
-     * str logic_port: 逻辑端口
+     * list<str> hosts: 主机名称 必 （主机与集群二选一）
+     * list<str> clusters: 集群名称 必（主机与集群二选一）
      * str mountType: 挂载模式（只读或读写）  readOnly/readWrite
      *
-     * @param params: include dataStoreInfos,host,cluster,logic_port,mountType
+     * @param params: include dataStoreName,hosts,clusters,mountType
      * @return: ResponseBodyBean
      */
     @RequestMapping(value = "/mountnfs", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean mountNfs(@RequestBody Map<String, Object> params)
             throws Exception {
-        LOG.info("accessnfs/mountvmfs=="+gson.toJson(params));
+        LOG.info("accessnfs/mountnfs=="+gson.toJson(params));
         String failureStr = "";
         try {
-//            dmeNFSAccessService.mountVmfs(params);
+            dmeNFSAccessService.mountNfs(params);
             return success();
         }catch (Exception e){
-            LOG.error("mount vmfs failure:", e);
+            LOG.error("mount nfs failure:", e);
             failureStr = e.getMessage();
         }
         return failure(failureStr);

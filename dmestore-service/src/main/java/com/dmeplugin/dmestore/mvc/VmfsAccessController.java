@@ -25,7 +25,7 @@ import java.util.Map;
 public class VmfsAccessController extends BaseController{
     public static final Logger LOG = LoggerFactory.getLogger(VmfsAccessController.class);
 
-    @Autowired
+
     private Gson gson = new Gson();
     @Autowired
     private VmfsAccessService vmfsAccessService;
@@ -83,25 +83,15 @@ public class VmfsAccessController extends BaseController{
      * param str volumeName: 名称 必 卷的名称
      * param int capacity: 容量，单位GB 必
      * param int count: 数量 必
-     * param int start_suffix: 该规格卷的起始后缀编号
-     * SchedulerHints对象包含如下属性
-     * param boolean affinity: 是否开启亲和性
-     * param str affinity_volume: 待亲和的卷id
-     * ServiceVolumeMapping对象包含如下属性
-     * param str host_id: 主机id，与hostgroup_id二选其一,不可同时存在
-     * param str hostgroup_id: 主机组id，与host_id二选其一，不可同时存在
      * param str service_level_id: 服务等级id 若未选择服务等级，可选择存储设备、存储池、设置QoS、Thin、Workload
-     * param str service_level_name; 服务等级名称  必
-     * param str project_id: 业务群组id
-     * param str availability_zone: 可用分区id
+     * param str service_level_name; 服务等级名称
      * param int version: 版本
      * param int blockSize: 块大小，单位KB
      * param int spaceReclamationGranularity   空间回收粒度 单位K
      * param str spaceReclamationPriority: 空间回收优先权
-     * param str host: 主机  必
+     * param str host: 主机  必  与cluster二选其一,不可同时存在
      * param str hostId: 主机
-     * param str hostlun; 可用的lun 必
-     * param str cluster: 集群
+     * param str cluster: 集群 必 与host二选其一,不可同时存在
      * param str clusterId: 集群
      * param str storage_id 存储设备id
      * param str pool_raw_id 卷所属存储池在存储设备上的id
