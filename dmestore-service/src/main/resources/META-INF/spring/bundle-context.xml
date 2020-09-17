@@ -52,7 +52,6 @@
           class="com.dmeplugin.dmestore.services.VCenterInfoServiceImpl">
     </bean>
 
-    <bean name="taskService" class="com.dmeplugin.dmestore.services.TaskServiceImpl"></bean>
 
     <bean name="dmeStorageService" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
     </bean>
@@ -73,11 +72,16 @@
           class="com.dmeplugin.dmestore.services.DataStoreStatisticHistoryServiceImpl">
     </bean>
 
+    <bean name="taskService" class="com.dmeplugin.dmestore.services.TaskServiceImpl">
+        <property name="dmeAccessService" ref="dmeAccessService"/>
+    </bean>
 
     <bean name="dmeNFSAccessService" class="com.dmeplugin.dmestore.services.DmeNFSAccessServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="dmeStorageService" ref="dmeStorageService"/>
+        <property name="dataStoreStatisticHistoryService" ref="DataStoreStatisticHistoryService"/>
+        <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
     </bean>
 
     <bean name="vmwareAccessService" class="com.dmeplugin.dmestore.services.VmwareAccessServiceImpl">
@@ -90,6 +94,35 @@
         <property name="taskService" ref="taskService"/>
     </bean>
 
+    <bean name="bestPracticeProcessService" class="com.dmeplugin.dmestore.services.BestPracticeProcessServiceImpl">
+        <property name="vcsdkUtils" ref="vCSDKUtils"/>
+        <property name="bestPracticeCheckDao" ref="bestPracticeCheckDao"/>
+        <property name="bestPracticeServices">
+            <list>
+                <ref bean="vmfs3EnableBlockDeleteService"/>
+                <ref bean="vmfs3HardwareAcceleratedLocking"/>
+                <ref bean="vmfs3UseATSForHBOnVMFS"/>
+                <ref bean="diskSchedQuantum"/>
+                <ref bean="diskDiskMaxIOSize"/>
+                <ref bean="dataMoverHardwareAcceleratedInit"/>
+                <ref bean="dataMoverHardwareAcceleratedMove"/>
+            </list>
+        </property>
+    </bean>
+
+    <!--最佳实践后端逻辑service-->
+    <bean name="vmfs3EnableBlockDeleteService" class="com.dmeplugin.dmestore.services.bestpractice.VMFS3EnableBlockDeleteImpl"/>
+    <bean name="vmfs3HardwareAcceleratedLocking" class="com.dmeplugin.dmestore.services.bestpractice.VMFS3HardwareAcceleratedLockingImpl"/>
+    <bean name="vmfs3UseATSForHBOnVMFS" class="com.dmeplugin.dmestore.services.bestpractice.VMFS3UseATSForHBOnVMFS5Impl"/>
+    <bean name="diskSchedQuantum" class="com.dmeplugin.dmestore.services.bestpractice.DiskSchedQuantumImpl"/>
+    <bean name="diskDiskMaxIOSize" class="com.dmeplugin.dmestore.services.bestpractice.DiskDiskMaxIOSizeImpl"/>
+    <bean name="dataMoverHardwareAcceleratedInit" class="com.dmeplugin.dmestore.services.bestpractice.DataMoverHardwareAcceleratedInitImpl"/>
+    <bean name="dataMoverHardwareAcceleratedMove" class="com.dmeplugin.dmestore.services.bestpractice.DataMoverHardwareAcceleratedMoveImpl"/>
+
+    <bean name="bestPracticeCheckDao" class="com.dmeplugin.dmestore.dao.BestPracticeCheckDao">
+        <property name="url" value="${h2.url}"/>
+    </bean>
+
     <bean name="vCSDKUtils" class="com.dmeplugin.dmestore.utils.VCSDKUtils">
         <property name="vcConnectionHelper" ref="vmwarePluginConnectionHelper"/>
     </bean>
@@ -97,6 +130,9 @@
     <bean name="vmwarePluginConnectionHelper" class="com.dmeplugin.vmware.VmwarePluginConnectionHelper">
         <property name="userSessionService" ref="userSessionService"/>
         <property name="vimObjectReferenceService" ref="vimObjectReferenceService"/>
+    </bean>
+
+    <bean name="dmeRelationInstanceService" class="com.dmeplugin.dmestore.services.DmeRelationInstanceServiceImpl">
     </bean>
 
 </beans>

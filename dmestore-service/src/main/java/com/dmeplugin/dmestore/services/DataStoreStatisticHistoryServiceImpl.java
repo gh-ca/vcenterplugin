@@ -89,7 +89,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         }
 
         //以下为实际消息的处理
-       /* params.put("range", " LAST_5_MINUTE");
+       /*
+        params.put("obj_type_id", "1125921381679104");//SYS_LUN
+        params.put("range", " LAST_5_MINUTE");
         Map<String, Object> currenResMap = queryVmfsStatistic(params);
         String code = currenResMap.get("code").toString();
         if("200".equals(code)){
@@ -133,7 +135,23 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     @Override
     public Map<String, Object> queryNfsStatisticCurrent(Map<String, Object> params) {
-        return queryVmfsStatisticCurrent(params);
+        Map<String, Object> remap = new HashMap<>();
+
+        //以下为模拟响应报文的处理
+        Object obj_ids = params.get("obj_ids");
+        if (null != obj_ids) {
+            List<String> volumeIds = (List<String>) obj_ids;
+            JsonObject dataJson = vmfsStatisticCurrentMimic(volumeIds);
+            remap.put("code", 200);
+            remap.put("message", "queryStatistic fs success!");
+            remap.put("data", dataJson);
+        }
+
+        //以下为实际响应报文处理
+        //params.put("obj_type_id", "XXXXXX");//fs的obj_type_id
+
+
+        return remap;
     }
 
     //query statistic

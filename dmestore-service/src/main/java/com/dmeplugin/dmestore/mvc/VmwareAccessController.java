@@ -11,7 +11,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-
+/**
+ * @Description: TODO
+ * @ClassName: VmwareAccessController
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 @RestController
 @RequestMapping(value = "/accessvmware")
 public class VmwareAccessController extends BaseController {
@@ -22,10 +28,12 @@ public class VmwareAccessController extends BaseController {
     @Autowired
     private VmwareAccessService vmwareAccessService;
 
-    /*
-   * Access hosts
-   * return: ResponseBodyBean include host info
-   */
+    /**
+     * Access hosts
+     *
+     * @return ResponseBodyBean List<Map<String, String>> include hostId hostName
+     * @throws Exception when error
+     */
     @RequestMapping(value = "/listhost", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean listHosts() throws Exception {
@@ -42,10 +50,13 @@ public class VmwareAccessController extends BaseController {
         return failure(failureStr);
     }
 
-    /*
-   * Access hosts
-   * return: ResponseBodyBean include host info
-   */
+    /**
+     * Access hosts
+     *
+     * @param  dataStoreName dataStore Name
+     * @return ResponseBodyBean List<Map<String, String>> include hostId hostName
+     * @throws Exception when error
+     */
     @RequestMapping(value = "/gethostsbydsname", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean getHostsByDsName(@RequestParam("dataStoreName") String dataStoreName) throws Exception {
@@ -62,10 +73,12 @@ public class VmwareAccessController extends BaseController {
         return failure(failureStr);
     }
 
-    /*
-   * Access cluster
-   * return: ResponseBodyBean include cluster info
-   */
+    /**
+     * Access clusters
+     *
+     * @return ResponseBodyBean List<Map<String, String>> include clusterId clusterName
+     * @throws Exception when error
+     */
     @RequestMapping(value = "/listcluster", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean listClusters() throws Exception {
@@ -82,10 +95,13 @@ public class VmwareAccessController extends BaseController {
         return failure(failureStr);
     }
 
-    /*
-   * Access cluster
-   * return: ResponseBodyBean include cluster info
-   */
+    /**
+     * Access clusters
+     *
+     * @param  dataStoreName dataStore Name
+     * @return ResponseBodyBean List<Map<String, String>> include clusterId clusterName
+     * @throws Exception when error
+     */
     @RequestMapping(value = "/getclustersbydsname", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean getClustersByDsName(@RequestParam("dataStoreName") String dataStoreName) throws Exception {
@@ -103,17 +119,21 @@ public class VmwareAccessController extends BaseController {
     }
 
 
-    /*
-   * Access datastore
-   * return: ResponseBodyBean include datastore info
-   */
+    /**
+     * Access datastore
+     *
+     * @param  hostName host Name
+     * @param  dataStoreType dataStore Type
+     * @return ResponseBodyBean List<Map<String, String>> include id name status type capacity freeSpace
+     * @throws Exception when error
+     */
     @RequestMapping(value = "/getdatastoresbyhostname", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseBodyBean getDataStoresByHostName(@RequestParam("hostName") String hostName) throws Exception {
+    public ResponseBodyBean getDataStoresByHostName(@RequestParam("hostName") String hostName, @RequestParam("dataStoreType") String dataStoreType) throws Exception {
         LOG.info("accessvmware/listhostbystoragename");
         String failureStr = "";
         try {
-            List<Map<String, String>> lists = vmwareAccessService.getDataStoresByHostName(hostName);
+            List<Map<String, String>> lists = vmwareAccessService.getDataStoresByHostName(hostName, dataStoreType);
             LOG.info("getDataStoresByHostName vmware lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {
@@ -123,17 +143,21 @@ public class VmwareAccessController extends BaseController {
         return failure(failureStr);
     }
 
-    /*
-   * Access datastore
-   * return: ResponseBodyBean include datastore info
-   */
+    /**
+     * Access datastore
+     *
+     * @param  clusterName cluster Name
+     * @param  dataStoreType dataStore Type
+     * @return ResponseBodyBean List<Map<String, String>> include id name status type capacity freeSpace
+     * @throws Exception when error
+     */
     @RequestMapping(value = "/getdatastoresbyclustername", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseBodyBean getDataStoresByClusterName(@RequestParam("clusterName") String clusterName) throws Exception {
+    public ResponseBodyBean getDataStoresByClusterName(@RequestParam("clusterName") String clusterName, @RequestParam("dataStoreType") String dataStoreType) throws Exception {
         LOG.info("accessvmware/listhostbystoragename");
         String failureStr = "";
         try {
-            List<Map<String, String>> lists = vmwareAccessService.getDataStoresByClusterName(clusterName);
+            List<Map<String, String>> lists = vmwareAccessService.getDataStoresByClusterName(clusterName, dataStoreType);
             LOG.info("getDataStoresByClusterName vmware lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {

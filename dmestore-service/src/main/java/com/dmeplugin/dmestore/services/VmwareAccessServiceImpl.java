@@ -12,6 +12,13 @@ import org.springframework.util.StringUtils;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @Description: TODO
+ * @ClassName: VmwareAccessServiceImpl
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 public class VmwareAccessServiceImpl implements VmwareAccessService {
 
     private static final Logger LOG = LoggerFactory.getLogger(VmwareAccessServiceImpl.class);
@@ -105,11 +112,11 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
     }
 
     @Override
-    public List<Map<String,String>> getDataStoresByHostName(String hostName) throws Exception {
+    public List<Map<String,String>> getDataStoresByHostName(String hostName, String dataStoreType) throws Exception {
         List<Map<String, String>> lists = null;
         try {
             //取得vcenter中的所有host。
-            String listStr = vcsdkUtils.getDataStoresByHostName(hostName);
+            String listStr = vcsdkUtils.getDataStoresByHostName(hostName, dataStoreType);
             LOG.info("host getDataStoresByHostName==" + listStr);
             if (!StringUtils.isEmpty(listStr)) {
                 lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
@@ -124,11 +131,11 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
     }
 
     @Override
-    public List<Map<String,String>> getDataStoresByClusterName(String clusterName) throws Exception {
+    public List<Map<String,String>> getDataStoresByClusterName(String clusterName, String dataStoreType) throws Exception {
         List<Map<String, String>> lists = null;
         try {
             //取得vcenter中的所有host。
-            String listStr = vcsdkUtils.getDataStoresByClusterName(clusterName);
+            String listStr = vcsdkUtils.getDataStoresByClusterName(clusterName, dataStoreType);
             LOG.info("host getDataStoresByClusterName==" + listStr);
             if (!StringUtils.isEmpty(listStr)) {
                 lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {

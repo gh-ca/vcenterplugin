@@ -1,9 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.model.CustomizeVolumeTuning;
-import com.dmeplugin.dmestore.model.QosPolicy;
-import com.dmeplugin.dmestore.model.Storage;
-import com.dmeplugin.dmestore.model.VolumeUpdate;
+import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
@@ -99,14 +96,14 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 return resMap;
             }
             String object = responseEntity.getBody();
-            JsonObject jsonObject=new JsonParser().parse(object).getAsJsonObject();
+            JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
             resMap.put("task_id", jsonObject.get("task_id").getAsString());
             return resMap;
         } catch (Exception e) {
             LOG.error("update vmfsDatastore error", e);
             resMap.put("code", 503);
             resMap.put("msg", e.getMessage());
-        }finally {
+        } finally {
             return resMap;
         }
     }
@@ -133,8 +130,8 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         String url = "/rest/blockservice/v1/volumes/expand";
         try {
             //ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(reqMap));
-            //ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, gson.toJson(reqMap));
-            /*int code = responseEntity.getStatusCodeValue();
+            ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, gson.toJson(reqMap));
+            int code = responseEntity.getStatusCodeValue();
             if (code != 202) {
                 resMap.put("code", code);
                 resMap.put("msg", "expand vmfsDatastore failed !");
@@ -142,22 +139,23 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             }
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-            resMap.put("task_id", jsonObject.get("task_id").getAsString());*/
+            resMap.put("task_id", jsonObject.get("task_id").getAsString());
 
             //scan volume of host
-           /* Map<String, Object> hostMap = getHostIpByVolume(volume_ids);
+            Map<String, Object> hostMap = getHostIpByVolume(volume_ids);
             Integer rescode = Integer.valueOf(hostMap.get("code").toString());
             if (rescode == 200) {
                 List<Object> ips = Arrays.asList(hostMap.get("host_ips"));
-               for (int i = 0; i < ips.size(); i++) {
-                    VCSDKUtils.hostRescanVmfs(ips.get(i).toString());
+                for (int i = 0; i < ips.size(); i++) {
+                    vcsdkUtils.hostRescanVmfs(ips.get(i).toString());
                 }
-             }*/
+            }
             //expand vmfs datastore
             for (int i = 0; i < volumes.size(); i++) {
                 Map<String, String> map = volumes.get(i);
                 String volume_id = map.get("volume_id");
                 String ds_name = map.get("ds_name");
+                String ds_add_capacity = map.get("ds_add_capacity");
                 Map<String, Object> deviceByVolume = getStorageDeviceByVolume(volume_id);
                 int deviceCode = ToolUtils.getInt(deviceByVolume.get("code"));
                 if (deviceCode != 200) {
@@ -166,8 +164,10 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                     return resMap;
                 }
                 Storage storage = (Storage) deviceByVolume.get("data");
-                String result = VCSDKUtils.expandVmfsDatastore(ds_name, 1);
-
+                String result = null;
+                if (!StringUtils.isEmpty(ds_add_capacity)) {
+                    result = vcsdkUtils.expandVmfsDatastore(ds_name, ToolUtils.getInt(ds_add_capacity));
+                }
                 if ("failed".equals(result)) {
                     resMap.put("code", 403);
                     resMap.put("msg", "expand vmfsDatastore failed !");
@@ -181,6 +181,135 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         } finally {
             return resMap;
         }
+    }
+
+    @Override
+    public Map<String, Object> recycleVmfsCapacity(List<String> dsname) {
+        Map<String, Object> resMap = new HashMap<>();
+        resMap.put("code", 200);
+        resMap.put("msg", "recycle vmfsDatastore success !");
+        try {
+            String result = null;
+            VCSDKUtils vcsdkUtils = new VCSDKUtils();
+            if (dsname != null && dsname.size() > 0) {
+                for (int i = 0; i < dsname.size(); i++) {
+                    result = vcsdkUtils.recycleVmfsCapacity(dsname.get(i));
+                }
+            }
+            if (result == null || result.equals("error")) {
+                resMap.put("code", 403);
+                resMap.put("msg", "recycle vmfsDatastore error");
+                return resMap;
+            }
+        } catch (Exception e) {
+            LOG.error("recycle vmfsDatastore error !", e);
+            resMap.put("code", 503);
+            resMap.put("msg", e.getMessage());
+        }
+        return resMap;
+    }
+
+    @Override
+    public Map<String, Object> updateVmfsServiceLevel(Map<String, Object> params) {
+
+        Map<String, Object> resMap = new HashMap<>();
+        resMap.put("code", 202);
+        resMap.put("msg", "update vmfs service level success !");
+        if (params == null || params.size() == 0) {
+            resMap.put("msg", "params error,please check your params!");
+            resMap.put("code", 403);
+        }
+        String url = "/rest/blockservice/v1/volumes/update-service-level";
+        try {
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(params));
+            LOG.info("url:{" + url + "},响应信息：" + responseEntity);
+            int code = responseEntity.getStatusCodeValue();
+            if (code != 202) {
+                resMap.put("msg", "update vmfs service level error!");
+                resMap.put("code", code);
+                return resMap;
+            }
+            String object = responseEntity.getBody();
+            JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+            String task_id = jsonObject.get("task_id").getAsString();
+            resMap.put("task_id", task_id);
+
+        } catch (Exception e) {
+            LOG.error("update vmfs service level error !", e);
+            resMap.put("msg", e.getMessage());
+            resMap.put("code", 503);
+        }
+        return resMap;
+    }
+
+    @Override
+    public Map<String, Object> listServiceLevelVMFS(Map<String, Object> params) {
+        //
+        Map<String, Object> resMap = new HashMap<>();
+        resMap.put("code", 200);
+        resMap.put("msg", "list vmfs service level success !");
+
+        List<SimpleServiceLevel> simpleServiceLevels = new ArrayList<>();
+
+        String url = "https://localhost:26335/rest/service-policy/v1/service-levels";
+        try {
+            //ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, gson.toJson(params));
+            ResponseEntity<String> responseEntity = access(url, HttpMethod.GET, gson.toJson(params));
+            int code = responseEntity.getStatusCodeValue();
+            if (code != 200) {
+                resMap.put("code", code);
+                resMap.put("msg", "list vmfs service level error !");
+                return resMap;
+            }
+            SimpleServiceLevel simpleServiceLevel = new SimpleServiceLevel();
+            String object = responseEntity.getBody();
+            JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+            JsonArray jsonArray = jsonObject.get("service-levels").getAsJsonArray();
+            for (JsonElement jsonElement : jsonArray) {
+                JsonObject element = jsonElement.getAsJsonObject();
+                simpleServiceLevel.setId(element.get("id").getAsString());
+                simpleServiceLevel.setName(element.get("name").getAsString());
+                simpleServiceLevel.setDescription(element.get("description").getAsString());
+                simpleServiceLevel.setType(element.get("type").getAsString());
+                simpleServiceLevel.setProtocol(element.get("protocol").getAsString());
+                simpleServiceLevel.setTotal_capacity(Double.valueOf(element.get("total_capacity").getAsString()));
+                simpleServiceLevel.setFree_capacity(Double.valueOf(element.get("free_capacity").getAsString()));
+                simpleServiceLevel.setUsed_capacity(Double.valueOf(element.get("used_capacity").getAsString()));
+
+                SimpleCapabilities capability = new SimpleCapabilities();
+                JsonObject capabilities = element.get("capabilities").getAsJsonObject();
+                capability.setResource_type(capabilities.get("resource_type").getAsString());
+                capability.setCompression(Boolean.valueOf(capabilities.get("compression").getAsString()));
+                capability.setDeduplication(Boolean.valueOf(capabilities.get("deduplication").getAsString()));
+
+                CapabilitiesSmarttier smarttier = new CapabilitiesSmarttier();
+                JsonObject smarttiers = capabilities.get("smarttier").getAsJsonObject();
+                smarttier.setPolicy(Integer.valueOf(smarttiers.get("policy").getAsString()));
+                smarttier.setEnabled(Boolean.valueOf(smarttiers.get("enabled").getAsString()));
+                capability.setSmarttier(smarttier);
+
+                QosParam qosParam = new QosParam();
+                JsonObject qos = capabilities.get("qos").getAsJsonObject();
+                qosParam.setEnabled(Boolean.valueOf(qos.get("enabled").getAsString()));
+
+                QosPolicy qosPolicy = new QosPolicy();
+                JsonObject jsonObject1 = qos.get("qos_param").getAsJsonObject();
+                qosPolicy.setLatency(jsonObject1.get("latency").getAsString());
+                qosPolicy.setMin_bandwidth(jsonObject1.get("minBandWidth").getAsString());
+                qosPolicy.setMin_iops(jsonObject1.get("minIOPS").getAsString());
+
+                qosParam.setQosPolicy(qosPolicy);
+                capability.setQosParam(qosParam);
+                simpleServiceLevel.setSimpleCapabilities(capability);
+                simpleServiceLevels.add(simpleServiceLevel);
+            }
+            resMap.put("data", simpleServiceLevels);
+        } catch (Exception e) {
+            LOG.error("list vmfs service level success !", e);
+            resMap.put("code", 503);
+            resMap.put("msg", e.getMessage());
+        }
+        return resMap;
     }
 
     private Map<String, Object> getHostIpByVolume(List<String> volume_ids) throws Exception {
@@ -251,6 +380,16 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         return resMap;
     }
 
+    private Map<String, Object> getVmfsServicLevel(Map<String, String> params) {
+
+        Map<String, Object> resMap = new HashMap<>();
+        resMap.put("code", 200);
+        resMap.put("msg", "list vmfs service level success !");
+
+
+        return resMap;
+    }
+
     private Map<String, Object> getVolumeCapacity(List<Map<String, String>> volumes) throws Exception {
 
         Map<String, Object> resMap = new HashMap<>();
@@ -313,7 +452,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             String azIds = jsonAzIds.getAsString();
             String[] az_ids = {azIds};
             storage.setAzIds(az_ids);
-        } else{
+        } else {
             String[] az_ids = {};
             storage.setAzIds(az_ids);
         }
@@ -332,7 +471,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
         ResponseEntity<String> responseEntity = restTemplate.exchange(url, method, entity, String.class);
-        LOG.info(url + "==responseEntity==" + (responseEntity==null?"null":responseEntity.getStatusCodeValue()));
+        LOG.info(url + "==responseEntity==" + (responseEntity == null ? "null" : responseEntity.getStatusCodeValue()));
 
         return responseEntity;
     }

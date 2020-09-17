@@ -13,8 +13,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author yy
- */
+ * @Description: TODO
+ * @ClassName: DmeAccessController
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 
 @RestController
 @RequestMapping(value = "/accessdme")

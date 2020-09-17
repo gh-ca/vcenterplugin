@@ -243,6 +243,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storagePool.setConsumed_capacity(Double.valueOf(element.get("consumed_capacity").getAsString()));
                     storagePool.setConsumed_capacity_percentage(element.get("consumed_capacity_percentage").getAsString());
                     storagePool.setConsumed_capacity_threshold(element.get("consumed_capacity_threshold").getAsString());
+                    storagePool.setStorage_pool_id(element.get("storage_pool_id").getAsString());
                     resList.add(storagePool);
                 }
                 resMap.put("data", resList);

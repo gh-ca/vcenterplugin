@@ -22,25 +22,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.dmeplugin.vmware.util.VmwareContext;
-import com.vmware.vim25.CustomFieldStringValue;
-import com.vmware.vim25.DatastoreInfo;
-import com.vmware.vim25.DynamicProperty;
-import com.vmware.vim25.HostNasVolumeSpec;
-import com.vmware.vim25.HostResignatureRescanResult;
-import com.vmware.vim25.HostScsiDisk;
-import com.vmware.vim25.HostUnresolvedVmfsResignatureSpec;
-import com.vmware.vim25.HostUnresolvedVmfsVolume;
-import com.vmware.vim25.ManagedObjectReference;
-import com.vmware.vim25.NasDatastoreInfo;
-import com.vmware.vim25.ObjectContent;
-import com.vmware.vim25.ObjectSpec;
-import com.vmware.vim25.PropertyFilterSpec;
-import com.vmware.vim25.PropertySpec;
-import com.vmware.vim25.TraversalSpec;
-import com.vmware.vim25.VmfsDatastoreCreateSpec;
-import com.vmware.vim25.VmfsDatastoreExpandSpec;
-import com.vmware.vim25.VmfsDatastoreOption;
-
+import com.vmware.vim25.*;
+import org.springframework.util.StringUtils;
 
 
 public class HostDatastoreSystemMO extends BaseMO {
@@ -194,16 +177,19 @@ public class HostDatastoreSystemMO extends BaseMO {
         return false;
     }
 
-    public ManagedObjectReference createNfsDatastore(String host, int port, String exportPath, String uuid) throws Exception {
+    public ManagedObjectReference createNfsDatastore(String host, int port, String exportPath, String uuid, String accessMode) throws Exception {
 
         HostNasVolumeSpec spec = new HostNasVolumeSpec();
         spec.setRemoteHost(host);
         spec.setRemotePath(exportPath);
         spec.setType("nfs");
         spec.setLocalPath(uuid);
-
         // readOnly/readWrite
-        spec.setAccessMode("readWrite");
+        if (!StringUtils.isEmpty(accessMode)) {
+            spec.setAccessMode(accessMode);
+        } else {
+            spec.setAccessMode("readWrite");
+        }
         return _context.getService().createNasDatastore(_mor, spec);
     }
 
@@ -261,5 +247,8 @@ public class HostDatastoreSystemMO extends BaseMO {
         pfSpecArr.add(pfSpec);
 
         return _context.getService().retrieveProperties(_context.getPropertyCollector(), pfSpecArr);
+    }
+    public void unmapVmfsVolumeExTask(List<String> vmfsUuids) throws Exception {
+        _context.getService().unmapVmfsVolumeExTask(_mor, vmfsUuids);
     }
 }

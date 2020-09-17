@@ -5,6 +5,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+
+/**
+ * @Description: TODO
+ * @ClassName: ToolUtils
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 public class ToolUtils {
 
     private final static Logger LOG = LoggerFactory.getLogger(ToolUtils.class);
@@ -45,6 +53,18 @@ public class ToolUtils {
         try {
             if (!StringUtils.isEmpty(obj)) {
                 re = Double.parseDouble(obj.toString());
+            }
+        } catch (Exception e) {
+            LOG.error("error:", e);
+        }
+        return re;
+    }
+
+    public static long getLong(Object obj){
+        long re = 0L;
+        try {
+            if (!StringUtils.isEmpty(obj)) {
+                re = Long.parseLong(obj.toString());
             }
         } catch (Exception e) {
             LOG.error("error:", e);
@@ -99,4 +119,6 @@ public class ToolUtils {
         }
         return re;
     }
+
+
 }
