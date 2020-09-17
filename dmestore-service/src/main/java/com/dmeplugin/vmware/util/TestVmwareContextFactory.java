@@ -50,7 +50,7 @@ public class TestVmwareContextFactory {
         vimClient.setVcenterSessionTimeout(1200000);
         vimClient.connect(serviceUrl, vCenterUserName, vCenterPassword);
 
-        VmwareContext context = new VmwareContext(vimClient, vCenterAddress);
+        VmwareContext context = new VmwareContext(vimClient, vimClient.getServiceContent().getAbout().getInstanceUuid());
         return context;
     }
 
@@ -60,7 +60,7 @@ public class TestVmwareContextFactory {
             context = create(vCenterAddress, vCenterUserName, vCenterPassword);
 
         if (context != null) {
-            context.setPoolInfo(s_pool, VmwareContextPool.composePoolKey(vCenterAddress, vCenterUserName));
+            context.setPoolInfo(s_pool, VmwareContextPool.composePoolKey(context.getServerAddress(), vCenterUserName));
         }
 
         return context;
