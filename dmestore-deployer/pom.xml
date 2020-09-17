@@ -202,10 +202,10 @@
     </dependencies>
     <build>
         <finalName>dmestore-deployer</finalName>
-        <resources>
+       <!-- <resources>
             <resource>
                 <directory>${project.basedir}/lib</directory>
-                <!--<targetPath></targetPath>-->
+                &lt;!&ndash;<targetPath></targetPath>&ndash;&gt;
                 <includes>
                     <include>**/*.jar</include>
                 </includes>
@@ -214,22 +214,23 @@
                 <directory>${project.basedir}/src/main/resources</directory>
 
             </resource>
-        </resources>
+        </resources>-->
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.0.2</version>
-                 <configuration>
-                    <archive>
-                       <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
-
-                        <addMavenDescriptor>false</addMavenDescriptor>
-                    </archive>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <includeSystemScope>true</includeSystemScope>
                 </configuration>
-
+                <executions>
+                              <execution>
+                                <goals>
+                                    <goal>build-info</goal>
+                                  <goal>repackage</goal>
+                                </goals>
+                              </execution>
+                </executions>
             </plugin>
-
         </plugins>
     </build>
 </project>

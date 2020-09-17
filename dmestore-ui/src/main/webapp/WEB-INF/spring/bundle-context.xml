@@ -29,6 +29,8 @@
 
    <bean name="dmeAccessController" class="com.dmeplugin.dmestore.mvc.DmeAccessController" />
 
+   <bean name="pluginRegisterController" class="com.dmeplugin.dmestore.mvc.PluginRegisterController" />
+
    <!-- OSGI references to platform services used by the controllers -->
 
    <osgi:reference id="dataService"
@@ -48,6 +50,9 @@
 
    <osgi:reference id="dmeAccessService"
                    interface="com.dmeplugin.dmestore.services.DmeAccessService" />
+
+   <osgi:reference id="systemService"
+                   interface="com.dmeplugin.dmestore.services.SystemService" />
 
 </beans>
 

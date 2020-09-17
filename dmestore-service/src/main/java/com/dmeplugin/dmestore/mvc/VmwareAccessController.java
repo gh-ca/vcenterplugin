@@ -23,7 +23,7 @@ import java.util.Map;
 public class VmwareAccessController extends BaseController {
     public static final Logger LOG = LoggerFactory.getLogger(VmwareAccessController.class);
 
-    @Autowired
+
     private Gson gson = new Gson();
     @Autowired
     private VmwareAccessService vmwareAccessService;

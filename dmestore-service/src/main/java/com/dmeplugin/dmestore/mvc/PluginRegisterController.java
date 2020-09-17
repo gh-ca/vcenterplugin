@@ -4,6 +4,7 @@ import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.DmeAccessService;
 import com.dmeplugin.dmestore.services.SystemService;
 import com.dmeplugin.dmestore.services.VmwareAccessService;
+import com.dmeplugin.dmestore.utils.RestUtils;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ public class PluginRegisterController extends BaseController {
                                          @RequestParam String dmeIp,
                                          @RequestParam String dmePort,
                                          @RequestParam String dmeUsername,
-                                         @RequestParam String dmePassword) throws Exception {
+                                         @RequestParam String dmePassword)  {
         LOG.info("registerservice/pluginaction");
         String failureStr = "";
         boolean isRemoveData = false;
@@ -53,7 +54,13 @@ public class PluginRegisterController extends BaseController {
                     params.put("hostPort", dmePort);
                     params.put("userName", dmeUsername);
                     params.put("password", dmePassword);
-                    dmeAccessService.accessDme(params);
+                    Map<String, Object> remap=dmeAccessService.accessDme(params);
+                    if (remap != null && remap.get(RestUtils.RESPONSE_STATE_CODE) != null
+                            && RestUtils.RESPONSE_STATE_200.equals(remap.get(RestUtils.RESPONSE_STATE_CODE).toString())) {
+                        return success(remap);
+                    }
+
+                    return failure(gson.toJson(remap));
                 }
                 if ("uninstall".equals(action)) {
                     //调用接口，删除数据

@@ -5,6 +5,9 @@ public class DPSqlFileConstant {
   public static final String DP_DME_ACCESS_INFO = "DP_DME_ACCESS_INFO"; //DME访问信息表
   public static final String DP_DME_VMWARE_RELATION = "DP_DME_VMWARE_RELATION"; //DME与VMWARE对应关系表
 
+  public static final String[] ALL_TABLES = {DPSqlFileConstant.DP_DME_ACCESS_INFO,
+          DPSqlFileConstant.DP_DME_VMWARE_RELATION};
+
   public static final String DP_DME_ACCESS_INFO_SQL = "DROP TABLE IF EXISTS \"DP_DME_ACCESS_INFO\";\n" +
           "CREATE TABLE DP_DME_ACCESS_INFO\n" +
           "(\n" +

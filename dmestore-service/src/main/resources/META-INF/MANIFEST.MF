@@ -6,17 +6,24 @@ Bundle-Name: dmestore-service
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: com.dmeplugin.dmestore.dmestore-service
 Export-Package: com.dmeplugin.dmestore.services;version="1.0.0",
- com.dmeplugin.dmestore.mvc;version="1.0.0"
+ com.dmeplugin.dmestore.mvc;version="1.0.0",
+ com.dmeplugin.dmestore.entity;version="1.0.0",
+ com.dmeplugin.dmestore.model;version="1.0.0",
+ com.dmeplugin.dmestore.exception;version="1.0.0"
 Bundle-ClassPath: .,h2-1.4.199.jar,
-    log4j-1.2.14.jar,httpclient-4.3.5.jar,httpcore-4.3.2.jar,joda-time-2.10.jar,wssamples.jar
+    log4j-1.2.14.jar,joda-time-2.10.jar,wssamples.jar
 Import-Package: org.apache.commons.logging;version="1.1.1",
  org.slf4j;version="0",
+ org.apache.http.conn.ssl;version="0",
+ org.apache.http.conn.socket;version="0",
+ org.apache.http.client;version="0",
+ org.apache.http.impl.client;version="0",
  com.vmware.vise.data;version="0",
  com.vmware.vise.data.query;version="0",
  com.vmware.vise.usersession;version="0",
  com.vmware.vise.security;version="0",
  com.vmware.vise.vim.data;version="0",
- com.vmware.vim25;version="6.5.0",
+ com.vmware.vim25;version="6.7.0",
  com.google.gson;version="2.3.1",
  javax.servlet.http;version="3.0",
  javax.net.ssl;version="0",

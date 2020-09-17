@@ -21,8 +21,8 @@ import java.util.*;
 public class ServiceLevelServiceImpl implements ServiceLevelService {
     private static final Logger log = LoggerFactory.getLogger(ServiceLevelServiceImpl.class);
 
-    @Autowired
-    private Gson gson;
+
+    private Gson gson=new Gson();
     @Autowired
     private DmeAccessService dmeAccessService;
     @Autowired
