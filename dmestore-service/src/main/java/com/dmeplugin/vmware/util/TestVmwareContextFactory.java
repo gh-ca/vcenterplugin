@@ -60,7 +60,7 @@ public class TestVmwareContextFactory {
             context = create(vCenterAddress, vCenterUserName, vCenterPassword);
 
         if (context != null) {
-            context.setPoolInfo(s_pool, VmwareContextPool.composePoolKey(context.getServerAddress(), vCenterUserName));
+            context.setPoolInfo(s_pool, VmwareContextPool.composePoolKey(vCenterAddress, vCenterUserName));
         }
 
         return context;
