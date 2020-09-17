@@ -2,6 +2,7 @@ package com.dmeplugin.dmestore.model;
 
 public class NfsDataInfo {
     //列表字段（基本视图）
+    String objectid; //跳转用唯一id
     String name;    //名称
     String status;  //状态
     Double capacity;  //总容量 单位GB
@@ -24,6 +25,14 @@ public class NfsDataInfo {
 
     Integer readResponseTime;   //读响应时间 单位ms
     Integer writeResponseTime; //写响应时间 单位ms
+
+    public String getObjectid() {
+        return objectid;
+    }
+
+    public void setObjectid(String objectid) {
+        this.objectid = objectid;
+    }
 
     public String getName() {
         return name;
