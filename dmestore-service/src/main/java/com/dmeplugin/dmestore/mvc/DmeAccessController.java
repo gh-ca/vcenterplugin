@@ -25,8 +25,7 @@ import java.util.Map;
 public class DmeAccessController extends BaseController {
     public static final Logger LOG = LoggerFactory.getLogger(DmeAccessController.class);
 
-    @Autowired
-    private Gson gson;
+    private Gson gson=new Gson();
     @Autowired
     private DmeAccessService dmeAccessService;
 

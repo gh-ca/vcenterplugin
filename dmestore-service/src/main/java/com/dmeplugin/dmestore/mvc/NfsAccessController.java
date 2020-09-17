@@ -24,7 +24,7 @@ import java.util.Map;
 public class NfsAccessController extends BaseController {
     public static final Logger LOG = LoggerFactory.getLogger(NfsAccessController.class);
 
-    @Autowired
+
     private Gson gson;
     @Autowired
     private DmeNFSAccessService dmeNFSAccessService;

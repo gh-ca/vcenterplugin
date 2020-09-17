@@ -25,7 +25,7 @@ import java.util.Map;
 public class VmfsAccessController extends BaseController{
     public static final Logger LOG = LoggerFactory.getLogger(VmfsAccessController.class);
 
-    @Autowired
+
     private Gson gson = new Gson();
     @Autowired
     private VmfsAccessService vmfsAccessService;
