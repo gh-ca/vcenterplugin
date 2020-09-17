@@ -61,7 +61,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     }
 
     @Override
-    public List<BestPracticeCheckRecordBean> getCheckRecord() throws Exception{
+    public List<BestPracticeCheckRecordBean> getCheckRecord() throws Exception {
         List<BestPracticeCheckRecordBean> list = new ArrayList<>();
         for (BestPracticeService bestPracticeService : bestPracticeServices) {
             BestPracticeCheckRecordBean bean = new BestPracticeCheckRecordBean();
@@ -72,11 +72,28 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                 List<BestPracticeBean> hostBean = bestPracticeCheckDao.getRecordBeanByHostsetting(bestPracticeService.getHostSetting());
                 bean.setHostList(hostBean);
                 bean.setCount(hostBean.size());
-            }catch (Exception ex){
+            } catch (Exception ex) {
                 continue;
             }
-            if(bean.getCount() > 0){
+            if (bean.getCount() > 0) {
                 list.add(bean);
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public List<BestPracticeBean> getCheckRecordBy(String hostSetting, int pageNo, int pageSize) throws Exception {
+        List<BestPracticeBean> list = new ArrayList<>();
+        for (BestPracticeService bestPracticeService : bestPracticeServices) {
+            String s = bestPracticeService.getHostSetting();
+            if (hostSetting.equals(s)) {
+                try {
+                    list = bestPracticeCheckDao.getRecordByPage(hostSetting, pageNo, pageSize);
+                } catch (Exception ex) {
+                    throw  new Exception(ex.getMessage());
+                }
+                break;
             }
         }
         return list;
