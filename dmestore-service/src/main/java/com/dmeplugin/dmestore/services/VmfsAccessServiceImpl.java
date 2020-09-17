@@ -763,7 +763,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
      **/
     @Override
     public boolean scanVmfs() throws Exception {
-        String listStr = vcsdkUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_VMFS);
+        String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(ToolUtils.STORE_TYPE_VMFS);
         LOG.info("===list vmfs datastore success====\n{}", listStr);
         if (StringUtils.isEmpty(listStr)) {
             return false;
