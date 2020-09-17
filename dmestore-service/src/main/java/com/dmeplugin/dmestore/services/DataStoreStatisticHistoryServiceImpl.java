@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -261,4 +262,22 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         }
         return dataObject;
     }
+
+    //性能查询条件
+    private Map<String, Object> queryParamsDefaulf(Map<String, Object> params){
+        String rang = ToolUtils.getStr(params.get("range"));
+        String interval = ToolUtils.getStr(params.get("interval"));
+        String range = params.get("range").toString();
+        long beginTime = ToolUtils.getLong(params.get("begin_time"));
+        long endTime = ToolUtils.getLong(params.get("end_time"));
+
+
+        //设置默认值
+        
+        return params;
+    }
+
+
+
+
 }
