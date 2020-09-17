@@ -542,7 +542,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                                     nfsDataInfo.setFs(dvr.getFsName());
                                     nfsDataInfo.setFsId(dvr.getFsId());
 
-                                    nfsDataInfo.setObjectid(ToolUtils.getStr(jo.get("objectid")));
+                                    nfsDataInfo.setObjectid(ToolUtils.jsonToStr(jo.get("objectid")));
 
                                     String fsUrl = "";
                                     try {
