@@ -72,26 +72,28 @@ public class VCSDKUtils {
     }
 
     //得到所有存储的info
-    public  String getAllVmfsDataStoreInfos(String storeType) throws Exception {
+    public String getAllVmfsDataStoreInfos(String storeType) throws Exception {
         String listStr = "";
         try {
-            VmwareContext[] vmwareContexts =vcConnectionHelper.getAllContext();
-            for (VmwareContext vmwareContext:vmwareContexts) {
+            VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
+            for (VmwareContext vmwareContext : vmwareContexts) {
                 RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
                 List<Pair<ManagedObjectReference, String>> dss = rootFsMO.getAllDatastoreOnRootFs();
                 if (dss != null && dss.size() > 0) {
-                    List<Map<String,Object>> lists = new ArrayList<>();
+                    List<Map<String, Object>> lists = new ArrayList<>();
 
                     for (Pair<ManagedObjectReference, String> ds : dss) {
                         DatastoreMO ds1 = new DatastoreMO(vmwareContext, ds.first());
-                        Map<String,Object> dsmap = gson.fromJson(gson.toJson(ds1.getSummary()), new TypeToken<Map<String,Object>>() {}.getType());
-                        if(storeType.equals(ToolUtils.STORE_TYPE_NFS) &&
-                                ds1.getSummary().getType().equals(ToolUtils.STORE_TYPE_NFS)){
-                            NasDatastoreInfo nasinfo = (NasDatastoreInfo)ds1.getInfo();
-                            String objectid=vcConnectionHelper.MOR2ObjectID(ds1.getMor(),vmwareContext.getServerAddress());
-                            dsmap.put("remoteHost",nasinfo.getNas().getRemoteHost());
-                            dsmap.put("remotePath",nasinfo.getNas().getRemotePath());
-                            dsmap.put("objectid",objectid);
+                        Map<String, Object> dsmap = gson.fromJson(gson.toJson(ds1.getSummary()), new TypeToken<Map<String, Object>>() {
+                        }.getType());
+                        if (storeType.equals(ToolUtils.STORE_TYPE_NFS) &&
+                                ds1.getSummary().getType().equals(ToolUtils.STORE_TYPE_NFS)) {
+                            NasDatastoreInfo nasinfo = (NasDatastoreInfo) ds1.getInfo();
+                            String objectid = vcConnectionHelper.MOR2ObjectID(ds1.getMor(), vmwareContext.getServerAddress());
+                            dsmap.put("remoteHost", nasinfo.getNas().getRemoteHost());
+                            dsmap.put("remotePath", nasinfo.getNas().getRemotePath());
+                            dsmap.put("objectid", objectid);
+                            dsmap.put("nfsStorageId", ds1.getMor().getValue());
                         }
 
                         if (StringUtils.isEmpty(storeType)) {
@@ -489,16 +491,18 @@ public class VCSDKUtils {
         List<String> hostlist = null;
         try {
             String unmountHostStr = getHostsByDsName(dataStoreName);
-            List<Map<String, String>> unmountHostlists = gson.fromJson(unmountHostStr, new TypeToken<List<Map<String, String>>>() {}.getType());
+            List<Map<String, String>> unmountHostlists = gson.fromJson(unmountHostStr, new TypeToken<List<Map<String, String>>>() {
+            }.getType());
 
-            if(clusters!=null && clusters.size()>0){
+            if (clusters != null && clusters.size() > 0) {
                 hostlist = new ArrayList<>();
-                for(String clusterName : clusters) {
+                for (String clusterName : clusters) {
                     String hostStr = getHostsOnCluster(clusterName);
-                    List<Map<String, String>> hostStrlists = gson.fromJson(hostStr, new TypeToken<List<Map<String, String>>>() {}.getType());
-                    if(hostStrlists!=null && hostStrlists.size()>0){
-                        for(Map<String, String> hostmap:hostStrlists){
-                            if(unmountHostlists.contains(hostmap)) {
+                    List<Map<String, String>> hostStrlists = gson.fromJson(hostStr, new TypeToken<List<Map<String, String>>>() {
+                    }.getType());
+                    if (hostStrlists != null && hostStrlists.size() > 0) {
+                        for (Map<String, String> hostmap : hostStrlists) {
+                            if (unmountHostlists.contains(hostmap)) {
                                 hostlist.add(ToolUtils.getStr(hostmap.get("hostName")));
                             }
                         }
@@ -689,7 +693,7 @@ public class VCSDKUtils {
     }
 
     //create nfs datastore
-    public String createNfsDatastore(String serverHost, Integer logicPort, String exportPath, String nfsName ,String accessMode,String mountHost) {
+    public String createNfsDatastore(String serverHost, Integer logicPort, String exportPath, String nfsName, String accessMode, String mountHost) {
         //todo
         //NfsDataInfo nfsDataInfo = new NfsDataInfo(); 用于详情和列表展示的自定义model
         //NasDatastoreInfo-->DataStoreInfo-->(aliasOf, containerId, freeSpace, maxFileSize, maxMemoryFileSize, maxVirtualDiskCapacity, name, timestamp, url)
@@ -716,7 +720,7 @@ public class VCSDKUtils {
                 HostMO hostMO = new HostMO(vmwareContext, managedObjectReference);
                 HostDatastoreSystemMO hostDatastoreSystemMO = hostMO.getHostDatastoreSystemMO();
                 //todo 存在返回值 需要处理
-                hostDatastoreSystemMO.createNfsDatastore(serverHost, logicPort, exportPath, nfsName,accessMode);
+                hostDatastoreSystemMO.createNfsDatastore(serverHost, logicPort, exportPath, nfsName, accessMode);
                 _logger.info("end creat nfs datastore");
             } else {
                 result = "failed";
@@ -1256,20 +1260,20 @@ public class VCSDKUtils {
                 _logger.info("datastore:" + dataStoreName + " is null");
                 return;
             }
-            if (clusters==null && hosts==null) {
+            if (clusters == null && hosts == null) {
                 _logger.info("host:" + hosts + " and cluster:" + clusters + " is null");
                 return;
             }
 
             List<String> hostlist = null;
-            if (hosts!=null) {
+            if (hosts != null) {
                 hostlist = hosts;
-            }else if (clusters!=null) {
+            } else if (clusters != null) {
                 //取得没有挂载这个存储的所有主机，以方便后面过滤
                 hostlist = getUnmoutHostsOnCluster(dataStoreName, clusters);
             }
 
-            if(hostlist!=null && hostlist.size()>0) {
+            if (hostlist != null && hostlist.size() > 0) {
                 VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
                 for (VmwareContext vmwareContext : vmwareContexts) {
                     RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
@@ -1293,9 +1297,9 @@ public class VCSDKUtils {
     }
 
     //挂载Nfs存储
-    public void mountNfs(DatastoreMO dsmo, HostMO hostMO,String mountType) throws Exception {
+    public void mountNfs(DatastoreMO dsmo, HostMO hostMO, String mountType) throws Exception {
         try {
-            if (dsmo==null) {
+            if (dsmo == null) {
                 _logger.info("datastore is null");
                 return;
             }
@@ -1308,9 +1312,9 @@ public class VCSDKUtils {
             hostMO.getHostStorageSystemMO().rescanVmfs();
             _logger.info("Rescan datastore before mounting");
             //挂载NFS
-            NasDatastoreInfo nasdsinfo = (NasDatastoreInfo)dsmo.getInfo();
-            hostMO.getHostDatastoreSystemMO().createNfsDatastore(nasdsinfo.getNas().getRemoteHost(),0,nasdsinfo.getNas().getRemotePath(),dsmo.getMor().getValue(),mountType);
-            _logger.info("mount nfs success:"+hostMO.getName()+":"+dsmo.getName());
+            NasDatastoreInfo nasdsinfo = (NasDatastoreInfo) dsmo.getInfo();
+            hostMO.getHostDatastoreSystemMO().createNfsDatastore(nasdsinfo.getNas().getRemoteHost(), 0, nasdsinfo.getNas().getRemotePath(), dsmo.getMor().getValue(), mountType);
+            _logger.info("mount nfs success:" + hostMO.getName() + ":" + dsmo.getName());
         } catch (Exception e) {
             e.printStackTrace();
             _logger.error("mount nfs error:", e);
