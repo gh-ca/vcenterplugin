@@ -32,6 +32,7 @@ public class DPSqlFileConstant {
           "    volume_wwn VARCHAR(255),\n" +
           "    volume_share VARCHAR(255),\n" +
           "    volume_fs VARCHAR(255),\n" +
+          "    storage_device_id VARCHAR(255),\n" +
           "    share_id VARCHAR(255),\n" +
           "    share_name VARCHAR(255),\n" +
           "    fs_id VARCHAR(255),\n" +

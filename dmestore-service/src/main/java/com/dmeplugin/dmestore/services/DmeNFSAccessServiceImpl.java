@@ -224,7 +224,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             return false;
         }
         Map<String, Object> storageOriginal = dmeStorageService.getStorages();
-        if (null == storageOriginal || !storageOriginal.get("200").toString().equals("200")) {
+        if (null == storageOriginal || !storageOriginal.get("code").toString().equals("200")) {
             return false;
         }
 
@@ -237,7 +237,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         for (int i = 0; i < jsonArray.size(); i++) {
             JsonObject nfsDatastore = jsonArray.get(i).getAsJsonObject();
 
-            //TODO 从vCenter nfsDataStore信息中提取 ip和path
+            //TODO 从vCenter nfsDataStore信息中提取存储id ip和path
+            String nfsStorageId = nfsDatastore.get("nfsStorageId").getAsString();
             String nfsDatastoreIp = nfsDatastore.get("remoteHost").getAsString();
             String nfsDataStoreSharePath = nfsDatastore.get("remotePath").getAsString();
             Storage storageInfo = storageMap.get(nfsDatastoreIp);
@@ -248,7 +249,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             String storage_id = storageInfo.getId();
             String storage_name = storageInfo.getName();
             DmeVmwareRelation relation = new DmeVmwareRelation();
-            relation.setStoreId(storage_id);
+            relation.setStoreId(nfsStorageId);
+            relation.setStorageDeviceId(storage_id);
             relation.setStoreName(storage_name);
             relation.setStoreType(store_type);
 
