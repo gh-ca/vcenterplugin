@@ -9,7 +9,7 @@ import java.util.List;
 
 public class SpringBootConnectionHelper extends VCConnectionHelper{
     @Override
-    public VmwareContext getServerContext(ManagedObjectReference mor) throws Exception {
+    public VmwareContext getServerContext(String serverguid) throws Exception {
         return TestVmwareContextFactory.getContext(getServerurl(),getUsername(),getPassword());
     }
 
