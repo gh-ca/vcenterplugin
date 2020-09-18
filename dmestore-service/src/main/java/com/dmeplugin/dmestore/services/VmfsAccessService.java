@@ -34,7 +34,6 @@ public interface VmfsAccessService {
     /**
      * Create vmfs include:
      * ServiceVolumeBasicParams对象包含如下属性
-     * param str dataStoreObjectId vmfs存储的objectid 必
      * param str name: 名称 必 vmfs stor的名称
      * param str volumeName: 名称 必 卷的名称
      * param int capacity: 容量，单位GB 必
