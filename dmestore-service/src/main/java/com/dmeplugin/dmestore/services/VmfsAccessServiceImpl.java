@@ -232,32 +232,36 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
                 }
                 LOG.info("taskId====" + taskId);
-                //查询看创建任务是否完成。
-                List<String> taskIds = new ArrayList<>();
-                taskIds.add(taskId);
-                boolean createFlag = taskService.checkTaskStatus(taskIds);
-                if (createFlag) { //DME创建完成
-                    //创建vmware中的vmfs存储。
-                    String dataStoreStr = createVmfsOnVmware(params);
-                    LOG.info("Vmfs dataStoreStr==" + dataStoreStr);
-                    if(!StringUtils.isEmpty(dataStoreStr)) {
-                        Map<String, Object> dataStoreMap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {
-                        }.getType());
-                        if (dataStoreMap != null) {
-                            //通过卷的名称去DME查询卷的信息
-                            Map<String, Object> volumeMap = getVolumeByName(ToolUtils.getStr(params.get("volumeName")));
-                            //将DME卷与vmfs的关系保存数据库
-                            saveDmeVmwareRalation(volumeMap,dataStoreMap);
-                            //关联服务等级
-                            if (params.get("service_level_id") != null) {
-                                String serviceLevelName = ToolUtils.getStr(params.get("service_level_name"));
-                                String attachTagStr = vcsdkUtils.attachTag(ToolUtils.getStr(dataStoreMap.get("type")), ToolUtils.getStr(dataStoreMap.get("id")), serviceLevelName);
-                                LOG.info("Vmfs attachTagStr==" + attachTagStr);
+                if(!StringUtils.isEmpty(taskId)) {
+                    //查询看创建任务是否完成。
+                    List<String> taskIds = new ArrayList<>();
+                    taskIds.add(taskId);
+                    boolean createFlag = taskService.checkTaskStatus(taskIds);
+                    if (createFlag) { //DME创建完成
+                        //创建vmware中的vmfs存储。
+                        String dataStoreStr = createVmfsOnVmware(params);
+                        LOG.info("Vmfs dataStoreStr==" + dataStoreStr);
+                        if (!StringUtils.isEmpty(dataStoreStr)) {
+                            Map<String, Object> dataStoreMap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {
+                            }.getType());
+                            if (dataStoreMap != null) {
+                                //通过卷的名称去DME查询卷的信息
+                                Map<String, Object> volumeMap = getVolumeByName(ToolUtils.getStr(params.get("volumeName")));
+                                //将DME卷与vmfs的关系保存数据库
+                                saveDmeVmwareRalation(volumeMap, dataStoreMap);
+                                //关联服务等级
+                                if (params.get("service_level_id") != null) {
+                                    String serviceLevelName = ToolUtils.getStr(params.get("service_level_name"));
+                                    String attachTagStr = vcsdkUtils.attachTag(ToolUtils.getStr(dataStoreMap.get("type")), ToolUtils.getStr(dataStoreMap.get("id")), serviceLevelName);
+                                    LOG.info("Vmfs attachTagStr==" + attachTagStr);
+                                }
                             }
                         }
+                    } else {
+                        throw new Exception("DME create vmfs volume error(task status)!");
                     }
                 } else {
-                    throw new Exception("DME create vmfs volume error(task status)!");
+                    throw new Exception("DME create vmfs volume error(task is null)!");
                 }
             } else {
                 throw new Exception("DME find or create host error!");
