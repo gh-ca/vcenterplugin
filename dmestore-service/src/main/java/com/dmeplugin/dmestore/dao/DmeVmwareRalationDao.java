@@ -185,7 +185,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         PreparedStatement pstm = null;
         try {
             con = getConnection();
-            String sql = "insert into DP_DME_VMWARE_RELATION(STORE_ID,STORE_NAME,VOLUME_ID,VOLUME_NAME,VOLUME_WWN,VOLUME_SHARE,VOLUME_FS,STORE_TYPE,SHARE_ID,SHARE_NAME,FS_ID,FS_NAME,LOGICPORT_ID,LOGIC_PORT_NAME,STORAGE_DEVICE_ID) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            String sql = "insert into DP_DME_VMWARE_RELATION(STORE_ID,STORE_NAME,VOLUME_ID,VOLUME_NAME,VOLUME_WWN,VOLUME_SHARE,VOLUME_FS,STORE_TYPE,SHARE_ID,SHARE_NAME,FS_ID,FS_NAME,LOGICPORT_ID,LOGICPORT_NAME,STORAGE_DEVICE_ID) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             pstm = con.prepareStatement(sql);
             //不自动提交
             con.setAutoCommit(false);

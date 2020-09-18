@@ -70,15 +70,15 @@ public interface DmeNFSAccessService {
     List<NfsDataInfo> listNfsPerformance(List<String> fsIds) throws Exception;
 
     /**
-     * Mount nfs,params中包含了 include:     *
+     * Mount nfs,params中包含了 include:
+     * dataStoreObjectId: datastore的object id
      * dataStoreName: datastore名称  必
-     * list<str> hosts: 主机名称 必 （主机与集群二选一）
-     * list<str> clusters: 集群名称 必（主机与集群二选一）
+     * list<map<str,str>> hosts: 主机objectid,主机名称 必 （主机与集群二选一）
+     * list<map<str,str>>  clusters: 集群objectid,集群名称 必（主机与集群二选一）
      * str mountType: 挂载模式（只读或读写）  readOnly/readWrite
      *
      * @param params: include dataStoreName,hosts,clusters,mountType
      * @return: ResponseBodyBean
-     * @throws Exception when error
      */
     void mountNfs(Map<String, Object> params) throws Exception;
 }
