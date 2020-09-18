@@ -59,7 +59,7 @@
         <property name="url" value="${h2.url}"/>
     </bean>
 
-    <bean name="vmfsAccessService" class="com.dmeplugin.dmestore.services.VmfsAccessServiceImpl">
+    <bean name="VmfsAccessServiceImpl" class="com.dmeplugin.dmestore.services.VmfsAccessServiceImpl">
         <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="dataStoreStatisticHistoryService" ref="DataStoreStatisticHistoryService"/>
