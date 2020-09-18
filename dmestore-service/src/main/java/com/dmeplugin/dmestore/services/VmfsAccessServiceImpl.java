@@ -626,7 +626,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 //                                Map<String, Object> dsmap = new HashMap<>();
 //                                dsmap.put("name", dataStoreName);
 //
-//                                vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), ToolUtils.getStr(params.get("cluster")), ToolUtils.getStr(params.get("host")));
+//                                vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), ToolUtils.getStr(params.get("clusterId")), ToolUtils.getStr(params.get("hostId")));
 //                            }
 //                        }
 //                    }
