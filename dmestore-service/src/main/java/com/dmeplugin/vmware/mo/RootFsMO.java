@@ -71,6 +71,21 @@ public class RootFsMO extends BaseMO{
         return objmo;
     }
 
+    public HostMO findHostById(String id) throws Exception {
+        HostMO objmo = null;
+        List<Pair<ManagedObjectReference, String>> objs = getAllHostOnRootFs();
+        if (objs != null && objs.size() > 0) {
+            for (Pair<ManagedObjectReference, String> obj : objs) {
+                HostMO submo = new HostMO(_context, obj.first());
+                if(id.equals(submo.getMor().getValue())){
+                    objmo = submo;
+                    break;
+                }
+            }
+        }
+        return objmo;
+    }
+
     public ClusterMO findCluster(String name) throws Exception {
         ClusterMO objmo = null;
         List<Pair<ManagedObjectReference, String>> objs = getAllClusterOnRootFs();
@@ -86,6 +101,21 @@ public class RootFsMO extends BaseMO{
         return objmo;
     }
 
+    public ClusterMO findClusterById(String id) throws Exception {
+        ClusterMO objmo = null;
+        List<Pair<ManagedObjectReference, String>> objs = getAllClusterOnRootFs();
+        if (objs != null && objs.size() > 0) {
+            for (Pair<ManagedObjectReference, String> obj : objs) {
+                ClusterMO submo = new ClusterMO(_context, obj.first());
+                if(id.equals(submo.getMor().getValue())){
+                    objmo = submo;
+                    break;
+                }
+            }
+        }
+        return objmo;
+    }
+
     public DatastoreMO findDataStore(String name) throws Exception {
         DatastoreMO objmo = null;
         List<Pair<ManagedObjectReference, String>> objs = getAllDatastoreOnRootFs();
@@ -93,6 +123,21 @@ public class RootFsMO extends BaseMO{
             for (Pair<ManagedObjectReference, String> obj : objs) {
                 DatastoreMO submo = new DatastoreMO(_context, obj.first());
                 if(name.equals(submo.getName())){
+                    objmo = submo;
+                    break;
+                }
+            }
+        }
+        return objmo;
+    }
+
+    public DatastoreMO findDataStoreById(String id) throws Exception {
+        DatastoreMO objmo = null;
+        List<Pair<ManagedObjectReference, String>> objs = getAllDatastoreOnRootFs();
+        if (objs != null && objs.size() > 0) {
+            for (Pair<ManagedObjectReference, String> obj : objs) {
+                DatastoreMO submo = new DatastoreMO(_context, obj.first());
+                if(id.equals(submo.getMor().getValue())){
                     objmo = submo;
                     break;
                 }
