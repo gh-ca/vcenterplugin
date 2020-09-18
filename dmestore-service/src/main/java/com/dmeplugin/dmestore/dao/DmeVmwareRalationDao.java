@@ -71,7 +71,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         return lists;
     }
 
-    public DmeVmwareRelation getDmeVmwareRelationByDsName(String storeName) throws SQLException {
+    public DmeVmwareRelation getDmeVmwareRelationByDsId(String storeId) throws SQLException {
 
         DmeVmwareRelation dvr = null;
         Connection con = null;
@@ -81,8 +81,8 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             con = getConnection();
             String sql = "SELECT * FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION
                     + " WHERE state=1 ";
-            if (!StringUtils.isEmpty(storeName)) {
-                sql = sql + " and STORE_NAME='" + storeName + "'";
+            if (!StringUtils.isEmpty(storeId)) {
+                sql = sql + " and STORE_ID='" + storeId + "'";
             }
 
             ps = con.prepareStatement(sql);
@@ -107,6 +107,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 dvr.setCreateTime(rs.getTimestamp("CREATETIME"));
                 dvr.setUpdateTime(rs.getTimestamp("UPDATETIME"));
                 dvr.setState(rs.getInt("STATE"));
+                dvr.setStorageDeviceId(rs.getString("STORAGE_DEVICE_ID"));
             }
         } catch (DataBaseException | SQLException e) {
             LOGGER.error("Failed to get Dme Vmware Relation: " + e.getMessage());
