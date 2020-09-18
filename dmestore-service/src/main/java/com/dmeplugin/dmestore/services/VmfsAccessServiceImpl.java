@@ -274,7 +274,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             if (params != null) {
                 //创建vmware中的vmfs存储。 cluster host
                 String hostName = ToolUtils.getStr(params.get("host"));
+                String hostObjectId = ToolUtils.getStr(params.get("hostId"));
                 String clusterName = ToolUtils.getStr(params.get("cluster"));
+                String clusterObjectId = ToolUtils.getStr(params.get("clusterId"));
                 String datastoreName = ToolUtils.getStr(params.get("name"));
                 int vmfsMajorVersion = ToolUtils.getInt(params.get("version"));
                 int blockSize = ToolUtils.getInt(params.get("blockSize"));
@@ -284,9 +286,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //从主机或集群中找出最接近capacity的LUN
                 Map<String, Object> hsdmap = null;
                 if (params != null && params.get("host") != null) {
-                    hsdmap = vcsdkUtils.getLunsOnHost(hostName, capacity);
+                    hsdmap = vcsdkUtils.getLunsOnHost(hostObjectId, capacity);
                 } else if (params != null && params.get("cluster") != null) {
-                    hsdmap = vcsdkUtils.getLunsOnCluster(clusterName, capacity);
+                    hsdmap = vcsdkUtils.getLunsOnCluster(clusterObjectId, capacity);
                 }
 
                 //创建
@@ -294,7 +296,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         vmfsMajorVersion, blockSize, unmapGranularity, unmapPriority);
 
                 //如果创建成功，在集群中的其他主机上扫描并挂载datastore
-                vcsdkUtils.mountVmfsOnCluster(dataStoreStr, clusterName, hostName);
+                vcsdkUtils.mountVmfsOnCluster(dataStoreStr, clusterObjectId, hostObjectId);
             }
         } catch (Exception e) {
             LOG.error("createVmfsByServiceLevel error:", e);
@@ -450,7 +452,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return objId;
     }
     //如果主机组不存在就创建并得到主机组ID 创建前要检查集群下的所有主机是否在DME中存在
-    private String checkOrcreateToHostGroup(String clusterName) {
+    private String checkOrcreateToHostGroup(String clusterName,String clusterObjectId) {
         String objId = "";
         try {
             //param str host: 主机  param str cluster: 集群
@@ -472,7 +474,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //如果主机组不存在就需要创建,创建前要检查集群下的所有主机是否在DME中存在
                 if (StringUtils.isEmpty(objId)) {
                     //取得集群下的所有主机
-                    String vmwarehosts = vcsdkUtils.getHostsOnCluster(clusterName);
+                    String vmwarehosts = vcsdkUtils.getHostsOnCluster(clusterObjectId);
                     LOG.info("vmwarehosts==" + vmwarehosts);
                     if (!StringUtils.isEmpty(vmwarehosts)) {
                         List<Map<String, String>> vmwarehostlists = gson.fromJson(vmwarehosts, new TypeToken<List<Map<String, String>>>() {
@@ -516,7 +518,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             if (params != null && params.get("host") != null) {
                 objId = checkOrcreateToHost(ToolUtils.getStr(params.get("host")));
             } else if (params != null && params.get("cluster") != null) {
-                objId = checkOrcreateToHostGroup(ToolUtils.getStr(params.get("cluster")));
+                objId = checkOrcreateToHostGroup(ToolUtils.getStr(params.get("cluster")),ToolUtils.getStr(params.get("clusterId")));
             }
         } catch (Exception e) {
             LOG.error("checkOrcreateToHostorHostGroup error:", e);
@@ -567,7 +569,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             List<DmeVmwareRelation> rallist = new ArrayList<>();
 
             DmeVmwareRelation dvr = new DmeVmwareRelation();
-            dvr.setStoreId(ToolUtils.getStr(dataStoreMap.get("id")));
+            dvr.setStoreId(ToolUtils.getStr(dataStoreMap.get("objectId")));
             dvr.setStoreName(ToolUtils.getStr(dataStoreMap.get("name")));
             dvr.setVolumeId(ToolUtils.getStr(volumeMap.get("volume_id")));
             dvr.setVolumeName(ToolUtils.getStr(volumeMap.get("volume_name")));
@@ -601,10 +603,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //挂载卷
                 String taskId = "";
                 if (params.get("host") != null) {
-                    //将卷挂载到主机
+                    //将卷挂载到主机DME
                     taskId = mountVmfsToHost(params, objhostid);
                 } else {
-                    //将卷挂载到集群
+                    //将卷挂载到集群DME
                     taskId = mountVmfsToHostGroup(params, objhostid);
                 }
                 LOG.info("taskId====" + taskId);
@@ -614,7 +616,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 boolean mountFlag = taskService.checkTaskStatus(taskIds);
                 if (mountFlag) { //DME创建完成
                     //调用vCenter在主机上扫描卷和Datastore
-                    vcsdkUtils.scanDataStore(ToolUtils.getStr(params.get("cluster")),ToolUtils.getStr(params.get("host")));
+                    vcsdkUtils.scanDataStore(ToolUtils.getStr(params.get("clusterId")),ToolUtils.getStr(params.get("hostId")));
                     //如果是需要扫描LUN来挂载，则需要执行下面的方法，dataStoreNames
 //                    {
 //                        List<String> dataStoreNames = (List<String>) params.get("dataStoreNames");
@@ -624,7 +626,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 //                                Map<String, Object> dsmap = new HashMap<>();
 //                                dsmap.put("name", dataStoreName);
 //
-//                                vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), ToolUtils.getStr(params.get("cluster")), ToolUtils.getStr(params.get("host")));
+//                                vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), ToolUtils.getStr(params.get("clusterId")), ToolUtils.getStr(params.get("hostId")));
 //                            }
 //                        }
 //                    }
@@ -638,7 +640,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             throw new Exception("Parameter exception:" + params);
         }
     }
-    //将卷挂载到主机
+    //将卷挂载到主机DME
     private String mountVmfsToHost(Map<String, Object> params, String objhostid) {
         String taskId = "";
         try {
@@ -670,7 +672,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return taskId;
     }
-    //将卷挂载到集群
+    //将卷挂载到集群DME
     private String mountVmfsToHostGroup(Map<String, Object> params, String objhostid) {
         String taskId = "";
         try {

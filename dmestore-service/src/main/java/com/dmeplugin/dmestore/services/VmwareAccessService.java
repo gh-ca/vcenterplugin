@@ -24,11 +24,11 @@ public interface VmwareAccessService {
     /**
      * Access hosts
      *
-     * @param  dataStoreName dataStore Name
+     * @param  dataStoreObjectId dataStore ObjectId
      * @return ResponseBodyBean List<Map<String, String>> include hostId hostName
      * @throws Exception when error
      */
-    List<Map<String,String>> getHostsByDsName(String dataStoreName) throws Exception;
+    List<Map<String,String>> getHostsByDsObjectId(String dataStoreObjectId) throws Exception;
 
     /**
      * Access clusters
@@ -41,31 +41,31 @@ public interface VmwareAccessService {
     /**
      * Access clusters
      *
-     * @param  dataStoreName dataStore Name
-     * @return ResponseBodyBean List<Map<String, String>> include clusterId clusterName
+     * @param  dataStoreObjectId dataStore ObjectId
+     * @return ResponseBodyBean List<Map<String, String>> include clusterId clusterObjectId
      * @throws Exception when error
      */
-    List<Map<String,String>> getClustersByDsName(String dataStoreName) throws Exception;
+    List<Map<String,String>> getClustersByDsObjectId(String dataStoreObjectId) throws Exception;
 
     /**
      * Access datastore
      *
-     * @param  hostName host Name
+     * @param  hostObjectId host ObjectId
      * @param  dataStoreType dataStore Type
      * @return ResponseBodyBean List<Map<String, String>> include id name status type capacity freeSpace
      * @throws Exception when error
      */
-    List<Map<String,String>> getDataStoresByHostName(String hostName, String dataStoreType) throws Exception;
+    List<Map<String,String>> getDataStoresByHostObjectId(String hostObjectId, String dataStoreType) throws Exception;
 
     /**
      * Access datastore
      *
-     * @param  clusterName cluster Name
+     * @param  clusterObjectId cluster ObjectId
      * @param  dataStoreType dataStore Type
      * @return ResponseBodyBean List<Map<String, String>> include id name status type capacity freeSpace
      * @throws Exception when error
      */
-    List<Map<String,String>> getDataStoresByClusterName(String clusterName, String dataStoreType) throws Exception;
+    List<Map<String,String>> getDataStoresByClusterObjectId(String clusterObjectId, String dataStoreType) throws Exception;
 
 
 

@@ -631,11 +631,11 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     @Override
     public void mountNfs(Map<String, Object> params) throws Exception{
         if (params != null) {
-            String dataStoreName = ToolUtils.getStr(params.get("dataStoreName"));
-            LOG.info("dataStoreName====" + dataStoreName);
-            if (!StringUtils.isEmpty(dataStoreName)) {
+            String dataStoreObjectId = ToolUtils.getStr(params.get("dataStoreObjectId"));
+            LOG.info("dataStoreObjectId====" + dataStoreObjectId);
+            if (!StringUtils.isEmpty(dataStoreObjectId)) {
                 //查询数据库，得到对应的nfs信息
-                DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsName(dataStoreName);
+                DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStoreObjectId);
                 if(dvr!=null && dvr.getShareId()!=null) {
                     params.put("shareId",dvr.getShareId());
                     //挂载卷
@@ -647,16 +647,16 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                     boolean mountFlag = taskService.checkTaskStatus(taskIds);
                     if (mountFlag) { //DME挂载完成
                         //调用vCenter在主机上扫描卷和Datastore，并挂载主机
-                        List<String> clusters = null;
-                        List<String> hosts = null;
+                        List<Map<String,String>> clusters = null;
+                        List<Map<String,String>> hosts = null;
                         String mountType = null;
                         if(params.get("hosts")!=null){
-                            hosts = (List<String>)params.get("hosts");
+                            hosts = (List<Map<String,String>>)params.get("hosts");
                         }
                         if(params.get("clusters")!=null){
-                            clusters = (List<String>)params.get("clusters");
+                            clusters = (List<Map<String,String>>)params.get("clusters");
                         }
-                        vcsdkUtils.mountNfsOnCluster(dataStoreName,
+                        vcsdkUtils.mountNfsOnCluster(dataStoreObjectId,
                                 clusters, hosts, ToolUtils.getStr(params.get("mountType")));
 
                     } else {
@@ -690,10 +690,16 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             //取得目标主机
             List<String> hostlist = null;
             if (params.get("hosts")!=null) {
-                hostlist = (List<String>)params.get("hosts");
+                hostlist = new ArrayList<>();
+                List<Map<String,String>> hosts = (List<Map<String,String>>)params.get("hosts");
+                if(hosts!=null && hosts.size()>0){
+                    for(Map<String,String> hostmap:hosts){
+                        hostlist.add(hostmap.get("hostName"));
+                    }
+                }
             }else if (params.get("clusters")!=null) {
                 //取得没有挂载这个存储的所有主机，以方便后面过滤
-                hostlist = vcsdkUtils.getUnmoutHostsOnCluster(ToolUtils.getStr(params.get("dataStoreName")), (List<String>)params.get("clusters"));
+                hostlist = vcsdkUtils.getUnmoutHostsOnCluster(ToolUtils.getStr(params.get("dataStoreObjectId")), (List<Map<String,String>>)params.get("clusters"));
             }
 
             //修改dme中的share
