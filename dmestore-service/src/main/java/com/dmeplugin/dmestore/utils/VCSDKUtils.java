@@ -1181,7 +1181,6 @@ public class VCSDKUtils {
         } catch (Exception e) {
             e.printStackTrace();
             _logger.error("mount Vmfs Volume error:", e);
-            throw e;
         }
     }
 
