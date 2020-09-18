@@ -46,7 +46,7 @@ public class NfsAccessController extends BaseController {
             return success(lists);
         } catch (Exception e) {
             LOG.error("list nfs failure:", e);
-            failureStr = "list nfs failure:"+e.getMessage();
+            failureStr = "list nfs failure:"+e.toString();
         }
         return failure(failureStr);
     }
@@ -69,7 +69,7 @@ public class NfsAccessController extends BaseController {
             return success(lists);
         } catch (Exception e) {
             LOG.error("get nfs performance failure:", e);
-            failureStr = "get nfs performance failure:"+e.getMessage();
+            failureStr = "get nfs performance failure:"+e.toString();
         }
         return failure(failureStr);
     }
@@ -97,7 +97,7 @@ public class NfsAccessController extends BaseController {
             return success(null,"Mount nfs success");
         }catch (Exception e){
             LOG.error("mount nfs failure:", e);
-            failureStr = "mount nfs failure:"+e.getMessage();
+            failureStr = "mount nfs failure:"+e.toString();
         }
         return failure(failureStr);
     }

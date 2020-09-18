@@ -48,7 +48,7 @@ public class VmfsAccessController extends BaseController{
             return success(lists);
         }catch (Exception e){
             LOG.error("list vmfs failure:", e);
-            failureStr = "list vmfs failure:"+e.getMessage();
+            failureStr = "list vmfs failure:"+e.toString();
         }
         return failure(failureStr);
     }
@@ -71,7 +71,7 @@ public class VmfsAccessController extends BaseController{
             return success(lists);
         }catch (Exception e){
             LOG.error("get vmfs performance failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "get vmfs performance failure:"+e.toString();
         }
         return failure(failureStr);
     }
@@ -121,7 +121,7 @@ public class VmfsAccessController extends BaseController{
             return success(null,"Create vmfs success");
         }catch (Exception e){
             LOG.error("create vmfs failure:", e);
-            failureStr = "create vmfs failure:"+e.getMessage();
+            failureStr = "create vmfs failure:"+e.toString();
         }
         return failure(failureStr);
     }
@@ -148,7 +148,7 @@ public class VmfsAccessController extends BaseController{
             return success(null,"Mount vmfs success");
         }catch (Exception e){
             LOG.error("mount vmfs failure:", e);
-            failureStr = "mount vmfs failure:"+e.getMessage();
+            failureStr = "mount vmfs failure:"+e.toString();
         }
         return failure(failureStr);
     }

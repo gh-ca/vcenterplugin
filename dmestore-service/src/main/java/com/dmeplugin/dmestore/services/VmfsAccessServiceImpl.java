@@ -417,7 +417,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return taskId;
     }
     //判断主机在DME中是否存在 如果主机不存在就创建并得到主机ID
-    private String checkOrcreateToHost(String hostIp) {
+    private String checkOrcreateToHost(String hostIp) throws Exception{
         String objId = "";
         try {
             //param str host: 主机  param str cluster: 集群
@@ -448,11 +448,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
         } catch (Exception e) {
             LOG.error("checkOrcreateToHost error:", e);
+            throw e;
         }
         return objId;
     }
     //如果主机组不存在就创建并得到主机组ID 创建前要检查集群下的所有主机是否在DME中存在
-    private String checkOrcreateToHostGroup(String clusterName,String clusterObjectId) {
+    private String checkOrcreateToHostGroup(String clusterName,String clusterObjectId) throws Exception{
         String objId = "";
         try {
             //param str host: 主机  param str cluster: 集群
@@ -507,11 +508,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
         } catch (Exception e) {
             LOG.error("checkOrcreateToHostGroup error:", e);
+            throw e;
         }
         return objId;
     }
     //根据参数选择检查主机或主机组的方法
-    private String checkOrcreateToHostorHostGroup(Map<String, Object> params) {
+    private String checkOrcreateToHostorHostGroup(Map<String, Object> params) throws Exception {
         String objId = "";
         try {
             //param str host: 主机  param str cluster: 集群
@@ -522,6 +524,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
         } catch (Exception e) {
             LOG.error("checkOrcreateToHostorHostGroup error:", e);
+            throw e;
         }
         return objId;
     }
