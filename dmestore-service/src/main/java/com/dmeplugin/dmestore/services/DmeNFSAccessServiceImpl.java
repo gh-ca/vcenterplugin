@@ -491,9 +491,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                                 //对比数据库关系表中的数据，只显示关系表中的数据
                                 if (dvrMap != null && dvrMap.get(vmwareObjectId) != null) {
                                     NfsDataInfo nfsDataInfo = new NfsDataInfo();
-                                    double capacity = ToolUtils.getDouble(jo.get("capacity")) / ToolUtils.Gi;
-                                    double freeSpace = ToolUtils.getDouble(jo.get("freeSpace")) / ToolUtils.Gi;
-                                    double reserveCapacity = (ToolUtils.getDouble(jo.get("capacity")) - ToolUtils.getDouble(jo.get("freeSpace"))) / ToolUtils.Gi;
+                                    double capacity = ToolUtils.getDouble(jo.get("capacity")) / ToolUtils.GI;
+                                    double freeSpace = ToolUtils.getDouble(jo.get("freeSpace")) / ToolUtils.GI;
+                                    double reserveCapacity = (ToolUtils.getDouble(jo.get("capacity")) - ToolUtils.getDouble(jo.get("freeSpace"))) / ToolUtils.GI;
 
                                     nfsDataInfo.setName(ToolUtils.jsonToStr(jo.get("name")));
 

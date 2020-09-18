@@ -92,9 +92,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                 //对比数据库关系表中的数据，只显示关系表中的数据
                                 if (dvrMap != null && dvrMap.get(vmwareStoreName) != null) {
                                     VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
-                                    double capacity = ToolUtils.getDouble(jo.get("capacity")) / ToolUtils.Gi;
-                                    double freeSpace = ToolUtils.getDouble(jo.get("freeSpace")) / ToolUtils.Gi;
-                                    double uncommitted = ToolUtils.getDouble(jo.get("uncommitted")) / ToolUtils.Gi;
+                                    double capacity = ToolUtils.getDouble(jo.get("capacity")) / ToolUtils.GI;
+                                    double freeSpace = ToolUtils.getDouble(jo.get("freeSpace")) / ToolUtils.GI;
+                                    double uncommitted = ToolUtils.getDouble(jo.get("uncommitted")) / ToolUtils.GI;
 
                                     vmfsDataInfo.setName(vmwareStoreName);
 
