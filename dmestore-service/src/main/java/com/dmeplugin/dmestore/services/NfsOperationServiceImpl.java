@@ -26,8 +26,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     @Autowired
     private DmeAccessService dmeAccessServiceImpl;
 
-    @Autowired
-    private Gson gson;
+    private Gson gson = new Gson();
 
     @Autowired
     private VCSDKUtils vcsdkUtils;
