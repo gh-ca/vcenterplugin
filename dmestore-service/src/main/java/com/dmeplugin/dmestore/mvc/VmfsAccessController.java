@@ -128,8 +128,7 @@ public class VmfsAccessController extends BaseController{
 
     /**
      * Mount vmfs include
-     * param list<str> dataStoreNames: datastore名称列表 必
-     * param list<str> volumeIds: 卷volumeId列表 必
+     * param list<str> dataStoreObjectIds: datastore object id列表 必
      * param str host: 主机名称 必 （主机与集群二选一）
      * param str hostId: 主机
      * param str cluster: 集群名称 必（主机与集群二选一）
