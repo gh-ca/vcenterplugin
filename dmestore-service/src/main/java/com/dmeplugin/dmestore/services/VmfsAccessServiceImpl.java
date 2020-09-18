@@ -603,10 +603,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //挂载卷
                 String taskId = "";
                 if (params.get("host") != null) {
-                    //将卷挂载到主机
+                    //将卷挂载到主机DME
                     taskId = mountVmfsToHost(params, objhostid);
                 } else {
-                    //将卷挂载到集群
+                    //将卷挂载到集群DME
                     taskId = mountVmfsToHostGroup(params, objhostid);
                 }
                 LOG.info("taskId====" + taskId);
@@ -616,7 +616,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 boolean mountFlag = taskService.checkTaskStatus(taskIds);
                 if (mountFlag) { //DME创建完成
                     //调用vCenter在主机上扫描卷和Datastore
-                    vcsdkUtils.scanDataStore(ToolUtils.getStr(params.get("cluster")),ToolUtils.getStr(params.get("host")));
+                    vcsdkUtils.scanDataStore(ToolUtils.getStr(params.get("clusterId")),ToolUtils.getStr(params.get("hostId")));
                     //如果是需要扫描LUN来挂载，则需要执行下面的方法，dataStoreNames
 //                    {
 //                        List<String> dataStoreNames = (List<String>) params.get("dataStoreNames");
@@ -640,7 +640,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             throw new Exception("Parameter exception:" + params);
         }
     }
-    //将卷挂载到主机
+    //将卷挂载到主机DME
     private String mountVmfsToHost(Map<String, Object> params, String objhostid) {
         String taskId = "";
         try {
@@ -672,7 +672,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return taskId;
     }
-    //将卷挂载到集群
+    //将卷挂载到集群DME
     private String mountVmfsToHostGroup(Map<String, Object> params, String objhostid) {
         String taskId = "";
         try {
