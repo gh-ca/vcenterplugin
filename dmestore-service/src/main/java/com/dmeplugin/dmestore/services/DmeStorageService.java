@@ -1,6 +1,5 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.model.Storage;
 
 import java.util.Map;
 
@@ -17,4 +16,6 @@ public interface DmeStorageService {
     Map<String,Object> getStorageDetail(String storageId);
 
     Map<String, Object> getStoragePools(String storageId);
+
+    Map<String, Object> getLogicPorts(String storageId);
 }

@@ -23,8 +23,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     private static final Logger LOG = LoggerFactory.getLogger(DmeStorageServiceImpl.class);
 
-
-    private Gson gson=new Gson();
+    @Autowired
+    private Gson gson;
 
     @Autowired
     private DmeAccessService dmeAccessServiceImpl;
@@ -35,7 +35,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     public Map<String, Object> getStorages() {
 
         Map<String, Object> objMap = new HashMap<>();
-        objMap.put("code", "200");
+        objMap.put("code", 200);
         objMap.put("msg", "list storage success!");
         List<Storage> list = new ArrayList<>();
 
@@ -253,6 +253,66 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             LOG.error("search oriented storage pool error", e);
             resMap.put("code", 503);
             resMap.put("msg",e.getMessage());
+        }finally {
+            return resMap;
+        }
+    }
+
+    @Override
+    public Map<String,Object> getLogicPorts(String storageId){
+
+        Map<String, Object> resMap = new HashMap<>();
+        resMap.put("code", 200);
+        resMap.put("msg", "list logic ports success!");
+        resMap.put("storageId", storageId);
+        List<LogicPorts> resList = new ArrayList<>();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+
+        String url = "https://localhost:26335/rest/storagemgmt/v1/storage-port/logic-ports?storage_id="+storageId;
+        try {
+            ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
+            Log.info("DmeStorageServiceImpl/getLogicPorts/responseEntity==" + responseEntity);
+            int code = responseEntity.getStatusCodeValue();
+            if (code != 200) {
+                resMap.put("code",code);
+                resMap.put("msg", "list bandports error!");
+            }
+            String object = responseEntity.getBody();
+            if (!StringUtils.isEmpty(object)) {
+                JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+                JsonArray jsonArray = jsonObject.get("logic_ports").getAsJsonArray();
+                for (JsonElement jsonElement : jsonArray) {
+                    JsonObject element = jsonElement.getAsJsonObject();
+                    LogicPorts logicPorts = new LogicPorts();
+                    logicPorts.setId(element.get("id").getAsString());
+                    logicPorts.setName(element.get("name").getAsString());
+                    logicPorts.setRunning_status(element.get("running_status").getAsString());
+                    logicPorts.setOperational_status(element.get("operational_status").getAsString());
+                    logicPorts.setMgmt_ip(element.get("mgmt_ip").getAsString());
+                    logicPorts.setMgmt_ipv6(element.get("mgmt_ipv6").getAsString());
+                    logicPorts.setHome_port_id(element.get("home_port_id").getAsString());
+                    logicPorts.setHome_port_name(element.get("home_port_name").getAsString());
+                    logicPorts.setRole(element.get("role").getAsString());
+                    logicPorts.setDdns_status(element.get("ddns_status").getAsString());
+                    logicPorts.setCurrent_port_id(element.get("current_port_id").getAsString());
+                    logicPorts.setCurrent_port_name(element.get("current_port_name").getAsString());
+                    logicPorts.setSupport_protocol(element.get("support_protocol").getAsString());
+                    logicPorts.setManagement_access(element.get("management_access").getAsString());
+                    logicPorts.setVstore_id( element.get("vstore_id").getAsString());
+                    logicPorts.setVstore_name(element.get("vstore_name").getAsString());
+                    resList.add(logicPorts);
+                }
+                resMap.put("data", resList);
+            }
+            return resMap;
+        } catch (Exception e) {
+            Log.error("list bandports error", e);
+            resMap.put("code", 503);
+            resMap.put("msg", e.getMessage());
+
         }finally {
             return resMap;
         }
@@ -538,65 +598,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
     }
 
-    private Map<String,Object> getLogicPorts(String storageId){
-
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put("code", 200);
-        resMap.put("msg", "list logic ports success!");
-        resMap.put("storageId", storageId);
-        List<LogicPorts> resList = new ArrayList<>();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-
-        String url = "https://localhost:26335/rest/storagemgmt/v1/storage-port/logic-ports?storage_id="+storageId;
-        try {
-            ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
-            Log.info("DmeStorageServiceImpl/getLogicPorts/responseEntity==" + responseEntity);
-            int code = responseEntity.getStatusCodeValue();
-            if (code != 200) {
-                resMap.put("code",code);
-                resMap.put("msg", "list bandports error!");
-            }
-            String object = responseEntity.getBody();
-            if (!StringUtils.isEmpty(object)) {
-                JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-                JsonArray jsonArray = jsonObject.get("logic_ports").getAsJsonArray();
-                for (JsonElement jsonElement : jsonArray) {
-                    JsonObject element = jsonElement.getAsJsonObject();
-                    LogicPorts logicPorts = new LogicPorts();
-                    logicPorts.setId(element.get("id").getAsString());
-                    logicPorts.setName(element.get("name").getAsString());
-                    logicPorts.setRunning_status(element.get("running_status").getAsString());
-                    logicPorts.setOperational_status(element.get("operational_status").getAsString());
-                    logicPorts.setMgmt_ip(element.get("mgmt_ip").getAsString());
-                    logicPorts.setMgmt_ipv6(element.get("mgmt_ipv6").getAsString());
-                    logicPorts.setHome_port_id(element.get("home_port_id").getAsString());
-                    logicPorts.setHome_port_name(element.get("home_port_name").getAsString());
-                    logicPorts.setRole(element.get("role").getAsString());
-                    logicPorts.setDdns_status(element.get("ddns_status").getAsString());
-                    logicPorts.setCurrent_port_id(element.get("current_port_id").getAsString());
-                    logicPorts.setCurrent_port_name(element.get("current_port_name").getAsString());
-                    logicPorts.setSupport_protocol(element.get("support_protocol").getAsString());
-                    logicPorts.setManagement_access(element.get("management_access").getAsString());
-                    logicPorts.setVstore_id( element.get("vstore_id").getAsString());
-                    logicPorts.setVstore_name(element.get("vstore_name").getAsString());
-                    resList.add(logicPorts);
-                }
-                resMap.put("data", resList);
-            }
-            return resMap;
-        } catch (Exception e) {
-            Log.error("list bandports error", e);
-            resMap.put("code", 503);
-            resMap.put("msg", e.getMessage());
-
-        }finally {
-            return resMap;
-        }
-    }
-
     private Map<String,Object> getStorageControllers(){
 
         String className = "SYS_Controller";
@@ -711,6 +712,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
         return responseEntity;
     }
+
     private ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws Exception {
 
         RestUtils restUtils = new RestUtils();
