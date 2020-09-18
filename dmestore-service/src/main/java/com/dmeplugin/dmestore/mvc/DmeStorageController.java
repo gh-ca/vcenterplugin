@@ -46,7 +46,7 @@ public class DmeStorageController extends BaseController{
     public ResponseBodyBean getStorages(){
 
         Map<String, Object> resMap = dmeStorageService.getStorages();
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals("200")) {
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -64,7 +64,7 @@ public class DmeStorageController extends BaseController{
         LOG.info("storage_id ==" + storageId );
         Map<String,Object> resMap=dmeStorageService.getStorageDetail(storageId);
 
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals("200")) {
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -81,7 +81,18 @@ public class DmeStorageController extends BaseController{
 
         LOG.info("storage_id ==" + storageId );
         Map<String, Object> resMap = dmeStorageService.getStoragePools(storageId);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals("200")) {
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
+    }
+
+    @GetMapping("/logicports")
+    @ResponseBody
+    public ResponseBodyBean getLogicPorts(@RequestParam(name = "storageId") String storageId){
+
+        Map<String, Object> resMap = dmeStorageService.getLogicPorts(storageId);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));

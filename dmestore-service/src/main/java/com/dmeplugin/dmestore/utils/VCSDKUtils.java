@@ -679,7 +679,7 @@ public class VCSDKUtils {
     }
 
     //create nfs datastore
-    public String createNfsDatastore(String serverHost, Integer logicPort, String exportPath, String nfsName, String accessMode, String mountHost) {
+    public String createNfsDatastore(String serverHost, Integer logicPort, String exportPath, String nfsName, String accessMode, String mountHost,String type) {
         //todo
         //NfsDataInfo nfsDataInfo = new NfsDataInfo(); 用于详情和列表展示的自定义model
         //NasDatastoreInfo-->DataStoreInfo-->(aliasOf, containerId, freeSpace, maxFileSize, maxMemoryFileSize, maxVirtualDiskCapacity, name, timestamp, url)
@@ -706,7 +706,7 @@ public class VCSDKUtils {
                 HostMO hostMO = new HostMO(vmwareContext, managedObjectReference);
                 HostDatastoreSystemMO hostDatastoreSystemMO = hostMO.getHostDatastoreSystemMO();
                 //todo 存在返回值 需要处理
-                hostDatastoreSystemMO.createNfsDatastore(serverHost, logicPort, exportPath, nfsName, accessMode);
+                hostDatastoreSystemMO.createNfsDatastore(serverHost, logicPort, exportPath, nfsName,accessMode,type);
                 _logger.info("end creat nfs datastore");
             } else {
                 result = "failed";
@@ -1304,7 +1304,7 @@ public class VCSDKUtils {
             _logger.info("Rescan datastore before mounting");
             //挂载NFS
             NasDatastoreInfo nasdsinfo = (NasDatastoreInfo) dsmo.getInfo();
-            hostMO.getHostDatastoreSystemMO().createNfsDatastore(nasdsinfo.getNas().getRemoteHost(), 0, nasdsinfo.getNas().getRemotePath(), dsmo.getMor().getValue(), mountType);
+            hostMO.getHostDatastoreSystemMO().createNfsDatastore(nasdsinfo.getNas().getRemoteHost(), 0, nasdsinfo.getNas().getRemotePath(), dsmo.getMor().getValue(), mountType,null);
             _logger.info("mount nfs success:" + hostMO.getName() + ":" + dsmo.getName());
         } catch (Exception e) {
             e.printStackTrace();
