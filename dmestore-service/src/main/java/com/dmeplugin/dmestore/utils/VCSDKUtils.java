@@ -84,7 +84,7 @@ public class VCSDKUtils {
         return listStr;
     }
 
-    //得到所有主机的ID与name  20200918objectId
+    //得到所有主机的ID与name
     public String getAllHosts() throws Exception {
         String listStr = "";
         try {
@@ -98,8 +98,7 @@ public class VCSDKUtils {
                         HostMO host1 = new HostMO(vmwareContext, host.first());
 
                         Map<String, String> map = new HashMap<>();
-                        String objectId = vcConnectionHelper.MOR2ObjectID(host1.getMor(), vmwareContext.getServerAddress());
-                        map.put("hostId", objectId);
+                        map.put("hostId", host1.getMor().getValue());
                         map.put("hostName", host1.getName());
                         lists.add(map);
                     }
@@ -131,7 +130,7 @@ public class VCSDKUtils {
         return gson.toJson(lists);
     }
 
-    //得到所有集群的id与name 20200918objectId
+    //得到所有集群的id与name
     public String getAllClusters() throws Exception {
         String listStr = "";
         try {
