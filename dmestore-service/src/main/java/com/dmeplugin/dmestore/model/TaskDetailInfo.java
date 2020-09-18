@@ -1,5 +1,7 @@
 package com.dmeplugin.dmestore.model;
 
+import java.util.List;
+
 /**
  * @Description: TODO
  * @ClassName: TaskDetailInfo
@@ -17,6 +19,7 @@ public class TaskDetailInfo {
     long startTime;
     long endTime;
     String detail;
+    List<TaskDetailResource> resources;
 
     public String getId() {
         return id;
@@ -88,5 +91,13 @@ public class TaskDetailInfo {
 
     public void setDetail(String detail) {
         this.detail = detail;
+    }
+
+    public List<TaskDetailResource> getResources() {
+        return resources;
+    }
+
+    public void setResources(List<TaskDetailResource> resources) {
+        this.resources = resources;
     }
 }
