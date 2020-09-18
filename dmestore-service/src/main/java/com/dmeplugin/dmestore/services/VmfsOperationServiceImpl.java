@@ -297,6 +297,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 qosPolicy.setLatency(jsonObject1.get("latency").getAsString());
                 qosPolicy.setMin_bandwidth(jsonObject1.get("minBandWidth").getAsString());
                 qosPolicy.setMin_iops(jsonObject1.get("minIOPS").getAsString());
+                qosPolicy.setLatencyUnit(jsonObject1.get("latencyUnit").getAsString());
 
                 qosParam.setQosPolicy(qosPolicy);
                 capability.setQosParam(qosParam);

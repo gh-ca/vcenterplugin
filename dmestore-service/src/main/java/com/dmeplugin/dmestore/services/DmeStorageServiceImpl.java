@@ -215,7 +215,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
         try {
-            ResponseEntity<String> responseEntity = HttpRequestUtil.requestWithBody(url, HttpMethod.POST, headers, gson.toJson(params), String.class);
+            ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, gson.toJson(params));
             //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.POST, gson.toJson(params));
             Log.info("DmeStorageServiceImpl/getStoragePools/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
@@ -723,7 +723,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
         ResponseEntity<String> responseEntity = restTemplate.exchange(url, method, entity, String.class);
-        LOG.info(url + "==responseEntity==" + (responseEntity==null?"null":responseEntity.getStatusCodeValue()));
+        LOG.info(url + "==responseEntity==" + (responseEntity == null ? "null" : responseEntity.getStatusCodeValue()));
 
         return responseEntity;
     }
