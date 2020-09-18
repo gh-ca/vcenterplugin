@@ -1175,12 +1175,12 @@ public class VCSDKUtils {
                     _logger.info(volume.getName() + "========" + volume.getUuid());
                     //挂载卷
                     hostMO.getHostStorageSystemMO().mountVmfsVolume(volume.getUuid());
+                    _logger.info("mount Vmfs success:"+volume.getName() + " : " + hostMO.getName());
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
             _logger.error("mount Vmfs Volume error:", e);
-            throw e;
         }
     }
 

@@ -583,17 +583,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             LOG.error("save DmeVmwareRalation error:",e);
         }
     }
-    /*
-   * Mount vmfs
-   * param list<str> volumeIds: 卷volumeId列表 必
-   * param str host: 主机名称 必 （主机与集群二选一）
-   * param str cluster: 集群名称 必（主机与集群二选一）
-   * return: Return ResponseBodyBean
-   */
+
     @Override
     public void mountVmfs(Map<String, Object> params) throws Exception {
         if (params != null) {
-            //param str host: 主机  param str cluster: 集群
+            //param str host: 主机  param str cluster: 集群  dataStoreObjectIds
             String objhostid = "";
             //判断主机或主机组在DME中是否存在
             //如果主机或主机不存在就创建并得到主机或主机组ID
@@ -602,6 +596,28 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             if (!StringUtils.isEmpty(objhostid)) {
                 //挂载卷
                 String taskId = "";
+                //通过存储的objectid查询卷id
+                if(params.get("dataStoreObjectIds") != null){
+                    List<String> dataStoreObjectIds = (List<String>)params.get("dataStoreObjectIds");
+                    if(dataStoreObjectIds!=null && dataStoreObjectIds.size()>0){
+                        List<String> volumeIds = new ArrayList<>();
+                        List<String> dataStoreNames = new ArrayList<>();
+                        for(String dsObjectId:dataStoreObjectIds){
+                            DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dsObjectId);
+                            if(dvr!=null){
+                                volumeIds.add(dvr.getVolumeId());
+                                dataStoreNames.add(dvr.getStoreName());
+                            }
+                        }
+                        if(volumeIds.size()>0){
+                            params.put("volumeIds",volumeIds);
+                            params.put("dataStoreNames",dataStoreNames);
+                        }
+                    }
+                }
+
+                LOG.info("mountvmfs=="+gson.toJson(params));
+
                 if (params.get("host") != null) {
                     //将卷挂载到主机DME
                     taskId = mountVmfsToHost(params, objhostid);
@@ -611,27 +627,31 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
                 LOG.info("taskId====" + taskId);
                 //查询看创建任务是否完成。
-                List<String> taskIds = new ArrayList<>();
-                taskIds.add(taskId);
-                boolean mountFlag = taskService.checkTaskStatus(taskIds);
-                if (mountFlag) { //DME创建完成
-                    //调用vCenter在主机上扫描卷和Datastore
-                    vcsdkUtils.scanDataStore(ToolUtils.getStr(params.get("clusterId")),ToolUtils.getStr(params.get("hostId")));
-                    //如果是需要扫描LUN来挂载，则需要执行下面的方法，dataStoreNames
-//                    {
-//                        List<String> dataStoreNames = (List<String>) params.get("dataStoreNames");
-//                        //
-//                        if (dataStoreNames != null && dataStoreNames.size() > 0) {
-//                            for (String dataStoreName : dataStoreNames) {
-//                                Map<String, Object> dsmap = new HashMap<>();
-//                                dsmap.put("name", dataStoreName);
-//
-//                                vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), ToolUtils.getStr(params.get("clusterId")), ToolUtils.getStr(params.get("hostId")));
-//                            }
-//                        }
-//                    }
+                if(!StringUtils.isEmpty(taskId)) {
+                    List<String> taskIds = new ArrayList<>();
+                    taskIds.add(taskId);
+                    boolean mountFlag = taskService.checkTaskStatus(taskIds);
+                    if (mountFlag) { //DME创建完成
+                        //调用vCenter在主机上扫描卷和Datastore
+                        vcsdkUtils.scanDataStore(ToolUtils.getStr(params.get("clusterId")), ToolUtils.getStr(params.get("hostId")));
+                        //如果是需要扫描LUN来挂载，则需要执行下面的方法，dataStoreNames
+                        if (params.get("dataStoreNames") != null) {
+                            List<String> dataStoreNames = (List<String>) params.get("dataStoreNames");
+                            //
+                            if (dataStoreNames != null && dataStoreNames.size() > 0) {
+                                for (String dataStoreName : dataStoreNames) {
+                                    Map<String, Object> dsmap = new HashMap<>();
+                                    dsmap.put("name", dataStoreName);
+
+                                    vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), ToolUtils.getStr(params.get("clusterId")), ToolUtils.getStr(params.get("hostId")));
+                                }
+                            }
+                        }
+                    } else {
+                        throw new Exception("DME mount vmfs volume error(task status)!");
+                    }
                 } else {
-                    throw new Exception("DME mount vmfs volume error(task status)!");
+                    throw new Exception("DME mount vmfs volume error(task is null)!");
                 }
             } else {
                 throw new Exception("DME find or create host error!");
@@ -666,6 +686,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         LOG.info("mountVmfsToHost task_id====" + taskId);
                     }
                 }
+            }else{
+                LOG.error("mountVmfsToHost error:volumeIds is null");
             }
         } catch (Exception e) {
             LOG.error("mountVmfsToHost error:", e);
@@ -698,6 +720,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         LOG.info("mountVmfsToHostGroup task_id====" + taskId);
                     }
                 }
+            }else{
+                LOG.error("mountVmfsToHost error:volumeIds is null");
             }
         } catch (Exception e) {
             LOG.error("mountVmfsToHostGroup error:", e);
