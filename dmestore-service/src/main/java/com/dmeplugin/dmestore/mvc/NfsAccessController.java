@@ -94,7 +94,7 @@ public class NfsAccessController extends BaseController {
         String failureStr = "";
         try {
             dmeNFSAccessService.mountNfs(params);
-            return success();
+            return success(null,"Mount nfs success");
         }catch (Exception e){
             LOG.error("mount nfs failure:", e);
             failureStr = e.getMessage();

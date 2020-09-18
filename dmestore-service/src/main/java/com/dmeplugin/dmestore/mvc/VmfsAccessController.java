@@ -118,7 +118,7 @@ public class VmfsAccessController extends BaseController{
         String failureStr = "";
         try {
             vmfsAccessService.createVmfs(params);
-            return success();
+            return success(null,"Create vmfs success");
         }catch (Exception e){
             LOG.error("create vmfs failure:", e);
             failureStr = e.getMessage();
@@ -145,7 +145,7 @@ public class VmfsAccessController extends BaseController{
         String failureStr = "";
         try {
             vmfsAccessService.mountVmfs(params);
-            return success();
+            return success(null,"Mount vmfs success");
         }catch (Exception e){
             LOG.error("mount vmfs failure:", e);
             failureStr = e.getMessage();
