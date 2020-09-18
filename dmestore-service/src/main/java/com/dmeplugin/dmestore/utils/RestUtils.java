@@ -32,9 +32,9 @@ import java.security.NoSuchAlgorithmException;
 public class RestUtils {
     public final static String RESPONSE_STATE_CODE = "code";
     public final static String RESPONSE_STATE_200 = "200";
-    public final static int RESPONSE_STATE_200i = 200;
-    public final static int RESPONSE_STATE_401i = 401;
-    public final static int RESPONSE_STATE_403i = 403;
+    public final static int RES_STATE_I_200 = 200;
+    public final static int RES_STATE_I_401 = 401;
+    public final static int RES_STATE_I_403 = 403;
 
     public RestTemplate getRestTemplate() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
         SSLContextBuilder builder = new SSLContextBuilder();
