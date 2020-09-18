@@ -134,7 +134,7 @@ public class VmfsAccessController extends BaseController{
      * param str cluster: 集群名称 必（主机与集群二选一）
      * param str clusterId: 集群
      *
-     * @param params: include dataStoreNames,volumeIds,host,hostId,cluster,clusterId
+     * @param params: include dataStoreObjectIds,host,hostId,cluster,clusterId
      * @return: ResponseBodyBean
      */
     @RequestMapping(value = "/mountvmfs", method = RequestMethod.POST)
