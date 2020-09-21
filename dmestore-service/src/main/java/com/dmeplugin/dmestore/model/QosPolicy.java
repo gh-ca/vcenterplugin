@@ -15,8 +15,18 @@ public class QosPolicy {
 
     private String max_bandwidth;
     private String max_iops;
+    //for list service level
+    private String latencyUnit;
     //for update
     private Object control_policy;
+
+    public String getLatencyUnit() {
+        return latencyUnit;
+    }
+
+    public void setLatencyUnit(String latencyUnit) {
+        this.latencyUnit = latencyUnit;
+    }
 
     public String getLatency() {
         return latency;
