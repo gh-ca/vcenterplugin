@@ -33,13 +33,21 @@ public class NfsOperationController extends BaseController{
      * String nfsName 名称  必
      * String accessMode  读写权限 必
      * String type  NFS版本 （标准：NFS / NFS41） 必
-     * filesystem_specs  array  文件系统规格属性[{
+     * filesystem_specs  array  文件系统规格属性[{  
      *      capacity double 该规格文件系统容量，单位GB  必
      *      name str  文件系统名称 必
-     *      count int 该规格文件系统数量  必
-     *      description str   描述
-     *      start_suffix int 该规格文件系统的起始后缀编号
+     *      count int 该规格文件系统数量  必 （count 固定：1）
      * }]
+     *  capacity_autonegotiation : {
+     *      capacity_self_adjusting_mode str  自动扩容触发门限百分比，默认85%。自动扩容触发门限百分比必须大于自动缩容触发门限百分比
+     *      capacity_recycle_mode str  容量回收模式。 expand_capacity：优先扩容；delete_snapshots：优先删除旧快照。默认优先扩容
+     *      auto_size_enable  boolean 自动调整容量开关。 false: 关闭；true：打开。默认打开
+     *      auto_grow_threshold_percent int 自动扩容触发门限百分比，默认85%。自动扩容触发门限百分比必须大于自动缩容触发门限百分比
+     *      auto_shrink_threshold_percent int 自动缩容触发门限百分比，默认50%。自动扩容触发门限百分比必须大于自动缩容触发门限百分比,
+     *      max_auto_size double 自动扩容下限。单位GB。默认16777216GB。自动扩容上限必须大于等于自动缩容下限
+     *      min_auto_size double 自动缩容下限。单位GB。默认16777216GB。自动扩容上限必须大于等于自动缩容下限
+     *      auto_size_increment int 自动扩（缩）容单次变化量。单位MB。默认1GB
+     *   },
      * tuning属性 （高级属性设置）{
      *      deduplication_enabled  boolean 重复数据删除。默认关闭
      *      compression_enabled  boolean 数据压缩。默认关闭
@@ -47,21 +55,16 @@ public class NfsOperationController extends BaseController{
      *      block_size int 文件系统块大小，单位KB
      *      allocation_type str 文件系统分配类型，取值范围 thin，thick。默认为thin
      *      }
-     * qos_policy 属性{
+     * qos_policy 属性(开启后 需要参数){
      *      max_bandwidth int 最大带宽，在控制上限的时候有效,与minbandwidth,miniops互斥
      *      max_iops int 最大iops，在控制上限的时候有效,与minbandwidth,miniops互斥
      *      min_bandwidth  int 最小带宽，在保护下限的时候有效，与maxbandwidth,maxiops互斥
      *      min_iops  int 最小iops，在保护下限的时候有效, 与maxbandwidth,maxiops互斥
      *      latency int 时延，单位ms 仅保护下限支持该参数
      *      }
-     * create_nfs_share_param   创建NFS共享参数 必{
+     * create_nfs_share_param   创建NFS共享参数 必 {
+     *      name Str  共享别名
      *      share_path str 共享路径 必
-     *      description  str 描述
-     *      name  str 共享别名
-     *     character_encoding str 当前共享使用的字符编码
-     *     audit_items array 支持审计的事件列表[ {
-     *                 audititem str 支持审计的事件：none：无操作，all：所有操作，open：打开，create：创建，read：读，write：写，close：关闭，delete：删除，rename：重命名，get_security：获取安全属性，set_security：设置安全属性，get_attr：获取属性，set_attr：设置属性
-     *               } ],
      *    }
      * nfs_share_client_addition  array  NFS共享客户端 [{
      *     name str   客户端IP或主机名或网络组名 必
@@ -69,10 +72,7 @@ public class NfsOperationController extends BaseController{
      *     sync str 写入模式：synchronization：同步， asynchronization：异步 必
      *     all_squash str 权限限制：all_squash，no_all_squash 必
      *     root_squash str root权限限制：root_squash，no_root_squash 必
-     *     secure str  源端口校验限制：secure，insecure
      *     }]
-     * nfs share param:
-     * show_snapshot_enable boolean 是否开启显示Snapshot的功能
      *
      */
 

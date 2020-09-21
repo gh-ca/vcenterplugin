@@ -119,7 +119,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     @Override
     public Map<String, Object> expandVMFS(List<Map<String, String>> volumes) {
 
-        //volumes{vo_add_capacity,ds_add_capacity,volume_id,ds_name}
+        //volumes{vo_add_capacity,volume_id,ds_name}
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 202);
         resMap.put("msg", "expand vmfsDatastore and volumes success !");

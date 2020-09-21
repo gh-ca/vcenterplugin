@@ -185,9 +185,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             List<String> mounts = new ArrayList<>();
             List<String> nfsShareClientArrayAddition = Arrays.asList(gson.toJson(nfs_share_client_addition));
             for (String shareClientHost : nfsShareClientArrayAddition) {
-                Map map = gson.fromJson(shareClientHost, Map.class);
-                if (map != null && map.size() > 0 && map.get("name").toString() != null) {
-                    mounts.add(map.get("name").toString());
+                Map<String,String> shareClientHostMap = gson.fromJson(shareClientHost, Map.class);
+                if (shareClientHostMap != null && shareClientHostMap.size() > 0 && shareClientHostMap.get("name")!= null) {
+                    mounts.add(shareClientHostMap.get("name"));
                 }
             }
             if (StringUtils.isEmpty(serverHost) || StringUtils.isEmpty(exportPath)

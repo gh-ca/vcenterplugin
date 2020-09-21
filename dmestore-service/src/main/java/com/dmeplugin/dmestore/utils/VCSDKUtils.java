@@ -703,14 +703,8 @@ public class VCSDKUtils {
                         managedObjectReference = hosts.get(0);
                         HostMO hostMO = new HostMO(vmwareContext, managedObjectReference);
                         HostDatastoreSystemMO hostDatastoreSystemMO = hostMO.getHostDatastoreSystemMO();
-                        if (i == 0) {
-                            //todo logic port param needed ?
-                            hostDatastoreSystemMO.createNfsDatastore(serverHost, 0, exportPath, nfsName, accessMode, type);
-                        }
-                        if (i > 0) {
-                            DatastoreMO dsMo = new DatastoreMO(vmwareContext, dcMo.findDatastore(nfsName));
-                            mountNfs(dsMo, hostMO, type);
-                        }
+                        //todo logic port param needed ?
+                        hostDatastoreSystemMO.createNfsDatastore(serverHost, 0, exportPath, nfsName, accessMode, type);
                     } else {
                         result = "failed";
                         _logger.error("can not find target host!");
@@ -1322,8 +1316,8 @@ public class VCSDKUtils {
     }
 
     public static void main(String[] args) {
-        try {
-            Gson gson = new Gson();
+//        try {
+//            Gson gson = new Gson();
 //            String listStr = VCSDKUtils.getAllVmfsDataStores(null);
 //            _logger.info("Vmfs listStr==" + listStr);
 //            listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_VMFS);
@@ -1375,8 +1369,61 @@ public class VCSDKUtils {
 //                }
 //            }
 
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+
+        String result = "success";
+        String exportPath = "/volume1/TESTNFS";
+        //需要判断nfs版本，如果是v4.1要将 Kerberos 安全功能与 NFS 4.1 结合使用，请启用 Kerberos 并选择适当的 Kerberos 模型。
+        String nfsName = "lqnfsv3.1";
+        //remoteHostNames equal remoteHost(v3)
+        String serverHost = "10.143.132.187";
+        String mountHost1 = "10.143.132.17";
+        String mountHost2 = "10.143.132.20";
+        List<String> mountHosts = new ArrayList<>();
+        mountHosts.add(mountHost1);
+        mountHosts.add(mountHost2);
+        String type = "NFS";
+        //logicPort = 0;
+        _logger.info("start creat nfs datastore");
+        String accessMode = "";
+        accessMode = StringUtils.isEmpty(accessMode) || accessMode.equals("readWrite") ? "readWrite" : "readOnly";
+        try {
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
+            DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
+            List<ManagedObjectReference> hosts = null;
+            if (mountHosts != null && mountHosts.size() > 0) {
+                ManagedObjectReference managedObjectReference = null;
+                for (int i = 0; i < mountHosts.size(); i++) {
+                    String mountHost = mountHosts.get(i);
+                    hosts = dcMo.findHost(mountHost);
+                    if (hosts != null && hosts.size() > 0) {
+                        managedObjectReference = hosts.get(0);
+                        HostMO hostMO = new HostMO(vmwareContext, managedObjectReference);
+                        HostDatastoreSystemMO hostDatastoreSystemMO = hostMO.getHostDatastoreSystemMO();
+                        hostDatastoreSystemMO.createNfsDatastore(serverHost, 0, exportPath, nfsName, accessMode, type);
+//                        if (i == 0) {
+//                            //todo logic port param needed ?
+//                        }
+//                        if (i > 0) {
+//                            DatastoreMO dsMo = new DatastoreMO(vmwareContext, dcMo.findDatastore(nfsName));
+//                            mountNfs(dsMo, hostMO, type);
+//                        }
+                    } else {
+                        result = "failed";
+                        _logger.error("can not find target host!");
+                    }
+                }
+            } else {
+                result = "failed";
+                _logger.error("{createNfsDatastore/mountHosts} params error");
+            }
+            _logger.info("end creat nfs datastore");
         } catch (Exception e) {
-            e.printStackTrace();
+            result = "failed";
+            _logger.error("vmware error:", e);
         }
     }
 }

@@ -49,10 +49,11 @@ public class VmfsOperationController extends BaseController{
 
     /**
      * expand vmfs datastore
-     * @param volumes
+     *
+     * @param volumes  volumes{vo_add_capacity,volume_id,ds_name}
      * @return
      */
-    @PostMapping("expandvmfs")
+    @PostMapping("/expandvmfs")
     @ResponseBody
     public ResponseBodyBean expandVMFS(@RequestBody List<Map<String,String >> volumes ){
 
