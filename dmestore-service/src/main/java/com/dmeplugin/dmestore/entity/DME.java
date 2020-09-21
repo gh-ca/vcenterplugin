@@ -140,9 +140,13 @@ public class DME extends DMEbase implements Serializable {
 	 * 加密dme对象的登录密码
 	 * @param dme
 	 */
-	public static void updateEsightWithEncryptedPassword(DME dme) {
+	public static void updateEsightWithEncryptedPassword(DME dme)   {
 		if (dme != null ) {
-			dme.setLoginPwd(CipherUtils.aesEncode(dme.getLoginPwd()));
+			try {
+				dme.setLoginPwd(CipherUtils.encryptString(dme.getLoginPwd()));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -150,9 +154,13 @@ public class DME extends DMEbase implements Serializable {
 	 * 解密dme对象的登录密码
 	 * @param dme
 	 */
-	public static void decryptedPassword(DME dme) {
+	public static void decryptedPassword(DME dme)   {
 		if (dme != null) {
-			dme.setLoginPwd(CipherUtils.aesDncode(dme.getLoginPwd()));
+			try {
+				dme.setLoginPwd(CipherUtils.decryptString(dme.getLoginPwd()));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

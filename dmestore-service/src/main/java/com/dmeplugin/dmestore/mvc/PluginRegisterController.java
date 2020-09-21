@@ -1,10 +1,15 @@
 package com.dmeplugin.dmestore.mvc;
 
+import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.DmeAccessService;
 import com.dmeplugin.dmestore.services.SystemService;
+import com.dmeplugin.dmestore.services.VCenterInfoService;
 import com.dmeplugin.dmestore.services.VmwareAccessService;
+import com.dmeplugin.dmestore.utils.CipherUtils;
 import com.dmeplugin.dmestore.utils.RestUtils;
+import com.dmeplugin.vmware.SpringBootConnectionHelper;
+import com.dmeplugin.vmware.VCConnectionHelper;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,10 +36,19 @@ public class PluginRegisterController extends BaseController {
     @Autowired
     private SystemService systemService;
 
+    @Autowired
+    private VCenterInfoService vCenterInfoService;
+
+
+    @Autowired
+    private VCConnectionHelper vcConnectionHelper;
+
 
     @RequestMapping(value = "/pluginaction", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean pluginaction(HttpServletRequest request,
+                                         @RequestParam String vcenterIP,
+                                         @RequestParam String vcenterPort,
                                           @RequestParam String vcenterUsername, @RequestParam String vcenterPassword,
                                           @RequestParam(required = false) String action,
                                           @RequestParam(required = false) String removeData,
@@ -47,19 +61,34 @@ public class PluginRegisterController extends BaseController {
         boolean isRemoveData = false;
         synchronized (lock) {
             try {
+                Map<String, Object> remap=new HashMap<>();
                 if ("install".equals(action)) {
-                    //调用接口，创建dme连接信息
-                    Map params = new HashMap();
-                    params.put("hostIp", dmeIp);
-                    params.put("hostPort", dmePort);
-                    params.put("userName", dmeUsername);
-                    params.put("password", dmePassword);
-                    Map<String, Object> remap=dmeAccessService.accessDme(params);
+                    //保存vcenter信息
+                    VCenterInfo vCenterInfo=new VCenterInfo();
+                    vCenterInfo.setHostIp(vcenterIP);
+                    vCenterInfo.setUserName(vcenterUsername);
+                    vCenterInfo.setPassword(CipherUtils.encryptString(vcenterPassword));
+                    vCenterInfo.setHostPort(Integer.parseInt(vcenterPort));
+                    vCenterInfoService.addVCenterInfo(vCenterInfo);
+
+                    vcConnectionHelper.setServerurl("https://"+vcenterIP+":"+vcenterPort+"/sdk");
+                    vcConnectionHelper.setUsername(vcenterUsername);
+                    vcConnectionHelper.setPassword(vcenterPassword);
+
+                    if (!"".equalsIgnoreCase(dmeIp)) {
+                        //调用接口，创建dme连接信息
+                        Map params = new HashMap();
+                        params.put("hostIp", dmeIp);
+                        params.put("hostPort", dmePort);
+                        params.put("userName", dmeUsername);
+                        params.put("password", dmePassword);
+                         remap = dmeAccessService.accessDme(params);
+
+                    }
                     if (remap != null && remap.get(RestUtils.RESPONSE_STATE_CODE) != null
                             && RestUtils.RESPONSE_STATE_200.equals(remap.get(RestUtils.RESPONSE_STATE_CODE).toString())) {
                         return success(remap);
                     }
-
                     return failure(gson.toJson(remap));
                 }
                 if ("uninstall".equals(action)) {
