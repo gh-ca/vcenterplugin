@@ -58,9 +58,17 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         if (!StringUtils.isEmpty(max_iops)) {
             qosPolicy.setMax_iops(max_iops.toString());
         }
+        Object min_iops = params.get("min_iops");
+        if (!StringUtils.isEmpty(min_iops)) {
+            qosPolicy.setMin_iops(min_iops.toString());
+        }
         Object max_bandwidth = params.get("max_bandwidth");
         if (!StringUtils.isEmpty(max_bandwidth)) {
             qosPolicy.setMax_bandwidth(max_bandwidth.toString());
+        }
+        Object min_bandwidth = params.get("min_bandwidth");
+        if (!StringUtils.isEmpty(min_bandwidth)) {
+            qosPolicy.setMin_bandwidth(min_bandwidth.toString());
         }
         CustomizeVolumeTuning customizeVolumeTuning = new CustomizeVolumeTuning();
         customizeVolumeTuning.setSmartQos(qosPolicy);

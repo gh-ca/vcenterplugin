@@ -73,8 +73,7 @@ public class NfsOperationController extends BaseController{
      *     }]
      * nfs share param:
      * show_snapshot_enable boolean 是否开启显示Snapshot的功能
-     * logic port:
-     * mgmt_ip  Str ipv4地址
+     *
      */
 
     /**
