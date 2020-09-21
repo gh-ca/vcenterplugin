@@ -82,6 +82,12 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         super(context, morType, morValue);
     }
 
+    public HostHardwareSummary getHostHardwareSummary() throws Exception {
+        HostConnectInfo hostInfo = _context.getService().queryHostConnectionInfo(_mor);
+        HostHardwareSummary hardwareSummary = hostInfo.getHost().getHardware();
+        return hardwareSummary;
+    }
+
     public HostMO(VmwareContext context, String hostName) throws Exception {
         super(context, null);
 
@@ -89,12 +95,6 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         if (_mor == null) {
             s_logger.error("Unable to locate host " + hostName);
         }
-    }
-
-    public HostHardwareSummary getHostHardwareSummary() throws Exception {
-        HostConnectInfo hostInfo = _context.getService().queryHostConnectionInfo(_mor);
-        HostHardwareSummary hardwareSummary = hostInfo.getHost().getHardware();
-        return hardwareSummary;
     }
 
     public HostConfigManager getHostConfigManager() throws Exception {
@@ -215,6 +215,16 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     public HostAdvanceOptionMO getHostAdvanceOptionMO() throws Exception {
         HostConfigManager configMgr = getHostConfigManager();
         return new HostAdvanceOptionMO(_context, configMgr.getAdvancedOption());
+    }
+
+    public HostKernelModuleSystemMO getHostKernelModuleSystemMO() throws Exception {
+        HostConfigManager configMgr = getHostConfigManager();
+        return new HostKernelModuleSystemMO(_context, configMgr.getKernelModuleSystem());
+    }
+
+    public IscsiManagerMO getIscsiManagerMO() throws Exception {
+        HostConfigManager configMgr = getHostConfigManager();
+        return new IscsiManagerMO(_context, configMgr.getIscsiManager());
     }
 
     public HostNetworkSystemMO getHostNetworkSystemMO() throws Exception {

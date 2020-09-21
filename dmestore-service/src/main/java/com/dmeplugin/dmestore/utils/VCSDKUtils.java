@@ -325,8 +325,8 @@ public class VCSDKUtils {
                             map.put("objectId", objectId);
                             map.put("status", dsmo.getSummary().isAccessible());
                             map.put("type", dsmo.getSummary().getType());
-                            map.put("capacity", dsmo.getSummary().getCapacity() / ToolUtils.Gi);
-                            map.put("freeSpace", dsmo.getSummary().getFreeSpace() / ToolUtils.Gi);
+                            map.put("capacity", dsmo.getSummary().getCapacity() / ToolUtils.GI);
+                            map.put("freeSpace", dsmo.getSummary().getFreeSpace() / ToolUtils.GI);
 
                             lists.add(map);
                         }
@@ -407,8 +407,8 @@ public class VCSDKUtils {
                             map.put("objectId", objectId);
                             map.put("status", dsmo.getSummary().isAccessible());
                             map.put("type", dsmo.getSummary().getType());
-                            map.put("capacity", dsmo.getSummary().getCapacity() / ToolUtils.Gi);
-                            map.put("freeSpace", dsmo.getSummary().getFreeSpace() / ToolUtils.Gi);
+                            map.put("capacity", dsmo.getSummary().getCapacity() / ToolUtils.GI);
+                            map.put("freeSpace", dsmo.getSummary().getFreeSpace() / ToolUtils.GI);
 
                             lists.add(map);
                         }
@@ -597,7 +597,7 @@ public class VCSDKUtils {
             HostMO hostMo = new HostMO(vmwareContext, managedObjectReference);
             //todo get oriented LUN  (参数设置存在问题)
             String devicePath = "/vmfs/devices/disks/t10.ATA_____WDC_WD1003FBYX2D01Y7B1________________________WD2DWCAW35431438";
-            Long totalSectors = add_capacity * 1L * ToolUtils.Gi;
+            Long totalSectors = add_capacity * 1L * ToolUtils.GI;
             HostScsiDisk candidateHostScsiDisk = null;
             if (hostMo != null) {
                 HostDatastoreSystemMO hostDatastoreSystemMO = hostMo.getHostDatastoreSystemMO();
@@ -898,7 +898,7 @@ public class VCSDKUtils {
         HostScsiDisk candidateHostScsiDisk = null;
         try {
             if (hostScsiDisks != null && hostScsiDisks.size() > 0 && capacity > 0) {
-                long oldcapacity = capacity * 1L * ToolUtils.Gi;
+                long oldcapacity = capacity * 1L * ToolUtils.GI;
                 long objcapacity = 0;
                 HostScsiDisk objHostScsiDisk = null;
                 long maxcapacity = 0;
@@ -967,7 +967,7 @@ public class VCSDKUtils {
                 if (hostMo != null) {
                     if (objhsd != null) {
                         _logger.info("Create datastore via host " + hostMo.getName() + " on disk " + objhsd.getDevicePath());
-                        long totalSectors = capacity * 1L * ToolUtils.Gi / objhsd.getCapacity().getBlockSize();
+                        long totalSectors = capacity * 1L * ToolUtils.GI / objhsd.getCapacity().getBlockSize();
                         _logger.info("Vmfs totalSectors==" + totalSectors);
                         //create vmfs
                         ManagedObjectReference datastore = null;

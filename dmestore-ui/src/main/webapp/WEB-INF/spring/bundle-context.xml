@@ -20,6 +20,7 @@
    <context:annotation-config/>
 
    <!-- Standard controller beans: you can modify them if necessary -->
+   <bean name="vmfsAccessController" class="com.dmeplugin.dmestore.mvc.VmfsAccessController" />
 
    <bean name="nfsAccessController" class="com.dmeplugin.dmestore.mvc.NfsAccessController" />
 
@@ -58,6 +59,9 @@
 
    <osgi:reference id="dmeNFSAccessService"
                    interface="com.dmeplugin.dmestore.services.DmeNFSAccessService" />
+
+   <osgi:reference id="vmfsAccessService"
+                   interface="com.dmeplugin.dmestore.services.VmfsAccessService" />
 
 </beans>
 
