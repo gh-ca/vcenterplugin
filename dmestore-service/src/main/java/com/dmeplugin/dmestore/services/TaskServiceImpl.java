@@ -1,6 +1,8 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.model.TaskDetailInfo;
+import com.dmeplugin.dmestore.model.TaskDetailResource;
+import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,6 +117,7 @@ public class TaskServiceImpl implements TaskService {
             long startTime = jsonObject.get("start_time").getAsLong();
             long endTime = jsonObject.get("end_time").getAsLong();
             String detail = null != jsonObject.get("detail_en") ? "" : jsonObject.get("detail_en").getAsString();
+            JsonArray resourcesArray = jsonObject.getAsJsonArray("resources");
 
             taskDetailInfo.setId(taskId);
             taskDetailInfo.setTaskName(taskName);
@@ -126,17 +129,34 @@ public class TaskServiceImpl implements TaskService {
             taskDetailInfo.setEndTime(endTime);
             taskDetailInfo.setDetail(detail);
 
+            if (null != resourcesArray) {
+                List<TaskDetailResource> resourceList = new ArrayList<>();
+                for (JsonElement jsonElement1 : resourcesArray) {
+                    TaskDetailResource tdr = new TaskDetailResource();
+                    JsonObject resourceObj = jsonElement1.getAsJsonObject();
+                    String operate = ToolUtils.getStr(resourceObj.get("operate"));
+                    String type = ToolUtils.getStr(resourceObj.get("type"));
+                    String id = ToolUtils.getStr(resourceObj.get("id"));
+                    String name = ToolUtils.getStr(resourceObj.get("name"));
+
+                    tdr.setOperate(operate);
+                    tdr.setType(type);
+                    tdr.setId(id);
+                    tdr.setName(name);
+                    resourceList.add(tdr);
+                }
+                taskDetailInfo.setResources(resourceList);
+            }
             taskDetailInfos.add(taskDetailInfo);
         }
         return taskDetailInfos;
     }
 
     /**
-     *
-     * @param taskIds 待查询的任务id集合
+     * @param taskIds       待查询的任务id集合
      * @param taskStatusMap 结束任务对应的状态集合
-     * @param timeout 任务查询超时时间 单位ms
-     * @param startTime 任务查询开始时间 单位ms
+     * @param timeout       任务查询超时时间 单位ms
+     * @param startTime     任务查询开始时间 单位ms
      */
     @Override
     public void getTaskStatus(List<String> taskIds, Map<String, Integer> taskStatusMap, int timeout, long startTime) {
@@ -178,7 +198,7 @@ public class TaskServiceImpl implements TaskService {
                 e.printStackTrace();
             }
             getTaskStatus(new ArrayList<>(queryTaskIds), taskStatusMap, timeout, startTime);
-        }else{
+        } else {
             return;
         }
     }
@@ -188,7 +208,7 @@ public class TaskServiceImpl implements TaskService {
         boolean unmountFlag = true;
         Map<String, Integer> taskStatusMap = new HashMap<>();
         getTaskStatus(taskIds, taskStatusMap, taskTimeOut, System.currentTimeMillis());
-        LOG.info("taskStatusMap==="+(taskStatusMap==null?"null":gson.toJson(taskStatusMap)));
+        LOG.info("taskStatusMap===" + (taskStatusMap == null ? "null" : gson.toJson(taskStatusMap)));
         for (Map.Entry<String, Integer> entry : taskStatusMap.entrySet()) {
             //String taskId = entry.getKey();
             int status = entry.getValue();
