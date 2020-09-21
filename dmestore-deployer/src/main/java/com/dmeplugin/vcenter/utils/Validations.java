@@ -34,49 +34,11 @@ public class Validations {
     HEADERS.add("Content-Type", "application/x-www-form-urlencoded");
   }
 
-  public static Map onSubmit(String packageUrl, String vcenterUsername, String vcenterPassword,
-      String vcenterIP, String vcenterPort) {
-    String version = getPackageVersion();
-    if ((version == null) || (version.trim().equals(""))) {
-      return Collections.singletonMap("error", "E001");
-    }
-    return onSubmit(packageUrl, vcenterUsername, vcenterPassword, vcenterIP, vcenterPort, version);
-  }
+
+
+
 
   public static Map onSubmit(String packageUrl, String vcenterUsername, String vcenterPassword,
-      String vcenterIP, String vcenterPort, String version) {
-    if (!packageUrl.startsWith("https://")) {
-      return Collections.singletonMap("error", "E002");
-    }
-    if ((vcenterIP == null) || (vcenterIP.isEmpty())) {
-      return Collections.singletonMap("error", "E003");
-    }
-    if ((vcenterPort == null) || (vcenterPort.isEmpty())) {
-      return Collections.singletonMap("error", "E004");
-    }
-    String serverThumbprint;
-    try {
-      serverThumbprint = KeytookUtil.getKeystoreServerThumbprint();
-    } catch (IOException e) {
-      e.printStackTrace();
-      return Collections.singletonMap("error", "E005");
-    }
-    String pluginKey = "com.dme.vcenterpluginui";
-    String url;
-    try {
-      url = encodeUrlFileName(packageUrl);
-    } catch (UnsupportedEncodingException e) {
-      url = packageUrl;
-    }
-
-      VcenterRegisterRunner
-          .run(version, url, serverThumbprint, vcenterIP, vcenterPort, vcenterUsername,
-              vcenterPassword, pluginKey);
-
-    return Collections.singletonMap("info", "check log");
-  }
-
-  public static Map onSubmitDME(String packageUrl, String vcenterUsername, String vcenterPassword,
                              String vcenterIP, String vcenterPort, String version,String dmeip,String dmeport,String dmeusername,String dmepassword) {
     if (!packageUrl.startsWith("https://")) {
       return Collections.singletonMap("error", "E002");
@@ -208,6 +170,8 @@ public class Validations {
     String result = null;
     try {
       Map<String, String> bodyParamMap = new HashMap<String, String>();
+      bodyParamMap.put("vcenterIP",vcenterIP);
+      bodyParamMap.put("vcenterPort",vcenterPort);
       bodyParamMap.put("vcenterUsername", vcenterUsername);
       bodyParamMap.put("vcenterPassword", vcenterPassword);
       bodyParamMap.put("action", action);
