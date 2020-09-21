@@ -802,7 +802,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             String storeType = ToolUtils.STORE_TYPE_VMFS;
             //TODO 暂时认为是从url中获取到wwn信息
             String vmfsDatastoreUrl = vmfsDatastore.get("url").getAsString();
-            String vmfsDatastoreId = vmfsDatastore.get("id").getAsString();
+            String vmfsDatastoreId = vmfsDatastore.get("objectid").getAsString();
             String vmfsDatastoreName = vmfsDatastore.get("name").getAsString();
             //拆分wwn TODO
             String wwn = vmfsDatastoreUrl.split("volumes/")[1];

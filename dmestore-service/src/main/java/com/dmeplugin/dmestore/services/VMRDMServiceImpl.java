@@ -61,14 +61,17 @@ public class VMRDMServiceImpl implements VMRDMService {
     }
 
     @Override
-    public void createRDM(String datacenter_name, String datastore_name, String vm_name, String host_id, VmRDMCreateBean createBean) throws Exception {
+    public void createRDM(String datastore_name, String vm_name, String host_id, VmRDMCreateBean createBean) throws Exception {
         List<String> volumeIds = createDmeRDM(createBean);
         LOG.info("create DME disk succeeded!");
+        String _host_id = vcsdkUtils.getVcConnectionHelper().objectID2Serverguid(host_id);
+        LOG.info("host_objectId:{}, DME host_id:{}", host_id, _host_id);
         //将卷映射给主机
-        hostMapping(host_id, volumeIds);
+        hostMapping(_host_id, volumeIds);
         LOG.info("disk mapping to host succeeded!");
+
         //查询主机信息
-        Map<String, Object> hostMap = dmeAccessService.getDmeHost(host_id);
+        Map<String, Object> hostMap = dmeAccessService.getDmeHost(_host_id);
         String host_ip = hostMap.get("ip").toString();
         String host_name = hostMap.get("name").toString();
         //调用vcenter扫描卷
@@ -94,7 +97,7 @@ public class VMRDMServiceImpl implements VMRDMService {
             throw new Exception("no matching Lun information was found!");
         }
         //调用Vcenter创建磁盘
-        vcsdkUtils.createDisk(datacenter_name, datastore_name, vm_name, lunObject.get("deviceName").getAsString(), createBean.getSize());
+        vcsdkUtils.createDisk(datastore_name, vm_name, lunObject.get("deviceName").getAsString(), createBean.getSize());
     }
 
     public List<String> createDmeRDM(VmRDMCreateBean vmRDMCreateBean) throws Exception {

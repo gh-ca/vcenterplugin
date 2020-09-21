@@ -123,7 +123,8 @@ public class VCSDKUtils {
             RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
             HostMO hostMO = rootFsMO.findHost(hostName);
             Map<String, String> map = new HashMap<>();
-            map.put("hostId", hostMO.getMor().getValue());
+            String objectId = vcConnectionHelper.MOR2ObjectID(hostMO.getMor(), vmwareContext.getServerAddress());
+            map.put("hostId", objectId);
             map.put("hostName", hostMO.getName());
             lists.add(map);
         }
@@ -1217,14 +1218,13 @@ public class VCSDKUtils {
      * @Author Administrator
      * @Description 为指定的虚拟机创建磁盘
      * @Date 11:41 2020/9/14
-     * @Param [datacenter_name, datastore_name, vm_name, rdmdevicename, size]
+     * @Param [datastore_name, vm_name, rdmdevicename, size]
      * @Return void
      **/
-    public void createDisk(String datacenter_name, String datastore_name, String vm_name, String rdmdevicename, int size) throws Exception {
+    public void createDisk(String datastore_name, String vm_name, String rdmdevicename, int size) throws Exception {
         VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
         for (VmwareContext vmwareContext : vmwareContexts) {
-            DatacenterMO dcMo = new DatacenterMO(vmwareContext, datacenter_name);
-            DatastoreMO dsMo = new DatastoreMO(vmwareContext, dcMo.findDatastore(datastore_name));
+            DatastoreMO dsMo = new DatastoreMO(vmwareContext, datastore_name);
             VirtualMachineMO virtualMachineMO = new VirtualMachineMO(vmwareContext, vm_name);
             String vmdkDatastorePath = dsMo.getDatastorePath(datastore_name);
             int sizeInMb = size;
