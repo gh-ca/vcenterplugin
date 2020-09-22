@@ -1,43 +1,44 @@
 package com.dmeplugin.dmestore.model;
 
 public class EthPortInfo {
+    //DME Storage 1.0.RC1 系统资源北向模型 01.pdf 存储端口
     String ownerType;
-    String ipv4Mask;
+    String ipv4Mask;  //IPv4掩码
     String logicalType;
     String storageDeviceId;
-    String portName;
+    String portName;    //端口名称
     String ownerId;
-    String portId;
-    String bondName;
-    String mac;
-    String mgmtIpv6;
-    String iscsiName;
+    String portId;  //端口ID
+    String bondName; //绑定名称
+    String mac;  //MAC地址
+    String mgmtIpv6; //IPv6地址
+    String iscsiName; //iSCSI名称
     String ownerName;
-    Long lastMonitorTime;
-    String mgmtIp;
+    Long lastMonitorTime; //最后监控时间
+    String mgmtIp;  //IPv4地址
     String confirmStatus;
-    String id;
-    Long lastModified;
-    String connectStatus;
+    String id;  //CMDB 实例 ID
+    Long lastModified; //最后修改时间
+    String connectStatus; //连接状态
     Integer classId;
-    String dataStatus;
+    String dataStatus; //监控状态
     Integer maxSpeed; //Mbit/s
     String resId;
     Boolean local;
-    String portType;
+    String portType; //端口类型
     String className;
     Integer numberOfInitiators;
-    String bondId;
+    String bondId;  //绑定ID
     String regionId;
-    String name;
-    String location;
-    String nativeId;
+    String name;  //名称
+    String location; //位置
+    String nativeId; //原始ID
     String dataSource;
-    String ipv6Mask;
-    String status;
+    String ipv6Mask; //IPv6掩码
+    String status; //状态
     Integer speed;  //Mbit/s
-    String wwn;
-    String sfpStatus;
+    String wwn;  //WWN
+    String sfpStatus; //光模块状态
 
     public String getOwnerType() {
         return ownerType;
