@@ -90,7 +90,7 @@ public class NfsOperationController extends BaseController{
 
     /** request params
      *  {
-     *
+     *      String dataStoreObjectId
      *      String nfsShareName nfsShare的名字 必
      *      String nfsName nfsDataStore名字 必
      *
