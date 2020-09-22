@@ -54,9 +54,13 @@
     </bean>
 
     <bean name="serviceLevelService" class="com.dmeplugin.dmestore.services.ServiceLevelServiceImpl">
+        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
+        <property name="dmeStorageService" ref="dmeStorageService"/>
+        <property name="dmeRelationInstanceService" ref="dmeRelationInstanceService"/>
     </bean>
 
     <bean name="dmeRelationInstanceService" class="com.dmeplugin.dmestore.services.DmeRelationInstanceServiceImpl">
+        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
     </bean>
 
     <bean name="dmeVmwareRalationDao" class="com.dmeplugin.dmestore.dao.DmeVmwareRalationDao">
@@ -121,13 +125,18 @@
     </bean>
 
     <!--最佳实践后端逻辑service-->
-    <bean name="vmfs3EnableBlockDeleteService" class="com.dmeplugin.dmestore.services.bestpractice.VMFS3EnableBlockDeleteImpl"/>
-    <bean name="vmfs3HardwareAcceleratedLocking" class="com.dmeplugin.dmestore.services.bestpractice.VMFS3HardwareAcceleratedLockingImpl"/>
-    <bean name="vmfs3UseATSForHBOnVMFS" class="com.dmeplugin.dmestore.services.bestpractice.VMFS3UseATSForHBOnVMFS5Impl"/>
+    <bean name="vmfs3EnableBlockDeleteService"
+          class="com.dmeplugin.dmestore.services.bestpractice.VMFS3EnableBlockDeleteImpl"/>
+    <bean name="vmfs3HardwareAcceleratedLocking"
+          class="com.dmeplugin.dmestore.services.bestpractice.VMFS3HardwareAcceleratedLockingImpl"/>
+    <bean name="vmfs3UseATSForHBOnVMFS"
+          class="com.dmeplugin.dmestore.services.bestpractice.VMFS3UseATSForHBOnVMFS5Impl"/>
     <bean name="diskSchedQuantum" class="com.dmeplugin.dmestore.services.bestpractice.DiskSchedQuantumImpl"/>
     <bean name="diskDiskMaxIOSize" class="com.dmeplugin.dmestore.services.bestpractice.DiskDiskMaxIOSizeImpl"/>
-    <bean name="dataMoverHardwareAcceleratedInit" class="com.dmeplugin.dmestore.services.bestpractice.DataMoverHardwareAcceleratedInitImpl"/>
-    <bean name="dataMoverHardwareAcceleratedMove" class="com.dmeplugin.dmestore.services.bestpractice.DataMoverHardwareAcceleratedMoveImpl"/>
+    <bean name="dataMoverHardwareAcceleratedInit"
+          class="com.dmeplugin.dmestore.services.bestpractice.DataMoverHardwareAcceleratedInitImpl"/>
+    <bean name="dataMoverHardwareAcceleratedMove"
+          class="com.dmeplugin.dmestore.services.bestpractice.DataMoverHardwareAcceleratedMoveImpl"/>
 
     <bean name="bestPracticeCheckDao" class="com.dmeplugin.dmestore.dao.BestPracticeCheckDao">
         <property name="url" value="${h2.url}"/>

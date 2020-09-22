@@ -133,7 +133,13 @@
         <property name="vimObjectReferenceService" ref="vimObjectReferenceService"/>
     </bean>
 
+    <bean name="serviceLevelService" class="com.dmeplugin.dmestore.services.ServiceLevelServiceImpl">
+        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
+        <property name="dmeStorageService" ref="dmeStorageService"/>
+        <property name="dmeRelationInstanceService" ref="dmeRelationInstanceService"/>
+    </bean>
     <bean name="dmeRelationInstanceService" class="com.dmeplugin.dmestore.services.DmeRelationInstanceServiceImpl">
+        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
     </bean>
 
 </beans>
