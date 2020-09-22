@@ -7,7 +7,6 @@ import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.*;
-import com.sun.xml.internal.ws.handler.HandlerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,13 +26,10 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
     public static final Logger LOG = LoggerFactory.getLogger(VmfsOperationController.class);
 
-    @Autowired
     private DmeAccessService dmeAccessServiceImpl;
 
-    @Autowired
     private TaskService taskService;
 
-    @Autowired
     private DmeStorageService dmeStorageService;
 
     private Gson gson = new Gson();
