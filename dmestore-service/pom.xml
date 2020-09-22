@@ -76,7 +76,14 @@
             <artifactId>vim25</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/vim25.jar</systemPath>
+            <systemPath>${project.basedir}/extlib/vim25.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.vmware</groupId>
+            <artifactId>pbm</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/extlib/pbm.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.vmware</groupId>

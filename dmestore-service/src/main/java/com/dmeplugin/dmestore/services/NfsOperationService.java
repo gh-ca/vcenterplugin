@@ -11,4 +11,6 @@ import java.util.Map;
 public interface NfsOperationService {
 
     Map<String,Object> createNfsDatastore(Map<String, String> params);
+
+    Map<String,Object> updateNfsDatastore(Map<String, String> params);
 }

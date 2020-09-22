@@ -209,6 +209,119 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         return resMap;
     }
 
+
+    /** request params
+     *  {
+     *      String dataStoreObjectId 跳转用唯一id  必
+     *      String nfsShareName nfsShare的名字 必
+     *      String nfsName nfsDataStore名字 必
+     *
+     *      fs params:
+     *      file_system_id String 文件系统唯一标识 必
+     *      capacity_autonegotiation 自动扩缩容 相关属性{
+     *          capacity_self_adjusting_mode str  自动扩容触发门限百分比，默认85%。自动扩容触发门限百分比必须大于自动缩容触发门限百分比
+     *          capacity_recycle_mode str  容量回收模式。 expand_capacity：优先扩容；delete_snapshots：优先删除旧快照。默认优先扩容
+     *          auto_size_enable  boolean 自动调整容量开关。 false: 关闭；true：打开。默认打开
+     *          auto_grow_threshold_percent int 自动扩容触发门限百分比，默认85%。自动扩容触发门限百分比必须大于自动缩容触发门限百分比
+     *          auto_shrink_threshold_percent int 自动缩容触发门限百分比，默认50%。自动扩容触发门限百分比必须大于自动缩容触发门限百分比,
+     *          max_auto_size double 自动扩容下限。单位GB。默认16777216GB。自动扩容上限必须大于等于自动缩容下限
+     *          min_auto_size double 自动缩容下限。单位GB。默认16777216GB。自动扩容上限必须大于等于自动缩容下限
+     *          auto_size_increment int 自动扩（缩）容单次变化量。单位MB。默认1GB
+     *       },
+     *       name String fs新名字 (取消勾选可以没有)
+     *       tuning属性 （高级属性设置）{
+     *             deduplication_enabled  boolean 重复数据删除。默认关闭
+     *             compression_enabled  boolean 数据压缩。默认关闭
+     *             allocation_type str 文件系统分配类型，取值范围 thin，thick。默认为thin
+     *        }
+     *       qos_policy 属性(开启后 需要参数){
+     *             max_bandwidth int 最大带宽，在控制上限的时候有效,与minbandwidth,miniops互斥
+     *             max_iops int 最大iops，在控制上限的时候有效,与minbandwidth,miniops互斥
+     *             min_bandwidth  int 最小带宽，在保护下限的时候有效，与maxbandwidth,maxiops互斥
+     *             min_iops  int 最小iops，在保护下限的时候有效, 与maxbandwidth,maxiops互斥
+     *             latency int 时延，单位ms 仅保护下限支持该参数
+     *             }
+     *
+     *       nfs share :
+     *       nfs_share_id string NFS共享的唯一标识 必  (id)
+     *  }
+     *
+     * @param params
+     * @return
+     */
+    @Override
+    public Map<String, Object> updateNfsDatastore(Map<String, String> params) {
+
+        Map<String, Object> resMap = new HashMap<>();
+        resMap.put("code", 200);
+        resMap.put("msg", "update nfs datastore success !");
+
+        if (params == null || params.size() == 0) {
+            LOG.error("params error , please check it! params=" + params);
+            resMap.put("code", 403);
+            resMap.put("msg", "params error , please check it!");
+            return resMap;
+        }
+
+        String dataStoreObjectId = params.get("dataStoreObjectId");
+        String nfsName = params.get("nfsName");
+        if (StringUtils.isEmpty(dataStoreObjectId)||StringUtils.isEmpty(nfsName)) {
+            LOG.error("params error , please check it! dataStoreObjectId=" + dataStoreObjectId);
+            resMap.put("code", 403);
+            resMap.put("msg", "params error , please check it!");
+            return resMap;
+        }
+
+        //update fs
+        Map<String, String> fsReqBody = new HashMap<>();
+        String tuning = params.get("tuning");
+        String qos_policy = params.get("qos_policy");
+        Map<String, String> tuningMap = null;
+        if (!StringUtils.isEmpty(tuning)) {
+            if (!StringUtils.isEmpty(qos_policy)) {
+                tuningMap = gson.fromJson(tuning, Map.class);
+                tuningMap.put("qos_policy", qos_policy);
+            }
+        }
+        if (tuningMap != null) {
+            fsReqBody.put("tuning", gson.toJson(tuningMap));
+        }
+        String file_system_id = params.get("file_system_id");
+        String capacity_autonegotiation = params.get("capacity_autonegotiation");
+        String name = params.get("name");
+        if (!StringUtils.isEmpty(file_system_id)) {
+            fsReqBody.put("file_system_id", file_system_id);
+        }
+        if (!StringUtils.isEmpty(capacity_autonegotiation)) {
+            fsReqBody.put("capacity_autonegotiation", capacity_autonegotiation);
+        }
+        if (!StringUtils.isEmpty(name)) {
+            fsReqBody.put("name", name);
+        }
+        try {
+            //update fs
+            Map<String, Object> stringObjectMap = updateFileSystem(fsReqBody);
+            int code = ToolUtils.getInt(stringObjectMap.get("code"));
+            if (code == 202) {
+                LOG.info("{"+name+"}"+stringObjectMap.get("msg"));
+            } else {
+                LOG.info("{"+name+"}"+stringObjectMap.get("msg"));
+                resMap.put("msg",stringObjectMap.get("msg"));
+            }
+            //update nfs datastore
+            String result = vcsdkUtils.renameDataStore(nfsName, dataStoreObjectId);
+            if (result.equals("success")) {
+                LOG.info("{"+nfsName+"}rename nfs datastore success!");
+            }
+            //todo update nfs share 没找到对应API
+        } catch (Exception e) {
+            LOG.error( "update nfs datastore error !",e);
+            resMap.put("code", 503);
+            resMap.put("msg", e.getMessage());
+        }
+        return resMap;
+    }
+
     //create file system
     //todo 挂载一个  挂载多个时候需要修改参数列表
     private Map<String, Object> createFileSystem(Map<String, String> params, String storage_pool_id) throws Exception {
@@ -307,7 +420,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         resMap.put("data", task_id);
         return resMap;
     }
-
     //create nfs share
     private Map<String,Object> createNfsShare(Map<String,String> params,String task_id,String dsname) throws Exception {
 
@@ -421,6 +533,39 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         LOG.info(url + "==responseEntity==" + (responseEntity == null ? "null" : responseEntity.getStatusCodeValue()));
 
         return responseEntity;
+    }
+
+    private Map<String,Object> updateFileSystem(Map<String,String> params) throws Exception {
+
+        Map<String, Object> resMap = new HashMap<>();
+        resMap.put("code", 202);
+        resMap.put("msg", "update nfs datastore success !");
+
+        String file_system_id = params.get("file_system_id");
+        if (StringUtils.isEmpty(file_system_id)) {
+            resMap.put("code", 403);
+            resMap.put("msg", "update nfs datastore error !");
+            return resMap;
+        }
+        String url = "/rest/fileservice/v1/filesystems/" + file_system_id;
+
+        ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.PUT, gson.toJson(params));
+        int code = responseEntity.getStatusCodeValue();
+        if (code!=202) {
+            resMap.put("code", code);
+            resMap.put("msg", "update nfs datastore error !");
+            return resMap;
+        }
+        String object = responseEntity.getBody();
+        JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+        String task_id = jsonObject.get("task_id").getAsString();
+        resMap.put("data", task_id);
+        return resMap;
+    }
+
+    private Map<String,Object> updateNfsShare(Map<String,String> params){
+
+        return new HashMap<>();
     }
 
     private String getFsIdByTaskId(String task_id,String dsname) throws Exception {
