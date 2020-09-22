@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xmlns:mvc="http://www.springframework.org/schema/mvc"
-   xmlns:context="http://www.springframework.org/schema/context"
-   xsi:schemaLocation="
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
       http://www.springframework.org/schema/beans
       http://www.springframework.org/schema/beans/spring-beans.xsd
       http://www.springframework.org/schema/mvc
@@ -13,13 +13,11 @@
 
     <context:property-placeholder location="classpath:application.properties"/>
 
-   <bean name="EchoServiceImpl" class="com.dmeplugin.dmestore.services.EchoServiceImpl">
+    <bean name="EchoServiceImpl" class="com.dmeplugin.dmestore.services.EchoServiceImpl"/>
 
-   </bean>
+    <bean name="SampleActionServiceImpl" class="com.dmeplugin.dmestore.services.SampleActionServiceImpl">
 
-   <bean name="SampleActionServiceImpl" class="com.dmeplugin.dmestore.services.SampleActionServiceImpl">
-
-   </bean>
+    </bean>
 
     <bean name="dmeInfoDao" class="com.dmeplugin.dmestore.dao.DmeInfoDao">
         <property name="url" value="${h2.url}"/>
@@ -28,7 +26,6 @@
     <bean name="DmeAccessServiceImpl" class="com.dmeplugin.dmestore.services.DmeAccessServiceImpl">
         <property name="dmeInfoDao" ref="dmeInfoDao"/>
     </bean>
-
     <bean name="h2DataBaseDao" class="com.dmeplugin.dmestore.dao.H2DataBaseDao">
         <property name="url" value="${h2.url}"/>
     </bean>
@@ -66,14 +63,11 @@
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
     </bean>
 
-    <bean name="dmeStorageService" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
-        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
-    </bean>
     <bean name="dmeVmwareRalationDao" class="com.dmeplugin.dmestore.dao.DmeVmwareRalationDao">
         <property name="url" value="${h2.url}"/>
     </bean>
 
-    <bean name="VmfsAccessServiceImpl" class="com.dmeplugin.dmestore.services.VmfsAccessServiceImpl">
+    <bean name="vmfsAccessService" class="com.dmeplugin.dmestore.services.VmfsAccessServiceImpl">
         <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="dataStoreStatisticHistoryService" ref="DataStoreStatisticHistoryService"/>
@@ -86,12 +80,20 @@
           class="com.dmeplugin.dmestore.services.DataStoreStatisticHistoryServiceImpl">
     </bean>
 
+    <bean name="vmwareAccessService" class="com.dmeplugin.dmestore.services.VmwareAccessServiceImpl">
+        <property name="vcsdkUtils" ref="vCSDKUtils"/>
+        <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
+    </bean>
+
+    <bean name="dmeStorageService" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
+        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
+    </bean>
 
     <bean name="taskService" class="com.dmeplugin.dmestore.services.TaskServiceImpl">
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
     </bean>
 
-    <bean name="DmeNFSAccessServiceImpl" class="com.dmeplugin.dmestore.services.DmeNFSAccessServiceImpl">
+    <bean name="dmeNFSAccessService" class="com.dmeplugin.dmestore.services.DmeNFSAccessServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="dmeStorageService" ref="dmeStorageService"/>
@@ -101,12 +103,6 @@
     </bean>
 
     <bean name="vmfsOperationService" class="com.dmeplugin.dmestore.services.VmfsOperationServiceImpl"/>
-
-
-    <bean name="vmwareAccessService" class="com.dmeplugin.dmestore.services.VmwareAccessServiceImpl">
-        <property name="vcsdkUtils" ref="vCSDKUtils"/>
-        <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
-    </bean>
 
     <bean name="vmrdmService" class="com.dmeplugin.dmestore.services.VMRDMServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
@@ -131,13 +127,18 @@
     </bean>
 
     <!--最佳实践后端逻辑service-->
-    <bean name="vmfs3EnableBlockDeleteService" class="com.dmeplugin.dmestore.services.bestpractice.VMFS3EnableBlockDeleteImpl"/>
-    <bean name="vmfs3HardwareAcceleratedLocking" class="com.dmeplugin.dmestore.services.bestpractice.VMFS3HardwareAcceleratedLockingImpl"/>
-    <bean name="vmfs3UseATSForHBOnVMFS" class="com.dmeplugin.dmestore.services.bestpractice.VMFS3UseATSForHBOnVMFS5Impl"/>
+    <bean name="vmfs3EnableBlockDeleteService"
+          class="com.dmeplugin.dmestore.services.bestpractice.VMFS3EnableBlockDeleteImpl"/>
+    <bean name="vmfs3HardwareAcceleratedLocking"
+          class="com.dmeplugin.dmestore.services.bestpractice.VMFS3HardwareAcceleratedLockingImpl"/>
+    <bean name="vmfs3UseATSForHBOnVMFS"
+          class="com.dmeplugin.dmestore.services.bestpractice.VMFS3UseATSForHBOnVMFS5Impl"/>
     <bean name="diskSchedQuantum" class="com.dmeplugin.dmestore.services.bestpractice.DiskSchedQuantumImpl"/>
     <bean name="diskDiskMaxIOSize" class="com.dmeplugin.dmestore.services.bestpractice.DiskDiskMaxIOSizeImpl"/>
-    <bean name="dataMoverHardwareAcceleratedInit" class="com.dmeplugin.dmestore.services.bestpractice.DataMoverHardwareAcceleratedInitImpl"/>
-    <bean name="dataMoverHardwareAcceleratedMove" class="com.dmeplugin.dmestore.services.bestpractice.DataMoverHardwareAcceleratedMoveImpl"/>
+    <bean name="dataMoverHardwareAcceleratedInit"
+          class="com.dmeplugin.dmestore.services.bestpractice.DataMoverHardwareAcceleratedInitImpl"/>
+    <bean name="dataMoverHardwareAcceleratedMove"
+          class="com.dmeplugin.dmestore.services.bestpractice.DataMoverHardwareAcceleratedMoveImpl"/>
 
     <bean name="bestPracticeCheckDao" class="com.dmeplugin.dmestore.dao.BestPracticeCheckDao">
         <property name="url" value="${h2.url}"/>
@@ -153,15 +154,8 @@
         <property name="password" value="Pbu4@123"/>
         <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
     </bean>
-
-    
     <bean name="nfsOperationService" class="com.dmeplugin.dmestore.services.NfsOperationServiceImpl"/>
 
 
-    <bean name="PluginRegisterServiceImpl" class="com.dmeplugin.dmestore.services.PluginRegisterServiceImpl">
-
-    </bean>
-
-
-
+    <bean name="PluginRegisterServiceImpl" class="com.dmeplugin.dmestore.services.PluginRegisterServiceImpl"/>
 </beans>
