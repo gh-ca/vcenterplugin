@@ -566,7 +566,7 @@ public class VCSDKUtils {
         resMap.put("msg", "success");
         _logger.info("==start get oriented datastore capacity==");
         try {
-            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", 443,"administrator@vsphere.local", "Pbu4@123");
             DatastoreMO dsMo = new DatastoreMO(vmwareContext, new DatacenterMO(vmwareContext, "Datacenter").findDatastore(dsname));
             DatastoreSummary summary = dsMo.getSummary();
             long capacity = summary.getCapacity();
@@ -587,7 +587,7 @@ public class VCSDKUtils {
         String result = "success";
         _logger.info("==start expand DataStore==");
         try {
-            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", 443,"administrator@vsphere.local", "Pbu4@123");
             DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
             DatastoreMO dsMo = new DatastoreMO(vmwareContext, dcMo.findDatastore(dsname));
             List<ManagedObjectReference> hosts = dcMo.findHost("10.143.132.17");
@@ -648,7 +648,7 @@ public class VCSDKUtils {
         String result = "success";
         List<String> uuids = new ArrayList<>();
         try {
-            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248",443, "administrator@vsphere.local", "Pbu4@123");
             DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
             List<ManagedObjectReference> hosts = dcMo.findHost("10.143.133.196");
             ManagedObjectReference managedObjectReference = null;
@@ -692,7 +692,7 @@ public class VCSDKUtils {
         _logger.info("start creat nfs datastore");
         accessMode = StringUtils.isEmpty(accessMode) || accessMode.equals("readWrite") ? "readWrite" : "readOnly";
         try {
-            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", 443,"administrator@vsphere.local", "Pbu4@123");
             DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
             List<ManagedObjectReference> hosts = null;
             if (mountHosts != null && mountHosts.size() > 0) {
@@ -1315,6 +1315,58 @@ public class VCSDKUtils {
         }
     }
 
+    //Get host's vmKernel IP,only provisioning provisioning
+    public String getVmKernelIpByHostObjectId(String hostObjectId) throws Exception {
+        String listStr = "";
+        try {
+            String serverguid = vcConnectionHelper.objectID2Serverguid(hostObjectId);
+            VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
+
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+            //取得该存储下所有已经挂载的主机ID
+            ManagedObjectReference objmor = vcConnectionHelper.objectID2MOR(hostObjectId);
+            HostMO hostmo = new HostMO(vmwareContext, objmor);
+            if (hostmo != null) {
+                List<VirtualNicManagerNetConfig> nics = hostmo.getHostVirtualNicManagerNetConfig();
+                if(nics!=null && nics.size()>0){
+                    for(VirtualNicManagerNetConfig nic:nics){
+                        if(nic.getNicType().equals("vSphereProvisioning")){
+                            List<Map<String, Object>> lists = new ArrayList<>();
+
+                            List<HostVirtualNic> subnics = nic.getCandidateVnic();
+                            if(subnics!=null && subnics.size()>0){
+                                for(HostVirtualNic subnic:subnics){
+                                    if(nic.getSelectedVnic().contains(subnic.getKey())){
+                                        Map<String, Object> map = new HashMap<>();
+                                        map.put("device", subnic.getDevice());
+                                        map.put("key", subnic.getKey());
+                                        map.put("portgroup", subnic.getPortgroup());
+                                        map.put("ipAddress", subnic.getSpec().getIp().getIpAddress());
+                                        map.put("mac", subnic.getSpec().getMac());
+                                        map.put("port", subnic.getPort());
+
+                                        lists.add(map);
+                                    }
+                                }
+                            }
+
+                            if (lists.size() > 0) {
+                                listStr = gson.toJson(lists);
+                            }
+
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware error:", e);
+            throw e;
+        }
+        return listStr;
+    }
+
     public static void main(String[] args) {
 //        try {
 //            Gson gson = new Gson();
@@ -1391,7 +1443,7 @@ public class VCSDKUtils {
         String accessMode = "";
         accessMode = StringUtils.isEmpty(accessMode) || accessMode.equals("readWrite") ? "readWrite" : "readOnly";
         try {
-            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", 443,"administrator@vsphere.local", "Pbu4@123");
             DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
             List<ManagedObjectReference> hosts = null;
             if (mountHosts != null && mountHosts.size() > 0) {

@@ -1,7 +1,8 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.model.Storage;
+import com.dmeplugin.dmestore.model.EthPortInfo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,4 +34,8 @@ public interface DmeStorageService {
     Map<String, Object> getStorageControllers();
 
     Map<String, Object> getStorageDisks();
+
+    List<EthPortInfo> getStorageEthPorts(String storageSn) throws Exception;
+
+    Map<String, Object> getVolume(String volumeId);
 }

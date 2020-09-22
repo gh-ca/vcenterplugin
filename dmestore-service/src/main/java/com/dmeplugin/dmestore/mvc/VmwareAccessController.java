@@ -45,7 +45,7 @@ public class VmwareAccessController extends BaseController {
             return success(lists);
         } catch (Exception e) {
             LOG.error("list vmware host failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "list vmware host failure:"+e.toString();
         }
         return failure(failureStr);
     }
@@ -68,7 +68,7 @@ public class VmwareAccessController extends BaseController {
             return success(lists);
         } catch (Exception e) {
             LOG.error("getHostsByDsObjectId vmware host failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "getHostsByDsObjectId vmware host failure:"+e.toString();
         }
         return failure(failureStr);
     }
@@ -90,7 +90,7 @@ public class VmwareAccessController extends BaseController {
             return success(lists);
         } catch (Exception e) {
             LOG.error("list vmware cluster failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "list vmware cluster failure:"+e.toString();
         }
         return failure(failureStr);
     }
@@ -113,7 +113,7 @@ public class VmwareAccessController extends BaseController {
             return success(lists);
         } catch (Exception e) {
             LOG.error("getClustersByDsObjectId vmware host failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "getClustersByDsObjectId vmware host failure:"+e.toString();
         }
         return failure(failureStr);
     }
@@ -138,7 +138,7 @@ public class VmwareAccessController extends BaseController {
             return success(lists);
         } catch (Exception e) {
             LOG.error("getDataStoresByHostObjectId vmware host failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "getDataStoresByHostObjectId vmware host failure:"+e.toString();
         }
         return failure(failureStr);
     }
@@ -162,10 +162,34 @@ public class VmwareAccessController extends BaseController {
             return success(lists);
         } catch (Exception e) {
             LOG.error("getDataStoresByClusterObjectId vmware host failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "getDataStoresByClusterObjectId vmware host failure:"+e.toString();
         }
         return failure(failureStr);
     }
+
+    /**
+     * Get host's vmKernel IP,only provisioning provisioning
+     *
+     * @param  hostObjectId host Object Id
+     * @return ResponseBodyBean List<Map<String, String>> include device portgroup ipAddress key mac
+     * @throws Exception when error
+     */
+    @RequestMapping(value = "/getvmkernelipbyhostobjectid", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseBodyBean getVmKernelIpByHostObjectId(@RequestParam("hostObjectId") String hostObjectId) throws Exception {
+        LOG.info("accessvmware/getvmkernelipbyhostobjectid");
+        String failureStr = "";
+        try {
+            List<Map<String, String>> lists = vmwareAccessService.getVmKernelIpByHostObjectId(hostObjectId);
+            LOG.info("getvmkernelipbyhostobjectid lists==" + gson.toJson(lists));
+            return success(lists);
+        } catch (Exception e) {
+            LOG.error("get vmkernel ip by hostobjectid failure:", e);
+            failureStr = "get vmkernel ip by hostobjectid failure:"+e.toString();
+        }
+        return failure(failureStr);
+    }
+
 
 
 

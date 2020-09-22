@@ -12,6 +12,7 @@ public abstract class VCConnectionHelper {
     //private ManagedObjectReference mor;
 
     private String serverurl;
+    private int serverport;
     private String username;
     private String password;
 
@@ -61,6 +62,14 @@ public abstract class VCConnectionHelper {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public int getServerport() {
+        return serverport;
+    }
+
+    public void setServerport(int serverport) {
+        this.serverport = serverport;
     }
 
     /**
