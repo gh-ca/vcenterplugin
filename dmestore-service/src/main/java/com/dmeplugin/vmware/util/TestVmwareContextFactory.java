@@ -35,12 +35,12 @@ public class TestVmwareContextFactory {
         s_pool = new VmwareContextPool();
     }
 
-    public static VmwareContext create(String vCenterAddress, String vCenterUserName, String vCenterPassword) throws Exception {
+    public static VmwareContext create(String vCenterAddress,int vCenterPort, String vCenterUserName, String vCenterPassword) throws Exception {
         assert (vCenterAddress != null);
         assert (vCenterUserName != null);
         assert (vCenterPassword != null);
 
-        String serviceUrl = "https://" + vCenterAddress + "/sdk/vimService";
+        String serviceUrl = "https://" + vCenterAddress +":"+vCenterPort+ "/sdk/vimService";
 
         if (s_logger.isDebugEnabled())
             s_logger.debug("initialize VmwareContext. url: " + serviceUrl + ", username: " + vCenterUserName + ", password: " +
@@ -54,10 +54,10 @@ public class TestVmwareContextFactory {
         return context;
     }
 
-    public static VmwareContext getContext(String vCenterAddress, String vCenterUserName, String vCenterPassword) throws Exception {
+    public static VmwareContext getContext(String vCenterAddress,int vCenterPort, String vCenterUserName, String vCenterPassword) throws Exception {
         VmwareContext context = s_pool.getContext(vCenterAddress, vCenterUserName);
         if (context == null)
-            context = create(vCenterAddress, vCenterUserName, vCenterPassword);
+            context = create(vCenterAddress,vCenterPort, vCenterUserName, vCenterPassword);
 
         if (context != null) {
             context.setPoolInfo(s_pool, VmwareContextPool.composePoolKey(vCenterAddress, vCenterUserName));
