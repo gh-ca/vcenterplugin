@@ -59,6 +59,7 @@
 
 
     <bean name="dmeStorageService" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
+        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
     </bean>
     <bean name="dmeVmwareRalationDao" class="com.dmeplugin.dmestore.dao.DmeVmwareRalationDao">
         <property name="url" value="${h2.url}"/>
@@ -141,7 +142,13 @@
         <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
     </bean>
 
+    <bean name="serviceLevelService" class="com.dmeplugin.dmestore.services.ServiceLevelServiceImpl">
+        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
+        <property name="dmeStorageService" ref="dmeStorageService"/>
+        <property name="dmeRelationInstanceService" ref="dmeRelationInstanceService"/>
+    </bean>
     <bean name="dmeRelationInstanceService" class="com.dmeplugin.dmestore.services.DmeRelationInstanceServiceImpl">
+        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
     </bean>
 
     <bean name="PluginRegisterServiceImpl" class="com.dmeplugin.dmestore.services.PluginRegisterServiceImpl">

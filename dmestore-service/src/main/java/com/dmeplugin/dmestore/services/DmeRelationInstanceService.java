@@ -37,4 +37,12 @@ public interface DmeRelationInstanceService {
      * @throws Exception
      */
     RelationInstance queryRelationByRelationNameInstanceId(String relationName, String instanceId) throws Exception;
+
+    /**
+     * 按资源类型和资源实例查询单个资源实例
+     * @param instanceName enum:SYS_Lun SYS_StorageDevice
+     * @param instanceId
+     * @return
+     */
+    Object queryInstanceByInstanceNameId(String instanceName, String instanceId) throws Exception;
 }

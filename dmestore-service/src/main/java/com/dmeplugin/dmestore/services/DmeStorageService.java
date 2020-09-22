@@ -36,4 +36,6 @@ public interface DmeStorageService {
     Map<String, Object> getStorageDisks();
 
     List<EthPortInfo> getStorageEthPorts(String storageSn) throws Exception;
+
+    Map<String, Object> getVolume(String volumeId);
 }

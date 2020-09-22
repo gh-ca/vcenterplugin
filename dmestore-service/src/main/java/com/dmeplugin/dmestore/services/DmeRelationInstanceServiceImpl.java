@@ -27,9 +27,17 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
 
     private final String LIST_RELATION_URL = "/rest/resourcedb/v1/relations/{relationName}/instances";
     private final String QUERY_RELATION_URL = "/rest/resourcedb/v1/relations/{relationName}/instances/{instanceId}";
+    private final String QUERY_INSTANCE_URL = "/rest/resourcedb/v1/instances/{className}/{instanceId}";
 
     private DmeAccessService dmeAccessService;
 
+    public DmeAccessService getDmeAccessService() {
+        return dmeAccessService;
+    }
+
+    public void setDmeAccessService(DmeAccessService dmeAccessService) {
+        this.dmeAccessService = dmeAccessService;
+    }
 
     @Override
     public List<RelationInstance> queryRelationByRelationName(String relationName) throws Exception {
@@ -84,6 +92,32 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     @Override
     public RelationInstance queryRelationByRelationNameInstanceId(String relationName, String instanceId) throws Exception {
         return null;
+    }
+
+    @Override
+    public Object queryInstanceByInstanceNameId(String instanceName, String instanceId) throws Exception {
+        Object obj = new Object();
+        Map<String, Object> remap = new HashMap<>();
+        remap.put("code", 200);
+        remap.put("message", "queryInstanceByInstanceNameId success!");
+        //remap.put("data", params);
+
+        String url = QUERY_INSTANCE_URL;
+        url = url.replace("{className}", instanceName);
+        url = url.replace("{instanceId}", instanceId);
+        url = "https://localhost:26335" + url;//上线时删除此行代码
+
+        ResponseEntity responseEntity;
+        try {
+            responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            if (responseEntity.getStatusCodeValue() == 200) {
+               obj = responseEntity.getBody();
+            }
+        } catch (Exception e) {
+            LOG.warn("通过资源类型名称和资源实例ID查询对应资源实例异常,className:{},instancId:{}!", instanceName, instanceId);
+            throw e;
+        }
+        return obj;
     }
 
     private List<RelationInstance> converRelation(Object object) {
