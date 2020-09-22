@@ -42,8 +42,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         String url = "https://localhost:26335/rest/storagemgmt/v1/storages";
 
         try {
-            ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
-            //ResponseEntity responseEntity = access(url, HttpMethod.GET, null);
+            //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
+            ResponseEntity responseEntity = access(url, HttpMethod.GET, null);
             Log.info("DmeStorageServiceImpl/getStorages/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
