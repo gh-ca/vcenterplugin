@@ -96,6 +96,18 @@ public class ToolUtils {
         return re;
     }
 
+    public static Long jsonToLon(JsonElement obj, Long defaultvalue) {
+        Long re = defaultvalue;
+        try {
+            if (!StringUtils.isEmpty(obj)) {
+                re = obj.getAsLong();
+            }
+        } catch (Exception e) {
+            LOG.error("error:", e);
+        }
+        return re;
+    }
+
     public static Double jsonToDou(JsonElement obj, Double defaultvalue) {
         Double re = defaultvalue;
         try {

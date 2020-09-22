@@ -66,5 +66,14 @@ public class DmeConstants {
      */
     public static final String DME_NFS_LOGICPORT_QUERY_URL = "/rest/storagemgmt/v1/storage-port/logic-ports?storage_id=#{storage_id}";
 
+    /**
+     * The resource ID of the storage device can be obtained through device Sn filtering
+     */
+    public static final String DME_RES_STORDEVICEID_QUERY_URL = "/rest/csm-cmdb/v1/instances/SYS_StorDevice";
+
+    /**
+     * Get Storage eth ports
+     */
+    public static final String DME_STORDEVICE_ETHPORT_QUERY_URL = "/rest/csm-cmdb/v1/instances/SYS_StoragePort";
 
 }
