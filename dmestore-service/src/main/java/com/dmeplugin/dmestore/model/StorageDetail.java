@@ -24,15 +24,6 @@ public class StorageDetail {
     private Double freeEffectiveCapacity;
     private String location;
     private String[] azIds;
-    private Object storagePool;
-    private Object volume;
-    private Object fileSystem;
-    private Object dTrees;
-    private Object nfsShares;
-    private Object bandPorts;
-    private Object logicPorts;
-    private Object storageControllers;
-    private Object storageDisks;
 
     public String getId() {
         return id;
@@ -155,75 +146,4 @@ public class StorageDetail {
         this.freeEffectiveCapacity = freeEffectiveCapacity;
     }
 
-    public Object getStoragePool() {
-        return storagePool;
-    }
-
-    public void setStoragePool(Object storagePool) {
-        this.storagePool = storagePool;
-    }
-
-    public Object getVolume() {
-        return volume;
-    }
-
-    public void setVolume(Object volume) {
-        this.volume = volume;
-    }
-
-    public Object getFileSystem() {
-        return fileSystem;
-    }
-
-    public void setFileSystem(Object fileSystem) {
-        this.fileSystem = fileSystem;
-    }
-
-    public Object getdTrees() {
-        return dTrees;
-    }
-
-    public void setdTrees(Object dTrees) {
-        this.dTrees = dTrees;
-    }
-
-    public Object getNfsShares() {
-        return nfsShares;
-    }
-
-    public void setNfsShares(Object nfsShares) {
-        this.nfsShares = nfsShares;
-    }
-
-    public Object getBandPorts() {
-        return bandPorts;
-    }
-
-    public void setBandPorts(Object bandPorts) {
-        this.bandPorts = bandPorts;
-    }
-
-    public Object getLogicPorts() {
-        return logicPorts;
-    }
-
-    public void setLogicPorts(Object logicPorts) {
-        this.logicPorts = logicPorts;
-    }
-
-    public Object getStorageControllers() {
-        return storageControllers;
-    }
-
-    public void setStorageControllers(Object storageControllers) {
-        this.storageControllers = storageControllers;
-    }
-
-    public Object getStorageDisks() {
-        return storageDisks;
-    }
-
-    public void setStorageDisks(Object storageDisks) {
-        this.storageDisks = storageDisks;
-    }
 }

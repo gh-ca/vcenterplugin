@@ -22,9 +22,7 @@ import java.util.*;
  */
 public class VmfsOperationServiceImpl implements VmfsOperationService {
 
-    @Autowired
     private DmeAccessService dmeAccessService;
-
 
     private Gson gson=new Gson();
 

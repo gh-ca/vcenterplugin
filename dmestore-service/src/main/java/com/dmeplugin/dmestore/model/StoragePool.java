@@ -1,6 +1,5 @@
 package com.dmeplugin.dmestore.model;
 
-import java.util.PrimitiveIterator;
 
 /**
  * @author lianq
