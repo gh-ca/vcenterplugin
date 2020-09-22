@@ -69,7 +69,8 @@ public class DmeInfoDao extends H2DataBaseDao {
                 dmeInfo.setUpdateTime(rs.getTimestamp("UPDATETIME"));
                 dmeInfo.setState(rs.getInt("STATE"));
             }
-        } catch (DataBaseException | SQLException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             LOGGER.error("Failed to get dme access info: " + e.toString());
             throw new Exception(e);
         } finally {

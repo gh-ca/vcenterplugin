@@ -98,7 +98,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
         } catch (Exception e) {
             remap.put("code", 503);
-            remap.put("message", "更新连接状态失败:" + e.getMessage());
+            remap.put("message", "更新连接状态失败:" + e.toString());
         }
 
         Map<String, Object> params = new HashMap<>();
@@ -247,7 +247,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                         }
                     }
                 } catch (Exception e) {
-                    LOG.error("DME link error url:" + workloadsUrl + ",error:" + e.getMessage());
+                    LOG.error("DME link error url:" + workloadsUrl + ",error:" + e.toString());
                 }
             }
         } catch (Exception e) {
@@ -311,7 +311,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("DME link error url:" + getHostsUrl + ",error:" + e.getMessage());
+            LOG.error("DME link error url:" + getHostsUrl + ",error:" + e.toString());
             throw e;
         }
         LOG.info("getDmeHosts relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
@@ -356,7 +356,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("DME link error url:" + getHostGroupsUrl + ",error:" + e.getMessage());
+            LOG.error("DME link error url:" + getHostGroupsUrl + ",error:" + e.toString());
             throw e;
         }
         LOG.info("getDmeHostgroups relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
@@ -393,7 +393,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("DME link error url:" + createHostUrl + ",error:" + e.getMessage());
+            LOG.error("DME link error url:" + createHostUrl + ",error:" + e.toString());
             throw e;
         }
         LOG.info("createHost hostmap===" + (hostmap == null ? "null" : (hostmap.size() + "==" + gson.toJson(hostmap))));
@@ -426,7 +426,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("DME link error url:" + createHostGroupUrl + ",error:" + e.getMessage());
+            LOG.error("DME link error url:" + createHostGroupUrl + ",error:" + e.toString());
             throw e;
         }
         LOG.info("createHostGroup hostmap===" + (hostgroupmap == null ? "null" : (hostgroupmap.size() + "==" + gson.toJson(hostgroupmap))));
@@ -474,7 +474,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("DME link error url:" + getHostUrl + ",error:" + e.getMessage());
+            LOG.error("DME link error url:" + getHostUrl + ",error:" + e.toString());
             throw e;
         }
         LOG.info("getDmeHost relists===" + (gson.toJson(map)));
