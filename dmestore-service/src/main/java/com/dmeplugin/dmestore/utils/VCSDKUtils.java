@@ -541,7 +541,7 @@ public class VCSDKUtils {
     }
 
     //rename datastore name
-    public String renameDataStore(String oldName, String newName,String dataStoreObjectId) throws Exception {
+    public String renameDataStore(String newName,String dataStoreObjectId) throws Exception {
 
         String result = "success";
         _logger.info("==start rename DataStore==");
