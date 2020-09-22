@@ -326,8 +326,8 @@ public class VCSDKUtils {
                             map.put("objectId", objectId);
                             map.put("status", dsmo.getSummary().isAccessible());
                             map.put("type", dsmo.getSummary().getType());
-                            map.put("capacity", dsmo.getSummary().getCapacity() / ToolUtils.Gi);
-                            map.put("freeSpace", dsmo.getSummary().getFreeSpace() / ToolUtils.Gi);
+                            map.put("capacity", dsmo.getSummary().getCapacity() / ToolUtils.GI);
+                            map.put("freeSpace", dsmo.getSummary().getFreeSpace() / ToolUtils.GI);
 
                             lists.add(map);
                         }
@@ -408,8 +408,8 @@ public class VCSDKUtils {
                             map.put("objectId", objectId);
                             map.put("status", dsmo.getSummary().isAccessible());
                             map.put("type", dsmo.getSummary().getType());
-                            map.put("capacity", dsmo.getSummary().getCapacity() / ToolUtils.Gi);
-                            map.put("freeSpace", dsmo.getSummary().getFreeSpace() / ToolUtils.Gi);
+                            map.put("capacity", dsmo.getSummary().getCapacity() / ToolUtils.GI);
+                            map.put("freeSpace", dsmo.getSummary().getFreeSpace() / ToolUtils.GI);
 
                             lists.add(map);
                         }
@@ -588,8 +588,8 @@ public class VCSDKUtils {
         _logger.info("==start expand DataStore==");
         try {
             VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
-            DatastoreMO dsMo = new DatastoreMO(vmwareContext, new DatacenterMO(vmwareContext, "Datacenter").findDatastore(dsname));
             DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
+            DatastoreMO dsMo = new DatastoreMO(vmwareContext, dcMo.findDatastore(dsname));
             List<ManagedObjectReference> hosts = dcMo.findHost("10.143.132.17");
             ManagedObjectReference managedObjectReference = null;
             if (hosts != null && hosts.size() > 0) {
@@ -598,7 +598,7 @@ public class VCSDKUtils {
             HostMO hostMo = new HostMO(vmwareContext, managedObjectReference);
             //todo get oriented LUN  (参数设置存在问题)
             String devicePath = "/vmfs/devices/disks/t10.ATA_____WDC_WD1003FBYX2D01Y7B1________________________WD2DWCAW35431438";
-            Long totalSectors = add_capacity * 1L * ToolUtils.Gi;
+            Long totalSectors = add_capacity * 1L * ToolUtils.GI;
             HostScsiDisk candidateHostScsiDisk = null;
             if (hostMo != null) {
                 HostDatastoreSystemMO hostDatastoreSystemMO = hostMo.getHostDatastoreSystemMO();
@@ -680,39 +680,42 @@ public class VCSDKUtils {
     }
 
     //create nfs datastore
-    public String createNfsDatastore(String serverHost, Integer logicPort, String exportPath, String nfsName, String accessMode, String mountHost,String type) {
-        //todo
-        //NfsDataInfo nfsDataInfo = new NfsDataInfo(); 用于详情和列表展示的自定义model
-        //NasDatastoreInfo-->DataStoreInfo-->(aliasOf, containerId, freeSpace, maxFileSize, maxMemoryFileSize, maxVirtualDiskCapacity, name, timestamp, url)
-        //如何拿到DataStoreInfo对象？去设置其中关于指定容量大小的问题
-        //如何让NFS和fs/share/logicport产生关系？（指定的主机上面是否绑定对应的fs/share/logicport列表?）
-        //String accessMode = "";
+    public String createNfsDatastore(String serverHost, String exportPath, String nfsName, String accessMode, List<String> mountHosts,String type) {
         String result = "success";
-        accessMode = StringUtils.isEmpty(accessMode) || accessMode.equals("readWrite") ? "readWrite" : "readOnly";
         //exportPath = "/volume1/TESTNFS";
         //需要判断nfs版本，如果是v4.1要将 Kerberos 安全功能与 NFS 4.1 结合使用，请启用 Kerberos 并选择适当的 Kerberos 模型。
         //nfsName = "lqnfsv3.1";
         //remoteHostNames equal remoteHost(v3)
         //serverHost = "10.143.132.187";
-        _logger.info("start creat nfs datastore");
         //mountHost = "10.143.132.17";
         //logicPort = 0;
+        _logger.info("start creat nfs datastore");
+        accessMode = StringUtils.isEmpty(accessMode) || accessMode.equals("readWrite") ? "readWrite" : "readOnly";
         try {
             VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
             DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
-            List<ManagedObjectReference> hosts = dcMo.findHost(mountHost);
-            ManagedObjectReference managedObjectReference = null;
-            if (hosts != null && hosts.size() > 0) {
-                managedObjectReference = hosts.get(0);
-                HostMO hostMO = new HostMO(vmwareContext, managedObjectReference);
-                HostDatastoreSystemMO hostDatastoreSystemMO = hostMO.getHostDatastoreSystemMO();
-                //todo 存在返回值 需要处理
-                hostDatastoreSystemMO.createNfsDatastore(serverHost, logicPort, exportPath, nfsName,accessMode,type);
-                _logger.info("end creat nfs datastore");
+            List<ManagedObjectReference> hosts = null;
+            if (mountHosts != null && mountHosts.size() > 0) {
+                ManagedObjectReference managedObjectReference = null;
+                for (int i = 0; i < mountHosts.size(); i++) {
+                    String mountHost = mountHosts.get(i);
+                    hosts = dcMo.findHost(mountHost);
+                    if (hosts != null && hosts.size() > 0) {
+                        managedObjectReference = hosts.get(0);
+                        HostMO hostMO = new HostMO(vmwareContext, managedObjectReference);
+                        HostDatastoreSystemMO hostDatastoreSystemMO = hostMO.getHostDatastoreSystemMO();
+                        //todo logic port param needed ?
+                        hostDatastoreSystemMO.createNfsDatastore(serverHost, 0, exportPath, nfsName, accessMode, type);
+                    } else {
+                        result = "failed";
+                        _logger.error("can not find target host!");
+                    }
+                }
             } else {
                 result = "failed";
-                _logger.error("can not find target host!");
+                _logger.error("{createNfsDatastore/mountHosts} params error");
             }
+            _logger.info("end creat nfs datastore");
         } catch (Exception e) {
             result = "failed";
             _logger.error("vmware error:", e);
@@ -899,7 +902,7 @@ public class VCSDKUtils {
         HostScsiDisk candidateHostScsiDisk = null;
         try {
             if (hostScsiDisks != null && hostScsiDisks.size() > 0 && capacity > 0) {
-                long oldcapacity = capacity * 1L * ToolUtils.Gi;
+                long oldcapacity = capacity * 1L * ToolUtils.GI;
                 long objcapacity = 0;
                 HostScsiDisk objHostScsiDisk = null;
                 long maxcapacity = 0;
@@ -968,7 +971,7 @@ public class VCSDKUtils {
                 if (hostMo != null) {
                     if (objhsd != null) {
                         _logger.info("Create datastore via host " + hostMo.getName() + " on disk " + objhsd.getDevicePath());
-                        long totalSectors = capacity * 1L * ToolUtils.Gi / objhsd.getCapacity().getBlockSize();
+                        long totalSectors = capacity * 1L * ToolUtils.GI / objhsd.getCapacity().getBlockSize();
                         _logger.info("Vmfs totalSectors==" + totalSectors);
                         //create vmfs
                         ManagedObjectReference datastore = null;
@@ -1313,8 +1316,8 @@ public class VCSDKUtils {
     }
 
     public static void main(String[] args) {
-        try {
-            Gson gson = new Gson();
+//        try {
+//            Gson gson = new Gson();
 //            String listStr = VCSDKUtils.getAllVmfsDataStores(null);
 //            _logger.info("Vmfs listStr==" + listStr);
 //            listStr = VCSDKUtils.getAllVmfsDataStores(ToolUtils.STORE_TYPE_VMFS);
@@ -1366,8 +1369,61 @@ public class VCSDKUtils {
 //                }
 //            }
 
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+
+
+        String result = "success";
+        String exportPath = "/volume1/TESTNFS";
+        //需要判断nfs版本，如果是v4.1要将 Kerberos 安全功能与 NFS 4.1 结合使用，请启用 Kerberos 并选择适当的 Kerberos 模型。
+        String nfsName = "lqnfsv3.1";
+        //remoteHostNames equal remoteHost(v3)
+        String serverHost = "10.143.132.187";
+        String mountHost1 = "10.143.132.17";
+        String mountHost2 = "10.143.132.20";
+        List<String> mountHosts = new ArrayList<>();
+        mountHosts.add(mountHost1);
+        mountHosts.add(mountHost2);
+        String type = "NFS";
+        //logicPort = 0;
+        _logger.info("start creat nfs datastore");
+        String accessMode = "";
+        accessMode = StringUtils.isEmpty(accessMode) || accessMode.equals("readWrite") ? "readWrite" : "readOnly";
+        try {
+            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", "administrator@vsphere.local", "Pbu4@123");
+            DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
+            List<ManagedObjectReference> hosts = null;
+            if (mountHosts != null && mountHosts.size() > 0) {
+                ManagedObjectReference managedObjectReference = null;
+                for (int i = 0; i < mountHosts.size(); i++) {
+                    String mountHost = mountHosts.get(i);
+                    hosts = dcMo.findHost(mountHost);
+                    if (hosts != null && hosts.size() > 0) {
+                        managedObjectReference = hosts.get(0);
+                        HostMO hostMO = new HostMO(vmwareContext, managedObjectReference);
+                        HostDatastoreSystemMO hostDatastoreSystemMO = hostMO.getHostDatastoreSystemMO();
+                        hostDatastoreSystemMO.createNfsDatastore(serverHost, 0, exportPath, nfsName, accessMode, type);
+//                        if (i == 0) {
+//                            //todo logic port param needed ?
+//                        }
+//                        if (i > 0) {
+//                            DatastoreMO dsMo = new DatastoreMO(vmwareContext, dcMo.findDatastore(nfsName));
+//                            mountNfs(dsMo, hostMO, type);
+//                        }
+                    } else {
+                        result = "failed";
+                        _logger.error("can not find target host!");
+                    }
+                }
+            } else {
+                result = "failed";
+                _logger.error("{createNfsDatastore/mountHosts} params error");
+            }
+            _logger.info("end creat nfs datastore");
         } catch (Exception e) {
-            e.printStackTrace();
+            result = "failed";
+            _logger.error("vmware error:", e);
         }
     }
 }

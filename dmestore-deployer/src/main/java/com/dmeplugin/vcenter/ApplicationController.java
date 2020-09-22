@@ -43,7 +43,7 @@ public class ApplicationController {
         formData.get("vcenterUsername"),
         formData.get("vcenterPassword"),
         formData.get("vcenterIP"),
-        formData.get("vcenterPort"));
+        formData.get("vcenterPort"),"","","","","");
   }
 
   @RequestMapping(value = "rest/register", method = RequestMethod.POST)
@@ -53,7 +53,7 @@ public class ApplicationController {
         formData.get("vcenterPassword"),
         formData.get("vcenterIP"),
         formData.get("vcenterPort"),
-        formData.get("version"));
+        formData.get("version"),"","","","");
   }
 
   @RequestMapping(value = "rest/registerByDME", method = RequestMethod.POST)
@@ -74,7 +74,7 @@ public class ApplicationController {
     String packageUrl=path+packageNamelist.get(0);
     String version=versionList.get(0);
 
-    return Validations.onSubmitDME(packageUrl,
+    return Validations.onSubmit(packageUrl,
             username,
             password,
             vcenterip,

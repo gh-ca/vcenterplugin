@@ -45,7 +45,7 @@ public class VmwareAccessController extends BaseController {
             return success(lists);
         } catch (Exception e) {
             LOG.error("list vmware host failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "list vmware host failure:"+e.toString();
         }
         return failure(failureStr);
     }
@@ -68,7 +68,7 @@ public class VmwareAccessController extends BaseController {
             return success(lists);
         } catch (Exception e) {
             LOG.error("getHostsByDsObjectId vmware host failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "getHostsByDsObjectId vmware host failure:"+e.toString();
         }
         return failure(failureStr);
     }
@@ -90,7 +90,7 @@ public class VmwareAccessController extends BaseController {
             return success(lists);
         } catch (Exception e) {
             LOG.error("list vmware cluster failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "list vmware cluster failure:"+e.toString();
         }
         return failure(failureStr);
     }
@@ -113,7 +113,7 @@ public class VmwareAccessController extends BaseController {
             return success(lists);
         } catch (Exception e) {
             LOG.error("getClustersByDsObjectId vmware host failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "getClustersByDsObjectId vmware host failure:"+e.toString();
         }
         return failure(failureStr);
     }
@@ -138,7 +138,7 @@ public class VmwareAccessController extends BaseController {
             return success(lists);
         } catch (Exception e) {
             LOG.error("getDataStoresByHostObjectId vmware host failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "getDataStoresByHostObjectId vmware host failure:"+e.toString();
         }
         return failure(failureStr);
     }
@@ -162,7 +162,7 @@ public class VmwareAccessController extends BaseController {
             return success(lists);
         } catch (Exception e) {
             LOG.error("getDataStoresByClusterObjectId vmware host failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "getDataStoresByClusterObjectId vmware host failure:"+e.toString();
         }
         return failure(failureStr);
     }

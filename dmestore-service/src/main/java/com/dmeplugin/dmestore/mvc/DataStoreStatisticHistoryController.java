@@ -38,12 +38,24 @@ public class DataStoreStatisticHistoryController extends BaseController {
         return failure(gson.toJson(resMap));
     }
 
-    @RequestMapping(value = "/nfsvolume", method = RequestMethod.POST)
+    @RequestMapping(value = "/nfsfs", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean getNfsVolumeStatistic(@RequestBody Map<String, Object> params) throws Exception {
-        LOG.info("datastorestatistichistrory/nfsvolume params==" + gson.toJson(params));
+        LOG.info("datastorestatistichistrory/nfsfs params==" + gson.toJson(params));
 
         Map<String, Object> resMap = dataSotreStatisticHistroyService.queryNfsStatistic(params);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
+    }
+
+    @RequestMapping(value = "/servicelevel", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean getServiceLevelStatistic(@RequestBody Map<String, Object> params) throws Exception {
+        LOG.info("datastorestatistichistrory/servicelevel params==" + gson.toJson(params));
+
+        Map<String, Object> resMap = dataSotreStatisticHistroyService.queryServiceLevelStatistic(params);
         if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
             return success(resMap);
         }

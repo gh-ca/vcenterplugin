@@ -32,7 +32,7 @@ public class VmfsOperationController extends BaseController{
     /**
      *
      * @param volume_id  required
-     * @param params  {control_policy,max_iops,max_bandwidth,newVoName,oldDsName,newDsName}
+     * @param params  {control_policy,max_iops,max_bandwidth,newVoName,oldDsName,newDsName,min_iops,min_bandwidth}
      * @return
      */
     @PutMapping("/updatevmfs")
@@ -49,10 +49,11 @@ public class VmfsOperationController extends BaseController{
 
     /**
      * expand vmfs datastore
-     * @param volumes
+     *
+     * @param volumes  volumes{vo_add_capacity,volume_id,ds_name}
      * @return
      */
-    @PostMapping("expandvmfs")
+    @PostMapping("/expandvmfs")
     @ResponseBody
     public ResponseBodyBean expandVMFS(@RequestBody List<Map<String,String >> volumes ){
 

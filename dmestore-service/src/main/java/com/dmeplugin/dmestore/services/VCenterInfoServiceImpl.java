@@ -39,7 +39,13 @@ public class VCenterInfoServiceImpl extends DMEOpenApiService implements VCenter
   }
 
   private void encode(VCenterInfo vCenterInfo) {
-    vCenterInfo.setPassword(CipherUtils.aesEncode(vCenterInfo.getPassword()));
+
+    try {
+      vCenterInfo.setPassword(CipherUtils.encryptString(vCenterInfo.getPassword()));
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
   }
 
   @Override

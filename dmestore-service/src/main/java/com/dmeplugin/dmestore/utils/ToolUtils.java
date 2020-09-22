@@ -20,9 +20,9 @@ public class ToolUtils {
     public final static String STORE_TYPE_VMFS = "VMFS";
     public final static String STORE_TYPE_NFS = "NFS";
 
-    public final static int Ki = 1024;
-    public final static int Mi = 1024 * 1024;
-    public final static int Gi = 1024 * 1024 * 1024;
+    public final static int KI = 1024;
+    public final static int MI = 1024 * 1024;
+    public final static int GI = 1024 * 1024 * 1024;
 
     public static String getStr(Object obj) {
         String re = null;

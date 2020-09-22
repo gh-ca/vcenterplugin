@@ -491,9 +491,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                                 //对比数据库关系表中的数据，只显示关系表中的数据
                                 if (dvrMap != null && dvrMap.get(vmwareObjectId) != null) {
                                     NfsDataInfo nfsDataInfo = new NfsDataInfo();
-                                    double capacity = ToolUtils.getDouble(jo.get("capacity")) / ToolUtils.Gi;
-                                    double freeSpace = ToolUtils.getDouble(jo.get("freeSpace")) / ToolUtils.Gi;
-                                    double reserveCapacity = (ToolUtils.getDouble(jo.get("capacity")) - ToolUtils.getDouble(jo.get("freeSpace"))) / ToolUtils.Gi;
+                                    double capacity = ToolUtils.getDouble(jo.get("capacity")) / ToolUtils.GI;
+                                    double freeSpace = ToolUtils.getDouble(jo.get("freeSpace")) / ToolUtils.GI;
+                                    double reserveCapacity = (ToolUtils.getDouble(jo.get("capacity")) - ToolUtils.getDouble(jo.get("freeSpace"))) / ToolUtils.GI;
 
                                     nfsDataInfo.setName(ToolUtils.jsonToStr(jo.get("name")));
 
@@ -640,27 +640,31 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                     params.put("shareId",dvr.getShareId());
                     //挂载卷
                     String taskId = mountnfsToHost(params);
-                    List<String> taskIds = new ArrayList<>();
-                    taskIds.add(taskId);
-                    LOG.info("taskIds====" + taskIds);
-                    //查询看挂载任务是否完成。
-                    boolean mountFlag = taskService.checkTaskStatus(taskIds);
-                    if (mountFlag) { //DME挂载完成
-                        //调用vCenter在主机上扫描卷和Datastore，并挂载主机
-                        List<Map<String,String>> clusters = null;
-                        List<Map<String,String>> hosts = null;
-                        String mountType = null;
-                        if(params.get("hosts")!=null){
-                            hosts = (List<Map<String,String>>)params.get("hosts");
-                        }
-                        if(params.get("clusters")!=null){
-                            clusters = (List<Map<String,String>>)params.get("clusters");
-                        }
-                        vcsdkUtils.mountNfsOnCluster(dataStoreObjectId,
-                                clusters, hosts, ToolUtils.getStr(params.get("mountType")));
+                    if(!StringUtils.isEmpty(taskId)) {
+                        List<String> taskIds = new ArrayList<>();
+                        taskIds.add(taskId);
+                        LOG.info("taskIds====" + taskIds);
+                        //查询看挂载任务是否完成。
+                        boolean mountFlag = taskService.checkTaskStatus(taskIds);
+                        if (mountFlag) { //DME挂载完成
+                            //调用vCenter在主机上扫描卷和Datastore，并挂载主机
+                            List<Map<String, String>> clusters = null;
+                            List<Map<String, String>> hosts = null;
+                            String mountType = null;
+                            if (params.get("hosts") != null) {
+                                hosts = (List<Map<String, String>>) params.get("hosts");
+                            }
+                            if (params.get("clusters") != null) {
+                                clusters = (List<Map<String, String>>) params.get("clusters");
+                            }
+                            vcsdkUtils.mountNfsOnCluster(dataStoreObjectId,
+                                    clusters, hosts, ToolUtils.getStr(params.get("mountType")));
 
+                        } else {
+                            throw new Exception("DME mount nfs error(task status)!");
+                        }
                     } else {
-                        throw new Exception("DME mount nfs error(task status)!");
+                        throw new Exception("DME mount nfs error(task is null)!");
                     }
                 }
             } else {

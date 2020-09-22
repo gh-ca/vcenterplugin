@@ -15,7 +15,7 @@ public class DPSqlFileConstant {
           "    hostIp VARCHAR(255),\n" +
           "    hostPort int,\n" +
           "    userName VARCHAR(255),\n" +
-          "    password VARCHAR(255),\n" +
+          "    password VARCHAR(1024),\n" +
           "    createTime datetime DEFAULT NOW(),\n" +
           "    updateTime datetime DEFAULT NOW(),\n" +
           "    state int DEFAULT 1\n" +

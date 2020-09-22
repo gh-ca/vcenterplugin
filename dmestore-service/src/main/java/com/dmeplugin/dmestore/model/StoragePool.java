@@ -1,6 +1,5 @@
 package com.dmeplugin.dmestore.model;
 
-import java.util.PrimitiveIterator;
 
 /**
  * @author lianq
@@ -22,6 +21,17 @@ public class StoragePool   {
     private String consumed_capacity_percentage;
     private String consumed_capacity_threshold;
     private String storage_pool_id;
+
+    //补充字段
+    private String media_type;
+
+    public String getMedia_type() {
+        return media_type;
+    }
+
+    public void setMedia_type(String media_type) {
+        this.media_type = media_type;
+    }
 
     public String getStorage_pool_id() {
         return storage_pool_id;
