@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.model;
 
+
 /**
  * @author lianq
  * @ClassName: StoragePool
@@ -23,7 +24,17 @@ public class StoragePool   {
     private String storage_instance_id;
     private String storage_device_id;
     private String storage_name;
+
+    //补充字段
     private String media_type;
+
+    public String getMedia_type() {
+        return media_type;
+    }
+
+    public void setMedia_type(String media_type) {
+        this.media_type = media_type;
+    }
 
     public String getStorage_pool_id() {
         return storage_pool_id;
@@ -145,11 +156,4 @@ public class StoragePool   {
         this.storage_name = storage_name;
     }
 
-    public String getMedia_type() {
-        return media_type;
-    }
-
-    public void setMedia_type(String media_type) {
-        this.media_type = media_type;
-    }
 }

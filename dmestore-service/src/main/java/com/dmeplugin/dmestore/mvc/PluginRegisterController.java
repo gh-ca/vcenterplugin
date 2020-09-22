@@ -1,10 +1,12 @@
 package com.dmeplugin.dmestore.mvc;
 
+import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
-import com.dmeplugin.dmestore.services.DmeAccessService;
-import com.dmeplugin.dmestore.services.SystemService;
-import com.dmeplugin.dmestore.services.VmwareAccessService;
+import com.dmeplugin.dmestore.services.*;
+import com.dmeplugin.dmestore.utils.CipherUtils;
 import com.dmeplugin.dmestore.utils.RestUtils;
+import com.dmeplugin.vmware.SpringBootConnectionHelper;
+import com.dmeplugin.vmware.VCConnectionHelper;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,15 +28,14 @@ public class PluginRegisterController extends BaseController {
     private Gson gson = new Gson();
 
     @Autowired
-    private DmeAccessService dmeAccessService;
-
-    @Autowired
-    private SystemService systemService;
+    private PluginRegisterService pluginRegisterService;
 
 
     @RequestMapping(value = "/pluginaction", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean pluginaction(HttpServletRequest request,
+                                         @RequestParam String vcenterIP,
+                                         @RequestParam String vcenterPort,
                                           @RequestParam String vcenterUsername, @RequestParam String vcenterPassword,
                                           @RequestParam(required = false) String action,
                                           @RequestParam(required = false) String removeData,
@@ -47,19 +48,13 @@ public class PluginRegisterController extends BaseController {
         boolean isRemoveData = false;
         synchronized (lock) {
             try {
+                Map<String, Object> remap;
                 if ("install".equals(action)) {
-                    //调用接口，创建dme连接信息
-                    Map params = new HashMap();
-                    params.put("hostIp", dmeIp);
-                    params.put("hostPort", dmePort);
-                    params.put("userName", dmeUsername);
-                    params.put("password", dmePassword);
-                    Map<String, Object> remap=dmeAccessService.accessDme(params);
+                    remap=pluginRegisterService.installService(vcenterIP,vcenterPort,vcenterUsername,vcenterPassword,dmeIp,dmePort,dmeUsername,dmePassword);
                     if (remap != null && remap.get(RestUtils.RESPONSE_STATE_CODE) != null
                             && RestUtils.RESPONSE_STATE_200.equals(remap.get(RestUtils.RESPONSE_STATE_CODE).toString())) {
                         return success(remap);
                     }
-
                     return failure(gson.toJson(remap));
                 }
                 if ("uninstall".equals(action)) {
@@ -67,7 +62,7 @@ public class PluginRegisterController extends BaseController {
                     isRemoveData = (removeData != null && ("1".equals(removeData) || Boolean
                             .valueOf(removeData)));
                     if (isRemoveData)
-                        systemService.cleanData();
+                        pluginRegisterService.uninstallService();
                 }
                 return success();
             } catch (Exception e) {

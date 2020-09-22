@@ -65,7 +65,7 @@ public class VmwarePluginContextFactory {
             context = create(userSessionService, vimObjectReferenceService, serverguid);
 
         if (context != null) {
-            context.setPoolInfo(s_pool, VmwareContextPool.composePoolKey(serverguid, "vCenterUserName"));
+            context.setPoolInfo(s_pool, VmwareContextPool.composePoolKey(serverguid, ""));
             s_pool.registerContext(context);
         }
 

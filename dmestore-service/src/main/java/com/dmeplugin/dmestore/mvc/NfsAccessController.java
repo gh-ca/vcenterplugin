@@ -46,7 +46,7 @@ public class NfsAccessController extends BaseController {
             return success(lists);
         } catch (Exception e) {
             LOG.error("list nfs failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "list nfs failure:"+e.toString();
         }
         return failure(failureStr);
     }
@@ -69,17 +69,18 @@ public class NfsAccessController extends BaseController {
             return success(lists);
         } catch (Exception e) {
             LOG.error("get nfs performance failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "get nfs performance failure:"+e.toString();
         }
         return failure(failureStr);
     }
 
 
     /**
-     * Mount nfs,params中包含了 include:     *
+     * Mount nfs,params中包含了 include:
+     * dataStoreObjectId: datastore的object id
      * dataStoreName: datastore名称  必
-     * list<str> hosts: 主机名称 必 （主机与集群二选一）
-     * list<str> clusters: 集群名称 必（主机与集群二选一）
+     * list<map<str,str>> hosts: 主机hostId,主机名称hostName 必 （主机与集群二选一）
+     * list<map<str,str>>  clusters: 集群clusterId,集群名称clusterName 必（主机与集群二选一）
      * str mountType: 挂载模式（只读或读写）  readOnly/readWrite
      *
      * @param params: include dataStoreName,hosts,clusters,mountType
@@ -93,10 +94,10 @@ public class NfsAccessController extends BaseController {
         String failureStr = "";
         try {
             dmeNFSAccessService.mountNfs(params);
-            return success();
+            return success(null,"Mount nfs success");
         }catch (Exception e){
             LOG.error("mount nfs failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "mount nfs failure:"+e.toString();
         }
         return failure(failureStr);
     }

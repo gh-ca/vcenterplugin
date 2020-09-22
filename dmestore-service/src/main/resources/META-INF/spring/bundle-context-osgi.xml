@@ -28,6 +28,15 @@
    <osgi:service id="DmeNFSAccessService" ref="DmeNFSAccessServiceImpl"
                  interface="com.dmeplugin.dmestore.services.DmeNFSAccessService" />
 
+   <osgi:service id="VmfsAccessService" ref="VmfsAccessServiceImpl"
+                   interface="com.dmeplugin.dmestore.services.VmfsAccessService" />
+
+   <osgi:service id="PluginRegisterService" ref="PluginRegisterServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.PluginRegisterService" />
+
+   <osgi:service id="VCenterInfoService" ref="VCenterInfoServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.VCenterInfoService" />
+
   <!-- References to platform services used by the controllers -->
 
    <osgi:reference id="dataService"

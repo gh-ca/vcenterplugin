@@ -80,6 +80,7 @@ public class DmeAccessController extends BaseController {
      *
      * @param storageId storage id
      * @return ResponseBodyBean
+     * @throws Exception when error
      */
     @RequestMapping(value = "/getworkloads", method = RequestMethod.GET)
     @ResponseBody
@@ -93,7 +94,7 @@ public class DmeAccessController extends BaseController {
             return success(lists);
         } catch (Exception e) {
             LOG.error("get WorkLoads failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "get WorkLoads failure:"+e.toString();
         }
         return failure(failureStr);
     }

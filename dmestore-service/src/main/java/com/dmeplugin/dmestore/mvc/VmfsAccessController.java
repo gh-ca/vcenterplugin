@@ -48,7 +48,7 @@ public class VmfsAccessController extends BaseController{
             return success(lists);
         }catch (Exception e){
             LOG.error("list vmfs failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "list vmfs failure:"+e.toString();
         }
         return failure(failureStr);
     }
@@ -71,7 +71,7 @@ public class VmfsAccessController extends BaseController{
             return success(lists);
         }catch (Exception e){
             LOG.error("get vmfs performance failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "get vmfs performance failure:"+e.toString();
         }
         return failure(failureStr);
     }
@@ -118,22 +118,23 @@ public class VmfsAccessController extends BaseController{
         String failureStr = "";
         try {
             vmfsAccessService.createVmfs(params);
-            return success();
+            return success(null,"Create vmfs success");
         }catch (Exception e){
             LOG.error("create vmfs failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "create vmfs failure:"+e.toString();
         }
         return failure(failureStr);
     }
 
     /**
      * Mount vmfs include
-     * param list<str> dataStoreNames: datastore名称列表 必
-     * param list<str> volumeIds: 卷volumeId列表 必
+     * param list<str> dataStoreObjectIds: datastore object id列表 必
      * param str host: 主机名称 必 （主机与集群二选一）
+     * param str hostId: 主机
      * param str cluster: 集群名称 必（主机与集群二选一）
+     * param str clusterId: 集群
      *
-     * @param params: include dataStoreNames,volumeIds,host,cluster
+     * @param params: include dataStoreObjectIds,host,hostId,cluster,clusterId
      * @return: ResponseBodyBean
      */
     @RequestMapping(value = "/mountvmfs", method = RequestMethod.POST)
@@ -144,10 +145,10 @@ public class VmfsAccessController extends BaseController{
         String failureStr = "";
         try {
             vmfsAccessService.mountVmfs(params);
-            return success();
+            return success(null,"Mount vmfs success");
         }catch (Exception e){
             LOG.error("mount vmfs failure:", e);
-            failureStr = e.getMessage();
+            failureStr = "mount vmfs failure:"+e.toString();
         }
         return failure(failureStr);
     }

@@ -16,5 +16,22 @@ public interface DmeStorageService {
 
     Map<String, Object> getStoragePools(String storageId);
 
+    Map<String, Object> getLogicPorts(String storageId);
+
+    Map<String, Object> getVolumes(String storageId);
+
+    Map<String, Object> getFileSystems(String storageId);
+
+    Map<String, Object> getDTrees(String storageId);
+
+    Map<String, Object> getNfsShares(String storageId);
+
+    Map<String, Object> getBandPorts(String storageId);
+
+    Map<String, Object> getStorageControllers();
+
+    Map<String, Object> getStorageDisks();
+
     Map<String, Object> getVolume(String volumeId);
+
 }

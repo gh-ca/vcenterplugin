@@ -12,6 +12,7 @@ public abstract class VCConnectionHelper {
     //private ManagedObjectReference mor;
 
     private String serverurl;
+    private int serverport;
     private String username;
     private String password;
 
@@ -63,12 +64,20 @@ public abstract class VCConnectionHelper {
         this.password = password;
     }
 
+    public int getServerport() {
+        return serverport;
+    }
+
+    public void setServerport(int serverport) {
+        this.serverport = serverport;
+    }
+
     /**
      * 获取单个context，主要用于前端传入了objectid的情况，类似详情，修改这种，需要将object转换为mor传入到helper使用
      * @return
      * @throws Exception
      */
-    public abstract VmwareContext getServerContext(ManagedObjectReference mor) throws Exception;
+    public abstract VmwareContext getServerContext(String serverguid) throws Exception;
     /**
      * 获取多个context，主要用于获取所有的主机，datastore这种
      * @return
@@ -85,6 +94,15 @@ public abstract class VCConnectionHelper {
         mor.setType(type);
         mor.setValue(value);
         return mor;
+    }
+
+    public  String objectID2Serverguid(String objectid){
+        String[] objectarry=objectid.split(":");
+        String type=objectarry[2];
+        String value=objectarry[3];
+        String serverguid=objectarry[4];
+
+        return serverguid;
     }
 
     public  String MOR2ObjectID(ManagedObjectReference mor,String serverguid){

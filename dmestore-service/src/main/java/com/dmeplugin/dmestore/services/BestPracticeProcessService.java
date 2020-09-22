@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.model.BestPracticeBean;
 import com.dmeplugin.dmestore.model.BestPracticeCheckRecordBean;
 
 import java.util.List;
@@ -13,6 +14,8 @@ import java.util.List;
  */
 public interface BestPracticeProcessService {
     List<BestPracticeCheckRecordBean> getCheckRecord() throws Exception;
+
+    List<BestPracticeBean> getCheckRecordBy(String hostSetting, int pageNo, int pageSize) throws Exception;
 
     void check(String hostName) throws Exception;
 

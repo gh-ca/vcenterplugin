@@ -177,13 +177,22 @@ public class HostDatastoreSystemMO extends BaseMO {
         return false;
     }
 
-    public ManagedObjectReference createNfsDatastore(String host, int port, String exportPath, String uuid, String accessMode) throws Exception {
+    public ManagedObjectReference createNfsDatastore(String host, int port, String exportPath, String uuid, String accessMode,String type) throws Exception {
 
         HostNasVolumeSpec spec = new HostNasVolumeSpec();
         spec.setRemoteHost(host);
         spec.setRemotePath(exportPath);
-        spec.setType("nfs");
+        //NFS41  NFS
+        if (StringUtils.isEmpty(type)) {
+            spec.setType("NFS");
+        }
+        /**
+         * 版本 4.1 需要设置安全类型，默认AUTH_SYS
+         */
+        //spec.setSecurityType();
+        spec.setType(type);
         spec.setLocalPath(uuid);
+
         // readOnly/readWrite
         if (!StringUtils.isEmpty(accessMode)) {
             spec.setAccessMode(accessMode);

@@ -6,7 +6,6 @@ import com.dmeplugin.dmestore.utils.RestUtils;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
@@ -24,27 +23,24 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     private Gson gson = new Gson();
 
-    @Autowired
+
     private DmeAccessService dmeAccessServiceImpl;
 
     @Override
     public Map<String, Object> getStorages() {
 
         Map<String, Object> objMap = new HashMap<>();
-        objMap.put("code", "200");
+        objMap.put("code", 200);
         objMap.put("msg", "list storage success!");
         List<Storage> list = new ArrayList<>();
 
         //String apiUrl = "/rest/storagemgmt/v1/storages";
         //test url
         String url = "https://localhost:26335/rest/storagemgmt/v1/storages";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
         try {
             //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
-            ResponseEntity responseEntity = sendHttpRequest(url, HttpMethod.GET, headers);
+            ResponseEntity responseEntity = access(url, HttpMethod.GET, null);
             Log.info("DmeStorageServiceImpl/getStorages/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -107,12 +103,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
         //String url = "/rest/storagemgmt/v1/storages/" + storageId + "/detail";
         String url = "https://localhost:26335/rest/storagemgmt/v1/storages/storage_id/detail";
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         try {
-            //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
-            ResponseEntity responseEntity = sendHttpRequest(url, HttpMethod.GET, headers);
+            ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
+            //ResponseEntity responseEntity = access(url, HttpMethod.GET, null);
             Log.info("DmeStorageServiceImpl/getStorageDetail/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -207,12 +200,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         Map<String, String> params = new HashMap<>();
         params.put("storage_id", storageId);
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-
         try {
-            ResponseEntity<String> responseEntity = HttpRequestUtil.requestWithBody(url, HttpMethod.POST, headers, gson.toJson(params), String.class);
+            ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, gson.toJson(params));
             //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.POST, gson.toJson(params));
             Log.info("DmeStorageServiceImpl/getStoragePools/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
@@ -257,60 +246,68 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public Map<String, Object> getVolume(String volumeId) {
+    public Map<String,Object> getLogicPorts(String storageId){
+
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 200);
-        resMap.put("msg", "get volume success!");
-        resMap.put("volume", volumeId);
-
-        List<Volume> volumes = new ArrayList<>();
-
-        //String reqPath = "/rest/blockservice/v1/volumes/{volume_id}";
-        String reqPath = "https://localhost:26335/rest/blockservice/v1/volumes";
-        String url = reqPath + "/" + volumeId;
+        resMap.put("msg", "list logic ports success!");
+        resMap.put("storageId", storageId);
+        List<LogicPorts> resList = new ArrayList<>();
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
+
+        String url = "https://localhost:26335/rest/storagemgmt/v1/storage-port/logic-ports?storage_id="+storageId;
         try {
-            //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
-            ResponseEntity responseEntity = sendHttpRequest(url, HttpMethod.GET, headers);
-            Log.info("DmeStorageServiceImpl/getVolume/responseEntity==" + responseEntity);
+            ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
+            Log.info("DmeStorageServiceImpl/getLogicPorts/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
-                resMap.put("code", code);
-                resMap.put("msg", "get volume error!");
-                return resMap;
+                resMap.put("code",code);
+                resMap.put("msg", "list bandports error!");
             }
-            Object object = responseEntity.getBody();
-            if (object != null) {
-                JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
-                JsonObject element = jsonObject.get("volume").getAsJsonObject();
-                Volume volume = new Volume();
-                volume.setId(element.get("id").getAsString());
-                volume.setName(element.get("name").getAsString());
-                volume.setStatus(element.get("status").getAsString());
-                volume.setAttached(Boolean.valueOf(element.get("attached").getAsString()));
-                volume.setAlloctype(element.get("alloctype").getAsString());
-                volume.setService_level_name(element.get("service_level_name").getAsString());
-                volume.setStorage_id(element.get("storage_id").getAsString());
-                volume.setPool_raw_id(element.get("pool_raw_id").getAsString());
-                volume.setCapacity_usage(element.get("capacity_usage").getAsString());
-                volume.setProtectionStatus(Boolean.valueOf(element.get("protectionStatus").getAsString()));
-                resMap.put("data", volume);
+            String object = responseEntity.getBody();
+            if (!StringUtils.isEmpty(object)) {
+                JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+                JsonArray jsonArray = jsonObject.get("logic_ports").getAsJsonArray();
+                for (JsonElement jsonElement : jsonArray) {
+                    JsonObject element = jsonElement.getAsJsonObject();
+                    LogicPorts logicPorts = new LogicPorts();
+                    logicPorts.setId(element.get("id").getAsString());
+                    logicPorts.setName(element.get("name").getAsString());
+                    logicPorts.setRunning_status(element.get("running_status").getAsString());
+                    logicPorts.setOperational_status(element.get("operational_status").getAsString());
+                    logicPorts.setMgmt_ip(element.get("mgmt_ip").getAsString());
+                    logicPorts.setMgmt_ipv6(element.get("mgmt_ipv6").getAsString());
+                    logicPorts.setHome_port_id(element.get("home_port_id").getAsString());
+                    logicPorts.setHome_port_name(element.get("home_port_name").getAsString());
+                    logicPorts.setRole(element.get("role").getAsString());
+                    logicPorts.setDdns_status(element.get("ddns_status").getAsString());
+                    logicPorts.setCurrent_port_id(element.get("current_port_id").getAsString());
+                    logicPorts.setCurrent_port_name(element.get("current_port_name").getAsString());
+                    logicPorts.setSupport_protocol(element.get("support_protocol").getAsString());
+                    logicPorts.setManagement_access(element.get("management_access").getAsString());
+                    logicPorts.setVstore_id( element.get("vstore_id").getAsString());
+                    logicPorts.setVstore_name(element.get("vstore_name").getAsString());
+                    resList.add(logicPorts);
+                }
+                resMap.put("data", resList);
             }
             return resMap;
         } catch (Exception e) {
-            Log.error("list volume error!");
+            Log.error("list bandports error", e);
             resMap.put("code", 503);
             resMap.put("msg", e.getMessage());
-        } finally {
+
+        }finally {
             return resMap;
         }
     }
 
-    private Map<String, Object> getVolumes(String storageId) {
+    @Override
+    public Map<String, Object> getVolumes(String storageId) {
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 200);
         resMap.put("msg", "list volumes success!");
@@ -322,13 +319,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         String reqPath = "https://localhost:26335/rest/blockservice/v1/volumes";
         String url = reqPath + "? storageId = " + storageId;
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-
         try {
             //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
-            ResponseEntity responseEntity = sendHttpRequest(url, HttpMethod.GET, headers);
+            ResponseEntity responseEntity = access(url, HttpMethod.GET,null);
             Log.info("DmeStorageServiceImpl/getVolumes/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -367,7 +360,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
     }
 
-    private Map<String, Object> getFileSystems(String storageId) {
+    @Override
+    public Map<String, Object> getFileSystems(String storageId) {
 
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 200);
@@ -429,7 +423,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
     }
 
-    private Map<String, Object> getDTrees(String storageId) {
+    @Override
+    public Map<String, Object> getDTrees(String storageId) {
 
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 200);
@@ -486,7 +481,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
     }
 
-    private Map<String, Object> getNfsShares(String storageId) {
+    @Override
+    public Map<String, Object> getNfsShares(String storageId) {
 
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 200);
@@ -541,21 +537,20 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
     }
 
-    private Map<String, Object> getBandPorts(String storageId) {
 
+    @Override
+    public Map<String,Object> getBandPorts(String storageId){
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 200);
         resMap.put("msg", "list band ports success!");
         resMap.put("storageId", storageId);
         List<BandPorts> resList = new ArrayList<>();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
         String url = "https://localhost:26335/rest/storagemgmt/v1/storage-port/bond-ports?storage_id" + storageId;
         try {
             ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
+            //ResponseEntity<String> responseEntity = access(url, HttpMethod.GET, null)
             Log.info("DmeStorageServiceImpl/getBandPorts/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -589,66 +584,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
     }
 
-    private Map<String, Object> getLogicPorts(String storageId) {
-
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put("code", 200);
-        resMap.put("msg", "list logic ports success!");
-        resMap.put("storageId", storageId);
-        List<LogicPorts> resList = new ArrayList<>();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-
-        String url = "https://localhost:26335/rest/storagemgmt/v1/storage-port/logic-ports?storage_id=" + storageId;
-        try {
-            ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
-            Log.info("DmeStorageServiceImpl/getLogicPorts/responseEntity==" + responseEntity);
-            int code = responseEntity.getStatusCodeValue();
-            if (code != 200) {
-                resMap.put("code", code);
-                resMap.put("msg", "list bandports error!");
-            }
-            String object = responseEntity.getBody();
-            if (!StringUtils.isEmpty(object)) {
-                JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-                JsonArray jsonArray = jsonObject.get("logic_ports").getAsJsonArray();
-                for (JsonElement jsonElement : jsonArray) {
-                    JsonObject element = jsonElement.getAsJsonObject();
-                    LogicPorts logicPorts = new LogicPorts();
-                    logicPorts.setId(element.get("id").getAsString());
-                    logicPorts.setName(element.get("name").getAsString());
-                    logicPorts.setRunning_status(element.get("running_status").getAsString());
-                    logicPorts.setOperational_status(element.get("operational_status").getAsString());
-                    logicPorts.setMgmt_ip(element.get("mgmt_ip").getAsString());
-                    logicPorts.setMgmt_ipv6(element.get("mgmt_ipv6").getAsString());
-                    logicPorts.setHome_port_id(element.get("home_port_id").getAsString());
-                    logicPorts.setHome_port_name(element.get("home_port_name").getAsString());
-                    logicPorts.setRole(element.get("role").getAsString());
-                    logicPorts.setDdns_status(element.get("ddns_status").getAsString());
-                    logicPorts.setCurrent_port_id(element.get("current_port_id").getAsString());
-                    logicPorts.setCurrent_port_name(element.get("current_port_name").getAsString());
-                    logicPorts.setSupport_protocol(element.get("support_protocol").getAsString());
-                    logicPorts.setManagement_access(element.get("management_access").getAsString());
-                    logicPorts.setVstore_id(element.get("vstore_id").getAsString());
-                    logicPorts.setVstore_name(element.get("vstore_name").getAsString());
-                    resList.add(logicPorts);
-                }
-                resMap.put("data", resList);
-            }
-            return resMap;
-        } catch (Exception e) {
-            Log.error("list bandports error", e);
-            resMap.put("code", 503);
-            resMap.put("msg", e.getMessage());
-
-        } finally {
-            return resMap;
-        }
-    }
-
-    private Map<String, Object> getStorageControllers() {
+    @Override
+    public Map<String,Object> getStorageControllers(){
 
         String className = "SYS_Controller";
         Map<String, Object> resMap = new HashMap<>();
@@ -662,9 +599,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
         String url = "https://localhost:26335/rest/resourcedb/v1/instances/" + className;
+
         try {
             //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
-            ResponseEntity responseEntity = sendHttpRequest(url, HttpMethod.GET, headers);
+            ResponseEntity responseEntity = access(url, HttpMethod.GET, null);
             Log.info("DmeStorageServiceImpl/getStorageControllers/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -697,7 +635,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
     }
 
-    private Map<String, Object> getStorageDisks() {
+    @Override
+    public Map<String,Object> getStorageDisks(){
 
         String className = "SYS_StorageDisk";
         Map<String, Object> resMap = new HashMap<>();
@@ -714,7 +653,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
         try {
             //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
-            ResponseEntity responseEntity = sendHttpRequest(url, HttpMethod.GET, headers);
+            ResponseEntity responseEntity = access(url, HttpMethod.GET, null);
             Log.info("DmeStorageServiceImpl/getStorageDisks/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -761,6 +700,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return responseEntity;
     }
 
+
     private ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws Exception {
 
         RestUtils restUtils = new RestUtils();
@@ -776,4 +716,60 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
         return responseEntity;
     }
+
+    @Override
+    public Map<String, Object> getVolume(String volumeId) {
+        Map<String, Object> resMap = new HashMap<>();
+        resMap.put("code", 200);
+        resMap.put("msg", "get volume success!");
+        resMap.put("volume", volumeId);
+
+        List<Volume> volumes = new ArrayList<>();
+
+        //String reqPath = "/rest/blockservice/v1/volumes/{volume_id}";
+        String reqPath = "https://localhost:26335/rest/blockservice/v1/volumes";
+        String url = reqPath + "/" + volumeId;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+
+        try {
+            //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
+            ResponseEntity responseEntity = sendHttpRequest(url, HttpMethod.GET, headers);
+            Log.info("DmeStorageServiceImpl/getVolume/responseEntity==" + responseEntity);
+            int code = responseEntity.getStatusCodeValue();
+            if (code != 200) {
+                resMap.put("code", code);
+                resMap.put("msg", "get volume error!");
+                return resMap;
+            }
+            Object object = responseEntity.getBody();
+            if (object != null) {
+                JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
+                JsonObject element = jsonObject.get("volume").getAsJsonObject();
+                Volume volume = new Volume();
+                volume.setId(element.get("id").getAsString());
+                volume.setName(element.get("name").getAsString());
+                volume.setStatus(element.get("status").getAsString());
+                volume.setAttached(Boolean.valueOf(element.get("attached").getAsString()));
+                volume.setAlloctype(element.get("alloctype").getAsString());
+                volume.setService_level_name(element.get("service_level_name").getAsString());
+                volume.setStorage_id(element.get("storage_id").getAsString());
+                volume.setPool_raw_id(element.get("pool_raw_id").getAsString());
+                volume.setCapacity_usage(element.get("capacity_usage").getAsString());
+                volume.setProtectionStatus(Boolean.valueOf(element.get("protectionStatus").getAsString()));
+                resMap.put("data", volume);
+            }
+            return resMap;
+        } catch (Exception e) {
+            Log.error("list volume error!");
+            resMap.put("code", 503);
+            resMap.put("msg", e.getMessage());
+        } finally {
+            return resMap;
+        }
+    }
+
+
 }

@@ -38,6 +38,10 @@
         <property name="url" value="${h2.url}"/>
     </bean>
 
+    <bean name="vcenterInfoDao" class="com.dmeplugin.dmestore.dao.VCenterInfoDao">
+        <property name="url" value="${h2.url}"/>
+    </bean>
+
     <bean name="InstantiationBeanServiceImpl"
           class="com.dmeplugin.dmestore.services.InstantiationBeanServiceImpl">
         <property name="systemService" ref="SystemServiceImpl"/>
@@ -50,6 +54,7 @@
 
     <bean name="VCenterInfoServiceImpl"
           class="com.dmeplugin.dmestore.services.VCenterInfoServiceImpl">
+        <property name="vCenterInfoDao" ref="vcenterInfoDao"/>
     </bean>
 
 
@@ -59,7 +64,7 @@
         <property name="url" value="${h2.url}"/>
     </bean>
 
-    <bean name="vmfsAccessService" class="com.dmeplugin.dmestore.services.VmfsAccessServiceImpl">
+    <bean name="VmfsAccessServiceImpl" class="com.dmeplugin.dmestore.services.VmfsAccessServiceImpl">
         <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="dataStoreStatisticHistoryService" ref="DataStoreStatisticHistoryService"/>
@@ -87,6 +92,7 @@
 
     <bean name="vmwareAccessService" class="com.dmeplugin.dmestore.services.VmwareAccessServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
+        <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
     </bean>
 
     <bean name="vmrdmService" class="com.dmeplugin.dmestore.services.VMRDMServiceImpl">
@@ -125,12 +131,14 @@
     </bean>
 
     <bean name="vCSDKUtils" class="com.dmeplugin.dmestore.utils.VCSDKUtils">
-        <property name="vcConnectionHelper" ref="vmwarePluginConnectionHelper"/>
+        <property name="vcConnectionHelper" ref="springBootConnectionHelper"/>
     </bean>
 
-    <bean name="vmwarePluginConnectionHelper" class="com.dmeplugin.vmware.VmwarePluginConnectionHelper">
-        <property name="userSessionService" ref="userSessionService"/>
-        <property name="vimObjectReferenceService" ref="vimObjectReferenceService"/>
+    <bean name="springBootConnectionHelper" class="com.dmeplugin.vmware.SpringBootConnectionHelper">
+        <property name="serverurl" value="10.143.132.123"/>
+        <property name="username" value="administrator@vsphere.local"/>
+        <property name="password" value="Pbu4@123"/>
+        <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
     </bean>
 
     <bean name="serviceLevelService" class="com.dmeplugin.dmestore.services.ServiceLevelServiceImpl">
@@ -141,5 +149,11 @@
     <bean name="dmeRelationInstanceService" class="com.dmeplugin.dmestore.services.DmeRelationInstanceServiceImpl">
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
     </bean>
+
+    <bean name="PluginRegisterServiceImpl" class="com.dmeplugin.dmestore.services.PluginRegisterServiceImpl">
+
+    </bean>
+
+
 
 </beans>
