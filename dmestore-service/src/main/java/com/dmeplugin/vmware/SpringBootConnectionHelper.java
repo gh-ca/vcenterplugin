@@ -5,14 +5,15 @@ import com.dmeplugin.dmestore.services.VCenterInfoService;
 import com.dmeplugin.dmestore.utils.CipherUtils;
 import com.dmeplugin.vmware.util.TestVmwareContextFactory;
 import com.dmeplugin.vmware.util.VmwareContext;
-import com.vmware.vim25.ManagedObjectReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class SpringBootConnectionHelper extends VCConnectionHelper{
 
+    private static final Logger log = LoggerFactory.getLogger(SpringBootConnectionHelper.class);
     private VCenterInfoService vCenterInfoService;
 
     public VCenterInfoService getvCenterInfoService() {
@@ -36,6 +37,7 @@ public class SpringBootConnectionHelper extends VCConnectionHelper{
             }
         } catch (Exception e) {
             e.printStackTrace();
+            log.error("获取本地vcenter信息出错");
         }
         return TestVmwareContextFactory.getContext(getServerurl(),getServerport(),getUsername(),getPassword());
     }
