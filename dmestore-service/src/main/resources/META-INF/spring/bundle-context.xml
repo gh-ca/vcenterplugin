@@ -148,9 +148,10 @@
     </bean>
 
     <bean name="springBootConnectionHelper" class="com.dmeplugin.vmware.SpringBootConnectionHelper">
-        <property name="serverurl" value="10.143.132.123"/>
+        <property name="serverurl" value="10.143.132.248"/>
         <property name="username" value="administrator@vsphere.local"/>
         <property name="password" value="Pbu4@123"/>
+        <property name="serverport" value="443"/>
         <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
     </bean>
 
