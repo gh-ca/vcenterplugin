@@ -24,6 +24,87 @@ public class StorageDetail {
     private Double freeEffectiveCapacity;
     private String location;
     private String[] azIds;
+    private String storagePool;
+    private String volume;
+    private String fileSystem;
+    private String dTrees;
+    private String nfsShares;
+    private String bandPorts;
+    private String logicPorts;
+    private String storageControllers;
+    private String storageDisks;
+
+    public String getStoragePool() {
+        return storagePool;
+    }
+
+    public void setStoragePool(String storagePool) {
+        this.storagePool = storagePool;
+    }
+
+    public String getVolume() {
+        return volume;
+    }
+
+    public void setVolume(String volume) {
+        this.volume = volume;
+    }
+
+    public String getFileSystem() {
+        return fileSystem;
+    }
+
+    public void setFileSystem(String fileSystem) {
+        this.fileSystem = fileSystem;
+    }
+
+    public String getdTrees() {
+        return dTrees;
+    }
+
+    public void setdTrees(String dTrees) {
+        this.dTrees = dTrees;
+    }
+
+    public String getNfsShares() {
+        return nfsShares;
+    }
+
+    public void setNfsShares(String nfsShares) {
+        this.nfsShares = nfsShares;
+    }
+
+    public String getBandPorts() {
+        return bandPorts;
+    }
+
+    public void setBandPorts(String bandPorts) {
+        this.bandPorts = bandPorts;
+    }
+
+    public String getLogicPorts() {
+        return logicPorts;
+    }
+
+    public void setLogicPorts(String logicPorts) {
+        this.logicPorts = logicPorts;
+    }
+
+    public String getStorageControllers() {
+        return storageControllers;
+    }
+
+    public void setStorageControllers(String storageControllers) {
+        this.storageControllers = storageControllers;
+    }
+
+    public String getStorageDisks() {
+        return storageDisks;
+    }
+
+    public void setStorageDisks(String storageDisks) {
+        this.storageDisks = storageDisks;
+    }
 
     public String getId() {
         return id;

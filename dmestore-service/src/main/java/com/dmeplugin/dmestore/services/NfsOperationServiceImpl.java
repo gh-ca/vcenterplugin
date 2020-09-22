@@ -1,6 +1,5 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.TaskDetailInfo;
 import com.dmeplugin.dmestore.model.TaskDetailResource;
 import com.dmeplugin.dmestore.mvc.VmfsOperationController;

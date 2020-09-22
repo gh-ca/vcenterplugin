@@ -14,12 +14,11 @@
     <context:property-placeholder location="classpath:application.properties"/>
 
    <bean name="EchoServiceImpl" class="com.dmeplugin.dmestore.services.EchoServiceImpl">
-       <property name="_userSessionService" ref="userSessionService"/>
-       <property name="_vimObjectReferenceService" ref="vimObjectReferenceService"/>
+
    </bean>
 
    <bean name="SampleActionServiceImpl" class="com.dmeplugin.dmestore.services.SampleActionServiceImpl">
-        <constructor-arg index="0" ref="vimObjectReferenceService"/>
+
    </bean>
 
     <bean name="dmeInfoDao" class="com.dmeplugin.dmestore.dao.DmeInfoDao">
@@ -38,6 +37,10 @@
         <property name="url" value="${h2.url}"/>
     </bean>
 
+    <bean name="vcenterInfoDao" class="com.dmeplugin.dmestore.dao.VCenterInfoDao">
+        <property name="url" value="${h2.url}"/>
+    </bean>
+
     <bean name="InstantiationBeanServiceImpl"
           class="com.dmeplugin.dmestore.services.InstantiationBeanServiceImpl">
         <property name="systemService" ref="SystemServiceImpl"/>
@@ -50,10 +53,21 @@
 
     <bean name="VCenterInfoServiceImpl"
           class="com.dmeplugin.dmestore.services.VCenterInfoServiceImpl">
+        <property name="vCenterInfoDao" ref="vcenterInfoDao"/>
     </bean>
 
+    <bean name="serviceLevelService" class="com.dmeplugin.dmestore.services.ServiceLevelServiceImpl">
+        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
+        <property name="dmeStorageService" ref="dmeStorageService"/>
+        <property name="dmeRelationInstanceService" ref="dmeRelationInstanceService"/>
+    </bean>
+
+    <bean name="dmeRelationInstanceService" class="com.dmeplugin.dmestore.services.DmeRelationInstanceServiceImpl">
+        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
+    </bean>
 
     <bean name="dmeStorageService" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
+        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
     </bean>
     <bean name="dmeVmwareRalationDao" class="com.dmeplugin.dmestore.dao.DmeVmwareRalationDao">
         <property name="url" value="${h2.url}"/>
@@ -72,6 +86,7 @@
           class="com.dmeplugin.dmestore.services.DataStoreStatisticHistoryServiceImpl">
     </bean>
 
+
     <bean name="taskService" class="com.dmeplugin.dmestore.services.TaskServiceImpl">
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
     </bean>
@@ -84,6 +99,9 @@
         <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
         <property name="taskService" ref="taskService"/>
     </bean>
+
+    <bean name="vmfsOperationService" class="com.dmeplugin.dmestore.services.VmfsOperationServiceImpl"/>
+
 
     <bean name="vmwareAccessService" class="com.dmeplugin.dmestore.services.VmwareAccessServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
@@ -126,20 +144,29 @@
     </bean>
 
     <bean name="vCSDKUtils" class="com.dmeplugin.dmestore.utils.VCSDKUtils">
-        <property name="vcConnectionHelper" ref="vmwarePluginConnectionHelper"/>
+        <property name="vcConnectionHelper" ref="springBootConnectionHelper"/>
     </bean>
 
-    <bean name="vmwarePluginConnectionHelper" class="com.dmeplugin.vmware.VmwarePluginConnectionHelper">
-        <property name="userSessionService" ref="userSessionService"/>
-        <property name="vimObjectReferenceService" ref="vimObjectReferenceService"/>
+    <bean name="springBootConnectionHelper" class="com.dmeplugin.vmware.SpringBootConnectionHelper">
+        <property name="serverurl" value="10.143.132.123"/>
+        <property name="username" value="administrator@vsphere.local"/>
+        <property name="password" value="Pbu4@123"/>
+        <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
     </bean>
 
-    <bean name="dmeRelationInstanceService" class="com.dmeplugin.dmestore.services.DmeRelationInstanceServiceImpl">
+    
+    <bean name="nfsOperationService" class="com.dmeplugin.dmestore.services.NfsOperationServiceImpl"/>
+
+
+    <bean name="PluginRegisterServiceImpl" class="com.dmeplugin.dmestore.services.PluginRegisterServiceImpl">
+
     </bean>
+
 
     <bean name="nfsOperationService" class="com.dmeplugin.dmestore.services.NfsOperationServiceImpl"/>
     <bean name="vmfsOperationService" class="com.dmeplugin.dmestore.services.VmfsOperationServiceImpl"/>
     <bean name="dmeStorageService" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
     </bean>
+
 
 </beans>
