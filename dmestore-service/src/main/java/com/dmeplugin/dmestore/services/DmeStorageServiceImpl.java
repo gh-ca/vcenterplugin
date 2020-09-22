@@ -3,6 +3,7 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.utils.HttpRequestUtil;
 import com.dmeplugin.dmestore.utils.RestUtils;
+import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -662,4 +663,191 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
         return responseEntity;
     }
+
+    @Override
+    public List<EthPortInfo> getStorageEthPorts(String storageSn) throws Exception{
+        List<EthPortInfo> relists = null;
+        try {
+            if (!StringUtils.isEmpty(storageSn)) {
+                //通过存储设备的sn查询 存储设备的资源ID
+                String dsResId = getStorageResIdBySn(storageSn);
+                if(!StringUtils.isEmpty(dsResId)){
+                    relists = getEthPortsByResId(dsResId);
+                }else{
+                    throw new Exception("get Storage ResId By Sn error:resId is null");
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("get Storage Eth Ports error:", e);
+            throw e;
+        }
+        LOG.info("getStorageEthPorts relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        return relists;
+    }
+    //通过存储设备的sn查询 存储设备的资源ID
+    public String getStorageResIdBySn(String storageSn){
+        String dsResId = null;
+        try {
+            if (!StringUtils.isEmpty(storageSn)) {
+                String stordeviceIdUrl = DmeConstants.DME_RES_STORDEVICEID_QUERY_URL;
+                JsonObject condition = new JsonObject();
+
+                JsonArray constraint = new JsonArray();
+
+                JsonObject consObj = new JsonObject();
+                JsonObject simple = new JsonObject();
+                simple.addProperty("name","dataStatus");
+                simple.addProperty("operator","equal");
+                simple.addProperty("value","normal");
+                consObj.add("simple",simple);
+                constraint.add(consObj);
+
+                JsonObject consObj1 = new JsonObject();
+                JsonObject simple1 = new JsonObject();
+                simple1.addProperty("name","sn");
+                simple1.addProperty("operator","equal");
+                simple1.addProperty("value",storageSn);
+                consObj1.add("simple",simple1);
+                consObj1.addProperty("logOp","and");
+                constraint.add(consObj1);
+
+                condition.add("constraint",constraint);
+
+                stordeviceIdUrl = stordeviceIdUrl+"?condition="+condition.toString();
+                LOG.info("stordeviceIdUrl===" + stordeviceIdUrl);
+                try {
+                    ResponseEntity responseEntity = access(stordeviceIdUrl, HttpMethod.GET, null);
+                    LOG.info("stordeviceIdUrl responseEntity==" + responseEntity.toString());
+                    if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
+                        JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                        if (jsonObject != null && jsonObject.get("objList") != null) {
+                            JsonArray objList = jsonObject.getAsJsonArray("objList");
+                            if (objList != null && objList.size() > 0) {
+                                JsonObject vjson = objList.get(0).getAsJsonObject();
+                                if (vjson != null) {
+                                    dsResId = ToolUtils.jsonToStr(vjson.get("id"));
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    LOG.error("DME link error url:" + stordeviceIdUrl + ",error:" + e.toString());
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("get Storage ResId By Sn error:", e);
+            throw e;
+        }
+        LOG.info("getStorageResIdBySn dsResId===" + dsResId);
+        return dsResId;
+    }
+    //通过资源管理API查询Eth接口
+    public List<EthPortInfo> getEthPortsByResId(String dsResId){
+        List<EthPortInfo> relists = null;
+        try {
+            if (!StringUtils.isEmpty(dsResId)) {
+                String ethPortUrl = DmeConstants.DME_STORDEVICE_ETHPORT_QUERY_URL;
+                JsonObject condition = new JsonObject();
+
+                JsonArray constraint = new JsonArray();
+
+                JsonObject consObj = new JsonObject();
+                JsonObject simple = new JsonObject();
+                simple.addProperty("name","dataStatus");
+                simple.addProperty("operator","equal");
+                simple.addProperty("value","normal");
+                consObj.add("simple",simple);
+                constraint.add(consObj);
+
+                JsonObject consObj1 = new JsonObject();
+                JsonObject simple1 = new JsonObject();
+                simple1.addProperty("name","portType");
+                simple1.addProperty("operator","equal");
+                simple1.addProperty("value","ETH");
+                consObj1.add("simple",simple1);
+                consObj1.addProperty("logOp","and");
+                constraint.add(consObj1);
+
+                JsonObject consObj2 = new JsonObject();
+                JsonObject simple2 = new JsonObject();
+                simple2.addProperty("name","storageDeviceId");
+                simple2.addProperty("operator","equal");
+                simple2.addProperty("value",dsResId);
+                consObj2.add("simple",simple2);
+                consObj2.addProperty("logOp","and");
+                constraint.add(consObj2);
+
+                condition.add("constraint",constraint);
+
+                ethPortUrl = ethPortUrl+"?condition="+condition.toString();
+                LOG.info("ethPortUrl===" + ethPortUrl);
+                try {
+                    ResponseEntity responseEntity = access(ethPortUrl, HttpMethod.GET, null);
+                    LOG.info("getWorkLoads responseEntity==" + responseEntity.toString());
+                    if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
+                        JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                        if (jsonObject != null && jsonObject.get("objList") != null) {
+                            JsonArray objList = jsonObject.getAsJsonArray("objList");
+                            if (objList != null && objList.size() > 0) {
+                                relists = new ArrayList<>();
+                                for (int i = 0; i < objList.size(); i++) {
+                                    JsonObject vjson = objList.get(i).getAsJsonObject();
+                                    if (vjson != null) {
+                                        EthPortInfo ethPort = new EthPortInfo();
+                                        ethPort.setOwnerType(ToolUtils.jsonToStr(vjson.get("ownerType")));
+                                        ethPort.setIpv4Mask(ToolUtils.jsonToStr(vjson.get("ipv4Mask")));
+                                        ethPort.setLogicalType(ToolUtils.jsonToStr(vjson.get("logicalType")));
+                                        ethPort.setStorageDeviceId(ToolUtils.jsonToStr(vjson.get("storageDeviceId")));
+                                        ethPort.setPortName(ToolUtils.jsonToStr(vjson.get("portName")));
+                                        ethPort.setOwnerId(ToolUtils.jsonToStr(vjson.get("ownerId")));
+                                        ethPort.setPortId(ToolUtils.jsonToStr(vjson.get("portId")));
+                                        ethPort.setBondName(ToolUtils.jsonToStr(vjson.get("bondName")));
+                                        ethPort.setMac(ToolUtils.jsonToStr(vjson.get("mac")));
+                                        ethPort.setMgmtIpv6(ToolUtils.jsonToStr(vjson.get("mgmtIpv6")));
+                                        ethPort.setIscsiName(ToolUtils.jsonToStr(vjson.get("iscsiName")));
+                                        ethPort.setOwnerName(ToolUtils.jsonToStr(vjson.get("ownerName")));
+                                        ethPort.setLastMonitorTime(ToolUtils.jsonToLon(vjson.get("lastMonitorTime"),0L));
+                                        ethPort.setMgmtIp(ToolUtils.jsonToStr(vjson.get("mgmtIp")));
+                                        ethPort.setConfirmStatus(ToolUtils.jsonToStr(vjson.get("confirmStatus")));
+                                        ethPort.setId(ToolUtils.jsonToStr(vjson.get("id")));
+                                        ethPort.setLastModified(ToolUtils.jsonToLon(vjson.get("last_Modified"),0L));
+                                        ethPort.setConnectStatus(ToolUtils.jsonToStr(vjson.get("connectStatus")));
+                                        ethPort.setClassId(ToolUtils.jsonToInt(vjson.get("classId"),0));
+                                        ethPort.setDataStatus(ToolUtils.jsonToStr(vjson.get("dataStatus")));
+                                        ethPort.setMaxSpeed(ToolUtils.jsonToInt(vjson.get("maxSpeed"),0));
+                                        ethPort.setResId(ToolUtils.jsonToStr(vjson.get("resId")));
+                                        ethPort.setLocal(ToolUtils.jsonToBoo(vjson.get("isLocal")));
+                                        ethPort.setPortType(ToolUtils.jsonToStr(vjson.get("portType")));
+                                        ethPort.setClassName(ToolUtils.jsonToStr(vjson.get("className")));
+                                        ethPort.setNumberOfInitiators(ToolUtils.jsonToInt(vjson.get("numberOfInitiators"),0));
+                                        ethPort.setBondId(ToolUtils.jsonToStr(vjson.get("bondId")));
+                                        ethPort.setRegionId(ToolUtils.jsonToStr(vjson.get("regionId")));
+                                        ethPort.setName(ToolUtils.jsonToStr(vjson.get("name")));
+                                        ethPort.setLocation(ToolUtils.jsonToStr(vjson.get("location")));
+                                        ethPort.setNativeId(ToolUtils.jsonToStr(vjson.get("nativeId")));
+                                        ethPort.setDataSource(ToolUtils.jsonToStr(vjson.get("dataSource")));
+                                        ethPort.setIpv6Mask(ToolUtils.jsonToStr(vjson.get("ipv6Mask")));
+                                        ethPort.setStatus(ToolUtils.jsonToStr(vjson.get("status")));
+                                        ethPort.setSpeed(ToolUtils.jsonToInt(vjson.get("speed"),0));
+                                        ethPort.setWwn(ToolUtils.jsonToStr(vjson.get("wwn")));
+                                        ethPort.setSfpStatus(ToolUtils.jsonToStr(vjson.get("sfpStatus")));
+
+                                        relists.add(ethPort);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    LOG.error("DME link error url:" + ethPortUrl + ",error:" + e.toString());
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("get EthPorts By ResId error:", e);
+            throw e;
+        }
+        LOG.info("getEthPortsByResId relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        return relists;
+    }
+
 }
