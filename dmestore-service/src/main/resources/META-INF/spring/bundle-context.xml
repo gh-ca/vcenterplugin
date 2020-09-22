@@ -56,10 +56,11 @@
         <property name="vCenterInfoDao" ref="vcenterInfoDao"/>
     </bean>
 
-    <bean name="serviceLevelService" class="com.dmeplugin.dmestore.services.ServiceLevelServiceImpl">
+    <bean name="ServiceLevelServiceImpl" class="com.dmeplugin.dmestore.services.ServiceLevelServiceImpl">
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="dmeStorageService" ref="dmeStorageService"/>
         <property name="dmeRelationInstanceService" ref="dmeRelationInstanceService"/>
+        <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
 
     <bean name="dmeRelationInstanceService" class="com.dmeplugin.dmestore.services.DmeRelationInstanceServiceImpl">
@@ -148,9 +149,10 @@
     </bean>
 
     <bean name="springBootConnectionHelper" class="com.dmeplugin.vmware.SpringBootConnectionHelper">
-        <property name="serverurl" value="10.143.132.123"/>
+        <property name="serverurl" value="10.143.132.248"/>
         <property name="username" value="administrator@vsphere.local"/>
         <property name="password" value="Pbu4@123"/>
+        <property name="serverport" value="443"/>
         <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
     </bean>
 
@@ -162,10 +164,8 @@
 
     </bean>
 
-
-    <bean name="nfsOperationService" class="com.dmeplugin.dmestore.services.NfsOperationServiceImpl"/>
-    <bean name="vmfsOperationService" class="com.dmeplugin.dmestore.services.VmfsOperationServiceImpl"/>
-    <bean name="dmeStorageService" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
+    <bean name="hostAccessService" class="com.dmeplugin.dmestore.services.HostAccessServiceImpl">
+        <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
 
 
