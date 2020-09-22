@@ -57,6 +57,11 @@
         <property name="vCenterInfoDao" ref="vcenterInfoDao"/>
     </bean>
 
+    <bean name="serviceLevelService" class="com.dmeplugin.dmestore.services.ServiceLevelServiceImpl">
+    </bean>
+
+    <bean name="dmeRelationInstanceService" class="com.dmeplugin.dmestore.services.DmeRelationInstanceServiceImpl">
+    </bean>
 
     <bean name="dmeStorageService" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
     </bean>
@@ -89,6 +94,9 @@
         <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
         <property name="taskService" ref="taskService"/>
     </bean>
+
+    <bean name="vmfsOperationService" class="com.dmeplugin.dmestore.services.VmfsOperationServiceImpl"/>
+
 
     <bean name="vmwareAccessService" class="com.dmeplugin.dmestore.services.VmwareAccessServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
@@ -141,11 +149,14 @@
         <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
     </bean>
 
-    <bean name="serviceLevelService" class="com.dmeplugin.dmestore.services.ServiceLevelServiceImpl">
+   <bean name="serviceLevelService" class="com.dmeplugin.dmestore.services.ServiceLevelServiceImpl">
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="dmeStorageService" ref="dmeStorageService"/>
         <property name="dmeRelationInstanceService" ref="dmeRelationInstanceService"/>
     </bean>
+    
+    <bean name="nfsOperationService" class="com.dmeplugin.dmestore.services.NfsOperationServiceImpl"/>
+
     <bean name="dmeRelationInstanceService" class="com.dmeplugin.dmestore.services.DmeRelationInstanceServiceImpl">
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
     </bean>
