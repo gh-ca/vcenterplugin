@@ -63,5 +63,10 @@
    <osgi:reference id="vmfsAccessService"
                    interface="com.dmeplugin.dmestore.services.VmfsAccessService" />
 
+   <osgi:reference id="pluginRegisterService"
+                   interface="com.dmeplugin.dmestore.services.PluginRegisterService" />
+
+   <osgi:reference id="vCenterInfoService"
+                   interface="com.dmeplugin.dmestore.services.VCenterInfoService" />
 </beans>
 

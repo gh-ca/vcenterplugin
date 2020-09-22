@@ -1,7 +1,5 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.model.Storage;
-
 import java.util.Map;
 
 /**
@@ -33,4 +31,7 @@ public interface DmeStorageService {
     Map<String, Object> getStorageControllers();
 
     Map<String, Object> getStorageDisks();
+
+    Map<String, Object> getVolume(String volumeId);
+
 }
