@@ -2,10 +2,7 @@ package com.dmeplugin.dmestore.mvc;
 
 import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
-import com.dmeplugin.dmestore.services.DmeAccessService;
-import com.dmeplugin.dmestore.services.SystemService;
-import com.dmeplugin.dmestore.services.VCenterInfoService;
-import com.dmeplugin.dmestore.services.VmwareAccessService;
+import com.dmeplugin.dmestore.services.*;
 import com.dmeplugin.dmestore.utils.CipherUtils;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.vmware.SpringBootConnectionHelper;
@@ -31,17 +28,7 @@ public class PluginRegisterController extends BaseController {
     private Gson gson = new Gson();
 
     @Autowired
-    private DmeAccessService dmeAccessService;
-
-    @Autowired
-    private SystemService systemService;
-
-    @Autowired
-    private VCenterInfoService vCenterInfoService;
-
-
-    @Autowired
-    private VCConnectionHelper vcConnectionHelper;
+    private PluginRegisterService pluginRegisterService;
 
 
     @RequestMapping(value = "/pluginaction", method = RequestMethod.POST)
@@ -61,30 +48,9 @@ public class PluginRegisterController extends BaseController {
         boolean isRemoveData = false;
         synchronized (lock) {
             try {
-                Map<String, Object> remap=new HashMap<>();
+                Map<String, Object> remap;
                 if ("install".equals(action)) {
-                    //保存vcenter信息
-                    VCenterInfo vCenterInfo=new VCenterInfo();
-                    vCenterInfo.setHostIp(vcenterIP);
-                    vCenterInfo.setUserName(vcenterUsername);
-                    vCenterInfo.setPassword(CipherUtils.encryptString(vcenterPassword));
-                    vCenterInfo.setHostPort(Integer.parseInt(vcenterPort));
-                    vCenterInfoService.addVCenterInfo(vCenterInfo);
-
-                    vcConnectionHelper.setServerurl("https://"+vcenterIP+":"+vcenterPort+"/sdk");
-                    vcConnectionHelper.setUsername(vcenterUsername);
-                    vcConnectionHelper.setPassword(vcenterPassword);
-
-                    if (!"".equalsIgnoreCase(dmeIp)) {
-                        //调用接口，创建dme连接信息
-                        Map params = new HashMap();
-                        params.put("hostIp", dmeIp);
-                        params.put("hostPort", dmePort);
-                        params.put("userName", dmeUsername);
-                        params.put("password", dmePassword);
-                         remap = dmeAccessService.accessDme(params);
-
-                    }
+                    remap=pluginRegisterService.installService(vcenterIP,vcenterPort,vcenterUsername,vcenterPassword,dmeIp,dmePort,dmeUsername,dmePassword);
                     if (remap != null && remap.get(RestUtils.RESPONSE_STATE_CODE) != null
                             && RestUtils.RESPONSE_STATE_200.equals(remap.get(RestUtils.RESPONSE_STATE_CODE).toString())) {
                         return success(remap);
@@ -96,7 +62,7 @@ public class PluginRegisterController extends BaseController {
                     isRemoveData = (removeData != null && ("1".equals(removeData) || Boolean
                             .valueOf(removeData)));
                     if (isRemoveData)
-                        systemService.cleanData();
+                        pluginRegisterService.uninstallService();
                 }
                 return success();
             } catch (Exception e) {

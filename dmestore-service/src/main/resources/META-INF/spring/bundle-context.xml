@@ -38,6 +38,10 @@
         <property name="url" value="${h2.url}"/>
     </bean>
 
+    <bean name="vcenterInfoDao" class="com.dmeplugin.dmestore.dao.VCenterInfoDao">
+        <property name="url" value="${h2.url}"/>
+    </bean>
+
     <bean name="InstantiationBeanServiceImpl"
           class="com.dmeplugin.dmestore.services.InstantiationBeanServiceImpl">
         <property name="systemService" ref="SystemServiceImpl"/>
@@ -50,6 +54,7 @@
 
     <bean name="VCenterInfoServiceImpl"
           class="com.dmeplugin.dmestore.services.VCenterInfoServiceImpl">
+        <property name="vCenterInfoDao" ref="vcenterInfoDao"/>
     </bean>
 
 
@@ -126,15 +131,23 @@
     </bean>
 
     <bean name="vCSDKUtils" class="com.dmeplugin.dmestore.utils.VCSDKUtils">
-        <property name="vcConnectionHelper" ref="vmwarePluginConnectionHelper"/>
+        <property name="vcConnectionHelper" ref="springBootConnectionHelper"/>
     </bean>
 
-    <bean name="vmwarePluginConnectionHelper" class="com.dmeplugin.vmware.VmwarePluginConnectionHelper">
-        <property name="userSessionService" ref="userSessionService"/>
-        <property name="vimObjectReferenceService" ref="vimObjectReferenceService"/>
+    <bean name="springBootConnectionHelper" class="com.dmeplugin.vmware.SpringBootConnectionHelper">
+        <property name="serverurl" value="10.143.132.123"/>
+        <property name="username" value="administrator@vsphere.local"/>
+        <property name="password" value="Pbu4@123"/>
+        <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
     </bean>
 
     <bean name="dmeRelationInstanceService" class="com.dmeplugin.dmestore.services.DmeRelationInstanceServiceImpl">
     </bean>
+
+    <bean name="PluginRegisterServiceImpl" class="com.dmeplugin.dmestore.services.PluginRegisterServiceImpl">
+
+    </bean>
+
+
 
 </beans>
