@@ -94,7 +94,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             Object dataStoreObjectId = params.get("dataStoreObjectId");
             String result = "";
             if (dataStoreObjectId != null) {
-                result = vcsdkUtils.renameDataStore(oldDsName.toString(), newDsName.toString(), dataStoreObjectId.toString());
+                result = vcsdkUtils.renameDataStore(newDsName.toString(), dataStoreObjectId.toString());
             }
             //ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, reqBody);
             ResponseEntity<String> responseEntity = access(url, HttpMethod.PUT, reqBody);
