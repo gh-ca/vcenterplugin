@@ -48,6 +48,10 @@ public class TaggingWorkflow {
         return this.categoryService.create(createSpec);
     }
 
+    public String createTagCategory(CategoryTypes.CreateSpec createSpec) {
+        return this.categoryService.create(createSpec);
+    }
+
     public List<String> listTagCategory() {
 
         return this.categoryService.list();
@@ -118,6 +122,10 @@ public class TaggingWorkflow {
     //list tags
     public List<String> listTags() {
         return this.taggingService.list();
+    }
+
+    public List<String> listTagsForCategory(String categoryid) {
+        return this.taggingService.listTagsForCategory(categoryid);
     }
 
     public TagModel getTag(String tagId) {

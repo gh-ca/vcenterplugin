@@ -5,9 +5,16 @@ import com.dmeplugin.dmestore.model.ServiceLevelInfo;
 import com.dmeplugin.dmestore.model.StoragePool;
 import com.dmeplugin.dmestore.model.Volume;
 import com.dmeplugin.dmestore.utils.ToolUtils;
+import com.dmeplugin.vmware.autosdk.SessionHelper;
+import com.dmeplugin.vmware.autosdk.TaggingWorkflow;
 import com.google.gson.*;
+import com.vmware.cis.tagging.CategoryModel;
+import com.vmware.cis.tagging.CategoryTypes;
+import com.vmware.cis.tagging.Tag;
+import com.vmware.cis.tagging.TagModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
@@ -23,8 +30,11 @@ import java.util.*;
 public class ServiceLevelServiceImpl implements ServiceLevelService {
     private static final Logger log = LoggerFactory.getLogger(ServiceLevelServiceImpl.class);
 
-    private Gson gson = new Gson();
+
+    private Gson gson=new Gson();
+    @Autowired
     private DmeAccessService dmeAccessService;
+    @Autowired
     private DmeRelationInstanceService dmeRelationInstanceService;
     private DmeStorageService dmeStorageService;
 
@@ -84,6 +94,88 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             return remap;
         }
         return remap;
+    }
+
+    public void updateVmwarePolicy(){
+        try {
+            String categoryid=getCategoryID();
+            SessionHelper sessionHelper=new SessionHelper();
+            sessionHelper.login("10.143.132.248","administrator@vsphere.local","Pbu4@123");
+            TaggingWorkflow taggingWorkflow=new TaggingWorkflow(sessionHelper);
+            List<TagModel> tagModels=getAllTagsByCategoryId(categoryid,sessionHelper);
+        ResponseEntity  responseEntity = dmeAccessService.access(LIST_SERVICE_LEVEL_URL, HttpMethod.GET, null);
+        Object object =responseEntity.getBody();
+        JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
+        JsonArray jsonArray = jsonObject.get("service-levels").getAsJsonArray();
+            List<TagModel> alreadyhasList=new ArrayList<>();
+            for (JsonElement jsonElement : jsonArray) {
+                    JsonObject object1 = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
+                    String name = object1.get("name").getAsString();
+                   boolean alreadyhas=false;
+                    for (TagModel tagModel:tagModels){
+                        if (tagModel.getName().equalsIgnoreCase(name))
+                        {
+                            alreadyhasList.add(tagModel);
+                            alreadyhas=true;
+                            break;
+                        }
+                    }
+                    if (!alreadyhas) {
+                        String taggingId = taggingWorkflow.createTag(name, "", categoryid);
+                        //创建虚拟机存储策略
+                    }
+            }
+            tagModels.removeAll(alreadyhasList);
+
+            //删除多余的tag，虚拟机存储策略
+
+
+        log.info("ssss");
+        } catch (Exception e) {
+            log.error("list serviceLevel error", e);
+        }
+    }
+
+    private List<TagModel> getAllTagsByCategoryId(String categoryid,SessionHelper sessionHelper){
+        List<TagModel> tagList=new ArrayList<>();
+        TaggingWorkflow taggingWorkflow=new TaggingWorkflow(sessionHelper);
+        List<String> tags=taggingWorkflow.listTagsForCategory(categoryid);
+        for (String tagid:tags){
+            tagList.add(taggingWorkflow.getTag(tagid));
+        }
+        return tagList;
+
+    }
+
+    private String getCategoryID() throws Exception {
+        String categoryid="";
+
+
+        SessionHelper sessionHelper=new SessionHelper();
+        sessionHelper.login("10.143.132.248","administrator@vsphere.local","Pbu4@123");
+        TaggingWorkflow taggingWorkflow=new TaggingWorkflow(sessionHelper);
+
+        List<String> categorylist=taggingWorkflow.listTagCategory();
+        for (String category:categorylist){
+            CategoryModel categoryModel=taggingWorkflow.getTagCategory(category);
+            if(categoryModel.getName().equalsIgnoreCase("DME Service Level")){
+                categoryid=categoryModel.getId();
+            }
+        }
+        if ("".equalsIgnoreCase(categoryid)){
+            //创建category
+            CategoryTypes.CreateSpec createSpec = new CategoryTypes.CreateSpec();
+            createSpec.setName("DME Service Level");
+
+            createSpec.setCardinality(CategoryModel.Cardinality.SINGLE);
+
+            Set<String> associableTypes = new HashSet<String>(); // empty hash set
+            associableTypes.add("Datastore");
+            createSpec.setAssociableTypes(associableTypes);
+            categoryid=taggingWorkflow.createTagCategory(createSpec);
+        }
+
+        return categoryid;
     }
 
     // convert the api responseBody to ServiceLevelInfo Bean list

@@ -44,7 +44,7 @@ public class ServiceLevelController extends BaseController {
         return failure(errMsg);
     }
 
-    @RequestMapping(value = "/listStoragePoolsByServiceLevelId", method = RequestMethod.POST)
+        @RequestMapping(value = "/listStoragePoolsByServiceLevelId", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean listStoragePoolsByServiceLevelId(@RequestBody String serviceLevelId) throws Exception {
         LOG.info("servicelevel/listStoragePoolsByServiceLevelId params==" + serviceLevelId);
@@ -74,5 +74,17 @@ public class ServiceLevelController extends BaseController {
             e.printStackTrace();
         }
         return failure(errMsg);
+    }
+
+    /**
+     * manual update service level
+     */
+    @RequestMapping(value = "/manualupdate", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean manualupdate()
+            throws Exception {
+        serviceLevelService.updateVmwarePolicy();
+
+        return success();
     }
 }

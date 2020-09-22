@@ -14,12 +14,14 @@ import java.util.Map;
  * @create: 2020-09-02
  **/
 public interface ServiceLevelService {
-    //服务等级列表
+ //服务等级列表
     Map<String, Object> listServiceLevel(Map<String, Object> params);
 
-    //服务等级关联的storagePool
+
+     //服务等级关联的storagePool
     List<StoragePool> getStoragePoolInfosByServiceLevelId(String serviceLevelId) throws Exception;
 
     List<Volume> getVolumeInfosByServiceLevelId(String serviceLevelId) throws Exception;
-
+    
+    void updateVmwarePolicy();
 }
