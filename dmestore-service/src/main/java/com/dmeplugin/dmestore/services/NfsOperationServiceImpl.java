@@ -25,13 +25,10 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
     public static final Logger LOG = LoggerFactory.getLogger(VmfsOperationController.class);
 
-    @Autowired
     private DmeAccessService dmeAccessServiceImpl;
 
-    @Autowired
     private TaskService taskService;
 
-    @Autowired
     private DmeStorageService dmeStorageService;
 
     private Gson gson = new Gson();

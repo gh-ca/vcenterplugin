@@ -102,4 +102,74 @@ public class DmeStorageController extends BaseController{
         }
         return failure(gson.toJson(resMap));
     }
+    @GetMapping("/volumes")
+    @ResponseBody
+    public ResponseBodyBean getVolumes(@RequestParam(name = "storageId") String storageId){
+
+        Map<String, Object> resMap = dmeStorageService.getVolumes(storageId);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
+    }
+    @GetMapping("/filesystems")
+    @ResponseBody
+    public ResponseBodyBean getFileSystems(@RequestParam(name = "storageId") String storageId){
+
+        Map<String, Object> resMap = dmeStorageService.getFileSystems(storageId);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
+    }
+    @GetMapping("/dtrees")
+    @ResponseBody
+    public ResponseBodyBean getDTrees(@RequestParam(name = "storageId") String storageId){
+
+        Map<String, Object> resMap = dmeStorageService.getDTrees(storageId);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
+    }
+    @GetMapping("/nfsshares")
+    @ResponseBody
+    public ResponseBodyBean getNfsShares(@RequestParam(name = "storageId") String storageId){
+
+        Map<String, Object> resMap = dmeStorageService.getNfsShares(storageId);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
+    }
+    @GetMapping("/bandports")
+    @ResponseBody
+    public ResponseBodyBean getBandPorts(@RequestParam(name = "storageId") String storageId){
+
+        Map<String, Object> resMap = dmeStorageService.getBandPorts(storageId);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
+    }
+    @GetMapping("/storagecontrollers")
+    @ResponseBody
+    public ResponseBodyBean getStorageControllers(){
+
+        Map<String, Object> resMap = dmeStorageService.getStorageControllers();
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
+    }
+    @GetMapping("/logicports")
+    @ResponseBody
+    public ResponseBodyBean getStorageDisks(){
+
+        Map<String, Object> resMap = dmeStorageService.getStorageDisks();
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
+    }
 }
