@@ -32,7 +32,7 @@ public class VmfsOperationController extends BaseController{
     /**
      *
      * @param volume_id  required
-     * @param params  {control_policy,max_iops,max_bandwidth,newVoName,oldDsName,newDsName,min_iops,min_bandwidth}
+     * @param params  {control_policy,max_iops,max_bandwidth,newVoName,oldDsName,newDsName,min_iops,min_bandwidth,String dataStoreObjectId}
      * @return
      */
     @PutMapping("/updatevmfs")

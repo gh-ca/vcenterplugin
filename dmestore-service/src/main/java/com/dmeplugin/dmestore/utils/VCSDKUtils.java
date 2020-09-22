@@ -540,17 +540,20 @@ public class VCSDKUtils {
         return hosts;
     }
 
-    public String renameDataStore(String oldName, String newName) throws Exception {
+    //rename datastore name
+    public String renameDataStore(String oldName, String newName,String dataStoreObjectId) throws Exception {
 
         String result = "success";
         _logger.info("==start rename DataStore==");
         try {
-            VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
-            for (VmwareContext vmwareContext : vmwareContexts) {
-                DatastoreMO dsMo = new DatastoreMO(vmwareContext, new DatacenterMO(vmwareContext, "Datacenter").findDatastore(oldName));
-                dsMo.renameDatastore(newName);
-                _logger.info("==end rename DataStore==");
-            }
+            String serverguid = vcConnectionHelper.objectID2Serverguid(dataStoreObjectId);
+            VmwareContext serverContext = vcConnectionHelper.getServerContext(serverguid);
+            ManagedObjectReference dsmor = vcConnectionHelper.objectID2MOR(dataStoreObjectId);
+            //todo 测试需要生成使用
+            //String objectId = vcConnectionHelper.MOR2ObjectID(dsMo.getMor(), dsMo.getContext().getServerAddress());
+            DatastoreMO dsMo = new DatastoreMO(serverContext, dsmor);
+            dsMo.renameDatastore(newName);
+            _logger.info("==end rename DataStore==");
         } catch (Exception e) {
             result = "failed";
             _logger.error("vmware error:", e);
