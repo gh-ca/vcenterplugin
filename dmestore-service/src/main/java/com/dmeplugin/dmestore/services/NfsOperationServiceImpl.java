@@ -209,6 +209,25 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         return resMap;
     }
 
+    @Override
+    public Map<String, Object> updateNfsDatastore(Map<String, String> params) {
+
+        Map<String, Object> resMap = new HashMap<>();
+        resMap.put("code", 200);
+        resMap.put("msg", "create nfs datastore success !");
+
+        //update fs
+
+        //todo 缺少修改nfsShare 名称的api  (修改H2中的名称？)
+        //update nfs share
+
+        //update nfs datastore
+
+
+
+        return null;
+    }
+
     //create file system
     //todo 挂载一个  挂载多个时候需要修改参数列表
     private Map<String, Object> createFileSystem(Map<String, String> params, String storage_pool_id) throws Exception {
@@ -307,7 +326,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         resMap.put("data", task_id);
         return resMap;
     }
-
     //create nfs share
     private Map<String,Object> createNfsShare(Map<String,String> params,String task_id,String dsname) throws Exception {
 
@@ -421,6 +439,21 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         LOG.info(url + "==responseEntity==" + (responseEntity == null ? "null" : responseEntity.getStatusCodeValue()));
 
         return responseEntity;
+    }
+
+    private Map<String,Object> updateFileSystem(Map<String,String> params){
+
+        Map<String, Object> resMap = new HashMap<>();
+        resMap.put("code", 200);
+        resMap.put("msg", "create nfs datastore success !");
+
+
+        return new HashMap<>();
+    }
+
+    private Map<String,Object> updateNfsShare(Map<String,String> params){
+
+        return new HashMap<>();
     }
 
     private String getFsIdByTaskId(String task_id,String dsname) throws Exception {

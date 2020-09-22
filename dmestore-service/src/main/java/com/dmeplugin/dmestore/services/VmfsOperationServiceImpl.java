@@ -41,7 +41,6 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     @Override
     public Map<String, Object> updateVMFS(String volume_id, Map<String, Object> params) {
 
-
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 202);
         resMap.put("msg", "update vmfsDatastore success !");
@@ -92,11 +91,15 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 return resMap;
             }
             //vcenter renameDatastore
-            String result = vcsdkUtils.renameDataStore(oldDsName.toString(), newDsName.toString());
+            Object dataStoreObjectId = params.get("dataStoreObjectId");
+            String result = "";
+            if (dataStoreObjectId != null) {
+                result = vcsdkUtils.renameDataStore(oldDsName.toString(), newDsName.toString(), dataStoreObjectId.toString());
+            }
             //ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, reqBody);
             ResponseEntity<String> responseEntity = access(url, HttpMethod.PUT, reqBody);
             int code = responseEntity.getStatusCodeValue();
-            if (code != 202 || result.equals("failed")) {
+            if (code != 202 ||StringUtils.isEmpty(result)||result.equals("failed")) {
                 resMap.put("code", code);
                 resMap.put("msg", "update VmfsDatastore failed");
                 return resMap;
@@ -329,8 +332,8 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         for (int i = 0; i < volume_ids.size(); i++) {
             String volume_id = volume_ids.get(i);
             url = "https://localhost:26335/rest/blockservice/v1/volumes/" + volume_id;
-            //ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            ResponseEntity<String> responseEntity = access(url, HttpMethod.GET, null);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            //ResponseEntity<String> responseEntity = access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
                 resMap.put("code", code);
