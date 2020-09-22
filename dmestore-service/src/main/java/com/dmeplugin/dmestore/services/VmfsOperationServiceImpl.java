@@ -22,6 +22,11 @@ import java.util.*;
  */
 public class VmfsOperationServiceImpl implements VmfsOperationService {
 
+    private final String API_VMFS_UPDATE = "/rest/blockservice/v1/volumes";
+    private final String API_VMFS_EXPAND = "/rest/blockservice/v1/volumes/expand";
+    private final String API_SERVICELEVEL_UPDATE = "/rest/blockservice/v1/volumes/update-service-level";
+    private final String API_SERVICELEVEL_LIST = "/rest/service-policy/v1/service-levels";
+
     private DmeAccessService dmeAccessService;
 
     private Gson gson=new Gson();
@@ -81,7 +86,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         reqMap.put("volume", volume);
         String reqBody = gson.toJson(reqMap);
 
-        String url = "https://localhost:26335/rest/blockservice/v1/volumes/" + volume_id;
+        String url = API_VMFS_UPDATE + "/" + volume_id;
         try {
             Object oldDsName = params.get("oldDsName");
             Object newDsName = params.get("newDsName");
@@ -96,8 +101,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             if (dataStoreObjectId != null) {
                 result = vcsdkUtils.renameDataStore(newDsName.toString(), dataStoreObjectId.toString());
             }
-            //ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, reqBody);
-            ResponseEntity<String> responseEntity = access(url, HttpMethod.PUT, reqBody);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, reqBody);
             int code = responseEntity.getStatusCodeValue();
             if (code != 202 ||StringUtils.isEmpty(result)||result.equals("failed")) {
                 resMap.put("code", code);
@@ -136,10 +140,8 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             reqBody.put("added_capacity", Integer.valueOf(map.get("vo_add_capacity")));
         }
         reqMap.put("volumes", reqBody);
-        String url = "/rest/blockservice/v1/volumes/expand";
         try {
-            //ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(reqMap));
-            ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, gson.toJson(reqMap));
+            ResponseEntity<String> responseEntity = dmeAccessService.access(API_VMFS_EXPAND, HttpMethod.POST, gson.toJson(reqMap));
             int code = responseEntity.getStatusCodeValue();
             if (code != 202) {
                 resMap.put("code", code);
@@ -228,10 +230,9 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             resMap.put("msg", "params error,please check your params!");
             resMap.put("code", 403);
         }
-        String url = "/rest/blockservice/v1/volumes/update-service-level";
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(params));
-            LOG.info("url:{" + url + "},响应信息：" + responseEntity);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(API_SERVICELEVEL_UPDATE, HttpMethod.PUT, gson.toJson(params));
+            LOG.info("url:{" + API_SERVICELEVEL_UPDATE + "},响应信息：" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 202) {
                 resMap.put("msg", "update vmfs service level error!");
@@ -260,10 +261,8 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
         List<SimpleServiceLevel> simpleServiceLevels = new ArrayList<>();
 
-        String url = "https://localhost:26335/rest/service-policy/v1/service-levels";
         try {
-            //ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, gson.toJson(params));
-            ResponseEntity<String> responseEntity = access(url, HttpMethod.GET, gson.toJson(params));
+            ResponseEntity<String> responseEntity = dmeAccessService.access(API_SERVICELEVEL_LIST, HttpMethod.GET, gson.toJson(params));
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
                 resMap.put("code", code);
