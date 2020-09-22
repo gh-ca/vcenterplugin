@@ -137,4 +137,9 @@
     <bean name="dmeRelationInstanceService" class="com.dmeplugin.dmestore.services.DmeRelationInstanceServiceImpl">
     </bean>
 
+    <bean name="nfsOperationService" class="com.dmeplugin.dmestore.services.NfsOperationServiceImpl"/>
+    <bean name="vmfsOperationService" class="com.dmeplugin.dmestore.services.VmfsOperationServiceImpl"/>
+    <bean name="dmeStorageService" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
+    </bean>
+
 </beans>
