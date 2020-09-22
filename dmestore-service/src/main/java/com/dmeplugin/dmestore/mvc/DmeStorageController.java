@@ -3,6 +3,7 @@ package com.dmeplugin.dmestore.mvc;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.model.Storage;
 import com.dmeplugin.dmestore.services.DmeStorageService;
+import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.google.gson.Gson;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,7 +30,6 @@ public class DmeStorageController extends BaseController{
 
     public static final Logger LOG = LoggerFactory.getLogger(NfsAccessController.class);
 
-
     private Gson gson=new Gson();
 
     @Autowired
@@ -46,15 +46,11 @@ public class DmeStorageController extends BaseController{
     public ResponseBodyBean getStorages(){
 
         Map<String, Object> resMap = dmeStorageService.getStorages();
-        ResponseBodyBean responseBodyBean = new ResponseBodyBean();
-        String code = resMap.get("code").toString();
-        responseBodyBean.setCode(code);
-        responseBodyBean.setDescription(resMap.get("msg").toString());
-        responseBodyBean.setData(resMap.get("data"));
+        Integer code = Integer.valueOf(resMap.get("code").toString());
         if (null != resMap && null != code && code.equals(200)) {
-            return success(responseBodyBean);
+            return success(resMap);
         }
-        return failure(gson.toJson(responseBodyBean));
+        return failure(gson.toJson(resMap));
     }
 
     /**
@@ -162,7 +158,7 @@ public class DmeStorageController extends BaseController{
         }
         return failure(gson.toJson(resMap));
     }
-    @GetMapping("/logicports")
+    @GetMapping("/storagedisks")
     @ResponseBody
     public ResponseBodyBean getStorageDisks(){
 
