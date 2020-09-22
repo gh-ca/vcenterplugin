@@ -1,17 +1,24 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.model.RelationInstance;
 import com.dmeplugin.dmestore.model.ServiceLevelInfo;
 import com.dmeplugin.dmestore.model.StoragePool;
 import com.dmeplugin.dmestore.model.Volume;
+import com.dmeplugin.dmestore.utils.CipherUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
+import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.dmeplugin.vmware.autosdk.SessionHelper;
 import com.dmeplugin.vmware.autosdk.TaggingWorkflow;
+import com.dmeplugin.vmware.util.PbmUtil;
+import com.dmeplugin.vmware.util.VmwareContext;
 import com.google.gson.*;
 import com.vmware.cis.tagging.CategoryModel;
 import com.vmware.cis.tagging.CategoryTypes;
 import com.vmware.cis.tagging.Tag;
 import com.vmware.cis.tagging.TagModel;
+import com.vmware.pbm.*;
+import com.vmware.vim25.ManagedObjectReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +45,13 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     private DmeRelationInstanceService dmeRelationInstanceService;
     private DmeStorageService dmeStorageService;
 
+    @Autowired
+    private VCenterInfoService vCenterInfoService;
+
+    private VCSDKUtils vcsdkUtils;
+
+    private static final String POLICY_DESC="policy created by dme";
+
     private final String LIST_SERVICE_LEVEL_URL = "https://localhost:26335/rest/service-policy/v1/service-levels";
 
     public DmeAccessService getDmeAccessService() {
@@ -62,6 +76,22 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
     public void setDmeStorageService(DmeStorageService dmeStorageService) {
         this.dmeStorageService = dmeStorageService;
+    }
+
+    public VCSDKUtils getVcsdkUtils() {
+        return vcsdkUtils;
+    }
+
+    public void setVcsdkUtils(VCSDKUtils vcsdkUtils) {
+        this.vcsdkUtils = vcsdkUtils;
+    }
+
+    public VCenterInfoService getvCenterInfoService() {
+        return vCenterInfoService;
+    }
+
+    public void setvCenterInfoService(VCenterInfoService vCenterInfoService) {
+        this.vCenterInfoService = vCenterInfoService;
     }
 
     @Override
@@ -98,19 +128,26 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
     public void updateVmwarePolicy(){
         try {
-            String categoryid=getCategoryID();
             SessionHelper sessionHelper=new SessionHelper();
-            sessionHelper.login("10.143.132.248","administrator@vsphere.local","Pbu4@123");
-            TaggingWorkflow taggingWorkflow=new TaggingWorkflow(sessionHelper);
-            List<TagModel> tagModels=getAllTagsByCategoryId(categoryid,sessionHelper);
-        ResponseEntity  responseEntity = dmeAccessService.access(LIST_SERVICE_LEVEL_URL, HttpMethod.GET, null);
-        Object object =responseEntity.getBody();
-        JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
-        JsonArray jsonArray = jsonObject.get("service-levels").getAsJsonArray();
+            VCenterInfo vCenterInfo= vCenterInfoService.getVCenterInfo();
+            if (null!=vCenterInfo) {
+                sessionHelper.login(vCenterInfo.getHostIp(),vCenterInfo.getUserName(),CipherUtils.decryptString(vCenterInfo.getPassword()));
+            }
+
+            String categoryid=vcsdkUtils.getCategoryID(sessionHelper);
+
+            List<TagModel> tagModels=vcsdkUtils.getAllTagsByCategoryId(categoryid,sessionHelper);
+            List<PbmProfile> pbmProfiles=vcsdkUtils.getAllSelfPolicyInallcontext();
+            ResponseEntity  responseEntity = dmeAccessService.access(LIST_SERVICE_LEVEL_URL, HttpMethod.GET, null);
+            Object object =responseEntity.getBody();
+            JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
+            JsonArray jsonArray = jsonObject.get("service-levels").getAsJsonArray();
             List<TagModel> alreadyhasList=new ArrayList<>();
+            List<PbmProfile> alreadyhasPolicyList=new ArrayList<>();
             for (JsonElement jsonElement : jsonArray) {
                     JsonObject object1 = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
                     String name = object1.get("name").getAsString();
+                    //tag是否存在判断
                    boolean alreadyhas=false;
                     for (TagModel tagModel:tagModels){
                         if (tagModel.getName().equalsIgnoreCase(name))
@@ -120,63 +157,42 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                             break;
                         }
                     }
+
+                    //虚拟机存储策略判断
+                    boolean alreadyhasPolicy=false;
+                    for (PbmProfile profile:pbmProfiles){
+                        if (profile.getName().equalsIgnoreCase(name))
+                        {
+                            alreadyhasPolicyList.add(profile);
+                            alreadyhasPolicy=true;
+                            break;
+                        }
+                    }
                     if (!alreadyhas) {
-                        String taggingId = taggingWorkflow.createTag(name, "", categoryid);
+                        //创建tag
+                         vcsdkUtils.createTag(name,sessionHelper);
+                    }
+
+                    if (!alreadyhasPolicy) {
                         //创建虚拟机存储策略
+                         vcsdkUtils.createPbmProfileInAllContext(vcsdkUtils.CATEGORY_NAME,name);
                     }
             }
             tagModels.removeAll(alreadyhasList);
-
+            pbmProfiles.removeAll(alreadyhasPolicyList);
             //删除多余的tag，虚拟机存储策略
-
-
-        log.info("ssss");
+            //先删除虚拟机存储策略
+            vcsdkUtils.removePbmProfileInAllContext(pbmProfiles);
+            vcsdkUtils.removeAllTags(tagModels,sessionHelper);
+            log.info("后台更新服务等级策略完成");
         } catch (Exception e) {
             log.error("list serviceLevel error", e);
         }
     }
 
-    private List<TagModel> getAllTagsByCategoryId(String categoryid,SessionHelper sessionHelper){
-        List<TagModel> tagList=new ArrayList<>();
-        TaggingWorkflow taggingWorkflow=new TaggingWorkflow(sessionHelper);
-        List<String> tags=taggingWorkflow.listTagsForCategory(categoryid);
-        for (String tagid:tags){
-            tagList.add(taggingWorkflow.getTag(tagid));
-        }
-        return tagList;
-
-    }
-
-    private String getCategoryID() throws Exception {
-        String categoryid="";
 
 
-        SessionHelper sessionHelper=new SessionHelper();
-        sessionHelper.login("10.143.132.248","administrator@vsphere.local","Pbu4@123");
-        TaggingWorkflow taggingWorkflow=new TaggingWorkflow(sessionHelper);
 
-        List<String> categorylist=taggingWorkflow.listTagCategory();
-        for (String category:categorylist){
-            CategoryModel categoryModel=taggingWorkflow.getTagCategory(category);
-            if(categoryModel.getName().equalsIgnoreCase("DME Service Level")){
-                categoryid=categoryModel.getId();
-            }
-        }
-        if ("".equalsIgnoreCase(categoryid)){
-            //创建category
-            CategoryTypes.CreateSpec createSpec = new CategoryTypes.CreateSpec();
-            createSpec.setName("DME Service Level");
-
-            createSpec.setCardinality(CategoryModel.Cardinality.SINGLE);
-
-            Set<String> associableTypes = new HashSet<String>(); // empty hash set
-            associableTypes.add("Datastore");
-            createSpec.setAssociableTypes(associableTypes);
-            categoryid=taggingWorkflow.createTagCategory(createSpec);
-        }
-
-        return categoryid;
-    }
 
     // convert the api responseBody to ServiceLevelInfo Bean list
     private List<ServiceLevelInfo> convertBean(Object object) {

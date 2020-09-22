@@ -24,6 +24,8 @@ import com.vmware.connection.helpers.builders.ObjectSpecBuilder;
 import com.vmware.connection.helpers.builders.PropertyFilterSpecBuilder;
 import com.vmware.connection.helpers.builders.PropertySpecBuilder;
 import com.vmware.connection.helpers.builders.TraversalSpecBuilder;
+import com.vmware.pbm.PbmPortType;
+import com.vmware.pbm.PbmServiceInstanceContent;
 import com.vmware.vim25.*;
 import com.vmware.vise.usersession.UserSessionService;
 import org.slf4j.Logger;
@@ -145,8 +147,16 @@ public class VmwareContext {
         return _vimClient.getService();
     }
 
+    public PbmPortType getPbmService() {
+        return _vimClient.getPbmService();
+    }
+
     public ServiceContent getServiceContent() {
         return _vimClient.getServiceContent();
+    }
+
+    public PbmServiceInstanceContent getPbmServiceContent() {
+        return _vimClient.getPbmServiceContent();
     }
 
     public ManagedObjectReference getPropertyCollector() {
@@ -743,6 +753,129 @@ public class VmwareContext {
         return inFolderByType(folder,morefType, new RetrieveOptions());
     }
 
+    /**
+     * Returns all the MOREFs of the specified type that are present under the
+     * container
+     *
+     * @param container       {@link ManagedObjectReference} of the container to begin the
+     *                        search from
+     * @param morefType       Type of the managed entity that needs to be searched
+     * @param morefProperties Array of properties to be fetched for the moref
+     * @return Map of MOREF and Map of name value pair of properties requested of
+     *         the managed objects present. If none exist then empty Map is
+     *         returned
+     * @throws InvalidPropertyFaultMsg
+     * @throws RuntimeFaultFaultMsg
+     */
+    public Map<ManagedObjectReference, Map<String, Object>> inContainerByType(
+            ManagedObjectReference container, String morefType,
+            String[] morefProperties, RetrieveOptions retrieveOptions) throws InvalidPropertyFaultMsg,
+            RuntimeFaultFaultMsg {
+        List<ObjectContent> oCont = containerViewByType(container, morefType, retrieveOptions, morefProperties).getObjects();
+
+        Map<ManagedObjectReference, Map<String, Object>> tgtMoref =
+                new HashMap<ManagedObjectReference, Map<String, Object>>();
+
+        if (oCont != null) {
+            for (ObjectContent oc : oCont) {
+                Map<String, Object> propMap = new HashMap<String, Object>();
+                List<DynamicProperty> dps = oc.getPropSet();
+                if (dps != null) {
+                    for (DynamicProperty dp : dps) {
+                        propMap.put(dp.getName(), dp.getVal());
+                    }
+                }
+                tgtMoref.put(oc.getObj(), propMap);
+            }
+        }
+        return tgtMoref;
+    }
+
+    /**
+     * Returns all the MOREFs of the specified type that are present under the
+     * container
+     *
+     * @param folder    {@link ManagedObjectReference} of the container to begin the
+     *                  search from
+     * @param morefType Type of the managed entity that needs to be searched
+     * @return Map of name and MOREF of the managed objects present. If none
+     *         exist then empty Map is returned
+     * @throws InvalidPropertyFaultMsg
+     * @throws RuntimeFaultFaultMsg
+     */
+    public List<Pair<ManagedObjectReference, String>> inContainerByType(
+            ManagedObjectReference folder, String morefType, RetrieveOptions retrieveOptions)
+            throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
+
+        RetrieveResult rslts = containerViewByType(folder, morefType, retrieveOptions);
+        return toList(rslts);
+    }
+
+    public List<Pair<ManagedObjectReference, String>> toList(RetrieveResult rslts) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
+        final List<Pair<ManagedObjectReference, String>> tgtMoref = new ArrayList<>();
+        String token = null;
+        token = populate(rslts, tgtMoref);
+
+        while ( token != null && !token.isEmpty() ) {
+            // fetch results based on new token
+            rslts = getService().continueRetrievePropertiesEx(
+                    getServiceContent().getPropertyCollector(), token);
+
+            token = populate(rslts, tgtMoref);
+        }
+
+        return tgtMoref;
+    }
+
+
+    public List<Pair<ManagedObjectReference, String>> inContainerByType(ManagedObjectReference container, String morefType) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
+        return inContainerByType(container, morefType, new RetrieveOptions());
+    }
+
+    /**
+     * Returns the raw RetrieveResult object for the provided container filtered on properties list
+     *
+     * @param container       - container to look in
+     * @param morefType       - type to filter for
+     * @param morefProperties - properties to include
+     * @return com.vmware.vim25.RetrieveResult for this query
+     * @throws RuntimeFaultFaultMsg
+     * @throws InvalidPropertyFaultMsg
+     */
+    public RetrieveResult containerViewByType(
+            final ManagedObjectReference container,
+            final String morefType,
+            final RetrieveOptions retrieveOptions,
+            final String... morefProperties
+    ) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+
+        PropertyFilterSpec[] propertyFilterSpecs = propertyFilterSpecs(container, morefType, morefProperties);
+
+        return containerViewByType(container,morefType,morefProperties,retrieveOptions,propertyFilterSpecs);
+    }
+
+    public RetrieveResult containerViewByType(
+            final ManagedObjectReference container,
+            final String morefType,
+            final String[] morefProperties,
+            final RetrieveOptions retrieveOptions,
+            final PropertyFilterSpec... propertyFilterSpecs
+    ) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+        return getService().retrievePropertiesEx(
+                getServiceContent().getPropertyCollector(),
+                Arrays.asList(propertyFilterSpecs),
+                retrieveOptions
+        );
+    }
+
+    public RetrieveResult containerViewByType(
+            final ManagedObjectReference container,
+            final String morefType,
+            final RetrieveOptions retrieveOptions
+    ) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+        return this.containerViewByType(container,morefType,retrieveOptions,"name");
+    }
+
     private void resultsToTgtMorefMap(RetrieveResult results, Map<String, ManagedObjectReference> tgtMoref) {
         List<ObjectContent> oCont = (results != null) ? results.getObjects() : null;
 
@@ -811,5 +944,24 @@ public class VmwareContext {
                                 )
                 )
         };
+    }
+
+    public static String populate(final RetrieveResult rslts, final List<Pair<ManagedObjectReference, String>> tgtMoref) {
+        String token = null;
+        if (rslts != null) {
+            token = rslts.getToken();
+            for(ObjectContent oc : rslts.getObjects()) {
+                ManagedObjectReference mr = oc.getObj();
+                String entityNm = null;
+                List<DynamicProperty> dps = oc.getPropSet();
+                if (dps != null) {
+                    for (DynamicProperty dp : dps) {
+                        entityNm = (String) dp.getVal();
+                    }
+                }
+                tgtMoref.add(new Pair<>(mr, entityNm));
+            }
+        }
+        return token;
     }
 }

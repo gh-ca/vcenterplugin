@@ -56,10 +56,11 @@
         <property name="vCenterInfoDao" ref="vcenterInfoDao"/>
     </bean>
 
-    <bean name="serviceLevelService" class="com.dmeplugin.dmestore.services.ServiceLevelServiceImpl">
+    <bean name="ServiceLevelServiceImpl" class="com.dmeplugin.dmestore.services.ServiceLevelServiceImpl">
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="dmeStorageService" ref="dmeStorageService"/>
         <property name="dmeRelationInstanceService" ref="dmeRelationInstanceService"/>
+        <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
 
     <bean name="dmeRelationInstanceService" class="com.dmeplugin.dmestore.services.DmeRelationInstanceServiceImpl">
