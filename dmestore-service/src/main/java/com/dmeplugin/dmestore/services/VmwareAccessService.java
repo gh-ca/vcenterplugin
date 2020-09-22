@@ -67,6 +67,12 @@ public interface VmwareAccessService {
      */
     List<Map<String,String>> getDataStoresByClusterObjectId(String clusterObjectId, String dataStoreType) throws Exception;
 
-
-
+    /**
+     * Get host's vmKernel IP,only provisioning provisioning
+     *
+     * @param  hostObjectId host Object Id
+     * @return ResponseBodyBean List<Map<String, String>> include device portgroup ipAddress key mac
+     * @throws Exception when error
+     */
+    List<Map<String,String>> getVmKernelIpByHostObjectId(String hostObjectId) throws Exception;
 }

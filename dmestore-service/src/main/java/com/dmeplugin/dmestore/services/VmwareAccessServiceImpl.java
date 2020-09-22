@@ -181,6 +181,24 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
         return lists;
     }
 
-
+    @Override
+    public List<Map<String,String>> getVmKernelIpByHostObjectId(String hostObjectId) throws Exception{
+        List<Map<String, String>> lists = null;
+        try {
+            //根据存储类型，取得vcenter中的所有存储。
+            String listStr = vcsdkUtils.getVmKernelIpByHostObjectId(hostObjectId);
+            LOG.info("host getVmKernelIpByHostObjectId==" + listStr);
+            if (!StringUtils.isEmpty(listStr)) {
+                lists = new ArrayList<>();
+                lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
+                }.getType());
+            }
+        } catch (Exception e) {
+            LOG.error("get vmkernel ip by hostobjectid error:", e);
+            throw e;
+        }
+        LOG.info("getVmKernelIpByHostObjectId===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
+        return lists;
+    }
 
 }
