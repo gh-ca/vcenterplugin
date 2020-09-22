@@ -5,6 +5,8 @@ import com.dmeplugin.dmestore.model.ServiceLevelInfo;
 import com.dmeplugin.dmestore.model.StoragePool;
 import com.dmeplugin.dmestore.model.Volume;
 import com.dmeplugin.dmestore.utils.ToolUtils;
+import com.dmeplugin.vmware.autosdk.SessionHelper;
+import com.dmeplugin.vmware.autosdk.TaggingWorkflow;
 import com.google.gson.*;
 import com.vmware.cis.tagging.CategoryModel;
 import com.vmware.cis.tagging.CategoryTypes;
@@ -100,7 +102,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             SessionHelper sessionHelper=new SessionHelper();
             sessionHelper.login("10.143.132.248","administrator@vsphere.local","Pbu4@123");
             TaggingWorkflow taggingWorkflow=new TaggingWorkflow(sessionHelper);
-            List<TagModel> tagModels=getAllTagsByCategoryId(categoryid);
+            List<TagModel> tagModels=getAllTagsByCategoryId(categoryid,sessionHelper);
         ResponseEntity  responseEntity = dmeAccessService.access(LIST_SERVICE_LEVEL_URL, HttpMethod.GET, null);
         Object object =responseEntity.getBody();
         JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
@@ -134,7 +136,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         }
     }
 
-    private List<TagModel> getAllTagsByCategoryId(String categoryid){
+    private List<TagModel> getAllTagsByCategoryId(String categoryid,SessionHelper sessionHelper){
         List<TagModel> tagList=new ArrayList<>();
         TaggingWorkflow taggingWorkflow=new TaggingWorkflow(sessionHelper);
         List<String> tags=taggingWorkflow.listTagsForCategory(categoryid);
