@@ -1,6 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.model.TaskDetailInfo;
+import com.dmeplugin.dmestore.model.TaskDetailResource;
 import com.dmeplugin.dmestore.mvc.VmfsOperationController;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
@@ -158,7 +159,11 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             if (fsCode == 202) {
                 task_id = fileSystem.get("task_id").toString();
             }
-            Map<String, Object> nfsShare = createNfsShare(nfsShareMap, task_id);
+            String nfsName = params.get("nfsName");
+            if (StringUtils.isEmpty(nfsName)) {
+                LOG.error("nfsName={"+nfsName+"}");
+            }
+            Map<String, Object> nfsShare = createNfsShare(nfsShareMap, task_id,nfsName);
             if (ToolUtils.getInt(nfsShare.get("code"))==202) {
                 String nfsShareTaskId = nfsShare.get("task_id").toString();
                 resMap.put("data", nfsShareTaskId);
@@ -173,7 +178,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 }
             }
             String exportPath = params.get("exportPath");
-            String nfsName = params.get("nfsName");
             String type = params.get("type");
             String accessMode = params.get("accessMode");
             //可以挂载多个
@@ -185,9 +189,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                     mounts.add(shareClientHostMap.get("name"));
                 }
             }
-            if (StringUtils.isEmpty(serverHost) || StringUtils.isEmpty(exportPath)
-                    || StringUtils.isEmpty(nfsName) || StringUtils.isEmpty(accessMode) || mounts.size() == 0) {
-
+            if (StringUtils.isEmpty(serverHost) || StringUtils.isEmpty(exportPath) || StringUtils.isEmpty(accessMode) || mounts.size() == 0) {
                 resMap.put("code", 403);
                 resMap.put("msg", "params error , please check your params !");
                 return resMap;
@@ -204,10 +206,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             resMap.put("msg", e.getMessage());
             return resMap;
         }
-
-
-
-
         return resMap;
     }
 
@@ -311,7 +309,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     }
 
     //create nfs share
-    private Map<String,Object> createNfsShare(Map<String,String> params,String task_id) throws Exception {
+    private Map<String,Object> createNfsShare(Map<String,String> params,String task_id,String dsname) throws Exception {
 
         /**
          * CreateNfsShareRequest{
@@ -345,9 +343,12 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
         //todo 获取taskDetailInfo中的资源id
         //注意：需要先确定任务完成状态，在完成状态之下才能拿到对应的id, 中间存在延时问题。
+        String fsId = "";
         if (!StringUtils.isEmpty(task_id)) {
-            TaskDetailInfo taskDetailInfo = taskService.queryTaskById(task_id);
-            String fsId = "taskDetailInfo.getFsId()";
+            fsId = getFsIdByTaskId(task_id, dsname);
+            if (StringUtils.isEmpty(fsId)) {
+                fsId = getFsIdByTaskId(task_id, dsname);
+            }
             params.put("fs_id", fsId);
             ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, gson.toJson(params));
             int code = responseEntity.getStatusCodeValue();
@@ -420,5 +421,21 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         LOG.info(url + "==responseEntity==" + (responseEntity == null ? "null" : responseEntity.getStatusCodeValue()));
 
         return responseEntity;
+    }
+
+    private String getFsIdByTaskId(String task_id,String dsname) throws Exception {
+
+        String fsId = "";
+        if (!StringUtils.isEmpty(task_id)) {
+            TaskDetailInfo taskDetailInfo = taskService.queryTaskById(task_id);
+            List<TaskDetailResource> resources = taskDetailInfo.getResources();
+            for (TaskDetailResource taskDetail : resources) {
+                if (taskDetail.getName().equals(dsname)) {
+                    fsId = taskDetail.getId();
+                    break;
+                }
+            }
+        }
+        return fsId;
     }
 }

@@ -42,8 +42,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         String url = "https://localhost:26335/rest/storagemgmt/v1/storages";
 
         try {
-            ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
-            //ResponseEntity responseEntity = access(url, HttpMethod.GET, null);
+            //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
+            ResponseEntity responseEntity = access(url, HttpMethod.GET, null);
             Log.info("DmeStorageServiceImpl/getStorages/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -165,10 +165,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
         Map<String, String> params = new HashMap<>();
         params.put("storage_id", storageId);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
         try {
             ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, gson.toJson(params));
