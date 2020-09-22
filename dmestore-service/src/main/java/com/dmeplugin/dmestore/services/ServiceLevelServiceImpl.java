@@ -2,10 +2,12 @@ package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.model.RelationInstance;
 import com.dmeplugin.dmestore.model.ServiceLevelInfo;
+import com.dmeplugin.dmestore.model.StoragePool;
+import com.dmeplugin.dmestore.model.Volume;
+import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
@@ -21,14 +23,36 @@ import java.util.*;
 public class ServiceLevelServiceImpl implements ServiceLevelService {
     private static final Logger log = LoggerFactory.getLogger(ServiceLevelServiceImpl.class);
 
-
-    private Gson gson=new Gson();
-    @Autowired
+    private Gson gson = new Gson();
     private DmeAccessService dmeAccessService;
-    @Autowired
     private DmeRelationInstanceService dmeRelationInstanceService;
+    private DmeStorageService dmeStorageService;
 
     private final String LIST_SERVICE_LEVEL_URL = "https://localhost:26335/rest/service-policy/v1/service-levels";
+
+    public DmeAccessService getDmeAccessService() {
+        return dmeAccessService;
+    }
+
+    public void setDmeAccessService(DmeAccessService dmeAccessService) {
+        this.dmeAccessService = dmeAccessService;
+    }
+
+    public DmeRelationInstanceService getDmeRelationInstanceService() {
+        return dmeRelationInstanceService;
+    }
+
+    public void setDmeRelationInstanceService(DmeRelationInstanceService dmeRelationInstanceService) {
+        this.dmeRelationInstanceService = dmeRelationInstanceService;
+    }
+
+    public DmeStorageService getDmeStorageService() {
+        return dmeStorageService;
+    }
+
+    public void setDmeStorageService(DmeStorageService dmeStorageService) {
+        this.dmeStorageService = dmeStorageService;
+    }
 
     @Override
     public Map<String, Object> listServiceLevel(Map<String, Object> params) {
@@ -103,12 +127,88 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     }
 
     //扫描服务等级 发现服务等级下的存储池,磁盘,(存储端口)
+    @Override
+    public List<StoragePool> getStoragePoolInfosByServiceLevelId(String serivceLevelId) throws Exception {
+        List<StoragePool> storagePools = new ArrayList<>();
+        // 1 获取serviceLevelId下的StoragePool实例集合
+        List<String> storagePoolInstanceIds = getStoragePoolIdsByServiceLevelId(serivceLevelId);
 
+        // 2 通过storagePoolInstanceId获取storagePoolId和storageDeviceId信息
+        List<StoragePool> sps = new ArrayList<>();
+        if (null != storagePoolInstanceIds && storagePoolInstanceIds.size() > 0) {
+            for (String instanceId : storagePoolInstanceIds) {
+                Object object = dmeRelationInstanceService.queryInstanceByInstanceNameId("SYS_StoragePool", instanceId);
+                StoragePool sp = convertInstanceToStoragePool(object);
+                sps.add(sp);
+            }
+        }
+
+        // 3 通过storageDeviceId和storagePoolId获取storagePool信息(这里先获取存储设备下的所有存储池,再通过storagePoolId过滤)
+        if (sps.size() > 0) {
+            Map<String, Set<String>> storageDevicePoolIds = new HashMap<>();
+            for (StoragePool sp : sps) {
+                String storageDeviceId = sp.getStorage_device_id();
+                String poolId = sp.getStorage_pool_id();
+                if (null == storageDevicePoolIds.get(storageDeviceId)) {
+                    Set<String> poolIds = new HashSet<>();
+                    poolIds.add(poolId);
+                    storageDevicePoolIds.put(storageDeviceId, poolIds);
+                } else {
+                    storageDevicePoolIds.get(storageDeviceId).add(poolId);
+                }
+            }
+            for (Map.Entry<String, Set<String>> entry : storageDevicePoolIds.entrySet()) {
+                String storageDevcieId = entry.getKey();
+                Set<String> storagePoolIds = entry.getValue();
+                List<StoragePool> storageDevicePools = getStoragePoolInfosByStorageIdStoragePoolIds(storageDevcieId, new ArrayList<>(storagePoolIds));
+                if (null != storageDevicePoolIds && storageDevicePoolIds.size() > 0) {
+                    storagePools.addAll(storageDevicePools);
+                } else {
+                    log.warn("存储设备:{}下的存储池集合:{}的信息为空", storageDevcieId, gson.toJson(storageDevicePools));
+                }
+            }
+        }
+        return storagePools;
+    }
+
+    @Override
+    public List<Volume> getVolumeInfosByServiceLevelId(String serviceLevelId) throws Exception {
+        List<Volume> volumeList = new ArrayList<>();
+        //1 获取serviveLevel关联的volumeId
+        List<String> volumeIds = getVolumeIdsByServiceLivelId(serviceLevelId);
+        //2 根据volumeId查询olume信息
+        if (null != volumeIds && volumeIds.size() > 0) {
+            for (String volumeId : volumeIds) {
+                Map<String, Object> map = dmeStorageService.getVolume(volumeId);
+                if ("200".equals(map.get("code").toString())) {
+                    Volume volume = (Volume) map.get("data");
+                    volumeList.add(volume);
+                }
+            }
+        }
+        return volumeList;
+    }
+
+    private List<StoragePool> getStoragePoolInfosByStorageIdStoragePoolIds(String storageDeviceId, List<String> storagePoolIds) {
+        List<StoragePool> sps = new ArrayList<>();
+        Map<String, Object> resp = dmeStorageService.getStoragePools(storageDeviceId);
+        String code = resp.get("code").toString();
+        if ("200".equals(code)) {
+            List<StoragePool> storagePools = (List<StoragePool>) resp.get("data");
+            for (StoragePool sp : storagePools) {
+                String poolId = sp.getStorage_pool_id();
+                if (storagePoolIds.contains(poolId)) {
+                    sps.add(sp);
+                }
+            }
+        }
+        return sps;
+    }
 
     //服务等级 发现服务等级下的存储池 serviceLevelId和sourceInstanceId一样?
     public List<String> getStoragePoolIdsByServiceLevelId(String serviceLevelId) throws Exception {
         String relatinName = "M_DjTierContainsStoragePool";
-       return getContainIdsByRelationNameLevelId(relatinName, serviceLevelId);
+        return getContainIdsByRelationNameLevelId(relatinName, serviceLevelId);
     }
 
     //服务等级 发现服务等级下的卷
@@ -128,13 +228,37 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return new ArrayList<>(ids);
     }
 
+    //存储池的详情需要通过存储设备ID和存储池在设备上的ID联合来查询
+    private void getStoragePoolDevcieIdRelationByRelationNameLevelId(String storageDeviceId, String storagePoolId) {
+
+    }
+
     //查询服务等级性能
-    public Object getStatisticByServiceLevelId(String serviceLevelId){
+    public Object getStatisticByServiceLevelId(String serviceLevelId) {
         //1 获取服务等级下的磁盘Id
 
         //2 获取磁盘性能
 
         return null;
+    }
+
+    //将instance转换为storagepool信息
+    private StoragePool convertInstanceToStoragePool(Object instanceObj) {
+        StoragePool sp = new StoragePool();
+        JsonObject jsonObject = new JsonParser().parse(instanceObj.toString()).getAsJsonObject();
+        String name = ToolUtils.getStr(jsonObject.get("name"));
+        String status = ToolUtils.getStr(jsonObject.get("status"));// runningStatus?
+        String type = ToolUtils.getStr(jsonObject.get("type"));// SYS_StorageDisk中取磁盘类型?
+        String poolId = ToolUtils.getStr(jsonObject.get("poolId"));
+        String storageDeviceId = ToolUtils.getStr(jsonObject.get("storageDeviceId"));
+        String storagePoolInstanceId = ToolUtils.getStr(jsonObject.get("id"));
+
+        sp.setName(name);
+        sp.setStorage_pool_id(poolId);
+        sp.setStorage_device_id(storageDeviceId);
+        sp.setStorage_instance_id(storagePoolInstanceId);
+
+        return sp;
     }
 
 
