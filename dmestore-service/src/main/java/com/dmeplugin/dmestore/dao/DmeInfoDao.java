@@ -4,6 +4,7 @@ package com.dmeplugin.dmestore.dao;
 import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
 import com.dmeplugin.dmestore.entity.DmeInfo;
 import com.dmeplugin.dmestore.exception.DataBaseException;
+import com.dmeplugin.dmestore.utils.CipherUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -19,7 +20,7 @@ import java.sql.SQLException;
  **/
 public class DmeInfoDao extends H2DataBaseDao {
 
-    public int addDmeInfo(DmeInfo dmeInfo) throws SQLException {
+    public int addDmeInfo(DmeInfo dmeInfo) throws Exception {
         checkDmeInfo(dmeInfo);
         Connection con = null;
         PreparedStatement ps = null;
@@ -32,22 +33,22 @@ public class DmeInfoDao extends H2DataBaseDao {
             ps.setString(1, dmeInfo.getHostIp());
             ps.setInt(2, dmeInfo.getHostPort());
             ps.setString(3, dmeInfo.getUserName());
-            ps.setString(4, dmeInfo.getPassword());
+            ps.setString(4, CipherUtils.encryptString(dmeInfo.getPassword()));
             int row = ps.executeUpdate();
             rs = ps.getGeneratedKeys();
             if (rs.next()) {
                 dmeInfo.setId(rs.getInt(1));
             }
             return row;
-        } catch (SQLException e) {
-            LOGGER.error("Failed to add vCenter info: " + e.getMessage());
+        } catch (Exception e) {
+            LOGGER.error("Failed to add vCenter info: " + e.toString());
             throw e;
         } finally {
             closeConnection(con, ps, rs);
         }
     }
 
-    public DmeInfo getDmeInfo() throws SQLException {
+    public DmeInfo getDmeInfo() throws Exception {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -63,14 +64,14 @@ public class DmeInfoDao extends H2DataBaseDao {
                 dmeInfo.setHostIp(rs.getString("HOSTIP"));
                 dmeInfo.setHostPort(rs.getInt("HOSTPORT"));
                 dmeInfo.setUserName(rs.getString("USERNAME"));
-                dmeInfo.setPassword(rs.getString("PASSWORD"));
+                dmeInfo.setPassword(CipherUtils.decryptString(rs.getString("PASSWORD")));
                 dmeInfo.setCreateTime(rs.getTimestamp("CREATETIME"));
                 dmeInfo.setUpdateTime(rs.getTimestamp("UPDATETIME"));
                 dmeInfo.setState(rs.getInt("STATE"));
             }
         } catch (DataBaseException | SQLException e) {
-            LOGGER.error("Failed to get dme access info: " + e.getMessage());
-            throw new SQLException(e);
+            LOGGER.error("Failed to get dme access info: " + e.toString());
+            throw new Exception(e);
         } finally {
             closeConnection(con, ps, rs);
         }
