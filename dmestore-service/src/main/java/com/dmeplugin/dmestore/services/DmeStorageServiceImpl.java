@@ -866,6 +866,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 volume.setPool_raw_id(element.get("pool_raw_id").getAsString());
                 volume.setCapacity_usage(element.get("capacity_usage").getAsString());
                 volume.setProtectionStatus(Boolean.valueOf(element.get("protectionStatus").getAsString()));
+                JsonArray jsonArray = element.get("attachments").getAsJsonArray();
+                volumeAttachments(jsonArray, volume);
                 resMap.put("data", volume);
             }
             return resMap;
@@ -877,4 +879,23 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             return resMap;
         }
     }
+
+
+    //从卷信息中查关联的主机和主机组
+    private void volumeAttachments(JsonArray array, Volume volume) {
+        if (null != array && array.size() > 0) {
+            List<String> hostIds = new ArrayList<>();
+            List<String> hostGroupIds = new ArrayList<>();
+            for (JsonElement element : array) {
+                JsonObject json = element.getAsJsonObject();
+                String hostId = ToolUtils.getStr(json.get("host_id"));
+                String hostGroupId = ToolUtils.getStr(json.get("attached_host_group"));
+                hostIds.add(hostId);
+                hostGroupIds.add(hostGroupId);
+            }
+            volume.setHostIds(hostIds);
+            volume.setHostGroupIds(hostGroupIds);
+        }
+    }
+
 }

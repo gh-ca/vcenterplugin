@@ -109,4 +109,12 @@ public interface DmeAccessService {
      */
     Map<String, Object> getDmeHost(String hostId) throws Exception;
 
+    /**
+     * get hostGroup's detail
+     * @param hsotGroupId hostGroups id
+     * @return
+     * @throws Exception
+     */
+    Map<String,Object> getDmeHostGroup(String hsotGroupId) throws Exception;
+
 }

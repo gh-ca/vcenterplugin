@@ -26,6 +26,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
     @Autowired
     DataStoreStatisticHistoryService dataSotreStatisticHistroyService;
 
+    /**
+     * 查询vmfs性能(实际vmfs下的volume的性能)
+     * @param params key required: obj_ids, indicator_ids, range (obj_ids volumeId集合)
+     * @return
+     * @throws Exception
+     */
     @RequestMapping(value = "/vmfsvolume", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean getVmfsVolumeStatistic(@RequestBody Map<String, Object> params) throws Exception {
@@ -38,6 +44,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
         return failure(gson.toJson(resMap));
     }
 
+    /**
+     * 查询nfs性能(实际nfs下的fs的性能)
+     * @param params key required: obj_ids, indicator_ids, range (obj_ids fsId集合)
+     * @return
+     * @throws Exception
+     */
     @RequestMapping(value = "/nfsfs", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean getNfsVolumeStatistic(@RequestBody Map<String, Object> params) throws Exception {
@@ -50,6 +62,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
         return failure(gson.toJson(resMap));
     }
 
+    /**
+     * 查询serviceLevel的性能(实际serviceLevel下的volume的性能)
+     * @param params key required: obj_ids, indicator_ids, range (obj_ids,volumeId集合)
+     * @return
+     * @throws Exception
+     */
     @RequestMapping(value = "/servicelevel", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean getServiceLevelStatistic(@RequestBody Map<String, Object> params) throws Exception {
