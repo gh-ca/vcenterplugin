@@ -570,28 +570,6 @@ public class VCSDKUtils {
         }
     }
 
-    //get oriented datastore capacity
-    public static Map<String, Object> getCapacityOnVmfs(String dsname) {
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put("msg", "success");
-        _logger.info("==start get oriented datastore capacity==");
-        try {
-            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", 443,"administrator@vsphere.local", "Pbu4@123");
-            DatastoreMO dsMo = new DatastoreMO(vmwareContext, new DatacenterMO(vmwareContext, "Datacenter").findDatastore(dsname));
-            DatastoreSummary summary = dsMo.getSummary();
-            long capacity = summary.getCapacity();
-            _logger.info("==end get oriented datastore capacity==");
-            resMap.put("capacity", capacity);
-            return resMap;
-        } catch (Exception e) {
-            resMap.put("msg", "failed");
-            _logger.error("vmware error:", e);
-            throw e;
-        } finally {
-            return resMap;
-        }
-    }
-
     //expand oriented datastore capacity
     public String expandVmfsDatastore(String dsname, Integer add_capacity) {
         String result = "success";
