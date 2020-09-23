@@ -33,6 +33,14 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
     private VCSDKUtils vcsdkUtils;
 
+    public DmeAccessService getDmeAccessService() {
+        return dmeAccessService;
+    }
+
+    public void setDmeAccessService(DmeAccessService dmeAccessService) {
+        this.dmeAccessService = dmeAccessService;
+    }
+
     public VCSDKUtils getVcsdkUtils() {
         return vcsdkUtils;
     }

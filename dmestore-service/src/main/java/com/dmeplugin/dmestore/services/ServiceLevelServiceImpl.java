@@ -1,6 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.entity.VCenterInfo;
+import com.dmeplugin.dmestore.exception.VcenterException;
 import com.dmeplugin.dmestore.model.RelationInstance;
 import com.dmeplugin.dmestore.model.ServiceLevelInfo;
 import com.dmeplugin.dmestore.model.StoragePool;
@@ -132,7 +133,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             VCenterInfo vCenterInfo= vCenterInfoService.getVCenterInfo();
             if (null!=vCenterInfo) {
                 sessionHelper.login(vCenterInfo.getHostIp(),vCenterInfo.getUserName(),CipherUtils.decryptString(vCenterInfo.getPassword()));
-            }
+
 
             String categoryid=vcsdkUtils.getCategoryID(sessionHelper);
 
@@ -185,6 +186,11 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             vcsdkUtils.removePbmProfileInAllContext(pbmProfiles);
             vcsdkUtils.removeAllTags(tagModels,sessionHelper);
             log.info("后台更新服务等级策略完成");
+            }
+            else
+            {
+                throw new VcenterException("数据库中没有vcenter信息");
+            }
         } catch (Exception e) {
             log.error("list serviceLevel error", e);
         }

@@ -1581,6 +1581,124 @@ public class VCSDKUtils {
 
     }
 
+    //主机配置iscsi
+    public void configureIscsi(String hostObjectId,Map<String, String> vmKernel,List<EthPortInfo> ethPorts) throws Exception{
+        try {
+            if(ethPorts==null){
+                _logger.error("configure Iscsi error:ethPorts is null.");
+                throw new Exception("configure Iscsi error:ethPorts is null.");
+            }
+            if(vmKernel==null){
+                _logger.error("configure Iscsi error:vmKernel is null.");
+                throw new Exception("configure Iscsi error:vmKernel is null.");
+            }
+            if(StringUtils.isEmpty(hostObjectId)){
+                _logger.error("configure Iscsi error:host ObjectId is null.");
+                throw new Exception("configure Iscsi error:host ObjectId is null.");
+            }
+
+            String serverguid = vcConnectionHelper.objectID2Serverguid(hostObjectId);
+            VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
+
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+            //取得该存储下所有已经挂载的主机ID
+            ManagedObjectReference objmor = vcConnectionHelper.objectID2MOR(hostObjectId);
+            HostMO hostmo = new HostMO(vmwareContext, objmor);
+            //查找对应的iscsi适配器
+            String iscsiHbaDevice = null;
+            List<HostHostBusAdapter> hbas = hostmo.getHostStorageSystemMO().getStorageDeviceInfo().getHostBusAdapter();
+            for (HostHostBusAdapter hba : hbas) {
+                if (hba instanceof HostInternetScsiHba) {
+                    HostInternetScsiHba iscsiHba = (HostInternetScsiHba) hba;
+                    if(!StringUtils.isEmpty(iscsiHba.getDevice())){
+                        iscsiHbaDevice = iscsiHba.getDevice();
+                        break;
+                    }
+                }
+            }
+            if(StringUtils.isEmpty(iscsiHbaDevice)){
+                _logger.error("find iscsi Hba Device error:No iSCSI adapter found");
+                throw new Exception("find iscsi Hba Device error:No iSCSI adapter found");
+            }
+            //得到vmKernel适配器
+            //网络端口邦定，将vmKernelDevice邦定到iscsiHbaDevice
+            boundVmKernel(hostmo, vmKernel, iscsiHbaDevice);
+            //添加发现目标
+            addIscsiSendTargets(hostmo, ethPorts, iscsiHbaDevice);
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware error:", e);
+            throw e;
+        }
+
+    }
+    //网络端口邦定，将vmKernelDevice邦定到iscsiHbaDevice
+    public void boundVmKernel(HostMO hostmo,Map<String, String> vmKernel,String iscsiHbaDevice) throws Exception{
+        try {
+            if(vmKernel==null){
+                _logger.error("configure Iscsi error:vmKernel is null.");
+                throw new Exception("configure Iscsi error:vmKernel is null.");
+            }
+            if(hostmo==null){
+                _logger.error("configure Iscsi error:host is null.");
+                throw new Exception("configure Iscsi error:host is null.");
+            }
+            if(StringUtils.isEmpty(iscsiHbaDevice)){
+                _logger.error("find iscsi Hba Device error:No iSCSI adapter found");
+                throw new Exception("find iscsi Hba Device error:No iSCSI adapter found");
+            }
+            //得到vmKernel适配器
+            String vmKernelDevice = ToolUtils.getStr(vmKernel.get("device"));
+            if(StringUtils.isEmpty(vmKernelDevice)){
+                _logger.error("find vmKernel Device error:No vmKernel adapter found");
+                throw new Exception("find vmKernel Device error:No vmKernel adapter found");
+            }
+            //网络端口邦定，将vmKernelDevice邦定到iscsiHbaDevice
+            hostmo.getIscsiManagerMO().bindVnic(iscsiHbaDevice,vmKernelDevice);
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware error:", e);
+            throw e;
+        }
+    }
+    //添加发现目标
+    public void addIscsiSendTargets(HostMO hostmo,List<EthPortInfo> ethPorts,String iscsiHbaDevice) throws Exception{
+        try {
+            if(ethPorts==null){
+                _logger.error("configure Iscsi error:ethPorts is null.");
+                throw new Exception("configure Iscsi error:ethPorts is null.");
+            }
+            if(hostmo==null){
+                _logger.error("configure Iscsi error:host is null.");
+                throw new Exception("configure Iscsi error:host is null.");
+            }
+            if(StringUtils.isEmpty(iscsiHbaDevice)){
+                _logger.error("find iscsi Hba Device error:No iSCSI adapter found");
+                throw new Exception("find iscsi Hba Device error:No iSCSI adapter found");
+            }
+
+            //添加发现目标
+            if(ethPorts!=null && ethPorts.size()>0){
+                List<HostInternetScsiHbaSendTarget> targets = new ArrayList<>();
+                for(EthPortInfo ethPortInfo:ethPorts){
+                    //组装发现目标
+                    HostInternetScsiHbaSendTarget target = new HostInternetScsiHbaSendTarget();
+                    target.setAddress(ethPortInfo.getMgmtIp());
+                    targets.add(target);
+                }
+                if(targets.size()>0){
+                    //向iscsi添加目标
+                    hostmo.getHostStorageSystemMO().addInternetScsiSendTargets(iscsiHbaDevice,targets);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware error:", e);
+            throw e;
+        }
+
+    }
+
     public static void main(String[] args) {
 //        try {
 //            Gson gson = new Gson();
