@@ -96,7 +96,17 @@ public class SystemServiceImpl implements SystemService {
       systemDao.checkExistAndCreateTable(SqlFileConstant.HW_BEST_PRACTICE_CHECK,
               SqlFileConstant.HW_BEST_PRACTICE_CHECK_SQL);
 
-      LOGGER.info("Removing HA data...");
+      // 20200922 add table DP_DME_TASK_INFO
+      systemDao.checkExistAndCreateTable(DPSqlFileConstant.DP_DME_TASK_INFO,
+              DPSqlFileConstant.DP_DME_TASK_INFO_SQL);
+
+      LOGGER.info("creating table over...");
+
+      systemDao.initData(DPSqlFileConstant.DP_DME_TASK_DATA_SYNCSERVICELEVEL_SQL);
+
+      systemDao.initData(DPSqlFileConstant.DP_DME_TASK_DATA_SYNCBESTPRACTISE_SQL);
+
+      LOGGER.info("init data over...");
       vCenterInfoService.deleteHASyncAndDeviceData();
     } catch (Exception e) {
       LOGGER.error("Failed to init DB: " + e.getMessage());

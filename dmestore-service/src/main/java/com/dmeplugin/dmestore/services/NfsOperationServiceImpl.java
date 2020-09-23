@@ -1,6 +1,5 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.model.TaskDetailInfo;
 import com.dmeplugin.dmestore.model.TaskDetailResource;
 import com.dmeplugin.dmestore.mvc.VmfsOperationController;
@@ -29,7 +28,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     private final String API_NFSSHARE_CREATE = "/rest/fileservice/v1/nfs-shares";
     private final String API_STORAGEPOOL_LIST = "/rest/storagemgmt/v1/storagepools/query";
     private final String API_FS_UPDATE = "/rest/fileservice/v1/filesystems";
-    private final String API_NFS_CHANGECAPACITY = "/rest/fileservice/v1/filesystems";
 
     public static final Logger LOG = LoggerFactory.getLogger(VmfsOperationController.class);
     private DmeAccessService dmeAccessService;
@@ -304,41 +302,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             resMap.put("msg", e.getMessage());
         }
         return resMap;
-    }
-
-    /**
-     *  params{
-     *      file_system_id String 文件系统唯一标识
-     *      capacity double 该规格文件系统容量，单位GB
-     *      is_expand boolean 扩容 true  缩容 false
-     *  }
-     * @param
-     * @return
-     */
-    @Override
-    public ResponseBodyBean changNfsCapacity(Map<String, String> params) {
-
-        ResponseBodyBean responseBodyBean = new ResponseBodyBean();
-        responseBodyBean.setCode("202");
-        responseBodyBean.setDescription("change nfs capacity success!");
-        String capacity = params.get("capacity");
-        String is_expand = params.get("is_expand");
-        if (params == null || params.size() == 0 || StringUtils.isEmpty(params.get("file_system_id"))
-                || StringUtils.isEmpty(params.get("capacity")) || StringUtils.isEmpty(params.get("is_expand"))) {
-            responseBodyBean.setCode("403");
-            responseBodyBean.setDescription("change nfs capacity error! cause : params error");
-        }
-        Double changeCapacity = Double.valueOf(capacity);
-        String url = API_NFS_CHANGECAPACITY + "/" + params.get("file_system_id");
-
-      /*  if () {
-        }*/
-
-
-
-
-
-        return null;
     }
 
     //create file system

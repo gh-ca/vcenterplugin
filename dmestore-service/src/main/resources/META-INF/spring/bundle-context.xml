@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xmlns:mvc="http://www.springframework.org/schema/mvc"
-   xmlns:context="http://www.springframework.org/schema/context"
-   xsi:schemaLocation="
-      http://www.springframework.org/schema/beans
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
       http://www.springframework.org/schema/beans/spring-beans.xsd
       http://www.springframework.org/schema/mvc
       http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
       http://www.springframework.org/schema/context
-      http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+      http://www.springframework.org/schema/context/spring-context-3.0.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
     <context:property-placeholder location="classpath:application.properties"/>
 
@@ -38,6 +38,10 @@
     </bean>
 
     <bean name="vcenterInfoDao" class="com.dmeplugin.dmestore.dao.VCenterInfoDao">
+        <property name="url" value="${h2.url}"/>
+    </bean>
+
+    <bean name="scheduleDao" class="com.dmeplugin.dmestore.dao.ScheduleDao">
         <property name="url" value="${h2.url}"/>
     </bean>
 
@@ -101,10 +105,7 @@
         <property name="taskService" ref="taskService"/>
     </bean>
 
-    <bean name="vmfsOperationService" class="com.dmeplugin.dmestore.services.VmfsOperationServiceImpl">
-        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
-        <property name="vcsdkUtils" ref="vCSDKUtils"/>
-    </bean>>
+    <bean name="vmfsOperationService" class="com.dmeplugin.dmestore.services.VmfsOperationServiceImpl"/>
 
 
     <bean name="vmwareAccessService" class="com.dmeplugin.dmestore.services.VmwareAccessServiceImpl">
@@ -178,6 +179,13 @@
     <bean name="hostAccessService" class="com.dmeplugin.dmestore.services.HostAccessServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
+    
+    
+    <context:annotation-config/>
+    <!--spring扫描注解的配置-->
+    <context:component-scan base-package="com.dmeplugin.dmestore.task"/>
 
-
+    <!--开启这个配置，spring才能识别@Scheduled注解-->
+    <task:annotation-driven scheduler="qbScheduler" mode="proxy"/>
+    <task:scheduler id="qbScheduler" pool-size="10"/>
 </beans>
