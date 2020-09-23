@@ -105,7 +105,10 @@
         <property name="taskService" ref="taskService"/>
     </bean>
 
-    <bean name="vmfsOperationService" class="com.dmeplugin.dmestore.services.VmfsOperationServiceImpl"/>
+    <bean name="vmfsOperationService" class="com.dmeplugin.dmestore.services.VmfsOperationServiceImpl">
+        <property name="vcsdkUtils" ref="vCSDKUtils"/>
+        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
+    </bean>
 
 
     <bean name="vmwareAccessService" class="com.dmeplugin.dmestore.services.VmwareAccessServiceImpl">
@@ -165,7 +168,12 @@
     </bean>
 
     
-    <bean name="nfsOperationService" class="com.dmeplugin.dmestore.services.NfsOperationServiceImpl"/>
+    <bean name="nfsOperationService" class="com.dmeplugin.dmestore.services.NfsOperationServiceImpl">
+        <property name="taskService" ref="taskService"/>
+        <property name="dmeStorageService" ref="dmeStorageService"/>
+        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
+        <property name="vcsdkUtils" ref="vCSDKUtils"/>
+    </bean>
 
 
     <bean name="PluginRegisterServiceImpl" class="com.dmeplugin.dmestore.services.PluginRegisterServiceImpl">
