@@ -669,7 +669,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                     }
                 }
             } else {
-                throw new Exception("DME find or create host error!");
+                throw new Exception("DME dataStore ObjectId is null!");
             }
         } else {
             throw new Exception("Mount nfs parameter exception:" + params);

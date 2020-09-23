@@ -165,18 +165,14 @@
     </bean>
 
     
-    <bean name="nfsOperationService" class="com.dmeplugin.dmestore.services.NfsOperationServiceImpl">
-        <property name="vcsdkUtils" ref="vCSDKUtils"/>
-        <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
-        <property name="dmeStorageService" ref="dmeStorageService"/>
-        <property name="taskService" ref="taskService"/>
-    </bean>
+    <bean name="nfsOperationService" class="com.dmeplugin.dmestore.services.NfsOperationServiceImpl"/>
+
 
     <bean name="PluginRegisterServiceImpl" class="com.dmeplugin.dmestore.services.PluginRegisterServiceImpl">
 
     </bean>
 
-    <bean name="hostAccessService" class="com.dmeplugin.dmestore.services.HostAccessServiceImpl">
+   <bean name="hostAccessService" class="com.dmeplugin.dmestore.services.HostAccessServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
     
