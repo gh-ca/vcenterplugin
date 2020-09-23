@@ -31,6 +31,10 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     private DmeInfoDao dmeInfoDao;
 
+    private VmfsAccessService vmfsAccessService;
+
+    private DmeNFSAccessService dmeNFSAccessService;
+
     private Gson gson = new Gson();
 
     private static String dmeToken;
@@ -475,6 +479,14 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         this.dmeInfoDao = dmeInfoDao;
     }
 
+    public void setVmfsAccessService(VmfsAccessService vmfsAccessService) {
+        this.vmfsAccessService = vmfsAccessService;
+    }
+
+    public void setDmeNFSAccessService(DmeNFSAccessService dmeNFSAccessService) {
+        this.dmeNFSAccessService = dmeNFSAccessService;
+    }
+
     @Override
     public Map<String, Object> getDmeHost(String hostId) throws Exception {
         Map<String, Object> map = new HashMap<>();
@@ -516,5 +528,37 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         }
         LOG.info("getDmeHost relists===" + (gson.toJson(map)));
         return map;
+    }
+
+    @Override
+    public void scanDatastore(String storageType) throws Exception{
+        if(!StringUtils.isEmpty(storageType)){
+            if(storageType.equals(ToolUtils.STORE_TYPE_VMFS)){
+                LOG.info("scan VMFS Datastore start");
+                vmfsAccessService.scanVmfs();
+                LOG.info("scan VMFS Datastore end");
+            }else if(storageType.equals(ToolUtils.STORE_TYPE_NFS)){
+                LOG.info("scan NFS Datastore start");
+                dmeNFSAccessService.scanNfs();
+                LOG.info("scan NFS Datastore end");
+            }else if(storageType.equals(ToolUtils.STORE_TYPE_ALL)){
+                //扫描vmfs
+                try {
+                    LOG.info("scan VMFS Datastore start");
+                    vmfsAccessService.scanVmfs();
+                    LOG.info("scan VMFS Datastore end");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                //扫描nfs
+                try {
+                    LOG.info("scan NFS Datastore start");
+                    dmeNFSAccessService.scanNfs();
+                    LOG.info("scan NFS Datastore end");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

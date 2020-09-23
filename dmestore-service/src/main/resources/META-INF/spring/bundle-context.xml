@@ -27,6 +27,8 @@
 
     <bean name="DmeAccessServiceImpl" class="com.dmeplugin.dmestore.services.DmeAccessServiceImpl">
         <property name="dmeInfoDao" ref="dmeInfoDao"/>
+        <property name="vmfsAccessService" ref="VmfsAccessServiceImpl"/>
+        <property name="dmeNFSAccessService" ref="DmeNFSAccessServiceImpl"/>
     </bean>
 
     <bean name="h2DataBaseDao" class="com.dmeplugin.dmestore.dao.H2DataBaseDao">

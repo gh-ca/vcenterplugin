@@ -100,5 +100,28 @@ public class DmeAccessController extends BaseController {
         return failure(failureStr);
     }
 
+    /**
+     * scan Datastore
+     *
+     * @param storageType storage type:VMFS,NFS,ALL
+     * @return ResponseBodyBean
+     * @throws Exception when error
+     */
+    @RequestMapping(value = "/scandatastore", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseBodyBean scanDatastore(@RequestParam("storageType") String storageType)
+            throws Exception {
+        LOG.info("accessdme/scandatastore storageId==" + storageType);
+        String failureStr = "";
+        try {
+            dmeAccessService.scanDatastore(storageType);
+            return success(null,"scan datastore complete!");
+        } catch (Exception e) {
+            LOG.error("scan datastore failure:", e);
+            failureStr = "scan datastore failure:"+e.toString();
+        }
+        return failure(failureStr);
+    }
+
 
 }

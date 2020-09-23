@@ -109,4 +109,13 @@ public interface DmeAccessService {
      */
     Map<String, Object> getDmeHost(String hostId) throws Exception;
 
+    /**
+     * scan Datastore
+     *
+     * @param storageType storage type:VMFS,NFS,ALL
+     * @return ResponseBodyBean
+     * @throws Exception when error
+     */
+    void scanDatastore(String storageType) throws Exception;
+
 }
