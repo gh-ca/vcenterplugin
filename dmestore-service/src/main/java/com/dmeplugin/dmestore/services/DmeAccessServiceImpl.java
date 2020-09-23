@@ -143,6 +143,40 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         return responseEntity;
     }
 
+    @Override
+    public ResponseEntity<String> accessByJson(String url, HttpMethod method, String jsonBody) throws Exception{
+        ResponseEntity<String> responseEntity = null;
+
+        if (StringUtils.isEmpty(dmeToken)) {
+            //如果token为空，就自动登录，获取token
+            LOG.info("token为空，自动登录，获取token");
+            iniLogin();
+        }
+
+        RestUtils restUtils = new RestUtils();
+        RestTemplate restTemplate = restUtils.getRestTemplate();
+
+        HttpHeaders headers = getHeaders();
+
+        HttpEntity<String> entity = new HttpEntity<>(null, headers);
+        if (url.indexOf("http") < 0) {
+            url = dmeHostUrl + url;
+        }
+        responseEntity = restTemplate.exchange(url, method, entity, String.class, jsonBody);
+        LOG.info(url + "==responseEntity==" + (responseEntity == null ? "null" : responseEntity.getStatusCodeValue()));
+        if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_403 ||
+                responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_401) {
+            //如果token失效，重新登录
+            dmeToken = null;
+            LOG.info("token失效，重新登录，获取token");
+            iniLogin();
+            //得到新token后，重新执行上次任务
+            LOG.info("得到新token后，重新执行上次任务，dmeToken==" + dmeToken);
+            responseEntity = restTemplate.exchange(dmeHostUrl + url, method, entity, String.class, jsonBody);
+        }
+        return responseEntity;
+    }
+
     private synchronized ResponseEntity login(Map<String, Object> params) throws Exception {
         ResponseEntity responseEntity = null;
         dmeToken = null;
