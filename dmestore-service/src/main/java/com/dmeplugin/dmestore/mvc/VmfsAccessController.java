@@ -22,7 +22,7 @@ import java.util.Map;
  **/
 @RestController
 @RequestMapping(value = "/accessvmfs")
-public class VmfsAccessController extends BaseController{
+public class VmfsAccessController extends BaseController {
     public static final Logger LOG = LoggerFactory.getLogger(VmfsAccessController.class);
 
 
@@ -33,7 +33,7 @@ public class VmfsAccessController extends BaseController{
 
     /**
      * Access vmfs
-
+     *
      * @return: ResponseBodyBean
      */
     @RequestMapping(value = "/listvmfs", method = RequestMethod.GET)
@@ -46,9 +46,9 @@ public class VmfsAccessController extends BaseController{
             List<VmfsDataInfo> lists = vmfsAccessService.listVmfs();
             LOG.info("listvmfs lists==" + gson.toJson(lists));
             return success(lists);
-        }catch (Exception e){
+        } catch (Exception e) {
             LOG.error("list vmfs failure:", e);
-            failureStr = "list vmfs failure:"+e.toString();
+            failureStr = "list vmfs failure:" + e.toString();
         }
         return failure(failureStr);
     }
@@ -56,22 +56,22 @@ public class VmfsAccessController extends BaseController{
     /**
      * Access vmfs performance
      *
-     * @param  volumeIds volumes id
+     * @param volumeIds volumes id
      * @return: ResponseBodyBean
      */
     @RequestMapping(value = "/listvmfsperformance", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean listVmfsPerformance(@RequestParam("volumeIds") List<String> volumeIds)
             throws Exception {
-        LOG.info("accessvmfs/listvmfsperformance volumeIds=="+gson.toJson(volumeIds));
+        LOG.info("accessvmfs/listvmfsperformance volumeIds==" + gson.toJson(volumeIds));
         String failureStr = "";
         try {
             List<VmfsDataInfo> lists = vmfsAccessService.listVmfsPerformance(volumeIds);
             LOG.info("listvmfsperformance lists==" + gson.toJson(lists));
             return success(lists);
-        }catch (Exception e){
+        } catch (Exception e) {
             LOG.error("get vmfs performance failure:", e);
-            failureStr = "get vmfs performance failure:"+e.toString();
+            failureStr = "get vmfs performance failure:" + e.toString();
         }
         return failure(failureStr);
     }
@@ -114,14 +114,14 @@ public class VmfsAccessController extends BaseController{
     @ResponseBody
     public ResponseBodyBean createVmfs(@RequestBody Map<String, Object> params)
             throws Exception {
-        LOG.info("accessvmfs/createvmfs=="+gson.toJson(params));
+        LOG.info("accessvmfs/createvmfs==" + gson.toJson(params));
         String failureStr = "";
         try {
             vmfsAccessService.createVmfs(params);
-            return success(null,"Create vmfs success");
-        }catch (Exception e){
+            return success(null, "Create vmfs success");
+        } catch (Exception e) {
             LOG.error("create vmfs failure:", e);
-            failureStr = "create vmfs failure:"+e.toString();
+            failureStr = "create vmfs failure:" + e.toString();
         }
         return failure(failureStr);
     }
@@ -141,14 +141,14 @@ public class VmfsAccessController extends BaseController{
     @ResponseBody
     public ResponseBodyBean mountVmfs(@RequestBody Map<String, Object> params)
             throws Exception {
-        LOG.info("accessvmfs/mountvmfs=="+gson.toJson(params));
+        LOG.info("accessvmfs/mountvmfs==" + gson.toJson(params));
         String failureStr = "";
         try {
             vmfsAccessService.mountVmfs(params);
-            return success(null,"Mount vmfs success");
-        }catch (Exception e){
+            return success(null, "Mount vmfs success");
+        } catch (Exception e) {
             LOG.error("mount vmfs failure:", e);
-            failureStr = "mount vmfs failure:"+e.toString();
+            failureStr = "mount vmfs failure:" + e.toString();
         }
         return failure(failureStr);
     }
@@ -190,7 +190,7 @@ public class VmfsAccessController extends BaseController{
         try {
             VmfsDatastoreVolumeDetail detail = vmfsAccessService.volumeDetail(volume_id);
             return success(detail);
-        }catch (Exception e){
+        } catch (Exception e) {
             return failure(e.getMessage());
         }
     }
@@ -198,10 +198,30 @@ public class VmfsAccessController extends BaseController{
     @RequestMapping(value = "/scanvmfs", method = RequestMethod.GET)
     public ResponseBodyBean scanvmfs() throws Exception {
         boolean flag = vmfsAccessService.scanVmfs();
-        if(flag){
+        if (flag) {
             return success();
         }
 
         return failure();
+    }
+
+    @RequestMapping(value = "/gethostsbystorageid}", method = RequestMethod.GET)
+    public ResponseBodyBean getHostsByStorageId(@PathVariable(value = "storageId") String storageId) throws Exception {
+        try {
+            List<Map<String, Object>> hosts = vmfsAccessService.getHostsByStorageId(storageId);
+            return success(hosts);
+        } catch (Exception e) {
+            return failure(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "/gethostgroupsbystorageid}", method = RequestMethod.GET)
+    public ResponseBodyBean getHostGroupsByStorageId(@PathVariable(value = "storageId") String storageId) throws Exception {
+        try {
+            List<Map<String, Object>> hosts = vmfsAccessService.getHostGroupsByStorageId(storageId);
+            return success(hosts);
+        } catch (Exception e) {
+            return failure(e.getMessage());
+        }
     }
 }

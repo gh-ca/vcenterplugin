@@ -9,6 +9,7 @@ public class ResponseBodyBean {
     public ResponseBodyBean() {
     }
 
+    
     public ResponseBodyBean(String code, Object data, String description) {
         this.code = code;
         this.data = data;

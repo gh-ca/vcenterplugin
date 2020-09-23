@@ -1,5 +1,7 @@
 package com.dmeplugin.dmestore.model;
 
+import java.util.List;
+
 /**
  * @author lianq
  * @ClassName: Volume
@@ -18,6 +20,8 @@ public class Volume  {
     private String pool_raw_id;
     private String capacity_usage;
     private Boolean protectionStatus;
+    private List<String> hostIds;
+    private List<String> hostGroupIds;
 
     public String getId() {
         return id;
@@ -97,5 +101,21 @@ public class Volume  {
 
     public void setProtectionStatus(Boolean protectionStatus) {
         this.protectionStatus = protectionStatus;
+    }
+
+    public List<String> getHostIds() {
+        return hostIds;
+    }
+
+    public void setHostIds(List<String> hostIds) {
+        this.hostIds = hostIds;
+    }
+
+    public List<String> getHostGroupIds() {
+        return hostGroupIds;
+    }
+
+    public void setHostGroupIds(List<String> hostGroupIds) {
+        this.hostGroupIds = hostGroupIds;
     }
 }
