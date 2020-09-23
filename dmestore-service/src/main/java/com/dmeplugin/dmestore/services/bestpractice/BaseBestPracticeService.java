@@ -38,6 +38,9 @@ public class BaseBestPracticeService {
 
     protected void update(VmwareContext context, String objectId,
                           String hostSetting, Object recommendValue) throws Exception {
+        if (check(context, objectId, hostSetting, recommendValue)) {
+            return;
+        }
         ManagedObjectReference mor = vcConnectionHelper.objectID2MOR(objectId);
         HostMO hostMo = new HostMO(context, mor);
         List<OptionValue> values = hostMo.getHostAdvanceOptionMO().queryOptions(hostSetting);
@@ -78,6 +81,9 @@ public class BaseBestPracticeService {
 
     protected void updateModuleOption(VmwareContext context, String objectId,
                                       String optionName, Object recommendValue) throws Exception {
+        if (checkModuleOption(context, objectId, optionName, recommendValue)) {
+            return;
+        }
         ManagedObjectReference mor = vcConnectionHelper.objectID2MOR(objectId);
         HostMO hostMo = new HostMO(context, mor);
         String v = optionName + "=" + String.valueOf(recommendValue);
