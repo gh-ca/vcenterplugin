@@ -31,6 +31,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     private final String API_INSTANCES_LIST = "/rest/resourcedb/v1/instances";
 
 
+
     private static final Logger LOG = LoggerFactory.getLogger(DmeStorageServiceImpl.class);
 
     private Gson gson=new Gson();
@@ -85,6 +86,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storageObj.setMaxIops(Double.valueOf(jsonObj.get("max_iops").getAsString()));
                     storageObj.setMaxBandwidth(Double.valueOf(jsonObj.get("max_bandwidth").getAsString()));
                     storageObj.setMaxLatency(Double.valueOf(jsonObj.get("max_latency").getAsString()));
+                    storageObj.setStatus(jsonObj.get("sn").getAsString());
                     JsonElement jsonAzIds = jsonObj.get("az_ids");
                     if (jsonAzIds != null) {
                         String azIds = jsonAzIds.getAsString();
@@ -625,6 +627,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
 
     }
+
 
     private ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws Exception {
 

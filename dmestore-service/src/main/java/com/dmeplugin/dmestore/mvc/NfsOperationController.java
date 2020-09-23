@@ -40,14 +40,7 @@ public class NfsOperationController extends BaseController{
      *           count int 该规格文件系统数量  必 （count 固定：1）
      *      }]
      *       capacity_autonegotiation : {
-     *           capacity_self_adjusting_mode str  自动扩容触发门限百分比，默认85%。自动扩容触发门限百分比必须大于自动缩容触发门限百分比
-     *           capacity_recycle_mode str  容量回收模式。 expand_capacity：优先扩容；delete_snapshots：优先删除旧快照。默认优先扩容
      *           auto_size_enable  boolean 自动调整容量开关。 false: 关闭；true：打开。默认打开
-     *           auto_grow_threshold_percent int 自动扩容触发门限百分比，默认85%。自动扩容触发门限百分比必须大于自动缩容触发门限百分比
-     *           auto_shrink_threshold_percent int 自动缩容触发门限百分比，默认50%。自动扩容触发门限百分比必须大于自动缩容触发门限百分比,
-     *           max_auto_size double 自动扩容下限。单位GB。默认16777216GB。自动扩容上限必须大于等于自动缩容下限
-     *           min_auto_size double 自动缩容下限。单位GB。默认16777216GB。自动扩容上限必须大于等于自动缩容下限
-     *           auto_size_increment int 自动扩（缩）容单次变化量。单位MB。默认1GB
      *        },
      *      tuning属性 （高级属性设置）{
      *           deduplication_enabled  boolean 重复数据删除。默认关闭
@@ -137,5 +130,25 @@ public class NfsOperationController extends BaseController{
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
+    }
+
+    /**
+     * {
+     *     file_system_id string 文件系统唯一标识 必
+     *     is_expand boolean 扩容 is_expand=true  缩容 is_expand = false 必
+     *     capacity double 该规格文件系统容量，单位GB 必
+     * }
+     * @param params
+     * @return
+     */
+    @PutMapping("/changenfsdatastore")
+    @ResponseBody
+    public ResponseBodyBean changeNfsCapacity(@RequestBody Map<String,String> params){
+
+        ResponseBodyBean responseBodyBean = nfsOperationService.changeNfsCapacity(params);
+        if (null != responseBodyBean && null != responseBodyBean.getCode() && responseBodyBean.getCode().equals("200")) {
+            return success(responseBodyBean);
+        }
+        return failure(gson.toJson(responseBodyBean));
     }
 }
