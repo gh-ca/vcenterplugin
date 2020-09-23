@@ -13,7 +13,9 @@
 
 package com.dmeplugin.vmware.autosdk;
 
-import com.vmware.common.ssl.TrustAllTrustManager;
+
+
+import com.dmeplugin.vmware.util.VmwareClient;
 
 import javax.net.ssl.*;
 import java.io.ByteArrayInputStream;
@@ -109,7 +111,7 @@ public class SslUtil {
             // Create the trust manager.
             TrustManager[] trustAllCerts =
                     new TrustManager[1];
-            TrustManager tm = new TrustAllTrustManager();
+            TrustManager tm = new VmwareClient.TrustAllTrustManager();
             trustAllCerts[0] = tm;
 
             // Create the SSL context
