@@ -121,7 +121,7 @@ public class NfsOperationController extends BaseController{
      * @param params
      * @return
      */
-    @PutMapping("/updatenfsdatastore")
+    @PostMapping("/updatenfsdatastore")
     @ResponseBody
     public ResponseBodyBean updateNfsDatastore(@RequestBody Map<String,String> params){
 
