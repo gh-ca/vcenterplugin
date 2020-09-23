@@ -32,7 +32,7 @@ public class HostAccessController extends BaseController {
      * Configure the host with iSCSI, params include:
      * String hostObjectId：host object id
      * Map<String, String> vmKernel：  选择的vmkernel
-     * List<EthPortInfo> ethPorts: 选择的以太网端口列表
+     * List<Map<String, Object>> ethPorts: 选择的以太网端口列表
      *
      * @param params: params include:hostObjectId,vmKernel,ethPorts
      * @return: ResponseBodyBean
