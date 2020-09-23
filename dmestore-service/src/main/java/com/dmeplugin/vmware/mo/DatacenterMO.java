@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 public class DatacenterMO extends BaseMO {
     private static final Logger s_logger = LoggerFactory.getLogger(DatacenterMO.class);
 
-    public DatacenterMO(VmwareContext context, ManagedObjectReference morDc) {
+        public DatacenterMO(VmwareContext context, ManagedObjectReference morDc) {
         super(context, morDc);
     }
 

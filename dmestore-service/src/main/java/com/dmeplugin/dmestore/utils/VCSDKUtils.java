@@ -1,28 +1,36 @@
 package com.dmeplugin.dmestore.utils;
 
+import com.dmeplugin.dmestore.model.EthPortInfo;
 import com.dmeplugin.dmestore.services.EchoServiceImpl;
 import com.dmeplugin.vmware.VCConnectionHelper;
 import com.dmeplugin.vmware.autosdk.SessionHelper;
 import com.dmeplugin.vmware.autosdk.TaggingWorkflow;
 import com.dmeplugin.vmware.mo.*;
 import com.dmeplugin.vmware.util.Pair;
+import com.dmeplugin.vmware.util.PbmUtil;
 import com.dmeplugin.vmware.util.TestVmwareContextFactory;
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.vmware.cis.tagging.CategoryModel;
+import com.vmware.cis.tagging.CategoryTypes;
 import com.vmware.cis.tagging.TagModel;
+import com.vmware.pbm.*;
+import com.vmware.pbm.RuntimeFaultFaultMsg;
 import com.vmware.vapi.std.DynamicID;
 import com.vmware.vim25.*;
+import com.vmware.vim25.InvalidArgumentFaultMsg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class VCSDKUtils {
+
+    private static final String POLICY_DESC="policy created by dme";
+
+    public static final String CATEGORY_NAME="DME Service Level";
 
     private VCConnectionHelper vcConnectionHelper;
 
@@ -34,7 +42,7 @@ public class VCSDKUtils {
         this.vcConnectionHelper = vcConnectionHelper;
     }
 
-    private final static Logger _logger = LoggerFactory.getLogger(EchoServiceImpl.class);
+    private final static Logger _logger = LoggerFactory.getLogger(VCSDKUtils.class);
 
     private Gson gson = new Gson();
 
@@ -540,17 +548,20 @@ public class VCSDKUtils {
         return hosts;
     }
 
-    public String renameDataStore(String oldName, String newName) throws Exception {
+    //rename datastore name
+    public String renameDataStore(String newName,String dataStoreObjectId) throws Exception {
 
         String result = "success";
         _logger.info("==start rename DataStore==");
         try {
-            VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
-            for (VmwareContext vmwareContext : vmwareContexts) {
-                DatastoreMO dsMo = new DatastoreMO(vmwareContext, new DatacenterMO(vmwareContext, "Datacenter").findDatastore(oldName));
-                dsMo.renameDatastore(newName);
-                _logger.info("==end rename DataStore==");
-            }
+            String serverguid = vcConnectionHelper.objectID2Serverguid(dataStoreObjectId);
+            VmwareContext serverContext = vcConnectionHelper.getServerContext(serverguid);
+            ManagedObjectReference dsmor = vcConnectionHelper.objectID2MOR(dataStoreObjectId);
+            //todo 测试需要生成使用
+            //String objectId = vcConnectionHelper.MOR2ObjectID(dsMo.getMor(), dsMo.getContext().getServerAddress());
+            DatastoreMO dsMo = new DatastoreMO(serverContext, dsmor);
+            dsMo.renameDatastore(newName);
+            _logger.info("==end rename DataStore==");
         } catch (Exception e) {
             result = "failed";
             _logger.error("vmware error:", e);
@@ -1365,6 +1376,327 @@ public class VCSDKUtils {
             throw e;
         }
         return listStr;
+    }
+
+    public List<PbmProfile> getAllSelfPolicyInallcontext(){
+        List<PbmProfile> pbmProfiles=new ArrayList<>();
+        try {
+            VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
+            for (VmwareContext vmwareContext : vmwareContexts) {
+                pbmProfiles.addAll(getAllSelfPolicy(vmwareContext));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("获取所有虚拟机存储策略出错");
+        }
+        return pbmProfiles;
+    }
+    private List<PbmProfile> getAllSelfPolicy(VmwareContext vmwareContext){
+        List<PbmProfile> pbmProfiles=new ArrayList<>();
+        try {
+            PbmServiceInstanceContent spbmsc;
+            // Get PBM Profile Manager & Associated Capability Metadata
+            spbmsc = vmwareContext.getPbmServiceContent();
+            ManagedObjectReference profileMgr = spbmsc.getProfileManager();
+            //query profiles
+            List<PbmProfileId> pbmProfileIds = vmwareContext.getPbmService().pbmQueryProfile(profileMgr, PbmUtil.getStorageResourceType(), null);
+
+            List<PbmProfile> pbmprofiles = vmwareContext.getPbmService().pbmRetrieveContent(profileMgr, pbmProfileIds);
+
+            //获取通过插件创建的策略
+            for (PbmProfile profile : pbmprofiles) {
+                if (POLICY_DESC.equalsIgnoreCase(profile.getDescription())) {
+                    pbmProfiles.add(profile);
+                }
+            }
+        } catch (com.vmware.pbm.InvalidArgumentFaultMsg | RuntimeFaultFaultMsg invalidArgumentFaultMsg) {
+            invalidArgumentFaultMsg.printStackTrace();
+            _logger.error("获取虚拟机存储策略出错");
+        }
+        return pbmProfiles;
+    }
+
+    public List<TagModel> getAllTagsByCategoryId(String categoryid,SessionHelper sessionHelper){
+        List<TagModel> tagList=new ArrayList<>();
+        TaggingWorkflow taggingWorkflow=new TaggingWorkflow(sessionHelper);
+        List<String> tags=taggingWorkflow.listTagsForCategory(categoryid);
+        for (String tagid:tags){
+            tagList.add(taggingWorkflow.getTag(tagid));
+        }
+        return tagList;
+
+    }
+
+    public String getCategoryID(SessionHelper sessionHelper) throws Exception {
+        String categoryid="";
+
+        TaggingWorkflow taggingWorkflow=new TaggingWorkflow(sessionHelper);
+
+        List<String> categorylist=taggingWorkflow.listTagCategory();
+        for (String category:categorylist){
+            CategoryModel categoryModel=taggingWorkflow.getTagCategory(category);
+            if(categoryModel.getName().equalsIgnoreCase(CATEGORY_NAME)){
+                categoryid=categoryModel.getId();
+            }
+        }
+        if ("".equalsIgnoreCase(categoryid)){
+            //创建category
+            CategoryTypes.CreateSpec createSpec = new CategoryTypes.CreateSpec();
+            createSpec.setName(CATEGORY_NAME);
+
+            createSpec.setCardinality(CategoryModel.Cardinality.SINGLE);
+
+            Set<String> associableTypes = new HashSet<String>(); // empty hash set
+            associableTypes.add("Datastore");
+            createSpec.setAssociableTypes(associableTypes);
+            categoryid=taggingWorkflow.createTagCategory(createSpec);
+        }
+
+        return categoryid;
+    }
+
+    public void createPbmProfileInAllContext(String categoryName,String tagName){
+        try {
+            VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
+            for (VmwareContext vmwareContext : vmwareContexts) {
+                createPbmProfile(vmwareContext, categoryName, tagName);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("在所有实例上创建虚拟机存储策略出错");
+        }
+    }
+
+    private void createPbmProfile(VmwareContext vmwareContext,String categoryName,String tagName) throws RuntimeFaultFaultMsg, InvalidArgumentFaultMsg, com.vmware.vim25.RuntimeFaultFaultMsg {
+        //String tagCategoryName="dme";
+        //String profileName="mytestprofile";
+        PbmServiceInstanceContent spbmsc;
+        // Get PBM Profile Manager & Associated Capability Metadata
+        spbmsc = vmwareContext.getPbmServiceContent();
+        ManagedObjectReference profileMgr = spbmsc.getProfileManager();
+        // Get PBM Supported Capability Metadata
+        List<PbmCapabilityMetadataPerCategory> metadata =
+                vmwareContext.getPbmService().pbmFetchCapabilityMetadata(profileMgr,
+                        PbmUtil.getStorageResourceType(), null);
+
+        // Step 1: Create Property Instance with tags from the specified Category
+        PbmCapabilityMetadata tagCategoryInfo =
+                PbmUtil.getTagCategoryMeta(categoryName, metadata);
+        if (tagCategoryInfo == null)
+            throw new InvalidArgumentFaultMsg(
+                    "Specified Tag Category does not exist", null);
+        // Fetch Property Metadata of the Tag Category
+        List<PbmCapabilityPropertyMetadata> propMetaList =
+                tagCategoryInfo.getPropertyMetadata();
+        PbmCapabilityPropertyMetadata propMeta = propMetaList.get(0);
+        // Create a New Property Instance based on the Tag Category ID
+        PbmCapabilityPropertyInstance prop = new PbmCapabilityPropertyInstance();
+        prop.setId(propMeta.getId());
+        // Fetch Allowed Tag Values Metadata
+        PbmCapabilityDiscreteSet tagSetMeta =
+                (PbmCapabilityDiscreteSet) propMeta.getAllowedValue();
+        if (tagSetMeta == null || tagSetMeta.getValues().isEmpty())
+            throw new com.vmware.vim25.RuntimeFaultFaultMsg("Specified Tag Category '"
+                    + categoryName + "' does not have any associated tags", null);
+        // Create a New Discrete Set for holding Tag Values
+        PbmCapabilityDiscreteSet tagSet = new PbmCapabilityDiscreteSet();
+        for (Object obj : tagSetMeta.getValues()) {
+            if (tagName.equalsIgnoreCase(((PbmCapabilityDescription) obj).getValue().toString()))
+            tagSet.getValues().add(((PbmCapabilityDescription) obj).getValue());
+        }
+        prop.setValue(tagSet);
+
+
+        // Step 2: Associate Property Instance with a Rule
+        PbmCapabilityConstraintInstance rule =
+                new PbmCapabilityConstraintInstance();
+        rule.getPropertyInstance().add(prop);
+
+        // Step 3: Associate Rule with a Capability Instance
+        PbmCapabilityInstance capability = new PbmCapabilityInstance();
+        capability.setId(tagCategoryInfo.getId());
+        capability.getConstraint().add(rule);
+
+        // Step 4: Add Rule to a RuleSet
+        PbmCapabilitySubProfile ruleSet = new PbmCapabilitySubProfile();
+        ruleSet.getCapability().add(capability);
+
+        // Step 5: Add Rule-Set to Capability Constraints
+        PbmCapabilitySubProfileConstraints constraints =
+                new PbmCapabilitySubProfileConstraints();
+        ruleSet.setName("Rule-Set" + (constraints.getSubProfiles().size() + 1));
+        constraints.getSubProfiles().add(ruleSet);
+
+        // Step 6: Build Capability-Based Profile
+        PbmCapabilityProfileCreateSpec spec =
+                new PbmCapabilityProfileCreateSpec();
+        spec.setName(tagName);
+        spec.setDescription(POLICY_DESC);
+        spec.setResourceType(PbmUtil.getStorageResourceType());
+        spec.setConstraints(constraints);
+    }
+
+    public void createTag(String tagName,SessionHelper sessionHelper){
+
+        try {
+            TaggingWorkflow taggingWorkflow = new TaggingWorkflow(sessionHelper);
+            taggingWorkflow.createTag(tagName, "", getCategoryID(sessionHelper));
+            sessionHelper.logout();
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("创建tag出错");
+        }
+    }
+
+    private void removePbmProfile(VmwareContext vmwareContext,List<PbmProfile> pbmProfiles) throws RuntimeFaultFaultMsg {
+        List<PbmProfileId> pbmProfileIds=new ArrayList<>();
+        for (PbmProfile profile:pbmProfiles){
+            pbmProfileIds.add(profile.getProfileId());
+        }
+        PbmServiceInstanceContent spbmsc;
+        // Get PBM Profile Manager & Associated Capability Metadata
+        spbmsc = vmwareContext.getPbmServiceContent();
+        ManagedObjectReference profileMgr = spbmsc.getProfileManager();
+                vmwareContext.getPbmService().pbmDelete(profileMgr,
+                        pbmProfileIds);
+    }
+
+    public void removePbmProfileInAllContext(List<PbmProfile> pbmProfiles){
+        try {
+            VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
+            for (VmwareContext vmwareContext : vmwareContexts) {
+                removePbmProfile(vmwareContext, pbmProfiles);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("删除所有虚拟机存储策略出错");
+        }
+    }
+
+    public void removeAllTags(List<TagModel> tagModels,SessionHelper sessionHelper){
+        TaggingWorkflow taggingWorkflow=new TaggingWorkflow(sessionHelper);
+        for (TagModel tagModel:tagModels){
+            taggingWorkflow.deleteTag(tagModel.getId());
+        }
+
+    }
+
+    //主机配置iscsi
+    public void configureIscsi(String hostObjectId,Map<String, String> vmKernel,List<EthPortInfo> ethPorts) throws Exception{
+        try {
+            if(ethPorts==null){
+                _logger.error("configure Iscsi error:ethPorts is null.");
+                throw new Exception("configure Iscsi error:ethPorts is null.");
+            }
+            if(vmKernel==null){
+                _logger.error("configure Iscsi error:vmKernel is null.");
+                throw new Exception("configure Iscsi error:vmKernel is null.");
+            }
+            if(StringUtils.isEmpty(hostObjectId)){
+                _logger.error("configure Iscsi error:host ObjectId is null.");
+                throw new Exception("configure Iscsi error:host ObjectId is null.");
+            }
+
+            String serverguid = vcConnectionHelper.objectID2Serverguid(hostObjectId);
+            VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
+
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+            //取得该存储下所有已经挂载的主机ID
+            ManagedObjectReference objmor = vcConnectionHelper.objectID2MOR(hostObjectId);
+            HostMO hostmo = new HostMO(vmwareContext, objmor);
+            //查找对应的iscsi适配器
+            String iscsiHbaDevice = null;
+            List<HostHostBusAdapter> hbas = hostmo.getHostStorageSystemMO().getStorageDeviceInfo().getHostBusAdapter();
+            for (HostHostBusAdapter hba : hbas) {
+                if (hba instanceof HostInternetScsiHba) {
+                    HostInternetScsiHba iscsiHba = (HostInternetScsiHba) hba;
+                    if(!StringUtils.isEmpty(iscsiHba.getDevice())){
+                        iscsiHbaDevice = iscsiHba.getDevice();
+                        break;
+                    }
+                }
+            }
+            if(StringUtils.isEmpty(iscsiHbaDevice)){
+                _logger.error("find iscsi Hba Device error:No iSCSI adapter found");
+                throw new Exception("find iscsi Hba Device error:No iSCSI adapter found");
+            }
+            //得到vmKernel适配器
+            //网络端口邦定，将vmKernelDevice邦定到iscsiHbaDevice
+            boundVmKernel(hostmo, vmKernel, iscsiHbaDevice);
+            //添加发现目标
+            addIscsiSendTargets(hostmo, ethPorts, iscsiHbaDevice);
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware error:", e);
+            throw e;
+        }
+
+    }
+    //网络端口邦定，将vmKernelDevice邦定到iscsiHbaDevice
+    public void boundVmKernel(HostMO hostmo,Map<String, String> vmKernel,String iscsiHbaDevice) throws Exception{
+        try {
+            if(vmKernel==null){
+                _logger.error("configure Iscsi error:vmKernel is null.");
+                throw new Exception("configure Iscsi error:vmKernel is null.");
+            }
+            if(hostmo==null){
+                _logger.error("configure Iscsi error:host is null.");
+                throw new Exception("configure Iscsi error:host is null.");
+            }
+            if(StringUtils.isEmpty(iscsiHbaDevice)){
+                _logger.error("find iscsi Hba Device error:No iSCSI adapter found");
+                throw new Exception("find iscsi Hba Device error:No iSCSI adapter found");
+            }
+            //得到vmKernel适配器
+            String vmKernelDevice = ToolUtils.getStr(vmKernel.get("device"));
+            if(StringUtils.isEmpty(vmKernelDevice)){
+                _logger.error("find vmKernel Device error:No vmKernel adapter found");
+                throw new Exception("find vmKernel Device error:No vmKernel adapter found");
+            }
+            //网络端口邦定，将vmKernelDevice邦定到iscsiHbaDevice
+            hostmo.getIscsiManagerMO().bindVnic(iscsiHbaDevice,vmKernelDevice);
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware error:", e);
+            throw e;
+        }
+    }
+    //添加发现目标
+    public void addIscsiSendTargets(HostMO hostmo,List<EthPortInfo> ethPorts,String iscsiHbaDevice) throws Exception{
+        try {
+            if(ethPorts==null){
+                _logger.error("configure Iscsi error:ethPorts is null.");
+                throw new Exception("configure Iscsi error:ethPorts is null.");
+            }
+            if(hostmo==null){
+                _logger.error("configure Iscsi error:host is null.");
+                throw new Exception("configure Iscsi error:host is null.");
+            }
+            if(StringUtils.isEmpty(iscsiHbaDevice)){
+                _logger.error("find iscsi Hba Device error:No iSCSI adapter found");
+                throw new Exception("find iscsi Hba Device error:No iSCSI adapter found");
+            }
+
+            //添加发现目标
+            if(ethPorts!=null && ethPorts.size()>0){
+                List<HostInternetScsiHbaSendTarget> targets = new ArrayList<>();
+                for(EthPortInfo ethPortInfo:ethPorts){
+                    //组装发现目标
+                    HostInternetScsiHbaSendTarget target = new HostInternetScsiHbaSendTarget();
+                    target.setAddress(ethPortInfo.getMgmtIp());
+                    targets.add(target);
+                }
+                if(targets.size()>0){
+                    //向iscsi添加目标
+                    hostmo.getHostStorageSystemMO().addInternetScsiSendTargets(iscsiHbaDevice,targets);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware error:", e);
+            throw e;
+        }
+
     }
 
     public static void main(String[] args) {

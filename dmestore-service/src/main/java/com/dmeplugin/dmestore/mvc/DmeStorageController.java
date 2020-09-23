@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
+import com.dmeplugin.dmestore.model.EthPortInfo;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.model.Storage;
 import com.dmeplugin.dmestore.services.DmeStorageService;
@@ -14,6 +15,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -167,5 +169,29 @@ public class DmeStorageController extends BaseController{
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
+    }
+
+    /**
+     * Get ETH ports
+     *
+     * @param  storageSn storage's Sn
+     * @return ResponseBodyBean List<EthPortInfo> include EthPortInfo
+     * @throws Exception when error
+     */
+    @GetMapping("/getstorageethports")
+    @ResponseBody
+    public ResponseBodyBean getStorageEthPorts(@RequestParam(name = "storageSn") String storageSn) throws Exception{
+
+        LOG.info("getStorageEthPorts storageSn==" + storageSn);
+        String failureStr = "";
+        try {
+            List<EthPortInfo> lists = dmeStorageService.getStorageEthPorts(storageSn);
+            LOG.info("getStorageEthPorts lists==" + gson.toJson(lists));
+            return success(lists);
+        } catch (Exception e) {
+            LOG.error("get Storage Eth Ports failure:", e);
+            failureStr = "get Storage Eth Ports failure:"+e.toString();
+        }
+        return failure(failureStr);
     }
 }

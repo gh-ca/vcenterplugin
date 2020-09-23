@@ -74,4 +74,8 @@ public class HostStorageSystemMO extends BaseMO {
     public List<HostUnresolvedVmfsVolume> queryUnresolvedVmfsVolume() throws Exception {
         return _context.getService().queryUnresolvedVmfsVolume(_mor);
     }
+
+    public void addInternetScsiSendTargets(String iScsiHbaDevice, List<HostInternetScsiHbaSendTarget> targets) throws HostConfigFaultFaultMsg, NotFoundFaultMsg, RuntimeFaultFaultMsg {
+        _context.getService().addInternetScsiSendTargets(_mor, iScsiHbaDevice, targets);
+    }
 }

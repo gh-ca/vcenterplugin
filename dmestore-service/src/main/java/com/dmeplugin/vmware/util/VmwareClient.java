@@ -17,6 +17,7 @@
 package com.dmeplugin.vmware.util;
 
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.*;
 
 import javax.net.ssl.HostnameVerifier;
@@ -26,6 +27,9 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.handler.MessageContext;
 
+import com.vmware.pbm.PbmPortType;
+import com.vmware.pbm.PbmService;
+import com.vmware.pbm.PbmServiceInstanceContent;
 import com.vmware.vise.usersession.ServerInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +71,7 @@ import com.vmware.vim25.WaitOptions;
 public class VmwareClient {
     private static final Logger s_logger = LoggerFactory.getLogger(VmwareClient.class);
 
-    private static class TrustAllTrustManager implements javax.net.ssl.TrustManager, javax.net.ssl.X509TrustManager {
+    public static class TrustAllTrustManager implements javax.net.ssl.TrustManager, javax.net.ssl.X509TrustManager {
 
         @Override
         public java.security.cert.X509Certificate[] getAcceptedIssuers() {
@@ -116,10 +120,15 @@ public class VmwareClient {
     }
 
     private final ManagedObjectReference svcInstRef = new ManagedObjectReference();
+    private final ManagedObjectReference pbmInstRef = new ManagedObjectReference();
     private static VimService vimService;
+    private static PbmService pbmService;
+    private PbmPortType pbmPortType;
     private VimPortType vimPort;
     private String serviceCookie;
     private final static String SVC_INST_NAME = "ServiceInstance";
+    private static final String PBMSERVICEINSTANCETYPE = "PbmServiceInstance";
+    private static final String PBMSERVICEINSTANCEVALUE = "ServiceInstance";
     private int vCenterSessionTimeout = 1200000; // Timeout in milliseconds
 
     private boolean isConnected = false;
@@ -136,6 +145,8 @@ public class VmwareClient {
     public void connect(ServerInfo serverInfo) throws Exception {
         svcInstRef.setType(SVC_INST_NAME);
         svcInstRef.setValue(SVC_INST_NAME);
+        pbmInstRef.setType(PBMSERVICEINSTANCETYPE);
+        pbmInstRef.setValue(PBMSERVICEINSTANCEVALUE);
 
         vimPort = vimService.getVimPort();
         Map<String, Object> ctxt = ((BindingProvider)vimPort).getRequestContext();
@@ -155,6 +166,22 @@ public class VmwareClient {
         ctxt.put("com.sun.xml.internal.ws.request.timeout", vCenterSessionTimeout);
         ctxt.put("com.sun.xml.internal.ws.connect.timeout", vCenterSessionTimeout);
 
+        pbmPortType = pbmService.getPbmPort();
+        Map<String, Object> pbmctxt = ((BindingProvider)vimPort).getRequestContext();
+
+
+        List<String> pbmvalues = new ArrayList<>();
+        values.add("vcSessionCookie=" + sessionCookie);
+        Map<String, List<String>> pbmreqHeadrs =
+                new HashMap<>();
+        pbmreqHeadrs.put("Cookie", pbmvalues);
+
+        pbmctxt.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, serverInfo.serviceUrl.replace("/sdk", "/pbm"));
+        pbmctxt.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
+        pbmctxt.put(MessageContext.HTTP_REQUEST_HEADERS, pbmreqHeadrs);
+
+        pbmctxt.put("com.sun.xml.internal.ws.request.timeout", vCenterSessionTimeout);
+        pbmctxt.put("com.sun.xml.internal.ws.connect.timeout", vCenterSessionTimeout);
 
         isConnected = true;
     }
@@ -162,8 +189,11 @@ public class VmwareClient {
     public void connect(String url, String userName, String password) throws Exception {
         svcInstRef.setType(SVC_INST_NAME);
         svcInstRef.setValue(SVC_INST_NAME);
+        pbmInstRef.setType(PBMSERVICEINSTANCETYPE);
+        pbmInstRef.setValue(PBMSERVICEINSTANCEVALUE);
 
         vimPort = vimService.getVimPort();
+
         Map<String, Object> ctxt = ((BindingProvider)vimPort).getRequestContext();
 
         ctxt.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
@@ -172,7 +202,10 @@ public class VmwareClient {
         ctxt.put("com.sun.xml.internal.ws.request.timeout", vCenterSessionTimeout);
         ctxt.put("com.sun.xml.internal.ws.connect.timeout", vCenterSessionTimeout);
 
+
         ServiceContent serviceContent = vimPort.retrieveServiceContent(svcInstRef);
+
+
 
         // Extract a cookie. See vmware sample program com.vmware.httpfileaccess.GetVMFiles
         @SuppressWarnings("unchecked")
@@ -197,8 +230,34 @@ public class VmwareClient {
         StringTokenizer tokenizer = new StringTokenizer(cookieValue, ";");
         cookieValue = tokenizer.nextToken();
         String pathData = "$" + tokenizer.nextToken();
-        serviceCookie = "$Version=\"1\"; " + cookieValue + "; " + pathData;
+        //serviceCookie = "$Version=\"1\"; " + cookieValue + "; " + pathData;
 
+
+
+        String[] tokens = cookieValue.split(";");
+        tokens = tokens[0].split("=");
+        String extractedCookie = tokens[1];
+        extractedCookie=extractedCookie.replace("\"","");
+
+        serviceCookie=extractedCookie;
+        pbmService = new PbmService();
+
+        HeaderHandlerResolver headerResolver = new HeaderHandlerResolver();
+        headerResolver.addHandler(new VcSessionHandler(extractedCookie));
+        pbmService.setHandlerResolver(headerResolver);
+
+
+        pbmPortType=pbmService.getPbmPort();
+
+        Map<String, Object> pbmctxt = ((BindingProvider)pbmPortType).getRequestContext();
+
+        pbmctxt.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url.replace("/sdk", "/pbm"));
+        pbmctxt.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
+
+        pbmctxt.put("com.sun.xml.internal.ws.request.timeout", vCenterSessionTimeout);
+        pbmctxt.put("com.sun.xml.internal.ws.connect.timeout", vCenterSessionTimeout);
+
+        PbmServiceInstanceContent pbmserviceContent = pbmPortType.pbmRetrieveServiceContent(pbmInstRef);
         isConnected = true;
     }
 
@@ -222,6 +281,13 @@ public class VmwareClient {
     }
 
     /**
+     * @return Service instance
+     */
+    public PbmPortType getPbmService() {
+        return pbmPortType;
+    }
+
+    /**
      * @return Service instance content
      */
     public ServiceContent getServiceContent() {
@@ -229,6 +295,19 @@ public class VmwareClient {
         try {
             return vimPort.retrieveServiceContent(svcInstRef);
         } catch (RuntimeFaultFaultMsg e) {
+        }
+        return null;
+    }
+
+    /**
+     * @return pbm Service instance content
+     */
+    public PbmServiceInstanceContent getPbmServiceContent() {
+
+        try {
+            return pbmPortType.pbmRetrieveServiceContent(pbmInstRef);
+        } catch (com.vmware.pbm.RuntimeFaultFaultMsg runtimeFaultFaultMsg) {
+            runtimeFaultFaultMsg.printStackTrace();
         }
         return null;
     }
