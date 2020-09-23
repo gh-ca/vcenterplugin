@@ -185,10 +185,10 @@ public class VmfsAccessController extends BaseController {
      * @Param [volume_id]
      * @Return com.dmeplugin.dmestore.model.ResponseBodyBean
      **/
-    @RequestMapping(value = "/volume/{volume_id}", method = RequestMethod.GET)
-    public ResponseBodyBean volumeDetail(@PathVariable(value = "volume_id") String volume_id) throws Exception {
+    @RequestMapping(value = "/volume/{storage_objectId}", method = RequestMethod.GET)
+    public ResponseBodyBean volumeDetail(@PathVariable(value = "storage_objectId") String storage_objectId) throws Exception {
         try {
-            VmfsDatastoreVolumeDetail detail = vmfsAccessService.volumeDetail(volume_id);
+            List<VmfsDatastoreVolumeDetail> detail = vmfsAccessService.volumeDetail(storage_objectId);
             return success(detail);
         } catch (Exception e) {
             return failure(e.getMessage());

@@ -351,13 +351,25 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
 
     //NFS存储 获取指定存储下的fileId的集合
     private List<String> getNfsContainIds(String storeId, String fileId) throws SQLException {
+        return getFileIdsByCondition(storeId, fileId, ToolUtils.STORE_TYPE_NFS);
+    }
+
+    /**
+     * 根据存储ID获取磁盘ID列表
+     */
+    public List<String> getVolumeIdsByStorageId(String storeId) throws SQLException {
+        return getFileIdsByCondition(storeId, "volume_id", ToolUtils.STORE_TYPE_VMFS);
+    }
+
+
+    private List<String> getFileIdsByCondition(String storeId, String fileId, String storeType) throws SQLException{
         List<String> lists = new ArrayList<>();
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT " + fileId + " FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_TYPE='" + ToolUtils.STORE_TYPE_NFS + "'and STORE_ID='" + storeId + "'";
+            String sql = "SELECT " + fileId + " FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_TYPE='" + storeType + "'and STORE_ID='" + storeId + "'";
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -370,6 +382,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             closeConnection(con, ps, rs);
         }
         return lists;
+
     }
 
     //VMFS 通过vmfsDataStorageIds查询关联的DME存储的信息
