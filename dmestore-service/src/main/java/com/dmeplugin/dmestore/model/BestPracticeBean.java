@@ -57,12 +57,12 @@ public class BestPracticeBean {
         this.needReboot = needReboot;
     }
 
-    public String getHostId() {
-        return hostId;
+    public String getHostObjectId() {
+        return hostObjectId;
     }
 
-    public void setHostId(String hostId) {
-        this.hostId = hostId;
+    public void setHostObjectId(String hostObjectId) {
+        this.hostObjectId = hostObjectId;
     }
 
     public String getHostName() {

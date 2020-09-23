@@ -34,9 +34,9 @@ public class HostAccessServiceImpl implements HostAccessService {
 
     /**
      * Configure the host with iSCSI, params include:
-     * String hostObjectIdï¼šhost object id
-     * Map<String, String> vmKernelï¼š  é€‰æ‹©çš„vmkernel
-     * List<EthPortInfo> ethPorts: é€‰æ‹©çš„ä»¥å¤ªç½‘ç«¯å£åˆ—è¡¨
+     * String hostObjectId£ºhost object id
+     * Map<String, String> vmKernel£º  Ñ¡ÔñµÄvmkernel
+     * List<EthPortInfo> ethPorts: Ñ¡ÔñµÄÒÔÌ«Íø¶Ë¿ÚÁĞ±í
      *
      * @param params: params include:hostObjectId,vmKernel,ethPorts
      * @return: ResponseBodyBean

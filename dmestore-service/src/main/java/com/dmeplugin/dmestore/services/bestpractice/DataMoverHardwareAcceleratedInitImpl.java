@@ -21,8 +21,8 @@ public class DataMoverHardwareAcceleratedInitImpl extends BaseBestPracticeServic
     }
 
     @Override
-    public Object getCurrentValue(VmwareContext context, String hostName) throws Exception{
-        return super.getCurrentValue(context, hostName, getHostSetting());
+    public Object getCurrentValue(VmwareContext context, String objectId) throws Exception{
+        return super.getCurrentValue(context, objectId, getHostSetting());
     }
 
     @Override

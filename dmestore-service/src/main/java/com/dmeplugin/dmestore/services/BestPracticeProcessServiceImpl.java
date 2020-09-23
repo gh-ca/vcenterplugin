@@ -3,6 +3,8 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.dao.BestPracticeCheckDao;
 import com.dmeplugin.dmestore.model.BestPracticeBean;
 import com.dmeplugin.dmestore.model.BestPracticeCheckRecordBean;
+import com.dmeplugin.dmestore.model.BestPracticeUpResultBase;
+import com.dmeplugin.dmestore.model.BestPracticeUpResultResponse;
 import com.dmeplugin.dmestore.services.bestpractice.BestPracticeService;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.dmeplugin.vmware.util.VmwareContext;
@@ -219,6 +221,8 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
         }
 
         //将成功修改了最佳实践值的记录从表中删除
-        bestPracticeCheckDao.deleteByHostNameAndHostsetting(successList, hostSetting);
+        bestPracticeCheckDao.deleteBy(responses);
+
+        return responses;
     }
 }

@@ -25,7 +25,7 @@ public class Storage  {
     private Double maxBandwidth;
     private Double maxLatency;
     private String[] azIds;
-    //è¡¥å……å­—æ®µ
+    //²¹³ä×Ö¶Î
     private String sn;
 
     public String getSn() {

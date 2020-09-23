@@ -14,17 +14,17 @@ public class FileSystem  {
     private String health_status;
     private String alloc_type;
     private Integer capacity_usage_ratio;
-    private String storage_pool_name;// æ–‡ä»¶ç³»ç»Ÿæ‰€åœ¨å­˜å‚¨æ± çš„åç§°
+    private String storage_pool_name;// ÎÄ¼şÏµÍ³ËùÔÚ´æ´¢³ØµÄÃû³Æ
     private Integer nfs_count;
     private Integer cifs_count;
     private Integer dtree_count;
     private Double capacity;
 
-    //è¡¥å……å­—æ®µ
-    private Double allocate_quota_in_pool; //æ–‡ä»¶ç³»ç»Ÿåœ¨å­˜å‚¨æ± ä¸Šå·²ç»åˆ†é…çš„å®¹é‡
-    private Double available_capacity; //æ–‡ä»¶ç³»ç»Ÿå¯ä»¥åˆ©ç”¨çš„å®¹é‡
-    private Double min_size_fs_capacity;//æ–‡ä»¶ç³»ç»Ÿèƒ½ç¼©å®¹çš„æœ€å°ç©ºé—´;
-    private String storage_id; //æ–‡ä»¶ç³»ç»Ÿæ‰€å±å­˜å‚¨è®¾å¤‡
+    //²¹³ä×Ö¶Î
+    private Double allocate_quota_in_pool; //ÎÄ¼şÏµÍ³ÔÚ´æ´¢³ØÉÏÒÑ¾­·ÖÅäµÄÈİÁ¿
+    private Double available_capacity; //ÎÄ¼şÏµÍ³¿ÉÒÔÀûÓÃµÄÈİÁ¿
+    private Double min_size_fs_capacity;//ÎÄ¼şÏµÍ³ÄÜËõÈİµÄ×îĞ¡¿Õ¼ä;
+    private String storage_id; //ÎÄ¼şÏµÍ³ËùÊô´æ´¢Éè±¸
 
     public Double getAllocate_quota_in_pool() {
         return allocate_quota_in_pool;
