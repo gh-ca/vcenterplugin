@@ -2,6 +2,7 @@ package com.dmeplugin.dmestore.services;
 
 
 import com.dmeplugin.dmestore.dao.DmeInfoDao;
+import com.dmeplugin.dmestore.dao.ScheduleDao;
 import com.dmeplugin.dmestore.entity.DmeInfo;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
@@ -30,6 +31,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     private static final Logger LOG = LoggerFactory.getLogger(DmeAccessServiceImpl.class);
 
     private DmeInfoDao dmeInfoDao;
+
+    private ScheduleDao scheduleDao;
 
     private VmfsAccessService vmfsAccessService;
 
@@ -487,6 +490,10 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         this.dmeNFSAccessService = dmeNFSAccessService;
     }
 
+    public void setScheduleDao(ScheduleDao scheduleDao) {
+        this.scheduleDao = scheduleDao;
+    }
+
     @Override
     public Map<String, Object> getDmeHost(String hostId) throws Exception {
         Map<String, Object> map = new HashMap<>();
@@ -561,4 +568,23 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             }
         }
     }
+
+    @Override
+    public void configureTaskTime(String taskId,String taskCron) throws Exception{
+        try {
+            if(!StringUtils.isEmpty(taskId) && !StringUtils.isEmpty(taskCron)) {
+                int re = scheduleDao.updateTaskTime(taskId,taskCron);
+                if(re>0){
+
+                }
+            }else{
+                throw new Exception("configure Task Time error:taskId or taskCorn is null");
+            }
+        } catch (Exception e) {
+            LOG.error("configure Task Time error:" + e.toString());
+            throw e;
+        }
+    }
+
+
 }

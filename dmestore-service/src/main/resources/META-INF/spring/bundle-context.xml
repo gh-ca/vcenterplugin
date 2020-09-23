@@ -27,6 +27,7 @@
 
     <bean name="DmeAccessServiceImpl" class="com.dmeplugin.dmestore.services.DmeAccessServiceImpl">
         <property name="dmeInfoDao" ref="dmeInfoDao"/>
+        <property name="scheduleDao" ref="scheduleDao"/>
         <property name="vmfsAccessService" ref="VmfsAccessServiceImpl"/>
         <property name="dmeNFSAccessService" ref="DmeNFSAccessServiceImpl"/>
     </bean>

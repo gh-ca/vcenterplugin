@@ -118,4 +118,14 @@ public interface DmeAccessService {
      */
     void scanDatastore(String storageType) throws Exception;
 
+    /**
+     * Configure task time
+     *
+     * @param taskId task Id
+     * @param taskCron task cron
+     * @return ResponseBodyBean
+     * @throws Exception when error
+     */
+    void configureTaskTime(String taskId,String taskCron) throws Exception;
+
 }
