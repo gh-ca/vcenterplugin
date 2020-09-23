@@ -1,5 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.model.ResponseBodyBean;
+
 import java.util.Map;
 
 /**
@@ -13,4 +15,6 @@ public interface NfsOperationService {
     Map<String,Object> createNfsDatastore(Map<String, String> params);
 
     Map<String,Object> updateNfsDatastore(Map<String, String> params);
+
+    ResponseBodyBean changNfsCapacity(Map<String, String> params);
 }

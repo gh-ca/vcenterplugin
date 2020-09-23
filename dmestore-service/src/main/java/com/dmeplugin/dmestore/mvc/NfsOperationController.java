@@ -138,4 +138,22 @@ public class NfsOperationController extends BaseController{
         }
         return failure(gson.toJson(resMap));
     }
+
+    /**
+     *  params{
+     *      file_system_id String 文件系统唯一标识
+     *      capacity double 该规格文件系统容量，单位GB
+     *      is_expand boolean 扩容 true  缩容 false
+     *  }
+     * @param
+     * @return
+     */
+    @PutMapping("/changnfscapacity")
+    @ResponseBody
+    public ResponseBodyBean changNfsCapacity(@RequestBody Map<String,String> params){
+
+        ResponseBodyBean responseBodyBean = nfsOperationService.changNfsCapacity(params);
+
+        return failure();
+    }
 }
