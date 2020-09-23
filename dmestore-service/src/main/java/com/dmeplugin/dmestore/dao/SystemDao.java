@@ -70,6 +70,22 @@ public class SystemDao extends H2DataBaseDao {
     }
   }
 
+  public void initData( String datasql) throws Exception {
+    Connection con = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    try {
+      con = getConnection();
+        ps = con.prepareStatement(datasql);
+        ps.executeUpdate();
+    } catch (Exception e) {
+      LOGGER.error("Failed to initData: " + e.getMessage());
+      throw e;
+    } finally {
+      closeConnection(con, ps, rs);
+    }
+  }
+
   /**
    * get h2 DB file path from URL
    */

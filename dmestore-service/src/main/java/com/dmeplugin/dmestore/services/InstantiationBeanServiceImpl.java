@@ -25,7 +25,7 @@ import java.util.List;
 
 
 public class InstantiationBeanServiceImpl implements
-    ApplicationListener<ContextRefreshedEvent>, InstantiationBeanService {
+     InstantiationBeanService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(InstantiationBeanServiceImpl.class);
 
@@ -37,7 +37,6 @@ public class InstantiationBeanServiceImpl implements
 
 
 
-  @Override
   public void onApplicationEvent(ContextRefreshedEvent event) {
     init();
   }
