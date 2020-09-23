@@ -81,8 +81,7 @@ public class ServiceLevelController extends BaseController {
      */
     @RequestMapping(value = "/manualupdate", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseBodyBean manualupdate()
-            throws Exception {
+    public ResponseBodyBean manualupdate() {
         serviceLevelService.updateVmwarePolicy();
 
         return success();

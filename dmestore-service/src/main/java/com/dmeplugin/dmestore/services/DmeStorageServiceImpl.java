@@ -1,13 +1,11 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.model.*;
-import com.dmeplugin.dmestore.utils.HttpRequestUtil;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
@@ -21,11 +19,27 @@ import java.util.*;
  * @date 2020/9/3 17:48
  */
 public class DmeStorageServiceImpl implements DmeStorageService {
+
+    private final String API_STORAGES = "/rest/storagemgmt/v1/storages";
+    private final String API_STORAGEPOOL_LIST = "/rest/storagemgmt/v1/storagepools/query";
+    private final String API_LOGICPORTS_LIST = "/rest/storagemgmt/v1/storage-port/logic-ports?storage_id=";
+    private final String API_VOLUME_LIST = "/rest/blockservice/v1/volumes?storageId =";
+    private final String API_FILESYSTEMS_LIST = "/rest/fileservice/v1/filesystems/query";
+    private final String API_DTREES_LIST = "/rest/fileservice/v1/dtrees/summary";
+    private final String API_NFSSHARE_LIST = "/rest/fileservice/v1/nfs-shares/summary";
+    private final String API_BANDPORTS_LIST = "/rest/storagemgmt/v1/storage-port/bond-ports?storage_id=";
+    private final String API_INSTANCES_LIST = "/rest/resourcedb/v1/instances";
+
+
     private static final Logger LOG = LoggerFactory.getLogger(DmeStorageServiceImpl.class);
 
     private Gson gson=new Gson();
 
     private DmeAccessService dmeAccessService;
+
+    public DmeAccessService getDmeAccessService() {
+        return dmeAccessService;
+    }
 
     public void setDmeAccessService(DmeAccessService dmeAccessService) {
         this.dmeAccessService = dmeAccessService;
@@ -39,14 +53,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         objMap.put("msg", "list storage success!");
         List<Storage> list = new ArrayList<>();
 
-        //String apiUrl = "/rest/storagemgmt/v1/storages";
-        //test url
-        String url = "https://localhost:26335/rest/storagemgmt/v1/storages";
-
         try {
-            //ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            ResponseEntity responseEntity = access(url, HttpMethod.GET, null);
-            LOG.info("DmeStorageServiceImpl/getStorages/responseEntity==" + responseEntity);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(API_STORAGES, HttpMethod.GET, null);
+            //ResponseEntity responseEntity = access( API_STORAGES_LIST, HttpMethod.GET, null);
+            LOG.info("{"+API_STORAGES+"}" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
                 objMap.put("code", code);
@@ -106,8 +116,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("msg", "search oriented storage success");
         resMap.put("data", storageId);
 
-        //String url = "/rest/storagemgmt/v1/storages/" + storageId + "/detail";
-        String url = "https://localhost:26335/rest/storagemgmt/v1/storages/storage_id/detail";
+        String url =  API_STORAGES + "/" + storageId + "/detail";
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             //ResponseEntity responseEntity = access(url, HttpMethod.GET, null);
@@ -161,16 +170,12 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("data", storageId);
 
         List<StoragePool> resList = new ArrayList<>();
-
-        //String url = "/rest/storagemgmt/v1/storagepools/query";
-        String url = "https://localhost:26335/rest/storagemgmt/v1/storagepools/query";
-
         Map<String, String> params = new HashMap<>();
         params.put("storage_id", storageId);
 
         try {
-            ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, gson.toJson(params));
-            //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.POST, gson.toJson(params));
+            //ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, gson.toJson(params));
+            ResponseEntity<String> responseEntity = dmeAccessService.access( API_STORAGEPOOL_LIST, HttpMethod.POST, gson.toJson(params));
             LOG.info("DmeStorageServiceImpl/getStoragePools/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code!=200) {
@@ -226,7 +231,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
-        String url = "https://localhost:26335/rest/storagemgmt/v1/storage-port/logic-ports?storage_id="+storageId;
+        String url =  API_LOGICPORTS_LIST + storageId;
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             LOG.info("DmeStorageServiceImpl/getLogicPorts/responseEntity==" + responseEntity);
@@ -282,14 +287,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("storageId", storageId);
 
         List<Volume> volumes = new ArrayList<>();
-
-        //String reqPath = "/rest/blockservice/v1/volumes";
-        String reqPath = "https://localhost:26335/rest/blockservice/v1/volumes";
-        String url = reqPath + "? storageId = "+ storageId;
+        String url =  API_VOLUME_LIST + storageId;
 
         try {
-            //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.GET, null);
-            ResponseEntity responseEntity = access(url, HttpMethod.GET,null);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            //ResponseEntity responseEntity = access(url, HttpMethod.GET,null);
             LOG.info("DmeStorageServiceImpl/getVolumes/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -338,10 +340,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
         List<FileSystem> fileSystems = new ArrayList<>();
 
-        String hostIp = "";
-        String reqPath = "https://localhost:26335/rest/fileservice/v1/filesystems/query";
-        String url = "https://" + hostIp + reqPath;
-
         Map<String, String> params = new HashMap<>();
         params.put("storage_id", storageId);
         String jsonParams = gson.toJson(params);
@@ -351,8 +349,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
         try {
-            ResponseEntity<String> responseEntity = HttpRequestUtil.requestWithBody(url, HttpMethod.POST, headers, jsonParams, String.class);
-            //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.POST, jsonParams);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(API_FILESYSTEMS_LIST , HttpMethod.POST, jsonParams);
             LOG.info("DmeStorageServiceImpl/getFileSystems/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -399,22 +396,12 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("msg", "list dtree success!");
         resMap.put("storageId", storageId);
 
-        //String hostIp = "";
-        String url = "https://localhost:26335/rest/fileservice/v1/dtrees/summary";
-        //String url = "https://" + hostIp + reqPath;
-
         List<Dtrees> resList = new ArrayList<>();
         Map<String, String> params = new HashMap<>();
         params.put("storage_id", storageId);
-        String jsonParams = gson.toJson(params);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
         try {
-            ResponseEntity<String> responseEntity = HttpRequestUtil.requestWithBody(url, HttpMethod.POST, headers, jsonParams, String.class);
-            //ResponseEntity<String> responseEntity = dmeAccessServiceImpl.access(url, HttpMethod.POST, jsonParams);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(API_DTREES_LIST, HttpMethod.POST, gson.toJson(params));
             LOG.info("DmeStorageServiceImpl/getDTrees/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code!=200) {
@@ -457,19 +444,12 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("msg", "list nfsshares success!");
         resMap.put("storageId", storageId);
         List<NfsShares> resList = new ArrayList<>();
-        String url = "https://localhost:26335/rest/fileservice/v1/nfs-shares/summary";
 
         Map<String, String> params = new HashMap<>();
         params.put("storage_id", storageId);
-        String jsonParams = gson.toJson(params);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
         try {
-            //ResponseEntity<String> responseEntity = HttpRequestUtil.requestWithBody(url, HttpMethod.POST, headers, jsonParams, String.class);
-            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, jsonParams);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(API_NFSSHARE_LIST, HttpMethod.POST, gson.toJson(params));
             LOG.info("DmeStorageServiceImpl/getNfsShares/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -514,11 +494,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("storageId", storageId);
         List<BandPorts> resList = new ArrayList<>();
 
-
-        String url = "https://localhost:26335/rest/storagemgmt/v1/storage-port/bond-ports?storage_id"+storageId;
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            //ResponseEntity<String> responseEntity = access(url, HttpMethod.GET, null)
+            ResponseEntity<String> responseEntity = dmeAccessService.access(API_BANDPORTS_LIST, HttpMethod.GET, null);
             LOG.info("DmeStorageServiceImpl/getBandPorts/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -562,10 +539,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("storageId", className);
         List<StorageControllers> resList = new ArrayList<>();
 
-        String url = "https://localhost:26335/rest/resourcedb/v1/instances/"+className;
+        String url = API_INSTANCES_LIST + "/" + className;
         try {
-            //ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            ResponseEntity responseEntity = access(url, HttpMethod.GET, null);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             LOG.info("DmeStorageServiceImpl/getStorageControllers/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -610,15 +586,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("storageId", className);
         List<StorageDisk> resList = new ArrayList<>();
 
-        String url = "https://localhost:26335/rest/resourcedb/v1/instances/"+className;
+        String url = API_INSTANCES_LIST + "/" + className;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 
         try {
-            //ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            ResponseEntity responseEntity = access(url, HttpMethod.GET, null);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             LOG.info("DmeStorageServiceImpl/getStorageDisks/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
