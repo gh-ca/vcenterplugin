@@ -1583,7 +1583,7 @@ public class VCSDKUtils {
     }
 
     //主机配置iscsi
-    public void configureIscsi(String hostObjectId,Map<String, String> vmKernel,List<EthPortInfo> ethPorts) throws Exception{
+    public void configureIscsi(String hostObjectId,Map<String, String> vmKernel,List<Map<String, Object>> ethPorts) throws Exception{
         try {
             if(ethPorts==null){
                 _logger.error("configure Iscsi error:ethPorts is null.");
@@ -1623,9 +1623,11 @@ public class VCSDKUtils {
             }
             //得到vmKernel适配器
             //网络端口邦定，将vmKernelDevice邦定到iscsiHbaDevice
+            _logger.info("iscsiHbaDevice:"+iscsiHbaDevice);
             boundVmKernel(hostmo, vmKernel, iscsiHbaDevice);
             //添加发现目标
             addIscsiSendTargets(hostmo, ethPorts, iscsiHbaDevice);
+            _logger.info("configure Iscsi success! iscsiHbaDevice:"+iscsiHbaDevice+" host:"+hostmo.getName());
         } catch (Exception e) {
             e.printStackTrace();
             _logger.error("vmware error:", e);
@@ -1654,8 +1656,10 @@ public class VCSDKUtils {
                 _logger.error("find vmKernel Device error:No vmKernel adapter found");
                 throw new Exception("find vmKernel Device error:No vmKernel adapter found");
             }
+            _logger.info("vmKernelDevice:"+vmKernelDevice);
             //网络端口邦定，将vmKernelDevice邦定到iscsiHbaDevice
             hostmo.getIscsiManagerMO().bindVnic(iscsiHbaDevice,vmKernelDevice);
+            _logger.info("bind Vnic success! iscsiHbaDevice:"+iscsiHbaDevice+" vmKernelDevice:"+vmKernelDevice);
         } catch (Exception e) {
             e.printStackTrace();
             _logger.error("vmware error:", e);
@@ -1663,7 +1667,7 @@ public class VCSDKUtils {
         }
     }
     //添加发现目标
-    public void addIscsiSendTargets(HostMO hostmo,List<EthPortInfo> ethPorts,String iscsiHbaDevice) throws Exception{
+    public void addIscsiSendTargets(HostMO hostmo,List<Map<String, Object>> ethPorts,String iscsiHbaDevice) throws Exception{
         try {
             if(ethPorts==null){
                 _logger.error("configure Iscsi error:ethPorts is null.");
@@ -1681,15 +1685,16 @@ public class VCSDKUtils {
             //添加发现目标
             if(ethPorts!=null && ethPorts.size()>0){
                 List<HostInternetScsiHbaSendTarget> targets = new ArrayList<>();
-                for(EthPortInfo ethPortInfo:ethPorts){
+                for(Map<String, Object> ethPortInfo:ethPorts){
                     //组装发现目标
                     HostInternetScsiHbaSendTarget target = new HostInternetScsiHbaSendTarget();
-                    target.setAddress(ethPortInfo.getMgmtIp());
+                    target.setAddress(ToolUtils.getStr(ethPortInfo.get("mgmtIp")));
                     targets.add(target);
                 }
                 if(targets.size()>0){
                     //向iscsi添加目标
                     hostmo.getHostStorageSystemMO().addInternetScsiSendTargets(iscsiHbaDevice,targets);
+                    _logger.info("add Iscsi Send Targets success! iscsiHbaDevice:"+iscsiHbaDevice+" targets:"+gson.toJson(targets));
                 }
             }
         } catch (Exception e) {
