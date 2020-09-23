@@ -61,6 +61,7 @@ public class TestVmwareContextFactory {
 
         if (context != null) {
             context.setPoolInfo(s_pool, VmwareContextPool.composePoolKey(vCenterAddress, vCenterUserName));
+            s_pool.registerContext(context);
         }
 
         return context;
