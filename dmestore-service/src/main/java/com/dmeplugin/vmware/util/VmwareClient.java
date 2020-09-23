@@ -71,7 +71,7 @@ import com.vmware.vim25.WaitOptions;
 public class VmwareClient {
     private static final Logger s_logger = LoggerFactory.getLogger(VmwareClient.class);
 
-    private static class TrustAllTrustManager implements javax.net.ssl.TrustManager, javax.net.ssl.X509TrustManager {
+    public static class TrustAllTrustManager implements javax.net.ssl.TrustManager, javax.net.ssl.X509TrustManager {
 
         @Override
         public java.security.cert.X509Certificate[] getAcceptedIssuers() {

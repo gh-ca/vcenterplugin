@@ -45,6 +45,17 @@ public interface DmeAccessService {
     ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws Exception;
 
     /**
+     * Public method access
+     *
+     * @param url url
+     * @param method Http Method
+     * @param jsonBody request Body
+     * @return ResponseBodyBean
+     * @throws Exception when error
+     */
+    ResponseEntity<String> accessByJson(String url, HttpMethod method, String jsonBody) throws Exception;
+
+    /**
      * Access workload info
      *
      * @param storageId storage id

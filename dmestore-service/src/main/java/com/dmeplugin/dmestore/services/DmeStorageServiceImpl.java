@@ -691,10 +691,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
                 condition.add("constraint",constraint);
 
-                stordeviceIdUrl = stordeviceIdUrl+"?condition="+condition.toString();
+                stordeviceIdUrl = stordeviceIdUrl+"?condition={json}";
                 LOG.info("stordeviceIdUrl===" + stordeviceIdUrl);
                 try {
-                    ResponseEntity responseEntity = dmeAccessService.access(stordeviceIdUrl, HttpMethod.GET, null);
+                    ResponseEntity responseEntity = dmeAccessService.accessByJson(stordeviceIdUrl, HttpMethod.GET, condition.toString());
                     LOG.info("stordeviceIdUrl responseEntity==" + responseEntity.toString());
                     if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                         JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -757,10 +757,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
                 condition.add("constraint",constraint);
 
-                ethPortUrl = ethPortUrl+"?condition="+condition.toString();
+                ethPortUrl = ethPortUrl+"?condition={json}";
                 LOG.info("ethPortUrl===" + ethPortUrl);
                 try {
-                    ResponseEntity responseEntity = dmeAccessService.access(ethPortUrl, HttpMethod.GET, null);
+                    ResponseEntity responseEntity = dmeAccessService.accessByJson(ethPortUrl, HttpMethod.GET, condition.toString());
                     LOG.info("getWorkLoads responseEntity==" + responseEntity.toString());
                     if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                         JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
