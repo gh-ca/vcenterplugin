@@ -12,6 +12,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -350,13 +351,25 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
 
     //NFS存储 获取指定存储下的fileId的集合
     private List<String> getNfsContainIds(String storeId, String fileId) throws SQLException {
+        return getFileIdsByCondition(storeId, fileId, ToolUtils.STORE_TYPE_NFS);
+    }
+
+    /**
+     * 根据存储ID获取磁盘ID列表
+     */
+    public List<String> getVolumeIdsByStorageId(String storeId) throws SQLException {
+        return getFileIdsByCondition(storeId, "volume_id", ToolUtils.STORE_TYPE_VMFS);
+    }
+
+
+    private List<String> getFileIdsByCondition(String storeId, String fileId, String storeType) throws SQLException{
         List<String> lists = new ArrayList<>();
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT " + fileId + " FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_TYPE='" + ToolUtils.STORE_TYPE_NFS + "'and STORE_ID='" + storeId + "'";
+            String sql = "SELECT " + fileId + " FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_TYPE='" + storeType + "'and STORE_ID='" + storeId + "'";
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -369,6 +382,61 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             closeConnection(con, ps, rs);
         }
         return lists;
+
+    }
+
+    //VMFS 通过vmfsDataStorageIds查询关联的DME存储的信息
+    public List<DmeVmwareRelation> getDmeVmwareRelationsByStorageIds(List<String> storageIds) throws Exception {
+        List<DmeVmwareRelation> lists = new ArrayList<>();
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            String condition = concatValues(storageIds);
+
+            String sql = "SELECT * FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_ID IN (" + condition + ")";
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                DmeVmwareRelation dvr = new DmeVmwareRelation();
+                dvr.setId(rs.getInt("ID"));
+                dvr.setStoreId(rs.getString("STORE_ID"));
+                dvr.setStoreName(rs.getString("STORE_NAME"));
+                dvr.setVolumeId(rs.getString("VOLUME_ID"));
+                dvr.setVolumeName(rs.getString("VOLUME_NAME"));
+                dvr.setVolumeWwn(rs.getString("VOLUME_WWN"));
+                dvr.setVolumeShare(rs.getString("VOLUME_SHARE"));
+                dvr.setVolumeFs(rs.getString("VOLUME_FS"));
+                dvr.setShareId(rs.getString("SHARE_ID"));
+                dvr.setShareName(rs.getString("SHARE_NAME"));
+                dvr.setState(rs.getInt("STATE"));
+                dvr.setStorageDeviceId(rs.getString("STORAGE_DEVICE_ID"));
+                lists.add(dvr);
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("Failed to get Dme Vmware Relation: " + e.getMessage());
+            throw new SQLException(e);
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return lists;
+    }
+
+    protected String concatValues(Collection<String> values) {
+        if (values == null || values.isEmpty()) {
+            return "";
+        }
+        StringBuilder buff = new StringBuilder();
+        for (String value : values) {
+            if (buff.length() > 0) {
+                buff.append(",");
+            }
+            buff.append(value);
+        }
+        String sql = buff.toString();
+        sql = sql.substring(1);
+        return sql;
     }
 
 

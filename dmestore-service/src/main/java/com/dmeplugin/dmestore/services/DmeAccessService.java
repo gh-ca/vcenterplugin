@@ -128,4 +128,13 @@ public interface DmeAccessService {
      */
     void configureTaskTime(String taskId,String taskCron) throws Exception;
 
+    /**
+     * get hostGroup's detail
+     * @param hsotGroupId hostGroups id
+     * @return
+     * @throws Exception
+     */
+    Map<String,Object> getDmeHostGroup(String hsotGroupId) throws Exception;
+
+
 }

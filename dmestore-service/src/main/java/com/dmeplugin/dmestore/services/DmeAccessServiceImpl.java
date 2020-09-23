@@ -53,6 +53,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     private final String CREATE_DME_HOST_URL = "/rest/hostmgmt/v1/hosts";
     private final String CREATE_DME_HOSTGROUP_URL = "/rest/hostmgmt/v1/hostgroups";
     private final String GET_DME_HOST_URL = "/rest/hostmgmt/v1/hosts/{host_id}/summary";
+    private final String GET_DME_HOSTGROUP_URL = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}/summary";
 
     @Override
     public Map<String, Object> accessDme(Map<String, Object> params) {
@@ -584,6 +585,32 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             LOG.error("configure Task Time error:" + e.toString());
             throw e;
         }
+    }
+
+    @Override
+    public Map<String, Object> getDmeHostGroup(String hostGroupId) throws Exception{
+        Map<String, Object> map = new HashMap<>();
+        String getHostGroupUrl = GET_DME_HOSTGROUP_URL;
+        getHostGroupUrl = getHostGroupUrl.replace("{hostgroup_id}", hostGroupId);
+        try {
+            LOG.info("getDmeHostGroup_url===" + getHostGroupUrl);
+            ResponseEntity responseEntity = access(getHostGroupUrl, HttpMethod.GET, null);
+            LOG.info("getDmeHostGroup responseEntity==" + responseEntity.toString());
+            if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
+                JsonObject vjson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                if (vjson != null) {
+                    map.put("id", ToolUtils.jsonToStr(vjson.get("id")));
+                    map.put("name", ToolUtils.jsonToStr(vjson.get("name")));
+                    map.put("host_count", ToolUtils.jsonToStr(vjson.get("host_count")));
+                    map.put("project_id", ToolUtils.jsonToStr(vjson.get("project_id")));
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("DME link error url:" + getHostGroupUrl + ",error:" + e.getMessage());
+            throw e;
+        }
+        LOG.info("getDmeHostGroup relists===" + (gson.toJson(map)));
+        return map;
     }
 
 

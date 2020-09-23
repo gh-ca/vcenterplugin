@@ -48,7 +48,10 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     @Override
     public Map<String, Object> queryVmfsStatistic(Map<String, Object> params) {
-        Map<String, Object> remap = new HashMap<>();
+        //通过存储ID查卷ID 实际获取卷的性能数据
+        return queryVmfsStatistic(params);
+
+        /*Map<String, Object> remap = new HashMap<>();
         remap.put("code", 200);
         remap.put("message", "queryStatistic success!");
         remap.put("data", params);
@@ -72,13 +75,14 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             remap.put("message", "queryStatistic exception!");
             log.error("queryStatistic exception.", e);
         }
-        return remap;
+        return remap;*/
     }
 
     @Override
     public Map<String, Object> queryVmfsStatisticCurrent(Map<String, Object> params) throws Exception {
+        String obj_type_id = "1125921381679104";//SYS_Lun
+        params.put("obj_type_id", obj_type_id);
         Map<String, Object> remap = new HashMap<>();
-        Object obj_ids = params.get("obj_ids");
         Object indicatorIds = params.get("indicator_ids");
         //以下为模拟响应报文的处理
         /*if (null != obj_ids) {

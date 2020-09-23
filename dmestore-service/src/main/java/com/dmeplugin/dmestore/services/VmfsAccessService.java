@@ -95,8 +95,23 @@ public interface VmfsAccessService {
     /**
      * vmfs 指定卷详细信息查询
      */
-    VmfsDatastoreVolumeDetail volumeDetail(String volumeId) throws Exception;
+    List<VmfsDatastoreVolumeDetail> volumeDetail(String volumeId) throws Exception;
 
     boolean scanVmfs() throws Exception;
+
+    /**
+     * 通过vmfs storageId查询DME侧关联的主机信息
+     * @return 返回主机列表，单个主机的信息以map方式存储属性和属性值
+     * @throws Exception
+     */
+    List<Map<String, Object>> getHostsByStorageId(String storageId) throws Exception;
+
+    /**
+     * 通过vmfs storageId查询DME侧关联的主机组信息
+     * @param storageId
+     * @return 返回主机组列表，单个主机组的信息以map方式存储属性和属性值
+     * @throws Exception
+     */
+    List<Map<String, Object>> getHostGroupsByStorageId(String storageId) throws Exception;
 
 }
