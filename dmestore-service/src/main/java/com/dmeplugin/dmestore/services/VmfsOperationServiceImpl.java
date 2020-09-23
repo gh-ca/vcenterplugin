@@ -464,15 +464,6 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         storage.setTotalCapacity(Double.valueOf(jsonObject.get("total_capacity").getAsString()));
         storage.setTotalEffectiveCapacity(Double.valueOf(jsonObject.get("total_effective_capacity").getAsString()));
         storage.setFreeEffectiveCapacity(Double.valueOf(jsonObject.get("free_effective_capacity").getAsString()));
-        JsonElement jsonAzIds = jsonObject.get("az_ids");
-        if (jsonAzIds != null) {
-            String azIds = jsonAzIds.getAsString();
-            String[] az_ids = {azIds};
-            storage.setAzIds(az_ids);
-        } else {
-            String[] az_ids = {};
-            storage.setAzIds(az_ids);
-        }
         resMap.put("data", storage);
         return resMap;
     }

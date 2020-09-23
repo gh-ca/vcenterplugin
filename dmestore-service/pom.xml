@@ -196,28 +196,28 @@
             <artifactId>vapi-runtime</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/vapi-runtime-2.15.0.jar</systemPath>
+            <systemPath>${project.basedir}/extlib/vapi-runtime-2.15.0.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>vsphereautosdk</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/vsphereautomation-client-sdk-3.3.0.jar</systemPath>
+            <systemPath>${project.basedir}/extlib/vsphereautomation-client-sdk-3.3.0.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>vapisamltoken</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/vapi-samltoken-2.15.0.jar</systemPath>
+            <systemPath>${project.basedir}/extlib/vapi-samltoken-2.15.0.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>vapiauth</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/vapi-authentication-2.15.0.jar</systemPath>
+            <systemPath>${project.basedir}/extlib/vapi-authentication-2.15.0.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>jackson</groupId>

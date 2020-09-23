@@ -25,6 +25,16 @@ public class Storage  {
     private Double maxBandwidth;
     private Double maxLatency;
     private String[] azIds;
+    //补充字段
+    private String sn;
+
+    public String getSn() {
+        return sn;
+    }
+
+    public void setSn(String sn) {
+        this.sn = sn;
+    }
 
     public String getId() {
         return id;

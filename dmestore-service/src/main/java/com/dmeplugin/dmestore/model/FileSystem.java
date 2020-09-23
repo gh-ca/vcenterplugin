@@ -13,12 +13,50 @@ public class FileSystem  {
     private String name;
     private String health_status;
     private String alloc_type;
-    private Double capacity;
     private Integer capacity_usage_ratio;
-    private String storage_pool_name;
+    private String storage_pool_name;// 文件系统所在存储池的名称
     private Integer nfs_count;
     private Integer cifs_count;
     private Integer dtree_count;
+    private Double capacity;
+
+    //补充字段
+    private Double allocate_quota_in_pool; //文件系统在存储池上已经分配的容量
+    private Double available_capacity; //文件系统可以利用的容量
+    private Double min_size_fs_capacity;//文件系统能缩容的最小空间;
+    private String storage_id; //文件系统所属存储设备
+
+    public Double getAllocate_quota_in_pool() {
+        return allocate_quota_in_pool;
+    }
+
+    public void setAllocate_quota_in_pool(Double allocate_quota_in_pool) {
+        this.allocate_quota_in_pool = allocate_quota_in_pool;
+    }
+
+    public Double getAvailable_capacity() {
+        return available_capacity;
+    }
+
+    public void setAvailable_capacity(Double available_capacity) {
+        this.available_capacity = available_capacity;
+    }
+
+    public Double getMin_size_fs_capacity() {
+        return min_size_fs_capacity;
+    }
+
+    public void setMin_size_fs_capacity(Double min_size_fs_capacity) {
+        this.min_size_fs_capacity = min_size_fs_capacity;
+    }
+
+    public String getStorage_id() {
+        return storage_id;
+    }
+
+    public void setStorage_id(String storage_id) {
+        this.storage_id = storage_id;
+    }
 
     public String getId() {
         return id;
