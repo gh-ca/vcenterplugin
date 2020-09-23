@@ -131,6 +131,8 @@
                 <ref bean="diskDiskMaxIOSize"/>
                 <ref bean="dataMoverHardwareAcceleratedInit"/>
                 <ref bean="dataMoverHardwareAcceleratedMove"/>
+                <ref bean="lunQueueDepthForEmulex"/>
+                <ref bean="lunQueueDepthForQlogic"/>
             </list>
         </property>
     </bean>
@@ -143,6 +145,8 @@
     <bean name="diskDiskMaxIOSize" class="com.dmeplugin.dmestore.services.bestpractice.DiskDiskMaxIOSizeImpl"/>
     <bean name="dataMoverHardwareAcceleratedInit" class="com.dmeplugin.dmestore.services.bestpractice.DataMoverHardwareAcceleratedInitImpl"/>
     <bean name="dataMoverHardwareAcceleratedMove" class="com.dmeplugin.dmestore.services.bestpractice.DataMoverHardwareAcceleratedMoveImpl"/>
+    <bean name="lunQueueDepthForEmulex" class="com.dmeplugin.dmestore.services.bestpractice.LunQueueDepthForEmulexImpl"/>
+    <bean name="lunQueueDepthForQlogic" class="com.dmeplugin.dmestore.services.bestpractice.LunQueueDepthForQlogicImpl"/>
 
     <bean name="bestPracticeCheckDao" class="com.dmeplugin.dmestore.dao.BestPracticeCheckDao">
         <property name="url" value="${h2.url}"/>
@@ -168,6 +172,11 @@
 
     </bean>
 
+   <bean name="hostAccessService" class="com.dmeplugin.dmestore.services.HostAccessServiceImpl">
+        <property name="vcsdkUtils" ref="vCSDKUtils"/>
+    </bean>
+    
+    
     <context:annotation-config/>
     <!--spring扫描注解的配置-->
     <context:component-scan base-package="com.dmeplugin.dmestore.task"/>

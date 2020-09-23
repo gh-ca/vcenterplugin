@@ -27,6 +27,7 @@ public class NfsOperationController extends BaseController{
 
     /**
      *  fs_param:
+     *      current_port_id String 当前逻辑端口id
      *      storage_id  str  存储设备id 必
      *      pool_raw_id str  存储池在指定存储设备上的id 必
      *      exportPath str 文件路径（和共享路径相同） 必
@@ -90,7 +91,7 @@ public class NfsOperationController extends BaseController{
 
     /** request params
      *  {
-     *
+     *      String dataStoreObjectId
      *      String nfsShareName nfsShare的名字 必
      *      String nfsName nfsDataStore名字 必
      *
