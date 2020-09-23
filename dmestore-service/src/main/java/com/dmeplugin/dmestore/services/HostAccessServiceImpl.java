@@ -32,16 +32,6 @@ public class HostAccessServiceImpl implements HostAccessService {
         this.vcsdkUtils = vcsdkUtils;
     }
 
-    /**
-     * Configure the host with iSCSI, params include:
-     * String hostObjectId：host object id
-     * Map<String, String> vmKernel：  选择的vmkernel
-     * List<EthPortInfo> ethPorts: 选择的以太网端口列表
-     *
-     * @param params: params include:hostObjectId,vmKernel,ethPorts
-     * @return: ResponseBodyBean
-     * @throws Exception when error
-     */
     @Override
     public void configureIscsi(Map<String, Object> params) throws Exception {
         if (params != null) {
