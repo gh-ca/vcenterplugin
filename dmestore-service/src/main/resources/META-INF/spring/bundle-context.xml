@@ -164,7 +164,7 @@
 
     </bean>
 
-    <bean name="hostAccessService" class="com.dmeplugin.dmestore.services.HostAccessServiceImpl">
+   <bean name="hostAccessService" class="com.dmeplugin.dmestore.services.HostAccessServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
 

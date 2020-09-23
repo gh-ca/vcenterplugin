@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.utils;
 
+import com.dmeplugin.dmestore.model.EthPortInfo;
 import com.dmeplugin.dmestore.services.EchoServiceImpl;
 import com.dmeplugin.vmware.VCConnectionHelper;
 import com.dmeplugin.vmware.autosdk.SessionHelper;
