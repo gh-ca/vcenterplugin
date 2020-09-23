@@ -108,6 +108,7 @@ public class VCSDKUtils {
                         Map<String, String> map = new HashMap<>();
                         String objectId = vcConnectionHelper.MOR2ObjectID(host1.getMor(), vmwareContext.getServerAddress());
                         map.put("hostId", objectId);
+                        map.put("objectId", objectId);
                         map.put("hostName", host1.getName());
                         lists.add(map);
                     }
@@ -124,15 +125,15 @@ public class VCSDKUtils {
         return listStr;
     }
 
-    public String getHostByName(String hostName) throws Exception {
+    public String findHostById(String objectId) throws Exception {
         VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
         List<Map<String, String>> lists = new ArrayList<>();
         for (VmwareContext vmwareContext : vmwareContexts) {
             RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
-            HostMO hostMO = rootFsMO.findHost(hostName);
+            HostMO hostMO = rootFsMO.findHostById(objectId);
             Map<String, String> map = new HashMap<>();
-            String objectId = vcConnectionHelper.MOR2ObjectID(hostMO.getMor(), vmwareContext.getServerAddress());
             map.put("hostId", objectId);
+            map.put("objectId", objectId);
             map.put("hostName", hostMO.getName());
             lists.add(map);
         }

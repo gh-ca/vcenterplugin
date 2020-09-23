@@ -35,7 +35,7 @@ public interface BestPracticeService {
      * @Param [context, hostName]
      * @Return java.lang.Object
      **/
-    Object getCurrentValue(VmwareContext context, String hostName) throws Exception;
+    Object getCurrentValue(VmwareContext context, String objectId) throws Exception;
 
     /**
      * @Author Administrator
@@ -63,7 +63,7 @@ public interface BestPracticeService {
      **/
     boolean autoRepair();
 
-    boolean check(VmwareContext context, String hostName) throws Exception;
+    boolean check(VmwareContext context, String objectId) throws Exception;
 
-    void update(VmwareContext context, String hostName) throws Exception;
+    void update(VmwareContext context, String objectId) throws Exception;
 }
