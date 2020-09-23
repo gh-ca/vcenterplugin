@@ -49,36 +49,4 @@ public class BestPracticeController extends BaseController{
         }
     }
 
-    /**
-     * manual update best practise
-     */
-    @RequestMapping(value = "/manualupdate", method = RequestMethod.POST)
-    @ResponseBody
-    public ResponseBodyBean manualupdate()
-            throws Exception {
-        bestPracticeProcessService.check(null);
-        return success();
-    }
-
-    /**
-     * second entry for apply best practise on host
-     */
-    @RequestMapping(value = "/manualapplyforhost", method = RequestMethod.POST)
-    @ResponseBody
-    public ResponseBodyBean applyforhost(@RequestParam(value = "hostid", required = true) String hostid)
-            throws Exception {
-
-        return success();
-    }
-
-    /**
-     * second entry for apply best practise on cluster
-     */
-    @RequestMapping(value = "/manualapplyforcluster", method = RequestMethod.POST)
-    @ResponseBody
-    public ResponseBodyBean applyforcluster(@RequestParam(value = "clusterid", required = true) String clusterid)
-            throws Exception {
-
-        return success();
-    }
 }

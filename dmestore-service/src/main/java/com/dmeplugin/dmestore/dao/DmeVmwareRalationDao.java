@@ -332,7 +332,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT " + fileId + " FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_TYPE='" + ToolUtils.STORE_TYPE_NFS + " 'and STORE_ID='" + storeId + "'";
+            String sql = "SELECT " + fileId + " FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_TYPE='" + ToolUtils.STORE_TYPE_NFS + "'and STORE_ID='" + storeId + "'";
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -356,7 +356,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT " + fileId + " FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_TYPE='" + ToolUtils.STORE_TYPE_NFS + " 'and STORE_ID='" + storeId + "'";
+            String sql = "SELECT " + fileId + " FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_TYPE='" + ToolUtils.STORE_TYPE_NFS + "'and STORE_ID='" + storeId + "'";
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {

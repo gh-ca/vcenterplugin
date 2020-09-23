@@ -21,8 +21,8 @@ public class LunQueueDepthForEmulexImpl extends BaseBestPracticeService implemen
     }
 
     @Override
-    public Object getCurrentValue(VmwareContext context, String hostName) throws Exception{
-        return super.getCurrentModuleOption(context, hostName, getOptionName());
+    public Object getCurrentValue(VmwareContext context, String objectId) throws Exception{
+        return super.getCurrentModuleOption(context, objectId, getOptionName());
     }
 
     @Override
@@ -41,13 +41,13 @@ public class LunQueueDepthForEmulexImpl extends BaseBestPracticeService implemen
     }
 
     @Override
-    public boolean check(VmwareContext context, String hostName) throws Exception {
-        return super.checkModuleOption(context, hostName, getOptionName(), getRecommendValue());
+    public boolean check(VmwareContext context, String objectId) throws Exception {
+        return super.checkModuleOption(context, objectId, getOptionName(), getRecommendValue());
     }
 
     @Override
-    public void update(VmwareContext context, String hostName) throws Exception{
-        super.updateModuleOption(context, hostName, getOptionName(), getRecommendValue());
+    public void update(VmwareContext context, String objectId) throws Exception{
+        super.updateModuleOption(context, objectId, getOptionName(), getRecommendValue());
     }
 
     private String getOptionName(){

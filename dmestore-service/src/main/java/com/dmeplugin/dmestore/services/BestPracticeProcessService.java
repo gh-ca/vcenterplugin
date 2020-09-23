@@ -2,6 +2,7 @@ package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.model.BestPracticeBean;
 import com.dmeplugin.dmestore.model.BestPracticeCheckRecordBean;
+import com.dmeplugin.dmestore.model.BestPracticeUpResultResponse;
 
 import java.util.List;
 
@@ -17,7 +18,23 @@ public interface BestPracticeProcessService {
 
     List<BestPracticeBean> getCheckRecordBy(String hostSetting, int pageNo, int pageSize) throws Exception;
 
-    void check(String hostName) throws Exception;
+    void check(String objectId) throws Exception;
 
-    void update(List<String> hostNames, String hostSetting) throws Exception;
+    /**
+     * @Author Administrator
+     * @Description 更新主机的所有检查项
+     * @Date 11:06 2020/9/23
+     * @Param [objectIds, hostSetting]
+     * @Return void
+     **/
+    List<BestPracticeUpResultResponse> update(List<String> objectIds) throws Exception;
+
+    /**
+     * @Author Administrator
+     * @Description 更新主机的某一检查项
+     * @Date 11:06 2020/9/23
+     * @Param [objectIds, hostSetting]
+     * @Return void
+     **/
+    List<BestPracticeUpResultResponse> update(List<String> objectIds, String hostSetting) throws Exception;
 }

@@ -13,7 +13,7 @@ public class BestPracticeBean {
     private String level;
     private String actualValue;
     private String needReboot;
-    private String hostId;
+    private String hostObjectId;
     private String hostName;
     private String autoRepair;
 
@@ -57,12 +57,12 @@ public class BestPracticeBean {
         this.needReboot = needReboot;
     }
 
-    public String getHostId() {
-        return hostId;
+    public String getHostObjectId() {
+        return hostObjectId;
     }
 
-    public void setHostId(String hostId) {
-        this.hostId = hostId;
+    public void setHostObjectId(String hostObjectId) {
+        this.hostObjectId = hostObjectId;
     }
 
     public String getHostName() {

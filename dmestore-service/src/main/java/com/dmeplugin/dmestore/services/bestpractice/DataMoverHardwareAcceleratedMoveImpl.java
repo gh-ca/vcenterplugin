@@ -21,8 +21,8 @@ public class DataMoverHardwareAcceleratedMoveImpl extends BaseBestPracticeServic
     }
 
     @Override
-    public Object getCurrentValue(VmwareContext context, String hostName) throws Exception{
-        return super.getCurrentValue(context, hostName, getHostSetting());
+    public Object getCurrentValue(VmwareContext context, String objectId) throws Exception{
+        return super.getCurrentValue(context, objectId, getHostSetting());
     }
 
     @Override
@@ -41,12 +41,12 @@ public class DataMoverHardwareAcceleratedMoveImpl extends BaseBestPracticeServic
     }
 
     @Override
-    public boolean check(VmwareContext context, String hostName) throws Exception {
-        return super.check(context, hostName, getHostSetting(), getRecommendValue());
+    public boolean check(VmwareContext context, String objectId) throws Exception {
+        return super.check(context, objectId, getHostSetting(), getRecommendValue());
     }
 
     @Override
-    public void update(VmwareContext context, String hostName) throws Exception{
-        super.update(context, hostName, getHostSetting(), getRecommendValue());
+    public void update(VmwareContext context, String objectId) throws Exception{
+        super.update(context, objectId, getHostSetting(), getRecommendValue());
     }
 }
