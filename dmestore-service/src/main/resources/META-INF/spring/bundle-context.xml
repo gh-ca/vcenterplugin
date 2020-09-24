@@ -186,8 +186,14 @@
    <bean name="hostAccessService" class="com.dmeplugin.dmestore.services.HostAccessServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
-    
-    
+
+
+    <bean name="overviewService" class="com.dmeplugin.dmestore.services.OverviewServiceImpl">
+        <property name="vmfsAccessService" ref="VmfsAccessServiceImpl"/>
+        <property name="dmeNFSAccessService" ref="DmeNFSAccessServiceImpl"/>
+        <property name="dmeStorageService" ref="dmeStorageService"/>
+        <property name="bestPracticeProcessService" ref="bestPracticeProcessService"/>
+    </bean>
 
     <!--开启这个配置，spring才能识别@Scheduled注解-->
     <task:annotation-driven scheduler="qbScheduler" mode="proxy"/>
