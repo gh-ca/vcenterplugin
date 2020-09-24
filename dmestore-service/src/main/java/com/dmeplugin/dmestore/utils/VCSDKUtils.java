@@ -702,10 +702,18 @@ public class VCSDKUtils {
         //mountHost = "10.143.132.17";
         //logicPort = 0;
         _logger.info("start creat nfs datastore");
+
+        String dataStoreObjectId = "";
+
         accessMode = StringUtils.isEmpty(accessMode) || accessMode.equals("readWrite") ? "readWrite" : "readOnly";
         try {
-            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", 443,"administrator@vsphere.local", "Pbu4@123");
-            DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
+            String serverguid = vcConnectionHelper.objectID2Serverguid(dataStoreObjectId);
+            VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
+            //VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", 443,"administrator@vsphere.local", "Pbu4@123");
+            //DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
+            ManagedObjectReference managedObjectReference1 = vcConnectionHelper.objectID2MOR(dataStoreObjectId);
+            DatacenterMO dcMo = new DatacenterMO(vmwareContext, managedObjectReference1);
+
             List<ManagedObjectReference> hosts = null;
             if (mountHosts != null && mountHosts.size() > 0) {
                 ManagedObjectReference managedObjectReference = null;
@@ -716,7 +724,6 @@ public class VCSDKUtils {
                         managedObjectReference = hosts.get(0);
                         HostMO hostMO = new HostMO(vmwareContext, managedObjectReference);
                         HostDatastoreSystemMO hostDatastoreSystemMO = hostMO.getHostDatastoreSystemMO();
-                        //todo logic port param needed ?
                         hostDatastoreSystemMO.createNfsDatastore(serverHost, 0, exportPath, nfsName, accessMode, type);
                     } else {
                         result = "failed";

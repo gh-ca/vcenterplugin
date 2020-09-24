@@ -73,6 +73,7 @@
 
     <bean name="dmeStorageService" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
+        <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
     <bean name="dmeVmwareRalationDao" class="com.dmeplugin.dmestore.dao.DmeVmwareRalationDao">
         <property name="url" value="${h2.url}"/>

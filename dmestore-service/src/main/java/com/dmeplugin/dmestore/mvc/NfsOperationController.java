@@ -27,6 +27,7 @@ public class NfsOperationController extends BaseController{
 
     /**
      *  fs_param:
+     *      storage_pool_id string 存储池id
      *      current_port_id String 当前逻辑端口id
      *      storage_id  str  存储设备id 必
      *      pool_raw_id str  存储池在指定存储设备上的id 必
@@ -72,7 +73,7 @@ public class NfsOperationController extends BaseController{
      */
     @PostMapping("/createnfsdatastore")
     @ResponseBody
-    public ResponseBodyBean createNfsDatastore(@RequestBody Map<String,String> params){
+    public ResponseBodyBean createNfsDatastore(@RequestBody Map<String,Object> params){
 
         LOG.info("url:{/operatenfs/createnfsdatastore},"+gson.toJson(params));
         Map<String,Object> resMap = nfsOperationService.createNfsDatastore(params);
@@ -91,14 +92,7 @@ public class NfsOperationController extends BaseController{
      *      fs params:
      *      file_system_id String 文件系统唯一标识 必
      *      capacity_autonegotiation 自动扩缩容 相关属性{
-     *          capacity_self_adjusting_mode str  自动扩容触发门限百分比，默认85%。自动扩容触发门限百分比必须大于自动缩容触发门限百分比
-     *          capacity_recycle_mode str  容量回收模式。 expand_capacity：优先扩容；delete_snapshots：优先删除旧快照。默认优先扩容
      *          auto_size_enable  boolean 自动调整容量开关。 false: 关闭；true：打开。默认打开
-     *          auto_grow_threshold_percent int 自动扩容触发门限百分比，默认85%。自动扩容触发门限百分比必须大于自动缩容触发门限百分比
-     *          auto_shrink_threshold_percent int 自动缩容触发门限百分比，默认50%。自动扩容触发门限百分比必须大于自动缩容触发门限百分比,
-     *          max_auto_size double 自动扩容下限。单位GB。默认16777216GB。自动扩容上限必须大于等于自动缩容下限
-     *          min_auto_size double 自动缩容下限。单位GB。默认16777216GB。自动扩容上限必须大于等于自动缩容下限
-     *          auto_size_increment int 自动扩（缩）容单次变化量。单位MB。默认1GB
      *       },
      *       name String fs新名字 (取消勾选可以没有)
      *       tuning属性 （高级属性设置）{
@@ -123,7 +117,7 @@ public class NfsOperationController extends BaseController{
      */
     @PostMapping("/updatenfsdatastore")
     @ResponseBody
-    public ResponseBodyBean updateNfsDatastore(@RequestBody Map<String,String> params){
+    public ResponseBodyBean updateNfsDatastore(@RequestBody Map<String,Object> params){
 
         Map<String,Object> resMap = nfsOperationService.updateNfsDatastore(params);
         if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
@@ -143,7 +137,7 @@ public class NfsOperationController extends BaseController{
      */
     @PutMapping("/changenfsdatastore")
     @ResponseBody
-    public ResponseBodyBean changeNfsCapacity(@RequestBody Map<String,String> params){
+    public ResponseBodyBean changeNfsCapacity(@RequestBody Map<String,Object> params){
 
         ResponseBodyBean responseBodyBean = nfsOperationService.changeNfsCapacity(params);
         if (null != responseBodyBean && null != responseBodyBean.getCode() && responseBodyBean.getCode().equals("200")) {

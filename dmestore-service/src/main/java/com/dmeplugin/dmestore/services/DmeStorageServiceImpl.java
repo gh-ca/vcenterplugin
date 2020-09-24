@@ -3,6 +3,7 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
+import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import org.springframework.http.*;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -37,6 +39,16 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     private Gson gson=new Gson();
 
     private DmeAccessService dmeAccessService;
+
+    private VCSDKUtils vcsdkUtils;
+
+    public VCSDKUtils getVcsdkUtils() {
+        return vcsdkUtils;
+    }
+
+    public void setVcsdkUtils(VCSDKUtils vcsdkUtils) {
+        this.vcsdkUtils = vcsdkUtils;
+    }
 
     public DmeAccessService getDmeAccessService() {
         return dmeAccessService;
@@ -86,7 +98,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storageObj.setMaxIops(Double.valueOf(jsonObj.get("max_iops").getAsString()));
                     storageObj.setMaxBandwidth(Double.valueOf(jsonObj.get("max_bandwidth").getAsString()));
                     storageObj.setMaxLatency(Double.valueOf(jsonObj.get("max_latency").getAsString()));
-                    storageObj.setStatus(jsonObj.get("sn").getAsString());
+                    storageObj.setSn(jsonObj.get("sn").getAsString());
+                    storageObj.setVersion(jsonObj.get("version").getAsString());
+                    storageObj.setTotal_pool_capacity(Double.valueOf(jsonObj.get("total_pool_capacity").getAsString()));
+
                     JsonElement jsonAzIds = jsonObj.get("az_ids");
                     if (jsonAzIds != null) {
                         String azIds = jsonAzIds.getAsString();
@@ -195,17 +210,35 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storagePool.setName(element.get("name").getAsString());
                     storagePool.setFree_capacity(Double.valueOf(element.get("free_capacity").getAsString()));
                     storagePool.setHealth_status(element.get("health_status").getAsString());
-                    storagePool.setLun_subscribed_capacity(Double.valueOf(element.get("lun_subscribed_capacity").getAsString()));
+                    Double lun_subscribed_capacity = Double.valueOf(element.get("lun_subscribed_capacity").getAsString());
+                    storagePool.setLun_subscribed_capacity(lun_subscribed_capacity);
                     storagePool.setParent_type(element.get("parent_type").getAsString());
                     storagePool.setRunning_status(element.get("running_status").getAsString());
+                    Double total_capacity = Double.valueOf(element.get("total_capacity").getAsString());
                     storagePool.setTotal_capacity(Double.valueOf(element.get("total_capacity").getAsString()));
-                    storagePool.setFs_subscribed_capacity(Double.valueOf(element.get("fs_subscribed_capacity").getAsString()));
+                    Double fs_subscribed_capacity = Double.valueOf(element.get("fs_subscribed_capacity").getAsString());
+                    storagePool.setFs_subscribed_capacity(fs_subscribed_capacity);
                     storagePool.setConsumed_capacity(Double.valueOf(element.get("consumed_capacity").getAsString()));
                     storagePool.setConsumed_capacity_percentage(element.get("consumed_capacity_percentage").getAsString());
                     storagePool.setConsumed_capacity_threshold(element.get("consumed_capacity_threshold").getAsString());
                     storagePool.setStorage_pool_id(element.get("storage_pool_id").getAsString());
                     storagePool.setStorage_name(element.get("storage_name").getAsString());
                     storagePool.setMedia_type(element.get("media_type").getAsString());
+                    storagePool.setTier0_disk_type(element.get("tier0_disk_type").getAsString());
+                    storagePool.setTier1_disk_type(element.get("tier1_disk_type").getAsString());
+                    storagePool.setTier2_disk_type(element.get("tier2_disk_type").getAsString());
+                    storagePool.setStorage_id(element.get("storage_id").getAsString());
+                    storagePool.setTier0_raid_lv(element.get("tier0_raid_lv").getAsString());
+                    storagePool.setTier1_raid_lv(element.get("tier1_raid_lv").getAsString());
+                    storagePool.setTier2_raid_lv(element.get("tier2_raid_lv").getAsString());
+                    storagePool.setConsumed_capacity(Double.valueOf(element.get("consumed_capacity").getAsString()));
+                    //订阅率（lun/fs订阅率）
+                    DecimalFormat df = new DecimalFormat("#.00");
+                    Double lun_subscription_rate = Double.valueOf(df.format(lun_subscribed_capacity/total_capacity));
+                    Double fs_subscription_rate = Double.valueOf(df.format(fs_subscribed_capacity / total_capacity));
+                    storagePool.setLun_subscription_rate(lun_subscription_rate);
+                    storagePool.setFs_subscription_rate(fs_subscription_rate);
+
                     resList.add(storagePool);
                 }
                 resMap.put("data", resList);
@@ -318,6 +351,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     volume.setPool_raw_id(element.get("pool_raw_id").getAsString());
                     volume.setCapacity_usage(element.get("capacity_usage").getAsString());
                     volume.setProtectionStatus( Boolean.valueOf(element.get("protectionStatus").getAsString()));
+                    volume.setCapacity(Integer.valueOf(element.get("capacity").getAsString()));
                     volumes.add(volume);
                 }
                 resMap.put("data", volumes);
@@ -424,6 +458,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     dtrees.setSecurity_style(element.get("security_style").getAsString());
                     dtrees.setTier_name(element.get("tier_name").getAsString());
                     dtrees.setNfs_count(Integer.valueOf(element.get("nfs_count").getAsString()));
+                    dtrees.setCifs_count(Integer.valueOf(element.get("cifs_count").getAsString()));
                     resList.add(dtrees);
                 }
                 resMap.put("data", resList);
@@ -883,6 +918,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
     }
 
+    private String getDataStoreOnVolume(String volumeId){
+
+        return "";
+    }
 
     //从卷信息中查关联的主机和主机组
     private void volumeAttachments(JsonArray array, Volume volume) {
