@@ -10,5 +10,5 @@ import com.dmeplugin.dmestore.model.VmRDMCreateBean;
  * @createTime 2020年09月09日 10:58:00
  */
 public interface VMRDMService {
-    void createRDM(String datastore_name, String vm_name, String host_id, VmRDMCreateBean createBean) throws Exception;
+    void createRDM(String datastore_objectId, String vm_objectId, String host_objectId, VmRDMCreateBean createBean) throws Exception;
 }

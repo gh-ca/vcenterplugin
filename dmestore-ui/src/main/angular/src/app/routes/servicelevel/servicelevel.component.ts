@@ -276,7 +276,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   // ===============storage pool==============
   storagePoolRefresh(state: ClrDatagridStateInterface){
     this.storeagePoolIsloading = true;
-    const params = this.commonService.refresh(state, this.storagePoolQuery);
+    // const params = this.commonService.refresh(state, this.storagePoolQuery);
     // this.http.get('https://api.github.com/search/repositories', this.practiceParams).subscribe((result: any) => {
     //       console.log(result)
     //       this.list = result.items;
@@ -284,7 +284,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     //       this.isLoading = false;
     //       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     // });
-    this.http.post('http://localhost:8080/datastorestatistichistrory/vmfsvolume', this.storagePoolQuery).subscribe((response: any) => {
+    this.http.post('http://localhost:8080/servicelevel/listStoragePoolsByServiceLevelId', this.selectedModel.id).subscribe((response: any) => {
       console.log(response);
     }, err => {
       console.error('ERROR', err);
@@ -307,6 +307,11 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     //       this.isLoading = false;
     //       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     // });
+    this.http.post('http://localhost:8080/servicelevel/listVolumesByServiceLevelId', this.selectedModel.id).subscribe((response: any) => {
+      console.log(response);
+    }, err => {
+      console.error('ERROR', err);
+    });
     this.volumeList = this.volumeReslut.items;
     this.volumeTotal = this.volumeReslut.total_count;
     this.volumeIsloading = false;

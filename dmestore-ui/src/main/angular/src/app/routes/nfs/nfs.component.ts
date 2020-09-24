@@ -1,5 +1,5 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import {Cluster, Host, List, Mount, NfsService} from './nfs.service';
+import {AddNfs, Cluster, FileSystem, Host, List, ModifyNfs, Mount, NfsService, Share, ShareClient} from './nfs.service';
 import {GlobalsService} from '../../shared/globals.service';
 import {LogicPort, StorageList, StoragePool, StorageService} from '../storage/storage.service';
 @Component({
@@ -26,38 +26,13 @@ export class NfsComponent implements OnInit {
   unmountShow = false; // 卸载提示
   mountObj = '1';
   fsIds = [];
-  // 添加form提交数据
-  form = {
-    storageDevice: '',
-    storagePool: '',
-    logicPort: 0,
-    datastoreName: 0,
-    fsname: '',
-    shareName: '',
-    size: 0,
-    unit: 'GB',
-    nfsProtocol: 'v3',
-    name: '',
-    favorite: '',
-    sameName: true,
-    qosPolicy: false,
-    thin: true,
-    control: 'up',
-    deduplication: 'disable',
-    compression: 'disable',
-    capAuto: false
-  };
-  currentData = {
-    name: '',
-    sameName: true,
-
-  };
+  addForm = new AddNfs();
+  selectHost = [];
+  hostLoading = true;
+  currentData = null;
   hostList: Host[] = [];
   clusterList: Cluster[] = [];
   mountForm = new Mount();
-  select1 = [];
-  select2 = [];
-
   storageList: StorageList[] = [];
   storagePools: StoragePool[] = [];
   logicPorts: LogicPort[] = [];
@@ -94,36 +69,107 @@ export class NfsComponent implements OnInit {
     this.remoteSrv.getChartData(this.fsIds).subscribe((result: any) => {
       if (result.code === '0'){
         const chartList: List [] = result.data;
-        this.list.forEach(item => {
-          chartList.forEach(charItem => {
-            if (item.fsId === charItem.fsId){
-              item.ops = charItem.ops;
-              item.bandwidth = charItem.bandwidth;
-              item.readResponseTime = charItem.readResponseTime;
-              item.writeResponseTime = charItem.writeResponseTime;
-            }
-          });
-        });
-        this.cdr.detectChanges();
+        if ( chartList !== null && chartList.length > 0){
+         this.list.forEach(item => {
+           chartList.forEach(charItem => {
+             if (item.fsId === charItem.fsId){
+               item.ops = charItem.ops;
+               item.bandwidth = charItem.bandwidth;
+               item.readResponseTime = charItem.readResponseTime;
+               item.writeResponseTime = charItem.writeResponseTime;
+             }
+           });
+         });
+         this.cdr.detectChanges();
+        }
       }
     });
   }
 
   addView(){
+    this.addForm = new AddNfs();
     // 获取存储列表
     this.storageService.getData().subscribe((s: any) => {
        if (s.code === '0'){
         this.storageList = s.data.data;
         }
     });
+    this.remoteSrv.getHostList().subscribe((r: any) => {
+      if (r.code === '0'){
+        this.hostList = r.data;
+        this.hostLoading = false;
+        this.cdr.detectChanges();
+      }
+    });
     this.popShow = true;
+  }
+  // 添加提交方法
+  addNfs(){
+    // 单位换算
+    switch (this.addForm.unit) {
+      case 'TB':
+        this.addForm.size = this.addForm.size * 1024;
+        break;
+      case 'MB':
+        this.addForm.size = this.addForm.size / 1024;
+        break;
+      case 'KB':
+        this.addForm.size = this.addForm.size / (1024 * 1024);
+        break;
+      default: // 默认GB 不变
+        break;
+    }
+    // 构建share 和fs对象
+    if (this.addForm.sameName){
+     const share = new Share();
+     share.name = this.addForm.nfsName;
+     share.share_path = this.addForm.nfsName;
+     this.addForm.create_nfs_share_param = share;
+     const fs = new FileSystem();
+     fs.name = this.addForm.nfsName;
+     fs.capacity = this.addForm.size;
+     fs.count = 1;
+     this.addForm.filesystem_specs.push(fs);
+    }else {
+      const share = new Share();
+      share.name = this.addForm.shareName;
+      share.share_path = this.addForm.shareName;
+      this.addForm.create_nfs_share_param = share;
+      const fs = new FileSystem();
+      fs.name = this.addForm.fsName;
+      fs.capacity = this.addForm.size;
+      fs.count = 1;
+      this.addForm.filesystem_specs.push(fs);
+    }
+    // nfs_share_client_addition 构建挂载的主机列表
+    if (this.selectHost !== null && this.selectHost.length > 0){
+      this.selectHost.forEach(h => {
+        const cli = new ShareClient();
+        cli.name = h.hostName;
+        cli.accessval = this.addForm.accessMode;
+        this.addForm.nfs_share_client_addition.push(cli);
+      });
+    }
+    // thin属性构造
+    if (this.addForm.thin){
+      this.addForm.tuning.allocation_type = 'thin';
+    }else{
+      this.addForm.tuning.allocation_type = 'thick';
+    }
+    // 构建exportPath路径
+    this.addForm.exportPath = this.addForm.nfsName;
+    this.remoteSrv.addNfs(this.addForm).subscribe((result: any) => {
+      if (result.code === '0'){
+        this.popShow = false;
+      }
+     });
   }
   selectStoragePool(){
     this.storagePools = null;
     this.logicPorts = null;
     console.log('查询存储池....');
     // 选择存储后获取存储池
-    this.storageService.getStoragePoolListByStorageId(this.form.storageDevice)
+    this.storageService.getStoragePoolListByStorageId(this.addForm.storage_id)
       .subscribe((r: any) => {
         if (r.code === '0'){
           this.storagePools = r.data.data;
@@ -134,7 +180,7 @@ export class NfsComponent implements OnInit {
   selectLogicPort(){
     console.log('查询逻辑端口....');
     // 选择存储后逻辑端口
-    this.storageService.getLogicPortListByStorageId(this.form.storageDevice)
+    this.storageService.getLogicPortListByStorageId(this.addForm.storage_id)
       .subscribe((r: any) => {
         if (r.code === '0'){
         this.logicPorts = r.data.data;
@@ -142,19 +188,20 @@ export class NfsComponent implements OnInit {
       });
   }
   modifyData() {
-    console.log(this.rowSelected[0]);
-    this.currentData = Object.assign({}, this.rowSelected[0]);
+
+    this.currentData = new ModifyNfs();
+    this.currentData.dataStoreObjectId = this.rowSelected[0].objectId;
+    this.currentData.nfsShareName = this.rowSelected[0].share;
+    this.currentData.nfsName = this.rowSelected[0].name;
+    this.currentData.file_system_id = this.rowSelected[0].fsId;
+    this.currentData.capacity_autonegotiation.auto_size_enable = false;
+    this.currentData.tuning.deduplication_enabled = false;
+    this.currentData.tuning.compression_enabled = false;
+    this.currentData.tuning.allocation_type = 'thin';
+    this.currentData.nfs_share_id = this.rowSelected[0].shareId;
+    console.log('modify');
+    console.log(this.currentData);
     this.modifyShow = true;
-  }
-  // 添加提交方法
-  addNfs(){
-    console.log('form');
-    console.log(this.form);
-    this.remoteSrv.addNfs(this.form).subscribe((result: any) => {
-      const data = result.data;
-      console.log('result');
-      console.log(data);
-    });
   }
   expandData(){
     console.log('扩容提交.....');
@@ -173,14 +220,16 @@ export class NfsComponent implements OnInit {
   }
   // 挂载
   mount(){
+    this.mountForm = new Mount();
     this.mountForm.dataStoreName = this.rowSelected[0].name;
-    this.remoteSrv.getHostList(this.mountForm.dataStoreName).subscribe((r: any) => {
+    this.mountForm.dataStoreObjectId = this.rowSelected[0].objectid;
+    this.remoteSrv.getHostListByObjectId(this.rowSelected[0].objectid).subscribe((r: any) => {
       if (r.code === '0'){
         this.hostList = r.data;
         this.cdr.detectChanges();
       }
     });
-    this.remoteSrv.getClusterList(this.mountForm.dataStoreName).subscribe((r: any) => {
+    this.remoteSrv.getClusterListByObjectId(this.rowSelected[0].objectid).subscribe((r: any) => {
       if (r.code === '0'){
         this.clusterList = r.data;
         this.cdr.detectChanges();
@@ -190,25 +239,10 @@ export class NfsComponent implements OnInit {
   }
   // 挂载提交
   mountSubmit(){
-    if (this.mountObj === '1'){
-      const strs: string[] = [];
-      this.select1.forEach(e => {
-        strs.push(e.hostId);
-      });
-      this.mountForm.hosts = strs;
-    }else if (this.mountObj === '2'){
-      const strs: string[] = [];
-      this.select2.forEach(e => {
-        strs.push(e.clusterId);
-      });
-      this.mountForm.clusters = strs;
-    }
     this.remoteSrv.mountNfs(this.mountForm).subscribe((result: any) => {
       if (result.code  ===  '0'){
         this.mountShow = false;
         this.mountForm = new Mount();
-        this.select1 = [];
-        this.select2 = [];
       }
     });
   }

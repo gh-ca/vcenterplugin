@@ -7,16 +7,14 @@ import com.dmeplugin.dmestore.utils.StringUtil;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @ClassName DmeNFSAccessServiceImpl
@@ -98,7 +96,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         shareAttr.setOwning_dtree_name(share.get("owning_dtree_name").getAsString());
         //查询客户端列表
         List<AuthClient> authClientList = getNFSDatastoreShareAuthClients(nfs_share_id);
-        if(null != authClientList && authClientList.size() >9){
+        if (null != authClientList && authClientList.size() > 9) {
             shareAttr.setAuth_client_list(authClientList);
         }
         return shareAttr;
@@ -110,7 +108,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_SHARE_AUTH_CLIENTS_URL, "nfs_share_id", shareId);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, null);
         if (responseEntity.getStatusCodeValue() / 100 == 2) {
-            String  resBody = responseEntity.getBody();
+            String resBody = responseEntity.getBody();
             JsonObject resObject = gson.fromJson(resBody, JsonObject.class);
             int total = resObject.get("total").getAsInt();
 
@@ -327,7 +325,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private ResponseEntity listShareByStorageId(String storageId) throws Exception {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("storage_id", storageId);
-        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL, HttpMethod.POST, requestbody.toString());
+        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL, HttpMethod.POST, gson.toJson(requestbody));
         return responseEntity;
     }
 
@@ -335,7 +333,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private ResponseEntity listShareBySharePath(String sharePath) throws Exception {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("share_path", sharePath);
-        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL, HttpMethod.POST, requestbody.toString());
+        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL, HttpMethod.POST, gson.toJson(requestbody));
         return responseEntity;
     }
 
@@ -385,7 +383,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         if (!StringUtils.isEmpty(fsName)) {
             requestbody.put("name", fsName);
         }
-        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_FILESERVICE_QUERY_URL, HttpMethod.POST, requestbody.toString());
+        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_FILESERVICE_QUERY_URL, HttpMethod.POST, gson.toJson(requestbody));
         return responseEntity;
     }
 
@@ -735,7 +733,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_SHARE_DETAIL_URL,
                         "nfs_share_id", ToolUtils.getStr(params.get("shareId")));
                 LOG.info("mountnfs URL===" + url);
-                ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.PUT, requestbody.toString());
+                ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(requestbody));
 
                 LOG.info("mountnfs responseEntity==" + responseEntity.toString());
                 if (responseEntity.getStatusCodeValue() == 202) {
@@ -776,13 +774,77 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             if (null != dvr) {
                 String shareId = dvr.getShareId();
                 List<AuthClient> authClientList = getNFSDatastoreShareAuthClients(shareId);
-                if(null != authClientList && authClientList.size() > 0){
+                if (null != authClientList && authClientList.size() > 0) {
                     //卸载
+                    List<String> authClientIds = new ArrayList<>();
+                    for (AuthClient authClient : authClientList) {
+                        authClientIds.add(authClient.getId());
+                    }
+                    String taskId = deleteAuthClient(shareId, authClientIds);
+                    if (!StringUtils.isEmpty(taskId)) {
+                        List<String> taskIds = new ArrayList<>();
+                        taskIds.add(taskId);
+                        LOG.info("taskIds====" + taskIds);
+                        //查询看删除任务是否完成。
+                        boolean unmountFlag = taskService.checkTaskStatus(taskIds);
+                        if (unmountFlag) { //DME NFS SHAER 删除authClient完成
+                            LOG.info("unmountNfs delete authClient success!");
+                        } else {
+                            throw new Exception("DME mount nfs error(task status)!");
+                        }
+                    } else {
+                        throw new Exception("DME mount nfs error(task is null)!");
+                    }
                 }
             }
-
         } else {
             throw new Exception("unmount nfs parameter exception:" + params);
+        }
+    }
+
+    @Override
+    public void deleteNfs(Map<String, Object> params) throws Exception {
+        if (null != params) {
+            String dataStorageId = ToolUtils.getStr(params.get("dataStoreObjectId"));
+            List<Map<String, String>> hosts = getHostsMountDataStoreByDsObjectId(dataStorageId);
+            List<String> hostIds = new ArrayList<>();
+            if (null != hosts && hosts.size() > 0) {
+                for (Map<String, String> hostMap : hosts) {
+                    String hostId = hostMap.get("hostId");
+                    hostIds.add(hostId);
+                }
+            }
+            //vcenter侧删除
+            if (hostIds.size() > 0) {
+                vcsdkUtils.deleteNfs(dataStorageId, hostIds);
+            }
+            //DME侧删除 1 获取dme侧存储的share fs(暂认为是一对一关系)
+            DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStorageId);
+            if (null != dvr) {
+                String shareId = dvr.getShareId();
+                String fsId = dvr.getFsId();
+                List<String> taskIds = new ArrayList<>();
+                if(!StringUtils.isEmpty(shareId)){
+                    String deleteShareTaskId = deleteNfsShare(Arrays.asList(shareId));
+                    if(!StringUtils.isEmpty(deleteShareTaskId)){
+                        taskIds.add(deleteShareTaskId);
+                    }
+                }
+                if(!StringUtils.isEmpty(fsId)){
+                    String deletefsTaskId = deleteNfsFs(Arrays.asList(fsId));
+                    if(!StringUtils.isEmpty(deletefsTaskId)){
+                        taskIds.add(deletefsTaskId);
+                    }
+                }
+                if(taskIds.size() > 0){
+                    boolean deleteFlag = taskService.checkTaskStatus(taskIds);
+                    if (deleteFlag) { //DME NFS 删除 SHAER FS
+                        LOG.info("Nfs delete share fs success!");
+                    } else {
+                        throw new Exception("DME delete nfs error(task status)!");
+                    }
+                }
+            }
         }
     }
 
@@ -793,4 +855,97 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private void unmountNfsFromCluster(String dataStoreObjectId, String clusterId) throws Exception {
         vcsdkUtils.unmountNfsOnCluster(dataStoreObjectId, clusterId);
     }
+
+    //dem卸载share访问客户端列表
+    private String deleteAuthClient(String shareId, List<String> authClientIds) {
+        String taskId = "";
+        Map<String, Object> requestbody = new HashMap<>();
+        List<Map<String, Object>> listAddition = new ArrayList<>();
+        for (String authClientId : authClientIds) {
+            Map<String, Object> addtion = new HashMap<>();
+            addtion.put("nfs_share_client_id_in_storage", authClientId);
+            listAddition.add(addtion);
+        }
+        requestbody.put("id", shareId);
+        requestbody.put("nfs_share_client_deletion", listAddition);
+        LOG.info("unmountnfs authClient requestbody==" + gson.toJson(requestbody));
+        try {
+            String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_SHARE_DETAIL_URL, "nfs_share_id", shareId);
+            ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.PUT, requestbody.toString());
+
+            LOG.info("unmountnfs authClient responseEntity==" + responseEntity.toString());
+            if (responseEntity.getStatusCodeValue() == 202) {
+                JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                if (jsonObject != null && jsonObject.get("task_id") != null) {
+                    taskId = ToolUtils.jsonToStr(jsonObject.get("task_id"));
+                    LOG.info("unmountnfs authClient task_id====" + taskId);
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("unmountnfs authClient error:", e);
+        }
+        return taskId;
+    }
+
+    private String deleteNfsShare(List<String> shareIds) {
+        String taskId = "";
+        Map<String, Object> requestbody = new HashMap<>();
+        requestbody.put("id_list", shareIds);
+        LOG.info("delete nfs share requestbody==" + gson.toJson(requestbody));
+        try {
+            ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
+            LOG.info("delete nfs share responseEntity==" + responseEntity.toString());
+            if (responseEntity.getStatusCodeValue() == 202) {
+                JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                if (jsonObject != null && jsonObject.get("task_id") != null) {
+                    taskId = ToolUtils.jsonToStr(jsonObject.get("task_id"));
+                    LOG.info("delete nfs share  task_id====" + taskId);
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("delete nfs share error:", e);
+        }
+        return taskId;
+    }
+
+    private String deleteNfsFs(List<String> fsIds) {
+        String taskId = "";
+        Map<String, Object> requestbody = new HashMap<>();
+        requestbody.put("file_system_ids", fsIds);
+        LOG.info("delete nfs fs requestbody==" + gson.toJson(requestbody));
+        try {
+            ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_FS_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
+            LOG.info("delete nfs fs responseEntity==" + responseEntity.toString());
+            if (responseEntity.getStatusCodeValue() == 202) {
+                JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                if (jsonObject != null && jsonObject.get("task_id") != null) {
+                    taskId = ToolUtils.jsonToStr(jsonObject.get("task_id"));
+                    LOG.info("delete nfs fs  task_id====" + taskId);
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("delete nfs fs error:", e);
+        }
+        return taskId;
+    }
+
+    public List<Map<String, String>> getHostsMountDataStoreByDsObjectId(String dataStoreObjectId) throws Exception {
+        List<Map<String, String>> lists = null;
+        try {
+            //取得vcenter中的所有挂载了当前存储的host
+            String listStr = vcsdkUtils.getHostsByDsObjectId(dataStoreObjectId, false);
+            LOG.info("host getHostsMountDataStoreByDsObjectId==" + listStr);
+            if (!StringUtils.isEmpty(listStr)) {
+                lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
+                }.getType());
+            }
+        } catch (Exception e) {
+            LOG.error("get Hosts MountDataStore By DsObjectId error:", e);
+            throw e;
+        }
+        LOG.info("getHostsMountDataStoreByDsObjectId===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
+        return lists;
+    }
+
+
 }

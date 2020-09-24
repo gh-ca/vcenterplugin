@@ -103,7 +103,7 @@
     </clr-dg-footer>
   </clr-datagrid>
   <!-- 示例 -->
-  <span class="tabs-btn-wrap">
+  <!--<span class="tabs-btn-wrap">
     <span (click)="expendActive = !expendActive" class="tabs-btn" [ngClass]="{'tabs-btn_active': !expendActive}">按钮1</span>
     <span (click)="expendActive = !expendActive" class="tabs-btn" [ngClass]="{'tabs-btn_active': expendActive}">按钮2</span>
   </span>
@@ -139,7 +139,7 @@
         </tbody>
       </table>
     </div>
-  </div>
+  </div>-->
   
   <!-- 弹出form提交框 添加 -->
   <clr-wizard #wizard [(clrWizardOpen)]="popShow">
@@ -151,7 +151,7 @@
     <clr-wizard-button (click)="addVmfsHanlde();" [type]="'finish'">{{'menu.ok' | translate}}</clr-wizard-button>
 
     <!--Page1 -->
-    <clr-wizard-page [clrWizardPageNextDisabled]="name.pristine || !formPageOne.valid">
+    <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="name.pristine || !formPageOne.valid">
         <ng-template clrPageTitle>{{'vmfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
   
         <form clrForm #formPageOne="ngForm">
@@ -278,20 +278,26 @@
         </form>
     </clr-wizard-page>
     <!--Page2 储存库设置-->
-    <clr-wizard-page [clrWizardPageNextDisabled]="number.pristine || !formPageTwo.valid">
+    <clr-wizard-page #addPageTwo [clrWizardPageNextDisabled]="number.pristine || !formPageTwo.valid">
         <ng-template clrPageTitle>
           {{'vmfs.storageSetting' | translate}}
         </ng-template> <!-- mandatory -->
-      <div class="btn-group btn-icon">
-        <div class="radio btn">
-          <input (click)="levelCheck = 'level'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3" checked>
-          <label for="btn-demo-radio-3" class="setBorderedius">{{'vmfs.byServiceLevel' | translate}}</label>
-        </div>
-        <div class="radio btn">
-          <input (click)="customerClickFunc();" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-4">
-          <label for="btn-demo-radio-4" class="setBorderedius">{{'vmfs.customer' | translate}}</label>
-        </div>
-      </div>
+        <span class="tabs-btn-wrap">
+          <!-- 服务等级 -->
+          <span (click)="levelCheck = 'level'" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'level'}">{{'vmfs.byServiceLevel' | translate}}</span>
+          <!-- 非服务等级 -->
+          <span (click)="customerClickFunc();" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'customer'}">{{'vmfs.customer' | translate}}</span>
+        </span>
+<!--      <div class="btn-group btn-icon">-->
+<!--        <div class="radio btn">-->
+<!--          <input (click)="levelCheck = 'level'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3" checked>-->
+<!--          <label for="btn-demo-radio-3" class="setBorderedius">{{'vmfs.byServiceLevel' | translate}}</label>-->
+<!--        </div>-->
+<!--        <div class="radio btn">-->
+<!--          <input (click)="customerClickFunc();" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-4">-->
+<!--          <label for="btn-demo-radio-4" class="setBorderedius">{{'vmfs.customer' | translate}}</label>-->
+<!--        </div>-->
+<!--      </div>-->
         <form clrForm #formPageTwo="ngForm">
           <!-- 1、选择 服务等级-->
           <ng-container *ngIf="levelCheck==='level'">
@@ -580,15 +586,24 @@
       <button type="button" class="btn btn-primary" (click)="delHandleFunc()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
-  <!--卸载提示-->
+  <!--卸载-->
   <clr-modal [(clrModalOpen)]="unmountShow" [clrModalSize]="'sm'">
     <h3 class="modal-title">{{'vmfs.unmount.title' | translate}}</h3>
     <div class="modal-body">
-      <p>{{'vmfs.unmount.content' | translate}}</p>
+      <clr-datagrid [(clrDgSelected)]="chooseUnmountDevice" [clrDgLoading]="isLoading">
+        <clr-dg-column hidden></clr-dg-column>
+        <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
+        <clr-dg-column [clrDgField]="'type'">{{'vmfs.type' | translate}}</clr-dg-column>
+        <clr-dg-row *clrDgItems="let item of mountedDeviceList" [clrDgItem]="item">
+          <clr-dg-cell>{{item.deviceId}}</clr-dg-cell>
+          <clr-dg-cell>{{item.deviceName}}</clr-dg-cell>
+          <clr-dg-cell>{{item.deviceType === 'host' ? 'vmfs.host':'vmfs.cluster'}}</clr-dg-cell>
+        </clr-dg-row>
+      </clr-datagrid>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="unmountShow=false">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="unmountHandleFunc();">{{'menu.ok' | translate}}</button>
+      <button type="button" class="btn btn-primary" [disabled]="chooseUnmountDevice.length !== 1" (click)="unmountHandleFunc();">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
   <!--空间回收提示-->

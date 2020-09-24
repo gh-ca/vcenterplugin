@@ -12,7 +12,7 @@ export class NfsService {
     return this.http.get('http://localhost:8080/accessnfs/listnfsperformance', {params: {fsIds}});
   }
   addNfs(params= {}){
-    return this.http.post('http://localhost:8080/operatenfs/operatenfs', { params });
+    return this.http.post('http://localhost:8080/operatenfs/createnfsdatastore', params);
   }
 
   mountNfs(params= {}){
@@ -21,11 +21,14 @@ export class NfsService {
   delNfs(param: string){
     return this.http.post('http://localhost:8080/accessnfs/delnfs', param);
   }
-  getHostList(dataStoreName: string){
-    return this.http.get('http://localhost:8080/accessvmware/gethostsbydsname', {params: {dataStoreName}});
+  getHostListByObjectId(dataStoreObjectId: string){
+    return this.http.get('http://localhost:8080/accessvmware/gethostsbydsobjectid', {params: {dataStoreObjectId}});
   }
-  getClusterList(dataStoreName: string){
-    return this.http.get('http://localhost:8080/accessvmware/getclustersbydsname', {params: {dataStoreName}});
+  getHostList(){
+    return this.http.get('http://localhost:8080/accessvmware/listhost');
+  }
+  getClusterListByObjectId(dataStoreObjectId: string){
+    return this.http.get('http://localhost:8080/accessvmware/getclustersbydsobjectid', {params: {dataStoreObjectId}});
   }
 }
 export interface List {
@@ -55,15 +58,41 @@ export class AddNfs{
   storage_id: string;
   pool_raw_id: number;
   exportPath: string;
+  current_port_id: string;
   nfsName: string;
   accessMode: string;
   type: string;
+  sameName: boolean;
   filesystem_specs: FileSystem[];
   capacity_autonegotiation: Autonegotiation;
   tuning: Advance;
   qos_policy: QosPolicy;
   create_nfs_share_param: Share;
   nfs_share_client_addition: ShareClient[];
+  fsName: string;
+  shareName: string;
+  size: number;
+  unit: string;
+  qosPolicy: boolean;
+  upLow: string;
+  thin: boolean;
+  auto: boolean;
+  constructor(){
+    this.sameName = true;
+    this.qosPolicy = false;
+    this.thin = true;
+    this.auto = false;
+    this.unit = 'GB';
+    this.accessMode = 'readWrite';
+    this.tuning = new Advance();
+    this.tuning.deduplication_enabled = true;
+    this.tuning.compression_enabled = false;
+    this.capacity_autonegotiation = new Autonegotiation();
+    this.capacity_autonegotiation.auto_size_enable = false;
+    this.qos_policy = new QosPolicy();
+    this.filesystem_specs = [];
+    this.nfs_share_client_addition = [];
+  }
 }
 export class FileSystem{
   capacity: number;
@@ -107,20 +136,102 @@ export class ShareClient{
 }
 
 // =================添加NFS参数 end =========
-
 export class Mount{
   dataStoreName: string;
+  dataStoreObjectId: string;
   hosts: string[];
   clusters: string[];
   mountType: string;
 }
-
 export class Host{
   hostId: string;
   hostName: string;
+  vkernelIP: string;
 }
 export class Cluster{
   clusterId: string;
   clusterName: string;
 }
 
+export class ModifyNfs{
+  dataStoreObjectId: string;
+  nfsShareName: string;
+  nfsName: string;
+  file_system_id: string;
+  capacity_autonegotiation = new Autonegotiation();
+  name: string;
+  tuning = new Advance();
+  qos_policy = new  QosPolicy();
+  nfs_share_id: string;
+  sameName = true;
+}
+export class ChartOptions{
+  height: number;
+  title: Title;
+  xAxis: XAxis;
+  yAxis: YAxis;
+  tooltip: null;
+  legend: Legend;
+  series: Serie[];
+
+}
+export class Title{
+  text: string;
+  subtext: string;
+  textStyle: TextStyle;
+  textAlign: string;
+}
+export class TextStyle{
+  fontStyle: string;
+}
+export class XAxis{
+  type: string;
+  data: string[];
+}
+export class YAxis{
+  type: string;
+  max: number;
+  min: number;
+  splitNumber: number;
+  boundaryGap: string[];
+  axisLine: AxisLine;
+}
+export class AxisLine{
+  show: boolean;
+}
+export class Legend{
+  data: LegendData[];
+  y: string;
+  x: string;
+}
+export class LegendData{
+  name: string;
+  icon: string;
+}
+export class Serie{
+  name: string;
+  data: SerieData[];
+  type: string;
+  smooth: boolean;
+  itemStyle: ItemStyle;
+  label: Label;
+}
+export class SerieData{
+  value: number;
+  symbol: string;
+}
+export class ItemStyle{
+  normal: LineStyle;
+}
+export class LineStyle{
+  width: number;
+  type: string; // 'dotted'虚线 'solid'实线
+  color: string;
+}
+export class Label{
+  show: boolean;
+  formatter: string; // 标签的文字。
+  constructor(){
+    this.show = true;
+  }
+}

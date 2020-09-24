@@ -1,8 +1,8 @@
 import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone, OnInit} from '@angular/core';
-import {DetailService, PoolList, StorageDetail} from './detail.service';
+import {DetailService, Dtrees, NfsShare, PoolList, StorageDetail, StoragePool, Volume} from './detail.service';
 import {VmfsPerformanceService} from '../../vmfs/volume-performance/performance.service';
-import * as echarts from 'echarts';
 import { EChartOption } from 'echarts';
+import {FileSystem} from '../../nfs/nfs.service';
 @Component({
   selector: 'app-detail',
   templateUrl: './detail.component.html',
@@ -32,7 +32,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       },
       left: '50%',
       top: '50%',
-      //subtext: '234'
+      // subtext: '234'
     },
 
     series: [
@@ -67,7 +67,205 @@ export class DetailComponent implements OnInit, AfterViewInit {
       }
     ],
     color: ['#FF0000', '#FF9538', '#63B3F7']
-  }
+  };
+  mychart = {
+    height: 300,
+    title: {
+      text: 'IOPS',
+      subtext: 'IO/s',
+      textStyle: {
+        fontStyle: 'normal' // y轴线消失
+      },
+      textAlign: 'bottom',
+      // left: '120px'
+    },
+    xAxis: {
+      type: 'category',
+      data: [
+         '4:00', '6:00', '8:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '01/20'
+      ]
+    },
+    yAxis: {
+      type: 'value',
+      max: 8,    // 设置最大值
+      min: 0,
+      splitNumber: 2,
+      boundaryGap: ['50%', '50%'],
+      axisLine: {
+        show: false // y轴线消失
+      },
+    },
+    tooltip: {},
+    legend: {
+      data: [
+        {
+          name: 'Upper Limit',  // 强制设置图形为圆。
+          // icon: 'dotted',
+        },
+        {
+          name: 'Lower Limit',  // 强制设置图形为圆。
+          // icon: 'dottedLine',
+        },
+        {
+          name: 'Read',  // 强制设置图形为圆。
+          icon: 'triangle',
+        },
+        {
+          name: 'Write',  // 强制设置图形为圆。
+          icon: 'triangle',
+        }
+      ],
+      y: 'top',    // 延Y轴居中
+      x: 'right' // 居右显示
+    },
+    // dataZoom: [
+    //   {   // 这个dataZoom组件，默认控制x轴。显示滑动框
+    //     type: 'slider', // 这个 dataZoom 组件是 slider 型 dataZoom 组件
+    //     xAxisIndex: 0, // x轴
+    //     start: 10,      // 左边在 10% 的位置。
+    //     end: 60         // 右边在 60% 的位置。
+    //   },
+    //   {   // 这个dataZoom组件，也控制x轴。 页面拖拽
+    //     type: 'inside', // 这个 dataZoom 组件是 inside 型 dataZoom 组件
+    //     xAxisIndex: 0, // x轴
+    //     start: 10,      // 左边在 10% 的位置。
+    //     end: 60         // 右边在 60% 的位置。
+    //   },
+    //   {
+    //     type: 'slider',
+    //     yAxisIndex: 0,
+    //     start: 10,
+    //     end: 80
+    //   },
+    //   {
+    //     type: 'inside',
+    //     yAxisIndex: 0,
+    //     start: 30,
+    //     end: 80
+    //   }
+    // ],
+    series: [
+      {
+        name: 'Upper Limit',
+        data: [
+          {value: 4, symbol: 'none'},
+          {value: 4, symbol: 'none'},
+          {value: 4, symbol: 'none'},
+          {value: 4, symbol: 'none'},
+          {value: 4, symbol: 'none'},
+          {value: 4, symbol: 'none'},
+          {value: 4, symbol: 'none'},
+          {value: 4, symbol: 'none'},
+          {value: 4, symbol: 'none'},
+          {value: 4, symbol: 'none'},
+          {value: 4, symbol: 'none'}],
+        type: 'line',
+        smooth: true,
+        // 普通样式。
+        itemStyle: {
+          normal: {
+            lineStyle: {
+              width: 2,
+              type: 'dotted',  // 'dotted'虚线 'solid'实线
+              color: '#DB2000' // 线条颜色
+            }
+          }
+        },
+        label: {
+          show: true,
+          // 标签的文字。
+          formatter: 'This is a normal label.'
+        },
+        //
+        //   // 高亮样式。
+        //   emphasis: {
+        //     itemStyle: {
+        //       // 高亮时点的颜色。
+        //       color: 'blue'
+        //     },
+        //     label: {
+        //       show: true,
+        //       // 高亮时标签的文字。
+        //       formatter: 'This is a emphasis label.'
+        //     }
+        //   }
+      },
+      {
+        name: 'Lower Limit',
+        data: [
+          {value: 3, symbol: 'none'},
+          {value: 3, symbol: 'none'},
+          {value: 3, symbol: 'none'},
+          {value: 3, symbol: 'none'},
+          {value: 3, symbol: 'none'},
+          {value: 3, symbol: 'none'},
+          {value: 3, symbol: 'none'},
+          {value: 3, symbol: 'none'}],
+        type: 'line',
+        smooth: true,
+        itemStyle: {
+          normal: {
+            lineStyle: {
+              width: 2,
+              type: 'dotted',  // 'dotted'虚线 'solid'实线
+              color: '#F8E082'
+            }
+          }
+        },
+      },
+      {
+        name: 'Read',
+        data: [
+          {value: 7, symbol: 'none'},
+          {value: 7, symbol: 'none'},
+          {value: 7, symbol: 'none'},
+          {value: 7, symbol: 'none'},
+          {value: 7, symbol: 'none'},
+          {value: 7, symbol: 'none'},
+          {value: 7, symbol: 'none'},
+          {value: 7, symbol: 'none'},
+          {value: 7, symbol: 'none'},
+          {value: 7, symbol: 'none'},
+          {value: 7, symbol: 'none'},
+          {value: 7, symbol: 'none'}],
+        type: 'line',
+        smooth: true,
+        itemStyle: {
+          normal: {
+            lineStyle: {
+              width: 2,
+              type: 'solid',  // 'dotted'虚线 'solid'实线
+              color: '#6870c4'
+            }
+          }
+        },
+      },
+      {
+        name: 'Write',
+        data: [
+          {value: 5, symbol: 'none'},
+          {value: 5, symbol: 'none'},
+          {value: 5, symbol: 'none'},
+          {value: 5, symbol: 'none'},
+          {value: 5, symbol: 'none'},
+          {value: 5, symbol: 'none'},
+          {value: 5, symbol: 'none'},
+          {value: 5, symbol: 'none'},
+          {value: 5, symbol: 'none'}],
+        type: 'line',
+        smooth: true,
+        itemStyle: {
+          normal: {
+            lineStyle: {
+              width: 2,
+              type: 'solid',  // 'dotted'虚线 'solid'实线
+              color: '#01bfa8'
+            }
+          }
+        },
+      }
+    ]
+  };
   // 创建表格对象
   // IOPS+QoS上下限
   iopsChart: EChartOption = {};
@@ -100,8 +298,15 @@ export class DetailComponent implements OnInit, AfterViewInit {
   storageId = '1234';
   constructor(private detailService: DetailService, private cdr: ChangeDetectorRef, private ngZone: NgZone, private perService: VmfsPerformanceService, ) { }
   detail: StorageDetail;
+  storagePool: StoragePool[];
+  volumes: Volume[];
+  fsList: FileSystem[];
+  dtrees: Dtrees[];
+  shares: NfsShare[];
+
   ngOnInit(): void {
-    // this.getStorageDetail(this.storageId);
+    this.getStorageDetail(true);
+    this.getStoragePoolList(true);
   }
   ngAfterViewInit() {
     this.ngZone.runOutsideAngular(() => this.initChart());
@@ -111,14 +316,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       this.poolList = result.data;
     });
   }
-  getStorageDetail(storageId){
-    this.detailService.getStorageDetail(storageId).subscribe((r: any) => {
-      if (r.code === '0'){
-        this.detail = r.data.data;
-        this.cdr.detectChanges();
-      }
-    });
-  }
+
   // 初始化表格对象
   async initChart() {
     switch (this.range) {
@@ -156,5 +354,143 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   async showChart() {
     console.log("更新图表")
+  }
+  changeTab(page: string){
+    if (page === 'conf'){
+      this.getStorageDetail(false);
+    }
+    if (page === 'pool'){
+      this.getStoragePoolList(false);
+    }
+    if (page === 'volume'){
+      this.getStorageVolumeList(false);
+    }
+    if (page === 'fs'){
+      this.getFileSystemList(false);
+    }
+    if (page === 'dtrees'){
+      this.getDtreeList(false);
+    }
+    if (page === 'shares'){
+      this.getShareList(false);
+    }
+  }
+  getStorageDetail(fresh: boolean){
+    if (fresh){
+      this.detailService.getStorageDetail(this.storageId).subscribe((r: any) => {
+        if (r.code === '0'){
+          this.detail = r.data.data;
+          this.cdr.detectChanges();
+        }
+      });
+    }else {
+      // 此处防止重复切换tab每次都去后台请求数据
+      if (this.detail !== null){
+        this.detailService.getStorageDetail(this.storageId).subscribe((r: any) => {
+          if (r.code === '0'){
+            this.detail = r.data.data;
+            this.cdr.detectChanges();
+          }
+        });
+      }
+    }
+  }
+  getStoragePoolList(fresh: boolean){
+    if (fresh){
+      this.detailService.getStoragePoolList(this.storageId).subscribe((r: any) =>{
+        if (r.code === '0'){
+          this.storagePool = r.data.data;
+        }
+      });
+    }else {
+      // 此处防止重复切换tab每次都去后台请求数据
+      if (this.poolList !== null){
+        this.detailService.getStoragePoolList(this.storageId).subscribe((r: any) =>{
+          if (r.code === '0'){
+            this.storagePool = r.data.data;
+          }
+        });
+      }
+    }
+  }
+  getStorageVolumeList(fresh: boolean){
+    if (fresh){
+      this.detailService.getVolumeListList(this.storageId).subscribe((r: any) => {
+        if (r.code === '0'){
+          this.volumes = r.data.data;
+          this.cdr.detectChanges();
+        }
+      });
+    }else {
+      // 此处防止重复切换tab每次都去后台请求数据
+      if (this.volumes !== null){
+        this.detailService.getVolumeListList(this.storageId).subscribe((r: any) => {
+          if (r.code === '0'){
+            this.volumes = r.data.data;
+            this.cdr.detectChanges();
+          }
+        });
+      }
+    }
+  }
+  getFileSystemList(fresh: boolean){
+    if (fresh){
+      this.detailService.getFileSystemList(this.storageId).subscribe((r: any) => {
+        if (r.code === '0'){
+          this.fsList = r.data.data;
+          this.cdr.detectChanges();
+        }
+      });
+    }else {
+      // 此处防止重复切换tab每次都去后台请求数据
+      if (this.fsList !== null){
+        this.detailService.getFileSystemList(this.storageId).subscribe((r: any) => {
+          if (r.code === '0'){
+            this.fsList = r.data.data;
+            this.cdr.detectChanges();
+          }
+        });
+      }
+    }
+  }
+  getDtreeList(fresh: boolean){
+    if (fresh){
+      this.detailService.getDtreeList(this.storageId).subscribe((r: any) => {
+        if (r.code === '0'){
+          this.dtrees = r.data.data;
+          this.cdr.detectChanges();
+        }
+      });
+    }else {
+      // 此处防止重复切换tab每次都去后台请求数据
+      if (this.dtrees !== null){
+        this.detailService.getDtreeList(this.storageId).subscribe((r: any) => {
+          if (r.code === '0'){
+            this.dtrees = r.data.data;
+            this.cdr.detectChanges();
+          }
+        });
+      }
+    }
+  }
+  getShareList(fresh: boolean){
+    if (fresh){
+      this.detailService.getShareList(this.storageId).subscribe((r: any) => {
+        if (r.code === '0'){
+          this.shares = r.data.data;
+          this.cdr.detectChanges();
+        }
+      });
+    }else {
+      // 此处防止重复切换tab每次都去后台请求数据
+      if (this.shares !== null){
+        this.detailService.getShareList(this.storageId).subscribe((r: any) => {
+          if (r.code === '0'){
+            this.shares = r.data.data;
+            this.cdr.detectChanges();
+          }
+        });
+      }
+    }
   }
 }
