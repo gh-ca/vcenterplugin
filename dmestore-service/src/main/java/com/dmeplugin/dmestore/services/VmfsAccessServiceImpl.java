@@ -87,16 +87,16 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         for (int i = 0; i < jsonArray.size(); i++) {
                             JsonObject jo = jsonArray.get(i).getAsJsonObject();
                             //LOG.info("jo==" + jo.toString());
-                            String vmwareStoreName = ToolUtils.jsonToStr(jo.get("name"));
-                            if (!StringUtils.isEmpty(vmwareStoreName)) {
+                            String vmwareStoreobjectid = ToolUtils.jsonToStr(jo.get("objectid"));
+                            if (!StringUtils.isEmpty(vmwareStoreobjectid)) {
                                 //对比数据库关系表中的数据，只显示关系表中的数据
-                                if (dvrMap != null && dvrMap.get(vmwareStoreName) != null) {
+                                if (dvrMap != null && dvrMap.get(vmwareStoreobjectid) != null) {
                                     VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
                                     double capacity = ToolUtils.getDouble(jo.get("capacity")) / ToolUtils.GI;
                                     double freeSpace = ToolUtils.getDouble(jo.get("freeSpace")) / ToolUtils.GI;
                                     double uncommitted = ToolUtils.getDouble(jo.get("uncommitted")) / ToolUtils.GI;
 
-                                    vmfsDataInfo.setName(vmwareStoreName);
+                                    vmfsDataInfo.setName(ToolUtils.jsonToStr(jo.get("name")));
 
                                     vmfsDataInfo.setCapacity(capacity);
                                     vmfsDataInfo.setFreeSpace(freeSpace);
@@ -1052,7 +1052,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             if (dvrlist != null && dvrlist.size() > 0) {
                 remap = new HashMap<>();
                 for (DmeVmwareRelation dvr : dvrlist) {
-                    remap.put(dvr.getStoreName(), dvr);
+                    remap.put(dvr.getStoreId(), dvr);
                 }
             }
         } catch (Exception e) {
