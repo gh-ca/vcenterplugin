@@ -1256,12 +1256,12 @@ public class VCSDKUtils {
      * @Param [datastore_name, vm_name, rdmdevicename, size]
      * @Return void
      **/
-    public void createDisk(String datastore_name, String vm_name, String rdmdevicename, int size) throws Exception {
+    public void createDisk(String datastore_objectId, String vm_objectId, String rdmdevicename, int size) throws Exception {
         VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
         for (VmwareContext vmwareContext : vmwareContexts) {
-            DatastoreMO dsMo = new DatastoreMO(vmwareContext, datastore_name);
-            VirtualMachineMO virtualMachineMO = new VirtualMachineMO(vmwareContext, vm_name);
-            String vmdkDatastorePath = dsMo.getDatastorePath(datastore_name);
+            DatastoreMO dsMo = new DatastoreMO(vmwareContext, vcConnectionHelper.objectID2MOR(datastore_objectId));
+            VirtualMachineMO virtualMachineMO = new VirtualMachineMO(vmwareContext, vcConnectionHelper.objectID2MOR(vm_objectId));
+            String vmdkDatastorePath = dsMo.getDatastorePath(dsMo.getName());
             int sizeInMb = size;
             try {
                 virtualMachineMO.createDisk(vmdkDatastorePath, VirtualDiskType.RDM, VirtualDiskMode.PERSISTENT,

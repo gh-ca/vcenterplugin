@@ -769,11 +769,17 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             //SmartTier
             volumeDetail.setSmartTier(tuning.get("smarttier").getAsString());
             //Tunning
-            volumeDetail.setDudeplication(tuning.get("dedupe_enabled").getAsBoolean());
+            if(tuning.get("dedupe_enabled") != null){
+                volumeDetail.setDudeplication(tuning.get("dedupe_enabled").getAsBoolean());
+            }
             volumeDetail.setProvisionType(tuning.get("alloctype").getAsString());
-            volumeDetail.setCompression(tuning.get("compression_enabled").getAsBoolean());
-            //TODO
-            volumeDetail.setApplicationType("--");
+            if(tuning.get("compression_enabled") != null){
+                volumeDetail.setCompression(tuning.get("compression_enabled").getAsBoolean());
+            }
+            //应用类型
+            if(tuning.get("workload_type_id") != null){
+                volumeDetail.setApplicationType(tuning.get("workload_type_id").getAsString());
+            }
 
             JsonObject smartqos = tuning.getAsJsonObject("smartqos");
             //Qos Policy
