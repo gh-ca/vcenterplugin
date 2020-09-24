@@ -207,7 +207,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             String hostUrl = "https://" + params.get("hostIp") + ":" + params.get("hostPort");
             LOG.info("hostUrl==" + hostUrl);
 
-            HttpEntity<String> entity = new HttpEntity<>(requestbody.toString(), headers);
+            HttpEntity<String> entity = new HttpEntity<>(gson.toJson(requestbody), headers);
             responseEntity = restTemplate.exchange(hostUrl + LOGIN_DME_URL
                     , HttpMethod.PUT, entity, String.class);
 
@@ -319,7 +319,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 LOG.info("requestbody==" + gson.toJson(requestbody));
             }
             LOG.info("getDmeHosts_url===" + getHostsUrl);
-            ResponseEntity responseEntity = access(getHostsUrl, HttpMethod.POST, (requestbody == null ? null : requestbody.toString()));
+            ResponseEntity responseEntity = access(getHostsUrl, HttpMethod.POST, (requestbody == null ? null : gson.toJson(requestbody)));
             LOG.info("getDmeHosts responseEntity==" + responseEntity.toString());
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -379,7 +379,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 LOG.info("requestbody==" + gson.toJson(requestbody));
             }
             LOG.info("gethostgroups_url===" + getHostGroupsUrl);
-            ResponseEntity responseEntity = access(getHostGroupsUrl, HttpMethod.POST, (requestbody == null ? null : requestbody.toString()));
+            ResponseEntity responseEntity = access(getHostGroupsUrl, HttpMethod.POST, (requestbody == null ? null : gson.toJson(requestbody)));
             LOG.info("getDmeHostgroups responseEntity==" + responseEntity.toString());
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -427,7 +427,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 LOG.info("requestbody==" + gson.toJson(requestbody));
 
                 LOG.info("createHost_url===" + createHostUrl);
-                ResponseEntity responseEntity = access(createHostUrl, HttpMethod.POST, requestbody.toString());
+                ResponseEntity responseEntity = access(createHostUrl, HttpMethod.POST, gson.toJson(requestbody));
                 LOG.info("getDmeHostgroups responseEntity==" + responseEntity.toString());
                 if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -463,7 +463,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 LOG.info("requestbody==" + gson.toJson(requestbody));
 
                 LOG.info("createHostGroup_url===" + createHostGroupUrl);
-                ResponseEntity responseEntity = access(createHostGroupUrl, HttpMethod.POST, requestbody.toString());
+                ResponseEntity responseEntity = access(createHostGroupUrl, HttpMethod.POST, gson.toJson(requestbody));
                 LOG.info("getDmeHostgroups responseEntity==" + responseEntity.toString());
                 if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();

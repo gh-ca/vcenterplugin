@@ -325,7 +325,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private ResponseEntity listShareByStorageId(String storageId) throws Exception {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("storage_id", storageId);
-        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL, HttpMethod.POST, requestbody.toString());
+        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL, HttpMethod.POST, gson.toJson(requestbody));
         return responseEntity;
     }
 
@@ -333,7 +333,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private ResponseEntity listShareBySharePath(String sharePath) throws Exception {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("share_path", sharePath);
-        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL, HttpMethod.POST, requestbody.toString());
+        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL, HttpMethod.POST, gson.toJson(requestbody));
         return responseEntity;
     }
 
@@ -383,7 +383,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         if (!StringUtils.isEmpty(fsName)) {
             requestbody.put("name", fsName);
         }
-        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_FILESERVICE_QUERY_URL, HttpMethod.POST, requestbody.toString());
+        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_FILESERVICE_QUERY_URL, HttpMethod.POST, gson.toJson(requestbody));
         return responseEntity;
     }
 
@@ -733,7 +733,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_SHARE_DETAIL_URL,
                         "nfs_share_id", ToolUtils.getStr(params.get("shareId")));
                 LOG.info("mountnfs URL===" + url);
-                ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.PUT, requestbody.toString());
+                ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(requestbody));
 
                 LOG.info("mountnfs responseEntity==" + responseEntity.toString());
                 if (responseEntity.getStatusCodeValue() == 202) {
