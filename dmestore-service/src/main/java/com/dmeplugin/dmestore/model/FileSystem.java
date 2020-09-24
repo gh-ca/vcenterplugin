@@ -9,6 +9,7 @@ import java.io.Serializable;
  */
 public class FileSystem  {
 
+
     private String id; //id
     private String name;//名称
     private String health_status; //状态
@@ -25,6 +26,43 @@ public class FileSystem  {
     private Double available_capacity;
     private Double min_size_fs_capacity;
     private String storage_id;
+
+
+    private String id;
+    private String name;
+    private String health_status;
+    private String alloc_type;
+    private Integer capacity_usage_ratio;
+    private String storage_pool_name;// 文件系统所在存储池的名称
+    private Integer nfs_count;
+    private Integer cifs_count;
+    private Integer dtree_count;
+    private Double capacity;
+
+    //补充字段
+    private Double allocate_quota_in_pool; //文件系统在存储池上已经分配的容量
+    private Double available_capacity; //文件系统可以利用的容量
+    private Double min_size_fs_capacity;//文件系统能缩容的最小空间;
+    private String storage_id; //文件系统所属存储设备
+
+
+    private String id; //id
+    private String name;//名称
+    private String health_status; //状态
+    private String alloc_type; //分配类型
+    private Integer capacity_usage_ratio; //容量利用率
+    private String storage_pool_name;//所属存储池名称
+    private Integer nfs_count; //nfs
+    private Integer cifs_count;//cifs
+    private Integer dtree_count; //dtree
+    private Double capacity;//总容量
+
+
+    private Double allocate_quota_in_pool;
+    private Double available_capacity;
+    private Double min_size_fs_capacity;
+    private String storage_id;
+
 
     public Double getAllocate_quota_in_pool() {
         return allocate_quota_in_pool;
