@@ -1,0 +1,30 @@
+import { EventEmitter, SimpleChanges, OnInit, OnChanges, QueryList } from '@angular/core';
+import { Observable } from 'rxjs';
+import { ClrCommonStringsService } from '../utils/i18n/common-strings.service';
+import { AccordionService } from './providers/accordion.service';
+import { AccordionStatus } from './enums/accordion-status.enum';
+import { IfExpandService } from '../utils/conditional/if-expanded.service';
+import { AccordionPanelModel } from './models/accordion.model';
+import { ClrAccordionDescription } from './accordion-description';
+export declare class ClrAccordionPanel implements OnInit, OnChanges {
+    commonStrings: ClrCommonStringsService;
+    private accordionService;
+    private ifExpandService;
+    id: string;
+    disabled: boolean;
+    panelOpen: boolean;
+    panelOpenChange: EventEmitter<boolean>;
+    accordionDescription: QueryList<ClrAccordionDescription>;
+    panel: Observable<AccordionPanelModel>;
+    readonly AccordionStatus: typeof AccordionStatus;
+    isAccordion: boolean;
+    constructor(commonStrings: ClrCommonStringsService, accordionService: AccordionService, ifExpandService: IfExpandService, id: string);
+    ngOnInit(): void;
+    ngOnChanges(changes: SimpleChanges): void;
+    togglePanel(): void;
+    collapsePanelOnAnimationDone(panel: AccordionPanelModel): void;
+    getPanelStateClasses(panel: AccordionPanelModel): string;
+    getAccordionContentId(id: string): string;
+    getAccordionHeaderId(id: string): string;
+    private emitPanelChange;
+}

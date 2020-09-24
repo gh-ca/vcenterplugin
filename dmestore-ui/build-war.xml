@@ -25,7 +25,7 @@
    <!-- Copies the localization files to the locales dir of the plugin -->
    <target name="compile-resources" description="Copy locales to the new plugin">
       <copy todir="${WEBAPP_DIR}/locales" failonerror="false">
-         <fileset dir="${SRC_DIR}/locale"/>
+         <fileset dir="/locale"/>
          <mapper type="regexp" from="${REGEXP1}" to="${REGEXP2}"/>
       </copy>
    </target>

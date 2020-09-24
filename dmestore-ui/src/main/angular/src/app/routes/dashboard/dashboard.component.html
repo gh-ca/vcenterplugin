@@ -1,0 +1,194 @@
+<div class="clr-row">
+  <div class="clr-col">
+    <div class="card">
+      <div class="card-block">
+          <div class="card-title">
+            DME
+          </div>
+          <div class="card-text">
+            <div class="gh-info-item">
+              <span class="gh-info-lable">IP</span>
+              <span class="gh-info-value" *ngIf="hostModel.hostIp == ''">--</span>
+              <span class="gh-info-value" *ngIf="hostModel.hostIp != ''">{{hostModel.hostIp}}</span>
+            </div>
+            <div class="gh-info-item">
+              <span class="gh-info-lable">Port</span>
+              <span class="gh-info-value" *ngIf="hostModel.hostPort == ''">--</span>
+              <span class="gh-info-value" *ngIf="hostModel.hostPort != ''">{{hostModel.hostPort}}</span>
+            </div>
+            <div class="gh-info-item">
+              <span class="gh-info-lable">Status</span>
+              <span class="gh-info-value">
+
+              </span>
+              <span class="gh-info-value" *ngIf="hostModel.hostIp == ''">
+                <button type="button" (click)="showPop()" class="btn btn-icon" aria-label="home"><clr-icon shape="add"></clr-icon>
+                </button>
+              </span>
+              <span class="gh-info-value" *ngIf="hostModel.hostIp != ''">Connected</span>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+  <div class="clr-col">
+    <div class="card">
+      <div class="card-block">
+          <div class="card-title">
+            Storage
+          </div>
+          <div class="card-text">
+            <div echarts [options]="charts[0]" id="chart1" style="height: 160px;"></div>
+          </div>
+      </div>
+    </div>
+  </div>
+  <div class="clr-col">
+    <div class="card">
+      <div class="card-block">
+          <div class="card-title">
+            Best Practice Violations
+          </div>
+          <div class="card-text">
+            <div echarts [options]="charts[1]" id="chart2" style="height: 160px;"></div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<clr-modal [(clrModalOpen)]="connectAlertSuccess">
+  <div class="modal-body">
+    <div class="alert alert-success" role="alert" >
+      <div class="alert-items">
+        <div class="alert-item static">
+          <div class="alert-icon-wrapper">
+            <clr-icon class="alert-icon" shape="check-circle"></clr-icon>
+          </div>
+          <span class="alert-text">
+         Connect success.
+      </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</clr-modal>
+<clr-modal [(clrModalOpen)]="connectAlertFail">
+  <div class="modal-body">
+    <div class="alert alert-danger" role="alert">
+      <div class="alert-items">
+        <div class="alert-item static">
+          <div class="alert-icon-wrapper">
+            <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
+          </div>
+          <span class="alert-text">
+          Connect failed.
+      </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</clr-modal>
+
+<!-- 示例20200922 -->
+<div class="clr-row">
+  <div class="info-card clr-col-6">
+    <div class="info-card-header border-header">
+      <div class="info-header-left">
+        <clr-icon size="36" shape="network-switch"></clr-icon>
+        <div class="info-header-content">
+          <div class="title">122</div>
+          <div class="text">
+            <span>8.46.8.122</span>
+            <span><clr-icon shape="display" class="is-solid is-highlight"></clr-icon></span>
+            <span class="header-divide"></span>
+            <span>OceanStor</span>
+          </div>
+        </div>
+      </div>
+      <clr-dropdown [clrCloseMenuOnItemClick]="false">
+        <button clrDropdownTrigger class="dropdown-toggle btn btn-link">
+          Operation
+          <clr-icon shape="caret down"></clr-icon>
+        </button>
+        <clr-dropdown-menu *clrIfOpen>
+          <div clrDropdownItem>Link 1</div>
+          <div clrDropdownItem>Link 2</div>
+        </clr-dropdown-menu>
+      </clr-dropdown>
+    </div>
+    <div class="info-card-content clr-row">
+      <div class="clr-col-6">
+        <div class="info-content-title">Capacity</div>
+        <div class="info-charts-wrap">
+          <div echarts [options]="charts[2]" id="chart3" style="width: 30%;height: 120px;"></div>
+          <div class="info-content">
+            <div class="info-content-text">
+              <span>Total</span>
+              <span>11 TB</span>
+            </div>
+            <div class="info-content-text">
+              <span>Used</span>
+              <span>11 TB</span>
+              <span class="squre used"></span>
+            </div>
+            <div class="info-content-text">
+              <span>Free</span>
+              <span>11 TB</span>
+              <span class="squre free"></span>
+            </div>
+          </div>
+        </div>
+        <div class="info-content-title">Health</div>
+        <div class="info-content-bottom">
+          <div class="info-bottom-box">
+            <div class="num">219</div>
+            <div class="bottom-label">Alarms</div>
+          </div>
+          <div class="info-bottom-box">
+            <div class="num">219</div>
+            <div class="bottom-label">Alarms</div>
+          </div>
+        </div>
+      </div>
+      <div class="clr-col-6">
+        <div class="info-content-title" style="margin-bottom: 20px;">Performance - Last 24 Hours</div>
+        <div class="info-content-title">IOPS</div>
+        <div echarts [options]="charts[3]" id="chart4" style="width: 100%;height: 100px;"></div>
+        <div class="info-content-title">IOPS</div>
+        <div echarts [options]="charts[3]" id="chart5" style="width: 100%;height: 100px;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 示例20200922 -->
+
+
+
+<clr-modal [(clrModalOpen)]="popShow">
+  <h3 class="modal-title">DME Connect</h3>
+  <div class="modal-body">
+    <form clrForm [formGroup]="connectForm">
+      <clr-input-container>
+        <label>IP</label>
+        <input clrInput formControlName="ip" type="text" [(ngModel)]="connectModel.hostIp" name="ip" />
+      </clr-input-container>
+      <clr-input-container>
+        <label>Port</label>
+        <input clrInput formControlName="port" type="text" [(ngModel)]="connectModel.hostPort" name="port" />
+      </clr-input-container>
+      <clr-input-container>
+        <label>User</label>
+        <input clrInput formControlName="username" type="text" [(ngModel)]="connectModel.userName" name="username" />
+      </clr-input-container>
+      <clr-password-container>
+        <label>password</label>
+        <input clrPassword formControlName="password" placeholder="Password" name="password" [(ngModel)]="connectModel.password" />
+      </clr-password-container>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline" (click)="popShow=false">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="submit()">Ok</button>
+  </div>
+</clr-modal>

@@ -1,0 +1,72 @@
+<div>
+  <clr-select-container>
+    <select clrSelect (ngModelOptions)="volNames" [(ngModel)]="selectVolName" name="defaultSelect" class="clr-select" (change)="changeVolFunc()">
+      <option *ngFor="let item of volNames" value="{{item}}">{{item}}</option>
+    </select>
+  </clr-select-container>
+  <table class="table table-vertical table-noborder table-compact">
+    <tbody>
+    <!-- Basic Information -->
+    <tr>
+      <th>{{'vmfs.basicInformation' | translate}}</th>
+    </tr>
+    <tr>
+      <th hidden></th>
+      <td>{{'vmfs.name' | translate}}</td>
+      <td>{{selectVolume.name}}</td>
+      <td>{{'vmfs.wwn' | translate}}</td>
+      <td>{{selectVolume.wwn}}</td>
+    </tr>
+    <tr>
+      <th hidden></th>
+      <td>{{'vmfs.storage' | translate}}</td>
+      <td>{{selectVolume.storage}}</td>
+      <td>{{'vmfs.storagePool' | translate}}</td>
+      <td>{{selectVolume.storagePool}}</td>
+    </tr>
+    <tr>
+      <th hidden></th>
+      <td>{{'vmfs.serviceLevelName' | translate}}</td>
+      <td>{{selectVolume.serviceLevel}}</td>
+    </tr>
+    <!-- Qos Policy -->
+    <tr>
+      <th>{{'vmfs.qosPolicy' | translate}}</th>
+    </tr>
+    <tr>
+      <th hidden></th>
+      <td>{{'vmfs.controlPolicy' | translate}}</td>
+      <td>{{selectVolume.controlPolicy}}</td>
+      <td>{{'vmfs.trafficControlObject' | translate}}</td>
+      <td>{{selectVolume.trafficControl}}</td>
+    </tr>
+    <!-- Qos SmartTier -->
+    <tr>
+      <th>{{'vmfs.smartTier' | translate}}</th>
+    </tr>
+    <tr>
+      <th hidden></th>
+      <td>{{'vmfs.smartTierPolicy' | translate}}</td>
+      <td>{{selectVolume.smartTier}}</td>
+    </tr>
+    <!-- Resource Tuning -->
+    <tr>
+      <th>{{'vmfs.applicationType' | translate}}</th>
+    </tr>
+    <tr>
+      <th hidden></th>
+      <td>{{'vmfs.applicationType' | translate}}</td>
+      <td>{{selectVolume.provisionType}}</td>
+      <td>{{'vmfs.provisioningType' | translate}}</td>
+      <td>{{selectVolume.provisionType}}</td>
+    </tr>
+    <tr>
+      <th hidden></th>
+      <td>{{'vmfs.deduplication' | translate}}</td>
+      <td>{{selectVolume.dudeplication}}</td>
+      <td>{{'vmfs.compression' | translate}}</td>
+      <td>{{selectVolume.compression}}</td>
+    </tr>
+    </tbody>
+  </table>
+</div>

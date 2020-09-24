@@ -1,0 +1,455 @@
+<div class="clr-row">
+  <button class="btn btn-primary" (click)="search();">Search</button>
+  <input clrInput  [(ngModel)]="searchName" name="name" #name="ngModel" />
+  <select  clrSelect (ngModelOptions)="sortItems" [(ngModel)]="sortItem" name="sort" (change)="sortItemsChange();">
+    <option *ngFor="let item of sortItems" value="{{item.id}}">{{item.value}}</option>
+  </select>
+  <button class="btn btn-primary" (click)="refresh();">refresh</button>
+</div>
+<div class="clr-row">
+  <div class="info-card clr-col-4" *ngFor="let item of serviceLevels" [clrDgItem]="item">
+    <div class="info-card-header">
+      <div class="info-card-title" style="cursor:pointer" (click)="popShow=true;selectedModel=item">{{item.name}}</div>
+      <clr-dropdown [clrCloseMenuOnItemClick]="false">
+        <button clrDropdownTrigger class="dropdown-toggle btn btn-link">
+          Operation
+          <clr-icon shape="caret down"></clr-icon>
+        </button>
+        <clr-dropdown-menu *clrIfOpen>
+          <div clrDropdownItem>Link 1</div>
+          <div clrDropdownItem>Link 2</div>
+        </clr-dropdown-menu>
+      </clr-dropdown>
+    </div>
+    <div class="info-card-content">
+      <div class="info-card-squre">
+        <div class="squre-per-box" [ngStyle]="{'height':(item.usedRate/100*200)+'px'}"></div>
+        <div class="squre-num">{{item.usedRate}}</div>
+      </div>
+      <div>
+        <div class="gh-info-item">
+          <span class="gh-info-lable">Total Capacity</span>
+          <span class="gh-info-value">{{item.total_capacity}} TB</span>
+        </div>
+        <div class="gh-info-item">
+          <span class="gh-info-lable">Free Capacity</span>
+          <span class="gh-info-value">{{item.free_capacity}} TB</span>
+        </div>
+        <div class="gh-info-item">
+          <span class="gh-info-lable">Qos Policy</span>
+          <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
+                                            && item.capabilities.qos.enabled == true
+                                            && item.capabilities.qos.qos_param.latency != undefined">
+            Latency = {{item.capabilities.qos.qos_param.latency}} {{item.capabilities.qos.qos_param.latencyUnit}}</span>
+        </div>
+        <div class="gh-info-item">
+          <span class="gh-info-lable"></span>
+          <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
+                                            && item.capabilities.qos.enabled == true
+                                            && item.capabilities.qos.qos_param.minBandWidth != undefined">
+            Bandwidth >= {{item.capabilities.qos.qos_param.minBandWidth}} Mbps/s
+          </span>
+          <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
+                                            && item.capabilities.qos.enabled == true
+                                            && item.capabilities.qos.qos_param.maxBandWidth != undefined">
+            Bandwidth <= {{item.capabilities.qos.qos_param.maxBandWidth}} Mbps/s
+          </span>
+        </div>
+        <div class="gh-info-item">
+          <span class="gh-info-lable"></span>
+          <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
+                                            && item.capabilities.qos.enabled == true
+                                            && item.capabilities.qos.qos_param.minIOPS != undefined">
+            IOPS >= {{item.capabilities.qos.qos_param.minIOPS}} IOPS/TB
+          </span>
+          <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
+                                            && item.capabilities.qos.enabled == true
+                                            && item.capabilities.qos.qos_param.maxIOPS != undefined">
+            IOPS <= {{item.capabilities.qos.qos_param.maxIOPS}} IOPS/TB
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<clr-modal class="modal" [(clrModalOpen)]="popShow" [clrModalSize]="'lg'">
+  <h3 class="modal-title">
+    <span>{{selectedModel.name}}</span>
+    <!--<span>下拉框</span>
+    <span>下拉框1</span>-->
+  </h3>
+  <div class="modal-body" >
+    <clr-tabs>
+      <clr-tab>
+        <button clrTabLink>General</button>
+        <clr-tab-content *clrIfActive>
+          <!-- 基础信息展示 -->
+          <div class="gh-info-head">Basic Information</div>
+          <div class="gh-info-wrap clr-row">
+            <div class="gh-info-item clr-col-4">
+              <span class="gh-info-lable">Name</span>
+              <span class="gh-info-value">{{selectedModel.name}}</span>
+            </div>
+            <div class="gh-info-item clr-col-4">
+              <span class="gh-info-lable">Total Capacity</span>
+              <span class="gh-info-value">{{selectedModel.total_capacity}} TB</span>
+            </div>
+            <div class="gh-info-item clr-col-4">
+              <span class="gh-info-lable">Free Capacity</span>
+              <span class="gh-info-value">{{selectedModel.free_capacity}} TB</span>
+            </div>
+            <div class="gh-info-item clr-col-4">
+              <span class="gh-info-lable">Used Capacity</span>
+              <span class="gh-info-value">{{selectedModel.used_capacity}} TB</span>
+            </div>
+            <div class="gh-info-item clr-col-4">
+              <span class="gh-info-lable">Capacity Usage</span>
+              <!--<span class="gh-info-value"><clr-progress-bar clrValue="{{selectedModel.usedRate}}" clrSuccess clrLabeled></clr-progress-bar></span>-->
+              <span class="gh-info-value">{{selectedModel.usedRate}}%</span>
+          </div>
+            <div class="gh-info-item clr-col-4">
+              <span class="gh-info-lable">I/O Priority</span>
+              <span class="gh-info-value" *ngIf="selectedModel.capabilities.iopriority !== undefined
+                                            && selectedModel.capabilities.iopriority.enabled === true">
+                  <span *ngIf="selectedModel.capabilities.iopriority.policy == 1">Lower</span>
+                  <span *ngIf="selectedModel.capabilities.iopriority.policy == 2">Middle</span>
+                  <span *ngIf="selectedModel.capabilities.iopriority.policy == 3">High</span>
+              </span>
+              <span class="gh-info-value" *ngIf="selectedModel.capabilities.iopriority === undefined
+                                            || selectedModel.capabilities.iopriority.enabled === false">
+                  --
+              </span>
+            </div>
+            <div class="gh-info-item clr-col-4">
+              <span class="gh-info-lable">Zoning Policy</span>
+              <span class="gh-info-value">--</span>
+            </div>
+          </div>
+          <!-- 基础信息展示 -->
+          <div class="gh-info-head">Qos Policy</div>
+          <div class="gh-info-wrap clr-row">
+            <div class="gh-info-item clr-col-4">
+              <span class="gh-info-lable">Control Policy</span>
+              <span class="gh-info-value" *ngIf="selectedModel.capabilities.qos != undefined
+                                            && selectedModel.capabilities.qos.enabled == true">
+                     <span *ngIf="selectedModel.capabilities.qos.qos_param.maxBandWidth != undefined
+                                  && selectedModel.capabilities.qos.qos_param.maxIOPS != undefined">
+                       Upper limit Control
+                     </span>
+                     <span *ngIf="selectedModel.capabilities.qos.qos_param.minBandWidth != undefined
+                                  && selectedModel.capabilities.qos.qos_param.minIOPS != undefined">
+                       Lower limit Control
+                     </span>
+              </span>
+              <span class="gh-info-value" *ngIf="selectedModel.capabilities.qos == undefined
+                                            || selectedModel.capabilities.qos.enabled == false">
+                     --
+              </span>
+            </div>
+            <div class="gh-info-item clr-col-4" *ngIf="selectedModel.capabilities.qos.qos_param.maxBandWidth != undefined">
+              <span class="gh-info-lable">BandWidth</span>
+              <span class="gh-info-value"> <= {{selectedModel.capabilities.qos.qos_param.maxBandWidth}} MBPS/TB</span>
+            </div>
+            <div class="gh-info-item clr-col-4" *ngIf="selectedModel.capabilities.qos.qos_param.minBandWidth != undefined">
+              <span class="gh-info-lable">BandWidth</span>
+              <span class="gh-info-value"> >= {{selectedModel.capabilities.qos.qos_param.minBandWidth}} MBPS/TB</span>
+            </div>
+            <div class="gh-info-item clr-col-4" *ngIf="selectedModel.capabilities.qos.qos_param.maxIOPS != undefined">
+              <span class="gh-info-lable">IOPS</span>
+              <span class="gh-info-value"> <= {{selectedModel.capabilities.qos.qos_param.maxIOPS}} IOPS/TB</span>
+            </div>
+            <div class="gh-info-item clr-col-4" *ngIf="selectedModel.capabilities.qos.qos_param.minIOPS != undefined">
+              <span class="gh-info-lable">IOPS</span>
+              <span class="gh-info-value"> >= {{selectedModel.capabilities.qos.qos_param.minIOPS}} IOPS/TB</span>
+            </div>
+          </div>
+          <!-- 基础信息展示 -->
+          <div class="gh-info-head">Resource Tuning</div>
+          <div class="gh-info-wrap clr-row">
+            <div class="gh-info-item clr-col-4">
+              <span class="gh-info-lable">Provisioning Type</span>
+              <span class="gh-info-value" *ngIf="selectedModel.capabilities.resource_type == undefined
+                                                || selectedModel.capabilities.resource_type == 'default_type'">--</span>
+              <span class="gh-info-value" *ngIf="selectedModel.capabilities.resource_type != undefined
+                                                && selectedModel.capabilities.resource_type != 'default_type'">
+                {{selectedModel.capabilities.resource_type}}
+              </span>
+            </div>
+            <div class="gh-info-item clr-col-4">
+              <span class="gh-info-lable">Deduplication</span>
+              <span class="gh-info-value" *ngIf="selectedModel.capabilities.deduplication == undefined
+                                                || selectedModel.capabilities.deduplication == 'default_type'">--</span>
+              <span class="gh-info-value" *ngIf="selectedModel.capabilities.deduplication != undefined
+                                                && selectedModel.capabilities.deduplication != 'default_type'">
+                {{selectedModel.capabilities.deduplication}}
+              </span>
+            </div>
+            <div class="gh-info-item clr-col-4">
+              <span class="gh-info-lable">Compression</span>
+              <span class="gh-info-value" *ngIf="selectedModel.capabilities.compression == undefined
+                                                || selectedModel.capabilities.compression == 'default_type'">--</span>
+              <span class="gh-info-value" *ngIf="selectedModel.capabilities.compression != undefined
+                                                && selectedModel.capabilities.compression != 'default_type'">
+                {{selectedModel.capabilities.compression}}
+              </span>
+            </div>
+            <div class="gh-info-item clr-col-4">
+              <span class="gh-info-lable">SmartTier Policy</span>
+              <span class="gh-info-value" *ngIf="selectedModel.capabilities.smarttier == undefined
+                                                || selectedModel.capabilities.smarttier.enabled == false">--</span>
+              <span class="gh-info-value" *ngIf="selectedModel.capabilities.smarttier != undefined
+                                                && selectedModel.capabilities.smarttier.enabled == true">
+                     <span *ngIf="selectedModel.capabilities.smarttier.policy == 0">
+                       不迁移
+                     </span>
+                     <span *ngIf="selectedModel.capabilities.smarttier.policy == 1">
+                       自动迁移
+                     </span>
+                     <span *ngIf="selectedModel.capabilities.smarttier.policy == 2">
+                       向低性能层迁移
+                     </span>
+                     <span *ngIf="selectedModel.capabilities.smarttier.policy == 3">
+                       向高性能层迁移
+                     </span>
+              </span>
+            </div>
+          </div>
+          <!-- 基础信息展示 -->
+          <div class="gh-info-head">Threshold Setting</div>
+          <div class="gh-info-wrap clr-row">
+             //
+          </div>
+        </clr-tab-content>
+      </clr-tab>
+      <clr-tab>
+        <button clrTabLink>Storage Pool</button>
+        <clr-tab-content *clrIfActive>
+
+            <div class="gh-info-head"></div>
+
+            <div class="btn-group btn-icon">
+              <div class="radio btn">
+                <input (click)="storagePoolRadioCheck = 'basic'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-1" checked>
+                <label for="btn-demo-radio-1"><clr-icon shape="list" size="20"></clr-icon></label>
+              </div>
+              <div class="radio btn">
+                <input (click)="storagePoolRadioCheck = 'capacity'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-2">
+                <label for="btn-demo-radio-2"><clr-icon shape="dashboard" size="20"></clr-icon></label>
+              </div>
+              <div class="radio btn">
+                <input (click)="storagePoolRadioCheck = 'performance'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3">
+                <label for="btn-demo-radio-3"><clr-icon shape="radar" size="20"></clr-icon></label>
+              </div>
+              <div class="radio btn merginLeft">
+                <label><clr-icon shape="refresh" size="20" (click)="storagePoolRefresh($event)"></clr-icon></label>
+              </div>
+            </div>
+
+            <!-- 列表页 -->
+            <clr-datagrid [(clrDgSelected)]="storagePoolSelected"   (clrDgRefresh)="storagePoolRefresh($event)" [clrDgLoading]="storeagePoolIsloading">
+
+              <clr-dg-column [clrDgField]="'name'">Name</clr-dg-column>
+
+              <ng-container *ngIf="storagePoolRadioCheck==='basic'">
+                <clr-dg-column [clrDgField]="'status'">Status</clr-dg-column>
+                <clr-dg-column [clrDgField]="'diskType'">Disk Type</clr-dg-column>
+                <clr-dg-column [clrDgField]="'storageDevice'">Storage Device</clr-dg-column>
+              </ng-container>
+
+              <ng-container *ngIf="storagePoolRadioCheck==='capacity'">
+                <clr-dg-column [clrDgField]="'totalCapacity'">Total Capacity</clr-dg-column>
+                <clr-dg-column [clrDgField]="'usedCapacity'">Used Capacity</clr-dg-column>
+                <clr-dg-column [clrDgField]="'capacityUsage'">Capacity Usage</clr-dg-column>
+                <clr-dg-column [clrDgField]="'freeCapacity'">Free Capacity</clr-dg-column>
+              </ng-container>
+
+              <ng-container *ngIf="storagePoolRadioCheck==='performance'">
+                <clr-dg-column [clrDgField]="'status'">Status</clr-dg-column>
+                <clr-dg-column [clrDgField]="'latency'">Latency(ms)</clr-dg-column>
+                <clr-dg-column [clrDgField]="'iops'">IOPS</clr-dg-column>
+                <clr-dg-column [clrDgField]="'bandwidth'">Bandwidth(MB/s)</clr-dg-column>
+              </ng-container>
+
+              <clr-dg-row *ngFor="let item of storagePoolList" [clrDgItem]="item">
+
+                <clr-dg-cell>{{item.name}}</clr-dg-cell>
+
+                <ng-container *ngIf="storagePoolRadioCheck==='basic'">
+                  <clr-dg-cell>{{item.status}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.diskType}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.storageDevice}}</clr-dg-cell>
+                </ng-container>
+
+                <ng-container *ngIf="storagePoolRadioCheck==='capacity'">
+                  <clr-dg-cell>{{item.totalCapacity}} TB</clr-dg-cell>
+                  <clr-dg-cell>{{item.usedCapacity}} TB</clr-dg-cell>
+                  <clr-dg-cell>
+                    <clr-progress-bar clrValue="{{item.capacityUsage}}" clrSuccess clrLabeled></clr-progress-bar>
+                  </clr-dg-cell>
+                  <clr-dg-cell>{{item.freeCapacity}} TB</clr-dg-cell>
+                </ng-container>
+
+                <ng-container *ngIf="storagePoolRadioCheck==='performance'">
+                  <clr-dg-cell>{{item.status}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.latency}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.iops}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.bandwidth}}</clr-dg-cell>
+                </ng-container>
+
+              </clr-dg-row>
+
+              <clr-dg-footer>
+                <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="storagePoolTotal">
+                  <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">per page</clr-dg-page-size>
+                  {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+                  of {{pagination.totalItems}}
+                </clr-dg-pagination>
+              </clr-dg-footer>
+
+
+          </clr-datagrid>
+        </clr-tab-content>
+      </clr-tab>
+
+      <clr-tab>
+        <button clrTabLink>Volume</button>
+        <clr-tab-content *clrIfActive>
+
+          <div class="gh-info-head"></div>
+
+          <div class="btn-group btn-icon">
+            <div class="radio btn">
+              <input (click)="volumeRadioCheck = 'basic'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-4" checked>
+              <label for="btn-demo-radio-4"><clr-icon shape="list" size="20"></clr-icon></label>
+            </div>
+            <div class="radio btn">
+              <input (click)="volumeRadioCheck = 'performance'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-5">
+              <label for="btn-demo-radio-5"><clr-icon shape="dashboard" size="20"></clr-icon></label>
+            </div>
+            <div class="radio btn merginLeft">
+              <label><clr-icon shape="refresh" size="20" (click)="volumeRefresh($event)"></clr-icon></label>
+            </div>
+          </div>
+
+          <clr-datagrid [(clrDgSelected)]="volumeSelected"   (clrDgRefresh)="volumeRefresh($event)" [clrDgLoading]="volumeIsloading">
+
+            <ng-container *ngIf="volumeRadioCheck==='basic'">
+              <clr-dg-column [clrDgField]="'name'">Name</clr-dg-column>
+              <clr-dg-column [clrDgField]="'status'">Status</clr-dg-column>
+              <clr-dg-column [clrDgField]="'totalCapacity'">Total Capacity</clr-dg-column>
+              <clr-dg-column [clrDgField]="'provisioningType'">Provisioning Type</clr-dg-column>
+              <clr-dg-column [clrDgField]="'capacityUsed'">capacity Usage</clr-dg-column>
+            </ng-container>
+            <ng-container *ngIf="volumeRadioCheck==='performance'">
+              <clr-dg-column [clrDgField]="'name'">Name</clr-dg-column>
+              <clr-dg-column [clrDgField]="'status'">Status</clr-dg-column>
+              <clr-dg-column [clrDgField]="'latency'">Latency(ms)</clr-dg-column>
+              <clr-dg-column [clrDgField]="'iops'">IOPS</clr-dg-column>
+              <clr-dg-column [clrDgField]="'bandwidth'">Bandwidth(MB/s)</clr-dg-column>
+            </ng-container>
+
+            <clr-dg-row *ngFor="let item of volumeList" [clrDgItem]="item">
+
+                <clr-dg-cell>{{item.name}}</clr-dg-cell>
+                <clr-dg-cell>{{item.status}}</clr-dg-cell>
+
+                <ng-container *ngIf="volumeRadioCheck==='basic'">
+                  <clr-dg-cell>{{item.totalCapacity}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.provisioningType}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.capacityUsed}}</clr-dg-cell>
+                </ng-container>
+                <ng-container *ngIf="volumeRadioCheck==='performance'">
+                  <clr-dg-cell>{{item.latency}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.iops}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.bandwidth}}</clr-dg-cell>
+                </ng-container>
+
+            </clr-dg-row>
+
+            <clr-dg-footer>
+              <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="volumeTotal">
+                <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">per page</clr-dg-page-size>
+                {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+                of {{pagination.totalItems}}
+              </clr-dg-pagination>
+            </clr-dg-footer>
+
+          </clr-datagrid>
+
+        </clr-tab-content>
+      </clr-tab>
+      <clr-tab>
+        <button clrTabLink (click)="initCapacityChart()">Capacity</button>
+        <clr-tab-content *clrIfActive>
+          <div class="gh-info-head"></div>
+          <div class="clr-select-wrapper">
+            <select class="clr-select" >
+              <option value="1">Last 1 month</option>
+              <option value="2">Last 3 month</option>
+              <option value="3">Last 6 month</option>
+              <option value="4">Last 1 year</option>
+            </select>
+          </div>
+          <div class="gh-info-head"></div>
+          <div id="volumeCapacityChart" style="height: 300px;"></div>
+          <div class="gh-info-head"></div>
+          <div id="storagePoolCapacityChart" style="height: 300px;"></div>
+        </clr-tab-content>
+      </clr-tab>
+      <clr-tab>
+        <button clrTabLink (click)="initPerformanceChart()">Performance</button>
+        <clr-tab-content *clrIfActive>
+          <div class="gh-info-head"></div>
+          <div class="clr-select-wrapper">
+            <select class="clr-select" >
+              <option value="1">Last 1 day</option>
+              <option value="2">Last 3 week</option>
+              <option value="3">Last 6 month</option>
+              <option value="4">Last 1 year</option>
+            </select>
+          </div>
+          <div class="gh-info-head"></div>
+          <div echarts [options]="volumeCapacityOption" id="volumeMaxResponseTimeChart" style="height: 300px;"></div>
+          <div class="gh-info-head"></div>
+          <div echarts [options]="volumeCapacityOption" id="volumeDensityChart" style="height: 300px;"></div>
+          <div class="gh-info-head"></div>
+          <div echarts [options]="volumeCapacityOption" id="volumeThroughputChart" style="height: 300px;"></div>
+          <div class="gh-info-head"></div>
+          <div echarts [options]="volumeCapacityOption" id="volumeBandwidthChart" style="height: 300px;"></div>
+          <div class="gh-info-head"></div>
+          <div echarts [options]="volumeCapacityOption" id="storagePoolDensityChart" style="height: 300px;"></div>
+        </clr-tab-content>
+      </clr-tab>
+      <clr-tab>
+        <button clrTabLink>Application Type</button>
+        <clr-tab-content *clrIfActive>
+          <clr-datagrid [(clrDgSelected)]="applicationTypeSelected"   (clrDgRefresh)="applicationTypeRefresh($event)" [clrDgLoading]="applicationTypeIsloading">
+
+            <clr-dg-column [clrDgField]="'storageDevice'">Storage Device</clr-dg-column>
+            <clr-dg-column [clrDgField]="'applicationType'">Application Type</clr-dg-column>
+
+            <clr-dg-row *ngFor="let item of applicationTypeList" [clrDgItem]="item">
+              <clr-dg-cell>{{item.storageDevice}}</clr-dg-cell>
+              <clr-dg-cell>{{item.applicationType}}</clr-dg-cell>
+            </clr-dg-row>
+
+            <clr-dg-footer>
+              <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="applicationTypeTotal">
+                <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">per page</clr-dg-page-size>
+                {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+                of {{pagination.totalItems}}
+              </clr-dg-pagination>
+            </clr-dg-footer>
+
+          </clr-datagrid>
+        </clr-tab-content>
+      </clr-tab>
+    </clr-tabs>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline bottom-middle" (click)="popShow=false">Close</button>
+  </div>
+</clr-modal>
