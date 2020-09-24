@@ -1,0 +1,92 @@
+
+<div>
+  <div class="gh-btngroup-header" style="margin-bottom: 1%">
+    <div class="gh-btngroup-left"></div>
+    <!-- 基本视图、性能视图、刷新 -->
+    <div class="btn-group btn-icon">
+      <div class="radio btn">
+        <input (click)="buttonTrigger = 'list'" type="radio" name="btn-group-demo-radios" id="buttonTrigger-1" checked>
+        <label for="buttonTrigger-1"><clr-icon shape="view-list" size="20"></clr-icon></label>
+      </div>
+      <div class="radio btn">
+        <input (click)="buttonTrigger = 'chart'" type="radio" name="btn-group-demo-radios" id="buttonTrigger-2">
+        <label for="buttonTrigger-2"><clr-icon shape="view-cards" size="20"></clr-icon></label>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="buttonTrigger==='list'">
+    <!-- 头部按钮组 -->
+    <div class="gh-btngroup-header">
+      <div class="gh-btngroup-left"></div>
+      <!-- 基本视图、性能视图、刷新 -->
+      <div class="btn-group btn-icon">
+        <div class="radio btn">
+          <input (click)="radioCheck = 'table1'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-1" checked>
+          <label for="btn-demo-radio-1"><clr-icon shape="list" size="20"></clr-icon></label>
+        </div>
+        <div class="radio btn">
+          <input (click)="radioCheck = 'table2'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-2">
+          <label for="btn-demo-radio-2"><clr-icon shape="dashboard" size="20"></clr-icon></label>
+        </div>
+        <div class="radio btn">
+          <input (click)="radioCheck = 'table3'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3">
+          <label for="btn-demo-radio-3"><clr-icon shape="radar" size="15"></clr-icon></label>
+        </div>
+        <div class="radio btn merginLeft">
+          <label><clr-icon shape="refresh" size="20" (click)="refresh()"></clr-icon></label>
+        </div>
+      </div>
+    </div>
+    <!-- 列表页 -->
+    <clr-datagrid [(clrDgSelected)]="rowSelected">
+      <clr-dg-column [clrDgField]="'name'">{{'storage.list.name' | translate}}</clr-dg-column>
+      <clr-dg-column [clrDgSortBy]="'stars'">{{'storage.list.ipAddress' | translate}}</clr-dg-column>
+
+      <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.status' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.vendor' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.model' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.zone' | translate}}</clr-dg-column>
+
+      <clr-dg-column [hidden]="radioCheck!=='table2'">{{'storage.list.rawCap' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='table2'">{{'storage.list.totalCap' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='table2'">{{'storage.list.usedCap' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='table2'">{{'storage.list.capUsage' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='table2'">{{'storage.list.freeCap' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='table2'">{{'storage.list.supRate' | translate}}</clr-dg-column>
+
+      <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.cpuUtilization' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.latency' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.iops' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.ops' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.bandwidth' | translate}}</clr-dg-column>
+
+      <clr-dg-row *ngFor="let item of list" [clrDgItem]="item">
+        <clr-dg-cell>{{item.name}}</clr-dg-cell>
+        <clr-dg-cell>{{item.ip}}</clr-dg-cell>
+        <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.status}}</clr-dg-cell>
+        <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.vendor}}</clr-dg-cell>
+        <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.model}}</clr-dg-cell>
+        <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.model}}</clr-dg-cell>
+
+        <clr-dg-cell [hidden]="radioCheck!=='table2'">{{item.totalCapacity}}</clr-dg-cell>
+        <clr-dg-cell [hidden]="radioCheck!=='table2'">{{item.totalCapacity}}</clr-dg-cell>
+        <clr-dg-cell [hidden]="radioCheck!=='table2'">{{item.usedCapacity}}</clr-dg-cell>
+        <clr-dg-cell [hidden]="radioCheck!=='table2'">{{item.freeEffectiveCapacity}}</clr-dg-cell>
+        <clr-dg-cell [hidden]="radioCheck!=='table2'">{{item.freeEffectiveCapacity}}</clr-dg-cell>
+        <clr-dg-cell [hidden]="radioCheck!=='table2'">{{item.maxCpuUtilization}}</clr-dg-cell>
+
+        <clr-dg-cell [hidden]="radioCheck!=='table3'">{{item.maxCpuUtilization}}</clr-dg-cell>
+        <clr-dg-cell [hidden]="radioCheck!=='table3'">{{item.maxLatency}}</clr-dg-cell>
+        <clr-dg-cell [hidden]="radioCheck!=='table3'">{{item.maxIops}}</clr-dg-cell>
+        <clr-dg-cell [hidden]="radioCheck!=='table3'">{{item.freeEffectiveCapacity}}</clr-dg-cell>
+        <clr-dg-cell [hidden]="radioCheck!=='table3'">{{item.maxBandwidth}}</clr-dg-cell>
+      </clr-dg-row>
+    </clr-datagrid>
+  </div>
+  <div [hidden]="buttonTrigger!=='chart'">
+
+  </div>
+</div>
+
+
+

@@ -81,4 +81,24 @@ public interface DmeNFSAccessService {
      * @return: ResponseBodyBean
      */
     void mountNfs(Map<String, Object> params) throws Exception;
+
+    /**
+     * unmount nfs,params中包含了 include:
+     * dataStoreObjectId: datastore的object id
+     * hostId: 主机hostId 必 （主机与集群二选一）
+     * clusterId: 集群clusterId 必（主机与集群二选一）
+     * @param params: include dataStoreName,hostId,clusterId
+     * @return: ResponseBodyBean
+     */
+    void unmountNfs(Map<String, Object> params) throws Exception;
+
+    /**
+     * delete nfs,params中包含了 include:
+     * dataStoreObjectId: datastore的object id
+     * @param params: include dataStoreObjectId
+     * @return: ResponseBodyBean
+     */
+    void deleteNfs(Map<String, Object> params) throws Exception;
+
+
 }

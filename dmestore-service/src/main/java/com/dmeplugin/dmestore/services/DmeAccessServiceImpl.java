@@ -2,15 +2,19 @@ package com.dmeplugin.dmestore.services;
 
 
 import com.dmeplugin.dmestore.dao.DmeInfoDao;
+import com.dmeplugin.dmestore.dao.ScheduleDao;
 import com.dmeplugin.dmestore.entity.DmeInfo;
+import com.dmeplugin.dmestore.task.ScheduleSetting;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
+import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
@@ -29,6 +33,17 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     private static final Logger LOG = LoggerFactory.getLogger(DmeAccessServiceImpl.class);
 
     private DmeInfoDao dmeInfoDao;
+
+    private ScheduleDao scheduleDao;
+
+    private VmfsAccessService vmfsAccessService;
+
+    private DmeNFSAccessService dmeNFSAccessService;
+
+    private VCSDKUtils vcsdkUtils;
+
+    @Autowired
+    private ScheduleSetting scheduleSetting;
 
     private Gson gson = new Gson();
 
@@ -195,7 +210,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             String hostUrl = "https://" + params.get("hostIp") + ":" + params.get("hostPort");
             LOG.info("hostUrl==" + hostUrl);
 
-            HttpEntity<String> entity = new HttpEntity<>(requestbody.toString(), headers);
+            HttpEntity<String> entity = new HttpEntity<>(gson.toJson(requestbody), headers);
             responseEntity = restTemplate.exchange(hostUrl + LOGIN_DME_URL
                     , HttpMethod.PUT, entity, String.class);
 
@@ -307,7 +322,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 LOG.info("requestbody==" + gson.toJson(requestbody));
             }
             LOG.info("getDmeHosts_url===" + getHostsUrl);
-            ResponseEntity responseEntity = access(getHostsUrl, HttpMethod.POST, (requestbody == null ? null : requestbody.toString()));
+            ResponseEntity responseEntity = access(getHostsUrl, HttpMethod.POST, (requestbody == null ? null : gson.toJson(requestbody)));
             LOG.info("getDmeHosts responseEntity==" + responseEntity.toString());
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -367,7 +382,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 LOG.info("requestbody==" + gson.toJson(requestbody));
             }
             LOG.info("gethostgroups_url===" + getHostGroupsUrl);
-            ResponseEntity responseEntity = access(getHostGroupsUrl, HttpMethod.POST, (requestbody == null ? null : requestbody.toString()));
+            ResponseEntity responseEntity = access(getHostGroupsUrl, HttpMethod.POST, (requestbody == null ? null : gson.toJson(requestbody)));
             LOG.info("getDmeHostgroups responseEntity==" + responseEntity.toString());
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -407,15 +422,24 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         try {
             Map<String, Object> requestbody = null;
             if (params != null && params.get("host") != null) {
+                //得到主机的hba信息
+                Map<String,Object> hbamap = vcsdkUtils.getHbaByHostObjectId(ToolUtils.getStr(params.get("hostId")));
+
                 requestbody = new HashMap<>();
                 requestbody.put("access_mode", "NONE");
-                requestbody.put("type", "UNKNOWN");
+                requestbody.put("type", "LINUX");
                 requestbody.put("ip", params.get("host"));
                 requestbody.put("host_name", params.get("host"));
+                List<Map<String,Object>> initiators = new ArrayList<>();
+                Map<String,Object> initiator = new HashMap<>();
+                initiator.put("protocol",ToolUtils.getStr(hbamap.get("type")));
+                initiator.put("port_name",ToolUtils.getStr(hbamap.get("name")));
+                initiators.add(initiator);
+                requestbody.put("initiator",initiators);
                 LOG.info("requestbody==" + gson.toJson(requestbody));
 
                 LOG.info("createHost_url===" + createHostUrl);
-                ResponseEntity responseEntity = access(createHostUrl, HttpMethod.POST, requestbody.toString());
+                ResponseEntity responseEntity = access(createHostUrl, HttpMethod.POST, gson.toJson(requestbody));
                 LOG.info("getDmeHostgroups responseEntity==" + responseEntity.toString());
                 if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -451,7 +475,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 LOG.info("requestbody==" + gson.toJson(requestbody));
 
                 LOG.info("createHostGroup_url===" + createHostGroupUrl);
-                ResponseEntity responseEntity = access(createHostGroupUrl, HttpMethod.POST, requestbody.toString());
+                ResponseEntity responseEntity = access(createHostGroupUrl, HttpMethod.POST, gson.toJson(requestbody));
                 LOG.info("getDmeHostgroups responseEntity==" + responseEntity.toString());
                 if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -473,6 +497,22 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     public void setDmeInfoDao(DmeInfoDao dmeInfoDao) {
         this.dmeInfoDao = dmeInfoDao;
+    }
+
+    public void setVmfsAccessService(VmfsAccessService vmfsAccessService) {
+        this.vmfsAccessService = vmfsAccessService;
+    }
+
+    public void setDmeNFSAccessService(DmeNFSAccessService dmeNFSAccessService) {
+        this.dmeNFSAccessService = dmeNFSAccessService;
+    }
+
+    public void setVcsdkUtils(VCSDKUtils vcsdkUtils) {
+        this.vcsdkUtils = vcsdkUtils;
+    }
+
+    public void setScheduleDao(ScheduleDao scheduleDao) {
+        this.scheduleDao = scheduleDao;
     }
 
     @Override
@@ -519,6 +559,55 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     }
 
     @Override
+    public void scanDatastore(String storageType) throws Exception{
+        if(!StringUtils.isEmpty(storageType)){
+            if(storageType.equals(ToolUtils.STORE_TYPE_VMFS)){
+                LOG.info("scan VMFS Datastore start");
+                vmfsAccessService.scanVmfs();
+                LOG.info("scan VMFS Datastore end");
+            }else if(storageType.equals(ToolUtils.STORE_TYPE_NFS)){
+                LOG.info("scan NFS Datastore start");
+                dmeNFSAccessService.scanNfs();
+                LOG.info("scan NFS Datastore end");
+            }else if(storageType.equals(ToolUtils.STORE_TYPE_ALL)){
+                //扫描vmfs
+                try {
+                    LOG.info("scan VMFS Datastore start");
+                    vmfsAccessService.scanVmfs();
+                    LOG.info("scan VMFS Datastore end");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                //扫描nfs
+                try {
+                    LOG.info("scan NFS Datastore start");
+                    dmeNFSAccessService.scanNfs();
+                    LOG.info("scan NFS Datastore end");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void configureTaskTime(Integer taskId,String taskCron) throws Exception{
+        try {
+            if(!StringUtils.isEmpty(taskId) && !StringUtils.isEmpty(taskCron)) {
+                int re = scheduleDao.updateTaskTime(taskId,taskCron);
+                if(re>0){
+                    scheduleSetting.refreshTasks(taskId,taskCron);
+                }
+            }else{
+                throw new Exception("configure Task Time error:taskId or taskCorn is null");
+            }
+        } catch (Exception e) {
+            LOG.error("configure Task Time error:" + e.toString());
+            throw e;
+        }
+    }
+
+    @Override
     public Map<String, Object> getDmeHostGroup(String hostGroupId) throws Exception{
         Map<String, Object> map = new HashMap<>();
         String getHostGroupUrl = GET_DME_HOSTGROUP_URL;
@@ -543,5 +632,6 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         LOG.info("getDmeHostGroup relists===" + (gson.toJson(map)));
         return map;
     }
+
 
 }

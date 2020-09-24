@@ -1,0 +1,690 @@
+<div>
+<!--  <div><span *ngFor="let item of rowSelected">{{item.name}}</span></div>-->
+  <!-- 头部按钮组 -->
+  <div class="gh-btngroup-header">
+    <div class="gh-btngroup-left">
+      <!--添加-->
+      <button class="btn btn-primary" (click)="addBtnClickFunc();">{{'menu.add' | translate}}</button>
+      <!--编辑-->
+      <button class="btn btn-primary" [disabled]="rowSelected.length !== 1" (click)="modifyData()">{{'menu.edit' | translate}}</button>
+      <!--扩容-->
+      <button class="btn btn-primary" (click)="expandBtnFunc();" [disabled]="rowSelected.length !== 1">{{'menu.expand' | translate}}</button>
+      <!-- 更多操作 -->
+      <clr-dropdown [clrCloseMenuOnItemClick]="false">
+        <button clrDropdownTrigger class="btn btn-primary" aria-label="Dropdown demo button">
+          {{'menu.more' | translate}}
+          <clr-icon shape="caret down"></clr-icon>
+        </button>
+        <clr-dropdown-menu *clrIfOpen>
+          <!--空间回收-->
+          <div aria-label="Dropdown header Action 1" (click)="reclaimShow=true;" [disabled]="rowSelected.length < 1" clrDropdownItem>{{'menu.reclaim' | translate}}</div>
+          <div class="dropdown-divider" role="separator" aria-hidden="true"></div>
+          <!--修改服务等级  按钮展示条件：Datastore所在卷属于服务等级时（选中的单条数据），才呈现“变更服务等级”按钮或菜单-->
+          <div aria-label="Dropdown header Action 2" (click)="changeServiceLevelBtnFunc();" *ngIf="rowSelected.length === 1 && rowSelected[0].serviceLevelName !== '' && rowSelected[0].serviceLevelName !== null" clrDropdownItem>{{'menu.changeServiceLevel' | translate}}</div>
+          <div class="dropdown-divider" role="separator" aria-hidden="true"></div>
+          <!--挂载-->
+          <div aria-label="Dropdown header Action 2" (click)="mountBtnFunc();" [disabled]="rowSelected.length !== 1" clrDropdownItem>{{'menu.mount' | translate}}</div>
+          <!--卸载-->
+          <div aria-label="Dropdown header Action 2" (click)="unmountShow=true" [disabled]="rowSelected.length !== 1" clrDropdownItem>{{'menu.unmount' | translate}}</div>
+          <div class="dropdown-divider" role="separator" aria-hidden="true"></div>
+          <!--删除-->
+          <div aria-label="Dropdown header Action 2" (click)="delShow=true" [disabled]="rowSelected.length < 1" clrDropdownItem>{{'menu.del' | translate}}</div>
+        </clr-dropdown-menu>
+      </clr-dropdown>
+    </div>
+    <!-- 基本视图、性能视图、刷新 -->
+    <div class="btn-group btn-icon">
+      <div class="radio btn">
+        <input (click)="radioCheck = 'list'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-1" checked>
+        <label for="btn-demo-radio-1"><clr-icon shape="list" size="20"></clr-icon></label>
+      </div>
+      <div class="radio btn">
+        <input (click)="radioCheck = 'chart'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-2">
+        <label for="btn-demo-radio-2"><clr-icon shape="dashboard" size="20"></clr-icon></label>
+      </div>
+      <div class="radio btn merginLeft">
+        <!--<input type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3">-->
+        <label><clr-icon shape="refresh" size="20" (click)="refresh();"></clr-icon></label>
+      </div>
+    </div>
+  </div>
+  <!-- 列表页 -->
+  <!-- 列表页 -->
+  <clr-datagrid [(clrDgSelected)]="rowSelected" [clrDgLoading]="isLoading">
+    <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
+    <clr-dg-column hidden [clrDgField]="'volumeId'">volumeId</clr-dg-column>
+    <clr-dg-column hidden [clrDgField]="'objectid'">objectid</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'status'">{{'vmfs.status' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacity'" [clrDgSortOrder]="'capacity'">{{'vmfs.capacity' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'usedCapacity'" [clrDgSortOrder]="'usedCapacity'">{{'vmfs.usedCapacity' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacityUsage'" [clrDgSortOrder]="'capacityUsage'">{{'vmfs.capacityUsage' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'freeSpace'" [clrDgSortOrder]="'freeSpace'">{{'vmfs.freeSpace' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'"  [clrDgField]="'reserveCapacity'" [clrDgSortOrder]="'reserveCapacity'">{{'vmfs.reserveCapacity' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'device'">{{'vmfs.device' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'serviceLevelName'">{{'vmfs.serviceLevelName' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'protectionStatus'">{{'vmfs.protectionStatus' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'" [clrDgField]="'iops'">{{'vmfs.iops' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.iopsQoSTarget' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'" [clrDgField]="'bandwidth'">{{'vmfs.bandwidth' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.bandwidthQoSTarget' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'" [clrDgField]="'readResponseTime'">{{'vmfs.readResponseTime' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'" [clrDgField]="'writeResponseTime'">{{'vmfs.writeResponseTime' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'" [clrDgField]="'latency'">{{'vmfs.latency' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.latencyQoSTarget' | translate}}</clr-dg-column>
+    <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
+      <clr-dg-cell (click)="navigateTo(item.objectid);">{{item.name}}</clr-dg-cell>
+      <clr-dg-cell hidden>{{item.volumeId}}</clr-dg-cell>
+      <clr-dg-cell hidden>{{item.objectid}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.status}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.capacity}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.capacity - item.freeSpace}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='list'"><clr-progress-bar clrValue="{{((item.capacity - item.freeSpace)/item.capacity * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.freeSpace}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.reserveCapacity}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.device}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.serviceLevelName}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.vmfsProtected ? '保护':'未保护'}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.iops}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='chart'">{{('vmfs.upper' | translate)+' '+item.maxIops+' | '+('vmfs.lower' | translate)+' '+item.minIops}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.bandwidth}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='chart'">{{('vmfs.upper' | translate)+' '+item.maxBandwidth+' | '+('vmfs.lower' | translate)+' '+item.minBandwidth}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.readResponseTime}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.writeResponseTime}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.latency}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='chart'" >{{('vmfs.lower' | translate)+' '+item.latency}}</clr-dg-cell>
+    </clr-dg-row>
+    <clr-dg-footer>
+
+      <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="total">
+        <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">per page</clr-dg-page-size>
+        {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+        of {{pagination.totalItems}}
+      </clr-dg-pagination>
+    </clr-dg-footer>
+  </clr-datagrid>
+  <!-- 示例 -->
+  <!--<span class="tabs-btn-wrap">
+    <span (click)="expendActive = !expendActive" class="tabs-btn" [ngClass]="{'tabs-btn_active': !expendActive}">按钮1</span>
+    <span (click)="expendActive = !expendActive" class="tabs-btn" [ngClass]="{'tabs-btn_active': expendActive}">按钮2</span>
+  </span>
+  <div class="expend-wrap" [ngClass]="{'expend-wrap_active': expendActive}">
+    <div (click)="expendActive = !expendActive" class="expend-title">
+      这里是标题
+    </div>
+    <div [hidden]="!expendActive" class="expend-content">
+      <table class="table table-vertical table-noborder table-compact">
+        <tbody>
+          <tr>
+            <th hidden></th>
+            <th>
+              3333333
+            </th>
+          </tr>
+        <tr>
+          <th hidden></th>
+            <td>{{'vmfs.capacityUsage' | translate}}</td>
+          <td>{{'vmfs.qos' | translate}}</td>
+          <td>{{'vmfs.protection' | translate}}</td>
+        </tr>
+        <tr>
+          <th hidden></th>
+          <th><clr-progress-bar clrValue="100" clrSuccess clrLabeled></clr-progress-bar></th>
+          <th>IOPS <= 100</th>
+        </tr>
+          <tr>
+            <th hidden></th>
+            <th>3 GB/4GB</th>
+            <th>Latency: 1414</th>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>-->
+  
+  <!-- 弹出form提交框 添加 -->
+  <clr-wizard #wizard [(clrWizardOpen)]="popShow">
+    <clr-wizard-title>{{'vmfs.addTitle' | translate}}</clr-wizard-title>
+  
+    <clr-wizard-button [type]="'cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
+    <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>
+    <clr-wizard-button [type]="'next'">{{'menu.next' | translate}}</clr-wizard-button>
+    <clr-wizard-button (click)="addVmfsHanlde();" [type]="'finish'">{{'menu.ok' | translate}}</clr-wizard-button>
+
+    <!--Page1 -->
+    <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="name.pristine || !formPageOne.valid">
+        <ng-template clrPageTitle>{{'vmfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
+  
+        <form clrForm #formPageOne="ngForm">
+          <!--名称 -->
+          <clr-input-container>
+            <label>{{'vmfs.name' | translate}}</label>
+            <input clrInput  [(ngModel)]="form.name" name="name" #name="ngModel" />
+            <clr-control-error>This field is required!</clr-control-error>
+          </clr-input-container>
+          <clr-checkbox-container>
+            <label></label>
+            <clr-checkbox-wrapper>
+              <input type="checkbox" clrCheckbox name="isSameName" [(ngModel)]="form.isSameName" />
+              <label>{{'vmfs.vmfsAddNameDesc' | translate}}</label>
+            </clr-checkbox-wrapper>
+          </clr-checkbox-container>
+          <clr-input-container *ngIf="!form.isSameName">
+            <label>{{'vmfs.volumeName' | translate}}</label>
+            <input clrInput  [(ngModel)]="form.volumeName" name="volumeName" />
+            <clr-control-error>This field is required!</clr-control-error>
+          </clr-input-container>
+
+
+          <!--版本 -->
+          <clr-select-container>
+            <label>{{'vmfs.version' | translate}}</label>
+            <select (change)="setBlockSizeOptions();"  [(ngModel)]="form.version" clrSelect name="version">
+              <option value='5'>VMFS 5</option>
+              <option value='6'>VMFS 6</option>
+            </select>
+          </clr-select-container>
+
+          <!-- 容量 -->
+          <clr-input-container>
+            <label>{{'vmfs.capacity' | translate}}</label>
+              <input clrInput  class="inputOneLine" type="number" [(ngModel)]="form.capacity" name="capacity" #number="ngModel" />
+              <select clrInput  [(ngModel)]="form.capacityUnit" name="capacityUnit" >
+                <option value="TB">TB</option>
+                <option value="GB">GB</option>
+                <option value="MB">MB</option>
+                <option value="KB">KB</option>
+              </select>
+              <input clrInput style="width: 20px;" readonly value="{{'vmfs.multiply' | translate}}">
+              <input clrInput  class="inputOneLine" type="number" [(ngModel)]="form.count" name="count" #number="ngModel" />
+          </clr-input-container>
+
+          <!-- 块大小 -->
+          <clr-select-container>
+            <label>{{'vmfs.blockSize' | translate}}</label>
+              <select  clrSelect [(ngModel)]="form.blockSize" name="blockSize" (change)="setSrgOptions();">
+                <option *ngFor="let item of blockSizeOptions" value="{{item.key}}">{{item.value}}</option>
+            </select>
+          </clr-select-container>
+
+          <!-- 空间回收粒度 -->
+          <clr-select-container>
+            <label>{{'vmfs.spaceReclamationGranularity' | translate}}</label>
+            <select  clrSelect (ngModelOptions)="srgOptions"  [(ngModel)]="form.spaceReclamationGranularity" name="spaceReclamationGranularity" >
+              <option *ngFor="let item of srgOptions" value="{{item.key}}">{{item.value}}</option>
+            </select>
+          </clr-select-container>
+
+          <!-- 空间回收优先级 -->
+          <clr-select-container>
+            <label>{{'vmfs.spaceReclamationPriority' | translate}}</label>
+            <select  clrSelect [(ngModel)]="form.spaceReclamationPriority" name="spaceReclamationPriority" >
+              <option value="low">{{'vmfs.low' | translate}}</option>
+              <option value="none">{{'vmfs.none' | translate}}</option>
+            </select>
+          </clr-select-container>
+
+          <!-- 主机/集群 -->
+<!--          <clr-select-container>-->
+<!--            <label>{{'vmfs.hostOrCluster' | translate}}</label>-->
+<!--            <select hidden clrSelect class="inputOneLine">-->
+<!--            </select>-->
+<!--            <label>-->
+<!--              <input readonly required clrInput [(ngModel)]="form.deviceName" name="deviceName">-->
+<!--              <clr-tree>-->
+<!--                &lt;!&ndash; 主机&ndash;&gt;-->
+<!--                <clr-tree-node *ngFor="let directory of hostRootDirectory" [(clrExpanded)]="directory.expanded">-->
+<!--                  <clr-icon [attr.shape]="directory.icon"></clr-icon>-->
+<!--                  {{directory.name}}-->
+<!--                  <clr-tree-node *ngFor="let file of directory.files">-->
+<!--                    <button-->
+<!--                      (click)="deviceDataHandle(directory.name, file.name, file.id)"-->
+<!--                      class="clr-treenode-link"-->
+<!--                      [class.active]="file.active">-->
+<!--                      <clr-icon [attr.shape]="file.icon"></clr-icon>-->
+<!--                      {{file.name}}-->
+<!--                    </button>-->
+<!--                  </clr-tree-node>-->
+<!--                </clr-tree-node>-->
+<!--                &lt;!&ndash; 集群 &ndash;&gt;-->
+<!--                <clr-tree-node *ngFor="let directory of clusterRootDirectory" [(clrExpanded)]="directory.expanded">-->
+<!--                  <clr-icon [attr.shape]="directory.icon"></clr-icon>-->
+<!--                  {{directory.name}}-->
+<!--                  <clr-tree-node *ngFor="let file of directory.files">-->
+<!--                    <button-->
+<!--                      (click)="deviceDataHandle(directory.name, file.name, file.id)"-->
+<!--                      class="clr-treenode-link"-->
+<!--                      [class.active]="file.active">-->
+<!--                      <clr-icon [attr.shape]="file.icon"></clr-icon>-->
+<!--                      {{file.name}}-->
+<!--                    </button>-->
+<!--                  </clr-tree-node>-->
+<!--                </clr-tree-node>-->
+<!--              </clr-tree>-->
+<!--            </label>-->
+<!--          </clr-select-container>-->
+          <clr-combobox-container>
+            <label>{{'vmfs.hostOrCluster' | translate}}</label>
+            <clr-combobox [(ngModel)]="chooseDevice" name="chooseDevice">
+              <clr-options *ngIf="form.hostDataloadSuccess && form.culDataloadSuccess">
+                <clr-option *clrOptionItems="let device of deviceList; field:'deviceName'" [clrValue]="device">
+                  <clr-icon shape="world" role="img" aria-label="World is turning"></clr-icon> {{device.deviceName}}
+                  <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon>
+                </clr-option>
+              </clr-options>
+            </clr-combobox>
+            <clr-control-helper>Helper text</clr-control-helper>
+            <clr-control-error>There was an error</clr-control-error>
+          </clr-combobox-container>
+        </form>
+    </clr-wizard-page>
+    <!--Page2 储存库设置-->
+    <clr-wizard-page #addPageTwo [clrWizardPageNextDisabled]="number.pristine || !formPageTwo.valid">
+        <ng-template clrPageTitle>
+          {{'vmfs.storageSetting' | translate}}
+        </ng-template> <!-- mandatory -->
+        <span class="tabs-btn-wrap">
+          <!-- 服务等级 -->
+          <span (click)="levelCheck = 'level'" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'level'}">{{'vmfs.byServiceLevel' | translate}}</span>
+          <!-- 非服务等级 -->
+          <span (click)="customerClickFunc();" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'customer'}">{{'vmfs.customer' | translate}}</span>
+        </span>
+<!--      <div class="btn-group btn-icon">-->
+<!--        <div class="radio btn">-->
+<!--          <input (click)="levelCheck = 'level'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3" checked>-->
+<!--          <label for="btn-demo-radio-3" class="setBorderedius">{{'vmfs.byServiceLevel' | translate}}</label>-->
+<!--        </div>-->
+<!--        <div class="radio btn">-->
+<!--          <input (click)="customerClickFunc();" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-4">-->
+<!--          <label for="btn-demo-radio-4" class="setBorderedius">{{'vmfs.customer' | translate}}</label>-->
+<!--        </div>-->
+<!--      </div>-->
+        <form clrForm #formPageTwo="ngForm">
+          <!-- 1、选择 服务等级-->
+          <ng-container *ngIf="levelCheck==='level'">
+            <clr-accordion>
+              <clr-accordion-panel *ngFor="let item of serviceLevelList">
+                <clr-accordion-title>{{item.name}}</clr-accordion-title>
+                <clr-accordion-content (click)="serviceLevelClickHandel(item.id, item.name);" class="blueBg" *clrIfExpanded>
+                  <table class="table table-vertical table-noborder table-compact">
+                      <tbody>
+                        <tr>
+                          <th hidden></th>
+                          <th>
+                            {{item.name}}
+                          </th>
+                        </tr>
+                      <tr>
+                        <th hidden></th>
+                          <td>{{'vmfs.capacityUsage' | translate}}</td>
+                        <td>{{'vmfs.qos' | translate}}</td>
+                        <td>{{'vmfs.protection' | translate}}</td>
+                      </tr>
+                      <tr>
+                        <th hidden></th>
+                        <th><clr-progress-bar clrValue="{{(item.used_capacity/item.total_capacity * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
+                        <th *ngIf="item.simpleCapabilities.qosParam.qosPolicy.max_iops != null">IOPS <= {{item.simpleCapabilities.qosParam.qosPolicy.max_iops}}</th>
+                        <th *ngIf="item.simpleCapabilities.qosParam.qosPolicy.min_iops != null">IOPS >= {{item.simpleCapabilities.qosParam.qosPolicy.min_iops}}</th>
+                      </tr>
+                        <tr>
+                          <th hidden></th>
+                          <th>{{item.used_capacity}} GB/{{item.total_capacity}}GB</th>
+                          <th>Latency: {{item.simpleCapabilities.qosParam.qosPolicy.latency + item.simpleCapabilities.qosParam.qosPolicy.latencyUnit}}</th>
+                        </tr>
+                      </tbody>
+                  </table>
+                </clr-accordion-content>
+              </clr-accordion-panel>
+            </clr-accordion>
+          </ng-container>
+          <!-- 2、未选择 服务等级-->
+          <ng-container *ngIf="levelCheck==='customer'">
+            <!--a.基本信息 -->
+            <clr-input-container>
+              <label>{{'vmfs.basicInformation' | translate}}</label>
+            </clr-input-container>
+            <clr-select-container>
+              <label>{{'vmfs.storageDevice' | translate}}</label>
+              <select clrSelect  [(ngModel)]="form.storage_id" name="storage_id" (ngModelChange)="getStoragePoolsByStorId();">
+                <option value=""></option>
+                <option *ngFor="let item of storageList" value="{{item.id}}">{{item.name}}</option>
+              </select>
+            </clr-select-container>
+            <clr-select-container>
+              <label>{{'vmfs.storagePool' | translate}}</label>
+              <select clrSelect [(ngModel)]="form.pool_raw_id" name="pool_raw_id" >
+                <option value=""></option>
+                <option *ngFor="let item of storagePoolList" value="{{item.id}}">{{item.name}}</option>
+              </select>
+            </clr-select-container>
+
+            <!--b.QoS 设置 -->
+            <clr-input-container>
+              <label>{{'vmfs.qosPolicy' | translate}}</label>
+            </clr-input-container>
+            <!-- 控制策略 -->
+            <clr-radio-container clrInline>
+              <label>{{'vmfs.controlPolicy' | translate}}</label>
+              <clr-radio-wrapper>
+                <input type="radio" clrRadio name="control_policy" checked="checked" value="1" [(ngModel)]="form.control_policy" />
+                <label>{{'vmfs.upperLimitControl' | translate}}</label>
+              </clr-radio-wrapper>
+              <clr-radio-wrapper>
+                <input type="radio" clrRadio name="control_policy" value="0" [(ngModel)]="form.control_policy" />
+                <label>{{'vmfs.lowerLimitControl' | translate}}</label>
+              </clr-radio-wrapper>
+            </clr-radio-container>
+            <!-- 交通管制对象 带宽 上限-->
+            <clr-checkbox-container *ngIf="form.control_policy === '1'">
+              <label>{{'vmfs.trafficControlObject' | translate}}</label>
+              <clr-checkbox-wrapper>
+                <input type="checkbox" [(ngModel)]="form.maxbandwidthChoose" name="maxbandwidthChoose" clrCheckbox/>
+                <label>
+                  {{'vmfs.bandwidthLimitUpper' | translate}}
+                  <input class="inputOneLine" name="maxbandwidth" [(ngModel)]="form.maxbandwidth"/>{{'vmfs.unitM' | translate}}
+                </label>
+              </clr-checkbox-wrapper>
+            </clr-checkbox-container>
+            <!-- 交通管制对象 IOPS 上限-->
+            <clr-checkbox-container *ngIf="form.control_policy === '1'">
+              <label></label>
+              <clr-checkbox-wrapper>
+                <input type="checkbox" clrCheckbox/>
+                <label>
+                  {{'vmfs.IOPSLimitUpper' | translate}}
+                  <input class="inputOneLine" name="maxiops" [(ngModel)]="form.maxiops"/>
+                </label>
+              </clr-checkbox-wrapper>
+            </clr-checkbox-container>
+
+            <!-- 交通管制对象 带宽 下限-->
+            <clr-checkbox-container *ngIf="form.control_policy === '0'">
+              <label>{{'vmfs.trafficControlObject' | translate}}</label>
+              <clr-checkbox-wrapper>
+                <input type="checkbox" clrCheckbox/>
+                <label>
+                  {{'vmfs.bandwidthLimitLower' | translate}}
+                  <input class="inputOneLine" name="minbandwidth" [(ngModel)]="form.minbandwidth"/>{{'vmfs.unitM' | translate}}
+                </label>
+              </clr-checkbox-wrapper>
+            </clr-checkbox-container>
+            <!-- 交通管制对象 IOPS 下限-->
+            <clr-checkbox-container *ngIf="form.control_policy === '0'">
+              <label></label>
+              <clr-checkbox-wrapper>
+                <input type="checkbox" clrCheckbox/>
+                <label>
+                  {{'vmfs.IOPSLimitLower' | translate}}
+                  <input class="inputOneLine" name="miniops" [(ngModel)]="form.miniops"/>
+                </label>
+              </clr-checkbox-wrapper>
+            </clr-checkbox-container>
+
+            <!--c.QoS 资源调优 -->
+            <clr-input-container>
+              <label>{{'vmfs.resourceTuning' | translate}}</label>
+            </clr-input-container>
+            <clr-select-container>
+              <label>{{'vmfs.provisioningType' | translate}}</label>
+              <select clrSelect [(ngModel)]="form.alloctype" name="alloctype" >
+                <option value="thin">thin</option>
+                <option value="thick">thick</option>
+              </select>
+            </clr-select-container>
+          </ng-container>
+
+        </form>
+    </clr-wizard-page>
+  </clr-wizard>
+  <!-- 编辑页面 -->
+  <clr-modal [(clrModalOpen)]="modifyShow">
+    <h3 class="modal-title">{{'menu.edit' | translate}}</h3>
+
+    <div class="modal-body">
+      <form *ngIf="rowSelected.length === 1" clrForm #formPageOne="ngForm">
+        <!-- 名称 -->
+        <clr-input-container>
+          <label>{{'vmfs.name' | translate}}</label>
+          <input clrInput  [(ngModel)]="modifyForm.name" name="name" #name="ngModel" /><br>
+          <clr-control-error>This field is required!</clr-control-error>
+        </clr-input-container>
+        <clr-checkbox-container>
+          <label></label>
+          <clr-checkbox-wrapper>
+            <input type="checkbox" clrCheckbox name="isSameName" [(ngModel)]="modifyForm.isSameName" />
+            <label>{{'vmfs.modifyNameDesc' | translate}}</label>
+          </clr-checkbox-wrapper>
+        </clr-checkbox-container>
+
+        <!-- 控制策略 -->
+        <clr-radio-container clrInline>
+          <label>{{'vmfs.controlPolicy' | translate}}</label>
+          <clr-radio-wrapper>
+            <input type="radio" clrRadio name="control_policy" checked="checked" value="1" [(ngModel)]="modifyForm.control_policy" />
+            <label>{{'vmfs.upperLimitControl' | translate}}</label>
+          </clr-radio-wrapper>
+          <clr-radio-wrapper>
+            <input type="radio" clrRadio name="control_policy" value="0" [(ngModel)]="modifyForm.control_policy" />
+            <label>{{'vmfs.lowerLimitControl' | translate}}</label>
+          </clr-radio-wrapper>
+        </clr-radio-container>
+        <!-- 交通管制对象 带宽 上限-->
+        <clr-checkbox-container *ngIf="modifyForm.control_policy === '1'">
+          <label>{{'vmfs.trafficControlObject' | translate}}</label>
+          <clr-checkbox-wrapper>
+            <input type="checkbox" clrCheckbox/>
+            <label>
+              {{'vmfs.bandwidthLimitUpper' | translate}}
+              <input type="number" class="inputOneLine" name="maxbandwidth" [(ngModel)]="modifyForm.max_bandwidth"/>{{'vmfs.unitM' | translate}}
+            </label>
+          </clr-checkbox-wrapper>
+        </clr-checkbox-container>
+        <!-- 交通管制对象 IOPS 上限-->
+        <clr-checkbox-container *ngIf="modifyForm.control_policy === '1'">
+          <label></label>
+          <clr-checkbox-wrapper>
+            <input type="checkbox" clrCheckbox/>
+            <label>
+              {{'vmfs.IOPSLimitUpper' | translate}}
+              <input type="number" class="inputOneLine" name="maxiops" [(ngModel)]="modifyForm.max_iops"/>
+            </label>
+          </clr-checkbox-wrapper>
+        </clr-checkbox-container>
+
+        <!-- 交通管制对象 带宽 下限-->
+        <clr-checkbox-container *ngIf="modifyForm.control_policy === '0'">
+          <label>{{'vmfs.trafficControlObject' | translate}}</label>
+          <clr-checkbox-wrapper>
+            <input type="checkbox" clrCheckbox/>
+            <label>
+              {{'vmfs.bandwidthLimitLower' | translate}}
+              <input type="number" class="inputOneLine" name="minbandwidth" [(ngModel)]="modifyForm.min_bandwidth"/>{{'vmfs.unitM' | translate}}
+            </label>
+          </clr-checkbox-wrapper>
+        </clr-checkbox-container>
+        <!-- 交通管制对象 IOPS 下限-->
+        <clr-checkbox-container *ngIf="modifyForm.control_policy === '0'">
+          <label></label>
+          <clr-checkbox-wrapper>
+            <input type="checkbox" clrCheckbox/>
+            <label>
+              {{'vmfs.IOPSLimitLower' | translate}}
+              <input type="number" class="inputOneLine" name="miniops" [(ngModel)]="modifyForm.min_iops"/>
+            </label>
+          </clr-checkbox-wrapper>
+        </clr-checkbox-container>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="modifyShow = false">{{'menu.cancel' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="modifyHandleFunc()">{{'menu.ok' | translate}}</button>
+    </div>
+  </clr-modal>
+  <!--挂载弹窗-->
+  <clr-modal [(clrModalOpen)]="mountShow">
+    <h3 class="modal-title">{{'vmfs.mount.mount' | translate}}</h3>
+    <div class="modal-body">
+      <form *ngIf="rowSelected.length === 1" clrForm>
+
+        <clr-radio-container clrInline>
+          <label class="floatleft">{{'vmfs.mount.mountObj' | translate}}</label>
+          <clr-radio-wrapper>
+            <input type="radio" clrRadio name="controlPolicy" value="1" [(ngModel)]="mountForm.mountType" ng-checked="true"/>
+            <label>{{'vmfs.mount.host' | translate}}</label>
+          </clr-radio-wrapper>
+          <clr-radio-wrapper>
+            <input type="radio" clrRadio name="controlPolicy" value="2"  [(ngModel)]="mountForm.mountType" />
+            <label>{{'vmfs.mount.cluster' | translate}}</label>
+          </clr-radio-wrapper>
+        </clr-radio-container>
+
+
+
+        <clr-combobox-container *ngIf="mountForm.mountType==='1'">
+          <label>{{'vmfs.mount.host' | translate}}</label>
+          <clr-combobox [(ngModel)]="chooseHost" name="chooseHost" required>
+            <clr-options>
+              <clr-option *clrOptionItems="let state of hostList; field:'hostName'" [clrValue]="state">
+                <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon>{{state.hostName}}
+              </clr-option>
+            </clr-options>
+          </clr-combobox>
+        </clr-combobox-container>
+
+        <clr-combobox-container *ngIf="mountForm.mountType==='2'">
+          <label>{{'vmfs.mount.cluster' | translate}}</label>
+          <clr-combobox [(ngModel)]="chooseCluster" name="chooseCluster" required>
+            <clr-options>
+              <clr-option *clrOptionItems="let state of clusterList; field:'clusterName'" [clrValue]="state">
+                <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon>{{state.clusterName}}
+              </clr-option>
+            </clr-options>
+          </clr-combobox>
+        </clr-combobox-container>
+
+<!--        <clr-select-container>-->
+<!--          <label>{{'vmfs.mount.mountType' | translate}}</label>-->
+<!--          <select clrSelect [(ngModel)]="mountForm.mountType" name="mountType">-->
+<!--            <option value="readOnly">{{'vmfs.mount.readOnly' | translate}}</option>-->
+<!--            <option value="readWrite">{{'vmfs.mount.readWrite' | translate}}</option>-->
+<!--          </select>-->
+<!--        </clr-select-container>-->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" (click)="mountShow = false">{{'menu.cancel' | translate}}</button>
+          <button type="button" class="btn btn-primary" (click)="mountSubmit()">{{'menu.ok' | translate}}</button>
+        </div>
+      </form>
+    </div>
+  </clr-modal>
+  <!--删除提示-->
+  <clr-modal [(clrModalOpen)]="delShow" [clrModalSize]="'sm'">
+    <h3 class="modal-title">{{'vmfs.del.title' | translate}}</h3>
+    <div class="modal-body">
+      <p>{{'vmfs.del.content' | translate}}</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="delShow=false">{{'menu.cancel' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="delHandleFunc()">{{'menu.ok' | translate}}</button>
+    </div>
+  </clr-modal>
+  <!--卸载-->
+  <clr-modal [(clrModalOpen)]="unmountShow" [clrModalSize]="'sm'">
+    <h3 class="modal-title">{{'vmfs.unmount.title' | translate}}</h3>
+    <div class="modal-body">
+      <clr-datagrid [(clrDgSelected)]="chooseUnmountDevice" [clrDgLoading]="isLoading">
+        <clr-dg-column hidden></clr-dg-column>
+        <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
+        <clr-dg-column [clrDgField]="'type'">{{'vmfs.type' | translate}}</clr-dg-column>
+        <clr-dg-row *clrDgItems="let item of mountedDeviceList" [clrDgItem]="item">
+          <clr-dg-cell>{{item.deviceId}}</clr-dg-cell>
+          <clr-dg-cell>{{item.deviceName}}</clr-dg-cell>
+          <clr-dg-cell>{{item.deviceType === 'host' ? 'vmfs.host':'vmfs.cluster'}}</clr-dg-cell>
+        </clr-dg-row>
+      </clr-datagrid>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="unmountShow=false">{{'menu.cancel' | translate}}</button>
+      <button type="button" class="btn btn-primary" [disabled]="chooseUnmountDevice.length !== 1" (click)="unmountHandleFunc();">{{'menu.ok' | translate}}</button>
+    </div>
+  </clr-modal>
+  <!--空间回收提示-->
+  <clr-modal [(clrModalOpen)]="reclaimShow" [clrModalSize]="'sm'">
+    <h3 class="modal-title">{{'vmfs.reclaim.title' | translate}}</h3>
+    <div class="modal-body">
+      <p>{{'vmfs.reclaim.content' | translate}}</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="reclaimShow=false">{{'menu.cancel' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="reclaimHandleFunc()">{{'menu.ok' | translate}}</button>
+    </div>
+  </clr-modal>
+  <!--变更服务等级-->
+  <clr-modal [(clrModalOpen)]="changeServiceLevelShow">
+    <h3 class="modal-title">{{'vmfs.changeServiceLevel' | translate}}</h3>
+    <div class="modal-body">
+      <form *ngIf="rowSelected.length === 1" clrForm #formPageOne="ngForm">
+        <!-- 1、选择 服务等级-->
+        <ng-container>
+          <clr-accordion>
+            <clr-accordion-panel *ngFor="let item of serviceLevelList">
+              <clr-accordion-title>{{item.name}}</clr-accordion-title>
+              <clr-accordion-content (click)="serviceLevelClickHandel(item.id, item.name);" class="blueBg" *clrIfExpanded>
+                <table class="table table-vertical table-noborder table-compact">
+                  <tbody>
+                  <tr>
+                    <th hidden></th>
+                    <th>
+                      {{item.name}}
+                    </th>
+                  </tr>
+                  <tr>
+                    <th hidden></th>
+                    <td>{{'vmfs.capacityUsage' | translate}}</td>
+                    <td>{{'vmfs.qos' | translate}}</td>
+                    <td>{{'vmfs.protection' | translate}}</td>
+                  </tr>
+                  <tr>
+                    <th hidden></th>
+                    <th><clr-progress-bar clrValue="{{(item.used_capacity/item.total_capacity * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
+                    <th *ngIf="item.simpleCapabilities.qosParam.qosPolicy.max_iops != null">IOPS <= {{item.simpleCapabilities.qosParam.qosPolicy.max_iops}}</th>
+                    <th *ngIf="item.simpleCapabilities.qosParam.qosPolicy.min_iops != null">IOPS >= {{item.simpleCapabilities.qosParam.qosPolicy.min_iops}}</th>
+                  </tr>
+                  <tr>
+                    <th hidden></th>
+                    <th>{{item.used_capacity}} GB/{{item.total_capacity}}GB</th>
+                    <th>Latency: {{item.simpleCapabilities.qosParam.qosPolicy.latency + item.simpleCapabilities.qosParam.qosPolicy.latencyUnit}}</th>
+                  </tr>
+                  </tbody>
+                </table>
+              </clr-accordion-content>
+            </clr-accordion-panel>
+          </clr-accordion>
+        </ng-container>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="changeServiceLevelShow = false">{{'menu.cancel' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="changeSLHandleFunc()">{{'menu.ok' | translate}}</button>
+    </div>
+  </clr-modal>
+  <!--扩容-->
+  <clr-modal [(clrModalOpen)]="expandShow">
+    <h3 class="modal-title">{{'menu.expand' | translate}}</h3>
+    <div class="modal-body">
+      <!--名称-->
+      <clr-input-container>
+        <label>{{'vmfs.expandSize' | translate}}</label>
+        <input clrInput type="number" name="vo_add_capacity" [(ngModel)]="expandForm.vo_add_capacity"/>
+        <select clrInput  [(ngModel)]="expandForm.capacityUnit" name="capacityUnit" >
+          <option value="TB">TB</option>
+          <option value="GB">GB</option>
+          <option value="MB">MB</option>
+          <option value="KB">KB</option>
+        </select>
+      </clr-input-container>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="expandShow = false;">{{'menu.cancel' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="expandHandleFunc();">{{'menu.ok' | translate}}</button>
+    </div>
+  </clr-modal>
+</div>

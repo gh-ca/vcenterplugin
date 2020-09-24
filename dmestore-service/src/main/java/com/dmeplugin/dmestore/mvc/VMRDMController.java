@@ -17,12 +17,12 @@ public class VMRDMController extends BaseController {
     private VMRDMService vmrdmService;
 
     @RequestMapping(value = "createRdm", method = RequestMethod.POST)
-    public ResponseBodyBean createRDM(@RequestParam("datastore_name") String datastore_name,
-                                      @RequestParam("host_id") String host_id,
-                                      @RequestParam("vm_name") String vm_name,
+    public ResponseBodyBean createRDM(@RequestParam("datastore_objectId") String datastore_objectId,
+                                      @RequestParam("host_objectId") String host_objectId,
+                                      @RequestParam("vm_objectId") String vm_objectId,
                                       @RequestBody VmRDMCreateBean createBean) throws Exception {
         try {
-            vmrdmService.createRDM(datastore_name, vm_name, host_id, createBean);
+            vmrdmService.createRDM(datastore_objectId, vm_objectId, host_objectId, createBean);
             return success();
         }catch (Exception e){
             LOG.error(e.getMessage());

@@ -29,7 +29,7 @@ public class BaseController {
 
   protected static final Logger LOGGER = LoggerFactory.getLogger(BaseController.class);
 
-  protected static final String CODE_SUCCESS = "0";
+  protected static final String CODE_SUCCESS = "200";
 
   protected static final String CODE_ALL_FAILURE = "-100001";
   protected static final String CODE_NOTALL_FAILURE = "-100000";

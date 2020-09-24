@@ -1,5 +1,8 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.model.EthPortInfo;
+
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -22,4 +25,15 @@ public interface HostAccessService {
      * @throws Exception when error
      */
     void configureIscsi(Map<String, Object> params) throws Exception;
+
+    /**
+     * Test Connectivity:
+     * String hostObjectId：host object id
+     * List<Map<String, Object>> ethPorts: 要测试的以太网端口列表
+     *
+     * @param params: params include:hostObjectId,ethPorts
+     * @return: ResponseBodyBean
+     * @throws Exception when error
+     */
+    List<EthPortInfo> testConnectivity(Map<String, Object> params) throws Exception;
 }

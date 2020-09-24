@@ -80,9 +80,10 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     @Override
     public Map<String, Object> queryVmfsStatisticCurrent(Map<String, Object> params) throws Exception {
-        String obj_type_id = "1125921381679104";//SYS_Lun
-        params.put("obj_type_id", obj_type_id);
         Map<String, Object> remap = new HashMap<>();
+        remap.put("code", 503);
+        remap.put("message", "queryStatistic failed!");
+        remap.put("data", "queryStatistic failed!");
         Object indicatorIds = params.get("indicator_ids");
         //以下为模拟响应报文的处理
         /*if (null != obj_ids) {
@@ -98,13 +99,16 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicatorIds = initVolumeIndicator();
             params.put("indicator_ids", indicatorIds);
         }
+        String obj_type_id = "1125921381679104";//SYS_Lun
+        params.put("obj_type_id", obj_type_id);
         params.put("range", RANGE_LAST_5_MINUTE);
         params.put("interval", INTERVAL_ONE_MINUTE);
         Map<String, Object> resp = queryStatisticByObjType("VMFS volume", params);
         String code = resp.get("code").toString();
         if ("200".equals(code)) {
-            Object data = remap.get("data");
+            Object data = resp.get("data");
             data = getCurrentStatistic(data);
+            remap.put("code", 200);
             remap.put("data", data);
         }
         return remap;
@@ -118,7 +122,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     @Override
     public Map<String, Object> queryNfsStatisticCurrent(Map<String, Object> params) throws Exception {
         Map<String, Object> remap = new HashMap<>();
-
+        remap.put("code", 503);
+        remap.put("message", "queryStatistic failed!");
+        remap.put("data", "queryStatistic failed!");
         Object obj_ids = params.get("obj_ids");
         Object indicatorIds = params.get("indicator_ids");
         //以下为模拟响应报文的处理
@@ -135,13 +141,16 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicatorIds = initFsIndicator();
             params.put("indicator_ids", indicatorIds);
         }
+        String obj_type_id = "1125904201809920";//SYS_???  使用存储设备? SYS_StorDevice 1125904201809920
+        params.put("obj_type_id", obj_type_id);
         params.put("range", RANGE_LAST_5_MINUTE);
         params.put("interval", INTERVAL_ONE_MINUTE);
         Map<String, Object> resp = queryStatisticByObjType("NFS", params);
         String code = resp.get("code").toString();
         if ("200".equals(code)) {
-            Object data = remap.get("data");
+            Object data = resp.get("data");
             data = getCurrentStatistic(data);
+            remap.put("code", 200);
             remap.put("data", data);
         }
         return remap;

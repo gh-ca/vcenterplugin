@@ -1,0 +1,159 @@
+<form clrForm #formPageTwo="ngForm">
+  <clr-input-container>
+    <label>Name</label>:
+    <input clrInput type="text" [(ngModel)]="configModel.name" name="name" />
+  </clr-input-container>
+
+  <clr-checkbox-container>
+    <label>Size</label>：
+    <clr-checkbox-wrapper>
+      <label>
+        <input class="inputOneLine" type="number" [(ngModel)]="configModel.size" name="size" #number="ngModel" />
+        <select [(ngModel)]="configModel.unit" name="unit" >
+          <option value="TB">TB</option>
+          <option value="GB">GB</option>
+          <option value="MB">MB</option>
+          <option value="KB">KB</option>
+        </select>
+        X
+        <input class="inputOneLine" type="number" [(ngModel)]="configModel.quantity" name="quantity" #number="ngModel" />
+      </label>
+    </clr-checkbox-wrapper>
+  </clr-checkbox-container>
+
+  <!-- 选择 服务等级 存储选-->
+  <clr-radio-container clrInline>
+    <label>Storage Type</label>
+    <clr-radio-wrapper>
+      <input type="radio" clrRadio (click)="levelCheck='level'" name="storageType" required value="1" [(ngModel)]="configModel.storageType" />
+      <label>Service Level</label>
+    </clr-radio-wrapper>
+    <clr-radio-wrapper>
+      <input type="radio" clrRadio  (click)="levelCheck='storage'" name="storageType" required value="2" [(ngModel)]="configModel.storageType" />
+      <label>Storage/Storage Pool</label>
+    </clr-radio-wrapper>
+    <!--<clr-control-helper>Helper text</clr-control-helper>
+    <clr-control-error>This field is required!</clr-control-error>-->
+  </clr-radio-container>
+
+  <!-- 服务等级-->
+  <div *ngIf="levelCheck==='level'" [hidden]="levelCheck !=='level'">
+    <table class="table table-vertical table-noborder table-compact blueBg">
+      <tbody>
+      <tr>
+        <th hidden></th>
+        <th>
+          storageName:LargeScaleERRHAHA
+        </th>
+      </tr>
+      <tr>
+        <th hidden></th>
+        <td>{{'vmfs.capacityUsage' | translate}}</td>
+        <td>{{'vmfs.qos' | translate}}</td>
+        <td>{{'vmfs.protection' | translate}}</td>
+      </tr>
+      <tr>
+        <th hidden></th>
+        <th><clr-progress-bar clrValue="{{(100- 10)/100 * 100}}" clrSuccess clrLabeled></clr-progress-bar></th>
+        <th>IOPS > 2000/TB</th>
+        <th>IOPS > 2000/TB</th>
+      </tr>
+      <tr>
+        <th hidden></th>
+        <th>136.700 TB/300.00TbB</th>
+        <th>Latency < 1 ms</th>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 选择存储 -->
+  <div *ngIf="levelCheck==='storage'"  [hidden]="levelCheck !=='storage'">
+    <clr-select-container>
+      <label>Storage Device</label>:
+      <select clrSelect  [(ngModel)]="configModel.storage_id" name="storage_id" (ngModelChange)="loadStoragePool(configModel.storage_id);">
+        <option value=""></option>
+        <option *ngFor="let item of storageDevices" value="{{item.id}}">{{item.name}}</option>
+      </select>
+    </clr-select-container>
+    <clr-select-container>
+      <label>Storage Pool</label>:
+      <select clrSelect [(ngModel)]="configModel.pool_raw_id" name="pool_raw_id" >
+        <option value=""></option>
+        <option *ngFor="let item of storagePools" value="{{item.pool_raw_id}}">{{item.name}}</option>
+      </select>
+    </clr-select-container>
+
+    <!--b.QoS 设置 -->
+    <clr-input-container>
+      <label>Qos Policy</label>:
+    </clr-input-container>
+    <!-- 控制策略 -->
+    <clr-radio-container clrInline>
+      <label>Control Policy</label>:
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="control_policy" required value="0" [(ngModel)]="configModel.control_policy" />
+        <label>Upper limit control</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="control_policy" required value="1" [(ngModel)]="configModel.control_policy" />
+        <label>Lower limit control</label>
+      </clr-radio-wrapper>
+    </clr-radio-container>
+    <!-- 带宽 下限-->
+    <clr-checkbox-container>
+      <label>Traffic Control</label>
+      <clr-checkbox-wrapper>
+        <input type="checkbox" clrCheckbox/>
+        <label>
+          Bandwidth >=
+          <input class="inputOneLine" name="maxbandwidth" [(ngModel)]="configModel.minBandwidth"/>MB/s
+        </label>
+      </clr-checkbox-wrapper>
+    </clr-checkbox-container>
+    <!-- IOPS 下限-->
+    <clr-checkbox-container>
+      <label></label>
+      <clr-checkbox-wrapper>
+        <input type="checkbox" clrCheckbox/>
+        <label>IOPS >=
+          <input class="inputOneLine" name="maxiops" [(ngModel)]="configModel.minIOPS"/>
+        </label>
+      </clr-checkbox-wrapper>
+    </clr-checkbox-container>
+    <!-- Latency 上限-->
+    <clr-checkbox-container>
+      <label></label>
+      <clr-checkbox-wrapper>
+        <input type="checkbox" clrCheckbox/>
+        <label>Latency <=
+          <input class="inputOneLine" name="maxiops" [(ngModel)]="configModel.maxLatency"/>us
+        </label>
+      </clr-checkbox-wrapper>
+    </clr-checkbox-container>
+
+    <!--c.QoS 资源调优 -->
+    <clr-input-container>
+      <label>Resource Tuning</label>
+    </clr-input-container>
+    <clr-select-container>
+      <label>Provisioning Type</label>
+      <select clrSelect [(ngModel)]="configModel.alloctype" name="alloctype" >
+        <option value="thin">thin</option>
+        <option value="thick">thick</option>
+      </select>
+    </clr-select-container>
+    <!--应用类型 -->
+    <clr-select-container>
+      <label>Application Type</label>
+      <select clrSelect [(ngModel)]="configModel.applicationType" name="applicationType" >
+        <option value="1">Vmware_VDI</option>
+      </select>
+    </clr-select-container>
+  </div>
+
+</form>
+
+<button type="button" class="btn btn-outline" (click)="popShow=false">Cancel</button>
+<button type="button" class="btn btn-primary" (click)="submit()">Ok</button>
+

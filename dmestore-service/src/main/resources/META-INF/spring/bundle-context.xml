@@ -27,6 +27,10 @@
 
     <bean name="DmeAccessServiceImpl" class="com.dmeplugin.dmestore.services.DmeAccessServiceImpl">
         <property name="dmeInfoDao" ref="dmeInfoDao"/>
+        <property name="scheduleDao" ref="scheduleDao"/>
+        <property name="vmfsAccessService" ref="VmfsAccessServiceImpl"/>
+        <property name="dmeNFSAccessService" ref="DmeNFSAccessServiceImpl"/>
+        <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
 
     <bean name="h2DataBaseDao" class="com.dmeplugin.dmestore.dao.H2DataBaseDao">
@@ -184,11 +188,14 @@
    <bean name="hostAccessService" class="com.dmeplugin.dmestore.services.HostAccessServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
-    
-    
-    <context:annotation-config/>
-    <!--spring扫描注解的配置-->
-    <context:component-scan base-package="com.dmeplugin.dmestore.task"/>
+
+
+    <bean name="overviewService" class="com.dmeplugin.dmestore.services.OverviewServiceImpl">
+        <property name="vmfsAccessService" ref="VmfsAccessServiceImpl"/>
+        <property name="dmeNFSAccessService" ref="DmeNFSAccessServiceImpl"/>
+        <property name="dmeStorageService" ref="dmeStorageService"/>
+        <property name="bestPracticeProcessService" ref="bestPracticeProcessService"/>
+    </bean>
 
     <!--开启这个配置，spring才能识别@Scheduled注解-->
     <task:annotation-driven scheduler="qbScheduler" mode="proxy"/>

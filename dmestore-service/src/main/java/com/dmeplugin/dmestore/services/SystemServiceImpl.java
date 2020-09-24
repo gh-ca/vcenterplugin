@@ -106,6 +106,8 @@ public class SystemServiceImpl implements SystemService {
 
       systemDao.initData(DPSqlFileConstant.DP_DME_TASK_DATA_SYNCBESTPRACTISE_SQL);
 
+      systemDao.initData(DPSqlFileConstant.DP_DME_TASK_DATA_SCANDATASTORE_SQL);
+
       LOGGER.info("init data over...");
       vCenterInfoService.deleteHASyncAndDeviceData();
     } catch (Exception e) {
