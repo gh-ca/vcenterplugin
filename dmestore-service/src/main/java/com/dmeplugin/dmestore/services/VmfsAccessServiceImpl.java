@@ -324,7 +324,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 LOG.info("ByServiceLevel requestbody==" + gson.toJson(requestbody));
 
                 LOG.info("create ByServiceLevel vmfs_url===" + CREATE_VOLUME_URL);
-                ResponseEntity responseEntity = dmeAccessService.access(CREATE_VOLUME_URL, HttpMethod.POST, requestbody.toString());
+                ResponseEntity responseEntity = dmeAccessService.access(CREATE_VOLUME_URL, HttpMethod.POST, gson.toJson(requestbody));
 
                 LOG.info("create ByServiceLevel vmfs responseEntity==" + responseEntity.toString());
                 if (responseEntity.getStatusCodeValue() == 202) {
@@ -392,7 +392,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
 
                 LOG.info("create UNServiceLevel vmfs_url===" + CREATE_VOLUME_UNSERVICE_URL);
-                ResponseEntity responseEntity = dmeAccessService.access(CREATE_VOLUME_UNSERVICE_URL, HttpMethod.POST, requestbody.toString());
+                ResponseEntity responseEntity = dmeAccessService.access(CREATE_VOLUME_UNSERVICE_URL, HttpMethod.POST, gson.toJson(requestbody));
                 LOG.info("create UNServiceLevel vmfs responseEntity==" + responseEntity.toString());
                 if (responseEntity.getStatusCodeValue() == 202) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -676,7 +676,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 LOG.info("mountVmfsToHost requestbody==" + gson.toJson(requestbody));
 
                 LOG.info("mountVmfsToHost URL===" + MOUNT_VOLUME_TO_HOST_URL);
-                ResponseEntity responseEntity = dmeAccessService.access(MOUNT_VOLUME_TO_HOST_URL, HttpMethod.POST, requestbody.toString());
+                ResponseEntity responseEntity = dmeAccessService.access(MOUNT_VOLUME_TO_HOST_URL, HttpMethod.POST, gson.toJson(requestbody));
 
                 LOG.info("mountVmfsToHost vmfs responseEntity==" + responseEntity.toString());
                 if (responseEntity.getStatusCodeValue() == 202) {
@@ -711,7 +711,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 LOG.info("mountVmfsToHostGroup requestbody==" + gson.toJson(requestbody));
 
                 LOG.info("mountVmfsToHostGroup URL===" + MOUNT_VOLUME_TO_HOSTGROUP_URL);
-                ResponseEntity responseEntity = dmeAccessService.access(MOUNT_VOLUME_TO_HOSTGROUP_URL, HttpMethod.POST, requestbody.toString());
+                ResponseEntity responseEntity = dmeAccessService.access(MOUNT_VOLUME_TO_HOSTGROUP_URL, HttpMethod.POST, gson.toJson(requestbody));
 
                 LOG.info("mountVmfsToHostGroup vmfs responseEntity==" + responseEntity.toString());
                 if (responseEntity.getStatusCodeValue() == 202) {
@@ -970,7 +970,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         Object volume_ids = params.get("volume_ids");
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("volume_ids", volume_ids);
-        ResponseEntity responseEntity = dmeAccessService.access(VOLUME_DELETE, HttpMethod.POST, requestbody.toString());
+        ResponseEntity responseEntity = dmeAccessService.access(VOLUME_DELETE, HttpMethod.POST, gson.toJson(requestbody));
         if (202 != responseEntity.getStatusCodeValue()) {
             throw new Exception("delete volume error!");
         } else {
@@ -1017,7 +1017,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("host_id", hostId);
         requestbody.put("volume_ids", volumeIds);
-        ResponseEntity responseEntity = dmeAccessService.access(HOST_UNMAPAPING, HttpMethod.POST, requestbody.toString());
+        ResponseEntity responseEntity = dmeAccessService.access(HOST_UNMAPAPING, HttpMethod.POST, gson.toJson(requestbody));
         return responseEntity;
     }
 
@@ -1027,7 +1027,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("host_id", hostGroupId);
         requestbody.put("volume_ids", volumeIds);
-        ResponseEntity responseEntity = dmeAccessService.access(HOSTGROUP_UNMAPPING, HttpMethod.POST, requestbody.toString());
+        ResponseEntity responseEntity = dmeAccessService.access(HOSTGROUP_UNMAPPING, HttpMethod.POST, gson.toJson(requestbody));
         return responseEntity;
 
     }
