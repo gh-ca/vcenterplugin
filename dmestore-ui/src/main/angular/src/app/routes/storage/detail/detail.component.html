@@ -267,9 +267,8 @@
     <button (click)="showChart()" clrTabLink>Performance</button>
     <clr-tab-content clrTabLinkInOverflow="true">
       <div echarts [options]="options" style="height: 600px;"></div>
-      <div id="iopsChart" style="height: 600px;"></div>
-      <div id="bandwidthChart" style="height: 600px;"></div>
-      <div id="latencyChart" style="height: 600px;"></div>
+      <div echarts [options]="mychart" style="height: 600px;"></div>
+      <div echarts [options]="mychart" style="height: 600px;"></div>
     </clr-tab-content>
   </clr-tab>
   <clr-tab>

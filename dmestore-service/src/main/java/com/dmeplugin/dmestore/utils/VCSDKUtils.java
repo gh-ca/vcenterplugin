@@ -1710,7 +1710,7 @@ public class VCSDKUtils {
     }
 
     //主机配置iscsi
-    public void configureIscsi(String hostObjectId,Map<String, String> vmKernel,List<Map<String, Object>> ethPorts) throws Exception{
+    public void configureIscsi(String hostObjectId, Map<String, String> vmKernel, List<Map<String, Object>> ethPorts) throws Exception {
         try {
             if (ethPorts == null) {
                 _logger.error("configure Iscsi error:ethPorts is null.");
@@ -1750,11 +1750,11 @@ public class VCSDKUtils {
             }
             //得到vmKernel适配器
             //网络端口邦定，将vmKernelDevice邦定到iscsiHbaDevice
-            _logger.info("iscsiHbaDevice:"+iscsiHbaDevice);
+            _logger.info("iscsiHbaDevice:" + iscsiHbaDevice);
             boundVmKernel(hostmo, vmKernel, iscsiHbaDevice);
             //添加发现目标
             addIscsiSendTargets(hostmo, ethPorts, iscsiHbaDevice);
-            _logger.info("configure Iscsi success! iscsiHbaDevice:"+iscsiHbaDevice+" host:"+hostmo.getName());
+            _logger.info("configure Iscsi success! iscsiHbaDevice:" + iscsiHbaDevice + " host:" + hostmo.getName());
         } catch (Exception e) {
             e.printStackTrace();
             _logger.error("vmware error:", e);
@@ -1784,10 +1784,10 @@ public class VCSDKUtils {
                 _logger.error("find vmKernel Device error:No vmKernel adapter found");
                 throw new Exception("find vmKernel Device error:No vmKernel adapter found");
             }
-            _logger.info("vmKernelDevice:"+vmKernelDevice);
+            _logger.info("vmKernelDevice:" + vmKernelDevice);
             //网络端口邦定，将vmKernelDevice邦定到iscsiHbaDevice
-            hostmo.getIscsiManagerMO().bindVnic(iscsiHbaDevice,vmKernelDevice);
-            _logger.info("bind Vnic success! iscsiHbaDevice:"+iscsiHbaDevice+" vmKernelDevice:"+vmKernelDevice);
+            hostmo.getIscsiManagerMO().bindVnic(iscsiHbaDevice, vmKernelDevice);
+            _logger.info("bind Vnic success! iscsiHbaDevice:" + iscsiHbaDevice + " vmKernelDevice:" + vmKernelDevice);
         } catch (Exception e) {
             e.printStackTrace();
             _logger.error("vmware error:", e);
@@ -1796,7 +1796,7 @@ public class VCSDKUtils {
     }
 
     //添加发现目标
-    public void addIscsiSendTargets(HostMO hostmo,List<Map<String, Object>> ethPorts,String iscsiHbaDevice) throws Exception{
+    public void addIscsiSendTargets(HostMO hostmo, List<Map<String, Object>> ethPorts, String iscsiHbaDevice) throws Exception {
         try {
             if (ethPorts == null) {
                 _logger.error("configure Iscsi error:ethPorts is null.");
@@ -1814,7 +1814,7 @@ public class VCSDKUtils {
             //添加发现目标
             if (ethPorts != null && ethPorts.size() > 0) {
                 List<HostInternetScsiHbaSendTarget> targets = new ArrayList<>();
-                for(Map<String, Object> ethPortInfo:ethPorts){
+                for (Map<String, Object> ethPortInfo : ethPorts) {
                     //组装发现目标
                     HostInternetScsiHbaSendTarget target = new HostInternetScsiHbaSendTarget();
                     target.setAddress(ToolUtils.getStr(ethPortInfo.get("mgmtIp")));
@@ -1822,8 +1822,8 @@ public class VCSDKUtils {
                 }
                 if (targets.size() > 0) {
                     //向iscsi添加目标
-                    hostmo.getHostStorageSystemMO().addInternetScsiSendTargets(iscsiHbaDevice,targets);
-                    _logger.info("add Iscsi Send Targets success! iscsiHbaDevice:"+iscsiHbaDevice+" targets:"+gson.toJson(targets));
+                    hostmo.getHostStorageSystemMO().addInternetScsiSendTargets(iscsiHbaDevice, targets);
+                    _logger.info("add Iscsi Send Targets success! iscsiHbaDevice:" + iscsiHbaDevice + " targets:" + gson.toJson(targets));
                 }
             }
         } catch (Exception e) {
@@ -1835,8 +1835,51 @@ public class VCSDKUtils {
     }
 
 
+    //删除NFS dataStore
+    public void deleteNfs(String dataStoreObjectId, List<String> hostIds) throws Exception {
+        if (StringUtils.isEmpty(dataStoreObjectId)) {
+            _logger.info("delete dataStore,  datasotreObject id:" + dataStoreObjectId + " is null");
+            return;
+        }
+        if (null == hostIds || hostIds.size() == 0) {
+            _logger.info("delete datasotre host:" + hostIds + " is null");
+            return;
+        }
+
+        String serverguid = vcConnectionHelper.objectID2Serverguid(dataStoreObjectId);
+        VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
+
+        RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+        //存储下的所有主机
+        ManagedObjectReference dsmor = vcConnectionHelper.objectID2MOR(dataStoreObjectId);
+        DatastoreMO dsmo = new DatastoreMO(vmwareContext, dsmor);
+        for (String hostId : hostIds) {
+            HostMO hostmo = rootFsMO.findHostById(hostId);
+            _logger.info("Host name: " + hostmo.getName());
+            //主机删除存储
+            deleteNfs(dsmo, hostmo, dataStoreObjectId);
+        }
+    }
+
+    public void deleteNfs(DatastoreMO dsmo, HostMO hostMO, String nfsId) {
+        String hostName = null;
+        try {
+            //删除前重新扫描datastore
+            hostMO.getHostStorageSystemMO().rescanVmfs();
+            _logger.info("Rescan datastore before mounting");
+            //删除NFS
+            NasDatastoreInfo nasdsinfo = (NasDatastoreInfo) dsmo.getInfo();
+            hostMO.getHostDatastoreSystemMO().deleteDatastore(nasdsinfo.getName());
+            hostName = hostMO.getName();
+            _logger.info("mount nfs success:" + hostMO.getName() + ":" + dsmo.getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("delete nfs error from host, hostId:" + hostName, e);
+        }
+    }
+
     //得到所有主机的ID与name boolean mount 是否已经挂载了当前存储的主机
-    private String getHostsByDsObjectId(String dataStoreObjectId, boolean mount) throws Exception {
+    public String getHostsByDsObjectId(String dataStoreObjectId, boolean mount) throws Exception {
         String listStr = "";
         try {
             //得到当前的context

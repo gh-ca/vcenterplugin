@@ -1,11 +1,11 @@
 import {
   Component,
   OnInit,
+  AfterViewInit,
   ChangeDetectionStrategy,
-  ChangeDetectorRef
+  ChangeDetectorRef, NgZone
 } from '@angular/core';
 import {StorageService, StorageList} from './storage.service';
-
 @Component({
   selector: 'app-storage',
   templateUrl: './storage.component.html',
@@ -13,17 +13,26 @@ import {StorageService, StorageList} from './storage.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [StorageService],
 })
-export class StorageComponent implements OnInit {
+export class StorageComponent implements OnInit, AfterViewInit {
 
   list: StorageList[] = []; // 数据列表
   total = 0; // 总数据数量
   isLoading = true; // table数据loading
   rowSelected = []; // 当前选中数据
   radioCheck = 'table1'; // 切换列表页显示
-  constructor(private remoteSrv: StorageService, private cdr: ChangeDetectorRef) {}
+  buttonTrigger = 'list'; // 切换列表页显示
+
+
+
+
+  constructor(private remoteSrv: StorageService, private cdr: ChangeDetectorRef, private ngZone: NgZone) {}
   // 生命周期： 初始化数据
   ngOnInit() {
-    this.refresh();
+   this.refresh();
+  }
+
+  ngAfterViewInit() {
+
   }
   // table数据处理
   refresh() {
