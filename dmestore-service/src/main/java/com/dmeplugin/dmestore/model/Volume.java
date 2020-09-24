@@ -8,20 +8,52 @@ import java.util.List;
  * @Company: GH-CA
  * @create 2020-09-03
  */
-public class Volume  {
+public class Volume {
 
-    private String id;
-    private String name;
-    private String status;
+    private String id; //卷的唯一标识
+    private String name; //名称
+    private String status; //状态
     private Boolean attached;
-    private String alloctype;
-    private String service_level_name;
-    private String storage_id;
-    private String pool_raw_id;
-    private String capacity_usage;
-    private Boolean protectionStatus;
+    private String alloctype;//分配类型
+    private String service_level_name;//服务等级
+    private String storage_id;//存储设备id
+    private String pool_raw_id;//存储池id
+    private String capacity_usage;//容量利用率
+    private Boolean protectionStatus;//保护状态
     private List<String> hostIds;
     private List<String> hostGroupIds;
+
+    private String storage_pool_name;//存储池名称
+    private Integer capacity;//总容量 单位GB
+    //关联的datastore
+    private List<VmfsDataInfo> datastores;
+
+    //时延 iops 带宽 公用存储设备的
+
+
+    public List<VmfsDataInfo> getDatastores() {
+        return datastores;
+    }
+
+    public void setDatastores(List<VmfsDataInfo> datastores) {
+        this.datastores = datastores;
+    }
+
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
+    }
+
+    public String getStorage_pool_name() {
+        return storage_pool_name;
+    }
+
+    public void setStorage_pool_name(String storage_pool_name) {
+        this.storage_pool_name = storage_pool_name;
+    }
 
     public String getId() {
         return id;

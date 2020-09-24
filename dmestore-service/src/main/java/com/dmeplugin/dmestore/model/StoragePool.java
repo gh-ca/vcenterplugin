@@ -9,24 +9,117 @@ package com.dmeplugin.dmestore.model;
  */
 public class StoragePool   {
 
-    private Double free_capacity;
-    private String health_status;
-    private Double lun_subscribed_capacity;
-    private String name;
+    private Double free_capacity;//空闲容量
+    private Double lun_subscribed_capacity; //LUN的配置容量（LUN订阅容量）
+    private String name;//名称
     private String parent_type;
-    private String running_status;
-    private Double total_capacity;
-    private Double fs_subscribed_capacity;
-    private Double consumed_capacity;
-    private String consumed_capacity_percentage;
+    private String running_status;//运行状态
+    private String health_status;//健康状态
+    private Double total_capacity;//总容量
+    private Double fs_subscribed_capacity; //订阅容量(文件系统订阅容量)
+    private Double consumed_capacity;//已用容量
+    private String consumed_capacity_percentage;//已用容量百分比(容量利用率)
     private String consumed_capacity_threshold;
     private String storage_pool_id;
     private String storage_instance_id;
     private String storage_device_id;
     private String storage_name;
-
+    //订阅率 = 订阅容量/总容量
+    private Double lun_subscription_rate;
+    private Double fs_subscription_rate;
     //补充字段
-    private String media_type;
+    private String media_type;//存储池主存类型
+    private String tier0_disk_type;//硬盘类型
+    private String tier0_raid_lv; //RAID级别
+    private String tier1_disk_type;//硬盘类型
+    private String tier1_raid_lv;//RAID级别
+    private String tier2_disk_type;//硬盘类型
+    private String tier2_raid_lv;//RAID级别
+    private String storage_id; //存储设备id
+    private Double data_space; //存储池上创建LUN或者文件系统时的可用容量 单位MB
+    //TODO 块 没找到对应字段
+    // 存储池没有服务等级，服务等级所属存储池上所有卷
+    //时延 iops 带宽 公用存储设备的
+
+    public Double getLun_subscription_rate() {
+        return lun_subscription_rate;
+    }
+
+    public void setLun_subscription_rate(Double lun_subscription_rate) {
+        this.lun_subscription_rate = lun_subscription_rate;
+    }
+
+    public Double getFs_subscription_rate() {
+        return fs_subscription_rate;
+    }
+
+    public void setFs_subscription_rate(Double fs_subscription_rate) {
+        this.fs_subscription_rate = fs_subscription_rate;
+    }
+
+    public Double getData_space() {
+        return data_space;
+    }
+
+    public void setData_space(Double data_space) {
+        this.data_space = data_space;
+    }
+
+    public String getTier0_raid_lv() {
+        return tier0_raid_lv;
+    }
+
+    public void setTier0_raid_lv(String tier0_raid_lv) {
+        this.tier0_raid_lv = tier0_raid_lv;
+    }
+
+    public String getTier1_raid_lv() {
+        return tier1_raid_lv;
+    }
+
+    public void setTier1_raid_lv(String tier1_raid_lv) {
+        this.tier1_raid_lv = tier1_raid_lv;
+    }
+
+    public String getTier2_raid_lv() {
+        return tier2_raid_lv;
+    }
+
+    public void setTier2_raid_lv(String tier2_raid_lv) {
+        this.tier2_raid_lv = tier2_raid_lv;
+    }
+
+    public String getStorage_id() {
+        return storage_id;
+    }
+
+    public void setStorage_id(String storage_id) {
+        this.storage_id = storage_id;
+    }
+
+    public String getTier0_disk_type() {
+        return tier0_disk_type;
+    }
+
+    public void setTier0_disk_type(String tier0_disk_type) {
+        this.tier0_disk_type = tier0_disk_type;
+    }
+
+    public String getTier1_disk_type() {
+        return tier1_disk_type;
+    }
+
+    public void setTier1_disk_type(String tier1_disk_type) {
+        this.tier1_disk_type = tier1_disk_type;
+    }
+
+    public String getTier2_disk_type() {
+        return tier2_disk_type;
+    }
+
+    public void setTier2_disk_type(String tier2_disk_type) {
+        this.tier2_disk_type = tier2_disk_type;
+    }
 
     public String getMedia_type() {
         return media_type;
