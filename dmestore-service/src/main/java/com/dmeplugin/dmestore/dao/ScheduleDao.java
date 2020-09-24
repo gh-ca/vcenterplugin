@@ -37,6 +37,26 @@ public class ScheduleDao extends H2DataBaseDao {
         return scheduleconfiglist;
     }
 
+    public int updateTaskTime(String taskId,String taskCron) throws SQLException {
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            ps = con.prepareStatement("UPDATE " + DPSqlFileConstant.DP_DME_TASK_INFO
+                    + " SET CRON=? WHERE ID=?");
+            ps.setString(1, taskCron);
+            ps.setInt(2, Integer.parseInt(taskId));
+
+            return ps.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.error("Failed to update task time: " + e.getMessage());
+            throw e;
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+    }
+
     private ScheduleConfig buildSchedule(ResultSet rs) throws SQLException {
         ScheduleConfig scheduleConfig = new ScheduleConfig();
         scheduleConfig.setClassName(rs.getString("CLASS_NAME"));

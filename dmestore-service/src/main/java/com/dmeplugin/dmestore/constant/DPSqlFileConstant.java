@@ -62,4 +62,7 @@ public class DPSqlFileConstant {
   public static final String DP_DME_TASK_DATA_SYNCBESTPRACTISE_SQL = "INSERT INTO DP_DME_TASK_INFO (ID, CLASS_NAME, CRON, JOB_NAME, METHOD) " +
           "VALUES (2, 'com.dmeplugin.dmestore.task.BackgroundSyncTask', '0 0 2 * * ?', 'syncCheckBestPractise', 'syncCheckBestPractise');";
 
+  public static final String DP_DME_TASK_DATA_SCANDATASTORE_SQL = "INSERT INTO DP_DME_TASK_INFO (ID, CLASS_NAME, CRON, JOB_NAME, METHOD) " +
+          "VALUES (3, 'com.dmeplugin.dmestore.task.BackgroundScanDatastoreTask', '0 0 0/6 * * ?', 'scanDatastore', 'scanDatastore');";
+
 }

@@ -2,6 +2,7 @@ package com.dmeplugin.dmestore.services;
 
 
 import com.dmeplugin.dmestore.dao.DmeInfoDao;
+import com.dmeplugin.dmestore.dao.ScheduleDao;
 import com.dmeplugin.dmestore.entity.DmeInfo;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
@@ -11,6 +12,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
@@ -29,6 +31,12 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     private static final Logger LOG = LoggerFactory.getLogger(DmeAccessServiceImpl.class);
 
     private DmeInfoDao dmeInfoDao;
+
+    private ScheduleDao scheduleDao;
+
+    private VmfsAccessService vmfsAccessService;
+
+    private DmeNFSAccessService dmeNFSAccessService;
 
     private Gson gson = new Gson();
 
@@ -475,6 +483,18 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         this.dmeInfoDao = dmeInfoDao;
     }
 
+    public void setVmfsAccessService(VmfsAccessService vmfsAccessService) {
+        this.vmfsAccessService = vmfsAccessService;
+    }
+
+    public void setDmeNFSAccessService(DmeNFSAccessService dmeNFSAccessService) {
+        this.dmeNFSAccessService = dmeNFSAccessService;
+    }
+
+    public void setScheduleDao(ScheduleDao scheduleDao) {
+        this.scheduleDao = scheduleDao;
+    }
+
     @Override
     public Map<String, Object> getDmeHost(String hostId) throws Exception {
         Map<String, Object> map = new HashMap<>();
@@ -519,6 +539,55 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     }
 
     @Override
+    public void scanDatastore(String storageType) throws Exception{
+        if(!StringUtils.isEmpty(storageType)){
+            if(storageType.equals(ToolUtils.STORE_TYPE_VMFS)){
+                LOG.info("scan VMFS Datastore start");
+                vmfsAccessService.scanVmfs();
+                LOG.info("scan VMFS Datastore end");
+            }else if(storageType.equals(ToolUtils.STORE_TYPE_NFS)){
+                LOG.info("scan NFS Datastore start");
+                dmeNFSAccessService.scanNfs();
+                LOG.info("scan NFS Datastore end");
+            }else if(storageType.equals(ToolUtils.STORE_TYPE_ALL)){
+                //扫描vmfs
+                try {
+                    LOG.info("scan VMFS Datastore start");
+                    vmfsAccessService.scanVmfs();
+                    LOG.info("scan VMFS Datastore end");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+                //扫描nfs
+                try {
+                    LOG.info("scan NFS Datastore start");
+                    dmeNFSAccessService.scanNfs();
+                    LOG.info("scan NFS Datastore end");
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    @Override
+    public void configureTaskTime(String taskId,String taskCron) throws Exception{
+        try {
+            if(!StringUtils.isEmpty(taskId) && !StringUtils.isEmpty(taskCron)) {
+                int re = scheduleDao.updateTaskTime(taskId,taskCron);
+                if(re>0){
+
+                }
+            }else{
+                throw new Exception("configure Task Time error:taskId or taskCorn is null");
+            }
+        } catch (Exception e) {
+            LOG.error("configure Task Time error:" + e.toString());
+            throw e;
+        }
+    }
+
+    @Override
     public Map<String, Object> getDmeHostGroup(String hostGroupId) throws Exception{
         Map<String, Object> map = new HashMap<>();
         String getHostGroupUrl = GET_DME_HOSTGROUP_URL;
@@ -543,5 +612,6 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         LOG.info("getDmeHostGroup relists===" + (gson.toJson(map)));
         return map;
     }
+
 
 }

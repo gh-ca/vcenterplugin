@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
+import com.dmeplugin.dmestore.model.EthPortInfo;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.DmeNFSAccessService;
 import com.dmeplugin.dmestore.services.HostAccessService;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,6 +52,31 @@ public class HostAccessController extends BaseController {
         } catch (Exception e) {
             LOG.error("configure iscsi failure:", e);
             failureStr = "configure iscsi failure:" + e.toString();
+        }
+        return failure(failureStr);
+    }
+
+    /**
+     * Test Connectivity:
+     * String hostObjectId：host object id
+     * List<Map<String, Object>> ethPorts: 要测试的以太网端口列表
+     *
+     * @param params: params include:hostObjectId,ethPorts
+     * @return: ResponseBodyBean
+     * @throws Exception when error
+     */
+    @RequestMapping(value = "/testconnectivity", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean testConnectivity(@RequestBody Map<String, Object> params)
+            throws Exception {
+        LOG.info("/testconnectivity==" + gson.toJson(params));
+        String failureStr = "";
+        try {
+            List<EthPortInfo> lists = hostAccessService.testConnectivity(params);
+            return success(lists);
+        } catch (Exception e) {
+            LOG.error("Test connectivity failure:", e);
+            failureStr = "Test connectivity failure:" + e.toString();
         }
         return failure(failureStr);
     }
