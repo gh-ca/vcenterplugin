@@ -9,22 +9,24 @@ import java.io.Serializable;
  */
 public class FileSystem  {
 
+
     private String id; //id
-    private String name;//Ãû³Æ
-    private String health_status; //×´Ì¬
-    private String alloc_type; //·ÖÅäÀàĞÍ
-    private Integer capacity_usage_ratio; //ÈİÁ¿ÀûÓÃÂÊ
-    private String storage_pool_name;//ËùÊô´æ´¢³ØÃû³Æ
+    private String name;//åç§°
+    private String health_status; //çŠ¶æ€
+    private String alloc_type; //åˆ†é…ç­–ç•¥
+    private Integer capacity_usage_ratio; //å®¹é‡ä½¿ç”¨ç‡
+    private String storage_pool_name;//å­˜å‚¨æ± åå­—
     private Integer nfs_count; //nfs
     private Integer cifs_count;//cifs
     private Integer dtree_count; //dtree
-    private Double capacity;//×ÜÈİÁ¿
+    private Double capacity;//æ€»å®¹é‡
 
 
     private Double allocate_quota_in_pool;
     private Double available_capacity;
     private Double min_size_fs_capacity;
     private String storage_id;
+
 
     public Double getAllocate_quota_in_pool() {
         return allocate_quota_in_pool;
