@@ -46,11 +46,5 @@ public class IniExecTask implements ApplicationListener<ContextRefreshedEvent> {
         }, 10, TimeUnit.SECONDS);
 
     }
-
-    private void test() {
-
-//        System.out.println("spring容易初始化完毕================================================");
-//        backgroundScanDatastoreTask.scanDatastore();
-    }
 }
 
