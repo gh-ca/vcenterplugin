@@ -188,9 +188,6 @@
     </bean>
     
     
-    <context:annotation-config/>
-    <!--spring扫描注解的配置-->
-    <context:component-scan base-package="com.dmeplugin.dmestore.task"/>
 
     <!--开启这个配置，spring才能识别@Scheduled注解-->
     <task:annotation-driven scheduler="qbScheduler" mode="proxy"/>
