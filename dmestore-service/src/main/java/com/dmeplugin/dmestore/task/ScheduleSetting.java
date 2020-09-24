@@ -29,6 +29,8 @@ public class ScheduleSetting implements SchedulingConfigurer {
     @Autowired
     private InstantiationBeanService instantiationBeanService;
 
+    private static List<ScheduleConfig> scheduleList;
+
     @Override
     public void configureTasks(ScheduledTaskRegistrar scheduledTaskRegistrar) {
         //初始化表
@@ -38,15 +40,27 @@ public class ScheduleSetting implements SchedulingConfigurer {
         reconfigureTasks();
     }
 
-    public void reconfigureTasks()
-    {
+    public void reconfigureTasks() {
         taskRegistrar.getTriggerTaskList().clear();
 
         // 获取所有任务
-        List<ScheduleConfig> scheduleList = scheduleDao.getScheduleList();
+        scheduleList = scheduleDao.getScheduleList();
         LOGGER.info("schedule size="+scheduleList.size());
         for (ScheduleConfig s : scheduleList){
             taskRegistrar.addTriggerTask(getRunnable(s), getTrigger(s));
+        }
+    }
+
+    //刷新任务
+    public void refreshTasks(int taskId,String cron){
+        // 获取所有任务
+        if(scheduleList!=null) {
+            LOGGER.info("schedule size=" + scheduleList.size());
+            for (ScheduleConfig s : scheduleList) {
+                if (s.getId() == taskId) {
+                    s.setCron(cron);
+                }
+            }
         }
     }
 

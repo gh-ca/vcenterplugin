@@ -4,6 +4,7 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.dao.DmeInfoDao;
 import com.dmeplugin.dmestore.dao.ScheduleDao;
 import com.dmeplugin.dmestore.entity.DmeInfo;
+import com.dmeplugin.dmestore.task.ScheduleSetting;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.google.gson.Gson;
@@ -37,6 +38,9 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     private VmfsAccessService vmfsAccessService;
 
     private DmeNFSAccessService dmeNFSAccessService;
+
+    @Autowired
+    private ScheduleSetting scheduleSetting;
 
     private Gson gson = new Gson();
 
@@ -576,7 +580,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             if(!StringUtils.isEmpty(taskId) && !StringUtils.isEmpty(taskCron)) {
                 int re = scheduleDao.updateTaskTime(taskId,taskCron);
                 if(re>0){
-
+                    scheduleSetting.refreshTasks(Integer.parseInt(taskId),taskCron);
                 }
             }else{
                 throw new Exception("configure Task Time error:taskId or taskCorn is null");
