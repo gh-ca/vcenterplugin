@@ -103,6 +103,7 @@ export class VmfsListComponent implements OnInit {
   chooseCluster: ClusterList; // 已选择的集群
   chooseUnmountDevice = []; // 已选择卸载的设备
   mountedDeviceList: HostOrCluster[] = []; // 已挂载的设备
+  storageType = 'vmfs'; // 扫描类型（扫描接口）
   // 生命周期： 初始化数据
   ngOnInit() {
     // 列表数据
@@ -179,12 +180,12 @@ export class VmfsListComponent implements OnInit {
     // 进行数据加载
     this.remoteSrv.getData(this.params)
         .subscribe((result: any) => {
+          console.log("result:");
           console.log(result);
           if (result.code === '0' && null != result.data ) {
             this.list = result.data;
             if (null !== this.list) {
               this.total = this.list.length;
-              this.isLoading = false;
               // 获取chart 数据
               const volumeIds = [];
               this.list.forEach(item => {
@@ -216,12 +217,27 @@ export class VmfsListComponent implements OnInit {
                   }
                 });
               }
-              this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
             }
           } else {
             console.log(result.description);
           }
+          this.isLoading = false;
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         });
+  }
+  // 点刷新那个功能是分两步，一步是刷新，然后等我们这边的扫描任务，任务完成后返回你状态，任务成功后，你再刷新列表页面。
+  scanDataStore() {
+    this.remoteSrv.scanVMFS(this.storageType).subscribe((res: any) => {
+      console.log('res');
+      console.log(res);
+      if (res.code === '0') {
+        this.refresh();
+        console.log('Scan success');
+      } else {
+        console.log('Scan faild');
+      }
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    });
   }
 
   // 主机或集群数据处理 deviceType: 设备类型、deviceName 设备名称、主机/集群ID
@@ -397,6 +413,11 @@ export class VmfsListComponent implements OnInit {
     this.setBlockSizeOptions();
     // 初始化数据
     this.deviceList = [];
+    // 初始化主机/集群选择数据
+    console.log('chooseDevice');
+    console.log(this.chooseDevice);
+    // Page2默认打开服务等级也页面
+    this.levelCheck = 'level';
     // 初始添加页面的主机集群信息
     this.setHostDatas().then(res => {
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -505,6 +526,7 @@ export class VmfsListComponent implements OnInit {
       }
       // 关闭删除页面
       this.delShow = false;
+      this.cdr.detectChanges();
     });
   }
   // 挂载按钮点击事件
@@ -551,6 +573,7 @@ export class VmfsListComponent implements OnInit {
       }
       // 隐藏挂载页面
       this.mountShow = false;
+      this.cdr.detectChanges();
     });
   }
   // 卸载处理函数
@@ -566,6 +589,7 @@ export class VmfsListComponent implements OnInit {
       }
       // 关闭卸载页面
       this.unmountShow = false;
+      this.cdr.detectChanges();
     });
   }
   // 回收空间 处理
@@ -583,6 +607,7 @@ export class VmfsListComponent implements OnInit {
       }
       // 关闭回收空间页面
       this.reclaimShow = false;
+      this.cdr.detectChanges();
     });
   }
   // 变更服务等级 按钮点击事件
@@ -615,6 +640,7 @@ export class VmfsListComponent implements OnInit {
       }
       // 关闭修改服务等级页面
       this.changeServiceLevelShow = false;
+      this.cdr.detectChanges();
     });
   }
   // 扩容按钮点击事件
@@ -656,6 +682,7 @@ export class VmfsListComponent implements OnInit {
       }
       // 隐藏扩容页面
       this.expandShow = false;
+      this.cdr.detectChanges();
     });
   }
 

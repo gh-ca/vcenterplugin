@@ -8,85 +8,89 @@ export class VmfsListService {
 
   // 主列表数据
   getData(params = {}) {
-    return this.http.get('http://localhost:8080/accessvmfs/listvmfs', params );
+    return this.http.get('accessvmfs/listvmfs', params );
   }
   // 附列表数据
   getChartData(volumeIds: string[] ) {
-    return this.http.get('http://localhost:8080/accessvmfs/listvmfsperformance', {params: {volumeIds}});
+    return this.http.get('accessvmfs/listvmfsperformance', {params: {volumeIds}});
   }
   // 获取存储
   getStorages() {
-    return this.http.get('http://localhost:8080/dmestorage/storages');
+    return this.http.get('dmestorage/storages');
   }
   // 通过存储ID获取存储池数据
   getStoragePoolsByStorId(storageId: string) {
-    return this.http.get('http://localhost:8080/dmestorage/storagepools', {params: {storageId}});
+    return this.http.get('dmestorage/storagepools', {params: {storageId}});
   }
 
   // 获取所有的主机
   getHostList() {
-    return this.http.get('http://localhost:8080/accessvmware/listhost');
+    return this.http.get('accessvmware/listhost');
   }
 
   // 获取所有的集群
   getClusterList() {
-    return this.http.get('http://localhost:8080/accessvmware/listcluster');
+    return this.http.get('accessvmware/listcluster');
   }
 
   // 通过名称获取主机
   getHostListByObjectId(objectId: string){
-    return this.http.get('http://localhost:8080/accessvmware/gethostsbydsobjectid?dataStoreObjectId=' + objectId);
+    return this.http.get('accessvmware/gethostsbydsobjectid?dataStoreObjectId=' + objectId);
   }
   // 通过名称获取集群
   getClusterListByObjectId(objectId: string){
-    return this.http.get('http://localhost:8080/accessvmware/getclustersbydsobjectid?dataStoreObjectId=' + objectId);
+    return this.http.get('accessvmware/getclustersbydsobjectid?dataStoreObjectId=' + objectId);
   }
 
 
   // 查询挂载的主机
   getMountHostOrCluSter(objectId: string) {
-    return this.http.get('http://localhost:8080/accessvmware/getclustersbydsobjectid?dataStoreObjectId=' + objectId);
+    return this.http.get('accessvmware/getclustersbydsobjectid?dataStoreObjectId=' + objectId);
   }
 
   // 获取所有的服务等级数据
   getServiceLevelList(params = {}) {
-    return this.http.put('http://localhost:8080/operatevmfs/listvmfsservicelevel', params);
+    return this.http.put('operatevmfs/listvmfsservicelevel', params);
   }
 
   // 创建vmfs
   createVmfs(params = {}) {
-     return  this.http.post('http://localhost:8080/accessvmfs/createvmfs', params);
+     return  this.http.post('accessvmfs/createvmfs', params);
   }
 
   // 修改VMFS
   updateVmfs(volumeId: string, params = {}) {
-    return  this.http.put('http://localhost:8080/operatevmfs/updatevmfs?volume_id=' + volumeId, params);
+    return  this.http.put('operatevmfs/updatevmfs?volume_id=' + volumeId, params);
   }
   // 删除
   delVmfs(params = {}) {
-    return  this.http.post('http://localhost:8080/accessvmfs/deletevmfs', params);
+    return  this.http.post('accessvmfs/deletevmfs', params);
   }
   // 卸载
   unmountVMFS(params = {}) {
-    return  this.http.post('http://localhost:8080/accessvmfs/mountvmfs', params);
+    return  this.http.post('accessvmfs/mountvmfs', params);
   }
   // 挂载
   mountVmfs(params = {}) {
-    return  this.http.post('http://localhost:8080/accessvmfs/mountvmfs', params);
+    return  this.http.post('accessvmfs/mountvmfs', params);
   }
   // 空间回收
   reclaimVmfs(params = {}) { // vmfs空间回收
-    return  this.http.post('http://localhost:8080/operatevmfs/recyclevmfs', params);
+    return  this.http.post('operatevmfs/recyclevmfs', params);
   }
 
   // 修改服务等级
   changeServiceLevel(params = {}) {
-    return  this.http.post('http://localhost:8080/operatevmfs/updatevmfsservicelevel', params);
+    return  this.http.post('operatevmfs/updatevmfsservicelevel', params);
   }
 
   // 扩容
   expandVMFS(params = {}) {
-    return  this.http.post('http://localhost:8080/operatevmfs/expandvmfs', params);
+    return  this.http.post('operatevmfs/expandvmfs', params);
+  }
+  // 扫描任务
+  scanVMFS(storageType: string) {
+    return  this.http.get('accessdme/scandatastore', {params: {storageType}});
   }
 
 }

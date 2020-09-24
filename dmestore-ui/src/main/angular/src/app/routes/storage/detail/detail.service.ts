@@ -6,27 +6,27 @@ export class DetailService {
   constructor(private http: HttpClient) {}
 
   getPoolList(params = {}){
-    return this.http.get('http://localhost:8080/dmestorage/storages', { params });
+    return this.http.get('dmestorage/storages', { params });
   }
 
   getStorageDetail(storageId: string){
-    return this.http.get('http://localhost:8080/dmestorage/storage', {params: {storageId}});
+    return this.http.get('dmestorage/storage', {params: {storageId}});
   }
 
   getStoragePoolList(storageId: string){
-    return this.http.get('http://localhost:8080/dmestorage/storagepools', {params: {storageId}});
+    return this.http.get('dmestorage/storagepools', {params: {storageId}});
   }
   getVolumeListList(storageId: string){
-    return this.http.get('http://localhost:8080/dmestorage/volumes', {params: {storageId}});
+    return this.http.get('dmestorage/volumes', {params: {storageId}});
   }
   getFileSystemList(storageId: string){
-    return this.http.get('http://localhost:8080/dmestorage/filesystems', {params: {storageId}});
+    return this.http.get('dmestorage/filesystems', {params: {storageId}});
   }
   getDtreeList(storageId: string){
-    return this.http.get('http://localhost:8080/dmestorage/dtrees', {params: {storageId}});
+    return this.http.get('dmestorage/dtrees', {params: {storageId}});
   }
   getShareList(storageId: string){
-    return this.http.get('http://localhost:8080/dmestorage/nfsshares', {params: {storageId}});
+    return this.http.get('dmestorage/nfsshares', {params: {storageId}});
   }
 }
 

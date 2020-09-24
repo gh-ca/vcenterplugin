@@ -6,7 +6,7 @@ export class FileSystemService {
   constructor(private http: HttpClient) {}
 
   getData(param) {
-    return this.http.get('http://localhost:8080/accessnfs/fileservice/'+param);
+    return this.http.get('accessnfs/fileservice/'+param);
   }
 }
 export class FsDetail{
