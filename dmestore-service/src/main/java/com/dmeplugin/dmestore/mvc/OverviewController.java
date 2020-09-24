@@ -2,7 +2,12 @@ package com.dmeplugin.dmestore.mvc;
 
 
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
+import com.dmeplugin.dmestore.services.OverviewService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * overview controller
@@ -10,6 +15,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class OverviewController extends BaseController{
 
+
+    @Autowired
+    private OverviewService overviewService;
     /**
      * get storage device num from dme(total,normal,abnormal)
      * @return ResponseBodyBean
@@ -18,7 +26,13 @@ public class OverviewController extends BaseController{
     @RequestMapping(value = "/getstoragenum", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean getStorageNum(){
-        return success();
+        try {
+            Map<String, Object> resMap = overviewService.getStorageNum();
+            return success(resMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failure();
+        }
     }
 
 
@@ -37,15 +51,13 @@ public class OverviewController extends BaseController{
     @RequestMapping(value = "/getdatastoreoverview", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean getDataStoreOverview(@RequestParam String type){
-        //type 0 :VMFS and NFS, 1:VMFS, 2:NFS
-        if ("0".equals(type)){
-
-        } else if ("1".equals(type)){
-
-        } else if ("2".equals(type)){
-
+        try {
+            Map<String, Object> resMap = overviewService.getDataStoreCapacitySummary(type);
+            return success(resMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failure();
         }
-        return success();
     }
 
     /**
@@ -74,36 +86,36 @@ public class OverviewController extends BaseController{
             topn = 5;
         }
         //type 0 :VMFS and NFS, 1:VMFS, 2:NFS
-        if ("0".equals(type)){
-
-        } else if ("1".equals(type)){
-
-        } else if ("2".equals(type)){
-
+        try {
+            List<Map<String, Object>> resMap = overviewService.getDataStoreCapacityTopN(type, topn);
+            return success(resMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failure();
         }
-        return success();
     }
 
 
     /**
      * get best practice violations
-     * @param type 0 :critical, 1:major, 2:warning, 3: info
      * @return ResponseBodyBean
-     * data like {"num": 5}
+     * data like {
+     *        critical : 5,
+     *        major: 2,
+     *        warning: 3,
+     *        info: 44
+     *        }
      */
     @RequestMapping(value = "/getbestpracticeviolations", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseBodyBean getBestPracticeViolations(@RequestParam String type){
+    public ResponseBodyBean getBestPracticeViolations(){
         //type 0 :critical, 1:major, 2:warning, 3: info
-        if ("0".equals(type)){
-
-        } else if ("1".equals(type)){
-
-        } else if ("2".equals(type)){
-
-        } else if ("4".equals(type)){
-
+        try {
+            Map<String, Object> resMap = overviewService.getBestPracticeViolations();
+            return success(resMap);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failure();
         }
-        return success();
     }
 }
