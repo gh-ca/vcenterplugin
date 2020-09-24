@@ -1,0 +1,181 @@
+/* You can add global styles to this file, and also import other style files */
+@import 'app/theme/style';
+@import 'styles/themes';
+@import 'styles/custom';
+@import 'styles/grid';
+@import 'styles/helpers';
+@import 'styles/plugins';
+
+.mat-card{
+  font-family: "Metropolis","Avenir Next","Helvetica Neue","PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+}
+.mat-card-subtitle{
+  color: rgb(90, 90, 90);
+  font-weight: bold;
+  font-size: 16px;
+}
+.gh-btngroup-header{
+  display: flex;
+  justify-content: space-between;
+}
+.gh-info-wrap{
+  display: flex;
+  flex-wrap: wrap;
+  .gh-info-item{
+
+  }
+}
+.gh-info-lable{
+  display: inline-block;
+  width: 150px;
+  text-align: left;
+  font-weight: 500;
+  font-size: 14px;
+  color: #A5A5A5;
+  line-height: 40px;
+  padding: 0 12px 0 0;
+  flex-shrink:0;
+}
+.gh-info-value{
+  display: inline-block;
+  text-align: left;
+  font-size: 14px;
+  line-height: 40px;
+  color: #303133;
+}
+.gh-info-head{
+  margin: 20px 0;
+  font-size: 20px;
+  color: #303133;
+}
+.info-card{
+  padding: 30px;
+  border: solid 1px hsl(198, 0%, 80%);
+  background-color: #fff;
+  .info-card-header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+}
+.info-card-header{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  .info-card-title{
+    font-size: 18px;
+    color: var(--clr-card-title-color, black);
+    font-weight: var(--clr-card-title-font-weight, 200);
+    font-size: .9rem;
+  }
+}
+.info-card-content{
+  display: flex;
+}
+.info-card-squre{
+  margin-right: 50px;
+  width: 80px;
+  height: 200px;
+  border: solid 2px hsl(198, 69%, 69%);
+  border-radius: 2px;
+  position: relative;
+  .squre-per-box{
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    border-top: solid 1px hsl(198, 69%, 69%);
+    background-image: linear-gradient(hsl(198, 69%, 69%), #fff);
+  }
+  .squre-num{
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    font-size: 12px;
+    text-align: center;
+  }
+}
+
+.info-header-left{
+  display: flex;
+  align-items: flex-end;
+}
+.info-header-content{
+  margin-left: 10px;
+  .title{
+    color: hsl(198, 100%, 32%);
+    font-size: 16px;
+    margin-bottom: 5px;
+  }
+  .text{
+    color: #303133;
+    .is-highlight{
+      margin-left: 5px;
+    }
+  }
+  .header-divide{
+    width: 1px;
+    height: 100%;
+    margin: 0 5px;
+    border-left: solid 2px hsl(198, 0%, 55%);
+  }
+}
+.border-header{
+  padding-bottom: 20px;
+  border-bottom: solid 1px hsl(198, 0%, 55%);
+}
+.info-content-title{
+  font-size: 18px;
+  color: #303133;
+}
+.info-charts-wrap{
+  display: flex;
+  align-items: center;
+  color: #303133;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+.info-content{
+  margin-left: 30px;
+}
+.info-content-text{
+  margin: 10px 0;
+  position: relative;
+  span:first-child{
+    width: 60px;
+    display: inline-block;
+  }
+  .squre{
+    position: absolute;
+    left: -20px;
+    top: 1px;
+    width: 14px;
+    height: 14px;
+  }
+  .used{
+    background-color: hsl(198, 100%, 32%);
+    border: solid 1px hsl(198, 100%, 24%);
+  }
+  .free{
+    background-color: hsl(198, 0%, 80%);
+    border: solid 1px hsl(198, 0%, 55%);
+  }
+}
+.info-content-bottom{
+  margin-top: 20px;
+  display: flex;
+  text-align: center;
+  .info-bottom-box{
+    margin-left: 20px;
+    .num{
+      color: #303133;
+      font-size: 18px;
+    }
+    .bottom-label{
+      margin-top: 5px;
+      font-size: 16px;
+    }
+  }
+}

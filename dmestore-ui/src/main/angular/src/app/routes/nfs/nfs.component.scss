@@ -1,0 +1,17 @@
+.inputOneLine{
+  border-bottom: 1px solid #dbdbdb;
+  border-top:0px;
+  border-left:0px;
+  border-right:0px;
+  width:80px;
+};
+.merginTop{
+  margin-top: 10px;
+}
+.merginLeft{
+  margin-left: 20px;
+  border-style: solid;
+}
+.btn+.btn {
+  border-left: 0.05rem solid;
+}

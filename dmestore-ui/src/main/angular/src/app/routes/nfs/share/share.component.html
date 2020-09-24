@@ -1,0 +1,32 @@
+<div *ngIf="shareDetail">
+    <table class="table table-noborder">
+    <tr>
+      <td class="left">{{'nfs.share.name' | translate}}</td>
+      <td class="left">{{shareDetail.name}}</td>
+      <td class="left">{{'nfs.share.sharePath' | translate}}</td>
+      <td class="left">{{shareDetail.share_path}}</td>
+    </tr>
+    <tr>
+      <td class="left">{{'nfs.share.dtree' | translate}}</td>
+      <td class="left">{{shareDetail.owning_dtree_name}}</td>
+
+      <td class="left">{{'nfs.share.description' | translate}}</td>
+      <td class="left">{{shareDetail.description}}</td>
+    </tr>
+  </table>
+  <h3>{{'nfs.share.clientInfo' | translate}}</h3>
+  <clr-datagrid>
+    <clr-dg-column>{{'nfs.share.nameAddr' | translate}}</clr-dg-column>
+    <clr-dg-column>{{'nfs.share.type' | translate}}</clr-dg-column>
+    <clr-dg-column>{{'nfs.share.permission' | translate}}</clr-dg-column>
+    <clr-dg-row *ngFor="let item of shareDetail.auth_client_list" [clrDgItem]="item">
+      <clr-dg-cell>{{item.name}}</clr-dg-cell>
+      <clr-dg-cell>{{item.type}}</clr-dg-cell>
+      <clr-dg-cell>{{item.accessval}}</clr-dg-cell>
+    </clr-dg-row>
+  </clr-datagrid>
+</div>
+<div *ngIf="!shareDetail">
+  未查询到数据
+</div>
+
