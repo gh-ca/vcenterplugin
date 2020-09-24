@@ -13,7 +13,7 @@ import {
   ClusterList,
   ServiceLevelList, HostOrCluster, GetForm,
 } from './list.service';
-import {ClrDatagridStateInterface} from '@clr/angular';
+import {ClrDatagridStateInterface, ClrWizard, ClrWizardPage} from '@clr/angular';
 import {GlobalsService} from '../../../shared/globals.service';
 import {Cluster, Host} from '../../nfs/nfs.service';
 
@@ -34,7 +34,12 @@ export class VmfsListComponent implements OnInit {
     return data || {}
   } */
   constructor(private remoteSrv: VmfsListService, private cdr: ChangeDetectorRef, public gs: GlobalsService) {}
-  expendActive = false // 示例
+  // 添加页面窗口
+  @ViewChild('wizard') wizard: ClrWizard;
+  @ViewChild('addPageOne') addPageOne: ClrWizardPage;
+  @ViewChild('addPageTwo') addPageTwo: ClrWizardPage;
+
+  expendActive = false; // 示例
   list: List[] = []; // 数据列表
   radioCheck = 'list'; // 切换列表页显示
   levelCheck = 'level'; // 是否选择服务等级：level 选择服务器等级 customer 未选择服务等级
@@ -96,6 +101,8 @@ export class VmfsListComponent implements OnInit {
   mountForm = new GetForm().getMountForm();
   chooseHost: HostList; // 已选择的主机
   chooseCluster: ClusterList; // 已选择的集群
+  chooseUnmountDevice = []; // 已选择卸载的设备
+  mountedDeviceList: HostOrCluster[] = []; // 已挂载的设备
   // 生命周期： 初始化数据
   ngOnInit() {
     // 列表数据
@@ -384,6 +391,8 @@ export class VmfsListComponent implements OnInit {
     this.form = new GetForm().getAddForm();
     // 添加页面显示
     this.popShow = true;
+    // 添加页面默认打开首页
+    this.jumpTo(this.addPageOne, this.wizard);
     // 版本、块大小、粒度下拉框初始化
     this.setBlockSizeOptions();
     // 初始化数据
@@ -396,6 +405,15 @@ export class VmfsListComponent implements OnInit {
     this.setClusterDatas();
     // 初始化服务等级数据
     this.setServiceLevelList();
+  }
+  // 页面跳转
+  jumpTo(page: ClrWizardPage, wizard: ClrWizard) {
+    if (page && page.completed) {
+      wizard.navService.currentPage = page;
+    } else {
+      wizard.navService.setLastEnabledPageCurrent();
+    }
+    this.wizard.open();
   }
   // 获取服务等级数据
   setServiceLevelList() {
@@ -640,4 +658,6 @@ export class VmfsListComponent implements OnInit {
       this.expandShow = false;
     });
   }
+
+
 }

@@ -1,43 +1,54 @@
 
 <form clrForm>
-  <clr-input-container>
-    <input hidden clrInput type="text" [(ngModel)]="configModel.hostId" name="hostId" />
-    <label>Host vKernel IP</label>:
-    <input clrInput type="text" [(ngModel)]="configModel.hostIp" name="hostIp" />
-  </clr-input-container>
-  <!--存储设备 -->
+  <clr-select-container>
+    <label>vmKernel</label>:
+    <select clrSelect (ngModelOptions)="ips"  [(ngModel)]="configModel.vmKernel.device" name="hostIp" >
+      <option *ngFor="let item of ips" value="{{item.device}}">{{item.ipAddress}}</option>
+    </select>
+  </clr-select-container>
   <clr-select-container>
     <label>Storage Device</label>:
-    <select clrSelect (change)="loadPorts();" (ngModelOptions)="storageDevices"  [(ngModel)]="configModel.storageDeviceId" name="storageDeviceId" >
-      <option *ngFor="let item of storageDevices" value="{{item.id}}">{{item.name}}</option>
+    <select clrSelect (change)="loadPorts();" (ngModelOptions)="storageDevices"  [(ngModel)]="configModel.sn" name="storageDeviceId" >
+      <option *ngFor="let item of storageDevices" value="{{item.sn}}">{{item.name}}</option>
     </select>
   </clr-select-container>
 </form>
-<clr-datagrid [(clrDgSelected)]="portSelected"   [clrDgLoading]="portLoading">
+<clr-datagrid [(clrDgSelected)]="configModel.ethPorts"   [clrDgLoading]="portLoading">
 
   <clr-dg-column [clrDgField]="'location'">Location</clr-dg-column>
-  <clr-dg-column [clrDgField]="'status'">status</clr-dg-column>
-  <clr-dg-column [clrDgField]="'ipv4Address'">IPv4 Address</clr-dg-column>
-  <clr-dg-column [clrDgField]="'ipv6Address'">IPv6 Address</clr-dg-column>
-  <clr-dg-column [clrDgField]="'workingRate'">Working Rate(Mbps)</clr-dg-column>
-  <clr-dg-column [clrDgField]="'iops'">IOPS</clr-dg-column>
-  <clr-dg-column [clrDgField]="'latency'">Latency(ms)</clr-dg-column>
-  <clr-dg-column [clrDgField]="'bandwidth'">BandWidth(MB/s)</clr-dg-column>
-  <clr-dg-column [clrDgField]="'usage'">Usage(%)</clr-dg-column>
-
-
+  <clr-dg-column [clrDgField]="'portName'">Port Name</clr-dg-column>
+  <clr-dg-column [clrDgField]="'mac'">Mac Address</clr-dg-column>
+  <clr-dg-column [clrDgField]="'maxSpeed'">Max Working Rate(Mbps)</clr-dg-column>
+  <clr-dg-column [clrDgField]="'mgmtIp'">IPv4 Address</clr-dg-column>
+  <clr-dg-column [clrDgField]="'mgmtIpv6'">IPv6 Address</clr-dg-column>
+  <clr-dg-column [clrDgField]="'speed'">Working Rate(Mbps)</clr-dg-column>
+  <clr-dg-column [clrDgField]="'status'">Health Status</clr-dg-column>
   <clr-dg-column [clrDgField]="'connectStatus'">Connect Status</clr-dg-column>
 
   <clr-dg-row *ngFor="let item of portList" [clrDgItem]="item">
     <clr-dg-cell>{{item.location}}</clr-dg-cell>
+    <clr-dg-cell>{{item.portName}}</clr-dg-cell>
+    <clr-dg-cell>
+      <span *ngIf="item.mac == ''">--</span>
+      <span *ngIf="item.mac != ''">{{item.mac}}</span>
+    </clr-dg-cell>
+    <clr-dg-cell>
+      <span *ngIf="item.maxSpeed == -1">--</span>
+      <span *ngIf="item.maxSpeed != -1">{{item.maxSpeed}}</span>
+    </clr-dg-cell>
+    <clr-dg-cell>
+      <span *ngIf="item.mgmtIp == ''">--</span>
+      <span *ngIf="item.mgmtIp != ''">{{item.mgmtIp}}</span>
+    </clr-dg-cell>
+    <clr-dg-cell>
+      <span *ngIf="item.mgmtIpv6 == ''">--</span>
+      <span *ngIf="item.mgmtIpv6 != ''">{{item.mgmtIpv6}}</span>
+    </clr-dg-cell>
+    <clr-dg-cell>
+      <span *ngIf="item.speed == -1">--</span>
+      <span *ngIf="item.speed != -1">{{item.speed}}</span>
+    </clr-dg-cell>
     <clr-dg-cell>{{item.status}}</clr-dg-cell>
-    <clr-dg-cell>{{item.ipv4Address}}</clr-dg-cell>
-    <clr-dg-cell>{{item.ipv6Address}}</clr-dg-cell>
-    <clr-dg-cell>{{item.workingRate}}</clr-dg-cell>
-    <clr-dg-cell>{{item.iops}}</clr-dg-cell>
-    <clr-dg-cell>{{item.bandwidth}}</clr-dg-cell>
-    <clr-dg-cell>{{item.bandwidth}}</clr-dg-cell>
-    <clr-dg-cell>{{item.usage}}</clr-dg-cell>
     <clr-dg-cell>{{item.connectStatus}}</clr-dg-cell>
   </clr-dg-row>
 
@@ -51,5 +62,5 @@
 
 </clr-datagrid>
 
-<button type="button" class="btn btn-outline" (click)="popShow=false">Cancel</button>
+<!--<button type="button" class="btn btn-outline" (click)="popShow=false">Cancel</button>-->
 <button type="button" class="btn btn-primary" (click)="submit()">Ok</button>

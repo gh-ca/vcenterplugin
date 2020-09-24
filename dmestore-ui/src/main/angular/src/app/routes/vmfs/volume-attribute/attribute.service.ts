@@ -5,8 +5,8 @@ import { HttpClient } from '@angular/common/http';
 export class AttributeService {
   constructor(private http: HttpClient) {}
 
-  getData(volumnId: string) {
-    return this.http.get('http://localhost:8080/accessvmfs/volume/' + volumnId );
+  getData(storageObjectId: string) {
+    return this.http.get('http://localhost:8080/accessvmfs/volume/' + storageObjectId );
   }
 }
 export interface VolumeInfo{

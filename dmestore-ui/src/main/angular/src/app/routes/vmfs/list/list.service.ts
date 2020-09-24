@@ -42,6 +42,12 @@ export class VmfsListService {
     return this.http.get('http://localhost:8080/accessvmware/getclustersbydsobjectid?dataStoreObjectId=' + objectId);
   }
 
+
+  // 查询挂载的主机
+  getMountHostOrCluSter(objectId: string) {
+    return this.http.get('http://localhost:8080/accessvmware/getclustersbydsobjectid?dataStoreObjectId=' + objectId);
+  }
+
   // 获取所有的服务等级数据
   getServiceLevelList(params = {}) {
     return this.http.put('http://localhost:8080/operatevmfs/listvmfsservicelevel', params);
@@ -82,6 +88,7 @@ export class VmfsListService {
   expandVMFS(params = {}) {
     return  this.http.post('http://localhost:8080/operatevmfs/expandvmfs', params);
   }
+
 }
 // vmfs列表
 export interface List {
@@ -255,6 +262,12 @@ export class GetForm {
       mountType: '1' // 挂载的设备类型 1 服务器、0 集群 前端自用参数
     };
     return mountForm;
+  }
+  getUnmountForm() {
+    const unmount = {
+      host: null,
+      hostId: null
+    };
   }
 }
 
