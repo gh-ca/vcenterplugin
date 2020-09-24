@@ -4,11 +4,29 @@ import { HttpClient } from '@angular/common/http';
 @Injectable()
 export class DetailService {
   constructor(private http: HttpClient) {}
+
   getPoolList(params = {}){
     return this.http.get('http://localhost:8080/dmestorage/storages', { params });
   }
+
   getStorageDetail(storageId: string){
     return this.http.get('http://localhost:8080/dmestorage/storage', {params: {storageId}});
+  }
+
+  getStoragePoolList(storageId: string){
+    return this.http.get('http://localhost:8080/dmestorage/storagepools', {params: {storageId}});
+  }
+  getVolumeListList(storageId: string){
+    return this.http.get('http://localhost:8080/dmestorage/volumes', {params: {storageId}});
+  }
+  getFileSystemList(storageId: string){
+    return this.http.get('http://localhost:8080/dmestorage/filesystems', {params: {storageId}});
+  }
+  getDtreeList(storageId: string){
+    return this.http.get('http://localhost:8080/dmestorage/dtrees', {params: {storageId}});
+  }
+  getShareList(storageId: string){
+    return this.http.get('http://localhost:8080/dmestorage/nfsshares', {params: {storageId}});
   }
 }
 
@@ -28,15 +46,6 @@ export class StorageDetail{
   freeEffectiveCapacity: number;
   location: number;
   azIds: string[];
-  storagePool: StoragePool[];
-  volume: Volume[];
-  fileSystem: FileSystem[];
-  dtrees: Dtrees[];
-  nfsShares: NfsShare[];
-  bandPorts: BandPorts[];
-  logicPorts: LogicPorts[];
-  storageControllers: StorageControllers[];
-  storageDisks: StorageDisk[];
 }
 
 export class StoragePool{

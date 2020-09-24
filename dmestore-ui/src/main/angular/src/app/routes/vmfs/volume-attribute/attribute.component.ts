@@ -23,7 +23,7 @@ export class AttributeComponent implements OnInit {
   ngOnInit(): void {
     const ctx = this.gs.getClientSdk().app.getContextObjects();
     // const objectId=ctx[0].id;
-    const objectId = '123';
+    const objectId = 'urn:vmomi:Datastore:datastore-183:f8e381d7-074b-4fa9-9962-9a68ab6106e1';
     this.getVolumeInfoByVolID(objectId);
   }
 
