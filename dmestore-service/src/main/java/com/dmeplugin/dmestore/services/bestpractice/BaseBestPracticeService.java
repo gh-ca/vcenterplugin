@@ -1,7 +1,9 @@
 package com.dmeplugin.dmestore.services.bestpractice;
 
+import com.dmeplugin.vmware.VCConnectionHelper;
 import com.dmeplugin.vmware.mo.HostMO;
 import com.dmeplugin.vmware.util.VmwareContext;
+import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.OptionValue;
 
 import java.util.List;
@@ -14,10 +16,19 @@ import java.util.List;
  * @Version V1.0
  **/
 public class BaseBestPracticeService {
+    protected VCConnectionHelper vcConnectionHelper;
 
-    protected boolean check(VmwareContext context, String hostName,
+    public VCConnectionHelper getVcConnectionHelper() {
+        return vcConnectionHelper;
+    }
+
+    public void setVcConnectionHelper(VCConnectionHelper vcConnectionHelper) {
+        this.vcConnectionHelper = vcConnectionHelper;
+    }
+
+    protected boolean check(VmwareContext context, String objectId,
                             String hostSetting, Object recommendValue) throws Exception {
-        Object v = getCurrentValue(context, hostName, hostSetting);
+        Object v = getCurrentValue(context, objectId, hostSetting);
         if (String.valueOf(v).equals(String.valueOf(recommendValue))) {
             return true;
         }
@@ -25,9 +36,13 @@ public class BaseBestPracticeService {
         return false;
     }
 
-    protected void update(VmwareContext context, String hostName,
+    protected void update(VmwareContext context, String objectId,
                           String hostSetting, Object recommendValue) throws Exception {
-        HostMO hostMo = new HostMO(context, hostName);
+        if (check(context, objectId, hostSetting, recommendValue)) {
+            return;
+        }
+        ManagedObjectReference mor = vcConnectionHelper.objectID2MOR(objectId);
+        HostMO hostMo = new HostMO(context, mor);
         List<OptionValue> values = hostMo.getHostAdvanceOptionMO().queryOptions(hostSetting);
         for (OptionValue value : values) {
             value.setValue(recommendValue);
@@ -36,8 +51,9 @@ public class BaseBestPracticeService {
     }
 
     protected Object getCurrentValue(VmwareContext context,
-                                     String hostName, String hostSetting) throws Exception {
-        HostMO hostMo = new HostMO(context, hostName);
+                                     String objectId, String hostSetting) throws Exception {
+        ManagedObjectReference mor = vcConnectionHelper.objectID2MOR(objectId);
+        HostMO hostMo = new HostMO(context, mor);
         List<OptionValue> values = hostMo.getHostAdvanceOptionMO().queryOptions(hostSetting);
         for (OptionValue value : values) {
             return value.getValue();
@@ -45,26 +61,31 @@ public class BaseBestPracticeService {
         return null;
     }
 
-    protected boolean checkModuleOption(VmwareContext context, String hostName,
+    protected boolean checkModuleOption(VmwareContext context, String objectId,
                                         String optionName, Object recommendValue) throws Exception {
-        String currentValue = getCurrentModuleOption(context, hostName, optionName);
+        String currentValue = getCurrentModuleOption(context, objectId, optionName);
         if (currentValue.equals(String.valueOf(recommendValue))) {
             return true;
         }
         return false;
     }
 
-    protected String getCurrentModuleOption(VmwareContext context, String hostName, String optionName) throws Exception {
-        HostMO hostMo = new HostMO(context, hostName);
+    protected String getCurrentModuleOption(VmwareContext context, String objectId, String optionName) throws Exception {
+        ManagedObjectReference mor = vcConnectionHelper.objectID2MOR(objectId);
+        HostMO hostMo = new HostMO(context, mor);
         String modlueOption = hostMo.getHostKernelModuleSystemMO().queryConfiguredModuleOptionString(optionName);
         //拆分值
         String[] s = modlueOption.split("=");
         return s[1];
     }
 
-    protected void updateModuleOption(VmwareContext context, String hostName,
+    protected void updateModuleOption(VmwareContext context, String objectId,
                                       String optionName, Object recommendValue) throws Exception {
-        HostMO hostMo = new HostMO(context, hostName);
+        if (checkModuleOption(context, objectId, optionName, recommendValue)) {
+            return;
+        }
+        ManagedObjectReference mor = vcConnectionHelper.objectID2MOR(objectId);
+        HostMO hostMo = new HostMO(context, mor);
         String v = optionName + "=" + String.valueOf(recommendValue);
         hostMo.getHostKernelModuleSystemMO().updateModuleOptionString(optionName, v);
     }

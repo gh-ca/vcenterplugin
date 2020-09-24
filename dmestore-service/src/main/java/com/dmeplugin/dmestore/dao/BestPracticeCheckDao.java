@@ -3,6 +3,8 @@ package com.dmeplugin.dmestore.dao;
 
 import com.dmeplugin.dmestore.exception.DataBaseException;
 import com.dmeplugin.dmestore.model.BestPracticeBean;
+import com.dmeplugin.dmestore.model.BestPracticeUpResultBase;
+import com.dmeplugin.dmestore.model.BestPracticeUpResultResponse;
 import org.springframework.util.StringUtils;
 
 import java.sql.*;
@@ -32,7 +34,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             //不自动提交
             con.setAutoCommit(false);
             for (BestPracticeBean bean : list) {
-                pstm.setString(1, bean.getHostId());
+                pstm.setString(1, bean.getHostObjectId());
                 pstm.setString(2, bean.getHostName());
                 pstm.setString(3, bean.getHostSetting());
                 pstm.setString(4, bean.getRecommendValue());
@@ -100,7 +102,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             rs = ps.executeQuery();
             while (rs.next()) {
                 BestPracticeBean bean = new BestPracticeBean();
-                bean.setHostId(rs.getString("HOST_ID"));
+                bean.setHostObjectId(rs.getString("HOST_ID"));
                 bean.setHostName(rs.getString("HOST_NAME"));
                 bean.setHostSetting(rs.getString("HOST_SETTING"));
                 bean.setRecommendValue(rs.getString("RECOMMEND_VALUE"));
@@ -134,7 +136,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             rs = ps.executeQuery();
             while (rs.next()) {
                 BestPracticeBean bean = new BestPracticeBean();
-                bean.setHostId(rs.getString("HOST_ID"));
+                bean.setHostObjectId(rs.getString("HOST_ID"));
                 bean.setHostName(rs.getString("HOST_NAME"));
                 bean.setHostSetting(rs.getString("HOST_SETTING"));
                 bean.setRecommendValue(rs.getString("RECOMMEND_VALUE"));
@@ -151,6 +153,40 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             closeConnection(con, ps, rs);
         }
         return lists;
+    }
+
+    public void deleteBy(List<BestPracticeUpResultResponse> list) {
+        if (null == list || list.size() == 0) {
+            return;
+        }
+
+        Connection con = null;
+        PreparedStatement pstm = null;
+        try {
+            con = getConnection();
+            String sql = "delete from HW_BEST_PRACTICE_CHECK where host_id=? and host_setting=?";
+            pstm = con.prepareStatement(sql);
+            con.setAutoCommit(false);
+            for (BestPracticeUpResultResponse response : list) {
+                List<BestPracticeUpResultBase> baseList = response.getResult();
+                for(BestPracticeUpResultBase base : baseList){
+                    pstm.setString(1, base.getHostObjectId());
+                    pstm.setString(2, base.getHostSetting());
+                }
+                pstm.addBatch();
+            }
+            pstm.executeBatch();
+            con.commit();
+        } catch (Exception ex) {
+            try {
+                //回滚
+                con.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } finally {
+            closeConnection(con, pstm, null);
+        }
     }
 
 

@@ -1,5 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.model.FileSystem;
+import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.model.TaskDetailInfo;
 import com.dmeplugin.dmestore.model.TaskDetailResource;
 import com.dmeplugin.dmestore.mvc.VmfsOperationController;
@@ -28,6 +30,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     private final String API_NFSSHARE_CREATE = "/rest/fileservice/v1/nfs-shares";
     private final String API_STORAGEPOOL_LIST = "/rest/storagemgmt/v1/storagepools/query";
     private final String API_FS_UPDATE = "/rest/fileservice/v1/filesystems";
+    //private final String API_NFS_CHANGECAPACITY = "/rest/fileservice/v1/filesystems";
+    private final String API_FILESYSTEMS_DETAIL = "/rest/fileservice/v1/filesystems/";
 
     public static final Logger LOG = LoggerFactory.getLogger(VmfsOperationController.class);
     private DmeAccessService dmeAccessService;
@@ -304,6 +308,106 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         return resMap;
     }
 
+    @Override
+    public ResponseBodyBean changeNfsCapacity(Map<String, String> params) {
+
+        ResponseBodyBean responseBodyBean = new ResponseBodyBean();
+        responseBodyBean.setCode("202");
+        responseBodyBean.setDescription("change nfs storage capacity success!");
+
+        String file_system_id = params.get("file_system_id");
+        String is_expand = params.get("is_expand");
+        String capacity = params.get("capacity");
+        if (params==null ||params.size()==0||StringUtils.isEmpty(file_system_id)
+                ||StringUtils.isEmpty(is_expand)||StringUtils.isEmpty(capacity)) {
+            responseBodyBean.setCode("202");
+            responseBodyBean.setDescription("change nfs storage capacity error,params error!");
+            return responseBodyBean;
+        }
+
+        String url = API_FS_UPDATE + "/" + file_system_id;
+
+        //查询指定fs拿对应的信息
+        Integer code = 0;
+        try {
+            FileSystem fileSystem = null;
+            Double data_space = null;
+            Map<String, String> orientedFileSystem = getOrientedFs(file_system_id);
+            if (orientedFileSystem.get("code").equals("200")) {
+                String fs = orientedFileSystem.get("data");
+                if (!StringUtils.isEmpty(fs)) {
+                    fileSystem = gson.fromJson(fs, FileSystem.class);
+                }
+            }
+            if (fileSystem != null) {
+                String storage_id = fileSystem.getStorage_id();
+                String storage_pool_name = fileSystem.getStorage_pool_name();
+                //Double allocate_quota_in_pool = fileSystem.getAllocate_quota_in_pool();
+                Double min_size_fs_capacity = fileSystem.getMin_size_fs_capacity();
+                Double available_capacity = fileSystem.getAvailable_capacity();
+                String alloc_type = fileSystem.getAlloc_type();
+                Double currentCapacity = fileSystem.getCapacity();
+                Integer capacity_usage_ratio = fileSystem.getCapacity_usage_ratio();
+                //查询存储池详情
+                Map<String, Object> storagePoolMap = getDataspaceOfStoragepool(storage_pool_name, null, storage_id);
+                if (storagePoolMap.get("code").toString().equals("200")) {
+                    if (storagePoolMap.get("data_space") != null) {
+                        data_space = Double.valueOf(storagePoolMap.get("data_space").toString());
+                    }
+                }
+                Double exchangedCapacity = null;
+                Double changeCapacity = Double.valueOf(capacity);
+                if (Boolean.valueOf(is_expand)) {
+                    //扩容
+                    if (data_space != null && Double.compare(Double.valueOf(capacity), data_space) > 1) {
+                        LOG.info("扩容量超出存储池可用容量，将当前存储池可用容量当做扩容量!");
+                        changeCapacity = data_space;
+                        exchangedCapacity = changeCapacity + currentCapacity;
+                    }
+                } else {
+                    //缩容
+                    if (!StringUtils.isEmpty(alloc_type) && alloc_type.equals("thin")) {
+                        //thin 分配策略缩容
+                        // 该文件系统总容量-可用容量-文件系统能缩容的最小空间=实际可用缩小容量与变化量进行比较
+                        if (Double.compare(changeCapacity, currentCapacity - available_capacity - min_size_fs_capacity) > 1) {
+                            //changeCapacity = currentCapacity - available_capacity - min_size_fs_capacity;
+                            LOG.info("thin策略：nfs预计缩容到Thin文件系统能缩容的最小空间!");
+                            exchangedCapacity = min_size_fs_capacity;
+                        } else {
+                            exchangedCapacity = currentCapacity - changeCapacity;
+                        }
+                    } else {
+                        //thick 分配策略缩容
+                        if (Double.compare(currentCapacity * capacity_usage_ratio, currentCapacity - changeCapacity) > 1) {
+                            exchangedCapacity = currentCapacity * capacity_usage_ratio;
+                        } else {
+                            exchangedCapacity = currentCapacity - changeCapacity;
+                        }
+                    }
+                }
+                Map<String, String> reqParam = new HashMap<>();
+                reqParam.put("file_system_id", file_system_id);
+                reqParam.put("capacity", gson.toJson(exchangedCapacity));
+                ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(reqParam));
+                code = responseEntity.getStatusCodeValue();
+                if (code != 200) {
+                    responseBodyBean.setCode(code.toString());
+                    responseBodyBean.setDescription("expand nfs storage capacity error!");
+                    return responseBodyBean;
+                }
+                String obgect = responseEntity.getBody();
+                JsonObject jsonObject = new JsonParser().parse(obgect).getAsJsonObject();
+                String task_id = jsonObject.get("task_id").getAsString();
+                responseBodyBean.setData("task_id:"+task_id);
+            }
+        } catch (Exception e) {
+            LOG.error("change nfs storage capacity error!",e);
+            responseBodyBean.setCode(gson.toJson(code));
+            responseBodyBean.setDescription("change nfs storage capacity error!"+e.getMessage());
+        }
+        return responseBodyBean;
+    }
+
     //create file system
     private Map<String, Object> createFileSystem(Map<String, String> params, String storage_pool_id) throws Exception {
         Map<String, Object> resMap = new HashMap<>();
@@ -326,7 +430,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         Double freeCapacity = null;
         Double data_space = null;
         if (!StringUtils.isEmpty(storage_id) || !StringUtils.isEmpty(storage_pool_id)) {
-            Map<String, Object> resBody = getDataspaceOfStoragepool(storage_id, storage_pool_id);
+            Map<String, Object> resBody = getDataspaceOfStoragepool(null, storage_id, storage_pool_id);
             if (ToolUtils.getInt(resBody.get("code")) == 200) {
                 data_space = Double.valueOf(resBody.get("data_space").toString());
                 if (freeCapacity == null && data_space != null) {
@@ -400,20 +504,20 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         return resMap;
     }
     //get oriented storage pool data_space
-    private Map<String,Object> getDataspaceOfStoragepool(String pool_id,String storage_id) throws Exception {
+    private Map<String,Object> getDataspaceOfStoragepool(String storage_pool_name,String pool_id,String storage_id) throws Exception {
 
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 200);
         resMap.put("msg", "get oriented data space of storage pool success!");
 
-        if (StringUtils.isEmpty(pool_id) || StringUtils.isEmpty(storage_id)) {
-            resMap.put("code", 403);
-            resMap.put("msg", "params error ,please check your params!");
-            return resMap;
-        }
         Map<String, String> reqBody = new HashMap<>();
+        if (!StringUtils.isEmpty(pool_id)) {
+            reqBody.put("pool_id", pool_id);
+        }
+        if (!StringUtils.isEmpty(storage_pool_name)) {
+            reqBody.put("storage_pool_name", storage_pool_name);
+        }
         reqBody.put("storage_id",storage_id);
-        reqBody.put("pool_id", pool_id);
 
         ResponseEntity<String> responseEntity = dmeAccessService.access(API_STORAGEPOOL_LIST, HttpMethod.POST, gson.toJson(reqBody));
         LOG.info("url:{" + API_STORAGEPOOL_LIST + "},responseEntity:" + responseEntity);
@@ -486,6 +590,37 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             }
         }
         return fsId;
+    }
+
+    private Map<String, String> getOrientedFs(String file_system_id) throws Exception {
+
+        Map<String, String> resMap = new HashMap<>();
+        resMap.put("code", "200");
+        resMap.put("msg", "list filesystem success!");
+
+        String url = API_FILESYSTEMS_DETAIL + "/" + file_system_id;
+
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+        int code = responseEntity.getStatusCodeValue();
+        if (code != 200) {
+            resMap.put("code", String.valueOf(code));
+            resMap.put("msg", "list filesystem success!");
+            return resMap;
+        }
+        String object = responseEntity.getBody();
+        JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+        FileSystem fileSystem = new FileSystem();
+        fileSystem.setCapacity(Double.valueOf(jsonObject.get("capacity").getAsString()));
+        fileSystem.setAllocate_quota_in_pool(Double.valueOf(jsonObject.get("allocate_quota_in_pool").getAsString()));
+        fileSystem.setAllocate_quota_in_pool(Double.valueOf(jsonObject.get("available_capacity").getAsString()));
+        fileSystem.setAllocate_quota_in_pool(Double.valueOf(jsonObject.get("min_size_fs_capacity").getAsString()));
+        fileSystem.setAllocate_quota_in_pool(Double.valueOf(jsonObject.get("min_size_fs_capacity").getAsString()));
+        fileSystem.setStorage_id(jsonObject.get("storage_id").getAsString());
+        fileSystem.setStorage_id(jsonObject.get("storage_pool_name").getAsString());
+
+        resMap.put("data", gson.toJson(fileSystem));
+        return resMap;
+
     }
 
     private ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws Exception {
