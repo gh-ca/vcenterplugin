@@ -575,12 +575,12 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     }
 
     @Override
-    public void configureTaskTime(String taskId,String taskCron) throws Exception{
+    public void configureTaskTime(Integer taskId,String taskCron) throws Exception{
         try {
             if(!StringUtils.isEmpty(taskId) && !StringUtils.isEmpty(taskCron)) {
                 int re = scheduleDao.updateTaskTime(taskId,taskCron);
                 if(re>0){
-                    scheduleSetting.refreshTasks(Integer.parseInt(taskId),taskCron);
+                    scheduleSetting.refreshTasks(taskId,taskCron);
                 }
             }else{
                 throw new Exception("configure Task Time error:taskId or taskCorn is null");

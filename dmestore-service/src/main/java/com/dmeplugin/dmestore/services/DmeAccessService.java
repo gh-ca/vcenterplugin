@@ -126,7 +126,7 @@ public interface DmeAccessService {
      * @return ResponseBodyBean
      * @throws Exception when error
      */
-    void configureTaskTime(String taskId,String taskCron) throws Exception;
+    void configureTaskTime(Integer taskId,String taskCron) throws Exception;
 
     /**
      * get hostGroup's detail

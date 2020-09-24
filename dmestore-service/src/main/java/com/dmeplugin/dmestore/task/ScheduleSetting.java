@@ -52,7 +52,7 @@ public class ScheduleSetting implements SchedulingConfigurer {
     }
 
     //刷新任务
-    public void refreshTasks(int taskId,String cron){
+    public void refreshTasks(Integer taskId,String cron){
         // 获取所有任务
         if(scheduleList!=null) {
             LOGGER.info("schedule size=" + scheduleList.size());
