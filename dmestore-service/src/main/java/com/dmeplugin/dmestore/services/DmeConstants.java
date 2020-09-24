@@ -76,4 +76,14 @@ public class DmeConstants {
      */
     public static final String DME_STORDEVICE_ETHPORT_QUERY_URL = "/rest/csm-cmdb/v1/instances/SYS_StoragePort";
 
+    /**
+     * delete share
+     */
+    public static final String DME_NFS_SHARE_DELETE_URL = "/rest/fileservice/v1/nfs-shares/delete";
+
+    /**
+     * delete fs
+     */
+    public static final String DME_NFS_FS_DELETE_URL = "/rest/fileservice/v1/filesystems/delete";
+
 }

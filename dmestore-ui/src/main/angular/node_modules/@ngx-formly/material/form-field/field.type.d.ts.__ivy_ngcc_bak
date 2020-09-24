@@ -1,0 +1,31 @@
+import { OnInit, OnDestroy, AfterViewInit, TemplateRef } from '@angular/core';
+import { FieldType as CoreFieldType, FormlyFieldConfig } from '@ngx-formly/core';
+import { Subject } from 'rxjs';
+import { MatFormField, MatFormFieldControl } from '@angular/material/form-field';
+import { FormlyErrorStateMatcher } from './formly.error-state-matcher';
+export declare abstract class FieldType<F extends FormlyFieldConfig = FormlyFieldConfig> extends CoreFieldType<F> implements OnInit, AfterViewInit, OnDestroy, MatFormFieldControl<any> {
+    matPrefix: TemplateRef<any>;
+    matSuffix: TemplateRef<any>;
+    formFieldControl: MatFormFieldControl<any>;
+    errorStateMatcher: FormlyErrorStateMatcher;
+    stateChanges: Subject<void>;
+    _errorState: boolean;
+    private _control;
+    ngOnInit(): void;
+    ngAfterViewInit(): void;
+    ngOnDestroy(): void;
+    setDescribedByIds(ids: string[]): void;
+    onContainerClick(event: MouseEvent): void;
+    readonly errorState: boolean;
+    readonly controlType: string;
+    readonly focused: boolean;
+    readonly disabled: boolean;
+    readonly required: boolean;
+    readonly placeholder: string;
+    readonly shouldPlaceholderFloat: boolean;
+    value: any;
+    readonly ngControl: any;
+    readonly empty: boolean;
+    readonly shouldLabelFloat: boolean;
+    readonly formField: MatFormField;
+}
