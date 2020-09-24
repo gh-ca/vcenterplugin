@@ -1,0 +1,17 @@
+import { QueryList, SimpleChanges, OnInit, OnChanges, AfterViewInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
+import { AccordionService } from './providers/accordion.service';
+import { ClrAccordionPanel } from './accordion-panel';
+export declare class ClrAccordion implements OnInit, OnChanges, AfterViewInit, OnDestroy {
+    private accordionService;
+    multiPanel: boolean;
+    panels: QueryList<ClrAccordionPanel>;
+    subscriptions: Subscription[];
+    constructor(accordionService: AccordionService);
+    ngOnInit(): void;
+    ngOnChanges(changes: SimpleChanges): void;
+    ngAfterViewInit(): void;
+    ngOnDestroy(): void;
+    private setAccordionStrategy;
+    private listenForDOMChanges;
+}

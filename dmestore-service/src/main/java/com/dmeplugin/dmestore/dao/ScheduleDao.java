@@ -37,7 +37,7 @@ public class ScheduleDao extends H2DataBaseDao {
         return scheduleconfiglist;
     }
 
-    public int updateTaskTime(String taskId,String taskCron) throws SQLException {
+    public int updateTaskTime(Integer taskId,String taskCron) throws SQLException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -46,7 +46,7 @@ public class ScheduleDao extends H2DataBaseDao {
             ps = con.prepareStatement("UPDATE " + DPSqlFileConstant.DP_DME_TASK_INFO
                     + " SET CRON=? WHERE ID=?");
             ps.setString(1, taskCron);
-            ps.setInt(2, Integer.parseInt(taskId));
+            ps.setInt(2, taskId);
 
             return ps.executeUpdate();
         } catch (SQLException e) {

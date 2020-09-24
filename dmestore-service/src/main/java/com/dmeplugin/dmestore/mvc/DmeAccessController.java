@@ -133,7 +133,7 @@ public class DmeAccessController extends BaseController {
      */
     @RequestMapping(value = "/configuretasktime", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseBodyBean configureTaskTime(@RequestParam("taskId") String taskId, @RequestParam("taskCron") String taskCron)
+    public ResponseBodyBean configureTaskTime(@RequestParam("taskId") Integer taskId, @RequestParam("taskCron") String taskCron)
             throws Exception {
         LOG.info("accessdme/configuretasktime taskId==" + taskId+"  taskCron=="+taskCron);
         String failureStr = "";

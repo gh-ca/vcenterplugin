@@ -1,0 +1,68 @@
+<div>
+  <!-- 头部按钮组 -->
+  <div>
+    <button class="btn btn-primary" [disabled]="rowSelected.length === 0" (click)="apply()">Apply Best Practice</button>
+    <button class="btn btn-primary" (click)="recheck()">Recheck</button>
+  </div>
+  <!-- 列表页 -->
+  <clr-datagrid [(clrDgSelected)]="rowSelected"   (clrDgRefresh)="practiceRefresh($event)" [clrDgLoading]="isLoading">
+
+    <clr-dg-column [clrDgField]="'hostSetting'">Host Setting</clr-dg-column>
+    <clr-dg-column [clrDgField]="'recommendValue'">Recommend Value</clr-dg-column>
+    <clr-dg-column [clrDgField]="'level'">Level</clr-dg-column>
+    <clr-dg-column [clrDgField]="'violation'" [clrDgSortOrder]="'violation'">Violation</clr-dg-column>
+
+    <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
+      <clr-dg-cell>{{item.hostSetting}}</clr-dg-cell>
+      <clr-dg-cell>{{item.recommendValue}}</clr-dg-cell>
+      <clr-dg-cell>{{item.level}}</clr-dg-cell>
+      <clr-dg-cell><span (click)="openHostList(item)" style="color:#00F;cursor:pointer">{{item.count}}</span></clr-dg-cell>
+    </clr-dg-row>
+
+    <clr-dg-footer>
+      <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="total">
+        <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">per page</clr-dg-page-size>
+        {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+        of {{pagination.totalItems}}
+      </clr-dg-pagination>
+    </clr-dg-footer>
+
+
+  </clr-datagrid>
+
+  <!-- 弹出框 -->
+  <clr-modal [(clrModalOpen)]="hostModalShow" style="Width: 576px; height: 300px">
+    <h3 class="modal-title">Non-compliant Host</h3>
+    <div class="modal-body">
+      <div>
+        <button class="btn btn-primary" [disabled]="hostSelected.length === 0" (click)="apply()">Apply Best Practice</button>
+      </div>
+      <!-- 列表页 -->
+      <clr-datagrid [(clrDgSelected)]="hostSelected"   (clrDgRefresh)="hostRefresh($event, currentBestpractice)" [clrDgLoading]="hostIsLoading">
+
+        <clr-dg-column [clrDgField]="'hostName'">Host Setting</clr-dg-column>
+        <clr-dg-column [clrDgField]="'actualValue'">Actual Value</clr-dg-column>
+        <clr-dg-column [clrDgField]="'recommendValue'">Recommend Value</clr-dg-column>
+
+        <clr-dg-row *clrDgItems="let item of hostList" [clrDgItem]="item">
+          <clr-dg-cell>{{item.hostName}}</clr-dg-cell>
+          <clr-dg-cell>{{item.actualValue}}</clr-dg-cell>
+          <clr-dg-cell>{{item.recommendValue}}</clr-dg-cell>
+        </clr-dg-row>
+
+        <clr-dg-footer>
+          <clr-dg-pagination #pagination1 [clrDgPageSize]="5" [clrDgTotalItems]="hostTotal">
+            <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">per page</clr-dg-page-size>
+            {{pagination1.firstItem + 1}} - {{pagination1.lastItem + 1}}
+            of {{pagination1.totalItems}}
+          </clr-dg-pagination>
+        </clr-dg-footer>
+
+      </clr-datagrid>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="hostModalShow = false">Close</button>
+    </div>
+  </clr-modal>
+
+</div>

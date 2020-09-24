@@ -1,0 +1,7 @@
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+export { FormlyMatMultiCheckboxModule } from './multicheckbox.module';
+export { FormlyFieldMultiCheckbox } from './multicheckbox.type';
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicHVibGljX2FwaS5qcyIsInNvdXJjZVJvb3QiOiJuZzovL0BuZ3gtZm9ybWx5L21hdGVyaWFsL211bHRpY2hlY2tib3gvIiwic291cmNlcyI6WyJwdWJsaWNfYXBpLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7QUFBQSxPQUFPLEVBQUUsNEJBQTRCLEVBQUUsTUFBTSx3QkFBd0IsQ0FBQztBQUN0RSxPQUFPLEVBQUUsd0JBQXdCLEVBQUUsTUFBTSxzQkFBc0IsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImV4cG9ydCB7IEZvcm1seU1hdE11bHRpQ2hlY2tib3hNb2R1bGUgfSBmcm9tICcuL211bHRpY2hlY2tib3gubW9kdWxlJztcbmV4cG9ydCB7IEZvcm1seUZpZWxkTXVsdGlDaGVja2JveCB9IGZyb20gJy4vbXVsdGljaGVja2JveC50eXBlJztcbiJdfQ==

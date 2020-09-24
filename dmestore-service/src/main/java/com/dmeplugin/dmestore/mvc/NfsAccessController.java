@@ -102,4 +102,29 @@ public class NfsAccessController extends BaseController {
         return failure(failureStr);
     }
 
+
+    /**
+     * Mount nfs,params中包含了 include:
+     * dataStoreObjectId: datastore的object id
+     * hostId: 主机hostId 必 （主机与集群二选一）
+     * clusterId: 集群clusterId 必（主机与集群二选一）
+     * @param params: include dataStoreName,hostId,clusterId
+     * @return: ResponseBodyBean
+     */
+    @RequestMapping(value = "/unmountnfs", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean unmountNfs(@RequestBody Map<String, Object> params) throws Exception {
+        LOG.info("accessnfs/unmountnfs=="+gson.toJson(params));
+        String failureStr = "";
+        try {
+            dmeNFSAccessService.unmountNfs(params);
+            return success(null,"unmount nfs success");
+        }catch (Exception e){
+            LOG.error("unmount nfs failure:", e);
+            failureStr = "unmount nfs failure:"+e.toString();
+        }
+        return failure(failureStr);
+    }
+
+
 }

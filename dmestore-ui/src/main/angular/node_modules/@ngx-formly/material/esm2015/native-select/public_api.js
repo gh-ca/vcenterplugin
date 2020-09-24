@@ -1,0 +1,7 @@
+/**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ */
+export { FormlyMatNativeSelectModule } from './native-select.module';
+export { FormlyFieldNativeSelect } from './native-select.type';
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicHVibGljX2FwaS5qcyIsInNvdXJjZVJvb3QiOiJuZzovL0BuZ3gtZm9ybWx5L21hdGVyaWFsL25hdGl2ZS1zZWxlY3QvIiwic291cmNlcyI6WyJwdWJsaWNfYXBpLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiI7Ozs7QUFBQSxPQUFPLEVBQUUsMkJBQTJCLEVBQUUsTUFBTSx3QkFBd0IsQ0FBQztBQUNyRSxPQUFPLEVBQUUsdUJBQXVCLEVBQUUsTUFBTSxzQkFBc0IsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbImV4cG9ydCB7IEZvcm1seU1hdE5hdGl2ZVNlbGVjdE1vZHVsZSB9IGZyb20gJy4vbmF0aXZlLXNlbGVjdC5tb2R1bGUnO1xuZXhwb3J0IHsgRm9ybWx5RmllbGROYXRpdmVTZWxlY3QgfSBmcm9tICcuL25hdGl2ZS1zZWxlY3QudHlwZSc7XG4iXX0=
