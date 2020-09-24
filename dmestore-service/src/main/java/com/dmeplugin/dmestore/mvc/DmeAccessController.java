@@ -100,5 +100,52 @@ public class DmeAccessController extends BaseController {
         return failure(failureStr);
     }
 
+    /**
+     * scan Datastore
+     *
+     * @param storageType storage type:VMFS,NFS,ALL
+     * @return ResponseBodyBean
+     * @throws Exception when error
+     */
+    @RequestMapping(value = "/scandatastore", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseBodyBean scanDatastore(@RequestParam("storageType") String storageType)
+            throws Exception {
+        LOG.info("accessdme/scandatastore storageId==" + storageType);
+        String failureStr = "";
+        try {
+            dmeAccessService.scanDatastore(storageType);
+            return success(null,"scan datastore complete!");
+        } catch (Exception e) {
+            LOG.error("scan datastore failure:", e);
+            failureStr = "scan datastore failure:"+e.toString();
+        }
+        return failure(failureStr);
+    }
+
+    /**
+     * Configure task time
+     *
+     * @param taskId task Id
+     * @param taskCron task cron
+     * @return ResponseBodyBean
+     * @throws Exception when error
+     */
+    @RequestMapping(value = "/configuretasktime", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseBodyBean configureTaskTime(@RequestParam("taskId") String taskId, @RequestParam("taskCron") String taskCron)
+            throws Exception {
+        LOG.info("accessdme/configuretasktime taskId==" + taskId+"  taskCron=="+taskCron);
+        String failureStr = "";
+        try {
+            dmeAccessService.configureTaskTime(taskId,taskCron);
+            return success(null,"configure task time complete!");
+        } catch (Exception e) {
+            LOG.error("configure task time failure:", e);
+            failureStr = "configure task time failure:"+e.toString();
+        }
+        return failure(failureStr);
+    }
+
 
 }

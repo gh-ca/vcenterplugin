@@ -51,11 +51,39 @@ public class HostAccessServiceImpl implements HostAccessService {
             Map<String, String> vmKernel = (Map<String, String>)params.get("vmKernel");
             String hostObjectId = params.get("hostObjectId").toString();
             LOG.info("params=="+gson.toJson(params));
-            LOG.info("ethPorts=="+gson.toJson(ethPorts));
             vcsdkUtils.configureIscsi(hostObjectId,vmKernel,ethPorts);
         } else {
             throw new Exception("configure Iscsi parameter exception:" + params);
         }
+    }
+
+    @Override
+    public List<EthPortInfo> testConnectivity(Map<String, Object> params) throws Exception {
+        List<EthPortInfo> relists = null;
+        try {
+            if (params != null) {
+                if(params.get("ethPorts")==null){
+                    LOG.error("test connectivity error:ethPorts is null.");
+                    throw new Exception("test connectivity error:ethPorts is null.");
+                }
+                if(StringUtils.isEmpty(params.get("hostObjectId"))){
+                    LOG.error("test connectivity error:host ObjectId is null.");
+                    throw new Exception("test connectivity error:host ObjectId is null.");
+                }
+                List<Map<String, Object>> ethPorts = (List<Map<String, Object>>)params.get("ethPorts");
+                String hostObjectId = params.get("hostObjectId").toString();
+                LOG.info("params=="+gson.toJson(params));
+                LOG.info("ethPorts=="+gson.toJson(ethPorts));
+//                relists = xxxxx;
+            } else {
+                throw new Exception("test connectivity parameter exception:" + params);
+            }
+        } catch (Exception e) {
+            LOG.error("test connectivity error:", e);
+            throw e;
+        }
+        LOG.info("test connectivity relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        return relists;
     }
 
 

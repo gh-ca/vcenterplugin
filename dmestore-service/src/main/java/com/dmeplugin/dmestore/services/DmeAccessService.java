@@ -110,11 +110,31 @@ public interface DmeAccessService {
     Map<String, Object> getDmeHost(String hostId) throws Exception;
 
     /**
+     * scan Datastore
+     *
+     * @param storageType storage type:VMFS,NFS,ALL
+     * @return ResponseBodyBean
+     * @throws Exception when error
+     */
+    void scanDatastore(String storageType) throws Exception;
+
+    /**
+     * Configure task time
+     *
+     * @param taskId task Id
+     * @param taskCron task cron
+     * @return ResponseBodyBean
+     * @throws Exception when error
+     */
+    void configureTaskTime(String taskId,String taskCron) throws Exception;
+
+    /**
      * get hostGroup's detail
      * @param hsotGroupId hostGroups id
      * @return
      * @throws Exception
      */
     Map<String,Object> getDmeHostGroup(String hsotGroupId) throws Exception;
+
 
 }
