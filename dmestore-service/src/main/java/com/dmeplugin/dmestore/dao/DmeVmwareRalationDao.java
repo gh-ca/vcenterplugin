@@ -439,5 +439,34 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         return sql;
     }
 
+    /**
+     * 根据volumeId获取对应的vmfs datastore
+     * @param volumeId
+     * @return
+     * @throws SQLException
+     */
+    public String getVmfsNameByVolumeId(String volumeId) throws SQLException {
+        String VmfsDatastoreName = "";
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            String sql = "SELECT * FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_TYPE='" + ToolUtils.STORE_TYPE_VMFS + "'and VOLUME_ID='" + volumeId + "'";
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                VmfsDatastoreName = rs.getString("STORE_NAME");
+                break;
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("Failed to get vmfs datastore on: " + volumeId + "," + e.getMessage());
+            throw new SQLException(e);
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return VmfsDatastoreName;
+    }
+
 
 }
