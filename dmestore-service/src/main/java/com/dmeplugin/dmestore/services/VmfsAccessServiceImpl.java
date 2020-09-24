@@ -409,7 +409,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     //判断主机在DME中是否存在 如果主机不存在就创建并得到主机ID
-    private String checkOrcreateToHost(String hostIp) throws Exception {
+    private String checkOrcreateToHost(String hostIp, String hostId) throws Exception {
         String objId = "";
         try {
             //param str host: 主机  param str cluster: 集群
@@ -431,6 +431,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 if (StringUtils.isEmpty(objId)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("host", hostIp);
+                    params.put("hostId", hostId);
                     Map<String, Object> hostmap = dmeAccessService.createHost(params);
                     if (hostmap != null && hostmap.get("id") != null) {
                         objId = hostmap.get("id").toString();
@@ -478,7 +479,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             List<String> hostlists = new ArrayList<>();
                             for (Map<String, String> hostmap : vmwarehostlists) {
                                 LOG.info("checkOrcreateToHost====" + hostmap.get("hostName"));
-                                String tmpHostId = checkOrcreateToHost(ToolUtils.getStr(hostmap.get("hostName")));
+                                String tmpHostId = checkOrcreateToHost(ToolUtils.getStr(hostmap.get("hostName")),ToolUtils.getStr(hostmap.get("hostId")));
                                 if (!StringUtils.isEmpty(tmpHostId)) {
                                     hostlists.add(tmpHostId);
                                 }
@@ -512,7 +513,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         try {
             //param str host: 主机  param str cluster: 集群
             if (params != null && params.get("host") != null) {
-                objId = checkOrcreateToHost(ToolUtils.getStr(params.get("host")));
+                objId = checkOrcreateToHost(ToolUtils.getStr(params.get("host")), ToolUtils.getStr(params.get("hostId")));
             } else if (params != null && params.get("cluster") != null) {
                 objId = checkOrcreateToHostGroup(ToolUtils.getStr(params.get("cluster")), ToolUtils.getStr(params.get("clusterId")));
             }

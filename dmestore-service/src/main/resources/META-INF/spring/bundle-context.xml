@@ -30,6 +30,7 @@
         <property name="scheduleDao" ref="scheduleDao"/>
         <property name="vmfsAccessService" ref="VmfsAccessServiceImpl"/>
         <property name="dmeNFSAccessService" ref="DmeNFSAccessServiceImpl"/>
+        <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
 
     <bean name="h2DataBaseDao" class="com.dmeplugin.dmestore.dao.H2DataBaseDao">

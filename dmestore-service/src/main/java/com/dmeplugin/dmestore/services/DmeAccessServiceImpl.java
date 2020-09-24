@@ -7,6 +7,7 @@ import com.dmeplugin.dmestore.entity.DmeInfo;
 import com.dmeplugin.dmestore.task.ScheduleSetting;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
+import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -38,6 +39,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     private VmfsAccessService vmfsAccessService;
 
     private DmeNFSAccessService dmeNFSAccessService;
+
+    private VCSDKUtils vcsdkUtils;
 
     @Autowired
     private ScheduleSetting scheduleSetting;
@@ -419,11 +422,20 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         try {
             Map<String, Object> requestbody = null;
             if (params != null && params.get("host") != null) {
+                //得到主机的hba信息
+                Map<String,Object> hbamap = vcsdkUtils.getHbaByHostObjectId(ToolUtils.getStr(params.get("hostId")));
+
                 requestbody = new HashMap<>();
                 requestbody.put("access_mode", "NONE");
-                requestbody.put("type", "UNKNOWN");
+                requestbody.put("type", "LINUX");
                 requestbody.put("ip", params.get("host"));
                 requestbody.put("host_name", params.get("host"));
+                List<Map<String,Object>> initiators = new ArrayList<>();
+                Map<String,Object> initiator = new HashMap<>();
+                initiator.put("protocol",ToolUtils.getStr(hbamap.get("type")));
+                initiator.put("port_name",ToolUtils.getStr(hbamap.get("name")));
+                initiators.add(initiator);
+                requestbody.put("initiator",initiators);
                 LOG.info("requestbody==" + gson.toJson(requestbody));
 
                 LOG.info("createHost_url===" + createHostUrl);
@@ -493,6 +505,10 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     public void setDmeNFSAccessService(DmeNFSAccessService dmeNFSAccessService) {
         this.dmeNFSAccessService = dmeNFSAccessService;
+    }
+
+    public void setVcsdkUtils(VCSDKUtils vcsdkUtils) {
+        this.vcsdkUtils = vcsdkUtils;
     }
 
     public void setScheduleDao(ScheduleDao scheduleDao) {

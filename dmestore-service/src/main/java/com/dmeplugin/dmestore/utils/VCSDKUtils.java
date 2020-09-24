@@ -1940,6 +1940,45 @@ public class VCSDKUtils {
         return listStr;
     }
 
+    //得到Hba信息
+    public Map<String,Object> getHbaByHostObjectId(String hostObjectId) throws Exception{
+        Map<String,Object> map = new HashMap<>();
+        try {
+            if (StringUtils.isEmpty(hostObjectId)) {
+                _logger.error("get Hba error:host ObjectId is null.");
+                throw new Exception("get Hba error:host ObjectId is null.");
+            }
+
+            String serverguid = vcConnectionHelper.objectID2Serverguid(hostObjectId);
+            VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
+
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+            //取得该存储下所有已经挂载的主机ID
+            ManagedObjectReference objmor = vcConnectionHelper.objectID2MOR(hostObjectId);
+            HostMO hostmo = new HostMO(vmwareContext, objmor);
+            //查找对应的iscsi适配器
+            String iscsiHbaDevice = null;
+            List<HostHostBusAdapter> hbas = hostmo.getHostStorageSystemMO().getStorageDeviceInfo().getHostBusAdapter();
+            for (HostHostBusAdapter hba : hbas) {
+                if (hba instanceof HostInternetScsiHba) {
+                    HostInternetScsiHba iscsiHba = (HostInternetScsiHba) hba;
+                    map.put("type","ISCSI");
+                    map.put("name",iscsiHba.getIScsiName());
+                }else if (hba instanceof HostFibreChannelHba) {
+                    HostFibreChannelHba fcHba = (HostFibreChannelHba) hba;
+                    map.put("type","FC");
+                    map.put("name",fcHba.getDevice());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware error:", e);
+            throw e;
+        }
+        return map;
+    }
+
+
     public static void main(String[] args) {
 //        try {
 //            Gson gson = new Gson();
