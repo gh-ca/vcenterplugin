@@ -1,0 +1,61 @@
+.modal-dialog .modal-content {
+  height: 500px;
+}
+
+.modal-body {
+  width: 100%;
+  height: 500px;
+}
+
+::ng-deep .modal-title-wrapper {
+  width: 100%;
+}
+
+::ng-deep .modal-footer {
+  justify-content: center;
+}
+
+::ng-deep .modal-dialog.modal-lg {
+  width: 1080px;
+}
+
+.modal-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.merginLeft {
+  margin-left: 10px;
+  border-style: solid;
+}
+
+.gh-btngroup-right {
+  display: flex;
+  justify-content: right;
+  align-items: right;
+}
+
+.btn + .btn {
+  border-left: 0.05rem solid;
+}
+
+/** mask **/
+
+.flyover .mask {
+  top: 0;
+  left: 0;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+  background: black;
+  z-index: 1049;
+}
+
+.flyover .alert {
+  left: 50%;
+  top: 50%;
+  position: fixed;
+  z-index: 1050;
+}
