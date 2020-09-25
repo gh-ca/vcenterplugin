@@ -30,6 +30,7 @@
         <property name="scheduleDao" ref="scheduleDao"/>
         <property name="vmfsAccessService" ref="VmfsAccessServiceImpl"/>
         <property name="dmeNFSAccessService" ref="DmeNFSAccessServiceImpl"/>
+        <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
 
     <bean name="h2DataBaseDao" class="com.dmeplugin.dmestore.dao.H2DataBaseDao">
@@ -76,6 +77,8 @@
 
     <bean name="dmeStorageService" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
+        <property name="vcsdkUtils" ref="vCSDKUtils"/>
+        <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
     </bean>
     <bean name="dmeVmwareRalationDao" class="com.dmeplugin.dmestore.dao.DmeVmwareRalationDao">
         <property name="url" value="${h2.url}"/>

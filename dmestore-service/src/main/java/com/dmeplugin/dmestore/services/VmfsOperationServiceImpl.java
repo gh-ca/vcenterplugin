@@ -459,11 +459,12 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         storage.setIp(jsonObject.get("ip").getAsString());
         storage.setStatus(jsonObject.get("status").getAsString());
         storage.setVendor(jsonObject.get("vendor").getAsString());
-        storage.setProductVersion(jsonObject.get("product_version").getAsString());
+        storage.setProduct_version(jsonObject.get("product_version").getAsString());
         storage.setUsedCapacity(Double.valueOf(jsonObject.get("used_capacity").getAsString()));
         storage.setTotalCapacity(Double.valueOf(jsonObject.get("total_capacity").getAsString()));
         storage.setTotalEffectiveCapacity(Double.valueOf(jsonObject.get("total_effective_capacity").getAsString()));
         storage.setFreeEffectiveCapacity(Double.valueOf(jsonObject.get("free_effective_capacity").getAsString()));
+        //容量利用率
         resMap.put("data", storage);
         return resMap;
     }
@@ -483,4 +484,5 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
         return responseEntity;
     }
+
 }

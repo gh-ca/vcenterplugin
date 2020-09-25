@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.google.gson.*;
 import org.slf4j.Logger;
@@ -29,11 +30,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private final String OBJ_TYPES_LIST = "/rest/metrics/v1/mgr-svc/obj-types";
     private final String INDICATORS_LIST = "/rest/metrics/v1/mgr-svc/indicators";
     private final String OBJ_TYPE_INDICATORS_QUERY = "/rest/metrics/v1/mgr-svc/obj-types/{obj-type-id}/indicators";
-
-    public static final String COUNTER_NAME_IOPS = "throughput";//IOPS指标名称
-    public static final String COUNTER_NAME_BANDWIDTH = "bandwidth";//带宽
-    public static final String COUNTER_NAME_READPESPONSETIME = "readResponseTime";//读响应时间
-    public static final String COUNTER_NAME_WRITERESPONSETIME = "writeResponseTime";//写响应时间
 
     //性能指标 id和name的映射关系
     private static Map<String, String> indicatorNameIdMap = new HashMap<>();
@@ -317,10 +313,10 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
         for (String volumeId : volumeIds) {
             JsonObject statisticObject = new JsonObject();
-            statisticObject.addProperty(COUNTER_NAME_IOPS, String.valueOf(counterValue_iops++));
-            statisticObject.addProperty(COUNTER_NAME_BANDWIDTH, String.valueOf(counterValue_bandwidth++));
-            statisticObject.addProperty(COUNTER_NAME_READPESPONSETIME, String.valueOf(counterValue_readResponseTime++));
-            statisticObject.addProperty(COUNTER_NAME_WRITERESPONSETIME, String.valueOf(counterValue_writeResponseTime++));
+            statisticObject.addProperty(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT, String.valueOf(counterValue_iops++));
+            statisticObject.addProperty(DmeIndicatorConstants.COUNTER_ID_VMFS_BANDWIDTH, String.valueOf(counterValue_bandwidth++));
+            statisticObject.addProperty(DmeIndicatorConstants.COUNTER_ID_VMFS_READRESPONSETIME, String.valueOf(counterValue_readResponseTime++));
+            statisticObject.addProperty(DmeIndicatorConstants.COUNTER_ID_VMFS_WRITERESPONSETIME, String.valueOf(counterValue_writeResponseTime++));
             dataObject.add(volumeId, statisticObject);
         }
         return dataObject;
@@ -406,31 +402,32 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     //nfs的默认指标集合 目前取的DME存储设备的指标
     private List<String> initFsIndicator() {
         List<String> indicators = new ArrayList<>();
-        indicators.add("1125904201875461");//readThroughput
-        indicators.add("1125904201875462");//writeThroughput
-        indicators.add("1125904201875459");//readBandwidth
-        indicators.add("1125904201875460");//writeBandwidth
-        indicators.add("1125904201875464");//responseTime 平均IO响应时间
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_READTHROUGHPUT);//readThroughput
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_WRITETHROUGHPUT);//writeThroughput
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_READBANDWIDTH);//readBandwidth
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_WRITEBANDWIDTH);//writeBandwidth
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_RESPONSETIME);//responseTime 平均IO响应时间
         return indicators;
     }
 
     //volume默认指标集合
     private List<String> initVolumeIndicator() {
         List<String> indicators = new ArrayList<>();
-        indicators.add("1125921381744648");//readThroughput 读IOPS
-        indicators.add("1125921381744649");//writeThroughput
-        indicators.add("1125921381744646");//readBandwidth
-        indicators.add("1125921381744647");//writeBandwidth
-        indicators.add("1125921381744656");//readResponseTime
-        indicators.add("1125921381744656");//writeResponseTime
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_READTHROUGHPUT);//readThroughput 读IOPS
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITETHROUGHPUT);//writeThroughput
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_READBANDWIDTH);//readBandwidth
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITEBANDWIDTH);//writeBandwidth
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_READRESPONSETIME);//readResponseTime
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_VMFS_WRITERESPONSETIME);//writeResponseTime
         return indicators;
     }
 
     //serviceLevel默认指标集合
     private List<String> initServiceLevelIndicator() {
         List<String> indicators = new ArrayList<>();
-        indicators.add("1126174784815111");//maxResponseTime
-        indicators.add("1126174784815118");//bandwidthTiB
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_SERVICELECVEL_MAXRESPONSETIME);//maxResponseTime
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_SERVICELEVEL_BANDWIDTHTIB);//bandwidthTiB
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_SERVICELEVEL_THROUGHPUTTIB);//throughputTiB
         return indicators;
     }
 

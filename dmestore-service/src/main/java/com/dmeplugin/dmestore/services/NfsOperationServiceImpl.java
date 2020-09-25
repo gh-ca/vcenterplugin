@@ -16,6 +16,7 @@ import org.springframework.http.*;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
+import javax.print.DocFlavor;
 import java.util.*;
 
 /**
@@ -27,7 +28,7 @@ import java.util.*;
 public class NfsOperationServiceImpl implements NfsOperationService {
 
     private final String API_FS_CREATE = "/rest/fileservice/v1/filesystems/customize";
-    private final String API_NFSSHARE_CREATE = "/rest/fileservice/v1/nfs-shares";
+    private static final String API_NFSSHARE_CREATE = "/rest/fileservice/v1/nfs-shares";
     private final String API_STORAGEPOOL_LIST = "/rest/storagemgmt/v1/storagepools/query";
     private final String API_FS_UPDATE = "/rest/fileservice/v1/filesystems";
     //private final String API_NFS_CHANGECAPACITY = "/rest/fileservice/v1/filesystems";
@@ -73,17 +74,11 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     }
 
     /**
-     * NFS 数据存储的准则和最佳做法包括以下项：
-     *
-     *     不能使用不同的 NFS 版本在不同主机上挂载同一数据存储。NFS 3 和 NFS 4.1 客户端是不兼容的，并且使用不同的锁定协议。因此，从两个不兼容的客户端访问同一虚拟磁盘可能导致不正确的行为，并导致数据损坏。
-     *     NFS 3 和 NFS 4.1 数据存储可以在同一主机上共存。
-     *     当在不同主机上挂载相同 NFS 3 卷时，确保各主机之间的服务器名称和文件夹名称相同。如果名称不匹配，则主机会将同一 NFS 版本 3 卷视为两个不同的数据存储。该错误可能导致诸如 vMotion 之类的功能运行失败。
-     *     例如，如果在一台主机上输入 filer 作为服务器名称，而在另一台主机上输入 filer.domain.com 作为服务器名称，就出现了这种名称不匹配的情况。此准则不适用于 NFS 版本 4.1。
      * @param params
      * @return
      */
     @Override
-    public Map<String, Object> createNfsDatastore(Map<String, String> params) {
+    public Map<String, Object> createNfsDatastore(Map<String, Object> params) {
 
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 200);
@@ -93,65 +88,64 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             resMap.put("msg", "params error , please check your params !");
             return resMap;
         }
-
         try {
             //创建fs
             Map<String, String> fsMap = new HashMap<>();
             Map<String, String> nfsShareMap = new HashMap<>();
-            String filesystem_specs = params.get("filesystem_specs");
+            Object filesystem_specs = params.get("filesystem_specs");
             if (StringUtils.isEmpty(filesystem_specs)) {
                 LOG.error("{filesystem_specs}={"+filesystem_specs+"}");
             }
-            fsMap.put("filesystem_specs", filesystem_specs);
-            String pool_raw_id = params.get("pool_raw_id");
-            String storage_id = params.get("storage_id");
+            fsMap.put("filesystem_specs", gson.toJson(filesystem_specs));
+            Object pool_raw_id = params.get("pool_raw_id");
+            Object storage_id = params.get("storage_id");
             if (StringUtils.isEmpty(storage_id) || StringUtils.isEmpty(storage_id)) {
                 LOG.error("{pool_raw_id/storage_id}={"+pool_raw_id+"/"+storage_id+"}");
             }
-            fsMap.put("pool_raw_id", pool_raw_id);
-            fsMap.put("storage_id", storage_id);
-            String tuning = params.get("tuning");
+            fsMap.put("pool_raw_id", gson.toJson(pool_raw_id));
+            fsMap.put("storage_id", gson.toJson(storage_id));
+            Object tuning = params.get("tuning");
             if (!StringUtils.isEmpty(tuning)) {
-                fsMap.put("tuning", tuning);
+                fsMap.put("tuning", gson.toJson(tuning));
             }
-            String create_nfs_share_param = params.get("create_nfs_share_param");
-            String nfs_share_client_addition = params.get("nfs_share_client_addition");
+            Object create_nfs_share_param = params.get("create_nfs_share_param");
+            Object nfs_share_client_addition = params.get("nfs_share_client_addition");
             Map<String, String> create_nfs_share_params = null;
             if (!StringUtils.isEmpty(create_nfs_share_param) && !StringUtils.isEmpty(nfs_share_client_addition)) {
-                create_nfs_share_params = gson.fromJson(create_nfs_share_param, Map.class);
+                create_nfs_share_params = gson.fromJson(gson.toJson(create_nfs_share_param), Map.class);
                 if (create_nfs_share_params != null && create_nfs_share_params.size() > 0) {
-                    create_nfs_share_params.put("nfs_share_client_addition", nfs_share_client_addition);
+                    create_nfs_share_params.put("nfs_share_client_addition", gson.toJson(nfs_share_client_addition));
                     fsMap.put("create_nfs_share_param", gson.toJson(create_nfs_share_params));
-                    String show_snapshot_enable = params.get("show_snapshot_enable");
+                    Object show_snapshot_enable = params.get("show_snapshot_enable");
                     if (!StringUtils.isEmpty(show_snapshot_enable)) {
-                        create_nfs_share_params.put("show_snapshot_enable", show_snapshot_enable);
+                        create_nfs_share_params.put("show_snapshot_enable", gson.toJson(show_snapshot_enable));
                     }
                     nfsShareMap.put("create_nfs_share_param", gson.toJson(create_nfs_share_params));
                 }
             }
-            String storage_pool_id = params.get("storage_pool_id");
+            Object storage_pool_id = params.get("storage_pool_id");
             if (StringUtils.isEmpty(storage_pool_id)) {
                 LOG.error("storage_pool_id={"+storage_pool_id+"}");
             }
             String task_id = "";
-            Map<String, Object> fileSystem = createFileSystem(fsMap, storage_pool_id);
+            Map<String, Object> fileSystem = createFileSystem(fsMap, storage_pool_id.toString());
             int fsCode = ToolUtils.getInt(fileSystem.get("code"));
             if (fsCode == 202) {
                 task_id = fileSystem.get("task_id").toString();
             }
-            String nfsName = params.get("nfsName");
+            Object nfsName = params.get("nfsName");
             if (StringUtils.isEmpty(nfsName)) {
                 LOG.error("nfsName={"+nfsName+"}");
             }
-            Map<String, Object> nfsShare = createNfsShare(nfsShareMap, task_id,nfsName);
+            Map<String, Object> nfsShare = createNfsShare(nfsShareMap, task_id,nfsName.toString());
             if (ToolUtils.getInt(nfsShare.get("code"))==202) {
                 String nfsShareTaskId = nfsShare.get("task_id").toString();
                 resMap.put("data", nfsShareTaskId);
             }
             //query oriented logic portv by storage_id
             String serverHost = "";
-            String current_port_id = params.get("current_port_id");
-            Map<String, Object> logicPorts = dmeStorageService.getLogicPorts(storage_id);
+            Object current_port_id = params.get("current_port_id");
+            Map<String, Object> logicPorts = dmeStorageService.getLogicPorts(storage_id.toString());
             Object logicPort = logicPorts.get("data");
             if (logicPort != null) {
                 JsonArray jsonArray = new JsonParser().parse(gson.toJson(logicPort)).getAsJsonArray();
@@ -164,9 +158,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                     }
                 }
             }
-            String exportPath = params.get("exportPath");
-            String type = params.get("type");
-            String accessMode = params.get("accessMode");
+            Object exportPath = params.get("exportPath");
+            Object type = params.get("type");
+            Object accessMode = params.get("accessMode");
             //可以挂载多个
             List<String> mounts = new ArrayList<>();
             List<String> nfsShareClientArrayAddition = Arrays.asList(gson.toJson(nfs_share_client_addition));
@@ -181,7 +175,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 resMap.put("msg", "params error , please check your params !");
                 return resMap;
             }
-            String result = vcsdkUtils.createNfsDatastore(serverHost, exportPath, nfsName, accessMode, mounts, type);
+            String result = vcsdkUtils.createNfsDatastore(serverHost, exportPath.toString(), nfsName.toString(), accessMode.toString(), mounts, type.toString());
             if ("failed".equals(result)) {
                 resMap.put("code", 403);
                 resMap.put("msg", "create nfs datastore error!");
@@ -232,23 +226,25 @@ public class NfsOperationServiceImpl implements NfsOperationService {
      *       nfs_share_id string NFS共享的唯一标识 必  (id)
      *  }
      *
-     * @param params
+     * @param reqParams
      * @return
      */
     @Override
-    public Map<String, Object> updateNfsDatastore(Map<String, String> params) {
+    public Map<String, Object> updateNfsDatastore(Map<String, Object> reqParams) {
 
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 200);
         resMap.put("msg", "update nfs datastore success !");
 
-        if (params == null || params.size() == 0) {
-            LOG.error("params error , please check it! params=" + params);
+
+
+        if (reqParams == null || reqParams.size() == 0) {
+            LOG.error("params error , please check it! reqParams=" + reqParams);
             resMap.put("code", 403);
             resMap.put("msg", "params error , please check it!");
             return resMap;
         }
-
+        Map<String,String> params = gson.fromJson(gson.toJson(reqParams), Map.class);
         String dataStoreObjectId = params.get("dataStoreObjectId");
         String nfsName = params.get("nfsName");
         if (StringUtils.isEmpty(dataStoreObjectId)||StringUtils.isEmpty(nfsName)) {
@@ -309,24 +305,26 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     }
 
     @Override
-    public ResponseBodyBean changeNfsCapacity(Map<String, String> params) {
+    public ResponseBodyBean changeNfsCapacity(Map<String, Object> reqParams) {
 
         ResponseBodyBean responseBodyBean = new ResponseBodyBean();
         responseBodyBean.setCode("202");
         responseBodyBean.setDescription("change nfs storage capacity success!");
-
-        String file_system_id = params.get("file_system_id");
-        String is_expand = params.get("is_expand");
-        String capacity = params.get("capacity");
-        if (params==null ||params.size()==0||StringUtils.isEmpty(file_system_id)
-                ||StringUtils.isEmpty(is_expand)||StringUtils.isEmpty(capacity)) {
+        if (reqParams == null || reqParams.size() == 0) {
             responseBodyBean.setCode("202");
             responseBodyBean.setDescription("change nfs storage capacity error,params error!");
             return responseBodyBean;
         }
-
+        Map<String,String> params = gson.fromJson(gson.toJson(reqParams), Map.class);
+        String file_system_id = params.get("file_system_id");
+        String is_expand = params.get("is_expand");
+        String capacity = params.get("capacity");
+        if (StringUtils.isEmpty(file_system_id) ||StringUtils.isEmpty(is_expand)||StringUtils.isEmpty(capacity)) {
+            responseBodyBean.setCode("202");
+            responseBodyBean.setDescription("change nfs storage capacity error,params error!");
+            return responseBodyBean;
+        }
         String url = API_FS_UPDATE + "/" + file_system_id;
-
         //查询指定fs拿对应的信息
         Integer code = 0;
         try {
@@ -430,7 +428,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         Double freeCapacity = null;
         Double data_space = null;
         if (!StringUtils.isEmpty(storage_id) || !StringUtils.isEmpty(storage_pool_id)) {
-            Map<String, Object> resBody = getDataspaceOfStoragepool(null, storage_id, storage_pool_id);
+            Map<String, Object> resBody = getDataspaceOfStoragepool(null, storage_pool_id,storage_id);
             if (ToolUtils.getInt(resBody.get("code")) == 200) {
                 data_space = Double.valueOf(resBody.get("data_space").toString());
                 if (freeCapacity == null && data_space != null) {
@@ -512,7 +510,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
         Map<String, String> reqBody = new HashMap<>();
         if (!StringUtils.isEmpty(pool_id)) {
-            reqBody.put("pool_id", pool_id);
+                reqBody.put("pool_id", pool_id);
         }
         if (!StringUtils.isEmpty(storage_pool_name)) {
             reqBody.put("storage_pool_name", storage_pool_name);
@@ -623,7 +621,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
     }
 
-    private ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws Exception {
+    private static ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws Exception {
 
         RestUtils restUtils = new RestUtils();
         RestTemplate restTemplate = restUtils.getRestTemplate();
@@ -637,5 +635,14 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         LOG.info(url + "==responseEntity==" + (responseEntity == null ? "null" : responseEntity.getStatusCodeValue()));
 
         return responseEntity;
+    }
+
+    public static void main(String[] args) {
+        try {
+
+            access("https://localhost:26335/"+API_NFSSHARE_CREATE, HttpMethod.POST, null);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

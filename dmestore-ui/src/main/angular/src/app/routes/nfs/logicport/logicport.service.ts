@@ -6,7 +6,7 @@ export class LogicportService {
   constructor(private http: HttpClient) {}
 
   getData(param) {
-    return this.http.get('http://localhost:8080/accessnfs/logicport/'+param);
+    return this.http.get('accessnfs/logicport/'+param);
   }
 }
 export class LogicDetail{

@@ -9,13 +9,13 @@ import java.io.Serializable;
  */
 public class NfsShares implements Serializable {
 
-    private String name;
-    private String share_path;
-    private String storage_id;
-    private String tier_name;
-    private String owning_dtree_name;
-    private String fs_name;
-    private String owning_dtree_id;
+    private String name; //名称
+    private String share_path; //共享路径
+    private String storage_id; //存储设备id
+    private String tier_name; //服务等级
+    private String owning_dtree_name;//所属dtree
+    private String fs_name; //所属文件系统名字在
+    private String owning_dtree_id; //所属dtreeid
 
     public String getName() {
         return name;

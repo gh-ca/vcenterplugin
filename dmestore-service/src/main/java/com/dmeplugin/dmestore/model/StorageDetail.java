@@ -10,18 +10,18 @@ package com.dmeplugin.dmestore.model;
 public class StorageDetail {
 
     private String id;
-    private String name;
-    private String ip;
-    private String status;
-    private String synStatus;
-    private String sn;
-    private String vendor;
-    private String model;
-    private String productVersion;
-    private Double usedCapacity;
-    private Double totalCapacity;
-    private Double totalEffectiveCapacity;
-    private Double freeEffectiveCapacity;
+    private String name;//名称
+    private String ip;//ip地址
+    private String status;//状态
+    private String synStatus;//同步状态
+    private String sn;//设备序列号。
+    private String vendor;//厂商
+    private String model;//产品型号
+    private String productVersion;//产品版本号
+    private Double usedCapacity;//已用容量 （单位:MB）
+    private Double totalCapacity; //裸容量（单位:MB）。
+    private Double totalEffectiveCapacity;//可得容量 （总容量）
+    private Double freeEffectiveCapacity;//空闲容量
     private String location;
     private String[] azIds;
     private String storagePool;

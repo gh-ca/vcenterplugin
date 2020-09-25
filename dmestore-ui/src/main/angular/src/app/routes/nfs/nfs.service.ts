@@ -6,29 +6,29 @@ export class NfsService {
   constructor(private http: HttpClient) {}
 
   getData() {
-    return this.http.get('http://localhost:8080/accessnfs/listnfs', );
+    return this.http.get('accessnfs/listnfs', );
   }
   getChartData(fsIds: string[] ) {
-    return this.http.get('http://localhost:8080/accessnfs/listnfsperformance', {params: {fsIds}});
+    return this.http.get('accessnfs/listnfsperformance', {params: {fsIds}});
   }
   addNfs(params= {}){
-    return this.http.post('http://localhost:8080/operatenfs/createnfsdatastore', params);
+    return this.http.post('operatenfs/createnfsdatastore', params);
   }
 
   mountNfs(params= {}){
-    return this.http.post('http://localhost:8080/accessnfs/mountnfs', params);
+    return this.http.post('accessnfs/mountnfs', params);
   }
   delNfs(param: string){
-    return this.http.post('http://localhost:8080/accessnfs/delnfs', param);
+    return this.http.post('accessnfs/delnfs', param);
   }
   getHostListByObjectId(dataStoreObjectId: string){
-    return this.http.get('http://localhost:8080/accessvmware/gethostsbydsobjectid', {params: {dataStoreObjectId}});
+    return this.http.get('accessvmware/gethostsbydsobjectid', {params: {dataStoreObjectId}});
   }
   getHostList(){
-    return this.http.get('http://localhost:8080/accessvmware/listhost');
+    return this.http.get('accessvmware/listhost');
   }
   getClusterListByObjectId(dataStoreObjectId: string){
-    return this.http.get('http://localhost:8080/accessvmware/getclustersbydsobjectid', {params: {dataStoreObjectId}});
+    return this.http.get('accessvmware/getclustersbydsobjectid', {params: {dataStoreObjectId}});
   }
 }
 export interface List {
