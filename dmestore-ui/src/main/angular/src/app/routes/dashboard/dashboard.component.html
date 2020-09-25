@@ -1,11 +1,15 @@
 <div class="clr-row">
-  <div class="clr-col">
-    <div class="card">
-      <div class="card-block">
-          <div class="card-title">
-            DME
-          </div>
-          <div class="card-text">
+  <div class="info-card clr-col-4">
+    <div class="info-card-header">
+      <div class="info-header-left">
+        <span>DME</span>
+      </div>
+    </div>
+    <div class="info-card-content clr-row">
+      <div class="clr-col-3"></div>
+      <div class="clr-col-9">
+        <div class="info-charts-wrap">
+          <div class="info-content">
             <div class="gh-info-item">
               <span class="gh-info-lable">IP</span>
               <span class="gh-info-value" *ngIf="hostModel.hostIp == ''">--</span>
@@ -28,70 +32,154 @@
               <span class="gh-info-value" *ngIf="hostModel.hostIp != ''">Connected</span>
             </div>
           </div>
+        </div>
       </div>
     </div>
   </div>
-  <div class="clr-col">
-    <div class="card">
-      <div class="card-block">
-          <div class="card-title">
-            Storage
+
+  <div class="info-card clr-col-4">
+    <div class="info-card-header">
+      <div class="info-header-left">
+        <span>Storage</span>
+      </div>
+    </div>
+    <div class="info-card-content clr-row">
+      <div class="clr-col-3"></div>
+      <div class="clr-col-9">
+        <div class="info-charts-wrap">
+          <div echarts [options]="{}" (chartInit)= "storageNumChartInit($event)" style="width: 30%;height: 120px;"></div>
+          <div class="info-content">
+            <div class="info-content-text">
+              <span>Total</span>
+              <span>{{storageNum.total}}</span>
+            </div>
+            <div class="info-content-text">
+              <span>Normal</span>
+              <span>{{storageNum.normal}}</span>
+              <span class="squre used"></span>
+            </div>
+            <div class="info-content-text">
+              <span>Abnormal</span>
+              <span>{{storageNum.abnormal}}</span>
+              <span class="squre free"></span>
+            </div>
           </div>
-          <div class="card-text">
-            <div echarts [options]="charts[0]" id="chart1" style="height: 160px;"></div>
-          </div>
+        </div>
       </div>
     </div>
   </div>
-  <div class="clr-col">
-    <div class="card">
-      <div class="card-block">
-          <div class="card-title">
-            Best Practice Violations
+
+  <div class="info-card clr-col-4">
+    <div class="info-card-header">
+      <div class="info-header-left">
+        <span>Storage</span>
+      </div>
+    </div>
+    <div class="info-card-content clr-row">
+      <div class="clr-col-3"></div>
+      <div class="clr-col-9">
+        <div class="info-charts-wrap">
+          <div echarts [options]="charts[2]" style="width: 30%;height: 120px;"></div>
+          <div class="info-content">
+            <div class="info-content-text">
+              <span>Total</span>
+              <span>11 TB</span>
+            </div>
+            <div class="info-content-text">
+              <span>Used</span>
+              <span>11 TB</span>
+              <span class="squre used"></span>
+            </div>
+            <div class="info-content-text">
+              <span>Free</span>
+              <span>11 TB</span>
+              <span class="squre free"></span>
+            </div>
           </div>
-          <div class="card-text">
-            <div echarts [options]="charts[1]" id="chart2" style="height: 160px;"></div>
-          </div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<clr-modal [(clrModalOpen)]="connectAlertSuccess">
-  <div class="modal-body">
-    <div class="alert alert-success" role="alert" >
-      <div class="alert-items">
-        <div class="alert-item static">
-          <div class="alert-icon-wrapper">
-            <clr-icon class="alert-icon" shape="check-circle"></clr-icon>
-          </div>
-          <span class="alert-text">
-         Connect success.
-      </span>
-        </div>
-      </div>
-    </div>
-  </div>
-</clr-modal>
-<clr-modal [(clrModalOpen)]="connectAlertFail">
-  <div class="modal-body">
-    <div class="alert alert-danger" role="alert">
-      <div class="alert-items">
-        <div class="alert-item static">
-          <div class="alert-icon-wrapper">
-            <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
-          </div>
-          <span class="alert-text">
-          Connect failed.
-      </span>
-        </div>
-      </div>
-    </div>
-  </div>
-</clr-modal>
-
-<!-- 示例20200922 -->
 <div class="clr-row">
+  <div class="info-card clr-col-5">
+    <div class="info-card-header">
+      <div class="info-header-left">
+        <clr-dropdown [clrCloseMenuOnItemClick]="true">
+          <button clrDropdownTrigger class="dropdown-toggle  btn btn-link">
+            Operation
+            <clr-icon shape="caret down"></clr-icon>
+          </button>
+          <clr-dropdown-menu *clrIfOpen>
+            <div clrDropdownItem (click)="loadstorageCapacity('0')">All DateStore</div>
+            <div clrDropdownItem (click)="loadstorageCapacity('1')">VMFS DateStore</div>
+            <div clrDropdownItem (click)="loadstorageCapacity('2')">NFS DateStore</div>
+          </clr-dropdown-menu>
+        </clr-dropdown>
+      </div>
+    </div>
+    <div class="info-card-content clr-row">
+      <div class="clr-col-3"></div>
+      <div class="clr-col-9">
+        <div class="info-charts-wrap">
+          <div echarts [options]="{}" (chartInit)="storageCapacityChartInit($event)" style="width: 30%;height: 120px;"></div>
+          <div class="info-content">
+            <div class="info-content-text">
+              <span>Total</span>
+              <span>{{storageCapacity.totalCapacity}} {{storageCapacity.capacityUnit}}</span>
+            </div>
+            <div class="info-content-text">
+              <span>Used</span>
+              <span>{{storageCapacity.usedCapacity}} {{storageCapacity.capacityUnit}}</span>
+              <span class="squre used"></span>
+            </div>
+            <div class="info-content-text">
+              <span>Free</span>
+              <span>{{storageCapacity.freeCapacity}} {{storageCapacity.capacityUnit}}</span>
+              <span class="squre free"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="info-card clr-col-7">
+    <div class="info-card-header">
+      <div class="info-header-left">
+        <span>Storage</span>
+      </div>
+    </div>
+    <div class="info-card-content clr-row">
+      <div class="clr-col-3"></div>
+      <div class="clr-col-9">
+        <div class="info-charts-wrap">
+          <div echarts [options]="charts[2]" style="width: 30%;height: 120px;"></div>
+          <div class="info-content">
+            <div class="info-content-text">
+              <span>Total</span>
+              <span>11 TB</span>
+            </div>
+            <div class="info-content-text">
+              <span>Used</span>
+              <span>11 TB</span>
+              <span class="squre used"></span>
+            </div>
+            <div class="info-content-text">
+              <span>Free</span>
+              <span>11 TB</span>
+              <span class="squre free"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<!-- 示例20200922 -->
+<div class="clr-row" [hidden]="true">
   <div class="info-card clr-col-6">
     <div class="info-card-header border-header">
       <div class="info-header-left">
@@ -190,5 +278,38 @@
   <div class="modal-footer">
     <button type="button" class="btn btn-outline" (click)="popShow=false">Cancel</button>
     <button type="button" class="btn btn-primary" (click)="submit()">Ok</button>
+  </div>
+</clr-modal>
+
+<clr-modal [(clrModalOpen)]="connectAlertSuccess">
+  <div class="modal-body">
+    <div class="alert alert-success" role="alert" >
+      <div class="alert-items">
+        <div class="alert-item static">
+          <div class="alert-icon-wrapper">
+            <clr-icon class="alert-icon" shape="check-circle"></clr-icon>
+          </div>
+          <span class="alert-text">
+         Connect success.
+      </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</clr-modal>
+<clr-modal [(clrModalOpen)]="connectAlertFail">
+  <div class="modal-body">
+    <div class="alert alert-danger" role="alert">
+      <div class="alert-items">
+        <div class="alert-item static">
+          <div class="alert-icon-wrapper">
+            <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
+          </div>
+          <span class="alert-text">
+          Connect failed.
+      </span>
+        </div>
+      </div>
+    </div>
   </div>
 </clr-modal>

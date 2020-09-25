@@ -13,6 +13,7 @@ import java.util.Map;
  * overview controller
  */
 @RestController
+@RequestMapping("/overview")
 public class OverviewController extends BaseController{
 
 
@@ -23,7 +24,7 @@ public class OverviewController extends BaseController{
      * @return ResponseBodyBean
      * data like {"total": 100,"normal": 90,"abnormal", 10}
      */
-    @RequestMapping(value = "/getstoragenum", method = RequestMethod.POST)
+    @RequestMapping(value = "/getstoragenum", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean getStorageNum(){
         try {
@@ -48,7 +49,7 @@ public class OverviewController extends BaseController{
      *             "capacityUnit": "TB"
      *           }
      */
-    @RequestMapping(value = "/getdatastoreoverview", method = RequestMethod.POST)
+    @RequestMapping(value = "/getdatastoreoverview", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean getDataStoreOverview(@RequestParam String type){
         try {
@@ -76,7 +77,7 @@ public class OverviewController extends BaseController{
      *             "capacityUnit": "TB"
      *           }]
      */
-    @RequestMapping(value = "/getdatastoretopn", method = RequestMethod.POST)
+    @RequestMapping(value = "/getdatastoretopn", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean getDataStoreTopN(@RequestParam String type,
                                              @RequestParam(required = false) Integer topn,
@@ -106,7 +107,7 @@ public class OverviewController extends BaseController{
      *        info: 44
      *        }
      */
-    @RequestMapping(value = "/getbestpracticeviolations", method = RequestMethod.POST)
+    @RequestMapping(value = "/getbestpracticeviolations", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean getBestPracticeViolations(){
         //type 0 :critical, 1:major, 2:warning, 3: info
