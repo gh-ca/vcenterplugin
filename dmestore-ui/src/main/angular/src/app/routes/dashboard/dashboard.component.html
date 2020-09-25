@@ -281,22 +281,18 @@
   </div>
 </clr-modal>
 
-<clr-modal [(clrModalOpen)]="connectAlertSuccess">
-  <div class="modal-body">
-    <div class="alert alert-success" role="alert" >
-      <div class="alert-items">
-        <div class="alert-item static">
-          <div class="alert-icon-wrapper">
-            <clr-icon class="alert-icon" shape="check-circle"></clr-icon>
-          </div>
-          <span class="alert-text">
+<div class="alert alert-success" role="alert">
+  <div class="alert-items">
+    <div class="alert-item center">
+      <div class="alert-icon-wrapper">
+        <clr-icon class="alert-icon" shape="check-circle"></clr-icon>
+      </div>
+      <span class="alert-text">
          Connect success.
       </span>
-        </div>
-      </div>
     </div>
   </div>
-</clr-modal>
+</div>
 <clr-modal [(clrModalOpen)]="connectAlertFail">
   <div class="modal-body">
     <div class="alert alert-danger" role="alert">
