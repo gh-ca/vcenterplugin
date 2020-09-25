@@ -11,22 +11,22 @@ import {GlobalsService} from '../../shared/globals.service';
 })
 export class IscsiComponent implements OnInit, AfterViewInit {
 
-  portGetUrl = 'http://localhost:8080/dmestorage/getstorageethports';
+  portGetUrl = 'dmestorage/getstorageethports';
   portGetUrlParams = {
     params: {
       storageSn: ''
     }
   };
-  ipsGetUrl = 'http://localhost:8080/accessvmware/getvmkernelipbyhostobjectid';
+  ipsGetUrl = 'accessvmware/getvmkernelipbyhostobjectid';
   ipsGetUrlParams = {
     params: {
       hostObjectId: ''
     }
   };
 
-  storageGetUrl = 'http://localhost:8080/dmestorage/storages';
+  storageGetUrl = 'dmestorage/storages';
 
-  configIscsiUrl = 'http://localhost:8080/accesshost/configureiscsi';
+  configIscsiUrl = 'accesshost/configureiscsi';
 
   // 存储下拉框数据
   storageDevices = [];

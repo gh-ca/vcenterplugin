@@ -70,7 +70,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   refresh(){
-    this.http.get('http://localhost:8080/accessdme/refreshaccess', {}).subscribe((result: any) => {
+    this.http.get('accessdme/refreshaccess', {}).subscribe((result: any) => {
       console.log(result);
       if (result.code === '0' || result.code === '200'){
         this.hostModel = result.data.data;
@@ -92,7 +92,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       // Do submit logic
       this.popShow = false;
       console.log(this.connectModel);
-      this.http.post('http://localhost:8080/accessdme/access', this.connectModel).subscribe((result: any) => {
+      this.http.post('accessdme/access', this.connectModel).subscribe((result: any) => {
         console.log(result);
         if (result.code !== '0' && result.code !== '200'){
              this.connectAlertFail = true;

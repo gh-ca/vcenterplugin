@@ -284,7 +284,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     //       this.isLoading = false;
     //       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     // });
-    this.http.post('http://localhost:8080/servicelevel/listStoragePoolsByServiceLevelId', this.selectedModel.id).subscribe((response: any) => {
+    this.http.post('servicelevel/listStoragePoolsByServiceLevelId', this.selectedModel.id).subscribe((response: any) => {
       console.log(response);
     }, err => {
       console.error('ERROR', err);
@@ -307,7 +307,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     //       this.isLoading = false;
     //       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     // });
-    this.http.post('http://localhost:8080/servicelevel/listVolumesByServiceLevelId', this.selectedModel.id).subscribe((response: any) => {
+    this.http.post('servicelevel/listVolumesByServiceLevelId', this.selectedModel.id).subscribe((response: any) => {
       console.log(response);
     }, err => {
       console.error('ERROR', err);
@@ -388,7 +388,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // 刷新服务等级列表
   refresh(){
-    this.http.post('http://localhost:8080/servicelevel/listservicelevel', {}).subscribe((response: any) => {
+    this.http.post('servicelevel/listservicelevel', {}).subscribe((response: any) => {
       response.data = response.data.replace('service-levels', 'serviceLevels');
       const r = JSON.parse(response.data);
       for (const i of r.serviceLevels){
