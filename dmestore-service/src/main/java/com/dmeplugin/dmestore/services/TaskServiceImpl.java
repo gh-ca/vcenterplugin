@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -47,7 +48,7 @@ public class TaskServiceImpl implements TaskService {
         }
         //解析responseEntity 转换为 TaskDetailInfo
         Object object = responseEntity.getBody();
-        List<TaskDetailInfo> tasks = converBean(object);
+        List<TaskDetailInfo> tasks = converBean(null, object);
         return tasks;
     }
 
@@ -67,7 +68,7 @@ public class TaskServiceImpl implements TaskService {
         }
         //解析responseEntity 转换为 TaskDetailInfo
         Object object = responseEntity.getBody();
-        List<TaskDetailInfo> tasks = converBean(object);
+        List<TaskDetailInfo> tasks = converBean(taskId, object);
         return tasks.get(0);
     }
 
@@ -78,9 +79,10 @@ public class TaskServiceImpl implements TaskService {
         while (loopFlag) {
             try {
                 ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+
                 JsonObject taskDetail = gson.fromJson(responseEntity.getBody(), JsonObject.class);
                 //任务进度完成100%后处理，否则等待2s后再尝试
-                if (taskDetail.get("progress").getAsInt() == 100) {
+                if (ToolUtils.getInt(taskDetail.get("progress")) == 100 || ToolUtils.getInt(taskDetail.get("status")) > 2) {
                     return taskDetail;
                 } else {
                     Thread.sleep(2 * 1000);
@@ -93,7 +95,7 @@ public class TaskServiceImpl implements TaskService {
         return null;
     }
 
-    private List<TaskDetailInfo> converBean(Object object) {
+    private List<TaskDetailInfo> converBean(String origonTaskId, Object object) {
         List<TaskDetailInfo> taskDetailInfos = new ArrayList<>();
 
         JsonArray jsonArray;
@@ -108,15 +110,19 @@ public class TaskServiceImpl implements TaskService {
         for (JsonElement jsonElement : jsonArray) {
             TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            String taskId = jsonObject.get("id").getAsString();
-            String taskName = jsonObject.get("name_en").getAsString();
-            int status = jsonObject.get("status").getAsInt();
-            int progress = jsonObject.get("progress").getAsInt();
-            String ownerName = jsonObject.get("owner_name").getAsString();
-            long createTime = jsonObject.get("create_time").getAsLong();
-            long startTime = jsonObject.get("start_time").getAsLong();
-            long endTime = jsonObject.get("end_time").getAsLong();
-            String detail = null != jsonObject.get("detail_en") ? "" : jsonObject.get("detail_en").getAsString();
+            String taskId = ToolUtils.getStr(jsonObject.get("id"));
+            //过滤子任务
+            if (!StringUtils.isEmpty(origonTaskId) && !origonTaskId.equals(taskId)) {
+                continue;
+            }
+            String taskName = ToolUtils.getStr(jsonObject.get("name_en"));
+            int status = ToolUtils.getInt(jsonObject.get("status"));
+            int progress = ToolUtils.getInt(jsonObject.get("progress"));
+            String ownerName = ToolUtils.getStr(jsonObject.get("owner_name"));
+            long createTime = ToolUtils.getLong(jsonObject.get("create_time"));
+            long startTime = ToolUtils.getLong(jsonObject.get("start_time"));
+            long endTime = ToolUtils.getLong(jsonObject.get("end_time"));
+            String detail = ToolUtils.getStr(jsonObject.get("detail_en"));
             JsonArray resourcesArray = jsonObject.getAsJsonArray("resources");
 
             taskDetailInfo.setId(taskId);
@@ -176,6 +182,10 @@ public class TaskServiceImpl implements TaskService {
         }
         for (TaskDetailInfo taskInfo : detailInfos) {
             String taskId = taskInfo.getId();
+            //过滤子任务
+            if (!taskIds.contains(taskId)) {
+                continue;
+            }
             int status = taskInfo.getStatus();
             int progress = taskInfo.getProgress();
             if (100 == progress || status > 2) {
@@ -205,19 +215,19 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Boolean checkTaskStatus(List<String> taskIds) {
-        boolean unmountFlag = true;
+        boolean flag = false;
         Map<String, Integer> taskStatusMap = new HashMap<>();
         getTaskStatus(taskIds, taskStatusMap, taskTimeOut, System.currentTimeMillis());
         LOG.info("taskStatusMap===" + (taskStatusMap == null ? "null" : gson.toJson(taskStatusMap)));
         for (Map.Entry<String, Integer> entry : taskStatusMap.entrySet()) {
             //String taskId = entry.getKey();
             int status = entry.getValue();
-            if (3 != status && 4 != status) {
-                unmountFlag = false;
+            if (3 == status || 4 == status) {
+                flag = true;
                 break;
             }
         }
-        return unmountFlag;
+        return flag;
     }
 
     public void setDmeAccessService(DmeAccessService dmeAccessService) {
