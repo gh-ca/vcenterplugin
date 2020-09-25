@@ -26,16 +26,16 @@ public class Volume {
     private String storage_pool_name;//存储池名称
     private Integer capacity;//总容量 单位GB
     //关联的datastore
-    private List<VmfsDataInfo> datastores;
+    private String datastores;
 
     //时延 iops 带宽 公用存储设备的
 
 
-    public List<VmfsDataInfo> getDatastores() {
+    public String getDatastores() {
         return datastores;
     }
 
-    public void setDatastores(List<VmfsDataInfo> datastores) {
+    public void setDatastores(String datastores) {
         this.datastores = datastores;
     }
 

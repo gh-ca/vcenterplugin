@@ -61,7 +61,7 @@ export class BestpracticeComponent implements OnInit {
   apply() {}
 
   recheck() {
-    this.http.post('http://localhost:8080/v1/bestpractice', {}).subscribe((result: any) => {
+    this.http.post('v1/bestpractice', {}).subscribe((result: any) => {
       console.log(result);
     }, err => {
       console.error('ERROR', err);
@@ -71,7 +71,7 @@ export class BestpracticeComponent implements OnInit {
   practiceRefresh(state: ClrDatagridStateInterface){
     this.isLoading = true;
     const params = this.commonService.refresh(state, this.query);
-    this.http.get('http://localhost:8080/v1/bestpractice/records/all', params).subscribe((result: any) => {
+    this.http.get('v1/bestpractice/records/all', params).subscribe((result: any) => {
           console.log(result);
           if (result.code === '0'){
             this.list = result.data;
