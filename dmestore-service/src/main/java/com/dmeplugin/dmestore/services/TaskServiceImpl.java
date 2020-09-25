@@ -69,7 +69,11 @@ public class TaskServiceImpl implements TaskService {
         //解析responseEntity 转换为 TaskDetailInfo
         Object object = responseEntity.getBody();
         List<TaskDetailInfo> tasks = converBean(taskId, object);
-        return tasks.get(0);
+        if (null != tasks && tasks.size() > 0) {
+            return tasks.get(0);
+        } else {
+            return null;
+        }
     }
 
     @Override
@@ -82,7 +86,7 @@ public class TaskServiceImpl implements TaskService {
 
                 JsonObject taskDetail = gson.fromJson(responseEntity.getBody(), JsonObject.class);
                 //任务进度完成100%后处理，否则等待2s后再尝试
-                if (ToolUtils.getInt(taskDetail.get("progress")) == 100 || ToolUtils.getInt(taskDetail.get("status")) > 2) {
+                if (ToolUtils.jsonToInt(taskDetail.get("progress")) == 100 || ToolUtils.jsonToInt(taskDetail.get("status")) > 2) {
                     return taskDetail;
                 } else {
                     Thread.sleep(2 * 1000);
@@ -110,19 +114,19 @@ public class TaskServiceImpl implements TaskService {
         for (JsonElement jsonElement : jsonArray) {
             TaskDetailInfo taskDetailInfo = new TaskDetailInfo();
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            String taskId = ToolUtils.getStr(jsonObject.get("id"));
+            String taskId = ToolUtils.jsonToStr(jsonObject.get("id"));
             //过滤子任务
             if (!StringUtils.isEmpty(origonTaskId) && !origonTaskId.equals(taskId)) {
                 continue;
             }
-            String taskName = ToolUtils.getStr(jsonObject.get("name_en"));
-            int status = ToolUtils.getInt(jsonObject.get("status"));
-            int progress = ToolUtils.getInt(jsonObject.get("progress"));
-            String ownerName = ToolUtils.getStr(jsonObject.get("owner_name"));
+            String taskName = ToolUtils.jsonToStr(jsonObject.get("name_en"));
+            int status = ToolUtils.jsonToInt(jsonObject.get("status"));
+            int progress = ToolUtils.jsonToInt(jsonObject.get("progress"));
+            String ownerName = ToolUtils.jsonToStr(jsonObject.get("owner_name"));
             long createTime = ToolUtils.getLong(jsonObject.get("create_time"));
             long startTime = ToolUtils.getLong(jsonObject.get("start_time"));
             long endTime = ToolUtils.getLong(jsonObject.get("end_time"));
-            String detail = ToolUtils.getStr(jsonObject.get("detail_en"));
+            String detail = ToolUtils.jsonToStr(jsonObject.get("detail_en"));
             JsonArray resourcesArray = jsonObject.getAsJsonArray("resources");
 
             taskDetailInfo.setId(taskId);
@@ -140,10 +144,10 @@ public class TaskServiceImpl implements TaskService {
                 for (JsonElement jsonElement1 : resourcesArray) {
                     TaskDetailResource tdr = new TaskDetailResource();
                     JsonObject resourceObj = jsonElement1.getAsJsonObject();
-                    String operate = ToolUtils.getStr(resourceObj.get("operate"));
-                    String type = ToolUtils.getStr(resourceObj.get("type"));
-                    String id = ToolUtils.getStr(resourceObj.get("id"));
-                    String name = ToolUtils.getStr(resourceObj.get("name"));
+                    String operate = ToolUtils.jsonToStr(resourceObj.get("operate"));
+                    String type = ToolUtils.jsonToStr(resourceObj.get("type"));
+                    String id = ToolUtils.jsonToStr(resourceObj.get("id"));
+                    String name = ToolUtils.jsonToStr(resourceObj.get("name"));
 
                     tdr.setOperate(operate);
                     tdr.setType(type);
