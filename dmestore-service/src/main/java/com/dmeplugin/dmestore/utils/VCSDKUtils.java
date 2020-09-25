@@ -1974,7 +1974,7 @@ public class VCSDKUtils {
                 }else if (hba instanceof HostFibreChannelHba) {
                     HostFibreChannelHba fcHba = (HostFibreChannelHba) hba;
                     map.put("type","FC");
-                    map.put("name",fcHba.getDevice());
+                    map.put("name",fcHba.getNodeWorldWideName());
                 }
             }
         } catch (Exception e) {
