@@ -212,7 +212,7 @@ export class VmfsPerformanceService {
   getIopsChart(title: string, subtext: string, objTypeId: string, indicatorIds: any[], objIds: any[], intervalParam: string, rangeParam: string, beginTime: number, endTime: number) {
     // this.iopsChart = 对象ID（卷ID）、指标ID（IOPSID）、range范围 只传
     return new Promise((resolve, reject) => {
-      this.http.post('http://localhost:8080/datastorestatistichistrory/vmfsvolume', {/*obj_type_id: objTypeId,*/
+      this.http.post('datastorestatistichistrory/vmfsvolume', {/*obj_type_id: objTypeId,*/
         indicator_ids: indicatorIds, // 指标
         obj_ids: objIds,
         interval: intervalParam,
@@ -220,7 +220,7 @@ export class VmfsPerformanceService {
         begin_time: beginTime,
         end_time: endTime })
         .subscribe((response: any) => {
-          if (response.code === '0' && response.data.code === '200') {
+          if (response.code === '200' && response.data !== null) {
             this.resData =  response.data.data;
             // 设置x轴
             this.setXAxisData(rangeParam, beginTime, endTime, intervalParam);

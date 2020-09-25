@@ -43,7 +43,7 @@ export class RdmComponent implements OnInit {
   check() {}
 
   loadStorageDevice(){
-    this.http.get('http://localhost:8080/dmestorage/storages', {}).subscribe((result: any) => {
+    this.http.get('dmestorage/storages', {}).subscribe((result: any) => {
       console.log(result);
       if (result.code === '0' || result.code === '200'){
         this.storageDevices = result.data.data;
@@ -55,7 +55,7 @@ export class RdmComponent implements OnInit {
   }
 
   loadStoragePool(storageId: string){
-    this.http.get('http://localhost:8080/dmestorage/storagepools', {params: {storageId}}).subscribe((result: any) => {
+    this.http.get('dmestorage/storagepools', {params: {storageId}}).subscribe((result: any) => {
       console.log(result);
       if (result.code === '0' || result.code === '200'){
         this.storagePools = result.data.data;

@@ -191,13 +191,13 @@ export class StorageService {
   constructor(private http: HttpClient) {}
 
   getData(){
-    return this.http.get('http://localhost:8080/dmestorage/storages');
+    return this.http.get('dmestorage/storages');
   }
   getStoragePoolListByStorageId(storageId: string){
-    return this.http.get('http://localhost:8080/dmestorage/storagepools', {params: {storageId}});
+    return this.http.get('dmestorage/storagepools', {params: {storageId}});
   }
   getLogicPortListByStorageId(storageId: string){
-    return this.http.get('http://localhost:8080/dmestorage/logicports', {params: {storageId}});
+    return this.http.get('dmestorage/logicports', {params: {storageId}});
   }
 
   getCharts() {

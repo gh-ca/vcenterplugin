@@ -52,6 +52,7 @@ export class NfsComponent implements OnInit {
     this.remoteSrv.getData()
       .subscribe((result: any) => {
         this.list = result.data;
+        console.log(result);
         this.isLoading = false;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         // 获取性能列表

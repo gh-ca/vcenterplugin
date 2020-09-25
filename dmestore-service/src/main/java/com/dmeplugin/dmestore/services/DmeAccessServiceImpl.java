@@ -7,6 +7,7 @@ import com.dmeplugin.dmestore.entity.DmeInfo;
 import com.dmeplugin.dmestore.task.ScheduleSetting;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
+import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
@@ -38,6 +40,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     private VmfsAccessService vmfsAccessService;
 
     private DmeNFSAccessService dmeNFSAccessService;
+
+    private VCSDKUtils vcsdkUtils;
 
     @Autowired
     private ScheduleSetting scheduleSetting;
@@ -140,17 +144,25 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         if (url.indexOf("http") < 0) {
             url = dmeHostUrl + url;
         }
-        responseEntity = restTemplate.exchange(url, method, entity, String.class);
+        try {
+            responseEntity = restTemplate.exchange(url, method, entity, String.class);
+        }catch (HttpClientErrorException e){
+            LOG.error("HttpClientErrorException:"+e.toString());
+            responseEntity = new ResponseEntity<String>(e.getStatusCode());
+
+        }
         LOG.info(url + "==responseEntity==" + (responseEntity == null ? "null" : responseEntity.getStatusCodeValue()));
-        if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_403 ||
-                responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_401) {
+        if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_401 ||
+                responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_403) {
             //如果token失效，重新登录
             dmeToken = null;
             LOG.info("token失效，重新登录，获取token");
             iniLogin();
             //得到新token后，重新执行上次任务
             LOG.info("得到新token后，重新执行上次任务，dmeToken==" + dmeToken);
-            responseEntity = restTemplate.exchange(dmeHostUrl + url, method, entity, String.class);
+            headers = getHeaders();
+            entity = new HttpEntity<>(requestBody, headers);
+            responseEntity = restTemplate.exchange(url, method, entity, String.class);
         }
         return responseEntity;
     }
@@ -174,17 +186,25 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         if (url.indexOf("http") < 0) {
             url = dmeHostUrl + url;
         }
-        responseEntity = restTemplate.exchange(url, method, entity, String.class, jsonBody);
+        try{
+            responseEntity = restTemplate.exchange(url, method, entity, String.class, jsonBody);
+        }catch (HttpClientErrorException e){
+            LOG.error("HttpClientErrorException:"+e.toString());
+            responseEntity = new ResponseEntity<String>(e.getStatusCode());
+
+        }
         LOG.info(url + "==responseEntity==" + (responseEntity == null ? "null" : responseEntity.getStatusCodeValue()));
-        if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_403 ||
-                responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_401) {
+        if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_401 ||
+                responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_403) {
             //如果token失效，重新登录
             dmeToken = null;
             LOG.info("token失效，重新登录，获取token");
             iniLogin();
             //得到新token后，重新执行上次任务
             LOG.info("得到新token后，重新执行上次任务，dmeToken==" + dmeToken);
-            responseEntity = restTemplate.exchange(dmeHostUrl + url, method, entity, String.class, jsonBody);
+            headers = getHeaders();
+            entity = new HttpEntity<>(null, headers);
+            responseEntity = restTemplate.exchange(url, method, entity, String.class, jsonBody);
         }
         return responseEntity;
     }
@@ -419,11 +439,20 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         try {
             Map<String, Object> requestbody = null;
             if (params != null && params.get("host") != null) {
+                //得到主机的hba信息
+                Map<String,Object> hbamap = vcsdkUtils.getHbaByHostObjectId(ToolUtils.getStr(params.get("hostId")));
+
                 requestbody = new HashMap<>();
                 requestbody.put("access_mode", "NONE");
-                requestbody.put("type", "UNKNOWN");
+                requestbody.put("type", "VMWAREESX");
                 requestbody.put("ip", params.get("host"));
                 requestbody.put("host_name", params.get("host"));
+                List<Map<String,Object>> initiators = new ArrayList<>();
+                Map<String,Object> initiator = new HashMap<>();
+                initiator.put("protocol",ToolUtils.getStr(hbamap.get("type")));
+                initiator.put("port_name",ToolUtils.getStr(hbamap.get("name")));
+                initiators.add(initiator);
+                requestbody.put("initiator",initiators);
                 LOG.info("requestbody==" + gson.toJson(requestbody));
 
                 LOG.info("createHost_url===" + createHostUrl);
@@ -493,6 +522,10 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     public void setDmeNFSAccessService(DmeNFSAccessService dmeNFSAccessService) {
         this.dmeNFSAccessService = dmeNFSAccessService;
+    }
+
+    public void setVcsdkUtils(VCSDKUtils vcsdkUtils) {
+        this.vcsdkUtils = vcsdkUtils;
     }
 
     public void setScheduleDao(ScheduleDao scheduleDao) {

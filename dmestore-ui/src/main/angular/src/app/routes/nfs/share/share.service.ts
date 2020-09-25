@@ -6,7 +6,7 @@ export class ShareService {
   constructor(private http: HttpClient) {}
 
   getData(param) {
-    return this.http.get('http://localhost:8080/accessnfs/share/' + param);
+    return this.http.get('accessnfs/share/' + param);
   }
 }
 export class ShareDetail{

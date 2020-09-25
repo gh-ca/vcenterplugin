@@ -6,7 +6,7 @@ export class AttributeService {
   constructor(private http: HttpClient) {}
 
   getData(storageObjectId: string) {
-    return this.http.get('http://localhost:8080/accessvmfs/volume/' + storageObjectId );
+    return this.http.get('accessvmfs/volume/' + storageObjectId );
   }
 }
 export interface VolumeInfo{

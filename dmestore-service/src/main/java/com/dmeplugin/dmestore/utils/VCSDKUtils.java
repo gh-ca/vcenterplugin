@@ -712,7 +712,7 @@ public class VCSDKUtils {
     }
 
     //create nfs datastore
-    public String createNfsDatastore(String serverHost, String exportPath, String nfsName, String accessMode, List<String> mountHosts, String type) {
+    public String createNfsDatastore(String serverHost, String exportPath, String nfsName, String accessMode, List<String> mountHosts,String type) {
         String result = "success";
         //exportPath = "/volume1/TESTNFS";
         //需要判断nfs版本，如果是v4.1要将 Kerberos 安全功能与 NFS 4.1 结合使用，请启用 Kerberos 并选择适当的 Kerberos 模型。
@@ -722,10 +722,18 @@ public class VCSDKUtils {
         //mountHost = "10.143.132.17";
         //logicPort = 0;
         _logger.info("start creat nfs datastore");
+
+        String dataStoreObjectId = "";
+
         accessMode = StringUtils.isEmpty(accessMode) || accessMode.equals("readWrite") ? "readWrite" : "readOnly";
         try {
-            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", 443, "administrator@vsphere.local", "Pbu4@123");
-            DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
+            String serverguid = vcConnectionHelper.objectID2Serverguid(dataStoreObjectId);
+            VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
+            //VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", 443,"administrator@vsphere.local", "Pbu4@123");
+            //DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
+            ManagedObjectReference managedObjectReference1 = vcConnectionHelper.objectID2MOR(dataStoreObjectId);
+            DatacenterMO dcMo = new DatacenterMO(vmwareContext, managedObjectReference1);
+
             List<ManagedObjectReference> hosts = null;
             if (mountHosts != null && mountHosts.size() > 0) {
                 ManagedObjectReference managedObjectReference = null;
@@ -736,7 +744,6 @@ public class VCSDKUtils {
                         managedObjectReference = hosts.get(0);
                         HostMO hostMO = new HostMO(vmwareContext, managedObjectReference);
                         HostDatastoreSystemMO hostDatastoreSystemMO = hostMO.getHostDatastoreSystemMO();
-                        //todo logic port param needed ?
                         hostDatastoreSystemMO.createNfsDatastore(serverHost, 0, exportPath, nfsName, accessMode, type);
                     } else {
                         result = "failed";
@@ -1939,6 +1946,45 @@ public class VCSDKUtils {
         }
         return listStr;
     }
+
+    //得到Hba信息
+    public Map<String,Object> getHbaByHostObjectId(String hostObjectId) throws Exception{
+        Map<String,Object> map = new HashMap<>();
+        try {
+            if (StringUtils.isEmpty(hostObjectId)) {
+                _logger.error("get Hba error:host ObjectId is null.");
+                throw new Exception("get Hba error:host ObjectId is null.");
+            }
+
+            String serverguid = vcConnectionHelper.objectID2Serverguid(hostObjectId);
+            VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
+
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+            //取得该存储下所有已经挂载的主机ID
+            ManagedObjectReference objmor = vcConnectionHelper.objectID2MOR(hostObjectId);
+            HostMO hostmo = new HostMO(vmwareContext, objmor);
+            //查找对应的iscsi适配器
+            String iscsiHbaDevice = null;
+            List<HostHostBusAdapter> hbas = hostmo.getHostStorageSystemMO().getStorageDeviceInfo().getHostBusAdapter();
+            for (HostHostBusAdapter hba : hbas) {
+                if (hba instanceof HostInternetScsiHba) {
+                    HostInternetScsiHba iscsiHba = (HostInternetScsiHba) hba;
+                    map.put("type","ISCSI");
+                    map.put("name",iscsiHba.getIScsiName());
+                }else if (hba instanceof HostFibreChannelHba) {
+                    HostFibreChannelHba fcHba = (HostFibreChannelHba) hba;
+                    map.put("type","FC");
+                    map.put("name",fcHba.getDevice());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware error:", e);
+            throw e;
+        }
+        return map;
+    }
+
 
     public static void main(String[] args) {
 //        try {

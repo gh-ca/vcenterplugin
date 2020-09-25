@@ -1,5 +1,5 @@
 export const environment = {
-  SERVER_ORIGIN: 'https://api.github.com',
+  SERVER_ORIGIN: 'rest/',
   production: true,
   useHash: true,
   hmr: false,

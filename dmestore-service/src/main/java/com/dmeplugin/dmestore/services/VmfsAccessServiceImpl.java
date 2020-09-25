@@ -7,6 +7,7 @@ import com.dmeplugin.dmestore.model.Storage;
 import com.dmeplugin.dmestore.model.VmfsDataInfo;
 import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
 import com.dmeplugin.dmestore.model.Volume;
+import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.*;
@@ -181,10 +182,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             if (statisticObject != null) {
                                 VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
                                 vmfsDataInfo.setVolumeId(volumeId);
-                                vmfsDataInfo.setIops(ToolUtils.jsonToInt(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_IOPS), null));
-                                vmfsDataInfo.setBandwidth(ToolUtils.jsonToDou(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_BANDWIDTH), null));
-                                vmfsDataInfo.setReadResponseTime(ToolUtils.jsonToInt(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_READPESPONSETIME), null));
-                                vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToInt(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_WRITERESPONSETIME), null));
+                                vmfsDataInfo.setIops(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT), null));
+                                vmfsDataInfo.setBandwidth(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_BANDWIDTH), null));
+                                vmfsDataInfo.setReadResponseTime(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_READRESPONSETIME), null));
+                                vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_WRITERESPONSETIME), null));
                                 relists.add(vmfsDataInfo);
                             }
                         }
@@ -409,7 +410,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     //判断主机在DME中是否存在 如果主机不存在就创建并得到主机ID
-    private String checkOrcreateToHost(String hostIp) throws Exception {
+    private String checkOrcreateToHost(String hostIp, String hostId) throws Exception {
         String objId = "";
         try {
             //param str host: 主机  param str cluster: 集群
@@ -431,6 +432,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 if (StringUtils.isEmpty(objId)) {
                     Map<String, Object> params = new HashMap<>();
                     params.put("host", hostIp);
+                    params.put("hostId", hostId);
                     Map<String, Object> hostmap = dmeAccessService.createHost(params);
                     if (hostmap != null && hostmap.get("id") != null) {
                         objId = hostmap.get("id").toString();
@@ -478,7 +480,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             List<String> hostlists = new ArrayList<>();
                             for (Map<String, String> hostmap : vmwarehostlists) {
                                 LOG.info("checkOrcreateToHost====" + hostmap.get("hostName"));
-                                String tmpHostId = checkOrcreateToHost(ToolUtils.getStr(hostmap.get("hostName")));
+                                String tmpHostId = checkOrcreateToHost(ToolUtils.getStr(hostmap.get("hostName")),ToolUtils.getStr(hostmap.get("hostId")));
                                 if (!StringUtils.isEmpty(tmpHostId)) {
                                     hostlists.add(tmpHostId);
                                 }
@@ -512,7 +514,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         try {
             //param str host: 主机  param str cluster: 集群
             if (params != null && params.get("host") != null) {
-                objId = checkOrcreateToHost(ToolUtils.getStr(params.get("host")));
+                objId = checkOrcreateToHost(ToolUtils.getStr(params.get("host")), ToolUtils.getStr(params.get("hostId")));
             } else if (params != null && params.get("cluster") != null) {
                 objId = checkOrcreateToHostGroup(ToolUtils.getStr(params.get("cluster")), ToolUtils.getStr(params.get("clusterId")));
             }

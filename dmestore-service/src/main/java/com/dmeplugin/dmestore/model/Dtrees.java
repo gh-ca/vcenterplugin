@@ -9,11 +9,21 @@ package com.dmeplugin.dmestore.model;
 public class Dtrees {
 
     private String name;
-    private String fs_name;
-    private boolean quota_switch;
-    private String security_style;
-    private String tier_name;
-    private Integer nfs_count;
+    private String fs_name; //所属文件系统名称
+    private boolean quota_switch; //配额
+    private String security_style;//安全模式
+    private String tier_name;//服务等级名称
+    private Integer nfs_count;//nfs
+    private Integer cifs_count;
+
+
+    public Integer getCifs_count() {
+        return cifs_count;
+    }
+
+    public void setCifs_count(Integer cifs_count) {
+        this.cifs_count = cifs_count;
+    }
 
     public String getFs_name() {
         return fs_name;
