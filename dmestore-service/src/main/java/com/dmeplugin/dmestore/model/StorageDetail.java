@@ -17,7 +17,6 @@ public class StorageDetail {
     private String sn;//设备序列号。
     private String vendor;//厂商
     private String model;//产品型号
-    private String productVersion;//产品版本号
     private Double usedCapacity;//已用容量 （单位:MB）
     private Double totalCapacity; //裸容量（单位:MB）。
     private Double totalEffectiveCapacity;//可得容量 （总容量）
@@ -33,6 +32,36 @@ public class StorageDetail {
     private String logicPorts;
     private String storageControllers;
     private String storageDisks;
+
+    //补充字段
+    private String productVersion;//固件版本
+    private Integer maintenance_start; //维护开始时间
+    private Integer maintenance_overtime;//维护结束时间
+    private String patch_version;//补订版本
+
+    public String getPatch_version() {
+        return patch_version;
+    }
+
+    public void setPatch_version(String patch_version) {
+        this.patch_version = patch_version;
+    }
+
+    public Integer getMaintenance_start() {
+        return maintenance_start;
+    }
+
+    public void setMaintenance_start(Integer maintenance_start) {
+        this.maintenance_start = maintenance_start;
+    }
+
+    public Integer getMaintenance_overtime() {
+        return maintenance_overtime;
+    }
+
+    public void setMaintenance_overtime(Integer maintenance_overtime) {
+        this.maintenance_overtime = maintenance_overtime;
+    }
 
     public String getStoragePool() {
         return storagePool;

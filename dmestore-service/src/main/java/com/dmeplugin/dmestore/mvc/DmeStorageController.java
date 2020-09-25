@@ -142,9 +142,9 @@ public class DmeStorageController extends BaseController{
     }
     @GetMapping("/bandports")
     @ResponseBody
-    public ResponseBodyBean getBandPorts(@RequestParam(name = "storageId") String storageId){
+    public ResponseBodyBean getBandPorts(@RequestParam(name = "storage_id") String storage_id){
 
-        Map<String, Object> resMap = dmeStorageService.getBandPorts(storageId);
+        Map<String, Object> resMap = dmeStorageService.getBandPorts(storage_id);
         if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
             return success(resMap);
         }

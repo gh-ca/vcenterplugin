@@ -28,7 +28,7 @@ public class StoragePool   {
     private Double lun_subscription_rate;
     private Double fs_subscription_rate;
     //补充字段
-    private String media_type;//存储池主存类型
+    private String media_type;//类型（块）
     private String tier0_disk_type;//硬盘类型
     private String tier0_raid_lv; //RAID级别
     private String tier1_disk_type;//硬盘类型
@@ -37,8 +37,6 @@ public class StoragePool   {
     private String tier2_raid_lv;//RAID级别
     private String storage_id; //存储设备id
     private Double data_space; //存储池上创建LUN或者文件系统时的可用容量 单位MB
-    //TODO 块 没找到对应字段
-    // 存储池没有服务等级，服务等级所属存储池上所有卷
     //时延 iops 带宽 公用存储设备的
 
     public Double getLun_subscription_rate() {
