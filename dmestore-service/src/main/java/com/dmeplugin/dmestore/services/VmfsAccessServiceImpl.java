@@ -827,6 +827,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             String vmfsDatastoreName = vmfsDatastore.get("name").getAsString();
             //拆分wwn TODO
             String wwn = vmfsDatastoreUrl.split("volumes/")[1];
+            int index = wwn.indexOf("/");
+            if(index != -1){
+                wwn = wwn.substring(0, index);
+            }
             //根据wwn从DME中查询卷信息
             String volumeUrlByWwn = LIST_VOLUME_URL + "?volume_wwn=" + wwn;
             ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByWwn, HttpMethod.GET, null);

@@ -119,9 +119,9 @@ public class VMRDMServiceImpl implements VMRDMService {
         JsonObject task = gson.fromJson(responseEntity.getBody(), JsonObject.class);
         String taskId = task.get("task_id").getAsString();
         JsonObject taskDetail = taskService.queryTaskByIdUntilFinish(taskId);
-        if (null != taskDetail && taskDetail.get("status").getAsInt() != 3) {
+        if (taskDetail.get("status").getAsInt() != 3) {
             LOG.error("The DME volume is in abnormal condition!taskDetail={}", gson.toJson(taskDetail));
-            throw new Exception("The DME volume is in abnormal condition!");
+            throw new Exception(taskDetail.get("detail_cn").getAsString());
         }
         List<String> volumeIds = new ArrayList();
         //获取卷资源
@@ -143,15 +143,14 @@ public class VMRDMServiceImpl implements VMRDMService {
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, body.toString());
         if (responseEntity.getStatusCodeValue() / 100 != 2) {
             LOG.error("host mapping failed!errorMsg:{}", responseEntity.getBody());
-            throw new Exception("");
+            throw new Exception(responseEntity.getBody());
         }
         JsonObject task = gson.fromJson(responseEntity.getBody(), JsonObject.class);
         String taskId = task.get("task_id").getAsString();
         JsonObject taskDetail = taskService.queryTaskByIdUntilFinish(taskId);
-        if (null != taskDetail && taskDetail.get("status").getAsInt() == 3) {
-            LOG.info("Disk mapping to host succeeded!");
-        } else {
-            LOG.error("Disk mapping to host failed!taskDetail={}", gson.toJson(taskDetail));
+        if (taskDetail.get("status").getAsInt() != 3) {
+            LOG.error("host mapping failed!task status={}", task.get("status").getAsInt());
+            throw new Exception(task.get("detail_cn").getAsString());
         }
     }
 

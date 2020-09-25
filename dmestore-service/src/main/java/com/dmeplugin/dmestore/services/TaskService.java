@@ -30,5 +30,5 @@ public interface TaskService {
      * @Param [taskId]
      * @Return com.google.gson.JsonObject
      **/
-    JsonObject queryTaskByIdUntilFinish(String taskId);
+    JsonObject queryTaskByIdUntilFinish(String taskId) throws Exception;
 }
