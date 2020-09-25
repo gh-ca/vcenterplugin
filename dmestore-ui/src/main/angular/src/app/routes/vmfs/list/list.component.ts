@@ -140,7 +140,7 @@ export class VmfsListComponent implements OnInit {
     }
     this.modifyForm.newDsName = this.modifyForm.name;
     this.remoteSrv.updateVmfs(this.modifyForm.volume_id, this.modifyForm).subscribe((result: any) => {
-      if (result.code === '0') {
+      if (result.code === '200') {
         console.log('modify success:' + this.modifyForm.oldDsName);
       } else {
         console.log('modify faild：' + this.modifyForm.oldDsName + result.description);
@@ -182,7 +182,7 @@ export class VmfsListComponent implements OnInit {
         .subscribe((result: any) => {
           console.log("result:");
           console.log(result);
-          if (result.code === '0' && null != result.data ) {
+          if (result.code === '200' && null != result.data ) {
             this.list = result.data;
             if (null !== this.list) {
               this.total = this.list.length;
@@ -198,7 +198,7 @@ export class VmfsListComponent implements OnInit {
                 this.remoteSrv.getChartData(this.volumnIds).subscribe((chartResult: any) => {
                   console.log('chartResult');
                   console.log(chartResult);
-                  if (chartResult.code === '0' && chartResult.data != null) {
+                  if (chartResult.code === '200' && chartResult.data != null) {
                     const chartList: List [] = chartResult.data;
                     this.list.forEach(item => {
                       chartList.forEach(charItem => {
@@ -230,7 +230,7 @@ export class VmfsListComponent implements OnInit {
     this.remoteSrv.scanVMFS(this.storageType).subscribe((res: any) => {
       console.log('res');
       console.log(res);
-      if (res.code === '0') {
+      if (res.code === '200') {
         this.refresh();
         console.log('Scan success');
       } else {
@@ -267,7 +267,7 @@ export class VmfsListComponent implements OnInit {
   getStorageList() {
     this.remoteSrv.getStorages().subscribe((result: any) => {
       console.log(result);
-      if (result.code === '0' && result.data !== null) {
+      if (result.code === '200' && result.data !== null) {
         this.storageList = result.data.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
@@ -280,7 +280,7 @@ export class VmfsListComponent implements OnInit {
     if (null !== this.form.storage_id && '' !== this.form.storage_id) {
       this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id).subscribe((result: any) => {
         console.log(result);
-        if (result.code === '0' && result.data !== null) {
+        if (result.code === '200' && result.data !== null) {
           this.storagePoolList = result.data.data;
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         }
@@ -344,7 +344,7 @@ export class VmfsListComponent implements OnInit {
       this.remoteSrv.getHostList().subscribe((result: any) => {
         let hostList: HostList[] = []; // 主机列表
         /*console.log(result);*/
-        if (result.code === '0' && result.data !== null) {
+        if (result.code === '200' && result.data !== null) {
           hostList = result.data;
           hostList.forEach(item => {
             // const hostData = {
@@ -376,7 +376,7 @@ export class VmfsListComponent implements OnInit {
       this.remoteSrv.getClusterList().subscribe((result: any) => {
         let clusterList: ClusterList [] = []; // 集群列表
         console.log(result);
-        if (result.code === '0' && result.data !== null) {
+        if (result.code === '200' && result.data !== null) {
           clusterList = result.data;
           clusterList.forEach(item => {
             // const culData = {
@@ -440,7 +440,7 @@ export class VmfsListComponent implements OnInit {
   setServiceLevelList() {
     this.remoteSrv.getServiceLevelList().subscribe((result: any) => {
       console.log(result);
-      if (result.code === '0' && result.data !== null) {
+      if (result.code === '200' && result.data !== null) {
         this.serviceLevelList = result.data.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
@@ -482,7 +482,7 @@ export class VmfsListComponent implements OnInit {
 
     console.log(this.form);
     this.remoteSrv.createVmfs(this.form).subscribe((result: any) => {
-      if (result.code === '0') {
+      if (result.code === '200') {
         console.log('创建成功');
       } else {
         console.log('创建失败：' + result.description);
@@ -517,7 +517,7 @@ export class VmfsListComponent implements OnInit {
     this.remoteSrv.delVmfs(volumeIds).subscribe((result: any) => {
       // 隐藏删除提示页面
       this.delShow = false;
-      if (result.code === '0'){
+      if (result.code === '200'){
         console.log('DEL success' + this.rowSelected[0].name + ' success');
         // 空间回收完成重新请求数据
         this.refresh();
@@ -539,7 +539,7 @@ export class VmfsListComponent implements OnInit {
     // 获取服务器 通过ObjectId过滤已挂载的服务器
     this.remoteSrv.getHostListByObjectId(this.rowSelected[0].objectid).subscribe((result: any) => {
     // this.remoteSrv.getHostList().subscribe((result: any) => {
-      if (result.code === '0' && result.data !== null){
+      if (result.code === '200' && result.data !== null){
         this.hostList = result.data;
         this.cdr.detectChanges();
       }
@@ -547,7 +547,7 @@ export class VmfsListComponent implements OnInit {
     // 获取集群 通过ObjectId过滤已挂载的集群
     this.remoteSrv.getClusterListByObjectId(this.rowSelected[0].objectid).subscribe((result: any) => {
     // this.remoteSrv.getClusterList().subscribe((result: any) => {
-      if (result.code === '0'){
+      if (result.code === '200'){
         this.clusterList = result.data;
         this.cdr.detectChanges();
       }
@@ -566,7 +566,7 @@ export class VmfsListComponent implements OnInit {
       this.mountForm.clusterId = this.chooseCluster.clusterId;
     }
     this.remoteSrv.mountVmfs(this.mountForm).subscribe((result: any) => {
-      if (result.code  ===  '0'){
+      if (result.code  ===  '200'){
         console.log('挂载成功');
       } else {
         console.log('挂载异常：' + result.description);
@@ -580,7 +580,7 @@ export class VmfsListComponent implements OnInit {
   unmountHandleFunc() {
     this.remoteSrv.unmountVMFS().subscribe((result: any) => {
 
-      if (result.code === '0'){
+      if (result.code === '200'){
         console.log('unmount ' + name + ' success');
         // 空间回收完成重新请求数据
         this.refresh();
@@ -598,7 +598,7 @@ export class VmfsListComponent implements OnInit {
     console.log('reclaim:' + name);
     const vmfsNames = this.rowSelected.map(item => item.name);
     this.remoteSrv.reclaimVmfs(vmfsNames).subscribe((result: any) => {
-      if (result.code === '0'){
+      if (result.code === '200'){
         console.log('Reclaim ' + name + ' success');
         // 空间回收完成重新请求数据
         this.refresh();
@@ -631,7 +631,7 @@ export class VmfsListComponent implements OnInit {
   // 变更服务等级 处理
   changeSLHandleFunc() {
     this.remoteSrv.changeServiceLevel(this.changeServiceLevelForm).subscribe((result: any) => {
-      if (result.code === '0'){
+      if (result.code === '200'){
         console.log('change service level success:' + name);
         // 空间回收完成重新请求数据
         this.refresh();
@@ -675,7 +675,7 @@ export class VmfsListComponent implements OnInit {
     const params = [];
     params.push(this.expandForm);
     this.remoteSrv.expandVMFS(params).subscribe((result: any) => {
-      if (result.code === '0'){
+      if (result.code === '200'){
         console.log('expand success:' + name);
       }else {
         console.log('expand: ' + name  + ' Reason:' + result.description);
