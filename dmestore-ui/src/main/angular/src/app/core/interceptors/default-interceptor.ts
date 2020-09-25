@@ -52,19 +52,19 @@ export class DefaultInterceptor implements HttpInterceptor {
   }
 
   private handleOkReq(event: HttpEvent<any>): Observable<any> {
-    if (event instanceof HttpResponse) {
-      const body: any = event.body;
-      // failure: { code: **, msg: 'failure' }
-      // success: { code: 0,  msg: 'success', data: {} }
-      if (body && body.code !== '0') {
-        if (body.msg && body.msg !== '') {
-          this.toastr.error(body.msg);
-        }
-        return throwError([]);
-      } else {
-        return of(event);
-      }
-    }
+    // if (event instanceof HttpResponse) {
+    //   const body: any = event.body;
+    //   // failure: { code: **, msg: 'failure' }
+    //   // success: { code: 0,  msg: 'success', data: {} }
+    //   if (body && body.code !== '0') {
+    //     if (body.msg && body.msg !== '') {
+    //       this.toastr.error(body.msg);
+    //     }
+    //     return throwError([]);
+    //   } else {
+    //     return of(event);
+    //   }
+    // }
     // Pass down event if everything is OK
     return of(event);
   }

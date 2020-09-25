@@ -220,7 +220,7 @@ export class VmfsPerformanceService {
         begin_time: beginTime,
         end_time: endTime })
         .subscribe((response: any) => {
-          if (response.code === '200' || response.data.code === '200') {
+          if (response.code === '200' && response.data !== null) {
             this.resData =  response.data.data;
             // 设置x轴
             this.setXAxisData(rangeParam, beginTime, endTime, intervalParam);
