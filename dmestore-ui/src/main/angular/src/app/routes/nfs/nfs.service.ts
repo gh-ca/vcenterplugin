@@ -1,8 +1,12 @@
-import { Injectable } from '@angular/core';
+import {ChangeDetectorRef, Injectable} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import {GlobalsService} from "@shared/globals.service";
 
 @Injectable()
 export class NfsService {
+  static indicatorIdsIOPS: Array<string> = ['1407379178651656', '1407379178586113'];
+  static indicatorIdsBDWT: Array<string> = ['1407379178651656', '1407379178586113'];
+  static indicatorIdsREST: Array<string> = ['1407379178651656', '1407379178586113'];
   constructor(private http: HttpClient) {}
 
   getData() {
@@ -29,6 +33,15 @@ export class NfsService {
   }
   getClusterListByObjectId(dataStoreObjectId: string){
     return this.http.get('accessvmware/getclustersbydsobjectid', {params: {dataStoreObjectId}});
+  }
+
+  /**
+   * 获取折线图
+   * @param url
+   * @param params
+   */
+  getLineChartData(url:string, params = {}) {
+    return this.http.post(url, params);
   }
 }
 export interface List {
@@ -221,7 +234,10 @@ export class SerieData{
   symbol: string;
 }
 export class ItemStyle{
-  normal: LineStyle;
+  normal: Normal;
+}
+export class Normal {
+  lineStyle: LineStyle;
 }
 export class LineStyle{
   width: number;
@@ -233,5 +249,237 @@ export class Label{
   formatter: string; // 标签的文字。
   constructor(){
     this.show = true;
+  }
+}
+@Injectable()
+export class MakePerformance {
+  // chart:ChartOptions = new ChartOptions();
+  constructor(private remoteSrv: NfsService, private cdr: ChangeDetectorRef, public gs: GlobalsService) {}
+
+  /**
+   * 设置折线图 ( 折线1 虚线UpperLine、折线2 虚线LowerLine、
+   * 折线3Read、折线4Write)
+   * @param height
+   * @param title 标题
+   * @param subtext 副标题
+   * @param indicatorIds  获取参数指标（带宽的读写等） 0 读 1写
+   * @param objIds 卷ID（vmfs）、fsId(nfs) 只能放一个值即length为1
+   * @param range 时间段 LAST_5_MINUTE LAST_1_HOUR LAST_1_DAY LAST_1_WEEK LAST_1_MONTH LAST_1_QUARTER HALF_1_YEAR LAST_1_YEAR BEGIN_END_TIME INVALID
+   * @param url 请求url
+   */
+  setChart(height: number, title: string, subtext: string, indicatorIds: any[], objIds: any[], range: string, url: string) {
+    // 生成chart optiond对象
+    const chart:ChartOptions = this.getNewChart(height, title, subtext);
+    return new Promise((resolve, reject) => {
+      const params = {
+        indicator_ids: indicatorIds, // 指标
+        obj_ids: objIds, // 指标
+        range: range, // 指标
+      }
+      this.remoteSrv.getLineChartData(url, params).subscribe((result: any) => {
+        console.log('chartData: ', result);
+        if (result.code === '200' && result.data !== null && result.data.data !== null) {
+          const resData = result.data.data;
+            // 设置标题
+          chart.title.text = title;
+            // 设置副标题
+          chart.title.subtext = subtext;
+          // 上限对象
+          const upperData = resData[objIds[0]][indicatorIds[0]];
+          // 下限对象
+          const lowerData = resData[objIds[0]][indicatorIds[1]];
+          // 上限最大值
+          const pmaxData = this.getUpperOrLower(upperData, 'upper');
+          // 下限最大值
+          let lmaxData = this.getUpperOrLower(lowerData, 'lower');
+          // 上限最小值
+          let pminData = this.getUpperOrLower(upperData, 'lower');
+          // 下限最小值
+          let lminData = this.getUpperOrLower(lowerData, 'lower');
+          // 上、下限数据
+          const uppers: any[] = upperData.series;
+          const lower: any[] = lowerData.series;
+          // 平均值
+          const pavgData = upperData.avg;
+          const lavgData = lowerData.avg;
+          // 设置X轴
+          this.setXAxisData(uppers, chart);
+          // 设置y轴最大值
+          chart.yAxis.max = (pmaxData > lmaxData ? pmaxData : lmaxData) + 2;
+          console.log('chart.yAxis.pmaxData', pmaxData);
+          console.log('chart.yAxis.lmaxData', lmaxData);
+          // 设置上限、均值 折线图数据
+          uppers.forEach(item => {
+            for (const key of Object.keys(item)) {
+              // chartData.value = item[key];
+              chart.series[2].data.push({value: Number(item[key]), symbol: 'none'});
+            }
+            for (const key of Object.keys(pavgData)) {
+              chart.series[0].data.push({value:  Number(pavgData[key]), symbol: 'none'});
+            }
+          });
+          // 设置下限、均值 折线图数据
+          lower.forEach(item => {
+            for (const key of Object.keys(item)) {
+              chart.series[3].data.push({value: Number(item[key]), symbol: 'none'});
+            }
+            for (const key of Object.keys(lavgData)) {
+              chart.series[1].data.push({value: Number(lavgData[key]), symbol: 'none'});
+            }
+          });
+          resolve(chart);
+        } else {
+          console.log('get chartData fail: ', result.description);
+        }
+      });
+    });
+  }
+
+  /**
+   * 获取一个chart的option对象 (option格式 折线1 虚线UpperLine、折线2 虚线LowerLine、
+   * 折线3Read、折线4Write)
+   * @param height
+   * @param title
+   * @param subtext
+   */
+  getNewChart(height: number, title: string, subtext: string) {
+    const chart: ChartOptions = new ChartOptions();
+    // 高度
+    chart.height = height;
+    // 标题
+    const titleInfo:Title = new Title();
+    titleInfo.text = title;
+    titleInfo.subtext = subtext;
+    titleInfo.textAlign = 'bottom';
+    const textStyle:TextStyle  = new TextStyle();
+    textStyle.fontStyle = 'normal';
+    titleInfo.textStyle = textStyle;
+
+    chart.title = titleInfo;
+
+    // x轴
+    const xAxis: XAxis = new XAxis();
+    xAxis.type = 'category';
+    xAxis.data = [];
+
+    chart.xAxis = xAxis;
+
+    // y轴
+    const yAxis: YAxis = new YAxis();
+    yAxis.type = 'value';
+    yAxis.min = 0;
+    yAxis.splitNumber = 2;
+    yAxis.boundaryGap = ['50%', '50%'];
+    const axisLine: AxisLine = new AxisLine();
+    axisLine.show = false;
+    yAxis.axisLine = axisLine;
+
+    chart.yAxis = yAxis;
+
+    // 提示数据
+    const legend: Legend = new Legend();
+    const legendData: LegendData[] = [];
+    legendData.push(this.setLengdData('Upper Limit', null));
+    legendData.push(this.setLengdData('Lower Limit', null));
+    legendData.push(this.setLengdData('Read', 'triangle'));
+    legendData.push(this.setLengdData('Write', 'triangle'));
+    legend.x = 'right';
+    legend.y = 'top';
+    legend.data = legendData;
+
+    chart.legend = legend;
+
+    // 数据(格式)
+    const series: Serie[] = [];
+    series.push(this.setSerieData('Upper Limit', 'line', true, 'dotted', '#DB2000', 'This is Upper Limit.'))
+    series.push(this.setSerieData('Lower Limit', 'line', true, 'dotted', '#F8E082', 'This is a Lower Limit.'))
+    series.push(this.setSerieData('Read', 'line', true, 'solid', '#6870c4', 'This is a Read.'))
+    series.push(this.setSerieData('Write', 'line', true, 'solid', '#01bfa8', 'This is a Write.'))
+
+    chart.series = series;
+
+    return chart;
+  }
+
+  /**
+   * set SerieData
+   * @param name
+   * @param type
+   * @param smooth
+   * @param lineType 线类型'dotted'虚线 'solid'实线
+   * @param lineColor 线颜色
+   */
+  setSerieData(name: string, type:string, smooth:boolean, lineType:string, lineColor:string, labelFormatter: string) {
+    const serie:Serie = new Serie();
+    serie.name = name;
+    serie.type = type;
+    const serieData: SerieData[] = [];
+    serie.data = serieData;
+    serie.smooth = smooth;
+
+    const itemStyle: ItemStyle = new ItemStyle();
+    const normal:Normal = new Normal();
+    const lineStyle: LineStyle = new LineStyle();
+    lineStyle.color = lineColor;
+    lineStyle.type = lineType;
+    lineStyle.width = 2;
+    normal.lineStyle = lineStyle;
+    itemStyle.normal = normal;
+    serie.itemStyle = itemStyle;
+
+    const lable:Label = new Label();
+    lable.formatter = labelFormatter;
+    lable.show = true;
+    serie.label = lable;
+
+    return serie;
+  }
+  /**
+   * set legendData
+   * @param name
+   * @param icon
+   */
+  setLengdData(name: string, icon: string) {
+    const legendData: LegendData = new LegendData();
+    legendData.name = name;
+    if (null !== icon) {
+      legendData.icon = icon;
+    }
+    return legendData;
+  }
+
+  /**
+   * 设置x轴
+   * @param data
+   * @param chart
+   */
+  setXAxisData(data: any[], chart:ChartOptions) {
+    data.forEach(item => {
+      for (const key of Object.keys(item)) {
+        const date = new Date(key);
+        chart.xAxis.data.push(date.toDateString());
+      }
+    });
+  }
+
+  /**
+   * 获取最大/小值
+   * @param data
+   * @param type upper 最大 lower最小
+   */
+  getUpperOrLower(data: any, type: string) {
+    let result;
+    if (type === 'lower') {
+      for (const key of Object.keys(data.max)) {
+        result = Number(data.max[key]);
+        console.log(result);
+      }
+    } else {
+      for (const key of Object.keys(data.max)) {
+        result = Number(data.min[key]);
+        console.log(result);
+      }
+    }
+    return result;
   }
 }
