@@ -32,7 +32,7 @@ public class ToolUtils {
                 re = obj.toString();
             }
         } catch (Exception e) {
-            LOG.error("error:", e);
+            LOG.error("error:"+e.toString());
         }
         return re;
     }
@@ -44,7 +44,7 @@ public class ToolUtils {
                 re = Integer.parseInt(obj.toString());
             }
         } catch (Exception e) {
-            LOG.error("error:", e);
+            LOG.error("error:"+e.toString());
         }
         return re;
     }
@@ -56,7 +56,7 @@ public class ToolUtils {
                 re = Double.parseDouble(obj.toString());
             }
         } catch (Exception e) {
-            LOG.error("error:", e);
+            LOG.error("error:"+e.toString());
         }
         return re;
     }
@@ -68,7 +68,7 @@ public class ToolUtils {
                 re = Long.parseLong(obj.toString());
             }
         } catch (Exception e) {
-            LOG.error("error:", e);
+            LOG.error("error:"+e.toString());
         }
         return re;
     }
@@ -80,7 +80,7 @@ public class ToolUtils {
                 re = obj.getAsString();
             }
         } catch (Exception e) {
-            LOG.error("error:", e);
+            LOG.error("error:"+e.toString());
         }
         return re;
     }
@@ -92,7 +92,7 @@ public class ToolUtils {
                 re = obj.getAsInt();
             }
         } catch (Exception e) {
-            LOG.error("error:", e);
+            LOG.error("error:"+e.toString());
         }
         return re;
     }
@@ -104,7 +104,7 @@ public class ToolUtils {
                 re = obj.getAsLong();
             }
         } catch (Exception e) {
-            LOG.error("error:", e);
+            LOG.error("error:"+e.toString());
         }
         return re;
     }
@@ -116,7 +116,7 @@ public class ToolUtils {
                 re = obj.getAsDouble();
             }
         } catch (Exception e) {
-            LOG.error("error:", e);
+            LOG.error("error:"+e.toString());
         }
         return re;
     }
@@ -128,7 +128,7 @@ public class ToolUtils {
                 re = obj.getAsBoolean();
             }
         } catch (Exception e) {
-            LOG.error("error:", e);
+            LOG.error("error:"+e.toString());
         }
         return re;
     }
