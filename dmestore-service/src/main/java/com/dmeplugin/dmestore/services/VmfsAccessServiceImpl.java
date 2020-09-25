@@ -419,29 +419,54 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         try {
             //param str host: 主机  param str cluster: 集群
             //判断主机或主机组在DME中是否存在
-            if (!StringUtils.isEmpty(hostIp)) {
-                List<Map<String, Object>> hostlist = dmeAccessService.getDmeHosts(hostIp);
-                if (hostlist != null && hostlist.size() > 0) {
-                    for (Map<String, Object> hostmap : hostlist) {
-                        if (hostmap != null && hostmap.get("ip") != null) {
-                            if (hostIp.equals(hostmap.get("ip").toString())) {
-                                objId = hostmap.get("id").toString();
+            if (!StringUtils.isEmpty(hostId)) {
+                //通过主机的objectid查到主机上所有的hba的wwn或者iqn
+                List<Map<String,Object>> hbas = vcsdkUtils.getHbasByHostObjectId(hostId);
+                if(hbas!=null && hbas.size()>0) {
+                    List<String> wwniqns = new ArrayList<>();
+                    for(Map<String,Object> hba:hbas){
+                        wwniqns.add(ToolUtils.getStr(hba.get("name")));
+                    }
+
+                    //取出所有主机
+                    List<Map<String, Object>> hostlist = dmeAccessService.getDmeHosts(null);
+                    if (hostlist != null && hostlist.size() > 0) {
+                        for (Map<String, Object> hostmap : hostlist) {
+                            if (hostmap != null && hostmap.get("id") != null) {
+                                //通过主机ID查到对应的主机的启动器
+                                String demHostId = ToolUtils.getStr(hostmap.get("id"));
+                                //得到主机的启动器
+                                List<Map<String, Object>> initiators = dmeAccessService.getDmeHostInitiators(demHostId);
+                                if(initiators!=null && initiators.size()>0){
+                                    for(Map<String, Object> inimap : initiators){
+                                        String port_name = ToolUtils.getStr(inimap.get("port_name"));
+                                        if(wwniqns.contains(port_name)){
+                                            objId = demHostId;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            //如果已经找到的主机就不再循环
+                            if(!StringUtils.isEmpty(objId)){
                                 break;
                             }
                         }
                     }
-                }
-                LOG.info("check host id==" + objId);
-                //如果主机或主机不存在就创建并得到主机或主机组ID
-                if (StringUtils.isEmpty(objId)) {
-                    Map<String, Object> params = new HashMap<>();
-                    params.put("host", hostIp);
-                    params.put("hostId", hostId);
-                    Map<String, Object> hostmap = dmeAccessService.createHost(params);
-                    if (hostmap != null && hostmap.get("id") != null) {
-                        objId = hostmap.get("id").toString();
+                    LOG.info("check host id==" + objId);
+                    //如果主机或主机不存在就创建并得到主机或主机组ID
+                    if (StringUtils.isEmpty(objId)) {
+                        Map<String, Object> params = new HashMap<>();
+                        params.put("host", hostIp);
+                        params.put("hostId", hostId);
+                        Map<String, Object> hostmap = dmeAccessService.createHost(params);
+                        if (hostmap != null && hostmap.get("id") != null) {
+                            objId = hostmap.get("id").toString();
+                        }
+                        LOG.info("create host id==" + objId);
                     }
-                    LOG.info("create host id==" + objId);
+                }else{
+                    throw new Exception(hostIp+" The host did not find a valid HbA");
                 }
             }
         } catch (Exception e) {

@@ -1987,6 +1987,48 @@ public class VCSDKUtils {
         return map;
     }
 
+    //得到主机的hba
+    public List<Map<String,Object>> getHbasByHostObjectId(String hostObjectId) throws Exception{
+        List<Map<String,Object>> hbalist = new ArrayList<>();
+        try {
+            if (StringUtils.isEmpty(hostObjectId)) {
+                _logger.error("get Hba error:host ObjectId is null.");
+                throw new Exception("get Hba error:host ObjectId is null.");
+            }
+
+            String serverguid = vcConnectionHelper.objectID2Serverguid(hostObjectId);
+            VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
+
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+            //取得该存储下所有已经挂载的主机ID
+            ManagedObjectReference objmor = vcConnectionHelper.objectID2MOR(hostObjectId);
+            HostMO hostmo = new HostMO(vmwareContext, objmor);
+            //查找对应的iscsi适配器
+            String iscsiHbaDevice = null;
+            List<HostHostBusAdapter> hbas = hostmo.getHostStorageSystemMO().getStorageDeviceInfo().getHostBusAdapter();
+            for (HostHostBusAdapter hba : hbas) {
+                if (hba instanceof HostInternetScsiHba) {
+                    Map<String,Object> map = new HashMap<>();
+                    HostInternetScsiHba iscsiHba = (HostInternetScsiHba) hba;
+                    map.put("type","ISCSI");
+                    map.put("name",iscsiHba.getIScsiName());
+                    hbalist.add(map);
+                }else if (hba instanceof HostFibreChannelHba) {
+                    Map<String,Object> map = new HashMap<>();
+                    HostFibreChannelHba fcHba = (HostFibreChannelHba) hba;
+                    map.put("type","FC");
+                    map.put("name",fcHba.getNodeWorldWideName());
+                    hbalist.add(map);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware error:", e);
+            throw e;
+        }
+        return hbalist;
+    }
+
 
     public static void main(String[] args) {
 //        try {
