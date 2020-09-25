@@ -7,6 +7,7 @@ import com.dmeplugin.dmestore.model.Storage;
 import com.dmeplugin.dmestore.model.VmfsDataInfo;
 import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
 import com.dmeplugin.dmestore.model.Volume;
+import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.*;
@@ -181,10 +182,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             if (statisticObject != null) {
                                 VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
                                 vmfsDataInfo.setVolumeId(volumeId);
-                                vmfsDataInfo.setIops(ToolUtils.jsonToInt(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_IOPS), null));
-                                vmfsDataInfo.setBandwidth(ToolUtils.jsonToDou(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_BANDWIDTH), null));
-                                vmfsDataInfo.setReadResponseTime(ToolUtils.jsonToInt(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_READPESPONSETIME), null));
-                                vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToInt(statisticObject.get(DataStoreStatisticHistoryServiceImpl.COUNTER_NAME_WRITERESPONSETIME), null));
+                                vmfsDataInfo.setIops(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT), null));
+                                vmfsDataInfo.setBandwidth(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_BANDWIDTH), null));
+                                vmfsDataInfo.setReadResponseTime(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_READRESPONSETIME), null));
+                                vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_WRITERESPONSETIME), null));
                                 relists.add(vmfsDataInfo);
                             }
                         }
