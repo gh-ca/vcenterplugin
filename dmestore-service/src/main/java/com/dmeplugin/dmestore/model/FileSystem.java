@@ -1,6 +1,5 @@
 package com.dmeplugin.dmestore.model;
 
-import java.io.Serializable;
 /**
  * @author lianq
  * @ClassName: FileSystem
