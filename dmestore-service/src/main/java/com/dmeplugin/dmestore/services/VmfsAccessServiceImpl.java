@@ -3,10 +3,7 @@ package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
-import com.dmeplugin.dmestore.model.Storage;
-import com.dmeplugin.dmestore.model.VmfsDataInfo;
-import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
-import com.dmeplugin.dmestore.model.Volume;
+import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
@@ -246,7 +243,14 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             }
                         }
                     } else {
-                        throw new Exception("DME create vmfs volume error(task status)!");
+                        TaskDetailInfo taskinfo = taskService.queryTaskById(taskId);
+                        if(taskinfo!=null){
+                            throw new Exception("DME create vmfs volume error(task status info:" +
+                                    "name:"+taskinfo.getTaskName()+";status:"+taskinfo.getStatus()+";" +
+                                    "progress:"+taskinfo.getProgress()+";detail:"+taskinfo.getDetail()+")!");
+                        }else {
+                            throw new Exception("DME create vmfs volume error(task status is failure)!");
+                        }
                     }
                 } else {
                     throw new Exception("DME create vmfs volume error(task is null)!");
@@ -823,6 +827,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             String vmfsDatastoreName = vmfsDatastore.get("name").getAsString();
             //拆分wwn TODO
             String wwn = vmfsDatastoreUrl.split("volumes/")[1];
+            int index = wwn.indexOf("/");
+            if(index != -1){
+                wwn = wwn.substring(0, index);
+            }
             //根据wwn从DME中查询卷信息
             String volumeUrlByWwn = LIST_VOLUME_URL + "?volume_wwn=" + wwn;
             ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByWwn, HttpMethod.GET, null);

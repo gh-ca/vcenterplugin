@@ -712,8 +712,8 @@ public class VCSDKUtils {
     }
 
     //create nfs datastore
-    public String createNfsDatastore(String serverHost, String exportPath, String nfsName, String accessMode, List<String> mountHosts,String type) {
-        String result = "success";
+    public String createNfsDatastore(String serverHost, String exportPath, String nfsName, String accessMode, List<Map<String,String>> hostObjectIds,String type) {
+        String response = "";
         //exportPath = "/volume1/TESTNFS";
         //需要判断nfs版本，如果是v4.1要将 Kerberos 安全功能与 NFS 4.1 结合使用，请启用 Kerberos 并选择适当的 Kerberos 模型。
         //nfsName = "lqnfsv3.1";
@@ -722,44 +722,46 @@ public class VCSDKUtils {
         //mountHost = "10.143.132.17";
         //logicPort = 0;
         _logger.info("start creat nfs datastore");
-
-        String dataStoreObjectId = "";
-
         accessMode = StringUtils.isEmpty(accessMode) || accessMode.equals("readWrite") ? "readWrite" : "readOnly";
         try {
-            String serverguid = vcConnectionHelper.objectID2Serverguid(dataStoreObjectId);
-            VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
-            //VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", 443,"administrator@vsphere.local", "Pbu4@123");
-            //DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
-            ManagedObjectReference managedObjectReference1 = vcConnectionHelper.objectID2MOR(dataStoreObjectId);
-            DatacenterMO dcMo = new DatacenterMO(vmwareContext, managedObjectReference1);
-
-            List<ManagedObjectReference> hosts = null;
-            if (mountHosts != null && mountHosts.size() > 0) {
-                ManagedObjectReference managedObjectReference = null;
-                for (int i = 0; i < mountHosts.size(); i++) {
-                    String mountHost = mountHosts.get(i);
-                    hosts = dcMo.findHost(mountHost);
-                    if (hosts != null && hosts.size() > 0) {
-                        managedObjectReference = hosts.get(0);
-                        HostMO hostMO = new HostMO(vmwareContext, managedObjectReference);
-                        HostDatastoreSystemMO hostDatastoreSystemMO = hostMO.getHostDatastoreSystemMO();
-                        hostDatastoreSystemMO.createNfsDatastore(serverHost, 0, exportPath, nfsName, accessMode, type);
-                    } else {
-                        result = "failed";
-                        _logger.error("can not find target host!");
+            VmwareContext vmwareContext = null;
+            ManagedObjectReference managedObjectReference = null;
+            List<Map<String, String>> nfsDatastoreInfos = new ArrayList<>();
+            Map<String, String> nfsDatastoreInfo = new HashMap<>();
+            if (hostObjectIds != null && hostObjectIds.size()!= 0) {
+                for (Map<String, String> hosts : hostObjectIds) {
+                    for (Map.Entry<String, String> host : hosts.entrySet()) {
+                        String serverguid = vcConnectionHelper.objectID2Serverguid(host.getKey());
+                        managedObjectReference = vcConnectionHelper.objectID2MOR(host.getKey());
+                        vmwareContext = vcConnectionHelper.getServerContext(serverguid);
+                        if (managedObjectReference != null && vmwareContext != null) {
+                            HostMO hostMO = new HostMO(vmwareContext, managedObjectReference);
+                            HostDatastoreSystemMO hostDatastoreSystemMO = hostMO.getHostDatastoreSystemMO();
+                            hostDatastoreSystemMO.createNfsDatastore(serverHost, 0, exportPath, nfsName, accessMode, type);
+                            String datastoreObjectId = vcConnectionHelper.MOR2ObjectID(managedObjectReference, serverguid);
+                            nfsDatastoreInfo.put("datastoreObjectId", datastoreObjectId);
+                            nfsDatastoreInfo.put("nfsName", nfsName);
+                            nfsDatastoreInfo.put("serverHost", serverHost);
+                            nfsDatastoreInfo.put("exportPath", exportPath);
+                            nfsDatastoreInfo.put("type", type);
+                            nfsDatastoreInfos.add(nfsDatastoreInfo);
+                        } else {
+                            response = "failed";
+                            _logger.error("can not find target host!");
+                        }
                     }
                 }
+                response = gson.toJson(nfsDatastoreInfos);
             } else {
-                result = "failed";
-                _logger.error("{createNfsDatastore/mountHosts} params error");
+                response = "failed";
+                _logger.error("{createNfsDatastore/createnfsdatastore} params error:hostObjectIds{"+hostObjectIds+"}");
             }
             _logger.info("end creat nfs datastore");
         } catch (Exception e) {
-            result = "failed";
+            response = "failed";
             _logger.error("vmware error:", e);
         }
-        return result;
+        return response;
     }
 
     public void hostRescanVmfs(String hostIp) throws Exception {
@@ -1974,7 +1976,7 @@ public class VCSDKUtils {
                 }else if (hba instanceof HostFibreChannelHba) {
                     HostFibreChannelHba fcHba = (HostFibreChannelHba) hba;
                     map.put("type","FC");
-                    map.put("name",fcHba.getDevice());
+                    map.put("name",fcHba.getNodeWorldWideName());
                 }
             }
         } catch (Exception e) {
@@ -2061,7 +2063,9 @@ public class VCSDKUtils {
         _logger.info("start creat nfs datastore");
         String accessMode = "";
         accessMode = StringUtils.isEmpty(accessMode) || accessMode.equals("readWrite") ? "readWrite" : "readOnly";
+
         try {
+
             VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", 443, "administrator@vsphere.local", "Pbu4@123");
             DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
             List<ManagedObjectReference> hosts = null;
