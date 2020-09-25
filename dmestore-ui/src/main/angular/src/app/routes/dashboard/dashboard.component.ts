@@ -11,6 +11,7 @@ import { DashboardService } from './dashboard.srevice';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ClrForm} from '@clr/angular';
 import {HttpClient} from '@angular/common/http';
+import {isNumber} from "util";
 
 @Component({
   selector: 'app-dashboard',
@@ -28,8 +29,22 @@ import {HttpClient} from '@angular/common/http';
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
-
   charts = this.dashboardSrv.getCharts();
+  storageNumChart = null;
+  storageNum = {
+    total: 0,
+    normal: 0,
+    abnormal: 0
+  };
+
+  storageCapacityChart= null;
+  storageCapacity = {
+    totalCapacity: 0,
+    usedCapacity: 0,
+    freeCapacity: 0,
+    utilization: 0,
+    capacityUnit: "TB"
+  };
 
   popShow = false;
   connectAlertSuccess = false;
@@ -63,7 +78,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngAfterViewInit() {
     this.refresh();
-    this.ngZone.runOutsideAngular(() => this.initChart());
+    // this.ngZone.runOutsideAngular(() => this.initChart());
   }
 
   ngOnDestroy() {
@@ -75,13 +90,76 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       if (result.code === '0' || result.code === '200'){
         this.hostModel = result.data.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        this.loadStorageNum();
+        this.loadstorageCapacity('0');
       }
     }, err => {
       console.error('ERROR', err);
     });
   }
 
-  initChart() {
+  storageCapacityChartInit(chart){
+    this.storageCapacityChart = chart;
+  }
+  loadstorageCapacity(type: string){
+    this.storageCapacityChart.showLoading();
+    this.http.get('overview/getdatastoreoverview', { params: {type: type}}).subscribe((result: any) => {
+      console.log(result);
+      if (result.code === '0' || result.code === '200'){
+        result.data.totalCapacity = result.data.totalCapacity.toFixed(2);
+        result.data.usedCapacity = result.data.usedCapacity.toFixed(2);
+        result.data.freeCapacity = result.data.freeCapacity.toFixed(2);
+        result.data.utilization = result.data.utilization.toFixed(2);
+        this.storageCapacity = result.data;
+        console.log(this.storageCapacity);
+        const os = [
+          {
+            name: 'Used',
+            value: result.data.usedCapacity
+          },
+          {
+            name: 'Free',
+            value: result.data.freeCapacity
+          }
+        ];
+        this.dashboardSrv.storageCapacityOption.series[0].data = os;
+        this.dashboardSrv.storageCapacityOption.title.text = this.storageCapacity.utilization + ' %';
+        this.storageCapacityChart.setOption(this.dashboardSrv.storageCapacityOption, true);
+        this.storageCapacityChart.hideLoading();
+      }
+    }, err => {
+      console.error('ERROR', err);
+    });
+  }
+
+  storageNumChartInit(chart){
+    this.storageNumChart = chart;
+  }
+
+  loadStorageNum(){
+    this.storageNumChart.showLoading();
+    this.http.get('overview/getstoragenum', {}).subscribe((result: any) => {
+      console.log(result);
+      if (result.code === '0' || result.code === '200'){
+        this.storageNum = result.data;
+        console.log(this.storageNum);
+        const os = [
+          {
+            name: 'normal',
+            value: result.data.normal
+          },
+          {
+            name: 'abnormal',
+            value: result.data.abnormal
+          }
+        ];
+        this.dashboardSrv.storageNumOption.series[0].data = os;
+        this.storageNumChart.setOption(this.dashboardSrv.storageNumOption, true);
+        this.storageNumChart.hideLoading();
+      }
+    }, err => {
+      console.error('ERROR', err);
+    });
   }
 
   // 提交表单连接DME

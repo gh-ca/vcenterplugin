@@ -275,8 +275,95 @@ export class DashboardService {
       }],
       color: ['hsl(198, 100%, 32%)']
     }
-
   ];
+
+  storageNumOption = {
+    tooltip: {
+      trigger: 'item',
+      formatter: ' {b}: {c} ({d}%)'
+    },
+    title: {},
+    series: [
+      {
+        name: '',
+        type: 'pie',
+        radius: ['60%', '70%'],
+        center: ['50%', '50%'],
+        avoidLabelOverlap: false,
+        label: {
+          show: false,
+          position: 'center'
+        },
+        emphasis: {
+          label: {
+            show: false,
+            fontSize: '20',
+            fontWeight: 'bold'
+          }
+        },
+        labelLine: {
+          show: false
+        },
+        data: [
+          {value: 8, name: 'normal'},
+          {value: 22, name: 'abnormal'},
+        ]
+      }
+    ],
+    color: ['#99CC66', '#FF0033']
+  };
+  storageCapacityOption = {
+    tooltip: {
+      trigger: 'item',
+      formatter: ' {b}: {c} ({d}%)'
+    },
+    title: {
+      text: '0.0 %',
+      textAlign: 'center',
+      padding: 0,
+      textVerticalAlign: 'middle',
+      textStyle: {
+        fontSize: 18,
+        color: '#63B3F7'
+      },
+      subtextStyle: {
+        fontSize: 12,
+        color: '#c2c6dc',
+        align: 'center'
+      },
+      left: '50%',
+      top: '50%',
+      //subtext: '234'
+    },
+    series: [
+      {
+        name: '',
+        type: 'pie',
+        radius: ['60%', '70%'],
+        center: ['50%', '50%'],
+        avoidLabelOverlap: false,
+        label: {
+          show: false,
+          position: 'center'
+        },
+        emphasis: {
+          label: {
+            show: false,
+            fontSize: '20',
+            fontWeight: 'bold'
+          }
+        },
+        labelLine: {
+          show: false
+        },
+        data: [
+          {value: 8, name: 'normal'},
+          {value: 22, name: 'abnormal'},
+        ]
+      }
+    ],
+    color: ['hsl(198, 100%, 32%)', 'hsl(198, 0%, 80%)']
+  };
 
   constructor(private http: HttpClient) {}
 
