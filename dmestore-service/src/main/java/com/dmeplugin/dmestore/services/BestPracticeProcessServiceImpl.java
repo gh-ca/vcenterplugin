@@ -216,6 +216,16 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             }
         }
 
+        if(null == objectIds || objectIds.size() == 0){
+            String json = vcsdkUtils.getAllHosts();
+            objectIds = new ArrayList<>();
+            JsonArray hostArray = gson.fromJson(json, JsonArray.class);
+            for(int i = 0 ; i < hostArray.size(); i++){
+                JsonObject object = hostArray.get(i).getAsJsonObject();
+                objectIds.add(object.get("objectId").getAsString());
+            }
+        }
+
         List<BestPracticeUpResultResponse> responses = new ArrayList<>();
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getAllContext()[0];
         List<String> successList = new ArrayList<>();
