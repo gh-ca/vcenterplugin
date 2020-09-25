@@ -31,7 +31,7 @@ export class AttributeComponent implements OnInit {
     console.log('objectId: ' + objectId);
     this.attribute.getData(objectId).subscribe((result: any) => {
       console.log(result);
-      if (result.code === '0') {
+      if (result.code === '200') {
         this.volumeInfoList = result.data;
         this.volumeInfoList.forEach(item => {
           this.volNames.push(item.name);

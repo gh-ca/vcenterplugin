@@ -97,6 +97,18 @@ public class ToolUtils {
         return re;
     }
 
+    public static Integer jsonToInt(JsonElement obj) {
+        Integer re = 0;
+        try {
+            if (!StringUtils.isEmpty(obj)) {
+                re = obj.getAsInt();
+            }
+        } catch (Exception e) {
+            LOG.error("error:"+e.toString());
+        }
+        return re;
+    }
+
     public static Long jsonToLon(JsonElement obj, Long defaultvalue) {
         Long re = defaultvalue;
         try {
