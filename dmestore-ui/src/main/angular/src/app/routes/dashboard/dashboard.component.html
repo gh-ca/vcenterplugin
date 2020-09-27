@@ -69,33 +69,34 @@
     </div>
   </div>
 
+
   <div class="info-card clr-col-4">
     <div class="info-card-header">
       <div class="info-header-left">
-        <span>Storage</span>
+        <span>Best Practice Violations</span>
       </div>
     </div>
     <div class="info-card-content clr-row">
-      <div class="clr-col-3"></div>
-      <div class="clr-col-9">
-        <div class="info-charts-wrap">
-          <div echarts [options]="charts[2]" style="width: 30%;height: 120px;"></div>
-          <div class="info-content">
-            <div class="info-content-text">
-              <span>Total</span>
-              <span>11 TB</span>
-            </div>
-            <div class="info-content-text">
-              <span>Used</span>
-              <span>11 TB</span>
-              <span class="squre used"></span>
-            </div>
-            <div class="info-content-text">
-              <span>Free</span>
-              <span>11 TB</span>
-              <span class="squre free"></span>
-            </div>
-          </div>
+      <div class="count-wrap">
+        <div class="count-item">
+          <div class="num">{{bestPracticeViolations.critical}}</div>
+          <div class="color-divide critical"></div>
+          <div class="text">Critical</div>
+        </div>
+        <div class="count-item">
+          <div class="num">{{bestPracticeViolations.major}}</div>
+          <div class="color-divide major"></div>
+          <div class="text">Major</div>
+        </div>
+        <div class="count-item">
+          <div class="num">{{bestPracticeViolations.warning}}</div>
+          <div class="color-divide warning"></div>
+          <div class="text">Warning</div>
+        </div>
+        <div class="count-item">
+          <div class="num">{{bestPracticeViolations.info}}</div>
+          <div class="color-divide info"></div>
+          <div class="text">Info</div>
         </div>
       </div>
     </div>
@@ -178,6 +179,48 @@
   </div>
 
 </div>
+
+<clr-modal [(clrModalOpen)]="popShow">
+  <h3 class="modal-title">DME Connect</h3>
+  <div class="modal-body">
+    <form clrForm [formGroup]="connectForm">
+      <clr-input-container>
+        <label>IP</label>
+        <input clrInput formControlName="ip" type="text" [(ngModel)]="connectModel.hostIp" name="ip" />
+      </clr-input-container>
+      <clr-input-container>
+        <label>Port</label>
+        <input clrInput formControlName="port" type="text" [(ngModel)]="connectModel.hostPort" name="port" />
+      </clr-input-container>
+      <clr-input-container>
+        <label>User</label>
+        <input clrInput formControlName="username" type="text" [(ngModel)]="connectModel.userName" name="username" />
+      </clr-input-container>
+      <clr-password-container>
+        <label>password</label>
+        <input clrPassword formControlName="password" placeholder="Password" name="password" [(ngModel)]="connectModel.password" />
+      </clr-password-container>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline" (click)="popShow=false">Cancel</button>
+    <button type="button" class="btn btn-primary" (click)="submit()">Ok</button>
+  </div>
+</clr-modal>
+
+<!--连接失败提示-->
+<clr-modal [(clrModalOpen)]="connectAlertFail" [clrModalSize]="'sm'">
+  <h3 class="modal-title">tip</h3>
+  <div class="modal-body">
+    connect failed.
+  </div>
+  <!--<div class="modal-footer">
+    <button type="button" class="btn btn-outline" (click)="delShow=false">{{'menu.cancel' | translate}}</button>
+    <button type="button" class="btn btn-primary" (click)="delNfs()">{{'menu.ok' | translate}}</button>
+  </div>-->
+</clr-modal>
+
+
 <!-- 示例20200922 -->
 <div class="clr-row" [hidden]="true">
   <div class="info-card clr-col-6">
@@ -250,62 +293,3 @@
   </div>
 </div>
 <!-- 示例20200922 -->
-
-
-
-<clr-modal [(clrModalOpen)]="popShow">
-  <h3 class="modal-title">DME Connect</h3>
-  <div class="modal-body">
-    <form clrForm [formGroup]="connectForm">
-      <clr-input-container>
-        <label>IP</label>
-        <input clrInput formControlName="ip" type="text" [(ngModel)]="connectModel.hostIp" name="ip" />
-      </clr-input-container>
-      <clr-input-container>
-        <label>Port</label>
-        <input clrInput formControlName="port" type="text" [(ngModel)]="connectModel.hostPort" name="port" />
-      </clr-input-container>
-      <clr-input-container>
-        <label>User</label>
-        <input clrInput formControlName="username" type="text" [(ngModel)]="connectModel.userName" name="username" />
-      </clr-input-container>
-      <clr-password-container>
-        <label>password</label>
-        <input clrPassword formControlName="password" placeholder="Password" name="password" [(ngModel)]="connectModel.password" />
-      </clr-password-container>
-    </form>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-outline" (click)="popShow=false">Cancel</button>
-    <button type="button" class="btn btn-primary" (click)="submit()">Ok</button>
-  </div>
-</clr-modal>
-
-<div class="alert alert-success" role="alert">
-  <div class="alert-items">
-    <div class="alert-item center">
-      <div class="alert-icon-wrapper">
-        <clr-icon class="alert-icon" shape="check-circle"></clr-icon>
-      </div>
-      <span class="alert-text">
-         Connect success.
-      </span>
-    </div>
-  </div>
-</div>
-<clr-modal [(clrModalOpen)]="connectAlertFail">
-  <div class="modal-body">
-    <div class="alert alert-danger" role="alert">
-      <div class="alert-items">
-        <div class="alert-item static">
-          <div class="alert-icon-wrapper">
-            <clr-icon class="alert-icon" shape="exclamation-circle"></clr-icon>
-          </div>
-          <span class="alert-text">
-          Connect failed.
-      </span>
-        </div>
-      </div>
-    </div>
-  </div>
-</clr-modal>

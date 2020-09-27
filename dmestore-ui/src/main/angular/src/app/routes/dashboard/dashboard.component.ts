@@ -11,7 +11,6 @@ import { DashboardService } from './dashboard.srevice';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ClrForm} from '@clr/angular';
 import {HttpClient} from '@angular/common/http';
-import {isNumber} from "util";
 
 @Component({
   selector: 'app-dashboard',
@@ -25,6 +24,7 @@ import {isNumber} from "util";
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  styleUrls: ['./dashboard.component.scss'],
   providers: [DashboardService],
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -44,6 +44,13 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     freeCapacity: 0,
     utilization: 0,
     capacityUnit: "TB"
+  };
+
+  bestPracticeViolations = {
+        critical : 0,
+        major: 0,
+        warning: 0,
+        info: 0
   };
 
   popShow = false;
@@ -92,6 +99,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         this.loadStorageNum();
         this.loadstorageCapacity('0');
+        this.loadBestPracticeViolations();
       }
     }, err => {
       console.error('ERROR', err);
@@ -156,6 +164,17 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         this.dashboardSrv.storageNumOption.series[0].data = os;
         this.storageNumChart.setOption(this.dashboardSrv.storageNumOption, true);
         this.storageNumChart.hideLoading();
+      }
+    }, err => {
+      console.error('ERROR', err);
+    });
+  }
+
+  loadBestPracticeViolations(){
+    this.http.get('overview/getbestpracticeviolations', {}).subscribe((result: any) => {
+      console.log(result);
+      if (result.code === '0' || result.code === '200'){
+         this.bestPracticeViolations = result.data;
       }
     }, err => {
       console.error('ERROR', err);
