@@ -496,6 +496,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     }
                 }
                 LOG.info("check host group id==" + objId);
+
+                //如果主机组id存在，就判断该主机组下的所有主机与集群下的主机是否一到处，如果不一致，不管是多还是少都算不一致，都需要重新创建主机组
+                if(!StringUtils.isEmpty(objId)){
+                    objId = checkHostInHostGroup(clusterObjectId,objId);
+                }
+
                 //如果主机组不存在就需要创建,创建前要检查集群下的所有主机是否在DME中存在
                 if (StringUtils.isEmpty(objId)) {
                     //取得集群下的所有主机
@@ -537,6 +543,70 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return objId;
     }
 
+    private String checkHostInHostGroup(String vmwareClusterObjectId,String dmeHostGroupId) throws Exception {
+        String objId = "";
+        try {
+            //得到集群下所有的主机的hba
+            if (!StringUtils.isEmpty(vmwareClusterObjectId)) {
+                List<Map<String,Object>> hbas = vcsdkUtils.getHbasByClusterObjectId(vmwareClusterObjectId);
+                if(hbas!=null && hbas.size()>0) {
+                    //整理hba名称
+                    List<String> wwniqns = new ArrayList<>();
+                    for (Map<String, Object> hba : hbas) {
+                        wwniqns.add(ToolUtils.getStr(hba.get("name")));
+                    }
+
+                    //得到DME中主机组下所有的主机对应的hba，并进行对比
+                    List<Map<String, Object>> initiators = null;
+                    List<Map<String,Object>> dmehosts = dmeAccessService.getDmeHostInHostGroup(dmeHostGroupId);
+                    if(dmehosts!=null && dmehosts.size()>0){
+                        initiators = new ArrayList<>();
+                        for(Map<String,Object> dmehost:dmehosts){
+                            //得到主机的启动器
+                            if(dmehost!=null && dmehost.get("id")!=null) {
+                                String demHostId = ToolUtils.getStr(dmehost.get("id"));
+                                List<Map<String, Object>> subinitiators = dmeAccessService.getDmeHostInitiators(demHostId);
+                                if (subinitiators != null && subinitiators.size() > 0) {
+                                    initiators.addAll(subinitiators);
+                                }
+                            }
+                        }
+                        //整理启动器
+                        if(initiators.size()>0){
+                            List<String> initiatorName = new ArrayList<>();
+                            for(Map<String, Object> inimap:initiators){
+                                if(inimap!=null && inimap.get("port_name")!=null) {
+                                    String port_name = ToolUtils.getStr(inimap.get("port_name"));
+                                    initiatorName.add(port_name);
+                                }
+                            }
+
+                            //对比集群中的主机hba与主机组中的启动器是否一致
+                            LOG.info("checkHostInHostGroup wwniqns=="+gson.toJson(wwniqns));
+                            LOG.info("checkHostInHostGroup initiatorName=="+gson.toJson(initiatorName));
+                            boolean checkHbaInHostGroup = ToolUtils.compare(wwniqns,initiatorName);
+                            if(checkHbaInHostGroup){
+                                objId = dmeHostGroupId;
+                            }
+                        }else{
+                            LOG.error("DME initiators In host is null");
+                        }
+                    }else{
+                        LOG.error("DME Host In HostGroup is null");
+                    }
+                }else{
+                    LOG.error("vmware Cluster hbas is null");
+                }
+            }else{
+                LOG.error("vmware Cluster Object Id is null");
+            }
+        } catch (Exception e) {
+            LOG.error("checkHostInHostGroup error:", e);
+            throw e;
+        }
+        LOG.info("check host In HostGroup objId==" + objId);
+        return objId;
+    }
     //根据参数选择检查主机或主机组的方法
     private String checkOrcreateToHostorHostGroup(Map<String, Object> params) throws Exception {
         String objId = "";

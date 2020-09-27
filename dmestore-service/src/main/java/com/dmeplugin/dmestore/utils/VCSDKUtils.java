@@ -2029,6 +2029,61 @@ public class VCSDKUtils {
         return hbalist;
     }
 
+    //得到主机的hba
+    public List<Map<String,Object>> getHbasByClusterObjectId(String clusterObjectId) throws Exception{
+        List<Map<String,Object>> hbalist = new ArrayList<>();
+        try {
+            if (StringUtils.isEmpty(clusterObjectId)) {
+                _logger.error("get Hba error:cluster ObjectId is null.");
+                throw new Exception("get Hba error:cluster ObjectId is null.");
+            }
+
+            String serverguid = vcConnectionHelper.objectID2Serverguid(clusterObjectId);
+            VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
+
+            RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+            //取得该存储下所有已经挂载的主机ID
+            ManagedObjectReference objmor = vcConnectionHelper.objectID2MOR(clusterObjectId);
+            ClusterMO objmo = new ClusterMO(vmwareContext, objmor);
+            List<Pair<ManagedObjectReference, String>> hosts = objmo.getClusterHosts();
+
+            if (hosts != null && hosts.size() > 0) {
+                List<Map<String, String>> lists = new ArrayList<>();
+                for (Pair<ManagedObjectReference, String> host : hosts) {
+
+                    List<Map<String,Object>> subhbalist = new ArrayList<>();
+                    HostMO hostmo = new HostMO(vmwareContext, host.first());
+                    List<HostHostBusAdapter> hbas = hostmo.getHostStorageSystemMO().getStorageDeviceInfo().getHostBusAdapter();
+                    for (HostHostBusAdapter hba : hbas) {
+                        if (hba instanceof HostInternetScsiHba) {
+                            Map<String,Object> map = new HashMap<>();
+                            HostInternetScsiHba iscsiHba = (HostInternetScsiHba) hba;
+                            map.put("type","ISCSI");
+                            map.put("name",iscsiHba.getIScsiName());
+                            subhbalist.add(map);
+                        }else if (hba instanceof HostFibreChannelHba) {
+                            Map<String,Object> map = new HashMap<>();
+                            HostFibreChannelHba fcHba = (HostFibreChannelHba) hba;
+                            map.put("type","FC");
+                            map.put("name",fcHba.getNodeWorldWideName());
+                            subhbalist.add(map);
+                        }
+                    }
+
+                    if(subhbalist.size()>0){
+                        hbalist.addAll(subhbalist);
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware error:", e);
+            throw e;
+        }
+        return hbalist;
+    }
+
 
     public static void main(String[] args) {
 //        try {
