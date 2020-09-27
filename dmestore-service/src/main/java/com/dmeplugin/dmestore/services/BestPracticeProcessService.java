@@ -29,6 +29,11 @@ public interface BestPracticeProcessService {
      **/
     List<BestPracticeUpResultResponse> update(List<String> objectIds) throws Exception;
 
+
+
+
+    public List<BestPracticeUpResultResponse> updateByCluster(String clusterobjectid) throws Exception;
+
     /**
      * @Author Administrator
      * @Description 更新主机的某一检查项
