@@ -1,0 +1,33 @@
+.count-wrap{
+  display: flex;
+}
+.count-item{
+  margin: 0 30px;
+  .num{
+    font-size: 24px;
+    font-weight: bold;
+    color: #565656;
+  }
+  .color-divide{
+    width: 70px;
+    height: 4px;
+    border-radius: 4px;
+    margin: 8px 0;
+  }
+  .critical{
+    background-color: #ca2200;
+  }
+  .major{
+    background-color: #f0c004;
+  }
+  .warning{
+    background-color: #fee273;
+  }
+  .info{
+    background-color: #79c6e6;
+  }
+  .text{
+    font-size: 14px;
+    color: #9e9e9e;
+  }
+}
