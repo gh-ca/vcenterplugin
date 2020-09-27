@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.services.bestpractice;
 
-import com.dmeplugin.vmware.util.VmwareContext;
+import com.dmeplugin.dmestore.utils.VCSDKUtils;
 
 /**
  * @ClassName LunQueueDepthForEmulexImpl
@@ -21,8 +21,8 @@ public class LunQueueDepthForEmulexImpl extends BaseBestPracticeService implemen
     }
 
     @Override
-    public Object getCurrentValue(VmwareContext context, String objectId) throws Exception{
-        return super.getCurrentModuleOption(context, objectId, getOptionName());
+    public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception{
+        return super.getCurrentModuleOption(vcsdkUtils, objectId, getOptionName());
     }
 
     @Override
@@ -41,13 +41,13 @@ public class LunQueueDepthForEmulexImpl extends BaseBestPracticeService implemen
     }
 
     @Override
-    public boolean check(VmwareContext context, String objectId) throws Exception {
-        return super.checkModuleOption(context, objectId, getOptionName(), getRecommendValue());
+    public boolean check(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
+        return super.checkModuleOption(vcsdkUtils, objectId, getOptionName(), getRecommendValue());
     }
 
     @Override
-    public void update(VmwareContext context, String objectId) throws Exception{
-        super.updateModuleOption(context, objectId, getOptionName(), getRecommendValue());
+    public void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception{
+        super.updateModuleOption(vcsdkUtils, objectId, getOptionName(), getRecommendValue());
     }
 
     private String getOptionName(){
