@@ -68,10 +68,11 @@ export interface List {
 }
 // =================添加NFS参数 start=========
 export class AddNfs{
-  storage_id: string;
-  pool_raw_id: number;
-  exportPath: string;
+  storage_pool_id: string;
   current_port_id: string;
+  storage_id: string;
+  pool_raw_id: string;
+  exportPath: string;
   nfsName: string;
   accessMode: string;
   type: string;

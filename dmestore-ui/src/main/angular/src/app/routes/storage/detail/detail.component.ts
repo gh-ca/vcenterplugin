@@ -355,6 +355,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   async showChart() {
     console.log("更新图表")
   }
+
   changeTab(page: string){
     if (page === 'conf'){
       this.getStorageDetail(false);
@@ -378,16 +379,18 @@ export class DetailComponent implements OnInit, AfterViewInit {
   getStorageDetail(fresh: boolean){
     if (fresh){
       this.detailService.getStorageDetail(this.storageId).subscribe((r: any) => {
-        if (r.code === '0'){
+        if (r.code === '200'){
           this.detail = r.data.data;
           this.cdr.detectChanges();
+        }else{
+
         }
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.detail !== null){
         this.detailService.getStorageDetail(this.storageId).subscribe((r: any) => {
-          if (r.code === '0'){
+          if (r.code === '200'){
             this.detail = r.data.data;
             this.cdr.detectChanges();
           }
@@ -398,7 +401,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   getStoragePoolList(fresh: boolean){
     if (fresh){
       this.detailService.getStoragePoolList(this.storageId).subscribe((r: any) =>{
-        if (r.code === '0'){
+        if (r.code === '200'){
           this.storagePool = r.data.data;
         }
       });
@@ -406,12 +409,13 @@ export class DetailComponent implements OnInit, AfterViewInit {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.poolList !== null){
         this.detailService.getStoragePoolList(this.storageId).subscribe((r: any) =>{
-          if (r.code === '0'){
+          if (r.code === '200'){
             this.storagePool = r.data.data;
           }
         });
       }
     }
+    this.cdr.detectChanges();
   }
   getStorageVolumeList(fresh: boolean){
     if (fresh){

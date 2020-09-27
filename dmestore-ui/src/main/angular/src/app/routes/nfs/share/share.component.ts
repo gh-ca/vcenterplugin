@@ -15,9 +15,7 @@ export class ShareComponent implements OnInit {
 
   ngOnInit(): void {
     const ctx = this.gs.getClientSdk().app.getContextObjects();
-    const objectId = '1234';
-    // objectId=ctx[0].id;
-    this.getShareDetail(objectId);
+    this.getShareDetail(ctx[0].id);
   }
   getShareDetail(objectId){
     this.remoteSrv.getData(objectId)
