@@ -1172,11 +1172,15 @@ public class VCSDKUtils {
                 VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
                 if (hosts != null && hosts.size() > 0) {
                     for (Pair<ManagedObjectReference, String> host : hosts) {
-                        HostMO host1 = new HostMO(vmwareContext, host.first());
-                        _logger.info("Host under Cluster: " + host1.getName());
-                        //只挂载其它的主机
-                        if (host1 != null && !objHostName.equals(host1.getName())) {
-                            mountVmfs(objDataStoreName, host1);
+                        try {
+                            HostMO host1 = new HostMO(vmwareContext, host.first());
+                            _logger.info("Host under Cluster: " + host1.getName());
+                            //只挂载其它的主机
+                            if (host1 != null && !objHostName.equals(host1.getName())) {
+                                mountVmfs(objDataStoreName, host1);
+                            }
+                        }catch (Exception e){
+                            _logger.error("mount Vmfs On Cluster error:", e);
                         }
                     }
                 }

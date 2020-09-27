@@ -238,7 +238,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                         //通过卷的名称去DME查询卷的信息
                                         Map<String, Object> volumeMap = getVolumeByName(ToolUtils.getStr(params.get("volumeName")));
                                         //将DME卷与vmfs的关系保存数据库
-                                        saveDmeVmwareRalation(volumeMap, dataStoreMap);
+                                        //因为可以同时创建几个卷，无法在此得到对应关系，所以此处不再保存关系信息
+//                                        saveDmeVmwareRalation(volumeMap, dataStoreMap);
                                         //关联服务等级
                                         if (params.get("service_level_id") != null) {
                                             String serviceLevelName = ToolUtils.getStr(params.get("service_level_name"));
