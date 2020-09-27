@@ -855,7 +855,7 @@ public class VCSDKUtils {
     }
 
     //得到主机对应的可用LUN 20200918objectId
-    public Map<String, Object> getLunsOnHost(String hostObjectId, int capacity) throws Exception {
+    public Map<String, Object> getLunsOnHost(String hostObjectId, int capacity,String volumeWwn) throws Exception {
         Map<String, Object> remap = null;
         HostScsiDisk candidateHostScsiDisk = null;
         try {
@@ -867,10 +867,18 @@ public class VCSDKUtils {
             HostMO hostMo = new HostMO(vmwareContext, objmor);
 
             if (hostMo != null) {
+                //在查找可用LUN前先扫描hba，已发现新的卷
+                List<String> devices = getHbaDeviceByHost(hostMo);
+                if(devices!=null && devices.size()>0){
+                    for(String device:devices){
+                        hostMo.getHostStorageSystemMO().rescanHba(device);
+                    }
+                }
+
                 //get available LUN
                 HostDatastoreSystemMO hostDatastoreSystem = hostMo.getHostDatastoreSystemMO();
                 List<HostScsiDisk> hostScsiDisks = hostDatastoreSystem.queryAvailableDisksForVmfs();
-                candidateHostScsiDisk = getObjectLuns(hostScsiDisks, capacity);
+                candidateHostScsiDisk = getObjectLuns(hostScsiDisks, capacity, volumeWwn);
                 remap = new HashMap<>();
                 remap.put("host", hostMo);
                 remap.put("hostScsiDisk", candidateHostScsiDisk);
@@ -886,8 +894,37 @@ public class VCSDKUtils {
 //
     }
 
+    //得到主机的hba设备名
+    public List<String> getHbaDeviceByHost(HostMO hostMo){
+        List<String> devices = null;
+        try{
+            if(hostMo!=null){
+                List<HostHostBusAdapter> hbas = hostMo.getHostStorageSystemMO().getStorageDeviceInfo().getHostBusAdapter();
+                if(hbas!=null && hbas.size()>0) {
+                    devices = new ArrayList<>();
+                    for (HostHostBusAdapter hba : hbas) {
+                        if (hba instanceof HostInternetScsiHba) {
+                            HostInternetScsiHba iscsiHba = (HostInternetScsiHba) hba;
+                            if (!StringUtils.isEmpty(iscsiHba.getDevice())) {
+                                devices.add(iscsiHba.getDevice());
+                            }
+                        } else if (hba instanceof HostFibreChannelHba) {
+                            HostFibreChannelHba fcHba = (HostFibreChannelHba) hba;
+                            if (!StringUtils.isEmpty(fcHba.getDevice())) {
+                                devices.add(fcHba.getDevice());
+                            }
+                        }
+                    }
+                }
+            }
+        }catch (Exception e){
+            _logger.error("get Hba Device By Host error:", e);
+        }
+        return devices;
+    }
+
     //得到集群下所有主机对应的可用LUN 20200918objectId
-    public Map<String, Object> getLunsOnCluster(String clusterObjectId, int capacity) throws Exception {
+    public Map<String, Object> getLunsOnCluster(String clusterObjectId, int capacity, String volumeWwn) throws Exception {
         Map<String, Object> remap = null;
         HostScsiDisk candidateHostScsiDisk = null;
         try {
@@ -905,6 +942,15 @@ public class VCSDKUtils {
                 List<HostScsiDisk> objHostScsiDisks = new ArrayList<>();
                 for (Pair<ManagedObjectReference, String> host : hosts) {
                     HostMO hostMo = new HostMO(vmwareContext, host.first());
+
+                    //在查找可用LUN前先扫描hba，已发现新的卷
+                    List<String> devices = getHbaDeviceByHost(hostMo);
+                    if(devices!=null && devices.size()>0){
+                        for(String device:devices){
+                            hostMo.getHostStorageSystemMO().rescanHba(device);
+                        }
+                    }
+
                     HostDatastoreSystemMO hostDatastoreSystem = hostMo.getHostDatastoreSystemMO();
                     List<HostScsiDisk> hostScsiDisks = hostDatastoreSystem.queryAvailableDisksForVmfs();
                     if (hostScsiDisks != null && hostScsiDisks.size() > 0) {
@@ -918,7 +964,7 @@ public class VCSDKUtils {
 
                 if (objHostScsiDisks.size() > 0) {
                     //get available LUN
-                    candidateHostScsiDisk = getObjectLuns(objHostScsiDisks, capacity);
+                    candidateHostScsiDisk = getObjectLuns(objHostScsiDisks, capacity, volumeWwn);
                     remap = new HashMap<>();
                     remap.put("host", hostMap.get(candidateHostScsiDisk.getDevicePath()));
                     remap.put("hostScsiDisk", candidateHostScsiDisk);
@@ -939,43 +985,15 @@ public class VCSDKUtils {
     }
 
     //得到主机对应的可用LUN 20200918objectId
-    public HostScsiDisk getObjectLuns(List<HostScsiDisk> hostScsiDisks, int capacity) throws Exception {
+    public HostScsiDisk getObjectLuns(List<HostScsiDisk> hostScsiDisks, int capacity, String volumeWwn) throws Exception {
         HostScsiDisk candidateHostScsiDisk = null;
         try {
             if (hostScsiDisks != null && hostScsiDisks.size() > 0 && capacity > 0) {
-                long oldcapacity = capacity * 1L * ToolUtils.GI;
-                long objcapacity = 0;
-                HostScsiDisk objHostScsiDisk = null;
-                long maxcapacity = 0;
-                HostScsiDisk maxHostScsiDisk = null;
                 for (HostScsiDisk hostScsiDisk : hostScsiDisks) {
-                    long tmpcapacity = hostScsiDisk.getCapacity().getBlockSize() * hostScsiDisk.getCapacity().getBlock();
-                    if (tmpcapacity > oldcapacity) {
-//                        _logger.info("tmpcapacity=="+tmpcapacity);
-                        if (objcapacity == 0) {
-                            objcapacity = tmpcapacity;
-                            objHostScsiDisk = hostScsiDisk;
-                        } else if (tmpcapacity < objcapacity) {
-                            objcapacity = tmpcapacity;
-                            objHostScsiDisk = hostScsiDisk;
-                        }
+                    if(hostScsiDisk.getCanonicalName().equals("naa."+volumeWwn)){
+                        candidateHostScsiDisk = hostScsiDisk;
+                        break;
                     }
-                    //同时也记录一个最大的
-                    if (maxcapacity == 0) {
-                        maxcapacity = tmpcapacity;
-                        maxHostScsiDisk = hostScsiDisk;
-                    } else if (tmpcapacity > maxcapacity) {
-                        maxcapacity = tmpcapacity;
-                        maxHostScsiDisk = hostScsiDisk;
-                    }
-                }
-
-                _logger.info("objcapacity==" + objcapacity + "==" + (objHostScsiDisk == null ? "null" : objHostScsiDisk.getDevicePath()));
-                _logger.info("maxcapacity==" + maxcapacity + "==" + (maxHostScsiDisk == null ? "null" : maxHostScsiDisk.getDevicePath()));
-                if (objcapacity > 0) {
-                    candidateHostScsiDisk = objHostScsiDisk;
-                } else {
-                    candidateHostScsiDisk = maxHostScsiDisk;
                 }
 
                 if (candidateHostScsiDisk != null) {

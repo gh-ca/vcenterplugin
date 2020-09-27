@@ -189,23 +189,27 @@ public class TaskServiceImpl implements TaskService {
         for (String taskId : taskIds) {
             try {
                 TaskDetailInfo taskDetailInfo = queryTaskById(taskId);
-                detailInfos.add(taskDetailInfo);
+                if(taskDetailInfo!=null) {
+                    detailInfos.add(taskDetailInfo);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
         for (TaskDetailInfo taskInfo : detailInfos) {
-            String taskId = taskInfo.getId();
-            //过滤子任务
-            if (!taskIds.contains(taskId)) {
-                continue;
-            }
-            int status = taskInfo.getStatus();
-            int progress = taskInfo.getProgress();
-            if (100 == progress || status > 2) {
-                taskStatusMap.put(taskId, status);
-            } else {
-                queryTaskIds.add(taskId);
+            if(taskInfo!=null) {
+                String taskId = taskInfo.getId();
+                //过滤子任务
+                if (!taskIds.contains(taskId)) {
+                    continue;
+                }
+                int status = taskInfo.getStatus();
+                int progress = taskInfo.getProgress();
+                if (100 == progress || status > 2) {
+                    taskStatusMap.put(taskId, status);
+                } else {
+                    queryTaskIds.add(taskId);
+                }
             }
         }
         //判断是否超时
