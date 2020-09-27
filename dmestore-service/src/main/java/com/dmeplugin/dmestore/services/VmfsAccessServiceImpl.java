@@ -300,7 +300,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         vmfsMajorVersion, blockSize, unmapGranularity, unmapPriority);
 
                 //如果创建成功，在集群中的其他主机上扫描并挂载datastore
-                vcsdkUtils.mountVmfsOnCluster(dataStoreStr, clusterObjectId, hostObjectId);
+                if(!StringUtils.isEmpty(clusterObjectId)) {
+                    vcsdkUtils.mountVmfsOnCluster(dataStoreStr, clusterObjectId, null);
+                }
             }
         } catch (Exception e) {
             LOG.error("createVmfsByServiceLevel error:", e);
