@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.utils;
 
+import com.dmeplugin.vmware.SpringBootConnectionHelper;
 import com.dmeplugin.vmware.VCConnectionHelper;
 import com.dmeplugin.vmware.autosdk.SessionHelper;
 import com.dmeplugin.vmware.autosdk.TaggingWorkflow;
@@ -9,6 +10,8 @@ import com.dmeplugin.vmware.util.PbmUtil;
 import com.dmeplugin.vmware.util.TestVmwareContextFactory;
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.vmware.cis.tagging.CategoryModel;
 import com.vmware.cis.tagging.CategoryTypes;
@@ -616,52 +619,40 @@ public class VCSDKUtils {
 
     //expand oriented datastore capacity
     public String expandVmfsDatastore(String dsname, Integer add_capacity) {
+
         String result = "success";
         _logger.info("==start expand DataStore==");
         try {
-            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", 443, "administrator@vsphere.local", "Pbu4@123");
-            DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
-            DatastoreMO dsMo = new DatastoreMO(vmwareContext, dcMo.findDatastore(dsname));
-            List<ManagedObjectReference> hosts = dcMo.findHost("10.143.132.17");
-            ManagedObjectReference managedObjectReference = null;
-            if (hosts != null && hosts.size() > 0) {
-                managedObjectReference = hosts.get(0);
-            }
-            HostMO hostMo = new HostMO(vmwareContext, managedObjectReference);
-            //todo get oriented LUN  (参数设置存在问题)
-            String devicePath = "/vmfs/devices/disks/t10.ATA_____WDC_WD1003FBYX2D01Y7B1________________________WD2DWCAW35431438";
-            Long totalSectors = add_capacity * 1L * ToolUtils.GI;
-            HostScsiDisk candidateHostScsiDisk = null;
-            if (hostMo != null) {
-                HostDatastoreSystemMO hostDatastoreSystemMO = hostMo.getHostDatastoreSystemMO();
-                List<HostScsiDisk> hostScsiDisks = hostDatastoreSystemMO.queryAvailableDisksForVmfs();
-                if (hostScsiDisks != null) {
-                    for (HostScsiDisk hostScsiDisk : hostScsiDisks) {
-                        if (hostScsiDisk.getDevicePath().equals(devicePath)) {
-                            candidateHostScsiDisk = hostScsiDisk;
+            ManagedObjectReference mor = null;
+            VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
+            for (VmwareContext vmwareContext : vmwareContexts) {
+                RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+                List<Pair<ManagedObjectReference, String>> hosts = rootFsMO.getAllHostOnRootFs();
+                if (hosts != null && hosts.size() > 0) {
+                    HostMO host1 = null;
+                    HostDatastoreSystemMO hdsMo = null;
+                    for (Pair<ManagedObjectReference, String> host : hosts) {
+                        host1 = new HostMO(vmwareContext, host.first());
+                        hdsMo = host1.getHostDatastoreSystemMO();
+                        if (null != hdsMo.findDatastore(dsname)) {
+                            mor = hdsMo.findDatastore(dsname);
                             break;
                         }
                     }
-                }
-                int blockSize = 0;
-                if (candidateHostScsiDisk != null) {
-                    blockSize = candidateHostScsiDisk.getCapacity().getBlockSize();
-                    totalSectors = totalSectors / blockSize;
-                }
-                List<VmfsDatastoreOption> vmfsDatastoreOptions = hostDatastoreSystemMO.queryVmfsDatastoreExpandOptions(dsMo);
-                if (vmfsDatastoreOptions != null && vmfsDatastoreOptions.size() > 0) {
-                    VmfsDatastoreOption vmfsDatastoreOption = vmfsDatastoreOptions.get(0);
-                    VmfsDatastoreExpandSpec spec = (VmfsDatastoreExpandSpec) vmfsDatastoreOption.getSpec();
-                    if (candidateHostScsiDisk != null) {
-                        HostDiskPartitionSpec hostDiskPartitionSpec = new HostDiskPartitionSpec();
-                        hostDiskPartitionSpec.setTotalSectors(totalSectors);
-                        spec.setPartition(hostDiskPartitionSpec);
-                        VmfsDatastoreSpec vmfsDatastoreSpec = new VmfsDatastoreSpec();
-                        vmfsDatastoreSpec.setDiskUuid(candidateHostScsiDisk.getUuid());
-                        vmfsDatastoreOption.setSpec(vmfsDatastoreSpec);
-
+                    if (mor != null && host1 != null && hdsMo != null) {
+                        DatastoreMO dsMo = new DatastoreMO(vmwareContext, mor);
+                        List<VmfsDatastoreOption> vmfsDatastoreOptions = hdsMo.queryVmfsDatastoreExpandOptions(dsMo);
+                        VmfsDatastoreInfo datastoreInfo = (VmfsDatastoreInfo) hdsMo.getDatastoreInfo(mor);
+                        if (vmfsDatastoreOptions != null && vmfsDatastoreOptions.size() > 0) {
+                            VmfsDatastoreOption vmfsDatastoreOption = vmfsDatastoreOptions.get(0);
+                            String diskUuid = vmfsDatastoreOption.getSpec().getDiskUuid();
+                            VmfsDatastoreExpandSpec spec = (VmfsDatastoreExpandSpec) vmfsDatastoreOption.getSpec();
+                            HostDiskPartitionSpec hostDiskPartitionSpec = new HostDiskPartitionSpec();
+                            hostDiskPartitionSpec.setTotalSectors(spec.getPartition().getTotalSectors());
+                            spec.setPartition(hostDiskPartitionSpec);
+                            host1.getHostDatastoreSystemMO().expandVmfsDatastore(dsMo, spec);
+                        }
                     }
-                    hostMo.getHostDatastoreSystemMO().expandVmfsDatastore(dsMo, spec);
                 }
             }
             _logger.info("==end expand DataStore==");
@@ -679,30 +670,36 @@ public class VCSDKUtils {
 
         String result = "success";
         List<String> uuids = new ArrayList<>();
-        try {
-            VmwareContext vmwareContext = TestVmwareContextFactory.getContext("10.143.132.248", 443, "administrator@vsphere.local", "Pbu4@123");
-            DatacenterMO dcMo = new DatacenterMO(vmwareContext, "Datacenter");
-            List<ManagedObjectReference> hosts = dcMo.findHost("10.143.133.196");
-            ManagedObjectReference managedObjectReference = null;
-            if (hosts != null && hosts.size() > 0) {
-                managedObjectReference = hosts.get(0);
-            }
 
-            HostMO hostMo = new HostMO(vmwareContext, managedObjectReference);
-            HostDatastoreSystemMO hostDatastoreSystemMO = hostMo.getHostDatastoreSystemMO();
-            HostStorageSystemMO hostStorageSystemMO = hostMo.getHostStorageSystemMO();
-            List<HostFileSystemMountInfo> mountInfo = hostStorageSystemMO.getHostFileSystemVolumeInfo().getMountInfo();
-            if (mountInfo != null && mountInfo.size() > 0) {
-                for (HostFileSystemMountInfo mount : mountInfo) {
-                    if (mount.getVolume() instanceof HostVmfsVolume
-                            && dsname.equals(mount.getVolume().getName())) {
-                        HostVmfsVolume volume = (HostVmfsVolume) mount.getVolume();
-                        _logger.info(volume.getName() + "========" + volume.getUuid());
-                        uuids.add(volume.getUuid());
+        //VCConnectionHelper vcConnectionHelper = new SpringBootConnectionHelper();
+        try {
+            ManagedObjectReference mor = null;
+            VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
+            for (VmwareContext vmwareContext : vmwareContexts) {
+                RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+                List<Pair<ManagedObjectReference, String>> hosts = rootFsMO.getAllHostOnRootFs();
+                if (hosts != null && hosts.size() > 0) {
+                    HostMO host1 = null;
+                    HostDatastoreSystemMO hdsMo = null;
+                    for (Pair<ManagedObjectReference, String> host : hosts) {
+                        host1 = new HostMO(vmwareContext, host.first());
+                        hdsMo = host1.getHostDatastoreSystemMO();
+                        if (null != hdsMo.findDatastore(dsname)) {
+                            mor = hdsMo.findDatastore(dsname);
+                            break;
+                        }
+                    }
+                    if (hdsMo != null) {
+                        VmfsDatastoreInfo datastoreInfo = (VmfsDatastoreInfo) hdsMo.getDatastoreInfo(mor);
+                        String uuid = datastoreInfo.getVmfs().getUuid();
+                        uuids.add(uuid);
+                        if (uuids.size() != 0 && uuid != null) {
+                            hdsMo.unmapVmfsVolumeExTask(uuids);
+                        }
                     }
                 }
             }
-            hostDatastoreSystemMO.unmapVmfsVolumeExTask(uuids);
+            _logger.info("==end expand DataStore==");
         } catch (Exception e) {
             result = "error";
             _logger.error("vmware error:", e);
@@ -1988,7 +1985,7 @@ public class VCSDKUtils {
     }
 
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
 //        try {
 //            Gson gson = new Gson();
 //            String listStr = VCSDKUtils.getAllVmfsDataStores(null);
@@ -2100,6 +2097,7 @@ public class VCSDKUtils {
             result = "failed";
             _logger.error("vmware error:", e);
         }
-    }
+    }*/
+
 }
 
