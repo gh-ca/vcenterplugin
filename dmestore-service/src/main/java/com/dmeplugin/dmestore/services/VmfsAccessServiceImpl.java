@@ -223,22 +223,30 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     taskIds.add(taskId);
                     boolean createFlag = taskService.checkTaskStatus(taskIds);
                     if (createFlag) { //DME创建完成
-                        //创建vmware中的vmfs存储。
-                        String dataStoreStr = createVmfsOnVmware(params);
-                        LOG.info("Vmfs dataStoreStr==" + dataStoreStr);
-                        if (!StringUtils.isEmpty(dataStoreStr)) {
-                            Map<String, Object> dataStoreMap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {
-                            }.getType());
-                            if (dataStoreMap != null) {
-                                //通过卷的名称去DME查询卷的信息
-                                Map<String, Object> volumeMap = getVolumeByName(ToolUtils.getStr(params.get("volumeName")));
-                                //将DME卷与vmfs的关系保存数据库
-                                saveDmeVmwareRalation(volumeMap, dataStoreMap);
-                                //关联服务等级
-                                if (params.get("service_level_id") != null) {
-                                    String serviceLevelName = ToolUtils.getStr(params.get("service_level_name"));
-                                    String attachTagStr = vcsdkUtils.attachTag(ToolUtils.getStr(dataStoreMap.get("type")), ToolUtils.getStr(dataStoreMap.get("id")), serviceLevelName);
-                                    LOG.info("Vmfs attachTagStr==" + attachTagStr);
+                        //创建时选择数量count，值是几，就创建几个VMFS
+                        int count = ToolUtils.getInt(params.get("count"));
+                        LOG.info("count==="+count);
+                        if(count>0) {
+                            for(int i=0;i<count;i++) {
+                                //创建vmware中的vmfs存储。
+                                String dataStoreStr = createVmfsOnVmware(params);
+                                LOG.info("Vmfs dataStoreStr==" + dataStoreStr);
+                                if (!StringUtils.isEmpty(dataStoreStr)) {
+                                    Map<String, Object> dataStoreMap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {
+                                    }.getType());
+                                    if (dataStoreMap != null) {
+                                        //通过卷的名称去DME查询卷的信息
+                                        Map<String, Object> volumeMap = getVolumeByName(ToolUtils.getStr(params.get("volumeName")));
+                                        //将DME卷与vmfs的关系保存数据库
+                                        //因为可以同时创建几个卷，无法在此得到对应关系，所以此处不再保存关系信息
+//                                        saveDmeVmwareRalation(volumeMap, dataStoreMap);
+                                        //关联服务等级
+                                        if (params.get("service_level_id") != null) {
+                                            String serviceLevelName = ToolUtils.getStr(params.get("service_level_name"));
+                                            String attachTagStr = vcsdkUtils.attachTag(ToolUtils.getStr(dataStoreMap.get("type")), ToolUtils.getStr(dataStoreMap.get("id")), serviceLevelName);
+                                            LOG.info("Vmfs attachTagStr==" + attachTagStr);
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -292,7 +300,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         vmfsMajorVersion, blockSize, unmapGranularity, unmapPriority);
 
                 //如果创建成功，在集群中的其他主机上扫描并挂载datastore
-                vcsdkUtils.mountVmfsOnCluster(dataStoreStr, clusterObjectId, hostObjectId);
+                if(!StringUtils.isEmpty(clusterObjectId)) {
+                    vcsdkUtils.mountVmfsOnCluster(dataStoreStr, clusterObjectId, null);
+                }
             }
         } catch (Exception e) {
             LOG.error("createVmfsByServiceLevel error:", e);
@@ -419,29 +429,54 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         try {
             //param str host: 主机  param str cluster: 集群
             //判断主机或主机组在DME中是否存在
-            if (!StringUtils.isEmpty(hostIp)) {
-                List<Map<String, Object>> hostlist = dmeAccessService.getDmeHosts(hostIp);
-                if (hostlist != null && hostlist.size() > 0) {
-                    for (Map<String, Object> hostmap : hostlist) {
-                        if (hostmap != null && hostmap.get("ip") != null) {
-                            if (hostIp.equals(hostmap.get("ip").toString())) {
-                                objId = hostmap.get("id").toString();
+            if (!StringUtils.isEmpty(hostId)) {
+                //通过主机的objectid查到主机上所有的hba的wwn或者iqn
+                List<Map<String,Object>> hbas = vcsdkUtils.getHbasByHostObjectId(hostId);
+                if(hbas!=null && hbas.size()>0) {
+                    List<String> wwniqns = new ArrayList<>();
+                    for(Map<String,Object> hba:hbas){
+                        wwniqns.add(ToolUtils.getStr(hba.get("name")));
+                    }
+
+                    //取出所有主机
+                    List<Map<String, Object>> hostlist = dmeAccessService.getDmeHosts(null);
+                    if (hostlist != null && hostlist.size() > 0) {
+                        for (Map<String, Object> hostmap : hostlist) {
+                            if (hostmap != null && hostmap.get("id") != null) {
+                                //通过主机ID查到对应的主机的启动器
+                                String demHostId = ToolUtils.getStr(hostmap.get("id"));
+                                //得到主机的启动器
+                                List<Map<String, Object>> initiators = dmeAccessService.getDmeHostInitiators(demHostId);
+                                if(initiators!=null && initiators.size()>0){
+                                    for(Map<String, Object> inimap : initiators){
+                                        String port_name = ToolUtils.getStr(inimap.get("port_name"));
+                                        if(wwniqns.contains(port_name)){
+                                            objId = demHostId;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                            //如果已经找到的主机就不再循环
+                            if(!StringUtils.isEmpty(objId)){
                                 break;
                             }
                         }
                     }
-                }
-                LOG.info("check host id==" + objId);
-                //如果主机或主机不存在就创建并得到主机或主机组ID
-                if (StringUtils.isEmpty(objId)) {
-                    Map<String, Object> params = new HashMap<>();
-                    params.put("host", hostIp);
-                    params.put("hostId", hostId);
-                    Map<String, Object> hostmap = dmeAccessService.createHost(params);
-                    if (hostmap != null && hostmap.get("id") != null) {
-                        objId = hostmap.get("id").toString();
+                    LOG.info("check host id==" + objId);
+                    //如果主机或主机不存在就创建并得到主机或主机组ID
+                    if (StringUtils.isEmpty(objId)) {
+                        Map<String, Object> params = new HashMap<>();
+                        params.put("host", hostIp);
+                        params.put("hostId", hostId);
+                        Map<String, Object> hostmap = dmeAccessService.createHost(params);
+                        if (hostmap != null && hostmap.get("id") != null) {
+                            objId = hostmap.get("id").toString();
+                        }
+                        LOG.info("create host id==" + objId);
                     }
-                    LOG.info("create host id==" + objId);
+                }else{
+                    throw new Exception(hostIp+" The host did not find a valid HbA");
                 }
             }
         } catch (Exception e) {
@@ -471,6 +506,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     }
                 }
                 LOG.info("check host group id==" + objId);
+
+                //如果主机组id存在，就判断该主机组下的所有主机与集群下的主机是否一到处，如果不一致，不管是多还是少都算不一致，都需要重新创建主机组
+                if(!StringUtils.isEmpty(objId)){
+                    objId = checkHostInHostGroup(clusterObjectId,objId);
+                }
+
                 //如果主机组不存在就需要创建,创建前要检查集群下的所有主机是否在DME中存在
                 if (StringUtils.isEmpty(objId)) {
                     //取得集群下的所有主机
@@ -512,6 +553,70 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return objId;
     }
 
+    private String checkHostInHostGroup(String vmwareClusterObjectId,String dmeHostGroupId) throws Exception {
+        String objId = "";
+        try {
+            //得到集群下所有的主机的hba
+            if (!StringUtils.isEmpty(vmwareClusterObjectId)) {
+                List<Map<String,Object>> hbas = vcsdkUtils.getHbasByClusterObjectId(vmwareClusterObjectId);
+                if(hbas!=null && hbas.size()>0) {
+                    //整理hba名称
+                    List<String> wwniqns = new ArrayList<>();
+                    for (Map<String, Object> hba : hbas) {
+                        wwniqns.add(ToolUtils.getStr(hba.get("name")));
+                    }
+
+                    //得到DME中主机组下所有的主机对应的hba，并进行对比
+                    List<Map<String, Object>> initiators = null;
+                    List<Map<String,Object>> dmehosts = dmeAccessService.getDmeHostInHostGroup(dmeHostGroupId);
+                    if(dmehosts!=null && dmehosts.size()>0){
+                        initiators = new ArrayList<>();
+                        for(Map<String,Object> dmehost:dmehosts){
+                            //得到主机的启动器
+                            if(dmehost!=null && dmehost.get("id")!=null) {
+                                String demHostId = ToolUtils.getStr(dmehost.get("id"));
+                                List<Map<String, Object>> subinitiators = dmeAccessService.getDmeHostInitiators(demHostId);
+                                if (subinitiators != null && subinitiators.size() > 0) {
+                                    initiators.addAll(subinitiators);
+                                }
+                            }
+                        }
+                        //整理启动器
+                        if(initiators.size()>0){
+                            List<String> initiatorName = new ArrayList<>();
+                            for(Map<String, Object> inimap:initiators){
+                                if(inimap!=null && inimap.get("port_name")!=null) {
+                                    String port_name = ToolUtils.getStr(inimap.get("port_name"));
+                                    initiatorName.add(port_name);
+                                }
+                            }
+
+                            //对比集群中的主机hba与主机组中的启动器是否一致
+                            LOG.info("checkHostInHostGroup wwniqns=="+gson.toJson(wwniqns));
+                            LOG.info("checkHostInHostGroup initiatorName=="+gson.toJson(initiatorName));
+                            boolean checkHbaInHostGroup = ToolUtils.compare(wwniqns,initiatorName);
+                            if(checkHbaInHostGroup){
+                                objId = dmeHostGroupId;
+                            }
+                        }else{
+                            LOG.error("DME initiators In host is null");
+                        }
+                    }else{
+                        LOG.error("DME Host In HostGroup is null");
+                    }
+                }else{
+                    LOG.error("vmware Cluster hbas is null");
+                }
+            }else{
+                LOG.error("vmware Cluster Object Id is null");
+            }
+        } catch (Exception e) {
+            LOG.error("checkHostInHostGroup error:", e);
+            throw e;
+        }
+        LOG.info("check host In HostGroup objId==" + objId);
+        return objId;
+    }
     //根据参数选择检查主机或主机组的方法
     private String checkOrcreateToHostorHostGroup(Map<String, Object> params) throws Exception {
         String objId = "";

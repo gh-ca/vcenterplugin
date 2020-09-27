@@ -74,6 +74,15 @@ public interface DmeAccessService {
     List<Map<String, Object>> getDmeHosts(String hostIp) throws Exception;
 
     /**
+     * Query Dme Host's initiators
+     *
+     * @param hostId host id
+     * @return ResponseBodyBean
+     * @throws Exception when error
+     */
+    List<Map<String, Object>> getDmeHostInitiators(String hostId) throws Exception;
+
+    /**
      * Query Dme hostgroup
      *
      * @param hostGroupName hostGroup Name
@@ -135,6 +144,14 @@ public interface DmeAccessService {
      * @throws Exception
      */
     Map<String,Object> getDmeHostGroup(String hsotGroupId) throws Exception;
+
+    /**
+     * get hostGroup's host
+     * @param hostGroupId hostGroups id
+     * @return
+     * @throws Exception
+     */
+    List<Map<String,Object>> getDmeHostInHostGroup(String hostGroupId) throws Exception;
 
 
 }

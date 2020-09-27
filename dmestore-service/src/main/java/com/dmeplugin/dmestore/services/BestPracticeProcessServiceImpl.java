@@ -11,8 +11,10 @@ import com.dmeplugin.vmware.util.VmwareContext;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -113,7 +115,6 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
         JsonArray hostArray = gson.fromJson(hostsStr, JsonArray.class);
 
         Map<String, List<BestPracticeBean>> checkMap = new HashMap<>();
-        VmwareContext context = vcsdkUtils.getVcConnectionHelper().getAllContext()[0];
         for (int i = 0; i < hostArray.size(); i++) {
             JsonObject hostObject = hostArray.get(i).getAsJsonObject();
             String _hostName = hostObject.get("hostName").getAsString();
@@ -121,7 +122,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             //对每一项进行检查
             for (BestPracticeService bestPracticeService : bestPracticeServices) {
                 try {
-                    boolean checkFlag = bestPracticeService.check(context, _objectId);
+                    boolean checkFlag = bestPracticeService.check(vcsdkUtils, _objectId);
                     if (!checkFlag) {
                         BestPracticeBean bean = new BestPracticeBean();
                         String hostSetting = bestPracticeService.getHostSetting();
@@ -129,7 +130,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                         bean.setRecommendValue(String.valueOf(bestPracticeService.getRecommendValue()));
                         bean.setLevel(bestPracticeService.getLevel());
                         bean.setNeedReboot(String.valueOf(bestPracticeService.needReboot()));
-                        bean.setActualValue(String.valueOf(bestPracticeService.getCurrentValue(context, _hostName)));
+                        bean.setActualValue(String.valueOf(bestPracticeService.getCurrentValue(vcsdkUtils, _objectId)));
                         bean.setHostObjectId(_objectId);
                         bean.setHostName(_hostName);
                         bean.setAutoRepair(String.valueOf(bestPracticeService.autoRepair()));
@@ -201,6 +202,25 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     }
 
     @Override
+    public List<BestPracticeUpResultResponse> updateByCluster(String clusterobjectid) throws Exception {
+        String vmwarehosts= vcsdkUtils.getHostsOnCluster(clusterobjectid);
+        if (!StringUtils.isEmpty(vmwarehosts)) {
+            List<Map<String, String>> vmwarehostlists = gson.fromJson(vmwarehosts, new TypeToken<List<Map<String, String>>>() {
+            }.getType());
+            List<String> hostlists = new ArrayList<>();
+            if (vmwarehostlists != null && vmwarehostlists.size() > 0) {
+                //分别检查每一个主机是否存在，如果不存在就创建
+
+                for (Map<String, String> hostmap : vmwarehostlists) {
+                   hostlists.add(hostmap.get("hostId"));
+                }
+            }
+            return update(hostlists);
+        }
+        return new ArrayList<>();
+    }
+
+    @Override
     public List<BestPracticeUpResultResponse> update(List<String> objectIds, String hostSetting) throws Exception {
         List<BestPracticeService> services = new ArrayList<>();
         //获取对应的service
@@ -216,18 +236,22 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             }
         }
 
-        if(null == objectIds || objectIds.size() == 0){
-            String json = vcsdkUtils.getAllHosts();
+        if (null == objectIds || objectIds.size() == 0) {
             objectIds = new ArrayList<>();
-            JsonArray hostArray = gson.fromJson(json, JsonArray.class);
-            for(int i = 0 ; i < hostArray.size(); i++){
-                JsonObject object = hostArray.get(i).getAsJsonObject();
-                objectIds.add(object.get("objectId").getAsString());
+            int pageNo = 0;
+            int pageSize = 100;
+            //获取本地所有
+            while (true){
+                List<String> hostIdList = bestPracticeCheckDao.getAllHostIds(pageNo++,  pageSize);
+                objectIds.addAll(hostIdList);
+
+                if(hostIdList.size() != pageSize){
+                    break;
+                }
             }
         }
 
         List<BestPracticeUpResultResponse> responses = new ArrayList<>();
-        VmwareContext context = vcsdkUtils.getVcConnectionHelper().getAllContext()[0];
         List<String> successList = new ArrayList<>();
         for (String objectId : objectIds) {
             BestPracticeUpResultResponse response = new BestPracticeUpResultResponse();
@@ -240,10 +264,10 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                 base.setHostSetting(service.getHostSetting());
                 base.setNeedReboot(service.needReboot());
                 try {
-                    service.update(context, objectId);
+                    service.update(vcsdkUtils, objectId);
                     base.setUpdateResult(true);
                     //更新成功后，只要有一项是需要重启的则该主机需要重启后生效
-                    if(service.needReboot()){
+                    if (service.needReboot()) {
                         needReboot = true;
                     }
                     successList.add(objectId);

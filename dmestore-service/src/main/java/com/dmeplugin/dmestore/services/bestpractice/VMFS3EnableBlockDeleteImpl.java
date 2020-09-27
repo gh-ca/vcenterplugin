@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.services.bestpractice;
 
-import com.dmeplugin.vmware.util.VmwareContext;
+import com.dmeplugin.dmestore.utils.VCSDKUtils;
 
 /**
  * @ClassName VMFS3EnableBlockDeleteImpl
@@ -21,8 +21,8 @@ public class VMFS3EnableBlockDeleteImpl extends BaseBestPracticeService implemen
     }
 
     @Override
-    public Object getCurrentValue(VmwareContext context, String objectId) throws Exception{
-        return super.getCurrentValue(context, objectId, getHostSetting());
+    public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception{
+        return super.getCurrentValue(vcsdkUtils, objectId, getHostSetting());
     }
 
     @Override
@@ -41,12 +41,12 @@ public class VMFS3EnableBlockDeleteImpl extends BaseBestPracticeService implemen
     }
 
     @Override
-    public boolean check(VmwareContext context, String objectId) throws Exception {
-        return super.check(context, objectId, getHostSetting(), getRecommendValue());
+    public boolean check(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
+        return super.check(vcsdkUtils, objectId, getHostSetting(), getRecommendValue());
     }
 
     @Override
-    public void update(VmwareContext context, String objectId) throws Exception{
-        super.update(context, objectId, getHostSetting(), getRecommendValue());
+    public void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception{
+        super.update(vcsdkUtils, objectId, getHostSetting(), getRecommendValue());
     }
 }
