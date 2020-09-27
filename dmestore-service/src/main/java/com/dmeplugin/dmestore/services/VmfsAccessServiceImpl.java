@@ -242,6 +242,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             for(Map<String, Object> volumemap:volumelist) {
                                 //创建vmware中的vmfs存储。
                                 params.put("volume_wwn",volumemap.get("volume_wwn"));
+                                params.put("volume_name",volumemap.get("volume_name"));
                                 String dataStoreStr = createVmfsOnVmware(params);
                                 LOG.info("Vmfs dataStoreStr==" + dataStoreStr);
                                 if (!StringUtils.isEmpty(dataStoreStr)) {
@@ -298,13 +299,19 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 int unmapGranularity = ToolUtils.getInt(params.get("spaceReclamationGranularity"));
                 String unmapPriority = ToolUtils.getStr(params.get("spaceReclamationPriority"));
                 int capacity = ToolUtils.getInt(params.get("capacity"));
-                String volumeWwn = ToolUtils.getStr(params.get("volume_wwn"));
+
+                String existVolumeWwn = ToolUtils.getStr(params.get("volume_wwn"));
+                String existVolumeName = ToolUtils.getStr(params.get("volume_name"));
+                String volumeName = ToolUtils.getStr(params.get("volumeName"));
+                existVolumeName = existVolumeName.replaceAll(volumeName,"");
+                //根据后缀序号改变VMFS的名称
+                datastoreName = datastoreName+existVolumeName;
                 //从主机或集群中找出最接近capacity的LUN
                 Map<String, Object> hsdmap = null;
                 if (params != null && params.get("host") != null) {
-                    hsdmap = vcsdkUtils.getLunsOnHost(hostObjectId, capacity,volumeWwn);
+                    hsdmap = vcsdkUtils.getLunsOnHost(hostObjectId, capacity,existVolumeWwn);
                 } else if (params != null && params.get("cluster") != null) {
-                    hsdmap = vcsdkUtils.getLunsOnCluster(clusterObjectId, capacity,volumeWwn);
+                    hsdmap = vcsdkUtils.getLunsOnCluster(clusterObjectId, capacity,existVolumeWwn);
                 }
 
                 //创建
