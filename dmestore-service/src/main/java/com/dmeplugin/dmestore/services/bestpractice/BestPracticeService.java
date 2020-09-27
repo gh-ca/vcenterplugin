@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services.bestpractice;
 
+import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.dmeplugin.vmware.util.VmwareContext;
 
 /**
@@ -35,7 +36,7 @@ public interface BestPracticeService {
      * @Param [context, hostName]
      * @Return java.lang.Object
      **/
-    Object getCurrentValue(VmwareContext context, String objectId) throws Exception;
+    Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception;
 
     /**
      * @Author Administrator
@@ -63,7 +64,7 @@ public interface BestPracticeService {
      **/
     boolean autoRepair();
 
-    boolean check(VmwareContext context, String objectId) throws Exception;
+    boolean check(VCSDKUtils vcsdkUtils, String objectId) throws Exception;
 
-    void update(VmwareContext context, String objectId) throws Exception;
+    void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception;
 }
