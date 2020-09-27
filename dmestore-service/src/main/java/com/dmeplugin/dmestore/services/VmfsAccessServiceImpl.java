@@ -223,22 +223,29 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     taskIds.add(taskId);
                     boolean createFlag = taskService.checkTaskStatus(taskIds);
                     if (createFlag) { //DME创建完成
-                        //创建vmware中的vmfs存储。
-                        String dataStoreStr = createVmfsOnVmware(params);
-                        LOG.info("Vmfs dataStoreStr==" + dataStoreStr);
-                        if (!StringUtils.isEmpty(dataStoreStr)) {
-                            Map<String, Object> dataStoreMap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {
-                            }.getType());
-                            if (dataStoreMap != null) {
-                                //通过卷的名称去DME查询卷的信息
-                                Map<String, Object> volumeMap = getVolumeByName(ToolUtils.getStr(params.get("volumeName")));
-                                //将DME卷与vmfs的关系保存数据库
-                                saveDmeVmwareRalation(volumeMap, dataStoreMap);
-                                //关联服务等级
-                                if (params.get("service_level_id") != null) {
-                                    String serviceLevelName = ToolUtils.getStr(params.get("service_level_name"));
-                                    String attachTagStr = vcsdkUtils.attachTag(ToolUtils.getStr(dataStoreMap.get("type")), ToolUtils.getStr(dataStoreMap.get("id")), serviceLevelName);
-                                    LOG.info("Vmfs attachTagStr==" + attachTagStr);
+                        //创建时选择数量count，值是几，就创建几个VMFS
+                        int count = ToolUtils.getInt(params.get("count"));
+                        LOG.info("count==="+count);
+                        if(count>0) {
+                            for(int i=0;i<count;i++) {
+                                //创建vmware中的vmfs存储。
+                                String dataStoreStr = createVmfsOnVmware(params);
+                                LOG.info("Vmfs dataStoreStr==" + dataStoreStr);
+                                if (!StringUtils.isEmpty(dataStoreStr)) {
+                                    Map<String, Object> dataStoreMap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {
+                                    }.getType());
+                                    if (dataStoreMap != null) {
+                                        //通过卷的名称去DME查询卷的信息
+                                        Map<String, Object> volumeMap = getVolumeByName(ToolUtils.getStr(params.get("volumeName")));
+                                        //将DME卷与vmfs的关系保存数据库
+                                        saveDmeVmwareRalation(volumeMap, dataStoreMap);
+                                        //关联服务等级
+                                        if (params.get("service_level_id") != null) {
+                                            String serviceLevelName = ToolUtils.getStr(params.get("service_level_name"));
+                                            String attachTagStr = vcsdkUtils.attachTag(ToolUtils.getStr(dataStoreMap.get("type")), ToolUtils.getStr(dataStoreMap.get("id")), serviceLevelName);
+                                            LOG.info("Vmfs attachTagStr==" + attachTagStr);
+                                        }
+                                    }
                                 }
                             }
                         }
