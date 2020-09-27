@@ -1,5 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.model.CreateVolumesRequest;
+import com.dmeplugin.dmestore.model.CustomizeVolumesRequest;
 import com.dmeplugin.dmestore.model.VmRDMCreateBean;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
@@ -26,10 +28,8 @@ import java.util.Map;
 public class VMRDMServiceImpl implements VMRDMService {
     private static final Logger LOG = LoggerFactory.getLogger(VMRDMServiceImpl.class);
 
-    //@Autowired
     private DmeAccessService dmeAccessService;
 
-    //@Autowired
     private TaskService taskService;
 
     private Gson gson = new Gson();
@@ -74,19 +74,29 @@ public class VMRDMServiceImpl implements VMRDMService {
         Map<String, Object> hostMap = dmeAccessService.getDmeHost(_host_id);
         String host_ip = hostMap.get("ip").toString();
         String host_name = hostMap.get("name").toString();
+
         //调用vcenter扫描卷
         vcsdkUtils.hostRescanVmfs(host_ip);
         LOG.info("scan vmfs succeeded!");
         //获取卷信息
         String lunStr = vcsdkUtils.getLunsOnHost(host_name);
         JsonArray lunArray = gson.fromJson(lunStr, JsonArray.class);
+        String requestVolumeName = "";
+        int size;
+        if(createBean.getCreateVolumesRequest() != null){
+            requestVolumeName = createBean.getCreateVolumesRequest().getVolumes().get(0).getName();
+            size = createBean.getCreateVolumesRequest().getVolumes().get(0).getCapacity();
+        }else {
+            requestVolumeName = createBean.getCustomizeVolumesRequest().getCustomize_volumes().getVolume_specs().getName();
+            size = createBean.getCustomizeVolumesRequest().getCustomize_volumes().getVolume_specs().getCapacity();
+        }
         JsonObject lunObject = null;
         boolean flag = false;
         for (int i = 0; i < lunArray.size(); i++) {
             lunObject = lunArray.get(i).getAsJsonObject();
-            LOG.info("Lun deviceName={}, requested name={}", lunObject.get("deviceName").getAsString(), createBean.getName());
+            LOG.info("Lun deviceName={}, requested name={}", lunObject.get("deviceName").getAsString(), requestVolumeName);
             //TODO 根据实际情况优化
-            if (lunObject.get("deviceName").getAsString().equals(createBean.getName())) {
+            if (lunObject.get("deviceName").getAsString().equals(requestVolumeName)) {
                 flag = true;
                 break;
             }
@@ -96,28 +106,19 @@ public class VMRDMServiceImpl implements VMRDMService {
             LOG.error("no matching Lun information was found!");
             throw new Exception("no matching Lun information was found!");
         }
-        //调用Vcenter创建磁盘
-        vcsdkUtils.createDisk(datastore_objectId, vm_objectId, lunObject.get("deviceName").getAsString(), createBean.getSize());
+        //调用Vcenter创建磁盘 TODO
+        vcsdkUtils.createDisk(datastore_objectId, vm_objectId, lunObject.get("deviceName").getAsString(), size);
     }
 
     public List<String> createDmeRDM(VmRDMCreateBean vmRDMCreateBean) throws Exception {
-        String url = DmeConstants.DME_VOLUME_BASE_URL;
-        JsonObject body = new JsonObject();
-        body.addProperty("service_level_id", vmRDMCreateBean.getServiceLevelId());
-        JsonArray volumes = new JsonArray();
-        JsonObject base = new JsonObject();
-        base.addProperty("name", vmRDMCreateBean.getName());
-        base.addProperty("capacity", vmRDMCreateBean.getSize());
-        base.addProperty("count", vmRDMCreateBean.getSize());
-        volumes.add(base);
-        body.add("volumes", volumes);
-        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, body.toString());
-        if (responseEntity.getStatusCodeValue() / 100 != 2) {
-            LOG.error("Failed to create RDM on DME!errorMsg:{}", responseEntity.getBody());
-            throw new Exception("Failed to create RDM on DME!");
+        String taskId;
+        //通过服务等级创建卷
+        if(vmRDMCreateBean.getCreateVolumesRequest() != null){
+            taskId = createDMEVolumeByServiceLevel(vmRDMCreateBean.getCreateVolumesRequest());
+        }else {
+            //用户自定义创建卷
+            taskId = createDMEVolumeByUnServiceLevel(vmRDMCreateBean.getCustomizeVolumesRequest());
         }
-        JsonObject task = gson.fromJson(responseEntity.getBody(), JsonObject.class);
-        String taskId = task.get("task_id").getAsString();
         JsonObject taskDetail = taskService.queryTaskByIdUntilFinish(taskId);
         if (taskDetail.get("status").getAsInt() != 3) {
             LOG.error("The DME volume is in abnormal condition!taskDetail={}", gson.toJson(taskDetail));
@@ -132,6 +133,32 @@ public class VMRDMServiceImpl implements VMRDMService {
             volumeIds.add(id);
         }
         return volumeIds;
+    }
+
+    private String createDMEVolumeByServiceLevel(CreateVolumesRequest createVolumesRequest) throws Exception{
+        String url = DmeConstants.DME_VOLUME_BASE_URL;
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(createVolumesRequest));
+        if (responseEntity.getStatusCodeValue() / 100 != 2) {
+            LOG.error("Failed to create RDM on DME!errorMsg:{}", responseEntity.getBody());
+            throw new Exception("Failed to create RDM on DME!");
+        }
+        JsonObject task = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+        String taskId = task.get("task_id").getAsString();
+
+        return taskId;
+    }
+
+    private String createDMEVolumeByUnServiceLevel(CustomizeVolumesRequest customizeVolumesRequest) throws Exception{
+        String url = DmeConstants.DME_CREATE_VOLUME_UNLEVEL_URL;
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(customizeVolumesRequest));
+        if (responseEntity.getStatusCodeValue() / 100 != 2) {
+            LOG.error("Failed to create RDM on DME!errorMsg:{}", responseEntity.getBody());
+            throw new Exception("Failed to create RDM on DME!");
+        }
+        JsonObject task = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+        String taskId = task.get("task_id").getAsString();
+
+        return taskId;
     }
 
     private void hostMapping(String hostId, List<String> volumeIds) throws Exception {

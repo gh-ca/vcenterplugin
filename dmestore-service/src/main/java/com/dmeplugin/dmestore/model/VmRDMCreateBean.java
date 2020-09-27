@@ -2,47 +2,28 @@ package com.dmeplugin.dmestore.model;
 
 /**
  * @ClassName VmRDMCreateBean
- * @Description TODO
+ * @Description DME卷创建请求Bean
  * @Author wangxiangyong
  * @Date 2020/9/2 16:48
  * @Version V1.0
  **/
 public class VmRDMCreateBean {
-    private String name;
-    private int size;
-    private String count;
-    private String serviceLevelId;
+    private CreateVolumesRequest createVolumesRequest;
+    private CustomizeVolumesRequest customizeVolumesRequest;
 
-
-    public String getName() {
-        return name;
+    public CreateVolumesRequest getCreateVolumesRequest() {
+        return createVolumesRequest;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setCreateVolumesRequest(CreateVolumesRequest createVolumesRequest) {
+        this.createVolumesRequest = createVolumesRequest;
     }
 
-    public int getSize() {
-        return size;
+    public CustomizeVolumesRequest getCustomizeVolumesRequest() {
+        return customizeVolumesRequest;
     }
 
-    public void setSize(int size) {
-        this.size = size;
-    }
-
-    public String getCount() {
-        return count;
-    }
-
-    public void setCount(String count) {
-        this.count = count;
-    }
-
-    public String getServiceLevelId() {
-        return serviceLevelId;
-    }
-
-    public void setServiceLevelId(String serviceLevelId) {
-        this.serviceLevelId = serviceLevelId;
+    public void setCustomizeVolumesRequest(CustomizeVolumesRequest customizeVolumesRequest) {
+        this.customizeVolumesRequest = customizeVolumesRequest;
     }
 }
