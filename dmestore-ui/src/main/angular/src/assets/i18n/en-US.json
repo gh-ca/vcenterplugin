@@ -309,7 +309,10 @@
         "ownSto":"Owning Storage",
         "nfs":"NFS",
         "cifs":"CIFS",
-        "dtree":"Dtree"
+        "dtree":"Dtree",
+        "fileType":"Filesystem Type",
+        "freeCap": "Free Capacity",
+        "capacityUsage":"Capacity Usage"
       },
       "dtrees":{
         "dtrees":"Dtrees",

@@ -3,6 +3,7 @@ import {DetailService, Dtrees, NfsShare, PoolList, StorageDetail, StoragePool, V
 import {VmfsPerformanceService} from '../../vmfs/volume-performance/performance.service';
 import { EChartOption } from 'echarts';
 import {FileSystem} from '../../nfs/nfs.service';
+import {ActivatedRoute} from "@angular/router";
 @Component({
   selector: 'app-detail',
   templateUrl: './detail.component.html',
@@ -296,7 +297,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
   poolRadio = 'table1'; // 存储池列表切换
   volumeRadio = 'table1'; // volume列表切换
   storageId = '1234';
-  constructor(private detailService: DetailService, private cdr: ChangeDetectorRef, private ngZone: NgZone, private perService: VmfsPerformanceService, ) { }
+  constructor(private detailService: DetailService, private cdr: ChangeDetectorRef, private ngZone: NgZone,
+              private activatedRoute: ActivatedRoute ) { }
   detail: StorageDetail;
   storagePool: StoragePool[];
   volumes: Volume[];
@@ -305,6 +307,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
   shares: NfsShare[];
 
   ngOnInit(): void {
+    this.activatedRoute.queryParams.subscribe(queryParam => {
+      this.storageId = queryParam.id;
+    });
+
     this.getStorageDetail(true);
     this.getStoragePoolList(true);
   }
@@ -357,6 +363,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
 
   changeTab(page: string){
+    console.log('点击：'+page);
     if (page === 'conf'){
       this.getStorageDetail(false);
     }
@@ -401,8 +408,11 @@ export class DetailComponent implements OnInit, AfterViewInit {
   getStoragePoolList(fresh: boolean){
     if (fresh){
       this.detailService.getStoragePoolList(this.storageId).subscribe((r: any) =>{
+        console.log('pool result:');
+        console.log(r);
         if (r.code === '200'){
           this.storagePool = r.data.data;
+          this.cdr.detectChanges();
         }
       });
     }else {
@@ -411,16 +421,17 @@ export class DetailComponent implements OnInit, AfterViewInit {
         this.detailService.getStoragePoolList(this.storageId).subscribe((r: any) =>{
           if (r.code === '200'){
             this.storagePool = r.data.data;
+            this.cdr.detectChanges();
           }
         });
       }
     }
-    this.cdr.detectChanges();
+
   }
   getStorageVolumeList(fresh: boolean){
     if (fresh){
       this.detailService.getVolumeListList(this.storageId).subscribe((r: any) => {
-        if (r.code === '0'){
+        if (r.code === '200'){
           this.volumes = r.data.data;
           this.cdr.detectChanges();
         }
@@ -429,7 +440,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.volumes !== null){
         this.detailService.getVolumeListList(this.storageId).subscribe((r: any) => {
-          if (r.code === '0'){
+          if (r.code === '200'){
             this.volumes = r.data.data;
             this.cdr.detectChanges();
           }
@@ -440,7 +451,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   getFileSystemList(fresh: boolean){
     if (fresh){
       this.detailService.getFileSystemList(this.storageId).subscribe((r: any) => {
-        if (r.code === '0'){
+        if (r.code === '200'){
           this.fsList = r.data.data;
           this.cdr.detectChanges();
         }
@@ -449,7 +460,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.fsList !== null){
         this.detailService.getFileSystemList(this.storageId).subscribe((r: any) => {
-          if (r.code === '0'){
+          if (r.code === '200'){
             this.fsList = r.data.data;
             this.cdr.detectChanges();
           }
@@ -460,7 +471,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   getDtreeList(fresh: boolean){
     if (fresh){
       this.detailService.getDtreeList(this.storageId).subscribe((r: any) => {
-        if (r.code === '0'){
+        if (r.code === '200'){
           this.dtrees = r.data.data;
           this.cdr.detectChanges();
         }
@@ -469,7 +480,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.dtrees !== null){
         this.detailService.getDtreeList(this.storageId).subscribe((r: any) => {
-          if (r.code === '0'){
+          if (r.code === '200'){
             this.dtrees = r.data.data;
             this.cdr.detectChanges();
           }
@@ -480,7 +491,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   getShareList(fresh: boolean){
     if (fresh){
       this.detailService.getShareList(this.storageId).subscribe((r: any) => {
-        if (r.code === '0'){
+        if (r.code === '200'){
           this.shares = r.data.data;
           this.cdr.detectChanges();
         }
@@ -489,7 +500,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.shares !== null){
         this.detailService.getShareList(this.storageId).subscribe((r: any) => {
-          if (r.code === '0'){
+          if (r.code === '200'){
             this.shares = r.data.data;
             this.cdr.detectChanges();
           }

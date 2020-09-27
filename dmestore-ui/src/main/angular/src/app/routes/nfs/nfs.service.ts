@@ -18,7 +18,9 @@ export class NfsService {
   addNfs(params= {}){
     return this.http.post('operatenfs/createnfsdatastore', params);
   }
-
+  updateNfs(params= {}){
+    return this.http.post('operatenfs/updatenfsdatastore', params);
+  }
   mountNfs(params= {}){
     return this.http.post('accessnfs/mountnfs', params);
   }
@@ -172,12 +174,21 @@ export class ModifyNfs{
   nfsShareName: string;
   nfsName: string;
   file_system_id: string;
+  fsName: string;
+  shareName: string;
   capacity_autonegotiation = new Autonegotiation();
   name: string;
   tuning = new Advance();
   qos_policy = new  QosPolicy();
   nfs_share_id: string;
   sameName = true;
+  advance: boolean;
+  qosPolicy: boolean;
+  upLow: string;
+  constructor(){
+    this.advance = true;
+    this.qosPolicy = true;
+  }
 }
 export class ChartOptions{
   height: number;

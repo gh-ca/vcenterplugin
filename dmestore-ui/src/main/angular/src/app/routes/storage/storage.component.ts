@@ -6,6 +6,7 @@ import {
   ChangeDetectorRef, NgZone
 } from '@angular/core';
 import {StorageService, StorageList} from './storage.service';
+import { Router} from "@angular/router";
 @Component({
   selector: 'app-storage',
   templateUrl: './storage.component.html',
@@ -22,10 +23,7 @@ export class StorageComponent implements OnInit, AfterViewInit {
   radioCheck = 'table1'; // 切换列表页显示
   buttonTrigger = 'list'; // 切换列表页显示
 
-
-
-
-  constructor(private remoteSrv: StorageService, private cdr: ChangeDetectorRef, private ngZone: NgZone) {}
+  constructor(private remoteSrv: StorageService, private cdr: ChangeDetectorRef, private ngZone: NgZone,private router:Router) {}
   // 生命周期： 初始化数据
   ngOnInit() {
    this.refresh();
@@ -50,5 +48,15 @@ export class StorageComponent implements OnInit, AfterViewInit {
     console.log(param);
     this.radioCheck = param;
     this.cdr.detectChanges();
+  }
+  //跳转详情页面的方法
+  toDetailView(id){
+    console.log('id')
+    console.log(id)
+    this.router.navigate(['storage/detail'],{
+      queryParams:{
+        id
+      }
+    });
   }
 }
