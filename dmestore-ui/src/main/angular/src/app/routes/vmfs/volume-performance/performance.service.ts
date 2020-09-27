@@ -32,7 +32,15 @@ export class VmfsPerformanceService {
         show: false // y轴线消失
       },
     },
-    tooltip: {},
+    tooltip: { // 提示框
+      trigger: 'axis',
+      formatter: '{b} <br/> {a0}: {c0}<br/>{a1}: {c1}<br/>{a2}: {c2}<br/>{a3}: {c3}',
+      axisPointer: {
+        type: 'line',
+        axis: 'x',
+        snap: true
+      }
+    },
     legend: {
       data: [
         {
@@ -320,9 +328,10 @@ export class VmfsPerformanceService {
     const endDate = new Date(endTime);
     console.log('--------------')
     console.log(beginTime)
+    console.log('type of beginTime:', typeof beginTime);
     console.log(endTime)
-    console.log(startDate.getMonth())
-    console.log(endDate)
+    console.log('startDate', startDate)
+    console.log('endDate', endDate)
     console.log(intervalNum)
     console.log(rangeNum)
     for (let i = 0; i < rangeNum * intervalNum; i++) {
