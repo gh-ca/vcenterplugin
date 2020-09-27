@@ -1,11 +1,11 @@
 <div>
   <!-- 头部按钮组 -->
   <div>
-    <button class="btn btn-primary" [disabled]="rowSelected.length === 0" (click)="apply()">Apply Best Practice</button>
+    <button class="btn btn-primary" [disabled]="rowSelected.length === 0" (click)="applySelectedPractice()">Apply Best Practice</button>
     <button class="btn btn-primary" (click)="recheck()">Recheck</button>
   </div>
   <!-- 列表页 -->
-  <clr-datagrid [(clrDgSelected)]="rowSelected"   (clrDgRefresh)="practiceRefresh($event)" [clrDgLoading]="isLoading">
+  <clr-datagrid [(clrDgSelected)]="rowSelected"   (clrDgRefresh)="practiceRefresh()" [clrDgLoading]="isLoading">
 
     <clr-dg-column [clrDgField]="'hostSetting'">Host Setting</clr-dg-column>
     <clr-dg-column [clrDgField]="'recommendValue'">Recommend Value</clr-dg-column>
@@ -35,10 +35,10 @@
     <h3 class="modal-title">Non-compliant Host</h3>
     <div class="modal-body">
       <div>
-        <button class="btn btn-primary" [disabled]="hostSelected.length === 0" (click)="apply()">Apply Best Practice</button>
+        <button class="btn btn-primary" [disabled]="hostSelected.length === 0" (click)="applyByHosts()">Apply Best Practice</button>
       </div>
       <!-- 列表页 -->
-      <clr-datagrid [(clrDgSelected)]="hostSelected"   (clrDgRefresh)="hostRefresh($event, currentBestpractice)" [clrDgLoading]="hostIsLoading">
+      <clr-datagrid [(clrDgSelected)]="hostSelected"   (clrDgRefresh)="hostRefresh()" [clrDgLoading]="hostIsLoading">
 
         <clr-dg-column [clrDgField]="'hostName'">Host Setting</clr-dg-column>
         <clr-dg-column [clrDgField]="'actualValue'">Actual Value</clr-dg-column>

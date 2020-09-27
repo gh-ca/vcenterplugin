@@ -147,7 +147,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         String url = API_STORAGES + "/" + storageId + "/detail";
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            //ResponseEntity responseEntity = access(url, HttpMethod.GET, null);
             LOG.info("DmeStorageServiceImpl/getStorageDetail/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -155,34 +154,42 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 resMap.put("msg", "search oriented storage error");
                 return resMap;
             }
-            Object object = responseEntity.getBody();
+            String object = responseEntity.getBody();
             if (object != null) {
-                JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
-                StorageDetail storageObj = new StorageDetail();
-                storageObj.setId(jsonObject.get("id").getAsString());
-                storageObj.setName(jsonObject.get("name").getAsString());
-                storageObj.setIp(jsonObject.get("ip").getAsString());
-                storageObj.setStatus(jsonObject.get("status").getAsString());
-                storageObj.setSynStatus(jsonObject.get("syn_status").getAsString());
-                storageObj.setVendor(jsonObject.get("vendor").getAsString());
-                storageObj.setModel(jsonObject.get("model").getAsString());
-                storageObj.setUsedCapacity(Double.valueOf(jsonObject.get("used_capacity").getAsString()));
-                storageObj.setTotalCapacity(Double.valueOf(jsonObject.get("total_capacity").getAsString()));
-                storageObj.setTotalEffectiveCapacity(Double.valueOf(jsonObject.get("total_effective_capacity").getAsString()));
-                storageObj.setFreeEffectiveCapacity(Double.valueOf(jsonObject.get("free_effective_capacity").getAsString()));
-                JsonArray ids = jsonObject.get("az_ids").getAsJsonArray();
-                if (ids.size() != 0) {
-                    String[] az_ids = {ids.getAsString()};
-                    storageObj.setAzIds(az_ids);
-                } else {
-                    String[] az_ids = {};
-                    storageObj.setAzIds(az_ids);
+                JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+                JsonArray jsonArray = jsonObject.get("datas").getAsJsonArray();
+                for (JsonElement jsonElement : jsonArray) {
+                    JsonObject element = jsonElement.getAsJsonObject();
+                    StorageDetail storageObj = new StorageDetail();
+                    storageObj.setId(element.get("id").getAsString());
+                    storageObj.setName(element.get("name").getAsString());
+                    storageObj.setIp(element.get("ip").getAsString());
+                    storageObj.setStatus(element.get("status").getAsString());
+                    storageObj.setSynStatus(element.get("syn_status").getAsString());
+                    storageObj.setPatch_version(element.get("patch_version").getAsString());
+                    storageObj.setVendor(element.get("vendor").getAsString());
+                    storageObj.setModel(element.get("model").getAsString());
+                    storageObj.setUsedCapacity(Double.valueOf(element.get("used_capacity").getAsString()));
+                    storageObj.setTotalCapacity(Double.valueOf(element.get("total_capacity").getAsString()));
+                    storageObj.setTotalEffectiveCapacity(Double.valueOf(element.get("total_effective_capacity").getAsString()));
+                    storageObj.setFreeEffectiveCapacity(Double.valueOf(element.get("free_effective_capacity").getAsString()));
+                    storageObj.setMaintenance_start(Integer.valueOf(element.get("maintenance_start").getAsString()));
+                    storageObj.setMaintenance_overtime(Integer.valueOf(element.get("maintenance_overtime").getAsString()));
+
+                    JsonArray ids = element.get("az_ids").getAsJsonArray();
+                    if (ids.size() != 0) {
+                        String[] az_ids = {ids.getAsString()};
+                        storageObj.setAzIds(az_ids);
+                    } else {
+                        String[] az_ids = {};
+                        storageObj.setAzIds(az_ids);
+                    }
+                    resMap.put("data", storageObj);
                 }
-                resMap.put("data", storageObj);
             }
             return resMap;
         } catch (Exception e) {
-            LOG.error("search oriented storage error!");
+            LOG.error("search oriented storage error!", e);
             resMap.put("code", 503);
             resMap.put("msg", e.getMessage());
         }
@@ -202,7 +209,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         params.put("storage_id", storageId);
 
         try {
-            //ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, gson.toJson(params));
             ResponseEntity<String> responseEntity = dmeAccessService.access(API_STORAGEPOOL_LIST, HttpMethod.POST, gson.toJson(params));
             LOG.info("DmeStorageServiceImpl/getStoragePools/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
@@ -245,8 +251,12 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storagePool.setConsumed_capacity(Double.valueOf(element.get("consumed_capacity").getAsString()));
                     //订阅率（lun/fs订阅率）
                     DecimalFormat df = new DecimalFormat("#.00");
-                    Double lun_subscription_rate = Double.valueOf(df.format(lun_subscribed_capacity / total_capacity));
-                    Double fs_subscription_rate = Double.valueOf(df.format(fs_subscribed_capacity / total_capacity));
+                    Double lun_subscription_rate = 0.0;
+                    Double fs_subscription_rate = 0.0;
+                    if (total_capacity!=0) {
+                        lun_subscription_rate = Double.valueOf(df.format(lun_subscribed_capacity / total_capacity));
+                        fs_subscription_rate = Double.valueOf(df.format(fs_subscribed_capacity / total_capacity));
+                    }
                     storagePool.setLun_subscription_rate(lun_subscription_rate);
                     storagePool.setFs_subscription_rate(fs_subscription_rate);
 
@@ -337,7 +347,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            //ResponseEntity responseEntity = access(url, HttpMethod.GET,null);
             LOG.info("DmeStorageServiceImpl/getVolumes/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -362,18 +371,20 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     volume.setStorage_id(element.get("storage_id").getAsString());
                     volume.setPool_raw_id(element.get("pool_raw_id").getAsString());
                     volume.setCapacity_usage(element.get("capacity_usage").getAsString());
-                    volume.setProtectionStatus(Boolean.valueOf(element.get("protectionStatus").getAsString()));
+                    volume.setProtectionStatus(Boolean.valueOf(element.get("protected").getAsString()));
                     volume.setCapacity(Integer.valueOf(element.get("capacity").getAsString()));
                     String datastore = getDataStoreOnVolume(volume_id);
+                    if (StringUtils.isEmpty(datastore)) {
+                        datastore = "";
+                    }
                     volume.setDatastores(datastore);
                     volumes.add(volume);
-
                 }
                 resMap.put("data", volumes);
             }
             return resMap;
         } catch (Exception e) {
-            LOG.error("list volume error!");
+            LOG.error("list volume error!",e);
             resMap.put("code", 503);
             resMap.put("msg", e.getMessage());
         } finally {
@@ -546,8 +557,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("storageId", storageId);
         List<BandPorts> resList = new ArrayList<>();
 
+        String url = API_BANDPORTS_LIST + storageId;
+
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.access(API_BANDPORTS_LIST, HttpMethod.GET, null);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             LOG.info("DmeStorageServiceImpl/getBandPorts/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {

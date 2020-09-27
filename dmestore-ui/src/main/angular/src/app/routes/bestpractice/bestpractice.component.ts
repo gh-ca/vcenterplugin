@@ -23,15 +23,6 @@ export class BestpracticeComponent implements OnInit {
   total = 0; // 总数据数量
 
   query = { // 查询数据
-
-  };
-
-  result = {
-    items: [{hostSetting: 'Disk Max IOSize',
-       recommendValue: 1,
-       level: 'waning',
-       violation: 49}],
-     total_count: 1
   };
   // =================END===============
 
@@ -50,7 +41,6 @@ export class BestpracticeComponent implements OnInit {
     page: 0,
     per_page: 5,
   };
-  hostResult = {};
   // ================END====================
 
   constructor(private cdr: ChangeDetectorRef, private http: HttpClient, private commonService: CommonService) { }
@@ -58,22 +48,75 @@ export class BestpracticeComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  apply() {}
+  applySelectedPractice() {
+    const params = [];
+    let ips = '';
+    this.rowSelected.forEach((item) => {
+      const i = {hostSetting:'', hostObjectIds: []};
+      i.hostSetting = item.hostSetting;
+      item.hostList.forEach((s) => {
+        i.hostObjectIds.push(s.hostObjectId);
+        if (s.needReboot == "true"){
+          ips += s.hostName+",";
+        }
+      });
+      params.push(i);
+    });
 
-  recheck() {
-    this.http.post('v1/bestpractice', {}).subscribe((result: any) => {
-      console.log(result);
+    if (ips.length != 0){
+      alert('modify config, you need reboot ' + ips);
+    }
+
+    console.log(params);
+    this.http.post('v1/bestpractice/update/bylist', params).subscribe((result: any) => {
+      if (result.code == '200'){
+        this.practiceRefresh();
+      }
     }, err => {
       console.error('ERROR', err);
     });
   }
 
-  practiceRefresh(state: ClrDatagridStateInterface){
+  applyByHosts(){
+    const params = [];
+    const i = {hostSetting:'', hostObjectIds: []};
+    i.hostSetting = this.currentBestpractice.hostSetting;
+    let ips = '';
+    this.hostSelected.forEach((s) => {
+      i.hostObjectIds.push(s.hostObjectId);
+      if (s.needReboot == "true"){
+        ips += s.hostName+",";
+      }
+    });
+    params.push(i);
+
+    if (ips.length != 0){
+      alert('modify config, you need reboot ' + ips);
+    }
+
+    console.log(params);
+    this.http.post('v1/bestpractice/update/bylist', params).subscribe((result: any) => {
+      if (result.code == '200'){
+        this.practiceRefresh();
+      }
+    }, err => {
+      console.error('ERROR', err);
+    });
+  }
+
+  recheck() {
+    this.http.post('v1/bestpractice/check', {}).subscribe((result: any) => {
+    }, err => {
+      console.error('ERROR', err);
+    });
+  }
+
+  practiceRefresh(){
+    console.log('123123123132');
     this.isLoading = true;
-    const params = this.commonService.refresh(state, this.query);
-    this.http.get('v1/bestpractice/records/all', params).subscribe((result: any) => {
-          console.log(result);
-          if (result.code === '0'){
+    //const params = this.commonService.refresh(state, this.query);
+    this.http.get('v1/bestpractice/records/all', {}).subscribe((result: any) => {
+          if (result.code === '200'){
             this.list = result.data;
             this.total = result.data.length;
             this.isLoading = false;
@@ -87,28 +130,14 @@ export class BestpracticeComponent implements OnInit {
   openHostList(bestpractice: Bestpractice){
     this.hostModalShow = true;
     this.currentBestpractice = bestpractice;
-    this.hostRefresh(null, bestpractice);
+    this.hostRefresh();
   }
 
-  hostRefresh(state: ClrDatagridStateInterface, bestpractice: Bestpractice){
+  hostRefresh(){
     if (this.hostModalShow === true){
       this.hostIsLoading = true;
-      console.log(bestpractice.hostList.length);
-      if (state){
-        const params = this.commonService.refresh(state, this.hostQuery);
-        // this.http.get('https://api.github.com/search/repositories', this.hostParams).subscribe((result: any) => {
-        //   console.log(result)
-        //   this.hostList = result.items;
-        //   this.total = result.total_count;
-        //   this.hostIsLoading = false;
-        //   this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        // });
-        this.hostList = bestpractice.hostList;
-        this.hostTotal = bestpractice.hostList.length;
-      } else{
-        this.hostList = bestpractice.hostList;
-        this.hostTotal = bestpractice.hostList.length;
-      }
+      this.hostList = this.currentBestpractice.hostList;
+      this.hostTotal = this.currentBestpractice.hostList.length;
       this.hostIsLoading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     }
@@ -129,6 +158,7 @@ class Host {
   hostName: string;
   recommendValue: number;
   actualValue: number;
+  hostObjectId: string;
   needReboot: string;
   hostId: string;
   autoRepair: string;

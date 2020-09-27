@@ -2,13 +2,14 @@ import {AfterViewInit, Component, NgZone, OnInit, ChangeDetectorRef} from '@angu
 import { EChartOption } from 'echarts';
 import { VmfsPerformanceService } from './performance.service';
 import {VmfsListService} from '../list/list.service';
+import {ChartOptions, NfsService, MakePerformance} from "../../nfs/nfs.service";
 
 
 @Component({
   selector: 'app-performance',
   templateUrl: './performance.component.html',
   styleUrls: ['./performance.component.scss'],
-  providers: [VmfsPerformanceService],
+  providers: [VmfsPerformanceService, MakePerformance, NfsService],
 })
 export class PerformanceComponent implements OnInit, AfterViewInit {
 
@@ -39,7 +40,7 @@ export class PerformanceComponent implements OnInit, AfterViewInit {
   // 定时函数执行时间 默认一天
   timeInterval = 1 * 60 * 60 * 1000;
   // 卷ID
-  constructor( private perService: VmfsPerformanceService, private ngZone: NgZone, private cdr: ChangeDetectorRef) {
+  constructor(private makePerformance: MakePerformance, private perService: VmfsPerformanceService, private ngZone: NgZone, private cdr: ChangeDetectorRef) {
   }
 
   ngAfterViewInit() {
@@ -60,9 +61,9 @@ export class PerformanceComponent implements OnInit, AfterViewInit {
       default: // 默认过去24h
         break;
     }
+    console.log('this.rang', this.range)
     // IOPS
-    this.perService.getIopsChart('IOPS', 'IO/s', this.objTypeId, this.indicatorIdsIOPS, this.objIds,
-      this.interval, this.range, this.beginTime, this.endTime).then(res => {
+    this.makePerformance.setChart(300,'IOPS', 'IO/s', this.indicatorIdsIOPS, this.objIds, null, 'datastorestatistichistrory/vmfsvolume').then(res => {
       this.iopsChart = res;
       this.cdr.detectChanges();
     });
@@ -73,11 +74,11 @@ export class PerformanceComponent implements OnInit, AfterViewInit {
       this.bandwidthChart = res;
       this.cdr.detectChanges();
     });
-    // 响应时间
-    this.perService.getIopsChart('Latency', 'ms', this.objTypeId, this.indicatorIdsREST, this.objIds,
-      this.interval, this.range, this.beginTime, this.endTime).then(res => {
-      this.latencyChart = res;
-      this.cdr.detectChanges();
-    });
+    // // 响应时间
+    // this.perService.getIopsChart('Latency', 'ms', this.objTypeId, this.indicatorIdsREST, this.objIds,
+    //   this.interval, this.range, this.beginTime, this.endTime).then(res => {
+    //   this.latencyChart = res;
+    //   this.cdr.detectChanges();
+    // });
   }
 }

@@ -70,22 +70,22 @@ export class DefaultInterceptor implements HttpInterceptor {
   }
 
   private handleErrorReq(error: HttpErrorResponse): Observable<never> {
-    switch (error.status) {
-      case 401:
-        this.goto(`/`);
-        break;
-      case 403:
-      case 404:
-      case 500:
-        this.goto(`/sessions/${error.status}`);
-        break;
-      default:
-        if (error instanceof HttpErrorResponse) {
-          console.error('ERROR', error);
-          this.toastr.error(error.error.msg || `${error.status} ${error.statusText}`);
-        }
-        break;
-    }
+    // switch (error.status) {
+    //   case 401:
+    //     this.goto(`/`);
+    //     break;
+    //   case 403:
+    //   case 404:
+    //   case 500:
+    //     this.goto(`/sessions/${error.status}`);
+    //     break;
+    //   default:
+    //     if (error instanceof HttpErrorResponse) {
+    //       console.error('ERROR', error);
+    //       this.toastr.error(error.error.msg || `${error.status} ${error.statusText}`);
+    //     }
+    //     break;
+    // }
     return throwError(error);
   }
 }

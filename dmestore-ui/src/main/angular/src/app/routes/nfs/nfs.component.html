@@ -83,10 +83,11 @@
   <!-- 添加nsf data store -->
   <clr-wizard #wizard [(clrWizardOpen)]="popShow">
     <clr-wizard-title>{{'nfs.add_title' | translate}}</clr-wizard-title>
+    <p *ngIf="errMessage!==''" style="color: red">{{errMessage}}</p>
     <clr-wizard-button [type]="'cancel'">{{'nfs.button_close' | translate}}</clr-wizard-button>
     <clr-wizard-button [type]="'previous'">{{'nfs.button_previous' | translate}}</clr-wizard-button>
     <clr-wizard-button [type]="'next'">{{'nfs.button_next' | translate}}</clr-wizard-button>
-    <clr-wizard-button [type]="'finish'" (click)="addNfs();">{{'nfs.button_done' | translate}}</clr-wizard-button>
+    <clr-wizard-button  (click)="addNfs();">{{'nfs.button_done' | translate}}</clr-wizard-button>
     <clr-wizard-page [clrWizardPageNextDisabled]="!formPageOne.valid">
       <ng-template clrPageTitle>{{'nfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
       <form clrForm #formPageOne="ngForm">
@@ -100,7 +101,7 @@
         <!--存储池-->
         <clr-select-container>
           <label>{{'nfs.storagePool' | translate}}</label>
-          <select clrSelect (ngModelOptions)="storagePools" [(ngModel)]="addForm.pool_raw_id" name="pool_raw_id" class="clr-select">
+          <select clrSelect (ngModelOptions)="storagePools" [(ngModel)]="addForm.storage_pool_id" name="pool_raw_id" class="clr-select">
             <option *ngFor="let item of storagePools" value="{{item.storage_pool_id}}">{{item.name}}</option>
           </select>
         </clr-select-container>

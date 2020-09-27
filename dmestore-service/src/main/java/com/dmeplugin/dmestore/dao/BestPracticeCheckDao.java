@@ -84,6 +84,32 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         return lists;
     }
 
+    public List<String> getAllHostIds(int pageNo, int pageSize) throws SQLException{
+        List<String> lists = new ArrayList<>();
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            String sql = "SELECT HOST_ID from HW_BEST_PRACTICE_CHECK where 1=1 ";
+            if(pageNo > 0 &&  pageSize > 0){
+                int offset = (pageNo - 1) * pageSize;
+                sql = sql + " OFFSET " + offset + " ROWS FETCH FIRST " + pageSize + " ROWS ONLY";
+            }
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                lists.add(rs.getString("HOST_ID"));
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("getAllHostIds Failed! " + e.getMessage());
+            throw new SQLException(e);
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return lists;
+    }
+
     public List<BestPracticeBean> getRecordByPage(String hostSetting, int pageNo, int pageSize) throws SQLException{
         int offset = (pageNo - 1) * pageSize;
         List<BestPracticeBean> lists = new ArrayList<>();
@@ -101,15 +127,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
-                BestPracticeBean bean = new BestPracticeBean();
-                bean.setHostObjectId(rs.getString("HOST_ID"));
-                bean.setHostName(rs.getString("HOST_NAME"));
-                bean.setHostSetting(rs.getString("HOST_SETTING"));
-                bean.setRecommendValue(rs.getString("RECOMMEND_VALUE"));
-                bean.setActualValue(rs.getString("ACTUAL_VALUE"));
-                bean.setLevel(rs.getString("HINT_LEVEL"));
-                bean.setNeedReboot(rs.getString("NEED_REBOOT"));
-                bean.setAutoRepair(rs.getString("AUTO_REPAIR"));
+                BestPracticeBean bean = getBestPracticeBean(rs);
                 lists.add(bean);
             }
         } catch (DataBaseException | SQLException e) {
@@ -135,15 +153,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
-                BestPracticeBean bean = new BestPracticeBean();
-                bean.setHostObjectId(rs.getString("HOST_ID"));
-                bean.setHostName(rs.getString("HOST_NAME"));
-                bean.setHostSetting(rs.getString("HOST_SETTING"));
-                bean.setRecommendValue(rs.getString("RECOMMEND_VALUE"));
-                bean.setActualValue(rs.getString("ACTUAL_VALUE"));
-                bean.setLevel(rs.getString("HINT_LEVEL"));
-                bean.setNeedReboot(rs.getString("NEED_REBOOT"));
-                bean.setAutoRepair(rs.getString("AUTO_REPAIR"));
+                BestPracticeBean bean = getBestPracticeBean(rs);
                 lists.add(bean);
             }
         } catch (DataBaseException | SQLException e) {
@@ -153,6 +163,19 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             closeConnection(con, ps, rs);
         }
         return lists;
+    }
+
+    private BestPracticeBean getBestPracticeBean(ResultSet rs) throws SQLException {
+        BestPracticeBean bean = new BestPracticeBean();
+        bean.setHostObjectId(rs.getString("HOST_ID"));
+        bean.setHostName(rs.getString("HOST_NAME"));
+        bean.setHostSetting(rs.getString("HOST_SETTING"));
+        bean.setRecommendValue(rs.getString("RECOMMEND_VALUE"));
+        bean.setActualValue(rs.getString("ACTUAL_VALUE"));
+        bean.setLevel(rs.getString("HINT_LEVEL"));
+        bean.setNeedReboot(rs.getString("NEED_REBOOT"));
+        bean.setAutoRepair(rs.getString("AUTO_REPAIR"));
+        return bean;
     }
 
     public void deleteBy(List<BestPracticeUpResultResponse> list) {

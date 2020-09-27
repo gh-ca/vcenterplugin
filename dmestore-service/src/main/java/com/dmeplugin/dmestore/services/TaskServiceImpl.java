@@ -77,23 +77,33 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public JsonObject queryTaskByIdUntilFinish(String taskId) {
+    public JsonObject queryTaskByIdUntilFinish(String taskId) throws Exception {
         String url = QUERY_TASK_URL.replace("{task_id}", taskId);
         boolean loopFlag = true;
+        int waitTime = 2 * 1000;
+        int times = taskTimeOut / waitTime;
         while (loopFlag) {
-            try {
-                ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-
-                JsonObject taskDetail = gson.fromJson(responseEntity.getBody(), JsonObject.class);
-                //任务进度完成100%后处理，否则等待2s后再尝试
-                if (ToolUtils.jsonToInt(taskDetail.get("progress")) == 100 || ToolUtils.jsonToInt(taskDetail.get("status")) > 2) {
-                    return taskDetail;
-                } else {
-                    Thread.sleep(2 * 1000);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            if (responseEntity.getStatusCodeValue() == 200) {
+                JsonArray taskArray = gson.fromJson(responseEntity.getBody(), JsonArray.class);
+                for (int i = 0; i < taskArray.size(); i++) {
+                    JsonObject taskDetail = taskArray.get(i).getAsJsonObject();
+                    //只查主任务
+                    if (taskDetail.get("id").getAsString().equals(taskId)) {
+                        //任务进度完成100%或者任务状态不正常直接结束查询，否则等待2s后再尝试
+                        if (taskDetail.get("progress").getAsInt() == 100 || taskDetail.get("status").getAsInt() > 2) {
+                            return taskDetail;
+                        } else {
+                            Thread.sleep(waitTime);
+                        }
+                    }
                 }
-            } catch (Exception e) {
-                LOG.error("query task error!errMsg:{}", e.getMessage());
-                loopFlag = false;
+            } else {
+                throw new Exception(responseEntity.getBody());
+            }
+
+            if((times--) < 0){
+                throw new Exception("查询任务状态超时！");
             }
         }
         return null;

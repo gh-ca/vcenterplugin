@@ -6,6 +6,8 @@ import com.dmeplugin.dmestore.services.BestPracticeProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping(value = "v1/bestpractice")
 public class BestPracticeController extends BaseController {
@@ -50,6 +52,21 @@ public class BestPracticeController extends BaseController {
         }
     }
 
+
+    @RequestMapping(value = "/update/bylist", method = RequestMethod.POST)
+    public ResponseBodyBean bylist(@RequestBody List<BestPracticeUpdateByTypeRequest> list) throws Exception {
+        try {
+            for (int i = 0; i < list.size(); i++) {
+                BestPracticeUpdateByTypeRequest _re = list.get(i);
+                upByHostSetting(_re);
+            }
+            return success();
+        } catch (Exception ex) {
+            return failure(ex.getMessage());
+        }
+    }
+
+    //应用某一最佳实践项的指定主机
     @RequestMapping(value = "/update/bytype", method = RequestMethod.POST)
     public ResponseBodyBean upByHostSetting(@RequestBody BestPracticeUpdateByTypeRequest request) throws Exception {
         try {
@@ -59,11 +76,31 @@ public class BestPracticeController extends BaseController {
         }
     }
 
-    //request 的hostSetting属性不用设置
+    //应用指定主机列表的所有最佳实践项
     @RequestMapping(value = "/update/byhosts", method = RequestMethod.POST)
-    public ResponseBodyBean upByHosts(@RequestBody BestPracticeUpdateByTypeRequest request) throws Exception {
+    public ResponseBodyBean upByHosts(@RequestBody List<String> hostObjectIds) throws Exception {
         try {
-            return success(bestPracticeProcessService.update(request.getHostObjectIds()));
+            return success(bestPracticeProcessService.update(hostObjectIds));
+        } catch (Exception ex) {
+            return failure(ex.getMessage());
+        }
+    }
+
+    //应用所有主机最佳实践项
+    @RequestMapping(value = "/update/all", method = RequestMethod.POST)
+    public ResponseBodyBean upAll() throws Exception {
+        try {
+            return success(bestPracticeProcessService.update(null, null));
+        } catch (Exception ex) {
+            return failure(ex.getMessage());
+        }
+    }
+
+    //应用集群最佳实践项
+    @RequestMapping(value = "/update/byCluster", method = RequestMethod.POST)
+    public ResponseBodyBean upByCluster() throws Exception {
+        try {
+            return success(bestPracticeProcessService.update(null, null));
         } catch (Exception ex) {
             return failure(ex.getMessage());
         }

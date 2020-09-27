@@ -14,9 +14,7 @@ export class LogicportComponent implements OnInit {
 
   ngOnInit(): void {
     const ctx = this.gs.getClientSdk().app.getContextObjects();
-    const objectId = '1234';
-    // objectId=ctx[0].id;
-    this.logicportDetail(objectId);
+    this.logicportDetail(ctx[0].id);
   }
 
   logicportDetail(objectId){
