@@ -659,19 +659,19 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         List<Map<String, Object>> volumelist = null;
         String listVolumeUrl = LIST_VOLUME_URL + "?name=" + volumeName;
         if(!StringUtils.isEmpty(hostId)){
-            listVolumeUrl = LIST_VOLUME_URL + "&host_id=" + hostId;
+            listVolumeUrl = listVolumeUrl + "&host_id=" + hostId;
         }
         if(!StringUtils.isEmpty(hostGroupId)){
-            listVolumeUrl = LIST_VOLUME_URL + "&hostgroup_id=" + hostGroupId;
+            listVolumeUrl = listVolumeUrl + "&hostgroup_id=" + hostGroupId;
         }
         if(!StringUtils.isEmpty(ServiceLevelId)){
-            listVolumeUrl = LIST_VOLUME_URL + "&service_level_id=" + ServiceLevelId;
+            listVolumeUrl = listVolumeUrl + "&service_level_id=" + ServiceLevelId;
         }
         if(!StringUtils.isEmpty(storageId)){
-            listVolumeUrl = LIST_VOLUME_URL + "&storage_id=" + storageId;
+            listVolumeUrl = listVolumeUrl + "&storage_id=" + storageId;
         }
         if(!StringUtils.isEmpty(poolRawId)){
-            listVolumeUrl = LIST_VOLUME_URL + "&pool_raw_id=" + poolRawId;
+            listVolumeUrl = listVolumeUrl + "&pool_raw_id=" + poolRawId;
         }
         try {
             ResponseEntity responseEntity = dmeAccessService.access(listVolumeUrl, HttpMethod.GET, null);
