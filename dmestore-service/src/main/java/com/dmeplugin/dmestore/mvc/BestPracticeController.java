@@ -66,7 +66,7 @@ public class BestPracticeController extends BaseController {
         }
     }
 
-    //更新某一检查项的指定主机
+    //应用某一最佳实践项的指定主机
     @RequestMapping(value = "/update/bytype", method = RequestMethod.POST)
     public ResponseBodyBean upByHostSetting(@RequestBody BestPracticeUpdateByTypeRequest request) throws Exception {
         try {
@@ -76,7 +76,7 @@ public class BestPracticeController extends BaseController {
         }
     }
 
-    //更新指定主机列表的所有检查项
+    //应用指定主机列表的所有最佳实践项
     @RequestMapping(value = "/update/byhosts", method = RequestMethod.POST)
     public ResponseBodyBean upByHosts(@RequestBody List<String> hostObjectIds) throws Exception {
         try {
@@ -86,9 +86,19 @@ public class BestPracticeController extends BaseController {
         }
     }
 
-    //更新所有主机所有项
+    //应用所有主机最佳实践项
     @RequestMapping(value = "/update/all", method = RequestMethod.POST)
     public ResponseBodyBean upAll() throws Exception {
+        try {
+            return success(bestPracticeProcessService.update(null, null));
+        } catch (Exception ex) {
+            return failure(ex.getMessage());
+        }
+    }
+
+    //应用集群最佳实践项
+    @RequestMapping(value = "/update/byCluster", method = RequestMethod.POST)
+    public ResponseBodyBean upByCluster() throws Exception {
         try {
             return success(bestPracticeProcessService.update(null, null));
         } catch (Exception ex) {
