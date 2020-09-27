@@ -44,6 +44,11 @@ public class DmeConstants {
      **/
     public static final String DME_VOLUME_BASE_URL = "/rest/blockservice/v1/volumes";
 
+    /**
+     * DME 磁盘操作基础URL
+     **/
+    public static final String DME_CREATE_VOLUME_UNLEVEL_URL = "/rest/blockservice/v1/volumes/customize-volumes";
+
 
     /**
      * DME 任务查询URL
