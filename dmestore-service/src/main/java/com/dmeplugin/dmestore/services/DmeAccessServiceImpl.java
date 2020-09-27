@@ -64,6 +64,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     private final String GET_DME_HOSTGROUP_URL = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}/summary";
 
     private final String GET_DME_HOSTS_INITIATORS_URL = "/rest/hostmgmt/v1/hosts/{host_id}/initiators";
+    private final String GET_DME_HOSTS_IN_HOSTGROUP_URL = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}/hosts/list";
 
     @Override
     public Map<String, Object> accessDme(Map<String, Object> params) {
@@ -689,5 +690,39 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         return map;
     }
 
+    @Override
+    public List<Map<String,Object>> getDmeHostInHostGroup(String hostGroupId) throws Exception {
+        List<Map<String,Object>> list = null;
+        String getHostInHostGroupUrl = GET_DME_HOSTS_IN_HOSTGROUP_URL;
+        getHostInHostGroupUrl = getHostInHostGroupUrl.replace("{hostgroup_id}", hostGroupId);
+        try {
+            Map<String, Object> requestbody = new HashMap<>();
+            LOG.info("getHostInHostGroup_Url===" + getHostInHostGroupUrl);
+            ResponseEntity responseEntity = access(getHostInHostGroupUrl, HttpMethod.POST, gson.toJson(requestbody));
+            LOG.info("getDmeHostGroup responseEntity==" + responseEntity.toString());
+            if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
+                list = new ArrayList<>();
+                JsonObject datajson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                if (datajson != null && datajson.get("hosts")!=null) {
+                    JsonArray hostsja = datajson.getAsJsonArray("hosts");
+                    if(hostsja!=null && hostsja.size()>0) {
+                        for(int i=0;i<hostsja.size();i++) {
+                            JsonObject hostjs = hostsja.get(i).getAsJsonObject();
+                            Map<String,Object> hostmap = new HashMap<>();
+                            hostmap.put("id", ToolUtils.jsonToStr(hostjs.get("id")));
+                            hostmap.put("name", ToolUtils.jsonToStr(hostjs.get("name")));
+                            hostmap.put("host_count", ToolUtils.jsonToStr(hostjs.get("ip")));
+                            list.add(hostmap);
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("DME link error url:" + getHostInHostGroupUrl + ",error:" + e.getMessage());
+            throw e;
+        }
+        LOG.info("getDmeHostInHostGroup relists===" + (gson.toJson(list)));
+        return list;
+    }
 
 }
