@@ -4,6 +4,7 @@ import {SharedModule} from '../../shared';
 
 import { RdmRoutingModule } from './rdm-routing.module';
 import { RdmComponent } from './rdm.component';
+import {FormsModule} from '@angular/forms';
 
 
 @NgModule({
@@ -11,6 +12,7 @@ import { RdmComponent } from './rdm.component';
   imports: [
     CommonModule,
     SharedModule,
+    FormsModule,
     RdmRoutingModule
   ]
 })
