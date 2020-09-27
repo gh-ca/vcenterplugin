@@ -5,10 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.conn.ssl.X509HostnameVerifier;
+import org.apache.http.conn.ssl.*;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
@@ -21,6 +18,7 @@ import javax.net.ssl.SSLContext;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 
 /**
  * @Description: TODO
@@ -37,16 +35,17 @@ public class RestUtils {
     public final static int RES_STATE_I_403 = 403;
 
     public RestTemplate getRestTemplate() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
-        SSLContextBuilder builder = new SSLContextBuilder();
-        builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+        TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+        HostnameVerifier hostnameVerifier = (s, sslSession) -> true;
 
         //HostnameVerifier hostnameVerifier = SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
 
-        X509HostnameVerifier hostnameVerifier = SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
-        SSLConnectionSocketFactory systemSocketFactory = new SSLConnectionSocketFactory(
+        SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+        SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+       /* SSLConnectionSocketFactory systemSocketFactory = new SSLConnectionSocketFactory(
                 builder.build(),
-                hostnameVerifier);
-        CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(systemSocketFactory).setMaxConnTotal(200).setMaxConnPerRoute(20).build();
+                hostnameVerifier);*/
+        CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(csf).setMaxConnTotal(200).setMaxConnPerRoute(20).build();
 
         HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
 
