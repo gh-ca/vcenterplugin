@@ -223,20 +223,6 @@ export interface StorageList {
    maxLatency: number;
    azIds: string[];
 }
-export class StoragePool{
-  free_capacity: number;
-  health_status:string;
-  lun_subscribed_capacity: number;
-  name:string;
-  parent_type:string;
-  running_status:string;
-  total_capacity: number;
-  fs_subscribed_capacity;
-  consumed_capacity: number;
-  consumed_capacity_percentage:string;
-  consumed_capacity_threshold:string;
-  storage_pool_id:string;
-}
 export class LogicPort{
   id: string;
   name: string;

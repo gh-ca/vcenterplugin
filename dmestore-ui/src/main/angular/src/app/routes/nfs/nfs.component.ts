@@ -1,7 +1,9 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {AddNfs, Cluster, FileSystem, Host, List, ModifyNfs, Mount, NfsService, Share, ShareClient} from './nfs.service';
 import {GlobalsService} from '../../shared/globals.service';
-import {LogicPort, StorageList, StoragePool, StorageService} from '../storage/storage.service';
+import {LogicPort, StorageList, StorageService} from '../storage/storage.service';
+import {StoragePool} from "../storage/detail/detail.service";
+import {ClrWizard, ClrWizardPage} from "@clr/angular";
 @Component({
   selector: 'app-nfs',
   templateUrl: './nfs.component.html',
@@ -37,6 +39,12 @@ export class NfsComponent implements OnInit {
   storagePools: StoragePool[] = [];
   logicPorts: LogicPort[] = [];
 
+  // 添加页面窗口
+  @ViewChild('wizard') wizard: ClrWizard;
+  @ViewChild('addPageOne') addPageOne: ClrWizardPage;
+  @ViewChild('addPageTwo') addPageTwo: ClrWizardPage;
+
+  errMessage = '';
   constructor(private remoteSrv: NfsService, private cdr: ChangeDetectorRef, public gs: GlobalsService , private storageService: StorageService) { }
   ngOnInit(): void {
   }
@@ -68,7 +76,7 @@ export class NfsComponent implements OnInit {
     console.log('fsIds');
     console.log(this.fsIds);
     this.remoteSrv.getChartData(this.fsIds).subscribe((result: any) => {
-      if (result.code === '0'){
+      if (result.code === '200'){
         const chartList: List [] = result.data;
         if ( chartList !== null && chartList.length > 0){
          this.list.forEach(item => {
@@ -89,20 +97,32 @@ export class NfsComponent implements OnInit {
 
   addView(){
     this.addForm = new AddNfs();
+    // 添加页面默认打开首页
+    this.jumpTo(this.addPageOne, this.wizard);
+    this.errMessage='';
     // 获取存储列表
     this.storageService.getData().subscribe((s: any) => {
-       if (s.code === '0'){
+       if (s.code === '200'){
         this.storageList = s.data.data;
         }
     });
     this.remoteSrv.getHostList().subscribe((r: any) => {
-      if (r.code === '0'){
+      if (r.code === '200'){
         this.hostList = r.data;
         this.hostLoading = false;
         this.cdr.detectChanges();
       }
     });
     this.popShow = true;
+  }
+  // 页面跳转
+  jumpTo(page: ClrWizardPage, wizard: ClrWizard) {
+    if (page && page.completed) {
+      wizard.navService.currentPage = page;
+    } else {
+      wizard.navService.setLastEnabledPageCurrent();
+    }
+    this.wizard.open();
   }
   // 添加提交方法
   addNfs(){
@@ -159,31 +179,33 @@ export class NfsComponent implements OnInit {
     }
     // 构建exportPath路径
     this.addForm.exportPath = this.addForm.nfsName;
+    this.addForm.pool_raw_id = this.addForm.storage_pool_id;
     this.remoteSrv.addNfs(this.addForm).subscribe((result: any) => {
-      if (result.code === '0'){
+      if (result.code === '200'){
         this.popShow = false;
+      }else{
+        this.popShow = true;
+        this.errMessage = '添加失败！'+result.description;
       }
      });
   }
   selectStoragePool(){
     this.storagePools = null;
     this.logicPorts = null;
-    console.log('查询存储池....');
     // 选择存储后获取存储池
     this.storageService.getStoragePoolListByStorageId(this.addForm.storage_id)
       .subscribe((r: any) => {
-        if (r.code === '0'){
+        if (r.code === '200'){
           this.storagePools = r.data.data;
         }
       });
     this.selectLogicPort();
   }
   selectLogicPort(){
-    console.log('查询逻辑端口....');
     // 选择存储后逻辑端口
     this.storageService.getLogicPortListByStorageId(this.addForm.storage_id)
       .subscribe((r: any) => {
-        if (r.code === '0'){
+        if (r.code === '200'){
         this.logicPorts = r.data.data;
       }
       });
@@ -225,13 +247,13 @@ export class NfsComponent implements OnInit {
     this.mountForm.dataStoreName = this.rowSelected[0].name;
     this.mountForm.dataStoreObjectId = this.rowSelected[0].objectid;
     this.remoteSrv.getHostListByObjectId(this.rowSelected[0].objectid).subscribe((r: any) => {
-      if (r.code === '0'){
+      if (r.code === '200'){
         this.hostList = r.data;
         this.cdr.detectChanges();
       }
     });
     this.remoteSrv.getClusterListByObjectId(this.rowSelected[0].objectid).subscribe((r: any) => {
-      if (r.code === '0'){
+      if (r.code === '200'){
         this.clusterList = r.data;
         this.cdr.detectChanges();
       }
@@ -241,7 +263,7 @@ export class NfsComponent implements OnInit {
   // 挂载提交
   mountSubmit(){
     this.remoteSrv.mountNfs(this.mountForm).subscribe((result: any) => {
-      if (result.code  ===  '0'){
+      if (result.code  ===  '200'){
         this.mountShow = false;
         this.mountForm = new Mount();
       }

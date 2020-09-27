@@ -17,8 +17,7 @@ export class FileSystemComponent implements OnInit {
 
   ngOnInit(): void {
     const ctx = this.gs.getClientSdk().app.getContextObjects();
-    const objectId = '1234';
-    this.getFsDetail(objectId);
+    this.getFsDetail(ctx[0].id);
   }
   getFsDetail(objectId){
     this.fsService.getData(objectId).subscribe((result: any) => {

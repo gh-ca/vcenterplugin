@@ -2,38 +2,41 @@
   <clr-tab>
     <button clrTabLink id="conf">{{'storage.detail.conf.configuration' | translate}}</button>
     <clr-tab-content id="configuration" *clrIfActive="true">
-      <table class="table table-noborder">
+      <table class="table table-noborder" *ngIf="detail">
         <tr>
           <td class="left">{{'storage.detail.conf.name' | translate}}</td>
-          <td class="left">name</td>
+          <td class="left">{{detail.name}}</td>
           <td class="left">{{'storage.detail.conf.ip' | translate}}</td>
-          <td class="left">192.1.1.1</td>
+          <td class="left">{{detail.ip}}</td>
           <td class="left">{{'storage.detail.conf.sn' | translate}}</td>
-          <td class="left">22222222222222222222</td>
+          <td class="left">{{detail.sn}}</td>
         </tr>
         <tr>
           <td class="left">{{'storage.detail.conf.status' | translate}}</td>
-          <td class="left">Normal</td>
+          <td class="left">{{detail.status}}</td>
+          <td class="left">{{'storage.detail.conf.fv' | translate}}</td>
+          <td class="left">固件版本未找到字段</td>
           <td class="left">{{'storage.detail.conf.pv' | translate}}</td>
-          <td class="left">V3423424234</td>
-          <td class="left">{{'storage.detail.conf.pv' | translate}}</td>
-          <td class="left">spc100</td>
+          <td class="left">补丁版本未找到字段</td>
         </tr>
         <tr>
           <td class="left">{{'storage.detail.conf.vendor' | translate}}</td>
-          <td class="left">Huawei</td>
+          <td class="left">{{detail.vendor}}</td>
           <td class="left">{{'storage.detail.conf.model' | translate}}</td>
-          <td class="left">550V3</td>
+          <td class="left">{{detail.model}}</td>
           <td class="left">{{'storage.detail.conf.az' | translate}}</td>
-          <td class="left">at</td>
+          <td class="left">{{detail.azIds}} azIds 返回的是id数组</td>
         </tr>
         <tr>
           <td class="left">{{'storage.detail.conf.wp' | translate}}</td>
-          <td class="left">----</td>
+          <td class="left">维保时间未找到字段</td>
           <td class="left">{{'storage.detail.conf.location' | translate}}</td>
-          <td class="left">3333</td>
+          <td class="left">{{detail.location}}</td>
         </tr>
       </table>
+      <div *ngIf="!detail" style="height: 50%">
+        抱歉未查询到相关数据
+      </div>
       <clr-tabs>
         <!--Storage Pools-->
         <clr-tab>
@@ -82,6 +85,21 @@
                 <clr-dg-column [hidden]="poolRadio!=='table3'">{{'storage.detail.storagePool.latency' | translate}}</clr-dg-column>
                 <clr-dg-column [hidden]="poolRadio!=='table3'">{{'storage.detail.storagePool.iops' | translate}}</clr-dg-column>
                 <clr-dg-column [hidden]="poolRadio!=='table3'">{{'storage.detail.storagePool.bandwidth' | translate}}</clr-dg-column>
+
+                <clr-dg-row *clrDgItems="let item of storagePool" [clrDgItem]="item">
+                  <clr-dg-cell>{{item.name}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.status}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.tier0_disk_type}}</clr-dg-cell>
+                </clr-dg-row>
+
+
+
+
+
+
+
+
+
 
               </clr-datagrid>
             </div>

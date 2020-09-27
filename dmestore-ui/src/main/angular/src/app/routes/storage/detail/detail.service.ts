@@ -32,76 +32,111 @@ export class DetailService {
 
 export class StorageDetail{
   id: string;
-  name: string;
-  ip: string;
-  status: string;
-  synStatus: string;
-  sn: string;
-  vendor: string;
-  model: string;
-  productVersion: string;
-  usedCapacity: number;
-  totalCapacity: number;
-  totalEffectiveCapacity: number;
-  freeEffectiveCapacity: number;
-  location: number;
+  name: string;//名称
+  ip: string;//ip地址
+  status: string;//状态
+  synStatus: string;//同步状态
+  sn: string;//设备序列号。
+  vendor: string;//厂商
+  model: string;//产品型号
+  productVersion: string;//产品版本号
+  usedCapacity: number;//已用容量 （单位:MB）
+  totalCapacity: number; //裸容量（单位:MB）。
+  totalEffectiveCapacity: number;//可得容量 （总容量）
+  freeEffectiveCapacity: number;//空闲容量
+  location: string;
   azIds: string[];
+  storagePool: string;
+  volume: string;
+  fileSystem: string;
+  dTrees: string;
+  nfsShares: string;
+  bandPorts: string;
+  logicPorts: string;
+  storageControllers: string;
+  storageDisks: string;
 }
-
 export class StoragePool{
-  free_capacity: number;
-  health_status: string;
-  lun_subscribed_capacity: number;
-  name: string;
+  free_capacity: number;// 空闲容量
+  lun_subscribed_capacity: number; // LUN的配置容量（LUN订阅容量）
+  name: string;// 名称
   parent_type: string;
-  running_status: string;
-  total_capacity: number;
-  fs_subscribed_capacity: number;
-  consumed_capacity: number;
-  consumed_capacity_percentage: string;
+  running_status: string;// 运行状态
+  health_status: string;// 健康状态
+  total_capacity: number;// 总容量
+  fs_subscribed_capacity: number; // 订阅容量(文件系统订阅容量)
+  consumed_capacity: number;//已用容量
+  consumed_capacity_percentage: string;// 已用容量百分比(容量利用率)
   consumed_capacity_threshold: string;
   storage_pool_id: string;
+  storage_instance_id: string;
+  storage_device_id: string;
+  storage_name: string;
+  //订阅率 = 订阅容量/总容量
+  lun_subscription_rate: number;
+  fs_subscription_rate: number;
+  //补充字段
+  media_type: string;// 存储池主存类型
+  tier0_disk_type: string;// 硬盘类型
+  tier0_raid_lv: string; // RAID级别
+  tier1_disk_type: string;// 硬盘类型
+  tier1_raid_lv: string;// RAID级别
+  tier2_disk_type: string;// 硬盘类型
+  tier2_raid_lv: string;// RAID级别
+  storage_id: string; // 存储设备id
+  data_space: number; // 存储池上创建LUN或者文件系统时的可用容量 单位MB
 }
 export class Volume{
-  id: string;
-  name: string;
-  status: string;
+  id: string; //卷的唯一标识
+  name: string; //名称
+  status: string; //状态
   attached: boolean;
-  alloctype: string;
-  service_level_name: string;
-  storage_id: string;
-  pool_raw_id: string;
-  capacity_usage: string;
-  protectionStatus: boolean;
+  alloctype: string;//分配类型
+  service_level_name: string;//服务等级
+  storage_id: string;//存储设备id
+  pool_raw_id: string;//存储池id
+  capacity_usage: string;//容量利用率
+  protectionStatus: boolean;//保护状态
+  hostIds: string[];
+  hostGroupIds: string;
+  storage_pool_name: string;//存储池名称
+  capacity: number;//总容量 单位GB
+  //关联的datastore
+  datastores: string;
 }
 export class FileSystem{
-  id: string;
-  name: string;
-  health_status: string;
-  alloc_type: string;
-  capacity: number;
-  capacity_usage_ratio: number;
-  storage_pool_name: string;
-  nfs_count: number;
-  cifs_count: number;
-  dtree_count: number;
+  id: string; //id
+  name: string;//名称
+  health_status: string; //状态
+  alloc_type: string; //分配策略
+  capacity_usage_ratio: number; //容量使用率
+  storage_pool_name: string;//存储池名字
+  nfs_count: number; //nfs
+  cifs_count: number;//cifs
+  dtree_count: number; //dtree
+  capacity: number;//总容量
+  allocate_quota_in_pool: number;
+  available_capacity: number;
+  min_size_fs_capacity: number;
+  storage_id: string;
 }
 export class Dtrees{
   name: string;
-  fs_name: string;
-  quota_switch: boolean;
-  security_style: string;
-  tier_name: string;
-  nfs_count: number;
+  fs_name: string; //所属文件系统名称
+  quota_switch: boolean; //配额
+  security_style: string;//安全模式
+  tier_name: string;//服务等级名称
+  nfs_count: number;//nfs
+  cifs_count: number;
 }
 export class NfsShare {
-  name: string;
-  share_path: string;
-  storage_id: string;
-  tier_name: string;
-  owning_dtree_name: string;
-  fs_name: string;
-  owning_dtree_id: string;
+  name: string; //名称
+  share_path: string; //共享路径
+  storage_id: string; //存储设备id
+  tier_name: string; //服务等级
+  owning_dtree_name: string;//所属dtree
+  fs_name: string; //所属文件系统名字在
+  owning_dtree_id: string; //所属dtreeid
 }
 export class BandPorts{
   id: string;
@@ -139,9 +174,6 @@ export class StorageDisk{
   status: string;
   capacity: string;
 }
-
-
-
 export interface PoolList {
    name: string;
    status: string;
