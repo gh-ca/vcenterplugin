@@ -55,7 +55,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private final String HOSTGROUP_UNMAPPING = "/rest/blockservice/v1/volumes/hostgroup-unmapping";
     private final String VOLUME_DELETE = "/rest/blockservice/v1/volumes/delete";
     private final String CREATE_VOLUME_URL = "/rest/blockservice/v1/volumes";
-    private final String CREATE_VOLUME_UNSERVICE_URL = "/rest/blockservice/v1/volumes";
+    private final String CREATE_VOLUME_UNSERVICE_URL = "/rest/blockservice/v1/volumes/customize-volumes";
     private final String MOUNT_VOLUME_TO_HOST_URL = "/rest/blockservice/v1/volumes/host-mapping";
     private final String MOUNT_VOLUME_TO_HOSTGROUP_URL = "/rest/blockservice/v1/volumes/hostgroup-mapping";
 
@@ -127,15 +127,14 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                             vmfsDataInfo.setDeviceId(storageId);
                                             vmfsDataInfo.setDevice(stoNameMap == null ? "" : stoNameMap.get(storageId));
 
-                                            if (vjson2 != null && vjson2.get("tuning") != null) {
+                                            if (vjson2 != null && !ToolUtils.jsonIsNull(vjson2.get("tuning"))) {
                                                 JsonObject tuning = vjson2.getAsJsonObject("tuning");
-                                                if (tuning != null && tuning.get("smartqos") != null) {
+                                                if (tuning != null && !ToolUtils.jsonIsNull(tuning.get("smartqos"))) {
                                                     JsonObject smartqos = tuning.getAsJsonObject("smartqos");
                                                     if (smartqos != null) {
                                                         vmfsDataInfo.setMaxIops(ToolUtils.jsonToInt(smartqos.get("maxiops"), null));
                                                         vmfsDataInfo.setMinIops(ToolUtils.jsonToInt(smartqos.get("miniops"), null));
                                                         vmfsDataInfo.setMaxBandwidth(ToolUtils.jsonToInt(smartqos.get("maxbandwidth"), null));
-                                                        ;
                                                         vmfsDataInfo.setMinBandwidth(ToolUtils.jsonToInt(smartqos.get("minbandwidth"), null));
                                                         vmfsDataInfo.setLatency(ToolUtils.jsonToInt(smartqos.get("latency"), null));
                                                     }
@@ -389,20 +388,26 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
                 Map<String, Object> tuning = new HashMap<>();
                 tuning.put("alloctype", ToolUtils.getStr(params.get("alloctype")));
-                tuning.put("workload_type_id", ToolUtils.getInt(params.get("workload_type_id")));
+                tuning.put("workload_type_id", ToolUtils.getInt(params.get("workload_type_id"),null));
 
                 Map<String, Object> smartqos = new HashMap<>();
                 smartqos.put("control_policy", ToolUtils.getStr(params.get("control_policy")));
-                smartqos.put("latency", ToolUtils.getInt(params.get("latency")));
-                smartqos.put("maxbandwidth", ToolUtils.getInt(params.get("maxbandwidth")));
-                smartqos.put("maxiops", ToolUtils.getInt(params.get("maxiops")));
-                smartqos.put("minbandwidth", ToolUtils.getInt(params.get("minbandwidth")));
-                smartqos.put("miniops", ToolUtils.getInt(params.get("miniops")));
+                smartqos.put("latency", ToolUtils.getInt(params.get("latency"),null));
+                smartqos.put("maxbandwidth", ToolUtils.getInt(params.get("maxbandwidth"),null));
+                smartqos.put("maxiops", ToolUtils.getInt(params.get("maxiops"),null));
+                smartqos.put("minbandwidth", ToolUtils.getInt(params.get("minbandwidth"),null));
+                smartqos.put("miniops", ToolUtils.getInt(params.get("miniops"),null));
                 smartqos.put("name", ToolUtils.getStr(params.get("qosname")));
 
-                tuning.put("smartqos", smartqos);
+                if(!StringUtils.isEmpty(params.get("control_policy"))) {
+                    tuning.put("smartqos", smartqos);
+                }
 
-                cv.put("tuning", tuning);
+                if(!StringUtils.isEmpty(params.get("alloctype"))
+                        || !StringUtils.isEmpty(params.get("workload_type_id"))
+                        || !StringUtils.isEmpty(params.get("control_policy"))) {
+                    cv.put("tuning", tuning);
+                }
 
                 List<Map<String, Object>> volumeSpecs = new ArrayList<>();
                 Map<String, Object> vs = new HashMap<>();
@@ -422,7 +427,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     mapping.put("hostgroup_id", objhostid);
                 }
                 requestbody.put("mapping", mapping);
-                LOG.info("ByServiceLevel requestbody==" + gson.toJson(requestbody));
+                LOG.info("By UNServiceLevel requestbody==" + gson.toJson(requestbody));
 
 
                 LOG.info("create UNServiceLevel vmfs_url===" + CREATE_VOLUME_UNSERVICE_URL);
@@ -745,11 +750,14 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //通过存储的objectid查询卷id
                 if (params.get("dataStoreObjectIds") != null) {
                     List<String> dataStoreObjectIds = (List<String>) params.get("dataStoreObjectIds");
+                    LOG.info("dataStoreObjectIds=="+dataStoreObjectIds);
                     if (dataStoreObjectIds != null && dataStoreObjectIds.size() > 0) {
                         List<String> volumeIds = new ArrayList<>();
                         List<String> dataStoreNames = new ArrayList<>();
                         for (String dsObjectId : dataStoreObjectIds) {
+                            LOG.info("dsObjectId=="+dsObjectId);
                             DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dsObjectId);
+                            LOG.info("getVolumeId=="+dvr.getVolumeId());
                             if (dvr != null) {
                                 volumeIds.add(dvr.getVolumeId());
                                 dataStoreNames.add(dvr.getStoreName());

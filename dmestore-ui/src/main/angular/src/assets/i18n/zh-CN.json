@@ -177,6 +177,8 @@
     "readResponseTime": "读响应时间(ms)",
     "writeResponseTime": "写响应时间(ms)",
     "latency": "时延(ms)",
+    "latencyMax": "时延 <= ",
+    "latencyUnit": "ms",
     "latencyQoSTarget": "时延QoS下限",
     "upper": "Upper",
     "lower": "Lower",
