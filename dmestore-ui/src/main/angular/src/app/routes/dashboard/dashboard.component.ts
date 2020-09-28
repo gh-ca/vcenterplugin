@@ -134,6 +134,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         this.dashboardSrv.storageCapacityOption.title.text = this.storageCapacity.utilization + ' %';
         this.storageCapacityChart.setOption(this.dashboardSrv.storageCapacityOption, true);
         this.storageCapacityChart.hideLoading();
+        this.cdr.detectChanges();
       }
     }, err => {
       console.error('ERROR', err);
@@ -164,6 +165,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         this.dashboardSrv.storageNumOption.series[0].data = os;
         this.storageNumChart.setOption(this.dashboardSrv.storageNumOption, true);
         this.storageNumChart.hideLoading();
+        this.cdr.detectChanges();
       }
     }, err => {
       console.error('ERROR', err);
@@ -175,6 +177,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       console.log(result);
       if (result.code === '0' || result.code === '200'){
          this.bestPracticeViolations = result.data;
+        this.cdr.detectChanges();
       }
     }, err => {
       console.error('ERROR', err);
