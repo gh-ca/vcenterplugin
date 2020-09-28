@@ -197,18 +197,6 @@ public class ToolUtils {
         return re;
     }
 
-    public static boolean jsonIsNull(JsonElement obj) {
-        boolean re = false;
-        try {
-            if (StringUtils.isEmpty(obj) || obj.isJsonNull()) {
-                re = true;
-            }
-        } catch (Exception e) {
-            LOG.error("error:" + e.toString());
-        }
-        return re;
-    }
-
     public static <T extends Comparable<T>> boolean compare(List<T> a, List<T> b) {
         if (a.size() != b.size()) {
             return false;
