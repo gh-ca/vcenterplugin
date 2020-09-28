@@ -95,6 +95,7 @@ public class VCSDKUtils {
 
     //得到所有主机的ID与name  20200918objectId
     public String getAllHosts() throws Exception {
+        _logger.info("get all hosts start");
         String listStr = "";
         try {
             VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
@@ -123,6 +124,7 @@ public class VCSDKUtils {
             _logger.error("vmware error:", e);
             throw e;
         }
+        _logger.info("get all hosts end");
         return listStr;
     }
 
