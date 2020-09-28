@@ -149,28 +149,33 @@
   <div class="info-card clr-col-7">
     <div class="info-card-header">
       <div class="info-header-left">
-        <span>Storage</span>
+        <clr-dropdown [clrCloseMenuOnItemClick]="true">
+          <button clrDropdownTrigger class="dropdown-toggle  btn btn-link">
+            Operation
+            <clr-icon shape="caret down"></clr-icon>
+          </button>
+          <clr-dropdown-menu *clrIfOpen>
+            <div clrDropdownItem (click)="loadTop5DataStore('0')">All DateStore</div>
+            <div clrDropdownItem (click)="loadTop5DataStore('1')">VMFS DateStore</div>
+            <div clrDropdownItem (click)="loadTop5DataStore('2')">NFS DateStore</div>
+          </clr-dropdown-menu>
+        </clr-dropdown>
+        <div>Top 5 DataStore</div>
       </div>
     </div>
     <div class="info-card-content clr-row">
-      <div class="clr-col-3"></div>
-      <div class="clr-col-9">
-        <div class="info-charts-wrap">
-          <div echarts [options]="charts[2]" style="width: 30%;height: 120px;"></div>
-          <div class="info-content">
-            <div class="info-content-text">
-              <span>Total</span>
-              <span>11 TB</span>
+      <div class="clr-col-1"></div>
+      <div class="clr-col-11">
+        <div></div>
+        <div class="progress" *ngFor="let item of storeageTopN" [clrDgItem]="item">
+          <div class="progress-item">
+            <div class="progress-label">{{item.name}}</div>
+            <div class="progress-default">
+              <div class="progress" [ngStyle]="{'width':(item.utilization)+'%'}" [ngClass]="{'warning': (item.utilization) >= 70}"></div>
             </div>
-            <div class="info-content-text">
-              <span>Used</span>
-              <span>11 TB</span>
-              <span class="squre used"></span>
-            </div>
-            <div class="info-content-text">
-              <span>Free</span>
-              <span>11 TB</span>
-              <span class="squre free"></span>
+            <div class="progress-text">
+              <span class="percent">{{item.utilization}}% </span>
+              <span class="unit">({{item.usedCapacity}}/{{item.totalCapacity}} {{item.capacityUnit}})</span>
             </div>
           </div>
         </div>

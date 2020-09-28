@@ -39,6 +39,7 @@ export class RdmComponent implements OnInit {
 
   basAdd(){
     this.configModel.volume_specs.push(new volume_specs());
+    console.log(this.configModel.volume_specs);
   }
 
   basRemove(item){
