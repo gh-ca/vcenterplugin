@@ -9,7 +9,7 @@ package com.dmeplugin.dmestore.model;
 public class QosParam {
 
     private Boolean enabled;
-    private QosPolicy qosPolicy;
+    private SmartQos SmartQos;
 
     public Boolean getEnabled() {
         return enabled;
@@ -19,12 +19,11 @@ public class QosParam {
         this.enabled = enabled;
     }
 
-    public QosPolicy getQosPolicy() {
-
-        return qosPolicy;
+    public com.dmeplugin.dmestore.model.SmartQos getSmartQos() {
+        return SmartQos;
     }
 
-    public void setQosPolicy(QosPolicy qosPolicy) {
-        this.qosPolicy = qosPolicy;
+    public void setSmartQos(com.dmeplugin.dmestore.model.SmartQos smartQos) {
+        SmartQos = smartQos;
     }
 }

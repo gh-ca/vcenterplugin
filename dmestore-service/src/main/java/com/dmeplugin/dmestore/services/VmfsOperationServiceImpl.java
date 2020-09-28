@@ -5,6 +5,7 @@ import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.*;
+import io.swagger.models.auth.In;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     private final String API_VMFS_EXPAND = "/rest/blockservice/v1/volumes/expand";
     private final String API_SERVICELEVEL_UPDATE = "/rest/blockservice/v1/volumes/update-service-level";
     private final String API_SERVICELEVEL_LIST = "/rest/service-policy/v1/service-levels";
+    private final String API_VOLUME_DETAIL = "/rest/blockservice/v1/volumes/";
+    private final String API_HOST_DETAIL = "/rest/hostmgmt/v1/hosts/";
+    private final String API_STORAGE_LIST = "/rest/storagemgmt/v1/storages/";
 
     private DmeAccessService dmeAccessService;
 
@@ -59,29 +63,29 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         resMap.put("msg", "update vmfsDatastore success !");
         resMap.put("task_id", volume_id);
 
-        QosPolicy qosPolicy = new QosPolicy();
+        SmartQos smartQos = new SmartQos();
         Object control_policy = params.get("control_policy");
         if (!StringUtils.isEmpty(control_policy)) {
-            qosPolicy.setControl_policy(control_policy);
+            smartQos.setControl_policy(control_policy.toString());
         }
         Object max_iops = params.get("max_iops");
         if (!StringUtils.isEmpty(max_iops)) {
-            qosPolicy.setMax_iops(max_iops.toString());
+            smartQos.setMaxiops(Integer.valueOf(max_iops.toString()));
         }
         Object min_iops = params.get("min_iops");
         if (!StringUtils.isEmpty(min_iops)) {
-            qosPolicy.setMin_iops(min_iops.toString());
+            smartQos.setMiniops(Integer.valueOf(min_iops.toString()));
         }
         Object max_bandwidth = params.get("max_bandwidth");
         if (!StringUtils.isEmpty(max_bandwidth)) {
-            qosPolicy.setMax_bandwidth(max_bandwidth.toString());
+            smartQos.setMaxbandwidth(Integer.valueOf(max_bandwidth.toString()));
         }
         Object min_bandwidth = params.get("min_bandwidth");
         if (!StringUtils.isEmpty(min_bandwidth)) {
-            qosPolicy.setMin_bandwidth(min_bandwidth.toString());
+            smartQos.setMinbandwidth(Integer.valueOf(min_bandwidth.toString()));
         }
         CustomizeVolumeTuning customizeVolumeTuning = new CustomizeVolumeTuning();
-        customizeVolumeTuning.setSmartQos(qosPolicy);
+        customizeVolumeTuning.setSmartQos(smartQos);
 
         VolumeUpdate volume = new VolumeUpdate();
         Object newVoName = params.get("newVoName");
@@ -174,7 +178,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 Map<String, String> map = volumes.get(i);
                 String volume_id = map.get("volume_id");
                 String ds_name = map.get("ds_name");
-                String ds_add_capacity = map.get("ds_add_capacity");
+                String vo_add_capacity = map.get("vo_add_capacity");
                 Map<String, Object> deviceByVolume = getStorageDeviceByVolume(volume_id);
                 int deviceCode = ToolUtils.getInt(deviceByVolume.get("code"));
                 if (deviceCode != 200) {
@@ -182,10 +186,10 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                     resMap.put("msg", "search storage by volume error");
                     return resMap;
                 }
-                Storage storage = (Storage) deviceByVolume.get("data");
+                //Storage storage = (Storage) deviceByVolume.get("data");
                 String result = null;
-                if (!StringUtils.isEmpty(ds_add_capacity)) {
-                    result = vcsdkUtils.expandVmfsDatastore(ds_name, ToolUtils.getInt(ds_add_capacity));
+                if (!StringUtils.isEmpty(vo_add_capacity)) {
+                    result = vcsdkUtils.expandVmfsDatastore(ds_name, ToolUtils.getInt(vo_add_capacity));
                 }
                 if ("failed".equals(result)) {
                     resMap.put("code", 403);
@@ -308,14 +312,14 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 JsonObject qos = capabilities.get("qos").getAsJsonObject();
                 qosParam.setEnabled(Boolean.valueOf(qos.get("enabled").getAsString()));
 
-                QosPolicy qosPolicy = new QosPolicy();
+                SmartQos smartQos = new SmartQos();
                 JsonObject jsonObject1 = qos.get("qos_param").getAsJsonObject();
-                qosPolicy.setLatency(jsonObject1.get("latency").getAsString());
-                qosPolicy.setMin_bandwidth(jsonObject1.get("minBandWidth").getAsString());
-                qosPolicy.setMin_iops(jsonObject1.get("minIOPS").getAsString());
-                qosPolicy.setLatencyUnit(jsonObject1.get("latencyUnit").getAsString());
+                smartQos.setLatency(Integer.valueOf(jsonObject1.get("latency").getAsString()));
+                smartQos.setMinbandwidth(Integer.valueOf(jsonObject1.get("minBandWidth").getAsString()));
+                smartQos.setMiniops(Integer.valueOf(jsonObject1.get("minIOPS").getAsString()));
+                smartQos.setLatencyUnit(jsonObject1.get("latencyUnit").getAsString());
 
-                qosParam.setQosPolicy(qosPolicy);
+                qosParam.setSmartQos(smartQos);
                 capability.setQosParam(qosParam);
                 simpleServiceLevel.setSimpleCapabilities(capability);
                 simpleServiceLevels.add(simpleServiceLevel);
@@ -338,9 +342,8 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         List<String> host_ids = new ArrayList<>();
         for (int i = 0; i < volume_ids.size(); i++) {
             String volume_id = volume_ids.get(i);
-            url = "https://localhost:26335/rest/blockservice/v1/volumes/" + volume_id;
+            url = API_VOLUME_DETAIL + volume_id;
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            //ResponseEntity<String> responseEntity = access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
                 resMap.put("code", code);
@@ -381,8 +384,8 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         String url;
         for (int i = 0; i < params.size(); i++) {
             String host_id = params.get(i);
-            url = "https://localhost:26335/rest/hostmgmt/v1/hosts/" + host_id + "/summary";
-            ResponseEntity<String> responseEntity = access(url, HttpMethod.GET, null);
+            url = API_HOST_DETAIL + host_id + "/summary";
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
                 resMap.put("code", code);
@@ -417,10 +420,8 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         for (int i = 0; i < volumes.size(); i++) {
             Map<String, String> reqmap = volumes.get(i);
             String volume_id = reqmap.get("volume_id");
-            url = "https://localhost:26335/rest/blockservice/v1/volumes/" + volume_id;
-            //ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            ResponseEntity<String> responseEntity = access(url, HttpMethod.GET, null);
-
+            url = API_VMFS_UPDATE + volume_id;
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
                 resMap.put("code", code);
@@ -444,8 +445,8 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 200);
         resMap.put("msg", "search storage device success ");
-        String url = "https://localhost:26335/rest/storagemgmt/v1/storages/" + volume_id + "/detail";
-        ResponseEntity<String> responseEntity = access(url, HttpMethod.GET, null);
+        String url = API_STORAGE_LIST + volume_id + "/detail";
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         int code = responseEntity.getStatusCodeValue();
         if (code != 200) {
             resMap.put("code", 200);

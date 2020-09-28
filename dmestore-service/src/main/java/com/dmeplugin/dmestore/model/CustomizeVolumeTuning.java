@@ -7,17 +7,17 @@ package com.dmeplugin.dmestore.model;
  */
 public class CustomizeVolumeTuning {
 
-    private QosPolicy smartQos;
+    private SmartQos smartQos;
     private Boolean compression_enabled;
     private Boolean dedupe_enabled;
     //数据迁移策略，取值范围 0：不迁移，1：自动迁移，2：向高性能层迁移，3：向低性能层迁移  默认值：不迁移
     private Integer smarttier;
 
-    public QosPolicy getSmartQos() {
+    public SmartQos getSmartQos() {
         return smartQos;
     }
 
-    public void setSmartQos(QosPolicy smartQos) {
+    public void setSmartQos(SmartQos smartQos) {
         this.smartQos = smartQos;
     }
 
