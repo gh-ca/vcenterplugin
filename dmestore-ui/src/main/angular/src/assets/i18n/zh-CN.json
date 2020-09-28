@@ -16,6 +16,7 @@
     "previous": "上一步",
     "reduce":"缩容",
     "ok":"确认",
+    "close": "关闭",
     "submit": "提交"
   },
   "validations": {
@@ -427,5 +428,16 @@
     "top5T": "使用率前5",
     "connectT": "DME连接",
     "connectFail": "连接失败"
+  },
+  "bestPractice": {
+    "apply": "实施最佳实践",
+    "check": "重新检查",
+    "hostSetting": "主机配置",
+    "recommend": "期望值",
+    "level": "级别",
+    "violation": "违规数",
+    "non-compliant": "违规主机",
+    "actual": "实际值",
+    "host": "主机名"
   }
 }

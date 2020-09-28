@@ -16,6 +16,7 @@
     "previous": "Previous",
     "reduce":"Reduce",
     "ok":"OK",
+    "close": "Close",
     "submit": "Submit"
   },
   "validations": {
@@ -424,5 +425,16 @@
     "top5T": "Top 5 DataStore",
     "connectT": "DME Connect",
     "connectFail": "connect failed."
+  },
+  "bestPractice": {
+    "apply": "Apply Best Practice",
+    "check": "Recheck",
+    "hostSetting": "HostSetting",
+    "recommend": "Recommend Value",
+    "level": "Level",
+    "violation": "Violation",
+    "non-compliant": "Non-compliant Host",
+    "actual": "actual Value",
+    "host": "Host Name"
   }
 }
