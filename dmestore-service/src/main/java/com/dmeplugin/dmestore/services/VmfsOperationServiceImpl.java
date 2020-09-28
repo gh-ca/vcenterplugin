@@ -8,7 +8,6 @@ import com.google.gson.*;
 import io.swagger.models.auth.In;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
@@ -321,7 +320,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
                 qosParam.setSmartQos(smartQos);
                 capability.setQosParam(qosParam);
-                simpleServiceLevel.setSimpleCapabilities(capability);
+                simpleServiceLevel.setCapabilities(capability);
                 simpleServiceLevels.add(simpleServiceLevel);
             }
             resMap.put("data", simpleServiceLevels);

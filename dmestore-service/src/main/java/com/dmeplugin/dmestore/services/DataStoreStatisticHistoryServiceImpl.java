@@ -43,35 +43,13 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private static Map<String, List<String>> objTypeCountersMap = new HashMap<>();
 
     @Override
-    public Map<String, Object> queryVmfsStatistic(Map<String, Object> params) {
+    public Map<String, Object> queryVmfsStatistic(Map<String, Object> params) throws Exception {
         //通过存储ID查卷ID 实际获取卷的性能数据
-        return queryVmfsStatistic(params);
+        return queryVolumeStatistic(params);
 
-        /*Map<String, Object> remap = new HashMap<>();
-        remap.put("code", 200);
-        remap.put("message", "queryStatistic success!");
-        remap.put("data", params);
-
-        ResponseEntity responseEntity;
-        Object statisticObj;
-        try {
-            responseEntity = queryStatistic(params);
-            if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
-                Object body = responseEntity.getBody();
-                JsonObject bodyJson = new JsonParser().parse(body.toString()).getAsJsonObject();
-                statisticObj = bodyJson.get("data").getAsJsonObject();
-                remap.put("data", statisticObj);
-            } else {
-                remap.put("code", 503);
-                remap.put("message", "queryStatistic error!");
-                log.error("queryStatistic error,the params is:{}", gson.toJson(params));
-            }
-        } catch (Exception e) {
-            remap.put("code", 503);
-            remap.put("message", "queryStatistic exception!");
-            log.error("queryStatistic exception.", e);
-        }
-        return remap;*/
+        /* String obj_type_id = "1125921381679104";//SYS_Lun  ?SYS_XXXXXX
+        params.put("obj_type_id", obj_type_id);
+        return queryStatisticByObjType("vmfs", params);*/
     }
 
     @Override
@@ -81,16 +59,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         remap.put("message", "queryStatistic failed!");
         remap.put("data", "queryStatistic failed!");
         Object indicatorIds = params.get("indicator_ids");
-        //以下为模拟响应报文的处理
-        /*if (null != obj_ids) {
-            List<String> volumeIds = (List<String>) obj_ids;
-            JsonObject dataJson = vmfsStatisticCurrentMimic(volumeIds);
-            remap.put("code", 200);
-            remap.put("message", "queryStatistic success!");
-            remap.put("data", dataJson);
-        }*/
-
-        //以下为实际消息的处理
         if (null == indicatorIds) {
             indicatorIds = initVolumeIndicator();
             params.put("indicator_ids", indicatorIds);
@@ -123,16 +91,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         remap.put("data", "queryStatistic failed!");
         Object obj_ids = params.get("obj_ids");
         Object indicatorIds = params.get("indicator_ids");
-        //以下为模拟响应报文的处理
-       /* if (null != obj_ids) {
-            List<String> volumeIds = (List<String>) obj_ids;
-            JsonObject dataJson = vmfsStatisticCurrentMimic(volumeIds);
-            remap.put("code", 200);
-            remap.put("message", "queryStatistic fs success!");
-            remap.put("data", dataJson);
-        }*/
-
-        //以下为实际响应报文处理
         if (null == indicatorIds) {
             indicatorIds = initFsIndicator();
             params.put("indicator_ids", indicatorIds);
@@ -155,8 +113,13 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     //查询卷的性能
     @Override
     public Map<String, Object> queryVolumeStatistic(Map<String, Object> params) throws Exception {
+        Object indicatorIds = params.get("indicator_ids");
         String obj_type_id = "1125921381679104";//SYS_Lun
         params.put("obj_type_id", obj_type_id);
+        if (null == indicatorIds) {
+            indicatorIds = initVolumeIndicator();
+            params.put("indicator_ids", indicatorIds);
+        }
         return queryStatisticByObjType("volume", params);
     }
 
@@ -193,14 +156,23 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         resmap.put("data", params);
 
         ResponseEntity responseEntity;
-        Object statisticObj;
+        JsonElement statisticElement;
+        //statisticElement中 data 为空 状态码又是200的情况 暂按正常来处理
+        //{"status_code":200,"error_code":-60,"error_msg":"ES: Query DB return empty","data":{}}
+        //{"status_code":200,"error_code":0,"error_msg":"Successful.","data":{"1282FFE20AA03E4EAC9A814C687B780A":{....}}
         try {
             responseEntity = queryStatistic(params);
             if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
                 Object body = responseEntity.getBody();
                 JsonObject bodyJson = new JsonParser().parse(body.toString()).getAsJsonObject();
-                statisticObj = bodyJson.get("data").getAsJsonObject();
-                resmap.put("data", statisticObj);
+                statisticElement = bodyJson.get("data");
+                Map<String, Object> objectMap = convertMap(statisticElement);
+                resmap.put("data", objectMap);
+                if (null == objectMap || objectMap.size() == 0) {
+                    resmap.put("code", 503);
+                    resmap.put("message", objectType + " Statistic error:" + bodyJson.get("error_msg").getAsString());
+                    log.error("query" + objectType + "Statistic error:", bodyJson.get("error_msg").getAsString());
+                }
             } else {
                 resmap.put("code", 503);
                 resmap.put("message", "query" + objectType + "Statistic error!");
@@ -238,7 +210,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         requestbody.put("range", range);
         requestbody.put("begin_time", beginTime);
         requestbody.put("end_time", endTime);
-        responseEntity = dmeAccessService.access(STATISTIC_QUERY, HttpMethod.POST, requestbody.toString());
+        responseEntity = dmeAccessService.access(STATISTIC_QUERY, HttpMethod.POST, gson.toJson(requestbody));
 
         return responseEntity;
     }
@@ -459,5 +431,86 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             data.add(volume_id, countRes);
         }
         return data;
+    }
+
+    //消息转换 object---map
+    private Map<String, Object> convertMap(JsonElement jsonElement) {
+        Map<String, Object> objectMap = new HashMap<>();
+        if (!ToolUtils.jsonIsNull(jsonElement)) {
+            Set<Map.Entry<String, JsonElement>> objectSet = jsonElement.getAsJsonObject().entrySet();
+            for (Map.Entry<String, JsonElement> objectEntry : objectSet) {
+                String objectId = objectEntry.getKey();
+                JsonElement objectElement = objectEntry.getValue();
+                //Map<String,Object> objectValueMap = new HashMap<>();
+                if (!ToolUtils.jsonIsNull(objectElement)) {
+                    Set<Map.Entry<String, JsonElement>> objectValueSet = objectElement.getAsJsonObject().entrySet();
+                    Map<String, Object> indicatorMap = new HashMap<>();
+                    for (Map.Entry<String, JsonElement> indicaterEntry : objectValueSet) {
+                        Map<String, Object> indicatorValueMap = new HashMap<>();
+                        String indicatoerId = indicaterEntry.getKey();
+                        JsonElement indicatorElement = indicaterEntry.getValue();
+                        JsonObject indicatorValueObject = indicatorElement.getAsJsonObject();
+
+                        JsonArray seriesArray = indicatorValueObject.get("series").getAsJsonArray();
+                        if (null != seriesArray && seriesArray.size() > 0) {
+                            List<Map<String, String>> seriesList = new ArrayList<>();
+                            for (JsonElement serieCellElemt : seriesArray) {
+                                Map<String, String> seriesMap = new HashMap<>();
+                                if (!ToolUtils.jsonIsNull(serieCellElemt)) {
+                                    Set<Map.Entry<String, JsonElement>> cellSet = serieCellElemt.getAsJsonObject().entrySet();
+                                    for (Map.Entry<String, JsonElement> cellEntry : cellSet) {
+                                        String time = cellEntry.getKey();
+                                        String value = cellEntry.getValue().getAsString();
+                                        seriesMap.put(time, value);
+                                        seriesList.add(seriesMap);
+                                        break;
+                                    }
+                                }
+                            }
+                            indicatorValueMap.put("series", seriesList);
+                        }
+                        JsonElement minElement = indicatorValueObject.get("min");
+                        if (!ToolUtils.jsonIsNull(minElement)) {
+                            Map<String, String> minValueMap = new HashMap<>();
+                            Set<Map.Entry<String, JsonElement>> minSet = minElement.getAsJsonObject().entrySet();
+                            for (Map.Entry<String, JsonElement> minEntry : minSet) {
+                                String time = minEntry.getKey();
+                                String value = minEntry.getValue().getAsString();
+                                minValueMap.put(time, value);
+                                break;
+                            }
+                            indicatorValueMap.put("min", minValueMap);
+                        }
+                        JsonElement maxElement = indicatorValueObject.get("max");
+                        if (!ToolUtils.jsonIsNull(maxElement)) {
+                            Map<String, String> maxValueMap = new HashMap<>();
+                            Set<Map.Entry<String, JsonElement>> maxSet = maxElement.getAsJsonObject().entrySet();
+                            for (Map.Entry<String, JsonElement> maxEntry : maxSet) {
+                                String time = maxEntry.getKey();
+                                String value = maxEntry.getValue().getAsString();
+                                maxValueMap.put(time, value);
+                                break;
+                            }
+                            indicatorValueMap.put("max", maxValueMap);
+                        }
+                        JsonElement avgElement = indicatorValueObject.get("avg");
+                        if (!ToolUtils.jsonIsNull(avgElement)) {
+                            Map<String, String> avgMap = new HashMap<>();
+                            Set<Map.Entry<String, JsonElement>> avgSet = avgElement.getAsJsonObject().entrySet();
+                            for (Map.Entry<String, JsonElement> avgEntry : avgSet) {
+                                String time = avgEntry.getKey();
+                                String value = avgEntry.getValue().getAsString();
+                                avgMap.put(time, value);
+                                break;
+                            }
+                            indicatorValueMap.put("avg", avgMap);
+                        }
+                        indicatorMap.put(indicatoerId, indicatorValueMap);
+                    }
+                    objectMap.put(objectId, indicatorMap);
+                }
+            }
+        }
+        return objectMap;
     }
 }

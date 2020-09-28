@@ -14,6 +14,15 @@ public class SimpleCapabilities {
 
     private CapabilitiesSmarttier smarttier;
     private QosParam qosParam;
+    private CapabilitiesQos qos;
+
+    public CapabilitiesQos getQos() {
+        return qos;
+    }
+
+    public void setQos(CapabilitiesQos qos) {
+        this.qos = qos;
+    }
 
     public String getResource_type() {
         return resource_type;
