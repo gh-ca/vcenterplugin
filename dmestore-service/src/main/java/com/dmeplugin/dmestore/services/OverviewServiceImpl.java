@@ -93,11 +93,11 @@ public class OverviewServiceImpl implements OverviewService {
                 r = getVMFSInfos();
                 r.addAll(getNFSInfos());
             }
-            r.sort(Comparator.comparing(o->(double)o.get("utilization")));
+            r.sort(Comparator.comparing(o->(double)((Map)o).get("utilization")).reversed());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return r;
+        return r.size() > topn ? r.subList(0, topn) : r;
     }
 
     /**
