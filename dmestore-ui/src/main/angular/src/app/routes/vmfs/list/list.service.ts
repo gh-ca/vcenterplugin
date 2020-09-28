@@ -158,13 +158,13 @@ export interface ServiceLevelList {
     };
     qosParam: {
       enabled: boolean;
-      qosPolicy: {
+      smartQos: {
         latency: string;
         latencyUnit: string;
-        min_bandwidth: string;
-        min_iops: string;
-        max_bandwidth: string;
-        max_iops: string;
+        minbandwidth: string;
+        miniops: string;
+        maxbandwidth: string;
+        maxiops: string;
         control_policy: string;
       };
     };
