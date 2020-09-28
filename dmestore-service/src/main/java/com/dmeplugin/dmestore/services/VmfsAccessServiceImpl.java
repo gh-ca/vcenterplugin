@@ -399,7 +399,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 smartqos.put("minbandwidth", ToolUtils.getInt(params.get("minbandwidth"),null));
                 smartqos.put("miniops", ToolUtils.getInt(params.get("miniops"),null));
                 smartqos.put("name", ToolUtils.getStr(params.get("qosname")));
-                
+
                 if(!StringUtils.isEmpty(params.get("control_policy"))) {
                     tuning.put("smartqos", smartqos);
                 }
