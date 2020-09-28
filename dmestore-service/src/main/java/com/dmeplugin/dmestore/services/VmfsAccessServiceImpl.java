@@ -389,7 +389,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
                 Map<String, Object> tuning = new HashMap<>();
                 tuning.put("alloctype", ToolUtils.getStr(params.get("alloctype")));
-                tuning.put("workload_type_id", ToolUtils.getInt(params.get("workload_type_id")));
+                tuning.put("workload_type_id", ToolUtils.getInt(params.get("workload_type_id"),null));
 
                 Map<String, Object> smartqos = new HashMap<>();
                 smartqos.put("control_policy", ToolUtils.getStr(params.get("control_policy")));
@@ -399,12 +399,14 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 smartqos.put("minbandwidth", ToolUtils.getInt(params.get("minbandwidth"),null));
                 smartqos.put("miniops", ToolUtils.getInt(params.get("miniops"),null));
                 smartqos.put("name", ToolUtils.getStr(params.get("qosname")));
-                LOG.info("smartqos.size()=="+smartqos.size());
-                if(smartqos.size()>0) {
+                
+                if(!StringUtils.isEmpty(params.get("control_policy"))) {
                     tuning.put("smartqos", smartqos);
                 }
-                LOG.info("tuning.size()=="+tuning.size());
-                if(tuning.size()>0) {
+
+                if(!StringUtils.isEmpty(params.get("alloctype"))
+                        || !StringUtils.isEmpty(params.get("workload_type_id"))
+                        || !StringUtils.isEmpty(params.get("control_policy"))) {
                     cv.put("tuning", tuning);
                 }
 
