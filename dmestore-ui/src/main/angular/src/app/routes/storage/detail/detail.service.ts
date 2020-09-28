@@ -76,7 +76,7 @@ export class StoragePool{
   lun_subscription_rate: number;
   fs_subscription_rate: number;
   //补充字段
-  media_type: string;// 存储池主存类型
+  media_type: string;//类型（块）
   tier0_disk_type: string;// 硬盘类型
   tier0_raid_lv: string; // RAID级别
   tier1_disk_type: string;// 硬盘类型

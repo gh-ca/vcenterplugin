@@ -176,6 +176,8 @@
     "readResponseTime": "读响应时间(ms)",
     "writeResponseTime": "写响应时间(ms)",
     "latency": "时延(ms)",
+    "latencyMax": "时延 <= ",
+    "latencyUnit": "ms",
     "latencyQoSTarget": "时延QoS下限",
     "upper": "Upper",
     "lower": "Lower",
@@ -307,22 +309,25 @@
         "name":"名称",
         "status":"状态",
         "totalCap":"总容量",
-        "proType":"供应类型",
+        "proType":"分配类型",
         "capUsage":"已使用容量",
         "ownSto":"所属存储",
         "nfs":"NFS",
         "cifs":"CIFS",
-        "dtree":"Dtree"
+        "dtree":"Dtree",
+        "fileType":"文件系统类型",
+        "freeCap": "可用容量",
+        "capacityUsage":"容量利用率"
       },
       "dtrees":{
         "dtrees":"Dtrees",
         "name":"名称",
         "ofs":"所属文件系统",
         "osl":"所属服务等级",
-        "secMod":"安全模块",
+        "secMod":"安全模式",
         "nfs":"NFS",
         "cifs":"CIFS",
-        "quota":"定额"
+        "quota":"配额"
       },
       "shares":{
         "shares":"Shares",

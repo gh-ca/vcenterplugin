@@ -1,26 +1,35 @@
+<clr-datagrid style="width: 700px">
+
+  <clr-dg-column [clrDgField]="'name'">Name</clr-dg-column>
+  <clr-dg-column [clrDgField]="'capacity'">Capacity</clr-dg-column>
+  <clr-dg-column [clrDgField]="'count'">Count</clr-dg-column>
+  <clr-dg-column [clrDgField]="'operation'">Operation</clr-dg-column>
+
+  <clr-dg-row *ngFor="let item of configModel.volume_specs" [clrDgItem]="item">
+    <clr-dg-cell style="width: 200px"><input clrInput type="text" [(ngModel)]="item.name" name="name"/></clr-dg-cell>
+    <clr-dg-cell style="width: 200px">
+      <clr-checkbox-wrapper>
+        <label>
+          <input class="inputOneLine" type="number" [(ngModel)]="item.capacity" #number="ngModel" />
+          <select [(ngModel)]="item.unit" name="unit" >
+            <option value="TB">TB</option>
+            <option value="GB">GB</option>
+            <option value="MB">MB</option>
+            <option value="KB">KB</option>
+          </select>
+        </label>
+      </clr-checkbox-wrapper>
+    </clr-dg-cell>
+    <clr-dg-cell style="width: 200px">
+      <input class="inputOneLine" type="number" [(ngModel)]="item.count" name="count" #number="ngModel" />
+    </clr-dg-cell>
+    <clr-dg-cell style="width: 100px">
+      <span (click)="basRemove(item)" style="color:#00F;cursor:pointer">remove</span>
+    </clr-dg-cell>
+  </clr-dg-row>
+</clr-datagrid>
+<button type="button" class="btn btn-outline" (click)="basAdd()">add</button>
 <form clrForm #formPageTwo="ngForm">
-  <clr-input-container>
-    <label>Name</label>:
-    <input clrInput type="text" [(ngModel)]="configModel.name" name="name" />
-  </clr-input-container>
-
-  <clr-checkbox-container>
-    <label>Size</label>：
-    <clr-checkbox-wrapper>
-      <label>
-        <input class="inputOneLine" type="number" [(ngModel)]="configModel.size" name="size" #number="ngModel" />
-        <select [(ngModel)]="configModel.unit" name="unit" >
-          <option value="TB">TB</option>
-          <option value="GB">GB</option>
-          <option value="MB">MB</option>
-          <option value="KB">KB</option>
-        </select>
-        X
-        <input class="inputOneLine" type="number" [(ngModel)]="configModel.quantity" name="quantity" #number="ngModel" />
-      </label>
-    </clr-checkbox-wrapper>
-  </clr-checkbox-container>
-
   <!-- 选择 服务等级 存储选-->
   <clr-radio-container clrInline>
     <label>Storage Type</label>
@@ -84,74 +93,151 @@
       </select>
     </clr-select-container>
 
-    <!--b.QoS 设置 -->
+    <clr-select-container>
+      <label>Owner Controller</label>:
+      <select clrSelect [(ngModel)]="configModel.owner_controller" name="owner_controller" >
+        <option value="0">Auto Select</option>
+        <option value="1">0A</option>
+        <option value="2">0B</option>
+      </select>
+    </clr-select-container>
+
+    <clr-select-container>
+      <label>Initial Distribute Policy</label>:
+      <select clrSelect [(ngModel)]="configModel.initial_distribute_policy" name="initial_distribute_policy" >
+        <option value="0">自动</option>
+        <option value="1">高性能层</option>
+        <option value="2">性能层</option>
+        <option value="3">容量层</option>
+      </select>
+    </clr-select-container>
+
+    <clr-select-container>
+      <label>Prefetch Policy</label>:
+      <select clrSelect [(ngModel)]="configModel.prefetch_policy" name="prefetch_policy" >
+        <option value="0">不预取</option>
+        <option value="1">固定预取</option>
+        <option value="2">可变预取</option>
+        <option value="3">智能预取</option>
+      </select>
+    </clr-select-container>
+
+    <!-- 调优 -->
     <clr-input-container>
-      <label>Qos Policy</label>:
+      <label>Tuning</label>
     </clr-input-container>
-    <!-- 控制策略 -->
-    <clr-radio-container clrInline>
-      <label>Control Policy</label>:
+
+
+
+    <!-- smartTier -->
+    <clr-toggle-container>
+      <clr-toggle-wrapper>
+        <label>smartTier</label>
+        <input type="checkbox" clrToggle [(ngModel)]="policyEnable.smartTier" name="options" />
+      </clr-toggle-wrapper>
+    </clr-toggle-container>
+
+    <clr-select-container *ngIf="policyEnable.smartTier">
+      <label>smartTier Policy</label>:
+      <select clrSelect [(ngModel)]="configModel.tuning.smarttier" name="smarttier" >
+        <option value="0">不迁移</option>
+        <option value="1">自动迁移</option>
+        <option value="2">向高性能层迁移</option>
+        <option value="3">向低性能层迁移</option>
+      </select>
+    </clr-select-container>
+
+
+    <!-- Qos Policy -->
+    <clr-toggle-container>
+      <clr-toggle-wrapper>
+        <label>Qos Policy</label>
+        <input type="checkbox" clrToggle  [(ngModel)]="policyEnable.qosPolicy" name="options" />
+      </clr-toggle-wrapper>
+    </clr-toggle-container>
+
+    <clr-radio-container clrInline *ngIf="policyEnable.qosPolicy">
+      <label class="floatleft">Control Policy</label>
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="control_policy" required value="0" [(ngModel)]="configModel.control_policy" />
-        <label>Upper limit control</label>
+        <input type="radio" clrRadio name="control_policy" required value="1" [(ngModel)]="configModel.tuning.smartqos.control_policy" />
+        <label>Upper Limit</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="control_policy" required value="1" [(ngModel)]="configModel.control_policy" />
-        <label>Lower limit control</label>
+        <input type="radio" clrRadio name="control_policy" required value="0" [(ngModel)]="configModel.tuning.smartqos.control_policy" />
+        <label>Lower Limit</label>
       </clr-radio-wrapper>
     </clr-radio-container>
-    <!-- 带宽 下限-->
-    <clr-checkbox-container>
-      <label>Traffic Control</label>
-      <clr-checkbox-wrapper>
-        <input type="checkbox" clrCheckbox/>
-        <label>
-          Bandwidth >=
-          <input class="inputOneLine" name="maxbandwidth" [(ngModel)]="configModel.minBandwidth"/>MB/s
-        </label>
-      </clr-checkbox-wrapper>
-    </clr-checkbox-container>
-    <!-- IOPS 下限-->
-    <clr-checkbox-container>
-      <label></label>
-      <clr-checkbox-wrapper>
-        <input type="checkbox" clrCheckbox/>
-        <label>IOPS >=
-          <input class="inputOneLine" name="maxiops" [(ngModel)]="configModel.minIOPS"/>
-        </label>
-      </clr-checkbox-wrapper>
-    </clr-checkbox-container>
-    <!-- Latency 上限-->
-    <clr-checkbox-container>
-      <label></label>
-      <clr-checkbox-wrapper>
-        <input type="checkbox" clrCheckbox/>
-        <label>Latency <=
-          <input class="inputOneLine" name="maxiops" [(ngModel)]="configModel.maxLatency"/>us
-        </label>
-      </clr-checkbox-wrapper>
-    </clr-checkbox-container>
 
-    <!--c.QoS 资源调优 -->
-    <clr-input-container>
-      <label>Resource Tuning</label>
-    </clr-input-container>
-    <clr-select-container>
-      <label>Provisioning Type</label>
-      <select clrSelect [(ngModel)]="configModel.alloctype" name="alloctype" >
+    <div *ngIf="policyEnable.qosPolicy">
+      <clr-checkbox-container *ngIf="configModel.tuning.smartqos.control_policy==='1'">
+          <label>Traffic Control</label>
+          <clr-checkbox-wrapper>
+            <input type="checkbox" clrCheckbox/>
+            <label>Brandwidth <= <input class="inputOneLine" name="Brandwidth" [(ngModel)]="configModel.tuning.smartqos.maxbandwidth"/> MB/s
+            </label>
+          </clr-checkbox-wrapper>
+          <clr-checkbox-wrapper>
+            <input type="checkbox" clrCheckbox/>
+            <label>IOPS <= <input class="inputOneLine" name="IOPS" [(ngModel)]="configModel.tuning.smartqos.maxiops"/>
+            </label>
+          </clr-checkbox-wrapper>
+      </clr-checkbox-container>
+
+      <clr-checkbox-container *ngIf="configModel.tuning.smartqos.control_policy==='0'">
+          <label>Traffic Control</label>
+          <clr-checkbox-wrapper>
+            <input type="checkbox" clrCheckbox/>
+            <label>Brandwidth >= <input class="inputOneLine" name="Brandwidth" [(ngModel)]="configModel.tuning.smartqos.minbandwidth"/> MB/s
+            </label>
+          </clr-checkbox-wrapper>
+          <clr-checkbox-wrapper>
+            <input type="checkbox" clrCheckbox/>
+            <label>IOPS >= <input class="inputOneLine" name="IOPS" [(ngModel)]="configModel.tuning.smartqos.miniops"/>
+            </label>
+          </clr-checkbox-wrapper>
+          <clr-checkbox-wrapper>
+            <input type="checkbox" clrCheckbox/>
+            <label>Latency <= <input class="inputOneLine" name="Latency" [(ngModel)]="configModel.tuning.smartqos.latency"/> ms
+            </label>
+          </clr-checkbox-wrapper>
+      </clr-checkbox-container>
+
+    </div>
+
+    <!-- Resource Tuning -->
+    <clr-toggle-container>
+      <clr-toggle-wrapper>
+        <label>Resource Tuning</label>
+        <input type="checkbox" clrToggle [(ngModel)]="policyEnable.resourceTuning" name="options" />
+      </clr-toggle-wrapper>
+    </clr-toggle-container>
+
+    <clr-select-container *ngIf="policyEnable.resourceTuning">
+      <label>smartTier Policy</label>:
+      <select clrSelect [(ngModel)]="configModel.tuning.alloctype" name="smarttier" >
         <option value="thin">thin</option>
         <option value="thick">thick</option>
       </select>
     </clr-select-container>
-    <!--应用类型 -->
-    <clr-select-container>
-      <label>Application Type</label>
-      <select clrSelect [(ngModel)]="configModel.applicationType" name="applicationType" >
-        <option value="1">Vmware_VDI</option>
+
+    <clr-select-container *ngIf="configModel.tuning.alloctype == 'thin'">
+      <label>dedupe</label>:
+      <select clrSelect [(ngModel)]="configModel.tuning.dedupe_enabled" name="dedupe" >
+        <option value="0">default</option>
+        <option value="1">enable</option>
+        <option value="2">disable</option>
+      </select>
+    </clr-select-container>
+
+    <clr-select-container *ngIf="configModel.tuning.alloctype == 'thin'">
+      <label>compression</label>:
+      <select clrSelect [(ngModel)]="configModel.tuning.compression_enabled" name="compression" >
+        <option value="0">default</option>
+        <option value="1">enable</option>
+        <option value="2">disable</option>
       </select>
     </clr-select-container>
   </div>
-
 </form>
 
 <button type="button" class="btn btn-outline" (click)="popShow=false">Cancel</button>

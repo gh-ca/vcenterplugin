@@ -52,6 +52,18 @@ public class ToolUtils {
         return re;
     }
 
+    public static Integer getInt(Object obj, Integer defaultvalue) {
+        Integer re = defaultvalue;
+        try {
+            if (!StringUtils.isEmpty(obj)) {
+                re = Integer.parseInt(obj.toString());
+            }
+        } catch (Exception e) {
+            LOG.error("error:"+e.toString());
+        }
+        return re;
+    }
+
     public static double getDouble(Object obj) {
         double re = 0;
         try {
@@ -209,6 +221,18 @@ public class ToolUtils {
             }
         }
         return true;
+    }
+
+    public static boolean jsonIsNull(JsonElement obj) {
+        boolean re = false;
+        try {
+            if (StringUtils.isEmpty(obj) || obj.isJsonNull()) {
+                re = true;
+            }
+        } catch (Exception e) {
+            LOG.error("error:" + e.toString());
+        }
+        return re;
     }
 
 

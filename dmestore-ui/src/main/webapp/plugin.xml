@@ -86,7 +86,7 @@
    <extension id="com.dmeplugin.dmestore.storageView">
       <extendedPoint>vise.global.views</extendedPoint>
       <object>
-         <!--<name>#{app.name}</name>-->
+         <name>#{storagelist}</name>
          <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
             <object>
                <root>
@@ -108,7 +108,7 @@
    <extension id="com.dmeplugin.dmestore.vmfslist">
       <extendedPoint>vise.global.views</extendedPoint>
       <object>
-         <name>#{app.name}</name>
+         <name>#{vmfsdatastorelist}</name>
          <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
             <object>
                <root>
@@ -130,7 +130,7 @@
    <extension id="com.dmeplugin.dmestore.nfslist">
       <extendedPoint>vise.global.views</extendedPoint>
       <object>
-         <name>#{app.name}</name>
+         <name>#{nfsdatastorelist}</name>
          <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
             <object>
                <root>
@@ -199,7 +199,7 @@
    <extension id="com.dmeplugin.dmestore.servicelevelView">
       <extendedPoint>vise.global.views</extendedPoint>
       <object>
-         <name>#{app.name}</name>
+         <name>#{servicelevellist}</name>
          <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
             <object>
                <root>
@@ -221,7 +221,7 @@
    <extension id="com.dmeplugin.dmestore.bestpractiseView">
       <extendedPoint>vise.global.views</extendedPoint>
       <object>
-         <name>#{app.name}</name>
+         <name>#{bestpractiselist}</name>
          <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
             <object>
                <root>

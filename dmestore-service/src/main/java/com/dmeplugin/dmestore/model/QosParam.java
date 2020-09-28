@@ -73,12 +73,11 @@ public class QosParam {
         this.enabled = enabled;
     }
 
-    public QosPolicy getQosPolicy() {
-
-        return qosPolicy;
+    public com.dmeplugin.dmestore.model.SmartQos getSmartQos() {
+        return SmartQos;
     }
 
-    public void setQosPolicy(QosPolicy qosPolicy) {
-        this.qosPolicy = qosPolicy;
+    public void setSmartQos(com.dmeplugin.dmestore.model.SmartQos smartQos) {
+        SmartQos = smartQos;
     }
 }

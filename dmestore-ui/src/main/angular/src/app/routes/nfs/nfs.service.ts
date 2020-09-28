@@ -18,7 +18,9 @@ export class NfsService {
   addNfs(params= {}){
     return this.http.post('operatenfs/createnfsdatastore', params);
   }
-
+  updateNfs(params= {}){
+    return this.http.post('operatenfs/updatenfsdatastore', params);
+  }
   mountNfs(params= {}){
     return this.http.post('accessnfs/mountnfs', params);
   }
@@ -172,19 +174,28 @@ export class ModifyNfs{
   nfsShareName: string;
   nfsName: string;
   file_system_id: string;
+  fsName: string;
+  shareName: string;
   capacity_autonegotiation = new Autonegotiation();
   name: string;
   tuning = new Advance();
   qos_policy = new  QosPolicy();
   nfs_share_id: string;
   sameName = true;
+  advance: boolean;
+  qosPolicy: boolean;
+  upLow: string;
+  constructor(){
+    this.advance = true;
+    this.qosPolicy = true;
+  }
 }
 export class ChartOptions{
   height: number;
   title: Title;
   xAxis: XAxis;
   yAxis: YAxis;
-  tooltip: null;
+  tooltip: Tooltip;
   legend: Legend;
   series: Serie[];
 
@@ -200,6 +211,7 @@ export class TextStyle{
 }
 export class XAxis{
   type: string;
+  boundaryGap: boolean;
   data: string[];
 }
 export class YAxis{
@@ -213,8 +225,19 @@ export class YAxis{
 export class AxisLine{
   show: boolean;
 }
+export class Tooltip {
+  trigger: string;
+  formatter: string;
+  axisPointer: AxisPointer;
+}
+export class AxisPointer {
+  type: string;
+  axis: string;
+  snap: boolean
+}
 export class Legend{
   data: LegendData[];
+  selectedMode: boolean;
   y: string;
   x: string;
 }
@@ -361,6 +384,7 @@ export class MakePerformance {
     // x轴
     const xAxis: XAxis = new XAxis();
     xAxis.type = 'category';
+    xAxis.boundaryGap = false;
     xAxis.data = [];
 
     chart.xAxis = xAxis;
@@ -376,6 +400,15 @@ export class MakePerformance {
     yAxis.axisLine = axisLine;
 
     chart.yAxis = yAxis;
+    // 提示框
+    const tooltip: Tooltip = new Tooltip();
+    tooltip.trigger = 'axis';
+    tooltip.formatter = '{b} <br/> {a0}: {c0}<br/>{a1}: {c1}<br/>{a2}: {c2}<br/>{a3}: {c3}';
+    const axisPointer: AxisPointer = new AxisPointer();
+    axisPointer.axis = 'x';
+    axisPointer.type = 'line';
+    tooltip.axisPointer = axisPointer;
+    chart.tooltip = tooltip;
 
     // 提示数据
     const legend: Legend = new Legend();
@@ -386,16 +419,17 @@ export class MakePerformance {
     legendData.push(this.setLengdData('Write', 'triangle'));
     legend.x = 'right';
     legend.y = 'top';
+    legend.selectedMode  = true;
     legend.data = legendData;
 
     chart.legend = legend;
 
     // 数据(格式)
     const series: Serie[] = [];
-    series.push(this.setSerieData('Upper Limit', 'line', true, 'dotted', '#DB2000', 'This is Upper Limit.'))
-    series.push(this.setSerieData('Lower Limit', 'line', true, 'dotted', '#F8E082', 'This is a Lower Limit.'))
-    series.push(this.setSerieData('Read', 'line', true, 'solid', '#6870c4', 'This is a Read.'))
-    series.push(this.setSerieData('Write', 'line', true, 'solid', '#01bfa8', 'This is a Write.'))
+    series.push(this.setSerieData('Upper Limit', 'line', true, 'dotted', '#DB2000', null))
+    series.push(this.setSerieData('Lower Limit', 'line', true, 'dotted', '#F8E082', null))
+    series.push(this.setSerieData('Read', 'line', true, 'solid', '#6870c4', null))
+    series.push(this.setSerieData('Write', 'line', true, 'solid', '#01bfa8', null))
 
     chart.series = series;
 
@@ -455,10 +489,16 @@ export class MakePerformance {
    * @param chart
    */
   setXAxisData(data: any[], chart:ChartOptions) {
+    console.log('data', data);
     data.forEach(item => {
       for (const key of Object.keys(item)) {
-        const date = new Date(key);
-        chart.xAxis.data.push(date.toDateString());
+        let numKey = + key;
+        const date = new Date(numKey);
+        console.log('date', date);
+        console.log('key', key);
+        const dateStr = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDay() + ' ' + date.getHours() + ':' + date.getMinutes();
+        console.log('dateStr', dateStr);
+        chart.xAxis.data.push(dateStr);
       }
     });
   }
