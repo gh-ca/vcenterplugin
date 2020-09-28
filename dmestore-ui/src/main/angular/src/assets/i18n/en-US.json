@@ -436,5 +436,18 @@
     "non-compliant": "Non-compliant Host",
     "actual": "actual Value",
     "host": "Host Name"
+  },
+  "iscsi": {
+    "hostIp": "Host VmKernel IP",
+    "storage": "Storage Device",
+    "location": "Location",
+    "portName": "Port Name",
+    "mac": "Mac Address",
+    "maxSpeed": "Max Working Rate(Mbps)",
+    "ip4": "IPv4 Address",
+    "ip6": "IPv6 Address",
+    "speed": "Working Rate(Mbps)",
+    "hStatus": "Health Status",
+    "cStatus": "Connect Status"
   }
 }

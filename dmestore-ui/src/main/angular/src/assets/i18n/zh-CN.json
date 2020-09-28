@@ -439,5 +439,18 @@
     "non-compliant": "违规主机",
     "actual": "实际值",
     "host": "主机名"
+  },
+  "iscsi": {
+    "hostIp": "主机VmKernel IP",
+    "storage": "存储设备",
+    "location": "位置",
+    "portName": "端口名称",
+    "mac": "Mac地址",
+    "maxSpeed": "最大工作速率(Mbps)",
+    "ip4": "IPv4地址",
+    "ip6": "IPv6地址",
+    "speed": "工作速率(Mbps)",
+    "hStatus": "健康状态",
+    "cStatus": "连接状态"
   }
 }
