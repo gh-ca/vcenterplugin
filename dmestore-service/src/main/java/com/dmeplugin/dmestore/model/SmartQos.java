@@ -9,12 +9,40 @@ public class SmartQos {
 
     private String name;
     //控制策略,0：保护IO下限，1：控制IO上限
-    private Integer controlPolicy;
     private Integer latency;
     private Integer maxbandwidth;
     private Integer maxiops;
     private Integer minbandwidth;
     private Integer miniops;
+    private Integer enabled;
+    //for update
+    private String control_policy;
+
+    private String latencyUnit;
+
+    public String getLatencyUnit() {
+        return latencyUnit;
+    }
+
+    public void setLatencyUnit(String latencyUnit) {
+        this.latencyUnit = latencyUnit;
+    }
+
+    public Integer getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Integer enabled) {
+        this.enabled = enabled;
+    }
+
+    public String getControl_policy() {
+        return control_policy;
+    }
+
+    public void setControl_policy(String control_policy) {
+        this.control_policy = control_policy;
+    }
 
     public String getName() {
         return name;
@@ -22,14 +50,6 @@ public class SmartQos {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public Integer getControlPolicy() {
-        return controlPolicy;
-    }
-
-    public void setControlPolicy(Integer control_policy) {
-        this.controlPolicy = control_policy;
     }
 
     public Integer getLatency() {
@@ -72,16 +92,4 @@ public class SmartQos {
         this.miniops = miniops;
     }
 
-    @Override
-    public String toString() {
-        return "SmartQos{" +
-                "name='" + name + '\'' +
-                ", control_policy=" + controlPolicy +
-                ", latency=" + latency +
-                ", maxbandwidth=" + maxbandwidth +
-                ", maxiops=" + maxiops +
-                ", minbandwidth=" + minbandwidth +
-                ", miniops=" + miniops +
-                '}';
-    }
 }

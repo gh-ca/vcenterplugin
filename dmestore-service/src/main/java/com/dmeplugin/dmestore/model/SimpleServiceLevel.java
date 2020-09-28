@@ -8,7 +8,7 @@ package com.dmeplugin.dmestore.model;
  */
 public class SimpleServiceLevel{
 
-    private SimpleCapabilities simpleCapabilities;
+    private SimpleCapabilities capabilities;
     private String id;
     private String name;
     private String description;
@@ -18,12 +18,12 @@ public class SimpleServiceLevel{
     private Double free_capacity;
     private Double used_capacity;
 
-    public SimpleCapabilities getSimpleCapabilities() {
-        return simpleCapabilities;
+    public SimpleCapabilities getCapabilities() {
+        return capabilities;
     }
 
-    public void setSimpleCapabilities(SimpleCapabilities simpleCapabilities) {
-        this.simpleCapabilities = simpleCapabilities;
+    public void setCapabilities(SimpleCapabilities capabilities) {
+        this.capabilities = capabilities;
     }
 
     public String getId() {

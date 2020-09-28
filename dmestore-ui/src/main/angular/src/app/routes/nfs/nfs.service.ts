@@ -4,9 +4,25 @@ import {GlobalsService} from "@shared/globals.service";
 
 @Injectable()
 export class NfsService {
-  static indicatorIdsIOPS: Array<string> = ['1407379178651656', '1407379178586113'];
-  static indicatorIdsBDWT: Array<string> = ['1407379178651656', '1407379178586113'];
-  static indicatorIdsREST: Array<string> = ['1407379178651656', '1407379178586113'];
+
+  // 性能数据指标： indicator_ids 获取参数指标（读写）
+  // VMFS IOPS 0Read 1Write
+  static vmfsIOPS: Array<string> = ['1125921381744648', '1125921381744649'];
+  // VMFS  bandwidth 0Read 1Write
+  static vmfsBDWT: Array<string> = ['1125921381744646', '1125921381744647'];
+  // VMFS  latency 0Read 1Write
+  static vmfsLatency: Array<string> = ['1125921381744656', '1125921381744657'];
+  // VMFS  url
+  static vmfsUrl = 'datastorestatistichistrory/vmfs';
+
+  // NFS IOPS 0Read 1Write
+  static nfsIOPS: Array<string> = ['1125921381744648', '1125921381744649'];
+  // NFS  bandwidth 0Read 1Write
+  static nfsBDWT: Array<string> = ['1125921381744646', '1125921381744647'];
+  // NFS  latency 0Read 1Write
+  static nfsLatency: Array<string> = ['1125921381744656', '1125921381744657'];
+  // NFS  url
+  static nfsUrl = 'datastorestatistichistrory/nfs';
   constructor(private http: HttpClient) {}
 
   getData() {
@@ -18,7 +34,9 @@ export class NfsService {
   addNfs(params= {}){
     return this.http.post('operatenfs/createnfsdatastore', params);
   }
-
+  updateNfs(params= {}){
+    return this.http.post('operatenfs/updatenfsdatastore', params);
+  }
   mountNfs(params= {}){
     return this.http.post('accessnfs/mountnfs', params);
   }
@@ -172,12 +190,21 @@ export class ModifyNfs{
   nfsShareName: string;
   nfsName: string;
   file_system_id: string;
+  fsName: string;
+  shareName: string;
   capacity_autonegotiation = new Autonegotiation();
   name: string;
   tuning = new Advance();
   qos_policy = new  QosPolicy();
   nfs_share_id: string;
   sameName = true;
+  advance: boolean;
+  qosPolicy: boolean;
+  upLow: string;
+  constructor(){
+    this.advance = true;
+    this.qosPolicy = true;
+  }
 }
 export class ChartOptions{
   height: number;
@@ -502,12 +529,10 @@ export class MakePerformance {
     if (type === 'lower') {
       for (const key of Object.keys(data.max)) {
         result = Number(data.max[key]);
-        console.log(result);
       }
     } else {
       for (const key of Object.keys(data.max)) {
         result = Number(data.min[key]);
-        console.log(result);
       }
     }
     return result;

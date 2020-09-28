@@ -442,6 +442,7 @@ export class VmfsListComponent implements OnInit {
       console.log(result);
       if (result.code === '200' && result.data !== null) {
         this.serviceLevelList = result.data.data;
+        console.log('this.serviceLevelList',this.serviceLevelList)
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
     });

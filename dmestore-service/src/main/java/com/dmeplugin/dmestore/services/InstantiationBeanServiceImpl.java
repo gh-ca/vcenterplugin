@@ -90,7 +90,7 @@ public class InstantiationBeanServiceImpl implements
 
       systemService.initDB();
 
-      ThumbprintsUtils.updateContextTrustThumbprints(vCenterInfoService.getThumbprints());
+      //ThumbprintsUtils.updateContextTrustThumbprints(vCenterInfoService.getThumbprints());
 
 
 

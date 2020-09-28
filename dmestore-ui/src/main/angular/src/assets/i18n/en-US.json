@@ -175,7 +175,9 @@
     "bandwidthQoSTarget": "Bandwidth QoS Target",
     "readResponseTime": "Read Response Time(ms)",
     "writeResponseTime": "Write Response Time(ms)",
-    "latency": "Latency(ms)",
+    "latency": "Latency",
+    "latency": "Latency <= ",
+    "latencyUnit": "ms",
     "latencyQoSTarget": "Latency QoS Target",
     "upper": "Upper",
     "lower": "Lower",
@@ -309,7 +311,10 @@
         "ownSto":"Owning Storage",
         "nfs":"NFS",
         "cifs":"CIFS",
-        "dtree":"Dtree"
+        "dtree":"Dtree",
+        "fileType":"Filesystem Type",
+        "freeCap": "Free Capacity",
+        "capacityUsage":"Capacity Usage"
       },
       "dtrees":{
         "dtrees":"Dtrees",

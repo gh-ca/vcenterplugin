@@ -3,13 +3,14 @@ package com.dmeplugin.dmestore.task;
 
 import com.dmeplugin.dmestore.services.DmeNFSAccessService;
 import com.dmeplugin.dmestore.services.VmfsAccessService;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class BackgroundScanDatastoreTask {
+public class BackgroundScanDatastoreTask implements StatefulJob {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BackgroundScanDatastoreTask.class);
 
@@ -39,4 +40,12 @@ public class BackgroundScanDatastoreTask {
     LOGGER.info("scanDatastore end");
   }
 
+  public void execute() {
+    LOGGER.info("scanDatastore rrr start");
+  }
+
+  @Override
+  public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+    LOGGER.info("scanDatastore rrr start");
+  }
 }

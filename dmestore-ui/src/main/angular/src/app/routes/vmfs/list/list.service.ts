@@ -158,13 +158,13 @@ export interface ServiceLevelList {
     };
     qosParam: {
       enabled: boolean;
-      qosPolicy: {
+      smartQos: {
         latency: string;
         latencyUnit: string;
-        min_bandwidth: string;
-        min_iops: string;
-        max_bandwidth: string;
-        max_iops: string;
+        minbandwidth: string;
+        miniops: string;
+        maxbandwidth: string;
+        maxiops: string;
         control_policy: string;
       };
     };
@@ -201,14 +201,14 @@ export class GetForm {
       workload_type_id: 0, // 应用类型id
       alloctype: null, // 卷分配类型，取值范围 thin，thick
       control_policy: '1', // 控制策略
-      latency: 0, // 时延，单位ms
-      maxbandwidth: 0, // 最大带宽
+      latency: null, // 时延，单位ms
+      maxbandwidth: null, // 最大带宽
       maxbandwidthChoose: false, // 最大带宽 选中
-      maxiops: 0, // 最大iops
+      maxiops: null, // 最大iops
       maxiopsChoose: false, // 最大iops 选中
-      minbandwidth: 0, // 最小带宽
+      minbandwidth: null, // 最小带宽
       minbandwidthChoose: false, // 最小带宽 选中
-      miniops: 0, // 最小iops
+      miniops: null, // 最小iops
       miniopsChoose: false, // 最小iops 选中
       qosname: null, // Smart QoS名称
       deviceName: null,

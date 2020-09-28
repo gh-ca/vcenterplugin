@@ -22,39 +22,63 @@ import java.util.Map;
 public class DataStoreStatisticHistoryController extends BaseController {
     public static final Logger LOG = LoggerFactory.getLogger(DataStoreStatisticHistoryController.class);
 
-    private Gson gson=new Gson();
+    private Gson gson = new Gson();
     @Autowired
     DataStoreStatisticHistoryService dataSotreStatisticHistroyService;
 
     /**
      * 查询vmfs性能(实际vmfs下的volume的性能)
-     * @param params key required: obj_ids, indicator_ids, range (obj_ids volumeId集合)
+     *
+     * @param params key required: obj_ids, indicator_ids, range (obj_ids volumeId集合? vmfs在dme侧对应资源的id集合?)
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/vmfsvolume", method = RequestMethod.POST)
+    @RequestMapping(value = "/vmfs", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean getVmfsVolumeStatistic(@RequestBody Map<String, Object> params) throws Exception {
-        LOG.info("datastorestatistichistrory/vmfsvolume params==" + gson.toJson(params));
+        LOG.info("datastorestatistichistrory/vmfs params==" + gson.toJson(params));
 
         Map<String, Object> resMap = dataSotreStatisticHistroyService.queryVmfsStatistic(params);
         if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
-            return success(resMap);
+            //Object data = resMap.get("data");
+            //JsonObject dataJson = new JsonParser().parse(data.toString()).getAsJsonObject();
+            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
+            return success(data);
+            //return success(gson.toJson(data));
         }
         return failure(gson.toJson(resMap));
     }
 
     /**
-     * 查询nfs性能(实际nfs下的fs的性能)
-     * @param params key required: obj_ids, indicator_ids, range (obj_ids fsId集合)
+     * 查询volume性能
+     *
+     * @param params key required: obj_ids, indicator_ids, range (obj_ids volumeId集合)
      * @return
      * @throws Exception
      */
-    @RequestMapping(value = "/nfsfs", method = RequestMethod.POST)
+    @RequestMapping(value = "/volume", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean getVolumeStatistic(@RequestBody Map<String, Object> params) throws Exception {
+        LOG.info("datastorestatistichistrory/volume params==" + gson.toJson(params));
+        Map<String, Object> resMap = dataSotreStatisticHistroyService.queryVolumeStatistic(params);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
+            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
+            return success(data);
+        }
+        return failure(gson.toJson(resMap));
+    }
+
+    /**
+     * 查询nfs性能(实际nfs下的fs的性能?)
+     *
+     * @param params key required: obj_ids, indicator_ids, range (obj_ids fsId集合? nfs在dme侧对应资源的id集合?)
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/nfs", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean getNfsVolumeStatistic(@RequestBody Map<String, Object> params) throws Exception {
-        LOG.info("datastorestatistichistrory/nfsfs params==" + gson.toJson(params));
-
+        LOG.info("datastorestatistichistrory/nfs params==" + gson.toJson(params));
         Map<String, Object> resMap = dataSotreStatisticHistroyService.queryNfsStatistic(params);
         if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
             return success(resMap);
@@ -63,7 +87,28 @@ public class DataStoreStatisticHistoryController extends BaseController {
     }
 
     /**
+     * 查询fs性能
+     *
+     * @param params key required: obj_ids, indicator_ids, range (obj_ids fsId集合)
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/fs", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean getFsStatistic(@RequestBody Map<String, Object> params) throws Exception {
+        LOG.info("datastorestatistichistrory/fs params==" + gson.toJson(params));
+
+        Map<String, Object> resMap = dataSotreStatisticHistroyService.queryFsStatistic(params);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
+    }
+
+
+    /**
      * 查询serviceLevel的性能(实际serviceLevel下的volume的性能)
+     *
      * @param params key required: obj_ids, indicator_ids, range (obj_ids,volumeId集合)
      * @return
      * @throws Exception

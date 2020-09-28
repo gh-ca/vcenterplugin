@@ -2,24 +2,14 @@ package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.exception.VcenterException;
-import com.dmeplugin.dmestore.model.RelationInstance;
-import com.dmeplugin.dmestore.model.ServiceLevelInfo;
-import com.dmeplugin.dmestore.model.StoragePool;
-import com.dmeplugin.dmestore.model.Volume;
+import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.utils.CipherUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.dmeplugin.vmware.autosdk.SessionHelper;
-import com.dmeplugin.vmware.autosdk.TaggingWorkflow;
-import com.dmeplugin.vmware.util.PbmUtil;
-import com.dmeplugin.vmware.util.VmwareContext;
 import com.google.gson.*;
-import com.vmware.cis.tagging.CategoryModel;
-import com.vmware.cis.tagging.CategoryTypes;
-import com.vmware.cis.tagging.Tag;
 import com.vmware.cis.tagging.TagModel;
-import com.vmware.pbm.*;
-import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.pbm.PbmProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +29,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     private static final Logger log = LoggerFactory.getLogger(ServiceLevelServiceImpl.class);
 
 
-    private Gson gson=new Gson();
+    private Gson gson = new Gson();
     @Autowired
     private DmeAccessService dmeAccessService;
     @Autowired
@@ -51,9 +41,9 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
     private VCSDKUtils vcsdkUtils;
 
-    private static final String POLICY_DESC="policy created by dme";
+    private static final String POLICY_DESC = "policy created by dme";
 
-    private final String LIST_SERVICE_LEVEL_URL = "https://localhost:26335/rest/service-policy/v1/service-levels";
+    private final String LIST_SERVICE_LEVEL_URL = "/rest/service-policy/v1/service-levels";
 
     public DmeAccessService getDmeAccessService() {
         return dmeAccessService;
@@ -103,7 +93,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         remap.put("data", params);
 
         ResponseEntity responseEntity;
-        List<ServiceLevelInfo> slis;
+        List<SimpleServiceLevel> slis;
         try {
             responseEntity = dmeAccessService.access(LIST_SERVICE_LEVEL_URL, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
@@ -113,10 +103,14 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                 return remap;
             }
             Object object = responseEntity.getBody();
-            //JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
-            //slis = convertBean(object);
-            //remap.put("data", slis);
-            remap.put("data", object);
+            slis = convertBean(object);
+            if(slis.size() >0){
+                Map<String, List<SimpleServiceLevel>> slMap = new HashMap<>();
+                slMap.put("service-levels", slis);
+                remap.put("data", slMap);
+            }else{
+                remap.put("data", object);
+            }
         } catch (Exception e) {
             log.error("list serviceLevel error", e);
             String message = e.getMessage();
@@ -127,68 +121,62 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return remap;
     }
 
-    public void updateVmwarePolicy(){
+    public void updateVmwarePolicy() {
         try {
-            SessionHelper sessionHelper=new SessionHelper();
-            VCenterInfo vCenterInfo= vCenterInfoService.getVCenterInfo();
-            if (null!=vCenterInfo) {
-                sessionHelper.login(vCenterInfo.getHostIp(),vCenterInfo.getUserName(),CipherUtils.decryptString(vCenterInfo.getPassword()));
+            SessionHelper sessionHelper = new SessionHelper();
+            VCenterInfo vCenterInfo = vCenterInfoService.getVCenterInfo();
+            if (null != vCenterInfo) {
+                sessionHelper.login(vCenterInfo.getHostIp(), vCenterInfo.getUserName(), CipherUtils.decryptString(vCenterInfo.getPassword()));
 
-
-            String categoryid=vcsdkUtils.getCategoryID(sessionHelper);
-
-            List<TagModel> tagModels=vcsdkUtils.getAllTagsByCategoryId(categoryid,sessionHelper);
-            List<PbmProfile> pbmProfiles=vcsdkUtils.getAllSelfPolicyInallcontext();
-            ResponseEntity  responseEntity = dmeAccessService.access(LIST_SERVICE_LEVEL_URL, HttpMethod.GET, null);
-            Object object =responseEntity.getBody();
-            JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
-            JsonArray jsonArray = jsonObject.get("service-levels").getAsJsonArray();
-            List<TagModel> alreadyhasList=new ArrayList<>();
-            List<PbmProfile> alreadyhasPolicyList=new ArrayList<>();
-            for (JsonElement jsonElement : jsonArray) {
+                String categoryid = vcsdkUtils.getCategoryID(sessionHelper);
+                List<TagModel> tagModels = vcsdkUtils.getAllTagsByCategoryId(categoryid, sessionHelper);
+                List<PbmProfile> pbmProfiles = vcsdkUtils.getAllSelfPolicyInallcontext();
+                ResponseEntity responseEntity = dmeAccessService.access(LIST_SERVICE_LEVEL_URL, HttpMethod.GET, null);
+                Object object = responseEntity.getBody();
+                JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
+                JsonArray jsonArray = jsonObject.get("service-levels").getAsJsonArray();
+                List<TagModel> alreadyhasList = new ArrayList<>();
+                List<PbmProfile> alreadyhasPolicyList = new ArrayList<>();
+                for (JsonElement jsonElement : jsonArray) {
                     JsonObject object1 = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
                     String name = object1.get("name").getAsString();
                     //tag是否存在判断
-                   boolean alreadyhas=false;
-                    for (TagModel tagModel:tagModels){
-                        if (tagModel.getName().equalsIgnoreCase(name))
-                        {
+                    boolean alreadyhas = false;
+                    for (TagModel tagModel : tagModels) {
+                        if (tagModel.getName().equalsIgnoreCase(name)) {
                             alreadyhasList.add(tagModel);
-                            alreadyhas=true;
+                            alreadyhas = true;
                             break;
                         }
                     }
 
                     //虚拟机存储策略判断
-                    boolean alreadyhasPolicy=false;
-                    for (PbmProfile profile:pbmProfiles){
-                        if (profile.getName().equalsIgnoreCase(name))
-                        {
+                    boolean alreadyhasPolicy = false;
+                    for (PbmProfile profile : pbmProfiles) {
+                        if (profile.getName().equalsIgnoreCase(name)) {
                             alreadyhasPolicyList.add(profile);
-                            alreadyhasPolicy=true;
+                            alreadyhasPolicy = true;
                             break;
                         }
                     }
                     if (!alreadyhas) {
                         //创建tag
-                         vcsdkUtils.createTag(name,sessionHelper);
+                        vcsdkUtils.createTag(name, sessionHelper);
                     }
 
                     if (!alreadyhasPolicy) {
                         //创建虚拟机存储策略
-                         vcsdkUtils.createPbmProfileInAllContext(vcsdkUtils.CATEGORY_NAME,name);
+                        vcsdkUtils.createPbmProfileInAllContext(vcsdkUtils.CATEGORY_NAME, name);
                     }
-            }
-            tagModels.removeAll(alreadyhasList);
-            pbmProfiles.removeAll(alreadyhasPolicyList);
-            //删除多余的tag，虚拟机存储策略
-            //先删除虚拟机存储策略
-            vcsdkUtils.removePbmProfileInAllContext(pbmProfiles);
-            vcsdkUtils.removeAllTags(tagModels,sessionHelper);
-            log.info("后台更新服务等级策略完成");
-            }
-            else
-            {
+                }
+                tagModels.removeAll(alreadyhasList);
+                pbmProfiles.removeAll(alreadyhasPolicyList);
+                //删除多余的tag，虚拟机存储策略
+                //先删除虚拟机存储策略
+                vcsdkUtils.removePbmProfileInAllContext(pbmProfiles);
+                vcsdkUtils.removeAllTags(tagModels, sessionHelper);
+                log.info("后台更新服务等级策略完成");
+            } else {
                 throw new VcenterException("数据库中没有vcenter信息");
             }
         } catch (Exception e) {
@@ -196,48 +184,87 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         }
     }
 
-
-
-
-
-    // convert the api responseBody to ServiceLevelInfo Bean list
-    private List<ServiceLevelInfo> convertBean(Object object) {
-        List<ServiceLevelInfo> slis = new ArrayList<>();
-
+    // convert the api responseBody to SimpleServiceLevel Bean list
+    private List<SimpleServiceLevel> convertBean(Object object) {
+        List<SimpleServiceLevel> ssls = new ArrayList<>();
         JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
         JsonArray jsonArray = jsonObject.get("service-levels").getAsJsonArray();
         for (JsonElement jsonElement : jsonArray) {
+            SimpleServiceLevel ssl = new SimpleServiceLevel();
             try {
                 JsonObject object1 = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
-                String id = object1.get("id").getAsString();
-                String name = object1.get("name").getAsString();
-                String type = object1.get("type").getAsString();
-                String protocol = object1.get("protocol").getAsString();
-                double totalCapacity = object1.get("total_capacity").getAsDouble();
-                double freeCapacity = object1.get("free_capacity").getAsDouble();
+                String id = ToolUtils.jsonToOriginalStr(object1.get("id"));
+                String name = ToolUtils.jsonToOriginalStr(object1.get("name"));
+                String descriptionn = ToolUtils.jsonToStr(object1.get("description"));
+                String type = ToolUtils.jsonToOriginalStr(object1.get("type"));
+                String protocol = ToolUtils.jsonToOriginalStr(object1.get("protocol"));
+                double totalCapacity = ToolUtils.jsonToDou(object1.get("total_capacity"));
+                double usedCapcity = ToolUtils.jsonToDou(object1.get("used_capacity"));
+                double freeCapacity = ToolUtils.jsonToDou(object1.get("free_capacity"));
+                ssl.setId(id);
+                ssl.setName(name);
+                ssl.setDescription(descriptionn);
+                ssl.setType(type);
+                ssl.setProtocol(protocol);
+                ssl.setTotal_capacity(totalCapacity);
+                ssl.setFree_capacity(freeCapacity);
+                ssl.setUsed_capacity(usedCapcity);
+                JsonElement capObj = object1.get("capabilities");
+                if (!ToolUtils.jsonIsNull(capObj)) {
+                    SimpleCapabilities scb = new SimpleCapabilities();
+                    JsonObject capJsonObj = capObj.getAsJsonObject();
+                    String resourceType = ToolUtils.jsonToOriginalStr(capJsonObj.get("resource_type"));
+                    boolean compression = ToolUtils.jsonToBoo(capJsonObj.get("compression"));
+                    scb.setResource_type(resourceType);
+                    scb.setCompression(compression);
 
-                JsonObject qosParamObject = object1.get("capabilities").getAsJsonObject().get("qos").getAsJsonObject().get("qos_param").getAsJsonObject();
-                int minIOPS = qosParamObject.get("minIOPS").getAsInt();
-                int latency = qosParamObject.get("latency").getAsInt();
-                String latencyUnit = qosParamObject.get("latencyUnit").getAsString();
+                    //报文中暂未出现此属性,暂不处理
+                    //JsonElement iopriorityObj = capJsonObj.get("iopriority");
+                    JsonElement smarttierObj = capJsonObj.get("smarttier");
+                    if (!ToolUtils.jsonIsNull(smarttierObj)) {
+                        CapabilitiesSmarttier cbs = new CapabilitiesSmarttier();
+                        JsonObject smartJsonObj = smarttierObj.getAsJsonObject();
+                        int policy = ToolUtils.jsonToInt(smartJsonObj.get("policy"), null);
+                        boolean enabled = ToolUtils.jsonToBoo(smartJsonObj.get("enabled"));
+                        cbs.setEnabled(enabled);
+                        cbs.setPolicy(policy);
+                        scb.setSmarttier(cbs);
+                    }
 
-                ServiceLevelInfo sli = new ServiceLevelInfo();
-                sli.setId(id);
-                sli.setName(name);
-                sli.setType(type);
-                sli.setProtocol(protocol);
-                sli.setTotalCapacity(totalCapacity);
-                sli.setFreeCapacity(freeCapacity);
-                sli.setMinIOPS(minIOPS);
-                sli.setLatency(latency);
-                sli.setLatencyUnit(latencyUnit);
-
-                slis.add(sli);
+                    JsonElement qosObject = capJsonObj.get("qos");
+                    if (!ToolUtils.jsonIsNull(qosObject)) {
+                        CapabilitiesQos cq = new CapabilitiesQos();
+                        JsonObject qosJsonObj = qosObject.getAsJsonObject();
+                        boolean enabled = ToolUtils.jsonToBoo(qosJsonObj.get("enabled"));
+                        cq.setEnabled(enabled);
+                        JsonElement qosParamObj = qosJsonObj.get("qos_param");
+                        if (!ToolUtils.jsonIsNull(qosParamObj)) {
+                            QosParam qp = new QosParam();
+                            JsonObject qosParamJsonObj = qosParamObj.getAsJsonObject();
+                            String latencyUnit = ToolUtils.jsonToStr(qosParamJsonObj.get("latencyUnit"));
+                            int latnecy = ToolUtils.jsonToInt(qosParamJsonObj.get("latency"));
+                            int minBandWidth = ToolUtils.jsonToInt(qosParamJsonObj.get("minBandWidth"));
+                            int minIOPS = ToolUtils.jsonToInt(qosParamJsonObj.get("minIOPS"));
+                            int maxBandWidth = ToolUtils.jsonToInt(qosParamJsonObj.get("maxBandWidth"));
+                            int maxIOPS = ToolUtils.jsonToInt(qosParamJsonObj.get("maxIOPS"));
+                            qp.setLatency(latnecy);
+                            qp.setLatencyUnit(latencyUnit);
+                            qp.setMinBandWidth(minBandWidth);
+                            qp.setMinIOPS(minIOPS);
+                            qp.setMaxBandWidth(maxBandWidth);
+                            qp.setMaxIOPS(maxIOPS);
+                            cq.setQosParam(qp);
+                        }
+                        scb.setQos(cq);
+                    }
+                    ssl.setCapabilities(scb);
+                }
+                ssls.add(ssl);
             } catch (Exception e) {
                 log.warn("servicelevel convert error:", e);
             }
         }
-        return slis;
+        return ssls;
     }
 
     //扫描服务等级 发现服务等级下的存储池,磁盘,(存储端口)

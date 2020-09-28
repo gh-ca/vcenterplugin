@@ -105,6 +105,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
 
     @Override
     public void check(String objectId) throws Exception {
+        log.info("checkstart ");
         String hostsStr;
         if (null != objectId) {
             hostsStr = vcsdkUtils.findHostById(objectId);
@@ -156,6 +157,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             //保存到数据库
             bachDBProcess(checkMap);
         }
+        log.info("check end ");
     }
 
     private void bachDBProcess(Map<String, List<BestPracticeBean>> map) {

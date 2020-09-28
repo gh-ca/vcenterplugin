@@ -322,13 +322,13 @@
                       <tr>
                         <th hidden></th>
                         <th><clr-progress-bar clrValue="{{(item.used_capacity/item.total_capacity * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
-                        <th *ngIf="item.simpleCapabilities.qosParam.qosPolicy.max_iops != null">IOPS <= {{item.simpleCapabilities.qosParam.qosPolicy.max_iops}}</th>
-                        <th *ngIf="item.simpleCapabilities.qosParam.qosPolicy.min_iops != null">IOPS >= {{item.simpleCapabilities.qosParam.qosPolicy.min_iops}}</th>
+                        <th *ngIf="item.simpleCapabilities.qosParam.smartQos.maxiops != null">IOPS <= {{item.simpleCapabilities.qosParam.smartQos.maxiops}}</th>
+                        <th *ngIf="item.simpleCapabilities.qosParam.smartQos.miniops != null">IOPS >= {{item.simpleCapabilities.qosParam.smartQos.miniops}}</th>
                       </tr>
                         <tr>
                           <th hidden></th>
                           <th>{{item.used_capacity}} GB/{{item.total_capacity}}GB</th>
-                          <th>Latency: {{item.simpleCapabilities.qosParam.qosPolicy.latency + item.simpleCapabilities.qosParam.qosPolicy.latencyUnit}}</th>
+                          <th>Latency: {{item.simpleCapabilities.qosParam.smartQos.latency + item.simpleCapabilities.qosParam.smartQos.latencyUnit}}</th>
                         </tr>
                       </tbody>
                   </table>
@@ -380,7 +380,7 @@
                 <input type="checkbox" [(ngModel)]="form.maxbandwidthChoose" name="maxbandwidthChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.bandwidthLimitUpper' | translate}}
-                  <input class="inputOneLine" name="maxbandwidth" [(ngModel)]="form.maxbandwidth"/>{{'vmfs.unitM' | translate}}
+                  <input type="number" class="inputOneLine" name="maxbandwidth" [(ngModel)]="form.maxbandwidth"/>{{'vmfs.unitM' | translate}}
                 </label>
               </clr-checkbox-wrapper>
             </clr-checkbox-container>
@@ -391,7 +391,7 @@
                 <input type="checkbox" clrCheckbox/>
                 <label>
                   {{'vmfs.IOPSLimitUpper' | translate}}
-                  <input class="inputOneLine" name="maxiops" [(ngModel)]="form.maxiops"/>
+                  <input type="number" class="inputOneLine" name="maxiops" [(ngModel)]="form.maxiops"/>
                 </label>
               </clr-checkbox-wrapper>
             </clr-checkbox-container>
@@ -403,7 +403,7 @@
                 <input type="checkbox" clrCheckbox/>
                 <label>
                   {{'vmfs.bandwidthLimitLower' | translate}}
-                  <input class="inputOneLine" name="minbandwidth" [(ngModel)]="form.minbandwidth"/>{{'vmfs.unitM' | translate}}
+                  <input type="number" class="inputOneLine" name="minbandwidth" [(ngModel)]="form.minbandwidth"/>{{'vmfs.unitM' | translate}}
                 </label>
               </clr-checkbox-wrapper>
             </clr-checkbox-container>
@@ -414,7 +414,18 @@
                 <input type="checkbox" clrCheckbox/>
                 <label>
                   {{'vmfs.IOPSLimitLower' | translate}}
-                  <input class="inputOneLine" name="miniops" [(ngModel)]="form.miniops"/>
+                  <input type="number" class="inputOneLine" name="miniops" [(ngModel)]="form.miniops"/>
+                </label>
+              </clr-checkbox-wrapper>
+            </clr-checkbox-container>
+            <!-- 交通管制对象 latency 时延-->
+            <clr-checkbox-container *ngIf="form.control_policy === '0'">
+              <label></label>
+              <clr-checkbox-wrapper>
+                <input type="checkbox" clrCheckbox/>
+                <label>
+                  {{'vmfs.latencyMax' | translate}}
+                  <input type="number" class="inputOneLine" name="latency" [(ngModel)]="form.latency"/>{{'vmfs.latencyUnit' | translate}}
                 </label>
               </clr-checkbox-wrapper>
             </clr-checkbox-container>
@@ -509,6 +520,17 @@
             <label>
               {{'vmfs.IOPSLimitLower' | translate}}
               <input type="number" class="inputOneLine" name="miniops" [(ngModel)]="modifyForm.min_iops"/>
+            </label>
+          </clr-checkbox-wrapper>
+        </clr-checkbox-container>
+        <!-- 交通管制对象 latency 时延-->
+        <clr-checkbox-container *ngIf="modifyForm.control_policy === '0'">
+          <label></label>
+          <clr-checkbox-wrapper>
+            <input type="checkbox" clrCheckbox/>
+            <label>
+              {{'vmfs.latencyMax' | translate}}
+              <input type="number" class="inputOneLine" name="latency" [(ngModel)]="form.latency"/>{{'vmfs.latencyUnit' | translate}}
             </label>
           </clr-checkbox-wrapper>
         </clr-checkbox-container>
@@ -645,8 +667,8 @@
                   <tr>
                     <th hidden></th>
                     <th><clr-progress-bar clrValue="{{(item.used_capacity/item.total_capacity * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
-                    <th *ngIf="item.simpleCapabilities.qosParam.qosPolicy.max_iops != null">IOPS <= {{item.simpleCapabilities.qosParam.qosPolicy.max_iops}}</th>
-                    <th *ngIf="item.simpleCapabilities.qosParam.qosPolicy.min_iops != null">IOPS >= {{item.simpleCapabilities.qosParam.qosPolicy.min_iops}}</th>
+                    <th *ngIf="item.simpleCapabilities.qosParam.qosPolicy.maxiops != null">IOPS <= {{item.simpleCapabilities.qosParam.qosPolicy.max_iops}}</th>
+                    <th *ngIf="item.simpleCapabilities.qosParam.qosPolicy.miniops != null">IOPS >= {{item.simpleCapabilities.qosParam.qosPolicy.min_iops}}</th>
                   </tr>
                   <tr>
                     <th hidden></th>

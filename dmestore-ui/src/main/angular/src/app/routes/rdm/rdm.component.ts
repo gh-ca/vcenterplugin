@@ -11,17 +11,14 @@ import {GlobalsService} from '../../shared/globals.service';
 })
 export class RdmComponent implements OnInit {
 
+  policyEnable = {
+    smartTier: false,
+    qosPolicy: false,
+    resourceTuning: false
+  };
 
   popShow = true;
-  configModel = {
-    name: '',
-    size: '',
-    unit: '1',
-    storage_id: '',
-    pool_raw_id: '',
-    storageType: '1',
-    quantity: '',
-  };
+  configModel = new customize_volumes();
   storageDevices = [];
   storagePools = [];
   levelCheck = 'level';
@@ -38,6 +35,17 @@ export class RdmComponent implements OnInit {
 
   submit(): void {
 
+  }
+
+  basAdd(){
+    this.configModel.volume_specs.push(new volume_specs());
+    console.log(this.configModel.volume_specs);
+  }
+
+  basRemove(item){
+    this.configModel.volume_specs = this.configModel.volume_specs.filter((i) => {
+        return i != item;
+    });
   }
 
   check() {}
@@ -66,4 +74,60 @@ export class RdmComponent implements OnInit {
     });
   }
 
+}
+
+
+class customize_volumes{
+  storageType: string;
+  availability_zone: string;
+  initial_distribute_policy: string;
+  owner_controller: string;
+  pool_raw_id: string;
+  prefetch_policy: string;
+  prefetch_value: string;
+  storage_id: string;
+  tuning: tuning;
+  volume_specs: volume_specs[];
+  constructor(){
+    this.volume_specs = [new volume_specs()];
+    this.tuning = new tuning();
+  }
+}
+
+class volume_specs{
+  capacity: number;
+  count: number;
+  name: string;
+  unit: string;
+  start_lun_id: number;
+  start_suffix: number;
+  constructor(){
+
+  }
+}
+
+
+class tuning{
+  alloctype:string;
+  compression_enabled: string;
+  dedupe_enabled: string;
+  smartqos: smartqos;
+  smarttier: string;
+  workload_type_id: string;
+  constructor(){
+    this.smartqos = new smartqos();
+  }
+}
+
+class smartqos{
+  control_policy: string;
+  latency: number;
+  maxbandwidth: number;
+  maxiops: number;
+  minbandwidth: number;
+  miniops: number;
+  name:string;
+  constructor(){
+
+  }
 }

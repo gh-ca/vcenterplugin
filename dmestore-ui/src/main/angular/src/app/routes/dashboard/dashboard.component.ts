@@ -11,7 +11,6 @@ import { DashboardService } from './dashboard.srevice';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ClrForm} from '@clr/angular';
 import {HttpClient} from '@angular/common/http';
-import {isNumber} from "util";
 
 @Component({
   selector: 'app-dashboard',
@@ -25,6 +24,7 @@ import {isNumber} from "util";
     `,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  styleUrls: ['./dashboard.component.scss'],
   providers: [DashboardService],
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -45,6 +45,14 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     utilization: 0,
     capacityUnit: "TB"
   };
+
+  bestPracticeViolations = {
+        critical : 0,
+        major: 0,
+        warning: 0,
+        info: 0
+  };
+  storeageTopN = [];
 
   popShow = false;
   connectAlertSuccess = false;
@@ -92,11 +100,33 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         this.loadStorageNum();
         this.loadstorageCapacity('0');
+        this.loadBestPracticeViolations();
+        this.loadTop5DataStore('0');
       }
     }, err => {
       console.error('ERROR', err);
     });
   }
+
+  // //type 0 :VMFS and NFS, 1:VMFS, 2:NFS
+  loadTop5DataStore(type: string){
+    this.http.get('overview/getdatastoretopn', { params: {type: type}}).subscribe((result: any) => {
+      console.log(result);
+      if (result.code === '0' || result.code === '200'){
+        result.data.forEach((item) => {
+          item.totalCapacity = item.totalCapacity.toFixed(2);
+          item.usedCapacity = item.usedCapacity.toFixed(2);
+          item.freeCapacity = item.freeCapacity.toFixed(2);
+          item.utilization = item.utilization.toFixed(2);
+        });
+        this.storeageTopN = result.data;
+        this.cdr.detectChanges();
+      }
+    }, err => {
+      console.error('ERROR', err);
+    });
+  }
+
 
   storageCapacityChartInit(chart){
     this.storageCapacityChart = chart;
@@ -126,6 +156,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         this.dashboardSrv.storageCapacityOption.title.text = this.storageCapacity.utilization + ' %';
         this.storageCapacityChart.setOption(this.dashboardSrv.storageCapacityOption, true);
         this.storageCapacityChart.hideLoading();
+        this.cdr.detectChanges();
       }
     }, err => {
       console.error('ERROR', err);
@@ -156,6 +187,19 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         this.dashboardSrv.storageNumOption.series[0].data = os;
         this.storageNumChart.setOption(this.dashboardSrv.storageNumOption, true);
         this.storageNumChart.hideLoading();
+        this.cdr.detectChanges();
+      }
+    }, err => {
+      console.error('ERROR', err);
+    });
+  }
+
+  loadBestPracticeViolations(){
+    this.http.get('overview/getbestpracticeviolations', {}).subscribe((result: any) => {
+      console.log(result);
+      if (result.code === '0' || result.code === '200'){
+         this.bestPracticeViolations = result.data;
+        this.cdr.detectChanges();
       }
     }, err => {
       console.error('ERROR', err);
