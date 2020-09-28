@@ -57,10 +57,10 @@ public class DPSqlFileConstant {
           ");";
 
   public static final String DP_DME_TASK_DATA_SYNCSERVICELEVEL_SQL = "INSERT INTO DP_DME_TASK_INFO (ID, CLASS_NAME, CRON, JOB_NAME, METHOD) " +
-          "VALUES (1, 'com.dmeplugin.dmestore.task.BackgroundSyncTask', '0 0 0/6 * * ?', 'syncServiceLevel', 'syncServiceLevel');";
+          "VALUES (1, 'com.dmeplugin.dmestore.task.BackgroundSyncServiceLevelTask', '0 0 0/6 * * ?', 'syncServiceLevel', 'syncServiceLevel');";
 
   public static final String DP_DME_TASK_DATA_SYNCBESTPRACTISE_SQL = "INSERT INTO DP_DME_TASK_INFO (ID, CLASS_NAME, CRON, JOB_NAME, METHOD) " +
-          "VALUES (2, 'com.dmeplugin.dmestore.task.BackgroundSyncTask', '0 0 2 * * ?', 'syncCheckBestPractise', 'syncCheckBestPractise');";
+          "VALUES (2, 'com.dmeplugin.dmestore.task.BackgroundCheckBestPractiseTask', '0 0 2 * * ?', 'syncCheckBestPractise', 'syncCheckBestPractise');";
 
   public static final String DP_DME_TASK_DATA_SCANDATASTORE_SQL = "INSERT INTO DP_DME_TASK_INFO (ID, CLASS_NAME, CRON, JOB_NAME, METHOD) " +
           "VALUES (3, 'com.dmeplugin.dmestore.task.BackgroundScanDatastoreTask', '0 0 0/6 * * ?', 'scanDatastore', 'scanDatastore');";

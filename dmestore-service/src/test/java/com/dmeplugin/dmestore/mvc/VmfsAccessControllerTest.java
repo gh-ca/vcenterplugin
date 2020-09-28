@@ -1,8 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
-import com.dmeplugin.dmestore.dao.DmeInfoDao;
 import com.dmeplugin.dmestore.model.VmfsDataInfo;
-import com.dmeplugin.dmestore.services.DmeAccessServiceImpl;
 import com.dmeplugin.dmestore.services.VmfsAccessServiceImpl;
 import com.google.gson.Gson;
 import org.junit.Test;

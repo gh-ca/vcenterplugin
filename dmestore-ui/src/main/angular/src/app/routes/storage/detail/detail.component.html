@@ -1,6 +1,6 @@
 <clr-tabs>
   <clr-tab>
-    <button clrTabLink id="conf">{{'storage.detail.conf.configuration' | translate}}</button>
+    <button clrTabLink id="conf" (click)="changeTab('conf')">{{'storage.detail.conf.configuration' | translate}}</button>
     <clr-tab-content id="configuration" *clrIfActive="true">
       <table class="table table-noborder" *ngIf="detail">
         <tr>
@@ -40,7 +40,7 @@
       <clr-tabs>
         <!--Storage Pools-->
         <clr-tab>
-          <button clrTabLink id="storage">{{'storage.detail.storagePool.storagePool' | translate}}</button>
+          <button clrTabLink id="storage" (click)="changeTab('pool')">{{'storage.detail.storagePool.storagePool' | translate}}</button>
           <clr-tab-content id="storagePool" *clrIfActive="true">
             <div>
               <!-- 头部按钮组 -->
@@ -66,7 +66,7 @@
                 </div>
               </div>
               <!-- 列表页 -->
-              <clr-datagrid [(clrDgSelected)]="rowSelected"   (clrDgRefresh)="getPoolList()" [clrDgLoading]="isLoading">
+              <clr-datagrid [(clrDgSelected)]="rowSelected" [clrDgLoading]="isLoading">
 
                 <clr-dg-column>{{'storage.detail.storagePool.name' | translate}}</clr-dg-column>
                 <clr-dg-column>{{'storage.detail.storagePool.status' | translate}}</clr-dg-column>
@@ -88,26 +88,30 @@
 
                 <clr-dg-row *clrDgItems="let item of storagePool" [clrDgItem]="item">
                   <clr-dg-cell>{{item.name}}</clr-dg-cell>
-                  <clr-dg-cell>{{item.status}}</clr-dg-cell>
-                  <clr-dg-cell>{{item.tier0_disk_type}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.health_status}}</clr-dg-cell>
+
+                  <clr-dg-cell [hidden]="poolRadio!=='table1'">{{item.tier0_disk_type}}</clr-dg-cell>
+                  <clr-dg-cell [hidden]="poolRadio!=='table1'">{{item.media_type}}</clr-dg-cell>
+                  <clr-dg-cell [hidden]="poolRadio!=='table1'">服务等级接口无字段</clr-dg-cell>
+                  <clr-dg-cell [hidden]="poolRadio!=='table1'">{{item.tier0_raid_lv}}</clr-dg-cell>
+
+                  <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.total_capacity}}</clr-dg-cell>
+                  <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.consumed_capacity}}</clr-dg-cell>
+                  <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.consumed_capacity_percentage}}</clr-dg-cell>
+                  <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.free_capacity}}</clr-dg-cell>
+                  <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.fs_subscribed_capacity/total_capacity}}</clr-dg-cell>
+
+                  <clr-dg-cell [hidden]="poolRadio!=='table3'">时延接口无相关字段</clr-dg-cell>
+                  <clr-dg-cell [hidden]="poolRadio!=='table3'">IOPS接口无相关字段</clr-dg-cell>
+                  <clr-dg-cell [hidden]="poolRadio!=='table3'">带宽接口无相关字段</clr-dg-cell>
                 </clr-dg-row>
-
-
-
-
-
-
-
-
-
-
               </clr-datagrid>
             </div>
           </clr-tab-content>
         </clr-tab>
         <!--volumes-->
         <clr-tab>
-          <button clrTabLink id="volume">{{'storage.detail.volumes.volumes' | translate}}</button>
+          <button clrTabLink id="volume" (click)="changeTab('volume')">{{'storage.detail.volumes.volumes' | translate}}</button>
           <clr-tab-content id="volumes">
             <div>
               <div class="gh-btngroup-header">
@@ -127,7 +131,7 @@
                   </div>
                 </div>
               </div>
-              <clr-datagrid>
+              <clr-datagrid class="datagrid-compact">
                 <clr-dg-column>{{'storage.detail.volumes.name' | translate}}</clr-dg-column>
                 <clr-dg-column>{{'storage.detail.volumes.status' | translate}}</clr-dg-column>
 
@@ -143,14 +147,30 @@
                 <clr-dg-column [hidden]="volumeRadio!=='table2'">{{'storage.detail.volumes.iops' | translate}}</clr-dg-column>
                 <clr-dg-column [hidden]="volumeRadio!=='table2'">{{'storage.detail.volumes.bandwidth' | translate}}</clr-dg-column>
 
-                <clr-dg-cell></clr-dg-cell>
+                <clr-dg-row *clrDgItems="let item of volumes" [clrDgItem]="item">
+                  <clr-dg-cell>{{item.name}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.status}}</clr-dg-cell>
+
+                  <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.capacity}}</clr-dg-cell>
+                  <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.alloctype}}</clr-dg-cell>
+                  <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.capacity_usage}}</clr-dg-cell>
+                  <clr-dg-cell [hidden]="volumeRadio!=='table1'">映射状态接口无相关字段</clr-dg-cell>
+                  <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.storage_pool_name}}</clr-dg-cell>
+                  <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.service_level_name}}</clr-dg-cell>
+                  <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.protectionStatus}}</clr-dg-cell>
+
+                  <clr-dg-cell [hidden]="volumeRadio!=='table2'">时延接口无相关字段</clr-dg-cell>
+                  <clr-dg-cell [hidden]="volumeRadio!=='table2'">IOPS接口无相关字段</clr-dg-cell>
+                  <clr-dg-cell [hidden]="volumeRadio!=='table2'">带宽接口无相关字段</clr-dg-cell>
+                </clr-dg-row>
+
               </clr-datagrid>
             </div>
           </clr-tab-content>
         </clr-tab>
         <!--fileSystems-->
         <clr-tab>
-          <button clrTabLink id="fs">{{'storage.detail.fileSystems.fileSystems' | translate}}</button>
+          <button clrTabLink id="fs" (click)="changeTab('fs')">{{'storage.detail.fileSystems.fileSystems' | translate}}</button>
           <clr-tab-content id="fileSystems">
             <div>
               <div class="gh-btngroup-header">
@@ -166,20 +186,36 @@
                 <clr-dg-column>{{'storage.detail.fileSystems.name' | translate}}</clr-dg-column>
                 <clr-dg-column>{{'storage.detail.fileSystems.status' | translate}}</clr-dg-column>
                 <clr-dg-column>{{'storage.detail.fileSystems.proType' | translate}}</clr-dg-column>
+                <clr-dg-column>{{'storage.detail.fileSystems.fileType' | translate}}</clr-dg-column>
                 <clr-dg-column>{{'storage.detail.fileSystems.totalCap' | translate}}</clr-dg-column>
-                <clr-dg-column>{{'storage.detail.fileSystems.capUsage' | translate}}</clr-dg-column>
+                <clr-dg-column>{{'storage.detail.fileSystems.freeCap' | translate}}</clr-dg-column>
+                <clr-dg-column>{{'storage.detail.fileSystems.capacityUsage' | translate}}</clr-dg-column>
                 <clr-dg-column>{{'storage.detail.fileSystems.ownSto' | translate}}</clr-dg-column>
                 <clr-dg-column>{{'storage.detail.fileSystems.nfs' | translate}}</clr-dg-column>
                 <clr-dg-column>{{'storage.detail.fileSystems.cifs' | translate}}</clr-dg-column>
                 <clr-dg-column>{{'storage.detail.fileSystems.dtree' | translate}}</clr-dg-column>
-                <clr-dg-cell></clr-dg-cell>
+
+                <clr-dg-row *clrDgItems="let item of fsList" [clrDgItem]="item">
+                  <clr-dg-cell>{{item.name}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.health_status}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.alloc_type}}</clr-dg-cell>
+                  <clr-dg-cell>文件系统类型接口无字段</clr-dg-cell>
+                  <clr-dg-cell>{{item.capacity}}</clr-dg-cell>
+                  <clr-dg-cell>可用容量接口无字段</clr-dg-cell>
+                  <clr-dg-cell>{{item.capacity_usage_ratio}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.storage_pool_name}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.nfs_count}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.cifs_count}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.dtree_count}}</clr-dg-cell>
+                </clr-dg-row>
+
               </clr-datagrid>
             </div>
           </clr-tab-content>
         </clr-tab>
         <!--dtrees-->
         <clr-tab>
-          <button clrTabLink id="dt">{{'storage.detail.dtrees.dtrees' | translate}}</button>
+          <button clrTabLink id="dt" (click)="changeTab('dtrees')">{{'storage.detail.dtrees.dtrees' | translate}}</button>
           <clr-tab-content id="dtrees">
             <div>
               <div class="gh-btngroup-header">
@@ -199,34 +235,74 @@
                 <clr-dg-column>{{'storage.detail.dtrees.nfs' | translate}}</clr-dg-column>
                 <clr-dg-column>{{'storage.detail.dtrees.cifs' | translate}}</clr-dg-column>
                 <clr-dg-column>{{'storage.detail.dtrees.quota' | translate}}</clr-dg-column>
-                <clr-dg-cell></clr-dg-cell>
+                <clr-dg-row  *clrDgItems="let item of dtrees" [clrDgItem]="item">
+                  <clr-dg-cell>{{item.name}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.fs_name}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.tier_name}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.security_style}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.nfs_count}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.cifs_count}}</clr-dg-cell>
+                  <clr-dg-cell>{{item.quota_switch}}</clr-dg-cell>
+                </clr-dg-row>
               </clr-datagrid>
             </div>
           </clr-tab-content>
         </clr-tab>
         <!--shares-->
         <clr-tab>
-          <button clrTabLink id="sh">{{'storage.detail.shares.shares' | translate}}</button>
+          <button clrTabLink id="sh" (click)="changeTab('shares')">{{'storage.detail.shares.shares' | translate}}</button>
           <clr-tab-content id="shares" >
-            <div>
-              <div class="gh-btngroup-header">
-                <div class="gh-btngroup-left"></div>
-                <!--刷新 -->
-                <div class="btn-group btn-icon">
-                  <div class="radio btn merginLeft">
-                    <label><clr-icon shape="refresh" size="20"></clr-icon></label>
+            <clr-accordion>
+              <clr-accordion-panel>
+                <clr-accordion-title>NFS</clr-accordion-title>
+                <clr-accordion-content *clrIfExpanded>
+                  <div>
+                    <div class="gh-btngroup-header">
+                      <div class="gh-btngroup-left"></div>
+                      <!--刷新 -->
+                      <div class="btn-group btn-icon">
+                        <div class="radio btn merginLeft">
+                          <label><clr-icon shape="refresh" size="20"></clr-icon></label>
+                        </div>
+                      </div>
+                    </div>
+                    <clr-datagrid>
+                      <clr-dg-column>{{'storage.detail.shares.name' | translate}}</clr-dg-column>
+                      <clr-dg-column>{{'storage.detail.shares.sharePath' | translate}}</clr-dg-column>
+                      <clr-dg-column>{{'storage.detail.shares.ofs' | translate}}</clr-dg-column>
+                      <clr-dg-column>{{'storage.detail.shares.od' | translate}}</clr-dg-column>
+                      <clr-dg-column>{{'storage.detail.shares.osl' | translate}}</clr-dg-column>
+                      <clr-dg-cell></clr-dg-cell>
+                    </clr-datagrid>
                   </div>
-                </div>
-              </div>
-              <clr-datagrid>
-                <clr-dg-column>{{'storage.detail.shares.name' | translate}}</clr-dg-column>
-                <clr-dg-column>{{'storage.detail.shares.sharePath' | translate}}</clr-dg-column>
-                <clr-dg-column>{{'storage.detail.shares.ofs' | translate}}</clr-dg-column>
-                <clr-dg-column>{{'storage.detail.shares.od' | translate}}</clr-dg-column>
-                <clr-dg-column>{{'storage.detail.shares.osl' | translate}}</clr-dg-column>
-                <clr-dg-cell></clr-dg-cell>
-              </clr-datagrid>
-            </div>
+                </clr-accordion-content>
+              </clr-accordion-panel>
+              <clr-accordion-panel>
+                <clr-accordion-title>CIFS</clr-accordion-title>
+                <clr-accordion-content *clrIfExpanded>
+                  <div>
+                    <div class="gh-btngroup-header">
+                      <div class="gh-btngroup-left"></div>
+                      <!--刷新 -->
+                      <div class="btn-group btn-icon">
+                        <div class="radio btn merginLeft">
+                          <label><clr-icon shape="refresh" size="20"></clr-icon></label>
+                        </div>
+                      </div>
+                    </div>
+                    <clr-datagrid>
+                      <clr-dg-column>{{'storage.detail.shares.name' | translate}}</clr-dg-column>
+                      <clr-dg-column>{{'storage.detail.shares.sharePath' | translate}}</clr-dg-column>
+                      <clr-dg-column>{{'storage.detail.shares.ofs' | translate}}</clr-dg-column>
+                      <clr-dg-column>{{'storage.detail.shares.od' | translate}}</clr-dg-column>
+                      <clr-dg-column>{{'storage.detail.shares.osl' | translate}}</clr-dg-column>
+                      <clr-dg-cell></clr-dg-cell>
+                    </clr-datagrid>
+                  </div>
+                </clr-accordion-content>
+              </clr-accordion-panel>
+            </clr-accordion>
+
           </clr-tab-content>
         </clr-tab>
       </clr-tabs>

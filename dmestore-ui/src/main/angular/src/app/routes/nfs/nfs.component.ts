@@ -31,7 +31,7 @@ export class NfsComponent implements OnInit {
   addForm = new AddNfs();
   selectHost = [];
   hostLoading = true;
-  currentData = null;
+  currentData = new ModifyNfs();
   hostList: Host[] = [];
   clusterList: Cluster[] = [];
   mountForm = new Mount();
@@ -48,11 +48,6 @@ export class NfsComponent implements OnInit {
   constructor(private remoteSrv: NfsService, private cdr: ChangeDetectorRef, public gs: GlobalsService , private storageService: StorageService) { }
   ngOnInit(): void {
   }
-  changeData() {
-    this.rowSelected[0] = this.currentData;
-    this.modifyShow = false;
-  }
-
   // 获取nfs列表
   getNfsList() {
     this.isLoading = true;
@@ -211,9 +206,8 @@ export class NfsComponent implements OnInit {
       });
   }
   modifyData() {
-
     this.currentData = new ModifyNfs();
-    this.currentData.dataStoreObjectId = this.rowSelected[0].objectId;
+    this.currentData.dataStoreObjectId = this.rowSelected[0].objectid;
     this.currentData.nfsShareName = this.rowSelected[0].share;
     this.currentData.nfsName = this.rowSelected[0].name;
     this.currentData.file_system_id = this.rowSelected[0].fsId;
@@ -222,9 +216,18 @@ export class NfsComponent implements OnInit {
     this.currentData.tuning.compression_enabled = false;
     this.currentData.tuning.allocation_type = 'thin';
     this.currentData.nfs_share_id = this.rowSelected[0].shareId;
-    console.log('modify');
-    console.log(this.currentData);
     this.modifyShow = true;
+  }
+  modifyCommit(){
+    console.log(this.currentData);
+    this.remoteSrv.updateNfs(this.addForm).subscribe((result: any) => {
+      if (result.code === '200'){
+        this.modifyShow = false;
+      }else{
+        this.modifyShow = true;
+        this.errMessage = '编辑失败！'+result.description;
+      }
+    });
   }
   expandData(){
     console.log('扩容提交.....');
