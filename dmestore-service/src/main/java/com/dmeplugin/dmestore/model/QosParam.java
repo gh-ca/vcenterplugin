@@ -16,6 +16,7 @@ public class QosParam {
     private Integer minIOPS;
     private Integer maxBandWidth;
     private Integer maxIOPS;
+    private SmartQos smartQos;
 
     public Integer getLatency() {
         return latency;
@@ -73,11 +74,19 @@ public class QosParam {
         this.enabled = enabled;
     }
 
-    public com.dmeplugin.dmestore.model.SmartQos getSmartQos() {
-        return SmartQos;
+    public QosPolicy getQosPolicy() {
+        return qosPolicy;
     }
 
-    public void setSmartQos(com.dmeplugin.dmestore.model.SmartQos smartQos) {
-        SmartQos = smartQos;
+    public void setQosPolicy(QosPolicy qosPolicy) {
+        this.qosPolicy = qosPolicy;
+    }
+
+    public SmartQos getSmartQos() {
+        return smartQos;
+    }
+
+    public void setSmartQos(SmartQos smartQos) {
+        this.smartQos = smartQos;
     }
 }
