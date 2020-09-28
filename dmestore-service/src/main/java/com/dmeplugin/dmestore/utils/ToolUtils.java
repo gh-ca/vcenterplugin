@@ -35,7 +35,7 @@ public class ToolUtils {
                 re = obj.toString();
             }
         } catch (Exception e) {
-            LOG.error("error:"+e.toString());
+            LOG.error("error:" + e.toString());
         }
         return re;
     }
@@ -47,7 +47,7 @@ public class ToolUtils {
                 re = Integer.parseInt(obj.toString());
             }
         } catch (Exception e) {
-            LOG.error("error:"+e.toString());
+            LOG.error("error:" + e.toString());
         }
         return re;
     }
@@ -59,19 +59,19 @@ public class ToolUtils {
                 re = Double.parseDouble(obj.toString());
             }
         } catch (Exception e) {
-            LOG.error("error:"+e.toString());
+            LOG.error("error:" + e.toString());
         }
         return re;
     }
 
-    public static long getLong(Object obj){
+    public static long getLong(Object obj) {
         long re = 0L;
         try {
             if (!StringUtils.isEmpty(obj)) {
                 re = Long.parseLong(obj.toString());
             }
         } catch (Exception e) {
-            LOG.error("error:"+e.toString());
+            LOG.error("error:" + e.toString());
         }
         return re;
     }
@@ -83,10 +83,35 @@ public class ToolUtils {
                 re = obj.getAsString();
             }
         } catch (Exception e) {
-            LOG.error("error:"+e.toString());
+            LOG.error("error:" + e.toString());
         }
         return re;
     }
+
+    public static String jsonToOriginalStr(JsonElement obj) {
+        String re = null;
+        try {
+            if (null != obj && !obj.isJsonNull()) {
+                re = obj.getAsString();
+            }
+        } catch (Exception e) {
+            LOG.error("error:" + e.toString());
+        }
+        return re;
+    }
+
+    public static String jsonToStr(JsonElement obj, String dedefaultvalue) {
+        String re = dedefaultvalue;
+        try {
+            if (!StringUtils.isEmpty(obj)) {
+                re = obj.getAsString();
+            }
+        } catch (Exception e) {
+            LOG.error("error:" + e.toString());
+        }
+        return re;
+    }
+
 
     public static Integer jsonToInt(JsonElement obj, Integer defaultvalue) {
         Integer re = defaultvalue;
@@ -95,7 +120,7 @@ public class ToolUtils {
                 re = obj.getAsInt();
             }
         } catch (Exception e) {
-            LOG.error("error:"+e.toString());
+            LOG.error("error:" + e.toString());
         }
         return re;
     }
@@ -107,7 +132,7 @@ public class ToolUtils {
                 re = obj.getAsInt();
             }
         } catch (Exception e) {
-            LOG.error("error:"+e.toString());
+            LOG.error("error:" + e.toString());
         }
         return re;
     }
@@ -119,7 +144,7 @@ public class ToolUtils {
                 re = obj.getAsLong();
             }
         } catch (Exception e) {
-            LOG.error("error:"+e.toString());
+            LOG.error("error:" + e.toString());
         }
         return re;
     }
@@ -131,7 +156,19 @@ public class ToolUtils {
                 re = obj.getAsDouble();
             }
         } catch (Exception e) {
-            LOG.error("error:"+e.toString());
+            LOG.error("error:" + e.toString());
+        }
+        return re;
+    }
+
+    public static Double jsonToDou(JsonElement obj) {
+        Double re = 0.00;
+        try {
+            if (!StringUtils.isEmpty(obj)) {
+                re = obj.getAsDouble();
+            }
+        } catch (Exception e) {
+            LOG.error("error:" + e.toString());
         }
         return re;
     }
@@ -143,19 +180,31 @@ public class ToolUtils {
                 re = obj.getAsBoolean();
             }
         } catch (Exception e) {
-            LOG.error("error:"+e.toString());
+            LOG.error("error:" + e.toString());
+        }
+        return re;
+    }
+
+    public static boolean jsonIsNull(JsonElement obj) {
+        boolean re = false;
+        try {
+            if (StringUtils.isEmpty(obj) || obj.isJsonNull()) {
+                re = true;
+            }
+        } catch (Exception e) {
+            LOG.error("error:" + e.toString());
         }
         return re;
     }
 
     public static <T extends Comparable<T>> boolean compare(List<T> a, List<T> b) {
-        if(a.size() != b.size()) {
+        if (a.size() != b.size()) {
             return false;
         }
         Collections.sort(a);
         Collections.sort(b);
-        for(int i=0;i<a.size();i++){
-            if(!a.get(i).equals(b.get(i))) {
+        for (int i = 0; i < a.size(); i++) {
+            if (!a.get(i).equals(b.get(i))) {
                 return false;
             }
         }
