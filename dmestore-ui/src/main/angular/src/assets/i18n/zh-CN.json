@@ -15,7 +15,8 @@
     "next": "下一步",
     "previous": "上一步",
     "reduce":"缩容",
-    "ok":"确认"
+    "ok":"确认",
+    "submit": "提交"
   },
   "validations": {
     "required": "该字段必填",
@@ -398,5 +399,31 @@
         }
       }
     }
+  },
+  "overview": {
+    "port":"端口",
+    "user": "用户",
+    "password": "密码",
+    "status":"连接状态",
+    "connected": "已连接",
+    "storage": "存储设备",
+    "total": "总数",
+    "normal": "正常数",
+    "abnormal": "异常数",
+    "violations": "最佳实践违规",
+    "critical": "紧急",
+    "major": "重要",
+    "warning": "警告",
+    "info": "一般",
+    "operation": "操作",
+    "allDataStore": "所有存储",
+    "VMFS": "VMFS存储",
+    "NFS": "NFS存储",
+    "totalCapacity": "总量",
+    "used": "已用",
+    "free": "可用",
+    "top5T": "使用率前5",
+    "connectT": "DME连接",
+    "connectFail": "连接失败"
   }
 }

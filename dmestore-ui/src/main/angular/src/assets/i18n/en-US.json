@@ -15,7 +15,8 @@
     "next": "Next",
     "previous": "Previous",
     "reduce":"Reduce",
-    "ok":"OK"
+    "ok":"OK",
+    "submit": "Submit"
   },
   "validations": {
     "required": "This field is required",
@@ -395,5 +396,31 @@
         }
       }
     }
+  },
+  "overview": {
+    "port":"Port",
+    "status":"Status",
+    "user": "User",
+    "password": "Password",
+    "connected": "Connected",
+    "storage": "Storage",
+    "total": "Total",
+    "normal": "Normal",
+    "abnormal": "Abnormal",
+    "violations": "Best Practice Violations",
+    "critical": "Critical",
+    "major": "Major",
+    "warning": "Warning",
+    "info": "Info",
+    "operation": "Operation",
+    "allDataStore": "All DataStore",
+    "VMFS": "VMFS DataStore",
+    "NFS": "NFS DataStore",
+    "totalCapacity": "Total",
+    "used": "Used",
+    "free": "Free",
+    "top5T": "Top 5 DataStore",
+    "connectT": "DME Connect",
+    "connectFail": "connect failed."
   }
 }
