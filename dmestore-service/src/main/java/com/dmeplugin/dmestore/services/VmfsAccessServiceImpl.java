@@ -127,9 +127,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                             vmfsDataInfo.setDeviceId(storageId);
                                             vmfsDataInfo.setDevice(stoNameMap == null ? "" : stoNameMap.get(storageId));
 
-                                            if (vjson2 != null && vjson2.get("tuning") != null && !vjson2.get("tuning").isJsonNull()) {
+                                            if (vjson2 != null && !ToolUtils.jsonIsNull(vjson2.get("tuning"))) {
                                                 JsonObject tuning = vjson2.getAsJsonObject("tuning");
-                                                if (tuning != null && tuning.get("smartqos") != null && !tuning.get("smartqos").isJsonNull()) {
+                                                if (tuning != null && !ToolUtils.jsonIsNull(tuning.get("smartqos"))) {
                                                     JsonObject smartqos = tuning.getAsJsonObject("smartqos");
                                                     if (smartqos != null) {
                                                         vmfsDataInfo.setMaxIops(ToolUtils.jsonToInt(smartqos.get("maxiops"), null));

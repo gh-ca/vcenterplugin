@@ -174,5 +174,17 @@ public class ToolUtils {
         return true;
     }
 
+    public static boolean jsonIsNull(JsonElement obj) {
+        boolean re = false;
+        try {
+            if (StringUtils.isEmpty(obj) || obj.isJsonNull()) {
+                re = true;
+            }
+        } catch (Exception e) {
+            LOG.error("error:" + e.toString());
+        }
+        return re;
+    }
+
 
 }
