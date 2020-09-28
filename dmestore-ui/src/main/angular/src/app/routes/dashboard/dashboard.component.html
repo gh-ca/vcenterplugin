@@ -166,11 +166,11 @@
       <div class="clr-col-1"></div>
       <div class="clr-col-11">
         <div></div>
-        <div class="progress" *ngFor="let item of storeageTopN" [clrDgItem]="item">
+        <div class="progress-container" *ngFor="let item of storeageTopN" [clrDgItem]="item">
           <div class="progress-item">
             <div class="progress-label">{{item.name}}</div>
             <div class="progress-default">
-              <div class="progress" [ngStyle]="{'width':(item.utilization)+'%'}" [ngClass]="{'warning': (item.utilization) >= 70}"></div>
+              <div class="progress-inner" [ngStyle]="{'width':(item.utilization)+'%'}" [ngClass]="{'warning': (item.utilization) >= 70}"></div>
             </div>
             <div class="progress-text">
               <span class="percent">{{item.utilization}}% </span>
