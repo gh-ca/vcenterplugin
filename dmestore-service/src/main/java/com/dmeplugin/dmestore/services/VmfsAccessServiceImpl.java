@@ -750,11 +750,14 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //通过存储的objectid查询卷id
                 if (params.get("dataStoreObjectIds") != null) {
                     List<String> dataStoreObjectIds = (List<String>) params.get("dataStoreObjectIds");
+                    LOG.info("dataStoreObjectIds=="+dataStoreObjectIds);
                     if (dataStoreObjectIds != null && dataStoreObjectIds.size() > 0) {
                         List<String> volumeIds = new ArrayList<>();
                         List<String> dataStoreNames = new ArrayList<>();
                         for (String dsObjectId : dataStoreObjectIds) {
+                            LOG.info("dsObjectId=="+dsObjectId);
                             DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dsObjectId);
+                            LOG.info("getVolumeId=="+dvr.getVolumeId());
                             if (dvr != null) {
                                 volumeIds.add(dvr.getVolumeId());
                                 dataStoreNames.add(dvr.getStoreName());
