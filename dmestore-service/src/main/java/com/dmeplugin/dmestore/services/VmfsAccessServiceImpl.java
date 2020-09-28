@@ -55,7 +55,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private final String HOSTGROUP_UNMAPPING = "/rest/blockservice/v1/volumes/hostgroup-unmapping";
     private final String VOLUME_DELETE = "/rest/blockservice/v1/volumes/delete";
     private final String CREATE_VOLUME_URL = "/rest/blockservice/v1/volumes";
-    private final String CREATE_VOLUME_UNSERVICE_URL = "/rest/blockservice/v1/volumes";
+    private final String CREATE_VOLUME_UNSERVICE_URL = "/rest/blockservice/v1/volumes/customize-volumes";
     private final String MOUNT_VOLUME_TO_HOST_URL = "/rest/blockservice/v1/volumes/host-mapping";
     private final String MOUNT_VOLUME_TO_HOSTGROUP_URL = "/rest/blockservice/v1/volumes/hostgroup-mapping";
 
@@ -393,16 +393,20 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
                 Map<String, Object> smartqos = new HashMap<>();
                 smartqos.put("control_policy", ToolUtils.getStr(params.get("control_policy")));
-                smartqos.put("latency", ToolUtils.getInt(params.get("latency")));
-                smartqos.put("maxbandwidth", ToolUtils.getInt(params.get("maxbandwidth")));
-                smartqos.put("maxiops", ToolUtils.getInt(params.get("maxiops")));
-                smartqos.put("minbandwidth", ToolUtils.getInt(params.get("minbandwidth")));
-                smartqos.put("miniops", ToolUtils.getInt(params.get("miniops")));
+                smartqos.put("latency", ToolUtils.getInt(params.get("latency"),null));
+                smartqos.put("maxbandwidth", ToolUtils.getInt(params.get("maxbandwidth"),null));
+                smartqos.put("maxiops", ToolUtils.getInt(params.get("maxiops"),null));
+                smartqos.put("minbandwidth", ToolUtils.getInt(params.get("minbandwidth"),null));
+                smartqos.put("miniops", ToolUtils.getInt(params.get("miniops"),null));
                 smartqos.put("name", ToolUtils.getStr(params.get("qosname")));
-
-                tuning.put("smartqos", smartqos);
-
-                cv.put("tuning", tuning);
+                LOG.info("smartqos.size()=="+smartqos.size());
+                if(smartqos.size()>0) {
+                    tuning.put("smartqos", smartqos);
+                }
+                LOG.info("tuning.size()=="+tuning.size());
+                if(tuning.size()>0) {
+                    cv.put("tuning", tuning);
+                }
 
                 List<Map<String, Object>> volumeSpecs = new ArrayList<>();
                 Map<String, Object> vs = new HashMap<>();
@@ -422,7 +426,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     mapping.put("hostgroup_id", objhostid);
                 }
                 requestbody.put("mapping", mapping);
-                LOG.info("ByServiceLevel requestbody==" + gson.toJson(requestbody));
+                LOG.info("By UNServiceLevel requestbody==" + gson.toJson(requestbody));
 
 
                 LOG.info("create UNServiceLevel vmfs_url===" + CREATE_VOLUME_UNSERVICE_URL);
