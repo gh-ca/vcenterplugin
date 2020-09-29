@@ -583,7 +583,6 @@ public class VCSDKUtils {
             String serverguid = vcConnectionHelper.objectID2Serverguid(dataStoreObjectId);
             VmwareContext serverContext = vcConnectionHelper.getServerContext(serverguid);
             ManagedObjectReference dsmor = vcConnectionHelper.objectID2MOR(dataStoreObjectId);
-            //todo 测试需要生成使用
             //String objectId = vcConnectionHelper.MOR2ObjectID(dsMo.getMor(), dsMo.getContext().getServerAddress());
             DatastoreMO dsMo = new DatastoreMO(serverContext, dsmor);
             dsMo.renameDatastore(newName);

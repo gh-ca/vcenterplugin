@@ -204,22 +204,15 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     /** request params
      *  {
      *      String dataStoreObjectId 跳转用唯一id  必
-     *      String nfsShareName nfsShare的名字 必
+     *      String nfsShareName nfsShare的名字 （不能修改share的名字）
      *      String nfsName nfsDataStore名字 必
      *
      *      fs params:
      *      file_system_id String 文件系统唯一标识 必
      *      capacity_autonegotiation 自动扩缩容 相关属性{
-     *          capacity_self_adjusting_mode str  自动扩容触发门限百分比，默认85%。自动扩容触发门限百分比必须大于自动缩容触发门限百分比
-     *          capacity_recycle_mode str  容量回收模式。 expand_capacity：优先扩容；delete_snapshots：优先删除旧快照。默认优先扩容
      *          auto_size_enable  boolean 自动调整容量开关。 false: 关闭；true：打开。默认打开
-     *          auto_grow_threshold_percent int 自动扩容触发门限百分比，默认85%。自动扩容触发门限百分比必须大于自动缩容触发门限百分比
-     *          auto_shrink_threshold_percent int 自动缩容触发门限百分比，默认50%。自动扩容触发门限百分比必须大于自动缩容触发门限百分比,
-     *          max_auto_size double 自动扩容下限。单位GB。默认16777216GB。自动扩容上限必须大于等于自动缩容下限
-     *          min_auto_size double 自动缩容下限。单位GB。默认16777216GB。自动扩容上限必须大于等于自动缩容下限
-     *          auto_size_increment int 自动扩（缩）容单次变化量。单位MB。默认1GB
      *       },
-     *       name String fs新名字 (取消勾选可以没有)
+     *       name String fs新名字 ()
      *       tuning属性 （高级属性设置）{
      *             deduplication_enabled  boolean 重复数据删除。默认关闭
      *             compression_enabled  boolean 数据压缩。默认关闭
@@ -234,58 +227,51 @@ public class NfsOperationServiceImpl implements NfsOperationService {
      *             }
      *
      *       nfs share :
-     *       nfs_share_id string NFS共享的唯一标识 必  (id)
+     *       nfs_share_id string NFS共享的唯一标识 必  (id) 暂时不能确定是否需要，需要等dme能创建share时候才能确定是否需要修改share
      *  }
      *
-     * @param reqParams
+     * @param params
      * @return
      */
     @Override
-    public Map<String, Object> updateNfsDatastore(Map<String, Object> reqParams) {
+    public Map<String, Object> updateNfsDatastore(Map<String, Object> params) {
 
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 200);
         resMap.put("msg", "update nfs datastore success !");
 
-
-
-        if (reqParams == null || reqParams.size() == 0) {
-            LOG.error("params error , please check it! reqParams=" + reqParams);
+        if (params == null || params.size() == 0) {
+            LOG.error("params error , please check it! reqParams=" + params);
             resMap.put("code", 403);
             resMap.put("msg", "params error , please check it!");
             return resMap;
         }
-        Map<String,String> params = gson.fromJson(gson.toJson(reqParams), Map.class);
-        String dataStoreObjectId = params.get("dataStoreObjectId");
-        String nfsName = params.get("nfsName");
+        String dataStoreObjectId = (String) params.get("dataStoreObjectId");
+        String nfsName = (String) params.get("nfsName");
         if (StringUtils.isEmpty(dataStoreObjectId)||StringUtils.isEmpty(nfsName)) {
             LOG.error("params error , please check it! dataStoreObjectId=" + dataStoreObjectId);
             resMap.put("code", 403);
             resMap.put("msg", "params error , please check it!");
             return resMap;
         }
-
         //update fs
-        Map<String, String> fsReqBody = new HashMap<>();
-        String tuning = params.get("tuning");
-        String qos_policy = params.get("qos_policy");
-        Map<String, String> tuningMap = null;
-        if (!StringUtils.isEmpty(tuning)) {
-            if (!StringUtils.isEmpty(qos_policy)) {
-                tuningMap = gson.fromJson(tuning, Map.class);
-                tuningMap.put("qos_policy", qos_policy);
+        Map<String, Object> fsReqBody = new HashMap<>();
+        Map<String,Object> tuning = gson.fromJson(gson.toJson(params.get("tuning")), Map.class);
+        Map<String,Object> qos_policy = gson.fromJson(gson.toJson(params.get("qos_policy")), Map.class);
+        if (tuning!=null&&tuning.size()!=0) {
+            if (qos_policy!=null&&qos_policy.size()!=0) {
+                tuning.put("qos_policy", qos_policy);
             }
+            fsReqBody.put("tuning", gson.toJson(tuning));
         }
-        if (tuningMap != null) {
-            fsReqBody.put("tuning", gson.toJson(tuningMap));
-        }
-        String file_system_id = params.get("file_system_id");
-        String capacity_autonegotiation = params.get("capacity_autonegotiation");
-        String name = params.get("name");
+
+        String file_system_id = (String) params.get("file_system_id");
+        Boolean capacity_autonegotiation = (Boolean)params.get("capacity_autonegotiation");
+        String name = (String) params.get("name");
         if (!StringUtils.isEmpty(file_system_id)) {
             fsReqBody.put("file_system_id", file_system_id);
         }
-        if (!StringUtils.isEmpty(capacity_autonegotiation)) {
+        if (capacity_autonegotiation != null) {
             fsReqBody.put("capacity_autonegotiation", capacity_autonegotiation);
         }
         if (!StringUtils.isEmpty(name)) {
@@ -306,7 +292,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             if (result.equals("success")) {
                 LOG.info("{"+nfsName+"}rename nfs datastore success!");
             }
-            //todo update nfs share 没找到对应API
         } catch (Exception e) {
             LOG.error( "update nfs datastore error !",e);
             resMap.put("code", 503);
@@ -552,13 +537,13 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         return resMap;
     }
 
-    private Map<String,Object> updateFileSystem(Map<String,String> params) throws Exception {
+    private Map<String,Object> updateFileSystem(Map<String,Object> params) throws Exception {
 
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 202);
         resMap.put("msg", "update nfs datastore success !");
 
-        String file_system_id = params.get("file_system_id");
+        String file_system_id = (String) params.get("file_system_id");
         if (StringUtils.isEmpty(file_system_id)) {
             resMap.put("code", 403);
             resMap.put("msg", "update nfs datastore error !");
@@ -575,8 +560,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         }
         String object = responseEntity.getBody();
         JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-        String task_id = jsonObject.get("task_id").getAsString();
-        resMap.put("data", task_id);
+        resMap.put("data", ToolUtils.jsonToStr(jsonObject.get("task_id")));
         return resMap;
     }
 

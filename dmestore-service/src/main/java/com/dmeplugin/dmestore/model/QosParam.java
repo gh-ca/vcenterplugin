@@ -9,8 +9,7 @@ package com.dmeplugin.dmestore.model;
 public class QosParam {
 
     private Boolean enabled;
-    private QosPolicy qosPolicy;
-    private Integer latency;//responTime;
+    private Integer latency; //responTime;
     private String latencyUnit;//Unit of response time eg:ms s
     private Integer minBandWidth;
     private Integer minIOPS;
@@ -72,14 +71,6 @@ public class QosParam {
 
     public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
-    }
-
-    public QosPolicy getQosPolicy() {
-        return qosPolicy;
-    }
-
-    public void setQosPolicy(QosPolicy qosPolicy) {
-        this.qosPolicy = qosPolicy;
     }
 
     public SmartQos getSmartQos() {
