@@ -21,7 +21,7 @@ export class RdmComponent implements OnInit {
   configModel = new customize_volumes();
   storageDevices = [];
   storagePools = [];
-  levelCheck = 'level';
+  levelCheck = 'storage';
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
               private commonService: CommonService,

@@ -212,7 +212,6 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         resMap.put("msg", "recycle vmfsDatastore success !");
         try {
             String result = null;
-            VCSDKUtils vcsdkUtils = new VCSDKUtils();
             if (dsname != null && dsname.size() > 0) {
                 for (int i = 0; i < dsname.size(); i++) {
                     result = vcsdkUtils.recycleVmfsCapacity(dsname.get(i));
@@ -286,37 +285,37 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             JsonArray jsonArray = jsonObject.get("service-levels").getAsJsonArray();
             for (JsonElement jsonElement : jsonArray) {
                 JsonObject element = jsonElement.getAsJsonObject();
-                simpleServiceLevel.setId(element.get("id").getAsString());
-                simpleServiceLevel.setName(element.get("name").getAsString());
-                simpleServiceLevel.setDescription(element.get("description").getAsString());
-                simpleServiceLevel.setType(element.get("type").getAsString());
-                simpleServiceLevel.setProtocol(element.get("protocol").getAsString());
-                simpleServiceLevel.setTotal_capacity(Double.valueOf(element.get("total_capacity").getAsString()));
-                simpleServiceLevel.setFree_capacity(Double.valueOf(element.get("free_capacity").getAsString()));
-                simpleServiceLevel.setUsed_capacity(Double.valueOf(element.get("used_capacity").getAsString()));
+                simpleServiceLevel.setId(ToolUtils.jsonToStr(element.get("id")));
+                simpleServiceLevel.setName(ToolUtils.jsonToStr(element.get("name")));
+                simpleServiceLevel.setDescription(ToolUtils.jsonToStr(element.get("description")));
+                simpleServiceLevel.setType(ToolUtils.jsonToStr(element.get("type")));
+                simpleServiceLevel.setProtocol(ToolUtils.jsonToStr(element.get("protocol")));
+                simpleServiceLevel.setTotal_capacity(ToolUtils.jsonToDou(element.get("total_capacity"),0.0));
+                simpleServiceLevel.setFree_capacity(ToolUtils.jsonToDou(element.get("free_capacity"),0.0));
+                simpleServiceLevel.setUsed_capacity(ToolUtils.jsonToDou(element.get("used_capacity"),0.0));
 
                 SimpleCapabilities capability = new SimpleCapabilities();
                 JsonObject capabilities = element.get("capabilities").getAsJsonObject();
-                capability.setResource_type(capabilities.get("resource_type").getAsString());
-                capability.setCompression(Boolean.valueOf(capabilities.get("compression").getAsString()));
-                capability.setDeduplication(Boolean.valueOf(capabilities.get("deduplication").getAsString()));
+                capability.setResource_type(ToolUtils.jsonToStr(capabilities.get("resource_type")));
+                capability.setCompression(ToolUtils.jsonToBoo(capabilities.get("compression")));
+                capability.setDeduplication(ToolUtils.jsonToBoo(capabilities.get("deduplication")));
 
                 CapabilitiesSmarttier smarttier = new CapabilitiesSmarttier();
                 JsonObject smarttiers = capabilities.get("smarttier").getAsJsonObject();
-                smarttier.setPolicy(Integer.valueOf(smarttiers.get("policy").getAsString()));
-                smarttier.setEnabled(Boolean.valueOf(smarttiers.get("enabled").getAsString()));
+                smarttier.setPolicy(ToolUtils.jsonToInt(smarttiers.get("policy"),0));
+                smarttier.setEnabled(ToolUtils.jsonToBoo(smarttiers.get("enabled")));
                 capability.setSmarttier(smarttier);
 
                 QosParam qosParam = new QosParam();
                 JsonObject qos = capabilities.get("qos").getAsJsonObject();
-                qosParam.setEnabled(Boolean.valueOf(qos.get("enabled").getAsString()));
+                qosParam.setEnabled(ToolUtils.jsonToBoo(qos.get("enabled")));
 
                 SmartQos smartQos = new SmartQos();
                 JsonObject jsonObject1 = qos.get("qos_param").getAsJsonObject();
-                smartQos.setLatency(Integer.valueOf(jsonObject1.get("latency").getAsString()));
-                smartQos.setMinbandwidth(Integer.valueOf(jsonObject1.get("minBandWidth").getAsString()));
-                smartQos.setMiniops(Integer.valueOf(jsonObject1.get("minIOPS").getAsString()));
-                smartQos.setLatencyUnit(jsonObject1.get("latencyUnit").getAsString());
+                smartQos.setLatency(ToolUtils.jsonToInt(jsonObject1.get("latency"),0));
+                smartQos.setMinbandwidth(ToolUtils.jsonToInt(jsonObject1.get("minBandWidth"),0));
+                smartQos.setMiniops(ToolUtils.jsonToInt(jsonObject1.get("minIOPS"),0));
+                smartQos.setLatencyUnit(ToolUtils.jsonToStr(jsonObject1.get("latencyUnit")));
 
                 qosParam.setSmartQos(smartQos);
                 capability.setQosParam(qosParam);
@@ -356,7 +355,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             //int length = attachments.getAsString().length();
             for (JsonElement jsonElement : attachments) {
                 JsonObject element = jsonElement.getAsJsonObject();
-                String host_id = element.get("host_id").getAsString();
+                String host_id = ToolUtils.jsonToStr(element.get("host_id"));
                 if (!host_ids.contains(host_id)) {
                     host_ids.add(host_id);
                 }
@@ -392,7 +391,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             }
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-            String ip = jsonObject.get("ip").getAsString();
+            String ip = ToolUtils.jsonToStr(jsonObject.get("ip"));
             host_ips.add(ip);
         }
         resMap.put("host_ips", host_ips);
@@ -454,16 +453,16 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         String object = responseEntity.getBody();
         JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
         Storage storage = new Storage();
-        storage.setId(jsonObject.get("id").getAsString());
-        storage.setName(jsonObject.get("name").getAsString());
-        storage.setIp(jsonObject.get("ip").getAsString());
-        storage.setStatus(jsonObject.get("status").getAsString());
-        storage.setVendor(jsonObject.get("vendor").getAsString());
-        storage.setProduct_version(jsonObject.get("product_version").getAsString());
-        storage.setUsedCapacity(Double.valueOf(jsonObject.get("used_capacity").getAsString()));
-        storage.setTotalCapacity(Double.valueOf(jsonObject.get("total_capacity").getAsString()));
-        storage.setTotalEffectiveCapacity(Double.valueOf(jsonObject.get("total_effective_capacity").getAsString()));
-        storage.setFreeEffectiveCapacity(Double.valueOf(jsonObject.get("free_effective_capacity").getAsString()));
+        storage.setId(ToolUtils.jsonToStr(jsonObject.get("id")));
+        storage.setName(ToolUtils.jsonToStr(jsonObject.get("name")));
+        storage.setIp(ToolUtils.jsonToStr(jsonObject.get("ip")));
+        storage.setStatus(ToolUtils.jsonToStr(jsonObject.get("status")));
+        storage.setVendor(ToolUtils.jsonToStr(jsonObject.get("vendor")));
+        storage.setProduct_version(ToolUtils.jsonToStr(jsonObject.get("product_version")));
+        storage.setUsedCapacity(ToolUtils.jsonToDou(jsonObject.get("used_capacity"),0.0));
+        storage.setTotalCapacity(ToolUtils.jsonToDou(jsonObject.get("total_capacity"),0.0));
+        storage.setTotalEffectiveCapacity(ToolUtils.jsonToDou(jsonObject.get("total_effective_capacity"),0.0));
+        storage.setFreeEffectiveCapacity(ToolUtils.jsonToDou(jsonObject.get("free_effective_capacity"),0.0));
         //容量利用率
         resMap.put("data", storage);
         return resMap;

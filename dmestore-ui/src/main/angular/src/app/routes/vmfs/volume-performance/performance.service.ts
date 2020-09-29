@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import {ChartOptions} from "../../nfs/nfs.service";
 
 @Injectable()
 export class VmfsPerformanceService {
@@ -63,32 +64,32 @@ export class VmfsPerformanceService {
       y: 'top',    // 延Y轴居中
       x: 'right' // 居右显示
     },
-    // dataZoom: [
-    //   {   // 这个dataZoom组件，默认控制x轴。显示滑动框
-    //     type: 'slider', // 这个 dataZoom 组件是 slider 型 dataZoom 组件
-    //     xAxisIndex: 0, // x轴
-    //     start: 10,      // 左边在 10% 的位置。
-    //     end: 60         // 右边在 60% 的位置。
-    //   },
-    //   {   // 这个dataZoom组件，也控制x轴。 页面拖拽
-    //     type: 'inside', // 这个 dataZoom 组件是 inside 型 dataZoom 组件
-    //     xAxisIndex: 0, // x轴
-    //     start: 10,      // 左边在 10% 的位置。
-    //     end: 60         // 右边在 60% 的位置。
-    //   },
-    //   {
-    //     type: 'slider',
-    //     yAxisIndex: 0,
-    //     start: 10,
-    //     end: 80
-    //   },
-    //   {
-    //     type: 'inside',
-    //     yAxisIndex: 0,
-    //     start: 30,
-    //     end: 80
-    //   }
-    // ],
+    dataZoom: [
+      {   // 这个dataZoom组件，默认控制x轴。显示滑动框
+        type: 'slider', // 这个 dataZoom 组件是 slider 型 dataZoom 组件
+        xAxisIndex: 0, // x轴
+        start: 10,      // 左边在 10% 的位置。
+        end: 60         // 右边在 60% 的位置。
+      },
+      {   // 这个dataZoom组件，也控制x轴。 页面拖拽
+        type: 'inside', // 这个 dataZoom 组件是 inside 型 dataZoom 组件
+        xAxisIndex: 0, // x轴
+        start: 10,      // 左边在 10% 的位置。
+        end: 60         // 右边在 60% 的位置。
+      },
+      {
+        type: 'slider',
+        yAxisIndex: 0,
+        start: 10,
+        end: 80
+      },
+      {
+        type: 'inside',
+        yAxisIndex: 0,
+        start: 30,
+        end: 80
+      }
+    ],
     series: [
       {
         name: 'Upper Limit',
@@ -217,21 +218,18 @@ export class VmfsPerformanceService {
     message: '',
     data: []
   };
+
   getIopsChart(title: string, subtext: string, objTypeId: string, indicatorIds: any[], objIds: any[], intervalParam: string, rangeParam: string, beginTime: number, endTime: number) {
     // this.iopsChart = 对象ID（卷ID）、指标ID（IOPSID）、range范围 只传
     return new Promise((resolve, reject) => {
-      this.http.post('datastorestatistichistrory/vmfsvolume', {/*obj_type_id: objTypeId,*/
+      this.http.post('datastorestatistichistrory/vmfs', {/*obj_type_id: objTypeId,*/
         indicator_ids: indicatorIds, // 指标
         obj_ids: objIds,
-        interval: intervalParam,
-        range: rangeParam,
-        begin_time: beginTime,
-        end_time: endTime })
+        range: rangeParam })
         .subscribe((response: any) => {
           if (response.code === '200' && response.data !== null) {
-            this.resData =  response.data.data;
-            // 设置x轴
-            this.setXAxisData(rangeParam, beginTime, endTime, intervalParam);
+            this.resData =  response.data;
+
             // 上限对象
             const upperData = this.resData[objIds[0]][indicatorIds[0]];
             console.log('upperData')
@@ -258,6 +256,8 @@ export class VmfsPerformanceService {
             // 上、下限数据
             const uppers: any[] = upperData.series;
             const lower: any[] = lowerData.series;
+            // 设置x轴
+            this.setXAxisData2(uppers, this.iopsChart);
             // 设置标题
             this.iopsChart.title.text = title;
             // 设置副标题
@@ -289,6 +289,18 @@ export class VmfsPerformanceService {
         }, err => {
           console.error('ERROR', err);
         });
+    });
+  }
+
+  setXAxisData2(data: any[], chart:any) {
+    console.log('data', data);
+    data.forEach(item => {
+      for (const key of Object.keys(item)) {
+        let numKey = + key;
+        const date = new Date(numKey);
+        const dateStr = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDay() + ' ' + date.getHours() + ':' + date.getMinutes();
+        chart.xAxis.data.push(dateStr);
+      }
     });
   }
   setXAxisData(rangeParam: string, beginTime: number, endTime: number, intervalParam: string) {

@@ -672,8 +672,6 @@ public class VCSDKUtils {
 
         String result = "success";
         List<String> uuids = new ArrayList<>();
-
-        //VCConnectionHelper vcConnectionHelper = new SpringBootConnectionHelper();
         try {
             ManagedObjectReference mor = null;
             VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
