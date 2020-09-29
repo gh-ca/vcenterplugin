@@ -1,6 +1,5 @@
 package com.dmeplugin.dmestore.utils;
 
-import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.vmware.SpringBootConnectionHelper;
 import com.dmeplugin.vmware.VCConnectionHelper;
@@ -26,6 +25,7 @@ import com.vmware.vim25.InvalidArgumentFaultMsg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
+import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 
 import java.net.URI;
 import java.net.URISyntaxException;
