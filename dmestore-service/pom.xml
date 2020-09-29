@@ -261,6 +261,61 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/commons-logging.jar</systemPath>
         </dependency>
+
+
+
+        <dependency>
+            <groupId>com.vmware</groupId>
+            <artifactId>vmvmodl</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/extlib/vimVmodl.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.vmware</groupId>
+            <artifactId>reflectVmodl</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/extlib/reflectVmodl.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.vmware</groupId>
+            <artifactId>vlsiCore</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/extlib/vlsiCore.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.vmware</groupId>
+            <artifactId>vlsiClient</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/extlib/vlsiClient.jar</systemPath>
+        </dependency>
+
+
+
+        <dependency>
+            <groupId>com.vmware</groupId>
+            <artifactId>queryVmodl</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/extlib/queryVmodl.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.vmware</groupId>
+            <artifactId>wood</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/extlib/woodstox-core-asl-4.0.5.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.vmware</groupId>
+            <artifactId>stax2</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/extlib/stax2-api-3.0.1.jar</systemPath>
+        </dependency>
     </dependencies>
     <build>
         <finalName>dmestore-service</finalName>
