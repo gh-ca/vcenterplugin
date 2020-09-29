@@ -302,9 +302,9 @@
           <!-- 1、选择 服务等级-->
           <ng-container *ngIf="levelCheck==='level'">
             <clr-accordion>
-              <clr-accordion-panel *ngFor="let item of serviceLevelList">
-                <clr-accordion-title>{{item.name}}</clr-accordion-title>
-                <clr-accordion-content (click)="serviceLevelClickHandel(item.id, item.name);" class="blueBg" *clrIfExpanded>
+              <clr-accordion-panel *ngFor="let item of serviceLevelList;">
+                <clr-accordion-title style="height: 50px; line-height: 50px;color: #333;font-size:16px;">{{item.name}}</clr-accordion-title>
+                <clr-accordion-content (click)="serviceLevelClickHandel(item.id, item.name);" style="background-color: #03A9F4" *clrIfExpanded>
                   <table class="table table-vertical table-noborder table-compact">
                       <tbody>
                         <tr>
@@ -322,17 +322,18 @@
                       <tr>
                         <th hidden></th>
                         <th><clr-progress-bar clrValue="{{(item.used_capacity/item.total_capacity * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
-                        <th *ngIf="item.simpleCapabilities.qosParam.smartQos.maxiops != null">IOPS <= {{item.simpleCapabilities.qosParam.smartQos.maxiops}}</th>
-                        <th *ngIf="item.simpleCapabilities.qosParam.smartQos.miniops != null">IOPS >= {{item.simpleCapabilities.qosParam.smartQos.miniops}}</th>
+                        <th *ngIf="item.capabilities.qos.smartQos.maxiops != null">IOPS <= {{item.capabilities.qos.smartQos.maxiops}}</th>
+                        <th *ngIf="item.capabilities.qos.smartQos.miniops != null">IOPS >= {{item.capabilities.qos.smartQos.miniops}}</th>
                       </tr>
                         <tr>
                           <th hidden></th>
                           <th>{{item.used_capacity}} GB/{{item.total_capacity}}GB</th>
-                          <th>Latency: {{item.simpleCapabilities.qosParam.smartQos.latency + item.simpleCapabilities.qosParam.smartQos.latencyUnit}}</th>
+                          <th>Latency: {{item.capabilities.qos.smartQos.latency + item.capabilities.qos.smartQos.latencyUnit}}</th>
                         </tr>
                       </tbody>
                   </table>
                 </clr-accordion-content>
+                <img height="30px" src="../../../../assets/images/selectDown.svg" style="position: relative;margin-left: 100%;bottom: 0px;" width="30px">
               </clr-accordion-panel>
             </clr-accordion>
           </ng-container>
@@ -447,7 +448,7 @@
     </clr-wizard-page>
   </clr-wizard>
   <!-- 编辑页面 -->
-  <clr-modal [(clrModalOpen)]="modifyShow">
+  <clr-modal [(clrModalOpen)]="modifyShow" [clrModalSize]="'lg'">
     <h3 class="modal-title">{{'menu.edit' | translate}}</h3>
 
     <div class="modal-body">
@@ -609,7 +610,7 @@
     </div>
   </clr-modal>
   <!--卸载-->
-  <clr-modal [(clrModalOpen)]="unmountShow" [clrModalSize]="'sm'">
+  <clr-modal [(clrModalOpen)]="unmountShow" [clrModalSize]="'lg'">
     <h3 class="modal-title">{{'vmfs.unmount.title' | translate}}</h3>
     <div class="modal-body">
       <clr-datagrid [(clrDgSelected)]="chooseUnmountDevice" [clrDgLoading]="isLoading">
@@ -640,7 +641,7 @@
     </div>
   </clr-modal>
   <!--变更服务等级-->
-  <clr-modal [(clrModalOpen)]="changeServiceLevelShow">
+  <clr-modal [(clrModalOpen)]="changeServiceLevelShow" [clrModalSize]="'xl'">
     <h3 class="modal-title">{{'vmfs.changeServiceLevel' | translate}}</h3>
     <div class="modal-body">
       <form *ngIf="rowSelected.length === 1" clrForm #formPageOne="ngForm">
@@ -667,17 +668,18 @@
                   <tr>
                     <th hidden></th>
                     <th><clr-progress-bar clrValue="{{(item.used_capacity/item.total_capacity * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
-                    <th *ngIf="item.simpleCapabilities.qosParam.qosPolicy.maxiops != null">IOPS <= {{item.simpleCapabilities.qosParam.qosPolicy.max_iops}}</th>
-                    <th *ngIf="item.simpleCapabilities.qosParam.qosPolicy.miniops != null">IOPS >= {{item.simpleCapabilities.qosParam.qosPolicy.min_iops}}</th>
+                    <th *ngIf="item.capabilities.qos.smartQos.maxiops != null">IOPS <= {{item.capabilities.qos.smartQos.maxiops}}</th>
+                    <th *ngIf="item.capabilities.qos.smartQos.miniops != null">IOPS >= {{item.capabilities.qos.smartQos.miniops}}</th>
                   </tr>
                   <tr>
                     <th hidden></th>
                     <th>{{item.used_capacity}} GB/{{item.total_capacity}}GB</th>
-                    <th>Latency: {{item.simpleCapabilities.qosParam.qosPolicy.latency + item.simpleCapabilities.qosParam.qosPolicy.latencyUnit}}</th>
+                    <th>Latency: {{item.capabilities.qos.smartQos.latency + item.capabilities.qos.smartQos.latencyUnit}}</th>
                   </tr>
                   </tbody>
                 </table>
               </clr-accordion-content>
+              <img height="30px" src="../../../../assets/images/selectDown.svg" style="position: relative;margin-left: 100%;bottom: 0px;" width="30px">
             </clr-accordion-panel>
           </clr-accordion>
         </ng-container>
@@ -689,7 +691,7 @@
     </div>
   </clr-modal>
   <!--扩容-->
-  <clr-modal [(clrModalOpen)]="expandShow">
+  <clr-modal [(clrModalOpen)]="expandShow" [clrModalSize]="'lg'">
     <h3 class="modal-title">{{'menu.expand' | translate}}</h3>
     <div class="modal-body">
       <!--名称-->

@@ -325,14 +325,16 @@ export class MakePerformance {
    * @param range 时间段 LAST_5_MINUTE LAST_1_HOUR LAST_1_DAY LAST_1_WEEK LAST_1_MONTH LAST_1_QUARTER HALF_1_YEAR LAST_1_YEAR BEGIN_END_TIME INVALID
    * @param url 请求url
    */
-  setChart(height: number, title: string, subtext: string, indicatorIds: any[], objIds: any[], range: string, url: string) {
+  setChart(height: number, title: string, subtext: string, indicatorIds: any[], objIds: any[], range: string, url: string, startTime:string, endTime:string) {
     // 生成chart optiond对象
     const chart:ChartOptions = this.getNewChart(height, title, subtext);
     return new Promise((resolve, reject) => {
       const params = {
-        indicator_ids: indicatorIds, // 指标
-        obj_ids: objIds, // 指标
-        range: range, // 指标
+        indicator_ids: indicatorIds,
+        obj_ids: objIds,
+        range: range,
+        begin_time: startTime,
+        end_time: endTime,
       }
       this.remoteSrv.getLineChartData(url, params).subscribe((result: any) => {
         console.log('chartData: ', result);
