@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.utils;
 
+import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.vmware.SpringBootConnectionHelper;
 import com.dmeplugin.vmware.VCConnectionHelper;
 import com.dmeplugin.vmware.autosdk.SessionHelper;
@@ -722,8 +723,7 @@ public class VCSDKUtils {
         try {
             VmwareContext vmwareContext = null;
             ManagedObjectReference managedObjectReference = null;
-            List<Map<String, String>> nfsDatastoreInfos = new ArrayList<>();
-            Map<String, String> nfsDatastoreInfo = new HashMap<>();
+            DmeVmwareRelation dmeVmwareRelation = new DmeVmwareRelation();
             if (hostObjectIds != null && hostObjectIds.size()!= 0) {
                 for (Map<String, String> hosts : hostObjectIds) {
                     for (Map.Entry<String, String> host : hosts.entrySet()) {
@@ -735,19 +735,16 @@ public class VCSDKUtils {
                             HostDatastoreSystemMO hostDatastoreSystemMO = hostMO.getHostDatastoreSystemMO();
                             hostDatastoreSystemMO.createNfsDatastore(serverHost, 0, exportPath, nfsName, accessMode, type);
                             String datastoreObjectId = vcConnectionHelper.MOR2ObjectID(managedObjectReference, serverguid);
-                            nfsDatastoreInfo.put("datastoreObjectId", datastoreObjectId);
-                            nfsDatastoreInfo.put("nfsName", nfsName);
-                            nfsDatastoreInfo.put("serverHost", serverHost);
-                            nfsDatastoreInfo.put("exportPath", exportPath);
-                            nfsDatastoreInfo.put("type", type);
-                            nfsDatastoreInfos.add(nfsDatastoreInfo);
+                            dmeVmwareRelation.setStoreId(datastoreObjectId);
+                            dmeVmwareRelation.setStoreName(nfsName);
+                            dmeVmwareRelation.setStoreType(ToolUtils.STORE_TYPE_NFS);
                         } else {
                             response = "failed";
                             _logger.error("can not find target host!");
                         }
                     }
                 }
-                response = gson.toJson(nfsDatastoreInfos);
+                response = gson.toJson(dmeVmwareRelation);
             } else {
                 response = "failed";
                 _logger.error("{createNfsDatastore/createnfsdatastore} params error:hostObjectIds{"+hostObjectIds+"}");
