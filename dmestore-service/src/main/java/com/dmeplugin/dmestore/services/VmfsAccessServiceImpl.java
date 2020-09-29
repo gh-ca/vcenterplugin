@@ -974,20 +974,20 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             String vmfsDatastoreUrl = vmfsDatastore.get("url").getAsString();
             String vmfsDatastoreId = vmfsDatastore.get("objectid").getAsString();
             String vmfsDatastoreName = vmfsDatastore.get("name").getAsString();
-            //拆分wwn TODO
-            String wwn = vmfsDatastoreUrl.split("volumes/")[1];
-            int index = wwn.indexOf("/");
-            if(index != -1){
-                wwn = wwn.substring(0, index);
-            }
+
             //根据wwn从DME中查询卷信息
-            String volumeUrlByWwn = LIST_VOLUME_URL + "?volume_wwn=" + wwn;
+            //String volumeUrlByWwn = LIST_VOLUME_URL + "?volume_wwn=" + wwn;
+            //暂时通过name来查询 TODO
+            String volumeUrlByWwn = LIST_VOLUME_URL + "?name=" + vmfsDatastoreName;
             ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByWwn, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() / 100 != 2) {
                 LOG.info(" Query DME volume failed! errorMsg:{}", responseEntity.toString());
                 continue;
             }
             JsonObject jsonObject = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+            if(jsonObject.getAsJsonArray("volumes").size() == 0){
+                continue;
+            }
             JsonObject volume = jsonObject.getAsJsonArray("volumes").get(0).getAsJsonObject();
             String volumeId = volume.get("id").getAsString();
             String volumeName = volume.get("name").getAsString();
