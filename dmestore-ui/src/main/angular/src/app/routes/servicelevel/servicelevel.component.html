@@ -65,12 +65,12 @@
           <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
                                             && item.capabilities.qos.enabled == true
                                             && item.capabilities.qos.qosParam.minIOPS != undefined">
-            IOPS >= {{item.capabilities.qos.qosParam.minIOPS}} IOPS/GB
+            IOPS >= {{item.capabilities.qos.qosParam.minIOPS}} IOPS/TB
           </span>
           <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
                                             && item.capabilities.qos.enabled == true
                                             && item.capabilities.qos.qosParam.maxIOPS != undefined">
-            IOPS <= {{item.capabilities.qos.qosParam.maxIOPS}} IOPS/GB
+            IOPS <= {{item.capabilities.qos.qosParam.maxIOPS}} IOPS/TB
           </span>
         </div>
       </div>
@@ -156,19 +156,19 @@
             </div>
             <div class="gh-info-item clr-col-4" *ngIf="selectedModel.capabilities.qos != undefined && selectedModel.capabilities.qos.qosParam.maxBandWidth != undefined">
               <span class="gh-info-lable">BandWidth</span>
-              <span class="gh-info-value"> <= {{selectedModel.capabilities.qos.qosParam.maxBandWidth}} MBPS/GB</span>
+              <span class="gh-info-value"> <= {{selectedModel.capabilities.qos.qosParam.maxBandWidth}} MBPS/TB</span>
             </div>
             <div class="gh-info-item clr-col-4" *ngIf="selectedModel.capabilities.qos != undefined && selectedModel.capabilities.qos.qosParam.minBandWidth != undefined">
               <span class="gh-info-lable">BandWidth</span>
-              <span class="gh-info-value"> >= {{selectedModel.capabilities.qos.qosParam.minBandWidth}} MBPS/GB</span>
+              <span class="gh-info-value"> >= {{selectedModel.capabilities.qos.qosParam.minBandWidth}} MBPS/TB</span>
             </div>
             <div class="gh-info-item clr-col-4" *ngIf="selectedModel.capabilities.qos != undefined && selectedModel.capabilities.qos.qosParam.maxIOPS != undefined">
               <span class="gh-info-lable">IOPS</span>
-              <span class="gh-info-value"> <= {{selectedModel.capabilities.qos.qosParam.maxIOPS}} IOPS/GB</span>
+              <span class="gh-info-value"> <= {{selectedModel.capabilities.qos.qosParam.maxIOPS}} IOPS/TB</span>
             </div>
             <div class="gh-info-item clr-col-4" *ngIf="selectedModel.capabilities.qos != undefined && selectedModel.capabilities.qos.qosParam.minIOPS != undefined">
               <span class="gh-info-lable">IOPS</span>
-              <span class="gh-info-value"> >= {{selectedModel.capabilities.qos.qosParam.minIOPS}} IOPS/GB</span>
+              <span class="gh-info-value"> >= {{selectedModel.capabilities.qos.qosParam.minIOPS}} IOPS/TB</span>
             </div>
           </div>
           <!-- 基础信息展示 -->
@@ -185,19 +185,15 @@
             </div>
             <div class="gh-info-item clr-col-4">
               <span class="gh-info-lable">Deduplication</span>
-              <span class="gh-info-value" *ngIf="selectedModel.capabilities.deduplication == undefined
-                                                || selectedModel.capabilities.deduplication == 'default_type'">--</span>
-              <span class="gh-info-value" *ngIf="selectedModel.capabilities.deduplication != undefined
-                                                && selectedModel.capabilities.deduplication != 'default_type'">
+              <span class="gh-info-value" *ngIf="selectedModel.capabilities.deduplication == undefined">--</span>
+              <span class="gh-info-value" *ngIf="selectedModel.capabilities.deduplication != undefined">
                 {{selectedModel.capabilities.deduplication}}
               </span>
             </div>
             <div class="gh-info-item clr-col-4">
               <span class="gh-info-lable">Compression</span>
-              <span class="gh-info-value" *ngIf="selectedModel.capabilities.compression == undefined
-                                                || selectedModel.capabilities.compression == 'default_type'">--</span>
-              <span class="gh-info-value" *ngIf="selectedModel.capabilities.compression != undefined
-                                                && selectedModel.capabilities.compression != 'default_type'">
+              <span class="gh-info-value" *ngIf="selectedModel.capabilities.compression == undefined">--</span>
+              <span class="gh-info-value" *ngIf="selectedModel.capabilities.compression != undefined">
                 {{selectedModel.capabilities.compression}}
               </span>
             </div>
