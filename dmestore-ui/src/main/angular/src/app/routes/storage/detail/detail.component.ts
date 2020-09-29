@@ -12,6 +12,11 @@ import {ActivatedRoute} from "@angular/router";
   providers: [DetailService, VmfsPerformanceService],
 })
 export class DetailComponent implements OnInit, AfterViewInit {
+
+
+
+
+
   options = {
     tooltip: {
       trigger: 'item',
@@ -302,6 +307,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   detail: StorageDetail;
   storagePool: StoragePool[];
   volumes: Volume[];
+  volumeSelect = [];
   fsList: FileSystem[];
   dtrees: Dtrees[];
   shares: NfsShare[];
@@ -506,6 +512,15 @@ export class DetailComponent implements OnInit, AfterViewInit {
           }
         });
       }
+    }
+  }
+  formatCapacity(c: number){
+    if (c < 1024){
+      return c.toFixed(3)+" GB";
+    }else if(c >= 1024 && c< 1048576){
+      return (c/1024).toFixed(3) +" TB";
+    }else if(c>= 1048576){
+      return (c/1024/1024).toFixed(3)+" PB"
     }
   }
 }
