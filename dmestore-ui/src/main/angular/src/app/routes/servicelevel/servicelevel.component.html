@@ -33,43 +33,44 @@
       <div>
         <div class="gh-info-item">
           <span class="gh-info-lable">Total Capacity</span>
-          <span class="gh-info-value">{{item.total_capacity}} TB</span>
+          <span class="gh-info-value">{{item.total_capacity}} GB</span>
         </div>
         <div class="gh-info-item">
           <span class="gh-info-lable">Free Capacity</span>
-          <span class="gh-info-value">{{item.free_capacity}} TB</span>
+          <span class="gh-info-value">{{item.free_capacity}} GB</span>
         </div>
         <div class="gh-info-item">
           <span class="gh-info-lable">Qos Policy</span>
+          <span class="gh-info-value" *ngIf="item.capabilities.qos == undefined">--</span>
           <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
                                             && item.capabilities.qos.enabled == true
-                                            && item.capabilities.qos.qos_param.latency != undefined">
-            Latency = {{item.capabilities.qos.qos_param.latency}} {{item.capabilities.qos.qos_param.latencyUnit}}</span>
+                                            && item.capabilities.qos.qosParam.latency != undefined">
+            Latency = {{item.capabilities.qos.qosParam.latency}} {{item.capabilities.qos.qosParam.latencyUnit}}</span>
         </div>
         <div class="gh-info-item">
           <span class="gh-info-lable"></span>
           <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
                                             && item.capabilities.qos.enabled == true
-                                            && item.capabilities.qos.qos_param.minBandWidth != undefined">
-            Bandwidth >= {{item.capabilities.qos.qos_param.minBandWidth}} Mbps/s
+                                            && item.capabilities.qos.qosParam.minBandWidth != undefined">
+            Bandwidth >= {{item.capabilities.qos.qosParam.minBandWidth}} Mbps/s
           </span>
           <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
                                             && item.capabilities.qos.enabled == true
-                                            && item.capabilities.qos.qos_param.maxBandWidth != undefined">
-            Bandwidth <= {{item.capabilities.qos.qos_param.maxBandWidth}} Mbps/s
+                                            && item.capabilities.qos.qosParam.maxBandWidth != undefined">
+            Bandwidth <= {{item.capabilities.qos.qosParam.maxBandWidth}} Mbps/s
           </span>
         </div>
         <div class="gh-info-item">
           <span class="gh-info-lable"></span>
           <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
                                             && item.capabilities.qos.enabled == true
-                                            && item.capabilities.qos.qos_param.minIOPS != undefined">
-            IOPS >= {{item.capabilities.qos.qos_param.minIOPS}} IOPS/TB
+                                            && item.capabilities.qos.qosParam.minIOPS != undefined">
+            IOPS >= {{item.capabilities.qos.qosParam.minIOPS}} IOPS/GB
           </span>
           <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
                                             && item.capabilities.qos.enabled == true
-                                            && item.capabilities.qos.qos_param.maxIOPS != undefined">
-            IOPS <= {{item.capabilities.qos.qos_param.maxIOPS}} IOPS/TB
+                                            && item.capabilities.qos.qosParam.maxIOPS != undefined">
+            IOPS <= {{item.capabilities.qos.qosParam.maxIOPS}} IOPS/GB
           </span>
         </div>
       </div>
@@ -99,15 +100,15 @@
             </div>
             <div class="gh-info-item clr-col-4">
               <span class="gh-info-lable">Total Capacity</span>
-              <span class="gh-info-value">{{selectedModel.total_capacity}} TB</span>
+              <span class="gh-info-value">{{selectedModel.total_capacity}} GB</span>
             </div>
             <div class="gh-info-item clr-col-4">
               <span class="gh-info-lable">Free Capacity</span>
-              <span class="gh-info-value">{{selectedModel.free_capacity}} TB</span>
+              <span class="gh-info-value">{{selectedModel.free_capacity}} GB</span>
             </div>
             <div class="gh-info-item clr-col-4">
               <span class="gh-info-lable">Used Capacity</span>
-              <span class="gh-info-value">{{selectedModel.used_capacity}} TB</span>
+              <span class="gh-info-value">{{selectedModel.used_capacity}} GB</span>
             </div>
             <div class="gh-info-item clr-col-4">
               <span class="gh-info-lable">Capacity Usage</span>
@@ -139,12 +140,12 @@
               <span class="gh-info-lable">Control Policy</span>
               <span class="gh-info-value" *ngIf="selectedModel.capabilities.qos != undefined
                                             && selectedModel.capabilities.qos.enabled == true">
-                     <span *ngIf="selectedModel.capabilities.qos.qos_param.maxBandWidth != undefined
-                                  && selectedModel.capabilities.qos.qos_param.maxIOPS != undefined">
+                     <span *ngIf="selectedModel.capabilities.qos.qosParam.maxBandWidth != undefined
+                                  && selectedModel.capabilities.qos.qosParam.maxIOPS != undefined">
                        Upper limit Control
                      </span>
-                     <span *ngIf="selectedModel.capabilities.qos.qos_param.minBandWidth != undefined
-                                  && selectedModel.capabilities.qos.qos_param.minIOPS != undefined">
+                     <span *ngIf="selectedModel.capabilities.qos.qosParam.minBandWidth != undefined
+                                  && selectedModel.capabilities.qos.qosParam.minIOPS != undefined ">
                        Lower limit Control
                      </span>
               </span>
@@ -153,21 +154,21 @@
                      --
               </span>
             </div>
-            <div class="gh-info-item clr-col-4" *ngIf="selectedModel.capabilities.qos.qos_param.maxBandWidth != undefined">
+            <div class="gh-info-item clr-col-4" *ngIf="selectedModel.capabilities.qos != undefined && selectedModel.capabilities.qos.qosParam.maxBandWidth != undefined">
               <span class="gh-info-lable">BandWidth</span>
-              <span class="gh-info-value"> <= {{selectedModel.capabilities.qos.qos_param.maxBandWidth}} MBPS/TB</span>
+              <span class="gh-info-value"> <= {{selectedModel.capabilities.qos.qosParam.maxBandWidth}} MBPS/GB</span>
             </div>
-            <div class="gh-info-item clr-col-4" *ngIf="selectedModel.capabilities.qos.qos_param.minBandWidth != undefined">
+            <div class="gh-info-item clr-col-4" *ngIf="selectedModel.capabilities.qos != undefined && selectedModel.capabilities.qos.qosParam.minBandWidth != undefined">
               <span class="gh-info-lable">BandWidth</span>
-              <span class="gh-info-value"> >= {{selectedModel.capabilities.qos.qos_param.minBandWidth}} MBPS/TB</span>
+              <span class="gh-info-value"> >= {{selectedModel.capabilities.qos.qosParam.minBandWidth}} MBPS/GB</span>
             </div>
-            <div class="gh-info-item clr-col-4" *ngIf="selectedModel.capabilities.qos.qos_param.maxIOPS != undefined">
+            <div class="gh-info-item clr-col-4" *ngIf="selectedModel.capabilities.qos != undefined && selectedModel.capabilities.qos.qosParam.maxIOPS != undefined">
               <span class="gh-info-lable">IOPS</span>
-              <span class="gh-info-value"> <= {{selectedModel.capabilities.qos.qos_param.maxIOPS}} IOPS/TB</span>
+              <span class="gh-info-value"> <= {{selectedModel.capabilities.qos.qosParam.maxIOPS}} IOPS/GB</span>
             </div>
-            <div class="gh-info-item clr-col-4" *ngIf="selectedModel.capabilities.qos.qos_param.minIOPS != undefined">
+            <div class="gh-info-item clr-col-4" *ngIf="selectedModel.capabilities.qos != undefined && selectedModel.capabilities.qos.qosParam.minIOPS != undefined">
               <span class="gh-info-lable">IOPS</span>
-              <span class="gh-info-value"> >= {{selectedModel.capabilities.qos.qos_param.minIOPS}} IOPS/TB</span>
+              <span class="gh-info-value"> >= {{selectedModel.capabilities.qos.qosParam.minIOPS}} IOPS/GB</span>
             </div>
           </div>
           <!-- 基础信息展示 -->
@@ -222,10 +223,10 @@
             </div>
           </div>
           <!-- 基础信息展示 -->
-          <div class="gh-info-head">Threshold Setting</div>
+          <!--<div class="gh-info-head">Threshold Setting</div>
           <div class="gh-info-wrap clr-row">
              //
-          </div>
+          </div>-->
         </clr-tab-content>
       </clr-tab>
       <clr-tab>
@@ -288,12 +289,12 @@
                 </ng-container>
 
                 <ng-container *ngIf="storagePoolRadioCheck==='capacity'">
-                  <clr-dg-cell>{{item.totalCapacity}} TB</clr-dg-cell>
-                  <clr-dg-cell>{{item.usedCapacity}} TB</clr-dg-cell>
+                  <clr-dg-cell>{{item.totalCapacity}} GB</clr-dg-cell>
+                  <clr-dg-cell>{{item.usedCapacity}} GB</clr-dg-cell>
                   <clr-dg-cell>
                     <clr-progress-bar clrValue="{{item.capacityUsage}}" clrSuccess clrLabeled></clr-progress-bar>
                   </clr-dg-cell>
-                  <clr-dg-cell>{{item.freeCapacity}} TB</clr-dg-cell>
+                  <clr-dg-cell>{{item.freeCapacity}} GB</clr-dg-cell>
                 </ng-container>
 
                 <ng-container *ngIf="storagePoolRadioCheck==='performance'">

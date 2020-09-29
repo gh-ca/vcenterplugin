@@ -88,7 +88,7 @@ export class RdmComponent implements OnInit {
   }
 
   loadHosts(){
-    this.http.get('accessvmware/listhost').subscribe((result: any) => {
+    this.http.get('v1/vmrdm/dmeHosts').subscribe((result: any) => {
       console.log(result);
       if (result.code === '0' || result.code === '200'){
         this.hostList = result.data;

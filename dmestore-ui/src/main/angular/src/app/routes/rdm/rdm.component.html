@@ -100,8 +100,8 @@
         <label>{{'rdm.host' | translate}}<span style="color: red">*</span></label>
         <clr-combobox [(ngModel)]="hostSelected" name="host_id">
           <clr-options>
-            <clr-option *clrOptionItems="let item of hostList;field:'hostName'" [clrValue]="item">
-              {{item.hostName}}
+            <clr-option *clrOptionItems="let item of hostList;field:'name'" [clrValue]="item">
+              {{item.ip}}({{item.name}})
             </clr-option>
           </clr-options>
         </clr-combobox>
