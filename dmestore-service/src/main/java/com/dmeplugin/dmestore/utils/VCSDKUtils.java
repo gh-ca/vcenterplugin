@@ -2187,10 +2187,11 @@ public class VCSDKUtils {
                         System.out.println("11xx==" + new String(soapResult.getResponse().getBytes("ISO-8859-1"), "UTF-8"));
                         _logger.info(mgmtIp+"====true");
                         ethPort.put("connectStatus","true");
-                        reEthPorts.add(ethPort);
                     } catch (Exception e) {
+                        ethPort.put("connectStatus","false");
                         _logger.info(mgmtIp+"===="+e.toString());
                     }
+                    reEthPorts.add(ethPort);
                 }
             }
 
