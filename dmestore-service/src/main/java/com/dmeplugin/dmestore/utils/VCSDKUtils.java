@@ -1735,12 +1735,14 @@ public class VCSDKUtils {
         for (PbmProfile profile : pbmProfiles) {
             pbmProfileIds.add(profile.getProfileId());
         }
-        PbmServiceInstanceContent spbmsc;
-        // Get PBM Profile Manager & Associated Capability Metadata
-        spbmsc = vmwareContext.getPbmServiceContent();
-        ManagedObjectReference profileMgr = spbmsc.getProfileManager();
-        vmwareContext.getPbmService().pbmDelete(profileMgr,
-                pbmProfileIds);
+        if (pbmProfileIds.size()>0) {
+            PbmServiceInstanceContent spbmsc;
+            // Get PBM Profile Manager & Associated Capability Metadata
+            spbmsc = vmwareContext.getPbmServiceContent();
+            ManagedObjectReference profileMgr = spbmsc.getProfileManager();
+            vmwareContext.getPbmService().pbmDelete(profileMgr,
+                    pbmProfileIds);
+        }
     }
 
     public void removePbmProfileInAllContext(List<PbmProfile> pbmProfiles) {
@@ -1751,7 +1753,7 @@ public class VCSDKUtils {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            _logger.error("删除所有虚拟机存储策略出错");
+            _logger.error("删除所有虚拟机存储策略出错",e);
         }
     }
 

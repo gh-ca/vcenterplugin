@@ -69,7 +69,7 @@
             <artifactId>joda-time</artifactId>
             <version>2.10</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/joda-time-2.10.jar</systemPath>
+            <systemPath>${project.basedir}/lib/joda-time-2.10.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.vmware</groupId>
@@ -121,25 +121,18 @@
             <systemPath>${project.basedir}/extlib/h2-1.4.199.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.10</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/joda-time-2.10.jar</systemPath>
-        </dependency>
-        <dependency>
             <groupId>com.apache</groupId>
             <artifactId>slf4j</artifactId>
             <version>1.7.26</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/slf4j-api-1.7.26.jar</systemPath>
+            <systemPath>${project.basedir}/lib/slf4j-api-1.7.26.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.apache</groupId>
             <artifactId>log4j</artifactId>
             <version>1.2.14</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/log4j-1.2.14.jar</systemPath>
+            <systemPath>${project.basedir}/lib/log4j-1.2.14.jar</systemPath>
         </dependency>
 <!--        <dependency>
             <groupId>org.slf4j</groupId>
@@ -153,14 +146,14 @@
             <artifactId>httpclient</artifactId>
             <version>4.3.5</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/httpclient-4.3.5.jar</systemPath>
+            <systemPath>${project.basedir}/lib/httpclient-4.3.5.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.apache</groupId>
             <artifactId>httpcore</artifactId>
             <version>4.3.2</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/httpcore-4.3.2.jar</systemPath>
+            <systemPath>${project.basedir}/lib/httpcore-4.3.2.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -196,28 +189,28 @@
             <artifactId>vapi-runtime</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/vapi-runtime-2.15.0.jar</systemPath>
+            <systemPath>${project.basedir}/lib/vapi-runtime-2.15.0.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>vsphereautosdk</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/vsphereautomation-client-sdk-3.3.0.jar</systemPath>
+            <systemPath>${project.basedir}/lib/vsphereautomation-client-sdk-3.3.0.jar</systemPath>
         </dependency>
-        <dependency>
+  <!--      <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>vapisamltoken</artifactId>
             <version>1.0</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/extlib/vapi-samltoken-2.15.0.jar</systemPath>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>vapiauth</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/vapi-authentication-2.15.0.jar</systemPath>
+            <systemPath>${project.basedir}/lib/vapi-authentication-2.15.0.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>jackson</groupId>
