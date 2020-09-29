@@ -41,7 +41,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.StringReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.KeyManagementException;
@@ -2183,9 +2193,14 @@ public class VCSDKUtils {
 
                         ManagedMethodExecuter.SoapResult soapResult = methodExecuter.executeSoap(moid, "urn:vim25/6.5", "vim.EsxCLI.network.diag.ping", soapArgumentList.toArray(new ManagedMethodExecuter.SoapArgument[0]));
 
-                        System.out.println("11xx==" + new String(soapResult.getResponse().getBytes("ISO-8859-1"), "UTF-8"));
-                        _logger.info(mgmtIp+"====true");
-                        ethPort.put("connectStatus","true");
+                        String re = new String(soapResult.getResponse().getBytes("ISO-8859-1"),"UTF-8");
+                        _logger.info(mgmtIp+"==re=="+re);
+                        String packetLost = xmlFormat(re);
+                        if(!StringUtils.isEmpty(packetLost) && !packetLost.equals("100")) {
+                            ethPort.put("connectStatus", "true");
+                        }else{
+                            ethPort.put("connectStatus","false");
+                        }
                     } catch (Exception e) {
                         ethPort.put("connectStatus","false");
                         _logger.info(mgmtIp+"===="+e.toString());
@@ -2201,6 +2216,36 @@ public class VCSDKUtils {
 
         return reStr;
     }
+
+    public String xmlFormat(String unformattedXml) {
+        String packetLost = null;
+        try {
+            final Document document = parseXmlFile(unformattedXml);
+            NodeList sms = document.getElementsByTagName("Summary");
+            Element sm = (Element)sms.item(0);
+            packetLost = sm.getElementsByTagName("PacketLost").item(0).getFirstChild().getNodeValue();
+        } catch (Exception e) {
+            _logger.error("error:"+e.toString());
+        }
+
+        return packetLost;
+    }
+
+    private Document parseXmlFile(String in) {
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            InputSource is = new InputSource(new StringReader(in));
+            return db.parse(is);
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        } catch (SAXException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /*public static void main(String[] args) {
 //        try {
 //            Gson gson = new Gson();
