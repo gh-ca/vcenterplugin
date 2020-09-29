@@ -10,7 +10,8 @@ Export-Package: com.dmeplugin.dmestore.services;version="1.0.0",
  com.dmeplugin.dmestore.entity;version="1.0.0",
  com.dmeplugin.dmestore.model;version="1.0.0",
  com.dmeplugin.dmestore.exception;version="1.0.0"
-Bundle-ClassPath: .,h2-1.4.199.jar,pbm.jar,vim25.jar,quartz-2.3.2.jar,wssamples.jar
+Bundle-ClassPath: .,h2-1.4.199.jar,pbm.jar,vim25.jar,quartz-2.3.2.jar,wssamples.jar,queryVmodl.jar,reflectVmodl.jar,stax2-api-3.0.1.jar,vimVmodl.jar,
+    vlsiClient.jar,vlsiCore.jar,woodstox-core-asl-4.0.5.jar
 Import-Package: org.apache.commons.logging;version="1.1.1",
  org.slf4j;version="0",
  org.joda.time;version="0",
