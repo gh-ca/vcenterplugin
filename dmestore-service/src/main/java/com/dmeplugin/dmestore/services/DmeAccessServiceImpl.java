@@ -4,6 +4,7 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.dao.DmeInfoDao;
 import com.dmeplugin.dmestore.dao.ScheduleDao;
 import com.dmeplugin.dmestore.entity.DmeInfo;
+import com.dmeplugin.dmestore.model.DMEHostInfo;
 import com.dmeplugin.dmestore.task.ScheduleSetting;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
@@ -12,6 +13,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -725,4 +727,17 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         return list;
     }
 
+    @Override
+    public List<DMEHostInfo> getAllDmeHost() throws Exception {
+        String getHostsUrl = GET_DME_HOSTS_URL;
+        try {
+            ResponseEntity<String> responseEntity = access(getHostsUrl, HttpMethod.GET, null);
+            if(responseEntity.getStatusCodeValue() == 200){
+                return gson.fromJson(responseEntity.getBody(), new TypeToken<List<DMEHostInfo>>(){}.getType());
+            }
+        }catch (Exception e){
+            throw  e;
+        }
+        return null;
+    }
 }

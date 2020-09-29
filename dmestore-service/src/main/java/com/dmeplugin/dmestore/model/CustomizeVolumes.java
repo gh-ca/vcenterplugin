@@ -1,5 +1,7 @@
 package com.dmeplugin.dmestore.model;
 
+import java.util.List;
+
 /**
  * @ClassName CustomizeVolumes
  * @Description TODO
@@ -17,7 +19,7 @@ public class CustomizeVolumes {
     //必须
     private String storage_id;
     private CustomizeVolumeTuningForCreate tuning;
-    private ServiceVolumeBasicParams volume_specs;
+    private List<ServiceVolumeBasicParams> volume_specs;
 
     public String getAvailability_zone() {
         return availability_zone;
@@ -83,11 +85,11 @@ public class CustomizeVolumes {
         this.tuning = tuning;
     }
 
-    public ServiceVolumeBasicParams getVolume_specs() {
+    public List<ServiceVolumeBasicParams> getVolume_specs() {
         return volume_specs;
     }
 
-    public void setVolume_specs(ServiceVolumeBasicParams volume_specs) {
+    public void setVolume_specs(List<ServiceVolumeBasicParams> volume_specs) {
         this.volume_specs = volume_specs;
     }
 }

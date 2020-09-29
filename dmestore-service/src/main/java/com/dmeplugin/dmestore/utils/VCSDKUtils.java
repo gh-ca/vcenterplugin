@@ -583,7 +583,6 @@ public class VCSDKUtils {
             String serverguid = vcConnectionHelper.objectID2Serverguid(dataStoreObjectId);
             VmwareContext serverContext = vcConnectionHelper.getServerContext(serverguid);
             ManagedObjectReference dsmor = vcConnectionHelper.objectID2MOR(dataStoreObjectId);
-            //todo 测试需要生成使用
             //String objectId = vcConnectionHelper.MOR2ObjectID(dsMo.getMor(), dsMo.getContext().getServerAddress());
             DatastoreMO dsMo = new DatastoreMO(serverContext, dsmor);
             dsMo.renameDatastore(newName);
@@ -672,8 +671,6 @@ public class VCSDKUtils {
 
         String result = "success";
         List<String> uuids = new ArrayList<>();
-
-        //VCConnectionHelper vcConnectionHelper = new SpringBootConnectionHelper();
         try {
             ManagedObjectReference mor = null;
             VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
@@ -1286,19 +1283,23 @@ public class VCSDKUtils {
      * @Param [datastore_name, vm_name, rdmdevicename, size]
      * @Return void
      **/
-    public void createDisk(String datastore_objectId, String vm_objectId, String rdmdevicename, int size) throws Exception {
-        VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
-        for (VmwareContext vmwareContext : vmwareContexts) {
-            DatastoreMO dsMo = new DatastoreMO(vmwareContext, vcConnectionHelper.objectID2MOR(datastore_objectId));
-            VirtualMachineMO virtualMachineMO = new VirtualMachineMO(vmwareContext, vcConnectionHelper.objectID2MOR(vm_objectId));
-            String vmdkDatastorePath = dsMo.getDatastorePath(dsMo.getName());
+    public void createDisk(String vm_objectId, String rdmDeviceName, int size) throws Exception {
+        String serverguid = vcConnectionHelper.objectID2Serverguid(vm_objectId);
+        VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
+        VirtualMachineMO virtualMachineMO = new VirtualMachineMO(vmwareContext, vcConnectionHelper.objectID2MOR(vm_objectId));
+        List<DatastoreMO> dsMOList = virtualMachineMO.getAllDatastores();
+        for (int i = 0; i < dsMOList.size(); i++) {
+            DatastoreMO dsMO = dsMOList.get(i);
+            String vmdkDatastorePath = dsMO.getDatastorePath(dsMO.getName());
             int sizeInMb = size;
             try {
                 virtualMachineMO.createDisk(vmdkDatastorePath, VirtualDiskType.RDM, VirtualDiskMode.PERSISTENT,
-                        rdmdevicename, sizeInMb, dsMo.getMor(), -1);
+                        rdmDeviceName, sizeInMb, dsMO.getMor(), -1);
+                break;
             } catch (Exception ex) {
                 _logger.error("create vcenter disk rdm failed!errorMsg:{}", ex.getMessage());
-                throw new Exception(ex.getMessage());
+                //throw new Exception(ex.getMessage());
+                continue;
             }
         }
     }

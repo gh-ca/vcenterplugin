@@ -12,8 +12,8 @@ public class StorageDetail {
     private String id;
     private String name;//名称
     private String ip;//ip地址
-    private String status;//状态
-    private String synStatus;//同步状态
+    private String status;//状态 运行状态 0-离线 1-正常 2-故障 9-未管理。
+    private String synStatus;//同步状态 同步状态 0-未同步 1-同步中 2-同步完成。
     private String sn;//设备序列号。
     private String vendor;//厂商
     private String model;//产品型号
@@ -38,6 +38,24 @@ public class StorageDetail {
     private Integer maintenance_start; //维护开始时间
     private Integer maintenance_overtime;//维护结束时间
     private String patch_version;//补订版本
+    private String warning; //警告
+    private String event;//事件
+
+    public String getWarning() {
+        return warning;
+    }
+
+    public void setWarning(String warning) {
+        this.warning = warning;
+    }
+
+    public String getEvent() {
+        return event;
+    }
+
+    public void setEvent(String event) {
+        this.event = event;
+    }
 
     public String getPatch_version() {
         return patch_version;

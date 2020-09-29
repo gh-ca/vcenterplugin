@@ -2,6 +2,7 @@ package com.dmeplugin.dmestore.mvc;
 
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.model.VmRDMCreateBean;
+import com.dmeplugin.dmestore.services.DmeAccessService;
 import com.dmeplugin.dmestore.services.VMRDMService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,13 +18,22 @@ public class VMRDMController extends BaseController {
     private VMRDMService vmrdmService;
 
     @RequestMapping(value = "createRdm", method = RequestMethod.POST)
-    public ResponseBodyBean createRDM(@RequestParam("datastore_objectId") String datastore_objectId,
-                                      @RequestParam("host_objectId") String host_objectId,
+    public ResponseBodyBean createRDM(@RequestParam("host_objectId") String host_objectId,
                                       @RequestParam("vm_objectId") String vm_objectId,
                                       @RequestBody VmRDMCreateBean createBean) throws Exception {
         try {
-            vmrdmService.createRDM(datastore_objectId, vm_objectId, host_objectId, createBean);
+            vmrdmService.createRDM(vm_objectId, host_objectId, createBean);
             return success();
+        }catch (Exception e){
+            LOG.error(e.getMessage());
+            return failure(e.getMessage());
+        }
+    }
+
+    @RequestMapping(value = "dmeHosts", method = RequestMethod.GET)
+    public ResponseBodyBean dmeHosts() throws Exception {
+        try {
+            return success(vmrdmService.getAllDmeHost());
         }catch (Exception e){
             LOG.error(e.getMessage());
             return failure(e.getMessage());
