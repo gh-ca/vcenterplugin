@@ -37,6 +37,39 @@
    <osgi:service id="VCenterInfoService" ref="VCenterInfoServiceImpl"
                  interface="com.dmeplugin.dmestore.services.VCenterInfoService" />
 
+   <osgi:service id="BestPracticeProcessService" ref="BestPracticeProcessServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.BestPracticeProcessService" />
+
+   <osgi:service id="DataStoreStatisticHistoryService" ref="DataStoreStatisticHistoryServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.DataStoreStatisticHistoryService" />
+
+   <osgi:service id="DmeRelationInstanceService" ref="DmeRelationInstanceServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.DmeRelationInstanceService" />
+
+   <osgi:service id="DmeStorageService" ref="DmeStorageServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.DmeStorageService" />
+
+   <osgi:service id="HostAccessService" ref="HostAccessServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.HostAccessService" />
+
+   <osgi:service id="NfsOperationService" ref="NfsOperationServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.NfsOperationService" />
+
+   <osgi:service id="OverviewService" ref="OverviewServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.OverviewService" />
+
+   <osgi:service id="ServiceLevelService" ref="ServiceLevelServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.ServiceLevelService" />
+
+   <osgi:service id="VmfsOperationService" ref="VmfsOperationServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.VmfsOperationService" />
+
+   <osgi:service id="VMRDMService" ref="VMRDMServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.VMRDMService" />
+
+   <osgi:service id="VmwareAccessService" ref="VmwareAccessServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.VmwareAccessService" />
+
   <!-- References to platform services used by the controllers -->
 
    <osgi:reference id="dataService"

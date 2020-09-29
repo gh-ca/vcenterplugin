@@ -64,7 +64,7 @@
    <extension id="com.dmeplugin.dmestore.dashboard">
       <extendedPoint>vise.global.views</extendedPoint>
       <object>
-         <!--<name>#{app.name}</name>-->
+         <name>#{overview}</name>
          <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
             <object>
                <root>
