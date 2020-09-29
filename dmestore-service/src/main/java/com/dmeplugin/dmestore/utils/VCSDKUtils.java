@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.utils;
 
+import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.vmware.SpringBootConnectionHelper;
 import com.dmeplugin.vmware.VCConnectionHelper;
 import com.dmeplugin.vmware.autosdk.SessionHelper;
@@ -19,12 +20,43 @@ import com.vmware.cis.tagging.TagModel;
 import com.vmware.pbm.*;
 import com.vmware.pbm.RuntimeFaultFaultMsg;
 import com.vmware.vapi.std.DynamicID;
+import com.vmware.vim.binding.vim.HostSystem;
+import com.vmware.vim.binding.vim.ServiceInstance;
+import com.vmware.vim.binding.vim.ServiceInstanceContent;
+import com.vmware.vim.binding.vim.SessionManager;
+import com.vmware.vim.binding.vim.fault.InvalidLogin;
+import com.vmware.vim.binding.vim.fault.InvalidLocale;
+import com.vmware.vim.binding.vim.version.version10;
+import com.vmware.vim.binding.vmodl.reflect.ManagedMethodExecuter;
+import com.vmware.vim.vmomi.client.Client;
+import com.vmware.vim.vmomi.client.http.HttpClientConfiguration;
+import com.vmware.vim.vmomi.client.http.HttpConfiguration;
+import com.vmware.vim.vmomi.client.http.impl.AllowAllThumbprintVerifier;
+import com.vmware.vim.vmomi.client.http.impl.HttpConfigurationImpl;
+import com.vmware.vim.vmomi.core.types.VmodlContext;
+
 import com.vmware.vim25.*;
 import com.vmware.vim25.InvalidArgumentFaultMsg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
+import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class VCSDKUtils {
@@ -44,6 +76,8 @@ public class VCSDKUtils {
     }
 
     private final static Logger _logger = LoggerFactory.getLogger(VCSDKUtils.class);
+
+    private static final Class<?> version = version10.class;
 
     private Gson gson = new Gson();
 
@@ -722,8 +756,7 @@ public class VCSDKUtils {
         try {
             VmwareContext vmwareContext = null;
             ManagedObjectReference managedObjectReference = null;
-            List<Map<String, String>> nfsDatastoreInfos = new ArrayList<>();
-            Map<String, String> nfsDatastoreInfo = new HashMap<>();
+            DmeVmwareRelation dmeVmwareRelation = new DmeVmwareRelation();
             if (hostObjectIds != null && hostObjectIds.size()!= 0) {
                 for (Map<String, String> hosts : hostObjectIds) {
                     for (Map.Entry<String, String> host : hosts.entrySet()) {
@@ -735,19 +768,16 @@ public class VCSDKUtils {
                             HostDatastoreSystemMO hostDatastoreSystemMO = hostMO.getHostDatastoreSystemMO();
                             hostDatastoreSystemMO.createNfsDatastore(serverHost, 0, exportPath, nfsName, accessMode, type);
                             String datastoreObjectId = vcConnectionHelper.MOR2ObjectID(managedObjectReference, serverguid);
-                            nfsDatastoreInfo.put("datastoreObjectId", datastoreObjectId);
-                            nfsDatastoreInfo.put("nfsName", nfsName);
-                            nfsDatastoreInfo.put("serverHost", serverHost);
-                            nfsDatastoreInfo.put("exportPath", exportPath);
-                            nfsDatastoreInfo.put("type", type);
-                            nfsDatastoreInfos.add(nfsDatastoreInfo);
+                            dmeVmwareRelation.setStoreId(datastoreObjectId);
+                            dmeVmwareRelation.setStoreName(nfsName);
+                            dmeVmwareRelation.setStoreType(ToolUtils.STORE_TYPE_NFS);
                         } else {
                             response = "failed";
                             _logger.error("can not find target host!");
                         }
                     }
                 }
-                response = gson.toJson(nfsDatastoreInfos);
+                response = gson.toJson(dmeVmwareRelation);
             } else {
                 response = "failed";
                 _logger.error("{createNfsDatastore/createnfsdatastore} params error:hostObjectIds{"+hostObjectIds+"}");
@@ -1712,12 +1742,14 @@ public class VCSDKUtils {
         for (PbmProfile profile : pbmProfiles) {
             pbmProfileIds.add(profile.getProfileId());
         }
-        PbmServiceInstanceContent spbmsc;
-        // Get PBM Profile Manager & Associated Capability Metadata
-        spbmsc = vmwareContext.getPbmServiceContent();
-        ManagedObjectReference profileMgr = spbmsc.getProfileManager();
-        vmwareContext.getPbmService().pbmDelete(profileMgr,
-                pbmProfileIds);
+        if (pbmProfileIds.size()>0) {
+            PbmServiceInstanceContent spbmsc;
+            // Get PBM Profile Manager & Associated Capability Metadata
+            spbmsc = vmwareContext.getPbmServiceContent();
+            ManagedObjectReference profileMgr = spbmsc.getProfileManager();
+            vmwareContext.getPbmService().pbmDelete(profileMgr,
+                    pbmProfileIds);
+        }
     }
 
     public void removePbmProfileInAllContext(List<PbmProfile> pbmProfiles) {
@@ -1728,7 +1760,7 @@ public class VCSDKUtils {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            _logger.error("删除所有虚拟机存储策略出错");
+            _logger.error("删除所有虚拟机存储策略出错",e);
         }
     }
 
@@ -2106,6 +2138,113 @@ public class VCSDKUtils {
         return hbalist;
     }
 
+    //使用主机测试目标机的连通性
+    public String testConnectivity(String hostObjectId,List<Map<String, Object>> ethPorts,Map<String, String> vmKernel,VCenterInfo vCenterInfo) throws URISyntaxException, InvalidLogin, InvalidLocale, KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+        String reStr = null;
+        HttpConfiguration httpConfig = new HttpConfigurationImpl();
+        httpConfig.setTimeoutMs(3000);
+        httpConfig.setThumbprintVerifier(new AllowAllThumbprintVerifier());
+
+        HttpClientConfiguration clientConfig = HttpClientConfiguration.Factory.newInstance();
+        clientConfig.setHttpConfiguration(httpConfig);
+        VmodlContext context= VmodlContext.initContext(new String[] { "com.vmware.vim.binding.vim","com.vmware.vim.binding.vmodl.reflect" });
+        Client vmomiClient = Client.Factory.createClient(new URI("https://"+vCenterInfo.getHostIp()+"/sdk"), version, context, clientConfig);
+        com.vmware.vim.binding.vmodl.ManagedObjectReference svcRef = new com.vmware.vim.binding.vmodl.ManagedObjectReference();
+        svcRef.setType("ServiceInstance");
+        svcRef.setValue("ServiceInstance");
+        ServiceInstance instance = vmomiClient.createStub(ServiceInstance.class, svcRef);
+        ServiceInstanceContent serviceInstanceContent=instance.retrieveContent();
+
+        SessionManager sessionManager = vmomiClient.createStub(SessionManager.class,
+                serviceInstanceContent.getSessionManager());
+        sessionManager.login(vCenterInfo.getUserName(), CipherUtils.decryptString(vCenterInfo.getPassword()), "en");
+        ManagedObjectReference objmor = vcConnectionHelper.objectID2MOR(hostObjectId);
+        com.vmware.vim.binding.vmodl.ManagedObjectReference hostmor = new com.vmware.vim.binding.vmodl.ManagedObjectReference();
+        hostmor.setType(objmor.getType());
+        hostmor.setValue(objmor.getValue());
+        HostSystem hostSystem=vmomiClient.createStub(HostSystem.class,hostmor);
+
+        com.vmware.vim.binding.vmodl.ManagedObjectReference methodexecutor=hostSystem.retrieveManagedMethodExecuter();
+
+        String moid="ha-cli-handler-network-diag";
+        ManagedMethodExecuter methodExecuter=vmomiClient.createStub(ManagedMethodExecuter.class,methodexecutor);
+
+        if(ethPorts!=null && ethPorts.size()>0) {
+            List<Map<String, Object>> reEthPorts = new ArrayList<>();
+            for(Map<String, Object> ethPort:ethPorts) {
+                String mgmtIp = ToolUtils.getStr(ethPort.get("mgmtIp"));
+                if(!StringUtils.isEmpty(mgmtIp)) {
+                    try {
+                        ManagedMethodExecuter.SoapArgument soapArgument0 = new ManagedMethodExecuter.SoapArgument();
+                        soapArgument0.setName("interface");
+                        soapArgument0.setVal("<interface xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"urn:vim25\">vmk1</interface>");
+
+                        ManagedMethodExecuter.SoapArgument soapArgument1 = new ManagedMethodExecuter.SoapArgument();
+                        soapArgument1.setName("wait");
+                        soapArgument1.setVal("<wait xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"urn:vim25\">3</wait>");
+
+                        ManagedMethodExecuter.SoapArgument soapArgument2 = new ManagedMethodExecuter.SoapArgument();
+                        soapArgument2.setName("host");
+                        soapArgument2.setVal("<host xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"urn:vim25\">" + mgmtIp + "</host>");
+                        List<ManagedMethodExecuter.SoapArgument> soapArgumentList = new ArrayList<>();
+//                      soapArgumentList.add(soapArgument0);
+//                      soapArgumentList.add(soapArgument1);
+                        soapArgumentList.add(soapArgument2);
+
+                        ManagedMethodExecuter.SoapResult soapResult = methodExecuter.executeSoap(moid, "urn:vim25/6.5", "vim.EsxCLI.network.diag.ping", soapArgumentList.toArray(new ManagedMethodExecuter.SoapArgument[0]));
+
+                        String re = new String(soapResult.getResponse().getBytes("ISO-8859-1"),"UTF-8");
+                        _logger.info(mgmtIp+"==re=="+re);
+                        String packetLost = xmlFormat(re);
+                        if(!StringUtils.isEmpty(packetLost) && !packetLost.equals("100")) {
+                            ethPort.put("connectStatus", "true");
+                        }else{
+                            ethPort.put("connectStatus","false");
+                        }
+                    } catch (Exception e) {
+                        ethPort.put("connectStatus","false");
+                        _logger.info(mgmtIp+"===="+e.toString());
+                    }
+                    reEthPorts.add(ethPort);
+                }
+            }
+
+            if(reEthPorts.size()>0){
+                reStr = gson.toJson(reEthPorts);
+            }
+        }
+
+        return reStr;
+    }
+
+    public String xmlFormat(String unformattedXml) {
+        String packetLost = null;
+        try {
+            final Document document = parseXmlFile(unformattedXml);
+            NodeList sms = document.getElementsByTagName("Summary");
+            Element sm = (Element)sms.item(0);
+            packetLost = sm.getElementsByTagName("PacketLost").item(0).getFirstChild().getNodeValue();
+        } catch (Exception e) {
+            _logger.error("error:"+e.toString());
+        }
+
+        return packetLost;
+    }
+
+    private Document parseXmlFile(String in) {
+        try {
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            InputSource is = new InputSource(new StringReader(in));
+            return db.parse(is);
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        } catch (SAXException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /*public static void main(String[] args) {
 //        try {
