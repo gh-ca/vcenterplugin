@@ -13,8 +13,16 @@ public class SimpleCapabilities {
     private Boolean deduplication;
 
     private CapabilitiesSmarttier smarttier;
-    private QosParam qosParam;
+    private CapabilitiesIopriority iopriority;
     private CapabilitiesQos qos;
+
+    public CapabilitiesIopriority getIopriority() {
+        return iopriority;
+    }
+
+    public void setIopriority(CapabilitiesIopriority iopriority) {
+        this.iopriority = iopriority;
+    }
 
     public CapabilitiesQos getQos() {
         return qos;
@@ -56,11 +64,4 @@ public class SimpleCapabilities {
         this.smarttier = smarttier;
     }
 
-    public QosParam getQosParam() {
-        return qosParam;
-    }
-
-    public void setQosParam(QosParam qosParam) {
-        this.qosParam = qosParam;
-    }
 }

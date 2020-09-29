@@ -8,8 +8,13 @@ package com.dmeplugin.dmestore.model;
  */
 public class CapabilitiesQos {
 
+    private SmartQos smartQos;
     private QosParam qosParam;
     private Boolean enabled;
+
+    public SmartQos getSmartQos() {
+        return smartQos;
+    }
 
     public QosParam getQosParam() {
         return qosParam;
@@ -17,6 +22,10 @@ public class CapabilitiesQos {
 
     public void setQosParam(QosParam qosParam) {
         this.qosParam = qosParam;
+    }
+
+    public void setSmartQos(SmartQos smartQos) {
+        this.smartQos = smartQos;
     }
 
     public Boolean getEnabled() {

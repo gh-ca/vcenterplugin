@@ -301,24 +301,32 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 capability.setDeduplication(ToolUtils.jsonToBoo(capabilities.get("deduplication")));
 
                 CapabilitiesSmarttier smarttier = new CapabilitiesSmarttier();
-                JsonObject smarttiers = capabilities.get("smarttier").getAsJsonObject();
-                smarttier.setPolicy(ToolUtils.jsonToInt(smarttiers.get("policy"),0));
-                smarttier.setEnabled(ToolUtils.jsonToBoo(smarttiers.get("enabled")));
+                JsonObject smarttiers = null;
+                if (!ToolUtils.jsonToStr(capabilities.get("smarttier")).equals("")) {
+                    smarttiers = capabilities.get("smarttier").getAsJsonObject();
+                    smarttier.setPolicy(ToolUtils.jsonToInt(smarttiers.get("policy"), 0));
+                    smarttier.setEnabled(ToolUtils.jsonToBoo(smarttiers.get("enabled")));
+                }
                 capability.setSmarttier(smarttier);
 
-                QosParam qosParam = new QosParam();
-                JsonObject qos = capabilities.get("qos").getAsJsonObject();
-                qosParam.setEnabled(ToolUtils.jsonToBoo(qos.get("enabled")));
-
+                CapabilitiesQos capabilitiesQos = new CapabilitiesQos();
+                JsonObject qos = null;
+                    if (!ToolUtils.jsonToStr(capabilities.get("qos")).equals("")) {
+                    qos = capabilities.get("qos").getAsJsonObject();
+                    capabilitiesQos.setEnabled(ToolUtils.jsonToBoo(qos.get("enabled")));
+                }
                 SmartQos smartQos = new SmartQos();
-                JsonObject jsonObject1 = qos.get("qos_param").getAsJsonObject();
-                smartQos.setLatency(ToolUtils.jsonToInt(jsonObject1.get("latency"),0));
-                smartQos.setMinbandwidth(ToolUtils.jsonToInt(jsonObject1.get("minBandWidth"),0));
-                smartQos.setMiniops(ToolUtils.jsonToInt(jsonObject1.get("minIOPS"),0));
-                smartQos.setLatencyUnit(ToolUtils.jsonToStr(jsonObject1.get("latencyUnit")));
+                JsonObject jsonObject1 = null;
+                if (qos != null && !ToolUtils.jsonToStr(qos.get("qos_param")).equals("")) {
+                    jsonObject1 = qos.get("qos_param").getAsJsonObject();
+                    smartQos.setLatency(ToolUtils.jsonToInt(jsonObject1.get("latency"), 0));
+                    smartQos.setMinbandwidth(ToolUtils.jsonToInt(jsonObject1.get("minBandWidth"), 0));
+                    smartQos.setMiniops(ToolUtils.jsonToInt(jsonObject1.get("minIOPS"), 0));
+                    smartQos.setLatencyUnit(ToolUtils.jsonToStr(jsonObject1.get("latencyUnit")));
+                }
 
-                qosParam.setSmartQos(smartQos);
-                capability.setQosParam(qosParam);
+                capabilitiesQos.setSmartQos(smartQos);
+                capability.setQos(capabilitiesQos);
                 simpleServiceLevel.setCapabilities(capability);
                 simpleServiceLevels.add(simpleServiceLevel);
             }
