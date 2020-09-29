@@ -1,16 +1,38 @@
 <div>
-  <div>
-    <clr-select-container style="float: left;">
-      <select clrSelect (ngModelOptions)="volNames" [(ngModel)]="selectVolName" name="defaultSelect" class="clr-select" (change)="changeVolFunc()">
-        <option *ngFor="let item of volNames" value="{{item}}">{{item}}</option>
-      </select>
-    </clr-select-container>
-    <clr-select-container style="float: right;">
-      <select clrSelect (ngModelOptions)="ranges" [(ngModel)]="selectRange" name="defaultSelect" class="clr-select" (change)="changeVolFunc()">
-        <option *ngFor="let item of ranges" value="{{item.key}}">{{item.value}}</option>
-      </select>
-    </clr-select-container>
-  </div>
+  <form clrForm #simpleForm="ngForm">
+      <table class="searchtable" cellpadding="5" >
+        <tr>
+          <td>
+            <clr-select-container>
+              <select clrSelect (ngModelOptions)="volNames" [(ngModel)]="selectVolName" name="defaultSelect" class="clr-select" (change)="changeVolFunc()">
+                <option *ngFor="let item of volNames" value="{{item}}">{{item}}</option>
+              </select>
+            </clr-select-container>
+          </td>
+          <td>
+            <clr-select-container>
+              <select clrSelect (ngModelOptions)="ranges" [(ngModel)]="selectRange" name="defaultSelect" class="clr-select" (change)="changeVolFunc()">
+                <option *ngFor="let item of ranges" value="{{item.key}}">{{item.value}}</option>
+              </select>
+            </clr-select-container>
+          </td>
+        </tr>
+        <tr *ngIf="selectRange === 'BEGIN_END_TIME'">
+          <td>
+            <clr-date-container>
+              <label>{{'vmfs.startTime' | translate}}</label>
+              <input type="date" name="startTime" [(ngModel)]="startTime" [max]="endTime" (clrDateChange)="changeDate($event);" clrDate>
+            </clr-date-container>
+          </td>
+          <td>
+            <clr-date-container>
+              <label>{{'vmfs.endTime' | translate}}</label>
+              <input type="date" name="endTime" [(ngModel)]="endTime" [min]="startTime" (clrDateChange)="changeDate();" clrDate>
+            </clr-date-container>
+          </td>
+        </tr>
+      </table>
+  </form>
   <div echarts [options]="iopsChart" id="iopsChart" style="height: 600px;"></div>
   <div echarts [options]="bandwidthChart" id="bandwidthChart" style="height: 600px;"></div>
   <div echarts [options]="latencyChart" id="latencyChart" style="height: 600px;"></div>
