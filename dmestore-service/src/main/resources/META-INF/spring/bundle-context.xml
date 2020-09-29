@@ -178,6 +178,7 @@
         <property name="taskService" ref="taskService"/>
         <property name="dmeStorageService" ref="dmeStorageService"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
+        <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
 
