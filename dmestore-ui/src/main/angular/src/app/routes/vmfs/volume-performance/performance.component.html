@@ -1,3 +1,17 @@
-<div echarts [options]="iopsChart" id="iopsChart" style="height: 600px;"></div>
-<div echarts [options]="bandwidthChart" id="bandwidthChart" style="height: 600px;"></div>
-<div echarts [options]="latencyChart" id="latencyChart" style="height: 600px;"></div>
+<div>
+  <div>
+    <clr-select-container style="float: left;">
+      <select clrSelect (ngModelOptions)="volNames" [(ngModel)]="selectVolName" name="defaultSelect" class="clr-select" (change)="changeVolFunc()">
+        <option *ngFor="let item of volNames" value="{{item}}">{{item}}</option>
+      </select>
+    </clr-select-container>
+    <clr-select-container style="float: right;">
+      <select clrSelect (ngModelOptions)="ranges" [(ngModel)]="selectRange" name="defaultSelect" class="clr-select" (change)="changeVolFunc()">
+        <option *ngFor="let item of ranges" value="{{item.key}}">{{item.value}}</option>
+      </select>
+    </clr-select-container>
+  </div>
+  <div echarts [options]="iopsChart" id="iopsChart" style="height: 600px;"></div>
+  <div echarts [options]="bandwidthChart" id="bandwidthChart" style="height: 600px;"></div>
+  <div echarts [options]="latencyChart" id="latencyChart" style="height: 600px;"></div>
+</div>
