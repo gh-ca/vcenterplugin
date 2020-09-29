@@ -33,6 +33,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     private final String API_NFSSHARE_LIST = "/rest/fileservice/v1/nfs-shares/summary";
     private final String API_BANDPORTS_LIST = "/rest/storagemgmt/v1/storage-port/bond-ports?storage_id=";
     private final String API_INSTANCES_LIST = "/rest/resourcedb/v1/instances";
+    private final String API_VOLUME_DETAIL = "/rest/blockservice/v1/volumes";
+
 
 
     private static final Logger LOG = LoggerFactory.getLogger(DmeStorageServiceImpl.class);
@@ -79,7 +81,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(API_STORAGES, HttpMethod.GET, null);
-            //ResponseEntity responseEntity = access( API_STORAGES_LIST, HttpMethod.GET, null);
             LOG.info("{" + API_STORAGES + "}" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -94,28 +95,28 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 for (JsonElement jsonElement : storage) {
                     JsonObject jsonObj = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
                     Storage storageObj = new Storage();
-                    storageObj.setId(jsonObj.get("id").getAsString());
-                    storageObj.setName(jsonObj.get("name").getAsString());
-                    storageObj.setIp(jsonObj.get("ip").getAsString());
-                    storageObj.setStatus(jsonObj.get("status").getAsString());
-                    storageObj.setSynStatus(jsonObj.get("syn_status").getAsString());
-                    storageObj.setVendor(jsonObj.get("vendor").getAsString());
-                    storageObj.setModel(jsonObj.get("model").getAsString());
-                    storageObj.setUsedCapacity(Double.valueOf(jsonObj.get("used_capacity").getAsString()));
-                    storageObj.setTotalCapacity(Double.valueOf(jsonObj.get("total_capacity").getAsString()));
-                    storageObj.setTotalEffectiveCapacity(Double.valueOf(jsonObj.get("total_effective_capacity").getAsString()));
-                    storageObj.setFreeEffectiveCapacity(Double.valueOf(jsonObj.get("free_effective_capacity").getAsString()));
-                    storageObj.setMaxCpuUtilization(Double.valueOf(jsonObj.get("max_cpu_utilization").getAsString()));
-                    storageObj.setMaxIops(Double.valueOf(jsonObj.get("max_iops").getAsString()));
-                    storageObj.setMaxBandwidth(Double.valueOf(jsonObj.get("max_bandwidth").getAsString()));
-                    storageObj.setMaxLatency(Double.valueOf(jsonObj.get("max_latency").getAsString()));
-                    storageObj.setSn(jsonObj.get("sn").getAsString());
-                    storageObj.setVersion(jsonObj.get("version").getAsString());
-                    storageObj.setTotal_pool_capacity(Double.valueOf(jsonObj.get("total_pool_capacity").getAsString()));
+                    storageObj.setId(ToolUtils.jsonToStr(jsonObj.get("id")));
+                    storageObj.setName(ToolUtils.jsonToStr(jsonObj.get("name")));
+                    storageObj.setIp(ToolUtils.jsonToStr(jsonObj.get("ip")));
+                    storageObj.setStatus(ToolUtils.jsonToStr(jsonObj.get("status")));
+                    storageObj.setSynStatus(ToolUtils.jsonToStr(jsonObj.get("syn_status")));
+                    storageObj.setVendor(ToolUtils.jsonToStr(jsonObj.get("vendor")));
+                    storageObj.setModel(ToolUtils.jsonToStr(jsonObj.get("model")));
+                    storageObj.setUsedCapacity(ToolUtils.jsonToDou(jsonObj.get("used_capacity"), 0.0));
+                    storageObj.setTotalCapacity(ToolUtils.jsonToDou(jsonObj.get("total_capacity"), 0.0));
+                    storageObj.setTotalEffectiveCapacity(ToolUtils.jsonToDou(jsonObj.get("total_effective_capacity"), 0.0));
+                    storageObj.setFreeEffectiveCapacity(ToolUtils.jsonToDou(jsonObj.get("free_effective_capacity"),0.0));
+                    storageObj.setMaxCpuUtilization(ToolUtils.jsonToDou(jsonObj.get("max_cpu_utilization"),0.0));
+                    storageObj.setMaxIops(ToolUtils.jsonToDou(jsonObj.get("max_iops"),0.0));
+                    storageObj.setMaxBandwidth(ToolUtils.jsonToDou(jsonObj.get("max_bandwidth"),0.0));
+                    storageObj.setMaxLatency(ToolUtils.jsonToDou(jsonObj.get("max_latency"),0.0));
+                    storageObj.setSn(ToolUtils.jsonToStr(jsonObj.get("sn")));
+                    storageObj.setVersion(ToolUtils.jsonToStr(jsonObj.get("version")));
+                    storageObj.setTotal_pool_capacity(ToolUtils.jsonToDou(jsonObj.get("total_pool_capacity"),0.0));
 
                     JsonElement jsonAzIds = jsonObj.get("az_ids");
                     if (jsonAzIds != null) {
-                        String azIds = jsonAzIds.getAsString();
+                        String azIds =ToolUtils.jsonToStr(jsonAzIds);
                         String[] az_ids = {azIds};
                         storageObj.setAzIds(az_ids);
                     } else {
@@ -156,36 +157,32 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
             String object = responseEntity.getBody();
             if (object != null) {
-                JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-                JsonArray jsonArray = jsonObject.get("datas").getAsJsonArray();
-                for (JsonElement jsonElement : jsonArray) {
-                    JsonObject element = jsonElement.getAsJsonObject();
-                    StorageDetail storageObj = new StorageDetail();
-                    storageObj.setId(element.get("id").getAsString());
-                    storageObj.setName(element.get("name").getAsString());
-                    storageObj.setIp(element.get("ip").getAsString());
-                    storageObj.setStatus(element.get("status").getAsString());
-                    storageObj.setSynStatus(element.get("syn_status").getAsString());
-                    storageObj.setPatch_version(element.get("patch_version").getAsString());
-                    storageObj.setVendor(element.get("vendor").getAsString());
-                    storageObj.setModel(element.get("model").getAsString());
-                    storageObj.setUsedCapacity(Double.valueOf(element.get("used_capacity").getAsString()));
-                    storageObj.setTotalCapacity(Double.valueOf(element.get("total_capacity").getAsString()));
-                    storageObj.setTotalEffectiveCapacity(Double.valueOf(element.get("total_effective_capacity").getAsString()));
-                    storageObj.setFreeEffectiveCapacity(Double.valueOf(element.get("free_effective_capacity").getAsString()));
-                    storageObj.setMaintenance_start(Integer.valueOf(element.get("maintenance_start").getAsString()));
-                    storageObj.setMaintenance_overtime(Integer.valueOf(element.get("maintenance_overtime").getAsString()));
+                JsonObject element = new JsonParser().parse(object).getAsJsonObject();
+                StorageDetail storageObj = new StorageDetail();
+                storageObj.setId(ToolUtils.jsonToStr(element.get("id")));
+                storageObj.setName(ToolUtils.jsonToStr(element.get("name")));
+                storageObj.setIp(ToolUtils.jsonToStr(element.get("ip")));
+                storageObj.setStatus(ToolUtils.jsonToStr(element.get("status")));
+                storageObj.setSynStatus(ToolUtils.jsonToStr(element.get("syn_status")));
+                storageObj.setPatch_version(ToolUtils.jsonToStr(element.get("patch_version")));
+                storageObj.setVendor(ToolUtils.jsonToStr(element.get("vendor")));
+                storageObj.setModel(ToolUtils.jsonToStr(element.get("model")));
+                storageObj.setUsedCapacity(ToolUtils.jsonToDou(element.get("used_capacity"),0.0));
+                storageObj.setTotalCapacity(ToolUtils.jsonToDou(element.get("total_capacity"),0.0));
+                storageObj.setTotalEffectiveCapacity(ToolUtils.jsonToDou(element.get("total_effective_capacity"),0.0));
+                storageObj.setFreeEffectiveCapacity(ToolUtils.jsonToDou(element.get("free_effective_capacity"),0.0));
+                storageObj.setMaintenance_start(ToolUtils.jsonToInt(element.get("maintenance_start"),0));
+                storageObj.setMaintenance_overtime(ToolUtils.jsonToInt(element.get("maintenance_overtime"),0));
 
-                    JsonArray ids = element.get("az_ids").getAsJsonArray();
-                    if (ids.size() != 0) {
-                        String[] az_ids = {ids.getAsString()};
-                        storageObj.setAzIds(az_ids);
-                    } else {
-                        String[] az_ids = {};
-                        storageObj.setAzIds(az_ids);
-                    }
-                    resMap.put("data", storageObj);
+                JsonArray ids = element.get("az_ids").getAsJsonArray();
+                if (ids.size() != 0) {
+                    String[] az_ids = {ToolUtils.jsonToStr(ids)};
+                    storageObj.setAzIds(az_ids);
+                } else {
+                    String[] az_ids = {};
+                    storageObj.setAzIds(az_ids);
                 }
+                resMap.put("data", storageObj);
             }
             return resMap;
         } catch (Exception e) {
@@ -224,31 +221,31 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
                     StoragePool storagePool = new StoragePool();
-                    storagePool.setName(element.get("name").getAsString());
-                    storagePool.setFree_capacity(Double.valueOf(element.get("free_capacity").getAsString()));
-                    storagePool.setHealth_status(element.get("health_status").getAsString());
-                    Double lun_subscribed_capacity = Double.valueOf(element.get("lun_subscribed_capacity").getAsString());
+                    storagePool.setName(ToolUtils.jsonToStr(element.get("name")));
+                    storagePool.setFree_capacity(ToolUtils.jsonToDou(element.get("free_capacity"),0.0));
+                    storagePool.setHealth_status(ToolUtils.jsonToStr(element.get("health_status")));
+                    Double lun_subscribed_capacity = Double.valueOf(ToolUtils.jsonToStr(element.get("lun_subscribed_capacity")));
                     storagePool.setLun_subscribed_capacity(lun_subscribed_capacity);
-                    storagePool.setParent_type(element.get("parent_type").getAsString());
-                    storagePool.setRunning_status(element.get("running_status").getAsString());
-                    Double total_capacity = Double.valueOf(element.get("total_capacity").getAsString());
-                    storagePool.setTotal_capacity(Double.valueOf(element.get("total_capacity").getAsString()));
-                    Double fs_subscribed_capacity = Double.valueOf(element.get("fs_subscribed_capacity").getAsString());
+                    storagePool.setParent_type(ToolUtils.jsonToStr(element.get("parent_type")));
+                    storagePool.setRunning_status(ToolUtils.jsonToStr(element.get("running_status")));
+                    Double total_capacity = Double.valueOf(ToolUtils.jsonToDou(element.get("total_capacity"),0.0));
+                    storagePool.setTotal_capacity(ToolUtils.jsonToDou(element.get("total_capacity"),0.0));
+                    Double fs_subscribed_capacity = Double.valueOf(ToolUtils.jsonToDou(element.get("fs_subscribed_capacity"),0.0));
                     storagePool.setFs_subscribed_capacity(fs_subscribed_capacity);
-                    storagePool.setConsumed_capacity(Double.valueOf(element.get("consumed_capacity").getAsString()));
-                    storagePool.setConsumed_capacity_percentage(element.get("consumed_capacity_percentage").getAsString());
-                    storagePool.setConsumed_capacity_threshold(element.get("consumed_capacity_threshold").getAsString());
-                    storagePool.setStorage_pool_id(element.get("storage_pool_id").getAsString());
-                    storagePool.setStorage_name(element.get("storage_name").getAsString());
-                    storagePool.setMedia_type(element.get("media_type").getAsString());
-                    storagePool.setTier0_disk_type(element.get("tier0_disk_type").getAsString());
-                    storagePool.setTier1_disk_type(element.get("tier1_disk_type").getAsString());
-                    storagePool.setTier2_disk_type(element.get("tier2_disk_type").getAsString());
-                    storagePool.setStorage_id(element.get("storage_id").getAsString());
-                    storagePool.setTier0_raid_lv(element.get("tier0_raid_lv").getAsString());
-                    storagePool.setTier1_raid_lv(element.get("tier1_raid_lv").getAsString());
-                    storagePool.setTier2_raid_lv(element.get("tier2_raid_lv").getAsString());
-                    storagePool.setConsumed_capacity(Double.valueOf(element.get("consumed_capacity").getAsString()));
+                    storagePool.setConsumed_capacity(Double.valueOf(ToolUtils.jsonToStr(element.get("consumed_capacity"))));
+                    storagePool.setConsumed_capacity_percentage(ToolUtils.jsonToStr(element.get("consumed_capacity_percentage")));
+                    storagePool.setConsumed_capacity_threshold(ToolUtils.jsonToStr(element.get("consumed_capacity_threshold")));
+                    storagePool.setStorage_pool_id(ToolUtils.jsonToStr(element.get("storage_pool_id")));
+                    storagePool.setStorage_name(ToolUtils.jsonToStr(element.get("storage_name")));
+                    storagePool.setMedia_type(ToolUtils.jsonToStr(element.get("media_type")));
+                    storagePool.setTier0_disk_type(ToolUtils.jsonToStr(element.get("tier0_disk_type")));
+                    storagePool.setTier1_disk_type(ToolUtils.jsonToStr(element.get("tier1_disk_type")));
+                    storagePool.setTier2_disk_type(ToolUtils.jsonToStr(element.get("tier2_disk_type")));
+                    storagePool.setStorage_id(ToolUtils.jsonToStr(element.get("storage_id")));
+                    storagePool.setTier0_raid_lv(ToolUtils.jsonToStr(element.get("tier0_raid_lv")));
+                    storagePool.setTier1_raid_lv(ToolUtils.jsonToStr(element.get("tier1_raid_lv")));
+                    storagePool.setTier2_raid_lv(ToolUtils.jsonToStr(element.get("tier2_raid_lv")));
+                    storagePool.setConsumed_capacity(ToolUtils.jsonToDou(element.get("consumed_capacity"),0.0));
                     //订阅率（lun/fs订阅率）
                     DecimalFormat df = new DecimalFormat("#.00");
                     Double lun_subscription_rate = 0.0;
@@ -283,10 +280,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("storageId", storageId);
         List<LogicPorts> resList = new ArrayList<>();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-
         String url = API_LOGICPORTS_LIST + storageId;
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
@@ -303,22 +296,22 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
                     LogicPorts logicPorts = new LogicPorts();
-                    logicPorts.setId(element.get("id").getAsString());
-                    logicPorts.setName(element.get("name").getAsString());
-                    logicPorts.setRunning_status(element.get("running_status").getAsString());
-                    logicPorts.setOperational_status(element.get("operational_status").getAsString());
-                    logicPorts.setMgmt_ip(element.get("mgmt_ip").getAsString());
-                    logicPorts.setMgmt_ipv6(element.get("mgmt_ipv6").getAsString());
-                    logicPorts.setHome_port_id(element.get("home_port_id").getAsString());
-                    logicPorts.setHome_port_name(element.get("home_port_name").getAsString());
-                    logicPorts.setRole(element.get("role").getAsString());
-                    logicPorts.setDdns_status(element.get("ddns_status").getAsString());
-                    logicPorts.setCurrent_port_id(element.get("current_port_id").getAsString());
-                    logicPorts.setCurrent_port_name(element.get("current_port_name").getAsString());
-                    logicPorts.setSupport_protocol(element.get("support_protocol").getAsString());
-                    logicPorts.setManagement_access(element.get("management_access").getAsString());
-                    logicPorts.setVstore_id(element.get("vstore_id").getAsString());
-                    logicPorts.setVstore_name(element.get("vstore_name").getAsString());
+                    logicPorts.setId(ToolUtils.jsonToStr(element.get("id")));
+                    logicPorts.setName(ToolUtils.jsonToStr(element.get("name")));
+                    logicPorts.setRunning_status(ToolUtils.jsonToStr(element.get("running_status")));
+                    logicPorts.setOperational_status(ToolUtils.jsonToStr(element.get("operational_status")));
+                    logicPorts.setMgmt_ip(ToolUtils.jsonToStr(element.get("mgmt_ip")));
+                    logicPorts.setMgmt_ipv6(ToolUtils.jsonToStr(element.get("mgmt_ipv6")));
+                    logicPorts.setHome_port_id(ToolUtils.jsonToStr(element.get("home_port_id")));
+                    logicPorts.setHome_port_name(ToolUtils.jsonToStr(element.get("home_port_name")));
+                    logicPorts.setRole(ToolUtils.jsonToStr(element.get("role")));
+                    logicPorts.setDdns_status(ToolUtils.jsonToStr(element.get("ddns_status")));
+                    logicPorts.setCurrent_port_id(ToolUtils.jsonToStr(element.get("current_port_id")));
+                    logicPorts.setCurrent_port_name(ToolUtils.jsonToStr(element.get("current_port_name")));
+                    logicPorts.setSupport_protocol(ToolUtils.jsonToStr(element.get("support_protocol")));
+                    logicPorts.setManagement_access(ToolUtils.jsonToStr(element.get("management_access")));
+                    logicPorts.setVstore_id(ToolUtils.jsonToStr(element.get("vstore_id")));
+                    logicPorts.setVstore_name(ToolUtils.jsonToStr(element.get("vstore_name")));
                     resList.add(logicPorts);
                 }
                 resMap.put("data", resList);
@@ -361,23 +354,19 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
                     Volume volume = new Volume();
-                    String volume_id = element.get("id").getAsString();
+                    String volume_id = ToolUtils.jsonToStr(element.get("id"));
                     volume.setId(volume_id);
-                    volume.setName(element.get("name").getAsString());
-                    volume.setStatus(element.get("status").getAsString());
-                    volume.setAttached(Boolean.valueOf(element.get("attached").getAsString()));
-                    volume.setAlloctype(element.get("alloctype").getAsString());
-                    volume.setService_level_name(element.get("service_level_name").getAsString());
-                    volume.setStorage_id(element.get("storage_id").getAsString());
-                    volume.setPool_raw_id(element.get("pool_raw_id").getAsString());
-                    volume.setCapacity_usage(element.get("capacity_usage").getAsString());
-                    volume.setProtectionStatus(Boolean.valueOf(element.get("protected").getAsString()));
-                    volume.setCapacity(Integer.valueOf(element.get("capacity").getAsString()));
-                    String datastore = getDataStoreOnVolume(volume_id);
-                    if (StringUtils.isEmpty(datastore)) {
-                        datastore = "";
-                    }
-                    volume.setDatastores(datastore);
+                    volume.setName(ToolUtils.jsonToStr(element.get("name")));
+                    volume.setStatus(ToolUtils.jsonToStr(element.get("status")));
+                    volume.setAttached(ToolUtils.jsonToBoo(element.get("attached")));
+                    volume.setAlloctype(ToolUtils.jsonToStr(element.get("alloctype")));
+                    volume.setService_level_name(ToolUtils.jsonToStr(element.get("service_level_name")));
+                    volume.setStorage_id(ToolUtils.jsonToStr(element.get("storage_id")));
+                    volume.setPool_raw_id(ToolUtils.jsonToStr(element.get("pool_raw_id")));
+                    volume.setCapacity_usage(ToolUtils.jsonToStr(element.get("capacity_usage")));
+                    volume.setProtectionStatus(ToolUtils.jsonToBoo(element.get("protected")));
+                    volume.setCapacity(ToolUtils.jsonToInt(element.get("capacity"),0));
+                    volume.setDatastores(getDataStoreOnVolume(volume_id));
                     volumes.add(volume);
                 }
                 resMap.put("data", volumes);
@@ -426,16 +415,16 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
                     FileSystem fileSystem = new FileSystem();
-                    fileSystem.setId(element.get("id").getAsString());
-                    fileSystem.setName(element.get("name").getAsString());
-                    fileSystem.setHealth_status(element.get("health_status").getAsString());
-                    fileSystem.setAlloc_type(element.get("alloc_type").getAsString());
-                    fileSystem.setCapacity(Double.valueOf(element.get("capacity").getAsString()));
-                    fileSystem.setCapacity_usage_ratio(Integer.valueOf(element.get("capacity_usage_ratio").getAsString()));
-                    fileSystem.setStorage_pool_name(element.get("storage_pool_name").getAsString());
-                    fileSystem.setNfs_count(Integer.valueOf(element.get("nfs_count").getAsString()));
-                    fileSystem.setCifs_count(Integer.valueOf(element.get("cifs_count").getAsString()));
-                    fileSystem.setDtree_count(Integer.valueOf(element.get("dtree_count").getAsString()));
+                    fileSystem.setId(ToolUtils.jsonToStr(element.get("id")));
+                    fileSystem.setName(ToolUtils.jsonToStr(element.get("name")));
+                    fileSystem.setHealth_status(ToolUtils.jsonToStr(element.get("health_status")));
+                    fileSystem.setAlloc_type(ToolUtils.jsonToStr(element.get("alloc_type")));
+                    fileSystem.setCapacity(ToolUtils.jsonToDou(element.get("capacity"),0.0));
+                    fileSystem.setCapacity_usage_ratio(ToolUtils.jsonToInt(element.get("capacity_usage_ratio"),0));
+                    fileSystem.setStorage_pool_name(ToolUtils.jsonToStr(element.get("storage_pool_name")));
+                    fileSystem.setNfs_count(ToolUtils.jsonToInt(element.get("nfs_count"),0));
+                    fileSystem.setCifs_count(ToolUtils.jsonToInt(element.get("cifs_count"),0));
+                    fileSystem.setDtree_count(ToolUtils.jsonToInt(element.get("dtree_count"),0));
                     fileSystems.add(fileSystem);
                 }
                 resMap.put("data", fileSystems);
@@ -478,13 +467,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
                     Dtrees dtrees = new Dtrees();
-                    dtrees.setName(element.get("name").getAsString());
-                    dtrees.setFs_name(element.get("fs_name").getAsString());
-                    dtrees.setQuota_switch(Boolean.valueOf(element.get("quota_switch").getAsString()));
-                    dtrees.setSecurity_style(element.get("security_style").getAsString());
-                    dtrees.setTier_name(element.get("tier_name").getAsString());
-                    dtrees.setNfs_count(Integer.valueOf(element.get("nfs_count").getAsString()));
-                    dtrees.setCifs_count(Integer.valueOf(element.get("cifs_count").getAsString()));
+                    dtrees.setName(ToolUtils.jsonToStr(element.get("name")));
+                    dtrees.setFs_name(ToolUtils.jsonToStr(element.get("fs_name")));
+                    dtrees.setQuota_switch(ToolUtils.jsonToBoo(element.get("quota_switch")));
+                    dtrees.setSecurity_style(ToolUtils.jsonToStr(element.get("security_style")));
+                    dtrees.setTier_name(ToolUtils.jsonToStr(element.get("tier_name")));
+                    dtrees.setNfs_count(ToolUtils.jsonToInt(element.get("nfs_count"),0));
+                    dtrees.setCifs_count(ToolUtils.jsonToInt(element.get("cifs_count"),0));
                     resList.add(dtrees);
                 }
                 resMap.put("data", resList);
@@ -527,13 +516,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
                     NfsShares nfsShares = new NfsShares();
-                    nfsShares.setName(element.get("name").getAsString());
-                    nfsShares.setShare_path(element.get("share_path").getAsString());
-                    nfsShares.setStorage_id(element.get("storage_id").getAsString());
-                    nfsShares.setTier_name(element.get("tier_name").getAsString());
-                    nfsShares.setOwning_dtree_name(element.get("owning_dtree_name").getAsString());
-                    nfsShares.setOwning_dtree_id(element.get("owning_dtree_id").getAsString());
-                    nfsShares.setFs_name(element.get("fs_name").getAsString());
+                    nfsShares.setName(ToolUtils.jsonToStr(element.get("name")));
+                    nfsShares.setShare_path(ToolUtils.jsonToStr(element.get("share_path")));
+                    nfsShares.setStorage_id(ToolUtils.jsonToStr(element.get("storage_id")));
+                    nfsShares.setTier_name(ToolUtils.jsonToStr(element.get("tier_name")));
+                    nfsShares.setOwning_dtree_name(ToolUtils.jsonToStr(element.get("owning_dtree_name")));
+                    nfsShares.setOwning_dtree_id(ToolUtils.jsonToStr(element.get("owning_dtree_id")));
+                    nfsShares.setFs_name(ToolUtils.jsonToStr(element.get("fs_name")));
                     resList.add(nfsShares);
                 }
                 resMap.put("data", resList);
@@ -574,11 +563,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
                     BandPorts bandPorts = new BandPorts();
-                    bandPorts.setId(element.get("id").getAsString());
-                    bandPorts.setName(element.get("name").getAsString());
-                    bandPorts.setHealth_status(element.get("health_status").getAsString());
-                    bandPorts.setRunning_status(element.get("running_status").getAsString());
-                    bandPorts.setMtu(element.get("mtu").getAsString());
+                    bandPorts.setId(ToolUtils.jsonToStr(element.get("id")));
+                    bandPorts.setName(ToolUtils.jsonToStr(element.get("name")));
+                    bandPorts.setHealth_status(ToolUtils.jsonToStr(element.get("health_status")));
+                    bandPorts.setRunning_status(ToolUtils.jsonToStr(element.get("running_status")));
+                    bandPorts.setMtu(ToolUtils.jsonToStr(element.get("mtu")));
                     resList.add(bandPorts);
                 }
                 resMap.put("data", resList);
@@ -621,10 +610,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
                     StorageControllers storageControllers = new StorageControllers();
-                    storageControllers.setName(element.get("name").getAsString());
-                    storageControllers.setSoftVer(element.get("softVer").getAsString());
-                    storageControllers.setStatus(element.get("status").getAsString());
-                    storageControllers.setCpuInfo(element.get("cpuInfo").getAsString());
+                    storageControllers.setName(ToolUtils.jsonToStr(element.get("name")));
+                    storageControllers.setSoftVer(ToolUtils.jsonToStr(element.get("name")));
+                    storageControllers.setStatus(ToolUtils.jsonToStr(element.get("status")));
+                    storageControllers.setCpuInfo(ToolUtils.jsonToStr(element.get("cpuInfo")));
                     resList.add(storageControllers);
                 }
                 resMap.put("data", resList);
@@ -673,9 +662,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
                     StorageDisk storageDisk = new StorageDisk();
-                    storageDisk.setName(element.get("name").getAsString());
-                    storageDisk.setStatus(element.get("status").getAsString());
-                    storageDisk.setCapacity(element.get("capacity").getAsString());
+                    storageDisk.setName(ToolUtils.jsonToStr(element.get("name")));
+                    storageDisk.setStatus(ToolUtils.jsonToStr(element.get("status")));
+                    storageDisk.setCapacity(ToolUtils.jsonToDou(element.get("capacity"),0.0));
                     resList.add(storageDisk);
                 }
                 resMap.put("data", resList);
@@ -902,16 +891,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("code", 200);
         resMap.put("msg", "get volume success!");
         resMap.put("volume", volumeId);
-
-        List<Volume> volumes = new ArrayList<>();
-
-        //String reqPath = "/rest/blockservice/v1/volumes/{volume_id}";
-        String reqPath = "/rest/blockservice/v1/volumes";
-        String url = reqPath + "/" + volumeId;
+        String url = API_VOLUME_DETAIL + "/" + volumeId;
 
         try {
-            //ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            ResponseEntity responseEntity = access(url, HttpMethod.GET, null);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             LOG.info("DmeStorageServiceImpl/getVolume/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -924,16 +907,16 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
                 JsonObject element = jsonObject.get("volume").getAsJsonObject();
                 Volume volume = new Volume();
-                volume.setId(element.get("id").getAsString());
-                volume.setName(element.get("name").getAsString());
-                volume.setStatus(element.get("status").getAsString());
-                volume.setAttached(Boolean.valueOf(element.get("attached").getAsString()));
-                volume.setAlloctype(element.get("alloctype").getAsString());
-                volume.setService_level_name(element.get("service_level_name").getAsString());
-                volume.setStorage_id(element.get("storage_id").getAsString());
-                volume.setPool_raw_id(element.get("pool_raw_id").getAsString());
-                volume.setCapacity_usage(element.get("capacity_usage").getAsString());
-                volume.setProtectionStatus(Boolean.valueOf(element.get("protectionStatus").getAsString()));
+                volume.setId(ToolUtils.jsonToStr(element.get("id")));
+                volume.setName(ToolUtils.jsonToStr(element.get("name")));
+                volume.setStatus(ToolUtils.jsonToStr(element.get("status")));
+                volume.setAttached(ToolUtils.jsonToBoo(element.get("attached")));
+                volume.setAlloctype(ToolUtils.jsonToStr(element.get("alloctype")));
+                volume.setService_level_name(ToolUtils.jsonToStr(element.get("service_level_name")));
+                volume.setStorage_id(ToolUtils.jsonToStr(element.get("storage_id")));
+                volume.setPool_raw_id(ToolUtils.jsonToStr(element.get("pool_raw_id")));
+                volume.setCapacity_usage(ToolUtils.jsonToStr(element.get("capacity_usage")));
+                volume.setProtectionStatus(ToolUtils.jsonToBoo(element.get("protectionStatus")));
                 JsonArray jsonArray = element.get("attachments").getAsJsonArray();
                 volumeAttachments(jsonArray, volume);
                 resMap.put("data", volume);

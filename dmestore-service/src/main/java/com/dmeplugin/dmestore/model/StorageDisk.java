@@ -10,7 +10,7 @@ public class StorageDisk {
 
     private String name;
     private String status;
-    private String capacity;
+    private Double capacity;
 
     public String getName() {
         return name;
@@ -28,11 +28,11 @@ public class StorageDisk {
         this.status = status;
     }
 
-    public String getCapacity() {
+    public Double getCapacity() {
         return capacity;
     }
 
-    public void setCapacity(String capacity) {
+    public void setCapacity(Double capacity) {
         this.capacity = capacity;
     }
 }
