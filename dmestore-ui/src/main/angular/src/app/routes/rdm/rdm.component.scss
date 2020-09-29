@@ -5,3 +5,14 @@
   border-right:0px;
   width:80px;
 };
+
+
+.clr-form-horizontal .clr-form-control>.clr-control-label{
+  width: 700px;
+}
+::ng-deep .clr-select-wrapper{
+  width: 190px;
+}
+::ng-deep .clr-select-wrapper select{
+  width: 190px;
+}

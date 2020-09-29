@@ -16,20 +16,19 @@
               <span class="gh-info-value" *ngIf="hostModel.hostIp != ''">{{hostModel.hostIp}}</span>
             </div>
             <div class="gh-info-item">
-              <span class="gh-info-lable">Port</span>
+              <span class="gh-info-lable">{{'overview.port' | translate}}</span>
               <span class="gh-info-value" *ngIf="hostModel.hostPort == ''">--</span>
               <span class="gh-info-value" *ngIf="hostModel.hostPort != ''">{{hostModel.hostPort}}</span>
             </div>
             <div class="gh-info-item">
-              <span class="gh-info-lable">Status</span>
+              <span class="gh-info-lable">{{'overview.status' | translate}}</span>
               <span class="gh-info-value">
-
               </span>
               <span class="gh-info-value" *ngIf="hostModel.hostIp == ''">
                 <button type="button" (click)="showPop()" class="btn btn-icon" aria-label="home"><clr-icon shape="add"></clr-icon>
                 </button>
               </span>
-              <span class="gh-info-value" *ngIf="hostModel.hostIp != ''">Connected</span>
+              <span class="gh-info-value" *ngIf="hostModel.hostIp != ''">{{'overview.connected' | translate}}</span>
             </div>
           </div>
         </div>
@@ -40,7 +39,7 @@
   <div class="info-card clr-col-4">
     <div class="info-card-header">
       <div class="info-header-left">
-        <span>Storage</span>
+        <span>{{'overview.storage' | translate}}</span>
       </div>
     </div>
     <div class="info-card-content clr-row">
@@ -50,16 +49,16 @@
           <div echarts [options]="{}" (chartInit)= "storageNumChartInit($event)" style="width: 30%;height: 120px;"></div>
           <div class="info-content">
             <div class="info-content-text">
-              <span>Total</span>
+              <span>{{'overview.total' | translate}}</span>
               <span>{{storageNum.total}}</span>
             </div>
             <div class="info-content-text">
-              <span>Normal</span>
+              <span>{{'overview.normal' | translate}}</span>
               <span>{{storageNum.normal}}</span>
               <span class="squre used"></span>
             </div>
             <div class="info-content-text">
-              <span>Abnormal</span>
+              <span>{{'overview.abnormal' | translate}}</span>
               <span>{{storageNum.abnormal}}</span>
               <span class="squre free"></span>
             </div>
@@ -73,7 +72,7 @@
   <div class="info-card clr-col-4">
     <div class="info-card-header">
       <div class="info-header-left">
-        <span>Best Practice Violations</span>
+        <span>{{'overview.violations' | translate}}</span>
       </div>
     </div>
     <div class="info-card-content clr-row">
@@ -81,22 +80,22 @@
         <div class="count-item">
           <div class="num">{{bestPracticeViolations.critical}}</div>
           <div class="color-divide critical"></div>
-          <div class="text">Critical</div>
+          <div class="text">{{'overview.critical' | translate}}</div>
         </div>
         <div class="count-item">
           <div class="num">{{bestPracticeViolations.major}}</div>
           <div class="color-divide major"></div>
-          <div class="text">Major</div>
+          <div class="text">{{'overview.major' | translate}}</div>
         </div>
         <div class="count-item">
           <div class="num">{{bestPracticeViolations.warning}}</div>
           <div class="color-divide warning"></div>
-          <div class="text">Warning</div>
+          <div class="text">{{'overview.warning' | translate}}</div>
         </div>
         <div class="count-item">
           <div class="num">{{bestPracticeViolations.info}}</div>
           <div class="color-divide info"></div>
-          <div class="text">Info</div>
+          <div class="text">{{'overview.info' | translate}}</div>
         </div>
       </div>
     </div>
@@ -109,13 +108,13 @@
       <div class="info-header-left">
         <clr-dropdown [clrCloseMenuOnItemClick]="true">
           <button clrDropdownTrigger class="dropdown-toggle  btn btn-link">
-            Operation
+            {{'overview.operation' | translate}}
             <clr-icon shape="caret down"></clr-icon>
           </button>
           <clr-dropdown-menu *clrIfOpen>
-            <div clrDropdownItem (click)="loadstorageCapacity('0')">All DateStore</div>
-            <div clrDropdownItem (click)="loadstorageCapacity('1')">VMFS DateStore</div>
-            <div clrDropdownItem (click)="loadstorageCapacity('2')">NFS DateStore</div>
+            <div clrDropdownItem (click)="loadstorageCapacity('0')">{{'overview.allDataStore' | translate}}</div>
+            <div clrDropdownItem (click)="loadstorageCapacity('1')">{{'overview.VMFS' | translate}}</div>
+            <div clrDropdownItem (click)="loadstorageCapacity('2')">{{'overview.NFS' | translate}}</div>
           </clr-dropdown-menu>
         </clr-dropdown>
       </div>
@@ -127,16 +126,16 @@
           <div echarts [options]="{}" (chartInit)="storageCapacityChartInit($event)" style="width: 30%;height: 120px;"></div>
           <div class="info-content">
             <div class="info-content-text">
-              <span>Total</span>
+              <span>{{'overview.totalCapacity' | translate}}</span>
               <span>{{storageCapacity.totalCapacity}} {{storageCapacity.capacityUnit}}</span>
             </div>
             <div class="info-content-text">
-              <span>Used</span>
+              <span>{{'overview.used' | translate}}</span>
               <span>{{storageCapacity.usedCapacity}} {{storageCapacity.capacityUnit}}</span>
               <span class="squre used"></span>
             </div>
             <div class="info-content-text">
-              <span>Free</span>
+              <span>{{'overview.free' | translate}}</span>
               <span>{{storageCapacity.freeCapacity}} {{storageCapacity.capacityUnit}}</span>
               <span class="squre free"></span>
             </div>
@@ -151,27 +150,27 @@
       <div class="info-header-left">
         <clr-dropdown [clrCloseMenuOnItemClick]="true">
           <button clrDropdownTrigger class="dropdown-toggle  btn btn-link">
-            Operation
+            {{'overview.operation' | translate}}
             <clr-icon shape="caret down"></clr-icon>
           </button>
           <clr-dropdown-menu *clrIfOpen>
-            <div clrDropdownItem (click)="loadTop5DataStore('0')">All DateStore</div>
-            <div clrDropdownItem (click)="loadTop5DataStore('1')">VMFS DateStore</div>
-            <div clrDropdownItem (click)="loadTop5DataStore('2')">NFS DateStore</div>
+            <div clrDropdownItem (click)="loadTop5DataStore('0')">{{'overview.allDataStore' | translate}}</div>
+            <div clrDropdownItem (click)="loadTop5DataStore('1')"> {{'overview.VMFS' | translate}}</div>
+            <div clrDropdownItem (click)="loadTop5DataStore('2')">{{'overview.NFS' | translate}}</div>
           </clr-dropdown-menu>
         </clr-dropdown>
-        <div>Top 5 DataStore</div>
+        <div>{{'overview.top5T' | translate}}</div>
       </div>
     </div>
     <div class="info-card-content clr-row">
       <div class="clr-col-1"></div>
       <div class="clr-col-11">
         <div></div>
-        <div class="progress" *ngFor="let item of storeageTopN" [clrDgItem]="item">
+        <div class="progress-container" *ngFor="let item of storeageTopN" [clrDgItem]="item">
           <div class="progress-item">
             <div class="progress-label">{{item.name}}</div>
             <div class="progress-default">
-              <div class="progress" [ngStyle]="{'width':(item.utilization)+'%'}" [ngClass]="{'warning': (item.utilization) >= 70}"></div>
+              <div class="progress-inner" [ngStyle]="{'width':(item.utilization)+'%'}" [ngClass]="{'warning': (item.utilization) >= 70}"></div>
             </div>
             <div class="progress-text">
               <span class="percent">{{item.utilization}}% </span>
@@ -186,7 +185,7 @@
 </div>
 
 <clr-modal [(clrModalOpen)]="popShow">
-  <h3 class="modal-title">DME Connect</h3>
+  <h3 class="modal-title">{{'overview.connectT' | translate}}</h3>
   <div class="modal-body">
     <form clrForm [formGroup]="connectForm">
       <clr-input-container>
@@ -194,22 +193,22 @@
         <input clrInput formControlName="ip" type="text" [(ngModel)]="connectModel.hostIp" name="ip" />
       </clr-input-container>
       <clr-input-container>
-        <label>Port</label>
+        <label>{{'overview.port' | translate}}</label>
         <input clrInput formControlName="port" type="text" [(ngModel)]="connectModel.hostPort" name="port" />
       </clr-input-container>
       <clr-input-container>
-        <label>User</label>
+        <label>{{'overview.user' | translate}}</label>
         <input clrInput formControlName="username" type="text" [(ngModel)]="connectModel.userName" name="username" />
       </clr-input-container>
       <clr-password-container>
-        <label>password</label>
+        <label>{{'overview.password' | translate}}</label>
         <input clrPassword formControlName="password" placeholder="Password" name="password" [(ngModel)]="connectModel.password" />
       </clr-password-container>
     </form>
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-outline" (click)="popShow=false">Cancel</button>
-    <button type="button" class="btn btn-primary" (click)="submit()">Ok</button>
+    <button type="button" class="btn btn-outline" (click)="popShow=false">{{'menu.cancel' | translate}}</button>
+    <button type="button" class="btn btn-primary" (click)="submit()">{{'menu.submit' | translate}}</button>
   </div>
 </clr-modal>
 
@@ -217,7 +216,7 @@
 <clr-modal [(clrModalOpen)]="connectAlertFail" [clrModalSize]="'sm'">
   <h3 class="modal-title">tip</h3>
   <div class="modal-body">
-    connect failed.
+    {{'menu.connectFail' | translate}}
   </div>
   <!--<div class="modal-footer">
     <button type="button" class="btn btn-outline" (click)="delShow=false">{{'menu.cancel' | translate}}</button>
