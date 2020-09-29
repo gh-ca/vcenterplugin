@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.model.DMEHostInfo;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
@@ -117,6 +118,8 @@ public interface DmeAccessService {
      * @throws Exception when error
      */
     Map<String, Object> getDmeHost(String hostId) throws Exception;
+
+    List<DMEHostInfo> getAllDmeHost() throws Exception;
 
     /**
      * scan Datastore

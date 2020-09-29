@@ -974,12 +974,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             String vmfsDatastoreUrl = vmfsDatastore.get("url").getAsString();
             String vmfsDatastoreId = vmfsDatastore.get("objectid").getAsString();
             String vmfsDatastoreName = vmfsDatastore.get("name").getAsString();
-            //拆分wwn TODO
-            String wwn = vmfsDatastoreUrl.split("volumes/")[1];
-            int index = wwn.indexOf("/");
-            if(index != -1){
-                wwn = wwn.substring(0, index);
-            }
+
             //根据wwn从DME中查询卷信息
             //String volumeUrlByWwn = LIST_VOLUME_URL + "?volume_wwn=" + wwn;
             //ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByWwn, HttpMethod.GET, null);
@@ -988,6 +983,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             //ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlById, HttpMethod.GET, null);
             String volumeUrlByName = LIST_VOLUME_URL + "?name=" + vmfsDatastoreName;
             ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByName, HttpMethod.GET, null);
+
             if (responseEntity.getStatusCodeValue() / 100 != 2) {
                 LOG.info(" Query DME volume failed! errorMsg:{}", responseEntity.toString());
                 continue;

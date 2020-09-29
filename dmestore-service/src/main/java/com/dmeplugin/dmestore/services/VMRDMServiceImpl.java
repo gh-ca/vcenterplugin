@@ -2,11 +2,13 @@ package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.model.CreateVolumesRequest;
 import com.dmeplugin.dmestore.model.CustomizeVolumesRequest;
+import com.dmeplugin.dmestore.model.DMEHostInfo;
 import com.dmeplugin.dmestore.model.VmRDMCreateBean;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.vmware.vim25.HostScsiDisk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,9 +63,32 @@ public class VMRDMServiceImpl implements VMRDMService {
     }
 
     @Override
-    public void createRDM(String datastore_objectId, String vm_objectId, String host_objectId, VmRDMCreateBean createBean) throws Exception {
-        List<String> volumeIds = createDmeRDM(createBean);
+    public void createRDM(String vm_objectId, String host_objectId, VmRDMCreateBean createBean) throws Exception {
+        createDmeRDM(createBean);
         LOG.info("create DME disk succeeded!");
+        String requestVolumeName = "";
+        int size;
+        int count;
+        if (createBean.getCreateVolumesRequest() != null) {
+            requestVolumeName = createBean.getCreateVolumesRequest().getVolumes().get(0).getName();
+            size = createBean.getCreateVolumesRequest().getVolumes().get(0).getCapacity();
+            count = createBean.getCreateVolumesRequest().getVolumes().get(0).getCount();
+        } else {
+            requestVolumeName = createBean.getCustomizeVolumesRequest().getCustomize_volumes().getVolume_specs().get(0).getName();
+            size = createBean.getCustomizeVolumesRequest().getCustomize_volumes().getVolume_specs().get(0).getCapacity();
+            count = createBean.getCustomizeVolumesRequest().getCustomize_volumes().getVolume_specs().get(0).getCount();
+        }
+        //根据卷名称查询已创建的卷信息
+        String url = DmeConstants.DME_VOLUME_BASE_URL + "?name=" + requestVolumeName;
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+        JsonObject jsonObject = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+        JsonArray volumeArr = jsonObject.getAsJsonArray("volumes");
+        List<String> volumeIds = new ArrayList<>();
+        for (int i = 0; i < volumeArr.size(); i++) {
+            volumeIds.add(volumeArr.get(i).getAsJsonObject().get("id").getAsString());
+        }
+        //datastore_objectId =
+        //host_objectId = "urn:vmomi:HostSystem:host-224:f8e381d7-074b-4fa9-9962-9a68ab6106e1";
         String _host_id = vcsdkUtils.getVcConnectionHelper().objectID2Serverguid(host_objectId);
         LOG.info("host_objectId:{}, DME host_id:{}", host_objectId, _host_id);
         //将卷映射给主机
@@ -74,48 +99,37 @@ public class VMRDMServiceImpl implements VMRDMService {
         Map<String, Object> hostMap = dmeAccessService.getDmeHost(_host_id);
         String host_ip = hostMap.get("ip").toString();
         String host_name = hostMap.get("name").toString();
-
         //调用vcenter扫描卷
         vcsdkUtils.hostRescanVmfs(host_ip);
         LOG.info("scan vmfs succeeded!");
-        //获取卷信息
-        String lunStr = vcsdkUtils.getLunsOnHost(host_name);
+
+        //获取LUN信息
+        String lunStr = vcsdkUtils.getLunsOnHost(host_ip);
         JsonArray lunArray = gson.fromJson(lunStr, JsonArray.class);
-        String requestVolumeName = "";
-        int size;
-        if(createBean.getCreateVolumesRequest() != null){
-            requestVolumeName = createBean.getCreateVolumesRequest().getVolumes().get(0).getName();
-            size = createBean.getCreateVolumesRequest().getVolumes().get(0).getCapacity();
-        }else {
-            requestVolumeName = createBean.getCustomizeVolumesRequest().getCustomize_volumes().getVolume_specs().getName();
-            size = createBean.getCustomizeVolumesRequest().getCustomize_volumes().getVolume_specs().getCapacity();
-        }
-        JsonObject lunObject = null;
-        boolean flag = false;
+        List<JsonObject> lunObjects = new ArrayList<>();
         for (int i = 0; i < lunArray.size(); i++) {
-            lunObject = lunArray.get(i).getAsJsonObject();
-            LOG.info("Lun deviceName={}, requested name={}", lunObject.get("deviceName").getAsString(), requestVolumeName);
-            //TODO 根据实际情况优化
-            if (lunObject.get("deviceName").getAsString().equals(requestVolumeName)) {
-                flag = true;
-                break;
+            JsonObject lunObject = lunArray.get(i).getAsJsonObject();
+            for (int j = 0; j < volumeArr.size(); j++) {
+                JsonObject volume = volumeArr.get(j).getAsJsonObject();
+                String wwn = volume.get("volume_wwn").getAsString();
+                if (lunObject.get("deviceName").getAsString().endsWith(wwn)) {
+                    lunObjects.add(lunObject);
+                }
             }
         }
 
-        if (!flag) {
-            LOG.error("no matching Lun information was found!");
-            throw new Exception("no matching Lun information was found!");
+        for (JsonObject object : lunObjects) {
+            //调用Vcenter创建磁盘
+            vcsdkUtils.createDisk(vm_objectId, object.get("devicePath").getAsString(), size);
         }
-        //调用Vcenter创建磁盘 TODO
-        vcsdkUtils.createDisk(datastore_objectId, vm_objectId, lunObject.get("deviceName").getAsString(), size);
     }
 
-    public List<String> createDmeRDM(VmRDMCreateBean vmRDMCreateBean) throws Exception {
+    public void createDmeRDM(VmRDMCreateBean vmRDMCreateBean) throws Exception {
         String taskId;
         //通过服务等级创建卷
-        if(vmRDMCreateBean.getCreateVolumesRequest() != null){
+        if (vmRDMCreateBean.getCreateVolumesRequest() != null) {
             taskId = createDMEVolumeByServiceLevel(vmRDMCreateBean.getCreateVolumesRequest());
-        }else {
+        } else {
             //用户自定义创建卷
             taskId = createDMEVolumeByUnServiceLevel(vmRDMCreateBean.getCustomizeVolumesRequest());
         }
@@ -124,18 +138,9 @@ public class VMRDMServiceImpl implements VMRDMService {
             LOG.error("The DME volume is in abnormal condition!taskDetail={}", gson.toJson(taskDetail));
             throw new Exception(taskDetail.get("detail_cn").getAsString());
         }
-        List<String> volumeIds = new ArrayList();
-        //获取卷资源
-        JsonArray resources = taskDetail.getAsJsonArray("resources");
-        for (int i = 0; i < resources.size(); i++) {
-            JsonObject resource = resources.get(i).getAsJsonObject();
-            String id = resource.get("id").getAsString();
-            volumeIds.add(id);
-        }
-        return volumeIds;
     }
 
-    private String createDMEVolumeByServiceLevel(CreateVolumesRequest createVolumesRequest) throws Exception{
+    private String createDMEVolumeByServiceLevel(CreateVolumesRequest createVolumesRequest) throws Exception {
         String url = DmeConstants.DME_VOLUME_BASE_URL;
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(createVolumesRequest));
         if (responseEntity.getStatusCodeValue() / 100 != 2) {
@@ -148,7 +153,7 @@ public class VMRDMServiceImpl implements VMRDMService {
         return taskId;
     }
 
-    private String createDMEVolumeByUnServiceLevel(CustomizeVolumesRequest customizeVolumesRequest) throws Exception{
+    private String createDMEVolumeByUnServiceLevel(CustomizeVolumesRequest customizeVolumesRequest) throws Exception {
         String url = DmeConstants.DME_CREATE_VOLUME_UNLEVEL_URL;
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(customizeVolumesRequest));
         if (responseEntity.getStatusCodeValue() / 100 != 2) {
@@ -181,4 +186,8 @@ public class VMRDMServiceImpl implements VMRDMService {
         }
     }
 
+    @Override
+    public List<DMEHostInfo> getAllDmeHost() throws Exception {
+        return dmeAccessService.getAllDmeHost();
+    }
 }
