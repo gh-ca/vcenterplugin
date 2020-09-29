@@ -209,6 +209,8 @@
     "host": "主机",
     "cluster": "集群",
     "type": "类型",
+    "startTime": "开始时间",
+    "endTime": "结束时间",
     "mount":{
       "mount":"挂载",
       "host":"主机",

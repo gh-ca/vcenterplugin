@@ -61,6 +61,11 @@ export class PerformanceComponent implements OnInit, AfterViewInit {
   ranges = NfsService.perRanges;
   // select range
   selectRange = 'LAST_1_DAY';
+  // startTime
+  startTime = null;
+
+  // endTime
+  endTime = null;
 
   constructor(private nfsService: NfsService, private makePerformance: MakePerformance, private perService: VmfsPerformanceService, private ngZone: NgZone, private cdr: ChangeDetectorRef) {
   }
@@ -84,7 +89,7 @@ export class PerformanceComponent implements OnInit, AfterViewInit {
     // volIds.push(this.selectVolume.wwn);
     volIds.push('1282FFE20AA03E4EAC9A814C687B780A');
     // IOPS
-    this.makePerformance.setChart(300,'IOPS', 'IO/s', NfsService.nfsIOPS, volIds, this.selectRange, NfsService.vmfsUrl).then(res => {
+    this.makePerformance.setChart(300,'IOPS', 'IO/s', NfsService.nfsIOPS, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
       this.iopsChart = res;
       this.cdr.detectChanges();
     });
@@ -105,6 +110,15 @@ export class PerformanceComponent implements OnInit, AfterViewInit {
   // 切换卷函数
   changeVolFunc() {
     console.log(this.selectVolName && this.selectRange);
+    if (this.selectRange === 'BEGIN_END_TIME') {
+      if (this.startTime === null || this.endTime === null) {
+        console.log('开始结束时间不能为空');
+        return;
+      }
+    } else { // 初始化开始结束时间
+      this.startTime = null;
+      this.endTime = null;
+    }
     // if (this.selectVolName && this.selectRange) {
     if (this.selectRange) {
       console.log('this.selectVolName+this.selectRange', this.selectVolName, this.selectRange);
@@ -116,5 +130,9 @@ export class PerformanceComponent implements OnInit, AfterViewInit {
       console.log('未选择卷或range');
     }
   }
+  changeDate() {
 
+    console.log('startTime', this.startTime);
+    console.log('endTime', this.endTime);
+  }
 }
