@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.utils;
 
+import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.vmware.SpringBootConnectionHelper;
 import com.dmeplugin.vmware.VCConnectionHelper;
 import com.dmeplugin.vmware.autosdk.SessionHelper;
@@ -19,12 +20,32 @@ import com.vmware.cis.tagging.TagModel;
 import com.vmware.pbm.*;
 import com.vmware.pbm.RuntimeFaultFaultMsg;
 import com.vmware.vapi.std.DynamicID;
+import com.vmware.vim.binding.vim.HostSystem;
+import com.vmware.vim.binding.vim.ServiceInstance;
+import com.vmware.vim.binding.vim.ServiceInstanceContent;
+import com.vmware.vim.binding.vim.SessionManager;
+import com.vmware.vim.binding.vim.fault.InvalidLogin;
+import com.vmware.vim.binding.vim.fault.InvalidLocale;
+import com.vmware.vim.binding.vim.version.version10;
+import com.vmware.vim.binding.vmodl.reflect.ManagedMethodExecuter;
+import com.vmware.vim.vmomi.client.Client;
+import com.vmware.vim.vmomi.client.http.HttpClientConfiguration;
+import com.vmware.vim.vmomi.client.http.HttpConfiguration;
+import com.vmware.vim.vmomi.client.http.impl.AllowAllThumbprintVerifier;
+import com.vmware.vim.vmomi.client.http.impl.HttpConfigurationImpl;
+import com.vmware.vim.vmomi.core.types.VmodlContext;
+
 import com.vmware.vim25.*;
 import com.vmware.vim25.InvalidArgumentFaultMsg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class VCSDKUtils {
@@ -44,6 +65,8 @@ public class VCSDKUtils {
     }
 
     private final static Logger _logger = LoggerFactory.getLogger(VCSDKUtils.class);
+
+    private static final Class<?> version = version10.class;
 
     private Gson gson = new Gson();
 
@@ -2106,7 +2129,79 @@ public class VCSDKUtils {
         return hbalist;
     }
 
+    //使用主机测试目标机的连通性
+    public String testConnectivity(String hostObjectId,List<Map<String, Object>> ethPorts,Map<String, String> vmKernel,VCenterInfo vCenterInfo) throws URISyntaxException, InvalidLogin, InvalidLocale, KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+        String reStr = null;
+        HttpConfiguration httpConfig = new HttpConfigurationImpl();
+        httpConfig.setTimeoutMs(3000);
+        httpConfig.setThumbprintVerifier(new AllowAllThumbprintVerifier());
 
+        HttpClientConfiguration clientConfig = HttpClientConfiguration.Factory.newInstance();
+        clientConfig.setHttpConfiguration(httpConfig);
+        VmodlContext context= VmodlContext.initContext(new String[] { "com.vmware.vim.binding.vim","com.vmware.vim.binding.vmodl.reflect" });
+        Client vmomiClient = Client.Factory.createClient(new URI("https://"+vCenterInfo.getHostIp()+"/sdk"), version, context, clientConfig);
+        com.vmware.vim.binding.vmodl.ManagedObjectReference svcRef = new com.vmware.vim.binding.vmodl.ManagedObjectReference();
+        svcRef.setType("ServiceInstance");
+        svcRef.setValue("ServiceInstance");
+        ServiceInstance instance = vmomiClient.createStub(ServiceInstance.class, svcRef);
+        ServiceInstanceContent serviceInstanceContent=instance.retrieveContent();
+
+        SessionManager sessionManager = vmomiClient.createStub(SessionManager.class,
+                serviceInstanceContent.getSessionManager());
+        sessionManager.login(vCenterInfo.getUserName(), CipherUtils.decryptString(vCenterInfo.getPassword()), "en");
+        ManagedObjectReference objmor = vcConnectionHelper.objectID2MOR(hostObjectId);
+        com.vmware.vim.binding.vmodl.ManagedObjectReference hostmor = new com.vmware.vim.binding.vmodl.ManagedObjectReference();
+        hostmor.setType(objmor.getType());
+        hostmor.setValue(objmor.getValue());
+        HostSystem hostSystem=vmomiClient.createStub(HostSystem.class,hostmor);
+
+        com.vmware.vim.binding.vmodl.ManagedObjectReference methodexecutor=hostSystem.retrieveManagedMethodExecuter();
+
+        String moid="ha-cli-handler-network-diag";
+        ManagedMethodExecuter methodExecuter=vmomiClient.createStub(ManagedMethodExecuter.class,methodexecutor);
+
+        if(ethPorts!=null && ethPorts.size()>0) {
+            List<Map<String, Object>> reEthPorts = new ArrayList<>();
+            for(Map<String, Object> ethPort:ethPorts) {
+                String mgmtIp = ToolUtils.getStr(ethPort.get("mgmtIp"));
+                if(!StringUtils.isEmpty(mgmtIp)) {
+                    try {
+                        ManagedMethodExecuter.SoapArgument soapArgument0 = new ManagedMethodExecuter.SoapArgument();
+                        soapArgument0.setName("interface");
+                        soapArgument0.setVal("<interface xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"urn:vim25\">vmk1</interface>");
+
+                        ManagedMethodExecuter.SoapArgument soapArgument1 = new ManagedMethodExecuter.SoapArgument();
+                        soapArgument1.setName("wait");
+                        soapArgument1.setVal("<wait xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"urn:vim25\">3</wait>");
+
+                        ManagedMethodExecuter.SoapArgument soapArgument2 = new ManagedMethodExecuter.SoapArgument();
+                        soapArgument2.setName("host");
+                        soapArgument2.setVal("<host xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"urn:vim25\">" + mgmtIp + "</host>");
+                        List<ManagedMethodExecuter.SoapArgument> soapArgumentList = new ArrayList<>();
+//                      soapArgumentList.add(soapArgument0);
+//                      soapArgumentList.add(soapArgument1);
+                        soapArgumentList.add(soapArgument2);
+
+                        ManagedMethodExecuter.SoapResult soapResult = methodExecuter.executeSoap(moid, "urn:vim25/6.5", "vim.EsxCLI.network.diag.ping", soapArgumentList.toArray(new ManagedMethodExecuter.SoapArgument[0]));
+
+                        System.out.println("11xx==" + new String(soapResult.getResponse().getBytes("ISO-8859-1"), "UTF-8"));
+                        _logger.info(mgmtIp+"====true");
+                        ethPort.put("connectStatus","true");
+                    } catch (Exception e) {
+                        ethPort.put("connectStatus","false");
+                        _logger.info(mgmtIp+"===="+e.toString());
+                    }
+                    reEthPorts.add(ethPort);
+                }
+            }
+
+            if(reEthPorts.size()>0){
+                reStr = gson.toJson(reEthPorts);
+            }
+        }
+
+        return reStr;
+    }
     /*public static void main(String[] args) {
 //        try {
 //            Gson gson = new Gson();

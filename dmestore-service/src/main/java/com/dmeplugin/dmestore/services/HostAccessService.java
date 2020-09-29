@@ -30,8 +30,9 @@ public interface HostAccessService {
      * Test Connectivity:
      * String hostObjectId：host object id
      * List<Map<String, Object>> ethPorts: 要测试的以太网端口列表
+     * Map<String, String> vmKernel: 虚拟网卡信息
      *
-     * @param params: params include:hostObjectId,ethPorts
+     * @param params: params include:hostObjectId,ethPorts，vmKernel
      * @return: ResponseBodyBean
      * @throws Exception when error
      */
