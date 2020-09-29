@@ -906,7 +906,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         List<Volume> volumes = new ArrayList<>();
 
         //String reqPath = "/rest/blockservice/v1/volumes/{volume_id}";
-        String reqPath = "https://localhost:26335/rest/blockservice/v1/volumes";
+        String reqPath = "/rest/blockservice/v1/volumes";
         String url = reqPath + "/" + volumeId;
 
         try {

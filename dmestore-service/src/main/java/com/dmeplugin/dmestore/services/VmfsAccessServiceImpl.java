@@ -970,7 +970,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         for (int i = 0; i < jsonArray.size(); i++) {
             JsonObject vmfsDatastore = jsonArray.get(i).getAsJsonObject();
             String storeType = ToolUtils.STORE_TYPE_VMFS;
-            //TODO 暂时认为是从url中获取到wwn信息
+            //TODO 暂时认为是从url中获取到wwn信息 modify 20200928 通过vcenter的vmfs的wwn，id与dme的卷均建立不了关系,目前通过名称建立关系
             String vmfsDatastoreUrl = vmfsDatastore.get("url").getAsString();
             String vmfsDatastoreId = vmfsDatastore.get("objectid").getAsString();
             String vmfsDatastoreName = vmfsDatastore.get("name").getAsString();
@@ -981,28 +981,39 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 wwn = wwn.substring(0, index);
             }
             //根据wwn从DME中查询卷信息
-            String volumeUrlByWwn = LIST_VOLUME_URL + "?volume_wwn=" + wwn;
-            ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByWwn, HttpMethod.GET, null);
+            //String volumeUrlByWwn = LIST_VOLUME_URL + "?volume_wwn=" + wwn;
+            //ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByWwn, HttpMethod.GET, null);
+            //根据volumeId从dme中查询卷信息
+            //String volumeUrlById = LIST_VOLUME_URL + "/" + wwn;
+            //ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlById, HttpMethod.GET, null);
+            String volumeUrlByName = LIST_VOLUME_URL + "?name=" + vmfsDatastoreName;
+            ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByName, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() / 100 != 2) {
                 LOG.info(" Query DME volume failed! errorMsg:{}", responseEntity.toString());
                 continue;
             }
             JsonObject jsonObject = gson.fromJson(responseEntity.getBody(), JsonObject.class);
-            JsonObject volume = jsonObject.getAsJsonArray("volumes").get(0).getAsJsonObject();
-            String volumeId = volume.get("id").getAsString();
-            String volumeName = volume.get("name").getAsString();
-            String volumeWwn = volume.get("volume_wwn").getAsString();
+            JsonElement volumesElement = jsonObject.get("volumes");
+            if(!ToolUtils.jsonIsNull(volumesElement)){
+                JsonArray volumeArray =  volumesElement.getAsJsonArray();
+                if(volumeArray.size() >0){
+                    JsonObject volumeObject = volumeArray.get(0).getAsJsonObject();
+                    String volumeId = ToolUtils.jsonToOriginalStr(volumeObject.get("id"));
+                    String volumeName = ToolUtils.jsonToOriginalStr(volumeObject.get("name"));
+                    String volumeWwn = ToolUtils.jsonToOriginalStr(volumeObject.get("volume_wwn"));
 
-            DmeVmwareRelation relation = new DmeVmwareRelation();
-            relation.setStoreId(vmfsDatastoreId);
-            relation.setStoreName(vmfsDatastoreName);
-            relation.setVolumeId(volumeId);
-            relation.setVolumeName(volumeName);
-            relation.setVolumeWwn(volumeWwn);
-            relation.setStoreType(storeType);
-            relation.setState(1);
+                    DmeVmwareRelation relation = new DmeVmwareRelation();
+                    relation.setStoreId(vmfsDatastoreId);
+                    relation.setStoreName(vmfsDatastoreName);
+                    relation.setVolumeId(volumeId);
+                    relation.setVolumeName(volumeName);
+                    relation.setVolumeWwn(volumeWwn);
+                    relation.setStoreType(storeType);
+                    relation.setState(1);
 
-            relationList.add(relation);
+                    relationList.add(relation);
+                }
+            }
         }
 
         if (relationList.size() > 0) {
@@ -1043,7 +1054,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return true;
     }
-
 
     /**
      * @param params volume_id host_id hostGroup_id由调用处传递过来，而不是在此处自己查询？
@@ -1345,6 +1355,4 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return volumes;
     }
-
-
 }
