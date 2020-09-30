@@ -49,13 +49,12 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
 
         String url = LIST_RELATION_URL;
         url = url.replace("{relationName}", relationName);
-        url = "https://localhost:26335" + url;//上线时删除此行代码
 
         ResponseEntity responseEntity;
         try {
             responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() == 200) {
-                ris = converRelation(responseEntity.getBody());
+                ris = converRelations(responseEntity.getBody());
             }
         } catch (Exception e) {
             throw e;
@@ -74,13 +73,13 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         String url = LIST_RELATION_URL;
         url = url.replace("{relationName}", relationName);
         url = url + "?condition=[{\"simple\":{\"name\":\"source_Instance_Id\",\"value\":\"" + sourceInstanceId + "\"}}]";
-        url = "https://localhost:26335" + url;//上线时删除此行代码
+
 
         ResponseEntity responseEntity;
         try {
             responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() == 200) {
-                ris = converRelation(responseEntity.getBody());
+                ris = converRelations(responseEntity.getBody());
             }
         } catch (Exception e) {
             LOG.warn("通过关系类型名称和源实例ID查询对应关系异常,relationName:{},sourceInstancId:{}!", relationName, sourceInstanceId);
@@ -91,7 +90,26 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
 
     @Override
     public RelationInstance queryRelationByRelationNameInstanceId(String relationName, String instanceId) throws Exception {
-        return null;
+        RelationInstance ri = new RelationInstance();
+        Map<String, Object> remap = new HashMap<>();
+        remap.put("code", 200);
+        remap.put("message", "queryRelationByRelationName success!");
+
+        String url = QUERY_RELATION_URL;
+        url = url.replace("{relationName}", relationName);
+        url = url.replace("{instanceId}", relationName);
+
+        ResponseEntity responseEntity;
+        try {
+            responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            if (responseEntity.getStatusCodeValue() == 200) {
+                ri = converRelation(responseEntity.getBody());
+            }
+        } catch (Exception e) {
+            LOG.warn("通过关系类型名称和源实例ID查询对应关系异常,relationName:{},InstancId:{}!", relationName, instanceId);
+            throw e;
+        }
+        return ri;
     }
 
     @Override
@@ -111,7 +129,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         try {
             responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() == 200) {
-               obj = responseEntity.getBody();
+                obj = responseEntity.getBody();
             }
         } catch (Exception e) {
             LOG.warn("通过资源类型名称和资源实例ID查询对应资源实例异常,className:{},instancId:{}!", instanceName, instanceId);
@@ -120,7 +138,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         return obj;
     }
 
-    private List<RelationInstance> converRelation(Object object) {
+    private List<RelationInstance> converRelations(Object object) {
         List<RelationInstance> ris = new ArrayList<>();
         JsonObject bodyJson = new JsonParser().parse(object.toString()).getAsJsonObject();
         JsonArray objList = bodyJson.get("objList").getAsJsonArray();
@@ -140,5 +158,19 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         return ris;
     }
 
+    private RelationInstance converRelation(Object object) {
+        RelationInstance ri = new RelationInstance();
+        JsonObject objJson = new JsonParser().parse(object.toString()).getAsJsonObject();
+        if(null != objJson){
+            ri.setSourceInstanceId(ToolUtils.getStr(objJson.get("source_Instance_Id")));
+            ri.setTargetInstanceId(ToolUtils.getStr(objJson.get("target_Instance_Id")));
+            ri.setRelationName(ToolUtils.getStr(objJson.get("relation_Name")));
+            ri.setId(ToolUtils.getStr(objJson.get("id")));
+            ri.setLastModified(ToolUtils.getLong(objJson.get("last_Modified")));
+            ri.setResId(ToolUtils.getStr(objJson.get("resId")));
+            ri.setRelationId(ToolUtils.getInt(objJson.get("relation_Id")));
+        }
+        return ri;
+    }
 
 }
