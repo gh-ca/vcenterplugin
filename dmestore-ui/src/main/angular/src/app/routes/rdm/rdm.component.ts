@@ -19,8 +19,11 @@ export class RdmComponent implements OnInit {
 
   popShow = true;
   configModel = new customize_volumes();
+  mapping = new mapping();
   storageDevices = [];
   storagePools = [];
+  hostList = [];
+  hostSelected = {};
   levelCheck = 'storage';
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
@@ -29,12 +32,22 @@ export class RdmComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadStorageDevice();
+    this.loadHosts();
     const ctx = this.gs.getClientSdk().app.getContextObjects();
     console.log(ctx);
   }
 
   submit(): void {
+    console.log(this.mapping);
+    this.http.post('', {}).subscribe((result: any) => {
 
+      if (result.code === '0' || result.code === '200'){
+        this.storageDevices = result.data.data;
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+      }
+    }, err => {
+      console.error('ERROR', err);
+    });
   }
 
   basAdd(){
@@ -52,7 +65,7 @@ export class RdmComponent implements OnInit {
 
   loadStorageDevice(){
     this.http.get('dmestorage/storages', {}).subscribe((result: any) => {
-      console.log(result);
+
       if (result.code === '0' || result.code === '200'){
         this.storageDevices = result.data.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -64,9 +77,21 @@ export class RdmComponent implements OnInit {
 
   loadStoragePool(storageId: string){
     this.http.get('dmestorage/storagepools', {params: {storageId}}).subscribe((result: any) => {
-      console.log(result);
+
       if (result.code === '0' || result.code === '200'){
         this.storagePools = result.data.data;
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+      }
+    }, err => {
+      console.error('ERROR', err);
+    });
+  }
+
+  loadHosts(){
+    this.http.get('v1/vmrdm/dmeHosts').subscribe((result: any) => {
+      console.log(result);
+      if (result.code === '0' || result.code === '200'){
+        this.hostList = result.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
     }, err => {
@@ -89,8 +114,12 @@ class customize_volumes{
   tuning: tuning;
   volume_specs: volume_specs[];
   constructor(){
+    this.storageType = '2';
     this.volume_specs = [new volume_specs()];
     this.tuning = new tuning();
+    this.initial_distribute_policy = '0';
+    this.owner_controller = '0';
+    this.prefetch_policy = '3';
   }
 }
 
@@ -102,7 +131,7 @@ class volume_specs{
   start_lun_id: number;
   start_suffix: number;
   constructor(){
-
+     this.unit = 'GB';
   }
 }
 
@@ -116,6 +145,10 @@ class tuning{
   workload_type_id: string;
   constructor(){
     this.smartqos = new smartqos();
+    this.alloctype = 'thick';
+    this.smarttier = '0';
+    this.compression_enabled = '0';
+    this.dedupe_enabled = '0';
   }
 }
 
@@ -128,6 +161,14 @@ class smartqos{
   miniops: number;
   name:string;
   constructor(){
+    this.control_policy = '1'
+  }
+}
 
+class mapping{
+  auto_zoning: boolean;
+  host_id: string;
+  hostgroup_id: string;
+  constructor(){
   }
 }

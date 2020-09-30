@@ -134,7 +134,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
             },
             qos: {
                 enabled: true,
-                qos_param: {
+                qosParam: {
                   latency: 25,
                   latencyU: 'ms',
                   minBandWidth: 2000,
@@ -389,10 +389,18 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   // 刷新服务等级列表
   refresh(){
     this.http.post('servicelevel/listservicelevel', {}).subscribe((response: any) => {
+      response.data = JSON.stringify(response.data);
       response.data = response.data.replace('service-levels', 'serviceLevels');
-      const r = JSON.parse(response.data);
+      const r = this.recursiveNullDelete(JSON.parse(response.data));
       for (const i of r.serviceLevels){
-        i.usedRate =  ((i.used_capacity / i.total_capacity * 100).toFixed(2));
+        if (i.total_capacity == 0){
+          i.usedRate = 0.0;
+        } else {
+          i.usedRate =  ((i.used_capacity / i.total_capacity * 100).toFixed(2));
+        }
+        i.used_capacity = (i.used_capacity/1024).toFixed(2);
+        i.total_capacity = (i.total_capacity/1024).toFixed(2);
+        i.free_capacity = (i.free_capacity/1024).toFixed(2);
       }
       this.serviceLevelsRes = r.serviceLevels;
       this.search();
@@ -418,6 +426,27 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     if (o.value !== ''){
       this.serviceLevels = this.serviceLevels.sort(this.compare(this.sortItem, 'asc'));
     }
+  }
+
+  recursiveNullDelete(obj: any){
+    for (const property in obj){
+      if (obj[property] === null){
+        delete obj[property];
+      } else if (obj[property] instanceof Object){
+        this.recursiveNullDelete(obj[property]);
+      } else if (property == 'minBandWidth' && obj[property] == 0){
+        delete obj[property];
+      } else if (property == 'maxBandWidth' && obj[property] == 0){
+        delete obj[property];
+      } else if (property == 'minIOPS' && obj[property] == 0){
+        delete obj[property];
+      } else if (property == 'maxIOPS' && obj[property] == 0){
+        delete obj[property];
+      } else if(property == 'latency' && obj[property] == 0){
+        delete obj[property];
+      }
+    }
+    return obj;
   }
 
   // 获取指定属性值
@@ -487,7 +516,7 @@ class Servicelevel {
     };
     qos: {
       enabled: boolean;
-      qos_param: {
+      qosParam: {
         latency: number;
         latencyU: string;
         minBandWidth: number;

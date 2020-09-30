@@ -131,7 +131,7 @@
                   </div>
                 </div>
               </div>
-              <clr-datagrid class="datagrid-compact">
+              <clr-datagrid class="datagrid-compact" [(clrDgSelected)]="volumeSelect">
                 <clr-dg-column>{{'storage.detail.volumes.name' | translate}}</clr-dg-column>
                 <clr-dg-column>{{'storage.detail.volumes.status' | translate}}</clr-dg-column>
 
@@ -151,9 +151,10 @@
                   <clr-dg-cell>{{item.name}}</clr-dg-cell>
                   <clr-dg-cell>{{item.status}}</clr-dg-cell>
 
-                  <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.capacity}}</clr-dg-cell>
+
+                  <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{formatCapacity(item.capacity)}}</clr-dg-cell>
                   <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.alloctype}}</clr-dg-cell>
-                  <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.capacity_usage}}</clr-dg-cell>
+                  <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.capacity_usage || "--"}}</clr-dg-cell>
                   <clr-dg-cell [hidden]="volumeRadio!=='table1'">映射状态接口无相关字段</clr-dg-cell>
                   <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.storage_pool_name}}</clr-dg-cell>
                   <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.service_level_name}}</clr-dg-cell>

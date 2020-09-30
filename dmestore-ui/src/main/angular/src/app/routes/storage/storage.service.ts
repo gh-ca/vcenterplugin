@@ -3,191 +3,6 @@ import { HttpClient } from '@angular/common/http';
 
 @Injectable()
 export class StorageService {
-  charts = [
-    {
-      tooltip: {
-        trigger: 'item',
-        formatter: ' {b}: {c} ({d}%)'
-      },
-      title: {
-        text: '123',
-        textAlign: 'center',
-        padding: 0,
-        textVerticalAlign: 'middle',
-        textStyle: {
-          fontSize: 22,
-          color: '#63B3F7'
-        },
-        subtextStyle: {
-          fontSize: 12,
-          color: '#c2c6dc',
-          align: 'center'
-        },
-        left: '50%',
-        top: '50%',
-        //subtext: '234'
-      },
-
-      series: [
-        {
-          name: '',
-          type: 'pie',
-          radius: ['50%', '70%'],
-          center: ['50%', '50%'],
-
-          avoidLabelOverlap: false,
-          label: {
-            show: false,
-            position: 'center'
-          },
-          emphasis: {
-            label: {
-              show: false,
-              fontSize: '30',
-              fontWeight: 'bold'
-            }
-          },
-          labelLine: {
-            show: false
-          },
-          data: [
-            {value: 335, name: '直接访问'},
-            {value: 310, name: '邮件营销'},
-            {value: 234, name: '联盟广告'},
-            {value: 135, name: '视频广告'},
-            {value: 1548, name: '搜索引擎'}
-          ]
-        }
-      ],
-      color: ['#FF0000', '#FF9538', '#63B3F7']
-    },
-    {
-      tooltip: {
-        trigger: 'item',
-        formatter: ' {b}: {c} ({d}%)'
-      },
-      title: {
-        text: '123',
-        textAlign: 'center',
-        padding: 0,
-        textVerticalAlign: 'middle',
-        textStyle: {
-          fontSize: 22,
-          color: '#63B3F7'
-        },
-        subtextStyle: {
-          fontSize: 12,
-          color: '#c2c6dc',
-          align: 'center'
-        },
-        left: '50%',
-        top: '50%',
-        //subtext: '234'
-      },
-
-      series: [
-        {
-          name: '',
-          type: 'pie',
-          radius: ['50%', '70%'],
-          center: ['50%', '50%'],
-
-          avoidLabelOverlap: false,
-          label: {
-            show: false,
-            position: 'center'
-          },
-          emphasis: {
-            label: {
-              show: false,
-              fontSize: '30',
-              fontWeight: 'bold'
-            }
-          },
-          labelLine: {
-            show: false
-          },
-          data: [
-            {value: 335, name: '直接访问'},
-            {value: 310, name: '邮件营销'},
-            {value: 234, name: '联盟广告'},
-            {value: 135, name: '视频广告'},
-            {value: 1548, name: '搜索引擎'}
-          ]
-        }
-      ],
-      color: ['#FF0000', '#FF9538', '#63B3F7']
-    },
-    {
-      tooltip: {
-        trigger: 'item',
-        formatter: ' {b}: {c} ({d}%)'
-      },
-      title: {
-        text: '123',
-        textAlign: 'center',
-        padding: 0,
-        textVerticalAlign: 'middle',
-        textStyle: {
-          fontSize: 18,
-          color: '#63B3F7'
-        },
-        subtextStyle: {
-          fontSize: 12,
-          color: '#c2c6dc',
-          align: 'center'
-        },
-        left: '50%',
-        top: '50%',
-      },
-
-      series: [
-        {
-          name: '',
-          type: 'pie',
-          radius: ['60%', '70%'],
-          center: ['50%', '50%'],
-          avoidLabelOverlap: false,
-          label: {
-            show: false,
-            position: 'center'
-          },
-          emphasis: {
-            label: {
-              show: false,
-              fontSize: '20',
-              fontWeight: 'bold'
-            }
-          },
-          labelLine: {
-            show: false
-          },
-          data: [
-            {value: 335, name: '直接访问'},
-            {value: 310, name: '邮件营销'}
-          ]
-        }
-      ],
-      color: ['hsl(198, 100%, 32%)', 'hsl(198, 0%, 80%)']
-    },
-    {
-      xAxis: {
-        show: false,
-        type: 'category'
-      },
-      yAxis: {
-        show: false,
-        type: 'value'
-      },
-      series: [{
-        data: [120, 200, 150, 80, 70, 110, 130, 120, 200, 150, 80, 70, 110, 130, 120, 200, 150, 80, 70, 110, 130, 120, 200, 150, 80, 70, 110, 130, 120, 200, 150, 80, 70, 110, 130, 120, 200, 150, 80, 70, 110, 130],
-        type: 'bar',
-        barCategoryGap: 0
-      }],
-      color: ['hsl(198, 100%, 32%)']
-    }
-
-  ];
   constructor(private http: HttpClient) {}
 
   getData(){
@@ -199,10 +14,6 @@ export class StorageService {
   getLogicPortListByStorageId(storageId: string){
     return this.http.get('dmestorage/logicports', {params: {storageId}});
   }
-
-  getCharts() {
-    return this.charts;
-  }
 }
 export interface StorageList {
    id: string;
@@ -212,6 +23,7 @@ export interface StorageList {
    synStatus: string;
    vendor: string;
    model: string;
+   version: string;
    productVersion: string;
    usedCapacity: number;
    totalCapacity: number;
@@ -222,6 +34,8 @@ export interface StorageList {
    maxBandwidth: number;
    maxLatency: number;
    azIds: string[];
+  total_pool_capacity: number;
+  subscription_capacity: number;
 }
 export class LogicPort{
   id: string;
@@ -240,4 +54,115 @@ export class LogicPort{
   management_access: string;
   vstore_id: string;
   vstore_name: string;
+}
+export class StorageChart{
+  id: string;
+  name: string;
+  ip: string;
+  model: string; // 5300 V5(OceanStor)
+  capacity: string;// 总容量
+  usedCapacity: string;// 已使用容量
+  freeCapacity: string;// 空闲容量
+  alarms: number;// 告警数
+  events: number;// 事件数
+  chart: CapacityChart;
+  iops: PerforChart;
+  bandwidth: PerforChart;
+}
+export class CapacityChart{
+  tooltip: any;
+  title: any;
+  series: CapacitySerie[] =[];
+  constructor(title: string){
+    this.tooltip = {trigger: 'item', formatter: ' {b}: {c} ({d}%)'};
+    this.title = {
+      text: title,
+      textAlign: 'center',
+      padding: 0,
+      textVerticalAlign: 'middle',
+      textStyle: {
+        fontSize: 15,
+        color: '#63B3F7'
+      },
+      subtextStyle: {
+        fontSize: 10,
+        color: '#c2c6dc',
+        align: 'center'
+      },
+      left: '50%',
+      top: '50%',
+      //subtext: '234'
+    };
+
+  }
+}
+export class CapacitySerie{
+  name:string;
+  type: string;
+  radius: string[];
+  center: any;
+  avoidLabelOverlap: boolean;
+  label: any;
+  emphasis: any;
+  labelLine: any;
+  color: any;
+  data: D[]=[];
+  constructor(use: number,free:number){
+    this.name= "";
+    this.type="pie";
+    this.radius=['60%', '70%'];
+    this.center=['50%', '50%'];
+    this.avoidLabelOverlap=false;
+    this.label = {
+      show: false,
+      position: 'center'
+    };
+    this.emphasis = {
+      label: {
+        show: false,
+        fontSize: '20',
+        fontWeight: 'bold'
+      }
+    };
+    this.color=['hsl(198, 100%, 32%)', 'hsl(198, 0%, 80%)'];
+    this.labelLine = {
+      show: false
+    };
+    const u = new D();
+    u.value=use;
+    u.name="已使用";
+    this.data.push(u);
+    const f= new D();
+    f.value=free;
+    f.name="空闲";
+    this.data.push(f);
+  }
+}
+export class D{
+  value: number;
+  name: string;
+}
+
+export class PerforChart{
+  xAxis: any;
+  yAxis: any;
+  series: any;
+  color: any;
+  constructor(d: number[]){
+    this.xAxis={
+      show: true,
+      type: 'category'
+    };
+    this.yAxis={
+      show: false,
+      type: 'value'
+    };
+    this.color=['hsl(198, 100%, 32%)'];
+    this.series=[
+      {
+        data: d,
+        type: 'line',
+        barCategoryGap: 0
+      }];
+  }
 }
