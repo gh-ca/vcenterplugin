@@ -1,7 +1,7 @@
 package com.dmeplugin.dmestore.utils;
 
+import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
-import com.dmeplugin.vmware.SpringBootConnectionHelper;
 import com.dmeplugin.vmware.VCConnectionHelper;
 import com.dmeplugin.vmware.autosdk.SessionHelper;
 import com.dmeplugin.vmware.autosdk.TaggingWorkflow;
@@ -11,8 +11,6 @@ import com.dmeplugin.vmware.util.PbmUtil;
 import com.dmeplugin.vmware.util.TestVmwareContextFactory;
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.vmware.cis.tagging.CategoryModel;
 import com.vmware.cis.tagging.CategoryTypes;
@@ -24,8 +22,8 @@ import com.vmware.vim.binding.vim.HostSystem;
 import com.vmware.vim.binding.vim.ServiceInstance;
 import com.vmware.vim.binding.vim.ServiceInstanceContent;
 import com.vmware.vim.binding.vim.SessionManager;
-import com.vmware.vim.binding.vim.fault.InvalidLogin;
 import com.vmware.vim.binding.vim.fault.InvalidLocale;
+import com.vmware.vim.binding.vim.fault.InvalidLogin;
 import com.vmware.vim.binding.vim.version.version10;
 import com.vmware.vim.binding.vmodl.reflect.ManagedMethodExecuter;
 import com.vmware.vim.vmomi.client.Client;
@@ -34,13 +32,11 @@ import com.vmware.vim.vmomi.client.http.HttpConfiguration;
 import com.vmware.vim.vmomi.client.http.impl.AllowAllThumbprintVerifier;
 import com.vmware.vim.vmomi.client.http.impl.HttpConfigurationImpl;
 import com.vmware.vim.vmomi.core.types.VmodlContext;
-
 import com.vmware.vim25.*;
 import com.vmware.vim25.InvalidArgumentFaultMsg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
-import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -1312,28 +1308,36 @@ public class VCSDKUtils {
      * @Author Administrator
      * @Description 为指定的虚拟机创建磁盘
      * @Date 11:41 2020/9/14
-     * @Param [datastore_name, vm_name, rdmdevicename, size]
+     * @Param [dataStoreName, vm_objectId, rdmDeviceName, size]
      * @Return void
      **/
-    public void createDisk(String vm_objectId, String rdmDeviceName, int size) throws Exception {
+    public void createDisk(String dataStoreName, String vm_objectId, String rdmDeviceName, int size) throws Exception {
         String serverguid = vcConnectionHelper.objectID2Serverguid(vm_objectId);
         VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
+        DatastoreMO datastoreMO = new DatastoreMO(vmwareContext, dataStoreName);
+        String vmdkDatastorePath = String.format("[%s]", datastoreMO.getName());
         VirtualMachineMO virtualMachineMO = new VirtualMachineMO(vmwareContext, vcConnectionHelper.objectID2MOR(vm_objectId));
-        List<DatastoreMO> dsMOList = virtualMachineMO.getAllDatastores();
-        for (int i = 0; i < dsMOList.size(); i++) {
-            DatastoreMO dsMO = dsMOList.get(i);
-            String vmdkDatastorePath = dsMO.getDatastorePath(dsMO.getName());
-            int sizeInMb = size;
-            try {
-                virtualMachineMO.createDisk(vmdkDatastorePath, VirtualDiskType.RDM, VirtualDiskMode.PERSISTENT,
-                        rdmDeviceName, sizeInMb, dsMO.getMor(), -1);
-                break;
-            } catch (Exception ex) {
-                _logger.error("create vcenter disk rdm failed!errorMsg:{}", ex.getMessage());
-                //throw new Exception(ex.getMessage());
-                continue;
+
+        virtualMachineMO.createDisk(vmdkDatastorePath, VirtualDiskType.RDM, VirtualDiskMode.PERSISTENT,
+                rdmDeviceName, size * 1024, datastoreMO.getMor(), -1);
+
+    }
+
+    public List<DatastoreSummary> getDatastoreMountsOnHost(String host_id, String host_ip) throws Exception {
+        List<DatastoreSummary> list = new ArrayList<>();
+        VmwareContext vmwareContext = vcConnectionHelper.getServerContext(host_id);
+        HostMO hostMo = new HostMO(vmwareContext, host_ip);
+        List<Pair<ManagedObjectReference, String>> datastoreMountsOnHost = hostMo.getDatastoreMountsOnHost();
+        for(Pair<ManagedObjectReference, String> pair : datastoreMountsOnHost){
+            ManagedObjectReference dsMor = pair.first();
+            DatastoreMO datastoreMO = new DatastoreMO(vmwareContext, dsMor);
+            DatastoreSummary summary = datastoreMO.getSummary();
+            if(summary.getType().equals(ToolUtils.STORE_TYPE_VMFS)){
+                list.add(summary);
             }
         }
+
+        return list;
     }
 
     //将存储挂载到集群下其它主机 20200918objectId

@@ -43,6 +43,7 @@ public class DmeConstants {
      * DME 磁盘操作基础URL
      **/
     public static final String DME_VOLUME_BASE_URL = "/rest/blockservice/v1/volumes";
+    public static final String DME_VOLUME_DELETE_URL ="/rest/blockservice/v1/volumes/delete";
 
     /**
      * DME 磁盘操作基础URL
@@ -60,6 +61,11 @@ public class DmeConstants {
      * DME 卷映射给主机URL
      **/
     public static final String DME_HOST_MAPPING_URL = "/rest/blockservice/v1/volumes/host-mapping";
+
+    /**
+     * 解除主机卷映射
+     **/
+    public static final String DME_HOST_UNMAPPING_URL = "/rest/blockservice/v1/volumes/host-unmapping";
 
     /**
      * NFS share列表 POST
