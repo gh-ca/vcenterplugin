@@ -215,13 +215,14 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             JsonObject nfsDatastore = jsonArray.get(i).getAsJsonObject();
 
             //TODO 从vCenter nfsDataStore信息中提取存储id ip和path
-            String nfsStorageId = nfsDatastore.get("nfsStorageId").getAsString();
+            String nfsStorageId = nfsDatastore.get("objectid").getAsString();
             String nfsDatastoreIp = nfsDatastore.get("remoteHost").getAsString();
             String nfsDataStoreSharePath = nfsDatastore.get("remotePath").getAsString();
             Storage storageInfo = storageMap.get(nfsDatastoreIp);
             if (null == storageInfo) {
                 LOG.warn("扫描NFS存储信息,share ip:{} 再DME侧没有找到对应的存储设备!!!", nfsDatastoreIp);
                 continue;
+                //storageInfo = storageMap.get("10.143.133.201");
             }
             String storage_id = storageInfo.getId();
             String storage_name = storageInfo.getName();
@@ -232,18 +233,21 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             relation.setStoreType(store_type);
 
             //获取logicPort信息
+            boolean withLogicPort = false;
             Map<String, Object> logicPortInfo = queryLogicPortInfo(storage_id);
             if (null != logicPortInfo && logicPortInfo.size() > 0) {
                 String id = ToolUtils.getStr(logicPortInfo.get("id"));
                 String name = ToolUtils.getStr(logicPortInfo.get("name"));
                 relation.setLogicPortId(id);
                 relation.setLogicPortName(name);
+                withLogicPort = true;
             } else {
                 LOG.warn("NFSDATASTORE id:" + storage_id + " contains logicport is null!");
             }
 
             //获取share信息 (条件:sharePath  可加 storageId)
             String fsName = "";
+            boolean withShare = false;
             Map<String, Object> shareInfo = queryShareInfo(nfsDataStoreSharePath);
             if (null != shareInfo && shareInfo.size() > 0) {
                 fsName = ToolUtils.getStr(shareInfo.get("fs_name"));
@@ -251,22 +255,26 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 String name = ToolUtils.getStr(shareInfo.get("name"));
                 relation.setShareId(id);
                 relation.setShareName(name);
+                withShare = true;
             } else {
                 LOG.warn("NFSDATASTORE id:" + storage_id + " contains share is null!");
             }
 
             //获取fs信息
+            boolean withFs = false;
             Map<String, Object> fsInfo = queryFsInfo(storage_id, fsName);
             if (null != fsInfo && fsInfo.size() > 0) {
                 String id = ToolUtils.getStr(fsInfo.get("id"));
                 String name = ToolUtils.getStr(fsInfo.get("name"));
                 relation.setFsId(id);
                 relation.setFsName(name);
+                withFs = true;
             } else {
                 LOG.warn("NFSDATASTORE id:" + storage_id + " contains fs is null!");
             }
-
-            relationList.add(relation);
+            if (withFs || withShare || withLogicPort) {
+                relationList.add(relation);
+            }
         }
 
         //数据库保存datastorage 与nfs的 share fs logicPort关系信息
@@ -279,7 +287,6 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private boolean dmeVmwareRelationDBProcess(List<DmeVmwareRelation> relationList, String storeType) throws Exception {
         //本地全量查询NFS
         List<String> storageIds = dmeVmwareRalationDao.getAllStorageIdByType(storeType);
-
         List<DmeVmwareRelation> newList = new ArrayList<>();
         List<DmeVmwareRelation> upList = new ArrayList<>();
         for (DmeVmwareRelation relation : relationList) {
@@ -312,7 +319,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private Map<String, Object> queryShareInfo(String sharePath) throws Exception {
         //ResponseEntity responseEntity = listShareByStorageId(storageId);
         ResponseEntity responseEntity = listShareBySharePath(sharePath);
-        if (responseEntity.getStatusCodeValue() / 100 != 2) {
+        if (responseEntity.getStatusCodeValue() / 100 == 2) {
             Object object = responseEntity.getBody();
             List<Map<String, Object>> list = converShare(object);
             if (list.size() > 0) {
@@ -364,10 +371,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return shareList;
     }
 
-    //DME按条件获取fs
+    //DME按条件获取fs 暂只考虑一对一关系 存储设备下多个FS只取第一个
     private Map<String, Object> queryFsInfo(String storageId, String fsName) throws Exception {
         ResponseEntity responseEntity = listFsByStorageId(storageId, fsName);
-        if (responseEntity.getStatusCodeValue() / 100 != 2) {
+        if (responseEntity.getStatusCodeValue() / 100 == 2) {
             Object object = responseEntity.getBody();
             List<Map<String, Object>> list = converFs(object);
             if (list.size() > 0) {
@@ -417,7 +424,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     //按条件查询logicPort
     private Map<String, Object> queryLogicPortInfo(String storageId) throws Exception {
         ResponseEntity responseEntity = listLogicPortByStorageId(storageId);
-        if (responseEntity.getStatusCodeValue() / 100 != 2) {
+        if (responseEntity.getStatusCodeValue() / 100 == 2) {
             Object object = responseEntity.getBody();
             List<Map<String, Object>> list = convertLogicPort(storageId, object);
             if (list.size() > 0) {
@@ -501,24 +508,19 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                                     double reserveCapacity = (ToolUtils.getDouble(jo.get("capacity")) - ToolUtils.getDouble(jo.get("freeSpace"))) / ToolUtils.GI;
 
                                     nfsDataInfo.setName(ToolUtils.jsonToStr(jo.get("name")));
-
                                     nfsDataInfo.setCapacity(capacity);
                                     nfsDataInfo.setFreeSpace(freeSpace);
                                     nfsDataInfo.setReserveCapacity(reserveCapacity);
-
                                     nfsDataInfo.setShareIp(ToolUtils.jsonToStr(jo.get("remoteHost")));
 
                                     DmeVmwareRelation dvr = dvrMap.get(vmwareObjectId);
-
                                     nfsDataInfo.setSharePath(dvr.getVolumeShare());
-
                                     nfsDataInfo.setLogicPort(dvr.getLogicPortName());
                                     nfsDataInfo.setLogicPortId(dvr.getLogicPortId());
                                     nfsDataInfo.setShare(dvr.getShareName());
                                     nfsDataInfo.setShareId(dvr.getShareId());
                                     nfsDataInfo.setFs(dvr.getFsName());
                                     nfsDataInfo.setFsId(dvr.getFsId());
-
                                     nfsDataInfo.setObjectid(ToolUtils.jsonToStr(jo.get("objectid")));
 
                                     String fsUrl = "";
@@ -825,19 +827,19 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 String shareId = dvr.getShareId();
                 String fsId = dvr.getFsId();
                 List<String> taskIds = new ArrayList<>();
-                if(!StringUtils.isEmpty(shareId)){
+                if (!StringUtils.isEmpty(shareId)) {
                     String deleteShareTaskId = deleteNfsShare(Arrays.asList(shareId));
-                    if(!StringUtils.isEmpty(deleteShareTaskId)){
+                    if (!StringUtils.isEmpty(deleteShareTaskId)) {
                         taskIds.add(deleteShareTaskId);
                     }
                 }
-                if(!StringUtils.isEmpty(fsId)){
+                if (!StringUtils.isEmpty(fsId)) {
                     String deletefsTaskId = deleteNfsFs(Arrays.asList(fsId));
-                    if(!StringUtils.isEmpty(deletefsTaskId)){
+                    if (!StringUtils.isEmpty(deletefsTaskId)) {
                         taskIds.add(deletefsTaskId);
                     }
                 }
-                if(taskIds.size() > 0){
+                if (taskIds.size() > 0) {
                     boolean deleteFlag = taskService.checkTaskStatus(taskIds);
                     if (deleteFlag) { //DME NFS 删除 SHAER FS
                         LOG.info("Nfs delete share fs success!");

@@ -217,10 +217,10 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+            LOGGER.error("Failed to svae datastorage dme relation: " + ex);
         } finally {
             closeConnection(con, pstm, null);
         }
-
     }
 
     public void deleteByWwn(List<String> list) {

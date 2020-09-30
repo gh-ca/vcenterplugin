@@ -115,7 +115,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storageObj.setTotal_pool_capacity(ToolUtils.jsonToDou(jsonObj.get("total_pool_capacity"),0.0));
 
                     JsonElement jsonAzIds = jsonObj.get("az_ids");
-                    if (jsonAzIds != null) {
+                    if (!ToolUtils.jsonIsNull(jsonAzIds)) {
                         String azIds =ToolUtils.jsonToStr(jsonAzIds);
                         String[] az_ids = {azIds};
                         storageObj.setAzIds(az_ids);

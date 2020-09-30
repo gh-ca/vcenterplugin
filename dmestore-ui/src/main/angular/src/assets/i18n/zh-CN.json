@@ -209,6 +209,8 @@
     "host": "主机",
     "cluster": "集群",
     "type": "类型",
+    "startTime": "开始时间",
+    "endTime": "结束时间",
     "mount":{
       "mount":"挂载",
       "host":"主机",
@@ -237,20 +239,39 @@
       "name":"名称",
       "ipAddress":"IP地址",
       "status":"状态",
-      "vendor":"卖方",
-      "model":"品牌",
+      "vendor":"厂商",
+      "model":"型号",
+      "version":"版本号",
+      "patchVersion":"补丁版本",
+      "location":"位置",
+      "wp":"维保时间",
+      "alarm":"告警",
+      "event":"事件",
       "zone":"可用区",
-      "rawCap":"原始容量",
+      "rawCap":"裸容量",
       "usedCap":"已使用容量",
-      "capUsage":"使用率",
+      "capUsage":"容量利用率",
+      "tec":"可得容量",
       "freeCap":"空闲容量",
-      "supRate":"供应能力",
+      "supRate":"订阅率",
       "totalCap":"总容量",
       "cpuUtilization":"CUP使用率",
       "latency":"延迟(毫秒)",
       "iops":"IOPS",
       "ops":"OPS",
       "bandwidth":"带宽(MB/s)"
+    },
+    "chart":{
+      "total":" 总计",
+      "used":" 已用",
+      "free":" 空闲",
+      "alarms":" 告警",
+      "events":" 事件",
+      "iops":"IOPS(IO/s)",
+      "bandwidth":"带宽(MS/s)",
+      "capacity":"容量",
+      "health":"健康",
+      "performance":"性能 - 过去24小时"
     },
     "detail":{
       "conf":{
@@ -296,11 +317,11 @@
         "name":"名称",
         "status":"状态",
         "totalCap":"总容量",
-        "proType":"供应类型",
-        "capUsage":"已使用容量",
+        "proType":"分配类型",
+        "capUsage":"容量利用率",
         "mapStatus":"映射状态",
         "stoPool":"存储池",
-        "serviceLevel":"读物登记",
+        "serviceLevel":"服务等级",
         "protStatus":"保护状态",
         "latency": "延迟(ms)",
         "iops": "IOPS",
@@ -500,6 +521,7 @@
 
     "default": "默认",
     "enable": "启用",
-    "disable": "禁用"
+    "disable": "禁用",
+    "host": "主机"
   }
 }

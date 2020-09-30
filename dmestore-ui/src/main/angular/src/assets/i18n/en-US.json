@@ -209,6 +209,8 @@
     "host": "host",
     "cluster": "cluster",
     "type": "type",
+    "startTime": "Start Time",
+    "endTime": "End Time",
     "mount":{
       "mount":"Mount",
       "host":"Host",
@@ -239,10 +241,17 @@
       "status":"Status",
       "vendor":"Vendor",
       "model":"Model",
+      "version":"Version",
+      "patchVersion":"Patch Version",
+      "location":"Location",
+      "wp":"Warranty Period",
+      "alarm":"Alarm",
+      "event":"Event",
       "zone":"Availability Zone",
       "rawCap":"Raw Capacity",
       "usedCap":"Used Capacity",
       "capUsage":"Capacity Usage",
+      "tec":"Total Effective Capacity",
       "freeCap":"Free Capacity",
       "supRate":"supscription Capacity",
       "totalCap":"Total Capacity",
@@ -251,6 +260,18 @@
       "iops":"IOPS",
       "ops":"OPS",
       "bandwidth":"Bandwith(MB/s)"
+    },
+    "chart":{
+      "total":" Total",
+      "used":" Used",
+      "free":" Free",
+      "alarms":" Alarms",
+      "events":" Events",
+      "iops":"IOPS(IO/s)",
+      "bandwidth":"Bandwidth(MS/s)",
+      "capacity":"Capacity",
+      "health":"Health",
+      "performance":"Performance - Last 24 Hours"
     },
     "detail":{
       "conf":{
@@ -497,6 +518,7 @@
 
     "default": "Default",
     "enable": "Enable",
-    "disable": "Disable"
+    "disable": "Disable",
+    "host": "Host"
   }
 }

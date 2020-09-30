@@ -196,8 +196,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
         String interval = params.get("interval").toString();
         String range = params.get("range").toString();
-        String beginTime = params.get("begin_time").toString();
-        String endTime = params.get("end_time").toString();
+
 
         //参数预处理 效验赋值 处理资源对象类型指标 指标id name转换等 目前要求按API格式传参,暂不效验
         //parseParams(); ......
@@ -208,8 +207,13 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         requestbody.put("obj_ids", objIds);
         requestbody.put("interval", interval);
         requestbody.put("range", range);
-        requestbody.put("begin_time", beginTime);
-        requestbody.put("end_time", endTime);
+        if(RANG_BEGIN_END_TIME.equals(range)){
+            String beginTime = ToolUtils.getStr(params.get("begin_time"));
+            String endTime = ToolUtils.getStr(params.get("end_time"));
+            requestbody.put("begin_time", beginTime);
+            requestbody.put("end_time", endTime);
+        }
+
         responseEntity = dmeAccessService.access(STATISTIC_QUERY, HttpMethod.POST, gson.toJson(requestbody));
 
         return responseEntity;
@@ -306,38 +310,17 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             rang = RANGE_LAST_1_DAY;
             params.put("range", rang);
         }
-        if (0 == endTime) {
-            endTime = System.currentTimeMillis();
-            params.put("end_time", endTime);
-        }
-        if (0 == beginTime) {
-            switch (rang) {
-                case RANGE_LAST_5_MINUTE:
-                    beginTime = endTime - 5 * 60 * 1000;
-                    break;
-                case RANGE_LAST_1_HOUR:
-                    beginTime = endTime - 60 * 60 * 1000;
-                    break;
-                case RANGE_LAST_1_DAY:
-                    beginTime = endTime - 24 * 60 * 60 * 1000;
-                    break;
-                case RANGE_LAST_1_WEEK:
-                    beginTime = endTime - 7 * 24 * 60 * 60 * 1000;
-                    break;
-                case RANGE_LAST_1_MONTH:
-                    beginTime = endTime - 30 * 24 * 60 * 60 * 1000;
-                    break;
-                case RANGE_LAST_1_QUARTER:
-                    beginTime = endTime - 3 * 30 * 24 * 60 * 60 * 1000;
-                    break;
-                case RANGE_HALF_1_YEAR:
-                    beginTime = endTime - 6 * 30 * 24 * 60 * 60 * 1000;
-                    break;
-                case RANGE_LAST_1_YEAR:
-                    beginTime = endTime - 365 * 24 * 60 * 60 * 1000;
-                    break;
+        //时间范围为时间段 而未设置具体时间 则默认一年
+        if (RANG_BEGIN_END_TIME.equals(rang)) {
+            if (0 == endTime) {
+                endTime = System.currentTimeMillis();
+                params.put("end_time", endTime);
             }
-            params.put("begin_time", beginTime);
+            if (0 == beginTime) {
+                beginTime = endTime - 365 * 24 * 60 * 60 * 1000;
+                params.put("begin_time", beginTime);
+            }
+
         }
         if (StringUtils.isEmpty(interval)) {
             switch (rang) {

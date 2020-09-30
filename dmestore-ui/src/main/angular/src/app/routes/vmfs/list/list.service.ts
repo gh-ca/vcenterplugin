@@ -148,7 +148,7 @@ export interface ServiceLevelList {
   description: string;
   type: string;
   protocol: string;
-  simpleCapabilities: {
+  capabilities: {
     resource_type: string;
     compression: boolean;
     deduplication: boolean;
@@ -156,7 +156,7 @@ export interface ServiceLevelList {
       enabled: boolean;
       policy: number;
     };
-    qosParam: {
+    qos: {
       enabled: boolean;
       smartQos: {
         latency: string;

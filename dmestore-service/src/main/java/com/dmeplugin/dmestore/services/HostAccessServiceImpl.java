@@ -1,8 +1,11 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.model.EthPortInfo;
+import com.dmeplugin.dmestore.utils.CipherUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -23,6 +26,12 @@ public class HostAccessServiceImpl implements HostAccessService {
     private Gson gson = new Gson();
 
     private VCSDKUtils vcsdkUtils;
+
+    private VCenterInfoService vCenterInfoService;
+
+    public void setvCenterInfoService(VCenterInfoService vCenterInfoService) {
+        this.vCenterInfoService = vCenterInfoService;
+    }
 
     public VCSDKUtils getVcsdkUtils() {
         return vcsdkUtils;
@@ -72,9 +81,22 @@ public class HostAccessServiceImpl implements HostAccessService {
                 }
                 List<Map<String, Object>> ethPorts = (List<Map<String, Object>>)params.get("ethPorts");
                 String hostObjectId = params.get("hostObjectId").toString();
+                Map<String, String> vmKernel = null;
+                if(params.get("vmKernel")!=null) {
+                    vmKernel = (Map<String, String>) params.get("vmKernel");
+                }
                 LOG.info("params=="+gson.toJson(params));
                 LOG.info("ethPorts=="+gson.toJson(ethPorts));
-//                relists = xxxxx;
+                LOG.info("vmKernel=="+gson.toJson(vmKernel));
+
+                VCenterInfo vCenterInfo= vCenterInfoService.getVCenterInfo();
+                LOG.info("vCenterInfo=="+gson.toJson(vCenterInfo));
+                if (null!=vCenterInfo) {
+                    String conStr = vcsdkUtils.testConnectivity(hostObjectId,ethPorts,vmKernel,vCenterInfo);
+                    if(!StringUtils.isEmpty(conStr)){
+                        relists = gson.fromJson(conStr, new TypeToken<List<EthPortInfo>>() {}.getType());
+                    }
+                }
             } else {
                 throw new Exception("test connectivity parameter exception:" + params);
             }

@@ -26,7 +26,7 @@ public class NfsOperationController extends BaseController{
 
 
     /**
-     *  fs_param:
+     *      fs_param:
      *      storage_pool_id string 存储池id
      *      current_port_id String 当前逻辑端口id
      *      storage_id  str  存储设备id 必
@@ -94,7 +94,7 @@ public class NfsOperationController extends BaseController{
      *      capacity_autonegotiation 自动扩缩容 相关属性{
      *          auto_size_enable  boolean 自动调整容量开关。 false: 关闭；true：打开。默认打开
      *       },
-     *       name String fs新名字 (取消勾选可以没有)
+     *       name String fs名字
      *       tuning属性 （高级属性设置）{
      *             deduplication_enabled  boolean 重复数据删除。默认关闭
      *             compression_enabled  boolean 数据压缩。默认关闭
