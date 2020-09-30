@@ -74,12 +74,12 @@ public class DmeConstants {
     /**
      * The resource ID of the storage device can be obtained through device Sn filtering
      */
-    public static final String DME_RES_STORDEVICEID_QUERY_URL = "/rest/csm-cmdb/v1/instances/SYS_StorDevice";
+    public static final String DME_RES_STORDEVICEID_QUERY_URL = "/rest/resourcedb/v1/instances/SYS_StorDevice";
 
     /**
      * Get Storage eth ports
      */
-    public static final String DME_STORDEVICE_ETHPORT_QUERY_URL = "/rest/csm-cmdb/v1/instances/SYS_StoragePort";
+    public static final String DME_STORDEVICE_ETHPORT_QUERY_URL = "/rest/resourcedb/v1/instances/SYS_StoragePort";
 
     /**
      * delete share
