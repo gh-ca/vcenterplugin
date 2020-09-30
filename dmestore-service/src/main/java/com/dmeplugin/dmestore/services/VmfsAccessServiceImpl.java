@@ -319,7 +319,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
                 //如果创建成功，在集群中的其他主机上扫描并挂载datastore
                 if(!StringUtils.isEmpty(clusterObjectId)) {
-                    vcsdkUtils.mountVmfsOnCluster(dataStoreStr, clusterObjectId, null);
+//                    vcsdkUtils.mountVmfsOnCluster(dataStoreStr, clusterObjectId, null);
+                    vcsdkUtils.scanDataStore(clusterObjectId,null);
                 }
             }
         } catch (Exception e) {
@@ -517,23 +518,29 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             //param str host: 主机  param str cluster: 集群
             //如果主机或主机不存在就创建并得到主机或主机组ID 如果主机组不存在就需要创建,创建前要检查集群下的所有主机是否在DME中存在
             if (!StringUtils.isEmpty(clusterName)) {
+                List<String> objIds = new ArrayList<>();
                 //检查集群对应的主机组在DME中是否存在
                 List<Map<String, Object>> hostgrouplist = dmeAccessService.getDmeHostGroups(clusterName);
                 if (hostgrouplist != null && hostgrouplist.size() > 0) {
                     for (Map<String, Object> hostgroupmap : hostgrouplist) {
                         if (hostgroupmap != null && hostgroupmap.get("name") != null) {
                             if (clusterName.equals(hostgroupmap.get("name").toString())) {
-                                objId = ToolUtils.getStr(hostgroupmap.get("id"));
-                                break;
+                                String tmpObjId = ToolUtils.getStr(hostgroupmap.get("id"));
+                                objIds.add(tmpObjId);
                             }
                         }
                     }
                 }
-                LOG.info("check host group id==" + objId);
+                LOG.info("check host group ids==" + objIds);
 
                 //如果主机组id存在，就判断该主机组下的所有主机与集群下的主机是否一到处，如果不一致，不管是多还是少都算不一致，都需要重新创建主机组
-                if(!StringUtils.isEmpty(objId)){
-                    objId = checkHostInHostGroup(clusterObjectId,objId);
+                if(objIds!=null && objIds.size()>0){
+                    for(String tmpObjId:objIds) {
+                        objId = checkHostInHostGroup(clusterObjectId, tmpObjId);
+                        if(!StringUtils.isEmpty(objId)){
+                            break;
+                        }
+                    }
                 }
 
                 //如果主机组不存在就需要创建,创建前要检查集群下的所有主机是否在DME中存在
