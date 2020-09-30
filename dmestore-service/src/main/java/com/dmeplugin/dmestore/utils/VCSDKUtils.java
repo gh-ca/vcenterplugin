@@ -1274,8 +1274,8 @@ public class VCSDKUtils {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            _logger.error("mount Vmfs Volume error:", e);
+            //e.printStackTrace();
+            _logger.error(hostMO.getName()+" mount Vmfs Volume:"+datastoreName+"  error:"+e.toString());
         }
     }
 
