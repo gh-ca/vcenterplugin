@@ -17,7 +17,9 @@
     "reduce":"Reduce",
     "ok":"OK",
     "close": "Close",
-    "submit": "Submit"
+    "submit": "Submit",
+    "search": "Search",
+    "refresh": "Refresh"
   },
   "validations": {
     "required": "This field is required",
@@ -520,5 +522,54 @@
     "enable": "Enable",
     "disable": "Disable",
     "host": "Host"
+  },
+  "tier": {
+    "name": "Name",
+    "total": "Total Capacity",
+    "free": "Free Capacity",
+    "used": "Used Capacity",
+    "usage": "Capacity Usage",
+    "basic": "Basic Information",
+    "iop": "I/O Priority",
+    "zoning": "Zoning Policy",
+    "smartTier": "SmartTier",
+    "smartTierP": "SmartTier Policy",
+    "qosP": "Qos Policy",
+    "controlP": "Control Policy",
+    "uLimit": "Upper Limit",
+    "lLimit": "Lower Limit",
+    "trafficC": "Traffic Control",
+    "bandwidth": "BandWidth",
+    "latency": "Latency",
+    "rtuning": "Resource Tuning",
+    "alloctype": "Allocate Type",
+    "dedupe": "Dedupe",
+    "compression": "Compression",
+
+    "status": "Status",
+    "diskType": "Disk Type",
+    "storage": "Storage Device",
+    "bandwidthm": "BandWidth(MB/s)",
+    "latencyms": "Latency(ms)",
+    "appType": "Application Type",
+
+    "general": "General",
+    "storagep": "Storage Pool",
+    "volume": "Volume",
+    "capacity": "Capacity",
+    "performance": "Performance",
+    "project": "Project",
+
+    "maxIOPS": "Max IOPS",
+    "minIOPS": "Min IOPS",
+    "maxBandWidth": "Max BandWidth",
+    "minBandWidth": "Min Band Width",
+
+    "enable": "Enable",
+    "disable": "Disable",
+    "notMove": "Not Move",
+    "autoMove": "Auto Move",
+    "highPMove": "High Performance Move",
+    "lowPMove": "Lower Performance Move"
   }
 }
