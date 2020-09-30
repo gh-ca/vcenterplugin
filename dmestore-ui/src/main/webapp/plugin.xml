@@ -46,7 +46,7 @@
          <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
             <object>
                <root>
-                  <url>/ui/dmestore/index.html</url>
+                  <url>/ui/dmestore/index.html?view=dashboard</url>
                </root>
             </object>
          </componentClass>
