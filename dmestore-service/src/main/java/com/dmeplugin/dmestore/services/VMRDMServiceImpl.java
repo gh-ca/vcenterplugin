@@ -97,7 +97,6 @@ public class VMRDMServiceImpl implements VMRDMService {
         //查询主机信息
         Map<String, Object> hostMap = dmeAccessService.getDmeHost(host_id);
         String host_ip = hostMap.get("ip").toString();
-        String host_name = hostMap.get("name").toString();
         //调用vcenter扫描卷
         vcsdkUtils.hostRescanVmfs(host_ip);
         LOG.info("scan vmfs succeeded!");
@@ -106,9 +105,9 @@ public class VMRDMServiceImpl implements VMRDMService {
         String lunStr = "";
         int times = 0;
         while (times ++ < 60){
-            if(StringUtil.isBlank(lunStr)){
-                lunStr = vcsdkUtils.getLunsOnHost(host_ip);
-                break;
+            lunStr = vcsdkUtils.getLunsOnHost(host_ip);
+            if(StringUtil.isNotBlank(lunStr)){
+               break;
             }else {
                 Thread.sleep(2 * 1000);
             }
@@ -120,6 +119,7 @@ public class VMRDMServiceImpl implements VMRDMService {
             deleteVolumes(host_id, volumeIds);
             throw new Exception("Failed to obtain the target LUN!");
         }
+        LOG.info("get LUN information succeeded!");
         JsonArray lunArray = gson.fromJson(lunStr, JsonArray.class);
         List<JsonObject> lunObjects = new ArrayList<>();
         for (int i = 0; i < lunArray.size(); i++) {

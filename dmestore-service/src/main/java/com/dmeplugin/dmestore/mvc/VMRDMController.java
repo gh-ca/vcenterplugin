@@ -17,7 +17,7 @@ public class VMRDMController extends BaseController {
     private VMRDMService vmrdmService;
 
     @RequestMapping(value = "createRdm", method = RequestMethod.POST)
-    public ResponseBodyBean createRDM(@RequestParam("host_objectId") String host_id,
+    public ResponseBodyBean createRDM(@RequestParam("host_id") String host_id,
                                       @RequestParam("vm_objectId") String vm_objectId,
                                       @RequestBody VmRDMCreateBean createBean,
                                       @RequestParam("data_store_name") String data_store_name) throws Exception {
