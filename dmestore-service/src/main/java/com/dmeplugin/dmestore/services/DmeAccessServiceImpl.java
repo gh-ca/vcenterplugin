@@ -68,6 +68,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     private final String GET_DME_HOSTS_INITIATORS_URL = "/rest/hostmgmt/v1/hosts/{host_id}/initiators";
     private final String GET_DME_HOSTS_IN_HOSTGROUP_URL = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}/hosts/list";
 
+
     @Override
     public Map<String, Object> accessDme(Map<String, Object> params) {
         Map<String, Object> remap = new HashMap<>();
@@ -728,16 +729,27 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     }
 
     @Override
-    public List<DMEHostInfo> getAllDmeHost() throws Exception {
-        String getHostsUrl = GET_DME_HOSTS_URL;
-        try {
-            ResponseEntity<String> responseEntity = access(getHostsUrl, HttpMethod.GET, null);
-            if(responseEntity.getStatusCodeValue() == 200){
-                return gson.fromJson(responseEntity.getBody(), new TypeToken<List<DMEHostInfo>>(){}.getType());
-            }
-        }catch (Exception e){
-            throw  e;
+    public void deleteVolumes(List<String> ids) throws Exception {
+        String url = DmeConstants.DME_VOLUME_DELETE_URL;
+        JsonObject body = new JsonObject();
+        JsonArray array = new JsonParser().parse(gson.toJson(ids)).getAsJsonArray();
+        body.add("volume_ids", array);
+        ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, body.toString());
+        if(responseEntity.getStatusCodeValue()/100 != 2){
+            throw new Exception(responseEntity.getBody());
         }
-        return null;
+    }
+
+    @Override
+    public void unMapHost(String host_id, List<String> ids) throws Exception {
+        String url = DmeConstants.DME_HOST_UNMAPPING_URL;
+        JsonObject body = new JsonObject();
+        JsonArray array = new JsonParser().parse(gson.toJson(ids)).getAsJsonArray();
+        body.add("volume_ids", array);
+        body.addProperty("host_id", host_id);
+        ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, body.toString());
+        if(responseEntity.getStatusCodeValue()/100 != 2){
+            throw new Exception(responseEntity.getBody());
+        }
     }
 }
