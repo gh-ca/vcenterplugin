@@ -262,28 +262,28 @@
             <artifactId>vmvmodl</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/vimVmodl.jar</systemPath>
+            <systemPath>${project.basedir}/lib/vimVmodl.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>reflectVmodl</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/reflectVmodl.jar</systemPath>
+            <systemPath>${project.basedir}/lib/reflectVmodl.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>vlsiCore</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/vlsiCore.jar</systemPath>
+            <systemPath>${project.basedir}/lib/vlsiCore.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>vlsiClient</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/vlsiClient.jar</systemPath>
+            <systemPath>${project.basedir}/lib/vlsiClient.jar</systemPath>
         </dependency>
 
 
@@ -293,21 +293,21 @@
             <artifactId>queryVmodl</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/queryVmodl.jar</systemPath>
+            <systemPath>${project.basedir}/lib/queryVmodl.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>wood</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/woodstox-core-asl-4.0.5.jar</systemPath>
+            <systemPath>${project.basedir}/lib/woodstox-core-asl-4.0.5.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>stax2</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/stax2-api-3.0.1.jar</systemPath>
+            <systemPath>${project.basedir}/lib/stax2-api-3.0.1.jar</systemPath>
         </dependency>
     </dependencies>
     <build>
