@@ -518,6 +518,7 @@
 
     "default": "Default",
     "enable": "Enable",
-    "disable": "Disable"
+    "disable": "Disable",
+    "host": "Host"
   }
 }

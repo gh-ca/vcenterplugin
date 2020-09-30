@@ -521,6 +521,7 @@
 
     "default": "默认",
     "enable": "启用",
-    "disable": "禁用"
+    "disable": "禁用",
+    "host": "主机"
   }
 }

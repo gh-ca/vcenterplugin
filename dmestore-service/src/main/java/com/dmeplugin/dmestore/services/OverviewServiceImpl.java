@@ -146,7 +146,7 @@ public class OverviewServiceImpl implements OverviewService {
         double usedCapacity;
         double utilization;
         List<VmfsDataInfo> vmfsDataInfos = vmfsAccessService.listVmfs();
-        if (vmfsDataInfos != null){
+        if (vmfsDataInfos != null && vmfsDataInfos.size() > 0){
             for (VmfsDataInfo vmfsDataInfo : vmfsDataInfos){
                 totalCapacity += vmfsDataInfo.getCapacity();
                 freeCapacity += vmfsDataInfo.getFreeSpace();
@@ -169,7 +169,7 @@ public class OverviewServiceImpl implements OverviewService {
         double usedCapacity;
         double utilization;
         List<NfsDataInfo> nfsDataInfos = dmeNFSAccessService.listNfs();
-        if (nfsDataInfos != null){
+        if (nfsDataInfos != null && nfsDataInfos.size() > 0){
             for (NfsDataInfo nfsDataInfo : nfsDataInfos){
                 totalCapacity += nfsDataInfo.getCapacity();
                 freeCapacity += nfsDataInfo.getFreeSpace();
