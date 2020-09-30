@@ -2164,6 +2164,12 @@ public class VCSDKUtils {
 
             HttpClientConfiguration clientConfig = HttpClientConfiguration.Factory.newInstance();
             clientConfig.setHttpConfiguration(httpConfig);
+            try {
+                context = VmodlContext.getContext();
+                context.loadVmodlPackages(new String[]{"com.vmware.vim.binding.vmodl.reflect"});
+            }catch (Exception e){
+                _logger.error("context is not ready",e);
+            }
             if (context == null) {
                 context = VmodlContext.initContext(new String[]{"com.vmware.vim.binding.vim", "com.vmware.vim.binding.vmodl.reflect"});
             }
