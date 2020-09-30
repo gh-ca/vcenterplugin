@@ -164,7 +164,7 @@ public class ToolUtils {
     public static Double jsonToDou(JsonElement obj, Double defaultvalue) {
         Double re = defaultvalue;
         try {
-            if (!StringUtils.isEmpty(obj)) {
+            if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsDouble();
             }
         } catch (Exception e) {
