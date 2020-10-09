@@ -1,19 +1,24 @@
-import {AfterViewInit, Component, NgZone, OnInit, ChangeDetectorRef} from '@angular/core';
+import {AfterViewInit, Component, NgZone, OnInit, ChangeDetectorRef, NgModule} from '@angular/core';
 import { EChartOption } from 'echarts';
 import { VmfsPerformanceService } from './performance.service';
 import {VmfsListService} from '../list/list.service';
 import {ChartOptions, NfsService, MakePerformance} from "../../nfs/nfs.service";
 import {VolumeInfo} from "../volume-attribute/attribute.service";
-
+import {MAT_DATE_LOCALE} from "@angular/material/core";
+import {FormControl, FormGroup} from "@angular/forms";
 
 @Component({
   selector: 'app-performance',
   templateUrl: './performance.component.html',
   styleUrls: ['./performance.component.scss'],
-  providers: [VmfsPerformanceService, MakePerformance, NfsService],
+  providers: [VmfsPerformanceService, MakePerformance, NfsService, {provide: MAT_DATE_LOCALE, useValue: 'en-GB'}],
 })
 export class PerformanceComponent implements OnInit, AfterViewInit {
 
+  rangeTime = new FormGroup({
+    start: new FormControl(),
+    end: new FormControl()
+  });
   // 创建表格对象
   // IOPS+QoS上下限
   iopsChart: EChartOption = {};
@@ -130,9 +135,21 @@ export class PerformanceComponent implements OnInit, AfterViewInit {
       console.log('未选择卷或range');
     }
   }
-  changeDate() {
 
-    console.log('startTime', this.startTime);
-    console.log('endTime', this.endTime);
+  /**
+   * 开始结束时间触发
+   */
+  changeDate() {
+    if (!this.rangeTime.controls.start.hasError('matStartDateInvalid')
+      && !this.rangeTime.controls.end.hasError('matEndDateInvalid')
+      && this.rangeTime.controls.start.value !== null && this.rangeTime.controls.end.value !== null) { // 需满足输入规范且不为空
+      this.startTime = this.rangeTime.controls.start.value._d.getTime();
+      this.endTime = this.rangeTime.controls.end.value._d.getTime();
+      console.log('startTime', this.startTime);
+      console.log('endTime', this.endTime);
+      this.changeVolFunc();
+    } else {
+      return;
+    }
   }
 }
