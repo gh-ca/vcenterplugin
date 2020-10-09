@@ -25,14 +25,14 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   // 详情页面弹出控制
   popShow = false;
   // 容量曲线图
-  volumeCapacityChart = null;
-  storagePoolCapacityChart = null;
+  volumeCapacityChart;
+  storagePoolCapacityChart;
   // 性能曲线图
-  volumeMaxResponseTimeChart = null;
-  volumeDensityChart = null;
-  volumeThroughputChart = null;
-  volumeBandwidthChart = null;
-  storagePoolDensityChart = null;
+  volumeMaxResponseTimeChart;
+  volumeDensityChart;
+  volumeThroughputChart;
+  volumeBandwidthChart;
+  storagePoolDensityChart;
 
   // 详情列表按钮控制
   storagePoolRadioCheck = 'basic';
@@ -48,31 +48,31 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   sortItems = [
     {
       id: 'name',
-      value: 'name'
+      value: 'tier.name'
     },
     {
       id: 'total_capacity',
-      value: 'total_capacity'
+      value: 'tier.total'
     },
     {
       id: 'latency',
-      value: 'latency'
+      value: 'tier.latency'
     },
     {
       id: 'maxIOPS',
-      value: 'maxIOPS'
+      value: 'tier.maxIOPS'
     },
     {
       id: 'minIOPS',
-      value: 'minIOPS'
+      value: 'tier.minIOPS'
     },
     {
       id: 'maxBandWidth',
-      value: 'maxBandWidth'
+      value: 'tier.maxBandWidth'
     },
     {
       id: 'minBandWidth',
-      value: 'minBandWidth'
+      value: 'tier.minBandWidth'
     }
   ];
 
@@ -134,7 +134,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
             },
             qos: {
                 enabled: true,
-                qos_param: {
+                qosParam: {
                   latency: 25,
                   latencyU: 'ms',
                   minBandWidth: 2000,
@@ -263,9 +263,6 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // if (this.volumeCapacityChart) {
-    //   this.volumeCapacityChart.dispose();
-    // }
   }
 
   ngAfterViewInit() {
@@ -337,62 +334,21 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   // ===============applicationType pool end==============
 
-  initPerformanceChart(){
-    setTimeout(() => {
-      const c1 = document.querySelector('#volumeMaxResponseTimeChart');
-      const c2 = document.querySelector('#volumeDensityChart');
-      const c3 = document.querySelector('#volumeThroughputChart');
-      const c4 = document.querySelector('#volumeBandwidthChart');
-      const c5 = document.querySelector('#storagePoolDensityChart');
-      if (c1 == null
-        || c2 == null
-        || c3 == null
-        || c4 == null
-        || c5 == null
-      ){
-        this.initPerformanceChart();
-      } else {
-        /* this.volumeMaxResponseTimeChart = echarts.init(document.querySelector('#volumeMaxResponseTimeChart'));
-        this.volumeMaxResponseTimeChart.setOption(this.volumeCapacityOption);
-
-        this.volumeDensityChart = echarts.init(document.querySelector('#volumeDensityChart'));
-        this.volumeDensityChart.setOption(this.volumeCapacityOption);
-
-        this.volumeThroughputChart = echarts.init(document.querySelector('#volumeThroughputChart'));
-        this.volumeThroughputChart.setOption(this.volumeCapacityOption);
-
-        this.volumeBandwidthChart = echarts.init(document.querySelector('#volumeBandwidthChart'));
-        this.volumeBandwidthChart.setOption(this.volumeCapacityOption);
-
-        this.storagePoolDensityChart = echarts.init(document.querySelector('#storagePoolDensityChart'));
-        this.storagePoolDensityChart.setOption(this.volumeCapacityOption); */
-      }
-    }, 100);
-  }
-
-  initCapacityChart(){
-    setTimeout(() => {
-      const c1 = document.querySelector('#volumeCapacityChart');
-      const c2 = document.querySelector('#storagePoolCapacityChart');
-      if (c1 == null || c2 == null){
-        this.initCapacityChart();
-      } else{
-        /* this.volumeCapacityChart = echarts.init(document.querySelector('#volumeCapacityChart'));
-        this.volumeCapacityChart.setOption(this.volumeCapacityOption);
-
-        this.storagePoolCapacityChart = echarts.init(document.querySelector('#storagePoolCapacityChart'));
-        this.storagePoolCapacityChart.setOption(this.volumeCapacityOption); */
-      }
-    }, 100);
-  }
-
   // 刷新服务等级列表
   refresh(){
     this.http.post('servicelevel/listservicelevel', {}).subscribe((response: any) => {
+      response.data = JSON.stringify(response.data);
       response.data = response.data.replace('service-levels', 'serviceLevels');
-      const r = JSON.parse(response.data);
+      const r = this.recursiveNullDelete(JSON.parse(response.data));
       for (const i of r.serviceLevels){
-        i.usedRate =  ((i.used_capacity / i.total_capacity * 100).toFixed(2));
+        if (i.total_capacity == 0){
+          i.usedRate = 0.0;
+        } else {
+          i.usedRate =  ((i.used_capacity / i.total_capacity * 100).toFixed(2));
+        }
+        i.used_capacity = (i.used_capacity/1024).toFixed(2);
+        i.total_capacity = (i.total_capacity/1024).toFixed(2);
+        i.free_capacity = (i.free_capacity/1024).toFixed(2);
       }
       this.serviceLevelsRes = r.serviceLevels;
       this.search();
@@ -418,6 +374,27 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     if (o.value !== ''){
       this.serviceLevels = this.serviceLevels.sort(this.compare(this.sortItem, 'asc'));
     }
+  }
+
+  recursiveNullDelete(obj: any){
+    for (const property in obj){
+      if (obj[property] === null){
+        delete obj[property];
+      } else if (obj[property] instanceof Object){
+        this.recursiveNullDelete(obj[property]);
+      } else if (property == 'minBandWidth' && obj[property] == 0){
+        delete obj[property];
+      } else if (property == 'maxBandWidth' && obj[property] == 0){
+        delete obj[property];
+      } else if (property == 'minIOPS' && obj[property] == 0){
+        delete obj[property];
+      } else if (property == 'maxIOPS' && obj[property] == 0){
+        delete obj[property];
+      } else if(property == 'latency' && obj[property] == 0){
+        delete obj[property];
+      }
+    }
+    return obj;
   }
 
   // 获取指定属性值
@@ -462,6 +439,32 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     };
   }
+
+
+  initCharts(chart: any, type: string){
+    // volumeCapacity
+    // storagePoolCapacity
+    // volumeMaxResponseTime
+    // volumeDensity
+    // volumeThroughput
+    // volumeBandwidth
+    // storagePoolDensity
+    if (type === 'volumeCapacity'){
+      this.volumeCapacityChart = chart;
+    } else if (type === 'storagePoolCapacity'){
+      this.storagePoolCapacityChart = chart;
+    } else if (type === 'volumeMaxResponseTime'){
+      this.volumeMaxResponseTimeChart = chart;
+    } else if (type === 'volumeDensity'){
+      this.volumeDensityChart = chart;
+    } else if (type === 'volumeThroughput'){
+      this.volumeThroughputChart = chart;
+    } else if (type === 'volumeBandwidth'){
+      this.volumeBandwidthChart = chart;
+    } else if (type === 'storagePoolDensity'){
+      this.storagePoolDensityChart = chart;
+    }
+  }
 }
 
 class Servicelevel {
@@ -487,7 +490,7 @@ class Servicelevel {
     };
     qos: {
       enabled: boolean;
-      qos_param: {
+      qosParam: {
         latency: number;
         latencyU: string;
         minBandWidth: number;

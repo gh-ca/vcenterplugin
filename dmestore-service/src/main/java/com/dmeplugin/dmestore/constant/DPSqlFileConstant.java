@@ -7,7 +7,7 @@ public class DPSqlFileConstant {
   public static final String DP_DME_VMWARE_RELATION = "DP_DME_VMWARE_RELATION"; //DME与VMWARE对应关系表
 
   public static final String[] ALL_TABLES = {DPSqlFileConstant.DP_DME_ACCESS_INFO,
-          DPSqlFileConstant.DP_DME_VMWARE_RELATION,DPSqlFileConstant.DP_DME_TASK_INFO};
+          DPSqlFileConstant.DP_DME_VMWARE_RELATION,DPSqlFileConstant.DP_DME_TASK_INFO, DPSqlFileConstant.HW_BEST_PRACTICE_CHECK};
 
   public static final String DP_DME_ACCESS_INFO_SQL = "DROP TABLE IF EXISTS \"DP_DME_ACCESS_INFO\";\n" +
           "CREATE TABLE DP_DME_ACCESS_INFO\n" +
@@ -64,5 +64,20 @@ public class DPSqlFileConstant {
 
   public static final String DP_DME_TASK_DATA_SCANDATASTORE_SQL = "INSERT INTO DP_DME_TASK_INFO (ID, CLASS_NAME, CRON, JOB_NAME, METHOD) " +
           "VALUES (3, 'com.dmeplugin.dmestore.task.BackgroundScanDatastoreTask', '0 0 0/6 * * ?', 'scanDatastore', 'scanDatastore');";
+
+  public static final String HW_BEST_PRACTICE_CHECK = "HW_BEST_PRACTICE_CHECK";
+  public static final String HW_BEST_PRACTICE_CHECK_SQL ="DROP TABLE IF EXISTS \"HW_BEST_PRACTICE_CHECK\";\n" +
+          "CREATE TABLE \"HW_BEST_PRACTICE_CHECK\" (\n" +
+          "\"ID\"  integer PRIMARY KEY AUTO_INCREMENT NOT NULL,\n" +
+          "\"HOST_ID\"  nvarchar(255),\n" +
+          "\"HOST_NAME\"  nvarchar(255),\n" +
+          "\"HOST_SETTING\"  nvarchar(255),\n" +
+          "\"RECOMMEND_VALUE\"  nvarchar(50) NOT NULL,\n" +
+          "\"ACTUAL_VALUE\"  nvarchar(50),\n" +
+          "\"HINT_LEVEL\"  nvarchar(20),\n" +
+          "\"NEED_REBOOT\"  nvarchar(10),\n" +
+          "\"AUTO_REPAIR\"  nvarchar(10),\n" +
+          "\"CREATE_TIME\"  datetime\n" +
+          ");";
 
 }

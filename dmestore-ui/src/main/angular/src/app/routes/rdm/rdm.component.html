@@ -13,10 +13,8 @@
       <clr-dg-cell style="width: 200px">
         <input type="number" [(ngModel)]="item.capacity" name="capacity" #number="ngModel" style="height: 30px;width: 100px"/>
         <select [(ngModel)]="item.unit" name="unit" style="height: 30px">
-          <option value="TB">TB</option>
           <option value="GB">GB</option>
-          <option value="MB">MB</option>
-          <option value="KB">KB</option>
+          <option value="TB">TB</option>
         </select>
       </clr-dg-cell>
       <clr-dg-cell style="width: 200px">
@@ -37,11 +35,11 @@
       <clr-radio-container clrInline>
         <label>{{'rdm.storageType' | translate}}</label>
         <clr-radio-wrapper>
-          <input type="radio" clrRadio (click)="levelCheck='level'" name="storageType" required value="1" [(ngModel)]="configModel.storageType" />
+          <input type="radio" clrRadio (click)="levelCheck='level'" name="storageType"  value="1" [(ngModel)]="configModel.storageType" />
           <label>{{'rdm.tier' | translate}}</label>
         </clr-radio-wrapper>
         <clr-radio-wrapper>
-          <input type="radio" clrRadio  (click)="levelCheck='storage'" name="storageType" required value="2" [(ngModel)]="configModel.storageType" />
+          <input type="radio" clrRadio  (click)="levelCheck='storage'" name="storageType"  value="2" [(ngModel)]="configModel.storageType" />
           <label>{{'rdm.storage1' | translate}}</label>
         </clr-radio-wrapper>
         <!--<clr-control-helper>Helper text</clr-control-helper>
@@ -84,22 +82,33 @@
     <!-- 选择存储 -->
     <div *ngIf="levelCheck==='storage'"  [hidden]="levelCheck !=='storage'">
       <clr-select-container>
-        <label>{{'rdm.storage' | translate}}</label>:
+        <label>{{'rdm.storage' | translate}}<span style="color: red">*</span></label>:
         <select clrSelect  [(ngModel)]="configModel.storage_id" name="storage_id" (ngModelChange)="loadStoragePool(configModel.storage_id);">
           <option value=""></option>
           <option *ngFor="let item of storageDevices" value="{{item.id}}">{{item.name}}</option>
         </select>
       </clr-select-container>
       <clr-select-container>
-        <label>{{'rdm.sPool' | translate}}</label>:
+        <label>{{'rdm.sPool' | translate}}<span style="color: red">*</span></label>:
         <select clrSelect [(ngModel)]="configModel.pool_raw_id" name="pool_raw_id" >
           <option value=""></option>
           <option *ngFor="let item of storagePools" value="{{item.pool_raw_id}}">{{item.name}}</option>
         </select>
       </clr-select-container>
 
+      <clr-combobox-container>
+        <label>{{'rdm.host' | translate}}<span style="color: red">*</span></label>
+        <clr-combobox [(ngModel)]="hostSelected" name="host_id">
+          <clr-options>
+            <clr-option *clrOptionItems="let item of hostList;field:'name'" [clrValue]="item">
+              {{item.ip}}({{item.name}})
+            </clr-option>
+          </clr-options>
+        </clr-combobox>
+      </clr-combobox-container>
+
       <clr-select-container>
-        <label>{{'rdm.ownerC' | translate}}</label>:
+        <label>{{'rdm.ownerC' | translate}}<span style="color: red">*</span></label>:
         <select clrSelect [(ngModel)]="configModel.owner_controller" name="owner_controller" >
           <option value="0">{{'rdm.autoSelect' | translate}}</option>
           <option value="1">0A</option>
@@ -108,7 +117,7 @@
       </clr-select-container>
 
       <clr-select-container>
-        <label>{{'rdm.idp' | translate}}</label>:
+        <label>{{'rdm.idp' | translate}}<span style="color: red">*</span></label>:
         <select clrSelect [(ngModel)]="configModel.initial_distribute_policy" name="initial_distribute_policy" >
           <option value="0">{{'rdm.autoSelect' | translate}}</option>
           <option value="1">{{'rdm.hperformanceLevel' | translate}}</option>
@@ -118,7 +127,7 @@
       </clr-select-container>
 
       <clr-select-container>
-        <label>{{'rdm.fetchP' | translate}}</label>:
+        <label>{{'rdm.fetchP' | translate}}<span style="color: red">*</span></label>:
         <select clrSelect [(ngModel)]="configModel.prefetch_policy" name="prefetch_policy" >
           <option value="0">{{'rdm.notFetch' | translate}}</option>
           <option value="1">{{'rdm.fixedFetch' | translate}}</option>
@@ -143,8 +152,8 @@
       </clr-toggle-container>
 
       <clr-select-container *ngIf="policyEnable.smartTier">
-        <label>{{'rdm.smartTierP' | translate}}</label>:
-        <select clrSelect [(ngModel)]="configModel.tuning.smarttier" name="smarttier" >
+        <label>{{'rdm.smartTierP' | translate}}<span style="color: red">*</span></label>:
+        <select clrSelect [(ngModel)]="configModel.tuning.smarttier" name="smarttier">
           <option value="0">{{'rdm.notMove' | translate}}</option>
           <option value="1">{{'rdm.autoMove' | translate}}</option>
           <option value="2">{{'rdm.highPMove' | translate}}</option>
@@ -162,7 +171,7 @@
       </clr-toggle-container>
 
       <clr-radio-container clrInline *ngIf="policyEnable.qosPolicy">
-        <label class="floatleft">{{'rdm.controlP' | translate}}</label>
+        <label class="floatleft">{{'rdm.controlP' | translate}}<span style="color: red">*</span></label>
         <clr-radio-wrapper>
           <input type="radio" clrRadio name="control_policy" required value="1" [(ngModel)]="configModel.tuning.smartqos.control_policy" />
           <label>{{'rdm.uLimit' | translate}}</label>
@@ -175,7 +184,7 @@
 
       <div *ngIf="policyEnable.qosPolicy">
         <clr-checkbox-container *ngIf="configModel.tuning.smartqos.control_policy==='1'">
-          <label>{{'rdm.trafficC' | translate}}</label>
+          <label>{{'rdm.trafficC' | translate}}<span style="color: red">*</span></label>
           <clr-checkbox-wrapper>
             <input type="checkbox" clrCheckbox/>
             <label>{{'rdm.bandwidth' | translate}} <= <input class="inputOneLine" name="Brandwidth" [(ngModel)]="configModel.tuning.smartqos.maxbandwidth"/> MB/s
@@ -189,7 +198,7 @@
         </clr-checkbox-container>
 
         <clr-checkbox-container *ngIf="configModel.tuning.smartqos.control_policy==='0'">
-          <label>{{'rdm.trafficC' | translate}}</label>
+          <label>{{'rdm.trafficC' | translate}}<span style="color: red">*</span></label>
           <clr-checkbox-wrapper>
             <input type="checkbox" clrCheckbox/>
             <label>{{'rdm.bandwidth' | translate}} >= <input class="inputOneLine" name="Brandwidth" [(ngModel)]="configModel.tuning.smartqos.minbandwidth"/> MB/s
@@ -218,15 +227,15 @@
       </clr-toggle-container>
 
       <clr-select-container *ngIf="policyEnable.resourceTuning">
-        <label>{{'rdm.alloctype' | translate}}</label>:
+        <label>{{'rdm.alloctype' | translate}}<span style="color: red">*</span></label>:
         <select clrSelect [(ngModel)]="configModel.tuning.alloctype" name="smarttier" >
           <option value="thin">thin</option>
           <option value="thick">thick</option>
         </select>
       </clr-select-container>
 
-      <clr-select-container *ngIf="configModel.tuning.alloctype == 'thin'">
-        <label>{{'rdm.dedupe' | translate}}</label>:
+      <clr-select-container *ngIf="configModel.tuning.alloctype == 'thin' && policyEnable.resourceTuning">
+        <label>{{'rdm.dedupe' | translate}}<span style="color: red">*</span></label>:
         <select clrSelect [(ngModel)]="configModel.tuning.dedupe_enabled" name="dedupe" >
           <option value="0">{{'rdm.default' | translate}}</option>
           <option value="1">{{'rdm.enable' | translate}}</option>
@@ -234,11 +243,11 @@
         </select>
       </clr-select-container>
 
-      <clr-select-container *ngIf="configModel.tuning.alloctype == 'thin'">
-        <label>{{'rdm.compression' | translate}}</label>:
+      <clr-select-container *ngIf="configModel.tuning.alloctype == 'thin' && policyEnable.resourceTuning">
+        <label>{{'rdm.compression' | translate}}<span style="color: red">*</span></label>:
         <select clrSelect [(ngModel)]="configModel.tuning.compression_enabled" name="compression" >
           <option value="0">{{'rdm.default' | translate}}</option>
-          <option value="1">{{'rdm.enable' | translate}}</option>
+          <option value='1'>{{'rdm.enable' | translate}}</option>
           <option value="2">{{'rdm.disable' | translate}}</option>
         </select>
       </clr-select-container>
@@ -251,5 +260,3 @@
     </div>
   </div>
 </form>
-
-

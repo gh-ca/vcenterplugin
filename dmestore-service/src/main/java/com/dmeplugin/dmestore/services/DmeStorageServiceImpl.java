@@ -714,7 +714,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             LOG.error("get Storage Eth Ports error:", e);
             throw e;
         }
-        LOG.info("getStorageEthPorts relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        //LOG.info("getStorageEthPorts relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
         return relists;
     }
 
@@ -818,7 +818,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 LOG.info("ethPortUrl===" + ethPortUrl);
                 try {
                     ResponseEntity responseEntity = dmeAccessService.accessByJson(ethPortUrl, HttpMethod.GET, condition.toString());
-                    LOG.info("getWorkLoads responseEntity==" + responseEntity.toString());
+                    LOG.info("ethPortUrl responseEntity==" + responseEntity.toString());
                     if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                         JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                         if (jsonObject != null && jsonObject.get("objList") != null) {

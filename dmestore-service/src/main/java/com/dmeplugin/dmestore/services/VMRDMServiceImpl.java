@@ -2,16 +2,16 @@ package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.model.CreateVolumesRequest;
 import com.dmeplugin.dmestore.model.CustomizeVolumesRequest;
-import com.dmeplugin.dmestore.model.DMEHostInfo;
+import com.dmeplugin.dmestore.model.ServiceVolumeMapping;
 import com.dmeplugin.dmestore.model.VmRDMCreateBean;
+import com.dmeplugin.dmestore.utils.StringUtil;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.vmware.vim25.HostScsiDisk;
+import com.vmware.vim25.DatastoreSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
@@ -63,20 +63,20 @@ public class VMRDMServiceImpl implements VMRDMService {
     }
 
     @Override
-    public void createRDM(String vm_objectId, String host_objectId, VmRDMCreateBean createBean) throws Exception {
+    public void createRDM(String data_store_name, String vm_objectId, String host_id, VmRDMCreateBean createBean) throws Exception {
         createDmeRDM(createBean);
         LOG.info("create DME disk succeeded!");
-        String requestVolumeName = "";
+        String requestVolumeName;
         int size;
-        int count;
+        ServiceVolumeMapping mapping;
         if (createBean.getCreateVolumesRequest() != null) {
             requestVolumeName = createBean.getCreateVolumesRequest().getVolumes().get(0).getName();
             size = createBean.getCreateVolumesRequest().getVolumes().get(0).getCapacity();
-            count = createBean.getCreateVolumesRequest().getVolumes().get(0).getCount();
+            mapping = createBean.getCreateVolumesRequest().getMapping();
         } else {
             requestVolumeName = createBean.getCustomizeVolumesRequest().getCustomize_volumes().getVolume_specs().get(0).getName();
             size = createBean.getCustomizeVolumesRequest().getCustomize_volumes().getVolume_specs().get(0).getCapacity();
-            count = createBean.getCustomizeVolumesRequest().getCustomize_volumes().getVolume_specs().get(0).getCount();
+            mapping = createBean.getCustomizeVolumesRequest().getMapping();
         }
         //根据卷名称查询已创建的卷信息
         String url = DmeConstants.DME_VOLUME_BASE_URL + "?name=" + requestVolumeName;
@@ -87,24 +87,39 @@ public class VMRDMServiceImpl implements VMRDMService {
         for (int i = 0; i < volumeArr.size(); i++) {
             volumeIds.add(volumeArr.get(i).getAsJsonObject().get("id").getAsString());
         }
-        //datastore_objectId =
-        //host_objectId = "urn:vmomi:HostSystem:host-224:f8e381d7-074b-4fa9-9962-9a68ab6106e1";
-        String _host_id = vcsdkUtils.getVcConnectionHelper().objectID2Serverguid(host_objectId);
-        LOG.info("host_objectId:{}, DME host_id:{}", host_objectId, _host_id);
-        //将卷映射给主机
-        hostMapping(_host_id, volumeIds);
+
+        if(null != mapping){
+            //将卷映射给主机
+             hostMapping(host_id, volumeIds);
+        }
         LOG.info("disk mapping to host succeeded!");
 
         //查询主机信息
-        Map<String, Object> hostMap = dmeAccessService.getDmeHost(_host_id);
+        Map<String, Object> hostMap = dmeAccessService.getDmeHost(host_id);
         String host_ip = hostMap.get("ip").toString();
-        String host_name = hostMap.get("name").toString();
         //调用vcenter扫描卷
         vcsdkUtils.hostRescanVmfs(host_ip);
         LOG.info("scan vmfs succeeded!");
 
-        //获取LUN信息
-        String lunStr = vcsdkUtils.getLunsOnHost(host_ip);
+        //获取LUN信息.有扫描需要一定的时间才能发现得了LUN信息，这里等待两分钟
+        String lunStr = "";
+        int times = 0;
+        while (times ++ < 60){
+            lunStr = vcsdkUtils.getLunsOnHost(host_ip);
+            if(StringUtil.isNotBlank(lunStr)){
+               break;
+            }else {
+                Thread.sleep(2 * 1000);
+            }
+        }
+
+        if(StringUtil.isBlank(lunStr)){
+            LOG.error("获取目标LUN失败！");
+            //将已经创建好的卷删除
+            deleteVolumes(host_id, volumeIds);
+            throw new Exception("Failed to obtain the target LUN!");
+        }
+        LOG.info("get LUN information succeeded!");
         JsonArray lunArray = gson.fromJson(lunStr, JsonArray.class);
         List<JsonObject> lunObjects = new ArrayList<>();
         for (int i = 0; i < lunArray.size(); i++) {
@@ -120,8 +135,17 @@ public class VMRDMServiceImpl implements VMRDMService {
 
         for (JsonObject object : lunObjects) {
             //调用Vcenter创建磁盘
-            vcsdkUtils.createDisk(vm_objectId, object.get("devicePath").getAsString(), size);
+            vcsdkUtils.createDisk(data_store_name, vm_objectId, object.get("devicePath").getAsString(), size);
         }
+    }
+
+    private void deleteVolumes(String host_id, List<String> ids) throws Exception{
+        unMapHost(host_id, ids);
+        dmeAccessService.deleteVolumes(ids);
+    }
+
+    private void unMapHost(String host_id, List<String> ids) throws Exception{
+        dmeAccessService.unMapHost(host_id, ids);
     }
 
     public void createDmeRDM(VmRDMCreateBean vmRDMCreateBean) throws Exception {
@@ -187,7 +211,16 @@ public class VMRDMServiceImpl implements VMRDMService {
     }
 
     @Override
-    public List<DMEHostInfo> getAllDmeHost() throws Exception {
-        return dmeAccessService.getAllDmeHost();
+    public List<Map<String, Object>> getAllDmeHost() throws Exception {
+        return dmeAccessService.getDmeHosts(null);
+    }
+
+    @Override
+    public List<DatastoreSummary> getDatastoreMountsOnHost(String host_id) throws Exception{
+        //查询主机信息
+        Map<String, Object> hostMap = dmeAccessService.getDmeHost(host_id);
+        String host_ip = hostMap.get("ip").toString();
+        String host_name = hostMap.get("name").toString();
+        return vcsdkUtils.getDatastoreMountsOnHost(host_id, host_ip);
     }
 }
