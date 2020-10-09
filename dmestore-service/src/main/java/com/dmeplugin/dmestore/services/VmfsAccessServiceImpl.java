@@ -3,6 +3,7 @@ package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
+import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.ToolUtils;
@@ -41,6 +42,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private TaskService taskService;
 
     private VCSDKUtils vcsdkUtils;
+
+    private VCenterInfoService vCenterInfoService;
+
+    public void setvCenterInfoService(VCenterInfoService vCenterInfoService) {
+        this.vCenterInfoService = vCenterInfoService;
+    }
 
     public VCSDKUtils getVcsdkUtils() {
         return vcsdkUtils;
@@ -238,6 +245,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
                         //创建了几个卷，就创建几个VMFS，用卷的wwn去找到lun
                         if(volumelist!=null && volumelist.size()>0) {
+                            VCenterInfo vCenterInfo = null;
+                            if (!StringUtils.isEmpty(params.get("service_level_id"))) {
+                                vCenterInfo = vCenterInfoService.getVCenterInfo();
+                            }
                             for(Map<String, Object> volumemap:volumelist) {
                                 //创建vmware中的vmfs存储。
                                 params.put("volume_wwn",volumemap.get("volume_wwn"));
@@ -252,9 +263,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                         //因为可以同时创建几个卷，无法在此得到对应关系，所以此处不再保存关系信息
                                         saveDmeVmwareRalation(volumemap, dataStoreMap);
                                         //关联服务等级
-                                        if (params.get("service_level_id") != null) {
+                                        if (!StringUtils.isEmpty(params.get("service_level_id"))) {
                                             String serviceLevelName = ToolUtils.getStr(params.get("service_level_name"));
-                                            String attachTagStr = vcsdkUtils.attachTag(ToolUtils.getStr(dataStoreMap.get("type")), ToolUtils.getStr(dataStoreMap.get("id")), serviceLevelName);
+                                            String attachTagStr = vcsdkUtils.attachTag(ToolUtils.getStr(dataStoreMap.get("type")),
+                                                    ToolUtils.getStr(dataStoreMap.get("id")), serviceLevelName, vCenterInfo);
                                             LOG.info("Vmfs attachTagStr==" + attachTagStr);
                                         }
                                     }

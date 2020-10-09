@@ -91,6 +91,7 @@
         <property name="dmeStorageService" ref="DmeStorageServiceImpl"/>
         <property name="taskService" ref="taskService"/>
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
+        <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
     </bean>
 
     <bean name="DataStoreStatisticHistoryServiceImpl"
@@ -188,7 +189,7 @@
     </bean>
 
    <bean name="HostAccessServiceImpl" class="com.dmeplugin.dmestore.services.HostAccessServiceImpl">
-        <property name="vcsdkUtils" ref="vCSDKUtils"/>
+       <property name="vcsdkUtils" ref="vCSDKUtils"/>
        <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
     </bean>
 
