@@ -19,11 +19,11 @@ package com.dmeplugin.vmware.mo;
 
 
 import com.dmeplugin.vmware.util.VmwareContext;
-import com.vmware.vim25.HostPortGroupSpec;
-import com.vmware.vim25.HostVirtualSwitchSpec;
-import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 
 public class HostNetworkSystemMO extends BaseMO {
@@ -64,5 +64,9 @@ public class HostNetworkSystemMO extends BaseMO {
 
     public void refresh() throws Exception {
         _context.getService().refreshNetworkSystem(_mor);
+    }
+
+    public void updateNetworkConfig(HostNetworkConfig config, String changeMode) throws Exception {
+        _context.getService().updateNetworkConfig(_mor, config, changeMode);
     }
 }

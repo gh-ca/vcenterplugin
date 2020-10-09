@@ -143,6 +143,7 @@
                 <ref bean="DataMoverHardwareAcceleratedMoveImpl"/>
                 <ref bean="LunQueueDepthForEmulexImpl"/>
                 <ref bean="LunQueueDepthForQlogicImpl"/>
+                <ref bean="JumboFrameMTUImpl"/>
             </list>
         </property>
     </bean>
@@ -157,6 +158,7 @@
     <bean name="DataMoverHardwareAcceleratedMoveImpl" class="com.dmeplugin.dmestore.services.bestpractice.DataMoverHardwareAcceleratedMoveImpl"/>
     <bean name="LunQueueDepthForEmulexImpl" class="com.dmeplugin.dmestore.services.bestpractice.LunQueueDepthForEmulexImpl"/>
     <bean name="LunQueueDepthForQlogicImpl" class="com.dmeplugin.dmestore.services.bestpractice.LunQueueDepthForQlogicImpl"/>
+    <bean name="JumboFrameMTUImpl" class="com.dmeplugin.dmestore.services.bestpractice.JumboFrameMTUImpl"/>
 
     <bean name="bestPracticeCheckDao" class="com.dmeplugin.dmestore.dao.BestPracticeCheckDao">
         <property name="url" value="${h2.url}"/>
