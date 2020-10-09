@@ -11,6 +11,7 @@ import {GlobalsService} from '../../shared/globals.service';
 })
 export class IscsiComponent implements OnInit, AfterViewInit {
 
+  testPortConnectedUrl = "accesshost/testconnectivity";
   portGetUrl = 'dmestorage/getstorageethports';
   portGetUrlParams = {
     params: {
@@ -44,7 +45,7 @@ export class IscsiComponent implements OnInit, AfterViewInit {
     sn: ''
   };
 
-  hostObjectId = 'urn:vmomi:HostSystem:host-9:f8e381d7-074b-4fa9-9962-9a68ab6106e1';
+  hostObjectId = 'urn:vmomi:HostSystem:host-224:f8e381d7-074b-4fa9-9962-9a68ab6106e1';
   // port列表
   portLoading = false;
   portList = [];
@@ -58,7 +59,6 @@ export class IscsiComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    console.log('12312');
     const ctx = this.gs.getClientSdk().app.getContextObjects();
     console.log(ctx);
     this.ipsGetUrlParams.params.hostObjectId = this.hostObjectId;
@@ -82,12 +82,10 @@ export class IscsiComponent implements OnInit, AfterViewInit {
   loadStorageDevice(){
     this.http.get(this.storageGetUrl, {}).subscribe((result: any) => {
       console.log(result);
-      if (result.code === '0' || result.code === '200'){
+      if (result.code === '200'){
         this.storageDevices = result.data.data;
         setTimeout(() => {
-          if (this.configModel.sn !== ''){
-            this.loadPorts();
-          }
+          this.loadPorts();
         }, 1000);
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
@@ -97,19 +95,44 @@ export class IscsiComponent implements OnInit, AfterViewInit {
   }
 
   loadPorts(){
-    this.portLoading = true;
-    this.portGetUrlParams.params.storageSn = this.configModel.sn;
-    this.http.get(this.portGetUrl, this.portGetUrlParams).subscribe((result: any) => {
+    // 有存储 有ip才去load
+    if (this.configModel.sn !== '' && this.configModel.vmKernel.device !== ''){
+      this.portLoading = true;
+      this.portGetUrlParams.params.storageSn = this.configModel.sn;
+      this.http.get(this.portGetUrl, this.portGetUrlParams).subscribe((result: any) => {
+        console.log(result);
+        if (result.code === '0' || result.code === '200'){
+          result.data.forEach((item) => {
+            item.connectStatus = '';
+          });
+          this.portList = result.data;
+          this.portTotal = result.data.length;
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+          this.portLoading = false;
+          // 连通状态
+          this.testPortConnected();
+        }
+      }, err => {
+        console.error('ERROR', err);
+        this.portLoading = false;
+      });
+    }
+  }
+
+  testPortConnected(){
+    const p = new testConnectParams();
+    p.ethPorts = this.portList;
+    p.hostObjectId = this.configModel.hostObjectId;
+    p.vmKernel = this.configModel.vmKernel;
+    this.http.post(this.testPortConnectedUrl, p).subscribe((result: any) => {
       console.log(result);
-      if (result.code === '0' || result.code === '200'){
+      if (result.code === '200'){
         this.portList = result.data;
         this.portTotal = result.data.length;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        this.portLoading = false;
       }
     }, err => {
       console.error('ERROR', err);
-      this.portLoading = false;
     });
   }
 
@@ -121,4 +144,11 @@ export class IscsiComponent implements OnInit, AfterViewInit {
       console.error('ERROR', err);
     });
   }
+}
+
+
+class testConnectParams{
+  ethPorts: any[];
+  hostObjectId: string;
+  vmKernel: object;
 }
