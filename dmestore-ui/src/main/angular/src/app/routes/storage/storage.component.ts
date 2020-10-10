@@ -62,10 +62,12 @@ export class StorageComponent implements OnInit, AfterViewInit {
   }
   //组装存储列表的表格数据
   getStrageCharts(){
+
+    this.strorageCharts = [];
     if (this.list !== null && this.list.length > 0){
       this.list.forEach(s=>{
         const chart = new StorageChart();
-        chart.ip = s.ip;
+        chart.id = s.id;
         chart.name = s.name;
         chart.ip = s.ip;
         chart.model = s.model;

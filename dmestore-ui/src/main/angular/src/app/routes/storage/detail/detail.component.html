@@ -309,44 +309,100 @@
       </clr-tabs>
     </clr-tab-content>
   </clr-tab>
-  <!--Capacity-->
   <clr-tab>
-    <button clrTabLink>capacity</button>
+    <button clrTabLink (click)="changeTab('capacity')">capacity</button>
     <clr-tab-content >
       <div>
         <div class="clr-row">
           <div class="clr-col-lg-4 clr-col-12">
-
-            <table class="table table-noborder">
-              <tr>
-                <td>Capacity Usage</td>
-              </tr>
-              <tr>
-                <td>Raw Capacity</td>
-                <td><clr-progress-bar clrValue="100" clrSuccess clrLabeled>10.748TB</clr-progress-bar></td>
-              </tr>
-              <tr>
-                <td>total Capacity</td>
-                <td><clr-progress-bar clrValue="100" clrSuccess clrLabeled>1.918TB</clr-progress-bar></td>
-              </tr>
-              <tr>
-                <td>Used/Free</td>
-                <td><clr-progress-bar clrValue="100" clrSuccess clrLabeled>333.000GB/1.593TB</clr-progress-bar></td>
-              </tr>
-              <tr>
-                <td>Subscribed</td>
-                <td><clr-progress-bar clrValue="100" clrSuccess clrLabeled>16.005PB</clr-progress-bar></td>
-              </tr>
-            </table>
+            <div>
+              <div class="">容量利用率</div>
+              <div class="capacity-wrap">
+                <span class="capacity-label">裸容量</span>
+                <div class="num-bar_outer">
+                  <div class="num-bar_inner"></div>
+                </div>
+                <span>6.389 TB</span>
+              </div>
+              <div class="capacity-wrap">
+                <span class="capacity-label">总容量</span>
+                <div class="num-bar_outer">
+                  <div class="num-bar_inner total" [ngStyle]="{'width':(3.2/6.389 * 100)+'%'}"></div>
+                </div>
+                <span>3.2 TB</span>
+              </div>
+              <div class="capacity-wrap">
+                <span class="capacity-label">已使用/空闲</span>
+                <div class="num-bar_outer">
+                  <div class="num-bar_inner used" [ngStyle]="{'width':(2/6.389 * 100)+'%'}"></div>
+                  <div class="num-bar_inner free" [ngStyle]="{'width':(1/6.389 * 100)+'%'}"></div>
+                </div>
+                <span>2 TB / 1 TB</span>
+              </div>
+            </div>
           </div>
           <div class="clr-col-lg-4 clr-col-12">
-            Capacity Distribution
+            <div class="info-content-title">{{'storage.chart.capacity' | translate}}</div>
+            <div class="info-charts-wrap">
+              <div echarts [options]="cd.chart" id="chart3" style="width: 30%;height: 120px;"></div>
+              <div class="info-content">
+                <div class="info-content-text">
+                  <span>{{'storage.chart.total' | translate}}</span>
+                  <span>{{cd.protection}}</span>
+                </div>
+                <div class="info-content-text">
+                  <span>{{'storage.chart.used' | translate}}</span>
+                  <span>{{cd.fileSystem}}</span>
+                  <span class="squre used"></span>
+                </div>
+                <div class="info-content-text">
+                  <span>{{'storage.chart.free' | translate}}</span>
+                  <span>{{cd.volume}}</span>
+                  <span class="squre free"></span>
+                </div>
+                <div class="info-content-text">
+                  <span>{{'storage.chart.free' | translate}}</span>
+                  <span>{{cd.freeCapacity}}</span>
+                  <span class="squre free"></span>
+                </div>
+              </div>
+            </div>
           </div>
           <div class="clr-col-lg-4 clr-col-12">
-            Capacity Saving
+            <div class="availability-box">
+              <div class="">容量利用率</div>
+              <div class="unit-banner">
+                <div class="unit-label"></div>
+                <div class="unit-outer">
+                  <div *ngFor="let item of [0,1,2,3]" class="unit-inner" [ngStyle]="{'width':(1/4 * 100)+'%'}">
+                    {{item}}
+                  </div>
+                </div>
+                <div>4(TB)</div>
+              </div>
+              <div class="capacity-line">
+                <div class="unit-label">节省前</div>
+                <div class="unit-outer">
+                  <div class="unit-inner_bar" [ngStyle]="{'width':(2.5/4 * 100)+'%'}"></div>
+                  <span class="num">2.5</span>
+                </div>
+              </div>
+              <div class="capacity-line">
+                <div class="unit-tips">重删</div>
+              </div>
+              <div class="capacity-line">
+                <div class="unit-tips">压缩</div>
+              </div>
+              <div class="capacity-line">
+                <div class="unit-label">节省后</div>
+                <div class="unit-outer">
+                  <div class="unit-inner_bar" [ngStyle]="{'width':(2.5/4 * 100)+'%'}"></div>
+                  <span class="num">2.5</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div></div>
         <div>
           Storage PoolList
           <clr-datagrid>
