@@ -294,4 +294,14 @@ export class NfsComponent implements OnInit {
       objectId: objectid
     });
   }
+
+  formatCapacity(c: number){
+    if (c < 1024){
+      return c.toFixed(3)+" MB";
+    }else if(c >= 1024 && c< 1048576){
+      return (c/1024).toFixed(3) +" GB";
+    }else if(c>= 1048576){
+      return (c/1024/1024).toFixed(3)+" TB"
+    }
+  }
 }

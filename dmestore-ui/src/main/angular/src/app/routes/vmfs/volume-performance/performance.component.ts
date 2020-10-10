@@ -30,9 +30,6 @@ export class PerformanceComponent implements OnInit, AfterViewInit {
   // obj_type_id  (卷类型ID)
   objTypeId;
   // indicator_ids 获取参数指标（上下限等） 0 上限 1下限
-  indicatorIdsIOPS: Array<string> = ['1407379178651656', '1407379178586113'];
-  indicatorIdsBDWT: Array<string> = ['1407379178651656', '1407379178586113'];
-  indicatorIdsREST: Array<string> = ['1407379178651656', '1407379178586113'];
   // obj_ids 卷ID
   // objIds: Array<string> = ['1282FFE20AA03E4EAC9A814C687B780A'];
   /*{
@@ -94,17 +91,26 @@ export class PerformanceComponent implements OnInit, AfterViewInit {
     // volIds.push(this.selectVolume.wwn);
     volIds.push('1282FFE20AA03E4EAC9A814C687B780A');
     // IOPS
-    this.makePerformance.setChart(300,'IOPS', 'IO/s', NfsService.nfsIOPS, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
+    this.makePerformance.setChart(300,'IOPS', 'IO/s', NfsService.vmfsIOPS, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
       this.iopsChart = res;
       this.cdr.detectChanges();
     });
 
     // 带宽
-    this.perService.getIopsChart('Bandwidth', 'MS/s', null,  NfsService.nfsIOPS, volIds,
-      this.interval, this.selectRange, null, null).then(res => {
+    this.makePerformance.setChart(300,'Bandwidth', 'MB/s', NfsService.vmfsBDWT, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
       this.bandwidthChart = res;
       this.cdr.detectChanges();
     });
+    // 响应时间
+    this.makePerformance.setChart(300,'Latency', 'ms', NfsService.vmfsLatency, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
+      this.latencyChart = res;
+      this.cdr.detectChanges();
+    });
+    // this.perService.getIopsChart('Bandwidth', 'MS/s', null,  NfsService.nfsIOPS, volIds,
+    //   this.interval, this.selectRange, null, null).then(res => {
+    //   this.bandwidthChart = res;
+    //   this.cdr.detectChanges();
+    // });
     // // 响应时间
     // this.perService.getIopsChart('Latency', 'ms', this.objTypeId, this.indicatorIdsREST, this.objIds,
     //   this.interval, this.range, this.beginTime, this.endTime).then(res => {
