@@ -74,16 +74,18 @@ public class DmeStorageController extends BaseController{
     }
 
     /**
-     *  list Storage Pool
-     * @param storageId required
+     *
+     * @param storageId
+     * @param media_type file,block,all
      * @return
      */
     @GetMapping("/storagepools")
     @ResponseBody
-    public ResponseBodyBean getStoragePools(@RequestParam(name = "storageId") String storageId){
+    public ResponseBodyBean getStoragePools(@RequestParam(name = "storageId") String storageId,
+                                            @RequestParam(name = "media_type") String media_type){
 
         LOG.info("storage_id ==" + storageId );
-        Map<String, Object> resMap = dmeStorageService.getStoragePools(storageId);
+        Map<String, Object> resMap = dmeStorageService.getStoragePools(storageId,media_type);
         if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
             return success(resMap);
         }
