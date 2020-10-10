@@ -224,51 +224,13 @@
           </clr-select-container>
 
           <!-- 主机/集群 -->
-<!--          <clr-select-container>-->
-<!--            <label>{{'vmfs.hostOrCluster' | translate}}</label>-->
-<!--            <select hidden clrSelect class="inputOneLine">-->
-<!--            </select>-->
-<!--            <label>-->
-<!--              <input readonly required clrInput [(ngModel)]="form.deviceName" name="deviceName">-->
-<!--              <clr-tree>-->
-<!--                &lt;!&ndash; 主机&ndash;&gt;-->
-<!--                <clr-tree-node *ngFor="let directory of hostRootDirectory" [(clrExpanded)]="directory.expanded">-->
-<!--                  <clr-icon [attr.shape]="directory.icon"></clr-icon>-->
-<!--                  {{directory.name}}-->
-<!--                  <clr-tree-node *ngFor="let file of directory.files">-->
-<!--                    <button-->
-<!--                      (click)="deviceDataHandle(directory.name, file.name, file.id)"-->
-<!--                      class="clr-treenode-link"-->
-<!--                      [class.active]="file.active">-->
-<!--                      <clr-icon [attr.shape]="file.icon"></clr-icon>-->
-<!--                      {{file.name}}-->
-<!--                    </button>-->
-<!--                  </clr-tree-node>-->
-<!--                </clr-tree-node>-->
-<!--                &lt;!&ndash; 集群 &ndash;&gt;-->
-<!--                <clr-tree-node *ngFor="let directory of clusterRootDirectory" [(clrExpanded)]="directory.expanded">-->
-<!--                  <clr-icon [attr.shape]="directory.icon"></clr-icon>-->
-<!--                  {{directory.name}}-->
-<!--                  <clr-tree-node *ngFor="let file of directory.files">-->
-<!--                    <button-->
-<!--                      (click)="deviceDataHandle(directory.name, file.name, file.id)"-->
-<!--                      class="clr-treenode-link"-->
-<!--                      [class.active]="file.active">-->
-<!--                      <clr-icon [attr.shape]="file.icon"></clr-icon>-->
-<!--                      {{file.name}}-->
-<!--                    </button>-->
-<!--                  </clr-tree-node>-->
-<!--                </clr-tree-node>-->
-<!--              </clr-tree>-->
-<!--            </label>-->
-<!--          </clr-select-container>-->
           <clr-combobox-container>
             <label>{{'vmfs.hostOrCluster' | translate}}</label>
             <clr-combobox [(ngModel)]="chooseDevice" name="chooseDevice">
               <clr-options *ngIf="form.hostDataloadSuccess && form.culDataloadSuccess">
                 <clr-option *clrOptionItems="let device of deviceList; field:'deviceName'" [clrValue]="device">
-                  <clr-icon shape="world" role="img" aria-label="World is turning"></clr-icon> {{device.deviceName}}
-                  <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon>
+                  <clr-icon *ngIf="device.deviceName !== ''" shape="world" role="img" aria-label="World is turning"></clr-icon> {{device.deviceName}}
+                  <clr-icon *ngIf="device.deviceName !== ''" shape="sun" role="img" aria-label="Sun is shining"></clr-icon>
                 </clr-option>
               </clr-options>
             </clr-combobox>
@@ -333,7 +295,7 @@
                       </tbody>
                   </table>
                 </clr-accordion-content>
-                <img src="../../../../assets/images/selectDown.svg" style="position: absolute;right: 0px;bottom: 0px;" width="40px" height="40px">
+                <img src="./assets/images/selectDown.svg" style="position: absolute;right: 0px;bottom: 0px;" width="40px" height="40px">
               </clr-accordion-panel>
             </clr-accordion>
           </ng-container>
@@ -679,7 +641,7 @@
                   </tbody>
                 </table>
               </clr-accordion-content>
-              <img src="../../../../assets/images/selectDown.svg" style="position: absolute;right: 0px;bottom: 0px;" width="40px" height="40px">
+              <img src="./assets/images/selectDown.svg" style="position: absolute;right: 0px;bottom: 0px;" width="40px" height="40px">
             </clr-accordion-panel>
           </clr-accordion>
         </ng-container>
