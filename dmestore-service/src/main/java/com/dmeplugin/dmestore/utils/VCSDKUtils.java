@@ -1140,9 +1140,7 @@ public class VCSDKUtils {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
             _logger.error("DataStore:" + datastoreId + " error:", e);
-            throw e;
         } finally {
             if (sessionHelper != null) {
                 sessionHelper.logout();
