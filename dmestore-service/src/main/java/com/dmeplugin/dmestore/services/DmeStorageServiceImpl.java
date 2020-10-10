@@ -25,7 +25,7 @@ import java.util.*;
 public class DmeStorageServiceImpl implements DmeStorageService {
 
     private final String API_STORAGES = "/rest/storagemgmt/v1/storages";
-    private final String API_STORAGEPOOL_LIST = "/rest/storagemgmt/v1/storagepools/query";
+    private final String API_STORAGEPOOL_LIST = "/rest/resourcedb/v1/instances/";
     private final String API_LOGICPORTS_LIST = "/rest/storagemgmt/v1/storage-port/logic-ports?storage_id=";
     private final String API_VOLUME_LIST = "/rest/blockservice/v1/volumes?storageId =";
     private final String API_FILESYSTEMS_LIST = "/rest/fileservice/v1/filesystems/query";
@@ -194,19 +194,19 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public Map<String, Object> getStoragePools(String storageId) {
+    public Map<String, Object> getStoragePools(String storageId ,String media_type) {
 
+        String className = "SYS_StoragePool";
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 200);
         resMap.put("msg", "search oriented storage pool success");
         resMap.put("data", storageId);
 
         List<StoragePool> resList = new ArrayList<>();
-        Map<String, String> params = new HashMap<>();
-        params.put("storage_id", storageId);
-
+        String url = API_STORAGEPOOL_LIST + className + "?storageDeviceId=" + storageId;
+        LOG.info(url);
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.access(API_STORAGEPOOL_LIST, HttpMethod.POST, gson.toJson(params));
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             LOG.info("DmeStorageServiceImpl/getStoragePools/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -217,47 +217,57 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             String object = responseEntity.getBody();
             if (!StringUtils.isEmpty(object)) {
                 JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-                JsonArray jsonArray = jsonObject.get("datas").getAsJsonArray();
+                JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
                     StoragePool storagePool = new StoragePool();
                     storagePool.setName(ToolUtils.jsonToStr(element.get("name")));
-                    storagePool.setFree_capacity(ToolUtils.jsonToDou(element.get("free_capacity"),0.0));
-                    storagePool.setHealth_status(ToolUtils.jsonToStr(element.get("health_status")));
-                    Double lun_subscribed_capacity = Double.valueOf(ToolUtils.jsonToStr(element.get("lun_subscribed_capacity")));
-                    storagePool.setLun_subscribed_capacity(lun_subscribed_capacity);
-                    storagePool.setParent_type(ToolUtils.jsonToStr(element.get("parent_type")));
-                    storagePool.setRunning_status(ToolUtils.jsonToStr(element.get("running_status")));
-                    Double total_capacity = Double.valueOf(ToolUtils.jsonToDou(element.get("total_capacity"),0.0));
-                    storagePool.setTotal_capacity(ToolUtils.jsonToDou(element.get("total_capacity"),0.0));
-                    Double fs_subscribed_capacity = Double.valueOf(ToolUtils.jsonToDou(element.get("fs_subscribed_capacity"),0.0));
-                    storagePool.setFs_subscribed_capacity(fs_subscribed_capacity);
-                    storagePool.setConsumed_capacity(Double.valueOf(ToolUtils.jsonToStr(element.get("consumed_capacity"))));
-                    storagePool.setConsumed_capacity_percentage(ToolUtils.jsonToStr(element.get("consumed_capacity_percentage")));
-                    storagePool.setConsumed_capacity_threshold(ToolUtils.jsonToStr(element.get("consumed_capacity_threshold")));
-                    storagePool.setStorage_pool_id(ToolUtils.jsonToStr(element.get("storage_pool_id")));
-                    storagePool.setStorage_name(ToolUtils.jsonToStr(element.get("storage_name")));
-                    storagePool.setMedia_type(ToolUtils.jsonToStr(element.get("media_type")));
-                    storagePool.setTier0_disk_type(ToolUtils.jsonToStr(element.get("tier0_disk_type")));
-                    storagePool.setTier1_disk_type(ToolUtils.jsonToStr(element.get("tier1_disk_type")));
-                    storagePool.setTier2_disk_type(ToolUtils.jsonToStr(element.get("tier2_disk_type")));
-                    storagePool.setStorage_id(ToolUtils.jsonToStr(element.get("storage_id")));
-                    storagePool.setTier0_raid_lv(ToolUtils.jsonToStr(element.get("tier0_raid_lv")));
-                    storagePool.setTier1_raid_lv(ToolUtils.jsonToStr(element.get("tier1_raid_lv")));
-                    storagePool.setTier2_raid_lv(ToolUtils.jsonToStr(element.get("tier2_raid_lv")));
-                    storagePool.setConsumed_capacity(ToolUtils.jsonToDou(element.get("consumed_capacity"),0.0));
+                    String poolId = ToolUtils.jsonToStr(element.get("poolId"));
+                    storagePool.setId(poolId);
+                    storagePool.setHealth_status(ToolUtils.jsonToStr(element.get("status")));
+                    storagePool.setRunning_status(ToolUtils.jsonToStr(element.get("runningStatus")));
+                    Double total_capacity =ToolUtils.jsonToDou(element.get("totalCapacity"),0.0);
+                    storagePool.setTotal_capacity(total_capacity);
+                    Double consumed_capacity = ToolUtils.jsonToDou(element.get("usedCapacity"), 0.0);
+                    storagePool.setConsumed_capacity(consumed_capacity);
+                    storagePool.setStorage_pool_id(ToolUtils.jsonToStr(element.get("storageDeviceId")));
+                    String type = ToolUtils.jsonToStr(element.get("type"));
+                    storagePool.setMedia_type(type);
+                    storagePool.setStorage_id(ToolUtils.jsonToStr(element.get("storageDeviceId")));
+                    storagePool.setTier0_raid_lv(ToolUtils.jsonToStr(element.get("tier0RaidLv")));
+                    storagePool.setTier1_raid_lv(ToolUtils.jsonToStr(element.get("tier1RaidLv")));
+                    storagePool.setTier2_raid_lv(ToolUtils.jsonToStr(element.get("tier2RaidLv")));
+                    storagePool.setConsumed_capacity(ToolUtils.jsonToDou(element.get("usedCapacity"),0.0));
+                    storagePool.setStorage_instance_id(ToolUtils.jsonToStr(element.get("resId")));
+                    String diskPoolId = ToolUtils.jsonToStr(element.get("diskPoolId"));
+                    storagePool.setDiskPoolId(diskPoolId);
+                    Double subscribedCapacity = ToolUtils.jsonToDou(element.get("subscribedCapacity"), 0.0);
+                    storagePool.setSubscribed_capacity(subscribedCapacity);
                     //订阅率（lun/fs订阅率）
                     DecimalFormat df = new DecimalFormat("#.00");
-                    Double lun_subscription_rate = 0.0;
-                    Double fs_subscription_rate = 0.0;
+                    Double subscribedCapacityRate = 0.0;
                     if (total_capacity!=0) {
-                        lun_subscription_rate = Double.valueOf(df.format(lun_subscribed_capacity / total_capacity));
-                        fs_subscription_rate = Double.valueOf(df.format(fs_subscribed_capacity / total_capacity));
+                        subscribedCapacityRate = Double.valueOf(df.format(subscribedCapacity / total_capacity));
                     }
-                    storagePool.setLun_subscription_rate(lun_subscription_rate);
-                    storagePool.setFs_subscription_rate(fs_subscription_rate);
 
-                    resList.add(storagePool);
+                    Double freeCapacity = 0.0;
+                    String consumed_percent = "0.0";
+                    if (Double.max(total_capacity, consumed_capacity) == total_capacity) {
+                        freeCapacity = total_capacity - consumed_capacity;
+                        consumed_percent = Double.valueOf(df.format(consumed_capacity / total_capacity)).toString();
+                    }
+
+                    String diskType = getDiskType(storageId,diskPoolId,poolId);
+                    storagePool.setPhysicalType(diskType);
+
+                    storagePool.setConsumed_capacity_percentage(consumed_percent);
+                    storagePool.setFree_capacity(freeCapacity);
+                    storagePool.setSubscription_rate(subscribedCapacityRate);
+                    if (media_type.equals(type)){
+                        resList.add(storagePool);
+                    } else if(media_type.equals("all")) {
+                        resList.add(storagePool);
+                    }
                 }
                 resMap.put("data", resList);
             }
@@ -933,6 +943,28 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     private String getDataStoreOnVolume(String volumeId) throws SQLException {
         return dmeVmwareRalationDao.getVmfsNameByVolumeId(volumeId);
+    }
+
+    private String getDiskType(String storageDeviceId,String diskPoolId,String poolId) throws Exception {
+        String result = "";
+        String className = "SYS_StorageDisk";
+        String url = API_INSTANCES_LIST+"/"+className+"?storageDeviceId="+storageDeviceId;
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+        int code = responseEntity.getStatusCodeValue();
+        if (code == 200) {
+            String object = responseEntity.getBody();
+            JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+            JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
+            for (JsonElement jsonElement : jsonArray) {
+                JsonObject element = jsonElement.getAsJsonObject();
+                String diskId = ToolUtils.jsonToStr(element.get("diskId"));
+                if (diskPoolId.equals(diskId)) {
+                    result = ToolUtils.jsonToStr(element.get("physicalType"));
+                    break;
+                }
+            }
+        }
+        return result;
     }
 
     //从卷信息中查关联的主机和主机组

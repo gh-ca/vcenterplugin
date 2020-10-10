@@ -207,19 +207,19 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     public void createVmfs(Map<String, Object> params) throws Exception {
         if (params != null) {
             //param str host: 主机  param str cluster: 集群
-            String objhostid = "";
+            String objHostId = "";
             //判断主机或主机组在DME中是否存在
             //如果主机或主机不存在就创建并得到主机或主机组ID
-            objhostid = checkOrcreateToHostorHostGroup(params);
-            LOG.info("objhostid====" + objhostid);
-            if (!StringUtils.isEmpty(objhostid)) {
+            objHostId = checkOrcreateToHostorHostGroup(params);
+            LOG.info("objHostId====" + objHostId);
+            if (!StringUtils.isEmpty(objHostId)) {
                 //创建DME卷
                 //判断服务等级是否存在  service_level_id
                 String taskId = "";
                 if (params.get("service_level_id") != null) {
-                    taskId = createVmfsByServiceLevel(params, objhostid);
+                    taskId = createVmfsByServiceLevel(params, objHostId);
                 } else {  //非服务化的创建
-                    taskId = createVmfsByUNServiceLevel(params, objhostid);
+                    taskId = createVmfsByUNServiceLevel(params, objHostId);
 
                 }
                 LOG.info("taskId====" + taskId);
@@ -233,9 +233,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         String dmeHostId = null;
                         String demHostGroupId = null;
                         if (params != null && params.get("host") != null) {
-                            dmeHostId = objhostid;
+                            dmeHostId = objHostId;
                         } else if (params != null && params.get("cluster") != null) {
-                            demHostGroupId = objhostid;
+                            demHostGroupId = objHostId;
                         }
                         List<Map<String, Object>> volumelist = getVolumeByName(ToolUtils.getStr(params.get("volumeName")),
                                 dmeHostId,demHostGroupId,
