@@ -31,56 +31,99 @@
     <span (click)="basAdd()" style="margin-top: 20px;margin-left: 20px;color:#00F;cursor:pointer">{{'rdm.add' | translate}}</span>
   </div>
   <div class="clr-row">
-      <!-- 选择 服务等级 存储选-->
-      <clr-radio-container clrInline>
-        <label>{{'rdm.storageType' | translate}}</label>
-        <clr-radio-wrapper>
-          <input type="radio" clrRadio (click)="levelCheck='level'" name="storageType"  value="1" [(ngModel)]="configModel.storageType" />
-          <label>{{'rdm.tier' | translate}}</label>
-        </clr-radio-wrapper>
-        <clr-radio-wrapper>
-          <input type="radio" clrRadio  (click)="levelCheck='storage'" name="storageType"  value="2" [(ngModel)]="configModel.storageType" />
-          <label>{{'rdm.storage1' | translate}}</label>
-        </clr-radio-wrapper>
-        <!--<clr-control-helper>Helper text</clr-control-helper>
-        <clr-control-error>This field is required!</clr-control-error>-->
-      </clr-radio-container>
+    <clr-select-container>
+      <label>{{'rdm.host' | translate}}<span style="color: red">*</span></label>
+      <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="hostSelected" name="hostSelected" class="clr-select" (change)="loadDataStore(hostSelected)">
+        <option *ngFor="let item of hostList" value="{{item.id}}">{{item.ip}}({{item.name}})</option>
+      </select>
+    </clr-select-container>
+    <clr-select-container>
+      <label>{{'rdm.dataStore' | translate}}<span style="color: red">*</span></label>
+      <select clrSelect (ngModelOptions)="dataStores" [(ngModel)]="data_store_name" name="data_store_name" class="clr-select">
+        <option *ngFor="let item of dataStores" value="{{item.name}}">{{item.name}}</option>
+      </select>
+    </clr-select-container>
+
+    <!-- 选择 服务等级 存储选-->
+    <clr-radio-container clrInline>
+      <label>{{'rdm.storageType' | translate}}</label>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio (click)="levelCheck='level'" name="storageType"  value="1" [(ngModel)]="configModel.storageType" />
+        <label>{{'rdm.tier' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio  (click)="levelCheck='storage'" name="storageType"  value="2" [(ngModel)]="configModel.storageType" />
+        <label>{{'rdm.storage1' | translate}}</label>
+      </clr-radio-wrapper>
+      <!--<clr-control-helper>Helper text</clr-control-helper>
+      <clr-control-error>This field is required!</clr-control-error>-->
+    </clr-radio-container>
   </div>
 
   <div class="clr-row">
     <!-- 服务等级-->
+    <!-- 1、选择 服务等级-->
     <div *ngIf="levelCheck==='level'" [hidden]="levelCheck !=='level'">
-      <table class="table table-vertical table-noborder table-compact blueBg">
-        <tbody>
-        <tr>
-          <th hidden></th>
-          <th>
-            storageName:LargeScaleERRHAHA
-          </th>
-        </tr>
-        <tr>
-          <th hidden></th>
-          <td>{{'vmfs.capacityUsage' | translate}}</td>
-          <td>{{'vmfs.qos' | translate}}</td>
-          <td>{{'vmfs.protection' | translate}}</td>
-        </tr>
-        <tr>
-          <th hidden></th>
-          <th><clr-progress-bar clrValue="{{(100- 10)/100 * 100}}" clrSuccess clrLabeled></clr-progress-bar></th>
-          <th>IOPS > 2000/TB</th>
-          <th>IOPS > 2000/TB</th>
-        </tr>
-        <tr>
-          <th hidden></th>
-          <th>136.700 TB/300.00TbB</th>
-          <th>Latency < 1 ms</th>
-        </tr>
-        </tbody>
-      </table>
+      <clr-accordion>
+        <clr-accordion-panel (click)="serviceLevelClick(item.id, item.name);" *ngFor="let item of serviceLevels;" style="margin-top: 20px;" >
+          <clr-accordion-title style="height: 50px; line-height: 50px;color: #333;font-size:16px;">{{item.name}}</clr-accordion-title>
+          <clr-accordion-content>
+            <table class="table table-vertical table-noborder table-compact">
+              <tbody>
+              <tr>
+                <th hidden></th>
+                <th>
+                  {{item.name}}
+                </th>
+              </tr>
+              <tr>
+                <th hidden></th>
+                <td>{{'vmfs.capacityUsage' | translate}}</td>
+                <td>{{'vmfs.qos' | translate}}</td>
+              </tr>
+              <tr>
+                <th hidden></th>
+                <th><clr-progress-bar clrValue="{{item.usedRate}}" clrSuccess clrLabeled></clr-progress-bar></th>
+                <th *ngIf="item.capabilities.qos != undefined && item.capabilities.qos.qosParam.maxIOPS != undefined">
+                  IOPS <= {{item.capabilities.qos.qosParam.maxIOPS}} IOPS/TB
+                </th>
+                <th *ngIf="item.capabilities.qos != undefined && item.capabilities.qos.qosParam.minIOPS != undefined">
+                  IOPS >= {{item.capabilities.qos.qosParam.minIOPS}} IOPS/TB
+                </th>
+              </tr>
+              <tr>
+                <th hidden></th>
+                <th></th>
+                <th *ngIf="item.capabilities.qos != undefined
+                                            && item.capabilities.qos.enabled == true
+                                            && item.capabilities.qos.qosParam.minBandWidth != undefined">
+                  {{'tier.bandwidth'|translate}} >= {{item.capabilities.qos.qosParam.minBandWidth}} Mbps/s
+                </th>
+                <th *ngIf="item.capabilities.qos != undefined
+                                            && item.capabilities.qos.enabled == true
+                                            && item.capabilities.qos.qosParam.maxBandWidth != undefined">
+                  {{'tier.bandwidth'|translate}} <= {{item.capabilities.qos.qosParam.maxBandWidth}} Mbps/s
+                </th>
+              </tr>
+              <tr>
+                <th hidden></th>
+                <th>{{item.used_capacity}} GB/{{item.total_capacity}}GB</th>
+                <th *ngIf="item.capabilities.qos != undefined
+                                            && item.capabilities.qos.enabled == true
+                                            && item.capabilities.qos.qosParam.latency != undefined">
+                  Latency= {{item.capabilities.qos.qosParam.latency}} {{item.capabilities.qos.qosParam.latencyUnit}}
+                </th>
+              </tr>
+              </tbody>
+            </table>
+          </clr-accordion-content>
+          <img src="./assets/images/selectDown.svg" style="position: absolute;right: 0px;bottom: 0px;" width="40px" height="40px">
+        </clr-accordion-panel>
+      </clr-accordion>
     </div>
 
     <!-- 选择存储 -->
-    <div *ngIf="levelCheck==='storage'"  [hidden]="levelCheck !=='storage'">
+    <div *ngIf="levelCheck==='storage'" [hidden]="levelCheck !=='storage'">
       <clr-select-container>
         <label>{{'rdm.storage' | translate}}<span style="color: red">*</span></label>:
         <select clrSelect  [(ngModel)]="configModel.storage_id" name="storage_id" (ngModelChange)="loadStoragePool(configModel.storage_id);">
@@ -92,13 +135,12 @@
         <label>{{'rdm.sPool' | translate}}<span style="color: red">*</span></label>:
         <select clrSelect [(ngModel)]="configModel.pool_raw_id" name="pool_raw_id" >
           <option value=""></option>
-          <option *ngFor="let item of storagePools" value="{{item.pool_raw_id}}">{{item.name}}</option>
+          <option *ngFor="let item of storagePools" value="{{item.storage_pool_id}}">{{item.name}}</option>
         </select>
       </clr-select-container>
-
-      <clr-combobox-container>
+      <!--<clr-combobox-container>
         <label>{{'rdm.host' | translate}}<span style="color: red">*</span></label>
-        <clr-combobox [(ngModel)]="hostSelected" name="host_id">
+        <clr-combobox (change)="loadDataStore(hostSelected.id)" [(ngModel)]="hostSelected" name="host_id">
           <clr-options>
             <clr-option *clrOptionItems="let item of hostList;field:'name'" [clrValue]="item">
               {{item.ip}}({{item.name}})
@@ -106,6 +148,17 @@
           </clr-options>
         </clr-combobox>
       </clr-combobox-container>
+
+      <clr-combobox-container>
+        <label>{{'rdm.dataStore' | translate}}<span style="color: red">*</span></label>
+        <clr-combobox [(ngModel)]="data_store_name" name="data_store_name">
+          <clr-options>
+            <clr-option *clrOptionItems="let item of dataStores;field:'name'" [clrValue]="item">
+              {{item.name}}
+            </clr-option>
+          </clr-options>
+        </clr-combobox>
+      </clr-combobox-container>-->
 
       <clr-select-container>
         <label>{{'rdm.ownerC' | translate}}<span style="color: red">*</span></label>:
@@ -228,7 +281,7 @@
 
       <clr-select-container *ngIf="policyEnable.resourceTuning">
         <label>{{'rdm.alloctype' | translate}}<span style="color: red">*</span></label>:
-        <select clrSelect [(ngModel)]="configModel.tuning.alloctype" name="smarttier" >
+        <select clrSelect [(ngModel)]="configModel.tuning.alloctype" name="alloctype" >
           <option value="thin">thin</option>
           <option value="thick">thick</option>
         </select>
@@ -237,18 +290,18 @@
       <clr-select-container *ngIf="configModel.tuning.alloctype == 'thin' && policyEnable.resourceTuning">
         <label>{{'rdm.dedupe' | translate}}<span style="color: red">*</span></label>:
         <select clrSelect [(ngModel)]="configModel.tuning.dedupe_enabled" name="dedupe" >
-          <option value="0">{{'rdm.default' | translate}}</option>
-          <option value="1">{{'rdm.enable' | translate}}</option>
-          <option value="2">{{'rdm.disable' | translate}}</option>
+          <option value=null>{{'rdm.default' | translate}}</option>
+          <option value=true>{{'rdm.enable' | translate}}</option>
+          <option value=false>{{'rdm.disable' | translate}}</option>
         </select>
       </clr-select-container>
 
       <clr-select-container *ngIf="configModel.tuning.alloctype == 'thin' && policyEnable.resourceTuning">
         <label>{{'rdm.compression' | translate}}<span style="color: red">*</span></label>:
         <select clrSelect [(ngModel)]="configModel.tuning.compression_enabled" name="compression" >
-          <option value="0">{{'rdm.default' | translate}}</option>
-          <option value='1'>{{'rdm.enable' | translate}}</option>
-          <option value="2">{{'rdm.disable' | translate}}</option>
+          <option value=null>{{'rdm.default' | translate}}</option>
+          <option value=true>{{'rdm.enable' | translate}}</option>
+          <option value=false>{{'rdm.disable' | translate}}</option>
         </select>
       </clr-select-container>
     </div>

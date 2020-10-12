@@ -52,8 +52,9 @@ public class VmwarePluginContextFactory {
             VmwareClient vimClient = new VmwareClient(serverInfo.serviceGuid);
             vimClient.setVcenterSessionTimeout(1200000);
             vimClient.connect(serverInfo);
-            if (serverguid.equalsIgnoreCase(serverInfo.serviceGuid))
+            if (serverguid.equalsIgnoreCase(serverInfo.serviceGuid)) {
                 context = new VmwareContext(vimClient, serverInfo.serviceGuid);
+            }
         }
 
         return context;
@@ -61,8 +62,9 @@ public class VmwarePluginContextFactory {
 
     public static VmwareContext getServerContext(UserSessionService userSessionService, VimObjectReferenceService vimObjectReferenceService, String serverguid) throws Exception {
         VmwareContext context = s_pool.getContext(serverguid,"");
-        if (context == null)
+        if (context == null) {
             context = create(userSessionService, vimObjectReferenceService, serverguid);
+        }
 
         if (context != null) {
             context.setPoolInfo(s_pool, VmwareContextPool.composePoolKey(serverguid, ""));

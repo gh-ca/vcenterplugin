@@ -48,8 +48,9 @@ public class VirtualDiskManagerMO extends BaseMO {
         ManagedObjectReference morTask = _context.getService().copyVirtualDiskTask(_mor, srcName, morSrcDc, destName, morDestDc, diskSpec, force);
 
         boolean result = _context.getVimClient().waitForTask(morTask);
-        if (!result)
+        if (!result) {
             throw new Exception("Unable to copy virtual disk " + srcName + " to " + destName + " due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+        }
 
         _context.waitForTaskProgressDone(morTask);
     }
@@ -58,8 +59,9 @@ public class VirtualDiskManagerMO extends BaseMO {
         ManagedObjectReference morTask = _context.getService().createVirtualDiskTask(_mor, name, morDc, diskSpec);
 
         boolean result = _context.getVimClient().waitForTask(morTask);
-        if (!result)
+        if (!result) {
             throw new Exception("Unable to create virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+        }
 
         _context.waitForTaskProgressDone(morTask);
     }
@@ -68,8 +70,9 @@ public class VirtualDiskManagerMO extends BaseMO {
         ManagedObjectReference morTask = _context.getService().defragmentVirtualDiskTask(_mor, name, morDc);
 
         boolean result = _context.getVimClient().waitForTask(morTask);
-        if (!result)
+        if (!result) {
             throw new Exception("Unable to defragment virtual disk " + name + " due to " + result);
+        }
 
         _context.waitForTaskProgressDone(morTask);
     }
@@ -78,8 +81,9 @@ public class VirtualDiskManagerMO extends BaseMO {
         ManagedObjectReference morTask = _context.getService().deleteVirtualDiskTask(_mor, name, morDc);
 
         boolean result = _context.getVimClient().waitForTask(morTask);
-        if (!result)
+        if (!result) {
             throw new Exception("Unable to delete virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+        }
 
         _context.waitForTaskProgressDone(morTask);
     }
@@ -88,8 +92,9 @@ public class VirtualDiskManagerMO extends BaseMO {
         ManagedObjectReference morTask = _context.getService().eagerZeroVirtualDiskTask(_mor, name, morDc);
 
         boolean result = _context.getVimClient().waitForTask(morTask);
-        if (!result)
+        if (!result) {
             throw new Exception("Unable to eager zero virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+        }
 
         _context.waitForTaskProgressDone(morTask);
     }
@@ -98,8 +103,9 @@ public class VirtualDiskManagerMO extends BaseMO {
         ManagedObjectReference morTask = _context.getService().extendVirtualDiskTask(_mor, name, morDc, newCapacityKb, eagerZero);
 
         boolean result = _context.getVimClient().waitForTask(morTask);
-        if (!result)
+        if (!result) {
             throw new Exception("Unable to extend virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+        }
 
         _context.waitForTaskProgressDone(morTask);
     }
@@ -108,8 +114,9 @@ public class VirtualDiskManagerMO extends BaseMO {
         ManagedObjectReference morTask = _context.getService().inflateVirtualDiskTask(_mor, name, morDc);
 
         boolean result = _context.getVimClient().waitForTask(morTask);
-        if (!result)
+        if (!result) {
             throw new Exception("Unable to inflate virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+        }
         _context.waitForTaskProgressDone(morTask);
     }
 
@@ -117,8 +124,9 @@ public class VirtualDiskManagerMO extends BaseMO {
         ManagedObjectReference morTask = _context.getService().shrinkVirtualDiskTask(_mor, name, morDc, copy);
 
         boolean result = _context.getVimClient().waitForTask(morTask);
-        if (!result)
+        if (!result) {
             throw new Exception("Unable to shrink virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+        }
         _context.waitForTaskProgressDone(morTask);
     }
 
@@ -126,8 +134,9 @@ public class VirtualDiskManagerMO extends BaseMO {
         ManagedObjectReference morTask = _context.getService().zeroFillVirtualDiskTask(_mor, name, morDc);
 
         boolean result = _context.getVimClient().waitForTask(morTask);
-        if (!result)
+        if (!result) {
             throw new Exception("Unable to zero fill virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+        }
         _context.waitForTaskProgressDone(morTask);
     }
 
@@ -136,8 +145,9 @@ public class VirtualDiskManagerMO extends BaseMO {
         ManagedObjectReference morTask = _context.getService().moveVirtualDiskTask(_mor, srcName, morSrcDc, destName, morDestDc, force, null);
 
         boolean result = _context.getVimClient().waitForTask(morTask);
-        if (!result)
+        if (!result) {
             throw new Exception("Unable to move virtual disk " + srcName + " to " + destName + " due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+        }
         _context.waitForTaskProgressDone(morTask);
     }
 

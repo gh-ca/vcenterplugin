@@ -16,3 +16,17 @@
 ::ng-deep .clr-select-wrapper select{
   width: 190px;
 }
+
+
+.clr-accordion-panel {
+  display: block;
+  width: 700px;
+}
+
+
+::ng-deep .clr-accordion-content{background-color: #EDF6FA;position: relative;border: none;}
+::ng-deep .clr-accordion-angle{display: none;}
+::ng-deep .clr-accordion-header{border: 3px solid #99C9E2; }
+::ng-deep .clr-accordion-panel:last-child .clr-accordion-header{border-bottom: 3px solid  #99C9E2;}
+::ng-deep .clr-accordion:not(.clr-stepper-forms) .clr-accordion-content{padding: 30px 5px;}
+::ng-deep .clr-accordion-panel:last-child .clr-accordion-content, .clr-accordion-panel:last-child .clr-accordion-header{border: none}
