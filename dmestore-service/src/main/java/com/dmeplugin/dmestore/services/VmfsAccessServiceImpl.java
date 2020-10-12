@@ -264,6 +264,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                             LOG.info("Vmfs attachTagStr==" + attachTagStr);
                                         }
                                     }
+                                }else{
+                                    throw new Exception("vmware create vmfs error:"+params.get("volume_name"));
                                 }
                             }
                         }
