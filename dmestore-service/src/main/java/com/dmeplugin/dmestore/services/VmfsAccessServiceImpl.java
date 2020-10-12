@@ -219,7 +219,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 if (params.get("service_level_id") != null) {
                     taskId = createVmfsByServiceLevel(params, objHostId);
                 } else {  //非服务化的创建
-                    taskId = createVmfsByUNServiceLevel(params, objHostId);
+                    taskId = createVmfsByUnServiceLevel(params, objHostId);
 
                 }
                 LOG.info("taskId====" + taskId);
@@ -388,7 +388,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     //通过非服务化创建卷，返回任务ID
-    private String createVmfsByUNServiceLevel(Map<String, Object> params, String objhostid) {
+    private String createVmfsByUnServiceLevel(Map<String, Object> params, String objhostid) {
         String taskId = "";
         try {
             if (params != null && params.get("storage_id") != null) {
