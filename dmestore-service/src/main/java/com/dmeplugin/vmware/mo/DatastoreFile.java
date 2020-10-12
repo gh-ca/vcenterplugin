@@ -29,10 +29,11 @@ public class DatastoreFile {
     }
 
     public DatastoreFile(String datastoreName, String dir, String fileName) {
-        if (dir == null || dir.isEmpty())
+        if (dir == null || dir.isEmpty()) {
             _path = String.format("[%s] %s", datastoreName, fileName);
-        else
+        } else {
             _path = String.format("[%s] %s/%s", datastoreName, dir, fileName);
+        }
     }
 
     public String getDatastoreName() {
@@ -45,22 +46,25 @@ public class DatastoreFile {
 
     public String getRelativePath() {
         int pos = _path.indexOf(']');
-        if (pos < 0)
+        if (pos < 0) {
             pos = 0;
-        else
+        } else {
             pos++;
+        }
 
         return _path.substring(pos).trim();
     }
 
     public String getDir() {
         int startPos = _path.indexOf("]");
-        if (startPos < 0)
+        if (startPos < 0) {
             startPos = 0;
+        }
 
         int endPos = _path.lastIndexOf('/');
-        if (endPos < 0)
+        if (endPos < 0) {
             endPos = 0;
+        }
 
         if (endPos > startPos) {
             return _path.substring(startPos + 1, endPos).trim();
@@ -71,10 +75,11 @@ public class DatastoreFile {
 
     public String getFileName() {
         int startPos = _path.indexOf("]");
-        if (startPos < 0)
+        if (startPos < 0) {
             startPos = 0;
-        else
+        } else {
             startPos++;
+        }
 
         int endPos = _path.lastIndexOf('/');
         if (endPos < 0) {
@@ -87,16 +92,18 @@ public class DatastoreFile {
     public String getFileBaseName() {
         String name = getFileName();
         int endPos = name.lastIndexOf('.');
-        if (endPos < 0)
+        if (endPos < 0) {
             return name;
+        }
         return name.substring(0, endPos);
     }
 
     public String getFileExtName() {
         String name = getFileName();
         int endPos = name.lastIndexOf('.');
-        if (endPos < 0)
+        if (endPos < 0) {
             return "";
+        }
 
         return name.substring(endPos);
     }

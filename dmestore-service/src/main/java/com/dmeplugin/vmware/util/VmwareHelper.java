@@ -219,8 +219,9 @@ public class VmwareHelper {
         disk.setBacking(backingInfo);
 
         int ideControllerKey = vmMo.getIDEDeviceControllerKey();
-        if (controllerKey < 0)
+        if (controllerKey < 0) {
             controllerKey = ideControllerKey;
+        }
         if (deviceNumber < 0) {
             deviceNumber = vmMo.getNextDeviceNumber(controllerKey);
         }
@@ -289,8 +290,9 @@ public class VmwareHelper {
         }
 
         int ideControllerKey = vmMo.getIDEDeviceControllerKey();
-        if (controllerKey < 0)
+        if (controllerKey < 0) {
             controllerKey = ideControllerKey;
+        }
         disk.setControllerKey(controllerKey);
         if (deviceNumber < 0) {
             deviceNumber = vmMo.getNextDeviceNumber(controllerKey);
@@ -327,8 +329,9 @@ public class VmwareHelper {
             disk.setBacking(backingInfo);
 
             int ideControllerKey = vmMo.getIDEDeviceControllerKey();
-            if (controllerKey < 0)
+            if (controllerKey < 0) {
                 controllerKey = ideControllerKey;
+            }
             if (deviceNumber < 0) {
                 deviceNumber = vmMo.getNextDeviceNumber(controllerKey);
             }
@@ -346,8 +349,9 @@ public class VmwareHelper {
         backingInfo.setFileName(vmdkDatastorePathChain[0]);
         if (vmdkDatastorePathChain.length > 1) {
             String[] parentDisks = new String[vmdkDatastorePathChain.length - 1];
-            for (int i = 0; i < vmdkDatastorePathChain.length - 1; i++)
+            for (int i = 0; i < vmdkDatastorePathChain.length - 1; i++) {
                 parentDisks[i] = vmdkDatastorePathChain[i + 1];
+            }
 
             setParentBackingInfo(backingInfo, morDs, parentDisks);
         }
@@ -370,8 +374,9 @@ public class VmwareHelper {
         backingInfo.setDiskMode(VirtualDiskMode.PERSISTENT.value());
         if (vmdkDatastorePathChain.length > 1) {
             Pair<String, ManagedObjectReference>[] parentDisks = new Pair[vmdkDatastorePathChain.length - 1];
-            for (int i = 0; i < vmdkDatastorePathChain.length - 1; i++)
+            for (int i = 0; i < vmdkDatastorePathChain.length - 1; i++) {
                 parentDisks[i] = vmdkDatastorePathChain[i + 1];
+            }
 
             setParentBackingInfo(backingInfo, parentDisks);
         }
@@ -379,8 +384,9 @@ public class VmwareHelper {
         disk.setBacking(backingInfo);
 
         int ideControllerKey = vmMo.getIDEDeviceControllerKey();
-        if (controllerKey < 0)
+        if (controllerKey < 0) {
             controllerKey = ideControllerKey;
+        }
         if (deviceNumber < 0) {
             deviceNumber = vmMo.getNextDeviceNumber(controllerKey);
         }
@@ -405,8 +411,9 @@ public class VmwareHelper {
 
         if (parentDatastorePathList.length > 1) {
             String[] nextDatastorePathList = new String[parentDatastorePathList.length - 1];
-            for (int i = 0; i < parentDatastorePathList.length - 1; i++)
+            for (int i = 0; i < parentDatastorePathList.length - 1; i++) {
                 nextDatastorePathList[i] = parentDatastorePathList[i + 1];
+            }
             setParentBackingInfo(parentBacking, morDs, nextDatastorePathList);
         }
         parentBacking.setFileName(parentDatastorePathList[0]);
@@ -423,8 +430,9 @@ public class VmwareHelper {
 
         if (parentDatastorePathList.length > 1) {
             Pair<String, ManagedObjectReference>[] nextDatastorePathList = new Pair[parentDatastorePathList.length - 1];
-            for (int i = 0; i < parentDatastorePathList.length - 1; i++)
+            for (int i = 0; i < parentDatastorePathList.length - 1; i++) {
                 nextDatastorePathList[i] = parentDatastorePathList[i + 1];
+            }
             setParentBackingInfo(parentBacking, nextDatastorePathList);
         }
         parentBacking.setFileName(parentDatastorePathList[0].first());
@@ -443,8 +451,9 @@ public class VmwareHelper {
 
             assert (vmMo.getIDEDeviceControllerKey() >= 0);
             cdRom.setControllerKey(vmMo.getIDEDeviceControllerKey());
-            if (deviceNumber < 0)
+            if (deviceNumber < 0) {
                 deviceNumber = vmMo.getNextIDEDeviceNumber();
+            }
 
             cdRom.setUnitNumber(deviceNumber);
             cdRom.setKey(-contextNumber);
@@ -470,8 +479,9 @@ public class VmwareHelper {
     }
 
     public static VirtualDisk getRootDisk(VirtualDisk[] disks) {
-        if (disks.length == 1)
+        if (disks.length == 1) {
             return disks[0];
+        }
 
         // TODO : for now, always return the first disk as root disk
         return disks[0];
@@ -481,8 +491,9 @@ public class VmwareHelper {
         assert (findName != null);
 
         ManagedObjectReference snapMor = null;
-        if (snapTree == null)
+        if (snapTree == null) {
             return snapMor;
+        }
 
         for (int i = 0; i < snapTree.size() && snapMor == null; i++) {
             VirtualMachineSnapshotTree node = snapTree.get(i);
@@ -531,8 +542,9 @@ public class VmwareHelper {
 
             out.newLine();
         } finally {
-            if (out != null)
+            if (out != null) {
                 out.close();
+            }
         }
 
         return bos.toByteArray();
@@ -547,14 +559,16 @@ public class VmwareHelper {
             needKeyboardSetup = true;
         }
 
-        if (optionsToMerge != null)
+        if (optionsToMerge != null) {
             numOptions += optionsToMerge.length;
+        }
 
         OptionValue[] options = new OptionValue[numOptions];
         int i = 0;
         if (optionsToMerge != null) {
-            for (int j = 0; j < optionsToMerge.length; j++)
+            for (int j = 0; j < optionsToMerge.length; j++) {
                 options[i++] = optionsToMerge[j];
+            }
         }
 
         options[i] = new OptionValue();
@@ -670,8 +684,9 @@ public class VmwareHelper {
         List<DynamicProperty> props = oc.getPropSet();
 
         for (DynamicProperty prop : props) {
-            if (prop.getName().equalsIgnoreCase(name))
+            if (prop.getName().equalsIgnoreCase(name)) {
                 return prop.getVal();
+            }
         }
 
         return null;
@@ -679,8 +694,9 @@ public class VmwareHelper {
 
     public static String getFileExtension(String fileName, String defaultExtension) {
         int pos = fileName.lastIndexOf('.');
-        if (pos < 0)
+        if (pos < 0) {
             return defaultExtension;
+        }
 
         return fileName.substring(pos);
     }
@@ -727,15 +743,18 @@ public class VmwareHelper {
 
         for (VirtualMachineMO vmMo : vmList) {
             HostMO hostMo = vmMo.getRunningHost();
-            if (hostMo.isHyperHostConnected())
+            if (hostMo.isHyperHostConnected()) {
                 candidates.add(vmMo);
+            }
         }
 
-        if (candidates.size() == 0)
+        if (candidates.size() == 0) {
             return null;
+        }
 
-        if (bFirstFit)
+        if (bFirstFit) {
             return candidates.get(0);
+        }
 
         Random random = new Random();
         return candidates.get(random.nextInt(candidates.size()));
@@ -785,8 +804,9 @@ public class VmwareHelper {
         String[] tokens = name.split("-");
         if (tokens.length > 1 && tokens[tokens.length - 1].matches("[0-9]{6,}")) {
             List<String> trimmedTokens = new ArrayList<String>();
-            for (int i = 0; i < tokens.length - 1; i++)
+            for (int i = 0; i < tokens.length - 1; i++) {
                 trimmedTokens.add(tokens[i]);
+            }
             return StringUtil.join(trimmedTokens, "-");
         }
         return name;
