@@ -52,7 +52,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     /**
      * 查询volume性能
      *
-     * @param params key required: obj_ids, indicator_ids, range (obj_ids volumeInstanceId集合)
+     * @param params key required: obj_ids, indicator_ids, range (obj_ids volumeInstanceId集合,无法直接获取目前使用wwn)
      * @return
      * @throws Exception
      */
