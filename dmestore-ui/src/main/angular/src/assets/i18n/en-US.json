@@ -213,6 +213,7 @@
     "type": "type",
     "startTime": "Start Time",
     "endTime": "End Time",
+    "timeInputTips": "Please enter start-end time！",
     "mount":{
       "mount":"Mount",
       "host":"Host",

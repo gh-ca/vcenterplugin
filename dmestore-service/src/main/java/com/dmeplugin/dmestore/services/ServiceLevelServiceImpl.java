@@ -352,7 +352,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
     private List<StoragePool> getStoragePoolInfosByStorageIdStoragePoolIds(String storageDeviceId, List<String> storagePoolIds) {
         List<StoragePool> sps = new ArrayList<>();
-        Map<String, Object> resp = dmeStorageService.getStoragePools(storageDeviceId);
+        Map<String, Object> resp = dmeStorageService.getStoragePools(storageDeviceId,"all");
         String code = resp.get("code").toString();
         if ("200".equals(code)) {
             List<StoragePool> storagePools = (List<StoragePool>) resp.get("data");
@@ -416,7 +416,6 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
         sp.setName(name);
         sp.setStorage_pool_id(poolId);
-        sp.setStorage_device_id(storageDeviceId);
         sp.setStorage_instance_id(storagePoolInstanceId);
 
         return sp;
