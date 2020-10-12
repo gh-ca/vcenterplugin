@@ -25,8 +25,8 @@ public class Volume {
 
     private String storage_pool_name;//存储池名称
     private Integer capacity;//总容量 单位GB
-    //关联的datastore
-    private String datastores;
+    private String datastores;//关联的datastore
+    private String instanceId;///volume对应的instanceId
 
     //时延 iops 带宽 公用存储设备的
 
@@ -149,5 +149,13 @@ public class Volume {
 
     public void setHostGroupIds(List<String> hostGroupIds) {
         this.hostGroupIds = hostGroupIds;
+    }
+
+    public String getInstanceId() {
+        return instanceId;
+    }
+
+    public void setInstanceId(String instanceId) {
+        this.instanceId = instanceId;
     }
 }

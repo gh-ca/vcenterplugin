@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 
@@ -327,8 +328,10 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         }
         Object object = responseEntity.getBody();
         if (object != null) {
+            Map<String, Map<String, Object>> sysLunMap = dmeRelationInstanceService.getLunInstance();
             JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
             JsonArray array = jsonObject.get("volumes").getAsJsonArray();
+
             for (JsonElement je : array) {
                 JsonObject element = je.getAsJsonObject();
                 Volume volume = new Volume();
@@ -343,6 +346,12 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                 volume.setCapacity_usage(ToolUtils.jsonToStr(element.get("capacity_usage")));
                 volume.setProtectionStatus(ToolUtils.jsonToBoo(element.get("protectionStatus")));
                 volume.setCapacity(ToolUtils.jsonToInt(element.get("capacity"), 0));
+
+                String wwn = ToolUtils.jsonToStr(element.get("volume_wwn"));
+                String instanceId = getInstancePropertyValue(sysLunMap, wwn, "wwn");
+                if (!StringUtils.isEmpty(instanceId)) {
+                    volume.setInstanceId(instanceId);
+                }
                 //JsonArray jsonArray = element.get("attachments").getAsJsonArray();
                 volumes.add(volume);
             }
@@ -350,9 +359,23 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return volumes;
     }
 
+    private String getInstancePropertyValue(Map<String, Map<String, Object>> instanceMap, String id, String name) {
+        String value = "";
+        if (null != instanceMap) {
+            Map<String, Object> instance = instanceMap.get(id);
+            if (null != instance) {
+                Object obj = instance.get(name);
+                if (null != obj) {
+                    value = obj.toString();
+                }
+            }
+        }
+        return value;
+    }
+
     private List<StoragePool> getStoragePoolInfosByStorageIdStoragePoolIds(String storageDeviceId, List<String> storagePoolIds) {
         List<StoragePool> sps = new ArrayList<>();
-        Map<String, Object> resp = dmeStorageService.getStoragePools(storageDeviceId,"all");
+        Map<String, Object> resp = dmeStorageService.getStoragePools(storageDeviceId, "all");
         String code = resp.get("code").toString();
         if ("200".equals(code)) {
             List<StoragePool> storagePools = (List<StoragePool>) resp.get("data");
