@@ -1,12 +1,9 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.dao.DMEDao;
-import com.dmeplugin.dmestore.entity.DME;
 import com.dmeplugin.dmestore.exception.DMEException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,7 +12,7 @@ import java.util.Map;
  */
 public class DMEOpenApiService {
 
-  protected DMEDao dmeDao;
+
 
   protected static final int FAIL_CODE = -99999;
 
@@ -34,21 +31,6 @@ public class DMEOpenApiService {
   protected static final String CODE_SUCCESS = String.valueOf(RESULT_SUCCESS_CODE);
 
   protected static final String CODE_SUCCESS_DOUBLE = String.valueOf(RESULT_SUCCESS_CODE_DOUBLE);
-
-  /**
-   * 根据IP获取esight信息
-   */
-  protected DME getDMEByIp(String ip) throws SQLException {
-    return dmeDao.getDMEByIp(ip);
-  }
-
-  protected DME getDMEById(int id) throws SQLException {
-    return dmeDao.getDMEById(id);
-  }
-
-  public void setDMEDao(DMEDao dmeDao) {
-    this.dmeDao = dmeDao;
-  }
 
   protected Map<String, Object> getNoDMEMap() {
     Map<String, Object> map = new HashMap();

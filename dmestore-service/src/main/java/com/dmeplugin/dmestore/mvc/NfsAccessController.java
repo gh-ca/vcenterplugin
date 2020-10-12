@@ -27,7 +27,7 @@ public class NfsAccessController extends BaseController {
 
     private Gson gson=new Gson();
     @Autowired
-    private DmeNFSAccessService dmeNFSAccessService;
+    private DmeNFSAccessService dmeNfsAccessService;
 
     /**
      * Access nfs
@@ -41,7 +41,7 @@ public class NfsAccessController extends BaseController {
         LOG.info("accessnfs/listnfs");
         String failureStr = "";
         try {
-            List<NfsDataInfo> lists = dmeNFSAccessService.listNfs();
+            List<NfsDataInfo> lists = dmeNfsAccessService.listNfs();
             LOG.info("listnfs lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {
@@ -64,7 +64,7 @@ public class NfsAccessController extends BaseController {
         LOG.info("accessnfs/listnfsperformance fsIds==" + gson.toJson(fsIds));
         String failureStr = "";
         try {
-            List<NfsDataInfo> lists = dmeNFSAccessService.listNfsPerformance(fsIds);
+            List<NfsDataInfo> lists = dmeNfsAccessService.listNfsPerformance(fsIds);
             LOG.info("listnfsperformance lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {
@@ -93,7 +93,7 @@ public class NfsAccessController extends BaseController {
         LOG.info("accessnfs/mountnfs=="+gson.toJson(params));
         String failureStr = "";
         try {
-            dmeNFSAccessService.mountNfs(params);
+            dmeNfsAccessService.mountNfs(params);
             return success(null,"Mount nfs success");
         }catch (Exception e){
             LOG.error("mount nfs failure:", e);
@@ -116,7 +116,7 @@ public class NfsAccessController extends BaseController {
         LOG.info("accessnfs/unmountnfs=="+gson.toJson(params));
         String failureStr = "";
         try {
-            dmeNFSAccessService.unmountNfs(params);
+            dmeNfsAccessService.unmountNfs(params);
             return success(null,"unmount nfs success");
         }catch (Exception e){
             LOG.error("unmount nfs failure:", e);
@@ -137,7 +137,7 @@ public class NfsAccessController extends BaseController {
         LOG.info("accessnfs/deletenfs=="+gson.toJson(params));
         String failureStr = "";
         try {
-            dmeNFSAccessService.deleteNfs(params);
+            dmeNfsAccessService.deleteNfs(params);
             return success(null,"delete nfs success");
         }catch (Exception e){
             LOG.error("delte nfs failure:", e);

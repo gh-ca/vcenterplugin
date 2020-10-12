@@ -1,19 +1,22 @@
 package com.dmeplugin.dmestore.dao;
 
 import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
-import com.dmeplugin.dmestore.constant.SqlFileConstant;
-import com.dmeplugin.dmestore.entity.DME;
 import com.dmeplugin.dmestore.entity.ScheduleConfig;
-import com.dmeplugin.dmestore.task.ScheduleSetting;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @Description: TODO
+ * @ClassName: ScheduleDao
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 public class ScheduleDao extends H2DataBaseDao {
     public List<ScheduleConfig> getScheduleList()  {
         Connection con = null;

@@ -1,6 +1,5 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.dao.DMEDao;
 import com.dmeplugin.dmestore.dao.VCenterInfoDao;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.exception.VcenterException;
@@ -118,22 +117,6 @@ public class VCenterInfoServiceImpl extends DMEOpenApiService implements VCenter
       return false;
     }
   }
-
-  @Override
-  public void deleteHAData() {
-    try {
-      vCenterInfoDao.deleteHAData();
-    } catch (Exception e) {
-      throw new VcenterException(e.getMessage());
-    }
-  }
-
-  @Override
-  public void deleteHASyncAndDeviceData() {
-    vCenterInfoDao.deleteHASyncAndDeviceData();
-  }
-
-
 
 
   @Override
