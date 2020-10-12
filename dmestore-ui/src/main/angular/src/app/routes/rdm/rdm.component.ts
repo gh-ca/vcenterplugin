@@ -23,8 +23,15 @@ export class RdmComponent implements OnInit {
   storageDevices = [];
   storagePools = [];
   hostList = [];
-  hostSelected = {};
-  levelCheck = 'storage';
+  hostSelected = '';
+  data_store_name = '';
+  levelCheck = 'level';
+  dataStores = [];
+
+  searchName = '';
+  serviceLevelsRes = [];
+  serviceLevels = [];
+  service_level_id = '';
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
               private commonService: CommonService,
@@ -33,18 +40,76 @@ export class RdmComponent implements OnInit {
   ngOnInit(): void {
     this.loadStorageDevice();
     this.loadHosts();
+    this.tierFresh();
     const ctx = this.gs.getClientSdk().app.getContextObjects();
     console.log(ctx);
   }
 
-  submit(): void {
-    console.log(this.mapping);
-    this.http.post('', {}).subscribe((result: any) => {
-
-      if (result.code === '0' || result.code === '200'){
-        this.storageDevices = result.data.data;
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+  // 刷新服务等级列表
+  tierFresh(){
+    this.http.post('servicelevel/listservicelevel', {}).subscribe((response: any) => {
+      response.data = JSON.stringify(response.data);
+      response.data = response.data.replace('service-levels', 'serviceLevels');
+      const r = this.recursiveNullDelete(JSON.parse(response.data));
+      for (const i of r.serviceLevels){
+        if (i.total_capacity == 0){
+          i.usedRate = 0.0;
+        } else {
+          i.usedRate =  ((i.used_capacity / i.total_capacity * 100).toFixed(2));
+        }
+        i.used_capacity = (i.used_capacity/1024).toFixed(2);
+        i.total_capacity = (i.total_capacity/1024).toFixed(2);
+        i.free_capacity = (i.free_capacity/1024).toFixed(2);
       }
+      this.serviceLevelsRes = r.serviceLevels;
+      this.search();
+      console.log(this.serviceLevelsRes);
+    }, err => {
+      console.error('ERROR', err);
+    });
+  }
+
+  serviceLevelClick(id: string, name: string){
+     this.service_level_id = id;
+  }
+
+  // 服务等级列表搜索
+  search(){
+    if (this.searchName !== ''){
+      this.serviceLevels = this.serviceLevelsRes.filter(item => item.name.indexOf(this.searchName) > -1);
+    } else{
+      this.serviceLevels = this.serviceLevelsRes;
+    }
+  }
+
+  submit(): void {
+    console.log(this.configModel);
+    const vm_objectId = 'vm_object_id:urn:vmomi:VirtualMachine:vm-229:f8e381d7-074b-4fa9-9962-9a68ab6106e1';
+    let body = {};
+    if (this.configModel.storageType == '2'){
+      body = {
+        customizeVolumesRequest: {
+          customize_volumes: this.configModel,
+            mapping: {
+            host_id: this.hostSelected
+          }
+        }
+      };
+    }
+    if (this.configModel.storageType == '1'){
+      body = {
+        createVolumesRequest: {
+          service_level_id: this.service_level_id,
+          volumes: this.configModel.volume_specs,
+          mapping: {
+            host_id: this.hostSelected
+          }
+        }
+      };
+    }
+    this.http.post('v1/vmrdm/createRdm?host_id='+this.hostSelected+'&vm_objectId='+vm_objectId+'&data_store_name='+this.data_store_name
+      , body).subscribe((result: any) => {
+      console.log(result);
     }, err => {
       console.error('ERROR', err);
     });
@@ -61,7 +126,26 @@ export class RdmComponent implements OnInit {
     });
   }
 
-  check() {}
+  recursiveNullDelete(obj: any){
+    for (const property in obj){
+      if (obj[property] === null){
+        delete obj[property];
+      } else if (obj[property] instanceof Object){
+        this.recursiveNullDelete(obj[property]);
+      } else if (property == 'minBandWidth' && obj[property] == 0){
+        delete obj[property];
+      } else if (property == 'maxBandWidth' && obj[property] == 0){
+        delete obj[property];
+      } else if (property == 'minIOPS' && obj[property] == 0){
+        delete obj[property];
+      } else if (property == 'maxIOPS' && obj[property] == 0){
+        delete obj[property];
+      } else if(property == 'latency' && obj[property] == 0){
+        delete obj[property];
+      }
+    }
+    return obj;
+  }
 
   loadStorageDevice(){
     this.http.get('dmestorage/storages', {}).subscribe((result: any) => {
@@ -76,7 +160,7 @@ export class RdmComponent implements OnInit {
   }
 
   loadStoragePool(storageId: string){
-    this.http.get('dmestorage/storagepools', {params: {storageId}}).subscribe((result: any) => {
+    this.http.get('dmestorage/storagepools', {params: {storageId, media_type: "all"}}).subscribe((result: any) => {
 
       if (result.code === '0' || result.code === '200'){
         this.storagePools = result.data.data;
@@ -99,6 +183,20 @@ export class RdmComponent implements OnInit {
     });
   }
 
+  loadDataStore(id: string){
+    this.http.get('v1/vmrdm/vCenter/datastoreOnHost', { params: {host_id : id}}).subscribe((result: any) => {
+      console.log(result);
+      if (result.code === '0' || result.code === '200'){
+        this.dataStores = result.data;
+      } else{
+        this.dataStores = [];
+      }
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    }, err => {
+      console.error('ERROR', err);
+    });
+  }
+
 }
 
 
@@ -114,7 +212,7 @@ class customize_volumes{
   tuning: tuning;
   volume_specs: volume_specs[];
   constructor(){
-    this.storageType = '2';
+    this.storageType = '1';
     this.volume_specs = [new volume_specs()];
     this.tuning = new tuning();
     this.initial_distribute_policy = '0';
@@ -138,8 +236,8 @@ class volume_specs{
 
 class tuning{
   alloctype:string;
-  compression_enabled: string;
-  dedupe_enabled: string;
+  compression_enabled: boolean;
+  dedupe_enabled: boolean;
   smartqos: smartqos;
   smarttier: string;
   workload_type_id: string;
@@ -147,8 +245,8 @@ class tuning{
     this.smartqos = new smartqos();
     this.alloctype = 'thick';
     this.smarttier = '0';
-    this.compression_enabled = '0';
-    this.dedupe_enabled = '0';
+    this.compression_enabled = null;
+    this.dedupe_enabled = null;
   }
 }
 
