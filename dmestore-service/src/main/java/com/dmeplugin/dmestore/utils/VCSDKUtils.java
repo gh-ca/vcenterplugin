@@ -1291,14 +1291,17 @@ public class VCSDKUtils {
 
                 if (hosts != null && hosts.size() > 0) {
                     for (Pair<ManagedObjectReference, String> host : hosts) {
-                        HostMO host1 = new HostMO(vmwareContext, host.first());
-                        _logger.info("Host under Cluster: " + host1.getName());
-                        host1.getHostStorageSystemMO().rescanVmfs();
+                        try {
+                            HostMO host1 = new HostMO(vmwareContext, host.first());
+                            _logger.info("Host under Cluster: " + host1.getName());
+                            host1.getHostStorageSystemMO().rescanVmfs();
+                        }catch (Exception ex){
+                            _logger.error("scan Data Store error:"+ex.toString());
+                        }
                     }
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             _logger.error("scan Data Store error:", e);
             throw e;
         }
