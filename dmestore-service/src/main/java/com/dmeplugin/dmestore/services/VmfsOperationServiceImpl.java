@@ -62,37 +62,39 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         resMap.put("msg", "update vmfsDatastore success !");
         resMap.put("task_id", volume_id);
 
-        SmartQos smartQos = new SmartQos();
-        Object control_policy = params.get("control_policy");
-        if (!StringUtils.isEmpty(control_policy)) {
-            smartQos.setControl_policy(control_policy.toString());
-        }
-        Object max_iops = params.get("max_iops");
-        if (!StringUtils.isEmpty(max_iops)) {
-            smartQos.setMaxiops(Integer.valueOf(max_iops.toString()));
-        }
-        Object min_iops = params.get("min_iops");
-        if (!StringUtils.isEmpty(min_iops)) {
-            smartQos.setMiniops(Integer.valueOf(min_iops.toString()));
-        }
-        Object max_bandwidth = params.get("max_bandwidth");
-        if (!StringUtils.isEmpty(max_bandwidth)) {
-            smartQos.setMaxbandwidth(Integer.valueOf(max_bandwidth.toString()));
-        }
-        Object min_bandwidth = params.get("min_bandwidth");
-        if (!StringUtils.isEmpty(min_bandwidth)) {
-            smartQos.setMinbandwidth(Integer.valueOf(min_bandwidth.toString()));
-        }
-        CustomizeVolumeTuning customizeVolumeTuning = new CustomizeVolumeTuning();
-        customizeVolumeTuning.setSmartQos(smartQos);
-
         VolumeUpdate volume = new VolumeUpdate();
-        Object newVoName = params.get("newVoName");
 
+        Object service_level_name = params.get("service_level_name");
+        if (StringUtils.isEmpty(service_level_name)) {
+            SmartQos smartQos = new SmartQos();
+            Object control_policy = params.get("control_policy");
+            if (!StringUtils.isEmpty(control_policy)) {
+                smartQos.setControl_policy(control_policy.toString());
+            }
+            Object max_iops = params.get("max_iops");
+            if (!StringUtils.isEmpty(max_iops)) {
+                smartQos.setMaxiops(Integer.valueOf(max_iops.toString()));
+            }
+            Object min_iops = params.get("min_iops");
+            if (!StringUtils.isEmpty(min_iops)) {
+                smartQos.setMiniops(Integer.valueOf(min_iops.toString()));
+            }
+            Object max_bandwidth = params.get("max_bandwidth");
+            if (!StringUtils.isEmpty(max_bandwidth)) {
+                smartQos.setMaxbandwidth(Integer.valueOf(max_bandwidth.toString()));
+            }
+            Object min_bandwidth = params.get("min_bandwidth");
+            if (!StringUtils.isEmpty(min_bandwidth)) {
+                smartQos.setMinbandwidth(Integer.valueOf(min_bandwidth.toString()));
+            }
+            CustomizeVolumeTuning customizeVolumeTuning = new CustomizeVolumeTuning();
+            customizeVolumeTuning.setSmartQos(smartQos);
+            volume.setTuning(customizeVolumeTuning);
+        }
+        Object newVoName = params.get("newVoName");
         if (!StringUtils.isEmpty(newVoName)) {
             volume.setName(newVoName.toString());
         }
-        volume.setTuning(customizeVolumeTuning);
         Map<String, Object> reqMap = new HashMap<>();
         reqMap.put("volume", volume);
         String reqBody = gson.toJson(reqMap);
@@ -122,14 +124,12 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
             resMap.put("task_id", jsonObject.get("task_id").getAsString());
-            return resMap;
         } catch (Exception e) {
             LOG.error("update vmfsDatastore error", e);
             resMap.put("code", 503);
             resMap.put("msg", e.getMessage());
-        } finally {
-            return resMap;
         }
+    return resMap;
     }
 
     @Override
@@ -185,7 +185,6 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                     resMap.put("msg", "search storage by volume error");
                     return resMap;
                 }
-                //Storage storage = (Storage) deviceByVolume.get("data");
                 String result = null;
                 if (!StringUtils.isEmpty(vo_add_capacity)) {
                     result = vcsdkUtils.expandVmfsDatastore(ds_name, ToolUtils.getInt(vo_add_capacity));
