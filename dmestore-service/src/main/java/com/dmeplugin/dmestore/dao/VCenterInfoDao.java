@@ -5,11 +5,18 @@ package com.dmeplugin.dmestore.dao;
 import com.dmeplugin.dmestore.constant.SqlFileConstant;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.exception.DataBaseException;
+import com.dmeplugin.dmestore.services.DmeConstants;
 
 import java.sql.*;
 import java.util.*;
 
-
+/**
+ * @Description: TODO
+ * @ClassName: VCenterInfoDao
+ * @Company: GH-CA
+ * @author: lgq
+ * @create: 2020-09-02
+ **/
 public class VCenterInfoDao extends H2DataBaseDao {
 
   public int addVCenterInfo(VCenterInfo vCenterInfo) throws SQLException {
@@ -255,7 +262,6 @@ public class VCenterInfoDao extends H2DataBaseDao {
         if(con != null) {
           con.rollback();
         }
-        // LOGGER.error(e.getMessage());
         LOGGER.error("Failed to mergeSaveAndLoadAllThumbprints" + e.getMessage());
         throw e;
       } finally {
@@ -291,19 +297,19 @@ public class VCenterInfoDao extends H2DataBaseDao {
   }
 
   private void checkIp(String ip) throws SQLException {
-    if (ip == null || ip.length() > 255) {
+    if (ip == null || ip.length() > DmeConstants.MAXLEN) {
       throw new SQLException("parameter ip is not correct");
     }
   }
 
   private void checkUserName(String userName) throws SQLException {
-    if (userName == null || userName.length() > 255) {
+    if (userName == null || userName.length() > DmeConstants.MAXLEN) {
       throw new SQLException("parameter userName is not correct");
     }
   }
 
   private void checkPassword(String password) throws SQLException {
-    if (password == null || password.length() > 255) {
+    if (password == null || password.length() > DmeConstants.MAXLEN) {
       throw new SQLException("parameter password is not correct");
     }
   }
