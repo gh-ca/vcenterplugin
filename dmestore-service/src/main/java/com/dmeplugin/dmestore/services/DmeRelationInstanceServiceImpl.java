@@ -134,7 +134,6 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         String url = QUERY_INSTANCE_URL;
         url = url.replace("{className}", instanceName);
         url = url.replace("{instanceId}", instanceId);
-        url = "https://localhost:26335" + url;//上线时删除此行代码
 
         ResponseEntity responseEntity;
         try {
