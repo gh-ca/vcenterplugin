@@ -2,7 +2,7 @@ package com.dmeplugin.dmestore.dao;
 
 
 
-import com.dmeplugin.dmestore.constant.SqlFileConstant;
+import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.exception.DataBaseException;
 import com.dmeplugin.dmestore.services.DmeConstants;
@@ -27,7 +27,7 @@ public class VCenterInfoDao extends H2DataBaseDao {
     try {
       con = getConnection();
       ps = con.prepareStatement(
-          "INSERT INTO " + SqlFileConstant.HW_VCENTER_INFO + " (HOST_IP,USER_NAME," +
+          "INSERT INTO " + DPSqlFileConstant.DP_DME_VCENTER_INFO + " (HOST_IP,USER_NAME," +
               "PASSWORD,STATE,CREATE_TIME,PUSH_EVENT,PUSH_EVENT_LEVEL,HOST_PORT) VALUES (?,?,?,?,CURRENT_TIMESTAMP,?,?,?)");
       ps.setString(1, vCenterInfo.getHostIp());
       ps.setString(2, vCenterInfo.getUserName());
@@ -58,7 +58,7 @@ public class VCenterInfoDao extends H2DataBaseDao {
     ResultSet rs = null;
     try {
       con = getConnection();
-      ps = con.prepareStatement("UPDATE " + SqlFileConstant.HW_VCENTER_INFO
+      ps = con.prepareStatement("UPDATE " + DPSqlFileConstant.DP_DME_VCENTER_INFO
           + " SET HOST_IP=?,USER_NAME=?,PASSWORD=?,STATE=?,PUSH_EVENT=?,PUSH_EVENT_LEVEL=?,HOST_PORT=? WHERE ID=?");
       ps.setString(1, vCenterInfo.getHostIp());
       ps.setString(2, vCenterInfo.getUserName());
@@ -83,7 +83,7 @@ public class VCenterInfoDao extends H2DataBaseDao {
     ResultSet rs = null;
     try {
       con = getConnection();
-      ps = con.prepareStatement("SELECT * FROM " + SqlFileConstant.HW_VCENTER_INFO
+      ps = con.prepareStatement("SELECT * FROM " + DPSqlFileConstant.DP_DME_VCENTER_INFO
           + " ORDER BY CREATE_TIME DESC LIMIT 1");
       rs = ps.executeQuery();
       if (rs.next()) {
@@ -113,7 +113,7 @@ public class VCenterInfoDao extends H2DataBaseDao {
     PreparedStatement ps = null;
     try {
       con = getConnection();
-      ps = con.prepareStatement("UPDATE " + SqlFileConstant.HW_VCENTER_INFO + " SET state=FALSE ");
+      ps = con.prepareStatement("UPDATE " + DPSqlFileConstant.DP_DME_VCENTER_INFO + " SET state=FALSE ");
       return ps.executeUpdate() > 0;
     } catch (DataBaseException | SQLException e) {
       LOGGER.error("Failed to disable vCenter info: " + e.getMessage());
@@ -129,7 +129,7 @@ public class VCenterInfoDao extends H2DataBaseDao {
     try {
       con = getConnection();
       ps = con
-          .prepareStatement("UPDATE " + SqlFileConstant.HW_VCENTER_INFO + " SET PUSH_EVENT=FALSE ");
+          .prepareStatement("UPDATE " + DPSqlFileConstant.DP_DME_VCENTER_INFO + " SET PUSH_EVENT=FALSE ");
       return ps.executeUpdate() > 0;
     } catch (DataBaseException | SQLException e) {
       LOGGER.error("Failed to disable push event: " + e.getMessage());
@@ -139,95 +139,8 @@ public class VCenterInfoDao extends H2DataBaseDao {
     }
   }
 
-  public void deleteAlarmDefinitions() throws SQLException {
-    Connection con = null;
-    Statement ps = null;
-    String sql = "DELETE FROM " + SqlFileConstant.HW_ALARM_DEFINITION;
-    try {
-      con = getConnection();
-      ps = con.createStatement();
-      ps.execute(sql);
-    } catch (SQLException e) {
-      LOGGER.error("Failed to delete alarm definitions: " + e.getMessage());
-      throw e;
-    } finally {
-      closeConnection(con, ps, null);
-    }
-  }
-
-  public void deleteAlarmDefinitions(List<Integer> ids) throws SQLException {
-    if (ids == null || ids.isEmpty()) {
-      return;
-    }
-    Connection con = null;
-    Statement ps = null;
-    String sql =
-        "DELETE FROM " + SqlFileConstant.HW_ALARM_DEFINITION + " WHERE ID IN( "
-            + concatInValues(ids) + ")";
-    try {
-      con = getConnection();
-      ps = con.createStatement();
-      ps.execute(sql);
-    } catch (SQLException e) {
-      LOGGER.error("Failed to delete alarm definitions: " + e.getMessage());
-      throw e;
-    } finally {
-      closeConnection(con, ps, null);
-    }
-  }
 
 
-  private static final String TABLE_NAME = SqlFileConstant.HW_ALARM_DEFINITION;
-
-
-
-
-  public void deleteHAData() throws SQLException {
-    Connection con = null;
-    Statement ps = null;
-    String sql1 = "DELETE FROM " + SqlFileConstant.HW_ESIGHT_HA_SERVER;
-    String sql2 = "DELETE FROM " + SqlFileConstant.HW_SERVER_DEVICE_DETAIL;
-    String sql3 = "DELETE FROM " + SqlFileConstant.HW_VCENTER_INFO;
-    String sql4 = "DELETE FROM " + SqlFileConstant.HW_HA_COMPONENT;
-    String sql5 = "DELETE FROM " + SqlFileConstant.HW_ALARM_RECORD;
-    try {
-      con = getConnection();
-      ps = con.createStatement();
-      ps.addBatch(sql1);
-      ps.addBatch(sql2);
-      ps.addBatch(sql3);
-      ps.addBatch(sql4);
-      ps.addBatch(sql5);
-      ps.executeBatch();
-    } catch (SQLException e) {
-      LOGGER.error("Failed to delete HA data: " + e.getMessage());
-      throw e;
-    } finally {
-      closeConnection(con, ps, null);
-    }
-  }
-
-  public void deleteHASyncAndDeviceData() {
-    Connection con = null;
-    Statement ps = null;
-    String sql1 = "DELETE FROM " + SqlFileConstant.HW_ESIGHT_HA_SERVER;
-    String sql2 = "DELETE FROM " + SqlFileConstant.HW_SERVER_DEVICE_DETAIL;
-    String sql3 = "DELETE FROM " + SqlFileConstant.HW_HA_COMPONENT;
-    String sql4 = "DELETE FROM " + SqlFileConstant.HW_ALARM_RECORD;
-    try {
-      con = getConnection();
-      ps = con.createStatement();
-      ps.addBatch(sql1);
-      ps.addBatch(sql2);
-      ps.addBatch(sql3);
-      ps.addBatch(sql4);
-      ps.executeBatch();
-    } catch (SQLException e) {
-      LOGGER.error("Failed to delete HA sync and device data: " + e.getMessage());
-    } finally {
-      closeConnection(con, ps, null);
-    }
-  }
 
   public String[] mergeSaveAndLoadAllThumbprints(String[] thumbprints) throws SQLException {
     if (thumbprints != null && thumbprints.length > 0) {
