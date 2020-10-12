@@ -1,7 +1,6 @@
 package com.dmeplugin.dmestore.dao;
 
 import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
-import com.dmeplugin.dmestore.constant.SqlFileConstant;
 
 import java.io.IOException;
 import java.io.InputStream;
