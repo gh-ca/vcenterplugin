@@ -1,28 +1,35 @@
 package com.dmeplugin.dmestore.mvc;
 
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
-import com.dmeplugin.dmestore.model.VmRDMCreateBean;
-import com.dmeplugin.dmestore.services.VMRDMService;
+import com.dmeplugin.dmestore.model.VmRdmCreateBean;
+import com.dmeplugin.dmestore.services.VmRdmService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * @author wangxiangyong
+ * @version 1.0.0
+ * @ClassName VmRdmController.java
+ * @Description TODO
+ * @createTime 2020年09月09日 10:58:00
+ */
 @RestController
 @RequestMapping(value = "v1/vmrdm")
-public class VMRDMController extends BaseController {
-    private static final Logger LOG = LoggerFactory.getLogger(VMRDMController.class);
+public class VmRdmController extends BaseController {
+    private static final Logger LOG = LoggerFactory.getLogger(VmRdmController.class);
 
     @Autowired
-    private VMRDMService vmrdmService;
+    private VmRdmService vmRdmService;
 
     @RequestMapping(value = "createRdm", method = RequestMethod.POST)
-    public ResponseBodyBean createRDM(@RequestParam("host_id") String host_id,
-                                      @RequestParam("vm_objectId") String vm_objectId,
-                                      @RequestBody VmRDMCreateBean createBean,
-                                      @RequestParam("data_store_name") String data_store_name) throws Exception {
+    public ResponseBodyBean createRdm(@RequestParam("hostId") String hostId,
+                                      @RequestParam("vmObjectId") String vmObjectId,
+                                      @RequestBody VmRdmCreateBean createBean,
+                                      @RequestParam("dataStoreName") String dataStoreName) throws Exception {
         try {
-            vmrdmService.createRDM(data_store_name, vm_objectId, host_id, createBean);
+            vmRdmService.createRdm(dataStoreName, vmObjectId, hostId, createBean);
             return success();
         }catch (Exception e){
             LOG.error(e.getMessage());
@@ -33,7 +40,7 @@ public class VMRDMController extends BaseController {
     @RequestMapping(value = "dmeHosts", method = RequestMethod.GET)
     public ResponseBodyBean dmeHosts() throws Exception {
         try {
-            return success(vmrdmService.getAllDmeHost());
+            return success(vmRdmService.getAllDmeHost());
         }catch (Exception e){
             LOG.error(e.getMessage());
             return failure(e.getMessage());
@@ -41,9 +48,9 @@ public class VMRDMController extends BaseController {
     }
 
     @RequestMapping(value = "vCenter/datastoreOnHost", method = RequestMethod.GET)
-    public ResponseBodyBean getDatastoreMountsOnHost(@RequestParam("host_id") String host_id) throws Exception {
+    public ResponseBodyBean getDatastoreMountsOnHost(@RequestParam("hostId") String hostId) throws Exception {
         try {
-            return success(vmrdmService.getDatastoreMountsOnHost(host_id));
+            return success(vmRdmService.getDatastoreMountsOnHost(hostId));
         }catch (Exception e){
             LOG.error(e.getMessage());
             return failure(e.getMessage());

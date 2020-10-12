@@ -9,7 +9,7 @@ import com.dmeplugin.dmestore.utils.VCSDKUtils;
  * @Date 2020/9/15 10:26
  * @Version V1.0
  **/
-public class VMFS3HardwareAcceleratedLockingImpl extends BaseBestPracticeService implements BestPracticeService {
+public class Vmfs3HardwareAcceleratedLockingImpl extends BaseBestPracticeService implements BestPracticeService {
     @Override
     public String getHostSetting() {
         return "VMFS3.HardwareAcceleratedLocking";

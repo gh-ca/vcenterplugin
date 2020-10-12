@@ -3,31 +3,31 @@ package com.dmeplugin.dmestore.services.bestpractice;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 
 /**
- * @ClassName VMFS3EnableBlockDeleteImpl
+ * @ClassName NMPPathSwitchPolicyImpl
  * @Description TODO
  * @Author wangxiangyong
  * @Date 2020/9/15 10:26
  * @Version V1.0
  **/
-public class Vmfs3EnableBlockDeleteImpl extends BaseBestPracticeService implements BestPracticeService {
+public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements BestPracticeService {
     @Override
     public String getHostSetting() {
-        return "VMFS3.EnableBlockDelete";
+        return "NMP path switch policy";
     }
 
     @Override
     public Object getRecommendValue() {
-        return 1L;
+        return new Integer(9000);
     }
 
     @Override
     public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception{
-        return super.getCurrentValue(vcsdkUtils, objectId, getHostSetting());
+        return super.getCurrentValue(vcsdkUtils, objectId, (Integer)getRecommendValue());
     }
 
     @Override
     public String getLevel() {
-        return "Info";
+        return "Major";
     }
 
     @Override
@@ -42,11 +42,11 @@ public class Vmfs3EnableBlockDeleteImpl extends BaseBestPracticeService implemen
 
     @Override
     public boolean check(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
-        return super.check(vcsdkUtils, objectId, getHostSetting(), getRecommendValue());
+        return super.check(vcsdkUtils, objectId, getRecommendValue());
     }
 
     @Override
     public void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception{
-        super.update(vcsdkUtils, objectId, getHostSetting(), getRecommendValue());
+        super.update(vcsdkUtils, objectId);
     }
 }
