@@ -240,7 +240,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             resMap.put("code", 403);
         }
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.access(API_SERVICELEVEL_UPDATE, HttpMethod.PUT, gson.toJson(params));
+            ResponseEntity<String> responseEntity = dmeAccessService.access(API_SERVICELEVEL_UPDATE, HttpMethod.POST, gson.toJson(params));
             LOG.info("url:{" + API_SERVICELEVEL_UPDATE + "},响应信息：" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 202) {
