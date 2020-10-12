@@ -45,16 +45,18 @@ public class HostDatastoreSystemMO extends BaseMO {
         List<ObjectContent> ocs = getDatastorePropertiesOnHostDatastoreSystem(new String[] {"name", String.format("value[%d]", key)});
         if (ocs != null) {
             for (ObjectContent oc : ocs) {
-                if (oc.getPropSet().get(0).getVal().equals(name))
+                if (oc.getPropSet().get(0).getVal().equals(name)) {
                     return oc.getObj();
+                }
 
                 if (oc.getPropSet().size() > 1) {
                     DynamicProperty prop = oc.getPropSet().get(1);
                     if (prop != null && prop.getVal() != null) {
                         if (prop.getVal() instanceof CustomFieldStringValue) {
                             String val = ((CustomFieldStringValue)prop.getVal()).getValue();
-                            if (val.equalsIgnoreCase(name))
+                            if (val.equalsIgnoreCase(name)) {
                                 return oc.getObj();
+                            }
                         }
                     }
                 }
@@ -86,8 +88,9 @@ public class HostDatastoreSystemMO extends BaseMO {
                 if (info != null) {
                     URI uri = new URI(storeUrl);
                     String vmwareStyleUrl = "netfs://" + uri.getHost() + "/" + uri.getPath() + "/";
-                    if (info.getUrl().equals(vmwareStyleUrl))
+                    if (info.getUrl().equals(vmwareStyleUrl)) {
                         return morDatastore;
+                    }
                 }
             }
         }
@@ -105,8 +108,9 @@ public class HostDatastoreSystemMO extends BaseMO {
                 DatastoreInfo info = getDatastoreInfo(morDatastore);
 
                 if (info != null) {
-                    if (info.getName().equals(datastoreName))
+                    if (info.getName().equals(datastoreName)) {
                         return morDatastore;
+                    }
                 }
             }
         }
@@ -123,18 +127,21 @@ public class HostDatastoreSystemMO extends BaseMO {
         if (datastores != null && datastores.size() > 0) {
             for (ManagedObjectReference morDatastore : datastores) {
                 DatastoreMO dsMo = new DatastoreMO(_context, morDatastore);
-                if (dsMo.getInventoryPath().equals(exportPath))
+                if (dsMo.getInventoryPath().equals(exportPath)) {
                     return morDatastore;
+                }
 
                 NasDatastoreInfo info = getNasDatastoreInfo(morDatastore);
                 if (info != null) {
                     String vmwareUrl = info.getUrl();
-                    if (vmwareUrl.charAt(vmwareUrl.length() - 1) == '/')
+                    if (vmwareUrl.charAt(vmwareUrl.length() - 1) == '/') {
                         vmwareUrl = vmwareUrl.substring(0, vmwareUrl.length() - 1);
+                    }
 
                     URI uri = new URI(vmwareUrl);
-                    if (uri.getPath().equals("/" + exportPath))
+                    if (uri.getPath().equals("/" + exportPath)) {
                         return morDatastore;
+                    }
                 }
             }
         }
@@ -212,8 +219,9 @@ public class HostDatastoreSystemMO extends BaseMO {
 
     public NasDatastoreInfo getNasDatastoreInfo(ManagedObjectReference morDatastore) throws Exception {
         DatastoreInfo info = (DatastoreInfo)_context.getVimClient().getDynamicProperty(morDatastore, "info");
-        if (info instanceof NasDatastoreInfo)
+        if (info instanceof NasDatastoreInfo) {
             return (NasDatastoreInfo)info;
+        }
         return null;
     }
 

@@ -390,8 +390,9 @@ public class DatacenterMO extends BaseMO {
                 List<DynamicProperty> props = oc.getPropSet();
                 if (props != null) {
                     for (DynamicProperty prop : props) {
-                        if (prop.getVal().equals(dvPortGroupName))
+                        if (prop.getVal().equals(dvPortGroupName)) {
                             return oc.getObj();
+                        }
                     }
                 }
             }
@@ -401,9 +402,7 @@ public class DatacenterMO extends BaseMO {
 
     public boolean hasDvPortGroup(String dvPortGroupName) throws Exception {
         ManagedObjectReference morNetwork = getDvPortGroupMor(dvPortGroupName);
-        if (morNetwork != null)
-            return true;
-        return false;
+        return morNetwork != null;
     }
 
     public DVPortgroupConfigInfo getDvPortGroupSpec(String dvPortGroupName) throws Exception {
