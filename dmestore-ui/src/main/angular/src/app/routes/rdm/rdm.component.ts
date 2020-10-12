@@ -23,8 +23,10 @@ export class RdmComponent implements OnInit {
   storageDevices = [];
   storagePools = [];
   hostList = [];
-  hostSelected = {};
+  hostSelected = '';
+  data_store_name = '';
   levelCheck = 'storage';
+  dataStores = [];
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
               private commonService: CommonService,
@@ -38,13 +40,18 @@ export class RdmComponent implements OnInit {
   }
 
   submit(): void {
-    console.log(this.mapping);
-    this.http.post('', {}).subscribe((result: any) => {
-
-      if (result.code === '0' || result.code === '200'){
-        this.storageDevices = result.data.data;
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      }
+    console.log(this.configModel);
+    const vm_objectId = 'vm_object_id:urn:vmomi:VirtualMachine:vm-229:f8e381d7-074b-4fa9-9962-9a68ab6106e1';
+    this.http.post('v1/vmrdm/createRdm?host_id='+this.hostSelected+'&vm_objectId='+vm_objectId+'&data_store_name='+this.data_store_name
+      , {
+        customizeVolumesRequest: {
+          customize_volumes: this.configModel,
+          mapping: {
+            host_id: this.hostSelected
+          }
+        }
+      }).subscribe((result: any) => {
+      console.log(result);
     }, err => {
       console.error('ERROR', err);
     });
@@ -99,6 +106,20 @@ export class RdmComponent implements OnInit {
     });
   }
 
+  loadDataStore(id: string){
+    this.http.get('v1/vmrdm/vCenter/datastoreOnHost', { params: {host_id : id}}).subscribe((result: any) => {
+      console.log(result);
+      if (result.code === '0' || result.code === '200'){
+        this.dataStores = result.data;
+      } else{
+        this.dataStores = [];
+      }
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    }, err => {
+      console.error('ERROR', err);
+    });
+  }
+
 }
 
 
@@ -138,8 +159,8 @@ class volume_specs{
 
 class tuning{
   alloctype:string;
-  compression_enabled: string;
-  dedupe_enabled: string;
+  compression_enabled: boolean;
+  dedupe_enabled: boolean;
   smartqos: smartqos;
   smarttier: string;
   workload_type_id: string;
@@ -147,8 +168,8 @@ class tuning{
     this.smartqos = new smartqos();
     this.alloctype = 'thick';
     this.smarttier = '0';
-    this.compression_enabled = '0';
-    this.dedupe_enabled = '0';
+    this.compression_enabled = null;
+    this.dedupe_enabled = null;
   }
 }
 

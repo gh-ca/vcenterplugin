@@ -96,9 +96,22 @@
         </select>
       </clr-select-container>
 
-      <clr-combobox-container>
+      <clr-select-container>
         <label>{{'rdm.host' | translate}}<span style="color: red">*</span></label>
-        <clr-combobox [(ngModel)]="hostSelected" name="host_id">
+        <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="hostSelected" name="hostSelected" class="clr-select" (change)="loadDataStore(hostSelected)">
+          <option *ngFor="let item of hostList" value="{{item.id}}">{{item.ip}}({{item.name}})</option>
+        </select>
+      </clr-select-container>
+
+      <clr-select-container>
+        <label>{{'rdm.dataStore' | translate}}<span style="color: red">*</span></label>
+        <select clrSelect (ngModelOptions)="dataStores" [(ngModel)]="data_store_name" name="data_store_name" class="clr-select">
+          <option *ngFor="let item of dataStores" value="{{item.name}}">{{item.name}}</option>
+        </select>
+      </clr-select-container>
+      <!--<clr-combobox-container>
+        <label>{{'rdm.host' | translate}}<span style="color: red">*</span></label>
+        <clr-combobox (change)="loadDataStore(hostSelected.id)" [(ngModel)]="hostSelected" name="host_id">
           <clr-options>
             <clr-option *clrOptionItems="let item of hostList;field:'name'" [clrValue]="item">
               {{item.ip}}({{item.name}})
@@ -106,6 +119,17 @@
           </clr-options>
         </clr-combobox>
       </clr-combobox-container>
+
+      <clr-combobox-container>
+        <label>{{'rdm.dataStore' | translate}}<span style="color: red">*</span></label>
+        <clr-combobox [(ngModel)]="data_store_name" name="data_store_name">
+          <clr-options>
+            <clr-option *clrOptionItems="let item of dataStores;field:'name'" [clrValue]="item">
+              {{item.name}}
+            </clr-option>
+          </clr-options>
+        </clr-combobox>
+      </clr-combobox-container>-->
 
       <clr-select-container>
         <label>{{'rdm.ownerC' | translate}}<span style="color: red">*</span></label>:
@@ -228,7 +252,7 @@
 
       <clr-select-container *ngIf="policyEnable.resourceTuning">
         <label>{{'rdm.alloctype' | translate}}<span style="color: red">*</span></label>:
-        <select clrSelect [(ngModel)]="configModel.tuning.alloctype" name="smarttier" >
+        <select clrSelect [(ngModel)]="configModel.tuning.alloctype" name="alloctype" >
           <option value="thin">thin</option>
           <option value="thick">thick</option>
         </select>
@@ -237,18 +261,18 @@
       <clr-select-container *ngIf="configModel.tuning.alloctype == 'thin' && policyEnable.resourceTuning">
         <label>{{'rdm.dedupe' | translate}}<span style="color: red">*</span></label>:
         <select clrSelect [(ngModel)]="configModel.tuning.dedupe_enabled" name="dedupe" >
-          <option value="0">{{'rdm.default' | translate}}</option>
-          <option value="1">{{'rdm.enable' | translate}}</option>
-          <option value="2">{{'rdm.disable' | translate}}</option>
+          <option value=null>{{'rdm.default' | translate}}</option>
+          <option value=true>{{'rdm.enable' | translate}}</option>
+          <option value=false>{{'rdm.disable' | translate}}</option>
         </select>
       </clr-select-container>
 
       <clr-select-container *ngIf="configModel.tuning.alloctype == 'thin' && policyEnable.resourceTuning">
         <label>{{'rdm.compression' | translate}}<span style="color: red">*</span></label>:
         <select clrSelect [(ngModel)]="configModel.tuning.compression_enabled" name="compression" >
-          <option value="0">{{'rdm.default' | translate}}</option>
-          <option value='1'>{{'rdm.enable' | translate}}</option>
-          <option value="2">{{'rdm.disable' | translate}}</option>
+          <option value=null>{{'rdm.default' | translate}}</option>
+          <option value=true>{{'rdm.enable' | translate}}</option>
+          <option value=false>{{'rdm.disable' | translate}}</option>
         </select>
       </clr-select-container>
     </div>
