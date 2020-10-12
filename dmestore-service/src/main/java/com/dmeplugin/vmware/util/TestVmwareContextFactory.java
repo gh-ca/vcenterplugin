@@ -42,9 +42,10 @@ public class TestVmwareContextFactory {
 
         String serviceUrl = "https://" + vCenterAddress +":"+vCenterPort+ "/sdk/vimService";
 
-        if (s_logger.isDebugEnabled())
+        if (s_logger.isDebugEnabled()) {
             s_logger.debug("initialize VmwareContext. url: " + serviceUrl + ", username: " + vCenterUserName + ", password: " +
                vCenterPassword);
+        }
 
         VmwareClient vimClient = new VmwareClient(vCenterAddress + "-" + s_seq++);
         vimClient.setVcenterSessionTimeout(1200000);
@@ -56,8 +57,9 @@ public class TestVmwareContextFactory {
 
     public static VmwareContext getContext(String vCenterAddress,int vCenterPort, String vCenterUserName, String vCenterPassword) throws Exception {
         VmwareContext context = s_pool.getContext(vCenterAddress, vCenterUserName);
-        if (context == null)
+        if (context == null) {
             context = create(vCenterAddress,vCenterPort, vCenterUserName, vCenterPassword);
+        }
 
         if (context != null) {
             context.setPoolInfo(s_pool, VmwareContextPool.composePoolKey(vCenterAddress, vCenterUserName));

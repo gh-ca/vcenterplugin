@@ -51,15 +51,17 @@ public class SnapshotDescriptor {
                 if (tokens.length == 2) {
                     String name = tokens[0].trim();
                     String value = tokens[1].trim();
-                    if (value.charAt(0) == '\"')
+                    if (value.charAt(0) == '\"') {
                         value = value.substring(1, value.length() - 1);
+                    }
 
                     _properties.put(name, value);
                 }
             }
         } finally {
-            if (in != null)
+            if (in != null) {
                 in.close();
+            }
         }
     }
 
@@ -85,8 +87,9 @@ public class SnapshotDescriptor {
                     }
                 }
 
-                if (diskFound)
+                if (diskFound) {
                     _properties.setProperty(String.format("snapshot%d.numDisks", i), String.valueOf(numDisks - 1));
+                }
             }
         }
     }
@@ -101,8 +104,9 @@ public class SnapshotDescriptor {
             out.write(String.format("snapshot.lastUID = \"%s\"", _properties.getProperty("snapshot.lastUID")));
             out.newLine();
             String numSnapshotsStr = _properties.getProperty("snapshot.numSnapshots");
-            if (numSnapshotsStr == null || numSnapshotsStr.isEmpty())
+            if (numSnapshotsStr == null || numSnapshotsStr.isEmpty()) {
                 numSnapshotsStr = "0";
+            }
             out.write(String.format("snapshot.numSnapshots = \"%s\"", numSnapshotsStr));
             out.newLine();
 
@@ -177,8 +181,9 @@ public class SnapshotDescriptor {
             assert (numSnapshotStr != null);
             for (int i = 0; i < Integer.parseInt(numSnapshotStr); i++) {
                 String value = _properties.getProperty(String.format("snapshot%d.uid", i));
-                if (value != null && Integer.parseInt(value) == seq)
+                if (value != null && Integer.parseInt(value) == seq) {
                     return i;
+                }
             }
         }
 
@@ -268,8 +273,9 @@ public class SnapshotDescriptor {
             if (_disks != null) {
                 int i = 0;
                 for (DiskInfo diskInfo : _disks) {
-                    if (i > 0)
+                    if (i > 0) {
                         sb.append(", ");
+                    }
                     sb.append(diskInfo.toString());
                     i++;
                 }

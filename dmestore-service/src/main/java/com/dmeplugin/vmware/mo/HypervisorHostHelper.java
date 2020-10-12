@@ -137,8 +137,9 @@ public class HypervisorHostHelper {
                         if (objProp.getName().equals("name")) {
                             vmNameInvCenter = (String)objProp.getVal();
                         } else if (objProp.getName().contains(instanceNameCustomField)) {
-                            if (objProp.getVal() != null)
+                            if (objProp.getVal() != null) {
                                 vmInternalCSName = ((CustomFieldStringValue)objProp.getVal()).getValue();
+                            }
                         }
 
                         if ((vmNameInvCenter != null && name.equalsIgnoreCase(vmNameInvCenter)) || (vmInternalCSName != null && name.equalsIgnoreCase(vmInternalCSName))) {
@@ -154,8 +155,9 @@ public class HypervisorHostHelper {
 
     public static ManagedObjectReference findDatastoreWithBackwardsCompatibility(VmwareHypervisorHost hyperHost, String uuidName) throws Exception {
         ManagedObjectReference morDs = hyperHost.findDatastore(uuidName.replace("-", ""));
-        if (morDs == null)
+        if (morDs == null) {
             morDs = hyperHost.findDatastore(uuidName);
+        }
 
         return morDs;
     }
@@ -171,8 +173,9 @@ public class HypervisorHostHelper {
                 List<DynamicProperty> objProps = oc.getPropSet();
                 if (objProps != null) {
                     for (DynamicProperty objProp : objProps) {
-                        if (objProp.getVal().toString().equals(datastoreName))
+                        if (objProp.getVal().toString().equals(datastoreName)) {
                             return new DatastoreMO(hyperHost.getContext(), oc.getObj());
+                        }
                     }
                 }
             }
@@ -200,10 +203,11 @@ public class HypervisorHostHelper {
 
         }
 
-        if (networkRateMbps != null && networkRateMbps.intValue() > 0)
+        if (networkRateMbps != null && networkRateMbps.intValue() > 0) {
             sb.append(".").append(String.valueOf(networkRateMbps));
-        else
+        } else {
             sb.append(".0");
+        }
         sb.append(".").append(VersioningContants.PORTGROUP_NAMING_VERSION);
         sb.append("-").append(vSwitchName);
 
@@ -603,11 +607,13 @@ public class HypervisorHostHelper {
     private static boolean isSpecMatch(HostPortGroupSpec spec, Integer vlanId, HostNetworkSecurityPolicy securityPolicy, HostNetworkTrafficShapingPolicy shapingPolicy) {
         // check VLAN configuration
         if (vlanId != null) {
-            if (vlanId.intValue() != spec.getVlanId())
+            if (vlanId.intValue() != spec.getVlanId()) {
                 return false;
+            }
         } else {
-            if (spec.getVlanId() != 0)
+            if (spec.getVlanId() != 0) {
                 return false;
+            }
         }
 
         // check security policy for the portgroup
@@ -642,19 +648,19 @@ public class HypervisorHostHelper {
         }
 
         // so far policyInSpec and shapingPolicy should both not be null
-        if (policyInSpec.isEnabled() == null || !policyInSpec.isEnabled().booleanValue())
+        if (policyInSpec.isEnabled() == null || !policyInSpec.isEnabled().booleanValue()) {
             return false;
+        }
 
-        if (policyInSpec.getAverageBandwidth() == null || policyInSpec.getAverageBandwidth().longValue() != shapingPolicy.getAverageBandwidth().longValue())
+        if (policyInSpec.getAverageBandwidth() == null || policyInSpec.getAverageBandwidth().longValue() != shapingPolicy.getAverageBandwidth().longValue()) {
             return false;
+        }
 
-        if (policyInSpec.getPeakBandwidth() == null || policyInSpec.getPeakBandwidth().longValue() != shapingPolicy.getPeakBandwidth().longValue())
+        if (policyInSpec.getPeakBandwidth() == null || policyInSpec.getPeakBandwidth().longValue() != shapingPolicy.getPeakBandwidth().longValue()) {
             return false;
+        }
 
-        if (policyInSpec.getBurstSize() == null || policyInSpec.getBurstSize().longValue() != shapingPolicy.getBurstSize().longValue())
-            return false;
-
-        return true;
+        return policyInSpec.getBurstSize() != null && policyInSpec.getBurstSize().longValue() == shapingPolicy.getBurstSize().longValue();
     }
 
     private static void createNvpPortGroup(HostMO hostMo, HostVirtualSwitch vSwitch, String networkName, HostNetworkTrafficShapingPolicy shapingPolicy) throws Exception {
@@ -670,8 +676,9 @@ public class HypervisorHostHelper {
         List<Integer> usedVlans = new ArrayList<Integer>();
         for (HostPortGroup pg : hostMo.getHostNetworkInfo().getPortgroup()) {
             HostPortGroupSpec hpgs = pg.getSpec();
-            if (vSwitchName.equals(hpgs.getVswitchName()))
+            if (vSwitchName.equals(hpgs.getVswitchName())) {
                 usedVlans.add(hpgs.getVlanId());
+            }
         }
 
         // Find the first free vlanid
@@ -719,15 +726,17 @@ public class HypervisorHostHelper {
                                         boolean limitCpuUse, int memoryMB, int memoryReserveMB, String guestOsIdentifier, ManagedObjectReference morDs, boolean snapshotDirToParent,
                                         Pair<String, String> controllerInfo, Boolean systemVm) throws Exception {
 
-        if (s_logger.isInfoEnabled())
+        if (s_logger.isInfoEnabled()) {
             s_logger.info("Create blank VM. cpuCount: " + cpuCount + ", cpuSpeed(MHz): " + cpuSpeedMHz + ", mem(Mb): " + memoryMB);
+        }
 
         VirtualDeviceConfigSpec controllerSpec = null;
         // VM config basics
         VirtualMachineConfigSpec vmConfig = new VirtualMachineConfigSpec();
         vmConfig.setName(vmName);
-        if (vmInternalCSName == null)
+        if (vmInternalCSName == null) {
             vmInternalCSName = vmName;
+        }
 
         VmwareHelper.setBasicVmConfig(vmConfig, cpuCount, cpuSpeedMHz, cpuReservedMHz, memoryMB, memoryReserveMB, guestOsIdentifier, limitCpuUse);
 
@@ -806,8 +815,9 @@ public class HypervisorHostHelper {
             int ideControllerKey = -1;
             while (ideControllerKey < 0) {
                 ideControllerKey = vmMo.tryGetIDEDeviceControllerKey();
-                if (ideControllerKey >= 0)
+                if (ideControllerKey >= 0) {
                     break;
+                }
 
                 s_logger.info("Waiting for IDE controller be ready in VM: " + vmInternalCSName);
                 Thread.sleep(1000);
@@ -873,8 +883,9 @@ public class HypervisorHostHelper {
         // Allow worker VM to float within cluster so that we will have better chance to
         // create it successfully
         ManagedObjectReference morCluster = hyperHost.getHyperHostCluster();
-        if (morCluster != null)
+        if (morCluster != null) {
             hyperHost = new ClusterMO(hyperHost.getContext(), morCluster);
+        }
 
         VirtualMachineMO workingVM = null;
         VirtualMachineConfigSpec vmConfig = new VirtualMachineConfigSpec();
@@ -1038,8 +1049,9 @@ public class HypervisorHostHelper {
         VmwareContext context = host.getContext();
         ManagedObjectReference morOvf = context.getServiceContent().getOvfManager();
         VirtualMachineMO workerVmMo = HypervisorHostHelper.createWorkerVM(host, new DatastoreMO(context, morDs), ovfName);
-        if (workerVmMo == null)
+        if (workerVmMo == null) {
             throw new Exception("Unable to find just-created worker VM");
+        }
 
         String[] disks = {datastorePath + File.separator + diskFileName};
         try {
