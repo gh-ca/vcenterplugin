@@ -71,7 +71,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         params.put("obj_type_id", obj_type_id);
         params.put("range", RANGE_LAST_5_MINUTE);
         params.put("interval", INTERVAL_ONE_MINUTE);
-        Map<String, Object> resp = queryStatisticByObjType("VMFS volume", params, null, null);
+        Map<String, Object> resp = queryStatisticByObjType("VMFS volume", params, null);
         String code = resp.get("code").toString();
         if ("200".equals(code)) {
             Object data = resp.get("data");
@@ -103,7 +103,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         params.put("obj_type_id", obj_type_id);
         params.put("range", RANGE_LAST_5_MINUTE);
         params.put("interval", INTERVAL_ONE_MINUTE);
-        Map<String, Object> resp = queryStatisticByObjType("NFS", params, null, null);
+        Map<String, Object> resp = queryStatisticByObjType("NFS", params, null);
         String code = resp.get("code").toString();
         if ("200".equals(code)) {
             Object data = resp.get("data");
@@ -117,14 +117,36 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     //查询卷的性能
     @Override
     public Map<String, Object> queryVolumeStatistic(Map<String, Object> params) throws Exception {
+        Map<String, String> idInstancdIdMap = new HashMap<>();
+        List<String> instanceIds = new ArrayList<>();
         Object indicatorIds = params.get("indicator_ids");
+        Object objIds = params.get("obj_ids");
+        List<String> ids = getObjIds(objIds);
+        //ids若为wwn的集合则转换为对应的instanceId集合,也有可能ids直接就是volume的instanceId集合
+        if (ids.size() > 0) {
+            Map<String, Map<String, Object>> sysLunMap = dmeRelationInstanceService.getLunInstance();
+            for (String id : ids) {
+                try {
+                    String instanceId = sysLunMap.get(id).get("resId").toString();
+                    if (!StringUtils.isEmpty(instanceId)) {
+                        idInstancdIdMap.put(id, instanceId);
+                        instanceIds.add(instanceId);
+                    }
+                } catch (Exception e) {
+                    log.warn("查询磁盘性能,通过wwn查询instanceId异常,wwn:" + id);
+                }
+            }
+            if (instanceIds.size() > 0) {
+                params.put("obj_ids", indicatorIds);
+            }
+        }
         String obj_type_id = "1125921381679104";//SYS_Lun
         params.put("obj_type_id", obj_type_id);
         if (null == indicatorIds) {
             indicatorIds = initVolumeIndicator();
             params.put("indicator_ids", indicatorIds);
         }
-        return queryStatisticByObjType("volume", params, null, null);
+        return queryStatisticByObjType("volume", params, idInstancdIdMap);
     }
 
     //查询FS的性能(NFS)
@@ -137,7 +159,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicatorIds = initFsIndicator();
             params.put("indicator_ids", indicatorIds);
         }
-        return queryStatisticByObjType("fs", params, null, null);
+        return queryStatisticByObjType("fs", params, null);
     }
 
     @Override
@@ -149,59 +171,67 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicatorIds = initServiceLevelIndicator();
             params.put("indicator_ids", indicatorIds);
         }
-        return queryStatisticByObjType("serviceLevel", params, null, null);
+        return queryStatisticByObjType("serviceLevel", params, null);
     }
 
     @Override
     public Map<String, Object> queryServiceLevelLunStatistic(Map<String, Object> params) throws Exception {
+        Map<String, String> idInstanceIdMap = new HashMap<>();
+        List<String> instanceIds = new ArrayList<>();
         String obj_type_id = "1125921381679104";//SYS_LUN
         String relationName = "M_DjTierContainsLun";
-        String objId = "";
         Object indicatorIds = params.get("indicator_ids");
         Object objIds = params.get("obj_ids");
         List<String> ids = getObjIds(objIds);
         if (ids.size() > 0) {
-            objId = ids.get(0);
-        }
-        //查询serviceLevel关联的lun实例ID
-        String targetInstanceId = getTargetInstanceIdByRelationNameSourceId(relationName, objId);
-        if(!StringUtils.isEmpty(targetInstanceId)){
-            List<String> realObjIds = new ArrayList<>();
-            realObjIds.add(targetInstanceId);
-            params.put("obj_ids", realObjIds);
+            for (String id : ids) {
+                //查询serviceLevel关联的lun实例ID
+                String targetInstanceId = getTargetInstanceIdByRelationNameSourceId(relationName, id);
+                if (!StringUtils.isEmpty(targetInstanceId)) {
+                    idInstanceIdMap.put(id, targetInstanceId);
+                    instanceIds.add(targetInstanceId);
+                }
+            }
+            if (instanceIds.size() > 0) {
+                params.put("obj_ids", instanceIds);
+            }
         }
         params.put("obj_type_id", obj_type_id);
         if (null == indicatorIds) {
             indicatorIds = initServiceLevelLunIndicator();
             params.put("indicator_ids", indicatorIds);
         }
-        return queryStatisticByObjType("serviceLevel Lun", params, targetInstanceId, objId);
+        return queryStatisticByObjType("serviceLevel Lun", params, idInstanceIdMap);
     }
 
     @Override
     public Map<String, Object> queryServiceLevelStoragePoolStatistic(Map<String, Object> params) throws Exception {
+        Map<String, String> idInstanceIdMap = new HashMap<>();
+        List<String> instanceIds = new ArrayList<>();
         String obj_type_id = "1125912791744512";//SYS_StoragePool
         String relationName = "M_DjTierContainsStoragePool";
-        String objId = "";
         Object indicatorIds = params.get("indicator_ids");
         Object objIds = params.get("obj_ids");
         List<String> ids = getObjIds(objIds);
         if (ids.size() > 0) {
-            objId = ids.get(0);
-        }
-        //查询serviceLevel关联的StoragePool的实例ID
-        String targetInstanceId = getTargetInstanceIdByRelationNameSourceId(relationName, objId);
-        if(!StringUtils.isEmpty(targetInstanceId)){
-            List<String> realObjIds = new ArrayList<>();
-            realObjIds.add(targetInstanceId);
-            params.put("obj_ids", realObjIds);
+            for (String id : ids) {
+                //查询serviceLevel关联的StoragePool的实例ID
+                String targetInstanceId = getTargetInstanceIdByRelationNameSourceId(relationName, id);
+                if (!StringUtils.isEmpty(targetInstanceId)) {
+                    idInstanceIdMap.put(id, targetInstanceId);
+                    instanceIds.add(targetInstanceId);
+                }
+            }
+            if (instanceIds.size() > 0) {
+                params.put("obj_ids", instanceIds);
+            }
         }
         params.put("obj_type_id", obj_type_id);
         if (null == indicatorIds) {
             indicatorIds = initServiceLevelStoragePoolIndicator();
             params.put("indicator_ids", indicatorIds);
         }
-        return queryStatisticByObjType("serviceLevel StroagePool", params, targetInstanceId, objId);
+        return queryStatisticByObjType("serviceLevel StroagePool", params, idInstanceIdMap);
     }
 
     //查询sourceId下relationName对应的关系
@@ -219,22 +249,22 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     //通过resourceId 查询resourceInstanceId,再查询resourceInstanceId关联的关系类型的targetInstanceId
-    private String getTargetInstanceIdByRelationNameSourceId(String relationName, String resourceId){
-        String sourceInstanceId ="";
+    private String getTargetInstanceIdByRelationNameSourceId(String relationName, String resourceId) {
+        String sourceInstanceId = "";
         String targetInstanceId = "";
         //获取sourceInstanceId
         Map<String, Map<String, Object>> serviceLevelInstance = dmeRelationInstanceService.getServiceLevelInstance();
-        if(null!=serviceLevelInstance){
+        if (null != serviceLevelInstance) {
             Map<String, Object> slInstance = serviceLevelInstance.get(resourceId);
-            if(null != slInstance){
+            if (null != slInstance) {
                 Object sourceIdObj = slInstance.get("resId");
-                if(null != sourceIdObj){
+                if (null != sourceIdObj) {
                     sourceInstanceId = sourceIdObj.toString();
                 }
             }
         }
         //获取targetInstanceId
-        if(!StringUtils.isEmpty(sourceInstanceId)){
+        if (!StringUtils.isEmpty(sourceInstanceId)) {
             RelationInstance instance = getInstance(relationName, sourceInstanceId);
             if (null != instance) {
                 targetInstanceId = instance.getTargetInstanceId();
@@ -261,7 +291,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     //query statistic by objType
-    private Map<String, Object> queryStatisticByObjType(String objectType, Map<String, Object> params, String instanceId, String replaceWithId) throws Exception {
+    private Map<String, Object> queryStatisticByObjType(String objectType, Map<String, Object> params, Map<String, String> idInstanceIdMap) throws Exception {
         Map<String, Object> resmap = new HashMap<>();
         resmap.put("code", 200);
         resmap.put("message", "query" + objectType + "Statistic success!");
@@ -278,8 +308,14 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 Object body = responseEntity.getBody();
                 String bodyStr = body.toString();
                 //将性能数据结果中的instanceId转换为参数传递的id
-                if (!StringUtils.isEmpty(instanceId) && !StringUtils.isEmpty(replaceWithId)) {
-                    bodyStr = bodyStr.replace(instanceId, replaceWithId);
+                if (null != idInstanceIdMap && idInstanceIdMap.size() > 0) {
+                    for (Map.Entry<String, String> entry : idInstanceIdMap.entrySet()) {
+                        String id = entry.getKey();
+                        String instanceId = entry.getValue();
+                        if (!StringUtils.isEmpty(instanceId) && !StringUtils.isEmpty(id)) {
+                            bodyStr = bodyStr.replace(instanceId, id);
+                        }
+                    }
                 }
                 JsonObject bodyJson = new JsonParser().parse(bodyStr).getAsJsonObject();
                 statisticElement = bodyJson.get("data");
