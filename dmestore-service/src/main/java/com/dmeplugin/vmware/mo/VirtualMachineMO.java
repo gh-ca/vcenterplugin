@@ -689,7 +689,7 @@ public class VirtualMachineMO extends BaseMO {
                 assert (props.size() == 2);
 
                 for (DynamicProperty prop : props) {
-                    if (prop.getName().equals("name")) {
+                    if ("name".equals(prop.getName())) {
                         vmName = prop.getVal().toString();
                     } else {
                         fileInfo = (VirtualMachineFileInfo)prop.getVal();
@@ -845,7 +845,7 @@ public class VirtualMachineMO extends BaseMO {
                 List<DynamicProperty> props = oc.getPropSet();
                 if (props != null) {
                     for (DynamicProperty prop : props) {
-                        if (prop.getName().equals("layoutEx")) {
+                        if ("layoutEx".equals(prop.getName())) {
                             fileLayout = (VirtualMachineFileLayoutEx)prop.getVal();
                             break;
                         }
@@ -935,9 +935,9 @@ public class VirtualMachineMO extends BaseMO {
                 String name = null;
 
                 for (DynamicProperty prop : oc.getPropSet()) {
-                    if (prop.getName().equals("name")) {
+                    if ("name".equals(prop.getName())) {
                         name = prop.getVal().toString();
-                    } else if (prop.getName().equals("vm")) {
+                    } else if ("vm".equals(prop.getName())) {
                         morVms = (ArrayOfManagedObjectReference)prop.getVal();
                     } else if (prop.getName().startsWith("value[")) {
                         CustomFieldStringValue val = (CustomFieldStringValue)prop.getVal();
@@ -1003,7 +1003,7 @@ public class VirtualMachineMO extends BaseMO {
 
         VirtualMachineFileInfo fileInfo = getFileInfo();
         String vmxFilePath = fileInfo.getVmPathName();
-        String vmxPathTokens[] = vmxFilePath.split("\\[|\\]|/");
+        String[] vmxPathTokens = vmxFilePath.split("\\[|\\]|/");
         assert (vmxPathTokens.length == 4);
         pathInfo[1] = vmxPathTokens[1].trim();                            // vSphere vm name
         pathInfo[2] = dcInfo.second();                                    // vSphere datacenter name
@@ -1016,7 +1016,7 @@ public class VirtualMachineMO extends BaseMO {
 
         VirtualMachineFileInfo fileInfo = getFileInfo();
         String vmxFilePath = fileInfo.getVmPathName();
-        String vmxPathTokens[] = vmxFilePath.split("\\[|\\]|/");
+        String[] vmxPathTokens = vmxFilePath.split("\\[|\\]|/");
 
         StringBuffer sb = new StringBuffer("https://" + _context.getServerAddress() + "/folder/");
         sb.append(URLEncoder.encode(vmxPathTokens[2].trim(), "UTF-8"));
@@ -1096,7 +1096,7 @@ public class VirtualMachineMO extends BaseMO {
 
         if (values != null) {
             for (OptionValue option : values) {
-                if (option.getKey().equals("RemoteDisplay.vnc.port")) {
+                if ("RemoteDisplay.vnc.port".equals(option.getKey())) {
                     String value = (String)option.getValue();
                     if (value != null) {
                         return new Pair<String, Integer>(summary.getHostIp(), Integer.parseInt(value));

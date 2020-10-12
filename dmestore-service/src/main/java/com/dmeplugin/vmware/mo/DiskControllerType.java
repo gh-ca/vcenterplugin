@@ -26,21 +26,21 @@ public enum DiskControllerType {
     pvscsi,
     none;
     public static DiskControllerType getType(String diskController) {
-        if (diskController == null || diskController.equalsIgnoreCase("osdefault")) {
+        if (diskController == null || "osdefault".equalsIgnoreCase(diskController)) {
             return DiskControllerType.osdefault;
-        } else if (diskController.equalsIgnoreCase("vim.vm.device.VirtualLsiLogicSASController") || diskController.equalsIgnoreCase("VirtualLsiLogicSASController")
+        } else if ("vim.vm.device.VirtualLsiLogicSASController".equalsIgnoreCase(diskController) || "VirtualLsiLogicSASController".equalsIgnoreCase(diskController)
                 || diskController.equalsIgnoreCase(ScsiDiskControllerType.LSILOGIC_SAS)) {
             return DiskControllerType.lsisas1068;
-        } else if (diskController.equalsIgnoreCase("vim.vm.device.VirtualLsiLogicController") || diskController.equalsIgnoreCase("VirtualLsiLogicController")
-                || diskController.equalsIgnoreCase(ScsiDiskControllerType.LSILOGIC_PARALLEL) || diskController.equalsIgnoreCase("scsi")) {
+        } else if ("vim.vm.device.VirtualLsiLogicController".equalsIgnoreCase(diskController) || "VirtualLsiLogicController".equalsIgnoreCase(diskController)
+                || diskController.equalsIgnoreCase(ScsiDiskControllerType.LSILOGIC_PARALLEL) || "scsi".equalsIgnoreCase(diskController)) {
             return DiskControllerType.lsilogic;
-        } else if (diskController.equalsIgnoreCase("vim.vm.device.VirtualIDEController") || diskController.equalsIgnoreCase("VirtualIDEController")
-                || diskController.equalsIgnoreCase("ide")) {
+        } else if ("vim.vm.device.VirtualIDEController".equalsIgnoreCase(diskController) || "VirtualIDEController".equalsIgnoreCase(diskController)
+                || "ide".equalsIgnoreCase(diskController)) {
             return DiskControllerType.ide;
-        } else if (diskController.equalsIgnoreCase("vim.vm.device.ParaVirtualSCSIController") || diskController.equalsIgnoreCase("ParaVirtualSCSIController")
+        } else if ("vim.vm.device.ParaVirtualSCSIController".equalsIgnoreCase(diskController) || "ParaVirtualSCSIController".equalsIgnoreCase(diskController)
                 || diskController.equalsIgnoreCase(ScsiDiskControllerType.VMWARE_PARAVIRTUAL)) {
             return DiskControllerType.pvscsi;
-        } else if (diskController.equalsIgnoreCase("vim.vm.device.VirtualBusLogicController") || diskController.equalsIgnoreCase("VirtualBusLogicController")
+        } else if ("vim.vm.device.VirtualBusLogicController".equalsIgnoreCase(diskController) || "VirtualBusLogicController".equalsIgnoreCase(diskController)
                 || diskController.equalsIgnoreCase(ScsiDiskControllerType.BUSLOGIC)) {
             return DiskControllerType.buslogic;
         } else {

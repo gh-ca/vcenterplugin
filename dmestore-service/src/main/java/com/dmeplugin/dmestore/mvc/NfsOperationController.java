@@ -140,7 +140,7 @@ public class NfsOperationController extends BaseController{
     public ResponseBodyBean changeNfsCapacity(@RequestBody Map<String,Object> params){
 
         ResponseBodyBean responseBodyBean = nfsOperationService.changeNfsCapacity(params);
-        if (null != responseBodyBean && null != responseBodyBean.getCode() && responseBodyBean.getCode().equals("200")) {
+        if (null != responseBodyBean && null != responseBodyBean.getCode() && "200".equals(responseBodyBean.getCode())) {
             return success(responseBodyBean);
         }
         return failure(gson.toJson(responseBodyBean));

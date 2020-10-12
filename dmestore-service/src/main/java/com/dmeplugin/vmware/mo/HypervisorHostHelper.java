@@ -134,7 +134,7 @@ public class HypervisorHostHelper {
                 List<DynamicProperty> objProps = oc.getPropSet();
                 if (objProps != null) {
                     for (DynamicProperty objProp : objProps) {
-                        if (objProp.getName().equals("name")) {
+                        if ("name".equals(objProp.getName())) {
                             vmNameInvCenter = (String)objProp.getVal();
                         } else if (objProp.getName().contains(instanceNameCustomField)) {
                             if (objProp.getVal() != null) {
@@ -576,11 +576,11 @@ public class HypervisorHostHelper {
         public static PvlanType fromStr(String val) {
             if (StringUtil.isBlank(val)) {
                 return null;
-            } else if (val.equalsIgnoreCase("promiscuous")) {
+            } else if ("promiscuous".equalsIgnoreCase(val)) {
                 return promiscuous;
-            } else if (val.equalsIgnoreCase("community")) {
+            } else if ("community".equalsIgnoreCase(val)) {
                 return community;
-            } else if (val.equalsIgnoreCase("isolated")) {
+            } else if ("isolated".equalsIgnoreCase(val)) {
                 return isolated;
             }
             return null;

@@ -175,7 +175,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
             String fsId = getInstanceIdByTaskId(task_id, fs_name);
             String share_id = null;
-            if (!fsId.equals("")) {
+            if (!"".equals(fsId)) {
                 nfsShareMap.put("fs_id", fsId);
                 Map<String, Object> nfsShare = createNfsShare(nfsShareMap);
                 if (ToolUtils.getInt(nfsShare.get("code"))==202) {
@@ -327,7 +327,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             }
             //update nfs datastore
             String result = vcsdkUtils.renameDataStore(nfsName, dataStoreObjectId);
-            if (result.equals("success")) {
+            if ("success".equals(result)) {
                 LOG.info("{"+nfsName+"}rename nfs datastore success!");
             }
         } catch (Exception e) {
@@ -364,7 +364,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         try {
             FileSystem fileSystem = null;
             Map<String, String> orientedFileSystem = getOrientedFs(file_system_id);
-            if (orientedFileSystem.get("code").equals("200")) {
+            if ("200".equals(orientedFileSystem.get("code"))) {
                 String fs = orientedFileSystem.get("data");
                 if (!StringUtils.isEmpty(fs)) {
                     fileSystem = gson.fromJson(fs, FileSystem.class);
@@ -392,7 +392,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                     }
                 } else {
                     //缩容
-                    if (!StringUtils.isEmpty(alloc_type) && alloc_type.equals("thin")) {
+                    if (!StringUtils.isEmpty(alloc_type) && "thin".equals(alloc_type)) {
                         //thin 分配策略缩容
                         // 该文件系统总容量-可用容量-文件系统能缩容的最小空间=实际可用缩小容量与变化量进行比较
                         if (Double.compare(changeCapacity, currentCapacity - available_capacity - min_size_fs_capacity) > 1) {

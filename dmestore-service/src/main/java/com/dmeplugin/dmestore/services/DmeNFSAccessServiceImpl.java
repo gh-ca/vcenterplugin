@@ -201,7 +201,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             return false;
         }
         Map<String, Object> storageOriginal = dmeStorageService.getStorages();
-        if (null == storageOriginal || !storageOriginal.get("code").toString().equals("200")) {
+        if (null == storageOriginal || !"200".equals(storageOriginal.get("code").toString())) {
             return false;
         }
 

@@ -114,7 +114,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             }
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, reqBody);
             int code = responseEntity.getStatusCodeValue();
-            if (code != 202 ||StringUtils.isEmpty(result)||result.equals("failed")) {
+            if (code != 202 ||StringUtils.isEmpty(result)|| "failed".equals(result)) {
                 resMap.put("code", code);
                 resMap.put("msg", "update VmfsDatastore failed");
                 return resMap;
@@ -217,7 +217,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                     result = vcsdkUtils.recycleVmfsCapacity(dsname.get(i));
                 }
             }
-            if (result == null || result.equals("error")) {
+            if (result == null || "error".equals(result)) {
                 resMap.put("code", 403);
                 resMap.put("msg", "recycle vmfsDatastore error");
                 return resMap;
@@ -302,7 +302,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
                 CapabilitiesSmarttier smarttier = new CapabilitiesSmarttier();
                 JsonObject smarttiers = null;
-                if (!ToolUtils.jsonToStr(capabilities.get("smarttier")).equals("")) {
+                if (!"".equals(ToolUtils.jsonToStr(capabilities.get("smarttier")))) {
                     smarttiers = capabilities.get("smarttier").getAsJsonObject();
                     smarttier.setPolicy(ToolUtils.jsonToInt(smarttiers.get("policy"), 0));
                     smarttier.setEnabled(ToolUtils.jsonToBoo(smarttiers.get("enabled")));
@@ -311,13 +311,13 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
                 CapabilitiesQos capabilitiesQos = new CapabilitiesQos();
                 JsonObject qos = null;
-                    if (!ToolUtils.jsonToStr(capabilities.get("qos")).equals("")) {
+                    if (!"".equals(ToolUtils.jsonToStr(capabilities.get("qos")))) {
                     qos = capabilities.get("qos").getAsJsonObject();
                     capabilitiesQos.setEnabled(ToolUtils.jsonToBoo(qos.get("enabled")));
                 }
                 SmartQos smartQos = new SmartQos();
                 JsonObject jsonObject1 = null;
-                if (qos != null && !ToolUtils.jsonToStr(qos.get("qos_param")).equals("")) {
+                if (qos != null && !"".equals(ToolUtils.jsonToStr(qos.get("qos_param")))) {
                     jsonObject1 = qos.get("qos_param").getAsJsonObject();
                     smartQos.setLatency(ToolUtils.jsonToInt(jsonObject1.get("latency"), 0));
                     smartQos.setMinbandwidth(ToolUtils.jsonToInt(jsonObject1.get("minBandWidth"), 0));
