@@ -1228,7 +1228,6 @@ public class VCSDKUtils {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             _logger.error("mount Vmfs On Cluster error:", e);
             throw e;
         }
