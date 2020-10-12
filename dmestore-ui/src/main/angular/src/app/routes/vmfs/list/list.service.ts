@@ -18,9 +18,9 @@ export class VmfsListService {
   getStorages() {
     return this.http.get('dmestorage/storages');
   }
-  // 通过存储ID获取存储池数据
-  getStoragePoolsByStorId(storageId: string) {
-    return this.http.get('dmestorage/storagepools', {params: {storageId}});
+  // 通过存储ID获取存储池数据 (vmfs添加mediaType为block)
+  getStoragePoolsByStorId(storageId: string, mediaType: string) {
+    return this.http.get('dmestorage/storagepools?storageId='+ storageId + '&media_type=' + mediaType);
   }
 
   // 获取所有的主机
@@ -231,7 +231,8 @@ export class GetForm {
       newDsName: '', // 新VMFS名称
       min_iops: '',
       min_bandwidth: '',
-      dataStoreObjectId: '' // objectID
+      dataStoreObjectId: '', // objectID,
+      service_level_name: '' // 服务等级名称
     };
     return editForm;
   }
