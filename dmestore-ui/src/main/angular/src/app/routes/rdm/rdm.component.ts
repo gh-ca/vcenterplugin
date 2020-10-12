@@ -24,7 +24,7 @@ export class RdmComponent implements OnInit {
   storagePools = [];
   hostList = [];
   hostSelected = '';
-  data_store_name = '';
+  dataStoreName = '';
   levelCheck = 'level';
   dataStores = [];
 
@@ -84,7 +84,7 @@ export class RdmComponent implements OnInit {
 
   submit(): void {
     console.log(this.configModel);
-    const vm_objectId = 'vm_object_id:urn:vmomi:VirtualMachine:vm-229:f8e381d7-074b-4fa9-9962-9a68ab6106e1';
+    const vmObjectId = 'urn:vmomi:VirtualMachine:vm-229:f8e381d7-074b-4fa9-9962-9a68ab6106e1';
     let body = {};
     if (this.configModel.storageType == '2'){
       body = {
@@ -107,7 +107,7 @@ export class RdmComponent implements OnInit {
         }
       };
     }
-    this.http.post('v1/vmrdm/createRdm?host_id='+this.hostSelected+'&vm_objectId='+vm_objectId+'&data_store_name='+this.data_store_name
+    this.http.post('v1/vmrdm/createRdm?hostId='+this.hostSelected+'&vmObjectId='+vmObjectId+'&dataStoreName='+this.dataStoreName
       , body).subscribe((result: any) => {
       console.log(result);
     }, err => {
@@ -184,7 +184,7 @@ export class RdmComponent implements OnInit {
   }
 
   loadDataStore(id: string){
-    this.http.get('v1/vmrdm/vCenter/datastoreOnHost', { params: {host_id : id}}).subscribe((result: any) => {
+    this.http.get('v1/vmrdm/vCenter/datastoreOnHost', { params: {hostId : id}}).subscribe((result: any) => {
       console.log(result);
       if (result.code === '0' || result.code === '200'){
         this.dataStores = result.data;

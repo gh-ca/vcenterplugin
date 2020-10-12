@@ -39,7 +39,7 @@
     </clr-select-container>
     <clr-select-container>
       <label>{{'rdm.dataStore' | translate}}<span style="color: red">*</span></label>
-      <select clrSelect (ngModelOptions)="dataStores" [(ngModel)]="data_store_name" name="data_store_name" class="clr-select">
+      <select clrSelect (ngModelOptions)="dataStores" [(ngModel)]="dataStoreName" name="dataStoreName" class="clr-select">
         <option *ngFor="let item of dataStores" value="{{item.name}}">{{item.name}}</option>
       </select>
     </clr-select-container>
