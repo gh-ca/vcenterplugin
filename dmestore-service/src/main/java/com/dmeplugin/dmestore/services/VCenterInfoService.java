@@ -22,8 +22,6 @@ public interface VCenterInfoService {
 
     VCenterInfo getVCenterInfo() throws SQLException;
 
-    boolean disableVCenterInfo();
-
 
 
 }
