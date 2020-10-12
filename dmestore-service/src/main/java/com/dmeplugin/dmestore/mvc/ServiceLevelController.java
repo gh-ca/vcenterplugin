@@ -44,7 +44,7 @@ public class ServiceLevelController extends BaseController {
         return failure(errMsg);
     }
 
-        @RequestMapping(value = "/listStoragePoolsByServiceLevelId", method = RequestMethod.POST)
+    @RequestMapping(value = "/listStoragePoolsByServiceLevelId", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean listStoragePoolsByServiceLevelId(@RequestBody String serviceLevelId) throws Exception {
         LOG.info("servicelevel/listStoragePoolsByServiceLevelId params==" + serviceLevelId);
@@ -60,6 +60,7 @@ public class ServiceLevelController extends BaseController {
         return failure(errMsg);
     }
 
+    //查询服务等级下的卷
     @RequestMapping(value = "/listVolumesByServiceLevelId", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean listVolumesByServiceLevelId(@RequestBody String serviceLevelId) throws Exception {
@@ -67,7 +68,7 @@ public class ServiceLevelController extends BaseController {
         String errMsg = "listVolumesByServiceLevelId error, the serviceLevel is: " + serviceLevelId;
         try {
             List<Volume> volumes = serviceLevelService.getVolumeInfosByServiceLevelId(serviceLevelId);
-            if (null != volumes &&volumes.size()>0) {
+            if (null != volumes && volumes.size() > 0) {
                 return success(volumes);
             }
         } catch (Exception e) {
@@ -86,4 +87,6 @@ public class ServiceLevelController extends BaseController {
 
         return success();
     }
+
+    //查询服务等级下的存储池
 }
