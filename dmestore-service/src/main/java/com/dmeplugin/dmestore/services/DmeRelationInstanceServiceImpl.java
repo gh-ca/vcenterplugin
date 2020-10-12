@@ -28,6 +28,10 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     private final String LIST_RELATION_URL = "/rest/resourcedb/v1/relations/{relationName}/instances";
     private final String QUERY_RELATION_URL = "/rest/resourcedb/v1/relations/{relationName}/instances/{instanceId}";
     private final String QUERY_INSTANCE_URL = "/rest/resourcedb/v1/instances/{className}/{instanceId}";
+    private final String LIST_INSTANCE_URL = "/rest/resourcedb/v1/instances/{className}";
+
+    private static Map<String, Map<String, Object>> serviceLevelInstance = new HashMap<>();
+    private static Map<String, Map<String, Object>> lunInstance = new HashMap<>();
 
     private DmeAccessService dmeAccessService;
 
@@ -72,17 +76,24 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
 
         String url = LIST_RELATION_URL;
         url = url.replace("{relationName}", relationName);
-        url = url + "?condition=[{\"simple\":{\"name\":\"source_Instance_Id\",\"value\":\"" + sourceInstanceId + "\"}}]";
+        url = url + "?condition={json}";
 
+        JsonArray constraint = new JsonArray();
+        JsonObject consObj2 = new JsonObject();
+        JsonObject simple2 = new JsonObject();
+        simple2.addProperty("name", "source_Instance_Id");
+        simple2.addProperty("value", sourceInstanceId);
+        consObj2.add("simple", simple2);
+        constraint.add(consObj2);
 
         ResponseEntity responseEntity;
         try {
-            responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, constraint.toString());
             if (responseEntity.getStatusCodeValue() == 200) {
                 ris = converRelations(responseEntity.getBody());
             }
         } catch (Exception e) {
-            LOG.warn("通过关系类型名称和源实例ID查询对应关系异常,relationName:{},sourceInstancId:{}!", relationName, sourceInstanceId);
+            LOG.warn("通过关系类型名称和源实例ID查询对应关系异常,url:{},condition:{},relationName:{},sourceInstancId:{}!", url, constraint.toString(), relationName, sourceInstanceId);
             throw e;
         }
         return ris;
@@ -106,7 +117,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
                 ri = converRelation(responseEntity.getBody());
             }
         } catch (Exception e) {
-            LOG.warn("通过关系类型名称和源实例ID查询对应关系异常,relationName:{},InstancId:{}!", relationName, instanceId);
+            LOG.warn("通过关系类型名称和源实例ID查询对应关系异常,url:{},relationName:{},InstancId:{}!", url, relationName, instanceId);
             throw e;
         }
         return ri;
@@ -138,6 +149,79 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         return obj;
     }
 
+    public void listInstanceServiceLevel() {
+        String instanceName = "SYS_DjTier";
+        JsonObject jsonObject = listInstancdByInstanceName(instanceName);
+        if (null != jsonObject) {
+            JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
+            Map<String, Map<String, Object>> map = new HashMap<>();
+            for (JsonElement element : jsonArray) {
+                Map<String, Object> slMap = new HashMap<>();
+                JsonObject slJson = element.getAsJsonObject();
+                slMap.put("resId", ToolUtils.jsonToOriginalStr(slJson.get("resId")));
+                slMap.put("name", ToolUtils.jsonToOriginalStr(slJson.get("name")));
+                slMap.put("id", ToolUtils.jsonToOriginalStr(slJson.get("id")));
+                slMap.put("nativeId", ToolUtils.jsonToOriginalStr(slJson.get("nativeId")));
+                map.put(ToolUtils.jsonToOriginalStr(slJson.get("nativeId")), slMap);
+            }
+            if (map.size() > 0) {
+                serviceLevelInstance.clear();
+                serviceLevelInstance.putAll(map);
+            }
+        }
+    }
+
+    public void listInstanceLun() {
+        String instanceName = "SYS_Lun";
+        JsonObject jsonObject = listInstancdByInstanceName(instanceName);
+        if (null != jsonObject) {
+            JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
+            Map<String, Map<String, Object>> map = new HashMap<>();
+            for (JsonElement element : jsonArray) {
+                Map<String, Object> lunMap = new HashMap<>();
+                JsonObject slJson = element.getAsJsonObject();
+                lunMap.put("resId", ToolUtils.jsonToOriginalStr(slJson.get("resId")));
+                lunMap.put("name", ToolUtils.jsonToOriginalStr(slJson.get("name")));
+                lunMap.put("id", ToolUtils.jsonToOriginalStr(slJson.get("id")));
+                lunMap.put("wwn", ToolUtils.jsonToOriginalStr(slJson.get("wwn")));
+                map.put(ToolUtils.jsonToOriginalStr(slJson.get("wwn")), lunMap);
+            }
+            if (map.size() > 0) {
+                lunInstance.clear();
+                lunInstance.putAll(map);
+            }
+        }
+    }
+
+    public Map<String, Map<String, Object>> getServiceLevelInstance() {
+        if (serviceLevelInstance.size() == 0) {
+            listInstanceServiceLevel();
+        }
+        return serviceLevelInstance;
+    }
+
+    public Map<String, Map<String, Object>> getLunInstance() {
+        if (lunInstance.size() == 0) {
+            listInstanceLun();
+        }
+        return lunInstance;
+    }
+
+    private JsonObject listInstancdByInstanceName(String instanceName) {
+        JsonObject jsonObject = null;
+        String url = LIST_INSTANCE_URL.replace("{className}", instanceName);
+        try {
+            ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
+                Object object = responseEntity.getBody();
+                jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
+            }
+        } catch (Exception e) {
+            LOG.warn("List instance error by instanceName:" + instanceName, e);
+        }
+        return jsonObject;
+    }
+
     private List<RelationInstance> converRelations(Object object) {
         List<RelationInstance> ris = new ArrayList<>();
         JsonObject bodyJson = new JsonParser().parse(object.toString()).getAsJsonObject();
@@ -145,13 +229,13 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         for (JsonElement element : objList) {
             RelationInstance ri = new RelationInstance();
             JsonObject objJson = element.getAsJsonObject();
-            ri.setSourceInstanceId(ToolUtils.getStr(objJson.get("source_Instance_Id")));
-            ri.setTargetInstanceId(ToolUtils.getStr(objJson.get("target_Instance_Id")));
-            ri.setRelationName(ToolUtils.getStr(objJson.get("relation_Name")));
-            ri.setId(ToolUtils.getStr(objJson.get("id")));
-            ri.setLastModified(ToolUtils.getLong(objJson.get("last_Modified")));
-            ri.setResId(ToolUtils.getStr(objJson.get("resId")));
-            ri.setRelationId(ToolUtils.getInt(objJson.get("relation_Id")));
+            ri.setSourceInstanceId(ToolUtils.jsonToStr(objJson.get("source_Instance_Id")));
+            ri.setTargetInstanceId(ToolUtils.jsonToStr(objJson.get("target_Instance_Id")));
+            ri.setRelationName(ToolUtils.jsonToStr(objJson.get("relation_Name")));
+            ri.setId(ToolUtils.jsonToStr(objJson.get("id")));
+            ri.setLastModified(ToolUtils.jsonToLon(objJson.get("last_Modified"), null));
+            ri.setResId(ToolUtils.jsonToStr(objJson.get("resId")));
+            ri.setRelationId(ToolUtils.jsonToInt(objJson.get("relation_Id"), 0));
 
             ris.add(ri);
         }
@@ -161,7 +245,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     private RelationInstance converRelation(Object object) {
         RelationInstance ri = new RelationInstance();
         JsonObject objJson = new JsonParser().parse(object.toString()).getAsJsonObject();
-        if(null != objJson){
+        if (null != objJson) {
             ri.setSourceInstanceId(ToolUtils.getStr(objJson.get("source_Instance_Id")));
             ri.setTargetInstanceId(ToolUtils.getStr(objJson.get("target_Instance_Id")));
             ri.setRelationName(ToolUtils.getStr(objJson.get("relation_Name")));
