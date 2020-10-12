@@ -6,6 +6,7 @@ import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
+import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.*;
@@ -115,9 +116,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                     try {
                                         ResponseEntity responseEntity = dmeAccessService.access(detailedVolumeUrl, HttpMethod.GET, null);
                                         LOG.info("volid responseEntity==" + responseEntity.toString());
-                                        if (responseEntity.getStatusCodeValue() == 200) {
+                                        if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                                             JsonObject voljson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
-
                                             JsonObject vjson2 = voljson.getAsJsonObject("volume");
 
                                             vmfsDataInfo.setVolumeId(ToolUtils.jsonToStr(vjson2.get("id")));
@@ -142,7 +142,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                                     }
                                                 }
                                             }
-
                                             relists.add(vmfsDataInfo);
                                         }
                                     } catch (Exception e) {
