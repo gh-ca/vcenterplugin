@@ -29,7 +29,7 @@ public class PluginRegisterServiceImpl implements PluginRegisterService{
     public Map<String, Object> installService(String vcenterIP,String vcenterPort,String vcenterUsername,String vcenterPassword,String dmeIp,
                                               String dmePort,String dmeUsername,String dmePassword) {
 
-        Map<String, Object> remap=new HashMap<>();
+        Map<String, Object> remap=new HashMap<>(16);
         try {
             //保存vcenter信息,如有已有vcenter信息，需要更新
             VCenterInfo vCenterInfo = new VCenterInfo();
@@ -45,7 +45,7 @@ public class PluginRegisterServiceImpl implements PluginRegisterService{
 
             if (!"".equalsIgnoreCase(dmeIp)) {
                 //调用接口，创建dme连接信息,如有已有dme信息，需要更新
-                Map params = new HashMap();
+                Map params = new HashMap(16);
                 params.put("hostIp", dmeIp);
                 params.put("hostPort", dmePort);
                 params.put("userName", dmeUsername);

@@ -671,7 +671,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
         ObjectContent[] ocs = getVmPropertiesOnHyperHost(new String[] {"name", "config.extraConfig[\"RemoteDisplay.vnc.port\"]", "value[" + key + "]"});
 
-        HashMap<String, Integer> portInfo = new HashMap<String, Integer>();
+        HashMap<String, Integer> portInfo = new HashMap<String, Integer>(16);
         if (ocs != null && ocs.length > 0) {
             for (ObjectContent oc : ocs) {
                 List<DynamicProperty> objProps = oc.getPropSet();
