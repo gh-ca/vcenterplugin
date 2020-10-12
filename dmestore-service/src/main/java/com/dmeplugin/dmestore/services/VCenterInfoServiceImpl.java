@@ -2,14 +2,10 @@ package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.dao.VCenterInfoDao;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
-import com.dmeplugin.dmestore.exception.VcenterException;
 import com.dmeplugin.dmestore.utils.CipherUtils;
-import com.dmeplugin.dmestore.utils.ThumbprintsUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpSession;
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -108,14 +104,6 @@ public class VCenterInfoServiceImpl extends DMEOpenApiService implements VCenter
     return vCenterInfoDao.getVCenterInfo();
   }
 
-  @Override
-  public boolean disableVCenterInfo() {
-    try {
-      return vCenterInfoDao.disableVCenterInfo();
-    } catch (SQLException e) {
-      LOGGER.error("Failed to disable vCenter info");
-      return false;
-    }
-  }
+
 
 }

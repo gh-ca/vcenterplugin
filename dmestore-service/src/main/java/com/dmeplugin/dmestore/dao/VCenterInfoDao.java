@@ -108,41 +108,6 @@ public class VCenterInfoDao extends H2DataBaseDao {
     return null;
   }
 
-  public boolean disableVCenterInfo() throws SQLException {
-    Connection con = null;
-    PreparedStatement ps = null;
-    try {
-      con = getConnection();
-      ps = con.prepareStatement("UPDATE " + DPSqlFileConstant.DP_DME_VCENTER_INFO + " SET state=FALSE ");
-      return ps.executeUpdate() > 0;
-    } catch (DataBaseException | SQLException e) {
-      LOGGER.error("Failed to disable vCenter info: " + e.getMessage());
-      throw new SQLException(e);
-    } finally {
-      closeConnection(con, ps, null);
-    }
-  }
-
-  public boolean disablePushEvent() throws SQLException {
-    Connection con = null;
-    PreparedStatement ps = null;
-    try {
-      con = getConnection();
-      ps = con
-          .prepareStatement("UPDATE " + DPSqlFileConstant.DP_DME_VCENTER_INFO + " SET PUSH_EVENT=FALSE ");
-      return ps.executeUpdate() > 0;
-    } catch (DataBaseException | SQLException e) {
-      LOGGER.error("Failed to disable push event: " + e.getMessage());
-      throw new SQLException(e);
-    } finally {
-      closeConnection(con, ps, null);
-    }
-  }
-
-
-
-
-
 
 
   private void checkIp(String ip) throws SQLException {
