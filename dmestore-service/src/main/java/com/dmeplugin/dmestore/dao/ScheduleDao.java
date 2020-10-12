@@ -14,6 +14,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @Description: TODO
+ * @ClassName: ScheduleDao
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 public class ScheduleDao extends H2DataBaseDao {
     public List<ScheduleConfig> getScheduleList()  {
         Connection con = null;
