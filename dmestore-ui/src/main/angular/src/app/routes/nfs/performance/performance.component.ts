@@ -62,7 +62,7 @@ export class NfsPerformanceComponent implements OnInit, AfterViewInit {
     }
     console.log('this.rang', this.range)
     // IOPS
-    this.makePerformance.setChart(300,'IOPS', 'IO/s', this.indicatorIdsIOPS, this.objIds, null, 'datastorestatistichistrory/vmfsvolume').then(res => {
+    this.makePerformance.setChart(300,'IOPS', 'IO/s', this.indicatorIdsIOPS, this.objIds, null, 'datastorestatistichistrory/vmfsvolume', null, null).then(res => {
       this.iopsChart = res;
       this.cdr.detectChanges();
     });

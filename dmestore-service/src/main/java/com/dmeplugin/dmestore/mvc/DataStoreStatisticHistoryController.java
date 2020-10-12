@@ -52,7 +52,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     /**
      * 查询volume性能
      *
-     * @param params key required: obj_ids, indicator_ids, range (obj_ids volumeId集合)
+     * @param params key required: obj_ids, indicator_ids, range (obj_ids volumeInstanceId集合)
      * @return
      * @throws Exception
      */
@@ -124,4 +124,43 @@ public class DataStoreStatisticHistoryController extends BaseController {
         }
         return failure(gson.toJson(resMap));
     }
+
+    /**
+     * 查询serviceLevel的卷性能
+     *
+     * @param params key required: obj_ids, indicator_ids, range (obj_ids,serviceLevelId)
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/servicelevelLun", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean getServiceLevelLunStatistic(@RequestBody Map<String, Object> params) throws Exception {
+        LOG.info("datastorestatistichistrory/servicelevellun params==" + gson.toJson(params));
+
+        Map<String, Object> resMap = dataSotreStatisticHistroyService.queryServiceLevelLunStatistic(params);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
+    }
+
+    /**
+     * 查询serviceLevel的存储池性能
+     *
+     * @param params key required: obj_ids, indicator_ids, range (obj_ids,serviceLevelId)
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/servicelevelStoragePool", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean getServiceLevelStoragePoolStatistic(@RequestBody Map<String, Object> params) throws Exception {
+        LOG.info("datastorestatistichistrory/servicelevelstoragepool params==" + gson.toJson(params));
+        Map<String, Object> resMap = dataSotreStatisticHistroyService.queryServiceLevelStoragePoolStatistic(params);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
+    }
+
+
 }

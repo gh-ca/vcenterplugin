@@ -1,6 +1,7 @@
 import {ChangeDetectorRef, Injectable} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {GlobalsService} from "@shared/globals.service";
+import {VolumeInfo} from "../vmfs/volume-attribute/attribute.service";
 
 @Injectable()
 export class NfsService {
@@ -23,6 +24,19 @@ export class NfsService {
   static nfsLatency: Array<string> = ['1125921381744656', '1125921381744657'];
   // NFS  url
   static nfsUrl = 'datastorestatistichistrory/nfs';
+  // 性能图可选range LAST_5_MINUTE LAST_1_HOUR LAST_1_DAY LAST_1_WEEK LAST_1_MONTH LAST_1_QUARTER HALF_1_YEAR LAST_1_YEAR BEGIN_END_TIME INVALID
+  static perRanges = [
+    {key: 'LAST_5_MINUTE', value: '最近5分钟'},
+    {key: 'LAST_1_HOUR', value: '最近1小时'},
+    {key: 'LAST_1_DAY', value: '最近1天'},
+    {key: 'LAST_1_WEEK', value: '最近1周'},
+    {key: 'LAST_1_MONTH', value: '最近1个月'},
+    {key: 'LAST_1_QUARTER', value: '最近1个季度'},
+    {key: 'HALF_1_YEAR', value: '最近半年'},
+    {key: 'LAST_1_YEAR', value: '最近1年'},
+    {key: 'BEGIN_END_TIME', value: '开始-结束时间'},
+    {key: 'INVALID', value: '无效'},
+    ];
   constructor(private http: HttpClient) {}
 
   getData() {
@@ -52,6 +66,10 @@ export class NfsService {
   getClusterListByObjectId(dataStoreObjectId: string){
     return this.http.get('accessvmware/getclustersbydsobjectid', {params: {dataStoreObjectId}});
   }
+  getVolsByObjId(objId: string) {
+    return this.http.get('accessvmfs/volume/' + objId );
+  }
+
 
   /**
    * 获取折线图
@@ -213,6 +231,7 @@ export class ChartOptions{
   yAxis: YAxis;
   tooltip: Tooltip;
   legend: Legend;
+  color: string[];
   series: Serie[];
 
 }
@@ -237,6 +256,11 @@ export class YAxis{
   splitNumber: number;
   boundaryGap: string[];
   axisLine: AxisLine;
+  splitLine: SplitLine;
+}
+export class SplitLine {
+  show: boolean;
+  lineStyle: LineStyle;
 }
 export class AxisLine{
   show: boolean;
@@ -307,19 +331,21 @@ export class MakePerformance {
    * @param range 时间段 LAST_5_MINUTE LAST_1_HOUR LAST_1_DAY LAST_1_WEEK LAST_1_MONTH LAST_1_QUARTER HALF_1_YEAR LAST_1_YEAR BEGIN_END_TIME INVALID
    * @param url 请求url
    */
-  setChart(height: number, title: string, subtext: string, indicatorIds: any[], objIds: any[], range: string, url: string) {
+  setChart(height: number, title: string, subtext: string, indicatorIds: any[], objIds: any[], range: string, url: string, startTime:string, endTime:string) {
     // 生成chart optiond对象
     const chart:ChartOptions = this.getNewChart(height, title, subtext);
     return new Promise((resolve, reject) => {
       const params = {
-        indicator_ids: indicatorIds, // 指标
-        obj_ids: objIds, // 指标
-        range: range, // 指标
+        indicator_ids: indicatorIds,
+        obj_ids: objIds,
+        range: range,
+        begin_time: startTime,
+        end_time: endTime,
       }
       this.remoteSrv.getLineChartData(url, params).subscribe((result: any) => {
-        console.log('chartData: ', result);
+        console.log('chartData: ', title, result);
         if (result.code === '200' && result.data !== null && result.data.data !== null) {
-          const resData = result.data.data;
+          const resData = result.data;
             // 设置标题
           chart.title.text = title;
             // 设置副标题
@@ -345,7 +371,7 @@ export class MakePerformance {
           // 设置X轴
           this.setXAxisData(uppers, chart);
           // 设置y轴最大值
-          chart.yAxis.max = (pmaxData > lmaxData ? pmaxData : lmaxData) + 2;
+          chart.yAxis.max = (pmaxData > lmaxData ? pmaxData : lmaxData);
           console.log('chart.yAxis.pmaxData', pmaxData);
           console.log('chart.yAxis.lmaxData', lmaxData);
           // 设置上限、均值 折线图数据
@@ -414,6 +440,12 @@ export class MakePerformance {
     const axisLine: AxisLine = new AxisLine();
     axisLine.show = false;
     yAxis.axisLine = axisLine;
+    const splitLine = new SplitLine();
+    splitLine.show = true;
+    const lineStyle = new LineStyle();
+    lineStyle.type = 'dashed';
+    splitLine.lineStyle = lineStyle;
+    yAxis.splitLine = splitLine;
 
     chart.yAxis = yAxis;
     // 提示框
@@ -426,19 +458,22 @@ export class MakePerformance {
     tooltip.axisPointer = axisPointer;
     chart.tooltip = tooltip;
 
-    // 提示数据
+    // 指标
     const legend: Legend = new Legend();
     const legendData: LegendData[] = [];
-    legendData.push(this.setLengdData('Upper Limit', null));
-    legendData.push(this.setLengdData('Lower Limit', null));
-    legendData.push(this.setLengdData('Read', 'triangle'));
-    legendData.push(this.setLengdData('Write', 'triangle'));
+    legendData.push(this.setLengdData('Upper Limit', 'line'));
+    legendData.push(this.setLengdData('Lower Limit', 'line'));
+    legendData.push(this.setLengdData('Read', 'circle'));
+    legendData.push(this.setLengdData('Write', 'circle'));
     legend.x = 'right';
     legend.y = 'top';
     legend.selectedMode  = true;
     legend.data = legendData;
 
     chart.legend = legend;
+    // 指标颜色
+    const colors:string[] = ['#DB2000', '#F8E082', '#6870c4', '#01bfa8'];
+    chart.color = colors;
 
     // 数据(格式)
     const series: Serie[] = [];
@@ -510,10 +545,7 @@ export class MakePerformance {
       for (const key of Object.keys(item)) {
         let numKey = + key;
         const date = new Date(numKey);
-        console.log('date', date);
-        console.log('key', key);
         const dateStr = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDay() + ' ' + date.getHours() + ':' + date.getMinutes();
-        console.log('dateStr', dateStr);
         chart.xAxis.data.push(dateStr);
       }
     });
@@ -536,5 +568,39 @@ export class MakePerformance {
       }
     }
     return result;
+  }
+
+  /**
+   * 通过objectId 获取卷信息并设置默认选中卷
+   * @param objectId
+   * @param volumeInfoList
+   * @param volNames
+   * @param selectVolName
+   * @param selectVolume
+   */
+  getVolsByObjId(objectId: string, volumeInfoList: VolumeInfo[], volNames: string[], selectVolName: string, selectVolume: VolumeInfo){
+    console.log('objectId: ' + objectId);
+    this.remoteSrv.getVolsByObjId(objectId).subscribe((result: any) => {
+      console.log(result);
+      if (result.code === '200') {
+        volumeInfoList = result.data;
+        const volName: string[] = [];
+        volumeInfoList.forEach(item => {
+          volName.push(item.name);
+        });
+        volNames = volName;
+        // 设置默认选中数据
+        selectVolName = volNames[0];
+        selectVolume = this.getVolByName(selectVolName, volumeInfoList);
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+      } else {
+        console.log(result.description);
+      }
+    });
+  }
+  // 通过名称获取卷信息
+  getVolByName(name: string, volumeInfoList: VolumeInfo[]){
+    const volumeInfo = volumeInfoList.filter(item  => item.name === name)[0];
+    return volumeInfo;
   }
 }

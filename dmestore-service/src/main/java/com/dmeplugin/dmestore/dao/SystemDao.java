@@ -1,7 +1,6 @@
 package com.dmeplugin.dmestore.dao;
 
 import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
-import com.dmeplugin.dmestore.constant.SqlFileConstant;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -141,31 +140,6 @@ public class SystemDao extends H2DataBaseDao {
     }
   }
 
-//  public void alterTableColumn(String tableName, String columnName, String alterSql) throws Exception {
-//    Connection con = null;
-//    PreparedStatement ps1 = null;
-//    PreparedStatement ps2 = null;
-//    ResultSet rs = null;
-//    try {
-//      con = getConnection();
-//      String sql = "SELECT * FROM " + tableName + " LIMIT 1";
-//      ps1 = con.prepareStatement(sql);
-//      rs = ps1.executeQuery();
-//      ResultSetMetaData resultSetMetaData = rs.getMetaData();
-//      for (int i = 0; i < resultSetMetaData.getColumnCount(); i++) {
-//        if (resultSetMetaData.getColumnName(i + 1).equals(columnName)) {
-//          ps2 = con.prepareStatement(alterSql);
-//          ps2.executeUpdate();
-//          break;
-//        }
-//      }
-//    } catch (Exception e) {
-//      LOGGER.error(e.getMessage());
-//      throw e;
-//    } finally {
-//      closeConnection(con, rs, ps1, ps2);
-//    }
-//  }
 
   public boolean isColumnExists(String tableName, String columnName) throws SQLException {
     Connection con = null;

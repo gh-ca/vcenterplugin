@@ -31,7 +31,7 @@ public class NFSDataStoreController extends BaseController{
     }
 
     @RequestMapping(value = "/scannfs", method = RequestMethod.GET)
-    public ResponseBodyBean scanvmfs() throws Exception {
+    public ResponseBodyBean scannfs() throws Exception {
         return success(dmeNFSAccessService.scanNfs());
     }
 }

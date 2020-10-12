@@ -23,7 +23,6 @@ import com.vmware.vapi.core.ExecutionContext.SecurityContext;
 import com.vmware.vapi.protocol.HttpConfiguration;
 import com.vmware.vapi.protocol.HttpConfiguration.SslConfiguration;
 import com.vmware.vapi.protocol.ProtocolConnection;
-import com.vmware.vapi.saml.SamlToken;
 import com.vmware.vapi.security.SessionSecurityContext;
 
 /**
@@ -90,58 +89,7 @@ public class VapiAuthenticationHelper {
         return stubConfig;
     }
 
-    /**
-     * Creates a session with the server using SAML Bearer Token
-     *
-     * @param server hostname or ip address of the server to log in to
-     * @param samlBearerToken a SAML bearer token
-     * @param httpConfig HTTP configuration settings to be applied
-     * for the connection to the server.
-     *
-     * @return the stub configuration configured with an authenticated session
-     * @throws Exception
-     */
-    public StubConfiguration loginBySamlBearerToken(
-        String server, SamlToken samlBearerToken, HttpConfiguration httpConfig)
-            throws Exception {
-        if(this.sessionSvc != null) {
-            throw new Exception("Session already created");
-        }
 
-        this.stubFactory = createApiStubFactory(server, httpConfig);
-
-        // Create a SAML security context using SAML bearer token
-        SecurityContext samlSecurityContext =
-                SecurityContextFactory.createSamlSecurityContext(
-                    samlBearerToken, null);
-
-        // Create a stub configuration with SAML security context
-        StubConfiguration stubConfig =
-                new StubConfiguration(samlSecurityContext);
-
-        // Create a session stub using the stub configuration.
-        Session session =
-                this.stubFactory.createStub(Session.class, stubConfig);
-
-        // Login and create a session
-        char[] sessionId = session.create();
-
-        // Initialize a session security context from the generated session id
-        SessionSecurityContext sessionSecurityContext =
-                new SessionSecurityContext(sessionId);
-
-        // Update the stub configuration to use the session id
-        stubConfig.setSecurityContext(sessionSecurityContext);
-
-        /*
-         * Create a stub for the session service using the authenticated
-         * session
-         */
-        this.sessionSvc =
-                this.stubFactory.createStub(Session.class, stubConfig);
-
-        return stubConfig;
-    }
 
 
     /**

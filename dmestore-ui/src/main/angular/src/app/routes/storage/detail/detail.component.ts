@@ -1,9 +1,13 @@
 import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone, OnInit} from '@angular/core';
-import {DetailService, Dtrees, NfsShare, PoolList, StorageDetail, StoragePool, Volume} from './detail.service';
+import {
+  CapacityDistribution, DetailService, Dtrees, NfsShare, PoolList, StorageDetail, StoragePool,
+  Volume
+} from './detail.service';
 import {VmfsPerformanceService} from '../../vmfs/volume-performance/performance.service';
 import { EChartOption } from 'echarts';
 import {FileSystem} from '../../nfs/nfs.service';
 import {ActivatedRoute} from "@angular/router";
+import {CapacityChart, CapacitySerie} from "../storage.service";
 @Component({
   selector: 'app-detail',
   templateUrl: './detail.component.html',
@@ -12,6 +16,11 @@ import {ActivatedRoute} from "@angular/router";
   providers: [DetailService, VmfsPerformanceService],
 })
 export class DetailComponent implements OnInit, AfterViewInit {
+
+  cd : CapacityDistribution;
+
+
+
   options = {
     tooltip: {
       trigger: 'item',
@@ -302,6 +311,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   detail: StorageDetail;
   storagePool: StoragePool[];
   volumes: Volume[];
+  volumeSelect = [];
   fsList: FileSystem[];
   dtrees: Dtrees[];
   shares: NfsShare[];
@@ -313,6 +323,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
 
     this.getStorageDetail(true);
     this.getStoragePoolList(true);
+    this.initCapacity();
   }
   ngAfterViewInit() {
     this.ngZone.runOutsideAngular(() => this.initChart());
@@ -381,6 +392,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }
     if (page === 'shares'){
       this.getShareList(false);
+    }
+
+    if (page === 'capacity'){
+      this.initCapacity();
     }
   }
   getStorageDetail(fresh: boolean){
@@ -507,5 +522,33 @@ export class DetailComponent implements OnInit, AfterViewInit {
         });
       }
     }
+  }
+  formatCapacity(c: number){
+    if (c < 1024){
+      return c.toFixed(3)+" GB";
+    }else if(c >= 1024 && c< 1048576){
+      return (c/1024).toFixed(3) +" TB";
+    }else if(c>= 1048576){
+      return (c/1024/1024).toFixed(3)+" PB"
+    }
+  }
+  initCapacity(){
+    this.initCapacityDistribution();
+  }
+  initCapacityDistribution(){
+    this.cd = new CapacityDistribution();
+    const p= 0;
+    this.cd.protection = p.toFixed(3);
+    const fs = 4;
+    this.cd.fileSystem = fs.toFixed(3);
+    const v = 2.024;
+    this.cd.volume = v.toFixed(3);
+    const fc =1.078;
+     this.cd.freeCapacity= fc.toFixed(3);
+
+    const cc = new CapacityChart('3.016 TB');
+    const cs = new CapacitySerie(2.024,1.078);
+    cc.series.push(cs);
+    this.cd.chart = cc;
   }
 }

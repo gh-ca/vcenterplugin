@@ -1,31 +1,31 @@
 
 <form clrForm>
   <clr-select-container>
-    <label>vmKernel</label>:
-    <select clrSelect (ngModelOptions)="ips"  [(ngModel)]="configModel.vmKernel.device" name="hostIp" >
-      <option *ngFor="let item of ips" value="{{item.device}}">{{item.ipAddress}}</option>
+    <label>{{'iscsi.hostIp' | translate}}</label>:
+    <select clrSelect (change)="loadPorts();" (ngModelOptions)="ips"  [(ngModel)]="configModel.vmKernel.device" name="hostIp" >
+      <option *ngFor="let item of ips" value="{{item.device}}">{{item.ipAddress}}({{item.device}})</option>
     </select>
   </clr-select-container>
   <clr-select-container>
-    <label>Storage Device</label>:
+    <label>{{'iscsi.storage' | translate}}</label>:
     <select clrSelect (change)="loadPorts();" (ngModelOptions)="storageDevices"  [(ngModel)]="configModel.sn" name="storageDeviceId" >
       <option *ngFor="let item of storageDevices" value="{{item.sn}}">{{item.name}}</option>
     </select>
   </clr-select-container>
 </form>
-<clr-datagrid [(clrDgSelected)]="configModel.ethPorts"   [clrDgLoading]="portLoading">
+<clr-datagrid [(clrDgSelected)]="configModel.ethPorts"  [clrDgLoading]="portLoading">
 
-  <clr-dg-column [clrDgField]="'location'">Location</clr-dg-column>
-  <clr-dg-column [clrDgField]="'portName'">Port Name</clr-dg-column>
-  <clr-dg-column [clrDgField]="'mac'">Mac Address</clr-dg-column>
-  <clr-dg-column [clrDgField]="'maxSpeed'">Max Working Rate(Mbps)</clr-dg-column>
-  <clr-dg-column [clrDgField]="'mgmtIp'">IPv4 Address</clr-dg-column>
-  <clr-dg-column [clrDgField]="'mgmtIpv6'">IPv6 Address</clr-dg-column>
-  <clr-dg-column [clrDgField]="'speed'">Working Rate(Mbps)</clr-dg-column>
-  <clr-dg-column [clrDgField]="'status'">Health Status</clr-dg-column>
-  <clr-dg-column [clrDgField]="'connectStatus'">Connect Status</clr-dg-column>
+  <clr-dg-column [clrDgField]="'location'">{{'iscsi.location' | translate}}</clr-dg-column>
+  <clr-dg-column [clrDgField]="'portName'">{{'iscsi.portName' | translate}}</clr-dg-column>
+  <clr-dg-column [clrDgField]="'mac'">{{'iscsi.mac' | translate}}</clr-dg-column>
+  <clr-dg-column [clrDgField]="'maxSpeed'">{{'iscsi.maxSpeed' | translate}}</clr-dg-column>
+  <clr-dg-column [clrDgField]="'mgmtIp'">{{'iscsi.ip4' | translate}}</clr-dg-column>
+  <clr-dg-column [clrDgField]="'mgmtIpv6'">{{'iscsi.ip6' | translate}}</clr-dg-column>
+  <clr-dg-column [clrDgField]="'speed'">{{'iscsi.speed' | translate}}</clr-dg-column>
+  <clr-dg-column [clrDgField]="'status'">{{'iscsi.hStatus' | translate}}</clr-dg-column>
+  <clr-dg-column [clrDgField]="'connectStatus'">{{'iscsi.cStatus' | translate}}</clr-dg-column>
 
-  <clr-dg-row *ngFor="let item of portList" [clrDgItem]="item">
+  <clr-dg-row  [clrDgSelectable]="false" *clrDgItems="let item of portList"  [clrDgItem]="item">
     <clr-dg-cell>{{item.location}}</clr-dg-cell>
     <clr-dg-cell>{{item.portName}}</clr-dg-cell>
     <clr-dg-cell>
@@ -49,18 +49,27 @@
       <span *ngIf="item.speed != -1">{{item.speed}}</span>
     </clr-dg-cell>
     <clr-dg-cell>{{item.status}}</clr-dg-cell>
-    <clr-dg-cell>{{item.connectStatus}}</clr-dg-cell>
+    <clr-dg-cell>
+          <span *ngIf="item.connectStatus == 'true'">
+            <!--<span ng-class="color-square" style="background-color: green;"></span>-->
+            一条坦途
+          </span>
+          <span *ngIf="item.connectStatus == 'false'">
+            <!--<span class="color-square" style="background-color: red;"></span>-->
+            此路不通
+          </span>
+    </clr-dg-cell>
   </clr-dg-row>
 
-  <clr-dg-footer>
+  <!--<clr-dg-footer>
     <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="portTotal">
-      <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">per page</clr-dg-page-size>
+      <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]"></clr-dg-page-size>
       {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
       of {{pagination.totalItems}}
     </clr-dg-pagination>
-  </clr-dg-footer>
+  </clr-dg-footer>-->
 
 </clr-datagrid>
 
 <!--<button type="button" class="btn btn-outline" (click)="popShow=false">Cancel</button>-->
-<button type="button" class="btn btn-primary" (click)="submit()">Ok</button>
+<button type="button" class="btn btn-primary" (click)="submit()">{{'menu.ok' | translate}}</button>

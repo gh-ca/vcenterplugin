@@ -22,18 +22,6 @@ public interface VCenterInfoService {
 
     VCenterInfo getVCenterInfo() throws SQLException;
 
-    boolean disableVCenterInfo();
-
-    void deleteHAData();
-
-    void deleteHASyncAndDeviceData();
-
-
-    int saveJksThumbprints(InputStream inputStream, String password);
-
-    void saveThumbprints(String[] thumbprints);
-
-    String[] getThumbprints() throws SQLException;
 
 
 }

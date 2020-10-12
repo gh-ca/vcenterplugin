@@ -3,6 +3,7 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.model.RelationInstance;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: TODO
@@ -45,4 +46,15 @@ public interface DmeRelationInstanceService {
      * @return
      */
     Object queryInstanceByInstanceNameId(String instanceName, String instanceId) throws Exception;
+
+    /**
+     *
+     */
+    Map<String, Map<String, Object>> getServiceLevelInstance();
+
+
+    Map<String, Map<String, Object>> getLunInstance();
+
+
 }
+

@@ -217,10 +217,10 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             } catch (SQLException e) {
                 e.printStackTrace();
             }
+            LOGGER.error("Failed to svae datastorage dme relation: " + ex);
         } finally {
             closeConnection(con, pstm, null);
         }
-
     }
 
     public void deleteByWwn(List<String> list) {
@@ -446,7 +446,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
      * @throws SQLException
      */
     public String getVmfsNameByVolumeId(String volumeId) throws SQLException {
-        String VmfsDatastoreName = "";
+        String vmfsDatastoreName = "";
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -456,7 +456,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
-                VmfsDatastoreName = rs.getString("STORE_NAME");
+                vmfsDatastoreName = rs.getString("STORE_NAME");
                 break;
             }
         } catch (DataBaseException | SQLException e) {
@@ -465,7 +465,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         } finally {
             closeConnection(con, ps, rs);
         }
-        return VmfsDatastoreName;
+        return vmfsDatastoreName;
     }
 
 

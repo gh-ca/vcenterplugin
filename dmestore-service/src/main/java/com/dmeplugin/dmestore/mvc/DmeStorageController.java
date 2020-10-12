@@ -30,7 +30,7 @@ import java.util.Map;
 @Api
 public class DmeStorageController extends BaseController{
 
-    public static final Logger LOG = LoggerFactory.getLogger(NfsAccessController.class);
+    public static final Logger LOG = LoggerFactory.getLogger(DmeStorageController.class);
 
     private Gson gson=new Gson();
 

@@ -13,13 +13,6 @@
 
     <context:property-placeholder location="classpath:application.properties"/>
 
-   <bean name="EchoServiceImpl" class="com.dmeplugin.dmestore.services.EchoServiceImpl">
-
-   </bean>
-
-   <bean name="SampleActionServiceImpl" class="com.dmeplugin.dmestore.services.SampleActionServiceImpl">
-
-   </bean>
 
     <bean name="dmeInfoDao" class="com.dmeplugin.dmestore.dao.DmeInfoDao">
         <property name="url" value="${h2.url}"/>
@@ -29,7 +22,7 @@
         <property name="dmeInfoDao" ref="dmeInfoDao"/>
         <property name="scheduleDao" ref="scheduleDao"/>
         <property name="vmfsAccessService" ref="VmfsAccessServiceImpl"/>
-        <property name="dmeNFSAccessService" ref="DmeNFSAccessServiceImpl"/>
+        <property name="dmeNfsAccessService" ref="DmeNFSAccessServiceImpl"/>
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
 
@@ -66,16 +59,16 @@
 
     <bean name="ServiceLevelServiceImpl" class="com.dmeplugin.dmestore.services.ServiceLevelServiceImpl">
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
-        <property name="dmeStorageService" ref="dmeStorageService"/>
-        <property name="dmeRelationInstanceService" ref="dmeRelationInstanceService"/>
+        <property name="dmeStorageService" ref="DmeStorageServiceImpl"/>
+        <property name="dmeRelationInstanceService" ref="DmeRelationInstanceServiceImpl"/>
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
 
-    <bean name="dmeRelationInstanceService" class="com.dmeplugin.dmestore.services.DmeRelationInstanceServiceImpl">
+    <bean name="DmeRelationInstanceServiceImpl" class="com.dmeplugin.dmestore.services.DmeRelationInstanceServiceImpl">
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
     </bean>
 
-    <bean name="dmeStorageService" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
+    <bean name="DmeStorageServiceImpl" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
         <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
@@ -87,13 +80,14 @@
     <bean name="VmfsAccessServiceImpl" class="com.dmeplugin.dmestore.services.VmfsAccessServiceImpl">
         <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
-        <property name="dataStoreStatisticHistoryService" ref="DataStoreStatisticHistoryService"/>
-        <property name="dmeStorageService" ref="dmeStorageService"/>
+        <property name="dataStoreStatisticHistoryService" ref="DataStoreStatisticHistoryServiceImpl"/>
+        <property name="dmeStorageService" ref="DmeStorageServiceImpl"/>
         <property name="taskService" ref="taskService"/>
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
+        <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
     </bean>
 
-    <bean name="DataStoreStatisticHistoryService"
+    <bean name="DataStoreStatisticHistoryServiceImpl"
           class="com.dmeplugin.dmestore.services.DataStoreStatisticHistoryServiceImpl">
     </bean>
 
@@ -105,24 +99,24 @@
     <bean name="DmeNFSAccessServiceImpl" class="com.dmeplugin.dmestore.services.DmeNFSAccessServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
-        <property name="dmeStorageService" ref="dmeStorageService"/>
-        <property name="dataStoreStatisticHistoryService" ref="DataStoreStatisticHistoryService"/>
+        <property name="dmeStorageService" ref="DmeStorageServiceImpl"/>
+        <property name="dataStoreStatisticHistoryService" ref="DataStoreStatisticHistoryServiceImpl"/>
         <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
         <property name="taskService" ref="taskService"/>
     </bean>
 
-    <bean name="vmfsOperationService" class="com.dmeplugin.dmestore.services.VmfsOperationServiceImpl">
+    <bean name="VmfsOperationServiceImpl" class="com.dmeplugin.dmestore.services.VmfsOperationServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
     </bean>
 
 
-    <bean name="vmwareAccessService" class="com.dmeplugin.dmestore.services.VmwareAccessServiceImpl">
+    <bean name="VmwareAccessServiceImpl" class="com.dmeplugin.dmestore.services.VmwareAccessServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
         <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
     </bean>
 
-    <bean name="vmrdmService" class="com.dmeplugin.dmestore.services.VMRDMServiceImpl">
+    <bean name="VmRdmServiceImpl" class="com.dmeplugin.dmestore.services.VmRdmServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="taskService" ref="taskService"/>
@@ -133,29 +127,31 @@
         <property name="bestPracticeCheckDao" ref="bestPracticeCheckDao"/>
         <property name="bestPracticeServices">
             <list>
-                <ref bean="vmfs3EnableBlockDeleteService"/>
-                <ref bean="vmfs3HardwareAcceleratedLocking"/>
-                <ref bean="vmfs3UseATSForHBOnVMFS"/>
-                <ref bean="diskSchedQuantum"/>
-                <ref bean="diskDiskMaxIOSize"/>
-                <ref bean="dataMoverHardwareAcceleratedInit"/>
-                <ref bean="dataMoverHardwareAcceleratedMove"/>
-                <ref bean="lunQueueDepthForEmulex"/>
-                <ref bean="lunQueueDepthForQlogic"/>
+                <ref bean="VMFS3EnableBlockDeleteImpl"/>
+                <ref bean="VMFS3HardwareAcceleratedLockingImpl"/>
+                <ref bean="VMFS3UseATSForHBOnVMFS5Impl"/>
+                <ref bean="DiskSchedQuantumImpl"/>
+                <ref bean="DiskDiskMaxIOSizeImpl"/>
+                <ref bean="DataMoverHardwareAcceleratedInitImpl"/>
+                <ref bean="DataMoverHardwareAcceleratedMoveImpl"/>
+                <ref bean="LunQueueDepthForEmulexImpl"/>
+                <ref bean="LunQueueDepthForQlogicImpl"/>
+                <ref bean="JumboFrameMTUImpl"/>
             </list>
         </property>
     </bean>
 
     <!--最佳实践后端逻辑service-->
-    <bean name="vmfs3EnableBlockDeleteService" class="com.dmeplugin.dmestore.services.bestpractice.VMFS3EnableBlockDeleteImpl"/>
-    <bean name="vmfs3HardwareAcceleratedLocking" class="com.dmeplugin.dmestore.services.bestpractice.VMFS3HardwareAcceleratedLockingImpl"/>
-    <bean name="vmfs3UseATSForHBOnVMFS" class="com.dmeplugin.dmestore.services.bestpractice.VMFS3UseATSForHBOnVMFS5Impl"/>
-    <bean name="diskSchedQuantum" class="com.dmeplugin.dmestore.services.bestpractice.DiskSchedQuantumImpl"/>
-    <bean name="diskDiskMaxIOSize" class="com.dmeplugin.dmestore.services.bestpractice.DiskDiskMaxIOSizeImpl"/>
-    <bean name="dataMoverHardwareAcceleratedInit" class="com.dmeplugin.dmestore.services.bestpractice.DataMoverHardwareAcceleratedInitImpl"/>
-    <bean name="dataMoverHardwareAcceleratedMove" class="com.dmeplugin.dmestore.services.bestpractice.DataMoverHardwareAcceleratedMoveImpl"/>
-    <bean name="lunQueueDepthForEmulex" class="com.dmeplugin.dmestore.services.bestpractice.LunQueueDepthForEmulexImpl"/>
-    <bean name="lunQueueDepthForQlogic" class="com.dmeplugin.dmestore.services.bestpractice.LunQueueDepthForQlogicImpl"/>
+    <bean name="VMFS3EnableBlockDeleteImpl" class="com.dmeplugin.dmestore.services.bestpractice.Vmfs3EnableBlockDeleteImpl"/>
+    <bean name="VMFS3HardwareAcceleratedLockingImpl" class="com.dmeplugin.dmestore.services.bestpractice.Vmfs3HardwareAcceleratedLockingImpl"/>
+    <bean name="VMFS3UseATSForHBOnVMFS5Impl" class="com.dmeplugin.dmestore.services.bestpractice.VMFS3UseATSForHBOnVMFS5Impl"/>
+    <bean name="DiskSchedQuantumImpl" class="com.dmeplugin.dmestore.services.bestpractice.DiskSchedQuantumImpl"/>
+    <bean name="DiskDiskMaxIOSizeImpl" class="com.dmeplugin.dmestore.services.bestpractice.DiskDiskMaxIOSizeImpl"/>
+    <bean name="DataMoverHardwareAcceleratedInitImpl" class="com.dmeplugin.dmestore.services.bestpractice.DataMoverHardwareAcceleratedInitImpl"/>
+    <bean name="DataMoverHardwareAcceleratedMoveImpl" class="com.dmeplugin.dmestore.services.bestpractice.DataMoverHardwareAcceleratedMoveImpl"/>
+    <bean name="LunQueueDepthForEmulexImpl" class="com.dmeplugin.dmestore.services.bestpractice.LunQueueDepthForEmulexImpl"/>
+    <bean name="LunQueueDepthForQlogicImpl" class="com.dmeplugin.dmestore.services.bestpractice.LunQueueDepthForQlogicImpl"/>
+    <bean name="JumboFrameMTUImpl" class="com.dmeplugin.dmestore.services.bestpractice.JumboFrameMTUImpl"/>
 
     <bean name="bestPracticeCheckDao" class="com.dmeplugin.dmestore.dao.BestPracticeCheckDao">
         <property name="url" value="${h2.url}"/>
@@ -174,9 +170,9 @@
     </bean>
 
     
-    <bean name="nfsOperationService" class="com.dmeplugin.dmestore.services.NfsOperationServiceImpl">
+    <bean name="NfsOperationServiceImpl" class="com.dmeplugin.dmestore.services.NfsOperationServiceImpl">
         <property name="taskService" ref="taskService"/>
-        <property name="dmeStorageService" ref="dmeStorageService"/>
+        <property name="dmeStorageService" ref="DmeStorageServiceImpl"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
@@ -187,15 +183,16 @@
 
     </bean>
 
-   <bean name="hostAccessService" class="com.dmeplugin.dmestore.services.HostAccessServiceImpl">
-        <property name="vcsdkUtils" ref="vCSDKUtils"/>
+   <bean name="HostAccessServiceImpl" class="com.dmeplugin.dmestore.services.HostAccessServiceImpl">
+       <property name="vcsdkUtils" ref="vCSDKUtils"/>
+       <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
     </bean>
 
 
-    <bean name="overviewService" class="com.dmeplugin.dmestore.services.OverviewServiceImpl">
+    <bean name="OverviewServiceImpl" class="com.dmeplugin.dmestore.services.OverviewServiceImpl">
         <property name="vmfsAccessService" ref="VmfsAccessServiceImpl"/>
         <property name="dmeNFSAccessService" ref="DmeNFSAccessServiceImpl"/>
-        <property name="dmeStorageService" ref="dmeStorageService"/>
+        <property name="dmeStorageService" ref="DmeStorageServiceImpl"/>
         <property name="bestPracticeProcessService" ref="BestPracticeProcessServiceImpl"/>
     </bean>
 

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import {CapacityChart} from "../storage.service";
 
 @Injectable()
 export class DetailService {
@@ -181,5 +182,12 @@ export interface PoolList {
   type: string;
   serviceLevel: string;
   raidLevel: string;
+}
+export class CapacityDistribution{
+  protection: string;
+  fileSystem: string;
+  volume: string;
+  freeCapacity: string;
+  chart: CapacityChart;
 }
 

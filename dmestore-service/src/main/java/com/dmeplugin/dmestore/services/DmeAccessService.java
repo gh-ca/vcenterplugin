@@ -118,6 +118,10 @@ public interface DmeAccessService {
      */
     Map<String, Object> getDmeHost(String hostId) throws Exception;
 
+    void deleteVolumes(List<String> ids) throws Exception;
+
+    void unMapHost(String host_id, List<String> ids) throws Exception;
+
     /**
      * scan Datastore
      *

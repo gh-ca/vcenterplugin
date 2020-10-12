@@ -1154,7 +1154,7 @@ public class VirtualMachineMO extends BaseMO {
             }
             backingInfo.setDeviceName(rdmDeviceName);
             if (diskType == VirtualDiskType.RDM) {
-                backingInfo.setDiskMode(VirtualDiskMode.PERSISTENT.value());
+                backingInfo.setDiskMode(diskMode.value());
             }
 
             backingInfo.setDatastore(morDs);

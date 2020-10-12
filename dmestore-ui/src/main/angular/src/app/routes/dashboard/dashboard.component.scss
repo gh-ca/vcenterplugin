@@ -33,7 +33,7 @@
 }
 
 // 进度条样式开始
-.progress{
+.progress-container{
   margin-bottom: 20px;
   .progress-item{
     display: flex;
@@ -51,7 +51,7 @@
     width: 400px;
     height: 16px;
     background-color: hsl(198, 0%, 87%);
-    .progress{
+    .progress-inner{
       height: 16px;
       background-color: hsl(198, 100%, 32%);
     }

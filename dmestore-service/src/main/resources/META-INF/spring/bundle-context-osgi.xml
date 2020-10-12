@@ -13,11 +13,6 @@
 
    <!-- Services defined by this module   -->
 
-   <osgi:service id="EchoService" ref="EchoServiceImpl"
-         interface="com.dmeplugin.dmestore.services.EchoService" />
-
-   <osgi:service id="SampleActionService" ref="SampleActionServiceImpl"
-         interface="com.dmeplugin.dmestore.services.SampleActionService" />
 
    <osgi:service id="SystemService" ref="SystemServiceImpl"
                  interface="com.dmeplugin.dmestore.services.SystemService" />
@@ -37,9 +32,42 @@
    <osgi:service id="VCenterInfoService" ref="VCenterInfoServiceImpl"
                  interface="com.dmeplugin.dmestore.services.VCenterInfoService" />
 
+   <osgi:service id="BestPracticeProcessService" ref="BestPracticeProcessServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.BestPracticeProcessService" />
+
+   <osgi:service id="DataStoreStatisticHistoryService" ref="DataStoreStatisticHistoryServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.DataStoreStatisticHistoryService" />
+
+   <osgi:service id="DmeRelationInstanceService" ref="DmeRelationInstanceServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.DmeRelationInstanceService" />
+
+   <osgi:service id="DmeStorageService" ref="DmeStorageServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.DmeStorageService" />
+
+   <osgi:service id="HostAccessService" ref="HostAccessServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.HostAccessService" />
+
+   <osgi:service id="NfsOperationService" ref="NfsOperationServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.NfsOperationService" />
+
+   <osgi:service id="OverviewService" ref="OverviewServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.OverviewService" />
+
+   <osgi:service id="ServiceLevelService" ref="ServiceLevelServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.ServiceLevelService" />
+
+   <osgi:service id="VmfsOperationService" ref="VmfsOperationServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.VmfsOperationService" />
+
+   <osgi:service id="VmRdmService" ref="VmRdmServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.VmRdmService" />
+
+   <osgi:service id="VmwareAccessService" ref="VmwareAccessServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.VmwareAccessService" />
+
   <!-- References to platform services used by the controllers -->
 
-   <osgi:reference id="dataService"
+  <!-- <osgi:reference id="dataService"
          interface="com.vmware.vise.data.query.DataService" />
 
    <osgi:reference id="objectReferenceService"
@@ -49,6 +77,6 @@
          interface="com.vmware.vise.vim.data.VimObjectReferenceService" />
 
    <osgi:reference id="userSessionService"
-                   interface="com.vmware.vise.usersession.UserSessionService"/>
+                   interface="com.vmware.vise.usersession.UserSessionService"/>-->
 
 </beans>
