@@ -46,6 +46,6 @@ public class BackgroundScanDatastoreTask implements StatefulJob {
 
   @Override
   public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-    LOGGER.info("scanDatastore rrr start");
+    scanDatastore();
   }
 }
