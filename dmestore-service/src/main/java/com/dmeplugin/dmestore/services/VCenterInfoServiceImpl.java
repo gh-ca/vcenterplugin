@@ -1,6 +1,5 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.dao.DMEDao;
 import com.dmeplugin.dmestore.dao.VCenterInfoDao;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.exception.VcenterException;
@@ -118,58 +117,5 @@ public class VCenterInfoServiceImpl extends DMEOpenApiService implements VCenter
       return false;
     }
   }
-
-  @Override
-  public void deleteHAData() {
-    try {
-      vCenterInfoDao.deleteHAData();
-    } catch (Exception e) {
-      throw new VcenterException(e.getMessage());
-    }
-  }
-
-  @Override
-  public void deleteHASyncAndDeviceData() {
-    vCenterInfoDao.deleteHASyncAndDeviceData();
-  }
-
-
-
-
-  @Override
-  public synchronized int saveJksThumbprints(InputStream inputStream, String password) {
-    try {
-      String[] thumbprints = ThumbprintsUtils.getThumbprintsFromJKS(inputStream, password);
-      String[] tp = vCenterInfoDao.mergeSaveAndLoadAllThumbprints(thumbprints);
-      LOGGER.info("Thumbprints have been saved, new list size: " + tp.length);
-      ThumbprintsUtils.updateContextTrustThumbprints(tp);
-      return RESULT_SUCCESS_CODE;
-    } catch (IOException e) {
-      LOGGER.warn("Cannot get thumbprints from JKS " + e.getMessage());
-      return RESULT_READ_CERT_ERROR;
-    } catch (Exception e) {
-      LOGGER.error("Cannot get/save thumbprints from JKS " + e.getMessage());
-      return FAIL_CODE;
-    }
-  }
-
-  @Override
-  public synchronized void saveThumbprints(String[] thumbprints) {
-    try {
-      String[] tp = vCenterInfoDao.mergeSaveAndLoadAllThumbprints(thumbprints);
-      LOGGER.info("Thumbprints have been saved, new list size: " + tp.length);
-      ThumbprintsUtils.updateContextTrustThumbprints(tp);
-    } catch (Exception e) {
-      LOGGER.warn("Cannot save thumbprints: " + e.getMessage());
-    }
-  }
-
-  @Override
-  public String[] getThumbprints() throws SQLException {
-    String[] thumbprints = vCenterInfoDao.loadThumbprints();
-    LOGGER.info("Thumbprints have been loaded, size: " + thumbprints.length);
-    return thumbprints;
-  }
-
 
 }

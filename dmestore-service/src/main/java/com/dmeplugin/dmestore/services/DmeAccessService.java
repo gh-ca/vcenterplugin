@@ -1,6 +1,5 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.model.DMEHostInfo;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 

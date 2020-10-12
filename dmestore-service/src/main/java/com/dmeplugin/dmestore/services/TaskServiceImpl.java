@@ -240,7 +240,7 @@ public class TaskServiceImpl implements TaskService {
         for (Map.Entry<String, Integer> entry : taskStatusMap.entrySet()) {
             //String taskId = entry.getKey();
             int status = entry.getValue();
-            if (3 == status || 4 == status) {
+            if (3 == status) {
                 flag = true;
                 break;
             }

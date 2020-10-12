@@ -9,6 +9,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+/**
+ * @Description: TODO
+ * @ClassName: BackgroundScanDatastoreTask
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 @Component
 public class BackgroundScanDatastoreTask implements StatefulJob {
 
@@ -18,7 +25,7 @@ public class BackgroundScanDatastoreTask implements StatefulJob {
   private VmfsAccessService vmfsAccessService;
 
   @Autowired
-  private DmeNFSAccessService dmeNFSAccessService;
+  private DmeNFSAccessService dmeNfsAccessService;
 
   /**
    * 后台定时
@@ -33,7 +40,7 @@ public class BackgroundScanDatastoreTask implements StatefulJob {
     }
     //扫描nfs
     try {
-      dmeNFSAccessService.scanNfs();
+      dmeNfsAccessService.scanNfs();
     }catch (Exception e){
       e.printStackTrace();
     }
@@ -46,6 +53,6 @@ public class BackgroundScanDatastoreTask implements StatefulJob {
 
   @Override
   public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
-    LOGGER.info("scanDatastore rrr start");
+    scanDatastore();
   }
 }

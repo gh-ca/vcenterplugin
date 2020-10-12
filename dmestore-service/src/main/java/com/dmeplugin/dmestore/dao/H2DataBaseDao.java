@@ -62,7 +62,7 @@ public class H2DataBaseDao {
   }
 
   protected String getTempTableName() {
-    return String.format("HW_%s", UUID.randomUUID().toString().replaceAll("-", "_"));
+    return String.format("DP_DME_%s", UUID.randomUUID().toString().replaceAll("-", "_"));
   }
 
   private static Boolean isWindows() {
