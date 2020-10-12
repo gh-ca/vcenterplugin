@@ -77,4 +77,22 @@ public interface DataStoreStatisticHistoryService {
      * @throws Exception
      */
     Map<String, Object> queryServiceLevelStatistic(Map<String, Object> params) throws Exception;
+
+    /**
+     * 查询服务等级卷历史性能数据
+     * @param params key required: obj_ids, indicator_ids, range
+     * @return
+     * @throws Exception
+     */
+    Map<String, Object> queryServiceLevelLunStatistic(Map<String, Object> params) throws Exception;
+
+    /**
+     * 查询服务等级存储池历史性能数据
+     * @param params key required: obj_ids, indicator_ids, range
+     * @return
+     * @throws Exception
+     */
+    Map<String, Object> queryServiceLevelStoragePoolStatistic(Map<String, Object> params) throws Exception;
+
+
 }

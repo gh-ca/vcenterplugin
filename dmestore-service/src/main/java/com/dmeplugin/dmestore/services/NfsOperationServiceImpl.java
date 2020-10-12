@@ -28,7 +28,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
     private final String API_FS_CREATE = "/rest/fileservice/v1/filesystems/customize";
     private static final String API_NFSSHARE_CREATE = "/rest/fileservice/v1/nfs-shares";
-    private final String API_STORAGEPOOL_LIST = "/rest/storagemgmt/v1/storagepools/query";
+    private final String API_STORAGEPOOL_LIST = "/rest/resourcedb/v1/instances/";
     private final String API_FS_UPDATE = "/rest/fileservice/v1/filesystems";
     //private final String API_NFS_CHANGECAPACITY = "/rest/fileservice/v1/filesystems";
     private final String API_FILESYSTEMS_DETAIL = "/rest/fileservice/v1/filesystems/";
@@ -251,7 +251,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
      *      capacity_autonegotiation 自动扩缩容 相关属性{
      *          auto_size_enable  boolean 自动调整容量开关。 false: 关闭；true：打开。默认打开
      *       },
-     *       name String fs新名字 ()
+     *       name String fs名字
      *       tuning属性 （高级属性设置）{
      *             deduplication_enabled  boolean 重复数据删除。默认关闭
      *             compression_enabled  boolean 数据压缩。默认关闭
@@ -317,7 +317,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             fsReqBody.put("name", name);
         }
         try {
-            //update fs
             Map<String, Object> stringObjectMap = updateFileSystem(fsReqBody);
             int code = ToolUtils.getInt(stringObjectMap.get("code"));
             if (code == 202) {
@@ -364,7 +363,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         Integer code = 0;
         try {
             FileSystem fileSystem = null;
-            Double data_space = null;
             Map<String, String> orientedFileSystem = getOrientedFs(file_system_id);
             if (orientedFileSystem.get("code").equals("200")) {
                 String fs = orientedFileSystem.get("data");
@@ -381,18 +379,13 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 String alloc_type = fileSystem.getAlloc_type();
                 Double currentCapacity = fileSystem.getCapacity();
                 Integer capacity_usage_ratio = fileSystem.getCapacity_usage_ratio();
-                //查询存储池详情
-                Map<String, Object> storagePoolMap = getDataspaceOfStoragepool(storage_pool_name, null, storage_id);
-                if (storagePoolMap.get("code").toString().equals("200")) {
-                    if (storagePoolMap.get("data_space") != null) {
-                        data_space = Double.valueOf(storagePoolMap.get("data_space").toString());
-                    }
-                }
+                //查询存储池可用空间
+                Double data_space = getDataspaceOfStoragepool(storage_pool_name, null, storage_id);
                 Double exchangedCapacity = null;
                 Double changeCapacity = Double.valueOf(capacity);
                 if (Boolean.valueOf(is_expand)) {
                     //扩容
-                    if (data_space != null && Double.compare(Double.valueOf(capacity), data_space) > 1) {
+                    if (data_space != null && Double.compare(changeCapacity, data_space) > 1) {
                         LOG.info("扩容量超出存储池可用容量，将当前存储池可用容量当做扩容量!");
                         changeCapacity = data_space;
                         exchangedCapacity = changeCapacity + currentCapacity;
@@ -454,42 +447,31 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             return resMap;
         }
         String storage_id = params.get("storage_id");
-        String filesystemSpecs = params.get("filesystem_specs");
-        List<String> list = Arrays.asList(filesystemSpecs);
         Map<String, Object> filesystem_specs = new HashMap<>();
+        List<Map<String, Object>> filesystemSpecsLists = new ArrayList<>();
 
         Double capacity = null;
         int count = 1;
-        Double freeCapacity = null;
         Double data_space = null;
         if (!StringUtils.isEmpty(storage_id) || !StringUtils.isEmpty(storage_pool_id)) {
-            Map<String, Object> resBody = getDataspaceOfStoragepool(null, storage_pool_id,storage_id);
-            if (ToolUtils.getInt(resBody.get("code")) == 200) {
-                data_space = Double.valueOf(resBody.get("data_space").toString());
-                if (freeCapacity == null && data_space != null) {
-                    freeCapacity = data_space;
-                }
-            }
+            data_space = getDataspaceOfStoragepool(null, storage_pool_id, storage_id);
         }
-        List<Map<String, Object>> filesystemSpecsList = new ArrayList<>();
         //目前一个nfs 对应一个fs (一对多通用)
+        String filesystemSpecs = params.get("filesystem_specs");
+        List<Map<String,Object>> filesystemSpecsList = gson.fromJson(filesystemSpecs, List.class);
         for (int i=0;i<filesystemSpecsList.size();i++) {
             Map<String, Object> filesystemSpec = filesystemSpecsList.get(i);
             Object objCapacity = filesystemSpec.get("capacity");
-            Object fsNum = filesystemSpec.get("count");
-            if (objCapacity != null && fsNum != null) {
+            if (objCapacity != null) {
                 capacity = Double.valueOf(objCapacity.toString());
-                count = ToolUtils.getInt(fsNum);
-                if (Double.compare(capacity * count, freeCapacity) > 1) {
-                    capacity = freeCapacity / count;
-                } else {
-                    freeCapacity -= capacity * count;
+                if (Double.compare(capacity * count, data_space) > 1) {
+                    capacity = data_space / count;
                 }
                 filesystem_specs.put("capacity", capacity);
                 filesystem_specs.put("name", filesystemSpec.get("name"));
                 filesystem_specs.put("count", filesystemSpec.get("count"));
             }
-            filesystemSpecsList.add(filesystem_specs);
+            filesystemSpecsLists.add(filesystem_specs);
         }
         params.put("filesystem_specs", gson.toJson(filesystemSpecsList));
         ResponseEntity<String> responseEntity = dmeAccessService.access(API_FS_CREATE, HttpMethod.POST, gson.toJson(params));
@@ -510,8 +492,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 202);
         resMap.put("msg", "create nfs share success !");
-        //todo 获取taskDetailInfo中的资源id
-        //注意：需要先确定任务完成状态，在完成状态之下才能拿到对应的id, 中间存在延时问题。
         ResponseEntity<String> responseEntity = dmeAccessService.access(API_NFSSHARE_CREATE, HttpMethod.POST, gson.toJson(params));
         int code = responseEntity.getStatusCodeValue();
         if (code != 202) {
@@ -525,43 +505,39 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         return resMap;
     }
     //get oriented storage pool data_space
-    private Map<String,Object> getDataspaceOfStoragepool(String storage_pool_name,String pool_id,String storage_id) throws Exception {
-
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put("code", 200);
-        resMap.put("msg", "get oriented data space of storage pool success!");
+    private Double getDataspaceOfStoragepool(String storage_pool_name,String pool_id,String storage_id) throws Exception {
+        Double data_space = 0.0;
+        String className = "SYS_StoragePool";
+        String url = API_STORAGEPOOL_LIST + className + "?storageDeviceId=" + storage_id;
 
         Map<String, String> reqBody = new HashMap<>();
         if (!StringUtils.isEmpty(pool_id)) {
-                reqBody.put("pool_id", pool_id);
+            reqBody.put("pool_id", pool_id);
+            url = url + " and pool_id=" + pool_id;
         }
         if (!StringUtils.isEmpty(storage_pool_name)) {
             reqBody.put("storage_pool_name", storage_pool_name);
+            url = url + " and storage_pool_name=" + storage_pool_name;
         }
         reqBody.put("storage_id",storage_id);
-
-        ResponseEntity<String> responseEntity = dmeAccessService.access(API_STORAGEPOOL_LIST, HttpMethod.POST, gson.toJson(reqBody));
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET,null);
         LOG.info("url:{" + API_STORAGEPOOL_LIST + "},responseEntity:" + responseEntity);
         int code = responseEntity.getStatusCodeValue();
-        if (code != 200) {
-            resMap.put("code", code);
-            resMap.put("msg", "get oriented data space of storage pool error!");
-            return resMap;
+        if (code == 200) {
+            String object = responseEntity.getBody();
+            JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+            JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
+            for (JsonElement jsonElement : jsonArray) {
+                JsonObject element = jsonElement.getAsJsonObject();
+                //可用空间=总容量-已用容量
+                Double total_capacity =ToolUtils.jsonToDou(element.get("totalCapacity"),0.0);
+                Double consumed_capacity = ToolUtils.jsonToDou(element.get("usedCapacity"), 0.0);
+                if (Double.max(total_capacity,consumed_capacity)==total_capacity) {
+                    data_space = total_capacity - consumed_capacity;
+                }
+            }
         }
-        String object = responseEntity.getBody();
-        JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-        JsonArray jsonArray = jsonObject.get("datas").getAsJsonArray();
-        Double data_space = null;
-        for (JsonElement jsonElement : jsonArray) {
-            JsonObject element = jsonElement.getAsJsonObject();
-            data_space = Double.valueOf(element.get("data_space").getAsString());
-        }
-        if (data_space != null) {
-            resMap.put("data_space", data_space);
-        }else {
-            LOG.error("get oriented data space of storage pool error");
-        }
-        return resMap;
+        return data_space;
     }
 
     private Map<String,Object> updateFileSystem(Map<String,Object> params) throws Exception {

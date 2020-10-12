@@ -338,12 +338,34 @@ export class VmfsListComponent implements OnInit {
     console.log('this.form.spaceReclamationGranularity:' + this.form.spaceReclamationGranularity);
   }
 
+  // 设置设备数据
+  setDeviceList() {
+    // 初始化数据
+    this.deviceList = [];
+    const nullDevice =  {
+      deviceId: '',
+      deviceName: '',
+      deviceType: '',
+    };
+    this.deviceList.push(nullDevice);
+
+    console.log('this.chooseDevice', this.chooseDevice);
+    // 初始添加页面的主机集群信息
+    this.setHostDatas().then(res => {
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    });
+
+    this.setClusterDatas().then(res => {
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    });
+  }
+
   // 设置主机数据
   setHostDatas() {
     return new Promise((resolve, reject) => {
       this.remoteSrv.getHostList().subscribe((result: any) => {
         let hostList: HostList[] = []; // 主机列表
-        /*console.log(result);*/
+        console.log('host', result);
         if (result.code === '200' && result.data !== null) {
           hostList = result.data;
           hostList.forEach(item => {
@@ -362,20 +384,22 @@ export class VmfsListComponent implements OnInit {
             };
             this.deviceList.push(hostInfo);
           });
-          /*console.log('this.deviceList  host::');
-          console.log(this.deviceList);*/
-          this.form.hostDataloadSuccess = true;
-          resolve(this.deviceList);
         }
+        /*console.log('this.deviceList  host::');
+        console.log(this.deviceList);*/
+        this.form.hostDataloadSuccess = true;
+        resolve(this.deviceList);
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       });
     });
   }
   // 设置集群数据
   setClusterDatas() {
-    // return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       this.remoteSrv.getClusterList().subscribe((result: any) => {
         let clusterList: ClusterList [] = []; // 集群列表
-        console.log(result);
+        console.log('cluster', result);
+        console.log('cluster', result.data !== null);
         if (result.code === '200' && result.data !== null) {
           clusterList = result.data;
           clusterList.forEach(item => {
@@ -394,12 +418,14 @@ export class VmfsListComponent implements OnInit {
             };
             this.deviceList.push(clusterInfo);
           });
-          // resolve(this.deviceList);
-          this.form.culDataloadSuccess = true;
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         }
+        this.chooseDevice = this.deviceList[0];
+        resolve(this.deviceList);
+        this.form.culDataloadSuccess = true;
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        console.log('cluster', result.data !== null);
       });
-    // });
+    });
   }
   // 点击addBtn触发事件
   addBtnClickFunc() {
@@ -411,19 +437,13 @@ export class VmfsListComponent implements OnInit {
     this.jumpTo(this.addPageOne, this.wizard);
     // 版本、块大小、粒度下拉框初始化
     this.setBlockSizeOptions();
-    // 初始化数据
-    this.deviceList = [];
-    // 初始化主机/集群选择数据
-    console.log('chooseDevice');
-    console.log(this.chooseDevice);
+
+    // 设置主机/集群
+    this.setDeviceList();
+
     // Page2默认打开服务等级也页面
     this.levelCheck = 'level';
-    // 初始添加页面的主机集群信息
-    this.setHostDatas().then(res => {
-      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-    });
 
-    this.setClusterDatas();
     // 初始化服务等级数据
     this.setServiceLevelList();
   }

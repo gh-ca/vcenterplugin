@@ -43,7 +43,7 @@ public class DmeConstants {
      * DME 磁盘操作基础URL
      **/
     public static final String DME_VOLUME_BASE_URL = "/rest/blockservice/v1/volumes";
-    public static final String DME_VOLUME_DELETE_URL ="/rest/blockservice/v1/volumes/delete";
+    public static final String DME_VOLUME_DELETE_URL = "/rest/blockservice/v1/volumes/delete";
 
     /**
      * DME 磁盘操作基础URL
@@ -97,4 +97,8 @@ public class DmeConstants {
      */
     public static final String DME_NFS_FS_DELETE_URL = "/rest/fileservice/v1/filesystems/delete";
 
+    /**
+     *
+     */
+    public static final String DME_RESOURCE_INSTANCE_LIST = "/rest/resourcedb/v1/instances/#{className}";
 }

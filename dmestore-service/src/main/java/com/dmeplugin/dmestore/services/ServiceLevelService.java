@@ -22,6 +22,6 @@ public interface ServiceLevelService {
     List<StoragePool> getStoragePoolInfosByServiceLevelId(String serviceLevelId) throws Exception;
 
     List<Volume> getVolumeInfosByServiceLevelId(String serviceLevelId) throws Exception;
-    
+
     void updateVmwarePolicy();
 }
