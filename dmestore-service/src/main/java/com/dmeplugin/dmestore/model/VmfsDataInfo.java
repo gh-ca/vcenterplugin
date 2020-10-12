@@ -2,34 +2,35 @@ package com.dmeplugin.dmestore.model;
 
 public class VmfsDataInfo {
     //列表字段（基本视图）
-    String objectid; //跳转用唯一id
-    String name;    //名称
-    String status;  //状态
+    String objectid; //vmware中跳转用唯一id
+    String name;    //名称 vmware中vmfs的名称
+    String status;  //dme中状态
 
-    Double capacity;  //总容量 单位GB
-    Double freeSpace; //空闲容量 单位GB
-    Double reserveCapacity; //置备容量  capacity+uncommitted-freeSpace 单位GB
+    Double capacity;  //vmware中总容量 单位GB
+    Double freeSpace; //vmware中空闲容量 单位GB
+    Double reserveCapacity; //vmware中置备容量  capacity+uncommitted-freeSpace 单位GB
 
-    String deviceId; //存储设备ID
-    String device; //存储设备名称
-    String serviceLevelName;    //服务等级
-    Boolean vmfsProtected;  //保护状态
+    String deviceId; //dme中存储设备ID
+    String device; //dme中存储设备名称
+    String serviceLevelName;    //dme中服务等级
+    Boolean vmfsProtected;  //dme中保护状态
 
     //列表字段（性能视图）：
-    Integer maxIops; //QoS上限
-    Integer minIops; //QoS下限
-    Integer iops; //iops 性能统计数据
+    Integer maxIops; //dme中QoS上限
+    Integer minIops; //dme中QoS下限
+    Integer iops; //dme中iops 性能统计数据
 
-    Integer maxBandwidth;   //带宽上限 单位MB/s
-    Integer minBandwidth;   //带宽下限 单位MB/s
-    Double bandwidth; //bandwidth 性能统计数据
+    Integer maxBandwidth;   //dme中带宽上限 单位MB/s
+    Integer minBandwidth;   //dme中带宽下限 单位MB/s
+    Double bandwidth; //dme中bandwidth 性能统计数据
 
-    Integer readResponseTime;   //读响应时间 单位ms  性能统计数据
-    Integer writeResponseTime; //写响应时间 单位ms   性能统计数据
-    Integer latency; //时延 单位ms
+    Integer readResponseTime;   //dme中读响应时间 单位ms  性能统计数据
+    Integer writeResponseTime; //dme中写响应时间 单位ms   性能统计数据
+    Integer latency; //dme中时延 单位ms
 
-    String volumeId; //卷ID
-    String wwn; //wwn
+    String volumeId; //dme中卷ID
+    String volumeName; //dme中卷名称
+    String wwn; //dme中wwn
 
     public String getWwn() {
         return wwn;
@@ -37,6 +38,14 @@ public class VmfsDataInfo {
 
     public void setWwn(String wwn) {
         this.wwn = wwn;
+    }
+
+    public String getVolumeName() {
+        return volumeName;
+    }
+
+    public void setVolumeName(String volumeName) {
+        this.volumeName = volumeName;
     }
 
     public String getObjectid() {
