@@ -13,11 +13,6 @@
 
    <!-- Services defined by this module   -->
 
-   <osgi:service id="EchoService" ref="EchoServiceImpl"
-         interface="com.dmeplugin.dmestore.services.EchoService" />
-
-   <osgi:service id="SampleActionService" ref="SampleActionServiceImpl"
-         interface="com.dmeplugin.dmestore.services.SampleActionService" />
 
    <osgi:service id="SystemService" ref="SystemServiceImpl"
                  interface="com.dmeplugin.dmestore.services.SystemService" />
@@ -72,7 +67,7 @@
 
   <!-- References to platform services used by the controllers -->
 
-   <osgi:reference id="dataService"
+  <!-- <osgi:reference id="dataService"
          interface="com.vmware.vise.data.query.DataService" />
 
    <osgi:reference id="objectReferenceService"
@@ -82,6 +77,6 @@
          interface="com.vmware.vise.vim.data.VimObjectReferenceService" />
 
    <osgi:reference id="userSessionService"
-                   interface="com.vmware.vise.usersession.UserSessionService"/>
+                   interface="com.vmware.vise.usersession.UserSessionService"/>-->
 
 </beans>

@@ -92,6 +92,7 @@ public class DPSqlFileConstant {
           + "\"CREATE_TIME\"  datetime NOT NULL,\n"
           + "\"PUSH_EVENT\"  BOOLEAN,\n"
           + "\"PUSH_EVENT_LEVEL\"  integer,\n"
-          + "CONSTRAINT UNIQUE_HOST_IP UNIQUE (HOST_IP)\n"
+          + "\"HOST_PORT\"  integer default 443,\n"
+          + "CONSTRAINT UNIQUE_DP_HOST_IP UNIQUE (HOST_IP)\n"
           + ");";
 }
