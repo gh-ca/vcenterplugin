@@ -4,6 +4,7 @@ package com.dmeplugin.dmestore.dao;
 import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
 import com.dmeplugin.dmestore.entity.DmeInfo;
 import com.dmeplugin.dmestore.exception.DataBaseException;
+import com.dmeplugin.dmestore.services.DmeConstants;
 import com.dmeplugin.dmestore.utils.CipherUtils;
 
 import java.sql.Connection;
@@ -81,19 +82,19 @@ public class DmeInfoDao extends H2DataBaseDao {
 
 
     private void checkIp(String ip) throws SQLException {
-        if (ip == null || ip.length() > 255) {
+        if (ip == null || ip.length() > DmeConstants.MAXLEN) {
             throw new SQLException("parameter ip is not correct");
         }
     }
 
     private void checkUserName(String userName) throws SQLException {
-        if (userName == null || userName.length() > 255) {
+        if (userName == null || userName.length() > DmeConstants.MAXLEN) {
             throw new SQLException("parameter userName is not correct");
         }
     }
 
     private void checkPassword(String password) throws SQLException {
-        if (password == null || password.length() > 255) {
+        if (password == null || password.length() > DmeConstants.MAXLEN) {
             throw new SQLException("parameter password is not correct");
         }
     }

@@ -105,6 +105,7 @@ public class DmeConstants {
     /**
      * Constant definition
      */
+    public static final int MAXLEN = 255;
     public static final String HTTP = "http";
     public static final String HOSTIP = "hostIp";
     public static final String ACCESSSESSION = "accessSession";
