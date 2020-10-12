@@ -41,7 +41,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     private VmfsAccessService vmfsAccessService;
 
-    private DmeNFSAccessService dmeNFSAccessService;
+    private DmeNFSAccessService dmeNfsAccessService;
 
     private VCSDKUtils vcsdkUtils;
 
@@ -563,8 +563,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         this.vmfsAccessService = vmfsAccessService;
     }
 
-    public void setDmeNFSAccessService(DmeNFSAccessService dmeNFSAccessService) {
-        this.dmeNFSAccessService = dmeNFSAccessService;
+    public void setDmeNfsAccessService(DmeNFSAccessService dmeNfsAccessService) {
+        this.dmeNfsAccessService = dmeNfsAccessService;
     }
 
     public void setVcsdkUtils(VCSDKUtils vcsdkUtils) {
@@ -627,7 +627,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 LOG.info("scan VMFS Datastore end");
             }else if(storageType.equals(ToolUtils.STORE_TYPE_NFS)){
                 LOG.info("scan NFS Datastore start");
-                dmeNFSAccessService.scanNfs();
+                dmeNfsAccessService.scanNfs();
                 LOG.info("scan NFS Datastore end");
             }else if(storageType.equals(ToolUtils.STORE_TYPE_ALL)){
                 //扫描vmfs
@@ -641,7 +641,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 //扫描nfs
                 try {
                     LOG.info("scan NFS Datastore start");
-                    dmeNFSAccessService.scanNfs();
+                    dmeNfsAccessService.scanNfs();
                     LOG.info("scan NFS Datastore end");
                 }catch (Exception e){
                     e.printStackTrace();
