@@ -13,13 +13,6 @@
 
     <context:property-placeholder location="classpath:application.properties"/>
 
-   <bean name="EchoServiceImpl" class="com.dmeplugin.dmestore.services.EchoServiceImpl">
-
-   </bean>
-
-   <bean name="SampleActionServiceImpl" class="com.dmeplugin.dmestore.services.SampleActionServiceImpl">
-
-   </bean>
 
     <bean name="dmeInfoDao" class="com.dmeplugin.dmestore.dao.DmeInfoDao">
         <property name="url" value="${h2.url}"/>
