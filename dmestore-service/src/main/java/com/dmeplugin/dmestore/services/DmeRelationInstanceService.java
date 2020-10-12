@@ -51,5 +51,10 @@ public interface DmeRelationInstanceService {
      *
      */
     Map<String, Map<String, Object>> getServiceLevelInstance();
+
+
+    Map<String, Map<String, Object>> getLunInstance();
+
+
 }
 

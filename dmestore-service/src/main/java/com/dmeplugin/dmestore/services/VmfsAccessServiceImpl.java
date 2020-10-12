@@ -124,6 +124,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                             vmfsDataInfo.setStatus(ToolUtils.jsonToStr(vjson2.get("status")));
                                             vmfsDataInfo.setServiceLevelName(ToolUtils.jsonToStr(vjson2.get("service_level_name")));
                                             vmfsDataInfo.setVmfsProtected(ToolUtils.jsonToBoo(vjson2.get("protected")));
+                                            vmfsDataInfo.setWwn(ToolUtils.jsonToStr(vjson2.get("volume_wwn")));
 
                                             String storageId = ToolUtils.jsonToStr(vjson2.get("storage_id"));
                                             vmfsDataInfo.setDeviceId(storageId);
@@ -481,8 +482,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                 List<Map<String, Object>> initiators = dmeAccessService.getDmeHostInitiators(demHostId);
                                 if(initiators!=null && initiators.size()>0){
                                     for(Map<String, Object> inimap : initiators){
-                                        String port_name = ToolUtils.getStr(inimap.get("port_name"));
-                                        if(wwniqns.contains(port_name)){
+                                        String portName = ToolUtils.getStr(inimap.get("port_name"));
+                                        if(wwniqns.contains(portName)){
                                             objId = demHostId;
                                             break;
                                         }
@@ -624,8 +625,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             List<String> initiatorName = new ArrayList<>();
                             for(Map<String, Object> inimap:initiators){
                                 if(inimap!=null && inimap.get("port_name")!=null) {
-                                    String port_name = ToolUtils.getStr(inimap.get("port_name"));
-                                    initiatorName.add(port_name);
+                                    String portName = ToolUtils.getStr(inimap.get("port_name"));
+                                    initiatorName.add(portName);
                                 }
                             }
 
@@ -674,7 +675,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     private List<Map<String, Object>> getVolumeByName(String volumeName,String hostId,String hostGroupId,
-                                                String ServiceLevelId,String storageId,String poolRawId) {
+                                                String serviceLevelId,String storageId,String poolRawId) {
         //根据卷名称,主机id,主机组id,服务等级id,存储设备ID，存储池ID 查询DME卷的信息
         List<Map<String, Object>> volumelist = null;
         String listVolumeUrl = LIST_VOLUME_URL + "?name=" + volumeName;
@@ -684,8 +685,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         if(!StringUtils.isEmpty(hostGroupId)){
             listVolumeUrl = listVolumeUrl + "&hostgroup_id=" + hostGroupId;
         }
-        if(!StringUtils.isEmpty(ServiceLevelId)){
-            listVolumeUrl = listVolumeUrl + "&service_level_id=" + ServiceLevelId;
+        if(!StringUtils.isEmpty(serviceLevelId)){
+            listVolumeUrl = listVolumeUrl + "&service_level_id=" + serviceLevelId;
         }
         if(!StringUtils.isEmpty(storageId)){
             listVolumeUrl = listVolumeUrl + "&storage_id=" + storageId;
@@ -905,14 +906,14 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
      * @Author wangxiangyong
      * @Description /vmfs datastore 卷详情查询
      * @Date 14:46 2020/9/3
-     * @Param [storage_objectId]
+     * @Param [storageObjectId]
      * @Return com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail
      **/
     @Override
-    public List<VmfsDatastoreVolumeDetail> volumeDetail(String storage_objectId) throws Exception {
+    public List<VmfsDatastoreVolumeDetail> volumeDetail(String storageObjectId) throws Exception {
         List<VmfsDatastoreVolumeDetail> list = new ArrayList<>();
         //根据存储ID获取磁盘ID
-        List<String> volumeIds = dmeVmwareRalationDao.getVolumeIdsByStorageId(storage_objectId);
+        List<String> volumeIds = dmeVmwareRalationDao.getVolumeIdsByStorageId(storageObjectId);
         for (String volumeId : volumeIds) {
             //调用DME接口获取卷详情
             String url = LIST_VOLUME_URL + "/" + volumeId;
@@ -1081,16 +1082,16 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 JsonArray attachments = volumJson.getAsJsonArray("attachments");
                 for (JsonElement attachment : attachments) {
                     //String volume_id = attachment.getAsJsonObject().get("volume_id").getAsString();//attachment中的volume_id和param中的volume_id应该是一致的
-                    String host_id = attachment.getAsJsonObject().get("host_id").getAsString();
-                    String hostgroup_id = attachment.getAsJsonObject().get("attached_host_group").getAsString();
+                    String hostId = attachment.getAsJsonObject().get("host_id").getAsString();
+                    String hostgroupId = attachment.getAsJsonObject().get("attached_host_group").getAsString();
                     List<String> volume_ids = Arrays.asList(volumeId);
 
                     params.put("volume_ids", volume_ids);
-                    if (!StringUtils.isEmpty(host_id)) {
-                        params.put("host_id", host_id);
+                    if (!StringUtils.isEmpty(hostId)) {
+                        params.put("host_id", hostId);
                     }
-                    if (!StringUtils.isEmpty(hostgroup_id)) {
-                        params.put("hostgroup_id", hostgroup_id);
+                    if (!StringUtils.isEmpty(hostgroupId)) {
+                        params.put("hostgroup_id", hostgroupId);
                     }
                     break;// break? volume 与host 及hostgroup的关系应该是1:1
                 }

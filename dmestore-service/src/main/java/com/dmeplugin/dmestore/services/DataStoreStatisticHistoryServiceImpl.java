@@ -157,38 +157,22 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         String obj_type_id = "1125921381679104";//SYS_LUN
         String relationName = "M_DjTierContainsLun";
         String objId = "";
-        String sourceInstanceId = "";
-        String targetInstanceId = "";
         Object indicatorIds = params.get("indicator_ids");
         Object objIds = params.get("obj_ids");
         List<String> ids = getObjIds(objIds);
         if (ids.size() > 0) {
             objId = ids.get(0);
         }
-        //查询serviceLevel的实例ID
-        Map<String, Map<String, Object>> serviceLevelInstance = dmeRelationInstanceService.getServiceLevelInstance();
-        if(null!=serviceLevelInstance){
-            Map<String, Object> slInstance = serviceLevelInstance.get(objId);
-            if(null != slInstance){
-                Object sourceIdObj = slInstance.get("resId");
-                if(null != sourceIdObj){
-                    sourceInstanceId = sourceIdObj.toString();
-                }
-            }
-        }
-        //查询lun的实例ID
-        RelationInstance instance = getInstance(relationName, sourceInstanceId);
-        if (null != instance) {
-            targetInstanceId = instance.getTargetInstanceId();
-            if (!StringUtils.isEmpty(targetInstanceId)) {
-                List<String> realObjIds = new ArrayList<>();
-                realObjIds.add(targetInstanceId);
-                params.put("obj_ids", realObjIds);
-            }
+        //查询serviceLevel关联的lun实例ID
+        String targetInstanceId = getTargetInstanceIdByRelationNameSourceId(relationName, objId);
+        if(!StringUtils.isEmpty(targetInstanceId)){
+            List<String> realObjIds = new ArrayList<>();
+            realObjIds.add(targetInstanceId);
+            params.put("obj_ids", realObjIds);
         }
         params.put("obj_type_id", obj_type_id);
         if (null == indicatorIds) {
-            indicatorIds = initServiceLevelIndicator();
+            indicatorIds = initServiceLevelLunIndicator();
             params.put("indicator_ids", indicatorIds);
         }
         return queryStatisticByObjType("serviceLevel Lun", params, targetInstanceId, objId);
@@ -199,36 +183,32 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         String obj_type_id = "1125912791744512";//SYS_StoragePool
         String relationName = "M_DjTierContainsStoragePool";
         String objId = "";
-        String targetInstanceId = "";
         Object indicatorIds = params.get("indicator_ids");
         Object objIds = params.get("obj_ids");
         List<String> ids = getObjIds(objIds);
         if (ids.size() > 0) {
             objId = ids.get(0);
         }
-        //查询lun的实例ID
-        RelationInstance instance = getInstance(relationName, objId);
-        if (null != instance) {
-            targetInstanceId = instance.getTargetInstanceId();
-            if (!StringUtils.isEmpty(targetInstanceId)) {
-                List<String> realObjIds = new ArrayList<>();
-                realObjIds.add(targetInstanceId);
-                params.put("obj_ids", realObjIds);
-            }
+        //查询serviceLevel关联的StoragePool的实例ID
+        String targetInstanceId = getTargetInstanceIdByRelationNameSourceId(relationName, objId);
+        if(!StringUtils.isEmpty(targetInstanceId)){
+            List<String> realObjIds = new ArrayList<>();
+            realObjIds.add(targetInstanceId);
+            params.put("obj_ids", realObjIds);
         }
         params.put("obj_type_id", obj_type_id);
         if (null == indicatorIds) {
-            indicatorIds = initServiceLevelIndicator();
+            indicatorIds = initServiceLevelStoragePoolIndicator();
             params.put("indicator_ids", indicatorIds);
         }
         return queryStatisticByObjType("serviceLevel StroagePool", params, targetInstanceId, objId);
     }
 
-    //id成对应的实例ID
-    private RelationInstance getInstance(String relationName, String id) {
+    //查询sourceId下relationName对应的关系
+    private RelationInstance getInstance(String relationName, String sourceId) {
         RelationInstance relationInstance = null;
         try {
-            List<RelationInstance> instances = dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(relationName, id);
+            List<RelationInstance> instances = dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(relationName, sourceId);
             if (instances.size() > 0) {
                 relationInstance = instances.get(0);
             }
@@ -236,6 +216,31 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             e.printStackTrace();
         }
         return relationInstance;
+    }
+
+    //通过resourceId 查询resourceInstanceId,再查询resourceInstanceId关联的关系类型的targetInstanceId
+    private String getTargetInstanceIdByRelationNameSourceId(String relationName, String resourceId){
+        String sourceInstanceId ="";
+        String targetInstanceId = "";
+        //获取sourceInstanceId
+        Map<String, Map<String, Object>> serviceLevelInstance = dmeRelationInstanceService.getServiceLevelInstance();
+        if(null!=serviceLevelInstance){
+            Map<String, Object> slInstance = serviceLevelInstance.get(resourceId);
+            if(null != slInstance){
+                Object sourceIdObj = slInstance.get("resId");
+                if(null != sourceIdObj){
+                    sourceInstanceId = sourceIdObj.toString();
+                }
+            }
+        }
+        //获取targetInstanceId
+        if(!StringUtils.isEmpty(sourceInstanceId)){
+            RelationInstance instance = getInstance(relationName, sourceInstanceId);
+            if (null != instance) {
+                targetInstanceId = instance.getTargetInstanceId();
+            }
+        }
+        return targetInstanceId;
     }
 
     //从ObjectIds中提取id

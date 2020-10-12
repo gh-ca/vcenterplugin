@@ -29,6 +29,15 @@ public class VmfsDataInfo {
     Integer latency; //时延 单位ms
 
     String volumeId; //卷ID
+    String wwn; //wwn
+
+    public String getWwn() {
+        return wwn;
+    }
+
+    public void setWwn(String wwn) {
+        this.wwn = wwn;
+    }
 
     public String getObjectid() {
         return objectid;
