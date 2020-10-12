@@ -116,7 +116,7 @@ export interface List {
   writeResponseTime: number;
   latency: number;
   volumeId: number;
-
+  volumeName: string;
 }
 // 存储
 export interface StorageList {

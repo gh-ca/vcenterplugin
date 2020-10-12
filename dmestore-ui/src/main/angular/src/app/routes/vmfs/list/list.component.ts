@@ -107,6 +107,8 @@ export class VmfsListComponent implements OnInit {
   // 生命周期： 初始化数据
 
   isServiceLevelData = true; // 编辑页面 所选数据是否为服务等级 true:是 false:否 若为是则不显示控制策略以及交通管制对象
+  mountHostData = true; // 挂载页面主机是否加载完毕 true是 false否
+  mountClusterData = true; // 挂载页面集群是否加载完毕 true是 false否
   ngOnInit() {
     // 列表数据
     this.refresh();
@@ -149,6 +151,9 @@ export class VmfsListComponent implements OnInit {
     // 设置修改的卷名称以及修改后的名称
     if (this.modifyForm.isSameName) {
       this.modifyForm.newVoName = this.modifyForm.name;
+    } else {
+      // 若不修改卷名称则将旧的卷名称设置为newVol
+      this.modifyForm.newVoName = this.rowSelected[0].volumeName;
     }
     this.modifyForm.newDsName = this.modifyForm.name;
     console.log('this.modifyForm:', this.modifyForm);
@@ -542,6 +547,7 @@ export class VmfsListComponent implements OnInit {
       this.cdr.detectChanges();
     });
   }
+
   // 挂载按钮点击事件
   mountBtnFunc() {
     // 初始化表单
@@ -549,24 +555,68 @@ export class VmfsListComponent implements OnInit {
     const objectIds = [];
     objectIds.push(this.rowSelected[0].objectid);
     this.mountForm.dataStoreObjectIds = objectIds;
-    // 获取服务器 通过ObjectId过滤已挂载的服务器
-    this.remoteSrv.getHostListByObjectId(this.rowSelected[0].objectid).subscribe((result: any) => {
-    // this.remoteSrv.getHostList().subscribe((result: any) => {
-      if (result.code === '200' && result.data !== null){
-        this.hostList = result.data;
-        this.cdr.detectChanges();
-      }
+
+    // 初始化主机
+    this.mountHostData = false;
+    this.hostList = [];
+    const hostNullInfo = {
+      hostId: '',
+      hostName: ''
+    };
+    this.hostList.push(hostNullInfo);
+    this.initMountHost().then(res => {
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
-    // 获取集群 通过ObjectId过滤已挂载的集群
-    this.remoteSrv.getClusterListByObjectId(this.rowSelected[0].objectid).subscribe((result: any) => {
-    // this.remoteSrv.getClusterList().subscribe((result: any) => {
-      if (result.code === '200'){
-        this.clusterList = result.data;
-        this.cdr.detectChanges();
-      }
+
+    // 初始化集群
+    this.mountClusterData = false;
+    this.clusterList = [];
+    const clusterNullInfo = {
+      clusterId: '',
+      clusterName: ''
+    }
+    this.clusterList.push(clusterNullInfo);
+
+    this.initMountCluster().then(res => {
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
+
     // 打开挂载页面
     this.mountShow = true;
+  }
+  // 挂载  集群数据初始化
+  initMountCluster() {
+    return new Promise((resolve, reject) => {
+      // 获取集群 通过ObjectId过滤已挂载的集群
+      this.remoteSrv.getClusterListByObjectId(this.rowSelected[0].objectid).subscribe((result: any) => {
+        if (result.code === '200'){
+          result.data.forEach(item => {
+            this.clusterList.push(item);
+          });
+        }
+        this.chooseCluster = this.clusterList[0];
+        this.mountClusterData = true;
+        resolve(this.deviceList);
+        this.cdr.detectChanges();
+      });
+    });
+  }
+  // 挂载 主机数据初始化
+  initMountHost() {
+    return new Promise((resolve, reject) => {
+      // 获取服务器 通过ObjectId过滤已挂载的服务器
+      this.remoteSrv.getHostListByObjectId(this.rowSelected[0].objectid).subscribe((result: any) => {
+        if (result.code === '200' && result.data !== null){
+          result.data.forEach(item => {
+            this.hostList.push(item);
+          });
+        }
+        this.chooseHost =  this.hostList[0];
+        this.mountHostData = true;
+        resolve(this.deviceList);
+        this.cdr.detectChanges();
+      });
+    });
   }
   // 挂载提交
   mountSubmit(){
