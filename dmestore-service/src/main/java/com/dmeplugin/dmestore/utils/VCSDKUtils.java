@@ -1286,19 +1286,32 @@ public class VCSDKUtils {
             if (!StringUtils.isEmpty(serverguid)) {
                 VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
                 //集群下的所有主机
-                List<Pair<ManagedObjectReference, String>> hosts = getHostsOnCluster(clusterObjectId, hostObjectId);
-
-                if (hosts != null && hosts.size() > 0) {
-                    for (Pair<ManagedObjectReference, String> host : hosts) {
-                        try {
-                            HostMO host1 = new HostMO(vmwareContext, host.first());
-                            _logger.info("Host under Cluster: " + host1.getName());
-                            host1.getHostStorageSystemMO().rescanVmfs();
-                        }catch (Exception ex){
-                            _logger.error("scan Data Store error:"+ex.toString());
+                List<Pair<ManagedObjectReference, String>> hosts = null;
+                if (!StringUtils.isEmpty(clusterObjectId)) {
+                    hosts = getHostsOnCluster(clusterObjectId, hostObjectId);
+                    if (hosts != null && hosts.size() > 0) {
+                        for (Pair<ManagedObjectReference, String> host : hosts) {
+                            try {
+                                HostMO host1 = new HostMO(vmwareContext, host.first());
+                                _logger.info("Host under Cluster: " + host1.getName());
+                                host1.getHostStorageSystemMO().rescanVmfs();
+                            }catch (Exception ex){
+                                _logger.error("under Cluster scan Data Store error:"+ex.toString());
+                            }
                         }
                     }
+                } else if (!StringUtils.isEmpty(hostObjectId)) {
+                    try {
+                        ManagedObjectReference objmor = vcConnectionHelper.objectID2MOR(hostObjectId);
+                        HostMO hostmo = new HostMO(vmwareContext, objmor);
+                        hostmo.getHostStorageSystemMO().rescanVmfs();
+                    }catch (Exception ex){
+                        _logger.error("scan Data Store error:"+ex.toString());
+                    }
                 }
+
+
+
             }
         } catch (Exception e) {
             _logger.error("scan Data Store error:", e);
