@@ -1,8 +1,11 @@
 package com.dmeplugin.dmestore.services.bestpractice;
 
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
+import com.dmeplugin.vmware.mo.HostDatastoreSystemMO;
 import com.dmeplugin.vmware.mo.HostMO;
+import com.dmeplugin.vmware.mo.HostStorageSystemMO;
 import com.dmeplugin.vmware.util.VmwareContext;
+import com.vmware.vim25.HostMultipathInfoLogicalUnit;
 import com.vmware.vim25.HostVirtualSwitch;
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.OptionValue;
@@ -126,6 +129,18 @@ public class BaseBestPracticeService {
         HostMO hostMo = new HostMO(context, mor);
         String v = optionName + "=" + String.valueOf(recommendValue);
         hostMo.getHostKernelModuleSystemMO().updateModuleOptionString(optionName, v);
+    }
+
+    protected void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
+        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
+        VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
+        HostMO hostMo = new HostMO(context, mor);
+        HostStorageSystemMO hostStorageSystemMO = hostMo.getHostStorageSystemMO();
+        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMO.getStorageDeviceInfo().getMultipathInfo().getLun();
+        for(HostMultipathInfoLogicalUnit hostMultipathInfoLogicalUnit : lunList){
+            //多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
+            hostMultipathInfoLogicalUnit.getPolicy().setPolicy("VMW_PSP_RR");
+        }
     }
 
 }

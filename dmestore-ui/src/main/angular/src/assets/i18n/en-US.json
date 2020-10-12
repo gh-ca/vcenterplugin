@@ -22,7 +22,7 @@
     "refresh": "Refresh"
   },
   "validations": {
-    "required": "This field is required",
+    "required": "This field is required!",
     "minlength": "Should have atleast {{number}} characters",
     "maxlength": "This value should be less than {{number}} characters",
     "min": "This value should be more than {{number}}",

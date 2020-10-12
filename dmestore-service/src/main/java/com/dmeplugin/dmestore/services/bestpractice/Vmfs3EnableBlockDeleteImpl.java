@@ -3,16 +3,16 @@ package com.dmeplugin.dmestore.services.bestpractice;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 
 /**
- * @ClassName VMFS3HardwareAcceleratedLockingImpl
+ * @ClassName VMFS3EnableBlockDeleteImpl
  * @Description TODO
  * @Author wangxiangyong
  * @Date 2020/9/15 10:26
  * @Version V1.0
  **/
-public class VMFS3HardwareAcceleratedLockingImpl extends BaseBestPracticeService implements BestPracticeService {
+public class Vmfs3EnableBlockDeleteImpl extends BaseBestPracticeService implements BestPracticeService {
     @Override
     public String getHostSetting() {
-        return "VMFS3.HardwareAcceleratedLocking";
+        return "VMFS3.EnableBlockDelete";
     }
 
     @Override
@@ -27,7 +27,7 @@ public class VMFS3HardwareAcceleratedLockingImpl extends BaseBestPracticeService
 
     @Override
     public String getLevel() {
-        return "Warning";
+        return "Info";
     }
 
     @Override

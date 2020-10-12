@@ -2,7 +2,6 @@ package com.dmeplugin.dmestore.services;
 
 
 import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
-import com.dmeplugin.dmestore.constant.SqlFileConstant;
 import com.dmeplugin.dmestore.dao.SystemDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,70 +19,6 @@ public class SystemServiceImpl implements SystemService {
   @Override
   public void initDB() {
     try {
-      systemDao.checkExistAndCreateTable(SqlFileConstant.HW_ESIGHT_HOST,
-          SqlFileConstant.HW_ESIGHT_HOST_SQL);
-      systemDao.checkExistAndCreateTable(SqlFileConstant.HW_ESIGHT_TASK,
-          SqlFileConstant.HW_ESIGHT_TASK_SQL);
-      systemDao.checkExistAndCreateTable(SqlFileConstant.HW_TASK_RESOURCE,
-          SqlFileConstant.HW_TASK_RESOURCE_SQL);
-      systemDao.checkExistAndCreateTable(SqlFileConstant.HW_ESIGHT_HA_SERVER, SqlFileConstant
-          .HW_ESIGHT_HA_SERVER_SQL);
-      systemDao.checkExistAndCreateTable(SqlFileConstant.HW_VCENTER_INFO,
-          SqlFileConstant.HW_VCENTER_INFO_SQL);
-      systemDao.checkExistAndCreateTable(SqlFileConstant.HW_SERVER_DEVICE_DETAIL, SqlFileConstant
-          .HW_SERVER_DEVICE_DETAIL_SQL);
-      systemDao.checkExistAndCreateTable(SqlFileConstant.HW_ALARM_DEFINITION, SqlFileConstant
-          .HW_ALARM_DEFINITION_SQL);
-
-      systemDao.checkExistTableColumnAnd(SqlFileConstant.HW_ESIGHT_HOST,
-          SqlFileConstant.HW_ESIGHT_HOST_SYSTEM_ID, SqlFileConstant.HW_ESIGHT_HOST_ALTER_SQL);
-      systemDao.checkExistTableColumnAnd(SqlFileConstant.HW_VCENTER_INFO,
-          SqlFileConstant.HW_VCENTER_INFO_STATE, SqlFileConstant.HW_VCENTER_INFO_STATE_ALTER_SQL);
-      systemDao.checkExistTableColumnAnd(SqlFileConstant.HW_ESIGHT_HA_SERVER,
-          SqlFileConstant.COLUMN_ESIGHT_SERVER_PARENT_DN,
-          SqlFileConstant.COLUMN_ESIGHT_SERVER_PARENT_DN_SQL);
-
-      // 20180823: add PUSH_EVENT(HW_VCENTER_INFO) column
-      systemDao.checkExistTableColumnAnd(SqlFileConstant.HW_VCENTER_INFO,
-          SqlFileConstant.HW_VCENTER_INFO_PUSHEVENT,
-          SqlFileConstant.HW_VCENTER_INFO_PUSHEVENT_ALTER_SQL);
-      systemDao.checkExistTableColumnAnd(SqlFileConstant.HW_VCENTER_INFO,
-          SqlFileConstant.HW_VCENTER_INFO_PUSHEVENTLEVEL,
-          SqlFileConstant.HW_VCENTER_INFO_PUSHEVENTLEVEL_ALTER_SQL);
-
-      // 20180825: add alarm definition columns
-      systemDao.checkExistTableColumnAnd(SqlFileConstant.HW_ALARM_DEFINITION,
-          SqlFileConstant.HW_ALARM_DEFINITION_SEVERITY,
-          SqlFileConstant.HW_ALARM_DEFINITION_SEVERITY_ALTER_SQL);
-      systemDao.checkExistTableColumnAnd(SqlFileConstant.HW_ALARM_DEFINITION,
-          SqlFileConstant.HW_ALARM_DEFINITION_EVENTTYPE,
-          SqlFileConstant.HW_ALARM_DEFINITION_EVENTTYPE_ALTER_SQL);
-      systemDao.checkExistTableColumnAnd(SqlFileConstant.HW_ALARM_DEFINITION,
-          SqlFileConstant.HW_ALARM_DEFINITION_DESCRIPTION,
-          SqlFileConstant.HW_ALARM_DEFINITION_DESCRIPTION_ALTER_SQL);
-
-      // 20180906: add esight columns for HA-provider state and Alarm-definition state
-      systemDao.checkExistTableColumnAnd(SqlFileConstant.HW_ESIGHT_HOST,
-          SqlFileConstant.HW_ESIGHT_HOST_HA_PROVIDER,
-          SqlFileConstant.HW_ESIGHT_HOST_HA_PROVIDER_ALTER_SQL);
-      systemDao.checkExistTableColumnAnd(SqlFileConstant.HW_ESIGHT_HOST,
-          SqlFileConstant.HW_ESIGHT_HOST_ALARM_DEFINITION,
-          SqlFileConstant.HW_ESIGHT_HOST_ALARM_DEFINITION_ALTER_SQL);
-
-      // 20181112: esight server certificate thumbprints
-      systemDao.checkExistAndCreateTable(SqlFileConstant.HW_ESIGHT_THUMBPRINT,
-          SqlFileConstant.HW_ESIGHT_THUMBPRINT_SQL);
-
-      // 20190219: add vcenter info port
-      systemDao.checkExistTableColumnAnd(SqlFileConstant.HW_VCENTER_INFO,
-          SqlFileConstant.HW_VCENTER_INFO_HOSTPORT,
-          SqlFileConstant.HW_VCENTER_INFO_HOSTPORT_ALTER_SQL);
-
-      // 20190220: use same as FD event
-      systemDao.checkExistAndCreateTable(SqlFileConstant.HW_HA_COMPONENT,
-          SqlFileConstant.HW_HA_COMPONENT_SQL);
-      systemDao.checkExistAndCreateTable(SqlFileConstant.HW_ALARM_RECORD,
-          SqlFileConstant.HW_ALARM_RECORD_SQL);
 
       // 20200904 add table DP_DME_ACCESS_INFO
       systemDao.checkExistAndCreateTable(DPSqlFileConstant.DP_DME_ACCESS_INFO,
@@ -92,13 +27,17 @@ public class SystemServiceImpl implements SystemService {
       systemDao.checkExistAndCreateTable(DPSqlFileConstant.DP_DME_VMWARE_RELATION,
               DPSqlFileConstant.DP_DME_VMWARE_RELATION_SQL);
 
-      //20200916 add table HW_BEST_PRACTICE_CHECK
-      systemDao.checkExistAndCreateTable(DPSqlFileConstant.HW_BEST_PRACTICE_CHECK,
-              DPSqlFileConstant.HW_BEST_PRACTICE_CHECK_SQL);
+      //20200916 add table DP_DME_BEST_PRACTICE_CHECK
+      systemDao.checkExistAndCreateTable(DPSqlFileConstant.DP_DME_BEST_PRACTICE_CHECK,
+              DPSqlFileConstant.DP_DME_BEST_PRACTICE_CHECK_SQL);
 
       // 20200922 add table DP_DME_TASK_INFO
       systemDao.checkExistAndCreateTable(DPSqlFileConstant.DP_DME_TASK_INFO,
               DPSqlFileConstant.DP_DME_TASK_INFO_SQL);
+
+      // 20201012 add table DP_DME_VCENTER_INFO
+      systemDao.checkExistAndCreateTable(DPSqlFileConstant.DP_DME_VCENTER_INFO,
+              DPSqlFileConstant.DP_DME_VCENTER_INFO_SQL);
 
       LOGGER.info("creating table over...");
 
@@ -109,7 +48,6 @@ public class SystemServiceImpl implements SystemService {
       systemDao.initData(DPSqlFileConstant.DP_DME_TASK_DATA_SCANDATASTORE_SQL);
 
       LOGGER.info("init data over...");
-      vCenterInfoService.deleteHASyncAndDeviceData();
     } catch (Exception e) {
       LOGGER.error("Failed to init DB: " + e.getMessage());
     }

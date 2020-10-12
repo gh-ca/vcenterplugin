@@ -7,7 +7,7 @@ package com.dmeplugin.dmestore.model;
  * @Date 2020/9/2 16:48
  * @Version V1.0
  **/
-public class VmRDMCreateBean {
+public class VmRdmCreateBean {
     private CreateVolumesRequest createVolumesRequest;
     private CustomizeVolumesRequest customizeVolumesRequest;
 
