@@ -102,21 +102,16 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                     double uncommitted = ToolUtils.getDouble(jo.get("uncommitted")) / ToolUtils.GI;
 
                                     vmfsDataInfo.setName(ToolUtils.jsonToStr(jo.get("name")));
-
                                     vmfsDataInfo.setCapacity(capacity);
                                     vmfsDataInfo.setFreeSpace(freeSpace);
                                     vmfsDataInfo.setReserveCapacity(capacity + uncommitted - freeSpace);
-
                                     vmfsDataInfo.setObjectid(ToolUtils.jsonToStr(jo.get("objectid")));
 
                                     DmeVmwareRelation dvr = dvrMap.get(vmwareStoreobjectid);
-                                    String volid = dvr.getVolumeId();
-                                    LOG.info("volid==" + volid);
-                                    //然后通过vmfs中的url值去DME系统中查询对应wwn的卷信息。
-                                    ///rest/blockservice/v1/volumes?volume_wwn=wwn
+                                    String volumeId = dvr.getVolumeId();
+                                    LOG.info("volumeId==" + volumeId);
                                     //这里由于DME系统中的卷太多。是分页查询，所以需要vmfs一个个的去查DME系统中的卷。
-                                    //而每次查询DME中的卷都需要调用两次，分别是查卷列表接口，查卷详细接口。
-                                    String detailedVolumeUrl = LIST_VOLUME_URL + "/" + volid;
+                                    String detailedVolumeUrl = LIST_VOLUME_URL + "/" + volumeId;
                                     try {
                                         ResponseEntity responseEntity = dmeAccessService.access(detailedVolumeUrl, HttpMethod.GET, null);
                                         LOG.info("volid responseEntity==" + responseEntity.toString());
