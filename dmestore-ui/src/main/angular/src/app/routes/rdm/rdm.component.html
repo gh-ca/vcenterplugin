@@ -92,7 +92,7 @@
         <label>{{'rdm.sPool' | translate}}<span style="color: red">*</span></label>:
         <select clrSelect [(ngModel)]="configModel.pool_raw_id" name="pool_raw_id" >
           <option value=""></option>
-          <option *ngFor="let item of storagePools" value="{{item.pool_raw_id}}">{{item.name}}</option>
+          <option *ngFor="let item of storagePools" value="{{item.storage_pool_id}}">{{item.name}}</option>
         </select>
       </clr-select-container>
 

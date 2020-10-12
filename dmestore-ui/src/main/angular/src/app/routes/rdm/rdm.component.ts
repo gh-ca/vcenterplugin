@@ -83,7 +83,7 @@ export class RdmComponent implements OnInit {
   }
 
   loadStoragePool(storageId: string){
-    this.http.get('dmestorage/storagepools', {params: {storageId}}).subscribe((result: any) => {
+    this.http.get('dmestorage/storagepools', {params: {storageId, media_type: "all"}}).subscribe((result: any) => {
 
       if (result.code === '0' || result.code === '200'){
         this.storagePools = result.data.data;
