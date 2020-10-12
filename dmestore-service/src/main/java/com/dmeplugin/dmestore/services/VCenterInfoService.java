@@ -25,11 +25,5 @@ public interface VCenterInfoService {
     boolean disableVCenterInfo();
 
 
-    int saveJksThumbprints(InputStream inputStream, String password);
-
-    void saveThumbprints(String[] thumbprints);
-
-    String[] getThumbprints() throws SQLException;
-
 
 }

@@ -27,7 +27,7 @@ public class SystemServiceImpl implements SystemService {
       systemDao.checkExistAndCreateTable(DPSqlFileConstant.DP_DME_VMWARE_RELATION,
               DPSqlFileConstant.DP_DME_VMWARE_RELATION_SQL);
 
-      //20200916 add table HW_BEST_PRACTICE_CHECK
+      //20200916 add table DP_DME_BEST_PRACTICE_CHECK
       systemDao.checkExistAndCreateTable(DPSqlFileConstant.DP_DME_BEST_PRACTICE_CHECK,
               DPSqlFileConstant.DP_DME_BEST_PRACTICE_CHECK_SQL);
 

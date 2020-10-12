@@ -29,7 +29,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         PreparedStatement pstm = null;
         try {
             con = getConnection();
-            String sql = "insert into HW_BEST_PRACTICE_CHECK(HOST_ID,HOST_NAME,HOST_SETTING,RECOMMEND_VALUE,ACTUAL_VALUE,HINT_LEVEL,NEED_REBOOT,AUTO_REPAIR,CREATE_TIME) values(?,?,?,?,?,?,?,?,?)";
+            String sql = "insert into DP_DME_BEST_PRACTICE_CHECK(HOST_ID,HOST_NAME,HOST_SETTING,RECOMMEND_VALUE,ACTUAL_VALUE,HINT_LEVEL,NEED_REBOOT,AUTO_REPAIR,CREATE_TIME) values(?,?,?,?,?,?,?,?,?)";
             pstm = con.prepareStatement(sql);
             //不自动提交
             con.setAutoCommit(false);
@@ -66,7 +66,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT HOST_NAME from HW_BEST_PRACTICE_CHECK where 1=1 ";
+            String sql = "SELECT HOST_NAME from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
             if (!StringUtils.isEmpty(hostSetting)) {
                 sql = sql + " and HOST_SETTING='" + hostSetting + "'";
             }
@@ -91,7 +91,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT HOST_ID from HW_BEST_PRACTICE_CHECK where 1=1 ";
+            String sql = "SELECT HOST_ID from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
             if(pageNo > 0 &&  pageSize > 0){
                 int offset = (pageNo - 1) * pageSize;
                 sql = sql + " OFFSET " + offset + " ROWS FETCH FIRST " + pageSize + " ROWS ONLY";
@@ -118,7 +118,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT HOST_ID,HOST_NAME,HOST_SETTING,RECOMMEND_VALUE,ACTUAL_VALUE,HINT_LEVEL,NEED_REBOOT,AUTO_REPAIR from HW_BEST_PRACTICE_CHECK where 1=1 ";
+            String sql = "SELECT HOST_ID,HOST_NAME,HOST_SETTING,RECOMMEND_VALUE,ACTUAL_VALUE,HINT_LEVEL,NEED_REBOOT,AUTO_REPAIR from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
             if (!StringUtils.isEmpty(hostSetting)) {
                 sql = sql + " and HOST_SETTING='" + hostSetting + "'";
             }
@@ -146,7 +146,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT HOST_ID,HOST_NAME,HOST_SETTING,RECOMMEND_VALUE,ACTUAL_VALUE,HINT_LEVEL,NEED_REBOOT,AUTO_REPAIR from HW_BEST_PRACTICE_CHECK where 1=1 ";
+            String sql = "SELECT HOST_ID,HOST_NAME,HOST_SETTING,RECOMMEND_VALUE,ACTUAL_VALUE,HINT_LEVEL,NEED_REBOOT,AUTO_REPAIR from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
             if (!StringUtils.isEmpty(hostSetting)) {
                 sql = sql + " and HOST_SETTING='" + hostSetting + "'";
             }
@@ -187,7 +187,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         PreparedStatement pstm = null;
         try {
             con = getConnection();
-            String sql = "delete from HW_BEST_PRACTICE_CHECK where host_id=? and host_setting=?";
+            String sql = "delete from DP_DME_BEST_PRACTICE_CHECK where host_id=? and host_setting=?";
             pstm = con.prepareStatement(sql);
             con.setAutoCommit(false);
             for (BestPracticeUpResultResponse response : list) {
@@ -222,7 +222,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         PreparedStatement pstm = null;
         try {
             con = getConnection();
-            String sql = "delete from HW_BEST_PRACTICE_CHECK where host_name=? and host_setting=?";
+            String sql = "delete from DP_DME_BEST_PRACTICE_CHECK where host_name=? and host_setting=?";
             pstm = con.prepareStatement(sql);
             con.setAutoCommit(false);
             for (String hostName : list) {
