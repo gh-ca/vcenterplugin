@@ -101,4 +101,19 @@ public class DmeConstants {
      *
      */
     public static final String DME_RESOURCE_INSTANCE_LIST = "/rest/resourcedb/v1/instances/#{className}";
+
+    /**
+     * Constant definition
+     */
+    public static final String HTTP = "http";
+    public static final String HOSTIP = "hostIp";
+    public static final String ACCESSSESSION = "accessSession";
+    public static final String DATAS = "datas";
+    public static final String HOSTS = "hosts";
+    public static final String INITIATORS = "initiators";
+    public static final String HOSTGROUPS = "hostgroups";
+    public static final String HOST = "host";
+    public static final String ID = "id";
+    public static final String CLUSTER = "cluster";
+    public static final String HOSTIDS = "hostids";
 }
