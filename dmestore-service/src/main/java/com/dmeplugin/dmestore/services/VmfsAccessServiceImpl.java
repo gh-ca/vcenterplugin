@@ -121,7 +121,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                             JsonObject vjson2 = voljson.getAsJsonObject("volume");
 
                                             vmfsDataInfo.setVolumeId(ToolUtils.jsonToStr(vjson2.get("id")));
-                                            vmfsDataInfo.setVolumeName(ToolUtils.jsonToStr(vjson2.get("name")));
                                             vmfsDataInfo.setStatus(ToolUtils.jsonToStr(vjson2.get("status")));
                                             vmfsDataInfo.setServiceLevelName(ToolUtils.jsonToStr(vjson2.get("service_level_name")));
                                             vmfsDataInfo.setVmfsProtected(ToolUtils.jsonToBoo(vjson2.get("protected")));
