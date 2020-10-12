@@ -1100,11 +1100,13 @@ public class VCSDKUtils {
     }
 
     //vmfs存储打标记 20200918objectId
-    public String attachTag(String datastoreType, String datastoreId, String serviceLevelName) throws Exception {
+    public String attachTag(String datastoreType, String datastoreId, String serviceLevelName, VCenterInfo vCenterInfo) throws Exception {
         String attachTagStr = "";
-        String vmwareUrl = "10.143.132.248";
-        String vmwareUserName = "administrator@vsphere.local";
-        String vmwarePassword = "Pbu4@123";
+
+        if(vCenterInfo==null || StringUtils.isEmpty(vCenterInfo.getHostIp())){
+            _logger.error("vCenter Info is null");
+            return null;
+        }
 
         SessionHelper sessionHelper = null;
         try {
@@ -1122,7 +1124,7 @@ public class VCSDKUtils {
             }
 
             sessionHelper = new SessionHelper();
-            sessionHelper.login(vmwareUrl, vmwareUserName, vmwarePassword);
+            sessionHelper.login(vCenterInfo.getHostIp(), vCenterInfo.getUserName(), vCenterInfo.getPassword());
             TaggingWorkflow taggingWorkflow = new TaggingWorkflow(sessionHelper);
 
             List<String> taglist = taggingWorkflow.listTags();
@@ -1138,9 +1140,7 @@ public class VCSDKUtils {
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
             _logger.error("DataStore:" + datastoreId + " error:", e);
-            throw e;
         } finally {
             if (sessionHelper != null) {
                 sessionHelper.logout();

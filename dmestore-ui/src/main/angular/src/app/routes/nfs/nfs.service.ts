@@ -231,6 +231,7 @@ export class ChartOptions{
   yAxis: YAxis;
   tooltip: Tooltip;
   legend: Legend;
+  color: string[];
   series: Serie[];
 
 }
@@ -255,6 +256,11 @@ export class YAxis{
   splitNumber: number;
   boundaryGap: string[];
   axisLine: AxisLine;
+  splitLine: SplitLine;
+}
+export class SplitLine {
+  show: boolean;
+  lineStyle: LineStyle;
 }
 export class AxisLine{
   show: boolean;
@@ -337,7 +343,7 @@ export class MakePerformance {
         end_time: endTime,
       }
       this.remoteSrv.getLineChartData(url, params).subscribe((result: any) => {
-        console.log('chartData: ', result);
+        console.log('chartData: ', title, result);
         if (result.code === '200' && result.data !== null && result.data.data !== null) {
           const resData = result.data;
             // 设置标题
@@ -365,7 +371,7 @@ export class MakePerformance {
           // 设置X轴
           this.setXAxisData(uppers, chart);
           // 设置y轴最大值
-          chart.yAxis.max = (pmaxData > lmaxData ? pmaxData : lmaxData) + 2;
+          chart.yAxis.max = (pmaxData > lmaxData ? pmaxData : lmaxData);
           console.log('chart.yAxis.pmaxData', pmaxData);
           console.log('chart.yAxis.lmaxData', lmaxData);
           // 设置上限、均值 折线图数据
@@ -434,6 +440,12 @@ export class MakePerformance {
     const axisLine: AxisLine = new AxisLine();
     axisLine.show = false;
     yAxis.axisLine = axisLine;
+    const splitLine = new SplitLine();
+    splitLine.show = true;
+    const lineStyle = new LineStyle();
+    lineStyle.type = 'dashed';
+    splitLine.lineStyle = lineStyle;
+    yAxis.splitLine = splitLine;
 
     chart.yAxis = yAxis;
     // 提示框
@@ -446,19 +458,22 @@ export class MakePerformance {
     tooltip.axisPointer = axisPointer;
     chart.tooltip = tooltip;
 
-    // 提示数据
+    // 指标
     const legend: Legend = new Legend();
     const legendData: LegendData[] = [];
-    legendData.push(this.setLengdData('Upper Limit', null));
-    legendData.push(this.setLengdData('Lower Limit', null));
-    legendData.push(this.setLengdData('Read', 'triangle'));
-    legendData.push(this.setLengdData('Write', 'triangle'));
+    legendData.push(this.setLengdData('Upper Limit', 'line'));
+    legendData.push(this.setLengdData('Lower Limit', 'line'));
+    legendData.push(this.setLengdData('Read', 'circle'));
+    legendData.push(this.setLengdData('Write', 'circle'));
     legend.x = 'right';
     legend.y = 'top';
     legend.selectedMode  = true;
     legend.data = legendData;
 
     chart.legend = legend;
+    // 指标颜色
+    const colors:string[] = ['#DB2000', '#F8E082', '#6870c4', '#01bfa8'];
+    chart.color = colors;
 
     // 数据(格式)
     const series: Serie[] = [];

@@ -28,6 +28,7 @@ import java.util.*;
 public class ServiceLevelServiceImpl implements ServiceLevelService {
     private static final Logger log = LoggerFactory.getLogger(ServiceLevelServiceImpl.class);
 
+    public static Map<String, Map<String, Object>> serviceLevelInstance = new HashMap<>();
 
     private Gson gson = new Gson();
     @Autowired
@@ -44,6 +45,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     private static final String POLICY_DESC = "policy created by dme";
 
     private final String LIST_SERVICE_LEVEL_URL = "/rest/service-policy/v1/service-levels";
+    private final String QUERY_SERVICE_LEVEL_VOLUME_URL = "/rest/blockservice/v1/volumes?service_level_id={serviceLevelId}";
 
     public DmeAccessService getDmeAccessService() {
         return dmeAccessService;
@@ -104,11 +106,11 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             }
             Object object = responseEntity.getBody();
             slis = convertBean(object);
-            if(slis.size() >0){
+            if (slis.size() > 0) {
                 Map<String, List<SimpleServiceLevel>> slMap = new HashMap<>();
                 slMap.put("service-levels", slis);
                 remap.put("data", slMap);
-            }else{
+            } else {
                 remap.put("data", object);
             }
         } catch (Exception e) {
@@ -314,25 +316,43 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
     @Override
     public List<Volume> getVolumeInfosByServiceLevelId(String serviceLevelId) throws Exception {
-        List<Volume> volumeList = new ArrayList<>();
-        //1 获取serviveLevel关联的volumeId
-        List<String> volumeIds = getVolumeIdsByServiceLivelId(serviceLevelId);
-        //2 根据volumeId查询olume信息
-        if (null != volumeIds && volumeIds.size() > 0) {
-            for (String volumeId : volumeIds) {
-                Map<String, Object> map = dmeStorageService.getVolume(volumeId);
-                if ("200".equals(map.get("code").toString())) {
-                    Volume volume = (Volume) map.get("data");
-                    volumeList.add(volume);
-                }
+        List<Volume> volumes = new ArrayList<>();
+        String url = QUERY_SERVICE_LEVEL_VOLUME_URL.replace("{serviceLevelId}", serviceLevelId);
+
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+        log.info("ServiceLevelServiceImpl/getVolumeInfosByServiceLevelId/responseEntity==" + responseEntity);
+        int code = responseEntity.getStatusCodeValue();
+        if (code != 200) {
+            return volumes;
+        }
+        Object object = responseEntity.getBody();
+        if (object != null) {
+            JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
+            JsonArray array = jsonObject.get("volumes").getAsJsonArray();
+            for (JsonElement je : array) {
+                JsonObject element = je.getAsJsonObject();
+                Volume volume = new Volume();
+                volume.setId(ToolUtils.jsonToStr(element.get("id")));
+                volume.setName(ToolUtils.jsonToStr(element.get("name")));
+                volume.setStatus(ToolUtils.jsonToStr(element.get("status")));
+                volume.setAttached(ToolUtils.jsonToBoo(element.get("attached")));
+                volume.setAlloctype(ToolUtils.jsonToStr(element.get("alloctype")));
+                volume.setService_level_name(ToolUtils.jsonToStr(element.get("service_level_name")));
+                volume.setStorage_id(ToolUtils.jsonToStr(element.get("storage_id")));
+                volume.setPool_raw_id(ToolUtils.jsonToStr(element.get("pool_raw_id")));
+                volume.setCapacity_usage(ToolUtils.jsonToStr(element.get("capacity_usage")));
+                volume.setProtectionStatus(ToolUtils.jsonToBoo(element.get("protectionStatus")));
+                volume.setCapacity(ToolUtils.jsonToInt(element.get("capacity"), 0));
+                //JsonArray jsonArray = element.get("attachments").getAsJsonArray();
+                volumes.add(volume);
             }
         }
-        return volumeList;
+        return volumes;
     }
 
     private List<StoragePool> getStoragePoolInfosByStorageIdStoragePoolIds(String storageDeviceId, List<String> storagePoolIds) {
         List<StoragePool> sps = new ArrayList<>();
-        Map<String, Object> resp = dmeStorageService.getStoragePools(storageDeviceId);
+        Map<String, Object> resp = dmeStorageService.getStoragePools(storageDeviceId,"all");
         String code = resp.get("code").toString();
         if ("200".equals(code)) {
             List<StoragePool> storagePools = (List<StoragePool>) resp.get("data");
@@ -352,7 +372,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return getContainIdsByRelationNameLevelId(relatinName, serviceLevelId);
     }
 
-    //服务等级 发现服务等级下的卷
+    //服务等级 发现服务等级下的卷实例ID
     public List<String> getVolumeIdsByServiceLivelId(String serviceLevelId) throws Exception {
         String relationName = "M_DjTierContainsLun";
         return getContainIdsByRelationNameLevelId(relationName, serviceLevelId);
@@ -396,12 +416,10 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
         sp.setName(name);
         sp.setStorage_pool_id(poolId);
-        sp.setStorage_device_id(storageDeviceId);
         sp.setStorage_instance_id(storagePoolInstanceId);
 
         return sp;
     }
-
 
     /*public static void main(String[] args) {
         String str = "{\"service-levels\":[{\"id\": \"UUID\",\"name\": \"service-level_block\",\"description\": \"block service-level for dj\",\"type\":\"BLOCK\",\"protocol\": \"FC\",\"total_capacity\": 200,\"free_capacity\": 200,\"used_capacity\":100,\"capabilities\": {\"resource_type\": \"thin\",\"compression\": true,\"deduplication\": true,\"smarttier\": {\"policy\": \"1\",\"enabled\": true},\"qos\": {\"enabled\": true,\"qos_param\":{\"latency\":\"10\",\"latencyUnit\": \"ms\",\"minBandWidth\": 1000,\"minIOPS\": 1000}}}}]}";

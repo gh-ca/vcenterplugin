@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.model.RelationInstance;
 import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.google.gson.*;
@@ -25,6 +26,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private Gson gson = new Gson();
     @Autowired
     private DmeAccessService dmeAccessService;
+    @Autowired
+    private DmeRelationInstanceService dmeRelationInstanceService;
+
 
     private final String STATISTIC_QUERY = "/rest/metrics/v1/data-svc/history-data/action/query";
     private final String OBJ_TYPES_LIST = "/rest/metrics/v1/mgr-svc/obj-types";
@@ -67,7 +71,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         params.put("obj_type_id", obj_type_id);
         params.put("range", RANGE_LAST_5_MINUTE);
         params.put("interval", INTERVAL_ONE_MINUTE);
-        Map<String, Object> resp = queryStatisticByObjType("VMFS volume", params);
+        Map<String, Object> resp = queryStatisticByObjType("VMFS volume", params, null, null);
         String code = resp.get("code").toString();
         if ("200".equals(code)) {
             Object data = resp.get("data");
@@ -99,7 +103,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         params.put("obj_type_id", obj_type_id);
         params.put("range", RANGE_LAST_5_MINUTE);
         params.put("interval", INTERVAL_ONE_MINUTE);
-        Map<String, Object> resp = queryStatisticByObjType("NFS", params);
+        Map<String, Object> resp = queryStatisticByObjType("NFS", params, null, null);
         String code = resp.get("code").toString();
         if ("200".equals(code)) {
             Object data = resp.get("data");
@@ -120,7 +124,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicatorIds = initVolumeIndicator();
             params.put("indicator_ids", indicatorIds);
         }
-        return queryStatisticByObjType("volume", params);
+        return queryStatisticByObjType("volume", params, null, null);
     }
 
     //查询FS的性能(NFS)
@@ -133,7 +137,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicatorIds = initFsIndicator();
             params.put("indicator_ids", indicatorIds);
         }
-        return queryStatisticByObjType("fs", params);
+        return queryStatisticByObjType("fs", params, null, null);
     }
 
     @Override
@@ -145,11 +149,114 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicatorIds = initServiceLevelIndicator();
             params.put("indicator_ids", indicatorIds);
         }
-        return queryStatisticByObjType("serviceLevel", params);
+        return queryStatisticByObjType("serviceLevel", params, null, null);
+    }
+
+    @Override
+    public Map<String, Object> queryServiceLevelLunStatistic(Map<String, Object> params) throws Exception {
+        String obj_type_id = "1125921381679104";//SYS_LUN
+        String relationName = "M_DjTierContainsLun";
+        String objId = "";
+        String sourceInstanceId = "";
+        String targetInstanceId = "";
+        Object indicatorIds = params.get("indicator_ids");
+        Object objIds = params.get("obj_ids");
+        List<String> ids = getObjIds(objIds);
+        if (ids.size() > 0) {
+            objId = ids.get(0);
+        }
+        //查询serviceLevel的实例ID
+        Map<String, Map<String, Object>> serviceLevelInstance = dmeRelationInstanceService.getServiceLevelInstance();
+        if(null!=serviceLevelInstance){
+            Map<String, Object> slInstance = serviceLevelInstance.get(objId);
+            if(null != slInstance){
+                Object sourceIdObj = slInstance.get("resId");
+                if(null != sourceIdObj){
+                    sourceInstanceId = sourceIdObj.toString();
+                }
+            }
+        }
+        //查询lun的实例ID
+        RelationInstance instance = getInstance(relationName, sourceInstanceId);
+        if (null != instance) {
+            targetInstanceId = instance.getTargetInstanceId();
+            if (!StringUtils.isEmpty(targetInstanceId)) {
+                List<String> realObjIds = new ArrayList<>();
+                realObjIds.add(targetInstanceId);
+                params.put("obj_ids", realObjIds);
+            }
+        }
+        params.put("obj_type_id", obj_type_id);
+        if (null == indicatorIds) {
+            indicatorIds = initServiceLevelIndicator();
+            params.put("indicator_ids", indicatorIds);
+        }
+        return queryStatisticByObjType("serviceLevel Lun", params, targetInstanceId, objId);
+    }
+
+    @Override
+    public Map<String, Object> queryServiceLevelStoragePoolStatistic(Map<String, Object> params) throws Exception {
+        String obj_type_id = "1125912791744512";//SYS_StoragePool
+        String relationName = "M_DjTierContainsStoragePool";
+        String objId = "";
+        String targetInstanceId = "";
+        Object indicatorIds = params.get("indicator_ids");
+        Object objIds = params.get("obj_ids");
+        List<String> ids = getObjIds(objIds);
+        if (ids.size() > 0) {
+            objId = ids.get(0);
+        }
+        //查询lun的实例ID
+        RelationInstance instance = getInstance(relationName, objId);
+        if (null != instance) {
+            targetInstanceId = instance.getTargetInstanceId();
+            if (!StringUtils.isEmpty(targetInstanceId)) {
+                List<String> realObjIds = new ArrayList<>();
+                realObjIds.add(targetInstanceId);
+                params.put("obj_ids", realObjIds);
+            }
+        }
+        params.put("obj_type_id", obj_type_id);
+        if (null == indicatorIds) {
+            indicatorIds = initServiceLevelIndicator();
+            params.put("indicator_ids", indicatorIds);
+        }
+        return queryStatisticByObjType("serviceLevel StroagePool", params, targetInstanceId, objId);
+    }
+
+    //id成对应的实例ID
+    private RelationInstance getInstance(String relationName, String id) {
+        RelationInstance relationInstance = null;
+        try {
+            List<RelationInstance> instances = dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(relationName, id);
+            if (instances.size() > 0) {
+                relationInstance = instances.get(0);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return relationInstance;
+    }
+
+    //从ObjectIds中提取id
+    private List<String> getObjIds(Object objIds) {
+        List<String> objectIds = new ArrayList<>();
+        if (null != objIds) {
+            JsonArray objIdJsonArray = new JsonParser().parse(objIds.toString()).getAsJsonArray();
+            for (JsonElement element : objIdJsonArray) {
+                try {
+                    String id = element.getAsString();
+                    objectIds.add(id);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return objectIds;
     }
 
     //query statistic by objType
-    private Map<String, Object> queryStatisticByObjType(String objectType, Map<String, Object> params) throws Exception {
+    private Map<String, Object> queryStatisticByObjType(String objectType, Map<String, Object> params, String instanceId, String replaceWithId) throws Exception {
         Map<String, Object> resmap = new HashMap<>();
         resmap.put("code", 200);
         resmap.put("message", "query" + objectType + "Statistic success!");
@@ -164,7 +271,12 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             responseEntity = queryStatistic(params);
             if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
                 Object body = responseEntity.getBody();
-                JsonObject bodyJson = new JsonParser().parse(body.toString()).getAsJsonObject();
+                String bodyStr = body.toString();
+                //将性能数据结果中的instanceId转换为参数传递的id
+                if (!StringUtils.isEmpty(instanceId) && !StringUtils.isEmpty(replaceWithId)) {
+                    bodyStr = bodyStr.replace(instanceId, replaceWithId);
+                }
+                JsonObject bodyJson = new JsonParser().parse(bodyStr).getAsJsonObject();
                 statisticElement = bodyJson.get("data");
                 Map<String, Object> objectMap = convertMap(statisticElement);
                 resmap.put("data", objectMap);
@@ -207,7 +319,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         requestbody.put("obj_ids", objIds);
         requestbody.put("interval", interval);
         requestbody.put("range", range);
-        if(RANG_BEGIN_END_TIME.equals(range)){
+        if (RANG_BEGIN_END_TIME.equals(range)) {
             String beginTime = ToolUtils.getStr(params.get("begin_time"));
             String endTime = ToolUtils.getStr(params.get("end_time"));
             requestbody.put("begin_time", beginTime);
@@ -383,6 +495,22 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         indicators.add(DmeIndicatorConstants.COUNTER_ID_SERVICELECVEL_MAXRESPONSETIME);//maxResponseTime
         indicators.add(DmeIndicatorConstants.COUNTER_ID_SERVICELEVEL_BANDWIDTHTIB);//bandwidthTiB
         indicators.add(DmeIndicatorConstants.COUNTER_ID_SERVICELEVEL_THROUGHPUTTIB);//throughputTiB
+        return indicators;
+    }
+
+    //serivceLevelLun默认指标集合
+    private List<String> initServiceLevelLunIndicator() {
+        List<String> indicators = new ArrayList<>();
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME);//ResponseTime
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH);//bandwidthTiB
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT);//throughput
+        return indicators;
+    }
+
+    //serviceLevelStoragepool 默认指标集合
+    private List<String> initServiceLevelStoragePoolIndicator() {
+        List<String> indicators = new ArrayList<>();
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT);//IOPS
         return indicators;
     }
 

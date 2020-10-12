@@ -5,6 +5,7 @@ import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.DmeRelationInstanceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.List;
 public class DmeRelationInstanceController extends BaseController {
     public static final Logger LOG = LoggerFactory.getLogger(DmeRelationInstanceController.class);
 
+    @Autowired
     DmeRelationInstanceService dmeRelationInstanceService;
 
     @GetMapping("/listbyrelationname")
@@ -50,5 +52,21 @@ public class DmeRelationInstanceController extends BaseController {
         String errMsg = "queryRelationInstanceByRelationNameInstanceId error,relationName:" + relationName + " , " + instanceId;
         return failure(errMsg);
     }
+
+    @GetMapping("/getbyrelationnameinstanceidcondition")
+    @ResponseBody
+    public ResponseBodyBean queryByRelationNameInstanceIdCondition(@RequestParam(name = "relationName") String relationName, @RequestParam(name = "instanceId") String instanceId) {
+        LOG.info("getbyrelationname instanceid:" + relationName + " , " + instanceId);
+        try {
+            List<RelationInstance> ris = dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(relationName, instanceId);
+            return success(ris);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        String errMsg = "queryRelationInstanceByRelationNameInstanceId error,relationName:" + relationName + " , " + instanceId;
+        return failure(errMsg);
+    }
+
+
 
 }
