@@ -73,6 +73,7 @@ public class SystemServiceImpl implements SystemService {
     }
   }
 
+  @Override
   public void cleanData() {
     LOGGER.info("Clean data from all tables...");
     systemDao.cleanAllData();

@@ -16,8 +16,9 @@ public class QuartzConfig {
     public Scheduler getScheduler(){
         StdSchedulerFactory stdSchedulerFactory=new StdSchedulerFactory();
         try {
-            if (null==scheduler)
-            scheduler = stdSchedulerFactory.getScheduler();
+            if (null==scheduler) {
+                scheduler = stdSchedulerFactory.getScheduler();
+            }
             scheduler.start();
         }catch (Exception e){
             LOGGER.error("get scheduler error",e);

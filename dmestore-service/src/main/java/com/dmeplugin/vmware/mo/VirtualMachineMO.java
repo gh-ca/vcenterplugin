@@ -1209,7 +1209,7 @@ public class VirtualMachineMO extends BaseMO {
             if (!currentAdapterType.equalsIgnoreCase(newAdapterType)) {
                 s_logger.info("Updating adapter type to " + newAdapterType + " for VMDK file " + vmdkFileName);
                 Pair<DatacenterMO, String> dcInfo = getOwnerDatacenter();
-                byte[] newVmdkContent = vmdkFileDescriptor.changeVmdkAdapterType(vmdkInfo.second(), newAdapterType);
+                byte[] newVmdkContent = VmdkFileDescriptor.changeVmdkAdapterType(vmdkInfo.second(), newAdapterType);
                 String vmdkUploadUrl = getContext().composeDatastoreBrowseUrl(dcInfo.first().getName(), vmdkFileName);
                 getContext().uploadResourceContent(vmdkUploadUrl, newVmdkContent);
                 s_logger.info("Updated VMDK file " + vmdkFileName);
@@ -1236,7 +1236,7 @@ public class VirtualMachineMO extends BaseMO {
                 VmdkAdapterType newAdapterType = VmdkAdapterType.lsilogic;
                 s_logger.debug("Updating adapter type to " + newAdapterType + " from " + currentAdapterTypeStr + " for VMDK file " + vmdkFileName);
                 Pair<DatacenterMO, String> dcInfo = getOwnerDatacenter();
-                byte[] newVmdkContent = vmdkFileDescriptor.changeVmdkAdapterType(vmdkInfo.second(), newAdapterType.toString());
+                byte[] newVmdkContent = VmdkFileDescriptor.changeVmdkAdapterType(vmdkInfo.second(), newAdapterType.toString());
                 String vmdkUploadUrl = getContext().composeDatastoreBrowseUrl(dcInfo.first().getName(), vmdkFileName);
 
                 getContext().uploadResourceContent(vmdkUploadUrl, newVmdkContent);

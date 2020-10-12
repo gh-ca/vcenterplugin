@@ -754,6 +754,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     //卸载NFS
+    @Override
     public void unmountNfs(Map<String, Object> params) throws Exception {
         // 过滤vm注册的主机和集群,此步骤暂未处理
         if (null != params) {
