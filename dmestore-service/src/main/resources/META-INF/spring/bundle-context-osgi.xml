@@ -59,8 +59,8 @@
    <osgi:service id="VmfsOperationService" ref="VmfsOperationServiceImpl"
                  interface="com.dmeplugin.dmestore.services.VmfsOperationService" />
 
-   <osgi:service id="VMRDMService" ref="VMRDMServiceImpl"
-                 interface="com.dmeplugin.dmestore.services.VMRDMService" />
+   <osgi:service id="VmRdmService" ref="VmRdmServiceImpl"
+                 interface="com.dmeplugin.dmestore.services.VmRdmService" />
 
    <osgi:service id="VmwareAccessService" ref="VmwareAccessServiceImpl"
                  interface="com.dmeplugin.dmestore.services.VmwareAccessService" />

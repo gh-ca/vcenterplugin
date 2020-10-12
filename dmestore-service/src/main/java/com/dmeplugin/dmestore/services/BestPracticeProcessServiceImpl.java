@@ -115,7 +115,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
 
         JsonArray hostArray = gson.fromJson(hostsStr, JsonArray.class);
 
-        Map<String, List<BestPracticeBean>> checkMap = new HashMap<>();
+        Map<String, List<BestPracticeBean>> checkMap = new HashMap<>(16);
         for (int i = 0; i < hostArray.size(); i++) {
             JsonObject hostObject = hostArray.get(i).getAsJsonObject();
             String _hostName = hostObject.get("hostName").getAsString();
@@ -155,12 +155,12 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
 
         if (checkMap.size() > 0) {
             //保存到数据库
-            bachDBProcess(checkMap);
+            bachDbProcess(checkMap);
         }
         log.info("check end ");
     }
 
-    private void bachDBProcess(Map<String, List<BestPracticeBean>> map) {
+    private void bachDbProcess(Map<String, List<BestPracticeBean>> map) {
         map.forEach((k, v) -> {
             //本地全量查询
             List<String> localHostNames = null;

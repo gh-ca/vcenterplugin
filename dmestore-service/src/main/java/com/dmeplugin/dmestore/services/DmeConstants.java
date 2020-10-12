@@ -117,4 +117,9 @@ public class DmeConstants {
     public static final String ID = "id";
     public static final String CLUSTER = "cluster";
     public static final String HOSTIDS = "hostids";
+
+    public static final String TASK_DETAIL_STATUS_FILE = "status";
+    public static final int TASK_SUCCESS = 3;
+    public static final int HTTPS_STATUS_CHECK_FLAG = 100;
+    public static final int HTTPS_STATUS_SUCCESS_PRE = 2;
 }
