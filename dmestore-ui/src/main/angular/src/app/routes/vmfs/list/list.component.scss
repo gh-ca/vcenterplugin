@@ -64,3 +64,24 @@
 ::ng-deep .clr-accordion-panel:last-child .clr-accordion-header{border-bottom: 3px solid  #99C9E2;}
 ::ng-deep .clr-accordion:not(.clr-stepper-forms) .clr-accordion-content{padding: 30px 5px;}
 ::ng-deep .clr-accordion-panel:last-child .clr-accordion-content, .clr-accordion-panel:last-child .clr-accordion-header{border: none}
+
+::ng-deep clr-icon {
+  display: inline-block;
+  margin: 0;
+  height: 20px;
+  width: 20px;
+  vertical-align: middle;
+  fill: currentColor;
+}
+
+.inputWidth40Percent{
+  width: 40%;
+}
+
+::ng-deep .clr-select-wrapper{
+  width: 40%;
+}
+
+::ng-deep .clr-select-wrapper select, .clr-multiselect-wrapper select{
+  width: 100%;
+}
