@@ -724,9 +724,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                     Map<String, Object> addition = new HashMap<>();
                     addition.put("name", hostIp);
                     addition.put("accessval", ToolUtils.getStr(params.get("mountType")));
-                    addition.put("all_squash", "all_squash");
+                    addition.put("all_squash", "no_all_squash");
                     addition.put("root_squash", "root_squash");
                     addition.put("sync", "synchronization");
+                    addition.put("secure", "insecure");
                     listAddition.add(addition);
                 }
                 requestbody.put("nfs_share_client_addition", listAddition);
