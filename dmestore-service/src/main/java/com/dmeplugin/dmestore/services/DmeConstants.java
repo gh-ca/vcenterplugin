@@ -130,6 +130,10 @@ public class DmeConstants {
     public static final String VOLUMES = "volumes";
     public static final String DATASTOREOBJECTIDS = "dataStoreObjectIds";
     public static final String DATASTORENAMES = "dataStoreNames";
+    public static final String ETHPORTS = "ethPorts";
+    public static final String VMKERNEL = "vmKernel";
+    public static final String HOSTOBJECTID = "hostObjectId";
+
 
     public static final String TASK_DETAIL_STATUS_FILE = "status";
     public static final int TASK_SUCCESS = 3;
