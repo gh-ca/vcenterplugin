@@ -730,7 +730,7 @@ public class VCSDKUtils {
                     }
                 }
             }
-            _logger.info("==end expand DataStore==");
+            _logger.info("==end recycle DataStore==");
         } catch (Exception e) {
             result = "error";
             _logger.error("vmware error:", e);
