@@ -88,7 +88,7 @@ public class VmRdmServiceImpl implements VmRdmService {
             volumeIds.add(volumeArr.get(i).getAsJsonObject().get("id").getAsString());
         }
 
-        if(null != mapping){
+        if(null == mapping){
             //将卷映射给主机
              hostMapping(hostId, volumeIds);
         }
