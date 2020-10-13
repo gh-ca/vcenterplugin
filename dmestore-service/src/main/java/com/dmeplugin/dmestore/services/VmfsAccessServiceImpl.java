@@ -293,7 +293,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
     }
 
-    private String createVmfsOnVmware(Map<String, Object> params) {
+    private String createVmfsOnVmware(Map<String, Object> params) throws Exception {
         //在vmware创建存储
         String dataStoreStr = "";
         try {
@@ -334,7 +334,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("createVmfsOnVmware error:", e);
+            LOG.error("createVmfsOnVmware error:"+e.toString());
+            throw e;
         }
         return dataStoreStr;
     }
