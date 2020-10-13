@@ -735,20 +735,20 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         JsonArray array = new JsonParser().parse(gson.toJson(ids)).getAsJsonArray();
         body.add("volume_ids", array);
         ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, body.toString());
-        if(responseEntity.getStatusCodeValue()/100 != 2){
+        if(responseEntity.getStatusCodeValue()/DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE){
             throw new Exception(responseEntity.getBody());
         }
     }
 
     @Override
-    public void unMapHost(String host_id, List<String> ids) throws Exception {
+    public void unMapHost(String hostId, List<String> ids) throws Exception {
         String url = DmeConstants.DME_HOST_UNMAPPING_URL;
         JsonObject body = new JsonObject();
         JsonArray array = new JsonParser().parse(gson.toJson(ids)).getAsJsonArray();
         body.add("volume_ids", array);
-        body.addProperty("host_id", host_id);
+        body.addProperty("host_id", hostId);
         ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, body.toString());
-        if(responseEntity.getStatusCodeValue()/100 != 2){
+        if(responseEntity.getStatusCodeValue()/DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE){
             throw new Exception(responseEntity.getBody());
         }
     }
