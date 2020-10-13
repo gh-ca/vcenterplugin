@@ -96,7 +96,7 @@
                         <clr-dg-cell>{{item.name}}</clr-dg-cell>
                         <clr-dg-cell>{{item.health_status}}</clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="poolRadio!=='table1'">{{item.tier0_disk_type}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table1'">{{item.physicalType}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">{{item.media_type}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">服务等级接口无字段</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">{{item.tier0_raid_lv}}</clr-dg-cell>
@@ -105,7 +105,7 @@
                         <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.consumed_capacity}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.consumed_capacity_percentage}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.free_capacity}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.fs_subscribed_capacity/total_capacity}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.subscription_rate}}</clr-dg-cell>
 
                         <clr-dg-cell [hidden]="poolRadio!=='table3'">时延接口无相关字段</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table3'">IOPS接口无相关字段</clr-dg-cell>
@@ -125,11 +125,11 @@
                       <!-- 基本视图、性能视图、刷新 -->
                       <div class="btn-group btn-icon">
                         <div class="radio btn">
-                          <input (click)="volumeRadio = 'table1'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-4" checked>
+                          <input (click)="volumeRadio = 'table1'" type="radio" name="btn-group-volume-radios" id="btn-demo-radio-4" checked>
                           <label for="btn-demo-radio-4"><clr-icon shape="list" size="20"></clr-icon></label>
                         </div>
                         <div class="radio btn">
-                          <input (click)="volumeRadio = 'table2'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-5">
+                          <input (click)="volumeRadio = 'table2'" type="radio" name="btn-group-volume-radios" id="btn-demo-radio-5">
                           <label for="btn-demo-radio-5"><clr-icon shape="dashboard" size="20"></clr-icon></label>
                         </div>
                         <div class="radio btn merginLeft">
@@ -284,32 +284,7 @@
                         </div>
                       </clr-accordion-content>
                     </clr-accordion-panel>
-                    <clr-accordion-panel>
-                      <clr-accordion-title>CIFS</clr-accordion-title>
-                      <clr-accordion-content *clrIfExpanded>
-                        <div>
-                          <div class="gh-btngroup-header">
-                            <div class="gh-btngroup-left"></div>
-                            <!--刷新 -->
-                            <div class="btn-group btn-icon">
-                              <div class="radio btn merginLeft">
-                                <label><clr-icon shape="refresh" size="20"></clr-icon></label>
-                              </div>
-                            </div>
-                          </div>
-                          <clr-datagrid>
-                            <clr-dg-column>{{'storage.detail.shares.name' | translate}}</clr-dg-column>
-                            <clr-dg-column>{{'storage.detail.shares.sharePath' | translate}}</clr-dg-column>
-                            <clr-dg-column>{{'storage.detail.shares.ofs' | translate}}</clr-dg-column>
-                            <clr-dg-column>{{'storage.detail.shares.od' | translate}}</clr-dg-column>
-                            <clr-dg-column>{{'storage.detail.shares.osl' | translate}}</clr-dg-column>
-                            <clr-dg-cell></clr-dg-cell>
-                          </clr-datagrid>
-                        </div>
-                      </clr-accordion-content>
-                    </clr-accordion-panel>
                   </clr-accordion>
-
                 </clr-tab-content>
               </clr-tab>
             </clr-tabs>
@@ -423,18 +398,18 @@
         <clr-tab>
           <button (click)="showChart()" clrTabLink>Performance</button>
           <clr-tab-content clrTabLinkInOverflow="true">
-            <div echarts [options]="options" style="height: 600px;"></div>
+            <div echarts [options]="mychart" style="height: 600px;"></div>
             <div echarts [options]="mychart" style="height: 600px;"></div>
             <div echarts [options]="mychart" style="height: 600px;"></div>
           </clr-tab-content>
         </clr-tab>
         <clr-tab>
-          <button clrTabLink>{{'storage.detail.hardware.hardware' | translate }}</button>
+          <button clrTabLink (click)="changeTab('hardware')">{{'storage.detail.hardware.hardware' | translate }}</button>
           <clr-tab-content>
             <div class="detail-margin-top">
               <clr-tabs>
                 <clr-tab>
-                  <button clrTabLink >{{'storage.detail.hardware.controllers.controllers' | translate}}</button>
+                  <button clrTabLink (click)="changeTab('controller')">{{'storage.detail.hardware.controllers.controllers' | translate}}</button>
                   <clr-tab-content >
                     <div class="detail-margin-top">
                       <clr-datagrid>
@@ -451,7 +426,7 @@
                   </clr-tab-content>
                 </clr-tab>
                 <clr-tab>
-                  <button clrTabLink>{{'storage.detail.hardware.disks.disks' | translate}}</button>
+                  <button clrTabLink (click)="changeTab('disk')">{{'storage.detail.hardware.disks.disks' | translate}}</button>
                   <clr-tab-content >
                     <div class="detail-margin-top">
                       <clr-datagrid>
@@ -472,7 +447,7 @@
                   </clr-tab-content>
                 </clr-tab>
                 <clr-tab>
-                  <button clrTabLink>{{'storage.detail.hardware.ports.ports' | translate}}</button>
+                  <button clrTabLink (click)="changeTab('port')">{{'storage.detail.hardware.ports.ports' | translate}}</button>
                   <clr-tab-content >
                     <div class="detail-margin-top">
                       <clr-accordion>
