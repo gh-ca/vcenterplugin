@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.*;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,11 +40,11 @@ public class Validations {
 
 
   public static Map onSubmit(String packageUrl, String vcenterUsername, String vcenterPassword,
-                             String vcenterIP, String vcenterPort, String version,String dmeip,String dmeport,String dmeusername,String dmepassword) {
+                             String vcenterIp, String vcenterPort, String version, String dmeip, String dmeport, String dmeusername, String dmepassword) {
     if (!packageUrl.startsWith("https://")) {
       return Collections.singletonMap("error", "E002");
     }
-    if ((vcenterIP == null) || (vcenterIP.isEmpty())) {
+    if ((vcenterIp == null) || (vcenterIp.isEmpty())) {
       return Collections.singletonMap("error", "E003");
     }
     if ((vcenterPort == null) || (vcenterPort.isEmpty())) {
@@ -65,14 +66,16 @@ public class Validations {
     }
 
     VcenterRegisterRunner
-            .run(version, url, serverThumbprint, vcenterIP, vcenterPort, vcenterUsername,
+            .run(version, url, serverThumbprint, vcenterIp, vcenterPort, vcenterUsername,
                     vcenterPassword, pluginKey);
 
 
 
 
     //安装插件完成，后台运行添加dme信息进程
-    Thread thread=new Thread(new Runnable() {
+    ThreadPoolExecutor executor = new ThreadPoolExecutor(1, 2, 1000, TimeUnit.MILLISECONDS, new SynchronousQueue<Runnable>(),Executors.defaultThreadFactory(),new ThreadPoolExecutor.AbortPolicy());
+
+    executor.execute(new Runnable() {
       @Override
       public void run() {
         while (true) {
@@ -81,7 +84,7 @@ public class Validations {
           } catch (InterruptedException e) {
             LOGGER.info("thread sleep error");
           }
-          String response = vcenteraction(vcenterIP, vcenterUsername, vcenterPassword, vcenterPort,
+          String response = vcenteraction(vcenterIp, vcenterUsername, vcenterPassword, vcenterPort,
                   "install", false, dmeip, dmeport, dmeusername, dmepassword);
           if (response != null) {
             try {
@@ -101,7 +104,6 @@ public class Validations {
       }
     });
 
-    thread.start();
     return Collections.singletonMap("info", "check log");
   }
 
@@ -114,8 +116,8 @@ public class Validations {
   }
 
   public static Map unRegister(String packageUrl, String vcenterUsername, String vcenterPassword,
-      String vcenterIP, String vcenterPort, String keepData) {
-    if ((vcenterIP == null) || (vcenterIP.isEmpty())) {
+                               String vcenterIp, String vcenterPort, String keepData) {
+    if ((vcenterIp == null) || (vcenterIp.isEmpty())) {
       return Collections.singletonMap("error", "E003");
     }
     if ((vcenterPort == null) || (vcenterPort.isEmpty())) {
@@ -130,7 +132,7 @@ public class Validations {
     if (keepData != null && !"1".equals(keepData)) {
       removeData = true;
     }
-    String response = vcenteraction(vcenterIP, vcenterUsername, vcenterPassword, vcenterPort, "uninstall",
+    String response = vcenteraction(vcenterIp, vcenterUsername, vcenterPassword, vcenterPort, "uninstall",
         removeData);
     if (response != null) {
       try {
@@ -141,36 +143,36 @@ public class Validations {
           LOGGER.info( (String) result.get("description"));
         } else if ("-1".equals(resultCode)) {
           LOGGER.info("No HA provider can be removed.");
-          VcenterRegisterRunner.unRegister(vcenterIP, vcenterPort, vcenterUsername,
+          VcenterRegisterRunner.unRegister(vcenterIp, vcenterPort, vcenterUsername,
               vcenterPassword, pluginKey);
         } else if ("-70001".equals(resultCode)) { // DB Exceptions
           LOGGER.info("No service to uninstall provider");
-          VcenterRegisterRunner.unRegister(vcenterIP, vcenterPort, vcenterUsername,
+          VcenterRegisterRunner.unRegister(vcenterIp, vcenterPort, vcenterUsername,
               vcenterPassword, pluginKey);
         } else {
           LOGGER.info("HA Provider has been removed.");
-          VcenterRegisterRunner.unRegister(vcenterIP, vcenterPort, vcenterUsername,
+          VcenterRegisterRunner.unRegister(vcenterIp, vcenterPort, vcenterUsername,
               vcenterPassword, pluginKey);
         }
       } catch (Exception e) {
         LOGGER.info("Cannot uninstall provider");
-        VcenterRegisterRunner.unRegister(vcenterIP, vcenterPort, vcenterUsername,
+        VcenterRegisterRunner.unRegister(vcenterIp, vcenterPort, vcenterUsername,
             vcenterPassword, pluginKey);
       }
     } else {
       LOGGER.info("No service to uninstall provider");
-      VcenterRegisterRunner.unRegister(vcenterIP, vcenterPort, vcenterUsername,
+      VcenterRegisterRunner.unRegister(vcenterIp, vcenterPort, vcenterUsername,
           vcenterPassword, pluginKey);
     }
     return Collections.singletonMap("info", "check log");
   }
 
-  public static String vcenteraction(String vcenterIP, String vcenterUsername,
-      String vcenterPassword, String vcenterPort, String action, boolean removeData,String dmeIp,String dmePort,String dmeUsername,String dmePassword) {
+  public static String vcenteraction(String vcenterIp, String vcenterUsername,
+                                     String vcenterPassword, String vcenterPort, String action, boolean removeData, String dmeIp, String dmePort, String dmeUsername, String dmePassword) {
     String result = null;
     try {
       Map<String, String> bodyParamMap = new HashMap<String, String>();
-      bodyParamMap.put("vcenterIP",vcenterIP);
+      bodyParamMap.put("vcenterIP",vcenterIp);
       bodyParamMap.put("vcenterPort",vcenterPort);
       bodyParamMap.put("vcenterUsername", vcenterUsername);
       bodyParamMap.put("vcenterPassword", vcenterPassword);
@@ -183,7 +185,7 @@ public class Validations {
       String body = HttpRequestUtil.concatParamAndEncode(bodyParamMap);
 
       result = HttpRequestUtil
-          .requestWithBody(String.format(RESTURL_VCENTERACTION, vcenterIP + ":" + vcenterPort),
+          .requestWithBody(String.format(RESTURL_VCENTERACTION, vcenterIp + ":" + vcenterPort),
               HttpMethod.POST, HEADERS, body, String.class).getBody();
       LOGGER.debug("unsubscribe: " + result);
     } catch (Exception e) {
@@ -192,10 +194,10 @@ public class Validations {
     return result;
   }
 
-  public static String vcenteraction(String vcenterIP, String vcenterUsername,
+  public static String vcenteraction(String vcenterIp, String vcenterUsername,
                                      String vcenterPassword, String vcenterPort, String action, boolean removeData) {
 
-    return vcenteraction(vcenterIP,vcenterUsername,vcenterPassword,vcenterPort,action,removeData,"","","","");
+    return vcenteraction(vcenterIp,vcenterUsername,vcenterPassword,vcenterPort,action,removeData,"","","","");
   }
 
   public static Map onloadChecker(HttpServletRequest request) {
@@ -217,7 +219,7 @@ public class Validations {
         if (file.getName().lastIndexOf(".zip") >= 0) {
           // check version
           String version = getPackageVersion(file.getName());
-          if ((version == null) || (version.trim().equals(""))) {
+          if ((version == null) || ("".equals(version.trim()))) {
             continue;
           }
           packageNameList.add(file.getName());
