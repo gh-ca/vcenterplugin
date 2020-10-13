@@ -275,6 +275,19 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     @Override
     public List<StoragePool> getStoragePoolInfosByServiceLevelId(String serivceLevelId) throws Exception {
         List<StoragePool> storagePools = new ArrayList<>();
+        // servicLevelId对应的serviceLevelInstanceId
+        Map<String, Map<String, Object>> serviceLevelMap = dmeRelationInstanceService.getServiceLevelInstance();
+        if(null!= serviceLevelMap && serviceLevelMap.size()>0){
+            try {
+                String serviceLevelInstanceId = serviceLevelMap.get(serivceLevelId).get("resId").toString();
+                if(!StringUtils.isEmpty(serviceLevelInstanceId)){
+                    serivceLevelId = serviceLevelInstanceId;
+                }
+            } catch (Exception e) {
+                log.warn("获取服务等级关联的存储池,查询服务等级instanceId异常,servcieLevelId:"+serivceLevelId);
+            }
+        }
+
         // 1 获取serviceLevelId下的StoragePool实例集合
         List<String> storagePoolInstanceIds = getStoragePoolIdsByServiceLevelId(serivceLevelId);
 
@@ -293,13 +306,13 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             Map<String, Set<String>> storageDevicePoolIds = new HashMap<>();
             for (StoragePool sp : sps) {
                 String storageDeviceId = sp.getStorage_device_id();
-                String poolId = sp.getStorage_pool_id();
+                String poolInstanceId = sp.getStorage_instance_id();
                 if (null == storageDevicePoolIds.get(storageDeviceId)) {
                     Set<String> poolIds = new HashSet<>();
-                    poolIds.add(poolId);
+                    poolIds.add(poolInstanceId);
                     storageDevicePoolIds.put(storageDeviceId, poolIds);
                 } else {
-                    storageDevicePoolIds.get(storageDeviceId).add(poolId);
+                    storageDevicePoolIds.get(storageDeviceId).add(poolInstanceId);
                 }
             }
             for (Map.Entry<String, Set<String>> entry : storageDevicePoolIds.entrySet()) {
@@ -381,7 +394,8 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         if ("200".equals(code)) {
             List<StoragePool> storagePools = (List<StoragePool>) resp.get("data");
             for (StoragePool sp : storagePools) {
-                String poolId = sp.getStorage_pool_id();
+                // String poolId = sp.getStorage_pool_id();
+                String poolId = sp.getStorage_instance_id();
                 if (storagePoolIds.contains(poolId)) {
                     sps.add(sp);
                 }
@@ -431,16 +445,17 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     private StoragePool convertInstanceToStoragePool(Object instanceObj) {
         StoragePool sp = new StoragePool();
         JsonObject jsonObject = new JsonParser().parse(instanceObj.toString()).getAsJsonObject();
-        String name = ToolUtils.getStr(jsonObject.get("name"));
-        String status = ToolUtils.getStr(jsonObject.get("status"));// runningStatus?
-        String type = ToolUtils.getStr(jsonObject.get("type"));// SYS_StorageDisk中取磁盘类型?
-        String poolId = ToolUtils.getStr(jsonObject.get("poolId"));
-        String storageDeviceId = ToolUtils.getStr(jsonObject.get("storageDeviceId"));
-        String storagePoolInstanceId = ToolUtils.getStr(jsonObject.get("id"));
+        String name = ToolUtils.jsonToStr(jsonObject.get("name"));
+        String status = ToolUtils.jsonToStr(jsonObject.get("status"));// runningStatus?
+        String type = ToolUtils.jsonToStr(jsonObject.get("type"));// SYS_StorageDisk中取磁盘类型?
+        String poolId = ToolUtils.jsonToStr(jsonObject.get("poolId"));
+        String storageDeviceId = ToolUtils.jsonToStr(jsonObject.get("storageDeviceId"));
+        String storagePoolInstanceId = ToolUtils.jsonToStr(jsonObject.get("id"));
 
         sp.setName(name);
         sp.setStorage_pool_id(poolId);
         sp.setStorage_instance_id(storagePoolInstanceId);
+        sp.setStorage_device_id(storageDeviceId);
 
         return sp;
     }
