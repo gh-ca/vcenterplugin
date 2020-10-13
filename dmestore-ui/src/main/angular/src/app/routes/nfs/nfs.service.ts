@@ -6,7 +6,7 @@ import {VolumeInfo} from "../vmfs/volume-attribute/attribute.service";
 @Injectable()
 export class NfsService {
 
-  // 性能数据指标： indicator_ids 获取参数指标（读写）
+  // 性能数据指标： indicator_ids 获取参数指标（读写）vmfs的性能数据查询的是卷的性能数据
   // VMFS IOPS 0Read 1Write
   static vmfsIOPS: Array<string> = ['1125921381744648', '1125921381744649'];
   // VMFS  bandwidth 0Read 1Write
