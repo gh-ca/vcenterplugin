@@ -1176,8 +1176,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     }
 
-    //查询指定vmfs
     private ResponseEntity queryVmfsById(String volume_id) throws Exception {
+        //查询指定vmfs
         String url = LIST_VOLUME_URL + "/" + volume_id;
         ResponseEntity<String> responseEntity;
         try {
@@ -1216,8 +1216,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     }
 
-    //整理关系表数据
     private Map<String, DmeVmwareRelation> getDvrMap(List<DmeVmwareRelation> dvrlist) {
+        //整理关系表数据
         Map<String, DmeVmwareRelation> remap = null;
         try {
             if (dvrlist != null && dvrlist.size() > 0) {
@@ -1232,8 +1232,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return remap;
     }
 
-    //整理存储信息
     private Map<String, String> getStorNameMap(Map<String, Object> storagemap) {
+        //整理存储信息
         Map<String, String> remap = null;
         try {
             if (storagemap != null && storagemap.get("data") != null) {
@@ -1338,8 +1338,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return hostMapList;
     }
 
-    //通过v魔法师DATa StorageId查询关联的dmeStorageIds集合(即卷id集合)
     private List<String> getDmeStorageIdsByStorageId(String storageId) throws Exception{
+        //通过v魔法师DATa StorageId查询关联的dmeStorageIds集合(即卷id集合)
         Set<String> dmeStorageIds = new HashSet<>();
         List<DmeVmwareRelation> relations = dmeVmwareRalationDao.getDmeVmwareRelationsByStorageIds(Arrays.asList(storageId));
         if (null != relations && relations.size() > 0) {
@@ -1352,8 +1352,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
 
-    //通过dmeStorageIds查询卷信息
     private List<Volume> getVolumesByDmeStorageIds(List<String> dmeStorageIds) throws Exception{
+        //通过dmeStorageIds查询卷信息
         List<Volume> volumes = new ArrayList<>();
         for (String id : dmeStorageIds) {
             Map<String, Object> volumeResp = dmeStorageService.getVolume(id);
