@@ -68,8 +68,9 @@ public class TaskMO extends BaseMO {
                 if (fault != null) {
                     sb.append(fault.getLocalizedMessage()).append(" ");
 
-                    if (fault.getFault() != null)
+                    if (fault.getFault() != null) {
                         sb.append(fault.getFault().getClass().getName());
+                    }
                 }
             }
         } catch (Exception e) {

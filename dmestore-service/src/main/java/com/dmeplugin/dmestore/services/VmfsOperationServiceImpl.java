@@ -62,37 +62,39 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         resMap.put("msg", "update vmfsDatastore success !");
         resMap.put("task_id", volume_id);
 
-        SmartQos smartQos = new SmartQos();
-        Object control_policy = params.get("control_policy");
-        if (!StringUtils.isEmpty(control_policy)) {
-            smartQos.setControl_policy(control_policy.toString());
-        }
-        Object max_iops = params.get("max_iops");
-        if (!StringUtils.isEmpty(max_iops)) {
-            smartQos.setMaxiops(Integer.valueOf(max_iops.toString()));
-        }
-        Object min_iops = params.get("min_iops");
-        if (!StringUtils.isEmpty(min_iops)) {
-            smartQos.setMiniops(Integer.valueOf(min_iops.toString()));
-        }
-        Object max_bandwidth = params.get("max_bandwidth");
-        if (!StringUtils.isEmpty(max_bandwidth)) {
-            smartQos.setMaxbandwidth(Integer.valueOf(max_bandwidth.toString()));
-        }
-        Object min_bandwidth = params.get("min_bandwidth");
-        if (!StringUtils.isEmpty(min_bandwidth)) {
-            smartQos.setMinbandwidth(Integer.valueOf(min_bandwidth.toString()));
-        }
-        CustomizeVolumeTuning customizeVolumeTuning = new CustomizeVolumeTuning();
-        customizeVolumeTuning.setSmartQos(smartQos);
-
         VolumeUpdate volume = new VolumeUpdate();
-        Object newVoName = params.get("newVoName");
 
+        Object service_level_name = params.get("service_level_name");
+        if (StringUtils.isEmpty(service_level_name)) {
+            SmartQos smartQos = new SmartQos();
+            Object control_policy = params.get("control_policy");
+            if (!StringUtils.isEmpty(control_policy)) {
+                smartQos.setControl_policy(control_policy.toString());
+            }
+            Object max_iops = params.get("max_iops");
+            if (!StringUtils.isEmpty(max_iops)) {
+                smartQos.setMaxiops(Integer.valueOf(max_iops.toString()));
+            }
+            Object min_iops = params.get("min_iops");
+            if (!StringUtils.isEmpty(min_iops)) {
+                smartQos.setMiniops(Integer.valueOf(min_iops.toString()));
+            }
+            Object max_bandwidth = params.get("max_bandwidth");
+            if (!StringUtils.isEmpty(max_bandwidth)) {
+                smartQos.setMaxbandwidth(Integer.valueOf(max_bandwidth.toString()));
+            }
+            Object min_bandwidth = params.get("min_bandwidth");
+            if (!StringUtils.isEmpty(min_bandwidth)) {
+                smartQos.setMinbandwidth(Integer.valueOf(min_bandwidth.toString()));
+            }
+            CustomizeVolumeTuning customizeVolumeTuning = new CustomizeVolumeTuning();
+            customizeVolumeTuning.setSmartQos(smartQos);
+            volume.setTuning(customizeVolumeTuning);
+        }
+        Object newVoName = params.get("newVoName");
         if (!StringUtils.isEmpty(newVoName)) {
             volume.setName(newVoName.toString());
         }
-        volume.setTuning(customizeVolumeTuning);
         Map<String, Object> reqMap = new HashMap<>();
         reqMap.put("volume", volume);
         String reqBody = gson.toJson(reqMap);
@@ -114,7 +116,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             }
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, reqBody);
             int code = responseEntity.getStatusCodeValue();
-            if (code != 202 ||StringUtils.isEmpty(result)||result.equals("failed")) {
+            if (code != 202 ||StringUtils.isEmpty(result)|| "failed".equals(result)) {
                 resMap.put("code", code);
                 resMap.put("msg", "update VmfsDatastore failed");
                 return resMap;
@@ -122,14 +124,12 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
             resMap.put("task_id", jsonObject.get("task_id").getAsString());
-            return resMap;
         } catch (Exception e) {
             LOG.error("update vmfsDatastore error", e);
             resMap.put("code", 503);
             resMap.put("msg", e.getMessage());
-        } finally {
-            return resMap;
         }
+    return resMap;
     }
 
     @Override
@@ -185,7 +185,6 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                     resMap.put("msg", "search storage by volume error");
                     return resMap;
                 }
-                //Storage storage = (Storage) deviceByVolume.get("data");
                 String result = null;
                 if (!StringUtils.isEmpty(vo_add_capacity)) {
                     result = vcsdkUtils.expandVmfsDatastore(ds_name, ToolUtils.getInt(vo_add_capacity));
@@ -217,7 +216,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                     result = vcsdkUtils.recycleVmfsCapacity(dsname.get(i));
                 }
             }
-            if (result == null || result.equals("error")) {
+            if (result == null || "error".equals(result)) {
                 resMap.put("code", 403);
                 resMap.put("msg", "recycle vmfsDatastore error");
                 return resMap;
@@ -241,7 +240,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             resMap.put("code", 403);
         }
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.access(API_SERVICELEVEL_UPDATE, HttpMethod.PUT, gson.toJson(params));
+            ResponseEntity<String> responseEntity = dmeAccessService.access(API_SERVICELEVEL_UPDATE, HttpMethod.POST, gson.toJson(params));
             LOG.info("url:{" + API_SERVICELEVEL_UPDATE + "},响应信息：" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 202) {
@@ -302,7 +301,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
                 CapabilitiesSmarttier smarttier = new CapabilitiesSmarttier();
                 JsonObject smarttiers = null;
-                if (!ToolUtils.jsonToStr(capabilities.get("smarttier")).equals("")) {
+                if (!"".equals(ToolUtils.jsonToStr(capabilities.get("smarttier")))) {
                     smarttiers = capabilities.get("smarttier").getAsJsonObject();
                     smarttier.setPolicy(ToolUtils.jsonToInt(smarttiers.get("policy"), 0));
                     smarttier.setEnabled(ToolUtils.jsonToBoo(smarttiers.get("enabled")));
@@ -311,13 +310,13 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
                 CapabilitiesQos capabilitiesQos = new CapabilitiesQos();
                 JsonObject qos = null;
-                    if (!ToolUtils.jsonToStr(capabilities.get("qos")).equals("")) {
+                    if (!"".equals(ToolUtils.jsonToStr(capabilities.get("qos")))) {
                     qos = capabilities.get("qos").getAsJsonObject();
                     capabilitiesQos.setEnabled(ToolUtils.jsonToBoo(qos.get("enabled")));
                 }
                 SmartQos smartQos = new SmartQos();
                 JsonObject jsonObject1 = null;
-                if (qos != null && !ToolUtils.jsonToStr(qos.get("qos_param")).equals("")) {
+                if (qos != null && !"".equals(ToolUtils.jsonToStr(qos.get("qos_param")))) {
                     jsonObject1 = qos.get("qos_param").getAsJsonObject();
                     smartQos.setLatency(ToolUtils.jsonToInt(jsonObject1.get("latency"), 0));
                     smartQos.setMinbandwidth(ToolUtils.jsonToInt(jsonObject1.get("minBandWidth"), 0));

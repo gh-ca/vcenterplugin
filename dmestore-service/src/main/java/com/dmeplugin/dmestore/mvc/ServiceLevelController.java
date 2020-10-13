@@ -35,7 +35,7 @@ public class ServiceLevelController extends BaseController {
     public ResponseBodyBean listServiceLevel(@RequestBody Map<String, Object> params) throws Exception {
         LOG.info("servicelevel/listservicelevel params==" + gson.toJson(params));
         Map<String, Object> resMap = serviceLevelService.listServiceLevel(params);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
+        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
             Object data = resMap.get("data");
             //JsonObject jsonObject = new JsonParser().parse(resMap.get("data").toString()).getAsJsonObject();//先转成json,则调用success()方法返回会报错
             return success(data);

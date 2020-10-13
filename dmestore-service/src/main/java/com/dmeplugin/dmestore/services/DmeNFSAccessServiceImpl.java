@@ -201,7 +201,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             return false;
         }
         Map<String, Object> storageOriginal = dmeStorageService.getStorages();
-        if (null == storageOriginal || !storageOriginal.get("code").toString().equals("200")) {
+        if (null == storageOriginal || !"200".equals(storageOriginal.get("code").toString())) {
             return false;
         }
 
@@ -754,6 +754,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     //卸载NFS
+    @Override
     public void unmountNfs(Map<String, Object> params) throws Exception {
         // 过滤vm注册的主机和集群,此步骤暂未处理
         if (null != params) {

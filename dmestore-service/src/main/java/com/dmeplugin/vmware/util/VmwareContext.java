@@ -101,8 +101,9 @@ public class VmwareContext {
         _serverAddress = address;
 
         registerOutstandingContext();
-        if (s_logger.isInfoEnabled())
+        if (s_logger.isInfoEnabled()) {
             s_logger.info("New VmwareContext object, current outstanding count: " + getOutstandingContextCount());
+        }
     }
 
     public VmwareContext() {
@@ -204,10 +205,11 @@ public class VmwareContext {
         assert (inventoryPath != null);
 
         String[] tokens;
-        if (inventoryPath.startsWith("/"))
+        if (inventoryPath.startsWith("/")) {
             tokens = inventoryPath.substring(1).split("/");
-        else
+        } else {
             tokens = inventoryPath.split("/");
+        }
 
         ManagedObjectReference mor = getRootFolder();
         for (int i = 0; i < tokens.length; i++) {
@@ -215,7 +217,7 @@ public class VmwareContext {
             List<ObjectContent> ocs;
             PropertySpec pSpec = null;
             ObjectSpec oSpec = null;
-            if (mor.getType().equalsIgnoreCase("Datacenter")) {
+            if ("Datacenter".equalsIgnoreCase(mor.getType())) {
                 pSpec = new PropertySpec();
                 pSpec.setAll(false);
                 pSpec.setType("ManagedEntity");
@@ -231,7 +233,7 @@ public class VmwareContext {
                 oSpec.setSkip(Boolean.TRUE);
                 oSpec.getSelectSet().add(dcHostFolderTraversal);
 
-            } else if (mor.getType().equalsIgnoreCase("Folder")) {
+            } else if ("Folder".equalsIgnoreCase(mor.getType())) {
                 pSpec = new PropertySpec();
                 pSpec.setAll(false);
                 pSpec.setType("ManagedEntity");
@@ -247,7 +249,7 @@ public class VmwareContext {
                 oSpec.setSkip(Boolean.TRUE);
                 oSpec.getSelectSet().add(folderChildrenTraversal);
 
-            } else if (mor.getType().equalsIgnoreCase("ClusterComputeResource")) {
+            } else if ("ClusterComputeResource".equalsIgnoreCase(mor.getType())) {
                 pSpec = new PropertySpec();
                 pSpec.setType("ManagedEntity");
                 pSpec.getPathSet().add("name");
@@ -278,11 +280,12 @@ public class VmwareContext {
                 boolean found = false;
                 for (ObjectContent oc : ocs) {
                     String name = oc.getPropSet().get(0).getVal().toString();
-                    if (name.equalsIgnoreCase(token) || name.equalsIgnoreCase("host")) {
+                    if (name.equalsIgnoreCase(token) || "host".equalsIgnoreCase(name)) {
                         mor = oc.getObj();
                         found = true;
-                        if (name.equalsIgnoreCase("host"))
+                        if ("host".equalsIgnoreCase(name)) {
                             i--;
+                        }
                         break;
                     }
                 }
@@ -303,10 +306,11 @@ public class VmwareContext {
         assert (inventoryPath != null);
 
         String[] tokens;
-        if (inventoryPath.startsWith("/"))
+        if (inventoryPath.startsWith("/")) {
             tokens = inventoryPath.substring(1).split("/");
-        else
+        } else {
             tokens = inventoryPath.split("/");
+        }
 
         if (tokens == null || tokens.length != 2) {
             s_logger.error("Invalid datastore inventory path. path: " + inventoryPath);
@@ -326,11 +330,13 @@ public class VmwareContext {
         while (true) {
             TaskInfo tinfo = (TaskInfo)_vimClient.getDynamicProperty(morTask, "info");
             Integer progress = tinfo.getProgress();
-            if (progress == null)
+            if (progress == null) {
                 break;
+            }
 
-            if (progress.intValue() >= 100)
+            if (progress.intValue() >= 100) {
                 break;
+            }
 
             Thread.sleep(1000);
         }
@@ -373,18 +379,22 @@ public class VmwareContext {
             br = new BufferedReader(new InputStreamReader(conn.getInputStream(), getCharSetFromConnection(conn)));
             String line;
             while ((line = br.readLine()) != null) {
-                if (s_logger.isTraceEnabled())
+                if (s_logger.isTraceEnabled()) {
                     s_logger.trace("Upload " + urlString + " response: " + line);
+                }
             }
         } finally {
-            if (in != null)
+            if (in != null) {
                 in.close();
+            }
 
-            if (out != null)
+            if (out != null) {
                 out.close();
+            }
 
-            if (br != null)
+            if (br != null) {
                 br.close();
+            }
         }
     }
 
@@ -429,15 +439,18 @@ public class VmwareContext {
                 bos.write(buffer, 0, bytesRead);
                 totalBytesUpdated += bytesRead;
                 bos.flush();
-                if (progressUpdater != null)
+                if (progressUpdater != null) {
                     progressUpdater.action(new Long(totalBytesUpdated));
+                }
             }
             bos.flush();
         } finally {
-            if (is != null)
+            if (is != null) {
                 is.close();
-            if (bos != null)
+            }
+            if (bos != null) {
                 bos.close();
+            }
 
             conn.disconnect();
         }
@@ -471,14 +484,17 @@ public class VmwareContext {
                 bytesWritten += len;
                 totalBytesDownloaded += len;
 
-                if (progressUpdater != null)
+                if (progressUpdater != null) {
                     progressUpdater.action(new Long(totalBytesDownloaded));
+                }
             }
         } finally {
-            if (in != null)
+            if (in != null) {
                 in.close();
-            if (out != null)
+            }
+            if (out != null) {
                 out.close();
+            }
 
             conn.disconnect();
         }
@@ -511,8 +527,9 @@ public class VmwareContext {
         BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), getCharSetFromConnection(conn)));
         String line;
         while ((in.ready()) && (line = in.readLine()) != null) {
-            if (s_logger.isTraceEnabled())
+            if (s_logger.isTraceEnabled()) {
                 s_logger.trace("Upload " + urlString + " response: " + line);
+            }
         }
         out.close();
         in.close();
@@ -582,8 +599,9 @@ public class VmwareContext {
             parsePos = content.indexOf(marker, parsePos < 0 ? 0 : parsePos);
             if (parsePos > 0) {
                 int beginPos = content.lastIndexOf('>', parsePos - 1);
-                if (beginPos < 0)
+                if (beginPos < 0) {
                     beginPos = 0;
+                }
 
                 fileList.add((content.substring(beginPos + 1, parsePos)));
                 parsePos += marker.length();
@@ -662,8 +680,9 @@ public class VmwareContext {
             }
         }
 
-        if (!connected)
+        if (!connected) {
             throw new Exception("Unable to connect to " + conn.toString());
+        }
     }
 
     public void close() {

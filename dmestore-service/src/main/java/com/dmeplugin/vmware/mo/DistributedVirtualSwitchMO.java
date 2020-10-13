@@ -160,12 +160,14 @@ public class DistributedVirtualSwitchMO extends BaseMO {
             }
             // If we already know that the vlanid is being used as a non primary vlan, it's futile to
             // go over the entire list. Return.
-            if (result.containsKey(vlanid) && result.get(vlanid) != HypervisorHostHelper.PvlanType.promiscuous)
+            if (result.containsKey(vlanid) && result.get(vlanid) != HypervisorHostHelper.PvlanType.promiscuous) {
                 return result;
+            }
 
             // If we've already found both vlanid and pvlanid, we have enough info to make a decision. Return.
-            if (result.containsKey(vlanid) && result.containsKey(secondaryvlanid))
+            if (result.containsKey(vlanid) && result.containsKey(secondaryvlanid)) {
                 return result;
+            }
         }
         return result;
     }

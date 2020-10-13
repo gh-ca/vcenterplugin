@@ -265,7 +265,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storagePool.setSubscription_rate(subscribedCapacityRate);
                     if (media_type.equals(type)){
                         resList.add(storagePool);
-                    } else if(media_type.equals("all")) {
+                    } else if("all".equals(media_type)) {
                         resList.add(storagePool);
                     }
                 }

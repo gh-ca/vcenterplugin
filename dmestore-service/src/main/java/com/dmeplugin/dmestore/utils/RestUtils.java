@@ -31,6 +31,7 @@ public class RestUtils {
     public final static String RESPONSE_STATE_CODE = "code";
     public final static String RESPONSE_STATE_200 = "200";
     public final static int RES_STATE_I_200 = 200;
+    public final static int RES_STATE_I_202 = 202;
     public final static int RES_STATE_I_401 = 401;
     public final static int RES_STATE_I_403 = 403;
 

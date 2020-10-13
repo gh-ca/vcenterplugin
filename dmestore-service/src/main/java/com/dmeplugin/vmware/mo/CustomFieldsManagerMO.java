@@ -60,8 +60,9 @@ public class CustomFieldsManagerMO extends BaseMO {
         List<CustomFieldDef> fields = getFields();
         if (fields != null) {
             for (CustomFieldDef field : fields) {
-                if (field.getName().equals(fieldName) && field.getManagedObjectType().equals(morType))
+                if (field.getName().equals(fieldName) && field.getManagedObjectType().equals(morType)) {
                     return field.getKey();
+                }
             }
         }
         return 0;
@@ -69,8 +70,9 @@ public class CustomFieldsManagerMO extends BaseMO {
 
     public int ensureCustomFieldDef(String morType, String fieldName) throws Exception {
         int key = getCustomFieldKey(morType, fieldName);
-        if (key > 0)
+        if (key > 0) {
             return key;
+        }
 
         try {
             CustomFieldDef field = addCustomerFieldDef(fieldName, morType, null, null);
@@ -80,8 +82,9 @@ public class CustomFieldsManagerMO extends BaseMO {
             key = getCustomFieldKey(morType, fieldName);
         }
 
-        if (key == 0)
+        if (key == 0) {
             throw new Exception("Unable to setup custom field facility for " + morType + ":" + fieldName);
+        }
 
         return key;
     }

@@ -121,6 +121,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                             JsonObject vjson2 = voljson.getAsJsonObject("volume");
 
                                             vmfsDataInfo.setVolumeId(ToolUtils.jsonToStr(vjson2.get("id")));
+                                            vmfsDataInfo.setVolumeName(ToolUtils.jsonToStr(vjson2.get("name")));
                                             vmfsDataInfo.setStatus(ToolUtils.jsonToStr(vjson2.get("status")));
                                             vmfsDataInfo.setServiceLevelName(ToolUtils.jsonToStr(vjson2.get("service_level_name")));
                                             vmfsDataInfo.setVmfsProtected(ToolUtils.jsonToBoo(vjson2.get("protected")));
@@ -171,7 +172,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 params.put("obj_ids", volumeIds);
                 Map<String, Object> remap = dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params);
                 LOG.info("remap===" + gson.toJson(remap));
-                if (remap != null && remap.get("data") != null) {
+                if (remap != null && remap.get(DmeConstants.DATA) != null) {
                     JsonObject dataJson = (JsonObject) remap.get("data");
                     if (dataJson != null) {
                         relists = new ArrayList<>();
@@ -211,7 +212,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //创建DME卷
                 //判断服务等级是否存在  service_level_id
                 String taskId = "";
-                if (params.get("service_level_id") != null) {
+                if (null!=params.get(DmeConstants.SERVICELEVELID)) {
                     taskId = createVmfsByServiceLevel(params, objHostId);
                 } else {  //非服务化的创建
                     taskId = createVmfsByUnServiceLevel(params, objHostId);
@@ -223,13 +224,14 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     List<String> taskIds = new ArrayList<>();
                     taskIds.add(taskId);
                     boolean createFlag = taskService.checkTaskStatus(taskIds);
-                    if (createFlag) { //DME创建完成
+                    if (createFlag) {
+                        //DME创建完成
                         //查找刚才创建好的卷
                         String dmeHostId = null;
                         String demHostGroupId = null;
-                        if (params != null && params.get("host") != null) {
+                        if (null!=params.get(DmeConstants.HOST)) {
                             dmeHostId = objHostId;
-                        } else if (params != null && params.get("cluster") != null) {
+                        } else if (null != params.get(DmeConstants.CLUSTER)) {
                             demHostGroupId = objHostId;
                         }
                         List<Map<String, Object>> volumelist = getVolumeByName(ToolUtils.getStr(params.get("volumeName")),
@@ -241,7 +243,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         //创建了几个卷，就创建几个VMFS，用卷的wwn去找到lun
                         if(volumelist!=null && volumelist.size()>0) {
                             VCenterInfo vCenterInfo = null;
-                            if (!StringUtils.isEmpty(params.get("service_level_id"))) {
+                            if (!StringUtils.isEmpty(params.get(DmeConstants.SERVICELEVELID))) {
                                 vCenterInfo = vCenterInfoService.getVCenterInfo();
                             }
                             for(Map<String, Object> volumemap:volumelist) {
@@ -316,9 +318,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 datastoreName = datastoreName+existVolumeName;
                 //从主机或集群中找出最接近capacity的LUN
                 Map<String, Object> hsdmap = null;
-                if (params != null && params.get("host") != null) {
+                if (null != params.get(DmeConstants.HOST)) {
                     hsdmap = vcsdkUtils.getLunsOnHost(hostObjectId, capacity,existVolumeWwn);
-                } else if (params != null && params.get("cluster") != null) {
+                } else if (null != params.get(DmeConstants.CLUSTER)) {
                     hsdmap = vcsdkUtils.getLunsOnCluster(clusterObjectId, capacity,existVolumeWwn);
                 }
 
@@ -341,7 +343,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         //通过服务等级创建卷，返回任务ID
         String taskId = "";
         try {
-            if (params != null && params.get("service_level_id") != null) {
+            if (null !=params && null != params.get(DmeConstants.SERVICELEVELID)) {
                 Map<String, Object> requestbody = null;
                 //判断该集群下有多少主机，如果主机在DME不存在就需要创建
                 requestbody = new HashMap<>();
@@ -357,7 +359,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 requestbody.put("service_level_id", ToolUtils.getStr(params.get("service_level_id")));
 
                 Map<String, Object> mapping = new HashMap<>();
-                if (!StringUtils.isEmpty(params.get("host"))) {
+                if (!StringUtils.isEmpty(params.get(DmeConstants.HOST))) {
                     mapping.put("host_id", objhostid);
                 } else {
                     mapping.put("hostgroup_id", objhostid);
@@ -369,9 +371,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 ResponseEntity responseEntity = dmeAccessService.access(CREATE_VOLUME_URL, HttpMethod.POST, gson.toJson(requestbody));
 
                 LOG.info("create ByServiceLevel vmfs responseEntity==" + responseEntity.toString());
-                if (responseEntity.getStatusCodeValue() == 202) {
+                if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_202) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
-                    if (jsonObject != null && jsonObject.get("task_id") != null) {
+                    if (null!=jsonObject && !ToolUtils.jsonIsNull(jsonObject.get(DmeConstants.TASKID))) {
                         taskId = ToolUtils.jsonToStr(jsonObject.get("task_id"));
                         LOG.info("createVmfsByServiceLevel task_id====" + taskId);
                     }
@@ -387,7 +389,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         //通过非服务化创建卷，返回任务ID
         String taskId = "";
         try {
-            if (params != null && params.get("storage_id") != null) {
+            if (null!=params && null!=params.get(DmeConstants.STORAGEID)) {
                 Map<String, Object> requestbody = null;
                 //判断该集群下有多少主机，如果主机在DME不存在就需要创建
                 requestbody = new HashMap<>();
@@ -408,11 +410,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 smartqos.put("miniops", ToolUtils.getInt(params.get("miniops"),null));
                 smartqos.put("name", ToolUtils.getStr(params.get("qosname")));
 
-                if(!StringUtils.isEmpty(params.get("control_policy"))) {
+                if(!StringUtils.isEmpty(params.get(DmeConstants.CONTROLPOLICY))) {
                     tuning.put("smartqos", smartqos);
                 }
 
-                if(!StringUtils.isEmpty(params.get("alloctype"))
+                if(!StringUtils.isEmpty(params.get(DmeConstants.ALLOCTYPE))
                         || !StringUtils.isEmpty(params.get("workload_type_id"))
                         || !StringUtils.isEmpty(params.get("control_policy"))) {
                     cv.put("tuning", tuning);
@@ -430,7 +432,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 requestbody.put("customize_volumes", cv);
 
                 Map<String, Object> mapping = new HashMap<>();
-                if (!StringUtils.isEmpty(params.get("host"))) {
+                if (!StringUtils.isEmpty(params.get(DmeConstants.HOST))) {
                     mapping.put("host_id", objhostid);
                 } else {
                     mapping.put("hostgroup_id", objhostid);
@@ -442,9 +444,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 LOG.info("create UNServiceLevel vmfs_url===" + CREATE_VOLUME_UNSERVICE_URL);
                 ResponseEntity responseEntity = dmeAccessService.access(CREATE_VOLUME_UNSERVICE_URL, HttpMethod.POST, gson.toJson(requestbody));
                 LOG.info("create UNServiceLevel vmfs responseEntity==" + responseEntity.toString());
-                if (responseEntity.getStatusCodeValue() == 202) {
+                if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_202) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
-                    if (jsonObject != null && jsonObject.get("task_id") != null) {
+                    if (null!=jsonObject && !ToolUtils.jsonIsNull(jsonObject.get(DmeConstants.TASKID))) {
                         taskId = ToolUtils.jsonToStr(jsonObject.get("task_id"));
                         LOG.info("createVmfsUNServiceLevel task_id====" + taskId);
                     }
@@ -503,7 +505,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         params.put("host", hostIp);
                         params.put("hostId", hostId);
                         Map<String, Object> hostmap = dmeAccessService.createHost(params);
-                        if (hostmap != null && hostmap.get("id") != null) {
+                        if (null!=hostmap && null!=hostmap.get(DmeConstants.ID)) {
                             objId = hostmap.get("id").toString();
                         }
                         LOG.info("create host id==" + objId);
@@ -576,7 +578,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                 params.put("cluster", clusterName);
                                 params.put("hostids", hostlists);
                                 Map<String, Object> hostmap = dmeAccessService.createHostGroup(params);
-                                if (hostmap != null && hostmap.get("id") != null) {
+                                if (null!=hostmap && null!=hostmap.get(DmeConstants.ID)) {
                                     objId = ToolUtils.getStr(hostmap.get("id"));
                                 }
                             }
@@ -662,9 +664,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         String objId = "";
         try {
             //param str host: 主机  param str cluster: 集群
-            if (params != null && params.get("host") != null) {
+            if (null!=params && null!=params.get(DmeConstants.HOST)) {
                 objId = checkOrCreateToHost(ToolUtils.getStr(params.get("host")), ToolUtils.getStr(params.get("hostId")));
-            } else if (params != null && params.get("cluster") != null) {
+            } else if (null!=params && null!=params.get(DmeConstants.CLUSTER)) {
                 objId = checkOrCreateToHostGroup(ToolUtils.getStr(params.get("cluster")), ToolUtils.getStr(params.get("clusterId")));
             }
         } catch (Exception e) {
@@ -697,10 +699,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         try {
             ResponseEntity responseEntity = dmeAccessService.access(listVolumeUrl, HttpMethod.GET, null);
             LOG.info("getVolumeByName responseEntity==" + responseEntity.toString());
-            if (responseEntity.getStatusCodeValue() == 200) {
+            if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
 
-                if (jsonObject != null && jsonObject.get("volumes") != null) {
+                if (jsonObject != null && jsonObject.get(DmeConstants.VOLUMES) != null) {
                     volumelist = new ArrayList<>();
                     JsonArray jsonArray = jsonObject.getAsJsonArray("volumes");
                     for (int i = 0; i < jsonArray.size(); i++) {
@@ -725,11 +727,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private void saveDmeVmwareRalation(Map<String, Object> volumeMap, Map<String, Object> dataStoreMap) {
         //保存卷与vmfs的关联关系
         try {
-            if (volumeMap == null || volumeMap.get("volume_id") == null) {
+            if (volumeMap == null || volumeMap.get(DmeConstants.VOLUMEID) == null) {
                 LOG.error("save Dme and Vmware's vmfs Ralation error: volume data is null");
                 return;
             }
-            if (dataStoreMap == null || dataStoreMap.get("id") == null) {
+            if (dataStoreMap == null || dataStoreMap.get(DmeConstants.ID) == null) {
                 LOG.error("save Dme and Vmware's vmfs Ralation error: dataStore data is null");
                 return;
             }
@@ -764,7 +766,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //挂载卷
                 String taskId = "";
                 //通过存储的objectid查询卷id
-                if (params.get("dataStoreObjectIds") != null) {
+                if (params.get(DmeConstants.DATASTOREOBJECTIDS) != null) {
                     List<String> dataStoreObjectIds = (List<String>) params.get("dataStoreObjectIds");
                     LOG.info("dataStoreObjectIds=="+dataStoreObjectIds);
                     if (dataStoreObjectIds != null && dataStoreObjectIds.size() > 0) {
@@ -788,7 +790,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
                 LOG.info("mountvmfs==" + gson.toJson(params));
 
-                if (params.get("host") != null) {
+                if (params.get(DmeConstants.HOST) != null) {
                     //将卷挂载到主机DME
                     taskId = mountVmfsToHost(params, objhostid);
                 } else {
@@ -801,11 +803,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     List<String> taskIds = new ArrayList<>();
                     taskIds.add(taskId);
                     boolean mountFlag = taskService.checkTaskStatus(taskIds);
-                    if (mountFlag) { //DME创建完成
+                    if (mountFlag) {
+                        //DME创建完成
                         //调用vCenter在主机上扫描卷和Datastore
                         vcsdkUtils.scanDataStore(ToolUtils.getStr(params.get("clusterId")), ToolUtils.getStr(params.get("hostId")));
                         //如果是需要扫描LUN来挂载，则需要执行下面的方法，dataStoreNames
-                        if (params.get("dataStoreNames") != null) {
+                        if (params.get(DmeConstants.DATASTORENAMES) != null) {
                             List<String> dataStoreNames = (List<String>) params.get("dataStoreNames");
                             //
                             if (dataStoreNames != null && dataStoreNames.size() > 0) {
@@ -835,7 +838,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         //将卷挂载到主机DME
         String taskId = "";
         try {
-            if (params != null && params.get("volumeIds") != null) {
+            if (params != null && params.get(DmeConstants.VOLUMEIDS) != null) {
                 Map<String, Object> requestbody = null;
                 //判断该集群下有多少主机，如果主机在DME不存在就需要创建
                 requestbody = new HashMap<>();
@@ -850,9 +853,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 ResponseEntity responseEntity = dmeAccessService.access(MOUNT_VOLUME_TO_HOST_URL, HttpMethod.POST, gson.toJson(requestbody));
 
                 LOG.info("mountVmfsToHost vmfs responseEntity==" + responseEntity.toString());
-                if (responseEntity.getStatusCodeValue() == 202) {
+                if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_202) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
-                    if (jsonObject != null && jsonObject.get("task_id") != null) {
+                    if (jsonObject != null && jsonObject.get(DmeConstants.TASKID) != null) {
                         taskId = ToolUtils.jsonToStr(jsonObject.get("task_id"));
                         LOG.info("mountVmfsToHost task_id====" + taskId);
                     }
@@ -870,7 +873,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         //将卷挂载到集群DME
         String taskId = "";
         try {
-            if (params != null && params.get("volumeIds") != null) {
+            if (params != null && params.get(DmeConstants.VOLUMEIDS) != null) {
                 Map<String, Object> requestbody = null;
                 //判断该集群下有多少主机，如果主机在DME不存在就需要创建
                 requestbody = new HashMap<>();
@@ -885,9 +888,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 ResponseEntity responseEntity = dmeAccessService.access(MOUNT_VOLUME_TO_HOSTGROUP_URL, HttpMethod.POST, gson.toJson(requestbody));
 
                 LOG.info("mountVmfsToHostGroup vmfs responseEntity==" + responseEntity.toString());
-                if (responseEntity.getStatusCodeValue() == 202) {
+                if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_202) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
-                    if (jsonObject != null && jsonObject.get("task_id") != null) {
+                    if (jsonObject != null && jsonObject.get(DmeConstants.TASKID) != null) {
                         taskId = ToolUtils.jsonToStr(jsonObject.get("task_id"));
                         LOG.info("mountVmfsToHostGroup task_id====" + taskId);
                     }
@@ -1099,18 +1102,18 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             //按需分别卸载host 和 hostgroup
             boolean unmappingHostFlag = true;
             boolean unmappingHostgroupFlag = true;
-            if (null != params.get("hostgroup_id")) {
+            if (null != params.get(DmeConstants.HOSTGROUPID)) {
                 ResponseEntity responseHostGroupUnmaaping = hostGroupUnmapping(params);
-                if (202 != responseHostGroupUnmaaping.getStatusCodeValue()) {
+                if (RestUtils.RES_STATE_I_202 != responseHostGroupUnmaaping.getStatusCodeValue()) {
                     unmappingHostgroupFlag = false;
                 } else {
                     String taskId = getTaskId(responseHostGroupUnmaaping);
                     taskIds.add(taskId);
                 }
             }
-            if (null != params.get("host_id")) {
+            if (null != params.get(DmeConstants.HOSTID)) {
                 ResponseEntity responseHostUnmapping = hostUnmapping(params);
-                if (202 != responseHostUnmapping.getStatusCodeValue()) {
+                if (RestUtils.RES_STATE_I_202 != responseHostUnmapping.getStatusCodeValue()) {
                     unmappingHostFlag = false;
                 } else {
                     String taskId = getTaskId(responseHostUnmapping);
@@ -1154,7 +1157,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("volume_ids", volume_ids);
         ResponseEntity responseEntity = dmeAccessService.access(VOLUME_DELETE, HttpMethod.POST, gson.toJson(requestbody));
-        if (202 != responseEntity.getStatusCodeValue()) {
+        if (RestUtils.RES_STATE_I_202 != responseEntity.getStatusCodeValue()) {
             throw new Exception("delete volume error!");
         } else {
             taskId = getTaskId(responseEntity);
@@ -1175,13 +1178,13 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     }
 
-    //查询指定vmfs
     private ResponseEntity queryVmfsById(String volume_id) throws Exception {
+        //查询指定vmfs
         String url = LIST_VOLUME_URL + "/" + volume_id;
         ResponseEntity<String> responseEntity;
         try {
             responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            if (responseEntity.getStatusCodeValue() / 100 != 2) {
+            if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
                 LOG.error("查询指定卷信息失败!错误信息:{}", responseEntity.getBody());
                 return null;
             }
@@ -1215,8 +1218,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     }
 
-    //整理关系表数据
     private Map<String, DmeVmwareRelation> getDvrMap(List<DmeVmwareRelation> dvrlist) {
+        //整理关系表数据
         Map<String, DmeVmwareRelation> remap = null;
         try {
             if (dvrlist != null && dvrlist.size() > 0) {
@@ -1231,11 +1234,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return remap;
     }
 
-    //整理存储信息
     private Map<String, String> getStorNameMap(Map<String, Object> storagemap) {
+        //整理存储信息
         Map<String, String> remap = null;
         try {
-            if (storagemap != null && storagemap.get("data") != null) {
+            if (storagemap != null && storagemap.get(DmeConstants.DATA) != null) {
                 List<Storage> list = (List<Storage>) storagemap.get("data");
                 if (list != null && list.size() > 0) {
                     remap = new HashMap<>();
@@ -1337,8 +1340,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return hostMapList;
     }
 
-    //通过v魔法师DATa StorageId查询关联的dmeStorageIds集合(即卷id集合)
     private List<String> getDmeStorageIdsByStorageId(String storageId) throws Exception{
+        //通过v魔法师DATa StorageId查询关联的dmeStorageIds集合(即卷id集合)
         Set<String> dmeStorageIds = new HashSet<>();
         List<DmeVmwareRelation> relations = dmeVmwareRalationDao.getDmeVmwareRelationsByStorageIds(Arrays.asList(storageId));
         if (null != relations && relations.size() > 0) {
@@ -1351,8 +1354,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
 
-    //通过dmeStorageIds查询卷信息
     private List<Volume> getVolumesByDmeStorageIds(List<String> dmeStorageIds) throws Exception{
+        //通过dmeStorageIds查询卷信息
         List<Volume> volumes = new ArrayList<>();
         for (String id : dmeStorageIds) {
             Map<String, Object> volumeResp = dmeStorageService.getVolume(id);
