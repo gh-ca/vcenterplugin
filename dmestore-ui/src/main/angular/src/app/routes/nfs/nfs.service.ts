@@ -401,6 +401,57 @@ export class MakePerformance {
     });
   }
 
+
+  /**
+   * 设置折线图 ( 折线1 虚线UpperLine、折线2 虚线LowerLine、
+   * 折线3Read、折线4Write)
+   * @param height
+   * @param title 标题
+   * @param subtext 副标题
+   * @param indicatorIds  获取参数指标（带宽的读写等） 0 读 1写
+   * @param objIds 卷ID（vmfs）、fsId(nfs) 只能放一个值即length为1
+   * @param range 时间段 LAST_5_MINUTE LAST_1_HOUR LAST_1_DAY LAST_1_WEEK LAST_1_MONTH LAST_1_QUARTER HALF_1_YEAR LAST_1_YEAR BEGIN_END_TIME INVALID
+   * @param url 请求url
+   */
+  setChartSingle(height: number, title: string, subtext: string, indicatorIds: any[], objIds: any[], range: string, url: string, startTime:string, endTime:string) {
+    // 生成chart optiond对象
+    const chart:ChartOptions = this.getNewChartSingle(height, title, subtext);
+    return new Promise((resolve, reject) => {
+      const params = {
+        indicator_ids: indicatorIds,
+        obj_ids: objIds,
+        range: range,
+        begin_time: startTime,
+        end_time: endTime,
+      }
+      this.remoteSrv.getLineChartData(url, params).subscribe((result: any) => {
+          console.log('chartData: ', title, result);
+          // 设置标题
+          chart.title.text = title;
+          // 设置副标题
+          chart.title.subtext = subtext;
+          if (result.code === '200' && result.data !== null && result.data.data !== null) {
+            let resData = result.data;
+            if (result.data.data){
+              resData = result.data.data
+            }
+            const seriesData = resData[objIds[0]][indicatorIds[0]].series;
+            // 设置X轴
+            this.setXAxisData(seriesData, chart);
+            seriesData.forEach(item => {
+              for (const key of Object.keys(item)) {
+                // chartData.value = item[key];
+                chart.series[0].data.push({value: Number(item[key]), symbol: 'none'});
+              }
+            });
+          } else {
+            console.log('get chartData fail: ', result.description);
+          }
+          resolve(chart);
+      });
+    });
+  }
+
   /**
    * 获取一个chart的option对象 (option格式 折线1 虚线UpperLine、折线2 虚线LowerLine、
    * 折线3Read、折线4Write)
@@ -481,6 +532,81 @@ export class MakePerformance {
     series.push(this.setSerieData('Lower Limit', 'line', true, 'dotted', '#F8E082', null))
     series.push(this.setSerieData('Read', 'line', true, 'solid', '#6870c4', null))
     series.push(this.setSerieData('Write', 'line', true, 'solid', '#01bfa8', null))
+
+    chart.series = series;
+
+    return chart;
+  }
+
+  getNewChartSingle(height: number, title: string, subtext: string) {
+    const chart: ChartOptions = new ChartOptions();
+    // 高度
+    chart.height = height;
+    // 标题
+    const titleInfo:Title = new Title();
+    titleInfo.text = title;
+    titleInfo.subtext = subtext;
+    titleInfo.textAlign = 'bottom';
+    const textStyle:TextStyle  = new TextStyle();
+    textStyle.fontStyle = 'normal';
+    titleInfo.textStyle = textStyle;
+
+    chart.title = titleInfo;
+
+    // x轴
+    const xAxis: XAxis = new XAxis();
+    xAxis.type = 'category';
+    xAxis.boundaryGap = false;
+    xAxis.data = [];
+
+    chart.xAxis = xAxis;
+
+    // y轴
+    const yAxis: YAxis = new YAxis();
+    yAxis.type = 'value';
+    yAxis.min = 0;
+    yAxis.splitNumber = 2;
+    yAxis.boundaryGap = ['50%', '50%'];
+    const axisLine: AxisLine = new AxisLine();
+    axisLine.show = false;
+    yAxis.axisLine = axisLine;
+    const splitLine = new SplitLine();
+    splitLine.show = true;
+    const lineStyle = new LineStyle();
+    lineStyle.type = 'dashed';
+    splitLine.lineStyle = lineStyle;
+    yAxis.splitLine = splitLine;
+
+    chart.yAxis = yAxis;
+    // 提示框
+    const tooltip: Tooltip = new Tooltip();
+    tooltip.trigger = 'axis';
+    tooltip.formatter = '{b} <br/> {a0}: {c0}';
+    const axisPointer: AxisPointer = new AxisPointer();
+    axisPointer.axis = 'x';
+    axisPointer.type = 'line';
+    tooltip.axisPointer = axisPointer;
+    chart.tooltip = tooltip;
+
+    // 指标
+    // const legend: Legend = new Legend();
+    // const legendData: LegendData[] = [];
+    // legendData.push(this.setLengdData('Upper Limit', 'line'));
+    // legendData.push(this.setLengdData('Lower Limit', 'line'));
+    // legend.x = 'right';
+    // legend.y = 'top';
+    // legend.selectedMode  = true;
+    // legend.data = legendData;
+
+    //chart.legend = legend;
+    // 指标颜色
+    const colors:string[] = ['#DB2000'];
+    chart.color = colors;
+
+    // 数据(格式)
+    const series: Serie[] = [];
+    series.push(this.setSerieData('卷最大I/O相应时间', 'line', true, 'dotted', '#DB2000', null))
+    //series.push(this.setSerieData('Lower Limit', 'line', true, 'dotted', '#F8E082', null))
 
     chart.series = series;
 
