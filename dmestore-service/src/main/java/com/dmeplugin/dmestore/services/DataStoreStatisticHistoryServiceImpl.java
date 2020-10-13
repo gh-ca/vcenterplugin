@@ -58,28 +58,43 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     @Override
     public Map<String, Object> queryVmfsStatisticCurrent(Map<String, Object> params) throws Exception {
+        Map<String, String> idInstancdIdMap = new HashMap<>();
+        List<String> instanceIds = new ArrayList<>();
         Map<String, Object> remap = new HashMap<>();
         remap.put("code", 503);
         remap.put("message", "queryStatistic failed!");
         remap.put("data", "queryStatistic failed!");
         Object indicatorIds = params.get("indicator_ids");
+        List<String> ids = (List<String>)params.get("obj_ids");
+        //ids若为wwn的集合则转换为对应的instanceId集合,也有可能ids直接就是volume的instanceId集合
+        if (ids.size() > 0) {
+            Map<String, Map<String, Object>> sysLunMap = dmeRelationInstanceService.getLunInstance();
+            for (String id : ids) {
+                try {
+                    String instanceId = sysLunMap.get(id).get("resId").toString();
+                    if (!StringUtils.isEmpty(instanceId)) {
+                        idInstancdIdMap.put(id, instanceId);
+                        instanceIds.add(instanceId);
+                    }
+                } catch (Exception e) {
+                    log.warn("查询vmfs性能,通过wwn查询instanceId异常,wwn:" + id);
+                }
+            }
+            if (instanceIds.size() > 0) {
+                params.put("obj_ids", instanceIds);
+            }
+        }
         if (null == indicatorIds) {
             indicatorIds = initVolumeIndicator();
             params.put("indicator_ids", indicatorIds);
         }
         String obj_type_id = "1125921381679104";//SYS_Lun
         params.put("obj_type_id", obj_type_id);
-        params.put("range", RANGE_LAST_5_MINUTE);
-        params.put("interval", INTERVAL_ONE_MINUTE);
-        Map<String, Object> resp = queryStatisticByObjType("VMFS volume", params, null);
-        String code = resp.get("code").toString();
-        if ("200".equals(code)) {
-            Object data = resp.get("data");
-            data = getCurrentStatistic(data);
-            remap.put("code", 200);
-            remap.put("data", data);
-        }
-        return remap;
+//        params.put("range", RANGE_LAST_5_MINUTE);
+//        params.put("interval", INTERVAL_ONE_MINUTE);
+        params.put("range", RANGE_LAST_1_DAY);
+        params.put("interval", INTERVAL_MINUTE);
+        return queryStatisticByObjType("VMFS volume", params, idInstancdIdMap);
     }
 
     @Override
@@ -137,7 +152,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 }
             }
             if (instanceIds.size() > 0) {
-                params.put("obj_ids", indicatorIds);
+                params.put("obj_ids", instanceIds);
             }
         }
         String obj_type_id = "1125921381679104";//SYS_Lun
