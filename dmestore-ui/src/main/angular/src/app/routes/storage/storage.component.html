@@ -1,5 +1,5 @@
 <div style="background-color: #F0F2F5;height: 100%;width: 100%;border: 1px #F0F2F5 solid;">
-  <h4 style="margin-left: 2%;margin-top: 1%;width: 5%">存储</h4>
+  <h4 style="margin-left: 2%;margin-top: 1%;width: 5%">{{'storage.storage' | translate}}</h4>
   <div class="gh-btngroup-header" style="margin-bottom: 1%">
     <div class="gh-btngroup-left"></div>
     <!-- 基本视图、性能视图、刷新 -->
@@ -41,7 +41,7 @@
         </div>
         <!-- 列表页 -->
         <clr-datagrid [(clrDgSelected)]="rowSelected" [clrDgLoading]="isLoading">
-          <clr-dg-column [clrDgField]="'name'">{{'storage.list.name' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'name'" style="color: red">{{'storage.list.name' | translate}}</clr-dg-column>
           <clr-dg-column [clrDgSortBy]="'stars'">{{'storage.list.ipAddress' | translate}}</clr-dg-column>
 
           <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.status' | translate}}</clr-dg-column>
@@ -70,7 +70,7 @@
           <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.bandwidth' | translate}}</clr-dg-column>
 
           <clr-dg-row *ngFor="let item of list" [clrDgItem]="item">
-            <clr-dg-cell (click)="toDetailView(item.id)">{{item.name}}</clr-dg-cell>
+            <clr-dg-cell (click)="toDetailView(item.id,item.name)">{{item.name}}</clr-dg-cell>
             <clr-dg-cell>{{item.ip}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table1'">{{parseStatus(item.status,1)}}<br/>{{parseStatus(item.synStatus,2)}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.vendor}}</clr-dg-cell>

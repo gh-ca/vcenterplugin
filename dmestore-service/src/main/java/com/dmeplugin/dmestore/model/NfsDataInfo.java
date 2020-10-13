@@ -20,11 +20,11 @@ public class NfsDataInfo {
     String fsId; //fs id
 
     //列表字段（性能视图）：
-    Integer OPS; //OPS
-    Double bandwidth;   //带宽 单位MB/s
+    Float OPS; //OPS
+    Float bandwidth;   //带宽 单位MB/s
 
-    Integer readResponseTime;   //读响应时间 单位ms
-    Integer writeResponseTime; //写响应时间 单位ms
+    Float readResponseTime;   //读响应时间 单位ms
+    Float writeResponseTime; //写响应时间 单位ms
 
     public String getObjectid() {
         return objectid;
@@ -72,6 +72,14 @@ public class NfsDataInfo {
 
     public void setReserveCapacity(Double reserveCapacity) {
         this.reserveCapacity = reserveCapacity;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 
     public String getDevice() {
@@ -146,43 +154,35 @@ public class NfsDataInfo {
         this.fsId = fsId;
     }
 
-    public Integer getOPS() {
+    public Float getOPS() {
         return OPS;
     }
 
-    public void setOPS(Integer OPS) {
+    public void setOPS(Float OPS) {
         this.OPS = OPS;
     }
 
-    public Double getBandwidth() {
+    public Float getBandwidth() {
         return bandwidth;
     }
 
-    public void setBandwidth(Double bandwidth) {
+    public void setBandwidth(Float bandwidth) {
         this.bandwidth = bandwidth;
     }
 
-    public Integer getReadResponseTime() {
+    public Float getReadResponseTime() {
         return readResponseTime;
     }
 
-    public void setReadResponseTime(Integer readResponseTime) {
+    public void setReadResponseTime(Float readResponseTime) {
         this.readResponseTime = readResponseTime;
     }
 
-    public Integer getWriteResponseTime() {
+    public Float getWriteResponseTime() {
         return writeResponseTime;
     }
 
-    public void setWriteResponseTime(Integer writeResponseTime) {
+    public void setWriteResponseTime(Float writeResponseTime) {
         this.writeResponseTime = writeResponseTime;
-    }
-
-    public String getDeviceId() {
-        return deviceId;
-    }
-
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
     }
 }

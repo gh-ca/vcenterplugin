@@ -181,10 +181,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             if (statisticObject != null) {
                                 VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
                                 vmfsDataInfo.setVolumeId(volumeId);
-                                vmfsDataInfo.setIops(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT), null));
-                                vmfsDataInfo.setBandwidth(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_BANDWIDTH), null));
-                                vmfsDataInfo.setReadResponseTime(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_READRESPONSETIME), null));
-                                vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_WRITERESPONSETIME), null));
+                                vmfsDataInfo.setIops(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT), null));
+                                vmfsDataInfo.setBandwidth(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_BANDWIDTH), null));
+                                vmfsDataInfo.setReadResponseTime(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_READRESPONSETIME), null));
+                                vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_WRITERESPONSETIME), null));
                                 relists.add(vmfsDataInfo);
                             }
                         }
@@ -293,7 +293,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
     }
 
-    private String createVmfsOnVmware(Map<String, Object> params) {
+    private String createVmfsOnVmware(Map<String, Object> params) throws Exception {
         //在vmware创建存储
         String dataStoreStr = "";
         try {
@@ -334,7 +334,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("createVmfsByServiceLevel error:", e);
+            LOG.error("createVmfsOnVmware error:"+e.toString());
+            throw e;
         }
         return dataStoreStr;
     }
@@ -456,6 +457,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }else{
                     throw new Exception("create UNService Level volume error:"+responseEntity.getBody().toString());
                 }
+            }else{
+                throw new Exception("create UNService Level volume parameters error.");
             }
         } catch (Exception e) {
             LOG.error("createVmfsUNServiceLevel error:", e);
@@ -1035,12 +1038,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
         if (relationList.size() > 0) {
             //数据库处理
-            return dmeVmwareRelationDBProcess(relationList, ToolUtils.STORE_TYPE_VMFS);
+            return dmeVmwareRelationDbProcess(relationList, ToolUtils.STORE_TYPE_VMFS);
         }
         return true;
     }
 
-    private boolean dmeVmwareRelationDBProcess(List<DmeVmwareRelation> relationList, String storeType) throws Exception {
+    private boolean dmeVmwareRelationDbProcess(List<DmeVmwareRelation> relationList, String storeType) throws Exception {
         //本地全量查询
         List<String> localWwns = dmeVmwareRalationDao.getAllWwnByType(storeType);
 
@@ -1093,9 +1096,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     //String volume_id = attachment.getAsJsonObject().get("volume_id").getAsString();//attachment中的volume_id和param中的volume_id应该是一致的
                     String hostId = attachment.getAsJsonObject().get("host_id").getAsString();
                     String hostgroupId = attachment.getAsJsonObject().get("attached_host_group").getAsString();
-                    List<String> volume_ids = Arrays.asList(volumeId);
+                    List<String> volumeIds = Arrays.asList(volumeId);
 
-                    params.put("volume_ids", volume_ids);
+                    params.put("volume_ids", volumeIds);
                     if (!StringUtils.isEmpty(hostId)) {
                         params.put("host_id", hostId);
                     }
@@ -1159,9 +1162,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         //删除vmfs
 
         String taskId;
-        Object volume_ids = params.get("volume_ids");
+        Object volumeIds = params.get("volume_ids");
         Map<String, Object> requestbody = new HashMap<>();
-        requestbody.put("volume_ids", volume_ids);
+        requestbody.put("volume_ids", volumeIds);
         ResponseEntity responseEntity = dmeAccessService.access(VOLUME_DELETE, HttpMethod.POST, gson.toJson(requestbody));
         if (RestUtils.RES_STATE_I_202 != responseEntity.getStatusCodeValue()) {
             throw new Exception("delete volume error!");
@@ -1184,9 +1187,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     }
 
-    private ResponseEntity queryVmfsById(String volume_id) throws Exception {
+    private ResponseEntity queryVmfsById(String volumeId) throws Exception {
         //查询指定vmfs
-        String url = LIST_VOLUME_URL + "/" + volume_id;
+        String url = LIST_VOLUME_URL + "/" + volumeId;
         ResponseEntity<String> responseEntity;
         try {
             responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
