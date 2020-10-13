@@ -114,10 +114,10 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicatorIds = initFsIndicator();
             params.put("indicator_ids", indicatorIds);
         }
-        String obj_type_id = "1125904201809920";//SYS_???  使用存储设备? SYS_StorDevice 1125904201809920
+        String obj_type_id = "1126179079716864";//SYS_StorageFileSystem
         params.put("obj_type_id", obj_type_id);
-        params.put("range", RANGE_LAST_5_MINUTE);
-        params.put("interval", INTERVAL_ONE_MINUTE);
+        params.put("range", RANGE_LAST_1_DAY);
+        params.put("interval", INTERVAL_MINUTE);
         Map<String, Object> resp = queryStatisticByObjType("NFS", params, null);
         String code = resp.get("code").toString();
         if ("200".equals(code)) {
