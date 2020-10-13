@@ -238,6 +238,7 @@
     }
   },
   "storage":{
+    "storage":"Storage",
     "list":{
       "name":"Name",
       "ipAddress":"IP Address",

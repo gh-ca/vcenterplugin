@@ -6,7 +6,7 @@ import {
 import {VmfsPerformanceService} from '../../vmfs/volume-performance/performance.service';
 import { EChartOption } from 'echarts';
 import {FileSystem} from '../../nfs/nfs.service';
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {CapacityChart, CapacitySerie} from "../storage.service";
 @Component({
   selector: 'app-detail',
@@ -306,8 +306,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
   poolRadio = 'table1'; // 存储池列表切换
   volumeRadio = 'table1'; // volume列表切换
   storageId = '1234';
+  storageName= "";
   constructor(private detailService: DetailService, private cdr: ChangeDetectorRef, private ngZone: NgZone,
-              private activatedRoute: ActivatedRoute ) { }
+              private activatedRoute: ActivatedRoute,private router:Router) { }
   detail: StorageDetail;
   storagePool: StoragePool[];
   volumes: Volume[];
@@ -319,6 +320,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(queryParam => {
       this.storageId = queryParam.id;
+      this.storageName = queryParam.name;
     });
 
     this.getStorageDetail(true);
@@ -550,5 +552,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
     const cs = new CapacitySerie(2.024,1.078);
     cc.series.push(cs);
     this.cd.chart = cc;
+  }
+  backToList(){
+    this.router.navigate(['storage']);
   }
 }
