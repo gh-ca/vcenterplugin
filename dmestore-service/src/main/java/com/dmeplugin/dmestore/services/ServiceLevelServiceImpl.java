@@ -124,6 +124,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return remap;
     }
 
+    @Override
     public void updateVmwarePolicy() {
         try {
             SessionHelper sessionHelper = new SessionHelper();
@@ -169,7 +170,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
                     if (!alreadyhasPolicy) {
                         //创建虚拟机存储策略
-                        vcsdkUtils.createPbmProfileInAllContext(vcsdkUtils.CATEGORY_NAME, name);
+                        vcsdkUtils.createPbmProfileInAllContext(VCSDKUtils.CATEGORY_NAME, name);
                     }
                 }
                 tagModels.removeAll(alreadyhasList);

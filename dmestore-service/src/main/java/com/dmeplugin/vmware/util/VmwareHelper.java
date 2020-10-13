@@ -310,8 +310,8 @@ public class VmwareHelper {
     }
 
     // vmdkDatastorePath: [datastore name] vmdkFilePath
-    public static VirtualDevice prepareDiskDevice(VirtualMachineMO vmMo, VirtualDisk device, int controllerKey, String vmdkDatastorePathChain[],
-            ManagedObjectReference morDs, int deviceNumber, int contextNumber) throws Exception {
+    public static VirtualDevice prepareDiskDevice(VirtualMachineMO vmMo, VirtualDisk device, int controllerKey, String[] vmdkDatastorePathChain,
+                                                  ManagedObjectReference morDs, int deviceNumber, int contextNumber) throws Exception {
 
         assert (vmdkDatastorePathChain != null);
         assert (vmdkDatastorePathChain.length >= 1);

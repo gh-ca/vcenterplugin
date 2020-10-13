@@ -750,7 +750,7 @@ public class VCSDKUtils {
         //mountHost = "10.143.132.17";
         //logicPort = 0;
         _logger.info("start creat nfs datastore");
-        accessMode = StringUtils.isEmpty(accessMode) || accessMode.equals("readWrite") ? "readWrite" : "readOnly";
+        accessMode = StringUtils.isEmpty(accessMode) || "readWrite".equals(accessMode) ? "readWrite" : "readOnly";
         try {
             VmwareContext vmwareContext = null;
             ManagedObjectReference managedObjectReference = null;
@@ -1550,7 +1550,7 @@ public class VCSDKUtils {
                 List<VirtualNicManagerNetConfig> nics = hostmo.getHostVirtualNicManagerNetConfig();
                 if (nics != null && nics.size() > 0) {
                     for (VirtualNicManagerNetConfig nic : nics) {
-                        if (nic.getNicType().equals("vSphereProvisioning")) {
+                        if ("vSphereProvisioning".equals(nic.getNicType())) {
                             List<Map<String, Object>> lists = new ArrayList<>();
 
                             List<HostVirtualNic> subnics = nic.getCandidateVnic();
@@ -1692,9 +1692,10 @@ public class VCSDKUtils {
         // Step 1: Create Property Instance with tags from the specified Category
         PbmCapabilityMetadata tagCategoryInfo =
                 PbmUtil.getTagCategoryMeta(categoryName, metadata);
-        if (tagCategoryInfo == null)
+        if (tagCategoryInfo == null) {
             throw new InvalidArgumentFaultMsg(
                     "Specified Tag Category does not exist", null);
+        }
         // Fetch Property Metadata of the Tag Category
         List<PbmCapabilityPropertyMetadata> propMetaList =
                 tagCategoryInfo.getPropertyMetadata();
@@ -1705,14 +1706,16 @@ public class VCSDKUtils {
         // Fetch Allowed Tag Values Metadata
         PbmCapabilityDiscreteSet tagSetMeta =
                 (PbmCapabilityDiscreteSet) propMeta.getAllowedValue();
-        if (tagSetMeta == null || tagSetMeta.getValues().isEmpty())
+        if (tagSetMeta == null || tagSetMeta.getValues().isEmpty()) {
             throw new com.vmware.vim25.RuntimeFaultFaultMsg("Specified Tag Category '"
                     + categoryName + "' does not have any associated tags", null);
+        }
         // Create a New Discrete Set for holding Tag Values
         PbmCapabilityDiscreteSet tagSet = new PbmCapabilityDiscreteSet();
         for (Object obj : tagSetMeta.getValues()) {
-            if (tagName.equalsIgnoreCase(((PbmCapabilityDescription) obj).getValue().toString()))
+            if (tagName.equalsIgnoreCase(((PbmCapabilityDescription) obj).getValue().toString())) {
                 tagSet.getValues().add(((PbmCapabilityDescription) obj).getValue());
+            }
         }
         prop.setValue(tagSet);
 
@@ -2242,7 +2245,7 @@ public class VCSDKUtils {
                             String re = new String(soapResult.getResponse().getBytes("ISO-8859-1"), "UTF-8");
                             _logger.info(mgmtIp + "==re==" + re);
                             String packetLost = xmlFormat(re);
-                            if (!StringUtils.isEmpty(packetLost) && !packetLost.equals("100")) {
+                            if (!StringUtils.isEmpty(packetLost) && !"100".equals(packetLost)) {
                                 ethPort.put("connectStatus", "true");
                             } else {
                                 ethPort.put("connectStatus", "false");

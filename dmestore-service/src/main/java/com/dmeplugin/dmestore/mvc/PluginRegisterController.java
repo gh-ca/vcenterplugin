@@ -61,8 +61,9 @@ public class PluginRegisterController extends BaseController {
                     //调用接口，删除数据
                     isRemoveData = (removeData != null && ("1".equals(removeData) || Boolean
                             .valueOf(removeData)));
-                    if (isRemoveData)
+                    if (isRemoveData) {
                         pluginRegisterService.uninstallService();
+                    }
                 }
                 return success();
             } catch (Exception e) {

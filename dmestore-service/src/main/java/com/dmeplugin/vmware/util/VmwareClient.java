@@ -594,7 +594,7 @@ public class VmwareClient {
         vimPort.destroyPropertyFilter(filterSpecRef);
 
         Object[] retVal = filterVals;
-        if (stateVal != null && stateVal.equalsIgnoreCase("success")) {
+        if (stateVal != null && "success".equalsIgnoreCase(stateVal)) {
             retVal = new Object[] { TaskInfoState.SUCCESS, null };
         }
 

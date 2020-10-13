@@ -196,7 +196,7 @@ public class VmdkFileDescriptor {
                         value = value.substring(1, value.length() - 1);
                     }
 
-                    if (parentFileName != null && name.equals("parentFileNameHint")) {
+                    if (parentFileName != null && "parentFileNameHint".equals(name)) {
                         out.write(name + "=\"" + parentFileName + "\"");
                         out.newLine();
                     } else {
