@@ -813,6 +813,36 @@ public class VCSDKUtils {
         }
     }
 
+    public void hostRescanHba(String hostIp) throws Exception {
+        try {
+            VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
+            for (VmwareContext vmwareContext : vmwareContexts) {
+                RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+                List<Pair<ManagedObjectReference, String>> hosts = rootFsMO.getAllHostOnRootFs();
+                if (hosts != null && hosts.size() > 0) {
+                    for (Pair<ManagedObjectReference, String> host : hosts) {
+                        HostMO hostMo = new HostMO(vmwareContext, host.first());
+                        String hostName = hostMo.getHostName();
+                        if (hostIp.equals(hostName)) {
+                            //在查找可用LUN前先扫描hba，已发现新的卷
+                            List<String> devices = getHbaDeviceByHost(hostMo);
+                            if(devices!=null && devices.size()>0){
+                                for(String device : devices){
+                                    hostMo.getHostStorageSystemMO().rescanHba(device);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware host rescan HBA error:", e);
+            throw e;
+        }
+    }
+
     private static void hostAction() {
 
     }

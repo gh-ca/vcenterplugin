@@ -43,6 +43,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     private DmeNFSAccessService dmeNfsAccessService;
 
+    private TaskService taskService;
+
     private VCSDKUtils vcsdkUtils;
 
     @Autowired
@@ -575,6 +577,14 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         this.scheduleDao = scheduleDao;
     }
 
+    public TaskService getTaskService() {
+        return taskService;
+    }
+
+    public void setTaskService(TaskService taskService) {
+        this.taskService = taskService;
+    }
+
     @Override
     public Map<String, Object> getDmeHost(String hostId) throws Exception {
         Map<String, Object> map = new HashMap<>(16);
@@ -738,6 +748,14 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         if(responseEntity.getStatusCodeValue()/DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE){
             throw new Exception(responseEntity.getBody());
         }
+
+        JsonObject task = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+        String taskId = task.get("task_id").getAsString();
+        JsonObject taskDetail = taskService.queryTaskByIdUntilFinish(taskId);
+        if (taskDetail.get(DmeConstants.TASK_DETAIL_STATUS_FILE).getAsInt() != DmeConstants.TASK_SUCCESS) {
+            LOG.error("delete volumes failed!task status={}", task.get("status").getAsInt());
+            throw new Exception(task.get("detail_cn").getAsString());
+        }
     }
 
     @Override
@@ -750,6 +768,35 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, body.toString());
         if(responseEntity.getStatusCodeValue()/DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE){
             throw new Exception(responseEntity.getBody());
+        }
+
+        JsonObject task = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+        String taskId = task.get("task_id").getAsString();
+        JsonObject taskDetail = taskService.queryTaskByIdUntilFinish(taskId);
+        if (taskDetail.get(DmeConstants.TASK_DETAIL_STATUS_FILE).getAsInt() != DmeConstants.TASK_SUCCESS) {
+            LOG.error("host unmapping failed!task status={}", task.get("status").getAsInt());
+            throw new Exception(task.get("detail_cn").getAsString());
+        }
+    }
+
+    @Override
+    public void hostMapping(String hostId, List<String> volumeIds) throws Exception {
+        String url = DmeConstants.DME_HOST_MAPPING_URL;
+        JsonObject body = new JsonObject();
+        body.addProperty("host_id", hostId);
+        JsonArray volumeIdArray = gson.fromJson(gson.toJson(volumeIds), JsonArray.class);
+        body.add("volume_ids", volumeIdArray);
+        ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, body.toString());
+        if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
+            LOG.error("host mapping failed!errorMsg:{}", responseEntity.getBody());
+            throw new Exception(responseEntity.getBody());
+        }
+        JsonObject task = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+        String taskId = task.get("task_id").getAsString();
+        JsonObject taskDetail = taskService.queryTaskByIdUntilFinish(taskId);
+        if (taskDetail.get(DmeConstants.TASK_DETAIL_STATUS_FILE).getAsInt() != DmeConstants.TASK_SUCCESS) {
+            LOG.error("host mapping failed!task status={}", task.get("status").getAsInt());
+            throw new Exception(task.get("detail_cn").getAsString());
         }
     }
 }
