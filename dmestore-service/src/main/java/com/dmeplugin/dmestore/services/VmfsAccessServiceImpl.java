@@ -339,7 +339,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return dataStoreStr;
     }
 
-    private String createVmfsByServiceLevel(Map<String, Object> params, String objhostid) {
+    private String createVmfsByServiceLevel(Map<String, Object> params, String objhostid) throws Exception {
         //通过服务等级创建卷，返回任务ID
         String taskId = "";
         try {
@@ -377,15 +377,18 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         taskId = ToolUtils.jsonToStr(jsonObject.get("task_id"));
                         LOG.info("createVmfsByServiceLevel task_id====" + taskId);
                     }
+                }else {
+                    throw new Exception("create volume error:"+responseEntity.getBody().toString());
                 }
             }
         } catch (Exception e) {
             LOG.error("createVmfsByServiceLevel error:", e);
+            throw new Exception("create volume error:"+e.toString());
         }
         return taskId;
     }
 
-    private String createVmfsByUnServiceLevel(Map<String, Object> params, String objhostid) {
+    private String createVmfsByUnServiceLevel(Map<String, Object> params, String objhostid) throws Exception{
         //通过非服务化创建卷，返回任务ID
         String taskId = "";
         try {
@@ -450,10 +453,13 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         taskId = ToolUtils.jsonToStr(jsonObject.get("task_id"));
                         LOG.info("createVmfsUNServiceLevel task_id====" + taskId);
                     }
+                }else{
+                    throw new Exception("create UNService Level volume error:"+responseEntity.getBody().toString());
                 }
             }
         } catch (Exception e) {
             LOG.error("createVmfsUNServiceLevel error:", e);
+            throw new Exception("create UNService Level volume error:"+e.toString());
         }
         return taskId;
     }
