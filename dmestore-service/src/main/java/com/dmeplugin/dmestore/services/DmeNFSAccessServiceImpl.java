@@ -607,10 +607,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                             if (statisticObject != null) {
                                 NfsDataInfo nfsDataInfo = new NfsDataInfo();
                                 nfsDataInfo.setFsId(fsId);
-                                nfsDataInfo.setOPS(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT), null));
-                                nfsDataInfo.setBandwidth(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_BANDWIDTH), null));
-                                nfsDataInfo.setReadResponseTime(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_READRESPONSETIME), null));
-                                nfsDataInfo.setWriteResponseTime(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_WRITERESPONSETIME), null));
+                                nfsDataInfo.setOPS(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT), null));
+                                nfsDataInfo.setBandwidth(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_BANDWIDTH), null));
+                                nfsDataInfo.setReadResponseTime(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_READRESPONSETIME), null));
+                                nfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_WRITERESPONSETIME), null));
                                 relists.add(nfsDataInfo);
                             }
                         }

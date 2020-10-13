@@ -181,10 +181,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             if (statisticObject != null) {
                                 VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
                                 vmfsDataInfo.setVolumeId(volumeId);
-                                vmfsDataInfo.setIops(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT), null));
-                                vmfsDataInfo.setBandwidth(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_BANDWIDTH), null));
-                                vmfsDataInfo.setReadResponseTime(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_READRESPONSETIME), null));
-                                vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_WRITERESPONSETIME), null));
+                                vmfsDataInfo.setIops(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT), null));
+                                vmfsDataInfo.setBandwidth(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_BANDWIDTH), null));
+                                vmfsDataInfo.setReadResponseTime(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_READRESPONSETIME), null));
+                                vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_WRITERESPONSETIME), null));
                                 relists.add(vmfsDataInfo);
                             }
                         }
