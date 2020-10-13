@@ -4,12 +4,13 @@ import {GlobalsService} from '../../shared/globals.service';
 import {LogicPort, StorageList, StorageService} from '../storage/storage.service';
 import {StoragePool} from "../storage/detail/detail.service";
 import {ClrWizard, ClrWizardPage} from "@clr/angular";
+import {VmfsListService} from "../vmfs/list/list.service";
 @Component({
   selector: 'app-nfs',
   templateUrl: './nfs.component.html',
   styleUrls: ['./nfs.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [NfsService, GlobalsService, StorageService],
+  providers: [NfsService, GlobalsService, StorageService,VmfsListService],
 })
 export class NfsComponent implements OnInit {
   list: List[] = []; // 数据列表
@@ -45,7 +46,8 @@ export class NfsComponent implements OnInit {
   @ViewChild('addPageTwo') addPageTwo: ClrWizardPage;
 
   errMessage = '';
-  constructor(private remoteSrv: NfsService, private cdr: ChangeDetectorRef, public gs: GlobalsService , private storageService: StorageService) { }
+  constructor(private remoteSrv: NfsService, private cdr: ChangeDetectorRef, public gs: GlobalsService ,
+              private storageService: StorageService,private vmfsListService: VmfsListService) { }
   ngOnInit(): void {
   }
   // 获取nfs列表
@@ -303,5 +305,17 @@ export class NfsComponent implements OnInit {
     }else if(c>= 1048576){
       return (c/1024/1024).toFixed(3)+" TB"
     }
+  }
+  // 点刷新那个功能是分两步，一步是刷新，然后等我们这边的扫描任务，任务完成后返回你状态，任务成功后，你再刷新列表页面。
+  scanDataStore() {
+    this.vmfsListService.scanVMFS('nfs').subscribe((res: any) => {
+      if (res.code === '200') {
+        this.getNfsList();
+        console.log('Scan success');
+      } else {
+        console.log('Scan faild');
+      }
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    });
   }
 }
