@@ -21,7 +21,7 @@ public class OverviewServiceImpl implements OverviewService {
         int abnormal = 0;
         int total;
         Map<String, Object> storageOriginal = dmeStorageService.getStorages();
-        if (null == storageOriginal || !storageOriginal.get("code").toString().equals("200")) {
+        if (null == storageOriginal || !"200".equals(storageOriginal.get("code").toString())) {
             throw new RuntimeException("query storage error.");
         } else{
             List<Storage> storages = (List<Storage>) storageOriginal.get("data");

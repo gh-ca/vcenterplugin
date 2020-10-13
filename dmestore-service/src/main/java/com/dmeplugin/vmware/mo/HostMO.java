@@ -146,7 +146,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public ClusterDasConfigInfo getDasConfig() throws Exception {
         ManagedObjectReference morParent = getParentMor();
-        if (morParent.getType().equals("ClusterComputeResource")) {
+        if ("ClusterComputeResource".equals(morParent.getType())) {
             ClusterMO clusterMo = new ClusterMO(_context, morParent);
             return clusterMo.getDasConfig();
         }
@@ -157,7 +157,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public boolean isHAEnabled() throws Exception {
         ManagedObjectReference morParent = getParentMor();
-        if (morParent.getType().equals("ClusterComputeResource")) {
+        if ("ClusterComputeResource".equals(morParent.getType())) {
             ClusterMO clusterMo = new ClusterMO(_context, morParent);
             return clusterMo.isHAEnabled();
         }
@@ -168,7 +168,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public void setRestartPriorityForVM(VirtualMachineMO vmMo, String priority) throws Exception {
         ManagedObjectReference morParent = getParentMor();
-        if (morParent.getType().equals("ClusterComputeResource")) {
+        if ("ClusterComputeResource".equals(morParent.getType())) {
             ClusterMO clusterMo = new ClusterMO(_context, morParent);
             clusterMo.setRestartPriorityForVM(vmMo, priority);
         }
@@ -178,7 +178,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     public String getHyperHostDefaultGateway() throws Exception {
         List<HostIpRouteEntry> entries = getHostIpRouteEntries();
         for (HostIpRouteEntry entry : entries) {
-            if (entry.getNetwork().equalsIgnoreCase("0.0.0.0")) {
+            if ("0.0.0.0".equalsIgnoreCase(entry.getNetwork())) {
                 return entry.getGateway();
             }
         }
@@ -263,7 +263,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     public ManagedObjectReference getHyperHostCluster() throws Exception {
         ManagedObjectReference morParent = (ManagedObjectReference)_context.getVimClient().getDynamicProperty(_mor, "parent");
 
-        if (morParent.getType().equalsIgnoreCase("ClusterComputeResource")) {
+        if ("ClusterComputeResource".equalsIgnoreCase(morParent.getType())) {
             return morParent;
         }
 
@@ -277,7 +277,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         if (datastores != null) {
             for (ManagedObjectReference mor : datastores) {
                 DatastoreSummary summary = (DatastoreSummary)_context.getVimClient().getDynamicProperty(mor, "summary");
-                if (summary.getType().equalsIgnoreCase("VMFS") && !summary.isMultipleHostAccess()) {
+                if ("VMFS".equalsIgnoreCase(summary.getType()) && !summary.isMultipleHostAccess()) {
                     l.add(mor);
                 }
             }
@@ -419,8 +419,8 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         List<HostOpaqueNetworkInfo> opaqueNetworks = netInfo.getOpaqueNetwork();
         if (opaqueNetworks != null){
             for (HostOpaqueNetworkInfo opaqueNetwork : opaqueNetworks){
-                if (opaqueNetwork.getOpaqueNetworkId() != null && opaqueNetwork.getOpaqueNetworkId().equals("br-int")
-                        && opaqueNetwork.getOpaqueNetworkType() != null && opaqueNetwork.getOpaqueNetworkType().equals("nsx.network")){
+                if (opaqueNetwork.getOpaqueNetworkId() != null && "br-int".equals(opaqueNetwork.getOpaqueNetworkId())
+                        && opaqueNetwork.getOpaqueNetworkType() != null && "nsx.network".equals(opaqueNetwork.getOpaqueNetworkType())){
                     return true;
                 }
             }
@@ -604,7 +604,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
                     String vmVcenterName = null;
                     String vmInternalCSName = null;
                     for (DynamicProperty prop : props) {
-                        if (prop.getName().equals("name")) {
+                        if ("name".equals(prop.getName())) {
                             vmVcenterName = prop.getVal().toString();
                         } else if (prop.getName().startsWith("value[")) {
                             if (prop.getVal() != null) {
@@ -633,7 +633,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     public VirtualMachineMO findVmOnPeerHyperHost(String name) throws Exception {
         ManagedObjectReference morParent = getParentMor();
 
-        if (morParent.getType().equals("ClusterComputeResource")) {
+        if ("ClusterComputeResource".equals(morParent.getType())) {
             ClusterMO clusterMo = new ClusterMO(_context, morParent);
             return clusterMo.findVmOnHyperHost(name);
         } else {
@@ -680,7 +680,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
                     String value = null;
                     String vmInternalCSName = null;
                     for (DynamicProperty objProp : objProps) {
-                        if (objProp.getName().equals("name")) {
+                        if ("name".equals(objProp.getName())) {
                             vmName = (String)objProp.getVal();
                         } else if (objProp.getName().startsWith("value[")) {
                             if (objProp.getVal() != null) {
@@ -796,7 +796,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         if (ocs != null) {
             for (ObjectContent oc : ocs) {
                 DatastoreSummary dsSummary = (DatastoreSummary) VmwareHelper.getPropValue(oc, "summary");
-                if (dsSummary.isMultipleHostAccess() == false && dsSummary.isAccessible() && dsSummary.getType().equalsIgnoreCase("vmfs")) {
+                if (dsSummary.isMultipleHostAccess() == false && dsSummary.isAccessible() && "vmfs".equalsIgnoreCase(dsSummary.getType())) {
                     ManagedObjectReference morDs = oc.getObj();
                     String name = (String)VmwareHelper.getPropValue(oc, "name");
 
@@ -1007,7 +1007,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
             String dvPortGroupKey;
             String portGroup;
             for (VirtualNicManagerNetConfig netConfig : netConfigs) {
-                if (netConfig.getNicType().equals("management")) {
+                if ("management".equals(netConfig.getNicType())) {
                     for (HostVirtualNic nic : netConfig.getCandidateVnic()) {
                         portGroup = nic.getPortgroup();
                         if (portGroup == null || portGroup.isEmpty()) {
@@ -1155,7 +1155,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public String getRecommendedDiskController(String guestOsId) throws Exception {
         ManagedObjectReference morParent = getParentMor();
-        if (morParent.getType().equals("ClusterComputeResource")) {
+        if ("ClusterComputeResource".equals(morParent.getType())) {
             ClusterMO clusterMo = new ClusterMO(_context, morParent);
             return clusterMo.getRecommendedDiskController(guestOsId);
         }

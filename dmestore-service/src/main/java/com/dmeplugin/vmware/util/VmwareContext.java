@@ -217,7 +217,7 @@ public class VmwareContext {
             List<ObjectContent> ocs;
             PropertySpec pSpec = null;
             ObjectSpec oSpec = null;
-            if (mor.getType().equalsIgnoreCase("Datacenter")) {
+            if ("Datacenter".equalsIgnoreCase(mor.getType())) {
                 pSpec = new PropertySpec();
                 pSpec.setAll(false);
                 pSpec.setType("ManagedEntity");
@@ -233,7 +233,7 @@ public class VmwareContext {
                 oSpec.setSkip(Boolean.TRUE);
                 oSpec.getSelectSet().add(dcHostFolderTraversal);
 
-            } else if (mor.getType().equalsIgnoreCase("Folder")) {
+            } else if ("Folder".equalsIgnoreCase(mor.getType())) {
                 pSpec = new PropertySpec();
                 pSpec.setAll(false);
                 pSpec.setType("ManagedEntity");
@@ -249,7 +249,7 @@ public class VmwareContext {
                 oSpec.setSkip(Boolean.TRUE);
                 oSpec.getSelectSet().add(folderChildrenTraversal);
 
-            } else if (mor.getType().equalsIgnoreCase("ClusterComputeResource")) {
+            } else if ("ClusterComputeResource".equalsIgnoreCase(mor.getType())) {
                 pSpec = new PropertySpec();
                 pSpec.setType("ManagedEntity");
                 pSpec.getPathSet().add("name");
@@ -280,10 +280,10 @@ public class VmwareContext {
                 boolean found = false;
                 for (ObjectContent oc : ocs) {
                     String name = oc.getPropSet().get(0).getVal().toString();
-                    if (name.equalsIgnoreCase(token) || name.equalsIgnoreCase("host")) {
+                    if (name.equalsIgnoreCase(token) || "host".equalsIgnoreCase(name)) {
                         mor = oc.getObj();
                         found = true;
-                        if (name.equalsIgnoreCase("host")) {
+                        if ("host".equalsIgnoreCase(name)) {
                             i--;
                         }
                         break;

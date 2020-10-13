@@ -117,7 +117,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         }
 
         ManagedObjectReference vmMor = vmMo.getMor();
-        if (vmMor == null || !vmMor.getType().equals("VirtualMachine")) {
+        if (vmMor == null || !"VirtualMachine".equals(vmMor.getType())) {
             s_logger.debug("Failed to get restart priority for VM: " + vmMo.getName() + ", invalid VM object reference");
             return null;
         }
@@ -158,7 +158,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         }
 
         ManagedObjectReference vmMor = vmMo.getMor();
-        if (vmMor == null || !vmMor.getType().equals("VirtualMachine")) {
+        if (vmMor == null || !"VirtualMachine".equals(vmMor.getType())) {
             s_logger.debug("Failed to set restart priority for VM: " + vmMo.getName() + ", invalid VM object reference");
             return;
         }
@@ -605,7 +605,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
                 ArrayOfHostIpRouteEntry entries = (ArrayOfHostIpRouteEntry)oc.getPropSet().get(0).getVal();
                 if (entries != null) {
                     for (HostIpRouteEntry entry : entries.getHostIpRouteEntry()) {
-                        if (entry.getNetwork().equalsIgnoreCase("0.0.0.0")) {
+                        if ("0.0.0.0".equalsIgnoreCase(entry.getNetwork())) {
                             return entry.getGateway();
                         }
                     }
@@ -716,7 +716,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
                     String name = null;
                     String value = null;
                     for (DynamicProperty objProp : objProps) {
-                        if (objProp.getName().equals("name")) {
+                        if ("name".equals(objProp.getName())) {
                             name = (String)objProp.getVal();
                         } else {
                             OptionValue optValue = (OptionValue)objProp.getVal();

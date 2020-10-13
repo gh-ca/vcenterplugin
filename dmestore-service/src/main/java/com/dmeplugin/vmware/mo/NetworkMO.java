@@ -40,6 +40,7 @@ public class NetworkMO extends BaseMO {
         return _context.getVimClient().getDynamicProperty(_mor, "vm");
     }
 
+    @Override
     public String getName() throws Exception {
         return _context.getVimClient().getDynamicProperty(_mor, "name");
     }

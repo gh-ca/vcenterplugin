@@ -92,7 +92,7 @@ public class PbmUtil {
    public static PbmCapabilityMetadata getTagCategoryMeta(
          String tagCategoryName, List<PbmCapabilityMetadataPerCategory> schema) {
       for (PbmCapabilityMetadataPerCategory cat : schema) {
-         if (cat.getSubCategory().equals("tag")) {
+         if ("tag".equals(cat.getSubCategory())) {
             for (PbmCapabilityMetadata cap : cat.getCapabilityMetadata()) {
                if (cap.getId().getId().equals(tagCategoryName)) {
                   return cap;
