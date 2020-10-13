@@ -12,12 +12,13 @@ import {HttpClient} from '@angular/common/http';
 import { CommonService } from '../common.service';
 /* import * as echarts from 'Echarts'; */
 import 'echarts-liquidfill';
+import {MakePerformance, NfsService} from "../nfs/nfs.service";
 
 @Component({
   selector: 'app-servicelevel',
   templateUrl: './servicelevel.component.html',
   styleUrls: ['./servicelevel.component.scss'],
-  providers: [ CommonService ]
+  providers: [ CommonService, MakePerformance, NfsService ]
 })
 export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -25,14 +26,16 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   // 详情页面弹出控制
   popShow = false;
   // 容量曲线图
-  volumeCapacityChart;
-  storagePoolCapacityChart;
+  volumeCapacity={};
+  storagePoolCapacity={};
   // 性能曲线图
-  volumeMaxResponseTimeChart;
-  volumeDensityChart;
-  volumeThroughputChart;
-  volumeBandwidthChart;
-  storagePoolDensityChart;
+  volumeMaxResponseTime={};
+  volumeDensity={};
+  volumeThroughput={};
+  volumeBandwidth={};
+  storagePoolDensity={};
+
+  range = new Range();
 
   // 详情列表按钮控制
   storagePoolRadioCheck = 'basic';
@@ -75,39 +78,6 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
       value: 'tier.minBandWidth'
     }
   ];
-
-  volumeCapacityOption = {
-    legend: {
-      data: ['Allocated(GB)', 'Total(GB)'],
-      left: 'right',
-    },
-    tooltip: {
-      trigger: 'axis'
-    },
-    title: {
-      left: 'left',
-      text: 'Volume Capacity'
-      // subtext:subTitle,
-    },
-    xAxis: {
-      type: 'category',
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    },
-    yAxis: {
-      type: 'value'
-    },
-    series: [{
-      name: 'Allocated(GB)',
-      data: [820, 932, 901, 934, 1290, 1330, 1320],
-      type: 'line',
-      smooth: true
-    }, {
-      name: 'Total(GB)',
-      data: [25, 932, 44, 934, 566, 1589, 558],
-      type: 'line',
-      smooth: true
-    }]
-  };
 
   // 选中的服务等级
   selectedModel: Servicelevel =
@@ -155,75 +125,16 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   // ===============storage pool==============
   // 表格loading标志
   storeagePoolIsloading = false;
-  // 数据总数
-  storagePoolTotal = 0;
   // 数据列表
   storagePoolList: StoragePool[] = [];
-  // 选中列表
-  storagePoolSelected: StoragePool[];
-  // 查询数据参数
-  storagePoolQuery = { // 查询数据
-      q: 'name',
-      sort: 'hostSetting',
-      order: 'desc',
-      page: 0,
-      per_page: 5
-  };
-  // 查询数据结果,测试用
-  storagePoolReslut = {
-    items: [{
-        id: '123',
-        name: 'storeage',
-        status: 'Online',
-        diskType: 'SSD',
-        storageDevice: 'dertV8_160',
-
-        totalCapacity: 1000,
-        usedCapacity: 600,
-        capacityUsage: 60,
-        freeCapacity: 400,
-
-        latency: 52,
-        iops: 4000,
-        bandwidth: 10000
-      }],
-    total_count: 1
-  };
   // ===============storage pool end==============
 
   // ===============volume==============
   // 表格loading标志
   volumeIsloading = false;
-  // 数据总数
-  volumeTotal = 0;
   // 数据列表
   volumeList: Volume[] = [];
-  // 选中列表
-  volumeSelected: Volume[];
-  // 查询数据参数
-  volumeQuery = { // 查询数据
-    q: 'name',
-    sort: 'hostSetting',
-    order: 'desc',
-    page: 0,
-    per_page: 5
-  };
-  // 查询数据结果,测试用
-  volumeReslut = {
-    items: [{
-      id: '123',
-      name: 'volume-001',
-      status: 'Normal',
-      totalCapacity: 1000,
-      provisioningType: 'thin',
-      capacityUsed: 500,
 
-      latency: 52,
-      iops: 4000,
-      bandwidth: 10000
-    }],
-    total_count: 1
-  };
   // ===============volume end==============
 
   // ===============applicationType==============
@@ -257,7 +168,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(private ngZone: NgZone,
               private cdr: ChangeDetectorRef,
               private http: HttpClient,
-              private commonService: CommonService) { }
+              private makePerformance: MakePerformance) { }
 
   ngOnInit(): void {
   }
@@ -266,69 +177,75 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    // this.ngZone.runOutsideAngular(() => this.initChart());
+    //this.ngZone.runOutsideAngular(() => this.initChart());
     this.refresh();
+  }
+
+  clickName(o: any){
+    this.popShow=true;
+    this.volumeRadioCheck = 'basic';
+    this.storagePoolRadioCheck = 'basic';
+    this.selectedModel=o;
+
+    this.initChart(this.range);
+  }
+
+  closeS(){
+    this.popShow=false;
+    this.volumeRadioCheck = 'basic';
+    this.storagePoolRadioCheck = 'basic';
   }
 
   // ===============storage pool==============
   storagePoolRefresh(state: ClrDatagridStateInterface){
-    this.storeagePoolIsloading = true;
-    // const params = this.commonService.refresh(state, this.storagePoolQuery);
-    // this.http.get('https://api.github.com/search/repositories', this.practiceParams).subscribe((result: any) => {
-    //       console.log(result)
-    //       this.list = result.items;
-    //       this.total = result.total_count;
-    //       this.isLoading = false;
-    //       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-    // });
-    this.http.post('servicelevel/listStoragePoolsByServiceLevelId', this.selectedModel.id).subscribe((response: any) => {
-      console.log(response);
-    }, err => {
-      console.error('ERROR', err);
-    });
-    this.storagePoolList = this.storagePoolReslut.items;
-    this.storagePoolTotal = this.storagePoolReslut.total_count;
-    this.storeagePoolIsloading = false;
-    this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    setTimeout(()=>{
+      this.storeagePoolIsloading = true;
+      this.http.post('servicelevel/listStoragePoolsByServiceLevelId', this.selectedModel.id).subscribe((response: any) => {
+        console.log(response);
+        if (response.code == '200'){
+          this.storagePoolList = response.data;
+        } else{
+          this.storagePoolList = [];
+        }
+        this.storeagePoolIsloading = false;
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+
+        this.lastStorePool24HPeak();
+      }, err => {
+        console.error('ERROR', err);
+        this.storeagePoolIsloading = false;
+      });
+    }, 200);
   }
   // ===============storage pool end==============
 
   // ===============volume pool==============
   volumeRefresh(state: ClrDatagridStateInterface){
-    this.volumeIsloading = true;
-    const params = this.commonService.refresh(state, this.volumeQuery);
-    // this.http.get('https://api.github.com/search/repositories', this.practiceParams).subscribe((result: any) => {
-    //       console.log(result)
-    //       this.list = result.items;
-    //       this.total = result.total_count;
-    //       this.isLoading = false;
-    //       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-    // });
-    this.http.post('servicelevel/listVolumesByServiceLevelId', this.selectedModel.id).subscribe((response: any) => {
-      console.log(response);
-    }, err => {
-      console.error('ERROR', err);
-    });
-    this.volumeList = this.volumeReslut.items;
-    this.volumeTotal = this.volumeReslut.total_count;
-    this.volumeIsloading = false;
-    this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    setTimeout(()=>{
+      this.volumeIsloading = true;
+      this.http.post('servicelevel/listVolumesByServiceLevelId', this.selectedModel.id).subscribe((response: any) => {
+        if (response.code == '200'){
+          this.volumeList = response.data;
+        } else{
+          this.volumeList = [];
+        }
+        this.volumeIsloading = false;
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+
+        this.lastVloume24HPeak();
+      }, err => {
+        console.error('ERROR', err);
+        this.volumeIsloading = false;
+      });
+    }, 200);
   }
   // ===============volume pool end==============
 
   // ===============applicationType pool==============
   applicationTypeRefresh(state: ClrDatagridStateInterface){
     this.applicationTypeIsloading = true;
-    const params = this.commonService.refresh(state, this.applicationTypeQuery);
-    // this.http.get('https://api.github.com/search/repositories', this.practiceParams).subscribe((result: any) => {
-    //       console.log(result)
-    //       this.list = result.items;
-    //       this.total = result.total_count;
-    //       this.isLoading = false;
-    //       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-    // });
-    this.applicationTypeList = this.applicationTypeReslut.items;
-    this.applicationTypeTotal = this.applicationTypeReslut.total_count;
+    this.applicationTypeList = []
+    this.applicationTypeTotal = 0
     this.applicationTypeIsloading = false;
     this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
   }
@@ -441,29 +358,151 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
 
-  initCharts(chart: any, type: string){
-    // volumeCapacity
-    // storagePoolCapacity
-    // volumeMaxResponseTime
-    // volumeDensity
-    // volumeThroughput
-    // volumeBandwidth
-    // storagePoolDensity
-    if (type === 'volumeCapacity'){
-      this.volumeCapacityChart = chart;
-    } else if (type === 'storagePoolCapacity'){
-      this.storagePoolCapacityChart = chart;
-    } else if (type === 'volumeMaxResponseTime'){
-      this.volumeMaxResponseTimeChart = chart;
-    } else if (type === 'volumeDensity'){
-      this.volumeDensityChart = chart;
-    } else if (type === 'volumeThroughput'){
-      this.volumeThroughputChart = chart;
-    } else if (type === 'volumeBandwidth'){
-      this.volumeBandwidthChart = chart;
-    } else if (type === 'storagePoolDensity'){
-      this.storagePoolDensityChart = chart;
-    }
+  lastVloume24HPeak(){
+    let obj_ids = [];
+    this.volumeList.forEach((item)=>{
+        if(item.instanceId){
+          obj_ids.push(item.instanceId);
+        }
+    });
+    const p = {
+      "obj_type_id" : "1125921381679104",
+      "indicator_ids" : ["1125921381744641","1125921381744642","1125921381744643"],
+      "obj_ids" : obj_ids,
+      "interval" : "MINUTE",
+      "range" : "LAST_1_DAY"
+    };
+    this.http.post('datastorestatistichistrory/volume', p).subscribe((response: any) => {
+      if (response.code == '200'){
+        this.volumeList.forEach((item)=>{
+            let i = response.data[item.instanceId];
+            if (i != undefined){
+              let iops = i['1125921381744641'].max;
+              let latency = i['1125921381744642'].max;
+              let bandwidth = i['1125921381744643'].max;
+
+              item.iops = parseFloat(iops[Object.keys(iops)[0]]).toFixed(2);
+              item.latency = parseFloat(latency[Object.keys(latency)[0]]).toFixed(2);
+              item.bandwidth = parseFloat(bandwidth[Object.keys(bandwidth)[0]]).toFixed(2);
+            }
+        });
+      } else{
+      }
+      this.cdr.detectChanges();
+    }, err => {
+      console.error('ERROR', err);
+      this.storeagePoolIsloading = false;
+    });
+  }
+
+  lastStorePool24HPeak(){
+    let obj_ids = [];
+    this.storagePoolList.forEach((item)=>{
+      if(item.storage_instance_id){
+        obj_ids.push(item.storage_instance_id);
+      }
+    });
+    const p = {
+      "obj_type_id" : "1125912791744512",
+      "indicator_ids" : ["1125912791810049","1125912791810050","1125912791810051"],
+      "obj_ids" : obj_ids,
+      "interval" : "MINUTE",
+      "range" : "LAST_1_DAY"
+    };
+    this.http.post('datastorestatistichistrory/servicelevelStoragePool', p).subscribe((response: any) => {
+      if (response.code == '200'){
+        this.storagePoolList.forEach((item)=>{
+          let i = response.data.data[item.storage_instance_id];
+          if (i != undefined){
+            let iops = i['1125912791810049'].max;
+            let latency = i['1125912791810050'].max;
+            let bandwidth = i['1125912791810051'].max;
+
+            item.iops = parseFloat(iops[Object.keys(iops)[0]]).toFixed(2);
+            item.latency = parseFloat(latency[Object.keys(latency)[0]]).toFixed(2);
+            item.bandwidth = parseFloat(bandwidth[Object.keys(bandwidth)[0]]).toFixed(2);
+          }
+        });
+      } else{
+      }
+      this.cdr.detectChanges();
+    }, err => {
+      console.error('ERROR', err);
+      this.storeagePoolIsloading = false;
+    });
+  }
+
+  async initChart(range: Range) {
+    this.makePerformance.setChartSingle(
+      300,
+      '卷最大I/O响应时间(ms)',
+      '',
+      ["1125921381744655"],
+      [this.selectedModel.id],
+      range.range,
+      'datastorestatistichistrory/servicelevelLun',
+      null,
+      null).then(
+        res => {
+      this.volumeMaxResponseTime = res;
+      this.cdr.detectChanges();
+    });
+    this.makePerformance.setChartSingle(
+      300,
+      '卷I/O密度(IOPS/TB)',
+      '',
+      ["1223"],
+      [this.selectedModel.id],
+      range.range,
+      'datastorestatistichistrory/servicelevelLun',
+      null,
+      null).then(
+      res => {
+        this.volumeDensity = res;
+        this.cdr.detectChanges();
+      });
+    this.makePerformance.setChartSingle(
+      300,
+      '卷总吞吐量(IOPS)',
+      '',
+      ["1125921381744641"],
+      [this.selectedModel.id],
+      range.range,
+      'datastorestatistichistrory/servicelevelLun',
+      null,
+      null).then(
+      res => {
+        this.volumeThroughput = res;
+        this.cdr.detectChanges();
+      });
+    this.makePerformance.setChartSingle(
+      300,
+      '卷总带宽(MB/s)',
+      '',
+      ["1125921381744643"],
+      [this.selectedModel.id],
+      range.range,
+      'datastorestatistichistrory/servicelevelLun',
+      null,
+      null).then(
+      res => {
+        this.volumeBandwidth = res;
+        this.cdr.detectChanges();
+      });
+    this.makePerformance.setChartSingle(
+      300,
+      '存储池I/O密度(IOPS/TB)',
+      '',
+      ["111"],
+      [this.selectedModel.id],
+      range.range,
+      'datastorestatistichistrory/servicelevelLun',
+      null,
+      null).then(
+      res => {
+        this.storagePoolDensity = res;
+        this.cdr.detectChanges();
+      });
   }
 }
 
@@ -505,31 +544,33 @@ class Servicelevel {
 interface StoragePool {
   id: string;
   name: string;
-  status: string;
-  diskType: string;
-  storageDevice: string;
+  running_status: string;
+  physicalType: string;
+  storage_name: string;
+  storage_instance_id: string;
 
-  totalCapacity: number;
-  usedCapacity: number;
-  capacityUsage: number;
-  freeCapacity: number;
+  total_capacity: number;
+  consumed_capacity: number;
+  consumed_capacity_percentage: number;
+  free_capacity: number;
 
-  latency: number;
-  iops: number;
-  bandwidth: number;
+  latency: string;
+  iops: string;
+  bandwidth: string;
 }
 
 interface Volume {
   id: string;
   name: string;
   status: string;
-  totalCapacity: number;
-  provisioningType: string;
-  capacityUsed: number;
+  capacity: number;
+  alloctype: string;
+  instanceId: string;
+  capacity_usage: number;
 
-  latency: number;
-  iops: number;
-  bandwidth: number;
+  latency: string;
+  iops: string;
+  bandwidth: string;
 }
 
 
@@ -537,4 +578,13 @@ class ApplicationType {
   id: string;
   storageDevice: string;
   applicationType;
+}
+
+class Range{
+  range: string;
+  interval: string;
+  constructor(){
+    this.range = "LAST_1_DAY" ;
+    this.interval = "MINUTE";
+  }
 }
