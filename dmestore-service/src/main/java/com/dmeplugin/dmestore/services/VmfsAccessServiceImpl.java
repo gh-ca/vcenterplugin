@@ -334,7 +334,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("createVmfsByServiceLevel error:", e);
+            LOG.error("createVmfsOnVmware error:", e);
         }
         return dataStoreStr;
     }
@@ -456,6 +456,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }else{
                     throw new Exception("create UNService Level volume error:"+responseEntity.getBody().toString());
                 }
+            }else{
+                throw new Exception("create UNService Level volume parameters error.");
             }
         } catch (Exception e) {
             LOG.error("createVmfsUNServiceLevel error:", e);
