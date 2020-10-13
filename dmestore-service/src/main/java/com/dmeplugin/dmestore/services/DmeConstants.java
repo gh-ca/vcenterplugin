@@ -110,6 +110,7 @@ public class DmeConstants {
     public static final String HOSTIP = "hostIp";
     public static final String ACCESSSESSION = "accessSession";
     public static final String DATAS = "datas";
+    public static final String DATA = "data";
     public static final String HOSTS = "hosts";
     public static final String INITIATORS = "initiators";
     public static final String HOSTGROUPS = "hostgroups";
@@ -117,4 +118,25 @@ public class DmeConstants {
     public static final String ID = "id";
     public static final String CLUSTER = "cluster";
     public static final String HOSTIDS = "hostids";
+    public static final String SERVICELEVELID = "service_level_id";
+    public static final String TASKID = "task_id";
+    public static final String STORAGEID = "storage_id";
+    public static final String HOSTID = "host_id";
+    public static final String HOSTGROUPID = "hostgroup_id";
+    public static final String VOLUMEID = "volume_id";
+    public static final String VOLUMEIDS = "volumeIds";
+    public static final String CONTROLPOLICY = "control_policy";
+    public static final String ALLOCTYPE = "alloctype";
+    public static final String VOLUMES = "volumes";
+    public static final String DATASTOREOBJECTIDS = "dataStoreObjectIds";
+    public static final String DATASTORENAMES = "dataStoreNames";
+    public static final String ETHPORTS = "ethPorts";
+    public static final String VMKERNEL = "vmKernel";
+    public static final String HOSTOBJECTID = "hostObjectId";
+
+
+    public static final String TASK_DETAIL_STATUS_FILE = "status";
+    public static final int TASK_SUCCESS = 3;
+    public static final int HTTPS_STATUS_CHECK_FLAG = 100;
+    public static final int HTTPS_STATUS_SUCCESS_PRE = 2;
 }

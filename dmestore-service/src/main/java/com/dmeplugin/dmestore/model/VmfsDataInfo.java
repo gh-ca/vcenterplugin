@@ -2,33 +2,38 @@ package com.dmeplugin.dmestore.model;
 
 public class VmfsDataInfo {
     //列表字段（基本视图）
-    String objectid; //跳转用唯一id
-    String name;    //名称
-    String status;  //状态
+    String objectid; //vmware中跳转用唯一id
+    String name;    //名称 vmware中vmfs的名称
+    String status;  //dme中状态
 
-    Double capacity;  //总容量 单位GB
-    Double freeSpace; //空闲容量 单位GB
-    Double reserveCapacity; //置备容量  capacity+uncommitted-freeSpace 单位GB
+    Double capacity;  //vmware中总容量 单位GB
+    Double freeSpace; //vmware中空闲容量 单位GB
+    Double reserveCapacity; //vmware中置备容量  capacity+uncommitted-freeSpace 单位GB
 
-    String deviceId; //存储设备ID
-    String device; //存储设备名称
-    String serviceLevelName;    //服务等级
-    Boolean vmfsProtected;  //保护状态
+    String deviceId; //dme中存储设备ID
+    String device; //dme中存储设备名称
+    String serviceLevelName;    //dme中服务等级
+    Boolean vmfsProtected;  //dme中保护状态
 
     //列表字段（性能视图）：
-    Integer maxIops; //QoS上限
-    Integer minIops; //QoS下限
-    Integer iops; //iops 性能统计数据
+    Integer maxIops; //dme中QoS上限
+    Integer minIops; //dme中QoS下限
 
-    Integer maxBandwidth;   //带宽上限 单位MB/s
-    Integer minBandwidth;   //带宽下限 单位MB/s
-    Double bandwidth; //bandwidth 性能统计数据
+    Float iops; //dme中iops 性能统计数据
 
-    Integer readResponseTime;   //读响应时间 单位ms  性能统计数据
-    Integer writeResponseTime; //写响应时间 单位ms   性能统计数据
-    Integer latency; //时延 单位ms
+    Integer maxBandwidth;   //dme中带宽上限 单位MB/s
+    Integer minBandwidth;   //dme中带宽下限 单位MB/s
 
-    String volumeId; //卷ID
+    Float bandwidth; //dme中bandwidth 性能统计数据
+
+    Float readResponseTime;   //dme中读响应时间 单位ms  性能统计数据
+    Float writeResponseTime; //dme中写响应时间 单位ms   性能统计数据
+
+    Integer latency; //dme中时延 单位ms
+
+    String volumeId; //dme中卷ID
+    String volumeName; //dme中卷名称
+    String wwn; //dme中wwn
 
     public String getObjectid() {
         return objectid;
@@ -78,6 +83,14 @@ public class VmfsDataInfo {
         this.reserveCapacity = reserveCapacity;
     }
 
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
     public String getDevice() {
         return device;
     }
@@ -118,11 +131,11 @@ public class VmfsDataInfo {
         this.minIops = minIops;
     }
 
-    public Integer getIops() {
+    public Float getIops() {
         return iops;
     }
 
-    public void setIops(Integer iops) {
+    public void setIops(Float iops) {
         this.iops = iops;
     }
 
@@ -142,27 +155,27 @@ public class VmfsDataInfo {
         this.minBandwidth = minBandwidth;
     }
 
-    public Double getBandwidth() {
+    public Float getBandwidth() {
         return bandwidth;
     }
 
-    public void setBandwidth(Double bandwidth) {
+    public void setBandwidth(Float bandwidth) {
         this.bandwidth = bandwidth;
     }
 
-    public Integer getReadResponseTime() {
+    public Float getReadResponseTime() {
         return readResponseTime;
     }
 
-    public void setReadResponseTime(Integer readResponseTime) {
+    public void setReadResponseTime(Float readResponseTime) {
         this.readResponseTime = readResponseTime;
     }
 
-    public Integer getWriteResponseTime() {
+    public Float getWriteResponseTime() {
         return writeResponseTime;
     }
 
-    public void setWriteResponseTime(Integer writeResponseTime) {
+    public void setWriteResponseTime(Float writeResponseTime) {
         this.writeResponseTime = writeResponseTime;
     }
 
@@ -182,11 +195,19 @@ public class VmfsDataInfo {
         this.volumeId = volumeId;
     }
 
-    public String getDeviceId() {
-        return deviceId;
+    public String getVolumeName() {
+        return volumeName;
     }
 
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
+    public void setVolumeName(String volumeName) {
+        this.volumeName = volumeName;
+    }
+
+    public String getWwn() {
+        return wwn;
+    }
+
+    public void setWwn(String wwn) {
+        this.wwn = wwn;
     }
 }

@@ -31,10 +31,13 @@ public class PbmUtil {
     */
    public static PbmCapabilityMetadata getCapabilityMeta(String capabilityName,
          List<PbmCapabilityMetadataPerCategory> schema) {
-      for (PbmCapabilityMetadataPerCategory cat : schema)
-         for (PbmCapabilityMetadata cap : cat.getCapabilityMetadata())
-            if (cap.getId().getId().equals(capabilityName))
+      for (PbmCapabilityMetadataPerCategory cat : schema) {
+         for (PbmCapabilityMetadata cap : cat.getCapabilityMetadata()) {
+            if (cap.getId().getId().equals(capabilityName)) {
                return cap;
+            }
+         }
+      }
       return null;
    }
 
@@ -54,8 +57,9 @@ public class PbmUtil {
            pbmPortType.pbmQueryProfile(profileMgr,
                   PbmUtil.getStorageResourceType(), null);
 
-      if (profileIds == null || profileIds.isEmpty())
+      if (profileIds == null || profileIds.isEmpty()) {
          throw new RuntimeFaultFaultMsg("No storage Profiles exist.", null);
+      }
       List<PbmProfile> pbmProfiles =
             pbmPortType.pbmRetrieveContent(profileMgr, profileIds);
       for (PbmProfile pbmProfile : pbmProfiles) {
@@ -87,11 +91,15 @@ public class PbmUtil {
     */
    public static PbmCapabilityMetadata getTagCategoryMeta(
          String tagCategoryName, List<PbmCapabilityMetadataPerCategory> schema) {
-      for (PbmCapabilityMetadataPerCategory cat : schema)
-         if (cat.getSubCategory().equals("tag"))
-            for (PbmCapabilityMetadata cap : cat.getCapabilityMetadata())
-               if (cap.getId().getId().equals(tagCategoryName))
+      for (PbmCapabilityMetadataPerCategory cat : schema) {
+         if ("tag".equals(cat.getSubCategory())) {
+            for (PbmCapabilityMetadata cap : cat.getCapabilityMetadata()) {
+               if (cap.getId().getId().equals(tagCategoryName)) {
                   return cap;
+               }
+            }
+         }
+      }
       return null;
    }
 }

@@ -22,7 +22,7 @@
     "refresh": "刷新"
   },
   "validations": {
-    "required": "该字段必填",
+    "required": "该字段必填!",
     "minlength": "必须大于 {{number}} 个字符",
     "maxlength": "必须小于 {{number}} 个字符",
     "min": "值必须大于 {{number}}",
@@ -238,6 +238,7 @@
     }
   },
   "storage":{
+    "storage":"存储",
     "list":{
       "name":"名称",
       "ipAddress":"IP地址",
@@ -488,6 +489,7 @@
     "storage1": "存储/存储池",
     "storage": "存储设备",
     "sPool": "存储池",
+    "dataStore": "数据存储",
     "ownerC": "归属控制器",
     "idp": "容量初始分配策略",
     "fetchP": "预取策略",

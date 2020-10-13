@@ -98,7 +98,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         }
         try {
             //创建fs
-            Map<String, String> fsMap = new HashMap<>();
+            Map<String, Object> fsMap = new HashMap<>();
             Map<String, String> nfsShareMap = new HashMap<>();
             Object filesystem_specs = params.get("filesystem_specs");
             if (StringUtils.isEmpty(filesystem_specs)) {
@@ -148,7 +148,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                     create_nfs_share_params = gson.fromJson(gson.toJson(create_nfs_share_param), Map.class);
                     if (create_nfs_share_params != null && create_nfs_share_params.size() > 0) {
                         create_nfs_share_params.put("nfs_share_client_addition", gson.toJson(reqNfsShareClientArrayAdditions));
-                        fsMap.put("create_nfs_share_param", gson.toJson(create_nfs_share_params));
                         share_name = create_nfs_share_params.get("name");
                         Object show_snapshot_enable = params.get("show_snapshot_enable");
                         if (!StringUtils.isEmpty(show_snapshot_enable)) {
@@ -175,7 +174,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
             String fsId = getInstanceIdByTaskId(task_id, fs_name);
             String share_id = null;
-            if (!fsId.equals("")) {
+            if (!"".equals(fsId)) {
                 nfsShareMap.put("fs_id", fsId);
                 Map<String, Object> nfsShare = createNfsShare(nfsShareMap);
                 if (ToolUtils.getInt(nfsShare.get("code"))==202) {
@@ -327,7 +326,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             }
             //update nfs datastore
             String result = vcsdkUtils.renameDataStore(nfsName, dataStoreObjectId);
-            if (result.equals("success")) {
+            if ("success".equals(result)) {
                 LOG.info("{"+nfsName+"}rename nfs datastore success!");
             }
         } catch (Exception e) {
@@ -364,7 +363,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         try {
             FileSystem fileSystem = null;
             Map<String, String> orientedFileSystem = getOrientedFs(file_system_id);
-            if (orientedFileSystem.get("code").equals("200")) {
+            if ("200".equals(orientedFileSystem.get("code"))) {
                 String fs = orientedFileSystem.get("data");
                 if (!StringUtils.isEmpty(fs)) {
                     fileSystem = gson.fromJson(fs, FileSystem.class);
@@ -392,7 +391,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                     }
                 } else {
                     //缩容
-                    if (!StringUtils.isEmpty(alloc_type) && alloc_type.equals("thin")) {
+                    if (!StringUtils.isEmpty(alloc_type) && "thin".equals(alloc_type)) {
                         //thin 分配策略缩容
                         // 该文件系统总容量-可用容量-文件系统能缩容的最小空间=实际可用缩小容量与变化量进行比较
                         if (Double.compare(changeCapacity, currentCapacity - available_capacity - min_size_fs_capacity) > 1) {
@@ -435,7 +434,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     }
 
     //create file system
-    private Map<String, Object> createFileSystem(Map<String, String> params, String storage_pool_id) throws Exception {
+    private Map<String, Object> createFileSystem(Map<String, Object> params, String storage_pool_id) throws Exception {
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 202);
         resMap.put("msg", "create file system success !");
@@ -446,7 +445,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             resMap.put("msg", "create file system error !");
             return resMap;
         }
-        String storage_id = params.get("storage_id");
+        String storage_id = (String) params.get("storage_id");
         Map<String, Object> filesystem_specs = new HashMap<>();
         List<Map<String, Object>> filesystemSpecsLists = new ArrayList<>();
 
@@ -457,9 +456,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             data_space = getDataspaceOfStoragepool(null, storage_pool_id, storage_id);
         }
         //目前一个nfs 对应一个fs (一对多通用)
-        String filesystemSpecs = params.get("filesystem_specs");
-        List<Map<String,Object>> filesystemSpecsList = gson.fromJson(filesystemSpecs, List.class);
-        for (int i=0;i<filesystemSpecsList.size();i++) {
+        String filesystemSpecs = (String) params.get("filesystem_specs");
+        List<Map<String, Object>> filesystemSpecsList = gson.fromJson(filesystemSpecs, List.class);
+        for (int i = 0; i < filesystemSpecsList.size(); i++) {
             Map<String, Object> filesystemSpec = filesystemSpecsList.get(i);
             Object objCapacity = filesystemSpec.get("capacity");
             if (objCapacity != null) {
@@ -469,11 +468,12 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 }
                 filesystem_specs.put("capacity", capacity);
                 filesystem_specs.put("name", filesystemSpec.get("name"));
-                filesystem_specs.put("count", filesystemSpec.get("count"));
+                filesystem_specs.put("count", count);
+                filesystem_specs.put("start_suffix", filesystemSpec.get("start_suffix"));
             }
             filesystemSpecsLists.add(filesystem_specs);
         }
-        params.put("filesystem_specs", gson.toJson(filesystemSpecsList));
+        params.put("filesystem_specs",filesystemSpecsLists.toString());
         ResponseEntity<String> responseEntity = dmeAccessService.access(API_FS_CREATE, HttpMethod.POST, gson.toJson(params));
         int code = responseEntity.getStatusCodeValue();
         if (code != 202) {

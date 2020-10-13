@@ -42,20 +42,23 @@ public class PerfCounterInfoMapper {
         assert (counterName != null);
 
         Map<String, List<PerfCounterInfo>> groupMap = _mapCounterInfos.get(groupName);
-        if (groupMap == null)
+        if (groupMap == null) {
             return null;
+        }
 
         List<PerfCounterInfo> counterInfoList = groupMap.get(counterName);
-        if (counterInfoList == null)
+        if (counterInfoList == null) {
             return null;
+        }
 
         if (rollupType == null) {
             return counterInfoList.toArray(new PerfCounterInfo[0]);
         }
 
         for (PerfCounterInfo info : counterInfoList) {
-            if (info.getRollupType() == rollupType)
+            if (info.getRollupType() == rollupType) {
                 return new PerfCounterInfo[] {info};
+            }
         }
 
         return null;
@@ -63,8 +66,9 @@ public class PerfCounterInfoMapper {
 
     public PerfCounterInfo lookupOne(String groupName, String counterName, PerfSummaryType rollupType) {
         PerfCounterInfo[] infos = lookup(groupName, counterName, rollupType);
-        if (infos != null && infos.length > 0)
+        if (infos != null && infos.length > 0) {
             return infos[0];
+        }
 
         return null;
     }

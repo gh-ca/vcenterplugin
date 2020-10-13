@@ -730,7 +730,7 @@ public class VCSDKUtils {
                     }
                 }
             }
-            _logger.info("==end expand DataStore==");
+            _logger.info("==end recycle DataStore==");
         } catch (Exception e) {
             result = "error";
             _logger.error("vmware error:", e);
@@ -750,7 +750,7 @@ public class VCSDKUtils {
         //mountHost = "10.143.132.17";
         //logicPort = 0;
         _logger.info("start creat nfs datastore");
-        accessMode = StringUtils.isEmpty(accessMode) || accessMode.equals("readWrite") ? "readWrite" : "readOnly";
+        accessMode = StringUtils.isEmpty(accessMode) || "readWrite".equals(accessMode) ? "readWrite" : "readOnly";
         try {
             VmwareContext vmwareContext = null;
             ManagedObjectReference managedObjectReference = null;
@@ -809,6 +809,36 @@ public class VCSDKUtils {
         } catch (Exception e) {
             e.printStackTrace();
             _logger.error("vmware host rescanVmfs error:", e);
+            throw e;
+        }
+    }
+
+    public void hostRescanHba(String hostIp) throws Exception {
+        try {
+            VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
+            for (VmwareContext vmwareContext : vmwareContexts) {
+                RootFsMO rootFsMO = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+                List<Pair<ManagedObjectReference, String>> hosts = rootFsMO.getAllHostOnRootFs();
+                if (hosts != null && hosts.size() > 0) {
+                    for (Pair<ManagedObjectReference, String> host : hosts) {
+                        HostMO hostMo = new HostMO(vmwareContext, host.first());
+                        String hostName = hostMo.getHostName();
+                        if (hostIp.equals(hostName)) {
+                            //在查找可用LUN前先扫描hba，已发现新的卷
+                            List<String> devices = getHbaDeviceByHost(hostMo);
+                            if(devices!=null && devices.size()>0){
+                                for(String device : devices){
+                                    hostMo.getHostStorageSystemMO().rescanHba(device);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            _logger.error("vmware host rescan HBA error:", e);
             throw e;
         }
     }
@@ -1228,7 +1258,6 @@ public class VCSDKUtils {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             _logger.error("mount Vmfs On Cluster error:", e);
             throw e;
         }
@@ -1287,18 +1316,34 @@ public class VCSDKUtils {
             if (!StringUtils.isEmpty(serverguid)) {
                 VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
                 //集群下的所有主机
-                List<Pair<ManagedObjectReference, String>> hosts = getHostsOnCluster(clusterObjectId, hostObjectId);
-
-                if (hosts != null && hosts.size() > 0) {
-                    for (Pair<ManagedObjectReference, String> host : hosts) {
-                        HostMO host1 = new HostMO(vmwareContext, host.first());
-                        _logger.info("Host under Cluster: " + host1.getName());
-                        host1.getHostStorageSystemMO().rescanVmfs();
+                List<Pair<ManagedObjectReference, String>> hosts = null;
+                if (!StringUtils.isEmpty(clusterObjectId)) {
+                    hosts = getHostsOnCluster(clusterObjectId, hostObjectId);
+                    if (hosts != null && hosts.size() > 0) {
+                        for (Pair<ManagedObjectReference, String> host : hosts) {
+                            try {
+                                HostMO host1 = new HostMO(vmwareContext, host.first());
+                                _logger.info("Host under Cluster: " + host1.getName());
+                                host1.getHostStorageSystemMO().rescanVmfs();
+                            }catch (Exception ex){
+                                _logger.error("under Cluster scan Data Store error:"+ex.toString());
+                            }
+                        }
+                    }
+                } else if (!StringUtils.isEmpty(hostObjectId)) {
+                    try {
+                        ManagedObjectReference objmor = vcConnectionHelper.objectID2MOR(hostObjectId);
+                        HostMO hostmo = new HostMO(vmwareContext, objmor);
+                        hostmo.getHostStorageSystemMO().rescanVmfs();
+                    }catch (Exception ex){
+                        _logger.error("scan Data Store error:"+ex.toString());
                     }
                 }
+
+
+
             }
         } catch (Exception e) {
-            e.printStackTrace();
             _logger.error("scan Data Store error:", e);
             throw e;
         }
@@ -1535,7 +1580,7 @@ public class VCSDKUtils {
                 List<VirtualNicManagerNetConfig> nics = hostmo.getHostVirtualNicManagerNetConfig();
                 if (nics != null && nics.size() > 0) {
                     for (VirtualNicManagerNetConfig nic : nics) {
-                        if (nic.getNicType().equals("vSphereProvisioning")) {
+                        if ("vSphereProvisioning".equals(nic.getNicType())) {
                             List<Map<String, Object>> lists = new ArrayList<>();
 
                             List<HostVirtualNic> subnics = nic.getCandidateVnic();
@@ -1677,9 +1722,10 @@ public class VCSDKUtils {
         // Step 1: Create Property Instance with tags from the specified Category
         PbmCapabilityMetadata tagCategoryInfo =
                 PbmUtil.getTagCategoryMeta(categoryName, metadata);
-        if (tagCategoryInfo == null)
+        if (tagCategoryInfo == null) {
             throw new InvalidArgumentFaultMsg(
                     "Specified Tag Category does not exist", null);
+        }
         // Fetch Property Metadata of the Tag Category
         List<PbmCapabilityPropertyMetadata> propMetaList =
                 tagCategoryInfo.getPropertyMetadata();
@@ -1690,14 +1736,16 @@ public class VCSDKUtils {
         // Fetch Allowed Tag Values Metadata
         PbmCapabilityDiscreteSet tagSetMeta =
                 (PbmCapabilityDiscreteSet) propMeta.getAllowedValue();
-        if (tagSetMeta == null || tagSetMeta.getValues().isEmpty())
+        if (tagSetMeta == null || tagSetMeta.getValues().isEmpty()) {
             throw new com.vmware.vim25.RuntimeFaultFaultMsg("Specified Tag Category '"
                     + categoryName + "' does not have any associated tags", null);
+        }
         // Create a New Discrete Set for holding Tag Values
         PbmCapabilityDiscreteSet tagSet = new PbmCapabilityDiscreteSet();
         for (Object obj : tagSetMeta.getValues()) {
-            if (tagName.equalsIgnoreCase(((PbmCapabilityDescription) obj).getValue().toString()))
+            if (tagName.equalsIgnoreCase(((PbmCapabilityDescription) obj).getValue().toString())) {
                 tagSet.getValues().add(((PbmCapabilityDescription) obj).getValue());
+            }
         }
         prop.setValue(tagSet);
 
@@ -2227,7 +2275,7 @@ public class VCSDKUtils {
                             String re = new String(soapResult.getResponse().getBytes("ISO-8859-1"), "UTF-8");
                             _logger.info(mgmtIp + "==re==" + re);
                             String packetLost = xmlFormat(re);
-                            if (!StringUtils.isEmpty(packetLost) && !packetLost.equals("100")) {
+                            if (!StringUtils.isEmpty(packetLost) && !"100".equals(packetLost)) {
                                 ethPort.put("connectStatus", "true");
                             } else {
                                 ethPort.put("connectStatus", "false");

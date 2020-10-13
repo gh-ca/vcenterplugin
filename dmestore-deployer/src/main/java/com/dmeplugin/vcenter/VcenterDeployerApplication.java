@@ -55,7 +55,7 @@ public class VcenterDeployerApplication {
       Enumeration<InetAddress> addresses = netInterface.getInetAddresses();
       while (addresses.hasMoreElements()) {
         ip = addresses.nextElement();
-        if (ip != null && ip instanceof Inet4Address && !ip.getHostAddress().equals("127.0.0.1")) {
+        if (ip != null && ip instanceof Inet4Address && !"127.0.0.1".equals(ip.getHostAddress())) {
           ipList.add(ip.getHostAddress());
         }
       }

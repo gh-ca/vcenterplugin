@@ -108,7 +108,7 @@ public class DatacenterMO extends BaseMO {
                 if (props != null) {
                     for (DynamicProperty prop : props) {
                         if (prop.getVal() != null) {
-                            if (prop.getName().equalsIgnoreCase("name")) {
+                            if ("name".equalsIgnoreCase(prop.getName())) {
                                 if (prop.getVal().toString().equals(vmLabel)) {
                                     list.add(new VirtualMachineMO(_context, oc.getObj()));
                                     break;        // break out inner loop
@@ -142,7 +142,7 @@ public class DatacenterMO extends BaseMO {
                     String vmVcenterName = null;
                     String vmInternalCSName = null;
                     for (DynamicProperty prop : props) {
-                        if (prop.getName().equals("name")) {
+                        if ("name".equals(prop.getName())) {
                             vmVcenterName = prop.getVal().toString();
                         }
                         if (prop.getName().startsWith("value[") && prop.getVal() != null) {
@@ -207,7 +207,7 @@ public class DatacenterMO extends BaseMO {
         if (ocs != null) {
             List<ManagedObjectReference> referenceList = new ArrayList<>();
             for (ObjectContent oc : ocs) {
-                if(null != name && !name.trim().equals("")){
+                if(null != name && !"".equals(name.trim())){
                     if (oc.getPropSet().get(0).getVal().toString().equals(name)) {
                         referenceList.add(oc.getObj());
                         break;
@@ -390,8 +390,9 @@ public class DatacenterMO extends BaseMO {
                 List<DynamicProperty> props = oc.getPropSet();
                 if (props != null) {
                     for (DynamicProperty prop : props) {
-                        if (prop.getVal().equals(dvPortGroupName))
+                        if (prop.getVal().equals(dvPortGroupName)) {
                             return oc.getObj();
+                        }
                     }
                 }
             }
@@ -401,9 +402,7 @@ public class DatacenterMO extends BaseMO {
 
     public boolean hasDvPortGroup(String dvPortGroupName) throws Exception {
         ManagedObjectReference morNetwork = getDvPortGroupMor(dvPortGroupName);
-        if (morNetwork != null)
-            return true;
-        return false;
+        return morNetwork != null;
     }
 
     public DVPortgroupConfigInfo getDvPortGroupSpec(String dvPortGroupName) throws Exception {
@@ -438,7 +437,7 @@ public class DatacenterMO extends BaseMO {
                 if (props != null) {
                     assert (props.size() == 2);
                     for (DynamicProperty prop : props) {
-                        if (prop.getName().equals("config")) {
+                        if ("config".equals(prop.getName())) {
                             configSpec = (DVPortgroupConfigInfo)prop.getVal();
                         } else {
                             nameProperty = prop.getVal().toString();
@@ -485,7 +484,7 @@ public class DatacenterMO extends BaseMO {
                 if (props != null) {
                     assert (props.size() == 2);
                     for (DynamicProperty prop : props) {
-                        if (prop.getName().equals("key")) {
+                        if ("key".equals(prop.getName())) {
                             dvPortGroupKey = (String)prop.getVal();
                         } else {
                             dvSwitchMor = (ManagedObjectReference)prop.getVal();
@@ -507,7 +506,7 @@ public class DatacenterMO extends BaseMO {
 
     public VirtualEthernetCardDistributedVirtualPortBackingInfo getDvPortBackingInfo(Pair<ManagedObjectReference, String> networkInfo) throws Exception {
         assert (networkInfo != null);
-        assert (networkInfo.first() != null && networkInfo.first().getType().equalsIgnoreCase("DistributedVirtualPortgroup"));
+        assert (networkInfo.first() != null && "DistributedVirtualPortgroup".equalsIgnoreCase(networkInfo.first().getType()));
         final VirtualEthernetCardDistributedVirtualPortBackingInfo dvPortBacking = new VirtualEthernetCardDistributedVirtualPortBackingInfo();
         final DistributedVirtualSwitchPortConnection dvPortConnection = new DistributedVirtualSwitchPortConnection();
         ManagedObjectReference dvsMor = getDvSwitchMor(networkInfo.first());

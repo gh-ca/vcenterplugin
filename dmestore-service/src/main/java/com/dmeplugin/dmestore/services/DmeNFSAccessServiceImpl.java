@@ -201,7 +201,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             return false;
         }
         Map<String, Object> storageOriginal = dmeStorageService.getStorages();
-        if (null == storageOriginal || !storageOriginal.get("code").toString().equals("200")) {
+        if (null == storageOriginal || !"200".equals(storageOriginal.get("code").toString())) {
             return false;
         }
 
@@ -607,10 +607,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                             if (statisticObject != null) {
                                 NfsDataInfo nfsDataInfo = new NfsDataInfo();
                                 nfsDataInfo.setFsId(fsId);
-                                nfsDataInfo.setOPS(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT), null));
-                                nfsDataInfo.setBandwidth(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_BANDWIDTH), null));
-                                nfsDataInfo.setReadResponseTime(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_READRESPONSETIME), null));
-                                nfsDataInfo.setWriteResponseTime(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_WRITERESPONSETIME), null));
+                                nfsDataInfo.setOPS(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT), null));
+                                nfsDataInfo.setBandwidth(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_BANDWIDTH), null));
+                                nfsDataInfo.setReadResponseTime(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_READRESPONSETIME), null));
+                                nfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_WRITERESPONSETIME), null));
                                 relists.add(nfsDataInfo);
                             }
                         }
@@ -724,9 +724,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                     Map<String, Object> addition = new HashMap<>();
                     addition.put("name", hostIp);
                     addition.put("accessval", ToolUtils.getStr(params.get("mountType")));
-                    addition.put("all_squash", "all_squash");
+                    addition.put("all_squash", "no_all_squash");
                     addition.put("root_squash", "root_squash");
                     addition.put("sync", "synchronization");
+                    addition.put("secure", "insecure");
                     listAddition.add(addition);
                 }
                 requestbody.put("nfs_share_client_addition", listAddition);
@@ -754,6 +755,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     //卸载NFS
+    @Override
     public void unmountNfs(Map<String, Object> params) throws Exception {
         // 过滤vm注册的主机和集群,此步骤暂未处理
         if (null != params) {

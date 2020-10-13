@@ -22,7 +22,7 @@
     "refresh": "Refresh"
   },
   "validations": {
-    "required": "This field is required",
+    "required": "This field is required!",
     "minlength": "Should have atleast {{number}} characters",
     "maxlength": "This value should be less than {{number}} characters",
     "min": "This value should be more than {{number}}",
@@ -238,6 +238,7 @@
     }
   },
   "storage":{
+    "storage":"Storage",
     "list":{
       "name":"Name",
       "ipAddress":"IP Address",
@@ -485,6 +486,7 @@
     "storage1": "Storage/Storage Pool",
     "storage": "Storage Device",
     "sPool": "Storage Pool",
+    "dataStore": "DataStore",
     "ownerC": "Owner Controller",
     "idp": "Initial Distribute Policy",
     "fetchP": "Prefetch Policy",
