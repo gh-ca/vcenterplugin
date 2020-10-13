@@ -23,6 +23,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
+/**
+ * @author andrewliu
+ */
 @RestController
 public class ApplicationController {
 
@@ -57,13 +60,13 @@ public class ApplicationController {
   }
 
   @RequestMapping(value = "rest/registerByDME", method = RequestMethod.POST)
-  public Map registerByDME(HttpServletRequest request,@RequestBody Map<String, String> formData) {
+  public Map registerByDme(HttpServletRequest request, @RequestBody Map<String, String> formData) {
     Map map=Validations.onloadChecker(request);
     String username=formData.get("vcenterUsername");
     String password=formData.get("vcenterPassword");
     String vcenterip=formData.get("vcenterIP");
     String vcenterport=formData.get("vcenterPort");
-    String dmeIP=formData.get("dmeIP");
+    String dmeIp=formData.get("dmeIP");
     String dmePort=formData.get("dmePort");
     String dmeUsername=formData.get("dmeUsername");
     String dmePassword=formData.get("dmePassword");
@@ -79,7 +82,7 @@ public class ApplicationController {
             password,
             vcenterip,
             vcenterport,
-            version,dmeIP,dmePort,dmeUsername,dmePassword);
+            version,dmeIp,dmePort,dmeUsername,dmePassword);
   }
 
   @RequestMapping(value = "rest/unregister", method = RequestMethod.POST)
@@ -93,7 +96,7 @@ public class ApplicationController {
   }
 
   @RequestMapping(value = "rest/unregisterByDME", method = RequestMethod.POST)
-  public Map unregisterByDME(@RequestBody Map<String, String> formData) {
+  public Map unregisterByDme(@RequestBody Map<String, String> formData) {
     return Validations.unRegister("",
             formData.get("vcenterUsername"),
             formData.get("vcenterPassword"),

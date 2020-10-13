@@ -238,6 +238,7 @@
     }
   },
   "storage":{
+    "storage":"存储",
     "list":{
       "name":"名称",
       "ipAddress":"IP地址",

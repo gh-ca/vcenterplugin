@@ -1,30 +1,92 @@
 package com.dmeplugin.dmestore.model;
-
+/**
+ * @Description: TODO
+ * @ClassName: NfsDataInfo
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 public class NfsDataInfo {
-    //列表字段（基本视图）
-    String objectid; //跳转用唯一id
-    String name;    //名称
-    String status;  //状态
-    Double capacity;  //总容量 单位GB
-    Double freeSpace; //空闲容量 单位GB
-    Double reserveCapacity; //置备容量  capacity+uncommitted-freeSpace 单位GB
-    String deviceId; //存储设备ID
-    String device; //存储设备名称
-    String logicPort; //逻辑端口
-    String logicPortId; //逻辑端口 id
-    String shareIp; //share ip
-    String sharePath; //share path
-    String share; //share 名称
-    String shareId; //share id
-    String fs; //fs
-    String fsId; //fs id
-
-    //列表字段（性能视图）：
-    Integer OPS; //OPS
-    Double bandwidth;   //带宽 单位MB/s
-
-    Integer readResponseTime;   //读响应时间 单位ms
-    Integer writeResponseTime; //写响应时间 单位ms
+    /**
+     * 跳转用唯一id
+     **/
+    String objectid;
+    /**
+     * 名称
+     **/
+    String name;
+    /**
+     * 状态
+     **/
+    String status;
+    /**
+     * 总容量 单位GB
+     **/
+    Double capacity;
+    /**
+     * 空闲容量 单位GB
+     **/
+    Double freeSpace;
+    /**
+     * 置备容量  capacity+uncommitted-freeSpace 单位GB
+     **/
+    Double reserveCapacity;
+    /**
+     * 存储设备ID
+     **/
+    String deviceId;
+    /**
+     * 存储设备名称
+     **/
+    String device;
+    /**
+     * 逻辑端口
+     **/
+    String logicPort;
+    /**
+     * 逻辑端口 id
+     **/
+    String logicPortId;
+    /**
+     * share ip
+     **/
+    String shareIp;
+    /**
+     * share path
+     **/
+    String sharePath;
+    /**
+     * share 名称
+     **/
+    String share;
+    /**
+     * share id
+     **/
+    String shareId;
+    /**
+     * fs
+     **/
+    String fs;
+    /**
+     * fs id
+     **/
+    String fsId;
+    /**
+     * OPS
+     **/
+    Float ops;
+    /**
+     * 带宽 单位MB/s
+     **/
+    Float bandwidth;
+    /**
+     * 读响应时间 单位ms
+     **/
+    Float readResponseTime;
+    /**
+     * 写响应时间 单位ms
+     **/
+    Float writeResponseTime;
 
     public String getObjectid() {
         return objectid;
@@ -72,6 +134,14 @@ public class NfsDataInfo {
 
     public void setReserveCapacity(Double reserveCapacity) {
         this.reserveCapacity = reserveCapacity;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 
     public String getDevice() {
@@ -146,43 +216,35 @@ public class NfsDataInfo {
         this.fsId = fsId;
     }
 
-    public Integer getOPS() {
-        return OPS;
+    public Float getOps() {
+        return ops;
     }
 
-    public void setOPS(Integer OPS) {
-        this.OPS = OPS;
+    public void setOps(Float ops) {
+        this.ops = ops;
     }
 
-    public Double getBandwidth() {
+    public Float getBandwidth() {
         return bandwidth;
     }
 
-    public void setBandwidth(Double bandwidth) {
+    public void setBandwidth(Float bandwidth) {
         this.bandwidth = bandwidth;
     }
 
-    public Integer getReadResponseTime() {
+    public Float getReadResponseTime() {
         return readResponseTime;
     }
 
-    public void setReadResponseTime(Integer readResponseTime) {
+    public void setReadResponseTime(Float readResponseTime) {
         this.readResponseTime = readResponseTime;
     }
 
-    public Integer getWriteResponseTime() {
+    public Float getWriteResponseTime() {
         return writeResponseTime;
     }
 
-    public void setWriteResponseTime(Integer writeResponseTime) {
+    public void setWriteResponseTime(Float writeResponseTime) {
         this.writeResponseTime = writeResponseTime;
-    }
-
-    public String getDeviceId() {
-        return deviceId;
-    }
-
-    public void setDeviceId(String deviceId) {
-        this.deviceId = deviceId;
     }
 }

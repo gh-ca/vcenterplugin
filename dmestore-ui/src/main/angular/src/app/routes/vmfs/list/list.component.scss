@@ -8,6 +8,10 @@
 .blueBg{
   background-color: lightblue;
 }
+.merginLeft{
+  margin-left: 20px;
+  border-style: solid;
+}
 .expend-wrap{
   padding: 0;
   border: solid 1px hsl(198, 78%, 78%);
@@ -50,6 +54,10 @@
     margin-left: -10px;
   }
 }
+.btn+.btn {
+  border-left: 0.05rem solid;
+}
+
 ::ng-deep .clr-accordion-content{background-color: #EDF6FA;position: relative;border: none;}
 ::ng-deep .clr-accordion-angle{display: none;}
 ::ng-deep .clr-accordion-header{border: 3px solid #99C9E2; }

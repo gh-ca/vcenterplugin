@@ -51,12 +51,10 @@ export class StorageComponent implements OnInit, AfterViewInit {
     this.cdr.detectChanges();
   }
   //跳转详情页面的方法
-  toDetailView(id){
-    console.log('id')
-    console.log(id)
+  toDetailView(id,name){
     this.router.navigate(['storage/detail'],{
       queryParams:{
-        id
+        id,name
       }
     });
   }

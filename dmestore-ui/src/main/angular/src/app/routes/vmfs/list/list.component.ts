@@ -46,7 +46,7 @@ export class VmfsListComponent implements OnInit {
   total = 0; // 总数据数量
   isLoading = true; // table数据loading
   rowSelected = []; // 当前选中数据
-  volumnIds = []; // 卷ID
+  wwns = []; // wwn 用来查询chart data
   query = { // 查询数据
     q: 'user:VMware',
     sort: 'stars',
@@ -184,15 +184,15 @@ export class VmfsListComponent implements OnInit {
             if (null !== this.list) {
               this.total = this.list.length;
               // 获取chart 数据
-              const volumeIds = [];
+              const wwns = [];
               this.list.forEach(item => {
-                volumeIds.push(item.volumeId);
+                wwns.push(item.wwn);
               });
               // 设置卷ID集合
-              this.volumnIds = volumeIds;
+              this.wwns = wwns;
 
-              if (this.volumnIds.length > 0) {
-                this.remoteSrv.getChartData(this.volumnIds).subscribe((chartResult: any) => {
+              if (this.wwns.length > 0) {
+                this.remoteSrv.getChartData(this.wwns).subscribe((chartResult: any) => {
                   console.log('chartResult');
                   console.log(chartResult);
                   if (chartResult.code === '200' && chartResult.data != null) {
@@ -200,7 +200,7 @@ export class VmfsListComponent implements OnInit {
                     this.list.forEach(item => {
                       chartList.forEach(charItem => {
                         // 若属同一个卷则将chartItem的带宽、iops、读写相应时间 值赋予列表
-                        if (item.volumeId === charItem.volumeId) {
+                        if (item.wwn === charItem.wwn) {
                           item.iops = charItem.iops;
                           item.bandwidth = charItem.bandwidth;
                           item.readResponseTime = charItem.readResponseTime;
