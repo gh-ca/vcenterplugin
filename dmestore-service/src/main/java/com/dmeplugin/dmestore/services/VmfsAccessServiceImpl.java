@@ -224,7 +224,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     List<String> taskIds = new ArrayList<>();
                     taskIds.add(taskId);
                     boolean createFlag = taskService.checkTaskStatus(taskIds);
-                    if (createFlag) { //DME创建完成
+                    if (createFlag) {
+                        //DME创建完成
                         //查找刚才创建好的卷
                         String dmeHostId = null;
                         String demHostGroupId = null;
@@ -802,7 +803,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     List<String> taskIds = new ArrayList<>();
                     taskIds.add(taskId);
                     boolean mountFlag = taskService.checkTaskStatus(taskIds);
-                    if (mountFlag) { //DME创建完成
+                    if (mountFlag) {
+                        //DME创建完成
                         //调用vCenter在主机上扫描卷和Datastore
                         vcsdkUtils.scanDataStore(ToolUtils.getStr(params.get("clusterId")), ToolUtils.getStr(params.get("hostId")));
                         //如果是需要扫描LUN来挂载，则需要执行下面的方法，dataStoreNames
