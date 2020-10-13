@@ -370,7 +370,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 ResponseEntity responseEntity = dmeAccessService.access(CREATE_VOLUME_URL, HttpMethod.POST, gson.toJson(requestbody));
 
                 LOG.info("create ByServiceLevel vmfs responseEntity==" + responseEntity.toString());
-                if (responseEntity.getStatusCodeValue() == 202) {
+                if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_202) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                     if (null!=jsonObject && !ToolUtils.jsonIsNull(jsonObject.get(DmeConstants.TASKID))) {
                         taskId = ToolUtils.jsonToStr(jsonObject.get("task_id"));
@@ -409,11 +409,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 smartqos.put("miniops", ToolUtils.getInt(params.get("miniops"),null));
                 smartqos.put("name", ToolUtils.getStr(params.get("qosname")));
 
-                if(!StringUtils.isEmpty(params.get("control_policy"))) {
+                if(!StringUtils.isEmpty(params.get(DmeConstants.CONTROLPOLICY))) {
                     tuning.put("smartqos", smartqos);
                 }
 
-                if(!StringUtils.isEmpty(params.get("alloctype"))
+                if(!StringUtils.isEmpty(params.get(DmeConstants.ALLOCTYPE))
                         || !StringUtils.isEmpty(params.get("workload_type_id"))
                         || !StringUtils.isEmpty(params.get("control_policy"))) {
                     cv.put("tuning", tuning);
@@ -443,7 +443,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 LOG.info("create UNServiceLevel vmfs_url===" + CREATE_VOLUME_UNSERVICE_URL);
                 ResponseEntity responseEntity = dmeAccessService.access(CREATE_VOLUME_UNSERVICE_URL, HttpMethod.POST, gson.toJson(requestbody));
                 LOG.info("create UNServiceLevel vmfs responseEntity==" + responseEntity.toString());
-                if (responseEntity.getStatusCodeValue() == 202) {
+                if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_202) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                     if (null!=jsonObject && !ToolUtils.jsonIsNull(jsonObject.get(DmeConstants.TASKID))) {
                         taskId = ToolUtils.jsonToStr(jsonObject.get("task_id"));
@@ -701,7 +701,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
 
-                if (jsonObject != null && jsonObject.get("volumes") != null) {
+                if (jsonObject != null && jsonObject.get(DmeConstants.VOLUMES) != null) {
                     volumelist = new ArrayList<>();
                     JsonArray jsonArray = jsonObject.getAsJsonArray("volumes");
                     for (int i = 0; i < jsonArray.size(); i++) {
@@ -765,7 +765,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //挂载卷
                 String taskId = "";
                 //通过存储的objectid查询卷id
-                if (params.get("dataStoreObjectIds") != null) {
+                if (params.get(DmeConstants.DATASTOREOBJECTIDS) != null) {
                     List<String> dataStoreObjectIds = (List<String>) params.get("dataStoreObjectIds");
                     LOG.info("dataStoreObjectIds=="+dataStoreObjectIds);
                     if (dataStoreObjectIds != null && dataStoreObjectIds.size() > 0) {
@@ -806,7 +806,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         //调用vCenter在主机上扫描卷和Datastore
                         vcsdkUtils.scanDataStore(ToolUtils.getStr(params.get("clusterId")), ToolUtils.getStr(params.get("hostId")));
                         //如果是需要扫描LUN来挂载，则需要执行下面的方法，dataStoreNames
-                        if (params.get("dataStoreNames") != null) {
+                        if (params.get(DmeConstants.DATASTORENAMES) != null) {
                             List<String> dataStoreNames = (List<String>) params.get("dataStoreNames");
                             //
                             if (dataStoreNames != null && dataStoreNames.size() > 0) {
@@ -1182,7 +1182,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         ResponseEntity<String> responseEntity;
         try {
             responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            if (responseEntity.getStatusCodeValue() / 100 != 2) {
+            if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
                 LOG.error("查询指定卷信息失败!错误信息:{}", responseEntity.getBody());
                 return null;
             }

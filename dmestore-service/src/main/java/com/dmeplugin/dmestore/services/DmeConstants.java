@@ -125,7 +125,11 @@ public class DmeConstants {
     public static final String HOSTGROUPID = "hostgroup_id";
     public static final String VOLUMEID = "volume_id";
     public static final String VOLUMEIDS = "volumeIds";
-
+    public static final String CONTROLPOLICY = "control_policy";
+    public static final String ALLOCTYPE = "alloctype";
+    public static final String VOLUMES = "volumes";
+    public static final String DATASTOREOBJECTIDS = "dataStoreObjectIds";
+    public static final String DATASTORENAMES = "dataStoreNames";
 
     public static final String TASK_DETAIL_STATUS_FILE = "status";
     public static final int TASK_SUCCESS = 3;
