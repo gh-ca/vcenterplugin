@@ -17,7 +17,7 @@ export class NfsService {
   static vmfsUrl = 'datastorestatistichistrory/vmfs';
 
   // NFS IOPS 0Read 1Write
-  static nfsIOPS: Array<string> = ['1125921381744648', '1125921381744649'];
+  static nfsOPS: Array<string> = ['1125921381744648', '1125921381744649'];
   // NFS  bandwidth 0Read 1Write
   static nfsBDWT: Array<string> = ['1125921381744646', '1125921381744647'];
   // NFS  latency 0Read 1Write
