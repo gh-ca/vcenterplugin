@@ -112,7 +112,7 @@ public class VCSDKUtils {
                             List<String> wwnList = new ArrayList<>();
                             if(null != extent){
                                 for(HostScsiDiskPartition hostScsiDiskPartition : extent){
-                                    String wwn = hostScsiDiskPartition.getDiskName().replace("nna.", "");
+                                    String wwn = hostScsiDiskPartition.getDiskName().replace("naa.", "");
                                     wwnList.add(wwn);
                                 }
                                 dsmap.put("vmfsWwnList", wwnList);

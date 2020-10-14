@@ -1005,7 +1005,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             String vmfsDatastoreId = vmfsDatastore.get("objectid").getAsString();
             String vmfsDatastoreName = vmfsDatastore.get("name").getAsString();
             JsonArray wwnArray = vmfsDatastore.getAsJsonArray("vmfsWwnList");
-            if(null != wwnArray || wwnArray.size() == 0){
+            if(null == wwnArray || wwnArray.size() == 0){
                 continue;
             }
 
