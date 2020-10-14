@@ -27,7 +27,7 @@
 }
 .gh-info-lable{
   display: inline-block;
-  width: 150px;
+  min-width: 80px;
   text-align: left;
   font-weight: 500;
   font-size: 14px;
@@ -50,8 +50,9 @@
 }
 .info-card{
   padding: 30px;
-  border: solid 1px hsl(198, 0%, 80%);
+  border: solid 1px #E4E7ED;
   background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .12), 0 0 6px rgba(0, 0, 0, .04);
   .info-card-header{
     display: flex;
     justify-content: space-between;
@@ -135,32 +136,40 @@
   align-items: center;
   color: #303133;
   font-size: 16px;
-  margin-bottom: 20px;
 }
 .info-content{
-  margin-left: 30px;
+  margin-left: 0px;
 }
 .info-content-text{
   margin: 10px 0;
   position: relative;
+  line-height: 22px;
   span:first-child{
-    width: 60px;
+    width: 80px;
     display: inline-block;
   }
   .squre{
     position: absolute;
-    left: -20px;
-    top: 1px;
+    left: -22px;
+    top: 4px;
     width: 14px;
     height: 14px;
   }
   .used{
     background-color: hsl(198, 100%, 32%);
-    border: solid 1px hsl(198, 100%, 24%);
+    border-radius: 1px;
   }
   .free{
-    background-color: hsl(198, 0%, 80%);
-    border: solid 1px hsl(198, 0%, 55%);
+    background-color: #e8e8e8;
+    border-radius: 1px;
+  }
+  .normal{
+    background-color: #92CF5A;
+    border-radius: 1px;
+  }
+  .abnormal{
+    background-color: #CA2200;
+    border-radius: 1px;
   }
 }
 .info-content-bottom{
