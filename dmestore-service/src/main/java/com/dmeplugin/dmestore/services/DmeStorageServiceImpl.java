@@ -456,7 +456,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             LOG.info("DmeStorageServiceImpl/getDTrees/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
-                resMap.put("code", 200);
+                resMap.put("code", code);
                 resMap.put("msg", "list dtree error!");
                 return resMap;
             }
