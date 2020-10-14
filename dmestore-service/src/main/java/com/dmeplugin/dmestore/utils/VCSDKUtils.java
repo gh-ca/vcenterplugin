@@ -79,8 +79,9 @@ public class VCSDKUtils {
     private static VmodlContext context;
 
     private Gson gson = new Gson();
-
-    //得到所有存储的info 20200918objectId
+    /**
+     *得到所有存储的info
+     **/
     public String getAllVmfsDataStoreInfos(String storeType) throws Exception {
         String listStr = "";
         try {
@@ -125,8 +126,9 @@ public class VCSDKUtils {
         }
         return listStr;
     }
-
-    //得到所有主机的ID与name  20200918objectId
+    /**
+     *得到所有主机的ID与name
+     **/
     public String getAllHosts() throws Exception {
         logger.info("get all hosts start");
         String listStr = "";
@@ -176,8 +178,9 @@ public class VCSDKUtils {
 
         return gson.toJson(lists);
     }
-
-    //得到所有集群的id与name 20200918objectId
+    /**
+     *得到所有集群的id与name
+     **/
     public String getAllClusters() throws Exception {
         String listStr = "";
         try {
@@ -208,19 +211,21 @@ public class VCSDKUtils {
         }
         return listStr;
     }
-
-    //得到所有主机的ID与name 除去已经挂载了当前存储的主机  20200918objectId
+    /**
+    *得到所有主机的ID与name 除去已经挂载了当前存储的主机  20200918objectId
+    **/
     public String getHostsByDsObjectId(String dataStoreObjectId) throws Exception {
         return getHostsByDsObjectId(dataStoreObjectId, true);
     }
-
-    ////得到所有主机的ID与name 除去没有挂载了当前存储的主机  20200923objectId
+    /**
+     *得到所有主机的ID与name 除去没有挂载了当前存储的主机
+     **/
     public String getMountHostsByDsObjectId(String dataStoreObjectId) throws Exception {
         return getHostsByDsObjectId(dataStoreObjectId, false);
     }
-
-    //得到所有集群的ID与name 除去已经挂载了当前存储的集群  扫描集群下所有主机，只要有一个主机没挂当前存储就要显示，只有集群下所有主机都挂载了该存储就不显示
-    //20200918objectId
+    /**
+     *得到所有集群的ID与name 除去已经挂载了当前存储的集群  扫描集群下所有主机，只要有一个主机没挂当前存储就要显示，只有集群下所有主机都挂载了该存储就不显示
+     **/
     public String getClustersByDsObjectId(String dataStoreObjectId) throws Exception {
         String listStr = "";
         try {
@@ -283,9 +288,9 @@ public class VCSDKUtils {
         }
         return listStr;
     }
-
-    //得到所有集群的ID与name 只要集群下有主机挂载了该存储就显示
-    //20200918objectId
+    /**
+     *得到所有集群的ID与name 只要集群下有主机挂载了该存储就显示
+     **/
     public String getMountClustersByDsObjectId(String dataStoreObjectId) throws Exception {
         String listStr = "";
         try {
@@ -348,8 +353,9 @@ public class VCSDKUtils {
         }
         return listStr;
     }
-
-    //得到所有存储 除去已经挂载了当前主机的存储 20200918objectId
+    /**
+     *得到所有存储 除去已经挂载了当前主机的存储 20200918objectId
+     **/
     public String getDataStoresByHostObjectId(String hostObjectId, String dataStoreType) throws Exception {
         String listStr = "";
         try {
@@ -413,9 +419,9 @@ public class VCSDKUtils {
         }
         return listStr;
     }
-
-    //得到所有存储 除去已经挂载了当前集群的存储 扫描集群下所有主机，只要有一个主机没挂当前存储就要显示，只有集群下所有主机都挂载了该存储就不显示
-    //20200918objectId
+    /**
+     *得到所有存储 除去已经挂载了当前集群的存储 扫描集群下所有主机，只要有一个主机没挂当前存储就要显示，只有集群下所有主机都挂载了该存储就不显示
+     **/
     public String getDataStoresByClusterObjectId(String clusterObjectId, String dataStoreType) throws Exception {
         String listStr = "";
         try {
@@ -495,8 +501,9 @@ public class VCSDKUtils {
         }
         return listStr;
     }
-
-    //得到指定集群下的所有主机 20200918objectId
+    /**
+     *得到指定集群下的所有主机 20200918objectId
+     **/
     public String getHostsOnCluster(String clusterObjectId) throws Exception {
         String listStr = "";
         try {
@@ -530,8 +537,9 @@ public class VCSDKUtils {
         }
         return listStr;
     }
-
-    //得到集群下所有没有挂载的主机 20200918objectId
+    /**
+     *得到集群下所有没有挂载的主机 20200918objectId
+     **/
     public List<String> getUnmoutHostsOnCluster(String dataStoreObjectId, List<Map<String, String>> clusters) throws Exception {
         List<String> hostlist = null;
         try {
@@ -561,8 +569,9 @@ public class VCSDKUtils {
         }
         return hostlist;
     }
-
-    //得到指定集群下的所有主机,以及指定主机所属集群下的所有主机 20200918objectId
+    /**
+     *得到指定集群下的所有主机,以及指定主机所属集群下的所有主机 20200918objectId
+     **/
     public List<Pair<ManagedObjectReference, String>> getHostsOnCluster(String clusterObjectId, String hostObjectId) throws Exception {
         List<Pair<ManagedObjectReference, String>> hosts = null;
         try {
@@ -604,8 +613,9 @@ public class VCSDKUtils {
 
         return hosts;
     }
-
-    //rename datastore name
+    /**
+     *rename datastore name
+     **/
     public String renameDataStore(String newName, String dataStoreObjectId) throws Exception {
 
         String result = "success";
@@ -626,8 +636,9 @@ public class VCSDKUtils {
             return result;
         }
     }
-
-    //get oriented datastore capacity
+    /**
+     *get oriented datastore capacity
+     **/
     public static Map<String, Object> getCapacityOnVmfs(String dsname) {
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("msg", "success");
@@ -648,8 +659,9 @@ public class VCSDKUtils {
             return resMap;
         }
     }
-
-    //expand oriented datastore capacity
+    /**
+     *expand oriented datastore capacity
+     **/
     public String expandVmfsDatastore(String dsname, Integer add_capacity) {
 
         String result = "success";
@@ -696,8 +708,9 @@ public class VCSDKUtils {
             return result;
         }
     }
-
-    //recycle vmfs datastore capacity
+    /**
+     *recycle vmfs datastore capacity
+     **/
     public String recycleVmfsCapacity(String dsname) throws Exception {
 
         String result = "success";
@@ -737,8 +750,9 @@ public class VCSDKUtils {
         }
         return result;
     }
-
-    //create nfs datastore
+    /**
+     *create nfs datastore
+     **/
     public String createNfsDatastore(String serverHost, String exportPath, String nfsName, String accessMode, List<Map<String,String>> hostObjectIds,String type) {
         String response = "";
         //exportPath = "/volume1/TESTNFS";
@@ -845,8 +859,9 @@ public class VCSDKUtils {
     private static void hostAction() {
 
     }
-
-    //得到主机对应的可用LUN
+    /**
+     *得到主机对应的可用LUN
+     **/
     public String getLunsOnHost(String hostName) throws Exception {
         String lunStr = "";
         try {
@@ -906,8 +921,9 @@ public class VCSDKUtils {
         return lunStr;
 //
     }
-
-    //得到主机对应的可用LUN 20200918objectId
+    /**
+     *得到主机对应的可用LUN 20200918objectId
+     **/
     public Map<String, Object> getLunsOnHost(String hostObjectId, int capacity,String volumeWwn) throws Exception {
         Map<String, Object> remap = null;
         HostScsiDisk candidateHostScsiDisk = null;
@@ -945,8 +961,9 @@ public class VCSDKUtils {
         return remap;
 //
     }
-
-    //得到主机的hba设备名
+    /**
+     *得到主机的hba设备名
+     **/
     public List<String> getHbaDeviceByHost(HostMO hostMo){
         List<String> devices = null;
         try{
@@ -974,8 +991,9 @@ public class VCSDKUtils {
         }
         return devices;
     }
-
-    //得到集群下所有主机对应的可用LUN 20200918objectId
+    /**
+     *得到集群下所有主机对应的可用LUN 20200918objectId
+     **/
     public Map<String, Object> getLunsOnCluster(String clusterObjectId, int capacity, String volumeWwn) throws Exception {
         Map<String, Object> remap = null;
         HostScsiDisk candidateHostScsiDisk = null;
@@ -1033,8 +1051,9 @@ public class VCSDKUtils {
         return remap;
 //
     }
-
-    //得到主机对应的可用LUN 20200918objectId
+    /**
+     *得到主机对应的可用LUN 20200918objectId
+     **/
     public HostScsiDisk getObjectLuns(List<HostScsiDisk> hostScsiDisks, int capacity, String volumeWwn) throws Exception {
         HostScsiDisk candidateHostScsiDisk = null;
         try {
@@ -1063,8 +1082,9 @@ public class VCSDKUtils {
         return candidateHostScsiDisk;
 //
     }
-
-    //创建vmfs存储 20200918objectId
+    /**
+     *创建vmfs存储 20200918objectId
+     **/
     public String createVmfsDataStore(Map<String, Object> hsdmap, int capacity, String datastoreName,
                                       int vmfsMajorVersion, int blockSize,
                                       int unmapGranularity, String unmapPriority) throws Exception {
@@ -1124,8 +1144,9 @@ public class VCSDKUtils {
         return dataStoreStr;
 //
     }
-
-    //vmfs存储打标记 20200918objectId
+    /**
+     *vmfs存储打标记 20200918objectId
+     **/
     public String attachTag(String datastoreType, String datastoreId, String serviceLevelName, VCenterInfo vCenterInfo) throws Exception {
         String attachTagStr = "";
 
@@ -1176,8 +1197,9 @@ public class VCSDKUtils {
 //
     }
 
-
-    //删除vmfs存储
+    /**
+     *删除vmfs存储
+     **/
     public boolean deleteVmfsDataStore(String name) throws Exception {
         boolean deleteFlag = false;
         try {
@@ -1204,8 +1226,9 @@ public class VCSDKUtils {
         }
         return deleteFlag;
     }
-
-    //将存储挂载到集群下其它主机 20200918objectId
+    /**
+     *将存储挂载到集群下其它主机 20200918objectId
+     **/
     public void mountVmfsOnCluster(String datastoreStr, String clusterObjectId, String hostObjectId) throws Exception {
         try {
             if (StringUtils.isEmpty(datastoreStr)) {
@@ -1258,8 +1281,9 @@ public class VCSDKUtils {
             throw e;
         }
     }
-
-    //挂载存储 20200918objectId
+    /**
+     *挂载存储 20200918objectId
+     **/
     public void mountVmfs(String datastoreName, HostMO hostMo) throws Exception {
         try {
             if (StringUtils.isEmpty(datastoreName)) {
@@ -1299,8 +1323,9 @@ public class VCSDKUtils {
             logger.error(hostMo.getName()+" mount Vmfs Volume:"+datastoreName+"  error:"+e.toString());
         }
     }
-
-    //在主机上扫描卷和Datastore 20200918objectId
+    /**
+     *在主机上扫描卷和Datastore 20200918objectId
+     **/
     public void scanDataStore(String clusterObjectId, String hostObjectId) throws Exception {
         try {
             String serverguid = null;
@@ -1380,8 +1405,9 @@ public class VCSDKUtils {
 
         return list;
     }
-
-    //将存储挂载到集群下其它主机 20200918objectId
+    /**
+     *将存储挂载到集群下其它主机 20200918objectId
+     **/
     public void mountNfsOnCluster(String dataStoreObjectId, List<Map<String, String>> clusters, List<Map<String, String>> hosts, String mountType) throws Exception {
         try {
             if (StringUtils.isEmpty(dataStoreObjectId)) {
@@ -1429,8 +1455,9 @@ public class VCSDKUtils {
             throw e;
         }
     }
-
-    //挂载Nfs存储 20200918objectId
+    /**
+     *挂载Nfs存储 20200918objectId
+     **/
     public void mountNfs(DatastoreMO dsmo, HostMO hostMo, String mountType) throws Exception {
         try {
             if (dsmo == null) {
@@ -1512,8 +1539,9 @@ public class VCSDKUtils {
             throw e;
         }
     }
-
-    //卸载Nfs存储 20200918objectId
+    /**
+     *卸载Nfs存储 20200918objectId
+     **/
     public void unmountNfsOnHost(DatastoreMO dsmo, HostMO hostMo, String nfsId) throws Exception {
         try {
             if (dsmo == null) {
@@ -1536,8 +1564,9 @@ public class VCSDKUtils {
             logger.error("unmount nfs error:", e);
         }
     }
-
-    //卸载Nfs存储 20200918objectId
+    /**
+     *卸载Nfs存储 20200918objectId
+     **/
     public void unmountNfsOnCluster(DatastoreMO dsmo, ClusterMO clusterMo, String nfsId) throws Exception {
         try {
             if (dsmo == null) {
@@ -1560,8 +1589,9 @@ public class VCSDKUtils {
             logger.error("unmount nfs error:", e);
         }
     }
-
-    //Get host's vmKernel IP,only provisioning provisioning
+    /**
+     *Get host's vmKernel IP,only provisioning provisioning
+     **/
     public String getVmKernelIpByHostObjectId(String hostObjectId) throws Exception {
         String listStr = "";
         try {
@@ -1820,8 +1850,9 @@ public class VCSDKUtils {
         }
 
     }
-
-    //主机配置iscsi
+    /**
+     *主机配置iscsi
+     **/
     public void configureIscsi(String hostObjectId, Map<String, String> vmKernel, List<Map<String, Object>> ethPorts) throws Exception {
         try {
             if (ethPorts == null) {
@@ -1873,8 +1904,9 @@ public class VCSDKUtils {
         }
 
     }
-
-    //网络端口邦定，将vmKernelDevice邦定到iscsiHbaDevice
+    /**
+     *网络端口邦定，将vmKernelDevice邦定到iscsiHbaDevice
+     **/
     public void boundVmKernel(HostMO hostmo, Map<String, String> vmKernel, String iscsiHbaDevice) throws Exception {
         try {
             if (vmKernel == null) {
@@ -1905,8 +1937,9 @@ public class VCSDKUtils {
             throw e;
         }
     }
-
-    //添加发现目标
+    /**
+     *添加发现目标
+     **/
     public void addIscsiSendTargets(HostMO hostmo, List<Map<String, Object>> ethPorts, String iscsiHbaDevice) throws Exception {
         try {
             if (ethPorts == null) {
@@ -1945,8 +1978,9 @@ public class VCSDKUtils {
 
     }
 
-
-    //删除NFS dataStore
+    /**
+     *删除NFS dataStore
+     **/
     public void deleteNfs(String dataStoreObjectId, List<String> hostIds) throws Exception {
         if (StringUtils.isEmpty(dataStoreObjectId)) {
             logger.info("delete dataStore,  datasotreObject id:" + dataStoreObjectId + " is null");
@@ -1988,8 +2022,9 @@ public class VCSDKUtils {
             logger.error("delete nfs error from host, hostId:" + hostName, e);
         }
     }
-
-    //得到所有主机的ID与name boolean mount 是否已经挂载了当前存储的主机
+    /**
+     *得到所有主机的ID与name boolean mount 是否已经挂载了当前存储的主机
+     **/
     public String getHostsByDsObjectId(String dataStoreObjectId, boolean mount) throws Exception {
         String listStr = "";
         try {
@@ -2050,8 +2085,9 @@ public class VCSDKUtils {
         }
         return listStr;
     }
-
-    //得到Hba信息
+    /**
+     *得到Hba信息
+     **/
     public Map<String,Object> getHbaByHostObjectId(String hostObjectId) throws Exception{
         Map<String,Object> map = new HashMap<>();
         try {
@@ -2087,8 +2123,9 @@ public class VCSDKUtils {
         }
         return map;
     }
-
-    //得到主机的hba
+    /**
+     *得到主机的hba
+     **/
     public List<Map<String,Object>> getHbasByHostObjectId(String hostObjectId) throws Exception{
         List<Map<String,Object>> hbalist = new ArrayList<>();
         try {
@@ -2128,8 +2165,9 @@ public class VCSDKUtils {
         }
         return hbalist;
     }
-
-    //得到主机的hba
+    /**
+     *得到主机的hba
+     **/
     public List<Map<String,Object>> getHbasByClusterObjectId(String clusterObjectId) throws Exception{
         List<Map<String,Object>> hbalist = new ArrayList<>();
         try {
@@ -2181,8 +2219,9 @@ public class VCSDKUtils {
         }
         return hbalist;
     }
-
-    //使用主机测试目标机的连通性
+    /**
+     *使用主机测试目标机的连通性
+     **/
     public String testConnectivity(String hostObjectId,List<Map<String, Object>> ethPorts,Map<String, String> vmKernel,VCenterInfo vCenterInfo) throws URISyntaxException, InvalidLogin, InvalidLocale, KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
         String reStr = null;
         if(StringUtils.isEmpty(hostObjectId)){
