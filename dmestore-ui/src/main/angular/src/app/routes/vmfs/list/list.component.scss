@@ -108,3 +108,13 @@
   vertical-align: middle;
   margin: 0
 }
+
+::ng-deep .modal-title-text{
+  line-height: 3rem;
+  border-bottom: 1px solid #DDDDDD;
+  font-weight: bolder;
+}
+
+::ng-deep .clr-wizard .clr-wizard-stepnav-link{
+  font-weight: bolder;
+}
