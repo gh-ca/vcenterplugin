@@ -24,6 +24,7 @@
         <property name="vmfsAccessService" ref="VmfsAccessServiceImpl"/>
         <property name="dmeNfsAccessService" ref="DmeNFSAccessServiceImpl"/>
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
+        <property name="taskService" ref="taskService"/>
     </bean>
 
     <bean name="h2DataBaseDao" class="com.dmeplugin.dmestore.dao.H2DataBaseDao">

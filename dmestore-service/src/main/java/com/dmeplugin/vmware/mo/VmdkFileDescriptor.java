@@ -49,17 +49,20 @@ public class VmdkFileDescriptor {
             while ((line = in.readLine()) != null) {
                 // ignore empty and comment lines
                 line = line.trim();
-                if (line.isEmpty())
+                if (line.isEmpty()) {
                     continue;
-                if (line.charAt(0) == '#')
+                }
+                if (line.charAt(0) == '#') {
                     continue;
+                }
 
                 String[] tokens = line.split("=");
                 if (tokens.length == 2) {
                     String name = tokens[0].trim();
                     String value = tokens[1].trim();
-                    if (value.charAt(0) == '\"')
+                    if (value.charAt(0) == '\"') {
                         value = value.substring(1, value.length() - 1);
+                    }
 
                     _properties.put(name, value);
                 } else {
@@ -76,8 +79,9 @@ public class VmdkFileDescriptor {
                 }
             }
         } finally {
-            if (in != null)
+            if (in != null) {
                 in.close();
+            }
         }
     }
 
@@ -130,8 +134,9 @@ public class VmdkFileDescriptor {
                 if (tokens.length == 2) {
                     String name = tokens[0].trim();
                     String value = tokens[1].trim();
-                    if (value.charAt(0) == '\"')
+                    if (value.charAt(0) == '\"') {
                         value = value.substring(1, value.length() - 1);
+                    }
 
                     if (newAdapterType != null && name.equals(VMDK_PROPERTY_ADAPTER_TYPE)) {
                         out.write(name + "=\"" + newAdapterType + "\"");
@@ -146,10 +151,12 @@ public class VmdkFileDescriptor {
                 }
             }
         } finally {
-            if (in != null)
+            if (in != null) {
                 in.close();
-            if (out != null)
+            }
+            if (out != null) {
                 out.close();
+            }
         }
 
         return bos.toByteArray();
@@ -185,10 +192,11 @@ public class VmdkFileDescriptor {
                 if (tokens.length == 2) {
                     String name = tokens[0].trim();
                     String value = tokens[1].trim();
-                    if (value.charAt(0) == '\"')
+                    if (value.charAt(0) == '\"') {
                         value = value.substring(1, value.length() - 1);
+                    }
 
-                    if (parentFileName != null && name.equals("parentFileNameHint")) {
+                    if (parentFileName != null && "parentFileNameHint".equals(name)) {
                         out.write(name + "=\"" + parentFileName + "\"");
                         out.newLine();
                     } else {
@@ -218,10 +226,12 @@ public class VmdkFileDescriptor {
                 }
             }
         } finally {
-            if (in != null)
+            if (in != null) {
                 in.close();
-            if (out != null)
+            }
+            if (out != null) {
                 out.close();
+            }
         }
 
         return bos.toByteArray();

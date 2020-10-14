@@ -16,6 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -88,9 +89,9 @@ public class VmRdmServiceImpl implements VmRdmService {
             volumeIds.add(volumeArr.get(i).getAsJsonObject().get("id").getAsString());
         }
 
-        if(null != mapping){
+        if(null == mapping){
             //将卷映射给主机
-             hostMapping(hostId, volumeIds);
+            dmeAccessService.hostMapping(hostId, volumeIds);
         }
         LOG.info("disk mapping to host succeeded!");
 
@@ -101,6 +102,9 @@ public class VmRdmServiceImpl implements VmRdmService {
         vcsdkUtils.hostRescanVmfs(hostIp);
         LOG.info("scan vmfs succeeded!");
 
+        //扫描hba，已发现新的卷
+        vcsdkUtils.hostRescanHba(hostIp);
+
         //获取LUN信息.有扫描需要一定的时间才能发现得了LUN信息，这里等待两分钟
         String lunStr = "";
         int times = 0;
@@ -109,7 +113,7 @@ public class VmRdmServiceImpl implements VmRdmService {
         while (times ++ < retryTimes){
             lunStr = vcsdkUtils.getLunsOnHost(hostIp);
             if(StringUtil.isNotBlank(lunStr)){
-               break;
+                break;
             }else {
                 Thread.sleep(2 * 1000);
             }
@@ -123,31 +127,58 @@ public class VmRdmServiceImpl implements VmRdmService {
         }
         LOG.info("get LUN information succeeded!");
         JsonArray lunArray = gson.fromJson(lunStr, JsonArray.class);
-        List<JsonObject> lunObjects = new ArrayList<>();
+        Map<String, JsonObject> lunMap = new HashMap<>();
         for (int i = 0; i < lunArray.size(); i++) {
             JsonObject lunObject = lunArray.get(i).getAsJsonObject();
             for (int j = 0; j < volumeArr.size(); j++) {
                 JsonObject volume = volumeArr.get(j).getAsJsonObject();
                 String wwn = volume.get("volume_wwn").getAsString();
                 if (lunObject.get("deviceName").getAsString().endsWith(wwn)) {
-                    lunObjects.add(lunObject);
+                    lunMap.put(volume.get("id").getAsString(), lunObject);
                 }
             }
         }
 
-        for (JsonObject object : lunObjects) {
-            //调用vCenter创建磁盘
-            vcsdkUtils.createDisk(dataStoreName, vmObjectId, object.get("devicePath").getAsString(), size);
+        String errorMsg = "";
+        int lunSize = lunMap.size();
+        if(lunSize > 0){
+            List<String> failList = new ArrayList();
+            for(Map.Entry<String, JsonObject> entry : lunMap.entrySet()){
+                String volumeId = entry.getKey();
+                JsonObject object = entry.getValue();
+                //调用vCenter创建磁盘
+                try {
+                    vcsdkUtils.createDisk(dataStoreName, vmObjectId, object.get("devicePath").getAsString(), size);
+                }catch (Exception ex){
+                    failList.add(volumeId);
+                    errorMsg = ex.getMessage();
+                }
+            }
+
+            if(failList.size() > 0){
+                deleteVolumes(hostId, failList);
+                //完全失败
+                if(failList.size() == lunSize){
+                    throw new Exception(errorMsg);
+                }
+            }
+        }else {
+            throw new Exception("No matching LUN information was found on the vCenter");
         }
     }
 
     private void deleteVolumes(String hostId, List<String> ids) throws Exception{
-        unMapHost(hostId, ids);
-        dmeAccessService.deleteVolumes(ids);
-    }
-
-    private void unMapHost(String hostId, List<String> ids) throws Exception{
-        dmeAccessService.unMapHost(hostId, ids);
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    dmeAccessService.unMapHost(hostId, ids);
+                    dmeAccessService.deleteVolumes(ids);
+                }catch (Exception ex){
+                    LOG.error("deleteVolumes error! {}", ex.getMessage());
+                }
+            }
+        });
     }
 
     public void createDmeRdm(VmRdmCreateBean vmRdmCreateBean) throws Exception {
@@ -190,26 +221,6 @@ public class VmRdmServiceImpl implements VmRdmService {
         String taskId = task.get("task_id").getAsString();
 
         return taskId;
-    }
-
-    private void hostMapping(String hostId, List<String> volumeIds) throws Exception {
-        String url = DmeConstants.DME_HOST_MAPPING_URL;
-        JsonObject body = new JsonObject();
-        body.addProperty("host_id", hostId);
-        JsonArray volumeIdArray = gson.fromJson(gson.toJson(volumeIds), JsonArray.class);
-        body.add("volume_ids", volumeIdArray);
-        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, body.toString());
-        if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
-            LOG.error("host mapping failed!errorMsg:{}", responseEntity.getBody());
-            throw new Exception(responseEntity.getBody());
-        }
-        JsonObject task = gson.fromJson(responseEntity.getBody(), JsonObject.class);
-        String taskId = task.get("task_id").getAsString();
-        JsonObject taskDetail = taskService.queryTaskByIdUntilFinish(taskId);
-        if (taskDetail.get(DmeConstants.TASK_DETAIL_STATUS_FILE).getAsInt() != DmeConstants.TASK_SUCCESS) {
-            LOG.error("host mapping failed!task status={}", task.get("status").getAsInt());
-            throw new Exception(task.get("detail_cn").getAsString());
-        }
     }
 
     @Override

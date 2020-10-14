@@ -37,7 +37,7 @@ public class SSLUtils {
     public static String[] getSupportedProtocols(String[] protocols) {
         Set<String> set = new HashSet<String>();
         for (String s : protocols) {
-            if (s.equals("SSLv3") || s.equals("SSLv2Hello")) {
+            if ("SSLv3".equals(s) || "SSLv2Hello".equals(s)) {
                 continue;
             }
             set.add(s);

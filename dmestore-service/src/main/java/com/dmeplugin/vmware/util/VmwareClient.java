@@ -361,8 +361,9 @@ public class VmwareClient {
 
         try {
             List<ObjectContent> ocary = vimPort.retrieveProperties(getPropCol(), specArr);
-            if (ocary != null && ocary.size() > 0)
+            if (ocary != null && ocary.size() > 0) {
                 return true;
+            }
         } catch (Exception e) {
             return false;
         }
@@ -593,7 +594,7 @@ public class VmwareClient {
         vimPort.destroyPropertyFilter(filterSpecRef);
 
         Object[] retVal = filterVals;
-        if (stateVal != null && stateVal.equalsIgnoreCase("success")) {
+        if (stateVal != null && "success".equalsIgnoreCase(stateVal)) {
             retVal = new Object[] { TaskInfoState.SUCCESS, null };
         }
 
@@ -775,8 +776,9 @@ public class VmwareClient {
                 if (type == null || type.equals(mor.getType())) {
                     if (propary.size() > 0) {
                         String propval = (String)propary.get(0).getVal();
-                        if (propval != null && name.equalsIgnoreCase(propval))
+                        if (propval != null && name.equalsIgnoreCase(propval)) {
                             return mor;
+                        }
                     }
                 }
             }

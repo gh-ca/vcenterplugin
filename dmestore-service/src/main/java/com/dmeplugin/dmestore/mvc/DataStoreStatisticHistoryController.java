@@ -37,9 +37,8 @@ public class DataStoreStatisticHistoryController extends BaseController {
     @ResponseBody
     public ResponseBodyBean getVmfsVolumeStatistic(@RequestBody Map<String, Object> params) throws Exception {
         LOG.info("datastorestatistichistrory/vmfs params==" + gson.toJson(params));
-
         Map<String, Object> resMap = dataSotreStatisticHistroyService.queryVmfsStatistic(params);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
+        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
             //Object data = resMap.get("data");
             //JsonObject dataJson = new JsonParser().parse(data.toString()).getAsJsonObject();
             Map<String, Object> data = (Map<String, Object>) resMap.get("data");
@@ -52,7 +51,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     /**
      * 查询volume性能
      *
-     * @param params key required: obj_ids, indicator_ids, range (obj_ids volumeInstanceId集合)
+     * @param params key required: obj_ids, indicator_ids, range (obj_ids volumeInstanceId集合,无法直接获取目前使用wwn)
      * @return
      * @throws Exception
      */
@@ -61,7 +60,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getVolumeStatistic(@RequestBody Map<String, Object> params) throws Exception {
         LOG.info("datastorestatistichistrory/volume params==" + gson.toJson(params));
         Map<String, Object> resMap = dataSotreStatisticHistroyService.queryVolumeStatistic(params);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
+        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
             Map<String, Object> data = (Map<String, Object>) resMap.get("data");
             return success(data);
         }
@@ -80,8 +79,9 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getNfsVolumeStatistic(@RequestBody Map<String, Object> params) throws Exception {
         LOG.info("datastorestatistichistrory/nfs params==" + gson.toJson(params));
         Map<String, Object> resMap = dataSotreStatisticHistroyService.queryNfsStatistic(params);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
-            return success(resMap);
+        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
+            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
+            return success(data);
         }
         return failure(gson.toJson(resMap));
     }
@@ -97,14 +97,13 @@ public class DataStoreStatisticHistoryController extends BaseController {
     @ResponseBody
     public ResponseBodyBean getFsStatistic(@RequestBody Map<String, Object> params) throws Exception {
         LOG.info("datastorestatistichistrory/fs params==" + gson.toJson(params));
-
         Map<String, Object> resMap = dataSotreStatisticHistroyService.queryFsStatistic(params);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
-            return success(resMap);
+        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
+            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
+            return success(data);
         }
         return failure(gson.toJson(resMap));
     }
-
 
     /**
      * 查询serviceLevel的性能(实际serviceLevel下的volume的性能)
@@ -119,14 +118,15 @@ public class DataStoreStatisticHistoryController extends BaseController {
         LOG.info("datastorestatistichistrory/servicelevel params==" + gson.toJson(params));
 
         Map<String, Object> resMap = dataSotreStatisticHistroyService.queryServiceLevelStatistic(params);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
-            return success(resMap);
+        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
+            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
+            return success(data);
         }
         return failure(gson.toJson(resMap));
     }
 
     /**
-     * 查询serviceLevel的卷性能
+     * 查询serviceLevel的卷性能,对象Id为服务等级Id eg:{"obj_ids" : ["cd17eca4-3056-4ca0-9a4a-2338174c33d8"]}
      *
      * @param params key required: obj_ids, indicator_ids, range (obj_ids,serviceLevelId)
      * @return
@@ -136,16 +136,16 @@ public class DataStoreStatisticHistoryController extends BaseController {
     @ResponseBody
     public ResponseBodyBean getServiceLevelLunStatistic(@RequestBody Map<String, Object> params) throws Exception {
         LOG.info("datastorestatistichistrory/servicelevellun params==" + gson.toJson(params));
-
         Map<String, Object> resMap = dataSotreStatisticHistroyService.queryServiceLevelLunStatistic(params);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
-            return success(resMap);
+        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
+            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
+            return success(data);
         }
         return failure(gson.toJson(resMap));
     }
 
     /**
-     * 查询serviceLevel的存储池性能
+     * 查询serviceLevel的存储池性能,对象Id为服务等级Id  eg:{"obj_ids" : ["cd17eca4-3056-4ca0-9a4a-2338174c33d8"]}
      *
      * @param params key required: obj_ids, indicator_ids, range (obj_ids,serviceLevelId)
      * @return
@@ -156,11 +156,11 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getServiceLevelStoragePoolStatistic(@RequestBody Map<String, Object> params) throws Exception {
         LOG.info("datastorestatistichistrory/servicelevelstoragepool params==" + gson.toJson(params));
         Map<String, Object> resMap = dataSotreStatisticHistroyService.queryServiceLevelStoragePoolStatistic(params);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").toString().equals("200")) {
-            return success(resMap);
+        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
+            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
+            return success(data);
         }
         return failure(gson.toJson(resMap));
     }
-
 
 }

@@ -129,8 +129,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         if (portGroups != null) {
             for (HostPortGroup portGroup : portGroups) {
                 HostPortGroupSpec spec = portGroup.getSpec();
-                if (spec.getName().equals(portGroupName))
+                if (spec.getName().equals(portGroupName)) {
                     return spec;
+                }
             }
         }
 
@@ -145,7 +146,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public ClusterDasConfigInfo getDasConfig() throws Exception {
         ManagedObjectReference morParent = getParentMor();
-        if (morParent.getType().equals("ClusterComputeResource")) {
+        if ("ClusterComputeResource".equals(morParent.getType())) {
             ClusterMO clusterMo = new ClusterMO(_context, morParent);
             return clusterMo.getDasConfig();
         }
@@ -156,7 +157,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public boolean isHAEnabled() throws Exception {
         ManagedObjectReference morParent = getParentMor();
-        if (morParent.getType().equals("ClusterComputeResource")) {
+        if ("ClusterComputeResource".equals(morParent.getType())) {
             ClusterMO clusterMo = new ClusterMO(_context, morParent);
             return clusterMo.isHAEnabled();
         }
@@ -167,7 +168,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public void setRestartPriorityForVM(VirtualMachineMO vmMo, String priority) throws Exception {
         ManagedObjectReference morParent = getParentMor();
-        if (morParent.getType().equals("ClusterComputeResource")) {
+        if ("ClusterComputeResource".equals(morParent.getType())) {
             ClusterMO clusterMo = new ClusterMO(_context, morParent);
             clusterMo.setRestartPriorityForVM(vmMo, priority);
         }
@@ -177,8 +178,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     public String getHyperHostDefaultGateway() throws Exception {
         List<HostIpRouteEntry> entries = getHostIpRouteEntries();
         for (HostIpRouteEntry entry : entries) {
-            if (entry.getNetwork().equalsIgnoreCase("0.0.0.0"))
+            if ("0.0.0.0".equalsIgnoreCase(entry.getNetwork())) {
                 return entry.getGateway();
+            }
         }
 
         throw new Exception("Could not find host default gateway, host is not properly configured?");
@@ -203,8 +205,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
                 List<DynamicProperty> objProps = oc.getPropSet();
                 if (objProps != null) {
                     for (DynamicProperty objProp : objProps) {
-                        if (objProp.getVal().toString().equals(datastoreName))
+                        if (objProp.getVal().toString().equals(datastoreName)) {
                             return new DatastoreMO(_context, oc.getObj());
+                        }
                     }
                 }
             }
@@ -237,8 +240,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         ManagedObjectReference morFirewall = configMgr.getFirewallSystem();
 
         // only ESX hosts have firewall manager
-        if (morFirewall != null)
+        if (morFirewall != null) {
             return new HostFirewallSystemMO(_context, morFirewall);
+        }
         return null;
     }
 
@@ -259,7 +263,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     public ManagedObjectReference getHyperHostCluster() throws Exception {
         ManagedObjectReference morParent = (ManagedObjectReference)_context.getVimClient().getDynamicProperty(_mor, "parent");
 
-        if (morParent.getType().equalsIgnoreCase("ClusterComputeResource")) {
+        if ("ClusterComputeResource".equalsIgnoreCase(morParent.getType())) {
             return morParent;
         }
 
@@ -273,8 +277,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         if (datastores != null) {
             for (ManagedObjectReference mor : datastores) {
                 DatastoreSummary summary = (DatastoreSummary)_context.getVimClient().getDynamicProperty(mor, "summary");
-                if (summary.getType().equalsIgnoreCase("VMFS") && !summary.isMultipleHostAccess())
+                if ("VMFS".equalsIgnoreCase(summary.getType()) && !summary.isMultipleHostAccess()) {
                     l.add(mor);
+                }
             }
         }
         return l.toArray(new ManagedObjectReference[1]);
@@ -285,8 +290,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
         if (switches != null) {
             for (HostVirtualSwitch vswitch : switches) {
-                if (vswitch.getName().equals(name))
+                if (vswitch.getName().equals(name)) {
                     return vswitch;
+                }
             }
         }
         return null;
@@ -302,10 +308,11 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
     public VmwareHostType getHostType() throws Exception {
         AboutInfo aboutInfo = getHostAboutInfo();
-        if ("VMware ESXi".equals(aboutInfo.getName()))
+        if ("VMware ESXi".equals(aboutInfo.getName())) {
             return VmwareHostType.ESXi;
-        else if ("VMware ESX".equals(aboutInfo.getName()))
+        } else if ("VMware ESX".equals(aboutInfo.getName())) {
             return VmwareHostType.ESX;
+        }
 
         throw new Exception("Unrecognized VMware host type " + aboutInfo.getName());
     }
@@ -313,16 +320,18 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     // default virtual switch is which management network residents on
     public HostVirtualSwitch getHostDefaultVirtualSwitch() throws Exception {
         String managementPortGroup = getPortGroupNameByNicType(HostVirtualNicType.management);
-        if (managementPortGroup != null)
+        if (managementPortGroup != null) {
             return getPortGroupVirtualSwitch(managementPortGroup);
+        }
 
         return null;
     }
 
     public HostVirtualSwitch getPortGroupVirtualSwitch(String portGroupName) throws Exception {
         String vSwitchName = getPortGroupVirtualSwitchName(portGroupName);
-        if (vSwitchName != null)
+        if (vSwitchName != null) {
             return getVirtualSwitchByName(vSwitchName);
+        }
 
         return null;
     }
@@ -332,8 +341,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         List<HostVirtualSwitch> vSwitchs = getHostVirtualSwitch();
         if (vSwitchs != null) {
             for (HostVirtualSwitch vSwitch : vSwitchs) {
-                if (vSwitch.getName().equals(vSwitchName))
+                if (vSwitch.getName().equals(vSwitchName)) {
                     return vSwitch;
+                }
             }
         }
 
@@ -346,8 +356,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         if (portGroups != null) {
             for (HostPortGroup portGroup : portGroups) {
                 HostPortGroupSpec spec = portGroup.getSpec();
-                if (spec.getName().equals(portGroupName))
+                if (spec.getName().equals(portGroupName)) {
                     return spec.getVswitchName();
+                }
             }
         }
 
@@ -360,8 +371,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         if (portGroups != null) {
             for (HostPortGroup portGroup : portGroups) {
                 HostPortGroupSpec spec = portGroup.getSpec();
-                if (spec.getName().equals(portGroupName))
+                if (spec.getName().equals(portGroupName)) {
                     return spec;
+                }
             }
         }
 
@@ -407,8 +419,8 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         List<HostOpaqueNetworkInfo> opaqueNetworks = netInfo.getOpaqueNetwork();
         if (opaqueNetworks != null){
             for (HostOpaqueNetworkInfo opaqueNetwork : opaqueNetworks){
-                if (opaqueNetwork.getOpaqueNetworkId() != null && opaqueNetwork.getOpaqueNetworkId().equals("br-int")
-                        && opaqueNetwork.getOpaqueNetworkType() != null && opaqueNetwork.getOpaqueNetworkType().equals("nsx.network")){
+                if (opaqueNetwork.getOpaqueNetworkId() != null && "br-int".equals(opaqueNetwork.getOpaqueNetworkId())
+                        && opaqueNetwork.getOpaqueNetworkType() != null && "nsx.network".equals(opaqueNetwork.getOpaqueNetworkType())){
                     return true;
                 }
             }
@@ -421,9 +433,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
     public boolean hasPortGroup(HostVirtualSwitch vSwitch, String portGroupName) throws Exception {
         ManagedObjectReference morNetwork = getNetworkMor(portGroupName);
-        if (morNetwork != null)
-            return true;
-        return false;
+        return morNetwork != null;
     }
 
     public void createPortGroup(HostVirtualSwitch vSwitch, String portGroupName, Integer vlanId, HostNetworkSecurityPolicy secPolicy,
@@ -435,11 +445,13 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         HostPortGroupSpec spec = new HostPortGroupSpec();
 
         spec.setName(portGroupName);
-        if (vlanId != null)
+        if (vlanId != null) {
             spec.setVlanId(vlanId.intValue());
+        }
         HostNetworkPolicy policy = new HostNetworkPolicy();
-        if (secPolicy != null)
+        if (secPolicy != null) {
             policy.setSecurity(secPolicy);
+        }
         policy.setShapingPolicy(shapingPolicy);
         spec.setPolicy(policy);
         spec.setVswitchName(vSwitch.getName());
@@ -455,11 +467,13 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         HostPortGroupSpec spec = new HostPortGroupSpec();
 
         spec.setName(portGroupName);
-        if (vlanId != null)
+        if (vlanId != null) {
             spec.setVlanId(vlanId.intValue());
+        }
         HostNetworkPolicy policy = new HostNetworkPolicy();
-        if (secPolicy != null)
+        if (secPolicy != null) {
             policy.setSecurity(secPolicy);
+        }
         policy.setShapingPolicy(shapingPolicy);
         spec.setPolicy(policy);
         spec.setVswitchName(vSwitch.getName());
@@ -501,8 +515,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
                 List<DynamicProperty> props = oc.getPropSet();
                 if (props != null) {
                     for (DynamicProperty prop : props) {
-                        if (prop.getVal().equals(portGroupName))
+                        if (prop.getVal().equals(portGroupName)) {
                             return oc.getObj();
+                        }
                     }
                 }
             }
@@ -512,8 +527,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
     public List<ManagedObjectReference> getVmMorsOnNetwork(String portGroupName) throws Exception {
         ManagedObjectReference morNetwork = getNetworkMor(portGroupName);
-        if (morNetwork != null)
+        if (morNetwork != null) {
             return _context.getVimClient().getDynamicProperty(morNetwork, "vm");
+        }
         return null;
     }
 
@@ -535,13 +551,15 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
     @Override
     public synchronized VirtualMachineMO findVmOnHyperHost(String vmName) throws Exception {
-        if (s_logger.isDebugEnabled())
+        if (s_logger.isDebugEnabled()) {
             s_logger.debug("find VM " + vmName + " on host");
+        }
 
         VirtualMachineMO vmMo = _vmCache.get(vmName);
         if (vmMo != null) {
-            if (s_logger.isDebugEnabled())
+            if (s_logger.isDebugEnabled()) {
                 s_logger.debug("VM " + vmName + " found in host cache");
+            }
             return vmMo;
         }
 
@@ -565,8 +583,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     }
 
     private void loadVmCache() throws Exception {
-        if (s_logger.isDebugEnabled())
+        if (s_logger.isDebugEnabled()) {
             s_logger.debug("load VM cache on host");
+        }
 
         _vmCache.clear();
 
@@ -585,11 +604,12 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
                     String vmVcenterName = null;
                     String vmInternalCSName = null;
                     for (DynamicProperty prop : props) {
-                        if (prop.getName().equals("name")) {
+                        if ("name".equals(prop.getName())) {
                             vmVcenterName = prop.getVal().toString();
                         } else if (prop.getName().startsWith("value[")) {
-                            if (prop.getVal() != null)
+                            if (prop.getVal() != null) {
                                 vmInternalCSName = ((CustomFieldStringValue)prop.getVal()).getValue();
+                            }
                         }
                     }
                     String vmName = null;
@@ -599,8 +619,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
                         vmName = vmVcenterName;
                     }
 
-                    if (s_logger.isTraceEnabled())
+                    if (s_logger.isTraceEnabled()) {
                         s_logger.trace("put " + vmName + " into host cache");
+                    }
 
                     _vmCache.put(vmName, new VirtualMachineMO(_context, oc.getObj()));
                 }
@@ -612,7 +633,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     public VirtualMachineMO findVmOnPeerHyperHost(String name) throws Exception {
         ManagedObjectReference morParent = getParentMor();
 
-        if (morParent.getType().equals("ClusterComputeResource")) {
+        if ("ClusterComputeResource".equals(morParent.getType())) {
             ClusterMO clusterMo = new ClusterMO(_context, morParent);
             return clusterMo.findVmOnHyperHost(name);
         } else {
@@ -659,19 +680,21 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
                     String value = null;
                     String vmInternalCSName = null;
                     for (DynamicProperty objProp : objProps) {
-                        if (objProp.getName().equals("name")) {
+                        if ("name".equals(objProp.getName())) {
                             vmName = (String)objProp.getVal();
                         } else if (objProp.getName().startsWith("value[")) {
-                            if (objProp.getVal() != null)
+                            if (objProp.getVal() != null) {
                                 vmInternalCSName = ((CustomFieldStringValue)objProp.getVal()).getValue();
+                            }
                         } else {
                             OptionValue optValue = (OptionValue)objProp.getVal();
                             value = (String)optValue.getValue();
                         }
                     }
 
-                    if (vmInternalCSName != null && isUserVMInternalCSName(vmInternalCSName))
+                    if (vmInternalCSName != null && isUserVMInternalCSName(vmInternalCSName)) {
                         vmName = vmInternalCSName;
+                    }
 
                     if (vmName != null && value != null) {
                         portInfo.put(vmName, Integer.parseInt(value));
@@ -685,9 +708,10 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
     @Override
     public ObjectContent[] getVmPropertiesOnHyperHost(String[] propertyPaths) throws Exception {
-        if (s_logger.isTraceEnabled())
+        if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - retrieveProperties() for VM properties. target MOR: " + _mor.getValue() + ", properties: " +
                     new Gson().toJson(propertyPaths));
+        }
 
         PropertySpec pSpec = new PropertySpec();
         pSpec.setType("VirtualMachine");
@@ -711,16 +735,18 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
         List<ObjectContent> properties = _context.getService().retrieveProperties(_context.getPropertyCollector(), pfSpecArr);
 
-        if (s_logger.isTraceEnabled())
+        if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - retrieveProperties() done");
+        }
         return properties.toArray(new ObjectContent[properties.size()]);
     }
 
     @Override
     public ObjectContent[] getDatastorePropertiesOnHyperHost(String[] propertyPaths) throws Exception {
-        if (s_logger.isTraceEnabled())
+        if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - retrieveProperties() on Datastore properties. target MOR: " + _mor.getValue() + ", properties: " +
                     new Gson().toJson(propertyPaths));
+        }
 
         PropertySpec pSpec = new PropertySpec();
         pSpec.setType("Datastore");
@@ -744,8 +770,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
         List<ObjectContent> properties = _context.getService().retrieveProperties(_context.getPropertyCollector(), pfSpecArr);
 
-        if (s_logger.isTraceEnabled())
+        if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - retrieveProperties() done");
+        }
         return properties.toArray(new ObjectContent[properties.size()]);
     }
 
@@ -769,7 +796,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         if (ocs != null) {
             for (ObjectContent oc : ocs) {
                 DatastoreSummary dsSummary = (DatastoreSummary) VmwareHelper.getPropValue(oc, "summary");
-                if (dsSummary.isMultipleHostAccess() == false && dsSummary.isAccessible() && dsSummary.getType().equalsIgnoreCase("vmfs")) {
+                if (dsSummary.isMultipleHostAccess() == false && dsSummary.isAccessible() && "vmfs".equalsIgnoreCase(dsSummary.getType())) {
                     ManagedObjectReference morDs = oc.getObj();
                     String name = (String)VmwareHelper.getPropValue(oc, "name");
 
@@ -789,18 +816,20 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     public boolean createBlankVm(String vmName, String vmInternalCSName, int cpuCount, int cpuSpeedMHz, int cpuReservedMHz, boolean limitCpuUse, int memoryMB,
                                  int memoryReserveMB, String guestOsIdentifier, ManagedObjectReference morDs, boolean snapshotDirToParent, Pair<String, String> controllerInfo, Boolean systemVm) throws Exception {
 
-        if (s_logger.isTraceEnabled())
+        if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - createBlankVm(). target MOR: " + _mor.getValue() + ", vmName: " + vmName + ", cpuCount: " + cpuCount + ", cpuSpeedMhz: " +
                     cpuSpeedMHz + ", cpuReservedMHz: " + cpuReservedMHz + ", limitCpu: " + limitCpuUse + ", memoryMB: " + memoryMB + ", guestOS: " + guestOsIdentifier +
                     ", datastore: " + morDs.getValue() + ", snapshotDirToParent: " + snapshotDirToParent +
                     ", controllerInfo:[" + controllerInfo.first() + "," + controllerInfo.second() + "], systemvm: " + systemVm);
+        }
 
         boolean result =
                 HypervisorHostHelper.createBlankVm(this, vmName, vmInternalCSName, cpuCount, cpuSpeedMHz, cpuReservedMHz, limitCpuUse, memoryMB, memoryReserveMB,
                         guestOsIdentifier, morDs, snapshotDirToParent, controllerInfo, systemVm);
 
-        if (s_logger.isTraceEnabled())
+        if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - createBlankVm() done");
+        }
         return result;
     }
 
@@ -839,9 +868,10 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public ManagedObjectReference mountDatastore(boolean vmfsDatastore, String poolHostAddress, int poolHostPort, String poolPath, String poolUuid) throws Exception {
 
-        if (s_logger.isTraceEnabled())
+        if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - mountDatastore(). target MOR: " + _mor.getValue() + ", vmfs: " + vmfsDatastore + ", poolHost: " + poolHostAddress +
                     ", poolHostPort: " + poolHostPort + ", poolPath: " + poolPath + ", poolUuid: " + poolUuid);
+        }
 
         HostDatastoreSystemMO hostDatastoreSystemMo = getHostDatastoreSystemMO();
         ManagedObjectReference morDatastore = hostDatastoreSystemMo.findDatastore(poolUuid);
@@ -865,8 +895,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
                     String msg = "Unable to create NFS datastore. host: " + poolHostAddress + ", port: " + poolHostPort + ", path: " + poolPath + ", uuid: " + poolUuid;
                     s_logger.error(msg);
 
-                    if (s_logger.isTraceEnabled())
+                    if (s_logger.isTraceEnabled()) {
                         s_logger.trace("vCenter API trace - mountDatastore() done(failed)");
+                    }
                     throw new Exception(msg);
                 }
             } else {
@@ -875,8 +906,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
                     String msg = "Unable to create VMFS datastore. host: " + poolHostAddress + ", port: " + poolHostPort + ", path: " + poolPath + ", uuid: " + poolUuid;
                     s_logger.error(msg);
 
-                    if (s_logger.isTraceEnabled())
+                    if (s_logger.isTraceEnabled()) {
                         s_logger.trace("vCenter API trace - mountDatastore() done(failed)");
+                    }
                     throw new Exception(msg);
                 }
 
@@ -885,8 +917,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
             }
         }
 
-        if (s_logger.isTraceEnabled())
+        if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - mountDatastore() done(successfully)");
+        }
 
         return morDatastore;
     }
@@ -894,21 +927,24 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public void unmountDatastore(String uuid) throws Exception {
 
-        if (s_logger.isTraceEnabled())
+        if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - unmountDatastore(). target MOR: " + _mor.getValue() + ", uuid: " + uuid);
+        }
 
         HostDatastoreSystemMO hostDatastoreSystemMo = getHostDatastoreSystemMO();
         if (!hostDatastoreSystemMo.deleteDatastore(uuid)) {
             String msg = "Unable to unmount datastore. uuid: " + uuid;
             s_logger.error(msg);
 
-            if (s_logger.isTraceEnabled())
+            if (s_logger.isTraceEnabled()) {
                 s_logger.trace("vCenter API trace - unmountDatastore() done(failed)");
+            }
             throw new Exception(msg);
         }
 
-        if (s_logger.isTraceEnabled())
+        if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - unmountDatastore() done");
+        }
     }
 
     @Override
@@ -936,8 +972,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
     @Override
     public VmwareHypervisorHostResourceSummary getHyperHostResourceSummary() throws Exception {
-        if (s_logger.isTraceEnabled())
+        if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - getHyperHostResourceSummary(). target MOR: " + _mor.getValue());
+        }
 
         VmwareHypervisorHostResourceSummary summary = new VmwareHypervisorHostResourceSummary();
 
@@ -948,15 +985,17 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         summary.setCpuSpeed(hardwareSummary.getCpuMhz());
         summary.setCpuSockets((int)hardwareSummary.getNumCpuPkgs());
 
-        if (s_logger.isTraceEnabled())
+        if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - getHyperHostResourceSummary() done");
+        }
         return summary;
     }
 
     @Override
     public VmwareHypervisorHostNetworkSummary getHyperHostNetworkSummary(String managementPortGroup) throws Exception {
-        if (s_logger.isTraceEnabled())
+        if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - getHyperHostNetworkSummary(). target MOR: " + _mor.getValue() + ", mgmtPortgroup: " + managementPortGroup);
+        }
 
         VmwareHypervisorHostNetworkSummary summary = new VmwareHypervisorHostNetworkSummary();
 
@@ -968,7 +1007,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
             String dvPortGroupKey;
             String portGroup;
             for (VirtualNicManagerNetConfig netConfig : netConfigs) {
-                if (netConfig.getNicType().equals("management")) {
+                if ("management".equals(netConfig.getNicType())) {
                     for (HostVirtualNic nic : netConfig.getCandidateVnic()) {
                         portGroup = nic.getPortgroup();
                         if (portGroup == null || portGroup.isEmpty()) {
@@ -980,8 +1019,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
                             summary.setHostNetmask(nic.getSpec().getIp().getSubnetMask());
                             summary.setHostMacAddress(nic.getSpec().getMac());
 
-                            if (s_logger.isTraceEnabled())
+                            if (s_logger.isTraceEnabled()) {
                                 s_logger.trace("vCenter API trace - getHyperHostNetworkSummary() done(successfully)");
+                            }
                             return summary;
                         }
                     }
@@ -998,23 +1038,26 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
                         summary.setHostNetmask(vnic.getSpec().getIp().getSubnetMask());
                         summary.setHostMacAddress(vnic.getSpec().getMac());
 
-                        if (s_logger.isTraceEnabled())
+                        if (s_logger.isTraceEnabled()) {
                             s_logger.trace("vCenter API trace - getHyperHostNetworkSummary() done(successfully)");
+                        }
                         return summary;
                     }
                 }
             }
         }
 
-        if (s_logger.isTraceEnabled())
+        if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - getHyperHostNetworkSummary() done(failed)");
+        }
         throw new Exception("Unable to find management port group " + managementPortGroup);
     }
 
     @Override
     public ComputeResourceSummary getHyperHostHardwareSummary() throws Exception {
-        if (s_logger.isTraceEnabled())
+        if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - getHyperHostHardwareSummary(). target MOR: " + _mor.getValue());
+        }
 
         //
         // This is to adopt the model when using Cluster as a big host while ComputeResourceSummary is used
@@ -1038,16 +1081,18 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         resourceSummary.setTotalCpu(totalCpu);
 
         HostListSummaryQuickStats stats = getHostQuickStats();
-        if (stats.getOverallCpuUsage() == null || stats.getOverallMemoryUsage() == null)
+        if (stats.getOverallCpuUsage() == null || stats.getOverallMemoryUsage() == null) {
             throw new Exception("Unable to get valid overal CPU/Memory usage data, host may be disconnected");
+        }
 
         resourceSummary.setEffectiveCpu(totalCpu - stats.getOverallCpuUsage());
 
         // Note effective memory is in MB unit
         resourceSummary.setEffectiveMemory(hardwareSummary.getMemorySize() / (1024 * 1024) - stats.getOverallMemoryUsage());
 
-        if (s_logger.isTraceEnabled())
+        if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - getHyperHostHardwareSummary() done");
+        }
 
         return resourceSummary;
     }
@@ -1101,15 +1146,16 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
                 }
             }
 
-            if (bRefresh)
+            if (bRefresh) {
                 firewallMo.refreshFirewall();
+            }
         }
     }
 
     @Override
     public String getRecommendedDiskController(String guestOsId) throws Exception {
         ManagedObjectReference morParent = getParentMor();
-        if (morParent.getType().equals("ClusterComputeResource")) {
+        if ("ClusterComputeResource".equals(morParent.getType())) {
             ClusterMO clusterMo = new ClusterMO(_context, morParent);
             return clusterMo.getRecommendedDiskController(guestOsId);
         }

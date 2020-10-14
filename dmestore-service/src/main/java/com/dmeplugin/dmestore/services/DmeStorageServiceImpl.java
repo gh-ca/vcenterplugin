@@ -263,7 +263,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storagePool.setSubscription_rate(subscribedCapacityRate);
                     if (media_type.equals(type)){
                         resList.add(storagePool);
-                    } else if(media_type.equals("all")) {
+                    } else if("all".equals(media_type)) {
                         resList.add(storagePool);
                     }
                 }
@@ -1060,8 +1060,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             List<String> hostGroupIds = new ArrayList<>();
             for (JsonElement element : array) {
                 JsonObject json = element.getAsJsonObject();
-                String hostId = ToolUtils.getStr(json.get("host_id"));
-                String hostGroupId = ToolUtils.getStr(json.get("attached_host_group"));
+                String hostId = ToolUtils.jsonToStr(json.get("host_id"));
+                String hostGroupId = ToolUtils.jsonToStr(json.get("attached_host_group"));
                 hostIds.add(hostId);
                 hostGroupIds.add(hostGroupId);
             }

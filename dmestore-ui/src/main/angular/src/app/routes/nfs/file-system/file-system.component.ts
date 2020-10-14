@@ -35,8 +35,6 @@ export class FileSystemComponent implements OnInit {
     return detail;
   }
   changeFs(){
-    console.log(this.defaultSelect);
     this.fsDetail = this.getFsDetailByName(this.defaultSelect);
-    console.log(this.fsDetail);
   }
 }

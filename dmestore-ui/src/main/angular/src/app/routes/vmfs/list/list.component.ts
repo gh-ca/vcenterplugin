@@ -46,7 +46,7 @@ export class VmfsListComponent implements OnInit {
   total = 0; // 总数据数量
   isLoading = true; // table数据loading
   rowSelected = []; // 当前选中数据
-  volumnIds = []; // 卷ID
+  wwns = []; // wwn 用来查询chart data
   query = { // 查询数据
     q: 'user:VMware',
     sort: 'stars',
@@ -107,6 +107,8 @@ export class VmfsListComponent implements OnInit {
   // 生命周期： 初始化数据
 
   isServiceLevelData = true; // 编辑页面 所选数据是否为服务等级 true:是 false:否 若为是则不显示控制策略以及交通管制对象
+  mountHostData = true; // 挂载页面主机是否加载完毕 true是 false否
+  mountClusterData = true; // 挂载页面集群是否加载完毕 true是 false否
   ngOnInit() {
     // 列表数据
     this.refresh();
@@ -149,6 +151,9 @@ export class VmfsListComponent implements OnInit {
     // 设置修改的卷名称以及修改后的名称
     if (this.modifyForm.isSameName) {
       this.modifyForm.newVoName = this.modifyForm.name;
+    } else {
+      // 若不修改卷名称则将旧的卷名称设置为newVol
+      this.modifyForm.newVoName = this.rowSelected[0].volumeName;
     }
     this.modifyForm.newDsName = this.modifyForm.name;
     console.log('this.modifyForm:', this.modifyForm);
@@ -179,15 +184,15 @@ export class VmfsListComponent implements OnInit {
             if (null !== this.list) {
               this.total = this.list.length;
               // 获取chart 数据
-              const volumeIds = [];
+              const wwns = [];
               this.list.forEach(item => {
-                volumeIds.push(item.volumeId);
+                wwns.push(item.wwn);
               });
               // 设置卷ID集合
-              this.volumnIds = volumeIds;
+              this.wwns = wwns;
 
-              if (this.volumnIds.length > 0) {
-                this.remoteSrv.getChartData(this.volumnIds).subscribe((chartResult: any) => {
+              if (this.wwns.length > 0) {
+                this.remoteSrv.getChartData(this.wwns).subscribe((chartResult: any) => {
                   console.log('chartResult');
                   console.log(chartResult);
                   if (chartResult.code === '200' && chartResult.data != null) {
@@ -195,7 +200,7 @@ export class VmfsListComponent implements OnInit {
                     this.list.forEach(item => {
                       chartList.forEach(charItem => {
                         // 若属同一个卷则将chartItem的带宽、iops、读写相应时间 值赋予列表
-                        if (item.volumeId === charItem.volumeId) {
+                        if (item.wwn === charItem.wwn) {
                           item.iops = charItem.iops;
                           item.bandwidth = charItem.bandwidth;
                           item.readResponseTime = charItem.readResponseTime;
@@ -441,6 +446,7 @@ export class VmfsListComponent implements OnInit {
 
     // 初始化存储池
     this.storagePoolList = [];
+
   }
   // 页面跳转
   jumpTo(page: ClrWizardPage, wizard: ClrWizard) {
@@ -453,6 +459,7 @@ export class VmfsListComponent implements OnInit {
   }
   // 获取服务等级数据
   setServiceLevelList() {
+    // 获取服务等级数据
     this.remoteSrv.getServiceLevelList().subscribe((result: any) => {
       console.log(result);
       if (result.code === '200' && result.data !== null) {
@@ -462,9 +469,25 @@ export class VmfsListComponent implements OnInit {
       }
     });
   }
-
+  showServiceLevel(show: boolean, obj:any) {
+    console.log('obj', obj);
+    if (show) {
+    }
+  }
   // 添加vmfs 处理
   addVmfsHanlde() {
+    let selectResult = this.serviceLevelList.find(item => item.show === true)
+    console.log('selectResult', selectResult)
+    console.log('selectResultIndex', this.serviceLevelList.indexOf(selectResult) === 0)
+    if (this.levelCheck === 'level') { // 选择服务等级
+      if (selectResult) {
+        this.form.service_level_id = selectResult.id;
+        this.form.service_level_name = selectResult.name;
+      } else {
+        console.log("服务等级不能为空！");
+        return;
+      }
+    }
     // 数据预处----卷名称
     if (this.form.isSameName) { // 卷名称与vmfs名称相同（PS：不同时为必填）
       this.form.volumeName = this.form.name;
@@ -542,6 +565,7 @@ export class VmfsListComponent implements OnInit {
       this.cdr.detectChanges();
     });
   }
+
   // 挂载按钮点击事件
   mountBtnFunc() {
     // 初始化表单
@@ -549,24 +573,68 @@ export class VmfsListComponent implements OnInit {
     const objectIds = [];
     objectIds.push(this.rowSelected[0].objectid);
     this.mountForm.dataStoreObjectIds = objectIds;
-    // 获取服务器 通过ObjectId过滤已挂载的服务器
-    this.remoteSrv.getHostListByObjectId(this.rowSelected[0].objectid).subscribe((result: any) => {
-    // this.remoteSrv.getHostList().subscribe((result: any) => {
-      if (result.code === '200' && result.data !== null){
-        this.hostList = result.data;
-        this.cdr.detectChanges();
-      }
+
+    // 初始化主机
+    this.mountHostData = false;
+    this.hostList = [];
+    const hostNullInfo = {
+      hostId: '',
+      hostName: ''
+    };
+    this.hostList.push(hostNullInfo);
+    this.initMountHost().then(res => {
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
-    // 获取集群 通过ObjectId过滤已挂载的集群
-    this.remoteSrv.getClusterListByObjectId(this.rowSelected[0].objectid).subscribe((result: any) => {
-    // this.remoteSrv.getClusterList().subscribe((result: any) => {
-      if (result.code === '200'){
-        this.clusterList = result.data;
-        this.cdr.detectChanges();
-      }
+
+    // 初始化集群
+    this.mountClusterData = false;
+    this.clusterList = [];
+    const clusterNullInfo = {
+      clusterId: '',
+      clusterName: ''
+    }
+    this.clusterList.push(clusterNullInfo);
+
+    this.initMountCluster().then(res => {
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
+
     // 打开挂载页面
     this.mountShow = true;
+  }
+  // 挂载  集群数据初始化
+  initMountCluster() {
+    return new Promise((resolve, reject) => {
+      // 获取集群 通过ObjectId过滤已挂载的集群
+      this.remoteSrv.getClusterListByObjectId(this.rowSelected[0].objectid).subscribe((result: any) => {
+        if (result.code === '200'){
+          result.data.forEach(item => {
+            this.clusterList.push(item);
+          });
+        }
+        this.chooseCluster = this.clusterList[0];
+        this.mountClusterData = true;
+        resolve(this.deviceList);
+        this.cdr.detectChanges();
+      });
+    });
+  }
+  // 挂载 主机数据初始化
+  initMountHost() {
+    return new Promise((resolve, reject) => {
+      // 获取服务器 通过ObjectId过滤已挂载的服务器
+      this.remoteSrv.getHostListByObjectId(this.rowSelected[0].objectid).subscribe((result: any) => {
+        if (result.code === '200' && result.data !== null){
+          result.data.forEach(item => {
+            this.hostList.push(item);
+          });
+        }
+        this.chooseHost =  this.hostList[0];
+        this.mountHostData = true;
+        resolve(this.deviceList);
+        this.cdr.detectChanges();
+      });
+    });
   }
   // 挂载提交
   mountSubmit(){
@@ -626,7 +694,8 @@ export class VmfsListComponent implements OnInit {
     });
   }
   // 服务等级 点击事件 serviceLevId:服务等级ID、serviceLevName：服务等级名称
-  serviceLevelClickHandel(serviceLevId: string, serviceLevName: string) {
+  serviceLevelClickHandel(serviceLevId: string, serviceLevName: string, isoppen:any) {
+    console.log('isoppen', isoppen)
     this.form.service_level_id = serviceLevId;
     this.form.service_level_name = serviceLevName;
     console.log('serviceLevId:' + serviceLevId + 'serviceLevName:' + serviceLevName);

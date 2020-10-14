@@ -6,14 +6,14 @@ import java.util.Map;
 import com.vmware.automatic.plugin.registration.PluginRegistrationMain;
 
 public class VcenterRegisterRunner {
-	public static void run(String version, String packageUrl, String serverThumbprint, String vcenterIP,
+	public static void run(String version, String packageUrl, String serverThumbprint, String vcenterIp,
 						   String vcenterPort, String username, String password, String key) {
 		Map<String, String> unRegParamMap = new HashMap();
 		unRegParamMap.put("-action", "unregisterPlugin");
 		unRegParamMap.put("-username", username);
 		unRegParamMap.put("-password", password);
 		unRegParamMap.put("-key", key);
-		unRegParamMap.put("-url", "https://" + vcenterIP + ":" + vcenterPort + "/sdk");
+		unRegParamMap.put("-url", "https://" + vcenterIp + ":" + vcenterPort + "/sdk");
 
 		PluginRegistrationMain.main(convertMapToArray(unRegParamMap));
 
@@ -26,12 +26,12 @@ public class VcenterRegisterRunner {
 		regParamMap.put("-pluginUrl", packageUrl);
 		regParamMap.put("-company", "DME");
 		regParamMap.put("--serverThumbprint", serverThumbprint);
-		regParamMap.put("-url", "https://" + vcenterIP + ":" + vcenterPort + "/sdk");
+		regParamMap.put("-url", "https://" + vcenterIp + ":" + vcenterPort + "/sdk");
 
 		PluginRegistrationMain.main(convertMapToArray(regParamMap));
 	}
 
-	public static void unRegister(String vcenterIP,
+	public static void unRegister(String vcenterIp,
 								  String vcenterPort, String username, String password, String key) {
 		// unregister alarm definitions
 		// new event type id should be added in regex
@@ -44,7 +44,7 @@ public class VcenterRegisterRunner {
 		unRegParamMap.put("-username", username);
 		unRegParamMap.put("-password", password);
 		unRegParamMap.put("-key", key);
-		unRegParamMap.put("-url", "https://" + vcenterIP + ":" + vcenterPort + "/sdk");
+		unRegParamMap.put("-url", "https://" + vcenterIp + ":" + vcenterPort + "/sdk");
 
 		PluginRegistrationMain.main(convertMapToArray(unRegParamMap));
 	}

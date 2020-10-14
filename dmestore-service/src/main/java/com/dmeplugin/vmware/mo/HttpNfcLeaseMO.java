@@ -72,8 +72,9 @@ public class HttpNfcLeaseMO extends BaseMO {
         HttpNfcLeaseState state;
         while (true) {
             state = getState();
-            if (state == HttpNfcLeaseState.READY || state == HttpNfcLeaseState.ERROR)
+            if (state == HttpNfcLeaseState.READY || state == HttpNfcLeaseState.ERROR) {
                 return state;
+            }
         }
     }
 
@@ -99,10 +100,11 @@ public class HttpNfcLeaseMO extends BaseMO {
 
     public void updateLeaseProgress(int percent) throws Exception {
         // make sure percentage is in right range
-        if (percent < 0)
+        if (percent < 0) {
             percent = 0;
-        else if (percent > 100)
+        } else if (percent > 100) {
             percent = 100;
+        }
 
         _context.getService().httpNfcLeaseProgress(_mor, percent);
     }
@@ -151,8 +153,9 @@ public class HttpNfcLeaseMO extends BaseMO {
         }
 
         public void close() {
-            if (s_logger.isInfoEnabled())
+            if (s_logger.isInfoEnabled()) {
                 s_logger.info("close ProgressReporter, interrupt reporter runner to let it quit");
+            }
 
             _done = true;
             interrupt();
@@ -165,16 +168,18 @@ public class HttpNfcLeaseMO extends BaseMO {
                     Thread.sleep(1000);            // update progess every 1 second
                     updateLeaseProgress(_percent);
                 } catch (InterruptedException e) {
-                    if (s_logger.isInfoEnabled())
+                    if (s_logger.isInfoEnabled()) {
                         s_logger.info("ProgressReporter is interrupted, quiting");
+                    }
                     break;
                 } catch (Exception e) {
                     s_logger.warn("Unexpected exception ", e);
                 }
             }
 
-            if (s_logger.isInfoEnabled())
+            if (s_logger.isInfoEnabled()) {
                 s_logger.info("ProgressReporter stopped");
+            }
         }
     }
 }

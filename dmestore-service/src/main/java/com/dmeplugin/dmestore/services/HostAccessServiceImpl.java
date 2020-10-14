@@ -44,15 +44,15 @@ public class HostAccessServiceImpl implements HostAccessService {
     @Override
     public void configureIscsi(Map<String, Object> params) throws Exception {
         if (params != null) {
-            if(params.get("ethPorts")==null){
+            if(null==params.get(DmeConstants.ETHPORTS)){
                 LOG.error("configure Iscsi error:ethPorts is null.");
                 throw new Exception("configure Iscsi error:ethPorts is null.");
             }
-            if(params.get("vmKernel")==null){
+            if(null==params.get(DmeConstants.VMKERNEL)){
                 LOG.error("configure Iscsi error:vmKernel is null.");
                 throw new Exception("configure Iscsi error:vmKernel is null.");
             }
-            if(StringUtils.isEmpty(params.get("hostObjectId"))){
+            if(StringUtils.isEmpty(params.get(DmeConstants.HOSTOBJECTID))){
                 LOG.error("configure Iscsi error:host ObjectId is null.");
                 throw new Exception("configure Iscsi error:host ObjectId is null.");
             }
@@ -71,18 +71,18 @@ public class HostAccessServiceImpl implements HostAccessService {
         List<EthPortInfo> relists = null;
         try {
             if (params != null) {
-                if(params.get("ethPorts")==null){
+                if(null==params.get(DmeConstants.ETHPORTS)){
                     LOG.error("test connectivity error:ethPorts is null.");
                     throw new Exception("test connectivity error:ethPorts is null.");
                 }
-                if(StringUtils.isEmpty(params.get("hostObjectId"))){
+                if(StringUtils.isEmpty(params.get(DmeConstants.HOSTOBJECTID))){
                     LOG.error("test connectivity error:host ObjectId is null.");
                     throw new Exception("test connectivity error:host ObjectId is null.");
                 }
                 List<Map<String, Object>> ethPorts = (List<Map<String, Object>>)params.get("ethPorts");
                 String hostObjectId = params.get("hostObjectId").toString();
                 Map<String, String> vmKernel = null;
-                if(params.get("vmKernel")!=null) {
+                if(null!=params.get(DmeConstants.VMKERNEL)) {
                     vmKernel = (Map<String, String>) params.get("vmKernel");
                 }
                 LOG.info("params=="+gson.toJson(params));

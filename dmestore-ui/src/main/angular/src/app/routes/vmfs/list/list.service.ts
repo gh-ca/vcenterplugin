@@ -116,7 +116,8 @@ export interface List {
   writeResponseTime: number;
   latency: number;
   volumeId: number;
-
+  volumeName: string;
+  wwn: string;
 }
 // 存储
 export interface StorageList {
@@ -169,6 +170,7 @@ export interface ServiceLevelList {
       };
     };
   };
+  show: boolean;
 }
 export interface HostOrCluster {
   deviceId: string;

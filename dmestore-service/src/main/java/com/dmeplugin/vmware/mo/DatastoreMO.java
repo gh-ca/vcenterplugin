@@ -48,8 +48,9 @@ public class DatastoreMO extends BaseMO {
 
     @Override
     public String getName() throws Exception {
-        if (_name == null)
+        if (_name == null) {
             _name = _context.getVimClient().getDynamicProperty(_mor, "name");
+        }
 
         return _name;
     }
@@ -85,8 +86,9 @@ public class DatastoreMO extends BaseMO {
     }
 
     public Pair<DatacenterMO, String> getOwnerDatacenter() throws Exception {
-        if (_ownerDc != null)
+        if (_ownerDc != null) {
             return _ownerDc;
+        }
 
         PropertySpec pSpec = new PropertySpec();
         pSpec.setType("Datacenter");
@@ -136,8 +138,9 @@ public class DatastoreMO extends BaseMO {
         ManagedObjectReference morFileManager = _context.getServiceContent().getFileManager();
 
         String fullPath = path;
-        if (!DatastoreFile.isFullDatastorePath(fullPath))
+        if (!DatastoreFile.isFullDatastorePath(fullPath)) {
             fullPath = String.format("[%s] %s", datastoreName, path);
+        }
 
         _context.getService().makeDirectory(morFileManager, fullPath, morDc, true);
     }
@@ -153,8 +156,9 @@ public class DatastoreMO extends BaseMO {
     public String getDatastorePath(String relativePathWithoutDatastoreName, boolean endWithPathDelimiter) throws Exception {
         String path = String.format("[%s] %s", getName(), relativePathWithoutDatastoreName);
         if (endWithPathDelimiter) {
-            if (!path.endsWith("/"))
+            if (!path.endsWith("/")) {
                 return path + "/";
+            }
         }
         return path;
     }
@@ -185,8 +189,9 @@ public class DatastoreMO extends BaseMO {
         ManagedObjectReference morFileManager = _context.getServiceContent().getFileManager();
 
         String fullPath = path;
-        if (!DatastoreFile.isFullDatastorePath(fullPath))
+        if (!DatastoreFile.isFullDatastorePath(fullPath)) {
             fullPath = String.format("[%s] %s", datastoreName, path);
+        }
         DatastoreFile file = new DatastoreFile(fullPath);
         // Test if file specified is null or empty. We don't need to attempt to delete and return success.
         if (file.getFileName() == null || file.getFileName().isEmpty()) {
@@ -228,12 +233,14 @@ public class DatastoreMO extends BaseMO {
 
         ManagedObjectReference morFileManager = _context.getServiceContent().getFileManager();
         String srcFullPath = srcFilePath;
-        if (!DatastoreFile.isFullDatastorePath(srcFullPath))
+        if (!DatastoreFile.isFullDatastorePath(srcFullPath)) {
             srcFullPath = String.format("[%s] %s", srcDsName, srcFilePath);
+        }
 
         String destFullPath = destFilePath;
-        if (!DatastoreFile.isFullDatastorePath(destFullPath))
+        if (!DatastoreFile.isFullDatastorePath(destFullPath)) {
             destFullPath = String.format("[%s] %s", destDsName, destFilePath);
+        }
 
         ManagedObjectReference morTask = _context.getService().copyDatastoreFileTask(morFileManager, srcFullPath, morSrcDc, destFullPath, morDestDc, forceOverwrite);
 
@@ -256,12 +263,14 @@ public class DatastoreMO extends BaseMO {
 
         ManagedObjectReference morFileManager = _context.getServiceContent().getFileManager();
         String srcFullPath = srcFilePath;
-        if (!DatastoreFile.isFullDatastorePath(srcFullPath))
+        if (!DatastoreFile.isFullDatastorePath(srcFullPath)) {
             srcFullPath = String.format("[%s] %s", srcDsName, srcFilePath);
+        }
 
         String destFullPath = destFilePath;
-        if (!DatastoreFile.isFullDatastorePath(destFullPath))
+        if (!DatastoreFile.isFullDatastorePath(destFullPath)) {
             destFullPath = String.format("[%s] %s", destDsName, destFilePath);
+        }
 
         ManagedObjectReference morTask = _context.getService().moveDatastoreFileTask(morFileManager, srcFullPath, morSrcDc, destFullPath, morDestDc, forceOverwrite);
 
@@ -285,25 +294,28 @@ public class DatastoreMO extends BaseMO {
         while (true) {
             String url = getContext().composeDatastoreBrowseUrl(dcPair.second(), currentVmdkFullPath);
             byte[] content = getContext().getResourceContent(url);
-            if (content == null || content.length == 0)
+            if (content == null || content.length == 0) {
                 break;
+            }
 
             VmdkFileDescriptor descriptor = new VmdkFileDescriptor();
             descriptor.parse(content);
 
             String parentFileName = descriptor.getParentFileName();
-            if (parentFileName == null)
+            if (parentFileName == null) {
                 break;
+            }
 
             if (parentFileName.startsWith("/")) {
                 // when parent file is not at the same directory as it is, assume it is at parent directory
                 // this is only valid in Apache CloudStack primary storage deployment
                 DatastoreFile dsFile = new DatastoreFile(currentVmdkFullPath);
                 String dir = dsFile.getDir();
-                if (dir != null && dir.lastIndexOf('/') > 0)
+                if (dir != null && dir.lastIndexOf('/') > 0) {
                     dir = dir.substring(0, dir.lastIndexOf('/'));
-                else
+                } else {
                     dir = "";
+                }
 
                 currentVmdkFullPath = new DatastoreFile(dsFile.getDatastoreName(), dir, parentFileName.substring(parentFileName.lastIndexOf('/') + 1)).getPath();
                 files.add(currentVmdkFullPath);
@@ -319,8 +331,9 @@ public class DatastoreMO extends BaseMO {
     @Deprecated
     public String[] listDirContent(String path) throws Exception {
         String fullPath = path;
-        if (!DatastoreFile.isFullDatastorePath(fullPath))
+        if (!DatastoreFile.isFullDatastorePath(fullPath)) {
             fullPath = String.format("[%s] %s", getName(), fullPath);
+        }
 
         Pair<DatacenterMO, String> dcPair = getOwnerDatacenter();
         String url = getContext().composeDatastoreBrowseUrl(dcPair.second(), fullPath);
@@ -428,8 +441,9 @@ public class DatastoreMO extends BaseMO {
                 for (FileInfo fi : info) {
                     absoluteFileName = parentFolderPath = result.getFolderPath();
                     s_logger.info("Found file " + fileName + " in datastore at " + absoluteFileName);
-                    if (parentFolderPath.endsWith("]"))
+                    if (parentFolderPath.endsWith("]")) {
                         absoluteFileName += " ";
+                    }
                     absoluteFileName += fi.getPath();
                     if(isValidCloudStackFolderPath(parentFolderPath, searchExcludedFolders)) {
                         return absoluteFileName;

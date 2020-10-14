@@ -66,8 +66,9 @@ public class BaseMO {
     }
 
     public String getName() throws Exception {
-        if (_name == null)
+        if (_name == null) {
             _name = (String)_context.getVimClient().getDynamicProperty(_mor, "name");
+        }
 
         return _name;
     }
@@ -121,20 +122,23 @@ public class BaseMO {
             }
         }
 
-        if (key == 0)
+        if (key == 0) {
             throw new Exception("Unable to setup custom field facility");
+        }
 
         cfmMo.setField(getMor(), key, value);
     }
 
     public String getCustomFieldValue(String fieldName) throws Exception {
         int key = getCustomFieldKey(fieldName);
-        if (key == 0)
+        if (key == 0) {
             return null;
+        }
 
         CustomFieldStringValue cfValue = (CustomFieldStringValue)_context.getVimClient().getDynamicProperty(getMor(), String.format("value[%d]", key));
-        if (cfValue != null)
+        if (cfValue != null) {
             return cfValue.getValue();
+        }
 
         return null;
     }

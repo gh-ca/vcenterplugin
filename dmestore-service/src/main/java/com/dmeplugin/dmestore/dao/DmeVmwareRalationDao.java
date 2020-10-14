@@ -362,7 +362,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
     }
 
 
-    private List<String> getFileIdsByCondition(String storeId, String fileId, String storeType) throws SQLException{
+    private List<String> getFileIdsByCondition(String storeId, String fileId, String storeType) throws SQLException {
         List<String> lists = new ArrayList<>();
         Connection con = null;
         PreparedStatement ps = null;
@@ -429,18 +429,19 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         }
         StringBuilder buff = new StringBuilder();
         for (String value : values) {
-            if (buff.length() > 0) {
-                buff.append(",");
-            }
-            buff.append(value);
+            buff.append(",");
+            buff.append("'" + value + "'");
         }
         String sql = buff.toString();
-        sql = sql.substring(1);
+        if(sql.length()>0){
+            sql = sql.substring(1);
+        }
         return sql;
     }
 
     /**
      * 根据volumeId获取对应的vmfs datastore
+     *
      * @param volumeId
      * @return
      * @throws SQLException

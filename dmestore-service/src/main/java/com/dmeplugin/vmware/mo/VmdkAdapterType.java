@@ -35,11 +35,11 @@ public enum VmdkAdapterType {
     }
 
     public static VmdkAdapterType getType(String vmdkAdapterType) {
-        if (vmdkAdapterType.equalsIgnoreCase("ide")) {
+        if ("ide".equalsIgnoreCase(vmdkAdapterType)) {
             return VmdkAdapterType.ide;
-        } else if (vmdkAdapterType.equalsIgnoreCase("lsilogic")) {
+        } else if ("lsilogic".equalsIgnoreCase(vmdkAdapterType)) {
             return VmdkAdapterType.lsilogic;
-        } else if (vmdkAdapterType.equalsIgnoreCase("buslogic")) {
+        } else if ("buslogic".equalsIgnoreCase(vmdkAdapterType)) {
             return VmdkAdapterType.buslogic;
         } else {
             return VmdkAdapterType.none;

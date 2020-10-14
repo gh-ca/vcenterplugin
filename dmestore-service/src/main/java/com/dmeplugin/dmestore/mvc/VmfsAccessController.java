@@ -153,16 +153,42 @@ public class VmfsAccessController extends BaseController {
         return failure(failureStr);
     }
 
-    /*
-   * Delete vmfs
-   * param list<str> volume_ids: 卷id列表 必
-   * param str host_id: 主机id 必
-   * param str hostGroup_id: 主机id 必
-   * return: Return execution status and information
-   *         code:Status code 202 or 503
-   *         message:Information
-   *         data: Data，including task_id
-   */
+    /**
+     * unmount vmfs include
+     * param list<str> dataStoreObjectIds: datastore object id列表 必
+     * param str hostId: 主机ID （主机ID与集群ID二选一）
+     * param str clusterId: 集群ID（主机ID与集群ID二选一）
+     *
+     * @param params: include volumeIds,host_id,cluster_id
+     * @return: ResponseBodyBean
+     */
+    @RequestMapping(value = "/ummountvmfs", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean unmountVmfs(@RequestBody Map<String, Object> params)
+            throws Exception {
+        LOG.info("accessvmfs/unmountvmfs==" + gson.toJson(params));
+        String failureStr = "";
+        try {
+            vmfsAccessService.unmountVmfs(params);
+            return success(null, "unmount vmfs success");
+        } catch (Exception e) {
+            LOG.error("unmount vmfs failure:", e);
+            failureStr = "unmount vmfs failure:" + e.toString();
+        }
+        return failure(failureStr);
+    }
+
+
+    /**
+     * Delete vmfs
+     * param list<str> dataStoreObjectIds: datastore object id列表 必
+     * param str host_id: 主机id 必
+     * param str hostGroup_id: 主机id 必
+     * return: Return execution status and information
+     * code:Status code 202 or 503
+     * message:Information
+     * data: Data，including task_id
+     */
     @RequestMapping(value = "/deletevmfs", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean deleteVmfs(@RequestBody Map<String, Object> params) throws Exception {
@@ -205,7 +231,8 @@ public class VmfsAccessController extends BaseController {
         return failure();
     }
 
-    @RequestMapping(value = "/gethostsbystorageid}", method = RequestMethod.GET)
+    @RequestMapping(value = "/gethostsbystorageid/{storageId}", method = RequestMethod.GET)
+    //public ResponseBodyBean getHostsByStorageId(@RequestBody String storageId) throws Exception {
     public ResponseBodyBean getHostsByStorageId(@PathVariable(value = "storageId") String storageId) throws Exception {
         try {
             List<Map<String, Object>> hosts = vmfsAccessService.getHostsByStorageId(storageId);
@@ -215,7 +242,7 @@ public class VmfsAccessController extends BaseController {
         }
     }
 
-    @RequestMapping(value = "/gethostgroupsbystorageid}", method = RequestMethod.GET)
+    @RequestMapping(value = "/gethostgroupsbystorageid/{storageId}", method = RequestMethod.GET)
     public ResponseBodyBean getHostGroupsByStorageId(@PathVariable(value = "storageId") String storageId) throws Exception {
         try {
             List<Map<String, Object>> hosts = vmfsAccessService.getHostGroupsByStorageId(storageId);
