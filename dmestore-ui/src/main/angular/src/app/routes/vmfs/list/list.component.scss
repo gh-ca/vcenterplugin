@@ -79,7 +79,7 @@
 }
 
 ::ng-deep .clr-select-wrapper{
-  width: 33%;
+  width: 35%;
 }
 
 ::ng-deep .clr-select-wrapper select, .clr-multiselect-wrapper select{
@@ -87,11 +87,11 @@
 }
 
 ::ng-deep .clr-combobox-wrapper{
-  width: 33%;
+  width: 35%;
   background-color: white;
 }
 ::ng-deep .clr-input-wrapper{
-  width: 33%;
+  width: 35%;
   //border-bottom: .05rem solid;
   //border-bottom-color: #b3b3b3;
 }
@@ -117,4 +117,10 @@
 
 ::ng-deep .clr-wizard .clr-wizard-stepnav-link{
   font-weight: bolder;
+}
+// 隐藏滚动条 滑轮滚动
+#body{}
+-webkit-scrollbar{
+  width:0px;
+  height:0px;
 }
