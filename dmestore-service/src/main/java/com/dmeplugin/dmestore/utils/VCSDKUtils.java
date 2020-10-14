@@ -662,7 +662,7 @@ public class VCSDKUtils {
     /**
      *expand oriented datastore capacity
      **/
-    public String expandVmfsDatastore(String dsname, Integer add_capacity) {
+    public String expandVmfsDatastore(String dsname, Integer addCapacity) {
 
         String result = "success";
         logger.info("==start expand DataStore==");
@@ -776,8 +776,8 @@ public class VCSDKUtils {
                         vmwareContext = vcConnectionHelper.getServerContext(serverguid);
                         if (managedObjectReference != null && vmwareContext != null) {
                             HostMO hostMo = new HostMO(vmwareContext, managedObjectReference);
-                            HostDatastoreSystemMO hostDatastoreSystemMO = hostMo.getHostDatastoreSystemMO();
-                            hostDatastoreSystemMO.createNfsDatastore(serverHost, 0, exportPath, nfsName, accessMode, type);
+                            HostDatastoreSystemMO hostDatastoreSystemMo = hostMo.getHostDatastoreSystemMO();
+                            hostDatastoreSystemMo.createNfsDatastore(serverHost, 0, exportPath, nfsName, accessMode, type);
                             String datastoreObjectId = vcConnectionHelper.MOR2ObjectID(managedObjectReference, serverguid);
                             dmeVmwareRelation.setStoreId(datastoreObjectId);
                             dmeVmwareRelation.setStoreName(nfsName);
