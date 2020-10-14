@@ -12,9 +12,24 @@ import java.util.Map;
  */
 public interface NfsOperationService {
 
+    /**
+     * 创建nfs存储
+     * @param params
+     * @return
+     */
     Map<String,Object> createNfsDatastore(Map<String, Object> params);
 
+    /**
+     * 更新NFS存储
+     * @param params
+     * @return
+     */
     Map<String,Object> updateNfsDatastore(Map<String, Object> params);
 
+    /**
+     * NFS存储扩容和缩容
+     * @param params
+     * @return
+     */
     ResponseBodyBean changeNfsCapacity(Map<String, Object> params);
 }

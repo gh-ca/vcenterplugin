@@ -456,7 +456,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             LOG.info("DmeStorageServiceImpl/getDTrees/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
-                resMap.put("code", 200);
+                resMap.put("code", code);
                 resMap.put("msg", "list dtree error!");
                 return resMap;
             }
@@ -577,7 +577,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public Map<String, Object> getStorageControllers() {
+    public Map<String, Object> getStorageControllers(String storageDeviceId) {
 
         String className = "SYS_Controller";
         Map<String, Object> resMap = new HashMap<>();
@@ -586,7 +586,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("storageId", className);
         List<StorageControllers> resList = new ArrayList<>();
 
-        String url = API_INSTANCES_LIST + "/" + className;
+        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageDeviceId;
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             LOG.info("DmeStorageServiceImpl/getStorageControllers/responseEntity==" + responseEntity);
@@ -620,7 +620,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public Map<String, Object> getStorageDisks() {
+    public Map<String, Object> getStorageDisks(String storageDeviceId) {
 
         String className = "SYS_StorageDisk";
         Map<String, Object> resMap = new HashMap<>();
@@ -629,7 +629,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         resMap.put("storageId", className);
         List<StorageDisk> resList = new ArrayList<>();
 
-        String url = API_INSTANCES_LIST + "/" + className;
+        String url = API_INSTANCES_LIST + "/" + className+"?storageDeviceId="+storageDeviceId;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -664,23 +664,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             resMap.put("msg", e.getMessage());
         }
         return resMap;
-    }
-
-
-    private ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws Exception {
-
-        RestUtils restUtils = new RestUtils();
-        RestTemplate restTemplate = restUtils.getRestTemplate();
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
-
-        ResponseEntity<String> responseEntity = restTemplate.exchange(url, method, entity, String.class);
-        LOG.info(url + "==responseEntity==" + (responseEntity == null ? "null" : responseEntity.getStatusCodeValue()));
-
-        return responseEntity;
     }
 
     @Override
@@ -972,7 +955,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 storagePort.setStorageDeviceId(ToolUtils.jsonToStr(element.get("storageDeviceId")));
                 if (portType.equals(type)) {
                     storagePorts.add(storagePort);
-                } else if (portType.equals("ALL")) {
+                } else if ("ALL".equals(portType)) {
                     storagePorts.add(storagePort);
                 }
             }
