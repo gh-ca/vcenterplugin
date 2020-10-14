@@ -475,7 +475,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 filesystem_specs.put("capacity", capacity);
                 filesystem_specs.put("name", filesystemSpec.get("name"));
                 filesystem_specs.put("count", count);
-                filesystem_specs.put("start_suffix", 0);
+                filesystem_specs.put("start_suffix", filesystemSpec.get("start_suffix"));
             }
             filesystemSpecsLists.add(filesystem_specs);
         }
