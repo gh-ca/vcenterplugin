@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
+import com.dmeplugin.dmestore.constant.ApiRespConstant;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.VmfsOperationService;
 import com.google.gson.Gson;
@@ -7,6 +8,7 @@ import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,7 +25,7 @@ import java.util.Map;
 public class VmfsOperationController extends BaseController{
 
     public static final Logger LOG = LoggerFactory.getLogger(VmfsOperationController.class);
-
+    private final String API_RESP_CODE = "code";
 
     private Gson gson=new Gson();
     @Autowired
@@ -41,7 +43,7 @@ public class VmfsOperationController extends BaseController{
                                        @RequestBody Map<String,Object> params){
 
         Map<String,Object> resMap = vmfsOperationService.updateVMFS(volume_id,params);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(202)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.ACCEPTED)) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -59,7 +61,7 @@ public class VmfsOperationController extends BaseController{
 
         LOG.info("volumes=="+gson.toJson(volumes));
         Map<String, Object> resMap = vmfsOperationService.expandVMFS(volumes);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(202)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.ACCEPTED)) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -72,7 +74,7 @@ public class VmfsOperationController extends BaseController{
     public ResponseBodyBean recycleVMFS(@RequestBody List<String> datastoreName){
         LOG.info("recyclevmfs=="+gson.toJson(datastoreName));
         Map<String,Object> resMap = vmfsOperationService.recycleVmfsCapacity(datastoreName);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK)) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -84,7 +86,7 @@ public class VmfsOperationController extends BaseController{
 
         LOG.info("recyclevmfs=="+gson.toJson(params));
         Map<String,Object> resMap =vmfsOperationService.listServiceLevelVMFS(params);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK)) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -105,14 +107,10 @@ public class VmfsOperationController extends BaseController{
 
         LOG.info("servicelevelvmfs=="+gson.toJson(params));
         Map<String,Object> resMap = vmfsOperationService.updateVmfsServiceLevel(params);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(202)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.ACCEPTED)) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
-
-    }
-
-    public static void main(String[] args) {
 
     }
 
