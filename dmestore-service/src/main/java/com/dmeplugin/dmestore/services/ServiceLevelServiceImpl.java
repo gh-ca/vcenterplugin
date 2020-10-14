@@ -130,7 +130,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             SessionHelper sessionHelper = new SessionHelper();
             VCenterInfo vCenterInfo = vCenterInfoService.getVCenterInfo();
             if (null != vCenterInfo) {
-                sessionHelper.login(vCenterInfo.getHostIp(), vCenterInfo.getUserName(), CipherUtils.decryptString(vCenterInfo.getPassword()));
+                sessionHelper.login(vCenterInfo.getHostIp(), String.valueOf(vCenterInfo.getHostPort()), vCenterInfo.getUserName(), CipherUtils.decryptString(vCenterInfo.getPassword()));
 
                 String categoryid = vcsdkUtils.getCategoryID(sessionHelper);
                 List<TagModel> tagModels = vcsdkUtils.getAllTagsByCategoryId(categoryid, sessionHelper);

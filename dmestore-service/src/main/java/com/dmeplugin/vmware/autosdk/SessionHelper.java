@@ -10,13 +10,13 @@ public class SessionHelper {
     protected VapiAuthenticationHelper vapiAuthHelper;
     protected StubConfiguration sessionStubConfig;
 
-    public void login(String server,String username,String password) throws Exception {
+    public void login(String server,String port,String username,String password) throws Exception {
         this.vapiAuthHelper = new VapiAuthenticationHelper();
 
         HttpConfiguration httpConfig = buildHttpConfiguration();
         this.sessionStubConfig =
                 vapiAuthHelper.loginByUsernameAndPassword(
-                        server, username, password, httpConfig);
+                        server,port, username, password, httpConfig);
 
     }
 
