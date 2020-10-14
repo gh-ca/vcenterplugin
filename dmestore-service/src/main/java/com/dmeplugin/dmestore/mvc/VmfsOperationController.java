@@ -1,6 +1,5 @@
 package com.dmeplugin.dmestore.mvc;
 
-import com.dmeplugin.dmestore.constant.ApiRespConstant;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.VmfsOperationService;
 import com.google.gson.Gson;
