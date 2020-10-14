@@ -116,7 +116,7 @@ public class VapiAuthenticationHelper {
             throws Exception {
         // Create a https connection with the vapi url
         ProtocolFactory pf = new ProtocolFactory();
-        String apiUrl = "https://" + server +port+ VAPI_PATH;
+        String apiUrl = "https://" + server +":"+port+ VAPI_PATH;
 
         // Get a connection to the vapi url
         ProtocolConnection connection =
