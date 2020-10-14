@@ -156,12 +156,10 @@ public class VmfsAccessController extends BaseController {
     /**
      * unmount vmfs include
      * param list<str> dataStoreObjectIds: datastore object id列表 必
-     * param str host: 主机名称 必 （主机与集群二选一）
-     * param str hostId: 主机
-     * param str cluster: 集群名称 必（主机与集群二选一）
-     * param str clusterId: 集群
+     * param str hostId: 主机ID （主机ID与集群ID二选一）
+     * param str clusterId: 集群ID（主机ID与集群ID二选一）
      *
-     * @param params: include dataStoreObjectIds,host,hostId,cluster,clusterId
+     * @param params: include volumeIds,host_id,cluster_id
      * @return: ResponseBodyBean
      */
     @RequestMapping(value = "/ummountvmfs", method = RequestMethod.POST)
@@ -183,7 +181,7 @@ public class VmfsAccessController extends BaseController {
 
     /**
      * Delete vmfs
-     * param list<str> volume_ids: 卷id列表 必
+     * param list<str> dataStoreObjectIds: datastore object id列表 必
      * param str host_id: 主机id 必
      * param str hostGroup_id: 主机id 必
      * return: Return execution status and information

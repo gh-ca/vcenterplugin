@@ -27,18 +27,29 @@ public class DmeIndicatorConstants {
     public static final String COUNTER_ID_VOLUME_READRESPONSETIME = "1125921381744656";//读响应时间
     public static final String COUNTER_ID_VOLUME_WRITERESPONSETIME = "1125921381744657";//写响应时间
 
+    //NFS的性能指标 文档中没找到 暂按存储设备来处理
     public static final String COUNTER_ID_NFS_READTHROUGHPUT = "1125904201875461";//读IOPS
     public static final String COUNTER_ID_NFS_WRITETHROUGHPUT = "1125904201875462";//写IOPS
     public static final String COUNTER_ID_NFS_READBANDWIDTH = "1125904201875459";//读带宽
     public static final String COUNTER_ID_NFS_WRITEBANDWIDTH = "1125904201875460";//写带宽
     public static final String COUNTER_ID_NFS_RESPONSETIME = "1125904201875464";//响应时间
 
-    // FS的性能指标 文档中没找到 暂按存储设备来处理
-    public static final String COUNTER_ID_FS_READTHROUGHPUT = "1125904201875461";//读IOPS
-    public static final String COUNTER_ID_FS_WRITETHROUGHPUT = "1125904201875462";//写IOPS
-    public static final String COUNTER_ID_FS_READBANDWIDTH = "1125904201875459";//读带宽
-    public static final String COUNTER_ID_FS_WRITEBANDWIDTH = "1125904201875460";//写带宽
-    public static final String COUNTER_ID_FS_RESPONSETIME = "1125904201875464";//响应时间
+    public static final String COUNTER_ID_FS_THROUGHPUT = "1126179079716865";//OPS
+    public static final String COUNTER_ID_FS_SERVICETIME = "1126179079716866";//服务时间
+    public static final String COUNTER_ID_FS_READTHROUGHPUT = "1126179079716867";//读OPS
+    public static final String COUNTER_ID_FS_READBANDWIDTH = "1126179079716868";//读带宽
+    public static final String COUNTER_ID_FS_READRESPONSETIME = "1126179079716869";//读OPS响应时间
+    public static final String COUNTER_ID_FS_WRITETHROUGHPUT = "1126179079716870";//写OPS
+    public static final String COUNTER_ID_FS_WRITEBANDWIDTH = "1126179079716871";//写带宽
+    public static final String COUNTER_ID_FS_WRITERESPONSETIME = "1126179079716872";//写OPS响应时间
+    public static final String COUNTER_ID_FS_READSIZE = "1126179079716873";//读I/O大小
+    public static final String COUNTER_ID_FS_WRITESIZE = "1126179079716874";//写I/O大小
+    public static final String COUNTER_ID_FS_IOSIZE = "1126179079716875";//平均IO大小
+    public static final String COUNTER_ID_FS_CACHEPAGESIZE = "1126179079716876";//Cache page保有量
+    public static final String COUNTER_ID_FS_CACHECHUNKSIZE = "1126179079716877";//Cache chunk保有量
+    public static final String COUNTER_ID_FS_BANDWIDTH = "1126179079716878";//带宽
+
+
 
     // 服务等级
     public static final String COUNTER_ID_SERVICELECVEL_MAXRESPONSETIME = "1126174784815111";//最大响应时间

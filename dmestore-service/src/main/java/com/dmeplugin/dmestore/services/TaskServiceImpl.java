@@ -234,15 +234,17 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Boolean checkTaskStatus(List<String> taskIds) {
         boolean flag = false;
-        Map<String, Integer> taskStatusMap = new HashMap<>(16);
-        getTaskStatus(taskIds, taskStatusMap, taskTimeOut, System.currentTimeMillis());
-        LOG.info("taskStatusMap===" + (taskStatusMap == null ? "null" : gson.toJson(taskStatusMap)));
-        for (Map.Entry<String, Integer> entry : taskStatusMap.entrySet()) {
-            //String taskId = entry.getKey();
-            int status = entry.getValue();
-            if (3 == status) {
-                flag = true;
-                break;
+        if(null !=taskIds && taskIds.size() >0){
+            Map<String, Integer> taskStatusMap = new HashMap<>(16);
+            getTaskStatus(taskIds, taskStatusMap, taskTimeOut, System.currentTimeMillis());
+            LOG.info("taskStatusMap===" + (taskStatusMap == null ? "null" : gson.toJson(taskStatusMap)));
+            for (Map.Entry<String, Integer> entry : taskStatusMap.entrySet()) {
+                //String taskId = entry.getKey();
+                int status = entry.getValue();
+                if (3 == status) {
+                    flag = true;
+                    break;
+                }
             }
         }
         return flag;
