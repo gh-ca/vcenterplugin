@@ -170,6 +170,7 @@ export interface ServiceLevelList {
       };
     };
   };
+  show: boolean;
 }
 export interface HostOrCluster {
   deviceId: string;

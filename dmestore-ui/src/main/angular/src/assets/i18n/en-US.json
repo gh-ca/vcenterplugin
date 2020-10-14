@@ -573,6 +573,16 @@
     "notMove": "Not Move",
     "autoMove": "Auto Move",
     "highPMove": "High Performance Move",
-    "lowPMove": "Lower Performance Move"
+    "lowPMove": "Lower Performance Move",
+
+    "last1D": "Last One Day",
+    "last1W": "Last One Week",
+    "last1M": "Last One Month",
+    "last1Y": "Last One Year",
+
+    "last1M": "Last One Month",
+    "last3M": "Last Three Month",
+    "last6M": "Last Six Month",
+    "last1Y": "Last One Year"
   }
 }
