@@ -9,27 +9,38 @@ import java.util.List;
  * @create 2020-09-03
  */
 public class Volume {
-
-    private String id; //卷的唯一标识
-    private String name; //名称
-    private String status; //状态
+    //卷的唯一标识
+    private String id;
+    //名称
+    private String name;
+    //状态
+    private String status;
     private Boolean attached;
-    private String alloctype;//分配类型
-    private String service_level_name;//服务等级
-    private String storage_id;//存储设备id
-    private String pool_raw_id;//存储池id
-    private String capacity_usage;//容量利用率
-    private Boolean protectionStatus;//保护状态
+    //分配类型
+    private String alloctype;
+    //服务等级
+    private String service_level_name;
+    //存储设备id
+    private String storage_id;
+    //存储池id
+    private String pool_raw_id;
+    //容量利用率
+    private String capacity_usage;
+    //保护状态
+    private Boolean protectionStatus;
     private List<String> hostIds;
     private List<String> hostGroupIds;
+    //存储池名称
+    private String storage_pool_name;
+    //总容量 单位GB
+    private Integer capacity;
+    //关联的datastore
+    private String datastores;
+    //volume对应的instanceId
+    private String instanceId;
 
-    private String storage_pool_name;//存储池名称
-    private Integer capacity;//总容量 单位GB
-    private String datastores;//关联的datastore
-    private String instanceId;///volume对应的instanceId
 
-    //时延 iops 带宽 公用存储设备的
-
+    //todo 时延 iops 带宽 公用存储设备的？
 
     public String getDatastores() {
         return datastores;

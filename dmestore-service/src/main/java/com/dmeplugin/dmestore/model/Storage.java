@@ -8,30 +8,69 @@ package com.dmeplugin.dmestore.model;
  */
 public class Storage  {
 
-    private String id;//存储设备ID。
-    private String name; //名称
-    private String ip;  //ip地址
-    private String status; //状态
-    private String synStatus; //状态
-    private String vendor; //厂商
-    private String model; //型号
-    private Double usedCapacity;//已用容量
-    private Double totalCapacity;//裸容量
+    //存储设备ID。
+    private String id;
+    //名称
+    private String name;
+    //ip地址
+    private String ip;
+    //状态
+    private String status;
+    //状态
+    private String synStatus;
+    //厂商
+    private String vendor;
+    //型号
+    private String model;
+    //已用容量
+    private Double usedCapacity;
+    //裸容量
+    private Double totalCapacity;
     private Double totalEffectiveCapacity;
-    private Double freeEffectiveCapacity;//空闲容量
-    private Double maxCpuUtilization;//CPU利用率
-    private Double maxIops;//iops
-    private Double maxBandwidth;//带宽
-    private Double maxLatency;//时延
-    private String[] azIds; //可用分区
-    private String sn;//设备序列号
-    private String version;//版本
+    //空闲容量
+    private Double freeEffectiveCapacity;
+    //CPU利用率
+    private Double maxCpuUtilization;
+    //iops
+    private Double maxIops;
+    //带宽
+    private Double maxBandwidth;
+    //时延
+    private Double maxLatency;
+    //可用分区
+    private String[] azIds;
+    //设备序列号
+    private String sn;
+    //版本
+    private String version;
     private String product_version;
-    private Double total_pool_capacity;//总容量
-    private Double subscription_capacity; //订阅容量
+    //总容量
+    private Double total_pool_capacity;
+    //订阅容量
+    private Double subscription_capacity;
 
     //容量利用率 = 已用容量/总容量
+    private Double capacityUtilization;
+
     //订阅率 =订阅容量/总容量
+    private Double subscription_Rate;
+
+    public Double getCapacityUtilization() {
+        return capacityUtilization;
+    }
+
+    public void setCapacityUtilization(Double capacityUtilization) {
+        this.capacityUtilization = capacityUtilization;
+    }
+
+    public Double getSubscription_Rate() {
+        return subscription_Rate;
+    }
+
+    public void setSubscription_Rate(Double subscription_Rate) {
+        this.subscription_Rate = subscription_Rate;
+    }
+
     // TODO OPS未找到
     public Double getTotal_pool_capacity() {
         return total_pool_capacity;

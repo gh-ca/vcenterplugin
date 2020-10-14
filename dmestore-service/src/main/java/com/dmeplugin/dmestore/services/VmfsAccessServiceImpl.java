@@ -168,7 +168,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         List<VmfsDataInfo> relists = null;
         try {
             if (volumeIds != null && volumeIds.size() > 0) {
-                Map<String, Object> params = new HashMap<>();
+                Map<String, Object> params = new HashMap<>(16);
                 params.put("obj_ids", volumeIds);
                 Map<String, Object> remap = dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params);
                 LOG.info("remap===" + gson.toJson(remap));

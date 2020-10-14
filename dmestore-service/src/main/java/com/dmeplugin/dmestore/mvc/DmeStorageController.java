@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +30,7 @@ import java.util.Map;
 @RequestMapping("/dmestorage")
 @Api
 public class DmeStorageController extends BaseController{
+
 
     public static final Logger LOG = LoggerFactory.getLogger(DmeStorageController.class);
 
@@ -82,11 +84,11 @@ public class DmeStorageController extends BaseController{
     @GetMapping("/storagepools")
     @ResponseBody
     public ResponseBodyBean getStoragePools(@RequestParam(name = "storageId") String storageId,
-                                            @RequestParam(name = "media_type") String media_type){
+                                            @RequestParam(name = "media_type",defaultValue = "all",required = false) String media_type){
 
         LOG.info("storage_id ==" + storageId );
         Map<String, Object> resMap = dmeStorageService.getStoragePools(storageId,media_type);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(HttpStatus.OK)) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -195,5 +197,31 @@ public class DmeStorageController extends BaseController{
             failureStr = "get Storage Eth Ports failure:"+e.toString();
         }
         return failure(failureStr);
+    }
+
+    /**
+     *
+     * @param portType FC FCoE ETH  默认 ALL 所有端口类型
+     * @return
+     */
+    @GetMapping("/storageport")
+    @ResponseBody
+    public ResponseBodyBean getStoragePort(@RequestParam(name = "storageDeviceId")String storageDeviceId,
+                                           @RequestParam(name = "portType", value = "ALL", required = false) String portType) {
+        Map<String, Object> resMap = dmeStorageService.getStoragePort(storageDeviceId,portType);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
+    }
+
+    @GetMapping("/failovergroups")
+    @ResponseBody
+    public ResponseBodyBean getFailoverGroups(@RequestParam(name = "storage_id")String storage_id) {
+        Map<String, Object> resMap = dmeStorageService.getFailoverGroups(storage_id);
+        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
     }
 }
