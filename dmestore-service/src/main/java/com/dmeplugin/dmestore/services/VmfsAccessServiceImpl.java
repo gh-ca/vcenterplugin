@@ -172,7 +172,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 params.put("obj_ids", volumeIds);
                 Map<String, Object> remap = dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params);
                 LOG.info("remap===" + gson.toJson(remap));
-                if (remap != null && remap.get("data") != null) {
+                if (null != remap && null != remap.get(DmeConstants.DATA)) {
                     try {
                         JsonObject dataJson = new JsonParser().parse(remap.get("data").toString()).getAsJsonObject();
                         if (dataJson != null) {
@@ -1372,7 +1372,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return volumes;
     }
 
-    //从性能数据中提取对应指标的对应值
+    /**
+     *从性能数据中提取对应指标的对应值
+     **/
     private JsonElement getStatistcValue(JsonObject statisticObject, String indicator, String type) {
         JsonElement object = null;
         if (null != statisticObject) {
