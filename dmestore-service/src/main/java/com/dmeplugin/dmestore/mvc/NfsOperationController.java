@@ -7,9 +7,9 @@ import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -18,7 +18,7 @@ import java.util.Map;
 public class NfsOperationController extends BaseController{
 
     public static final Logger LOG = LoggerFactory.getLogger(NfsOperationController.class);
-
+    private final String API_RESP_CODE = "code";
     private Gson gson=new Gson();
 
     @Autowired
@@ -77,7 +77,7 @@ public class NfsOperationController extends BaseController{
 
         LOG.info("url:{/operatenfs/createnfsdatastore},"+gson.toJson(params));
         Map<String,Object> resMap = nfsOperationService.createNfsDatastore(params);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK)) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -120,7 +120,7 @@ public class NfsOperationController extends BaseController{
     public ResponseBodyBean updateNfsDatastore(@RequestBody Map<String,Object> params){
 
         Map<String,Object> resMap = nfsOperationService.updateNfsDatastore(params);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK)) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -140,7 +140,7 @@ public class NfsOperationController extends BaseController{
     public ResponseBodyBean changeNfsCapacity(@RequestBody Map<String,Object> params){
 
         ResponseBodyBean responseBodyBean = nfsOperationService.changeNfsCapacity(params);
-        if (null != responseBodyBean && null != responseBodyBean.getCode() && "200".equals(responseBodyBean.getCode())) {
+        if (null != responseBodyBean && null != responseBodyBean.getCode() && HttpStatus.OK.toString().equals(responseBodyBean.getCode())) {
             return success(responseBodyBean);
         }
         return failure(gson.toJson(responseBodyBean));

@@ -9,11 +9,16 @@ package com.dmeplugin.dmestore.model;
 public class Dtrees {
 
     private String name;
-    private String fs_name; //所属文件系统名称
-    private boolean quota_switch; //配额
-    private String security_style;//安全模式
-    private String tier_name;//服务等级名称
-    private Integer nfs_count;//nfs
+    //所属文件系统名称
+    private String fs_name;
+    //配额
+    private boolean quota_switch;
+    //安全模式
+    private String security_style;
+    //服务等级名称
+    private String tier_name;
+    //nfs
+    private Integer nfs_count;
     private Integer cifs_count;
 
 
