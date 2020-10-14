@@ -71,7 +71,7 @@ export class VmfsListComponent implements OnInit {
   blockSizeOptions = []; // 块大小选择
   srgOptions = []; // 空间回收粒度初始化
   deviceList: HostOrCluster[] = []; // 主机AND集群
-  chooseDevice: HostOrCluster; // 已选择的主机/集群
+  chooseDevice; // 已选择的主机/集群
   hostRootDirectory: any[] = [
     {
       name: 'Host',
@@ -345,6 +345,7 @@ export class VmfsListComponent implements OnInit {
       deviceType: '',
     };
     this.deviceList.push(nullDevice);
+    this.chooseDevice = this.deviceList[0];
 
     console.log('this.chooseDevice', this.chooseDevice);
     // 初始添加页面的主机集群信息
@@ -416,7 +417,6 @@ export class VmfsListComponent implements OnInit {
             this.deviceList.push(clusterInfo);
           });
         }
-        this.chooseDevice = this.deviceList[0];
         resolve(this.deviceList);
         this.form.culDataloadSuccess = true;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -518,6 +518,11 @@ export class VmfsListComponent implements OnInit {
       this.form.service_level_id = null;
       this.form.service_level_name = null;
     }
+    // 若控制策略数据为空，则将控制策略变量置为空
+    if(this.form.maxbandwidth === null && this.form.maxiops
+      && this.form.minbandwidth && this.form.miniops && this.form.latency) {
+      this.form.control_policy = null;
+    }
     this.form.control_policy = null;
     console.log(this.form);
     this.remoteSrv.createVmfs(this.form).subscribe((result: any) => {
@@ -529,6 +534,33 @@ export class VmfsListComponent implements OnInit {
         console.log('创建失败：' + result.description);
       }
     });
+  }
+
+  // 容量单位转换
+  capacityChange() {
+    let capatityG;
+    // 数据预处----容量 （后端默认单位为GB）
+    switch (this.form.capacityUnit) {
+      case 'TB':
+        capatityG = this.form.capacity * 1024;
+        break;
+      case 'MB':
+        capatityG = this.form.capacity / 1024;
+        break;
+      case 'KB':
+        capatityG = this.form.capacity / (1024 * 1024);
+        break;
+      default: // 默认GB 不变
+        // capatityG = capacity;
+        break;
+    }
+    // 版本号5 最小容量为1.3G 版本号6最小2G
+    if ((capatityG < 1.3 && this.form.version === '5')
+      || (capatityG < 2 && this.form.version === '6')) {
+      return 1;
+    } else {
+      return 2;
+    }
   }
 
   // 未选择服务等级 时调用方法

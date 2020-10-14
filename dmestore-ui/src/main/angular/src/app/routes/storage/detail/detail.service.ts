@@ -29,6 +29,15 @@ export class DetailService {
   getShareList(storageId: string){
     return this.http.get('dmestorage/nfsshares', {params: {storageId}});
   }
+  getControllerList(storageId: string){
+    return this.http.get('dmestorage/storagecontrollers', {params: {storageId}});
+  }
+  getDiskList(storageId: string){
+    return this.http.get('dmestorage/storagedisks', {params: {storageId}});
+  }
+  getPortList(storageId: string){
+    return this.http.get('dmestorage/getstorageethports', {params: {storageId}});
+  }
 }
 
 export class StorageDetail{
@@ -59,33 +68,27 @@ export class StorageDetail{
 }
 export class StoragePool{
   free_capacity: number;// 空闲容量
-  lun_subscribed_capacity: number; // LUN的配置容量（LUN订阅容量）
   name: string;// 名称
-  parent_type: string;
+  id: string;// id
   running_status: string;// 运行状态
   health_status: string;// 健康状态
   total_capacity: number;// 总容量
-  fs_subscribed_capacity: number; // 订阅容量(文件系统订阅容量)
   consumed_capacity: number;//已用容量
   consumed_capacity_percentage: string;// 已用容量百分比(容量利用率)
-  consumed_capacity_threshold: string;
   storage_pool_id: string;
   storage_instance_id: string;
   storage_device_id: string;
-  storage_name: string;
-  //订阅率 = 订阅容量/总容量
-  lun_subscription_rate: number;
-  fs_subscription_rate: number;
+  subscription_rate: number; //订阅率
   //补充字段
   media_type: string;//类型（块）
-  tier0_disk_type: string;// 硬盘类型
   tier0_raid_lv: string; // RAID级别
-  tier1_disk_type: string;// 硬盘类型
-  tier1_raid_lv: string;// RAID级别
-  tier2_disk_type: string;// 硬盘类型
-  tier2_raid_lv: string;// RAID级别
+  tier1_raid_lv: string; // RAID级别
+  tier2_raid_lv: string; // RAID级别
   storage_id: string; // 存储设备id
   data_space: number; // 存储池上创建LUN或者文件系统时的可用容量 单位MB
+  subscribed_capacity: number; //订阅容量
+  physicalType: string;//硬盘类型
+  diskPoolId:string;//存储池所处硬盘id
 }
 export class Volume{
   id: string; //卷的唯一标识
@@ -189,5 +192,11 @@ export class CapacityDistribution{
   volume: string;
   freeCapacity: string;
   chart: CapacityChart;
+}
+export class StorageController{
+  name:string;
+  status:string;
+  softVer:string;
+  cpuInfo:string;
 }
 

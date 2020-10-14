@@ -185,9 +185,9 @@ export class GetForm {
       name: null, // vmfs stor的名称 必
       volumeName: null, // 卷名称 必
       isSameName: true, // 卷名称与数据存储名称相同 true相同 false 不同
-      capacity: 0, // 容量，单位GB 必
+      capacity: null, // 容量，单位GB 必
       capacityUnit: 'GB', // 容量单位 （最后需转换为GB）
-      count: 0, // 数量 必
+      count: null, // 数量 必
       service_level_id: null, // 服务等级id 若未选择服务等级，可选择存储设备、存储池、设置QoS、Thin、Workload
       service_level_name: null, // 服务等级名称  必
       version: '5', // 版本
@@ -203,6 +203,7 @@ export class GetForm {
       workload_type_id: 0, // 应用类型id
       alloctype: null, // 卷分配类型，取值范围 thin，thick
       control_policy: '1', // 控制策略
+      latencyChoose: false, // 时延 选中
       latency: null, // 时延，单位ms
       maxbandwidth: null, // 最大带宽
       maxbandwidthChoose: false, // 最大带宽 选中

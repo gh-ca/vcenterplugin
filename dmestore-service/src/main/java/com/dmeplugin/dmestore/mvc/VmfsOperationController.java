@@ -50,7 +50,7 @@ public class VmfsOperationController extends BaseController{
     /**
      * expand vmfs datastore
      *
-     * @param volumes  volumes{vo_add_capacity,volume_id,ds_name}
+     * @param volumes  volumes{vo_add_capacity,hostObjectId,ds_name}
      * @return
      */
     @PostMapping("/expandvmfs")

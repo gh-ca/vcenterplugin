@@ -287,8 +287,8 @@ export class DashboardService {
       {
         name: '',
         type: 'pie',
-        radius: ['60%', '70%'],
-        center: ['50%', '50%'],
+        radius: ['50%', '80%'],
+        center: ['60%', '60%'],
         avoidLabelOverlap: false,
         label: {
           show: false,
@@ -310,7 +310,7 @@ export class DashboardService {
         ]
       }
     ],
-    color: ['#99CC66', '#FF0033']
+    color: ['#92CF5A', '#CA2200']
   };
   storageCapacityOption = {
     tooltip: {

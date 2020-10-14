@@ -8,22 +8,33 @@ package com.dmeplugin.dmestore.model;
  */
 public class FileSystem  {
 
-
-    private String id; //id
-    private String name;//名称
-    private String health_status; //状态
-    private String alloc_type; //分配策略
-    private Integer capacity_usage_ratio; //容量使用率
-    private String storage_pool_name;//存储池名字
-    private Integer nfs_count; //nfs
-    private Integer cifs_count;//cifs
-    private Integer dtree_count; //dtree
-    private Double capacity;//总容量
-
-
+    //id
+    private String id;
+    //名称
+    private String name;
+    //状态
+    private String health_status;
+    //分配策略
+    private String alloc_type;
+    //容量使用率
+    private Integer capacity_usage_ratio;
+    //存储池名字
+    private String storage_pool_name;
+    //nfs
+    private Integer nfs_count;
+    //cifs
+    private Integer cifs_count;
+    //dtree
+    private Integer dtree_count;
+    //总容量
+    private Double capacity;
+    //文件系统在存储池上已经分配的容量
     private Double allocate_quota_in_pool;
+    //可用空间
     private Double available_capacity;
+    //Thin文件系统能缩容的最小空间。单位GB，保留三位小数
     private Double min_size_fs_capacity;
+    //存储设备Id
     private String storage_id;
 
 

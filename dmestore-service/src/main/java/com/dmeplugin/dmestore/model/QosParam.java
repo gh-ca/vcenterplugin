@@ -9,8 +9,10 @@ package com.dmeplugin.dmestore.model;
 public class QosParam {
 
     private Boolean enabled;
-    private Integer latency; //responTime;
-    private String latencyUnit;//Unit of response time eg:ms s
+    //responTime;
+    private Integer latency;
+    //Unit of response time eg:ms s
+    private String latencyUnit;
     private Integer minBandWidth;
     private Integer minIOPS;
     private Integer maxBandWidth;
