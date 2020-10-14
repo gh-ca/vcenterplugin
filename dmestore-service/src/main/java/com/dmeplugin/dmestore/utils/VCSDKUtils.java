@@ -662,7 +662,7 @@ public class VCSDKUtils {
     /**
      *expand oriented datastore capacity
      **/
-    public String expandVmfsDatastore(String dsname, Integer addCapacity) {
+    public String expandVmfsDatastore(String dsname, Integer addCapacity,String hostObjectId) {
 
         String result = "success";
         logger.info("==start expand DataStore==");
@@ -695,6 +695,7 @@ public class VCSDKUtils {
                             hostDiskPartitionSpec.setTotalSectors(spec.getPartition().getTotalSectors());
                             spec.setPartition(hostDiskPartitionSpec);
                             host1.getHostDatastoreSystemMO().expandVmfsDatastore(dsMo, spec);
+                            scanDataStore(null,hostObjectId);
                         }
                     }
                 }
@@ -2479,4 +2480,3 @@ public class VCSDKUtils {
     }*/
 
 }
-
