@@ -1709,6 +1709,7 @@ public class VCSDKUtils {
             //创建category
             CategoryTypes.CreateSpec createSpec = new CategoryTypes.CreateSpec();
             createSpec.setName(CATEGORY_NAME);
+            createSpec.setDescription(CATEGORY_NAME);
 
             createSpec.setCardinality(CategoryModel.Cardinality.SINGLE);
 
