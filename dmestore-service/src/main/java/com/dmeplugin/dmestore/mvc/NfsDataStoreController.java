@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = "accessnfs")
-public class NFSDataStoreController extends BaseController{
+public class NfsDataStoreController extends BaseController{
 
     @Autowired
     private DmeNFSAccessService dmeNFSAccessService;

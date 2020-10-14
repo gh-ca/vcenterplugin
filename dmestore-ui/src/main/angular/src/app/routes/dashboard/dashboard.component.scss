@@ -1,74 +1,98 @@
-.count-wrap{
-  display: flex;
+.count-wrap {
+  width: 100%;
 }
-.count-item{
-  margin: 0 30px;
-  .num{
-    font-size: 24px;
+.count-item {
+  // margin: 0 30px;
+  .num {
+    font-size: 30px;
     font-weight: bold;
     color: #565656;
   }
-  .color-divide{
-    width: 70px;
+  .color-divide {
+    width: 60%;
     height: 4px;
     border-radius: 4px;
     margin: 8px 0;
   }
-  .critical{
+  .critical {
     background-color: #ca2200;
   }
-  .major{
+  .major {
     background-color: #f0c004;
   }
-  .warning{
+  .warning {
     background-color: #fee273;
   }
-  .info{
+  .info {
     background-color: #79c6e6;
   }
-  .text{
+  .text {
     font-size: 14px;
     color: #9e9e9e;
   }
 }
 
 // 进度条样式开始
-.progress-container{
+.progress-container {
   margin-bottom: 20px;
-  .progress-item{
+  .progress-item {
     display: flex;
     align-items: center;
   }
 }
-.progress-item{
-  .progress-label{
+.progress-item {
+  .progress-label {
     width: 100px;
     font-size: 16px;
     color: #9e9e9e;
   }
-  .progress-default{
+  .progress-default {
     position: relative;
     width: 400px;
     height: 16px;
     background-color: hsl(198, 0%, 87%);
-    .progress-inner{
+    .progress-inner {
       height: 16px;
       background-color: hsl(198, 100%, 32%);
     }
-    .warning{
+    .warning {
       background-color: #f0c004;
     }
   }
-  .progress-text{
+  .progress-text {
     margin-left: 10px;
     font-size: 16px;
-    .percent{
+    .percent {
       color: black;
       font-weight: bold;
     }
-    .unit{
+    .unit {
       color: #9e9e9e;
     }
   }
 }
 // 进度条样式结束
+.bestprac{
+  padding-left: 10%;
+  padding-top: 15px;
+}
+.over-top{
+  .info-card{
+    height: 100%;
+  }
+}
+.ds-wrap{
+  margin-top: 20px;
+  .info-card{
+    display: flex;
+  }
+}
+.ds-left{
+  width: 35%;
+}
+.ds-right {
+  width: 65%;
+  border-left: solid 1px #e8e8e8;
+  box-sizing: border-box;
+  padding-left: 150px;
+}

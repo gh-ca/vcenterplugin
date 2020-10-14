@@ -1,6 +1,7 @@
 import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone, OnInit} from '@angular/core';
 import {
-  CapacityDistribution, DetailService, Dtrees, NfsShare, PoolList, StorageDetail, StoragePool,
+  CapacityDistribution, DetailService, Dtrees, NfsShare, PoolList, StorageController, StorageDetail, StorageDisk,
+  StoragePool,
   Volume
 } from './detail.service';
 import {VmfsPerformanceService} from '../../vmfs/volume-performance/performance.service';
@@ -316,7 +317,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
   fsList: FileSystem[];
   dtrees: Dtrees[];
   shares: NfsShare[];
-
+  controllers:StorageController[];
+  disks: StorageDisk[];
+  //portList:
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(queryParam => {
       this.storageId = queryParam.id;
@@ -395,10 +398,22 @@ export class DetailComponent implements OnInit, AfterViewInit {
     if (page === 'shares'){
       this.getShareList(false);
     }
-
     if (page === 'capacity'){
       this.initCapacity();
     }
+    if (page === 'hardware'){
+      this.getControllerList(false);
+    }
+    if (page === 'controller'){
+      this.getControllerList(false);
+    }
+    if (page === 'disk'){
+      this.getControllerList(false);
+    }
+    if (page === 'port'){
+      this.getControllerList(false);
+    }
+
   }
   getStorageDetail(fresh: boolean){
     if (fresh){
@@ -525,6 +540,28 @@ export class DetailComponent implements OnInit, AfterViewInit {
       }
     }
   }
+  getControllerList(fresh: boolean){
+    if (fresh){
+      this.detailService.getControllerList(this.storageId).subscribe((r: any) => {
+        if (r.code === '200'){
+          this.controllers = r.data.data;
+          this.cdr.detectChanges();
+        }
+      });
+    }else {
+      // 此处防止重复切换tab每次都去后台请求数据
+      if (this.shares !== null){
+        this.detailService.getControllerList(this.storageId).subscribe((r: any) => {
+          if (r.code === '200'){
+            this.controllers = r.data.data;
+            this.cdr.detectChanges();
+          }
+        });
+      }
+    }
+  }
+
+
   formatCapacity(c: number){
     if (c < 1024){
       return c.toFixed(3)+" GB";
