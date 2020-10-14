@@ -78,11 +78,11 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     @Override
-    public NFSDataStoreShareAttr getNFSDatastoreShareAttr(String storage_id) throws Exception {
+    public NFSDataStoreShareAttr getNFSDatastoreShareAttr(String storageObjectId) throws Exception {
         //根据存储ID 获取逻nfs_share_id
-        String nfs_share_id = dmeVmwareRalationDao.getShareIdByStorageId(storage_id);
+        String nfsShareId = dmeVmwareRalationDao.getShareIdByStorageId(storageObjectId);
         String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_SHARE_DETAIL_URL,
-                "nfs_share_id", nfs_share_id);
+                "nfs_share_id", nfsShareId);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         if (responseEntity.getStatusCodeValue() / 100 != 2) {
             LOG.error("获取 NFS Share 信息失败！返回信息：{}", responseEntity.getBody());
@@ -96,7 +96,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         shareAttr.setDescription(share.get("description").getAsString());
         shareAttr.setOwning_dtree_name(share.get("owning_dtree_name").getAsString());
         //查询客户端列表
-        List<AuthClient> authClientList = getNFSDatastoreShareAuthClients(nfs_share_id);
+        List<AuthClient> authClientList = getNFSDatastoreShareAuthClients(nfsShareId);
         if (null != authClientList && authClientList.size() > 9) {
             shareAttr.setAuth_client_list(authClientList);
         }
@@ -129,15 +129,15 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     @Override
-    public NFSDataStoreLogicPortAttr getNFSDatastoreLogicPortAttr(String storage_id) throws Exception {
+    public NFSDataStoreLogicPortAttr getNFSDatastoreLogicPortAttr(String storageObjectId) throws Exception {
         //根据存储ID 获取逻辑端口ID
-        String logic_port_id = dmeVmwareRalationDao.getLogicPortIdByStorageId(storage_id);
+        String logicPortId = dmeVmwareRalationDao.getLogicPortIdByStorageId(storageObjectId);
 
         String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_LOGICPORT_DETAIL_URL,
-                "logic_port_id", logic_port_id);
+                "logic_port_id", logicPortId);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         if (responseEntity.getStatusCodeValue() / 100 != 2) {
-            LOG.error("NFS 逻辑端口详细信息获取失败！logic_port_id={},返回信息：{}", logic_port_id, responseEntity.getBody());
+            LOG.error("NFS 逻辑端口详细信息获取失败！logic_port_id={},返回信息：{}", logicPortId, responseEntity.getBody());
             return null;
         }
         JsonObject logicPort = gson.fromJson(responseEntity.getBody(), JsonObject.class);
@@ -157,9 +157,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     @Override
-    public List<NFSDataStoreFSAttr> getNFSDatastoreFSAttr(String storage_id) throws Exception {
+    public List<NFSDataStoreFSAttr> getNFSDatastoreFSAttr(String storageObjectId) throws Exception {
         //根据存储ID获取fs
-        List<String> fsIds = dmeVmwareRalationDao.getFsIdsByStorageId(storage_id);
+        List<String> fsIds = dmeVmwareRalationDao.getFsIdsByStorageId(storageObjectId);
         List<NFSDataStoreFSAttr> list = new ArrayList<>();
         for (int i = 0; i < fsIds.size(); i++) {
             NFSDataStoreFSAttr fsAttr = new NFSDataStoreFSAttr();
@@ -607,10 +607,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                             if (statisticObject != null) {
                                 NfsDataInfo nfsDataInfo = new NfsDataInfo();
                                 nfsDataInfo.setFsId(fsId);
-                                nfsDataInfo.setOPS(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT), null));
-                                nfsDataInfo.setBandwidth(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_BANDWIDTH), null));
-                                nfsDataInfo.setReadResponseTime(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_READRESPONSETIME), null));
-                                nfsDataInfo.setWriteResponseTime(ToolUtils.jsonToInt(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_WRITERESPONSETIME), null));
+                                nfsDataInfo.setOps(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT), null));
+                                nfsDataInfo.setBandwidth(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_BANDWIDTH), null));
+                                nfsDataInfo.setReadResponseTime(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_READRESPONSETIME), null));
+                                nfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_WRITERESPONSETIME), null));
                                 relists.add(nfsDataInfo);
                             }
                         }
@@ -724,9 +724,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                     Map<String, Object> addition = new HashMap<>();
                     addition.put("name", hostIp);
                     addition.put("accessval", ToolUtils.getStr(params.get("mountType")));
-                    addition.put("all_squash", "all_squash");
+                    addition.put("all_squash", "no_all_squash");
                     addition.put("root_squash", "root_squash");
                     addition.put("sync", "synchronization");
+                    addition.put("secure", "insecure");
                     listAddition.add(addition);
                 }
                 requestbody.put("nfs_share_client_addition", listAddition);

@@ -46,7 +46,7 @@ export class VmfsListComponent implements OnInit {
   total = 0; // 总数据数量
   isLoading = true; // table数据loading
   rowSelected = []; // 当前选中数据
-  volumnIds = []; // 卷ID
+  wwns = []; // wwn 用来查询chart data
   query = { // 查询数据
     q: 'user:VMware',
     sort: 'stars',
@@ -184,15 +184,15 @@ export class VmfsListComponent implements OnInit {
             if (null !== this.list) {
               this.total = this.list.length;
               // 获取chart 数据
-              const volumeIds = [];
+              const wwns = [];
               this.list.forEach(item => {
-                volumeIds.push(item.volumeId);
+                wwns.push(item.wwn);
               });
               // 设置卷ID集合
-              this.volumnIds = volumeIds;
+              this.wwns = wwns;
 
-              if (this.volumnIds.length > 0) {
-                this.remoteSrv.getChartData(this.volumnIds).subscribe((chartResult: any) => {
+              if (this.wwns.length > 0) {
+                this.remoteSrv.getChartData(this.wwns).subscribe((chartResult: any) => {
                   console.log('chartResult');
                   console.log(chartResult);
                   if (chartResult.code === '200' && chartResult.data != null) {
@@ -200,7 +200,7 @@ export class VmfsListComponent implements OnInit {
                     this.list.forEach(item => {
                       chartList.forEach(charItem => {
                         // 若属同一个卷则将chartItem的带宽、iops、读写相应时间 值赋予列表
-                        if (item.volumeId === charItem.volumeId) {
+                        if (item.wwn === charItem.wwn) {
                           item.iops = charItem.iops;
                           item.bandwidth = charItem.bandwidth;
                           item.readResponseTime = charItem.readResponseTime;
@@ -446,6 +446,7 @@ export class VmfsListComponent implements OnInit {
 
     // 初始化存储池
     this.storagePoolList = [];
+
   }
   // 页面跳转
   jumpTo(page: ClrWizardPage, wizard: ClrWizard) {
@@ -458,6 +459,7 @@ export class VmfsListComponent implements OnInit {
   }
   // 获取服务等级数据
   setServiceLevelList() {
+    // 获取服务等级数据
     this.remoteSrv.getServiceLevelList().subscribe((result: any) => {
       console.log(result);
       if (result.code === '200' && result.data !== null) {
@@ -467,9 +469,25 @@ export class VmfsListComponent implements OnInit {
       }
     });
   }
-
+  showServiceLevel(show: boolean, obj:any) {
+    console.log('obj', obj);
+    if (show) {
+    }
+  }
   // 添加vmfs 处理
   addVmfsHanlde() {
+    let selectResult = this.serviceLevelList.find(item => item.show === true)
+    console.log('selectResult', selectResult)
+    console.log('selectResultIndex', this.serviceLevelList.indexOf(selectResult) === 0)
+    if (this.levelCheck === 'level') { // 选择服务等级
+      if (selectResult) {
+        this.form.service_level_id = selectResult.id;
+        this.form.service_level_name = selectResult.name;
+      } else {
+        console.log("服务等级不能为空！");
+        return;
+      }
+    }
     // 数据预处----卷名称
     if (this.form.isSameName) { // 卷名称与vmfs名称相同（PS：不同时为必填）
       this.form.volumeName = this.form.name;
@@ -676,7 +694,8 @@ export class VmfsListComponent implements OnInit {
     });
   }
   // 服务等级 点击事件 serviceLevId:服务等级ID、serviceLevName：服务等级名称
-  serviceLevelClickHandel(serviceLevId: string, serviceLevName: string) {
+  serviceLevelClickHandel(serviceLevId: string, serviceLevName: string, isoppen:any) {
+    console.log('isoppen', isoppen)
     this.form.service_level_id = serviceLevId;
     this.form.service_level_name = serviceLevName;
     console.log('serviceLevId:' + serviceLevId + 'serviceLevName:' + serviceLevName);

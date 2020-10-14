@@ -53,6 +53,7 @@
   <clr-datagrid [(clrDgSelected)]="rowSelected" [clrDgLoading]="isLoading">
     <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
     <clr-dg-column hidden [clrDgField]="'volumeId'">volumeId</clr-dg-column>
+    <clr-dg-column hidden [clrDgField]="'wwn'">wwn</clr-dg-column>
     <clr-dg-column hidden [clrDgField]="'volumeName'">volumeName</clr-dg-column>
     <clr-dg-column hidden [clrDgField]="'objectid'">objectid</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'status'">{{'vmfs.status' | translate}}</clr-dg-column>
@@ -75,6 +76,7 @@
     <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
       <clr-dg-cell (click)="navigateTo(item.objectid);">{{item.name}}</clr-dg-cell>
       <clr-dg-cell hidden>{{item.volumeId}}</clr-dg-cell>
+      <clr-dg-cell hidden>{{item.wwn}}</clr-dg-cell>
       <clr-dg-cell hidden>{{item.volumeName}}</clr-dg-cell>
       <clr-dg-cell hidden>{{item.objectid}}</clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.status}}</clr-dg-cell>
@@ -122,7 +124,7 @@
           <!--名称 -->
           <clr-input-container>
             <label>{{'vmfs.name' | translate}}</label>
-            <input clrInput  [(ngModel)]="form.name" name="name" #name="ngModel" required/>
+            <input clrInput class="inputWidth40Percent"  [(ngModel)]="form.name" name="name" #name="ngModel" required/>
             <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
           </clr-input-container>
           <clr-checkbox-container>
@@ -134,7 +136,7 @@
           </clr-checkbox-container>
           <clr-input-container *ngIf="!form.isSameName">
             <label>{{'vmfs.volumeName' | translate}}</label>
-            <input clrInput  [(ngModel)]="form.volumeName" name="volumeName" required/>
+            <input clrInput class="inputWidth40Percent"  [(ngModel)]="form.volumeName" name="volumeName" required/>
             <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
           </clr-input-container>
 
@@ -198,8 +200,9 @@
             <clr-combobox [(ngModel)]="chooseDevice" name="chooseDevice" required>
               <clr-options *ngIf="form.hostDataloadSuccess && form.culDataloadSuccess">
                 <clr-option *clrOptionItems="let device of deviceList; field:'deviceName'" [clrValue]="device">
-                  <clr-icon *ngIf="device.deviceName !== ''" shape="world" role="img" aria-label="World is turning"></clr-icon> {{device.deviceName}}
-                  <clr-icon *ngIf="device.deviceName !== ''" shape="sun" role="img" aria-label="Sun is shining"></clr-icon>
+                  <clr-icon *ngIf="device.deviceName !== '' && device.deviceType === 'host'" shape="host" role="img" aria-label="World is turning"></clr-icon>
+                  <clr-icon *ngIf="device.deviceName !== '' && device.deviceType !== 'host'" shape="host-group" role="img" aria-label="World is turning"></clr-icon>
+                  {{device.deviceName}}
                 </clr-option>
               </clr-options>
             </clr-combobox>
@@ -215,7 +218,7 @@
         </ng-template> <!-- mandatory -->
         <span class="tabs-btn-wrap">
           <!-- 服务等级 -->
-          <span (click)="levelCheck = 'level'" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'level'}">{{'vmfs.byServiceLevel' | translate}}</span>
+          <span (click)="levelCheck = 'level';" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'level'}">{{'vmfs.byServiceLevel' | translate}}</span>
           <!-- 非服务等级 -->
           <span (click)="customerClickFunc();" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'customer'}">{{'vmfs.customer' | translate}}</span>
         </span>
@@ -224,8 +227,8 @@
           <ng-container *ngIf="levelCheck==='level'">
             <clr-accordion>
               <clr-accordion-panel *ngFor="let item of serviceLevelList;" style="margin-top: 20px;" >
-                <clr-accordion-title style="height: 50px; line-height: 50px;color: #333;font-size:16px;">{{item.name}}</clr-accordion-title>
-                <clr-accordion-content (click)="serviceLevelClickHandel(item.id, item.name);">
+                <clr-accordion-title (click)="showServiceLevel(!item.show, this);" *ngIf="!item.show" style="height: 50px; line-height: 50px;color: #333;font-size:16px;">{{item.name}}</clr-accordion-title>
+                <clr-accordion-content [(clrIfExpanded)]="item.show">
                   <table class="table table-vertical table-noborder table-compact">
                       <tbody>
                         <tr>

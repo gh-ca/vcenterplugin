@@ -238,6 +238,7 @@
     }
   },
   "storage":{
+    "storage":"存储",
     "list":{
       "name":"名称",
       "ipAddress":"IP地址",
@@ -575,6 +576,16 @@
     "notMove": "不迁移",
     "autoMove": "自动迁移",
     "highPMove": "向高性能层迁移",
-    "lowPMove": "向低性能层迁移"
+    "lowPMove": "向低性能层迁移",
+
+    "last1D": "最近1天",
+    "last1W": "最近1周",
+    "last1M": "最近1个月",
+    "last1Y": "最近1年",
+
+    "last1M": "最近1个月",
+    "last3M": "最近3个月",
+    "last6M": "最近6个月",
+    "last1Y": "最近一年"
   }
 }

@@ -43,7 +43,8 @@ public class HttpRequestUtil {
             LOGGER.info(e.getMessage());
         }
 
-        final HostnameVerifier PROMISCUOUS_VERIFIER = new HostnameVerifier() {
+        final HostnameVerifier promiscuousverifier = new HostnameVerifier() {
+            @Override
             public boolean verify(String s, SSLSession sslSession) {
                 return true;
             }
@@ -57,7 +58,7 @@ public class HttpRequestUtil {
                     throws IOException {
 
                 if (connection instanceof HttpsURLConnection) {
-                    ((HttpsURLConnection) connection).setHostnameVerifier(PROMISCUOUS_VERIFIER);
+                    ((HttpsURLConnection) connection).setHostnameVerifier(promiscuousverifier);
                 }
                 super.prepareConnection(connection, httpMethod);
             }
@@ -94,10 +95,14 @@ public class HttpRequestUtil {
      * Return key=value param concat by &, value is encoded
      */
     public static String concatParamAndEncode(Map<String, String> paramMap) {
-        if (paramMap == null || paramMap.isEmpty()) return "";
+        if (paramMap == null || paramMap.isEmpty()) {
+            return "";
+        }
         StringBuilder buff = new StringBuilder();
         for (Map.Entry<String, String> entry : paramMap.entrySet()) {
-            if (buff.length() > 0) buff.append("&");
+            if (buff.length() > 0) {
+                buff.append("&");
+            }
             buff.append(entry.getKey()).append("=").append(encode(entry.getValue()));
         }
         return buff.toString();
@@ -115,13 +120,16 @@ public class HttpRequestUtil {
 
         private static final TrustManager[] UNQUESTIONING_TRUST_MANAGER = new TrustManager[]{
             new X509TrustManager() {
+                @Override
                 public X509Certificate[] getAcceptedIssuers() {
                     return new X509Certificate[0];
                 }
 
+                @Override
                 public void checkClientTrusted(X509Certificate[] certs, String authType) {
                 }
 
+                @Override
                 public void checkServerTrusted(X509Certificate[] certs, String authType) {
                 }
             }

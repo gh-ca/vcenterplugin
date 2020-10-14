@@ -24,7 +24,7 @@ public interface DmeNFSAccessService {
      * @Param []
      * @Return com.dmeplugin.dmestore.model.NFSDataStoreShareAttr
      **/
-    NFSDataStoreShareAttr getNFSDatastoreShareAttr(String nfs_share_id) throws Exception;
+    NFSDataStoreShareAttr getNFSDatastoreShareAttr(String storageObjectId) throws Exception;
 
     /**
      * @Author wangxiangyong
@@ -33,7 +33,7 @@ public interface DmeNFSAccessService {
      * @Param [params]
      * @Return com.dmeplugin.dmestore.model.NFSDataStorePortAttr
      **/
-    NFSDataStoreLogicPortAttr getNFSDatastoreLogicPortAttr(String logic_port_id) throws Exception;
+    NFSDataStoreLogicPortAttr getNFSDatastoreLogicPortAttr(String storageObjectId) throws Exception;
 
     /**
      * @Author wangxiangyong
@@ -42,7 +42,7 @@ public interface DmeNFSAccessService {
      * @Param []
      * @Return com.dmeplugin.dmestore.model.NFSDataStoreFSAttr
      **/
-    List<NFSDataStoreFSAttr> getNFSDatastoreFSAttr(String storage_id) throws Exception;
+    List<NFSDataStoreFSAttr> getNFSDatastoreFSAttr(String storageObjectId) throws Exception;
 
     /**
      * 扫描NFS 存储DataSotre 与share fs logicPort的关系

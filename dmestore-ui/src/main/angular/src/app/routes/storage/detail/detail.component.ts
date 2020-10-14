@@ -1,12 +1,13 @@
 import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone, OnInit} from '@angular/core';
 import {
-  CapacityDistribution, DetailService, Dtrees, NfsShare, PoolList, StorageDetail, StoragePool,
+  CapacityDistribution, DetailService, Dtrees, NfsShare, PoolList, StorageController, StorageDetail, StorageDisk,
+  StoragePool,
   Volume
 } from './detail.service';
 import {VmfsPerformanceService} from '../../vmfs/volume-performance/performance.service';
 import { EChartOption } from 'echarts';
 import {FileSystem} from '../../nfs/nfs.service';
-import {ActivatedRoute} from "@angular/router";
+import {ActivatedRoute, Router} from "@angular/router";
 import {CapacityChart, CapacitySerie} from "../storage.service";
 @Component({
   selector: 'app-detail',
@@ -306,8 +307,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
   poolRadio = 'table1'; // 存储池列表切换
   volumeRadio = 'table1'; // volume列表切换
   storageId = '1234';
+  storageName= "";
   constructor(private detailService: DetailService, private cdr: ChangeDetectorRef, private ngZone: NgZone,
-              private activatedRoute: ActivatedRoute ) { }
+              private activatedRoute: ActivatedRoute,private router:Router) { }
   detail: StorageDetail;
   storagePool: StoragePool[];
   volumes: Volume[];
@@ -315,10 +317,13 @@ export class DetailComponent implements OnInit, AfterViewInit {
   fsList: FileSystem[];
   dtrees: Dtrees[];
   shares: NfsShare[];
-
+  controllers:StorageController[];
+  disks: StorageDisk[];
+  //portList:
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(queryParam => {
       this.storageId = queryParam.id;
+      this.storageName = queryParam.name;
     });
 
     this.getStorageDetail(true);
@@ -393,10 +398,22 @@ export class DetailComponent implements OnInit, AfterViewInit {
     if (page === 'shares'){
       this.getShareList(false);
     }
-
     if (page === 'capacity'){
       this.initCapacity();
     }
+    if (page === 'hardware'){
+      this.getControllerList(false);
+    }
+    if (page === 'controller'){
+      this.getControllerList(false);
+    }
+    if (page === 'disk'){
+      this.getControllerList(false);
+    }
+    if (page === 'port'){
+      this.getControllerList(false);
+    }
+
   }
   getStorageDetail(fresh: boolean){
     if (fresh){
@@ -523,6 +540,28 @@ export class DetailComponent implements OnInit, AfterViewInit {
       }
     }
   }
+  getControllerList(fresh: boolean){
+    if (fresh){
+      this.detailService.getControllerList(this.storageId).subscribe((r: any) => {
+        if (r.code === '200'){
+          this.controllers = r.data.data;
+          this.cdr.detectChanges();
+        }
+      });
+    }else {
+      // 此处防止重复切换tab每次都去后台请求数据
+      if (this.shares !== null){
+        this.detailService.getControllerList(this.storageId).subscribe((r: any) => {
+          if (r.code === '200'){
+            this.controllers = r.data.data;
+            this.cdr.detectChanges();
+          }
+        });
+      }
+    }
+  }
+
+
   formatCapacity(c: number){
     if (c < 1024){
       return c.toFixed(3)+" GB";
@@ -550,5 +589,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
     const cs = new CapacitySerie(2.024,1.078);
     cc.series.push(cs);
     this.cd.chart = cc;
+  }
+  backToList(){
+    this.router.navigate(['storage']);
   }
 }

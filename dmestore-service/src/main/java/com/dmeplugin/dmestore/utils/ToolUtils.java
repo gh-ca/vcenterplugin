@@ -185,6 +185,30 @@ public class ToolUtils {
         return re;
     }
 
+    public static Float jsonToFloat(JsonElement obj, Float defaultvalue) {
+        Float re = defaultvalue;
+        try {
+            if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
+                re = obj.getAsFloat();
+            }
+        } catch (Exception e) {
+            LOG.error("error:" + e.toString());
+        }
+        return re;
+    }
+
+    public static Float jsonToFloat(JsonElement obj) {
+        Float re = 0.0F;
+        try {
+            if (!StringUtils.isEmpty(obj)) {
+                re = obj.getAsFloat();
+            }
+        } catch (Exception e) {
+            LOG.error("error:" + e.toString());
+        }
+        return re;
+    }
+
     public static boolean jsonToBoo(JsonElement obj) {
         boolean re = false;
         try {

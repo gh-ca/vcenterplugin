@@ -171,4 +171,5 @@ public interface DmeAccessService {
     List<Map<String,Object>> getDmeHostInHostGroup(String hostGroupId) throws Exception;
 
 
+    void hostMapping(String hostId, List<String> volumeIds) throws Exception;
 }

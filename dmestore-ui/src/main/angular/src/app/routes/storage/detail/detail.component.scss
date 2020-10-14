@@ -131,3 +131,30 @@
   height: 12px;
   background-color: hsl(198, 100%, 32%);
 }
+.detail-outer{
+  //border: 1px red solid;
+  height: 100%;
+  width: 100%;
+  background-color:#F0F2F5 ;
+}
+.detail-header{
+  //border: 1px green solid;
+  height: 5%;
+  position: relative;
+}
+.detail-header-font{
+  font-size: 18px;
+  position: absolute;
+  transform: translateY(-50%);
+  margin-left: 20px;
+}
+.detail-content{
+  //border: 1px blue solid;
+  height: 94%;
+  padding: 2%;
+  margin: 1%;
+  background-color: #FFFFFF;
+}
+.detail-margin-top{
+  margin-top: 1%;
+}
