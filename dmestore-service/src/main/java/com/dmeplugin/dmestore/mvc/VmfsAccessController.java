@@ -205,22 +205,28 @@ public class VmfsAccessController extends BaseController {
     }
 
     /**
-     * @Author wangxiangyong
-     * @Description dme卷详细信息查询
-     * @Date 17:20 2020/9/8
-     * @Param [volume_id]
-     * @Return com.dmeplugin.dmestore.model.ResponseBodyBean
+     * 根据存储ID查询关联的DME卷详细信息
+     * @author wangxy
+     * @date 10:01 2020/10/14
+     * @param storageObjectId vCenter存储ID
+     * @return com.dmeplugin.dmestore.model.ResponseBodyBean
      **/
-    @RequestMapping(value = "/volume/{storage_objectId}", method = RequestMethod.GET)
-    public ResponseBodyBean volumeDetail(@PathVariable(value = "storage_objectId") String storage_objectId) throws Exception {
+    @RequestMapping(value = "/volume/{storageObjectId}", method = RequestMethod.GET)
+    public ResponseBodyBean volumeDetail(@PathVariable(value = "storageObjectId") String storageObjectId) throws Exception {
         try {
-            List<VmfsDatastoreVolumeDetail> detail = vmfsAccessService.volumeDetail(storage_objectId);
+            List<VmfsDatastoreVolumeDetail> detail = vmfsAccessService.volumeDetail(storageObjectId);
             return success(detail);
         } catch (Exception e) {
             return failure(e.getMessage());
         }
     }
 
+    /**
+     * VMFS扫描发现
+     * @author wangxy
+     * @date 10:25 2020/10/14
+     * @return com.dmeplugin.dmestore.model.ResponseBodyBean
+     **/
     @RequestMapping(value = "/scanvmfs", method = RequestMethod.GET)
     public ResponseBodyBean scanvmfs() throws Exception {
         boolean flag = vmfsAccessService.scanVmfs();

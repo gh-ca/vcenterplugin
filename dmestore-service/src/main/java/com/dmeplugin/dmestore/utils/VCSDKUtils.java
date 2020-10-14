@@ -105,6 +105,18 @@ public class VCSDKUtils {
                             dsmap.put("remoteHost", nasinfo.getNas().getRemoteHost());
                             dsmap.put("remotePath", nasinfo.getNas().getRemotePath());
                             dsmap.put("nfsStorageId", ds1.getMor().getValue());
+                        }else if(storeType.equals(ToolUtils.STORE_TYPE_VMFS) &&
+                                ds1.getSummary().getType().equals(ToolUtils.STORE_TYPE_VMFS)){
+                            VmfsDatastoreInfo vmfsDatastoreInfo = ds1.getVmfsDatastoreInfo();
+                            List<HostScsiDiskPartition> extent = vmfsDatastoreInfo.getVmfs().getExtent();
+                            List<String> wwnList = new ArrayList<>();
+                            if(null != extent){
+                                for(HostScsiDiskPartition hostScsiDiskPartition : extent){
+                                    String wwn = hostScsiDiskPartition.getDiskName().replace("nna.", "");
+                                    wwnList.add(wwn);
+                                }
+                                dsmap.put("vmfsWwnList", wwnList);
+                            }
                         }
 
                         if (StringUtils.isEmpty(storeType)) {
@@ -112,7 +124,6 @@ public class VCSDKUtils {
                         } else if (ds1.getSummary().getType().equals(storeType)) {
                             lists.add(dsmap);
                         }
-
                     }
                     if (lists.size() > 0) {
                         listStr = gson.toJson(lists);
