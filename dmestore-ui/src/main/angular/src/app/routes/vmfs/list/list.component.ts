@@ -446,6 +446,7 @@ export class VmfsListComponent implements OnInit {
 
     // 初始化存储池
     this.storagePoolList = [];
+
   }
   // 页面跳转
   jumpTo(page: ClrWizardPage, wizard: ClrWizard) {
@@ -458,6 +459,7 @@ export class VmfsListComponent implements OnInit {
   }
   // 获取服务等级数据
   setServiceLevelList() {
+    // 获取服务等级数据
     this.remoteSrv.getServiceLevelList().subscribe((result: any) => {
       console.log(result);
       if (result.code === '200' && result.data !== null) {
@@ -467,9 +469,25 @@ export class VmfsListComponent implements OnInit {
       }
     });
   }
-
+  showServiceLevel(show: boolean, obj:any) {
+    console.log('obj', obj);
+    if (show) {
+    }
+  }
   // 添加vmfs 处理
   addVmfsHanlde() {
+    let selectResult = this.serviceLevelList.find(item => item.show === true)
+    console.log('selectResult', selectResult)
+    console.log('selectResultIndex', this.serviceLevelList.indexOf(selectResult) === 0)
+    if (this.levelCheck === 'level') { // 选择服务等级
+      if (selectResult) {
+        this.form.service_level_id = selectResult.id;
+        this.form.service_level_name = selectResult.name;
+      } else {
+        console.log("服务等级不能为空！");
+        return;
+      }
+    }
     // 数据预处----卷名称
     if (this.form.isSameName) { // 卷名称与vmfs名称相同（PS：不同时为必填）
       this.form.volumeName = this.form.name;
@@ -676,7 +694,8 @@ export class VmfsListComponent implements OnInit {
     });
   }
   // 服务等级 点击事件 serviceLevId:服务等级ID、serviceLevName：服务等级名称
-  serviceLevelClickHandel(serviceLevId: string, serviceLevName: string) {
+  serviceLevelClickHandel(serviceLevId: string, serviceLevName: string, isoppen:any) {
+    console.log('isoppen', isoppen)
     this.form.service_level_id = serviceLevId;
     this.form.service_level_name = serviceLevName;
     console.log('serviceLevId:' + serviceLevId + 'serviceLevName:' + serviceLevName);

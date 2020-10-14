@@ -1,39 +1,100 @@
 package com.dmeplugin.dmestore.model;
-
+/**
+ * @Description: TODO
+ * @ClassName: VmfsDataInfo
+ * @Company: GH-CA
+ * @author: yy
+ * @create: 2020-09-02
+ **/
 public class VmfsDataInfo {
-    //列表字段（基本视图）
-    String objectid; //vmware中跳转用唯一id
-    String name;    //名称 vmware中vmfs的名称
-    String status;  //dme中状态
-
-    Double capacity;  //vmware中总容量 单位GB
-    Double freeSpace; //vmware中空闲容量 单位GB
-    Double reserveCapacity; //vmware中置备容量  capacity+uncommitted-freeSpace 单位GB
-
-    String deviceId; //dme中存储设备ID
-    String device; //dme中存储设备名称
-    String serviceLevelName;    //dme中服务等级
-    Boolean vmfsProtected;  //dme中保护状态
-
-    //列表字段（性能视图）：
-    Integer maxIops; //dme中QoS上限
-    Integer minIops; //dme中QoS下限
-
-    Float iops; //dme中iops 性能统计数据
-
-    Integer maxBandwidth;   //dme中带宽上限 单位MB/s
-    Integer minBandwidth;   //dme中带宽下限 单位MB/s
-
-    Float bandwidth; //dme中bandwidth 性能统计数据
-
-    Float readResponseTime;   //dme中读响应时间 单位ms  性能统计数据
-    Float writeResponseTime; //dme中写响应时间 单位ms   性能统计数据
-
-    Integer latency; //dme中时延 单位ms
-
-    String volumeId; //dme中卷ID
-    String volumeName; //dme中卷名称
-    String wwn; //dme中wwn
+    /**
+     * vmware中跳转用唯一id
+     **/
+    String objectid;
+    /**
+     * 名称 vmware中vmfs的名称
+     **/
+    String name;
+    /**
+     * dme中状态
+     **/
+    String status;
+    /**
+     * vmware中总容量 单位GB
+     **/
+    Double capacity;
+    /**
+     * vmware中空闲容量 单位GB
+     **/
+    Double freeSpace;
+    /**
+     * vmware中置备容量  capacity+uncommitted-freeSpace 单位GB
+     **/
+    Double reserveCapacity;
+    /**
+     * dme中存储设备ID
+     **/
+    String deviceId;
+    /**
+     * dme中存储设备名称
+     **/
+    String device;
+    /**
+     * dme中服务等级
+     **/
+    String serviceLevelName;
+    /**
+     * dme中保护状态
+     **/
+    Boolean vmfsProtected;
+    /**
+     * dme中QoS上限
+     **/
+    Integer maxIops;
+    /**
+     * dme中QoS下限
+     **/
+    Integer minIops;
+    /**
+     * dme中iops 性能统计数据
+     **/
+    Float iops;
+    /**
+     * dme中带宽上限 单位MB/s
+     **/
+    Integer maxBandwidth;
+    /**
+     * dme中带宽下限 单位MB/s
+     **/
+    Integer minBandwidth;
+    /**
+     * dme中bandwidth 性能统计数据
+     **/
+    Float bandwidth;
+    /**
+     * dme中读响应时间 单位ms  性能统计数据
+     **/
+    Float readResponseTime;
+    /**
+     * dme中写响应时间 单位ms   性能统计数据
+     **/
+    Float writeResponseTime;
+    /**
+     * dme中时延 单位ms
+     **/
+    Integer latency;
+    /**
+     * dme中卷ID
+     **/
+    String volumeId;
+    /**
+     * dme中卷名称
+     **/
+    String volumeName;
+    /**
+     * dme中wwn
+     **/
+    String wwn;
 
     public String getObjectid() {
         return objectid;
