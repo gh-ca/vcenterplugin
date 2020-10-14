@@ -77,7 +77,7 @@ public class NfsOperationController extends BaseController{
 
         LOG.info("url:{/operatenfs/createnfsdatastore},"+gson.toJson(params));
         Map<String,Object> resMap = nfsOperationService.createNfsDatastore(params);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -120,7 +120,7 @@ public class NfsOperationController extends BaseController{
     public ResponseBodyBean updateNfsDatastore(@RequestBody Map<String,Object> params){
 
         Map<String,Object> resMap = nfsOperationService.updateNfsDatastore(params);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -140,7 +140,7 @@ public class NfsOperationController extends BaseController{
     public ResponseBodyBean changeNfsCapacity(@RequestBody Map<String,Object> params){
 
         ResponseBodyBean responseBodyBean = nfsOperationService.changeNfsCapacity(params);
-        if (null != responseBodyBean && null != responseBodyBean.getCode() && HttpStatus.OK.toString().equals(responseBodyBean.getCode())) {
+        if (null != responseBodyBean && null != responseBodyBean.getCode() && "202".equals(responseBodyBean.getCode())) {
             return success(responseBodyBean);
         }
         return failure(gson.toJson(responseBodyBean));
