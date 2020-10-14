@@ -42,7 +42,7 @@ public class VmfsOperationController extends BaseController{
                                        @RequestBody Map<String,Object> params){
 
         Map<String,Object> resMap = vmfsOperationService.updateVMFS(volume_id,params);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.ACCEPTED)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.ACCEPTED.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -60,7 +60,7 @@ public class VmfsOperationController extends BaseController{
 
         LOG.info("volumes=="+gson.toJson(volumes));
         Map<String, Object> resMap = vmfsOperationService.expandVMFS(volumes);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.ACCEPTED)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.ACCEPTED.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -73,7 +73,7 @@ public class VmfsOperationController extends BaseController{
     public ResponseBodyBean recycleVMFS(@RequestBody List<String> datastoreName){
         LOG.info("recyclevmfs=="+gson.toJson(datastoreName));
         Map<String,Object> resMap = vmfsOperationService.recycleVmfsCapacity(datastoreName);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -85,7 +85,7 @@ public class VmfsOperationController extends BaseController{
 
         LOG.info("recyclevmfs=="+gson.toJson(params));
         Map<String,Object> resMap =vmfsOperationService.listServiceLevelVMFS(params);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -106,7 +106,7 @@ public class VmfsOperationController extends BaseController{
 
         LOG.info("servicelevelvmfs=="+gson.toJson(params));
         Map<String,Object> resMap = vmfsOperationService.updateVmfsServiceLevel(params);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.ACCEPTED)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.ACCEPTED.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
