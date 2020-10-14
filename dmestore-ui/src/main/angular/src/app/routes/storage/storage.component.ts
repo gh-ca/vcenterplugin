@@ -21,7 +21,7 @@ export class StorageComponent implements OnInit, AfterViewInit {
   isLoading = true; // table数据loading
   rowSelected = []; // 当前选中数据
   radioCheck = 'table1'; // 切换列表页显示
-  buttonTrigger = 'list'; // 切换列表页显示
+  buttonTrigger ='list'; // 切换列表页显示
   strorageCharts: StorageChart[] = [];
   constructor(private remoteSrv: StorageService, private cdr: ChangeDetectorRef, private ngZone: NgZone,private router:Router) {}
   // 生命周期： 初始化数据

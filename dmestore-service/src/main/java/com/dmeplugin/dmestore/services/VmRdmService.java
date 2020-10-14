@@ -10,34 +10,37 @@ import java.util.Map;
  * @Author admin
  * @version 1.0.0
  * @ClassName VMRDMService.java
- * @Description TODO
+ * @Description RDM创建相关接口
  * @createTime 2020年09月09日 10:58:00
  */
 public interface VmRdmService {
+
     /**
-     * @Author Administrator
-     * @Description vCenter虚拟机创建Rdm
-     * @Date 10:29 2020/10/12
-     * @Param [dataStoreName, vmObjectId, hostId, createBean]
-     * @Return void
+     * @author wangxy
+     * @description vCenter 虚拟机RDM创建
+     * @date 17:37 2020/10/13
+     * @param dataStoreName vCenter存储名称
+     * @param vmObjectId    vCenter虚拟机ID
+     * @param hostId        DME主机ID
+     * @param createBean    DME卷创建基础信息
+     * @return void
      **/
     void createRdm(String dataStoreName, String vmObjectId, String hostId, VmRdmCreateBean createBean) throws Exception;
 
     /**
-     * @Author Administrator
-     * @Description 获取所有DME主机
-     * @Date 10:32 2020/10/12
-     * @Param []
-     * @Return java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
+     * @author wangxy
+     * @description 获取DME主机信息
+     * @date 17:43 2020/10/13
+     * @return java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
      **/
     List<Map<String, Object>> getAllDmeHost() throws Exception;
 
     /**
-     * @Author Administrator
-     * @Description 获取vCenter主机已关联的VMFS存储
-     * @Date 10:36 2020/10/12
-     * @Param [hostId]
-     * @Return java.util.List<com.vmware.vim25.DatastoreSummary>
+     * @author Administrator
+     * @description 根据主机绑定的存储查询
+     * @date 17:36 2020/10/13
+     * @param hostId DME主机ID
+     * @return java.util.List<com.vmware.vim25.DatastoreSummary>
      **/
     List<DatastoreSummary> getDatastoreMountsOnHost(String hostId) throws Exception;
 }

@@ -246,7 +246,7 @@ public class FileUtils {
     return PATH;
   }
 
-  public static String getPath(boolean isDBPath) {
+  public static String getPath(boolean isDbPath) {
     if (isWindows()) {
       return VMWARE_WINDOWS_DIR;
     } else {
@@ -273,7 +273,7 @@ public class FileUtils {
         }
       } else {
         // 6.0 doesn't support H5, so return flash version path
-        linuxDir = (isDBPath ? VMWARE_LINUX60_DB_DIR : VMWARE_LINUX60_DIR);
+        linuxDir = (isDbPath ? VMWARE_LINUX60_DB_DIR : VMWARE_LINUX60_DIR);
       }
       // LOGGER.info("Linux file path: " + linuxDir);
       return linuxDir;
