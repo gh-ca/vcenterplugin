@@ -47,10 +47,47 @@ public class StoragePool   {
     private String physicalType;
     //存储池所处硬盘id
     private String diskPoolId;
-    /**
-     *服务等级
-     **/
+
     private String serviceLevelName;
+
+    /**
+     *iops
+     **/
+    private Float maxIops;
+
+    /**
+     *带宽
+     **/
+    private Float maxBandwidth;
+
+    /**
+     *时延
+     **/
+    private Float maxLatency;
+
+    public Float getMaxIops() {
+        return maxIops;
+    }
+
+    public void setMaxIops(Float maxIops) {
+        this.maxIops = maxIops;
+    }
+
+    public Float getMaxBandwidth() {
+        return maxBandwidth;
+    }
+
+    public void setMaxBandwidth(Float maxBandwidth) {
+        this.maxBandwidth = maxBandwidth;
+    }
+
+    public Float getMaxLatency() {
+        return maxLatency;
+    }
+
+    public void setMaxLatency(Float maxLatency) {
+        this.maxLatency = maxLatency;
+    }
 
     public String getServiceLevelName() {
         return serviceLevelName;
