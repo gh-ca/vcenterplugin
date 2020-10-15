@@ -200,7 +200,7 @@ export class VmfsListComponent implements OnInit {
                     this.list.forEach(item => {
                       chartList.forEach(charItem => {
                         // 若属同一个卷则将chartItem的带宽、iops、读写相应时间 值赋予列表
-                        if (item.wwn === charItem.wwn) {
+                        if (item.wwn === charItem.volumeId) {
                           item.iops = charItem.iops;
                           item.bandwidth = charItem.bandwidth;
                           item.readResponseTime = charItem.readResponseTime;
@@ -537,30 +537,40 @@ export class VmfsListComponent implements OnInit {
   }
 
   // 容量单位转换
-  capacityChange() {
-    let capatityG;
-    // 数据预处----容量 （后端默认单位为GB）
-    switch (this.form.capacityUnit) {
-      case 'TB':
-        capatityG = this.form.capacity * 1024;
-        break;
-      case 'MB':
-        capatityG = this.form.capacity / 1024;
-        break;
-      case 'KB':
-        capatityG = this.form.capacity / (1024 * 1024);
-        break;
-      default: // 默认GB 不变
-        // capatityG = capacity;
-        break;
-    }
-    // 版本号5 最小容量为1.3G 版本号6最小2G
-    if ((capatityG < 1.3 && this.form.version === '5')
-      || (capatityG < 2 && this.form.version === '6')) {
-      return 1;
+  capacityChange(obj: any) {
+    console.log('event', obj.value === '1')
+    const objValue = obj.value.match(/\d+(\.\d{0,2})?/)? obj.value.match(/\d+(\.\d{0,2})?/)[0] : '';
+
+    if (objValue !== '') {
+
+      let capatityG;
+      // 数据预处----容量 （后端默认单位为GB）
+      switch (this.form.capacityUnit) {
+        case 'TB':
+          capatityG = objValue * 1024;
+          break;
+        case 'MB':
+          capatityG = objValue / 1024;
+          break;
+        case 'KB':
+          capatityG = objValue / (1024 * 1024);
+          break;
+        default: // 默认GB 不变
+          capatityG = objValue;
+          break;
+      }
+
+      // 版本号5 最小容量为1.3G 版本号6最小2G
+      if (capatityG < 1.3 && this.form.version === '5') {
+        capatityG = 1.3;
+      } else if(capatityG < 2 && this.form.version === '6') {
+        capatityG = 2;
+      }
+      obj.value = capatityG;
     } else {
-      return 2;
+      obj.value = objValue;
     }
+
   }
 
   // 未选择服务等级 时调用方法

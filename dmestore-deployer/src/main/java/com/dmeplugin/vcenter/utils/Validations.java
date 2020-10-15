@@ -93,9 +93,13 @@ public class Validations {
               if ("-99999".equals(resultCode)) {
                 LOGGER.info((String) result.get("description"));
               }
+              if ("200".equals(resultCode)) {
+                LOGGER.info("add dme info to vcenter success");
+              }
             } catch (Exception e) {
               LOGGER.info("Cannot add dme info in vcenter");
             }
+
             break;
           } else {
             LOGGER.info("service is not ready wait for ready");
@@ -189,7 +193,7 @@ public class Validations {
               HttpMethod.POST, HEADERS, body, String.class).getBody();
       LOGGER.debug("unsubscribe: " + result);
     } catch (Exception e) {
-      LOGGER.debug( e.getMessage());
+      LOGGER.error( e.getMessage(),e);
     }
     return result;
   }

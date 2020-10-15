@@ -1012,7 +1012,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             for(int j = 0; j< wwnArray.size(); j++){
                 String wwn = wwnArray.get(j).getAsString();
                 //根据wwn从DME中查询卷信息
-                String volumeUrlByName = LIST_VOLUME_URL + "?wwn=" + wwn;
+                String volumeUrlByName = LIST_VOLUME_URL + "?volume_wwn=" + wwn;
                 ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByName, HttpMethod.GET, null);
 
                 if (responseEntity.getStatusCodeValue() / 100 != 2) {
