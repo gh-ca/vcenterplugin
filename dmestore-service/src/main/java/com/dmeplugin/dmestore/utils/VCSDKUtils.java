@@ -105,6 +105,18 @@ public class VCSDKUtils {
                             dsmap.put("remoteHost", nasinfo.getNas().getRemoteHost());
                             dsmap.put("remotePath", nasinfo.getNas().getRemotePath());
                             dsmap.put("nfsStorageId", ds1.getMor().getValue());
+                        }else if(storeType.equals(ToolUtils.STORE_TYPE_VMFS) &&
+                                ds1.getSummary().getType().equals(ToolUtils.STORE_TYPE_VMFS)){
+                            VmfsDatastoreInfo vmfsDatastoreInfo = ds1.getVmfsDatastoreInfo();
+                            List<HostScsiDiskPartition> extent = vmfsDatastoreInfo.getVmfs().getExtent();
+                            List<String> wwnList = new ArrayList<>();
+                            if(null != extent){
+                                for(HostScsiDiskPartition hostScsiDiskPartition : extent){
+                                    String wwn = hostScsiDiskPartition.getDiskName().replace("naa.", "");
+                                    wwnList.add(wwn);
+                                }
+                                dsmap.put("vmfsWwnList", wwnList);
+                            }
                         }
 
                         if (StringUtils.isEmpty(storeType)) {
@@ -112,7 +124,6 @@ public class VCSDKUtils {
                         } else if (ds1.getSummary().getType().equals(storeType)) {
                             lists.add(dsmap);
                         }
-
                     }
                     if (lists.size() > 0) {
                         listStr = gson.toJson(lists);
@@ -595,14 +606,18 @@ public class VCSDKUtils {
                     logger.info("object host Object Id:" + hostObjectId);
                     ManagedObjectReference objmor = vcConnectionHelper.objectID2MOR(hostObjectId);
                     HostMO hostMo = new HostMO(vmwareContext, objmor);
-                    ManagedObjectReference cluster = hostMo.getHyperHostCluster();
-                    logger.info("Host cluster id:" + cluster.getValue());
-                    if (cluster != null) {
-                        ClusterMO clusterMo = new ClusterMO(hostMo.getContext(), cluster);
-                        logger.info("Host cluster name:" + clusterMo.getName());
-                        hosts = clusterMo.getClusterHosts();
+                    try {
+                        ManagedObjectReference cluster = hostMo.getHyperHostCluster();
+                        logger.info("Host cluster id:" + cluster.getValue());
+                        if (cluster != null) {
+                            ClusterMO clusterMo = new ClusterMO(hostMo.getContext(), cluster);
+                            logger.info("Host cluster name:" + clusterMo.getName());
+                            hosts = clusterMo.getClusterHosts();
+                        }
+                        logger.info("Number of hosts in cluster:" + (hosts == null ? "null" : hosts.size()));
+                    }catch (Exception e){
+                        logger.error("Number of hosts in cluster:" + (hosts == null ? "null" : hosts.size()));
                     }
-                    logger.info("Number of hosts in cluster:" + (hosts == null ? "null" : hosts.size()));
                 }
             }
         } catch (Exception e) {
@@ -1251,8 +1266,6 @@ public class VCSDKUtils {
                 objDataStoreName = ToolUtils.getStr(dsmap.get("name"));
             }
 
-            //集群下的所有主机
-            List<Pair<ManagedObjectReference, String>> hosts = getHostsOnCluster(clusterObjectId, hostObjectId);
 
             String serverguid = null;
             if (!StringUtils.isEmpty(clusterObjectId)) {
@@ -1262,20 +1275,36 @@ public class VCSDKUtils {
             }
             if (!StringUtils.isEmpty(serverguid)) {
                 VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
-                if (hosts != null && hosts.size() > 0) {
-                    for (Pair<ManagedObjectReference, String> host : hosts) {
-                        try {
-                            HostMO host1 = new HostMO(vmwareContext, host.first());
-                            logger.info("Host under Cluster: " + host1.getName());
-                            //只挂载其它的主机
-                            if (host1 != null && !objHostName.equals(host1.getName())) {
-                                mountVmfs(objDataStoreName, host1);
+                if (!StringUtils.isEmpty(clusterObjectId)) {
+                    //集群下的所有主机
+                    List<Pair<ManagedObjectReference, String>> hosts = getHostsOnCluster(clusterObjectId, hostObjectId);
+                    if (hosts != null && hosts.size() > 0) {
+                        for (Pair<ManagedObjectReference, String> host : hosts) {
+                            try {
+                                HostMO host1 = new HostMO(vmwareContext, host.first());
+                                logger.info("Host under Cluster: " + host1.getName());
+                                //只挂载其它的主机
+                                if (host1 != null && !objHostName.equals(host1.getName())) {
+                                    mountVmfs(objDataStoreName, host1);
+                                }
+                            }catch (Exception e){
+                                logger.error("mount Vmfs On Cluster error:", e);
                             }
-                        }catch (Exception e){
-                            logger.error("mount Vmfs On Cluster error:", e);
                         }
                     }
+                } else if (!StringUtils.isEmpty(hostObjectId)) {
+                    try {
+                        ManagedObjectReference objmor = vcConnectionHelper.objectID2MOR(hostObjectId);
+                        HostMO hostmo = new HostMO(vmwareContext, objmor);
+                        //只挂载其它的主机
+                        if (hostmo != null && !objHostName.equals(hostmo.getName())) {
+                            mountVmfs(objDataStoreName, hostmo);
+                        }
+                    }catch (Exception e){
+                        logger.error("mount Vmfs On Cluster error:", e);
+                    }
                 }
+
             }
         } catch (Exception e) {
             logger.error("mount Vmfs On Cluster error:", e);
@@ -1709,6 +1738,7 @@ public class VCSDKUtils {
             //创建category
             CategoryTypes.CreateSpec createSpec = new CategoryTypes.CreateSpec();
             createSpec.setName(CATEGORY_NAME);
+            createSpec.setDescription(CATEGORY_NAME);
 
             createSpec.setCardinality(CategoryModel.Cardinality.SINGLE);
 
