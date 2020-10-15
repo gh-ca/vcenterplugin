@@ -32,6 +32,8 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
 
     private static Map<String, Map<String, Object>> serviceLevelInstance = new HashMap<>();
     private static Map<String, Map<String, Object>> lunInstance = new HashMap<>();
+    private static Map<String, Map<String, Object>> storagePoolInstance = new HashMap<>();
+    private static Map<String, Map<String, Object>> storageDevcieInstance = new HashMap<>();
 
     private DmeAccessService dmeAccessService;
 
@@ -192,6 +194,50 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         }
     }
 
+    public void listInstanceStoragePool(){
+        String instanceName = "SYS_StoragePool";
+        JsonObject jsonObject = listInstancdByInstanceName(instanceName);
+        if (null != jsonObject) {
+            JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
+            Map<String, Map<String, Object>> map = new HashMap<>();
+            for (JsonElement element : jsonArray) {
+                Map<String, Object> lunMap = new HashMap<>();
+                JsonObject slJson = element.getAsJsonObject();
+                lunMap.put("resId", ToolUtils.jsonToOriginalStr(slJson.get("resId")));
+                lunMap.put("name", ToolUtils.jsonToOriginalStr(slJson.get("name")));
+                lunMap.put("id", ToolUtils.jsonToOriginalStr(slJson.get("id")));
+                map.put(ToolUtils.jsonToOriginalStr(slJson.get("id")), lunMap);
+            }
+            if (map.size() > 0) {
+                storagePoolInstance.clear();
+                storagePoolInstance.putAll(map);
+            }
+        }
+    }
+
+    public void listInstanceStorageDevcie(){
+        String instanceName = "SYS_StorDevice";
+        JsonObject jsonObject = listInstancdByInstanceName(instanceName);
+        if (null != jsonObject) {
+            JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
+            Map<String, Map<String, Object>> map = new HashMap<>();
+            for (JsonElement element : jsonArray) {
+                Map<String, Object> lunMap = new HashMap<>();
+                JsonObject slJson = element.getAsJsonObject();
+                lunMap.put("resId", ToolUtils.jsonToOriginalStr(slJson.get("resId")));
+                lunMap.put("name", ToolUtils.jsonToOriginalStr(slJson.get("name")));
+                lunMap.put("id", ToolUtils.jsonToOriginalStr(slJson.get("id")));
+                lunMap.put("nativeId", ToolUtils.jsonToOriginalStr(slJson.get("nativeId")));
+                lunMap.put("sn", ToolUtils.jsonToOriginalStr(slJson.get("sn")));
+                map.put(ToolUtils.jsonToOriginalStr(slJson.get("nativeId")), lunMap);
+            }
+            if (map.size() > 0) {
+                storageDevcieInstance.clear();
+                storageDevcieInstance.putAll(map);
+            }
+        }
+    }
+
     @Override
     public Map<String, Map<String, Object>> getServiceLevelInstance() {
         if (serviceLevelInstance.size() == 0) {
@@ -206,6 +252,22 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
             listInstanceLun();
         }
         return lunInstance;
+    }
+
+    @Override
+    public Map<String, Map<String, Object>> getStoragePoolInstance() {
+        if (storagePoolInstance.size() == 0) {
+            listInstanceStoragePool();
+        }
+        return storagePoolInstance;
+    }
+
+    @Override
+    public Map<String, Map<String, Object>> getStorageDeviceInstance() {
+        if (storageDevcieInstance.size() == 0) {
+            listInstanceStorageDevcie();
+        }
+        return storageDevcieInstance;
     }
 
     private JsonObject listInstancdByInstanceName(String instanceName) {

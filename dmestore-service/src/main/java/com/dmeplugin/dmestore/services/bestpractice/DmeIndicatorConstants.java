@@ -8,6 +8,13 @@ package com.dmeplugin.dmestore.services.bestpractice;
  * @create: 2020-09-24
  **/
 public class DmeIndicatorConstants {
+
+    public static final String RESOURCE_TYPE_NAME_STORAGEDEVICE = "SYS_StorDevice";
+    public static final String RESOURCE_TYPE_NAME_STORAGEPOOL = "SYS_StoragePool";
+    public static final String RESOURCE_TYPE_NAME_SERVICELEVEL = "SYS_DjTier";
+    public static final String RESOURCE_TYPE_NAME_LUN = "SYS_Lun";
+    public static final String RESOURCE_TYPE_NAME_FILESYSTEM = "SYS_StorageFileSystem";
+
     public static final String COUNTER_ID_VMFS_THROUGHPUT = "1125921381744641";//IOPS
     public static final String COUNTER_ID_VMFS_BANDWIDTH = "1125921381744643";//bandwidth
     public static final String COUNTER_ID_VMFS_READTHROUGHPUT = "1125921381744648";//读IOPS
@@ -34,6 +41,7 @@ public class DmeIndicatorConstants {
     public static final String COUNTER_ID_NFS_WRITEBANDWIDTH = "1125904201875460";//写带宽
     public static final String COUNTER_ID_NFS_RESPONSETIME = "1125904201875464";//响应时间
 
+    //文件系统
     public static final String COUNTER_ID_FS_THROUGHPUT = "1126179079716865";//OPS
     public static final String COUNTER_ID_FS_SERVICETIME = "1126179079716866";//服务时间
     public static final String COUNTER_ID_FS_READTHROUGHPUT = "1126179079716867";//读OPS
@@ -49,14 +57,12 @@ public class DmeIndicatorConstants {
     public static final String COUNTER_ID_FS_CACHECHUNKSIZE = "1126179079716877";//Cache chunk保有量
     public static final String COUNTER_ID_FS_BANDWIDTH = "1126179079716878";//带宽
 
-
-
     // 服务等级
     public static final String COUNTER_ID_SERVICELECVEL_MAXRESPONSETIME = "1126174784815111";//最大响应时间
     public static final String COUNTER_ID_SERVICELEVEL_THROUGHPUTTIB = "1126174784815117";//卷IO密度
     public static final String COUNTER_ID_SERVICELEVEL_BANDWIDTHTIB = "1126174784815118";//总带宽
 
-    //存储池
+    //存储池 SYS_StoragePool 1125912791744512
     public static final String COUNTER_ID_STORAGEPOOL_THROUGHPUT = "1125912791810049";//throughput IOPS
     public static final String COUNTER_ID_STORAGEPOOL_RESPONSETIME = "1125912791810050";//响应时间
     public static final String COUNTER_ID_STORAGEPOOL_BANDWIDTH = "1125912791810051";//带宽
@@ -64,5 +70,15 @@ public class DmeIndicatorConstants {
     public static final String COUNTER_ID_STORAGEPOOL_WRITEBANDWIDTH = "1125912791810053";//写带宽
     public static final String COUNTER_ID_STORAGEPOOL_READTHROUGHPUT = "1125912791810054";//读IOPS
     public static final String COUNTER_ID_STORAGEPOOL_WRITETHROUGHPUT = "1125912791810055";//写IOPS
+
+    //存储 SYS_StorDevice 1125904201809920
+    public static final String COUNTER_ID_STORDEVICE_CPUUSAGE = "1125904201875457";//CPU使用率
+    public static final String COUNTER_ID_STORDEVICE_BANDWIDTH = "1125904201875458";//带宽
+    public static final String COUNTER_ID_STORDEVICE_READBANDWIDTH = "1125904201875459";//读带宽
+    public static final String COUNTER_ID_STORDEVICE_WRITEBANDWIDTH = "1125904201875460";//写带宽
+    public static final String COUNTER_ID_STORDEVICE_READTHROUGHPUT = "1125904201875461";//读IOPS
+    public static final String COUNTER_ID_STORDEVICE_WRITETHROUGHPUT = "1125904201875462";//写IOPS
+    public static final String COUNTER_ID_STORDEVICE_MEMORYUSAGE = "1125904201875463";//内存占用率
+    public static final String COUNTER_ID_STORDEVICE_RESPONSETIME = "1125904201875464";//平均IO响应时间
 
 }

@@ -163,4 +163,83 @@ public class DataStoreStatisticHistoryController extends BaseController {
         return failure(gson.toJson(resMap));
     }
 
+    /**
+     * 查询存储池性能,对象Id为存储池Id  eg:{"obj_ids" : ["cd17eca4-3056-4ca0-9a4a-2338174c33d8"]}
+     *
+     * @param params key required: obj_ids, indicator_ids, range (obj_ids, poolIds)
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/storagePool", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean getStoragePoolStatistic(@RequestBody Map<String, Object> params) throws Exception {
+        LOG.info("datastorestatistichistrory/storagepool params==" + gson.toJson(params));
+       /* Map<String, Object> resMap = dataSotreStatisticHistroyService.queryStoragePoolStatistic(params);
+        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
+            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
+            return success(data);
+        }
+        return failure(gson.toJson(resMap));*/
+        return null;
+    }
+
+    /**
+     * 查询存储池当前性能,对象Id为存储池Id  eg:{"obj_ids" : ["cd17eca4-3056-4ca0-9a4a-2338174c33d8"]}
+     *
+     * @param params key required: obj_ids, indicator_ids, range (obj_ids, poolIds)
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/storagePoolCurrent", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean getStoragePoolCurrentStatistic(@RequestBody Map<String, Object> params) throws Exception {
+        LOG.info("datastorestatistichistrory/storagepoolcurrent params==" + gson.toJson(params));
+        Map<String, Object> resMap = dataSotreStatisticHistroyService.queryStoragePoolCurrentStatistic(params);
+        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
+            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
+            return success(data);
+        }
+        return failure(gson.toJson(resMap));
+    }
+
+    /**
+     * 查询存储设备性能,对象Id为存储设备Id  eg:{"obj_ids" : ["cd17eca4-3056-4ca0-9a4a-2338174c33d8"]}
+     *
+     * @param params key required: obj_ids, indicator_ids, range (obj_ids, storagedeviceIds)
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/storageDevice", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean getStoragDeviceStatistic(@RequestBody Map<String, Object> params) throws Exception {
+        LOG.info("datastorestatistichistrory/storagedevice params==" + gson.toJson(params));
+        Map<String, Object> resMap = dataSotreStatisticHistroyService.queryStorageDevcieStatistic(params);
+        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
+            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
+            return success(data);
+        }
+        return failure(gson.toJson(resMap));
+    }
+
+    /**
+     * 查询存储设备当前性能,对象Id为存储设备Id  eg:{"obj_ids" : ["cd17eca4-3056-4ca0-9a4a-2338174c33d8"]}
+     *
+     * @param params key required: obj_ids, indicator_ids, range (obj_ids, storagedeviceIds)
+     * @return
+     * @throws Exception
+     */
+    @RequestMapping(value = "/storageDeviceCurrent", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean getStoragDeviceCurrenStatistic(@RequestBody Map<String, Object> params) throws Exception {
+        LOG.info("datastorestatistichistrory/storagedevicecurrent params==" + gson.toJson(params));
+        Map<String, Object> resMap = dataSotreStatisticHistroyService.queryStorageDevcieCurrentStatistic(params);
+        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
+            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
+            return success(data);
+        }
+        return failure(gson.toJson(resMap));
+    }
+
+
+
 }

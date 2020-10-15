@@ -934,7 +934,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         List<Map<String, String>> lists = null;
         try {
             //取得vcenter中的所有挂载了当前存储的host
-            String listStr = vcsdkUtils.getHostsByDsObjectId(dataStoreObjectId, false);
+            String listStr = vcsdkUtils.getHostsByDsObjectId(dataStoreObjectId, true);
             LOG.info("host getHostsMountDataStoreByDsObjectId==" + listStr);
             if (!StringUtils.isEmpty(listStr)) {
                 lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {

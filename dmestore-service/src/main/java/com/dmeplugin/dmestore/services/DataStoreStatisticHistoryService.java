@@ -30,6 +30,7 @@ public interface DataStoreStatisticHistoryService {
 
     /**
      * 获取VMFS历史性能数据
+     *
      * @param params key required: obj_ids, indicator_ids, range
      * @return
      */
@@ -37,6 +38,7 @@ public interface DataStoreStatisticHistoryService {
 
     /**
      * 获取VMFS当前性能数据值
+     *
      * @param params key required: obj_ids
      * @return
      */
@@ -44,6 +46,7 @@ public interface DataStoreStatisticHistoryService {
 
     /**
      * 获取NFS历史性能数据值
+     *
      * @param params key required: obj_ids, indicator_ids, range
      * @return
      */
@@ -51,6 +54,7 @@ public interface DataStoreStatisticHistoryService {
 
     /**
      * 获取NFS当前性能数据
+     *
      * @param params key required: obj_ids
      * @return
      */
@@ -58,6 +62,7 @@ public interface DataStoreStatisticHistoryService {
 
     /**
      * 查询磁盘(卷)历史性能数据
+     *
      * @param params key required: obj_ids, indicator_ids, range
      * @return
      */
@@ -65,6 +70,7 @@ public interface DataStoreStatisticHistoryService {
 
     /**
      * 查询fileSystem历史性能数据(Nfsdatasotrage)
+     *
      * @param params key required: obj_ids, indicator_ids, range
      * @return
      */
@@ -72,6 +78,7 @@ public interface DataStoreStatisticHistoryService {
 
     /**
      * 查询服务等级历史性能数据
+     *
      * @param params key required: obj_ids, indicator_ids, range
      * @return
      * @throws Exception
@@ -80,6 +87,7 @@ public interface DataStoreStatisticHistoryService {
 
     /**
      * 查询服务等级卷历史性能数据
+     *
      * @param params key required: obj_ids, indicator_ids, range
      * @return
      * @throws Exception
@@ -88,11 +96,64 @@ public interface DataStoreStatisticHistoryService {
 
     /**
      * 查询服务等级存储池历史性能数据
+     *
      * @param params key required: obj_ids, indicator_ids, range
      * @return
      * @throws Exception
      */
     Map<String, Object> queryServiceLevelStoragePoolStatistic(Map<String, Object> params) throws Exception;
 
+    /**
+     * 查询存储池历史性能数据
+     *
+     * @param params key required: obj_ids, indicator_ids, range
+     * @return
+     * @throws Exception
+     */
+    Map<String, Object> queryStoragePoolStatistic(Map<String, Object> params) throws Exception;
 
+    /**
+     * 查询存储池当前性能数据
+     *
+     * @param params key required: obj_ids, indicator_ids, range
+     * @return
+     * @throws Exception
+     */
+    Map<String, Object> queryStoragePoolCurrentStatistic(Map<String, Object> params) throws Exception;
+
+    /**
+     * 查询存储设备历史性能数据
+     *
+     * @param params key required: obj_ids, indicator_ids, range
+     * @return
+     * @throws Exception
+     */
+    Map<String, Object> queryStorageDevcieStatistic(Map<String, Object> params) throws Exception;
+
+    /**
+     * 查询存储设备当前性能数据
+     *
+     * @param params key required: obj_ids, indicator_ids, range
+     * @return
+     * @throws Exception
+     */
+    Map<String, Object> queryStorageDevcieCurrentStatistic(Map<String, Object> params) throws Exception;
+
+    /**
+     * 查询指定资源类型的历史性能数据
+     *
+     * @param resType 实例类型;  params key required: obj_ids, indicator_ids, range
+     * @return
+     * @throws Exception
+     */
+    Map<String, Object> queryHistoryStatistic(String resType, Map<String, Object> params) throws Exception;
+
+    /**
+     * 查询指定资源类型的当前性能数据
+     *
+     * @param resType 实例类型;  params key required: obj_ids, indicator_ids, range
+     * @return
+     * @throws Exception
+     */
+    Map<String, Object> queryCurrentStatistic(String resType, Map<String, Object> params) throws Exception;
 }
