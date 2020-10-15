@@ -37,7 +37,7 @@ public class VmwareContextPool {
     private static final Logger s_logger = LoggerFactory.getLogger(VmwareContextPool.class);
 
     private static final Duration DEFAULT_CHECK_INTERVAL = Duration.millis(10000L);
-    private static final int DEFAULT_IDLE_QUEUE_LENGTH = 128;
+    private static final int DEFAULT_IDLE_QUEUE_LENGTH = 3;
 
     private final ConcurrentMap<String, Queue<VmwareContext>> _pool;
     private int _maxIdleQueueLength = DEFAULT_IDLE_QUEUE_LENGTH;

@@ -135,8 +135,8 @@ public class BaseBestPracticeService {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = new HostMO(context, mor);
-        HostStorageSystemMO hostStorageSystemMO = hostMo.getHostStorageSystemMO();
-        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMO.getStorageDeviceInfo().getMultipathInfo().getLun();
+        HostStorageSystemMO hostStorageSystemMo = hostMo.getHostStorageSystemMO();
+        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo().getMultipathInfo().getLun();
         for(HostMultipathInfoLogicalUnit hostMultipathInfoLogicalUnit : lunList){
             //多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
             hostMultipathInfoLogicalUnit.getPolicy().setPolicy("VMW_PSP_RR");

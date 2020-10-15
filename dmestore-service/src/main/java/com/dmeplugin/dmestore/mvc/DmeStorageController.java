@@ -69,7 +69,7 @@ public class DmeStorageController extends BaseController{
         LOG.info("storage_id ==" + storageId );
         Map<String,Object> resMap=dmeStorageService.getStorageDetail(storageId);
 
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -88,7 +88,7 @@ public class DmeStorageController extends BaseController{
 
         LOG.info("storage_id ==" + storageId );
         Map<String, Object> resMap = dmeStorageService.getStoragePools(storageId,media_type);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
