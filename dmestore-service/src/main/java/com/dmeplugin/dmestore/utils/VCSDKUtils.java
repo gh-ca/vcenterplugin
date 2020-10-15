@@ -226,13 +226,13 @@ public class VCSDKUtils {
     *得到所有主机的ID与name 除去已经挂载了当前存储的主机  20200918objectId
     **/
     public String getHostsByDsObjectId(String dataStoreObjectId) throws Exception {
-        return getHostsByDsObjectId(dataStoreObjectId, true);
+        return getHostsByDsObjectId(dataStoreObjectId, false);
     }
     /**
      *得到所有主机的ID与name 除去没有挂载了当前存储的主机
      **/
     public String getMountHostsByDsObjectId(String dataStoreObjectId) throws Exception {
-        return getHostsByDsObjectId(dataStoreObjectId, false);
+        return getHostsByDsObjectId(dataStoreObjectId, true);
     }
     /**
      *得到所有集群的ID与name 除去已经挂载了当前存储的集群  扫描集群下所有主机，只要有一个主机没挂当前存储就要显示，只有集群下所有主机都挂载了该存储就不显示
@@ -1181,7 +1181,7 @@ public class VCSDKUtils {
             }
 
             sessionHelper = new SessionHelper();
-            sessionHelper.login(vCenterInfo.getHostIp(), String.valueOf(vCenterInfo.getHostPort()),vCenterInfo.getUserName(), vCenterInfo.getPassword());
+            sessionHelper.login(vCenterInfo.getHostIp(), String.valueOf(vCenterInfo.getHostPort()),vCenterInfo.getUserName(), CipherUtils.decryptString(vCenterInfo.getPassword()));
             TaggingWorkflow taggingWorkflow = new TaggingWorkflow(sessionHelper);
 
             List<String> taglist = taggingWorkflow.listTags();
@@ -2051,7 +2051,7 @@ public class VCSDKUtils {
         }
     }
     /**
-     *得到所有主机的ID与name boolean mount 是否已经挂载了当前存储的主机
+     *得到所有主机的ID与name, boolean mount 是否已经挂载了当前存储的主机
      **/
     public String getHostsByDsObjectId(String dataStoreObjectId, boolean mount) throws Exception {
         String listStr = "";
@@ -2085,7 +2085,7 @@ public class VCSDKUtils {
                 for (Pair<ManagedObjectReference, String> host : hosts) {
                     HostMO host1 = new HostMO(vmwareContext, host.first());
                     if (mount) {
-                        if (!mounthostids.contains(host1.getMor().getValue())) {
+                        if (mounthostids.contains(host1.getMor().getValue())) {
                             Map<String, String> map = new HashMap<>();
                             String objectId = vcConnectionHelper.MOR2ObjectID(host1.getMor(), vmwareContext.getServerAddress());
                             map.put("hostId", objectId);
@@ -2093,7 +2093,7 @@ public class VCSDKUtils {
                             lists.add(map);
                         }
                     } else {
-                        if (mounthostids.contains(host1.getMor().getValue())) {
+                        if (!mounthostids.contains(host1.getMor().getValue())) {
                             Map<String, String> map = new HashMap<>();
                             String objectId = vcConnectionHelper.MOR2ObjectID(host1.getMor(), vmwareContext.getServerAddress());
                             map.put("hostId", objectId);

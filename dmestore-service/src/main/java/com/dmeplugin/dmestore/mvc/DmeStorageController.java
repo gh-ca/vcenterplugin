@@ -1,9 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
-import com.dmeplugin.dmestore.model.EthPortInfo;
-import com.dmeplugin.dmestore.model.ResponseBodyBean;
-import com.dmeplugin.dmestore.model.Storage;
-import com.dmeplugin.dmestore.model.VmfsDataInfo;
+import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.services.DmeStorageService;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.google.gson.Gson;
@@ -246,6 +243,29 @@ public class DmeStorageController extends BaseController{
         } catch (Exception e) {
             LOG.error("get Storage performance failure:", e);
             failureStr = "get Storage performance failure:" + e.toString();
+        }
+        return failure(failureStr);
+    }
+
+    /**
+     * Access storage pool performance
+     *
+     * @param storagePoolIds storage pool res Id
+     * @return: ResponseBodyBean
+     */
+    @RequestMapping(value = "/liststoragepoolperformance", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean listStoragePoolPerformance(@RequestParam("storagePoolIds") List<String> storagePoolIds)
+            throws Exception {
+        LOG.info("accessvmfs/listStoragePoolPerformance storagePoolIds==" + gson.toJson(storagePoolIds));
+        String failureStr = "";
+        try {
+            List<StoragePool> lists = dmeStorageService.listStoragePoolPerformance(storagePoolIds);
+            LOG.info("liststorageperformance lists==" + gson.toJson(lists));
+            return success(lists);
+        } catch (Exception e) {
+            LOG.error("get Storage Pool performance failure:", e);
+            failureStr = "get Storage Pool performance failure:" + e.toString();
         }
         return failure(failureStr);
     }
