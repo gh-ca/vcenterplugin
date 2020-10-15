@@ -100,26 +100,27 @@ export class RdmComponent implements OnInit {
       this.rdmFormGroup.markAsTouched();
       return;
     }
-    console.log(this.configModel);
+    let b = JSON.parse(JSON.stringify(this.configModel));
+    console.log(b);
     let body = {};
     if (this.configModel.storageType == '2'){
       if(!this.policyEnable.smartTier){
-        this.configModel.tuning.smarttier = null;
+        b.tuning.smarttier = null;
       }
       if(!this.policyEnable.qosPolicy){
-        this.configModel.tuning.smartqos = null;
+        b.tuning.smartqos = null;
       }
       if(!this.policyEnable.resourceTuning){
-        this.configModel.tuning.alloctype = null;
-        this.configModel.tuning.dedupe_enabled = null;
-        this.configModel.tuning.compression_enabled = null;
+        b.tuning.alloctype = null;
+        b.tuning.dedupe_enabled = null;
+        b.tuning.compression_enabled = null;
       }
       if(!this.policyEnable.smartTier && !this.policyEnable.qosPolicy && !this.policyEnable.resourceTuning){
-        this.configModel.tuning = null;
+        b.tuning = null;
       }
       body = {
         customizeVolumesRequest: {
-          customize_volumes: this.configModel,
+          customize_volumes: b,
             mapping: {
             host_id: this.hostSelected
           }
