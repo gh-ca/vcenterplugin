@@ -114,6 +114,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storageObj.setVersion(ToolUtils.jsonToStr(jsonObj.get("version")));
                     storageObj.setTotal_pool_capacity(ToolUtils.jsonToDou(jsonObj.get("total_pool_capacity"),0.0));
 
+                    storageObj.setLocation(ToolUtils.jsonToStr(jsonObj.get("location"),null));
+                    storageObj.setPatchVersion(ToolUtils.jsonToStr(jsonObj.get("patch_version"),null));
+                    storageObj.setMaintenanceStart(ToolUtils.jsonToStr(jsonObj.get("maintenance_start"),null));
+                    storageObj.setMaintenanceOvertime(ToolUtils.jsonToStr(jsonObj.get("maintenance_overtime"),null));
+
                     JsonElement jsonAzIds = jsonObj.get("az_ids");
                     if (!ToolUtils.jsonIsNull(jsonAzIds)) {
                         String azIds =ToolUtils.jsonToStr(jsonAzIds);
