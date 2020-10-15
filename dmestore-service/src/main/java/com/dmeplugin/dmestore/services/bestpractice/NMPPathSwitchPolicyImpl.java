@@ -3,11 +3,7 @@ package com.dmeplugin.dmestore.services.bestpractice;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 
 /**
- * @ClassName NMPPathSwitchPolicyImpl
- * @Description TODO
- * @Author wangxiangyong
- * @Date 2020/9/15 10:26
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements BestPracticeService {
     @Override

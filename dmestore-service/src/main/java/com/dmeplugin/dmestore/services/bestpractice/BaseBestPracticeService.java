@@ -1,7 +1,6 @@
 package com.dmeplugin.dmestore.services.bestpractice;
 
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
-import com.dmeplugin.vmware.mo.HostDatastoreSystemMO;
 import com.dmeplugin.vmware.mo.HostMO;
 import com.dmeplugin.vmware.mo.HostStorageSystemMO;
 import com.dmeplugin.vmware.util.VmwareContext;
@@ -13,11 +12,7 @@ import com.vmware.vim25.OptionValue;
 import java.util.List;
 
 /**
- * @ClassName BaseBestPracticeService
- * @Description TODO
- * @Author wangxiangyong
- * @Date 2020/9/15 11:14
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class BaseBestPracticeService {
 

@@ -3,14 +3,9 @@ package com.dmeplugin.dmestore.model;
 import java.io.Serializable;
 
 /**
- * @ClassName NFSDataStorePortAttr
- * @Description NFS DataStore逻辑端口属性
- * @Author wangxiangyong
- * @Date 2020/9/2 16:56
- * @Version V1.0
+ * @author wangxiangyong
  **/
-public class NFSDataStoreLogicPortAttr implements Serializable{
-    //名称、IP、状态、运行状态、Active port、Current Port、Failover Group
+public class NfsDataStoreLogicPortAttr implements Serializable{
     private String name;
     private String ip;
     private String status;
@@ -18,7 +13,6 @@ public class NFSDataStoreLogicPortAttr implements Serializable{
     private String activePort;
     private String currentPort;
     private String failoverGroup;
-
 
     public String getName() {
         return name;

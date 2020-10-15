@@ -3,14 +3,9 @@ package com.dmeplugin.dmestore.model;
 import java.io.Serializable;
 
 /**
- * @ClassName NFSDataStoreFSAttr
- * @Description TODO
- * @Author wangxiangyong
- * @Date 2020/9/2 17:06
- * @Version V1.0
+ * @author wangxiangyong
  **/
-public class NFSDataStoreFSAttr implements Serializable {
-    //Name、Description、设备、存储池、控制器、Thin、重删、压缩、应用场景
+public class NfsDataStoreFsAttr implements Serializable {
     private String name;
     private String description;
     private String device;

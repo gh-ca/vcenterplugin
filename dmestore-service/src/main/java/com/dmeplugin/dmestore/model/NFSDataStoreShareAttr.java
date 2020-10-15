@@ -3,14 +3,9 @@ package com.dmeplugin.dmestore.model;
 import java.util.List;
 
 /**
- * @ClassName NFSDataStoreShareAttr
- * @Description NFSDataStore share属性
- * @Author wangxiangyong
- * @Date 2020/9/2 17:01
- * @Version V1.0
+ * @author wangxiangyong
  **/
-public class NFSDataStoreShareAttr {
-    //Name、Share Path、Description、DTree、客户端单列表
+public class NfsDataStoreShareAttr {
     private String fs_name;
     private String name;
     private String share_path;
