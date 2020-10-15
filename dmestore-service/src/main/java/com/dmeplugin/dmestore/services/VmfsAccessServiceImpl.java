@@ -918,13 +918,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
 
-    /**
-     * @Author wangxiangyong
-     * @Description /vmfs datastore 卷详情查询
-     * @Date 14:46 2020/9/3
-     * @Param [storageObjectId]
-     * @Return com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail
-     **/
     @Override
     public List<VmfsDatastoreVolumeDetail> volumeDetail(String storageObjectId) throws Exception {
         List<VmfsDatastoreVolumeDetail> list = new ArrayList<>();
@@ -982,13 +975,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return list;
     }
 
-    /**
-     * @Author Administrator
-     * @Description 扫描vmfs datastore并和卷建立关系
-     * @Date 16:49 2020/9/7
-     * @Param []
-     * @Return boolean
-     **/
     @Override
     public boolean scanVmfs() throws Exception {
         String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(ToolUtils.STORE_TYPE_VMFS);

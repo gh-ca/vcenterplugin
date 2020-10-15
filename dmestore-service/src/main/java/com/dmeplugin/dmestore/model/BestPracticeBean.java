@@ -1,11 +1,7 @@
 package com.dmeplugin.dmestore.model;
 
 /**
- * @ClassName BestPracticeBean
- * @Description TODO
- * @Author wangxiangyong
- * @Date 2020/9/3 9:47
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class BestPracticeBean {
     private String hostSetting;

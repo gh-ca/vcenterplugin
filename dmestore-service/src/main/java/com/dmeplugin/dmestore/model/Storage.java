@@ -37,23 +37,27 @@ public class Storage  {
     private Double maxBandwidth;
     //时延
     private Double maxLatency;
+    /**
+     *最大ops
+     **/
+    private Double maxOps;
     //可用分区
     private String[] azIds;
     //设备序列号
     private String sn;
     //版本
     private String version;
-    private String product_version;
+    private String productVersion;
     //总容量
-    private Double total_pool_capacity;
+    private Double totalPoolCapacity;
     //订阅容量
-    private Double subscription_capacity;
+    private Double subscriptionCapacity;
 
     //容量利用率 = 已用容量/总容量
     private Double capacityUtilization;
 
     //订阅率 =订阅容量/总容量
-    private Double subscription_Rate;
+    private Double subscriptionRate;
 
     /**
      *位置
@@ -112,30 +116,7 @@ public class Storage  {
         this.capacityUtilization = capacityUtilization;
     }
 
-    public Double getSubscription_Rate() {
-        return subscription_Rate;
-    }
 
-    public void setSubscription_Rate(Double subscription_Rate) {
-        this.subscription_Rate = subscription_Rate;
-    }
-
-    // TODO OPS未找到
-    public Double getTotal_pool_capacity() {
-        return total_pool_capacity;
-    }
-
-    public void setTotal_pool_capacity(Double total_pool_capacity) {
-        this.total_pool_capacity = total_pool_capacity;
-    }
-
-    public Double getSubscription_capacity() {
-        return subscription_capacity;
-    }
-
-    public void setSubscription_capacity(Double subscription_capacity) {
-        this.subscription_capacity = subscription_capacity;
-    }
 
     public String getVersion() {
         return version;
@@ -145,13 +126,6 @@ public class Storage  {
         this.version = version;
     }
 
-    public String getProduct_version() {
-        return product_version;
-    }
-
-    public void setProduct_version(String product_version) {
-        this.product_version = product_version;
-    }
 
     public String getSn() {
         return sn;
@@ -289,4 +263,43 @@ public class Storage  {
         this.azIds = azIds;
     }
 
+    public String getProductVersion() {
+        return productVersion;
+    }
+
+    public void setProductVersion(String productVersion) {
+        this.productVersion = productVersion;
+    }
+
+    public Double getTotalPoolCapacity() {
+        return totalPoolCapacity;
+    }
+
+    public void setTotalPoolCapacity(Double totalPoolCapacity) {
+        this.totalPoolCapacity = totalPoolCapacity;
+    }
+
+    public Double getSubscriptionCapacity() {
+        return subscriptionCapacity;
+    }
+
+    public void setSubscriptionCapacity(Double subscriptionCapacity) {
+        this.subscriptionCapacity = subscriptionCapacity;
+    }
+
+    public Double getSubscriptionRate() {
+        return subscriptionRate;
+    }
+
+    public void setSubscriptionRate(Double subscriptionRate) {
+        this.subscriptionRate = subscriptionRate;
+    }
+
+    public Double getMaxOps() {
+        return maxOps;
+    }
+
+    public void setMaxOps(Double maxOps) {
+        this.maxOps = maxOps;
+    }
 }

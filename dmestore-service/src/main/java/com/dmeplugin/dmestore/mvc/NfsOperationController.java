@@ -87,7 +87,7 @@ public class NfsOperationController extends BaseController{
      *      fs params:
      *      file_system_id String 文件系统唯一标识 必
      *      capacity_autonegotiation 自动扩缩容 相关属性{
-     *          auto_size_enable  boolean 自动调整容量开关。 false: 关闭；true：打开。默认打开
+     *          auto_size_enable  boolean 自动调整容量开关。 false: 关闭；true：打开。默认false
      *       },
      *       name String fs名字
      *       tuning属性 （高级属性设置）{
@@ -115,7 +115,7 @@ public class NfsOperationController extends BaseController{
     public ResponseBodyBean updateNfsDatastore(@RequestBody Map<String,Object> params){
 
         Map<String,Object> resMap = nfsOperationService.updateNfsDatastore(params);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.ACCEPTED.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));

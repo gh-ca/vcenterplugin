@@ -3,11 +3,7 @@ package com.dmeplugin.dmestore.services.bestpractice;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 
 /**
- * @ClassName DiskSchedQuantumImpl
- * @Description TODO
- * @Author wangxiangyong
- * @Date 2020/9/15 10:26
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPracticeService {
     @Override

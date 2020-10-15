@@ -276,6 +276,22 @@
                   </root></object>
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
+
+            <com.vmware.actionsfw.ActionSpec>
+               <uid>com.dmeplugin.dmestore.host.iscsi</uid>
+               <label>#{hostMenu.iscsi}</label>
+               <icon>#{addIcon}</icon>
+               <delegate>
+                  <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
+                  <object>
+                     <root>
+                        <actionUrl>/ui/dmestore/index.html?view=iscsi</actionUrl>
+                        <dialogTitle>iscsi</dialogTitle>
+                        <dialogSize>1800,600</dialogSize>
+                     </root>
+                  </object>
+               </delegate>
+            </com.vmware.actionsfw.ActionSpec>
           </actions>
       </object>
       <metadata>
@@ -302,6 +318,10 @@
                   <type>action</type>
                   <uid>com.dmeplugin.dmestore.sampleAction2</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <type>action</type>
+                  <uid>com.dmeplugin.dmestore.host.iscsi</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
             </Array>
          </children>
       </object>
@@ -310,4 +330,51 @@
       </metadata>
    </extension>
 
+
+   <!-- Sample Actions on VM -->
+   <extension id="com.dmeplugin.dmestore.vm.actionSet">
+      <extendedPoint>vise.actions.sets</extendedPoint>
+      <object>
+         <actions>
+            <com.vmware.actionsfw.ActionSpec>
+               <uid>com.dmeplugin.dmestore.vm.rdm</uid>
+               <label>#{vmMenu.createRdm}</label>
+               <icon>#{addIcon}</icon>
+               <delegate>
+                  <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
+                  <object>
+                     <root>
+                        <actionUrl>/ui/dmestore/index.html?view=rdm</actionUrl>
+                        <dialogTitle>RDM</dialogTitle>
+                        <dialogSize>1800,600</dialogSize>
+                     </root>
+                  </object>
+               </delegate>
+            </com.vmware.actionsfw.ActionSpec>
+         </actions>
+      </object>
+      <metadata>
+         <objectType>VirtualMachine</objectType>
+      </metadata>
+   </extension>
+
+   <extension id="com.dmeplugin.dmestore.VMMenu">
+      <extendedPoint>vsphere.core.menus.solutionMenus</extendedPoint>
+      <object>
+         <!-- <label> is required here because it is an extension to an existing menu -->
+         <label>#{sampleMenu.label}</label>
+         <uid>com.dmeplugin.dmestore.VMMenu</uid>
+         <children>
+            <Array>
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <type>action</type>
+                  <uid>com.dmeplugin.dmestore.vm.rdm</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
+            </Array>
+         </children>
+      </object>
+      <metadata>
+         <objectType>VirtualMachine</objectType>
+      </metadata>
+   </extension>
 </plugin>
