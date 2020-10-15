@@ -215,6 +215,7 @@
     "endTime": "结束时间",
     "timeInputTips": "请输入开始-结束时间！",
     "capacityTips": "若版本为VMFS5则容量最小值为1.3G，若版本为VMFS6则容量最小值为2G。",
+    "serviceLevelCantBeNull": "服务等级是必选项！",
     "mount":{
       "mount":"挂载",
       "host":"主机",

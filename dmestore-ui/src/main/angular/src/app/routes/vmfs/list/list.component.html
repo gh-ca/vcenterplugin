@@ -108,7 +108,7 @@
   </clr-datagrid>
 
   <!-- 弹出form提交框 添加 -->
-  <clr-wizard #wizard [(clrWizardOpen)]="popShow">
+  <clr-wizard #wizard [(clrWizardOpen)]="popShow" [clrWizardClosable]="false">
     <clr-wizard-title style="font-weight: bolder">{{'vmfs.addTitle' | translate}}</clr-wizard-title>
   
     <clr-wizard-button [type]="'cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
@@ -218,26 +218,36 @@
     </clr-wizard-page>
     <!--Page2 储存库设置-->
     <clr-wizard-page #addPageTwo [clrWizardPageNextDisabled]="number.pristine || !formPageTwo.valid">
-        <ng-template clrPageTitle>
+        <ng-template clrPageNavTitle>
           {{'vmfs.storageSetting' | translate}}
-        </ng-template> <!-- mandatory -->
-        <span class="tabs-btn-wrap">
-          <!-- 服务等级 -->
-          <span (click)="levelCheck = 'level';" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'level'}">{{'vmfs.byServiceLevel' | translate}}</span>
-          <!-- 非服务等级 -->
-          <span (click)="customerClickFunc();" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'customer'}">{{'vmfs.customer' | translate}}</span>
-        </span>
+        </ng-template>
+        <ng-template clrPageTitle>
+          <div class="page-title">
+            <span>{{'vmfs.storageSetting' | translate}}</span>
+            <!-- mandatory -->
+            <span class="tabs-btn-wrap">
+              <!-- 服务等级 -->
+              <span (click)="levelCheck = 'level';" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'level'}">{{'vmfs.byServiceLevel' | translate}}</span>
+                <!-- 非服务等级 -->
+              <span (click)="customerClickFunc();" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'customer'}">{{'vmfs.customer' | translate}}</span>
+            </span>
+          </div>
+
+        </ng-template>
+
         <form clrForm #formPageTwo="ngForm">
+          <!-- 1、选择 服务等级-->
+          <div *ngIf="serviceLevelIsNull" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.serviceLevelCantBeNull' | translate}}</div>
           <!-- 1、选择 服务等级-->
           <ng-container *ngIf="levelCheck==='level'">
             <clr-accordion>
               <clr-accordion-panel *ngFor="let item of serviceLevelList;" style="margin-top: 20px;" >
-                <clr-accordion-title (click)="showServiceLevel(!item.show, this);" *ngIf="!item.show" style="height: 50px; line-height: 50px;color: #333;font-size:16px;">{{item.name}}</clr-accordion-title>
+                <clr-accordion-title class="" (click)="item.show ? this.hidden:this.show" *ngIf="!item.show" style="height: 50px; line-height: 50px;color: #333;font-size:16px;">{{item.name}}</clr-accordion-title>
                 <clr-accordion-content [(clrIfExpanded)]="item.show">
                   <table class="table table-vertical table-noborder table-compact">
                       <tbody>
                         <tr>
-                          <th hidden></th>
+                          <th hidden></th>3
                           <th>
                             {{item.name}}
                           </th>
@@ -379,7 +389,7 @@
     </clr-wizard-page>
   </clr-wizard>
   <!-- 编辑页面 -->
-  <clr-modal [(clrModalOpen)]="modifyShow" [clrModalSize]="'lg'">
+  <clr-modal [(clrModalOpen)]="modifyShow" [clrModalClosable]="false">
     <h3 class="modal-title">{{'menu.edit' | translate}}</h3>
 
     <div class="modal-body">
@@ -474,7 +484,7 @@
     </div>
   </clr-modal>
   <!--挂载弹窗-->
-  <clr-modal [(clrModalOpen)]="mountShow">
+  <clr-modal [(clrModalOpen)]="mountShow" [clrModalClosable]="false">
     <h3 class="modal-title">{{'vmfs.mount.mount' | translate}}</h3>
     <div class="modal-body">
       <form *ngIf="rowSelected.length === 1" clrForm>
@@ -530,7 +540,7 @@
     </div>
   </clr-modal>
   <!--删除提示-->
-  <clr-modal [(clrModalOpen)]="delShow" [clrModalSize]="'sm'">
+  <clr-modal [(clrModalOpen)]="delShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
     <h3 class="modal-title">{{'vmfs.del.title' | translate}}</h3>
     <div class="modal-body">
       <p>{{'vmfs.del.content' | translate}}</p>
@@ -541,7 +551,7 @@
     </div>
   </clr-modal>
   <!--卸载-->
-  <clr-modal [(clrModalOpen)]="unmountShow" [clrModalSize]="'lg'">
+  <clr-modal [(clrModalOpen)]="unmountShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
     <h3 class="modal-title">{{'vmfs.unmount.title' | translate}}</h3>
     <div class="modal-body">
       <clr-datagrid [(clrDgSelected)]="chooseUnmountDevice" [clrDgLoading]="isLoading">
@@ -561,7 +571,7 @@
     </div>
   </clr-modal>
   <!--空间回收提示-->
-  <clr-modal [(clrModalOpen)]="reclaimShow" [clrModalSize]="'sm'">
+  <clr-modal [(clrModalOpen)]="reclaimShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
     <h3 class="modal-title">{{'vmfs.reclaim.title' | translate}}</h3>
     <div class="modal-body">
       <p>{{'vmfs.reclaim.content' | translate}}</p>
@@ -572,16 +582,17 @@
     </div>
   </clr-modal>
   <!--变更服务等级-->
-  <clr-modal [(clrModalOpen)]="changeServiceLevelShow" [clrModalSize]="'lg'">
+  <clr-modal [(clrModalOpen)]="changeServiceLevelShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
     <h3 class="modal-title">{{'vmfs.changeServiceLevel' | translate}}</h3>
     <div class="modal-body">
       <form *ngIf="rowSelected.length === 1" clrForm #formPageOne="ngForm">
         <!-- 1、选择 服务等级-->
+        <div *ngIf="serviceLevelIsNull" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.serviceLevelCantBeNull' | translate}}</div>
         <ng-container>
           <clr-accordion>
             <clr-accordion-panel *ngFor="let item of serviceLevelList" style="margin-top: 20px;">
-              <clr-accordion-title style="height: 50px; line-height: 50px;color: #333;font-size:16px;">{{item.name}}</clr-accordion-title>
-              <clr-accordion-content (click)="changeSLDataClickFunc(item.id, item.name);" class="blueBg" *clrIfExpanded>
+              <clr-accordion-title class="accordion-title"  style="height: 50px; line-height: 50px;color: #333;font-size:16px;">{{item.name}}</clr-accordion-title>
+              <clr-accordion-content [(clrIfExpanded)]="item.show">
                 <table class="table table-vertical table-noborder table-compact">
                   <tbody>
                   <tr>
@@ -622,7 +633,7 @@
     </div>
   </clr-modal>
   <!--扩容-->
-  <clr-modal [(clrModalOpen)]="expandShow" [clrModalSize]="'lg'">
+  <clr-modal [(clrModalOpen)]="expandShow" [clrModalClosable]="false">
     <h3 class="modal-title">{{'menu.expand' | translate}}</h3>
     <div class="modal-body">
       <!--名称-->
