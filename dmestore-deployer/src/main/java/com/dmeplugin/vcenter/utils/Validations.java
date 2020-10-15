@@ -21,6 +21,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 
 
+/**
+ * @author andrewliu
+ */
 public class Validations {
 
   protected static final Logger LOGGER = LoggerFactory.getLogger(Validations.class);
@@ -149,7 +152,8 @@ public class Validations {
           LOGGER.info("No HA provider can be removed.");
           VcenterRegisterRunner.unRegister(vcenterIp, vcenterPort, vcenterUsername,
               vcenterPassword, pluginKey);
-        } else if ("-70001".equals(resultCode)) { // DB Exceptions
+          // DB Exceptions
+        } else if ("-70001".equals(resultCode)) {
           LOGGER.info("No service to uninstall provider");
           VcenterRegisterRunner.unRegister(vcenterIp, vcenterPort, vcenterUsername,
               vcenterPassword, pluginKey);
