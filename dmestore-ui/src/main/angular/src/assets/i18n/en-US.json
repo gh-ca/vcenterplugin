@@ -215,6 +215,7 @@
     "startTime": "Start Time",
     "endTime": "End Time",
     "timeInputTips": "Please enter start-end time！",
+    "capacityTips": "If the version is VMFS5, the minimum capacity is 1.3G, and if the version is VMFS6, the minimum capacity is 2G.",
     "mount":{
       "mount":"Mount",
       "host":"Host",

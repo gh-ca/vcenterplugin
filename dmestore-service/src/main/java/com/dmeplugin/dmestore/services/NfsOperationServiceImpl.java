@@ -137,11 +137,12 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                     Map<String, Object> shareClientHostMap = nfsShareClientArrayAddition.get(i);
                     if (shareClientHostMap != null && shareClientHostMap.size() > 0 && shareClientHostMap.get("objectId") != null) {
                         reqNfsShareClientArrayAddition.put("name", shareClientHostMap.get("name"));
-                        reqNfsShareClientArrayAddition.put("accessval", shareClientHostMap.get("accessval"));
-                        reqNfsShareClientArrayAddition.put("sync", shareClientHostMap.get("sync"));
-                        reqNfsShareClientArrayAddition.put("all_squash", shareClientHostMap.get("all_squash"));
-                        reqNfsShareClientArrayAddition.put("root_squash", shareClientHostMap.get("root_squash"));
-                        reqNfsShareClientArrayAddition.put("secure", shareClientHostMap.get("secure"));
+                        //设置创建nfs默认值
+                        reqNfsShareClientArrayAddition.put("accessval", "read-only");
+                        reqNfsShareClientArrayAddition.put("sync", "synchronization");
+                        reqNfsShareClientArrayAddition.put("all_squash", "all_squash");
+                        reqNfsShareClientArrayAddition.put("root_squash", "root_squash");
+                        reqNfsShareClientArrayAddition.put("secure", "insecure");
                         mount.put((String) shareClientHostMap.get("objectId"), (String) shareClientHostMap.get("name"));
                     }
                     reqNfsShareClientArrayAdditions.add(reqNfsShareClientArrayAddition);
@@ -681,7 +682,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         DmeVmwareRelation datastoreInfo = gson.fromJson(params, DmeVmwareRelation.class);
         datastoreInfo.setLogicPortId(current_port_id);
         datastoreInfo.setLogicPortName(logicPortName);
-        datastoreInfo.setStoreId(storage_id);
         datastoreInfo.setFsId(fsId);
         datastoreInfo.setFsName(fs_name);
         datastoreInfo.setShareName(share_name);

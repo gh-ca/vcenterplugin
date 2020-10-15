@@ -566,11 +566,25 @@ export class VmfsListComponent implements OnInit {
       } else if(capatityG < 2 && this.form.version === '6') {
         capatityG = 2;
       }
+      switch (this.form.capacityUnit) {
+        case 'TB':
+          capatityG = capatityG / 1024;
+          break;
+        case 'MB':
+          capatityG = capatityG * 1024;
+          break;
+        case 'KB':
+          capatityG = capatityG * (1024 * 1024);
+          break;
+        default: // 默认GB 不变
+          capatityG = capatityG;
+          break;
+      }
+
       obj.value = capatityG;
     } else {
       obj.value = objValue;
     }
-
   }
 
   // 未选择服务等级 时调用方法
