@@ -51,7 +51,11 @@ export class RdmComponent implements OnInit {
     this.tierFresh();
     const ctx = this.gs.getClientSdk().app.getContextObjects();
     console.log(ctx);
-    this.vmObjectId = ctx[0].id;
+    if(ctx != null){
+      this.vmObjectId = ctx[0].id;
+    } else{
+      this.vmObjectId = 'urn:vmomi:VirtualMachine:vm-1046:674908e5-ab21-4079-9cb1-596358ee5dd1';
+    }
   }
 
   // 刷新服务等级列表
@@ -97,9 +101,22 @@ export class RdmComponent implements OnInit {
       return;
     }
     console.log(this.configModel);
-    //this.vmObjectId = 'urn:vmomi:VirtualMachine:vm-229:f8e381d7-074b-4fa9-9962-9a68ab6106e1';
     let body = {};
     if (this.configModel.storageType == '2'){
+      if(!this.policyEnable.smartTier){
+        this.configModel.tuning.smarttier = null;
+      }
+      if(!this.policyEnable.qosPolicy){
+        this.configModel.tuning.smartqos = null;
+      }
+      if(!this.policyEnable.resourceTuning){
+        this.configModel.tuning.alloctype = null;
+        this.configModel.tuning.dedupe_enabled = null;
+        this.configModel.tuning.compression_enabled = null;
+      }
+      if(!this.policyEnable.smartTier && !this.policyEnable.qosPolicy && !this.policyEnable.resourceTuning){
+        this.configModel.tuning = {};
+      }
       body = {
         customizeVolumesRequest: {
           customize_volumes: this.configModel,
@@ -222,7 +239,7 @@ class customize_volumes{
   prefetch_policy: string;
   prefetch_value: string;
   storage_id: string;
-  tuning: tuning;
+  tuning: any;
   volume_specs: volume_specs[];
   constructor(){
     this.storageType = '1';
