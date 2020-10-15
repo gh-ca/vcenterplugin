@@ -222,6 +222,12 @@ public class VmRdmServiceImpl implements VmRdmService {
 
     private String createDmeVolumeByUnServiceLevel(CustomizeVolumesRequest customizeVolumesRequest) throws Exception {
         String url = DmeConstants.DME_CREATE_VOLUME_UNLEVEL_URL;
+        String  ownerController = customizeVolumesRequest.getCustomize_volumes().getOwner_controller();
+        //归属控制器自动则不下发参数
+        final String OWNER_CONTROLLER_AUTO = "0";
+        if( OWNER_CONTROLLER_AUTO.equals(ownerController)){
+            customizeVolumesRequest.getCustomize_volumes().setOwner_controller(null);
+        }
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(customizeVolumesRequest));
         if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
             LOG.error("Failed to create RDM on DME!errorMsg:{}", responseEntity.getBody());
