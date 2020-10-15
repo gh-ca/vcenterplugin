@@ -115,7 +115,7 @@ export interface List {
   readResponseTime: number;
   writeResponseTime: number;
   latency: number;
-  volumeId: number;
+  volumeId: string;
   volumeName: string;
   wwn: string;
 }
