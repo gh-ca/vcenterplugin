@@ -320,6 +320,7 @@
         "volumes":"卷",
         "name":"名称",
         "status":"状态",
+        "dataStore":"Data Store",
         "totalCap":"总容量",
         "proType":"分配类型",
         "capUsage":"容量利用率",

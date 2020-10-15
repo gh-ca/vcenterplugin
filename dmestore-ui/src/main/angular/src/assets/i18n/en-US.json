@@ -317,6 +317,7 @@
         "volumes":"Volumes",
         "name":"Name",
         "status":"Status",
+        "dataStore":"Data Store",
         "totalCap":"Total Capacity",
         "proType":"Provisioning Type",
         "capUsage":"Capacity Usage",

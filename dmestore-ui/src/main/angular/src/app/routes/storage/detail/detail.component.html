@@ -148,6 +148,7 @@
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.stoPool' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.serviceLevel' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.protStatus' | translate}}</clr-dg-column>
+                      <clr-dg-column [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.dataStore' | translate}}</clr-dg-column>
 
                       <clr-dg-column [hidden]="volumeRadio!=='table2'">{{'storage.detail.volumes.latency' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="volumeRadio!=='table2'">{{'storage.detail.volumes.iops' | translate}}</clr-dg-column>
@@ -165,6 +166,7 @@
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.storage_pool_name}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.service_level_name}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.protectionStatus}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.datastores}}</clr-dg-cell>
 
                         <clr-dg-cell [hidden]="volumeRadio!=='table2'">时延接口无相关字段</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table2'">IOPS接口无相关字段</clr-dg-cell>
@@ -199,7 +201,7 @@
                       <clr-dg-column>{{'storage.detail.fileSystems.capacityUsage' | translate}}</clr-dg-column>
                       <clr-dg-column>{{'storage.detail.fileSystems.ownSto' | translate}}</clr-dg-column>
                       <clr-dg-column>{{'storage.detail.fileSystems.nfs' | translate}}</clr-dg-column>
-                      <clr-dg-column>{{'storage.detail.fileSystems.cifs' | translate}}</clr-dg-column>
+                      <!--<clr-dg-column>{{'storage.detail.fileSystems.cifs' | translate}}</clr-dg-column>-->
                       <clr-dg-column>{{'storage.detail.fileSystems.dtree' | translate}}</clr-dg-column>
 
                       <clr-dg-row *clrDgItems="let item of fsList" [clrDgItem]="item">
@@ -212,7 +214,7 @@
                         <clr-dg-cell>{{item.capacity_usage_ratio}}</clr-dg-cell>
                         <clr-dg-cell>{{item.storage_pool_name}}</clr-dg-cell>
                         <clr-dg-cell>{{item.nfs_count}}</clr-dg-cell>
-                        <clr-dg-cell>{{item.cifs_count}}</clr-dg-cell>
+                        <!--<clr-dg-cell>{{item.cifs_count}}</clr-dg-cell>-->
                         <clr-dg-cell>{{item.dtree_count}}</clr-dg-cell>
                       </clr-dg-row>
 
@@ -240,7 +242,7 @@
                       <clr-dg-column>{{'storage.detail.dtrees.osl' | translate}}</clr-dg-column>
                       <clr-dg-column>{{'storage.detail.dtrees.secMod' | translate}}</clr-dg-column>
                       <clr-dg-column>{{'storage.detail.dtrees.nfs' | translate}}</clr-dg-column>
-                      <clr-dg-column>{{'storage.detail.dtrees.cifs' | translate}}</clr-dg-column>
+                      <!--<clr-dg-column>{{'storage.detail.dtrees.cifs' | translate}}</clr-dg-column>-->
                       <clr-dg-column>{{'storage.detail.dtrees.quota' | translate}}</clr-dg-column>
                       <clr-dg-row  *clrDgItems="let item of dtrees" [clrDgItem]="item">
                         <clr-dg-cell>{{item.name}}</clr-dg-cell>
@@ -248,7 +250,7 @@
                         <clr-dg-cell>{{item.tier_name}}</clr-dg-cell>
                         <clr-dg-cell>{{item.security_style}}</clr-dg-cell>
                         <clr-dg-cell>{{item.nfs_count}}</clr-dg-cell>
-                        <clr-dg-cell>{{item.cifs_count}}</clr-dg-cell>
+                        <!--<clr-dg-cell>{{item.cifs_count}}</clr-dg-cell>-->
                         <clr-dg-cell>{{item.quota_switch}}</clr-dg-cell>
                       </clr-dg-row>
                     </clr-datagrid>
