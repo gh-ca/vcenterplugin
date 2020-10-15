@@ -772,8 +772,8 @@ public class VCSDKUtils {
                         if (managedObjectReference != null && vmwareContext != null) {
                             HostMO hostMo = new HostMO(vmwareContext, managedObjectReference);
                             HostDatastoreSystemMO hostDatastoreSystemMo = hostMo.getHostDatastoreSystemMO();
-                            hostDatastoreSystemMo.createNfsDatastore(serverHost, 0, exportPath, nfsName, accessMode, type);
-                            String datastoreObjectId = vcConnectionHelper.MOR2ObjectID(managedObjectReference, serverguid);
+                            ManagedObjectReference datastore = hostDatastoreSystemMo.createNfsDatastore(serverHost, 0, exportPath, nfsName, accessMode, type);
+                            String datastoreObjectId = vcConnectionHelper.MOR2ObjectID(datastore, serverguid);
                             dmeVmwareRelation.setStoreId(datastoreObjectId);
                             dmeVmwareRelation.setStoreName(nfsName);
                             dmeVmwareRelation.setStoreType(ToolUtils.STORE_TYPE_NFS);
