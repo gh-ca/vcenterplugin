@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 
+/**
+ * @author andrewliu
+ */
 public class KeytookUtil {
 
     private static final String KEY ="tomcat.keystore";

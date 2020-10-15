@@ -5,6 +5,9 @@ import java.util.Map;
 
 import com.vmware.automatic.plugin.registration.PluginRegistrationMain;
 
+/**
+ * @author andrewliu
+ */
 public class VcenterRegisterRunner {
 	public static void run(String version, String packageUrl, String serverThumbprint, String vcenterIp,
 						   String vcenterPort, String username, String password, String key) {
@@ -33,12 +36,6 @@ public class VcenterRegisterRunner {
 
 	public static void unRegister(String vcenterIp,
 								  String vcenterPort, String username, String password, String key) {
-		// unregister alarm definitions
-		// new event type id should be added in regex
-		//new ConnectedVim()
-		//		.unregisterAlarmDefinitions(vcenterIP, username, password, vcenterPort, "^(ibmc|hmm)-.+$");
-
-		// unregister plugin
 		Map<String, String> unRegParamMap = new HashMap();
 		unRegParamMap.put("-action", "unregisterPlugin");
 		unRegParamMap.put("-username", username);

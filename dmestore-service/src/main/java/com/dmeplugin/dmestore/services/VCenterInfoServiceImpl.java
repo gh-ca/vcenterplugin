@@ -44,7 +44,7 @@ public class VCenterInfoServiceImpl extends DMEOpenApiService implements VCenter
   }
 
   @Override
-  public int saveVCenterInfo(final VCenterInfo vCenterInfo, final HttpSession session)
+  public int saveVCenterInfo(final VCenterInfo vCenterInfo)
       throws SQLException {
     VCenterInfo vCenterInfo1 = vCenterInfoDao.getVCenterInfo();
     int returnValue = 0;
