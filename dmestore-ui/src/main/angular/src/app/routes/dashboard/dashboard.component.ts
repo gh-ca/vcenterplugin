@@ -11,6 +11,7 @@ import { DashboardService } from './dashboard.srevice';
 import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ClrForm} from '@clr/angular';
 import {HttpClient} from '@angular/common/http';
+import {Router} from "@angular/router";
 
 @Component({
   selector: 'app-dashboard',
@@ -79,7 +80,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     private dashboardSrv: DashboardService,
     private ngZone: NgZone,
     private http: HttpClient,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private router:Router
   ) {}
 
   ngOnInit() {}
@@ -240,5 +242,14 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   showPop(){
     this.popShow = true;
     this.resetForm();
+  }
+
+  //跳转页面的方法
+  toBestParcticeView(type){
+    this.router.navigate(['bestpractice'],{
+      queryParams:{
+        type: type
+      }
+    });
   }
 }
