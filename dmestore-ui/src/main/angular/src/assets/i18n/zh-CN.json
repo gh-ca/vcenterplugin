@@ -19,7 +19,8 @@
     "close": "关闭",
     "submit": "提交",
     "search": "搜索",
-    "refresh": "刷新"
+    "refresh": "刷新",
+    "synSPolicy": "同步虚拟机存储策略"
   },
   "validations": {
     "required": "该字段必填!",
