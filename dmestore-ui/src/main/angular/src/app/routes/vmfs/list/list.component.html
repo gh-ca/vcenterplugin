@@ -56,7 +56,21 @@
     <clr-dg-column hidden [clrDgField]="'wwn'">wwn</clr-dg-column>
     <clr-dg-column hidden [clrDgField]="'volumeName'">volumeName</clr-dg-column>
     <clr-dg-column hidden [clrDgField]="'objectid'">objectid</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'status'">{{'vmfs.status' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'status'">
+      {{'vmfs.status' | translate}}
+      <clr-dg-filter [clrDgFilter]="myFilter">
+        <clr-checkbox-container #myFilter style="margin-top: 0;">
+          <clr-checkbox-wrapper>
+            <input type="checkbox" clrCheckbox value="normal" name="options" />
+            <label>normal</label>
+          </clr-checkbox-wrapper>
+          <clr-checkbox-wrapper>
+            <input type="checkbox" clrCheckbox value="abnormal" name="options" />
+            <label>abnormal</label>
+          </clr-checkbox-wrapper>
+        </clr-checkbox-container>
+      </clr-dg-filter>
+    </clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacity'" [clrDgSortOrder]="'capacity'">{{'vmfs.capacity' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'usedCapacity'" [clrDgSortOrder]="'usedCapacity'">{{'vmfs.usedCapacity' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacityUsage'" [clrDgSortOrder]="'capacityUsage'">{{'vmfs.capacityUsage' | translate}}</clr-dg-column>
