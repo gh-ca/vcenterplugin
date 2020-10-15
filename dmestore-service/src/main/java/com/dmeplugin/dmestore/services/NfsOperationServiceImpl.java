@@ -682,7 +682,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         DmeVmwareRelation datastoreInfo = gson.fromJson(params, DmeVmwareRelation.class);
         datastoreInfo.setLogicPortId(current_port_id);
         datastoreInfo.setLogicPortName(logicPortName);
-        datastoreInfo.setStoreId(storage_id);
         datastoreInfo.setFsId(fsId);
         datastoreInfo.setFsName(fs_name);
         datastoreInfo.setShareName(share_name);
