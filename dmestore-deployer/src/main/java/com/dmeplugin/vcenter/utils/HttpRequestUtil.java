@@ -24,19 +24,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+/**
+ * @author andrewliu
+ */
 public class HttpRequestUtil {
 
     private static RestTemplate restTemplate;
 
     private static final Logger LOGGER = Logger.getLogger(HttpRequestUtil.class.getSimpleName());
 
-    private static final int REQUEST_TIMEOUT = 600000; // millis
+    /**
+     * millis
+     */
+    private static final int REQUEST_TIMEOUT = 600000;
 
     static {
         System.setProperty("https.protocols", "TLSv1.2,TLSv1.1,TLSv1");
 
         try {
-            SSLUtil.turnOffSslChecking();
+            SslUtil.turnOffSslChecking();
         } catch (KeyManagementException e) {
             LOGGER.info(e.getMessage());
         } catch (NoSuchAlgorithmException e) {
@@ -116,7 +122,7 @@ public class HttpRequestUtil {
         }
     }
 
-    static class SSLUtil {
+    static class SslUtil {
 
         private static final TrustManager[] UNQUESTIONING_TRUST_MANAGER = new TrustManager[]{
             new X509TrustManager() {
@@ -148,7 +154,7 @@ public class HttpRequestUtil {
             SSLContext.getInstance("SSL").init(null, null, null);
         }
 
-        private SSLUtil() {
+        private SslUtil() {
             throw new UnsupportedOperationException("Do not instantiate libraries.");
         }
     }
