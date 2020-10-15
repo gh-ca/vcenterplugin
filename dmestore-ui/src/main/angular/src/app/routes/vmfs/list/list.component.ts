@@ -562,9 +562,11 @@ export class VmfsListComponent implements OnInit {
 
       // 版本号5 最小容量为1.3G 版本号6最小2G
       if (capatityG < 1.3 && this.form.version === '5') {
-
+        capatityG = 1.3;
       } else if(capatityG < 2 && this.form.version === '6') {
+        capatityG = 2;
       }
+      obj.value = capatityG;
     } else {
       obj.value = objValue;
     }
