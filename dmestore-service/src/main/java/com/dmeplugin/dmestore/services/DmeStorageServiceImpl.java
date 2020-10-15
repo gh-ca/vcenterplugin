@@ -116,8 +116,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
                     storageObj.setLocation(ToolUtils.jsonToStr(jsonObj.get("location"),null));
                     storageObj.setPatchVersion(ToolUtils.jsonToStr(jsonObj.get("patch_version"),null));
-                    storageObj.setMaintenanceStart(ToolUtils.jsonToInt(jsonObj.get("maintenance_start"),0));
-                    storageObj.setMaintenanceOvertime(ToolUtils.jsonToInt(jsonObj.get("maintenance_overtime"),0));
+                    storageObj.setMaintenanceStart(ToolUtils.jsonToDateStr(jsonObj.get("maintenance_start"),null));
+                    storageObj.setMaintenanceOvertime(ToolUtils.jsonToDateStr(jsonObj.get("maintenance_overtime"),null));
                     storageObj.setSubscriptionCapacity(ToolUtils.jsonToDou(jsonObj.get("subscription_capacity")));
 
                     JsonElement jsonAzIds = jsonObj.get("az_ids");
@@ -177,8 +177,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
                 storageObj.setLocation(ToolUtils.jsonToStr(element.get("location"),null));
                 storageObj.setPatchVersion(ToolUtils.jsonToStr(element.get("patch_version"),null));
-                storageObj.setMaintenanceStart(ToolUtils.jsonToInt(element.get("maintenance_start"),0));
-                storageObj.setMaintenanceOvertime(ToolUtils.jsonToInt(element.get("maintenance_overtime"),0));
+                storageObj.setMaintenanceStart(ToolUtils.jsonToDateStr(element.get("maintenance_start"),null));
+                storageObj.setMaintenanceOvertime(ToolUtils.jsonToDateStr(element.get("maintenance_overtime"),null));
                 storageObj.setProductVersion(ToolUtils.jsonToStr(element.get("product_version")));
                 storageObj.setSn(ToolUtils.jsonToStr(element.get("sn"),null));
 

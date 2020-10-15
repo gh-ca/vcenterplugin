@@ -66,11 +66,11 @@ public class Storage  {
     /**
      *维保开始时间
      **/
-    private Integer maintenanceStart;
+    private String maintenanceStart;
     /**
      *维保结束时间
      **/
-    private Integer maintenanceOvertime;
+    private String maintenanceOvertime;
 
     public String getLocation() {
         return location;
@@ -88,19 +88,19 @@ public class Storage  {
         this.patchVersion = patchVersion;
     }
 
-    public Integer getMaintenanceStart() {
+    public String getMaintenanceStart() {
         return maintenanceStart;
     }
 
-    public void setMaintenanceStart(Integer maintenanceStart) {
+    public void setMaintenanceStart(String maintenanceStart) {
         this.maintenanceStart = maintenanceStart;
     }
 
-    public Integer getMaintenanceOvertime() {
+    public String getMaintenanceOvertime() {
         return maintenanceOvertime;
     }
 
-    public void setMaintenanceOvertime(Integer maintenanceOvertime) {
+    public void setMaintenanceOvertime(String maintenanceOvertime) {
         this.maintenanceOvertime = maintenanceOvertime;
     }
 
