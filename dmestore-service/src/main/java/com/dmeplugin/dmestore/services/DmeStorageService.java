@@ -128,7 +128,7 @@ public interface DmeStorageService {
      * @param storageIds storage id
      * @return: ResponseBodyBean
      */
-    List<Storage> listStoragePerformance(List<String> storageIds, String resType) throws Exception;
+    List<Storage> listStoragePerformance(List<String> storageIds) throws Exception;
 
     /**
      * Access storage pool performance
@@ -136,5 +136,5 @@ public interface DmeStorageService {
      * @param storagePoolIds storage pool res Id
      * @return: ResponseBodyBean
      */
-    List<StoragePool> listStoragePoolPerformance(List<String> storagePoolIds, String resType) throws Exception;
+    List<StoragePool> listStoragePoolPerformance(List<String> storagePoolIds) throws Exception;
 }

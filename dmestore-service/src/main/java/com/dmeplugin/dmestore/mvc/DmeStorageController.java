@@ -232,12 +232,12 @@ public class DmeStorageController extends BaseController{
      */
     @RequestMapping(value = "/liststorageperformance", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseBodyBean listStoragePerformance(@RequestParam("storageIds") List<String> storageIds,@RequestParam("resType") String resType)
+    public ResponseBodyBean listStoragePerformance(@RequestParam("storageIds") List<String> storageIds)
             throws Exception {
-        LOG.info("accessvmfs/liststorageperformance resType=="+resType+"==storageIds==" + gson.toJson(storageIds));
+        LOG.info("accessvmfs/liststorageperformance storageIds==" + gson.toJson(storageIds));
         String failureStr = "";
         try {
-            List<Storage> lists = dmeStorageService.listStoragePerformance(storageIds,resType);
+            List<Storage> lists = dmeStorageService.listStoragePerformance(storageIds);
             LOG.info("liststorageperformance lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {
@@ -255,12 +255,12 @@ public class DmeStorageController extends BaseController{
      */
     @RequestMapping(value = "/liststoragepoolperformance", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseBodyBean listStoragePoolPerformance(@RequestParam("storagePoolIds") List<String> storagePoolIds,@RequestParam("resType") String resType)
+    public ResponseBodyBean listStoragePoolPerformance(@RequestParam("storagePoolIds") List<String> storagePoolIds)
             throws Exception {
-        LOG.info("accessvmfs/listStoragePoolPerformance resType=="+resType+"==storagePoolIds==" + gson.toJson(storagePoolIds));
+        LOG.info("accessvmfs/listStoragePoolPerformance storagePoolIds==" + gson.toJson(storagePoolIds));
         String failureStr = "";
         try {
-            List<StoragePool> lists = dmeStorageService.listStoragePoolPerformance(storagePoolIds,resType);
+            List<StoragePool> lists = dmeStorageService.listStoragePoolPerformance(storagePoolIds);
             LOG.info("liststorageperformance lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {

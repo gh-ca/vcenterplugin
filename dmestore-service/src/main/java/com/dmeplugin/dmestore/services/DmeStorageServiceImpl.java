@@ -1084,13 +1084,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public List<Storage> listStoragePerformance(List<String> storageIds, String resType) throws Exception{
+    public List<Storage> listStoragePerformance(List<String> storageIds) throws Exception{
         List<Storage> relists = null;
         try {
             if (storageIds != null && storageIds.size() > 0) {
                 Map<String, Object> params = new HashMap<>(16);
                 params.put("obj_ids", storageIds);
-                Map<String, Object> remap = null; //dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params,resType);
+                Map<String, Object> remap = null; //dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params,"storage");
                 LOG.info("remap===" + gson.toJson(remap));
                 if (null != remap && null != remap.get(DmeConstants.DATA)) {
                     try {
@@ -1125,13 +1125,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public List<StoragePool> listStoragePoolPerformance(List<String> storagePoolIds, String resType) throws Exception{
+    public List<StoragePool> listStoragePoolPerformance(List<String> storagePoolIds) throws Exception{
         List<StoragePool> relists = null;
         try {
             if (storagePoolIds != null && storagePoolIds.size() > 0) {
                 Map<String, Object> params = new HashMap<>(16);
                 params.put("obj_ids", storagePoolIds);
-                Map<String, Object> remap = null; //dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params,resType);
+                Map<String, Object> remap = null; //dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params,"storagepool");
                 LOG.info("remap===" + gson.toJson(remap));
                 if (null != remap && null != remap.get(DmeConstants.DATA)) {
                     try {
