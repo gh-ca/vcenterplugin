@@ -47,6 +47,18 @@ public class StoragePool   {
     private String physicalType;
     //存储池所处硬盘id
     private String diskPoolId;
+    /**
+     *服务等级
+     **/
+    private String serviceLevelName;
+
+    public String getServiceLevelName() {
+        return serviceLevelName;
+    }
+
+    public void setServiceLevelName(String serviceLevelName) {
+        this.serviceLevelName = serviceLevelName;
+    }
 
     public String getDiskPoolId() {
         return diskPoolId;
