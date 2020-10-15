@@ -1084,13 +1084,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public List<Storage> listStoragePerformance(List<String> storageIds) throws Exception{
+    public List<Storage> listStoragePerformance(List<String> storageIds, String resType) throws Exception{
         List<Storage> relists = null;
         try {
             if (storageIds != null && storageIds.size() > 0) {
                 Map<String, Object> params = new HashMap<>(16);
                 params.put("obj_ids", storageIds);
-                Map<String, Object> remap = dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params);
+                Map<String, Object> remap = null; //dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params,resType);
                 LOG.info("remap===" + gson.toJson(remap));
                 if (null != remap && null != remap.get(DmeConstants.DATA)) {
                     try {
@@ -1112,15 +1112,54 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                             }
                         }
                     } catch (Exception e) {
-                        LOG.warn("查询vmfs实时性能数据listVmfsPerformance异常", e);
+                        LOG.warn("查询Storage实时性能数据listStoragePerformance异常", e);
                     }
                 }
             }
         } catch (Exception e) {
-            LOG.error("list vmfs performance error:", e);
+            LOG.error("list Storage performance error:", e);
             throw e;
         }
-        LOG.info("listVmfsPerformance relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        LOG.info("listStoragePerformance relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        return relists;
+    }
+
+    @Override
+    public List<StoragePool> listStoragePoolPerformance(List<String> storagePoolIds, String resType) throws Exception{
+        List<StoragePool> relists = null;
+        try {
+            if (storagePoolIds != null && storagePoolIds.size() > 0) {
+                Map<String, Object> params = new HashMap<>(16);
+                params.put("obj_ids", storagePoolIds);
+                Map<String, Object> remap = null; //dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params,resType);
+                LOG.info("remap===" + gson.toJson(remap));
+                if (null != remap && null != remap.get(DmeConstants.DATA)) {
+                    try {
+                        JsonObject dataJson = new JsonParser().parse(remap.get("data").toString()).getAsJsonObject();
+                        if (dataJson != null) {
+                            relists = new ArrayList<>();
+                            for (String storagePoolId : storagePoolIds) {
+                                JsonObject statisticObject = dataJson.getAsJsonObject(storagePoolId);
+                                if (statisticObject != null) {
+                                    StoragePool sp = new StoragePool();
+                                    sp.setId(storagePoolId);
+                                    sp.setMaxIops(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    sp.setMaxBandwidth(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    sp.setMaxLatency(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    relists.add(sp);
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        LOG.warn("查询StoragePool实时性能数据listStoragePoolPerformance异常", e);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("list StoragePool performance error:", e);
+            throw e;
+        }
+        LOG.info("listStoragePoolPerformance relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
         return relists;
     }
 
