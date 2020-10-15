@@ -32,7 +32,7 @@ public class StorageDetail {
     private Double totalEffectiveCapacity;
     //空闲容量
     private Double freeEffectiveCapacity;
-    private String location;
+
     private String[] azIds;
     private String storagePool;
     private String volume;
@@ -57,6 +57,47 @@ public class StorageDetail {
     private String warning;
     //事件
     private String event;
+
+    /**
+     *位置
+     **/
+    private String location;
+    /**
+     *补丁版本
+     **/
+    private String patchVersion;
+    /**
+     *维保开始时间
+     **/
+    private String maintenanceStart;
+    /**
+     *维保结束时间
+     **/
+    private String maintenanceOvertime;
+
+    public String getPatchVersion() {
+        return patchVersion;
+    }
+
+    public void setPatchVersion(String patchVersion) {
+        this.patchVersion = patchVersion;
+    }
+
+    public String getMaintenanceStart() {
+        return maintenanceStart;
+    }
+
+    public void setMaintenanceStart(String maintenanceStart) {
+        this.maintenanceStart = maintenanceStart;
+    }
+
+    public String getMaintenanceOvertime() {
+        return maintenanceOvertime;
+    }
+
+    public void setMaintenanceOvertime(String maintenanceOvertime) {
+        this.maintenanceOvertime = maintenanceOvertime;
+    }
 
     public String getWarning() {
         return warning;

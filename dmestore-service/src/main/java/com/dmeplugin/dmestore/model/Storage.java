@@ -55,6 +55,55 @@ public class Storage  {
     //订阅率 =订阅容量/总容量
     private Double subscription_Rate;
 
+    /**
+     *位置
+     **/
+    private String location;
+    /**
+     *补丁版本
+    **/
+    private String patchVersion;
+    /**
+     *维保开始时间
+     **/
+    private String maintenanceStart;
+    /**
+     *维保结束时间
+     **/
+    private String maintenanceOvertime;
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getPatchVersion() {
+        return patchVersion;
+    }
+
+    public void setPatchVersion(String patchVersion) {
+        this.patchVersion = patchVersion;
+    }
+
+    public String getMaintenanceStart() {
+        return maintenanceStart;
+    }
+
+    public void setMaintenanceStart(String maintenanceStart) {
+        this.maintenanceStart = maintenanceStart;
+    }
+
+    public String getMaintenanceOvertime() {
+        return maintenanceOvertime;
+    }
+
+    public void setMaintenanceOvertime(String maintenanceOvertime) {
+        this.maintenanceOvertime = maintenanceOvertime;
+    }
+
     public Double getCapacityUtilization() {
         return capacityUtilization;
     }
