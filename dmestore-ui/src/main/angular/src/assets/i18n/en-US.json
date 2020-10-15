@@ -475,7 +475,8 @@
     "ip6": "IPv6 Address",
     "speed": "Working Rate(Mbps)",
     "hStatus": "Health Status",
-    "cStatus": "Connect Status"
+    "cStatus": "Connect Status",
+    "ports": "Please Select Storage Device Ports"
   },
   "rdm": {
     "name": "Name",
