@@ -37,6 +37,10 @@ public class Storage  {
     private Double maxBandwidth;
     //时延
     private Double maxLatency;
+    /**
+     *最大ops
+     **/
+    private Double maxOps;
     //可用分区
     private String[] azIds;
     //设备序列号
@@ -289,5 +293,13 @@ public class Storage  {
 
     public void setSubscriptionRate(Double subscriptionRate) {
         this.subscriptionRate = subscriptionRate;
+    }
+
+    public Double getMaxOps() {
+        return maxOps;
+    }
+
+    public void setMaxOps(Double maxOps) {
+        this.maxOps = maxOps;
     }
 }

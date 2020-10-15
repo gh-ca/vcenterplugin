@@ -3,6 +3,7 @@ package com.dmeplugin.dmestore.mvc;
 import com.dmeplugin.dmestore.model.EthPortInfo;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.model.Storage;
+import com.dmeplugin.dmestore.model.VmfsDataInfo;
 import com.dmeplugin.dmestore.services.DmeStorageService;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.google.gson.Gson;
@@ -224,5 +225,28 @@ public class DmeStorageController extends BaseController{
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
+    }
+
+    /**
+     * Access storage performance
+     *
+     * @param storageIds storage id
+     * @return: ResponseBodyBean
+     */
+    @RequestMapping(value = "/liststorageperformance", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean listStoragePerformance(@RequestParam("storageIds") List<String> storageIds)
+            throws Exception {
+        LOG.info("accessvmfs/liststorageperformance storageIds==" + gson.toJson(storageIds));
+        String failureStr = "";
+        try {
+            List<Storage> lists = dmeStorageService.listStoragePerformance(storageIds);
+            LOG.info("liststorageperformance lists==" + gson.toJson(lists));
+            return success(lists);
+        } catch (Exception e) {
+            LOG.error("get Storage performance failure:", e);
+            failureStr = "get Storage performance failure:" + e.toString();
+        }
+        return failure(failureStr);
     }
 }
