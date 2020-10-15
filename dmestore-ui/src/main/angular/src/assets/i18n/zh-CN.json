@@ -262,7 +262,7 @@
       "supRate":"订阅率",
       "totalCap":"总容量",
       "cpuUtilization":"CUP使用率",
-      "latency":"延迟(毫秒)",
+      "latency":"时延(毫秒)",
       "iops":"IOPS",
       "ops":"OPS",
       "bandwidth":"带宽(MB/s)"
@@ -293,7 +293,7 @@
         "az":"可用分区",
         "wp":"维保时间",
         "location":"位置",
-        "latency": "延迟(ms)",
+        "latency": "时延(ms)",
         "iops": "IOPS",
         "bandwidth": "带宽(MB/s)"
       },
@@ -322,6 +322,7 @@
         "volumes":"卷",
         "name":"名称",
         "status":"状态",
+        "dataStore":"Data Store",
         "totalCap":"总容量",
         "proType":"分配类型",
         "capUsage":"容量利用率",
@@ -329,7 +330,7 @@
         "stoPool":"存储池",
         "serviceLevel":"服务等级",
         "protStatus":"保护状态",
-        "latency": "延迟(ms)",
+        "latency": "时延(ms)",
         "iops": "IOPS",
         "bandwidth": "带宽(MB/s)"
       },
@@ -383,7 +384,7 @@
           "cpuUsage":"CPU使用率",
           "iops":"IOPS",
           "ops":"OPS",
-          "latency":"延迟(毫秒)",
+          "latency":"时延(毫秒)",
           "bandwidth":"带宽(MB/s)"
         },
         "disks":{
@@ -396,7 +397,7 @@
           "diskDomain":"磁盘域",
           "rotationalSpeed":"转速",
           "iops":"IOPS",
-          "latency":"延迟(毫秒)",
+          "latency":"时延(毫秒)",
           "bandwidth":"带宽(MB/s)",
           "usage":"使用率(%)"
         },
@@ -407,7 +408,7 @@
           "wwn":"WWN",
           "workingRate":"工作速度(Mbps)",
           "iops":"IOPS",
-          "latency":"延迟(毫秒)",
+          "latency":"时延(毫秒)",
           "bandwidth":"带宽(MB/s)",
           "usage":"使用率(%)",
           "name":"名称",

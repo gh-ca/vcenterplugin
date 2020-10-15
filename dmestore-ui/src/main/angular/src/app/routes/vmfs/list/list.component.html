@@ -98,7 +98,6 @@
       <clr-dg-cell [hidden]="radioCheck!=='chart'" >{{('vmfs.lower' | translate)+' '+(item.latency || "--")}}</clr-dg-cell>
     </clr-dg-row>
     <clr-dg-footer>
-
       <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="total">
         <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">per page</clr-dg-page-size>
         {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
@@ -110,7 +109,7 @@
   <!-- 弹出form提交框 添加 -->
   <clr-wizard #wizard [(clrWizardOpen)]="popShow">
     <clr-wizard-title style="font-weight: bolder">{{'vmfs.addTitle' | translate}}</clr-wizard-title>
-  
+
     <clr-wizard-button [type]="'cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
     <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>
     <clr-wizard-button [type]="'next'">{{'menu.next' | translate}}</clr-wizard-button>
@@ -119,7 +118,7 @@
     <!--Page1 -->
     <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="name.pristine || !formPageOne.valid">
         <ng-template clrPageTitle>{{'vmfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
-  
+
         <form clrForm #formPageOne="ngForm">
           <!--名称 -->
           <clr-input-container>

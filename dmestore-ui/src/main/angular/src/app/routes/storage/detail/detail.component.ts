@@ -9,6 +9,7 @@ import { EChartOption } from 'echarts';
 import {FileSystem} from '../../nfs/nfs.service';
 import {ActivatedRoute, Router} from "@angular/router";
 import {CapacityChart, CapacitySerie} from "../storage.service";
+import {BondPort, EthernetPort, FailoverGroup, FCoEPort, FCPort, LogicPort} from "./port.service";
 @Component({
   selector: 'app-detail',
   templateUrl: './detail.component.html',
@@ -319,6 +320,13 @@ export class DetailComponent implements OnInit, AfterViewInit {
   shares: NfsShare[];
   controllers:StorageController[];
   disks: StorageDisk[];
+
+  fcs:FCPort[];
+  eths: EthernetPort[];
+  fcoes: FCoEPort[];
+  bonds: BondPort[];
+  logicports:LogicPort[];
+  fgs:FailoverGroup[];
   //portList:
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(queryParam => {
@@ -332,11 +340,6 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   ngAfterViewInit() {
     this.ngZone.runOutsideAngular(() => this.initChart());
-  }
-  getPoolList(){
-    this.detailService.getPoolList(null).subscribe((result: any) => {
-      this.poolList = result.data;
-    });
   }
 
   // 初始化表格对象
@@ -408,10 +411,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
       this.getControllerList(false);
     }
     if (page === 'disk'){
-      this.getControllerList(false);
+      this.getDisksList(false);
     }
     if (page === 'port'){
-      this.getControllerList(false);
+      this.getPortsList();
     }
 
   }
@@ -427,7 +430,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
-      if (this.detail !== null){
+      if (this.detail === null){
         this.detailService.getStorageDetail(this.storageId).subscribe((r: any) => {
           if (r.code === '200'){
             this.detail = r.data.data;
@@ -449,7 +452,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
-      if (this.poolList !== null){
+      if (this.poolList === null){
         this.detailService.getStoragePoolList(this.storageId).subscribe((r: any) =>{
           if (r.code === '200'){
             this.storagePool = r.data.data;
@@ -461,6 +464,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
 
   }
   getStorageVolumeList(fresh: boolean){
+    console.log("is null?")
+    console.log(this.volumes)
+    console.log(this.volumes==null)
     if (fresh){
       this.detailService.getVolumeListList(this.storageId).subscribe((r: any) => {
         if (r.code === '200'){
@@ -470,7 +476,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
-      if (this.volumes !== null){
+      if (this.volumes == null){
         this.detailService.getVolumeListList(this.storageId).subscribe((r: any) => {
           if (r.code === '200'){
             this.volumes = r.data.data;
@@ -490,7 +496,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
-      if (this.fsList !== null){
+      if (this.fsList == null){
         this.detailService.getFileSystemList(this.storageId).subscribe((r: any) => {
           if (r.code === '200'){
             this.fsList = r.data.data;
@@ -510,7 +516,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
-      if (this.dtrees !== null){
+      if (this.dtrees == null){
         this.detailService.getDtreeList(this.storageId).subscribe((r: any) => {
           if (r.code === '200'){
             this.dtrees = r.data.data;
@@ -530,7 +536,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
-      if (this.shares !== null){
+
+      if (this.shares == null){
         this.detailService.getShareList(this.storageId).subscribe((r: any) => {
           if (r.code === '200'){
             this.shares = r.data.data;
@@ -550,7 +557,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
-      if (this.shares !== null){
+      if (this.controllers == null){
         this.detailService.getControllerList(this.storageId).subscribe((r: any) => {
           if (r.code === '200'){
             this.controllers = r.data.data;
@@ -560,7 +567,82 @@ export class DetailComponent implements OnInit, AfterViewInit {
       }
     }
   }
-
+  getDisksList(fresh: boolean){
+    if (fresh){
+      this.detailService.getDiskList(this.storageId).subscribe((r: any) => {
+        if (r.code === '200'){
+          this.disks = r.data.data;
+          this.cdr.detectChanges();
+        }
+      });
+    }else {
+      // 此处防止重复切换tab每次都去后台请求数据
+      if (this.disks == null){
+        this.detailService.getDiskList(this.storageId).subscribe((r: any) => {
+          if (r.code === '200'){
+            this.disks = r.data.data;
+            this.cdr.detectChanges();
+          }
+        });
+      }
+    }
+  }
+  getPortsList(){
+    this.getFCPortList();
+    this.getFCoEPortList();
+    this.getEthernetPortList();
+    this.getBondPortList();
+    this.getLogicPortsList();
+    this.getFailoverGroups();
+  }
+  getFCPortList(){
+      this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"FC"}).subscribe((r: any) => {
+        if (r.code === '200'){
+          this.fcs = r.data.data;
+          this.cdr.detectChanges();
+        }
+      });
+  }
+  getFCoEPortList(){
+    this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"FCoE"}).subscribe((r: any) => {
+      if (r.code === '200'){
+        this.fcoes = r.data.data;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+  getEthernetPortList(){
+    this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"ETH"}).subscribe((r: any) => {
+      if (r.code === '200'){
+        this.eths = r.data.data;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+  getBondPortList(){
+    this.detailService.getBondPortList(this.storageId).subscribe((r: any) => {
+      if (r.code === '200'){
+        this.bonds = r.data.data;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+  getLogicPortsList(){
+    this.detailService.getLogicPortList(this.storageId).subscribe((r: any) => {
+      if (r.code === '200'){
+        this.logicports = r.data.data;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+  getFailoverGroups(){
+    this.detailService.getFailoverGroups(this.storageId).subscribe((r: any) => {
+      if (r.code === '200'){
+        this.fgs = r.data.data;
+        this.cdr.detectChanges();
+      }
+    });
+  }
 
   formatCapacity(c: number){
     if (c < 1024){
@@ -592,5 +674,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   backToList(){
     this.router.navigate(['storage']);
+  }
+  parseUsage(c:string){
+    if (c===null || c==='') return 0;
+    return Number.parseFloat(c).toFixed(2);
   }
 }
