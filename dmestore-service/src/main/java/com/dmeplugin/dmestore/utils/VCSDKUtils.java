@@ -1763,7 +1763,7 @@ public class VCSDKUtils {
         }
     }
 
-    private void createPbmProfile(VmwareContext vmwareContext, String categoryName, String tagName) throws RuntimeFaultFaultMsg, InvalidArgumentFaultMsg, com.vmware.vim25.RuntimeFaultFaultMsg {
+    private void createPbmProfile(VmwareContext vmwareContext, String categoryName, String tagName) throws RuntimeFaultFaultMsg, InvalidArgumentFaultMsg, com.vmware.vim25.RuntimeFaultFaultMsg, com.vmware.pbm.InvalidArgumentFaultMsg, PbmFaultProfileStorageFaultFaultMsg, PbmDuplicateNameFaultMsg {
         //String tagCategoryName="dme";
         //String profileName="mytestprofile";
         PbmServiceInstanceContent spbmsc;
@@ -1833,6 +1833,9 @@ public class VCSDKUtils {
         spec.setDescription(POLICY_DESC);
         spec.setResourceType(PbmUtil.getStorageResourceType());
         spec.setConstraints(constraints);
+
+        // Step 7: Create Storage Profile
+        PbmProfileId profile = vmwareContext.getPbmService().pbmCreate(profileMgr, spec);
     }
 
     public void createTag(String tagName, SessionHelper sessionHelper) {
