@@ -109,6 +109,7 @@ export class VmfsListComponent implements OnInit {
   isServiceLevelData = true; // 编辑页面 所选数据是否为服务等级 true:是 false:否 若为是则不显示控制策略以及交通管制对象
   mountHostData = true; // 挂载页面主机是否加载完毕 true是 false否
   mountClusterData = true; // 挂载页面集群是否加载完毕 true是 false否
+  serviceLevelIsNull = false; // 未选择服务等级true未选择 false选择 添加、服务登记变更
   ngOnInit() {
     // 列表数据
     this.refresh();
@@ -459,6 +460,8 @@ export class VmfsListComponent implements OnInit {
   }
   // 获取服务等级数据
   setServiceLevelList() {
+    // 初始化服务等级选择参数
+    this.serviceLevelIsNull = false;
     // 获取服务等级数据
     this.remoteSrv.getServiceLevelList().subscribe((result: any) => {
       console.log(result);
@@ -469,71 +472,71 @@ export class VmfsListComponent implements OnInit {
       }
     });
   }
-  showServiceLevel(show: boolean, obj:any) {
-    console.log('obj', obj);
-    if (show) {
+  showServiceLevel(obj:any, isShow:boolean) {
+    console.log('obj+isShow', obj, isShow);
+    if (isShow) {
+      obj.hide = true;
     }
   }
   // 添加vmfs 处理
   addVmfsHanlde() {
-    let selectResult = this.serviceLevelList.find(item => item.show === true)
-    console.log('selectResult', selectResult)
-    console.log('selectResultIndex', this.serviceLevelList.indexOf(selectResult) === 0)
-    if (this.levelCheck === 'level') { // 选择服务等级
+    let selectResult = this.serviceLevelList.find(item => item.show === true);
+    console.log('selectResult', this.levelCheck === 'level' && selectResult)
+    if ((this.levelCheck === 'level' && selectResult) || this.levelCheck !== 'level') { // 选择服务等级
       if (selectResult) {
         this.form.service_level_id = selectResult.id;
         this.form.service_level_name = selectResult.name;
-      } else {
-        console.log("服务等级不能为空！");
-        return;
       }
-    }
-    // 数据预处----卷名称
-    if (this.form.isSameName) { // 卷名称与vmfs名称相同（PS：不同时为必填）
-      this.form.volumeName = this.form.name;
-    }
-    // 数据预处----容量 （后端默认单位为GB）
-    switch (this.form.capacityUnit) {
-      case 'TB':
-        this.form.capacity = this.form.capacity * 1024;
-        break;
-      case 'MB':
-        this.form.capacity = this.form.capacity / 1024;
-        break;
-      case 'KB':
-        this.form.capacity = this.form.capacity / (1024 * 1024);
-        break;
-      default: // 默认GB 不变
-        break;
-    }
-    // 主机/集群数据处理
-    if (this.chooseDevice.deviceType === 'host') {
-      this.form.host = this.chooseDevice.deviceName;
-      this.form.hostId = this.chooseDevice.deviceId;
-    } else {
-      this.form.cluster = this.chooseDevice.deviceName;
-      this.form.clusterId = this.chooseDevice.deviceId;
-    }
-    if (this.levelCheck === 'customer') { // 未选择 服务等级 需要将服务等级数据设置为空
-      this.form.service_level_id = null;
-      this.form.service_level_name = null;
-    }
-    // 若控制策略数据为空，则将控制策略变量置为空
-    if(this.form.maxbandwidth === null && this.form.maxiops
-      && this.form.minbandwidth && this.form.miniops && this.form.latency) {
+      // 数据预处----卷名称
+      if (this.form.isSameName) { // 卷名称与vmfs名称相同（PS：不同时为必填）
+        this.form.volumeName = this.form.name;
+      }
+      // 数据预处----容量 （后端默认单位为GB）
+      switch (this.form.capacityUnit) {
+        case 'TB':
+          this.form.capacity = this.form.capacity * 1024;
+          break;
+        case 'MB':
+          this.form.capacity = this.form.capacity / 1024;
+          break;
+        case 'KB':
+          this.form.capacity = this.form.capacity / (1024 * 1024);
+          break;
+        default: // 默认GB 不变
+          break;
+      }
+      // 主机/集群数据处理
+      if (this.chooseDevice.deviceType === 'host') {
+        this.form.host = this.chooseDevice.deviceName;
+        this.form.hostId = this.chooseDevice.deviceId;
+      } else {
+        this.form.cluster = this.chooseDevice.deviceName;
+        this.form.clusterId = this.chooseDevice.deviceId;
+      }
+      if (this.levelCheck === 'customer') { // 未选择 服务等级 需要将服务等级数据设置为空
+        this.form.service_level_id = null;
+        this.form.service_level_name = null;
+      }
+      // 若控制策略数据为空，则将控制策略变量置为空
+      if(this.form.maxbandwidth === null && this.form.maxiops
+        && this.form.minbandwidth && this.form.miniops && this.form.latency) {
+        this.form.control_policy = null;
+      }
       this.form.control_policy = null;
+      console.log(this.form);
+      this.remoteSrv.createVmfs(this.form).subscribe((result: any) => {
+        if (result.code === '200') {
+          console.log('创建成功');
+          // 重新请求数据
+          this.scanDataStore();
+        } else {
+          console.log('创建失败：' + result.description);
+        }
+      });
+    } else {
+      this.serviceLevelIsNull = true;
+      this.wizard.open();
     }
-    this.form.control_policy = null;
-    console.log(this.form);
-    this.remoteSrv.createVmfs(this.form).subscribe((result: any) => {
-      if (result.code === '200') {
-        console.log('创建成功');
-        // 重新请求数据
-        this.scanDataStore();
-      } else {
-        console.log('创建失败：' + result.description);
-      }
-    });
   }
 
   // 容量单位转换
@@ -758,6 +761,7 @@ export class VmfsListComponent implements OnInit {
   }
   // 变更服务等级 按钮点击事件
   changeServiceLevelBtnFunc() {
+
     // 初始化表单
     this.changeServiceLevelForm = new GetForm().getChangeLevelForm();
     if (this.rowSelected.length === 1) {
@@ -778,20 +782,29 @@ export class VmfsListComponent implements OnInit {
     this.changeServiceLevelForm.service_level_id = serviceLevId;
     this.changeServiceLevelForm.service_level_name = serviceLevName;
   }
+
   // 变更服务等级 处理
   changeSLHandleFunc() {
-    this.remoteSrv.changeServiceLevel(this.changeServiceLevelForm).subscribe((result: any) => {
-      if (result.code === '200'){
-        console.log('change service level success:' + name);
-        // 重新请求数据
-        this.scanDataStore();
-      } else {
-        console.log('change service level faild: ' + name  + ' Reason:' + result.description);
-      }
-      // 关闭修改服务等级页面
-      this.changeServiceLevelShow = false;
-      this.cdr.detectChanges();
-    });
+    let selectResult = this.serviceLevelList.find(item => item.show === true)
+    console.log('selectResult', selectResult)
+    if (selectResult) {
+      this.serviceLevelIsNull = false;
+      this.remoteSrv.changeServiceLevel(this.changeServiceLevelForm).subscribe((result: any) => {
+        if (result.code === '200'){
+          console.log('change service level success:' + name);
+          // 重新请求数据
+          this.scanDataStore();
+        } else {
+          console.log('change service level faild: ' + name  + ' Reason:' + result.description);
+        }
+        // 关闭修改服务等级页面
+        this.changeServiceLevelShow = false;
+        this.cdr.detectChanges();
+      });
+    } else {
+      this.serviceLevelIsNull = true;
+      console.log("服务等级不能为空！");
+    }
   }
   // 扩容按钮点击事件
   expandBtnFunc() {
