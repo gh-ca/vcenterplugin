@@ -23,11 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @ClassName BestPracticeProcessServiceImpl
- * @Description TODO
- * @Author wangxiangyong
- * @Date 2020/9/15 16:41
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class BestPracticeProcessServiceImpl implements BestPracticeProcessService {
     private static final Logger log = LoggerFactory.getLogger(BestPracticeProcessServiceImpl.class);

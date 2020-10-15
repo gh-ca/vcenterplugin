@@ -115,7 +115,7 @@ public class NfsOperationController extends BaseController{
     public ResponseBodyBean updateNfsDatastore(@RequestBody Map<String,Object> params){
 
         Map<String,Object> resMap = nfsOperationService.updateNfsDatastore(params);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.ACCEPTED.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));

@@ -1,11 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
 /**
- * @ClassName DmeConstants
- * @Description Dme 常量
- * @Author wangxiangyong
- * @Date 2020/9/4 10:40
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class DmeConstants {
     public static final String DEFAULT_PATTERN = "#\\{.*?\\}";

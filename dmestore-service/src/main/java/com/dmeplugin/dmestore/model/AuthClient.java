@@ -1,11 +1,7 @@
 package com.dmeplugin.dmestore.model;
 
 /**
- * @ClassName AuthClient
- * @Description TODO
- * @Author wangxiangyong
- * @Date 2020/9/2 17:24
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class AuthClient {
     private String accessval;

@@ -2,6 +2,7 @@ package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.model.*;
+import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
@@ -46,6 +47,12 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     private DmeVmwareRalationDao dmeVmwareRalationDao;
 
     private VCSDKUtils vcsdkUtils;
+
+    private DataStoreStatisticHistoryService dataStoreStatisticHistoryService;
+
+    public void setDataStoreStatisticHistoryService(DataStoreStatisticHistoryService dataStoreStatisticHistoryService) {
+        this.dataStoreStatisticHistoryService = dataStoreStatisticHistoryService;
+    }
 
     public VCSDKUtils getVcsdkUtils() {
         return vcsdkUtils;
@@ -112,13 +119,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storageObj.setMaxLatency(ToolUtils.jsonToDou(jsonObj.get("max_latency"),0.0));
                     storageObj.setSn(ToolUtils.jsonToStr(jsonObj.get("sn")));
                     storageObj.setVersion(ToolUtils.jsonToStr(jsonObj.get("version")));
-                    storageObj.setTotal_pool_capacity(ToolUtils.jsonToDou(jsonObj.get("total_pool_capacity"),0.0));
+                    storageObj.setTotalPoolCapacity(ToolUtils.jsonToDou(jsonObj.get("total_pool_capacity"),0.0));
 
                     storageObj.setLocation(ToolUtils.jsonToStr(jsonObj.get("location"),null));
                     storageObj.setPatchVersion(ToolUtils.jsonToStr(jsonObj.get("patch_version"),null));
-                    storageObj.setMaintenanceStart(ToolUtils.jsonToStr(jsonObj.get("maintenance_start"),null));
-                    storageObj.setMaintenanceOvertime(ToolUtils.jsonToStr(jsonObj.get("maintenance_overtime"),null));
-                    storageObj.setSubscription_capacity(ToolUtils.jsonToDou(jsonObj.get("subscription_capacity")));
+                    storageObj.setMaintenanceStart(ToolUtils.jsonToDateStr(jsonObj.get("maintenance_start"),null));
+                    storageObj.setMaintenanceOvertime(ToolUtils.jsonToDateStr(jsonObj.get("maintenance_overtime"),null));
+                    storageObj.setSubscriptionCapacity(ToolUtils.jsonToDou(jsonObj.get("subscription_capacity")));
 
                     JsonElement jsonAzIds = jsonObj.get("az_ids");
                     if (!ToolUtils.jsonIsNull(jsonAzIds)) {
@@ -168,20 +175,19 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 storageObj.setIp(ToolUtils.jsonToStr(element.get("ip")));
                 storageObj.setStatus(ToolUtils.jsonToStr(element.get("status")));
                 storageObj.setSynStatus(ToolUtils.jsonToStr(element.get("syn_status")));
-                storageObj.setPatch_version(ToolUtils.jsonToStr(element.get("patch_version")));
                 storageObj.setVendor(ToolUtils.jsonToStr(element.get("vendor")));
                 storageObj.setModel(ToolUtils.jsonToStr(element.get("model")));
                 storageObj.setUsedCapacity(ToolUtils.jsonToDou(element.get("used_capacity"),0.0));
                 storageObj.setTotalCapacity(ToolUtils.jsonToDou(element.get("total_capacity"),0.0));
                 storageObj.setTotalEffectiveCapacity(ToolUtils.jsonToDou(element.get("total_effective_capacity"),0.0));
                 storageObj.setFreeEffectiveCapacity(ToolUtils.jsonToDou(element.get("free_effective_capacity"),0.0));
-                storageObj.setMaintenance_start(ToolUtils.jsonToInt(element.get("maintenance_start"),0));
-                storageObj.setMaintenance_overtime(ToolUtils.jsonToInt(element.get("maintenance_overtime"),0));
 
                 storageObj.setLocation(ToolUtils.jsonToStr(element.get("location"),null));
                 storageObj.setPatchVersion(ToolUtils.jsonToStr(element.get("patch_version"),null));
-                storageObj.setMaintenanceStart(ToolUtils.jsonToStr(element.get("maintenance_start"),null));
-                storageObj.setMaintenanceOvertime(ToolUtils.jsonToStr(element.get("maintenance_overtime"),null));
+                storageObj.setMaintenanceStart(ToolUtils.jsonToDateStr(element.get("maintenance_start"),null));
+                storageObj.setMaintenanceOvertime(ToolUtils.jsonToDateStr(element.get("maintenance_overtime"),null));
+                storageObj.setProductVersion(ToolUtils.jsonToStr(element.get("product_version")));
+                storageObj.setSn(ToolUtils.jsonToStr(element.get("sn"),null));
 
 
                 JsonArray ids = element.get("az_ids").getAsJsonArray();
@@ -1065,5 +1071,45 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
     }
 
+    @Override
+    public List<Storage> listStoragePerformance(List<String> storageIds) throws Exception{
+        List<Storage> relists = null;
+        try {
+            if (storageIds != null && storageIds.size() > 0) {
+                Map<String, Object> params = new HashMap<>(16);
+                params.put("obj_ids", storageIds);
+                Map<String, Object> remap = dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params);
+                LOG.info("remap===" + gson.toJson(remap));
+                if (null != remap && null != remap.get(DmeConstants.DATA)) {
+                    try {
+                        JsonObject dataJson = new JsonParser().parse(remap.get("data").toString()).getAsJsonObject();
+                        if (dataJson != null) {
+                            relists = new ArrayList<>();
+                            for (String storageId : storageIds) {
+                                JsonObject statisticObject = dataJson.getAsJsonObject(storageId);
+                                if (statisticObject != null) {
+                                    Storage storage = new Storage();
+                                    storage.setId(storageId);
+                                    storage.setMaxIops(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    storage.setMaxBandwidth(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    storage.setMaxCpuUtilization(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    storage.setMaxLatency(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    storage.setMaxOps(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    relists.add(storage);
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        LOG.warn("查询vmfs实时性能数据listVmfsPerformance异常", e);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("list vmfs performance error:", e);
+            throw e;
+        }
+        LOG.info("listVmfsPerformance relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        return relists;
+    }
 
 }
