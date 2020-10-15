@@ -231,20 +231,7 @@
          </componentClass>
       </object>
    </extension>
-   <!-- Host monitor sample view -->
-   <extension id="com.dmeplugin.dmestore.host.monitor">
-      <extendedPoint>vsphere.core.host.monitorViews</extendedPoint>
-      <object>
-         <name>#{monitorTab.label}</name>
-         <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
-            <object>
-               <root>
-                  <url>/ui/dmestore/resources/host-monitor.html</url>
-               </root>
-            </object>
-         </componentClass>
-      </object>
-   </extension>
+
 
    <!-- Sample Actions on Hosts -->
    <extension id="com.dmeplugin.dmestore.actionSet">
