@@ -19,7 +19,8 @@
     "close": "Close",
     "submit": "Submit",
     "search": "Search",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "synSPolicy": "Synchronize VM Storage Policies"
   },
   "validations": {
     "required": "This field is required!",

@@ -281,7 +281,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     public Map<String, Object> updateNfsDatastore(Map<String, Object> params) {
 
         Map<String, Object> resMap = new HashMap<>();
-        resMap.put("code", 200);
+        resMap.put("code", 202);
         resMap.put("msg", "update nfs datastore success !");
 
         if (params == null || params.size() == 0) {
@@ -306,29 +306,25 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             if (qos_policy!=null&&qos_policy.size()!=0) {
                 tuning.put("qos_policy", qos_policy);
             }
-            fsReqBody.put("tuning", gson.toJson(tuning));
+            fsReqBody.put("tuning", tuning);
         }
 
         String file_system_id = (String) params.get("file_system_id");
-        Boolean capacity_autonegotiation = (Boolean)params.get("capacity_autonegotiation");
-        String name = (String) params.get("name");
-        if (!StringUtils.isEmpty(file_system_id)) {
-            fsReqBody.put("file_system_id", file_system_id);
-        }
+        Object capacity_autonegotiation = params.get("capacity_autonegotiation");
+
         if (capacity_autonegotiation != null) {
             fsReqBody.put("capacity_autonegotiation", capacity_autonegotiation);
         }
-        if (!StringUtils.isEmpty(name)) {
-            fsReqBody.put("name", name);
-        }
         try {
-            Map<String, Object> stringObjectMap = updateFileSystem(fsReqBody);
-            int code = ToolUtils.getInt(stringObjectMap.get("code"));
-            if (code == 202) {
-                LOG.info("{"+name+"}"+stringObjectMap.get("msg"));
-            } else {
-                LOG.info("{"+name+"}"+stringObjectMap.get("msg"));
-                resMap.put("msg",stringObjectMap.get("msg"));
+            if (!StringUtils.isEmpty(file_system_id)) {
+                Map<String, Object> stringObjectMap = updateFileSystem(fsReqBody,file_system_id);
+                int code = ToolUtils.getInt(stringObjectMap.get("code"));
+                if (code == 202) {
+                    LOG.info("{fs}"+stringObjectMap.get("msg"));
+                } else {
+                    LOG.info("{fs}"+stringObjectMap.get("msg"));
+                    resMap.put("msg",stringObjectMap.get("msg"));
+                }
             }
             //update nfs datastore
             String result = vcsdkUtils.renameDataStore(nfsName, dataStoreObjectId);
@@ -548,13 +544,12 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         return data_space;
     }
 
-    private Map<String,Object> updateFileSystem(Map<String,Object> params) throws Exception {
+    private Map<String,Object> updateFileSystem(Map<String,Object> params,String file_system_id) throws Exception {
 
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 202);
         resMap.put("msg", "update nfs datastore success !");
 
-        String file_system_id = (String) params.get("file_system_id");
         if (StringUtils.isEmpty(file_system_id)) {
             resMap.put("code", 403);
             resMap.put("msg", "update nfs datastore error !");

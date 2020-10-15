@@ -47,12 +47,6 @@ public class StorageDetail {
     //补充字段
     //固件版本
     private String productVersion;
-    //维护开始时间
-    private Integer maintenance_start;
-    //维护结束时间
-    private Integer maintenance_overtime;
-    //补订版本
-    private String patch_version;
     //警告
     private String warning;
     //事件
@@ -113,30 +107,6 @@ public class StorageDetail {
 
     public void setEvent(String event) {
         this.event = event;
-    }
-
-    public String getPatch_version() {
-        return patch_version;
-    }
-
-    public void setPatch_version(String patch_version) {
-        this.patch_version = patch_version;
-    }
-
-    public Integer getMaintenance_start() {
-        return maintenance_start;
-    }
-
-    public void setMaintenance_start(Integer maintenance_start) {
-        this.maintenance_start = maintenance_start;
-    }
-
-    public Integer getMaintenance_overtime() {
-        return maintenance_overtime;
-    }
-
-    public void setMaintenance_overtime(Integer maintenance_overtime) {
-        this.maintenance_overtime = maintenance_overtime;
     }
 
     public String getStoragePool() {

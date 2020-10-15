@@ -504,6 +504,24 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
         this.cdr.detectChanges();
       });
   }
+
+  /**
+   * 同步虚拟机存储策略
+   */
+  syncStoragePolicy(){
+    const url = "servicelevel/manualupdate";
+    this.http.post(url, {}).subscribe((response: any) => {
+      console.log(response);
+      if (response.code == '200'){
+         alert("同步成功");
+      } else{
+        alert("同步失败");
+      }
+    }, err => {
+      console.error('ERROR', err);
+      alert("同步失败");
+    });
+  }
 }
 
 class Servicelevel {
