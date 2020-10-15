@@ -68,6 +68,10 @@ public class DatastoreMO extends BaseMO {
         return (DatastoreInfo)_context.getVimClient().getDynamicProperty(_mor, "info");
     }
 
+    public VmfsDatastoreInfo getVmfsDatastoreInfo() throws Exception {
+        return (VmfsDatastoreInfo)_context.getVimClient().getDynamicProperty(_mor, "info");
+    }
+
     public DatastoreSummary getSummary() throws Exception {
         return (DatastoreSummary)_context.getVimClient().getDynamicProperty(_mor, "summary");
     }

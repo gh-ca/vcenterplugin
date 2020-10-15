@@ -93,10 +93,22 @@ public interface VmfsAccessService {
     void deleteVmfs(Map<String, Object> params) throws Exception;
 
     /**
-     * vmfs 指定卷详细信息查询
-     */
-    List<VmfsDatastoreVolumeDetail> volumeDetail(String volumeId) throws Exception;
+     * vCenter VMFS存储卷详细信息查询
+     * @author wangxy
+     * @date 10:05 2020/10/14
+     * @param storageObjectId VMFS存储ID
+     * @throws Exception always
+     * @return java.util.List<com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail>
+     **/
+    List<VmfsDatastoreVolumeDetail> volumeDetail(String storageObjectId) throws Exception;
 
+    /**
+     * vCenter VMFS存储扫描发现
+     * @author wangxy
+     * @date 10:03 2020/10/14
+     * @throws Exception always
+     * @return boolean
+     **/
     boolean scanVmfs() throws Exception;
 
     /**

@@ -168,11 +168,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         List<VmfsDataInfo> relists = null;
         try {
             if (volumeIds != null && volumeIds.size() > 0) {
-                Map<String, Object> params = new HashMap<>();
+                Map<String, Object> params = new HashMap<>(16);
                 params.put("obj_ids", volumeIds);
                 Map<String, Object> remap = dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params);
                 LOG.info("remap===" + gson.toJson(remap));
-                if (remap != null && remap.get("data") != null) {
+                if (null != remap && null != remap.get(DmeConstants.DATA)) {
                     try {
                         JsonObject dataJson = new JsonParser().parse(remap.get("data").toString()).getAsJsonObject();
                         if (dataJson != null) {
@@ -992,7 +992,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     @Override
     public boolean scanVmfs() throws Exception {
         String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(ToolUtils.STORE_TYPE_VMFS);
-        LOG.info("===list vmfs datastore success====\n{}", listStr);
+        LOG.debug("===list vmfs datastore success====\n{}", listStr);
         if (StringUtils.isEmpty(listStr)) {
             return false;
         }
@@ -1002,40 +1002,44 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         for (int i = 0; i < jsonArray.size(); i++) {
             JsonObject vmfsDatastore = jsonArray.get(i).getAsJsonObject();
             String storeType = ToolUtils.STORE_TYPE_VMFS;
-            //TODO 暂时认为是从url中获取到wwn信息 modify 20200928 通过vcenter的vmfs的wwn，id与dme的卷均建立不了关系,目前通过名称建立关系
-            String vmfsDatastoreUrl = vmfsDatastore.get("url").getAsString();
             String vmfsDatastoreId = vmfsDatastore.get("objectid").getAsString();
             String vmfsDatastoreName = vmfsDatastore.get("name").getAsString();
-
-            //根据wwn从DME中查询卷信息
-            //根据volumeId从dme中查询卷信息
-            String volumeUrlByName = LIST_VOLUME_URL + "?name=" + vmfsDatastoreName;
-            ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByName, HttpMethod.GET, null);
-
-            if (responseEntity.getStatusCodeValue() / 100 != 2) {
-                LOG.info(" Query DME volume failed! errorMsg:{}", responseEntity.toString());
+            JsonArray wwnArray = vmfsDatastore.getAsJsonArray("vmfsWwnList");
+            if(null == wwnArray || wwnArray.size() == 0){
                 continue;
             }
-            JsonObject jsonObject = gson.fromJson(responseEntity.getBody(), JsonObject.class);
-            JsonElement volumesElement = jsonObject.get("volumes");
-            if (!ToolUtils.jsonIsNull(volumesElement)) {
-                JsonArray volumeArray = volumesElement.getAsJsonArray();
-                if (volumeArray.size() > 0) {
-                    JsonObject volumeObject = volumeArray.get(0).getAsJsonObject();
-                    String volumeId = ToolUtils.jsonToOriginalStr(volumeObject.get("id"));
-                    String volumeName = ToolUtils.jsonToOriginalStr(volumeObject.get("name"));
-                    String volumeWwn = ToolUtils.jsonToOriginalStr(volumeObject.get("volume_wwn"));
 
-                    DmeVmwareRelation relation = new DmeVmwareRelation();
-                    relation.setStoreId(vmfsDatastoreId);
-                    relation.setStoreName(vmfsDatastoreName);
-                    relation.setVolumeId(volumeId);
-                    relation.setVolumeName(volumeName);
-                    relation.setVolumeWwn(volumeWwn);
-                    relation.setStoreType(storeType);
-                    relation.setState(1);
+            for(int j = 0; j< wwnArray.size(); j++){
+                String wwn = wwnArray.get(j).getAsString();
+                //根据wwn从DME中查询卷信息
+                String volumeUrlByName = LIST_VOLUME_URL + "?wwn=" + wwn;
+                ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByName, HttpMethod.GET, null);
 
-                    relationList.add(relation);
+                if (responseEntity.getStatusCodeValue() / 100 != 2) {
+                    LOG.info(" Query DME volume failed! errorMsg:{}", responseEntity.toString());
+                    continue;
+                }
+                JsonObject jsonObject = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+                JsonElement volumesElement = jsonObject.get("volumes");
+                if (!ToolUtils.jsonIsNull(volumesElement)) {
+                    JsonArray volumeArray = volumesElement.getAsJsonArray();
+                    if (volumeArray.size() > 0) {
+                        JsonObject volumeObject = volumeArray.get(0).getAsJsonObject();
+                        String volumeId = ToolUtils.jsonToOriginalStr(volumeObject.get("id"));
+                        String volumeName = ToolUtils.jsonToOriginalStr(volumeObject.get("name"));
+                        String volumeWwn = ToolUtils.jsonToOriginalStr(volumeObject.get("volume_wwn"));
+
+                        DmeVmwareRelation relation = new DmeVmwareRelation();
+                        relation.setStoreId(vmfsDatastoreId);
+                        relation.setStoreName(vmfsDatastoreName);
+                        relation.setVolumeId(volumeId);
+                        relation.setVolumeName(volumeName);
+                        relation.setVolumeWwn(volumeWwn);
+                        relation.setStoreType(storeType);
+                        relation.setState(1);
+
+                        relationList.add(relation);
+                    }
                 }
             }
         }
@@ -1372,7 +1376,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return volumes;
     }
 
-    //从性能数据中提取对应指标的对应值
+    /**
+     *从性能数据中提取对应指标的对应值
+     **/
     private JsonElement getStatistcValue(JsonObject statisticObject, String indicator, String type) {
         JsonElement object = null;
         if (null != statisticObject) {

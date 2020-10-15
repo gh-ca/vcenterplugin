@@ -1,7 +1,9 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {CommonService} from '../common.service';
 import {GlobalsService} from '../../shared/globals.service';
+import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {ClrForm} from "@clr/angular";
 
 @Component({
   selector: 'app-rdm',
@@ -10,6 +12,10 @@ import {GlobalsService} from '../../shared/globals.service';
   providers: [CommonService, GlobalsService]
 })
 export class RdmComponent implements OnInit {
+
+  @ViewChild(ClrForm, {static: true}) rdmFormGroup;
+  @ViewChild('rdmForm', {static: true}) rdmForm;
+
 
   policyEnable = {
     smartTier: false,
@@ -83,6 +89,10 @@ export class RdmComponent implements OnInit {
   }
 
   submit(): void {
+    if (this.rdmForm.form.invalid) {
+      this.rdmFormGroup.markAsTouched();
+      return;
+    }
     console.log(this.configModel);
     const vmObjectId = 'urn:vmomi:VirtualMachine:vm-229:f8e381d7-074b-4fa9-9962-9a68ab6106e1';
     let body = {};

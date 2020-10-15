@@ -325,7 +325,9 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         return getNfsContainIds(storeId, "LOGICPORT_ID");
     }
 
-    //NFS存储 获取指定存储下的fileId的一个值
+    /**
+     * NFS存储 获取指定存储下的fileId的一个值
+     */
     private String getNfsContainId(String storeId, String fileId) throws SQLException {
         String id = "";
         Connection con = null;
@@ -349,7 +351,9 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         return id;
     }
 
-    //NFS存储 获取指定存储下的fileId的集合
+    /**
+     * NFS存储 获取指定存储下的fileId的集合
+     */
     private List<String> getNfsContainIds(String storeId, String fileId) throws SQLException {
         return getFileIdsByCondition(storeId, fileId, ToolUtils.STORE_TYPE_NFS);
     }
@@ -384,8 +388,10 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         return lists;
 
     }
-
-    //VMFS 通过vmfsDataStorageIds查询关联的DME存储的信息
+    
+    /**
+     * VMFS 通过vmfsDataStorageIds查询关联的DME存储的信息
+     */
     public List<DmeVmwareRelation> getDmeVmwareRelationsByStorageIds(List<String> storageIds) throws Exception {
         List<DmeVmwareRelation> lists = new ArrayList<>();
         Connection con = null;

@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,8 +31,9 @@ import java.util.Map;
 @Api
 public class DmeStorageController extends BaseController{
 
-    public static final Logger LOG = LoggerFactory.getLogger(DmeStorageController.class);
 
+    public static final Logger LOG = LoggerFactory.getLogger(DmeStorageController.class);
+    private final String API_RESP_CODE = "code";
     private Gson gson=new Gson();
 
     @Autowired
@@ -48,8 +50,8 @@ public class DmeStorageController extends BaseController{
     public ResponseBodyBean getStorages(){
 
         Map<String, Object> resMap = dmeStorageService.getStorages();
-        Integer code = Integer.valueOf(resMap.get("code").toString());
-        if (null != resMap && null != code && code.equals(200)) {
+        Integer code = Integer.valueOf(resMap.get(API_RESP_CODE).toString());
+        if (null != resMap && null != code && code.equals(HttpStatus.OK.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -67,7 +69,7 @@ public class DmeStorageController extends BaseController{
         LOG.info("storage_id ==" + storageId );
         Map<String,Object> resMap=dmeStorageService.getStorageDetail(storageId);
 
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK)) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -82,11 +84,11 @@ public class DmeStorageController extends BaseController{
     @GetMapping("/storagepools")
     @ResponseBody
     public ResponseBodyBean getStoragePools(@RequestParam(name = "storageId") String storageId,
-                                            @RequestParam(name = "media_type") String media_type){
+                                            @RequestParam(name = "media_type",defaultValue = "all",required = false) String media_type){
 
         LOG.info("storage_id ==" + storageId );
         Map<String, Object> resMap = dmeStorageService.getStoragePools(storageId,media_type);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK)) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -97,7 +99,7 @@ public class DmeStorageController extends BaseController{
     public ResponseBodyBean getLogicPorts(@RequestParam(name = "storageId") String storageId){
 
         Map<String, Object> resMap = dmeStorageService.getLogicPorts(storageId);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -107,7 +109,7 @@ public class DmeStorageController extends BaseController{
     public ResponseBodyBean getVolumes(@RequestParam(name = "storageId") String storageId){
 
         Map<String, Object> resMap = dmeStorageService.getVolumes(storageId);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -117,7 +119,7 @@ public class DmeStorageController extends BaseController{
     public ResponseBodyBean getFileSystems(@RequestParam(name = "storageId") String storageId){
 
         Map<String, Object> resMap = dmeStorageService.getFileSystems(storageId);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -127,7 +129,7 @@ public class DmeStorageController extends BaseController{
     public ResponseBodyBean getDTrees(@RequestParam(name = "storageId") String storageId){
 
         Map<String, Object> resMap = dmeStorageService.getDTrees(storageId);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -137,7 +139,7 @@ public class DmeStorageController extends BaseController{
     public ResponseBodyBean getNfsShares(@RequestParam(name = "storageId") String storageId){
 
         Map<String, Object> resMap = dmeStorageService.getNfsShares(storageId);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -147,27 +149,27 @@ public class DmeStorageController extends BaseController{
     public ResponseBodyBean getBandPorts(@RequestParam(name = "storage_id") String storage_id){
 
         Map<String, Object> resMap = dmeStorageService.getBandPorts(storage_id);
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
     }
     @GetMapping("/storagecontrollers")
     @ResponseBody
-    public ResponseBodyBean getStorageControllers(){
+    public ResponseBodyBean getStorageControllers(@RequestParam(name = "storageDeviceId")String storageDeviceId){
 
-        Map<String, Object> resMap = dmeStorageService.getStorageControllers();
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+        Map<String, Object> resMap = dmeStorageService.getStorageControllers(storageDeviceId);
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
     }
     @GetMapping("/storagedisks")
     @ResponseBody
-    public ResponseBodyBean getStorageDisks(){
+    public ResponseBodyBean getStorageDisks(@RequestParam(name = "storageDeviceId") String storageDeviceId){
 
-        Map<String, Object> resMap = dmeStorageService.getStorageDisks();
-        if (null != resMap && null != resMap.get("code") && resMap.get("code").equals(200)) {
+        Map<String, Object> resMap = dmeStorageService.getStorageDisks(storageDeviceId);
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));
@@ -195,5 +197,31 @@ public class DmeStorageController extends BaseController{
             failureStr = "get Storage Eth Ports failure:"+e.toString();
         }
         return failure(failureStr);
+    }
+
+    /**
+     *
+     * @param portType FC FCoE ETH  默认 ALL 所有端口类型
+     * @return
+     */
+    @GetMapping("/storageport")
+    @ResponseBody
+    public ResponseBodyBean getStoragePort(@RequestParam(name = "storageDeviceId")String storageDeviceId,
+                                           @RequestParam(name = "portType", defaultValue = "ALL", required = false) String portType) {
+        Map<String, Object> resMap = dmeStorageService.getStoragePort(storageDeviceId,portType);
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
+    }
+
+    @GetMapping("/failovergroups")
+    @ResponseBody
+    public ResponseBodyBean getFailoverGroups(@RequestParam(name = "storage_id")String storage_id) {
+        Map<String, Object> resMap = dmeStorageService.getFailoverGroups(storage_id);
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
     }
 }

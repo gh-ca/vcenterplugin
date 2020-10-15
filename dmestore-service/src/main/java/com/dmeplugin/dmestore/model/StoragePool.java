@@ -8,33 +8,45 @@ package com.dmeplugin.dmestore.model;
  * @create 2020-09-03
  */
 public class StoragePool   {
-
-    private Double free_capacity;//空闲容量
-    private String name;//名称
-    private String id;//存储池id
-    private String running_status;//运行状态
-    private String health_status;//健康状态
-    private Double total_capacity;//总容量
-    private Double consumed_capacity;//已用容量
-    private String consumed_capacity_percentage;//已用容量百分比(容量利用率)
-    //private String consumed_capacity_threshold;
+    //空闲容量
+    private Double free_capacity;
+    //名称
+    private String name;
+    //存储池id
+    private String id;
+    //运行状态
+    private String running_status;
+    //健康状态
+    private String health_status;
+    //总容量
+    private Double total_capacity;
+    //已用容量
+    private Double consumed_capacity;
+    //已用容量百分比(容量利用率)
+    private String consumed_capacity_percentage;
     private String storage_pool_id;
     private String storage_instance_id;
     private String storage_device_id;
     //订阅率 = 订阅容量/总容量
-    private Double subscription_rate;//订阅率
-    //补充字段
-    private String media_type;//类型（块）
+    private Double subscription_rate;
+    //类型（块）
+    private String media_type;
     //0-无效，1-RAID 10，2-RAID 5，3-RAID 0，4-RAID 1，5-RAID 6，6-RAID 50，7-RAID 3。
-    private String tier0_raid_lv; //RAID级别
-    private String tier1_raid_lv;//RAID级别
-    private String tier2_raid_lv;//RAID级别
-    private String storage_id; //存储设备id
-    private Double data_space; //存储池上创建LUN或者文件系统时的可用容量 单位MB
+    //RAID级别
+    private String tier0_raid_lv;
+    private String tier1_raid_lv;
+    private String tier2_raid_lv;
+    //存储设备id
+    private String storage_id;
+    //存储池上创建LUN或者文件系统时的可用容量 单位MB
+    private Double data_space;
     //时延 iops 带宽 公用存储设备的
-    private Double subscribed_capacity; //订阅容量
-    private String physicalType;//硬盘类型
-    private String diskPoolId;//存储池所处硬盘id
+    //订阅容量
+    private Double subscribed_capacity;
+    //硬盘类型
+    private String physicalType;
+    //存储池所处硬盘id
+    private String diskPoolId;
 
     public String getDiskPoolId() {
         return diskPoolId;

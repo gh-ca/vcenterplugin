@@ -10,17 +10,28 @@ package com.dmeplugin.dmestore.model;
 public class StorageDetail {
 
     private String id;
-    private String name;//名称
-    private String ip;//ip地址
-    private String status;//状态 运行状态 0-离线 1-正常 2-故障 9-未管理。
-    private String synStatus;//同步状态 同步状态 0-未同步 1-同步中 2-同步完成。
-    private String sn;//设备序列号。
-    private String vendor;//厂商
-    private String model;//产品型号
-    private Double usedCapacity;//已用容量 （单位:MB）
-    private Double totalCapacity; //裸容量（单位:MB）。
-    private Double totalEffectiveCapacity;//可得容量 （总容量）
-    private Double freeEffectiveCapacity;//空闲容量
+    //名称
+    private String name;
+    //ip地址
+    private String ip;
+    //状态 运行状态 0-离线 1-正常 2-故障 9-未管理。
+    private String status;
+    //同步状态 同步状态 0-未同步 1-同步中 2-同步完成。
+    private String synStatus;
+    //设备序列号。
+    private String sn;
+    //厂商
+    private String vendor;
+    //产品型号
+    private String model;
+    //已用容量 （单位:MB）
+    private Double usedCapacity;
+    //裸容量（单位:MB）。
+    private Double totalCapacity;
+    //可得容量 （总容量）
+    private Double totalEffectiveCapacity;
+    //空闲容量
+    private Double freeEffectiveCapacity;
     private String location;
     private String[] azIds;
     private String storagePool;
@@ -34,12 +45,18 @@ public class StorageDetail {
     private String storageDisks;
 
     //补充字段
-    private String productVersion;//固件版本
-    private Integer maintenance_start; //维护开始时间
-    private Integer maintenance_overtime;//维护结束时间
-    private String patch_version;//补订版本
-    private String warning; //警告
-    private String event;//事件
+    //固件版本
+    private String productVersion;
+    //维护开始时间
+    private Integer maintenance_start;
+    //维护结束时间
+    private Integer maintenance_overtime;
+    //补订版本
+    private String patch_version;
+    //警告
+    private String warning;
+    //事件
+    private String event;
 
     public String getWarning() {
         return warning;
