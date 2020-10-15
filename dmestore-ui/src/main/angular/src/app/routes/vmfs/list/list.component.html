@@ -158,7 +158,7 @@
                 <!-- V5时最小值1.3G V6时最小值2G-->
                 <input clrInput style="width: 60%;border-bottom: none" type="number" [(ngModel)]="form.capacity" name="capacity" #number="ngModel"
                        (keyup)="capacityChange($event.target)" required/>
-                <select class="capacity" clrInput style="width: 40%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;" [(ngModel)]="form.capacityUnit" name="capacityUnit" >
+                <select class="capacity" (change)="form.capacity = null;" clrInput style="width: 40%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;" [(ngModel)]="form.capacityUnit" name="capacityUnit" >
                   <option value="TB">TB</option>
                   <option value="GB">GB</option>
                   <option value="MB">MB</option>
@@ -167,6 +167,7 @@
               </div>
               <input clrInput style="width: 19%;text-align: center;" readonly value="{{'vmfs.multiply' | translate}}">
               <input clrInput style="width: 27%;" type="number" [(ngModel)]="form.count" name="count" #number="ngModel" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" required/>
+              <clr-control-helper>{{'vmfs.capacityTips' | translate}}</clr-control-helper>
               <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
           </clr-input-container>
 
