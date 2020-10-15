@@ -1,77 +1,89 @@
-<div class="clr-row" style="margin-bottom: 20px">
-  <div class="clr-col-7"></div>
-  <div class="clr-col-5">
-    <label>{{'tier.name'|translate}}</label>
-    <input  style="height: 30px;margin-left: 20px" [(ngModel)]="searchName" type="search" result="s" name="name" #name="ngModel" />
-    <button class="btn btn-outline" style="height: 30px;margin-left: 20px" (click)="search();">{{'menu.search'|translate}}</button>
-    <select style="height: 30px;margin-left: 20px; width: 100px;" (ngModelOptions)="sortItems" [(ngModel)]="sortItem" name="sort" (change)="sortItemsChange();">
-      <option *ngFor="let item of sortItems" value="{{item.id}}">{{item.value|translate}}</option>
-    </select>
-    <button class="btn btn-outline" style="height: 30px;margin-left: 20px" (click)="refresh();">{{'menu.refresh'|translate}}</button>
+<!-- 头部按钮组 -->
+<div class="gh-btngroup-header">
+  <div class="gh-btngroup-left">
+
+  </div>
+  <div class="btn-group btn-icon">
   </div>
 </div>
 <div class="clr-row">
-  <div class="info-card clr-col-4" *ngFor="let item of serviceLevels" [clrDgItem]="item">
-    <div class="info-card-header">
-      <div class="info-card-title" style="cursor:pointer" (click)="clickName(item)">{{item.name}}</div>
-      <!--<clr-dropdown [clrCloseMenuOnItemClick]="false">
-        <button clrDropdownTrigger class="dropdown-toggle btn btn-link">
-          Operation
-          <clr-icon shape="caret down"></clr-icon>
-        </button>
-        <clr-dropdown-menu *clrIfOpen>
-          <div clrDropdownItem>Link 1</div>
-          <div clrDropdownItem>Link 2</div>
-        </clr-dropdown-menu>
-      </clr-dropdown>-->
-    </div>
-    <div class="info-card-content">
-      <div class="info-card-squre">
-        <div class="squre-per-box" [ngStyle]="{'height':(item.usedRate/100*200)+'px'}"></div>
-        <div class="squre-num">{{item.usedRate}}</div>
+  <div class="clr-col-7">
+    <button class="btn btn-primary" (click)="syncStoragePolicy()" style="margin-left: 10px">{{'menu.synSPolicy' | translate}}</button>
+  </div>
+  <div class="clr-col-5">
+    <label>{{'tier.name'|translate}}</label>
+    <input  style="height: 30px;margin-left: 20px" [(ngModel)]="searchName" type="search" result="s" name="name" #name="ngModel" />
+    <button class="btn btn-primary" style="height: 30px;margin-left: 20px" (click)="search();">{{'menu.search'|translate}}</button>
+    <select style="height: 30px;margin-left: 20px; width: 100px;" (ngModelOptions)="sortItems" [(ngModel)]="sortItem" name="sort" (change)="sortItemsChange();">
+      <option *ngFor="let item of sortItems" value="{{item.id}}">{{item.value|translate}}</option>
+    </select>
+    <button class="btn btn-primary" style="height: 30px;margin-left: 20px" (click)="refresh();">{{'menu.refresh'|translate}}</button>
+  </div>
+</div>
+<div class="clr-row">
+  <div class="clr-col-4" *ngFor="let item of serviceLevels" [clrDgItem]="item">
+    <div class="info-card" style="margin-left: 10px;margin-top: 30px; height: 300px">
+      <div class="info-card-header">
+        <div class="info-card-title" style="cursor:pointer" (click)="clickName(item)">{{item.name}}</div>
+        <!--<clr-dropdown [clrCloseMenuOnItemClick]="false">
+          <button clrDropdownTrigger class="dropdown-toggle btn btn-link">
+            Operation
+            <clr-icon shape="caret down"></clr-icon>
+          </button>
+          <clr-dropdown-menu *clrIfOpen>
+            <div clrDropdownItem>Link 1</div>
+            <div clrDropdownItem>Link 2</div>
+          </clr-dropdown-menu>
+        </clr-dropdown>-->
       </div>
-      <div>
-        <div class="gh-info-item">
-          <span class="gh-info-lable">{{'tier.total'|translate}}</span>
-          <span class="gh-info-value">{{item.total_capacity}} GB</span>
+      <div class="info-card-content">
+        <div class="info-card-squre">
+          <div class="squre-per-box" [ngStyle]="{'height':(item.usedRate/100*200)+'px'}"></div>
+          <div class="squre-num">{{item.usedRate}}</div>
         </div>
-        <div class="gh-info-item">
-          <span class="gh-info-lable">{{'tier.free'|translate}}</span>
-          <span class="gh-info-value">{{item.free_capacity}} GB</span>
-        </div>
-        <div class="gh-info-item">
-          <span class="gh-info-lable">{{'tier.qosP'|translate}}</span>
-          <span class="gh-info-value" *ngIf="item.capabilities.qos == undefined">--</span>
-          <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
+        <div>
+          <div class="gh-info-item">
+            <span class="gh-info-lable">{{'tier.total'|translate}}</span>
+            <span class="gh-info-value">{{item.total_capacity}} GB</span>
+          </div>
+          <div class="gh-info-item">
+            <span class="gh-info-lable">{{'tier.free'|translate}}</span>
+            <span class="gh-info-value">{{item.free_capacity}} GB</span>
+          </div>
+          <div class="gh-info-item">
+            <span class="gh-info-lable">{{'tier.qosP'|translate}}</span>
+            <span class="gh-info-value" *ngIf="item.capabilities.qos == undefined">--</span>
+            <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
                                             && item.capabilities.qos.enabled == true
                                             && item.capabilities.qos.qosParam.latency != undefined">
             {{'tier.latency'|translate}} = {{item.capabilities.qos.qosParam.latency}} {{item.capabilities.qos.qosParam.latencyUnit}}</span>
-        </div>
-        <div class="gh-info-item">
-          <span class="gh-info-lable"></span>
-          <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
+          </div>
+          <div class="gh-info-item">
+            <span class="gh-info-lable"></span>
+            <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
                                             && item.capabilities.qos.enabled == true
                                             && item.capabilities.qos.qosParam.minBandWidth != undefined">
             {{'tier.bandwidth'|translate}} >= {{item.capabilities.qos.qosParam.minBandWidth}} Mbps/s
           </span>
-          <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
+            <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
                                             && item.capabilities.qos.enabled == true
                                             && item.capabilities.qos.qosParam.maxBandWidth != undefined">
             {{'tier.bandwidth'|translate}} <= {{item.capabilities.qos.qosParam.maxBandWidth}} Mbps/s
           </span>
-        </div>
-        <div class="gh-info-item">
-          <span class="gh-info-lable"></span>
-          <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
+          </div>
+          <div class="gh-info-item">
+            <span class="gh-info-lable"></span>
+            <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
                                             && item.capabilities.qos.enabled == true
                                             && item.capabilities.qos.qosParam.minIOPS != undefined">
             IOPS >= {{item.capabilities.qos.qosParam.minIOPS}} IOPS/TB
           </span>
-          <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
+            <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
                                             && item.capabilities.qos.enabled == true
                                             && item.capabilities.qos.qosParam.maxIOPS != undefined">
             IOPS <= {{item.capabilities.qos.qosParam.maxIOPS}} IOPS/TB
           </span>
+          </div>
         </div>
       </div>
     </div>
