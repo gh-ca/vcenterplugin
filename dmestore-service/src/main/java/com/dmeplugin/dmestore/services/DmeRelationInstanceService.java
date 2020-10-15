@@ -55,6 +55,11 @@ public interface DmeRelationInstanceService {
 
     Map<String, Map<String, Object>> getLunInstance();
 
+    Map<String, Map<String, Object>> getStorageDeviceInstance();
+
+    Map<String, Map<String, Object>> getStoragePoolInstance();
+
+
 
 }
 

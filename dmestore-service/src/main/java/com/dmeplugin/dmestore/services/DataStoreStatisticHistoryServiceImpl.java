@@ -225,6 +225,86 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         return queryStatisticByObjType("serviceLevel StroagePool", params, idInstanceIdMap);
     }
 
+    @Override
+    public Map<String, Object> queryStoragePoolStatistic(Map<String, Object> params) throws Exception {
+        Map<String, String> idInstancdIdMap = new HashMap<>();
+        List<String> instanceIds = new ArrayList<>();
+        List<String> ids = (List<String>) params.get("obj_ids");
+        Object indicatorIds = params.get("indicator_ids");
+        Map<String, Map<String, Object>> sysLunMap = dmeRelationInstanceService.getStoragePoolInstance();
+        for (String id : ids) {
+            try {
+                String instanceId = sysLunMap.get(id).get("resId").toString();
+                if (!StringUtils.isEmpty(instanceId)) {
+                    idInstancdIdMap.put(id, instanceId);
+                    instanceIds.add(instanceId);
+                }
+            } catch (Exception e) {
+                log.warn("查询存储池性能,通过storagePoolId查询instanceId异常,storagePoolId:" + id);
+            }
+        }
+        if (instanceIds.size() > 0) {
+            params.put("obj_ids", instanceIds);
+        }
+        if (null == indicatorIds) {
+            indicatorIds = initStoragePoolIndicator();
+            params.put("indicator_ids", indicatorIds);
+        }
+        String obj_type_id = "1125912791744512";//SYS_StoragePool
+        params.put("obj_type_id", obj_type_id);
+        return queryStatisticByObjType("queryStoragePoolStatistic", params, idInstancdIdMap);
+    }
+
+    @Override
+    public Map<String, Object> queryStoragePoolCurrentStatistic(Map<String, Object> params) throws Exception {
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> queryStorageDevcieStatistic(Map<String, Object> params) throws Exception {
+        Map<String, String> idInstancdIdMap = new HashMap<>();
+        List<String> instanceIds = new ArrayList<>();
+        List<String> ids = (List<String>) params.get("obj_ids");
+        Object indicatorIds = params.get("indicator_ids");
+        Map<String, Map<String, Object>> instanceMap = dmeRelationInstanceService.getStorageDeviceInstance();
+        for (String id : ids) {
+            try {
+                String instanceId = instanceMap.get(id).get("resId").toString();
+                if (!StringUtils.isEmpty(instanceId)) {
+                    idInstancdIdMap.put(id, instanceId);
+                    instanceIds.add(instanceId);
+                }
+            } catch (Exception e) {
+                log.warn("查询存储设备性能,通过storageDeviceId查询instanceId异常,storageDeviceId:" + id);
+            }
+        }
+        if (instanceIds.size() > 0) {
+            params.put("obj_ids", instanceIds);
+        }
+        if (null == indicatorIds) {
+            indicatorIds = initStorageDeviceIndicator();
+            params.put("indicator_ids", indicatorIds);
+        }
+        String obj_type_id = "1125912791744512";//SYS_StoragePool
+        params.put("obj_type_id", obj_type_id);
+        return queryStatisticByObjType("queryStoragePoolStatistic", params, idInstancdIdMap);
+    }
+
+    @Override
+    public Map<String, Object> queryStorageDevcieCurrentStatistic(Map<String, Object> params) throws Exception {
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> queryHistoryStatistic(String resType, Map<String, Object> params) throws Exception {
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> queryCurrentStatistic(String resType, Map<String, Object> params) throws Exception {
+        return null;
+    }
+
     //查询sourceId下relationName对应的关系
     private RelationInstance getInstance(String relationName, String sourceId) {
         RelationInstance relationInstance = null;
@@ -521,6 +601,27 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         return indicators;
     }
 
+    //Storagepool 默认指标集合
+    private List<String> initStoragePoolIndicator() {
+        List<String> indicators = new ArrayList<>();
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT);//IOPS
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME);//时延
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH);//带宽
+        return indicators;
+    }
+
+    //StorageDevice 默认指标集合
+    private List<String> initStorageDeviceIndicator() {
+        List<String> indicators = new ArrayList<>();
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_READTHROUGHPUT);//读IOPS
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_WRITETHROUGHPUT);//写IOPS
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_READBANDWIDTH);//带宽
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_WRITEBANDWIDTH);//带宽
+        return indicators;
+    }
+
+    //1125912791744512
+
     //消息转换  提取实时性能数据
     private JsonObject getCurrentStatistic(Object object) {
         JsonObject data = new JsonObject();
@@ -622,6 +723,47 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                                 break;
                             }
                             indicatorValueMap.put("avg", avgMap);
+                        }
+                        indicatorMap.put(indicatoerId, indicatorValueMap);
+                    }
+                    objectMap.put(objectId, indicatorMap);
+                }
+            }
+        }
+        return objectMap;
+    }
+
+    //消息转换 object-map 提取指定的标签
+    private Map<String, Object> convertMap(String type,JsonElement jsonElement) {
+        Map<String, Object> objectMap = new HashMap<>();
+        if (!ToolUtils.jsonIsNull(jsonElement)) {
+            Set<Map.Entry<String, JsonElement>> objectSet = jsonElement.getAsJsonObject().entrySet();
+            for (Map.Entry<String, JsonElement> objectEntry : objectSet) {
+                String objectId = objectEntry.getKey();
+                JsonElement objectElement = objectEntry.getValue();
+                //Map<String,Object> objectValueMap = new HashMap<>();
+                if (!ToolUtils.jsonIsNull(objectElement)) {
+                    Set<Map.Entry<String, JsonElement>> objectValueSet = objectElement.getAsJsonObject().entrySet();
+                    Map<String, Object> indicatorMap = new HashMap<>();
+                    for (Map.Entry<String, JsonElement> indicaterEntry : objectValueSet) {
+                        Map<String, Object> indicatorValueMap = new HashMap<>();
+                        String indicatoerId = indicaterEntry.getKey();
+                        JsonElement indicatorElement = indicaterEntry.getValue();
+                        JsonObject indicatorValueObject = indicatorElement.getAsJsonObject();
+
+
+
+                        JsonElement maxElement = indicatorValueObject.get("max");
+                        if (!ToolUtils.jsonIsNull(maxElement)) {
+                            Map<String, String> maxValueMap = new HashMap<>();
+                            Set<Map.Entry<String, JsonElement>> maxSet = maxElement.getAsJsonObject().entrySet();
+                            for (Map.Entry<String, JsonElement> maxEntry : maxSet) {
+                                String time = maxEntry.getKey();
+                                String value = maxEntry.getValue().getAsString();
+                                maxValueMap.put(time, value);
+                                break;
+                            }
+                            indicatorValueMap.put("max", maxValueMap);
                         }
                         indicatorMap.put(indicatoerId, indicatorValueMap);
                     }
