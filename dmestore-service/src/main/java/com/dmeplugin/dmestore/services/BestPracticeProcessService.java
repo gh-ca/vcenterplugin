@@ -7,11 +7,7 @@ import com.dmeplugin.dmestore.model.BestPracticeUpResultResponse;
 import java.util.List;
 
 /**
- * @author admin
- * @version 1.0.0
- * @ClassName BestPracticeProcessService.java
- * @Description TODO
- * @createTime 2020年09月15日 16:35:00
+ * @author wangxiangyong
  */
 public interface BestPracticeProcessService {
     List<BestPracticeCheckRecordBean> getCheckRecord() throws Exception;
@@ -29,10 +25,7 @@ public interface BestPracticeProcessService {
      **/
     List<BestPracticeUpResultResponse> update(List<String> objectIds) throws Exception;
 
-
-
-
-    public List<BestPracticeUpResultResponse> updateByCluster(String clusterobjectid) throws Exception;
+    List<BestPracticeUpResultResponse> updateByCluster(String clusterobjectid) throws Exception;
 
     /**
      * @Author Administrator

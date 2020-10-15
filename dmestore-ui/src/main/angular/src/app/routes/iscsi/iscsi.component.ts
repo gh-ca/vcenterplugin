@@ -61,6 +61,7 @@ export class IscsiComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     const ctx = this.gs.getClientSdk().app.getContextObjects();
     console.log(ctx);
+    this.hostObjectId = ctx[0].id;
     this.ipsGetUrlParams.params.hostObjectId = this.hostObjectId;
     this.configModel.hostObjectId = this.hostObjectId;
     this.loadIps();

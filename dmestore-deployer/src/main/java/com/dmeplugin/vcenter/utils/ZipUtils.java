@@ -10,6 +10,9 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
+/**
+ * @author andrewliu
+ */
 public class ZipUtils {
 	public static String getVersionFromPackage(String file) throws Exception {
         ZipFile zf = null;

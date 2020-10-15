@@ -1,11 +1,7 @@
 package com.dmeplugin.dmestore.model;
 
 /**
- * @Author wangxiangyong
- * @Description //TODO 
- * @Date 17:47 2020/9/27
- * @Param 
- * @Return 
+ * @author wangxiangyong
  **/
 public class CustomizeVolumeTuningForCreate {
     private SmartQos smartqos;

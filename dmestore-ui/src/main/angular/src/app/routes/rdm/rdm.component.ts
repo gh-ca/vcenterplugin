@@ -38,6 +38,8 @@ export class RdmComponent implements OnInit {
   serviceLevelsRes = [];
   serviceLevels = [];
   service_level_id = '';
+
+  vmObjectId = '';
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
               private commonService: CommonService,
@@ -49,6 +51,7 @@ export class RdmComponent implements OnInit {
     this.tierFresh();
     const ctx = this.gs.getClientSdk().app.getContextObjects();
     console.log(ctx);
+    this.vmObjectId = ctx[0].id;
   }
 
   // 刷新服务等级列表
@@ -94,7 +97,7 @@ export class RdmComponent implements OnInit {
       return;
     }
     console.log(this.configModel);
-    const vmObjectId = 'urn:vmomi:VirtualMachine:vm-229:f8e381d7-074b-4fa9-9962-9a68ab6106e1';
+    //this.vmObjectId = 'urn:vmomi:VirtualMachine:vm-229:f8e381d7-074b-4fa9-9962-9a68ab6106e1';
     let body = {};
     if (this.configModel.storageType == '2'){
       body = {
@@ -117,7 +120,7 @@ export class RdmComponent implements OnInit {
         }
       };
     }
-    this.http.post('v1/vmrdm/createRdm?hostId='+this.hostSelected+'&vmObjectId='+vmObjectId+'&dataStoreName='+this.dataStoreName
+    this.http.post('v1/vmrdm/createRdm?hostId='+this.hostSelected+'&vmObjectId='+this.vmObjectId+'&dataStoreName='+this.dataStoreName
       , body).subscribe((result: any) => {
       console.log(result);
     }, err => {

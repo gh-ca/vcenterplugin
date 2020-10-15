@@ -137,11 +137,12 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                     Map<String, Object> shareClientHostMap = nfsShareClientArrayAddition.get(i);
                     if (shareClientHostMap != null && shareClientHostMap.size() > 0 && shareClientHostMap.get("objectId") != null) {
                         reqNfsShareClientArrayAddition.put("name", shareClientHostMap.get("name"));
-                        reqNfsShareClientArrayAddition.put("accessval", shareClientHostMap.get("accessval"));
-                        reqNfsShareClientArrayAddition.put("sync", shareClientHostMap.get("sync"));
-                        reqNfsShareClientArrayAddition.put("all_squash", shareClientHostMap.get("all_squash"));
-                        reqNfsShareClientArrayAddition.put("root_squash", shareClientHostMap.get("root_squash"));
-                        reqNfsShareClientArrayAddition.put("secure", shareClientHostMap.get("secure"));
+                        //设置创建nfs默认值
+                        reqNfsShareClientArrayAddition.put("accessval", "read-only");
+                        reqNfsShareClientArrayAddition.put("sync", "synchronization");
+                        reqNfsShareClientArrayAddition.put("all_squash", "all_squash");
+                        reqNfsShareClientArrayAddition.put("root_squash", "root_squash");
+                        reqNfsShareClientArrayAddition.put("secure", "insecure");
                         mount.put((String) shareClientHostMap.get("objectId"), (String) shareClientHostMap.get("name"));
                     }
                     reqNfsShareClientArrayAdditions.add(reqNfsShareClientArrayAddition);
@@ -280,7 +281,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     public Map<String, Object> updateNfsDatastore(Map<String, Object> params) {
 
         Map<String, Object> resMap = new HashMap<>();
-        resMap.put("code", 200);
+        resMap.put("code", 202);
         resMap.put("msg", "update nfs datastore success !");
 
         if (params == null || params.size() == 0) {
@@ -305,29 +306,25 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             if (qos_policy!=null&&qos_policy.size()!=0) {
                 tuning.put("qos_policy", qos_policy);
             }
-            fsReqBody.put("tuning", gson.toJson(tuning));
+            fsReqBody.put("tuning", tuning);
         }
 
         String file_system_id = (String) params.get("file_system_id");
-        Boolean capacity_autonegotiation = (Boolean)params.get("capacity_autonegotiation");
-        String name = (String) params.get("name");
-        if (!StringUtils.isEmpty(file_system_id)) {
-            fsReqBody.put("file_system_id", file_system_id);
-        }
+        Object capacity_autonegotiation = params.get("capacity_autonegotiation");
+
         if (capacity_autonegotiation != null) {
             fsReqBody.put("capacity_autonegotiation", capacity_autonegotiation);
         }
-        if (!StringUtils.isEmpty(name)) {
-            fsReqBody.put("name", name);
-        }
         try {
-            Map<String, Object> stringObjectMap = updateFileSystem(fsReqBody);
-            int code = ToolUtils.getInt(stringObjectMap.get("code"));
-            if (code == 202) {
-                LOG.info("{"+name+"}"+stringObjectMap.get("msg"));
-            } else {
-                LOG.info("{"+name+"}"+stringObjectMap.get("msg"));
-                resMap.put("msg",stringObjectMap.get("msg"));
+            if (!StringUtils.isEmpty(file_system_id)) {
+                Map<String, Object> stringObjectMap = updateFileSystem(fsReqBody,file_system_id);
+                int code = ToolUtils.getInt(stringObjectMap.get("code"));
+                if (code == 202) {
+                    LOG.info("{fs}"+stringObjectMap.get("msg"));
+                } else {
+                    LOG.info("{fs}"+stringObjectMap.get("msg"));
+                    resMap.put("msg",stringObjectMap.get("msg"));
+                }
             }
             //update nfs datastore
             String result = vcsdkUtils.renameDataStore(nfsName, dataStoreObjectId);
@@ -547,13 +544,12 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         return data_space;
     }
 
-    private Map<String,Object> updateFileSystem(Map<String,Object> params) throws Exception {
+    private Map<String,Object> updateFileSystem(Map<String,Object> params,String file_system_id) throws Exception {
 
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", 202);
         resMap.put("msg", "update nfs datastore success !");
 
-        String file_system_id = (String) params.get("file_system_id");
         if (StringUtils.isEmpty(file_system_id)) {
             resMap.put("code", 403);
             resMap.put("msg", "update nfs datastore error !");
@@ -681,7 +677,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         DmeVmwareRelation datastoreInfo = gson.fromJson(params, DmeVmwareRelation.class);
         datastoreInfo.setLogicPortId(current_port_id);
         datastoreInfo.setLogicPortName(logicPortName);
-        datastoreInfo.setStoreId(storage_id);
         datastoreInfo.setFsId(fsId);
         datastoreInfo.setFsName(fs_name);
         datastoreInfo.setShareName(share_name);

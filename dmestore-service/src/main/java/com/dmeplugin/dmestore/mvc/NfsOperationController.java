@@ -33,7 +33,7 @@ public class NfsOperationController extends BaseController{
      *      pool_raw_id str  存储池在指定存储设备上的id 必
      *      exportPath str 文件路径（和共享路径相同） 必
      *      String nfsName 名称  必
-     *      String accessMode  读写权限 必
+     *      String accessMode  读写权限 必 （ "readWrite" : "readOnly"）
      *      String type  NFS版本 （标准：NFS / NFS41） 必
      *      filesystem_specs  array  文件系统规格属性[{
      *           capacity double 该规格文件系统容量，单位GB  必
@@ -46,8 +46,6 @@ public class NfsOperationController extends BaseController{
      *      tuning属性 （高级属性设置）{
      *           deduplication_enabled  boolean 重复数据删除。默认关闭
      *           compression_enabled  boolean 数据压缩。默认关闭
-     *           application_scenario str 应用场景。database： 数据库；VM：虚拟机；user_defined：自定义。默认自定义
-     *           block_size int 文件系统块大小，单位KB
      *           allocation_type str 文件系统分配类型，取值范围 thin，thick。默认为thin
      *           }
      *      qos_policy 属性(开启后 需要参数){
@@ -62,11 +60,8 @@ public class NfsOperationController extends BaseController{
      *           share_path str 共享路径 必
      *         }
      *      nfs_share_client_addition  array  NFS共享客户端 [{
-     *          name str   客户端IP或主机名或网络组名 必
-     *          accessval str 权限：read-only：只读， read/write：读写 必
-     *          sync str 写入模式：synchronization：同步， asynchronization：异步 必
-     *          all_squash str 权限限制：all_squash，no_all_squash 必
-     *          root_squash str root权限限制：root_squash，no_root_squash 必
+     *          name str   客户端IP或主机名或网络组名(vkernel ip) 必
+     *          objectId String  主机objectId
      *          }]
      * @param params
      * @return
@@ -92,7 +87,7 @@ public class NfsOperationController extends BaseController{
      *      fs params:
      *      file_system_id String 文件系统唯一标识 必
      *      capacity_autonegotiation 自动扩缩容 相关属性{
-     *          auto_size_enable  boolean 自动调整容量开关。 false: 关闭；true：打开。默认打开
+     *          auto_size_enable  boolean 自动调整容量开关。 false: 关闭；true：打开。默认false
      *       },
      *       name String fs名字
      *       tuning属性 （高级属性设置）{
@@ -120,7 +115,7 @@ public class NfsOperationController extends BaseController{
     public ResponseBodyBean updateNfsDatastore(@RequestBody Map<String,Object> params){
 
         Map<String,Object> resMap = nfsOperationService.updateNfsDatastore(params);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.ACCEPTED.value())) {
             return success(resMap);
         }
         return failure(gson.toJson(resMap));

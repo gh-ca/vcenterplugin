@@ -12,11 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @Description: TODO
- * @ClassName: BestPracticeCheckDao
- * @Company: GH-CA
  * @author: wangxiangyong
- * @create: 2020-09-16
  **/
 public class BestPracticeCheckDao extends H2DataBaseDao {
 

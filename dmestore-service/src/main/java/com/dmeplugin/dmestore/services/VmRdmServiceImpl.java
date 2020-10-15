@@ -25,10 +25,6 @@ import java.util.concurrent.*;
 
 /**
  * @author wangxiangyong
- * @version 1.0.0
- * @ClassName VMRDMService.java
- * @Description TODO
- * @createTime 2020年09月09日 10:58:00
  */
 public class VmRdmServiceImpl implements VmRdmService {
     private static final Logger LOG = LoggerFactory.getLogger(VmRdmServiceImpl.class);
