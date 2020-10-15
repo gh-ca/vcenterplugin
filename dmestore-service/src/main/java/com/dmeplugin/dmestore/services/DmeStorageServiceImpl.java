@@ -2,6 +2,7 @@ package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.model.*;
+import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
@@ -46,6 +47,12 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     private DmeVmwareRalationDao dmeVmwareRalationDao;
 
     private VCSDKUtils vcsdkUtils;
+
+    private DataStoreStatisticHistoryService dataStoreStatisticHistoryService;
+
+    public void setDataStoreStatisticHistoryService(DataStoreStatisticHistoryService dataStoreStatisticHistoryService) {
+        this.dataStoreStatisticHistoryService = dataStoreStatisticHistoryService;
+    }
 
     public VCSDKUtils getVcsdkUtils() {
         return vcsdkUtils;
@@ -1064,5 +1071,45 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
     }
 
+    @Override
+    public List<Storage> listStoragePerformance(List<String> storageIds) throws Exception{
+        List<Storage> relists = null;
+        try {
+            if (storageIds != null && storageIds.size() > 0) {
+                Map<String, Object> params = new HashMap<>(16);
+                params.put("obj_ids", storageIds);
+                Map<String, Object> remap = dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params);
+                LOG.info("remap===" + gson.toJson(remap));
+                if (null != remap && null != remap.get(DmeConstants.DATA)) {
+                    try {
+                        JsonObject dataJson = new JsonParser().parse(remap.get("data").toString()).getAsJsonObject();
+                        if (dataJson != null) {
+                            relists = new ArrayList<>();
+                            for (String storageId : storageIds) {
+                                JsonObject statisticObject = dataJson.getAsJsonObject(storageId);
+                                if (statisticObject != null) {
+                                    Storage storage = new Storage();
+                                    storage.setId(storageId);
+                                    storage.setMaxIops(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    storage.setMaxBandwidth(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    storage.setMaxCpuUtilization(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    storage.setMaxLatency(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    storage.setMaxOps(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    relists.add(storage);
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        LOG.warn("查询vmfs实时性能数据listVmfsPerformance异常", e);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("list vmfs performance error:", e);
+            throw e;
+        }
+        LOG.info("listVmfsPerformance relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        return relists;
+    }
 
 }

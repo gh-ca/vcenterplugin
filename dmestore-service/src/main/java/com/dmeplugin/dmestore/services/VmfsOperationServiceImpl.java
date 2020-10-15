@@ -446,7 +446,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         storage.setIp(ToolUtils.jsonToStr(jsonObject.get("ip")));
         storage.setStatus(ToolUtils.jsonToStr(jsonObject.get("status")));
         storage.setVendor(ToolUtils.jsonToStr(jsonObject.get("vendor")));
-        storage.setProduct_version(ToolUtils.jsonToStr(jsonObject.get("product_version")));
+        storage.setProductVersion(ToolUtils.jsonToStr(jsonObject.get("product_version")));
         Double used_capacity = ToolUtils.jsonToDou(jsonObject.get("used_capacity"), 0.0);
         storage.setUsedCapacity(used_capacity);
         Double total_capacity = ToolUtils.jsonToDou(jsonObject.get("total_capacity"), 0.0);
