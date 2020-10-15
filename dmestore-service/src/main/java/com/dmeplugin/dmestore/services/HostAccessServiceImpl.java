@@ -14,11 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @ClassName HostAccessServiceImpl
- * @Description TODO
- * @Author wangxiangyong
- * @Date 2020/9/4 10:33
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class HostAccessServiceImpl implements HostAccessService {
     private static final Logger LOG = LoggerFactory.getLogger(HostAccessServiceImpl.class);

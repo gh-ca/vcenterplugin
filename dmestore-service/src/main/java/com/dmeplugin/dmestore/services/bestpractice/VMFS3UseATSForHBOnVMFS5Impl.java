@@ -3,11 +3,7 @@ package com.dmeplugin.dmestore.services.bestpractice;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 
 /**
- * @ClassName VMFS3UseATSForHBOnVMFS5Impl
- * @Description TODO
- * @Author wangxiangyong
- * @Date 2020/9/15 10:26
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class VMFS3UseATSForHBOnVMFS5Impl extends BaseBestPracticeService implements BestPracticeService {
     @Override

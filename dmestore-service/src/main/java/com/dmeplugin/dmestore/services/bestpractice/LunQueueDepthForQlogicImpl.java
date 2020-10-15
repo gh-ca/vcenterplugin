@@ -3,11 +3,7 @@ package com.dmeplugin.dmestore.services.bestpractice;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 
 /**
- * @ClassName LunQueueDepthForQlogicImpl
- * @Description 板卡队列深度 For QLogic
- * @Author wangxiangyong
- * @Date 2020/9/15 10:26
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class LunQueueDepthForQlogicImpl extends BaseBestPracticeService implements BestPracticeService {
     @Override

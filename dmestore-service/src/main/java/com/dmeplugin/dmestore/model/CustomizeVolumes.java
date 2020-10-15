@@ -3,11 +3,7 @@ package com.dmeplugin.dmestore.model;
 import java.util.List;
 
 /**
- * @ClassName CustomizeVolumes
- * @Description TODO
- * @Author wangxiangyong
- * @Date 2020/9/27 16:17
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class CustomizeVolumes {
     private String availability_zone;

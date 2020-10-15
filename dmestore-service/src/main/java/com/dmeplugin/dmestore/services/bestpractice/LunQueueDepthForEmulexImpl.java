@@ -3,11 +3,7 @@ package com.dmeplugin.dmestore.services.bestpractice;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 
 /**
- * @ClassName LunQueueDepthForEmulexImpl
- * @Description 板卡队列深度 For Emulex
- * @Author wangxiangyong
- * @Date 2020/9/15 10:26
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class LunQueueDepthForEmulexImpl extends BaseBestPracticeService implements BestPracticeService {
     @Override

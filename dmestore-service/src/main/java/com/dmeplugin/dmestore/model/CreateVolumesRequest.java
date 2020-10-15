@@ -3,11 +3,7 @@ package com.dmeplugin.dmestore.model;
 import java.util.List;
 
 /**
- * @ClassName CreateVolumesRequest
- * @Description TODO
- * @Author wangxiangyong
- * @Date 2020/9/27 15:52
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class CreateVolumesRequest {
     private String service_level_id;
