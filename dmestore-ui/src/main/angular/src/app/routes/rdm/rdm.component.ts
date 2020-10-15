@@ -115,7 +115,7 @@ export class RdmComponent implements OnInit {
         this.configModel.tuning.compression_enabled = null;
       }
       if(!this.policyEnable.smartTier && !this.policyEnable.qosPolicy && !this.policyEnable.resourceTuning){
-        this.configModel.tuning = {};
+        this.configModel.tuning = null;
       }
       body = {
         customizeVolumesRequest: {
