@@ -89,13 +89,13 @@
       <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.serviceLevelName}}</clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.vmfsProtected ? '保护':'未保护'}}</clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.iops}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='chart'">{{('vmfs.upper' | translate)+' '+item.maxIops+' | '+('vmfs.lower' | translate)+' '+item.minIops}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='chart'">{{('vmfs.upper' | translate)+' '+ (item.maxIops || "--")+' | '+('vmfs.lower' | translate)+' '+(item.minIops || "--")}}</clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.bandwidth}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='chart'">{{('vmfs.upper' | translate)+' '+item.maxBandwidth+' | '+('vmfs.lower' | translate)+' '+item.minBandwidth}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='chart'">{{('vmfs.upper' | translate)+' '+(item.maxBandwidth|| "--")+' | '+('vmfs.lower' | translate)+' '+(item.minBandwidth || "--")}}</clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.readResponseTime}}</clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.writeResponseTime}}</clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.latency}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='chart'" >{{('vmfs.lower' | translate)+' '+item.latency}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='chart'" >{{('vmfs.lower' | translate)+' '+(item.latency || "--")}}</clr-dg-cell>
     </clr-dg-row>
     <clr-dg-footer>
 
