@@ -26,6 +26,10 @@
                 <span class="gh-info-value">
                 </span>
                 <span class="gh-info-value" *ngIf="hostModel.hostIp != ''">{{'overview.connected' | translate}}</span>
+                <span class="gh-info-value" *ngIf="hostModel.hostIp == ''">
+                  <button type="button" (click)="showPop()" class="btn btn-icon" aria-label="home"><clr-icon shape="add"></clr-icon>
+                  </button>
+                </span>
               </div>
             </div>
           </div>

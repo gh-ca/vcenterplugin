@@ -9,6 +9,7 @@
     <clr-dg-row *ngFor="let item of configModel.volume_specs" [clrDgItem]="item">
       <clr-dg-cell style="width: 200px">
         <input type="text" required [(ngModel)]="item.name" #name="ngModel" name="name" style="height: 30px"/>
+        <!--<div [hidden]="item.name!==''">*爱好为必填项</div>-->
       </clr-dg-cell>
       <clr-dg-cell style="width: 200px">
         <input type="number" [(ngModel)]="item.capacity" name="capacity" #number="ngModel" style="height: 30px;width: 100px"/>
@@ -20,28 +21,32 @@
       <clr-dg-cell style="width: 200px">
         <input type="number" [(ngModel)]="item.count" name="count" #number="ngModel" style="height: 30px"/>
       </clr-dg-cell>
-      <clr-dg-cell style="width: 100px">
+      <clr-dg-cell [hidden]="configModel.volume_specs.length===1" style="width: 100px">
         <span (click)="basRemove(item)" style="color:#00F;cursor:pointer">{{'rdm.remove' | translate}}</span>
+      </clr-dg-cell>
+      <clr-dg-cell [hidden]="configModel.volume_specs.length!==1" style="width: 100px">
       </clr-dg-cell>
     </clr-dg-row>
   </clr-datagrid>
 </div>
-<form clrForm>
+<form clrForm #rdmForm="ngForm">
   <div class="clr-row">
     <span (click)="basAdd()" style="margin-top: 20px;margin-left: 20px;color:#00F;cursor:pointer">{{'rdm.add' | translate}}</span>
   </div>
   <div class="clr-row">
     <clr-select-container>
       <label>{{'rdm.host' | translate}}<span style="color: red">*</span></label>
-      <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="hostSelected" name="hostSelected" class="clr-select" (change)="loadDataStore(hostSelected)">
+      <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="hostSelected" required name="hostSelected" class="clr-select" (change)="loadDataStore(hostSelected)">
         <option *ngFor="let item of hostList" value="{{item.id}}">{{item.ip}}({{item.name}})</option>
       </select>
+      <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
     </clr-select-container>
     <clr-select-container>
       <label>{{'rdm.dataStore' | translate}}<span style="color: red">*</span></label>
-      <select clrSelect (ngModelOptions)="dataStores" [(ngModel)]="dataStoreName" name="dataStoreName" class="clr-select">
+      <select clrSelect (ngModelOptions)="dataStores" required [(ngModel)]="dataStoreName" name="dataStoreName" class="clr-select">
         <option *ngFor="let item of dataStores" value="{{item.name}}">{{item.name}}</option>
       </select>
+      <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
     </clr-select-container>
 
     <!-- 选择 服务等级 存储选-->
@@ -126,17 +131,19 @@
     <div *ngIf="levelCheck==='storage'" [hidden]="levelCheck !=='storage'">
       <clr-select-container>
         <label>{{'rdm.storage' | translate}}<span style="color: red">*</span></label>:
-        <select clrSelect  [(ngModel)]="configModel.storage_id" name="storage_id" (ngModelChange)="loadStoragePool(configModel.storage_id);">
+        <select clrSelect  [(ngModel)]="configModel.storage_id" name="storage_id" required (ngModelChange)="loadStoragePool(configModel.storage_id);">
           <option value=""></option>
           <option *ngFor="let item of storageDevices" value="{{item.id}}">{{item.name}}</option>
         </select>
+        <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-select-container>
       <clr-select-container>
         <label>{{'rdm.sPool' | translate}}<span style="color: red">*</span></label>:
-        <select clrSelect [(ngModel)]="configModel.pool_raw_id" name="pool_raw_id" >
+        <select clrSelect [(ngModel)]="configModel.pool_raw_id" name="pool_raw_id" required>
           <option value=""></option>
           <option *ngFor="let item of storagePools" value="{{item.storage_pool_id}}">{{item.name}}</option>
         </select>
+        <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-select-container>
       <!--<clr-combobox-container>
         <label>{{'rdm.host' | translate}}<span style="color: red">*</span></label>
@@ -162,31 +169,34 @@
 
       <clr-select-container>
         <label>{{'rdm.ownerC' | translate}}<span style="color: red">*</span></label>:
-        <select clrSelect [(ngModel)]="configModel.owner_controller" name="owner_controller" >
+        <select clrSelect [(ngModel)]="configModel.owner_controller" name="owner_controller" required>
           <option value="0">{{'rdm.autoSelect' | translate}}</option>
           <option value="1">0A</option>
           <option value="2">0B</option>
         </select>
+        <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-select-container>
 
       <clr-select-container>
         <label>{{'rdm.idp' | translate}}<span style="color: red">*</span></label>:
-        <select clrSelect [(ngModel)]="configModel.initial_distribute_policy" name="initial_distribute_policy" >
+        <select clrSelect [(ngModel)]="configModel.initial_distribute_policy" name="initial_distribute_policy" required>
           <option value="0">{{'rdm.autoSelect' | translate}}</option>
           <option value="1">{{'rdm.hperformanceLevel' | translate}}</option>
           <option value="2">{{'rdm.performanceLevel' | translate}}</option>
           <option value="3">{{'rdm.capacityLevel' | translate}}</option>
         </select>
+        <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-select-container>
 
       <clr-select-container>
         <label>{{'rdm.fetchP' | translate}}<span style="color: red">*</span></label>:
-        <select clrSelect [(ngModel)]="configModel.prefetch_policy" name="prefetch_policy" >
+        <select clrSelect [(ngModel)]="configModel.prefetch_policy" name="prefetch_policy" required>
           <option value="0">{{'rdm.notFetch' | translate}}</option>
           <option value="1">{{'rdm.fixedFetch' | translate}}</option>
           <option value="2">{{'rdm.variableFetch' | translate}}</option>
           <option value="3">{{'rdm.smartFetch' | translate}}</option>
         </select>
+        <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-select-container>
 
       <!-- 调优 -->
