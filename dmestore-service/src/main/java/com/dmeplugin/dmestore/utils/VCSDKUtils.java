@@ -706,9 +706,10 @@ public class VCSDKUtils {
                             VmfsDatastoreOption vmfsDatastoreOption = vmfsDatastoreOptions.get(0);
                             String diskUuid = vmfsDatastoreOption.getSpec().getDiskUuid();
                             VmfsDatastoreExpandSpec spec = (VmfsDatastoreExpandSpec) vmfsDatastoreOption.getSpec();
-                            HostDiskPartitionSpec hostDiskPartitionSpec = new HostDiskPartitionSpec();
-                            hostDiskPartitionSpec.setTotalSectors(spec.getPartition().getTotalSectors());
-                            spec.setPartition(hostDiskPartitionSpec);
+                            //HostDiskPartitionSpec hostDiskPartitionSpec = new HostDiskPartitionSpec();
+                            //hostDiskPartitionSpec.setTotalSectors(spec.getPartition().getTotalSectors());
+                            //todo 终于搞出来了 组长还是厉害
+                            //spec.getPartition().setTotalSectors();
                             host1.getHostDatastoreSystemMO().expandVmfsDatastore(dsMo, spec);
                             scanDataStore(null,hostObjectId);
                         }
@@ -771,13 +772,6 @@ public class VCSDKUtils {
      **/
     public String createNfsDatastore(String serverHost, String exportPath, String nfsName, String accessMode, List<Map<String,String>> hostObjectIds,String type) {
         String response = "";
-        //exportPath = "/volume1/TESTNFS";
-        //需要判断nfs版本，如果是v4.1要将 Kerberos 安全功能与 NFS 4.1 结合使用，请启用 Kerberos 并选择适当的 Kerberos 模型。
-        //nfsName = "lqnfsv3.1";
-        //remoteHostNames equal remoteHost(v3)
-        //serverHost = "10.143.132.187";
-        //mountHost = "10.143.132.17";
-        //logicPort = 0;
         logger.info("start creat nfs datastore");
         accessMode = StringUtils.isEmpty(accessMode) || "readWrite".equals(accessMode) ? "readWrite" : "readOnly";
         try {
