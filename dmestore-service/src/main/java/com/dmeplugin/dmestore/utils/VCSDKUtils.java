@@ -1181,7 +1181,7 @@ public class VCSDKUtils {
             }
 
             sessionHelper = new SessionHelper();
-            sessionHelper.login(vCenterInfo.getHostIp(), String.valueOf(vCenterInfo.getHostPort()),vCenterInfo.getUserName(), vCenterInfo.getPassword());
+            sessionHelper.login(vCenterInfo.getHostIp(), String.valueOf(vCenterInfo.getHostPort()),vCenterInfo.getUserName(), CipherUtils.decryptString(vCenterInfo.getPassword()));
             TaggingWorkflow taggingWorkflow = new TaggingWorkflow(sessionHelper);
 
             List<String> taglist = taggingWorkflow.listTags();
