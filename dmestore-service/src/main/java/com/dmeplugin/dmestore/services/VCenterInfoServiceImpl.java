@@ -33,15 +33,7 @@ public class VCenterInfoServiceImpl extends DMEOpenApiService implements VCenter
     return vCenterInfoDao.addVCenterInfo(vCenterInfo);
   }
 
-  private void encode(VCenterInfo vCenterInfo) {
 
-    try {
-      vCenterInfo.setPassword(CipherUtils.encryptString(vCenterInfo.getPassword()));
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-
-  }
 
   @Override
   public int saveVCenterInfo(final VCenterInfo vCenterInfo)
@@ -65,16 +57,11 @@ public class VCenterInfoServiceImpl extends DMEOpenApiService implements VCenter
         vCenterInfo1.setHostPort(vCenterInfo.getHostPort());
         if (vCenterInfo.getPassword() != null && !"".equals(vCenterInfo.getPassword())) {
           vCenterInfo1.setPassword(vCenterInfo.getPassword());
-          encode(vCenterInfo1);
-        }
 
+        }
 
         returnValue = vCenterInfoDao.updateVCenterInfo(vCenterInfo1);
       } else {
-        // insert
-        encode(vCenterInfo);
-
-
 
         returnValue = addVCenterInfo(vCenterInfo);
       }

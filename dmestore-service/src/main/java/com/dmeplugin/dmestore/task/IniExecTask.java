@@ -63,7 +63,7 @@ public class IniExecTask implements ApplicationListener<ContextRefreshedEvent> {
     }
 
     private void initTask() {
-        ScheduledExecutorService mScheduledExecutorService = Executors.newScheduledThreadPool(3);
+        ScheduledExecutorService mScheduledExecutorService = Executors.newScheduledThreadPool(1);
         mScheduledExecutorService.schedule(new Runnable() {
             @Override
             public void run() {
@@ -72,28 +72,6 @@ public class IniExecTask implements ApplicationListener<ContextRefreshedEvent> {
                 LOG.info("--->ini Scan Datastore Task...end");
             }
         }, 10, TimeUnit.SECONDS);
-        mScheduledExecutorService.schedule(new Runnable() {
-            @Override
-            public void run() {
-                LOG.info("--->ini update service level Task...start");
-                serviceLevelService.updateVmwarePolicy();
-                LOG.info("--->ini update service level Task...end");
-            }
-        }, 10, TimeUnit.SECONDS);
-        mScheduledExecutorService.schedule(new Runnable() {
-            @Override
-            public void run() {
-                LOG.info("--->ini check best practise Task...start");
-                try {
-                    bestPracticeProcessService.check(null);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    LOG.error("CheckBestPractise error",e);
-                }
-                LOG.info("--->ini check best practise Task...end");
-            }
-        }, 10, TimeUnit.SECONDS);
-
     }
 
     private void iniScheduleTask() {
