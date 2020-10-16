@@ -707,9 +707,7 @@ public class VCSDKUtils {
                             String diskUuid = vmfsDatastoreOption.getSpec().getDiskUuid();
                             VmfsDatastoreExpandSpec spec = (VmfsDatastoreExpandSpec) vmfsDatastoreOption.getSpec();
                             HostVmfsVolume vmfs = datastoreInfo.getVmfs();
-                            Integer blockSize = vmfs.getBlockSize();
-                            int maxBlocks = vmfs.getMaxBlocks();
-                            Long totalSectors = addCapacity * ToolUtils.GI * 1L / vmfs.getBlockSize() * vmfs.getMaxBlocks();
+                            Long totalSectors = addCapacity * ToolUtils.GI * 1L / vmfs.getBlockSize();
                             spec.getPartition().setTotalSectors(totalSectors);
                             host1.getHostDatastoreSystemMO().expandVmfsDatastore(dsMo, spec);
                             scanDataStore(null,hostObjectId);

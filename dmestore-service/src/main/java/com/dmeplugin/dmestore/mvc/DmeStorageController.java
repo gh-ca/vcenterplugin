@@ -2,6 +2,8 @@ package com.dmeplugin.dmestore.mvc;
 
 import com.dmeplugin.dmestore.model.EthPortInfo;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
+import com.dmeplugin.dmestore.model.Storage;
+import com.dmeplugin.dmestore.model.StoragePool;
 import com.dmeplugin.dmestore.services.DmeStorageService;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.google.gson.Gson;
