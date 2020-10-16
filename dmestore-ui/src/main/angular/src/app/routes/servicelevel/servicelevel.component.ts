@@ -201,7 +201,6 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(()=>{
       this.storeagePoolIsloading = true;
       this.http.post('servicelevel/listStoragePoolsByServiceLevelId', this.selectedModel.id).subscribe((response: any) => {
-        console.log(response);
         if (response.code == '200'){
           this.storagePoolList = response.data;
         } else{
@@ -511,7 +510,6 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   syncStoragePolicy(){
     const url = "servicelevel/manualupdate";
     this.http.post(url, {}).subscribe((response: any) => {
-      console.log(response);
       if (response.code == '200'){
          alert("同步成功");
       } else{
