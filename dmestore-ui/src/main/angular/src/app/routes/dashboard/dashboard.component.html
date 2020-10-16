@@ -50,7 +50,7 @@
         <div class="clr-col-12">
           <div class="info-charts-wrap">
             <div echarts [options]="{}" (chartInit)= "storageNumChartInit($event)" style="width: 30%;height: 150px;margin-right: 20%;"></div>
-            <div class="info-content">
+            <div class="info-content" style="cursor:pointer" (click)="toDatastoreDeviceView()">
               <div class="info-content-text">
                 <span>{{'overview.total' | translate}}</span>
                 <span>{{storageNum.total}}</span>

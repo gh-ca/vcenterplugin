@@ -260,4 +260,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   }
+
+  toDatastoreDeviceView(){
+    this.router.navigate(['storage'],{
+      queryParams:{
+      }
+    });
+  }
 }
