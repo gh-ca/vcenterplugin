@@ -140,7 +140,6 @@ export class RdmComponent implements OnInit {
     }
     this.http.post('v1/vmrdm/createRdm?hostId='+this.hostSelected+'&vmObjectId='+this.vmObjectId+'&dataStoreName='+this.dataStoreName
       , body).subscribe((result: any) => {
-      console.log(result);
     }, err => {
       console.error('ERROR', err);
     });
@@ -148,7 +147,6 @@ export class RdmComponent implements OnInit {
 
   basAdd(){
     this.configModel.volume_specs.push(new volume_specs());
-    console.log(this.configModel.volume_specs);
   }
 
   basRemove(item){
@@ -204,7 +202,6 @@ export class RdmComponent implements OnInit {
 
   loadHosts(){
     this.http.get('v1/vmrdm/dmeHosts').subscribe((result: any) => {
-      console.log(result);
       if (result.code === '0' || result.code === '200'){
         this.hostList = result.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -216,7 +213,6 @@ export class RdmComponent implements OnInit {
 
   loadDataStore(id: string){
     this.http.get('v1/vmrdm/vCenter/datastoreOnHost', { params: {hostId : id}}).subscribe((result: any) => {
-      console.log(result);
       if (result.code === '0' || result.code === '200'){
         this.dataStores = result.data;
       } else{
