@@ -31,13 +31,13 @@
                 <td class="left">{{'storage.detail.conf.model' | translate}}</td>
                 <td class="left">{{detail.model}}</td>
                 <td class="left">{{'storage.detail.conf.az' | translate}}</td>
-                <td class="left">{{detail.azIds}} azIds 返回的是id数组</td>
+                <td class="left">{{detail.azIds.length>0?detail.azIds:'--'}}</td>
               </tr>
               <tr>
                 <td class="left">{{'storage.detail.conf.wp' | translate}}</td>
-                <td class="left">维保时间未找到字段</td>
+                <td class="left">{{detail.maintenanceStart}}--{{detail.maintenanceOvertime}}</td>
                 <td class="left">{{'storage.detail.conf.location' | translate}}</td>
-                <td class="left">{{detail.location}}</td>
+                <td class="left">{{detail.location || '--'}}</td>
               </tr>
             </table>
             <div *ngIf="!detail" style="height: 50%">
@@ -67,7 +67,7 @@
                           <label for="btn-demo-radio-3"><clr-icon shape="radar" size="20"></clr-icon></label>
                         </div>
                         <div class="radio btn merginLeft">
-                          <label><clr-icon shape="refresh" size="20"></clr-icon></label>
+                          <label><clr-icon shape="refresh" size="20" (click)="getStoragePoolList(true)"></clr-icon></label>
                         </div>
                       </div>
                     </div>
@@ -101,10 +101,13 @@
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">服务等级接口无字段</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">{{item.tier0_raid_lv}}</clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.total_capacity}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.consumed_capacity}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.consumed_capacity_percentage}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.free_capacity}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{formatCapacity(item.total_capacity)}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{formatCapacity(item.consumed_capacity)}}</clr-dg-cell>
+                        <!--<clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.consumed_capacity_percentage}}</clr-dg-cell>-->
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'">
+                          <clr-progress-bar clrValue="{{(item.consumed_capacity_percentage * 100).toFixed(3)}}" clrSuccess clrLabeled></clr-progress-bar>
+                        </clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{formatCapacity(item.free_capacity)}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.subscription_rate}}</clr-dg-cell>
 
                         <clr-dg-cell [hidden]="poolRadio!=='table3'">时延接口无相关字段</clr-dg-cell>
@@ -133,7 +136,7 @@
                           <label for="btn-demo-radio-5"><clr-icon shape="dashboard" size="20"></clr-icon></label>
                         </div>
                         <div class="radio btn merginLeft">
-                          <label><clr-icon shape="refresh" size="20"></clr-icon></label>
+                          <label><clr-icon shape="refresh" size="20" (click)="getStorageVolumeList(true)"></clr-icon></label>
                         </div>
                       </div>
                     </div>
@@ -148,6 +151,7 @@
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.stoPool' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.serviceLevel' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.protStatus' | translate}}</clr-dg-column>
+                      <clr-dg-column [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.dataStore' | translate}}</clr-dg-column>
 
                       <clr-dg-column [hidden]="volumeRadio!=='table2'">{{'storage.detail.volumes.latency' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="volumeRadio!=='table2'">{{'storage.detail.volumes.iops' | translate}}</clr-dg-column>
@@ -160,11 +164,14 @@
 
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{formatCapacity(item.capacity)}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.alloctype}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.capacity_usage || "--"}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">
+                          <clr-progress-bar clrValue="{{parseUsage(item.capacity_usage)}}" clrSuccess clrLabeled></clr-progress-bar>
+                        </clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">映射状态接口无相关字段</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.storage_pool_name}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.service_level_name}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.protectionStatus}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.datastores}}</clr-dg-cell>
 
                         <clr-dg-cell [hidden]="volumeRadio!=='table2'">时延接口无相关字段</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table2'">IOPS接口无相关字段</clr-dg-cell>
@@ -185,7 +192,7 @@
                       <!--刷新 -->
                       <div class="btn-group btn-icon">
                         <div class="radio btn merginLeft">
-                          <label><clr-icon shape="refresh" size="20"></clr-icon></label>
+                          <label><clr-icon shape="refresh" (click)="getFileSystemList(true)" size="20"></clr-icon></label>
                         </div>
                       </div>
                     </div>
@@ -199,7 +206,7 @@
                       <clr-dg-column>{{'storage.detail.fileSystems.capacityUsage' | translate}}</clr-dg-column>
                       <clr-dg-column>{{'storage.detail.fileSystems.ownSto' | translate}}</clr-dg-column>
                       <clr-dg-column>{{'storage.detail.fileSystems.nfs' | translate}}</clr-dg-column>
-                      <clr-dg-column>{{'storage.detail.fileSystems.cifs' | translate}}</clr-dg-column>
+                      <!--<clr-dg-column>{{'storage.detail.fileSystems.cifs' | translate}}</clr-dg-column>-->
                       <clr-dg-column>{{'storage.detail.fileSystems.dtree' | translate}}</clr-dg-column>
 
                       <clr-dg-row *clrDgItems="let item of fsList" [clrDgItem]="item">
@@ -207,12 +214,14 @@
                         <clr-dg-cell>{{item.health_status}}</clr-dg-cell>
                         <clr-dg-cell>{{item.alloc_type}}</clr-dg-cell>
                         <clr-dg-cell>文件系统类型接口无字段</clr-dg-cell>
-                        <clr-dg-cell>{{item.capacity}}</clr-dg-cell>
+                        <clr-dg-cell>{{formatCapacity(item.capacity)}}</clr-dg-cell>
                         <clr-dg-cell>可用容量接口无字段</clr-dg-cell>
-                        <clr-dg-cell>{{item.capacity_usage_ratio}}</clr-dg-cell>
+                        <clr-dg-cell>
+                          <clr-progress-bar clrValue="{{item.capacity_usage_ratio.toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar>
+                        </clr-dg-cell>
                         <clr-dg-cell>{{item.storage_pool_name}}</clr-dg-cell>
                         <clr-dg-cell>{{item.nfs_count}}</clr-dg-cell>
-                        <clr-dg-cell>{{item.cifs_count}}</clr-dg-cell>
+                        <!--<clr-dg-cell>{{item.cifs_count}}</clr-dg-cell>-->
                         <clr-dg-cell>{{item.dtree_count}}</clr-dg-cell>
                       </clr-dg-row>
 
@@ -230,7 +239,7 @@
                       <!--刷新 -->
                       <div class="btn-group btn-icon">
                         <div class="radio btn merginLeft">
-                          <label><clr-icon shape="refresh" size="20"></clr-icon></label>
+                          <label><clr-icon shape="refresh" size="20" (click)="getDtreeList(true)"></clr-icon></label>
                         </div>
                       </div>
                     </div>
@@ -240,15 +249,15 @@
                       <clr-dg-column>{{'storage.detail.dtrees.osl' | translate}}</clr-dg-column>
                       <clr-dg-column>{{'storage.detail.dtrees.secMod' | translate}}</clr-dg-column>
                       <clr-dg-column>{{'storage.detail.dtrees.nfs' | translate}}</clr-dg-column>
-                      <clr-dg-column>{{'storage.detail.dtrees.cifs' | translate}}</clr-dg-column>
+                      <!--<clr-dg-column>{{'storage.detail.dtrees.cifs' | translate}}</clr-dg-column>-->
                       <clr-dg-column>{{'storage.detail.dtrees.quota' | translate}}</clr-dg-column>
                       <clr-dg-row  *clrDgItems="let item of dtrees" [clrDgItem]="item">
                         <clr-dg-cell>{{item.name}}</clr-dg-cell>
                         <clr-dg-cell>{{item.fs_name}}</clr-dg-cell>
-                        <clr-dg-cell>{{item.tier_name}}</clr-dg-cell>
-                        <clr-dg-cell>{{item.security_style}}</clr-dg-cell>
+                        <clr-dg-cell>{{item.tier_name||'--'}}</clr-dg-cell>
+                        <clr-dg-cell>{{item.security_style||'--'}}</clr-dg-cell>
                         <clr-dg-cell>{{item.nfs_count}}</clr-dg-cell>
-                        <clr-dg-cell>{{item.cifs_count}}</clr-dg-cell>
+                        <!--<clr-dg-cell>{{item.cifs_count}}</clr-dg-cell>-->
                         <clr-dg-cell>{{item.quota_switch}}</clr-dg-cell>
                       </clr-dg-row>
                     </clr-datagrid>
@@ -269,7 +278,7 @@
                             <!--刷新 -->
                             <div class="btn-group btn-icon">
                               <div class="radio btn merginLeft">
-                                <label><clr-icon shape="refresh" size="20"></clr-icon></label>
+                                <label><clr-icon shape="refresh" size="20" (click)="getShareList(true)"></clr-icon></label>
                               </div>
                             </div>
                           </div>
@@ -279,7 +288,14 @@
                             <clr-dg-column>{{'storage.detail.shares.ofs' | translate}}</clr-dg-column>
                             <clr-dg-column>{{'storage.detail.shares.od' | translate}}</clr-dg-column>
                             <clr-dg-column>{{'storage.detail.shares.osl' | translate}}</clr-dg-column>
-                            <clr-dg-cell></clr-dg-cell>
+                            <clr-dg-row  *clrDgItems="let item of shares" [clrDgItem]="item">
+                              <clr-dg-cell>{{item.name}}</clr-dg-cell>
+                              <clr-dg-cell>{{item.share_path}}</clr-dg-cell>
+                              <clr-dg-cell>{{item.fs_name}}</clr-dg-cell>
+                              <clr-dg-cell>{{item.owning_dtree_name||'--'}}</clr-dg-cell>
+                              <clr-dg-cell>{{item.tier_name||'--'}}</clr-dg-cell>
+                            </clr-dg-row>
+
                           </clr-datagrid>
                         </div>
                       </clr-accordion-content>
@@ -421,6 +437,17 @@
                         <clr-dg-column>{{'storage.detail.hardware.controllers.ops' | translate}}</clr-dg-column>
                         <clr-dg-column>{{'storage.detail.hardware.controllers.latency' | translate}}</clr-dg-column>
                         <clr-dg-column>{{'storage.detail.hardware.controllers.bandwidth' | translate}}</clr-dg-column>
+                        <clr-dg-row  *clrDgItems="let item of controllers" [clrDgItem]="item">
+                          <clr-dg-cell>{{item.name}}</clr-dg-cell>
+                          <clr-dg-cell>{{item.status}}</clr-dg-cell>
+                          <clr-dg-cell>{{item.softVer}}</clr-dg-cell>
+                          <clr-dg-cell>--</clr-dg-cell>
+                          <clr-dg-cell>--</clr-dg-cell>
+                          <clr-dg-cell>--</clr-dg-cell>
+                          <clr-dg-cell>--</clr-dg-cell>
+                          <clr-dg-cell>--</clr-dg-cell>
+
+                        </clr-dg-row>
                       </clr-datagrid>
                     </div>
                   </clr-tab-content>
@@ -441,7 +468,19 @@
                         <clr-dg-column >{{'storage.detail.hardware.disks.latency' | translate}}</clr-dg-column>
                         <clr-dg-column >{{'storage.detail.hardware.disks.bandwidth' | translate}}</clr-dg-column>
                         <clr-dg-column >{{'storage.detail.hardware.disks.usage' | translate}}</clr-dg-column>
-
+                        <clr-dg-row  *clrDgItems="let item of disks" [clrDgItem]="item">
+                          <clr-dg-cell>{{item.name}}</clr-dg-cell>
+                          <clr-dg-cell>{{item.status}}</clr-dg-cell>
+                          <clr-dg-cell>--</clr-dg-cell>
+                          <clr-dg-cell>{{formatCapacity(item.capacity)}}</clr-dg-cell>
+                          <clr-dg-cell>--</clr-dg-cell>
+                          <clr-dg-cell>--</clr-dg-cell>
+                          <clr-dg-cell>--</clr-dg-cell>
+                          <clr-dg-cell>--</clr-dg-cell>
+                          <clr-dg-cell>--</clr-dg-cell>
+                          <clr-dg-cell>--</clr-dg-cell>
+                          <clr-dg-cell>--</clr-dg-cell>
+                        </clr-dg-row>
                       </clr-datagrid>
                     </div>
                   </clr-tab-content>
@@ -452,7 +491,7 @@
                     <div class="detail-margin-top">
                       <clr-accordion>
                         <clr-accordion-panel>
-                          <clr-accordion-title>FC Ports(8)</clr-accordion-title>
+                          <clr-accordion-title>FC Ports({{fcs==null?0:fcs.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid>
                               <clr-dg-column >{{'storage.detail.hardware.ports.location' | translate}}</clr-dg-column>
@@ -463,11 +502,48 @@
                               <clr-dg-column >{{'storage.detail.hardware.ports.latency' | translate}}</clr-dg-column>
                               <clr-dg-column >{{'storage.detail.hardware.ports.bandwidth' | translate}}</clr-dg-column>
                               <clr-dg-column >{{'storage.detail.hardware.ports.usage' | translate}}</clr-dg-column>
+                              <clr-dg-row  *clrDgItems="let item of fcs" [clrDgItem]="item">
+                                <clr-dg-cell>{{item.location}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.status}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.wwn}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.speed}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.iops|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.latency|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.bandwidth|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.usage|| '--'}}</clr-dg-cell>
+                              </clr-dg-row>
                             </clr-datagrid>
                           </clr-accordion-content>
                         </clr-accordion-panel>
                         <clr-accordion-panel>
-                          <clr-accordion-title>Ethernet Port(8)</clr-accordion-title>
+                          <clr-accordion-title>Ethernet Port({{eths==null?0:eths.length}})</clr-accordion-title>
+                          <clr-accordion-content *clrIfExpanded>
+                            <clr-datagrid>
+                              <clr-dg-column >{{'storage.detail.hardware.ports.location' | translate}}</clr-dg-column>
+                              <clr-dg-column >{{'storage.detail.hardware.ports.status' | translate}}</clr-dg-column>
+                              <clr-dg-column >{{'storage.detail.hardware.ports.ipv4' | translate}}</clr-dg-column>
+                              <clr-dg-column >{{'storage.detail.hardware.ports.ipv6' | translate}}</clr-dg-column>
+                              <clr-dg-column >{{'storage.detail.hardware.ports.workingRate' | translate}}</clr-dg-column>
+                              <clr-dg-column >{{'storage.detail.hardware.ports.iops' | translate}}</clr-dg-column>
+                              <clr-dg-column >{{'storage.detail.hardware.ports.latency' | translate}}</clr-dg-column>
+                              <clr-dg-column >{{'storage.detail.hardware.ports.bandwidth' | translate}}</clr-dg-column>
+                              <clr-dg-column >{{'storage.detail.hardware.ports.usage' | translate}}</clr-dg-column>
+                              <clr-dg-row  *clrDgItems="let item of eths" [clrDgItem]="item">
+                                <clr-dg-cell>{{item.location}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.status}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.ipv4|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.ipv6|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.speed}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.iops|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.latency|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.bandwidth|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.usage|| '--'}}</clr-dg-cell>
+                              </clr-dg-row>
+                            </clr-datagrid>
+                          </clr-accordion-content>
+                        </clr-accordion-panel>
+                        <clr-accordion-panel>
+                          <clr-accordion-title>FCoE Port({{fcoes==null?0:fcoes.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid>
                               <clr-dg-column >{{'storage.detail.hardware.ports.location' | translate}}</clr-dg-column>
@@ -478,26 +554,21 @@
                               <clr-dg-column >{{'storage.detail.hardware.ports.latency' | translate}}</clr-dg-column>
                               <clr-dg-column >{{'storage.detail.hardware.ports.bandwidth' | translate}}</clr-dg-column>
                               <clr-dg-column >{{'storage.detail.hardware.ports.usage' | translate}}</clr-dg-column>
+                              <clr-dg-row  *clrDgItems="let item of fcoes" [clrDgItem]="item">
+                                <clr-dg-cell>{{item.location}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.status}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.wwn}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.speed}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.iops|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.latency|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.bandwidth|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.usage|| '--'}}</clr-dg-cell>
+                              </clr-dg-row>
                             </clr-datagrid>
                           </clr-accordion-content>
                         </clr-accordion-panel>
                         <clr-accordion-panel>
-                          <clr-accordion-title>FCoE Port(0)</clr-accordion-title>
-                          <clr-accordion-content *clrIfExpanded>
-                            <clr-datagrid>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.location' | translate}}</clr-dg-column>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.status' | translate}}</clr-dg-column>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.wwn' | translate}}</clr-dg-column>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.workingRate' | translate}}</clr-dg-column>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.iops' | translate}}</clr-dg-column>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.latency' | translate}}</clr-dg-column>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.bandwidth' | translate}}</clr-dg-column>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.usage' | translate}}</clr-dg-column>
-                            </clr-datagrid>
-                          </clr-accordion-content>
-                        </clr-accordion-panel>
-                        <clr-accordion-panel>
-                          <clr-accordion-title>Bond Port(1)</clr-accordion-title>
+                          <clr-accordion-title>Bond Port({{bonds==null?0:bonds.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid>
                               <clr-dg-column >{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
@@ -507,11 +578,20 @@
                               <clr-dg-column >{{'storage.detail.hardware.ports.totalIops' | translate}}</clr-dg-column>
                               <clr-dg-column >{{'storage.detail.hardware.ports.avg' | translate}}</clr-dg-column>
                               <clr-dg-column >{{'storage.detail.hardware.ports.totalBandwidth' | translate}}</clr-dg-column>
+                              <clr-dg-row  *clrDgItems="let item of bonds" [clrDgItem]="item">
+                                <clr-dg-cell>{{item.name}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.health_status}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.running_status}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.mtu}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.iops|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.latency|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.bandwidth|| '--'}}</clr-dg-cell>
+                              </clr-dg-row>
                             </clr-datagrid>
                           </clr-accordion-content>
                         </clr-accordion-panel>
                         <clr-accordion-panel>
-                          <clr-accordion-title>Logical Port(2)</clr-accordion-title>
+                          <clr-accordion-title>Logical Port({{logicports==null?0:logicports.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid>
                               <clr-dg-column >{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
@@ -525,15 +605,32 @@
                               <clr-dg-column >{{'storage.detail.hardware.ports.dataProtocol' | translate}}</clr-dg-column>
                               <clr-dg-column >{{'storage.detail.hardware.ports.manageAccess' | translate}}</clr-dg-column>
                               <clr-dg-column >{{'storage.detail.hardware.ports.vStoreName' | translate}}</clr-dg-column>
+                              <clr-dg-row  *clrDgItems="let item of logicports" [clrDgItem]="item">
+                                <clr-dg-cell>{{item.name}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.running_status}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.operational_status}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.mgmt_ip|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.mgmt_ipv6|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.current_port_name|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.role|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.ddns_status|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.support_protocol|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.management_access|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.vstore_name|| '--'}}</clr-dg-cell>
+                              </clr-dg-row>
                             </clr-datagrid>
                           </clr-accordion-content>
                         </clr-accordion-panel>
                         <clr-accordion-panel>
-                          <clr-accordion-title>Failover Group(2)</clr-accordion-title>
+                          <clr-accordion-title>Failover Group({{fgs==null?0:fgs.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid>
                               <clr-dg-column >{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
                               <clr-dg-column >{{'storage.detail.hardware.ports.type' | translate}}</clr-dg-column>
+                              <clr-dg-row  *clrDgItems="let item of fgs" [clrDgItem]="item">
+                                <clr-dg-cell>{{item.name}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.failover_group_type}}</clr-dg-cell>
+                              </clr-dg-row>
                             </clr-datagrid>
                           </clr-accordion-content>
                         </clr-accordion-panel>

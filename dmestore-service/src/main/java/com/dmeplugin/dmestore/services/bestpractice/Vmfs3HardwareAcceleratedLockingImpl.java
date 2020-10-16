@@ -3,11 +3,7 @@ package com.dmeplugin.dmestore.services.bestpractice;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 
 /**
- * @ClassName VMFS3HardwareAcceleratedLockingImpl
- * @Description TODO
- * @Author wangxiangyong
- * @Date 2020/9/15 10:26
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class Vmfs3HardwareAcceleratedLockingImpl extends BaseBestPracticeService implements BestPracticeService {
     @Override

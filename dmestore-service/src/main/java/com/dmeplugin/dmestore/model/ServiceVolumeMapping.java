@@ -1,11 +1,7 @@
 package com.dmeplugin.dmestore.model;
 
 /**
- * @ClassName ServiceVolumeMapping
- * @Description TODO
- * @Author wangxiangyong
- * @Date 2020/9/27 16:00
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class ServiceVolumeMapping {
     private String host_id;

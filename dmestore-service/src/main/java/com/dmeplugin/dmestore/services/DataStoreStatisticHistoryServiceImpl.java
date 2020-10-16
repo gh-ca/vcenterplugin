@@ -55,10 +55,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     public Map<String, Object> queryVmfsStatisticCurrent(Map<String, Object> params) throws Exception {
         Map<String, String> idInstancdIdMap = new HashMap<>();
         List<String> instanceIds = new ArrayList<>();
-        Map<String, Object> remap = new HashMap<>();
-        remap.put("code", 503);
-        remap.put("message", "queryStatistic failed!");
-        remap.put("data", "queryStatistic failed!");
         Object indicatorIds = params.get("indicator_ids");
         List<String> ids = (List<String>) params.get("obj_ids");
         //ids若为wwn的集合则转换为对应的instanceId集合,也有可能ids直接就是volume的instanceId集合
@@ -85,7 +81,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         }
         String obj_type_id = "1125921381679104";//SYS_Lun
         params.put("obj_type_id", obj_type_id);
-        return queryStatisticByObjType("queryVmfsStatisticCurrent", params, idInstancdIdMap);
+        return queryHistoryStatistic("queryVmfsStatisticCurrent", params, idInstancdIdMap);
     }
 
     @Override
@@ -102,67 +98,27 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         }
         String obj_type_id = "1126179079716864";//SYS_StorageFileSystem
         params.put("obj_type_id", obj_type_id);
-        return queryStatisticByObjType("queryNfsStatisticCurrent", params, null);
+        return queryHistoryStatistic("queryNfsStatisticCurrent", params, null);
     }
 
     //查询卷的性能
     @Override
     public Map<String, Object> queryVolumeStatistic(Map<String, Object> params) throws Exception {
-        Map<String, String> idInstancdIdMap = new HashMap<>();
-        List<String> instanceIds = new ArrayList<>();
-        Object indicatorIds = params.get("indicator_ids");
-        Object objIds = params.get("obj_ids");
-        List<String> ids = getObjIds(objIds);
-        //ids若为wwn的集合则转换为对应的instanceId集合,也有可能ids直接就是volume的instanceId集合
-        if (ids.size() > 0) {
-            Map<String, Map<String, Object>> sysLunMap = dmeRelationInstanceService.getLunInstance();
-            for (String id : ids) {
-                try {
-                    String instanceId = sysLunMap.get(id).get("resId").toString();
-                    if (!StringUtils.isEmpty(instanceId)) {
-                        idInstancdIdMap.put(id, instanceId);
-                        instanceIds.add(instanceId);
-                    }
-                } catch (Exception e) {
-                    log.warn("查询磁盘性能,通过wwn查询instanceId异常,wwn:" + id);
-                }
-            }
-            if (instanceIds.size() > 0) {
-                params.put("obj_ids", instanceIds);
-            }
-        }
-        String obj_type_id = "1125921381679104";//SYS_Lun
-        params.put("obj_type_id", obj_type_id);
-        if (null == indicatorIds) {
-            indicatorIds = initVolumeIndicator();
-            params.put("indicator_ids", indicatorIds);
-        }
-        return queryStatisticByObjType("volume", params, idInstancdIdMap);
+        Map<String, String> idInstancdIdMap = initParamVolume(params);
+        return queryHistoryStatistic("volume", params, idInstancdIdMap);
     }
 
     //查询FS的性能(NFS)
     @Override
     public Map<String, Object> queryFsStatistic(Map<String, Object> params) throws Exception {
-        Object indicatorIds = params.get("indicator_ids");
-        String obj_type_id = "1126179079716864";//SYS_StorageFileSystem
-        params.put("obj_type_id", obj_type_id);
-        if (null == indicatorIds) {
-            indicatorIds = initFsIndicator();
-            params.put("indicator_ids", indicatorIds);
-        }
-        return queryStatisticByObjType("storageFileSystem", params, null);
+        Map<String, String> idInstancdIdMap = initParamFs(params);
+        return queryHistoryStatistic("storageFileSystem", params, idInstancdIdMap);
     }
 
     @Override
     public Map<String, Object> queryServiceLevelStatistic(Map<String, Object> params) throws Exception {
-        Object indicatorIds = params.get("indicator_ids");
-        String obj_type_id = "1126174784749568";//SYS_DjTier
-        params.put("obj_type_id", obj_type_id);
-        if (null == indicatorIds) {
-            indicatorIds = initServiceLevelIndicator();
-            params.put("indicator_ids", indicatorIds);
-        }
-        return queryStatisticByObjType("serviceLevel", params, null);
+        Map<String, String> idInstancdIdMap = initParamServiceLevel(params);
+        return queryHistoryStatistic("serviceLevel", params, idInstancdIdMap);
     }
 
     @Override
@@ -192,7 +148,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicatorIds = initServiceLevelLunIndicator();
             params.put("indicator_ids", indicatorIds);
         }
-        return queryStatisticByObjType("serviceLevel Lun", params, idInstanceIdMap);
+        return queryHistoryStatistic("serviceLevel Lun", params, idInstanceIdMap);
     }
 
     @Override
@@ -222,7 +178,236 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicatorIds = initServiceLevelStoragePoolIndicator();
             params.put("indicator_ids", indicatorIds);
         }
-        return queryStatisticByObjType("serviceLevel StroagePool", params, idInstanceIdMap);
+        return queryHistoryStatistic("serviceLevel StroagePool", params, idInstanceIdMap);
+    }
+
+    @Override
+    public Map<String, Object> queryStoragePoolStatistic(Map<String, Object> params) throws Exception {
+        Map<String, String> idInstancdIdMap = initParamStoragePool(params);
+        return queryHistoryStatistic("queryStoragePoolStatistic", params, idInstancdIdMap);
+    }
+
+    @Override
+    public Map<String, Object> queryStorageDevcieStatistic(Map<String, Object> params) throws Exception {
+        Map<String, String> idInstancdIdMap = initParamStorageDevice(params);
+        return queryHistoryStatistic("queryStorageDevcieStatistic", params, idInstancdIdMap);
+    }
+
+    @Override
+    public Map<String, Object> queryStorageDevcieCurrentStatistic(Map<String, Object> params) throws Exception {
+        Map<String, String> idInstancdIdMap = initParamStorageDevice(params);
+        return queryCurrentStatistic("StorageDevcie", params, idInstancdIdMap);
+    }
+
+    @Override
+    public Map<String, Object> queryStoragePoolCurrentStatistic(Map<String, Object> params) throws Exception {
+        Map<String, String> idInstancdIdMap = initParamStoragePool(params);
+        return queryCurrentStatistic("StoragePool", params, idInstancdIdMap);
+    }
+
+    public Map<String, Object> queryVolumeCurrentStatistic(Map<String, Object> params) throws Exception {
+        Map<String, String> idInstancdIdMap = initParamVolume(params);
+        return queryCurrentStatistic("volume", params, idInstancdIdMap);
+    }
+
+    public Map<String, Object> queryServiceLevelCurrentStatistic(Map<String, Object> params) throws Exception {
+        Map<String, String> idInstancdIdMap = initParamServiceLevel(params);
+        return queryCurrentStatistic("volume", params, idInstancdIdMap);
+    }
+
+    public Map<String, Object> queryFsCurrentStatistic(Map<String, Object> params) throws Exception {
+        Map<String, String> idInstancdIdMap = initParamFs(params);
+        return queryCurrentStatistic("volume", params, idInstancdIdMap);
+    }
+
+
+    @Override
+    public Map<String, Object> queryHistoryStatistic(String relationOrInstance, Map<String, Object> params) throws Exception {
+        Map<String, Object> resultMap = new HashMap<>();
+        if (!StringUtils.isEmpty(relationOrInstance)) {
+            switch (relationOrInstance) {
+                case DmeIndicatorConstants.RESOURCE_TYPE_NAME_STORAGEDEVICE:
+                    resultMap = queryStorageDevcieStatistic(params);
+                    break;
+                case DmeIndicatorConstants.RESOURCE_TYPE_NAME_STORAGEPOOL:
+                    resultMap = queryStoragePoolStatistic(params);
+                    break;
+                case DmeIndicatorConstants.RESOURCE_TYPE_NAME_LUN:
+                    resultMap = queryVolumeStatistic(params);
+                    break;
+                case DmeIndicatorConstants.RESOURCE_TYPE_NAME_SERVICELEVEL:
+                    resultMap = queryServiceLevelStatistic(params);
+                    break;
+                case DmeIndicatorConstants.RESOURCE_TYPE_NAME_FILESYSTEM:
+                    resultMap = queryFsStatistic(params);
+                    break;
+                default:
+                    resultMap.put("code", 503);
+                    resultMap.put("message", "query " + relationOrInstance + " statistic error, non-supported relation and instance!");
+                    log.error("query " + relationOrInstance + " statistic error, non-supported relation and instance.the params is:{}", gson.toJson(params));
+            }
+
+        }
+        return resultMap;
+    }
+
+    @Override
+    public Map<String, Object> queryCurrentStatistic(String relationOrInstance, Map<String, Object> params) throws Exception {
+        Map<String, Object> resultMap = new HashMap<>();
+        if (!StringUtils.isEmpty(relationOrInstance)) {
+            switch (relationOrInstance) {
+                case DmeIndicatorConstants.RESOURCE_TYPE_NAME_STORAGEDEVICE:
+                    resultMap = queryStorageDevcieCurrentStatistic(params);
+                    break;
+                case DmeIndicatorConstants.RESOURCE_TYPE_NAME_STORAGEPOOL:
+                    resultMap = queryStoragePoolCurrentStatistic(params);
+                    break;
+                case DmeIndicatorConstants.RESOURCE_TYPE_NAME_LUN:
+                    resultMap = queryVolumeCurrentStatistic(params);
+                    break;
+                case DmeIndicatorConstants.RESOURCE_TYPE_NAME_SERVICELEVEL:
+                    resultMap = queryServiceLevelCurrentStatistic(params);
+                    break;
+                case DmeIndicatorConstants.RESOURCE_TYPE_NAME_FILESYSTEM:
+                    resultMap = queryFsCurrentStatistic(params);
+                    break;
+                default:
+                    resultMap.put("code", 503);
+                    resultMap.put("message", "query " + relationOrInstance + " current statistic error, non-supported relation and instance!");
+                    log.error("query " + relationOrInstance + " current statistic error, non-supported relation and instance.the params is:{}", gson.toJson(params));
+            }
+
+        }
+        return resultMap;
+    }
+
+    //预处理存储设备参数
+    private Map<String, String> initParamStorageDevice(Map<String, Object> params) {
+        if (null == params || params.size() == 0) {
+            return null;
+        }
+        Map<String, String> idInstancdIdMap = new HashMap<>();
+        List<String> instanceIds = new ArrayList<>();
+        List<String> ids = (List<String>) params.get("obj_ids");
+        Object indicatorIds = params.get("indicator_ids");
+        Map<String, Map<String, Object>> instanceMap = dmeRelationInstanceService.getStorageDeviceInstance();
+        for (String id : ids) {
+            try {
+                String instanceId = instanceMap.get(id).get("resId").toString();
+                if (!StringUtils.isEmpty(instanceId)) {
+                    idInstancdIdMap.put(id, instanceId);
+                    instanceIds.add(instanceId);
+                }
+            } catch (Exception e) {
+                log.warn("查询存储设备性能,通过storageDeviceId查询instanceId异常,storageDeviceId:" + id);
+            }
+        }
+        if (instanceIds.size() > 0) {
+            params.put("obj_ids", instanceIds);
+        }
+        if (null == indicatorIds) {
+            indicatorIds = initStorageDeviceIndicator();
+            params.put("indicator_ids", indicatorIds);
+        }
+        String obj_type_id = "1125904201809920";//SYS_StorDevice
+        params.put("obj_type_id", obj_type_id);
+        return idInstancdIdMap;
+    }
+
+    //预处理存储池参数
+    private Map<String, String> initParamStoragePool(Map<String, Object> params) {
+        if (null == params || params.size() == 0) {
+            return null;
+        }
+        Map<String, String> idInstancdIdMap = new HashMap<>();
+        List<String> instanceIds = new ArrayList<>();
+        List<String> ids = (List<String>) params.get("obj_ids");
+        Object indicatorIds = params.get("indicator_ids");
+        Map<String, Map<String, Object>> sysLunMap = dmeRelationInstanceService.getStoragePoolInstance();
+        for (String id : ids) {
+            try {
+                String instanceId = sysLunMap.get(id).get("resId").toString();
+                if (!StringUtils.isEmpty(instanceId)) {
+                    idInstancdIdMap.put(id, instanceId);
+                    instanceIds.add(instanceId);
+                }
+            } catch (Exception e) {
+                log.warn("查询存储池性能,通过storagePoolId查询instanceId异常,storagePoolId:" + id);
+            }
+        }
+        if (instanceIds.size() > 0) {
+            params.put("obj_ids", instanceIds);
+        }
+        if (null == indicatorIds) {
+            indicatorIds = initStoragePoolIndicator();
+            params.put("indicator_ids", indicatorIds);
+        }
+        String obj_type_id = "1125912791744512";//SYS_StoragePool
+        params.put("obj_type_id", obj_type_id);
+        return idInstancdIdMap;
+    }
+
+    //预处理卷参数
+    private Map<String, String> initParamVolume(Map<String, Object> params) {
+        if (null == params || params.size() == 0) {
+            return null;
+        }
+        Map<String, String> idInstancdIdMap = new HashMap<>();
+        List<String> instanceIds = new ArrayList<>();
+        Object indicatorIds = params.get("indicator_ids");
+        Object objIds = params.get("obj_ids");
+        List<String> ids = getObjIds(objIds);
+        //ids若为wwn的集合则转换为对应的instanceId集合,也有可能ids直接就是volume的instanceId集合
+        if (ids.size() > 0) {
+            Map<String, Map<String, Object>> sysLunMap = dmeRelationInstanceService.getLunInstance();
+            for (String id : ids) {
+                try {
+                    String instanceId = sysLunMap.get(id).get("resId").toString();
+                    if (!StringUtils.isEmpty(instanceId)) {
+                        idInstancdIdMap.put(id, instanceId);
+                        instanceIds.add(instanceId);
+                    }
+                } catch (Exception e) {
+                    log.warn("查询磁盘性能,通过wwn查询instanceId异常,wwn:" + id);
+                }
+            }
+            if (instanceIds.size() > 0) {
+                params.put("obj_ids", instanceIds);
+            }
+        }
+        String obj_type_id = "1125921381679104";//SYS_Lun
+        params.put("obj_type_id", obj_type_id);
+        if (null == indicatorIds) {
+            indicatorIds = initVolumeIndicator();
+            params.put("indicator_ids", indicatorIds);
+        }
+        return idInstancdIdMap;
+    }
+
+    //预处理服务等级参数(params中的obj_ids如果是instanceId 则不用做转换处理)
+    private Map<String, String> initParamServiceLevel(Map<String, Object> params) {
+        Map<String, String> idInstanceIdMap = new HashMap<>();
+        Object indicatorIds = params.get("indicator_ids");
+        String obj_type_id = "1126174784749568";//SYS_DjTier
+        params.put("obj_type_id", obj_type_id);
+        if (null == indicatorIds) {
+            indicatorIds = initServiceLevelIndicator();
+            params.put("indicator_ids", indicatorIds);
+        }
+        return idInstanceIdMap;
+    }
+
+    //预处理文件系统参数(params中的obj_ids如果是instanceId 则不用做转换处理)
+    private Map<String, String> initParamFs(Map<String, Object> params) {
+        Map<String, String> idInstanceIdMap = new HashMap<>();
+        Object indicatorIds = params.get("indicator_ids");
+        String obj_type_id = "1126179079716864";//SYS_StorageFileSystem
+        params.put("obj_type_id", obj_type_id);
+        if (null == indicatorIds) {
+            indicatorIds = initFsIndicator();
+            params.put("indicator_ids", indicatorIds);
+        }
+        return idInstanceIdMap;
     }
 
     //查询sourceId下relationName对应的关系
@@ -282,10 +467,10 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     //query statistic by objType(methodName)
-    private Map<String, Object> queryStatisticByObjType(String objectType, Map<String, Object> params, Map<String, String> idInstanceIdMap) throws Exception {
+    private Map<String, Object> queryHistoryStatistic(String relationOrInstance, Map<String, Object> params, Map<String, String> idInstanceIdMap) throws Exception {
         Map<String, Object> resmap = new HashMap<>();
         resmap.put("code", 200);
-        resmap.put("message", "query" + objectType + "Statistic success!");
+        resmap.put("message", "query" + relationOrInstance + " statistic success!");
         resmap.put("data", params);
 
         ResponseEntity responseEntity;
@@ -298,34 +483,65 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
                 Object body = responseEntity.getBody();
                 String bodyStr = body.toString();
-                //将性能数据结果中的instanceId转换为参数传递的id
-                if (null != idInstanceIdMap && idInstanceIdMap.size() > 0) {
-                    for (Map.Entry<String, String> entry : idInstanceIdMap.entrySet()) {
-                        String id = entry.getKey();
-                        String instanceId = entry.getValue();
-                        if (!StringUtils.isEmpty(instanceId) && !StringUtils.isEmpty(id)) {
-                            bodyStr = bodyStr.replace(instanceId, id);
-                        }
-                    }
-                }
+                bodyStr = replace(bodyStr, idInstanceIdMap);
                 JsonObject bodyJson = new JsonParser().parse(bodyStr).getAsJsonObject();
                 statisticElement = bodyJson.get("data");
                 Map<String, Object> objectMap = convertMap(statisticElement);
                 resmap.put("data", objectMap);
                 if (null == objectMap || objectMap.size() == 0) {
                     resmap.put("code", 503);
-                    resmap.put("message", objectType + " Statistic error:" + bodyJson.get("error_msg").getAsString());
-                    log.error("query" + objectType + "Statistic error:", bodyJson.get("error_msg").getAsString());
+                    resmap.put("message", "query " + relationOrInstance + " statistic error:" + bodyJson.get("error_msg").getAsString());
+                    log.error("query " + relationOrInstance + "Statistic error:", bodyJson.get("error_msg").getAsString());
                 }
             } else {
                 resmap.put("code", 503);
-                resmap.put("message", "query" + objectType + "Statistic error!");
-                log.error("query" + objectType + "Statistic error,the params is:{}", gson.toJson(params));
+                resmap.put("message", "query " + relationOrInstance + " statistic error!");
+                log.error("query " + relationOrInstance + " statistic error,the params is:{}", gson.toJson(params));
             }
         } catch (Exception e) {
             resmap.put("code", 503);
-            resmap.put("message", "query" + objectType + "Statistic exception!");
-            log.error("query" + objectType + "Statistic exception.", e);
+            resmap.put("message", "query " + relationOrInstance + " statistic exception!");
+            log.error("query " + relationOrInstance + " statistic exception.", e);
+        }
+        return resmap;
+    }
+
+    private Map<String, Object> queryCurrentStatistic(String relationOrInstance, Map<String, Object> params, Map<String, String> idInstanceIdMap) throws Exception {
+        Map<String, Object> resmap = new HashMap<>();
+        resmap.put("code", 200);
+        resmap.put("message", "query " + relationOrInstance + " current statistic success!");
+        resmap.put("data", params);
+
+        String label = "max";
+        ResponseEntity responseEntity;
+        JsonElement statisticElement;
+        //statisticElement中 data 为空 状态码又是200的情况 暂按正常来处理
+        //{"status_code":200,"error_code":-60,"error_msg":"ES: Query DB return empty","data":{}}
+        //{"status_code":200,"error_code":0,"error_msg":"Successful.","data":{"1282FFE20AA03E4EAC9A814C687B780A":{....}}
+        try {
+            responseEntity = queryStatistic(params);
+            if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
+                Object body = responseEntity.getBody();
+                String bodyStr = body.toString();
+                bodyStr = replace(bodyStr, idInstanceIdMap);
+                JsonObject bodyJson = new JsonParser().parse(bodyStr).getAsJsonObject();
+                statisticElement = bodyJson.get("data");
+                Map<String, Object> objectMap = convertMap(statisticElement, label);
+                resmap.put("data", objectMap);
+                if (null == objectMap || objectMap.size() == 0) {
+                    resmap.put("code", 503);
+                    resmap.put("message", "query " + relationOrInstance + " current statistic error:" + bodyJson.get("error_msg").getAsString());
+                    log.error("query " + relationOrInstance + " current statistic error:", bodyJson.get("error_msg").getAsString());
+                }
+            } else {
+                resmap.put("code", 503);
+                resmap.put("message", "query " + relationOrInstance + " current statistic error!");
+                log.error("query " + relationOrInstance + " current statistic error,the params is:{}", gson.toJson(params));
+            }
+        } catch (Exception e) {
+            resmap.put("code", 503);
+            resmap.put("message", "query " + relationOrInstance + " current statistic exception!");
+            log.error("query " + relationOrInstance + " current statistic exception.", e);
         }
         return resmap;
     }
@@ -375,9 +591,8 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     // query obj_type indicators
-    private void queryIndicatorsOfObjetype(Map<String, Object> params) throws Exception {
+    private void queryIndicatorsByObjetypeId(String objtypeId) throws Exception {
         String apiUrl = OBJ_TYPE_INDICATORS_QUERY;
-        String objtypeId = params.get("obj_type_id").toString();
         apiUrl = apiUrl.replace("{obj-type-id}", objtypeId);
         if (apiUrl.indexOf("{obj-type-id}") > 0) {
             log.error("DataStoreStatistic query,the url is error, required \"obj-type-id\"!{}", apiUrl);
@@ -521,6 +736,26 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         return indicators;
     }
 
+    //Storagepool 默认指标集合
+    private List<String> initStoragePoolIndicator() {
+        List<String> indicators = new ArrayList<>();
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT);//IOPS
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME);//时延
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH);//带宽
+        return indicators;
+    }
+
+    //StorageDevice 默认指标集合
+    private List<String> initStorageDeviceIndicator() {
+        List<String> indicators = new ArrayList<>();
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_READTHROUGHPUT);//读IOPS
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_WRITETHROUGHPUT);//写IOPS
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_READBANDWIDTH);//带宽
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_WRITEBANDWIDTH);//带宽
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_THROUGHPUT);//IOPS
+        return indicators;
+    }
+
     //消息转换  提取实时性能数据
     private JsonObject getCurrentStatistic(Object object) {
         JsonObject data = new JsonObject();
@@ -559,7 +794,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             for (Map.Entry<String, JsonElement> objectEntry : objectSet) {
                 String objectId = objectEntry.getKey();
                 JsonElement objectElement = objectEntry.getValue();
-                //Map<String,Object> objectValueMap = new HashMap<>();
                 if (!ToolUtils.jsonIsNull(objectElement)) {
                     Set<Map.Entry<String, JsonElement>> objectValueSet = objectElement.getAsJsonObject().entrySet();
                     Map<String, Object> indicatorMap = new HashMap<>();
@@ -568,7 +802,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                         String indicatoerId = indicaterEntry.getKey();
                         JsonElement indicatorElement = indicaterEntry.getValue();
                         JsonObject indicatorValueObject = indicatorElement.getAsJsonObject();
-
                         JsonArray seriesArray = indicatorValueObject.get("series").getAsJsonArray();
                         if (null != seriesArray && seriesArray.size() > 0) {
                             List<Map<String, String>> seriesList = new ArrayList<>();
@@ -630,5 +863,57 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             }
         }
         return objectMap;
+    }
+
+    //消息转换 object-map 提取指定的标签
+    private Map<String, Object> convertMap(JsonElement jsonElement, String label) {
+        Map<String, Object> objectMap = new HashMap<>();
+        if (!ToolUtils.jsonIsNull(jsonElement)) {
+            Set<Map.Entry<String, JsonElement>> objectSet = jsonElement.getAsJsonObject().entrySet();
+            for (Map.Entry<String, JsonElement> objectEntry : objectSet) {
+                String objectId = objectEntry.getKey();
+                JsonElement objectElement = objectEntry.getValue();
+                //Map<String,Object> objectValueMap = new HashMap<>();
+                if (!ToolUtils.jsonIsNull(objectElement)) {
+                    Set<Map.Entry<String, JsonElement>> objectValueSet = objectElement.getAsJsonObject().entrySet();
+                    Map<String, Object> indicatorMap = new HashMap<>();
+                    for (Map.Entry<String, JsonElement> indicaterEntry : objectValueSet) {
+                        Map<String, Object> indicatorValueMap = new HashMap<>();
+                        String indicatoerId = indicaterEntry.getKey();
+                        JsonElement indicatorElement = indicaterEntry.getValue();
+                        JsonObject indicatorValueObject = indicatorElement.getAsJsonObject();
+                        JsonElement maxElement = indicatorValueObject.get(label);
+                        if (!ToolUtils.jsonIsNull(maxElement)) {
+                            Map<String, String> maxValueMap = new HashMap<>();
+                            Set<Map.Entry<String, JsonElement>> maxSet = maxElement.getAsJsonObject().entrySet();
+                            for (Map.Entry<String, JsonElement> maxEntry : maxSet) {
+                                String time = maxEntry.getKey();
+                                String value = maxEntry.getValue().getAsString();
+                                indicatorMap.put(indicatoerId, indicatorValueMap);
+                                break;
+                            }
+                            //indicatorValueMap.put("max", maxValueMap);
+                        }
+                        //indicatorMap.put(indicatoerId, indicatorValueMap);
+                    }
+                    objectMap.put(objectId, indicatorMap);
+                }
+            }
+        }
+        return objectMap;
+    }
+
+    //将性能数据结果中的instanceId转换为参数传递的id
+    private String replace(String result, Map<String, String> idInstanceIdMap) {
+        if (!StringUtils.isEmpty(result) && null != idInstanceIdMap && idInstanceIdMap.size() > 0) {
+            for (Map.Entry<String, String> entry : idInstanceIdMap.entrySet()) {
+                String id = entry.getKey();
+                String instanceId = entry.getValue();
+                if (!StringUtils.isEmpty(instanceId) && !StringUtils.isEmpty(id)) {
+                    result = result.replace(instanceId, id);
+                }
+            }
+        }
+        return result;
     }
 }

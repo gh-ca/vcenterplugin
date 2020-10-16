@@ -1,18 +1,13 @@
 package com.dmeplugin.dmestore.model;
 
 /**
- * @Author wangxiangyong
- * @Description //TODO 
- * @Date 17:47 2020/9/27
- * @Param 
- * @Return 
+ * @author wangxiangyong
  **/
 public class CustomizeVolumeTuningForCreate {
     private SmartQos smartqos;
     private Boolean compression_enabled;
     private Boolean dedupe_enabled;
-    //数据迁移策略，取值范围 0：不迁移，1：自动迁移，2：向高性能层迁移，3：向低性能层迁移  默认值：不迁移
-    private Integer smarttier;
+    private String smarttier;
     private String alloctype;
     private Integer workload_type_id;
 
@@ -40,11 +35,11 @@ public class CustomizeVolumeTuningForCreate {
         this.dedupe_enabled = dedupe_enabled;
     }
 
-    public Integer getSmarttier() {
+    public String getSmarttier() {
         return smarttier;
     }
 
-    public void setSmarttier(Integer smarttier) {
+    public void setSmarttier(String smarttier) {
         this.smarttier = smarttier;
     }
 

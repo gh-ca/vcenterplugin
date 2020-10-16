@@ -1,48 +1,47 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.model.NFSDataStoreFSAttr;
-import com.dmeplugin.dmestore.model.NFSDataStoreLogicPortAttr;
-import com.dmeplugin.dmestore.model.NFSDataStoreShareAttr;
+import com.dmeplugin.dmestore.model.NfsDataStoreFsAttr;
+import com.dmeplugin.dmestore.model.NfsDataStoreLogicPortAttr;
+import com.dmeplugin.dmestore.model.NfsDataStoreShareAttr;
 import com.dmeplugin.dmestore.model.NfsDataInfo;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * @ClassName DmeNFSAccessService
- * @Description TODO
- * @Author wangxiangyong
- * @Date 2020/9/4 10:18
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public interface DmeNFSAccessService {
 
     /**
-     * @Author wangxiangyong
-     * @Description NFS DataStore share属性获取
-     * @Date 10:21 2020/9/4
-     * @Param []
-     * @Return com.dmeplugin.dmestore.model.NFSDataStoreShareAttr
+     * NFS DataStore share属性获取
+     * @author wangxy
+     * @date 14:15 2020/10/15
+     * @param storageObjectId vCenter存储ID
+     * @throws Exception
+     * @return com.dmeplugin.dmestore.model.NFSDataStoreShareAttr
      **/
-    NFSDataStoreShareAttr getNFSDatastoreShareAttr(String storageObjectId) throws Exception;
+    NfsDataStoreShareAttr getNfsDatastoreShareAttr(String storageObjectId) throws Exception;
 
     /**
-     * @Author wangxiangyong
-     * @Description NFS DataStore 逻辑端口属性获取
-     * @Date 10:31 2020/9/4
-     * @Param [params]
-     * @Return com.dmeplugin.dmestore.model.NFSDataStorePortAttr
+     * NFS DataStore 逻辑端口属性获取
+     * @author wangxy
+     * @date 14:16 2020/10/15
+     * @param storageObjectId vCenter存储ID
+     * @throws Exception
+     * @return com.dmeplugin.dmestore.model.NFSDataStoreLogicPortAttr
      **/
-    NFSDataStoreLogicPortAttr getNFSDatastoreLogicPortAttr(String storageObjectId) throws Exception;
+    NfsDataStoreLogicPortAttr getNfsDatastoreLogicPortAttr(String storageObjectId) throws Exception;
 
     /**
-     * @Author wangxiangyong
-     * @Description NFS DataStore FS属性获取
-     * @Date 10:32 2020/9/4
-     * @Param []
-     * @Return com.dmeplugin.dmestore.model.NFSDataStoreFSAttr
+     * NFS DataStore FileSystem属性获取
+     * @author wangxy
+     * @date 14:16 2020/10/15
+     * @param storageObjectId vCenter存储ID
+     * @throws Exception
+     * @return java.util.List<com.dmeplugin.dmestore.model.NFSDataStoreFSAttr>
      **/
-    List<NFSDataStoreFSAttr> getNFSDatastoreFSAttr(String storageObjectId) throws Exception;
+    List<NfsDataStoreFsAttr> getNfsDatastoreFsAttr(String storageObjectId) throws Exception;
 
     /**
      * 扫描NFS 存储DataSotre 与share fs logicPort的关系

@@ -14,6 +14,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+/**
+ * @author andrewliu
+ */
 @SpringBootApplication
 public class VcenterDeployerApplication {
 
@@ -30,8 +33,7 @@ public class VcenterDeployerApplication {
     SpringApplication.run(VcenterDeployerApplication.class, args);
 
     try {
-      //String url = "";
-      //String host = InetAddress.getLocalHost().getHostAddress();
+
       LOGGER.info("Server has been started.");
       List<String> hosts = getLocalIp();
       StringBuffer buffer = new StringBuffer();
@@ -39,8 +41,6 @@ public class VcenterDeployerApplication {
         buffer.append("\r\n").append("https://").append(host).append(":8443");
       }
       LOGGER.info("Use either URL that vCenter can access to open page: " + buffer.toString());
-//    } catch (UnknownHostException e) {
-//      e.printStackTrace();
     } catch (SocketException e) {
       e.printStackTrace();
     }

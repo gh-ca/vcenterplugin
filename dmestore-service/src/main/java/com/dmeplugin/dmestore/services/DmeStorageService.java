@@ -2,6 +2,8 @@ package com.dmeplugin.dmestore.services;
 
 
 import com.dmeplugin.dmestore.model.EthPortInfo;
+import com.dmeplugin.dmestore.model.Storage;
+import com.dmeplugin.dmestore.model.StoragePool;
 
 import java.util.List;
 import java.util.Map;
@@ -119,4 +121,21 @@ public interface DmeStorageService {
      * @return
      */
     Map<String,Object> getFailoverGroups(String storage_id);
+
+    Map<String,Object> getFileSystemDetail(String file_system_id);
+    /**
+     * Access storage performance
+     *
+     * @param storageIds storage id
+     * @return: ResponseBodyBean
+     */
+    List<Storage> listStoragePerformance(List<String> storageIds) throws Exception;
+
+    /**
+     * Access storage pool performance
+     *
+     * @param storagePoolIds storage pool res Id
+     * @return: ResponseBodyBean
+     */
+    List<StoragePool> listStoragePoolPerformance(List<String> storagePoolIds) throws Exception;
 }

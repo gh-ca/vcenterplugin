@@ -19,7 +19,8 @@
     "close": "Close",
     "submit": "Submit",
     "search": "Search",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "synSPolicy": "Synchronize VM Storage Policies"
   },
   "validations": {
     "required": "This field is required!",
@@ -214,6 +215,8 @@
     "startTime": "Start Time",
     "endTime": "End Time",
     "timeInputTips": "Please enter start-end time！",
+    "capacityTips": "If the version is VMFS5, the minimum capacity is 1.3G, and if the version is VMFS6, the minimum capacity is 2G.",
+    "serviceLevelCantBeNull": "Service level is a must！",
     "mount":{
       "mount":"Mount",
       "host":"Host",
@@ -317,6 +320,7 @@
         "volumes":"Volumes",
         "name":"Name",
         "status":"Status",
+        "dataStore":"Data Store",
         "totalCap":"Total Capacity",
         "proType":"Provisioning Type",
         "capUsage":"Capacity Usage",
@@ -473,7 +477,8 @@
     "ip6": "IPv6 Address",
     "speed": "Working Rate(Mbps)",
     "hStatus": "Health Status",
-    "cStatus": "Connect Status"
+    "cStatus": "Connect Status",
+    "ports": "Please Select Storage Device Ports"
   },
   "rdm": {
     "name": "Name",

@@ -226,13 +226,13 @@ public class VCSDKUtils {
     *得到所有主机的ID与name 除去已经挂载了当前存储的主机  20200918objectId
     **/
     public String getHostsByDsObjectId(String dataStoreObjectId) throws Exception {
-        return getHostsByDsObjectId(dataStoreObjectId, true);
+        return getHostsByDsObjectId(dataStoreObjectId, false);
     }
     /**
      *得到所有主机的ID与name 除去没有挂载了当前存储的主机
      **/
     public String getMountHostsByDsObjectId(String dataStoreObjectId) throws Exception {
-        return getHostsByDsObjectId(dataStoreObjectId, false);
+        return getHostsByDsObjectId(dataStoreObjectId, true);
     }
     /**
      *得到所有集群的ID与name 除去已经挂载了当前存储的集群  扫描集群下所有主机，只要有一个主机没挂当前存储就要显示，只有集群下所有主机都挂载了该存储就不显示
@@ -706,9 +706,9 @@ public class VCSDKUtils {
                             VmfsDatastoreOption vmfsDatastoreOption = vmfsDatastoreOptions.get(0);
                             String diskUuid = vmfsDatastoreOption.getSpec().getDiskUuid();
                             VmfsDatastoreExpandSpec spec = (VmfsDatastoreExpandSpec) vmfsDatastoreOption.getSpec();
-                            HostDiskPartitionSpec hostDiskPartitionSpec = new HostDiskPartitionSpec();
-                            hostDiskPartitionSpec.setTotalSectors(spec.getPartition().getTotalSectors());
-                            spec.setPartition(hostDiskPartitionSpec);
+                            HostVmfsVolume vmfs = datastoreInfo.getVmfs();
+                            Long totalSectors = addCapacity * ToolUtils.GI * 1L / vmfs.getBlockSize();
+                            spec.getPartition().setTotalSectors(totalSectors);
                             host1.getHostDatastoreSystemMO().expandVmfsDatastore(dsMo, spec);
                             scanDataStore(null,hostObjectId);
                         }
@@ -771,13 +771,6 @@ public class VCSDKUtils {
      **/
     public String createNfsDatastore(String serverHost, String exportPath, String nfsName, String accessMode, List<Map<String,String>> hostObjectIds,String type) {
         String response = "";
-        //exportPath = "/volume1/TESTNFS";
-        //需要判断nfs版本，如果是v4.1要将 Kerberos 安全功能与 NFS 4.1 结合使用，请启用 Kerberos 并选择适当的 Kerberos 模型。
-        //nfsName = "lqnfsv3.1";
-        //remoteHostNames equal remoteHost(v3)
-        //serverHost = "10.143.132.187";
-        //mountHost = "10.143.132.17";
-        //logicPort = 0;
         logger.info("start creat nfs datastore");
         accessMode = StringUtils.isEmpty(accessMode) || "readWrite".equals(accessMode) ? "readWrite" : "readOnly";
         try {
@@ -793,8 +786,8 @@ public class VCSDKUtils {
                         if (managedObjectReference != null && vmwareContext != null) {
                             HostMO hostMo = new HostMO(vmwareContext, managedObjectReference);
                             HostDatastoreSystemMO hostDatastoreSystemMo = hostMo.getHostDatastoreSystemMO();
-                            hostDatastoreSystemMo.createNfsDatastore(serverHost, 0, exportPath, nfsName, accessMode, type);
-                            String datastoreObjectId = vcConnectionHelper.MOR2ObjectID(managedObjectReference, serverguid);
+                            ManagedObjectReference datastore = hostDatastoreSystemMo.createNfsDatastore(serverHost, 0, exportPath, nfsName, accessMode, type);
+                            String datastoreObjectId = vcConnectionHelper.MOR2ObjectID(datastore, serverguid);
                             dmeVmwareRelation.setStoreId(datastoreObjectId);
                             dmeVmwareRelation.setStoreName(nfsName);
                             dmeVmwareRelation.setStoreType(ToolUtils.STORE_TYPE_NFS);
@@ -1187,7 +1180,7 @@ public class VCSDKUtils {
             }
 
             sessionHelper = new SessionHelper();
-            sessionHelper.login(vCenterInfo.getHostIp(), String.valueOf(vCenterInfo.getHostPort()),vCenterInfo.getUserName(), vCenterInfo.getPassword());
+            sessionHelper.login(vCenterInfo.getHostIp(), String.valueOf(vCenterInfo.getHostPort()),vCenterInfo.getUserName(), CipherUtils.decryptString(vCenterInfo.getPassword()));
             TaggingWorkflow taggingWorkflow = new TaggingWorkflow(sessionHelper);
 
             List<String> taglist = taggingWorkflow.listTags();
@@ -1763,7 +1756,7 @@ public class VCSDKUtils {
         }
     }
 
-    private void createPbmProfile(VmwareContext vmwareContext, String categoryName, String tagName) throws RuntimeFaultFaultMsg, InvalidArgumentFaultMsg, com.vmware.vim25.RuntimeFaultFaultMsg {
+    private void createPbmProfile(VmwareContext vmwareContext, String categoryName, String tagName) throws RuntimeFaultFaultMsg, InvalidArgumentFaultMsg, com.vmware.vim25.RuntimeFaultFaultMsg, com.vmware.pbm.InvalidArgumentFaultMsg, PbmFaultProfileStorageFaultFaultMsg, PbmDuplicateNameFaultMsg {
         //String tagCategoryName="dme";
         //String profileName="mytestprofile";
         PbmServiceInstanceContent spbmsc;
@@ -1833,6 +1826,9 @@ public class VCSDKUtils {
         spec.setDescription(POLICY_DESC);
         spec.setResourceType(PbmUtil.getStorageResourceType());
         spec.setConstraints(constraints);
+
+        // Step 7: Create Storage Profile
+        PbmProfileId profile = vmwareContext.getPbmService().pbmCreate(profileMgr, spec);
     }
 
     public void createTag(String tagName, SessionHelper sessionHelper) {
@@ -2054,7 +2050,7 @@ public class VCSDKUtils {
         }
     }
     /**
-     *得到所有主机的ID与name boolean mount 是否已经挂载了当前存储的主机
+     *得到所有主机的ID与name, boolean mount 是否已经挂载了当前存储的主机
      **/
     public String getHostsByDsObjectId(String dataStoreObjectId, boolean mount) throws Exception {
         String listStr = "";
@@ -2088,7 +2084,7 @@ public class VCSDKUtils {
                 for (Pair<ManagedObjectReference, String> host : hosts) {
                     HostMO host1 = new HostMO(vmwareContext, host.first());
                     if (mount) {
-                        if (!mounthostids.contains(host1.getMor().getValue())) {
+                        if (mounthostids.contains(host1.getMor().getValue())) {
                             Map<String, String> map = new HashMap<>();
                             String objectId = vcConnectionHelper.MOR2ObjectID(host1.getMor(), vmwareContext.getServerAddress());
                             map.put("hostId", objectId);
@@ -2096,7 +2092,7 @@ public class VCSDKUtils {
                             lists.add(map);
                         }
                     } else {
-                        if (mounthostids.contains(host1.getMor().getValue())) {
+                        if (!mounthostids.contains(host1.getMor().getValue())) {
                             Map<String, String> map = new HashMap<>();
                             String objectId = vcConnectionHelper.MOR2ObjectID(host1.getMor(), vmwareContext.getServerAddress());
                             map.put("hostId", objectId);
@@ -2277,16 +2273,18 @@ public class VCSDKUtils {
             HttpClientConfiguration clientConfig = HttpClientConfiguration.Factory.newInstance();
             clientConfig.setHttpConfiguration(httpConfig);
             try {
-                context = VmodlContext.getContext();
-                context.loadVmodlPackages(new String[]{"com.vmware.vim.binding.vmodl.reflect"});
+                if(context == null) {
+                    context = VmodlContext.getContext();
+                    context.loadVmodlPackages(new String[]{"com.vmware.vim.binding.vmodl.reflect"});
+                }
             }catch (Exception e){
                 logger.error("context is not ready",e);
             }
             if (context == null) {
                 context = VmodlContext.initContext(new String[]{"com.vmware.vim.binding.vim", "com.vmware.vim.binding.vmodl.reflect"});
             }
-
-            vmomiClient = Client.Factory.createClient(new URI("https://" + vCenterInfo.getHostIp() + "/sdk"), VERSION, context, clientConfig);
+            logger.info("vcenter info=="+gson.toJson(vCenterInfo));
+            vmomiClient = Client.Factory.createClient(new URI("https://" + vCenterInfo.getHostIp() + ":"+vCenterInfo.getHostPort()+"/sdk"), VERSION, context, clientConfig);
             com.vmware.vim.binding.vmodl.ManagedObjectReference svcRef = new com.vmware.vim.binding.vmodl.ManagedObjectReference();
             svcRef.setType("ServiceInstance");
             svcRef.setValue("ServiceInstance");

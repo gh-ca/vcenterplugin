@@ -1,11 +1,7 @@
 package com.dmeplugin.dmestore.model;
 
 /**
- * @ClassName CustomizeVolumesRequest
- * @Description 非服务等级创建卷请求bean
- * @Author wangxiangyong
- * @Date 2020/9/27 16:14
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class CustomizeVolumesRequest {
     private CustomizeVolumes customize_volumes;

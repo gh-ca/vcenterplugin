@@ -1,5 +1,7 @@
 package com.dmeplugin.dmestore.task;
 
+import com.dmeplugin.dmestore.services.BestPracticeProcessService;
+import com.dmeplugin.dmestore.services.ServiceLevelService;
 import com.dmeplugin.dmestore.services.SystemServiceImpl;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -40,6 +42,12 @@ public class IniExecTask implements ApplicationListener<ContextRefreshedEvent> {
     private BackgroundScanDatastoreTask backgroundScanDatastoreTask;
 
     @Autowired
+    private ServiceLevelService serviceLevelService;
+
+    @Autowired
+    private BestPracticeProcessService bestPracticeProcessService;
+
+    @Autowired
     private SystemServiceImpl systemService;
 
 
@@ -49,12 +57,12 @@ public class IniExecTask implements ApplicationListener<ContextRefreshedEvent> {
         //重启插件时执行一次
         if (event.getApplicationContext().getParent() == null) {
             systemService.initDB();
-            iniScanDatastoreTask();
+            initTask();
             iniScheduleTask();
         }
     }
 
-    private void iniScanDatastoreTask() {
+    private void initTask() {
         ScheduledExecutorService mScheduledExecutorService = Executors.newScheduledThreadPool(1);
         mScheduledExecutorService.schedule(new Runnable() {
             @Override
@@ -64,7 +72,6 @@ public class IniExecTask implements ApplicationListener<ContextRefreshedEvent> {
                 LOG.info("--->ini Scan Datastore Task...end");
             }
         }, 10, TimeUnit.SECONDS);
-
     }
 
     private void iniScheduleTask() {

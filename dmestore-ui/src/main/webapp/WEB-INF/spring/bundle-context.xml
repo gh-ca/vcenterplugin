@@ -24,12 +24,6 @@
 
    <bean name="nfsAccessController" class="com.dmeplugin.dmestore.mvc.NfsAccessController" />
 
-   <bean name="servicesController" class="com.dmeplugin.dmestore.mvc.ServicesController" />
-
-   <bean name="dataAccessController" class="com.dmeplugin.dmestore.mvc.DataAccessController" />
-
-   <bean name="actionsController" class="com.dmeplugin.dmestore.mvc.ActionsController" />
-
    <bean name="dmeAccessController" class="com.dmeplugin.dmestore.mvc.DmeAccessController" />
 
    <bean name="pluginRegisterController" class="com.dmeplugin.dmestore.mvc.PluginRegisterController" />
@@ -44,7 +38,7 @@
 
    <bean name="hostAccessController" class="com.dmeplugin.dmestore.mvc.HostAccessController" />
 
-   <bean name="nFSDataStoreController" class="com.dmeplugin.dmestore.mvc.NFSDataStoreController" />
+   <bean name="nfsDataStoreController" class="com.dmeplugin.dmestore.mvc.NfsDataStoreController" />
 
    <bean name="nfsOperationController" class="com.dmeplugin.dmestore.mvc.NfsOperationController" />
 
@@ -54,26 +48,11 @@
 
    <bean name="vmfsOperationController" class="com.dmeplugin.dmestore.mvc.VmfsOperationController" />
 
-   <bean name="vMRDMController" class="com.dmeplugin.dmestore.mvc.VMRDMController" />
+   <bean name="vmRdmController" class="com.dmeplugin.dmestore.mvc.VmRdmController" />
 
    <bean name="vmwareAccessController" class="com.dmeplugin.dmestore.mvc.VmwareAccessController" />
 
    <!-- OSGI references to platform services used by the controllers -->
-
-   <osgi:reference id="dataService"
-         interface="com.vmware.vise.data.query.DataService" />
-
-   <osgi:reference id="objectReferenceService"
-         interface="com.vmware.vise.data.query.ObjectReferenceService" />
-
-
-   <!-- OSGI references to your services used by the controllers -->
-
-   <osgi:reference id="echoService"
-         interface="com.dmeplugin.dmestore.services.EchoService" />
-
-   <osgi:reference id="sampleActionService"
-         interface="com.dmeplugin.dmestore.services.SampleActionService" />
 
    <osgi:reference id="dmeAccessService"
                    interface="com.dmeplugin.dmestore.services.DmeAccessService" />
@@ -120,8 +99,8 @@
    <osgi:reference id="vmfsOperationService"
                    interface="com.dmeplugin.dmestore.services.VmfsOperationService" />
 
-   <osgi:reference id="vMRDMService"
-                   interface="com.dmeplugin.dmestore.services.VMRDMService" />
+   <osgi:reference id="VmRdmService"
+                   interface="com.dmeplugin.dmestore.services.VmRdmService" />
 
    <osgi:reference id="vmwareAccessService"
                    interface="com.dmeplugin.dmestore.services.VmwareAccessService" />

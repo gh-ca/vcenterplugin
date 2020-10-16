@@ -21,6 +21,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 
 
+/**
+ * @author andrewliu
+ */
 public class Validations {
 
   protected static final Logger LOGGER = LoggerFactory.getLogger(Validations.class);
@@ -93,9 +96,13 @@ public class Validations {
               if ("-99999".equals(resultCode)) {
                 LOGGER.info((String) result.get("description"));
               }
+              if ("200".equals(resultCode)) {
+                LOGGER.info("add dme info to vcenter success");
+              }
             } catch (Exception e) {
               LOGGER.info("Cannot add dme info in vcenter");
             }
+
             break;
           } else {
             LOGGER.info("service is not ready wait for ready");
@@ -145,7 +152,8 @@ public class Validations {
           LOGGER.info("No HA provider can be removed.");
           VcenterRegisterRunner.unRegister(vcenterIp, vcenterPort, vcenterUsername,
               vcenterPassword, pluginKey);
-        } else if ("-70001".equals(resultCode)) { // DB Exceptions
+          // DB Exceptions
+        } else if ("-70001".equals(resultCode)) {
           LOGGER.info("No service to uninstall provider");
           VcenterRegisterRunner.unRegister(vcenterIp, vcenterPort, vcenterUsername,
               vcenterPassword, pluginKey);
@@ -189,7 +197,7 @@ public class Validations {
               HttpMethod.POST, HEADERS, body, String.class).getBody();
       LOGGER.debug("unsubscribe: " + result);
     } catch (Exception e) {
-      LOGGER.debug( e.getMessage());
+      LOGGER.error( e.getMessage(),e);
     }
     return result;
   }

@@ -14,7 +14,7 @@ public interface VCenterInfoService {
 
     int addVCenterInfo(VCenterInfo vCenterInfo) throws SQLException;
 
-    int saveVCenterInfo(VCenterInfo vCenterInfo, HttpSession session) throws SQLException;
+    int saveVCenterInfo(VCenterInfo vCenterInfo) throws SQLException;
 
 
 

@@ -18,11 +18,7 @@ import org.springframework.util.StringUtils;
 import java.util.*;
 
 /**
- * @ClassName DmeNFSAccessServiceImpl
- * @Description TODO
- * @Author wangxiangyong
- * @Date 2020/9/4 10:33
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private static final Logger LOG = LoggerFactory.getLogger(DmeNFSAccessServiceImpl.class);
@@ -78,7 +74,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     @Override
-    public NFSDataStoreShareAttr getNFSDatastoreShareAttr(String storageObjectId) throws Exception {
+    public NfsDataStoreShareAttr getNfsDatastoreShareAttr(String storageObjectId) throws Exception {
         //根据存储ID 获取逻nfs_share_id
         String nfsShareId = dmeVmwareRalationDao.getShareIdByStorageId(storageObjectId);
         String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_SHARE_DETAIL_URL,
@@ -90,7 +86,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         }
         String resBody = responseEntity.getBody();
         JsonObject share = gson.fromJson(resBody, JsonObject.class);
-        NFSDataStoreShareAttr shareAttr = new NFSDataStoreShareAttr();
+        NfsDataStoreShareAttr shareAttr = new NfsDataStoreShareAttr();
         shareAttr.setName(share.get("name").getAsString());
         shareAttr.setShare_path(share.get("share_path").getAsString());
         shareAttr.setDescription(share.get("description").getAsString());
@@ -129,7 +125,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     @Override
-    public NFSDataStoreLogicPortAttr getNFSDatastoreLogicPortAttr(String storageObjectId) throws Exception {
+    public NfsDataStoreLogicPortAttr getNfsDatastoreLogicPortAttr(String storageObjectId) throws Exception {
         //根据存储ID 获取逻辑端口ID
         String logicPortId = dmeVmwareRalationDao.getLogicPortIdByStorageId(storageObjectId);
 
@@ -141,7 +137,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             return null;
         }
         JsonObject logicPort = gson.fromJson(responseEntity.getBody(), JsonObject.class);
-        NFSDataStoreLogicPortAttr logicPortAttr = new NFSDataStoreLogicPortAttr();
+        NfsDataStoreLogicPortAttr logicPortAttr = new NfsDataStoreLogicPortAttr();
         logicPortAttr.setName(logicPort.get("name").getAsString());
         String ipv4 = logicPort.get("mgmt_ip").getAsString();
         ipv4 = (null == ipv4 ? "" : ipv4.trim());
@@ -157,12 +153,12 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     @Override
-    public List<NFSDataStoreFSAttr> getNFSDatastoreFSAttr(String storageObjectId) throws Exception {
+    public List<NfsDataStoreFsAttr> getNfsDatastoreFsAttr(String storageObjectId) throws Exception {
         //根据存储ID获取fs
         List<String> fsIds = dmeVmwareRalationDao.getFsIdsByStorageId(storageObjectId);
-        List<NFSDataStoreFSAttr> list = new ArrayList<>();
+        List<NfsDataStoreFsAttr> list = new ArrayList<>();
         for (int i = 0; i < fsIds.size(); i++) {
-            NFSDataStoreFSAttr fsAttr = new NFSDataStoreFSAttr();
+            NfsDataStoreFsAttr fsAttr = new NfsDataStoreFsAttr();
             String file_system_id = fsIds.get(i);
             String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL,
                     "file_system_id", file_system_id);
@@ -938,7 +934,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         List<Map<String, String>> lists = null;
         try {
             //取得vcenter中的所有挂载了当前存储的host
-            String listStr = vcsdkUtils.getHostsByDsObjectId(dataStoreObjectId, false);
+            String listStr = vcsdkUtils.getHostsByDsObjectId(dataStoreObjectId, true);
             LOG.info("host getHostsMountDataStoreByDsObjectId==" + listStr);
             if (!StringUtils.isEmpty(listStr)) {
                 lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {

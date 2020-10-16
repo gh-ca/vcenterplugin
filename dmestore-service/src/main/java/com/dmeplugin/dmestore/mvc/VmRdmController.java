@@ -10,10 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * @author wangxiangyong
- * @version 1.0.0
- * @ClassName VmRdmController.java
- * @Description TODO
- * @createTime 2020年09月09日 10:58:00
  */
 @RestController
 @RequestMapping(value = "v1/vmrdm")
