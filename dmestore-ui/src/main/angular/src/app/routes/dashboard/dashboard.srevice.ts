@@ -287,8 +287,7 @@ export class DashboardService {
       {
         name: '',
         type: 'pie',
-        radius: ['50%', '80%'],
-        center: ['60%', '60%'],
+        radius: ['60%', '80%'],
         avoidLabelOverlap: false,
         label: {
           show: false,
@@ -339,8 +338,7 @@ export class DashboardService {
       {
         name: '',
         type: 'pie',
-        radius: ['60%', '70%'],
-        center: ['50%', '50%'],
+        radius: ['60%', '80%'],
         avoidLabelOverlap: false,
         label: {
           show: false,
