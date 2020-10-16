@@ -24,15 +24,28 @@ public class DmeIndicatorConstants {
     public static final String COUNTER_ID_VMFS_READRESPONSETIME = "1125921381744656";//读响应时间
     public static final String COUNTER_ID_VMFS_WRITERESPONSETIME = "1125921381744657";//写响应时间
 
+    //SYS_Lun 1125921381679104
     public static final String COUNTER_ID_VOLUME_THROUGHPUT = "1125921381744641";//IOPS
     public static final String COUNTER_ID_VOLUME_RESPONSETIME = "1125921381744642";//平均IO响应时间
     public static final String COUNTER_ID_VOLUME_BANDWIDTH = "1125921381744643";//带宽
-    public static final String COUNTER_ID_VOLUME_READTHROUGHPUT = "1125921381744648";//读IOPS
-    public static final String COUNTER_ID_VOLUME_WRITETHROUGHPUT = "1125921381744649";//写IOPS
+    public static final String COUNTER_ID_VOLUME_READHITRATIO = "1125921381744644";//读缓存命中率
+    public static final String COUNTER_ID_VOLUME_WRITEHITRATIO = "1125921381744645";//写缓存命中率
     public static final String COUNTER_ID_VOLUME_READBANDWIDTH = "1125921381744646";//读带宽
     public static final String COUNTER_ID_VOLUME_WRITEBANDWIDTH = "1125921381744647";//写带宽
+    public static final String COUNTER_ID_VOLUME_READTHROUGHPUT = "1125921381744648";//读IOPS
+    public static final String COUNTER_ID_VOLUME_WRITETHROUGHPUT = "1125921381744649";//写IOPS
+    /*public static final String COUNTER_ID_VOLUME_READBANDWIDTH = "1125921381744650";//读带宽
+    public static final String COUNTER_ID_VOLUME_WRITEBANDWIDTH = "1125921381744651";//写带宽
+    public static final String COUNTER_ID_VOLUME_READBANDWIDTH = "1125921381744652";//读带宽
+    public static final String COUNTER_ID_VOLUME_WRITEBANDWIDTH = "1125921381744653";//写带宽
+    public static final String COUNTER_ID_VOLUME_READBANDWIDTH = "1125921381744654";//读带宽
+    public static final String COUNTER_ID_VOLUME_WRITEBANDWIDTH = "1125921381744655";//写带宽*/
+
     public static final String COUNTER_ID_VOLUME_READRESPONSETIME = "1125921381744656";//读响应时间
     public static final String COUNTER_ID_VOLUME_WRITERESPONSETIME = "1125921381744657";//写响应时间
+   /* public static final String COUNTER_ID_VOLUME_READBANDWIDTH = "1125921381744658";//读带宽
+    public static final String COUNTER_ID_VOLUME_WRITEBANDWIDTH = "1125921381744659";//写带宽
+    public static final String COUNTER_ID_VOLUME_READBANDWIDTH = "1125921381744660";//读带宽*/
 
     //NFS的性能指标 文档中没找到 暂按存储设备来处理
     public static final String COUNTER_ID_NFS_READTHROUGHPUT = "1125904201875461";//读IOPS
