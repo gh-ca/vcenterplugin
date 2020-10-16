@@ -25,7 +25,9 @@
                 <span class="gh-info-lable">{{'overview.status' | translate}}</span>
                 <span class="gh-info-value">
                 </span>
-                <span class="gh-info-value" *ngIf="hostModel.hostIp != ''">{{'overview.connected' | translate}}</span>
+                <span class="gh-info-value" *ngIf="hostModel.hostIp != ''">
+                  <clr-icon shape="success-standard" class="is-solid" style="color: #59A220;margin-right: 5px;"></clr-icon>
+                  {{'overview.connected' | translate}}</span>
                 <span class="gh-info-value" *ngIf="hostModel.hostIp == ''">
                   <button type="button" (click)="showPop()" class="btn btn-icon" aria-label="home"><clr-icon shape="add"></clr-icon>
                   </button>
@@ -79,22 +81,22 @@
       <div class="info-card-content bestprac">
         <div class="count-wrap clr-row">
           <div class="count-item clr-col-3">
-            <div class="num">{{bestPracticeViolations.critical || 0}}</div>
+            <div (click)="toBestParcticeView('critical')"  style="cursor:pointer" class="num">{{bestPracticeViolations.critical || 0}}</div>
             <div class="color-divide critical"></div>
             <div class="text">{{'overview.critical' | translate}}</div>
           </div>
           <div class="count-item clr-col-3">
-            <div class="num">{{bestPracticeViolations.major || 0}}</div>
+            <div (click)="toBestParcticeView('major')" style="cursor:pointer" class="num">{{bestPracticeViolations.major || 0}}</div>
             <div class="color-divide major"></div>
             <div class="text">{{'overview.major' | translate}}</div>
           </div>
           <div class="count-item clr-col-3">
-            <div class="num">{{bestPracticeViolations.warning || 0}}</div>
+            <div (click)="toBestParcticeView('warning')" style="cursor:pointer" class="num">{{bestPracticeViolations.warning || 0}}</div>
             <div class="color-divide warning"></div>
             <div class="text">{{'overview.warning' | translate}}</div>
           </div>
           <div class="count-item clr-col-3">
-            <div class="num">{{bestPracticeViolations.info || 0}}</div>
+            <div (click)="toBestParcticeView('info')" style="cursor:pointer" class="num">{{bestPracticeViolations.info || 0}}</div>
             <div class="color-divide info"></div>
             <div class="text">{{'overview.info' | translate}}</div>
           </div>

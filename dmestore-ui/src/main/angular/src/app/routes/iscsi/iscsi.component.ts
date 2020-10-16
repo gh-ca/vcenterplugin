@@ -126,14 +126,25 @@ export class IscsiComponent implements OnInit, AfterViewInit {
 
   testPortConnected(){
     const p = new testConnectParams();
-    p.ethPorts = this.portList;
+    const testPortList = [];
+    this.portList.forEach((item)=>{
+       if (item.mgmtIp && item.mgmtIp != ""){
+         testPortList.push(item);
+       }
+    });
+    p.ethPorts = testPortList;
     p.hostObjectId = this.configModel.hostObjectId;
     p.vmKernel = this.configModel.vmKernel;
     this.http.post(this.testPortConnectedUrl, p).subscribe((result: any) => {
       console.log(result);
       if (result.code === '200' && result.data){
-        this.portList = result.data;
-        this.portTotal = result.data.length;
+        result.data.forEach((i)=>{
+            this.portList.forEach((j)=>{
+               if(i.id == j.id){
+                 j.connectStatus = i.connectStatus;
+               }
+            });
+        });
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       } else{
         alert("测试连通性出错");

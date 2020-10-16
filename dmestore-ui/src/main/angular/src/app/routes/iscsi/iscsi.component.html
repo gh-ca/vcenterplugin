@@ -18,63 +18,63 @@
     </div>
     <div style="margin-top: 20px">
       <p style="margin-top: 2%">{{'iscsi.ports' | translate}}</p>
-      <clr-datagrid [(clrDgSelected)]="configModel.ethPorts"  [clrDgLoading]="portLoading">
+      <ng-container>
+        <clr-datagrid [(clrDgSelected)]="configModel.ethPorts"  [clrDgLoading]="portLoading">
 
-        <clr-dg-column [clrDgField]="'location'">{{'iscsi.location' | translate}}</clr-dg-column>
-        <clr-dg-column [clrDgField]="'portName'">{{'iscsi.portName' | translate}}</clr-dg-column>
-        <clr-dg-column [clrDgField]="'mac'">{{'iscsi.mac' | translate}}</clr-dg-column>
-        <clr-dg-column [clrDgField]="'maxSpeed'">{{'iscsi.maxSpeed' | translate}}</clr-dg-column>
-        <clr-dg-column [clrDgField]="'mgmtIp'">{{'iscsi.ip4' | translate}}</clr-dg-column>
-        <clr-dg-column [clrDgField]="'mgmtIpv6'">{{'iscsi.ip6' | translate}}</clr-dg-column>
-        <clr-dg-column [clrDgField]="'speed'">{{'iscsi.speed' | translate}}</clr-dg-column>
-        <clr-dg-column [clrDgField]="'status'">{{'iscsi.hStatus' | translate}}</clr-dg-column>
-        <clr-dg-column [clrDgField]="'connectStatus'">{{'iscsi.cStatus' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'location'">{{'iscsi.location' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'portName'">{{'iscsi.portName' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'mac'">{{'iscsi.mac' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'maxSpeed'">{{'iscsi.maxSpeed' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'mgmtIp'">{{'iscsi.ip4' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'mgmtIpv6'">{{'iscsi.ip6' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'speed'">{{'iscsi.speed' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'status'">{{'iscsi.hStatus' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'connectStatus'">{{'iscsi.cStatus' | translate}}</clr-dg-column>
 
-        <clr-dg-row  [clrDgSelectable]="false" *clrDgItems="let item of portList"  [clrDgItem]="item">
-          <clr-dg-cell>{{item.location}}</clr-dg-cell>
-          <clr-dg-cell>{{item.portName}}</clr-dg-cell>
-          <clr-dg-cell>
-            <span *ngIf="item.mac == ''">--</span>
-            <span *ngIf="item.mac != ''">{{item.mac}}</span>
-          </clr-dg-cell>
-          <clr-dg-cell>
-            <span *ngIf="item.maxSpeed == -1">--</span>
-            <span *ngIf="item.maxSpeed != -1">{{item.maxSpeed}}</span>
-          </clr-dg-cell>
-          <clr-dg-cell>
-            <span *ngIf="item.mgmtIp == ''">--</span>
-            <span *ngIf="item.mgmtIp != ''">{{item.mgmtIp}}</span>
-          </clr-dg-cell>
-          <clr-dg-cell>
-            <span *ngIf="item.mgmtIpv6 == ''">--</span>
-            <span *ngIf="item.mgmtIpv6 != ''">{{item.mgmtIpv6}}</span>
-          </clr-dg-cell>
-          <clr-dg-cell>
-            <span *ngIf="item.speed == -1">--</span>
-            <span *ngIf="item.speed != -1">{{item.speed}}</span>
-          </clr-dg-cell>
-          <clr-dg-cell>{{item.status}}</clr-dg-cell>
-          <clr-dg-cell>
-          <span *ngIf="item.connectStatus == 'true'">
-            <!--<span ng-class="color-square" style="background-color: green;"></span>-->
-            一条坦途
-          </span>
-            <span *ngIf="item.connectStatus == 'false'">
-            <!--<span class="color-square" style="background-color: red;"></span>-->
-            此路不通
-          </span>
-          </clr-dg-cell>
-        </clr-dg-row>
+          <clr-dg-row [clrDgSelectable]="item.connectStatus == 'true'" *clrDgItems="let item of portList"  [clrDgItem]="item">
+            <clr-dg-cell>{{item.location}}</clr-dg-cell>
+            <clr-dg-cell>{{item.portName}}</clr-dg-cell>
+            <clr-dg-cell>
+              <span *ngIf="item.mac == ''">--</span>
+              <span *ngIf="item.mac != ''">{{item.mac}}</span>
+            </clr-dg-cell>
+            <clr-dg-cell>
+              <span *ngIf="item.maxSpeed == -1">--</span>
+              <span *ngIf="item.maxSpeed != -1">{{item.maxSpeed}}</span>
+            </clr-dg-cell>
+            <clr-dg-cell>
+              <span *ngIf="item.mgmtIp == ''">--</span>
+              <span *ngIf="item.mgmtIp != ''">{{item.mgmtIp}}</span>
+            </clr-dg-cell>
+            <clr-dg-cell>
+              <span *ngIf="item.mgmtIpv6 == ''">--</span>
+              <span *ngIf="item.mgmtIpv6 != ''">{{item.mgmtIpv6}}</span>
+            </clr-dg-cell>
+            <clr-dg-cell>
+              <span *ngIf="item.speed == -1">--</span>
+              <span *ngIf="item.speed != -1">{{item.speed}}</span>
+            </clr-dg-cell>
+            <clr-dg-cell>{{item.status}}</clr-dg-cell>
+            <clr-dg-cell>
+              <span *ngIf="item.connectStatus == 'true'">
+                <span class="color-square" [style.backgroundColor]="'green'"></span>
+              </span>
+              <span *ngIf="item.connectStatus == 'false' || item.mgmtIp == '' || item.mgmtIp == null">
+                 <span class="color-square" [style.backgroundColor]="'red'"></span>
+              </span>
+            </clr-dg-cell>
+          </clr-dg-row>
 
-        <!--<clr-dg-footer>
-          <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="portTotal">
-            <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]"></clr-dg-page-size>
-            {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-            of {{pagination.totalItems}}
-          </clr-dg-pagination>
-        </clr-dg-footer>-->
+          <!--<clr-dg-footer>
+            <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="portTotal">
+              <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]"></clr-dg-page-size>
+              {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+              of {{pagination.totalItems}}
+            </clr-dg-pagination>
+          </clr-dg-footer>-->
 
-      </clr-datagrid>
+        </clr-datagrid>
+      </ng-container>
     </div>
     <div style="margin-top: 20px">
       <button type="button" style="display:block;margin:0 auto" class="btn btn-primary" (click)="submit()">{{'menu.ok' | translate}}</button>
