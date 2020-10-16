@@ -17,17 +17,17 @@ public class NfsDataStoreController extends BaseController{
 
     @RequestMapping(value = "/logicport/{storageObjectId}", method = RequestMethod.GET)
     public ResponseBodyBean portAttr(@PathVariable("storageObjectId") String storageObjectId) throws Exception {
-        return success(dmeNFSAccessService.getNFSDatastoreLogicPortAttr(storageObjectId));
+        return success(dmeNFSAccessService.getNfsDatastoreLogicPortAttr(storageObjectId));
     }
 
     @RequestMapping(value = "/share/{storageObjectId}", method = RequestMethod.GET)
     public ResponseBodyBean shareAttr(@PathVariable("storageObjectId") String storageObjectId) throws Exception {
-        return success(dmeNFSAccessService.getNFSDatastoreShareAttr(storageObjectId));
+        return success(dmeNFSAccessService.getNfsDatastoreShareAttr(storageObjectId));
     }
 
     @RequestMapping(value = "/fileservice/{storageObjectId}", method = RequestMethod.GET)
     public ResponseBodyBean fsAttr(@PathVariable("storageObjectId") String storageObjectId) throws Exception {
-        return success(dmeNFSAccessService.getNFSDatastoreFSAttr(storageObjectId));
+        return success(dmeNFSAccessService.getNfsDatastoreFsAttr(storageObjectId));
     }
 
     @RequestMapping(value = "/scannfs", method = RequestMethod.GET)

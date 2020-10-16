@@ -1,11 +1,7 @@
 package com.dmeplugin.dmestore.model;
 
 /**
- * @ClassName VmRDMCreateBean
- * @Description DME卷创建请求Bean
- * @Author wangxiangyong
- * @Date 2020/9/2 16:48
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class VmRdmCreateBean {
     private CreateVolumesRequest createVolumesRequest;

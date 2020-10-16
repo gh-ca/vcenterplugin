@@ -32,7 +32,7 @@ public class StorageDetail {
     private Double totalEffectiveCapacity;
     //空闲容量
     private Double freeEffectiveCapacity;
-    private String location;
+
     private String[] azIds;
     private String storagePool;
     private String volume;
@@ -47,16 +47,51 @@ public class StorageDetail {
     //补充字段
     //固件版本
     private String productVersion;
-    //维护开始时间
-    private Integer maintenance_start;
-    //维护结束时间
-    private Integer maintenance_overtime;
-    //补订版本
-    private String patch_version;
     //警告
     private String warning;
     //事件
     private String event;
+
+    /**
+     *位置
+     **/
+    private String location;
+    /**
+     *补丁版本
+     **/
+    private String patchVersion;
+    /**
+     *维保开始时间
+     **/
+    private String maintenanceStart;
+    /**
+     *维保结束时间
+     **/
+    private String maintenanceOvertime;
+
+    public String getPatchVersion() {
+        return patchVersion;
+    }
+
+    public void setPatchVersion(String patchVersion) {
+        this.patchVersion = patchVersion;
+    }
+
+    public String getMaintenanceStart() {
+        return maintenanceStart;
+    }
+
+    public void setMaintenanceStart(String maintenanceStart) {
+        this.maintenanceStart = maintenanceStart;
+    }
+
+    public String getMaintenanceOvertime() {
+        return maintenanceOvertime;
+    }
+
+    public void setMaintenanceOvertime(String maintenanceOvertime) {
+        this.maintenanceOvertime = maintenanceOvertime;
+    }
 
     public String getWarning() {
         return warning;
@@ -72,30 +107,6 @@ public class StorageDetail {
 
     public void setEvent(String event) {
         this.event = event;
-    }
-
-    public String getPatch_version() {
-        return patch_version;
-    }
-
-    public void setPatch_version(String patch_version) {
-        this.patch_version = patch_version;
-    }
-
-    public Integer getMaintenance_start() {
-        return maintenance_start;
-    }
-
-    public void setMaintenance_start(Integer maintenance_start) {
-        this.maintenance_start = maintenance_start;
-    }
-
-    public Integer getMaintenance_overtime() {
-        return maintenance_overtime;
-    }
-
-    public void setMaintenance_overtime(Integer maintenance_overtime) {
-        this.maintenance_overtime = maintenance_overtime;
     }
 
     public String getStoragePool() {

@@ -5,7 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 
@@ -27,6 +29,8 @@ public class ToolUtils {
     public final static int KI = 1024;
     public final static int MI = 1024 * 1024;
     public final static int GI = 1024 * 1024 * 1024;
+
+    public final static SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public static String getStr(Object obj) {
         String re = null;
@@ -240,6 +244,18 @@ public class ToolUtils {
         try {
             if (StringUtils.isEmpty(obj) || obj.isJsonNull()) {
                 re = true;
+            }
+        } catch (Exception e) {
+            LOG.error("error:" + e.toString());
+        }
+        return re;
+    }
+
+    public static String jsonToDateStr(JsonElement obj, String defaultvalue) {
+        String re = defaultvalue;
+        try {
+            if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
+                re = sdf.format(new Date(Long.parseLong(String.valueOf(obj.getAsBigInteger()))));
             }
         } catch (Exception e) {
             LOG.error("error:" + e.toString());

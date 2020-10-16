@@ -45,7 +45,7 @@ export class IscsiComponent implements OnInit, AfterViewInit {
     sn: ''
   };
 
-  hostObjectId = 'urn:vmomi:HostSystem:host-224:f8e381d7-074b-4fa9-9962-9a68ab6106e1';
+  hostObjectId = '';
   // port列表
   portLoading = false;
   portList = [];
@@ -61,6 +61,11 @@ export class IscsiComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     const ctx = this.gs.getClientSdk().app.getContextObjects();
     console.log(ctx);
+    if(ctx == null){
+      this.hostObjectId = 'urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1';
+    } else{
+      this.hostObjectId = ctx[0].id;
+    }
     this.ipsGetUrlParams.params.hostObjectId = this.hostObjectId;
     this.configModel.hostObjectId = this.hostObjectId;
     this.loadIps();
@@ -126,10 +131,12 @@ export class IscsiComponent implements OnInit, AfterViewInit {
     p.vmKernel = this.configModel.vmKernel;
     this.http.post(this.testPortConnectedUrl, p).subscribe((result: any) => {
       console.log(result);
-      if (result.code === '200'){
+      if (result.code === '200' && result.data){
         this.portList = result.data;
         this.portTotal = result.data.length;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+      } else{
+        alert("测试连通性出错");
       }
     }, err => {
       console.error('ERROR', err);

@@ -48,14 +48,14 @@ public class VapiAuthenticationHelper {
      * @throws Exception if there is an existing session
      */
     public StubConfiguration loginByUsernameAndPassword(
-        String server, String username, String password,
+        String server, String port,String username, String password,
         HttpConfiguration httpConfig)
             throws Exception {
         if(this.sessionSvc != null) {
             throw new Exception("Session already created");
         }
 
-        this.stubFactory = createApiStubFactory(server, httpConfig);
+        this.stubFactory = createApiStubFactory(server, port,httpConfig);
 
         // Create a security context for username/password authentication
         SecurityContext securityContext =
@@ -111,12 +111,12 @@ public class VapiAuthenticationHelper {
      *
      * @return factory for the client side stubs
      */
-    public StubFactory createApiStubFactory(String server,
+    public StubFactory createApiStubFactory(String server,String port,
         HttpConfiguration httpConfig)
             throws Exception {
         // Create a https connection with the vapi url
         ProtocolFactory pf = new ProtocolFactory();
-        String apiUrl = "https://" + server + VAPI_PATH;
+        String apiUrl = "https://" + server +":"+port+ VAPI_PATH;
 
         // Get a connection to the vapi url
         ProtocolConnection connection =
@@ -134,8 +134,8 @@ public class VapiAuthenticationHelper {
      * @param httpConfig
      * @throws Exception
      */
-    public void createStubFactory(String server, HttpConfiguration httpConfig) throws Exception {
-        this.stubFactory = createApiStubFactory(server, httpConfig);
+    public void createStubFactory(String server,String port, HttpConfiguration httpConfig) throws Exception {
+        this.stubFactory = createApiStubFactory(server,port, httpConfig);
 
     }
     
@@ -145,8 +145,8 @@ public class VapiAuthenticationHelper {
      * @param skipServerVerification
      * @throws Exception
      */
-    public void createStubFactory(String server, boolean skipServerVerification) throws Exception {
-        this.stubFactory = createApiStubFactory(server, buildHttpConfiguration(skipServerVerification));
+    public void createStubFactory(String server,String port, boolean skipServerVerification) throws Exception {
+        this.stubFactory = createApiStubFactory(server,port, buildHttpConfiguration(skipServerVerification));
 
     }
     /**

@@ -2,6 +2,7 @@ package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.model.*;
+import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
@@ -36,6 +37,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     private final String API_VOLUME_DETAIL = "/rest/blockservice/v1/volumes";
     private final String API_FILESYSTEM_DETAIL = "/rest/fileservice/v1/filesystems/";
 
+    private final String DJTIERCONTAINSSTORAGEPOOL_URL = "/rest/resourcedb/v1/relations/M_DjTierContainsStoragePool/instances";
+    private final String SYS_DJTIER_URL = "/rest/resourcedb/v1/instances/SYS_DjTier";
 
 
     private static final Logger LOG = LoggerFactory.getLogger(DmeStorageServiceImpl.class);
@@ -47,6 +50,12 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     private DmeVmwareRalationDao dmeVmwareRalationDao;
 
     private VCSDKUtils vcsdkUtils;
+
+    private DataStoreStatisticHistoryService dataStoreStatisticHistoryService;
+
+    public void setDataStoreStatisticHistoryService(DataStoreStatisticHistoryService dataStoreStatisticHistoryService) {
+        this.dataStoreStatisticHistoryService = dataStoreStatisticHistoryService;
+    }
 
     public VCSDKUtils getVcsdkUtils() {
         return vcsdkUtils;
@@ -113,7 +122,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storageObj.setMaxLatency(ToolUtils.jsonToDou(jsonObj.get("max_latency"),0.0));
                     storageObj.setSn(ToolUtils.jsonToStr(jsonObj.get("sn")));
                     storageObj.setVersion(ToolUtils.jsonToStr(jsonObj.get("version")));
-                    storageObj.setTotal_pool_capacity(ToolUtils.jsonToDou(jsonObj.get("total_pool_capacity"),0.0));
+                    storageObj.setTotalPoolCapacity(ToolUtils.jsonToDou(jsonObj.get("total_pool_capacity"),0.0));
+
+                    storageObj.setLocation(ToolUtils.jsonToStr(jsonObj.get("location"),null));
+                    storageObj.setPatchVersion(ToolUtils.jsonToStr(jsonObj.get("patch_version"),null));
+                    storageObj.setMaintenanceStart(ToolUtils.jsonToDateStr(jsonObj.get("maintenance_start"),null));
+                    storageObj.setMaintenanceOvertime(ToolUtils.jsonToDateStr(jsonObj.get("maintenance_overtime"),null));
+                    storageObj.setSubscriptionCapacity(ToolUtils.jsonToDou(jsonObj.get("subscription_capacity")));
 
                     JsonElement jsonAzIds = jsonObj.get("az_ids");
                     if (!ToolUtils.jsonIsNull(jsonAzIds)) {
@@ -163,15 +178,20 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 storageObj.setIp(ToolUtils.jsonToStr(element.get("ip")));
                 storageObj.setStatus(ToolUtils.jsonToStr(element.get("status")));
                 storageObj.setSynStatus(ToolUtils.jsonToStr(element.get("syn_status")));
-                storageObj.setPatch_version(ToolUtils.jsonToStr(element.get("patch_version")));
                 storageObj.setVendor(ToolUtils.jsonToStr(element.get("vendor")));
                 storageObj.setModel(ToolUtils.jsonToStr(element.get("model")));
                 storageObj.setUsedCapacity(ToolUtils.jsonToDou(element.get("used_capacity"),0.0));
                 storageObj.setTotalCapacity(ToolUtils.jsonToDou(element.get("total_capacity"),0.0));
                 storageObj.setTotalEffectiveCapacity(ToolUtils.jsonToDou(element.get("total_effective_capacity"),0.0));
                 storageObj.setFreeEffectiveCapacity(ToolUtils.jsonToDou(element.get("free_effective_capacity"),0.0));
-                storageObj.setMaintenance_start(ToolUtils.jsonToInt(element.get("maintenance_start"),0));
-                storageObj.setMaintenance_overtime(ToolUtils.jsonToInt(element.get("maintenance_overtime"),0));
+
+                storageObj.setLocation(ToolUtils.jsonToStr(element.get("location"),null));
+                storageObj.setPatchVersion(ToolUtils.jsonToStr(element.get("patch_version"),null));
+                storageObj.setMaintenanceStart(ToolUtils.jsonToDateStr(element.get("maintenance_start"),null));
+                storageObj.setMaintenanceOvertime(ToolUtils.jsonToDateStr(element.get("maintenance_overtime"),null));
+                storageObj.setProductVersion(ToolUtils.jsonToStr(element.get("product_version")));
+                storageObj.setSn(ToolUtils.jsonToStr(element.get("sn"),null));
+
 
                 JsonArray ids = element.get("az_ids").getAsJsonArray();
                 if (ids.size() != 0) {
@@ -215,6 +235,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
             String object = responseEntity.getBody();
             if (!StringUtils.isEmpty(object)) {
+                //得到存储池与服务等级的关系
+                Map<String, Object> djofspMap = getDjTierOfStoragePool();
                 JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
                 for (JsonElement jsonElement : jsonArray) {
@@ -262,6 +284,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storagePool.setConsumed_capacity_percentage(consumed_percent);
                     storagePool.setFree_capacity(freeCapacity);
                     storagePool.setSubscription_rate(subscribedCapacityRate);
+
+                    String resId = ToolUtils.jsonToStr(element.get("resId"));
+                    if(null != djofspMap && null != djofspMap.get(resId)){
+                        storagePool.setServiceLevelName(gson.toJson(djofspMap.get(resId)));
+                    }
+
+
+
                     if (media_type.equals(type)){
                         resList.add(storagePool);
                     } else if("all".equals(media_type)) {
@@ -1110,5 +1140,194 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
     }
 
+    @Override
+    public List<Storage> listStoragePerformance(List<String> storageIds) throws Exception{
+        List<Storage> relists = null;
+        try {
+            if (storageIds != null && storageIds.size() > 0) {
+                Map<String, Object> params = new HashMap<>(16);
+                params.put("obj_ids", storageIds);
+                Map<String, Object> remap = null; //dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params,"storage");
+                LOG.info("remap===" + gson.toJson(remap));
+                if (null != remap && null != remap.get(DmeConstants.DATA)) {
+                    try {
+                        JsonObject dataJson = new JsonParser().parse(remap.get("data").toString()).getAsJsonObject();
+                        if (dataJson != null) {
+                            relists = new ArrayList<>();
+                            for (String storageId : storageIds) {
+                                JsonObject statisticObject = dataJson.getAsJsonObject(storageId);
+                                if (statisticObject != null) {
+                                    Storage storage = new Storage();
+                                    storage.setId(storageId);
+                                    storage.setMaxIops(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    storage.setMaxBandwidth(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    storage.setMaxCpuUtilization(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    storage.setMaxLatency(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    storage.setMaxOps(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    relists.add(storage);
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        LOG.warn("查询Storage实时性能数据listStoragePerformance异常", e);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("list Storage performance error:", e);
+            throw e;
+        }
+        LOG.info("listStoragePerformance relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        return relists;
+    }
+
+    @Override
+    public List<StoragePool> listStoragePoolPerformance(List<String> storagePoolIds) throws Exception{
+        List<StoragePool> relists = null;
+        try {
+            if (storagePoolIds != null && storagePoolIds.size() > 0) {
+                Map<String, Object> params = new HashMap<>(16);
+                params.put("obj_ids", storagePoolIds);
+                Map<String, Object> remap = null; //dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params,"storagepool");
+                LOG.info("remap===" + gson.toJson(remap));
+                if (null != remap && null != remap.get(DmeConstants.DATA)) {
+                    try {
+                        JsonObject dataJson = new JsonParser().parse(remap.get("data").toString()).getAsJsonObject();
+                        if (dataJson != null) {
+                            relists = new ArrayList<>();
+                            for (String storagePoolId : storagePoolIds) {
+                                JsonObject statisticObject = dataJson.getAsJsonObject(storagePoolId);
+                                if (statisticObject != null) {
+                                    StoragePool sp = new StoragePool();
+                                    sp.setId(storagePoolId);
+                                    sp.setMaxIops(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    sp.setMaxBandwidth(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    sp.setMaxLatency(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    relists.add(sp);
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        LOG.warn("查询StoragePool实时性能数据listStoragePoolPerformance异常", e);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("list StoragePool performance error:", e);
+            throw e;
+        }
+        LOG.info("listStoragePoolPerformance relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        return relists;
+    }
+
+    /**
+    *得到存储池与服务等级的关系信息
+    **/
+    public Map<String, Object> getDjTierContainsStoragePool() throws Exception{
+        Map<String, Object> map = new HashMap<>(16);
+        String getDjTierContainsStoragePoolUrl = DJTIERCONTAINSSTORAGEPOOL_URL;
+        try {
+            LOG.info("getDjTierContainsStoragePoolUrl===" + getDjTierContainsStoragePoolUrl);
+            ResponseEntity responseEntity = dmeAccessService.access(getDjTierContainsStoragePoolUrl, HttpMethod.GET, null);
+            LOG.info("getDjTierContainsStoragePool responseEntity==" + responseEntity.toString());
+            if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
+                JsonObject vjson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                if (null != vjson && !vjson.isJsonNull()) {
+                    if(null != vjson.get("objList") && !vjson.get("objList").isJsonNull()){
+                        JsonArray objList = vjson.getAsJsonArray("objList");
+                        if(null != objList && objList.size()>0){
+                            for(int i=0;i<objList.size();i++){
+                                JsonObject objJson = objList.get(i).getAsJsonObject();
+                                if(!objJson.isJsonNull()){
+                                    String sourceInstanceId = ToolUtils.jsonToStr(objJson.get("source_Instance_Id"));
+                                    String targetInstanceId = ToolUtils.jsonToStr(objJson.get("target_Instance_Id"));
+                                    if(null != map.get(targetInstanceId)){
+                                        List<String> siIds = (List<String>)map.get(targetInstanceId);
+                                        siIds.add(sourceInstanceId);
+                                    }else{
+                                        List<String> siIds = new ArrayList<>();
+                                        siIds.add(sourceInstanceId);
+                                        map.put(targetInstanceId,siIds);
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("DME link error url:" + getDjTierContainsStoragePoolUrl + ",error:" + e.getMessage());
+            throw e;
+        }
+        LOG.info("getDjTierContainsStoragePoolUrl relists===" + (gson.toJson(map)));
+        return map;
+    }
+
+    /**
+     *得到服务等级的实例信息
+     **/
+    public Map<String, Object> getDjtier() throws Exception{
+        Map<String, Object> map = new HashMap<>(16);
+        String getDjtierUrl = SYS_DJTIER_URL;
+        try {
+            LOG.info("getDjtierUrl===" + getDjtierUrl);
+            ResponseEntity responseEntity = dmeAccessService.access(getDjtierUrl, HttpMethod.GET, null);
+            LOG.info("getDjtier responseEntity==" + responseEntity.toString());
+            if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
+                JsonObject vjson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                if (null != vjson && !vjson.isJsonNull()) {
+                    if(null != vjson.get("objList") && !vjson.get("objList").isJsonNull()){
+                        JsonArray objList = vjson.getAsJsonArray("objList");
+                        if(null != objList && objList.size()>0){
+                            for(int i=0;i<objList.size();i++){
+                                JsonObject objJson = objList.get(i).getAsJsonObject();
+                                if(!objJson.isJsonNull()){
+                                    String resId = ToolUtils.jsonToStr(objJson.get("resId"));
+                                    String name = ToolUtils.jsonToStr(objJson.get("name"));
+                                    map.put(resId,name);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("DME link error url:" + getDjtierUrl + ",error:" + e.getMessage());
+            throw e;
+        }
+        LOG.info("getDjtierUrl relists===" + (gson.toJson(map)));
+        return map;
+    }
+
+    /**
+     *整理存储池与服务的关系信息
+     **/
+    public Map<String, Object> getDjTierOfStoragePool() throws Exception{
+        Map<String, Object> map = new HashMap<>(16);
+        String getDjtierUrl = SYS_DJTIER_URL;
+        try {
+            Map<String, Object> djtierMap = getDjtier();
+            Map<String, Object> djTierStoragePoolMap = getDjTierContainsStoragePool();
+            Set<String> sps = djTierStoragePoolMap.keySet();
+            for(String spkey:sps){
+                if(null != djTierStoragePoolMap.get(spkey)){
+                    List<String> djIds = (List<String>)djTierStoragePoolMap.get(spkey);
+                    if(null != djIds && djIds.size()>0){
+                        List<String> diNames = new ArrayList<>();
+                        for(String djId:djIds){
+                            diNames.add(ToolUtils.getStr(djtierMap.get(djId)));
+                        }
+                        map.put(spkey,diNames);
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            LOG.error("getDjTierOfStoragePool error:" + e.getMessage());
+        }
+        LOG.info("getDjTierOfStoragePool map===" + (gson.toJson(map)));
+        return map;
+    }
 
 }

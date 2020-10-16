@@ -29,14 +29,23 @@ export class DetailService {
   getShareList(storageId: string){
     return this.http.get('dmestorage/nfsshares', {params: {storageId}});
   }
-  getControllerList(storageId: string){
-    return this.http.get('dmestorage/storagecontrollers', {params: {storageId}});
+  getControllerList(storageDeviceId: string){
+    return this.http.get('dmestorage/storagecontrollers', {params: {storageDeviceId}});
   }
-  getDiskList(storageId: string){
-    return this.http.get('dmestorage/storagedisks', {params: {storageId}});
+  getDiskList(storageDeviceId: string){
+    return this.http.get('dmestorage/storagedisks', {params: {storageDeviceId}});
   }
-  getPortList(storageId: string){
-    return this.http.get('dmestorage/getstorageethports', {params: {storageId}});
+  getFCPortList(param: any){
+    return this.http.get('dmestorage/storageport', {params: param});
+  }
+  getBondPortList(storage_id: string){
+    return this.http.get('dmestorage/bandports', {params: {storage_id}});
+  }
+  getLogicPortList(storageId: string){
+    return this.http.get('dmestorage/logicports', {params: {storageId}});
+  }
+  getFailoverGroups(storage_id: string){
+    return this.http.get('dmestorage/failovergroups', {params: {storage_id}});
   }
 }
 
@@ -65,6 +74,9 @@ export class StorageDetail{
   logicPorts: string;
   storageControllers: string;
   storageDisks: string;
+  patchVersion:string;
+  maintenanceOvertime: string;
+  maintenanceStart: string;
 }
 export class StoragePool{
   free_capacity: number;// 空闲容量

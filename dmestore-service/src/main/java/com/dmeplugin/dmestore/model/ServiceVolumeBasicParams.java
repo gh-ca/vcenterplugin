@@ -1,11 +1,7 @@
 package com.dmeplugin.dmestore.model;
 
 /**
- * @ClassName ServiceVolumeBasicParams
- * @Description TODO
- * @Author wangxiangyong
- * @Date 2020/9/27 15:53
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class ServiceVolumeBasicParams {
     private String name;

@@ -1,7 +1,9 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
+import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {CommonService} from '../common.service';
 import {GlobalsService} from '../../shared/globals.service';
+import {FormControl, FormGroup, Validators} from "@angular/forms";
+import {ClrForm} from "@clr/angular";
 
 @Component({
   selector: 'app-rdm',
@@ -10,6 +12,10 @@ import {GlobalsService} from '../../shared/globals.service';
   providers: [CommonService, GlobalsService]
 })
 export class RdmComponent implements OnInit {
+
+  @ViewChild(ClrForm, {static: true}) rdmFormGroup;
+  @ViewChild('rdmForm', {static: true}) rdmForm;
+
 
   policyEnable = {
     smartTier: false,
@@ -32,6 +38,8 @@ export class RdmComponent implements OnInit {
   serviceLevelsRes = [];
   serviceLevels = [];
   service_level_id = '';
+
+  vmObjectId = '';
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
               private commonService: CommonService,
@@ -43,6 +51,11 @@ export class RdmComponent implements OnInit {
     this.tierFresh();
     const ctx = this.gs.getClientSdk().app.getContextObjects();
     console.log(ctx);
+    if(ctx != null){
+      this.vmObjectId = ctx[0].id;
+    } else{
+      this.vmObjectId = 'urn:vmomi:VirtualMachine:vm-1046:674908e5-ab21-4079-9cb1-596358ee5dd1';
+    }
   }
 
   // 刷新服务等级列表
@@ -83,13 +96,31 @@ export class RdmComponent implements OnInit {
   }
 
   submit(): void {
-    console.log(this.configModel);
-    const vmObjectId = 'urn:vmomi:VirtualMachine:vm-229:f8e381d7-074b-4fa9-9962-9a68ab6106e1';
+    if (this.rdmForm.form.invalid) {
+      this.rdmFormGroup.markAsTouched();
+      return;
+    }
+    let b = JSON.parse(JSON.stringify(this.configModel));
+    console.log(b);
     let body = {};
     if (this.configModel.storageType == '2'){
+      if(!this.policyEnable.smartTier){
+        b.tuning.smarttier = null;
+      }
+      if(!this.policyEnable.qosPolicy){
+        b.tuning.smartqos = null;
+      }
+      if(!this.policyEnable.resourceTuning){
+        b.tuning.alloctype = null;
+        b.tuning.dedupe_enabled = null;
+        b.tuning.compression_enabled = null;
+      }
+      if(!this.policyEnable.smartTier && !this.policyEnable.qosPolicy && !this.policyEnable.resourceTuning){
+        b.tuning = null;
+      }
       body = {
         customizeVolumesRequest: {
-          customize_volumes: this.configModel,
+          customize_volumes: b,
             mapping: {
             host_id: this.hostSelected
           }
@@ -107,7 +138,7 @@ export class RdmComponent implements OnInit {
         }
       };
     }
-    this.http.post('v1/vmrdm/createRdm?hostId='+this.hostSelected+'&vmObjectId='+vmObjectId+'&dataStoreName='+this.dataStoreName
+    this.http.post('v1/vmrdm/createRdm?hostId='+this.hostSelected+'&vmObjectId='+this.vmObjectId+'&dataStoreName='+this.dataStoreName
       , body).subscribe((result: any) => {
       console.log(result);
     }, err => {
@@ -209,7 +240,7 @@ class customize_volumes{
   prefetch_policy: string;
   prefetch_value: string;
   storage_id: string;
-  tuning: tuning;
+  tuning: any;
   volume_specs: volume_specs[];
   constructor(){
     this.storageType = '1';

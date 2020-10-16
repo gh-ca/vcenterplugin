@@ -1,7 +1,6 @@
 package com.dmeplugin.dmestore.services.bestpractice;
 
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
-import com.dmeplugin.vmware.mo.HostDatastoreSystemMO;
 import com.dmeplugin.vmware.mo.HostMO;
 import com.dmeplugin.vmware.mo.HostStorageSystemMO;
 import com.dmeplugin.vmware.util.VmwareContext;
@@ -13,11 +12,7 @@ import com.vmware.vim25.OptionValue;
 import java.util.List;
 
 /**
- * @ClassName BaseBestPracticeService
- * @Description TODO
- * @Author wangxiangyong
- * @Date 2020/9/15 11:14
- * @Version V1.0
+ * @author wangxiangyong
  **/
 public class BaseBestPracticeService {
 
@@ -135,8 +130,8 @@ public class BaseBestPracticeService {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = new HostMO(context, mor);
-        HostStorageSystemMO hostStorageSystemMO = hostMo.getHostStorageSystemMO();
-        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMO.getStorageDeviceInfo().getMultipathInfo().getLun();
+        HostStorageSystemMO hostStorageSystemMo = hostMo.getHostStorageSystemMO();
+        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo().getMultipathInfo().getLun();
         for(HostMultipathInfoLogicalUnit hostMultipathInfoLogicalUnit : lunList){
             //多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
             hostMultipathInfoLogicalUnit.getPolicy().setPolicy("VMW_PSP_RR");

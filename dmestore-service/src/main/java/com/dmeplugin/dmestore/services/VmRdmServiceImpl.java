@@ -6,6 +6,7 @@ import com.dmeplugin.dmestore.model.ServiceVolumeMapping;
 import com.dmeplugin.dmestore.model.VmRdmCreateBean;
 import com.dmeplugin.dmestore.utils.StringUtil;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -19,14 +20,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.*;
 
 
 /**
  * @author wangxiangyong
- * @version 1.0.0
- * @ClassName VMRDMService.java
- * @Description TODO
- * @createTime 2020年09月09日 10:58:00
  */
 public class VmRdmServiceImpl implements VmRdmService {
     private static final Logger LOG = LoggerFactory.getLogger(VmRdmServiceImpl.class);
@@ -89,7 +87,7 @@ public class VmRdmServiceImpl implements VmRdmService {
             volumeIds.add(volumeArr.get(i).getAsJsonObject().get("id").getAsString());
         }
 
-        if(null == mapping){
+        if (null == mapping) {
             //将卷映射给主机
             dmeAccessService.hostMapping(hostId, volumeIds);
         }
@@ -110,16 +108,16 @@ public class VmRdmServiceImpl implements VmRdmService {
         int times = 0;
         //获取LUN信息重试次数
         final int retryTimes = 60;
-        while (times ++ < retryTimes){
+        while (times++ < retryTimes) {
             lunStr = vcsdkUtils.getLunsOnHost(hostIp);
-            if(StringUtil.isNotBlank(lunStr)){
+            if (StringUtil.isNotBlank(lunStr)) {
                 break;
-            }else {
+            } else {
                 Thread.sleep(2 * 1000);
             }
         }
 
-        if(StringUtil.isBlank(lunStr)){
+        if (StringUtil.isBlank(lunStr)) {
             LOG.error("获取目标LUN失败！");
             //将已经创建好的卷删除
             deleteVolumes(hostId, volumeIds);
@@ -141,44 +139,56 @@ public class VmRdmServiceImpl implements VmRdmService {
 
         String errorMsg = "";
         int lunSize = lunMap.size();
-        if(lunSize > 0){
+        if (lunSize > 0) {
             List<String> failList = new ArrayList();
-            for(Map.Entry<String, JsonObject> entry : lunMap.entrySet()){
+            for (Map.Entry<String, JsonObject> entry : lunMap.entrySet()) {
                 String volumeId = entry.getKey();
                 JsonObject object = entry.getValue();
                 //调用vCenter创建磁盘
                 try {
                     vcsdkUtils.createDisk(dataStoreName, vmObjectId, object.get("devicePath").getAsString(), size);
-                }catch (Exception ex){
+                } catch (Exception ex) {
                     failList.add(volumeId);
                     errorMsg = ex.getMessage();
                 }
             }
 
-            if(failList.size() > 0){
+            if (failList.size() > 0) {
                 deleteVolumes(hostId, failList);
                 //完全失败
-                if(failList.size() == lunSize){
+                if (failList.size() == lunSize) {
                     throw new Exception(errorMsg);
                 }
             }
-        }else {
+        } else {
             throw new Exception("No matching LUN information was found on the vCenter");
         }
     }
 
-    private void deleteVolumes(String hostId, List<String> ids) throws Exception{
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    dmeAccessService.unMapHost(hostId, ids);
-                    dmeAccessService.deleteVolumes(ids);
-                }catch (Exception ex){
-                    LOG.error("deleteVolumes error! {}", ex.getMessage());
-                }
+    /**
+     * DME卷先解除映射后删除
+     * @author wangxy
+     * @date 11:04 2020/10/14
+     * @param hostId 主机ID
+     * @param ids    卷ID列表
+     * @throws Exception always
+     * @return 
+     **/
+    private void deleteVolumes(String hostId, List<String> ids) throws Exception {
+        ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
+                .setNameFormat("volumeDelete-pool-%d").build();
+        ExecutorService singleThreadPool = new ThreadPoolExecutor(1, 1,
+                0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<Runnable>(1024), namedThreadFactory, new ThreadPoolExecutor.AbortPolicy());
+        singleThreadPool.execute(() -> {
+            try {
+                dmeAccessService.unMapHost(hostId, ids);
+                dmeAccessService.deleteVolumes(ids);
+            } catch (Exception ex) {
+                LOG.error("deleteVolumes error!{}", ex.getMessage());
             }
         });
+        singleThreadPool.shutdown();
     }
 
     public void createDmeRdm(VmRdmCreateBean vmRdmCreateBean) throws Exception {
@@ -212,6 +222,12 @@ public class VmRdmServiceImpl implements VmRdmService {
 
     private String createDmeVolumeByUnServiceLevel(CustomizeVolumesRequest customizeVolumesRequest) throws Exception {
         String url = DmeConstants.DME_CREATE_VOLUME_UNLEVEL_URL;
+        String  ownerController = customizeVolumesRequest.getCustomize_volumes().getOwner_controller();
+        //归属控制器自动则不下发参数
+        final String OWNER_CONTROLLER_AUTO = "0";
+        if( OWNER_CONTROLLER_AUTO.equals(ownerController)){
+            customizeVolumesRequest.getCustomize_volumes().setOwner_controller(null);
+        }
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(customizeVolumesRequest));
         if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
             LOG.error("Failed to create RDM on DME!errorMsg:{}", responseEntity.getBody());
@@ -229,7 +245,7 @@ public class VmRdmServiceImpl implements VmRdmService {
     }
 
     @Override
-    public List<DatastoreSummary> getDatastoreMountsOnHost(String hostId) throws Exception{
+    public List<DatastoreSummary> getDatastoreMountsOnHost(String hostId) throws Exception {
         //查询主机信息
         Map<String, Object> hostMap = dmeAccessService.getDmeHost(hostId);
         String hostIp = hostMap.get("ip").toString();
