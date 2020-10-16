@@ -1,13 +1,12 @@
 package com.dmeplugin.dmestore.model;
 
-import java.io.Serializable;
 /**
  * @author lianq
  * @ClassName: NfsShare
  * @Company: GH-CA
  * @create 2020-09-03
  */
-public class NfsShares implements Serializable {
+public class NfsShares {
 
     //名称
     private String name;
