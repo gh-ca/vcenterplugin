@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -71,7 +74,78 @@ public class NfsOperationController extends BaseController{
     public ResponseBodyBean createNfsDatastore(@RequestBody Map<String,Object> params){
 
         LOG.info("url:{/operatenfs/createnfsdatastore},"+gson.toJson(params));
-        Map<String,Object> resMap = nfsOperationService.createNfsDatastore(params);
+        //入参调整
+        Map<String, Object> param = new HashMap<>(16);
+        Map<String, Object> createNfsShareParam = new HashMap<>(16);
+        List<Map<String, Object>> nfsShareClientAdditions = new ArrayList<>(10);
+        Map<String, Object> nfsShareClientAddition = new HashMap<>(16);
+        List<Map<String, Object>> filesystemSpecs = new ArrayList<>(10);
+        Map<String, Object> filesystemSpec = new HashMap<>(16);
+        param.put("storage_id", params.get("storagId"));
+        param.put("storage_pool_id", params.get("storagePoolId"));
+        param.put("pool_raw_id", params.get("poolRawId"));
+        param.put("current_port_id", params.get("currentPortId"));
+        param.put("accessMode", params.get("accessMode"));
+        Object nfsName = params.get("nfsName");
+        param.put("nfsName", nfsName);
+        Boolean sameName = (Boolean)params.get("sameName");
+        param.put("type", params.get("type"));
+        filesystemSpec.put("capacity", params.get("size"));
+        filesystemSpec.put("count", 1);
+        if (sameName) {
+            createNfsShareParam.put("name", "/"+nfsName);
+            createNfsShareParam.put("share_path", "/" + nfsName + "/");
+            filesystemSpec.put("name", nfsName);
+            param.put("exportPath", "/" + nfsName);
+        } else {
+            createNfsShareParam.put("name", "/"+params.get("shareName"));
+            createNfsShareParam.put("share_path", "/" + params.get("fsName") + "/");
+            filesystemSpec.put("name", params.get("fsName"));
+            param.put("exportPath", "/" + params.get("fsName"));
+        }
+        filesystemSpecs.add(filesystemSpec);
+        param.put("filesystem_specs", filesystemSpecs);
+        nfsShareClientAddition.put("name", params.get("vkernelIp"));
+        nfsShareClientAddition.put("objectId", params.get("hostObjectId"));
+        createNfsShareParam.put("character_encoding", "utf-8");
+        param.put("create_nfs_share_param", createNfsShareParam);
+        Boolean advance = (Boolean)params.get("advance");
+        nfsShareClientAdditions.add(nfsShareClientAddition);
+        param.put("nfs_share_client_addition", nfsShareClientAdditions);
+        Map<String, Object> tuning = new HashMap<>(16);
+        Map<String, Object> capacityAutonegotiation = new HashMap<>(16);
+        if (advance) {
+            Boolean qosFlag = (Boolean) params.get("qosFlag");
+            if (qosFlag) {
+                Map<String, Object> qosPolicy = new HashMap<>(16);
+                String contolPolicy = (String) params.get("contolPolicy");
+                if ("up".equals(contolPolicy)) {
+                    qosPolicy.put("max_bandwidth", params.get("maxBandwidth"));
+                    qosPolicy.put("max_iops", params.get("maxIops"));
+                } else if ("low".equals(contolPolicy)) {
+                    qosPolicy.put("min_bandwidth", params.get("minBandwidth"));
+                    qosPolicy.put("min_iops", params.get("minIops"));
+                    qosPolicy.put("latency", params.get("latency"));
+                }
+                param.put("qos_policy", qosPolicy);
+            }
+            Boolean thin = (Boolean) params.get("thin");
+            if (thin) {
+                tuning.put("allocation_type", "thin");
+            } else {
+                tuning.put("allocation_type", "thick");
+            }
+            tuning.put("compression_enabled", params.get("compressionEnabled"));
+            tuning.put("deduplication_enabled", params.get("deduplicationEnabled"));
+            capacityAutonegotiation.put("auto_size_enable", params.get("autoSizeEnable"));
+        } else {
+            tuning.put("allocation_type", "thin");
+            tuning.put("compression_enabled", false);
+            tuning.put("deduplication_enabled", false);
+            capacityAutonegotiation.put("auto_size_enable", false);
+        }
+        param.put("tuning", tuning);
+        Map<String,Object> resMap = nfsOperationService.createNfsDatastore(param);
         if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }

@@ -427,7 +427,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         resMap.put("code", 200);
         resMap.put("msg", "search volume capacity success ");
         String url;
-        List<Map<String, String>> list = new ArrayList<>();
+        List<Map<String, Object>> list = new ArrayList<>();
         for (int i = 0; i < volumes.size(); i++) {
             Map<String, String> reqmap = volumes.get(i);
             String volume_id = reqmap.get("volume_id");
@@ -442,8 +442,8 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
             JsonObject volume = jsonObject.get("volume").getAsJsonObject();
-            String capacity = volume.get("capacity").getAsString();
-            Map<String, String> map = new HashMap<>(16);
+            Double capacity = ToolUtils.jsonToDou(volume.get("capacity"));
+            Map<String, Object> map = new HashMap<>(16);
             map.put(volume_id, capacity);
             list.add(map);
         }
