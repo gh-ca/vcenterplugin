@@ -87,7 +87,7 @@
     <clr-dg-column [hidden]="radioCheck!=='chart'" [clrDgField]="'writeResponseTime'">{{'vmfs.writeResponseTime' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='chart'" [clrDgField]="'latency'">{{'vmfs.latency' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.latencyQoSTarget' | translate}}</clr-dg-column>
-    <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
+    <clr-dg-row [clrDgSelectable]="false" *clrDgItems="let item of list" [clrDgItem]="item">
       <clr-dg-cell (click)="navigateTo(item.objectid);">{{item.name}}</clr-dg-cell>
       <clr-dg-cell hidden>{{item.volumeId}}</clr-dg-cell>
       <clr-dg-cell hidden>{{item.wwn}}</clr-dg-cell>
