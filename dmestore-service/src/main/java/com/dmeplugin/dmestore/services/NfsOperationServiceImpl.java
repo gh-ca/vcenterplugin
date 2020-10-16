@@ -354,8 +354,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             responseBodyBean.setDescription("change nfs storage capacity error,params error!");
             return responseBodyBean;
         }
-        String file_system_id = (String) params.get("file_system_id");
-        Boolean is_expand = (Boolean) params.get("is_expand");
+        String file_system_id = (String) params.get("fileSystemId");
+        Boolean is_expand = (Boolean) params.get("expand");
         Double capacity = (Double)params.get("capacity");
         if (StringUtils.isEmpty(file_system_id) ||StringUtils.isEmpty(is_expand)||StringUtils.isEmpty(capacity)) {
             responseBodyBean.setCode("202");

@@ -222,8 +222,8 @@ public class NfsOperationController extends BaseController{
 
     /**
      * {
-     *     file_system_id string 文件系统唯一标识 必
-     *     is_expand boolean 扩容 is_expand=true  缩容 is_expand = false 必
+     *     fileSystemId string 文件系统唯一标识 必
+     *     expand boolean 扩容 is_expand=true  缩容 is_expand = false 必
      *     capacity double 该规格文件系统容量，单位GB 必
      * }
      * @param params
