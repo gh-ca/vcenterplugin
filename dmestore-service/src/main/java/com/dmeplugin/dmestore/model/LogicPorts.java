@@ -9,8 +9,8 @@ package com.dmeplugin.dmestore.model;
 public class LogicPorts {
     private String id;
     private String name;
-    private String running_status;
-    private String operational_status;
+    private String runningStatus;
+    private String operationalStatus;
     private String mgmtIp;
     private String mgmtIpv6;
     private String homePortId;
@@ -40,20 +40,20 @@ public class LogicPorts {
         this.name = name;
     }
 
-    public String getRunning_status() {
-        return running_status;
+    public String getRunningStatus() {
+        return runningStatus;
     }
 
-    public void setRunning_status(String running_status) {
-        this.running_status = running_status;
+    public void setRunningStatus(String runningStatus) {
+        this.runningStatus = runningStatus;
     }
 
-    public String getOperational_status() {
-        return operational_status;
+    public String getOperationalStatus() {
+        return operationalStatus;
     }
 
-    public void setOperational_status(String operational_status) {
-        this.operational_status = operational_status;
+    public void setOperationalStatus(String operationalStatus) {
+        this.operationalStatus = operationalStatus;
     }
 
     public String getMgmtIp() {
