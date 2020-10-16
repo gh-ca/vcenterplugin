@@ -11,13 +11,16 @@
     <button class="btn btn-primary" (click)="syncStoragePolicy()" style="margin-left: 10px">{{'menu.synSPolicy' | translate}}</button>
   </div>
   <div class="clr-col-4">
-    <label>{{'tier.name'|translate}}</label>
-    <input  style="height: 35px; margin-left: 20px; margin-right: 20px;width: 200px;" [(ngModel)]="searchName" type="search" result="s" name="name" #name="ngModel" />
-    <button class="btn btn-primary" (click)="search();">{{'menu.search'|translate}}</button>
-    <select style="height: 35px; margin-left: 20px; margin-right: 20px;width: 100px;" (ngModelOptions)="sortItems" [(ngModel)]="sortItem" name="sort" (change)="sortItemsChange();">
+    <input (input)="search()"  style="height: 35px; margin-left: 100px;width: 200px;"
+            [(ngModel)]="searchName" placeholder="{{'tier.namep'|translate}}" type="search" name="name"/>
+    <select style="height: 35px; margin-left: 10px; margin-right: 10px;width: 150px;" (ngModelOptions)="sortItems" [(ngModel)]="sortItem" name="sort" (change)="sortItemsChange();">
       <option *ngFor="let item of sortItems" value="{{item.id}}">{{item.value|translate}}</option>
     </select>
-    <button class="btn btn-primary" (click)="refresh();">{{'menu.refresh'|translate}}</button>
+    <button class="btn btn-icon" (click)="sortBtnClick();">
+       <clr-icon [hidden] ="sortUpDown.s == 'asc'" shape="angle-double down"></clr-icon>
+       <clr-icon [hidden] ="sortUpDown.s == 'desc'" shape="angle-double up"></clr-icon>
+    </button>
+    <button class="btn btn-icon" (click)="refresh();"><clr-icon shape="refresh"></clr-icon></button>
   </div>
 </div>
 <div class="clr-row">

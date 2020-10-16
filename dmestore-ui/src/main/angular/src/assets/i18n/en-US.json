@@ -538,6 +538,7 @@
   },
   "tier": {
     "name": "Name",
+    "namep": "Please Enter Name",
     "total": "Total Capacity",
     "free": "Free Capacity",
     "used": "Used Capacity",
@@ -593,6 +594,14 @@
     "last1M": "Last One Month",
     "last3M": "Last Three Month",
     "last6M": "Last Six Month",
-    "last1Y": "Last One Year"
+    "last1Y": "Last One Year",
+
+    "names": "OrderBy Name",
+    "totals": "OrderBy TotalCapacity",
+    "latencys": "OrderBy Latency",
+    "maxIOPSs": "OrderBy MaxIOPS",
+    "minIOPSs": "OrderBy MinIOPS",
+    "maxBandWidths": "OrderBy MaxBandWidth",
+    "minBandWidths": "OrderBy MinBandWidth"
   }
 }

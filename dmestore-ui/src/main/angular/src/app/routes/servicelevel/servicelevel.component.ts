@@ -42,38 +42,35 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   // 服务等级列表搜索
   searchName = '';
   // 服务等级列表排序
-  sortItem = {
-    id: '',
-    value: ''
-  };
+  sortItem = '';
   sortItems = [
     {
       id: 'name',
-      value: 'tier.name'
+      value: 'tier.names'
     },
     {
       id: 'total_capacity',
-      value: 'tier.total'
+      value: 'tier.totals'
     },
     {
       id: 'latency',
-      value: 'tier.latency'
+      value: 'tier.latencys'
     },
     {
       id: 'maxIOPS',
-      value: 'tier.maxIOPS'
+      value: 'tier.maxIOPSs'
     },
     {
       id: 'minIOPS',
-      value: 'tier.minIOPS'
+      value: 'tier.minIOPSs'
     },
     {
       id: 'maxBandWidth',
-      value: 'tier.maxBandWidth'
+      value: 'tier.maxBandWidths'
     },
     {
       id: 'minBandWidth',
-      value: 'tier.minBandWidth'
+      value: 'tier.minBandWidths'
     }
   ];
 
@@ -119,6 +116,11 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   // 服务等级列表 服务器返回数据
   serviceLevelsRes = [];
 
+
+  sortUpDown = {
+    isFirst: true,
+    s: 'desc'
+  }
 
   // ===============storage pool==============
   // 表格loading标志
@@ -257,6 +259,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // 服务等级列表搜索
   search(){
+    console.log(234);
     if (this.searchName !== ''){
       this.serviceLevels = this.serviceLevelsRes.filter(item => item.name.indexOf(this.searchName) > -1);
     } else{
@@ -265,12 +268,25 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     this.sortItemsChange();
   }
 
+  sortBtnClick(){
+    if(this.sortItem != '' || !this.sortUpDown.isFirst){
+      if(this.sortUpDown.s == "desc"){
+        this.sortUpDown.s = "asc";
+      } else if(this.sortUpDown.s == "asc"){
+        this.sortUpDown.s = "desc";
+      }
+    }
+    this.sortUpDown.isFirst = false;
+    this.sortItemsChange();
+  }
+
   // 服务等级列表排序
   sortItemsChange(){
-    const o = this.sortItem;
-    if (o.value !== ''){
-      this.serviceLevels = this.serviceLevels.sort(this.compare(this.sortItem, 'asc'));
+    let o = this.sortItem;
+    if (o == ''){
+      o = 'total_capacity';
     }
+    this.serviceLevels = this.serviceLevels.sort(this.compare(o, this.sortUpDown.s));
   }
 
   recursiveNullDelete(obj: any){
