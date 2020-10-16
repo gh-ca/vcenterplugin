@@ -99,6 +99,7 @@ export class NfsComponent implements OnInit {
 
   addView(){
     this.addForm = new AddNfs();
+    this.checkedPool= null;
     // 添加页面默认打开首页
     this.jumpTo(this.addPageOne, this.wizard);
     this.errMessage='';
@@ -128,10 +129,8 @@ export class NfsComponent implements OnInit {
   }
   // 添加提交方法
   addNfs(){
-    this.addForm.poolRawId=this.checkedPool.poolId;
-    this.addForm.storagePoolId= this.checkedPool.storagePoolId;
-    console.log('提交参数：')
-    console.log(this.addForm);
+    this.addForm.poolRawId=this.checkedPool.diskPoolId;
+    this.addForm.storagePoolId= this.checkedPool.id;
     // 单位换算
     switch (this.unit) {
       case 'TB':
@@ -146,6 +145,8 @@ export class NfsComponent implements OnInit {
       default: // 默认GB 不变
         break;
     }
+    console.log('提交参数：')
+    console.log(this.addForm);
     this.remoteSrv.addNfs(this.addForm).subscribe((result: any) => {
       if (result.code === '200'){
         this.popShow = false;

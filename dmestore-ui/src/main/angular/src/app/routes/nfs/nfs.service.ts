@@ -46,6 +46,8 @@ export class NfsService {
     return this.http.get('accessnfs/listnfsperformance', {params: {fsIds}});
   }
   addNfs(params= {}){
+    console.log("addNfs")
+    console.log(params)
     return this.http.post('operatenfs/createnfsdatastore', params);
   }
   updateNfs(params= {}){
