@@ -9,35 +9,35 @@ package com.dmeplugin.dmestore.model;
 public class FileSystemTurning {
 
     //重复数据删除。默认关闭
-    private Boolean deduplication_enabled;
+    private Boolean deduplicationEnabled;
     //数据压缩。默认关闭
-    private Boolean compression_enabled;
+    private Boolean compressionEnabled;
     //文件系统分配类型
-    private String allocation_type;
+    private String allocationType;
     private SmartQos smartQos;
 
-    public String getAllocation_type() {
-        return allocation_type;
+    public Boolean getDeduplicationEnabled() {
+        return deduplicationEnabled;
     }
 
-    public void setAllocation_type(String allocation_type) {
-        this.allocation_type = allocation_type;
+    public void setDeduplicationEnabled(Boolean deduplicationEnabled) {
+        this.deduplicationEnabled = deduplicationEnabled;
     }
 
-    public Boolean getDeduplication_enabled() {
-        return deduplication_enabled;
+    public Boolean getCompressionEnabled() {
+        return compressionEnabled;
     }
 
-    public void setDeduplication_enabled(Boolean deduplication_enabled) {
-        this.deduplication_enabled = deduplication_enabled;
+    public void setCompressionEnabled(Boolean compressionEnabled) {
+        this.compressionEnabled = compressionEnabled;
     }
 
-    public Boolean getCompression_enabled() {
-        return compression_enabled;
+    public String getAllocationType() {
+        return allocationType;
     }
 
-    public void setCompression_enabled(Boolean compression_enabled) {
-        this.compression_enabled = compression_enabled;
+    public void setAllocationType(String allocationType) {
+        this.allocationType = allocationType;
     }
 
     public SmartQos getSmartQos() {

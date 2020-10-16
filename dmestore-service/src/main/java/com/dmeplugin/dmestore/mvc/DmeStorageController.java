@@ -274,8 +274,8 @@ public class DmeStorageController extends BaseController{
     }
     @GetMapping("/filesystemdetail")
     @ResponseBody
-    public ResponseBodyBean getFileSystemDetail(@RequestParam(name = "file_system_id")String file_system_id) {
-        Map<String, Object> resMap = dmeStorageService.getFileSystemDetail(file_system_id);
+    public ResponseBodyBean getFileSystemDetail(@RequestParam(name = "fileSystemId")String fileSystemId) {
+        Map<String, Object> resMap = dmeStorageService.getFileSystemDetail(fileSystemId);
         if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }

@@ -1076,9 +1076,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             fileSystemDetail.setCapacityAutonegotiation(capacityAutonegotiation);
             JsonObject tuning = jsonObject.get("tuning").getAsJsonObject();
             FileSystemTurning fileSystemTurning = new FileSystemTurning();
-            fileSystemTurning.setAllocation_type(ToolUtils.jsonToStr(jsonObject.get("alloc_type")));
-            fileSystemTurning.setCompression_enabled(ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
-            fileSystemTurning.setDeduplication_enabled(ToolUtils.jsonToBoo(tuning.get("deduplication_enabled")));
+            fileSystemTurning.setAllocationType(ToolUtils.jsonToStr(jsonObject.get("alloc_type")));
+            fileSystemTurning.setCompressionEnabled(ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
+            fileSystemTurning.setDeduplicationEnabled(ToolUtils.jsonToBoo(tuning.get("deduplication_enabled")));
             SmartQos smartQos = new SmartQos();
             String smart_qos = ToolUtils.jsonToStr(tuning.get("smart_qos"));
             if (!StringUtils.isEmpty(smart_qos)) {
