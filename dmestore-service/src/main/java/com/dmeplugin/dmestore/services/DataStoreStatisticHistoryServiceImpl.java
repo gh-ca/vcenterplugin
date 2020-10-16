@@ -76,7 +76,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             }
         }
         if (null == indicatorIds) {
-            indicatorIds = initVolumeIndicator();
+            indicatorIds = initVolumeIndicator(true);
             params.put("indicator_ids", indicatorIds);
         }
         String obj_type_id = "1125921381679104";//SYS_Lun
@@ -93,7 +93,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     public Map<String, Object> queryNfsStatisticCurrent(Map<String, Object> params) throws Exception {
         Object indicatorIds = params.get("indicator_ids");
         if (null == indicatorIds) {
-            indicatorIds = initFsIndicator();
+            indicatorIds = initFsIndicator(true);
             params.put("indicator_ids", indicatorIds);
         }
         String obj_type_id = "1126179079716864";//SYS_StorageFileSystem
@@ -104,14 +104,14 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     //查询卷的性能
     @Override
     public Map<String, Object> queryVolumeStatistic(Map<String, Object> params) throws Exception {
-        Map<String, String> idInstancdIdMap = initParamVolume(params);
+        Map<String, String> idInstancdIdMap = initParamVolume(params, false);
         return queryHistoryStatistic("volume", params, idInstancdIdMap);
     }
 
     //查询FS的性能(NFS)
     @Override
     public Map<String, Object> queryFsStatistic(Map<String, Object> params) throws Exception {
-        Map<String, String> idInstancdIdMap = initParamFs(params);
+        Map<String, String> idInstancdIdMap = initParamFs(params, false);
         return queryHistoryStatistic("storageFileSystem", params, idInstancdIdMap);
     }
 
@@ -206,7 +206,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     public Map<String, Object> queryVolumeCurrentStatistic(Map<String, Object> params) throws Exception {
-        Map<String, String> idInstancdIdMap = initParamVolume(params);
+        Map<String, String> idInstancdIdMap = initParamVolume(params, false);
         return queryCurrentStatistic("volume", params, idInstancdIdMap);
     }
 
@@ -216,7 +216,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     public Map<String, Object> queryFsCurrentStatistic(Map<String, Object> params) throws Exception {
-        Map<String, String> idInstancdIdMap = initParamFs(params);
+        Map<String, String> idInstancdIdMap = initParamFs(params, true);
         return queryCurrentStatistic("volume", params, idInstancdIdMap);
     }
 
@@ -348,7 +348,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     //预处理卷参数
-    private Map<String, String> initParamVolume(Map<String, Object> params) {
+    private Map<String, String> initParamVolume(Map<String, Object> params, boolean isCurrent) {
         if (null == params || params.size() == 0) {
             return null;
         }
@@ -378,7 +378,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         String obj_type_id = "1125921381679104";//SYS_Lun
         params.put("obj_type_id", obj_type_id);
         if (null == indicatorIds) {
-            indicatorIds = initVolumeIndicator();
+            indicatorIds = initVolumeIndicator(isCurrent);
             params.put("indicator_ids", indicatorIds);
         }
         return idInstancdIdMap;
@@ -398,13 +398,13 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     //预处理文件系统参数(params中的obj_ids如果是instanceId 则不用做转换处理)
-    private Map<String, String> initParamFs(Map<String, Object> params) {
+    private Map<String, String> initParamFs(Map<String, Object> params, boolean isCurrent) {
         Map<String, String> idInstanceIdMap = new HashMap<>();
         Object indicatorIds = params.get("indicator_ids");
         String obj_type_id = "1126179079716864";//SYS_StorageFileSystem
         params.put("obj_type_id", obj_type_id);
         if (null == indicatorIds) {
-            indicatorIds = initFsIndicator();
+            indicatorIds = initFsIndicator(isCurrent);
             params.put("indicator_ids", indicatorIds);
         }
         return idInstanceIdMap;
@@ -688,26 +688,37 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     //nfs的默认指标集合 目前取的DME存储设备的指标
-    private List<String> initFsIndicator() {
+    private List<String> initFsIndicator(boolean wetherCurrent) {
         List<String> indicators = new ArrayList<>();
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_READTHROUGHPUT);//readThroughput
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_WRITETHROUGHPUT);//writeThroughput
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_READBANDWIDTH);//readBandwidth
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_WRITEBANDWIDTH);//writeBandwidth
+        if (wetherCurrent) {
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_THROUGHPUT);//ops
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_BANDWIDTH);//bandwith
+        } else {
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_READTHROUGHPUT);//readThroughput
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_WRITETHROUGHPUT);//writeThroughput
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_READBANDWIDTH);//readBandwidth
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_WRITEBANDWIDTH);//writeBandwidth
+        }
         indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_READRESPONSETIME);//reedresponseTime 读IO响应时间
         indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_WRITERESPONSETIME);//writeresponseTime 写IO响应时间
+
         return indicators;
     }
 
     //volume默认指标集合
-    private List<String> initVolumeIndicator() {
+    private List<String> initVolumeIndicator(boolean isCurrent) {
         List<String> indicators = new ArrayList<>();
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_READTHROUGHPUT);//readThroughput 读IOPS
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITETHROUGHPUT);//writeThroughput
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_READBANDWIDTH);//readBandwidth
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITEBANDWIDTH);//writeBandwidth
+        if (isCurrent) {
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT);//throughput
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH);//bandwidth
+        } else {
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_READTHROUGHPUT);//readThroughput 读IOPS
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITETHROUGHPUT);//writeThroughput
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_READBANDWIDTH);//readBandwidth
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITEBANDWIDTH);//writeBandwidth
+        }
         indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_READRESPONSETIME);//readResponseTime
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_VMFS_WRITERESPONSETIME);//writeResponseTime
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITERESPONSETIME);//writeResponseTime
         return indicators;
     }
 
