@@ -305,8 +305,8 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         if (sps.size() > 0) {
             Map<String, Set<String>> storageDevicePoolIds = new HashMap<>();
             for (StoragePool sp : sps) {
-                String storageDeviceId = sp.getStorage_device_id();
-                String poolInstanceId = sp.getStorage_instance_id();
+                String storageDeviceId = sp.getStorageDeviceId();
+                String poolInstanceId = sp.getStorageInstanceId();
                 if (null == storageDevicePoolIds.get(storageDeviceId)) {
                     Set<String> poolIds = new HashSet<>();
                     poolIds.add(poolInstanceId);
@@ -395,7 +395,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             List<StoragePool> storagePools = (List<StoragePool>) resp.get("data");
             for (StoragePool sp : storagePools) {
                 // String poolId = sp.getStorage_pool_id();
-                String poolId = sp.getStorage_instance_id();
+                String poolId = sp.getStorageInstanceId();
                 if (storagePoolIds.contains(poolId)) {
                     sps.add(sp);
                 }
@@ -453,9 +453,9 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         String storagePoolInstanceId = ToolUtils.jsonToStr(jsonObject.get("id"));
 
         sp.setName(name);
-        sp.setStorage_pool_id(poolId);
-        sp.setStorage_instance_id(storagePoolInstanceId);
-        sp.setStorage_device_id(storageDeviceId);
+        sp.setStoragePoolId(poolId);
+        sp.setStorageInstanceId(storagePoolInstanceId);
+        sp.setStorageDeviceId(storageDeviceId);
 
         return sp;
     }
