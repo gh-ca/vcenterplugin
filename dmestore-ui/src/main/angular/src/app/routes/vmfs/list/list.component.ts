@@ -277,9 +277,12 @@ export class VmfsListComponent implements OnInit {
     console.log('selectSotrageId' + this.form.storage_id);
     if (null !== this.form.storage_id && '' !== this.form.storage_id) {
       this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, 'block').subscribe((result: any) => {
-        console.log(result);
+        console.log('storagePools', result);
+        console.log('result.code === \'200\' && result.data !== null', result.code === '200' && result.data !== null);
         if (result.code === '200' && result.data !== null) {
           this.storagePoolList = result.data.data;
+          console.log('this.storagePoolList', this.storagePoolList);
+
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         }
       });
@@ -593,7 +596,14 @@ export class VmfsListComponent implements OnInit {
   // 未选择服务等级 时调用方法
   customerClickFunc() {
     this.levelCheck = 'customer';
+    this.serviceLevelIsNull = false;
     this.getStorageList();
+  }
+  // 选择服务等级时
+  serviceLevelBtnFunc() {
+    this.levelCheck = 'level';
+    this.serviceLevelIsNull = false;
+    this.setServiceLevelList();
   }
   // 页面跳转
   navigateTo(objectid: string){

@@ -138,3 +138,12 @@
 ::ng-deep .clr-accordion-panel-open .clr-accordion-header{
   display: none;
 }
+
+::ng-deep .modal-title-wrapper{
+  width: 100%;
+}
+.modelTile{
+  line-height: 3rem;
+  border-bottom: 1px solid #DDDDDD;
+  font-weight: normal;
+}

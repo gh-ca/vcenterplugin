@@ -232,7 +232,7 @@
       "content":"Are you sure to delete?"
     },
     "unmount":{
-      "title":"Tips",
+      "title":"Unmount",
       "content":"Are you sure to unmount?"
     },
     "reclaim": {

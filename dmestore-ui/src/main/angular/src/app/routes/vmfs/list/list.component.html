@@ -226,7 +226,7 @@
             <!-- mandatory -->
             <span class="tabs-btn-wrap">
               <!-- 服务等级 -->
-              <span (click)="levelCheck = 'level';" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'level'}">{{'vmfs.byServiceLevel' | translate}}</span>
+              <span (click)="serviceLevelBtnFunc();" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'level'}">{{'vmfs.byServiceLevel' | translate}}</span>
                 <!-- 非服务等级 -->
               <span (click)="customerClickFunc();" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'customer'}">{{'vmfs.customer' | translate}}</span>
             </span>
@@ -389,13 +389,13 @@
   </clr-wizard>
   <!-- 编辑页面 -->
   <clr-modal [(clrModalOpen)]="modifyShow" [clrModalClosable]="false">
-    <h3 class="modal-title">{{'menu.edit' | translate}}</h3>
+    <h3 class="modal-title modelTile">{{'menu.edit' | translate}}</h3>
 
     <div class="modal-body">
       <form *ngIf="rowSelected.length === 1" clrForm #formPageOne="ngForm">
         <!-- 名称 -->
         <clr-input-container>
-          <label>{{'vmfs.name' | translate}}</label>
+          <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
           <input clrInput  [(ngModel)]="modifyForm.name" name="name" #name="ngModel" required/><br>
           <clr-control-error>This field is required!</clr-control-error>
         </clr-input-container>
@@ -484,7 +484,7 @@
   </clr-modal>
   <!--挂载弹窗-->
   <clr-modal [(clrModalOpen)]="mountShow" [clrModalClosable]="false">
-    <h3 class="modal-title">{{'vmfs.mount.mount' | translate}}</h3>
+    <h3 class="modal-title modelTile">{{'vmfs.mount.mount' | translate}}</h3>
     <div class="modal-body">
       <form *ngIf="rowSelected.length === 1" clrForm>
 
@@ -540,7 +540,7 @@
   </clr-modal>
   <!--删除提示-->
   <clr-modal [(clrModalOpen)]="delShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
-    <h3 class="modal-title">{{'vmfs.del.title' | translate}}</h3>
+    <h3 class="modal-title modelTile">{{'vmfs.del.title' | translate}}</h3>
     <div class="modal-body">
       <p>{{'vmfs.del.content' | translate}}</p>
     </div>
@@ -551,7 +551,7 @@
   </clr-modal>
   <!--卸载-->
   <clr-modal [(clrModalOpen)]="unmountShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
-    <h3 class="modal-title">{{'vmfs.unmount.title' | translate}}</h3>
+    <h3 class="modal-title modelTile">{{'vmfs.unmount.title' | translate}}</h3>
     <div class="modal-body">
       <clr-datagrid [(clrDgSelected)]="chooseUnmountDevice" [clrDgLoading]="isLoading">
         <clr-dg-column hidden></clr-dg-column>
@@ -571,7 +571,7 @@
   </clr-modal>
   <!--空间回收提示-->
   <clr-modal [(clrModalOpen)]="reclaimShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
-    <h3 class="modal-title">{{'vmfs.reclaim.title' | translate}}</h3>
+    <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
     <div class="modal-body">
       <p>{{'vmfs.reclaim.content' | translate}}</p>
     </div>
@@ -582,7 +582,7 @@
   </clr-modal>
   <!--变更服务等级-->
   <clr-modal [(clrModalOpen)]="changeServiceLevelShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
-    <h3 class="modal-title">{{'vmfs.changeServiceLevel' | translate}}</h3>
+    <h3 class="modal-title modelTile">{{'vmfs.changeServiceLevel' | translate}}</h3>
     <div class="modal-body">
       <form *ngIf="rowSelected.length === 1" clrForm #formPageOne="ngForm">
         <!-- 1、选择 服务等级-->
@@ -633,19 +633,24 @@
   </clr-modal>
   <!--扩容-->
   <clr-modal [(clrModalOpen)]="expandShow" [clrModalClosable]="false">
-    <h3 class="modal-title">{{'menu.expand' | translate}}</h3>
+    <h3 class="modal-title  modelTile">{{'menu.expand' | translate}}</h3>
     <div class="modal-body">
       <!--名称-->
-      <clr-input-container>
-        <label>{{'vmfs.expandSize' | translate}}</label>
-        <input clrInput type="number" name="vo_add_capacity" [(ngModel)]="expandForm.vo_add_capacity"/>
-        <select clrInput  [(ngModel)]="expandForm.capacityUnit" name="capacityUnit" >
-          <option value="TB">TB</option>
-          <option value="GB">GB</option>
-          <option value="MB">MB</option>
-          <option value="KB">KB</option>
-        </select>
-      </clr-input-container>
+      <form clrForm #formPageOne="ngForm">
+        <clr-input-container>
+          <label style="color: #9F9F9F;">{{'vmfs.expandSize' | translate}}</label>
+          <div clrInput style="float: left;position: relative;">
+            <input clrInput style="width: 70%;border-bottom: none" type="number" [(ngModel)]="form.capacity" name="vo_add_capacity" #number="ngModel"
+                   onkeyup="this.value.match(/\d+(\.\d{0,2})?/)? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''" required/>
+            <select class="capacity" [(ngModel)]="expandForm.capacityUnit" clrInput style="width: 30%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;"  name="capacityUnit" >
+              <option value="TB">TB</option>
+              <option value="GB">GB</option>
+              <option value="MB">MB</option>
+              <option value="KB">KB</option>
+            </select>
+          </div>
+        </clr-input-container>
+      </form >
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="expandShow = false;">{{'menu.cancel' | translate}}</button>
