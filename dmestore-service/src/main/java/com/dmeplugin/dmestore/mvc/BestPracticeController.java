@@ -57,8 +57,8 @@ public class BestPracticeController extends BaseController {
     public ResponseBodyBean bylist(@RequestBody List<BestPracticeUpdateByTypeRequest> list) throws Exception {
         try {
             for (int i = 0; i < list.size(); i++) {
-                BestPracticeUpdateByTypeRequest _re = list.get(i);
-                upByHostSetting(_re);
+                BestPracticeUpdateByTypeRequest request = list.get(i);
+                upByHostSetting(request);
             }
             return success();
         } catch (Exception ex) {

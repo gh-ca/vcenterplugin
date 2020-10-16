@@ -239,7 +239,8 @@
     },
     "unmount":{
       "title":"卸载",
-      "content":"确认要卸载吗?"
+      "content":"确认要卸载吗?",
+      "notChooseDeviceTips":"请选择需要卸载的主机或集群！"
     },
     "reclaim": {
       "title":"提示",
