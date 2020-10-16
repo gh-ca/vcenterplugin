@@ -28,7 +28,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     private final String LIST_RELATION_URL = "/rest/resourcedb/v1/relations/{relationName}/instances";
     private final String QUERY_RELATION_URL = "/rest/resourcedb/v1/relations/{relationName}/instances/{instanceId}";
     private final String QUERY_INSTANCE_URL = "/rest/resourcedb/v1/instances/{className}/{instanceId}";
-    private final String LIST_INSTANCE_URL = "/rest/resourcedb/v1/instances/{className}";
+    private final String LIST_INSTANCE_URL = "/rest/resourcedb/v1/instances/{className}?pageSize=1000";
 
     private static Map<String, Map<String, Object>> serviceLevelInstance = new HashMap<>();
     private static Map<String, Map<String, Object>> lunInstance = new HashMap<>();
