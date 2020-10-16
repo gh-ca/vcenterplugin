@@ -1,6 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.model.*;
+import com.dmeplugin.dmestore.utils.StringUtil;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.*;
@@ -32,6 +33,16 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     private Gson gson=new Gson();
 
     private VCSDKUtils vcsdkUtils;
+
+    private TaskService taskService;
+
+    public TaskService getTaskService() {
+        return taskService;
+    }
+
+    public void setTaskService(TaskService taskService) {
+        this.taskService = taskService;
+    }
 
     public DmeAccessService getDmeAccessService() {
         return dmeAccessService;
@@ -132,22 +143,28 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     @Override
     public Map<String, Object> expandVMFS(List<Map<String, String>> volumes) {
 
-        //volumes{vo_add_capacity,volume_id,ds_name}
         Map<String, Object> resMap = new HashMap<>(16);
         resMap.put("code", 202);
         resMap.put("msg", "expand vmfsDatastore and volumes success !");
 
         Map<String, Object> reqBody = new HashMap<>(16);
-        Map<String, Map<String, Object>> reqMap = new HashMap<>(16);
+        List<Object> reqList = new ArrayList<>(10);
+        Map<String, Object> reqMap = new HashMap<>(16);
         List<String> volume_ids = new ArrayList<>(10);
         for (int i = 0; i < volumes.size(); i++) {
             Map<String, String> map = volumes.get(i);
             String volume_id = map.get("volume_id");
+            String vo_add_capacity = map.get("vo_add_capacity");
+            if (!StringUtils.isEmpty(volume_id) && !StringUtils.isEmpty(vo_add_capacity)) {
+                volume_ids.add(volume_id);
+            }
             volume_ids.add(volume_id);
             reqBody.put("volume_id", volume_id);
             reqBody.put("added_capacity", Integer.valueOf(map.get("vo_add_capacity")));
+            reqList.add(reqBody);
         }
-        reqMap.put("volumes", reqBody);
+
+        reqMap.put("volumes", reqList);
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(API_VMFS_EXPAND, HttpMethod.POST, gson.toJson(reqMap));
             int code = responseEntity.getStatusCodeValue();
@@ -158,17 +175,17 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             }
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-            resMap.put("task_id", jsonObject.get("task_id").getAsString());
-
-            //scan volume of host
-            Map<String, Object> hostMap = getHostIpByVolume(volume_ids);
-            Integer rescode = Integer.valueOf(hostMap.get("code").toString());
-            if (rescode == 200) {
-                List<Object> ips = Arrays.asList(hostMap.get("host_ips"));
-                for (int i = 0; i < ips.size(); i++) {
-                    vcsdkUtils.hostRescanVmfs(ips.get(i).toString());
-                }
+            String task_id = ToolUtils.jsonToStr(jsonObject.get("task_id"));
+            List<String> task_ids = new ArrayList<>(10);
+            task_ids.add(task_id);
+            Boolean flag = taskService.checkTaskStatus(task_ids);
+            if (!flag) {
+                resMap.put("code", code);
+                resMap.put("msg", "expand volume failed !");
+                return resMap;
             }
+            resMap.put("task_id", task_id);
+
             //expand vmfs datastore
             for (int i = 0; i < volumes.size(); i++) {
                 Map<String, String> map = volumes.get(i);
@@ -183,6 +200,15 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                     resMap.put("code", 403);
                     resMap.put("msg", "expand vmfsDatastore failed !");
                     return resMap;
+                }
+            }
+            //scan volume of host
+            Map<String, Object> hostMap = getHostIpByVolume(volume_ids);
+            Integer rescode = Integer.valueOf(hostMap.get("code").toString());
+            if (rescode == 200) {
+                List<Object> ips = Arrays.asList(hostMap.get("host_ips"));
+                for (int i = 0; i < ips.size(); i++) {
+                    vcsdkUtils.hostRescanVmfs(ips.get(i).toString());
                 }
             }
         } catch (Exception e) {

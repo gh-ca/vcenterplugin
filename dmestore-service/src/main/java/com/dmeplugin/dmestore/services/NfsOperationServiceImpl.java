@@ -302,6 +302,11 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         Map<String, Object> fsReqBody = new HashMap<>();
         Map<String,Object> tuning = gson.fromJson(gson.toJson(params.get("tuning")), Map.class);
         Map<String,Object> qos_policy = gson.fromJson(gson.toJson(params.get("qos_policy")), Map.class);
+        String name = (String)params.get("name");
+        if (!StringUtils.isEmpty(name)) {
+            fsReqBody.put("name", name);
+        }
+
         if (tuning!=null&&tuning.size()!=0) {
             if (qos_policy!=null&&qos_policy.size()!=0) {
                 tuning.put("qos_policy", qos_policy);
@@ -340,20 +345,19 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     }
 
     @Override
-    public ResponseBodyBean changeNfsCapacity(Map<String, Object> reqParams) {
+    public ResponseBodyBean changeNfsCapacity(Map<String, Object> params) {
 
         ResponseBodyBean responseBodyBean = new ResponseBodyBean();
         responseBodyBean.setCode("202");
         responseBodyBean.setDescription("change nfs storage capacity success!");
-        if (reqParams == null || reqParams.size() == 0) {
+        if (params == null || params.size() == 0) {
             responseBodyBean.setCode("202");
             responseBodyBean.setDescription("change nfs storage capacity error,params error!");
             return responseBodyBean;
         }
-        Map<String,String> params = gson.fromJson(gson.toJson(reqParams), Map.class);
-        String file_system_id = params.get("file_system_id");
-        String is_expand = params.get("is_expand");
-        String capacity = params.get("capacity");
+        String file_system_id = (String) params.get("file_system_id");
+        Boolean is_expand = (Boolean) params.get("is_expand");
+        Double capacity = (Double)params.get("capacity");
         if (StringUtils.isEmpty(file_system_id) ||StringUtils.isEmpty(is_expand)||StringUtils.isEmpty(capacity)) {
             responseBodyBean.setCode("202");
             responseBodyBean.setDescription("change nfs storage capacity error,params error!");
@@ -374,62 +378,70 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             if (fileSystem != null) {
                 String storage_id = fileSystem.getStorage_id();
                 String storage_pool_name = fileSystem.getStorage_pool_name();
-                //Double allocate_quota_in_pool = fileSystem.getAllocate_quota_in_pool();
                 Double min_size_fs_capacity = fileSystem.getMin_size_fs_capacity();
                 Double available_capacity = fileSystem.getAvailable_capacity();
                 String alloc_type = fileSystem.getAlloc_type();
                 Double currentCapacity = fileSystem.getCapacity();
-                Integer capacity_usage_ratio = fileSystem.getCapacity_usage_ratio();
                 //查询存储池可用空间
                 Double data_space = getDataspaceOfStoragepool(storage_pool_name, null, storage_id);
-                Double exchangedCapacity = null;
-                Double changeCapacity = Double.valueOf(capacity);
-                if (Boolean.valueOf(is_expand)) {
+                Double exchangedCapacity = 0.0;
+                Double changeCapacity = capacity;
+                if (is_expand) {
                     //扩容
                     if (data_space != null && Double.compare(changeCapacity, data_space) > 1) {
                         LOG.info("扩容量超出存储池可用容量，将当前存储池可用容量当做扩容量!");
                         changeCapacity = data_space;
-                        exchangedCapacity = changeCapacity + currentCapacity;
                     }
-                } else {
+                    exchangedCapacity = changeCapacity + currentCapacity;
+                } else if(!is_expand) {
                     //缩容
                     if (!StringUtils.isEmpty(alloc_type) && "thin".equals(alloc_type)) {
                         //thin 分配策略缩容
-                        // 该文件系统总容量-可用容量-文件系统能缩容的最小空间=实际可用缩小容量与变化量进行比较
-                        if (Double.compare(changeCapacity, currentCapacity - available_capacity - min_size_fs_capacity) > 1) {
-                            //changeCapacity = currentCapacity - available_capacity - min_size_fs_capacity;
-                            LOG.info("thin策略：nfs预计缩容到Thin文件系统能缩容的最小空间!");
-                            exchangedCapacity = min_size_fs_capacity;
-                        } else {
-                            exchangedCapacity = currentCapacity - changeCapacity;
+                        // 该文件系统总容量-可用容量-文件系统能缩容的最小空间=实际可用缩小容量    与变化量进行比较
+                        if (currentCapacity - changeCapacity >= min_size_fs_capacity) {
+                            if (Double.compare(changeCapacity, available_capacity) > 1) {
+                                LOG.info("thin策略：nfs预计缩容到Thin文件系统能缩容的最小空间!");
+                                exchangedCapacity = currentCapacity - available_capacity;
+                            } else {
+                                exchangedCapacity = currentCapacity - changeCapacity;
+                            }
+                        }else {
+                            exchangedCapacity = currentCapacity;
+                            responseBodyBean.setDescription("FileSystem:{id:"+file_system_id+"}未达到能缩容条件,FileSystem缩容后条件容量不得小于:"+min_size_fs_capacity+"GB");
+                            LOG.info("FileSystem:{"+file_system_id+"}未达到能缩容条件,FileSystem缩容后条件容量不得小于:"+min_size_fs_capacity+"GB");
                         }
                     } else {
-                        //thick 分配策略缩容
-                        if (Double.compare(currentCapacity * capacity_usage_ratio, currentCapacity - changeCapacity) > 1) {
-                            exchangedCapacity = currentCapacity * capacity_usage_ratio;
-                        } else {
+                        if (Double.compare(available_capacity, changeCapacity) > 1) {
                             exchangedCapacity = currentCapacity - changeCapacity;
+                        } else {
+                            exchangedCapacity = currentCapacity - available_capacity;
                         }
                     }
                 }
-                Map<String, String> reqParam = new HashMap<>();
+                Map<String, Object> reqParam = new HashMap<>();
                 reqParam.put("file_system_id", file_system_id);
-                reqParam.put("capacity", gson.toJson(exchangedCapacity));
+                reqParam.put("capacity",exchangedCapacity);
                 ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(reqParam));
                 code = responseEntity.getStatusCodeValue();
-                if (code != 200) {
+                if (code != 202) {
                     responseBodyBean.setCode(code.toString());
-                    responseBodyBean.setDescription("expand nfs storage capacity error!");
+                    responseBodyBean.setDescription("expand or recycle nfs storage capacity error!");
                     return responseBodyBean;
                 }
-                String obgect = responseEntity.getBody();
-                JsonObject jsonObject = new JsonParser().parse(obgect).getAsJsonObject();
+                String object = responseEntity.getBody();
+                JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
                 String task_id = jsonObject.get("task_id").getAsString();
+                List<String> task_ids = new ArrayList<>();
+                task_ids.add(task_id);
+                Boolean flag = taskService.checkTaskStatus(task_ids);
+                if (!flag) {
+                    responseBodyBean.setDescription("expand or recycle nfs storage capacity failed!");
+                }
                 responseBodyBean.setData("task_id:"+task_id);
             }
         } catch (Exception e) {
             LOG.error("change nfs storage capacity error!",e);
-            responseBodyBean.setCode(gson.toJson(code));
+            responseBodyBean.setCode(code.toString());
             responseBodyBean.setDescription("change nfs storage capacity error!"+e.getMessage());
         }
         return responseBodyBean;
@@ -659,12 +671,13 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
         FileSystem fileSystem = new FileSystem();
         fileSystem.setCapacity(Double.valueOf(jsonObject.get("capacity").getAsString()));
-        fileSystem.setAllocate_quota_in_pool(Double.valueOf(jsonObject.get("allocate_quota_in_pool").getAsString()));
-        fileSystem.setAllocate_quota_in_pool(Double.valueOf(jsonObject.get("available_capacity").getAsString()));
-        fileSystem.setAllocate_quota_in_pool(Double.valueOf(jsonObject.get("min_size_fs_capacity").getAsString()));
-        fileSystem.setAllocate_quota_in_pool(Double.valueOf(jsonObject.get("min_size_fs_capacity").getAsString()));
-        fileSystem.setStorage_id(jsonObject.get("storage_id").getAsString());
-        fileSystem.setStorage_id(jsonObject.get("storage_pool_name").getAsString());
+        fileSystem.setAllocate_quota_in_pool(ToolUtils.jsonToDou(jsonObject.get("allocate_quota_in_pool")));
+        fileSystem.setAvailable_capacity(ToolUtils.jsonToDou(jsonObject.get("available_capacity")));
+        fileSystem.setMin_size_fs_capacity(ToolUtils.jsonToDou(jsonObject.get("min_size_fs_capacity")));
+        fileSystem.setMin_size_fs_capacity(ToolUtils.jsonToDou(jsonObject.get("min_size_fs_capacity")));
+        fileSystem.setStorage_id(ToolUtils.jsonToStr(jsonObject.get("storage_id")));
+        fileSystem.setStorage_pool_name(ToolUtils.jsonToStr(jsonObject.get("storage_pool_name")));
+        fileSystem.setAlloc_type(ToolUtils.jsonToStr(jsonObject.get("alloc_type")));
 
         resMap.put("data", gson.toJson(fileSystem));
         return resMap;

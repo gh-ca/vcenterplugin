@@ -35,6 +35,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     private final String API_BANDPORTS_LIST = "/rest/storagemgmt/v1/storage-port/bond-ports?storage_id=";
     private final String API_INSTANCES_LIST = "/rest/resourcedb/v1/instances";
     private final String API_VOLUME_DETAIL = "/rest/blockservice/v1/volumes";
+    private final String API_FILESYSTEM_DETAIL = "/rest/fileservice/v1/filesystems/";
 
     private final String DJTIERCONTAINSSTORAGEPOOL_URL = "/rest/resourcedb/v1/relations/M_DjTierContainsStoragePool/instances";
     private final String SYS_DJTIER_URL = "/rest/resourcedb/v1/instances/SYS_DjTier";
@@ -1034,6 +1035,62 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             resMap.put("data", failoverGroups);
         } catch (Exception e) {
             LOG.error("list failover group error!");
+            resMap.put("code", 503);
+            resMap.put("msg", e.getMessage());
+        }
+        return resMap;
+    }
+
+    @Override
+    public Map<String, Object> getFileSystemDetail(String file_system_id) {
+
+        Map<String, Object> resMap = new HashMap<>(16);
+        resMap.put("code", 200);
+        resMap.put("msg", "get file system detail success!");
+
+        if (StringUtils.isEmpty(file_system_id)) {
+            resMap.put("code", 403);
+            resMap.put("msg", "param error!");
+            return resMap;
+        }
+        String url = API_FILESYSTEM_DETAIL + file_system_id;
+        try {
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            int code = responseEntity.getStatusCodeValue();
+            if (code != 200) {
+                resMap.put("code", code);
+                resMap.put("msg", "get file system detail error!");
+                return resMap;
+            }
+            FileSystemDetail fileSystemDetail = new FileSystemDetail();
+            String object = responseEntity.getBody();
+            JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+            fileSystemDetail.setId(ToolUtils.jsonToStr(jsonObject.get("id")));
+            fileSystemDetail.setName(ToolUtils.jsonToStr(jsonObject.get("name")));
+            CapacityAutonegotiation capacityAutonegotiation = new CapacityAutonegotiation();
+            JsonObject json = jsonObject.get("capacity_auto_negotiation").getAsJsonObject();
+            capacityAutonegotiation.setAuto_size_enable(ToolUtils.jsonToBoo(json.get("auto_size_enable")));
+            fileSystemDetail.setCapacityAutonegotiation(capacityAutonegotiation);
+            JsonObject tuning = jsonObject.get("tuning").getAsJsonObject();
+            FileSystemTurning fileSystemTurning = new FileSystemTurning();
+            fileSystemTurning.setAllocation_type(ToolUtils.jsonToStr(jsonObject.get("alloc_type")));
+            fileSystemTurning.setCompression_enabled(ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
+            fileSystemTurning.setDeduplication_enabled(ToolUtils.jsonToBoo(tuning.get("deduplication_enabled")));
+            SmartQos smartQos = new SmartQos();
+            String smart_qos = ToolUtils.jsonToStr(tuning.get("smart_qos"));
+            if (!StringUtils.isEmpty(smart_qos)) {
+                JsonObject qos_policy = new JsonParser().parse(smart_qos).getAsJsonObject();
+                smartQos.setMaxbandwidth(ToolUtils.jsonToInt(qos_policy.get("max_bandwidth")));
+                smartQos.setMaxiops(ToolUtils.jsonToInt(qos_policy.get("max_iops")));
+                smartQos.setLatency(ToolUtils.jsonToInt(qos_policy.get("latency")));
+                smartQos.setMinbandwidth(ToolUtils.jsonToInt(qos_policy.get("min_bandwidth")));
+                smartQos.setMiniops(ToolUtils.jsonToInt(qos_policy.get("min_iops")));
+            }
+            fileSystemTurning.setSmartQos(smartQos);
+            fileSystemDetail.setFileSystemTurning(fileSystemTurning);
+            resMap.put("data", fileSystemDetail);
+        } catch (Exception e) {
+            LOG.error("get file system detail error");
             resMap.put("code", 503);
             resMap.put("msg", e.getMessage());
         }
