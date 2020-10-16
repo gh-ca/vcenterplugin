@@ -1,7 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.model.*;
-import com.dmeplugin.dmestore.utils.StringUtil;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.*;
