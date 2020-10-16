@@ -639,9 +639,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             JsonArray jsonArray = new JsonParser().parse(gson.toJson(logicPort)).getAsJsonArray();
             for (JsonElement jsonElement : jsonArray) {
                 JsonObject element = jsonElement.getAsJsonObject();
-                String current_port_id1 = element.get("current_port_id").getAsString();
+                String current_port_id1 = element.get("homePortId").getAsString();
                 if (!StringUtils.isEmpty(current_port_id) && current_port_id1.equals(current_port_id)) {
-                    mgmt = ToolUtils.jsonToStr(element.get("mgmt_ip"));
+                    mgmt = ToolUtils.jsonToStr(element.get("mgmtIp"));
                     logicName = ToolUtils.jsonToStr(element.get("name"));
                     break;
                 }
