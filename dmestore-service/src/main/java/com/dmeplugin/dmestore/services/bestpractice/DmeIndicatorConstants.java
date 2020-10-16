@@ -80,5 +80,5 @@ public class DmeIndicatorConstants {
     public static final String COUNTER_ID_STORDEVICE_WRITETHROUGHPUT = "1125904201875462";//写IOPS
     public static final String COUNTER_ID_STORDEVICE_MEMORYUSAGE = "1125904201875463";//内存占用率
     public static final String COUNTER_ID_STORDEVICE_RESPONSETIME = "1125904201875464";//平均IO响应时间
-
+    public static final String COUNTER_ID_STORDEVICE_THROUGHPUT = "1125904201875465";//IOPS
 }
