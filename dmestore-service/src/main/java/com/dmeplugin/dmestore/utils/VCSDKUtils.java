@@ -1304,6 +1304,73 @@ public class VCSDKUtils {
             throw e;
         }
     }
+
+    /**
+     * 将vmfs从主机或集群上卸载
+     **/
+    public void unmountVmfsOnHostOrCluster(String datastoreStr, String clusterObjectId, String hostObjectId) throws Exception {
+        try {
+            if (StringUtils.isEmpty(datastoreStr)) {
+                logger.info("unmountVmfs datastore:" + datastoreStr + " is null");
+                return;
+            }
+            if (StringUtils.isEmpty(hostObjectId) && StringUtils.isEmpty(clusterObjectId)) {
+                logger.info("unmountVmfs host:" + hostObjectId + " and cluster:" + clusterObjectId + " is null");
+                return;
+            }
+            Map<String, Object> dsmap = gson.fromJson(datastoreStr, new TypeToken<Map<String, Object>>() {
+            }.getType());
+            String objHostName = "";
+            String objDataStoreName = "";
+            if (dsmap != null) {
+                objHostName = ToolUtils.getStr(dsmap.get("hostName"));
+                objHostName = objHostName == null ? "" : objHostName;
+                objDataStoreName = ToolUtils.getStr(dsmap.get("name"));
+            }
+            String serverguid = null;
+            if (!StringUtils.isEmpty(clusterObjectId)) {
+                serverguid = vcConnectionHelper.objectID2Serverguid(clusterObjectId);
+            } else if (!StringUtils.isEmpty(hostObjectId)) {
+                serverguid = vcConnectionHelper.objectID2Serverguid(hostObjectId);
+            }
+            if (!StringUtils.isEmpty(serverguid)) {
+                VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
+                if (!StringUtils.isEmpty(clusterObjectId)) {
+                    //集群下的所有主机
+                    List<Pair<ManagedObjectReference, String>> hosts = getHostsOnCluster(clusterObjectId, hostObjectId);
+                    if (hosts != null && hosts.size() > 0) {
+                        for (Pair<ManagedObjectReference, String> host : hosts) {
+                            try {
+                                HostMO host1 = new HostMO(vmwareContext, host.first());
+                                logger.info("Host under Cluster: " + host1.getName());
+                                //从挂载的主机卸载
+                                if (host1 != null && objHostName.equals(host1.getName())) {
+                                    unmountVmfs(objDataStoreName, host1);
+                                }
+                            }catch (Exception e){
+                                logger.error("unmount Vmfs On Cluster error:", e);
+                            }
+                        }
+                    }
+                } else if (!StringUtils.isEmpty(hostObjectId)) {
+                    try {
+                        ManagedObjectReference objmor = vcConnectionHelper.objectID2MOR(hostObjectId);
+                        HostMO hostmo = new HostMO(vmwareContext, objmor);
+                        //从挂载的主机卸载
+                        if (hostmo != null) {
+                            unmountVmfs(objDataStoreName, hostmo);
+                        }
+                    }catch (Exception e){
+                        logger.error("mount Vmfs On Cluster error:", e);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("mount Vmfs On Cluster error:", e);
+            throw e;
+        }
+    }
+
     /**
      *挂载存储 20200918objectId
      **/
@@ -1346,6 +1413,39 @@ public class VCSDKUtils {
             logger.error(hostMo.getName()+" mount Vmfs Volume:"+datastoreName+"  error:"+e.toString());
         }
     }
+
+    /**
+     *卸载存储 20201016objectId
+     **/
+    public void unmountVmfs(String datastoreName, HostMO hostMo) throws Exception {
+        try {
+            if (StringUtils.isEmpty(datastoreName)) {
+                logger.info("unmountVmfs datastore Name is null");
+                return;
+            }
+            if (hostMo == null) {
+                logger.info("unmountVmfs host is null");
+                return;
+            }
+            logger.info("Hosts that need to be unmounted:" + hostMo.getName());
+            //卸载前重新扫描datastore
+            hostMo.getHostStorageSystemMO().rescanVmfs();
+            logger.info("Rescan datastore before unmounting");
+            //查询指定vmfs
+            for (HostFileSystemMountInfo mount : hostMo.getHostStorageSystemMO().getHostFileSystemVolumeInfo().getMountInfo()) {
+                if (mount.getVolume() instanceof HostVmfsVolume && datastoreName.equals(mount.getVolume().getName())) {
+                    HostVmfsVolume volume = (HostVmfsVolume) mount.getVolume();
+                    logger.info(volume.getName() + "========" + volume.getUuid());
+                    //从主机卸载vmfs(卷)
+                    hostMo.getHostStorageSystemMO().unmountVmfsVolume(volume.getUuid());
+                    logger.info("unmount Vmfs success:" + volume.getName() + " : " + hostMo.getName());
+                }
+            }
+        } catch (Exception e) {
+            logger.error(hostMo.getName()+" unmount Vmfs Volume:"+datastoreName+"  error:"+e.toString());
+        }
+    }
+
     /**
      *在主机上扫描卷和Datastore 20200918objectId
      **/

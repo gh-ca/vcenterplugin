@@ -45,20 +45,20 @@ export interface StorageList {
 export class LogicPort{
   id: string;
   name: string;
-  running_status: string;
-  operational_status: string;
-  mgmt_ip: string;
-  mgmt_ipv6: string;
-  home_port_id: string;
-  home_port_name: string;
-  current_port_id: string;
-  current_port_name: string;
+  runningStatus: string;
+  operationalStatus: string;
+  mgmtIp: string;
+  mgmtIpv6: string;
+  homePortId: string;
+  homePortName: string;
+  currentPortId: string;
+  currentPortName: string;
   role: string;
-  ddns_status: string;
-  support_protocol: string;
-  management_access: string;
-  vstore_id: string;
-  vstore_name: string;
+  ddnsStatus: string;
+  supportProtocol: string;
+  managementAccess: string;
+  vstoreId: string;
+  vstoreName: string;
 }
 export class StorageChart{
   id: string;

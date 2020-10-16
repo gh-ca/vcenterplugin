@@ -245,28 +245,28 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storagePool.setName(ToolUtils.jsonToStr(element.get("name")));
                     String poolId = ToolUtils.jsonToStr(element.get("poolId"));
                     storagePool.setId(poolId);
-                    storagePool.setHealth_status(ToolUtils.jsonToStr(element.get("status")));
-                    storagePool.setRunning_status(ToolUtils.jsonToStr(element.get("runningStatus")));
+                    storagePool.setHealthStatus(ToolUtils.jsonToStr(element.get("status")));
+                    storagePool.setRunningStatus(ToolUtils.jsonToStr(element.get("runningStatus")));
                     Double total_capacity =ToolUtils.jsonToDou(element.get("totalCapacity"),0.0);
-                    storagePool.setTotal_capacity(total_capacity);
+                    storagePool.setTotalCapacity(total_capacity);
                     Double consumed_capacity = ToolUtils.jsonToDou(element.get("usedCapacity"), 0.0);
-                    storagePool.setConsumed_capacity(consumed_capacity);
-                    storagePool.setStorage_pool_id(ToolUtils.jsonToStr(element.get("storageDeviceId")));
+                    storagePool.setConsumedCapacity(consumed_capacity);
+                    storagePool.setStoragePoolId(ToolUtils.jsonToStr(element.get("storageDeviceId")));
                     String type = ToolUtils.jsonToStr(element.get("type"));
-                    storagePool.setMedia_type(type);
-                    storagePool.setStorage_id(ToolUtils.jsonToStr(element.get("storageDeviceId")));
-                    storagePool.setTier0_raid_lv(ToolUtils.jsonToStr(element.get("tier0RaidLv")));
-                    storagePool.setTier1_raid_lv(ToolUtils.jsonToStr(element.get("tier1RaidLv")));
-                    storagePool.setTier2_raid_lv(ToolUtils.jsonToStr(element.get("tier2RaidLv")));
-                    storagePool.setConsumed_capacity(ToolUtils.jsonToDou(element.get("usedCapacity"),0.0));
-                    storagePool.setStorage_instance_id(ToolUtils.jsonToStr(element.get("resId")));
+                    storagePool.setMediaType(type);
+                    storagePool.setStorageId(ToolUtils.jsonToStr(element.get("storageDeviceId")));
+                    storagePool.setTier0RaidLv(ToolUtils.jsonToStr(element.get("tier0RaidLv")));
+                    storagePool.setTier1RaidLv(ToolUtils.jsonToStr(element.get("tier1RaidLv")));
+                    storagePool.setTier2RaidLv(ToolUtils.jsonToStr(element.get("tier2RaidLv")));
+                    storagePool.setConsumedCapacity(ToolUtils.jsonToDou(element.get("usedCapacity"),0.0));
+                    storagePool.setStorageInstanceId(ToolUtils.jsonToStr(element.get("resId")));
 
                     storagePool.setPoolId(ToolUtils.jsonToStr(element.get("poolId")));
 
                     String diskPoolId = ToolUtils.jsonToStr(element.get("diskPoolId"));
                     storagePool.setDiskPoolId(diskPoolId);
                     Double subscribedCapacity = ToolUtils.jsonToDou(element.get("subscribedCapacity"), 0.0);
-                    storagePool.setSubscribed_capacity(subscribedCapacity);
+                    storagePool.setSubscribedCapacity(subscribedCapacity);
                     //订阅率（lun/fs订阅率）
                     DecimalFormat df = new DecimalFormat("#.00");
                     Double subscribedCapacityRate = 0.0;
@@ -284,9 +284,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     String diskType = getDiskType(storageId,diskPoolId,poolId);
                     storagePool.setPhysicalType(diskType);
 
-                    storagePool.setConsumed_capacity_percentage(consumed_percent);
-                    storagePool.setFree_capacity(freeCapacity);
-                    storagePool.setSubscription_rate(subscribedCapacityRate);
+                    storagePool.setConsumedCapacityPercentage(consumed_percent);
+                    storagePool.setFreeCapacity(freeCapacity);
+                    storagePool.setSubscriptionRate(subscribedCapacityRate);
 
                     String resId = ToolUtils.jsonToStr(element.get("resId"));
                     if(null != djofspMap && null != djofspMap.get(resId)){
@@ -338,20 +338,20 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     LogicPorts logicPorts = new LogicPorts();
                     logicPorts.setId(ToolUtils.jsonToStr(element.get("id")));
                     logicPorts.setName(ToolUtils.jsonToStr(element.get("name")));
-                    logicPorts.setRunning_status(ToolUtils.jsonToStr(element.get("running_status")));
-                    logicPorts.setOperational_status(ToolUtils.jsonToStr(element.get("operational_status")));
-                    logicPorts.setMgmt_ip(ToolUtils.jsonToStr(element.get("mgmt_ip")));
-                    logicPorts.setMgmt_ipv6(ToolUtils.jsonToStr(element.get("mgmt_ipv6")));
-                    logicPorts.setHome_port_id(ToolUtils.jsonToStr(element.get("home_port_id")));
-                    logicPorts.setHome_port_name(ToolUtils.jsonToStr(element.get("home_port_name")));
+                    logicPorts.setRunningStatus(ToolUtils.jsonToStr(element.get("running_status")));
+                    logicPorts.setOperationalStatus(ToolUtils.jsonToStr(element.get("operational_status")));
+                    logicPorts.setMgmtIp(ToolUtils.jsonToStr(element.get("mgmt_ip")));
+                    logicPorts.setMgmtIpv6(ToolUtils.jsonToStr(element.get("mgmt_ipv6")));
+                    logicPorts.setHomePortId(ToolUtils.jsonToStr(element.get("home_port_id")));
+                    logicPorts.setHomePortName(ToolUtils.jsonToStr(element.get("home_port_name")));
                     logicPorts.setRole(ToolUtils.jsonToStr(element.get("role")));
-                    logicPorts.setDdns_status(ToolUtils.jsonToStr(element.get("ddns_status")));
-                    logicPorts.setCurrent_port_id(ToolUtils.jsonToStr(element.get("current_port_id")));
-                    logicPorts.setCurrent_port_name(ToolUtils.jsonToStr(element.get("current_port_name")));
-                    logicPorts.setSupport_protocol(ToolUtils.jsonToStr(element.get("support_protocol")));
-                    logicPorts.setManagement_access(ToolUtils.jsonToStr(element.get("management_access")));
-                    logicPorts.setVstore_id(ToolUtils.jsonToStr(element.get("vstore_id")));
-                    logicPorts.setVstore_name(ToolUtils.jsonToStr(element.get("vstore_name")));
+                    logicPorts.setDdnsStatus(ToolUtils.jsonToStr(element.get("ddns_status")));
+                    logicPorts.setCurrentPortId(ToolUtils.jsonToStr(element.get("current_port_id")));
+                    logicPorts.setCurrentPortName(ToolUtils.jsonToStr(element.get("current_port_name")));
+                    logicPorts.setSupportProtocol(ToolUtils.jsonToStr(element.get("support_protocol")));
+                    logicPorts.setManagementAccess(ToolUtils.jsonToStr(element.get("management_access")));
+                    logicPorts.setVstoreId(ToolUtils.jsonToStr(element.get("vstore_id")));
+                    logicPorts.setVstoreName(ToolUtils.jsonToStr(element.get("vstore_name")));
                     resList.add(logicPorts);
                 }
                 resMap.put("data", resList);
