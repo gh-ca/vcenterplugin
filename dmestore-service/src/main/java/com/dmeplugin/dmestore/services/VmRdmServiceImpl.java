@@ -7,9 +7,7 @@ import com.dmeplugin.dmestore.model.VmRdmCreateBean;
 import com.dmeplugin.dmestore.utils.StringUtil;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
 import com.vmware.vim25.DatastoreSummary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,8 +71,8 @@ public class VmRdmServiceImpl implements VmRdmService {
             size = createBean.getCreateVolumesRequest().getVolumes().get(0).getCapacity();
             mapping = createBean.getCreateVolumesRequest().getMapping();
         } else {
-            requestVolumeName = createBean.getCustomizeVolumesRequest().getCustomize_volumes().getVolume_specs().get(0).getName();
-            size = createBean.getCustomizeVolumesRequest().getCustomize_volumes().getVolume_specs().get(0).getCapacity();
+            requestVolumeName = createBean.getCustomizeVolumesRequest().getCustomizeVolumes().getVolumeSpecs().get(0).getName();
+            size = createBean.getCustomizeVolumesRequest().getCustomizeVolumes().getVolumeSpecs().get(0).getCapacity();
             mapping = createBean.getCustomizeVolumesRequest().getMapping();
         }
         //根据卷名称查询已创建的卷信息
@@ -209,7 +207,8 @@ public class VmRdmServiceImpl implements VmRdmService {
 
     private String createDmeVolumeByServiceLevel(CreateVolumesRequest createVolumesRequest) throws Exception {
         String url = DmeConstants.DME_VOLUME_BASE_URL;
-        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(createVolumesRequest));
+        Gson gsonTemp = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gsonTemp.toJson(createVolumesRequest));
         if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
             LOG.error("Failed to create RDM on DME!errorMsg:{}", responseEntity.getBody());
             throw new Exception("Failed to create RDM on DME!");
@@ -222,13 +221,14 @@ public class VmRdmServiceImpl implements VmRdmService {
 
     private String createDmeVolumeByUnServiceLevel(CustomizeVolumesRequest customizeVolumesRequest) throws Exception {
         String url = DmeConstants.DME_CREATE_VOLUME_UNLEVEL_URL;
-        String  ownerController = customizeVolumesRequest.getCustomize_volumes().getOwner_controller();
+        String  ownerController = customizeVolumesRequest.getCustomizeVolumes().getOwnerController();
         //归属控制器自动则不下发参数
-        final String OWNER_CONTROLLER_AUTO = "0";
-        if( OWNER_CONTROLLER_AUTO.equals(ownerController)){
-            customizeVolumesRequest.getCustomize_volumes().setOwner_controller(null);
+        final String ownerControllerAuto = "0";
+        if( ownerControllerAuto.equals(ownerController)){
+            customizeVolumesRequest.getCustomizeVolumes().setOwnerController(null);
         }
-        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(customizeVolumesRequest));
+        Gson gsonTemp = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gsonTemp.toJson(customizeVolumesRequest));
         if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
             LOG.error("Failed to create RDM on DME!errorMsg:{}", responseEntity.getBody());
             throw new Exception("Failed to create RDM on DME!");
