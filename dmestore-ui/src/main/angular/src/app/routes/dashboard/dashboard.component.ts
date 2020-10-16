@@ -12,6 +12,8 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ClrForm} from '@clr/angular';
 import {HttpClient} from '@angular/common/http';
 import {Router} from "@angular/router";
+import { TranslateService } from "@ngx-translate/core";
+
 
 @Component({
   selector: 'app-dashboard',
@@ -26,7 +28,7 @@ import {Router} from "@angular/router";
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./dashboard.component.scss'],
-  providers: [DashboardService],
+  providers: [DashboardService, TranslateService],
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -53,6 +55,9 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         warning: 0,
         info: 0
   };
+
+  capadataStoreName = this.translateService.instant("overview.allDataStore");
+  top5dataStoreName = this.translateService.instant("overview.allDataStore");
   storeageTopN = [];
 
   popShow = false;
@@ -78,6 +83,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private dashboardSrv: DashboardService,
+    private translateService: TranslateService,
     private ngZone: NgZone,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
@@ -101,9 +107,9 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         this.hostModel = result.data.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         this.loadStorageNum();
-        this.loadstorageCapacity('0');
+        this.loadstorageCapacity('0', 'overview.allDataStore');
         this.loadBestPracticeViolations();
-        this.loadTop5DataStore('0');
+        this.loadTop5DataStore('0', 'overview.allDataStore');
       }
     }, err => {
       console.error('ERROR', err);
@@ -111,7 +117,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // //type 0 :VMFS and NFS, 1:VMFS, 2:NFS
-  loadTop5DataStore(type: string){
+  loadTop5DataStore(type: string, name: string){
+    this.top5dataStoreName = this.translateService.instant(name);
     this.http.get('overview/getdatastoretopn', { params: {type: type}}).subscribe((result: any) => {
       console.log(result);
       if (result.code === '0' || result.code === '200'){
@@ -133,7 +140,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   storageCapacityChartInit(chart){
     this.storageCapacityChart = chart;
   }
-  loadstorageCapacity(type: string){
+  loadstorageCapacity(type: string, name: string){
+    this.capadataStoreName = this.translateService.instant(name);
     this.storageCapacityChart.showLoading();
     this.http.get('overview/getdatastoreoverview', { params: {type: type}}).subscribe((result: any) => {
       console.log(result);
@@ -249,6 +257,13 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['bestpractice'],{
       queryParams:{
         type: type
+      }
+    });
+  }
+
+  toDatastoreDeviceView(){
+    this.router.navigate(['storage'],{
+      queryParams:{
       }
     });
   }
