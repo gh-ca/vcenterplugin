@@ -1,4 +1,4 @@
-<div>
+<div *ngIf="fsDetails">
   <clr-select-container>
     <select clrSelect (ngModelOptions)="fsNames" [(ngModel)]="defaultSelect" name="defaultSelect" class="clr-select" (change)="changeFs()">
       <option *ngFor="let item of fsNames" value="{{item}}">{{item}}</option>
@@ -32,4 +32,7 @@
       <td class="left">{{fsDetail.dateCompression}}</td>
     </tr>
   </table>
+</div>
+<div *ngIf="!fsDetails">
+  无
 </div>

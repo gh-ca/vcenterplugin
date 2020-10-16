@@ -127,7 +127,7 @@ export class VmfsListComponent implements OnInit {
   }
   // 修改
   modifyBtnClick() {
-    console.log(this.rowSelected[0]);
+    console.log('this.rowSelected[0]', this.rowSelected[0]);
     // 初始化form
     this.modifyForm = new GetForm().getEditForm();
     if (this.rowSelected.length === 1) {
@@ -166,6 +166,12 @@ export class VmfsListComponent implements OnInit {
     } else {
       // 若不修改卷名称则将旧的卷名称设置为newVol
       this.modifyForm.newVoName = this.rowSelected[0].volumeName;
+    }
+    if (this.isServiceLevelData) {
+      if(this.modifyForm.max_bandwidth === null && this.modifyForm.max_iops === null
+        && this.modifyForm.min_bandwidth === null && this.modifyForm.min_iops === null && this.modifyForm.latency === null) {
+        this.modifyForm.control_policy = null;
+      }
     }
     this.modifyForm.newDsName = this.modifyForm.name;
     console.log('this.modifyForm:', this.modifyForm);
@@ -532,12 +538,11 @@ export class VmfsListComponent implements OnInit {
         this.form.service_level_name = null;
       }
       // 若控制策略数据为空，则将控制策略变量置为空
-      if(this.form.maxbandwidth === null && this.form.maxiops
-        && this.form.minbandwidth && this.form.miniops && this.form.latency) {
+      if(this.form.maxbandwidth === null && this.form.maxiops === null
+        && this.form.minbandwidth === null && this.form.miniops === null && this.form.latency === null) {
         this.form.control_policy = null;
       }
-      this.form.control_policy = null;
-      console.log(this.form);
+      console.log('addFrom', this.form);
       this.remoteSrv.createVmfs(this.form).subscribe((result: any) => {
         if (result.code === '200') {
           console.log('创建成功');
@@ -649,38 +654,40 @@ export class VmfsListComponent implements OnInit {
   // 挂载按钮点击事件
   mountBtnFunc() {
     // 初始化表单
-    this.mountForm = new GetForm().getMountForm();
-    const objectIds = [];
-    objectIds.push(this.rowSelected[0].objectid);
-    this.mountForm.dataStoreObjectIds = objectIds;
+    if (this.rowSelected.length === 1) {
+      this.mountForm = new GetForm().getMountForm();
+      const objectIds = [];
+      objectIds.push(this.rowSelected[0].objectid);
+      this.mountForm.dataStoreObjectIds = objectIds;
 
-    // 初始化主机
-    this.mountHostData = false;
-    this.hostList = [];
-    const hostNullInfo = {
-      hostId: '',
-      hostName: ''
-    };
-    this.hostList.push(hostNullInfo);
-    this.initMountHost().then(res => {
-      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-    });
+      // 初始化主机
+      this.mountHostData = false;
+      this.hostList = [];
+      const hostNullInfo = {
+        hostId: '',
+        hostName: ''
+      };
+      this.hostList.push(hostNullInfo);
+      this.initMountHost().then(res => {
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+      });
 
-    // 初始化集群
-    this.mountClusterData = false;
-    this.clusterList = [];
-    const clusterNullInfo = {
-      clusterId: '',
-      clusterName: ''
+      // 初始化集群
+      this.mountClusterData = false;
+      this.clusterList = [];
+      const clusterNullInfo = {
+        clusterId: '',
+        clusterName: ''
+      }
+      this.clusterList.push(clusterNullInfo);
+
+      this.initMountCluster().then(res => {
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+      });
+
+      // 打开挂载页面
+      this.mountShow = true;
     }
-    this.clusterList.push(clusterNullInfo);
-
-    this.initMountCluster().then(res => {
-      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-    });
-
-    // 打开挂载页面
-    this.mountShow = true;
   }
   // 挂载  集群数据初始化
   initMountCluster() {
@@ -783,9 +790,9 @@ export class VmfsListComponent implements OnInit {
   // 变更服务等级 按钮点击事件
   changeServiceLevelBtnFunc() {
 
-    // 初始化表单
-    this.changeServiceLevelForm = new GetForm().getChangeLevelForm();
     if (this.rowSelected.length === 1) {
+      // 初始化表单
+      this.changeServiceLevelForm = new GetForm().getChangeLevelForm();
       // 设置表单默认参数
       const volumeIds = [];
       volumeIds.push(this.rowSelected[0].volumeId);
@@ -872,5 +879,22 @@ export class VmfsListComponent implements OnInit {
     });
   }
 
-
+  // 空间回收按钮点击事件
+  reclaimBtnClick() {
+    if (this.rowSelected.length >= 1) {
+      this.reclaimShow=true;
+    }
+  }
+  // 卸载按钮点击事件
+  unmountBtnFunc() {
+    if (this.rowSelected.length === 1) {
+      this.unmountShow=true;
+    }
+  }
+  // 删除按钮点击事件
+  delBtnClickFUnc() {
+    if(this.rowSelected.length >= 1) {
+      this.delShow=true
+    }
+  }
 }

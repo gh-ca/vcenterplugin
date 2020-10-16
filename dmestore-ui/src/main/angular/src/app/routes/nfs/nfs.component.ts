@@ -1,5 +1,8 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
-import {AddNfs, Cluster, FileSystem, Host, List, ModifyNfs, Mount, NfsService, Share, ShareClient} from './nfs.service';
+import {
+  AddNfs, Cluster, FileSystem, Host, List, ModifyNfs, Mount, NfsService, Share, ShareClient,
+  Vmkernel
+} from './nfs.service';
 import {GlobalsService} from '../../shared/globals.service';
 import {LogicPort, StorageList, StorageService} from '../storage/storage.service';
 import {StoragePool} from "../storage/detail/detail.service";
@@ -30,15 +33,20 @@ export class NfsComponent implements OnInit {
   mountObj = '1';
   fsIds = [];
   addForm = new AddNfs();
+  unit='GB';
   selectHost = [];
   hostLoading = true;
   currentData = new ModifyNfs();
   hostList: Host[] = [];
+  vmkernelList: Vmkernel[]=[];
+  //vmkernel:any;
+  checkedPool:any;
   clusterList: Cluster[] = [];
   mountForm = new Mount();
   storageList: StorageList[] = [];
   storagePools: StoragePool[] = [];
   logicPorts: LogicPort[] = [];
+
 
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
@@ -57,7 +65,6 @@ export class NfsComponent implements OnInit {
     this.remoteSrv.getData()
       .subscribe((result: any) => {
         this.list = result.data;
-        console.log(result);
         this.isLoading = false;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         // 获取性能列表
@@ -70,8 +77,6 @@ export class NfsComponent implements OnInit {
     this.list.forEach(item => {
       this.fsIds.push(item.fsId);
     });
-    console.log('fsIds');
-    console.log(this.fsIds);
     this.remoteSrv.getChartData(this.fsIds).subscribe((result: any) => {
       if (result.code === '200'){
         const chartList: List [] = result.data;
@@ -123,8 +128,12 @@ export class NfsComponent implements OnInit {
   }
   // 添加提交方法
   addNfs(){
+    this.addForm.poolRawId=this.checkedPool.poolId;
+    this.addForm.storagePoolId= this.checkedPool.storagePoolId;
+    console.log('提交参数：')
+    console.log(this.addForm);
     // 单位换算
-    switch (this.addForm.unit) {
+    switch (this.unit) {
       case 'TB':
         this.addForm.size = this.addForm.size * 1024;
         break;
@@ -137,46 +146,6 @@ export class NfsComponent implements OnInit {
       default: // 默认GB 不变
         break;
     }
-    // 构建share 和fs对象
-    if (this.addForm.sameName){
-     const share = new Share();
-     share.name = this.addForm.nfsName;
-     share.share_path = this.addForm.nfsName;
-     this.addForm.create_nfs_share_param = share;
-     const fs = new FileSystem();
-     fs.name = this.addForm.nfsName;
-     fs.capacity = this.addForm.size;
-     fs.count = 1;
-     this.addForm.filesystem_specs.push(fs);
-    }else {
-      const share = new Share();
-      share.name = this.addForm.shareName;
-      share.share_path = this.addForm.shareName;
-      this.addForm.create_nfs_share_param = share;
-      const fs = new FileSystem();
-      fs.name = this.addForm.fsName;
-      fs.capacity = this.addForm.size;
-      fs.count = 1;
-      this.addForm.filesystem_specs.push(fs);
-    }
-    // nfs_share_client_addition 构建挂载的主机列表
-    if (this.selectHost !== null && this.selectHost.length > 0){
-      this.selectHost.forEach(h => {
-        const cli = new ShareClient();
-        cli.name = h.hostName;
-        cli.accessval = this.addForm.accessMode;
-        this.addForm.nfs_share_client_addition.push(cli);
-      });
-    }
-    // thin属性构造
-    if (this.addForm.thin){
-      this.addForm.tuning.allocation_type = 'thin';
-    }else{
-      this.addForm.tuning.allocation_type = 'thick';
-    }
-    // 构建exportPath路径
-    this.addForm.exportPath = this.addForm.nfsName;
-    this.addForm.pool_raw_id = this.addForm.storage_pool_id;
     this.remoteSrv.addNfs(this.addForm).subscribe((result: any) => {
       if (result.code === '200'){
         this.popShow = false;
@@ -190,7 +159,7 @@ export class NfsComponent implements OnInit {
     this.storagePools = null;
     this.logicPorts = null;
     // 选择存储后获取存储池
-    this.storageService.getStoragePoolListByStorageId(this.addForm.storage_id)
+    this.storageService.getStoragePoolListByStorageId(this.addForm.storagId)
       .subscribe((r: any) => {
         if (r.code === '200'){
           this.storagePools = r.data.data;
@@ -198,9 +167,20 @@ export class NfsComponent implements OnInit {
       });
     this.selectLogicPort();
   }
+  checkHost(){
+    this.addForm.vkernelIp=null;
+    //选择主机后获取虚拟网卡
+    this.remoteSrv.getVmkernelListByObjectId(this.addForm.hostObjectId)
+      .subscribe((r: any) => {
+        if (r.code === '200'){
+          this.vmkernelList = r.data;
+        }
+      });
+    this.selectLogicPort();
+  }
   selectLogicPort(){
     // 选择存储后逻辑端口
-    this.storageService.getLogicPortListByStorageId(this.addForm.storage_id)
+    this.storageService.getLogicPortListByStorageId(this.addForm.storagId)
       .subscribe((r: any) => {
         if (r.code === '200'){
         this.logicPorts = r.data.data;
@@ -238,32 +218,37 @@ export class NfsComponent implements OnInit {
   }
   // 弹出缩容页面
   reduceView(){
-    console.log(this.rowSelected[0]);
-    this.oldCapacity = this.rowSelected[0].capacity;
-    this.reduceOpen = true;
+    if (this.rowSelected.length === 1) {
+      console.log(this.rowSelected[0]);
+      this.oldCapacity = this.rowSelected[0].capacity;
+      this.reduceOpen = true;
+    }
   }
   // 缩容提交
   reduceCommit(){
 
   }
+
   // 挂载
   mount(){
-    this.mountForm = new Mount();
-    this.mountForm.dataStoreName = this.rowSelected[0].name;
-    this.mountForm.dataStoreObjectId = this.rowSelected[0].objectid;
-    this.remoteSrv.getHostListByObjectId(this.rowSelected[0].objectid).subscribe((r: any) => {
-      if (r.code === '200'){
-        this.hostList = r.data;
-        this.cdr.detectChanges();
-      }
-    });
-    this.remoteSrv.getClusterListByObjectId(this.rowSelected[0].objectid).subscribe((r: any) => {
-      if (r.code === '200'){
-        this.clusterList = r.data;
-        this.cdr.detectChanges();
-      }
-    });
-    this.mountShow = true;
+    if (this.rowSelected.length === 1) {
+      this.mountForm = new Mount();
+      this.mountForm.dataStoreName = this.rowSelected[0].name;
+      this.mountForm.dataStoreObjectId = this.rowSelected[0].objectid;
+      this.remoteSrv.getHostListByObjectId(this.rowSelected[0].objectid).subscribe((r: any) => {
+        if (r.code === '200'){
+          this.hostList = r.data;
+          this.cdr.detectChanges();
+        }
+      });
+      this.remoteSrv.getClusterListByObjectId(this.rowSelected[0].objectid).subscribe((r: any) => {
+        if (r.code === '200'){
+          this.clusterList = r.data;
+          this.cdr.detectChanges();
+        }
+      });
+      this.mountShow = true;
+    }
   }
   // 挂载提交
   mountSubmit(){
@@ -274,11 +259,23 @@ export class NfsComponent implements OnInit {
       }
     });
   }
+  // 卸载按钮点击事件
+  unmountBtnFunc() {
+    if (this.rowSelected.length === 1) {
+      this.unmountShow=true;
+    }
+  }
   // 卸载
   unmount(){
     const name = this.rowSelected[0].name;
     console.log(name);
     this.unmountShow = false;
+  }
+  // 删除按钮点击事件
+  delBtnFunc() {
+    if (this.rowSelected.length === 1) {
+      this.delShow=true
+    }
   }
   // 删除NFS
   delNfs(){
