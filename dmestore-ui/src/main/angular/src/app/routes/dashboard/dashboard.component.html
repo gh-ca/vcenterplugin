@@ -50,7 +50,7 @@
         <div class="clr-col-12">
           <div class="info-charts-wrap">
             <div echarts [options]="{}" (chartInit)= "storageNumChartInit($event)" style="width: 30%;height: 150px;margin-right: 20%;"></div>
-            <div class="info-content">
+            <div class="info-content" style="cursor:pointer" (click)="toDatastoreDeviceView()">
               <div class="info-content-text">
                 <span>{{'overview.total' | translate}}</span>
                 <span>{{storageNum.total}}</span>
@@ -114,13 +114,13 @@
           <div class="info-header-left">
             <clr-dropdown [clrCloseMenuOnItemClick]="true">
               <button clrDropdownTrigger class="dropdown-toggle  btn btn-link">
-                {{'overview.operation' | translate}}
+                {{capadataStoreName}}
                 <clr-icon shape="caret down"></clr-icon>
               </button>
               <clr-dropdown-menu *clrIfOpen>
-                <div clrDropdownItem (click)="loadstorageCapacity('0')">{{'overview.allDataStore' | translate}}</div>
-                <div clrDropdownItem (click)="loadstorageCapacity('1')">{{'overview.VMFS' | translate}}</div>
-                <div clrDropdownItem (click)="loadstorageCapacity('2')">{{'overview.NFS' | translate}}</div>
+                <div clrDropdownItem (click)="loadstorageCapacity('0', 'overview.allDataStore')">{{'overview.allDataStore' | translate}}</div>
+                <div clrDropdownItem (click)="loadstorageCapacity('1', 'overview.VMFS')">{{'overview.VMFS' | translate}}</div>
+                <div clrDropdownItem (click)="loadstorageCapacity('2', 'overview.NFS')">{{'overview.NFS' | translate}}</div>
               </clr-dropdown-menu>
             </clr-dropdown>
           </div>
@@ -153,6 +153,17 @@
         <div class="info-card-header">
           <div class="info-header-left">
             <!--  -->
+            <clr-dropdown [clrCloseMenuOnItemClick]="true">
+              <button clrDropdownTrigger class="dropdown-toggle  btn btn-link" style="margin-right: 10px">
+                {{top5dataStoreName}}
+                <clr-icon shape="caret down"></clr-icon>
+              </button>
+              <clr-dropdown-menu *clrIfOpen>
+                <div clrDropdownItem (click)="loadTop5DataStore('0', 'overview.allDataStore')">{{'overview.allDataStore' | translate}}</div>
+                <div clrDropdownItem (click)="loadTop5DataStore('1', 'overview.VMFS')">{{'overview.VMFS' | translate}}</div>
+                <div clrDropdownItem (click)="loadTop5DataStore('2', 'overview.NFS')">{{'overview.NFS' | translate}}</div>
+              </clr-dropdown-menu>
+            </clr-dropdown>
             <div>{{'overview.top5T' | translate}}</div>
           </div>
         </div>

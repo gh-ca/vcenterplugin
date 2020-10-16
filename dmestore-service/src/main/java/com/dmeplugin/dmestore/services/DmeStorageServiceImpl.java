@@ -338,8 +338,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     LogicPorts logicPorts = new LogicPorts();
                     logicPorts.setId(ToolUtils.jsonToStr(element.get("id")));
                     logicPorts.setName(ToolUtils.jsonToStr(element.get("name")));
-                    logicPorts.setRunning_status(ToolUtils.jsonToStr(element.get("running_status")));
-                    logicPorts.setOperational_status(ToolUtils.jsonToStr(element.get("operational_status")));
+                    logicPorts.setRunningStatus(ToolUtils.jsonToStr(element.get("running_status")));
+                    logicPorts.setOperationalStatus(ToolUtils.jsonToStr(element.get("operational_status")));
                     logicPorts.setMgmtIp(ToolUtils.jsonToStr(element.get("mgmt_ip")));
                     logicPorts.setMgmtIpv6(ToolUtils.jsonToStr(element.get("mgmt_ipv6")));
                     logicPorts.setHomePortId(ToolUtils.jsonToStr(element.get("home_port_id")));

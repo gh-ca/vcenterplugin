@@ -7,17 +7,17 @@
   </div>
 </div>
 <div class="clr-row">
-  <div class="clr-col-7">
+  <div class="clr-col-8">
     <button class="btn btn-primary" (click)="syncStoragePolicy()" style="margin-left: 10px">{{'menu.synSPolicy' | translate}}</button>
   </div>
-  <div class="clr-col-5">
+  <div class="clr-col-4">
     <label>{{'tier.name'|translate}}</label>
-    <input  style="height: 30px;margin-left: 20px" [(ngModel)]="searchName" type="search" result="s" name="name" #name="ngModel" />
-    <button class="btn btn-primary" style="height: 30px;margin-left: 20px" (click)="search();">{{'menu.search'|translate}}</button>
-    <select style="height: 30px;margin-left: 20px; width: 100px;" (ngModelOptions)="sortItems" [(ngModel)]="sortItem" name="sort" (change)="sortItemsChange();">
+    <input  style="height: 35px; margin-left: 20px; margin-right: 20px;width: 200px;" [(ngModel)]="searchName" type="search" result="s" name="name" #name="ngModel" />
+    <button class="btn btn-primary" (click)="search();">{{'menu.search'|translate}}</button>
+    <select style="height: 35px; margin-left: 20px; margin-right: 20px;width: 100px;" (ngModelOptions)="sortItems" [(ngModel)]="sortItem" name="sort" (change)="sortItemsChange();">
       <option *ngFor="let item of sortItems" value="{{item.id}}">{{item.value|translate}}</option>
     </select>
-    <button class="btn btn-primary" style="height: 30px;margin-left: 20px" (click)="refresh();">{{'menu.refresh'|translate}}</button>
+    <button class="btn btn-primary" (click)="refresh();">{{'menu.refresh'|translate}}</button>
   </div>
 </div>
 <div class="clr-row">

@@ -1,44 +1,123 @@
 package com.dmeplugin.dmestore.model;
-
+/**
+ * @author yy
+ * @className EthPortInfo
+ * @description TODO
+ * @date 2020/9/3 17:43
+ */
 public class EthPortInfo {
-    //DME Storage 1.0.RC1 系统资源北向模型 01.pdf 存储端口
+    /**
+     * DME Storage 1.0.RC1 系统资源北向模型 01.pdf 存储端口
+    **/
     String ownerType;
-    String ipv4Mask;  //IPv4掩码
+    /**
+     * IPv4掩码
+     **/
+    String ipv4Mask;
     String logicalType;
     String storageDeviceId;
-    String portName;    //端口名称
+    /**
+     * 端口名称
+     **/
+    String portName;
     String ownerId;
-    String portId;  //端口ID
-    String bondName; //绑定名称
-    String mac;  //MAC地址
-    String mgmtIpv6; //IPv6地址
-    String iscsiName; //iSCSI名称
+    /**
+     * 端口ID
+     **/
+    String portId;
+    /**
+     * 绑定名称
+     **/
+    String bondName;
+    /**
+     * MAC地址
+     **/
+    String mac;
+    /**
+     * IPv6地址
+     **/
+    String mgmtIpv6;
+    /**
+     * iSCSI名称
+     **/
+    String iscsiName;
     String ownerName;
-    Long lastMonitorTime; //最后监控时间
-    String mgmtIp;  //IPv4地址
+    /**
+     * 最后监控时间
+     **/
+    Long lastMonitorTime;
+    /**
+     * IPv4地址
+     **/
+    String mgmtIp;
     String confirmStatus;
-    String id;  //CMDB 实例 ID
-    Long lastModified; //最后修改时间
-    String connectStatus; //连接状态
+    /**
+     * CMDB 实例 ID
+     **/
+    String id;
+    /**
+     * 最后修改时间
+     **/
+    Long lastModified;
+    /**
+     * 连接状态
+     **/
+    String connectStatus;
     Integer classId;
-    String dataStatus; //监控状态
-    Integer maxSpeed; //Mbit/s
+    /**
+     * 监控状态
+     **/
+    String dataStatus;
+    /**
+     * Mbit/s
+     **/
+    Integer maxSpeed;
     String resId;
     Boolean local;
-    String portType; //端口类型
+    /**
+     * 端口类型
+     **/
+    String portType;
     String className;
     Integer numberOfInitiators;
-    String bondId;  //绑定ID
+    /**
+     * 绑定ID
+     **/
+    String bondId;
     String regionId;
-    String name;  //名称
-    String location; //位置
-    String nativeId; //原始ID
+    /**
+     * 名称
+     **/
+    String name;
+    /**
+     * 位置
+     **/
+    String location;
+    /**
+     * 原始ID
+     **/
+    String nativeId;
     String dataSource;
-    String ipv6Mask; //IPv6掩码
-    String status; //状态
-    Integer speed;  //Mbit/s
-    String wwn;  //WWN
-    String sfpStatus; //光模块状态
+    /**
+     * IPv6掩码
+     **/
+    String ipv6Mask;
+    /**
+     * 状态
+     **/
+    String status;
+    /**
+     * Mbit/s
+     **/
+    Integer speed;
+    /**
+     * WWN
+     **/
+    String wwn;  
+    /**
+     * 光模块状态
+     **/
+    String sfpStatus;
 
     public String getOwnerType() {
         return ownerType;
