@@ -1,76 +1,85 @@
 package com.dmeplugin.dmestore.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 /**
  * @author wangxiangyong
  **/
 public class CustomizeVolumes {
-    private String availability_zone;
-    private String initial_distribute_policy;
-    private String owner_controller;
-    private String pool_raw_id;
-    private String prefetch_policy;
-    private String prefetch_value;
-    //必须
-    private String storage_id;
+    @JsonProperty("availability_zone")
+    private String availabilityZone;
+    @JsonProperty("initial_distribute_policy")
+    private String initialDistributePolicy;
+    @JsonProperty("owner_controller")
+    private String ownerController;
+    @JsonProperty("pool_raw_id")
+    private String poolRawId;
+    @JsonProperty("prefetch_policy")
+    private String prefetchPolicy;
+    @JsonProperty("prefetch_value")
+    private String prefetchValue;
+    @JsonProperty("storage_id")
+    private String storageId;
     private CustomizeVolumeTuningForCreate tuning;
-    private List<ServiceVolumeBasicParams> volume_specs;
+    @JsonProperty("volume_specs")
+    private List<ServiceVolumeBasicParams> volumeSpecs;
 
-    public String getAvailability_zone() {
-        return availability_zone;
+    public String getAvailabilityZone() {
+        return availabilityZone;
     }
 
-    public void setAvailability_zone(String availability_zone) {
-        this.availability_zone = availability_zone;
+    public void setAvailabilityZone(String availabilityZone) {
+        this.availabilityZone = availabilityZone;
     }
 
-    public String getInitial_distribute_policy() {
-        return initial_distribute_policy;
+    public String getInitialDistributePolicy() {
+        return initialDistributePolicy;
     }
 
-    public void setInitial_distribute_policy(String initial_distribute_policy) {
-        this.initial_distribute_policy = initial_distribute_policy;
+    public void setInitialDistributePolicy(String initialDistributePolicy) {
+        this.initialDistributePolicy = initialDistributePolicy;
     }
 
-    public String getOwner_controller() {
-        return owner_controller;
+    public String getOwnerController() {
+        return ownerController;
     }
 
-    public void setOwner_controller(String owner_controller) {
-        this.owner_controller = owner_controller;
+    public void setOwnerController(String ownerController) {
+        this.ownerController = ownerController;
     }
 
-    public String getPool_raw_id() {
-        return pool_raw_id;
+    public String getPoolRawId() {
+        return poolRawId;
     }
 
-    public void setPool_raw_id(String pool_raw_id) {
-        this.pool_raw_id = pool_raw_id;
+    public void setPoolRawId(String poolRawId) {
+        this.poolRawId = poolRawId;
     }
 
-    public String getPrefetch_policy() {
-        return prefetch_policy;
+    public String getPrefetchPolicy() {
+        return prefetchPolicy;
     }
 
-    public void setPrefetch_policy(String prefetch_policy) {
-        this.prefetch_policy = prefetch_policy;
+    public void setPrefetchPolicy(String prefetchPolicy) {
+        this.prefetchPolicy = prefetchPolicy;
     }
 
-    public String getPrefetch_value() {
-        return prefetch_value;
+    public String getPrefetchValue() {
+        return prefetchValue;
     }
 
-    public void setPrefetch_value(String prefetch_value) {
-        this.prefetch_value = prefetch_value;
+    public void setPrefetchValue(String prefetchValue) {
+        this.prefetchValue = prefetchValue;
     }
 
-    public String getStorage_id() {
-        return storage_id;
+    public String getStorageId() {
+        return storageId;
     }
 
-    public void setStorage_id(String storage_id) {
-        this.storage_id = storage_id;
+    public void setStorageId(String storageId) {
+        this.storageId = storageId;
     }
 
     public CustomizeVolumeTuningForCreate getTuning() {
@@ -81,11 +90,11 @@ public class CustomizeVolumes {
         this.tuning = tuning;
     }
 
-    public List<ServiceVolumeBasicParams> getVolume_specs() {
-        return volume_specs;
+    public List<ServiceVolumeBasicParams> getVolumeSpecs() {
+        return volumeSpecs;
     }
 
-    public void setVolume_specs(List<ServiceVolumeBasicParams> volume_specs) {
-        this.volume_specs = volume_specs;
+    public void setVolumeSpecs(List<ServiceVolumeBasicParams> volumeSpecs) {
+        this.volumeSpecs = volumeSpecs;
     }
 }

@@ -1,38 +1,43 @@
 package com.dmeplugin.dmestore.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * @author wangxiangyong
  **/
 public class CustomizeVolumeTuningForCreate {
-    private SmartQos smartqos;
-    private Boolean compression_enabled;
-    private Boolean dedupe_enabled;
+    private SmartQosForRdmCreate smartqos;
+    @JsonProperty("compression_enabled")
+    private Boolean compressionEnabled;
+    @JsonProperty("dedupe_enabled")
+    private Boolean dedupeEnabled;
     private String smarttier;
     private String alloctype;
-    private Integer workload_type_id;
+    @JsonProperty("workload_type_id")
+    private Integer workloadTypeId;
 
-    public SmartQos getSmartqos() {
+    public SmartQosForRdmCreate getSmartqos() {
         return smartqos;
     }
 
-    public void setSmartqos(SmartQos smartqos) {
+    public void setSmartqos(SmartQosForRdmCreate smartqos) {
         this.smartqos = smartqos;
     }
 
-    public Boolean getCompression_enabled() {
-        return compression_enabled;
+    public Boolean getCompressionEnabled() {
+        return compressionEnabled;
     }
 
-    public void setCompression_enabled(Boolean compression_enabled) {
-        this.compression_enabled = compression_enabled;
+    public void setCompressionEnabled(Boolean compressionEnabled) {
+        this.compressionEnabled = compressionEnabled;
     }
 
-    public Boolean getDedupe_enabled() {
-        return dedupe_enabled;
+    public Boolean getDedupeEnabled() {
+        return dedupeEnabled;
     }
 
-    public void setDedupe_enabled(Boolean dedupe_enabled) {
-        this.dedupe_enabled = dedupe_enabled;
+    public void setDedupeEnabled(Boolean dedupeEnabled) {
+        this.dedupeEnabled = dedupeEnabled;
     }
 
     public String getSmarttier() {
@@ -51,11 +56,11 @@ public class CustomizeVolumeTuningForCreate {
         this.alloctype = alloctype;
     }
 
-    public Integer getWorkload_type_id() {
-        return workload_type_id;
+    public Integer getWorkloadTypeId() {
+        return workloadTypeId;
     }
 
-    public void setWorkload_type_id(Integer workload_type_id) {
-        this.workload_type_id = workload_type_id;
+    public void setWorkloadTypeId(Integer workloadTypeId) {
+        this.workloadTypeId = workloadTypeId;
     }
 }
