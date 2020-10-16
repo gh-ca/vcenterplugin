@@ -542,6 +542,7 @@
   },
   "tier": {
     "name": "名称",
+    "namep": "请输入名称",
     "total": "总量",
     "free": "空闲量",
     "used": "已使用",
@@ -597,6 +598,14 @@
     "last1M": "最近1个月",
     "last3M": "最近3个月",
     "last6M": "最近6个月",
-    "last1Y": "最近一年"
+    "last1Y": "最近一年",
+
+    "names": "按名称排序",
+    "totals": "按总量排序",
+    "latencys": "按时延排序",
+    "maxIOPSs": "按IOPS上限排序",
+    "minIOPSs": "按IOPS下限排序",
+    "maxBandWidths": "按带宽上限排序",
+    "minBandWidths": "按带宽下限排序"
   }
 }
