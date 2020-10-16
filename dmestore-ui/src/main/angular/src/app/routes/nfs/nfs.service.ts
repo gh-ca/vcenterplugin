@@ -135,11 +135,12 @@ export class AddNfs{
   accessMode:string;//  挂载方式 分 只读 和读写
   constructor(){
     this.sameName = true;
-    this.advance = true;
+    this.advance = false;
     this.qosFlag = false;
     this.deduplicationEnabled = false;
     this.compressionEnabled = false;
     this.autoSizeEnable = false;
+    this.contolPolicy='up';
     this.thin = true;
   }
 }
