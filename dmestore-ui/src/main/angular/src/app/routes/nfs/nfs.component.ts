@@ -39,6 +39,8 @@ export class NfsComponent implements OnInit {
   currentData = new ModifyNfs();
   hostList: Host[] = [];
   vmkernelList: Vmkernel[]=[];
+  //vmkernel:any;
+  checkedPool:any;
   clusterList: Cluster[] = [];
   mountForm = new Mount();
   storageList: StorageList[] = [];
@@ -63,7 +65,6 @@ export class NfsComponent implements OnInit {
     this.remoteSrv.getData()
       .subscribe((result: any) => {
         this.list = result.data;
-        console.log(result);
         this.isLoading = false;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         // 获取性能列表
@@ -127,34 +128,32 @@ export class NfsComponent implements OnInit {
   }
   // 添加提交方法
   addNfs(){
+    this.addForm.poolRawId=this.checkedPool.poolId;
+    this.addForm.storagePoolId= this.checkedPool.storagePoolId;
     console.log('提交参数：')
     console.log(this.addForm);
-    // // nfs_share_client_addition 构建挂载的主机列表
-    // if (this.selectHost !== null && this.selectHost.length > 0){
-    //   this.selectHost.forEach(h => {
-    //     const cli = new ShareClient();
-    //     cli.name = h.hostName;
-    //     cli.accessval = this.addForm.accessMode;
-    //     this.addForm.nfs_share_client_addition.push(cli);
-    //   });
-    // }
-    // // thin属性构造
-    // if (this.addForm.thin){
-    //   this.addForm.tuning.allocation_type = 'thin';
-    // }else{
-    //   this.addForm.tuning.allocation_type = 'thick';
-    // }
-    // // 构建exportPath路径
-    // this.addForm.exportPath = this.addForm.nfsName;
-    // this.addForm.pool_raw_id = this.addForm.storage_pool_id;
-    // this.remoteSrv.addNfs(this.addForm).subscribe((result: any) => {
-    //   if (result.code === '200'){
-    //     this.popShow = false;
-    //   }else{
-    //     this.popShow = true;
-    //     this.errMessage = '添加失败！'+result.description;
-    //   }
-    //  });
+    // 单位换算
+    switch (this.unit) {
+      case 'TB':
+        this.addForm.size = this.addForm.size * 1024;
+        break;
+      case 'MB':
+        this.addForm.size = this.addForm.size / 1024;
+        break;
+      case 'KB':
+        this.addForm.size = this.addForm.size / (1024 * 1024);
+        break;
+      default: // 默认GB 不变
+        break;
+    }
+    this.remoteSrv.addNfs(this.addForm).subscribe((result: any) => {
+      if (result.code === '200'){
+        this.popShow = false;
+      }else{
+        this.popShow = true;
+        this.errMessage = '添加失败！'+result.description;
+      }
+     });
   }
   selectStoragePool(){
     this.storagePools = null;

@@ -95,12 +95,24 @@
           </select>
         </clr-select-container>
         <!--存储池-->
-        <clr-select-container>
+        <!--<clr-select-container>-->
+          <!--<label>{{'nfs.storagePool' | translate}}</label>-->
+          <!--<select clrSelect (ngModelOptions)="storagePools" [(ngModel)]="addForm.storagePoolId" name="storagePoolId" class="clr-select">-->
+            <!--<option *ngFor="let item of storagePools" value="{{item.storageId}}">{{item.name}}</option>-->
+          <!--</select>-->
+        <!--</clr-select-container>-->
+        <clr-combobox-container>
           <label>{{'nfs.storagePool' | translate}}</label>
-          <select clrSelect (ngModelOptions)="storagePools" [(ngModel)]="addForm.storagePoolId" name="storagePoolId" class="clr-select">
-            <option *ngFor="let item of storagePools" value="{{item.storageId}}">{{item.name}}</option>
-          </select>
-        </clr-select-container>
+          <clr-combobox  [(ngModel)]="checkedPool" name="checkedPool" required>
+            <clr-options>
+              <clr-option *clrOptionItems="let device of storagePools; field:'name'" [clrValue]="device">
+                <!--<clr-icon *ngIf="device.deviceName !== '' && device.deviceType === 'host'" shape="host" role="img" aria-label="World is turning"></clr-icon>-->
+                <!--<clr-icon *ngIf="device.deviceName !== '' && device.deviceType !== 'host'" shape="host-group" role="img" aria-label="World is turning"></clr-icon>-->
+                {{device.name}}
+              </clr-option>
+            </clr-options>
+          </clr-combobox>
+        </clr-combobox-container>
         <!--逻辑端口-->
         <clr-select-container>
           <label>{{'nfs.logicPort' | translate}}</label>
@@ -108,6 +120,18 @@
             <option *ngFor="let item of logicPorts" value="{{item.currentPortId}}">{{item.currentPortName}}</option>
           </select>
         </clr-select-container>
+        <!--<clr-combobox-container>-->
+          <!--<label style="color: #9F9F9F;">{{'nfs.logicPort' | translate}}</label>-->
+          <!--<clr-combobox  [(ngModel)]="checkedLogic" name="checkedLogic" required>-->
+            <!--<clr-options>-->
+              <!--<clr-option *clrOptionItems="let device of logicPorts; field:'currentPortName'" [clrValue]="device">-->
+                <!--&lt;!&ndash;<clr-icon *ngIf="device.deviceName !== '' && device.deviceType === 'host'" shape="host" role="img" aria-label="World is turning"></clr-icon>&ndash;&gt;-->
+                <!--&lt;!&ndash;<clr-icon *ngIf="device.deviceName !== '' && device.deviceType !== 'host'" shape="host-group" role="img" aria-label="World is turning"></clr-icon>&ndash;&gt;-->
+                <!--{{device.currentPortName}}-->
+              <!--</clr-option>-->
+            <!--</clr-options>-->
+          <!--</clr-combobox>-->
+        <!--</clr-combobox-container>-->
         <!--名称-->
         <clr-input-container>
           <label>{{'nfs.datastoreName' | translate}}</label>
@@ -156,6 +180,18 @@
             <option *ngFor="let item of hostList" value="{{item.objectId}}">{{item.hostName}}</option>
           </select>
         </clr-select-container>
+        <!--<clr-combobox-container>-->
+          <!--<label style="color: #9F9F9F;">{{'nfs.vkernel' | translate}}</label>-->
+          <!--<clr-combobox  [(ngModel)]="vmkernel" name="vmkernel" required>-->
+            <!--<clr-options>-->
+              <!--<clr-option *clrOptionItems="let device of vmkernelList; field:'ipAddress'" [clrValue]="device">-->
+                <!--&lt;!&ndash;<clr-icon *ngIf="device.deviceName !== '' && device.deviceType === 'host'" shape="host" role="img" aria-label="World is turning"></clr-icon>&ndash;&gt;-->
+                <!--&lt;!&ndash;<clr-icon *ngIf="device.deviceName !== '' && device.deviceType !== 'host'" shape="host-group" role="img" aria-label="World is turning"></clr-icon>&ndash;&gt;-->
+                <!--{{device.ipAddress}}-->
+              <!--</clr-option>-->
+            <!--</clr-options>-->
+          <!--</clr-combobox>-->
+        <!--</clr-combobox-container>-->
         <!--虚拟网卡IP-->
         <clr-select-container>
           <label>{{'nfs.vkernel' | translate}}</label>
