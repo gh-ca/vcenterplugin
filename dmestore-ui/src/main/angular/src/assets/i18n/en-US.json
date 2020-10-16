@@ -239,7 +239,8 @@
     },
     "unmount":{
       "title":"Unmount",
-      "content":"Are you sure to unmount?"
+      "content":"Are you sure to unmount?",
+      "notChooseDeviceTips":"Please select the host or cluster to be uninstalled!"
     },
     "reclaim": {
       "title":"Tips",
