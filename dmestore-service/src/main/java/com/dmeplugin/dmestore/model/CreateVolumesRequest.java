@@ -1,21 +1,24 @@
 package com.dmeplugin.dmestore.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.List;
 
 /**
  * @author wangxiangyong
  **/
 public class CreateVolumesRequest {
-    private String service_level_id;
+    @JsonProperty("service_level_id")
+    private String serviceLevelId;
     private List<ServiceVolumeBasicParams> volumes;
     private ServiceVolumeMapping mapping;
 
-    public String getService_level_id() {
-        return service_level_id;
+    public String getServiceLevelId() {
+        return serviceLevelId;
     }
 
-    public void setService_level_id(String service_level_id) {
-        this.service_level_id = service_level_id;
+    public void setServiceLevelId(String serviceLevelId) {
+        this.serviceLevelId = serviceLevelId;
     }
 
     public List<ServiceVolumeBasicParams> getVolumes() {
