@@ -260,6 +260,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storagePool.setTier2_raid_lv(ToolUtils.jsonToStr(element.get("tier2RaidLv")));
                     storagePool.setConsumed_capacity(ToolUtils.jsonToDou(element.get("usedCapacity"),0.0));
                     storagePool.setStorage_instance_id(ToolUtils.jsonToStr(element.get("resId")));
+
+                    storagePool.setPoolId(ToolUtils.jsonToStr(element.get("poolId")));
+
                     String diskPoolId = ToolUtils.jsonToStr(element.get("diskPoolId"));
                     storagePool.setDiskPoolId(diskPoolId);
                     Double subscribedCapacity = ToolUtils.jsonToDou(element.get("subscribedCapacity"), 0.0);
