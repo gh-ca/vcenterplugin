@@ -16,7 +16,7 @@ public class SmartQos {
     private Integer miniops;
     private Boolean enabled;
     //for update
-    private String control_policy;
+    private String controlPolicy;
 
     private String latencyUnit;
 
@@ -37,12 +37,12 @@ public class SmartQos {
         this.enabled = enabled;
     }
 
-    public String getControl_policy() {
-        return control_policy;
+    public String getControlPolicy() {
+        return controlPolicy;
     }
 
-    public void setControl_policy(String control_policy) {
-        this.control_policy = control_policy;
+    public void setControlPolicy(String controlPolicy) {
+        this.controlPolicy = controlPolicy;
     }
 
     public String getName() {

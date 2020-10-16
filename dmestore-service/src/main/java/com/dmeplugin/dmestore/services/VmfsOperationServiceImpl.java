@@ -76,7 +76,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             SmartQos smartQos = new SmartQos();
             Object control_policy = params.get("control_policy");
             if (!StringUtils.isEmpty(control_policy)) {
-                smartQos.setControl_policy(control_policy.toString());
+                smartQos.setControlPolicy(control_policy.toString());
             }
             Object max_iops = params.get("max_iops");
             if (!StringUtils.isEmpty(max_iops)) {
