@@ -1090,7 +1090,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             if (storageIds != null && storageIds.size() > 0) {
                 Map<String, Object> params = new HashMap<>(16);
                 params.put("obj_ids", storageIds);
-                Map<String, Object> remap = null; //dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params,"storage");
+                Map<String, Object> remap = dataStoreStatisticHistoryService.queryCurrentStatistic(DmeIndicatorConstants.RESOURCE_TYPE_NAME_STORAGEDEVICE,params);
                 LOG.info("remap===" + gson.toJson(remap));
                 if (null != remap && null != remap.get(DmeConstants.DATA)) {
                     try {
@@ -1102,11 +1102,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                                 if (statisticObject != null) {
                                     Storage storage = new Storage();
                                     storage.setId(storageId);
-                                    storage.setMaxIops(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
-                                    storage.setMaxBandwidth(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
-                                    storage.setMaxCpuUtilization(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
-                                    storage.setMaxLatency(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
-                                    storage.setMaxOps(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+
+                                    storage.setMaxBandwidth(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_BANDWIDTH)));
+                                    storage.setMaxCpuUtilization(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_CPUUSAGE)));
+                                    storage.setMaxLatency(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_RESPONSETIME)));
+//                                    storage.setMaxOps(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.aa)));
                                     relists.add(storage);
                                 }
                             }
@@ -1131,7 +1131,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             if (storagePoolIds != null && storagePoolIds.size() > 0) {
                 Map<String, Object> params = new HashMap<>(16);
                 params.put("obj_ids", storagePoolIds);
-                Map<String, Object> remap = null; //dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params,"storagepool");
+                Map<String, Object> remap = dataStoreStatisticHistoryService.queryCurrentStatistic(DmeIndicatorConstants.RESOURCE_TYPE_NAME_STORAGEPOOL,params);
                 LOG.info("remap===" + gson.toJson(remap));
                 if (null != remap && null != remap.get(DmeConstants.DATA)) {
                     try {
@@ -1143,9 +1143,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                                 if (statisticObject != null) {
                                     StoragePool sp = new StoragePool();
                                     sp.setId(storagePoolId);
-                                    sp.setMaxIops(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
-                                    sp.setMaxBandwidth(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
-                                    sp.setMaxLatency(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT)));
+                                    sp.setMaxIops(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT)));
+                                    sp.setMaxBandwidth(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH)));
+                                    sp.setMaxLatency(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME)));
                                     relists.add(sp);
                                 }
                             }
