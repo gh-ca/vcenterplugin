@@ -46,6 +46,8 @@ export class NfsService {
     return this.http.get('accessnfs/listnfsperformance', {params: {fsIds}});
   }
   addNfs(params= {}){
+    console.log("addNfs")
+    console.log(params)
     return this.http.post('operatenfs/createnfsdatastore', params);
   }
   updateNfs(params= {}){
@@ -135,12 +137,11 @@ export class AddNfs{
   accessMode:string;//  挂载方式 分 只读 和读写
   constructor(){
     this.sameName = true;
-    this.advance = false;
+    this.advance = true;
     this.qosFlag = false;
     this.deduplicationEnabled = false;
     this.compressionEnabled = false;
     this.autoSizeEnable = false;
-    this.contolPolicy='up';
     this.thin = true;
   }
 }

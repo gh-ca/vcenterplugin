@@ -129,8 +129,8 @@ export class NfsComponent implements OnInit {
   }
   // 添加提交方法
   addNfs(){
-    this.addForm.poolRawId=this.checkedPool.poolId;
-    this.addForm.storagePoolId= this.checkedPool.storagePoolId;
+    this.addForm.poolRawId=this.checkedPool.diskPoolId;
+    this.addForm.storagePoolId= this.checkedPool.id;
     // 单位换算
     switch (this.unit) {
       case 'TB':
