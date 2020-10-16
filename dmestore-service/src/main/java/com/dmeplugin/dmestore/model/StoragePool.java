@@ -48,6 +48,13 @@ public class StoragePool   {
     //存储池所处硬盘id
     private String diskPoolId;
 
+    /**
+     *存储池所在存储中的ID
+     **/
+    private String poolId;
+    /**
+     *服务等级
+     **/
     private String serviceLevelName;
 
     /**
@@ -64,6 +71,14 @@ public class StoragePool   {
      *时延
      **/
     private Float maxLatency;
+
+    public String getPoolId() {
+        return poolId;
+    }
+
+    public void setPoolId(String poolId) {
+        this.poolId = poolId;
+    }
 
     public Float getMaxIops() {
         return maxIops;
