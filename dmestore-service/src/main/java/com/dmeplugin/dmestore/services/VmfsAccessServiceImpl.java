@@ -182,10 +182,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                 if (statisticObject != null) {
                                     VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
                                     vmfsDataInfo.setVolumeId(volumeId);
-                                    vmfsDataInfo.setIops(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VMFS_THROUGHPUT, "max"), null));
-                                    vmfsDataInfo.setBandwidth(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VMFS_BANDWIDTH, "max"), null));
-                                    vmfsDataInfo.setReadResponseTime(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VMFS_READRESPONSETIME, "max"), null));
-                                    vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VMFS_WRITERESPONSETIME, "max"), null));
+                                    vmfsDataInfo.setIops(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT, "max"), null));
+                                    vmfsDataInfo.setBandwidth(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH, "max"), null));
+                                    vmfsDataInfo.setReadResponseTime(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_READRESPONSETIME, "max"), null));
+                                    vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITERESPONSETIME, "max"), null));
                                     relists.add(vmfsDataInfo);
                                 }
                             }
@@ -1434,8 +1434,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 String initiatorId = checkToHost(hostId);
                 if (!StringUtils.isEmpty(initiatorId)) {
                     Map<String, Object> tempMap = new HashMap<>();
-                    tempMap.put("host_id", hostId);
-                    tempMap.put("host_name", hostNmme);
+                    tempMap.put("hostId", hostId);
+                    tempMap.put("hostName", hostNmme);
                     hostMapList.add(tempMap);
                 }
             }
@@ -1445,19 +1445,29 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     @Override
     public List<Map<String, Object>> getHostGroupsByStorageId(String storageId) throws Exception {
-        List<Map<String, Object>> hostMapList = new ArrayList<>();
+        List<Map<String, Object>> hostGroupMapList = new ArrayList<>();
 
-        List<Map<String, String>> lists = null;
+        List<Map<String, String>> clusters = null;
         //取得vcenter中的所有cluster
         String listStr = vcsdkUtils.getClustersByDsObjectId(storageId);
         LOG.info("host getClustersByDsObjectId==" + listStr);
         if (!StringUtils.isEmpty(listStr)) {
-            lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
+            clusters = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
             }.getType());
+            //vcenter侧主机启动器是否和dem侧主机启动器一致
+            for (Map<String, String> cluster : clusters) {
+                String hostId = ToolUtils.getStr(cluster.get("clusterId"));
+                String hostNmme = ToolUtils.getStr(cluster.get("clusterName"));
+                String initiatorId = checkToHost(hostId);
+                if (!StringUtils.isEmpty(initiatorId)) {
+                    Map<String, Object> tempMap = new HashMap<>();
+                    tempMap.put("hostGroupId", hostId);
+                    tempMap.put("hostGroupName", hostNmme);
+                    hostGroupMapList.add(tempMap);
+                }
+            }
         }
-
-
-        //通过vmware storageId 查询DME存储的关联关系 提取DME的存储ID
+       /* //通过vmware storageId 查询DME存储的关联关系 提取DME的存储ID
         List<String> dmeStorageIds = getDmeStorageIdsByStorageId(storageId);
 
         //通过dmeStorageIds 查主机组ID
@@ -1477,10 +1487,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         if (hostgroupIds.size() > 0) {
             for (String hostGroupId : hostgroupIds) {
                 Map<String, Object> hostGroupMap = dmeAccessService.getDmeHostGroup(hostGroupId);
-                hostMapList.add(hostGroupMap);
+                hostGroupMapList.add(hostGroupMap);
             }
-        }
-        return hostMapList;
+        }*/
+        return hostGroupMapList;
     }
 
     private List<String> getDmeStorageIdsByStorageId(String storageId) throws Exception {
