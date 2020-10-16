@@ -128,6 +128,8 @@ export interface StorageList {
 export interface StoragePoolList {
   name: string;
   id: string;
+  storage_id: string;
+  storage_name: string;
 }
 // 主机列表
 export interface HostList {
@@ -200,7 +202,7 @@ export class GetForm {
       clusterId: null, // 集群
       storage_id: null, // 存储设备id
       pool_raw_id: null, // 卷所属存储池在存储设备上的id
-      workload_type_id: 0, // 应用类型id
+      workload_type_id: null, // 应用类型id
       alloctype: null, // 卷分配类型，取值范围 thin，thick
       control_policy: '1', // 控制策略
       latencyChoose: false, // 时延 选中

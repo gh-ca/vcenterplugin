@@ -232,7 +232,7 @@
       "content":"确认要删除吗?"
     },
     "unmount":{
-      "title":"提示",
+      "title":"卸载",
       "content":"确认要卸载吗?"
     },
     "reclaim": {
