@@ -79,26 +79,26 @@ export class StorageDetail{
   maintenanceStart: string;
 }
 export class StoragePool{
-  free_capacity: number;// 空闲容量
+  freeCapacity: number;// 空闲容量
   name: string;// 名称
   id: string;// id
-  running_status: string;// 运行状态
-  health_status: string;// 健康状态
-  total_capacity: number;// 总容量
-  consumed_capacity: number;//已用容量
-  consumed_capacity_percentage: string;// 已用容量百分比(容量利用率)
-  storage_pool_id: string;
-  storage_instance_id: string;
-  storage_device_id: string;
-  subscription_rate: number; //订阅率
+  runningStatus: string;// 运行状态
+  healthStatus: string;// 健康状态
+  totalCapacity: number;// 总容量
+  consumedCapacity: number;//已用容量
+  consumedCapacity_percentage: string;// 已用容量百分比(容量利用率)
+  storagePoolId: string;
+  storageInstanceId: string;
+  storageDeviceId: string;
+  subscriptionRate: number; //订阅率
   //补充字段
-  media_type: string;//类型（块）
-  tier0_raid_lv: string; // RAID级别
-  tier1_raid_lv: string; // RAID级别
-  tier2_raid_lv: string; // RAID级别
-  storage_id: string; // 存储设备id
-  data_space: number; // 存储池上创建LUN或者文件系统时的可用容量 单位MB
-  subscribed_capacity: number; //订阅容量
+  mediaType: string;//类型（块）
+  tier0RaidLv: string; // RAID级别
+  tier1RaidLv: string; // RAID级别
+  tier2RaidLv: string; // RAID级别
+  storageId: string; // 存储设备id
+  dataSpace: number; // 存储池上创建LUN或者文件系统时的可用容量 单位MB
+  subscribedCapacity: number; //订阅容量
   physicalType: string;//硬盘类型
   diskPoolId:string;//存储池所处硬盘id
 }

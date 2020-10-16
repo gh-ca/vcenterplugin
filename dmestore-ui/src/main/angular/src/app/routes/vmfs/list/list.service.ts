@@ -127,7 +127,9 @@ export interface StorageList {
 // 存储池
 export interface StoragePoolList {
   name: string;
-  id: string;
+  poolId: string;
+  storage_id: string;
+  storage_name: string;
 }
 // 主机列表
 export interface HostList {
@@ -200,7 +202,7 @@ export class GetForm {
       clusterId: null, // 集群
       storage_id: null, // 存储设备id
       pool_raw_id: null, // 卷所属存储池在存储设备上的id
-      workload_type_id: 0, // 应用类型id
+      workload_type_id: null, // 应用类型id
       alloctype: null, // 卷分配类型，取值范围 thin，thick
       control_policy: '1', // 控制策略
       latencyChoose: false, // 时延 选中
@@ -223,19 +225,20 @@ export class GetForm {
   // 获取修改form表单（初始化的添加表单）
   getEditForm() {
     const editForm = {
-      name: '',
+      name: null,
       isSameName: true, // 卷名称与vmfs名称是否相同
-      volume_id: '', // 卷ID
+      volume_id: null, // 卷ID
       control_policy: '1', // 控制策略,
-      max_iops: '',
-      max_bandwidth: '',
+      max_iops: null,
+      max_bandwidth: null,
       newVoName: null, // 新卷名称
-      oldDsName: '', // 旧VMFS名称
-      newDsName: '', // 新VMFS名称
-      min_iops: '',
-      min_bandwidth: '',
-      dataStoreObjectId: '', // objectID,
-      service_level_name: '' // 服务等级名称
+      oldDsName: null, // 旧VMFS名称
+      newDsName: null, // 新VMFS名称
+      min_iops: null,
+      min_bandwidth: null,
+      dataStoreObjectId: null, // objectID,
+      service_level_name: null, // 服务等级名称
+      latency: null
     };
     return editForm;
   }

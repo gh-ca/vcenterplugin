@@ -67,6 +67,11 @@
     "qosPolicy":"Qos策略",
     "controlPolicy":"控制策略",
     "tfo":"交通管制对象",
+    "qos_bandwidth":"带宽",
+    "qos_iops":"IOPS",
+    "qos_latency":"时延",
+    "host":"主机",
+    "vkernel":"虚拟网卡IP",
     "thin":"Thin",
     "dataDedu":"重删",
     "disable":"关闭",
@@ -232,7 +237,7 @@
       "content":"确认要删除吗?"
     },
     "unmount":{
-      "title":"提示",
+      "title":"卸载",
       "content":"确认要卸载吗?"
     },
     "reclaim": {
@@ -454,7 +459,7 @@
     "totalCapacity": "总量",
     "used": "已用",
     "free": "可用",
-    "top5T": "使用率前5",
+    "top5T": "存储使用率前5",
     "connectT": "DME连接",
     "connectFail": "连接失败"
   },

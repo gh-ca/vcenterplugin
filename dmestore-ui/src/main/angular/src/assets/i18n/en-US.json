@@ -67,6 +67,11 @@
     "qosPolicy":"Qos Policy",
     "controlPolicy":"Control Policy",
     "tfo":"Traffic Control Object",
+    "qos_bandwidth":"Bandwidth",
+    "qos_iops":"IOPS",
+    "qos_latency":"Latency",
+    "host":"Host",
+    "vkernel":"vkernel IP",
     "thin":"Thin",
     "dataDedu":"Data Deduplication",
     "dataCompre":"Data Compression",
@@ -232,7 +237,7 @@
       "content":"Are you sure to delete?"
     },
     "unmount":{
-      "title":"Tips",
+      "title":"Unmount",
       "content":"Are you sure to unmount?"
     },
     "reclaim": {
