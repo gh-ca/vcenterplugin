@@ -2,7 +2,6 @@ import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {CommonService} from '../common.service';
 import {GlobalsService} from '../../shared/globals.service';
-import {FormControl, FormGroup, Validators} from "@angular/forms";
 import {ClrForm} from "@clr/angular";
 
 @Component({

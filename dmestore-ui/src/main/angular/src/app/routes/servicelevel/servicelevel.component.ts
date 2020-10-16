@@ -10,8 +10,6 @@ import {
 import {ClrDatagridStateInterface} from '@clr/angular';
 import {HttpClient} from '@angular/common/http';
 import { CommonService } from '../common.service';
-/* import * as echarts from 'Echarts'; */
-import 'echarts-liquidfill';
 import {MakePerformance, NfsService} from "../nfs/nfs.service";
 
 @Component({
@@ -146,23 +144,6 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   applicationTypeList: ApplicationType[] = [];
   // 选中列表
   applicationTypeSelected: ApplicationType[];
-  // 查询数据参数
-  applicationTypeQuery = { // 查询数据
-    q: 'name',
-    sort: 'hostSetting',
-    order: 'desc',
-    page: 0,
-    per_page: 5
-  };
-  // 查询数据结果,测试用
-  applicationTypeReslut = {
-    items: [{
-      id: '123',
-      storageDevice: 'applicationType-001',
-      applicationType: 'SSP'
-    }],
-    total_count: 1
-  };
   // ===============applicationType end==============
 
   constructor(private ngZone: NgZone,
