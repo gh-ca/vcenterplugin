@@ -316,7 +316,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
         String file_system_id = (String) params.get("file_system_id");
         Object capacity_autonegotiation = params.get("capacity_autonegotiation");
-
         if (capacity_autonegotiation != null) {
             fsReqBody.put("capacity_autonegotiation", capacity_autonegotiation);
         }

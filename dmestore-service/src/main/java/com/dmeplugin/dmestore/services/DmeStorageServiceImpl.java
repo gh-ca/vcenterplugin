@@ -1072,7 +1072,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             fileSystemDetail.setName(ToolUtils.jsonToStr(jsonObject.get("name")));
             CapacityAutonegotiation capacityAutonegotiation = new CapacityAutonegotiation();
             JsonObject json = jsonObject.get("capacity_auto_negotiation").getAsJsonObject();
-            capacityAutonegotiation.setAuto_size_enable(ToolUtils.jsonToBoo(json.get("auto_size_enable")));
+            capacityAutonegotiation.setAutoSizeEnable(ToolUtils.jsonToBoo(json.get("auto_size_enable")));
             fileSystemDetail.setCapacityAutonegotiation(capacityAutonegotiation);
             JsonObject tuning = jsonObject.get("tuning").getAsJsonObject();
             FileSystemTurning fileSystemTurning = new FileSystemTurning();
