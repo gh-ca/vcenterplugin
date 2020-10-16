@@ -238,32 +238,37 @@ export class NfsComponent implements OnInit {
   }
   // 弹出缩容页面
   reduceView(){
-    console.log(this.rowSelected[0]);
-    this.oldCapacity = this.rowSelected[0].capacity;
-    this.reduceOpen = true;
+    if (this.rowSelected.length === 1) {
+      console.log(this.rowSelected[0]);
+      this.oldCapacity = this.rowSelected[0].capacity;
+      this.reduceOpen = true;
+    }
   }
   // 缩容提交
   reduceCommit(){
 
   }
+
   // 挂载
   mount(){
-    this.mountForm = new Mount();
-    this.mountForm.dataStoreName = this.rowSelected[0].name;
-    this.mountForm.dataStoreObjectId = this.rowSelected[0].objectid;
-    this.remoteSrv.getHostListByObjectId(this.rowSelected[0].objectid).subscribe((r: any) => {
-      if (r.code === '200'){
-        this.hostList = r.data;
-        this.cdr.detectChanges();
-      }
-    });
-    this.remoteSrv.getClusterListByObjectId(this.rowSelected[0].objectid).subscribe((r: any) => {
-      if (r.code === '200'){
-        this.clusterList = r.data;
-        this.cdr.detectChanges();
-      }
-    });
-    this.mountShow = true;
+    if (this.rowSelected.length === 1) {
+      this.mountForm = new Mount();
+      this.mountForm.dataStoreName = this.rowSelected[0].name;
+      this.mountForm.dataStoreObjectId = this.rowSelected[0].objectid;
+      this.remoteSrv.getHostListByObjectId(this.rowSelected[0].objectid).subscribe((r: any) => {
+        if (r.code === '200'){
+          this.hostList = r.data;
+          this.cdr.detectChanges();
+        }
+      });
+      this.remoteSrv.getClusterListByObjectId(this.rowSelected[0].objectid).subscribe((r: any) => {
+        if (r.code === '200'){
+          this.clusterList = r.data;
+          this.cdr.detectChanges();
+        }
+      });
+      this.mountShow = true;
+    }
   }
   // 挂载提交
   mountSubmit(){
@@ -274,11 +279,23 @@ export class NfsComponent implements OnInit {
       }
     });
   }
+  // 卸载按钮点击事件
+  unmountBtnFunc() {
+    if (this.rowSelected.length === 1) {
+      this.unmountShow=true;
+    }
+  }
   // 卸载
   unmount(){
     const name = this.rowSelected[0].name;
     console.log(name);
     this.unmountShow = false;
+  }
+  // 删除按钮点击事件
+  delBtnFunc() {
+    if (this.rowSelected.length === 1) {
+      this.delShow=true
+    }
   }
   // 删除NFS
   delNfs(){
