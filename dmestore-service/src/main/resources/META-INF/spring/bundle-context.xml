@@ -109,6 +109,7 @@
     <bean name="VmfsOperationServiceImpl" class="com.dmeplugin.dmestore.services.VmfsOperationServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
+        <property name="taskService" ref="taskService"/>
     </bean>
 
 

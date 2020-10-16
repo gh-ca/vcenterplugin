@@ -14,7 +14,7 @@ public class SmartQos {
     private Integer maxiops;
     private Integer minbandwidth;
     private Integer miniops;
-    private Integer enabled;
+    private Boolean enabled;
     //for update
     private String control_policy;
 
@@ -28,11 +28,12 @@ public class SmartQos {
         this.latencyUnit = latencyUnit;
     }
 
-    public Integer getEnabled() {
+
+    public Boolean getEnabled() {
         return enabled;
     }
 
-    public void setEnabled(Integer enabled) {
+    public void setEnabled(Boolean enabled) {
         this.enabled = enabled;
     }
 

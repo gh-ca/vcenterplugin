@@ -2,18 +2,13 @@ package com.dmeplugin.dmestore.mvc;
 
 import com.dmeplugin.dmestore.model.EthPortInfo;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
-import com.dmeplugin.dmestore.model.Storage;
 import com.dmeplugin.dmestore.services.DmeStorageService;
-import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.google.gson.Gson;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -220,6 +215,15 @@ public class DmeStorageController extends BaseController{
     @ResponseBody
     public ResponseBodyBean getFailoverGroups(@RequestParam(name = "storage_id")String storage_id) {
         Map<String, Object> resMap = dmeStorageService.getFailoverGroups(storage_id);
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
+    }
+    @GetMapping("/filesystemdetail")
+    @ResponseBody
+    public ResponseBodyBean getFileSystemDetail(@RequestParam(name = "file_system_id")String file_system_id) {
+        Map<String, Object> resMap = dmeStorageService.getFileSystemDetail(file_system_id);
         if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }
