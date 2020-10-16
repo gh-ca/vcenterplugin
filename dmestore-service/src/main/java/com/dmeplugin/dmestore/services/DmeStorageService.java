@@ -122,6 +122,7 @@ public interface DmeStorageService {
      */
     Map<String,Object> getFailoverGroups(String storage_id);
 
+    Map<String,Object> getFileSystemDetail(String file_system_id);
     /**
      * Access storage performance
      *

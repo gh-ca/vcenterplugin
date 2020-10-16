@@ -706,10 +706,9 @@ public class VCSDKUtils {
                             VmfsDatastoreOption vmfsDatastoreOption = vmfsDatastoreOptions.get(0);
                             String diskUuid = vmfsDatastoreOption.getSpec().getDiskUuid();
                             VmfsDatastoreExpandSpec spec = (VmfsDatastoreExpandSpec) vmfsDatastoreOption.getSpec();
-                            //HostDiskPartitionSpec hostDiskPartitionSpec = new HostDiskPartitionSpec();
-                            //hostDiskPartitionSpec.setTotalSectors(spec.getPartition().getTotalSectors());
-                            //todo 终于搞出来了 组长还是厉害
-                            //spec.getPartition().setTotalSectors();
+                            HostVmfsVolume vmfs = datastoreInfo.getVmfs();
+                            Long totalSectors = addCapacity * ToolUtils.GI * 1L / vmfs.getBlockSize();
+                            spec.getPartition().setTotalSectors(totalSectors);
                             host1.getHostDatastoreSystemMO().expandVmfsDatastore(dsMo, spec);
                             scanDataStore(null,hostObjectId);
                         }
@@ -2274,16 +2273,18 @@ public class VCSDKUtils {
             HttpClientConfiguration clientConfig = HttpClientConfiguration.Factory.newInstance();
             clientConfig.setHttpConfiguration(httpConfig);
             try {
-                context = VmodlContext.getContext();
-                context.loadVmodlPackages(new String[]{"com.vmware.vim.binding.vmodl.reflect"});
+                if(context == null) {
+                    context = VmodlContext.getContext();
+                    context.loadVmodlPackages(new String[]{"com.vmware.vim.binding.vmodl.reflect"});
+                }
             }catch (Exception e){
                 logger.error("context is not ready",e);
             }
             if (context == null) {
                 context = VmodlContext.initContext(new String[]{"com.vmware.vim.binding.vim", "com.vmware.vim.binding.vmodl.reflect"});
             }
-
-            vmomiClient = Client.Factory.createClient(new URI("https://" + vCenterInfo.getHostIp() + "/sdk"), VERSION, context, clientConfig);
+            logger.info("vcenter info=="+gson.toJson(vCenterInfo));
+            vmomiClient = Client.Factory.createClient(new URI("https://" + vCenterInfo.getHostIp() + ":"+vCenterInfo.getHostPort()+"/sdk"), VERSION, context, clientConfig);
             com.vmware.vim.binding.vmodl.ManagedObjectReference svcRef = new com.vmware.vim.binding.vmodl.ManagedObjectReference();
             svcRef.setType("ServiceInstance");
             svcRef.setValue("ServiceInstance");

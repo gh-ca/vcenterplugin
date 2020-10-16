@@ -1,6 +1,9 @@
 package com.dmeplugin.dmestore.mvc;
 
-import com.dmeplugin.dmestore.model.*;
+import com.dmeplugin.dmestore.model.EthPortInfo;
+import com.dmeplugin.dmestore.model.ResponseBodyBean;
+import com.dmeplugin.dmestore.model.Storage;
+import com.dmeplugin.dmestore.model.StoragePool;
 import com.dmeplugin.dmestore.services.DmeStorageService;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.google.gson.Gson;
@@ -268,5 +271,14 @@ public class DmeStorageController extends BaseController{
             failureStr = "get Storage Pool performance failure:" + e.toString();
         }
         return failure(failureStr);
+    }
+    @GetMapping("/filesystemdetail")
+    @ResponseBody
+    public ResponseBodyBean getFileSystemDetail(@RequestParam(name = "file_system_id")String file_system_id) {
+        Map<String, Object> resMap = dmeStorageService.getFileSystemDetail(file_system_id);
+        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
+            return success(resMap);
+        }
+        return failure(gson.toJson(resMap));
     }
 }
