@@ -2273,16 +2273,18 @@ public class VCSDKUtils {
             HttpClientConfiguration clientConfig = HttpClientConfiguration.Factory.newInstance();
             clientConfig.setHttpConfiguration(httpConfig);
             try {
-                context = VmodlContext.getContext();
-                context.loadVmodlPackages(new String[]{"com.vmware.vim.binding.vmodl.reflect"});
+                if(context == null) {
+                    context = VmodlContext.getContext();
+                    context.loadVmodlPackages(new String[]{"com.vmware.vim.binding.vmodl.reflect"});
+                }
             }catch (Exception e){
                 logger.error("context is not ready",e);
             }
             if (context == null) {
                 context = VmodlContext.initContext(new String[]{"com.vmware.vim.binding.vim", "com.vmware.vim.binding.vmodl.reflect"});
             }
-
-            vmomiClient = Client.Factory.createClient(new URI("https://" + vCenterInfo.getHostIp() + "/sdk"), VERSION, context, clientConfig);
+            logger.info("vcenter info=="+gson.toJson(vCenterInfo));
+            vmomiClient = Client.Factory.createClient(new URI("https://" + vCenterInfo.getHostIp() + ":"+vCenterInfo.getHostPort()+"/sdk"), VERSION, context, clientConfig);
             com.vmware.vim.binding.vmodl.ManagedObjectReference svcRef = new com.vmware.vim.binding.vmodl.ManagedObjectReference();
             svcRef.setType("ServiceInstance");
             svcRef.setValue("ServiceInstance");

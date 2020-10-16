@@ -160,7 +160,7 @@
     border-radius: 1px;
   }
   .free{
-    background-color: #e8e8e8;
+    background-color: hsl(198, 0%, 80%);
     border-radius: 1px;
   }
   .normal{
@@ -187,4 +187,11 @@
       font-size: 16px;
     }
   }
+}
+.datagrid{
+  overflow: hidden;
+}
+// 隐藏表格过滤的关闭按钮
+.datagrid-filter-close-wrapper{
+  display: none;
 }

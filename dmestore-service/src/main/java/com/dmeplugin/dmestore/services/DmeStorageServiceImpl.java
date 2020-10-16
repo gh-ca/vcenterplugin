@@ -260,6 +260,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storagePool.setTier2_raid_lv(ToolUtils.jsonToStr(element.get("tier2RaidLv")));
                     storagePool.setConsumed_capacity(ToolUtils.jsonToDou(element.get("usedCapacity"),0.0));
                     storagePool.setStorage_instance_id(ToolUtils.jsonToStr(element.get("resId")));
+
+                    storagePool.setPoolId(ToolUtils.jsonToStr(element.get("poolId")));
+
                     String diskPoolId = ToolUtils.jsonToStr(element.get("diskPoolId"));
                     storagePool.setDiskPoolId(diskPoolId);
                     Double subscribedCapacity = ToolUtils.jsonToDou(element.get("subscribedCapacity"), 0.0);
@@ -1163,7 +1166,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                                     storage.setMaxBandwidth(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_BANDWIDTH)));
                                     storage.setMaxCpuUtilization(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_CPUUSAGE)));
                                     storage.setMaxLatency(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_RESPONSETIME)));
-//                                    storage.setMaxOps(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.aa)));
+                                    storage.setMaxOps(ToolUtils.jsonToDou(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_THROUGHPUT)));
                                     relists.add(storage);
                                 }
                             }
