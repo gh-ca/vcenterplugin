@@ -199,6 +199,11 @@
         <property name="bestPracticeProcessService" ref="BestPracticeProcessServiceImpl"/>
     </bean>
 
+    <bean name="datastoreCustomPropertey" class="com.dmeplugin.dmestore.utils.DatastoreCustomProperter" autowire="constructor">
+     <!--   <property name="vimObjectReferenceService" ref="vimObjectReferenceService"/>-->
+        <!--<constructor-arg index="0" ref="dataServiceExtensionRegistry"></constructor-arg>-->
+    </bean>
+
     <context:annotation-config/>
     <!--spring扫描注解的配置-->
     <context:component-scan base-package="com.dmeplugin.dmestore.task"/>
