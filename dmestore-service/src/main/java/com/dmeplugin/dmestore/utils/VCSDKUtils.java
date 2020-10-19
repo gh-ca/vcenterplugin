@@ -1428,15 +1428,15 @@ public class VCSDKUtils {
                 return;
             }
             logger.info("Hosts that need to be unmounted:" + hostMo.getName());
-            //卸载前重新扫描datastore
-            hostMo.getHostStorageSystemMO().rescanVmfs();
+            //卸载前重新扫描datastore  20201019 暂时屏蔽此方法。DME侧卸载后，vcenter侧调用重新扫描接口，会直接删除此vmfs 原因不详
+            //hostMo.getHostStorageSystemMO().rescanVmfs();
             logger.info("Rescan datastore before unmounting");
             //查询指定vmfs
             for (HostFileSystemMountInfo mount : hostMo.getHostStorageSystemMO().getHostFileSystemVolumeInfo().getMountInfo()) {
                 if (mount.getVolume() instanceof HostVmfsVolume && datastoreName.equals(mount.getVolume().getName())) {
                     HostVmfsVolume volume = (HostVmfsVolume) mount.getVolume();
                     logger.info(volume.getName() + "========" + volume.getUuid());
-                    //从主机卸载vmfs(卷)
+                    //从主机卸载vmfs(卷) (The operation is not allowed in the current state.) 暂时屏蔽此方法 勿删
                     //hostMo.getHostStorageSystemMO().unmountVmfsVolume(volume.getUuid());
                     logger.info("unmount Vmfs success:" + volume.getName() + " : " + hostMo.getName());
                 }
