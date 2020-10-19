@@ -1,4 +1,7 @@
 package com.dmeplugin.dmestore.model;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * @author lianq
  * @ClassName: CustomizeVolumeTuning
@@ -8,8 +11,10 @@ package com.dmeplugin.dmestore.model;
 public class CustomizeVolumeTuning {
 
     private SmartQos smartQos;
-    private Boolean compression_enabled;
-    private Boolean dedupe_enabled;
+    @JsonProperty(value = "compression_enabled")
+    private Boolean compressionEnabled;
+    @JsonProperty(value = "dedupe_enabled")
+    private Boolean dedupeEnabled;
     //数据迁移策略，取值范围 0：不迁移，1：自动迁移，2：向高性能层迁移，3：向低性能层迁移  默认值：不迁移
     private Integer smarttier;
 
@@ -21,20 +26,20 @@ public class CustomizeVolumeTuning {
         this.smartQos = smartQos;
     }
 
-    public Boolean getCompression_enabled() {
-        return compression_enabled;
+    public Boolean getCompressionEnabled() {
+        return compressionEnabled;
     }
 
-    public void setCompression_enabled(Boolean compression_enabled) {
-        this.compression_enabled = compression_enabled;
+    public void setCompressionEnabled(Boolean compressionEnabled) {
+        this.compressionEnabled = compressionEnabled;
     }
 
-    public Boolean getDedupe_enabled() {
-        return dedupe_enabled;
+    public Boolean getDedupeEnabled() {
+        return dedupeEnabled;
     }
 
-    public void setDedupe_enabled(Boolean dedupe_enabled) {
-        this.dedupe_enabled = dedupe_enabled;
+    public void setDedupeEnabled(Boolean dedupeEnabled) {
+        this.dedupeEnabled = dedupeEnabled;
     }
 
     public Integer getSmarttier() {

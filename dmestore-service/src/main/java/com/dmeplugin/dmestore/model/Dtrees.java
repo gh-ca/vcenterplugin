@@ -10,33 +10,16 @@ public class Dtrees {
 
     private String name;
     //所属文件系统名称
-    private String fs_name;
+    private String fsName;
     //配额
-    private boolean quota_switch;
+    private boolean quotaSwitch;
     //安全模式
-    private String security_style;
+    private String securityStyle;
     //服务等级名称
-    private String tier_name;
+    private String tierName;
     //nfs
-    private Integer nfs_count;
-    private Integer cifs_count;
-
-
-    public Integer getCifs_count() {
-        return cifs_count;
-    }
-
-    public void setCifs_count(Integer cifs_count) {
-        this.cifs_count = cifs_count;
-    }
-
-    public String getFs_name() {
-        return fs_name;
-    }
-
-    public void setFs_name(String fs_name) {
-        this.fs_name = fs_name;
-    }
+    private Integer nfsCount;
+    private Integer cifsCount;
 
     public String getName() {
         return name;
@@ -46,35 +29,51 @@ public class Dtrees {
         this.name = name;
     }
 
-    public boolean isQuota_switch() {
-        return quota_switch;
+    public String getFsName() {
+        return fsName;
     }
 
-    public void setQuota_switch(boolean quota_switch) {
-        this.quota_switch = quota_switch;
+    public void setFsName(String fsName) {
+        this.fsName = fsName;
     }
 
-    public String getSecurity_style() {
-        return security_style;
+    public boolean isQuotaSwitch() {
+        return quotaSwitch;
     }
 
-    public void setSecurity_style(String security_style) {
-        this.security_style = security_style;
+    public void setQuotaSwitch(boolean quotaSwitch) {
+        this.quotaSwitch = quotaSwitch;
     }
 
-    public String getTier_name() {
-        return tier_name;
+    public String getSecurityStyle() {
+        return securityStyle;
     }
 
-    public void setTier_name(String tier_name) {
-        this.tier_name = tier_name;
+    public void setSecurityStyle(String securityStyle) {
+        this.securityStyle = securityStyle;
     }
 
-    public Integer getNfs_count() {
-        return nfs_count;
+    public String getTierName() {
+        return tierName;
     }
 
-    public void setNfs_count(Integer nfs_count) {
-        this.nfs_count = nfs_count;
+    public void setTierName(String tierName) {
+        this.tierName = tierName;
+    }
+
+    public Integer getNfsCount() {
+        return nfsCount;
+    }
+
+    public void setNfsCount(Integer nfsCount) {
+        this.nfsCount = nfsCount;
+    }
+
+    public Integer getCifsCount() {
+        return cifsCount;
+    }
+
+    public void setCifsCount(Integer cifsCount) {
+        this.cifsCount = cifsCount;
     }
 }

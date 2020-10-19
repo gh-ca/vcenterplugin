@@ -888,6 +888,10 @@ export class VmfsListComponent implements OnInit {
     console.log('selectResult', selectResult)
     if (selectResult) {
       this.serviceLevelIsNull = false;
+      this.changeServiceLevelForm.service_level_id = selectResult.id;
+      this.changeServiceLevelForm.service_level_name = selectResult.name;
+
+
       this.remoteSrv.changeServiceLevel(this.changeServiceLevelForm).subscribe((result: any) => {
         if (result.code === '200'){
           console.log('change service level success:' + name);

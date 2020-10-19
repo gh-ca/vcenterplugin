@@ -15,7 +15,20 @@
     <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
       <clr-dg-cell>{{item.hostSetting}}</clr-dg-cell>
       <clr-dg-cell>{{item.recommendValue}}</clr-dg-cell>
-      <clr-dg-cell>{{item.level}}</clr-dg-cell>
+      <clr-dg-cell>
+        <span [hidden]="item.level != 'Critical'">
+          <span class="color-square" style="background-color: #CA2200; margin-right: 10px"></span>{{'bestPractice.critical'|translate}}
+        </span>
+        <span [hidden]="item.level != 'Major'">
+          <span class="color-square" style="background-color: #F0C004; margin-right: 10px"></span>{{'bestPractice.major'|translate}}
+        </span>
+        <span [hidden]="item.level != 'Warning'">
+          <span class="color-square" style="background-color: #FEE273; margin-right: 10px"></span>{{'bestPractice.warning'|translate}}
+        </span>
+        <span [hidden]="item.level != 'Info'">
+          <span class="color-square" style="background-color: #79C6E6; margin-right: 10px"></span>{{'bestPractice.info'|translate}}
+        </span>
+      </clr-dg-cell>
       <clr-dg-cell><span (click)="openHostList(item)" style="color:#00F;cursor:pointer">{{item.count}}</span></clr-dg-cell>
     </clr-dg-row>
 
