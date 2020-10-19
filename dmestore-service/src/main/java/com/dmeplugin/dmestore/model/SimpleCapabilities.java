@@ -8,7 +8,7 @@ package com.dmeplugin.dmestore.model;
  */
 public class SimpleCapabilities {
 
-    private String resource_type;
+    private String resourceType;
     private Boolean compression;
     private Boolean deduplication;
 
@@ -32,12 +32,12 @@ public class SimpleCapabilities {
         this.qos = qos;
     }
 
-    public String getResource_type() {
-        return resource_type;
+    public String getResourceType() {
+        return resourceType;
     }
 
-    public void setResource_type(String resource_type) {
-        this.resource_type = resource_type;
+    public void setResourceType(String resourceType) {
+        this.resourceType = resourceType;
     }
 
     public Boolean getCompression() {

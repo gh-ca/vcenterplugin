@@ -1,4 +1,7 @@
 package com.dmeplugin.dmestore.model;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * @author lianq
  * @ClassName: SmartQos
@@ -16,6 +19,7 @@ public class SmartQos {
     private Integer miniops;
     private Boolean enabled;
     //for update
+    @JsonProperty(value = "control_policy")
     private String controlPolicy;
 
     private String latencyUnit;

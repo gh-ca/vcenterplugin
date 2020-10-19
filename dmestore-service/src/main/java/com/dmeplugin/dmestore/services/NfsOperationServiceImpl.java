@@ -375,11 +375,11 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 }
             }
             if (fileSystem != null) {
-                String storage_id = fileSystem.getStorage_id();
-                String storage_pool_name = fileSystem.getStorage_pool_name();
-                Double min_size_fs_capacity = fileSystem.getMin_size_fs_capacity();
-                Double available_capacity = fileSystem.getAvailable_capacity();
-                String alloc_type = fileSystem.getAlloc_type();
+                String storage_id = fileSystem.getStorageId();
+                String storage_pool_name = fileSystem.getStoragePoolName();
+                Double min_size_fs_capacity = fileSystem.getMinSizeFsCapacity();
+                Double available_capacity = fileSystem.getAvailableCapacity();
+                String alloc_type = fileSystem.getAllocType();
                 Double currentCapacity = fileSystem.getCapacity();
                 //查询存储池可用空间
                 Double data_space = getDataspaceOfStoragepool(storage_pool_name, null, storage_id);
@@ -406,7 +406,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                             }
                         }else {
                             exchangedCapacity = currentCapacity;
-                            responseBodyBean.setDescription("FileSystem:{id:"+file_system_id+"}未达到能缩容条件,FileSystem缩容后条件容量不得小于:"+min_size_fs_capacity+"GB");
+                            responseBodyBean.setCode("400");
+                            responseBodyBean.setDescription("FileSystem:{id:"+file_system_id+"}未达到能缩容条件,FileSystem缩容后容量不得小于:"+min_size_fs_capacity+"GB");
                             LOG.info("FileSystem:{"+file_system_id+"}未达到能缩容条件,FileSystem缩容后条件容量不得小于:"+min_size_fs_capacity+"GB");
                         }
                     } else {
@@ -670,13 +671,12 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
         FileSystem fileSystem = new FileSystem();
         fileSystem.setCapacity(Double.valueOf(jsonObject.get("capacity").getAsString()));
-        fileSystem.setAllocate_quota_in_pool(ToolUtils.jsonToDou(jsonObject.get("allocate_quota_in_pool")));
-        fileSystem.setAvailable_capacity(ToolUtils.jsonToDou(jsonObject.get("available_capacity")));
-        fileSystem.setMin_size_fs_capacity(ToolUtils.jsonToDou(jsonObject.get("min_size_fs_capacity")));
-        fileSystem.setMin_size_fs_capacity(ToolUtils.jsonToDou(jsonObject.get("min_size_fs_capacity")));
-        fileSystem.setStorage_id(ToolUtils.jsonToStr(jsonObject.get("storage_id")));
-        fileSystem.setStorage_pool_name(ToolUtils.jsonToStr(jsonObject.get("storage_pool_name")));
-        fileSystem.setAlloc_type(ToolUtils.jsonToStr(jsonObject.get("alloc_type")));
+        fileSystem.setAllocateQuotaInPool(ToolUtils.jsonToDou(jsonObject.get("allocate_quota_in_pool")));
+        fileSystem.setAvailableCapacity(ToolUtils.jsonToDou(jsonObject.get("available_capacity")));
+        fileSystem.setMinSizeFsCapacity(ToolUtils.jsonToDou(jsonObject.get("min_size_fs_capacity")));
+        fileSystem.setStorageId(ToolUtils.jsonToStr(jsonObject.get("storage_id")));
+        fileSystem.setStoragePoolName(ToolUtils.jsonToStr(jsonObject.get("storage_pool_name")));
+        fileSystem.setAllocType(ToolUtils.jsonToStr(jsonObject.get("alloc_type")));
 
         resMap.put("data", gson.toJson(fileSystem));
         return resMap;

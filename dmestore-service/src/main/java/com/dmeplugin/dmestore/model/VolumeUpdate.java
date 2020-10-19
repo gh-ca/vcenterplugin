@@ -1,5 +1,7 @@
 package com.dmeplugin.dmestore.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * @author lianq
  * @className VolumeUpdate
@@ -9,9 +11,12 @@ package com.dmeplugin.dmestore.model;
 public class VolumeUpdate {
 
      private String name;
-     private String owner_controller;
-     private String prefetch_policy;
-     private String prefetch_value;
+    @JsonProperty("owner_controller")
+     private String ownerController;
+    @JsonProperty("prefetch_policy")
+     private String prefetchPolicy;
+    @JsonProperty("prefetch_value")
+     private String prefetchValue;
      private CustomizeVolumeTuning tuning;
 
     public String getName() {
@@ -22,28 +27,28 @@ public class VolumeUpdate {
         this.name = name;
     }
 
-    public String getOwner_controller() {
-        return owner_controller;
+    public String getOwnerController() {
+        return ownerController;
     }
 
-    public void setOwner_controller(String owner_controller) {
-        this.owner_controller = owner_controller;
+    public void setOwnerController(String ownerController) {
+        this.ownerController = ownerController;
     }
 
-    public String getPrefetch_policy() {
-        return prefetch_policy;
+    public String getPrefetchPolicy() {
+        return prefetchPolicy;
     }
 
-    public void setPrefetch_policy(String prefetch_policy) {
-        this.prefetch_policy = prefetch_policy;
+    public void setPrefetchPolicy(String prefetchPolicy) {
+        this.prefetchPolicy = prefetchPolicy;
     }
 
-    public String getPrefetch_value() {
-        return prefetch_value;
+    public String getPrefetchValue() {
+        return prefetchValue;
     }
 
-    public void setPrefetch_value(String prefetch_value) {
-        this.prefetch_value = prefetch_value;
+    public void setPrefetchValue(String prefetchValue) {
+        this.prefetchValue = prefetchValue;
     }
 
     public CustomizeVolumeTuning getTuning() {

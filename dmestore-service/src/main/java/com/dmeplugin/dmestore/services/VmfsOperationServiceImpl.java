@@ -253,8 +253,13 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             resMap.put("msg", "params error,please check your params!");
             resMap.put("code", 403);
         }
+
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("service_level_id", params.get("service_level_id"));
+        reqMap.put("volume_ids", params.get("volume_ids"));
+
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.access(API_SERVICELEVEL_UPDATE, HttpMethod.POST, gson.toJson(params));
+            ResponseEntity<String> responseEntity = dmeAccessService.access(API_SERVICELEVEL_UPDATE, HttpMethod.POST, gson.toJson(reqMap));
             LOG.info("url:{" + API_SERVICELEVEL_UPDATE + "},响应信息：" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 202) {
@@ -305,13 +310,13 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 simpleServiceLevel.setDescription(ToolUtils.jsonToStr(element.get("description")));
                 simpleServiceLevel.setType(ToolUtils.jsonToStr(element.get("type")));
                 simpleServiceLevel.setProtocol(ToolUtils.jsonToStr(element.get("protocol")));
-                simpleServiceLevel.setTotal_capacity(ToolUtils.jsonToDou(element.get("total_capacity"),0.0));
-                simpleServiceLevel.setFree_capacity(ToolUtils.jsonToDou(element.get("free_capacity"),0.0));
-                simpleServiceLevel.setUsed_capacity(ToolUtils.jsonToDou(element.get("used_capacity"),0.0));
+                simpleServiceLevel.setTotalCapacity(ToolUtils.jsonToDou(element.get("total_capacity"),0.0));
+                simpleServiceLevel.setFreeCapacity(ToolUtils.jsonToDou(element.get("free_capacity"),0.0));
+                simpleServiceLevel.setUsedCapacity(ToolUtils.jsonToDou(element.get("used_capacity"),0.0));
 
                 SimpleCapabilities capability = new SimpleCapabilities();
                 JsonObject capabilities = element.get("capabilities").getAsJsonObject();
-                capability.setResource_type(ToolUtils.jsonToStr(capabilities.get("resource_type")));
+                capability.setResourceType(ToolUtils.jsonToStr(capabilities.get("resource_type")));
                 capability.setCompression(ToolUtils.jsonToBoo(capabilities.get("compression")));
                 capability.setDeduplication(ToolUtils.jsonToBoo(capabilities.get("deduplication")));
 
