@@ -471,7 +471,11 @@
     "violation": "Violation",
     "non-compliant": "Non-compliant Host",
     "actual": "actual Value",
-    "host": "Host Name"
+    "host": "Host Name",
+    "critical": "Critical",
+    "info": "Info",
+    "warning": "Warning",
+    "major": "Major"
   },
   "iscsi": {
     "hostIp": "Host VmKernel IP",
