@@ -19,52 +19,25 @@ public class Volume {
     //分配类型
     private String alloctype;
     //服务等级
-    private String service_level_name;
+    private String serviceLevelName;
     //存储设备id
-    private String storage_id;
+    private String storageId;
     //存储池id
-    private String pool_raw_id;
+    private String poolRawId;
     //容量利用率
-    private String capacity_usage;
+    private String capacityUsage;
     //保护状态
     private Boolean protectionStatus;
     private List<String> hostIds;
     private List<String> hostGroupIds;
     //存储池名称
-    private String storage_pool_name;
+    private String storagePoolName;
     //总容量 单位GB
     private Integer capacity;
     //关联的datastore
     private String datastores;
     //volume对应的instanceId
     private String instanceId;
-
-
-    //todo 时延 iops 带宽 公用存储设备的？
-
-    public String getDatastores() {
-        return datastores;
-    }
-
-    public void setDatastores(String datastores) {
-        this.datastores = datastores;
-    }
-
-    public Integer getCapacity() {
-        return capacity;
-    }
-
-    public void setCapacity(Integer capacity) {
-        this.capacity = capacity;
-    }
-
-    public String getStorage_pool_name() {
-        return storage_pool_name;
-    }
-
-    public void setStorage_pool_name(String storage_pool_name) {
-        this.storage_pool_name = storage_pool_name;
-    }
 
     public String getId() {
         return id;
@@ -106,36 +79,36 @@ public class Volume {
         this.alloctype = alloctype;
     }
 
-    public String getService_level_name() {
-        return service_level_name;
+    public String getServiceLevelName() {
+        return serviceLevelName;
     }
 
-    public void setService_level_name(String service_level_name) {
-        this.service_level_name = service_level_name;
+    public void setServiceLevelName(String serviceLevelName) {
+        this.serviceLevelName = serviceLevelName;
     }
 
-    public String getStorage_id() {
-        return storage_id;
+    public String getStorageId() {
+        return storageId;
     }
 
-    public void setStorage_id(String storage_id) {
-        this.storage_id = storage_id;
+    public void setStorageId(String storageId) {
+        this.storageId = storageId;
     }
 
-    public String getPool_raw_id() {
-        return pool_raw_id;
+    public String getPoolRawId() {
+        return poolRawId;
     }
 
-    public void setPool_raw_id(String pool_raw_id) {
-        this.pool_raw_id = pool_raw_id;
+    public void setPoolRawId(String poolRawId) {
+        this.poolRawId = poolRawId;
     }
 
-    public String getCapacity_usage() {
-        return capacity_usage;
+    public String getCapacityUsage() {
+        return capacityUsage;
     }
 
-    public void setCapacity_usage(String capacity_usage) {
-        this.capacity_usage = capacity_usage;
+    public void setCapacityUsage(String capacityUsage) {
+        this.capacityUsage = capacityUsage;
     }
 
     public Boolean getProtectionStatus() {
@@ -160,6 +133,30 @@ public class Volume {
 
     public void setHostGroupIds(List<String> hostGroupIds) {
         this.hostGroupIds = hostGroupIds;
+    }
+
+    public String getStoragePoolName() {
+        return storagePoolName;
+    }
+
+    public void setStoragePoolName(String storagePoolName) {
+        this.storagePoolName = storagePoolName;
+    }
+
+    public Integer getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(Integer capacity) {
+        this.capacity = capacity;
+    }
+
+    public String getDatastores() {
+        return datastores;
+    }
+
+    public void setDatastores(String datastores) {
+        this.datastores = datastores;
     }
 
     public String getInstanceId() {

@@ -32,16 +32,16 @@ public class VmfsOperationController extends BaseController{
 
     /**
      *
-     * @param volume_id  required
+     * @param volumeId  required
      * @param params  {control_policy,max_iops,max_bandwidth,newVoName,newDsName,min_iops,min_bandwidth,String dataStoreObjectId,String service_level_name}
      * @return
      */
     @PutMapping("/updatevmfs")
     @ResponseBody
-    public ResponseBodyBean updateVMFS(@RequestParam(value = "volume_id" ) String volume_id,
+    public ResponseBodyBean updateVMFS(@RequestParam(value = "volumeId" ) String volumeId,
                                        @RequestBody Map<String,Object> params){
 
-        Map<String,Object> resMap = vmfsOperationService.updateVMFS(volume_id,params);
+        Map<String,Object> resMap = vmfsOperationService.updateVMFS(volumeId,params);
         if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.ACCEPTED.value())) {
             return success(resMap);
         }

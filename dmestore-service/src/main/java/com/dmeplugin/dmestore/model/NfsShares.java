@@ -11,17 +11,17 @@ public class NfsShares {
     //名称
     private String name;
     //共享路径
-    private String share_path;
+    private String sharePath;
     //存储设备id
-    private String storage_id;
+    private String storageId;
     //服务等级
-    private String tier_name;
+    private String tierName;
     //所属dtree
-    private String owning_dtree_name;
+    private String owningDtreeName;
     //所属文件系统名字在
-    private String fs_name;
+    private String fsName;
     //所属dtreeid
-    private String owning_dtree_id;
+    private String owningDtreeId;
 
     public String getName() {
         return name;
@@ -31,51 +31,51 @@ public class NfsShares {
         this.name = name;
     }
 
-    public String getShare_path() {
-        return share_path;
+    public String getSharePath() {
+        return sharePath;
     }
 
-    public void setShare_path(String share_path) {
-        this.share_path = share_path;
+    public void setSharePath(String sharePath) {
+        this.sharePath = sharePath;
     }
 
-    public String getStorage_id() {
-        return storage_id;
+    public String getStorageId() {
+        return storageId;
     }
 
-    public void setStorage_id(String storage_id) {
-        this.storage_id = storage_id;
+    public void setStorageId(String storageId) {
+        this.storageId = storageId;
     }
 
-    public String getTier_name() {
-        return tier_name;
+    public String getTierName() {
+        return tierName;
     }
 
-    public void setTier_name(String tier_name) {
-        this.tier_name = tier_name;
+    public void setTierName(String tierName) {
+        this.tierName = tierName;
     }
 
-    public String getOwning_dtree_name() {
-        return owning_dtree_name;
+    public String getOwningDtreeName() {
+        return owningDtreeName;
     }
 
-    public void setOwning_dtree_name(String owning_dtree_name) {
-        this.owning_dtree_name = owning_dtree_name;
+    public void setOwningDtreeName(String owningDtreeName) {
+        this.owningDtreeName = owningDtreeName;
     }
 
-    public String getFs_name() {
-        return fs_name;
+    public String getFsName() {
+        return fsName;
     }
 
-    public void setFs_name(String fs_name) {
-        this.fs_name = fs_name;
+    public void setFsName(String fsName) {
+        this.fsName = fsName;
     }
 
-    public String getOwning_dtree_id() {
-        return owning_dtree_id;
+    public String getOwningDtreeId() {
+        return owningDtreeId;
     }
 
-    public void setOwning_dtree_id(String owning_dtree_id) {
-        this.owning_dtree_id = owning_dtree_id;
+    public void setOwningDtreeId(String owningDtreeId) {
+        this.owningDtreeId = owningDtreeId;
     }
 }
