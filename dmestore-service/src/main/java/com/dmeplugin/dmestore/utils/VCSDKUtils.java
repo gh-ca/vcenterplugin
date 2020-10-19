@@ -1437,7 +1437,7 @@ public class VCSDKUtils {
                     HostVmfsVolume volume = (HostVmfsVolume) mount.getVolume();
                     logger.info(volume.getName() + "========" + volume.getUuid());
                     //从主机卸载vmfs(卷)
-                    hostMo.getHostStorageSystemMO().unmountVmfsVolume(volume.getUuid());
+                    //hostMo.getHostStorageSystemMO().unmountVmfsVolume(volume.getUuid());
                     logger.info("unmount Vmfs success:" + volume.getName() + " : " + hostMo.getName());
                 }
             }
@@ -2607,4 +2607,25 @@ public class VCSDKUtils {
         }
     }*/
 
+
+    /**
+     * 判断数据存储中是否有注册的虚拟机，有则返回true，没有返回false
+     * @param objectid 数据存储的objectid
+     * @return  是否存在vm
+     */
+    public boolean hasVmOnDatastore(String objectid){
+        String serverguid = vcConnectionHelper.objectID2Serverguid(objectid);
+        try {
+            VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
+
+            DatastoreMO ds1 = new DatastoreMO(vmwareContext, vcConnectionHelper.objectID2MOR(objectid));
+            List<ManagedObjectReference> vms = ds1.getVM();
+            if (vms.size() > 0) {
+                return true;
+            }
+        }catch (Exception e){
+            logger.error("query vms on datastore error:", e);
+        }
+        return false;
+    }
 }

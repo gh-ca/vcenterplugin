@@ -297,7 +297,15 @@
             <Array>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
+                  <uid>com.dmeplugin.dmestore.datastore.vmfsmountaction</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <type>action</type>
                   <uid>com.dmeplugin.dmestore.datastore.vmfsumountaction</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <type>action</type>
+                  <uid>com.dmeplugin.dmestore.datastore.nfsmountaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
@@ -318,6 +326,21 @@
          <actions>
 
             <com.vmware.actionsfw.ActionSpec>
+               <uid>com.dmeplugin.dmestore.datastore.vmfsmountaction</uid>
+               <label>#{mount.label}</label>
+               <icon>#{addIcon}</icon>
+               <delegate>
+                  <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
+                  <object>
+                     <root>
+                        <actionUrl>/ui/dmestore/index.html?view=vmfs/vmfsMount</actionUrl>
+                        <dialogTitle>vmfs</dialogTitle>
+                        <dialogSize>1800,600</dialogSize>
+                     </root>
+                  </object>
+               </delegate>
+            </com.vmware.actionsfw.ActionSpec>
+            <com.vmware.actionsfw.ActionSpec>
                <uid>com.dmeplugin.dmestore.datastore.vmfsumountaction</uid>
                <label>#{umount.label}</label>
                <icon>#{addIcon}</icon>
@@ -325,7 +348,7 @@
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
                   <object>
                      <root>
-                        <actionUrl>/ui/dmestore/index.html?view=vmfs</actionUrl>
+                        <actionUrl>/ui/dmestore/index.html?view=vmfs/vmfsUnMount</actionUrl>
                         <dialogTitle>vmfs</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
@@ -361,6 +384,21 @@
          <actions>
 
             <com.vmware.actionsfw.ActionSpec>
+               <uid>com.dmeplugin.dmestore.datastore.nfsmountaction</uid>
+               <label>#{mount.label}</label>
+               <icon>#{addIcon}</icon>
+               <delegate>
+                  <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
+                  <object>
+                     <root>
+                        <actionUrl>/ui/dmestore/index.html?view=nfs/nfsMount</actionUrl>
+                        <dialogTitle>nfs</dialogTitle>
+                        <dialogSize>1800,600</dialogSize>
+                     </root>
+                  </object>
+               </delegate>
+            </com.vmware.actionsfw.ActionSpec>
+            <com.vmware.actionsfw.ActionSpec>
                <uid>com.dmeplugin.dmestore.datastore.nfsumountaction</uid>
                <label>#{umount.label}</label>
                <icon>#{addIcon}</icon>
@@ -368,7 +406,7 @@
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
                   <object>
                      <root>
-                        <actionUrl>/ui/dmestore/index.html?view=nfs</actionUrl>
+                        <actionUrl>/ui/dmestore/index.html?view=nfs/nfsUnmount</actionUrl>
                         <dialogTitle>nfs</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
