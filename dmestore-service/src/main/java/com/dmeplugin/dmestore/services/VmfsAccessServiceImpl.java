@@ -1290,7 +1290,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     @Override
     public void deleteVmfs(Map<String, Object> params) throws Exception {
-        //先调卸载的接口
+        //先调卸载的接口 卸载是卸载所有所有主机和集群(dem侧主机,主机组)
         try {
             unmountVmfs(params);
         } catch (Exception e) {
