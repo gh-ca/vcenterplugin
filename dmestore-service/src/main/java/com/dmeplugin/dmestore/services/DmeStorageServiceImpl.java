@@ -6,6 +6,7 @@ import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -293,8 +294,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                         storagePool.setServiceLevelName(gson.toJson(djofspMap.get(resId)));
                     }
 
-
-
                     if (media_type.equals(type)){
                         resList.add(storagePool);
                     } else if("all".equals(media_type)) {
@@ -375,7 +374,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
         List<Volume> volumes = new ArrayList<>();
         String url = API_VOLUME_LIST + storageId;
-
+        String poolId = "";
+        String tempVolumeId = "";
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             LOG.info("DmeStorageServiceImpl/getVolumes/responseEntity==" + responseEntity);
@@ -392,19 +392,21 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
                     Volume volume = new Volume();
-                    String volume_id = ToolUtils.jsonToStr(element.get("id"));
-                    volume.setId(volume_id);
+                    String volumeId = ToolUtils.jsonToStr(element.get("id"));
+                    volume.setId(volumeId);
                     volume.setName(ToolUtils.jsonToStr(element.get("name")));
                     volume.setStatus(ToolUtils.jsonToStr(element.get("status")));
                     volume.setAttached(ToolUtils.jsonToBoo(element.get("attached")));
                     volume.setAlloctype(ToolUtils.jsonToStr(element.get("alloctype")));
                     volume.setServiceLevelName(ToolUtils.jsonToStr(element.get("service_level_name")));
                     volume.setStorageId(ToolUtils.jsonToStr(element.get("storage_id")));
-                    volume.setPoolRawId(ToolUtils.jsonToStr(element.get("pool_raw_id")));
+                    String poolRawId = ToolUtils.jsonToStr(element.get("pool_raw_id"));
+                    volume.setPoolRawId(poolRawId);
                     volume.setCapacityUsage(ToolUtils.jsonToStr(element.get("capacity_usage")));
                     volume.setProtectionStatus(ToolUtils.jsonToBoo(element.get("protected")));
                     volume.setCapacity(ToolUtils.jsonToInt(element.get("capacity"),0));
-                    volume.setDatastores(getDataStoreOnVolume(volume_id));
+                    volume.setDatastores(getDataStoreOnVolume(volumeId));
+                    volume.setStoragePoolName(getStorageByPoolRawId(poolRawId));
                     volumes.add(volume);
                 }
                 resMap.put("data", volumes);
@@ -1331,6 +1333,36 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
         LOG.info("getDjTierOfStoragePool map===" + (gson.toJson(map)));
         return map;
+    }
+
+    private String getStorageByPoolRawId(String poolRawId) throws Exception {
+
+        String className = "SYS_StoragePool";
+        String poolName = "";
+        String url = API_INSTANCES_LIST+"/"+ className;
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET,null);
+        if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
+            String object = responseEntity.getBody();
+            JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+            JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
+            for (JsonElement jsonElement : jsonArray) {
+                JsonObject element = jsonElement.getAsJsonObject();
+                if (poolRawId.equals(ToolUtils.jsonToStr(element.get("poolId")))) {
+                    poolName = ToolUtils.jsonToStr(element.get("name"));
+                    break;
+                }
+            }
+        }
+        return poolName;
+    }
+    
+     /**
+     * 判断数据存储中是否有注册的虚拟机，有则返回true，没有返回false
+     * @param objectid 数据存储的objectid
+     * @return  是否存在vm
+     */
+    public boolean hasVmOnDatastore(String objectid){
+        return vcsdkUtils.hasVmOnDatastore(objectid);
     }
 
 }

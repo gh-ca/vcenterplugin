@@ -49,7 +49,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
       value: 'tier.names'
     },
     {
-      id: 'total_capacity',
+      id: 'totalCapacity',
       value: 'tier.totals'
     },
     {
@@ -82,11 +82,12 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
         description: 'description',
         type: 'BLOCK', // FILE BLOCK
         protocol: 'iSCSI', // FC, iSCSI
-        total_capacity: 1000,
-        used_capacity: 600,
-        free_capacity: 400,
+        totalCapacity: 1000,
+        usedCapacity: 600,
+        usedRate: 40,
+        freeCapacity: 400,
         capabilities: {
-            resource_type: 'thin', // default_type、thin、thick
+            resourceType: 'thin', // default_type、thin、thick
             compression: 'default_type', // default_type, enabled, disabled,
             deduplication: 'enabled', // default_type, enabled, disabled,
             iopriority: {
@@ -240,14 +241,14 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
       response.data = response.data.replace('service-levels', 'serviceLevels');
       const r = this.recursiveNullDelete(JSON.parse(response.data));
       for (const i of r.serviceLevels){
-        if (i.total_capacity == 0){
+        if (i.totalCapacity == 0){
           i.usedRate = 0.0;
         } else {
-          i.usedRate =  ((i.used_capacity / i.total_capacity * 100).toFixed(2));
+          i.usedRate =  ((i.usedCapacity / i.totalCapacity * 100).toFixed(2));
         }
-        i.used_capacity = (i.used_capacity/1024).toFixed(2);
-        i.total_capacity = (i.total_capacity/1024).toFixed(2);
-        i.free_capacity = (i.free_capacity/1024).toFixed(2);
+        i.usedCapacity = (i.usedCapacity/1024).toFixed(2);
+        i.totalCapacity = (i.totalCapacity/1024).toFixed(2);
+        i.freeCapacity = (i.freeCapacity/1024).toFixed(2);
       }
       this.serviceLevelsRes = r.serviceLevels;
       this.search();
@@ -259,7 +260,6 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // 服务等级列表搜索
   search(){
-    console.log(234);
     if (this.searchName !== ''){
       this.serviceLevels = this.serviceLevelsRes.filter(item => item.name.indexOf(this.searchName) > -1);
     } else{
@@ -284,7 +284,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   sortItemsChange(){
     let o = this.sortItem;
     if (o == ''){
-      o = 'total_capacity';
+      o = 'totalCapacity';
     }
     this.serviceLevels = this.serviceLevels.sort(this.compare(o, this.sortUpDown.s));
   }
@@ -525,11 +525,12 @@ class Servicelevel {
   description: string;
   type: string; // FILE BLOCK
   protocol: string; // FC, iSCSI
-  total_capacity: number;
-  used_capacity: number;
-  free_capacity: number;
+  totalCapacity: number;
+  usedCapacity: number;
+  freeCapacity: number;
+  usedRate: number;
   capabilities: {
-    resource_type: string; // default_type、thin、thick
+    resourceType: string; // default_type、thin、thick
     compression: string; // default_type, enabled, disabled;
     deduplication: string; // default_type, enabled, disabled;
     iopriority: {
@@ -579,7 +580,7 @@ interface Volume {
   capacity: number;
   alloctype: string;
   instanceId: string;
-  capacity_usage: number;
+  capacityUsage: number;
 
   latency: string;
   iops: string;
