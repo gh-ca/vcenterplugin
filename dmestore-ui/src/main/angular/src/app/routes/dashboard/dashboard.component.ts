@@ -12,6 +12,7 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ClrForm} from '@clr/angular';
 import {HttpClient} from '@angular/common/http';
 import {Router} from "@angular/router";
+import { GlobalsService }     from "../../shared/globals.service";
 
 @Component({
   selector: 'app-dashboard',
@@ -29,7 +30,6 @@ import {Router} from "@angular/router";
   providers: [DashboardService],
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
-
   charts = this.dashboardSrv.getCharts();
   storageNumChart = null;
   storageNum = {
@@ -75,16 +75,17 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   });
   @ViewChild(ClrForm, {static: true}) clrForm;
 
-
   constructor(
     private dashboardSrv: DashboardService,
     private ngZone: NgZone,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
-    private router:Router
+    private router:Router,
+    public gs: GlobalsService
   ) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+  }
 
   ngAfterViewInit() {
     this.refresh();
@@ -95,9 +96,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   refresh(){
+    this.gs.loading = true // 设置全局loading 为 TRUE
     this.http.get('accessdme/refreshaccess', {}).subscribe((result: any) => {
       console.log(result);
       if (result.code === '0' || result.code === '200'){
+        this.gs.loading = false  // 设置全局loading 为 FALSE
         this.hostModel = result.data.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         this.loadStorageNum();
