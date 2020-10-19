@@ -949,4 +949,14 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
 
+    public boolean isNfs(String objectId) throws Exception {
+        List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_NFS);
+        for (DmeVmwareRelation dmeVmwareRelation:dvrlist){
+            if (dmeVmwareRelation.getStoreId().equalsIgnoreCase(objectId)) {
+                return true;
+            }
+
+        }
+        return false;
+    }
 }
