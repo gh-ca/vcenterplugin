@@ -90,7 +90,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         shareAttr.setName(share.get("name").getAsString());
         shareAttr.setShare_path(share.get("share_path").getAsString());
         shareAttr.setDescription(share.get("description").getAsString());
-        shareAttr.setOwning_dtree_name(share.get("owning_dtree_name").getAsString());
+        shareAttr.setOwning_dtree_name(ToolUtils.jsonToStr(share.get("owning_dtree_name"),  null));
         //查询客户端列表
         List<AuthClient> authClientList = getNFSDatastoreShareAuthClients(nfsShareId);
         if (null != authClientList && authClientList.size() > 9) {
@@ -103,7 +103,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private List<AuthClient> getNFSDatastoreShareAuthClients(String shareId) throws Exception {
         List<AuthClient> clientList = new ArrayList<>();
         String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_SHARE_AUTH_CLIENTS_URL, "nfs_share_id", shareId);
-        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, null);
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(new HashMap<>()));
         if (responseEntity.getStatusCodeValue() / 100 == 2) {
             String resBody = responseEntity.getBody();
             JsonObject resObject = gson.fromJson(resBody, JsonObject.class);
