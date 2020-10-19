@@ -199,8 +199,7 @@ export class VmfsListComponent implements OnInit {
     // 进行数据加载
     this.remoteSrv.getData(this.params)
         .subscribe((result: any) => {
-          console.log("result:");
-          console.log(result);
+          console.log("result:", result);
           if (result.code === '200' && null != result.data ) {
             this.list = result.data;
             if (null !== this.list) {
