@@ -1265,7 +1265,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         } else {
             //DME创建完成
             //调用vCenter在主机上扫描卷和Datastore
-            vcsdkUtils.scanDataStore(ToolUtils.getStr(params.get("clusterId")), ToolUtils.getStr(params.get("hostId")));
+            //modify 20201019 暂时屏蔽此方法。DME侧卸载后，vcenter侧调用重新扫描接口，会直接删除此vmfs 原因不详
+            //vcsdkUtils.scanDataStore(ToolUtils.getStr(params.get("clusterId")), ToolUtils.getStr(params.get("hostId")));
             //如果是需要扫描LUN来挂载，则需要执行下面的方法，dataStoreNames
             if (params.get(DmeConstants.DATASTORENAMES) != null) {
                 List<String> dataStoreNames = (List<String>) params.get("dataStoreNames");
