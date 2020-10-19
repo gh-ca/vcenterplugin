@@ -1574,4 +1574,15 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return object;
     }
+
+    public boolean isVmfs(String objectId) throws Exception {
+        List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_VMFS);
+        for (DmeVmwareRelation dmeVmwareRelation:dvrlist){
+            if (dmeVmwareRelation.getStoreId().equalsIgnoreCase(objectId)) {
+                return true;
+            }
+
+        }
+        return false;
+    }
 }
