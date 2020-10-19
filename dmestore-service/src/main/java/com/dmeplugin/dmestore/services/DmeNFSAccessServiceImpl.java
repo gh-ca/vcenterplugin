@@ -368,13 +368,13 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         for (JsonElement jsonElement : jsonArray) {
             Map<String, Object> shareMap = new HashMap<>();
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            shareMap.put("id", ToolUtils.getStr(jsonObject.get("id")));
-            shareMap.put("name", ToolUtils.getStr(jsonObject.get("name")));
-            shareMap.put("share_path", ToolUtils.getStr(jsonObject.get("share_path")));
-            shareMap.put("storage_id", ToolUtils.getStr(jsonObject.get("storage_id")));
-            shareMap.put("device_name", ToolUtils.getStr(jsonObject.get("device_name")));
-            shareMap.put("owning_dtree_id", ToolUtils.getStr(jsonObject.get("owning_dtree_id")));
-            shareMap.put("owning_dtree_name", ToolUtils.getStr(jsonObject.get("owning_dtree_name")));
+            shareMap.put("id", ToolUtils.jsonToStr(jsonObject.get("id")));
+            shareMap.put("name", ToolUtils.jsonToStr(jsonObject.get("name")));
+            shareMap.put("share_path", ToolUtils.jsonToStr(jsonObject.get("share_path")));
+            shareMap.put("storage_id", ToolUtils.jsonToStr(jsonObject.get("storage_id")));
+            shareMap.put("device_name", ToolUtils.jsonToStr(jsonObject.get("device_name")));
+            shareMap.put("owning_dtree_id", ToolUtils.jsonToStr(jsonObject.get("owning_dtree_id")));
+            shareMap.put("owning_dtree_name", ToolUtils.jsonToStr(jsonObject.get("owning_dtree_name")));
             shareList.add(shareMap);
         }
         return shareList;
