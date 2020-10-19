@@ -8,13 +8,13 @@ package com.dmeplugin.dmestore.model;
  */
 public class CapacityAutonegotiation {
 
-    private Boolean auto_size_enable;
+    private Boolean autoSizeEnable;
 
-    public Boolean getAuto_size_enable() {
-        return auto_size_enable;
+    public Boolean getAutoSizeEnable() {
+        return autoSizeEnable;
     }
 
-    public void setAuto_size_enable(Boolean auto_size_enable) {
-        this.auto_size_enable = auto_size_enable;
+    public void setAutoSizeEnable(Boolean autoSizeEnable) {
+        this.autoSizeEnable = autoSizeEnable;
     }
 }

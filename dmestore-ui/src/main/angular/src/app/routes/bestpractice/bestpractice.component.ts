@@ -3,7 +3,6 @@ import {
   OnInit,
   ChangeDetectionStrategy, ChangeDetectorRef,
 } from '@angular/core';
-import {ClrDatagridStateInterface} from '@clr/angular';
 import {HttpClient} from '@angular/common/http';
 import { CommonService } from '../common.service';
 
@@ -33,14 +32,6 @@ export class BestpracticeComponent implements OnInit {
   hostList: Host[] = []; // 数据列表
   hostTotal = 0; // 总数据数量
   currentBestpractice: Bestpractice;
-
-  hostQuery = { // 查询数据
-    q: '',
-    sort: 'hostName',
-    order: 'desc',
-    page: 0,
-    per_page: 5,
-  };
   // ================END====================
 
   constructor(private cdr: ChangeDetectorRef, private http: HttpClient, private commonService: CommonService) { }
@@ -112,7 +103,6 @@ export class BestpracticeComponent implements OnInit {
   }
 
   practiceRefresh(){
-    console.log('123123123132');
     this.isLoading = true;
     //const params = this.commonService.refresh(state, this.query);
     this.http.get('v1/bestpractice/records/all', {}).subscribe((result: any) => {

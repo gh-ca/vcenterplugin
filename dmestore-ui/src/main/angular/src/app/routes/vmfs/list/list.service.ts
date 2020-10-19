@@ -66,9 +66,17 @@ export class VmfsListService {
   delVmfs(params = {}) {
     return  this.http.post('accessvmfs/deletevmfs', params);
   }
+  // 获取已挂载主机
+  getMountHost(objectId) {
+    return  this.http.get('accessvmfs/gethostsbystorageid/'+objectId);
+  }
+  // 获取已挂载集群
+  getMountCluster(objectId) {
+    return  this.http.get('accessvmfs/gethostgroupsbystorageid/'+objectId);
+  }
   // 卸载
   unmountVMFS(params = {}) {
-    return  this.http.post('accessvmfs/mountvmfs', params);
+    return  this.http.post('/accessvmfs/ummountvmfs', params);
   }
   // 挂载
   mountVmfs(params = {}) {
@@ -270,15 +278,21 @@ export class GetForm {
       clusterId: null,
       cluster: null,
       dataStoreObjectIds: [], // datastore object id列表 必,
-      mountType: '1' // 挂载的设备类型 1 服务器、0 集群 前端自用参数
+      mountType: null // 挂载的设备类型 1 服务器、2 集群 前端自用参数
     };
     return mountForm;
   }
   getUnmountForm() {
     const unmount = {
-      host: null,
-      hostId: null
+      name: null,
+      hostName: null,
+      hostId: null,
+      hostGroupId: null,
+      hostGroupName: null,
+      dataStoreObjectIds: [],
+      mountType: '1' // 挂载的设备类型 1 服务器、0 集群 前端自用参数
     };
+    return unmount;
   }
 }
 

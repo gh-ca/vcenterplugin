@@ -567,20 +567,50 @@
   <clr-modal [(clrModalOpen)]="unmountShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
     <h3 class="modal-title modelTile">{{'vmfs.unmount.title' | translate}}</h3>
     <div class="modal-body">
-      <clr-datagrid [(clrDgSelected)]="chooseUnmountDevice" [clrDgLoading]="isLoading">
-        <clr-dg-column hidden></clr-dg-column>
-        <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
-        <clr-dg-column [clrDgField]="'type'">{{'vmfs.type' | translate}}</clr-dg-column>
-        <clr-dg-row *clrDgItems="let item of mountedDeviceList" [clrDgItem]="item">
-          <clr-dg-cell>{{item.deviceId}}</clr-dg-cell>
-          <clr-dg-cell>{{item.deviceName}}</clr-dg-cell>
-          <clr-dg-cell>{{item.deviceType === 'host' ? 'vmfs.host':'vmfs.cluster'}}</clr-dg-cell>
-        </clr-dg-row>
-      </clr-datagrid>
+      <form clrForm >
+        <div *ngIf="notChooseUnmountDevice" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.unmount.notChooseDeviceTips' | translate}}</div>
+        <clr-input-container>
+          <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
+          <input clrInput readonly [(ngModel)]="unmountForm.name" name="name" #name="ngModel" required/><br>
+          <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+        </clr-input-container>
+        <clr-radio-container clrInline>
+          <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.mount.mountObj' | translate}}</label>
+          <clr-radio-wrapper>
+            <input type="radio" clrRadio name="controlPolicy" value="1" [(ngModel)]="unmountForm.mountType" ng-checked="true"/>
+            <label>{{'vmfs.mount.host' | translate}}</label>
+          </clr-radio-wrapper>
+          <clr-radio-wrapper>
+            <input type="radio" clrRadio name="controlPolicy" value="2"  [(ngModel)]="unmountForm.mountType" />
+            <label>{{'vmfs.mount.cluster' | translate}}</label>
+          </clr-radio-wrapper>
+        </clr-radio-container>
+
+        <clr-datagrid *ngIf="unmountForm.mountType === '1' && mountedCluster.length === 0" [(clrDgSingleSelected)]="chooseUnmountHost" [clrDgLoading]="isLoading">
+          <clr-dg-column hidden></clr-dg-column>
+          <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'type'">{{'vmfs.type' | translate}}</clr-dg-column>
+          <clr-dg-row *clrDgItems="let item of mountedHost" [clrDgItem]="item">
+            <clr-dg-cell hidden>{{item.deviceId}}</clr-dg-cell>
+            <clr-dg-cell>{{item.deviceName}}</clr-dg-cell>
+            <clr-dg-cell>{{'vmfs.host' | translate}}</clr-dg-cell>
+          </clr-dg-row>
+        </clr-datagrid>
+        <clr-datagrid *ngIf="unmountForm.mountType === '2'" [(clrDgSingleSelected)]="chooseUnmountCluster" [clrDgLoading]="isLoading">
+          <clr-dg-column hidden></clr-dg-column>
+          <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'type'">{{'vmfs.type' | translate}}</clr-dg-column>
+          <clr-dg-row *clrDgItems="let item of mountedCluster" [clrDgItem]="item">
+            <clr-dg-cell hidden>{{item.deviceId}}</clr-dg-cell>
+            <clr-dg-cell>{{item.deviceName}}</clr-dg-cell>
+            <clr-dg-cell>{{'vmfs.cluster' | translate}}</clr-dg-cell>
+          </clr-dg-row>
+        </clr-datagrid>
+      </form>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="unmountShow=false">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" [disabled]="chooseUnmountDevice.length !== 1" (click)="unmountHandleFunc();">{{'menu.ok' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="unmountHandleFunc();">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
   <!--空间回收提示-->
