@@ -284,6 +284,119 @@
       </metadata>
    </extension>
 
+   <!--
+      This adds a sub-menu to the datastore menu
+   -->
+   <extension id="com.dmeplugin.dmestore.datastore.datastoremenu">
+      <extendedPoint>vsphere.core.menus.solutionMenus</extendedPoint>
+      <object>
+         <!-- <label> is required here because it is an extension to an existing menu -->
+         <label>#{dmemenu.label}</label>
+         <uid>com.dmeplugin.dmestore.datastore.datastoremenu</uid>
+         <children>
+            <Array>
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <type>action</type>
+                  <uid>com.dmeplugin.dmestore.datastore.vmfsumountaction</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <type>action</type>
+                  <uid>com.dmeplugin.dmestore.datastore.nfsumountaction</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
+            </Array>
+         </children>
+      </object>
+      <metadata>
+         <objectType>Datastore</objectType>
+      </metadata>
+   </extension>
+
+   <!-- vmfs unmount action -->
+   <extension id="com.dmeplugin.dmestore.datastore.actionSet">
+      <extendedPoint>vise.actions.sets</extendedPoint>
+      <object>
+         <actions>
+
+            <com.vmware.actionsfw.ActionSpec>
+               <uid>com.dmeplugin.dmestore.datastore.vmfsumountaction</uid>
+               <label>#{umount.label}</label>
+               <icon>#{addIcon}</icon>
+               <delegate>
+                  <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
+                  <object>
+                     <root>
+                        <actionUrl>/ui/dmestore/index.html?view=vmfs</actionUrl>
+                        <dialogTitle>vmfs</dialogTitle>
+                        <dialogSize>1800,600</dialogSize>
+                     </root>
+                  </object>
+               </delegate>
+            </com.vmware.actionsfw.ActionSpec>
+         </actions>
+      </object>
+      <metadata>
+         <objectType>Datastore</objectType>
+         <propertyConditions>
+            <com.vmware.data.query.CompositeConstraint>
+               <nestedConstraints>
+                  <com.vmware.data.query.PropertyConstraint>
+                     <propertyName>isVmfs</propertyName>
+                     <comparator>EQUALS</comparator>
+                     <comparableValue>
+                        <Boolean>true</Boolean>
+                     </comparableValue>
+                  </com.vmware.data.query.PropertyConstraint>
+               </nestedConstraints>
+               <conjoiner>AND</conjoiner>
+            </com.vmware.data.query.CompositeConstraint>
+         </propertyConditions>
+      </metadata>
+   </extension>
+
+
+   <!-- nfs unmount action -->
+   <extension id="com.dmeplugin.dmestore.datastore.actionSet">
+      <extendedPoint>vise.actions.sets</extendedPoint>
+      <object>
+         <actions>
+
+            <com.vmware.actionsfw.ActionSpec>
+               <uid>com.dmeplugin.dmestore.datastore.nfsumountaction</uid>
+               <label>#{umount.label}</label>
+               <icon>#{addIcon}</icon>
+               <delegate>
+                  <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
+                  <object>
+                     <root>
+                        <actionUrl>/ui/dmestore/index.html?view=nfs</actionUrl>
+                        <dialogTitle>nfs</dialogTitle>
+                        <dialogSize>1800,600</dialogSize>
+                     </root>
+                  </object>
+               </delegate>
+            </com.vmware.actionsfw.ActionSpec>
+         </actions>
+      </object>
+      <metadata>
+         <objectType>Datastore</objectType>
+         <propertyConditions>
+            <com.vmware.data.query.CompositeConstraint>
+               <nestedConstraints>
+                  <com.vmware.data.query.PropertyConstraint>
+                     <propertyName>isNfs</propertyName>
+                     <comparator>EQUALS</comparator>
+                     <comparableValue>
+                        <Boolean>true</Boolean>
+                     </comparableValue>
+                  </com.vmware.data.query.PropertyConstraint>
+               </nestedConstraints>
+               <conjoiner>AND</conjoiner>
+            </com.vmware.data.query.CompositeConstraint>
+         </propertyConditions>
+      </metadata>
+   </extension>
+
+
 
    <!-- Sample Actions on VM -->
    <extension id="com.dmeplugin.dmestore.vm.actionSet">
