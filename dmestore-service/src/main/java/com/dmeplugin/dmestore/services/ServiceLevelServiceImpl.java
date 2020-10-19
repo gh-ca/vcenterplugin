@@ -210,16 +210,16 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                 ssl.setDescription(descriptionn);
                 ssl.setType(type);
                 ssl.setProtocol(protocol);
-                ssl.setTotal_capacity(totalCapacity);
-                ssl.setFree_capacity(freeCapacity);
-                ssl.setUsed_capacity(usedCapcity);
+                ssl.setTotalCapacity(totalCapacity);
+                ssl.setFreeCapacity(freeCapacity);
+                ssl.setUsedCapacity(usedCapcity);
                 JsonElement capObj = object1.get("capabilities");
                 if (!ToolUtils.jsonIsNull(capObj)) {
                     SimpleCapabilities scb = new SimpleCapabilities();
                     JsonObject capJsonObj = capObj.getAsJsonObject();
                     String resourceType = ToolUtils.jsonToOriginalStr(capJsonObj.get("resource_type"));
                     boolean compression = ToolUtils.jsonToBoo(capJsonObj.get("compression"));
-                    scb.setResource_type(resourceType);
+                    scb.setResourceType(resourceType);
                     scb.setCompression(compression);
 
                     //报文中暂未出现此属性,暂不处理
@@ -354,10 +354,10 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                 volume.setStatus(ToolUtils.jsonToStr(element.get("status")));
                 volume.setAttached(ToolUtils.jsonToBoo(element.get("attached")));
                 volume.setAlloctype(ToolUtils.jsonToStr(element.get("alloctype")));
-                volume.setService_level_name(ToolUtils.jsonToStr(element.get("service_level_name")));
-                volume.setStorage_id(ToolUtils.jsonToStr(element.get("storage_id")));
-                volume.setPool_raw_id(ToolUtils.jsonToStr(element.get("pool_raw_id")));
-                volume.setCapacity_usage(ToolUtils.jsonToStr(element.get("capacity_usage")));
+                volume.setServiceLevelName(ToolUtils.jsonToStr(element.get("service_level_name")));
+                volume.setStorageId(ToolUtils.jsonToStr(element.get("storage_id")));
+                volume.setPoolRawId(ToolUtils.jsonToStr(element.get("pool_raw_id")));
+                volume.setCapacityUsage(ToolUtils.jsonToStr(element.get("capacity_usage")));
                 volume.setProtectionStatus(ToolUtils.jsonToBoo(element.get("protectionStatus")));
                 volume.setCapacity(ToolUtils.jsonToInt(element.get("capacity"), 0));
 

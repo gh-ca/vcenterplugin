@@ -474,7 +474,11 @@
     "violation": "违规数",
     "non-compliant": "违规主机",
     "actual": "实际值",
-    "host": "主机名"
+    "host": "主机名",
+    "critical": "紧急",
+    "info": "提示",
+    "warning": "次要",
+    "major": "重要"
   },
   "iscsi": {
     "hostIp": "主机VmKernel IP",

@@ -10,8 +10,8 @@ public class BandPorts {
 
    private String id;
    private String name;
-   private String health_status;
-   private String running_status;
+   private String healthStatus;
+   private String runningStatus;
    private String mtu;
 
     public String getId() {
@@ -30,20 +30,20 @@ public class BandPorts {
         this.name = name;
     }
 
-    public String getHealth_status() {
-        return health_status;
+    public String getHealthStatus() {
+        return healthStatus;
     }
 
-    public void setHealth_status(String health_status) {
-        this.health_status = health_status;
+    public void setHealthStatus(String healthStatus) {
+        this.healthStatus = healthStatus;
     }
 
-    public String getRunning_status() {
-        return running_status;
+    public String getRunningStatus() {
+        return runningStatus;
     }
 
-    public void setRunning_status(String running_status) {
-        this.running_status = running_status;
+    public void setRunningStatus(String runningStatus) {
+        this.runningStatus = runningStatus;
     }
 
     public String getMtu() {
