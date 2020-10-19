@@ -1437,7 +1437,7 @@ public class VCSDKUtils {
                     HostVmfsVolume volume = (HostVmfsVolume) mount.getVolume();
                     logger.info(volume.getName() + "========" + volume.getUuid());
                     //从主机卸载vmfs(卷)
-                    hostMo.getHostStorageSystemMO().unmountVmfsVolume(volume.getUuid());
+                    //hostMo.getHostStorageSystemMO().unmountVmfsVolume(volume.getUuid());
                     logger.info("unmount Vmfs success:" + volume.getName() + " : " + hostMo.getName());
                 }
             }
