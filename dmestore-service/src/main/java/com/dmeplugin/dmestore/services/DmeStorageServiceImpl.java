@@ -1333,4 +1333,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return map;
     }
 
+    /**
+     * 判断数据存储中是否有注册的虚拟机，有则返回true，没有返回false
+     * @param objectid 数据存储的objectid
+     * @return  是否存在vm
+     */
+    public boolean hasVmOnDatastore(String objectid){
+        return vcsdkUtils.hasVmOnDatastore(objectid);
+    }
+
 }
