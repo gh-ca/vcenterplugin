@@ -1049,6 +1049,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
             String responseBody = responseEntity.getBody();
             JsonObject volume = gson.fromJson(responseBody, JsonObject.class).getAsJsonObject("volume");
+            if (null == volume) {
+                continue;
+            }
 
             VmfsDatastoreVolumeDetail volumeDetail = new VmfsDatastoreVolumeDetail();
             //basic info
@@ -1078,7 +1081,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             JsonObject smartqos = tuning.getAsJsonObject("smartqos");
             //Qos Policy
             if (null != smartqos) {
-                volumeDetail.setControlPolicy(smartqos.get("control_policy").getAsString());
+                volumeDetail.setControlPolicy(ToolUtils.jsonToStr(smartqos.get("control_policy"), null));
                 //TODO
                 volumeDetail.setTrafficControl("--");
             }
@@ -1102,40 +1105,44 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         for (int i = 0; i < jsonArray.size(); i++) {
             JsonObject vmfsDatastore = jsonArray.get(i).getAsJsonObject();
             String storeType = ToolUtils.STORE_TYPE_VMFS;
-            //TODO 暂时认为是从url中获取到wwn信息 modify 20200928 通过vcenter的vmfs的wwn，id与dme的卷均建立不了关系,目前通过名称建立关系
-            String vmfsDatastoreUrl = vmfsDatastore.get("url").getAsString();
             String vmfsDatastoreId = vmfsDatastore.get("objectid").getAsString();
             String vmfsDatastoreName = vmfsDatastore.get("name").getAsString();
-
-            //根据wwn从DME中查询卷信息
-            //根据volumeId从dme中查询卷信息
-            String volumeUrlByName = LIST_VOLUME_URL + "?name=" + vmfsDatastoreName;
-            ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByName, HttpMethod.GET, null);
-
-            if (responseEntity.getStatusCodeValue() / 100 != 2) {
-                LOG.info(" Query DME volume failed! errorMsg:{}", responseEntity.toString());
+            JsonArray wwnArray = vmfsDatastore.getAsJsonArray("vmfsWwnList");
+            if(null == wwnArray || wwnArray.size() == 0){
                 continue;
             }
-            JsonObject jsonObject = gson.fromJson(responseEntity.getBody(), JsonObject.class);
-            JsonElement volumesElement = jsonObject.get("volumes");
-            if (!ToolUtils.jsonIsNull(volumesElement)) {
-                JsonArray volumeArray = volumesElement.getAsJsonArray();
-                if (volumeArray.size() > 0) {
-                    JsonObject volumeObject = volumeArray.get(0).getAsJsonObject();
-                    String volumeId = ToolUtils.jsonToOriginalStr(volumeObject.get("id"));
-                    String volumeName = ToolUtils.jsonToOriginalStr(volumeObject.get("name"));
-                    String volumeWwn = ToolUtils.jsonToOriginalStr(volumeObject.get("volume_wwn"));
 
-                    DmeVmwareRelation relation = new DmeVmwareRelation();
-                    relation.setStoreId(vmfsDatastoreId);
-                    relation.setStoreName(vmfsDatastoreName);
-                    relation.setVolumeId(volumeId);
-                    relation.setVolumeName(volumeName);
-                    relation.setVolumeWwn(volumeWwn);
-                    relation.setStoreType(storeType);
-                    relation.setState(1);
+            for(int j = 0; j< wwnArray.size(); j++){
+                String wwn = wwnArray.get(j).getAsString();
+                //根据wwn从DME中查询卷信息
+                String volumeUrlByName = LIST_VOLUME_URL + "?volume_wwn=" + wwn;
+                ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByName, HttpMethod.GET, null);
 
-                    relationList.add(relation);
+                if (responseEntity.getStatusCodeValue() / 100 != 2) {
+                    LOG.info(" Query DME volume failed! errorMsg:{}", responseEntity.toString());
+                    continue;
+                }
+                JsonObject jsonObject = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+                JsonElement volumesElement = jsonObject.get("volumes");
+                if (!ToolUtils.jsonIsNull(volumesElement)) {
+                    JsonArray volumeArray = volumesElement.getAsJsonArray();
+                    if (volumeArray.size() > 0) {
+                        JsonObject volumeObject = volumeArray.get(0).getAsJsonObject();
+                        String volumeId = ToolUtils.jsonToOriginalStr(volumeObject.get("id"));
+                        String volumeName = ToolUtils.jsonToOriginalStr(volumeObject.get("name"));
+                        String volumeWwn = ToolUtils.jsonToOriginalStr(volumeObject.get("volume_wwn"));
+
+                        DmeVmwareRelation relation = new DmeVmwareRelation();
+                        relation.setStoreId(vmfsDatastoreId);
+                        relation.setStoreName(vmfsDatastoreName);
+                        relation.setVolumeId(volumeId);
+                        relation.setVolumeName(volumeName);
+                        relation.setVolumeWwn(volumeWwn);
+                        relation.setStoreType(storeType);
+                        relation.setState(1);
+
+                        relationList.add(relation);
+                    }
                 }
             }
         }
@@ -1283,7 +1290,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     @Override
     public void deleteVmfs(Map<String, Object> params) throws Exception {
-        //先调卸载的接口
+        //先调卸载的接口 卸载是卸载所有所有主机和集群(dem侧主机,主机组)
         try {
             unmountVmfs(params);
         } catch (Exception e) {
@@ -1573,5 +1580,16 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
         }
         return object;
+    }
+
+    public boolean isVmfs(String objectId) throws Exception {
+        List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_VMFS);
+        for (DmeVmwareRelation dmeVmwareRelation:dvrlist){
+            if (dmeVmwareRelation.getStoreId().equalsIgnoreCase(objectId)) {
+                return true;
+            }
+
+        }
+        return false;
     }
 }

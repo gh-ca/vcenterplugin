@@ -74,6 +74,14 @@ export class NfsService {
   getVmkernelListByObjectId(hostObjectId:string){
     return this.http.get('accessvmware/getvmkernelipbyhostobjectid',{params: {hostObjectId}} );
   }
+  getNfsDetailById(fileSystemId:string){
+    return this.http.get('dmestorage/filesystemdetail',{params: {fileSystemId}} );
+  }
+  changeCapacity(params= {}){
+    return this.http.post('operatenfs/changenfsdatastore', params);
+  }
+
+
 
   /**
    * 获取折线图
@@ -137,13 +145,70 @@ export class AddNfs{
   accessMode:string;//  挂载方式 分 只读 和读写
   constructor(){
     this.sameName = true;
-    this.advance = true;
+    this.advance = false;
     this.qosFlag = false;
     this.deduplicationEnabled = false;
     this.compressionEnabled = false;
     this.autoSizeEnable = false;
     this.thin = true;
   }
+}
+
+export class UpdateNfs{
+  dataStoreObjectId: string;
+  nfsName:string;//   DataStoname
+  sameName:boolean;// false true 如果是false就传
+  shareName:string;//  共享名称
+  fsName:string;//  文件系统名称
+  fileSystemId: string;
+  qosFlag:boolean;// qos策略开关 false true false关闭
+  contolPolicy :string;//  上下线选择标记  枚举值 up low
+// up 取值如下
+  maxBandwidth: number; //
+  maxIops: number; //
+//low取值
+  minBandwidth: number; //
+  minIops: number; //
+  latency: number; //
+  thin:boolean;// true  代表thin false代表thick
+  deduplicationEnabled:boolean;// 重删 true false
+  compressionEnabled:boolean;// 压缩 true false
+  autoSizeEnable:boolean;// 自动扩容 true false
+  shareId: string;
+  name: string;
+  constructor(){
+    this.sameName=true;
+  }
+}
+
+export class NfsDetail{
+  id:string;
+  name:string;
+  fileSystemTurning: FileSystemTurning;
+  capacityAutonegotiation: CapacityAutonegotiation;
+}
+export class FileSystemTurning{
+  deduplicationEnabled: boolean;
+  compressionEnabled: boolean;
+  allocationType: string;
+  smartQos: SmartQos;
+
+}
+export class SmartQos{
+  name: string;
+  //控制策略,0：保护IO下限，1：控制IO上限
+  latency: number;
+  maxbandwidth: number;
+  maxiops: number;
+  minbandwidth: number;
+  miniops: number;
+  enabled:false;
+  //for update
+  controlPolicy: string;
+  latencyUnit: string;
+}
+export class CapacityAutonegotiation{
+  autoSizeEnable:boolean;
 }
 export class FileSystem{
   capacity: number;

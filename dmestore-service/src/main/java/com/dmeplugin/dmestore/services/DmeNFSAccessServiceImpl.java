@@ -211,65 +211,78 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             JsonObject nfsDatastore = jsonArray.get(i).getAsJsonObject();
 
             //TODO 从vCenter nfsDataStore信息中提取存储id ip和path
-            String nfsStorageId = nfsDatastore.get("objectid").getAsString();
-            String nfsDatastoreIp = nfsDatastore.get("remoteHost").getAsString();
-            String nfsDataStoreSharePath = nfsDatastore.get("remotePath").getAsString();
-            Storage storageInfo = storageMap.get(nfsDatastoreIp);
+            String nfsStorageId = ToolUtils.jsonToStr(nfsDatastore.get("objectid"));
+            String nfsDatastoreIp = ToolUtils.jsonToStr(nfsDatastore.get("remoteHost"));
+            String nfsDataStoreSharePath = ToolUtils.jsonToStr(nfsDatastore.get("remotePath"));
+            String nfsDataStorageName = ToolUtils.jsonToStr(nfsDatastore.get("name"));
+           /* Storage storageInfo = storageMap.get(nfsDatastoreIp);
             if (null == storageInfo) {
                 LOG.warn("扫描NFS存储信息,share ip:{} 再DME侧没有找到对应的存储设备!!!", nfsDatastoreIp);
                 continue;
                 //storageInfo = storageMap.get("10.143.133.201");
-            }
-            String storage_id = storageInfo.getId();
-            String storage_name = storageInfo.getName();
-            DmeVmwareRelation relation = new DmeVmwareRelation();
-            relation.setStoreId(nfsStorageId);
-            relation.setStorageDeviceId(storage_id);
-            relation.setStoreName(storage_name);
-            relation.setStoreType(store_type);
+            }*/
+            if(null != storageMap && storageMap.size() >0){
+                for(Map.Entry<String, Storage> entry : storageMap.entrySet()){
+                    Storage storageInfo = entry.getValue();
+                    String storage_id = storageInfo.getId();
+                    String storage_name = storageInfo.getName();
+                    DmeVmwareRelation relation = new DmeVmwareRelation();
+                    relation.setStoreId(nfsStorageId);
+                    relation.setStorageDeviceId(storage_id);
+                    relation.setStoreName(nfsDataStorageName);
+                    relation.setStoreType(store_type);
 
-            //获取logicPort信息
-            boolean withLogicPort = false;
-            Map<String, Object> logicPortInfo = queryLogicPortInfo(storage_id);
-            if (null != logicPortInfo && logicPortInfo.size() > 0) {
-                String id = ToolUtils.getStr(logicPortInfo.get("id"));
-                String name = ToolUtils.getStr(logicPortInfo.get("name"));
-                relation.setLogicPortId(id);
-                relation.setLogicPortName(name);
-                withLogicPort = true;
-            } else {
-                LOG.warn("NFSDATASTORE id:" + storage_id + " contains logicport is null!");
-            }
+                    //获取logicPort信息
+                    boolean withLogicPort = false;
+                    List<Map<String, Object>> logicPortInfos = queryLogicPortInfo(storage_id);
+                    if (null != logicPortInfos && logicPortInfos.size() > 0) {
+                        for(Map<String, Object> logicPortInfo : logicPortInfos){
+                            String id = ToolUtils.getStr(logicPortInfo.get("id"));
+                            String name = ToolUtils.getStr(logicPortInfo.get("home_port_name"));
+                            String mgmtIp = ToolUtils.getStr(logicPortInfo.get("mgmt_ip"));
+                            if(nfsDatastoreIp.equals(mgmtIp)){
+                                relation.setLogicPortId(id);
+                                relation.setLogicPortName(name);
+                                withLogicPort = true;
+                                break;
+                                //此处若匹配到了多个IP,属于异常场景,处理方法见需求说明文档
+                            }
+                        }
+                    } else {
+                        LOG.warn("NFSDATASTORE id:" + storage_id + " contains logicport is null!");
+                    }
 
-            //获取share信息 (条件:sharePath  可加 storageId)
-            String fsName = "";
-            boolean withShare = false;
-            Map<String, Object> shareInfo = queryShareInfo(nfsDataStoreSharePath);
-            if (null != shareInfo && shareInfo.size() > 0) {
-                fsName = ToolUtils.getStr(shareInfo.get("fs_name"));
-                String id = ToolUtils.getStr(shareInfo.get("id"));
-                String name = ToolUtils.getStr(shareInfo.get("name"));
-                relation.setShareId(id);
-                relation.setShareName(name);
-                withShare = true;
-            } else {
-                LOG.warn("NFSDATASTORE id:" + storage_id + " contains share is null!");
-            }
+                    //获取share信息 (条件:sharePath  可加 storageId)
+                    String fsName = "";
+                    boolean withShare = false;
+                    Map<String, Object> shareInfo = queryShareInfo(nfsDataStoreSharePath);
+                    if (null != shareInfo && shareInfo.size() > 0) {
+                        fsName = ToolUtils.getStr(shareInfo.get("fs_name"));
+                        String id = ToolUtils.getStr(shareInfo.get("id"));
+                        String name = ToolUtils.getStr(shareInfo.get("name"));
+                        relation.setShareId(id);
+                        relation.setShareName(name);
+                        withShare = true;
+                    } else {
+                        LOG.warn("NFSDATASTORE id:" + storage_id + " contains share is null!");
+                    }
 
-            //获取fs信息
-            boolean withFs = false;
-            Map<String, Object> fsInfo = queryFsInfo(storage_id, fsName);
-            if (null != fsInfo && fsInfo.size() > 0) {
-                String id = ToolUtils.getStr(fsInfo.get("id"));
-                String name = ToolUtils.getStr(fsInfo.get("name"));
-                relation.setFsId(id);
-                relation.setFsName(name);
-                withFs = true;
-            } else {
-                LOG.warn("NFSDATASTORE id:" + storage_id + " contains fs is null!");
-            }
-            if (withFs || withShare || withLogicPort) {
-                relationList.add(relation);
+                    //获取fs信息
+                    boolean withFs = false;
+                    Map<String, Object> fsInfo = queryFsInfo(storage_id, fsName);
+                    if (null != fsInfo && fsInfo.size() > 0) {
+                        String id = ToolUtils.getStr(fsInfo.get("id"));
+                        String name = ToolUtils.getStr(fsInfo.get("name"));
+                        relation.setFsId(id);
+                        relation.setFsName(name);
+                        withFs = true;
+                    } else {
+                        LOG.warn("NFSDATASTORE id:" + storage_id + " contains fs is null!");
+                    }
+                    if (withFs || withShare || withLogicPort) {
+                        relationList.add(relation);
+                    }
+                }
             }
         }
 
@@ -405,26 +418,26 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         for (JsonElement jsonElement : jsonArray) {
             Map<String, Object> fsMap = new HashMap<>();
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            fsMap.put("id", ToolUtils.getStr(jsonObject.get("id")));
-            fsMap.put("name", ToolUtils.getStr(jsonObject.get("name")));
-            fsMap.put("storage_id", ToolUtils.getStr(jsonObject.get("storage_id")));
-            fsMap.put("storage_name", ToolUtils.getStr(jsonObject.get("storage_name")));
-            fsMap.put("storage_pool_name", ToolUtils.getStr(jsonObject.get("storage_pool_name")));
-            fsMap.put("tier_id", ToolUtils.getStr(jsonObject.get("tier_id")));
-            fsMap.put("tier_name", ToolUtils.getStr(jsonObject.get("tier_name")));
+            fsMap.put("id", ToolUtils.jsonToStr(jsonObject.get("id")));
+            fsMap.put("name", ToolUtils.jsonToStr(jsonObject.get("name")));
+            fsMap.put("storage_id", ToolUtils.jsonToStr(jsonObject.get("storage_id")));
+            fsMap.put("storage_name", ToolUtils.jsonToStr(jsonObject.get("storage_name")));
+            fsMap.put("storage_pool_name", ToolUtils.jsonToStr(jsonObject.get("storage_pool_name")));
+            fsMap.put("tier_id", ToolUtils.jsonToStr(jsonObject.get("tier_id")));
+            fsMap.put("tier_name", ToolUtils.jsonToStr(jsonObject.get("tier_name")));
             fsList.add(fsMap);
         }
         return fsList;
     }
 
     //按条件查询logicPort
-    private Map<String, Object> queryLogicPortInfo(String storageId) throws Exception {
+    private List<Map<String, Object>> queryLogicPortInfo(String storageId) throws Exception {
         ResponseEntity responseEntity = listLogicPortByStorageId(storageId);
         if (responseEntity.getStatusCodeValue() / 100 == 2) {
             Object object = responseEntity.getBody();
             List<Map<String, Object>> list = convertLogicPort(storageId, object);
             if (list.size() > 0) {
-                return list.get(0);
+                return list;
             }
         }
         return null;
@@ -451,13 +464,14 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         for (JsonElement jsonElement : jsonArray) {
             Map<String, Object> logicPortMap = new HashMap<>();
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            logicPortMap.put("id", ToolUtils.getStr(jsonObject.get("id")));
-            logicPortMap.put("name", ToolUtils.getStr(jsonObject.get("name")));
+            logicPortMap.put("id", ToolUtils.jsonToStr(jsonObject.get("id")));
+            logicPortMap.put("name", ToolUtils.jsonToStr(jsonObject.get("name")));
             logicPortMap.put("storage_id", storageId);
-            logicPortMap.put("home_port_id", ToolUtils.getStr(jsonObject.get("home_port_id")));
-            logicPortMap.put("home_port_name", ToolUtils.getStr(jsonObject.get("home_port_name")));
-            logicPortMap.put("current_port_id", ToolUtils.getStr(jsonObject.get("current_port_id")));
-            logicPortMap.put("current_port_id", ToolUtils.getStr(jsonObject.get("current_port_id")));
+            logicPortMap.put("home_port_id", ToolUtils.jsonToStr(jsonObject.get("home_port_id")));
+            logicPortMap.put("home_port_name", ToolUtils.jsonToStr(jsonObject.get("home_port_name")));
+            logicPortMap.put("current_port_id", ToolUtils.jsonToStr(jsonObject.get("current_port_id")));
+            logicPortMap.put("current_port_id", ToolUtils.jsonToStr(jsonObject.get("current_port_id")));
+            logicPortMap.put("mgmt_ip", ToolUtils.jsonToStr(jsonObject.get("mgmt_ip")));
             logicPortList.add(logicPortMap);
         }
         return logicPortList;
@@ -949,4 +963,14 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
 
+    public boolean isNfs(String objectId) throws Exception {
+        List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_NFS);
+        for (DmeVmwareRelation dmeVmwareRelation:dvrlist){
+            if (dmeVmwareRelation.getStoreId().equalsIgnoreCase(objectId)) {
+                return true;
+            }
+
+        }
+        return false;
+    }
 }

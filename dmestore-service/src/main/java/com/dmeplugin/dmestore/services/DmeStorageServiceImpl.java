@@ -37,7 +37,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     private final String API_INSTANCES_LIST = "/rest/resourcedb/v1/instances";
     private final String API_VOLUME_DETAIL = "/rest/blockservice/v1/volumes";
     private final String API_FILESYSTEM_DETAIL = "/rest/fileservice/v1/filesystems/";
-    private final String API_STROAGEPOOL_DETAIL = "/rest/storagemgmt/v1/storagepools/query";
+
     private final String DJTIERCONTAINSSTORAGEPOOL_URL = "/rest/resourcedb/v1/relations/M_DjTierContainsStoragePool/instances";
     private final String SYS_DJTIER_URL = "/rest/resourcedb/v1/instances/SYS_DjTier";
 
@@ -1354,6 +1354,15 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         }
         return poolName;
+    }
+    
+     /**
+     * 判断数据存储中是否有注册的虚拟机，有则返回true，没有返回false
+     * @param objectid 数据存储的objectid
+     * @return  是否存在vm
+     */
+    public boolean hasVmOnDatastore(String objectid){
+        return vcsdkUtils.hasVmOnDatastore(objectid);
     }
 
 }
