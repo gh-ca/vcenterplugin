@@ -53,7 +53,7 @@ public class DatastoreCustomProperter implements PropertyProviderAdapter {
 
     @Override
     public ResultSet getProperties(PropertyRequestSpec propertyRequest) {
-        // Logic to retrieve properties and return as result set
+
         ResultSet resultSet = new ResultSet();
 
         try {
@@ -61,11 +61,17 @@ public class DatastoreCustomProperter implements PropertyProviderAdapter {
 
             for (Object objRef : propertyRequest.objects) {
                 ResultItem resultItem =new ResultItem();
-                PropertyValue isDataStorePv = new PropertyValue();
+                PropertyValue isVmfsDataStore = new PropertyValue();
 
-                isDataStorePv.resourceObject = objRef;
+                isVmfsDataStore.resourceObject = objRef;
 
-                isDataStorePv.propertyName = "isdme";
+                isVmfsDataStore.propertyName = "isVmfs";
+
+                PropertyValue isNfsDataStore = new PropertyValue();
+
+                isNfsDataStore.resourceObject = objRef;
+
+                isNfsDataStore.propertyName = "isNfs";
 
                 String entityType = vimObjectReferenceService.getResourceObjectType(objRef);
                 String entityName = vimObjectReferenceService.getValue(objRef);
@@ -75,14 +81,14 @@ public class DatastoreCustomProperter implements PropertyProviderAdapter {
                 mor.setValue(entityName);
                 String objectid=vcConnectionHelper.MOR2ObjectID(mor,serverGuid);
 
-                boolean isDme=vmfsAccessService.isVmfs(objectid);
-                isDataStorePv.value = ""+isDme; //logic for assign the value for ISDATASTORE property
+                boolean isVmfs=vmfsAccessService.isVmfs(objectid);
+                isVmfsDataStore.value = isVmfs;
 
-//add isDataStorePv to resultItem's property array as shown
+                boolean isNfs=dmeNFSAccessService.isNfs(objectid);
+                isNfsDataStore.value= isNfs;
 
-                LOG.error("myVMdata: "+objectid + isDme);
                 resultItem.resourceObject=objRef;
-                resultItem.properties = new PropertyValue[] {isDataStorePv };
+                resultItem.properties = new PropertyValue[] {isVmfsDataStore,isNfsDataStore };
                 resultItems.add(resultItem);
             }
 
@@ -90,7 +96,7 @@ public class DatastoreCustomProperter implements PropertyProviderAdapter {
             resultSet.items = resultItems.toArray(new ResultItem[] {});
 
         } catch (Exception e) {
-            LOG.error("VicUIServiceImpl.getProperties error: " + e);
+            LOG.error("vmfsnfsLogic.getProperties error: " + e);
         }
 
         return resultSet;
