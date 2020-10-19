@@ -1,6 +1,7 @@
 package com.dmeplugin.dmestore.utils;
 
 import com.dmeplugin.dmestore.services.DmeNFSAccessServiceImpl;
+import com.dmeplugin.dmestore.services.DmeStorageServiceImpl;
 import com.dmeplugin.dmestore.services.VmfsAccessServiceImpl;
 import com.dmeplugin.vmware.VCConnectionHelper;
 import com.vmware.vim25.ManagedObjectReference;
@@ -24,6 +25,9 @@ public class DatastoreCustomProperter implements PropertyProviderAdapter {
     private DmeNFSAccessServiceImpl dmeNFSAccessService;
 
     @Autowired
+    private DmeStorageServiceImpl dmeStorageService;
+
+    @Autowired
     @Lazy
     private VimObjectReferenceService vimObjectReferenceService;
 
@@ -41,7 +45,7 @@ public class DatastoreCustomProperter implements PropertyProviderAdapter {
     public DatastoreCustomProperter(DataServiceExtensionRegistry extensionRegistry) {
         TypeInfo vmTypeInfo = new TypeInfo();
         vmTypeInfo.type = "Datastore";
-        vmTypeInfo.properties = new String[] { "isVmfs","isNfs" };
+        vmTypeInfo.properties = new String[] { "isVmfs","isNfs","hasVm" };
         TypeInfo[] providerTypes = new TypeInfo[] {vmTypeInfo};
 
         extensionRegistry.registerDataAdapter(this, providerTypes);
@@ -73,6 +77,12 @@ public class DatastoreCustomProperter implements PropertyProviderAdapter {
 
                 isNfsDataStore.propertyName = "isNfs";
 
+                PropertyValue hasVmDatastore = new PropertyValue();
+
+                hasVmDatastore.resourceObject = objRef;
+
+                hasVmDatastore.propertyName = "hasVm";
+
                 String entityType = vimObjectReferenceService.getResourceObjectType(objRef);
                 String entityName = vimObjectReferenceService.getValue(objRef);
                 String serverGuid = vimObjectReferenceService.getServerGuid(objRef);
@@ -87,8 +97,11 @@ public class DatastoreCustomProperter implements PropertyProviderAdapter {
                 boolean isNfs=dmeNFSAccessService.isNfs(objectid);
                 isNfsDataStore.value= isNfs;
 
+                boolean hasVm=dmeStorageService.hasVmOnDatastore(objectid);
+                hasVmDatastore.value=hasVm;
+
                 resultItem.resourceObject=objRef;
-                resultItem.properties = new PropertyValue[] {isVmfsDataStore,isNfsDataStore };
+                resultItem.properties = new PropertyValue[] {isVmfsDataStore,isNfsDataStore,hasVmDatastore };
                 resultItems.add(resultItem);
             }
 
