@@ -75,7 +75,7 @@ public class DPSqlFileConstant {
           "\"HOST_NAME\"  nvarchar(255),\n" +
           "\"HOST_SETTING\"  nvarchar(255),\n" +
           "\"RECOMMEND_VALUE\"  nvarchar(50) NOT NULL,\n" +
-          "\"ACTUAL_VALUE\"  nvarchar(50),\n" +
+          "\"ACTUAL_VALUE\"  clob,\n" +
           "\"HINT_LEVEL\"  nvarchar(20),\n" +
           "\"NEED_REBOOT\"  nvarchar(10),\n" +
           "\"AUTO_REPAIR\"  nvarchar(10),\n" +

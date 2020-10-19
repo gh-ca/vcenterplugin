@@ -90,7 +90,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         shareAttr.setName(share.get("name").getAsString());
         shareAttr.setShare_path(share.get("share_path").getAsString());
         shareAttr.setDescription(share.get("description").getAsString());
-        shareAttr.setOwning_dtree_name(share.get("owning_dtree_name").getAsString());
+        shareAttr.setOwning_dtree_name(ToolUtils.jsonToStr(share.get("owning_dtree_name"),  null));
         //查询客户端列表
         List<AuthClient> authClientList = getNFSDatastoreShareAuthClients(nfsShareId);
         if (null != authClientList && authClientList.size() > 9) {
@@ -103,7 +103,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private List<AuthClient> getNFSDatastoreShareAuthClients(String shareId) throws Exception {
         List<AuthClient> clientList = new ArrayList<>();
         String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_SHARE_AUTH_CLIENTS_URL, "nfs_share_id", shareId);
-        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, null);
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(new HashMap<>()));
         if (responseEntity.getStatusCodeValue() / 100 == 2) {
             String resBody = responseEntity.getBody();
             JsonObject resObject = gson.fromJson(resBody, JsonObject.class);
@@ -368,8 +368,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         for (JsonElement jsonElement : jsonArray) {
             Map<String, Object> shareMap = new HashMap<>();
             JsonObject jsonObject = jsonElement.getAsJsonObject();
-            shareMap.put("id", ToolUtils.getStr(jsonObject.get("id")));
-            shareMap.put("name", ToolUtils.getStr(jsonObject.get("name")));
+            shareMap.put("id", ToolUtils.jsonToStr(jsonObject.get("id")));
+            shareMap.put("name", ToolUtils.jsonToStr(jsonObject.get("name")));
             shareMap.put("share_path", ToolUtils.getStr(jsonObject.get("share_path")));
             shareMap.put("storage_id", ToolUtils.getStr(jsonObject.get("storage_id")));
             shareMap.put("device_name", ToolUtils.getStr(jsonObject.get("device_name")));
