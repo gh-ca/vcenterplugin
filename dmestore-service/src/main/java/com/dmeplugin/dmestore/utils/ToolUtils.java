@@ -116,8 +116,8 @@ public class ToolUtils {
         return re;
     }
 
-    public static String jsonToStr(JsonElement obj, String dedefaultvalue) {
-        String re = dedefaultvalue;
+    public static String jsonToStr(JsonElement obj, String defaultValue) {
+        String re = defaultValue;
         try {
             if (!StringUtils.isEmpty(obj)) {
                 re = obj.getAsString();
@@ -129,8 +129,8 @@ public class ToolUtils {
     }
 
 
-    public static Integer jsonToInt(JsonElement obj, Integer defaultvalue) {
-        Integer re = defaultvalue;
+    public static Integer jsonToInt(JsonElement obj, Integer defaultValue) {
+        Integer re = defaultValue;
         try {
             if (!StringUtils.isEmpty(obj)) {
                 re = obj.getAsInt();
@@ -153,8 +153,8 @@ public class ToolUtils {
         return re;
     }
 
-    public static Long jsonToLon(JsonElement obj, Long defaultvalue) {
-        Long re = defaultvalue;
+    public static Long jsonToLon(JsonElement obj, Long defaultValue) {
+        Long re = defaultValue;
         try {
             if (!StringUtils.isEmpty(obj)) {
                 re = obj.getAsLong();
@@ -165,8 +165,8 @@ public class ToolUtils {
         return re;
     }
 
-    public static Double jsonToDou(JsonElement obj, Double defaultvalue) {
-        Double re = defaultvalue;
+    public static Double jsonToDou(JsonElement obj, Double defaultValue) {
+        Double re = defaultValue;
         try {
             if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsDouble();
@@ -189,8 +189,8 @@ public class ToolUtils {
         return re;
     }
 
-    public static Float jsonToFloat(JsonElement obj, Float defaultvalue) {
-        Float re = defaultvalue;
+    public static Float jsonToFloat(JsonElement obj, Float defaultValue) {
+        Float re = defaultValue;
         try {
             if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsFloat();
@@ -251,8 +251,8 @@ public class ToolUtils {
         return re;
     }
 
-    public static String jsonToDateStr(JsonElement obj, String defaultvalue) {
-        String re = defaultvalue;
+    public static String jsonToDateStr(JsonElement obj, String defaultValue) {
+        String re = defaultValue;
         try {
             if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = sdf.format(new Date(Long.parseLong(String.valueOf(obj.getAsBigInteger()))));
