@@ -1,0 +1,34 @@
+<div>
+  <!--挂载弹窗-->
+  <clr-modal [(clrModalOpen)]="mountShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
+    <h3 class="modal-title modelTile">{{'vmfs.mount.mount' | translate}} | {{hostOrClusterName}}</h3>
+    <div class="modal-body">
+      <form clrForm >
+        <div *ngIf="notChooseMountDevice" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.unmount.notChooseDeviceTips' | translate}}</div>
+        <clr-datagrid [(clrDgSelected)]="chooseMountDataStore" [clrDgLoading]="isLoading">
+          <clr-dg-column hidden>ID</clr-dg-column>
+          <clr-dg-column hidden>objectId</clr-dg-column>
+          <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'type'">{{'vmfs.type' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'status'">{{'vmfs.status' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'capacity'">{{'vmfs.capacity' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'freeSpace'">{{'vmfs.freeSpace' | translate}}</clr-dg-column>
+          <clr-dg-row *clrDgItems="let item of dataStores" [clrDgItem]="item">
+            <clr-dg-cell hidden>{{item.id}}</clr-dg-cell>
+            <clr-dg-cell hidden>{{item.objectId}}</clr-dg-cell>
+            <clr-dg-cell>{{item.name}}</clr-dg-cell>
+            <clr-dg-cell>{{item.type}}</clr-dg-cell>
+            <clr-dg-cell>{{item.status}}</clr-dg-cell>
+            <clr-dg-cell>{{item.capacity}}</clr-dg-cell>
+            <clr-dg-cell>{{item.freeSpace}}</clr-dg-cell>
+          </clr-dg-row>
+        </clr-datagrid>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" (click)="mountShow = false;">{{'menu.cancel' | translate}}</button>
+          <button type="button" class="btn btn-primary" (click)="mountHandleFunc();">{{'menu.ok' | translate}}</button>
+        </div>
+      </form>
+    </div>
+  </clr-modal>
+</div>
+
