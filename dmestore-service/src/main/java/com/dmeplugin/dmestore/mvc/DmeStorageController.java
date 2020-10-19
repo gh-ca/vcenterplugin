@@ -79,16 +79,16 @@ public class DmeStorageController extends BaseController{
     /**
      *
      * @param storageId
-     * @param media_type file,block,all
+     * @param mediaType file,block,all
      * @return
      */
     @GetMapping("/storagepools")
     @ResponseBody
     public ResponseBodyBean getStoragePools(@RequestParam(name = "storageId") String storageId,
-                                            @RequestParam(name = "media_type",defaultValue = "all",required = false) String media_type){
+                                            @RequestParam(name = "mediaType",defaultValue = "all",required = false) String mediaType){
 
         LOG.info("storage_id ==" + storageId );
-        Map<String, Object> resMap = dmeStorageService.getStoragePools(storageId,media_type);
+        Map<String, Object> resMap = dmeStorageService.getStoragePools(storageId,mediaType);
         if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }
@@ -148,9 +148,9 @@ public class DmeStorageController extends BaseController{
     }
     @GetMapping("/bandports")
     @ResponseBody
-    public ResponseBodyBean getBandPorts(@RequestParam(name = "storage_id") String storage_id){
+    public ResponseBodyBean getBandPorts(@RequestParam(name = "storageId") String storageId){
 
-        Map<String, Object> resMap = dmeStorageService.getBandPorts(storage_id);
+        Map<String, Object> resMap = dmeStorageService.getBandPorts(storageId);
         if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }
@@ -219,8 +219,8 @@ public class DmeStorageController extends BaseController{
 
     @GetMapping("/failovergroups")
     @ResponseBody
-    public ResponseBodyBean getFailoverGroups(@RequestParam(name = "storage_id")String storage_id) {
-        Map<String, Object> resMap = dmeStorageService.getFailoverGroups(storage_id);
+    public ResponseBodyBean getFailoverGroups(@RequestParam(name = "storageId")String storageId) {
+        Map<String, Object> resMap = dmeStorageService.getFailoverGroups(storageId);
         if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
             return success(resMap);
         }

@@ -14,9 +14,9 @@ public class SimpleServiceLevel{
     private String description;
     private String type;
     private String protocol;
-    private Double total_capacity;
-    private Double free_capacity;
-    private Double used_capacity;
+    private Double totalCapacity;
+    private Double freeCapacity;
+    private Double usedCapacity;
 
     public SimpleCapabilities getCapabilities() {
         return capabilities;
@@ -66,27 +66,27 @@ public class SimpleServiceLevel{
         this.protocol = protocol;
     }
 
-    public Double getTotal_capacity() {
-        return total_capacity;
+    public Double getTotalCapacity() {
+        return totalCapacity;
     }
 
-    public void setTotal_capacity(Double total_capacity) {
-        this.total_capacity = total_capacity;
+    public void setTotalCapacity(Double totalCapacity) {
+        this.totalCapacity = totalCapacity;
     }
 
-    public Double getFree_capacity() {
-        return free_capacity;
+    public Double getFreeCapacity() {
+        return freeCapacity;
     }
 
-    public void setFree_capacity(Double free_capacity) {
-        this.free_capacity = free_capacity;
+    public void setFreeCapacity(Double freeCapacity) {
+        this.freeCapacity = freeCapacity;
     }
 
-    public Double getUsed_capacity() {
-        return used_capacity;
+    public Double getUsedCapacity() {
+        return usedCapacity;
     }
 
-    public void setUsed_capacity(Double used_capacity) {
-        this.used_capacity = used_capacity;
+    public void setUsedCapacity(Double usedCapacity) {
+        this.usedCapacity = usedCapacity;
     }
 }
