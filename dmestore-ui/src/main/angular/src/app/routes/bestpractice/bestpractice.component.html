@@ -90,3 +90,23 @@
     <button type="button" class="btn btn-outline-warning" (click)="tipOk()">{{'menu.ok'|translate}}</button>
   </div>
 </clr-modal>
+
+<clr-modal [(clrModalOpen)]="tipModalSuccess" [clrModalSize]="'sm'">
+    <h3 class="modal-title">{{'menu.tip'|translate}}</h3>
+    <div class="modal-body">
+      <clr-icon shape="success-standard" class="is-solid" style="color: #59A220;margin-right: 5px;"></clr-icon>{{'bestPractice.exeSuccess'|translate}}
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-success" (click)="tipModalSuccess=false">{{'menu.ok'|translate}}</button>
+    </div>
+</clr-modal>
+
+<clr-modal [(clrModalOpen)]="tipModalFail" [clrModalSize]="'sm'">
+  <h3 class="modal-title">{{'menu.tip'|translate}}</h3>
+  <div class="modal-body">
+    <clr-icon shape="error-standard" class="is-solid" style="color: red;margin-right: 5px;"></clr-icon>{{'bestPractice.exeFail'|translate}}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="tipModalFail=false">{{'menu.ok'|translate}}</button>
+  </div>
+</clr-modal>

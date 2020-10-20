@@ -39,6 +39,9 @@ export class BestpracticeComponent implements OnInit {
   ips = '';
   applyType = '1';
 
+
+  tipModalSuccess = false;
+  tipModalFail = false;
   constructor(private cdr: ChangeDetectorRef,
               public gs: GlobalsService,
               private http: HttpClient,
@@ -97,8 +100,15 @@ export class BestpracticeComponent implements OnInit {
     this.http.post('v1/bestpractice/update/bylist', params).subscribe((result: any) => {
       this.gs.loading = false;
       if (result.code == '200'){
+        this.tipModalSuccess = true;
+        if(this.applyType != '1'){
+          this.hostModalShow = false;
+        }
         this.practiceRefresh();
+      } else{
+        this.tipModalFail = true;
       }
+      this.cdr.detectChanges();
     }, err => {
       console.error('ERROR', err);
     });
@@ -142,6 +152,12 @@ export class BestpracticeComponent implements OnInit {
     this.gs.loading = true;
     this.http.post('v1/bestpractice/check', {}).subscribe((result: any) => {
       this.gs.loading = false;
+      if (result.code == '200'){
+        this.tipModalSuccess = true;
+      } else{
+        this.tipModalFail = true;
+      }
+      this.cdr.detectChanges();
     }, err => {
       console.error('ERROR', err);
     });

@@ -479,7 +479,9 @@
     "major": "Major",
     "tipmessage": "Modify Host Config,You need Reboot Host,IP:",
     "syncSuccess": "Sync Success",
-    "syncFail": "Sync Failed"
+    "syncFail": "Sync Failed",
+    "exeSuccess": "Execute Success",
+    "exeFail": "Execute Failed"
   },
   "iscsi": {
     "hostIp": "Host VmKernel IP",

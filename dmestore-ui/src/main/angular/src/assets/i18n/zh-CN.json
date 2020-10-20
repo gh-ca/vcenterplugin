@@ -482,7 +482,9 @@
     "major": "重要",
     "tipmessage": "修改主机配置，您需要重启主机，IP:",
     "syncSuccess": "同步成功",
-    "syncFail": "同步失败"
+    "syncFail": "同步失败",
+    "exeSuccess": "执行成功",
+    "exeFail": "执行失败"
   },
   "iscsi": {
     "hostIp": "主机VmKernel IP",
