@@ -17,14 +17,7 @@ import {ClrDatagridStateInterface, ClrWizard, ClrWizardPage} from '@clr/angular'
 import {GlobalsService} from '../../../shared/globals.service';
 import {Cluster, Host} from '../../nfs/nfs.service';
 import {ClrDatagridFilterInterface} from "@clr/angular";
-import { User } from '@core';
-import { Subject } from 'rxjs';
 
-class MyFilter implements ClrDatagridFilterInterface<User> {
-    changes = new Subject<any>();
-    isActive(): boolean { return false/* ... */ }
-    accepts(user: User) { return false/* ... */ }
-}
 
 @Component({
   selector: 'app-list',
@@ -47,8 +40,6 @@ export class VmfsListComponent implements OnInit {
   @ViewChild('wizard') wizard: ClrWizard;
   @ViewChild('addPageOne') addPageOne: ClrWizardPage;
   @ViewChild('addPageTwo') addPageTwo: ClrWizardPage;
-
-  public myFilter = new MyFilter()
   
   expendActive = false; // 示例
   list: List[] = []; // 数据列表
