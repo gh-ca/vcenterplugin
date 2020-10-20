@@ -1066,17 +1066,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             //SmartTier
             volumeDetail.setSmartTier(tuning.get("smarttier").getAsString());
             //Tunning
-            if (tuning.get("dedupe_enabled") != null) {
-                volumeDetail.setDudeplication(tuning.get("dedupe_enabled").getAsBoolean());
-            }
+            volumeDetail.setDudeplication(ToolUtils.jsonToBoo(tuning.get("dedupe_enabled")));
             volumeDetail.setProvisionType(tuning.get("alloctype").getAsString());
-            if (tuning.get("compression_enabled") != null) {
-                volumeDetail.setCompression(tuning.get("compression_enabled").getAsBoolean());
-            }
+            volumeDetail.setCompression(ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
             //应用类型
-            if (tuning.get("workload_type_id") != null) {
-                volumeDetail.setApplicationType(tuning.get("workload_type_id").getAsString());
-            }
+            volumeDetail.setApplicationType(ToolUtils.jsonToStr(tuning.get("workload_type_id"), null));
 
             JsonObject smartqos = tuning.getAsJsonObject("smartqos");
             //Qos Policy
@@ -1397,20 +1391,20 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 vcsdkUtils.hostRescanVmfs(hostIp);*/
                 vcsdkUtils.scanDataStore(null, hostObjId);
             }
-        }else{
+        } else {
             //dme侧已删除(卸载) hostObjectIds参数为空，此时通过dsObjectId查询hostObjId,再扫描一次
             List<String> dataStoreObjectIds = (List<String>) params.get("dataStoreObjectIds");
             List<Map<String, String>> lists = new ArrayList<>();
-            for(String dsObjId : dataStoreObjectIds){
+            for (String dsObjId : dataStoreObjectIds) {
                 String listStr = vcsdkUtils.getHostsByDsObjectId(dsObjId);
                 if (!StringUtils.isEmpty(listStr)) {
                     lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
                     }.getType());
                 }
-                if(null != lists && lists.size() >0){
-                    for(Map<String, String> hostMap : lists){
+                if (null != lists && lists.size() > 0) {
+                    for (Map<String, String> hostMap : lists) {
                         String hostObjId = hostMap.get("hostId");
-                        if(!StringUtils.isEmpty(hostObjId)){
+                        if (!StringUtils.isEmpty(hostObjId)) {
                             vcsdkUtils.scanDataStore(null, hostObjId);
                         }
                     }
