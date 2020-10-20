@@ -14,7 +14,7 @@ public class FileSystem  {
     private String name;
     //状态
     private String healthStatus;
-    //分配策略
+    //分配策略(分配类型)
     private String allocType;
     //容量使用率
     private Integer capacityUsageRatio;
@@ -30,7 +30,7 @@ public class FileSystem  {
     private Double capacity;
     //文件系统在存储池上已经分配的容量
     private Double allocateQuotaInPool;
-    //可用空间
+    //可用容量
     private Double availableCapacity;
     //Thin文件系统能缩容的最小空间。单位GB，保留三位小数
     private Double minSizeFsCapacity;
