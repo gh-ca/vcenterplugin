@@ -769,7 +769,7 @@ public class VCSDKUtils {
     /**
      *create nfs datastore
      **/
-    public String createNfsDatastore(String serverHost, String exportPath, String nfsName, String accessMode, List<Map<String,String>> hostObjectIds,String type) {
+    public String createNfsDatastore(String serverHost, String exportPath, String nfsName, String accessMode, List<Map<String,String>> hostObjectIds,String type) throws Exception {
         String response = "";
         logger.info("start creat nfs datastore");
         accessMode = StringUtils.isEmpty(accessMode) || "readWrite".equals(accessMode) ? "readWrite" : "readOnly";
@@ -806,6 +806,7 @@ public class VCSDKUtils {
         } catch (Exception e) {
             response = "failed";
             logger.error("vmware error:", e);
+            throw new Exception("create nfs datastore error");
         }
         return response;
     }
