@@ -13,7 +13,7 @@ import {ClrForm} from '@clr/angular';
 import {HttpClient} from '@angular/common/http';
 import {Router} from "@angular/router";
 import { TranslateService } from "@ngx-translate/core";
-
+import { GlobalsService }     from "../../shared/globals.service";
 
 @Component({
   selector: 'app-dashboard',
@@ -87,7 +87,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     private ngZone: NgZone,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
-    private router:Router
+    private router:Router,
+    public gs: GlobalsService
   ) {}
 
   ngOnInit() {}
@@ -101,8 +102,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   refresh(){
+    this.gs.loading = true // 设置全局loading 为 TRUE
     this.http.get('accessdme/refreshaccess', {}).subscribe((result: any) => {
+      console.log(result);
       if (result.code === '0' || result.code === '200'){
+        this.gs.loading = false  // 设置全局loading 为 FALSE
         this.hostModel = result.data.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         this.loadStorageNum();
