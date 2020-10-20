@@ -1624,7 +1624,7 @@ public class VCSDKUtils {
             ManagedObjectReference dsmor = vcConnectionHelper.objectID2MOR(dataStoreObjectId);
             DatastoreMO dsmo = new DatastoreMO(vmwareContext, dsmor);
 
-            HostMO hostmo = rootFsMo.findHostById(hostId);
+            HostMO hostmo = rootFsMo.findHostById(hostId);//通过主机名称而不是主机ID查询主机MO
             logger.info("Host name: " + hostmo.getName());
             //卸载
             unmountNfsOnHost(dsmo, hostmo, dataStoreObjectId);

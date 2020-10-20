@@ -99,5 +99,19 @@ public interface DmeNFSAccessService {
      */
     void deleteNfs(Map<String, Object> params) throws Exception;
 
+    /**
+     * 通过nfs storageId查询DME侧关联的主机信息
+     * @return 返回主机列表，单个主机的信息以map方式存储属性和属性值
+     * @throws Exception
+     */
+    List<Map<String, Object>> getHostsMountDataStoreByDsObjectId(String storageId) throws Exception;
+
+    /**
+     * 通过nfs storageId查询DME侧关联的主机组信息
+     * @param storageId
+     * @return 返回主机组列表，单个主机组的信息以map方式存储属性和属性值
+     * @throws Exception
+     */
+    List<Map<String, Object>> getClusterMountDataStoreByDsObjectId(String storageId) throws Exception;
 
 }
