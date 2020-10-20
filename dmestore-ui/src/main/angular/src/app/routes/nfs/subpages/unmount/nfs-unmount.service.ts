@@ -5,3 +5,12 @@ import {HttpClient} from "@angular/common/http";
 export class NfsUnmountService{
   constructor(private http: HttpClient) {}
 }
+export class DataStore{
+  freeSpace:string;
+  name: string;
+  id : string;
+  type: string;
+  objectId: string;
+  status: string;
+  capacity: string;
+}

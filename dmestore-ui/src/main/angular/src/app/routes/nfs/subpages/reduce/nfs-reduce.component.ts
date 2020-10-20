@@ -1,15 +1,15 @@
 import {Component, OnInit} from "@angular/core";
 import {GlobalsService} from "../../../../shared/globals.service";
-import {NfsUnmountService} from "./nfs-unmount.service";
+import {NfsReduceService} from "./nfs-reduce.service";
 import {ActivatedRoute, Router} from "@angular/router";
 import {DataStore} from "../mount/nfs-mount.service";
 @Component({
-  selector: 'app-unmount',
-  templateUrl: './nfs-unmount.component.html',
-  styleUrls: ['./nfs-unmount.component.scss'],
-  providers: [GlobalsService,NfsUnmountService]
+  selector: 'app-reduce',
+  templateUrl: './nfs-reduce.component.html',
+  styleUrls: ['./nfs-reduce.component.scss'],
+  providers: [GlobalsService,NfsReduceService]
 })
-export class NfsUnmountComponent implements OnInit{
+export class NfsReduceComponent implements OnInit{
 
   routePath: string;
   viewPage: string;
@@ -18,7 +18,7 @@ export class NfsUnmountComponent implements OnInit{
   rowSelected = []; // 当前选中数据
   dataStoreList: DataStore[];
   errorMsg: string;
-  constructor(private unmountService: NfsUnmountService, private gs: GlobalsService,
+  constructor(private reduceService: NfsReduceService, private gs: GlobalsService,
               private activatedRoute: ActivatedRoute,private router:Router){
   }
   ngOnInit(): void {

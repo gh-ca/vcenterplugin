@@ -20,10 +20,6 @@ import java.util.List;
 public class BestPracticeCheckDao extends H2DataBaseDao {
 
     public void save(List<BestPracticeBean> list) {
-        if (null == list || list.size() == 0) {
-            return;
-        }
-
         Connection con = null;
         PreparedStatement pstm = null;
         try {
@@ -58,7 +54,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         }
     }
 
-    public List<String> getHostNameByHostsetting(String hostSetting) throws SQLException{
+    public List<String> getHostNameByHostsetting(String hostSetting) throws SQLException {
         List<String> lists = new ArrayList<>();
         Connection con = null;
         PreparedStatement ps = null;
@@ -83,7 +79,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         return lists;
     }
 
-    public List<String> getAllHostIds(int pageNo, int pageSize) throws SQLException{
+    public List<String> getAllHostIds(int pageNo, int pageSize) throws SQLException {
         List<String> lists = new ArrayList<>();
         Connection con = null;
         PreparedStatement ps = null;
@@ -91,7 +87,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         try {
             con = getConnection();
             String sql = "SELECT HOST_ID from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
-            if(pageNo > 0 &&  pageSize > 0){
+            if (pageNo > 0 && pageSize > 0) {
                 int offset = (pageNo - 1) * pageSize;
                 sql = sql + " OFFSET " + offset + " ROWS FETCH FIRST " + pageSize + " ROWS ONLY";
             }
@@ -109,7 +105,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         return lists;
     }
 
-    public List<BestPracticeBean> getRecordByPage(String hostSetting, int pageNo, int pageSize) throws SQLException{
+    public List<BestPracticeBean> getRecordByPage(String hostSetting, int pageNo, int pageSize) throws SQLException {
         int offset = (pageNo - 1) * pageSize;
         List<BestPracticeBean> lists = new ArrayList<>();
         Connection con = null;
@@ -138,7 +134,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         return lists;
     }
 
-    public List<BestPracticeBean> getRecordBeanByHostsetting(String hostSetting) throws SQLException{
+    public List<BestPracticeBean> getRecordBeanByHostsetting(String hostSetting) throws SQLException {
         List<BestPracticeBean> lists = new ArrayList<>();
         Connection con = null;
         PreparedStatement ps = null;
@@ -177,7 +173,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         return bean;
     }
 
-    private String clobStreamToStr(Clob clob){
+    private String clobStreamToStr(Clob clob) {
         try {
             InputStream input = clob.getAsciiStream();
             int len = (int) clob.length();
@@ -209,7 +205,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             con.setAutoCommit(false);
             for (BestPracticeUpResultResponse response : list) {
                 List<BestPracticeUpResultBase> baseList = response.getResult();
-                for(BestPracticeUpResultBase base : baseList){
+                for (BestPracticeUpResultBase base : baseList) {
                     pstm.setString(1, base.getHostObjectId());
                     pstm.setString(2, base.getHostSetting());
                 }
@@ -262,5 +258,34 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         }
     }
 
+    public void update(List<BestPracticeBean> list) {
+        Connection con = null;
+        PreparedStatement pstm = null;
+        try {
+            con = getConnection();
+            String sql = "UPDATE DP_DME_BEST_PRACTICE_CHECK SET ACTUAL_VALUE=?,CREATE_TIME=? where HOST_NAME=? and HOST_SETTING=?";
+            pstm = con.prepareStatement(sql);
+            //不自动提交
+            con.setAutoCommit(false);
+            for (BestPracticeBean bean : list) {
+                pstm.setCharacterStream(1, new StringReader(bean.getActualValue()));
+                pstm.setDate(2, new Date(System.currentTimeMillis()));
+                pstm.setString(3, bean.getHostName());
+                pstm.setString(4, bean.getHostSetting());
+                pstm.addBatch();
+            }
+            pstm.executeUpdate();
+            con.commit();
+        } catch (Exception ex) {
+            try {
+                //回滚
+                con.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } finally {
+            closeConnection(con, pstm, null);
+        }
+    }
 
 }

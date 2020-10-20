@@ -120,9 +120,9 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             for (BestPracticeService bestPracticeService : bestPracticeServices) {
                 try {
                     boolean checkFlag = bestPracticeService.check(vcsdkUtils, _objectId);
+                    String hostSetting = bestPracticeService.getHostSetting();
                     if (!checkFlag) {
                         BestPracticeBean bean = new BestPracticeBean();
-                        String hostSetting = bestPracticeService.getHostSetting();
                         bean.setHostSetting(hostSetting);
                         bean.setRecommendValue(String.valueOf(bestPracticeService.getRecommendValue()));
                         bean.setLevel(bestPracticeService.getLevel());
@@ -140,6 +140,8 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                         } else {
                             checkMap.get(hostSetting).add(bean);
                         }
+                    }else {
+                        checkMap.put(hostSetting, null);
                     }
                 } catch (Exception ex) {
                     //报错，跳过当前项检查
@@ -168,19 +170,21 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
 
             List<BestPracticeBean> newList = new ArrayList<>();
             List<BestPracticeBean> upList = new ArrayList<>();
-            for (BestPracticeBean o : v) {
-                String hostName = o.getHostName();
-                if (localHostNames.contains(hostName)) {
-                    upList.add(o);
-                    localHostNames.remove(hostName);
-                } else {
-                    newList.add(o);
+            if(null != v && v.size() > 0){
+                for (BestPracticeBean o : v) {
+                    String hostName = o.getHostName();
+                    if (localHostNames.contains(hostName)) {
+                        upList.add(o);
+                        localHostNames.remove(hostName);
+                    } else {
+                        newList.add(o);
+                    }
                 }
             }
 
             //更新
             if (!upList.isEmpty()) {
-                //bestPracticeCheckDao.update(upList);
+                bestPracticeCheckDao.update(upList);
             }
 
             //新增

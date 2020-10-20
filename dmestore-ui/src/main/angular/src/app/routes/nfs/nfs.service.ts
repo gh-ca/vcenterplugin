@@ -46,28 +46,18 @@ export class NfsService {
     return this.http.get('accessnfs/listnfsperformance', {params: {fsIds}});
   }
   addNfs(params= {}){
-    console.log("addNfs")
-    console.log(params)
     return this.http.post('operatenfs/createnfsdatastore', params);
   }
   updateNfs(params= {}){
     return this.http.post('operatenfs/updatenfsdatastore', params);
   }
-  mountNfs(params= {}){
-    return this.http.post('accessnfs/mountnfs', params);
-  }
   delNfs(param: string){
     return this.http.post('accessnfs/delnfs', param);
-  }
-  getHostListByObjectId(dataStoreObjectId: string){
-    return this.http.get('accessvmware/gethostsbydsobjectid', {params: {dataStoreObjectId}});
   }
   getHostList(){
     return this.http.get('accessvmware/listhost');
   }
-  getClusterListByObjectId(dataStoreObjectId: string){
-    return this.http.get('accessvmware/getclustersbydsobjectid', {params: {dataStoreObjectId}});
-  }
+
   getVolsByObjId(objId: string) {
     return this.http.get('accessvmfs/volume/' + objId );
   }

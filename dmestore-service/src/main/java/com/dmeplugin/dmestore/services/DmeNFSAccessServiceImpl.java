@@ -160,6 +160,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         for (int i = 0; i < fsIds.size(); i++) {
             NfsDataStoreFsAttr fsAttr = new NfsDataStoreFsAttr();
             String file_system_id = fsIds.get(i);
+            if(StringUtils.isEmpty(file_system_id)){
+                continue;
+            }
             String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL,
                     "file_system_id", file_system_id);
             ResponseEntity<String> responseTuning = dmeAccessService.access(url, HttpMethod.GET, null);
@@ -175,11 +178,15 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 fsAttr.setApplicationScenario(tuning.get("application_scenario").getAsString());
                 fsAttr.setDataDeduplication(tuning.get("deduplication_enabled").getAsBoolean());
                 fsAttr.setDateCompression(tuning.get("compression_enabled").getAsBoolean());
+                list.add(fsAttr);
             }
-            list.add(fsAttr);
         }
 
-        return list;
+        if(list.size() > 0){
+            return list;
+        }
+
+        return null;
     }
 
     @Override
