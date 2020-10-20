@@ -4,7 +4,6 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.dao.H2DataBaseDao;
 import com.dmeplugin.dmestore.utils.FileUtils;
 import com.dmeplugin.dmestore.utils.VCClientUtils;
-import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +53,7 @@ public class InstantiationBeanServiceImpl implements
       // (linux only) MV files
       if (!FileUtils.isWindows()) { // Linux
         try {
-          File newDbFile = new File(FileUtils.getPath(true) + "/" + FilenameUtils.getName(H2DataBaseDao.getDBFileName()));
+          File newDbFile = new File(FileUtils.getPath(true) + "/" + H2DataBaseDao.getDBFileName());
           String oldDbFile = FileUtils.getOldDBFolder() + "/" + H2DataBaseDao.getDBFileName();
           if (new File(oldDbFile).exists() && !newDbFile.exists()) { // no DB file in new path
             // move db file

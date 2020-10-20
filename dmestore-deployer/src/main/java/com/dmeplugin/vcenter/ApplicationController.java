@@ -2,7 +2,6 @@ package com.dmeplugin.vcenter;
 
 import com.dmeplugin.vcenter.utils.Validations;
 
-import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -118,9 +117,9 @@ public class ApplicationController {
       throws IOException {
     File file;    
     if (zipName.endsWith(zipFile)) {
-        file = new File(FilenameUtils.getName(zipName));
+        file = new File(zipName);
     } else {
-        file = new File(FilenameUtils.getName(zipName + ".zip"));
+        file = new File(zipName + ".zip");
     }    
     response.setContentType("application/zip");
     response.setContentLengthLong(file.length());
