@@ -66,9 +66,17 @@ export class VmfsListService {
   delVmfs(params = {}) {
     return  this.http.post('accessvmfs/deletevmfs', params);
   }
+  // 获取已挂载主机
+  getMountHost(objectId) {
+    return  this.http.get('accessvmfs/gethostsbystorageid/'+objectId);
+  }
+  // 获取已挂载集群
+  getMountCluster(objectId) {
+    return  this.http.get('accessvmfs/gethostgroupsbystorageid/'+objectId);
+  }
   // 卸载
   unmountVMFS(params = {}) {
-    return  this.http.post('accessvmfs/mountvmfs', params);
+    return  this.http.post('/accessvmfs/ummountvmfs', params);
   }
   // 挂载
   mountVmfs(params = {}) {
@@ -127,7 +135,7 @@ export interface StorageList {
 // 存储池
 export interface StoragePoolList {
   name: string;
-  id: string;
+  poolId: string;
   storage_id: string;
   storage_name: string;
 }
@@ -225,19 +233,20 @@ export class GetForm {
   // 获取修改form表单（初始化的添加表单）
   getEditForm() {
     const editForm = {
-      name: '',
+      name: null,
       isSameName: true, // 卷名称与vmfs名称是否相同
-      volume_id: '', // 卷ID
+      volume_id: null, // 卷ID
       control_policy: '1', // 控制策略,
-      max_iops: '',
-      max_bandwidth: '',
+      max_iops: null,
+      max_bandwidth: null,
       newVoName: null, // 新卷名称
-      oldDsName: '', // 旧VMFS名称
-      newDsName: '', // 新VMFS名称
-      min_iops: '',
-      min_bandwidth: '',
-      dataStoreObjectId: '', // objectID,
-      service_level_name: '' // 服务等级名称
+      oldDsName: null, // 旧VMFS名称
+      newDsName: null, // 新VMFS名称
+      min_iops: null,
+      min_bandwidth: null,
+      dataStoreObjectId: null, // objectID,
+      service_level_name: null, // 服务等级名称
+      latency: null
     };
     return editForm;
   }
@@ -269,15 +278,21 @@ export class GetForm {
       clusterId: null,
       cluster: null,
       dataStoreObjectIds: [], // datastore object id列表 必,
-      mountType: '1' // 挂载的设备类型 1 服务器、0 集群 前端自用参数
+      mountType: null // 挂载的设备类型 1 服务器、2 集群 前端自用参数
     };
     return mountForm;
   }
   getUnmountForm() {
     const unmount = {
-      host: null,
-      hostId: null
+      name: null,
+      hostName: null,
+      hostId: null,
+      hostGroupId: null,
+      hostGroupName: null,
+      dataStoreObjectIds: [],
+      mountType: '1' // 挂载的设备类型 1 服务器、0 集群 前端自用参数
     };
+    return unmount;
   }
 }
 

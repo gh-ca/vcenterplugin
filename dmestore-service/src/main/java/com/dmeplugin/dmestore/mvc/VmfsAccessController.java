@@ -238,7 +238,6 @@ public class VmfsAccessController extends BaseController {
     }
 
     @RequestMapping(value = "/gethostsbystorageid/{storageId}", method = RequestMethod.GET)
-    //public ResponseBodyBean getHostsByStorageId(@RequestBody String storageId) throws Exception {
     public ResponseBodyBean getHostsByStorageId(@PathVariable(value = "storageId") String storageId) throws Exception {
         try {
             List<Map<String, Object>> hosts = vmfsAccessService.getHostsByStorageId(storageId);

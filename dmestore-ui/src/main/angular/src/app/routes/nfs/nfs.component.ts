@@ -1,5 +1,8 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
-import {AddNfs, Cluster, FileSystem, Host, List, ModifyNfs, Mount, NfsService, Share, ShareClient} from './nfs.service';
+import {
+  AddNfs, Cluster, FileSystem, Host, List, ModifyNfs, Mount, NfsDetail, NfsService, Share, ShareClient, UpdateNfs,
+  Vmkernel
+} from './nfs.service';
 import {GlobalsService} from '../../shared/globals.service';
 import {LogicPort, StorageList, StorageService} from '../storage/storage.service';
 import {StoragePool} from "../storage/detail/detail.service";
@@ -19,6 +22,7 @@ export class NfsComponent implements OnInit {
   isLoading = true; // table数据loading
   rowSelected = []; // 当前选中数据
   oldCapacity = 0;
+  newCapacity = 0;
   // ==========弹窗参数=======
   modifyShow = false;
   popShow = false; // 弹出层显示
@@ -30,16 +34,21 @@ export class NfsComponent implements OnInit {
   mountObj = '1';
   fsIds = [];
   addForm = new AddNfs();
+  unit='GB';
   selectHost = [];
   hostLoading = true;
   currentData = new ModifyNfs();
   hostList: Host[] = [];
+  vmkernelList: Vmkernel[]=[];
+  //vmkernel:any;
+  checkedPool:any;
   clusterList: Cluster[] = [];
   mountForm = new Mount();
   storageList: StorageList[] = [];
   storagePools: StoragePool[] = [];
   logicPorts: LogicPort[] = [];
-
+  nfsDetail: NfsDetail;
+  updateNfs: UpdateNfs = new UpdateNfs();
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
   @ViewChild('addPageOne') addPageOne: ClrWizardPage;
@@ -57,7 +66,6 @@ export class NfsComponent implements OnInit {
     this.remoteSrv.getData()
       .subscribe((result: any) => {
         this.list = result.data;
-        console.log(result);
         this.isLoading = false;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         // 获取性能列表
@@ -70,8 +78,6 @@ export class NfsComponent implements OnInit {
     this.list.forEach(item => {
       this.fsIds.push(item.fsId);
     });
-    console.log('fsIds');
-    console.log(this.fsIds);
     this.remoteSrv.getChartData(this.fsIds).subscribe((result: any) => {
       if (result.code === '200'){
         const chartList: List [] = result.data;
@@ -94,6 +100,7 @@ export class NfsComponent implements OnInit {
 
   addView(){
     this.addForm = new AddNfs();
+    this.checkedPool= null;
     // 添加页面默认打开首页
     this.jumpTo(this.addPageOne, this.wizard);
     this.errMessage='';
@@ -123,8 +130,10 @@ export class NfsComponent implements OnInit {
   }
   // 添加提交方法
   addNfs(){
+    this.addForm.poolRawId=this.checkedPool.diskPoolId;
+    this.addForm.storagePoolId= this.checkedPool.id;
     // 单位换算
-    switch (this.addForm.unit) {
+    switch (this.unit) {
       case 'TB':
         this.addForm.size = this.addForm.size * 1024;
         break;
@@ -137,46 +146,8 @@ export class NfsComponent implements OnInit {
       default: // 默认GB 不变
         break;
     }
-    // 构建share 和fs对象
-    if (this.addForm.sameName){
-     const share = new Share();
-     share.name = this.addForm.nfsName;
-     share.share_path = this.addForm.nfsName;
-     this.addForm.create_nfs_share_param = share;
-     const fs = new FileSystem();
-     fs.name = this.addForm.nfsName;
-     fs.capacity = this.addForm.size;
-     fs.count = 1;
-     this.addForm.filesystem_specs.push(fs);
-    }else {
-      const share = new Share();
-      share.name = this.addForm.shareName;
-      share.share_path = this.addForm.shareName;
-      this.addForm.create_nfs_share_param = share;
-      const fs = new FileSystem();
-      fs.name = this.addForm.fsName;
-      fs.capacity = this.addForm.size;
-      fs.count = 1;
-      this.addForm.filesystem_specs.push(fs);
-    }
-    // nfs_share_client_addition 构建挂载的主机列表
-    if (this.selectHost !== null && this.selectHost.length > 0){
-      this.selectHost.forEach(h => {
-        const cli = new ShareClient();
-        cli.name = h.hostName;
-        cli.accessval = this.addForm.accessMode;
-        this.addForm.nfs_share_client_addition.push(cli);
-      });
-    }
-    // thin属性构造
-    if (this.addForm.thin){
-      this.addForm.tuning.allocation_type = 'thin';
-    }else{
-      this.addForm.tuning.allocation_type = 'thick';
-    }
-    // 构建exportPath路径
-    this.addForm.exportPath = this.addForm.nfsName;
-    this.addForm.pool_raw_id = this.addForm.storage_pool_id;
+    console.log('提交参数：')
+    console.log(this.addForm);
     this.remoteSrv.addNfs(this.addForm).subscribe((result: any) => {
       if (result.code === '200'){
         this.popShow = false;
@@ -190,7 +161,7 @@ export class NfsComponent implements OnInit {
     this.storagePools = null;
     this.logicPorts = null;
     // 选择存储后获取存储池
-    this.storageService.getStoragePoolListByStorageId(this.addForm.storage_id)
+    this.storageService.getStoragePoolListByStorageId(this.addForm.storagId)
       .subscribe((r: any) => {
         if (r.code === '200'){
           this.storagePools = r.data.data;
@@ -198,9 +169,20 @@ export class NfsComponent implements OnInit {
       });
     this.selectLogicPort();
   }
+  checkHost(){
+    this.addForm.vkernelIp=null;
+    //选择主机后获取虚拟网卡
+    this.remoteSrv.getVmkernelListByObjectId(this.addForm.hostObjectId)
+      .subscribe((r: any) => {
+        if (r.code === '200'){
+          this.vmkernelList = r.data;
+        }
+      });
+    this.selectLogicPort();
+  }
   selectLogicPort(){
     // 选择存储后逻辑端口
-    this.storageService.getLogicPortListByStorageId(this.addForm.storage_id)
+    this.storageService.getLogicPortListByStorageId(this.addForm.storagId)
       .subscribe((r: any) => {
         if (r.code === '200'){
         this.logicPorts = r.data.data;
@@ -208,21 +190,65 @@ export class NfsComponent implements OnInit {
       });
   }
   modifyData() {
-    this.currentData = new ModifyNfs();
-    this.currentData.dataStoreObjectId = this.rowSelected[0].objectid;
-    this.currentData.nfsShareName = this.rowSelected[0].share;
-    this.currentData.nfsName = this.rowSelected[0].name;
-    this.currentData.file_system_id = this.rowSelected[0].fsId;
-    this.currentData.capacity_autonegotiation.auto_size_enable = false;
-    this.currentData.tuning.deduplication_enabled = false;
-    this.currentData.tuning.compression_enabled = false;
-    this.currentData.tuning.allocation_type = 'thin';
-    this.currentData.nfs_share_id = this.rowSelected[0].shareId;
+    const fsId = this.rowSelected[0].fsId;
+    this.updateNfs = new UpdateNfs();
+    this.updateNfs.dataStoreObjectId=this.rowSelected[0].objectid;
+    this.updateNfs.shareId=this.rowSelected[0].shareId;
+    this.updateNfs.fileSystemId=fsId;
+    this.updateNfs.nfsName=this.rowSelected[0].name;
+    this.remoteSrv.getNfsDetailById(fsId).subscribe((result: any) => {
+      if (result.code === '200'){
+        this.nfsDetail = result.data.data;
+        if (this.nfsDetail.fileSystemTurning.smartQos.maxbandwidth==null
+          &&this.nfsDetail.fileSystemTurning.smartQos.maxiops==null
+          &&this.nfsDetail.fileSystemTurning.smartQos.minbandwidth==null
+          &&this.nfsDetail.fileSystemTurning.smartQos.miniops==null
+          &&this.nfsDetail.fileSystemTurning.smartQos.latency==null
+        ){
+          //qos策略没开启
+          this.updateNfs.qosFlag=false;
+        }else{
+          //qos策略是开启的
+          this.updateNfs.maxBandwidth=this.nfsDetail.fileSystemTurning.smartQos.maxbandwidth;
+          this.updateNfs.maxIops=this.nfsDetail.fileSystemTurning.smartQos.miniops;
+          this.updateNfs.minBandwidth=this.nfsDetail.fileSystemTurning.smartQos.minbandwidth;
+          this.updateNfs.minIops=this.nfsDetail.fileSystemTurning.smartQos.miniops;
+          this.updateNfs.latency=this.nfsDetail.fileSystemTurning.smartQos.latency;
+          this.updateNfs.qosFlag=true;
+          this.updateNfs.contolPolicy='up';
+        }
+        this.updateNfs.autoSizeEnable=this.nfsDetail.capacityAutonegotiation.autoSizeEnable;
+        if (this.nfsDetail.fileSystemTurning.allocationType=='thin'){
+          this.updateNfs.thin=true;
+        }else{
+          this.updateNfs.thin=false;
+        }
+        if (this.nfsDetail.fileSystemTurning.deduplicationEnabled==null){
+          this.updateNfs.deduplicationEnabled=false;
+        }else {
+          this.updateNfs.deduplicationEnabled=this.nfsDetail.fileSystemTurning.deduplicationEnabled;
+        }
+        if (this.nfsDetail.fileSystemTurning.compressionEnabled==null){
+          this.updateNfs.compressionEnabled=false;
+        }else {
+          this.updateNfs.compressionEnabled=this.nfsDetail.fileSystemTurning.compressionEnabled;
+        }
+        console.log(this.updateNfs)
+      }
+    });
     this.modifyShow = true;
   }
   modifyCommit(){
-    console.log(this.currentData);
-    this.remoteSrv.updateNfs(this.addForm).subscribe((result: any) => {
+    console.log('提交参数：');
+    this.updateNfs.name=this.updateNfs.nfsName;
+
+    this.updateNfs.autoSizeEnable = null;
+    this.updateNfs.deduplicationEnabled = null;
+    this.updateNfs.compressionEnabled = null;
+    this.updateNfs.thin = null;
+
+    console.log(this.updateNfs);
+    this.remoteSrv.updateNfs(this.updateNfs).subscribe((result: any) => {
       if (result.code === '200'){
         this.modifyShow = false;
       }else{
@@ -231,39 +257,100 @@ export class NfsComponent implements OnInit {
       }
     });
   }
+  expandView(){
+    this.oldCapacity=this.rowSelected[0].capacity;
+    this.expand = true;
+  }
   expandData(){
-    console.log('扩容提交.....');
+    console.log('扩容提交.....changenfsdatastore');
     // 弹窗关闭
-    this.expand = false;
+    switch (this.unit) {
+      case 'TB':
+        this.newCapacity = this.newCapacity * 1024;
+        break;
+      case 'MB':
+        this.newCapacity = this.newCapacity / 1024;
+        break;
+      case 'KB':
+        this.newCapacity = this.newCapacity / (1024 * 1024);
+        break;
+      default: // 默认GB 不变
+        break;
+    }//
+    const fsId = this.rowSelected[0].fsId;
+    var param={
+      "fileSystemId": fsId,
+       "expand":true,
+      "capacity": this.newCapacity
+    }
+    this.remoteSrv.changeCapacity(param).subscribe((result: any) => {
+      if (result.code === '200'){
+        this.expand = false;
+      }else{
+        this.expand = true;
+        this.errMessage = '编辑失败！'+result.description;
+      }
+    });
   }
   // 弹出缩容页面
   reduceView(){
-    console.log(this.rowSelected[0]);
-    this.oldCapacity = this.rowSelected[0].capacity;
-    this.reduceOpen = true;
+    if (this.rowSelected.length === 1) {
+      this.oldCapacity = this.rowSelected[0].capacity;
+      this.reduceOpen = true;
+    }
   }
   // 缩容提交
   reduceCommit(){
-
+// 弹窗关闭
+    switch (this.unit) {
+      case 'TB':
+        this.newCapacity = this.newCapacity * 1024;
+        break;
+      case 'MB':
+        this.newCapacity = this.newCapacity / 1024;
+        break;
+      case 'KB':
+        this.newCapacity = this.newCapacity / (1024 * 1024);
+        break;
+      default: // 默认GB 不变
+        break;
+    }//
+    const fsId = this.rowSelected[0].fsId;
+    var param={
+      "fileSystemId": fsId,
+      "expand":false,
+      "capacity": this.newCapacity
+    }
+    this.remoteSrv.changeCapacity(param).subscribe((result: any) => {
+      if (result.code === '200'){
+        this.expand = false;
+      }else{
+        this.expand = true;
+        this.errMessage = '编辑失败！'+result.description;
+      }
+    });
   }
+
   // 挂载
   mount(){
-    this.mountForm = new Mount();
-    this.mountForm.dataStoreName = this.rowSelected[0].name;
-    this.mountForm.dataStoreObjectId = this.rowSelected[0].objectid;
-    this.remoteSrv.getHostListByObjectId(this.rowSelected[0].objectid).subscribe((r: any) => {
-      if (r.code === '200'){
-        this.hostList = r.data;
-        this.cdr.detectChanges();
-      }
-    });
-    this.remoteSrv.getClusterListByObjectId(this.rowSelected[0].objectid).subscribe((r: any) => {
-      if (r.code === '200'){
-        this.clusterList = r.data;
-        this.cdr.detectChanges();
-      }
-    });
-    this.mountShow = true;
+    if (this.rowSelected.length === 1) {
+      this.mountForm = new Mount();
+      this.mountForm.dataStoreName = this.rowSelected[0].name;
+      this.mountForm.dataStoreObjectId = this.rowSelected[0].objectid;
+      this.remoteSrv.getHostListByObjectId(this.rowSelected[0].objectid).subscribe((r: any) => {
+        if (r.code === '200'){
+          this.hostList = r.data;
+          this.cdr.detectChanges();
+        }
+      });
+      this.remoteSrv.getClusterListByObjectId(this.rowSelected[0].objectid).subscribe((r: any) => {
+        if (r.code === '200'){
+          this.clusterList = r.data;
+          this.cdr.detectChanges();
+        }
+      });
+      this.mountShow = true;
+    }
   }
   // 挂载提交
   mountSubmit(){
@@ -274,11 +361,23 @@ export class NfsComponent implements OnInit {
       }
     });
   }
+  // 卸载按钮点击事件
+  unmountBtnFunc() {
+    if (this.rowSelected.length === 1) {
+      this.unmountShow=true;
+    }
+  }
   // 卸载
   unmount(){
     const name = this.rowSelected[0].name;
     console.log(name);
     this.unmountShow = false;
+  }
+  // 删除按钮点击事件
+  delBtnFunc() {
+    if (this.rowSelected.length === 1) {
+      this.delShow=true
+    }
   }
   // 删除NFS
   delNfs(){
@@ -299,11 +398,11 @@ export class NfsComponent implements OnInit {
 
   formatCapacity(c: number){
     if (c < 1024){
-      return c.toFixed(3)+" MB";
+      return c.toFixed(3)+" GB";
     }else if(c >= 1024 && c< 1048576){
-      return (c/1024).toFixed(3) +" GB";
+      return (c/1024).toFixed(3) +" TB";
     }else if(c>= 1048576){
-      return (c/1024/1024).toFixed(3)+" TB"
+      return (c/1024/1024).toFixed(3)+" PB"
     }
   }
   // 点刷新那个功能是分两步，一步是刷新，然后等我们这边的扫描任务，任务完成后返回你状态，任务成功后，你再刷新列表页面。

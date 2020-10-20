@@ -76,7 +76,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             SmartQos smartQos = new SmartQos();
             Object control_policy = params.get("control_policy");
             if (!StringUtils.isEmpty(control_policy)) {
-                smartQos.setControl_policy(control_policy.toString());
+                smartQos.setControlPolicy(control_policy.toString());
             }
             Object max_iops = params.get("max_iops");
             if (!StringUtils.isEmpty(max_iops)) {
@@ -253,8 +253,13 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             resMap.put("msg", "params error,please check your params!");
             resMap.put("code", 403);
         }
+
+        Map<String, Object> reqMap = new HashMap<>();
+        reqMap.put("service_level_id", params.get("service_level_id"));
+        reqMap.put("volume_ids", params.get("volume_ids"));
+
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.access(API_SERVICELEVEL_UPDATE, HttpMethod.POST, gson.toJson(params));
+            ResponseEntity<String> responseEntity = dmeAccessService.access(API_SERVICELEVEL_UPDATE, HttpMethod.POST, gson.toJson(reqMap));
             LOG.info("url:{" + API_SERVICELEVEL_UPDATE + "},响应信息：" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 202) {
@@ -305,13 +310,13 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 simpleServiceLevel.setDescription(ToolUtils.jsonToStr(element.get("description")));
                 simpleServiceLevel.setType(ToolUtils.jsonToStr(element.get("type")));
                 simpleServiceLevel.setProtocol(ToolUtils.jsonToStr(element.get("protocol")));
-                simpleServiceLevel.setTotal_capacity(ToolUtils.jsonToDou(element.get("total_capacity"),0.0));
-                simpleServiceLevel.setFree_capacity(ToolUtils.jsonToDou(element.get("free_capacity"),0.0));
-                simpleServiceLevel.setUsed_capacity(ToolUtils.jsonToDou(element.get("used_capacity"),0.0));
+                simpleServiceLevel.setTotalCapacity(ToolUtils.jsonToDou(element.get("total_capacity"),0.0));
+                simpleServiceLevel.setFreeCapacity(ToolUtils.jsonToDou(element.get("free_capacity"),0.0));
+                simpleServiceLevel.setUsedCapacity(ToolUtils.jsonToDou(element.get("used_capacity"),0.0));
 
                 SimpleCapabilities capability = new SimpleCapabilities();
                 JsonObject capabilities = element.get("capabilities").getAsJsonObject();
-                capability.setResource_type(ToolUtils.jsonToStr(capabilities.get("resource_type")));
+                capability.setResourceType(ToolUtils.jsonToStr(capabilities.get("resource_type")));
                 capability.setCompression(ToolUtils.jsonToBoo(capabilities.get("compression")));
                 capability.setDeduplication(ToolUtils.jsonToBoo(capabilities.get("deduplication")));
 
@@ -427,7 +432,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         resMap.put("code", 200);
         resMap.put("msg", "search volume capacity success ");
         String url;
-        List<Map<String, String>> list = new ArrayList<>();
+        List<Map<String, Object>> list = new ArrayList<>();
         for (int i = 0; i < volumes.size(); i++) {
             Map<String, String> reqmap = volumes.get(i);
             String volume_id = reqmap.get("volume_id");
@@ -442,8 +447,8 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
             JsonObject volume = jsonObject.get("volume").getAsJsonObject();
-            String capacity = volume.get("capacity").getAsString();
-            Map<String, String> map = new HashMap<>(16);
+            Double capacity = ToolUtils.jsonToDou(volume.get("capacity"));
+            Map<String, Object> map = new HashMap<>(16);
             map.put(volume_id, capacity);
             list.add(map);
         }

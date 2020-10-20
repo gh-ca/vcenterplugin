@@ -9,20 +9,20 @@ package com.dmeplugin.dmestore.model;
 public class LogicPorts {
     private String id;
     private String name;
-    private String running_status;
-    private String operational_status;
-    private String mgmt_ip;
-    private String mgmt_ipv6;
-    private String home_port_id;
-    private String home_port_name;
-    private String current_port_id;
-    private String current_port_name;
+    private String runningStatus;
+    private String operationalStatus;
+    private String mgmtIp;
+    private String mgmtIpv6;
+    private String homePortId;
+    private String homePortName;
+    private String currentPortId;
+    private String currentPortName;
     private String role;
-    private String ddns_status;
-    private String support_protocol;
-    private String management_access;
-    private String vstore_id;
-    private String vstore_name;
+    private String ddnsStatus;
+    private String supportProtocol;
+    private String managementAccess;
+    private String vstoreId;
+    private String vstoreName;
 
     public String getId() {
         return id;
@@ -40,68 +40,68 @@ public class LogicPorts {
         this.name = name;
     }
 
-    public String getRunning_status() {
-        return running_status;
+    public String getRunningStatus() {
+        return runningStatus;
     }
 
-    public void setRunning_status(String running_status) {
-        this.running_status = running_status;
+    public void setRunningStatus(String runningStatus) {
+        this.runningStatus = runningStatus;
     }
 
-    public String getOperational_status() {
-        return operational_status;
+    public String getOperationalStatus() {
+        return operationalStatus;
     }
 
-    public void setOperational_status(String operational_status) {
-        this.operational_status = operational_status;
+    public void setOperationalStatus(String operationalStatus) {
+        this.operationalStatus = operationalStatus;
     }
 
-    public String getMgmt_ip() {
-        return mgmt_ip;
+    public String getMgmtIp() {
+        return mgmtIp;
     }
 
-    public void setMgmt_ip(String mgmt_ip) {
-        this.mgmt_ip = mgmt_ip;
+    public void setMgmtIp(String mgmtIp) {
+        this.mgmtIp = mgmtIp;
     }
 
-    public String getMgmt_ipv6() {
-        return mgmt_ipv6;
+    public String getMgmtIpv6() {
+        return mgmtIpv6;
     }
 
-    public void setMgmt_ipv6(String mgmt_ipv6) {
-        this.mgmt_ipv6 = mgmt_ipv6;
+    public void setMgmtIpv6(String mgmtIpv6) {
+        this.mgmtIpv6 = mgmtIpv6;
     }
 
-    public String getHome_port_id() {
-        return home_port_id;
+    public String getHomePortId() {
+        return homePortId;
     }
 
-    public void setHome_port_id(String home_port_id) {
-        this.home_port_id = home_port_id;
+    public void setHomePortId(String homePortId) {
+        this.homePortId = homePortId;
     }
 
-    public String getHome_port_name() {
-        return home_port_name;
+    public String getHomePortName() {
+        return homePortName;
     }
 
-    public void setHome_port_name(String home_port_name) {
-        this.home_port_name = home_port_name;
+    public void setHomePortName(String homePortName) {
+        this.homePortName = homePortName;
     }
 
-    public String getCurrent_port_id() {
-        return current_port_id;
+    public String getCurrentPortId() {
+        return currentPortId;
     }
 
-    public void setCurrent_port_id(String current_port_id) {
-        this.current_port_id = current_port_id;
+    public void setCurrentPortId(String currentPortId) {
+        this.currentPortId = currentPortId;
     }
 
-    public String getCurrent_port_name() {
-        return current_port_name;
+    public String getCurrentPortName() {
+        return currentPortName;
     }
 
-    public void setCurrent_port_name(String current_port_name) {
-        this.current_port_name = current_port_name;
+    public void setCurrentPortName(String currentPortName) {
+        this.currentPortName = currentPortName;
     }
 
     public String getRole() {
@@ -112,43 +112,43 @@ public class LogicPorts {
         this.role = role;
     }
 
-    public String getDdns_status() {
-        return ddns_status;
+    public String getDdnsStatus() {
+        return ddnsStatus;
     }
 
-    public void setDdns_status(String ddns_status) {
-        this.ddns_status = ddns_status;
+    public void setDdnsStatus(String ddnsStatus) {
+        this.ddnsStatus = ddnsStatus;
     }
 
-    public String getSupport_protocol() {
-        return support_protocol;
+    public String getSupportProtocol() {
+        return supportProtocol;
     }
 
-    public void setSupport_protocol(String support_protocol) {
-        this.support_protocol = support_protocol;
+    public void setSupportProtocol(String supportProtocol) {
+        this.supportProtocol = supportProtocol;
     }
 
-    public String getManagement_access() {
-        return management_access;
+    public String getManagementAccess() {
+        return managementAccess;
     }
 
-    public void setManagement_access(String management_access) {
-        this.management_access = management_access;
+    public void setManagementAccess(String managementAccess) {
+        this.managementAccess = managementAccess;
     }
 
-    public String getVstore_id() {
-        return vstore_id;
+    public String getVstoreId() {
+        return vstoreId;
     }
 
-    public void setVstore_id(String vstore_id) {
-        this.vstore_id = vstore_id;
+    public void setVstoreId(String vstoreId) {
+        this.vstoreId = vstoreId;
     }
 
-    public String getVstore_name() {
-        return vstore_name;
+    public String getVstoreName() {
+        return vstoreName;
     }
 
-    public void setVstore_name(String vstore_name) {
-        this.vstore_name = vstore_name;
+    public void setVstoreName(String vstoreName) {
+        this.vstoreName = vstoreName;
     }
 }

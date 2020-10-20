@@ -74,7 +74,6 @@ export class IscsiComponent implements OnInit, AfterViewInit {
 
   loadIps(){
     this.http.get(this.ipsGetUrl, this.ipsGetUrlParams).subscribe((result: any) => {
-      console.log(result);
       if (result.code === '0' || result.code === '200'){
         this.ips = result.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -86,7 +85,6 @@ export class IscsiComponent implements OnInit, AfterViewInit {
 
   loadStorageDevice(){
     this.http.get(this.storageGetUrl, {}).subscribe((result: any) => {
-      console.log(result);
       if (result.code === '200'){
         this.storageDevices = result.data.data;
         setTimeout(() => {
@@ -105,7 +103,6 @@ export class IscsiComponent implements OnInit, AfterViewInit {
       this.portLoading = true;
       this.portGetUrlParams.params.storageSn = this.configModel.sn;
       this.http.get(this.portGetUrl, this.portGetUrlParams).subscribe((result: any) => {
-        console.log(result);
         if (result.code === '0' || result.code === '200'){
           result.data.forEach((item) => {
             item.connectStatus = '';
@@ -126,14 +123,24 @@ export class IscsiComponent implements OnInit, AfterViewInit {
 
   testPortConnected(){
     const p = new testConnectParams();
-    p.ethPorts = this.portList;
+    const testPortList = [];
+    this.portList.forEach((item)=>{
+       if (item.mgmtIp && item.mgmtIp != ""){
+         testPortList.push(item);
+       }
+    });
+    p.ethPorts = testPortList;
     p.hostObjectId = this.configModel.hostObjectId;
     p.vmKernel = this.configModel.vmKernel;
     this.http.post(this.testPortConnectedUrl, p).subscribe((result: any) => {
-      console.log(result);
       if (result.code === '200' && result.data){
-        this.portList = result.data;
-        this.portTotal = result.data.length;
+        result.data.forEach((i)=>{
+            this.portList.forEach((j)=>{
+               if(i.id == j.id){
+                 j.connectStatus = i.connectStatus;
+               }
+            });
+        });
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       } else{
         alert("测试连通性出错");
@@ -146,7 +153,6 @@ export class IscsiComponent implements OnInit, AfterViewInit {
   submit(){
     console.log(this.configModel);
     this.http.post(this.configIscsiUrl, this.configModel).subscribe((result: any) => {
-      console.log(result);
     }, err => {
       console.error('ERROR', err);
     });

@@ -9,18 +9,18 @@ package com.dmeplugin.dmestore.model;
 public class FailoverGroup {
 
     //漂移组类型，枚举（system、VLAN、customized）
-    private String failover_group_type;
+    private String failoverGroupType;
     //漂移组id
     private String id;
     //漂移组名称
     private String name;
 
-    public String getFailover_group_type() {
-        return failover_group_type;
+    public String getFailoverGroupType() {
+        return failoverGroupType;
     }
 
-    public void setFailover_group_type(String failover_group_type) {
-        this.failover_group_type = failover_group_type;
+    public void setFailoverGroupType(String failoverGroupType) {
+        this.failoverGroupType = failoverGroupType;
     }
 
     public String getId() {

@@ -76,6 +76,10 @@ public class DatastoreMO extends BaseMO {
         return (DatastoreSummary)_context.getVimClient().getDynamicProperty(_mor, "summary");
     }
 
+    public List<ManagedObjectReference> getVM()throws Exception {
+        return _context.getVimClient().getDynamicProperty(_mor, "vm");
+    }
+
     public HostDatastoreBrowserMO getHostDatastoreBrowserMO() throws Exception {
         return new HostDatastoreBrowserMO(_context, (ManagedObjectReference)_context.getVimClient().getDynamicProperty(_mor, "browser"));
     }

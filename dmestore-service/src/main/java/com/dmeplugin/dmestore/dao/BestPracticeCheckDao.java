@@ -7,6 +7,9 @@ import com.dmeplugin.dmestore.model.BestPracticeUpResultBase;
 import com.dmeplugin.dmestore.model.BestPracticeUpResultResponse;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +37,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
                 pstm.setString(2, bean.getHostName());
                 pstm.setString(3, bean.getHostSetting());
                 pstm.setString(4, bean.getRecommendValue());
-                pstm.setString(5, bean.getActualValue());
+                pstm.setCharacterStream(5, new StringReader(bean.getActualValue()));
                 pstm.setString(6, bean.getLevel());
                 pstm.setString(7, bean.getNeedReboot());
                 pstm.setString(8, bean.getAutoRepair());
@@ -167,11 +170,29 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         bean.setHostName(rs.getString("HOST_NAME"));
         bean.setHostSetting(rs.getString("HOST_SETTING"));
         bean.setRecommendValue(rs.getString("RECOMMEND_VALUE"));
-        bean.setActualValue(rs.getString("ACTUAL_VALUE"));
+        bean.setActualValue(clobStreamToStr(rs.getClob("ACTUAL_VALUE")));
         bean.setLevel(rs.getString("HINT_LEVEL"));
         bean.setNeedReboot(rs.getString("NEED_REBOOT"));
         bean.setAutoRepair(rs.getString("AUTO_REPAIR"));
         return bean;
+    }
+
+    private String clobStreamToStr(Clob clob){
+        try {
+            InputStream input = clob.getAsciiStream();
+            int len = (int) clob.length();
+            byte[] by = new byte[len];
+            int i;
+            while (-1 != (i = input.read(by, 0, by.length))) {
+                input.read(by, 0, i);
+            }
+            return new String(by);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 
     public void deleteBy(List<BestPracticeUpResultResponse> list) {

@@ -10,8 +10,6 @@ import {
 import {ClrDatagridStateInterface} from '@clr/angular';
 import {HttpClient} from '@angular/common/http';
 import { CommonService } from '../common.service';
-/* import * as echarts from 'Echarts'; */
-import 'echarts-liquidfill';
 import {MakePerformance, NfsService} from "../nfs/nfs.service";
 
 @Component({
@@ -44,38 +42,35 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   // 服务等级列表搜索
   searchName = '';
   // 服务等级列表排序
-  sortItem = {
-    id: '',
-    value: ''
-  };
+  sortItem = '';
   sortItems = [
     {
       id: 'name',
-      value: 'tier.name'
+      value: 'tier.names'
     },
     {
-      id: 'total_capacity',
-      value: 'tier.total'
+      id: 'totalCapacity',
+      value: 'tier.totals'
     },
     {
       id: 'latency',
-      value: 'tier.latency'
+      value: 'tier.latencys'
     },
     {
       id: 'maxIOPS',
-      value: 'tier.maxIOPS'
+      value: 'tier.maxIOPSs'
     },
     {
       id: 'minIOPS',
-      value: 'tier.minIOPS'
+      value: 'tier.minIOPSs'
     },
     {
       id: 'maxBandWidth',
-      value: 'tier.maxBandWidth'
+      value: 'tier.maxBandWidths'
     },
     {
       id: 'minBandWidth',
-      value: 'tier.minBandWidth'
+      value: 'tier.minBandWidths'
     }
   ];
 
@@ -87,11 +82,12 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
         description: 'description',
         type: 'BLOCK', // FILE BLOCK
         protocol: 'iSCSI', // FC, iSCSI
-        total_capacity: 1000,
-        used_capacity: 600,
-        free_capacity: 400,
+        totalCapacity: 1000,
+        usedCapacity: 600,
+        usedRate: 40,
+        freeCapacity: 400,
         capabilities: {
-            resource_type: 'thin', // default_type、thin、thick
+            resourceType: 'thin', // default_type、thin、thick
             compression: 'default_type', // default_type, enabled, disabled,
             deduplication: 'enabled', // default_type, enabled, disabled,
             iopriority: {
@@ -122,6 +118,11 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   serviceLevelsRes = [];
 
 
+  sortUpDown = {
+    isFirst: true,
+    s: 'desc'
+  }
+
   // ===============storage pool==============
   // 表格loading标志
   storeagePoolIsloading = false;
@@ -146,23 +147,6 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   applicationTypeList: ApplicationType[] = [];
   // 选中列表
   applicationTypeSelected: ApplicationType[];
-  // 查询数据参数
-  applicationTypeQuery = { // 查询数据
-    q: 'name',
-    sort: 'hostSetting',
-    order: 'desc',
-    page: 0,
-    per_page: 5
-  };
-  // 查询数据结果,测试用
-  applicationTypeReslut = {
-    items: [{
-      id: '123',
-      storageDevice: 'applicationType-001',
-      applicationType: 'SSP'
-    }],
-    total_count: 1
-  };
   // ===============applicationType end==============
 
   constructor(private ngZone: NgZone,
@@ -201,7 +185,6 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     setTimeout(()=>{
       this.storeagePoolIsloading = true;
       this.http.post('servicelevel/listStoragePoolsByServiceLevelId', this.selectedModel.id).subscribe((response: any) => {
-        console.log(response);
         if (response.code == '200'){
           this.storagePoolList = response.data;
         } else{
@@ -258,14 +241,14 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
       response.data = response.data.replace('service-levels', 'serviceLevels');
       const r = this.recursiveNullDelete(JSON.parse(response.data));
       for (const i of r.serviceLevels){
-        if (i.total_capacity == 0){
+        if (i.totalCapacity == 0){
           i.usedRate = 0.0;
         } else {
-          i.usedRate =  ((i.used_capacity / i.total_capacity * 100).toFixed(2));
+          i.usedRate =  ((i.usedCapacity / i.totalCapacity * 100).toFixed(2));
         }
-        i.used_capacity = (i.used_capacity/1024).toFixed(2);
-        i.total_capacity = (i.total_capacity/1024).toFixed(2);
-        i.free_capacity = (i.free_capacity/1024).toFixed(2);
+        i.usedCapacity = (i.usedCapacity/1024).toFixed(2);
+        i.totalCapacity = (i.totalCapacity/1024).toFixed(2);
+        i.freeCapacity = (i.freeCapacity/1024).toFixed(2);
       }
       this.serviceLevelsRes = r.serviceLevels;
       this.search();
@@ -285,12 +268,25 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     this.sortItemsChange();
   }
 
+  sortBtnClick(){
+    if(this.sortItem != '' || !this.sortUpDown.isFirst){
+      if(this.sortUpDown.s == "desc"){
+        this.sortUpDown.s = "asc";
+      } else if(this.sortUpDown.s == "asc"){
+        this.sortUpDown.s = "desc";
+      }
+    }
+    this.sortUpDown.isFirst = false;
+    this.sortItemsChange();
+  }
+
   // 服务等级列表排序
   sortItemsChange(){
-    const o = this.sortItem;
-    if (o.value !== ''){
-      this.serviceLevels = this.serviceLevels.sort(this.compare(this.sortItem, 'asc'));
+    let o = this.sortItem;
+    if (o == ''){
+      o = 'totalCapacity';
     }
+    this.serviceLevels = this.serviceLevels.sort(this.compare(o, this.sortUpDown.s));
   }
 
   recursiveNullDelete(obj: any){
@@ -511,7 +507,6 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   syncStoragePolicy(){
     const url = "servicelevel/manualupdate";
     this.http.post(url, {}).subscribe((response: any) => {
-      console.log(response);
       if (response.code == '200'){
          alert("同步成功");
       } else{
@@ -530,11 +525,12 @@ class Servicelevel {
   description: string;
   type: string; // FILE BLOCK
   protocol: string; // FC, iSCSI
-  total_capacity: number;
-  used_capacity: number;
-  free_capacity: number;
+  totalCapacity: number;
+  usedCapacity: number;
+  freeCapacity: number;
+  usedRate: number;
   capabilities: {
-    resource_type: string; // default_type、thin、thick
+    resourceType: string; // default_type、thin、thick
     compression: string; // default_type, enabled, disabled;
     deduplication: string; // default_type, enabled, disabled;
     iopriority: {
@@ -584,7 +580,7 @@ interface Volume {
   capacity: number;
   alloctype: string;
   instanceId: string;
-  capacity_usage: number;
+  capacityUsage: number;
 
   latency: string;
   iops: string;

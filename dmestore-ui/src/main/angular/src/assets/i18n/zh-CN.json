@@ -64,9 +64,15 @@
     "storageSetting":"存储设置",
     "fsName":"文件系统名称",
     "shareName":"共享名称",
+    "add_advance":"高级属性",
     "qosPolicy":"Qos策略",
     "controlPolicy":"控制策略",
     "tfo":"交通管制对象",
+    "qos_bandwidth":"带宽",
+    "qos_iops":"IOPS",
+    "qos_latency":"时延",
+    "mountHost":"挂载主机",
+    "vkernel":"虚拟网卡IP",
     "thin":"Thin",
     "dataDedu":"重删",
     "disable":"关闭",
@@ -233,7 +239,8 @@
     },
     "unmount":{
       "title":"卸载",
-      "content":"确认要卸载吗?"
+      "content":"确认要卸载吗?",
+      "notChooseDeviceTips":"请选择需要卸载的主机或集群！"
     },
     "reclaim": {
       "title":"提示",
@@ -454,7 +461,7 @@
     "totalCapacity": "总量",
     "used": "已用",
     "free": "可用",
-    "top5T": "使用率前5",
+    "top5T": "存储使用率前5",
     "connectT": "DME连接",
     "connectFail": "连接失败"
   },
@@ -467,7 +474,11 @@
     "violation": "违规数",
     "non-compliant": "违规主机",
     "actual": "实际值",
-    "host": "主机名"
+    "host": "主机名",
+    "critical": "紧急",
+    "info": "提示",
+    "warning": "次要",
+    "major": "重要"
   },
   "iscsi": {
     "hostIp": "主机VmKernel IP",
@@ -536,6 +547,7 @@
   },
   "tier": {
     "name": "名称",
+    "namep": "请输入名称",
     "total": "总量",
     "free": "空闲量",
     "used": "已使用",
@@ -591,6 +603,14 @@
     "last1M": "最近1个月",
     "last3M": "最近3个月",
     "last6M": "最近6个月",
-    "last1Y": "最近一年"
+    "last1Y": "最近一年",
+
+    "names": "按名称排序",
+    "totals": "按总量排序",
+    "latencys": "按时延排序",
+    "maxIOPSs": "按IOPS上限排序",
+    "minIOPSs": "按IOPS下限排序",
+    "maxBandWidths": "按带宽上限排序",
+    "minBandWidths": "按带宽下限排序"
   }
 }

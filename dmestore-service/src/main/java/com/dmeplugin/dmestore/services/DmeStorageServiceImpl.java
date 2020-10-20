@@ -6,6 +6,7 @@ import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -245,28 +246,28 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storagePool.setName(ToolUtils.jsonToStr(element.get("name")));
                     String poolId = ToolUtils.jsonToStr(element.get("poolId"));
                     storagePool.setId(poolId);
-                    storagePool.setHealth_status(ToolUtils.jsonToStr(element.get("status")));
-                    storagePool.setRunning_status(ToolUtils.jsonToStr(element.get("runningStatus")));
+                    storagePool.setHealthStatus(ToolUtils.jsonToStr(element.get("status")));
+                    storagePool.setRunningStatus(ToolUtils.jsonToStr(element.get("runningStatus")));
                     Double total_capacity =ToolUtils.jsonToDou(element.get("totalCapacity"),0.0);
-                    storagePool.setTotal_capacity(total_capacity);
+                    storagePool.setTotalCapacity(total_capacity);
                     Double consumed_capacity = ToolUtils.jsonToDou(element.get("usedCapacity"), 0.0);
-                    storagePool.setConsumed_capacity(consumed_capacity);
-                    storagePool.setStorage_pool_id(ToolUtils.jsonToStr(element.get("storageDeviceId")));
+                    storagePool.setConsumedCapacity(consumed_capacity);
+                    storagePool.setStoragePoolId(ToolUtils.jsonToStr(element.get("storageDeviceId")));
                     String type = ToolUtils.jsonToStr(element.get("type"));
-                    storagePool.setMedia_type(type);
-                    storagePool.setStorage_id(ToolUtils.jsonToStr(element.get("storageDeviceId")));
-                    storagePool.setTier0_raid_lv(ToolUtils.jsonToStr(element.get("tier0RaidLv")));
-                    storagePool.setTier1_raid_lv(ToolUtils.jsonToStr(element.get("tier1RaidLv")));
-                    storagePool.setTier2_raid_lv(ToolUtils.jsonToStr(element.get("tier2RaidLv")));
-                    storagePool.setConsumed_capacity(ToolUtils.jsonToDou(element.get("usedCapacity"),0.0));
-                    storagePool.setStorage_instance_id(ToolUtils.jsonToStr(element.get("resId")));
+                    storagePool.setMediaType(type);
+                    storagePool.setStorageId(ToolUtils.jsonToStr(element.get("storageDeviceId")));
+                    storagePool.setTier0RaidLv(ToolUtils.jsonToStr(element.get("tier0RaidLv")));
+                    storagePool.setTier1RaidLv(ToolUtils.jsonToStr(element.get("tier1RaidLv")));
+                    storagePool.setTier2RaidLv(ToolUtils.jsonToStr(element.get("tier2RaidLv")));
+                    storagePool.setConsumedCapacity(ToolUtils.jsonToDou(element.get("usedCapacity"),0.0));
+                    storagePool.setStorageInstanceId(ToolUtils.jsonToStr(element.get("resId")));
 
                     storagePool.setPoolId(ToolUtils.jsonToStr(element.get("poolId")));
 
                     String diskPoolId = ToolUtils.jsonToStr(element.get("diskPoolId"));
                     storagePool.setDiskPoolId(diskPoolId);
                     Double subscribedCapacity = ToolUtils.jsonToDou(element.get("subscribedCapacity"), 0.0);
-                    storagePool.setSubscribed_capacity(subscribedCapacity);
+                    storagePool.setSubscribedCapacity(subscribedCapacity);
                     //订阅率（lun/fs订阅率）
                     DecimalFormat df = new DecimalFormat("#.00");
                     Double subscribedCapacityRate = 0.0;
@@ -284,16 +285,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     String diskType = getDiskType(storageId,diskPoolId,poolId);
                     storagePool.setPhysicalType(diskType);
 
-                    storagePool.setConsumed_capacity_percentage(consumed_percent);
-                    storagePool.setFree_capacity(freeCapacity);
-                    storagePool.setSubscription_rate(subscribedCapacityRate);
+                    storagePool.setConsumedCapacityPercentage(consumed_percent);
+                    storagePool.setFreeCapacity(freeCapacity);
+                    storagePool.setSubscriptionRate(subscribedCapacityRate);
 
                     String resId = ToolUtils.jsonToStr(element.get("resId"));
                     if(null != djofspMap && null != djofspMap.get(resId)){
                         storagePool.setServiceLevelName(gson.toJson(djofspMap.get(resId)));
                     }
-
-
 
                     if (media_type.equals(type)){
                         resList.add(storagePool);
@@ -338,20 +337,20 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     LogicPorts logicPorts = new LogicPorts();
                     logicPorts.setId(ToolUtils.jsonToStr(element.get("id")));
                     logicPorts.setName(ToolUtils.jsonToStr(element.get("name")));
-                    logicPorts.setRunning_status(ToolUtils.jsonToStr(element.get("running_status")));
-                    logicPorts.setOperational_status(ToolUtils.jsonToStr(element.get("operational_status")));
-                    logicPorts.setMgmt_ip(ToolUtils.jsonToStr(element.get("mgmt_ip")));
-                    logicPorts.setMgmt_ipv6(ToolUtils.jsonToStr(element.get("mgmt_ipv6")));
-                    logicPorts.setHome_port_id(ToolUtils.jsonToStr(element.get("home_port_id")));
-                    logicPorts.setHome_port_name(ToolUtils.jsonToStr(element.get("home_port_name")));
+                    logicPorts.setRunningStatus(ToolUtils.jsonToStr(element.get("running_status")));
+                    logicPorts.setOperationalStatus(ToolUtils.jsonToStr(element.get("operational_status")));
+                    logicPorts.setMgmtIp(ToolUtils.jsonToStr(element.get("mgmt_ip")));
+                    logicPorts.setMgmtIpv6(ToolUtils.jsonToStr(element.get("mgmt_ipv6")));
+                    logicPorts.setHomePortId(ToolUtils.jsonToStr(element.get("home_port_id")));
+                    logicPorts.setHomePortName(ToolUtils.jsonToStr(element.get("home_port_name")));
                     logicPorts.setRole(ToolUtils.jsonToStr(element.get("role")));
-                    logicPorts.setDdns_status(ToolUtils.jsonToStr(element.get("ddns_status")));
-                    logicPorts.setCurrent_port_id(ToolUtils.jsonToStr(element.get("current_port_id")));
-                    logicPorts.setCurrent_port_name(ToolUtils.jsonToStr(element.get("current_port_name")));
-                    logicPorts.setSupport_protocol(ToolUtils.jsonToStr(element.get("support_protocol")));
-                    logicPorts.setManagement_access(ToolUtils.jsonToStr(element.get("management_access")));
-                    logicPorts.setVstore_id(ToolUtils.jsonToStr(element.get("vstore_id")));
-                    logicPorts.setVstore_name(ToolUtils.jsonToStr(element.get("vstore_name")));
+                    logicPorts.setDdnsStatus(ToolUtils.jsonToStr(element.get("ddns_status")));
+                    logicPorts.setCurrentPortId(ToolUtils.jsonToStr(element.get("current_port_id")));
+                    logicPorts.setCurrentPortName(ToolUtils.jsonToStr(element.get("current_port_name")));
+                    logicPorts.setSupportProtocol(ToolUtils.jsonToStr(element.get("support_protocol")));
+                    logicPorts.setManagementAccess(ToolUtils.jsonToStr(element.get("management_access")));
+                    logicPorts.setVstoreId(ToolUtils.jsonToStr(element.get("vstore_id")));
+                    logicPorts.setVstoreName(ToolUtils.jsonToStr(element.get("vstore_name")));
                     resList.add(logicPorts);
                 }
                 resMap.put("data", resList);
@@ -368,14 +367,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     @Override
     public Map<String, Object> getVolumes(String storageId) {
 
-        Map<String, Object> resMap = new HashMap<>();
+        Map<String, Object> resMap = new HashMap<>(16);
         resMap.put("code", 200);
         resMap.put("msg", "list volumes success!");
         resMap.put("storageId", storageId);
 
-        List<Volume> volumes = new ArrayList<>();
+        List<Volume> volumes = new ArrayList<>(10);
         String url = API_VOLUME_LIST + storageId;
-
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             LOG.info("DmeStorageServiceImpl/getVolumes/responseEntity==" + responseEntity);
@@ -392,19 +390,21 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
                     Volume volume = new Volume();
-                    String volume_id = ToolUtils.jsonToStr(element.get("id"));
-                    volume.setId(volume_id);
+                    String volumeId = ToolUtils.jsonToStr(element.get("id"));
+                    volume.setId(volumeId);
                     volume.setName(ToolUtils.jsonToStr(element.get("name")));
                     volume.setStatus(ToolUtils.jsonToStr(element.get("status")));
                     volume.setAttached(ToolUtils.jsonToBoo(element.get("attached")));
                     volume.setAlloctype(ToolUtils.jsonToStr(element.get("alloctype")));
-                    volume.setService_level_name(ToolUtils.jsonToStr(element.get("service_level_name")));
-                    volume.setStorage_id(ToolUtils.jsonToStr(element.get("storage_id")));
-                    volume.setPool_raw_id(ToolUtils.jsonToStr(element.get("pool_raw_id")));
-                    volume.setCapacity_usage(ToolUtils.jsonToStr(element.get("capacity_usage")));
+                    volume.setServiceLevelName(ToolUtils.jsonToStr(element.get("service_level_name")));
+                    volume.setStorageId(ToolUtils.jsonToStr(element.get("storage_id")));
+                    String poolRawId = ToolUtils.jsonToStr(element.get("pool_raw_id"));
+                    volume.setPoolRawId(poolRawId);
+                    volume.setCapacityUsage(ToolUtils.jsonToStr(element.get("capacity_usage")));
                     volume.setProtectionStatus(ToolUtils.jsonToBoo(element.get("protected")));
                     volume.setCapacity(ToolUtils.jsonToInt(element.get("capacity"),0));
-                    volume.setDatastores(getDataStoreOnVolume(volume_id));
+                    volume.setDatastores(getDataStoreOnVolume(volumeId));
+                    volume.setStoragePoolName(getStorageByPoolRawId(poolRawId));
                     volumes.add(volume);
                 }
                 resMap.put("data", volumes);
@@ -453,14 +453,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     FileSystem fileSystem = new FileSystem();
                     fileSystem.setId(ToolUtils.jsonToStr(element.get("id")));
                     fileSystem.setName(ToolUtils.jsonToStr(element.get("name")));
-                    fileSystem.setHealth_status(ToolUtils.jsonToStr(element.get("health_status")));
-                    fileSystem.setAlloc_type(ToolUtils.jsonToStr(element.get("alloc_type")));
+                    fileSystem.setHealthStatus(ToolUtils.jsonToStr(element.get("health_status")));
+                    fileSystem.setAllocType(ToolUtils.jsonToStr(element.get("alloc_type")));
                     fileSystem.setCapacity(ToolUtils.jsonToDou(element.get("capacity"),0.0));
-                    fileSystem.setCapacity_usage_ratio(ToolUtils.jsonToInt(element.get("capacity_usage_ratio"),0));
-                    fileSystem.setStorage_pool_name(ToolUtils.jsonToStr(element.get("storage_pool_name")));
-                    fileSystem.setNfs_count(ToolUtils.jsonToInt(element.get("nfs_count"),0));
-                    fileSystem.setCifs_count(ToolUtils.jsonToInt(element.get("cifs_count"),0));
-                    fileSystem.setDtree_count(ToolUtils.jsonToInt(element.get("dtree_count"),0));
+                    fileSystem.setCapacityUsageRatio(ToolUtils.jsonToInt(element.get("capacity_usage_ratio"),0));
+                    fileSystem.setStoragePoolName(ToolUtils.jsonToStr(element.get("storage_pool_name")));
+                    fileSystem.setNfsCount(ToolUtils.jsonToInt(element.get("nfs_count"),0));
+                    fileSystem.setCifsCount(ToolUtils.jsonToInt(element.get("cifs_count"),0));
+                    fileSystem.setDtreeCount(ToolUtils.jsonToInt(element.get("dtree_count"),0));
                     fileSystems.add(fileSystem);
                 }
                 resMap.put("data", fileSystems);
@@ -502,12 +502,12 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     JsonObject element = jsonElement.getAsJsonObject();
                     Dtrees dtrees = new Dtrees();
                     dtrees.setName(ToolUtils.jsonToStr(element.get("name")));
-                    dtrees.setFs_name(ToolUtils.jsonToStr(element.get("fs_name")));
-                    dtrees.setQuota_switch(ToolUtils.jsonToBoo(element.get("quota_switch")));
-                    dtrees.setSecurity_style(ToolUtils.jsonToStr(element.get("security_style")));
-                    dtrees.setTier_name(ToolUtils.jsonToStr(element.get("tier_name")));
-                    dtrees.setNfs_count(ToolUtils.jsonToInt(element.get("nfs_count"),0));
-                    dtrees.setCifs_count(ToolUtils.jsonToInt(element.get("cifs_count"),0));
+                    dtrees.setFsName(ToolUtils.jsonToStr(element.get("fs_name")));
+                    dtrees.setQuotaSwitch(ToolUtils.jsonToBoo(element.get("quota_switch")));
+                    dtrees.setSecurityStyle(ToolUtils.jsonToStr(element.get("security_style")));
+                    dtrees.setTierName(ToolUtils.jsonToStr(element.get("tier_name")));
+                    dtrees.setNfsCount(ToolUtils.jsonToInt(element.get("nfs_count"),0));
+                    dtrees.setCifsCount(ToolUtils.jsonToInt(element.get("cifs_count"),0));
                     resList.add(dtrees);
                 }
                 resMap.put("data", resList);
@@ -549,12 +549,12 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     JsonObject element = jsonElement.getAsJsonObject();
                     NfsShares nfsShares = new NfsShares();
                     nfsShares.setName(ToolUtils.jsonToStr(element.get("name")));
-                    nfsShares.setShare_path(ToolUtils.jsonToStr(element.get("share_path")));
-                    nfsShares.setStorage_id(ToolUtils.jsonToStr(element.get("storage_id")));
-                    nfsShares.setTier_name(ToolUtils.jsonToStr(element.get("tier_name")));
-                    nfsShares.setOwning_dtree_name(ToolUtils.jsonToStr(element.get("owning_dtree_name")));
-                    nfsShares.setOwning_dtree_id(ToolUtils.jsonToStr(element.get("owning_dtree_id")));
-                    nfsShares.setFs_name(ToolUtils.jsonToStr(element.get("fs_name")));
+                    nfsShares.setSharePath(ToolUtils.jsonToStr(element.get("share_path")));
+                    nfsShares.setStorageId(ToolUtils.jsonToStr(element.get("storage_id")));
+                    nfsShares.setTierName(ToolUtils.jsonToStr(element.get("tier_name")));
+                    nfsShares.setOwningDtreeName(ToolUtils.jsonToStr(element.get("owning_dtree_name")));
+                    nfsShares.setOwningDtreeId(ToolUtils.jsonToStr(element.get("owning_dtree_id")));
+                    nfsShares.setFsName(ToolUtils.jsonToStr(element.get("fs_name")));
                     resList.add(nfsShares);
                 }
                 resMap.put("data", resList);
@@ -595,8 +595,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     BandPorts bandPorts = new BandPorts();
                     bandPorts.setId(ToolUtils.jsonToStr(element.get("id")));
                     bandPorts.setName(ToolUtils.jsonToStr(element.get("name")));
-                    bandPorts.setHealth_status(ToolUtils.jsonToStr(element.get("health_status")));
-                    bandPorts.setRunning_status(ToolUtils.jsonToStr(element.get("running_status")));
+                    bandPorts.setHealthStatus(ToolUtils.jsonToStr(element.get("health_status")));
+                    bandPorts.setRunningStatus(ToolUtils.jsonToStr(element.get("running_status")));
                     bandPorts.setMtu(ToolUtils.jsonToStr(element.get("mtu")));
                     resList.add(bandPorts);
                 }
@@ -688,6 +688,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storageDisk.setName(ToolUtils.jsonToStr(element.get("name")));
                     storageDisk.setStatus(ToolUtils.jsonToStr(element.get("status")));
                     storageDisk.setCapacity(ToolUtils.jsonToDou(element.get("capacity"),0.0));
+                    storageDisk.setSpeed(ToolUtils.jsonToLon(element.get("speed"),0L));
+                    storageDisk.setLogicalType(ToolUtils.jsonToStr(element.get("logicalType")));
+                    storageDisk.setPhysicalType(ToolUtils.jsonToStr(element.get("physicalType")));
+                    String poolId = ToolUtils.jsonToStr(element.get("poolId"));
+                    storageDisk.setPoolId(poolId);
+                    storageDisk.setStorageDeviceId(ToolUtils.jsonToStr(element.get("storageDeviceId")));
+                    storageDisk.setDiskPools(getDiskPoolByPoolId(poolId));
                     resList.add(storageDisk);
                 }
                 resMap.put("data", resList);
@@ -915,10 +922,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 volume.setStatus(ToolUtils.jsonToStr(element.get("status")));
                 volume.setAttached(ToolUtils.jsonToBoo(element.get("attached")));
                 volume.setAlloctype(ToolUtils.jsonToStr(element.get("alloctype")));
-                volume.setService_level_name(ToolUtils.jsonToStr(element.get("service_level_name")));
-                volume.setStorage_id(ToolUtils.jsonToStr(element.get("storage_id")));
-                volume.setPool_raw_id(ToolUtils.jsonToStr(element.get("pool_raw_id")));
-                volume.setCapacity_usage(ToolUtils.jsonToStr(element.get("capacity_usage")));
+                volume.setServiceLevelName(ToolUtils.jsonToStr(element.get("service_level_name")));
+                volume.setStorageId(ToolUtils.jsonToStr(element.get("storage_id")));
+                volume.setPoolRawId(ToolUtils.jsonToStr(element.get("pool_raw_id")));
+                volume.setCapacityUsage(ToolUtils.jsonToStr(element.get("capacity_usage")));
                 volume.setProtectionStatus(ToolUtils.jsonToBoo(element.get("protectionStatus")));
                 JsonArray jsonArray = element.get("attachments").getAsJsonArray();
                 volumeAttachments(jsonArray, volume);
@@ -1030,7 +1037,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             for (JsonElement jsonElement : jsonArray) {
                 JsonObject element = jsonElement.getAsJsonObject();
                 FailoverGroup failoverGroup = new FailoverGroup();
-                failoverGroup.setFailover_group_type(ToolUtils.jsonToStr(element.get("failover_group_type")));
+                failoverGroup.setFailoverGroupType(ToolUtils.jsonToStr(element.get("failover_group_type")));
                 failoverGroup.setId(ToolUtils.jsonToStr(element.get("id")));
                 failoverGroup.setName(ToolUtils.jsonToStr(element.get("name")));
                 failoverGroups.add(failoverGroup);
@@ -1072,13 +1079,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             fileSystemDetail.setName(ToolUtils.jsonToStr(jsonObject.get("name")));
             CapacityAutonegotiation capacityAutonegotiation = new CapacityAutonegotiation();
             JsonObject json = jsonObject.get("capacity_auto_negotiation").getAsJsonObject();
-            capacityAutonegotiation.setAuto_size_enable(ToolUtils.jsonToBoo(json.get("auto_size_enable")));
+            capacityAutonegotiation.setAutoSizeEnable(ToolUtils.jsonToBoo(json.get("auto_size_enable")));
             fileSystemDetail.setCapacityAutonegotiation(capacityAutonegotiation);
             JsonObject tuning = jsonObject.get("tuning").getAsJsonObject();
             FileSystemTurning fileSystemTurning = new FileSystemTurning();
-            fileSystemTurning.setAllocation_type(ToolUtils.jsonToStr(jsonObject.get("alloc_type")));
-            fileSystemTurning.setCompression_enabled(ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
-            fileSystemTurning.setDeduplication_enabled(ToolUtils.jsonToBoo(tuning.get("deduplication_enabled")));
+            fileSystemTurning.setAllocationType(ToolUtils.jsonToStr(jsonObject.get("alloc_type")));
+            fileSystemTurning.setCompressionEnabled(ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
+            fileSystemTurning.setDeduplicationEnabled(ToolUtils.jsonToBoo(tuning.get("deduplication_enabled")));
             SmartQos smartQos = new SmartQos();
             String smart_qos = ToolUtils.jsonToStr(tuning.get("smart_qos"));
             if (!StringUtils.isEmpty(smart_qos)) {
@@ -1332,5 +1339,82 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         LOG.info("getDjTierOfStoragePool map===" + (gson.toJson(map)));
         return map;
     }
+
+    private String getStorageByPoolRawId(String poolRawId) throws Exception {
+
+        String className = "SYS_StoragePool";
+        String poolName = "";
+        String url = API_INSTANCES_LIST+"/"+ className;
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET,null);
+        if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
+            String object = responseEntity.getBody();
+            JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+            JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
+            for (JsonElement jsonElement : jsonArray) {
+                JsonObject element = jsonElement.getAsJsonObject();
+                if (poolRawId.equals(ToolUtils.jsonToStr(element.get("poolId")))) {
+                    poolName = ToolUtils.jsonToStr(element.get("name"));
+                    break;
+                }
+            }
+        }
+        return poolName;
+    }
+
+    private List<DiskPool> getDiskPoolByPoolId(String poolId) throws Exception {
+        String className = "SYS_DiskPool";
+        String url = API_INSTANCES_LIST+"/"+ className;
+        List<DiskPool> diskPools = new ArrayList<>(10);
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+        if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
+            String object = responseEntity.getBody();
+            JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+            JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
+            for (JsonElement jsonElement : jsonArray) {
+                JsonObject element = jsonElement.getAsJsonObject();
+                DiskPool diskPool = new DiskPool();
+                diskPool.setId(ToolUtils.jsonToStr(element.get("id")));
+                diskPool.setNativeId(ToolUtils.jsonToStr(element.get("nativeId")));
+                diskPool.setLastModified(ToolUtils.jsonToStr(element.get("lastModified")));
+                diskPool.setLastMonitorTime(ToolUtils.jsonToStr(element.get("lastMonitorTime")));
+                diskPool.setDataStatus(ToolUtils.jsonToStr(element.get("dataStatus")));
+                diskPool.setName(ToolUtils.jsonToStr(element.get("name")));
+                diskPool.setStatus(ToolUtils.jsonToStr(element.get("status")));
+                diskPool.setRunningStatus(ToolUtils.jsonToStr(element.get("runningStatus")));
+                diskPool.setEncryptDiskType(ToolUtils.jsonToStr(element.get("encryptDiskType")));
+                Double totalCapacity = ToolUtils.jsonToDou(element.get("totalCapacity"));
+                diskPool.setTotalCapacity(totalCapacity);
+                Double usedCapacity = ToolUtils.jsonToDou(element.get("usedCapacity"));
+                diskPool.setUsedCapacity(usedCapacity);
+                diskPool.setFreeCapacity(ToolUtils.jsonToDou(element.get("freeCapacity")));
+                diskPool.setSpareCapacity(ToolUtils.jsonToDou(element.get("spareCapacity")));
+                diskPool.setUsedSpareCapacity(ToolUtils.jsonToDou(element.get("usedSpareCapacity")));
+                String poolId1 = ToolUtils.jsonToStr(element.get("poolId"));
+                diskPool.setPoolId(poolId1);
+                //订阅率（lun/fs订阅率）
+                DecimalFormat df = new DecimalFormat("#.00");
+                Double usageCapacityRate = 0.0;
+                if (totalCapacity!=0) {
+                    usageCapacityRate = Double.valueOf(df.format(usedCapacity / totalCapacity)) * 100;
+                }
+                diskPool.setUsageRate(usageCapacityRate);
+                diskPool.setStorageDeviceId(ToolUtils.jsonToStr(element.get("storageDeviceId")));
+                if (poolId.equals(poolId1)) {
+                    diskPools.add(diskPool);
+                }
+            }
+        }
+        return diskPools;
+    }
+    
+     /**
+     * 判断数据存储中是否有注册的虚拟机，有则返回true，没有返回false
+     * @param objectid 数据存储的objectid
+     * @return  是否存在vm
+     */
+    public boolean hasVmOnDatastore(String objectid){
+        return vcsdkUtils.hasVmOnDatastore(objectid);
+    }
+
 
 }

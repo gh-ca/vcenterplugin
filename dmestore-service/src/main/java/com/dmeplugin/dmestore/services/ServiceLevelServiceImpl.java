@@ -210,16 +210,16 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                 ssl.setDescription(descriptionn);
                 ssl.setType(type);
                 ssl.setProtocol(protocol);
-                ssl.setTotal_capacity(totalCapacity);
-                ssl.setFree_capacity(freeCapacity);
-                ssl.setUsed_capacity(usedCapcity);
+                ssl.setTotalCapacity(totalCapacity);
+                ssl.setFreeCapacity(freeCapacity);
+                ssl.setUsedCapacity(usedCapcity);
                 JsonElement capObj = object1.get("capabilities");
                 if (!ToolUtils.jsonIsNull(capObj)) {
                     SimpleCapabilities scb = new SimpleCapabilities();
                     JsonObject capJsonObj = capObj.getAsJsonObject();
                     String resourceType = ToolUtils.jsonToOriginalStr(capJsonObj.get("resource_type"));
                     boolean compression = ToolUtils.jsonToBoo(capJsonObj.get("compression"));
-                    scb.setResource_type(resourceType);
+                    scb.setResourceType(resourceType);
                     scb.setCompression(compression);
 
                     //报文中暂未出现此属性,暂不处理
@@ -305,8 +305,8 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         if (sps.size() > 0) {
             Map<String, Set<String>> storageDevicePoolIds = new HashMap<>();
             for (StoragePool sp : sps) {
-                String storageDeviceId = sp.getStorage_device_id();
-                String poolInstanceId = sp.getStorage_instance_id();
+                String storageDeviceId = sp.getStorageDeviceId();
+                String poolInstanceId = sp.getStorageInstanceId();
                 if (null == storageDevicePoolIds.get(storageDeviceId)) {
                     Set<String> poolIds = new HashSet<>();
                     poolIds.add(poolInstanceId);
@@ -354,10 +354,10 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                 volume.setStatus(ToolUtils.jsonToStr(element.get("status")));
                 volume.setAttached(ToolUtils.jsonToBoo(element.get("attached")));
                 volume.setAlloctype(ToolUtils.jsonToStr(element.get("alloctype")));
-                volume.setService_level_name(ToolUtils.jsonToStr(element.get("service_level_name")));
-                volume.setStorage_id(ToolUtils.jsonToStr(element.get("storage_id")));
-                volume.setPool_raw_id(ToolUtils.jsonToStr(element.get("pool_raw_id")));
-                volume.setCapacity_usage(ToolUtils.jsonToStr(element.get("capacity_usage")));
+                volume.setServiceLevelName(ToolUtils.jsonToStr(element.get("service_level_name")));
+                volume.setStorageId(ToolUtils.jsonToStr(element.get("storage_id")));
+                volume.setPoolRawId(ToolUtils.jsonToStr(element.get("pool_raw_id")));
+                volume.setCapacityUsage(ToolUtils.jsonToStr(element.get("capacity_usage")));
                 volume.setProtectionStatus(ToolUtils.jsonToBoo(element.get("protectionStatus")));
                 volume.setCapacity(ToolUtils.jsonToInt(element.get("capacity"), 0));
 
@@ -395,7 +395,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             List<StoragePool> storagePools = (List<StoragePool>) resp.get("data");
             for (StoragePool sp : storagePools) {
                 // String poolId = sp.getStorage_pool_id();
-                String poolId = sp.getStorage_instance_id();
+                String poolId = sp.getStorageInstanceId();
                 if (storagePoolIds.contains(poolId)) {
                     sps.add(sp);
                 }
@@ -453,9 +453,9 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         String storagePoolInstanceId = ToolUtils.jsonToStr(jsonObject.get("id"));
 
         sp.setName(name);
-        sp.setStorage_pool_id(poolId);
-        sp.setStorage_instance_id(storagePoolInstanceId);
-        sp.setStorage_device_id(storageDeviceId);
+        sp.setStoragePoolId(poolId);
+        sp.setStorageInstanceId(storagePoolInstanceId);
+        sp.setStorageDeviceId(storageDeviceId);
 
         return sp;
     }

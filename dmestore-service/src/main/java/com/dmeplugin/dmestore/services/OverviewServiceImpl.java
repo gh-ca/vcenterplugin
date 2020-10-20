@@ -7,7 +7,23 @@ import com.dmeplugin.dmestore.model.VmfsDataInfo;
 
 import java.util.*;
 
+/**
+ * @author chenjie
+ */
 public class OverviewServiceImpl implements OverviewService {
+
+    private static final String STORAGE_TYPE_VMFS = "1";
+    private static final String STORAGE_TYPE_NFS = "2";
+
+    private static final String SUCCESS_CODE = "200";
+    private static final String COLUMN_CODE = "code";
+
+    private static final String STORAGE_DEVICE_STATUS_NORMAL = "1";
+
+    private static final String CRITICAL = "Critical";
+    private static final String MAJOR = "Major";
+    private static final String WARNING = "Warning";
+    private static final String INFO = "Info";
 
     private VmfsAccessService vmfsAccessService;
     private DmeNFSAccessService dmeNFSAccessService;
@@ -16,19 +32,19 @@ public class OverviewServiceImpl implements OverviewService {
 
     @Override
     public Map<String, Object> getStorageNum() {
-        Map<String, Object> r = new HashMap<>();
+        Map<String, Object> r = new HashMap<>(16);
         int normal = 0;
         int abnormal = 0;
         int total;
         Map<String, Object> storageOriginal = dmeStorageService.getStorages();
-        if (null == storageOriginal || !"200".equals(storageOriginal.get("code").toString())) {
+        if (null == storageOriginal || !SUCCESS_CODE.equals(storageOriginal.get(COLUMN_CODE).toString())) {
             throw new RuntimeException("query storage error.");
         } else{
             List<Storage> storages = (List<Storage>) storageOriginal.get("data");
             total = storages.size();
             for (Storage storage : storages) {
                 // 运行状态 0-离线 1-正常 2-故障 9-未管理。
-                if ("1".equals(storage.getStatus())) {
+                if (STORAGE_DEVICE_STATUS_NORMAL.equals(storage.getStatus())) {
                     normal++;
                 } else{
                     abnormal++;
@@ -51,9 +67,9 @@ public class OverviewServiceImpl implements OverviewService {
         Map<String, Object> r = new HashMap();
         try {
             double[] ds;
-            if ("1".equals(type)){
+            if (STORAGE_TYPE_VMFS.equals(type)){
                 ds = computeVMFsDataStoreCapacity();
-            } else if ("2".equals(type)){
+            } else if (STORAGE_TYPE_NFS.equals(type)){
                 ds = computeNFSDataStoreCapacity();
             } else {
                 ds = new double[4];
@@ -85,9 +101,9 @@ public class OverviewServiceImpl implements OverviewService {
     public List<Map<String, Object>> getDataStoreCapacityTopN(String type, int topn) {
         List<Map<String, Object>> r;
         try {
-            if ("1".equals(type)){
+            if (STORAGE_TYPE_VMFS.equals(type)){
                 r = getVMFSInfos();
-            } else if ("2".equals(type)){
+            } else if (STORAGE_TYPE_NFS.equals(type)){
                 r = getNFSInfos();
             } else {
                 r = getVMFSInfos();
@@ -109,7 +125,7 @@ public class OverviewServiceImpl implements OverviewService {
      */
     @Override
     public Map<String, Object> getBestPracticeViolations() {
-        Map<String, Object> r = new HashMap<>();
+        Map<String, Object> r = new HashMap<>(16);
         try {
             int critical = 0;
             int major = 0;
@@ -117,13 +133,13 @@ public class OverviewServiceImpl implements OverviewService {
             int info = 0;
             List<BestPracticeCheckRecordBean> rs = bestPracticeProcessService.getCheckRecord();
             for (BestPracticeCheckRecordBean b : rs){
-                if ("Critical".equals(b.getLevel())){
+                if (CRITICAL.equals(b.getLevel())){
                     critical++;
-                } else if ("Major".equals(b.getLevel())){
+                } else if (MAJOR.equals(b.getLevel())){
                     major++;
-                } else if ("Warning".equals(b.getLevel())){
+                } else if (WARNING.equals(b.getLevel())){
                     warning++;
-                } else if ("Info".equals(b.getLevel())){
+                } else if (INFO.equals(b.getLevel())){
                     info++;
                 }
 

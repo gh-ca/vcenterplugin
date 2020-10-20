@@ -46,6 +46,8 @@ export class NfsService {
     return this.http.get('accessnfs/listnfsperformance', {params: {fsIds}});
   }
   addNfs(params= {}){
+    console.log("addNfs")
+    console.log(params)
     return this.http.post('operatenfs/createnfsdatastore', params);
   }
   updateNfs(params= {}){
@@ -69,6 +71,16 @@ export class NfsService {
   getVolsByObjId(objId: string) {
     return this.http.get('accessvmfs/volume/' + objId );
   }
+  getVmkernelListByObjectId(hostObjectId:string){
+    return this.http.get('accessvmware/getvmkernelipbyhostobjectid',{params: {hostObjectId}} );
+  }
+  getNfsDetailById(fileSystemId:string){
+    return this.http.get('dmestorage/filesystemdetail',{params: {fileSystemId}} );
+  }
+  changeCapacity(params= {}){
+    return this.http.post('operatenfs/changenfsdatastore', params);
+  }
+
 
 
   /**
@@ -104,45 +116,99 @@ export interface List {
 }
 // =================添加NFS参数 start=========
 export class AddNfs{
-  storage_pool_id: string;
-  current_port_id: string;
-  storage_id: string;
-  pool_raw_id: string;
-  exportPath: string;
-  nfsName: string;
-  accessMode: string;
-  type: string;
-  sameName: boolean;
-  filesystem_specs: FileSystem[];
-  capacity_autonegotiation: Autonegotiation;
-  tuning: Advance;
-  qos_policy: QosPolicy;
-  create_nfs_share_param: Share;
-  nfs_share_client_addition: ShareClient[];
-  fsName: string;
-  shareName: string;
-  size: number;
-  unit: string;
-  qosPolicy: boolean;
-  upLow: string;
-  thin: boolean;
-  auto: boolean;
+  storagId:string;// 存储设备id
+  storagePoolId:string;//  存储池id (storage_pool_id)
+  poolRawId:string;//  存储池在指定存储设备上的id（poolId）
+  currentPortId:string;//  逻辑端口id
+  nfsName:string;//   DataStoname
+  sameName:boolean;// false true 如果是false就传
+  shareName:string;//  共享名称
+  fsName:string;//  文件系统名称
+  size: number; //  ?待确认默认单位（界面可选。前端可转换）
+  type:string;//  nfs协议版本
+  advance :boolean;//false true  true 是有高级选项
+  qosFlag:boolean;// qos策略开关 false true false关闭
+  contolPolicy :string;//  上下线选择标记  枚举值 up low
+// up 取值如下
+  maxBandwidth: number; //
+  maxIops: number; //
+//low取值
+  minBandwidth: number; //
+  minIops: number; //
+  latency: number; //
+  thin:boolean;// true  代表thin false代表thick
+  deduplicationEnabled:boolean;// 重删 true false
+  compressionEnabled:boolean;// 压缩 true false
+  autoSizeEnable:boolean;// 自动扩容 true false
+  vkernelIp:string;//  虚拟网卡ip
+  hostObjectId:string;//  挂载主机的Objectid
+  accessMode:string;//  挂载方式 分 只读 和读写
   constructor(){
     this.sameName = true;
-    this.qosPolicy = false;
+    this.advance = false;
+    this.qosFlag = false;
+    this.deduplicationEnabled = false;
+    this.compressionEnabled = false;
+    this.autoSizeEnable = false;
     this.thin = true;
-    this.auto = false;
-    this.unit = 'GB';
-    this.accessMode = 'readWrite';
-    this.tuning = new Advance();
-    this.tuning.deduplication_enabled = true;
-    this.tuning.compression_enabled = false;
-    this.capacity_autonegotiation = new Autonegotiation();
-    this.capacity_autonegotiation.auto_size_enable = false;
-    this.qos_policy = new QosPolicy();
-    this.filesystem_specs = [];
-    this.nfs_share_client_addition = [];
   }
+}
+
+export class UpdateNfs{
+  dataStoreObjectId: string;
+  nfsName:string;//   DataStoname
+  sameName:boolean;// false true 如果是false就传
+  shareName:string;//  共享名称
+  fsName:string;//  文件系统名称
+  fileSystemId: string;
+  qosFlag:boolean;// qos策略开关 false true false关闭
+  contolPolicy :string;//  上下线选择标记  枚举值 up low
+// up 取值如下
+  maxBandwidth: number; //
+  maxIops: number; //
+//low取值
+  minBandwidth: number; //
+  minIops: number; //
+  latency: number; //
+  thin:boolean;// true  代表thin false代表thick
+  deduplicationEnabled:boolean;// 重删 true false
+  compressionEnabled:boolean;// 压缩 true false
+  autoSizeEnable:boolean;// 自动扩容 true false
+  shareId: string;
+  name: string;
+  constructor(){
+    this.sameName=true;
+  }
+}
+
+export class NfsDetail{
+  id:string;
+  name:string;
+  fileSystemTurning: FileSystemTurning;
+  capacityAutonegotiation: CapacityAutonegotiation;
+}
+export class FileSystemTurning{
+  deduplicationEnabled: boolean;
+  compressionEnabled: boolean;
+  allocationType: string;
+  smartQos: SmartQos;
+
+}
+export class SmartQos{
+  name: string;
+  //控制策略,0：保护IO下限，1：控制IO上限
+  latency: number;
+  maxbandwidth: number;
+  maxiops: number;
+  minbandwidth: number;
+  miniops: number;
+  enabled:false;
+  //for update
+  controlPolicy: string;
+  latencyUnit: string;
+}
+export class CapacityAutonegotiation{
+  autoSizeEnable:boolean;
 }
 export class FileSystem{
   capacity: number;
@@ -150,20 +216,11 @@ export class FileSystem{
   count: number;
 }
 export class Autonegotiation{
-  capacity_self_adjusting_mode: string;
-  capacity_recycle_mode: string;
   auto_size_enable: boolean;
-  auto_grow_threshold_percent: number;
-  auto_shrink_threshold_percent: number;
-  max_auto_size: number;
-  min_auto_size: number;
-  auto_size_increment: number;
 }
 export class Advance{
   deduplication_enabled: boolean;
   compression_enabled: boolean;
-  application_scenario: string;
-  block_size: number;
   allocation_type: string;
 }
 export class QosPolicy{
@@ -183,8 +240,17 @@ export class ShareClient{
   sync: string;
   all_squash: string;
   root_squash: string;
+  secure: string;
+  objectId: string;
+  hostId: string;
 }
-
+export class Vmkernel{
+  portgroup: string;
+  ipAddress: string;
+  device: string;
+  key: string;
+  mac: string;
+}
 // =================添加NFS参数 end =========
 export class Mount{
   dataStoreName: string;
@@ -196,7 +262,7 @@ export class Mount{
 export class Host{
   hostId: string;
   hostName: string;
-  vkernelIP: string;
+  objectId: string;
 }
 export class Cluster{
   clusterId: string;

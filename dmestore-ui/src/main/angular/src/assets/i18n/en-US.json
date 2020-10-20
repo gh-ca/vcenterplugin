@@ -54,6 +54,7 @@
     "button_previous":"Previous",
     "button_next":"Next",
     "button_done":"Done",
+    "add_advance":"Advance",
     "datastoreSetting":"Datastore Setting",
     "add_title":"Create Datastore on HUAWEI DME",
     "storeageDevice":"Storage Device",
@@ -67,6 +68,11 @@
     "qosPolicy":"Qos Policy",
     "controlPolicy":"Control Policy",
     "tfo":"Traffic Control Object",
+    "qos_bandwidth":"Bandwidth",
+    "qos_iops":"IOPS",
+    "qos_latency":"Latency",
+    "mountHost":"Host",
+    "vkernel":"vkernel IP",
     "thin":"Thin",
     "dataDedu":"Data Deduplication",
     "dataCompre":"Data Compression",
@@ -233,7 +239,8 @@
     },
     "unmount":{
       "title":"Unmount",
-      "content":"Are you sure to unmount?"
+      "content":"Are you sure to unmount?",
+      "notChooseDeviceTips":"Please select the host or cluster to be uninstalled!"
     },
     "reclaim": {
       "title":"Tips",
@@ -464,7 +471,11 @@
     "violation": "Violation",
     "non-compliant": "Non-compliant Host",
     "actual": "actual Value",
-    "host": "Host Name"
+    "host": "Host Name",
+    "critical": "Critical",
+    "info": "Info",
+    "warning": "Warning",
+    "major": "Major"
   },
   "iscsi": {
     "hostIp": "Host VmKernel IP",
@@ -533,6 +544,7 @@
   },
   "tier": {
     "name": "Name",
+    "namep": "Please Enter Name",
     "total": "Total Capacity",
     "free": "Free Capacity",
     "used": "Used Capacity",
@@ -588,6 +600,14 @@
     "last1M": "Last One Month",
     "last3M": "Last Three Month",
     "last6M": "Last Six Month",
-    "last1Y": "Last One Year"
+    "last1Y": "Last One Year",
+
+    "names": "OrderBy Name",
+    "totals": "OrderBy TotalCapacity",
+    "latencys": "OrderBy Latency",
+    "maxIOPSs": "OrderBy MaxIOPS",
+    "minIOPSs": "OrderBy MinIOPS",
+    "maxBandWidths": "OrderBy MaxBandWidth",
+    "minBandWidths": "OrderBy MinBandWidth"
   }
 }

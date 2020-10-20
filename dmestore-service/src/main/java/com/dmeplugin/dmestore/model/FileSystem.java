@@ -13,62 +13,29 @@ public class FileSystem  {
     //名称
     private String name;
     //状态
-    private String health_status;
-    //分配策略
-    private String alloc_type;
+    private String healthStatus;
+    //分配策略(分配类型)
+    private String allocType;
     //容量使用率
-    private Integer capacity_usage_ratio;
+    private Integer capacityUsageRatio;
     //存储池名字
-    private String storage_pool_name;
+    private String storagePoolName;
     //nfs
-    private Integer nfs_count;
+    private Integer nfsCount;
     //cifs
-    private Integer cifs_count;
+    private Integer cifsCount;
     //dtree
-    private Integer dtree_count;
+    private Integer dtreeCount;
     //总容量
     private Double capacity;
     //文件系统在存储池上已经分配的容量
-    private Double allocate_quota_in_pool;
-    //可用空间
-    private Double available_capacity;
+    private Double allocateQuotaInPool;
+    //可用容量
+    private Double availableCapacity;
     //Thin文件系统能缩容的最小空间。单位GB，保留三位小数
-    private Double min_size_fs_capacity;
+    private Double minSizeFsCapacity;
     //存储设备Id
-    private String storage_id;
-
-
-    public Double getAllocate_quota_in_pool() {
-        return allocate_quota_in_pool;
-    }
-
-    public void setAllocate_quota_in_pool(Double allocate_quota_in_pool) {
-        this.allocate_quota_in_pool = allocate_quota_in_pool;
-    }
-
-    public Double getAvailable_capacity() {
-        return available_capacity;
-    }
-
-    public void setAvailable_capacity(Double available_capacity) {
-        this.available_capacity = available_capacity;
-    }
-
-    public Double getMin_size_fs_capacity() {
-        return min_size_fs_capacity;
-    }
-
-    public void setMin_size_fs_capacity(Double min_size_fs_capacity) {
-        this.min_size_fs_capacity = min_size_fs_capacity;
-    }
-
-    public String getStorage_id() {
-        return storage_id;
-    }
-
-    public void setStorage_id(String storage_id) {
-        this.storage_id = storage_id;
-    }
+    private String storageId;
 
     public String getId() {
         return id;
@@ -86,20 +53,60 @@ public class FileSystem  {
         this.name = name;
     }
 
-    public String getHealth_status() {
-        return health_status;
+    public String getHealthStatus() {
+        return healthStatus;
     }
 
-    public void setHealth_status(String health_status) {
-        this.health_status = health_status;
+    public void setHealthStatus(String healthStatus) {
+        this.healthStatus = healthStatus;
     }
 
-    public String getAlloc_type() {
-        return alloc_type;
+    public String getAllocType() {
+        return allocType;
     }
 
-    public void setAlloc_type(String alloc_type) {
-        this.alloc_type = alloc_type;
+    public void setAllocType(String allocType) {
+        this.allocType = allocType;
+    }
+
+    public Integer getCapacityUsageRatio() {
+        return capacityUsageRatio;
+    }
+
+    public void setCapacityUsageRatio(Integer capacityUsageRatio) {
+        this.capacityUsageRatio = capacityUsageRatio;
+    }
+
+    public String getStoragePoolName() {
+        return storagePoolName;
+    }
+
+    public void setStoragePoolName(String storagePoolName) {
+        this.storagePoolName = storagePoolName;
+    }
+
+    public Integer getNfsCount() {
+        return nfsCount;
+    }
+
+    public void setNfsCount(Integer nfsCount) {
+        this.nfsCount = nfsCount;
+    }
+
+    public Integer getCifsCount() {
+        return cifsCount;
+    }
+
+    public void setCifsCount(Integer cifsCount) {
+        this.cifsCount = cifsCount;
+    }
+
+    public Integer getDtreeCount() {
+        return dtreeCount;
+    }
+
+    public void setDtreeCount(Integer dtreeCount) {
+        this.dtreeCount = dtreeCount;
     }
 
     public Double getCapacity() {
@@ -110,43 +117,35 @@ public class FileSystem  {
         this.capacity = capacity;
     }
 
-    public Integer getCapacity_usage_ratio() {
-        return capacity_usage_ratio;
+    public Double getAllocateQuotaInPool() {
+        return allocateQuotaInPool;
     }
 
-    public void setCapacity_usage_ratio(Integer capacity_usage_ratio) {
-        this.capacity_usage_ratio = capacity_usage_ratio;
+    public void setAllocateQuotaInPool(Double allocateQuotaInPool) {
+        this.allocateQuotaInPool = allocateQuotaInPool;
     }
 
-    public String getStorage_pool_name() {
-        return storage_pool_name;
+    public Double getAvailableCapacity() {
+        return availableCapacity;
     }
 
-    public void setStorage_pool_name(String storage_pool_name) {
-        this.storage_pool_name = storage_pool_name;
+    public void setAvailableCapacity(Double availableCapacity) {
+        this.availableCapacity = availableCapacity;
     }
 
-    public Integer getNfs_count() {
-        return nfs_count;
+    public Double getMinSizeFsCapacity() {
+        return minSizeFsCapacity;
     }
 
-    public void setNfs_count(Integer nfs_count) {
-        this.nfs_count = nfs_count;
+    public void setMinSizeFsCapacity(Double minSizeFsCapacity) {
+        this.minSizeFsCapacity = minSizeFsCapacity;
     }
 
-    public Integer getCifs_count() {
-        return cifs_count;
+    public String getStorageId() {
+        return storageId;
     }
 
-    public void setCifs_count(Integer cifs_count) {
-        this.cifs_count = cifs_count;
-    }
-
-    public Integer getDtree_count() {
-        return dtree_count;
-    }
-
-    public void setDtree_count(Integer dtree_count) {
-        this.dtree_count = dtree_count;
+    public void setStorageId(String storageId) {
+        this.storageId = storageId;
     }
 }
