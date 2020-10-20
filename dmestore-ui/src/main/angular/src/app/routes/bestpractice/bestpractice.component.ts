@@ -34,41 +34,41 @@ export class BestpracticeComponent implements OnInit {
   currentBestpractice: Bestpractice;
   // ================END====================
 
+  tipModal = false;
+  ips = '';
+  applyType = '1';
+
   constructor(private cdr: ChangeDetectorRef, private http: HttpClient, private commonService: CommonService) { }
 
   ngOnInit(): void {
   }
 
-  applySelectedPractice() {
+  /**
+   * 列表实时最佳实践 参数封装
+   * @returns {any[]}
+   */
+  packApplyPracticeParams() {
     const params = [];
-    let ips = '';
+    this.ips = '';
     this.rowSelected.forEach((item) => {
       const i = {hostSetting:'', hostObjectIds: []};
       i.hostSetting = item.hostSetting;
       item.hostList.forEach((s) => {
         i.hostObjectIds.push(s.hostObjectId);
         if (s.needReboot == "true"){
-          ips += s.hostName+",";
+          this.ips += s.hostName+",";
         }
       });
       params.push(i);
     });
-
-    if (ips.length != 0){
-      alert('modify config, you need reboot ' + ips);
-    }
-
-    console.log(params);
-    this.http.post('v1/bestpractice/update/bylist', params).subscribe((result: any) => {
-      if (result.code == '200'){
-        this.practiceRefresh();
-      }
-    }, err => {
-      console.error('ERROR', err);
-    });
+    return params;
   }
 
-  applyByHosts(){
+  /**
+   * 主机列表实时最佳实践 参数封装
+   * @returns {any[]}
+   */
+  packApplyPracticeParamsByHost(){
     const params = [];
     const i = {hostSetting:'', hostObjectIds: []};
     i.hostSetting = this.currentBestpractice.hostSetting;
@@ -81,11 +81,14 @@ export class BestpracticeComponent implements OnInit {
     });
     params.push(i);
 
-    if (ips.length != 0){
-      alert('modify config, you need reboot ' + ips);
-    }
+    return params;
+  }
 
-    console.log(params);
+  /**
+   * 实时最佳实践
+   * @param params
+   */
+  applyPractice(params){
     this.http.post('v1/bestpractice/update/bylist', params).subscribe((result: any) => {
       if (result.code == '200'){
         this.practiceRefresh();
@@ -93,6 +96,40 @@ export class BestpracticeComponent implements OnInit {
     }, err => {
       console.error('ERROR', err);
     });
+  }
+
+  openTip(){
+    this.tipModal = true;
+  }
+
+  closeTip(){
+    this.tipModal = false;
+  }
+
+  applyClick(type: string){
+    this.applyType = type;
+    let params;
+    if(this.applyType == '1'){
+      params = this.packApplyPracticeParams();
+    } else {
+      params = this.packApplyPracticeParamsByHost();
+    }
+    if(this.ips.length != 0){
+      this.openTip();
+    } else{
+      this.applyPractice(params);
+    }
+  }
+
+  tipOk(){
+    this.closeTip();
+    let params;
+    if(this.applyType == '1'){
+      params = this.packApplyPracticeParams();
+    } else {
+      params = this.packApplyPracticeParamsByHost();
+    }
+    this.applyPractice(params);
   }
 
   recheck() {
@@ -104,7 +141,6 @@ export class BestpracticeComponent implements OnInit {
 
   practiceRefresh(){
     this.isLoading = true;
-    //const params = this.commonService.refresh(state, this.query);
     this.http.get('v1/bestpractice/records/all', {}).subscribe((result: any) => {
           if (result.code === '200'){
             this.list = result.data;

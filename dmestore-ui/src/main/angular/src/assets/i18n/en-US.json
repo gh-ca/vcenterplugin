@@ -20,7 +20,8 @@
     "submit": "Submit",
     "search": "Search",
     "refresh": "Refresh",
-    "synSPolicy": "Synchronize VM Storage Policies"
+    "synSPolicy": "Synchronize VM Storage Policies",
+    "tip": "Tip"
   },
   "validations": {
     "required": "This field is required!",
@@ -475,7 +476,8 @@
     "critical": "Critical",
     "info": "Info",
     "warning": "Warning",
-    "major": "Major"
+    "major": "Major",
+    "tipmessage": "Modify Host Config,You need Reboot Host,IP:"
   },
   "iscsi": {
     "hostIp": "Host VmKernel IP",

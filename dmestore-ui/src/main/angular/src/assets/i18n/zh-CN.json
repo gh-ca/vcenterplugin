@@ -20,7 +20,8 @@
     "submit": "提交",
     "search": "搜索",
     "refresh": "刷新",
-    "synSPolicy": "同步虚拟机存储策略"
+    "synSPolicy": "同步虚拟机存储策略",
+    "tip": "提示"
   },
   "validations": {
     "required": "该字段必填!",
@@ -478,7 +479,8 @@
     "critical": "紧急",
     "info": "提示",
     "warning": "次要",
-    "major": "重要"
+    "major": "重要",
+    "tipmessage": "修改主机配置，您需要重启主机，IP:"
   },
   "iscsi": {
     "hostIp": "主机VmKernel IP",
