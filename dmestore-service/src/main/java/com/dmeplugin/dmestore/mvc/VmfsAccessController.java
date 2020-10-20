@@ -182,8 +182,6 @@ public class VmfsAccessController extends BaseController {
     /**
      * Delete vmfs
      * param list<str> dataStoreObjectIds: datastore object id列表 必
-     * param str host_id: 主机id 必
-     * param str hostGroup_id: 主机id 必
      * return: Return execution status and information
      * code:Status code 202 or 503
      * message:Information
