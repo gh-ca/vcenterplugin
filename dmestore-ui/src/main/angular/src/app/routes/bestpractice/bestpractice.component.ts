@@ -5,6 +5,7 @@ import {
 } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import { CommonService } from '../common.service';
+import { GlobalsService }     from "../../shared/globals.service";
 
 @Component({
   selector: 'app-bestpractice',
@@ -38,7 +39,10 @@ export class BestpracticeComponent implements OnInit {
   ips = '';
   applyType = '1';
 
-  constructor(private cdr: ChangeDetectorRef, private http: HttpClient, private commonService: CommonService) { }
+  constructor(private cdr: ChangeDetectorRef,
+              public gs: GlobalsService,
+              private http: HttpClient,
+              private commonService: CommonService) { }
 
   ngOnInit(): void {
   }
@@ -89,7 +93,9 @@ export class BestpracticeComponent implements OnInit {
    * @param params
    */
   applyPractice(params){
+    this.gs.loading = true;
     this.http.post('v1/bestpractice/update/bylist', params).subscribe((result: any) => {
+      this.gs.loading = false;
       if (result.code == '200'){
         this.practiceRefresh();
       }
@@ -133,7 +139,9 @@ export class BestpracticeComponent implements OnInit {
   }
 
   recheck() {
+    this.gs.loading = true;
     this.http.post('v1/bestpractice/check', {}).subscribe((result: any) => {
+      this.gs.loading = false;
     }, err => {
       console.error('ERROR', err);
     });
