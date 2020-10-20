@@ -29,6 +29,8 @@ import javax.servlet.http.HttpServletResponse;
 @RestController
 public class ApplicationController {
 
+  private String zipFile=".zip";
+
   @RequestMapping(value = "rest", method = RequestMethod.GET)
   public Map onload(HttpServletRequest request, HttpServletResponse response)
       throws UnsupportedEncodingException {
@@ -114,7 +116,7 @@ public class ApplicationController {
   public void getPackage(HttpServletResponse response, @PathVariable String zipName)
       throws IOException {
     File file;    
-    if (zipName.endsWith(".zip")) {
+    if (zipName.endsWith(zipFile)) {
         file = new File(zipName);
     } else {
         file = new File(zipName + ".zip");

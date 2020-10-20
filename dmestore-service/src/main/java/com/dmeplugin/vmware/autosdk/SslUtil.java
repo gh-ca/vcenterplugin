@@ -116,7 +116,7 @@ public class SslUtil {
 
             // Create the SSL context
             SSLContext sc =
-                    SSLContext.getInstance("SSL");
+                    SSLContext.getInstance("TLS");
 
             // Create the session context
             javax.net.ssl.SSLSessionContext sslsc =
