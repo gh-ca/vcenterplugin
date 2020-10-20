@@ -2,6 +2,7 @@ package com.dmeplugin.dmestore.utils;
 
 
 import com.dmeplugin.dmestore.exception.VcenterException;
+import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -36,7 +37,7 @@ public class FileUtils {
   private static String PATH = null;
 
   public static String getKey(String fileName) {
-    File file = new File(getPath() + File.separator + fileName);
+    File file = new File(getPath() + File.separator + FilenameUtils.getName(fileName));
     createFile(file);
     String line = null;
     StringBuffer result = new StringBuffer();
@@ -83,7 +84,7 @@ public class FileUtils {
   }
 
   public static void saveKey(String key, String fileName) {
-    File file = new File(getPath() + File.separator + fileName);
+    File file = new File(getPath() + File.separator + FilenameUtils.getName(fileName));
     createFile(file);
     FileOutputStream f = null;
     OutputStreamWriter out = null;

@@ -2,6 +2,7 @@ package com.dmeplugin.vcenter;
 
 import com.dmeplugin.vcenter.utils.Validations;
 
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,6 +29,8 @@ import javax.servlet.http.HttpServletResponse;
  */
 @RestController
 public class ApplicationController {
+
+  private String zipFile=".zip";
 
   @RequestMapping(value = "rest", method = RequestMethod.GET)
   public Map onload(HttpServletRequest request, HttpServletResponse response)
@@ -114,10 +117,10 @@ public class ApplicationController {
   public void getPackage(HttpServletResponse response, @PathVariable String zipName)
       throws IOException {
     File file;    
-    if (zipName.endsWith(".zip")) {
-        file = new File(zipName);
+    if (zipName.endsWith(zipFile)) {
+        file = new File(FilenameUtils.getName(zipName));
     } else {
-        file = new File(zipName + ".zip");
+        file = new File(FilenameUtils.getName(zipName + ".zip"));
     }    
     response.setContentType("application/zip");
     response.setContentLengthLong(file.length());

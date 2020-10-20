@@ -26,6 +26,16 @@ import org.springframework.http.HttpMethod;
  */
 public class Validations {
 
+  private static String httpsstart="https://";
+
+  private static String errorCode="-99999";
+
+  private static String hasKeepData="1";
+
+  private static String noHa="-1";
+
+  private static String noService="-70001";
+
   protected static final Logger LOGGER = LoggerFactory.getLogger(Validations.class);
 
   private static final String RESTURL_VCENTERACTION = "https://%s/ui/dmestore/rest/registerservice/pluginaction";
@@ -44,7 +54,7 @@ public class Validations {
 
   public static Map onSubmit(String packageUrl, String vcenterUsername, String vcenterPassword,
                              String vcenterIp, String vcenterPort, String version, String dmeip, String dmeport, String dmeusername, String dmepassword) {
-    if (!packageUrl.startsWith("https://")) {
+    if (!packageUrl.startsWith(httpsstart)) {
       return Collections.singletonMap("error", "E002");
     }
     if ((vcenterIp == null) || (vcenterIp.isEmpty())) {
@@ -136,7 +146,7 @@ public class Validations {
     String pluginKey = "com.dme.vcenterpluginui";
     boolean removeData = false;
     LOGGER.info("Removing vCenter plugin data, please wait patiently...");
-    if (keepData != null && !"1".equals(keepData)) {
+    if (keepData != null && !hasKeepData.equals(keepData)) {
       removeData = true;
     }
     String response = vcenteraction(vcenterIp, vcenterUsername, vcenterPassword, vcenterPort, "uninstall",
@@ -145,15 +155,15 @@ public class Validations {
       try {
         Map<String, Object> result = JSON_PARSER.parseMap(response);
         String resultCode = (String) result.get("code");
-        if ("-99999".equals(resultCode)) {
+        if (errorCode.equals(resultCode)) {
          
           LOGGER.info( (String) result.get("description"));
-        } else if ("-1".equals(resultCode)) {
+        } else if (noHa.equals(resultCode)) {
           LOGGER.info("No HA provider can be removed.");
           VcenterRegisterRunner.unRegister(vcenterIp, vcenterPort, vcenterUsername,
               vcenterPassword, pluginKey);
           // DB Exceptions
-        } else if ("-70001".equals(resultCode)) {
+        } else if (noService.equals(resultCode)) {
           LOGGER.info("No service to uninstall provider");
           VcenterRegisterRunner.unRegister(vcenterIp, vcenterPort, vcenterUsername,
               vcenterPassword, pluginKey);
@@ -179,7 +189,7 @@ public class Validations {
                                      String vcenterPassword, String vcenterPort, String action, boolean removeData, String dmeIp, String dmePort, String dmeUsername, String dmePassword) {
     String result = null;
     try {
-      Map<String, String> bodyParamMap = new HashMap<String, String>();
+      Map<String, String> bodyParamMap = new HashMap<String, String>(12);
       bodyParamMap.put("vcenterIP",vcenterIp);
       bodyParamMap.put("vcenterPort",vcenterPort);
       bodyParamMap.put("vcenterUsername", vcenterUsername);
@@ -209,7 +219,7 @@ public class Validations {
   }
 
   public static Map onloadChecker(HttpServletRequest request) {
-    Map<String, Object> returnMap = new HashMap<>();
+    Map<String, Object> returnMap = new HashMap<>(10);
 
     File keyFile = new File(Constants.KEYSTORE_FILE);
     if (!keyFile.exists()) {
