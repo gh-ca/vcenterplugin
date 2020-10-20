@@ -495,7 +495,8 @@
     "speed": "Working Rate(Mbps)",
     "hStatus": "Health Status",
     "cStatus": "Connect Status",
-    "ports": "Please Select Storage Device Ports"
+    "ports": "Please Select Storage Device Ports",
+    "portNullMessage": "Port is not be Empty!"
   },
   "rdm": {
     "name": "Name",
