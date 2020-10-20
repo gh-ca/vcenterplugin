@@ -39,7 +39,7 @@ public class ToolUtils {
                 re = obj.toString();
             }
         } catch (Exception e) {
-            LOG.error("error:" + e.toString());
+            LOG.error("getStr error:" + e.toString());
         }
         return re;
     }
@@ -51,7 +51,7 @@ public class ToolUtils {
                 re = Integer.parseInt(obj.toString());
             }
         } catch (Exception e) {
-            LOG.error("error:" + e.toString());
+            LOG.error("getInt error:" + e.toString());
         }
         return re;
     }
@@ -63,7 +63,7 @@ public class ToolUtils {
                 re = Integer.parseInt(obj.toString());
             }
         } catch (Exception e) {
-            LOG.error("error:"+e.toString());
+            LOG.error("getInt2 error:"+e.toString());
         }
         return re;
     }
@@ -75,7 +75,7 @@ public class ToolUtils {
                 re = Double.parseDouble(obj.toString());
             }
         } catch (Exception e) {
-            LOG.error("error:" + e.toString());
+            LOG.error("getDouble error:" + e.toString());
         }
         return re;
     }
@@ -87,7 +87,7 @@ public class ToolUtils {
                 re = Long.parseLong(obj.toString());
             }
         } catch (Exception e) {
-            LOG.error("error:" + e.toString());
+            LOG.error("getLong error:" + e.toString());
         }
         return re;
     }
@@ -95,11 +95,11 @@ public class ToolUtils {
     public static String jsonToStr(JsonElement obj) {
         String re = "";
         try {
-            if (!StringUtils.isEmpty(obj)) {
+            if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsString();
             }
         } catch (Exception e) {
-            LOG.error("error:" + e.toString());
+            LOG.error("jsonToStr error:" + e.toString());
         }
         return re;
     }
@@ -111,7 +111,7 @@ public class ToolUtils {
                 re = obj.getAsString();
             }
         } catch (Exception e) {
-            LOG.error("error:" + e.toString());
+            LOG.error("jsonToOriginalStr error:" + e.toString());
         }
         return re;
     }
@@ -119,11 +119,11 @@ public class ToolUtils {
     public static String jsonToStr(JsonElement obj, String defaultValue) {
         String re = defaultValue;
         try {
-            if (!StringUtils.isEmpty(obj)) {
+            if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsString();
             }
         } catch (Exception e) {
-            LOG.error("error:" + e.toString());
+            LOG.error("jsonToStr2 error:" + e.toString());
         }
         return re;
     }
@@ -136,7 +136,7 @@ public class ToolUtils {
                 re = obj.getAsInt();
             }
         } catch (Exception e) {
-            LOG.error("error:" + e.toString());
+            LOG.error("jsonToInt error:" + e.toString());
         }
         return re;
     }
@@ -148,7 +148,7 @@ public class ToolUtils {
                 re = obj.getAsInt();
             }
         } catch (Exception e) {
-            LOG.error("error:" + e.toString());
+            LOG.error("jsonToInt2 error:" + e.toString());
         }
         return re;
     }
@@ -160,7 +160,7 @@ public class ToolUtils {
                 re = obj.getAsLong();
             }
         } catch (Exception e) {
-            LOG.error("error:" + e.toString());
+            LOG.error("jsonToLon error:" + e.toString());
         }
         return re;
     }
@@ -172,7 +172,7 @@ public class ToolUtils {
                 re = obj.getAsDouble();
             }
         } catch (Exception e) {
-            LOG.error("error:" + e.toString());
+            LOG.error("jsonToDou error:" + e.toString());
         }
         return re;
     }
@@ -184,7 +184,7 @@ public class ToolUtils {
                 re = obj.getAsDouble();
             }
         } catch (Exception e) {
-            LOG.error("error:" + e.toString());
+            LOG.error("jsonToDou2 error:" + e.toString());
         }
         return re;
     }
@@ -196,7 +196,7 @@ public class ToolUtils {
                 re = obj.getAsFloat();
             }
         } catch (Exception e) {
-            LOG.error("error:" + e.toString());
+            LOG.error("jsonToFloat error:" + e.toString());
         }
         return re;
     }
@@ -208,7 +208,7 @@ public class ToolUtils {
                 re = obj.getAsFloat();
             }
         } catch (Exception e) {
-            LOG.error("error:" + e.toString());
+            LOG.error("jsonToFloat2 error:" + e.toString());
         }
         return re;
     }
@@ -216,11 +216,11 @@ public class ToolUtils {
     public static boolean jsonToBoo(JsonElement obj) {
         boolean re = false;
         try {
-            if (!StringUtils.isEmpty(obj)) {
+            if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsBoolean();
             }
         } catch (Exception e) {
-            LOG.error("error:" + e.toString());
+            LOG.error("jsonToBoo error:" + e.toString());
         }
         return re;
     }
@@ -246,7 +246,7 @@ public class ToolUtils {
                 re = true;
             }
         } catch (Exception e) {
-            LOG.error("error:" + e.toString());
+            LOG.error("jsonIsNull error:" + e.toString());
         }
         return re;
     }
@@ -258,7 +258,7 @@ public class ToolUtils {
                 re = sdf.format(new Date(Long.parseLong(String.valueOf(obj.getAsBigInteger()))));
             }
         } catch (Exception e) {
-            LOG.error("error:" + e.toString());
+            LOG.error("jsonToDateStr error:" + e.toString());
         }
         return re;
     }
