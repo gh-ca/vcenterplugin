@@ -1414,6 +1414,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         if (!dmeDeleteFlag) {
             throw new Exception("delete volume precondition unmount host and hostGroup error(task status)!");
         }
+        //重新扫描关联关系 更新数据库
+        scanVmfs();
     }
 
     private ResponseEntity queryVmfsById(String volumeId) throws Exception {

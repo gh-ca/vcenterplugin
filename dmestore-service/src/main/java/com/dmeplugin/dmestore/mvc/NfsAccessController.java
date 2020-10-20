@@ -146,7 +146,25 @@ public class NfsAccessController extends BaseController {
         return failure(failureStr);
     }
 
+    @RequestMapping(value = "/gethostsbystorageid/{storageId}", method = RequestMethod.GET)
+    public ResponseBodyBean getHostsByStorageId(@PathVariable(value = "storageId") String storageId) throws Exception {
+        try {
+            List<Map<String, Object>> hosts = dmeNfsAccessService.getHostsMountDataStoreByDsObjectId(storageId);
+            return success(hosts);
+        } catch (Exception e) {
+            return failure(e.getMessage());
+        }
+    }
 
+    @RequestMapping(value = "/gethostgroupsbystorageid/{storageId}", method = RequestMethod.GET)
+    public ResponseBodyBean getHostGroupsByStorageId(@PathVariable(value = "storageId") String storageId) throws Exception {
+        try {
+            List<Map<String, Object>> hosts = dmeNfsAccessService.getClusterMountDataStoreByDsObjectId(storageId);
+            return success(hosts);
+        } catch (Exception e) {
+            return failure(e.getMessage());
+        }
+    }
 
 
 }
