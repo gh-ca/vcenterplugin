@@ -8,6 +8,7 @@ import {LogicPort, StorageList, StorageService} from '../storage/storage.service
 import {StoragePool} from "../storage/detail/detail.service";
 import {ClrWizard, ClrWizardPage} from "@clr/angular";
 import {VmfsListService} from "../vmfs/list/list.service";
+import {Router} from "@angular/router";
 @Component({
   selector: 'app-nfs',
   templateUrl: './nfs.component.html',
@@ -28,22 +29,17 @@ export class NfsComponent implements OnInit {
   popShow = false; // 弹出层显示
   expand = false; // 扩容弹出框
   reduceOpen = false; // 缩容
-  mountShow = false; // 挂载
   delShow = false; // 删除提示
   unmountShow = false; // 卸载提示
   mountObj = '1';
   fsIds = [];
   addForm = new AddNfs();
   unit='GB';
-  selectHost = [];
   hostLoading = true;
-  currentData = new ModifyNfs();
   hostList: Host[] = [];
   vmkernelList: Vmkernel[]=[];
   //vmkernel:any;
   checkedPool:any;
-  clusterList: Cluster[] = [];
-  mountForm = new Mount();
   storageList: StorageList[] = [];
   storagePools: StoragePool[] = [];
   logicPorts: LogicPort[] = [];
@@ -56,7 +52,7 @@ export class NfsComponent implements OnInit {
 
   errMessage = '';
   constructor(private remoteSrv: NfsService, private cdr: ChangeDetectorRef, public gs: GlobalsService ,
-              private storageService: StorageService,private vmfsListService: VmfsListService) { }
+              private storageService: StorageService,private vmfsListService: VmfsListService,private router:Router) { }
   ngOnInit(): void {
   }
   // 获取nfs列表
@@ -333,38 +329,20 @@ export class NfsComponent implements OnInit {
 
   // 挂载
   mount(){
-    if (this.rowSelected.length === 1) {
-      this.mountForm = new Mount();
-      this.mountForm.dataStoreName = this.rowSelected[0].name;
-      this.mountForm.dataStoreObjectId = this.rowSelected[0].objectid;
-      this.remoteSrv.getHostListByObjectId(this.rowSelected[0].objectid).subscribe((r: any) => {
-        if (r.code === '200'){
-          this.hostList = r.data;
-          this.cdr.detectChanges();
-        }
-      });
-      this.remoteSrv.getClusterListByObjectId(this.rowSelected[0].objectid).subscribe((r: any) => {
-        if (r.code === '200'){
-          this.clusterList = r.data;
-          this.cdr.detectChanges();
-        }
-      });
-      this.mountShow = true;
-    }
+    this.jumpPage(this.rowSelected[0].objectid,"nfs/dataStore/mount");
   }
-  // 挂载提交
-  mountSubmit(){
-    this.remoteSrv.mountNfs(this.mountForm).subscribe((result: any) => {
-      if (result.code  ===  '200'){
-        this.mountShow = false;
-        this.mountForm = new Mount();
+  jumpPage(objectId:string,url:string){
+    const flag = 'plugin';
+    this.router.navigate([url],{
+      queryParams:{
+        objectId,flag
       }
     });
   }
   // 卸载按钮点击事件
   unmountBtnFunc() {
-    if (this.rowSelected.length === 1) {
-      this.unmountShow=true;
+    if(this.rowSelected!=null && this.rowSelected.length==1){
+      this.jumpPage(this.rowSelected[0].objectid,"nfs/dataStore/unmount");
     }
   }
   // 卸载
