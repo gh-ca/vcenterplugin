@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services.bestpractice;
 
+import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.dmeplugin.vmware.mo.DatastoreMO;
 import com.dmeplugin.vmware.mo.HostMO;
@@ -7,6 +8,7 @@ import com.dmeplugin.vmware.util.Pair;
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.vmware.vim25.DatastoreSummary;
 import com.vmware.vim25.ManagedObjectReference;
 
 import java.util.List;
@@ -31,23 +33,23 @@ public class NumberOfVolumesInDatastoreImpl extends BaseBestPracticeService impl
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = new HostMO(context, mor);
         List<Pair<ManagedObjectReference, String>> datastoreMountsOnHost = hostMo.getDatastoreMountsOnHost();
-        int volumeCount = 0;
         JsonArray array = new JsonArray();
         for (Pair<ManagedObjectReference, String> pair : datastoreMountsOnHost) {
             ManagedObjectReference dsMor = pair.first();
             DatastoreMO datastoreMo = new DatastoreMO(context, dsMor);
-            String dataStoreName = datastoreMo.getSummary().getName();
-            int volumeSize = datastoreMo.getVmfsDatastoreInfo().getVmfs().getExtent().size();
-            JsonObject object = new JsonObject();
-            object.addProperty("dataStoreName", dataStoreName);
-            object.addProperty("volumeSize", volumeSize);
-            volumeCount = volumeCount + volumeSize;
-
-            array.add(object);
+            DatastoreSummary summary = datastoreMo.getSummary();
+            if (summary.getType().equals(ToolUtils.STORE_TYPE_VMFS)) {
+                JsonObject object = new JsonObject();
+                int volumeSize = datastoreMo.getVmfsDatastoreInfo().getVmfs().getExtent().size();
+                if (volumeSize > Integer.parseInt(getRecommendValue().toString())) {
+                    object.addProperty("dataStoreName", summary.getName());
+                    object.addProperty("volumeSize", volumeSize);
+                }
+                array.add(object);
+            }
         }
 
         JsonObject reObject = new JsonObject();
-        reObject.addProperty("volumeCount", volumeCount);
         reObject.add("dataStores", array);
         return reObject.toString();
     }
@@ -76,10 +78,13 @@ public class NumberOfVolumesInDatastoreImpl extends BaseBestPracticeService impl
         for (Pair<ManagedObjectReference, String> pair : datastoreMountsOnHost) {
             ManagedObjectReference dsMor = pair.first();
             DatastoreMO datastoreMo = new DatastoreMO(context, dsMor);
-            int volumeSize = datastoreMo.getVmfsDatastoreInfo().getVmfs().getExtent().size();
-            //只要有一个存储对应的卷超过推荐值就认为该主机不满足最佳实践
-            if (volumeSize > Integer.parseInt(getRecommendValue().toString())) {
-                return false;
+            DatastoreSummary summary = datastoreMo.getSummary();
+            if (summary.getType().equals(ToolUtils.STORE_TYPE_VMFS)) {
+                int volumeSize = datastoreMo.getVmfsDatastoreInfo().getVmfs().getExtent().size();
+                //只要有一个存储对应的卷超过推荐值就认为该主机不满足最佳实践
+                if (volumeSize > Integer.parseInt(getRecommendValue().toString())) {
+                    return false;
+                }
             }
         }
         return true;
