@@ -20,6 +20,7 @@ import { environment } from '@env/environment';
 
 import { SettingsService, AppSettings } from '@core';
 import { AppDirectionality } from '@shared';
+import { GlobalsService }     from "../../shared/globals.service";
 
 const MOBILE_MEDIAQUERY = 'screen and (max-width: 599px)';
 const TABLET_MEDIAQUERY = 'screen and (min-width: 600px) and (max-width: 959px)';
@@ -36,6 +37,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
   //@ViewChild('content', { static: true }) content: MatSidenavContent;
   env = environment
   options = this.settings.getOptions();
+  loading = this.gs.loading
 
   private layoutChangesSubscription: Subscription;
 
@@ -69,7 +71,8 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
     private element: ElementRef,
     private settings: SettingsService,
     @Optional() @Inject(DOCUMENT) private document: Document,
-    @Inject(Directionality) public dir: AppDirectionality
+    @Inject(Directionality) public dir: AppDirectionality,
+    public gs: GlobalsService
   ) {
     this.dir.value = this.options.dir;
     this.document.body.dir = this.dir.value;

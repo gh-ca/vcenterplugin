@@ -269,16 +269,19 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
                     //获取fs信息
                     boolean withFs = false;
-                    Map<String, Object> fsInfo = queryFsInfo(storage_id, fsName);
-                    if (null != fsInfo && fsInfo.size() > 0) {
-                        String id = ToolUtils.getStr(fsInfo.get("id"));
-                        String name = ToolUtils.getStr(fsInfo.get("name"));
-                        relation.setFsId(id);
-                        relation.setFsName(name);
-                        withFs = true;
-                    } else {
-                        LOG.warn("NFSDATASTORE id:" + storage_id + " contains fs is null!");
+                    if(!StringUtils.isEmpty(fsName)){
+                        Map<String, Object> fsInfo = queryFsInfo(storage_id, fsName);
+                        if (null != fsInfo && fsInfo.size() > 0) {
+                            String id = ToolUtils.getStr(fsInfo.get("id"));
+                            String name = ToolUtils.getStr(fsInfo.get("name"));
+                            relation.setFsId(id);
+                            relation.setFsName(name);
+                            withFs = true;
+                        } else {
+                            LOG.warn("NFSDATASTORE id:" + storage_id + " contains fs is null!");
+                        }
                     }
+
                     if (withFs || withShare || withLogicPort) {
                         relationList.add(relation);
                     }
@@ -375,6 +378,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             shareMap.put("device_name", ToolUtils.jsonToStr(jsonObject.get("device_name")));
             shareMap.put("owning_dtree_id", ToolUtils.jsonToStr(jsonObject.get("owning_dtree_id")));
             shareMap.put("owning_dtree_name", ToolUtils.jsonToStr(jsonObject.get("owning_dtree_name")));
+            shareMap.put("fs_name", ToolUtils.jsonToStr(jsonObject.get("fs_name")));
             shareList.add(shareMap);
         }
         return shareList;
