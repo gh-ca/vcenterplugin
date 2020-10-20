@@ -480,7 +480,9 @@
     "info": "提示",
     "warning": "次要",
     "major": "重要",
-    "tipmessage": "修改主机配置，您需要重启主机，IP:"
+    "tipmessage": "修改主机配置，您需要重启主机，IP:",
+    "syncSuccess": "同步成功",
+    "syncFail": "同步失败"
   },
   "iscsi": {
     "hostIp": "主机VmKernel IP",

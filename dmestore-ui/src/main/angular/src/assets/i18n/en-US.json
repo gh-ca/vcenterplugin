@@ -477,7 +477,9 @@
     "info": "Info",
     "warning": "Warning",
     "major": "Major",
-    "tipmessage": "Modify Host Config,You need Reboot Host,IP:"
+    "tipmessage": "Modify Host Config,You need Reboot Host,IP:",
+    "syncSuccess": "Sync Success",
+    "syncFail": "Sync Failed"
   },
   "iscsi": {
     "hostIp": "Host VmKernel IP",
