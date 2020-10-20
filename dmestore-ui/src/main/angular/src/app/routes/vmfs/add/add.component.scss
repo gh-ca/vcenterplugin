@@ -147,3 +147,10 @@
   border-bottom: 1px solid #DDDDDD;
   font-weight: normal;
 }
+.add-wizard-wrap ::ng-deep .modal-backdrop{
+  display: none;
+}
+.add-wizard-wrap ::ng-deep .modal{
+  padding: 0;
+  position: initial;
+}
