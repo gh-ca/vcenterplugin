@@ -455,68 +455,6 @@
       <button type="button" class="btn btn-primary" (click)="reduceCommit()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
-  <!--挂载弹窗-->
-  <clr-modal [(clrModalOpen)]="mountShow">
-    <h3 class="modal-title">{{'nfs.mount.mount' | translate}}</h3>
-    <div class="modal-body">
-      <form *ngIf="rowSelected.length === 1" clrForm>
-
-        <clr-radio-container clrInline>
-          <label class="floatleft">{{'nfs.mount.mountObj' | translate}}</label>
-          <clr-radio-wrapper>
-            <input type="radio" clrRadio name="controlPolicy" value="1" [(ngModel)]="mountObj" ng-checked="true"/>
-            <label>{{'nfs.mount.host' | translate}}</label>
-          </clr-radio-wrapper>
-          <clr-radio-wrapper>
-            <input type="radio" clrRadio name="controlPolicy" value="2"  [(ngModel)]="mountObj" />
-            <label>{{'nfs.mount.cluster' | translate}}</label>
-          </clr-radio-wrapper>
-        </clr-radio-container>
-
-
-
-        <clr-combobox-container *ngIf="mountObj==='1'">
-          <label>{{'nfs.mount.host' | translate}}</label>
-          <clr-combobox [(ngModel)]="mountForm.hosts" name="hosts" clrMulti="true" required>
-            <ng-container *clrOptionSelected="let selected">
-              <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon> {{selected?.hostName}}
-            </ng-container>
-            <clr-options>
-              <clr-option *clrOptionItems="let state of hostList; field:'hostName'" [clrValue]="state">
-                <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon>{{state.hostName}}
-              </clr-option>
-            </clr-options>
-          </clr-combobox>
-        </clr-combobox-container>
-
-        <clr-combobox-container *ngIf="mountObj==='2'">
-          <label>{{'nfs.mount.cluster' | translate}}</label>
-          <clr-combobox [(ngModel)]="mountForm.clusters" name="clusters" clrMulti="true" required>
-            <ng-container *clrOptionSelected="let selected">
-              <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon> {{selected?.clusterName}}
-            </ng-container>
-            <clr-options>
-              <clr-option *clrOptionItems="let state of clusterList; field:'clusterName'" [clrValue]="state">
-                <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon>{{state.clusterName}}
-              </clr-option>
-            </clr-options>
-          </clr-combobox>
-        </clr-combobox-container>
-
-        <clr-select-container>
-          <label>{{'nfs.mount.mountType' | translate}}</label>
-          <select clrSelect [(ngModel)]="mountForm.mountType" name="mountType">
-            <option value="readOnly">{{'nfs.mount.readOnly' | translate}}</option>
-            <option value="readWrite">{{'nfs.mount.readWrite' | translate}}</option>
-          </select>
-        </clr-select-container>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline" (click)="mountShow = false">{{'menu.cancel' | translate}}</button>
-          <button type="button" class="btn btn-primary" (click)="mountSubmit()">{{'menu.ok' | translate}}</button>
-        </div>
-      </form>
-    </div>
-  </clr-modal>
   <!--删除提示-->
   <clr-modal [(clrModalOpen)]="delShow" [clrModalSize]="'sm'">
     <h3 class="modal-title">{{'nfs.del.title' | translate}}</h3>
@@ -528,7 +466,7 @@
       <button type="button" class="btn btn-primary" (click)="delNfs()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
-<!--卸载提示-->
+  <!--卸载提示-->
   <clr-modal [(clrModalOpen)]="unmountShow" [clrModalSize]="'sm'">
     <h3 class="modal-title">{{'nfs.unmount.title' | translate}}</h3>
     <div class="modal-body">
