@@ -22,13 +22,11 @@ public class ZipUtils {
         BufferedReader br = null;
         String version = null;
         InputStreamReader inr = null;
-
         try {
             zf = new ZipFile(file);
             fin = new FileInputStream(file);
             in = new BufferedInputStream(fin);
             zin = new ZipInputStream(in);
-
             while(true) {
                 ZipEntry ze;
                 do {
@@ -38,10 +36,8 @@ public class ZipUtils {
                         }
                     } while(ze.isDirectory());
                 } while(!"plugin-package.xml".equals(ze.getName()));
-
                 inr = new InputStreamReader(zf.getInputStream(ze),"utf-8");
                 br = new BufferedReader(inr);
-
                 String line;
                 while((line = br.readLine()) != null) {
                     if(line.startsWith("<pluginPackage") && line.contains("version=\"")) {
@@ -60,7 +56,6 @@ public class ZipUtils {
                     var.printStackTrace();
                 }
             }
-
             if(br != null) {
                 try {
                 br.close();
@@ -68,23 +63,8 @@ public class ZipUtils {
                     var.printStackTrace();
                 }
             }
-
-            if(zin != null) {
-                try {
-                zin.close();
-                } catch (Exception var) {
-                    var.printStackTrace();
-                }
-            }
-
-            if(in != null) {
-                try {
-                in.close();
-                } catch (Exception var) {
-                    var.printStackTrace();
-                }
-            }
-
+            closeInputStream(zin);
+            closeInputStream(in);
             if(inr != null){
                 try {
                 inr.close();
@@ -92,15 +72,7 @@ public class ZipUtils {
                     var.printStackTrace();
                 }
             }
-
-            if(fin != null){
-                try {
-                fin.close();
-                } catch (Exception var) {
-                    var.printStackTrace();
-                }
-            }
-
+            closeInputStream(fin);
             if(zf != null){
                 try {
                 zf.close();
@@ -109,7 +81,16 @@ public class ZipUtils {
                 }
             }
         }
-
         return version;
+    }
+
+    private static void closeInputStream(InputStream inputStream){
+        if(inputStream != null){
+            try {
+                inputStream.close();
+            } catch (Exception var) {
+                var.printStackTrace();
+            }
+        }
     }
 }

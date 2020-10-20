@@ -11,7 +11,7 @@ import com.vmware.automatic.plugin.registration.PluginRegistrationMain;
 public class VcenterRegisterRunner {
 	public static void run(String version, String packageUrl, String serverThumbprint, String vcenterIp,
 						   String vcenterPort, String username, String password, String key) {
-		Map<String, String> unRegParamMap = new HashMap();
+		Map<String, String> unRegParamMap = new HashMap(10);
 		unRegParamMap.put("-action", "unregisterPlugin");
 		unRegParamMap.put("-username", username);
 		unRegParamMap.put("-password", password);
@@ -20,7 +20,7 @@ public class VcenterRegisterRunner {
 
 		PluginRegistrationMain.main(convertMapToArray(unRegParamMap));
 
-		Map<String, String> regParamMap = new HashMap();
+		Map<String, String> regParamMap = new HashMap(12);
 		regParamMap.put("-action", "registerPlugin");
 		regParamMap.put("-username", username);
 		regParamMap.put("-password", password);
@@ -36,7 +36,7 @@ public class VcenterRegisterRunner {
 
 	public static void unRegister(String vcenterIp,
 								  String vcenterPort, String username, String password, String key) {
-		Map<String, String> unRegParamMap = new HashMap();
+		Map<String, String> unRegParamMap = new HashMap(10);
 		unRegParamMap.put("-action", "unregisterPlugin");
 		unRegParamMap.put("-username", username);
 		unRegParamMap.put("-password", password);
