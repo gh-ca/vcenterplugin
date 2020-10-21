@@ -24,6 +24,7 @@ import java.util.List;
 
 
 import com.dmeplugin.dmestore.exception.VcenterException;
+import com.dmeplugin.dmestore.exception.VcenterRuntimeException;
 import com.dmeplugin.dmestore.utils.StringUtil;
 import com.dmeplugin.vmware.util.Pair;
 import com.dmeplugin.vmware.util.VmwareContext;

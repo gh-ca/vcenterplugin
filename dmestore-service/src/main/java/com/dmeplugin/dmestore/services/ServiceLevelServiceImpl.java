@@ -1,7 +1,9 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.entity.VCenterInfo;
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.exception.VcenterException;
+import com.dmeplugin.dmestore.exception.VcenterRuntimeException;
 import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.utils.CipherUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
@@ -89,11 +91,11 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     }
 
     @Override
-    public Map<String, Object> listServiceLevel(Map<String, Object> params) {
-        Map<String, Object> remap = new HashMap<>();
-        remap.put("code", 200);
-        remap.put("message", "list serviceLevel success!");
-        remap.put("data", params);
+    public List<SimpleServiceLevel> listServiceLevel(Map<String, Object> params) throws DMEException {
+        //Map<String, Object> remap = new HashMap<>();
+        //remap.put("code", 200);
+        //remap.put("message", "list serviceLevel success!");
+        //remap.put("data", params);
 
         ResponseEntity responseEntity;
         List<SimpleServiceLevel> slis;
@@ -101,31 +103,33 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             responseEntity = dmeAccessService.access(LIST_SERVICE_LEVEL_URL, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (200 != code) {
-                remap.put("code", 503);
-                remap.put("message", "list serviceLevel response error!");
-                return remap;
+                //remap.put("code", 503);
+                //remap.put("message", "list serviceLevel response error!");
+                //return remap;
+                throw new DMEException("503","list serviceLevel response error!");
             }
             Object object = responseEntity.getBody();
             slis = convertBean(object);
-            if (slis.size() > 0) {
+           /* if (slis.size() > 0) {
                 Map<String, List<SimpleServiceLevel>> slMap = new HashMap<>();
                 slMap.put("service-levels", slis);
                 remap.put("data", slMap);
             } else {
                 remap.put("data", object);
-            }
+            }*/
         } catch (Exception e) {
             log.error("list serviceLevel error", e);
             String message = e.getMessage();
-            remap.put("code", 503);
-            remap.put("message", message);
-            return remap;
+            //remap.put("code", 503);
+            //remap.put("message", message);
+            //return remap;
+            throw new DMEException("503",e.getMessage());
         }
-        return remap;
+        return slis;
     }
 
     @Override
-    public void updateVmwarePolicy() {
+    public void updateVmwarePolicy() throws DMEException {
         try {
             SessionHelper sessionHelper = new SessionHelper();
             VCenterInfo vCenterInfo = vCenterInfoService.getVCenterInfo();
@@ -185,6 +189,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             }
         } catch (Exception e) {
             log.error("list serviceLevel error", e);
+            throw new DMEException("503","update service level error"+e.getMessage());
         }
     }
 
@@ -387,12 +392,10 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return value;
     }
 
-    private List<StoragePool> getStoragePoolInfosByStorageIdStoragePoolIds(String storageDeviceId, List<String> storagePoolIds) {
+    private List<StoragePool> getStoragePoolInfosByStorageIdStoragePoolIds(String storageDeviceId, List<String> storagePoolIds) throws DMEException {
         List<StoragePool> sps = new ArrayList<>();
-        Map<String, Object> resp = dmeStorageService.getStoragePools(storageDeviceId, "all");
-        String code = resp.get("code").toString();
-        if ("200".equals(code)) {
-            List<StoragePool> storagePools = (List<StoragePool>) resp.get("data");
+        List<StoragePool> storagePools = dmeStorageService.getStoragePools(storageDeviceId, "all");
+
             for (StoragePool sp : storagePools) {
                 // String poolId = sp.getStorage_pool_id();
                 String poolId = sp.getStorageInstanceId();
@@ -400,7 +403,6 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                     sps.add(sp);
                 }
             }
-        }
         return sps;
     }
 

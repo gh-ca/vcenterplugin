@@ -30,14 +30,28 @@ export class MountService {
   mountVmfs(params = {}) {
     return  this.http.post('accessvmfs/mountvmfs', params);
   }
+
+  // 通过objectId获取主机
+  getHostListByObjectId(objectId: string){
+    return this.http.get('accessvmware/gethostsbydsobjectid?dataStoreObjectId=' + objectId);
+  }
+  // 通过objectId获取集群
+  getClusterListByObjectId(objectId: string){
+    return this.http.get('accessvmware/getclustersbydsobjectid?dataStoreObjectId=' + objectId);
+  }
+
+  // 卸载
+  unmountVMFS(params = {}) {
+    return  this.http.post('/accessvmfs/ummountvmfs', params);
+  }
 }
 
 export interface DataStore {
-  "freeSpace": string;
-  "name": string;
-  "id": string;
-  "type": string;
-  "objectId": string;
-  "status": boolean,
-  "capacity": number
+  'freeSpace': string;
+  'name': string;
+  'id': string;
+  'type': string;
+  'objectId': string;
+  'status': boolean;
+  'capacity': number;
 }

@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {
-  AddNfs, Cluster, FileSystem, Host, List, ModifyNfs, Mount, NfsDetail, NfsService, Share, ShareClient, UpdateNfs,
+  AddNfs,Host, List,NfsDetail, NfsService,UpdateNfs,
   Vmkernel
 } from './nfs.service';
 import {GlobalsService} from '../../shared/globals.service';
@@ -22,27 +22,14 @@ export class NfsComponent implements OnInit {
   total = 0; // 总数据数量
   isLoading = true; // table数据loading
   rowSelected = []; // 当前选中数据
-  oldCapacity = 0;
-  newCapacity = 0;
   // ==========弹窗参数=======
   modifyShow = false;
-  popShow = false; // 弹出层显示
   expand = false; // 扩容弹出框
-  reduceOpen = false; // 缩容
-  delShow = false; // 删除提示
-  unmountShow = false; // 卸载提示
   mountObj = '1';
   fsIds = [];
-  addForm = new AddNfs();
   unit='GB';
-  hostLoading = true;
   hostList: Host[] = [];
-  vmkernelList: Vmkernel[]=[];
-  //vmkernel:any;
-  checkedPool:any;
-  storageList: StorageList[] = [];
   storagePools: StoragePool[] = [];
-  logicPorts: LogicPort[] = [];
   nfsDetail: NfsDetail;
   updateNfs: UpdateNfs = new UpdateNfs();
   // 添加页面窗口
@@ -95,95 +82,12 @@ export class NfsComponent implements OnInit {
   }
 
   addView(){
-    this.addForm = new AddNfs();
-    this.checkedPool= null;
-    // 添加页面默认打开首页
-    this.jumpTo(this.addPageOne, this.wizard);
-    this.errMessage='';
-    // 获取存储列表
-    this.storageService.getData().subscribe((s: any) => {
-       if (s.code === '200'){
-        this.storageList = s.data.data;
-        }
-    });
-    this.remoteSrv.getHostList().subscribe((r: any) => {
-      if (r.code === '200'){
-        this.hostList = r.data;
-        this.hostLoading = false;
-        this.cdr.detectChanges();
+    const flag = 'plugin';
+    this.router.navigate(['nfs/add'],{
+      queryParams:{
+        flag
       }
     });
-    this.popShow = true;
-  }
-  // 页面跳转
-  jumpTo(page: ClrWizardPage, wizard: ClrWizard) {
-    if (page && page.completed) {
-      wizard.navService.currentPage = page;
-    } else {
-      wizard.navService.setLastEnabledPageCurrent();
-    }
-    this.wizard.open();
-  }
-  // 添加提交方法
-  addNfs(){
-    this.addForm.poolRawId=this.checkedPool.diskPoolId;
-    this.addForm.storagePoolId= this.checkedPool.id;
-    // 单位换算
-    switch (this.unit) {
-      case 'TB':
-        this.addForm.size = this.addForm.size * 1024;
-        break;
-      case 'MB':
-        this.addForm.size = this.addForm.size / 1024;
-        break;
-      case 'KB':
-        this.addForm.size = this.addForm.size / (1024 * 1024);
-        break;
-      default: // 默认GB 不变
-        break;
-    }
-    console.log('提交参数：')
-    console.log(this.addForm);
-    this.remoteSrv.addNfs(this.addForm).subscribe((result: any) => {
-      if (result.code === '200'){
-        this.popShow = false;
-      }else{
-        this.popShow = true;
-        this.errMessage = '添加失败！'+result.description;
-      }
-     });
-  }
-  selectStoragePool(){
-    this.storagePools = null;
-    this.logicPorts = null;
-    // 选择存储后获取存储池
-    this.storageService.getStoragePoolListByStorageId(this.addForm.storagId)
-      .subscribe((r: any) => {
-        if (r.code === '200'){
-          this.storagePools = r.data.data;
-        }
-      });
-    this.selectLogicPort();
-  }
-  checkHost(){
-    this.addForm.vkernelIp=null;
-    //选择主机后获取虚拟网卡
-    this.remoteSrv.getVmkernelListByObjectId(this.addForm.hostObjectId)
-      .subscribe((r: any) => {
-        if (r.code === '200'){
-          this.vmkernelList = r.data;
-        }
-      });
-    this.selectLogicPort();
-  }
-  selectLogicPort(){
-    // 选择存储后逻辑端口
-    this.storageService.getLogicPortListByStorageId(this.addForm.storagId)
-      .subscribe((r: any) => {
-        if (r.code === '200'){
-        this.logicPorts = r.data.data;
-      }
-      });
   }
   modifyData() {
     const fsId = this.rowSelected[0].fsId;
@@ -254,79 +158,24 @@ export class NfsComponent implements OnInit {
     });
   }
   expandView(){
-    this.oldCapacity=this.rowSelected[0].capacity;
-    this.expand = true;
-  }
-  expandData(){
-    console.log('扩容提交.....changenfsdatastore');
-    // 弹窗关闭
-    switch (this.unit) {
-      case 'TB':
-        this.newCapacity = this.newCapacity * 1024;
-        break;
-      case 'MB':
-        this.newCapacity = this.newCapacity / 1024;
-        break;
-      case 'KB':
-        this.newCapacity = this.newCapacity / (1024 * 1024);
-        break;
-      default: // 默认GB 不变
-        break;
-    }//
-    const fsId = this.rowSelected[0].fsId;
-    var param={
-      "fileSystemId": fsId,
-       "expand":true,
-      "capacity": this.newCapacity
-    }
-    this.remoteSrv.changeCapacity(param).subscribe((result: any) => {
-      if (result.code === '200'){
-        this.expand = false;
-      }else{
-        this.expand = true;
-        this.errMessage = '编辑失败！'+result.description;
+    const flag = 'plugin';
+    const fsId=this.rowSelected[0].fsId;
+    this.router.navigate(['nfs/expand'],{
+      queryParams:{
+        fsId,flag
       }
     });
   }
   // 弹出缩容页面
   reduceView(){
-    if (this.rowSelected.length === 1) {
-      this.oldCapacity = this.rowSelected[0].capacity;
-      this.reduceOpen = true;
-    }
-  }
-  // 缩容提交
-  reduceCommit(){
-// 弹窗关闭
-    switch (this.unit) {
-      case 'TB':
-        this.newCapacity = this.newCapacity * 1024;
-        break;
-      case 'MB':
-        this.newCapacity = this.newCapacity / 1024;
-        break;
-      case 'KB':
-        this.newCapacity = this.newCapacity / (1024 * 1024);
-        break;
-      default: // 默认GB 不变
-        break;
-    }//
-    const fsId = this.rowSelected[0].fsId;
-    var param={
-      "fileSystemId": fsId,
-      "expand":false,
-      "capacity": this.newCapacity
-    }
-    this.remoteSrv.changeCapacity(param).subscribe((result: any) => {
-      if (result.code === '200'){
-        this.expand = false;
-      }else{
-        this.expand = true;
-        this.errMessage = '编辑失败！'+result.description;
+    const flag = 'plugin';
+    const fsId=this.rowSelected[0].fsId;
+    this.router.navigate(['nfs/reduce'],{
+      queryParams:{
+        fsId,flag
       }
     });
   }
-
   // 挂载
   mount(){
     this.jumpPage(this.rowSelected[0].objectid,"nfs/dataStore/mount");
@@ -345,25 +194,15 @@ export class NfsComponent implements OnInit {
       this.jumpPage(this.rowSelected[0].objectid,"nfs/dataStore/unmount");
     }
   }
-  // 卸载
-  unmount(){
-    const name = this.rowSelected[0].name;
-    console.log(name);
-    this.unmountShow = false;
-  }
   // 删除按钮点击事件
   delBtnFunc() {
-    if (this.rowSelected.length === 1) {
-      this.delShow=true
-    }
-  }
-  // 删除NFS
-  delNfs(){
-    const name = this.rowSelected[0].name;
-    console.log(name);
-    this.remoteSrv.delNfs(name).subscribe((result: any) => {
-      this.delShow = false;
-    });
+    const flag = 'plugin';
+    const objectid=this.rowSelected[0].objectid;
+    this.router.navigate(['nfs/delete'],{
+      queryParams:{
+        objectid,flag
+      }
+    })
   }
   navigateTo(objectid){
     console.log('页面跳转了');

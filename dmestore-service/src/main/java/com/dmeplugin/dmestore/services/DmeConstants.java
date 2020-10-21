@@ -94,9 +94,14 @@ public class DmeConstants {
     public static final String DME_NFS_FS_DELETE_URL = "/rest/fileservice/v1/filesystems/delete";
 
     /**
-     *
+     * get resource instances
      */
-    public static final String DME_RESOURCE_INSTANCE_LIST = "/rest/resourcedb/v1/instances/#{className}";
+    public static final String DME_RESOURCE_INSTANCE_LIST = "/rest/resourcedb/v1/instances/%s";
+
+    /**
+     * storage detail
+     */
+    public static final String DME_STORAGE_DETAIL_URL = "/rest/storagemgmt/v1/storages/%s/detail";
 
     /**
      * Constant definition

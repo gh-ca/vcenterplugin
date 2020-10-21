@@ -3,7 +3,7 @@ package com.dmeplugin.dmestore.mvc;
 
 import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.exception.NoDMEException;
-import com.dmeplugin.dmestore.exception.VcenterException;
+import com.dmeplugin.dmestore.exception.VcenterRuntimeException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.DMEOpenApiService;
 import com.dmeplugin.dmestore.utils.JsonUtil;
@@ -77,10 +77,10 @@ public class BaseController {
     return generateError(request, CODE_ESIGHT_CONNECT_EXCEPTION, exception.getMessage(), null);
   }
 
-  @ExceptionHandler(VcenterException.class)
+  @ExceptionHandler(VcenterRuntimeException.class)
   @ResponseStatus(HttpStatus.OK)
-  protected Map<String, Object> handleException(VcenterException exception,
-      HttpServletRequest request) {
+  protected Map<String, Object> handleException(VcenterRuntimeException exception,
+                                                HttpServletRequest request) {
     LOGGER.error("vCenter plugin exception!" + exception.getMessage());
     return generateError(request, generateCode(exception.getCode()), exception.getMessage(), null);
   }

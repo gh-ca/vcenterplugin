@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.DmeAccessService;
 import com.dmeplugin.dmestore.utils.RestUtils;
@@ -43,16 +44,15 @@ public class DmeAccessController extends BaseController {
     @RequestMapping(value = "/access", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean accessDme(@RequestBody Map<String, Object> params)
-            throws Exception {
+    {
         LOG.info("accessdme/access params==" + gson.toJson(params));
-        Map<String, Object> remap = dmeAccessService.accessDme(params);
-        LOG.info("accessdme/access remap==" + gson.toJson(remap));
-        if (remap != null && remap.get(RestUtils.RESPONSE_STATE_CODE) != null
-                && RestUtils.RESPONSE_STATE_200.equals(remap.get(RestUtils.RESPONSE_STATE_CODE).toString())) {
-            return success(remap);
+        try {
+            dmeAccessService.accessDme(params);
+            return success();
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-
-        return failure(gson.toJson(remap));
     }
 
 
@@ -64,16 +64,15 @@ public class DmeAccessController extends BaseController {
     @RequestMapping(value = "/refreshaccess", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean refreshDme()
-            throws Exception {
+    {
         LOG.info("accessdme/refreshaccess==");
-        Map<String, Object> remap = dmeAccessService.refreshDme();
-        LOG.info("accessdme/refreshaccess remap==" + gson.toJson(remap));
-        if (remap != null && remap.get(RestUtils.RESPONSE_STATE_CODE) != null
-                && RestUtils.RESPONSE_STATE_200.equals(remap.get(RestUtils.RESPONSE_STATE_CODE).toString())) {
-            return success(remap);
+        try {
+            return success(dmeAccessService.refreshDme());
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
 
-        return failure(gson.toJson(remap));
     }
 
     /**
@@ -86,7 +85,7 @@ public class DmeAccessController extends BaseController {
     @RequestMapping(value = "/getworkloads", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean getWorkLoads(@RequestParam("storageId") String storageId)
-            throws Exception {
+              {
         LOG.info("accessdme/getworkloads storageId==" + storageId);
         String failureStr = "";
         try {
