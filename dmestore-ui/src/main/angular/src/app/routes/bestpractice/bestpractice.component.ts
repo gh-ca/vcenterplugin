@@ -154,6 +154,7 @@ export class BestpracticeComponent implements OnInit {
       this.gs.loading = false;
       if (result.code == '200'){
         this.tipModalSuccess = true;
+        this.practiceRefresh();
       } else{
         this.tipModalFail = true;
       }
