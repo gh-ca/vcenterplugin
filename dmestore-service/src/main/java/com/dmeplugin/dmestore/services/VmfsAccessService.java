@@ -129,4 +129,12 @@ public interface VmfsAccessService {
      */
     List<Map<String, Object>> getHostGroupsByStorageId(String storageId) throws DMEException;
 
+    /**
+     * query vmfs
+
+     * @return List<VmfsDataInfo>
+     * @throws Exception when error
+     */
+    List<VmfsDataInfo> queryVmfs(String dataStoreObjectId) throws Exception;
+
 }

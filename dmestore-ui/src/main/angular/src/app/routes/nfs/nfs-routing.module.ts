@@ -12,6 +12,7 @@ import {NfsReduceComponent} from "./subpages/reduce/nfs-reduce.component";
 import {NfsExpandComponent} from "./subpages/expand/nfs-expand.component";
 import {NfsDeleteComponent} from "./subpages/delete/nfs-delete.component";
 import {NfsAddComponent} from "./subpages/add/nfs-add.component";
+import {NfsModifyComponent} from "./subpages/modify/nfs-modify.component";
 
 const routes: Routes = [
   { path: '', component: NfsComponent },
@@ -25,6 +26,7 @@ const routes: Routes = [
   {path:'cluster/mount',component: NfsMountComponent},
   {path:'cluster/unmount',component: NfsUnmountComponent},
   {path:'add',component: NfsAddComponent},
+  {path:'modify',component: NfsModifyComponent},
   {path:'reduce',component: NfsReduceComponent},
   {path:'expand',component: NfsExpandComponent},
   {path:'delete',component: NfsDeleteComponent},

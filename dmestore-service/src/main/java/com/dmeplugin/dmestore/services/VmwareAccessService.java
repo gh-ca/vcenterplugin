@@ -77,4 +77,26 @@ public interface VmwareAccessService {
      * @throws Exception when error
      */
     List<Map<String,String>> getVmKernelIpByHostObjectId(String hostObjectId) throws DMEException;
+
+
+    /**
+     * Access datastore
+     *
+     * @param  hostObjectId host ObjectId
+     * @param  dataStoreType dataStore Type
+     * @return ResponseBodyBean List<Map<String, String>> include id name status type capacity freeSpace
+     * @throws Exception when error
+     */
+    List<Map<String,String>> getMountDataStoresByHostObjectId(String hostObjectId, String dataStoreType) throws Exception;
+
+    /**
+     * Access datastore
+     *
+     * @param  clusterObjectId cluster ObjectId
+     * @param  dataStoreType dataStore Type
+     * @return ResponseBodyBean List<Map<String, String>> include id name status type capacity freeSpace
+     * @throws Exception when error
+     */
+    List<Map<String,String>> getMountDataStoresByClusterObjectId(String clusterObjectId, String dataStoreType) throws Exception;
+
 }

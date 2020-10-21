@@ -21,7 +21,7 @@ export class NfsDeleteComponent implements OnInit{
   ngOnInit(): void {
     const ctx = this.gs.getClientSdk().app.getContextObjects();
     //入口是DataSource
-    this.viewPage='add_plugin'
+    this.viewPage='delete_plugin'
     this.activatedRoute.queryParams.subscribe(queryParam => {
       this.dataStoreObjectId = queryParam.objectid;
       this.pluginFlag =queryParam.flag;
@@ -33,7 +33,10 @@ export class NfsDeleteComponent implements OnInit{
     }
   }
   delNfs(){
-    this.deleteService.delNfs(this.dataStoreObjectId).subscribe((result: any) => {
+    var params={
+      "dataStoreObjectId": this.dataStoreObjectId
+    };
+    this.deleteService.delNfs(params).subscribe((result: any) => {
       if (result.code === '200'){
         if(this.pluginFlag=='plugin'){
           this.backToNfsList();
@@ -41,7 +44,7 @@ export class NfsDeleteComponent implements OnInit{
           this.closeModel();
         }
       }else{
-        this.errorMsg = '编辑失败！'+result.description;
+        this.errorMsg = '删除失败！'+result.description;
       }
     });
   }
