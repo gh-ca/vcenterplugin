@@ -2156,13 +2156,13 @@ public class VCSDKUtils {
     /**
      *删除NFS dataStore
      **/
-    public void deleteNfs(String dataStoreObjectId, List<String> hostIds) throws VcenterException {
+    public void deleteNfs(String dataStoreObjectId, List<String> hostObjIds) throws VcenterException {
         if (StringUtils.isEmpty(dataStoreObjectId)) {
             logger.info("delete dataStore,  datasotreObject id:" + dataStoreObjectId + " is null");
             return;
         }
-        if (null == hostIds || hostIds.size() == 0) {
-            logger.info("delete datasotre host:" + hostIds + " is null");
+        if (null == hostObjIds || hostObjIds.size() == 0) {
+            logger.info("delete datasotre host:" + hostObjIds + " is null");
             return;
         }
 

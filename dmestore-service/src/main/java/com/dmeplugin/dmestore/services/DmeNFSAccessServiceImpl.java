@@ -4,6 +4,7 @@ import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.exception.DmeSqlException;
+import com.dmeplugin.dmestore.exception.VcenterException;
 import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.StringUtil;
@@ -890,12 +891,12 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         }
     }
 
-    private void unmountNfsFromHost(String dataStoreObjectId, String hostId) throws Exception {
+    private void unmountNfsFromHost(String dataStoreObjectId, String hostId) throws VcenterException {
         vcsdkUtils.unmountNfsOnHost(dataStoreObjectId, hostId);
         //vcsdkUtils.unmountVmfsOnHostOrCluster(dataStoreObjectId,null,hostId);
     }
 
-    private void unmountNfsFromCluster(String dataStoreObjectId, String clusterId) throws Exception {
+    private void unmountNfsFromCluster(String dataStoreObjectId, String clusterId) throws VcenterException {
         vcsdkUtils.unmountNfsOnCluster(dataStoreObjectId, clusterId);
     }
 
