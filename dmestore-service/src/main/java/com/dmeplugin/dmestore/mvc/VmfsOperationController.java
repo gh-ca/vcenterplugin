@@ -8,7 +8,6 @@ import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -83,6 +82,20 @@ public class VmfsOperationController extends BaseController{
         LOG.info("recyclevmfs=="+gson.toJson(datastoreName));
         try {
             vmfsOperationService.recycleVmfsCapacity(datastoreName);
+            return success();
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
+        }
+
+    }
+
+    @PostMapping("/recyclevmfsbydatastoreids")
+    @ResponseBody
+    public ResponseBodyBean recycleVMFSByDatastoreIds(@RequestBody List<String> datastoreIds){
+        LOG.info("recyclevmfsbydatastoreids=="+gson.toJson(datastoreIds));
+        try {
+            vmfsOperationService.recycleVmfsCapacityByDataStoreIds(datastoreIds);
             return success();
         } catch (DMEException e) {
             e.printStackTrace();

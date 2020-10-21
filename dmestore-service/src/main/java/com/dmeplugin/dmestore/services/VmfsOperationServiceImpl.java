@@ -254,6 +254,34 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     }
 
     @Override
+    public void recycleVmfsCapacityByDataStoreIds(List<String> dsIds) throws DMEException {
+        //Map<String, Object> resMap = new HashMap<>(16);
+        ////resMap.put("code", 200);
+        //resMap.put("msg", "recycle vmfsDatastore success !");
+        try {
+            String result = null;
+            if (dsIds != null && dsIds.size() > 0) {
+                for (int i = 0; i < dsIds.size(); i++) {
+                    String dsName = vcsdkUtils.getDataStoreName(dsIds.get(i));
+                    result = vcsdkUtils.recycleVmfsCapacity(dsName);
+                }
+            }
+            if (result == null || "error".equals(result)) {
+                //resMap.put("code", 403);
+                //resMap.put("msg", "recycle vmfsDatastore error");
+                //return resMap;
+                throw new DMEException("403","recycle vmfsDatastore error");
+            }
+        } catch (Exception e) {
+            LOG.error("recycle vmfsDatastore error !", e);
+            //resMap.put("code", 503);
+            // resMap.put("msg", e.getMessage());
+            throw new DMEException("503",e.getMessage());
+        }
+        //return resMap;
+    }
+
+    @Override
     public void updateVmfsServiceLevel(Map<String, Object> params) throws DMEException {
 
         //Map<String, Object> resMap = new HashMap<>(16);
