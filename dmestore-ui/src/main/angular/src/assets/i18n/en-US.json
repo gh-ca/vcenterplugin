@@ -461,7 +461,8 @@
     "free": "Free",
     "top5T": "Top 5 DataStore",
     "connectT": "DME Connect",
-    "connectFail": "connect failed."
+    "connectFail": "Connect Failed!",
+    "connectSuccess": "Connect Success!"
   },
   "bestPractice": {
     "apply": "Apply Best Practice",

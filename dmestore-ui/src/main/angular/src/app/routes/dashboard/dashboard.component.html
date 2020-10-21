@@ -217,88 +217,22 @@
   </div>
 </clr-modal>
 
-<!--连接失败提示-->
-<clr-modal [(clrModalOpen)]="connectAlertFail" [clrModalSize]="'sm'">
-  <h3 class="modal-title">tip</h3>
+<clr-modal [(clrModalOpen)]="connectAlertSuccess" [clrModalSize]="'sm'" style="height: 100px;">
+  <h3 class="modal-title">{{'menu.tip'|translate}}</h3>
   <div class="modal-body">
-    {{'menu.connectFail' | translate}}
+    <clr-icon shape="success-standard" class="is-solid" style="color: #59A220;margin-right: 5px;"></clr-icon>{{'overview.connectSuccess'|translate}}
   </div>
-  <!--<div class="modal-footer">
-    <button type="button" class="btn btn-outline" (click)="delShow=false">{{'menu.cancel' | translate}}</button>
-    <button type="button" class="btn btn-primary" (click)="delNfs()">{{'menu.ok' | translate}}</button>
-  </div>-->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success" (click)="connectAlertSuccess=false">{{'menu.ok'|translate}}</button>
+  </div>
 </clr-modal>
 
-
-<!-- 示例20200922 -->
-<div class="clr-row" [hidden]="true">
-  <div class="info-card clr-col-6">
-    <div class="info-card-header border-header">
-      <div class="info-header-left">
-        <clr-icon size="36" shape="network-switch"></clr-icon>
-        <div class="info-header-content">
-          <div class="title">122</div>
-          <div class="text">
-            <span>8.46.8.122</span>
-            <span><clr-icon shape="display" class="is-solid is-highlight"></clr-icon></span>
-            <span class="header-divide"></span>
-            <span>OceanStor</span>
-          </div>
-        </div>
-      </div>
-      <clr-dropdown [clrCloseMenuOnItemClick]="false">
-        <button clrDropdownTrigger class="dropdown-toggle  btn btn-link">
-          Operation
-          <clr-icon shape="caret down"></clr-icon>
-        </button>
-        <clr-dropdown-menu *clrIfOpen>
-          <div clrDropdownItem>Link 1</div>
-          <div clrDropdownItem>Link 2</div>
-        </clr-dropdown-menu>
-      </clr-dropdown>
-    </div>
-    <div class="info-card-content clr-row">
-      <div class="clr-col-6">
-        <div class="info-content-title">Capacity</div>
-        <div class="info-charts-wrap">
-          <div echarts [options]="charts[2]" id="chart3" style="width: 30%;height: 120px;"></div>
-          <div class="info-content">
-            <div class="info-content-text">
-              <span>Total</span>
-              <span>11 TB</span>
-            </div>
-            <div class="info-content-text">
-              <span>Used</span>
-              <span>11 TB</span>
-              <span class="squre used"></span>
-            </div>
-            <div class="info-content-text">
-              <span>Free</span>
-              <span>11 TB</span>
-              <span class="squre free"></span>
-            </div>
-          </div>
-        </div>
-        <div class="info-content-title">Health</div>
-        <div class="info-content-bottom">
-          <div class="info-bottom-box">
-            <div class="num">219</div>
-            <div class="bottom-label">Alarms</div>
-          </div>
-          <div class="info-bottom-box">
-            <div class="num">219</div>
-            <div class="bottom-label">Alarms</div>
-          </div>
-        </div>
-      </div>
-      <div class="clr-col-6">
-        <div class="info-content-title" style="margin-bottom: 20px;">Performance - Last 24 Hours</div>
-        <div class="info-content-title">IOPS</div>
-        <div echarts [options]="charts[3]" id="chart4" style="width: 100%;height: 100px;"></div>
-        <div class="info-content-title">IOPS</div>
-        <div echarts [options]="charts[3]" id="chart5" style="width: 100%;height: 100px;"></div>
-      </div>
-    </div>
+<clr-modal [(clrModalOpen)]="connectAlertFail" [clrModalSize]="'sm'">
+  <h3 class="modal-title">{{'menu.tip'|translate}}</h3>
+  <div class="modal-body">
+    <clr-icon shape="error-standard" class="is-solid" style="color: red;margin-right: 5px;"></clr-icon>{{'overview.connectFail'|translate}}
   </div>
-</div>
-<!-- 示例20200922 -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="connectAlertFail=false">{{'menu.ok'|translate}}</button>
+  </div>
+</clr-modal>
