@@ -1,5 +1,6 @@
 <div>
   <div style="margin-left: 30px;margin-right: 30px">
+    <form clrForm #rdmForm="ngForm" clrLayout="horizontal">
         <div class="clr-row">
           <clr-datagrid style="width: 700px">
 
@@ -10,20 +11,33 @@
 
             <clr-dg-row *ngFor="let item of configModel.volume_specs" [clrDgItem]="item">
               <clr-dg-cell style="width: 200px">
-            <input type="text" required [(ngModel)]="item.name"  name="name" style="height: 30px"/>
-            <!--<div [hidden]="item.name!==''">*爱好为必填项</div>-->
+                <clr-input-container>
+                  <label [hidden]="true"></label>
+                  <input clrInput type="text" required [(ngModel)]="item.name"  name="{{item.inputName}}" style="height: 30px"/>
+                  <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+                </clr-input-container>
               </clr-dg-cell>
-              <clr-dg-cell style="width: 200px">
-                <input type="number" [(ngModel)]="item.capacity" name="capacity" style="height: 30px;width: 100px"/>
-                <select [(ngModel)]="item.unit" name="unit" style="height: 30px">
+              <clr-dg-cell style="width: 200px;position: relative">
+                <clr-input-container>
+                  <label [hidden]="true"></label>
+                  <input clrInput type="number" required [(ngModel)]="item.capacity" name="{{item.inputCapacity}}" style="height: 30px"
+                         onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/>
+                  <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+                </clr-input-container>
+                <select [(ngModel)]="item.unit" name="{{item.inputUnit}}" style="height: 30px; position: absolute;right: 8px;top: 29px;">
                   <option value="GB">GB</option>
                   <option value="TB">TB</option>
                 </select>
               </clr-dg-cell>
-              <clr-dg-cell style="width: 200px">
-                <input type="number" [(ngModel)]="item.count" name="count"  style="height: 30px"/>
+              <clr-dg-cell style="width: 200px;">
+                <clr-input-container>
+                  <label [hidden]="true"></label>
+                  <input clrInput type="number" required [(ngModel)]="item.count" name="{{item.inputCount}}"  style="height: 30px"
+                         onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/>
+                  <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+                </clr-input-container>
               </clr-dg-cell>
-              <clr-dg-cell [hidden]="configModel.volume_specs.length==1" style="width: 100px">
+              <clr-dg-cell [hidden]="configModel.volume_specs.length==1" style="width: 100px;padding-top: 30px;">
                 <span (click)="basRemove(item)" style="color:#00F;cursor:pointer">{{'rdm.remove' | translate}}</span>
               </clr-dg-cell>
               <clr-dg-cell [hidden]="configModel.volume_specs.length!==1" style="width: 100px">
@@ -35,7 +49,6 @@
           <span (click)="basAdd()" style="margin-top: 20px;margin-left: 20px;color:#00F;cursor:pointer">{{'rdm.add' | translate}}</span>
         </div>
         <div class="clr-row">
-      <form clrForm #rdmForm="ngForm" clrLayout="horizontal">
             <clr-select-container>
               <label>{{'rdm.host' | translate}}<span style="color: red">*</span></label>
               <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="hostSelected" required name="hostSelected" class="clr-select" (change)="loadDataStore(hostSelected)">
@@ -144,27 +157,6 @@
                 </select>
                 <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
               </clr-select-container>
-              <!--<clr-combobox-container>
-                <label>{{'rdm.host' | translate}}<span style="color: red">*</span></label>
-                <clr-combobox (change)="loadDataStore(hostSelected.id)" [(ngModel)]="hostSelected" name="host_id">
-                  <clr-options>
-                    <clr-option *clrOptionItems="let item of hostList;field:'name'" [clrValue]="item">
-                      {{item.ip}}({{item.name}})
-                    </clr-option>
-                  </clr-options>
-                </clr-combobox>
-              </clr-combobox-container>
-
-              <clr-combobox-container>
-                <label>{{'rdm.dataStore' | translate}}<span style="color: red">*</span></label>
-                <clr-combobox [(ngModel)]="data_store_name" name="data_store_name">
-                  <clr-options>
-                    <clr-option *clrOptionItems="let item of dataStores;field:'name'" [clrValue]="item">
-                      {{item.name}}
-                    </clr-option>
-                  </clr-options>
-                </clr-combobox>
-              </clr-combobox-container>-->
 
               <clr-select-container>
                 <label>{{'rdm.ownerC' | translate}}<span style="color: red">*</span></label>:
@@ -314,8 +306,8 @@
                 </select>
               </clr-select-container>
             </div>
-      </form>
         </div>
+    </form>
     <div class="clr-row">
       <div class="clr-col-4"></div>
       <button type="button" class="btn btn-primary" (click)="submit()">{{'menu.submit' | translate}}</button>
