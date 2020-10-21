@@ -1,6 +1,7 @@
 package com.dmeplugin.dmestore.utils;
 
 
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -35,30 +36,36 @@ public class RestUtils {
     public final static int RES_STATE_I_401 = 401;
     public final static int RES_STATE_I_403 = 403;
 
-    public RestTemplate getRestTemplate() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
-        TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-        HostnameVerifier hostnameVerifier = (s, sslSession) -> true;
+    public RestTemplate getRestTemplate() throws DMEException {
+        RestTemplate restTemplate;
+        try {
+            TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
+            HostnameVerifier hostnameVerifier = (s, sslSession) -> true;
 
-        //HostnameVerifier hostnameVerifier = SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
+            //HostnameVerifier hostnameVerifier = SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
 
-        SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
-        SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+            SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+            SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext, SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
        /* SSLConnectionSocketFactory systemSocketFactory = new SSLConnectionSocketFactory(
                 builder.build(),
                 hostnameVerifier);*/
-        CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(csf).setMaxConnTotal(200).setMaxConnPerRoute(20).build();
+            CloseableHttpClient httpClient = HttpClients.custom().setSSLSocketFactory(csf).setMaxConnTotal(200).setMaxConnPerRoute(20).build();
 
-        HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
+            HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory();
 
-        requestFactory.setHttpClient(httpClient);
-        requestFactory.setReadTimeout(10000);
-        requestFactory.setConnectTimeout(3000);
-        RestTemplate restTemplate = new RestTemplate(requestFactory);
+            requestFactory.setHttpClient(httpClient);
+            requestFactory.setReadTimeout(10000);
+            requestFactory.setConnectTimeout(3000);
+             restTemplate = new RestTemplate(requestFactory);
 
+        } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+            e.printStackTrace();
+            throw new DMEException("初始化resttemplate错误");
+        }
         return restTemplate;
     }
 
-    public static void main( String[] args ) throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
+    public static void main( String[] args ) throws DMEException {
         RestUtils restUtils = new RestUtils();
         RestTemplate restTemplate = restUtils.getRestTemplate();
 

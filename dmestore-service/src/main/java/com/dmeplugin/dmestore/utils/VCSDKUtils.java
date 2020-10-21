@@ -2,6 +2,7 @@ package com.dmeplugin.dmestore.utils;
 
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
+import com.dmeplugin.dmestore.exception.VcenterException;
 import com.dmeplugin.dmestore.services.DmeConstants;
 import com.dmeplugin.vmware.VCConnectionHelper;
 import com.dmeplugin.vmware.autosdk.SessionHelper;
@@ -136,6 +137,26 @@ public class VCSDKUtils {
             throw e;
         }
         return listStr;
+    }
+
+    /**
+     *得到指定objectid存储的info
+     **/
+    public Map<String, Object> getDataStoreSummaryByObjectId(String objectid) throws VcenterException {
+        Map<String, Object> dsmap;
+        try {
+            String serverguid=vcConnectionHelper.objectID2Serverguid(objectid);
+            VmwareContext vmwareContext=vcConnectionHelper.getServerContext(serverguid);
+            ManagedObjectReference datastoremor=vcConnectionHelper.objectID2MOR(objectid);
+            DatastoreMO datastoreMO=new DatastoreMO(vmwareContext,datastoremor);
+             dsmap = gson.fromJson(gson.toJson(datastoreMO.getSummary()), new TypeToken<Map<String, Object>>() {
+            }.getType());
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("vmware error:", e);
+            throw new VcenterException(e.getMessage());
+        }
+        return dsmap;
     }
     /**
      *得到所有主机的ID与name

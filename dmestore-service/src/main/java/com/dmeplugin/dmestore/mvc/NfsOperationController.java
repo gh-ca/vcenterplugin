@@ -250,4 +250,18 @@ public class NfsOperationController extends BaseController{
         }
 
     }
+
+
+    @GetMapping("/editnfsstore")
+    @ResponseBody
+    public ResponseBodyBean getEditNfsStore(@RequestParam(name = "storeObjectId")String storeObjectId) {
+        try {
+            return success(nfsOperationService.getEditNfsStore(storeObjectId));
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
+        }
+
+
+    }
 }
