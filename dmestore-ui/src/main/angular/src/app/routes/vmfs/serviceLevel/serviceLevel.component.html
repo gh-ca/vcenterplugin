@@ -1,0 +1,47 @@
+<div>
+  <form clrForm>
+    <!-- 1、选择 服务等级-->
+    <div *ngIf="serviceLevelIsNull" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.serviceLevelCantBeNull' | translate}}</div>
+    <ng-container>
+      <clr-accordion>
+        <clr-accordion-panel *ngFor="let item of serviceLevelList" style="margin-top: 20px;">
+          <clr-accordion-title class="accordion-title"  style="height: 50px; line-height: 50px;color: #333;font-size:16px;">{{item.name}}</clr-accordion-title>
+          <clr-accordion-content [(clrIfExpanded)]="item.show">
+            <table class="table table-vertical table-noborder table-compact">
+              <tbody>
+              <tr>
+                <th hidden></th>
+                <th>
+                  {{item.name}}
+                </th>
+              </tr>
+              <tr>
+                <th hidden></th>
+                <td>{{'vmfs.capacityUsage' | translate}}</td>
+                <td>{{'vmfs.qos' | translate}}</td>
+                <td>{{'vmfs.protection' | translate}}</td>
+              </tr>
+              <tr>
+                <th hidden></th>
+                <th><clr-progress-bar clrValue="{{(item.used_capacity/item.total_capacity * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
+                <th *ngIf="item.capabilities.qos.smartQos.maxiops != null">IOPS <= {{item.capabilities.qos.smartQos.maxiops}}</th>
+                <th *ngIf="item.capabilities.qos.smartQos.miniops != null">IOPS >= {{item.capabilities.qos.smartQos.miniops}}</th>
+              </tr>
+              <tr>
+                <th hidden></th>
+                <th>{{item.used_capacity}} GB/{{item.total_capacity}}GB</th>
+                <th>Latency: {{item.capabilities.qos.smartQos.latency + item.capabilities.qos.smartQos.latencyUnit}}</th>
+              </tr>
+              </tbody>
+            </table>
+          </clr-accordion-content>
+          <img src="./assets/images/selectDown.svg" style="position: absolute;right: 0px;bottom: 0px;" width="40px" height="40px">
+        </clr-accordion-panel>
+      </clr-accordion>
+    </ng-container>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="cancel()">{{'menu.cancel' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="changeSLHandleFunc()">{{'menu.ok' | translate}}</button>
+    </div>
+  </form>
+</div>

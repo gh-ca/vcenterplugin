@@ -45,33 +45,17 @@ export class NfsService {
   getChartData(fsIds: string[] ) {
     return this.http.get('accessnfs/listnfsperformance', {params: {fsIds}});
   }
-  addNfs(params= {}){
-    return this.http.post('operatenfs/createnfsdatastore', params);
-  }
+
   updateNfs(params= {}){
     return this.http.post('operatenfs/updatenfsdatastore', params);
-  }
-  delNfs(param: string){
-    return this.http.post('accessnfs/delnfs', param);
-  }
-  getHostList(){
-    return this.http.get('accessvmware/listhost');
   }
 
   getVolsByObjId(objId: string) {
     return this.http.get('accessvmfs/volume/' + objId );
   }
-  getVmkernelListByObjectId(hostObjectId:string){
-    return this.http.get('accessvmware/getvmkernelipbyhostobjectid',{params: {hostObjectId}} );
-  }
   getNfsDetailById(fileSystemId:string){
     return this.http.get('dmestorage/filesystemdetail',{params: {fileSystemId}} );
   }
-  changeCapacity(params= {}){
-    return this.http.post('operatenfs/changenfsdatastore', params);
-  }
-
-
 
   /**
    * 获取折线图

@@ -11,6 +11,7 @@ import {ClrDatagridStateInterface} from '@clr/angular';
 import {HttpClient} from '@angular/common/http';
 import { CommonService } from '../common.service';
 import {MakePerformance, NfsService} from "../nfs/nfs.service";
+import { GlobalsService }     from "../../shared/globals.service";
 
 @Component({
   selector: 'app-servicelevel',
@@ -149,9 +150,13 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   applicationTypeSelected: ApplicationType[];
   // ===============applicationType end==============
 
+  tipModalSuccess = false;
+  tipModalFail = false;
+
   constructor(private ngZone: NgZone,
               private cdr: ChangeDetectorRef,
               private http: HttpClient,
+              private gs: GlobalsService,
               private makePerformance: MakePerformance) { }
 
   ngOnInit(): void {
@@ -227,8 +232,8 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   // ===============applicationType pool==============
   applicationTypeRefresh(state: ClrDatagridStateInterface){
     this.applicationTypeIsloading = true;
-    this.applicationTypeList = []
-    this.applicationTypeTotal = 0
+    this.applicationTypeList = [];
+    this.applicationTypeTotal = 0;
     this.applicationTypeIsloading = false;
     this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
   }
@@ -236,7 +241,9 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // 刷新服务等级列表
   refresh(){
+    this.gs.loading = true;
     this.http.post('servicelevel/listservicelevel', {}).subscribe((response: any) => {
+      this.gs.loading = false;
       response.data = JSON.stringify(response.data);
       response.data = response.data.replace('service-levels', 'serviceLevels');
       const r = this.recursiveNullDelete(JSON.parse(response.data));
@@ -505,12 +512,14 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
    * 同步虚拟机存储策略
    */
   syncStoragePolicy(){
+    this.gs.loading = true;
     const url = "servicelevel/manualupdate";
     this.http.post(url, {}).subscribe((response: any) => {
+      this.gs.loading = false;
       if (response.code == '200'){
-         alert("同步成功");
+         this.tipModalSuccess = true;
       } else{
-        alert("同步失败");
+        this.tipModalFail = true;
       }
     }, err => {
       console.error('ERROR', err);
