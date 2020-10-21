@@ -34,6 +34,12 @@ public interface VmfsOperationService {
     void recycleVmfsCapacity(List<String> vmfsUuids) throws DMEException;
 
     /**
+     * vmfs存储空间回收
+     * @param vmfsObjIds
+     */
+    void recycleVmfsCapacityByDataStoreIds(List<String> vmfsObjIds) throws DMEException;
+
+    /**
      * 更新vmfs存储
      * @param params
      */
