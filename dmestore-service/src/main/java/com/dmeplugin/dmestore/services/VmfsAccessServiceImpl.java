@@ -887,6 +887,17 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     @Override
     public void mountVmfs(Map<String, Object> params) throws DMEException {
         if (params != null) {
+            //modify 20201021 传递参数中取消host/cluster  此处通过hostId/clusterId补充
+            String hostObjId = ToolUtils.getStr(params.get("hostId"));
+            String clusterObjId = ToolUtils.getStr(params.get("clusterId"));
+            if(!StringUtils.isEmpty(hostObjId)){
+                String hostName = vcsdkUtils.getHostName(hostObjId);
+                params.put("host",hostName);
+            }
+            if(!StringUtils.isEmpty(clusterObjId)){
+                String clusterName = vcsdkUtils.getClusterName(clusterObjId);
+                params.put("cluster",clusterName);
+            }
             //param str host: 主机  param str cluster: 集群  dataStoreObjectIds
             String objhostid = "";
             //判断主机或主机组在DME中是否存在
@@ -1711,5 +1722,101 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
         }
         return false;
+    }
+
+    @Override
+    public List<VmfsDataInfo> queryVmfs(String dsObjId) throws Exception {
+        List<VmfsDataInfo> relists = null;
+        try {
+            //从关系表中取得DME卷与vcenter存储的对应关系
+            List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_VMFS);
+            LOG.info("dvrlist==" + gson.toJson(dvrlist));
+            if (dvrlist != null && dvrlist.size() > 0) {
+                //整理数据
+                Map<String, DmeVmwareRelation> dvrMap = getDvrMap(dvrlist);
+
+                //取得所有的存储设备
+                List<Storage> storagemap = dmeStorageService.getStorages();
+                //整理数据
+                Map<String, String> stoNameMap = getStorNameMap(storagemap);
+                LOG.info("stoNameMap===" + gson.toJson(stoNameMap));
+                //取得vcenter中的所有vmfs存储。
+                String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(ToolUtils.STORE_TYPE_VMFS);
+                LOG.info("Vmfs listStr==" + listStr);
+                if (!StringUtils.isEmpty(listStr)) {
+                    JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
+                    if (jsonArray != null && jsonArray.size() > 0) {
+                        relists = new ArrayList<>();
+                        for (int i = 0; i < jsonArray.size(); i++) {
+                            JsonObject jo = jsonArray.get(i).getAsJsonObject();
+
+                            String vmwareStoreobjectid = ToolUtils.jsonToStr(jo.get("objectid"));
+                            if (!StringUtils.isEmpty(vmwareStoreobjectid) && vmwareStoreobjectid.equals(dsObjId) ) {
+                                //对比数据库关系表中的数据，只显示关系表中的数据
+                                if (dvrMap != null && dvrMap.get(vmwareStoreobjectid) != null) {
+                                    VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
+                                    double capacity = ToolUtils.getDouble(jo.get("capacity")) / ToolUtils.GI;
+                                    double freeSpace = ToolUtils.getDouble(jo.get("freeSpace")) / ToolUtils.GI;
+                                    double uncommitted = ToolUtils.getDouble(jo.get("uncommitted")) / ToolUtils.GI;
+
+                                    vmfsDataInfo.setName(ToolUtils.jsonToStr(jo.get("name")));
+                                    vmfsDataInfo.setCapacity(capacity);
+                                    vmfsDataInfo.setFreeSpace(freeSpace);
+                                    vmfsDataInfo.setReserveCapacity(capacity + uncommitted - freeSpace);
+                                    vmfsDataInfo.setObjectid(ToolUtils.jsonToStr(jo.get("objectid")));
+
+                                    DmeVmwareRelation dvr = dvrMap.get(vmwareStoreobjectid);
+                                    String volumeId = dvr.getVolumeId();
+                                    LOG.info("volumeId==" + volumeId);
+                                    //这里由于DME系统中的卷太多。是分页查询，所以需要vmfs一个个的去查DME系统中的卷。
+                                    String detailedVolumeUrl = LIST_VOLUME_URL + "/" + volumeId;
+                                    try {
+                                        ResponseEntity responseEntity = dmeAccessService.access(detailedVolumeUrl, HttpMethod.GET, null);
+                                        LOG.info("volid responseEntity==" + responseEntity.toString());
+                                        if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
+                                            JsonObject voljson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                                            JsonObject vjson2 = voljson.getAsJsonObject("volume");
+
+                                            vmfsDataInfo.setVolumeId(ToolUtils.jsonToStr(vjson2.get("id")));
+                                            vmfsDataInfo.setVolumeName(ToolUtils.jsonToStr(vjson2.get("name")));
+                                            vmfsDataInfo.setStatus(ToolUtils.jsonToStr(vjson2.get("status")));
+                                            vmfsDataInfo.setServiceLevelName(ToolUtils.jsonToStr(vjson2.get("service_level_name")));
+                                            vmfsDataInfo.setVmfsProtected(ToolUtils.jsonToBoo(vjson2.get("protected")));
+                                            vmfsDataInfo.setWwn(ToolUtils.jsonToStr(vjson2.get("volume_wwn")));
+
+                                            String storageId = ToolUtils.jsonToStr(vjson2.get("storage_id"));
+                                            vmfsDataInfo.setDeviceId(storageId);
+                                            vmfsDataInfo.setDevice(stoNameMap == null ? "" : stoNameMap.get(storageId));
+
+                                            if (vjson2 != null && !ToolUtils.jsonIsNull(vjson2.get("tuning"))) {
+                                                JsonObject tuning = vjson2.getAsJsonObject("tuning");
+                                                if (tuning != null && !ToolUtils.jsonIsNull(tuning.get("smartqos"))) {
+                                                    JsonObject smartqos = tuning.getAsJsonObject("smartqos");
+                                                    if (smartqos != null) {
+                                                        vmfsDataInfo.setMaxIops(ToolUtils.jsonToInt(smartqos.get("maxiops"), null));
+                                                        vmfsDataInfo.setMinIops(ToolUtils.jsonToInt(smartqos.get("miniops"), null));
+                                                        vmfsDataInfo.setMaxBandwidth(ToolUtils.jsonToInt(smartqos.get("maxbandwidth"), null));
+                                                        vmfsDataInfo.setMinBandwidth(ToolUtils.jsonToInt(smartqos.get("minbandwidth"), null));
+                                                        vmfsDataInfo.setLatency(ToolUtils.jsonToInt(smartqos.get("latency"), null));
+                                                    }
+                                                }
+                                            }
+                                            relists.add(vmfsDataInfo);
+                                        }
+                                    } catch (Exception e) {
+                                        LOG.error("DME link error url:" + detailedVolumeUrl + ",error:" + e.getMessage());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("query vmfs error:", e);
+            throw e;
+        }
+        LOG.info("relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        return relists;
     }
 }
