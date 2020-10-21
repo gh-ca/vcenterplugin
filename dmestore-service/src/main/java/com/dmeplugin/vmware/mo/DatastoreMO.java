@@ -491,4 +491,8 @@ public class DatastoreMO extends BaseMO {
         }
         return isAccessible;
     }
+
+    public void refreshDatastore() throws Exception {
+         _context.getService().refreshDatastore(_mor);
+    }
 }

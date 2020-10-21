@@ -451,6 +451,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                    // responseBodyBean.setDescription("expand or recycle nfs storage capacity failed!");
                     throw new DMEException("503","expand or recycle nfs storage capacity failed!");
                 }
+                //刷新datastore容量
+                vcsdkUtils.refreshDatastore(storeObjectId);
                 //responseBodyBean.setData("task_id:"+task_id);
             }
         } catch (Exception e) {
