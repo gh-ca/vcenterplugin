@@ -800,7 +800,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         String resBody = responseEntity.getBody();
         JsonObject share = gson.fromJson(resBody, JsonObject.class);
         resultMap.put("shareName",ToolUtils.jsonToStr(share.get("name")));
-        if ( String.valueOf(summaryMap.get("name")).equalsIgnoreCase(fsname)&&  String.valueOf(summaryMap.get("name")).equalsIgnoreCase(ToolUtils.jsonToStr(share.get("name")))){
+        if ( String.valueOf(summaryMap.get("name")).equalsIgnoreCase(fsname)&&  ("/"+ summaryMap.get("name")).equalsIgnoreCase(ToolUtils.jsonToStr(share.get("name")))){
             resultMap.put("sameName",true);
         }else
         {
