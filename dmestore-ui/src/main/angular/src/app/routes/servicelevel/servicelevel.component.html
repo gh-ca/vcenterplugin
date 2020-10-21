@@ -129,9 +129,8 @@
             </div>
             <div class="gh-info-item clr-col-4">
               <span class="gh-info-lable">{{'tier.usage'|translate}}</span>
-              <!--<span class="gh-info-value"><clr-progress-bar clrValue="{{selectedModel.usedRate}}" clrSuccess clrLabeled></clr-progress-bar></span>-->
-              <span class="gh-info-value">{{selectedModel.usedRate}}%</span>
-          </div>
+              <span class="gh-info-value" style="width: 60%"><clr-progress-bar clrValue="{{selectedModel.usedRate}}" clrLabeled></clr-progress-bar></span>
+            </div>
             <div class="gh-info-item clr-col-4">
               <span class="gh-info-lable">{{'tier.iop'|translate}}</span>
               <span class="gh-info-value" *ngIf="selectedModel.capabilities.iopriority !== undefined

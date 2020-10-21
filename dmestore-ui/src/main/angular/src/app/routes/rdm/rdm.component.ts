@@ -60,21 +60,20 @@ export class RdmComponent implements OnInit {
     this.gs.loading = true;
     this.http.post('servicelevel/listservicelevel', {}).subscribe((response: any) => {
       this.gs.loading = false;
-      response.data = JSON.stringify(response.data);
-      response.data = response.data.replace('service-levels', 'serviceLevels');
-      const r = this.recursiveNullDelete(JSON.parse(response.data));
-      for (const i of r.serviceLevels){
-        if (i.totalCapacity == 0){
-          i.usedRate = 0.0;
-        } else {
-          i.usedRate =  ((i.usedCapacity / i.totalCapacity * 100).toFixed(2));
+      if(response.code == '200'){
+        this.serviceLevelsRes = this.recursiveNullDelete(response.data);
+        for (const i of this.serviceLevelsRes){
+          if (i.totalCapacity == 0){
+            i.usedRate = 0.0;
+          } else {
+            i.usedRate =  ((i.usedCapacity / i.totalCapacity * 100).toFixed(2));
+          }
+          i.usedCapacity = (i.usedCapacity/1024).toFixed(2);
+          i.totalCapacity = (i.totalCapacity/1024).toFixed(2);
+          i.freeCapacity = (i.freeCapacity/1024).toFixed(2);
         }
-        i.usedCapacity = (i.usedCapacity/1024).toFixed(2);
-        i.totalCapacity = (i.totalCapacity/1024).toFixed(2);
-        i.freeCapacity = (i.freeCapacity/1024).toFixed(2);
+        this.search();
       }
-      this.serviceLevelsRes = r.serviceLevels;
-      this.search();
     }, err => {
       console.error('ERROR', err);
     });
@@ -179,7 +178,7 @@ export class RdmComponent implements OnInit {
     this.http.get('dmestorage/storages', {}).subscribe((result: any) => {
       this.gs.loading = false;
       if (result.code === '200'){
-        this.storageDevices = result.data.data;
+        this.storageDevices = result.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
     }, err => {
@@ -192,7 +191,7 @@ export class RdmComponent implements OnInit {
     this.http.get('dmestorage/storagepools', {params: {storageId, media_type: "all"}}).subscribe((result: any) => {
       this.gs.loading = false;
       if (result.code === '200'){
-        this.storagePools = result.data.data;
+        this.storagePools = result.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
     }, err => {

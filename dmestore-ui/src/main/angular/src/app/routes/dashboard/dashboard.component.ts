@@ -32,7 +32,6 @@ import { GlobalsService }     from "../../shared/globals.service";
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  charts = this.dashboardSrv.getCharts();
   storageNumChart = null;
   storageNum = {
     total: 0,
@@ -102,18 +101,19 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   refresh(){
-    this.gs.loading = true // 设置全局loading 为 TRUE
+    this.gs.loading = true;
     this.http.get('accessdme/refreshaccess', {}).subscribe((result: any) => {
-      console.log(result);
-      if (result.code === '0' || result.code === '200'){
+      if (result.code === '200'){
         this.gs.loading = false  // 设置全局loading 为 FALSE
-        this.hostModel = result.data.data;
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        this.hostModel = result.data;
         this.loadStorageNum();
         this.loadstorageCapacity('0', 'overview.allDataStore');
         this.loadBestPracticeViolations();
         this.loadTop5DataStore('0', 'overview.allDataStore');
+      } else{
+        this.gs.loading = false;
       }
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     }, err => {
       console.error('ERROR', err);
     });
@@ -123,7 +123,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   loadTop5DataStore(type: string, name: string){
     this.top5dataStoreName = this.translateService.instant(name);
     this.http.get('overview/getdatastoretopn', { params: {type: type}}).subscribe((result: any) => {
-      if (result.code === '0' || result.code === '200'){
+      if (result.code === '200'){
         result.data.forEach((item) => {
           item.totalCapacity = item.totalCapacity.toFixed(2);
           item.usedCapacity = item.usedCapacity.toFixed(2);
@@ -146,7 +146,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.capadataStoreName = this.translateService.instant(name);
     this.storageCapacityChart.showLoading();
     this.http.get('overview/getdatastoreoverview', { params: {type: type}}).subscribe((result: any) => {
-      if (result.code === '0' || result.code === '200'){
+      if (result.code === '200'){
         result.data.totalCapacity = result.data.totalCapacity.toFixed(2);
         result.data.usedCapacity = result.data.usedCapacity.toFixed(2);
         result.data.freeCapacity = result.data.freeCapacity.toFixed(2);
@@ -180,7 +180,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   loadStorageNum(){
     this.storageNumChart.showLoading();
     this.http.get('overview/getstoragenum', {}).subscribe((result: any) => {
-      if (result.code === '0' || result.code === '200'){
+      if (result.code === '200'){
         this.storageNum = result.data;
         const os = [
           {
@@ -204,8 +204,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
   loadBestPracticeViolations(){
     this.http.get('overview/getbestpracticeviolations', {}).subscribe((result: any) => {
-      if (result.code === '0' || result.code === '200'){
-         this.bestPracticeViolations = result.data;
+      if (result.code === '200'){
+        this.bestPracticeViolations = result.data;
         this.cdr.detectChanges();
       }
     }, err => {
@@ -218,22 +218,17 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.connectForm.invalid) {
       this.clrForm.markAsTouched();
     } else {
-      // Do submit logic
-      this.popShow = false;
-      console.log(this.connectModel);
+      this.gs.loading = true;
       this.http.post('accessdme/access', this.connectModel).subscribe((result: any) => {
-        if (result.code !== '0' && result.code !== '200'){
-             this.connectAlertFail = true;
-             /*setTimeout(() => {
-               this.connectAlertFail = false;
-             }, 1000);*/
-        } else{
+        this.gs.loading = false;
+        if (result.code == '200'){
           this.refresh();
           this.connectAlertSuccess = true;
-          /*setTimeout(() => {
-            this.connectAlertSuccess = false;
-          }, 1000);*/
+          this.popShow = false;
+        } else{
+          this.connectAlertFail = true;
         }
+        this.cdr.detectChanges();
       });
       this.resetForm();
     }
