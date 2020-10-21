@@ -9,7 +9,7 @@ import {ActivatedRoute, Router} from "@angular/router";
   providers: [GlobalsService,NfsReduceService]
 })
 export class NfsReduceComponent implements OnInit{
-
+  storeObjectId:string;
   viewPage: string;
   unit='GB';
   newCapacity = 0;
@@ -21,29 +21,31 @@ export class NfsReduceComponent implements OnInit{
               private activatedRoute: ActivatedRoute,private router:Router){
   }
   ngOnInit(): void {
-    const ctx = this.gs.getClientSdk().app.getContextObjects();
+
     //入口是DataSource
     this.viewPage='reduce_plugin'
     this.activatedRoute.queryParams.subscribe(queryParam => {
       this.fsId = queryParam.fsId;
       this.pluginFlag =queryParam.flag;
+      this.storeObjectId =queryParam.objectId;
     });
     if(this.pluginFlag==null){
       //入口来至Vcenter
-      //this.dsObjectId=ctx[0].id;
+      const ctx = this.gs.getClientSdk().app.getContextObjects();
+      this.storeObjectId=ctx[0].id;
       this.viewPage='reduce_vcenter'
     }
   }
-
   backToNfsList(){
+    this.gs.loading=false;
     this.router.navigate(['nfs']);
   }
-
   closeModel(){
+    this.gs.loading=false;
     this.gs.getClientSdk().modal.close();
   }
   reduceCommit(){
-// 弹窗关闭
+    this.gs.loading=true;
     switch (this.unit) {
       case 'TB':
         this.newCapacity = this.newCapacity * 1024;
@@ -56,20 +58,34 @@ export class NfsReduceComponent implements OnInit{
         break;
       default: // 默认GB 不变
         break;
-    }//
-    const fsId = this.rowSelected[0].fsId;
-    var param={
-      "fileSystemId": fsId,
-      "expand":false,
-      "capacity": this.newCapacity
     }
-    this.reduceService.changeCapacity(param).subscribe((result: any) => {
+    var params;
+    if (this.pluginFlag=='plugin'){
+      params={
+        "fileSystemId": this.fsId,
+        "storeObjectId": this.storeObjectId,
+        "expand":false,
+        "capacity": this.newCapacity
+      }
+    }
+    if(this.pluginFlag==null){
+      params={
+        "storeObjectId": this.storeObjectId,
+        "expand":false,
+        "capacity": this.newCapacity
+      }
+    }
+    this.reduceService.changeCapacity(params).subscribe((result: any) => {
+      this.gs.loading=false;
       if (result.code === '200'){
-        this.closeModel();
+        if(this.pluginFlag=='plugin'){
+          this.backToNfsList();
+        }else{
+          this.closeModel();
+        }
       }else{
-        this.errorMsg = '编辑失败！'+result.description;
+        this.errorMsg = '缩容失败！'+result.description;
       }
     });
   }
-
 }
