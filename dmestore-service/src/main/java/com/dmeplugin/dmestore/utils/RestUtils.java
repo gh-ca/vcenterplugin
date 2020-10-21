@@ -11,11 +11,14 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 
 import org.springframework.http.*;
+import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
+import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -57,6 +60,7 @@ public class RestUtils {
             requestFactory.setReadTimeout(10000);
             requestFactory.setConnectTimeout(3000);
              restTemplate = new RestTemplate(requestFactory);
+             restTemplate.setErrorHandler(new CustomErrorHandler());
 
         } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
             e.printStackTrace();
@@ -85,5 +89,18 @@ public class RestUtils {
         System.out.println("re==="+responseEntity.getBody());
         JsonArray jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonArray();
         System.out.println("re==="+jsonObject);
+    }
+
+     class CustomErrorHandler implements ResponseErrorHandler {
+
+        @Override
+        public boolean hasError(ClientHttpResponse response) throws IOException {
+            return true;
+        }
+
+        @Override
+        public void handleError(ClientHttpResponse response) throws IOException {
+
+        }
     }
 }
