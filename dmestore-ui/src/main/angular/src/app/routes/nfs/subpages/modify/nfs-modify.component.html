@@ -1,0 +1,105 @@
+<div>
+  <clr-modal [clrModalOpen]="viewPage=='modify_plugin'">
+    <h3 class="modal-title">{{'menu.modify' | translate}}</h3>
+    <div class="modal-body">
+      <form  clrForm #formPageOne="ngForm">
+        <!--名称-->
+        <clr-input-container>
+          <label>{{'nfs.name' | translate}}</label>
+          <input clrInput name="nfsName" [(ngModel)]="updateNfs.nfsName"/>
+        </clr-input-container>
+        <clr-checkbox-container>
+          <label></label>
+          <clr-checkbox-wrapper>
+            <input type="checkbox" clrCheckbox [(ngModel)]="updateNfs.sameName" name="sameName" />
+            <label>{{'nfs.sameName' | translate}}</label>
+          </clr-checkbox-wrapper>
+        </clr-checkbox-container>
+        <clr-input-container *ngIf="!updateNfs.sameName">
+          <label>{{'nfs.fsName' | translate}}</label>
+          <input clrInput [(ngModel)]="updateNfs.fsName" name="fsName" />
+        </clr-input-container>
+        <clr-input-container *ngIf="!updateNfs.sameName">
+          <label>{{'nfs.shareName' | translate}}</label>
+          <input clrInput [(ngModel)]="updateNfs.shareName" name="shareName" />
+        </clr-input-container>
+        <!--qos-->
+        <clr-toggle-wrapper>
+          <label>{{'nfs.qosPolicy' | translate}}</label>
+          <input type="checkbox" clrToggle name="qosFlag" [(ngModel)]="updateNfs.qosFlag"/>
+        </clr-toggle-wrapper>
+        <div *ngIf="updateNfs.qosFlag">
+          <clr-radio-container clrInline >
+            <label class="floatleft">{{'nfs.controlPolicy' | translate}}</label>
+            <clr-radio-wrapper>
+              <input type="radio" clrRadio name="controlPolicy" required value="up" [(ngModel)]="updateNfs.contolPolicy" />
+              <label>{{'nfs.ulc' | translate}}</label>
+            </clr-radio-wrapper>
+            <clr-radio-wrapper>
+              <input type="radio" clrRadio name="controlPolicy" required value="low" [(ngModel)]="updateNfs.contolPolicy" />
+              <label>{{'nfs.llc' | translate}}</label>
+            </clr-radio-wrapper>
+          </clr-radio-container>
+          <div *ngIf="updateNfs.contolPolicy">
+            <clr-radio-container *ngIf="updateNfs.contolPolicy==='up'">
+              <label>{{'nfs.tfo' | translate}}</label>
+              <clr-radio-wrapper>
+                <input type="radio" clrRadio required value="1" />
+                <label>{{'nfs.qos_bandwidth' | translate}}<=<input class="inputOneLine" type="text" name="maxBandwidth" [(ngModel)]="updateNfs.maxBandwidth"> MB/s</label>
+              </clr-radio-wrapper>
+              <clr-radio-wrapper>
+                <input type="radio" clrRadio name="tfo" required value="2"/>
+                <label>{{'nfs.qos_iops' | translate}}<=<input class="inputOneLine" type="text" [(ngModel)]="updateNfs.maxIops" name="maxIops"> MB/s</label>
+              </clr-radio-wrapper>
+            </clr-radio-container>
+
+            <clr-radio-container *ngIf="updateNfs.contolPolicy==='low'">
+              <label>{{'nfs.tfo' | translate}}</label>
+              <clr-radio-wrapper>
+                <input type="radio" clrRadio name="tfo" required value="1"/>
+                <label>{{'nfs.qos_bandwidth' | translate}}>=<input class="inputOneLine" type="text" name="minBandwidth" [(ngModel)]="updateNfs.minBandwidth"> MB/s</label>
+              </clr-radio-wrapper>
+              <clr-radio-wrapper>
+                <input type="radio" clrRadio name="tfo" required/>
+                <label>{{'nfs.qos_iops' | translate}}>=<input class="inputOneLine" type="text" [(ngModel)]="updateNfs.minIops" name="minIops"> MB/s</label>
+              </clr-radio-wrapper>
+              <clr-radio-wrapper>
+                <input type="radio" clrRadio name="tfo" required value="3"/>
+                <label>{{'nfs.qos_latency' | translate}}<=<input class="inputOneLine" type="text" [(ngModel)]="updateNfs.latency" name="latency"> ms</label>
+              </clr-radio-wrapper>
+            </clr-radio-container>
+          </div>
+        </div>
+        <!--thin-->
+        <clr-toggle-wrapper>
+          <label> {{'nfs.thin' | translate}}</label>
+          <input type="checkbox" name="thin" clrToggle [(ngModel)]="updateNfs.thin"/>
+        </clr-toggle-wrapper>
+        <!--重删-->
+        <clr-select-container>
+          <label>{{'nfs.dataDedu' | translate}}</label>
+          <select clrSelect [(ngModel)]="updateNfs.deduplicationEnabled" name="deduplicationEnabled">
+            <option value="false">{{'nfs.disable' | translate}}</option>
+            <option value="true">{{'nfs.enable' | translate}}</option>
+          </select>
+        </clr-select-container>
+        <!--压缩-->
+        <clr-select-container>
+          <label>{{'nfs.dataCompre' | translate}}</label>
+          <select clrSelect [(ngModel)]="updateNfs.compressionEnabled" name="compressionEnabled">
+            <option value="false">{{'nfs.disable' | translate}}</option>
+            <option value="true">{{'nfs.enable' | translate}}</option>
+          </select>
+        </clr-select-container>
+        <clr-toggle-wrapper >
+          <label>{{'nfs.capAuto' | translate}}</label>
+          <input type="checkbox" clrToggle [(ngModel)]="updateNfs.autoSizeEnable" name="autoSizeEnable"/>
+        </clr-toggle-wrapper>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="backToNfsList()">{{'menu.cancel' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="modifyCommit()">{{'menu.ok' | translate}}</button>
+    </div>
+  </clr-modal>
+</div>

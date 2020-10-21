@@ -147,7 +147,6 @@ export class NfsAddComponent implements OnInit{
   backToNfsList(){
     this.router.navigate(['nfs']);
   }
-
   closeModel(){
     this.gs.getClientSdk().modal.close();
   }
