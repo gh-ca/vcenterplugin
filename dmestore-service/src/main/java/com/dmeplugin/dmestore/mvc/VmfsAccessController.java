@@ -254,4 +254,26 @@ public class VmfsAccessController extends BaseController {
             return failure(e.getMessage());
         }
     }
+
+    /**
+     * Access vmfs
+     *
+     * @return: ResponseBodyBean
+     */
+    @RequestMapping(value = "/queryvmfs", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseBodyBean queryVmfs(@RequestParam("dataStoreObjectId") String dataStoreObjectId) throws Exception {
+        LOG.info("accessvmfs/queryvmfs");
+        String failureStr = "";
+        try {
+            List<VmfsDataInfo> lists = vmfsAccessService.queryVmfs(dataStoreObjectId);
+            LOG.info("listvmfs lists==" + gson.toJson(lists));
+            return success(lists);
+        } catch (Exception e) {
+            LOG.error("list vmfs failure:", e);
+            failureStr = "list vmfs failure:" + e.toString();
+        }
+        return failure(failureStr);
+    }
+
 }
