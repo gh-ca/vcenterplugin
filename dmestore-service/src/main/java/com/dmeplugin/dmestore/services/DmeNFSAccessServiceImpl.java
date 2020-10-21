@@ -784,20 +784,26 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             String clusterObjId = ToolUtils.getStr(params.get("clusterId"));
             //查询Datastore关联主机、集群、VM，过滤掉VM注册的主机和集群
             vcsdkUtils.hasVmOnDatastore(dataStoreObjectId);
-
-            //vcenter侧主机 集群二选一
-            if (!StringUtils.isEmpty(hostObjId)) {
-                //unmountNfsFromHost(dataStoreObjectId, hostObjId);
-            } else if (!StringUtils.isEmpty(clusterObjId)) {
-                //unmountNfsFromCluster(dataStoreObjectId, clusterObjId);
-            } else {
-                //throw new Exception("unmount nfs parameter exception,No host or cluster is specified :" + params);
-            }
-            // vcenter refresh一下?
-
-            //***dme侧卸载
             // 1获取dme的share 2 获取share下的客户端访问列表
             DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStoreObjectId);
+            if(null != dvr){
+                String dsName = dvr.getStoreName();
+                if(!StringUtils.isEmpty(dsName)){
+                    Map<String, Object> dsmap = new HashMap<>();
+                    dsmap.put("name", dsName);
+                    //vcenter侧主机 集群二选一
+                    if (!StringUtils.isEmpty(hostObjId)) {
+                        unmountNfsFromHost(dataStoreObjectId, hostObjId);
+                    } else if (!StringUtils.isEmpty(clusterObjId)) {
+                        //unmountNfsFromCluster(dataStoreObjectId, clusterObjId);
+                    } else {
+                        //throw new Exception("unmount nfs parameter exception,No host or cluster is specified :" + params);
+                    }
+                    // vcenter refresh一下?
+                }
+            }
+
+            //***dme侧卸载
             if (null != dvr) {
                 String shareId = dvr.getShareId();
                 List<AuthClient> authClientList = getNFSDatastoreShareAuthClients(shareId);
@@ -884,8 +890,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         }
     }
 
-    private void unmountNfsFromHost(String dataStoreObjectId, String hsotId) throws Exception {
-        vcsdkUtils.unmountNfsOnHost(dataStoreObjectId, hsotId);
+    private void unmountNfsFromHost(String dataStoreObjectId, String hostId) throws Exception {
+        vcsdkUtils.unmountNfsOnHost(dataStoreObjectId, hostId);
+        //vcsdkUtils.unmountVmfsOnHostOrCluster(dataStoreObjectId,null,hostId);
     }
 
     private void unmountNfsFromCluster(String dataStoreObjectId, String clusterId) throws Exception {

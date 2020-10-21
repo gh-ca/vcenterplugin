@@ -1385,6 +1385,8 @@ public class VCSDKUtils {
                     try {
                         ManagedObjectReference objmor = vcConnectionHelper.objectID2MOR(hostObjectId);
                         HostMO hostmo = new HostMO(vmwareContext, objmor);
+                        String hostmoName = hostmo.getHostName();
+                        String hostmoName2 = hostmo.getName();
                         //从挂载的主机卸载
                         if (hostmo != null) {
                             unmountVmfs(objDataStoreName, hostmo);
@@ -1645,14 +1647,14 @@ public class VCSDKUtils {
         }
     }
 
-    public void unmountNfsOnHost(String dataStoreObjectId, String hostId) throws VcenterException {
+    public void unmountNfsOnHost(String dataStoreObjectId, String hostObjId) throws VcenterException {
         try {
             if (StringUtils.isEmpty(dataStoreObjectId)) {
                 logger.info("dataStore object id:" + dataStoreObjectId + " is null");
                 return;
             }
-            if (StringUtils.isEmpty(hostId)) {
-                logger.info("host:" + hostId + " is null");
+            if (StringUtils.isEmpty(hostObjId)) {
+                logger.info("host:" + hostObjId + " is null");
                 return;
             }
 
@@ -1663,7 +1665,9 @@ public class VCSDKUtils {
             ManagedObjectReference dsmor = vcConnectionHelper.objectID2MOR(dataStoreObjectId);
             DatastoreMO dsmo = new DatastoreMO(vmwareContext, dsmor);
 
-            HostMO hostmo = rootFsMo.findHostById(hostId);//通过主机名称而不是主机ID查询主机MO
+            ManagedObjectReference objmor = vcConnectionHelper.objectID2MOR(hostObjId);
+            HostMO hostmo = new HostMO(vmwareContext, objmor);
+            
             logger.info("Host name: " + hostmo.getName());
             //卸载
             unmountNfsOnHost(dsmo, hostmo, dataStoreObjectId);
@@ -1719,6 +1723,10 @@ public class VCSDKUtils {
             //卸载前重新扫描datastore
             hostMo.getHostStorageSystemMO().rescanVmfs();
             logger.info("Rescan datastore before unmounting");
+             //从主机卸载datastore
+            String dsName = dsmo.getName();
+            hostMo.getHostDatastoreSystemMO().deleteDatastore(dsName);
+
             //卸载NFS
             hostMo.unmountDatastore(nfsId);
             logger.info("unmount nfs success:" + hostMo.getName() + ":" + dsmo.getName());
@@ -2167,9 +2175,10 @@ public class VCSDKUtils {
             //存储下的所有主机
             ManagedObjectReference dsmor = vcConnectionHelper.objectID2MOR(dataStoreObjectId);
             DatastoreMO dsmo = new DatastoreMO(vmwareContext, dsmor);
-            for (String hostId : hostIds) {
-                HostMO hostmo = rootFsMo.findHostById(hostId);
-                logger.info("Host name: " + hostmo.getName());
+        	for (String hostObjId : hostObjIds) {
+            	ManagedObjectReference objmor = vcConnectionHelper.objectID2MOR(hostObjId);
+            	HostMO hostmo = new HostMO(vmwareContext, objmor);
+            	logger.info("Host name: " + hostmo.getName());
                 //主机删除存储
                 deleteNfs(dsmo, hostmo, dataStoreObjectId);
             }
@@ -2666,7 +2675,7 @@ public class VCSDKUtils {
 
             DatastoreMO ds1 = new DatastoreMO(vmwareContext, vcConnectionHelper.objectID2MOR(objectid));
             List<ManagedObjectReference> vms = ds1.getVM();
-            if (vms.size() > 0) {
+            if (null != vms && vms.size() > 0) {
                 return true;
             }
         }catch (Exception e){
