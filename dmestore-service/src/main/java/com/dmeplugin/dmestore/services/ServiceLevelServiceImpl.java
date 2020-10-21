@@ -278,7 +278,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
     //扫描服务等级 发现服务等级下的存储池,磁盘,(存储端口)
     @Override
-    public List<StoragePool> getStoragePoolInfosByServiceLevelId(String serivceLevelId) throws Exception {
+    public List<StoragePool> getStoragePoolInfosByServiceLevelId(String serivceLevelId) throws DMEException {
         List<StoragePool> storagePools = new ArrayList<>();
         // servicLevelId对应的serviceLevelInstanceId
         Map<String, Map<String, Object>> serviceLevelMap = dmeRelationInstanceService.getServiceLevelInstance();
@@ -335,7 +335,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     }
 
     @Override
-    public List<Volume> getVolumeInfosByServiceLevelId(String serviceLevelId) throws Exception {
+    public List<Volume> getVolumeInfosByServiceLevelId(String serviceLevelId) throws DMEException {
         List<Volume> volumes = new ArrayList<>();
         String url = QUERY_SERVICE_LEVEL_VOLUME_URL.replace("{serviceLevelId}", serviceLevelId);
 
@@ -407,18 +407,18 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     }
 
     //服务等级 发现服务等级下的存储池 serviceLevelId和sourceInstanceId一样?
-    public List<String> getStoragePoolIdsByServiceLevelId(String serviceLevelId) throws Exception {
+    public List<String> getStoragePoolIdsByServiceLevelId(String serviceLevelId) throws DMEException {
         String relatinName = "M_DjTierContainsStoragePool";
         return getContainIdsByRelationNameLevelId(relatinName, serviceLevelId);
     }
 
     //服务等级 发现服务等级下的卷实例ID
-    public List<String> getVolumeIdsByServiceLivelId(String serviceLevelId) throws Exception {
+    public List<String> getVolumeIdsByServiceLivelId(String serviceLevelId) throws DMEException {
         String relationName = "M_DjTierContainsLun";
         return getContainIdsByRelationNameLevelId(relationName, serviceLevelId);
     }
 
-    private List<String> getContainIdsByRelationNameLevelId(String relationName, String serviceLevelId) throws Exception {
+    private List<String> getContainIdsByRelationNameLevelId(String relationName, String serviceLevelId) throws DMEException {
         Set<String> ids = new HashSet<>();
         List<RelationInstance> ris = dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(relationName, serviceLevelId);
         if (null != ris && ris.size() > 0) {

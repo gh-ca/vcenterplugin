@@ -464,7 +464,8 @@
     "free": "可用",
     "top5T": "存储使用率前5",
     "connectT": "DME连接",
-    "connectFail": "连接失败"
+    "connectFail": "连接失败！",
+    "connectSuccess": "连接成功！"
   },
   "bestPractice": {
     "apply": "实施最佳实践",

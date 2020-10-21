@@ -2,6 +2,7 @@ package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.dao.VCenterInfoDao;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
+import com.dmeplugin.dmestore.exception.DmeSqlException;
 import com.dmeplugin.dmestore.utils.CipherUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -29,15 +30,14 @@ public class VCenterInfoServiceImpl extends DMEOpenApiService implements VCenter
   private VCenterInfoService vCenterInfoService;
 
   @Override
-  public int addVCenterInfo(VCenterInfo vCenterInfo) throws SQLException {
+  public int addVCenterInfo(VCenterInfo vCenterInfo) throws DmeSqlException {
     return vCenterInfoDao.addVCenterInfo(vCenterInfo);
   }
 
 
 
   @Override
-  public int saveVCenterInfo(final VCenterInfo vCenterInfo)
-      throws SQLException {
+  public int saveVCenterInfo(final VCenterInfo vCenterInfo) throws DmeSqlException {
     VCenterInfo vCenterInfo1 = vCenterInfoDao.getVCenterInfo();
     int returnValue = 0;
     boolean supportHA = true;
@@ -72,7 +72,7 @@ public class VCenterInfoServiceImpl extends DMEOpenApiService implements VCenter
   }
 
   @Override
-  public Map<String, Object> findVCenterInfo() throws SQLException {
+  public Map<String, Object> findVCenterInfo() throws DmeSqlException {
     Map<String, Object> returnMap = new HashMap<>();
     VCenterInfo vCenterInfo = vCenterInfoDao.getVCenterInfo();
     if (vCenterInfo != null) {
@@ -87,7 +87,7 @@ public class VCenterInfoServiceImpl extends DMEOpenApiService implements VCenter
   }
 
   @Override
-  public VCenterInfo getVCenterInfo() throws SQLException {
+  public VCenterInfo getVCenterInfo() throws DmeSqlException {
     return vCenterInfoDao.getVCenterInfo();
   }
 

@@ -244,22 +244,20 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     this.gs.loading = true;
     this.http.post('servicelevel/listservicelevel', {}).subscribe((response: any) => {
       this.gs.loading = false;
-      response.data = JSON.stringify(response.data);
-      response.data = response.data.replace('service-levels', 'serviceLevels');
-      const r = this.recursiveNullDelete(JSON.parse(response.data));
-      for (const i of r.serviceLevels){
-        if (i.totalCapacity == 0){
-          i.usedRate = 0.0;
-        } else {
-          i.usedRate =  ((i.usedCapacity / i.totalCapacity * 100).toFixed(2));
+      if(response.code == '200'){
+        this.serviceLevelsRes = this.recursiveNullDelete(response.data);
+        for (const i of this.serviceLevelsRes){
+          if (i.totalCapacity == 0){
+            i.usedRate = 0.0;
+          } else {
+            i.usedRate =  ((i.usedCapacity / i.totalCapacity * 100).toFixed(2));
+          }
+          i.usedCapacity = (i.usedCapacity/1024).toFixed(2);
+          i.totalCapacity = (i.totalCapacity/1024).toFixed(2);
+          i.freeCapacity = (i.freeCapacity/1024).toFixed(2);
         }
-        i.usedCapacity = (i.usedCapacity/1024).toFixed(2);
-        i.totalCapacity = (i.totalCapacity/1024).toFixed(2);
-        i.freeCapacity = (i.freeCapacity/1024).toFixed(2);
+        this.search();
       }
-      this.serviceLevelsRes = r.serviceLevels;
-      this.search();
-      console.log(this.serviceLevels);
     }, err => {
       console.error('ERROR', err);
     });

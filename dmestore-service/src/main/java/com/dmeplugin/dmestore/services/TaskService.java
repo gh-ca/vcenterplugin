@@ -1,5 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeSqlException;
 import com.dmeplugin.dmestore.model.TaskDetailInfo;
 import com.google.gson.JsonObject;
 
@@ -15,9 +17,9 @@ import java.util.Map;
  **/
 public interface TaskService {
 
-    List<TaskDetailInfo> listTasks() throws Exception;
+    List<TaskDetailInfo> listTasks() ;
 
-    TaskDetailInfo queryTaskById(String taskId) throws Exception;
+    TaskDetailInfo queryTaskById(String taskId) ;
 
     void getTaskStatus(List<String> taskIds, Map<String, Integer> taskStatusMap, int timeout, long startTime);
 
@@ -30,5 +32,5 @@ public interface TaskService {
      * @Param [taskId]
      * @Return com.google.gson.JsonObject
      **/
-    JsonObject queryTaskByIdUntilFinish(String taskId) throws Exception;
+    JsonObject queryTaskByIdUntilFinish(String taskId) throws DMEException;
 }

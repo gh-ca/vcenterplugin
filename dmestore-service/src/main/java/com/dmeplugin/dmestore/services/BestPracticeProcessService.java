@@ -1,5 +1,8 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeSqlException;
+import com.dmeplugin.dmestore.exception.VcenterException;
 import com.dmeplugin.dmestore.model.BestPracticeBean;
 import com.dmeplugin.dmestore.model.BestPracticeCheckRecordBean;
 import com.dmeplugin.dmestore.model.BestPracticeUpResultResponse;
@@ -10,9 +13,9 @@ import java.util.List;
  * @author wangxiangyong
  */
 public interface BestPracticeProcessService {
-    List<BestPracticeCheckRecordBean> getCheckRecord() throws Exception;
+    List<BestPracticeCheckRecordBean> getCheckRecord()  ;
 
-    List<BestPracticeBean> getCheckRecordBy(String hostSetting, int pageNo, int pageSize) throws Exception;
+    List<BestPracticeBean> getCheckRecordBy(String hostSetting, int pageNo, int pageSize) throws DMEException;
 
     void check(String objectId) throws Exception;
 
@@ -23,9 +26,9 @@ public interface BestPracticeProcessService {
      * @Param [objectIds, hostSetting]
      * @Return void
      **/
-    List<BestPracticeUpResultResponse> update(List<String> objectIds) throws Exception;
+    List<BestPracticeUpResultResponse> update(List<String> objectIds) throws DmeSqlException;
 
-    List<BestPracticeUpResultResponse> updateByCluster(String clusterobjectid) throws Exception;
+    List<BestPracticeUpResultResponse> updateByCluster(String clusterobjectid) throws VcenterException, DmeSqlException;
 
     /**
      * @Author Administrator
@@ -34,5 +37,5 @@ public interface BestPracticeProcessService {
      * @Param [objectIds, hostSetting]
      * @Return void
      **/
-    List<BestPracticeUpResultResponse> update(List<String> objectIds, String hostSetting) throws Exception;
+    List<BestPracticeUpResultResponse> update(List<String> objectIds, String hostSetting) throws DmeSqlException;
 }

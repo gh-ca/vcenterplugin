@@ -5,6 +5,7 @@ package com.dmeplugin.dmestore.dao;
 import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.exception.DataBaseException;
+import com.dmeplugin.dmestore.exception.DmeSqlException;
 import com.dmeplugin.dmestore.services.DmeConstants;
 
 import java.sql.*;
@@ -19,7 +20,7 @@ import java.util.*;
  **/
 public class VCenterInfoDao extends H2DataBaseDao {
 
-  public int addVCenterInfo(VCenterInfo vCenterInfo) throws SQLException {
+  public int addVCenterInfo(VCenterInfo vCenterInfo) throws DmeSqlException {
     checkVCenterInfo(vCenterInfo);
     Connection con = null;
     PreparedStatement ps = null;
@@ -44,13 +45,13 @@ public class VCenterInfoDao extends H2DataBaseDao {
       return row;
     } catch (SQLException e) {
       LOGGER.error("Failed to add vCenter info: " + e.getMessage());
-      throw e;
+      throw new DmeSqlException(e.getMessage());
     } finally {
       closeConnection(con, ps, rs);
     }
   }
 
-  public int updateVCenterInfo(VCenterInfo vCenterInfo) throws SQLException {
+  public int updateVCenterInfo(VCenterInfo vCenterInfo) throws DmeSqlException {
     checkVCenterInfo(vCenterInfo);
     checkID(vCenterInfo.getId());
     Connection con = null;
@@ -71,13 +72,13 @@ public class VCenterInfoDao extends H2DataBaseDao {
       return ps.executeUpdate();
     } catch (SQLException e) {
       LOGGER.error("Failed to update vCenter info: " + e.getMessage());
-      throw e;
+      throw new DmeSqlException(e.getMessage());
     } finally {
       closeConnection(con, ps, rs);
     }
   }
 
-  public VCenterInfo getVCenterInfo() throws SQLException {
+  public VCenterInfo getVCenterInfo() throws DmeSqlException {
     Connection con = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
@@ -101,7 +102,7 @@ public class VCenterInfoDao extends H2DataBaseDao {
       }
     } catch (DataBaseException | SQLException e) {
       LOGGER.error("Failed to get vCenter info: " + e.getMessage());
-      throw new SQLException(e);
+      throw new DmeSqlException(e.getMessage());
     } finally {
       closeConnection(con, ps, rs);
     }
@@ -110,32 +111,32 @@ public class VCenterInfoDao extends H2DataBaseDao {
 
 
 
-  private void checkIp(String ip) throws SQLException {
+  private void checkIp(String ip) throws  DmeSqlException {
     if (ip == null || ip.length() > DmeConstants.MAXLEN) {
-      throw new SQLException("parameter ip is not correct");
+      throw new DmeSqlException("parameter ip is not correct");
     }
   }
 
-  private void checkUserName(String userName) throws SQLException {
+  private void checkUserName(String userName) throws  DmeSqlException {
     if (userName == null || userName.length() > DmeConstants.MAXLEN) {
-      throw new SQLException("parameter userName is not correct");
+      throw new DmeSqlException("parameter userName is not correct");
     }
   }
 
-  private void checkPassword(String password) throws SQLException {
+  private void checkPassword(String password) throws DmeSqlException {
     if (password == null || password.length() > DmeConstants.MAXLEN) {
-      throw new SQLException("parameter password is not correct");
+      throw new DmeSqlException("parameter password is not correct");
     }
   }
 
-  private void checkID(int id) throws SQLException {
+  private void checkID(int id) throws  DmeSqlException {
     if (id < 1) {
-      throw new SQLException("parameter is is not correct");
+      throw new DmeSqlException("parameter is is not correct");
     }
 
   }
 
-  private void checkVCenterInfo(VCenterInfo vCenterInfo) throws SQLException {
+  private void checkVCenterInfo(VCenterInfo vCenterInfo) throws DmeSqlException {
     checkIp(vCenterInfo.getHostIp());
     checkUserName(vCenterInfo.getUserName());
     checkPassword(vCenterInfo.getPassword());

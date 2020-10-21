@@ -353,15 +353,25 @@ public class NfsOperationServiceImpl implements NfsOperationService {
            // return responseBodyBean;
             throw new DMEException("503","change nfs storage capacity error,params error!");
         }
+        String storeObjectId = (String) params.get("storeObjectId");
         String file_system_id = (String) params.get("fileSystemId");
         Boolean is_expand = (Boolean) params.get("expand");
         Double capacity = Double.valueOf(params.get("capacity").toString());
-        if (StringUtils.isEmpty(file_system_id) ||StringUtils.isEmpty(is_expand)||StringUtils.isEmpty(capacity)) {
+        if ((StringUtils.isEmpty(storeObjectId)&&StringUtils.isEmpty(file_system_id)) ||StringUtils.isEmpty(is_expand)||StringUtils.isEmpty(capacity)) {
             //responseBodyBean.setCode("202");
             //responseBodyBean.setDescription("change nfs storage capacity error,params error!");
             //return responseBodyBean;
             throw new DMEException("202","change nfs storage capacity error,params error!");
         }
+
+        if (!StringUtils.isEmpty(storeObjectId)){
+            List<String> fsIds = dmeVmwareRalationDao.getFsIdsByStorageId(storeObjectId);
+            if (fsIds.size()>0){
+                //如果objectid存在，则通过objectid的关系表来获取fsid
+                file_system_id=fsIds.get(0);
+            }
+        }
+
         String url = API_FS_UPDATE + "/" + file_system_id;
         //查询指定fs拿对应的信息
         Integer code = 0;

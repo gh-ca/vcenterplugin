@@ -99,7 +99,7 @@ export class IscsiComponent implements OnInit, AfterViewInit {
     this.http.get(this.storageGetUrl, {}).subscribe((result: any) => {
       this.gs.loading = false;
       if (result.code === '200'){
-        this.storageDevices = result.data.data;
+        this.storageDevices = result.data;
         setTimeout(() => {
           this.loadPorts();
         }, 1000);
@@ -108,7 +108,6 @@ export class IscsiComponent implements OnInit, AfterViewInit {
     }, err => {
       console.error('ERROR', err);
     });
-    this.cdr.detectChanges();
   }
 
   loadPorts(){

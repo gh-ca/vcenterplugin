@@ -1,6 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.entity.VCenterInfo;
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.EthPortInfo;
 import com.dmeplugin.dmestore.utils.CipherUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
@@ -38,19 +39,19 @@ public class HostAccessServiceImpl implements HostAccessService {
     }
 
     @Override
-    public void configureIscsi(Map<String, Object> params) throws Exception {
+    public void configureIscsi(Map<String, Object> params) throws DMEException {
         if (params != null) {
             if(null==params.get(DmeConstants.ETHPORTS)){
                 LOG.error("configure Iscsi error:ethPorts is null.");
-                throw new Exception("configure Iscsi error:ethPorts is null.");
+                throw new DMEException("configure Iscsi error:ethPorts is null.");
             }
             if(null==params.get(DmeConstants.VMKERNEL)){
                 LOG.error("configure Iscsi error:vmKernel is null.");
-                throw new Exception("configure Iscsi error:vmKernel is null.");
+                throw new DMEException("configure Iscsi error:vmKernel is null.");
             }
             if(StringUtils.isEmpty(params.get(DmeConstants.HOSTOBJECTID))){
                 LOG.error("configure Iscsi error:host ObjectId is null.");
-                throw new Exception("configure Iscsi error:host ObjectId is null.");
+                throw new DMEException("configure Iscsi error:host ObjectId is null.");
             }
             List<Map<String, Object>> ethPorts = (List<Map<String, Object>>)params.get("ethPorts");
             Map<String, String> vmKernel = (Map<String, String>)params.get("vmKernel");
@@ -58,22 +59,22 @@ public class HostAccessServiceImpl implements HostAccessService {
             LOG.info("params=="+gson.toJson(params));
             vcsdkUtils.configureIscsi(hostObjectId,vmKernel,ethPorts);
         } else {
-            throw new Exception("configure Iscsi parameter exception:" + params);
+            throw new DMEException("configure Iscsi parameter exception:" + params);
         }
     }
 
     @Override
-    public List<EthPortInfo> testConnectivity(Map<String, Object> params) throws Exception {
+    public List<EthPortInfo> testConnectivity(Map<String, Object> params) throws DMEException {
         List<EthPortInfo> relists = null;
         try {
             if (params != null) {
                 if(null==params.get(DmeConstants.ETHPORTS)){
                     LOG.error("test connectivity error:ethPorts is null.");
-                    throw new Exception("test connectivity error:ethPorts is null.");
+                    throw new DMEException("test connectivity error:ethPorts is null.");
                 }
                 if(StringUtils.isEmpty(params.get(DmeConstants.HOSTOBJECTID))){
                     LOG.error("test connectivity error:host ObjectId is null.");
-                    throw new Exception("test connectivity error:host ObjectId is null.");
+                    throw new DMEException("test connectivity error:host ObjectId is null.");
                 }
                 List<Map<String, Object>> ethPorts = (List<Map<String, Object>>)params.get("ethPorts");
                 String hostObjectId = params.get("hostObjectId").toString();
@@ -98,7 +99,7 @@ public class HostAccessServiceImpl implements HostAccessService {
             }
         } catch (Exception e) {
             LOG.error("test connectivity error:", e);
-            throw e;
+            throw new DMEException(e.getMessage());
         }
         LOG.info("test connectivity relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
         return relists;
