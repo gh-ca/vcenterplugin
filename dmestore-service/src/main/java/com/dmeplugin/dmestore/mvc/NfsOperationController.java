@@ -1,6 +1,7 @@
 package com.dmeplugin.dmestore.mvc;
 
 import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.model.CapacityAutonegotiation;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.NfsOperationService;
 import com.google.gson.Gson;
@@ -89,12 +90,12 @@ public class NfsOperationController extends BaseController{
         filesystemSpec.put("capacity", params.get("size"));
         filesystemSpec.put("count", 1);
         if (sameName) {
-            createNfsShareParam.put("name", "/"+nfsName);
+            createNfsShareParam.put("name", nfsName);
             createNfsShareParam.put("share_path", "/" + nfsName + "/");
             filesystemSpec.put("name", nfsName);
             param.put("exportPath", "/" + nfsName);
         } else {
-            createNfsShareParam.put("name", "/"+params.get("shareName"));
+            createNfsShareParam.put("name", params.get("shareName"));
             createNfsShareParam.put("share_path", "/" + params.get("fsName") + "/");
             filesystemSpec.put("name", params.get("fsName"));
             param.put("exportPath", "/" + params.get("fsName"));
@@ -133,6 +134,9 @@ public class NfsOperationController extends BaseController{
             }
             tuning.put("compression_enabled", params.get("compressionEnabled"));
             tuning.put("deduplication_enabled", params.get("deduplicationEnabled"));
+
+            String capacitymode=(Boolean.parseBoolean(String.valueOf(params.get("autoSizeEnable")))? CapacityAutonegotiation.capacitymodeauto:CapacityAutonegotiation.capacitymodeoff);
+            capacityAutonegotiation.put("capacity_self_adjusting_mode", capacitymode);
             capacityAutonegotiation.put("auto_size_enable", params.get("autoSizeEnable"));
         } else {
             tuning.put("allocation_type", "thin");
@@ -190,6 +194,8 @@ public class NfsOperationController extends BaseController{
         Object autoSizeEnable = params.get("autoSizeEnable");
         if (autoSizeEnable!=null) {
             capacityAutonegotiation.put("auto_size_enable", params.get("autoSizeEnable"));
+            String capacitymode=(Boolean.parseBoolean(String.valueOf(params.get("autoSizeEnable")))? CapacityAutonegotiation.capacitymodeauto:CapacityAutonegotiation.capacitymodeoff);
+            capacityAutonegotiation.put("capacity_self_adjusting_mode", capacitymode);
             param.put("capacity_autonegotiation",capacityAutonegotiation);
         }
         Map<String, Object> tuning = new HashMap<>(16);
