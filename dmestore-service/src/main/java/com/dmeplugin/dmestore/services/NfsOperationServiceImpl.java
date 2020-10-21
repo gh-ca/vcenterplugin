@@ -595,7 +595,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             //resMap.put("code", code);
             //resMap.put("msg", "update nfs datastore error !");
             //return resMap;
-            throw new DMEException("503","update nfs datastore error !");
+            throw new DMEException("503","update nfs datastore error !"+responseEntity.getBody());
         }
         String object = responseEntity.getBody();
         JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
