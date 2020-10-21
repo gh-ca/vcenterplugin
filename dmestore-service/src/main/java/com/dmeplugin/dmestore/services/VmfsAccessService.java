@@ -1,5 +1,8 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeSqlException;
+import com.dmeplugin.dmestore.exception.VcenterException;
 import com.dmeplugin.dmestore.model.VmfsDataInfo;
 import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
 
@@ -20,7 +23,7 @@ public interface VmfsAccessService {
      * @return List<VmfsDataInfo>
      * @throws Exception when error
      */
-    List<VmfsDataInfo> listVmfs() throws Exception;
+    List<VmfsDataInfo> listVmfs() throws DMEException;
 
     /**
      * List vmfs Performance
@@ -29,7 +32,7 @@ public interface VmfsAccessService {
      * @return List<VmfsDataInfo>
      * @throws Exception when error
      */
-    List<VmfsDataInfo> listVmfsPerformance(List<String> volumeIds) throws Exception;
+    List<VmfsDataInfo> listVmfsPerformance(List<String> volumeIds) throws DMEException;
 
     /**
      * Create vmfs include:
@@ -66,7 +69,7 @@ public interface VmfsAccessService {
      * @return: ResponseBodyBean
      * @throws Exception when error
      */
-    void createVmfs(Map<String, Object> params) throws Exception;
+    void createVmfs(Map<String, Object> params) throws DMEException;
 
     /**
      * Mount vmfs include
@@ -80,17 +83,17 @@ public interface VmfsAccessService {
      * @return: ResponseBodyBean
      * @throws Exception when error
      */
-    void mountVmfs(Map<String, Object> params) throws Exception;
+    void mountVmfs(Map<String, Object> params) throws DMEException;
 
     /**
      * unmounted vmfs
      */
-    void unmountVmfs(Map<String, Object> params) throws Exception;
+    void unmountVmfs(Map<String, Object> params) throws DMEException;
 
     /**
      * delete vmfs
      */
-    void deleteVmfs(Map<String, Object> params) throws Exception;
+    void deleteVmfs(Map<String, Object> params) throws DMEException;
 
     /**
      * vCenter VMFS存储卷详细信息查询
@@ -100,7 +103,7 @@ public interface VmfsAccessService {
      * @throws Exception always
      * @return java.util.List<com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail>
      **/
-    List<VmfsDatastoreVolumeDetail> volumeDetail(String storageObjectId) throws Exception;
+    List<VmfsDatastoreVolumeDetail> volumeDetail(String storageObjectId) throws DMEException;
 
     /**
      * vCenter VMFS存储扫描发现
@@ -109,14 +112,14 @@ public interface VmfsAccessService {
      * @throws Exception always
      * @return boolean
      **/
-    boolean scanVmfs() throws Exception;
+    boolean scanVmfs() throws DMEException;
 
     /**
      * 通过vmfs storageId查询DME侧关联的主机信息
      * @return 返回主机列表，单个主机的信息以map方式存储属性和属性值
      * @throws Exception
      */
-    List<Map<String, Object>> getHostsByStorageId(String storageId) throws Exception;
+    List<Map<String, Object>> getHostsByStorageId(String storageId) throws DMEException;
 
     /**
      * 通过vmfs storageId查询DME侧关联的主机组信息
@@ -124,6 +127,6 @@ public interface VmfsAccessService {
      * @return 返回主机组列表，单个主机组的信息以map方式存储属性和属性值
      * @throws Exception
      */
-    List<Map<String, Object>> getHostGroupsByStorageId(String storageId) throws Exception;
+    List<Map<String, Object>> getHostGroupsByStorageId(String storageId) throws DMEException;
 
 }
