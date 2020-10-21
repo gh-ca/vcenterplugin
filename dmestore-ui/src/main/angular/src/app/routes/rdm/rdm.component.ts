@@ -178,7 +178,7 @@ export class RdmComponent implements OnInit {
     this.http.get('dmestorage/storages', {}).subscribe((result: any) => {
       this.gs.loading = false;
       if (result.code === '200'){
-        this.storageDevices = result.data.data;
+        this.storageDevices = result.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
     }, err => {
@@ -191,7 +191,7 @@ export class RdmComponent implements OnInit {
     this.http.get('dmestorage/storagepools', {params: {storageId, media_type: "all"}}).subscribe((result: any) => {
       this.gs.loading = false;
       if (result.code === '200'){
-        this.storagePools = result.data.data;
+        this.storagePools = result.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
     }, err => {
