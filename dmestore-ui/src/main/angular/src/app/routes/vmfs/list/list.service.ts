@@ -238,15 +238,20 @@ export class GetForm {
       volume_id: null, // 卷ID
       control_policy: '1', // 控制策略,
       max_iops: null,
+      maxiopsChoose: false, // 最大iops 选中
       max_bandwidth: null,
+      maxbandwidthChoose: false, // 最大带宽 选中
       newVoName: null, // 新卷名称
       oldDsName: null, // 旧VMFS名称
       newDsName: null, // 新VMFS名称
       min_iops: null,
+      miniopsChoose: false, // 最小iops 选中
       min_bandwidth: null,
+      minbandwidthChoose: false, // 最小带宽 选中
       dataStoreObjectId: null, // objectID,
       service_level_name: null, // 服务等级名称
-      latency: null
+      latency: null,
+      latencyChoose: false, // 时延 选中
     };
     return editForm;
   }
