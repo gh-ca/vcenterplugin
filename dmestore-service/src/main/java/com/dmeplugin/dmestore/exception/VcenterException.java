@@ -1,7 +1,7 @@
 package com.dmeplugin.dmestore.exception;
 
 
-public class VcenterException extends Exception {
+public class VcenterException extends DMEException {
     private String code;
     private String message;
 

@@ -2,6 +2,7 @@ package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeSqlException;
 import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.RestUtils;
@@ -1139,7 +1140,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return fileSystemDetail;
     }
 
-    private String getDataStoreOnVolume(String volumeId) throws SQLException {
+    private String getDataStoreOnVolume(String volumeId) throws DmeSqlException {
         return dmeVmwareRalationDao.getVmfsNameByVolumeId(volumeId);
     }
 

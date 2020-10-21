@@ -310,7 +310,7 @@ public class DmeStorageController extends BaseController{
         }
         return failure(failureStr);
     }
-    @GetMapping("/filesystemdetail")
+    /*@GetMapping("/filesystemdetail")
     @ResponseBody
     public ResponseBodyBean getFileSystemDetail(@RequestParam(name = "fileSystemId")String fileSystemId) {
         try {
@@ -321,5 +321,5 @@ public class DmeStorageController extends BaseController{
         }
 
 
-    }
+    }*/
 }

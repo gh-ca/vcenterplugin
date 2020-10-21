@@ -250,4 +250,23 @@ public class NfsOperationController extends BaseController{
         }
 
     }
+
+
+    /**
+     * 通过storeobjectid来获取存储编译所需要的信息
+     * @param storeObjectId  存储的objectid
+     * @return 根据页面参数来确定的map
+     */
+    @GetMapping("/editnfsstore")
+    @ResponseBody
+    public ResponseBodyBean getEditNfsStore(@RequestParam(name = "storeObjectId")String storeObjectId) {
+        try {
+            return success(nfsOperationService.getEditNfsStore(storeObjectId));
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
+        }
+
+
+    }
 }

@@ -4,6 +4,7 @@ package com.dmeplugin.dmestore.dao;
 import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.exception.DataBaseException;
+import com.dmeplugin.dmestore.exception.DmeSqlException;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import org.springframework.util.StringUtils;
 
@@ -24,7 +25,7 @@ import java.util.List;
  **/
 public class DmeVmwareRalationDao extends H2DataBaseDao {
 
-    public List<DmeVmwareRelation> getDmeVmwareRelation(String storeType) throws SQLException {
+    public List<DmeVmwareRelation> getDmeVmwareRelation(String storeType) throws DmeSqlException {
 
         List<DmeVmwareRelation> lists = new ArrayList<>();
         Connection con = null;
@@ -65,14 +66,14 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             }
         } catch (DataBaseException | SQLException e) {
             LOGGER.error("Failed to get Dme Vmware Relation: " + e.getMessage());
-            throw new SQLException(e);
+            throw new DmeSqlException(e.getMessage());
         } finally {
             closeConnection(con, ps, rs);
         }
         return lists;
     }
 
-    public DmeVmwareRelation getDmeVmwareRelationByDsId(String storeId) throws SQLException {
+    public DmeVmwareRelation getDmeVmwareRelationByDsId(String storeId) throws DmeSqlException {
 
         DmeVmwareRelation dvr = null;
         Connection con = null;
@@ -112,14 +113,14 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             }
         } catch (DataBaseException | SQLException e) {
             LOGGER.error("Failed to get Dme Vmware Relation: " + e.getMessage());
-            throw new SQLException(e);
+            throw new DmeSqlException(e.getMessage());
         } finally {
             closeConnection(con, ps, rs);
         }
         return dvr;
     }
 
-    public List<String> getAllWwnByType(String storeType) throws SQLException {
+    public List<String> getAllWwnByType(String storeType) throws DmeSqlException {
         List<String> lists = new ArrayList<>();
         Connection con = null;
         PreparedStatement ps = null;
@@ -139,14 +140,14 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             }
         } catch (DataBaseException | SQLException e) {
             LOGGER.error("Failed to get dme access info: " + e.getMessage());
-            throw new SQLException(e);
+            throw new DmeSqlException(e.getMessage());
         } finally {
             closeConnection(con, ps, rs);
         }
         return lists;
     }
 
-    public List<String> getAllStorageIdByType(String storeType) throws SQLException {
+    public List<String> getAllStorageIdByType(String storeType) throws DmeSqlException {
         List<String> lists = new ArrayList<>();
         Connection con = null;
         PreparedStatement ps = null;
@@ -166,7 +167,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             }
         } catch (DataBaseException | SQLException e) {
             LOGGER.error("Failed to get dme store info: " + e.getMessage());
-            throw new SQLException(e);
+            throw new DmeSqlException(e.getMessage());
         } finally {
             closeConnection(con, ps, rs);
         }
@@ -286,49 +287,49 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
     /**
      * 根据存储ID获取fsId
      */
-    public String getFsIdByStorageId(String storeId) throws SQLException {
+    public String getFsIdByStorageId(String storeId) throws DmeSqlException {
         return getNfsContainId(storeId, "FS_ID");
     }
 
     /**
      * 根据存储ID获取shareId
      */
-    public String getShareIdByStorageId(String storeId) throws SQLException {
+    public String getShareIdByStorageId(String storeId) throws DmeSqlException {
         return getNfsContainId(storeId, "SHARE_ID");
     }
 
     /**
      * 根据存储ID获取logicportId
      */
-    public String getLogicPortIdByStorageId(String storeId) throws SQLException {
+    public String getLogicPortIdByStorageId(String storeId) throws DmeSqlException {
         return getNfsContainId(storeId, "LOGICPORT_ID");
     }
 
     /**
      * 根据存储ID获取fsId列表
      */
-    public List<String> getFsIdsByStorageId(String storeId) throws SQLException {
+    public List<String> getFsIdsByStorageId(String storeId) throws DmeSqlException {
         return getNfsContainIds(storeId, "FS_ID");
     }
 
     /**
      * 根据存储ID获取shareId列表
      */
-    public List<String> getShareIdsByStorageId(String storeId) throws SQLException {
+    public List<String> getShareIdsByStorageId(String storeId) throws DmeSqlException {
         return getNfsContainIds(storeId, "SHARE_ID");
     }
 
     /**
      * 根据存储ID获取logicPortId列表
      */
-    public List<String> getLogicPortIdsByStorageId(String storeId) throws SQLException {
+    public List<String> getLogicPortIdsByStorageId(String storeId) throws DmeSqlException {
         return getNfsContainIds(storeId, "LOGICPORT_ID");
     }
 
     /**
      * NFS存储 获取指定存储下的fileId的一个值
      */
-    private String getNfsContainId(String storeId, String fileId) throws SQLException {
+    private String getNfsContainId(String storeId, String fileId) throws DmeSqlException {
         String id = "";
         Connection con = null;
         PreparedStatement ps = null;
@@ -344,7 +345,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             }
         } catch (DataBaseException | SQLException e) {
             LOGGER.error("Failed to get dme nfs relation fileId: " + fileId + "," + e.getMessage());
-            throw new SQLException(e);
+            throw new DmeSqlException(e.getMessage());
         } finally {
             closeConnection(con, ps, rs);
         }
@@ -354,19 +355,19 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
     /**
      * NFS存储 获取指定存储下的fileId的集合
      */
-    private List<String> getNfsContainIds(String storeId, String fileId) throws SQLException {
+    private List<String> getNfsContainIds(String storeId, String fileId) throws DmeSqlException {
         return getFileIdsByCondition(storeId, fileId, ToolUtils.STORE_TYPE_NFS);
     }
 
     /**
      * 根据存储ID获取磁盘ID列表
      */
-    public List<String> getVolumeIdsByStorageId(String storeId) throws SQLException {
+    public List<String> getVolumeIdsByStorageId(String storeId) throws DmeSqlException {
         return getFileIdsByCondition(storeId, "volume_id", ToolUtils.STORE_TYPE_VMFS);
     }
 
 
-    private List<String> getFileIdsByCondition(String storeId, String fileId, String storeType) throws SQLException {
+    private List<String> getFileIdsByCondition(String storeId, String fileId, String storeType) throws DmeSqlException {
         List<String> lists = new ArrayList<>();
         Connection con = null;
         PreparedStatement ps = null;
@@ -381,7 +382,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             }
         } catch (DataBaseException | SQLException e) {
             LOGGER.error("Failed to get dme nfs relations fileId: " + fileId + "," + e.getMessage());
-            throw new SQLException(e);
+            throw new DmeSqlException(e.getMessage());
         } finally {
             closeConnection(con, ps, rs);
         }
@@ -392,7 +393,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
     /**
      * VMFS 通过vmfsDataStorageIds查询关联的DME存储的信息
      */
-    public List<DmeVmwareRelation> getDmeVmwareRelationsByStorageIds(List<String> storageIds) throws Exception {
+    public List<DmeVmwareRelation> getDmeVmwareRelationsByStorageIds(List<String> storageIds) throws DmeSqlException {
         List<DmeVmwareRelation> lists = new ArrayList<>();
         Connection con = null;
         PreparedStatement ps = null;
@@ -422,7 +423,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             }
         } catch (DataBaseException | SQLException e) {
             LOGGER.error("Failed to get Dme Vmware Relation: " + e.getMessage());
-            throw new SQLException(e);
+            throw new DmeSqlException(e.getMessage());
         } finally {
             closeConnection(con, ps, rs);
         }
@@ -452,7 +453,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
      * @return
      * @throws SQLException
      */
-    public String getVmfsNameByVolumeId(String volumeId) throws SQLException {
+    public String getVmfsNameByVolumeId(String volumeId) throws DmeSqlException {
         String vmfsDatastoreName = "";
         Connection con = null;
         PreparedStatement ps = null;
@@ -468,7 +469,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             }
         } catch (DataBaseException | SQLException e) {
             LOGGER.error("Failed to get vmfs datastore on: " + volumeId + "," + e.getMessage());
-            throw new SQLException(e);
+            throw new DmeSqlException(e.getMessage());
         } finally {
             closeConnection(con, ps, rs);
         }

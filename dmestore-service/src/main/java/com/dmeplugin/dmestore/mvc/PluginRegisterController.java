@@ -48,14 +48,9 @@ public class PluginRegisterController extends BaseController {
         boolean isRemoveData = false;
         synchronized (lock) {
             try {
-                Map<String, Object> remap;
                 if ("install".equals(action)) {
-                    remap=pluginRegisterService.installService(vcenterIP,vcenterPort,vcenterUsername,vcenterPassword,dmeIp,dmePort,dmeUsername,dmePassword);
-                    if (remap != null && remap.get(RestUtils.RESPONSE_STATE_CODE) != null
-                            && RestUtils.RESPONSE_STATE_200.equals(remap.get(RestUtils.RESPONSE_STATE_CODE).toString())) {
-                        return success(remap);
-                    }
-                    return failure(gson.toJson(remap));
+                    pluginRegisterService.installService(vcenterIP,vcenterPort,vcenterUsername,vcenterPassword,dmeIp,dmePort,dmeUsername,dmePassword);
+
                 }
                 if ("uninstall".equals(action)) {
                     //调用接口，删除数据
@@ -69,9 +64,9 @@ public class PluginRegisterController extends BaseController {
             } catch (Exception e) {
                 LOG.error("installplugin for dme failure:", e);
                 failureStr = e.getMessage();
+                return failure(failureStr);
             }
         }
-        return failure(failureStr);
     }
 
 
