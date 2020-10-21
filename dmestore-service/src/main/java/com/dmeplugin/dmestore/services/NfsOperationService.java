@@ -29,4 +29,6 @@ public interface NfsOperationService {
      * @param params
      */
     void changeNfsCapacity(Map<String, Object> params) throws DMEException;
+
+    Map<String,Object> getEditNfsStore(String storeObjectId) throws DMEException;
 }

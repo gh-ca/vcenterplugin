@@ -23,6 +23,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
@@ -140,7 +143,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     }
 
     @Override
-    public ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws Exception {
+    public ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws DMEException {
         ResponseEntity<String> responseEntity = null;
 
         if (StringUtils.isEmpty(dmeToken)) {
@@ -223,7 +226,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         return responseEntity;
     }
 
-    private synchronized ResponseEntity login(Map<String, Object> params) throws Exception {
+    private synchronized ResponseEntity login(Map<String, Object> params) throws DMEException {
         ResponseEntity responseEntity = null;
         dmeToken = null;
         if (params != null && params.get(DmeConstants.HOSTIP) != null) {
@@ -263,7 +266,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         return responseEntity;
     }
 
-    private HttpHeaders getHeaders() throws Exception {
+    private HttpHeaders getHeaders()   {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -275,7 +278,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         return headers;
     }
 
-    private synchronized void iniLogin() throws Exception {
+    private synchronized void iniLogin() throws DMEException {
         if (StringUtils.isEmpty(dmeToken)) {
             //查询数据库
             DmeInfo dmeInfo = dmeInfoDao.getDmeInfo();
@@ -290,7 +293,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 //登录
                 login(params);
             } else {
-                throw new Exception("目前没有DME接入信息");
+                throw new DMEException("目前没有DME接入信息");
             }
         }
     }

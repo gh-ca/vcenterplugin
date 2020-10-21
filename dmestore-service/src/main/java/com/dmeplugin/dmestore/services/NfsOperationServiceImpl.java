@@ -7,6 +7,7 @@ import com.dmeplugin.dmestore.exception.VcenterRuntimeException;
 import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.mvc.VmfsOperationController;
 import com.dmeplugin.dmestore.utils.RestUtils;
+import com.dmeplugin.dmestore.utils.StringUtil;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.*;
@@ -352,15 +353,25 @@ public class NfsOperationServiceImpl implements NfsOperationService {
            // return responseBodyBean;
             throw new DMEException("503","change nfs storage capacity error,params error!");
         }
+        String storeObjectId = (String) params.get("storeObjectId");
         String file_system_id = (String) params.get("fileSystemId");
         Boolean is_expand = (Boolean) params.get("expand");
         Double capacity = Double.valueOf(params.get("capacity").toString());
-        if (StringUtils.isEmpty(file_system_id) ||StringUtils.isEmpty(is_expand)||StringUtils.isEmpty(capacity)) {
+        if ((StringUtils.isEmpty(storeObjectId)&&StringUtils.isEmpty(file_system_id)) ||StringUtils.isEmpty(is_expand)||StringUtils.isEmpty(capacity)) {
             //responseBodyBean.setCode("202");
             //responseBodyBean.setDescription("change nfs storage capacity error,params error!");
             //return responseBodyBean;
             throw new DMEException("202","change nfs storage capacity error,params error!");
         }
+
+        if (!StringUtils.isEmpty(storeObjectId)){
+            List<String> fsIds = dmeVmwareRalationDao.getFsIdsByStorageId(storeObjectId);
+            if (fsIds.size()>0){
+                //如果objectid存在，则通过objectid的关系表来获取fsid
+                file_system_id=fsIds.get(0);
+            }
+        }
+
         String url = API_FS_UPDATE + "/" + file_system_id;
         //查询指定fs拿对应的信息
         Integer code = 0;
@@ -720,6 +731,82 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         LOG.info(url + "==responseEntity==" + (responseEntity == null ? "null" : responseEntity.getStatusCodeValue()));
 
         return responseEntity;
+    }
+
+    @Override
+    public Map<String, Object> getEditNfsStore(String storeObjectId) throws DMEException {
+        List<String> fsIds = dmeVmwareRalationDao.getFsIdsByStorageId(storeObjectId);
+        Map<String, Object> summaryMap=vcsdkUtils.getDataStoreSummaryByObjectId(storeObjectId);
+        Map<String, Object> resultMap=new HashMap<>();
+        resultMap.put("nfsName", String.valueOf(summaryMap.get("name")));
+        String fsname = "";
+        if (fsIds.size()<=0){
+            throw new DMEException("没有对应的文件系统");
+        }
+        for (int i = 0; i < fsIds.size(); i++) {
+            String file_system_id = fsIds.get(i);
+            if(StringUtils.isEmpty(file_system_id)){
+                continue;
+            }
+            String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL,
+                    "file_system_id", file_system_id);
+            ResponseEntity<String> responseTuning = dmeAccessService.access(url, HttpMethod.GET, null);
+            if (responseTuning.getStatusCodeValue() / 100 == 2) {
+                JsonObject fsDetail = gson.fromJson(responseTuning.getBody(), JsonObject.class);
+                resultMap.put("fsName",ToolUtils.jsonToStr(fsDetail.get("name")));
+                fsname=ToolUtils.jsonToStr(fsDetail.get("name"));
+                resultMap.put("fileSystemId",file_system_id);
+                JsonObject json = fsDetail.get("capacity_auto_negotiation").getAsJsonObject();
+                //fileSystemDetail.setCapacityAutonegotiation(capacityAutonegotiation);
+                resultMap.put("autoSizeEnable",ToolUtils.jsonToBoo(json.get("auto_size_enable")));
+                boolean isThin=("thin".equalsIgnoreCase(ToolUtils.jsonToStr(fsDetail.get("alloc_type"))))?true:false;
+                resultMap.put("thin",isThin);
+
+                JsonObject tuning = fsDetail.get("tuning").getAsJsonObject();
+
+                resultMap.put("compressionEnabled",ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
+                resultMap.put("deduplicationEnabled",ToolUtils.jsonToBoo(tuning.get("deduplication_enabled")));
+                String smart_qos = ToolUtils.jsonToStr(tuning.get("smart_qos"));
+                if (!StringUtils.isEmpty(smart_qos)) {
+                    resultMap.put("qosFlag",true);
+                    JsonObject qos_policy = new JsonParser().parse(smart_qos).getAsJsonObject();
+                    resultMap.put("maxBandwidth",ToolUtils.jsonToInt(qos_policy.get("max_bandwidth")));
+                    resultMap.put("maxIops",ToolUtils.jsonToInt(qos_policy.get("max_iops")));
+                    resultMap.put("latency",ToolUtils.jsonToInt(qos_policy.get("latency")));
+                    resultMap.put("minBandwidth",ToolUtils.jsonToInt(qos_policy.get("min_bandwidth")));
+                    resultMap.put("minIops",ToolUtils.jsonToInt(qos_policy.get("min_iops")));
+                }else
+                {
+                    resultMap.put("qosFlag",false);
+                }
+            }
+            break;
+        }
+
+        //根据存储ID 获取逻nfs_share_id
+        String nfsShareId = dmeVmwareRalationDao.getShareIdByStorageId(storeObjectId);
+        if (null==nfsShareId){
+            throw new DMEException("没有对应的共享");
+        }
+        String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_SHARE_DETAIL_URL,
+                "nfs_share_id", nfsShareId);
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+        if (responseEntity.getStatusCodeValue() / 100 != 2) {
+            LOG.error("获取 NFS Share 信息失败！返回信息：{}", responseEntity.getBody());
+            return null;
+        }
+        String resBody = responseEntity.getBody();
+        JsonObject share = gson.fromJson(resBody, JsonObject.class);
+        resultMap.put("shareName",ToolUtils.jsonToStr(share.get("name")));
+        if ( String.valueOf(summaryMap.get("name")).equalsIgnoreCase(fsname)&&  String.valueOf(summaryMap.get("name")).equalsIgnoreCase(ToolUtils.jsonToStr(share.get("name")))){
+            resultMap.put("sameName",true);
+        }else
+        {
+            resultMap.put("sameName",false);
+        }
+
+
+        return resultMap;
     }
 
 }

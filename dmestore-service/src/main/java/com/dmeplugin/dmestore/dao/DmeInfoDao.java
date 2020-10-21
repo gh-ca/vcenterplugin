@@ -3,6 +3,7 @@ package com.dmeplugin.dmestore.dao;
 
 import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
 import com.dmeplugin.dmestore.entity.DmeInfo;
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.exception.DataBaseException;
 import com.dmeplugin.dmestore.services.DmeConstants;
 import com.dmeplugin.dmestore.utils.CipherUtils;
@@ -49,7 +50,7 @@ public class DmeInfoDao extends H2DataBaseDao {
         }
     }
 
-    public DmeInfo getDmeInfo() throws Exception {
+    public DmeInfo getDmeInfo() throws DMEException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -73,7 +74,7 @@ public class DmeInfoDao extends H2DataBaseDao {
         } catch (Exception e) {
             e.printStackTrace();
             LOGGER.error("Failed to get dme access info: " + e.toString());
-            throw new Exception(e);
+            throw new DMEException("503",e.getMessage());
         } finally {
             closeConnection(con, ps, rs);
         }
