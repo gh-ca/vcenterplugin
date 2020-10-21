@@ -29,14 +29,15 @@ public class DmeRelationInstanceController extends BaseController {
     @ResponseBody
     public ResponseBodyBean queryByRelationName(@RequestParam(name = "relationName") String relationName) {
         LOG.info("listbyrelationname:" + relationName);
+
+        List<RelationInstance> ris = null;
         try {
-            List<RelationInstance> ris = dmeRelationInstanceService.queryRelationByRelationName(relationName);
-            return success(ris);
+           return success( dmeRelationInstanceService.queryRelationByRelationName(relationName));
         } catch (Exception e) {
             e.printStackTrace();
+            String errMsg = "queryRelationInstanceByRelationName error,relationName:" + relationName;
+            return failure(errMsg);
         }
-        String errMsg = "queryRelationInstanceByRelationName error,relationName:" + relationName;
-        return failure(errMsg);
     }
 
     @GetMapping("/getbyrelationnameinstanceid")
@@ -44,13 +45,12 @@ public class DmeRelationInstanceController extends BaseController {
     public ResponseBodyBean queryByRelationNameInstanceId(@RequestParam(name = "relationName") String relationName, @RequestParam(name = "instanceId") String instanceId) {
         LOG.info("getbyrelationname instanceid:" + relationName + " , " + instanceId);
         try {
-            RelationInstance ri = dmeRelationInstanceService.queryRelationByRelationNameInstanceId(relationName, instanceId);
-            return success(ri);
+            return success(dmeRelationInstanceService.queryRelationByRelationNameInstanceId(relationName, instanceId));
         } catch (Exception e) {
             e.printStackTrace();
+            String errMsg = "queryRelationInstanceByRelationNameInstanceId error,relationName:" + relationName + " , " + instanceId;
+            return failure(errMsg);
         }
-        String errMsg = "queryRelationInstanceByRelationNameInstanceId error,relationName:" + relationName + " , " + instanceId;
-        return failure(errMsg);
     }
 
     @GetMapping("/getbyrelationnameinstanceidcondition")
@@ -58,13 +58,13 @@ public class DmeRelationInstanceController extends BaseController {
     public ResponseBodyBean queryByRelationNameInstanceIdCondition(@RequestParam(name = "relationName") String relationName, @RequestParam(name = "instanceId") String instanceId) {
         LOG.info("getbyrelationname instanceid:" + relationName + " , " + instanceId);
         try {
-            List<RelationInstance> ris = dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(relationName, instanceId);
-            return success(ris);
+            return  success(dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(relationName, instanceId));
         } catch (Exception e) {
             e.printStackTrace();
+            String errMsg = "queryRelationInstanceByRelationNameInstanceId error,relationName:" + relationName + " , " + instanceId;
+            return failure(errMsg);
         }
-        String errMsg = "queryRelationInstanceByRelationNameInstanceId error,relationName:" + relationName + " , " + instanceId;
-        return failure(errMsg);
+
     }
 
 

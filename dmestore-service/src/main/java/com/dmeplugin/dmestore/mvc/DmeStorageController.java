@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.EthPortInfo;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.model.Storage;
@@ -50,12 +51,14 @@ public class DmeStorageController extends BaseController{
     @ResponseBody
     public ResponseBodyBean getStorages(){
 
-        Map<String, Object> resMap = dmeStorageService.getStorages();
-        Integer code = Integer.valueOf(resMap.get(API_RESP_CODE).toString());
-        if (null != resMap && null != code && code.equals(HttpStatus.OK.value())) {
-            return success(resMap);
+        try {
+            return success(dmeStorageService.getStorages());
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
+
     }
 
     /**
@@ -68,12 +71,16 @@ public class DmeStorageController extends BaseController{
     public ResponseBodyBean getStorageDetail(@RequestParam(name = "storageId") String storageId){
 
         LOG.info("storage_id ==" + storageId );
-        Map<String,Object> resMap=dmeStorageService.getStorageDetail(storageId);
 
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
-            return success(resMap);
+        try {
+            return success(dmeStorageService.getStorageDetail(storageId));
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
+
+
     }
 
     /**
@@ -88,93 +95,119 @@ public class DmeStorageController extends BaseController{
                                             @RequestParam(name = "mediaType",defaultValue = "all",required = false) String mediaType){
 
         LOG.info("storage_id ==" + storageId );
-        Map<String, Object> resMap = dmeStorageService.getStoragePools(storageId,mediaType);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
-            return success(resMap);
+        try {
+            return success(dmeStorageService.getStoragePools(storageId,mediaType));
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
+
     }
 
     @GetMapping("/logicports")
     @ResponseBody
     public ResponseBodyBean getLogicPorts(@RequestParam(name = "storageId") String storageId){
 
-        Map<String, Object> resMap = dmeStorageService.getLogicPorts(storageId);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
-            return success(resMap);
+        try {
+            return success(dmeStorageService.getLogicPorts(storageId));
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
+
     }
     @GetMapping("/volumes")
     @ResponseBody
     public ResponseBodyBean getVolumes(@RequestParam(name = "storageId") String storageId){
 
-        Map<String, Object> resMap = dmeStorageService.getVolumes(storageId);
-        Integer code = (Integer)resMap.get(API_RESP_CODE);
-        if (null != resMap && null != code && code.equals(HttpStatus.OK.value())) {
-            return success(resMap);
+        try {
+            return success(dmeStorageService.getVolumes(storageId));
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
+
     }
     @GetMapping("/filesystems")
     @ResponseBody
     public ResponseBodyBean getFileSystems(@RequestParam(name = "storageId") String storageId){
 
-        Map<String, Object> resMap = dmeStorageService.getFileSystems(storageId);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
-            return success(resMap);
+        try {
+            return success(dmeStorageService.getFileSystems(storageId));
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
+
     }
     @GetMapping("/dtrees")
     @ResponseBody
     public ResponseBodyBean getDTrees(@RequestParam(name = "storageId") String storageId){
 
-        Map<String, Object> resMap = dmeStorageService.getDTrees(storageId);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
-            return success(resMap);
+        try {
+            return success(dmeStorageService.getDTrees(storageId));
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
+
     }
     @GetMapping("/nfsshares")
     @ResponseBody
     public ResponseBodyBean getNfsShares(@RequestParam(name = "storageId") String storageId){
 
-        Map<String, Object> resMap = dmeStorageService.getNfsShares(storageId);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
-            return success(resMap);
+        try {
+            return success(dmeStorageService.getNfsShares(storageId));
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
+
     }
     @GetMapping("/bandports")
     @ResponseBody
     public ResponseBodyBean getBandPorts(@RequestParam(name = "storageId") String storageId){
 
-        Map<String, Object> resMap = dmeStorageService.getBandPorts(storageId);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
-            return success(resMap);
+        try {
+            return success(dmeStorageService.getBandPorts(storageId));
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
+
     }
     @GetMapping("/storagecontrollers")
     @ResponseBody
     public ResponseBodyBean getStorageControllers(@RequestParam(name = "storageDeviceId")String storageDeviceId){
 
-        Map<String, Object> resMap = dmeStorageService.getStorageControllers(storageDeviceId);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
-            return success(resMap);
+        try {
+            return success(dmeStorageService.getStorageControllers(storageDeviceId));
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
+
     }
     @GetMapping("/storagedisks")
     @ResponseBody
     public ResponseBodyBean getStorageDisks(@RequestParam(name = "storageDeviceId") String storageDeviceId){
 
-        Map<String, Object> resMap = dmeStorageService.getStorageDisks(storageDeviceId);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
-            return success(resMap);
+        try {
+            return success(dmeStorageService.getStorageDisks(storageDeviceId));
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
+
     }
 
     /**
@@ -210,21 +243,26 @@ public class DmeStorageController extends BaseController{
     @ResponseBody
     public ResponseBodyBean getStoragePort(@RequestParam(name = "storageDeviceId")String storageDeviceId,
                                            @RequestParam(name = "portType", defaultValue = "ALL", required = false) String portType) {
-        Map<String, Object> resMap = dmeStorageService.getStoragePort(storageDeviceId,portType);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
-            return success(resMap);
+        try {
+            return success(dmeStorageService.getStoragePort(storageDeviceId,portType));
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
+
     }
 
     @GetMapping("/failovergroups")
     @ResponseBody
     public ResponseBodyBean getFailoverGroups(@RequestParam(name = "storageId")String storageId) {
-        Map<String, Object> resMap = dmeStorageService.getFailoverGroups(storageId);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
-            return success(resMap);
+        try {
+            return success(dmeStorageService.getFailoverGroups(storageId));
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
     }
 
     /**
@@ -275,10 +313,13 @@ public class DmeStorageController extends BaseController{
     @GetMapping("/filesystemdetail")
     @ResponseBody
     public ResponseBodyBean getFileSystemDetail(@RequestParam(name = "fileSystemId")String fileSystemId) {
-        Map<String, Object> resMap = dmeStorageService.getFileSystemDetail(fileSystemId);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
-            return success(resMap);
+        try {
+            return success(dmeStorageService.getFileSystemDetail(fileSystemId));
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
+
     }
 }

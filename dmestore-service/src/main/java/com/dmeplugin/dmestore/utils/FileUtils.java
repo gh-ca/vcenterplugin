@@ -1,7 +1,7 @@
 package com.dmeplugin.dmestore.utils;
 
 
-import com.dmeplugin.dmestore.exception.VcenterException;
+import com.dmeplugin.dmestore.exception.VcenterRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
@@ -265,11 +265,11 @@ public class FileUtils {
             linuxDir = huaweiParentDir + "/huawei";
             createDir(linuxDir);
           } else {
-            throw new VcenterException("No appropriate group permission: " + huaweiParentDir);
+            throw new VcenterRuntimeException("No appropriate group permission: " + huaweiParentDir);
           }
         } catch (IOException e) {
           LOGGER.error("Cannot get path permission");
-          throw new VcenterException("Cannot get path permission");
+          throw new VcenterRuntimeException("Cannot get path permission");
         }
       } else {
         // 6.0 doesn't support H5, so return flash version path

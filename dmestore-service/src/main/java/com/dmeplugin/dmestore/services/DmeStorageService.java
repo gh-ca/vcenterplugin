@@ -1,9 +1,8 @@
 package com.dmeplugin.dmestore.services;
 
 
-import com.dmeplugin.dmestore.model.EthPortInfo;
-import com.dmeplugin.dmestore.model.Storage;
-import com.dmeplugin.dmestore.model.StoragePool;
+import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.model.*;
 
 import java.util.List;
 import java.util.Map;
@@ -20,13 +19,13 @@ public interface DmeStorageService {
      * 存储设备列表
      * @return
      */
-    Map<String, Object> getStorages();
+    List<Storage> getStorages() throws DMEException;
     /**
      * 获取存储详情
      * @param storageId
      * @return
      */
-    Map<String,Object> getStorageDetail(String storageId);
+    StorageDetail getStorageDetail(String storageId) throws DMEException;
 
     /**
      * 获取存储池列表
@@ -34,63 +33,63 @@ public interface DmeStorageService {
      * @param media_type 存储池类型 file block all(默认)
      * @return
      */
-    Map<String, Object> getStoragePools(String storageId ,String media_type);
+    List<StoragePool> getStoragePools(String storageId , String media_type) throws DMEException;
 
     /**
      * 获取逻辑端口列表
      * @param storageId
      * @return
      */
-    Map<String, Object> getLogicPorts(String storageId);
+    List<LogicPorts> getLogicPorts(String storageId) throws DMEException;
 
     /**
      * 获取卷列表
      * @param storageId
      * @return
      */
-    Map<String, Object> getVolumes(String storageId);
+    List<Volume> getVolumes(String storageId) throws DMEException;
 
     /**
      * 获取文件系统列表
      * @param storageId
      * @return
      */
-    Map<String, Object> getFileSystems(String storageId);
+    List<FileSystem> getFileSystems(String storageId) throws DMEException;
 
     /**
      * 获取Dtree列表
      * @param storageId
      * @return
      */
-    Map<String, Object> getDTrees(String storageId);
+    List<Dtrees> getDTrees(String storageId) throws DMEException;
 
     /**
      * 获取share列表
      * @param storageId
      * @return
      */
-    Map<String, Object> getNfsShares(String storageId);
+    List<NfsShares> getNfsShares(String storageId) throws DMEException;
 
     /**
      * 获取绑定端口列表
      * @param storageId
      * @return
      */
-    Map<String, Object> getBandPorts(String storageId);
+    List<BandPorts> getBandPorts(String storageId) throws DMEException;
 
     /**
      * 获取控制器列表
      * @param storageDeviceId
      * @return
      */
-    Map<String, Object> getStorageControllers(String storageDeviceId);
+    List<StorageControllers> getStorageControllers(String storageDeviceId) throws DMEException;
 
     /**
      * 获取存储硬盘列表
      * @param storageDeviceId
      * @return
      */
-    Map<String, Object> getStorageDisks(String storageDeviceId);
+    List<StorageDisk> getStorageDisks(String storageDeviceId) throws DMEException;
 
     /**
      * 获取StorageEthPorts列表
@@ -113,16 +112,16 @@ public interface DmeStorageService {
      * @param portType
      * @return
      */
-    Map<String,Object> getStoragePort(String storageDeviceId,String portType);
+    List<StoragePort> getStoragePort(String storageDeviceId, String portType) throws DMEException;
 
     /**
      * 获取漂移组列表
      * @param storage_id
      * @return
      */
-    Map<String,Object> getFailoverGroups(String storage_id);
+    List<FailoverGroup> getFailoverGroups(String storage_id) throws DMEException;
 
-    Map<String,Object> getFileSystemDetail(String file_system_id);
+    FileSystemDetail getFileSystemDetail(String file_system_id) throws DMEException;
     /**
      * Access storage performance
      *
