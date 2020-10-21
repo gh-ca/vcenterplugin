@@ -1,5 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.model.SimpleServiceLevel;
 import com.dmeplugin.dmestore.model.StoragePool;
 import com.dmeplugin.dmestore.model.Volume;
 
@@ -15,7 +17,7 @@ import java.util.Map;
  **/
 public interface ServiceLevelService {
  //服务等级列表
-    Map<String, Object> listServiceLevel(Map<String, Object> params);
+    List<SimpleServiceLevel> listServiceLevel(Map<String, Object> params) throws DMEException;
 
 
      //服务等级关联的storagePool
@@ -23,5 +25,5 @@ public interface ServiceLevelService {
 
     List<Volume> getVolumeInfosByServiceLevelId(String serviceLevelId) throws Exception;
 
-    void updateVmwarePolicy();
+    void updateVmwarePolicy() throws DMEException;
 }

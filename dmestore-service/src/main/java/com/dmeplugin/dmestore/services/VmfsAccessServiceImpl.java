@@ -79,7 +79,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //整理数据
                 Map<String, DmeVmwareRelation> dvrMap = getDvrMap(dvrlist);
                 //取得所有的存储设备
-                Map<String, Object> storagemap = dmeStorageService.getStorages();
+                List<Storage> storagemap = dmeStorageService.getStorages();
                 //整理数据
                 Map<String, String> stoNameMap = getStorNameMap(storagemap);
                 LOG.info("stoNameMap===" + gson.toJson(stoNameMap));
@@ -1049,7 +1049,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
             String responseBody = responseEntity.getBody();
             JsonObject volume = gson.fromJson(responseBody, JsonObject.class).getAsJsonObject("volume");
-            if (null == volume) {
+            if (volume.isJsonNull()) {
                 continue;
             }
 
@@ -1057,48 +1057,53 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             //basic info
             volumeDetail.setWwn(volume.get("volume_wwn").getAsString());
             volumeDetail.setName(volume.get("name").getAsString());
-            volumeDetail.setServiceLevel(volume.get("service_level_name").getAsString());
-            String storageId = volume.get("storage_id").getAsString();
-            //根据存储ID查询存储信息
-            url = String.format(DmeConstants.DME_STORAGE_DETAIL_URL, storageId);
-            responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            if (responseEntity.getStatusCodeValue() / 100 == 2) {
-                JsonObject storeageDetail = gson.fromJson(responseEntity.getBody(), JsonObject.class);
-                volumeDetail.setStorage(storeageDetail.get("name").getAsString());
+            volumeDetail.setServiceLevel(ToolUtils.jsonToStr(volume.get("service_level_name"), null));
+            if(!volume.get("storage_id").isJsonNull()){
+                String storageId = volume.get("storage_id").getAsString();
+                //根据存储ID查询存储信息
+                url = String.format(DmeConstants.DME_STORAGE_DETAIL_URL, storageId);
+                responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+                if (responseEntity.getStatusCodeValue() / 100 == 2) {
+                    JsonObject storeageDetail = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+                    volumeDetail.setStorage(storeageDetail.get("name").getAsString());
+                }
             }
 
-            String poolId = volume.get("pool_raw_id").getAsString();
-            url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, "SYS_StoragePool");
-            //构造查询body
-            String constraint = String.format("{\"constraint\": [{\"simple\": {\"name\": \"poolId\",\"value\": \"%s\"}}]}", poolId);
-            url = url + "?condition={json}";
-            responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, constraint);
-            if (responseEntity.getStatusCodeValue() / 100 == 2) {
-                JsonObject o = gson.fromJson(responseEntity.getBody(), JsonObject.class);
-                if(o.get("totalNum").getAsInt() > 0){
-                    JsonArray objList = o.getAsJsonArray("objList");
-                    volumeDetail.setStoragePool(objList.get(0).getAsJsonObject().get("name").getAsString());
+            if(!volume.get("pool_raw_id").isJsonNull()){
+                String poolId = volume.get("pool_raw_id").getAsString();
+                url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, "SYS_StoragePool");
+                //构造查询body
+                String constraint = String.format("{\"constraint\": [{\"simple\": {\"name\": \"poolId\",\"value\": \"%s\"}}]}", poolId);
+                url = url + "?condition={json}";
+                responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, constraint);
+                if (responseEntity.getStatusCodeValue() / 100 == 2) {
+                    JsonObject o = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+                    if(o.get("totalNum").getAsInt() > 0){
+                        JsonArray objList = o.getAsJsonArray("objList");
+                        volumeDetail.setStoragePool(objList.get(0).getAsJsonObject().get("name").getAsString());
+                    }
                 }
             }
 
             JsonObject tuning = volume.getAsJsonObject("tuning");
-            //SmartTier
-            volumeDetail.setSmartTier(tuning.get("smarttier").getAsString());
-            //Tunning
-            volumeDetail.setDudeplication(ToolUtils.jsonToBoo(tuning.get("dedupe_enabled")));
-            volumeDetail.setProvisionType(tuning.get("alloctype").getAsString());
-            volumeDetail.setCompression(ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
-            //应用类型
-            volumeDetail.setApplicationType(ToolUtils.jsonToStr(tuning.get("workload_type_id"), null));
+            if(!tuning.isJsonNull()){
+                //SmartTier
+                volumeDetail.setSmartTier(tuning.get("smarttier").getAsString());
+                //Tunning
+                volumeDetail.setDudeplication(ToolUtils.jsonToBoo(tuning.get("dedupe_enabled")));
+                volumeDetail.setProvisionType(ToolUtils.jsonToStr(tuning.get("alloctype"), null));
+                volumeDetail.setCompression(ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
+                //应用类型
+                volumeDetail.setApplicationType(ToolUtils.jsonToStr(tuning.get("workload_type_id"), null));
 
-            //Qos Policy
-            if (!tuning.get("smartqos").isJsonNull()) {
-                JsonObject smartqos = tuning.getAsJsonObject("smartqos");
-                volumeDetail.setControlPolicy(ToolUtils.jsonToStr(smartqos.get("control_policy"), null));
-                //TODO
-                volumeDetail.setTrafficControl("--");
+                //Qos Policy
+                if (!tuning.get("smartqos").isJsonNull()) {
+                    JsonObject smartqos = tuning.getAsJsonObject("smartqos");
+                    volumeDetail.setControlPolicy(ToolUtils.jsonToStr(smartqos.get("control_policy"), null));
+                    //TODO
+                    volumeDetail.setTrafficControl("--");
+                }
             }
-
             list.add(volumeDetail);
         }
 
@@ -1410,20 +1415,20 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 vcsdkUtils.hostRescanVmfs(hostIp);*/
                 vcsdkUtils.scanDataStore(null, hostObjId);
             }
-        } else {
+        }else{
             //dme侧已删除(卸载) hostObjectIds参数为空，此时通过dsObjectId查询hostObjId,再扫描一次
             List<String> dataStoreObjectIds = (List<String>) params.get("dataStoreObjectIds");
             List<Map<String, String>> lists = new ArrayList<>();
-            for (String dsObjId : dataStoreObjectIds) {
+            for(String dsObjId : dataStoreObjectIds){
                 String listStr = vcsdkUtils.getHostsByDsObjectId(dsObjId);
                 if (!StringUtils.isEmpty(listStr)) {
                     lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
                     }.getType());
                 }
-                if (null != lists && lists.size() > 0) {
-                    for (Map<String, String> hostMap : lists) {
+                if(null != lists && lists.size() >0){
+                    for(Map<String, String> hostMap : lists){
                         String hostObjId = hostMap.get("hostId");
-                        if (!StringUtils.isEmpty(hostObjId)) {
+                        if(!StringUtils.isEmpty(hostObjId)){
                             vcsdkUtils.scanDataStore(null, hostObjId);
                         }
                     }
@@ -1492,19 +1497,17 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return remap;
     }
 
-    private Map<String, String> getStorNameMap(Map<String, Object> storagemap) {
+    private Map<String, String> getStorNameMap(List<Storage> list) {
         //整理存储信息
         Map<String, String> remap = null;
         try {
-            if (storagemap != null && storagemap.get(DmeConstants.DATA) != null) {
-                List<Storage> list = (List<Storage>) storagemap.get("data");
+
                 if (list != null && list.size() > 0) {
                     remap = new HashMap<>();
                     for (Storage sr : list) {
                         remap.put(sr.getId(), sr.getName());
                     }
                 }
-            }
         } catch (Exception e) {
             LOG.error("error:", e);
         }

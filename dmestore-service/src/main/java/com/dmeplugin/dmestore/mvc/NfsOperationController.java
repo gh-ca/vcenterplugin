@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.NfsOperationService;
 import com.google.gson.Gson;
@@ -140,11 +141,16 @@ public class NfsOperationController extends BaseController{
             capacityAutonegotiation.put("auto_size_enable", false);
         }
         param.put("tuning", tuning);
-        Map<String,Object> resMap = nfsOperationService.createNfsDatastore(param);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
-            return success(resMap);
+
+        try {
+            nfsOperationService.createNfsDatastore(param);
+            return success();
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
+
     }
 
     /**
@@ -213,11 +219,14 @@ public class NfsOperationController extends BaseController{
             }
             param.put("qos_policy", qosPolicy);
         }
-        Map<String,Object> resMap = nfsOperationService.updateNfsDatastore(param);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.ACCEPTED.value())) {
-            return success(resMap);
+        try {
+            nfsOperationService.updateNfsDatastore(param);
+            return success();
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
     }
 
     /**
@@ -232,11 +241,13 @@ public class NfsOperationController extends BaseController{
     @PutMapping("/changenfsdatastore")
     @ResponseBody
     public ResponseBodyBean changeNfsCapacity(@RequestBody Map<String,Object> params){
-
-        ResponseBodyBean responseBodyBean = nfsOperationService.changeNfsCapacity(params);
-        if (null != responseBodyBean && null != responseBodyBean.getCode() && "202".equals(responseBodyBean.getCode())) {
-            return success(responseBodyBean);
+        try {
+            nfsOperationService.changeNfsCapacity(params);
+            return success();
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(responseBodyBean));
+
     }
 }

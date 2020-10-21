@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.RelationInstance;
 import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.ToolUtils;
@@ -242,9 +243,10 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                     resultMap = queryFsStatistic(params);
                     break;
                 default:
-                    resultMap.put("code", 503);
-                    resultMap.put("message", "query " + relationOrInstance + " statistic error, non-supported relation and instance!");
+                    //resultMap.put("code", 503);
+                   // resultMap.put("message", "query " + relationOrInstance + " statistic error, non-supported relation and instance!");
                     log.error("query " + relationOrInstance + " statistic error, non-supported relation and instance.the params is:{}", gson.toJson(params));
+                    throw new DMEException("503","query " + relationOrInstance + " statistic error, non-supported relation and instance.the params is:{}"+ gson.toJson(params));
             }
 
         }
@@ -468,10 +470,11 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     //query statistic by objType(methodName)
     private Map<String, Object> queryHistoryStatistic(String relationOrInstance, Map<String, Object> params, Map<String, String> idInstanceIdMap) throws Exception {
-        Map<String, Object> resmap = new HashMap<>();
-        resmap.put("code", 200);
-        resmap.put("message", "query" + relationOrInstance + " statistic success!");
-        resmap.put("data", params);
+        //Map<String, Object> resmap = new HashMap<>();
+        //resmap.put("code", 200);
+        //resmap.put("message", "query" + relationOrInstance + " statistic success!");
+       // resmap.put("data", params);
+        Map<String, Object> resultmap = new HashMap<>();
 
         ResponseEntity responseEntity;
         JsonElement statisticElement;
@@ -487,30 +490,34 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 JsonObject bodyJson = new JsonParser().parse(bodyStr).getAsJsonObject();
                 statisticElement = bodyJson.get("data");
                 Map<String, Object> objectMap = convertMap(statisticElement);
-                resmap.put("data", objectMap);
+                //resmap.put("data", objectMap);
+                resultmap=objectMap;
                 if (null == objectMap || objectMap.size() == 0) {
-                    resmap.put("code", 503);
-                    resmap.put("message", "query " + relationOrInstance + " statistic error:" + bodyJson.get("error_msg").getAsString());
+                    //resmap.put("code", 503);
+                    //resmap.put("message", "query " + relationOrInstance + " statistic error:" + bodyJson.get("error_msg").getAsString());
                     log.error("query " + relationOrInstance + "Statistic error:", bodyJson.get("error_msg").getAsString());
+                    throw new DMEException("503","query " + relationOrInstance + "Statistic error:"+ bodyJson.get("error_msg").getAsString());
                 }
             } else {
-                resmap.put("code", 503);
-                resmap.put("message", "query " + relationOrInstance + " statistic error!");
+                //resmap.put("code", 503);
+                //resmap.put("message", "query " + relationOrInstance + " statistic error!");
                 log.error("query " + relationOrInstance + " statistic error,the params is:{}", gson.toJson(params));
+                throw new DMEException("503","query " + relationOrInstance + " statistic error,the params is:{}"+ gson.toJson(params));
             }
         } catch (Exception e) {
-            resmap.put("code", 503);
-            resmap.put("message", "query " + relationOrInstance + " statistic exception!");
+            //resmap.put("code", 503);
+            //resmap.put("message", "query " + relationOrInstance + " statistic exception!");
             log.error("query " + relationOrInstance + " statistic exception.", e);
+            throw new DMEException("503","query " + relationOrInstance + " statistic exception."+e.getMessage());
         }
-        return resmap;
+        return resultmap;
     }
 
     private Map<String, Object> queryCurrentStatistic(String relationOrInstance, Map<String, Object> params, Map<String, String> idInstanceIdMap) throws Exception {
-        Map<String, Object> resmap = new HashMap<>();
-        resmap.put("code", 200);
-        resmap.put("message", "query " + relationOrInstance + " current statistic success!");
-        resmap.put("data", params);
+        Map<String, Object> resultmap = new HashMap<>();
+        //resmap.put("code", 200);
+        //resmap.put("message", "query " + relationOrInstance + " current statistic success!");
+        //resmap.put("data", params);
 
         String label = "max";
         ResponseEntity responseEntity;
@@ -527,23 +534,27 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 JsonObject bodyJson = new JsonParser().parse(bodyStr).getAsJsonObject();
                 statisticElement = bodyJson.get("data");
                 Map<String, Object> objectMap = convertMap(statisticElement, label);
-                resmap.put("data", objectMap);
+                //resmap.put("data", objectMap);
+                resultmap=objectMap;
                 if (null == objectMap || objectMap.size() == 0) {
-                    resmap.put("code", 503);
-                    resmap.put("message", "query " + relationOrInstance + " current statistic error:" + bodyJson.get("error_msg").getAsString());
+                    //resmap.put("code", 503);
+                    //resmap.put("message", "query " + relationOrInstance + " current statistic error:" + bodyJson.get("error_msg").getAsString());
                     log.error("query " + relationOrInstance + " current statistic error:", bodyJson.get("error_msg").getAsString());
+                    throw new DMEException("503","query " + relationOrInstance + " current statistic error:"+ bodyJson.get("error_msg").getAsString());
                 }
             } else {
-                resmap.put("code", 503);
-                resmap.put("message", "query " + relationOrInstance + " current statistic error!");
+               // resmap.put("code", 503);
+                //resmap.put("message", "query " + relationOrInstance + " current statistic error!");
                 log.error("query " + relationOrInstance + " current statistic error,the params is:{}", gson.toJson(params));
+                throw new DMEException("503","query " + relationOrInstance + " current statistic error,the params is:{}"+ gson.toJson(params));
             }
         } catch (Exception e) {
-            resmap.put("code", 503);
-            resmap.put("message", "query " + relationOrInstance + " current statistic exception!");
+            //resmap.put("code", 503);
+            //resmap.put("message", "query " + relationOrInstance + " current statistic exception!");
             log.error("query " + relationOrInstance + " current statistic exception.", e);
+            throw new DMEException("503","query " + relationOrInstance + " current statistic exception."+ e.getMessage());
         }
-        return resmap;
+        return resultmap;
     }
 
     //query statistic

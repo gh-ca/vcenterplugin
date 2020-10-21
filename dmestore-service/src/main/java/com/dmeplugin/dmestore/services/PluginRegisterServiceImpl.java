@@ -50,7 +50,7 @@ public class PluginRegisterServiceImpl implements PluginRegisterService{
                 params.put("hostPort", dmePort);
                 params.put("userName", dmeUsername);
                 params.put("password", dmePassword);
-                remap = dmeAccessService.accessDme(params);
+                dmeAccessService.accessDme(params);
 
             }
 

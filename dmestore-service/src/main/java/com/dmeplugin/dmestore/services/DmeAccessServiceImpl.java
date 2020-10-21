@@ -4,6 +4,7 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.dao.DmeInfoDao;
 import com.dmeplugin.dmestore.dao.ScheduleDao;
 import com.dmeplugin.dmestore.entity.DmeInfo;
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.DMEHostInfo;
 import com.dmeplugin.dmestore.task.ScheduleSetting;
 import com.dmeplugin.dmestore.utils.RestUtils;
@@ -72,11 +73,11 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
 
     @Override
-    public Map<String, Object> accessDme(Map<String, Object> params) {
-        Map<String, Object> remap = new HashMap<>(16);
-        remap.put("code", 200);
-        remap.put("message", "连接成功");
-        remap.put("data", params);
+    public void accessDme(Map<String, Object> params) throws DMEException {
+        //Map<String, Object> remap = new HashMap<>(16);
+        //remap.put("code", 200);
+        //remap.put("message", "连接成功");
+        //remap.put("data", params);
         try {
             LOG.info("params==" + (params == null ? "null" : gson.toJson(params)));
             if (params != null) {
@@ -91,46 +92,51 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                         LOG.info("re==" + re);
                     } catch (Exception ex) {
                         ex.printStackTrace();
-                        remap.put("code", 503);
-                        remap.put("message", "连接信息保存失败:" + ex.getMessage());
+                        //remap.put("code", 503);
+                        //remap.put("message", "连接信息保存失败:" + ex.getMessage());
+                        throw new DMEException("503","连接信息保存失败:" + ex.getMessage());
                     }
                 } else {
-                    remap.put("code", 503);
-                    remap.put("message", "连接失败:" + responseEntity.toString());
+                    //remap.put("code", 503);
+                   // remap.put("message", "连接失败:" + responseEntity.toString());
+                    throw new DMEException("503","连接信息保存失败:" + responseEntity.toString());
                 }
             }
         } catch (Exception e) {
-            remap.put("code", 503);
-            remap.put("message", "连接失败:" + e.getMessage());
+            //remap.put("code", 503);
+            //remap.put("message", "连接失败:" + e.getMessage());
+            throw new DMEException("503","连接信息保存失败:" + e.getMessage());
         }
 
-        return remap;
+        //return remap;
     }
 
     @Override
-    public Map<String, Object> refreshDme() {
-        Map<String, Object> remap = new HashMap<>(16);
-        remap.put("code", 200);
-        remap.put("message", "更新连接状态成功");
+    public Map<String, Object> refreshDme() throws DMEException {
+        //Map<String, Object> remap = new HashMap<>(16);
+        //remap.put("code", 200);
+        //remap.put("message", "更新连接状态成功");
         try {
             //判断与服务器的连接
             ResponseEntity responseEntity = access(REFRES_STATE_URL, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() != RestUtils.RES_STATE_I_200) {
-                remap.put("code", 503);
-                remap.put("message", "更新连接状态失败:" + responseEntity.toString());
+                //remap.put("code", 503);
+                //remap.put("message", "更新连接状态失败:" + responseEntity.toString());
+                throw new DMEException("503","更新连接状态失败:" + responseEntity.toString());
             }
 
         } catch (Exception e) {
-            remap.put("code", 503);
-            remap.put("message", "更新连接状态失败:" + e.toString());
+            //remap.put("code", 503);
+            //remap.put("message", "更新连接状态失败:" + e.toString());
+            throw new DMEException("503", "更新连接状态失败:" + e.toString());
         }
 
         Map<String, Object> params = new HashMap<>(16);
         params.put("hostIp", dmeHostIp);
         params.put("hostPort", dmeHostPort);
-        remap.put("data", params);
+        //remap.put("data", params);
 
-        return remap;
+        return params;
     }
 
     @Override
@@ -325,11 +331,12 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                     }
                 } catch (Exception e) {
                     LOG.error("DME link error url:" + workloadsUrl + ",error:" + e.toString());
+                    throw new DMEException("503","DME link error url:" + workloadsUrl + ",error:" + e.toString());
                 }
             }
         } catch (Exception e) {
             LOG.error("get WorkLoads error:", e);
-            throw e;
+            throw new DMEException("503","get WorkLoads error:"+e.getMessage());
         }
         LOG.info("getWorkLoads relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
         return relists;

@@ -35,17 +35,14 @@ public class DataStoreStatisticHistoryController extends BaseController {
      */
     @RequestMapping(value = "/vmfs", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseBodyBean getVmfsVolumeStatistic(@RequestBody Map<String, Object> params) throws Exception {
+    public ResponseBodyBean getVmfsVolumeStatistic(@RequestBody Map<String, Object> params)   {
         LOG.info("datastorestatistichistrory/vmfs params==" + gson.toJson(params));
-        Map<String, Object> resMap = dataSotreStatisticHistroyService.queryVmfsStatistic(params);
-        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
-            //Object data = resMap.get("data");
-            //JsonObject dataJson = new JsonParser().parse(data.toString()).getAsJsonObject();
-            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
-            return success(data);
-            //return success(gson.toJson(data));
+        try {
+            return success(dataSotreStatisticHistroyService.queryVmfsStatistic(params));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
     }
 
     /**
@@ -57,14 +54,15 @@ public class DataStoreStatisticHistoryController extends BaseController {
      */
     @RequestMapping(value = "/volume", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseBodyBean getVolumeStatistic(@RequestBody Map<String, Object> params) throws Exception {
+    public ResponseBodyBean getVolumeStatistic(@RequestBody Map<String, Object> params)   {
         LOG.info("datastorestatistichistrory/volume params==" + gson.toJson(params));
-        Map<String, Object> resMap = dataSotreStatisticHistroyService.queryVolumeStatistic(params);
-        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
-            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
-            return success(data);
+        try {
+            return success(dataSotreStatisticHistroyService.queryVolumeStatistic(params));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
     }
 
     /**
@@ -76,14 +74,17 @@ public class DataStoreStatisticHistoryController extends BaseController {
      */
     @RequestMapping(value = "/nfs", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseBodyBean getNfsVolumeStatistic(@RequestBody Map<String, Object> params) throws Exception {
+    public ResponseBodyBean getNfsVolumeStatistic(@RequestBody Map<String, Object> params)   {
         LOG.info("datastorestatistichistrory/nfs params==" + gson.toJson(params));
-        Map<String, Object> resMap = dataSotreStatisticHistroyService.queryNfsStatistic(params);
-        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
-            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
-            return success(data);
+
+        try {
+            return success(dataSotreStatisticHistroyService.queryNfsStatistic(params));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
+
     }
 
     /**
@@ -95,14 +96,14 @@ public class DataStoreStatisticHistoryController extends BaseController {
      */
     @RequestMapping(value = "/fs", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseBodyBean getFsStatistic(@RequestBody Map<String, Object> params) throws Exception {
+    public ResponseBodyBean getFsStatistic(@RequestBody Map<String, Object> params)   {
         LOG.info("datastorestatistichistrory/fs params==" + gson.toJson(params));
-        Map<String, Object> resMap = dataSotreStatisticHistroyService.queryFsStatistic(params);
-        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
-            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
-            return success(data);
+        try {
+            return success(dataSotreStatisticHistroyService.queryFsStatistic(params));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
     }
 
     /**
@@ -114,15 +115,16 @@ public class DataStoreStatisticHistoryController extends BaseController {
      */
     @RequestMapping(value = "/servicelevel", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseBodyBean getServiceLevelStatistic(@RequestBody Map<String, Object> params) throws Exception {
+    public ResponseBodyBean getServiceLevelStatistic(@RequestBody Map<String, Object> params)  {
         LOG.info("datastorestatistichistrory/servicelevel params==" + gson.toJson(params));
 
-        Map<String, Object> resMap = dataSotreStatisticHistroyService.queryServiceLevelStatistic(params);
-        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
-            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
-            return success(data);
+        try {
+            return success(dataSotreStatisticHistroyService.queryServiceLevelStatistic(params));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
     }
 
     /**
@@ -134,14 +136,15 @@ public class DataStoreStatisticHistoryController extends BaseController {
      */
     @RequestMapping(value = "/servicelevelLun", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseBodyBean getServiceLevelLunStatistic(@RequestBody Map<String, Object> params) throws Exception {
+    public ResponseBodyBean getServiceLevelLunStatistic(@RequestBody Map<String, Object> params)  {
         LOG.info("datastorestatistichistrory/servicelevellun params==" + gson.toJson(params));
-        Map<String, Object> resMap = dataSotreStatisticHistroyService.queryServiceLevelLunStatistic(params);
-        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
-            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
-            return success(data);
+        try {
+            return success(dataSotreStatisticHistroyService.queryServiceLevelLunStatistic(params));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
     }
 
     /**
@@ -153,14 +156,15 @@ public class DataStoreStatisticHistoryController extends BaseController {
      */
     @RequestMapping(value = "/servicelevelStoragePool", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseBodyBean getServiceLevelStoragePoolStatistic(@RequestBody Map<String, Object> params) throws Exception {
+    public ResponseBodyBean getServiceLevelStoragePoolStatistic(@RequestBody Map<String, Object> params)   {
         LOG.info("datastorestatistichistrory/servicelevelstoragepool params==" + gson.toJson(params));
-        Map<String, Object> resMap = dataSotreStatisticHistroyService.queryServiceLevelStoragePoolStatistic(params);
-        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
-            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
-            return success(data);
+        try {
+            return success(dataSotreStatisticHistroyService.queryServiceLevelStoragePoolStatistic(params));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
     }
 
     /**
@@ -192,14 +196,15 @@ public class DataStoreStatisticHistoryController extends BaseController {
      */
     @RequestMapping(value = "/storagePoolCurrent", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseBodyBean getStoragePoolCurrentStatistic(@RequestBody Map<String, Object> params) throws Exception {
+    public ResponseBodyBean getStoragePoolCurrentStatistic(@RequestBody Map<String, Object> params)   {
         LOG.info("datastorestatistichistrory/storagepoolcurrent params==" + gson.toJson(params));
-        Map<String, Object> resMap = dataSotreStatisticHistroyService.queryStoragePoolCurrentStatistic(params);
-        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
-            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
-            return success(data);
+        try {
+            return success(dataSotreStatisticHistroyService.queryStoragePoolCurrentStatistic(params));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
     }
 
     /**
@@ -211,14 +216,15 @@ public class DataStoreStatisticHistoryController extends BaseController {
      */
     @RequestMapping(value = "/storageDevice", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseBodyBean getStoragDeviceStatistic(@RequestBody Map<String, Object> params) throws Exception {
+    public ResponseBodyBean getStoragDeviceStatistic(@RequestBody Map<String, Object> params)  {
         LOG.info("datastorestatistichistrory/storagedevice params==" + gson.toJson(params));
-        Map<String, Object> resMap = dataSotreStatisticHistroyService.queryStorageDevcieStatistic(params);
-        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
-            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
-            return success(data);
+        try {
+            return success(dataSotreStatisticHistroyService.queryStorageDevcieStatistic(params));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
     }
 
     /**
@@ -230,14 +236,15 @@ public class DataStoreStatisticHistoryController extends BaseController {
      */
     @RequestMapping(value = "/storageDeviceCurrent", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseBodyBean getStoragDeviceCurrenStatistic(@RequestBody Map<String, Object> params) throws Exception {
+    public ResponseBodyBean getStoragDeviceCurrenStatistic(@RequestBody Map<String, Object> params)  {
         LOG.info("datastorestatistichistrory/storagedevicecurrent params==" + gson.toJson(params));
-        Map<String, Object> resMap = dataSotreStatisticHistroyService.queryStorageDevcieCurrentStatistic(params);
-        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
-            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
-            return success(data);
+        try {
+            return success(dataSotreStatisticHistroyService.queryStorageDevcieCurrentStatistic(params));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
     }
 
 
