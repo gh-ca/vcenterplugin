@@ -1,12 +1,11 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.entity.VCenterInfo;
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.utils.CipherUtils;
-import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.vmware.VCConnectionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,10 +25,10 @@ public class PluginRegisterServiceImpl implements PluginRegisterService{
     private VCConnectionHelper vcConnectionHelper;
 
     @Override
-    public Map<String, Object> installService(String vcenterIP,String vcenterPort,String vcenterUsername,String vcenterPassword,String dmeIp,
-                                              String dmePort,String dmeUsername,String dmePassword) {
+    public void installService(String vcenterIP, String vcenterPort, String vcenterUsername, String vcenterPassword, String dmeIp,
+                               String dmePort, String dmeUsername, String dmePassword) throws DMEException {
 
-        Map<String, Object> remap=new HashMap<>(16);
+        //Map<String, Object> remap=new HashMap<>(16);
         try {
             //保存vcenter信息,如有已有vcenter信息，需要更新
             VCenterInfo vCenterInfo = new VCenterInfo();
@@ -54,12 +53,11 @@ public class PluginRegisterServiceImpl implements PluginRegisterService{
 
             }
 
-        }catch (SQLException throwables) {
-            throwables.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
+            throw new DMEException("503",e.getMessage());
         }
-        return remap;
+       // return remap;
     }
 
     @Override

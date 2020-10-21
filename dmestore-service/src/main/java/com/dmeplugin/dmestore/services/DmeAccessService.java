@@ -43,7 +43,7 @@ public interface DmeAccessService {
      * @return ResponseBodyBean
      * @throws Exception when error
      */
-    ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws Exception;
+    ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws DMEException;
 
     /**
      * Public method access
