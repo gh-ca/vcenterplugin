@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.RelationInstance;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.google.gson.*;
@@ -46,7 +47,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     }
 
     @Override
-    public List<RelationInstance> queryRelationByRelationName(String relationName) throws Exception {
+    public List<RelationInstance> queryRelationByRelationName(String relationName) throws DMEException {
         List<RelationInstance> ris = new ArrayList<>();
         Map<String, Object> remap = new HashMap<>();
         remap.put("code", 200);
@@ -63,13 +64,13 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
                 ris = converRelations(responseEntity.getBody());
             }
         } catch (Exception e) {
-            throw e;
+            throw new DMEException(e.getMessage());
         }
         return ris;
     }
 
     @Override
-    public List<RelationInstance> queryRelationByRelationNameConditionSourceInstanceId(String relationName, String sourceInstanceId) throws Exception {
+    public List<RelationInstance> queryRelationByRelationNameConditionSourceInstanceId(String relationName, String sourceInstanceId) throws DMEException {
         List<RelationInstance> ris = new ArrayList<>();
         Map<String, Object> remap = new HashMap<>();
         remap.put("code", 200);
@@ -96,13 +97,13 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
             }
         } catch (Exception e) {
             LOG.warn("通过关系类型名称和源实例ID查询对应关系异常,url:{},condition:{},relationName:{},sourceInstancId:{}!", url, constraint.toString(), relationName, sourceInstanceId);
-            throw e;
+            throw new DMEException(e.getMessage());
         }
         return ris;
     }
 
     @Override
-    public RelationInstance queryRelationByRelationNameInstanceId(String relationName, String instanceId) throws Exception {
+    public RelationInstance queryRelationByRelationNameInstanceId(String relationName, String instanceId) throws DMEException {
         RelationInstance ri = new RelationInstance();
         Map<String, Object> remap = new HashMap<>();
         remap.put("code", 200);
@@ -120,13 +121,13 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
             }
         } catch (Exception e) {
             LOG.warn("通过关系类型名称和源实例ID查询对应关系异常,url:{},relationName:{},InstancId:{}!", url, relationName, instanceId);
-            throw e;
+            throw new DMEException(e.getMessage());
         }
         return ri;
     }
 
     @Override
-    public Object queryInstanceByInstanceNameId(String instanceName, String instanceId) throws Exception {
+    public Object queryInstanceByInstanceNameId(String instanceName, String instanceId) throws DMEException {
         Object obj = new Object();
         Map<String, Object> remap = new HashMap<>();
         remap.put("code", 200);
@@ -145,7 +146,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
             }
         } catch (Exception e) {
             LOG.warn("通过资源类型名称和资源实例ID查询对应资源实例异常,className:{},instancId:{}!", instanceName, instanceId);
-            throw e;
+            throw new DMEException(e.getMessage());
         }
         return obj;
     }

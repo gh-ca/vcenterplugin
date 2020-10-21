@@ -729,7 +729,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public List<EthPortInfo> getStorageEthPorts(String storageSn) throws Exception {
+    public List<EthPortInfo> getStorageEthPorts(String storageSn) throws DMEException {
         List<EthPortInfo> relists = null;
         try {
             if (!StringUtils.isEmpty(storageSn)) {
@@ -743,7 +743,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("get Storage Eth Ports error:", e);
-            throw e;
+            throw new DMEException(e.getMessage());
         }
         //LOG.info("getStorageEthPorts relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
         return relists;
@@ -1144,7 +1144,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return dmeVmwareRalationDao.getVmfsNameByVolumeId(volumeId);
     }
 
-    private String getDiskType(String storageDeviceId,String diskPoolId,String poolId) throws Exception {
+    private String getDiskType(String storageDeviceId,String diskPoolId,String poolId) throws DMEException {
         String result = "";
         String className = "SYS_StorageDisk";
         String url = API_INSTANCES_LIST+"/"+className+"?storageDeviceId="+storageDeviceId;
@@ -1184,7 +1184,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public List<Storage> listStoragePerformance(List<String> storageIds) throws Exception{
+    public List<Storage> listStoragePerformance(List<String> storageIds) throws DMEException {
         List<Storage> relists = null;
         try {
             if (storageIds != null && storageIds.size() > 0) {
@@ -1218,14 +1218,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("list Storage performance error:", e);
-            throw e;
+            throw new DMEException(e.getMessage());
         }
         LOG.info("listStoragePerformance relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
         return relists;
     }
 
     @Override
-    public List<StoragePool> listStoragePoolPerformance(List<String> storagePoolIds) throws Exception{
+    public List<StoragePool> listStoragePoolPerformance(List<String> storagePoolIds) throws DMEException {
         List<StoragePool> relists = null;
         try {
             if (storagePoolIds != null && storagePoolIds.size() > 0) {
@@ -1257,7 +1257,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("list StoragePool performance error:", e);
-            throw e;
+            throw new DMEException(e.getMessage());
         }
         LOG.info("listStoragePoolPerformance relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
         return relists;
@@ -1266,7 +1266,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     /**
     *得到存储池与服务等级的关系信息
     **/
-    public Map<String, Object> getDjTierContainsStoragePool() throws Exception{
+    public Map<String, Object> getDjTierContainsStoragePool() throws DMEException {
         Map<String, Object> map = new HashMap<>(16);
         String getDjTierContainsStoragePoolUrl = DJTIERCONTAINSSTORAGEPOOL_URL;
         try {
@@ -1301,7 +1301,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("DME link error url:" + getDjTierContainsStoragePoolUrl + ",error:" + e.getMessage());
-            throw e;
+            throw new DMEException(e.getMessage());
         }
         LOG.info("getDjTierContainsStoragePoolUrl relists===" + (gson.toJson(map)));
         return map;
@@ -1310,7 +1310,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     /**
      *得到服务等级的实例信息
      **/
-    public Map<String, Object> getDjtier() throws Exception{
+    public Map<String, Object> getDjtier() throws DMEException {
         Map<String, Object> map = new HashMap<>(16);
         String getDjtierUrl = SYS_DJTIER_URL;
         try {
@@ -1337,7 +1337,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("DME link error url:" + getDjtierUrl + ",error:" + e.getMessage());
-            throw e;
+            throw new DMEException(e.getMessage());
         }
         LOG.info("getDjtierUrl relists===" + (gson.toJson(map)));
         return map;
@@ -1346,7 +1346,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     /**
      *整理存储池与服务的关系信息
      **/
-    public Map<String, Object> getDjTierOfStoragePool() throws Exception{
+    public Map<String, Object> getDjTierOfStoragePool() {
         Map<String, Object> map = new HashMap<>(16);
         String getDjtierUrl = SYS_DJTIER_URL;
         try {
@@ -1373,7 +1373,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return map;
     }
 
-    private String getStorageByPoolRawId(String poolRawId) throws Exception {
+    private String getStorageByPoolRawId(String poolRawId) throws DMEException {
 
         String className = "SYS_StoragePool";
         String poolName = "";
@@ -1394,7 +1394,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return poolName;
     }
 
-    private List<DiskPool> getDiskPoolByPoolId(String poolId) throws Exception {
+    private List<DiskPool> getDiskPoolByPoolId(String poolId) throws DMEException {
         String className = "SYS_DiskPool";
         String url = API_INSTANCES_LIST+"/"+ className;
         List<DiskPool> diskPools = new ArrayList<>(10);

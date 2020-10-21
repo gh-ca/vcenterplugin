@@ -1,5 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeSqlException;
 import com.dmeplugin.dmestore.model.TaskDetailInfo;
 import com.dmeplugin.dmestore.model.TaskDetailResource;
 import com.dmeplugin.dmestore.utils.ToolUtils;
@@ -34,7 +36,7 @@ public class TaskServiceImpl implements TaskService {
     Gson gson = new Gson();
 
     @Override
-    public List<TaskDetailInfo> listTasks() throws Exception {
+    public List<TaskDetailInfo> listTasks()  {
         ResponseEntity<String> responseEntity;
         try {
             responseEntity = dmeAccessService.access(LIST_TASK_URL, HttpMethod.GET, null);
@@ -53,7 +55,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskDetailInfo queryTaskById(String taskId) throws Exception {
+    public TaskDetailInfo queryTaskById(String taskId)  {
         String url = QUERY_TASK_URL.replace("{task_id}", taskId);
         ResponseEntity<String> responseEntity;
         try {
@@ -77,7 +79,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public JsonObject queryTaskByIdUntilFinish(String taskId) throws Exception {
+    public JsonObject queryTaskByIdUntilFinish(String taskId) throws DMEException {
         String url = QUERY_TASK_URL.replace("{task_id}", taskId);
         boolean loopFlag = true;
         int waitTime = 2 * 1000;
@@ -94,16 +96,21 @@ public class TaskServiceImpl implements TaskService {
                         if (taskDetail.get("progress").getAsInt() == 100 || taskDetail.get("status").getAsInt() > 2) {
                             return taskDetail;
                         } else {
-                            Thread.sleep(waitTime);
+                            try {
+                                Thread.sleep(waitTime);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                                throw new DMEException(e.getMessage());
+                            }
                         }
                     }
                 }
             } else {
-                throw new Exception(responseEntity.getBody());
+                throw new DmeSqlException(responseEntity.getBody());
             }
 
             if((times--) < 0){
-                throw new Exception("查询任务状态超时！");
+                throw new DmeSqlException("查询任务状态超时！");
             }
         }
         return null;

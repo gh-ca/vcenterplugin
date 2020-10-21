@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.VmRdmCreateBean;
 import com.vmware.vim25.DatastoreSummary;
 
@@ -25,7 +26,7 @@ public interface VmRdmService {
      * @param createBean    DME卷创建基础信息
      * @return void
      **/
-    void createRdm(String dataStoreName, String vmObjectId, String hostId, VmRdmCreateBean createBean) throws Exception;
+    void createRdm(String dataStoreName, String vmObjectId, String hostId, VmRdmCreateBean createBean) throws DMEException;
 
     /**
      * @author wangxy
@@ -33,7 +34,7 @@ public interface VmRdmService {
      * @date 17:43 2020/10/13
      * @return java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
      **/
-    List<Map<String, Object>> getAllDmeHost() throws Exception;
+    List<Map<String, Object>> getAllDmeHost() throws DMEException;
 
     /**
      * @author Administrator
@@ -42,5 +43,5 @@ public interface VmRdmService {
      * @param hostId DME主机ID
      * @return java.util.List<com.vmware.vim25.DatastoreSummary>
      **/
-    List<DatastoreSummary> getDatastoreMountsOnHost(String hostId) throws Exception;
+    List<DatastoreSummary> getDatastoreMountsOnHost(String hostId) throws DMEException;
 }
