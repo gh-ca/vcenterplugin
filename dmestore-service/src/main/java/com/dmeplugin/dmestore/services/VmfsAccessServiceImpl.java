@@ -1049,7 +1049,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
             String responseBody = responseEntity.getBody();
             JsonObject volume = gson.fromJson(responseBody, JsonObject.class).getAsJsonObject("volume");
-            if (null == volume) {
+            if (volume.isJsonNull()) {
                 continue;
             }
 
@@ -1057,29 +1057,53 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             //basic info
             volumeDetail.setWwn(volume.get("volume_wwn").getAsString());
             volumeDetail.setName(volume.get("name").getAsString());
-            volumeDetail.setServiceLevel(volume.get("service_level_name").getAsString());
-            //TODO
-            volumeDetail.setStorage(volume.get("storage_id").getAsString());
-            volumeDetail.setStoragePool(volume.get("pool_raw_id").getAsString());
-
-            JsonObject tuning = volume.getAsJsonObject("tuning");
-            //SmartTier
-            volumeDetail.setSmartTier(tuning.get("smarttier").getAsString());
-            //Tunning
-            volumeDetail.setDudeplication(ToolUtils.jsonToBoo(tuning.get("dedupe_enabled")));
-            volumeDetail.setProvisionType(tuning.get("alloctype").getAsString());
-            volumeDetail.setCompression(ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
-            //应用类型
-            volumeDetail.setApplicationType(ToolUtils.jsonToStr(tuning.get("workload_type_id"), null));
-
-            JsonObject smartqos = tuning.getAsJsonObject("smartqos");
-            //Qos Policy
-            if (null != smartqos) {
-                volumeDetail.setControlPolicy(ToolUtils.jsonToStr(smartqos.get("control_policy"), null));
-                //TODO
-                volumeDetail.setTrafficControl("--");
+            volumeDetail.setServiceLevel(ToolUtils.jsonToStr(volume.get("service_level_name"), null));
+            if(!volume.get("storage_id").isJsonNull()){
+                String storageId = volume.get("storage_id").getAsString();
+                //根据存储ID查询存储信息
+                url = String.format(DmeConstants.DME_STORAGE_DETAIL_URL, storageId);
+                responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+                if (responseEntity.getStatusCodeValue() / 100 == 2) {
+                    JsonObject storeageDetail = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+                    volumeDetail.setStorage(storeageDetail.get("name").getAsString());
+                }
             }
 
+            if(!volume.get("pool_raw_id").isJsonNull()){
+                String poolId = volume.get("pool_raw_id").getAsString();
+                url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, "SYS_StoragePool");
+                //构造查询body
+                String constraint = String.format("{\"constraint\": [{\"simple\": {\"name\": \"poolId\",\"value\": \"%s\"}}]}", poolId);
+                url = url + "?condition={json}";
+                responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, constraint);
+                if (responseEntity.getStatusCodeValue() / 100 == 2) {
+                    JsonObject o = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+                    if(o.get("totalNum").getAsInt() > 0){
+                        JsonArray objList = o.getAsJsonArray("objList");
+                        volumeDetail.setStoragePool(objList.get(0).getAsJsonObject().get("name").getAsString());
+                    }
+                }
+            }
+
+            JsonObject tuning = volume.getAsJsonObject("tuning");
+            if(!tuning.isJsonNull()){
+                //SmartTier
+                volumeDetail.setSmartTier(tuning.get("smarttier").getAsString());
+                //Tunning
+                volumeDetail.setDudeplication(ToolUtils.jsonToBoo(tuning.get("dedupe_enabled")));
+                volumeDetail.setProvisionType(ToolUtils.jsonToStr(tuning.get("alloctype"), null));
+                volumeDetail.setCompression(ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
+                //应用类型
+                volumeDetail.setApplicationType(ToolUtils.jsonToStr(tuning.get("workload_type_id"), null));
+
+                //Qos Policy
+                if (!tuning.get("smartqos").isJsonNull()) {
+                    JsonObject smartqos = tuning.getAsJsonObject("smartqos");
+                    volumeDetail.setControlPolicy(ToolUtils.jsonToStr(smartqos.get("control_policy"), null));
+                    //TODO
+                    volumeDetail.setTrafficControl("--");
+                }
+            }
             list.add(volumeDetail);
         }
 
