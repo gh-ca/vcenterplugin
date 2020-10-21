@@ -90,7 +90,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         shareAttr.setName(share.get("name").getAsString());
         shareAttr.setShare_path(share.get("share_path").getAsString());
         shareAttr.setDescription(share.get("description").getAsString());
-        shareAttr.setOwning_dtree_name(ToolUtils.jsonToStr(share.get("owning_dtree_name"), null));
+        shareAttr.setOwning_dtree_name(ToolUtils.jsonToStr(share.get("owning_dtree_name"),  null));
         //查询客户端列表
         List<AuthClient> authClientList = getNFSDatastoreShareAuthClients(nfsShareId);
         if (null != authClientList && authClientList.size() > 9) {
@@ -204,13 +204,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         if (StringUtils.isEmpty(listStr)) {
             return false;
         }
-        Map<String, Object> storageOriginal = dmeStorageService.getStorages();
-        if (null == storageOriginal || !"200".equals(storageOriginal.get("code").toString())) {
-            return false;
-        }
 
         //将DME的存储设备集合转换为map key:ip value:Storage
-        List<Storage> storages = (List<Storage>) storageOriginal.get("data");
+        List<Storage> storages = dmeStorageService.getStorages();
         Map<String, Storage> storageMap = converStorage(storages);
 
         JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
@@ -229,8 +225,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 continue;
                 //storageInfo = storageMap.get("10.143.133.201");
             }*/
-            if (null != storageMap && storageMap.size() > 0) {
-                for (Map.Entry<String, Storage> entry : storageMap.entrySet()) {
+            if(null != storageMap && storageMap.size() >0){
+                for(Map.Entry<String, Storage> entry : storageMap.entrySet()){
                     Storage storageInfo = entry.getValue();
                     String storage_id = storageInfo.getId();
                     String storage_name = storageInfo.getName();
@@ -244,11 +240,11 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                     boolean withLogicPort = false;
                     List<Map<String, Object>> logicPortInfos = queryLogicPortInfo(storage_id);
                     if (null != logicPortInfos && logicPortInfos.size() > 0) {
-                        for (Map<String, Object> logicPortInfo : logicPortInfos) {
+                        for(Map<String, Object> logicPortInfo : logicPortInfos){
                             String id = ToolUtils.getStr(logicPortInfo.get("id"));
                             String name = ToolUtils.getStr(logicPortInfo.get("home_port_name"));
                             String mgmtIp = ToolUtils.getStr(logicPortInfo.get("mgmt_ip"));
-                            if (nfsDatastoreIp.equals(mgmtIp)) {
+                            if(nfsDatastoreIp.equals(mgmtIp)){
                                 relation.setLogicPortId(id);
                                 relation.setLogicPortName(name);
                                 withLogicPort = true;
@@ -277,7 +273,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
                     //获取fs信息
                     boolean withFs = false;
-                    if (!StringUtils.isEmpty(fsName)) {
+                    if(!StringUtils.isEmpty(fsName)){
                         Map<String, Object> fsInfo = queryFsInfo(storage_id, fsName);
                         if (null != fsInfo && fsInfo.size() > 0) {
                             String id = ToolUtils.getStr(fsInfo.get("id"));

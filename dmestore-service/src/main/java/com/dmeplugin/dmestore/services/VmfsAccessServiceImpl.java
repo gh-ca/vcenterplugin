@@ -79,7 +79,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 //整理数据
                 Map<String, DmeVmwareRelation> dvrMap = getDvrMap(dvrlist);
                 //取得所有的存储设备
-                Map<String, Object> storagemap = dmeStorageService.getStorages();
+                List<Storage> storagemap = dmeStorageService.getStorages();
                 //整理数据
                 Map<String, String> stoNameMap = getStorNameMap(storagemap);
                 LOG.info("stoNameMap===" + gson.toJson(stoNameMap));
@@ -1391,20 +1391,20 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 vcsdkUtils.hostRescanVmfs(hostIp);*/
                 vcsdkUtils.scanDataStore(null, hostObjId);
             }
-        } else {
+        }else{
             //dme侧已删除(卸载) hostObjectIds参数为空，此时通过dsObjectId查询hostObjId,再扫描一次
             List<String> dataStoreObjectIds = (List<String>) params.get("dataStoreObjectIds");
             List<Map<String, String>> lists = new ArrayList<>();
-            for (String dsObjId : dataStoreObjectIds) {
+            for(String dsObjId : dataStoreObjectIds){
                 String listStr = vcsdkUtils.getHostsByDsObjectId(dsObjId);
                 if (!StringUtils.isEmpty(listStr)) {
                     lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
                     }.getType());
                 }
-                if (null != lists && lists.size() > 0) {
-                    for (Map<String, String> hostMap : lists) {
+                if(null != lists && lists.size() >0){
+                    for(Map<String, String> hostMap : lists){
                         String hostObjId = hostMap.get("hostId");
-                        if (!StringUtils.isEmpty(hostObjId)) {
+                        if(!StringUtils.isEmpty(hostObjId)){
                             vcsdkUtils.scanDataStore(null, hostObjId);
                         }
                     }
@@ -1473,19 +1473,17 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return remap;
     }
 
-    private Map<String, String> getStorNameMap(Map<String, Object> storagemap) {
+    private Map<String, String> getStorNameMap(List<Storage> list) {
         //整理存储信息
         Map<String, String> remap = null;
         try {
-            if (storagemap != null && storagemap.get(DmeConstants.DATA) != null) {
-                List<Storage> list = (List<Storage>) storagemap.get("data");
+
                 if (list != null && list.size() > 0) {
                     remap = new HashMap<>();
                     for (Storage sr : list) {
                         remap.put(sr.getId(), sr.getName());
                     }
                 }
-            }
         } catch (Exception e) {
             LOG.error("error:", e);
         }

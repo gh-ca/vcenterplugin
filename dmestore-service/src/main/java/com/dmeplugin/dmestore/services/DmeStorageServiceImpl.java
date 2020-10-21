@@ -1,6 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.RestUtils;
@@ -83,11 +84,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public Map<String, Object> getStorages() {
+    public List<Storage> getStorages() throws DMEException {
 
-        Map<String, Object> objMap = new HashMap<>();
-        objMap.put("code", 200);
-        objMap.put("msg", "list storage success!");
+        //Map<String, Object> objMap = new HashMap<>();
+       // objMap.put("code", 200);
+       // objMap.put("msg", "list storage success!");
         List<Storage> list = new ArrayList<>();
 
         try {
@@ -95,9 +96,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             LOG.info("{" + API_STORAGES + "}" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
-                objMap.put("code", code);
-                objMap.put("msg", "list storage error !");
-                return objMap;
+                throw new DMEException("503","list storage error !");
             }
             Object object = responseEntity.getBody();
             if (object != null) {
@@ -143,37 +142,38 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     list.add(storageObj);
                 }
             }
-            objMap.put("data", list);
         } catch (Exception e) {
             LOG.error("list storage error", e);
             String message = e.getMessage();
-            objMap.put("code", 503);
-            objMap.put("message", message);
+            //objMap.put("code", 503);
+            //objMap.put("message", message);
+            throw new DMEException("503",message);
         }
-        return objMap;
+        return list;
     }
 
     @Override
-    public Map<String, Object> getStorageDetail(String storageId) {
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put("code", 200);
-        resMap.put("msg", "search oriented storage success");
-        resMap.put("data", storageId);
-
+    public StorageDetail getStorageDetail(String storageId) throws DMEException {
+        //Map<String, Object> resMap = new HashMap<>();
+        //resMap.put("code", 200);
+        //resMap.put("msg", "search oriented storage success");
+        //resMap.put("data", storageId);
+        StorageDetail storageObj = null;
         String url = API_STORAGES + "/" + storageId + "/detail";
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             LOG.info("DmeStorageServiceImpl/getStorageDetail/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
-                resMap.put("code", code);
-                resMap.put("msg", "search oriented storage error");
-                return resMap;
+                //resMap.put("code", code);
+                //resMap.put("msg", "search oriented storage error");
+                //return resMap;
+                throw new DMEException("503","search oriented storage error");
             }
             String object = responseEntity.getBody();
             if (object != null) {
                 JsonObject element = new JsonParser().parse(object).getAsJsonObject();
-                StorageDetail storageObj = new StorageDetail();
+                 storageObj = new StorageDetail();
                 storageObj.setId(ToolUtils.jsonToStr(element.get("id")));
                 storageObj.setName(ToolUtils.jsonToStr(element.get("name")));
                 storageObj.setIp(ToolUtils.jsonToStr(element.get("ip")));
@@ -202,25 +202,27 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     String[] az_ids = {};
                     storageObj.setAzIds(az_ids);
                 }
-                resMap.put("data", storageObj);
+                //resMap.put("data", storageObj);
             }
-            return resMap;
+            //return resMap;
         } catch (Exception e) {
             LOG.error("search oriented storage error!", e);
-            resMap.put("code", 503);
-            resMap.put("msg", e.getMessage());
+            //resMap.put("code", 503);
+            //resMap.put("msg", e.getMessage());
+            throw new DMEException("503",e.getMessage());
         }
-        return resMap;
+        //return resMap;
+        return storageObj;
     }
 
     @Override
-    public Map<String, Object> getStoragePools(String storageId ,String media_type) {
+    public List<StoragePool> getStoragePools(String storageId , String media_type) throws DMEException {
 
         String className = "SYS_StoragePool";
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put("code", 200);
-        resMap.put("msg", "search oriented storage pool success");
-        resMap.put("data", storageId);
+        //Map<String, Object> resMap = new HashMap<>();
+       // resMap.put("code", 200);
+        //resMap.put("msg", "search oriented storage pool success");
+        //resMap.put("data", storageId);
 
         List<StoragePool> resList = new ArrayList<>();
         String url = API_INSTANCES_LIST+"/"+ className + "?storageDeviceId=" + storageId;
@@ -230,9 +232,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             LOG.info("DmeStorageServiceImpl/getStoragePools/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
-                resMap.put("msg", "search oriented storage pool error");
-                resMap.put("code", code);
-                return resMap;
+                //resMap.put("msg", "search oriented storage pool error");
+                //resMap.put("code", code);
+                //return resMap;
+                throw new DMEException("503","search oriented storage pool error");
             }
             String object = responseEntity.getBody();
             if (!StringUtils.isEmpty(object)) {
@@ -300,23 +303,24 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                         resList.add(storagePool);
                     }
                 }
-                resMap.put("data", resList);
+                //resMap.put("data", resList);
             }
         } catch (Exception e) {
             LOG.error("search oriented storage pool error", e);
-            resMap.put("code", 503);
-            resMap.put("msg", e.getMessage());
+            //resMap.put("code", 503);
+            //resMap.put("msg", e.getMessage());
+            throw new DMEException("503",e.getMessage());
         }
-        return resMap;
+        return resList;
     }
 
     @Override
-    public Map<String, Object> getLogicPorts(String storageId) {
+    public List<LogicPorts> getLogicPorts(String storageId) throws DMEException {
 
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put("code", 200);
-        resMap.put("msg", "list logic ports success!");
-        resMap.put("storageId", storageId);
+        //Map<String, Object> resMap = new HashMap<>();
+        //resMap.put("code", 200);
+        //resMap.put("msg", "list logic ports success!");
+        //resMap.put("storageId", storageId);
         List<LogicPorts> resList = new ArrayList<>();
 
         String url = API_LOGICPORTS_LIST + storageId;
@@ -325,8 +329,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             LOG.info("DmeStorageServiceImpl/getLogicPorts/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
-                resMap.put("code", code);
-                resMap.put("msg", "list bandports error!");
+                //resMap.put("code", code);
+                //resMap.put("msg", "list bandports error!");
+                throw new DMEException("503","list bandports error!");
             }
             String object = responseEntity.getBody();
             if (!StringUtils.isEmpty(object)) {
@@ -353,24 +358,25 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     logicPorts.setVstoreName(ToolUtils.jsonToStr(element.get("vstore_name")));
                     resList.add(logicPorts);
                 }
-                resMap.put("data", resList);
+                //resMap.put("data", resList);
             }
-            return resMap;
+            //return resMap;
         } catch (Exception e) {
             LOG.error("list bandports error", e);
-            resMap.put("code", 503);
-            resMap.put("msg", e.getMessage());
+            //resMap.put("code", 503);
+            //resMap.put("msg", e.getMessage());
+            throw new DMEException("503",e.getMessage());
         }
-        return resMap;
+        return resList;
     }
 
     @Override
-    public Map<String, Object> getVolumes(String storageId) {
+    public List<Volume> getVolumes(String storageId) throws DMEException {
 
-        Map<String, Object> resMap = new HashMap<>(16);
-        resMap.put("code", 200);
-        resMap.put("msg", "list volumes success!");
-        resMap.put("storageId", storageId);
+        //Map<String, Object> resMap = new HashMap<>(16);
+        //resMap.put("code", 200);
+        //resMap.put("msg", "list volumes success!");
+        //resMap.put("storageId", storageId);
 
         List<Volume> volumes = new ArrayList<>(10);
         String url = API_VOLUME_LIST + storageId;
@@ -379,9 +385,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             LOG.info("DmeStorageServiceImpl/getVolumes/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
-                resMap.put("code", code);
-                resMap.put("msg", "list volumes error!");
-                return resMap;
+                //resMap.put("code", code);
+                //resMap.put("msg", "list volumes error!");
+                //return resMap;
+                throw new DMEException("503","list volumes error!");
             }
             Object object = responseEntity.getBody();
             if (object != null) {
@@ -407,23 +414,24 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     volume.setStoragePoolName(getStorageByPoolRawId(poolRawId));
                     volumes.add(volume);
                 }
-                resMap.put("data", volumes);
+                //resMap.put("data", volumes);
             }
         } catch (Exception e) {
             LOG.error("list volume error!",e);
-            resMap.put("code", 503);
-            resMap.put("msg", e.getMessage());
+            //resMap.put("code", 503);
+            //resMap.put("msg", e.getMessage());
+            throw new DMEException("503",e.getMessage());
         }
-        return resMap;
+        return volumes;
     }
 
     @Override
-    public Map<String, Object> getFileSystems(String storageId) {
+    public List<FileSystem> getFileSystems(String storageId) throws DMEException {
 
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put("code", 200);
-        resMap.put("msg", "list filesystem success!");
-        resMap.put("storageId", storageId);
+        //Map<String, Object> resMap = new HashMap<>();
+        //resMap.put("code", 200);
+        //resMap.put("msg", "list filesystem success!");
+        //resMap.put("storageId", storageId);
 
         List<FileSystem> fileSystems = new ArrayList<>();
 
@@ -440,9 +448,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             LOG.info("DmeStorageServiceImpl/getFileSystems/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
-                resMap.put("code", code);
-                resMap.put("msg", "list filesystem error!");
-                return resMap;
+                //resMap.put("code", code);
+                //resMap.put("msg", "list filesystem error!");
+                //return resMap;
+                throw new DMEException("503", "list filesystem error!");
             }
             String respObject = responseEntity.getBody();
             if (!StringUtils.isEmpty(respObject)) {
@@ -463,23 +472,24 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     fileSystem.setDtreeCount(ToolUtils.jsonToInt(element.get("dtree_count"),0));
                     fileSystems.add(fileSystem);
                 }
-                resMap.put("data", fileSystems);
+                //resMap.put("data", fileSystems);
             }
         } catch (Exception e) {
             LOG.error("list filesystem error!", e);
-            resMap.put("code", 503);
-            resMap.put("msg", e.getMessage());
+            //resMap.put("code", 503);
+            //resMap.put("msg", e.getMessage());
+            throw new DMEException("503",e.getMessage());
         }
-        return resMap;
+        return fileSystems;
     }
 
     @Override
-    public Map<String, Object> getDTrees(String storageId) {
+    public List<Dtrees> getDTrees(String storageId) throws DMEException {
 
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put("code", 200);
-        resMap.put("msg", "list dtree success!");
-        resMap.put("storageId", storageId);
+        //Map<String, Object> resMap = new HashMap<>();
+        //resMap.put("code", 200);
+        //resMap.put("msg", "list dtree success!");
+        //resMap.put("storageId", storageId);
 
         List<Dtrees> resList = new ArrayList<>();
         Map<String, String> params = new HashMap<>();
@@ -490,9 +500,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             LOG.info("DmeStorageServiceImpl/getDTrees/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
-                resMap.put("code", code);
-                resMap.put("msg", "list dtree error!");
-                return resMap;
+                //resMap.put("code", code);
+                //resMap.put("msg", "list dtree error!");
+                //return resMap;
+                throw new DMEException("503","list dtree error!");
             }
             String object = responseEntity.getBody();
             if (!StringUtils.isEmpty(object)) {
@@ -510,23 +521,24 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     dtrees.setCifsCount(ToolUtils.jsonToInt(element.get("cifs_count"),0));
                     resList.add(dtrees);
                 }
-                resMap.put("data", resList);
+                //resMap.put("data", resList);
             }
         } catch (Exception e) {
             LOG.error("list dtree error!", e);
-            resMap.put("code", 503);
-            resMap.put("msg", e.getMessage());
+            //resMap.put("code", 503);
+            //resMap.put("msg", e.getMessage());
+            throw new DMEException("503",e.getMessage());
         }
-        return resMap;
+        return resList;
     }
 
     @Override
-    public Map<String, Object> getNfsShares(String storageId) {
+    public List<NfsShares> getNfsShares(String storageId) throws DMEException {
 
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put("code", 200);
-        resMap.put("msg", "list nfsshares success!");
-        resMap.put("storageId", storageId);
+        //Map<String, Object> resMap = new HashMap<>();
+        //resMap.put("code", 200);
+        //resMap.put("msg", "list nfsshares success!");
+        //resMap.put("storageId", storageId);
         List<NfsShares> resList = new ArrayList<>();
 
         Map<String, String> params = new HashMap<>();
@@ -537,9 +549,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             LOG.info("DmeStorageServiceImpl/getNfsShares/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
-                resMap.put("code", code);
-                resMap.put("msg", "list nfsshares error!");
-                return resMap;
+                //resMap.put("code", code);
+                //resMap.put("msg", "list nfsshares error!");
+                //return resMap;
+                throw new DMEException("503","list nfsshares error!");
             }
             String object = responseEntity.getBody();
             if (!StringUtils.isEmpty(object)) {
@@ -557,23 +570,24 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     nfsShares.setFsName(ToolUtils.jsonToStr(element.get("fs_name")));
                     resList.add(nfsShares);
                 }
-                resMap.put("data", resList);
+                //resMap.put("data", resList);
             }
         } catch (Exception e) {
             LOG.error("list nfsshares error!", e);
-            resMap.put("code", 503);
-            resMap.put("msg", e.getMessage());
+            //resMap.put("code", 503);
+            //resMap.put("msg", e.getMessage());
+            throw new DMEException("503",e.getMessage());
         }
-        return resMap;
+        return resList;
     }
 
     @Override
-    public Map<String, Object> getBandPorts(String storageId) {
+    public List<BandPorts> getBandPorts(String storageId) throws DMEException {
 
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put("code", 200);
-        resMap.put("msg", "list band ports success!");
-        resMap.put("storageId", storageId);
+        //Map<String, Object> resMap = new HashMap<>();
+        //resMap.put("code", 200);
+        //resMap.put("msg", "list band ports success!");
+        //resMap.put("storageId", storageId);
         List<BandPorts> resList = new ArrayList<>();
 
         String url = API_BANDPORTS_LIST + storageId;
@@ -583,8 +597,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             LOG.info("DmeStorageServiceImpl/getBandPorts/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
-                resMap.put("code", code);
-                resMap.put("msg", "list bandports error!");
+                //resMap.put("code", code);
+                //resMap.put("msg", "list bandports error!");
+                throw new DMEException("503","list bandports error!");
             }
             String object = responseEntity.getBody();
             if (!StringUtils.isEmpty(object)) {
@@ -600,24 +615,25 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     bandPorts.setMtu(ToolUtils.jsonToStr(element.get("mtu")));
                     resList.add(bandPorts);
                 }
-                resMap.put("data", resList);
+                //resMap.put("data", resList);
             }
         } catch (Exception e) {
             LOG.error("list bandports error!", e);
-            resMap.put("code", 503);
-            resMap.put("msg", e.getMessage());
+            //resMap.put("code", 503);
+            //resMap.put("msg", e.getMessage());
+            throw new DMEException("503",e.getMessage());
         }
-        return resMap;
+        return resList;
     }
 
     @Override
-    public Map<String, Object> getStorageControllers(String storageDeviceId) {
+    public List<StorageControllers> getStorageControllers(String storageDeviceId) throws DMEException {
 
         String className = "SYS_Controller";
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put("code", 200);
-        resMap.put("msg", "list storage controller success!");
-        resMap.put("storageId", className);
+        //Map<String, Object> resMap = new HashMap<>();
+        //resMap.put("code", 200);
+        //resMap.put("msg", "list storage controller success!");
+        //resMap.put("storageId", className);
         List<StorageControllers> resList = new ArrayList<>();
 
         String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageDeviceId;
@@ -626,9 +642,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             LOG.info("DmeStorageServiceImpl/getStorageControllers/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
-                resMap.put("code", code);
-                resMap.put("msg", "list storage controller error!");
-                return resMap;
+                //resMap.put("code", code);
+                //resMap.put("msg", "list storage controller error!");
+                //return resMap;
+                throw new DMEException("503","list storage controller error!");
             }
             Object object = responseEntity.getBody();
             if (!StringUtils.isEmpty(object)) {
@@ -643,24 +660,25 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storageControllers.setCpuInfo(ToolUtils.jsonToStr(element.get("cpuInfo")));
                     resList.add(storageControllers);
                 }
-                resMap.put("data", resList);
+                //resMap.put("data", resList);
             }
         } catch (Exception e) {
             LOG.error("list storage controller error!");
-            resMap.put("code", 503);
-            resMap.put("msg", e.getMessage());
+            //resMap.put("code", 503);
+            //resMap.put("msg", e.getMessage());
+            throw new DMEException("503",e.getMessage());
         }
-        return resMap;
+        return resList;
     }
 
     @Override
-    public Map<String, Object> getStorageDisks(String storageDeviceId) {
+    public List<StorageDisk> getStorageDisks(String storageDeviceId) throws DMEException {
 
         String className = "SYS_StorageDisk";
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put("code", 200);
-        resMap.put("msg", "list storage disk success!");
-        resMap.put("storageId", className);
+        //Map<String, Object> resMap = new HashMap<>();
+        //resMap.put("code", 200);
+        //resMap.put("msg", "list storage disk success!");
+        //resMap.put("storageId", className);
         List<StorageDisk> resList = new ArrayList<>();
 
         String url = API_INSTANCES_LIST + "/" + className+"?storageDeviceId="+storageDeviceId;
@@ -674,9 +692,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             LOG.info("DmeStorageServiceImpl/getStorageDisks/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
-                resMap.put("code", code);
-                resMap.put("msg", "list storage disk error!");
-                return resMap;
+                //resMap.put("code", code);
+                //resMap.put("msg", "list storage disk error!");
+                //return resMap;
+                throw new DMEException("503","list storage disk error!");
             }
             Object object = responseEntity.getBody();
             if (!StringUtils.isEmpty(object)) {
@@ -697,14 +716,15 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storageDisk.setDiskPools(getDiskPoolByPoolId(poolId));
                     resList.add(storageDisk);
                 }
-                resMap.put("data", resList);
+                //resMap.put("data", resList);
             }
         } catch (Exception e) {
             LOG.error("list storage disk error!", e);
-            resMap.put("code", 503);
-            resMap.put("msg", e.getMessage());
+            //resMap.put("code", 503);
+            //resMap.put("msg", e.getMessage());
+            throw new DMEException("503",e.getMessage());
         }
-        return resMap;
+        return resList;
     }
 
     @Override
@@ -940,29 +960,32 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public Map<String, Object> getStoragePort(String storageDeviceId,String portType) {
-        Map<String, Object> resMap = new HashMap<>(16);
-        resMap.put("code", 200);
-        resMap.put("msg", "list storage port success!");
+    public List<StoragePort> getStoragePort(String storageDeviceId, String portType) throws DMEException {
+        //Map<String, Object> resMap = new HashMap<>(16);
+        //resMap.put("code", 200);
+        //resMap.put("msg", "list storage port success!");
         if (StringUtils.isEmpty(storageDeviceId) || StringUtils.isEmpty(portType)) {
-            resMap.put("code", 403);
-            resMap.put("msg", "request storageDeviceId or portType error!");
-            return resMap;
+            //resMap.put("code", 403);
+            //resMap.put("msg", "request storageDeviceId or portType error!");
+            //return resMap;
+            throw new DMEException("403","request storageDeviceId or portType error!");
         }
+        List<StoragePort> storagePorts = new ArrayList<>(10);
         String className = "SYS_StoragePort";
         String url = API_INSTANCES_LIST+"/"+ className + "?storageDeviceId=" + storageDeviceId;
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code!=200) {
-                resMap.put("code", code);
-                resMap.put("msg", "get storage port failed!");
-                return resMap;
+                //resMap.put("code", code);
+                //resMap.put("msg", "get storage port failed!");
+                //return resMap;
+                throw new DMEException("503","get storage port failed!");
             }
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
             JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
-            List<StoragePort> storagePorts = new ArrayList<>(10);
+
             for (JsonElement jsonElement : jsonArray) {
                 JsonObject element = jsonElement.getAsJsonObject();
                 StoragePort storagePort = new StoragePort();
@@ -1000,40 +1023,44 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storagePorts.add(storagePort);
                 }
             }
-            resMap.put("data", storagePorts);
+            //resMap.put("data", storagePorts);
         } catch (Exception e) {
             LOG.error("list storage port error!");
-            resMap.put("code", 503);
-            resMap.put("msg", e.getMessage());
+            //resMap.put("code", 503);
+            //resMap.put("msg", e.getMessage());
+            throw new DMEException("503",e.getMessage());
         }
 
-        return resMap;
+        return storagePorts;
     }
 
     @Override
-    public Map<String, Object> getFailoverGroups(String storage_id) {
+    public List<FailoverGroup> getFailoverGroups(String storage_id) throws DMEException {
 
-        Map<String, Object> resMap = new HashMap<>(16);
-        resMap.put("code", 200);
-        resMap.put("msg", "list failover group success!");
+        //Map<String, Object> resMap = new HashMap<>(16);
+        //resMap.put("code", 200);
+        //resMap.put("msg", "list failover group success!");
         if (StringUtils.isEmpty(storage_id)) {
-            resMap.put("code", 403);
-            resMap.put("msg", "request param storage_id error!");
-            return resMap;
+            //resMap.put("code", 403);
+            //resMap.put("msg", "request param storage_id error!");
+            //return resMap;
+            throw new DMEException("403","request param storage_id error!");
         }
+        List<FailoverGroup> failoverGroups = new ArrayList<>(10);
         String url = API_FAILOVERGROUPS + storage_id;
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
-                resMap.put("code", code);
-                resMap.put("msg", "list failover group failed!");
-                return resMap;
+                //resMap.put("code", code);
+                //resMap.put("msg", "list failover group failed!");
+                //return resMap;
+                throw new DMEException("503","list failover group failed!");
             }
             String body = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();
             JsonArray jsonArray = jsonObject.get("failover_groups").getAsJsonArray();
-            List<FailoverGroup> failoverGroups = new ArrayList<>(10);
+
             for (JsonElement jsonElement : jsonArray) {
                 JsonObject element = jsonElement.getAsJsonObject();
                 FailoverGroup failoverGroup = new FailoverGroup();
@@ -1042,37 +1069,41 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 failoverGroup.setName(ToolUtils.jsonToStr(element.get("name")));
                 failoverGroups.add(failoverGroup);
             }
-            resMap.put("data", failoverGroups);
+            //resMap.put("data", failoverGroups);
         } catch (Exception e) {
             LOG.error("list failover group error!");
-            resMap.put("code", 503);
-            resMap.put("msg", e.getMessage());
+            //resMap.put("code", 503);
+            //resMap.put("msg", e.getMessage());
+            throw new DMEException("503",e.getMessage());
         }
-        return resMap;
+        return failoverGroups;
     }
 
     @Override
-    public Map<String, Object> getFileSystemDetail(String file_system_id) {
+    public FileSystemDetail getFileSystemDetail(String file_system_id) throws DMEException {
 
-        Map<String, Object> resMap = new HashMap<>(16);
-        resMap.put("code", 200);
-        resMap.put("msg", "get file system detail success!");
+        //Map<String, Object> resMap = new HashMap<>(16);
+        //resMap.put("code", 200);
+        //resMap.put("msg", "get file system detail success!");
 
         if (StringUtils.isEmpty(file_system_id)) {
-            resMap.put("code", 403);
-            resMap.put("msg", "param error!");
-            return resMap;
+            //resMap.put("code", 403);
+            //resMap.put("msg", "param error!");
+            //return resMap;
+            throw new DMEException("403","param error!");
         }
+        FileSystemDetail fileSystemDetail = new FileSystemDetail();
         String url = API_FILESYSTEM_DETAIL + file_system_id;
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
-                resMap.put("code", code);
-                resMap.put("msg", "get file system detail error!");
-                return resMap;
+                //resMap.put("code", code);
+                //resMap.put("msg", "get file system detail error!");
+                //return resMap;
+                throw new DMEException("503","get file system detail error!");
             }
-            FileSystemDetail fileSystemDetail = new FileSystemDetail();
+
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
             fileSystemDetail.setId(ToolUtils.jsonToStr(jsonObject.get("id")));
@@ -1098,13 +1129,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
             fileSystemTurning.setSmartQos(smartQos);
             fileSystemDetail.setFileSystemTurning(fileSystemTurning);
-            resMap.put("data", fileSystemDetail);
+            //resMap.put("data", fileSystemDetail);
         } catch (Exception e) {
             LOG.error("get file system detail error");
-            resMap.put("code", 503);
-            resMap.put("msg", e.getMessage());
+            //resMap.put("code", 503);
+            //resMap.put("msg", e.getMessage());
+            throw new DMEException("503",e.getMessage());
         }
-        return resMap;
+        return fileSystemDetail;
     }
 
     private String getDataStoreOnVolume(String volumeId) throws SQLException {

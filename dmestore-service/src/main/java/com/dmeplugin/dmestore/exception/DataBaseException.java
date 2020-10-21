@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.exception;
 
-public class DataBaseException extends VcenterException {
+public class DataBaseException extends VcenterRuntimeException {
 
 	public DataBaseException() {
 		super();

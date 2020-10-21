@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.exception.DMEException;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
@@ -24,14 +25,14 @@ public interface DmeAccessService {
      * @param params: include hostIp,hostPort,userName,password
      * @return: ResponseBodyBean
      */
-    Map<String, Object> accessDme(Map<String, Object> params);
+    void accessDme(Map<String, Object> params) throws DMEException;
 
     /**
      * Refresh connection status
      *
      * @return ResponseBodyBean
      */
-    Map<String, Object> refreshDme();
+    Map<String, Object> refreshDme() throws DMEException;
 
     /**
      * Public method access

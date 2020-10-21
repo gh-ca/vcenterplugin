@@ -48,8 +48,7 @@ public class DmeAccessControllerTest {
         params.put("hostPort", 26335);
         params.put("userName", "testadmin001");
         params.put("password", "Pbu421234");
-        Map<String, Object> remap = dmeAccessService.accessDme(params);
-        System.out.println("remap==" + remap);
+        dmeAccessService.accessDme(params);
     }
 
     @Test

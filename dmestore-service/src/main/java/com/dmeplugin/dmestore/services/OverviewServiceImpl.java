@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.BestPracticeCheckRecordBean;
 import com.dmeplugin.dmestore.model.NfsDataInfo;
 import com.dmeplugin.dmestore.model.Storage;
@@ -31,16 +32,12 @@ public class OverviewServiceImpl implements OverviewService {
     private BestPracticeProcessService bestPracticeProcessService;
 
     @Override
-    public Map<String, Object> getStorageNum() {
+    public Map<String, Object> getStorageNum() throws DMEException {
         Map<String, Object> r = new HashMap<>(16);
         int normal = 0;
         int abnormal = 0;
         int total;
-        Map<String, Object> storageOriginal = dmeStorageService.getStorages();
-        if (null == storageOriginal || !SUCCESS_CODE.equals(storageOriginal.get(COLUMN_CODE).toString())) {
-            throw new RuntimeException("query storage error.");
-        } else{
-            List<Storage> storages = (List<Storage>) storageOriginal.get("data");
+        List<Storage> storages = dmeStorageService.getStorages();
             total = storages.size();
             for (Storage storage : storages) {
                 // 运行状态 0-离线 1-正常 2-故障 9-未管理。
@@ -53,7 +50,6 @@ public class OverviewServiceImpl implements OverviewService {
             r.put("total", total);
             r.put("normal", normal);
             r.put("abnormal", abnormal);
-        }
         return r;
     }
 

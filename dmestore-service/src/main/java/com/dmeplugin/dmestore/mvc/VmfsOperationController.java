@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.VmfsOperationService;
 import com.google.gson.Gson;
@@ -41,11 +42,15 @@ public class VmfsOperationController extends BaseController{
     public ResponseBodyBean updateVMFS(@RequestParam(value = "volumeId" ) String volumeId,
                                        @RequestBody Map<String,Object> params){
 
-        Map<String,Object> resMap = vmfsOperationService.updateVMFS(volumeId,params);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.ACCEPTED.value())) {
-            return success(resMap);
+        try {
+            vmfsOperationService.updateVMFS(volumeId,params);
+            return success();
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
+
     }
 
     /**
@@ -59,11 +64,15 @@ public class VmfsOperationController extends BaseController{
     public ResponseBodyBean expandVMFS(@RequestBody List<Map<String,String >> volumes ){
 
         LOG.info("volumes=="+gson.toJson(volumes));
-        Map<String, Object> resMap = vmfsOperationService.expandVMFS(volumes);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.ACCEPTED.value())) {
-            return success(resMap);
+        try {
+            vmfsOperationService.expandVMFS(volumes);
+            return success();
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
+
     }
 
 
@@ -72,11 +81,14 @@ public class VmfsOperationController extends BaseController{
     @ResponseBody
     public ResponseBodyBean recycleVMFS(@RequestBody List<String> datastoreName){
         LOG.info("recyclevmfs=="+gson.toJson(datastoreName));
-        Map<String,Object> resMap = vmfsOperationService.recycleVmfsCapacity(datastoreName);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
-            return success(resMap);
+        try {
+            vmfsOperationService.recycleVmfsCapacity(datastoreName);
+            return success();
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
     }
 
     @PutMapping("/listvmfsservicelevel")
@@ -84,11 +96,13 @@ public class VmfsOperationController extends BaseController{
     public ResponseBodyBean listServiceLevelVMFS(@RequestBody(required = false) Map<String,Object> params){
 
         LOG.info("recyclevmfs=="+gson.toJson(params));
-        Map<String,Object> resMap =vmfsOperationService.listServiceLevelVMFS(params);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
-            return success(resMap);
+        try {
+            return success(vmfsOperationService.listServiceLevelVMFS(params));
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
     }
 
     /**
@@ -105,11 +119,14 @@ public class VmfsOperationController extends BaseController{
     public ResponseBodyBean updateServiceLevelVMFS(@RequestBody Map<String,Object> params){
 
         LOG.info("servicelevelvmfs=="+gson.toJson(params));
-        Map<String,Object> resMap = vmfsOperationService.updateVmfsServiceLevel(params);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.ACCEPTED.value())) {
-            return success(resMap);
+        try {
+            vmfsOperationService.updateVmfsServiceLevel(params);
+            return success();
+        } catch (DMEException e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
 
     }
 
