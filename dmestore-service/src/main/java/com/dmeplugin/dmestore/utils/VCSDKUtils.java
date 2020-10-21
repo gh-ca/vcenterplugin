@@ -2858,6 +2858,23 @@ public class VCSDKUtils {
         return name;
     }
 
+    
+    public String getDataStoreName(String dsObjId){
+        String name = null;
+        try {
+            String serverguid = vcConnectionHelper.objectID2Serverguid(dsObjId);
+            VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
+            ManagedObjectReference objmor = vcConnectionHelper.objectID2MOR(dsObjId);
+            DatastoreMO dataStoreMo = new DatastoreMO(vmwareContext, objmor);
+            if (null != dataStoreMo) {
+                name = dataStoreMo.getName();
+            }
+        } catch (Exception e) {
+            logger.error("query clusterName on datastore error:", e);
+        }
+        return name;
+    }
+
     /**
      * 刷新datastore容量
      * @param objectid 存储objectid

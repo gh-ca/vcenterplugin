@@ -36,6 +36,8 @@ export class RdmComponent implements OnInit {
   serviceLevels = [];
   service_level_id = '';
 
+  diskNum = 1;
+
   vmObjectId = '';
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
@@ -143,7 +145,9 @@ export class RdmComponent implements OnInit {
   }
 
   basAdd(){
-    this.configModel.volume_specs.push(new volume_specs());
+    this.diskNum = this.diskNum + 1;
+    const i = this.diskNum;
+    this.configModel.volume_specs.push(new volume_specs("name"+i,"unit"+i,"count"+i,"capacity"+i));
   }
 
   basRemove(item){
@@ -243,7 +247,7 @@ class customize_volumes{
   volume_specs: volume_specs[];
   constructor(){
     this.storageType = '1';
-    this.volume_specs = [new volume_specs()];
+    this.volume_specs = [new volume_specs("name1","unit1","count1", "capacity1")];
     this.tuning = new tuning();
     this.initial_distribute_policy = '0';
     this.owner_controller = '0';
@@ -259,7 +263,18 @@ class volume_specs{
   start_lun_id: number;
   start_suffix: number;
   inputName: string;
-  constructor(){
+  inputUnit: string;
+  inputCount: string;
+  inputCapacity: string;
+  constructor(inputName, inputUnit, inputCount, inputCapacity){
+     this.inputCapacity = inputCapacity;
+     this.inputCount = inputCount;
+     this.inputName = inputName;
+     this.inputUnit = inputUnit;
+
+     this.name = '';
+     this.capacity = null;
+     this.count = 1;
      this.unit = 'GB';
   }
 }
