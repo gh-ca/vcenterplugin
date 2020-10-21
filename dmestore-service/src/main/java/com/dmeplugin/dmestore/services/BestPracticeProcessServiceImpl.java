@@ -1,6 +1,9 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.dao.BestPracticeCheckDao;
+import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeSqlException;
+import com.dmeplugin.dmestore.exception.VcenterException;
 import com.dmeplugin.dmestore.model.BestPracticeBean;
 import com.dmeplugin.dmestore.model.BestPracticeCheckRecordBean;
 import com.dmeplugin.dmestore.model.BestPracticeUpResultBase;
@@ -61,7 +64,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     }
 
     @Override
-    public List<BestPracticeCheckRecordBean> getCheckRecord() throws Exception {
+    public List<BestPracticeCheckRecordBean> getCheckRecord()   {
         List<BestPracticeCheckRecordBean> list = new ArrayList<>();
         for (BestPracticeService bestPracticeService : bestPracticeServices) {
             BestPracticeCheckRecordBean bean = new BestPracticeCheckRecordBean();
@@ -83,7 +86,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     }
 
     @Override
-    public List<BestPracticeBean> getCheckRecordBy(String hostSetting, int pageNo, int pageSize) throws Exception {
+    public List<BestPracticeBean> getCheckRecordBy(String hostSetting, int pageNo, int pageSize) throws DMEException {
         List<BestPracticeBean> list = new ArrayList<>();
         for (BestPracticeService bestPracticeService : bestPracticeServices) {
             String s = bestPracticeService.getHostSetting();
@@ -91,7 +94,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                 try {
                     list = bestPracticeCheckDao.getRecordByPage(hostSetting, pageNo, pageSize);
                 } catch (Exception ex) {
-                    throw new Exception(ex.getMessage());
+                    throw new DMEException(ex.getMessage());
                 }
                 break;
             }
@@ -100,7 +103,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     }
 
     @Override
-    public void check(String objectId) throws Exception {
+    public void check(String objectId) throws VcenterException {
         log.info("checkstart ");
         String hostsStr;
         if (null != objectId) {
@@ -199,12 +202,12 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     }
 
     @Override
-    public List<BestPracticeUpResultResponse> update(List<String> objectIds) throws Exception {
+    public List<BestPracticeUpResultResponse> update(List<String> objectIds) throws DmeSqlException {
         return update(objectIds, null);
     }
 
     @Override
-    public List<BestPracticeUpResultResponse> updateByCluster(String clusterobjectid) throws Exception {
+    public List<BestPracticeUpResultResponse> updateByCluster(String clusterobjectid) throws VcenterException, DmeSqlException {
         String vmwarehosts= vcsdkUtils.getHostsOnCluster(clusterobjectid);
         if (!StringUtils.isEmpty(vmwarehosts)) {
             List<Map<String, String>> vmwarehostlists = gson.fromJson(vmwarehosts, new TypeToken<List<Map<String, String>>>() {
@@ -223,7 +226,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     }
 
     @Override
-    public List<BestPracticeUpResultResponse> update(List<String> objectIds, String hostSetting) throws Exception {
+    public List<BestPracticeUpResultResponse> update(List<String> objectIds, String hostSetting) throws DmeSqlException {
         List<BestPracticeService> services = new ArrayList<>();
         //获取对应的service
         for (BestPracticeService bestPracticeService : bestPracticeServices) {
@@ -243,13 +246,18 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             int pageNo = 0;
             int pageSize = 100;
             //获取本地所有
-            while (true){
-                List<String> hostIdList = bestPracticeCheckDao.getAllHostIds(pageNo++,  pageSize);
-                objectIds.addAll(hostIdList);
+            try {
+                while (true) {
+                    List<String> hostIdList = bestPracticeCheckDao.getAllHostIds(pageNo++, pageSize);
+                    objectIds.addAll(hostIdList);
 
-                if(hostIdList.size() != pageSize){
-                    break;
+                    if (hostIdList.size() != pageSize) {
+                        break;
+                    }
                 }
+            }catch (SQLException e){
+                e.printStackTrace();
+                throw new DmeSqlException(e.getMessage());
             }
         }
 

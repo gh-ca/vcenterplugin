@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.CreateVolumesRequest;
 import com.dmeplugin.dmestore.model.CustomizeVolumesRequest;
 import com.dmeplugin.dmestore.model.ServiceVolumeMapping;
@@ -60,7 +61,7 @@ public class VmRdmServiceImpl implements VmRdmService {
     }
 
     @Override
-    public void createRdm(String dataStoreName, String vmObjectId, String hostId, VmRdmCreateBean createBean) throws Exception {
+    public void createRdm(String dataStoreName, String vmObjectId, String hostId, VmRdmCreateBean createBean) throws DMEException {
         createDmeRdm(createBean);
         LOG.info("create DME disk succeeded!");
         String requestVolumeName;
@@ -111,7 +112,12 @@ public class VmRdmServiceImpl implements VmRdmService {
             if (StringUtil.isNotBlank(lunStr)) {
                 break;
             } else {
-                Thread.sleep(2 * 1000);
+                try {
+                    Thread.sleep(2 * 1000);
+                }catch (InterruptedException e) {
+                    e.printStackTrace();
+                    throw new DMEException(e.getMessage());
+                }
             }
         }
 
@@ -119,7 +125,7 @@ public class VmRdmServiceImpl implements VmRdmService {
             LOG.error("获取目标LUN失败！");
             //将已经创建好的卷删除
             deleteVolumes(hostId, volumeIds);
-            throw new Exception("Failed to obtain the target LUN!");
+            throw new DMEException("Failed to obtain the target LUN!");
         }
         LOG.info("get LUN information succeeded!");
         JsonArray lunArray = gson.fromJson(lunStr, JsonArray.class);
@@ -155,11 +161,11 @@ public class VmRdmServiceImpl implements VmRdmService {
                 deleteVolumes(hostId, failList);
                 //完全失败
                 if (failList.size() == lunSize) {
-                    throw new Exception(errorMsg);
+                    throw new DMEException(errorMsg);
                 }
             }
         } else {
-            throw new Exception("No matching LUN information was found on the vCenter");
+            throw new DMEException("No matching LUN information was found on the vCenter");
         }
     }
 
@@ -172,7 +178,7 @@ public class VmRdmServiceImpl implements VmRdmService {
      * @throws Exception always
      * @return 
      **/
-    private void deleteVolumes(String hostId, List<String> ids) throws Exception {
+    private void deleteVolumes(String hostId, List<String> ids)  {
         ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
                 .setNameFormat("volumeDelete-pool-%d").build();
         ExecutorService singleThreadPool = new ThreadPoolExecutor(1, 1,
@@ -189,7 +195,7 @@ public class VmRdmServiceImpl implements VmRdmService {
         singleThreadPool.shutdown();
     }
 
-    public void createDmeRdm(VmRdmCreateBean vmRdmCreateBean) throws Exception {
+    public void createDmeRdm(VmRdmCreateBean vmRdmCreateBean) throws DMEException {
         String taskId;
         //通过服务等级创建卷
         if (vmRdmCreateBean.getCreateVolumesRequest() != null) {
@@ -201,17 +207,17 @@ public class VmRdmServiceImpl implements VmRdmService {
         JsonObject taskDetail = taskService.queryTaskByIdUntilFinish(taskId);
         if (taskDetail.get(DmeConstants.TASK_DETAIL_STATUS_FILE).getAsInt() != DmeConstants.TASK_SUCCESS) {
             LOG.error("The DME volume is in abnormal condition!taskDetail={}", gson.toJson(taskDetail));
-            throw new Exception(taskDetail.get("detail_cn").getAsString());
+            throw new DMEException(taskDetail.get("detail_cn").getAsString());
         }
     }
 
-    private String createDmeVolumeByServiceLevel(CreateVolumesRequest createVolumesRequest) throws Exception {
+    private String createDmeVolumeByServiceLevel(CreateVolumesRequest createVolumesRequest) throws DMEException {
         String url = DmeConstants.DME_VOLUME_BASE_URL;
         Gson gsonTemp = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gsonTemp.toJson(createVolumesRequest));
         if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
             LOG.error("Failed to create RDM on DME!errorMsg:{}", responseEntity.getBody());
-            throw new Exception("Failed to create RDM on DME!");
+            throw new DMEException("Failed to create RDM on DME!");
         }
         JsonObject task = gson.fromJson(responseEntity.getBody(), JsonObject.class);
         String taskId = task.get("task_id").getAsString();
@@ -219,7 +225,7 @@ public class VmRdmServiceImpl implements VmRdmService {
         return taskId;
     }
 
-    private String createDmeVolumeByUnServiceLevel(CustomizeVolumesRequest customizeVolumesRequest) throws Exception {
+    private String createDmeVolumeByUnServiceLevel(CustomizeVolumesRequest customizeVolumesRequest) throws DMEException {
         String url = DmeConstants.DME_CREATE_VOLUME_UNLEVEL_URL;
         String  ownerController = customizeVolumesRequest.getCustomizeVolumes().getOwnerController();
         //归属控制器自动则不下发参数
@@ -231,7 +237,7 @@ public class VmRdmServiceImpl implements VmRdmService {
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gsonTemp.toJson(customizeVolumesRequest));
         if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
             LOG.error("Failed to create RDM on DME!errorMsg:{}", responseEntity.getBody());
-            throw new Exception("Failed to create RDM on DME!");
+            throw new DMEException("Failed to create RDM on DME!");
         }
         JsonObject task = gson.fromJson(responseEntity.getBody(), JsonObject.class);
         String taskId = task.get("task_id").getAsString();
@@ -240,12 +246,12 @@ public class VmRdmServiceImpl implements VmRdmService {
     }
 
     @Override
-    public List<Map<String, Object>> getAllDmeHost() throws Exception {
+    public List<Map<String, Object>> getAllDmeHost() throws DMEException {
         return dmeAccessService.getDmeHosts(null);
     }
 
     @Override
-    public List<DatastoreSummary> getDatastoreMountsOnHost(String hostId) throws Exception {
+    public List<DatastoreSummary> getDatastoreMountsOnHost(String hostId) throws DMEException {
         //查询主机信息
         Map<String, Object> hostMap = dmeAccessService.getDmeHost(hostId);
         String hostIp = hostMap.get("ip").toString();

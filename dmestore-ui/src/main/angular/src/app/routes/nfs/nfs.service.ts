@@ -53,9 +53,6 @@ export class NfsService {
   getVolsByObjId(objId: string) {
     return this.http.get('accessvmfs/volume/' + objId );
   }
-  getNfsDetailById(fileSystemId:string){
-    return this.http.get('dmestorage/filesystemdetail',{params: {fileSystemId}} );
-  }
 
   /**
    * 获取折线图
@@ -88,45 +85,7 @@ export interface List {
   writeResponseTime: number; // 写响应时间 单位ms
   objectid: string; //
 }
-// =================添加NFS参数 start=========
-export class AddNfs{
-  storagId:string;// 存储设备id
-  storagePoolId:string;//  存储池id (storage_pool_id)
-  poolRawId:string;//  存储池在指定存储设备上的id（poolId）
-  currentPortId:string;//  逻辑端口id
-  nfsName:string;//   DataStoname
-  sameName:boolean;// false true 如果是false就传
-  shareName:string;//  共享名称
-  fsName:string;//  文件系统名称
-  size: number; //  ?待确认默认单位（界面可选。前端可转换）
-  type:string;//  nfs协议版本
-  advance :boolean;//false true  true 是有高级选项
-  qosFlag:boolean;// qos策略开关 false true false关闭
-  contolPolicy :string;//  上下线选择标记  枚举值 up low
-// up 取值如下
-  maxBandwidth: number; //
-  maxIops: number; //
-//low取值
-  minBandwidth: number; //
-  minIops: number; //
-  latency: number; //
-  thin:boolean;// true  代表thin false代表thick
-  deduplicationEnabled:boolean;// 重删 true false
-  compressionEnabled:boolean;// 压缩 true false
-  autoSizeEnable:boolean;// 自动扩容 true false
-  vkernelIp:string;//  虚拟网卡ip
-  hostObjectId:string;//  挂载主机的Objectid
-  accessMode:string;//  挂载方式 分 只读 和读写
-  constructor(){
-    this.sameName = true;
-    this.advance = false;
-    this.qosFlag = false;
-    this.deduplicationEnabled = false;
-    this.compressionEnabled = false;
-    this.autoSizeEnable = false;
-    this.thin = true;
-  }
-}
+
 
 export class UpdateNfs{
   dataStoreObjectId: string;

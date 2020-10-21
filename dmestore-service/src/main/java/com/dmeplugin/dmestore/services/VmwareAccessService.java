@@ -1,5 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.exception.DMEException;
+
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +21,7 @@ public interface VmwareAccessService {
      * @return ResponseBodyBean List<Map<String, String>> include hostId hostName
      * @throws Exception when error
      */
-    List<Map<String,String>> listHosts() throws Exception;
+    List<Map<String,String>> listHosts() throws DMEException;
 
     /**
      * Access hosts
@@ -28,7 +30,7 @@ public interface VmwareAccessService {
      * @return ResponseBodyBean List<Map<String, String>> include hostId hostName
      * @throws Exception when error
      */
-    List<Map<String,String>> getHostsByDsObjectId(String dataStoreObjectId) throws Exception;
+    List<Map<String,String>> getHostsByDsObjectId(String dataStoreObjectId) throws DMEException;
 
     /**
      * Access clusters
@@ -36,7 +38,7 @@ public interface VmwareAccessService {
      * @return ResponseBodyBean List<Map<String, String>> include clusterId clusterName
      * @throws Exception when error
      */
-    List<Map<String,String>> listClusters() throws Exception;
+    List<Map<String,String>> listClusters() throws DMEException;
 
     /**
      * Access clusters
@@ -45,7 +47,7 @@ public interface VmwareAccessService {
      * @return ResponseBodyBean List<Map<String, String>> include clusterId clusterObjectId
      * @throws Exception when error
      */
-    List<Map<String,String>> getClustersByDsObjectId(String dataStoreObjectId) throws Exception;
+    List<Map<String,String>> getClustersByDsObjectId(String dataStoreObjectId) throws DMEException;
 
     /**
      * Access datastore
@@ -55,7 +57,7 @@ public interface VmwareAccessService {
      * @return ResponseBodyBean List<Map<String, String>> include id name status type capacity freeSpace
      * @throws Exception when error
      */
-    List<Map<String,String>> getDataStoresByHostObjectId(String hostObjectId, String dataStoreType) throws Exception;
+    List<Map<String,String>> getDataStoresByHostObjectId(String hostObjectId, String dataStoreType) throws DMEException;
 
     /**
      * Access datastore
@@ -65,7 +67,7 @@ public interface VmwareAccessService {
      * @return ResponseBodyBean List<Map<String, String>> include id name status type capacity freeSpace
      * @throws Exception when error
      */
-    List<Map<String,String>> getDataStoresByClusterObjectId(String clusterObjectId, String dataStoreType) throws Exception;
+    List<Map<String,String>> getDataStoresByClusterObjectId(String clusterObjectId, String dataStoreType) throws DMEException;
 
     /**
      * Get host's vmKernel IP,only provisioning provisioning
@@ -74,5 +76,27 @@ public interface VmwareAccessService {
      * @return ResponseBodyBean List<Map<String, String>> include device portgroup ipAddress key mac
      * @throws Exception when error
      */
-    List<Map<String,String>> getVmKernelIpByHostObjectId(String hostObjectId) throws Exception;
+    List<Map<String,String>> getVmKernelIpByHostObjectId(String hostObjectId) throws DMEException;
+
+
+    /**
+     * Access datastore
+     *
+     * @param  hostObjectId host ObjectId
+     * @param  dataStoreType dataStore Type
+     * @return ResponseBodyBean List<Map<String, String>> include id name status type capacity freeSpace
+     * @throws Exception when error
+     */
+    List<Map<String,String>> getMountDataStoresByHostObjectId(String hostObjectId, String dataStoreType) throws Exception;
+
+    /**
+     * Access datastore
+     *
+     * @param  clusterObjectId cluster ObjectId
+     * @param  dataStoreType dataStore Type
+     * @return ResponseBodyBean List<Map<String, String>> include id name status type capacity freeSpace
+     * @throws Exception when error
+     */
+    List<Map<String,String>> getMountDataStoresByClusterObjectId(String clusterObjectId, String dataStoreType) throws Exception;
+
 }

@@ -54,7 +54,7 @@ public interface DmeAccessService {
      * @return ResponseBodyBean
      * @throws Exception when error
      */
-    ResponseEntity<String> accessByJson(String url, HttpMethod method, String jsonBody) throws Exception;
+    ResponseEntity<String> accessByJson(String url, HttpMethod method, String jsonBody) throws DMEException;
 
     /**
      * Access workload info
@@ -63,7 +63,7 @@ public interface DmeAccessService {
      * @return ResponseBodyBean
      * @throws Exception when error
      */
-    List<Map<String, Object>> getWorkLoads(String storageId) throws Exception;
+    List<Map<String, Object>> getWorkLoads(String storageId) throws DMEException;
 
     /**
      * Query Dme Hosts
@@ -72,7 +72,7 @@ public interface DmeAccessService {
      * @return ResponseBodyBean
      * @throws Exception when error
      */
-    List<Map<String, Object>> getDmeHosts(String hostIp) throws Exception;
+    List<Map<String, Object>> getDmeHosts(String hostIp) throws DMEException;
 
     /**
      * Query Dme Host's initiators
@@ -81,7 +81,7 @@ public interface DmeAccessService {
      * @return ResponseBodyBean
      * @throws Exception when error
      */
-    List<Map<String, Object>> getDmeHostInitiators(String hostId) throws Exception;
+    List<Map<String, Object>> getDmeHostInitiators(String hostId) throws DMEException;
 
     /**
      * Query Dme hostgroup
@@ -90,7 +90,7 @@ public interface DmeAccessService {
      * @return ResponseBodyBean
      * @throws Exception when error
      */
-    List<Map<String, Object>> getDmeHostGroups(String hostGroupName) throws Exception;
+    List<Map<String, Object>> getDmeHostGroups(String hostGroupName) throws DMEException;
 
     /**
      * create host
@@ -99,7 +99,7 @@ public interface DmeAccessService {
      * @return ResponseBodyBean
      * @throws Exception when error
      */
-    Map<String, Object> createHost(Map<String, Object> params) throws Exception;
+    Map<String, Object> createHost(Map<String, Object> params) throws DMEException;
 
     /**
      * create hostgroup
@@ -108,7 +108,7 @@ public interface DmeAccessService {
      * @return ResponseBodyBean
      * @throws Exception when error
      */
-    Map<String, Object> createHostGroup(Map<String, Object> params) throws Exception;
+    Map<String, Object> createHostGroup(Map<String, Object> params) throws DMEException;
 
     /**
      * get host's detailed
@@ -117,7 +117,7 @@ public interface DmeAccessService {
      * @return ResponseBodyBean
      * @throws Exception when error
      */
-    Map<String, Object> getDmeHost(String hostId) throws Exception;
+    Map<String, Object> getDmeHost(String hostId) throws DMEException;
 
     /**
      * delete Volume
@@ -125,7 +125,7 @@ public interface DmeAccessService {
      * @param ids host ids
      * @throws Exception when error
      */
-    void deleteVolumes(List<String> ids) throws Exception;
+    void deleteVolumes(List<String> ids) throws DMEException;
 
     /**
      * unMap Host
@@ -134,7 +134,7 @@ public interface DmeAccessService {
      * @param ids datastore ids
      * @throws Exception when error
      */
-    void unMapHost(String hostId, List<String> ids) throws Exception;
+    void unMapHost(String hostId, List<String> ids) throws DMEException;
 
     /**
      * scan Datastore
@@ -143,7 +143,7 @@ public interface DmeAccessService {
      * @return ResponseBodyBean
      * @throws Exception when error
      */
-    void scanDatastore(String storageType) throws Exception;
+    void scanDatastore(String storageType) throws DMEException;
 
     /**
      * Configure task time
@@ -153,7 +153,7 @@ public interface DmeAccessService {
      * @return ResponseBodyBean
      * @throws Exception when error
      */
-    void configureTaskTime(Integer taskId,String taskCron) throws Exception;
+    void configureTaskTime(Integer taskId,String taskCron) throws DMEException;
 
     /**
      * get hostGroup's detail
@@ -161,7 +161,7 @@ public interface DmeAccessService {
      * @return
      * @throws Exception
      */
-    Map<String,Object> getDmeHostGroup(String hsotGroupId) throws Exception;
+    Map<String,Object> getDmeHostGroup(String hsotGroupId) throws DMEException;
 
     /**
      * get hostGroup's host
@@ -169,8 +169,8 @@ public interface DmeAccessService {
      * @return
      * @throws Exception
      */
-    List<Map<String,Object>> getDmeHostInHostGroup(String hostGroupId) throws Exception;
+    List<Map<String,Object>> getDmeHostInHostGroup(String hostGroupId) throws DMEException;
 
 
-    void hostMapping(String hostId, List<String> volumeIds) throws Exception;
+    void hostMapping(String hostId, List<String> volumeIds) throws DMEException;
 }

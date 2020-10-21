@@ -21,9 +21,9 @@ public interface ServiceLevelService {
 
 
      //服务等级关联的storagePool
-    List<StoragePool> getStoragePoolInfosByServiceLevelId(String serviceLevelId) throws Exception;
+    List<StoragePool> getStoragePoolInfosByServiceLevelId(String serviceLevelId) throws DMEException;
 
-    List<Volume> getVolumeInfosByServiceLevelId(String serviceLevelId) throws Exception;
+    List<Volume> getVolumeInfosByServiceLevelId(String serviceLevelId) throws DMEException;
 
     void updateVmwarePolicy() throws DMEException;
 }

@@ -59,7 +59,7 @@ public class SessionHelper {
         return sslConfig;
     }
 
-    public void logout() throws Exception {
+    public void logout()  {
         this.vapiAuthHelper.logout();
     }
 }

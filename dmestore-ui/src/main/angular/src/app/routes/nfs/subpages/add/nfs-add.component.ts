@@ -5,13 +5,12 @@ import {AddNfs, Host, NfsAddService, Vmkernel} from "./nfs-add.service";
 import {ClrWizard, ClrWizardPage} from "@clr/angular";
 import {LogicPort, StorageList, StorageService} from "../../../storage/storage.service";
 import {StoragePool} from "../../../storage/detail/detail.service";
-
 @Component({
   selector: 'app-add',
   templateUrl: './nfs-add.component.html',
   styleUrls: ['./nfs-add.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [GlobalsService,NfsAddService,StorageService]
+  providers: [NfsAddService,StorageService]
 })
 export class NfsAddComponent implements OnInit{
   viewPage: string;
@@ -44,8 +43,6 @@ export class NfsAddComponent implements OnInit{
       //入口来至Vcenter
       this.viewPage='delete_vcenter'
     }
-
-    const ctx = this.gs.getClientSdk().app.getContextObjects();
     //入口是DataSource
     this.viewPage='add_plugin'
     this.activatedRoute.queryParams.subscribe(queryParam => {
@@ -53,10 +50,15 @@ export class NfsAddComponent implements OnInit{
     });
     if(this.pluginFlag==null){
       //入口来至Vcenter
-      //this.dsObjectId=ctx[0].id;
       this.viewPage='add_vcenter'
     }
-
+    this.gs.loading=true;
+    this.storageService.getData().subscribe((s: any) => {
+      if (s.code === '200'){
+        this.storageList = s.data;
+        this.gs.loading=false;
+      }
+    });
     this.addService.getHostList().subscribe((r: any) => {
       if (r.code === '200'){
         this.hostList = r.data;
@@ -67,15 +69,9 @@ export class NfsAddComponent implements OnInit{
     this.checkedPool= null;
     this.errorMsg='';
     // 获取存储列表
-    this.storageService.getData().subscribe((s: any) => {
-      if (s.code === '200'){
-        this.storageList = s.data.data;
-      }
-    });
-    // 添加页面默认打开首页
-   // this.jumpTo2(this.addPageOne, this.wizard);
+    this.cdr.detectChanges();
   }
-  jumpTo2(page: ClrWizardPage, wizard: ClrWizard) {
+  jumpTo(page: ClrWizardPage, wizard: ClrWizard) {
     console.log('wizard:')
     console.log(this.wizard)
     if (page && page.completed) {
@@ -86,6 +82,7 @@ export class NfsAddComponent implements OnInit{
     this.wizard.open();
   }
   addNfs(){
+    this.gs.loading=true;
     this.addForm.poolRawId=this.checkedPool.diskPoolId;
     this.addForm.storagePoolId= this.checkedPool.id;
     // 单位换算
@@ -105,8 +102,13 @@ export class NfsAddComponent implements OnInit{
     console.log('提交参数：')
     console.log(this.addForm);
     this.addService.addNfs(this.addForm).subscribe((result: any) => {
+      this.gs.loading=false;
       if (result.code === '200'){
-        this.backToNfsList();
+        if (this.pluginFlag=='plugin'){
+          this.backToNfsList();
+        }else{
+          this.closeModel();
+        }
       }else{
         this.errorMsg = '添加失败！'+result.description;
       }
@@ -119,7 +121,7 @@ export class NfsAddComponent implements OnInit{
     this.storageService.getStoragePoolListByStorageId(this.addForm.storagId)
       .subscribe((r: any) => {
         if (r.code === '200'){
-          this.storagePools = r.data.data;
+          this.storagePools = r.data;
         }
       });
     this.selectLogicPort();
@@ -129,7 +131,7 @@ export class NfsAddComponent implements OnInit{
     this.storageService.getLogicPortListByStorageId(this.addForm.storagId)
       .subscribe((r: any) => {
         if (r.code === '200'){
-          this.logicPorts = r.data.data;
+          this.logicPorts = r.data;
         }
       });
   }
@@ -145,10 +147,12 @@ export class NfsAddComponent implements OnInit{
     this.selectLogicPort();
   }
   backToNfsList(){
+    this.gs.loading=false;
     this.router.navigate(['nfs']);
   }
-
   closeModel(){
+    this.gs.loading=false;
     this.gs.getClientSdk().modal.close();
   }
+
 }
