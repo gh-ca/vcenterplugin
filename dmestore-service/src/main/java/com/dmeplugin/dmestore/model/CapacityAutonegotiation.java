@@ -8,6 +8,9 @@ package com.dmeplugin.dmestore.model;
  */
 public class CapacityAutonegotiation {
 
+    public static String capacitymodeoff="off";
+    public static String capacitymodeauto="grow_shrink";
+
     private Boolean autoSizeEnable;
 
     public Boolean getAutoSizeEnable() {
