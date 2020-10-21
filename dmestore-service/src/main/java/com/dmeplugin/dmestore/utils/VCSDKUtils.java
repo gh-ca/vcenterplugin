@@ -2858,6 +2858,7 @@ public class VCSDKUtils {
         return name;
     }
 
+    
     public String getDataStoreName(String dsObjId){
         String name = null;
         try {
@@ -2874,4 +2875,20 @@ public class VCSDKUtils {
         return name;
     }
 
+    /**
+     * 刷新datastore容量
+     * @param objectid 存储objectid
+     */
+    public void refreshDatastore(String objectid){
+        String serverguid = vcConnectionHelper.objectID2Serverguid(objectid);
+        try {
+            VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
+
+            DatastoreMO ds1 = new DatastoreMO(vmwareContext, vcConnectionHelper.objectID2MOR(objectid));
+            ds1.refreshDatastore();
+        }catch (Exception e){
+            logger.error("query vms on datastore error:", e);
+        }
+
+    }
 }
