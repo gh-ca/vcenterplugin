@@ -1,6 +1,7 @@
 <div>
   <clr-modal [clrModalOpen]="viewPage=='modify_plugin'">
     <h3 class="modal-title">{{'menu.modify' | translate}}</h3>
+    <p style="color: red">{{errorMsg}}</p>
     <div class="modal-body">
       <form  clrForm #formPageOne="ngForm">
         <!--名称-->

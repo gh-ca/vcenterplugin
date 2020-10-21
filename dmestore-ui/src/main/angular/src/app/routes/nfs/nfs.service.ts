@@ -53,9 +53,6 @@ export class NfsService {
   getVolsByObjId(objId: string) {
     return this.http.get('accessvmfs/volume/' + objId );
   }
-  getNfsDetailById(fileSystemId:string){
-    return this.http.get('dmestorage/filesystemdetail',{params: {fileSystemId}} );
-  }
 
   /**
    * 获取折线图

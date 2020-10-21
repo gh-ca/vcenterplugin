@@ -5,7 +5,7 @@ import {HttpClient} from "@angular/common/http";
 export class NfsExpandService{
   constructor(private http: HttpClient) {}
   changeCapacity(params= {}){
-    return this.http.post('operatenfs/changenfsdatastore', params);
+    return this.http.put('operatenfs/changenfsdatastore', params);
   }
 }
 

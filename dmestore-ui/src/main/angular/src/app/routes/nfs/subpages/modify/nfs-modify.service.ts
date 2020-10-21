@@ -4,11 +4,15 @@ import {HttpClient} from "@angular/common/http";
 @Injectable()
 export class NfsModifyService{
   constructor(private http: HttpClient) {}
-  getNfsDetailById(fileSystemId:string){
-    return this.http.get('dmestorage/filesystemdetail',{params: {fileSystemId}} );
+  getNfsDetailById(storeObjectId:string){
+    console.log(123)
+    return this.http.get('operatenfs/editnfsstore',{params: {storeObjectId}} );
+  }
+  updateNfs(params= {}){
+    return this.http.post('operatenfs/updatenfsdatastore', params);
   }
 }
-export class UpdateNfs{
+export class NfsModify{
   dataStoreObjectId: string;
   nfsName:string;//   DataStoname
   sameName:boolean;// false true 如果是false就传
@@ -29,7 +33,6 @@ export class UpdateNfs{
   compressionEnabled:boolean;// 压缩 true false
   autoSizeEnable:boolean;// 自动扩容 true false
   shareId: string;
-  name: string;
   constructor(){
     this.sameName=true;
   }
