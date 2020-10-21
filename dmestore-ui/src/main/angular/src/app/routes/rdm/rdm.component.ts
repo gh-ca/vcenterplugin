@@ -8,7 +8,7 @@ import {ClrForm} from "@clr/angular";
   selector: 'app-rdm',
   templateUrl: './rdm.component.html',
   styleUrls: ['./rdm.component.scss'],
-  providers: [CommonService, GlobalsService]
+  providers: [CommonService]
 })
 export class RdmComponent implements OnInit {
 
@@ -22,9 +22,7 @@ export class RdmComponent implements OnInit {
     resourceTuning: false
   };
 
-  popShow = true;
   configModel = new customize_volumes();
-  mapping = new mapping();
   storageDevices = [];
   storagePools = [];
   hostList = [];
@@ -59,23 +57,24 @@ export class RdmComponent implements OnInit {
 
   // 刷新服务等级列表
   tierFresh(){
+    this.gs.loading = true;
     this.http.post('servicelevel/listservicelevel', {}).subscribe((response: any) => {
+      this.gs.loading = false;
       response.data = JSON.stringify(response.data);
       response.data = response.data.replace('service-levels', 'serviceLevels');
       const r = this.recursiveNullDelete(JSON.parse(response.data));
       for (const i of r.serviceLevels){
-        if (i.total_capacity == 0){
+        if (i.totalCapacity == 0){
           i.usedRate = 0.0;
         } else {
-          i.usedRate =  ((i.used_capacity / i.total_capacity * 100).toFixed(2));
+          i.usedRate =  ((i.usedCapacity / i.totalCapacity * 100).toFixed(2));
         }
-        i.used_capacity = (i.used_capacity/1024).toFixed(2);
-        i.total_capacity = (i.total_capacity/1024).toFixed(2);
-        i.free_capacity = (i.free_capacity/1024).toFixed(2);
+        i.usedCapacity = (i.usedCapacity/1024).toFixed(2);
+        i.totalCapacity = (i.totalCapacity/1024).toFixed(2);
+        i.freeCapacity = (i.freeCapacity/1024).toFixed(2);
       }
       this.serviceLevelsRes = r.serviceLevels;
       this.search();
-      console.log(this.serviceLevelsRes);
     }, err => {
       console.error('ERROR', err);
     });
@@ -176,9 +175,10 @@ export class RdmComponent implements OnInit {
   }
 
   loadStorageDevice(){
+    this.gs.loading = true;
     this.http.get('dmestorage/storages', {}).subscribe((result: any) => {
-
-      if (result.code === '0' || result.code === '200'){
+      this.gs.loading = false;
+      if (result.code === '200'){
         this.storageDevices = result.data.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
@@ -188,9 +188,10 @@ export class RdmComponent implements OnInit {
   }
 
   loadStoragePool(storageId: string){
+    this.gs.loading = true;
     this.http.get('dmestorage/storagepools', {params: {storageId, media_type: "all"}}).subscribe((result: any) => {
-
-      if (result.code === '0' || result.code === '200'){
+      this.gs.loading = false;
+      if (result.code === '200'){
         this.storagePools = result.data.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
@@ -200,8 +201,10 @@ export class RdmComponent implements OnInit {
   }
 
   loadHosts(){
+    this.gs.loading = true;
     this.http.get('v1/vmrdm/dmeHosts').subscribe((result: any) => {
-      if (result.code === '0' || result.code === '200'){
+      this.gs.loading = false;
+      if (result.code === '200'){
         this.hostList = result.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
@@ -211,8 +214,10 @@ export class RdmComponent implements OnInit {
   }
 
   loadDataStore(id: string){
+    this.gs.loading = true;
     this.http.get('v1/vmrdm/vCenter/datastoreOnHost', { params: {hostId : id}}).subscribe((result: any) => {
-      if (result.code === '0' || result.code === '200'){
+      this.gs.loading = false;
+      if (result.code === '200'){
         this.dataStores = result.data;
       } else{
         this.dataStores = [];
@@ -254,6 +259,7 @@ class volume_specs{
   unit: string;
   start_lun_id: number;
   start_suffix: number;
+  inputName: string;
   constructor(){
      this.unit = 'GB';
   }

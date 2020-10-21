@@ -20,7 +20,8 @@
     "submit": "提交",
     "search": "搜索",
     "refresh": "刷新",
-    "synSPolicy": "同步虚拟机存储策略"
+    "synSPolicy": "同步虚拟机存储策略",
+    "tip": "提示"
   },
   "validations": {
     "required": "该字段必填!",
@@ -478,7 +479,12 @@
     "critical": "紧急",
     "info": "提示",
     "warning": "次要",
-    "major": "重要"
+    "major": "重要",
+    "tipmessage": "修改主机配置，您需要重启主机，IP:",
+    "syncSuccess": "同步成功",
+    "syncFail": "同步失败",
+    "exeSuccess": "执行成功",
+    "exeFail": "执行失败"
   },
   "iscsi": {
     "hostIp": "主机VmKernel IP",
@@ -492,7 +498,8 @@
     "speed": "工作速率(Mbps)",
     "hStatus": "健康状态",
     "cStatus": "连接状态",
-    "ports": "请选择存储设备的以太网端口"
+    "ports": "请选择存储设备的以太网端口",
+    "portNullMessage": "端口不能为空！"
   },
   "rdm": {
     "name": "名称",
