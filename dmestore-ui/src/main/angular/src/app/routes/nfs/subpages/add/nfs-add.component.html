@@ -1,8 +1,8 @@
 <div>
-  <clr-wizard #wizard [clrWizardOpen]="viewPage=='add_plugin'">
+  <clr-wizard #wizard [clrWizardOpen]="viewPage=='add_plugin'" [clrWizardClosable]="false">
     <clr-wizard-title>{{'nfs.add_title' | translate}}</clr-wizard-title>
     <p *ngIf="errorMsg!==''" style="color: red">{{errorMsg}}</p>
-    <clr-wizard-button (click)="closeModel()" [type]="'cancel'">{{'nfs.button_close' | translate}}</clr-wizard-button>
+    <clr-wizard-button (click)="backToNfsList();">{{'nfs.button_close' | translate}}</clr-wizard-button>
     <clr-wizard-button [type]="'previous'">{{'nfs.button_previous' | translate}}</clr-wizard-button>
     <clr-wizard-button [type]="'next'">{{'nfs.button_next' | translate}}</clr-wizard-button>
     <clr-wizard-button  (click)="addNfs();">{{'nfs.button_done' | translate}}</clr-wizard-button>

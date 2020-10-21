@@ -109,7 +109,7 @@
 
   </div>
   <!--vcenter host-->
-  <div>
+  <div *ngIf="viewPage=='unmount_hostcluster'">
     <div>
       <p>请选择挂载的Data Store</p>
       <p *ngIf="errorMsg" style="color: red">{{errorMsg}}</p>

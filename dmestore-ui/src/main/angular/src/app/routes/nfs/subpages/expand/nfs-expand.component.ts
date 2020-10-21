@@ -7,7 +7,7 @@ import {DataStore} from "../mount/nfs-mount.service";
   selector: 'app-reduce',
   templateUrl: './nfs-expand.component.html',
   styleUrls: ['./nfs-expand.component.scss'],
-  providers: [GlobalsService,NfsExpandService]
+  providers: [NfsExpandService]
 })
 export class NfsExpandComponent implements OnInit{
   newCapacity = 0;
@@ -17,11 +17,11 @@ export class NfsExpandComponent implements OnInit{
   rowSelected = []; // 当前选中数据
   fsId:string;
   errorMsg: string;
+  storeObjectId:string; //当入口为vcenter的时候需要获取此值
   constructor(private expandService: NfsExpandService, private gs: GlobalsService,
               private activatedRoute: ActivatedRoute,private router:Router){
   }
   ngOnInit(): void {
-      const ctx = this.gs.getClientSdk().app.getContextObjects();
       //入口是DataSource
       this.viewPage='expand_plugin'
       this.activatedRoute.queryParams.subscribe(queryParam => {
@@ -30,11 +30,13 @@ export class NfsExpandComponent implements OnInit{
       });
       if(this.pluginFlag==null){
         //入口来至Vcenter
-        //this.dsObjectId=ctx[0].id;
+        const ctx = this.gs.getClientSdk().app.getContextObjects();
+        this.storeObjectId=ctx[0].id;
         this.viewPage='expand_vcenter'
       }
   }
   expandData(){
+    this.gs.loading=true;
     switch (this.unit) {
       case 'TB':
         this.newCapacity = this.newCapacity * 1024;
@@ -47,24 +49,41 @@ export class NfsExpandComponent implements OnInit{
         break;
       default: // 默认GB 不变
         break;
-    }//
-    var param={
-      "fileSystemId": this.fsId,
-      "expand":true,
-      "capacity": this.newCapacity
     }
-    this.expandService.changeCapacity(param).subscribe((result: any) => {
+    var params;
+    if (this.pluginFlag=='plugin'){
+      params={
+        "fileSystemId": this.fsId,
+        "expand":true,
+        "capacity": this.newCapacity
+      }
+    }
+    if(this.pluginFlag==null){
+      params={
+        "storeObjectId": this.storeObjectId,
+        "expand":true,
+        "capacity": this.newCapacity
+      }
+    }
+    this.expandService.changeCapacity(params).subscribe((result: any) => {
+      this.gs.loading=false;
       if (result.code === '200'){
-        this.backToNfsList();
+        if(this.pluginFlag=='plugin'){
+          this.backToNfsList();
+        }else{
+          this.closeModel();
+        }
       }else{
-        this.errorMsg = '编辑失败！'+result.description;
+        this.errorMsg = '扩容失败！'+result.description;
       }
     });
   }
   backToNfsList(){
+    this.gs.loading=false;
     this.router.navigate(['nfs']);
   }
   closeModel(){
+    this.gs.loading=false;
     this.gs.getClientSdk().modal.close();
   }
 

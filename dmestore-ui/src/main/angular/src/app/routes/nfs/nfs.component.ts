@@ -1,10 +1,10 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {
-  AddNfs,Host, List,NfsDetail, NfsService,UpdateNfs,
-  Vmkernel
+  Host, List,NfsDetail, NfsService,UpdateNfs,
+
 } from './nfs.service';
 import {GlobalsService} from '../../shared/globals.service';
-import {LogicPort, StorageList, StorageService} from '../storage/storage.service';
+import {StorageService} from '../storage/storage.service';
 import {StoragePool} from "../storage/detail/detail.service";
 import {ClrWizard, ClrWizardPage} from "@clr/angular";
 import {VmfsListService} from "../vmfs/list/list.service";
@@ -30,7 +30,6 @@ export class NfsComponent implements OnInit {
   unit='GB';
   hostList: Host[] = [];
   storagePools: StoragePool[] = [];
-  nfsDetail: NfsDetail;
   updateNfs: UpdateNfs = new UpdateNfs();
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
@@ -90,63 +89,17 @@ export class NfsComponent implements OnInit {
     });
   }
   modifyData() {
-    const fsId = this.rowSelected[0].fsId;
-    this.updateNfs = new UpdateNfs();
-    this.updateNfs.dataStoreObjectId=this.rowSelected[0].objectid;
-    this.updateNfs.shareId=this.rowSelected[0].shareId;
-    this.updateNfs.fileSystemId=fsId;
-    this.updateNfs.nfsName=this.rowSelected[0].name;
-    this.remoteSrv.getNfsDetailById(fsId).subscribe((result: any) => {
-      if (result.code === '200'){
-        this.nfsDetail = result.data.data;
-        if (this.nfsDetail.fileSystemTurning.smartQos.maxbandwidth==null
-          &&this.nfsDetail.fileSystemTurning.smartQos.maxiops==null
-          &&this.nfsDetail.fileSystemTurning.smartQos.minbandwidth==null
-          &&this.nfsDetail.fileSystemTurning.smartQos.miniops==null
-          &&this.nfsDetail.fileSystemTurning.smartQos.latency==null
-        ){
-          //qos策略没开启
-          this.updateNfs.qosFlag=false;
-        }else{
-          //qos策略是开启的
-          this.updateNfs.maxBandwidth=this.nfsDetail.fileSystemTurning.smartQos.maxbandwidth;
-          this.updateNfs.maxIops=this.nfsDetail.fileSystemTurning.smartQos.miniops;
-          this.updateNfs.minBandwidth=this.nfsDetail.fileSystemTurning.smartQos.minbandwidth;
-          this.updateNfs.minIops=this.nfsDetail.fileSystemTurning.smartQos.miniops;
-          this.updateNfs.latency=this.nfsDetail.fileSystemTurning.smartQos.latency;
-          this.updateNfs.qosFlag=true;
-          this.updateNfs.contolPolicy='up';
-        }
-        this.updateNfs.autoSizeEnable=this.nfsDetail.capacityAutonegotiation.autoSizeEnable;
-        if (this.nfsDetail.fileSystemTurning.allocationType=='thin'){
-          this.updateNfs.thin=true;
-        }else{
-          this.updateNfs.thin=false;
-        }
-        if (this.nfsDetail.fileSystemTurning.deduplicationEnabled==null){
-          this.updateNfs.deduplicationEnabled=false;
-        }else {
-          this.updateNfs.deduplicationEnabled=this.nfsDetail.fileSystemTurning.deduplicationEnabled;
-        }
-        if (this.nfsDetail.fileSystemTurning.compressionEnabled==null){
-          this.updateNfs.compressionEnabled=false;
-        }else {
-          this.updateNfs.compressionEnabled=this.nfsDetail.fileSystemTurning.compressionEnabled;
-        }
-        console.log(this.updateNfs)
+    const flag="plugin";
+    const objectid=this.rowSelected[0].objectid;
+    this.router.navigate(['nfs/modify'],{
+      queryParams:{
+        objectid,flag
       }
     });
-    this.modifyShow = true;
   }
   modifyCommit(){
     console.log('提交参数：');
     this.updateNfs.name=this.updateNfs.nfsName;
-
-    this.updateNfs.autoSizeEnable = null;
-    this.updateNfs.deduplicationEnabled = null;
-    this.updateNfs.compressionEnabled = null;
-    this.updateNfs.thin = null;
-
     console.log(this.updateNfs);
     this.remoteSrv.updateNfs(this.updateNfs).subscribe((result: any) => {
       if (result.code === '200'){
