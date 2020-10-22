@@ -18,7 +18,7 @@ export class DeleteComponent implements OnInit{
   }
 
   // 存储ID
-  objectId = 'urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1';
+  objectId;
 
   // 操作来源 list:列表页面、dataStore：在DataStore菜单页面操作
   resource;
@@ -39,15 +39,16 @@ export class DeleteComponent implements OnInit{
       console.log('url', url);
       this.route.queryParams.subscribe(queryParam => {
         this.resource = queryParam.resource;
-        this.objectId = queryParam.objectId;
         let objIds = [];
         if (this.resource === 'list') { // 列表入口
-          objIds = this.objectId.split(',');
+          objIds = queryParam.objectId.split(',');
         } else { // dataStore入口
-          objIds.push(this.objectId);
+          const ctx = this.globalsService.getClientSdk().app.getContextObjects();
+          objIds.push(ctx[0].id);
         }
         this.objectIds = objIds;
         console.log('del vmfs objectIds:' + objIds);
+        console.log('this.resource', this.resource);
       });
     });
 
@@ -57,7 +58,7 @@ export class DeleteComponent implements OnInit{
    * 取消
    */
   cancel() {
-    console.log('this.resource', this.resource);
+
     this.delShow = false;
     if (this.resource === 'list') { // 列表入口
       this.router.navigate(['vmfs/list']);

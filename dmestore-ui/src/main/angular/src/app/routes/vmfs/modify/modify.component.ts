@@ -45,6 +45,12 @@ export class ModifyComponent implements OnInit{
       console.log('url', url);
       this.route.queryParams.subscribe(queryParam => {
         this.resource = queryParam.resource;
+        if (this.resource === 'list') {
+          this.objectId = queryParam.objectId;
+        } else {
+          const ctx = this.globalsService.getClientSdk().app.getContextObjects();
+          this.objectId = ctx[0].id;
+        }
         this.objectId = queryParam.objectId;
         // 获取vmfs数据
         this.remoteSrv.getVmfsById(this.objectId)
@@ -79,7 +85,7 @@ export class ModifyComponent implements OnInit{
                 this.isServiceLevelData = true;
               }
             }
-            console.log('this.modifyForm.:', this.modifyForm);
+            console.log('this.modifyForm:', this.modifyForm);
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
           });
       });

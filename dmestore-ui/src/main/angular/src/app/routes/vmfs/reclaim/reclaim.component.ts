@@ -26,7 +26,11 @@ export class ReclaimComponent implements OnInit{
   // 操作来源 list:列表页面、dataStore：在DataStore菜单页面操作
   resource;
 
+  // 空间回收 隐藏/显示
+  reclaimShow = false;
+
   ngOnInit(): void {
+    this.reclaimShow = false;
     this.initData();
     // 初始化添加数据
 
@@ -39,13 +43,15 @@ export class ReclaimComponent implements OnInit{
       console.log('url', url);
       this.route.queryParams.subscribe(queryParam => {
         this.resource = queryParam.resource;
-        this.objectId = queryParam.objectId;
         let objIds = [];
         if (this.resource === 'list') { // 列表入口
-          objIds = this.objectId.split(',');
+          objIds = queryParam.objectId.split(',');
         } else { // dataStore入口
+          const ctx = this.globalsService.getClientSdk().app.getContextObjects();
+          this.objectId = ctx[0].id;
           objIds.push(this.objectId);
         }
+        this.reclaimShow = true;
         this.objectIds = objIds;
         console.log('del vmfs objectIds:' + objIds);
       });
@@ -57,6 +63,7 @@ export class ReclaimComponent implements OnInit{
    * 取消/关闭
    */
   cancel() {
+    this.reclaimShow = false;
     if (this.resource === 'list') { // 列表入口
       this.router.navigate(['vmfs/list']);
     } else { // dataStore入口
