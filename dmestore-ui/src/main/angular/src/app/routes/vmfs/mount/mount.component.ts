@@ -1,6 +1,14 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {ClusterList, GetForm, HostList, HostOrCluster, ServiceLevelList, VmfsListService} from '../list/list.service';
+import {
+  ClusterList,
+  GetForm,
+  HostList,
+  HostOrCluster,
+  ServiceLevelList,
+  VmfsInfo,
+  VmfsListService
+} from '../list/list.service';
 import {DataStore, MountService} from "./mount.service";
 import {GlobalsService} from "../../../shared/globals.service";
 
@@ -14,7 +22,7 @@ import {GlobalsService} from "../../../shared/globals.service";
 export class MountComponent implements OnInit{
 
   constructor(private remoteSrv: MountService, private activatedRoute: ActivatedRoute, private cdr: ChangeDetectorRef,
-              private router:Router, private globalsService: GlobalsService,) {
+              private router:Router, private globalsService: GlobalsService) {
 
   }
   // dataStore数据
@@ -33,18 +41,15 @@ export class MountComponent implements OnInit{
   // 未选择卸载的DataStore
   notChooseUnmountDevice = false;
   // 挂载的form
-  mountForm;
+  mountForm = new GetForm().getMountForm();
   // 挂载模块展示/隐藏
   mountShow = false;
   // 卸载模块展示/隐藏
   unMountShow = false;
-  // 扩容模块展示/隐藏
-  expandShow = false;
+
 
   // 服务器/集群ID
-  hostOrClusterId = 'urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1';
-  // 服务器/集群名称
-  hostOrClusterName = '10.143.133.17';
+  hostOrClusterId;
   // objectid
   objectId;
 
@@ -66,7 +71,13 @@ export class MountComponent implements OnInit{
   chooseUnmountCluster: HostOrCluster = null; // 已选择卸载的集群
   mountedHost: HostOrCluster[] = []; // 已挂载的主机
   mountedCluster: HostOrCluster[] = []; // 已挂载的集群
+
+  // vmfs数据
+  vmfsInfo;
   ngOnInit(): void {
+    // 初始化隐藏窗口
+    this.unmountShow = false;
+    this.mountShow = false;
     this.initData();
   }
 
@@ -74,17 +85,43 @@ export class MountComponent implements OnInit{
     // 设备类型 操作类型初始化
     this.activatedRoute.url.subscribe(url => {
       console.log('url', url);
-      this.dataType = url[0] + '';
-      this.operationType = url[1] + '';
+      if (url.length > 1) {
+        this.dataType = url[0] + '';
+        this.operationType = url[1] + '';
+      } else {
+        this.operationType = url[0] + '';
+      }
       this.activatedRoute.queryParams.subscribe(queryParam => {
         this.resource = queryParam.resource;
         if (this.resource !== 'others') {
           this.objectId = queryParam.objectId;
+
+          // 获取vmfs数据
+          this.remoteSrv.getVmfsById(this.objectId)
+            .subscribe((result: any) => {
+              console.log('result:', result);
+              if (result.code === '200' && null != result.data) {
+                this.vmfsInfo = result.data.filter(item => item.objectid === this.objectId)[0];
+              }
+              console.log('this.vmfsInfo ', this.vmfsInfo );
+              if (this.operationType === 'mount') {
+                this.mountShow = true;
+              } else {
+                this.unMountShow = true;
+              }
+
+              this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+            });
+
+        } else {
+          this.hostOrClusterId = queryParam.objectId;
         }
+        this.cdr.detectChanges();
       });
 
     });
     console.log('this.objectId', this.objectId);
+    console.log('this.hostOrClusterId', this.hostOrClusterId);
     // 数据初始化
     this.getDataStore();
   }
@@ -96,19 +133,37 @@ export class MountComponent implements OnInit{
     // 初始化dataStore
     this.dataStores = [];
     console.log('this.dataType', this.dataType === 'host');
+    console.log('this.operationType', this.operationType === 'unmount');
+    console.log('this.resource', this.resource === 'others');
 
+    // 初始化挂载/卸载 form
+    if (this.operationType === 'mount') {
+      this.mountForm = new GetForm().getMountForm();
+      if (this.dataType === 'host') { // 主机
+        this.mountForm.mountType = '1';
+      } else { // 集群
+        this.mountForm.mountType = '2';
+      }
+    } else {
+      this.unmountForm = new GetForm().getUnmountForm();
+      if (this.dataType === 'host') { // 主机
+        this.unmountForm.mountType = '1';
+      } else { // 集群
+        this.unmountForm.mountType = '2';
+      }
+    }
+    // 挂载、卸载 数据初始化
     if (this.resource === 'others') { // 以主机/集群为入口
+      this.mountShow = false;
+      this.unmountShow = false;
       if (this.operationType === 'mount') {
         this.mountDataStore();
       } else {
         this.unmountDataStore();
       }
     } else { // 以列表/dataStore为入口
-      if (this.operationType === 'mount') {
+      if (this.operationType === 'mount') { // 挂载
 
-        this.mountForm =  new GetForm().getMountForm();
-
-        this.mountShow = true;
         // 初始化主机
         this.mountHostData = false;
         this.hostList = [];
@@ -131,21 +186,64 @@ export class MountComponent implements OnInit{
         this.initMountCluster().then(res => {
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         });
-      } else {
-        // this.unmountDataStore();
+      } else { // 卸载
+
+        this.isLoading = true;
+        console.log('this.unMountShow', this.unMountShow);
+        // 初始化卸载 页面未选择设备 提示数据展示
+        this.notChooseUnmountDevice = false;
+        // 初始话已选择数据
+        this.chooseUnmountCluster = null;
+        this.chooseUnmountHost = null;
+        // 获取主机
+        this.remoteSrv.getMountHost(this.objectId).subscribe((result: any) => {
+          console.log(result);
+          if (result.code === '200' && result.data !== null && result.data.length >= 1) {
+            this.unmountForm.mountType = '1';
+            const mountHost: HostOrCluster [] = [];
+            result.data.forEach(item => {
+              const hostInfo = {
+                deviceId: item.hostId,
+                deviceName: item.hostName,
+                deviceType: 'host'
+              };
+              mountHost.push(hostInfo);
+            });
+            this.mountedHost = mountHost;
+          }
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        });
+        // 获取集群
+        this.remoteSrv.getMountCluster(this.objectId).subscribe((result: any) => {
+          console.log(result);
+          if (result.code === '200' && result.data !== null && result.data.length >= 1) {
+            this.unmountForm.mountType = '2';
+            const mountCluster: HostOrCluster [] = [];
+            result.data.forEach(item => {
+              const hostInfo = {
+                deviceId: item.hostId,
+                deviceName: item.hostName,
+                deviceType: 'host'
+              };
+              mountCluster.push(hostInfo);
+            });
+            this.mountedCluster = mountCluster;
+          }
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        });
+        this.isLoading = false;
       }
     }
   }
 
   /**
-   * 挂载的DataStore
+   * 主机/集群入口 挂载数初始化
    */
   mountDataStore() {
     switch (this.dataType) {
       case 'host':
         // 设置主机相关参数
         this.mountForm.hostId = this.hostOrClusterId;
-        this.mountForm.host = this.hostOrClusterName;
 
         // 获取dataStore
         this.remoteSrv.getDataStoreByHostId(this.hostOrClusterId, 'VMFS').subscribe((result: any) => {
@@ -160,7 +258,6 @@ export class MountComponent implements OnInit{
       case 'cluster':
         // 设置集群相关参数
         this.mountForm.clusterId = this.hostOrClusterId;
-        this.mountForm.cluster = this.hostOrClusterName;
 
         // 获取dataStore
         this.remoteSrv.getDataStoreByClusterId(this.hostOrClusterId, 'VMFS').subscribe((result: any) => {
@@ -178,15 +275,33 @@ export class MountComponent implements OnInit{
   }
 
   /**
-   * 卸载的DataStore
+   * 主机/集群入口 卸载数据初始化
    */
   unmountDataStore() {
+
     switch (this.dataType) {
       case 'host':
         this.isLoading = false;
+        // 获取dataStore
+        this.remoteSrv.getMountedByHostObjId(this.hostOrClusterId, 'VMFS').subscribe((result: any) => {
+          console.log('mountedHostData:', result);
+          if (result.code === '200' && null != result.data) {
+            this.dataStores = result.data;
+          }
+          this.isLoading = false;
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        });
         break;
       case 'cluster':
         this.isLoading = false;
+        this.remoteSrv.getMountedByClusterObjId(this.hostOrClusterId, 'VMFS').subscribe((result: any) => {
+          console.log('mountedClusterData:', result);
+          if (result.code === '200' && null != result.data) {
+            this.dataStores = result.data;
+          }
+          this.isLoading = false;
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        });
         break;
       default:
         break;
@@ -194,7 +309,7 @@ export class MountComponent implements OnInit{
   }
 
   /**
-   * 挂载Or卸载
+   * 表单提交（挂载/卸载）
    */
   mountOrUnmountFunc() {
     if (this.resource === 'others') {
@@ -218,6 +333,16 @@ export class MountComponent implements OnInit{
    * 取消/关闭函数
    */
   cancel() {
+
+    // dataStore/列表入口 窗口隐藏
+    if (this.resource !== 'others') {
+      if (this.operationType === 'mount') {
+        this.mountShow = false;
+      } else {
+        this.unMountShow = false;
+      }
+    }
+    // 父窗口关闭
     if (this.resource === 'list') { // 主机/集群入口
       this.router.navigate(['vmfs/list']);
     } else { // dataStore/列表入口
@@ -260,6 +385,25 @@ export class MountComponent implements OnInit{
       this.notChooseUnmountDevice = true;
     } else {
       this.notChooseUnmountDevice = false;
+
+      if (this.unmountForm.mountType === '1') {
+        this.unmountForm.hostId = this.hostOrClusterId;
+      } else {
+        this.unmountForm.clusterId = this.hostOrClusterId;
+      }
+      const unmountObjIds = this.chooseMountDataStore.map(item => item.objectId);
+      this.unmountForm.dataStoreObjectIds = unmountObjIds;
+      this.remoteSrv.unmountVMFS(this.unmountForm).subscribe((result: any) => {
+
+        if (result.code === '200'){
+          console.log('unmount  success');
+        } else {
+          console.log('unmount  fail：' + result.description);
+        }
+        // 关闭卸载页面
+        this.unmountShow = false;
+        this.cdr.detectChanges();
+      });
     }
   }
 
@@ -332,7 +476,7 @@ export class MountComponent implements OnInit{
       if (this.unmountForm.mountType === '1') {
         this.unmountForm.hostId = this.chooseUnmountHost.deviceId;
       } else {
-        this.unmountForm.hostGroupId = this.chooseUnmountCluster.deviceId;
+        this.unmountForm.clusterId = this.chooseUnmountCluster.deviceId;
       }
       console.log('this.unmountForm', this.unmountForm);
       this.notChooseUnmountDevice = false;

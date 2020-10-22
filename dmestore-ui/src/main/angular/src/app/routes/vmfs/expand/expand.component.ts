@@ -1,7 +1,8 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {ExpandService} from './expand.service';
-import {ActivatedRoute} from '@angular/router';
-import {GetForm, ServiceLevelList, VmfsListService} from '../list/list.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {GetForm, ServiceLevelList, VmfsInfo, VmfsListService} from '../list/list.service';
+import {GlobalsService} from "../../../shared/globals.service";
 
 @Component({
   selector: 'app-list',
@@ -12,15 +13,22 @@ import {GetForm, ServiceLevelList, VmfsListService} from '../list/list.service';
 })
 export class ExpandComponent implements OnInit{
 
-  constructor(private remoteSrv: ExpandService, private route: ActivatedRoute, private cdr: ChangeDetectorRef) {
+  constructor(private remoteSrv: ExpandService, private route: ActivatedRoute, private cdr: ChangeDetectorRef,
+              private router:Router, private globalsService: GlobalsService) {
 
   }
 
   // 服务器/集群ID
-  storageObjId = 'urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1';
+  objectId = 'urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1';
 
   // 扩容form
   expandForm = new GetForm().getExpandForm();
+
+  // 操作来源 list:列表页面、dataStore：在DataStore菜单页面操作
+  resource;
+
+  // vmfs数据
+  vmfsInfo: VmfsInfo;
 
   ngOnInit(): void {
     this.initData();
@@ -30,13 +38,36 @@ export class ExpandComponent implements OnInit{
    * 初始化数据
    */
   initData() {
+    // 设备类型 操作类型初始化
+    this.route.url.subscribe(url => {
+      console.log('url', url);
+      this.route.queryParams.subscribe(queryParam => {
+        this.resource = queryParam.resource;
+        this.objectId = queryParam.objectId;
+        this.remoteSrv.getVmfsById(this.objectId).subscribe((result: any) => {
+          console.log('VmfsInfo:', result);
+          if (result.code === '200' && null != result.data) {
+            this.vmfsInfo = result.data[0];
+            // form表单数据初始化
+            this.expandForm.volume_id = this.vmfsInfo.volumeId;
+            this.expandForm.ds_name = this.vmfsInfo.name;
+          }
+        });
+      });
+    });
+    // 初始化form表单
+    this.expandForm = new GetForm().getExpandForm();
   }
 
   /**
-   * 取消
+   * 取消/关闭页面
    */
   cancel() {
-
+    if (this.resource === 'list') { // 列表入口
+      this.router.navigate(['vmfs/list']);
+    } else { // dataStore入口
+      this.globalsService.getClientSdk().modal.close();
+    }
   }
 
   /**
@@ -67,8 +98,9 @@ export class ExpandComponent implements OnInit{
       }else {
         console.log('expand: ' + name  + ' Reason:' + result.description);
       }
-      // 隐藏扩容页面
       this.cdr.detectChanges();
+      // 隐藏扩容页面
+      this.cancel();
     });
   }
 }

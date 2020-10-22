@@ -7,8 +7,8 @@ export class VmfsListService {
   constructor(private http: HttpClient) {}
 
   // 主列表数据
-  getData(params = {}) {
-    return this.http.get('accessvmfs/listvmfs', params );
+  getData() {
+    return this.http.get('accessvmfs/listvmfs');
   }
   // 附列表数据
   getChartData(volumeIds: string[] ) {
@@ -60,7 +60,7 @@ export class VmfsListService {
 
   // 修改VMFS
   updateVmfs(volumeId: string, params = {}) {
-    return  this.http.put('operatevmfs/updatevmfs?volume_id=' + volumeId, params);
+    return  this.http.put('operatevmfs/updatevmfs?volumeId=' + volumeId, params);
   }
   // 删除
   delVmfs(params = {}) {
@@ -76,7 +76,7 @@ export class VmfsListService {
   }
   // 卸载
   unmountVMFS(params = {}) {
-    return  this.http.post('/accessvmfs/ummountvmfs', params);
+    return  this.http.post('accessvmfs/ummountvmfs', params);
   }
   // 挂载
   mountVmfs(params = {}) {
@@ -103,7 +103,7 @@ export class VmfsListService {
 
 }
 // vmfs列表
-export interface List {
+export interface VmfsInfo {
   objectid: string; // 跳转用唯一id
   name: string;
   status: string;
@@ -153,9 +153,9 @@ export interface ClusterList {
 export interface ServiceLevelList {
   id: string;
   name: string;
-  free_capacity: number;
-  used_capacity: number;
-  total_capacity: number;
+  freeCapacity: number;
+  usedCapacity: number;
+  totalCapacity: number;
   description: string;
   type: string;
   protocol: string;
@@ -235,7 +235,7 @@ export class GetForm {
     const editForm = {
       name: null,
       isSameName: true, // 卷名称与vmfs名称是否相同
-      volume_id: null, // 卷ID
+      volumeId: null, // 卷ID
       control_policy: '1', // 控制策略,
       max_iops: null,
       maxiopsChoose: false, // 最大iops 选中
@@ -290,10 +290,8 @@ export class GetForm {
   getUnmountForm() {
     const unmount = {
       name: null,
-      hostName: null,
       hostId: null,
-      hostGroupId: null,
-      hostGroupName: null,
+      clusterId: null,
       dataStoreObjectIds: [],
       mountType: '1' // 挂载的设备类型 1 服务器、0 集群 前端自用参数
     };

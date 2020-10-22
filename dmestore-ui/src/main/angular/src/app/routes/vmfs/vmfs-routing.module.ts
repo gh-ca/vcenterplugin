@@ -23,14 +23,14 @@ const routes: Routes = [
   { path: 'cluster/unmount', component: MountComponent, data: { title: 'Vmfs cluster unmount' } },
   { path: 'host/unmount', component: MountComponent, data: { title: 'Vmfs host unmount' } },
   // 在Datastore菜单中点击"添加"、"修改"、"扩容"、"挂载"、"卸载"、"删除"、"空间回收"、"服务等级变更"
-  { path: 'dataStore/add', component: AddComponent, data: { title: 'Vmfs ADD' } },
-  { path: 'dataStore/modify', component: ModifyComponent, data: { title: 'Vmfs Modify' } },
-  { path: 'dataStore/expand', component: ExpandComponent, data: { title: 'Vmfs expand' } },
-  { path: 'dataStore/mount', component: MountComponent, data: { title: 'Vmfs mount' } },
-  { path: 'dataStore/unmount', component: MountComponent, data: { title: 'Vmfs unmount' } },
-  { path: 'dataStore/delete', component: DeleteComponent, data: { title: 'Vmfs delete' } },
-  { path: 'dataStore/reclaim', component: ReclaimComponent, data: { title: 'Vmfs reclaim' } },
-  { path: 'dataStore/serviceLevel', component: ServiceLevelComponent, data: { title: 'Vmfs update serviceLevel' } },
+  { path: 'add', component: AddComponent, data: { title: 'Vmfs ADD' } },
+  { path: 'modify', component: ModifyComponent, data: { title: 'Vmfs Modify' } },
+  { path: 'expand', component: ExpandComponent, data: { title: 'Vmfs expand' } },
+  { path: 'mount', component: MountComponent, data: { title: 'Vmfs mount' } },
+  { path: 'unmount', component: MountComponent, data: { title: 'Vmfs unmount' } },
+  { path: 'delete', component: DeleteComponent, data: { title: 'Vmfs delete' } },
+  { path: 'reclaim', component: ReclaimComponent, data: { title: 'Vmfs reclaim' } },
+  { path: 'serviceLevel', component: ServiceLevelComponent, data: { title: 'Vmfs update serviceLevel' } },
 ];
 
 @NgModule({

@@ -23,13 +23,13 @@
               </tr>
               <tr>
                 <th hidden></th>
-                <th><clr-progress-bar clrValue="{{(item.used_capacity/item.total_capacity * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
+                <th><clr-progress-bar clrValue="{{(item.usedCapacity/item.totalCapacity * 100 || 0).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
                 <th *ngIf="item.capabilities.qos.smartQos.maxiops != null">IOPS <= {{item.capabilities.qos.smartQos.maxiops}}</th>
                 <th *ngIf="item.capabilities.qos.smartQos.miniops != null">IOPS >= {{item.capabilities.qos.smartQos.miniops}}</th>
               </tr>
               <tr>
                 <th hidden></th>
-                <th>{{item.used_capacity}} GB/{{item.total_capacity}}GB</th>
+                <th>{{item.usedCapacity || "0"}} GB/{{item.totalCapacity || "0"}}GB</th>
                 <th>Latency: {{item.capabilities.qos.smartQos.latency + item.capabilities.qos.smartQos.latencyUnit}}</th>
               </tr>
               </tbody>
