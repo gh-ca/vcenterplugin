@@ -8,6 +8,7 @@ import java.util.List;
  **/
 public class BestPracticeUpResultResponse {
     private String hostObjectId;
+    private String hostName;
     private List<BestPracticeUpResultBase> result;
     private boolean needReboot;
 
@@ -17,6 +18,14 @@ public class BestPracticeUpResultResponse {
 
     public void setHostObjectId(String hostObjectId) {
         this.hostObjectId = hostObjectId;
+    }
+
+    public String getHostName() {
+        return hostName;
+    }
+
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
     }
 
     public List<BestPracticeUpResultBase> getResult() {
