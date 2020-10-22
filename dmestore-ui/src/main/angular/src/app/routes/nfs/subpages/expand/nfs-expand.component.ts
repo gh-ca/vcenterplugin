@@ -27,6 +27,7 @@ export class NfsExpandComponent implements OnInit{
       this.activatedRoute.queryParams.subscribe(queryParam => {
         this.fsId = queryParam.fsId;
         this.pluginFlag =queryParam.flag;
+        this.storeObjectId =queryParam.objectId;
       });
       if(this.pluginFlag==null){
         //入口来至Vcenter
@@ -54,6 +55,7 @@ export class NfsExpandComponent implements OnInit{
     if (this.pluginFlag=='plugin'){
       params={
         "fileSystemId": this.fsId,
+        "storeObjectId": this.storeObjectId,
         "expand":true,
         "capacity": this.newCapacity
       }
@@ -86,5 +88,4 @@ export class NfsExpandComponent implements OnInit{
     this.gs.loading=false;
     this.gs.getClientSdk().modal.close();
   }
-
 }

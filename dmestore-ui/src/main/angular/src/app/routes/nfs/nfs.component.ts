@@ -113,9 +113,10 @@ export class NfsComponent implements OnInit {
   expandView(){
     const flag = 'plugin';
     const fsId=this.rowSelected[0].fsId;
+    const objectId=this.rowSelected[0].objectid;
     this.router.navigate(['nfs/expand'],{
       queryParams:{
-        fsId,flag
+        objectId,fsId,flag
       }
     });
   }
@@ -123,9 +124,10 @@ export class NfsComponent implements OnInit {
   reduceView(){
     const flag = 'plugin';
     const fsId=this.rowSelected[0].fsId;
+    const objectId=this.rowSelected[0].objectid;
     this.router.navigate(['nfs/reduce'],{
       queryParams:{
-        fsId,flag
+        objectId,fsId,flag
       }
     });
   }
