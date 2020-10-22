@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from "@angular/core";
 import {AddService} from './add.service';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {
   ClusterList,
   GetForm,
@@ -11,6 +11,7 @@ import {
   VmfsListService
 } from '../list/list.service';
 import {ClrWizard, ClrWizardPage} from "@clr/angular";
+import {GlobalsService} from "../../../shared/globals.service";
 
 @Component({
   selector: 'app-list',
@@ -21,7 +22,8 @@ import {ClrWizard, ClrWizardPage} from "@clr/angular";
 })
 export class AddComponent implements OnInit{
 
-  constructor(private remoteSrv: AddService, private route: ActivatedRoute, private cdr: ChangeDetectorRef) {
+  constructor(private remoteSrv: AddService, private route: ActivatedRoute, private cdr: ChangeDetectorRef,
+              private router:Router, private globalsService: GlobalsService) {
 
   }
   // 初始化表单
@@ -35,8 +37,6 @@ export class AddComponent implements OnInit{
   // 已选择的主机/集群
   chooseDevice;
 
-  popShow = true; // 弹出层显示
-
   // 服务等级列表
   serviceLevelList: ServiceLevelList[] = [];
   // 未选择服务等级true未选择 false选择 添加、服务登记变更
@@ -48,10 +48,9 @@ export class AddComponent implements OnInit{
   storagePoolList: StoragePoolList[] = [];
   storageList: StorageList[] = []; // 存储数据
 
-  // 服务器/集群ID
-  hostOrClusterId = 'urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1';
-  // 服务器/集群名称
-  hostOrClusterName = '10.143.133.17';
+  // 操作来源 list:列表页面、dataStore：在DataStore菜单页面操作
+  resource;
+
 
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
@@ -68,6 +67,9 @@ export class AddComponent implements OnInit{
     // 设备类型 操作类型初始化
     this.route.url.subscribe(url => {
       console.log('url', url);
+      this.route.queryParams.subscribe(queryParam => {
+        this.resource = queryParam.resource;
+      });
     });
     // 初始化表单
     this.form = new GetForm().getAddForm();
@@ -235,7 +237,7 @@ export class AddComponent implements OnInit{
     this.remoteSrv.getServiceLevelList().subscribe((result: any) => {
       console.log(result);
       if (result.code === '200' && result.data !== null) {
-        this.serviceLevelList = result.data.data;
+        this.serviceLevelList = result.data;
         console.log('this.serviceLevelList', this.serviceLevelList);
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
@@ -259,7 +261,7 @@ export class AddComponent implements OnInit{
     this.remoteSrv.getStorages().subscribe((result: any) => {
       console.log(result);
       if (result.code === '200' && result.data !== null) {
-        this.storageList = result.data.data;
+        this.storageList = result.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
     });
@@ -272,7 +274,7 @@ export class AddComponent implements OnInit{
         console.log('storagePools', result);
         console.log('result.code === \'200\' && result.data !== null', result.code === '200' && result.data !== null);
         if (result.code === '200' && result.data !== null) {
-          this.storagePoolList = result.data.data;
+          this.storagePoolList = result.data;
           console.log('this.storagePoolList', this.storagePoolList);
 
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -285,7 +287,12 @@ export class AddComponent implements OnInit{
    * 取消
    */
   cancel() {
-
+    this.wizard.close();// 关闭弹窗
+    if (this.resource === 'list') { // 列表入口
+      this.router.navigate(['vmfs/list']);
+    } else { // dataStore入口
+      this.globalsService.getClientSdk().modal.close();
+    }
   }
 
   // 添加vmfs 处理
@@ -336,10 +343,11 @@ export class AddComponent implements OnInit{
       this.remoteSrv.createVmfs(this.form).subscribe((result: any) => {
         if (result.code === '200') {
           console.log('创建成功');
-          // 重新请求数据
         } else {
           console.log('创建失败：' + result.description);
         }
+        // 关闭窗口
+        this.cancel();
       });
     } else {
       this.serviceLevelIsNull = true;

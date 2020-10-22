@@ -19,4 +19,12 @@ export class ServiceLevelService {
   getServiceLevelList(params = {}) {
     return this.http.put('operatevmfs/listvmfsservicelevel', params);
   }
+
+  /**
+   * 通过objectId 获取vmfs
+   * @param objectId
+   */
+  getVmfsById(objectId) {
+    return this.http.get('accessvmfs/queryvmfs?dataStoreObjectId='+objectId);
+  }
 }

@@ -42,7 +42,38 @@ export class MountService {
 
   // 卸载
   unmountVMFS(params = {}) {
-    return  this.http.post('/accessvmfs/ummountvmfs', params);
+    return  this.http.post('accessvmfs/ummountvmfs', params);
+  }
+
+  // 获取已挂载主机
+  getMountHost(objectId) {
+    return  this.http.get('accessvmfs/gethostsbystorageid/'+objectId);
+  }
+  // 获取已挂载集群
+  getMountCluster(objectId) {
+    return  this.http.get('accessvmfs/gethostgroupsbystorageid/'+objectId);
+  }
+
+  /**
+   * 通过hostID查询已挂载的VMFS
+   * @param hostObjectId
+   */
+  getMountedByHostObjId(hostObjectId, dataStoreType) {
+    return  this.http.get('accessvmware/getmountdatastoresbyhostobjectid?hostObjectId='+hostObjectId+'&dataStoreType='+dataStoreType);
+  }
+  /**
+   * 通过clusterID查询已挂载的VMFS
+   * @param hostObjectId
+   */
+  getMountedByClusterObjId(clusterObjId, dataStoreType) {
+    return  this.http.get('accessvmware/getmountdatastoresbyclusterobjectid?clusterObjectId='+clusterObjId+'&dataStoreType='+dataStoreType);
+  }
+  /**
+   * 通过objectId 获取vmfs
+   * @param objectId
+   */
+  getVmfsById(objectId) {
+    return this.http.get('accessvmfs/queryvmfs?dataStoreObjectId='+objectId);
   }
 }
 
