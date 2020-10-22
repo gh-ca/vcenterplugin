@@ -8,10 +8,7 @@ import com.dmeplugin.dmestore.exception.DmeSqlException;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import org.springframework.util.StringUtils;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -176,6 +173,45 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
 
     public void update(List<DmeVmwareRelation> list) {
 
+    }
+
+    public void update(List<DmeVmwareRelation> list, String storeType) {
+        if(null != storeType && storeType.equals(ToolUtils.STORE_TYPE_VMFS)){
+            updateVmfs(list);
+        }
+    }
+
+    private void updateVmfs(List<DmeVmwareRelation> list){
+        if (null == list || list.size() == 0) {
+            return;
+        }
+
+        Connection con = null;
+        PreparedStatement pstm = null;
+        try {
+            con = getConnection();
+            String sql = "UPDATE " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " SET STORE_NAME=?,VOLUME_NAME=?,UPDATETIME=? where VOLUME_WWN=?";
+            pstm = con.prepareStatement(sql);
+            con.setAutoCommit(false);
+            for (DmeVmwareRelation o : list) {
+                pstm.setString(1, o.getStoreName());
+                pstm.setString(2, o.getVolumeName());
+                pstm.setDate(3, new Date(System.currentTimeMillis()));
+                pstm.setString(4, o.getVolumeWwn());
+                pstm.addBatch();
+            }
+            pstm.executeBatch();
+            con.commit();
+        } catch (Exception ex) {
+            try {
+                //回滚
+                con.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } finally {
+            closeConnection(con, pstm, null);
+        }
     }
 
     public void save(List<DmeVmwareRelation> list) {

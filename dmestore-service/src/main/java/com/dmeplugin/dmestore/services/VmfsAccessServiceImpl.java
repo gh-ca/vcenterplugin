@@ -1203,7 +1203,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
         //更新
         if (!upList.isEmpty()) {
-            dmeVmwareRalationDao.update(upList);
+            dmeVmwareRalationDao.update(upList, storeType);
         }
 
         //新增
