@@ -333,7 +333,6 @@ export class DetailComponent implements OnInit, AfterViewInit {
       this.storageId = queryParam.id;
       this.storageName = queryParam.name;
     });
-
     this.getStorageDetail(true);
     this.getStoragePoolList(true);
     this.initCapacity();
@@ -422,7 +421,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     if (fresh){
       this.detailService.getStorageDetail(this.storageId).subscribe((r: any) => {
         if (r.code === '200'){
-          this.detail = r.data.data;
+          this.detail = r.data;
           this.cdr.detectChanges();
         }else{
 
@@ -433,7 +432,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       if (this.detail === null){
         this.detailService.getStorageDetail(this.storageId).subscribe((r: any) => {
           if (r.code === '200'){
-            this.detail = r.data.data;
+            this.detail = r.data;
             this.cdr.detectChanges();
           }
         });
@@ -446,7 +445,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
         console.log('pool result:');
         console.log(r);
         if (r.code === '200'){
-          this.storagePool = r.data.data;
+          this.storagePool = r.data;
           this.cdr.detectChanges();
         }
       });
@@ -455,7 +454,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       if (this.poolList === null){
         this.detailService.getStoragePoolList(this.storageId).subscribe((r: any) =>{
           if (r.code === '200'){
-            this.storagePool = r.data.data;
+            this.storagePool = r.data;
             this.cdr.detectChanges();
           }
         });
@@ -470,7 +469,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     if (fresh){
       this.detailService.getVolumeListList(this.storageId).subscribe((r: any) => {
         if (r.code === '200'){
-          this.volumes = r.data.data;
+          this.volumes = r.data;
           this.cdr.detectChanges();
         }
       });
@@ -479,7 +478,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       if (this.volumes == null){
         this.detailService.getVolumeListList(this.storageId).subscribe((r: any) => {
           if (r.code === '200'){
-            this.volumes = r.data.data;
+            this.volumes = r.data;
             this.cdr.detectChanges();
           }
         });
@@ -490,7 +489,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     if (fresh){
       this.detailService.getFileSystemList(this.storageId).subscribe((r: any) => {
         if (r.code === '200'){
-          this.fsList = r.data.data;
+          this.fsList = r.data;
           this.cdr.detectChanges();
         }
       });
@@ -499,7 +498,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       if (this.fsList == null){
         this.detailService.getFileSystemList(this.storageId).subscribe((r: any) => {
           if (r.code === '200'){
-            this.fsList = r.data.data;
+            this.fsList = r.data;
             this.cdr.detectChanges();
           }
         });
@@ -510,7 +509,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     if (fresh){
       this.detailService.getDtreeList(this.storageId).subscribe((r: any) => {
         if (r.code === '200'){
-          this.dtrees = r.data.data;
+          this.dtrees = r.data;
           this.cdr.detectChanges();
         }
       });
@@ -519,7 +518,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       if (this.dtrees == null){
         this.detailService.getDtreeList(this.storageId).subscribe((r: any) => {
           if (r.code === '200'){
-            this.dtrees = r.data.data;
+            this.dtrees = r.data;
             this.cdr.detectChanges();
           }
         });
@@ -530,7 +529,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     if (fresh){
       this.detailService.getShareList(this.storageId).subscribe((r: any) => {
         if (r.code === '200'){
-          this.shares = r.data.data;
+          this.shares = r.data;
           this.cdr.detectChanges();
         }
       });
@@ -540,7 +539,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       if (this.shares == null){
         this.detailService.getShareList(this.storageId).subscribe((r: any) => {
           if (r.code === '200'){
-            this.shares = r.data.data;
+            this.shares = r.data;
             this.cdr.detectChanges();
           }
         });
@@ -551,7 +550,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     if (fresh){
       this.detailService.getControllerList(this.storageId).subscribe((r: any) => {
         if (r.code === '200'){
-          this.controllers = r.data.data;
+          this.controllers = r.data;
           this.cdr.detectChanges();
         }
       });
@@ -560,7 +559,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       if (this.controllers == null){
         this.detailService.getControllerList(this.storageId).subscribe((r: any) => {
           if (r.code === '200'){
-            this.controllers = r.data.data;
+            this.controllers = r.data;
             this.cdr.detectChanges();
           }
         });
@@ -571,7 +570,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     if (fresh){
       this.detailService.getDiskList(this.storageId).subscribe((r: any) => {
         if (r.code === '200'){
-          this.disks = r.data.data;
+          this.disks = r.data;
           this.cdr.detectChanges();
         }
       });
@@ -580,7 +579,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       if (this.disks == null){
         this.detailService.getDiskList(this.storageId).subscribe((r: any) => {
           if (r.code === '200'){
-            this.disks = r.data.data;
+            this.disks = r.data;
             this.cdr.detectChanges();
           }
         });
@@ -598,7 +597,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   getFCPortList(){
       this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"FC"}).subscribe((r: any) => {
         if (r.code === '200'){
-          this.fcs = r.data.data;
+          this.fcs = r.data;
           this.cdr.detectChanges();
         }
       });
@@ -606,7 +605,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   getFCoEPortList(){
     this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"FCoE"}).subscribe((r: any) => {
       if (r.code === '200'){
-        this.fcoes = r.data.data;
+        this.fcoes = r.data;
         this.cdr.detectChanges();
       }
     });
@@ -614,7 +613,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   getEthernetPortList(){
     this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"ETH"}).subscribe((r: any) => {
       if (r.code === '200'){
-        this.eths = r.data.data;
+        this.eths = r.data;
         this.cdr.detectChanges();
       }
     });
@@ -622,7 +621,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   getBondPortList(){
     this.detailService.getBondPortList(this.storageId).subscribe((r: any) => {
       if (r.code === '200'){
-        this.bonds = r.data.data;
+        this.bonds = r.data;
         this.cdr.detectChanges();
       }
     });
@@ -630,7 +629,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   getLogicPortsList(){
     this.detailService.getLogicPortList(this.storageId).subscribe((r: any) => {
       if (r.code === '200'){
-        this.logicports = r.data.data;
+        this.logicports = r.data;
         this.cdr.detectChanges();
       }
     });
@@ -638,7 +637,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   getFailoverGroups(){
     this.detailService.getFailoverGroups(this.storageId).subscribe((r: any) => {
       if (r.code === '200'){
-        this.fgs = r.data.data;
+        this.fgs = r.data;
         this.cdr.detectChanges();
       }
     });
@@ -678,5 +677,18 @@ export class DetailComponent implements OnInit, AfterViewInit {
   parseUsage(c:string){
     if (c===null || c==='') return 0;
     return Number.parseFloat(c).toFixed(2);
+  }
+  formatArry(str: string){
+    if(str===null){
+      return '';
+    }
+    str=str.replace("[","")
+      .replace("]","");
+    const strs=str.split(",");
+    let r=""
+    strs.forEach(s=>{
+      r+=s.replace('"','').replace('"','')+",";
+    });
+    return r.substr(0,r.length-1);
   }
 }
