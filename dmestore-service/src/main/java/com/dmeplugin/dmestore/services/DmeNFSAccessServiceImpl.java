@@ -93,7 +93,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         shareAttr.setName(share.get("name").getAsString());
         shareAttr.setShare_path(share.get("share_path").getAsString());
         shareAttr.setDescription(share.get("description").getAsString());
-        shareAttr.setOwning_dtree_name(ToolUtils.jsonToStr(share.get("owning_dtree_name"),  null));
+        shareAttr.setOwning_dtree_name(ToolUtils.jsonToStr(share.get("owning_dtree_name"), null));
         //查询客户端列表
         List<AuthClient> authClientList = getNFSDatastoreShareAuthClients(nfsShareId);
         if (null != authClientList && authClientList.size() > 0) {
@@ -164,7 +164,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         for (int i = 0; i < fsIds.size(); i++) {
             NfsDataStoreFsAttr fsAttr = new NfsDataStoreFsAttr();
             String file_system_id = fsIds.get(i);
-            if(StringUtils.isEmpty(file_system_id)){
+            if (StringUtils.isEmpty(file_system_id)) {
                 continue;
             }
             String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL,
@@ -186,7 +186,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             }
         }
 
-        if(list.size() > 0){
+        if (list.size() > 0) {
             return list;
         }
 
@@ -228,8 +228,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 continue;
                 //storageInfo = storageMap.get("10.143.133.201");
             }*/
-            if(null != storageMap && storageMap.size() >0){
-                for(Map.Entry<String, Storage> entry : storageMap.entrySet()){
+            if (null != storageMap && storageMap.size() > 0) {
+                for (Map.Entry<String, Storage> entry : storageMap.entrySet()) {
                     Storage storageInfo = entry.getValue();
                     String storage_id = storageInfo.getId();
                     String storage_name = storageInfo.getName();
@@ -243,11 +243,11 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                     boolean withLogicPort = false;
                     List<Map<String, Object>> logicPortInfos = queryLogicPortInfo(storage_id);
                     if (null != logicPortInfos && logicPortInfos.size() > 0) {
-                        for(Map<String, Object> logicPortInfo : logicPortInfos){
+                        for (Map<String, Object> logicPortInfo : logicPortInfos) {
                             String id = ToolUtils.getStr(logicPortInfo.get("id"));
                             String name = ToolUtils.getStr(logicPortInfo.get("home_port_name"));
                             String mgmtIp = ToolUtils.getStr(logicPortInfo.get("mgmt_ip"));
-                            if(nfsDatastoreIp.equals(mgmtIp)){
+                            if (nfsDatastoreIp.equals(mgmtIp)) {
                                 relation.setLogicPortId(id);
                                 relation.setLogicPortName(name);
                                 withLogicPort = true;
@@ -276,7 +276,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
                     //获取fs信息
                     boolean withFs = false;
-                    if(!StringUtils.isEmpty(fsName)){
+                    if (!StringUtils.isEmpty(fsName)) {
                         Map<String, Object> fsInfo = queryFsInfo(storage_id, fsName);
                         if (null != fsInfo && fsInfo.size() > 0) {
                             String id = ToolUtils.getStr(fsInfo.get("id"));
@@ -619,8 +619,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 params.put("obj_ids", fsIds);
                 Map<String, Object> remap = dataStoreStatisticHistoryService.queryNfsStatisticCurrent(params);
                 LOG.info("remap===" + gson.toJson(remap));
-                if (remap != null && remap.get("data") != null) {
-                    JsonObject dataJson = (JsonObject) remap.get("data");
+                if (remap != null && remap.size() > 0) {
+                    JsonObject dataJson = new JsonParser().parse(remap.toString()).getAsJsonObject();
                     if (dataJson != null) {
                         relists = new ArrayList<>();
                         for (String fsId : fsIds) {
@@ -787,9 +787,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             vcsdkUtils.hasVmOnDatastore(dataStoreObjectId);
             // 1获取dme的share 2 获取share下的客户端访问列表
             DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStoreObjectId);
-            if(null != dvr){
+            if (null != dvr) {
                 String dsName = dvr.getStoreName();
-                if(!StringUtils.isEmpty(dsName)){
+                if (!StringUtils.isEmpty(dsName)) {
                     Map<String, Object> dsmap = new HashMap<>();
                     dsmap.put("name", dsName);
                     //vcenter侧主机 集群二选一

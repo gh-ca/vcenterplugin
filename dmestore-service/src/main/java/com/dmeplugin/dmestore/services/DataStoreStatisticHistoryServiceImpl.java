@@ -277,8 +277,8 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                     resultMap.put("code", 503);
                     resultMap.put("message", "query " + relationOrInstance + " current statistic error, non-supported relation and instance!");
                     log.error("query " + relationOrInstance + " current statistic error, non-supported relation and instance.the params is:{}", gson.toJson(params));
+                    throw new DMEException(gson.toJson(resultMap));
             }
-
         }
         return resultMap;
     }
