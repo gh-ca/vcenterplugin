@@ -451,6 +451,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                    // responseBodyBean.setDescription("expand or recycle nfs storage capacity failed!");
                     throw new DMEException("503","expand or recycle nfs storage capacity failed!");
                 }
+                //刷新datastore容量
+                vcsdkUtils.refreshDatastore(storeObjectId);
                 //responseBodyBean.setData("task_id:"+task_id);
             }
         } catch (Exception e) {
@@ -593,7 +595,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             //resMap.put("code", code);
             //resMap.put("msg", "update nfs datastore error !");
             //return resMap;
-            throw new DMEException("503","update nfs datastore error !");
+            throw new DMEException("503","update nfs datastore error !"+responseEntity.getBody());
         }
         String object = responseEntity.getBody();
         JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
@@ -798,7 +800,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         String resBody = responseEntity.getBody();
         JsonObject share = gson.fromJson(resBody, JsonObject.class);
         resultMap.put("shareName",ToolUtils.jsonToStr(share.get("name")));
-        if ( String.valueOf(summaryMap.get("name")).equalsIgnoreCase(fsname)&&  String.valueOf(summaryMap.get("name")).equalsIgnoreCase(ToolUtils.jsonToStr(share.get("name")))){
+        if ( String.valueOf(summaryMap.get("name")).equalsIgnoreCase(fsname)&&  ("/"+ summaryMap.get("name")).equalsIgnoreCase(ToolUtils.jsonToStr(share.get("name")))){
             resultMap.put("sameName",true);
         }else
         {

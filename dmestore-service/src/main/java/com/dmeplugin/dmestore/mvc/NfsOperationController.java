@@ -90,12 +90,12 @@ public class NfsOperationController extends BaseController{
         filesystemSpec.put("capacity", params.get("size"));
         filesystemSpec.put("count", 1);
         if (sameName) {
-            createNfsShareParam.put("name", nfsName);
+            createNfsShareParam.put("name", "/" +nfsName);
             createNfsShareParam.put("share_path", "/" + nfsName + "/");
             filesystemSpec.put("name", nfsName);
             param.put("exportPath", "/" + nfsName);
         } else {
-            createNfsShareParam.put("name", params.get("shareName"));
+            createNfsShareParam.put("name", "/" +params.get("shareName"));
             createNfsShareParam.put("share_path", "/" + params.get("fsName") + "/");
             filesystemSpec.put("name", params.get("fsName"));
             param.put("exportPath", "/" + params.get("fsName"));
