@@ -96,7 +96,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         shareAttr.setOwning_dtree_name(ToolUtils.jsonToStr(share.get("owning_dtree_name"),  null));
         //查询客户端列表
         List<AuthClient> authClientList = getNFSDatastoreShareAuthClients(nfsShareId);
-        if (null != authClientList && authClientList.size() > 9) {
+        if (null != authClientList && authClientList.size() > 0) {
             shareAttr.setAuth_client_list(authClientList);
         }
         return shareAttr;
@@ -147,9 +147,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         ipv4 = (null == ipv4 ? "" : ipv4.trim());
         String ipv6 = logicPort.get("mgmt_ipv6").getAsString();
         logicPortAttr.setIp(!StringUtils.isEmpty(ipv4) ? ipv4 : ipv6);
-        String running_status = logicPort.get("running_status").getAsString();
-        logicPortAttr.setStatus(running_status);
-        logicPortAttr.setRunningStatus(running_status);
+        String runningStatus = logicPort.get("running_status").getAsString();
+        logicPortAttr.setStatus(runningStatus);
+        logicPortAttr.setRunningStatus(runningStatus);
         logicPortAttr.setCurrentPort(logicPort.get("current_port_name").getAsString());
         logicPortAttr.setActivePort(logicPort.get("home_port_name").getAsString());
         logicPortAttr.setFailoverGroup("failover_group_name");
