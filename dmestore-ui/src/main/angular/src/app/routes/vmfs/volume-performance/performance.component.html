@@ -24,7 +24,7 @@
           </td>
           <td>
             <clr-select-container>
-              <select clrSelect (ngModelOptions)="ranges" [(ngModel)]="selectRange" name="defaultSelect" class="clr-select" (change)="changeVolFunc()">
+              <select clrSelect (ngModelOptions)="ranges" [(ngModel)]="selectRange" name="selectRange" class="clr-select" (change)="changeVolFunc()" required>
                 <option *ngFor="let item of ranges" value="{{item.key}}">{{item.value}}</option>
               </select>
             </clr-select-container>
