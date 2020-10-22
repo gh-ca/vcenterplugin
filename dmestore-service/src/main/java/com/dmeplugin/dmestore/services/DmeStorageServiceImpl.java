@@ -471,6 +471,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     fileSystem.setNfsCount(ToolUtils.jsonToInt(element.get("nfs_count"),0));
                     fileSystem.setCifsCount(ToolUtils.jsonToInt(element.get("cifs_count"),0));
                     fileSystem.setDtreeCount(ToolUtils.jsonToInt(element.get("dtree_count"),0));
+                    fileSystem.setAvailableCapacity(ToolUtils.jsonToDou(element.get("available_capacity"),0.0));
                     fileSystems.add(fileSystem);
                 }
                 //resMap.put("data", fileSystems);
@@ -656,7 +657,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     JsonObject element = jsonElement.getAsJsonObject();
                     StorageControllers storageControllers = new StorageControllers();
                     storageControllers.setName(ToolUtils.jsonToStr(element.get("name")));
-                    storageControllers.setSoftVer(ToolUtils.jsonToStr(element.get("name")));
+                    storageControllers.setSoftVer(ToolUtils.jsonToStr(element.get("softVer")));
                     storageControllers.setStatus(ToolUtils.jsonToStr(element.get("status")));
                     storageControllers.setCpuInfo(ToolUtils.jsonToStr(element.get("cpuInfo")));
                     resList.add(storageControllers);
