@@ -33,6 +33,26 @@ public class StorageDetail {
     //空闲容量
     private Double freeEffectiveCapacity;
 
+    //订阅容量
+    private Double subscriptionCapacity;
+
+    //容量分布
+    //保护容量
+    private Double protectionCapacity;
+    //文件系统
+    private Double fileCapacity;
+    //卷
+    private Double blockCapacity;
+
+    /**
+     *去重容量
+     **/
+    private Double dedupedCapacity;
+    /**
+     *压缩容量
+     **/
+    private Double compressedCapacity;
+
     private String[] azIds;
     private String storagePool;
     private String volume;
@@ -302,4 +322,52 @@ public class StorageDetail {
         this.freeEffectiveCapacity = freeEffectiveCapacity;
     }
 
+
+    public Double getSubscriptionCapacity() {
+        return subscriptionCapacity;
+    }
+
+    public void setSubscriptionCapacity(Double subscriptionCapacity) {
+        this.subscriptionCapacity = subscriptionCapacity;
+    }
+
+    public Double getProtectionCapacity() {
+        return protectionCapacity;
+    }
+
+    public void setProtectionCapacity(Double protectionCapacity) {
+        this.protectionCapacity = protectionCapacity;
+    }
+
+    public Double getFileCapacity() {
+        return fileCapacity;
+    }
+
+    public void setFileCapacity(Double fileCapacity) {
+        this.fileCapacity = fileCapacity;
+    }
+
+    public Double getBlockCapacity() {
+        return blockCapacity;
+    }
+
+    public void setBlockCapacity(Double blockCapacity) {
+        this.blockCapacity = blockCapacity;
+    }
+
+    public Double getDedupedCapacity() {
+        return dedupedCapacity;
+    }
+
+    public void setDedupedCapacity(Double dedupedCapacity) {
+        this.dedupedCapacity = dedupedCapacity;
+    }
+
+    public Double getCompressedCapacity() {
+        return compressedCapacity;
+    }
+
+    public void setCompressedCapacity(Double compressedCapacity) {
+        this.compressedCapacity = compressedCapacity;
+    }
 }
