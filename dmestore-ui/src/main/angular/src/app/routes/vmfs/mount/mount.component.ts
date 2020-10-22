@@ -73,7 +73,9 @@ export class MountComponent implements OnInit{
   mountedCluster: HostOrCluster[] = []; // 已挂载的集群
 
   // vmfs数据
-  vmfsInfo;
+  vmfsInfo = {
+    name: ''
+  };
   ngOnInit(): void {
     // 初始化隐藏窗口
     this.unmountShow = false;

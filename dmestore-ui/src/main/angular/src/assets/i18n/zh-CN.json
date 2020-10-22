@@ -31,7 +31,8 @@
     "max": "值必须小于 {{number}}",
     "exist": "{{value}} 已存在",
     "inconsistent": "与 {{value}} 不一致",
-    "invalid_email": "邮箱格式不正确"
+    "invalid_email": "邮箱格式不正确",
+    "comboboxTips": "如果需要重新选择主机/集群，请先删除输入框中数据。"
   },
   "table": {
     "name": "名称",
