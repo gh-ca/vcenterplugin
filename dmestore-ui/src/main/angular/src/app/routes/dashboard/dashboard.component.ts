@@ -258,4 +258,17 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   }
+
+
+  toBestParcticeViewSdk(type: string){
+    this.gs.getClientSdk().app.navigateTo({
+      targetViewId: 'com.dmeplugin.dmestore.bestpractiseView'
+    });
+  }
+
+  toDatastoreDeviceViewSdk(){
+    this.gs.getClientSdk().app.navigateTo({
+      targetViewId: 'com.dmeplugin.dmestore.storageView'
+    });
+  }
 }
