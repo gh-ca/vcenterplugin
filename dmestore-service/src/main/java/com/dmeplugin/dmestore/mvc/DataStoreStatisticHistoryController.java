@@ -178,13 +178,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
     @ResponseBody
     public ResponseBodyBean getStoragePoolStatistic(@RequestBody Map<String, Object> params) throws Exception {
         LOG.info("datastorestatistichistrory/storagepool params==" + gson.toJson(params));
-       /* Map<String, Object> resMap = dataSotreStatisticHistroyService.queryStoragePoolStatistic(params);
-        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
-            Map<String, Object> data = (Map<String, Object>) resMap.get("data");
-            return success(data);
+        try {
+            return success(dataSotreStatisticHistroyService.queryStoragePoolStatistic(params));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));*/
-        return null;
     }
 
     /**

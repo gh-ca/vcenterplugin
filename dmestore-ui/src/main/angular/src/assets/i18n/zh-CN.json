@@ -31,7 +31,8 @@
     "max": "值必须小于 {{number}}",
     "exist": "{{value}} 已存在",
     "inconsistent": "与 {{value}} 不一致",
-    "invalid_email": "邮箱格式不正确"
+    "invalid_email": "邮箱格式不正确",
+    "comboboxTips": "如果需要重新选择主机/集群，请先删除输入框中数据。"
   },
   "table": {
     "name": "名称",
@@ -232,7 +233,8 @@
       "mountType":"挂载类型",
       "readOnly":"只读",
       "readWrite":"读写",
-      "mountObj":"挂载对象"
+      "mountObj":"挂载对象",
+      "notChooseDataStoreTips":"请选择需要挂载的DataStore！"
     },
     "del":{
       "title":"提示",
@@ -241,7 +243,8 @@
     "unmount":{
       "title":"卸载",
       "content":"确认要卸载吗?",
-      "notChooseDeviceTips":"请选择需要卸载的主机或集群！"
+      "notChooseDeviceTips":"请选择需要卸载的主机或集群！",
+      "notChooseDataStoreTips":"请选择需要卸载的DataStore！"
     },
     "reclaim": {
       "title":"提示",

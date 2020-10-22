@@ -62,6 +62,11 @@ public class StoragePort {
     //存储设备ID
     private String storageDeviceId;
 
+    private Float iops;
+    private Float lantency;
+    private Float bandwith;
+    private Float useage;
+
     public String getId() {
         return id;
     }
@@ -276,5 +281,37 @@ public class StoragePort {
 
     public void setStorageDeviceId(String storageDeviceId) {
         this.storageDeviceId = storageDeviceId;
+    }
+
+    public Float getIops() {
+        return iops;
+    }
+
+    public void setIops(Float iops) {
+        this.iops = iops;
+    }
+
+    public Float getLantency() {
+        return lantency;
+    }
+
+    public void setLantency(Float lantency) {
+        this.lantency = lantency;
+    }
+
+    public Float getBandwith() {
+        return bandwith;
+    }
+
+    public void setBandwith(Float bandwith) {
+        this.bandwith = bandwith;
+    }
+
+    public Float getUseage() {
+        return useage;
+    }
+
+    public void setUseage(Float useage) {
+        this.useage = useage;
     }
 }

@@ -1,6 +1,8 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from "@angular/core";
-import {ActivatedRoute} from '@angular/router';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from "@angular/core";
+import {ActivatedRoute, Router} from '@angular/router';
 import {DeleteService} from "../delete/delete.service";
+import {GlobalsService} from "../../../shared/globals.service";
+import {ClrModal, ClrWizard} from "@clr/angular";
 
 @Component({
   selector: 'app-list',
@@ -11,26 +13,43 @@ import {DeleteService} from "../delete/delete.service";
 })
 export class DeleteComponent implements OnInit{
 
-  constructor(private remoteSrv: DeleteService, private route: ActivatedRoute, private cdr: ChangeDetectorRef) {
+  constructor(private remoteSrv: DeleteService, private route: ActivatedRoute, private cdr: ChangeDetectorRef, private router:Router, private globalsService: GlobalsService) {
 
   }
 
-  // 服务器/集群ID
-  hostOrClusterId = 'urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1';
-  // 服务器/集群名称
-  hostOrClusterName = '10.143.133.17';
-  //
-  volumeIds = [];
+  // 存储ID
+  objectId;
+
+  // 操作来源 list:列表页面、dataStore：在DataStore菜单页面操作
+  resource;
+
+  // 待删除VMFS的卷ID
+  objectIds = [];
+
+  delShow:boolean;
+
   ngOnInit(): void {
     this.initData();
-    // 初始化添加数据
-
   }
 
   initData() {
+    this.delShow = true;
     // 设备类型 操作类型初始化
     this.route.url.subscribe(url => {
       console.log('url', url);
+      this.route.queryParams.subscribe(queryParam => {
+        this.resource = queryParam.resource;
+        let objIds = [];
+        if (this.resource === 'list') { // 列表入口
+          objIds = queryParam.objectId.split(',');
+        } else { // dataStore入口
+          const ctx = this.globalsService.getClientSdk().app.getContextObjects();
+          objIds.push(ctx[0].id);
+        }
+        this.objectIds = objIds;
+        console.log('del vmfs objectIds:' + objIds);
+        console.log('this.resource', this.resource);
+      });
     });
 
   }
@@ -40,20 +59,29 @@ export class DeleteComponent implements OnInit{
    */
   cancel() {
 
+    this.delShow = false;
+    if (this.resource === 'list') { // 列表入口
+      this.router.navigate(['vmfs/list']);
+    } else { // dataStore入口
+      this.globalsService.getClientSdk().modal.close();
+    }
   }
 
   // 删除VMFS 处理函数
   delHandleFunc() {
-    console.log('del vmfs volumeIds:' + this.volumeIds);
-    this.remoteSrv.delVmfs(this.volumeIds).subscribe((result: any) => {
+    const delInfos = {
+      dataStoreObjectIds: this.objectIds
+    }
+    this.remoteSrv.delVmfs(delInfos).subscribe((result: any) => {
       // 隐藏删除提示页面
       if (result.code === '200'){
         console.log('DEL success');
       } else {
         console.log('DEL faild: ' + result.description);
       }
-      // 关闭删除页面
       this.cdr.detectChanges();
+      // 关闭删除页面
+      this.cancel();
     });
   }
 

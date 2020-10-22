@@ -13,6 +13,12 @@ public class StorageControllers {
     private String softVer;
     private String cpuInfo;
 
+    private Float cpuUsage;
+    private Float iops;
+    private Float ops;
+    private Float lantency;
+    private Float bandwith;
+
     public String getName() {
         return name;
     }
@@ -43,5 +49,45 @@ public class StorageControllers {
 
     public void setCpuInfo(String cpuInfo) {
         this.cpuInfo = cpuInfo;
+    }
+
+    public Float getCpuUsage() {
+        return cpuUsage;
+    }
+
+    public void setCpuUsage(Float cpuUsage) {
+        this.cpuUsage = cpuUsage;
+    }
+
+    public Float getIops() {
+        return iops;
+    }
+
+    public void setIops(Float iops) {
+        this.iops = iops;
+    }
+
+    public Float getOps() {
+        return ops;
+    }
+
+    public void setOps(Float ops) {
+        this.ops = ops;
+    }
+
+    public Float getLantency() {
+        return lantency;
+    }
+
+    public void setLantency(Float lantency) {
+        this.lantency = lantency;
+    }
+
+    public Float getBandwith() {
+        return bandwith;
+    }
+
+    public void setBandwith(Float bandwith) {
+        this.bandwith = bandwith;
     }
 }

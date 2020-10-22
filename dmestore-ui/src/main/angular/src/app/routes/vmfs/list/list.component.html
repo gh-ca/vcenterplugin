@@ -180,7 +180,7 @@
               </div>
               <input clrInput style="width: 19%;text-align: center;" readonly value="{{'vmfs.multiply' | translate}}">
               <input clrInput style="width: 27%;" type="number" [(ngModel)]="form.count" name="count" #number="ngModel" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" required/>
-              <clr-control-helper>{{'vmfs.capacityTips' | translate}}</clr-control-helper>
+              <clr-control-helper><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.capacityTips' | translate}}</clr-control-helper>
               <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
           </clr-input-container>
 
@@ -224,7 +224,7 @@
                 </clr-option>
               </clr-options>
             </clr-combobox>
-<!--            <clr-control-helper>Helper text</clr-control-helper>-->
+            <clr-control-helper><clr-icon shape="info-circle" class="is-solid"></clr-icon>{{'validations.comboboxTips' | translate}}</clr-control-helper>
             <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
           </clr-combobox-container>
         </form>
@@ -260,26 +260,26 @@
                   <table class="table table-vertical table-noborder table-compact">
                       <tbody>
                         <tr>
-                          <th hidden></th>3
+                          <th hidden></th>
                           <th>
                             {{item.name}}
                           </th>
                         </tr>
                       <tr>
                         <th hidden></th>
-                          <td>{{'vmfs.capacityUsage' | translate}}</td>
+                        <td>{{'vmfs.capacityUsage' | translate}}</td>
                         <td>{{'vmfs.qos' | translate}}</td>
                         <td>{{'vmfs.protection' | translate}}</td>
                       </tr>
                       <tr>
                         <th hidden></th>
-                        <th><clr-progress-bar clrValue="{{(item.used_capacity/item.total_capacity * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
+                        <th><clr-progress-bar clrValue="{{(item.usedCapacity/item.totalCapacity * 100 || 0).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
                         <th *ngIf="item.capabilities.qos.smartQos.maxiops != null">IOPS <= {{item.capabilities.qos.smartQos.maxiops}}</th>
                         <th *ngIf="item.capabilities.qos.smartQos.miniops != null">IOPS >= {{item.capabilities.qos.smartQos.miniops}}</th>
                       </tr>
                         <tr>
                           <th hidden></th>
-                          <th>{{item.used_capacity}} GB/{{item.total_capacity}}GB</th>
+                          <th>{{item.usedCapacity || 0}} GB/{{item.totalCapacity || 0}}GB</th>
                           <th>Latency: {{item.capabilities.qos.smartQos.latency + item.capabilities.qos.smartQos.latencyUnit}}</th>
                         </tr>
                       </tbody>
@@ -503,7 +503,7 @@
       <form *ngIf="rowSelected.length === 1" clrForm>
 
         <clr-radio-container clrInline>
-          <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.mount.mountObj' | translate}}</label>
+          <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
           <clr-radio-wrapper>
             <input type="radio" clrRadio name="controlPolicy" value="1" [(ngModel)]="mountForm.mountType" ng-checked="true"/>
             <label>{{'vmfs.mount.host' | translate}}</label>
@@ -525,6 +525,7 @@
               </clr-option>
             </clr-options>
           </clr-combobox>
+          <clr-control-helper><clr-icon shape="info-circle" class="is-solid"></clr-icon>{{'validations.comboboxTips' | translate}}</clr-control-helper>
         </clr-combobox-container>
 
         <clr-combobox-container *ngIf="mountForm.mountType==='2'">
@@ -536,6 +537,7 @@
               </clr-option>
             </clr-options>
           </clr-combobox>
+          <clr-control-helper><clr-icon shape="info-circle" class="is-solid"></clr-icon>{{'validations.comboboxTips' | translate}}</clr-control-helper>
         </clr-combobox-container>
 
 <!--        <clr-select-container>-->
@@ -575,7 +577,7 @@
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-input-container>
         <clr-radio-container clrInline>
-          <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.mount.mountObj' | translate}}</label>
+          <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
           <clr-radio-wrapper>
             <input type="radio" clrRadio name="controlPolicy" value="1" [(ngModel)]="unmountForm.mountType" ng-checked="true"/>
             <label>{{'vmfs.mount.host' | translate}}</label>
@@ -586,7 +588,7 @@
           </clr-radio-wrapper>
         </clr-radio-container>
 
-        <clr-datagrid *ngIf="unmountForm.mountType === '1' && mountedCluster.length === 0" [(clrDgSingleSelected)]="chooseUnmountHost" [clrDgLoading]="isLoading">
+        <clr-datagrid *ngIf="unmountForm.mountType === '1'" [(clrDgSingleSelected)]="chooseUnmountHost" [clrDgLoading]="isLoading">
           <clr-dg-column hidden></clr-dg-column>
           <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
           <clr-dg-column [clrDgField]="'type'">{{'vmfs.type' | translate}}</clr-dg-column>
@@ -596,7 +598,7 @@
             <clr-dg-cell>{{'vmfs.host' | translate}}</clr-dg-cell>
           </clr-dg-row>
         </clr-datagrid>
-        <clr-datagrid *ngIf="unmountForm.mountType === '2'" [(clrDgSingleSelected)]="chooseUnmountCluster" Loading]="isLoading">
+        <clr-datagrid *ngIf="unmountForm.mountType === '2'" [(clrDgSingleSelected)]="chooseUnmountCluster" [clrDgLoading]="isLoading">
           <clr-dg-column hidden></clr-dg-column>
           <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
           <clr-dg-column [clrDgField]="'type'">{{'vmfs.type' | translate}}</clr-dg-column>
@@ -652,13 +654,13 @@
                   </tr>
                   <tr>
                     <th hidden></th>
-                    <th><clr-progress-bar clrValue="{{(item.used_capacity/item.total_capacity * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
+                    <th><clr-progress-bar clrValue="{{(item.usedCapacity/item.totalCapacity * 100 || 0).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
                     <th *ngIf="item.capabilities.qos.smartQos.maxiops != null">IOPS <= {{item.capabilities.qos.smartQos.maxiops}}</th>
                     <th *ngIf="item.capabilities.qos.smartQos.miniops != null">IOPS >= {{item.capabilities.qos.smartQos.miniops}}</th>
                   </tr>
                   <tr>
                     <th hidden></th>
-                    <th>{{item.used_capacity}} GB/{{item.total_capacity}}GB</th>
+                    <th>{{item.usedCapacity || 0}} GB/{{item.totalCapacity || 0}}GB</th>
                     <th>Latency: {{item.capabilities.qos.smartQos.latency + item.capabilities.qos.smartQos.latencyUnit}}</th>
                   </tr>
                   </tbody>

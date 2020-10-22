@@ -6,6 +6,7 @@ import {ChartOptions, NfsService, MakePerformance} from "../../nfs/nfs.service";
 import {VolumeInfo} from "../volume-attribute/attribute.service";
 import {MAT_DATE_LOCALE} from "@angular/material/core";
 import {FormControl, FormGroup} from "@angular/forms";
+import {GlobalsService} from "@shared/globals.service";
 
 @Component({
   selector: 'app-performance',
@@ -69,7 +70,9 @@ export class PerformanceComponent implements OnInit, AfterViewInit {
   // endTime
   endTime = null;
 
-  constructor(private nfsService: NfsService, private makePerformance: MakePerformance, private perService: VmfsPerformanceService, private ngZone: NgZone, private cdr: ChangeDetectorRef) {
+  constructor(private nfsService: NfsService, private makePerformance: MakePerformance,
+              private perService: VmfsPerformanceService, private ngZone: NgZone,
+              private cdr: ChangeDetectorRef, private gs: GlobalsService) {
   }
 
   ngAfterViewInit() {
@@ -78,8 +81,9 @@ export class PerformanceComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     // 初始化卷信息
-    // const objectId=ctx[0].id;
-    const objectId = 'urn:vmomi:Datastore:datastore-183:f8e381d7-074b-4fa9-9962-9a68ab6106e1';
+    const ctx = this.gs.getClientSdk().app.getContextObjects();
+    const objectId=ctx[0].id;
+    // const objectId = 'urn:vmomi:Datastore:datastore-183:f8e381d7-074b-4fa9-9962-9a68ab6106e1';
     this.makePerformance.getVolsByObjId(objectId, this.volumeInfoList, this.volNames, this.selectVolName, this.selectVolume);
   }
   // 初始化表格对象

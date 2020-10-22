@@ -11,6 +11,19 @@ export class ModifyService {
    * @param params
    */
   updateVmfs(volumeId: string, params = {}) {
-    return  this.http.put('operatevmfs/updatevmfs?volume_id=' + volumeId, params);
+    return  this.http.put('operatevmfs/updatevmfs?volumeId=' + volumeId, params);
+  }
+
+  /**
+   * 通过objectId 获取vmfs
+   * @param objectId
+   */
+  getVmfsById(objectId) {
+    return this.http.get('accessvmfs/queryvmfs?dataStoreObjectId='+objectId);
+  }
+
+  // 附列表数据
+  getChartData(volumeIds: string[] ) {
+    return this.http.get('accessvmfs/listvmfsperformance', {params: {volumeIds}});
   }
 }

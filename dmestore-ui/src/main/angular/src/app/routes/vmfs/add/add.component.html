@@ -2,7 +2,7 @@
 <clr-wizard class="add-wizard-wrap" #wizard [clrWizardOpen]="true" [clrWizardClosable]="false">
   <clr-wizard-title style="font-weight: bolder">{{'vmfs.addTitle' | translate}}</clr-wizard-title>
 
-  <clr-wizard-button [type]="'cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
+  <clr-wizard-button [type]="'cancel'" (click)="cancel();" >{{'menu.cancel' | translate}}</clr-wizard-button>
   <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>
   <clr-wizard-button [type]="'next'">{{'menu.next' | translate}}</clr-wizard-button>
   <clr-wizard-button (click)="addVmfsHanlde();" [type]="'finish'">{{'menu.ok' | translate}}</clr-wizard-button>
@@ -58,7 +58,7 @@
         </div>
         <input clrInput style="width: 19%;text-align: center;" readonly value="{{'vmfs.multiply' | translate}}">
         <input clrInput style="width: 27%;" type="number" [(ngModel)]="form.count" name="count" #number="ngModel" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" required/>
-        <clr-control-helper>{{'vmfs.capacityTips' | translate}}</clr-control-helper>
+        <clr-control-helper><clr-icon shape="exclamation-circle"></clr-icon>{{'vmfs.capacityTips' | translate}}</clr-control-helper>
         <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-input-container>
 
@@ -102,7 +102,7 @@
             </clr-option>
           </clr-options>
         </clr-combobox>
-        <!--            <clr-control-helper>Helper text</clr-control-helper>-->
+        <clr-control-helper><clr-icon shape="info-circle"></clr-icon>{{'validations.comboboxTips' | translate}}</clr-control-helper>
         <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-combobox-container>
     </form>
@@ -138,7 +138,7 @@
               <table class="table table-vertical table-noborder table-compact">
                 <tbody>
                 <tr>
-                  <th hidden></th>3
+                  <th hidden></th>
                   <th>
                     {{item.name}}
                   </th>
@@ -151,13 +151,13 @@
                 </tr>
                 <tr>
                   <th hidden></th>
-                  <th><clr-progress-bar clrValue="{{(item.used_capacity/item.total_capacity * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
+                  <th><clr-progress-bar clrValue="{{(item.usedCapacity/item.totalCapacity * 100 || 0).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
                   <th *ngIf="item.capabilities.qos.smartQos.maxiops != null">IOPS <= {{item.capabilities.qos.smartQos.maxiops}}</th>
                   <th *ngIf="item.capabilities.qos.smartQos.miniops != null">IOPS >= {{item.capabilities.qos.smartQos.miniops}}</th>
                 </tr>
                 <tr>
                   <th hidden></th>
-                  <th>{{item.used_capacity}} GB/{{item.total_capacity}}GB</th>
+                  <th>{{item.usedCapacity || 0}} GB/{{item.totalCapacity || 0}}GB</th>
                   <th>Latency: {{item.capabilities.qos.smartQos.latency + item.capabilities.qos.smartQos.latencyUnit}}</th>
                 </tr>
                 </tbody>

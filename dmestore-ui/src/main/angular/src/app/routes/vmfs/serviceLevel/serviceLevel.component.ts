@@ -1,7 +1,8 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {ServiceLevelService} from './serviceLevel.service';
-import {ActivatedRoute} from '@angular/router';
-import {GetForm, ServiceLevelList, VmfsListService} from '../list/list.service';
+import {ActivatedRoute, Router} from '@angular/router';
+import {GetForm, ServiceLevelList, VmfsInfo, VmfsListService} from '../list/list.service';
+import {GlobalsService} from "../../../shared/globals.service";
 
 @Component({
   selector: 'app-list',
@@ -12,7 +13,8 @@ import {GetForm, ServiceLevelList, VmfsListService} from '../list/list.service';
 })
 export class ServiceLevelComponent implements OnInit{
 
-  constructor(private remoteSrv: ServiceLevelService, private route: ActivatedRoute, private cdr: ChangeDetectorRef) {
+  constructor(private remoteSrv: ServiceLevelService, private route: ActivatedRoute, private cdr: ChangeDetectorRef,
+              private router:Router, private globalsService: GlobalsService) {
 
   }
 
@@ -25,9 +27,47 @@ export class ServiceLevelComponent implements OnInit{
   changeServiceLevelForm = new GetForm().getChangeLevelForm();
 
   // 服务器/集群ID
-  hostOrClusterId = 'urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1';
+  objectId;
+
+  // 操作来源 list:列表页面、dataStore：在DataStore菜单页面操作
+  resource;
+
+  // vmfs数据
+  vmfsInfo: VmfsInfo;
+
+  // 变更服务等级 隐藏/展示
+  changeServiceLevelShow = false;
 
   ngOnInit(): void {
+    this.changeServiceLevelShow = false;
+    // 获取vmfsInfo
+    // 初始化表单
+    this.changeServiceLevelForm = new GetForm().getChangeLevelForm();
+    this.route.url.subscribe(url => {
+      console.log('url', url);
+      this.route.queryParams.subscribe(queryParam => {
+        this.resource = queryParam.resource;
+        if (this.resource === 'list') {// 以列表为入口
+          this.objectId = queryParam.objectId;
+        } else { // 以dataStore为入口
+          const ctx = this.globalsService.getClientSdk().app.getContextObjects();
+          this.objectId = ctx[0].id;
+        }
+
+        // todo 获取vmfs数据
+        this.remoteSrv.getVmfsById(this.objectId).subscribe((result: any) => {
+          if (result.code === '200' && null != result.data) {
+            this.vmfsInfo = result.data.filter(item => item.objectid === this.objectId)[0];
+
+            // 表单数据初始化
+            const volumeIds = [];
+            volumeIds.push(this.vmfsInfo.volumeId);
+            this.changeServiceLevelForm.volume_ids = volumeIds;
+            this.changeServiceLevelForm.ds_name = this.vmfsInfo.name;
+          }
+        });
+      });
+    });
     // 初始化dataStore数据
     this.getServiceLevels();
   }
@@ -42,17 +82,23 @@ export class ServiceLevelComponent implements OnInit{
     this.remoteSrv.getServiceLevelList().subscribe((result: any) => {
       console.log(result);
       if (result.code === '200' && result.data !== null) {
-        this.serviceLevelList = result.data.data;
+        this.serviceLevelList = result.data;
         console.log('this.serviceLevelList', this.serviceLevelList);
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
+      this.changeServiceLevelShow = true;
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
   /**
    * 取消
    */
   cancel() {
-
+    this.changeServiceLevelShow = false;
+    if (this.resource === 'list') { // 列表入口
+      this.router.navigate(['vmfs/list']);
+    } else { // dataStore入口
+      this.globalsService.getClientSdk().modal.close();
+    }
   }
 
   /**

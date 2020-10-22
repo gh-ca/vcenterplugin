@@ -31,7 +31,8 @@
     "max": "This value should be less than {{number}}",
     "exist": "The {{value}} has exists",
     "inconsistent": "Inconsistent with {{value}}",
-    "invalid_email": "Invalid email"
+    "invalid_email": "Invalid email",
+    "comboboxTips": "If you need to reselect the host/cluster, please delete the data in the input box first."
   },
   "table": {
     "name": "Name",
@@ -232,7 +233,8 @@
       "mountType":"Mount Type",
       "readOnly":"Read Only",
       "readWrite":"Read Write",
-      "mountObj":"Mount Object"
+      "mountObj":"Mount Object",
+      "notChooseDataStoreTips":"Please select the DataStore to be mounted！"
     },
     "del":{
       "title":"Tips",
@@ -241,7 +243,8 @@
     "unmount":{
       "title":"Unmount",
       "content":"Are you sure to unmount?",
-      "notChooseDeviceTips":"Please select the host or cluster to be uninstalled!"
+      "notChooseDeviceTips":"Please select the host or cluster to be uninstalled!",
+      "notChooseDataStoreTips":"Please select the DataStore to be unmounted！"
     },
     "reclaim": {
       "title":"Tips",

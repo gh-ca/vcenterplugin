@@ -146,6 +146,69 @@
          </componentClass>
       </object>
    </extension>
+   <!--vmfs datastore 监控页面-->
+   <extension id="com.dmeplugin.dmestore.datastore.monitorCategory">
+      <extendedPoint>vsphere.core.datastore.monitorCategories</extendedPoint>
+      <object>
+         <label>#{dmemenu.label}</label>
+      </object>
+   </extension>
+
+   <extension id="com.dmeplugin.dmestore.datastore.vmfsmonitorView">
+      <extendedPoint>vsphere.core.datastore.monitorViews</extendedPoint>
+      <object>
+         <name>#{performance.label}</name>
+         <categoryUid>com.dmeplugin.dmestore.datastore.monitorCategory</categoryUid>
+         <contentSpec>
+            <url>/ui/dmestore/index.html?view=vmfs/performance</url>
+         </contentSpec>
+      </object>
+      <metadata>
+         <objectType>Datastore</objectType>
+         <propertyConditions>
+            <com.vmware.data.query.CompositeConstraint>
+               <nestedConstraints>
+                  <com.vmware.data.query.PropertyConstraint>
+                     <propertyName>isVmfs</propertyName>
+                     <comparator>EQUALS</comparator>
+                     <comparableValue>
+                        <Boolean>true</Boolean>
+                     </comparableValue>
+                  </com.vmware.data.query.PropertyConstraint>
+               </nestedConstraints>
+               <conjoiner>AND</conjoiner>
+            </com.vmware.data.query.CompositeConstraint>
+         </propertyConditions>
+      </metadata>
+   </extension>
+   <!--nfs datastore 监控页面-->
+   <extension id="com.dmeplugin.dmestore.datastore.nfsmonitorView">
+      <extendedPoint>vsphere.core.datastore.monitorViews</extendedPoint>
+      <object>
+         <name>#{performance.label}</name>
+         <categoryUid>com.dmeplugin.dmestore.datastore.monitorCategory</categoryUid>
+         <contentSpec>
+            <url>/ui/dmestore/index.html?view=nfs/performance</url>
+         </contentSpec>
+      </object>
+      <metadata>
+         <objectType>Datastore</objectType>
+         <propertyConditions>
+            <com.vmware.data.query.CompositeConstraint>
+               <nestedConstraints>
+                  <com.vmware.data.query.PropertyConstraint>
+                     <propertyName>isNfs</propertyName>
+                     <comparator>EQUALS</comparator>
+                     <comparableValue>
+                        <Boolean>true</Boolean>
+                     </comparableValue>
+                  </com.vmware.data.query.PropertyConstraint>
+               </nestedConstraints>
+               <conjoiner>AND</conjoiner>
+            </com.vmware.data.query.CompositeConstraint>
+         </propertyConditions>
+      </metadata>
+   </extension>
    <!--vmfs datastore 卷详情-->
    <extension id="com.dmeplugin.dmestore.datastore.summary.lunsummary">
 

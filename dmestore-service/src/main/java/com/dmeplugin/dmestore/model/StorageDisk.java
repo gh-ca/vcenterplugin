@@ -15,6 +15,11 @@ public class StorageDisk {
     private Double capacity;
     private String poolId;
     private String storageDeviceId;
+
+    private Float iops;
+    private Float lantency;
+    private Float bandwith;
+    private Float useage;
     //硬盘域
     private List<DiskPool> diskPools;
     //补充字段
@@ -127,5 +132,37 @@ public class StorageDisk {
 
     public void setCapacity(Double capacity) {
         this.capacity = capacity;
+    }
+
+    public Float getIops() {
+        return iops;
+    }
+
+    public void setIops(Float iops) {
+        this.iops = iops;
+    }
+
+    public Float getLantency() {
+        return lantency;
+    }
+
+    public void setLantency(Float lantency) {
+        this.lantency = lantency;
+    }
+
+    public Float getBandwith() {
+        return bandwith;
+    }
+
+    public void setBandwith(Float bandwith) {
+        this.bandwith = bandwith;
+    }
+
+    public Float getUseage() {
+        return useage;
+    }
+
+    public void setUseage(Float useage) {
+        this.useage = useage;
     }
 }
