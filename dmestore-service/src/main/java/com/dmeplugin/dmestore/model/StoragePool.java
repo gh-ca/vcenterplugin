@@ -48,7 +48,7 @@ public class StoragePool   {
     **/
     private Double subscriptionRate;
     /**
-     *类型（块）
+     *类型（块）file 或者 block
     **/
     private String mediaType;
     /**
@@ -72,6 +72,18 @@ public class StoragePool   {
      *订阅容量
     **/
     private Double subscribedCapacity;
+    /**
+     *去重容量
+     **/
+    private Double dedupedCapacity;
+    /**
+     *压缩容量
+     **/
+    private Double compressedCapacity;
+    /**
+     *保护容量
+     **/
+    private Double protectionCapacity;
     /**
      *硬盘类型
     **/
@@ -311,5 +323,29 @@ public class StoragePool   {
 
     public void setMaxLatency(Float maxLatency) {
         this.maxLatency = maxLatency;
+    }
+
+    public Double getDedupedCapacity() {
+        return dedupedCapacity;
+    }
+
+    public void setDedupedCapacity(Double dedupedCapacity) {
+        this.dedupedCapacity = dedupedCapacity;
+    }
+
+    public Double getCompressedCapacity() {
+        return compressedCapacity;
+    }
+
+    public void setCompressedCapacity(Double compressedCapacity) {
+        this.compressedCapacity = compressedCapacity;
+    }
+
+    public Double getProtectionCapacity() {
+        return protectionCapacity;
+    }
+
+    public void setProtectionCapacity(Double protectionCapacity) {
+        this.protectionCapacity = protectionCapacity;
     }
 }
