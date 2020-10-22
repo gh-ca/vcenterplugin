@@ -358,7 +358,6 @@
       <extendedPoint>vise.actions.sets</extendedPoint>
       <object>
          <actions>
-
             <com.vmware.actionsfw.ActionSpec>
                <uid>com.dmeplugin.dmestore.host.iscsi</uid>
                <label>#{hostMenu.iscsi}</label>
@@ -370,6 +369,21 @@
                         <actionUrl>/ui/dmestore/index.html?view=iscsi</actionUrl>
                         <dialogTitle>iscsi</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
+                     </root>
+                  </object>
+               </delegate>
+            </com.vmware.actionsfw.ActionSpec>
+            <com.vmware.actionsfw.ActionSpec>
+               <uid>com.dmeplugin.dmestore.hostbestpractice.apply</uid>
+               <label>#{hostMenu.applyBestPractice}</label>
+               <icon>#{addIcon}</icon>
+               <delegate>
+                  <className>com.vmware.vsphere.client.htmlbridge.HtmlActionDelegate</className>
+                  <object>
+                     <root>
+                        <actionUrl>/ui/dmestore/index.html?view=applybp</actionUrl>
+                        <dialogTitle>#{tip}</dialogTitle>
+                        <dialogSize>380,180</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -412,6 +426,10 @@
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
                   <uid>com.dmeplugin.dmestore.datastore.hostnfsumountaction</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <type>action</type>
+                  <uid>com.dmeplugin.dmestore.hostbestpractice.apply</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
             </Array>
          </children>
@@ -778,6 +796,10 @@
                   <type>action</type>
                   <uid>com.dmeplugin.dmestore.datastore.clusternfsumountaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <type>action</type>
+                  <uid>com.dmeplugin.dmestore.clusterbestpractice.apply</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
             </Array>
          </children>
       </object>
@@ -847,6 +869,21 @@
                         <actionUrl>/ui/dmestore/index.html?view=nfs/cluster/unmount</actionUrl>
                         <dialogTitle>nfs</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
+                     </root>
+                  </object>
+               </delegate>
+            </com.vmware.actionsfw.ActionSpec>
+            <com.vmware.actionsfw.ActionSpec>
+               <uid>com.dmeplugin.dmestore.clusterbestpractice.apply</uid>
+               <label>#{clusterMenu.applyBestPractice}</label>
+               <icon>#{addIcon}</icon>
+               <delegate>
+                  <className>com.vmware.vsphere.client.htmlbridge.HtmlActionDelegate</className>
+                  <object>
+                     <root>
+                        <actionUrl>/ui/dmestore/index.html?view=applybp</actionUrl>
+                        <dialogTitle>#{tip}</dialogTitle>
+                        <dialogSize>380,180</dialogSize>
                      </root>
                   </object>
                </delegate>
