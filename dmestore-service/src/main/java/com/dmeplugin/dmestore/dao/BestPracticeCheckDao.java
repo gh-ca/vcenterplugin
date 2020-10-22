@@ -12,7 +12,9 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: wangxiangyong
@@ -79,14 +81,14 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         return lists;
     }
 
-    public List<String> getAllHostIds(int pageNo, int pageSize) throws SQLException {
-        List<String> lists = new ArrayList<>();
+    public Map<String, String> getAllHostIds(int pageNo, int pageSize) throws SQLException {
+        Map<String, String> map = new HashMap<>(16);
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT HOST_ID from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
+            String sql = "SELECT HOST_ID,HOST_NAME from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
             if (pageNo > 0 && pageSize > 0) {
                 int offset = (pageNo - 1) * pageSize;
                 sql = sql + " OFFSET " + offset + " ROWS FETCH FIRST " + pageSize + " ROWS ONLY";
@@ -94,7 +96,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
-                lists.add(rs.getString("HOST_ID"));
+                map.put(rs.getString("HOST_ID"), rs.getString("HOST_NAME"));
             }
         } catch (DataBaseException | SQLException e) {
             LOGGER.error("getAllHostIds Failed! " + e.getMessage());
@@ -102,7 +104,40 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         } finally {
             closeConnection(con, ps, rs);
         }
-        return lists;
+        return map;
+    }
+
+    public Map<String, String> getByHostIds(List<String> ids) throws SQLException {
+        Map<String, String> map = new HashMap<>(16);
+        if(null == ids || ids.size() == 0){
+            return map;
+        }
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            String sql = "SELECT HOST_ID,HOST_NAME from DP_DME_BEST_PRACTICE_CHECK where 1=1 AND HOST_ID in(%s)";
+            StringBuilder stringBuilder = new StringBuilder();
+            for(int i = 0; i < ids.size(); i++){
+                stringBuilder.append("'").append(ids.get(i)).append("'");
+                if(i < ids.size() -1){
+                    stringBuilder.append(",");
+                }
+            }
+            sql = String.format(sql, stringBuilder.toString());
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                map.put(rs.getString("HOST_ID"), rs.getString("HOST_NAME"));
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("getAllHostIds Failed! " + e.getMessage());
+            throw new SQLException(e);
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return map;
     }
 
     public List<BestPracticeBean> getRecordByPage(String hostSetting, int pageNo, int pageSize) throws SQLException {
@@ -197,21 +232,20 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         }
 
         Connection con = null;
-        PreparedStatement pstm = null;
+        Statement stm = null;
         try {
             con = getConnection();
-            String sql = "delete from DP_DME_BEST_PRACTICE_CHECK where host_id=? and host_setting=?";
-            pstm = con.prepareStatement(sql);
+            String sql = "delete from DP_DME_BEST_PRACTICE_CHECK where host_id='%s' and host_setting='%s'";
+            stm = con.createStatement();
             con.setAutoCommit(false);
             for (BestPracticeUpResultResponse response : list) {
                 List<BestPracticeUpResultBase> baseList = response.getResult();
                 for (BestPracticeUpResultBase base : baseList) {
-                    pstm.setString(1, base.getHostObjectId());
-                    pstm.setString(2, base.getHostSetting());
+                    String sqlTemp = String.format(sql, base.getHostObjectId(), base.getHostSetting());
+                    stm.addBatch(sqlTemp);
                 }
-                pstm.addBatch();
             }
-            pstm.executeBatch();
+            stm.executeBatch();
             con.commit();
         } catch (Exception ex) {
             try {
@@ -221,7 +255,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
                 e.printStackTrace();
             }
         } finally {
-            closeConnection(con, pstm, null);
+            closeConnection(con, stm, null);
         }
     }
 
