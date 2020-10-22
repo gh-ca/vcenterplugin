@@ -58,7 +58,7 @@
         </div>
         <input clrInput style="width: 19%;text-align: center;" readonly value="{{'vmfs.multiply' | translate}}">
         <input clrInput style="width: 27%;" type="number" [(ngModel)]="form.count" name="count" #number="ngModel" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" required/>
-        <clr-control-helper>{{'vmfs.capacityTips' | translate}}</clr-control-helper>
+        <clr-control-helper><clr-icon shape="exclamation-circle"></clr-icon>{{'vmfs.capacityTips' | translate}}</clr-control-helper>
         <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-input-container>
 
@@ -102,7 +102,7 @@
             </clr-option>
           </clr-options>
         </clr-combobox>
-        <!--            <clr-control-helper>Helper text</clr-control-helper>-->
+        <clr-control-helper><clr-icon shape="info-circle"></clr-icon>{{'validations.comboboxTips' | translate}}</clr-control-helper>
         <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-combobox-container>
     </form>
