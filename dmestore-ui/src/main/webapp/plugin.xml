@@ -23,6 +23,7 @@
       <extendedPoint>vise.home.shortcuts</extendedPoint>
       <object>
          <name>#{app.name}</name>
+         <icon>#{plugin-icons}</icon>
          <categoryUid>vsphere.core.controlcenter.administrationCategory</categoryUid>
          <targetViewUid>com.dmeplugin.dmestore.mainView</targetViewUid>
       </object>
@@ -33,6 +34,7 @@
       <extendedPoint>vise.navigator.nodespecs</extendedPoint>
       <object>
          <title>#{app.name}</title>
+         <icon>#{menu-icons}</icon>
          <parentUid>vsphere.core.navigator.solutionsCategory</parentUid>
          <navigationTargetUid>com.dmeplugin.dmestore.mainView</navigationTargetUid>
          <viewOpenedUponFocus className="com.vmware.ui.objectnavigator.views.CategoryNodeTreeView" />
@@ -57,6 +59,7 @@
       <extendedPoint>vise.navigator.nodespecs</extendedPoint>
       <object>
          <title>#{overview}</title>
+         <icon>#{overview-icons}</icon>
          <parentUid>com.dmeplugin.dmestore.entryPoint</parentUid>
          <navigationTargetUid>com.dmeplugin.dmestore.dashboard</navigationTargetUid>
       </object>
@@ -79,6 +82,7 @@
       <extendedPoint>vise.navigator.nodespecs</extendedPoint>
       <object>
          <title>#{storagelist}</title>
+         <icon>#{storage-icons}</icon>
          <parentUid>com.dmeplugin.dmestore.entryPoint</parentUid>
          <navigationTargetUid>com.dmeplugin.dmestore.storageView</navigationTargetUid>
       </object>
@@ -101,6 +105,7 @@
       <extendedPoint>vise.navigator.nodespecs</extendedPoint>
       <object>
          <title>#{vmfsdatastorelist}</title>
+         <icon>#{vmfsdatastore-icons}</icon>
          <parentUid>com.dmeplugin.dmestore.entryPoint</parentUid>
          <navigationTargetUid>com.dmeplugin.dmestore.vmfslist</navigationTargetUid>
       </object>
@@ -123,6 +128,7 @@
       <extendedPoint>vise.navigator.nodespecs</extendedPoint>
       <object>
          <title>#{nfsdatastorelist}</title>
+         <icon>#{nfsdatastore-icons}</icon>
          <parentUid>com.dmeplugin.dmestore.entryPoint</parentUid>
          <navigationTargetUid>com.dmeplugin.dmestore.nfslist</navigationTargetUid>
       </object>
@@ -304,6 +310,7 @@
       <extendedPoint>vise.navigator.nodespecs</extendedPoint>
       <object>
          <title>#{servicelevellist}</title>
+         <icon>#{servicelevel-icons}</icon>
          <parentUid>com.dmeplugin.dmestore.entryPoint</parentUid>
          <navigationTargetUid>com.dmeplugin.dmestore.servicelevelView</navigationTargetUid>
       </object>
@@ -326,6 +333,7 @@
       <extendedPoint>vise.navigator.nodespecs</extendedPoint>
       <object>
          <title>#{bestpractiselist}</title>
+         <icon>#{bestpractice-icons}</icon>
          <parentUid>com.dmeplugin.dmestore.entryPoint</parentUid>
          <navigationTargetUid>com.dmeplugin.dmestore.bestpractiseView</navigationTargetUid>
       </object>
@@ -381,6 +389,7 @@
       <object>
          <!-- <label> is required here because it is an extension to an existing menu -->
          <label>#{dmemenu.label}</label>
+         <icon>#{menu-icons}</icon>
          <uid>com.dmeplugin.dmestore.hostMenu</uid>
          <children>
             <Array>
@@ -420,6 +429,7 @@
       <object>
          <!-- <label> is required here because it is an extension to an existing menu -->
          <label>#{dmemenu.label}</label>
+         <icon>#{menu-icons}</icon>
          <uid>com.dmeplugin.dmestore.datastore.datastoremenu</uid>
          <children>
             <Array>
@@ -748,6 +758,7 @@
       <object>
          <!-- <label> is required here because it is an extension to an existing menu -->
          <label>#{dmemenu.label}</label>
+         <icon>#{menu-icons}</icon>
          <uid>com.dmeplugin.dmestore.hostMenu</uid>
          <children>
             <Array>
@@ -880,6 +891,7 @@
       <object>
          <!-- <label> is required here because it is an extension to an existing menu -->
          <label>#{dmemenu.label}</label>
+         <icon>#{menu-icons}</icon>
          <uid>com.dmeplugin.dmestore.VMMenu</uid>
          <children>
             <Array>
