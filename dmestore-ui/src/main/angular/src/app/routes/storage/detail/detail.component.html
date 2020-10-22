@@ -21,9 +21,9 @@
                 <td class="left">{{'storage.detail.conf.status' | translate}}</td>
                 <td class="left">{{detail.status}}</td>
                 <td class="left">{{'storage.detail.conf.fv' | translate}}</td>
-                <td class="left">固件版本未找到字段</td>
+                <td class="left">{{detail.productVersion}}</td>
                 <td class="left">{{'storage.detail.conf.pv' | translate}}</td>
-                <td class="left">补丁版本未找到字段</td>
+                <td class="left">{{detail.patchVersion}}</td>
               </tr>
               <tr>
                 <td class="left">{{'storage.detail.conf.vendor' | translate}}</td>
@@ -94,25 +94,24 @@
 
                       <clr-dg-row *clrDgItems="let item of storagePool" [clrDgItem]="item">
                         <clr-dg-cell>{{item.name}}</clr-dg-cell>
-                        <clr-dg-cell>{{item.health_status}}</clr-dg-cell>
+                        <clr-dg-cell>{{item.healthStatus}}</clr-dg-cell>
 
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">{{item.physicalType}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table1'">{{item.media_type}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table1'">{{item.mediaType}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">服务等级接口无字段</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table1'">{{item.tier0_raid_lv}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table1'">{{item.tier0RaidLv}}</clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{formatCapacity(item.total_capacity)}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{formatCapacity(item.consumed_capacity)}}</clr-dg-cell>
-                        <!--<clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.consumed_capacity_percentage}}</clr-dg-cell>-->
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{formatCapacity(item.totalCapacity)}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{formatCapacity(item.consumedCapacity)}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table2'">
                           <clr-progress-bar clrValue="{{(item.consumed_capacity_percentage * 100).toFixed(3)}}" clrSuccess clrLabeled></clr-progress-bar>
                         </clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{formatCapacity(item.free_capacity)}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.subscription_rate}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{formatCapacity(item.freeCapacity)}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{item.subscriptionRate}}</clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="poolRadio!=='table3'">时延接口无相关字段</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table3'">IOPS接口无相关字段</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table3'">带宽接口无相关字段</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxLatency ||'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxIops ||'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxBandwidth ||'--'}}</clr-dg-cell>
                       </clr-dg-row>
                     </clr-datagrid>
                   </div>

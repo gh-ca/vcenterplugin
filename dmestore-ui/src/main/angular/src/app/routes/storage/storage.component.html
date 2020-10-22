@@ -1,19 +1,19 @@
 <div style="background-color: #F0F2F5;height: 100%;width: 100%;border: 1px #F0F2F5 solid;">
-  <h4 style="margin-left: 2%;margin-top: 1%;width: 5%">{{'storage.storage' | translate}}</h4>
-  <div class="gh-btngroup-header" style="margin-bottom: 1%">
-    <div class="gh-btngroup-left"></div>
-    <!-- 基本视图、性能视图、刷新 -->
-    <div class="btn-group btn-icon">
-      <div class="radio btn">
-        <input (click)="buttonTrigger = 'list'" type="radio" name="btn-group-buttonTrigger-radios" id="buttonTrigger-1" checked>
-        <label for="buttonTrigger-1"><clr-icon shape="view-list" size="20"></clr-icon></label>
-      </div>
-      <div class="radio btn">
-        <input (click)="buttonTrigger = 'chart'" type="radio" name="btn-group-buttonTrigger-radios" id="buttonTrigger-2">
-        <label for="buttonTrigger-2"><clr-icon shape="view-cards" size="20"></clr-icon></label>
-      </div>
-    </div>
-  </div>
+  <!--<h4 style="margin-left: 2%;margin-top: 1%;width: 5%">{{'storage.storage' | translate}}</h4>-->
+  <!--<div class="gh-btngroup-header" style="margin-bottom: 1%">-->
+    <!--<div class="gh-btngroup-left"></div>-->
+    <!--&lt;!&ndash; 基本视图、性能视图、刷新 &ndash;&gt;-->
+    <!--<div class="btn-group btn-icon">-->
+      <!--<div class="radio btn">-->
+        <!--<input (click)="buttonTrigger = 'list'" type="radio" name="btn-group-buttonTrigger-radios" id="buttonTrigger-1" checked>-->
+        <!--<label for="buttonTrigger-1"><clr-icon shape="view-list" size="20"></clr-icon></label>-->
+      <!--</div>-->
+      <!--<div class="radio btn">-->
+        <!--<input (click)="buttonTrigger = 'chart'" type="radio" name="btn-group-buttonTrigger-radios" id="buttonTrigger-2">-->
+        <!--<label for="buttonTrigger-2"><clr-icon shape="view-cards" size="20"></clr-icon></label>-->
+      <!--</div>-->
+    <!--</div>-->
+  <!--</div>-->
   <div style="background-color: #FFFFFF;height: 85%;width:98%;margin: auto">
     <div style="margin-left: 2%;margin-right: 2%">
       <div *ngIf="buttonTrigger==='list'" style="padding-top: 1%">
@@ -81,14 +81,13 @@
 
             <clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.totalCapacity)}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.totalEffectiveCapacity)}}</clr-dg-cell>
-            <clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.total_pool_capacity)}}</clr-dg-cell>
+            <clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.totalPoolCapacity)}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.usedCapacity)}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table2'">
-              <clr-progress-bar clrValue="{{(item.usedCapacity/item.total_pool_capacity * 100).toFixed(3)}}" clrSuccess clrLabeled></clr-progress-bar>
+              <clr-progress-bar clrValue="{{(item.usedCapacity/item.totalPoolCapacity * 100).toFixed(3)}}" clrSuccess clrLabeled></clr-progress-bar>
             </clr-dg-cell>
-            <clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.total_pool_capacity-item.usedCapacity)}}</clr-dg-cell>
-            <!--<clr-dg-cell [hidden]="radioCheck!=='table2'">{{(item.subscription_capacity/item.total_pool_capacity* 100).toFixed(3)}}</clr-dg-cell>-->
-            <clr-dg-cell [hidden]="radioCheck!=='table2'">接口未返回订阅量字段</clr-dg-cell>
+            <clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.totalPoolCapacity-item.usedCapacity)}}</clr-dg-cell>
+            <clr-dg-cell [hidden]="radioCheck!=='table2'">{{(item.subscriptionCapacity/item.totalPoolCapacity * 100).toFixed(3)}} %</clr-dg-cell>
 
             <clr-dg-cell [hidden]="radioCheck!=='table3'">{{item.maxCpuUtilization}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table3'">{{item.maxLatency}}</clr-dg-cell>
