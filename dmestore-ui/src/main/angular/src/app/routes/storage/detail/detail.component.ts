@@ -678,4 +678,17 @@ export class DetailComponent implements OnInit, AfterViewInit {
     if (c===null || c==='') return 0;
     return Number.parseFloat(c).toFixed(2);
   }
+  formatArry(str: string){
+    if(str===null){
+      return '';
+    }
+    str=str.replace("[","")
+      .replace("]","");
+    const strs=str.split(",");
+    let r=""
+    strs.forEach(s=>{
+      r+=s.replace('"','').replace('"','')+",";
+    });
+    return r.substr(0,r.length-1);
+  }
 }
