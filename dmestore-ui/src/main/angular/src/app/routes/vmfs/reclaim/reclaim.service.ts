@@ -6,7 +6,7 @@ export class ReclaimService {
   constructor(private http: HttpClient) {}
   // 空间回收
   reclaimVmfs(params = {}) { // vmfs空间回收
-    return  this.http.post('operatevmfs/recyclevmfs', params);
+    return  this.http.post('operatevmfs/recyclevmfsbydatastoreids', params);
   }
 }
 

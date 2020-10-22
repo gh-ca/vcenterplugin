@@ -12,4 +12,12 @@ export class ExpandService {
   expandVMFS(params = {}) {
     return  this.http.post('operatevmfs/expandvmfs', params);
   }
+
+  /**
+   * 通过objectId 获取vmfs
+   * @param objectId
+   */
+  getVmfsById(objectId) {
+    return this.http.get('accessvmfs/listvmfs?objectId='+objectId);
+  }
 }

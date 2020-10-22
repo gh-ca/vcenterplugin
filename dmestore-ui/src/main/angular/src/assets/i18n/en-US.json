@@ -232,7 +232,8 @@
       "mountType":"Mount Type",
       "readOnly":"Read Only",
       "readWrite":"Read Write",
-      "mountObj":"Mount Object"
+      "mountObj":"Mount Object",
+      "notChooseDataStoreTips":"Please select the DataStore to be mounted！"
     },
     "del":{
       "title":"Tips",
@@ -241,7 +242,8 @@
     "unmount":{
       "title":"Unmount",
       "content":"Are you sure to unmount?",
-      "notChooseDeviceTips":"Please select the host or cluster to be uninstalled!"
+      "notChooseDeviceTips":"Please select the host or cluster to be uninstalled!",
+      "notChooseDataStoreTips":"Please select the DataStore to be unmounted！"
     },
     "reclaim": {
       "title":"Tips",
