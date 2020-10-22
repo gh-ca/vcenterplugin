@@ -34,13 +34,12 @@ export interface StorageList {
    maxBandwidth: number;
    maxLatency: number;
    azIds: string[];
-   total_pool_capacity: number;
-   subscription_capacity: number;
+   totalPoolCapacity: number;
+   subscriptionCapacity: number;
    maintenanceStart: string;
    maintenanceOvertime: string;
    location: string;
    patchVersion: string;
-  Subscription_capacity
 }
 export class LogicPort{
   id: string;

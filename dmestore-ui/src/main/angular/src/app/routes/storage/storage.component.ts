@@ -37,8 +37,7 @@ export class StorageComponent implements OnInit, AfterViewInit {
     this.isLoading = true;
     this.remoteSrv.getData()
         .subscribe((result: any) => {
-          console.log(result);
-          this.list = result.data.data;
+          this.list = result.data;
           // this.total = result.total_count;
           this.isLoading = false;
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -69,12 +68,12 @@ export class StorageComponent implements OnInit, AfterViewInit {
         chart.name = s.name;
         chart.ip = s.ip;
         chart.model = s.model;
-        chart.capacity  = this.formatCapacity(s.total_pool_capacity);
+        chart.capacity  = this.formatCapacity(s.totalPoolCapacity);
         chart.usedCapacity = this.formatCapacity(s.usedCapacity);
-        chart.freeCapacity = this.formatCapacity(s.total_pool_capacity-s.usedCapacity);
+        chart.freeCapacity = this.formatCapacity(s.totalPoolCapacity-s.usedCapacity);
         chart.alarms = 2;
         chart.events = 1;
-        const title=((s.usedCapacity/s.total_pool_capacity)*100).toFixed(2)+"%";
+        const title=((s.usedCapacity/s.totalPoolCapacity)*100).toFixed(2)+"%";
         const cc = new CapacityChart(title);
         const cs = new CapacitySerie(Number.parseInt(chart.usedCapacity),Number.parseInt(chart.freeCapacity));
         cc.series.push(cs);
