@@ -1399,7 +1399,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         List<String> hostObjIds = new ArrayList<>();
         List<String> volumeIds = new ArrayList<>();
         List<String> dataStoreNames = new ArrayList<>();
-        boolean hasVm = false;
         LOG.info("vmfs dsObjectId==" + dsObjId);
         DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dsObjId);
         LOG.info("getVolumeId==" + dvr.getVolumeId());
@@ -1411,11 +1410,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         if (volumeIds.size() > 0) {
             params.put("volumeIds", volumeIds);
             params.put("dataStoreNames", dataStoreNames);
-        }
-        if (hasVm) {
-            LOG.info("vmfs delete,all vmfs contain vm,can not delete!!!");
-            //抛出异常?
-            return;
         }
 
         //获取datastore关联的所有hostId, dataStoreObjectIds只有一个值
