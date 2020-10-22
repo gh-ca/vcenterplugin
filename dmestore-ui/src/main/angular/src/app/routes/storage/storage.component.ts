@@ -110,6 +110,7 @@ export class StorageComponent implements OnInit, AfterViewInit {
   }
   // 容量单位转换
   formatCapacity(c: number){
+    if(c==null) return '--';
     if (c < 1024){
       return c.toFixed(3)+" MB";
     }else if(c >= 1024 && c< 1048576){

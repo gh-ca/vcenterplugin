@@ -13,13 +13,29 @@
                 <td class="left">{{'storage.detail.conf.name' | translate}}</td>
                 <td class="left">{{detail.name}}</td>
                 <td class="left">{{'storage.detail.conf.ip' | translate}}</td>
-                <td class="left">{{detail.ip}}</td>
+                <td class="left">{{detail.ip}} <clr-icon shape="display" class="is-solid is-highlight"></clr-icon></td>
                 <td class="left">{{'storage.detail.conf.sn' | translate}}</td>
                 <td class="left">{{detail.sn}}</td>
               </tr>
               <tr>
                 <td class="left">{{'storage.detail.conf.status' | translate}}</td>
-                <td class="left">{{detail.status}}</td>
+                <td class="left">
+                  <span *ngIf="detail.status == 0">
+                <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>{{'storage.list.offLine' | translate}}
+              </span>
+                  <span *ngIf="detail.status == 1">
+                <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px;"></span>{{'storage.list.normal' | translate}}
+              </span>
+                  <span *ngIf="detail.status == 2">
+                <span class="color-square" style="background-color: red; margin-right: 10px"></span>{{'storage.list.fault' | translate}}
+              </span>
+                  <span *ngIf="detail.status == 9">
+                <span class="color-square" style="background-color: yellow; margin-right: 10px"></span>{{'storage.list.notMgr' | translate}}
+              </span>
+                  <span *ngIf="!detail.status">
+                <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>--
+              </span>
+                </td>
                 <td class="left">{{'storage.detail.conf.fv' | translate}}</td>
                 <td class="left">{{detail.productVersion}}</td>
                 <td class="left">{{'storage.detail.conf.pv' | translate}}</td>
@@ -311,40 +327,47 @@
           </clr-tab-content>
         </clr-tab>
         <clr-tab>
-          <button clrTabLink (click)="changeTab('capacity')">capacity</button>
+          <button clrTabLink (click)="changeTab('capacity')">{{'storage.detail.cap.capacity' | translate}}</button>
           <clr-tab-content >
             <div class="detail-margin-top">
               <div class="clr-row">
                 <div class="clr-col-lg-4 clr-col-12">
-                  <div>
-                    <div class="">容量利用率</div>
+                  <div class="info-content-title" style="margin-bottom: 2%">{{'storage.detail.cap.capacityUsage' | translate}}</div>
+                  <div style="border: 1px red solid">
                     <div class="capacity-wrap">
-                      <span class="capacity-label">裸容量</span>
+                      <span class="capacity-label">{{'storage.detail.cap.bareCapacity' | translate}}</span>
                       <div class="num-bar_outer">
                         <div class="num-bar_inner"></div>
                       </div>
-                      <span>6.389 TB</span>
+                      <span>{{formatCapacity(detail.totalCapacity)}}</span>
                     </div>
                     <div class="capacity-wrap">
-                      <span class="capacity-label">总容量</span>
+                      <span class="capacity-label">{{'storage.detail.cap.totalCapacity' | translate}}</span>
                       <div class="num-bar_outer">
                         <div class="num-bar_inner total" [ngStyle]="{'width':(3.2/6.389 * 100)+'%'}"></div>
                       </div>
-                      <span>3.2 TB</span>
+                      <span>{{formatCapacity(detail.totalCapacity)}}</span>
                     </div>
                     <div class="capacity-wrap">
-                      <span class="capacity-label">已使用/空闲</span>
+                      <span class="capacity-label">{{'storage.detail.cap.useFree' | translate}}</span>
                       <div class="num-bar_outer">
                         <div class="num-bar_inner used" [ngStyle]="{'width':(2/6.389 * 100)+'%'}"></div>
                         <div class="num-bar_inner free" [ngStyle]="{'width':(1/6.389 * 100)+'%'}"></div>
                       </div>
-                      <span>2 TB / 1 TB</span>
+                      <span>{{formatCapacity(detail.usedCapacity)}} / {{formatCapacity(detail.totalCapacity-detail.usedCapacity)}}</span>
+                    </div>
+                    <div class="capacity-wrap">
+                      <span class="capacity-label">{{'storage.detail.cap.subscribe' | translate}}</span>
+                      <div class="num-bar_outer">
+                        <div class="num-bar_inner total" [ngStyle]="{'width':(3.2/6.389 * 100)+'%'}"></div>
+                      </div>
+                      <span>{{formatCapacity(detail.usedCapacity)}}</span>
                     </div>
                   </div>
                 </div>
                 <div class="clr-col-lg-4 clr-col-12">
                   <div class="info-content-title">{{'storage.chart.capacity' | translate}}</div>
-                  <div class="info-charts-wrap">
+                  <div class="info-charts-wrap" style="border: 1px red solid">
                     <div echarts [options]="cd.chart" id="chart3" style="width: 30%;height: 120px;"></div>
                     <div class="info-content">
                       <div class="info-content-text">
@@ -370,8 +393,8 @@
                   </div>
                 </div>
                 <div class="clr-col-lg-4 clr-col-12">
-                  <div class="availability-box">
-                    <div class="">容量利用率</div>
+                  <div class="info-content-title">容量利用率</div>
+                  <div class="availability-box"  style="border: 1px red solid">
                     <div class="unit-banner">
                       <div class="unit-label"></div>
                       <div class="unit-outer">
@@ -404,20 +427,29 @@
                   </div>
                 </div>
               </div>
-              <div>
-                Storage PoolList
+              <div style="width: 75%">
+                <div class="info-content-title">{{'storage.detail.cap.storagePool' | translate}}</div>
                 <clr-datagrid>
                   <clr-dg-column>{{'storage.detail.capacity.pool.name' | translate}}</clr-dg-column>
                   <clr-dg-column>{{'storage.detail.capacity.pool.status' | translate}}</clr-dg-column>
                   <clr-dg-column>{{'storage.detail.capacity.pool.capacity' | translate}}</clr-dg-column>
+                  <clr-dg-row *clrDgItems="let item of storagePool" [clrDgItem]="item">
+                    <clr-dg-cell>{{item.name}}</clr-dg-cell>
+                    <clr-dg-cell>{{item.healthStatus}}</clr-dg-cell>
+                    <clr-dg-cell>
+                      <clr-progress-bar clrValue="{{((item.consumedCapacity/item.totalCapacity) * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar>
+                      <span>{{'storage.detail.cap.used' | translate}}{{formatCapacity(item.consumedCapacity)}}/{{formatCapacity(item.totalCapacity)}}</span>
+                    </clr-dg-cell>
+                  </clr-dg-row>
                 </clr-datagrid>
               </div>
             </div>
           </clr-tab-content>
         </clr-tab>
         <clr-tab>
-          <button (click)="showChart()" clrTabLink>Performance</button>
+          <button  clrTabLink>{{'storage.detail.performance.performance' | translate}}</button>
           <clr-tab-content clrTabLinkInOverflow="true">
+            <div>{{'storage.detail.performance.ptc' | translate}}</div>
             <div echarts [options]="mychart" style="height: 600px;"></div>
             <div echarts [options]="mychart" style="height: 600px;"></div>
             <div echarts [options]="mychart" style="height: 600px;"></div>

@@ -68,9 +68,43 @@
           <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.bandwidth' | translate}}</clr-dg-column>
 
           <clr-dg-row *ngFor="let item of list" [clrDgItem]="item">
-            <clr-dg-cell (click)="toDetailView(item.id,item.name)">{{item.name}}</clr-dg-cell>
+            <clr-dg-cell><span (click)="toDetailView(item.id,item.name)" style="color:#829DE6;cursor:pointer">{{item.name}}</span></clr-dg-cell>
             <clr-dg-cell>{{item.ip}}</clr-dg-cell>
-            <clr-dg-cell [hidden]="radioCheck!=='table1'">{{parseStatus(item.status,1)}}<br/>{{parseStatus(item.synStatus,2)}}</clr-dg-cell>
+
+            <clr-dg-cell [hidden]="radioCheck!=='table1'">
+
+              <span *ngIf="item.status == 0">
+                <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>{{'storage.list.offLine' | translate}}
+              </span>
+              <span *ngIf="item.status == 1">
+                <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px;"></span>{{'storage.list.normal' | translate}}
+              </span>
+              <span *ngIf="item.status == 2">
+                <span class="color-square" style="background-color: red; margin-right: 10px"></span>{{'storage.list.fault' | translate}}
+              </span>
+              <span *ngIf="item.status == 9">
+                <span class="color-square" style="background-color: yellow; margin-right: 10px"></span>{{'storage.list.notMgr' | translate}}
+              </span>
+              <span *ngIf="!item.status">
+                <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>--
+              </span>
+              <br/>
+              <span *ngIf="item.synStatus == 0">
+                <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>{{'storage.list.notSync' | translate}}
+              </span>
+              <span *ngIf="item.synStatus == 1">
+                <span class="color-square" style="background-color: #00BFFF; margin-right: 10px"></span>
+                {{'storage.list.inSync' | translate}}
+              </span>
+              <span *ngIf="item.synStatus == 2">
+                <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>
+                {{'storage.list.synced' | translate}}
+              </span>
+              <span *ngIf="!item.synStatus">
+                <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>--
+              </span>
+            </clr-dg-cell>
+
             <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.vendor}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.model}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.version}}</clr-dg-cell>
@@ -84,7 +118,7 @@
             <clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.totalPoolCapacity)}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.usedCapacity)}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table2'">
-              <clr-progress-bar clrValue="{{(item.usedCapacity/item.totalPoolCapacity * 100).toFixed(3)}}" clrSuccess clrLabeled></clr-progress-bar>
+              <clr-progress-bar clrValue="{{(item.usedCapacity/item.totalPoolCapacity * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar>
             </clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.totalPoolCapacity-item.usedCapacity)}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table2'">{{(item.subscriptionCapacity/item.totalPoolCapacity * 100).toFixed(3)}} %</clr-dg-cell>

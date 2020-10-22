@@ -276,7 +276,14 @@
       "latency":"时延(毫秒)",
       "iops":"IOPS",
       "ops":"OPS",
-      "bandwidth":"带宽(MB/s)"
+      "bandwidth":"带宽(MB/s)",
+      "offLine":"离线",
+      "normal": "正常",
+      "fault": "故障",
+      "notMgr": "未管理",
+      "notSync": "未同步",
+      "inSync": "同步中",
+      "synced": "已同步"
     },
     "chart":{
       "total":" 总计",
@@ -309,9 +316,19 @@
         "bandwidth": "带宽(MB/s)"
       },
       "cap":{
-        "capacity":"容量"
+        "capacity":"容量",
+        "capacityUsage":"容量利用率",
+        "bareCapacity":"裸容量",
+        "totalCapacity":"总容量",
+        "useFree":"已使用/空闲",
+        "subscribe":"已订阅",
+        "storagePool":"存储池列表",
+        "used":"已用:"
       },
-      "performance":{},
+      "performance":{
+        "performance":"性能",
+        "ptc":"性能趋势图"
+      },
       "storagePool":{
         "storagePool":"存储池",
         "name":"名称",

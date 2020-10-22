@@ -276,7 +276,14 @@
       "latency":"Latency(ms)",
       "iops":"IOPS",
       "ops":"OPS",
-      "bandwidth":"Bandwith(MB/s)"
+      "bandwidth":"Bandwith(MB/s)",
+      "offLine":"Off Line",
+      "normal": "Normal",
+      "fault": "fault",
+      "notMgr": "Not Manage",
+      "notSync": "Not Sync",
+      "inSync": "in Sync",
+      "synced": "Synchronized"
     },
     "chart":{
       "total":" Total",
@@ -306,9 +313,19 @@
         "location":"Location"
       },
       "cap":{
-        "capacity":"Capacity"
+        "capacity":"Capacity",
+        "capacityUsage":"Capacity Usage",
+        "bareCapacity":"Bare Capacity",
+        "totalCapacity":"Total Capacity",
+        "useFree":"Use/Free",
+        "subscribe":"Subscribed",
+        "storagePool":"Storage Pool List",
+        "used":"Used:"
       },
-      "performance":{},
+      "performance":{
+        "performance":"Performance",
+        "ptc":"Performance Trend Chart"
+      },
       "storagePool":{
         "storagePool":"Storage Pools",
         "name":"Name",
