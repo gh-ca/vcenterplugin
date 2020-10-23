@@ -60,7 +60,7 @@ public class VmfsOperationController extends BaseController{
      */
     @PostMapping("/expandvmfs")
     @ResponseBody
-    public ResponseBodyBean expandVMFS(@RequestBody List<Map<String,String >> volumes ){
+    public ResponseBodyBean expandVMFS(@RequestBody Map<String,String > volumes ){
 
         LOG.info("volumes=="+gson.toJson(volumes));
         try {
