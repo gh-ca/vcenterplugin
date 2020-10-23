@@ -1292,7 +1292,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     @Override
     public List<Storage> listStoragePerformance(List<String> storageIds) throws DMEException {
-        List<Storage> relists = null;
+        List<Storage> relists = new ArrayList<>();
         try {
             if (storageIds != null && storageIds.size() > 0) {
                 Map<String, Object> params = new HashMap<>(16);
@@ -1333,7 +1333,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     @Override
     public List<StoragePool> listStoragePoolPerformance(List<String> storagePoolIds) throws DMEException {
-        List<StoragePool> relists = null;
+        List<StoragePool> relists = new ArrayList<>();
         try {
             if (storagePoolIds != null && storagePoolIds.size() > 0) {
                 Map<String, Object> params = new HashMap<>(16);
@@ -1372,7 +1372,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     @Override
     public List<StorageControllers> listStorageControllerPerformance(List<String> storageControllerIds) throws DMEException {
-        List<StorageControllers> relists = null;
+        List<StorageControllers> relists = new ArrayList<>();
         try {
             if (storageControllerIds != null && storageControllerIds.size() > 0) {
                 Map<String, Object> params = new HashMap<>(16);
@@ -1412,7 +1412,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     @Override
     public List<StorageDisk> listStorageDiskPerformance(List<String> storageDiskIds) throws DMEException {
-        List<StorageDisk> relists = null;
+        List<StorageDisk> relists = new ArrayList<>();
         try {
             if (storageDiskIds != null && storageDiskIds.size() > 0) {
                 Map<String, Object> params = new HashMap<>(16);
@@ -1452,7 +1452,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     @Override
     public List<StoragePort> listStoragePortPerformance(List<String> storagePortIds) throws DMEException {
-        List<StoragePort> relists = null;
+        List<StoragePort> relists = new ArrayList<>();
         try {
             if (storagePortIds != null && storagePortIds.size() > 0) {
                 Map<String, Object> params = new HashMap<>(16);
@@ -1492,7 +1492,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     @Override
     public List<Volume> listVolumesPerformance(List<String> volumeIds) throws DMEException {
-        List<Volume> relists = null;
+        List<Volume> relists = new ArrayList<>();
         try {
             if (volumeIds != null && volumeIds.size() > 0) {
                 Map<String, Object> params = new HashMap<>(16);

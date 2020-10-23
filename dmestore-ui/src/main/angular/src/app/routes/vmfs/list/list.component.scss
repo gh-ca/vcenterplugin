@@ -147,3 +147,14 @@
   border-bottom: 1px solid #DDDDDD;
   font-weight: normal;
 }
+
+// 隐藏input标签箭头
+input[type=number] {
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+
+  -moz-appearance: textfield;
+}

@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.utils;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +31,8 @@ public class ToolUtils {
     public final static int MI = 1024 * 1024;
     public final static int GI = 1024 * 1024 * 1024;
 
-    public final static SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public static Gson gson = new Gson();
 
     public static String getStr(Object obj) {
         String re = null;
@@ -63,7 +65,7 @@ public class ToolUtils {
                 re = Integer.parseInt(obj.toString());
             }
         } catch (Exception e) {
-            LOG.error("getInt2 error:"+e.toString());
+            LOG.error("getInt2 error:" + e.toString());
         }
         return re;
     }
@@ -242,7 +244,7 @@ public class ToolUtils {
     public static boolean jsonIsNull(JsonElement obj) {
         boolean re = false;
         try {
-            if (StringUtils.isEmpty(obj) || obj.isJsonNull()) {
+            if (StringUtils.isEmpty(obj) || obj.isJsonNull() || "{}".equals(gson.toJson(obj))) {
                 re = true;
             }
         } catch (Exception e) {

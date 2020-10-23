@@ -184,7 +184,7 @@
     "multiply": "X",
     "iops": "IOPS",
     "iopsQoSTarget": "IOPS QoS上下限",
-    "bandwidth": "带宽(MB/s)",
+    "bandwidth": "带宽",
     "bandwidthQoSTarget": "带宽 QoS上下限",
     "readResponseTime": "读响应时间(ms)",
     "writeResponseTime": "写响应时间(ms)",
