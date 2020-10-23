@@ -343,7 +343,7 @@ export class MakePerformance {
       }
       this.remoteSrv.getLineChartData(url, params).subscribe((result: any) => {
         console.log('chartData: ', title, result);
-        if (result.code === '200' && result.data !== null && result.data.data !== null) {
+        if (result.code === '200' && result.data !== null && result.data !== null) {
           const resData = result.data;
             // 设置标题
           chart.title.text = title;
@@ -429,10 +429,10 @@ export class MakePerformance {
           chart.title.text = title;
           // 设置副标题
           chart.title.subtext = subtext;
-          if (result.code === '200' && result.data !== null && result.data.data !== null) {
+          if (result.code === '200' && result.data !== null && result.data !== null) {
             let resData = result.data;
-            if (result.data.data){
-              resData = result.data.data
+            if (result.data){
+              resData = result.data
             }
             const seriesData = resData[objIds[0]][indicatorIds[0]].series;
             // 设置X轴

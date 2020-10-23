@@ -221,7 +221,7 @@ export class PerformanceService {
         end_time: endTime })
         .subscribe((response: any) => {
           if (response.code === '200' && response.data !== null) {
-            this.resData =  response.data.data;
+            this.resData =  response.data;
             // 设置x轴
             this.setXAxisData(rangeParam, beginTime, endTime, intervalParam);
             // 上限对象

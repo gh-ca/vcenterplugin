@@ -268,7 +268,7 @@ public class DmeStorageController extends BaseController{
      * @param storageIds storage id
      * @return: ResponseBodyBean
      */
-    @RequestMapping(value = "/liststorageperformance", method = RequestMethod.POST)
+    @RequestMapping(value = "/liststorageperformance", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean listStoragePerformance(@RequestParam("storageIds") List<String> storageIds)
             throws Exception {
@@ -291,7 +291,7 @@ public class DmeStorageController extends BaseController{
      * @param storagePoolIds storage pool res Id
      * @return: ResponseBodyBean
      */
-    @RequestMapping(value = "/liststoragepoolperformance", method = RequestMethod.POST)
+    @RequestMapping(value = "/liststoragepoolperformance", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean listStoragePoolPerformance(@RequestParam("storagePoolIds") List<String> storagePoolIds)
             throws Exception {
@@ -314,7 +314,7 @@ public class DmeStorageController extends BaseController{
      * @param storageControllerIds controller res Id
      * @return: ResponseBodyBean
      */
-    @RequestMapping(value = "/listStorageControllerPerformance", method = RequestMethod.POST)
+    @RequestMapping(value = "/listStorageControllerPerformance", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean listStorageControllerPerformance(@RequestParam("storageControllerIds") List<String> storageControllerIds)
             throws Exception {
@@ -337,7 +337,7 @@ public class DmeStorageController extends BaseController{
      * @param storageDiskIds storage disk res Id
      * @return: ResponseBodyBean
      */
-    @RequestMapping(value = "/listStorageDiskPerformance", method = RequestMethod.POST)
+    @RequestMapping(value = "/listStorageDiskPerformance", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean listStorageDiskPerformance(@RequestParam("storageDiskIds") List<String> storageDiskIds)
             throws Exception {
@@ -383,7 +383,7 @@ public class DmeStorageController extends BaseController{
      * @param volumeId storage volume res Id
      * @return: ResponseBodyBean
      */
-    @RequestMapping(value = "/listVolumesPerformance", method = RequestMethod.POST)
+    @RequestMapping(value = "/listVolumesPerformance", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean listVolumesPerformance(@RequestParam("volumeId") List<String> volumeId)
             throws Exception {

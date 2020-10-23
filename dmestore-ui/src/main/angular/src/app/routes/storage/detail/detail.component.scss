@@ -81,7 +81,7 @@
   }
 }
 .num-bar_outer{
-  width: 300px;
+  width: 280px;
   height: 16px;
   margin-right: 30px;
   display: flex;
@@ -158,3 +158,12 @@
 .detail-margin-top{
   margin-top: 1%;
 }
+.color-square {
+  display: inline-block;
+  vertical-align: text-bottom;
+  height: .7rem;
+  width: .7rem;
+  border: .05rem solid #000;
+  border-radius: 2rem;
+}
+
