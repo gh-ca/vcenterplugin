@@ -53,6 +53,11 @@ public class StorageDetail {
      **/
     private Double compressedCapacity;
 
+    /**
+     *节省后容量
+     **/
+    private Double optimizeCapacity;
+
     private String[] azIds;
     private String storagePool;
     private String volume;
@@ -369,5 +374,13 @@ public class StorageDetail {
 
     public void setCompressedCapacity(Double compressedCapacity) {
         this.compressedCapacity = compressedCapacity;
+    }
+
+    public Double getOptimizeCapacity() {
+        return optimizeCapacity;
+    }
+
+    public void setOptimizeCapacity(Double optimizeCapacity) {
+        this.optimizeCapacity = optimizeCapacity;
     }
 }
