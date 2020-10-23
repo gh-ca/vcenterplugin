@@ -19,7 +19,7 @@ export class ExpandComponent implements OnInit{
   }
 
   // 服务器/集群ID
-  objectId = 'urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1';
+  objectId;
 
   // 扩容form
   expandForm = new GetForm().getExpandForm();
@@ -99,6 +99,7 @@ export class ExpandComponent implements OnInit{
       default: // 默认GB 不变
         break;
     }
+    this.expandForm.obj_id = this.objectId;
     // 参数封装
     const params = [];
     params.push(this.expandForm);

@@ -844,6 +844,7 @@ export class VmfsListComponent implements OnInit {
       console.log(this.rowSelected[0]);
       this.expandForm.volume_id = this.rowSelected[0].volumeId;
       this.expandForm.ds_name = this.rowSelected[0].name;
+      this.expandForm.obj_id = this.rowSelected[0].objectid;
     }
   }
   // 扩容处理
