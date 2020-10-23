@@ -39,6 +39,9 @@ public class Volume {
     //volume对应的instanceId
     private String instanceId;
 
+    //wwn标识
+    private String wwn;
+
     private Float iops;
     private Float lantency;
     private Float bandwith;
@@ -193,5 +196,13 @@ public class Volume {
 
     public void setBandwith(Float bandwith) {
         this.bandwith = bandwith;
+    }
+
+    public String getWwn() {
+        return wwn;
+    }
+
+    public void setWwn(String wwn) {
+        this.wwn = wwn;
     }
 }

@@ -444,6 +444,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     volume.setStorageId(ToolUtils.jsonToStr(element.get("storage_id")));
                     String poolRawId = ToolUtils.jsonToStr(element.get("pool_raw_id"));
                     volume.setPoolRawId(poolRawId);
+                    volume.setWwn(ToolUtils.jsonToStr(element.get("volume_wwn")));
                     volume.setCapacityUsage(ToolUtils.jsonToStr(element.get("capacity_usage")));
                     volume.setProtectionStatus(ToolUtils.jsonToBoo(element.get("protected")));
                     volume.setCapacity(ToolUtils.jsonToInt(element.get("capacity"), 0));
@@ -1491,12 +1492,12 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public List<Volume> listVolumesPerformance(List<String> volumeIds) throws DMEException {
+    public List<Volume> listVolumesPerformance(List<String> volumeWwns) throws DMEException {
         List<Volume> relists = new ArrayList<>();
         try {
-            if (volumeIds != null && volumeIds.size() > 0) {
+            if (volumeWwns != null && volumeWwns.size() > 0) {
                 Map<String, Object> params = new HashMap<>(16);
-                params.put("obj_ids", volumeIds);
+                params.put("obj_ids", volumeWwns);
                 Map<String, Object> remap = dataStoreStatisticHistoryService.queryCurrentStatistic(DmeIndicatorConstants.RESOURCE_TYPE_NAME_LUN, params);
                 LOG.info("remap===" + gson.toJson(remap));
                 if (null != remap && remap.size() > 0) {
@@ -1504,11 +1505,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                         JsonObject dataJson = new JsonParser().parse(remap.toString()).getAsJsonObject();
                         if (dataJson != null) {
                             relists = new ArrayList<>();
-                            for (String storagePoolId : volumeIds) {
-                                JsonObject statisticObject = dataJson.getAsJsonObject(storagePoolId);
+                            for (String wwnid : volumeWwns) {
+                                JsonObject statisticObject = dataJson.getAsJsonObject(wwnid);
                                 if (statisticObject != null) {
                                     Volume sp = new Volume();
-                                    //sp.setId(storagePoolId);
+                                    sp.setWwn(wwnid);
                                     sp.setIops(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT)));
                                     sp.setBandwith(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH)));
                                     sp.setLantency(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME)));
