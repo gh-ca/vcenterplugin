@@ -137,4 +137,36 @@ public interface DmeStorageService {
      * @return: ResponseBodyBean
      */
     List<StoragePool> listStoragePoolPerformance(List<String> storagePoolIds) throws DMEException;
+
+    /**
+     *
+     * @param storageControllerIds  controllerid
+     * @return
+     * @throws DMEException
+     */
+    public List<StorageControllers> listStorageControllerPerformance(List<String> storageControllerIds) throws DMEException;
+
+    /**
+     *
+     * @param storageDiskIds  diskid
+     * @return
+     * @throws DMEException
+     */
+    public List<StorageDisk> listStorageDiskPerformance(List<String> storageDiskIds) throws DMEException;
+
+    /**
+     *
+     * @param storagePortIds portid
+     * @return
+     * @throws DMEException
+     */
+    public List<StoragePort> listStoragePortPerformance(List<String> storagePortIds) throws DMEException;
+
+    /**
+     *
+     * @param volumeIds volumeid
+     * @return
+     * @throws DMEException
+     */
+    public List<Volume> listVolumesPerformance(List<String> volumeId) throws DMEException;
 }
