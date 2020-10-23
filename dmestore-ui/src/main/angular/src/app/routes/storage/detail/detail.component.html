@@ -144,9 +144,9 @@
                         <clr-dg-cell [hidden]="poolRadio!=='table2'">{{formatCapacity(item.freeCapacity)}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table2'">{{(item.subscribedCapacity/item.totalCapacity*100).toFixed(2)}}%</clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxLatency.toFixed(2)}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxIops.toFixed(1)}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxBandwidth.toFixed(1)}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxLatency?item.maxLatency.toFixed(2):0.00}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxIops?item.maxIops.toFixed(1):0.0}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxBandwidth?item.maxBandwidth.toFixed(1):0.0}}</clr-dg-cell>
                       </clr-dg-row>
                     </clr-datagrid>
                   </div>
@@ -212,11 +212,17 @@
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.protectionStatus ? "已保护":"未保护"}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.datastores}}</clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">时延接口无相关字段</clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">IOPS接口无相关字段</clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">带宽接口无相关字段</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.maxLatency}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.maxIops}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.maxBandwidth}}</clr-dg-cell>
                       </clr-dg-row>
-
+                      <clr-dg-footer>
+                        <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="volumeTotal">
+                          <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">per page</clr-dg-page-size>
+                          {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+                          of {{pagination.totalItems}}
+                        </clr-dg-pagination>
+                      </clr-dg-footer>
                     </clr-datagrid>
                   </div>
                 </clr-tab-content>
@@ -498,12 +504,11 @@
                           <clr-dg-cell>{{item.name}}</clr-dg-cell>
                           <clr-dg-cell>{{item.status}}</clr-dg-cell>
                           <clr-dg-cell>{{item.softVer}}</clr-dg-cell>
-                          <clr-dg-cell>--</clr-dg-cell>
-                          <clr-dg-cell>--</clr-dg-cell>
-                          <clr-dg-cell>--</clr-dg-cell>
-                          <clr-dg-cell>--</clr-dg-cell>
-                          <clr-dg-cell>--</clr-dg-cell>
-
+                          <clr-dg-cell>{{item.cpuUsage||'--'}}</clr-dg-cell>
+                          <clr-dg-cell>{{item.iops||'--'}}</clr-dg-cell>
+                          <clr-dg-cell>{{item.ops||'--'}}</clr-dg-cell>
+                          <clr-dg-cell>{{item.lantency||'--'}}</clr-dg-cell>
+                          <clr-dg-cell>{{item.bandwith||'--'}}</clr-dg-cell>
                         </clr-dg-row>
                       </clr-datagrid>
                     </div>
@@ -533,10 +538,10 @@
                           <clr-dg-cell>{{item.logicalType}}</clr-dg-cell>
                           <clr-dg-cell>{{item.diskDomain}}</clr-dg-cell>
                           <clr-dg-cell>{{item.speed}}</clr-dg-cell>
-                          <clr-dg-cell>--</clr-dg-cell>
-                          <clr-dg-cell>--</clr-dg-cell>
-                          <clr-dg-cell>--</clr-dg-cell>
-                          <clr-dg-cell>--</clr-dg-cell>
+                          <clr-dg-cell>{{item.iops}}</clr-dg-cell>
+                          <clr-dg-cell>{{item.lantency}}</clr-dg-cell>
+                          <clr-dg-cell>{{item.bandwith}}</clr-dg-cell>
+                          <clr-dg-cell>{{item.useage}}</clr-dg-cell>
                         </clr-dg-row>
                       </clr-datagrid>
                     </div>

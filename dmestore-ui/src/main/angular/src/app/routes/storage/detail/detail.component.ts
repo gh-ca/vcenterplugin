@@ -312,6 +312,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   detail: StorageDetail;
   storagePool: StoragePool[];
   volumes: Volume[];
+  volumeTotal=0;
   volumeSelect = [];
   fsList: FileSystem[];
   dtrees: Dtrees[];
@@ -326,6 +327,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   logicports:LogicPort[];
   fgs:FailoverGroup[];
   storagePoolIds=[];
+  volumeIds=[];
   //portList:
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(queryParam => {
@@ -446,7 +448,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
           this.cdr.detectChanges();
           console.log('pool result:');
           console.log(r);
-          this.listperformance();
+          this.liststoragepoolperformance();
         }
       });
     }else {
@@ -456,19 +458,19 @@ export class DetailComponent implements OnInit, AfterViewInit {
           if (r.code === '200'){
             this.storagePool = r.data;
             this.cdr.detectChanges();
-            this.listperformance();
+            this.liststoragepoolperformance();
           }
         });
       }
     }
   }
-  listperformance(){
+  liststoragepoolperformance(){
     console.log("storagePool",this.storagePool);
     if (this.storagePool === null || this.storagePool.length <= 0){ return; }
     this.storagePool.forEach(item => {
       this.storagePoolIds.push(item.storageInstanceId);
     });
-    this.detailService.listnfsperformance(this.storagePoolIds).subscribe((result: any) => {
+    this.detailService.liststoragepoolperformance(this.storagePoolIds).subscribe((result: any) => {
       if (result.code === '200'){
         const chartList: StoragePool [] = result.data;
         if ( chartList !== null && chartList.length > 0){
@@ -487,14 +489,15 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
   }
   getStorageVolumeList(fresh: boolean){
-    console.log("is null?")
-    console.log(this.volumes)
-    console.log(this.volumes==null)
     if (fresh){
       this.detailService.getVolumeListList(this.storageId).subscribe((r: any) => {
         if (r.code === '200'){
           this.volumes = r.data;
+          if(this.volumes!=null){
+            this.volumeTotal=this.volumes.length;
+          }
           this.cdr.detectChanges();
+          this.listVolumesperformance();
         }
       });
     }else {
@@ -503,11 +506,38 @@ export class DetailComponent implements OnInit, AfterViewInit {
         this.detailService.getVolumeListList(this.storageId).subscribe((r: any) => {
           if (r.code === '200'){
             this.volumes = r.data;
+            if(this.volumes!=null){
+              this.volumeTotal=this.volumes.length;
+            }
             this.cdr.detectChanges();
+            this.listVolumesperformance();
           }
         });
       }
     }
+  }
+  listVolumesperformance(){
+    if (this.volumes === null || this.volumes.length <= 0){ return; }
+    this.volumes.forEach(item => {
+      this.volumeIds.push(item.id);
+    });
+    this.detailService.listVolumesperformance(this.volumeIds).subscribe((result: any) => {
+      if (result.code === '200'){
+        const chartList: Volume [] = result.data;
+        if ( chartList !== null && chartList.length > 0){
+          this.storagePool.forEach(item => {
+            chartList.forEach(charItem => {
+              if (item.id === charItem.id){
+                item.maxBandwidth=charItem.maxBandwidth;
+                item.maxIops=charItem.maxIops;
+                item.maxLatency=charItem.maxLatency;
+              }
+            });
+          });
+          this.cdr.detectChanges();
+        }
+      }
+    });
   }
   getFileSystemList(fresh: boolean){
     if (fresh){

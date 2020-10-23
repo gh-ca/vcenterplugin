@@ -17,8 +17,11 @@ export class DetailService {
   getStoragePoolList(storageId: string){
     return this.http.get('dmestorage/storagepools', {params: {storageId}});
   }
-  listnfsperformance(storagePoolIds:string[]) {
+  liststoragepoolperformance(storagePoolIds:string[]) {
     return this.http.get('dmestorage/liststoragepoolperformance', {params: {storagePoolIds}});
+  }
+  listVolumesperformance(volumeId:string[]) {
+    return this.http.get('dmestorage/listVolumesPerformance', {params: {volumeId}});
   }
   getVolumeListList(storageId: string){
     return this.http.get('dmestorage/volumes', {params: {storageId}});
@@ -126,6 +129,9 @@ export class Volume{
   capacity: number;//总容量 单位GB
   //关联的datastore
   datastores: string;
+  maxBandwidth: number;
+  maxIops: number;
+  maxLatency: number;
 }
 export class Dtrees{
   name: string;
@@ -156,6 +162,10 @@ export class StorageDisk{
   speed: number
   status: string;
   storageDeviceId: string;
+  iops:number;
+  useage:number;
+  bandwith:number;
+  lantency:number;
 }
 export interface PoolList {
    name: string;
@@ -177,5 +187,10 @@ export class StorageController{
   status:string;
   softVer:string;
   cpuInfo:string;
+  cpuUsage:number;
+  iops:number;
+  ops:number;
+  bandwith:number;
+  lantency:number;
 }
 
