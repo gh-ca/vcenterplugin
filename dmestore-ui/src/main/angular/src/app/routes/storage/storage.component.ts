@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import {StorageService, StorageList, StorageChart, CapacityChart, CapacitySerie, PerforChart} from './storage.service';
 import { Router} from "@angular/router";
+import {List} from "../nfs/nfs.service";
 @Component({
   selector: 'app-storage',
   templateUrl: './storage.component.html',
@@ -23,6 +24,7 @@ export class StorageComponent implements OnInit, AfterViewInit {
   radioCheck = 'table1'; // 切换列表页显示
   buttonTrigger ='list'; // 切换列表页显示
   strorageCharts: StorageChart[] = [];
+  obj_ids=[];
   constructor(private remoteSrv: StorageService, private cdr: ChangeDetectorRef, private ngZone: NgZone,private router:Router) {}
   // 生命周期： 初始化数据
   ngOnInit() {
@@ -41,8 +43,31 @@ export class StorageComponent implements OnInit, AfterViewInit {
           // this.total = result.total_count;
           this.isLoading = false;
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-          this.getStrageCharts();
+          //this.getStrageCharts();
+          this.listperformance();
         });
+  }
+  // 性能视图列表
+  listperformance(){
+    if (this.list === null || this.list.length <= 0){ return; }
+    this.list.forEach(item => {
+      this.obj_ids.push(item.id);
+    });
+    this.remoteSrv.listperformance(this.obj_ids).subscribe((result: any) => {
+      if (result.code === '200'){
+        const chartList: StorageList [] = result.data;
+        if ( chartList !== null && chartList.length > 0){
+          this.list.forEach(item => {
+            chartList.forEach(charItem => {
+              if (item.id === charItem.id){
+                item.maxOps=charItem.maxOps;
+              }
+            });
+          });
+          this.cdr.detectChanges();
+        }
+      }
+    });
   }
   check(param){
     console.log(param);
@@ -110,6 +135,7 @@ export class StorageComponent implements OnInit, AfterViewInit {
   }
   // 容量单位转换
   formatCapacity(c: number){
+    if(c==null) return '--';
     if (c < 1024){
       return c.toFixed(3)+" MB";
     }else if(c >= 1024 && c< 1048576){

@@ -278,10 +278,21 @@
       "latency":"时延(毫秒)",
       "iops":"IOPS",
       "ops":"OPS",
-      "bandwidth":"带宽(MB/s)"
+      "bandwidth":"带宽(MB/s)",
+      "offLine":"离线",
+      "normal": "正常",
+      "fault": "故障",
+      "notMgr": "未管理",
+      "notSync": "未同步",
+      "inSync": "同步中",
+      "synced": "已同步"
     },
     "chart":{
       "total":" 总计",
+      "protection":"保护",
+      "fileSystem":"文件系统",
+      "volume":"卷",
+      "freeCapacity":"空闲容量",
       "used":" 已用",
       "free":" 空闲",
       "alarms":" 告警",
@@ -311,9 +322,24 @@
         "bandwidth": "带宽(MB/s)"
       },
       "cap":{
-        "capacity":"容量"
+        "capacity":"容量",
+        "capacityUsage":"容量利用率",
+        "bareCapacity":"裸容量",
+        "totalCapacity":"总容量",
+        "useFree":"已使用/空闲",
+        "subscribe":"已订阅",
+        "storagePool":"存储池列表",
+        "used":"已用:",
+        "capacitySavings":"容量节省率",
+        "beforeSave":"节省前",
+        "afterSave":"节省后",
+        "dedupe": "重删",
+        "compression": "压缩"
       },
-      "performance":{},
+      "performance":{
+        "performance":"性能",
+        "ptc":"性能趋势图"
+      },
       "storagePool":{
         "storagePool":"存储池",
         "name":"名称",
@@ -329,7 +355,11 @@
         "supRate":"订阅率",
         "latency": "时延(ms)",
         "iops": "IOPS",
-        "bandwidth": "带宽(MB/s)"
+        "bandwidth": "带宽(MB/s)",
+        "normal":"正常",
+        "fault":"故障",
+        "degraded":"降级",
+        "unknown":"未知"
       },
       "volumes":{
         "volumes":"卷",
@@ -632,5 +662,14 @@
     "error": "最佳实践实施出错",
     "boot": "您需要重启主机",
     "eff": "主机配置才会生效!"
+  },
+  "enum":{
+    "status":{
+
+    },
+    "type":{
+      "block":"块",
+      "file":"文件"
+    }
   }
 }

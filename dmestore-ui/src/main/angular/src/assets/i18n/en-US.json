@@ -278,10 +278,21 @@
       "latency":"Latency(ms)",
       "iops":"IOPS",
       "ops":"OPS",
-      "bandwidth":"Bandwith(MB/s)"
+      "bandwidth":"Bandwith(MB/s)",
+      "offLine":"Off Line",
+      "normal": "Normal",
+      "fault": "fault",
+      "notMgr": "Not Manage",
+      "notSync": "Not Sync",
+      "inSync": "in Sync",
+      "synced": "Synchronized"
     },
     "chart":{
       "total":" Total",
+      "protection":" Protection",
+      "fileSystem":" File System",
+      "volume":" Volume",
+      "freeCapacity":" Free Capacity",
       "used":" Used",
       "free":" Free",
       "alarms":" Alarms",
@@ -308,9 +319,24 @@
         "location":"Location"
       },
       "cap":{
-        "capacity":"Capacity"
+        "capacity":"Capacity",
+        "capacityUsage":"Capacity Usage",
+        "bareCapacity":"Bare Capacity",
+        "totalCapacity":"Total Capacity",
+        "useFree":"Use/Free",
+        "subscribe":"Subscribed",
+        "storagePool":"Storage Pool List",
+        "used":"Used:",
+        "capacitySavings":"Capacity Savings",
+        "beforeSave":"Before Savings",
+        "afterSave":"After Savings",
+        "dedupe": "Dedupe",
+        "compression": "Compression"
       },
-      "performance":{},
+      "performance":{
+        "performance":"Performance",
+        "ptc":"Performance Trend Chart"
+      },
       "storagePool":{
         "storagePool":"Storage Pools",
         "name":"Name",
@@ -326,7 +352,11 @@
         "supRate":"supscription Rate",
         "latency": "Latency(ms)",
         "iops": "IOPS",
-        "bandwidth": "Bandwidth(MB/s)"
+        "bandwidth": "Bandwidth(MB/s)",
+        "normal":"Normal",
+        "fault":"Fault",
+        "degraded":"Degraded",
+        "unknown":"Unknown"
       },
       "volumes":{
         "volumes":"Volumes",
@@ -629,5 +659,14 @@
     "error": "Best Practice occur Error",
     "boot": "You need reboot host",
     "eff": "Host Config is effective!"
+  },
+   "enum":{
+     "status":{
+
+     },
+     "type":{
+      "block":"Block",
+      "file":"File"
+     }
   }
 }
