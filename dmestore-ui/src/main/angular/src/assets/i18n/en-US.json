@@ -289,6 +289,10 @@
     },
     "chart":{
       "total":" Total",
+      "protection":" Protection",
+      "fileSystem":" File System",
+      "volume":" Volume",
+      "freeCapacity":" Free Capacity",
       "used":" Used",
       "free":" Free",
       "alarms":" Alarms",
@@ -322,7 +326,12 @@
         "useFree":"Use/Free",
         "subscribe":"Subscribed",
         "storagePool":"Storage Pool List",
-        "used":"Used:"
+        "used":"Used:",
+        "capacitySavings":"Capacity Savings",
+        "beforeSave":"Before Savings",
+        "afterSave":"After Savings",
+        "dedupe": "Dedupe",
+        "compression": "Compression"
       },
       "performance":{
         "performance":"Performance",
@@ -642,5 +651,14 @@
     "minIOPSs": "OrderBy MinIOPS",
     "maxBandWidths": "OrderBy MaxBandWidth",
     "minBandWidths": "OrderBy MinBandWidth"
-  }
+  },
+   "enum":{
+     "status":{
+
+     },
+     "type":{
+      "block":"Block",
+      "file":"File"
+     }
+   }
 }

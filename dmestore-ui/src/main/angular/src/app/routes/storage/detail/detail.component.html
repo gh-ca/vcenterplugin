@@ -132,7 +132,11 @@
                           <span *ngIf="item.physicalType == 'nl-sas'">NL-SAS</span>
                           <span *ngIf="item.physicalType == 'unknown'">{{'storage.detail.storagePool.unknown' | translate}}</span>
                         </clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table1'">{{item.mediaType}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table1'">
+                          <span *ngIf="!item.mediaType">--</span>
+                          <span *ngIf="item.mediaType == 'file'">{{'enum.type.file' | translate}}</span>
+                          <span *ngIf="item.mediaType == 'block'">{{'enum.type.block' | translate}}</span>
+                        </clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">{{formatArry(item.serviceLevelName)}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">{{item.tier0RaidLv}}</clr-dg-cell>
 
@@ -355,104 +359,109 @@
           <button clrTabLink (click)="changeTab('capacity')">{{'storage.detail.cap.capacity' | translate}}</button>
           <clr-tab-content >
             <div class="detail-margin-top">
-              <div class="clr-row">
-                <div class="clr-col-lg-4 clr-col-12">
-                  <div class="info-content-title" style="margin-bottom: 2%">{{'storage.detail.cap.capacityUsage' | translate}}</div>
-                  <div style=".data">
-                    <div class="capacity-wrap">
-                      <span class="capacity-label">{{'storage.detail.cap.bareCapacity' | translate}}</span>
-                      <div class="num-bar_outer">
-                        <div class="num-bar_inner"></div>
+              <div *ngIf="detail" class="clr-row">
+                  <div class="clr-col-lg-4 clr-col-12">
+                    <div class="info-content-title" style="margin-bottom: 2%">{{'storage.detail.cap.capacityUsage' | translate}}</div>
+                    <div style=".data">
+                      <div class="capacity-wrap">
+                        <span class="capacity-label">{{'storage.detail.cap.bareCapacity' | translate}}</span>
+                        <div class="num-bar_outer">
+                          <div class="num-bar_inner"></div>
+                        </div>
+                        <span>{{formatCapacity(detail.totalCapacity)}}</span>
                       </div>
-                      <!--<span>{{formatCapacity(detail.totalCapacity)}}</span>-->
-                      <span>1</span>
-                    </div>
-                    <div class="capacity-wrap">
-                      <span class="capacity-label">{{'storage.detail.cap.totalCapacity' | translate}}</span>
-                      <div class="num-bar_outer">
-                        <div class="num-bar_inner total" [ngStyle]="{'width':(3.2/6.389 * 100)+'%'}"></div>
+                      <div class="capacity-wrap">
+                        <span class="capacity-label">{{'storage.detail.cap.totalCapacity' | translate}}</span>
+                        <div class="num-bar_outer">
+                          <div class="num-bar_inner total" [ngStyle]="{'width':(detail.totalEffectiveCapacity/detail.totalCapacity * 100)+'%'}"></div>
+                        </div>
+                        <span>{{formatCapacity(detail.totalEffectiveCapacity)}}</span>
                       </div>
-                      <!--<span>{{formatCapacity(detail.totalCapacity)}}</span>-->
-                      <span>1</span>
-                    </div>
-                    <div class="capacity-wrap">
-                      <span class="capacity-label">{{'storage.detail.cap.useFree' | translate}}</span>
-                      <div class="num-bar_outer">
-                        <div class="num-bar_inner used" [ngStyle]="{'width':(2/6.389 * 100)+'%'}"></div>
-                        <div class="num-bar_inner free" [ngStyle]="{'width':(1/6.389 * 100)+'%'}"></div>
+                      <div class="capacity-wrap">
+                        <span class="capacity-label">{{'storage.detail.cap.useFree' | translate}}</span>
+                        <div class="num-bar_outer">
+                          <div class="num-bar_inner used" [ngStyle]="{'width':(detail.usedCapacity/detail.totalCapacity * 100)+'%'}"></div>
+                          <div class="num-bar_inner free" [ngStyle]="{'width':((detail.totalEffectiveCapacity-detail.usedCapacity)/detail.totalCapacity * 100)+'%'}"></div>
+                        </div>
+                        <span>{{formatCapacity(detail.usedCapacity)}} / {{getFreeCapacity(detail.totalEffectiveCapacity,detail.usedCapacity)}}</span>
                       </div>
-                      <!--<span>{{formatCapacity(detail.usedCapacity)}} / {{formatCapacity(detail.totalCapacity-detail.usedCapacity)}}</span>-->
-                    </div>
-                    <div class="capacity-wrap">
-                      <span class="capacity-label">{{'storage.detail.cap.subscribe' | translate}}</span>
-                      <div class="num-bar_outer">
-                        <div class="num-bar_inner total" [ngStyle]="{'width':(3.2/6.389 * 100)+'%'}"></div>
-                      </div>
-                      <!--<span>{{formatCapacity(detail.usedCapacity)}}</span>-->
-                    </div>
-                  </div>
-                </div>
-                <div class="clr-col-lg-4 clr-col-12">
-                  <div class="info-content-title">{{'storage.chart.capacity' | translate}}</div>
-                  <div class="info-charts-wrap" style=".data">
-                    <div echarts [options]="cd.chart" id="chart3" style="width: 30%;height: 120px;"></div>
-                    <div class="info-content">
-                      <div class="info-content-text">
-                        <span>{{'storage.chart.total' | translate}}</span>
-                        <span>{{cd.protection}}</span>
-                      </div>
-                      <div class="info-content-text">
-                        <span>{{'storage.chart.used' | translate}}</span>
-                        <span>{{cd.fileSystem}}</span>
-                        <span class="squre used"></span>
-                      </div>
-                      <div class="info-content-text">
-                        <span>{{'storage.chart.free' | translate}}</span>
-                        <span>{{cd.volume}}</span>
-                        <span class="squre free"></span>
-                      </div>
-                      <div class="info-content-text">
-                        <span>{{'storage.chart.free' | translate}}</span>
-                        <span>{{cd.freeCapacity}}</span>
-                        <span class="squre free"></span>
+                      <div class="capacity-wrap">
+                        <span class="capacity-label">{{'storage.detail.cap.subscribe' | translate}}</span>
+                        <div class="num-bar_outer">
+                          <div class="num-bar_inner total" [ngStyle]="{'width':(detail.subscriptionCapacity/detail.totalCapacity * 100)+'%'}"></div>
+                        </div>
+                        <span>{{formatCapacity(detail.subscriptionCapacity)}}</span>
                       </div>
                     </div>
                   </div>
-                </div>
-                <div class="clr-col-lg-4 clr-col-12">
-                  <div class="info-content-title">容量利用率</div>
-                  <div class="availability-box"  style=".data">
-                    <div class="unit-banner">
-                      <div class="unit-label"></div>
-                      <div class="unit-outer">
-                        <div *ngFor="let item of [0,1,2,3]" class="unit-inner" [ngStyle]="{'width':(1/4 * 100)+'%'}">
-                          {{item}}
+                  <div class="clr-col-lg-4 clr-col-12">
+                    <div class="info-content-title">{{'storage.chart.capacity' | translate}}</div>
+                    <div class="info-charts-wrap" style=".data">
+                      <div echarts [options]="cd.chart" id="chart3" style="width: 30%;height: 120px;"></div>
+                      <div class="info-content">
+                        <div class="info-content-text">
+                          <span>{{'storage.chart.protection' | translate}}</span>
+                          <span>{{cd.protection}}</span>
+                        </div>
+                        <div class="info-content-text">
+                          <span>{{'storage.chart.fileSystem' | translate}}</span>
+                          <span>{{cd.fileSystem}}</span>
+                          <span class="squre used"></span>
+                        </div>
+                        <div class="info-content-text">
+                          <span>{{'storage.chart.volume' | translate}}</span>
+                          <span>{{cd.volume}}</span>
+                          <span class="squre free"></span>
+                        </div>
+                        <div class="info-content-text">
+                          <span>{{'storage.chart.freeCapacity' | translate}}</span>
+                          <span>{{cd.freeCapacity}}</span>
+                          <span class="squre free"></span>
                         </div>
                       </div>
-                      <div>4(TB)</div>
                     </div>
-                    <div class="capacity-line">
-                      <div class="unit-label">节省前</div>
-                      <div class="unit-outer">
-                        <div class="unit-inner_bar" [ngStyle]="{'width':(2.5/4 * 100)+'%'}"></div>
-                        <span class="num">2.5</span>
+                  </div>
+                  <div class="clr-col-lg-4 clr-col-12">
+                    <div class="info-content-title">{{'storage.detail.cap.capacitySavings' | translate}}</div>
+                    <div class="availability-box"  style=".data">
+                      <div class="unit-banner">
+                        <div class="unit-label"></div>
+                        <div class="unit-outer">
+                          <div *ngFor="let item of capSave.bars" class="unit-inner" [ngStyle]="{'width':(1/4 * 100)+'%'}">
+                            {{item}}
+                          </div>
+                        </div>
+                        <div>({{capSave.unit}})</div>
                       </div>
-                    </div>
-                    <div class="capacity-line">
-                      <div class="unit-tips">重删</div>
-                    </div>
-                    <div class="capacity-line">
-                      <div class="unit-tips">压缩</div>
-                    </div>
-                    <div class="capacity-line">
-                      <div class="unit-label">节省后</div>
-                      <div class="unit-outer">
-                        <div class="unit-inner_bar" [ngStyle]="{'width':(2.5/4 * 100)+'%'}"></div>
-                        <span class="num">2.5</span>
+                      <div class="capacity-line">
+                        <div class="unit-label">{{'storage.detail.cap.beforeSave' | translate}}</div>
+                        <div class="unit-outer">
+                          <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.beforeSave/capSave.max * 100)+'%'}"></div>
+                          <span *ngIf="capSave.dedupe!=null && capSave.dedupe!=0" class="num">{{capSave.beforeSave}}</span>
+                        </div>
+                      </div>
+                      <div class="capacity-line">
+                        <div class="unit-tips">{{'storage.detail.cap.dedupe' | translate}}</div>
+                        <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.dedupe/capSave.max * 100)+'%'}"></div>
+                        <span *ngIf="capSave.dedupe!=null && capSave.dedupe!=0" class="num">{{capSave.dedupe}}</span>
+                      </div>
+                      <div class="capacity-line">
+                        <div class="unit-tips">{{'storage.detail.cap.compression' | translate}}</div>
+                        <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.compression/capSave.max * 100)+'%'}"></div>
+                        <span *ngIf="capSave.dedupe!=null && capSave.dedupe!=0" class="num">{{capSave.compression}}</span>
+                      </div>
+                      <div class="capacity-line">
+                        <div class="unit-label">{{'storage.detail.cap.afterSave' | translate}}</div>
+                        <div class="unit-outer">
+                          <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.afterSave/capSave.max * 100)+'%'}"></div>
+                          <span *ngIf="capSave.dedupe!=null && capSave.dedupe!=0" class="num">{{capSave.afterSave}}</span>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+              </div>
+              <div *ngIf="!detail">
+                无
               </div>
               <div style="width: 75%">
                 <div class="info-content-title">{{'storage.detail.cap.storagePool' | translate}}</div>

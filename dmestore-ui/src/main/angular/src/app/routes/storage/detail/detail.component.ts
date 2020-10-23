@@ -1,6 +1,7 @@
 import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone, OnInit} from '@angular/core';
 import {
-  CapacityDistribution, DetailService, Dtrees, NfsShare, PoolList, StorageController, StorageDetail, StorageDisk,
+  CapacityDistribution, CapacitySavings, DetailService, Dtrees, NfsShare, PoolList, StorageController, StorageDetail,
+  StorageDisk,
   StoragePool,
   Volume
 } from './detail.service';
@@ -20,7 +21,7 @@ import {BondPort, EthernetPort, FailoverGroup, FCoEPort, FCPort, LogicPort} from
 export class DetailComponent implements OnInit, AfterViewInit {
 
   cd : CapacityDistribution;
-
+  capSave:CapacitySavings;
 
 
   options = {
@@ -336,7 +337,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
     this.getStorageDetail(true);
     this.getStoragePoolList(true);
-    this.initCapacity();
+    //this.initCapacity();
   }
   ngAfterViewInit() {
     this.ngZone.runOutsideAngular(() => this.initChart());
@@ -708,20 +709,50 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   initCapacity(){
     this.initCapacityDistribution();
+    this.buildCapacitySavings();
+  }
+
+  buildCapacitySavings(){
+    this.capSave=new CapacitySavings();
+    const usedCapacity=this.detail.usedCapacity; //默认单位是GB
+    const beforeSave=Math.trunc(usedCapacity);//先取整数
+    if(beforeSave< 4096){
+      this.capSave.unit="GB";
+      this.capSave.max=beforeSave+4-beforeSave%4;
+      this.capSave.beforeSave=this.detail.usedCapacity;
+      this.capSave.dedupe=this.detail.dedupedCapacity;
+      this.capSave.compression=this.detail.compressedCapacity;
+      this.capSave.afterSave=this.detail.optimizeCapacity;
+    }else{
+      this.capSave.unit="TB";
+
+      this.capSave.beforeSave=this.detail.usedCapacity?this.detail.usedCapacity/1024:null;
+      this.capSave.dedupe=this.detail.dedupedCapacity?this.detail.dedupedCapacity/1024:null;
+      this.capSave.compression=this.detail.compressedCapacity?this.detail.compressedCapacity/1024:null;
+      this.capSave.afterSave=this.detail.optimizeCapacity?this.detail.optimizeCapacity/1024:null;
+      const max=Math.trunc(beforeSave/1024);
+      this.capSave.max=max+4-max%4;
+    }
+    const bars=[0];
+    for(var i=0;i<4;i++){
+      bars.push(this.capSave.max/4*(i+1))
+    }
+    this.capSave.bars=bars;
+    this.capSave.rate=(this.capSave.beforeSave/this.capSave.afterSave).toFixed(0) +": 1";
   }
   initCapacityDistribution(){
     this.cd = new CapacityDistribution();
     const p= 0;
-    this.cd.protection = p.toFixed(3);
-    const fs = 4;
-    this.cd.fileSystem = fs.toFixed(3);
+    this.detail.protectionCapacity
+    this.cd.protection = this.formatCapacity(this.detail.protectionCapacity);
+    this.cd.fileSystem =this.formatCapacity(this.detail.fileCapacity);
     const v = 2.024;
-    this.cd.volume = v.toFixed(3);
-    const fc =1.078;
-     this.cd.freeCapacity= fc.toFixed(3);
+    this.cd.volume =this.formatCapacity(this.detail.blockCapacity);
+     this.cd.freeCapacity= this.getFreeCapacity(this.detail.totalEffectiveCapacity,this.detail.usedCapacity);
 
-    const cc = new CapacityChart('3.016 TB');
-    const cs = new CapacitySerie(2.024,1.078);
+    const cc = new CapacityChart(this.formatCapacity(this.detail.totalEffectiveCapacity));
+    const free=(this.detail.totalEffectiveCapacity-this.detail.usedCapacity)*100;
+    const cs = new CapacitySerie(this.detail.usedCapacity,free);
     cc.series.push(cs);
     this.cd.chart = cc;
   }
@@ -744,5 +775,12 @@ export class DetailComponent implements OnInit, AfterViewInit {
       r+=s.replace('"','').replace('"','')+",";
     });
     return r.substr(0,r.length-1);
+  }
+  getFreeCapacity(t:number,u:number){
+    if(t==null ||t==0) return this.formatCapacity(0);
+    if(u==null || u==0){
+      return this.formatCapacity(t);
+    }
+    return this.formatCapacity(t-u);
   }
 }
