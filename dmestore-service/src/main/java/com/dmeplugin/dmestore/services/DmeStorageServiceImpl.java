@@ -221,6 +221,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 storageObj.setBlockCapacity(blockCapacity);
                 storageObj.setDedupedCapacity(dedupedCapacity);
                 storageObj.setCompressedCapacity(compressedCapacity);
+                storageObj.setOptimizeCapacity(storageObj.getUsedCapacity()-dedupedCapacity-compressedCapacity);
 
 
                 JsonArray ids = element.get("az_ids").getAsJsonArray();
@@ -429,6 +430,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             if (object != null) {
                 JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.get("volumes").getAsJsonArray();
+                Map<String,String> poolnamecacheMap=new HashMap<>();
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
                     Volume volume = new Volume();
@@ -446,7 +448,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     volume.setProtectionStatus(ToolUtils.jsonToBoo(element.get("protected")));
                     volume.setCapacity(ToolUtils.jsonToInt(element.get("capacity"), 0));
                     volume.setDatastores(getDataStoreOnVolume(volumeId));
-                    volume.setStoragePoolName(getStorageByPoolRawId(poolRawId));
+                    String poolname="";
+                    if (null==poolnamecacheMap.get(poolRawId)){
+                        poolnamecacheMap.put(poolRawId,getStorageByPoolRawId(poolRawId));
+                    }
+                    volume.setStoragePoolName(poolnamecacheMap.get(poolRawId));
                     volumes.add(volume);
                 }
                 //resMap.put("data", volumes);
@@ -687,13 +693,36 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             if (!StringUtils.isEmpty(object)) {
                 JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
+
+                List<String> resids=new ArrayList<>();
+
+                for (JsonElement jsonElement : jsonArray) {
+                    JsonObject element = jsonElement.getAsJsonObject();
+                    String id = ToolUtils.jsonToStr(element.get("id"));
+                    resids.add(id);
+                }
+
+                List<StorageControllers> storageControllersperf=listStorageControllerPerformance(resids);
+                Map<String,StorageControllers> storageControllersMap=new HashMap<>();
+                for (StorageControllers storageControllers:storageControllersperf){
+                    storageControllersMap.put(storageControllers.getId(),storageControllers);
+                }
+
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
                     StorageControllers storageControllers = new StorageControllers();
+                    storageControllers.setId(ToolUtils.jsonToStr(element.get("id")));
                     storageControllers.setName(ToolUtils.jsonToStr(element.get("name")));
                     storageControllers.setSoftVer(ToolUtils.jsonToStr(element.get("softVer")));
                     storageControllers.setStatus(ToolUtils.jsonToStr(element.get("status")));
                     storageControllers.setCpuInfo(ToolUtils.jsonToStr(element.get("cpuInfo")));
+                    if(null!=storageControllersMap.get(storageControllers.getId()))
+                    {
+                        storageControllers.setLantency(storageControllersMap.get(storageControllers.getId()).getLantency());
+                        storageControllers.setBandwith(storageControllersMap.get(storageControllers.getId()).getBandwith());
+                        storageControllers.setIops(storageControllersMap.get(storageControllers.getId()).getIops());
+                        storageControllers.setCpuUsage(storageControllersMap.get(storageControllers.getId()).getCpuUsage());
+                    }
                     resList.add(storageControllers);
                 }
                 //resMap.put("data", resList);
@@ -737,9 +766,24 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             if (!StringUtils.isEmpty(object)) {
                 JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
+
+                List<String> resids=new ArrayList<>();
+
+                for (JsonElement jsonElement : jsonArray) {
+                    JsonObject element = jsonElement.getAsJsonObject();
+                    String id = ToolUtils.jsonToStr(element.get("id"));
+                    resids.add(id);
+                }
+
+                List<StorageDisk> storageDiskperf=listStorageDiskPerformance(resids);
+                Map<String,StorageDisk> storageDiskMap=new HashMap<>();
+                for (StorageDisk storageDisk:storageDiskperf){
+                    storageDiskMap.put(storageDisk.getId(),storageDisk);
+                }
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
                     StorageDisk storageDisk = new StorageDisk();
+                    storageDisk.setId(ToolUtils.jsonToStr(element.get("id")));
                     storageDisk.setName(ToolUtils.jsonToStr(element.get("name")));
                     storageDisk.setStatus(ToolUtils.jsonToStr(element.get("status")));
                     storageDisk.setCapacity(ToolUtils.jsonToDou(element.get("capacity"), 0.0));
@@ -750,6 +794,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storageDisk.setPoolId(poolId);
                     storageDisk.setStorageDeviceId(ToolUtils.jsonToStr(element.get("storageDeviceId")));
                     storageDisk.setDiskPools(getDiskPoolByPoolId(poolId));
+                    if(null!=storageDiskMap.get(storageDisk.getId()))
+                    {
+                        storageDisk.setLantency(storageDiskMap.get(storageDisk.getId()).getLantency());
+                        storageDisk.setBandwith(storageDiskMap.get(storageDisk.getId()).getBandwith());
+                        storageDisk.setIops(storageDiskMap.get(storageDisk.getId()).getIops());
+                        storageDisk.setUseage(storageDiskMap.get(storageDisk.getId()).getUseage());
+                    }
                     resList.add(storageDisk);
                 }
                 //resMap.put("data", resList);
@@ -1022,6 +1073,20 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
             JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
 
+            List<String> resids=new ArrayList<>();
+
+            for (JsonElement jsonElement : jsonArray) {
+                JsonObject element = jsonElement.getAsJsonObject();
+                String id = ToolUtils.jsonToStr(element.get("id"));
+                resids.add(id);
+            }
+
+            List<StoragePort> storagePortperf=listStoragePortPerformance(resids);
+            Map<String,StoragePort> storagePortMap=new HashMap<>();
+            for (StoragePort storagePort:storagePortperf){
+                storagePortMap.put(storagePort.getId(),storagePort);
+            }
+
             for (JsonElement jsonElement : jsonArray) {
                 JsonObject element = jsonElement.getAsJsonObject();
                 StoragePort storagePort = new StoragePort();
@@ -1053,6 +1118,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 storagePort.setSpeed(ToolUtils.jsonToInt(element.get("speed")));
                 storagePort.setMaxSpeed(ToolUtils.jsonToInt(element.get("maxSpeed")));
                 storagePort.setStorageDeviceId(ToolUtils.jsonToStr(element.get("storageDeviceId")));
+                if(null!=storagePortMap.get(storagePort.getId()))
+                {
+                    storagePort.setLantency(storagePortMap.get(storagePort.getId()).getLantency());
+                    storagePort.setBandwith(storagePortMap.get(storagePort.getId()).getBandwith());
+                    storagePort.setIops(storagePortMap.get(storagePort.getId()).getIops());
+                    storagePort.setUseage(storagePortMap.get(storagePort.getId()).getUseage());
+                }
                 if (portType.equals(type)) {
                     storagePorts.add(storagePort);
                 } else if ("ALL".equals(portType)) {
@@ -1298,27 +1370,29 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return relists;
     }
 
+    @Override
     public List<StorageControllers> listStorageControllerPerformance(List<String> storageControllerIds) throws DMEException {
         List<StorageControllers> relists = null;
         try {
             if (storageControllerIds != null && storageControllerIds.size() > 0) {
                 Map<String, Object> params = new HashMap<>(16);
                 params.put("obj_ids", storageControllerIds);
-                Map<String, Object> remap = dataStoreStatisticHistoryService.queryCurrentStatistic(DmeIndicatorConstants.RESOURCE_TYPE_NAME_STORAGEPOOL, params);
+                Map<String, Object> remap = dataStoreStatisticHistoryService.queryCurrentStatistic(DmeIndicatorConstants.RESOURCE_TYPE_NAME_CONTROLLER, params);
                 LOG.info("remap===" + gson.toJson(remap));
                 if (null != remap && remap.size() > 0) {
                     try {
                         JsonObject dataJson = new JsonParser().parse(remap.toString()).getAsJsonObject();
                         if (dataJson != null) {
                             relists = new ArrayList<>();
-                            for (String storagePoolId : storageControllerIds) {
-                                JsonObject statisticObject = dataJson.getAsJsonObject(storagePoolId);
+                            for (String storagecontrollerid : storageControllerIds) {
+                                JsonObject statisticObject = dataJson.getAsJsonObject(storagecontrollerid);
                                 if (statisticObject != null) {
                                     StorageControllers sp = new StorageControllers();
-                                    //sp.setId(storagePoolId);
-                                    sp.setIops(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT)));
-                                    sp.setBandwith(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH)));
-                                    sp.setLantency(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME)));
+                                    sp.setId(storagecontrollerid);
+                                    sp.setIops(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_THROUGHPUT)));
+                                    sp.setBandwith(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_BANDWIDTH)));
+                                    sp.setLantency(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_RESPONSETIME)));
+                                    sp.setCpuUsage(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_CPUUSAGE)));
                                     relists.add(sp);
                                 }
                             }
@@ -1336,27 +1410,29 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return relists;
     }
 
+    @Override
     public List<StorageDisk> listStorageDiskPerformance(List<String> storageDiskIds) throws DMEException {
         List<StorageDisk> relists = null;
         try {
             if (storageDiskIds != null && storageDiskIds.size() > 0) {
                 Map<String, Object> params = new HashMap<>(16);
                 params.put("obj_ids", storageDiskIds);
-                Map<String, Object> remap = dataStoreStatisticHistoryService.queryCurrentStatistic(DmeIndicatorConstants.RESOURCE_TYPE_NAME_STORAGEPOOL, params);
+                Map<String, Object> remap = dataStoreStatisticHistoryService.queryCurrentStatistic(DmeIndicatorConstants.RESOURCE_TYPE_NAME_STORAGEDISK, params);
                 LOG.info("remap===" + gson.toJson(remap));
                 if (null != remap && remap.size() > 0) {
                     try {
                         JsonObject dataJson = new JsonParser().parse(remap.toString()).getAsJsonObject();
                         if (dataJson != null) {
                             relists = new ArrayList<>();
-                            for (String storagePoolId : storageDiskIds) {
-                                JsonObject statisticObject = dataJson.getAsJsonObject(storagePoolId);
+                            for (String storageDiskId : storageDiskIds) {
+                                JsonObject statisticObject = dataJson.getAsJsonObject(storageDiskId);
                                 if (statisticObject != null) {
                                     StorageDisk sp = new StorageDisk();
-                                    //sp.setId(storagePoolId);
-                                    sp.setIops(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT)));
-                                    sp.setBandwith(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH)));
-                                    sp.setLantency(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME)));
+                                    sp.setId(storageDiskId);
+                                    sp.setIops(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_THROUGHPUT)));
+                                    sp.setBandwith(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_BANDWIDTH)));
+                                    sp.setLantency(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_RESPONSETIME)));
+                                    sp.setUseage(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_UTILITY)));
                                     relists.add(sp);
                                 }
                             }
@@ -1374,27 +1450,29 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return relists;
     }
 
+    @Override
     public List<StoragePort> listStoragePortPerformance(List<String> storagePortIds) throws DMEException {
         List<StoragePort> relists = null;
         try {
             if (storagePortIds != null && storagePortIds.size() > 0) {
                 Map<String, Object> params = new HashMap<>(16);
                 params.put("obj_ids", storagePortIds);
-                Map<String, Object> remap = dataStoreStatisticHistoryService.queryCurrentStatistic(DmeIndicatorConstants.RESOURCE_TYPE_NAME_STORAGEPOOL, params);
+                Map<String, Object> remap = dataStoreStatisticHistoryService.queryCurrentStatistic(DmeIndicatorConstants.RESOURCE_TYPE_NAME_STORAGEPORT, params);
                 LOG.info("remap===" + gson.toJson(remap));
                 if (null != remap && remap.size() > 0) {
                     try {
                         JsonObject dataJson = new JsonParser().parse(remap.toString()).getAsJsonObject();
                         if (dataJson != null) {
                             relists = new ArrayList<>();
-                            for (String storagePoolId : storagePortIds) {
-                                JsonObject statisticObject = dataJson.getAsJsonObject(storagePoolId);
+                            for (String storagePortId : storagePortIds) {
+                                JsonObject statisticObject = dataJson.getAsJsonObject(storagePortId);
                                 if (statisticObject != null) {
                                     StoragePort sp = new StoragePort();
-                                    //sp.setId(storagePoolId);
-                                    sp.setIops(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT)));
-                                    sp.setBandwith(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH)));
-                                    sp.setLantency(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME)));
+                                    sp.setId(storagePortId);
+                                    sp.setIops(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_THROUGHPUT)));
+                                    sp.setBandwith(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_BANDWIDTH)));
+                                    sp.setLantency(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_RESPONSETIME)));
+                                    sp.setUseage(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_UTILITY)));
                                     relists.add(sp);
                                 }
                             }
@@ -1409,6 +1487,45 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             throw new DMEException(e.getMessage());
         }
         LOG.info("listStoragePortPerformance relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        return relists;
+    }
+
+    @Override
+    public List<Volume> listVolumesPerformance(List<String> volumeIds) throws DMEException {
+        List<Volume> relists = null;
+        try {
+            if (volumeIds != null && volumeIds.size() > 0) {
+                Map<String, Object> params = new HashMap<>(16);
+                params.put("obj_ids", volumeIds);
+                Map<String, Object> remap = dataStoreStatisticHistoryService.queryCurrentStatistic(DmeIndicatorConstants.RESOURCE_TYPE_NAME_LUN, params);
+                LOG.info("remap===" + gson.toJson(remap));
+                if (null != remap && remap.size() > 0) {
+                    try {
+                        JsonObject dataJson = new JsonParser().parse(remap.toString()).getAsJsonObject();
+                        if (dataJson != null) {
+                            relists = new ArrayList<>();
+                            for (String storagePoolId : volumeIds) {
+                                JsonObject statisticObject = dataJson.getAsJsonObject(storagePoolId);
+                                if (statisticObject != null) {
+                                    Volume sp = new Volume();
+                                    //sp.setId(storagePoolId);
+                                    sp.setIops(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT)));
+                                    sp.setBandwith(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH)));
+                                    sp.setLantency(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME)));
+                                    relists.add(sp);
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        LOG.warn("查询volume实时性能数据listVolumesPerformance异常", e);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOG.error("list volume performance error:", e);
+            throw new DMEException(e.getMessage());
+        }
+        LOG.info("listVolumesPerformance relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
         return relists;
     }
 
