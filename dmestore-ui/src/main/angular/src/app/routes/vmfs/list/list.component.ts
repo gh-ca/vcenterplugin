@@ -844,6 +844,7 @@ export class VmfsListComponent implements OnInit {
       console.log(this.rowSelected[0]);
       this.expandForm.volume_id = this.rowSelected[0].volumeId;
       this.expandForm.ds_name = this.rowSelected[0].name;
+      this.expandForm.obj_id = this.rowSelected[0].objectid;
     }
   }
   // 扩容处理
@@ -863,9 +864,7 @@ export class VmfsListComponent implements OnInit {
         break;
     }
     // 参数封装
-    const params = [];
-    params.push(this.expandForm);
-    this.remoteSrv.expandVMFS(params).subscribe((result: any) => {
+    this.remoteSrv.expandVMFS(this.expandForm).subscribe((result: any) => {
       if (result.code === '200'){
         console.log('expand success:' + name);
         // 重新请求数据

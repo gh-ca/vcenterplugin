@@ -520,18 +520,18 @@ export class DetailComponent implements OnInit, AfterViewInit {
   listVolumesperformance(){
     if (this.volumes === null || this.volumes.length <= 0){ return; }
     this.volumes.forEach(item => {
-      this.volumeIds.push(item.id);
+      this.volumeIds.push(item.wwn);
     });
     this.detailService.listVolumesperformance(this.volumeIds).subscribe((result: any) => {
       if (result.code === '200'){
         const chartList: Volume [] = result.data;
         if ( chartList !== null && chartList.length > 0){
-          this.storagePool.forEach(item => {
+          this.volumes.forEach(item => {
             chartList.forEach(charItem => {
-              if (item.id === charItem.id){
-                item.maxBandwidth=charItem.maxBandwidth;
-                item.maxIops=charItem.maxIops;
-                item.maxLatency=charItem.maxLatency;
+              if (item.wwn === charItem.wwn){
+                item.bandwith=charItem.bandwith;
+                item.iops=charItem.iops;
+                item.lantency=charItem.lantency;
               }
             });
           });
