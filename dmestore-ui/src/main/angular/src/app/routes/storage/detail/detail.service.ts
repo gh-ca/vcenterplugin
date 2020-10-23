@@ -139,9 +139,10 @@ export class Volume{
   capacity: number;//总容量 单位GB
   //关联的datastore
   datastores: string;
-  maxBandwidth: number;
-  maxIops: number;
-  maxLatency: number;
+  bandwith: number;
+  iops: number;
+  lantency: number;
+  wwn:string;
 }
 export class Dtrees{
   name: string;
