@@ -45,14 +45,14 @@ export class DetailService {
   getFCPortList(param: any){
     return this.http.get('dmestorage/storageport', {params: param});
   }
-  getBondPortList(storage_id: string){
-    return this.http.get('dmestorage/bandports', {params: {storage_id}});
+  getBondPortList(storageId: string){
+    return this.http.get('dmestorage/bandports', {params: {storageId}});
   }
   getLogicPortList(storageId: string){
     return this.http.get('dmestorage/logicports', {params: {storageId}});
   }
-  getFailoverGroups(storage_id: string){
-    return this.http.get('dmestorage/failovergroups', {params: {storage_id}});
+  getFailoverGroups(storageId: string){
+    return this.http.get('dmestorage/failovergroups', {params: {storageId}});
   }
 }
 
