@@ -8,7 +8,7 @@ import {VmfsPerformanceService} from '../../vmfs/volume-performance/performance.
 import { EChartOption } from 'echarts';
 import {FileSystem} from '../../nfs/nfs.service';
 import {ActivatedRoute, Router} from "@angular/router";
-import {CapacityChart, CapacitySerie} from "../storage.service";
+import {CapacityChart, CapacitySerie, StorageList} from "../storage.service";
 import {BondPort, EthernetPort, FailoverGroup, FCoEPort, FCPort, LogicPort} from "./port.service";
 @Component({
   selector: 'app-detail',
@@ -303,8 +303,6 @@ export class DetailComponent implements OnInit, AfterViewInit {
   endTime = 1552567343000;
   // 定时函数执行时间 默认一天
   timeInterval = 1 * 60 * 60 * 1000;
-  // 存储池列表
-  poolList: PoolList[] = [];
   poolRadio = 'table1'; // 存储池列表切换
   volumeRadio = 'table1'; // volume列表切换
   storageId = '1234';
@@ -327,6 +325,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   bonds: BondPort[];
   logicports:LogicPort[];
   fgs:FailoverGroup[];
+  storagePoolIds=[];
   //portList:
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(queryParam => {
@@ -442,25 +441,50 @@ export class DetailComponent implements OnInit, AfterViewInit {
   getStoragePoolList(fresh: boolean){
     if (fresh){
       this.detailService.getStoragePoolList(this.storageId).subscribe((r: any) =>{
-        console.log('pool result:');
-        console.log(r);
         if (r.code === '200'){
           this.storagePool = r.data;
           this.cdr.detectChanges();
+          console.log('pool result:');
+          console.log(r);
+          this.listperformance();
         }
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
-      if (this.poolList === null){
+      if (this.storagePool === null){
         this.detailService.getStoragePoolList(this.storageId).subscribe((r: any) =>{
           if (r.code === '200'){
             this.storagePool = r.data;
             this.cdr.detectChanges();
+            this.listperformance();
           }
         });
       }
     }
-
+  }
+  listperformance(){
+    console.log("storagePool",this.storagePool);
+    if (this.storagePool === null || this.storagePool.length <= 0){ return; }
+    this.storagePool.forEach(item => {
+      this.storagePoolIds.push(item.storageInstanceId);
+    });
+    this.detailService.listnfsperformance(this.storagePoolIds).subscribe((result: any) => {
+      if (result.code === '200'){
+        const chartList: StoragePool [] = result.data;
+        if ( chartList !== null && chartList.length > 0){
+          this.storagePool.forEach(item => {
+            chartList.forEach(charItem => {
+              if (item.storageInstanceId === charItem.id){
+                item.maxBandwidth=charItem.maxBandwidth;
+                item.maxIops=charItem.maxIops;
+                item.maxLatency=charItem.maxLatency;
+              }
+            });
+          });
+          this.cdr.detectChanges();
+        }
+      }
+    });
   }
   getStorageVolumeList(fresh: boolean){
     console.log("is null?")

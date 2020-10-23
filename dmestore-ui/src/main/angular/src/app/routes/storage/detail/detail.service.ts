@@ -17,6 +17,9 @@ export class DetailService {
   getStoragePoolList(storageId: string){
     return this.http.get('dmestorage/storagepools', {params: {storageId}});
   }
+  listnfsperformance(storagePoolIds:string[]) {
+    return this.http.get('dmestorage/liststoragepoolperformance', {params: {storagePoolIds}});
+  }
   getVolumeListList(storageId: string){
     return this.http.get('dmestorage/volumes', {params: {storageId}});
   }

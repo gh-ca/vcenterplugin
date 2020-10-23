@@ -14,6 +14,9 @@ export class StorageService {
   getLogicPortListByStorageId(storageId: string){
     return this.http.get('dmestorage/logicports', {params: {storageId}});
   }
+  listperformance(storageIds:string[]) {
+    return this.http.get('dmestorage/liststorageperformance', {params: {storageIds}});
+  }
 }
 export interface StorageList {
    id: string;
@@ -33,6 +36,7 @@ export interface StorageList {
    maxIops: number;
    maxBandwidth: number;
    maxLatency: number;
+   maxOps:number;
    azIds: string[];
    totalPoolCapacity: number;
    subscriptionCapacity: number;
