@@ -101,9 +101,7 @@ export class ExpandComponent implements OnInit{
     }
     this.expandForm.obj_id = this.objectId;
     // 参数封装
-    const params = [];
-    params.push(this.expandForm);
-    this.remoteSrv.expandVMFS(params).subscribe((result: any) => {
+    this.remoteSrv.expandVMFS(this.expandForm).subscribe((result: any) => {
       if (result.code === '200'){
         console.log('expand success:' + name);
         // 重新请求数据
