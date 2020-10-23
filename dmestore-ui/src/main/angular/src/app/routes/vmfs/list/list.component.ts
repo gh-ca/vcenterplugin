@@ -13,10 +13,9 @@ import {
   ClusterList,
   ServiceLevelList, HostOrCluster, GetForm,
 } from './list.service';
-import {ClrDatagridStateInterface, ClrWizard, ClrWizardPage} from '@clr/angular';
+import {ClrWizard, ClrWizardPage} from '@clr/angular';
 import {GlobalsService} from '../../../shared/globals.service';
-import {Cluster, Host} from '../../nfs/nfs.service';
-import {ClrDatagridFilterInterface} from '@clr/angular';
+import {Host} from '../../nfs/nfs.service';
 import {Router} from "@angular/router";
 
 
@@ -32,10 +31,7 @@ export class VmfsListComponent implements OnInit {
     const p = Object.assign({}, this.query);
     return p;
   }
-  /* get currentData() {
-    const data = Object.assign({}, this.rowSelected[0]);
-    return data || {}
-  } */
+
   constructor(private remoteSrv: VmfsListService, private cdr: ChangeDetectorRef,
               public gs: GlobalsService, private router:Router) {}
   // 添加页面窗口
@@ -76,22 +72,7 @@ export class VmfsListComponent implements OnInit {
   srgOptions = []; // 空间回收粒度初始化
   deviceList: HostOrCluster[] = []; // 主机AND集群
   chooseDevice; // 已选择的主机/集群
-  hostRootDirectory: any[] = [
-    {
-      name: 'Host',
-      icon: 'folder',
-      expanded: false,
-      files: []
-    }
-  ]; // 主机树结构
-  clusterRootDirectory: any[] = [
-    {
-      name: 'Cluster',
-      icon: 'folder',
-      expanded: false,
-      files: []
-    }
-  ]; // 集群树结构
+
   serviceLevelList: ServiceLevelList[] = []; // 服务等级列表
   mountShow = false; // 挂载窗口
   delShow = false; // 删除窗口
@@ -250,29 +231,6 @@ export class VmfsListComponent implements OnInit {
     });
   }
 
-  // 主机或集群数据处理 deviceType: 设备类型、deviceName 设备名称、主机/集群ID
-  deviceDataHandle(deviceType: string, deviceName: string, deviceId) {
-      console.log('deviceType:' + deviceType + ', deviceName: ' + deviceName + ',deviceId: ' + deviceId);
-      this.form.deviceName = deviceName;
-      switch (deviceType) {
-        case 'Host':
-          this.form.hostId = deviceId;
-          this.form.host = deviceName;
-          this.hostRootDirectory[0].expanded = false;
-          break;
-        case 'Cluster':
-          this.form.cluster = deviceName;
-          this.form.clusterId = deviceId;
-          this.clusterRootDirectory[0].expanded = false;
-          break;
-        default:
-          this.form.hostId = '';
-          this.form.host = '';
-          this.form.cluster = '';
-          this.form.clusterId = '';
-          break;
-      }
-  }
   // 获取所有存储数据
   getStorageList() {
     this.remoteSrv.getStorages().subscribe((result: any) => {
@@ -374,13 +332,6 @@ export class VmfsListComponent implements OnInit {
         if (result.code === '200' && result.data !== null) {
           hostList = result.data;
           hostList.forEach(item => {
-            // const hostData = {
-            //   icon: 'map',
-            //   id: item.hostId,
-            //   name: item.hostName,
-            //   active: false
-            // };
-            // this.hostRootDirectory[0].files.push(hostData);
 
             const hostInfo = {
               deviceId: item.hostId,
@@ -390,8 +341,6 @@ export class VmfsListComponent implements OnInit {
             this.deviceList.push(hostInfo);
           });
         }
-        /*console.log('this.deviceList  host::');
-        console.log(this.deviceList);*/
         this.form.hostDataloadSuccess = true;
         resolve(this.deviceList);
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -408,13 +357,6 @@ export class VmfsListComponent implements OnInit {
         if (result.code === '200' && result.data !== null) {
           clusterList = result.data;
           clusterList.forEach(item => {
-            // const culData = {
-            //   icon: 'map',
-            //   id: item.clusterId,
-            //   name: item.clusterName,
-            //   active: false
-            // };
-            // this.clusterRootDirectory[0].files.push(culData);
 
             const clusterInfo = {
               deviceId: item.clusterId,
@@ -473,16 +415,11 @@ export class VmfsListComponent implements OnInit {
       console.log(result);
       if (result.code === '200' && result.data !== null) {
         this.serviceLevelList = result.data.filter(item => item.totalCapacity !== 0);
+        // this.serviceLevelList = result.data;
         console.log('this.serviceLevelList', this.serviceLevelList);
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
     });
-  }
-  showServiceLevel(obj: any, isShow: boolean) {
-    console.log('obj+isShow', obj, isShow);
-    if (isShow) {
-      obj.hide = true;
-    }
   }
   // 添加vmfs 处理
   addVmfsHanlde() {
@@ -846,13 +783,6 @@ export class VmfsListComponent implements OnInit {
       this.cdr.detectChanges();
     });
   }
-  // 服务等级 点击事件 serviceLevId:服务等级ID、serviceLevName：服务等级名称
-  serviceLevelClickHandel(serviceLevId: string, serviceLevName: string, isoppen: any) {
-    console.log('isoppen', isoppen);
-    this.form.service_level_id = serviceLevId;
-    this.form.service_level_name = serviceLevName;
-    console.log('serviceLevId:' + serviceLevId + 'serviceLevName:' + serviceLevName);
-  }
   // 变更服务等级 按钮点击事件
   changeServiceLevelBtnFunc() {
 
@@ -961,5 +891,22 @@ export class VmfsListComponent implements OnInit {
     if (this.rowSelected.length >= 1) {
       this.delShow = true;
     }
+  }
+
+  /**
+   * 容量格式化
+   * @param c 容量值
+   * @param isGB true GB、false MB
+   */
+  formatCapacity(c: number, isGB:boolean){
+    let cNum;
+    if (c < 1024){
+      cNum = isGB ? c.toFixed(3)+'GB':c.toFixed(3)+'MB';
+    }else if(c >= 1024 && c< 1048576){
+      cNum = isGB ? (c/1024).toFixed(3) + 'TB' : (c/1024).toFixed(3) + 'GB';
+    }else if(c>= 1048576){
+      cNum = isGB ? (c/1024/1024).toFixed(3) + 'PB':(c/1024/1024).toFixed(3) + 'TB';
+    }
+    return cNum;
   }
 }

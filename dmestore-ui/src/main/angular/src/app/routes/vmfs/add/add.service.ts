@@ -32,7 +32,7 @@ export class AddService {
    * @param params
    */
   getServiceLevelList(params = {}) {
-    return this.http.put('operatevmfs/listvmfsservicelevel', params);
+    return this.http.post('servicelevel/listservicelevel', params);
   }
 }
 
