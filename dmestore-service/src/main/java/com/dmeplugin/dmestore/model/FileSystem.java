@@ -12,6 +12,8 @@ public class FileSystem  {
     private String id;
     //名称
     private String name;
+    //文件系统类型
+    private String type;
     //状态
     private String healthStatus;
     //分配策略(分配类型)
@@ -147,5 +149,13 @@ public class FileSystem  {
 
     public void setStorageId(String storageId) {
         this.storageId = storageId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 }

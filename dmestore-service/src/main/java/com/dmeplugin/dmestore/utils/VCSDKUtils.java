@@ -846,7 +846,7 @@ public class VCSDKUtils {
     /**
      *expand oriented datastore capacity
      **/
-    public String expandVmfsDatastore(String dsname, Integer addCapacity,String hostObjectId) {
+    public String expandVmfsDatastore(String dsname, Integer addCapacity,String datastoreobjid) {
 
         String result = "success";
         logger.info("==start expand DataStore==");
@@ -878,8 +878,15 @@ public class VCSDKUtils {
                             HostVmfsVolume vmfs = datastoreInfo.getVmfs();
                             Long totalSectors = addCapacity * ToolUtils.GI * 1L / vmfs.getBlockSize();
                             spec.getPartition().setTotalSectors(totalSectors);
+                            //刷新vmfs存储，需等待2秒
+                            List<DatastoreHostMount> hostMountInfos=dsMo.getHostMounts();
+                            for (DatastoreHostMount datastoreHostMount:hostMountInfos){
+                                HostMO hostmo=new HostMO(vmwareContext,datastoreHostMount.getKey());
+
+                                hostmo.getHostStorageSystemMO().refreshStorageSystem();
+                            }
+                            Thread.sleep(2000);
                             host1.getHostDatastoreSystemMO().expandVmfsDatastore(dsMo, spec);
-                            scanDataStore(null,hostObjectId);
                         }
                     }
                 }
@@ -2886,6 +2893,23 @@ public class VCSDKUtils {
 
             DatastoreMO ds1 = new DatastoreMO(vmwareContext, vcConnectionHelper.objectID2MOR(objectid));
             ds1.refreshDatastore();
+        }catch (Exception e){
+            logger.error("query vms on datastore error:", e);
+        }
+
+    }
+
+    /**
+     * 刷新vmfs相关的volume容量
+     * @param objectid 主机objectid
+     */
+    public void refreshStorageSystem(String objectid){
+        String serverguid = vcConnectionHelper.objectID2Serverguid(objectid);
+        try {
+            VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
+
+            HostStorageSystemMO ds1 = new HostStorageSystemMO(vmwareContext, vcConnectionHelper.objectID2MOR(objectid));
+            ds1.refreshStorageSystem();
         }catch (Exception e){
             logger.error("query vms on datastore error:", e);
         }

@@ -25,7 +25,7 @@ public interface VmfsOperationService {
      * vmfs存储扩容
      * @param volumes
      */
-    void expandVMFS(List<Map<String,String>> volumes) throws DMEException;
+    void expandVMFS(Map<String,String> volumes) throws DMEException;
 
     /**
      * vmfs存储空间回收

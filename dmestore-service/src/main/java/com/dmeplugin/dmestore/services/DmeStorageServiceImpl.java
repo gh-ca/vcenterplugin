@@ -504,6 +504,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     FileSystem fileSystem = new FileSystem();
                     fileSystem.setId(ToolUtils.jsonToStr(element.get("id")));
                     fileSystem.setName(ToolUtils.jsonToStr(element.get("name")));
+                    fileSystem.setType(ToolUtils.jsonToStr(element.get("type")));
                     fileSystem.setHealthStatus(ToolUtils.jsonToStr(element.get("health_status")));
                     fileSystem.setAllocType(ToolUtils.jsonToStr(element.get("alloc_type")));
                     fileSystem.setCapacity(ToolUtils.jsonToDou(element.get("capacity"), 0.0));

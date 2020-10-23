@@ -271,7 +271,8 @@ export class GetForm {
       vo_add_capacity: 0, // 扩容大小默认GB
       capacityUnit: 'GB', // 容量单位 （最后需转换为GB）
       volume_id: '', // 卷ID
-      ds_name: '' // vmfsName
+      ds_name: '', // vmfsName
+      obj_id: '' // dataStoreObjectId
     };
     return expandForm;
   }
