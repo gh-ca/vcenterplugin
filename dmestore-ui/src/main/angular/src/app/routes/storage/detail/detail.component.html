@@ -216,9 +216,9 @@
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.protectionStatus ? "已保护":"未保护"}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.datastores}}</clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.maxLatency}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.maxIops}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.maxBandwidth}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.lantency}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.iops}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.bandwith}}</clr-dg-cell>
                       </clr-dg-row>
                       <clr-dg-footer>
                         <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="volumeTotal">
@@ -396,7 +396,8 @@
                   </div>
                   <div class="clr-col-lg-4 clr-col-12">
                     <div class="info-content-title">{{'storage.chart.capacity' | translate}}</div>
-                    <div class="info-charts-wrap" style=".data">
+                    <div *ngIf="cd" class="info-charts-wrap" style=".data">
+
                       <div echarts [options]="cd.chart" id="chart3" style="width: 30%;height: 120px;"></div>
                       <div class="info-content">
                         <div class="info-content-text">
@@ -423,7 +424,7 @@
                   </div>
                   <div class="clr-col-lg-4 clr-col-12">
                     <div class="info-content-title">{{'storage.detail.cap.capacitySavings' | translate}}</div>
-                    <div class="availability-box"  style=".data">
+                    <div *ngIf="capSave" class="availability-box"  style=".data">
                       <div class="unit-banner">
                         <div class="unit-label"></div>
                         <div class="unit-outer">
@@ -578,10 +579,10 @@
                                 <clr-dg-cell>{{item.status}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.wwn}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.speed}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.iops|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.latency|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.bandwidth|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.usage|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.iops}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.lantency}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.bandwith}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.useage}}</clr-dg-cell>
                               </clr-dg-row>
                             </clr-datagrid>
                           </clr-accordion-content>
@@ -604,11 +605,11 @@
                                 <clr-dg-cell>{{item.status}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.ipv4|| '--'}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.ipv6|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.speed}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.speed|| '--'}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.iops|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.latency|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.bandwidth|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.usage|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.lantency|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.bandwith|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.useage|| '--'}}</clr-dg-cell>
                               </clr-dg-row>
                             </clr-datagrid>
                           </clr-accordion-content>

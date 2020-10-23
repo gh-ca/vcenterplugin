@@ -45,14 +45,14 @@ export class DetailService {
   getFCPortList(param: any){
     return this.http.get('dmestorage/storageport', {params: param});
   }
-  getBondPortList(storage_id: string){
-    return this.http.get('dmestorage/bandports', {params: {storage_id}});
+  getBondPortList(storageId: string){
+    return this.http.get('dmestorage/bandports', {params: {storageId}});
   }
   getLogicPortList(storageId: string){
     return this.http.get('dmestorage/logicports', {params: {storageId}});
   }
-  getFailoverGroups(storage_id: string){
-    return this.http.get('dmestorage/failovergroups', {params: {storage_id}});
+  getFailoverGroups(storageId: string){
+    return this.http.get('dmestorage/failovergroups', {params: {storageId}});
   }
 }
 
@@ -139,9 +139,10 @@ export class Volume{
   capacity: number;//总容量 单位GB
   //关联的datastore
   datastores: string;
-  maxBandwidth: number;
-  maxIops: number;
-  maxLatency: number;
+  bandwith: number;
+  iops: number;
+  lantency: number;
+  wwn:string;
 }
 export class Dtrees{
   name: string;
