@@ -50,7 +50,7 @@ export class VmfsListService {
 
   // 获取所有的服务等级数据
   getServiceLevelList(params = {}) {
-    return this.http.put('operatevmfs/listvmfsservicelevel', params);
+    return this.http.post('servicelevel/listservicelevel', params);
   }
 
   // 创建vmfs
@@ -160,7 +160,7 @@ export interface ServiceLevelList {
   type: string;
   protocol: string;
   capabilities: {
-    resource_type: string;
+    resourceType: string;
     compression: boolean;
     deduplication: boolean;
     smarttier: {
@@ -169,13 +169,23 @@ export interface ServiceLevelList {
     };
     qos: {
       enabled: boolean;
+      "qosParam": {
+        "enabled": boolean;
+        "latency": number;
+        "latencyUnit": string;
+        "minBandWidth": number;
+        "minIOPS": number;
+        "maxBandWidth": number;
+        "maxIOPS": number;
+        "smartQos": string;
+      },
       smartQos: {
         latency: string;
         latencyUnit: string;
-        minbandwidth: string;
-        miniops: string;
-        maxbandwidth: string;
-        maxiops: string;
+        minBandWidth: number;
+        minIOPS: number;
+        maxBandWidth: number;
+        maxIOPS: number;
         control_policy: string;
       };
     };
