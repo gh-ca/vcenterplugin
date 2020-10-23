@@ -110,9 +110,28 @@
 
                       <clr-dg-row *clrDgItems="let item of storagePool" [clrDgItem]="item">
                         <clr-dg-cell>{{item.name}}</clr-dg-cell>
-                        <clr-dg-cell>{{item.healthStatus}}</clr-dg-cell>
+                        <clr-dg-cell>
+                          <span *ngIf="item.healthStatus == 'normal'">
+                            <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>
+                            {{'storage.detail.storagePool.normal' | translate}}
+                          </span>
+                          <span *ngIf="item.healthStatus == 'fault'">
+                            <span class="color-square" style="background-color: red; margin-right: 10px"></span>
+                            {{'storage.detail.storagePool.fault' | translate}}
+                          </span>
+                          <span *ngIf="item.healthStatus == 'degraded'">
+                            <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>
+                            {{'storage.detail.storagePool.degraded' | translate}}
+                          </span>
+                        </clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="poolRadio!=='table1'">{{item.physicalType}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table1'">
+                          <span *ngIf="item.physicalType == 'sata'">SATA</span>
+                          <span *ngIf="item.physicalType == 'sas'">SAS</span>
+                          <span *ngIf="item.physicalType == 'ssd'">SSD</span>
+                          <span *ngIf="item.physicalType == 'nl-sas'">NL-SAS</span>
+                          <span *ngIf="item.physicalType == 'unknown'">{{'storage.detail.storagePool.unknown' | translate}}</span>
+                        </clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">{{item.mediaType}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">{{formatArry(item.serviceLevelName)}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">{{item.tier0RaidLv}}</clr-dg-cell>
@@ -333,7 +352,7 @@
               <div class="clr-row">
                 <div class="clr-col-lg-4 clr-col-12">
                   <div class="info-content-title" style="margin-bottom: 2%">{{'storage.detail.cap.capacityUsage' | translate}}</div>
-                  <div style="border: 1px red solid">
+                  <div style=".data">
                     <div class="capacity-wrap">
                       <span class="capacity-label">{{'storage.detail.cap.bareCapacity' | translate}}</span>
                       <div class="num-bar_outer">
@@ -367,7 +386,7 @@
                 </div>
                 <div class="clr-col-lg-4 clr-col-12">
                   <div class="info-content-title">{{'storage.chart.capacity' | translate}}</div>
-                  <div class="info-charts-wrap" style="border: 1px red solid">
+                  <div class="info-charts-wrap" style=".data">
                     <div echarts [options]="cd.chart" id="chart3" style="width: 30%;height: 120px;"></div>
                     <div class="info-content">
                       <div class="info-content-text">
@@ -394,7 +413,7 @@
                 </div>
                 <div class="clr-col-lg-4 clr-col-12">
                   <div class="info-content-title">容量利用率</div>
-                  <div class="availability-box"  style="border: 1px red solid">
+                  <div class="availability-box"  style=".data">
                     <div class="unit-banner">
                       <div class="unit-label"></div>
                       <div class="unit-outer">

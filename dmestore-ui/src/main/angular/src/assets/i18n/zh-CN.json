@@ -344,7 +344,11 @@
         "supRate":"订阅率",
         "latency": "时延(ms)",
         "iops": "IOPS",
-        "bandwidth": "带宽(MB/s)"
+        "bandwidth": "带宽(MB/s)",
+        "normal":"正常",
+        "fault":"故障",
+        "degraded":"降级",
+        "unknown":"未知"
       },
       "volumes":{
         "volumes":"卷",

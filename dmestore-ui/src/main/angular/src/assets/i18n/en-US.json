@@ -341,7 +341,11 @@
         "supRate":"supscription Rate",
         "latency": "Latency(ms)",
         "iops": "IOPS",
-        "bandwidth": "Bandwidth(MB/s)"
+        "bandwidth": "Bandwidth(MB/s)",
+        "normal":"Normal",
+        "fault":"Fault",
+        "degraded":"Degraded",
+        "unknown":"Unknown"
       },
       "volumes":{
         "volumes":"Volumes",
