@@ -4,6 +4,10 @@ import {ChartOptions} from "../../nfs/nfs.service";
 
 @Injectable()
 export class VmfsPerformanceService {
+
+  getData(storageObjectId: string) {
+    return this.http.get('accessvmfs/volume/' + storageObjectId );
+  }
   constructor(private http: HttpClient) {}
   // iopsChart后台请求数据
   iopsChart = {
