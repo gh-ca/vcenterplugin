@@ -1,10 +1,10 @@
 <div>
   <div style="margin-left: 30px;margin-top: 20px;">
-    <span [hidden]="status != 1" style="font-size: larger;">最佳实践实施中<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;"></span>
-    <span [hidden]="status != 2" style="font-size: larger;">最佳实践实施完成<clr-icon shape="success-standard" class="is-solid" style="color: #59A220; margin-left: 20px"></clr-icon></span>
-    <span [hidden]="status != 3" style="font-size: larger;">最佳实践实施出错<clr-icon shape="error-standard" class="is-solid" style="color: #e07676; margin-left: 20px"></clr-icon></span>
+    <span [hidden]="status != 1" style="font-size: larger;">{{'applybp.ing'|translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;"></span>
+    <span [hidden]="status != 2" style="font-size: larger;">{{'applybp.ed'|translate}}<clr-icon shape="success-standard" class="is-solid" style="color: #59A220; margin-left: 20px"></clr-icon></span>
+    <span [hidden]="status != 3" style="font-size: larger;">{{'applybp.error'|translate}}<clr-icon shape="error-standard" class="is-solid" style="color: #e07676; margin-left: 20px"></clr-icon></span>
     <br>
-    <span [hidden]="hiddenTip"><p style="color: red;margin-right: 20px">您需要重启主机{{ips}}主机配置才会生效!</p></span>
+    <span [hidden]="hiddenTip"><p style="color: red;margin-right: 20px">{{'applybp.boot'|translate}}{{ips}}{{'applybp.eff'|translate}}</p></span>
   </div>
   <div style="margin-left: 50px; position: relative;">
     <button [hidden]="status != 2" type="button" class="btn btn-success" style="position: absolute; right: 20px" (click)="okClick()">{{'menu.ok'|translate}}</button>

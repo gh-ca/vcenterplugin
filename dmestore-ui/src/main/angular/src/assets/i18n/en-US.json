@@ -620,5 +620,12 @@
     "minIOPSs": "OrderBy MinIOPS",
     "maxBandWidths": "OrderBy MaxBandWidth",
     "minBandWidths": "OrderBy MinBandWidth"
+  },
+  "applybp": {
+    "ing": "Best Practice is Executing",
+    "ed": "Best Practice is Finished",
+    "error": "Best Practice occur Error",
+    "boot": "You need reboot host",
+    "eff": "Host Config is effective!"
   }
 }
