@@ -35,7 +35,11 @@ export class ServiceLevelComponent implements OnInit{
   // vmfs数据
   vmfsInfo: VmfsInfo;
 
+  // 变更服务等级 隐藏/展示
+  changeServiceLevelShow = false;
+
   ngOnInit(): void {
+    this.changeServiceLevelShow = false;
     // 获取vmfsInfo
     // 初始化表单
     this.changeServiceLevelForm = new GetForm().getChangeLevelForm();
@@ -43,7 +47,13 @@ export class ServiceLevelComponent implements OnInit{
       console.log('url', url);
       this.route.queryParams.subscribe(queryParam => {
         this.resource = queryParam.resource;
-        this.objectId = queryParam.objectId;
+        if (this.resource === 'list') {// 以列表为入口
+          this.objectId = queryParam.objectId;
+        } else { // 以dataStore为入口
+          const ctx = this.globalsService.getClientSdk().app.getContextObjects();
+          this.objectId = ctx[0].id;
+        }
+
         // todo 获取vmfs数据
         this.remoteSrv.getVmfsById(this.objectId).subscribe((result: any) => {
           if (result.code === '200' && null != result.data) {
@@ -74,14 +84,16 @@ export class ServiceLevelComponent implements OnInit{
       if (result.code === '200' && result.data !== null) {
         this.serviceLevelList = result.data;
         console.log('this.serviceLevelList', this.serviceLevelList);
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
+      this.changeServiceLevelShow = true;
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
   /**
    * 取消
    */
   cancel() {
+    this.changeServiceLevelShow = false;
     if (this.resource === 'list') { // 列表入口
       this.router.navigate(['vmfs/list']);
     } else { // dataStore入口

@@ -227,6 +227,9 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
 
     @Override
     public List<BestPracticeUpResultResponse> update(List<String> objectIds, String hostSetting) throws DmeSqlException {
+        objectIds = new ArrayList();
+        objectIds.add("urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1");
+        objectIds.add("123213124");
         List<BestPracticeService> services = new ArrayList<>();
         //获取对应的service
         for (BestPracticeService bestPracticeService : bestPracticeServices) {
@@ -241,17 +244,17 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             }
         }
 
+        Map<String, String> hostMap = new HashMap<>();
         if (null == objectIds || objectIds.size() == 0) {
-            objectIds = new ArrayList<>();
             int pageNo = 0;
             int pageSize = 100;
             //获取本地所有
             try {
                 while (true) {
-                    List<String> hostIdList = bestPracticeCheckDao.getAllHostIds(pageNo++, pageSize);
-                    objectIds.addAll(hostIdList);
+                    Map<String, String> hostMapTemp = bestPracticeCheckDao.getAllHostIds(pageNo++, pageSize);
+                    hostMap.putAll(hostMapTemp);
 
-                    if (hostIdList.size() != pageSize) {
+                    if (hostMapTemp.size() != pageSize) {
                         break;
                     }
                 }
@@ -259,14 +262,24 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                 e.printStackTrace();
                 throw new DmeSqlException(e.getMessage());
             }
+        }else {
+            try {
+                //从本地数据库查询指定的主机信息
+                hostMap = bestPracticeCheckDao.getByHostIds(objectIds);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         List<BestPracticeUpResultResponse> responses = new ArrayList<>();
         List<String> successList = new ArrayList<>();
-        for (String objectId : objectIds) {
+        for (Map.Entry<String, String> entry : hostMap.entrySet()) {
+            String objectId = entry.getKey();
+            String hostName = entry.getValue();
             BestPracticeUpResultResponse response = new BestPracticeUpResultResponse();
             List<BestPracticeUpResultBase> baseList = new ArrayList();
             response.setHostObjectId(objectId);
+            response.setHostName(hostName);
             boolean needReboot = false;
             for (BestPracticeService service : services) {
                 BestPracticeUpResultBase base = new BestPracticeUpResultBase();

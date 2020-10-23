@@ -79,6 +79,30 @@ public interface DataStoreStatisticHistoryService {
     Map<String, Object> queryFsStatistic(Map<String, Object> params) throws DMEException;
 
     /**
+     * 查询controller历史性能数据(SYS_Controller)
+     *
+     * @param params key required: obj_ids, indicator_ids, range
+     * @return
+     */
+    Map<String, Object> queryControllerStatistic(Map<String, Object> params) throws DMEException;
+
+    /**
+     * 查询StoragePort历史性能数据(SYS_StoragePort)
+     *
+     * @param params key required: obj_ids, indicator_ids, range
+     * @return
+     */
+    Map<String, Object> queryStoragePortStatistic(Map<String, Object> params) throws DMEException;
+
+    /**
+     * 查询storageDisk历史性能数据(SYS_StorageDisk)
+     *
+     * @param params key required: obj_ids, indicator_ids, range
+     * @return
+     */
+    Map<String, Object> queryStorageDiskStatistic(Map<String, Object> params) throws DMEException;
+
+    /**
      * 查询服务等级历史性能数据
      *
      * @param params key required: obj_ids, indicator_ids, range
@@ -140,6 +164,33 @@ public interface DataStoreStatisticHistoryService {
      * @throws Exception
      */
     Map<String, Object> queryStorageDevcieCurrentStatistic(Map<String, Object> params) throws DMEException;
+
+    /**
+     * 查询控制器当前性能数据
+     *
+     * @param params key required: obj_ids, indicator_ids, range
+     * @return
+     * @throws Exception
+     */
+    Map<String, Object> queryControllerCurrentStatistic(Map<String, Object> params) throws DMEException;
+
+    /**
+     * 查询存储端口当前性能数据
+     *
+     * @param params key required: obj_ids, indicator_ids, range
+     * @return
+     * @throws Exception
+     */
+    Map<String, Object> queryStoragePortCurrentStatistic(Map<String, Object> params) throws DMEException;
+
+    /**
+     * 查询存储磁盘当前性能数据
+     *
+     * @param params key required: obj_ids, indicator_ids, range
+     * @return
+     * @throws Exception
+     */
+    Map<String, Object> queryStorageDiskCurrentStatistic(Map<String, Object> params) throws DMEException;
 
     /**
      * 查询指定资源类型的历史性能数据

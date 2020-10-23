@@ -1,4 +1,4 @@
-<div *ngIf="modifyShow">
+<clr-modal class="add-wizard-wrap" [(clrModalOpen)]="modifyShow" [clrModalClosable]="false">
   <div class="modal-body">
     <form clrForm >
       <!-- 名称 -->
@@ -89,5 +89,5 @@
     <button type="button" class="btn btn-outline" (click)="cancel();">{{'menu.cancel' | translate}}</button>
     <button type="submit" class="btn btn-primary" (click)="modifyHandleFunc()">{{'menu.ok' | translate}}</button>
   </div>
-</div>
+</clr-modal>
 

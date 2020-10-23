@@ -146,6 +146,69 @@
          </componentClass>
       </object>
    </extension>
+   <!--vmfs datastore 监控页面-->
+   <extension id="com.dmeplugin.dmestore.datastore.monitorCategory">
+      <extendedPoint>vsphere.core.datastore.monitorCategories</extendedPoint>
+      <object>
+         <label>#{dmemenu.label}</label>
+      </object>
+   </extension>
+
+   <extension id="com.dmeplugin.dmestore.datastore.vmfsmonitorView">
+      <extendedPoint>vsphere.core.datastore.monitorViews</extendedPoint>
+      <object>
+         <name>#{performance.label}</name>
+         <categoryUid>com.dmeplugin.dmestore.datastore.monitorCategory</categoryUid>
+         <contentSpec>
+            <url>/ui/dmestore/index.html?view=vmfs/performance</url>
+         </contentSpec>
+      </object>
+      <metadata>
+         <objectType>Datastore</objectType>
+         <propertyConditions>
+            <com.vmware.data.query.CompositeConstraint>
+               <nestedConstraints>
+                  <com.vmware.data.query.PropertyConstraint>
+                     <propertyName>isVmfs</propertyName>
+                     <comparator>EQUALS</comparator>
+                     <comparableValue>
+                        <Boolean>true</Boolean>
+                     </comparableValue>
+                  </com.vmware.data.query.PropertyConstraint>
+               </nestedConstraints>
+               <conjoiner>AND</conjoiner>
+            </com.vmware.data.query.CompositeConstraint>
+         </propertyConditions>
+      </metadata>
+   </extension>
+   <!--nfs datastore 监控页面-->
+   <extension id="com.dmeplugin.dmestore.datastore.nfsmonitorView">
+      <extendedPoint>vsphere.core.datastore.monitorViews</extendedPoint>
+      <object>
+         <name>#{performance.label}</name>
+         <categoryUid>com.dmeplugin.dmestore.datastore.monitorCategory</categoryUid>
+         <contentSpec>
+            <url>/ui/dmestore/index.html?view=nfs/performance</url>
+         </contentSpec>
+      </object>
+      <metadata>
+         <objectType>Datastore</objectType>
+         <propertyConditions>
+            <com.vmware.data.query.CompositeConstraint>
+               <nestedConstraints>
+                  <com.vmware.data.query.PropertyConstraint>
+                     <propertyName>isNfs</propertyName>
+                     <comparator>EQUALS</comparator>
+                     <comparableValue>
+                        <Boolean>true</Boolean>
+                     </comparableValue>
+                  </com.vmware.data.query.PropertyConstraint>
+               </nestedConstraints>
+               <conjoiner>AND</conjoiner>
+            </com.vmware.data.query.CompositeConstraint>
+         </propertyConditions>
+      </metadata>
+   </extension>
    <!--vmfs datastore 卷详情-->
    <extension id="com.dmeplugin.dmestore.datastore.summary.lunsummary">
 
@@ -358,7 +421,6 @@
       <extendedPoint>vise.actions.sets</extendedPoint>
       <object>
          <actions>
-
             <com.vmware.actionsfw.ActionSpec>
                <uid>com.dmeplugin.dmestore.host.iscsi</uid>
                <label>#{hostMenu.iscsi}</label>
@@ -370,6 +432,21 @@
                         <actionUrl>/ui/dmestore/index.html?view=iscsi</actionUrl>
                         <dialogTitle>iscsi</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
+                     </root>
+                  </object>
+               </delegate>
+            </com.vmware.actionsfw.ActionSpec>
+            <com.vmware.actionsfw.ActionSpec>
+               <uid>com.dmeplugin.dmestore.hostbestpractice.apply</uid>
+               <label>#{hostMenu.applyBestPractice}</label>
+               <icon>#{addIcon}</icon>
+               <delegate>
+                  <className>com.vmware.vsphere.client.htmlbridge.HtmlActionDelegate</className>
+                  <object>
+                     <root>
+                        <actionUrl>/ui/dmestore/index.html?view=applybp</actionUrl>
+                        <dialogTitle>#{tip}</dialogTitle>
+                        <dialogSize>380,180</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -412,6 +489,10 @@
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
                   <uid>com.dmeplugin.dmestore.datastore.hostnfsumountaction</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <type>action</type>
+                  <uid>com.dmeplugin.dmestore.hostbestpractice.apply</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
             </Array>
          </children>
@@ -778,6 +859,10 @@
                   <type>action</type>
                   <uid>com.dmeplugin.dmestore.datastore.clusternfsumountaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <type>action</type>
+                  <uid>com.dmeplugin.dmestore.clusterbestpractice.apply</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
             </Array>
          </children>
       </object>
@@ -847,6 +932,21 @@
                         <actionUrl>/ui/dmestore/index.html?view=nfs/cluster/unmount</actionUrl>
                         <dialogTitle>nfs</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
+                     </root>
+                  </object>
+               </delegate>
+            </com.vmware.actionsfw.ActionSpec>
+            <com.vmware.actionsfw.ActionSpec>
+               <uid>com.dmeplugin.dmestore.clusterbestpractice.apply</uid>
+               <label>#{clusterMenu.applyBestPractice}</label>
+               <icon>#{addIcon}</icon>
+               <delegate>
+                  <className>com.vmware.vsphere.client.htmlbridge.HtmlActionDelegate</className>
+                  <object>
+                     <root>
+                        <actionUrl>/ui/dmestore/index.html?view=applybp</actionUrl>
+                        <dialogTitle>#{tip}</dialogTitle>
+                        <dialogSize>380,180</dialogSize>
                      </root>
                   </object>
                </delegate>

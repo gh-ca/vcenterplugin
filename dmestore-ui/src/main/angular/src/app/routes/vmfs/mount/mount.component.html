@@ -1,34 +1,39 @@
 <div>
   <!--以主机或集群为入口 挂载/卸载-->
-  <form clrForm *ngIf="resource === 'others'">
-    <div *ngIf="notChooseMountDevice" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.mount.notChooseDataStoreTips' | translate}}</div>
-    <div *ngIf="notChooseUnmountDevice" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.unmount.notChooseDataStoreTips' | translate}}</div>
-    <clr-datagrid [(clrDgSelected)]="chooseMountDataStore" [clrDgLoading]="isLoading">
-      <clr-dg-column hidden>ID</clr-dg-column>
-      <clr-dg-column hidden>objectId</clr-dg-column>
-      <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
-      <clr-dg-column [clrDgField]="'type'">{{'vmfs.type' | translate}}</clr-dg-column>
-      <clr-dg-column [clrDgField]="'status'">{{'vmfs.status' | translate}}</clr-dg-column>
-      <clr-dg-column [clrDgField]="'capacity'">{{'vmfs.capacity' | translate}}</clr-dg-column>
-      <clr-dg-column [clrDgField]="'freeSpace'">{{'vmfs.freeSpace' | translate}}</clr-dg-column>
-      <clr-dg-row *clrDgItems="let item of dataStores" [clrDgItem]="item">
-        <clr-dg-cell hidden>{{item.id}}</clr-dg-cell>
-        <clr-dg-cell hidden>{{item.objectId}}</clr-dg-cell>
-        <clr-dg-cell>{{item.name}}</clr-dg-cell>
-        <clr-dg-cell>{{item.type}}</clr-dg-cell>
-        <clr-dg-cell>{{item.status}}</clr-dg-cell>
-        <clr-dg-cell>{{item.capacity}}</clr-dg-cell>
-        <clr-dg-cell>{{item.freeSpace}}</clr-dg-cell>
-      </clr-dg-row>
-    </clr-datagrid>
+  <clr-modal class="add-wizard-wrap" [(clrModalOpen)]="hostMountShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
+    <div class="modal-body">
+      <form clrForm *ngIf="resource === 'others'">
+        <div *ngIf="notChooseMountDevice" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.mount.notChooseDataStoreTips' | translate}}</div>
+        <div *ngIf="notChooseUnmountDevice" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.unmount.notChooseDataStoreTips' | translate}}</div>
+        <clr-datagrid [(clrDgSelected)]="chooseMountDataStore" [clrDgLoading]="isLoading">
+          <clr-dg-column hidden>ID</clr-dg-column>
+          <clr-dg-column hidden>objectId</clr-dg-column>
+          <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'type'">{{'vmfs.type' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'status'">{{'vmfs.status' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'capacity'">{{'vmfs.capacity' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'freeSpace'">{{'vmfs.freeSpace' | translate}}</clr-dg-column>
+          <clr-dg-row *clrDgItems="let item of dataStores" [clrDgItem]="item">
+            <clr-dg-cell hidden>{{item.id}}</clr-dg-cell>
+            <clr-dg-cell hidden>{{item.objectId}}</clr-dg-cell>
+            <clr-dg-cell>{{item.name}}</clr-dg-cell>
+            <clr-dg-cell>{{item.type}}</clr-dg-cell>
+            <clr-dg-cell>{{item.status}}</clr-dg-cell>
+            <clr-dg-cell>{{item.capacity}}</clr-dg-cell>
+            <clr-dg-cell>{{item.freeSpace}}</clr-dg-cell>
+          </clr-dg-row>
+        </clr-datagrid>
+      </form>
+    </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel();">{{'menu.cancel' | translate}}</button>
       <button type="button" class="btn btn-primary" (click)="mountOrUnmountFunc();">{{'menu.ok' | translate}}</button>
     </div>
-  </form>
+  </clr-modal>
+
 
   <!--以列表或dataStore为入口 挂载-->
-  <div *ngIf="mountShow">
+  <clr-modal class="add-wizard-wrap" [(clrModalOpen)]="mountShow" [clrModalClosable]="false">
     <div class="modal-body">
       <form clrForm>
         <clr-input-container>
@@ -56,6 +61,7 @@
               </clr-option>
             </clr-options>
           </clr-combobox>
+          <clr-control-helper><clr-icon shape="info-circle" class="is-solid"></clr-icon>{{'validations.comboboxTips' | translate}}</clr-control-helper>
         </clr-combobox-container>
 
         <clr-combobox-container *ngIf="mountForm.mountType==='2'">
@@ -67,6 +73,7 @@
               </clr-option>
             </clr-options>
           </clr-combobox>
+          <clr-control-helper><clr-icon shape="info-circle" class="is-solid"></clr-icon>{{'validations.comboboxTips' | translate}}</clr-control-helper>
         </clr-combobox-container>
 
       </form>
@@ -75,10 +82,10 @@
       <button type="button" class="btn btn-outline" (click)="cancel();">{{'menu.cancel' | translate}}</button>
       <button type="button" class="btn btn-primary" (click)="mountOrUnmountFunc()">{{'menu.ok' | translate}}</button>
     </div>
-  </div>
+  </clr-modal>
 
   <!--以列表或dataStore为入口 卸载-->
-  <div *ngIf="unMountShow">
+  <clr-modal class="add-wizard-wrap" [(clrModalOpen)]="unmountShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
     <div class="modal-body">
       <form clrForm >
         <div *ngIf="notChooseUnmountDevice" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.unmount.notChooseDeviceTips' | translate}}</div>
@@ -125,6 +132,6 @@
       <button type="button" class="btn btn-outline" (click)="cancel();">{{'menu.cancel' | translate}}</button>
       <button type="button" class="btn btn-primary" (click)="mountOrUnmountFunc();">{{'menu.ok' | translate}}</button>
     </div>
-  </div>
+  </clr-modal>
 </div>
 

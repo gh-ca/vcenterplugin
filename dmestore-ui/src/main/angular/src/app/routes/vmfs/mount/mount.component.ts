@@ -42,11 +42,11 @@ export class MountComponent implements OnInit{
   notChooseUnmountDevice = false;
   // 挂载的form
   mountForm = new GetForm().getMountForm();
-  // 挂载模块展示/隐藏
+  // 以list/DataStore 为入口 挂载展示/隐藏
   mountShow = false;
-  // 卸载模块展示/隐藏
-  unMountShow = false;
 
+  // 以主机集群为入口的挂载/卸载
+  hostMountShow = false;
 
   // 服务器/集群ID
   hostOrClusterId;
@@ -73,11 +73,14 @@ export class MountComponent implements OnInit{
   mountedCluster: HostOrCluster[] = []; // 已挂载的集群
 
   // vmfs数据
-  vmfsInfo;
+  vmfsInfo = {
+    name: ''
+  };
   ngOnInit(): void {
     // 初始化隐藏窗口
     this.unmountShow = false;
     this.mountShow = false;
+    this.hostMountShow = false;
     this.initData();
   }
 
@@ -93,8 +96,13 @@ export class MountComponent implements OnInit{
       }
       this.activatedRoute.queryParams.subscribe(queryParam => {
         this.resource = queryParam.resource;
-        if (this.resource !== 'others') {
-          this.objectId = queryParam.objectId;
+        const ctx = this.globalsService.getClientSdk().app.getContextObjects();
+        if (this.resource !== 'others') { // 以列表/dataStore 为入口
+          if (this.resource === 'list') {// 以列表为入口
+            this.objectId = queryParam.objectId;
+          } else { // 以dataStore为入口
+            this.objectId = ctx[0].id;
+          }
 
           // 获取vmfs数据
           this.remoteSrv.getVmfsById(this.objectId)
@@ -107,14 +115,15 @@ export class MountComponent implements OnInit{
               if (this.operationType === 'mount') {
                 this.mountShow = true;
               } else {
-                this.unMountShow = true;
+                this.unmountShow = true;
               }
 
               this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
             });
 
-        } else {
-          this.hostOrClusterId = queryParam.objectId;
+        } else { // 以集群为入口
+          this.hostOrClusterId = ctx[0].id;
+          this.hostMountShow = true;
         }
         this.cdr.detectChanges();
       });
@@ -189,7 +198,7 @@ export class MountComponent implements OnInit{
       } else { // 卸载
 
         this.isLoading = true;
-        console.log('this.unMountShow', this.unMountShow);
+        console.log('this.unmountShow', this.unmountShow);
         // 初始化卸载 页面未选择设备 提示数据展示
         this.notChooseUnmountDevice = false;
         // 初始话已选择数据
@@ -339,7 +348,7 @@ export class MountComponent implements OnInit{
       if (this.operationType === 'mount') {
         this.mountShow = false;
       } else {
-        this.unMountShow = false;
+        this.unmountShow = false;
       }
     }
     // 父窗口关闭

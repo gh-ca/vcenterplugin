@@ -30,6 +30,9 @@ export class ExpandComponent implements OnInit{
   // vmfs数据
   vmfsInfo: VmfsInfo;
 
+  // 弹窗隐藏/显示
+  expandShow = false;
+
   ngOnInit(): void {
     this.initData();
   }
@@ -38,12 +41,18 @@ export class ExpandComponent implements OnInit{
    * 初始化数据
    */
   initData() {
+    this.expandShow = false;
     // 设备类型 操作类型初始化
     this.route.url.subscribe(url => {
       console.log('url', url);
       this.route.queryParams.subscribe(queryParam => {
         this.resource = queryParam.resource;
-        this.objectId = queryParam.objectId;
+        if (this.resource === 'list') {
+          this.objectId = queryParam.objectId;
+        } else {
+          const ctx = this.globalsService.getClientSdk().app.getContextObjects();
+          this.objectId = ctx[0].id;
+        }
         this.remoteSrv.getVmfsById(this.objectId).subscribe((result: any) => {
           console.log('VmfsInfo:', result);
           if (result.code === '200' && null != result.data) {
@@ -52,6 +61,8 @@ export class ExpandComponent implements OnInit{
             this.expandForm.volume_id = this.vmfsInfo.volumeId;
             this.expandForm.ds_name = this.vmfsInfo.name;
           }
+          this.expandShow = true;
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         });
       });
     });
