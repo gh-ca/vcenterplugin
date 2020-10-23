@@ -255,6 +255,10 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
           i.usedCapacity = (i.usedCapacity/1024).toFixed(2);
           i.totalCapacity = (i.totalCapacity/1024).toFixed(2);
           i.freeCapacity = (i.freeCapacity/1024).toFixed(2);
+
+          if(!i.capabilities){
+            i.capabilities = {};
+          }
         }
         this.search();
       }
