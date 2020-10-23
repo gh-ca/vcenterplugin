@@ -574,34 +574,44 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         //statisticElement中 data 为空 状态码又是200的情况 暂按正常来处理
         //{"status_code":200,"error_code":-60,"error_msg":"ES: Query DB return empty","data":{}}
         //{"status_code":200,"error_code":0,"error_msg":"Successful.","data":{"1282FFE20AA03E4EAC9A814C687B780A":{....}}
-        try {
-            responseEntity = queryStatistic(params);
-            if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
-                Object body = responseEntity.getBody();
-                String bodyStr = body.toString();
-                bodyStr = replace(bodyStr, idInstanceIdMap);
-                JsonObject bodyJson = new JsonParser().parse(bodyStr).getAsJsonObject();
-                statisticElement = bodyJson.get("data");
-                Map<String, Object> objectMap = convertMap(statisticElement);
-                //resmap.put("data", objectMap);
-                resultmap = objectMap;
-                if (null == objectMap || objectMap.size() == 0) {
+        List<List<String>> objIdGroup = groupObjIds(params);
+        if (null != objIdGroup && objIdGroup.size() > 0) {
+            for (List<String> objids : objIdGroup) {
+                params.put("obj_ids", objids);
+                try {
+                    responseEntity = queryStatistic(params);
+                    if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
+                        Object body = responseEntity.getBody();
+                        String bodyStr = body.toString();
+                        bodyStr = replace(bodyStr, idInstanceIdMap);
+                        JsonObject bodyJson = new JsonParser().parse(bodyStr).getAsJsonObject();
+                        statisticElement = bodyJson.get("data");
+                        if (ToolUtils.jsonIsNull(statisticElement)) {
+                            log.error("query " + relationOrInstance + "objid: " + gson.toJson(objids) + "Statistic is null:", bodyJson.get("error_msg").getAsString());
+                            continue;
+                        }
+                        Map<String, Object> objectMap = convertMap(statisticElement);
+                        //resmap.put("data", objectMap);
+                        resultmap.putAll(objectMap);
+                        if (null == objectMap || objectMap.size() == 0) {
+                            //resmap.put("code", 503);
+                            //resmap.put("message", "query " + relationOrInstance + " statistic error:" + bodyJson.get("error_msg").getAsString());
+                            log.error("query " + relationOrInstance + "Statistic error:", bodyJson.get("error_msg").getAsString());
+                            throw new DMEException("503", "query " + relationOrInstance + "Statistic error:" + bodyJson.get("error_msg").getAsString());
+                        }
+                    } else {
+                        //resmap.put("code", 503);
+                        //resmap.put("message", "query " + relationOrInstance + " statistic error!");
+                        log.error("query " + relationOrInstance + " statistic error,the params is:{}", gson.toJson(params));
+                        throw new DMEException("503", "query " + relationOrInstance + " statistic error,the params is:{}" + gson.toJson(params));
+                    }
+                } catch (Exception e) {
                     //resmap.put("code", 503);
-                    //resmap.put("message", "query " + relationOrInstance + " statistic error:" + bodyJson.get("error_msg").getAsString());
-                    log.error("query " + relationOrInstance + "Statistic error:", bodyJson.get("error_msg").getAsString());
-                    throw new DMEException("503", "query " + relationOrInstance + "Statistic error:" + bodyJson.get("error_msg").getAsString());
+                    //resmap.put("message", "query " + relationOrInstance + " statistic exception!");
+                    log.error("query " + relationOrInstance + " statistic exception.", e);
+                    throw new DMEException("503", "query " + relationOrInstance + " statistic exception." + e.getMessage());
                 }
-            } else {
-                //resmap.put("code", 503);
-                //resmap.put("message", "query " + relationOrInstance + " statistic error!");
-                log.error("query " + relationOrInstance + " statistic error,the params is:{}", gson.toJson(params));
-                throw new DMEException("503", "query " + relationOrInstance + " statistic error,the params is:{}" + gson.toJson(params));
             }
-        } catch (Exception e) {
-            //resmap.put("code", 503);
-            //resmap.put("message", "query " + relationOrInstance + " statistic exception!");
-            log.error("query " + relationOrInstance + " statistic exception.", e);
-            throw new DMEException("503", "query " + relationOrInstance + " statistic exception." + e.getMessage());
         }
         return resultmap;
     }
@@ -618,34 +628,38 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         //statisticElement中 data 为空 状态码又是200的情况 暂按正常来处理
         //{"status_code":200,"error_code":-60,"error_msg":"ES: Query DB return empty","data":{}}
         //{"status_code":200,"error_code":0,"error_msg":"Successful.","data":{"1282FFE20AA03E4EAC9A814C687B780A":{....}}
-        try {
-            responseEntity = queryStatistic(params);
-            if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
-                Object body = responseEntity.getBody();
-                String bodyStr = body.toString();
-                bodyStr = replace(bodyStr, idInstanceIdMap);
-                JsonObject bodyJson = new JsonParser().parse(bodyStr).getAsJsonObject();
-                statisticElement = bodyJson.get("data");
-                Map<String, Object> objectMap = convertMap(statisticElement, label);
-                //resmap.put("data", objectMap);
-                resultmap = objectMap;
-                if (null == objectMap || objectMap.size() == 0) {
-                    //resmap.put("code", 503);
-                    //resmap.put("message", "query " + relationOrInstance + " current statistic error:" + bodyJson.get("error_msg").getAsString());
-                    log.error("query " + relationOrInstance + " current statistic error:", bodyJson.get("error_msg").getAsString());
-                    throw new DMEException("503", "query " + relationOrInstance + " current statistic error:" + bodyJson.get("error_msg").getAsString());
+        List<List<String>> objIdGroup = groupObjIds(params);
+        if (null != objIdGroup && objIdGroup.size() > 0) {
+            for (List<String> objids : objIdGroup) {
+                params.put("obj_ids", objids);
+                try {
+                    responseEntity = queryStatistic(params);
+                    if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
+                        Object body = responseEntity.getBody();
+                        String bodyStr = body.toString();
+                        bodyStr = replace(bodyStr, idInstanceIdMap);
+                        JsonObject bodyJson = new JsonParser().parse(bodyStr).getAsJsonObject();
+                        statisticElement = bodyJson.get("data");
+                        if (ToolUtils.jsonIsNull(statisticElement)) {
+                            log.error("query " + relationOrInstance + "objid: " + gson.toJson(objids) + "currentStatistic is null:", bodyJson.get("error_msg").getAsString());
+                            continue;
+                        }
+                        Map<String, Object> objectMap = convertMap(statisticElement, label);
+                        //resmap.put("data", objectMap);
+                        resultmap.putAll(objectMap);
+                        if (null == objectMap || objectMap.size() == 0) {
+                            log.error("query " + relationOrInstance + " current statistic error:", bodyJson.get("error_msg").getAsString());
+                            throw new DMEException("503", "query " + relationOrInstance + " current statistic error:" + bodyJson.get("error_msg").getAsString());
+                        }
+                    } else {
+                        log.error("query " + relationOrInstance + " current statistic error,the params is:{}", gson.toJson(params));
+                        throw new DMEException("503", "query " + relationOrInstance + " current statistic error,the params is:{}" + gson.toJson(params));
+                    }
+                } catch (Exception e) {
+                    log.error("query " + relationOrInstance + " current statistic exception.", e);
+                    throw new DMEException("503", "query " + relationOrInstance + " current statistic exception." + e.getMessage());
                 }
-            } else {
-                // resmap.put("code", 503);
-                //resmap.put("message", "query " + relationOrInstance + " current statistic error!");
-                log.error("query " + relationOrInstance + " current statistic error,the params is:{}", gson.toJson(params));
-                throw new DMEException("503", "query " + relationOrInstance + " current statistic error,the params is:{}" + gson.toJson(params));
             }
-        } catch (Exception e) {
-            //resmap.put("code", 503);
-            //resmap.put("message", "query " + relationOrInstance + " current statistic exception!");
-            log.error("query " + relationOrInstance + " current statistic exception.", e);
-            throw new DMEException("503", "query " + relationOrInstance + " current statistic exception." + e.getMessage());
         }
         return resultmap;
     }
@@ -883,16 +897,16 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         if (isCurrent) {
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_THROUGHPUT);//throughput
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_BANDWIDTH);//bandwidth
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_RESPONSETIME);//responsetime
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_CPUUSAGE);//cpuusage
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_CPUUSAGE);//cpu usedrate
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_RESPONSETIME);//时延
         } else {
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_READTHROUGHPUT);//readThroughput 读IOPS
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_WRITETHROUGHPUT);//writeThroughput
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_READBANDWIDTH);//readBandwidth
             indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_WRITEBANDWIDTH);//writeBandwidth
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_READRESPONSETIME);//readResponseTime
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_WRITERESPONSETIME);//writeResponseTime
         }
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_READRESPONSETIME);//readResponseTime
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_WRITERESPONSETIME);//writeResponseTime
         return indicators;
     }
 
@@ -902,16 +916,16 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         if (isCurrent) {
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_THROUGHPUT);//throughput
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_BANDWIDTH);//bandwidth
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_READRESPONSETIME);//responsetime
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_UTILITY);//utility
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_UTILITY);//利用率
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_THROUGHPUT);//IOPS
         } else {
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_READTHROUGHPUT);//readThroughput 读IOPS
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_WRITETHROUGHPUT);//writeThroughput
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_READBANDWIDTH);//readBandwidth
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_WRITEBANDWIDTH);//writeBandwidth
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_READRESPONSETIME);//readResponseTime
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_WRITERESPONSETIME);//writeResponseTime
         }
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_READRESPONSETIME);//readResponseTime
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_WRITERESPONSETIME);//writeResponseTime
         return indicators;
     }
 
@@ -919,16 +933,15 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private List<String> initStorageDiskIndicator(boolean isCurrent) {
         List<String> indicators = new ArrayList<>();
         if (isCurrent) {
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_THROUGHPUT);//throughput
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_THROUGHPUT);//IOPS
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_BANDWIDTH);//bandwidth
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_RESPONSETIME);//responsetime
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_UTILITY);//utlity
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_UTILITY);//使用率
         } else {
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_READTHROUGHPUT);//readThroughput 读IOPS
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_WRITETHROUGHPUT);//writeThroughput
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_BANDWIDTH);//writeBandwidth
         }
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_RESPONSETIME);//readResponseTime
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_RESPONSETIME);//时延
         return indicators;
     }
 
@@ -1064,7 +1077,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                             Set<Map.Entry<String, JsonElement>> maxSet = maxElement.getAsJsonObject().entrySet();
                             for (Map.Entry<String, JsonElement> maxEntry : maxSet) {
                                 String time = maxEntry.getKey();
-                                String value = maxEntry.getValue().getAsString();
+                                String value = ToolUtils.jsonToStr(maxEntry.getValue());
                                 indicatorMap.put(indicatoerId, value);
                                 break;
                             }
@@ -1091,5 +1104,29 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             }
         }
         return result;
+    }
+
+    //将对象分组:当对象数*指标数 > 100 时分组
+    private List<List<String>> groupObjIds(Map<String, Object> params) {
+        int maxObjIndicator = 100;
+        List<List<String>> objGroup = new ArrayList<>();
+        List<String> objIds = (List<String>) params.get("obj_ids");
+        List<String> indicator_ids = (List<String>) params.get("indicator_ids");
+        int objSize = objIds.size();
+        int indicatorSize = indicator_ids.size();
+        if (objSize * indicatorSize > maxObjIndicator) {
+            int length = maxObjIndicator / indicatorSize;
+            int count = 0;
+            List<String> list = null;
+            for (String objId : objIds) {
+                if (0 == count % length) {
+                    list = new ArrayList<>();
+                    objGroup.add(list);
+                }
+                list.add(objId);
+                count++;
+            }
+        }
+        return objGroup;
     }
 }
