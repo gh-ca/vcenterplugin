@@ -82,7 +82,7 @@ export class ServiceLevelComponent implements OnInit{
     this.remoteSrv.getServiceLevelList().subscribe((result: any) => {
       console.log(result);
       if (result.code === '200' && result.data !== null) {
-        this.serviceLevelList = result.data;
+        this.serviceLevelList = result.data.filter(item => item.totalCapacity !== 0);
         console.log('this.serviceLevelList', this.serviceLevelList);
       }
       this.changeServiceLevelShow = true;
@@ -107,7 +107,7 @@ export class ServiceLevelComponent implements OnInit{
   changeSLHandleFunc() {
     const selectResult = this.serviceLevelList.find(item => item.show === true);
     console.log('selectResult', selectResult);
-    if (selectResult) {
+    if (selectResult && selectResult.totalCapacity !== 0) {
       this.serviceLevelIsNull = false;
       this.changeServiceLevelForm.service_level_id = selectResult.id;
       this.changeServiceLevelForm.service_level_name = selectResult.name;

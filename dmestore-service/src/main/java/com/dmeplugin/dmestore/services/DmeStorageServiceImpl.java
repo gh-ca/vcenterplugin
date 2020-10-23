@@ -180,7 +180,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 storageObj.setSynStatus(ToolUtils.jsonToStr(element.get("syn_status")));
                 storageObj.setVendor(ToolUtils.jsonToStr(element.get("vendor")));
                 storageObj.setModel(ToolUtils.jsonToStr(element.get("model")));
-                storageObj.setUsedCapacity(ToolUtils.jsonToDou(element.get("used_capacity"), 0.0));
+                storageObj.setUsedCapacity(ToolUtils.jsonToDou(element.get("used_capacity"), 0.0)/1024);
                 storageObj.setTotalCapacity(ToolUtils.jsonToDou(element.get("total_capacity"), 0.0)/1024);
                 storageObj.setTotalEffectiveCapacity(ToolUtils.jsonToDou(element.get("total_effective_capacity"), 0.0));
                 storageObj.setFreeEffectiveCapacity(ToolUtils.jsonToDou(element.get("free_effective_capacity"), 0.0));

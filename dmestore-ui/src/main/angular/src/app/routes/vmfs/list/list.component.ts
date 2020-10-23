@@ -303,10 +303,7 @@ export class VmfsListComponent implements OnInit {
   // 初始化块大小（修改版本触发事件）
   setBlockSizeOptions() {
     const options = [];
-    // const versionVal = this.versionBtn.nativeElement.value;
     const versionVal = this.form.version + '';
-    const option0 = {key: null, value : ''};
-    options.push(option0);
     console.log('versionVal' + versionVal);
     if (versionVal === '6') {
       const option1 = {key: 1024, value : '1MB'};
@@ -317,22 +314,16 @@ export class VmfsListComponent implements OnInit {
       const option1 = {key: 1024, value : '1MB'};
       options.push(option1);
     }
-    // 重置blockSize的值
-    this.form.blockSize = null;
-    // this.blockSizeBtn.nativeElement.value = null;
     // 设置blockSize 可选值
     this.blockSizeOptions = options;
+    this.form.blockSize = this.blockSizeOptions[0].key;
     // 重置空间回收粒度
-    // this.form.spaceReclamationGranularity = 0;
     this.setSrgOptions();
   }
   // 初始化空间回收粒度
   setSrgOptions() {
     const options = [];
-    // const srgValue = this.blockSizeBtn.nativeElement.value;
     const blockValue = this.form.blockSize + '';
-    const option0 = {key: null, value : ''};
-    options.push(option0);
     if (blockValue === '1024') {
       const option1 = {key: 1024, value : '1MB'};
       options.push(option1);
@@ -344,8 +335,9 @@ export class VmfsListComponent implements OnInit {
       const option2 = {key: 8, value : '8KB'};
       options.push(option2);
     }
+
     this.srgOptions = options;
-    this.form.spaceReclamationGranularity = null;
+    this.form.spaceReclamationGranularity = this.srgOptions[0].key;
     console.log('this.form.blockSize:' + this.form.blockSize);
     console.log('this.form.spaceReclamationGranularity:' + this.form.spaceReclamationGranularity);
   }
@@ -446,7 +438,7 @@ export class VmfsListComponent implements OnInit {
     // 添加页面显示
     this.popShow = true;
     // 添加页面默认打开首页
-    this.jumpTo(this.addPageOne, this.wizard);
+    this.jumpTo(this.addPageOne);
     // 版本、块大小、粒度下拉框初始化
     this.setBlockSizeOptions();
 
@@ -464,11 +456,11 @@ export class VmfsListComponent implements OnInit {
 
   }
   // 页面跳转
-  jumpTo(page: ClrWizardPage, wizard: ClrWizard) {
+  jumpTo(page: ClrWizardPage) {
     if (page && page.completed) {
-      wizard.navService.currentPage = page;
+      this.wizard.navService.currentPage = page;
     } else {
-      wizard.navService.setLastEnabledPageCurrent();
+      this.wizard.navService.setLastEnabledPageCurrent();
     }
     this.wizard.open();
   }
@@ -480,7 +472,7 @@ export class VmfsListComponent implements OnInit {
     this.remoteSrv.getServiceLevelList().subscribe((result: any) => {
       console.log(result);
       if (result.code === '200' && result.data !== null) {
-        this.serviceLevelList = result.data;
+        this.serviceLevelList = result.data.filter(item => item.totalCapacity !== 0);
         console.log('this.serviceLevelList', this.serviceLevelList);
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
@@ -496,7 +488,8 @@ export class VmfsListComponent implements OnInit {
   addVmfsHanlde() {
     const selectResult = this.serviceLevelList.find(item => item.show === true);
     console.log('selectResult', this.levelCheck === 'level' && selectResult);
-    if ((this.levelCheck === 'level' && selectResult) || this.levelCheck !== 'level') { // 选择服务等级
+    console.log('flagggggg', (this.levelCheck === 'level' && selectResult && selectResult.totalCapacity !== 0) || this.levelCheck !== 'level');
+    if ((this.levelCheck === 'level' && selectResult && selectResult.totalCapacity !== 0) || this.levelCheck !== 'level') { // 选择服务等级
       if (selectResult) {
         this.form.service_level_id = selectResult.id;
         this.form.service_level_name = selectResult.name;
@@ -888,7 +881,7 @@ export class VmfsListComponent implements OnInit {
   changeSLHandleFunc() {
     const selectResult = this.serviceLevelList.find(item => item.show === true);
     console.log('selectResult', selectResult);
-    if (selectResult) {
+    if (selectResult && selectResult.totalCapacity !== 0) {
       this.serviceLevelIsNull = false;
       this.changeServiceLevelForm.service_level_id = selectResult.id;
       this.changeServiceLevelForm.service_level_name = selectResult.name;

@@ -683,7 +683,7 @@
     <div class="modal-body">
       <!--名称-->
       <form clrForm #formPageOne="ngForm">
-        <clr-input-container>
+        <clr-input-container style="height: 4rem;">
           <label style="color: #9F9F9F;">{{'vmfs.expandSize' | translate}}</label>
           <div clrInput style="float: left;position: relative;">
             <input clrInput style="width: 70%;border-bottom: none" type="number" [(ngModel)]="expandForm.vo_add_capacity" name="vo_add_capacity" #number="ngModel"
@@ -694,6 +694,9 @@
               <option value="MB">MB</option>
               <option value="KB">KB</option>
             </select>
+            <clr-control-helper style="position: absolute">
+              <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.expandTips' | translate}}
+            </clr-control-helper>
           </div>
         </clr-input-container>
       </form >
