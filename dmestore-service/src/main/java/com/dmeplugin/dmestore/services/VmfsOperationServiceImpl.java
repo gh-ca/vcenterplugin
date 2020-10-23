@@ -144,7 +144,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     }
 
     @Override
-    public void expandVMFS(List<Map<String, String>> volumes) throws DMEException {
+    public void expandVMFS(Map<String, String> volumemap) throws DMEException {
 
         //Map<String, Object> resMap = new HashMap<>(16);
         //resMap.put("code", 202);
@@ -154,18 +154,18 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         List<Object> reqList = new ArrayList<>(10);
         Map<String, Object> reqMap = new HashMap<>(16);
         List<String> volume_ids = new ArrayList<>(10);
-        for (int i = 0; i < volumes.size(); i++) {
-            Map<String, String> map = volumes.get(i);
-            String volume_id = map.get("volume_id");
-            String vo_add_capacity = map.get("vo_add_capacity");
-            if (!StringUtils.isEmpty(volume_id) && !StringUtils.isEmpty(vo_add_capacity)) {
-                volume_ids.add(volume_id);
-            }
+
+        String volume_id = volumemap.get("volume_id");
+        String datastoreobjid = volumemap.get("obj_id");
+        String vo_add_capacity = volumemap.get("vo_add_capacity");
+        if (!StringUtils.isEmpty(volume_id) && !StringUtils.isEmpty(vo_add_capacity)) {
             volume_ids.add(volume_id);
-            reqBody.put("volume_id", volume_id);
-            reqBody.put("added_capacity", Integer.valueOf(map.get("vo_add_capacity")));
-            reqList.add(reqBody);
         }
+        volume_ids.add(volume_id);
+        reqBody.put("volume_id", volume_id);
+        reqBody.put("added_capacity", Integer.valueOf(volumemap.get("vo_add_capacity")));
+        reqList.add(reqBody);
+
 
         reqMap.put("volumes", reqList);
         try {
@@ -192,31 +192,22 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             //resMap.put("task_id", task_id);
 
             //expand vmfs datastore
-            for (int i = 0; i < volumes.size(); i++) {
-                Map<String, String> map = volumes.get(i);
-                String ds_name = map.get("ds_name");
-                String vo_add_capacity = map.get("vo_add_capacity");
-                String hostObjectId = map.get("hostObjectId");
-                String result = null;
-                if (!StringUtils.isEmpty(vo_add_capacity)&&!StringUtils.isEmpty(hostObjectId)) {
-                    result = vcsdkUtils.expandVmfsDatastore(ds_name, ToolUtils.getInt(vo_add_capacity),hostObjectId);
-                }
-                if ("failed".equals(result)) {
-                    //resMap.put("code", 403);
-                    //resMap.put("msg", "expand vmfsDatastore failed !");
-                   // return resMap;
-                    throw new DMEException("403","expand vmfsDatastore failed !");
-                }
+
+            String ds_name = volumemap.get("ds_name");
+            //String vo_add_capacity = volumemap.get("vo_add_capacity");
+            //String hostObjectId = volumemap.get("hostObjectId");
+            String result = null;
+            if (!StringUtils.isEmpty(vo_add_capacity)&&!StringUtils.isEmpty(datastoreobjid)) {
+                result = vcsdkUtils.expandVmfsDatastore(ds_name, ToolUtils.getInt(vo_add_capacity),datastoreobjid);
             }
-            //scan volume of host
-            Map<String, Object> hostMap = getHostIpByVolume(volume_ids);
-            Integer rescode = Integer.valueOf(hostMap.get("code").toString());
-            if (rescode == 200) {
-                List<Object> ips = Arrays.asList(hostMap.get("host_ips"));
-                for (int i = 0; i < ips.size(); i++) {
-                    vcsdkUtils.hostRescanVmfs(ips.get(i).toString());
-                }
+            if ("failed".equals(result)) {
+                //resMap.put("code", 403);
+                //resMap.put("msg", "expand vmfsDatastore failed !");
+               // return resMap;
+                throw new DMEException("403","expand vmfsDatastore failed !");
             }
+
+
         } catch (Exception e) {
             LOG.error("expand vmfsDatastore error !", e);
             //resMap.put("code", 503);
