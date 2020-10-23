@@ -184,7 +184,7 @@
     "multiply": "X",
     "IOPS": "IOPS",
     "IOPSQoSTarget": "IOPS QoS Target",
-    "bandwidth": "Bandwidth(MB/s)",
+    "bandwidth": "Bandwidth",
     "bandwidthQoSTarget": "Bandwidth QoS Target",
     "readResponseTime": "Read Response Time(ms)",
     "writeResponseTime": "Write Response Time(ms)",

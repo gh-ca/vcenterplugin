@@ -408,4 +408,20 @@ export class AddComponent implements OnInit{
       obj.value = objValue;
     }
   }
+  /**
+   * 容量格式化
+   * @param c 容量值
+   * @param isGB true GB、false MB
+   */
+  formatCapacity(c: number, isGB:boolean){
+    let cNum;
+    if (c < 1024){
+      cNum = isGB ? c.toFixed(3)+'GB':c.toFixed(3)+'MB';
+    }else if(c >= 1024 && c< 1048576){
+      cNum = isGB ? (c/1024).toFixed(3) + 'TB' : (c/1024).toFixed(3) + 'GB';
+    }else if(c>= 1048576){
+      cNum = isGB ? (c/1024/1024).toFixed(3) + 'PB':(c/1024/1024).toFixed(3) + 'TB';
+    }
+    return cNum;
+  }
 }
