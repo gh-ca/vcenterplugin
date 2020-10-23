@@ -123,7 +123,7 @@ export class PerformanceComponent implements OnInit{
     if (this.selectRange) {
       console.log('this.selectVolName+this.selectRange', this.selectVolName, this.selectRange);
       // 获取已选择的卷
-      this.selectVolume = this.makePerformance.getVolByName(this.selectVolName, this.volumeInfoList);
+      this.selectVolume = this.getVolByName(this.selectVolName);
       // 请求后台重新加载折线图
       this.initChart();
     } else {

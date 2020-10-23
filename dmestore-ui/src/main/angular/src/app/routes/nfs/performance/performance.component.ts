@@ -15,6 +15,7 @@ import {FormControl, FormGroup} from "@angular/forms";
 })
 export class NfsPerformanceComponent implements OnInit, AfterViewInit {
   fsDetails: FsDetail[];
+  chooseFs: FsDetail;
   fsNames: string[] = [];
   defaultSelect: string;
 
@@ -46,9 +47,29 @@ export class NfsPerformanceComponent implements OnInit, AfterViewInit {
 
   ngOnInit(): void {
     const ctx = this.gs.getClientSdk().app.getContextObjects();
-    //this.getFsDetail(ctx[0].id);
+    this.getFsDetail(ctx[0].id);
+    // this.getFsDetail('urn:vmomi:Datastore:datastore-1115:674908e5-ab21-4079-9cb1-596358ee5dd1');
   }
-  changeFs(){}
+  changeFs(){
+    if (this.selectRange === 'BEGIN_END_TIME') {
+      if (this.startTime === null || this.endTime === null) {
+        console.log('开始结束时间不能为空');
+        return;
+      }
+    } else { // 初始化开始结束时间
+      this.startTime = null;
+      this.endTime = null;
+    }
+    if (this.selectRange) {
+      console.log('this.selectVolName+this.selectRange', this.defaultSelect, this.selectRange);
+      // 获取已选择的卷
+      this.chooseFs = this.getVolByName(this.defaultSelect);
+      // 请求后台重新加载折线图
+      this.initChart();
+    } else {
+      console.log('未选择卷或range');
+    }
+  }
   getFsDetail(objectId){
     this.fsService.getData(objectId).subscribe((result: any) => {
       this.fsDetails = result.data;
@@ -56,13 +77,15 @@ export class NfsPerformanceComponent implements OnInit, AfterViewInit {
         this.fsNames.push(f.name);
       });
       this.defaultSelect = this.fsNames[0];
+      this.chooseFs = this.getVolByName(this.defaultSelect);
     });
   }
 
   // 初始化表格对象
   async initChart() {
     const fsNames:string[] = [];
-    fsNames.push('1282FFE20AA03E4EAC9A814C687B780A');
+    // fsNames.push('A7213075B5EE3AF3989D7DB938ED2CF8');
+    fsNames.push(this.chooseFs.fsId);
     //ops
     this.makePerformance.setChart(300,"OPS","IO/s",
       NfsService.nfsOPS,fsNames,this.selectRange,NfsService.nfsUrl, this.startTime, this.endTime).then(res=>{
@@ -99,4 +122,9 @@ export class NfsPerformanceComponent implements OnInit, AfterViewInit {
     }
   }
 
+  // 通过名称获取卷信息
+  getVolByName(name): any {
+    const volumeInfo = this.fsDetails.filter(item  => item.name === name)[0];
+    return volumeInfo;
+  }
 }

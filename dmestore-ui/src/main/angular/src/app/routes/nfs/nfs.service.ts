@@ -17,11 +17,11 @@ export class NfsService {
   static vmfsUrl = 'datastorestatistichistrory/vmfs';
 
   // NFS IOPS 0Read 1Write
-  static nfsOPS: Array<string> = ['1125921381744648', '1125921381744649'];
+  static nfsOPS: Array<string> = ['1126179079716867', '1126179079716870'];
   // NFS  bandwidth 0Read 1Write
-  static nfsBDWT: Array<string> = ['1125921381744646', '1125921381744647'];
+  static nfsBDWT: Array<string> = ['1126179079716868', '1126179079716871'];
   // NFS  latency 0Read 1Write
-  static nfsLatency: Array<string> = ['1125921381744656', '1125921381744657'];
+  static nfsLatency: Array<string> = ['1126179079716869', '1126179079716872'];
   // NFS  url
   static nfsUrl = 'datastorestatistichistrory/nfs';
   // 性能图可选range LAST_5_MINUTE LAST_1_HOUR LAST_1_DAY LAST_1_WEEK LAST_1_MONTH LAST_1_QUARTER HALF_1_YEAR LAST_1_YEAR BEGIN_END_TIME INVALID
@@ -682,6 +682,7 @@ export class MakePerformance {
    * @param type upper 最大 lower最小
    */
   getUpperOrLower(data: any, type: string) {
+    console.log("data", data)
     let result;
     if (type === 'lower') {
       for (const key of Object.keys(data.max)) {
