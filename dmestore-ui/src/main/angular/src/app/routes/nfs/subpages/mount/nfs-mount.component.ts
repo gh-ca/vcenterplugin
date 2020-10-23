@@ -8,7 +8,7 @@ import {Cluster, Host, Mount} from "../../nfs.service";
   selector: 'app-mount',
   templateUrl: './nfs-mount.component.html',
   styleUrls: ['./nfs-mount.component.scss'],
-  providers: [GlobalsService,NfsMountService]
+  providers: [NfsMountService]
 })
 export class NfsMountComponent implements OnInit{
   viewPage: string;

@@ -199,7 +199,7 @@
       </clr-input-container>
       <clr-input-container>
         <label>{{'overview.port' | translate}}</label>
-        <input clrInput formControlName="port" type="text" [(ngModel)]="connectModel.hostPort" name="port" />
+        <input clrInput formControlName="port" type="text" placeholder="{{'overview.portholder'|translate}}" [(ngModel)]="connectModel.hostPort" name="port" />
       </clr-input-container>
       <clr-input-container>
         <label>{{'overview.user' | translate}}</label>
@@ -207,7 +207,7 @@
       </clr-input-container>
       <clr-password-container>
         <label>{{'overview.password' | translate}}</label>
-        <input clrPassword formControlName="password" placeholder="Password" name="password" [(ngModel)]="connectModel.password" />
+        <input clrPassword formControlName="password" name="password" [(ngModel)]="connectModel.password" />
       </clr-password-container>
     </form>
   </div>

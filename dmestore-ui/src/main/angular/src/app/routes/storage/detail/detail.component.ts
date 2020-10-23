@@ -1,6 +1,7 @@
 import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone, OnInit} from '@angular/core';
 import {
-  CapacityDistribution, DetailService, Dtrees, NfsShare, PoolList, StorageController, StorageDetail, StorageDisk,
+  CapacityDistribution, CapacitySavings, DetailService, Dtrees, NfsShare, PoolList, StorageController, StorageDetail,
+  StorageDisk,
   StoragePool,
   Volume
 } from './detail.service';
@@ -8,7 +9,7 @@ import {VmfsPerformanceService} from '../../vmfs/volume-performance/performance.
 import { EChartOption } from 'echarts';
 import {FileSystem} from '../../nfs/nfs.service';
 import {ActivatedRoute, Router} from "@angular/router";
-import {CapacityChart, CapacitySerie} from "../storage.service";
+import {CapacityChart, CapacitySerie, StorageList} from "../storage.service";
 import {BondPort, EthernetPort, FailoverGroup, FCoEPort, FCPort, LogicPort} from "./port.service";
 @Component({
   selector: 'app-detail',
@@ -20,7 +21,7 @@ import {BondPort, EthernetPort, FailoverGroup, FCoEPort, FCPort, LogicPort} from
 export class DetailComponent implements OnInit, AfterViewInit {
 
   cd : CapacityDistribution;
-
+  capSave:CapacitySavings;
 
 
   options = {
@@ -303,8 +304,6 @@ export class DetailComponent implements OnInit, AfterViewInit {
   endTime = 1552567343000;
   // 定时函数执行时间 默认一天
   timeInterval = 1 * 60 * 60 * 1000;
-  // 存储池列表
-  poolList: PoolList[] = [];
   poolRadio = 'table1'; // 存储池列表切换
   volumeRadio = 'table1'; // volume列表切换
   storageId = '1234';
@@ -314,6 +313,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   detail: StorageDetail;
   storagePool: StoragePool[];
   volumes: Volume[];
+  volumeTotal=0;
   volumeSelect = [];
   fsList: FileSystem[];
   dtrees: Dtrees[];
@@ -327,6 +327,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
   bonds: BondPort[];
   logicports:LogicPort[];
   fgs:FailoverGroup[];
+  storagePoolIds=[];
+  volumeIds=[];
   //portList:
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(queryParam => {
@@ -335,7 +337,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
     this.getStorageDetail(true);
     this.getStoragePoolList(true);
-    this.initCapacity();
+    //this.initCapacity();
   }
   ngAfterViewInit() {
     this.ngZone.runOutsideAngular(() => this.initChart());
@@ -442,35 +444,61 @@ export class DetailComponent implements OnInit, AfterViewInit {
   getStoragePoolList(fresh: boolean){
     if (fresh){
       this.detailService.getStoragePoolList(this.storageId).subscribe((r: any) =>{
-        console.log('pool result:');
-        console.log(r);
         if (r.code === '200'){
           this.storagePool = r.data;
           this.cdr.detectChanges();
+          console.log('pool result:');
+          console.log(r);
+          this.liststoragepoolperformance();
         }
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
-      if (this.poolList === null){
+      if (this.storagePool === null){
         this.detailService.getStoragePoolList(this.storageId).subscribe((r: any) =>{
           if (r.code === '200'){
             this.storagePool = r.data;
             this.cdr.detectChanges();
+            this.liststoragepoolperformance();
           }
         });
       }
     }
-
+  }
+  liststoragepoolperformance(){
+    console.log("storagePool",this.storagePool);
+    if (this.storagePool === null || this.storagePool.length <= 0){ return; }
+    this.storagePool.forEach(item => {
+      this.storagePoolIds.push(item.storageInstanceId);
+    });
+    this.detailService.liststoragepoolperformance(this.storagePoolIds).subscribe((result: any) => {
+      if (result.code === '200'){
+        const chartList: StoragePool [] = result.data;
+        if ( chartList !== null && chartList.length > 0){
+          this.storagePool.forEach(item => {
+            chartList.forEach(charItem => {
+              if (item.storageInstanceId === charItem.id){
+                item.maxBandwidth=charItem.maxBandwidth;
+                item.maxIops=charItem.maxIops;
+                item.maxLatency=charItem.maxLatency;
+              }
+            });
+          });
+          this.cdr.detectChanges();
+        }
+      }
+    });
   }
   getStorageVolumeList(fresh: boolean){
-    console.log("is null?")
-    console.log(this.volumes)
-    console.log(this.volumes==null)
     if (fresh){
       this.detailService.getVolumeListList(this.storageId).subscribe((r: any) => {
         if (r.code === '200'){
           this.volumes = r.data;
+          if(this.volumes!=null){
+            this.volumeTotal=this.volumes.length;
+          }
           this.cdr.detectChanges();
+          this.listVolumesperformance();
         }
       });
     }else {
@@ -479,11 +507,38 @@ export class DetailComponent implements OnInit, AfterViewInit {
         this.detailService.getVolumeListList(this.storageId).subscribe((r: any) => {
           if (r.code === '200'){
             this.volumes = r.data;
+            if(this.volumes!=null){
+              this.volumeTotal=this.volumes.length;
+            }
             this.cdr.detectChanges();
+            this.listVolumesperformance();
           }
         });
       }
     }
+  }
+  listVolumesperformance(){
+    if (this.volumes === null || this.volumes.length <= 0){ return; }
+    this.volumes.forEach(item => {
+      this.volumeIds.push(item.id);
+    });
+    this.detailService.listVolumesperformance(this.volumeIds).subscribe((result: any) => {
+      if (result.code === '200'){
+        const chartList: Volume [] = result.data;
+        if ( chartList !== null && chartList.length > 0){
+          this.storagePool.forEach(item => {
+            chartList.forEach(charItem => {
+              if (item.id === charItem.id){
+                item.maxBandwidth=charItem.maxBandwidth;
+                item.maxIops=charItem.maxIops;
+                item.maxLatency=charItem.maxLatency;
+              }
+            });
+          });
+          this.cdr.detectChanges();
+        }
+      }
+    });
   }
   getFileSystemList(fresh: boolean){
     if (fresh){
@@ -654,20 +709,50 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   initCapacity(){
     this.initCapacityDistribution();
+    this.buildCapacitySavings();
+  }
+
+  buildCapacitySavings(){
+    this.capSave=new CapacitySavings();
+    const usedCapacity=this.detail.usedCapacity; //默认单位是GB
+    const beforeSave=Math.trunc(usedCapacity);//先取整数
+    if(beforeSave< 4096){
+      this.capSave.unit="GB";
+      this.capSave.max=beforeSave+4-beforeSave%4;
+      this.capSave.beforeSave=this.detail.usedCapacity;
+      this.capSave.dedupe=this.detail.dedupedCapacity;
+      this.capSave.compression=this.detail.compressedCapacity;
+      this.capSave.afterSave=this.detail.optimizeCapacity;
+    }else{
+      this.capSave.unit="TB";
+
+      this.capSave.beforeSave=this.detail.usedCapacity?this.detail.usedCapacity/1024:null;
+      this.capSave.dedupe=this.detail.dedupedCapacity?this.detail.dedupedCapacity/1024:null;
+      this.capSave.compression=this.detail.compressedCapacity?this.detail.compressedCapacity/1024:null;
+      this.capSave.afterSave=this.detail.optimizeCapacity?this.detail.optimizeCapacity/1024:null;
+      const max=Math.trunc(beforeSave/1024);
+      this.capSave.max=max+4-max%4;
+    }
+    const bars=[0];
+    for(var i=0;i<4;i++){
+      bars.push(this.capSave.max/4*(i+1))
+    }
+    this.capSave.bars=bars;
+    this.capSave.rate=(this.capSave.beforeSave/this.capSave.afterSave).toFixed(0) +": 1";
   }
   initCapacityDistribution(){
     this.cd = new CapacityDistribution();
     const p= 0;
-    this.cd.protection = p.toFixed(3);
-    const fs = 4;
-    this.cd.fileSystem = fs.toFixed(3);
+    this.detail.protectionCapacity
+    this.cd.protection = this.formatCapacity(this.detail.protectionCapacity);
+    this.cd.fileSystem =this.formatCapacity(this.detail.fileCapacity);
     const v = 2.024;
-    this.cd.volume = v.toFixed(3);
-    const fc =1.078;
-     this.cd.freeCapacity= fc.toFixed(3);
+    this.cd.volume =this.formatCapacity(this.detail.blockCapacity);
+     this.cd.freeCapacity= this.getFreeCapacity(this.detail.totalEffectiveCapacity,this.detail.usedCapacity);
 
-    const cc = new CapacityChart('3.016 TB');
-    const cs = new CapacitySerie(2.024,1.078);
+    const cc = new CapacityChart(this.formatCapacity(this.detail.totalEffectiveCapacity));
+    const free=(this.detail.totalEffectiveCapacity-this.detail.usedCapacity)*100;
+    const cs = new CapacitySerie(this.detail.usedCapacity,free);
     cc.series.push(cs);
     this.cd.chart = cc;
   }
@@ -690,5 +775,12 @@ export class DetailComponent implements OnInit, AfterViewInit {
       r+=s.replace('"','').replace('"','')+",";
     });
     return r.substr(0,r.length-1);
+  }
+  getFreeCapacity(t:number,u:number){
+    if(t==null ||t==0) return this.formatCapacity(0);
+    if(u==null || u==0){
+      return this.formatCapacity(t);
+    }
+    return this.formatCapacity(t-u);
   }
 }

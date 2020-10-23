@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {CapacityChart} from "../storage.service";
+import {Warnings} from "@angular/cli/lib/config/schema";
 
 @Injectable()
 export class DetailService {
@@ -16,6 +17,12 @@ export class DetailService {
 
   getStoragePoolList(storageId: string){
     return this.http.get('dmestorage/storagepools', {params: {storageId}});
+  }
+  liststoragepoolperformance(storagePoolIds:string[]) {
+    return this.http.get('dmestorage/liststoragepoolperformance', {params: {storagePoolIds}});
+  }
+  listVolumesperformance(volumeId:string[]) {
+    return this.http.get('dmestorage/listVolumesPerformance', {params: {volumeId}});
   }
   getVolumeListList(storageId: string){
     return this.http.get('dmestorage/volumes', {params: {storageId}});
@@ -50,33 +57,42 @@ export class DetailService {
 }
 
 export class StorageDetail{
-  id: string;
-  name: string;//名称
-  ip: string;//ip地址
-  status: string;//状态
-  synStatus: string;//同步状态
-  sn: string;//设备序列号。
-  vendor: string;//厂商
-  model: string;//产品型号
-  productVersion: string;//产品版本号
-  usedCapacity: number;//已用容量 （单位:MB）
-  totalCapacity: number; //裸容量（单位:MB）。
-  totalEffectiveCapacity: number;//可得容量 （总容量）
-  freeEffectiveCapacity: number;//空闲容量
-  location: string;
   azIds: string[];
-  storagePool: string;
-  volume: string;
-  fileSystem: string;
-  dTrees: string;
-  nfsShares: string;
   bandPorts: string;
+  blockCapacity: number;
+  compressedCapacity: number;
+  dTrees:string;
+  dedupedCapacity: number;
+  event: number;
+  fileCapacity: number;
+  fileSystem: string;
+  freeEffectiveCapacity: number;
+  id: string;
+  ip: string;
+  location: string;
   logicPorts: string;
-  storageControllers: string;
-  storageDisks: string;
-  patchVersion:string;
   maintenanceOvertime: string;
   maintenanceStart: string;
+  model: string;
+  name: string;
+  nfsShares: string;
+  optimizeCapacity: number;
+  patchVersion: string;
+  productVersion: string;
+  protectionCapacity: number;
+  sn: string;
+  status: string;
+  storageControllers: string;
+  storageDisks: string;
+  storagePool:string;
+  subscriptionCapacity: number;
+  synStatus: string;
+  totalCapacity: number;
+  totalEffectiveCapacity: number;
+  usedCapacity: number;
+  vendor: string;
+  volume: string;
+  warning: number;
 }
 export class StoragePool{
   freeCapacity: number;// 空闲容量
@@ -123,6 +139,9 @@ export class Volume{
   capacity: number;//总容量 单位GB
   //关联的datastore
   datastores: string;
+  maxBandwidth: number;
+  maxIops: number;
+  maxLatency: number;
 }
 export class Dtrees{
   name: string;
@@ -153,6 +172,10 @@ export class StorageDisk{
   speed: number
   status: string;
   storageDeviceId: string;
+  iops:number;
+  useage:number;
+  bandwith:number;
+  lantency:number;
 }
 export interface PoolList {
    name: string;
@@ -174,5 +197,23 @@ export class StorageController{
   status:string;
   softVer:string;
   cpuInfo:string;
+  cpuUsage:number;
+  iops:number;
+  ops:number;
+  bandwith:number;
+  lantency:number;
+}
+export class CapacitySavings{
+  bars:number[];
+  unit:string;
+  beforeSave:number;
+  dedupe:number;
+  compression:number;
+  afterSave:number;
+  max:number;
+  rate:string;
+  constructor(){
+    this.bars=[];
+  }
 }
 

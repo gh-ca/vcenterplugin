@@ -3,10 +3,10 @@ export class FCPort{
   status:string;
   wwn:string;
   speed: number;
-  iops:string;
-  latency: string;
-  bandwidth: string;
-  usage: string;
+  iops:number;
+  lantency:number;
+  bandwith:number;
+  useage:number;
 }
 export class EthernetPort{
   location:string;
@@ -14,29 +14,30 @@ export class EthernetPort{
   ipv4:string;
   ipv6: number;
   speed: number;
-  iops:string;
-  latency: string;
-  bandwidth: string;
-  usage: string;
+  iops:number;
+  lantency:number;
+  bandwith:number;
+  useage:number;
 }
 export class FCoEPort{
   location:string;
   status:string;
   wwn:string;
   speed: number;
-  iops:string;
-  latency: string;
-  bandwidth: string;
-  usage: string;
+  iops:number;
+  lantency:number;
+  bandwith:number;
+  useage:number;
 }
 export class BondPort{
   name:string;
   healthStatus:string;
   runningStatus:string;
   mtu: number;
-  iops:string;
-  latency: string;
-  bandwidth: string;
+  iops:number;
+  lantency:number;
+  bandwith:number;
+  useage:number;
 }
 export class LogicPort{
   id: string;
