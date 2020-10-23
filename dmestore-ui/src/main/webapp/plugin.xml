@@ -441,7 +441,7 @@
                <label>#{hostMenu.applyBestPractice}</label>
                <icon>#{addIcon}</icon>
                <delegate>
-                  <className>com.vmware.vsphere.client.htmlbridge.HtmlActionDelegate</className>
+                  <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=applybp</actionUrl>
@@ -1164,7 +1164,7 @@
                <label>#{clusterMenu.applyBestPractice}</label>
                <icon>#{addIcon}</icon>
                <delegate>
-                  <className>com.vmware.vsphere.client.htmlbridge.HtmlActionDelegate</className>
+                  <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=applybp</actionUrl>
