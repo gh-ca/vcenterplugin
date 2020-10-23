@@ -221,7 +221,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 storageObj.setBlockCapacity(blockCapacity);
                 storageObj.setDedupedCapacity(dedupedCapacity);
                 storageObj.setCompressedCapacity(compressedCapacity);
-                storageObj.setOptimizeCapacity(storageObj.getUsedCapacity()/1024-dedupedCapacity-compressedCapacity);
+                storageObj.setOptimizeCapacity(storageObj.getUsedCapacity()-dedupedCapacity-compressedCapacity);
 
 
                 JsonArray ids = element.get("az_ids").getAsJsonArray();
