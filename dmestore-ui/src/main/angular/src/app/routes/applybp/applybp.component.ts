@@ -24,7 +24,8 @@ export class ApplybpComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit() {
     // /update/byCluster
-    console.log(this.gs.getClientSdk());
+    console.log(this.gs.getClientSdk().app.getClientInfo());
+    console.log(this.gs.getClientSdk().app.getNavigationData());
     this.http.post('v1/bestpractice/update/all', {}).subscribe((result: any) => {
       if (result.code == '200'){
         this.status = 2;
