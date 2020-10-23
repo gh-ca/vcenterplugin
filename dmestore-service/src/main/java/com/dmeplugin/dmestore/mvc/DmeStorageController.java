@@ -1,10 +1,7 @@
 package com.dmeplugin.dmestore.mvc;
 
 import com.dmeplugin.dmestore.exception.DMEException;
-import com.dmeplugin.dmestore.model.EthPortInfo;
-import com.dmeplugin.dmestore.model.ResponseBodyBean;
-import com.dmeplugin.dmestore.model.Storage;
-import com.dmeplugin.dmestore.model.StoragePool;
+import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.services.DmeStorageService;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.google.gson.Gson;
@@ -307,6 +304,98 @@ public class DmeStorageController extends BaseController{
         } catch (Exception e) {
             LOG.error("get Storage Pool performance failure:", e);
             failureStr = "get Storage Pool performance failure:" + e.toString();
+        }
+        return failure(failureStr);
+    }
+
+    /**
+     * Access storage controller performance
+     *
+     * @param storageControllerIds controller res Id
+     * @return: ResponseBodyBean
+     */
+    @RequestMapping(value = "/listStorageControllerPerformance", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean listStorageControllerPerformance(@RequestParam("storageControllerIds") List<String> storageControllerIds)
+            throws Exception {
+        LOG.info("accessvmfs/listStorageControllerPerformance storagePoolIds==" + gson.toJson(storageControllerIds));
+        String failureStr = "";
+        try {
+            List<StorageControllers> lists = dmeStorageService.listStorageControllerPerformance(storageControllerIds);
+            LOG.info("listStorageControllerPerformance lists==" + gson.toJson(lists));
+            return success(lists);
+        } catch (Exception e) {
+            LOG.error("get Storage controller performance failure:", e);
+            failureStr = "get Storage controller performance failure:" + e.toString();
+        }
+        return failure(failureStr);
+    }
+
+    /**
+     * Access storage disk performance
+     *
+     * @param storageDiskIds storage disk res Id
+     * @return: ResponseBodyBean
+     */
+    @RequestMapping(value = "/listStorageDiskPerformance", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean listStorageDiskPerformance(@RequestParam("storageDiskIds") List<String> storageDiskIds)
+            throws Exception {
+        LOG.info("accessvmfs/listStorageDiskPerformance storagePoolIds==" + gson.toJson(storageDiskIds));
+        String failureStr = "";
+        try {
+            List<StorageDisk> lists = dmeStorageService.listStorageDiskPerformance(storageDiskIds);
+            LOG.info("listStorageDiskPerformance lists==" + gson.toJson(lists));
+            return success(lists);
+        } catch (Exception e) {
+            LOG.error("get Storage disk performance failure:", e);
+            failureStr = "get Storage disk performance failure:" + e.toString();
+        }
+        return failure(failureStr);
+    }
+
+    /**
+     * Access storage port performance
+     *
+     * @param storagePortIds storage port res Id
+     * @return: ResponseBodyBean
+     */
+    @RequestMapping(value = "/listStoragePortPerformance", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean listStoragePortPerformance(@RequestParam("storagePortIds") List<String> storagePortIds)
+            throws Exception {
+        LOG.info("accessvmfs/listStoragePortPerformance storagePoolIds==" + gson.toJson(storagePortIds));
+        String failureStr = "";
+        try {
+            List<StoragePort> lists = dmeStorageService.listStoragePortPerformance(storagePortIds);
+            LOG.info("listStoragePortPerformance lists==" + gson.toJson(lists));
+            return success(lists);
+        } catch (Exception e) {
+            LOG.error("get Storage port performance failure:", e);
+            failureStr = "get Storage port performance failure:" + e.toString();
+        }
+        return failure(failureStr);
+    }
+
+    /**
+     * Access storage volume performance
+     *
+     * @param volumeId storage volume res Id
+     * @return: ResponseBodyBean
+     */
+    @RequestMapping(value = "/listVolumesPerformance", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseBodyBean listVolumesPerformance(@RequestParam("volumeId") List<String> volumeId)
+            throws Exception {
+        LOG.info("accessvmfs/listVolumesPerformance storagePoolIds==" + gson.toJson(volumeId));
+        String failureStr = "";
+        try {
+            List<Volume> lists = dmeStorageService.listVolumesPerformance(volumeId);
+            LOG.info("listVolumesPerformance lists==" + gson.toJson(lists));
+            return success(lists);
+        } catch (Exception e) {
+            LOG.error("get Storage volume performance failure:", e);
+            failureStr = "get Storage volume performance failure:" + e.toString();
         }
         return failure(failureStr);
     }
