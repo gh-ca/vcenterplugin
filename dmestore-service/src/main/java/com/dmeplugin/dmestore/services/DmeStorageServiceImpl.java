@@ -255,7 +255,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         //resMap.put("data", storageId);
 
         List<StoragePool> resList = new ArrayList<>();
-        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageId;
+        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageId+"&&pageSize=1000";
         LOG.info(url);
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
@@ -678,7 +678,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         //resMap.put("storageId", className);
         List<StorageControllers> resList = new ArrayList<>();
 
-        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageDeviceId;
+        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageDeviceId+"&&pageSize=1000";
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             LOG.info("DmeStorageServiceImpl/getStorageControllers/responseEntity==" + responseEntity);
@@ -746,7 +746,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         //resMap.put("storageId", className);
         List<StorageDisk> resList = new ArrayList<>();
 
-        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageDeviceId;
+        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageDeviceId+"&&pageSize=1000";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -1059,7 +1059,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
         List<StoragePort> storagePorts = new ArrayList<>(10);
         String className = "SYS_StoragePort";
-        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageDeviceId;
+        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageDeviceId+"&&pageSize=1000";
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
@@ -1254,7 +1254,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     private String getDiskType(String storageDeviceId, String diskPoolId, String poolId) throws DMEException {
         String result = "";
         String className = "SYS_StorageDisk";
-        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageDeviceId;
+        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageDeviceId+"&&pageSize=1000";
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         int code = responseEntity.getStatusCodeValue();
         if (code == 200) {
@@ -1643,7 +1643,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
         String className = "SYS_StoragePool";
         String poolName = "";
-        String url = API_INSTANCES_LIST + "/" + className;
+        String url = API_INSTANCES_LIST + "/" + className+"?pageSize=1000";
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
             String object = responseEntity.getBody();
@@ -1662,7 +1662,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     private List<DiskPool> getDiskPoolByPoolId(String poolId) throws DMEException {
         String className = "SYS_DiskPool";
-        String url = API_INSTANCES_LIST + "/" + className;
+        String url = API_INSTANCES_LIST + "/" + className+"?pageSize=1000";
         List<DiskPool> diskPools = new ArrayList<>(10);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
