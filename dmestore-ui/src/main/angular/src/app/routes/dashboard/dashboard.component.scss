@@ -104,3 +104,9 @@
     justify-content: center;
   }
 }
+
+::ng-deep .clr-input-wrapper {
+  white-space: nowrap;
+  max-height: 1.2rem;
+  width: 220px;
+}

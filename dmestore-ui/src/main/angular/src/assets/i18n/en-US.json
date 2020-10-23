@@ -465,7 +465,8 @@
     "top5T": "Top 5 DataStore",
     "connectT": "DME Connect",
     "connectFail": "Connect Failed!",
-    "connectSuccess": "Connect Success!"
+    "connectSuccess": "Connect Success!",
+    "portholder": "Port Default 26335"
   },
   "bestPractice": {
     "apply": "Apply Best Practice",

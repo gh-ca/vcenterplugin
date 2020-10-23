@@ -468,7 +468,8 @@
     "top5T": "存储使用率前5",
     "connectT": "DME连接",
     "connectFail": "连接失败！",
-    "connectSuccess": "连接成功！"
+    "connectSuccess": "连接成功！",
+    "portholder": "端口默认26335"
   },
   "bestPractice": {
     "apply": "实施最佳实践",
