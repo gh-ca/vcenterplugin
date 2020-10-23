@@ -1126,6 +1126,8 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 list.add(objId);
                 count++;
             }
+        }else{
+            objGroup.add(objIds);
         }
         return objGroup;
     }
