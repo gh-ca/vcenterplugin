@@ -496,7 +496,8 @@
     "top5T": "Top 5 DataStore",
     "connectT": "DME Connect",
     "connectFail": "Connect Failed!",
-    "connectSuccess": "Connect Success!"
+    "connectSuccess": "Connect Success!",
+    "portholder": "Port Default 26335"
   },
   "bestPractice": {
     "apply": "Apply Best Practice",
@@ -652,6 +653,13 @@
     "maxBandWidths": "OrderBy MaxBandWidth",
     "minBandWidths": "OrderBy MinBandWidth"
   },
+  "applybp": {
+    "ing": "Best Practice is Executing",
+    "ed": "Best Practice is Finished",
+    "error": "Best Practice occur Error",
+    "boot": "You need reboot host",
+    "eff": "Host Config is effective!"
+  },
    "enum":{
      "status":{
 
@@ -660,5 +668,5 @@
       "block":"Block",
       "file":"File"
      }
-   }
+  }
 }

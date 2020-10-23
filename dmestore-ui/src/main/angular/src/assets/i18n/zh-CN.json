@@ -499,7 +499,8 @@
     "top5T": "存储使用率前5",
     "connectT": "DME连接",
     "connectFail": "连接失败！",
-    "connectSuccess": "连接成功！"
+    "connectSuccess": "连接成功！",
+    "portholder": "端口默认26335"
   },
   "bestPractice": {
     "apply": "实施最佳实践",
@@ -654,6 +655,13 @@
     "minIOPSs": "按IOPS下限排序",
     "maxBandWidths": "按带宽上限排序",
     "minBandWidths": "按带宽下限排序"
+  },
+  "applybp": {
+    "ing": "最佳实践实施中",
+    "ed": "最佳实践实施完成",
+    "error": "最佳实践实施出错",
+    "boot": "您需要重启主机",
+    "eff": "主机配置才会生效!"
   },
   "enum":{
     "status":{
