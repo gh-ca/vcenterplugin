@@ -21,7 +21,8 @@
     "search": "Search",
     "refresh": "Refresh",
     "synSPolicy": "Synchronize VM Storage Policies",
-    "tip": "Tip"
+    "tip": "Tip",
+    "back":"Back"
   },
   "validations": {
     "required": "This field is required!",
@@ -664,7 +665,13 @@
   },
    "enum":{
      "status":{
-
+       "creating":"创建中",
+       "normal":"正常",
+       "mapping":"映射中",
+       "unmapping":"解除映射中",
+       "deleting":"删除中",
+       "error":"错误",
+       "expanding":"扩容中"
      },
      "type":{
       "block":"Block",
