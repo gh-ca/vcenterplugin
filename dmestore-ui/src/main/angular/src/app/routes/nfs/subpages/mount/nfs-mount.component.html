@@ -1,6 +1,7 @@
 <div>
   <!--plugin-->
-  <clr-modal [clrModalOpen]="viewPage=='dataStore_pugin'" [clrModalClosable]="false">
+  <clr-modal [clrModalOpen]="viewPage=='mount_plugin'" [clrModalClosable]="false">
+    <h3 class="modal-title modelTile">{{'vmfs.mount.mount' | translate}}</h3>
     <div class="modal-body">
       <form clrForm>
         <clr-radio-container clrInline>
@@ -54,65 +55,66 @@
       <button type="button" class="btn btn-primary" (click)="mountSubmit()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
-  <!--vcenter-->
-  <div *ngIf="viewPage=='dataStore_vcenter'">
-    <form clrForm>
-      <clr-radio-container clrInline>
-        <label class="floatleft">{{'nfs.mount.mountObj' | translate}}</label>
-        <clr-radio-wrapper>
-          <input type="radio" clrRadio name="controlPolicy" value="1" [(ngModel)]="mountObj" ng-checked="true"/>
+  <!--vcenter-datastore-->
+  <clr-modal class="add-wizard-wrap" [clrModalOpen]="viewPage=='mount_datastore'" [clrModalClosable]="false">
+    <h3 class="modal-title modelTile">{{'vmfs.mount.mount' | translate}}</h3>
+    <div class="modal-body">
+      <form clrForm>
+        <clr-radio-container clrInline>
+          <label class="floatleft">{{'nfs.mount.mountObj' | translate}}</label>
+          <clr-radio-wrapper>
+            <input type="radio" clrRadio name="controlPolicy" value="1" [(ngModel)]="mountObj" ng-checked="true"/>
+            <label>{{'nfs.mount.host' | translate}}</label>
+          </clr-radio-wrapper>
+          <clr-radio-wrapper>
+            <input type="radio" clrRadio name="controlPolicy" value="2"  [(ngModel)]="mountObj" />
+            <label>{{'nfs.mount.cluster' | translate}}</label>
+          </clr-radio-wrapper>
+        </clr-radio-container>
+        <clr-combobox-container *ngIf="mountObj==='1'">
           <label>{{'nfs.mount.host' | translate}}</label>
-        </clr-radio-wrapper>
-        <clr-radio-wrapper>
-          <input type="radio" clrRadio name="controlPolicy" value="2"  [(ngModel)]="mountObj" />
+          <clr-combobox [(ngModel)]="mountForm.hosts" name="hosts" clrMulti="true" required>
+            <ng-container *clrOptionSelected="let selected">
+              <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon> {{selected?.hostName}}
+            </ng-container>
+            <clr-options>
+              <clr-option *clrOptionItems="let state of hostList; field:'hostName'" [clrValue]="state">
+                <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon>{{state.hostName}}
+              </clr-option>
+            </clr-options>
+          </clr-combobox>
+        </clr-combobox-container>
+        <clr-combobox-container *ngIf="mountObj==='2'">
           <label>{{'nfs.mount.cluster' | translate}}</label>
-        </clr-radio-wrapper>
-      </clr-radio-container>
-      <clr-combobox-container *ngIf="mountObj==='1'">
-        <label>{{'nfs.mount.host' | translate}}</label>
-        <clr-combobox [(ngModel)]="mountForm.hosts" name="hosts" clrMulti="true" required>
-          <ng-container *clrOptionSelected="let selected">
-            <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon> {{selected?.hostName}}
-          </ng-container>
-          <clr-options>
-            <clr-option *clrOptionItems="let state of hostList; field:'hostName'" [clrValue]="state">
-              <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon>{{state.hostName}}
-            </clr-option>
-          </clr-options>
-        </clr-combobox>
-      </clr-combobox-container>
-      <clr-combobox-container *ngIf="mountObj==='2'">
-        <label>{{'nfs.mount.cluster' | translate}}</label>
-        <clr-combobox [(ngModel)]="mountForm.clusters" name="clusters" clrMulti="true" required>
-          <ng-container *clrOptionSelected="let selected">
-            <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon> {{selected?.clusterName}}
-          </ng-container>
-          <clr-options>
-            <clr-option *clrOptionItems="let state of clusterList; field:'clusterName'" [clrValue]="state">
-              <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon>{{state.clusterName}}
-            </clr-option>
-          </clr-options>
-        </clr-combobox>
-      </clr-combobox-container>
-      <clr-select-container>
-        <label>{{'nfs.mount.mountType' | translate}}</label>
-        <select clrSelect [(ngModel)]="mountForm.mountType" name="mountType">
-          <option value="readOnly">{{'nfs.mount.readOnly' | translate}}</option>
-          <option value="readWrite">{{'nfs.mount.readWrite' | translate}}</option>
-        </select>
-      </clr-select-container>
-      <div style="float: right">
-        <button type="button" class="btn btn-outline" (click)="closeModel()">{{'menu.cancel' | translate}}</button>
-        <button type="button" class="btn btn-primary" (click)="mountSubmit()">{{'menu.ok' | translate}}</button>
-      </div>
-    </form>
-
-  </div>
-  <!--vcenter host-->
-  <div *ngIf="viewPage=='unmount_hostcluster'">
-    <div>
-      <p>请选择挂载的Data Store</p>
-      <p *ngIf="errorMsg" style="color: red">{{errorMsg}}</p>
+          <clr-combobox [(ngModel)]="mountForm.clusters" name="clusters" clrMulti="true" required>
+            <ng-container *clrOptionSelected="let selected">
+              <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon> {{selected?.clusterName}}
+            </ng-container>
+            <clr-options>
+              <clr-option *clrOptionItems="let state of clusterList; field:'clusterName'" [clrValue]="state">
+                <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon>{{state.clusterName}}
+              </clr-option>
+            </clr-options>
+          </clr-combobox>
+        </clr-combobox-container>
+        <clr-select-container>
+          <label>{{'nfs.mount.mountType' | translate}}</label>
+          <select clrSelect [(ngModel)]="mountForm.mountType" name="mountType">
+            <option value="readOnly">{{'nfs.mount.readOnly' | translate}}</option>
+            <option value="readWrite">{{'nfs.mount.readWrite' | translate}}</option>
+          </select>
+        </clr-select-container>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="closeModel()">{{'menu.cancel' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="mountSubmit()">{{'menu.ok' | translate}}</button>
+    </div>
+  </clr-modal>
+  <!--vcenter-host-->
+  <clr-modal class="add-wizard-wrap" [clrModalOpen]="viewPage=='mount_host'" [clrModalClosable]="false">
+    <h3 class="modal-title modelTile">{{'vmfs.mount.mount' | translate}}</h3>
+    <div class="modal-body">
       <clr-datagrid [(clrDgSelected)]="rowSelected">
         <clr-dg-column>{{'nfs.name' | translate}}</clr-dg-column>
         <clr-dg-column>{{'nfs.status' | translate}}</clr-dg-column>
@@ -125,12 +127,50 @@
           <clr-dg-cell>{{formatCapacity(item.freeSpace)}}</clr-dg-cell>
         </clr-dg-row>
       </clr-datagrid>
+      <form clrForm>
+        <clr-select-container>
+          <label>{{'nfs.mount.mountType' | translate}}</label>
+          <select clrSelect [(ngModel)]="mountForm.mountType" name="mountType">
+            <option value="readOnly">{{'nfs.mount.readOnly' | translate}}</option>
+            <option value="readWrite">{{'nfs.mount.readWrite' | translate}}</option>
+          </select>
+        </clr-select-container>
+      </form>
     </div>
-    <div style="float: right">
+    <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="closeModel()">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="hostClusterMount()">{{'menu.ok' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="mountSubmit()">{{'menu.ok' | translate}}</button>
     </div>
-  </div>
+  </clr-modal>
+  <!--vcenter-cluster-->
+  <clr-modal class="add-wizard-wrap" [clrModalOpen]="viewPage=='mount_cluster'" [clrModalClosable]="false">
+    <h3 class="modal-title modelTile">{{'vmfs.mount.mount' | translate}}</h3>
+    <div class="modal-body">
+      <clr-datagrid [(clrDgSelected)]="rowSelected">
+        <clr-dg-column>{{'nfs.name' | translate}}</clr-dg-column>
+        <clr-dg-column>{{'nfs.status' | translate}}</clr-dg-column>
+        <clr-dg-column>{{'nfs.totalCapacity' | translate}}</clr-dg-column>
+        <clr-dg-column>{{'nfs.freeCapacity' | translate}}</clr-dg-column>
+        <clr-dg-row *ngFor="let item of dataStoreList" [clrDgItem]="item">
+          <clr-dg-cell>{{item.name}}</clr-dg-cell>
+          <clr-dg-cell>{{item.status}}</clr-dg-cell>
+          <clr-dg-cell>{{formatCapacity(item.capacity)}}</clr-dg-cell>
+          <clr-dg-cell>{{formatCapacity(item.freeSpace)}}</clr-dg-cell>
+        </clr-dg-row>
+      </clr-datagrid>
+      <form clrForm>
+        <clr-select-container>
+          <label>{{'nfs.mount.mountType' | translate}}</label>
+          <select clrSelect [(ngModel)]="mountForm.mountType" name="mountType">
+            <option value="readOnly">{{'nfs.mount.readOnly' | translate}}</option>
+            <option value="readWrite">{{'nfs.mount.readWrite' | translate}}</option>
+          </select>
+        </clr-select-container>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="closeModel()">{{'menu.cancel' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="mountSubmit()">{{'menu.ok' | translate}}</button>
+    </div>
+  </clr-modal>
 </div>
-
-
