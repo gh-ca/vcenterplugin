@@ -56,7 +56,7 @@
       <clr-dg-column [hidden]="radioCheck!=='chart'">{{'nfs.respWt' | translate}}</clr-dg-column>
 
     <clr-dg-row *ngFor="let item of list" [clrDgItem]="item">
-        <clr-dg-cell (click)="navigateTo(item.objectid)">{{item.name}}</clr-dg-cell>
+      <clr-dg-cell ><span (click)="navigateTo(item.objectid)" style="color:#829DE6;cursor:pointer">{{item.name}}</span></clr-dg-cell>
         <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.status}}</clr-dg-cell>
         <clr-dg-cell [hidden]="radioCheck!=='list'">{{formatCapacity(item.capacity)}}</clr-dg-cell>
         <clr-dg-cell [hidden]="radioCheck!=='list'">{{formatCapacity(item.freeSpace)}}</clr-dg-cell>

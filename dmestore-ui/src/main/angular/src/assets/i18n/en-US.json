@@ -98,6 +98,8 @@
     "bandwidth":"Bandwidth",
     "respRt":"Response Time-Read(ms)",
     "respWt":"Response Time-Write(ms)",
+    "expandTips": "Expansion capacity can only be a positive integer.",
+    "reduceTips": "Reduce capacity can only be a positive integer.",
     "logic":{
       "logic":"Logic Port",
       "name":"Name",

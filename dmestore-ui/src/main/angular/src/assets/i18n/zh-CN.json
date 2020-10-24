@@ -93,6 +93,8 @@
     "advance":"高级",
     "expandSize":"扩容大小",
     "oldCapacity":"原有容量",
+    "expandTips": "扩容容量只能为正整数。",
+    "reduceTips": "缩容容量只能为正整数。",
     "reduSize":"缩容大小",
     "ops":"OPS",
     "bandwidth":"带宽(MB/s)",
