@@ -629,7 +629,18 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="unmountShow=false">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="unmountHandleFunc();">{{'menu.ok' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="unMountConfirm();">{{'menu.ok' | translate}}</button>
+    </div>
+  </clr-modal>
+  <!--卸载提示-->
+  <clr-modal [(clrModalOpen)]="unmountTipsShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+    <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+    <div class="modal-body">
+      <p>{{'vmfs.unmount.tips' | translate}}</p>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="unmountTipsShow=false;unmountShow=false;">{{'menu.cancel' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="unmountHandleFunc()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
   <!--空间回收提示-->
