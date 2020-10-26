@@ -5,18 +5,28 @@ import {
   StoragePool,
   Volume
 } from './detail.service';
-import {VmfsPerformanceService} from '../../vmfs/volume-performance/performance.service';
 import { EChartOption } from 'echarts';
-import {FileSystem} from '../../nfs/nfs.service';
+import {
+  AxisLine, AxisPointer,
+  ChartOptions,
+  FileSystem, Legend, LegendData, LineStyle, MakePerformance,
+  NfsService, Serie,
+  SplitLine,
+  TextStyle,
+  Title, Tooltip,
+  XAxis,
+  YAxis
+} from '../../nfs/nfs.service';
 import {ActivatedRoute, Router} from "@angular/router";
-import {CapacityChart, CapacitySerie, StorageList} from "../storage.service";
+import {CapacityChart, CapacitySerie} from "../storage.service";
 import {BondPort, EthernetPort, FailoverGroup, FCoEPort, FCPort, LogicPort} from "./port.service";
+import {FormControl, FormGroup} from "@angular/forms";
 @Component({
   selector: 'app-detail',
   templateUrl: './detail.component.html',
   styleUrls: ['./detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [DetailService, VmfsPerformanceService],
+  providers: [DetailService, MakePerformance, NfsService],
 })
 export class DetailComponent implements OnInit, AfterViewInit {
 
@@ -298,17 +308,13 @@ export class DetailComponent implements OnInit, AfterViewInit {
   interval;
   // range 时间段 LAST_5_MINUTE LAST_1_HOUR LAST_1_DAY LAST_1_WEEK LAST_1_MONTH LAST_1_QUARTER HALF_1_YEAR LAST_1_YEAR BEGIN_END_TIME INVALID
   range;
-  // begin_time 开始时间 时间戳(例：1552477343834)
-  beginTime = 1552477343834;
-  // end_time 结束时间 时间戳
-  endTime = 1552567343000;
   // 定时函数执行时间 默认一天
   timeInterval = 1 * 60 * 60 * 1000;
   poolRadio = 'table1'; // 存储池列表切换
   volumeRadio = 'table1'; // volume列表切换
   storageId = '1234';
   storageName= "";
-  constructor(private detailService: DetailService, private cdr: ChangeDetectorRef, private ngZone: NgZone,
+  constructor(private nfsService:NfsService, private makePerformance: MakePerformance, private detailService: DetailService, private cdr: ChangeDetectorRef, private ngZone: NgZone,
               private activatedRoute: ActivatedRoute,private router:Router) { }
   detail: StorageDetail;
   storagePool: StoragePool[];
@@ -329,6 +335,19 @@ export class DetailComponent implements OnInit, AfterViewInit {
   fgs:FailoverGroup[];
   storagePoolIds=[];
   volumeIds=[];
+
+  selectRange = 'LAST_1_DAY';
+  startTime = null;
+  // endTime
+  endTime = null;
+
+  rangeTime = new FormGroup({
+    start: new FormControl(),
+    end: new FormControl()
+  });
+  // ranges
+  ranges = NfsService.perRanges;
+
   //portList:
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(queryParam => {
@@ -337,7 +356,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
     this.getStorageDetail(true);
     this.getStoragePoolList(true);
-    //this.initCapacity();
+    this.initCapacity();
   }
   ngAfterViewInit() {
     this.ngZone.runOutsideAngular(() => this.initChart());
@@ -345,41 +364,40 @@ export class DetailComponent implements OnInit, AfterViewInit {
 
   // 初始化表格对象
   async initChart() {
-    switch (this.range) {
-      case 'LAST_1_HOUR': // 过去一小时
-        break;
-      case 'LAST_4_HOUR': // 过去四小时 此值目前接口没有
-        break;
-      case 'LAST_12_HOUR': // 过去12小时 此值目前接口没有
-        break;
-      default: // 默认过去24h
-        break;
-    }
-    /* // IOPS
-    this.iopsChart = echarts.init(document.querySelector('#iopsChart'));
-    this.perService.getIopsChart('IOPS', 'IO/s', this.objTypeId, this.indicatorIdsIOPS, this.objIds,
-      this.interval, this.range, this.beginTime, this.endTime).then(res => {
-      this.iopsChart.setOption(res, true);
+    // switch (this.range) {
+    //   case 'LAST_1_HOUR': // 过去一小时
+    //     break;
+    //   case 'LAST_4_HOUR': // 过去四小时 此值目前接口没有
+    //     break;
+    //   case 'LAST_12_HOUR': // 过去12小时 此值目前接口没有
+    //     break;
+    //   default: // 默认过去24h
+    //     break;
+    // }
+    const fsNames:string[] = [];
+    fsNames.push('A7213075B5EE3AF3989D7DB938ED2CF8');
+     // IOPS
+    this.setChart(300,"IOPS","IO/s",
+      NfsService.storageIOPS,fsNames,this.selectRange,NfsService.nfsUrl, this.startTime, this.endTime).then(res=>{
+      // NfsService.nfsOPS,fsNames,this.selectRange,NfsService.nfsUrl, this.startTime, this.endTime).then(res=>{
+      this.iopsChart = res;
       this.cdr.detectChanges();
     });
 
     // 带宽
-    this.bandwidthChart = echarts.init(document.querySelector('#bandwidthChart'));
-    this.perService.getIopsChart('Bandwidth', 'MS/s', this.objTypeId, this.indicatorIdsBDWT, this.objIds,
-      this.interval, this.range, this.beginTime, this.endTime).then(res => {
-      this.bandwidthChart.setOption(res, true);
+    this.setChart(300,'Bandwidth', 'MB/s',
+      NfsService.storageBDWT, fsNames, this.selectRange, NfsService.nfsUrl, this.startTime, this.endTime).then(res => {
+      // NfsService.nfsBDWT, fsNames, this.selectRange, NfsService.nfsUrl, this.startTime, this.endTime).then(res => {
+      this.bandwidthChart = res;
       this.cdr.detectChanges();
     });
     // 响应时间
-    this.latencyChart = echarts.init(document.querySelector('#latencyChart'));
-    this.perService.getIopsChart('Latency', 'ms', this.objTypeId, this.indicatorIdsREST, this.objIds,
-      this.interval, this.range, this.beginTime, this.endTime).then(res => {
-      this.latencyChart.setOption(res, true);
-      this.cdr.detectChanges();
-    }); */
-  }
-  async showChart() {
-    console.log("更新图表")
+    // this.latencyChart = echarts.init(document.querySelector('#latencyChart'));
+    // this.perService.getIopsChart('Latency', 'ms', this.objTypeId, this.indicatorIdsREST, this.objIds,
+    //   this.interval, this.range, this.beginTime, this.endTime).then(res => {
+    //   this.latencyChart.setOption(res, true);
+    //   this.cdr.detectChanges();
+    // });
   }
 
   changeTab(page: string){
@@ -782,5 +800,192 @@ export class DetailComponent implements OnInit, AfterViewInit {
       return this.formatCapacity(t);
     }
     return this.formatCapacity(t-u);
+  }
+
+  /**
+   * 设置折线图 ( 折线1 虚线UpperLine、折线2 虚线LowerLine、
+   * 折线3Read、折线4Write)
+   * @param height
+   * @param title 标题
+   * @param subtext 副标题
+   * @param indicatorIds  获取参数指标（带宽的读写等） 0 读 1写
+   * @param objIds 卷ID（vmfs）、fsId(nfs) 只能放一个值即length为1
+   * @param range 时间段 LAST_5_MINUTE LAST_1_HOUR LAST_1_DAY LAST_1_WEEK LAST_1_MONTH LAST_1_QUARTER HALF_1_YEAR LAST_1_YEAR BEGIN_END_TIME INVALID
+   * @param url 请求url
+   */
+  setChart(height: number, title: string, subtext: string, indicatorIds: any[], objIds: any[], range: string, url: string, startTime:string, endTime:string) {
+    // 生成chart optiond对象
+    const chart:ChartOptions = this.getNewChart(height, title, subtext);
+    return new Promise((resolve, reject) => {
+      const params = {
+        indicator_ids: indicatorIds,
+        obj_ids: objIds,
+        range: range,
+        begin_time: startTime,
+        end_time: endTime,
+      }
+      this.nfsService.getLineChartData(url, params).subscribe((result: any) => {
+        console.log('chartData: ', title, result);
+        if (result.code === '200' && result.data !== null && result.data !== null) {
+          const resData = result.data;
+          // 设置标题
+          chart.title.text = title;
+          // 设置副标题
+          chart.title.subtext = subtext;
+          // 上限对象
+          const upperData = resData[objIds[0]][indicatorIds[0]];
+          // 下限对象
+          const lowerData = resData[objIds[0]][indicatorIds[1]];
+          // 上限最大值
+          const pmaxData = this.makePerformance.getUpperOrLower(upperData, 'upper');
+          // 下限最大值
+          let lmaxData = this.makePerformance.getUpperOrLower(lowerData, 'lower');
+          // 上、下限数据
+          const uppers: any[] = upperData.series;
+          const lower: any[] = lowerData.series;
+          // 设置X轴
+          this.makePerformance.setXAxisData(uppers, chart);
+          // 设置y轴最大值
+          chart.yAxis.max = (pmaxData > lmaxData ? pmaxData : lmaxData);
+          console.log('chart.yAxis.pmaxData', pmaxData);
+          console.log('chart.yAxis.lmaxData', lmaxData);
+          // 设置Read 折线图数据
+          uppers.forEach(item => {
+            for (const key of Object.keys(item)) {
+              // chartData.value = item[key];
+              chart.series[0].data.push({value: Number(item[key]), symbol: 'none'});
+            }
+          });
+          // 设置write 折线图数据
+          lower.forEach(item => {
+            for (const key of Object.keys(item)) {
+              chart.series[1].data.push({value: Number(item[key]), symbol: 'none'});
+            }
+          });
+          resolve(chart);
+        } else {
+          console.log('get chartData fail: ', result.description);
+        }
+      });
+    });
+  }
+  /**
+   * 获取一个chart的option对象 (option格式 折线1 虚线UpperLine、折线2 虚线LowerLine、
+   * 折线3Read、折线4Write)
+   * @param height
+   * @param title
+   * @param subtext
+   */
+  getNewChart(height: number, title: string, subtext: string) {
+    const chart: ChartOptions = new ChartOptions();
+    // 高度
+    chart.height = height;
+    // 标题
+    const titleInfo:Title = new Title();
+    titleInfo.text = title;
+    titleInfo.subtext = subtext;
+    titleInfo.textAlign = 'bottom';
+    const textStyle:TextStyle  = new TextStyle();
+    textStyle.fontStyle = 'normal';
+    titleInfo.textStyle = textStyle;
+
+    chart.title = titleInfo;
+
+    // x轴
+    const xAxis: XAxis = new XAxis();
+    xAxis.type = 'category';
+    xAxis.boundaryGap = false;
+    xAxis.data = [];
+
+    chart.xAxis = xAxis;
+
+    // y轴
+    const yAxis: YAxis = new YAxis();
+    yAxis.type = 'value';
+    yAxis.min = 0;
+    yAxis.splitNumber = 2;
+    yAxis.boundaryGap = ['50%', '50%'];
+    const axisLine: AxisLine = new AxisLine();
+    axisLine.show = false;
+    yAxis.axisLine = axisLine;
+    const splitLine = new SplitLine();
+    splitLine.show = true;
+    const lineStyle = new LineStyle();
+    lineStyle.type = 'dashed';
+    splitLine.lineStyle = lineStyle;
+    yAxis.splitLine = splitLine;
+
+    chart.yAxis = yAxis;
+    // 提示框
+    const tooltip: Tooltip = new Tooltip();
+    tooltip.trigger = 'axis';
+    tooltip.formatter = '{b} <br/> {a0}: {c0}<br/>{a1}: {c1}<br/>';
+    const axisPointer: AxisPointer = new AxisPointer();
+    axisPointer.axis = 'x';
+    axisPointer.type = 'line';
+    tooltip.axisPointer = axisPointer;
+    chart.tooltip = tooltip;
+
+    // 指标
+    const legend: Legend = new Legend();
+    const legendData: LegendData[] = [];
+    legendData.push(this.makePerformance.setLengdData('Read', 'circle'));
+    legendData.push(this.makePerformance.setLengdData('Write', 'circle'));
+    legend.x = 'right';
+    legend.y = 'top';
+    legend.selectedMode  = true;
+    legend.data = legendData;
+
+    chart.legend = legend;
+    // 指标颜色
+    const colors:string[] = ['#6870c4', '#01bfa8'];
+    chart.color = colors;
+
+    // 数据(格式)
+    const series: Serie[] = [];
+    series.push(this.makePerformance.setSerieData('Read', 'line', true, 'solid', '#6870c4', null))
+    series.push(this.makePerformance.setSerieData('Write', 'line', true, 'solid', '#01bfa8', null))
+
+    chart.series = series;
+
+    return chart;
+  }
+
+  /**
+   * 开始结束时间触发
+   */
+  changeDate() {
+    if (!this.rangeTime.controls.start.hasError('matStartDateInvalid')
+      && !this.rangeTime.controls.end.hasError('matEndDateInvalid')
+      && this.rangeTime.controls.start.value !== null && this.rangeTime.controls.end.value !== null) { // 需满足输入规范且不为空
+      this.startTime = this.rangeTime.controls.start.value._d.getTime();
+      this.endTime = this.rangeTime.controls.end.value._d.getTime();
+      console.log('startTime', this.startTime);
+      console.log('endTime', this.endTime);
+      this.changeFunc();
+    } else {
+      return;
+    }
+  }
+
+  // 切换卷函数
+  changeFunc() {
+    console.log(this.selectRange);
+    if (this.selectRange === 'BEGIN_END_TIME') {
+      if (this.startTime === null || this.endTime === null) {
+        console.log('开始结束时间不能为空');
+        return;
+      }
+    } else { // 初始化开始结束时间
+      this.startTime = null;
+      this.endTime = null;
+    }
+    if (this.selectRange) {
+      console.log('this.selectVolName+this.selectRange', this.selectRange);
+      // 请求后台重新加载折线图
+      this.initChart();
+    } else {
+      console.log('未选择卷或range');
+    }
   }
 }
