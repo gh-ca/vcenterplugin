@@ -56,6 +56,9 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class VCSDKUtils {
 
@@ -2623,53 +2626,70 @@ public class VCSDKUtils {
                 }
 
                 List<Map<String, Object>> reEthPorts = new ArrayList<>();
+                ExecutorService taskExecutor = Executors.newFixedThreadPool(5);
+                final CountDownLatch latch = new CountDownLatch(ethPorts.size());//用于判断所有的线程是否结束
                 for (Map<String, Object> ethPort : ethPorts) {
-                    String mgmtIp = ToolUtils.getStr(ethPort.get("mgmtIp"));
-                    if (!StringUtils.isEmpty(mgmtIp)) {
-                        try {
+                    final String deviceFinal = device;
+                    Runnable run = new Runnable() {
+                        public void run() {
+                            try {
+                                String mgmtIp = ToolUtils.getStr(ethPort.get("mgmtIp"));
+                                if (!StringUtils.isEmpty(mgmtIp)) {
+                                    try {
+                                        ManagedMethodExecuter.SoapArgument soapArgument0 = new ManagedMethodExecuter.SoapArgument();
+                                        soapArgument0.setName("host");
+                                        soapArgument0.setVal("<host xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"urn:vim25\">" + mgmtIp + "</host>");
+                                        List<ManagedMethodExecuter.SoapArgument> soapArgumentList = new ArrayList<>();
+                                        soapArgumentList.add(soapArgument0);
 
-                            ManagedMethodExecuter.SoapArgument soapArgument0 = new ManagedMethodExecuter.SoapArgument();
-                            soapArgument0.setName("host");
-                            soapArgument0.setVal("<host xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"urn:vim25\">" + mgmtIp + "</host>");
-                            List<ManagedMethodExecuter.SoapArgument> soapArgumentList = new ArrayList<>();
-                            soapArgumentList.add(soapArgument0);
+                                        if (!StringUtils.isEmpty(deviceFinal)) {
+                                            ManagedMethodExecuter.SoapArgument soapArgument1 = new ManagedMethodExecuter.SoapArgument();
+                                            soapArgument1.setName("interface");
+                                            soapArgument1.setVal("<interface xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"urn:vim25\">" + deviceFinal + "</interface>");
+                                            soapArgumentList.add(soapArgument1);
+                                        }
 
-                            if (!StringUtils.isEmpty(device)) {
-                                ManagedMethodExecuter.SoapArgument soapArgument1 = new ManagedMethodExecuter.SoapArgument();
-                                soapArgument1.setName("interface");
-                                soapArgument1.setVal("<interface xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"urn:vim25\">" + device + "</interface>");
-                                soapArgumentList.add(soapArgument1);
+                                        ManagedMethodExecuter.SoapResult soapResult = methodExecuter.executeSoap(moid, "urn:vim25/6.5", "vim.EsxCLI.network.diag.ping", soapArgumentList.toArray(new ManagedMethodExecuter.SoapArgument[0]));
+
+                                        String re = new String(soapResult.getResponse().getBytes("ISO-8859-1"), "UTF-8");
+                                        logger.info(mgmtIp + "==re==" + re);
+                                        String packetLost = xmlFormat(re);
+                                        if (!StringUtils.isEmpty(packetLost) && !"100".equals(packetLost)) {
+                                            ethPort.put("connectStatus", "true");
+                                        } else {
+                                            ethPort.put("connectStatus", "false");
+                                        }
+                                    } catch (Exception e) {
+                                        ethPort.put("connectStatus", "false");
+                                        logger.error(mgmtIp + "====" + e.toString());
+                                    }
+                                    reEthPorts.add(ethPort);
+                                }
+                            } finally {
+                                latch.countDown();
                             }
-
-                            ManagedMethodExecuter.SoapResult soapResult = methodExecuter.executeSoap(moid, "urn:vim25/6.5", "vim.EsxCLI.network.diag.ping", soapArgumentList.toArray(new ManagedMethodExecuter.SoapArgument[0]));
-
-                            String re = new String(soapResult.getResponse().getBytes("ISO-8859-1"), "UTF-8");
-                            logger.info(mgmtIp + "==re==" + re);
-                            String packetLost = xmlFormat(re);
-                            if (!StringUtils.isEmpty(packetLost) && !"100".equals(packetLost)) {
-                                ethPort.put("connectStatus", "true");
-                            } else {
-                                ethPort.put("connectStatus", "false");
-                            }
-                        } catch (Exception e) {
-                            ethPort.put("connectStatus", "false");
-                            logger.error(mgmtIp + "====" + e.toString());
                         }
-                        reEthPorts.add(ethPort);
-                    }
+                    };
+                    taskExecutor.execute(run);
                 }
+                try {
+                    latch.await();//等待所有线程执行完毕
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                taskExecutor.shutdown();//关闭线程池
 
                 if (reEthPorts.size() > 0) {
                     reStr = gson.toJson(reEthPorts);
                 }
             }
-        }catch (Exception ex){
-            logger.error("error:",ex);
-        }finally {
-            if(sessionManager!=null){
+        } catch (Exception ex) {
+            logger.error("error:", ex);
+        } finally {
+            if (sessionManager != null) {
                 sessionManager.logout();
             }
-            if(vmomiClient!=null){
+            if (vmomiClient != null) {
                 vmomiClient.shutdown();
             }
         }

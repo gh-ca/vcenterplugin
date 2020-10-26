@@ -24,6 +24,12 @@ export class NfsService {
   static nfsLatency: Array<string> = ['1126179079716869', '1126179079716872'];
   // NFS  url
   static nfsUrl = 'datastorestatistichistrory/nfs';
+
+  // Storage Detail 0Read 1Write
+  static storageIOPS: Array<string> = ['1125904201875461', '1125904201875462'];
+  // Storage bandwidth 0Read 1Write
+  static storageBDWT: Array<string> = ['1125904201875459', '1125904201875460'];
+
   // 性能图可选range LAST_5_MINUTE LAST_1_HOUR LAST_1_DAY LAST_1_WEEK LAST_1_MONTH LAST_1_QUARTER HALF_1_YEAR LAST_1_YEAR BEGIN_END_TIME INVALID
   static perRanges = [
     {key: 'LAST_5_MINUTE', value: '最近5分钟'},
