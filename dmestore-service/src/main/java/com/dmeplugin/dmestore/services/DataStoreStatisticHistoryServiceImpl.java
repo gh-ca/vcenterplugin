@@ -228,7 +228,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     public Map<String, Object> queryVolumeCurrentStatistic(Map<String, Object> params) throws DMEException {
-        Map<String, String> idInstancdIdMap = initParamVolume(params, true);
+        Map<String, String> idInstancdIdMap = initParamVolume(params, false);
         return queryCurrentStatistic("volume", params, idInstancdIdMap);
     }
 
@@ -762,14 +762,14 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             rang = RANGE_LAST_1_DAY;
             params.put("range", rang);
         }
-        //时间范围为时间段 而未设置具体时间 则默认一天
+        //时间范围为时间段 而未设置具体时间 则默认一年
         if (RANG_BEGIN_END_TIME.equals(rang)) {
             if (0 == endTime) {
                 endTime = System.currentTimeMillis();
                 params.put("end_time", endTime);
             }
             if (0 == beginTime) {
-                beginTime = endTime - 24 * 60 * 60 * 1000;
+                beginTime = endTime - 365 * 24 * 60 * 60 * 1000;
                 params.put("begin_time", beginTime);
             }
         }
@@ -779,16 +779,16 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                     interval = INTERVAL_ONE_MINUTE;
                     break;
                 case RANGE_LAST_1_HOUR:
-                    interval = INTERVAL_ONE_MINUTE;
+                    interval = INTERVAL_MINUTE;
                     break;
                 case RANGE_LAST_1_DAY:
-                    interval = INTERVAL_ONE_MINUTE;
+                    interval = INTERVAL_MINUTE;
                     break;
                 case RANGE_LAST_1_WEEK:
                     interval = INTERVAL_HALF_HOUR;
                     break;
                 case RANGE_LAST_1_MONTH:
-                    interval = INTERVAL_HALF_HOUR;
+                    interval = INTERVAL_HOUR;
                     break;
                 case RANGE_LAST_1_QUARTER:
                     interval = INTERVAL_DAY;
@@ -798,9 +798,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                     break;
                 case RANGE_LAST_1_YEAR:
                     interval = INTERVAL_DAY;
-                    break;
-                case RANG_BEGIN_END_TIME:
-                    interval = INTERVAL_ONE_MINUTE;
                     break;
             }
             params.put("interval", interval);
@@ -920,6 +917,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_THROUGHPUT);//throughput
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_BANDWIDTH);//bandwidth
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_UTILITY);//利用率
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_THROUGHPUT);//IOPS
         } else {
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_READTHROUGHPUT);//readThroughput 读IOPS
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_WRITETHROUGHPUT);//writeThroughput
@@ -1128,7 +1126,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 list.add(objId);
                 count++;
             }
-        } else {
+        }else{
             objGroup.add(objIds);
         }
         return objGroup;

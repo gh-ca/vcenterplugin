@@ -1,10 +1,9 @@
 <div>
   <!--卸载提示-->
-  <clr-modal [clrModalOpen]="viewPage=='unmount_plugin'" [clrModalSize]="'md'" [clrModalClosable]="false">
-    <h3 class="modal-title modelTile">{{'nfs.unmount.title' | translate}}</h3>
+  <clr-modal [clrModalOpen]="viewPage=='unmount_pugin'" [clrModalSize]="'md'">
+    <h3 class="modal-title">{{'nfs.unmount.title' | translate}}</h3>
     <div class="modal-body">
-      <form clrForm>
-        <clr-radio-container clrInline>
+      <clr-radio-container clrInline>
         <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.mount.mountObj' | translate}}</label>
         <clr-radio-wrapper>
           <input type="radio" clrRadio name="controlPolicy" value="1" [(ngModel)]="mountType" ng-checked="true"/>
@@ -15,50 +14,6 @@
           <label>{{'vmfs.mount.cluster' | translate}}</label>
         </clr-radio-wrapper>
       </clr-radio-container>
-      </form>
-      <p style="color:red;">{{errorMsg}}</p>
-      <clr-datagrid *ngIf="mountType === '1'" [(clrDgSingleSelected)]="checkHost" [clrDgLoading]="isLoading">
-        <clr-dg-column hidden></clr-dg-column>
-        <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
-        <clr-dg-column [clrDgField]="'type'">{{'vmfs.type' | translate}}</clr-dg-column>
-        <clr-dg-row *clrDgItems="let item of hostList" [clrDgItem]="item">
-          <clr-dg-cell hidden>{{item.deviceId}}</clr-dg-cell>
-          <clr-dg-cell>{{item.hostName}}</clr-dg-cell>
-          <clr-dg-cell>{{'vmfs.host' | translate}}</clr-dg-cell>
-        </clr-dg-row>
-      </clr-datagrid>
-      <clr-datagrid *ngIf="mountType === '2'" [(clrDgSingleSelected)]="checkCluster" [clrDgLoading]="isLoading">
-        <clr-dg-column hidden></clr-dg-column>
-        <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
-        <clr-dg-column [clrDgField]="'type'">{{'vmfs.type' | translate}}</clr-dg-column>
-        <clr-dg-row *clrDgItems="let item of clusterList" [clrDgItem]="item">
-          <clr-dg-cell hidden>{{item.deviceId}}</clr-dg-cell>
-          <clr-dg-cell>{{item.clusterName}}</clr-dg-cell>
-          <clr-dg-cell>{{'vmfs.cluster' | translate}}</clr-dg-cell>
-        </clr-dg-row>
-      </clr-datagrid>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-outline" (click)="backToNfsList()">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="unMount()">{{'menu.ok' | translate}}</button>
-    </div>
-  </clr-modal>
-  <clr-modal class="add-wizard-wrap" [clrModalOpen]="viewPage=='unmount_datastore'" [clrModalSize]="'md'" [clrModalClosable]="false">
-    <h3 class="modal-title modelTile">{{'nfs.unmount.title' | translate}}</h3>
-    <div class="modal-body">
-      <form clrForm>
-        <clr-radio-container clrInline>
-        <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.mount.mountObj' | translate}}</label>
-        <clr-radio-wrapper>
-          <input type="radio" clrRadio name="controlPolicy" value="1" [(ngModel)]="mountType" ng-checked="true"/>
-          <label>{{'vmfs.mount.host' | translate}}</label>
-        </clr-radio-wrapper>
-        <clr-radio-wrapper>
-          <input type="radio" clrRadio name="controlPolicy" value="2"  [(ngModel)]="mountType" />
-          <label>{{'vmfs.mount.cluster' | translate}}</label>
-        </clr-radio-wrapper>
-      </clr-radio-container>
-      </form>
       <p style="color:red;">{{errorMsg}}</p>
       <clr-datagrid *ngIf="mountType === '1'" [(clrDgSingleSelected)]="checkHost" [clrDgLoading]="isLoading">
         <clr-dg-column hidden></clr-dg-column>
@@ -86,9 +41,30 @@
       <button type="button" class="btn btn-primary" (click)="unMount()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
-  <clr-modal class="add-wizard-wrap" [clrModalOpen]="viewPage=='unmount_host'" [clrModalClosable]="false" >
-    <h3 class="modal-title modelTile">{{'nfs.unmount.title' | translate}}</h3>
-    <div class="modal-body">
+  <div *ngIf="viewPage=='unmount_vcenter'">
+    <div class="clr-row">
+      <div class="clr-col-lg-4 clr-col-md-6 clr-col-12">
+        <div class="card">
+          <div class="card-header">
+            提示
+          </div>
+          <div class="card-block">
+            <div class="card-text">
+              {{'nfs.unmount.content' | translate}}
+            </div>
+          </div>
+          <div class="card-footer">
+            <button type="button" class="btn btn-outline" (click)="backToNfsList()">{{'menu.cancel' | translate}}</button>
+            <button type="button" class="btn btn-primary" (click)="unMount()">{{'menu.ok' | translate}}</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div *ngIf="viewPage=='unmount_hostcluster'">
+    <div>
+      <p>请选择卸载的Data Store</p>
+      <p *ngIf="errorMsg" style="color: red">{{errorMsg}}</p>
       <clr-datagrid [(clrDgSelected)]="rowSelected">
         <clr-dg-column>{{'nfs.name' | translate}}</clr-dg-column>
         <clr-dg-column>{{'nfs.status' | translate}}</clr-dg-column>
@@ -102,30 +78,9 @@
         </clr-dg-row>
       </clr-datagrid>
     </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-outline" (click)="backToNfsList()">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="unMount()">{{'menu.ok' | translate}}</button>
+    <div style="float: right">
+      <button type="button" class="btn btn-outline" (click)="closeModel()">{{'menu.cancel' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="hostClusterUnmount()">{{'menu.ok' | translate}}</button>
     </div>
-  </clr-modal>
-  <clr-modal class="add-wizard-wrap" [clrModalOpen]="viewPage=='unmount_cluster'" [clrModalClosable]="false">
-    <h3 class="modal-title  modelTile">{{'nfs.unmount.title' | translate}}</h3>
-    <div class="modal-body">
-      <clr-datagrid [(clrDgSelected)]="rowSelected">
-        <clr-dg-column>{{'nfs.name' | translate}}</clr-dg-column>
-        <clr-dg-column>{{'nfs.status' | translate}}</clr-dg-column>
-        <clr-dg-column>{{'nfs.totalCapacity' | translate}}</clr-dg-column>
-        <clr-dg-column>{{'nfs.freeCapacity' | translate}}</clr-dg-column>
-        <clr-dg-row *ngFor="let item of dataStoreList" [clrDgItem]="item">
-          <clr-dg-cell>{{item.name}}</clr-dg-cell>
-          <clr-dg-cell>{{item.status}}</clr-dg-cell>
-          <clr-dg-cell>{{formatCapacity(item.capacity)}}</clr-dg-cell>
-          <clr-dg-cell>{{formatCapacity(item.freeSpace)}}</clr-dg-cell>
-        </clr-dg-row>
-      </clr-datagrid>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-outline" (click)="backToNfsList()">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="unMount()">{{'menu.ok' | translate}}</button>
-    </div>
-  </clr-modal>
+  </div>
 </div>

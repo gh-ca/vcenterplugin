@@ -19,6 +19,5 @@ export class FsDetail{
    dataDeduplication: boolean;
    dateCompression: boolean;
    controller: string;
-   fsId:string;
 }
 

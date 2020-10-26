@@ -21,8 +21,7 @@
     "search": "搜索",
     "refresh": "刷新",
     "synSPolicy": "同步虚拟机存储策略",
-    "tip": "提示",
-    "back":"返回"
+    "tip": "提示"
   },
   "validations": {
     "required": "该字段必填!",
@@ -94,8 +93,6 @@
     "advance":"高级",
     "expandSize":"扩容大小",
     "oldCapacity":"原有容量",
-    "expandTips": "扩容容量只能为正整数。",
-    "reduceTips": "缩容容量只能为正整数。",
     "reduSize":"缩容大小",
     "ops":"OPS",
     "bandwidth":"带宽(MB/s)",
@@ -668,13 +665,7 @@
   },
   "enum":{
     "status":{
-      "creating":"Creating",
-      "normal":"Normal",
-      "mapping":"Mapping",
-      "unmapping":"Unmapping",
-      "deleting":"Deleting",
-      "error":"Error",
-      "expanding":"Expanding"
+
     },
     "type":{
       "block":"块",
