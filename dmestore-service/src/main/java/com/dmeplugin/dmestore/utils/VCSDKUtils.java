@@ -898,7 +898,6 @@ public class VCSDKUtils {
                             }
                             Thread.sleep(2000);
                             host1.getHostDatastoreSystemMO().expandVmfsDatastore(dsMo, spec);
-                            scanDataStore(null, hostObjectId);
                         }
                     }
                 }
