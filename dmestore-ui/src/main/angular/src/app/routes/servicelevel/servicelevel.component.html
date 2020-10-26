@@ -55,15 +55,16 @@
             <span class="gh-info-lable">{{'tier.free'|translate}}</span>
             <span class="gh-info-value">{{item.freeCapacity}} GB</span>
           </div>
-          <div class="gh-info-item" style="width: 215px;">
+          <div class="gh-info-item" style="width: 300px;">
             <span class="gh-info-lable">{{'tier.qosP'|translate}}</span>
-            <span class="gh-info-value" *ngIf="item.capabilities.qos == undefined">--</span>
-            <div  style="float: right;margin-top: 10px" *ngIf="item.capabilities.qos != undefined
-                                            && item.capabilities.qos.enabled == true
-                                            && item.capabilities.qos.qosParam.latency != undefined">
-                  {{'tier.latency'|translate}} <= {{item.capabilities.qos.qosParam.latency}} {{item.capabilities.qos.qosParam.latencyUnit}}<br>
-                  {{'tier.bandwidth'|translate}} >= {{item.capabilities.qos.qosParam.minBandWidth}} Mbps/s<br>
-                  IOPS <= {{item.capabilities.qos.qosParam.maxIOPS}} IOPS/TB
+            <div class="gh-info-value" *ngIf="item.capabilities.qos == undefined">--</div>
+            <div style="float: right;margin-top: 5px; width: 220px" *ngIf="item.capabilities.qos != undefined
+                                            && item.capabilities.qos.enabled == true">
+              <div style="margin-top: 5px" *ngIf="item.capabilities.qos.qosParam.latency != undefined">{{'tier.latency'|translate}} <= {{item.capabilities.qos.qosParam.latency}} {{item.capabilities.qos.qosParam.latencyUnit}}</div>
+              <div style="margin-top: 5px" *ngIf="item.capabilities.qos.qosParam.maxIOPS != undefined">IOPS <= {{item.capabilities.qos.qosParam.maxIOPS}} IOPS/TB</div>
+              <div style="margin-top: 5px" *ngIf="item.capabilities.qos.qosParam.minIOPS != undefined">IOPS >= {{item.capabilities.qos.qosParam.minIOPS}} IOPS/TB</div>
+              <div style="margin-top: 5px" *ngIf="item.capabilities.qos.qosParam.maxBandWidth != undefined">{{'tier.bandwidth'|translate}} <= {{item.capabilities.qos.qosParam.maxBandWidth}} Mbps/s</div>
+              <div style="margin-top: 5px" *ngIf="item.capabilities.qos.qosParam.minBandWidth != undefined">{{'tier.bandwidth'|translate}} >= {{item.capabilities.qos.qosParam.minBandWidth}} Mbps/s</div>
             </div>
           </div>
           <!--<div class="gh-info-item">
