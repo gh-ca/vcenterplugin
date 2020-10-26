@@ -13,6 +13,7 @@ export class NfsService {
   static vmfsBDWT: Array<string> = ['1125921381744646', '1125921381744647'];
   // VMFS  latency 0Read 1Write
   static vmfsLatency: Array<string> = ['1125921381744656', '1125921381744657'];
+  static COUNTER_ID_VOLUME_RESPONSETIME: Array<string> = ['1125921381744642'];
   // VMFS  url
   static vmfsUrl = 'datastorestatistichistrory/vmfs';
 
@@ -336,7 +337,8 @@ export class MakePerformance {
    * @param range 时间段 LAST_5_MINUTE LAST_1_HOUR LAST_1_DAY LAST_1_WEEK LAST_1_MONTH LAST_1_QUARTER HALF_1_YEAR LAST_1_YEAR BEGIN_END_TIME INVALID
    * @param url 请求url
    */
-  setChart(height: number, title: string, subtext: string, indicatorIds: any[], objIds: any[], range: string, url: string, startTime:string, endTime:string) {
+  setChart(height: number, title: string, subtext: string, indicatorIds: any[], objIds: any[], range: string,
+           url: string, startTime:string, endTime:string) {
     // 生成chart optiond对象
     const chart:ChartOptions = this.getNewChart(height, title, subtext);
     return new Promise((resolve, reject) => {
@@ -360,9 +362,9 @@ export class MakePerformance {
           // 下限对象
           const lowerData = resData[objIds[0]][indicatorIds[1]];
           // 上限最大值
-          const pmaxData = this.getUpperOrLower(upperData, 'upper');
+          let pmaxData = this.getUpperOrLower(upperData, 'upper');
           // 下限最大值
-          let lmaxData = this.getUpperOrLower(lowerData, 'lower');
+          let lmaxData = this.getUpperOrLower(lowerData, 'upper');
           // 上限最小值
           let pminData = this.getUpperOrLower(upperData, 'lower');
           // 下限最小值
@@ -382,20 +384,23 @@ export class MakePerformance {
           // 设置上限、均值 折线图数据
           uppers.forEach(item => {
             for (const key of Object.keys(item)) {
-              // chartData.value = item[key];
-              chart.series[2].data.push({value: Number(item[key]), symbol: 'none'});
+              const value = Number(Number(item[key]).toFixed(4));
+              chart.series[2].data.push({value: value, symbol: 'none'});
             }
             for (const key of Object.keys(pavgData)) {
-              chart.series[0].data.push({value:  Number(pavgData[key]), symbol: 'none'});
+              const value = Number(Number(pavgData[key]).toFixed(4));
+              chart.series[0].data.push({value: value, symbol: 'none'});
             }
           });
           // 设置下限、均值 折线图数据
           lower.forEach(item => {
             for (const key of Object.keys(item)) {
-              chart.series[3].data.push({value: Number(item[key]), symbol: 'none'});
+              const value = Number(Number(item[key]).toFixed(4));
+              chart.series[3].data.push({value: value, symbol: 'none'});
             }
             for (const key of Object.keys(lavgData)) {
-              chart.series[1].data.push({value: Number(lavgData[key]), symbol: 'none'});
+              const value = Number(Number(lavgData[key]).toFixed(4));
+              chart.series[1].data.push({value: value, symbol: 'none'});
             }
           });
           resolve(chart);
@@ -673,10 +678,11 @@ export class MakePerformance {
   setXAxisData(data: any[], chart:ChartOptions) {
     console.log('data', data);
     data.forEach(item => {
+
       for (const key of Object.keys(item)) {
         let numKey = + key;
         const date = new Date(numKey);
-        const dateStr = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDay() + ' ' + date.getHours() + ':' + date.getMinutes();
+        const dateStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes();
         chart.xAxis.data.push(dateStr);
       }
     });
@@ -691,15 +697,15 @@ export class MakePerformance {
     console.log("data", data)
     let result;
     if (type === 'lower') {
-      for (const key of Object.keys(data.max)) {
-        result = Number(data.max[key]);
+      for (const key of Object.keys(data.min)) {
+        result = Number(data.min[key]);
       }
     } else {
       for (const key of Object.keys(data.max)) {
-        result = Number(data.min[key]);
+        result = Number(data.max[key]);
       }
     }
-    return result;
+    return Number(result.toFixed(4));
   }
 
   /**

@@ -853,13 +853,15 @@ export class DetailComponent implements OnInit, AfterViewInit {
           uppers.forEach(item => {
             for (const key of Object.keys(item)) {
               // chartData.value = item[key];
-              chart.series[0].data.push({value: Number(item[key]), symbol: 'none'});
+              const value = Number(Number(item[key]).toFixed(4));
+              chart.series[0].data.push({value: value, symbol: 'none'});
             }
           });
           // 设置write 折线图数据
           lower.forEach(item => {
             for (const key of Object.keys(item)) {
-              chart.series[1].data.push({value: Number(item[key]), symbol: 'none'});
+              const value = Number(Number(item[key]).toFixed(4));
+              chart.series[1].data.push({value: value, symbol: 'none'});
             }
           });
           resolve(chart);
