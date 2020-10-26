@@ -15,6 +15,7 @@ public class NfsDataStoreFsAttr implements Serializable {
     private boolean dataDeduplication;
     private boolean dateCompression;
     private String controller;
+    private String fileSystemId;
 
     public String getController() {
         return controller;
@@ -86,5 +87,13 @@ public class NfsDataStoreFsAttr implements Serializable {
 
     public void setDateCompression(boolean dateCompression) {
         this.dateCompression = dateCompression;
+    }
+
+    public String getFileSystemId() {
+        return fileSystemId;
+    }
+
+    public void setFileSystemId(String fileSystemId) {
+        this.fileSystemId = fileSystemId;
     }
 }
