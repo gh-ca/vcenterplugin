@@ -248,7 +248,8 @@
       "title":"Unmount",
       "content":"Are you sure to unmount?",
       "notChooseDeviceTips":"Please select the host or cluster to be uninstalled!",
-      "notChooseDataStoreTips":"Please select the DataStore to be unmounted！"
+      "notChooseDataStoreTips":"Please select the DataStore to be unmounted！",
+      "tips":"If all the hosts/clusters mounted by VMFS are unmounted, the VMFS device will be deleted automatically！"
     },
     "reclaim": {
       "title":"Tips",
