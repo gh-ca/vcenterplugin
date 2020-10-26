@@ -1,6 +1,6 @@
 <div class="detail-outer">
   <div class="detail-header">
-    <p class="detail-header-font"><clr-icon shape="undo" size="20" (click)="backToList()"></clr-icon>{{storageName}}</p>
+    <button style="float: right" type="button" class="btn btn-outline-primary btn-sm" (click)="backToList()">{{'menu.back' | translate}}</button>
   </div>
   <div class="detail-content">
     <div>
@@ -88,7 +88,7 @@
                       </div>
                     </div>
                     <!-- 列表页 -->
-                    <clr-datagrid [(clrDgSelected)]="rowSelected" [clrDgLoading]="isLoading">
+                    <clr-datagrid  [clrDgLoading]="isLoading">
 
                       <clr-dg-column>{{'storage.detail.storagePool.name' | translate}}</clr-dg-column>
                       <clr-dg-column>{{'storage.detail.storagePool.status' | translate}}</clr-dg-column>
@@ -262,7 +262,7 @@
                         <clr-dg-cell>{{item.name}}</clr-dg-cell>
                         <clr-dg-cell>{{item.healthStatus}}</clr-dg-cell>
                         <clr-dg-cell>{{item.allocType}}</clr-dg-cell>
-                        <clr-dg-cell>文件系统类型接口无字段</clr-dg-cell>
+                        <clr-dg-cell>{{item.type}}</clr-dg-cell>
                         <clr-dg-cell>{{formatCapacity(item.capacity)}}</clr-dg-cell>
                         <clr-dg-cell>{{item.availableCapacity}}</clr-dg-cell>
                         <clr-dg-cell>
@@ -486,10 +486,22 @@
         <clr-tab>
           <button  clrTabLink>{{'storage.detail.performance.performance' | translate}}</button>
           <clr-tab-content clrTabLinkInOverflow="true">
-            <div>{{'storage.detail.performance.ptc' | translate}}</div>
-            <div echarts [options]="mychart" style="height: 600px;"></div>
-            <div echarts [options]="mychart" style="height: 600px;"></div>
-            <div echarts [options]="mychart" style="height: 600px;"></div>
+            <div style="margin-bottom: 1%;font-size: 5px">{{'storage.detail.performance.ptc' | translate}}</div>
+            <div style="float: right;">
+              <table cellpadding="5" >
+                <tr>
+                  <td>
+                    <clr-select-container>
+                      <select clrSelect (ngModelOptions)="ranges" [(ngModel)]="selectRange" name="defaultSelect" class="clr-select" (change)="changeFunc()">
+                        <option *ngFor="let item of ranges" value="{{item.key}}">{{item.value}}</option>
+                      </select>
+                    </clr-select-container>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div echarts [options]="iopsChart" style="height: 300px;"></div>
+            <div echarts [options]="bandwidthChart" style="height: 300px;"></div>
           </clr-tab-content>
         </clr-tab>
         <clr-tab>
