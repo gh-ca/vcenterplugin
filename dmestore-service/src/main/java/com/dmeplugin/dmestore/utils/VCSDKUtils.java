@@ -846,7 +846,7 @@ public class VCSDKUtils {
     /**
      *expand oriented datastore capacity
      **/
-    public String expandVmfsDatastore(String dsname, Integer addCapacity,String datastoreobjid) {
+    public String expandVmfsDatastore(String datastoreObjectId, Integer addCapacity) {
 
         String result = "success";
         logger.info("==start expand DataStore==");
@@ -862,18 +862,16 @@ public class VCSDKUtils {
                     for (Pair<ManagedObjectReference, String> host : hosts) {
                         host1 = new HostMO(vmwareContext, host.first());
                         hdsMo = host1.getHostDatastoreSystemMO();
-                        if (null != hdsMo.findDatastore(dsname)) {
-                            mor = hdsMo.findDatastore(dsname);
-                            break;
-                        }
+
                     }
+                    mor = vcConnectionHelper.objectID2MOR(datastoreObjectId);
                     if (mor != null && host1 != null && hdsMo != null) {
                         DatastoreMO dsMo = new DatastoreMO(vmwareContext, mor);
                         List<VmfsDatastoreOption> vmfsDatastoreOptions = hdsMo.queryVmfsDatastoreExpandOptions(dsMo);
                         VmfsDatastoreInfo datastoreInfo = (VmfsDatastoreInfo) hdsMo.getDatastoreInfo(mor);
                         if (vmfsDatastoreOptions != null && vmfsDatastoreOptions.size() > 0) {
                             VmfsDatastoreOption vmfsDatastoreOption = vmfsDatastoreOptions.get(0);
-                            String diskUuid = vmfsDatastoreOption.getSpec().getDiskUuid();
+                            //String diskUuid = vmfsDatastoreOption.getSpec().getDiskUuid();
                             VmfsDatastoreExpandSpec spec = (VmfsDatastoreExpandSpec) vmfsDatastoreOption.getSpec();
                             HostVmfsVolume vmfs = datastoreInfo.getVmfs();
                             Long totalSectors = addCapacity * ToolUtils.GI * 1L / vmfs.getBlockSize();
