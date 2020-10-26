@@ -14,7 +14,7 @@ import {Router} from "@angular/router";
   templateUrl: './nfs.component.html',
   styleUrls: ['./nfs.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [NfsService, GlobalsService, StorageService,VmfsListService],
+  providers: [NfsService,StorageService,VmfsListService],
 })
 export class NfsComponent implements OnInit {
   list: List[] = []; // 数据列表
@@ -179,7 +179,9 @@ export class NfsComponent implements OnInit {
   }
   // 点刷新那个功能是分两步，一步是刷新，然后等我们这边的扫描任务，任务完成后返回你状态，任务成功后，你再刷新列表页面。
   scanDataStore() {
+    this.isLoading = true;
     this.vmfsListService.scanVMFS('nfs').subscribe((res: any) => {
+      this.isLoading = false;
       if (res.code === '200') {
         this.getNfsList();
         console.log('Scan success');

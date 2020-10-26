@@ -1,0 +1,51 @@
+.inputWidth100Percent{
+  width: 100%;
+}
+
+::ng-deep .clr-select-wrapper{
+  width: 35%;
+}
+
+::ng-deep .clr-select-wrapper select, .clr-multiselect-wrapper select {
+  width: 100%;
+}
+.modelTile{
+  line-height: 3rem;
+  border-bottom: 1px solid #DDDDDD;
+  font-weight: normal;
+}
+.errorTips{
+  border: none;
+  color: red;
+}
+.add-wizard-wrap ::ng-deep .modal-backdrop{
+  display: none;
+}
+.add-wizard-wrap ::ng-deep .modal{
+  padding: 0;
+  position: initial;
+}
+// 隐藏input标签箭头
+input[type=number] {
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+
+  -moz-appearance: textfield;
+}
+.modelTile{
+  line-height: 3rem;
+  border-bottom: 1px solid #DDDDDD;
+  font-weight: normal;
+}
+::ng-deep .modal-title-text{
+  line-height: 3rem;
+  border-bottom: 1px solid #DDDDDD;
+  font-weight: bolder;
+}
+::ng-deep .modal-title-wrapper{
+  width: 100%;
+}
+

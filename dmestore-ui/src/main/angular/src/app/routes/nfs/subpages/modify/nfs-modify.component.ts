@@ -29,18 +29,22 @@ export class NfsModifyComponent implements OnInit{
     if(this.pluginFlag==null){
       //入口来至Vcenter
       const ctx = this.gs.getClientSdk().app.getContextObjects();
-      this.objectId=ctx[0].id;
+      if(ctx!=null){
+        this.objectId=ctx[0].id;
+      }
       this.viewPage='modify_vcenter'
     }
-    this.gs.loading=true;
-    this.modifyService.getNfsDetailById(this.objectId).subscribe((result: any) => {
-      if (result.code === '200'){
-        this.updateNfs=result.data;
-        this.updateNfs.sameName=true;
-        this.updateNfs.dataStoreObjectId=this.objectId;
-        this.gs.loading=false;
-      }
-    });
+    if(this.objectId!=null){
+      this.gs.loading=true;
+      this.modifyService.getNfsDetailById(this.objectId).subscribe((result: any) => {
+        if (result.code === '200'){
+          this.updateNfs=result.data;
+          this.updateNfs.sameName=true;
+          this.updateNfs.dataStoreObjectId=this.objectId;
+          this.gs.loading=false;
+        }
+      });
+    }
   }
   modifyCommit(){
     this.gs.loading=true;
@@ -59,6 +63,7 @@ export class NfsModifyComponent implements OnInit{
         }
       }else{
         this.errorMsg = '编辑失败！'+result.description;
+        this.cdr.detectChanges();
       }
     });
   }

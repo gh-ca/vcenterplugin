@@ -31,39 +31,49 @@ export class NfsMountComponent implements OnInit{
               private activatedRoute: ActivatedRoute,private router:Router){
   }
   ngOnInit(): void {
+    this.gs.loading=true;
     this.activatedRoute.url.subscribe(url => {
       this.routePath=url[0].path;
     });
-    const ctx = this.gs.getClientSdk().app.getContextObjects();
+
     if ("dataStore"===this.routePath){
       //入口是DataSource
-      this.viewPage='dataStore_pugin'
+      this.viewPage='mount_plugin'
       this.activatedRoute.queryParams.subscribe(queryParam => {
         this.dsObjectId = queryParam.objectId;
         this.pluginFlag =queryParam.flag;
       });
       if(this.pluginFlag==null){
         //入口来至Vcenter
-        //this.dsObjectId=ctx[0].id;
-        this.viewPage='dataStore_vcenter'
+        const ctx = this.gs.getClientSdk().app.getContextObjects();
+        this.dsObjectId=ctx[0].id;
+        this.viewPage='mount_dataStore'
       }
       if (this.dsObjectId!=null && this.dsObjectId!=''){
         this.initHostAndClusterList();
       }
-      console.log('viewPage');
-      console.log(this.viewPage);
+      this.gs.loading=false;
     }else{
       //入口是主机或者集群
       if ('host'===this.routePath){
-        this.hostObjectId=ctx[0].id;
-        //入口是主机
-        if (this.hostObjectId!=null){
+        this.viewPage='mount_host';
+        const ctx = this.gs.getClientSdk().app.getContextObjects();
+        if(ctx!=null){
+          this.hostObjectId=ctx[0].id;
           this.getDataStoreList('host');
         }
+        this.gs.loading=false;
       }else if('cluster'===this.routePath){
-        //入口是集群
-        this.getDataStoreList('cluster');
+        this.viewPage='mount_cluster'
+        const ctx = this.gs.getClientSdk().app.getContextObjects();
+        if(ctx!=null){
+          this.clusterObjectId=ctx[0].id;
+          //入口是集群
+          this.getDataStoreList('cluster');
+        }
+        this.gs.loading=false;
       }
+      this.gs.loading=false;
     }
     this.cdr.detectChanges();
   }
@@ -72,12 +82,14 @@ export class NfsMountComponent implements OnInit{
       if (r.code === '200'){
         this.hostList = r.data;
         this.cdr.detectChanges();
+        this.gs.loading=false;
       }
     });
     this.mountService.getClusterListByObjectId(this.dsObjectId).subscribe((r: any) => {
       if (r.code === '200'){
         this.clusterList = r.data;
         this.cdr.detectChanges();
+        this.gs.loading=false;
       }
     });
   }
@@ -130,10 +142,12 @@ export class NfsMountComponent implements OnInit{
 
   }
   backToNfsList(){
+    this.gs.loading=false;
     this.router.navigate(['nfs']);
   }
   closeModel(){
     this.gs.getClientSdk().modal.close();
+    this.gs.loading=false;
   }
   formatCapacity(c: number){
     if (c < 1024){
