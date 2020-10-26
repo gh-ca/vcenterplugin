@@ -18,13 +18,19 @@ export class NfsService {
   static vmfsUrl = 'datastorestatistichistrory/vmfs';
 
   // NFS IOPS 0Read 1Write
-  static nfsOPS: Array<string> = ['1125921381744648', '1125921381744649'];
+  static nfsOPS: Array<string> = ['1126179079716867', '1126179079716870'];
   // NFS  bandwidth 0Read 1Write
-  static nfsBDWT: Array<string> = ['1125921381744646', '1125921381744647'];
+  static nfsBDWT: Array<string> = ['1126179079716868', '1126179079716871'];
   // NFS  latency 0Read 1Write
-  static nfsLatency: Array<string> = ['1125921381744656', '1125921381744657'];
+  static nfsLatency: Array<string> = ['1126179079716869', '1126179079716872'];
   // NFS  url
   static nfsUrl = 'datastorestatistichistrory/nfs';
+
+  // Storage Detail 0Read 1Write
+  static storageIOPS: Array<string> = ['1125904201875461', '1125904201875462'];
+  // Storage bandwidth 0Read 1Write
+  static storageBDWT: Array<string> = ['1125904201875459', '1125904201875460'];
+
   // 性能图可选range LAST_5_MINUTE LAST_1_HOUR LAST_1_DAY LAST_1_WEEK LAST_1_MONTH LAST_1_QUARTER HALF_1_YEAR LAST_1_YEAR BEGIN_END_TIME INVALID
   static perRanges = [
     {key: 'LAST_5_MINUTE', value: '最近5分钟'},
@@ -37,7 +43,7 @@ export class NfsService {
     {key: 'LAST_1_YEAR', value: '最近1年'},
     {key: 'BEGIN_END_TIME', value: '开始-结束时间'},
     {key: 'INVALID', value: '无效'},
-    ];
+  ];
   constructor(private http: HttpClient) {}
 
   getData() {
@@ -65,21 +71,21 @@ export class NfsService {
   }
 }
 export interface List {
-   name: string;    // 名称
-   status: string;  // 状态
+  name: string;    // 名称
+  status: string;  // 状态
   capacity: number;  // 总容量 单位GB
   freeSpace: number; // 空闲容量 单位GB
   reserveCapacity: number; // 置备容量  capacity+uncommitted-freeSpace 单位GB
-   deviceId: string; // 存储设备ID
-   device: string; // 存储设备名称
-   logicPort: string; // 逻辑端口
-   logicPortId: string; // 逻辑端口 id
-   shareIp: string; // share ip
-   sharePath: string; // share path
-   share: string; // share 名称
-   shareId: string; // share id
-   fs: string; // fs
-   fsId: string; // fs id
+  deviceId: string; // 存储设备ID
+  device: string; // 存储设备名称
+  logicPort: string; // 逻辑端口
+  logicPortId: string; // 逻辑端口 id
+  shareIp: string; // share ip
+  sharePath: string; // share path
+  share: string; // share 名称
+  shareId: string; // share id
+  fs: string; // fs
+  fsId: string; // fs id
   ops: number; // OPS
   bandwidth: number;   // 带宽 单位MB/s
   readResponseTime: number;   // 读响应时间 单位ms
@@ -347,9 +353,9 @@ export class MakePerformance {
         console.log('chartData: ', title, result);
         if (result.code === '200' && result.data !== null && result.data !== null) {
           const resData = result.data;
-            // 设置标题
+          // 设置标题
           chart.title.text = title;
-            // 设置副标题
+          // 设置副标题
           chart.title.subtext = subtext;
           // 上限对象
           const upperData = resData[objIds[0]][indicatorIds[0]];
@@ -429,29 +435,29 @@ export class MakePerformance {
         end_time: endTime,
       }
       this.remoteSrv.getLineChartData(url, params).subscribe((result: any) => {
-          console.log('chartData: ', title, result);
-          // 设置标题
-          chart.title.text = title;
-          // 设置副标题
-          chart.title.subtext = subtext;
-          if (result.code === '200' && result.data !== null && result.data !== null) {
-            let resData = result.data;
-            if (result.data){
-              resData = result.data
-            }
-            const seriesData = resData[objIds[0]][indicatorIds[0]].series;
-            // 设置X轴
-            this.setXAxisData(seriesData, chart);
-            seriesData.forEach(item => {
-              for (const key of Object.keys(item)) {
-                // chartData.value = item[key];
-                chart.series[0].data.push({value: Number(item[key]), symbol: 'none'});
-              }
-            });
-          } else {
-            console.log('get chartData fail: ', result.description);
+        console.log('chartData: ', title, result);
+        // 设置标题
+        chart.title.text = title;
+        // 设置副标题
+        chart.title.subtext = subtext;
+        if (result.code === '200' && result.data !== null && result.data !== null) {
+          let resData = result.data;
+          if (result.data){
+            resData = result.data
           }
-          resolve(chart);
+          const seriesData = resData[objIds[0]][indicatorIds[0]].series;
+          // 设置X轴
+          this.setXAxisData(seriesData, chart);
+          seriesData.forEach(item => {
+            for (const key of Object.keys(item)) {
+              // chartData.value = item[key];
+              chart.series[0].data.push({value: Number(item[key]), symbol: 'none'});
+            }
+          });
+        } else {
+          console.log('get chartData fail: ', result.description);
+        }
+        resolve(chart);
       });
     });
   }
@@ -688,6 +694,7 @@ export class MakePerformance {
    * @param type upper 最大 lower最小
    */
   getUpperOrLower(data: any, type: string) {
+    console.log("data", data)
     let result;
     if (type === 'lower') {
       for (const key of Object.keys(data.min)) {

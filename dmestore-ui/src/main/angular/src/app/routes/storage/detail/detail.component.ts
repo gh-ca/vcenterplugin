@@ -5,18 +5,28 @@ import {
   StoragePool,
   Volume
 } from './detail.service';
-import {VmfsPerformanceService} from '../../vmfs/volume-performance/performance.service';
 import { EChartOption } from 'echarts';
-import {FileSystem} from '../../nfs/nfs.service';
+import {
+  AxisLine, AxisPointer,
+  ChartOptions,
+  FileSystem, Legend, LegendData, LineStyle, MakePerformance,
+  NfsService, Serie,
+  SplitLine,
+  TextStyle,
+  Title, Tooltip,
+  XAxis,
+  YAxis
+} from '../../nfs/nfs.service';
 import {ActivatedRoute, Router} from "@angular/router";
-import {CapacityChart, CapacitySerie, StorageList} from "../storage.service";
+import {CapacityChart, CapacitySerie} from "../storage.service";
 import {BondPort, EthernetPort, FailoverGroup, FCoEPort, FCPort, LogicPort} from "./port.service";
+import {FormControl, FormGroup} from "@angular/forms";
 @Component({
   selector: 'app-detail',
   templateUrl: './detail.component.html',
   styleUrls: ['./detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [DetailService, VmfsPerformanceService],
+  providers: [DetailService, MakePerformance, NfsService],
 })
 export class DetailComponent implements OnInit, AfterViewInit {
 
@@ -95,7 +105,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     xAxis: {
       type: 'category',
       data: [
-         '4:00', '6:00', '8:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '01/20'
+        '4:00', '6:00', '8:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '01/20'
       ]
     },
     yAxis: {
@@ -298,17 +308,13 @@ export class DetailComponent implements OnInit, AfterViewInit {
   interval;
   // range 时间段 LAST_5_MINUTE LAST_1_HOUR LAST_1_DAY LAST_1_WEEK LAST_1_MONTH LAST_1_QUARTER HALF_1_YEAR LAST_1_YEAR BEGIN_END_TIME INVALID
   range;
-  // begin_time 开始时间 时间戳(例：1552477343834)
-  beginTime = 1552477343834;
-  // end_time 结束时间 时间戳
-  endTime = 1552567343000;
   // 定时函数执行时间 默认一天
   timeInterval = 1 * 60 * 60 * 1000;
   poolRadio = 'table1'; // 存储池列表切换
   volumeRadio = 'table1'; // volume列表切换
   storageId = '1234';
   storageName= "";
-  constructor(private detailService: DetailService, private cdr: ChangeDetectorRef, private ngZone: NgZone,
+  constructor(private nfsService:NfsService, private makePerformance: MakePerformance, private detailService: DetailService, private cdr: ChangeDetectorRef, private ngZone: NgZone,
               private activatedRoute: ActivatedRoute,private router:Router) { }
   detail: StorageDetail;
   storagePool: StoragePool[];
@@ -329,6 +335,19 @@ export class DetailComponent implements OnInit, AfterViewInit {
   fgs:FailoverGroup[];
   storagePoolIds=[];
   volumeIds=[];
+
+  selectRange = 'LAST_1_DAY';
+  startTime = null;
+  // endTime
+  endTime = null;
+
+  rangeTime = new FormGroup({
+    start: new FormControl(),
+    end: new FormControl()
+  });
+  // ranges
+  ranges = NfsService.perRanges;
+
   //portList:
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(queryParam => {
@@ -337,7 +356,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
     this.getStorageDetail(true);
     this.getStoragePoolList(true);
-    //this.initCapacity();
+    this.initCapacity();
   }
   ngAfterViewInit() {
     this.ngZone.runOutsideAngular(() => this.initChart());
@@ -345,41 +364,40 @@ export class DetailComponent implements OnInit, AfterViewInit {
 
   // 初始化表格对象
   async initChart() {
-    switch (this.range) {
-      case 'LAST_1_HOUR': // 过去一小时
-        break;
-      case 'LAST_4_HOUR': // 过去四小时 此值目前接口没有
-        break;
-      case 'LAST_12_HOUR': // 过去12小时 此值目前接口没有
-        break;
-      default: // 默认过去24h
-        break;
-    }
-    /* // IOPS
-    this.iopsChart = echarts.init(document.querySelector('#iopsChart'));
-    this.perService.getIopsChart('IOPS', 'IO/s', this.objTypeId, this.indicatorIdsIOPS, this.objIds,
-      this.interval, this.range, this.beginTime, this.endTime).then(res => {
-      this.iopsChart.setOption(res, true);
+    // switch (this.range) {
+    //   case 'LAST_1_HOUR': // 过去一小时
+    //     break;
+    //   case 'LAST_4_HOUR': // 过去四小时 此值目前接口没有
+    //     break;
+    //   case 'LAST_12_HOUR': // 过去12小时 此值目前接口没有
+    //     break;
+    //   default: // 默认过去24h
+    //     break;
+    // }
+    const fsNames:string[] = [];
+    fsNames.push('A7213075B5EE3AF3989D7DB938ED2CF8');
+    // IOPS
+    this.setChart(300,"IOPS","IO/s",
+      NfsService.storageIOPS,fsNames,this.selectRange,NfsService.nfsUrl, this.startTime, this.endTime).then(res=>{
+      // NfsService.nfsOPS,fsNames,this.selectRange,NfsService.nfsUrl, this.startTime, this.endTime).then(res=>{
+      this.iopsChart = res;
       this.cdr.detectChanges();
     });
 
     // 带宽
-    this.bandwidthChart = echarts.init(document.querySelector('#bandwidthChart'));
-    this.perService.getIopsChart('Bandwidth', 'MS/s', this.objTypeId, this.indicatorIdsBDWT, this.objIds,
-      this.interval, this.range, this.beginTime, this.endTime).then(res => {
-      this.bandwidthChart.setOption(res, true);
+    this.setChart(300,'Bandwidth', 'MB/s',
+      NfsService.storageBDWT, fsNames, this.selectRange, NfsService.nfsUrl, this.startTime, this.endTime).then(res => {
+      // NfsService.nfsBDWT, fsNames, this.selectRange, NfsService.nfsUrl, this.startTime, this.endTime).then(res => {
+      this.bandwidthChart = res;
       this.cdr.detectChanges();
     });
     // 响应时间
-    this.latencyChart = echarts.init(document.querySelector('#latencyChart'));
-    this.perService.getIopsChart('Latency', 'ms', this.objTypeId, this.indicatorIdsREST, this.objIds,
-      this.interval, this.range, this.beginTime, this.endTime).then(res => {
-      this.latencyChart.setOption(res, true);
-      this.cdr.detectChanges();
-    }); */
-  }
-  async showChart() {
-    console.log("更新图表")
+    // this.latencyChart = echarts.init(document.querySelector('#latencyChart'));
+    // this.perService.getIopsChart('Latency', 'ms', this.objTypeId, this.indicatorIdsREST, this.objIds,
+    //   this.interval, this.range, this.beginTime, this.endTime).then(res => {
+    //   this.latencyChart.setOption(res, true);
+    //   this.cdr.detectChanges();
+    // });
   }
 
   changeTab(page: string){
@@ -650,12 +668,12 @@ export class DetailComponent implements OnInit, AfterViewInit {
     this.getFailoverGroups();
   }
   getFCPortList(){
-      this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"FC"}).subscribe((r: any) => {
-        if (r.code === '200'){
-          this.fcs = r.data;
-          this.cdr.detectChanges();
-        }
-      });
+    this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"FC"}).subscribe((r: any) => {
+      if (r.code === '200'){
+        this.fcs = r.data;
+        this.cdr.detectChanges();
+      }
+    });
   }
   getFCoEPortList(){
     this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"FCoE"}).subscribe((r: any) => {
@@ -748,7 +766,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     this.cd.fileSystem =this.formatCapacity(this.detail.fileCapacity);
     const v = 2.024;
     this.cd.volume =this.formatCapacity(this.detail.blockCapacity);
-     this.cd.freeCapacity= this.getFreeCapacity(this.detail.totalEffectiveCapacity,this.detail.usedCapacity);
+    this.cd.freeCapacity= this.getFreeCapacity(this.detail.totalEffectiveCapacity,this.detail.usedCapacity);
 
     const cc = new CapacityChart(this.formatCapacity(this.detail.totalEffectiveCapacity));
     const free=(this.detail.totalEffectiveCapacity-this.detail.usedCapacity)*100;
