@@ -1799,7 +1799,7 @@ public class VCSDKUtils {
             logger.info("Rescan datastore before mounting");
             //挂载NFS
             NasDatastoreInfo nasdsinfo = (NasDatastoreInfo) datastoreMO.getInfo();
-            hostMO.getHostDatastoreSystemMO().createNfsDatastore(logicPortIp, 0, nasdsinfo.getNas().getRemotePath(), datastoreMO.getMor().getValue(), mountType, null);
+            hostMO.getHostDatastoreSystemMO().createNfsDatastore(logicPortIp, 0, nasdsinfo.getNas().getRemotePath(), datastoreMO.getName(), mountType, null);
             logger.info("mount nfs success:" + hostMO.getName() + ":" + datastoreMO.getName());
         } catch (Exception e) {
             e.printStackTrace();

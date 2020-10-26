@@ -659,7 +659,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
      */
     @Override
     public void mountNfs(Map<String, Object> params) throws DMEException {
-        if (params != null&&null!=params.get("dataStoreObjectIds") ) {
+        if (params != null&&null!=params.get("dataStoreObjectId") ) {
             String dataStoreObjectId = ToolUtils.getStr(params.get("dataStoreObjectId"));
 
             LOG.info("dataStoreObjectId====" + dataStoreObjectId);
@@ -721,9 +721,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 LOG.info("mount nfs To Host fail: share Id is null");
                 throw new Exception("mount nfs To Host fail: share Id is null");
             }
-            if (params.get("hosts") == null ) {
-                LOG.info("mount nfs To Host fail: hosts or clusters is null");
-                throw new Exception("mount nfs To Host fail: hosts or clusters is null");
+            if (params.get("hostVkernelIp") == null ) {
+                LOG.info("mount nfs To Host fail: vkernelIp is null");
+                throw new Exception("mount nfs To Host fail: vkernelIp is null");
             }
 
             //修改dme中的share
@@ -736,7 +736,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
             Map<String, Object> addition = new HashMap<>();
             addition.put("name", vkernelIp);
-            addition.put("accessval", ToolUtils.getStr(params.get("mountType")));
+            String accessval=("readOnly".equalsIgnoreCase(ToolUtils.getStr(params.get("mountType"))))?"read-only":"read/write";
+            addition.put("accessval",accessval);
             addition.put("all_squash", "no_all_squash");
             addition.put("root_squash", "root_squash");
             addition.put("sync", "synchronization");
