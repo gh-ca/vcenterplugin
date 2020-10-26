@@ -82,7 +82,7 @@ public class VmfsDataInfo {
     /**
      * dme中时延 单位ms
      **/
-    Integer latency;
+    Float latency;
     /**
      * dme中卷ID
      **/
@@ -240,11 +240,11 @@ public class VmfsDataInfo {
         this.writeResponseTime = writeResponseTime;
     }
 
-    public Integer getLatency() {
+    public Float getLatency() {
         return latency;
     }
 
-    public void setLatency(Integer latency) {
+    public void setLatency(Float latency) {
         this.latency = latency;
     }
 
