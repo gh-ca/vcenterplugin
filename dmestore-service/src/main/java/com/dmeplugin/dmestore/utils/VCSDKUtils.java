@@ -1565,7 +1565,7 @@ public class VCSDKUtils {
             }
             logger.info("Hosts that need to be mounted:" + hostMo.getName());
             //挂载前重新扫描datastore
-            hostMo.getHostStorageSystemMO().rescanVmfs();
+            hostMo.getHostStorageSystemMO().refreshStorageSystem();
             logger.info("Rescan datastore before mounting");
             //查询目前未挂载的卷
 //            List<HostUnresolvedVmfsVolume> unvlist = hostMo.getHostStorageSystemMO().queryUnresolvedVmfsVolume();
@@ -1720,7 +1720,9 @@ public class VCSDKUtils {
     }
     /**
      *将存储挂载到集群下其它主机 20200918objectId
+     * 废弃
      **/
+    @Deprecated
     public void mountNfsOnCluster(String dataStoreObjectId, List<Map<String, String>> clusters, List<Map<String, String>> hosts, String mountType) throws VcenterException {
         try {
             if (StringUtils.isEmpty(dataStoreObjectId)) {
@@ -1759,7 +1761,9 @@ public class VCSDKUtils {
                     HostMO hostmo = rootFsMo.findHost(hostName);
                     logger.info("Host name: " + hostmo.getName());
                     //只挂载其它的主机
-                    mountNfs(dsmo, hostmo, mountType);
+                    //此处需要设置逻辑端口ip，而不是datastore的ip
+                    NasDatastoreInfo nasdsinfo = (NasDatastoreInfo) dsmo.getInfo();
+                    mountNfs(vcConnectionHelper.MOR2ObjectID(dsmo.getMor(),serverguid), vcConnectionHelper.MOR2ObjectID(hostmo.getMor(),serverguid),nasdsinfo.getNas().getRemoteHost(), mountType);
                 }
             }
         } catch (Exception e) {
@@ -1771,24 +1775,32 @@ public class VCSDKUtils {
     /**
      *挂载Nfs存储 20200918objectId
      **/
-    public void mountNfs(DatastoreMO dsmo, HostMO hostMo, String mountType) throws VcenterException {
+    public void mountNfs(String datastoreobjectid, String hostobjectid,String logicPortIp, String mountType) throws VcenterException {
         try {
-            if (dsmo == null) {
+            if (datastoreobjectid == null) {
                 logger.info("datastore is null");
                 return;
             }
-            if (hostMo == null) {
+            if (hostobjectid == null) {
                 logger.info("host is null");
                 return;
             }
-            logger.info("Hosts that need to be mounted:" + hostMo.getName());
+            if (logicPortIp == null) {
+                logger.info("logicPortIp is null");
+                return;
+            }
+            String serverguid = vcConnectionHelper.objectID2Serverguid(datastoreobjectid);
+            VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
+            DatastoreMO datastoreMO=new DatastoreMO(vmwareContext,vcConnectionHelper.objectID2MOR(datastoreobjectid));
+            HostMO hostMO=new HostMO(vmwareContext,vcConnectionHelper.objectID2MOR(hostobjectid));
+            logger.info("Hosts that need to be mounted:" + hostMO.getName());
             //挂载前重新扫描datastore
-            hostMo.getHostStorageSystemMO().rescanVmfs();
+            hostMO.getHostStorageSystemMO().refreshStorageSystem();
             logger.info("Rescan datastore before mounting");
             //挂载NFS
-            NasDatastoreInfo nasdsinfo = (NasDatastoreInfo) dsmo.getInfo();
-            hostMo.getHostDatastoreSystemMO().createNfsDatastore(nasdsinfo.getNas().getRemoteHost(), 0, nasdsinfo.getNas().getRemotePath(), dsmo.getMor().getValue(), mountType, null);
-            logger.info("mount nfs success:" + hostMo.getName() + ":" + dsmo.getName());
+            NasDatastoreInfo nasdsinfo = (NasDatastoreInfo) datastoreMO.getInfo();
+            hostMO.getHostDatastoreSystemMO().createNfsDatastore(logicPortIp, 0, nasdsinfo.getNas().getRemotePath(), datastoreMO.getMor().getValue(), mountType, null);
+            logger.info("mount nfs success:" + hostMO.getName() + ":" + datastoreMO.getName());
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("mount nfs error:", e);
@@ -1869,7 +1881,7 @@ public class VCSDKUtils {
             }
             logger.info("Hosts that need to be unmounted:" + hostMo.getName());
             //卸载前重新扫描datastore
-            hostMo.getHostStorageSystemMO().rescanVmfs();
+            hostMo.getHostStorageSystemMO().refreshStorageSystem();
             logger.info("Rescan datastore before unmounting");
              //从主机卸载datastore
             String dsName = dsmo.getName();

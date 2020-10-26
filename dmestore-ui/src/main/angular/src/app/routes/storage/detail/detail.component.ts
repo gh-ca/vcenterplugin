@@ -783,4 +783,193 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }
     return this.formatCapacity(t-u);
   }
+
+  /**
+   * 设置折线图 ( 折线1 虚线UpperLine、折线2 虚线LowerLine、
+   * 折线3Read、折线4Write)
+   * @param height
+   * @param title 标题
+   * @param subtext 副标题
+   * @param indicatorIds  获取参数指标（带宽的读写等） 0 读 1写
+   * @param objIds 卷ID（vmfs）、fsId(nfs) 只能放一个值即length为1
+   * @param range 时间段 LAST_5_MINUTE LAST_1_HOUR LAST_1_DAY LAST_1_WEEK LAST_1_MONTH LAST_1_QUARTER HALF_1_YEAR LAST_1_YEAR BEGIN_END_TIME INVALID
+   * @param url 请求url
+   */
+  setChart(height: number, title: string, subtext: string, indicatorIds: any[], objIds: any[], range: string, url: string, startTime:string, endTime:string) {
+    // 生成chart optiond对象
+    const chart:ChartOptions = this.getNewChart(height, title, subtext);
+    return new Promise((resolve, reject) => {
+      const params = {
+        indicator_ids: indicatorIds,
+        obj_ids: objIds,
+        range: range,
+        begin_time: startTime,
+        end_time: endTime,
+      }
+      this.nfsService.getLineChartData(url, params).subscribe((result: any) => {
+        console.log('chartData: ', title, result);
+        if (result.code === '200' && result.data !== null && result.data !== null) {
+          const resData = result.data;
+          // 设置标题
+          chart.title.text = title;
+          // 设置副标题
+          chart.title.subtext = subtext;
+          // 上限对象
+          const upperData = resData[objIds[0]][indicatorIds[0]];
+          // 下限对象
+          const lowerData = resData[objIds[0]][indicatorIds[1]];
+          // 上限最大值
+          const pmaxData = this.makePerformance.getUpperOrLower(upperData, 'upper');
+          // 下限最大值
+          let lmaxData = this.makePerformance.getUpperOrLower(lowerData, 'lower');
+          // 上、下限数据
+          const uppers: any[] = upperData.series;
+          const lower: any[] = lowerData.series;
+          // 设置X轴
+          this.makePerformance.setXAxisData(uppers, chart);
+          // 设置y轴最大值
+          chart.yAxis.max = (pmaxData > lmaxData ? pmaxData : lmaxData);
+          console.log('chart.yAxis.pmaxData', pmaxData);
+          console.log('chart.yAxis.lmaxData', lmaxData);
+          // 设置Read 折线图数据
+          uppers.forEach(item => {
+            for (const key of Object.keys(item)) {
+              // chartData.value = item[key];
+              const value = Number(Number(item[key]).toFixed(4));
+              chart.series[0].data.push({value: value, symbol: 'none'});
+            }
+          });
+          // 设置write 折线图数据
+          lower.forEach(item => {
+            for (const key of Object.keys(item)) {
+              const value = Number(Number(item[key]).toFixed(4));
+              chart.series[1].data.push({value: value, symbol: 'none'});
+            }
+          });
+          resolve(chart);
+        } else {
+          console.log('get chartData fail: ', result.description);
+        }
+      });
+    });
+  }
+  /**
+   * 获取一个chart的option对象 (option格式 折线1 虚线UpperLine、折线2 虚线LowerLine、
+   * 折线3Read、折线4Write)
+   * @param height
+   * @param title
+   * @param subtext
+   */
+  getNewChart(height: number, title: string, subtext: string) {
+    const chart: ChartOptions = new ChartOptions();
+    // 高度
+    chart.height = height;
+    // 标题
+    const titleInfo:Title = new Title();
+    titleInfo.text = title;
+    titleInfo.subtext = subtext;
+    titleInfo.textAlign = 'bottom';
+    const textStyle:TextStyle  = new TextStyle();
+    textStyle.fontStyle = 'normal';
+    titleInfo.textStyle = textStyle;
+
+    chart.title = titleInfo;
+
+    // x轴
+    const xAxis: XAxis = new XAxis();
+    xAxis.type = 'category';
+    xAxis.boundaryGap = false;
+    xAxis.data = [];
+
+    chart.xAxis = xAxis;
+
+    // y轴
+    const yAxis: YAxis = new YAxis();
+    yAxis.type = 'value';
+    yAxis.min = 0;
+    yAxis.splitNumber = 2;
+    yAxis.boundaryGap = ['50%', '50%'];
+    const axisLine: AxisLine = new AxisLine();
+    axisLine.show = false;
+    yAxis.axisLine = axisLine;
+    const splitLine = new SplitLine();
+    splitLine.show = true;
+    const lineStyle = new LineStyle();
+    lineStyle.type = 'dashed';
+    splitLine.lineStyle = lineStyle;
+    yAxis.splitLine = splitLine;
+
+    chart.yAxis = yAxis;
+    // 提示框
+    const tooltip: Tooltip = new Tooltip();
+    tooltip.trigger = 'axis';
+    tooltip.formatter = '{b} <br/> {a0}: {c0}<br/>{a1}: {c1}<br/>';
+    const axisPointer: AxisPointer = new AxisPointer();
+    axisPointer.axis = 'x';
+    axisPointer.type = 'line';
+    tooltip.axisPointer = axisPointer;
+    chart.tooltip = tooltip;
+
+    // 指标
+    const legend: Legend = new Legend();
+    const legendData: LegendData[] = [];
+    legendData.push(this.makePerformance.setLengdData('Read', 'circle'));
+    legendData.push(this.makePerformance.setLengdData('Write', 'circle'));
+    legend.x = 'right';
+    legend.y = 'top';
+    legend.selectedMode  = true;
+    legend.data = legendData;
+
+    chart.legend = legend;
+    // 指标颜色
+    const colors:string[] = ['#6870c4', '#01bfa8'];
+    chart.color = colors;
+
+    // 数据(格式)
+    const series: Serie[] = [];
+    series.push(this.makePerformance.setSerieData('Read', 'line', true, 'solid', '#6870c4', null))
+    series.push(this.makePerformance.setSerieData('Write', 'line', true, 'solid', '#01bfa8', null))
+
+    chart.series = series;
+
+    return chart;
+  }
+
+  /**
+   * 开始结束时间触发
+   */
+  changeDate() {
+    if (!this.rangeTime.controls.start.hasError('matStartDateInvalid')
+      && !this.rangeTime.controls.end.hasError('matEndDateInvalid')
+      && this.rangeTime.controls.start.value !== null && this.rangeTime.controls.end.value !== null) { // 需满足输入规范且不为空
+      this.startTime = this.rangeTime.controls.start.value._d.getTime();
+      this.endTime = this.rangeTime.controls.end.value._d.getTime();
+      console.log('startTime', this.startTime);
+      console.log('endTime', this.endTime);
+      this.changeFunc();
+    } else {
+      return;
+    }
+  }
+
+  // 切换卷函数
+  changeFunc() {
+    console.log(this.selectRange);
+    if (this.selectRange === 'BEGIN_END_TIME') {
+      if (this.startTime === null || this.endTime === null) {
+        console.log('开始结束时间不能为空');
+        return;
+      }
+    } else { // 初始化开始结束时间
+      this.startTime = null;
+      this.endTime = null;
+    }
+    if (this.selectRange) {
+      console.log('this.selectVolName+this.selectRange', this.selectRange);
+      // 请求后台重新加载折线图
+      this.initChart();
+    } else {
+      console.log('未选择卷或range');
+    }
+  }
 }
