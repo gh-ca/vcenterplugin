@@ -29,11 +29,8 @@ import {FormControl, FormGroup} from "@angular/forms";
   providers: [DetailService, MakePerformance, NfsService],
 })
 export class DetailComponent implements OnInit, AfterViewInit {
-
   cd : CapacityDistribution;
   capSave:CapacitySavings;
-
-
   options = {
     tooltip: {
       trigger: 'item',
@@ -91,225 +88,13 @@ export class DetailComponent implements OnInit, AfterViewInit {
     ],
     color: ['#FF0000', '#FF9538', '#63B3F7']
   };
-  mychart = {
-    height: 300,
-    title: {
-      text: 'IOPS',
-      subtext: 'IO/s',
-      textStyle: {
-        fontStyle: 'normal' // y轴线消失
-      },
-      textAlign: 'bottom',
-      // left: '120px'
-    },
-    xAxis: {
-      type: 'category',
-      data: [
-        '4:00', '6:00', '8:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '01/20'
-      ]
-    },
-    yAxis: {
-      type: 'value',
-      max: 8,    // 设置最大值
-      min: 0,
-      splitNumber: 2,
-      boundaryGap: ['50%', '50%'],
-      axisLine: {
-        show: false // y轴线消失
-      },
-    },
-    tooltip: {},
-    legend: {
-      data: [
-        {
-          name: 'Upper Limit',  // 强制设置图形为圆。
-          // icon: 'dotted',
-        },
-        {
-          name: 'Lower Limit',  // 强制设置图形为圆。
-          // icon: 'dottedLine',
-        },
-        {
-          name: 'Read',  // 强制设置图形为圆。
-          icon: 'triangle',
-        },
-        {
-          name: 'Write',  // 强制设置图形为圆。
-          icon: 'triangle',
-        }
-      ],
-      y: 'top',    // 延Y轴居中
-      x: 'right' // 居右显示
-    },
-    // dataZoom: [
-    //   {   // 这个dataZoom组件，默认控制x轴。显示滑动框
-    //     type: 'slider', // 这个 dataZoom 组件是 slider 型 dataZoom 组件
-    //     xAxisIndex: 0, // x轴
-    //     start: 10,      // 左边在 10% 的位置。
-    //     end: 60         // 右边在 60% 的位置。
-    //   },
-    //   {   // 这个dataZoom组件，也控制x轴。 页面拖拽
-    //     type: 'inside', // 这个 dataZoom 组件是 inside 型 dataZoom 组件
-    //     xAxisIndex: 0, // x轴
-    //     start: 10,      // 左边在 10% 的位置。
-    //     end: 60         // 右边在 60% 的位置。
-    //   },
-    //   {
-    //     type: 'slider',
-    //     yAxisIndex: 0,
-    //     start: 10,
-    //     end: 80
-    //   },
-    //   {
-    //     type: 'inside',
-    //     yAxisIndex: 0,
-    //     start: 30,
-    //     end: 80
-    //   }
-    // ],
-    series: [
-      {
-        name: 'Upper Limit',
-        data: [
-          {value: 4, symbol: 'none'},
-          {value: 4, symbol: 'none'},
-          {value: 4, symbol: 'none'},
-          {value: 4, symbol: 'none'},
-          {value: 4, symbol: 'none'},
-          {value: 4, symbol: 'none'},
-          {value: 4, symbol: 'none'},
-          {value: 4, symbol: 'none'},
-          {value: 4, symbol: 'none'},
-          {value: 4, symbol: 'none'},
-          {value: 4, symbol: 'none'}],
-        type: 'line',
-        smooth: true,
-        // 普通样式。
-        itemStyle: {
-          normal: {
-            lineStyle: {
-              width: 2,
-              type: 'dotted',  // 'dotted'虚线 'solid'实线
-              color: '#DB2000' // 线条颜色
-            }
-          }
-        },
-        label: {
-          show: true,
-          // 标签的文字。
-          formatter: 'This is a normal label.'
-        },
-        //
-        //   // 高亮样式。
-        //   emphasis: {
-        //     itemStyle: {
-        //       // 高亮时点的颜色。
-        //       color: 'blue'
-        //     },
-        //     label: {
-        //       show: true,
-        //       // 高亮时标签的文字。
-        //       formatter: 'This is a emphasis label.'
-        //     }
-        //   }
-      },
-      {
-        name: 'Lower Limit',
-        data: [
-          {value: 3, symbol: 'none'},
-          {value: 3, symbol: 'none'},
-          {value: 3, symbol: 'none'},
-          {value: 3, symbol: 'none'},
-          {value: 3, symbol: 'none'},
-          {value: 3, symbol: 'none'},
-          {value: 3, symbol: 'none'},
-          {value: 3, symbol: 'none'}],
-        type: 'line',
-        smooth: true,
-        itemStyle: {
-          normal: {
-            lineStyle: {
-              width: 2,
-              type: 'dotted',  // 'dotted'虚线 'solid'实线
-              color: '#F8E082'
-            }
-          }
-        },
-      },
-      {
-        name: 'Read',
-        data: [
-          {value: 7, symbol: 'none'},
-          {value: 7, symbol: 'none'},
-          {value: 7, symbol: 'none'},
-          {value: 7, symbol: 'none'},
-          {value: 7, symbol: 'none'},
-          {value: 7, symbol: 'none'},
-          {value: 7, symbol: 'none'},
-          {value: 7, symbol: 'none'},
-          {value: 7, symbol: 'none'},
-          {value: 7, symbol: 'none'},
-          {value: 7, symbol: 'none'},
-          {value: 7, symbol: 'none'}],
-        type: 'line',
-        smooth: true,
-        itemStyle: {
-          normal: {
-            lineStyle: {
-              width: 2,
-              type: 'solid',  // 'dotted'虚线 'solid'实线
-              color: '#6870c4'
-            }
-          }
-        },
-      },
-      {
-        name: 'Write',
-        data: [
-          {value: 5, symbol: 'none'},
-          {value: 5, symbol: 'none'},
-          {value: 5, symbol: 'none'},
-          {value: 5, symbol: 'none'},
-          {value: 5, symbol: 'none'},
-          {value: 5, symbol: 'none'},
-          {value: 5, symbol: 'none'},
-          {value: 5, symbol: 'none'},
-          {value: 5, symbol: 'none'}],
-        type: 'line',
-        smooth: true,
-        itemStyle: {
-          normal: {
-            lineStyle: {
-              width: 2,
-              type: 'solid',  // 'dotted'虚线 'solid'实线
-              color: '#01bfa8'
-            }
-          }
-        },
-      }
-    ]
-  };
   // 创建表格对象
   // IOPS+QoS上下限
   iopsChart: EChartOption = {};
   // 带宽+QoS上下限
   bandwidthChart: EChartOption = {};
-  // 响应时间+QoS下限
-  latencyChart: EChartOption = {};
-  // obj_type_id  (卷类型ID)
-  objTypeId;
-  // indicator_ids 获取参数指标（上下限等） 0 上限 1下限
-  indicatorIdsIOPS: Array<string> = ['1407379178651656', '1407379178586113'];
-  indicatorIdsBDWT: Array<string> = ['1407379178651656', '1407379178586113'];
-  indicatorIdsREST: Array<string> = ['1407379178651656', '1407379178586113'];
-  // obj_ids 卷ID
-  objIds: Array<string> = ['47FEBD5002AB344D90EC6CFCD6127BA3'];
-  // interval 时间间隔单位 ONE_MINUTE MINUTE HALF_HOUR HOUR DAY WEEK MONTH
-  interval;
-  // range 时间段 LAST_5_MINUTE LAST_1_HOUR LAST_1_DAY LAST_1_WEEK LAST_1_MONTH LAST_1_QUARTER HALF_1_YEAR LAST_1_YEAR BEGIN_END_TIME INVALID
   range;
   // 定时函数执行时间 默认一天
-  timeInterval = 1 * 60 * 60 * 1000;
   poolRadio = 'table1'; // 存储池列表切换
   volumeRadio = 'table1'; // volume列表切换
   storageId = '1234';
@@ -346,7 +131,16 @@ export class DetailComponent implements OnInit, AfterViewInit {
     end: new FormControl()
   });
   // ranges
-  ranges = NfsService.perRanges;
+  ranges =  [
+    {key: 'LAST_5_MINUTE', value: '最近5分钟'},
+    {key: 'LAST_1_HOUR', value: '最近1小时'},
+    {key: 'LAST_1_DAY', value: '最近1天'},
+    {key: 'LAST_1_WEEK', value: '最近1周'},
+    {key: 'LAST_1_MONTH', value: '最近1个月'},
+    {key: 'LAST_1_QUARTER', value: '最近1个季度'},
+    {key: 'HALF_1_YEAR', value: '最近半年'},
+    {key: 'LAST_1_YEAR', value: '最近1年'},
+  ];
 
   //portList:
   ngOnInit(): void {
@@ -356,7 +150,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
     this.getStorageDetail(true);
     this.getStoragePoolList(true);
-    this.initCapacity();
+
   }
   ngAfterViewInit() {
     this.ngZone.runOutsideAngular(() => this.initChart());
@@ -364,30 +158,20 @@ export class DetailComponent implements OnInit, AfterViewInit {
 
   // 初始化表格对象
   async initChart() {
-    // switch (this.range) {
-    //   case 'LAST_1_HOUR': // 过去一小时
-    //     break;
-    //   case 'LAST_4_HOUR': // 过去四小时 此值目前接口没有
-    //     break;
-    //   case 'LAST_12_HOUR': // 过去12小时 此值目前接口没有
-    //     break;
-    //   default: // 默认过去24h
-    //     break;
-    // }
     const fsNames:string[] = [];
-    fsNames.push('A7213075B5EE3AF3989D7DB938ED2CF8');
-    // IOPS
-    this.setChart(300,"IOPS","IO/s",
-      NfsService.storageIOPS,fsNames,this.selectRange,NfsService.nfsUrl, this.startTime, this.endTime).then(res=>{
-      // NfsService.nfsOPS,fsNames,this.selectRange,NfsService.nfsUrl, this.startTime, this.endTime).then(res=>{
+    fsNames.push(this.storageId);
+     // IOPS
+    this.setChart(150,"IOPS","IO/s",
+     NfsService.storageIOPS,fsNames,this.selectRange,NfsService.nfsUrl, this.startTime, this.endTime).then(res=>{
+      //NfsService.nfsOPS,fsNames,this.selectRange,NfsService.nfsUrl, this.startTime, this.endTime).then(res=>{
       this.iopsChart = res;
       this.cdr.detectChanges();
     });
 
     // 带宽
-    this.setChart(300,'Bandwidth', 'MB/s',
-      NfsService.storageBDWT, fsNames, this.selectRange, NfsService.nfsUrl, this.startTime, this.endTime).then(res => {
-      // NfsService.nfsBDWT, fsNames, this.selectRange, NfsService.nfsUrl, this.startTime, this.endTime).then(res => {
+    this.setChart(150,'Bandwidth', 'MB/s',
+      //NfsService.storageBDWT, fsNames, this.selectRange, NfsService.nfsUrl, this.startTime, this.endTime).then(res => {
+      NfsService.nfsBDWT, fsNames, this.selectRange, NfsService.nfsUrl, this.startTime, this.endTime).then(res => {
       this.bandwidthChart = res;
       this.cdr.detectChanges();
     });
@@ -442,6 +226,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       this.detailService.getStorageDetail(this.storageId).subscribe((r: any) => {
         if (r.code === '200'){
           this.detail = r.data;
+          this.initCapacity();
           this.cdr.detectChanges();
         }else{
 
@@ -453,6 +238,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
         this.detailService.getStorageDetail(this.storageId).subscribe((r: any) => {
           if (r.code === '200'){
             this.detail = r.data;
+            this.initCapacity();
             this.cdr.detectChanges();
           }
         });
@@ -668,12 +454,12 @@ export class DetailComponent implements OnInit, AfterViewInit {
     this.getFailoverGroups();
   }
   getFCPortList(){
-    this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"FC"}).subscribe((r: any) => {
-      if (r.code === '200'){
-        this.fcs = r.data;
-        this.cdr.detectChanges();
-      }
-    });
+      this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"FC"}).subscribe((r: any) => {
+        if (r.code === '200'){
+          this.fcs = r.data;
+          this.cdr.detectChanges();
+        }
+      });
   }
   getFCoEPortList(){
     this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"FCoE"}).subscribe((r: any) => {
@@ -766,7 +552,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     this.cd.fileSystem =this.formatCapacity(this.detail.fileCapacity);
     const v = 2.024;
     this.cd.volume =this.formatCapacity(this.detail.blockCapacity);
-    this.cd.freeCapacity= this.getFreeCapacity(this.detail.totalEffectiveCapacity,this.detail.usedCapacity);
+     this.cd.freeCapacity= this.getFreeCapacity(this.detail.totalEffectiveCapacity,this.detail.usedCapacity);
 
     const cc = new CapacityChart(this.formatCapacity(this.detail.totalEffectiveCapacity));
     const free=(this.detail.totalEffectiveCapacity-this.detail.usedCapacity)*100;
@@ -853,15 +639,13 @@ export class DetailComponent implements OnInit, AfterViewInit {
           uppers.forEach(item => {
             for (const key of Object.keys(item)) {
               // chartData.value = item[key];
-              const value = Number(Number(item[key]).toFixed(4));
-              chart.series[0].data.push({value: value, symbol: 'none'});
+              chart.series[0].data.push({value: Number(item[key]), symbol: 'none'});
             }
           });
           // 设置write 折线图数据
           lower.forEach(item => {
             for (const key of Object.keys(item)) {
-              const value = Number(Number(item[key]).toFixed(4));
-              chart.series[1].data.push({value: value, symbol: 'none'});
+              chart.series[1].data.push({value: Number(item[key]), symbol: 'none'});
             }
           });
           resolve(chart);
