@@ -1276,13 +1276,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
         }
         if (null != params.get(DmeConstants.HOSTID)) {
-            ResponseEntity responseHostUnmapping = hostUnmapping(params);
-            if (RestUtils.RES_STATE_I_202 != responseHostUnmapping.getStatusCodeValue()) {
-                unmappingHostFlag = false;
-            } else {
-                String taskId = getTaskId(responseHostUnmapping);
-                taskIds.add(taskId);
-            }
+            String taskId = unmountHostGetTaskId(params);
+            taskIds.add(taskId);
         }
         //判断是否卸载成功 ，卸载失败 抛出错误提示
         if (!(unmappingHostFlag && unmappingHostgroupFlag)) {
@@ -1319,7 +1314,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         vcsdkUtils.hostRescanVmfs(hostIp);
     }
 
-    public void unmountVmfsAll(Map<String, Object> params) throws Exception {
+    public List<String> unmountVmfsAll(Map<String, Object> params) throws Exception {
         List<String> taskIds = new ArrayList<>();
         //获取vmfs关联的dme侧volume 并提取volumeId
         if (null != params && null != params.get(DmeConstants.DATASTOREOBJECTIDS)) {
@@ -1354,7 +1349,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 if (hasVm) {
                     LOG.info("vmfs delete,all vmfs contain vm,can not delete!!!");
                     //抛出异常?
-                    return;
+                    return taskIds;
                 }
             }
 
@@ -1373,7 +1368,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                 Map<String, Object> tempParams = new HashMap<>();
                                 tempParams.put("host_id", hostId);
                                 tempParams.put("volumeIds", params.get("volumeIds"));
-                                hostUnmapping(tempParams);
+                                String taskId = unmountHostGetTaskId(tempParams);
+                                if (!StringUtils.isEmpty(taskId)) {
+                                    taskIds.add(taskId);
+                                }
                             }
                         }
                     }
@@ -1390,9 +1388,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         Map<String, Object> hostInfoMap = dmeAccessService.getDmeHost(hostId);
         String hostIp = hostInfoMap.get("ip").toString();
         vcsdkUtils.hostRescanVmfs(hostIp);*/
+
+        return taskIds;
     }
 
-    public void unmountVmfsAll(String dsObjId, String clusterObjId, String hostObjId) throws Exception {
+    public List<String> unmountVmfsAll(String dsObjId, String clusterObjId, String hostObjId) throws Exception {
         Map<String, List<String>> params = new HashMap<>();
         List<String> taskIds = new ArrayList<>();
         //获取vmfs关联的dme侧volume 并提取volumeId
@@ -1422,7 +1422,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 String hostId = ToolUtils.getStr(hostMap.get("id"));
                 tempParams.put("host_id", hostId);
                 tempParams.put("volumeIds", volumeIds);
-                hostUnmapping(tempParams);
+                String taskId = unmountHostGetTaskId(tempParams);
+                if (!StringUtils.isEmpty(taskId)) {
+                    taskIds.add(taskId);
+                }
             }
         } else {
             //没有指定主机 则查询datastore下的主机 并过滤与vm有关联的
@@ -1444,7 +1447,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             Map<String, Object> tempParams = new HashMap<>();
                             tempParams.put("host_id", hostId);
                             tempParams.put("volumeIds", volumeIds);
-                            hostUnmapping(tempParams);
+                            String taskId = unmountHostGetTaskId(tempParams);
+                            taskIds.add(taskId);
                         }
                     }
                 }
@@ -1459,7 +1463,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 String hostId = ToolUtils.getStr(hostMap.get("id"));
                 tempParams.put("host_id", hostId);
                 tempParams.put("volumeIds", volumeIds);
-                hostUnmapping(tempParams);
+                String taskId = unmountHostGetTaskId(tempParams);
+                taskIds.add(taskId);
             }
         } else {
             List<Map<String, Object>> vcClusters = getHostGroupsByStorageId(dsObjId);
@@ -1477,13 +1482,18 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         Map<String, Object> hostInfoMap = dmeAccessService.getDmeHost(hostId);
         String hostIp = hostInfoMap.get("ip").toString();
         vcsdkUtils.hostRescanVmfs(hostIp);*/
+
+        return taskIds;
     }
 
     @Override
     public void deleteVmfs(Map<String, Object> params) throws DMEException {
         //先调卸载的接口 卸载是卸载所有所有主机和集群(dem侧主机,主机组)
         try {
-            unmountVmfsAll(params);
+            List<String> taskIds = unmountVmfsAll(params);
+            if(null != taskIds && taskIds.size() >0){
+
+            }
         } catch (Exception e) {
             LOG.error("delete volume precondition unmapping host and hostGroup error!");
             throw new DMEException("delete volume precondition unmapping host and hostGroup error!");
@@ -1495,10 +1505,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         requestbody.put("volume_ids", volumeIds);
         ResponseEntity responseEntity = dmeAccessService.access(VOLUME_DELETE, HttpMethod.POST, gson.toJson(requestbody));
         boolean dmeDeleteFlag = false;
-        if (RestUtils.RES_STATE_I_202 != responseEntity.getStatusCodeValue()) {
-            //throw new Exception("delete volume error!");
-        } else {
-            taskId = getTaskId(responseEntity);
+        taskId = getTaskId(responseEntity);
+        if (!StringUtils.isEmpty(taskId)) {
             dmeDeleteFlag = taskService.checkTaskStatus(Arrays.asList(taskId));
         }
         //vcenter侧删除 不调用 直接扫描
@@ -1560,6 +1568,19 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             return null;
         }
         return responseEntity;
+    }
+
+
+    //DME侧从主机卸载卷
+    private String unmountHostGetTaskId(Map<String, Object> params) {
+        String taskId = "";
+        try {
+            ResponseEntity responseEntity = hostUnmapping(params);
+            taskId = getTaskId(responseEntity);
+        } catch (DMEException e) {
+            e.printStackTrace();
+        }
+        return taskId;
     }
 
 
@@ -1638,9 +1659,20 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     private String getTaskId(ResponseEntity responseEntity) {
-        Object hostGroupBody = responseEntity.getBody();
-        JsonObject hostJson = new JsonParser().parse(hostGroupBody.toString()).getAsJsonObject();
-        String taskId = hostJson.get("task_id").getAsString();
+        String taskId = "";
+        if (null != responseEntity) {
+            if (RestUtils.RES_STATE_I_202 != responseEntity.getStatusCodeValue()) {
+                try {
+                    Object hostGroupBody = responseEntity.getBody();
+                    if (null != hostGroupBody) {
+                        JsonObject hostJson = new JsonParser().parse(hostGroupBody.toString()).getAsJsonObject();
+                        taskId = ToolUtils.jsonToStr(hostJson.get("task_id"));
+                    }
+                } catch (JsonSyntaxException e) {
+                    LOG.warn("从结构体:{}中获取任务ID失败!", null == responseEntity ? "" : gson.toJson(responseEntity));
+                }
+            }
+        }
         return taskId;
     }
 
