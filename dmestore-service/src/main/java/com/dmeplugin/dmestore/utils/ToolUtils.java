@@ -227,6 +227,18 @@ public class ToolUtils {
         return re;
     }
 
+    public static Boolean jsonToBoo(JsonElement obj, Boolean defaultVal) {
+        Boolean re = defaultVal;
+        try {
+            if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
+                re = obj.getAsBoolean();
+            }
+        } catch (Exception e) {
+            LOG.error("jsonToBoo error:" + e.toString());
+        }
+        return re;
+    }
+
     public static <T extends Comparable<T>> boolean compare(List<T> a, List<T> b) {
         if (a.size() != b.size()) {
             return false;
