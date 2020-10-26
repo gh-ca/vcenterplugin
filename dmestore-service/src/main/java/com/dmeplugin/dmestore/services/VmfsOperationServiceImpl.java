@@ -193,12 +193,12 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
             //expand vmfs datastore
 
-            String ds_name = volumemap.get("ds_name");
+            //String ds_name = volumemap.get("ds_name");
             //String vo_add_capacity = volumemap.get("vo_add_capacity");
             //String hostObjectId = volumemap.get("hostObjectId");
             String result = null;
             if (!StringUtils.isEmpty(vo_add_capacity)&&!StringUtils.isEmpty(datastoreobjid)) {
-                result = vcsdkUtils.expandVmfsDatastore(ds_name, ToolUtils.getInt(vo_add_capacity),datastoreobjid);
+                result = vcsdkUtils.expandVmfsDatastore(datastoreobjid, ToolUtils.getInt(vo_add_capacity));
             }
             if ("failed".equals(result)) {
                 //resMap.put("code", 403);
