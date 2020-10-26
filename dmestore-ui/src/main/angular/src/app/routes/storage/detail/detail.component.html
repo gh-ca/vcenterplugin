@@ -4,6 +4,30 @@
   </div>
   <div class="detail-content">
     <div>
+      <table class="searchtable" cellpadding="5" >
+        <tr>
+          <td>
+            <clr-select-container>
+              <select clrSelect (ngModelOptions)="ranges" [(ngModel)]="selectRange" name="defaultSelect" class="clr-select" (change)="changeFunc()">
+                <option *ngFor="let item of ranges" value="{{item.key}}">{{item.value}}</option>
+              </select>
+            </clr-select-container>
+          </td>
+          <td *ngIf="selectRange === 'BEGIN_END_TIME'">
+            <mat-form-field appearance="fill">
+              <mat-label>{{'vmfs.timeInputTips' | translate}}</mat-label>
+              <mat-date-range-input [formGroup]="rangeTime" [rangePicker]="picker">
+                <input required matStartDate  formControlName="start" placeholder="Start date" (dateChange)="changeDate();">
+                <input required matEndDate formControlName="end" placeholder="End date" (dateChange)="changeDate();">
+              </mat-date-range-input>
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-date-range-picker #picker></mat-date-range-picker>
+              <mat-error *ngIf="rangeTime.controls.start.hasError('matStartDateInvalid')">Invalid start date</mat-error>
+              <mat-error *ngIf="rangeTime.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
+            </mat-form-field>
+          </td>
+        </tr>
+      </table>
       <clr-tabs>
         <clr-tab>
           <button clrTabLink id="conf" (click)="changeTab('conf')">{{'storage.detail.conf.configuration' | translate}}</button>
@@ -487,8 +511,8 @@
           <button  clrTabLink>{{'storage.detail.performance.performance' | translate}}</button>
           <clr-tab-content clrTabLinkInOverflow="true">
             <div>{{'storage.detail.performance.ptc' | translate}}</div>
-            <div echarts [options]="mychart" style="height: 600px;"></div>
-            <div echarts [options]="mychart" style="height: 600px;"></div>
+            <div echarts [options]="iopsChart" style="height: 600px;"></div>
+            <div echarts [options]="bandwidthChart" style="height: 600px;"></div>
             <div echarts [options]="mychart" style="height: 600px;"></div>
           </clr-tab-content>
         </clr-tab>
