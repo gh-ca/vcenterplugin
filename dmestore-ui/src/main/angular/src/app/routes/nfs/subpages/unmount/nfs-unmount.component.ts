@@ -22,54 +22,35 @@ export class NfsUnmountComponent implements OnInit{
   mountType='1';
   checkHost:Host;
   checkCluster: Cluster;
-  hostId:string;
-  clusterId:string;
   constructor(private unmountService: NfsUnmountService, private gs: GlobalsService,
               private activatedRoute: ActivatedRoute,private router:Router){
   }
   ngOnInit(): void {
-    this.gs.loading=true;
 
     this.activatedRoute.url.subscribe(url => {
       this.routePath=url[0].path;
     });
-
+    const ctx = this.gs.getClientSdk().app.getContextObjects();
     if ("dataStore"===this.routePath){
       //入口是DataSource
-      this.viewPage='unmount_plugin'
+      this.viewPage='unmount_pugin'
       this.activatedRoute.queryParams.subscribe(queryParam => {
         this.dsObjectId = queryParam.objectId;
         this.pluginFlag =queryParam.flag;
       });
       if(this.pluginFlag==null){
         //入口来至Vcenter
-        const ctx = this.gs.getClientSdk().app.getContextObjects();
-        if(ctx!=null){
-          this.dsObjectId=ctx[0].id;
-        }
-        this.viewPage='unmount_datastore'
+        //this.dsObjectId=ctx[0].id;
+        this.viewPage='unmount_vcenter'
       }
-      this.gs.loading=false;
-    }else if("host"=== this.routePath){
-      this.viewPage='unmount_host'
-      const ctx = this.gs.getClientSdk().app.getContextObjects();
-      if(ctx!=null){
-        this.dsObjectId=ctx[0].id;
-      }
-      this.getMountedHostList();
-      this.gs.loading=false;
-    }else if( "cluster"=== this.routePath){
-      this.viewPage='unmount_cluster'
-      const ctx = this.gs.getClientSdk().app.getContextObjects();
-      if(ctx!=null){
-        this.dsObjectId=ctx[0].id;
-        this.getMountedClusterList();
-        this.gs.loading=false;
-      }
+    }else if("host"=== this.routePath || "cluster"=== this.routePath){
+      this.viewPage='unmount_hostcluster'
     }
+    this.getMountedHostList();
+    this.getMountedClusterList();
   }
+
   backToNfsList(){
-    this.gs.loading=false;
     this.router.navigate(['nfs']);
   }
   unMount(){
@@ -110,8 +91,10 @@ export class NfsUnmountComponent implements OnInit{
       }
     });
   }
+  hostClusterUnmount(){
+
+  }
   closeModel(){
-    this.gs.loading=false;
     this.gs.getClientSdk().modal.close();
   }
   formatCapacity(c: number){
@@ -124,14 +107,14 @@ export class NfsUnmountComponent implements OnInit{
     }
   }
   getMountedHostList(){
-    this.unmountService.getMountedHostList(this.hostId).subscribe((r: any) => {
+    this.unmountService.getMountedHostList(this.dsObjectId).subscribe((r: any) => {
       if (r.code=='200'){
         this.hostList=r.data;
       }
     });
   }
   getMountedClusterList(){
-    this.unmountService.getMountedClusterList(this.clusterId).subscribe((r: any) => {
+    this.unmountService.getMountedClusterList(this.dsObjectId).subscribe((r: any) => {
       if (r.code=='200'){
         this.clusterList=r.data;
       }

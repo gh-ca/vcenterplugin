@@ -28,20 +28,15 @@ export class NfsDeleteComponent implements OnInit{
     });
     if(this.pluginFlag==null){
       //入口来至Vcenter
-      const ctx = this.gs.getClientSdk().app.getContextObjects();
-      if(ctx!==null){
-        this.dataStoreObjectId=ctx[0].id;
-      }
+      //this.dsObjectId=ctx[0].id;
       this.viewPage='delete_vcenter'
     }
   }
   delNfs(){
-    this.gs.loading=true;
     var params={
       "dataStoreObjectId": this.dataStoreObjectId
     };
     this.deleteService.delNfs(params).subscribe((result: any) => {
-      this.gs.loading=false;
       if (result.code === '200'){
         if(this.pluginFlag=='plugin'){
           this.backToNfsList();
@@ -55,12 +50,10 @@ export class NfsDeleteComponent implements OnInit{
   }
 
   backToNfsList(){
-    this.gs.loading=false;
     this.router.navigate(['nfs']);
   }
 
   closeModel(){
-    this.gs.loading=false;
     this.gs.getClientSdk().modal.close();
   }
 }

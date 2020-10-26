@@ -105,7 +105,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     xAxis: {
       type: 'category',
       data: [
-         '4:00', '6:00', '8:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '01/20'
+        '4:00', '6:00', '8:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00', '01/20'
       ]
     },
     yAxis: {
@@ -376,7 +376,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     // }
     const fsNames:string[] = [];
     fsNames.push('A7213075B5EE3AF3989D7DB938ED2CF8');
-     // IOPS
+    // IOPS
     this.setChart(300,"IOPS","IO/s",
       NfsService.storageIOPS,fsNames,this.selectRange,NfsService.nfsUrl, this.startTime, this.endTime).then(res=>{
       // NfsService.nfsOPS,fsNames,this.selectRange,NfsService.nfsUrl, this.startTime, this.endTime).then(res=>{
@@ -668,12 +668,12 @@ export class DetailComponent implements OnInit, AfterViewInit {
     this.getFailoverGroups();
   }
   getFCPortList(){
-      this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"FC"}).subscribe((r: any) => {
-        if (r.code === '200'){
-          this.fcs = r.data;
-          this.cdr.detectChanges();
-        }
-      });
+    this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"FC"}).subscribe((r: any) => {
+      if (r.code === '200'){
+        this.fcs = r.data;
+        this.cdr.detectChanges();
+      }
+    });
   }
   getFCoEPortList(){
     this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"FCoE"}).subscribe((r: any) => {
@@ -766,7 +766,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     this.cd.fileSystem =this.formatCapacity(this.detail.fileCapacity);
     const v = 2.024;
     this.cd.volume =this.formatCapacity(this.detail.blockCapacity);
-     this.cd.freeCapacity= this.getFreeCapacity(this.detail.totalEffectiveCapacity,this.detail.usedCapacity);
+    this.cd.freeCapacity= this.getFreeCapacity(this.detail.totalEffectiveCapacity,this.detail.usedCapacity);
 
     const cc = new CapacityChart(this.formatCapacity(this.detail.totalEffectiveCapacity));
     const free=(this.detail.totalEffectiveCapacity-this.detail.usedCapacity)*100;

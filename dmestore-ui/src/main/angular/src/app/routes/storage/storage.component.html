@@ -49,12 +49,12 @@
           <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.model' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.version' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.patchVersion' | translate}}</clr-dg-column>
-          <!--<clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.location' | translate}}</clr-dg-column>-->
-          <!--<clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.zone' | translate}}</clr-dg-column>-->
-          <!--<clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.wp' | translate}}</clr-dg-column>-->
+          <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.location' | translate}}</clr-dg-column>
+          <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.zone' | translate}}</clr-dg-column>
+          <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.wp' | translate}}</clr-dg-column>
 
           <clr-dg-column [hidden]="radioCheck!=='table2'">{{'storage.list.rawCap' | translate}}</clr-dg-column>
-          <!--<clr-dg-column [hidden]="radioCheck!=='table2'">{{'storage.list.tec' | translate}}</clr-dg-column>-->
+          <clr-dg-column [hidden]="radioCheck!=='table2'">{{'storage.list.tec' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table2'">{{'storage.list.totalCap' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table2'">{{'storage.list.usedCap' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table2'">{{'storage.list.capUsage' | translate}}</clr-dg-column>
@@ -109,12 +109,12 @@
             <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.model}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.version}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.patchVersion}}</clr-dg-cell>
-            <!--<clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.location}}</clr-dg-cell>-->
-            <!--<clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.azIds || '&#45;&#45;'}}</clr-dg-cell>-->
-            <!--<clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.maintenanceStart}}-{{item.maintenanceOvertime}}</clr-dg-cell>-->
+            <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.location}}</clr-dg-cell>
+            <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.azIds || '--'}}</clr-dg-cell>
+            <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.maintenanceStart}}-{{item.maintenanceOvertime}}</clr-dg-cell>
 
             <clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.totalCapacity)}}</clr-dg-cell>
-            <!--<clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.totalEffectiveCapacity)}}</clr-dg-cell>-->
+            <clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.totalEffectiveCapacity)}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.totalPoolCapacity)}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.usedCapacity)}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table2'">

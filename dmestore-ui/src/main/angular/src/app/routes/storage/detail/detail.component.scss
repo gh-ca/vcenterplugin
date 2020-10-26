@@ -139,8 +139,14 @@
 }
 .detail-header{
   //border: 1px green solid;
-  height: 3%;
+  height: 5%;
   position: relative;
+}
+.detail-header-font{
+  font-size: 18px;
+  position: absolute;
+  transform: translateY(-50%);
+  margin-left: 20px;
 }
 .detail-content{
   //border: 1px blue solid;

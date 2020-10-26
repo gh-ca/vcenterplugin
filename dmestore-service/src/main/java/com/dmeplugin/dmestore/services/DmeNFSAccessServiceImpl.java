@@ -163,16 +163,15 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         List<NfsDataStoreFsAttr> list = new ArrayList<>();
         for (int i = 0; i < fsIds.size(); i++) {
             NfsDataStoreFsAttr fsAttr = new NfsDataStoreFsAttr();
-            String fileSystemId = fsIds.get(i);
-            if (StringUtils.isEmpty(fileSystemId)) {
+            String file_system_id = fsIds.get(i);
+            if (StringUtils.isEmpty(file_system_id)) {
                 continue;
             }
             String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL,
-                    "file_system_id", fileSystemId);
+                    "file_system_id", file_system_id);
             ResponseEntity<String> responseTuning = dmeAccessService.access(url, HttpMethod.GET, null);
             if (responseTuning.getStatusCodeValue() / 100 == 2) {
                 JsonObject fsDetail = gson.fromJson(responseTuning.getBody(), JsonObject.class);
-                fsAttr.setFileSystemId(fileSystemId);
                 fsAttr.setName(fsDetail.get("name").getAsString());
                 fsAttr.setProvisionType(fsDetail.get("alloc_type").getAsString());
                 fsAttr.setDevice(fsDetail.get("storage_name").getAsString());
@@ -180,11 +179,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 fsAttr.setController(fsDetail.get("owning_controller").getAsString());
                 //查询详情，获取tuning信息
                 JsonObject tuning = fsDetail.getAsJsonObject("tuning");
-                if (!tuning.isJsonNull()) {
-                    fsAttr.setApplicationScenario(ToolUtils.jsonToStr(tuning.get("application_scenario"), null));
-                    fsAttr.setDataDeduplication(ToolUtils.jsonToBoo(tuning.get("deduplication_enabled"), null));
-                    fsAttr.setDateCompression(ToolUtils.jsonToBoo(tuning.get("compression_enabled"), null));
-                }
+                fsAttr.setApplicationScenario(tuning.get("application_scenario").getAsString());
+                fsAttr.setDataDeduplication(tuning.get("deduplication_enabled").getAsBoolean());
+                fsAttr.setDateCompression(tuning.get("compression_enabled").getAsBoolean());
                 list.add(fsAttr);
             }
         }

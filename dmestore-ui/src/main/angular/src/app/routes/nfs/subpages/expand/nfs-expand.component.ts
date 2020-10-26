@@ -2,6 +2,7 @@ import {Component, OnInit} from "@angular/core";
 import {GlobalsService} from "../../../../shared/globals.service";
 import {NfsExpandService} from "./nfs-expand.service";
 import {ActivatedRoute, Router} from "@angular/router";
+import {DataStore} from "../mount/nfs-mount.service";
 @Component({
   selector: 'app-reduce',
   templateUrl: './nfs-expand.component.html',
@@ -31,9 +32,7 @@ export class NfsExpandComponent implements OnInit{
       if(this.pluginFlag==null){
         //入口来至Vcenter
         const ctx = this.gs.getClientSdk().app.getContextObjects();
-        if(ctx!=null){
-          this.storeObjectId=ctx[0].id;
-        }
+        this.storeObjectId=ctx[0].id;
         this.viewPage='expand_vcenter'
       }
   }

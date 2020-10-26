@@ -56,9 +56,6 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class VCSDKUtils {
 
@@ -849,7 +846,7 @@ public class VCSDKUtils {
     /**
      *expand oriented datastore capacity
      **/
-    public String expandVmfsDatastore(String datastoreObjectId, Integer addCapacity) {
+    public String expandVmfsDatastore(String dsname, Integer addCapacity,String datastoreobjid) {
 
         String result = "success";
         logger.info("==start expand DataStore==");
@@ -865,16 +862,18 @@ public class VCSDKUtils {
                     for (Pair<ManagedObjectReference, String> host : hosts) {
                         host1 = new HostMO(vmwareContext, host.first());
                         hdsMo = host1.getHostDatastoreSystemMO();
-
+                        if (null != hdsMo.findDatastore(dsname)) {
+                            mor = hdsMo.findDatastore(dsname);
+                            break;
+                        }
                     }
-                    mor = vcConnectionHelper.objectID2MOR(datastoreObjectId);
                     if (mor != null && host1 != null && hdsMo != null) {
                         DatastoreMO dsMo = new DatastoreMO(vmwareContext, mor);
                         List<VmfsDatastoreOption> vmfsDatastoreOptions = hdsMo.queryVmfsDatastoreExpandOptions(dsMo);
                         VmfsDatastoreInfo datastoreInfo = (VmfsDatastoreInfo) hdsMo.getDatastoreInfo(mor);
                         if (vmfsDatastoreOptions != null && vmfsDatastoreOptions.size() > 0) {
                             VmfsDatastoreOption vmfsDatastoreOption = vmfsDatastoreOptions.get(0);
-                            //String diskUuid = vmfsDatastoreOption.getSpec().getDiskUuid();
+                            String diskUuid = vmfsDatastoreOption.getSpec().getDiskUuid();
                             VmfsDatastoreExpandSpec spec = (VmfsDatastoreExpandSpec) vmfsDatastoreOption.getSpec();
                             HostVmfsVolume vmfs = datastoreInfo.getVmfs();
                             Long totalSectors = addCapacity * ToolUtils.GI * 1L / vmfs.getBlockSize();
@@ -2626,70 +2625,53 @@ public class VCSDKUtils {
                 }
 
                 List<Map<String, Object>> reEthPorts = new ArrayList<>();
-                ExecutorService taskExecutor = Executors.newFixedThreadPool(5);
-                final CountDownLatch latch = new CountDownLatch(ethPorts.size());//用于判断所有的线程是否结束
                 for (Map<String, Object> ethPort : ethPorts) {
-                    final String deviceFinal = device;
-                    Runnable run = new Runnable() {
-                        public void run() {
-                            try {
-                                String mgmtIp = ToolUtils.getStr(ethPort.get("mgmtIp"));
-                                if (!StringUtils.isEmpty(mgmtIp)) {
-                                    try {
-                                        ManagedMethodExecuter.SoapArgument soapArgument0 = new ManagedMethodExecuter.SoapArgument();
-                                        soapArgument0.setName("host");
-                                        soapArgument0.setVal("<host xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"urn:vim25\">" + mgmtIp + "</host>");
-                                        List<ManagedMethodExecuter.SoapArgument> soapArgumentList = new ArrayList<>();
-                                        soapArgumentList.add(soapArgument0);
+                    String mgmtIp = ToolUtils.getStr(ethPort.get("mgmtIp"));
+                    if (!StringUtils.isEmpty(mgmtIp)) {
+                        try {
 
-                                        if (!StringUtils.isEmpty(deviceFinal)) {
-                                            ManagedMethodExecuter.SoapArgument soapArgument1 = new ManagedMethodExecuter.SoapArgument();
-                                            soapArgument1.setName("interface");
-                                            soapArgument1.setVal("<interface xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"urn:vim25\">" + deviceFinal + "</interface>");
-                                            soapArgumentList.add(soapArgument1);
-                                        }
+                            ManagedMethodExecuter.SoapArgument soapArgument0 = new ManagedMethodExecuter.SoapArgument();
+                            soapArgument0.setName("host");
+                            soapArgument0.setVal("<host xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"urn:vim25\">" + mgmtIp + "</host>");
+                            List<ManagedMethodExecuter.SoapArgument> soapArgumentList = new ArrayList<>();
+                            soapArgumentList.add(soapArgument0);
 
-                                        ManagedMethodExecuter.SoapResult soapResult = methodExecuter.executeSoap(moid, "urn:vim25/6.5", "vim.EsxCLI.network.diag.ping", soapArgumentList.toArray(new ManagedMethodExecuter.SoapArgument[0]));
-
-                                        String re = new String(soapResult.getResponse().getBytes("ISO-8859-1"), "UTF-8");
-                                        logger.info(mgmtIp + "==re==" + re);
-                                        String packetLost = xmlFormat(re);
-                                        if (!StringUtils.isEmpty(packetLost) && !"100".equals(packetLost)) {
-                                            ethPort.put("connectStatus", "true");
-                                        } else {
-                                            ethPort.put("connectStatus", "false");
-                                        }
-                                    } catch (Exception e) {
-                                        ethPort.put("connectStatus", "false");
-                                        logger.error(mgmtIp + "====" + e.toString());
-                                    }
-                                    reEthPorts.add(ethPort);
-                                }
-                            } finally {
-                                latch.countDown();
+                            if (!StringUtils.isEmpty(device)) {
+                                ManagedMethodExecuter.SoapArgument soapArgument1 = new ManagedMethodExecuter.SoapArgument();
+                                soapArgument1.setName("interface");
+                                soapArgument1.setVal("<interface xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns=\"urn:vim25\">" + device + "</interface>");
+                                soapArgumentList.add(soapArgument1);
                             }
+
+                            ManagedMethodExecuter.SoapResult soapResult = methodExecuter.executeSoap(moid, "urn:vim25/6.5", "vim.EsxCLI.network.diag.ping", soapArgumentList.toArray(new ManagedMethodExecuter.SoapArgument[0]));
+
+                            String re = new String(soapResult.getResponse().getBytes("ISO-8859-1"), "UTF-8");
+                            logger.info(mgmtIp + "==re==" + re);
+                            String packetLost = xmlFormat(re);
+                            if (!StringUtils.isEmpty(packetLost) && !"100".equals(packetLost)) {
+                                ethPort.put("connectStatus", "true");
+                            } else {
+                                ethPort.put("connectStatus", "false");
+                            }
+                        } catch (Exception e) {
+                            ethPort.put("connectStatus", "false");
+                            logger.error(mgmtIp + "====" + e.toString());
                         }
-                    };
-                    taskExecutor.execute(run);
+                        reEthPorts.add(ethPort);
+                    }
                 }
-                try {
-                    latch.await();//等待所有线程执行完毕
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                taskExecutor.shutdown();//关闭线程池
 
                 if (reEthPorts.size() > 0) {
                     reStr = gson.toJson(reEthPorts);
                 }
             }
-        } catch (Exception ex) {
-            logger.error("error:", ex);
-        } finally {
-            if (sessionManager != null) {
+        }catch (Exception ex){
+            logger.error("error:",ex);
+        }finally {
+            if(sessionManager!=null){
                 sessionManager.logout();
             }
-            if (vmomiClient != null) {
+            if(vmomiClient!=null){
                 vmomiClient.shutdown();
             }
         }
