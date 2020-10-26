@@ -198,6 +198,7 @@ public class HostDatastoreSystemMO extends BaseMO {
          */
         //spec.setSecurityType();
         spec.setType(type);
+        //需要设置datastore名称
         spec.setLocalPath(uuid);
 
         // readOnly/readWrite
