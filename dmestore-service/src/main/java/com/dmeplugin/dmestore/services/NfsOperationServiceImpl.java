@@ -130,6 +130,11 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             if (!StringUtils.isEmpty(tuning)) {
                 fsMap.put("tuning", tuning);
             }
+
+            Object capacityAutonegotiation = params.get("capacity_autonegotiation");
+            if (!StringUtils.isEmpty(capacityAutonegotiation)) {
+                fsMap.put("capacity_autonegotiation", capacityAutonegotiation);
+            }
             //可以挂载多个
             List<Map<String,String>> mounts = new ArrayList<>();
             Map<String, String> mount = new HashMap<>();
@@ -221,6 +226,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             }
             String exportPath = (String)params.get("exportPath");
             String type = (String)params.get("type");
+            String securityType = ToolUtils.getStr(params.get("securityType"));
             String accessMode = (String)params.get("accessMode");
 
             if (StringUtils.isEmpty(serverHost) || StringUtils.isEmpty(exportPath) || StringUtils.isEmpty(accessMode) || mounts.size() == 0) {
@@ -229,7 +235,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 //return resMap;
                 throw new DMEException("403","params error , please check your params !");
             }
-            String result = vcsdkUtils.createNfsDatastore(serverHost, exportPath, nfsName, accessMode, mounts, type);
+            String result = vcsdkUtils.createNfsDatastore(serverHost, exportPath, nfsName, accessMode, mounts, type,securityType);
             if ("failed".equals(result)) {
                 //resMap.put("code", 403);
                 //resMap.put("msg", "create nfs datastore error!");

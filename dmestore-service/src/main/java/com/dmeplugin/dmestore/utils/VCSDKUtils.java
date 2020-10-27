@@ -945,7 +945,7 @@ public class VCSDKUtils {
     /**
      *create nfs datastore
      **/
-    public String createNfsDatastore(String serverHost, String exportPath, String nfsName, String accessMode, List<Map<String,String>> hostObjectIds,String type) throws VcenterException {
+    public String createNfsDatastore(String serverHost, String exportPath, String nfsName, String accessMode, List<Map<String,String>> hostObjectIds,String type,String securityType) throws VcenterException {
         String response = "";
         logger.info("start creat nfs datastore");
         accessMode = StringUtils.isEmpty(accessMode) || "readWrite".equals(accessMode) ? "readWrite" : "readOnly";
@@ -962,7 +962,7 @@ public class VCSDKUtils {
                         if (managedObjectReference != null && vmwareContext != null) {
                             HostMO hostMo = new HostMO(vmwareContext, managedObjectReference);
                             HostDatastoreSystemMO hostDatastoreSystemMo = hostMo.getHostDatastoreSystemMO();
-                            ManagedObjectReference datastore = hostDatastoreSystemMo.createNfsDatastore(serverHost, 0, exportPath, nfsName, accessMode, type);
+                            ManagedObjectReference datastore = hostDatastoreSystemMo.createNfsDatastore(serverHost, 0, exportPath, nfsName, accessMode, type,securityType);
                             String datastoreObjectId = vcConnectionHelper.MOR2ObjectID(datastore, serverguid);
                             dmeVmwareRelation.setStoreId(datastoreObjectId);
                             dmeVmwareRelation.setStoreName(nfsName);
@@ -1799,7 +1799,7 @@ public class VCSDKUtils {
             logger.info("Rescan datastore before mounting");
             //挂载NFS
             NasDatastoreInfo nasdsinfo = (NasDatastoreInfo) datastoreMO.getInfo();
-            hostMO.getHostDatastoreSystemMO().createNfsDatastore(nasdsinfo.getNas().getRemoteHost(), 0, nasdsinfo.getNas().getRemotePath(), datastoreMO.getName(), mountType, null);
+            hostMO.getHostDatastoreSystemMO().createNfsDatastore(nasdsinfo.getNas().getRemoteHost(), 0, nasdsinfo.getNas().getRemotePath(), datastoreMO.getName(), mountType,  nasdsinfo.getNas().getType(),nasdsinfo.getNas().getSecurityType());
             logger.info("mount nfs success:" + hostMO.getName() + ":" + datastoreMO.getName());
         } catch (Exception e) {
             e.printStackTrace();
