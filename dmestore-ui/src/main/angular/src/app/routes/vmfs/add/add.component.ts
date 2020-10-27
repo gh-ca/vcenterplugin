@@ -51,6 +51,8 @@ export class AddComponent implements OnInit{
   // 操作来源 list:列表页面、dataStore：在DataStore菜单页面操作
   resource;
 
+  modalLoading = false; // 弹窗加载
+
 
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
@@ -64,6 +66,8 @@ export class AddComponent implements OnInit{
   }
 
   initData() {
+    // 初始化loading
+    this.modalLoading = true;
     // 设备类型 操作类型初始化
     this.route.url.subscribe(url => {
       console.log('url', url);
@@ -147,13 +151,13 @@ export class AddComponent implements OnInit{
   setDeviceList() {
     // 初始化数据
     this.deviceList = [];
-    const nullDevice =  {
-      deviceId: '',
-      deviceName: '',
-      deviceType: '',
-    };
-    this.deviceList.push(nullDevice);
-    this.chooseDevice = this.deviceList[0];
+    // const nullDevice =  {
+    //   deviceId: '',
+    //   deviceName: '',
+    //   deviceType: '',
+    // };
+    // this.deviceList.push(nullDevice);
+    this.chooseDevice = undefined;
 
     console.log('this.chooseDevice', this.chooseDevice);
     // 初始添加页面的主机集群信息
@@ -175,13 +179,6 @@ export class AddComponent implements OnInit{
         if (result.code === '200' && result.data !== null) {
           hostList = result.data;
           hostList.forEach(item => {
-            // const hostData = {
-            //   icon: 'map',
-            //   id: item.hostId,
-            //   name: item.hostName,
-            //   active: false
-            // };
-            // this.hostRootDirectory[0].files.push(hostData);
 
             const hostInfo = {
               deviceId: item.hostId,
@@ -191,8 +188,6 @@ export class AddComponent implements OnInit{
             this.deviceList.push(hostInfo);
           });
         }
-        /*console.log('this.deviceList  host::');
-        console.log(this.deviceList);*/
         this.form.hostDataloadSuccess = true;
         resolve(this.deviceList);
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -209,13 +204,6 @@ export class AddComponent implements OnInit{
         if (result.code === '200' && result.data !== null) {
           clusterList = result.data;
           clusterList.forEach(item => {
-            // const culData = {
-            //   icon: 'map',
-            //   id: item.clusterId,
-            //   name: item.clusterName,
-            //   active: false
-            // };
-            // this.clusterRootDirectory[0].files.push(culData);
 
             const clusterInfo = {
               deviceId: item.clusterId,
@@ -243,8 +231,9 @@ export class AddComponent implements OnInit{
       if (result.code === '200' && result.data !== null) {
         this.serviceLevelList = result.data.filter(item => item.totalCapacity !== 0);
         console.log('this.serviceLevelList', this.serviceLevelList);
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
+      this.modalLoading = false;
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
 

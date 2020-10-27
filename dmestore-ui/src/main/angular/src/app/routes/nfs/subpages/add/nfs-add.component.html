@@ -76,6 +76,23 @@
             <option value="NFS41">v4.1</option>
           </select>
         </clr-select-container>
+        <clr-radio-container *ngIf="addForm.type=='NFS41'">
+          <label>{{'nfs.securityType' | translate}}</label>
+          <clr-radio-wrapper>
+            <input type="radio" clrRadio name="securityType" [(ngModel)]="addForm.securityType" value="AUTH_SYS"/>
+            <label>{{'nfs.authSys' | translate}}</label>
+          </clr-radio-wrapper>
+          <clr-radio-wrapper>
+            <input type="radio" clrRadio name="securityType" [(ngModel)]="addForm.securityType" value="SEC_KRB5"/>
+            <label>{{'nfs.secKrb5' | translate}}</label>
+          </clr-radio-wrapper>
+          <clr-radio-wrapper>
+            <input type="radio" clrRadio name="securityType" [(ngModel)]="addForm.securityType" value="SEC_KRB5I"/>
+            <label>{{'nfs.secKrb5i' | translate}}</label>
+          </clr-radio-wrapper>
+        </clr-radio-container>
+
+
         <!--主机-->
         <clr-select-container>
           <label>{{'nfs.mountHost' | translate}}</label>
@@ -370,3 +387,4 @@
     </clr-wizard-page>
   </clr-wizard>
 </div>
+

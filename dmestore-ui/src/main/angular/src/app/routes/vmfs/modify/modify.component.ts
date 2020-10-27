@@ -32,14 +32,14 @@ export class ModifyComponent implements OnInit{
   resource;
 
   // 编辑窗口隐藏于展示
-  modifyShow:boolean;
+  // modifyShow:boolean;
 
   ngOnInit(): void {
     this.initData();
   }
 
   initData() {
-    this.modifyShow = true;
+    // this.modifyShow = true;
     // 设备类型 操作类型初始化
     this.route.url.subscribe(url => {
       console.log('url', url);
@@ -51,7 +51,6 @@ export class ModifyComponent implements OnInit{
           const ctx = this.globalsService.getClientSdk().app.getContextObjects();
           this.objectId = ctx[0].id;
         }
-        this.objectId = queryParam.objectId;
         // 获取vmfs数据
         this.remoteSrv.getVmfsById(this.objectId)
           .subscribe((result: any) => {
@@ -99,7 +98,7 @@ export class ModifyComponent implements OnInit{
    */
   cancel() {
     console.log('this.resource', this.resource);
-    this.modifyShow = false;
+    // this.modifyShow = false;
     if (this.resource === 'list') { // 列表入口
       this.router.navigate(['vmfs/list']);
     } else { // dataStore入口

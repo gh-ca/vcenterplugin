@@ -7,6 +7,11 @@
   <clr-wizard-button [type]="'next'">{{'menu.next' | translate}}</clr-wizard-button>
   <clr-wizard-button (click)="addVmfsHanlde();" [type]="'finish'">{{'menu.ok' | translate}}</clr-wizard-button>
 
+  <div *ngIf="modalLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+  </div>
   <!--Page1 -->
   <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="name.pristine || !formPageOne.valid">
     <ng-template clrPageTitle>{{'vmfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->

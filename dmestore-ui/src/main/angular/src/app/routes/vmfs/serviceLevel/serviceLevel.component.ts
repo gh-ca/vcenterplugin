@@ -36,10 +36,10 @@ export class ServiceLevelComponent implements OnInit{
   vmfsInfo: VmfsInfo;
 
   // 变更服务等级 隐藏/展示
-  changeServiceLevelShow = false;
+  // changeServiceLevelShow = false;
 
   ngOnInit(): void {
-    this.changeServiceLevelShow = false;
+    // this.changeServiceLevelShow = false;
     // 获取vmfsInfo
     // 初始化表单
     this.changeServiceLevelForm = new GetForm().getChangeLevelForm();
@@ -51,7 +51,9 @@ export class ServiceLevelComponent implements OnInit{
           this.objectId = queryParam.objectId;
         } else { // 以dataStore为入口
           const ctx = this.globalsService.getClientSdk().app.getContextObjects();
+          console.log('ctx', ctx);
           this.objectId = ctx[0].id;
+
         }
 
         // todo 获取vmfs数据
@@ -85,7 +87,7 @@ export class ServiceLevelComponent implements OnInit{
         this.serviceLevelList = result.data.filter(item => item.totalCapacity !== 0);
         console.log('this.serviceLevelList', this.serviceLevelList);
       }
-      this.changeServiceLevelShow = true;
+      // this.changeServiceLevelShow = true;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
@@ -93,7 +95,7 @@ export class ServiceLevelComponent implements OnInit{
    * 取消
    */
   cancel() {
-    this.changeServiceLevelShow = false;
+    // this.changeServiceLevelShow = false;
     if (this.resource === 'list') { // 列表入口
       this.router.navigate(['vmfs/list']);
     } else { // dataStore入口

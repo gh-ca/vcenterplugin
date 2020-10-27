@@ -26,14 +26,14 @@ export class DeleteComponent implements OnInit{
   // 待删除VMFS的卷ID
   objectIds = [];
 
-  delShow:boolean;
+  // delShow:boolean;
 
   ngOnInit(): void {
     this.initData();
   }
 
   initData() {
-    this.delShow = true;
+    // this.delShow = true;
     // 设备类型 操作类型初始化
     this.route.url.subscribe(url => {
       console.log('url', url);
@@ -59,7 +59,7 @@ export class DeleteComponent implements OnInit{
    */
   cancel() {
 
-    this.delShow = false;
+    // this.delShow = false;
     if (this.resource === 'list') { // 列表入口
       this.router.navigate(['vmfs/list']);
     } else { // dataStore入口
