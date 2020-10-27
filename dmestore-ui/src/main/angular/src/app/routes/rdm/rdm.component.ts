@@ -39,6 +39,12 @@ export class RdmComponent implements OnInit {
   diskNum = 1;
 
   vmObjectId = '';
+
+  options1 = "";
+  options2 = "";
+  options3 = "";
+  options4 = "";
+  options5= "";
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
               private commonService: CommonService,
