@@ -6,7 +6,7 @@ import {ActivatedRoute, Router} from "@angular/router";
   selector: 'app-reduce',
   templateUrl: './nfs-reduce.component.html',
   styleUrls: ['./nfs-reduce.component.scss'],
-  providers: [GlobalsService,NfsReduceService]
+  providers: [NfsReduceService]
 })
 export class NfsReduceComponent implements OnInit{
   storeObjectId:string;
@@ -21,7 +21,6 @@ export class NfsReduceComponent implements OnInit{
               private activatedRoute: ActivatedRoute,private router:Router){
   }
   ngOnInit(): void {
-
     //入口是DataSource
     this.viewPage='reduce_plugin'
     this.activatedRoute.queryParams.subscribe(queryParam => {
@@ -32,15 +31,19 @@ export class NfsReduceComponent implements OnInit{
     if(this.pluginFlag==null){
       //入口来至Vcenter
       const ctx = this.gs.getClientSdk().app.getContextObjects();
-      this.storeObjectId=ctx[0].id;
+      if(ctx!=null){
+        this.storeObjectId=ctx[0].id;
+      }
       this.viewPage='reduce_vcenter'
     }
   }
   backToNfsList(){
     this.gs.loading=false;
+    this.errorMsg=null;
     this.router.navigate(['nfs']);
   }
   closeModel(){
+    this.errorMsg=null;
     this.gs.loading=false;
     this.gs.getClientSdk().modal.close();
   }
@@ -84,7 +87,8 @@ export class NfsReduceComponent implements OnInit{
           this.closeModel();
         }
       }else{
-        this.errorMsg = '缩容失败！'+result.description;
+        this.errorMsg = '1';
+        console.log("Reduce failed:",result.description);
       }
     });
   }
