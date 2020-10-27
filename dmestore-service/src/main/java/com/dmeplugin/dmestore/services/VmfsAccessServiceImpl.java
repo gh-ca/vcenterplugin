@@ -588,20 +588,20 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return objId;
     }
 
-    private String checkOrCreateToHostGroup(String clusterName, String clusterObjectId) throws DMEException {
-        //如果主机组不存在就创建并得到主机组ID 创建前要检查集群下的所有主机是否在DME中存在
+    private String checkOrCreateToHostGroup(String clusterObjectId) throws DMEException {
+        //如果主机组不存在就创建并得到主机组ID 创建前要检查集群下的所有主机是否在DME中存在，只能通过id来创建主机组，如果集群有中文，dme中会创建失败
         String objId = "";
         try {
             //param str host: 主机  param str cluster: 集群
             //如果主机或主机不存在就创建并得到主机或主机组ID 如果主机组不存在就需要创建,创建前要检查集群下的所有主机是否在DME中存在
-            if (!StringUtils.isEmpty(clusterName)) {
+            if (!StringUtils.isEmpty(clusterObjectId)) {
                 List<String> objIds = new ArrayList<>();
                 //检查集群对应的主机组在DME中是否存在
-                List<Map<String, Object>> hostgrouplist = dmeAccessService.getDmeHostGroups(clusterName);
+                List<Map<String, Object>> hostgrouplist = dmeAccessService.getDmeHostGroups(clusterObjectId);
                 if (hostgrouplist != null && hostgrouplist.size() > 0) {
                     for (Map<String, Object> hostgroupmap : hostgrouplist) {
                         if (hostgroupmap != null && hostgroupmap.get("name") != null) {
-                            if (clusterName.equals(hostgroupmap.get("name").toString())) {
+                            if (clusterObjectId.equals(hostgroupmap.get("name").toString())) {
                                 String tmpObjId = ToolUtils.getStr(hostgroupmap.get("id"));
                                 objIds.add(tmpObjId);
                             }
@@ -642,7 +642,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             //在DME中创建主机组
                             if (hostlists.size() > 0) {
                                 Map<String, Object> params = new HashMap<>();
-                                params.put("cluster", clusterName);
+                                params.put("cluster", vcsdkUtils.getVcConnectionHelper().objectID2MOR(clusterObjectId).getValue());
                                 params.put("hostids", hostlists);
                                 Map<String, Object> hostmap = dmeAccessService.createHostGroup(params);
                                 if (null != hostmap && null != hostmap.get(DmeConstants.ID)) {
@@ -797,7 +797,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             if (null != params && null != params.get(DmeConstants.HOST)) {
                 objId = checkOrCreateToHost(ToolUtils.getStr(params.get("host")), ToolUtils.getStr(params.get("hostId")));
             } else if (null != params && null != params.get(DmeConstants.CLUSTER)) {
-                objId = checkOrCreateToHostGroup(ToolUtils.getStr(params.get("cluster")), ToolUtils.getStr(params.get("clusterId")));
+                objId = checkOrCreateToHostGroup( ToolUtils.getStr(params.get("clusterId")));
             }
         } catch (Exception e) {
             LOG.error("checkOrcreateToHostorHostGroup error:", e);
