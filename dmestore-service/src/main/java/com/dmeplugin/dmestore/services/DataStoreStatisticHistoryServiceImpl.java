@@ -228,7 +228,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     public Map<String, Object> queryVolumeCurrentStatistic(Map<String, Object> params) throws DMEException {
-        Map<String, String> idInstancdIdMap = initParamVolume(params, false);
+        Map<String, String> idInstancdIdMap = initParamVolume(params, true);
         return queryCurrentStatistic("volume", params, idInstancdIdMap);
     }
 
