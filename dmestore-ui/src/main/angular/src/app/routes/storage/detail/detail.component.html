@@ -53,7 +53,7 @@
                 <td class="left">{{'storage.detail.conf.wp' | translate}}</td>
                 <td class="left">{{detail.maintenanceStart}}--{{detail.maintenanceOvertime}}</td>
                 <td class="left">{{'storage.detail.conf.location' | translate}}</td>
-                <td class="left">{{detail.location || '--'}}</td>
+                <td class="left">{{detail.location !=null?detail.location:'--'}}</td>
               </tr>
             </table>
             <div *ngIf="!detail" style="height: 50%">
@@ -152,6 +152,13 @@
                         <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxIops?item.maxIops.toFixed(1):0.0}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxBandwidth?item.maxBandwidth.toFixed(1):0.0}}</clr-dg-cell>
                       </clr-dg-row>
+                      <clr-dg-footer>
+                        <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="poolTotal">
+                          <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                          {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+                          of {{pagination.totalItems}}
+                        </clr-dg-pagination>
+                      </clr-dg-footer>
                     </clr-datagrid>
                   </div>
                 </clr-tab-content>
@@ -178,7 +185,7 @@
                         </div>
                       </div>
                     </div>
-                    <clr-datagrid class="datagrid-compact" [(clrDgSelected)]="volumeSelect">
+                    <clr-datagrid [clrDgLoading]="isLoading">
                       <clr-dg-column>{{'storage.detail.volumes.name' | translate}}</clr-dg-column>
                       <clr-dg-column>{{'storage.detail.volumes.status' | translate}}</clr-dg-column>
 
@@ -222,7 +229,7 @@
                       </clr-dg-row>
                       <clr-dg-footer>
                         <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="volumeTotal">
-                          <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">per page</clr-dg-page-size>
+                          <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
                           {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
                           of {{pagination.totalItems}}
                         </clr-dg-pagination>
@@ -264,7 +271,7 @@
                         <clr-dg-cell>{{item.allocType}}</clr-dg-cell>
                         <clr-dg-cell>{{item.type}}</clr-dg-cell>
                         <clr-dg-cell>{{formatCapacity(item.capacity)}}</clr-dg-cell>
-                        <clr-dg-cell>{{item.availableCapacity}}</clr-dg-cell>
+                        <clr-dg-cell>{{formatCapacity(item.availableCapacity)}}</clr-dg-cell>
                         <clr-dg-cell>
                           <clr-progress-bar clrValue="{{item.capacityUsageRatio.toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar>
                         </clr-dg-cell>
@@ -273,7 +280,13 @@
                         <!--<clr-dg-cell>{{item.cifs_count}}</clr-dg-cell>-->
                         <clr-dg-cell>{{item.dtreeCount}}</clr-dg-cell>
                       </clr-dg-row>
-
+                      <clr-dg-footer>
+                        <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="fsTotal">
+                          <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                          {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+                          of {{pagination.totalItems}}
+                        </clr-dg-pagination>
+                      </clr-dg-footer>
                     </clr-datagrid>
                   </div>
                 </clr-tab-content>
@@ -303,12 +316,19 @@
                       <clr-dg-row  *clrDgItems="let item of dtrees" [clrDgItem]="item">
                         <clr-dg-cell>{{item.name}}</clr-dg-cell>
                         <clr-dg-cell>{{item.fsName}}</clr-dg-cell>
-                        <clr-dg-cell>{{item.tierName||'--'}}</clr-dg-cell>
-                        <clr-dg-cell>{{item.securityStyle||'--'}}</clr-dg-cell>
+                        <clr-dg-cell>{{item.tierName!=null?item.tierName:'--'}}</clr-dg-cell>
+                        <clr-dg-cell>{{item.securityStyle!=null?item.securityStyle:'--'}}</clr-dg-cell>
                         <clr-dg-cell>{{item.nfsCount}}</clr-dg-cell>
                         <!--<clr-dg-cell>{{item.cifs_count}}</clr-dg-cell>-->
                         <clr-dg-cell>{{item.quotaSwitch}}</clr-dg-cell>
                       </clr-dg-row>
+                      <clr-dg-footer>
+                        <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="dtreeTotal">
+                          <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                          {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+                          of {{pagination.totalItems}}
+                        </clr-dg-pagination>
+                      </clr-dg-footer>
                     </clr-datagrid>
                   </div>
                 </clr-tab-content>
@@ -317,39 +337,38 @@
               <clr-tab>
                 <button clrTabLink id="sh" (click)="changeTab('shares')">{{'storage.detail.shares.shares' | translate}}</button>
                 <clr-tab-content id="shares" >
-                  <clr-accordion>
-                    <clr-accordion-panel>
-                      <clr-accordion-title>NFS</clr-accordion-title>
-                      <clr-accordion-content *clrIfExpanded>
-                        <div>
-                          <div class="gh-btngroup-header">
-                            <div class="gh-btngroup-left"></div>
-                            <!--刷新 -->
-                            <div class="btn-group btn-icon">
-                              <div class="radio btn merginLeft">
-                                <label><clr-icon shape="refresh" size="20" (click)="getShareList(true)"></clr-icon></label>
-                              </div>
-                            </div>
+                  <div class="detail-margin-top">
+                      <div class="gh-btngroup-header">
+                        <div class="gh-btngroup-left"></div>
+                        <!--刷新 -->
+                        <div class="btn-group btn-icon">
+                          <div class="radio btn merginLeft">
+                            <label><clr-icon shape="refresh" size="20" (click)="getShareList(true)"></clr-icon></label>
                           </div>
-                          <clr-datagrid>
-                            <clr-dg-column>{{'storage.detail.shares.name' | translate}}</clr-dg-column>
-                            <clr-dg-column>{{'storage.detail.shares.sharePath' | translate}}</clr-dg-column>
-                            <clr-dg-column>{{'storage.detail.shares.ofs' | translate}}</clr-dg-column>
-                            <clr-dg-column>{{'storage.detail.shares.od' | translate}}</clr-dg-column>
-                            <clr-dg-column>{{'storage.detail.shares.osl' | translate}}</clr-dg-column>
-                            <clr-dg-row  *clrDgItems="let item of shares" [clrDgItem]="item">
-                              <clr-dg-cell>{{item.name}}</clr-dg-cell>
-                              <clr-dg-cell>{{item.sharePath}}</clr-dg-cell>
-                              <clr-dg-cell>{{item.fsName}}</clr-dg-cell>
-                              <clr-dg-cell>{{item.owningDtreeName||'--'}}</clr-dg-cell>
-                              <clr-dg-cell>{{item.tierName||'--'}}</clr-dg-cell>
-                            </clr-dg-row>
-
-                          </clr-datagrid>
                         </div>
-                      </clr-accordion-content>
-                    </clr-accordion-panel>
-                  </clr-accordion>
+                      </div>
+                      <clr-datagrid [clrDgLoading]="isLoading">
+                        <clr-dg-column>{{'storage.detail.shares.name' | translate}}</clr-dg-column>
+                        <clr-dg-column>{{'storage.detail.shares.sharePath' | translate}}</clr-dg-column>
+                        <clr-dg-column>{{'storage.detail.shares.ofs' | translate}}</clr-dg-column>
+                        <clr-dg-column>{{'storage.detail.shares.od' | translate}}</clr-dg-column>
+                        <clr-dg-column>{{'storage.detail.shares.osl' | translate}}</clr-dg-column>
+                        <clr-dg-row  *clrDgItems="let item of shares" [clrDgItem]="item">
+                          <clr-dg-cell>{{item.name}}</clr-dg-cell>
+                          <clr-dg-cell>{{item.sharePath}}</clr-dg-cell>
+                          <clr-dg-cell>{{item.fsName}}</clr-dg-cell>
+                          <clr-dg-cell>{{item.owningDtreeName!=null?item.owningDtreeName:'--'}}</clr-dg-cell>
+                          <clr-dg-cell>{{item.tierName!=null?item.tierName:'--'}}</clr-dg-cell>
+                        </clr-dg-row>
+                        <clr-dg-footer>
+                          <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="shareTotal">
+                            <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                            {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+                            of {{pagination.totalItems}}
+                          </clr-dg-pagination>
+                        </clr-dg-footer>
+                      </clr-datagrid>
+                    </div>
                 </clr-tab-content>
               </clr-tab>
             </clr-tabs>
@@ -526,12 +545,19 @@
                           <clr-dg-cell>{{item.name}}</clr-dg-cell>
                           <clr-dg-cell>{{item.status}}</clr-dg-cell>
                           <clr-dg-cell>{{item.softVer}}</clr-dg-cell>
-                          <clr-dg-cell>{{item.cpuUsage||'--'}}</clr-dg-cell>
-                          <clr-dg-cell>{{item.iops||'--'}}</clr-dg-cell>
-                          <clr-dg-cell>{{item.ops||'--'}}</clr-dg-cell>
-                          <clr-dg-cell>{{item.lantency||'--'}}</clr-dg-cell>
-                          <clr-dg-cell>{{item.bandwith||'--'}}</clr-dg-cell>
+                          <clr-dg-cell>{{item.cpuUsage!=null?item.cpuUsage:'--'}}</clr-dg-cell>
+                          <clr-dg-cell>{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
+                          <clr-dg-cell>{{item.ops!=null?item.ops:'--'}}</clr-dg-cell>
+                          <clr-dg-cell>{{item.lantency!=null?item.lantency:'--'}}</clr-dg-cell>
+                          <clr-dg-cell>{{item.bandwith!=null?item.bandwith:'--'}}</clr-dg-cell>
                         </clr-dg-row>
+                        <clr-dg-footer>
+                          <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="conTotal">
+                            <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                            {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+                            of {{pagination.totalItems}}
+                          </clr-dg-pagination>
+                        </clr-dg-footer>
                       </clr-datagrid>
                     </div>
                   </clr-tab-content>
@@ -565,6 +591,13 @@
                           <clr-dg-cell>{{item.bandwith}}</clr-dg-cell>
                           <clr-dg-cell>{{item.useage}}</clr-dg-cell>
                         </clr-dg-row>
+                        <clr-dg-footer>
+                          <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="diskTotal">
+                            <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                            {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+                            of {{pagination.totalItems}}
+                          </clr-dg-pagination>
+                        </clr-dg-footer>
                       </clr-datagrid>
                     </div>
                   </clr-tab-content>
@@ -575,7 +608,7 @@
                     <div class="detail-margin-top">
                       <clr-accordion>
                         <clr-accordion-panel>
-                          <clr-accordion-title>FC Ports({{fcs==null?0:fcs.length}})</clr-accordion-title>
+                          <clr-accordion-title>{{'storage.detail.hardware.ports.fc' | translate}}({{fcs==null?0:fcs.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid>
                               <clr-dg-column >{{'storage.detail.hardware.ports.location' | translate}}</clr-dg-column>
@@ -596,11 +629,18 @@
                                 <clr-dg-cell>{{item.bandwith}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.useage}}</clr-dg-cell>
                               </clr-dg-row>
+                              <clr-dg-footer>
+                                <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="fcTotal">
+                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                                  {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+                                  of {{pagination.totalItems}}
+                                </clr-dg-pagination>
+                              </clr-dg-footer>
                             </clr-datagrid>
                           </clr-accordion-content>
                         </clr-accordion-panel>
                         <clr-accordion-panel>
-                          <clr-accordion-title>Ethernet Port({{eths==null?0:eths.length}})</clr-accordion-title>
+                          <clr-accordion-title>{{'storage.detail.hardware.ports.eth' | translate}}({{eths==null?0:eths.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid>
                               <clr-dg-column >{{'storage.detail.hardware.ports.location' | translate}}</clr-dg-column>
@@ -614,20 +654,34 @@
                               <clr-dg-column >{{'storage.detail.hardware.ports.usage' | translate}}</clr-dg-column>
                               <clr-dg-row  *clrDgItems="let item of eths" [clrDgItem]="item">
                                 <clr-dg-cell>{{item.location}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.status}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.ipv4|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.ipv6|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.speed|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.iops|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.lantency|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.bandwith|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.useage|| '--'}}</clr-dg-cell>
+
+                                <clr-dg-cell>
+                                  <span *ngIf="item.connectStatus =='disconnected'">{{'enum.status.disconnected' | translate}}</span>
+                                  <span *ngIf="item.connectStatus =='connected'">{{'enum.status.connected' | translate}}</span>
+                                  <span *ngIf="!item.connectStatus">--</span>
+                                </clr-dg-cell>
+                                <clr-dg-cell>{{item.mgmtIp!=null?item.mgmtIp!=''?item.mgmtIp:'--':'--'}}</clr-dg-cell>
+                                <clr-dg-cell  class="over_flow">
+                                  {{item.mgmtIpv6!=null?item.mgmtIpv6!=''?item.mgmtIpv6:'--':'--'}}
+                                </clr-dg-cell>
+                                <clr-dg-cell>{{item.speed!=null?item.speed:'--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.lantency!=null?item.lantency:'--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.bandwith!=null?item.bandwith:'--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.useage!=null?item.useage:'--'}}</clr-dg-cell>
                               </clr-dg-row>
+                              <clr-dg-footer>
+                                <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="ethTotal">
+                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                                  {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+                                  of {{pagination.totalItems}}
+                                </clr-dg-pagination>
+                              </clr-dg-footer>
                             </clr-datagrid>
                           </clr-accordion-content>
                         </clr-accordion-panel>
                         <clr-accordion-panel>
-                          <clr-accordion-title>FCoE Port({{fcoes==null?0:fcoes.length}})</clr-accordion-title>
+                          <clr-accordion-title>{{'storage.detail.hardware.ports.fcoe' | translate}}({{fcoes==null?0:fcoes.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid>
                               <clr-dg-column >{{'storage.detail.hardware.ports.location' | translate}}</clr-dg-column>
@@ -643,16 +697,23 @@
                                 <clr-dg-cell>{{item.status}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.wwn}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.speed}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.iops|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.latency|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.bandwidth|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.usage|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.latency!=null?item.latency:'--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.bandwidth!=null?item.bandwidth:'--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.usage!=null?item.usage:'--'}}</clr-dg-cell>
                               </clr-dg-row>
+                              <clr-dg-footer>
+                                <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="fcoeTotal">
+                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                                  {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+                                  of {{pagination.totalItems}}
+                                </clr-dg-pagination>
+                              </clr-dg-footer>
                             </clr-datagrid>
                           </clr-accordion-content>
                         </clr-accordion-panel>
                         <clr-accordion-panel>
-                          <clr-accordion-title>Bond Port({{bonds==null?0:bonds.length}})</clr-accordion-title>
+                          <clr-accordion-title>{{'storage.detail.hardware.ports.bond' | translate}}({{bonds==null?0:bonds.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid>
                               <clr-dg-column >{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
@@ -667,15 +728,22 @@
                                 <clr-dg-cell>{{item.healthStatus}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.runningStatus}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.mtu}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.iops|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.latency|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.bandwidth|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.latency!=null?item.latency:'--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.bandwidth!=null?item.bandwidth:'--'}}</clr-dg-cell>
                               </clr-dg-row>
+                              <clr-dg-footer>
+                                <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="bondTotal">
+                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                                  {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+                                  of {{pagination.totalItems}}
+                                </clr-dg-pagination>
+                              </clr-dg-footer>
                             </clr-datagrid>
                           </clr-accordion-content>
                         </clr-accordion-panel>
                         <clr-accordion-panel>
-                          <clr-accordion-title>Logical Port({{logicports==null?0:logicports.length}})</clr-accordion-title>
+                          <clr-accordion-title>{{'storage.detail.hardware.ports.logic' | translate}}({{logicports==null?0:logicports.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid>
                               <clr-dg-column >{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
@@ -693,20 +761,29 @@
                                 <clr-dg-cell>{{item.name}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.runningStatus}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.operationalStatus}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.mgmtIp|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.mgmtIpv6|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.currentPortName|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.role|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.ddnsStatus|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.supportProtocol|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.managementAccess|| '--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.vstoreName|| '--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.mgmtIp!=null?item.mgmtIp!=''?item.mgmtIp:'--':'--'}}</clr-dg-cell>
+                                <clr-dg-cell  class="over_flow">
+                                  {{item.mgmtIpv6!=null?item.mgmtIpv6!=''?item.mgmtIpv6:'--':'--'}}
+                                </clr-dg-cell>
+                                <clr-dg-cell>{{item.currentPortName!=null?item.currentPortName:'--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.role!=null?item.role:'--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.ddnsStatus!=null?item.ddnsStatus:'--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.supportProtocol!=null?item.supportProtocol:'--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.managementAccess!=null?item.managementAccess:'--'}}</clr-dg-cell>
+                                <clr-dg-cell>{{item.vstoreName!=null?item.vstoreName!=''?item.vstoreName:'--':'--'}}</clr-dg-cell>
                               </clr-dg-row>
+                              <clr-dg-footer>
+                                <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="logicTotal">
+                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                                  {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+                                  of {{pagination.totalItems}}
+                                </clr-dg-pagination>
+                              </clr-dg-footer>
                             </clr-datagrid>
                           </clr-accordion-content>
                         </clr-accordion-panel>
                         <clr-accordion-panel>
-                          <clr-accordion-title>Failover Group({{fgs==null?0:fgs.length}})</clr-accordion-title>
+                          <clr-accordion-title>{{'storage.detail.hardware.ports.fail' | translate}}({{fgs==null?0:fgs.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid>
                               <clr-dg-column >{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
@@ -715,6 +792,13 @@
                                 <clr-dg-cell>{{item.name}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.failoverGroupType}}</clr-dg-cell>
                               </clr-dg-row>
+                              <clr-dg-footer>
+                                <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="failTotal">
+                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                                  {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+                                  of {{pagination.totalItems}}
+                                </clr-dg-pagination>
+                              </clr-dg-footer>
                             </clr-datagrid>
                           </clr-accordion-content>
                         </clr-accordion-panel>

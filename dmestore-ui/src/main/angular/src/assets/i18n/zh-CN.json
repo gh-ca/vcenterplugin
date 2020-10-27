@@ -21,7 +21,8 @@
     "search": "搜索",
     "refresh": "刷新",
     "synSPolicy": "同步虚拟机存储策略",
-    "tip": "提示"
+    "tip": "提示",
+    "back":"返回"
   },
   "validations": {
     "required": "该字段必填!",
@@ -476,9 +477,16 @@
           "dataProtocol":"数据协议",
           "manageAccess":"管理访问",
           "vStoreName":"VStore名称",
-          "type":"类型"
+          "type":"类型",
+          "fc":"FC端口",
+          "eth":"以太端口",
+          "fcoe":"FCoE端口",
+          "bond":"绑定端口",
+          "logic":"逻辑端口",
+          "fail":"漂移组"
         }
-      }
+      },
+      "perPage":"每页"
     }
   },
   "overview": {
@@ -677,7 +685,8 @@
   },
   "enum":{
     "status":{
-
+      "disconnected":"未连接",
+      "connected":"已连接"
     },
     "type":{
       "block":"块",
