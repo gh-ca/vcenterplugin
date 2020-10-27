@@ -649,7 +649,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     /**
      * Mount nfs,params中包含了 include:
      *  dataStoreObjectId: datastore的object id
-     *  logicPortIp:存储逻辑端口IP
+     *  logicPortIp:存储逻辑端口IP  暂时不需要
      * hostObjectId:主机objectid
      * hostVkernelIp:主机vkernelip
      * str mountType: 挂载模式（只读或读写）  readOnly/readWrite
@@ -683,9 +683,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                             String hostObjectId=null;
                             String logicPortIp=null;
                             //String mountType = null;
-                            if (params.get("hostObjectId") != null&&null!=params.get("hostVkernelIp")) {
+                            if (params.get("hostObjectId") != null) {
                                 hostObjectId= ToolUtils.getStr(params.get("hostObjectId"));
-                                logicPortIp= ToolUtils.getStr( params.get("logicPortIp"));
+                                //logicPortIp= ToolUtils.getStr( params.get("logicPortIp"));
                             }
                         /*if (params.get("clusters") != null) {
                             clusters = (List<Map<String, String>>) params.get("clusters");
