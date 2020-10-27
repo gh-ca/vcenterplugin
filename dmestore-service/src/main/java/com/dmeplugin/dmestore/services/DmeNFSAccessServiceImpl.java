@@ -180,7 +180,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 fsAttr.setController(fsDetail.get("owning_controller").getAsString());
                 //查询详情，获取tuning信息
                 JsonObject tuning = fsDetail.getAsJsonObject("tuning");
-                if(tuning.isJsonNull()){
+                if(!tuning.isJsonNull()){
                     fsAttr.setApplicationScenario(ToolUtils.jsonToStr(tuning.get("application_scenario"), null));
                     fsAttr.setDataDeduplication(ToolUtils.jsonToBoo(tuning.get("deduplication_enabled"), null));
                     fsAttr.setDateCompression(ToolUtils.jsonToBoo(tuning.get("compression_enabled"), null));
@@ -970,6 +970,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return taskId;
     }
 
+    @Override
     public List<Map<String, Object>> getHostsMountDataStoreByDsObjectId(String dataStoreObjectId) throws DMEException {
         List<Map<String, Object>> lists = null;
         try {
@@ -988,6 +989,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return lists;
     }
 
+    @Override
     public List<Map<String, Object>> getClusterMountDataStoreByDsObjectId(String dataStoreObjectId) throws DMEException {
         List<Map<String, Object>> lists = null;
         try {
