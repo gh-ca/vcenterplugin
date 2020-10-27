@@ -43,6 +43,7 @@ export class AddNfs{
   vkernelIp:string;//  虚拟网卡ip
   hostObjectId:string;//  挂载主机的Objectid
   accessMode:string;//  挂载方式 分 只读 和读写
+  securityType:string;//安全类型
   constructor(){
     this.sameName = true;
     this.advance = false;
