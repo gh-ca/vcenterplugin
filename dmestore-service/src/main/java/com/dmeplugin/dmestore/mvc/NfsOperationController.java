@@ -41,7 +41,7 @@ public class NfsOperationController extends BaseController{
      * shareName 共享名称
      * fsName 文件系统名称
      * size  ?待确认默认单位（界面可选。前端可转换）
-     * type nfs协议版本
+     * type nfs协议版本   NFS以及NFS41
      * advance false true  true 是有高级选项
      * qosFlag qos策略开关 false true false关闭
      * contolPolicy 上下线选择标记  枚举值 up low
@@ -62,6 +62,7 @@ public class NfsOperationController extends BaseController{
      * hostObjectId 挂载主机的Objectid
      *
      * accessMode 挂载方式 分 只读 和读写
+     * securityType NFS41的时候，安全类型AUTH_SYS,SEC_KRB5,SEC_KRB5I
      * }
      * @param params
      * @return
@@ -87,6 +88,7 @@ public class NfsOperationController extends BaseController{
         param.put("nfsName", nfsName);
         Boolean sameName = (Boolean)params.get("sameName");
         param.put("type", params.get("type"));
+        param.put("securityType", params.get("securityType"));
         filesystemSpec.put("capacity", params.get("size"));
         filesystemSpec.put("count", 1);
         if (sameName) {
@@ -143,9 +145,10 @@ public class NfsOperationController extends BaseController{
             tuning.put("compression_enabled", false);
             tuning.put("deduplication_enabled", false);
             capacityAutonegotiation.put("auto_size_enable", false);
+            capacityAutonegotiation.put("capacity_self_adjusting_mode", CapacityAutonegotiation.capacitymodeoff);
         }
         param.put("tuning", tuning);
-
+        param.put("capacity_autonegotiation",capacityAutonegotiation);
         try {
             nfsOperationService.createNfsDatastore(param);
             return success();

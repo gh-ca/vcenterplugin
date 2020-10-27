@@ -96,6 +96,7 @@
     "reduSize":"缩容大小",
     "ops":"OPS",
     "bandwidth":"带宽(MB/s)",
+    "nfsStore":"NFS存储",
     "respRt":"读响应时间(毫秒)",
     "respWt":"写响应时间(毫秒)",
     "logic":{
@@ -672,5 +673,14 @@
       "block":"块",
       "file":"文件"
     }
+  },
+  "errorMsg":{
+    "mountError":"挂载失败！请联系管理员！",
+    "unMountError":"卸载失败！请联系管理员！",
+    "expandError":"扩容失败！请联系管理员！",
+    "reduceError":"缩容失败！请联系管理员！",
+    "deleteError":"删除失败！请联系管理员！",
+    "addError":"添加失败！请联系管理员！",
+    "modifyError":"编辑失败！请联系管理员！"
   }
 }

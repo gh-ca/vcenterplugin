@@ -1,6 +1,7 @@
 package com.dmeplugin.dmestore.task;
 
 
+import com.dmeplugin.dmestore.services.BestPracticeProcessService;
 import com.dmeplugin.dmestore.services.DmeNFSAccessService;
 import com.dmeplugin.dmestore.services.VmfsAccessService;
 import org.quartz.*;
@@ -21,12 +22,6 @@ public class BackgroundScanDatastoreTask implements StatefulJob {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BackgroundScanDatastoreTask.class);
 
-  @Autowired
-  private VmfsAccessService vmfsAccessService;
-
-  @Autowired
-  private DmeNFSAccessService dmeNfsAccessService;
-
   /**
    * 后台定时
    */
@@ -34,15 +29,19 @@ public class BackgroundScanDatastoreTask implements StatefulJob {
     LOGGER.info("scanDatastore start");
     //扫描vmfs
     try {
-      vmfsAccessService.scanVmfs();
-    }catch (Exception e){
+      Object obj=ApplicationContextHelper.getBean("VmfsAccessServiceImpl");
+      ((VmfsAccessService)obj).scanVmfs();
+    } catch (Exception e) {
       e.printStackTrace();
+      LOGGER.error("scanDatastore vmfs error",e);
     }
     //扫描nfs
     try {
-      dmeNfsAccessService.scanNfs();
-    }catch (Exception e){
+      Object obj=ApplicationContextHelper.getBean("DmeNFSAccessServiceImpl");
+      ((DmeNFSAccessService)obj).scanNfs();
+    } catch (Exception e) {
       e.printStackTrace();
+      LOGGER.error("scanDatastore nfs error",e);
     }
     LOGGER.info("scanDatastore end");
   }

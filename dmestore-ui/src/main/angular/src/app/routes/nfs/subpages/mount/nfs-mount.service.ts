@@ -24,6 +24,9 @@ export class NfsMountService{
   getVmkernelListByObjectId(hostObjectId:string){
     return this.http.get('accessvmware/getvmkernelipbyhostobjectid',{params: {hostObjectId}} );
   }
+  getLogicPortListByStorageId(storageId: string){
+    return this.http.get('dmestorage/logicports', {params: {storageId}});
+  }
 }
 export class DataStore{
   freeSpace:string;
@@ -42,10 +45,8 @@ export class Vmkernel{
   mac: string;
 }
 export class Mount{
-  dataStoreName: string;
   dataStoreObjectId: string;
-  hosts: string[];
-  clusters: string[];
+  hostObjectId
+  hostVkernelIp:string;//  虚拟网卡ip
   mountType: string;
-  vkernelIp:string;//  虚拟网卡ip
 }

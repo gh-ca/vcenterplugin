@@ -91,9 +91,12 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         JsonObject share = gson.fromJson(resBody, JsonObject.class);
         NfsDataStoreShareAttr shareAttr = new NfsDataStoreShareAttr();
         shareAttr.setName(share.get("name").getAsString());
+        shareAttr.setFs_name(ToolUtils.jsonToStr(share.get("fs_name"), null));
         shareAttr.setShare_path(share.get("share_path").getAsString());
         shareAttr.setDescription(share.get("description").getAsString());
+        shareAttr.setDevice_name(ToolUtils.jsonToStr(share.get("device_name"), null));
         shareAttr.setOwning_dtree_name(ToolUtils.jsonToStr(share.get("owning_dtree_name"), null));
+        shareAttr.setOwning_dtree_id(ToolUtils.jsonToStr(share.get("owning_dtree_id"), null));
         //查询客户端列表
         List<AuthClient> authClientList = getNFSDatastoreShareAuthClients(nfsShareId);
         if (null != authClientList && authClientList.size() > 0) {
@@ -143,16 +146,16 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         JsonObject logicPort = gson.fromJson(responseEntity.getBody(), JsonObject.class);
         NfsDataStoreLogicPortAttr logicPortAttr = new NfsDataStoreLogicPortAttr();
         logicPortAttr.setName(logicPort.get("name").getAsString());
-        String ipv4 = logicPort.get("mgmt_ip").getAsString();
+        String ipv4 = ToolUtils.jsonToStr(logicPort.get("mgmt_ip"), null);
         ipv4 = (null == ipv4 ? "" : ipv4.trim());
-        String ipv6 = logicPort.get("mgmt_ipv6").getAsString();
+        String ipv6 = ToolUtils.jsonToStr(logicPort.get("mgmt_ipv6"), null);
         logicPortAttr.setIp(!StringUtils.isEmpty(ipv4) ? ipv4 : ipv6);
         String runningStatus = logicPort.get("running_status").getAsString();
-        logicPortAttr.setStatus(runningStatus);
+        logicPortAttr.setStatus(ToolUtils.jsonToStr(logicPort.get("operational_status"), null));
         logicPortAttr.setRunningStatus(runningStatus);
         logicPortAttr.setCurrentPort(logicPort.get("current_port_name").getAsString());
         logicPortAttr.setActivePort(logicPort.get("home_port_name").getAsString());
-        logicPortAttr.setFailoverGroup("failover_group_name");
+        logicPortAttr.setFailoverGroup(ToolUtils.jsonToStr(logicPort.get("failover_group_name"), null));
         return logicPortAttr;
     }
 
@@ -180,7 +183,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 fsAttr.setController(fsDetail.get("owning_controller").getAsString());
                 //查询详情，获取tuning信息
                 JsonObject tuning = fsDetail.getAsJsonObject("tuning");
-                if(tuning.isJsonNull()){
+                if(!tuning.isJsonNull()){
                     fsAttr.setApplicationScenario(ToolUtils.jsonToStr(tuning.get("application_scenario"), null));
                     fsAttr.setDataDeduplication(ToolUtils.jsonToBoo(tuning.get("deduplication_enabled"), null));
                     fsAttr.setDateCompression(ToolUtils.jsonToBoo(tuning.get("compression_enabled"), null));
@@ -970,6 +973,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return taskId;
     }
 
+    @Override
     public List<Map<String, Object>> getHostsMountDataStoreByDsObjectId(String dataStoreObjectId) throws DMEException {
         List<Map<String, Object>> lists = null;
         try {
@@ -988,6 +992,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return lists;
     }
 
+    @Override
     public List<Map<String, Object>> getClusterMountDataStoreByDsObjectId(String dataStoreObjectId) throws DMEException {
         List<Map<String, Object>> lists = null;
         try {

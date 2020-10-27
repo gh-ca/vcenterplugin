@@ -10,23 +10,13 @@
     </div>
   </clr-modal>
   <div *ngIf="viewPage=='delete_vcenter'">
-    <div class="clr-row">
-      <div class="clr-col-lg-4 clr-col-md-6 clr-col-12">
-        <div class="card">
-          <div class="card-header">
-            提示
-          </div>
-          <div class="card-block">
-            <div class="card-text">
-              {{'nfs.unmount.content' | translate}}
-            </div>
-          </div>
-          <div class="card-footer">
-            <button type="button" class="btn btn-outline" (click)="backToNfsList()">{{'menu.cancel' | translate}}</button>
-            <button type="button" class="btn btn-primary" (click)="delNfs()">{{'menu.ok' | translate}}</button>
-          </div>
-        </div>
-      </div>
+    <div>
+      <p *ngIf="errorMsg" style="color: red">{{'errorMsg.reduceError' | translate}}</p>
+      <p>{{'nfs.del.content' | translate}}</p>
+    </div>
+    <div style="float: right">
+      <button type="button" class="btn btn-outline" (click)="closeModel()">{{'menu.cancel' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="delNfs()">{{'menu.ok' | translate}}</button>
     </div>
   </div>
 </div>

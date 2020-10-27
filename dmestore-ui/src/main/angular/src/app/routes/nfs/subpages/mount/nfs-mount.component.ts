@@ -2,7 +2,8 @@ import {ChangeDetectorRef, Component, OnInit} from "@angular/core";
 import {GlobalsService} from "../../../../shared/globals.service";
 import {DataStore, Mount, NfsMountService, Vmkernel} from "./nfs-mount.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {Cluster, Host} from "../../nfs.service";
+import {Host} from "../../nfs.service";
+import {LogicPort} from "../../../storage/storage.service";
 
 @Component({
   selector: 'app-mount',
@@ -16,15 +17,14 @@ export class NfsMountComponent implements OnInit{
   objectId:string;
   mountForm = new Mount();
   hostList: Host[] = [];
-  clusterList: Cluster[] = [];
   dsObjectId: string;
   hostObjectId: string;
-  clusterObjectId: string;
   routePath: string;
   rowSelected = []; // 当前选中数据
   dataStoreList: DataStore[];
   pluginFlag: string;//来至插件的标记
   errorMsg:string;
+  logicPorts: LogicPort[] = [];
   vmkernelList: Vmkernel[]=[];
   constructor(private mountService: NfsMountService, private cdr: ChangeDetectorRef,
               private gs: GlobalsService,
@@ -41,7 +41,6 @@ export class NfsMountComponent implements OnInit{
       this.activatedRoute.queryParams.subscribe(queryParam => {
         this.dsObjectId = queryParam.objectId;
         this.mountForm.dataStoreObjectId=queryParam.objectId;
-        this.mountForm.dataStoreName=queryParam.dsName;
         this.pluginFlag =queryParam.flag;
       });
       if(this.pluginFlag==null){
@@ -51,11 +50,11 @@ export class NfsMountComponent implements OnInit{
           this.dsObjectId=ctx[0].id;
           this.mountForm.dataStoreObjectId=ctx[0].id;
         }
-        this.dsObjectId='urn:vmomi:Datastore:datastore-1128:674908e5-ab21-4079-9cb1-596358ee5dd1';
         this.viewPage='mount_dataStore'
       }
       if (this.dsObjectId!=null && this.dsObjectId!=''){
         this.initHostAndClusterList();
+        this.getLogicPortByDsId(this.dsObjectId)
       }
       this.gs.loading=false;
     }else{
@@ -65,16 +64,9 @@ export class NfsMountComponent implements OnInit{
         const ctx = this.gs.getClientSdk().app.getContextObjects();
         if(ctx!=null){
           this.hostObjectId=ctx[0].id;
-          this.getDataStoreList('host');
-        }
-        this.gs.loading=false;
-      }else if('cluster'===this.routePath){
-        this.viewPage='mount_cluster'
-        const ctx = this.gs.getClientSdk().app.getContextObjects();
-        if(ctx!=null){
-          this.clusterObjectId=ctx[0].id;
-          //入口是集群
-          this.getDataStoreList('cluster');
+          this.getDataStoreList(this.hostObjectId);
+          this.getVmkernelListByObjectId(this.hostObjectId);
+          this.mountForm.hostObjectId=this.hostObjectId;
         }
         this.gs.loading=false;
       }
@@ -85,14 +77,7 @@ export class NfsMountComponent implements OnInit{
   checkHost(){
     this.gs.loading=true;
     //选择主机后获取虚拟网卡
-    this.mountService.getVmkernelListByObjectId(this.mountForm.dataStoreObjectId)
-      .subscribe((r: any) => {
-        this.gs.loading=false;
-        if (r.code === '200'){
-          this.vmkernelList = r.data;
-          this.cdr.detectChanges();
-        }
-      });
+    this.getVmkernelListByObjectId(this.mountForm.hostObjectId);
   }
   initHostAndClusterList(){
     this.mountService.getHostListByObjectId(this.dsObjectId).subscribe((r: any) => {
@@ -102,41 +87,46 @@ export class NfsMountComponent implements OnInit{
         this.gs.loading=false;
       }
     });
-    // this.mountService.getClusterListByObjectId(this.dsObjectId).subscribe((r: any) => {
-    //   if (r.code === '200'){
-    //     this.clusterList = r.data;
-    //     this.cdr.detectChanges();
-    //     this.gs.loading=false;
-    //   }
-    // });
   }
-  getDataStoreList(type: string){
+  getDataStoreList(hostObjectId: string){
     this.dataStoreList=null;
-    if ('host' == type){
       let params=
-        {"hostObjectId":this.hostObjectId,
+        {"hostObjectId":hostObjectId,
           "dataStoreType": "NFS"}
       this.mountService.getDatastoreListByHostObjectId(params).subscribe((r: any)=>{
         if (r.code==='200'){
           this.dataStoreList=r.data;
         }
       });
-    }
-    if ('cluster'== type){
-      let params= {
-        "clusterObjectId":this.clusterObjectId,
-          "dataStoreType": "NFS"
-      };
-      this.mountService.getDatastoreListByClusterObjectId(params).subscribe((r: any)=>{
-        if (r.code==='200'){
-          this.dataStoreList=r.data;
-        }
-      });
-    }
+
     this.cdr.detectChanges();
   }
+  getLogicPortByDsId(storagId: string){
+    // 选择存储后逻辑端口
+    this.gs.loading=true;
+    this.mountService.getLogicPortListByStorageId(storagId)
+      .subscribe((r: any) => {
+        this.gs.loading=false;
+        if (r.code === '200'){
+          this.logicPorts = r.data;
+          this.cdr.detectChanges();
+        }
+      });
+  }
+  getVmkernelListByObjectId(hostObjectId:string){
+    this.mountService.getVmkernelListByObjectId(hostObjectId)
+      .subscribe((r: any) => {
+        this.gs.loading=false;
+        if (r.code === '200'){
+          this.vmkernelList = r.data;
+          this.cdr.detectChanges();
+        }
+      });
+  }
   mountSubmit(){
+    this.gs.loading=true;
     this.mountService.mountNfs(this.mountForm).subscribe((result: any) => {
+      this.gs.loading=false;
       if (result.code  ===  '200'){
         this.mountForm = new Mount();
         if (this.pluginFlag=='plugin'){
@@ -144,14 +134,19 @@ export class NfsMountComponent implements OnInit{
         }else {
          this.closeModel();
         }
+      }else{
+        console.log('mount failed:',result.description);
+        this.errorMsg='1';
       }
     });
   }
   backToNfsList(){
     this.gs.loading=false;
+    this.errorMsg=null;
     this.router.navigate(['nfs']);
   }
   closeModel(){
+    this.errorMsg=null;
     this.gs.getClientSdk().modal.close();
     this.gs.loading=false;
   }

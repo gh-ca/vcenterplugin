@@ -82,7 +82,7 @@ export class NfsAddComponent implements OnInit{
     this.wizard.open();
   }
   addNfs(){
-    this.wizard.open();
+    //
     this.gs.loading=true;
     this.addForm.poolRawId=this.checkedPool.diskPoolId;
     this.addForm.storagePoolId= this.checkedPool.id;
@@ -111,6 +111,7 @@ export class NfsAddComponent implements OnInit{
       }else{
         this.errorMsg = '添加失败！'+result.description;
         this.cdr.detectChanges();
+        this.wizard.open();
       }
     });
   }
