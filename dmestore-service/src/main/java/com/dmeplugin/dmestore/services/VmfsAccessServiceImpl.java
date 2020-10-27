@@ -124,8 +124,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
                                             vmfsDataInfo.setVolumeId(ToolUtils.jsonToStr(vjson2.get("id")));
                                             vmfsDataInfo.setVolumeName(ToolUtils.jsonToStr(vjson2.get("name")));
+                                            //状态：creating：创建中；normal：正常；mapping：映射中；unmapping：解除映射中；deleting：删除中；error：错误；expanding：扩容中
                                             vmfsDataInfo.setStatus(ToolUtils.jsonToStr(vjson2.get("status")));
                                             vmfsDataInfo.setServiceLevelName(ToolUtils.jsonToStr(vjson2.get("service_level_name")));
+                                            //卷的保护状态， true表示卷已经被保护，false表示卷未被保护
                                             vmfsDataInfo.setVmfsProtected(ToolUtils.jsonToBoo(vjson2.get("protected")));
                                             vmfsDataInfo.setWwn(ToolUtils.jsonToStr(vjson2.get("volume_wwn")));
 
