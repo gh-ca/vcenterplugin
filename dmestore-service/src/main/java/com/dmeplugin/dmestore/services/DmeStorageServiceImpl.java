@@ -106,7 +106,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storageObj.setId(ToolUtils.jsonToStr(jsonObj.get("id")));
                     storageObj.setName(ToolUtils.jsonToStr(jsonObj.get("name")));
                     storageObj.setIp(ToolUtils.jsonToStr(jsonObj.get("ip")));
+                    //运行状态取值包括“正常”、“离线”“故障”、“未管理”、“未知”。
                     storageObj.setStatus(ToolUtils.jsonToStr(jsonObj.get("status")));
+                    //同步状态取值包括：“未同步”“同步中”“已同步”“未知”
                     storageObj.setSynStatus(ToolUtils.jsonToStr(jsonObj.get("syn_status")));
                     storageObj.setVendor(ToolUtils.jsonToStr(jsonObj.get("vendor")));
                     storageObj.setModel(ToolUtils.jsonToStr(jsonObj.get("model")));
