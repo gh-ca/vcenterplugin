@@ -2,7 +2,6 @@ import {Component, OnInit} from "@angular/core";
 import {GlobalsService} from "../../../../shared/globals.service";
 import {NfsExpandService} from "./nfs-expand.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {DataStore} from "../mount/nfs-mount.service";
 @Component({
   selector: 'app-reduce',
   templateUrl: './nfs-expand.component.html',
@@ -76,16 +75,19 @@ export class NfsExpandComponent implements OnInit{
           this.closeModel();
         }
       }else{
-        this.errorMsg = '扩容失败！'+result.description;
+        this.errorMsg = '1';
+        console.log('Expand failed:',result.description)
       }
     });
   }
   backToNfsList(){
     this.gs.loading=false;
+    this.errorMsg=null;
     this.router.navigate(['nfs']);
   }
   closeModel(){
     this.gs.loading=false;
+    this.errorMsg=null;
     this.gs.getClientSdk().modal.close();
   }
 }

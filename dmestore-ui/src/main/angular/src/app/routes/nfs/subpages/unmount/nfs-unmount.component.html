@@ -3,38 +3,16 @@
   <clr-modal [clrModalOpen]="viewPage=='unmount_pugin'" [clrModalSize]="'md'">
     <h3 class="modal-title">{{'nfs.unmount.title' | translate}}</h3>
     <div class="modal-body">
-      <clr-radio-container clrInline>
-        <label class="floatleft" style="color: #9F9F9F;">{{'vmfs.mount.mountObj' | translate}}</label>
-        <clr-radio-wrapper>
-          <input type="radio" clrRadio name="controlPolicy" value="1" [(ngModel)]="mountType" ng-checked="true"/>
-          <label>{{'vmfs.mount.host' | translate}}</label>
-        </clr-radio-wrapper>
-        <clr-radio-wrapper>
-          <input type="radio" clrRadio name="controlPolicy" value="2"  [(ngModel)]="mountType" />
-          <label>{{'vmfs.mount.cluster' | translate}}</label>
-        </clr-radio-wrapper>
-      </clr-radio-container>
-      <p style="color:red;">{{errorMsg}}</p>
-      <clr-datagrid *ngIf="mountType === '1'" [(clrDgSingleSelected)]="checkHost" [clrDgLoading]="isLoading">
-        <clr-dg-column hidden></clr-dg-column>
-        <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
-        <clr-dg-column [clrDgField]="'type'">{{'vmfs.type' | translate}}</clr-dg-column>
-        <clr-dg-row *clrDgItems="let item of hostList" [clrDgItem]="item">
-          <clr-dg-cell hidden>{{item.deviceId}}</clr-dg-cell>
-          <clr-dg-cell>{{item.hostName}}</clr-dg-cell>
-          <clr-dg-cell>{{'vmfs.host' | translate}}</clr-dg-cell>
-        </clr-dg-row>
-      </clr-datagrid>
-      <clr-datagrid *ngIf="mountType === '2'" [(clrDgSingleSelected)]="checkCluster" Loading]="isLoading">
-        <clr-dg-column hidden></clr-dg-column>
-        <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
-        <clr-dg-column [clrDgField]="'type'">{{'vmfs.type' | translate}}</clr-dg-column>
-        <clr-dg-row *clrDgItems="let item of clusterList" [clrDgItem]="item">
-          <clr-dg-cell hidden>{{item.deviceId}}</clr-dg-cell>
-          <clr-dg-cell>{{item.clusterName}}</clr-dg-cell>
-          <clr-dg-cell>{{'vmfs.cluster' | translate}}</clr-dg-cell>
-        </clr-dg-row>
-      </clr-datagrid>
+      <form clrForm>
+        <p *ngIf="errorMsg" style="color: red">{{'errorMsg.unMountError' | translate}}</p>
+        <clr-select-container>
+          <label>{{'nfs.mountHost' | translate}}</label>
+          <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="hostId"
+                  required name="hostId" class="clr-select">
+            <option *ngFor="let item of hostList" value="{{item.hostId}}">{{item.hostName}}</option>
+          </select>
+        </clr-select-container>
+      </form>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="backToNfsList()">{{'menu.cancel' | translate}}</button>
@@ -42,45 +20,39 @@
     </div>
   </clr-modal>
   <div *ngIf="viewPage=='unmount_vcenter'">
-    <div class="clr-row">
-      <div class="clr-col-lg-4 clr-col-md-6 clr-col-12">
-        <div class="card">
-          <div class="card-header">
-            提示
-          </div>
-          <div class="card-block">
-            <div class="card-text">
-              {{'nfs.unmount.content' | translate}}
-            </div>
-          </div>
-          <div class="card-footer">
-            <button type="button" class="btn btn-outline" (click)="backToNfsList()">{{'menu.cancel' | translate}}</button>
-            <button type="button" class="btn btn-primary" (click)="unMount()">{{'menu.ok' | translate}}</button>
-          </div>
-        </div>
-      </div>
+    <div>
+      <form clrForm>
+        <p *ngIf="errorMsg" style="color: red">{{'errorMsg.unMountError' | translate}}</p>
+        <clr-select-container>
+          <label>{{'nfs.mountHost' | translate}}</label>
+          <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="hostId"
+                  required name="hostId" class="clr-select">
+            <option *ngFor="let item of hostList" value="{{item.hostId}}">{{item.hostName}}</option>
+          </select>
+        </clr-select-container>
+      </form>
+    </div>
+    <div style="float:right;">
+      <button type="button" class="btn btn-outline" (click)="closeModel()">{{'menu.cancel' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="unMount()">{{'menu.ok' | translate}}</button>
     </div>
   </div>
-  <div *ngIf="viewPage=='unmount_hostcluster'">
+  <div *ngIf="viewPage=='unmount_host'">
     <div>
-      <p>请选择卸载的Data Store</p>
-      <p *ngIf="errorMsg" style="color: red">{{errorMsg}}</p>
-      <clr-datagrid [(clrDgSelected)]="rowSelected">
-        <clr-dg-column>{{'nfs.name' | translate}}</clr-dg-column>
-        <clr-dg-column>{{'nfs.status' | translate}}</clr-dg-column>
-        <clr-dg-column>{{'nfs.totalCapacity' | translate}}</clr-dg-column>
-        <clr-dg-column>{{'nfs.freeCapacity' | translate}}</clr-dg-column>
-        <clr-dg-row *ngFor="let item of dataStoreList" [clrDgItem]="item">
-          <clr-dg-cell>{{item.name}}</clr-dg-cell>
-          <clr-dg-cell>{{item.status}}</clr-dg-cell>
-          <clr-dg-cell>{{formatCapacity(item.capacity)}}</clr-dg-cell>
-          <clr-dg-cell>{{formatCapacity(item.freeSpace)}}</clr-dg-cell>
-        </clr-dg-row>
-      </clr-datagrid>
+      <form clrForm>
+        <p *ngIf="errorMsg" style="color: red">{{'errorMsg.unMountError' | translate}}</p>
+        <clr-select-container>
+          <label>{{'nfs.nfsStore' | translate}}</label>
+          <select clrSelect (ngModelOptions)="dataStoreList" [(ngModel)]="dataStoreObjectId"
+                  required name="dataStoreObjectId" class="clr-select" (change)="checkHost()">
+            <option *ngFor="let item of dataStoreList" value="{{item.objectId}}">{{item.name}}</option>
+          </select>
+        </clr-select-container>
+      </form>
     </div>
     <div style="float: right">
       <button type="button" class="btn btn-outline" (click)="closeModel()">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="hostClusterUnmount()">{{'menu.ok' | translate}}</button>
+      <button type="button" class="btn btn-primary" (click)="unMount()">{{'menu.ok' | translate}}</button>
     </div>
   </div>
 </div>

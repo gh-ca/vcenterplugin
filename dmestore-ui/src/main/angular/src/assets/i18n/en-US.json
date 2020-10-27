@@ -96,6 +96,7 @@
     "reduSize":"Reduction Size",
     "ops":"OPS",
     "bandwidth":"Bandwidth",
+    "nfsStore":"NFS DataStore",
     "respRt":"Response Time-Read(ms)",
     "respWt":"Response Time-Write(ms)",
     "logic":{
@@ -669,5 +670,14 @@
       "block":"Block",
       "file":"File"
      }
+  },
+  "errorMsg":{
+    "mountError":"Mount failed!Please contact management!",
+    "unMountError":"UnMount failed!Please contact management!",
+    "expandError":"Expand failed!Please contact management!",
+    "reduceError":"Reduce failed!Please contact management!",
+    "deleteError":"Delete failed!Please contact management!",
+    "addError":"Delete failed!Please contact management!",
+    "modifyError":"Delete failed!Please contact management!"
   }
 }
