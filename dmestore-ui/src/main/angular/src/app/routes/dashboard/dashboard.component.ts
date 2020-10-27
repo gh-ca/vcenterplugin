@@ -64,6 +64,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   connectAlertFail = false;
   connectModel = { hostIp: '', hostPort: '', userName: '', password: ''};
   hostModel = { hostIp: '', hostPort: ''};
+
+  bestShowLoading = true;
+  top5ShowLoading = true;
+
   connectForm = new FormGroup({
     port: new FormControl('', [
         Validators.required,
@@ -122,7 +126,9 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   // //type 0 :VMFS and NFS, 1:VMFS, 2:NFS
   loadTop5DataStore(type: string, name: string){
     this.top5dataStoreName = this.translateService.instant(name);
+    this.top5ShowLoading = true;
     this.http.get('overview/getdatastoretopn', { params: {type: type}}).subscribe((result: any) => {
+      this.top5ShowLoading = false;
       if (result.code === '200'){
         result.data.forEach((item) => {
           item.totalCapacity = item.totalCapacity.toFixed(2);
@@ -203,7 +209,9 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadBestPracticeViolations(){
+    this.bestShowLoading = true;
     this.http.get('overview/getbestpracticeviolations', {}).subscribe((result: any) => {
+      this.bestShowLoading = false;
       if (result.code === '200'){
         this.bestPracticeViolations = result.data;
         this.cdr.detectChanges();

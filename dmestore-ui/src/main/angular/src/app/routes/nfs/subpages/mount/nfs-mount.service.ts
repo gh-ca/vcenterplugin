@@ -20,6 +20,10 @@ export class NfsMountService{
   mountNfs(params= {}){
     return this.http.post('accessnfs/mountnfs', params);
   }
+  //获取主机对应的虚拟ip列表
+  getVmkernelListByObjectId(hostObjectId:string){
+    return this.http.get('accessvmware/getvmkernelipbyhostobjectid',{params: {hostObjectId}} );
+  }
 }
 export class DataStore{
   freeSpace:string;
@@ -29,4 +33,19 @@ export class DataStore{
   objectId: string;
   status: string;
   capacity: string;
+}
+export class Vmkernel{
+  portgroup: string;
+  ipAddress: string;
+  device: string;
+  key: string;
+  mac: string;
+}
+export class Mount{
+  dataStoreName: string;
+  dataStoreObjectId: string;
+  hosts: string[];
+  clusters: string[];
+  mountType: string;
+  vkernelIp:string;//  虚拟网卡ip
 }
