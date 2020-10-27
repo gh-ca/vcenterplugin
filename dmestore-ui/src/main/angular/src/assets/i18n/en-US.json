@@ -585,7 +585,12 @@
     "default": "Default",
     "enable": "Enable",
     "disable": "Disable",
-    "host": "Host"
+    "host": "Host",
+
+    "atOne": "Please Select one!",
+    "bandNotNull": "BandWidth not be empty!",
+    "IOPSNotNull": "IOPS not be empty!",
+    "latencyNotNull": "Latency not be empty!"
   },
   "tier": {
     "name": "Name",

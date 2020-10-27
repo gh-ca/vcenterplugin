@@ -227,11 +227,11 @@
               <clr-radio-container clrInline *ngIf="policyEnable.qosPolicy">
                 <label class="floatleft">{{'rdm.controlP' | translate}}<span style="color: red">*</span></label>
                 <clr-radio-wrapper>
-                  <input type="radio" clrRadio name="control_policy" required value="1" [(ngModel)]="configModel.tuning.smartqos.control_policy" />
+                  <input type="radio" clrRadio name="control_policy" required value="1" (change)="changeQosRedio()" [(ngModel)]="configModel.tuning.smartqos.control_policy" />
                   <label>{{'rdm.uLimit' | translate}}</label>
                 </clr-radio-wrapper>
                 <clr-radio-wrapper>
-                  <input type="radio" clrRadio name="control_policy" required value="0" [(ngModel)]="configModel.tuning.smartqos.control_policy" />
+                  <input type="radio" clrRadio name="control_policy" required value="0" (change)="changeQosRedio()" [(ngModel)]="configModel.tuning.smartqos.control_policy" />
                   <label>{{'rdm.lLimit' | translate}}</label>
                 </clr-radio-wrapper>
               </clr-radio-container>
@@ -240,38 +240,55 @@
                 <clr-checkbox-container *ngIf="configModel.tuning.smartqos.control_policy==='1'">
                   <label>{{'rdm.trafficC' | translate}}<span style="color: red">*</span></label>
                   <clr-checkbox-wrapper>
-                    <input type="checkbox" clrCheckbox name="c1" [(ngModel)]="options1"/>
-                    <label>{{'rdm.bandwidth' | translate}} <= <input class="inputOneLine" name="Brandwidth" [(ngModel)]="configModel.tuning.smartqos.maxbandwidth"/> MB/s
+                    <input type="checkbox" clrCheckbox name="c1" [(ngModel)]="options1" (change)="changeQosInput('box')"/>
+                    <label>{{'rdm.bandwidth' | translate}} <=
+                         <input class="inputOneLine" disabled="{{!options1}}" name="Brandwidth" [(ngModel)]="configModel.tuning.smartqos.maxbandwidth"
+                                (change)="changeQosInput('band')"
+                                onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/> MB/s
                     </label>
                   </clr-checkbox-wrapper>
                   <clr-checkbox-wrapper>
-                    <input type="checkbox" clrCheckbox name="c2" required [(ngModel)]="options2"/>
-                    <label>IOPS <= <input class="inputOneLine" name="IOPS" [(ngModel)]="configModel.tuning.smartqos.maxiops"/>
+                    <input type="checkbox" clrCheckbox name="c2" [(ngModel)]="options2" (change)="changeQosInput('box')"/>
+                    <label>IOPS <=
+                         <input class="inputOneLine" disabled="{{!options2}}" name="IOPS" [(ngModel)]="configModel.tuning.smartqos.maxiops"
+                                (change)="changeQosInput('iops')"
+                                onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/>
                     </label>
                   </clr-checkbox-wrapper>
-                  <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
                 </clr-checkbox-container>
-
                 <clr-checkbox-container *ngIf="configModel.tuning.smartqos.control_policy==='0'">
                   <label>{{'rdm.trafficC' | translate}}<span style="color: red">*</span></label>
                   <clr-checkbox-wrapper>
-                    <input type="checkbox" clrCheckbox name="c3" required [(ngModel)]="options3"/>
-                    <label>{{'rdm.bandwidth' | translate}} >= <input class="inputOneLine" name="Brandwidth" [(ngModel)]="configModel.tuning.smartqos.minbandwidth"/> MB/s
+                    <input type="checkbox" clrCheckbox  name="c3"  [(ngModel)]="options3" (change)="changeQosInput('box')"/>
+                    <label>{{'rdm.bandwidth' | translate}} >=
+                         <input class="inputOneLine" disabled="{{!options3}}" name="Brandwidth" [(ngModel)]="configModel.tuning.smartqos.minbandwidth"
+                                (change)="changeQosInput('band')"
+                                onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/> MB/s
                     </label>
                   </clr-checkbox-wrapper>
                   <clr-checkbox-wrapper>
-                    <input type="checkbox" clrCheckbox name="c4" required [(ngModel)]="options4"/>
-                    <label>IOPS >= <input class="inputOneLine" name="IOPS" [(ngModel)]="configModel.tuning.smartqos.miniops"/>
+                    <input type="checkbox" clrCheckbox name="c4"  [(ngModel)]="options4" (change)="changeQosInput('box')"/>
+                    <label>IOPS >=
+                         <input class="inputOneLine" disabled="{{!options4}}" name="IOPS" [(ngModel)]="configModel.tuning.smartqos.miniops"
+                                (change)="changeQosInput('iops')"
+                                onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/>
                     </label>
                   </clr-checkbox-wrapper>
                   <clr-checkbox-wrapper>
-                    <input type="checkbox" clrCheckbox name="c5" required [(ngModel)]="options5"/>
-                    <label>{{'rdm.latency' | translate}} <= <input class="inputOneLine" name="Latency" [(ngModel)]="configModel.tuning.smartqos.latency"/> ms
+                    <input type="checkbox" clrCheckbox name="c5"  [(ngModel)]="options5" (change)="changeQosInput('box')"/>
+                    <label>{{'rdm.latency' | translate}} <=
+                        <input class="inputOneLine" disabled="{{!options5}}" name="Latency" [(ngModel)]="configModel.tuning.smartqos.latency"
+                               (change)="changeQosInput('latency')"
+                               onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/> ms
                     </label>
                   </clr-checkbox-wrapper>
-                  <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
                 </clr-checkbox-container>
-
+                <div style="margin-left: 150px">
+                  <div [hidden]="!qos1Show"><span style="color: #C7381F;">{{'rdm.atOne'| translate}}</span></div>
+                  <div [hidden]="!qos2Show"><span style="color: #C7381F;">{{'rdm.bandNotNull'| translate}}</span></div>
+                  <div [hidden]="!qos3Show"><span style="color: #C7381F;">{{'rdm.IOPSNotNull'| translate}}</span></div>
+                  <div [hidden]="!qos4Show"><span style="color: #C7381F;">{{'rdm.latencyNotNull'| translate}}</span></div>
+                </div>
               </div>
 
               <!-- Resource Tuning -->
