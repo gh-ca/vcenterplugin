@@ -74,34 +74,41 @@
             <clr-dg-cell [hidden]="radioCheck!=='table1'">
 
               <span *ngIf="item.status == 0">
-                <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>{{'storage.list.offLine' | translate}}
+                <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>
+                <span>{{'storage.list.offLine' | translate}}</span>
               </span>
               <span *ngIf="item.status == 1">
-                <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px;"></span>{{'storage.list.normal' | translate}}
+                <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px;"></span>
+                <span>{{'storage.list.normal' | translate}}</span>
               </span>
               <span *ngIf="item.status == 2">
-                <span class="color-square" style="background-color: red; margin-right: 10px"></span>{{'storage.list.fault' | translate}}
+                <span class="color-square" style="background-color: red; margin-right: 10px"></span>
+                <span>{{'storage.list.fault' | translate}}</span>
               </span>
               <span *ngIf="item.status == 9">
-                <span class="color-square" style="background-color: yellow; margin-right: 10px"></span>{{'storage.list.notMgr' | translate}}
+                <span class="color-square" style="background-color: yellow; margin-right: 10px"></span>
+                <span>{{'storage.list.notMgr' | translate}}</span>
               </span>
               <span *ngIf="!item.status">
-                <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>--
+                <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>
+                <span>--</span>
               </span>
               <br/>
               <span *ngIf="item.synStatus == 0">
-                <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>{{'storage.list.notSync' | translate}}
+                <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>
+                <span>{{'storage.list.notSync' | translate}}</span>
               </span>
               <span *ngIf="item.synStatus == 1">
                 <span class="color-square" style="background-color: #00BFFF; margin-right: 10px"></span>
-                {{'storage.list.inSync' | translate}}
+                <span>{{'storage.list.inSync' | translate}}</span>
               </span>
               <span *ngIf="item.synStatus == 2">
                 <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>
-                {{'storage.list.synced' | translate}}
+                <span>{{'storage.list.synced' | translate}}</span>
               </span>
               <span *ngIf="!item.synStatus">
-                <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>--
+                <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>
+                <span>--</span>
               </span>
             </clr-dg-cell>
 
