@@ -240,34 +240,36 @@
                 <clr-checkbox-container *ngIf="configModel.tuning.smartqos.control_policy==='1'">
                   <label>{{'rdm.trafficC' | translate}}<span style="color: red">*</span></label>
                   <clr-checkbox-wrapper>
-                    <input type="checkbox" clrCheckbox/>
+                    <input type="checkbox" clrCheckbox name="c1" [(ngModel)]="options1"/>
                     <label>{{'rdm.bandwidth' | translate}} <= <input class="inputOneLine" name="Brandwidth" [(ngModel)]="configModel.tuning.smartqos.maxbandwidth"/> MB/s
                     </label>
                   </clr-checkbox-wrapper>
                   <clr-checkbox-wrapper>
-                    <input type="checkbox" clrCheckbox/>
+                    <input type="checkbox" clrCheckbox name="c2" required [(ngModel)]="options2"/>
                     <label>IOPS <= <input class="inputOneLine" name="IOPS" [(ngModel)]="configModel.tuning.smartqos.maxiops"/>
                     </label>
                   </clr-checkbox-wrapper>
+                  <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
                 </clr-checkbox-container>
 
                 <clr-checkbox-container *ngIf="configModel.tuning.smartqos.control_policy==='0'">
                   <label>{{'rdm.trafficC' | translate}}<span style="color: red">*</span></label>
                   <clr-checkbox-wrapper>
-                    <input type="checkbox" clrCheckbox/>
+                    <input type="checkbox" clrCheckbox name="c3" required [(ngModel)]="options3"/>
                     <label>{{'rdm.bandwidth' | translate}} >= <input class="inputOneLine" name="Brandwidth" [(ngModel)]="configModel.tuning.smartqos.minbandwidth"/> MB/s
                     </label>
                   </clr-checkbox-wrapper>
                   <clr-checkbox-wrapper>
-                    <input type="checkbox" clrCheckbox/>
+                    <input type="checkbox" clrCheckbox name="c4" required [(ngModel)]="options4"/>
                     <label>IOPS >= <input class="inputOneLine" name="IOPS" [(ngModel)]="configModel.tuning.smartqos.miniops"/>
                     </label>
                   </clr-checkbox-wrapper>
                   <clr-checkbox-wrapper>
-                    <input type="checkbox" clrCheckbox/>
+                    <input type="checkbox" clrCheckbox name="c5" required [(ngModel)]="options5"/>
                     <label>{{'rdm.latency' | translate}} <= <input class="inputOneLine" name="Latency" [(ngModel)]="configModel.tuning.smartqos.latency"/> ms
                     </label>
                   </clr-checkbox-wrapper>
+                  <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
                 </clr-checkbox-container>
 
               </div>
