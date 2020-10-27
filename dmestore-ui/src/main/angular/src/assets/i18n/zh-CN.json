@@ -245,7 +245,8 @@
       "title":"卸载",
       "content":"确认要卸载吗?",
       "notChooseDeviceTips":"请选择需要卸载的主机或集群！",
-      "notChooseDataStoreTips":"请选择需要卸载的DataStore！"
+      "notChooseDataStoreTips":"请选择需要卸载的DataStore！",
+      "tips":"若VMFS所挂载的主机/集群全部被卸载，则会自动删除此VMFS设备！"
     },
     "reclaim": {
       "title":"提示",

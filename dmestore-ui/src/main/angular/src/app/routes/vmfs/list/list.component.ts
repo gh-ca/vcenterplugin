@@ -77,7 +77,7 @@ export class VmfsListComponent implements OnInit {
   mountShow = false; // 挂载窗口
   delShow = false; // 删除窗口
   unmountShow = false; // 卸载窗口
-  unmountTipsShow = false; // 卸载提示窗口
+  unmountTipsShow = false; // 卸载窗口
   reclaimShow = false; // 空间回收窗口
   changeServiceLevelShow = false; // 变更服务等级
   expandShow = false; // 变更服务等级
@@ -735,8 +735,14 @@ export class VmfsListComponent implements OnInit {
       this.unmountShow = true;
     }
   }
+
+  // 卸载确认
+  unMountConfirm() {
+    this.unmountTipsShow = true;
+  }
   // 卸载处理函数
   unmountHandleFunc() {
+    this.unmountTipsShow = false;
     console.log('this.chooseUnmountHost', this.chooseUnmountHost);
     console.log('this.chooseUnmountCluster', this.chooseUnmountCluster);
     console.log('this.flag', (!this.chooseUnmountHost && this.unmountForm.mountType === '1') || (!this.chooseUnmountCluster && this.unmountForm.mountType === '2'));

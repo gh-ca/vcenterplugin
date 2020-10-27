@@ -14,7 +14,7 @@ import {Router} from "@angular/router";
   templateUrl: './nfs.component.html',
   styleUrls: ['./nfs.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [NfsService, GlobalsService, StorageService,VmfsListService],
+  providers: [NfsService,StorageService,VmfsListService],
 })
 export class NfsComponent implements OnInit {
   list: List[] = []; // 数据列表
@@ -40,6 +40,7 @@ export class NfsComponent implements OnInit {
   constructor(private remoteSrv: NfsService, private cdr: ChangeDetectorRef, public gs: GlobalsService ,
               private storageService: StorageService,private vmfsListService: VmfsListService,private router:Router) { }
   ngOnInit(): void {
+    this.getNfsList();
   }
   // 获取nfs列表
   getNfsList() {
@@ -134,6 +135,14 @@ export class NfsComponent implements OnInit {
   // 挂载
   mount(){
     this.jumpPage(this.rowSelected[0].objectid,"nfs/dataStore/mount");
+    const flag = 'plugin';
+    const objectId=this.rowSelected[0].objectid;
+    const dsName=this.rowSelected[0].name;
+    this.router.navigate(["nfs/dataStore/mount"],{
+      queryParams:{
+        objectId,flag,dsName
+      }
+    });
   }
   jumpPage(objectId:string,url:string){
     const flag = 'plugin';
@@ -179,7 +188,9 @@ export class NfsComponent implements OnInit {
   }
   // 点刷新那个功能是分两步，一步是刷新，然后等我们这边的扫描任务，任务完成后返回你状态，任务成功后，你再刷新列表页面。
   scanDataStore() {
+    this.isLoading = true;
     this.vmfsListService.scanVMFS('nfs').subscribe((res: any) => {
+      this.isLoading = false;
       if (res.code === '200') {
         this.getNfsList();
         console.log('Scan success');

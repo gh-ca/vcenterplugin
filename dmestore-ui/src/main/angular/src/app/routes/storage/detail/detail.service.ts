@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {CapacityChart} from "../storage.service";
-import {Warnings} from "@angular/cli/lib/config/schema";
 
 @Injectable()
 export class DetailService {

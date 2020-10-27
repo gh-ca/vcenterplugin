@@ -163,14 +163,15 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         List<NfsDataStoreFsAttr> list = new ArrayList<>();
         for (int i = 0; i < fsIds.size(); i++) {
             NfsDataStoreFsAttr fsAttr = new NfsDataStoreFsAttr();
-            String file_system_id = fsIds.get(i);
-            if (StringUtils.isEmpty(file_system_id)) {
+            String fileSystemId = fsIds.get(i);
+            if (StringUtils.isEmpty(fileSystemId)) {
                 continue;
             }
             String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL,
-                    "file_system_id", file_system_id);
+                    "file_system_id", fileSystemId);
             ResponseEntity<String> responseTuning = dmeAccessService.access(url, HttpMethod.GET, null);
             if (responseTuning.getStatusCodeValue() / 100 == 2) {
+                fsAttr.setFileSystemId(fileSystemId);
                 JsonObject fsDetail = gson.fromJson(responseTuning.getBody(), JsonObject.class);
                 fsAttr.setName(fsDetail.get("name").getAsString());
                 fsAttr.setProvisionType(fsDetail.get("alloc_type").getAsString());
@@ -179,9 +180,11 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 fsAttr.setController(fsDetail.get("owning_controller").getAsString());
                 //查询详情，获取tuning信息
                 JsonObject tuning = fsDetail.getAsJsonObject("tuning");
-                fsAttr.setApplicationScenario(tuning.get("application_scenario").getAsString());
-                fsAttr.setDataDeduplication(tuning.get("deduplication_enabled").getAsBoolean());
-                fsAttr.setDateCompression(tuning.get("compression_enabled").getAsBoolean());
+                if(tuning.isJsonNull()){
+                    fsAttr.setApplicationScenario(ToolUtils.jsonToStr(tuning.get("application_scenario"), null));
+                    fsAttr.setDataDeduplication(ToolUtils.jsonToBoo(tuning.get("deduplication_enabled"), null));
+                    fsAttr.setDateCompression(ToolUtils.jsonToBoo(tuning.get("compression_enabled"), null));
+                }
                 list.add(fsAttr);
             }
         }
@@ -649,7 +652,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     /**
      * Mount nfs,params中包含了 include:
      *  dataStoreObjectId: datastore的object id
-     *  logicPortIp:存储逻辑端口IP
+     *  logicPortIp:存储逻辑端口IP  暂时不需要
      * hostObjectId:主机objectid
      * hostVkernelIp:主机vkernelip
      * str mountType: 挂载模式（只读或读写）  readOnly/readWrite
@@ -683,9 +686,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                             String hostObjectId=null;
                             String logicPortIp=null;
                             //String mountType = null;
-                            if (params.get("hostObjectId") != null&&null!=params.get("hostVkernelIp")) {
+                            if (params.get("hostObjectId") != null) {
                                 hostObjectId= ToolUtils.getStr(params.get("hostObjectId"));
-                                logicPortIp= ToolUtils.getStr( params.get("logicPortIp"));
+                                //logicPortIp= ToolUtils.getStr( params.get("logicPortIp"));
                             }
                         /*if (params.get("clusters") != null) {
                             clusters = (List<Map<String, String>>) params.get("clusters");

@@ -82,6 +82,7 @@ export class NfsAddComponent implements OnInit{
     this.wizard.open();
   }
   addNfs(){
+    this.wizard.open();
     this.gs.loading=true;
     this.addForm.poolRawId=this.checkedPool.diskPoolId;
     this.addForm.storagePoolId= this.checkedPool.id;
@@ -99,8 +100,6 @@ export class NfsAddComponent implements OnInit{
       default: // 默认GB 不变
         break;
     }
-    console.log('提交参数：')
-    console.log(this.addForm);
     this.addService.addNfs(this.addForm).subscribe((result: any) => {
       this.gs.loading=false;
       if (result.code === '200'){
@@ -111,10 +110,12 @@ export class NfsAddComponent implements OnInit{
         }
       }else{
         this.errorMsg = '添加失败！'+result.description;
+        this.cdr.detectChanges();
       }
     });
   }
   selectStoragePool(){
+    this.gs.loading=true;
     this.storagePools = null;
     this.logicPorts = null;
     // 选择存储后获取存储池
@@ -122,6 +123,7 @@ export class NfsAddComponent implements OnInit{
       .subscribe((r: any) => {
         if (r.code === '200'){
           this.storagePools = r.data;
+          this.cdr.detectChanges();
         }
       });
     this.selectLogicPort();
@@ -130,21 +132,25 @@ export class NfsAddComponent implements OnInit{
     // 选择存储后逻辑端口
     this.storageService.getLogicPortListByStorageId(this.addForm.storagId)
       .subscribe((r: any) => {
+        this.gs.loading=false;
         if (r.code === '200'){
           this.logicPorts = r.data;
+          this.cdr.detectChanges();
         }
       });
   }
   checkHost(){
+    this.gs.loading=true;
     this.addForm.vkernelIp=null;
     //选择主机后获取虚拟网卡
     this.addService.getVmkernelListByObjectId(this.addForm.hostObjectId)
       .subscribe((r: any) => {
+        this.gs.loading=false;
         if (r.code === '200'){
           this.vmkernelList = r.data;
+          this.cdr.detectChanges();
         }
       });
-    this.selectLogicPort();
   }
   backToNfsList(){
     this.gs.loading=false;
@@ -156,3 +162,4 @@ export class NfsAddComponent implements OnInit{
   }
 
 }
+
