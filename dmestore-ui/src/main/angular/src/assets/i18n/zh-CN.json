@@ -593,7 +593,12 @@
     "default": "默认",
     "enable": "启用",
     "disable": "禁用",
-    "host": "主机"
+    "host": "主机",
+
+    "atOne": "请至少选择一项！",
+    "bandNotNull": "带宽不能为空！",
+    "IOPSNotNull": "IOPS不能为空！",
+    "latencyNotNull": "时延不能为空！"
   },
   "tier": {
     "name": "名称",
