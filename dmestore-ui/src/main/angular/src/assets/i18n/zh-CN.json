@@ -226,6 +226,7 @@
     "capacityTips": "若版本为VMFS5则容量最小值为1.3G，若版本为VMFS6则容量最小值为2G。",
     "serviceLevelCantBeNull": "服务等级是必选项，且只能选择容量不为0的服务等级！",
     "expandTips": "扩容容量只能为正整数,且最小单位为GB。",
+    "loadingTips": "数据加载中，请稍后",
     "mount":{
       "mount":"挂载",
       "host":"主机",

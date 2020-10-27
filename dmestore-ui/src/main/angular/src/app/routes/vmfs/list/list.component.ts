@@ -71,7 +71,7 @@ export class VmfsListComponent implements OnInit {
   blockSizeOptions = []; // 块大小选择
   srgOptions = []; // 空间回收粒度初始化
   deviceList: HostOrCluster[] = []; // 主机AND集群
-  chooseDevice; // 已选择的主机/集群
+  chooseDevice: HostOrCluster; // 已选择的主机/集群
 
   serviceLevelList: ServiceLevelList[] = []; // 服务等级列表
   mountShow = false; // 挂载窗口
@@ -100,6 +100,9 @@ export class VmfsListComponent implements OnInit {
   mountHostData = true; // 挂载页面主机是否加载完毕 true是 false否
   mountClusterData = true; // 挂载页面集群是否加载完毕 true是 false否
   serviceLevelIsNull = false; // 未选择服务等级true未选择 false选择 添加、服务登记变更
+
+  modalLoading = true; // 弹窗加载
+
   ngOnInit() {
     // 列表数据
     this.refresh();
@@ -305,13 +308,13 @@ export class VmfsListComponent implements OnInit {
   setDeviceList() {
     // 初始化数据
     this.deviceList = [];
-    const nullDevice =  {
-      deviceId: '',
-      deviceName: '',
-      deviceType: '',
-    };
-    this.deviceList.push(nullDevice);
-    this.chooseDevice = this.deviceList[0];
+    // const nullDevice =  {
+    //   deviceId: '',
+    //   deviceName: '',
+    //   deviceType: '',
+    // };
+    // this.deviceList.push(nullDevice);
+    this.chooseDevice = undefined;
 
     console.log('this.chooseDevice', this.chooseDevice);
     // 初始添加页面的主机集群信息
@@ -376,6 +379,9 @@ export class VmfsListComponent implements OnInit {
   }
   // 点击addBtn触发事件
   addBtnClickFunc() {
+    // 展示loading
+    this.modalLoading = true;
+
     // 初始化表单
     this.form = new GetForm().getAddForm();
     // 添加页面显示
@@ -418,8 +424,10 @@ export class VmfsListComponent implements OnInit {
         this.serviceLevelList = result.data.filter(item => item.totalCapacity !== 0);
         // this.serviceLevelList = result.data;
         console.log('this.serviceLevelList', this.serviceLevelList);
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
+      // 隐藏loading
+      this.modalLoading = false;
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
   // 添加vmfs 处理

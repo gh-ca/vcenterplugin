@@ -1,6 +1,7 @@
 <div>
   <!--以主机或集群为入口 挂载/卸载-->
-  <clr-modal class="add-wizard-wrap" [(clrModalOpen)]="hostMountShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
+<!--  <clr-modal class="add-wizard-wrap" [(clrModalOpen)]="hostMountShow" [clrModalSize]="'lg'" [clrModalClosable]="false">-->
+  <div *ngIf="hostMountShow">
     <div class="modal-body">
       <form clrForm *ngIf="resource === 'others'">
         <div *ngIf="notChooseMountDevice" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.mount.notChooseDataStoreTips' | translate}}</div>
@@ -29,12 +30,14 @@
       <button type="button" class="btn btn-outline" (click)="cancel();">{{'menu.cancel' | translate}}</button>
       <button type="button" class="btn btn-primary" (click)="mountOrUnmountFunc();">{{'menu.ok' | translate}}</button>
     </div>
-  </clr-modal>
+  </div>
+<!--  </clr-modal>-->
 
 
   <!--以列表或dataStore为入口 挂载-->
-  <clr-modal class="add-wizard-wrap" [(clrModalOpen)]="mountShow" [clrModalClosable]="false">
-    <div class="modal-body">
+<!--  <clr-modal class="add-wizard-wrap" [(clrModalOpen)]="mountShow" [clrModalClosable]="false">-->
+  <div *ngIf="mountShow">
+    <div class="modal-body" *ngIf="mountShow">
       <form clrForm>
         <clr-input-container>
           <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
@@ -82,10 +85,12 @@
       <button type="button" class="btn btn-outline" (click)="cancel();">{{'menu.cancel' | translate}}</button>
       <button type="button" class="btn btn-primary" (click)="mountOrUnmountFunc()">{{'menu.ok' | translate}}</button>
     </div>
-  </clr-modal>
+  </div>
+<!--  </clr-modal>-->
 
   <!--以列表或dataStore为入口 卸载-->
-  <clr-modal class="add-wizard-wrap" [(clrModalOpen)]="unmountShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
+<!--  <clr-modal class="add-wizard-wrap" [(clrModalOpen)]="unmountShow" [clrModalSize]="'lg'" [clrModalClosable]="false">-->
+  <div *ngIf="unmountShow">
     <div class="modal-body">
       <form clrForm >
         <div *ngIf="notChooseUnmountDevice" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.unmount.notChooseDeviceTips' | translate}}</div>
@@ -132,6 +137,7 @@
       <button type="button" class="btn btn-outline" (click)="cancel();">{{'menu.cancel' | translate}}</button>
       <button type="button" class="btn btn-primary" (click)="mountOrUnmountFunc();">{{'menu.ok' | translate}}</button>
     </div>
-  </clr-modal>
+  </div>
+<!--  </clr-modal>-->
 </div>
 
