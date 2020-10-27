@@ -2,16 +2,16 @@
 <clr-wizard class="add-wizard-wrap" #wizard [clrWizardOpen]="true" [clrWizardClosable]="false">
   <clr-wizard-title style="font-weight: bolder">{{'vmfs.addTitle' | translate}}</clr-wizard-title>
 
-  <clr-wizard-button [type]="'cancel'" (click)="cancel();" >{{'menu.cancel' | translate}}</clr-wizard-button>
-  <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>
-  <clr-wizard-button [type]="'next'">{{'menu.next' | translate}}</clr-wizard-button>
-  <clr-wizard-button (click)="addVmfsHanlde();" [type]="'finish'">{{'menu.ok' | translate}}</clr-wizard-button>
+<!--  <clr-wizard-button [type]="'cancel'" (click)="cancel();" >{{'menu.cancel' | translate}}</clr-wizard-button>-->
+<!--  <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>-->
+<!--  <clr-wizard-button [type]="'next'">{{'menu.next' | translate}}</clr-wizard-button>-->
+<!--  <clr-wizard-button (click)="addVmfsHanlde();" [type]="'finish'">{{'menu.ok' | translate}}</clr-wizard-button>-->
 
-  <div *ngIf="modalLoading" class="loadingDiv">
-      <span>
-        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
-      </span>
-  </div>
+<!--  <div *ngIf="modalLoading" class="loadingDiv">-->
+<!--      <span>-->
+<!--        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">-->
+<!--      </span>-->
+<!--  </div>-->
   <!--Page1 -->
   <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="name.pristine || !formPageOne.valid">
     <ng-template clrPageTitle>{{'vmfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
@@ -53,16 +53,15 @@
         <div clrInput style="float: left;width: 54%;position: relative;">
           <!-- V5时最小值1.3G V6时最小值2G-->
           <input clrInput style="width: 60%;border-bottom: none" type="number" [(ngModel)]="form.capacity" name="capacity" #number="ngModel"
-                 (keyup)="capacityChange($event.target)" required/>
+                 (blur)="capacityOnblur()" required/>
           <select class="capacity" (change)="form.capacity = null;" clrInput style="width: 40%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;" [(ngModel)]="form.capacityUnit" name="capacityUnit" >
             <option value="TB">TB</option>
             <option value="GB">GB</option>
             <option value="MB">MB</option>
-            <option value="KB">KB</option>
           </select>
         </div>
         <input clrInput style="width: 19%;text-align: center;" readonly value="{{'vmfs.multiply' | translate}}">
-        <input clrInput style="width: 27%;" type="number" [(ngModel)]="form.count" name="count" #number="ngModel" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" required/>
+        <input clrInput (blur)="countBlur();" style="width: 27%;" type="number" [(ngModel)]="form.count" name="count" #number="ngModel" required/>
         <clr-control-helper><clr-icon shape="exclamation-circle"></clr-icon>{{'vmfs.capacityTips' | translate}}</clr-control-helper>
         <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-input-container>
@@ -111,6 +110,10 @@
         <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-combobox-container>
     </form>
+    <ng-template clrPageButtons>
+      <clr-wizard-button [type]="'cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
+      <clr-wizard-button (click)="addNextPage();" [type]="'custom-next'">{{'menu.next' | translate}}</clr-wizard-button>
+    </ng-template>
   </clr-wizard-page>
   <!--Page2 储存库设置-->
   <clr-wizard-page #addPageTwo [clrWizardPageNextDisabled]="number.pristine || !formPageTwo.valid">
@@ -130,6 +133,7 @@
       </div>
 
     </ng-template>
+
 
     <form clrForm #formPageTwo="ngForm">
       <!-- 1、选择 服务等级-->
@@ -157,30 +161,30 @@
                 <tr>
                   <th hidden></th>
                   <th><clr-progress-bar clrValue="{{(item.usedCapacity/item.totalCapacity * 100 || 0).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
-                  <th *ngIf="item.capabilities.qos !== null
+                  <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
                         && item.capabilities.qos.qosParam.maxBandWidth !== 0">{{'vmfs.bandwidth' | translate}} <= {{item.capabilities.qos.qosParam.maxBandWidth}}MBPS/TB</th>
-                  <th *ngIf="item.capabilities.qos !== null
+                  <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
                         && item.capabilities.qos.qosParam.minBandWidth !== 0">{{'vmfs.bandwidth' | translate}} >= {{item.capabilities.qos.qosParam.minBandWidth}}MBPS/TB</th>
-                  <th *ngIf="item.capabilities.qos !== null
+                  <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
                         && item.capabilities.qos.qosParam.maxIOPS !== 0">{{'vmfs.iops' | translate}} <= {{item.capabilities.qos.qosParam.minIOPS}}IOPS/TB</th>
-                  <th *ngIf="item.capabilities.qos !== null
+                  <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
                         && item.capabilities.qos.qosParam.minIOPS !== 0 ">{{'vmfs.iops' | translate}} >= {{item.capabilities.qos.qosParam.minIOPS}}IOPS/TB</th>
-                  <th *ngIf="item.capabilities.qos === null || item.capabilities.qos.qosParam === null
+                  <th *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos.qosParam === null
                         || (item.capabilities.qos.qosParam.maxBandWidth === 0 && item.capabilities.qos.qosParam.minBandWidth === 0)">--</th>
-                  <th *ngIf="item.capabilities.qos === null || item.capabilities.qos.qosParam === null
+                  <th *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos.qosParam === null
                         || (item.capabilities.qos.qosParam.minIOPS === 0 && item.capabilities.qos.qosParam.maxIOPS === 0)">--</th>
                 </tr>
                 <tr>
                   <th hidden></th>
                   <th>{{formatCapacity(item.usedCapacity, false)}} /{{formatCapacity(item.totalCapacity, false)}}</th>
-                  <th *ngIf="item.capabilities.qos !== null
+                  <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
                         && item.capabilities.qos.qosParam.latency !== 0 ">Latency: {{item.capabilities.qos.qosParam.latency + item.capabilities.qos.qosParam.latencyUnit}}</th>
-                  <th *ngIf="item.capabilities.qos === null || item.capabilities.qos.qosParam === null || item.capabilities.qos.qosParam.latency === 0">--</th>
+                  <th *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos.qosParam === null || item.capabilities.qos.qosParam.latency === 0">--</th>
                 </tr>
                 </tbody>
               </table>
@@ -299,5 +303,10 @@
       </ng-container>
 
     </form>
+    <ng-template clrPageButtons>
+      <clr-wizard-button [type]="'cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
+      <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>
+      <clr-wizard-button (click)="addVmfsHanlde();" [type]="'custom-finish'">{{'menu.ok' | translate}}</clr-wizard-button>
+    </ng-template>
   </clr-wizard-page>
 </clr-wizard>

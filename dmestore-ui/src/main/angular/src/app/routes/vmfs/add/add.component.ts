@@ -67,7 +67,8 @@ export class AddComponent implements OnInit{
 
   initData() {
     // 初始化loading
-    this.modalLoading = true;
+    // this.modalLoading = true;
+    this.globalsService.loading = true;
     // 设备类型 操作类型初始化
     this.route.url.subscribe(url => {
       console.log('url', url);
@@ -91,6 +92,9 @@ export class AddComponent implements OnInit{
 
     // 添加页面默认打开首页
     this.jumpTo(this.addPageOne);
+
+    // 容量设置
+    this.capacityOnblur();
   }
   // 页面跳转
   jumpTo(page: ClrWizardPage) {
@@ -122,6 +126,8 @@ export class AddComponent implements OnInit{
     this.form.blockSize = this.blockSizeOptions[0].key;
     // 重置空间回收粒度
     this.setSrgOptions();
+
+
   }
 
   /**
@@ -143,8 +149,9 @@ export class AddComponent implements OnInit{
     }
     this.srgOptions = options;
     this.form.spaceReclamationGranularity = this.srgOptions[0].key;;
-    console.log('this.form.blockSize:' + this.form.blockSize);
-    console.log('this.form.spaceReclamationGranularity:' + this.form.spaceReclamationGranularity);
+
+    // 容量设置
+    this.capacityOnblur();
   }
 
   // 设置设备数据
@@ -232,7 +239,8 @@ export class AddComponent implements OnInit{
         this.serviceLevelList = result.data.filter(item => item.totalCapacity !== 0);
         console.log('this.serviceLevelList', this.serviceLevelList);
       }
-      this.modalLoading = false;
+      // this.modalLoading = false;
+      this.globalsService.loading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
@@ -333,18 +341,20 @@ export class AddComponent implements OnInit{
         this.form.control_policy = null;
       }
       console.log('addFrom', this.form);
+      // 打开 loading
+      this.globalsService.loading = true;
       this.remoteSrv.createVmfs(this.form).subscribe((result: any) => {
         if (result.code === '200') {
           console.log('创建成功');
         } else {
           console.log('创建失败：' + result.description);
         }
+        this.globalsService.loading = false;
         // 关闭窗口
         this.cancel();
       });
     } else {
       this.serviceLevelIsNull = true;
-      this.wizard.open();
     }
   }
   // 容量单位转换
@@ -412,5 +422,87 @@ export class AddComponent implements OnInit{
       cNum = isGB ? (c/1024/1024).toFixed(3) + 'PB':(c/1024/1024).toFixed(3) + 'TB';
     }
     return cNum;
+  }
+  /**
+   * 容量
+   * @param obj
+   */
+  capacityOnblur() {
+    let capacity = this.form.capacity;
+    if (capacity) {
+      if (capacity.toString().match(/\d+(\.\d{0,2})?/)) {
+        capacity = capacity.toString().match(/\d+(\.\d{0,2})?/)[0];
+      } else {
+        capacity = '';
+      }
+      if (capacity !== '') {
+        if (this.form.capacityUnit === 'TB') {
+          if (this.form.version === '5') {
+            if (capacity < 1.3/1024) {
+              capacity = '';
+            }
+          } else {
+            if (capacity < 2/1024) {
+              capacity = '';
+            }
+          }
+        } else if (this.form.capacityUnit === 'MB') {
+          if (this.form.version === '5') {
+            if (capacity < 1.3*1024) {
+              capacity = '';
+            }
+          } else {
+            if (capacity < 2*1024) {
+              capacity = '';
+            }
+          }
+        } else {
+          if (this.form.version === '5') {
+            if (capacity < 1.3) {
+              capacity = '';
+            }
+          } else {
+            if (capacity < 2) {
+              capacity = '';
+            }
+          }
+        }
+      }
+      if (capacity !== '') {
+        capacity = Number(capacity);
+      }
+      this.form.capacity = capacity;
+    }
+    console.log('this.form.capacityUnit', this.form.capacityUnit);
+    console.log('this.form.capacity', this.form.capacity);
+    console.log('this.form.count', this.form.count);
+  }
+
+  /**
+   * 数量变化
+   */
+  countBlur() {
+    let count = this.form.count;
+    if(count.length==1)
+    {
+      count = count.toString().replace(/[^1-9]/g,'')
+    }
+    else{
+      count = count.toString().replace(/\D/g,'')
+    }
+
+    if (count !== '') {
+      count = Number(count);
+    }
+    this.form.count =  count;
+  }
+
+  /**
+   * add 下一页
+   */
+  addNextPage() {
+    if (this.form.capacity !== '' && this.form.count !== '') {
+      this.wizard.next();
+    }
   }
 }
