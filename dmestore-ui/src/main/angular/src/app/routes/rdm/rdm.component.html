@@ -241,7 +241,7 @@
                   <label>{{'rdm.trafficC' | translate}}<span style="color: red">*</span></label>
                   <clr-checkbox-wrapper>
                     <input type="checkbox" clrCheckbox name="c1" [(ngModel)]="options1" (change)="changeQosInput('box')"/>
-                    <label>{{'rdm.bandwidth' | translate}} <=
+                    <label style="width: 230px">{{'rdm.bandwidth' | translate}} <=
                          <input class="inputOneLine" disabled="{{!options1}}" name="Brandwidth" [(ngModel)]="configModel.tuning.smartqos.maxbandwidth"
                                 (change)="changeQosInput('band')"
                                 onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/> MB/s
@@ -249,7 +249,7 @@
                   </clr-checkbox-wrapper>
                   <clr-checkbox-wrapper>
                     <input type="checkbox" clrCheckbox name="c2" [(ngModel)]="options2" (change)="changeQosInput('box')"/>
-                    <label>IOPS <=
+                    <label style="width: 230px">IOPS <=
                          <input class="inputOneLine" disabled="{{!options2}}" name="IOPS" [(ngModel)]="configModel.tuning.smartqos.maxiops"
                                 (change)="changeQosInput('iops')"
                                 onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/>
@@ -260,7 +260,7 @@
                   <label>{{'rdm.trafficC' | translate}}<span style="color: red">*</span></label>
                   <clr-checkbox-wrapper>
                     <input type="checkbox" clrCheckbox  name="c3"  [(ngModel)]="options3" (change)="changeQosInput('box')"/>
-                    <label>{{'rdm.bandwidth' | translate}} >=
+                    <label style="width: 230px">{{'rdm.bandwidth' | translate}} >=
                          <input class="inputOneLine" disabled="{{!options3}}" name="Brandwidth" [(ngModel)]="configModel.tuning.smartqos.minbandwidth"
                                 (change)="changeQosInput('band')"
                                 onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/> MB/s
@@ -268,7 +268,7 @@
                   </clr-checkbox-wrapper>
                   <clr-checkbox-wrapper>
                     <input type="checkbox" clrCheckbox name="c4"  [(ngModel)]="options4" (change)="changeQosInput('box')"/>
-                    <label>IOPS >=
+                    <label style="width: 230px">IOPS >=
                          <input class="inputOneLine" disabled="{{!options4}}" name="IOPS" [(ngModel)]="configModel.tuning.smartqos.miniops"
                                 (change)="changeQosInput('iops')"
                                 onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/>
@@ -276,7 +276,7 @@
                   </clr-checkbox-wrapper>
                   <clr-checkbox-wrapper>
                     <input type="checkbox" clrCheckbox name="c5"  [(ngModel)]="options5" (change)="changeQosInput('box')"/>
-                    <label>{{'rdm.latency' | translate}} <=
+                    <label style="width: 230px">{{'rdm.latency' | translate}} <=
                         <input class="inputOneLine" disabled="{{!options5}}" name="Latency" [(ngModel)]="configModel.tuning.smartqos.latency"
                                (change)="changeQosInput('latency')"
                                onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/> ms
