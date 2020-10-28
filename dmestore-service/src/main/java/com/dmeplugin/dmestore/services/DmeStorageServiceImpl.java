@@ -797,7 +797,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     String poolId = ToolUtils.jsonToStr(element.get("poolId"));
                     storageDisk.setPoolId(poolId);
                     storageDisk.setStorageDeviceId(ToolUtils.jsonToStr(element.get("storageDeviceId")));
-                    storageDisk.setDiskPools(getDiskPoolByPoolId(poolId));
+                    //storageDisk.setDiskPools(getDiskPoolByPoolId(poolId));
+                    storageDisk.setDiskDomain(getDiskPoolByPoolId(poolId).getName());
                     if(null!=storageDiskMap.get(storageDisk.getId()))
                     {
                         storageDisk.setLantency(storageDiskMap.get(storageDisk.getId()).getLantency());
@@ -1664,10 +1665,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return poolName;
     }
 
-    private List<DiskPool> getDiskPoolByPoolId(String poolId) throws DMEException {
+    private DiskPool getDiskPoolByPoolId(String poolId) throws DMEException {
         String className = "SYS_DiskPool";
         String url = API_INSTANCES_LIST + "/" + className+"?pageSize=1000";
-        List<DiskPool> diskPools = new ArrayList<>(10);
+        DiskPool retdiskPool = new DiskPool();
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
             String object = responseEntity.getBody();
@@ -1703,11 +1704,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 diskPool.setUsageRate(usageCapacityRate);
                 diskPool.setStorageDeviceId(ToolUtils.jsonToStr(element.get("storageDeviceId")));
                 if (poolId.equals(poolId1)) {
-                    diskPools.add(diskPool);
+                    retdiskPool=diskPool;
                 }
             }
         }
-        return diskPools;
+        return retdiskPool;
     }
 
     /**
