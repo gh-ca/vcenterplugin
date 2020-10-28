@@ -229,7 +229,7 @@
     "startTime": "Start Time",
     "endTime": "End Time",
     "timeInputTips": "Please enter start-end time！",
-    "capacityTips": "If the version is VMFS5, the minimum capacity is 1.3G, and if the version is VMFS6, the minimum capacity is 2G.",
+    "capacityTips": "If the version is VMFS5, the minimum capacity is 1G, and if the version is VMFS6, the minimum capacity is 2G.",
     "serviceLevelCantBeNull": "The service level is a must, and you can only choose the service level whose capacity is not 0!",
     "expandTips": "The expansion capacity can only be a positive integer, and the smallest unit is GB.",
     "loadingTips": "Data loading, please wait",

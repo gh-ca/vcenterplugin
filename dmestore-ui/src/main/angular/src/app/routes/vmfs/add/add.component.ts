@@ -357,7 +357,7 @@ export class AddComponent implements OnInit{
       // this.globalsService.loading = true;
       this.modalLoading = true;
       this.remoteSrv.createVmfs(this.form).subscribe((result: any) => {
-        this.modalLoading = true;
+        this.modalLoading = false;
         if (result.code === '200') {
           console.log('创建成功');
         } else {
@@ -365,9 +365,9 @@ export class AddComponent implements OnInit{
           // 失败信息
           this.isOperationErr = true;
         }
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         // 关闭窗口
         this.cancel();
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       });
     } else {
       this.serviceLevelIsNull = true;
