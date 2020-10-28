@@ -123,17 +123,11 @@
   <!-- 弹出form提交框 添加 -->
   <clr-wizard #wizard [(clrWizardOpen)]="popShow" [clrWizardClosable]="false">
     <clr-wizard-title style="font-weight: bolder">{{'vmfs.addTitle' | translate}}</clr-wizard-title>
-
-    <clr-wizard-button [type]="'cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
-    <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>
-    <clr-wizard-button [type]="'next'">{{'menu.next' | translate}}</clr-wizard-button>
-    <clr-wizard-button (click)="addVmfsHanlde();" [type]="'finish'">{{'menu.ok' | translate}}</clr-wizard-button>
-
-    <div *ngIf="modalLoading" class="loadingDiv">
-      <span>
-        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
-      </span>
-    </div>
+<!--    <div *ngIf="modalLoading" class="loadingDiv">-->
+<!--      <span>-->
+<!--        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">-->
+<!--      </span>-->
+<!--    </div>-->
     <!--Page1 -->
     <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="name.pristine || !formPageOne.valid">
         <ng-template clrPageTitle>{{'vmfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
@@ -174,19 +168,17 @@
             <label style="color: #9F9F9F;">{{'vmfs.capacity' | translate}}</label>
               <div clrInput style="float: left;width: 54%;position: relative;">
                 <!-- V5时最小值1.3G V6时最小值2G-->
-                <input clrInput style="width: 60%;border-bottom: none" type="number" [(ngModel)]="form.capacity" name="capacity" #number="ngModel"
-                       (keyup)="capacityChange($event.target)" required/>
+                <input clrInput (blur)="capacityOnblur();" style="width: 60%;border-bottom: none" type="number" [(ngModel)]="form.capacity" name="capacity" #number="ngModel" required/>
                 <select class="capacity" (change)="form.capacity = null;" clrInput style="width: 40%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;" [(ngModel)]="form.capacityUnit" name="capacityUnit" >
                   <option value="TB">TB</option>
                   <option value="GB">GB</option>
                   <option value="MB">MB</option>
-                  <option value="KB">KB</option>
                 </select>
               </div>
               <input clrInput style="width: 19%;text-align: center;" readonly value="{{'vmfs.multiply' | translate}}">
-              <input clrInput style="width: 27%;" type="number" [(ngModel)]="form.count" name="count" #number="ngModel" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" required/>
+              <input clrInput (blur)="countBlur();" style="width: 27%;" type="number" [(ngModel)]="form.count" name="count" #number="ngModel" required/>
               <clr-control-helper><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.capacityTips' | translate}}</clr-control-helper>
-              <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+              <clr-control-error>{{'validations.required' | translate}}：{{'vmfs.capacityTips' | translate}}</clr-control-error>
           </clr-input-container>
 
           <!-- 块大小 -->
@@ -233,6 +225,10 @@
             <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
           </clr-combobox-container>
         </form>
+      <ng-template clrPageButtons>
+        <clr-wizard-button [type]="'cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
+        <clr-wizard-button (click)="addNextPage();" [type]="'custom-next'">{{'menu.next' | translate}}</clr-wizard-button>
+      </ng-template>
     </clr-wizard-page>
     <!--Page2 储存库设置-->
     <clr-wizard-page #addPageTwo [clrWizardPageNextDisabled]="number.pristine || !formPageTwo.valid">
@@ -421,6 +417,11 @@
           </ng-container>
 
         </form>
+      <ng-template clrPageButtons>
+        <clr-wizard-button [type]="'cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
+        <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>
+        <clr-wizard-button (click)="addVmfsHanlde();" [type]="'custom-finish'">{{'menu.ok' | translate}}</clr-wizard-button>
+      </ng-template>
     </clr-wizard-page>
   </clr-wizard>
   <!-- 编辑页面 -->

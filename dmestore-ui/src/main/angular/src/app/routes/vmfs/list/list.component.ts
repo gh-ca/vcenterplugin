@@ -302,6 +302,9 @@ export class VmfsListComponent implements OnInit {
     this.form.spaceReclamationGranularity = this.srgOptions[0].key;
     console.log('this.form.blockSize:' + this.form.blockSize);
     console.log('this.form.spaceReclamationGranularity:' + this.form.spaceReclamationGranularity);
+
+    // 容量设置
+    this.capacityOnblur();
   }
 
   // 设置设备数据
@@ -380,7 +383,8 @@ export class VmfsListComponent implements OnInit {
   // 点击addBtn触发事件
   addBtnClickFunc() {
     // 展示loading
-    this.modalLoading = true;
+    // this.modalLoading = true;
+    this.gs.loading = true;
 
     // 初始化表单
     this.form = new GetForm().getAddForm();
@@ -426,15 +430,16 @@ export class VmfsListComponent implements OnInit {
         console.log('this.serviceLevelList', this.serviceLevelList);
       }
       // 隐藏loading
-      this.modalLoading = false;
+      // this.modalLoading = false;
+      this.gs.loading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
   // 添加vmfs 处理
   addVmfsHanlde() {
+
     const selectResult = this.serviceLevelList.find(item => item.show === true);
     console.log('selectResult', this.levelCheck === 'level' && selectResult);
-    console.log('flagggggg', (this.levelCheck === 'level' && selectResult && selectResult.totalCapacity !== 0) || this.levelCheck !== 'level');
     if ((this.levelCheck === 'level' && selectResult && selectResult.totalCapacity !== 0) || this.levelCheck !== 'level') { // 选择服务等级
       if (selectResult) {
         this.form.service_level_id = selectResult.id;
@@ -476,7 +481,12 @@ export class VmfsListComponent implements OnInit {
         this.form.control_policy = null;
       }
       console.log('addFrom', this.form);
+
+      // 打开 loading
+      this.gs.loading = true;
       this.remoteSrv.createVmfs(this.form).subscribe((result: any) => {
+        // 关闭 loading
+        this.gs.loading = false;
         if (result.code === '200') {
           console.log('创建成功');
           // 重新请求数据
@@ -484,10 +494,12 @@ export class VmfsListComponent implements OnInit {
         } else {
           console.log('创建失败：' + result.description);
         }
+        this.gs.loading = false;
+        // 关闭窗口;
+        this.wizard.close();
       });
     } else {
       this.serviceLevelIsNull = true;
-      this.wizard.open();
     }
   }
 
@@ -922,5 +934,88 @@ export class VmfsListComponent implements OnInit {
       cNum = isGB ? (c/1024/1024).toFixed(3) + 'PB':(c/1024/1024).toFixed(3) + 'TB';
     }
     return cNum;
+  }
+
+  /**
+   * 容量
+   * @param obj
+   */
+  capacityOnblur() {
+    let capacity = this.form.capacity;
+    if (capacity) {
+      if (capacity.toString().match(/\d+(\.\d{0,2})?/)) {
+        capacity = capacity.toString().match(/\d+(\.\d{0,2})?/)[0];
+      } else {
+        capacity = '';
+      }
+      if (capacity !== '') {
+        if (this.form.capacityUnit === 'TB') {
+          if (this.form.version === '5') {
+            if (capacity < 1.3/1024) {
+              capacity = '';
+            }
+          } else {
+            if (capacity < 2/1024) {
+              capacity = '';
+            }
+          }
+        } else if (this.form.capacityUnit === 'MB') {
+          if (this.form.version === '5') {
+            if (capacity < 1.3*1024) {
+              capacity = '';
+            }
+          } else {
+            if (capacity < 2*1024) {
+              capacity = '';
+            }
+          }
+        } else {
+          if (this.form.version === '5') {
+            if (capacity < 1.3) {
+              capacity = '';
+            }
+          } else {
+            if (capacity < 2) {
+              capacity = '';
+            }
+          }
+        }
+      }
+      if (capacity !== '') {
+        capacity = Number(capacity);
+      }
+      this.form.capacity = capacity;
+    }
+    console.log('this.form.capacityUnit', this.form.capacityUnit);
+    console.log('this.form.capacity', this.form.capacity);
+    console.log('this.form.count', this.form.count);
+  }
+
+  /**
+   * 数量变化
+   */
+  countBlur() {
+    let count = this.form.count;
+    if(count.length==1)
+    {
+      count = count.toString().replace(/[^1-9]/g,'')
+    }
+    else{
+      count = count.toString().replace(/\D/g,'')
+    }
+
+    if (count !== '') {
+      count = Number(count);
+    }
+    this.form.count =  count;
+  }
+
+  /**
+   * add 下一页
+   */
+  addNextPage() {
+    if (this.form.capacity !== '' && this.form.count !== '') {
+      this.wizard.next();
+    }
   }
 }
