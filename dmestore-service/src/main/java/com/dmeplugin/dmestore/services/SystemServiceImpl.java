@@ -40,6 +40,7 @@ public class SystemServiceImpl implements SystemService {
               DPSqlFileConstant.DP_DME_VCENTER_INFO_SQL);
 
       LOGGER.info("creating table over...");
+      systemDao.initData(DPSqlFileConstant.DP_DME_BEST_PRACTICE_CHECK_ALTER_SQL);
 
       systemDao.initData(DPSqlFileConstant.DP_DME_TASK_DATA_SYNCSERVICELEVEL_SQL);
 
