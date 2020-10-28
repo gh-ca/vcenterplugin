@@ -1,11 +1,7 @@
 <div>
   <clr-wizard #wizard [clrWizardOpen]="viewPage=='add_plugin'" [clrWizardClosable]="false">
     <clr-wizard-title>{{'nfs.add_title' | translate}}</clr-wizard-title>
-    <p *ngIf="errorMsg!==''" style="color: red">{{errorMsg}}</p>
-    <clr-wizard-button (click)="backToNfsList();">{{'nfs.button_close' | translate}}</clr-wizard-button>
-    <clr-wizard-button [type]="'previous'">{{'nfs.button_previous' | translate}}</clr-wizard-button>
-    <clr-wizard-button [type]="'next'">{{'nfs.button_next' | translate}}</clr-wizard-button>
-    <clr-wizard-button  (click)="addNfs();" [type]="'finish'">{{'nfs.button_done' | translate}}</clr-wizard-button>
+    <p *ngIf="errorMsg" style="color: red">{{errorMsg}}</p>
     <clr-wizard-page [clrWizardPageNextDisabled]="!formPageOne.valid">
       <ng-template clrPageTitle>{{'nfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
       <form clrForm #formPageOne="ngForm">
@@ -18,7 +14,6 @@
           </select>
           <clr-control-error>This field is required!</clr-control-error>
         </clr-select-container>
-
         <clr-combobox-container>
           <label>{{'nfs.storagePool' | translate}}</label>
           <clr-combobox  [(ngModel)]="checkedPool" name="checkedPool" required>
@@ -48,7 +43,6 @@
             <label>{{'nfs.sameName' | translate}}</label>
           </clr-checkbox-wrapper>
         </clr-checkbox-container>
-
         <clr-input-container *ngIf="!addForm.sameName">
           <label>{{'nfs.fsName' | translate}}</label>
           <input class="inputWidth100Percent" clrInput [(ngModel)]="addForm.fsName" name="fsName" />
@@ -68,7 +62,6 @@
             <option value="KB">KB</option>
           </select>
         </clr-input-container>
-
         <clr-select-container>
           <label>{{'nfs.nfsProtocol' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.type" name="type" ng-selected="v3">
@@ -91,8 +84,6 @@
             <label>{{'nfs.secKrb5i' | translate}}</label>
           </clr-radio-wrapper>
         </clr-radio-container>
-
-
         <!--主机-->
         <clr-select-container>
           <label>{{'nfs.mountHost' | translate}}</label>
@@ -115,12 +106,16 @@
           </select>
         </clr-select-container>
       </form>
+      <ng-template clrPageButtons>
+        <clr-wizard-button (click)="backToNfsList()" [type]="'custom-cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
+        <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>
+        <clr-wizard-button [type]="'next'">{{'nfs.button_next' | translate}}</clr-wizard-button>
+      </ng-template>
     </clr-wizard-page>
     <clr-wizard-page [clrWizardPageNextDisabled]="!formPageTwo.valid">
       <ng-template clrPageTitle>{{'nfs.storageSetting' | translate}}</ng-template> <!-- mandatory -->
       <ng-template clrPageNavTitle>{{'nfs.storageSetting' | translate}}</ng-template> <!-- optional -->
       <form clrForm #formPageTwo="ngForm">
-
         <clr-toggle-wrapper>
           <label>{{'nfs.add_advance' | translate}}</label>
           <input type="checkbox" clrToggle name="advance" [(ngModel)]="addForm.advance"/>
@@ -199,15 +194,16 @@
           </clr-toggle-wrapper>
         </div>
       </form>
+      <ng-template clrPageButtons>
+        <clr-wizard-button (click)="backToNfsList()" [type]="'custom-cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
+        <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>
+        <clr-wizard-button (click)="addNfs();" [type]="'custom-finish'">{{'menu.ok' | translate}}</clr-wizard-button>
+      </ng-template>
     </clr-wizard-page>
   </clr-wizard>
   <clr-wizard class="add-wizard-wrap" #wizard [clrWizardOpen]="viewPage=='add_vcenter'" [clrWizardClosable]="false">
     <clr-wizard-title>{{'nfs.add_title' | translate}}</clr-wizard-title>
     <p *ngIf="errorMsg!==''" style="color: red">{{errorMsg}}</p>
-    <clr-wizard-button (click)="closeModel();">{{'nfs.button_close' | translate}}</clr-wizard-button>
-    <clr-wizard-button [type]="'previous'">{{'nfs.button_previous' | translate}}</clr-wizard-button>
-    <clr-wizard-button [type]="'next'">{{'nfs.button_next' | translate}}</clr-wizard-button>
-    <clr-wizard-button  (click)="addNfs();" [type]="'finish'">{{'nfs.button_done' | translate}}</clr-wizard-button>
     <clr-wizard-page [clrWizardPageNextDisabled]="!formPageOne.valid">
       <ng-template clrPageTitle>{{'nfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
       <form clrForm #formPageOne="ngForm">
@@ -300,12 +296,16 @@
           </select>
         </clr-select-container>
       </form>
+      <ng-template clrPageButtons>
+        <clr-wizard-button (click)="closeModel()" [type]="'custom-cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
+        <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>
+        <clr-wizard-button [type]="'next'">{{'nfs.button_next' | translate}}</clr-wizard-button>
+      </ng-template>
     </clr-wizard-page>
     <clr-wizard-page [clrWizardPageNextDisabled]="!formPageTwo.valid">
       <ng-template clrPageTitle>{{'nfs.storageSetting' | translate}}</ng-template> <!-- mandatory -->
       <ng-template clrPageNavTitle>{{'nfs.storageSetting' | translate}}</ng-template> <!-- optional -->
       <form clrForm #formPageTwo="ngForm">
-
         <clr-toggle-wrapper>
           <label>{{'nfs.add_advance' | translate}}</label>
           <input type="checkbox" clrToggle name="advance" [(ngModel)]="addForm.advance"/>
@@ -384,6 +384,11 @@
           </clr-toggle-wrapper>
         </div>
       </form>
+      <ng-template clrPageButtons>
+        <clr-wizard-button (click)="closeModel()" [type]="'custom-cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
+        <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>
+        <clr-wizard-button (click)="addNfs();" [type]="'custom-finish'">{{'menu.ok' | translate}}</clr-wizard-button>
+      </ng-template>
     </clr-wizard-page>
   </clr-wizard>
 </div>

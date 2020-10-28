@@ -21,7 +21,8 @@
     "search": "Search",
     "refresh": "Refresh",
     "synSPolicy": "Synchronize VM Storage Policies",
-    "tip": "Tip"
+    "tip": "Tip",
+    "back":"Back"
   },
   "validations": {
     "required": "This field is required!",
@@ -473,9 +474,16 @@
           "dataProtocol":"Data Protocol",
           "manageAccess":"Manage Access",
           "vStoreName":"VStore Name",
-          "type":"类型"
+          "type":"类型",
+          "fc":"FC Ports",
+          "eth":"Ethernet Port",
+          "fcoe":"FCoE Port",
+          "bond":"Bond Port",
+          "logic":"Logical Port",
+          "fail":"Failover Group"
         }
-      }
+      },
+      "perPage":"perPage"
     }
   },
   "overview": {
@@ -674,7 +682,8 @@
   },
    "enum":{
      "status":{
-
+       "disconnected":"Disconnected",
+       "connected":"Connected"
      },
      "type":{
       "block":"Block",
