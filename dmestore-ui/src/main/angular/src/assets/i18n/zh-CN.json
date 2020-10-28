@@ -233,6 +233,9 @@
     "serviceLevelCantBeNull": "服务等级是必选项，且只能选择容量不为0的服务等级！",
     "expandTips": "扩容容量只能为正整数,且最小单位为GB。",
     "loadingTips": "数据加载中，请稍后",
+    "add": {
+      "errorTips": "添加失败！"
+    },
     "mount":{
       "mount":"挂载",
       "host":"主机",

@@ -233,6 +233,9 @@
     "serviceLevelCantBeNull": "The service level is a must, and you can only choose the service level whose capacity is not 0!",
     "expandTips": "The expansion capacity can only be a positive integer, and the smallest unit is GB.",
     "loadingTips": "Data loading, please wait",
+    "add": {
+      "errorTips": "add failed！"
+    },
     "mount":{
       "mount":"Mount",
       "host":"Host",

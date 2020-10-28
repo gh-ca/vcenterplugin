@@ -52,6 +52,7 @@ export class AddComponent implements OnInit{
   resource;
 
   modalLoading = false; // 弹窗加载
+  isOperationErr = false; // 错误信息
 
 
   // 添加页面窗口
@@ -67,8 +68,9 @@ export class AddComponent implements OnInit{
 
   initData() {
     // 初始化loading
-    // this.modalLoading = true;
-    this.globalsService.loading = true;
+    this.modalLoading = true;
+    this.isOperationErr = false;
+    // this.globalsService.loading = true;
     // 设备类型 操作类型初始化
     this.route.url.subscribe(url => {
       console.log('url', url);
@@ -239,8 +241,8 @@ export class AddComponent implements OnInit{
         this.serviceLevelList = result.data.filter(item => item.totalCapacity !== 0);
         console.log('this.serviceLevelList', this.serviceLevelList);
       }
-      // this.modalLoading = false;
-      this.globalsService.loading = false;
+      this.modalLoading = false;
+      // this.globalsService.loading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
@@ -342,14 +344,18 @@ export class AddComponent implements OnInit{
       }
       console.log('addFrom', this.form);
       // 打开 loading
-      this.globalsService.loading = true;
+      // this.globalsService.loading = true;
+      this.modalLoading = true;
       this.remoteSrv.createVmfs(this.form).subscribe((result: any) => {
+        this.modalLoading = true;
         if (result.code === '200') {
           console.log('创建成功');
         } else {
           console.log('创建失败：' + result.description);
+          // 失败信息
+          this.isOperationErr = true;
         }
-        this.globalsService.loading = false;
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         // 关闭窗口
         this.cancel();
       });
@@ -381,9 +387,9 @@ export class AddComponent implements OnInit{
           break;
       }
 
-      // 版本号5 最小容量为1.3G 版本号6最小2G
-      if (capatityG < 1.3 && this.form.version === '5') {
-        capatityG = 1.3;
+      // 版本号5 最小容量为1G 版本号6最小2G
+      if (capatityG < 1 && this.form.version === '5') {
+        capatityG = 1;
       } else if (capatityG < 2 && this.form.version === '6') {
         capatityG = 2;
       }
@@ -430,15 +436,25 @@ export class AddComponent implements OnInit{
   capacityOnblur() {
     let capacity = this.form.capacity;
     if (capacity) {
-      if (capacity.toString().match(/\d+(\.\d{0,2})?/)) {
-        capacity = capacity.toString().match(/\d+(\.\d{0,2})?/)[0];
+      if (this.form.capacityUnit === 'TB') {
+        if (capacity.toString().match(/\d+(\.\d{0,2})?/)) {
+          capacity = capacity.toString().match(/\d+(\.\d{0,2})?/)[0];
+        } else {
+          capacity = '';
+        }
       } else {
-        capacity = '';
+        if(capacity.length==1)
+        {
+          capacity = capacity.toString().replace(/[^1-9]/g,'')
+        }
+        else{
+          capacity = capacity.toString().replace(/\D/g,'')
+        }
       }
       if (capacity !== '') {
         if (this.form.capacityUnit === 'TB') {
           if (this.form.version === '5') {
-            if (capacity < 1.3/1024) {
+            if (capacity < 1/1024) {
               capacity = '';
             }
           } else {
@@ -448,7 +464,7 @@ export class AddComponent implements OnInit{
           }
         } else if (this.form.capacityUnit === 'MB') {
           if (this.form.version === '5') {
-            if (capacity < 1.3*1024) {
+            if (capacity < 1*1024) {
               capacity = '';
             }
           } else {
@@ -458,7 +474,7 @@ export class AddComponent implements OnInit{
           }
         } else {
           if (this.form.version === '5') {
-            if (capacity < 1.3) {
+            if (capacity < 1) {
               capacity = '';
             }
           } else {
@@ -503,6 +519,57 @@ export class AddComponent implements OnInit{
   addNextPage() {
     if (this.form.capacity !== '' && this.form.count !== '') {
       this.wizard.next();
+    }
+  }
+  /**
+   * 带宽 blur
+   * @param type
+   * @param operationType add modify
+   * @param valType
+   */
+  qosBlur(type:String, operationType:string) {
+
+    let objVal;
+      switch (operationType) {
+        case 'maxbandwidth':
+          objVal = this.form.maxbandwidth;
+          break;
+        case 'maxiops':
+          objVal = this.form.maxiops;
+          break;
+        case 'minbandwidth':
+          objVal = this.form.minbandwidth;
+          break;
+        case 'miniops':
+          objVal = this.form.miniops;
+          break;
+        default:
+          objVal = this.form.latency;
+          break;
+      }
+    if (objVal && objVal !== '') {
+      if (objVal.toString().match(/\d+(\.\d{0,2})?/)) {
+        objVal = objVal.toString().match(/\d+(\.\d{0,2})?/)[0];
+      } else {
+        objVal = '';
+      }
+    }
+    switch (operationType) {
+      case 'maxbandwidth':
+        this.form.maxbandwidth = objVal;
+        break;
+      case 'maxiops':
+        this.form.maxiops = objVal;
+        break;
+      case 'minbandwidth':
+        this.form.minbandwidth = objVal;
+        break;
+      case 'miniops':
+        this.form.miniops = objVal;
+        break;
+      default:
+        this.form.latency = objVal;
+        break;
     }
   }
 }
