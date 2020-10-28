@@ -81,6 +81,7 @@ public class DPSqlFileConstant {
           "\"AUTO_REPAIR\"  nvarchar(10),\n" +
           "\"CREATE_TIME\"  datetime\n" +
           ");";
+  public static final String DP_DME_BEST_PRACTICE_CHECK_ALTER_SQL ="ALTER TABLE DP_DME_BEST_PRACTICE_CHECK ALTER COLUMN ACTUAL_VALUE CLOB;";
 
   public static final String DP_DME_VCENTER_INFO_SQL = "DROP TABLE IF EXISTS \"DP_DME_VCENTER_INFO\";\n"
           + "CREATE TABLE \"DP_DME_VCENTER_INFO\" (\n"
