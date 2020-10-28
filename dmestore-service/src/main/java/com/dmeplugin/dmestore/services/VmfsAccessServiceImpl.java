@@ -596,14 +596,15 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         try {
             //param str host: 主机  param str cluster: 集群
             //如果主机或主机不存在就创建并得到主机或主机组ID 如果主机组不存在就需要创建,创建前要检查集群下的所有主机是否在DME中存在
+            String clustername=vcsdkUtils.getVcConnectionHelper().objectID2MOR(clusterObjectId).getValue();
             if (!StringUtils.isEmpty(clusterObjectId)) {
                 List<String> objIds = new ArrayList<>();
                 //检查集群对应的主机组在DME中是否存在
-                List<Map<String, Object>> hostgrouplist = dmeAccessService.getDmeHostGroups(clusterObjectId);
+                List<Map<String, Object>> hostgrouplist = dmeAccessService.getDmeHostGroups(clustername);
                 if (hostgrouplist != null && hostgrouplist.size() > 0) {
                     for (Map<String, Object> hostgroupmap : hostgrouplist) {
                         if (hostgroupmap != null && hostgroupmap.get("name") != null) {
-                            if (clusterObjectId.equals(hostgroupmap.get("name").toString())) {
+                            if (clustername.equals(hostgroupmap.get("name").toString())) {
                                 String tmpObjId = ToolUtils.getStr(hostgroupmap.get("id"));
                                 objIds.add(tmpObjId);
                             }

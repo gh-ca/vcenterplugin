@@ -37,7 +37,7 @@ public class VmwareContextPool {
     private static final Logger s_logger = LoggerFactory.getLogger(VmwareContextPool.class);
 
     private static final Duration DEFAULT_CHECK_INTERVAL = Duration.millis(10000L);
-    private static final int DEFAULT_IDLE_QUEUE_LENGTH = 5;
+    private static final int DEFAULT_IDLE_QUEUE_LENGTH = 4;
 
     private final ConcurrentMap<String, Queue<VmwareContext>> _pool;
     private int _maxIdleQueueLength = DEFAULT_IDLE_QUEUE_LENGTH;
@@ -165,5 +165,19 @@ public class VmwareContextPool {
         assert (vCenterUserName != null);
         assert (vCenterAddress != null);
         return vCenterUserName + "@" + vCenterAddress;
+    }
+
+    public void closeAll(){
+        for (final Queue<VmwareContext> ctxQueue : _pool.values()) {
+            for (Iterator<VmwareContext> iterator = ctxQueue.iterator(); iterator.hasNext();) {
+                final VmwareContext context = iterator.next();
+                if (context == null) {
+                    iterator.remove();
+                    continue;
+                }
+                context.close();
+            }
+        }
+
     }
 }
