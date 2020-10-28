@@ -257,6 +257,13 @@ export class AddComponent implements OnInit{
   customerClickFunc() {
     this.levelCheck = 'customer';
     this.serviceLevelIsNull = false;
+
+    this.storageList = null;
+    this.storagePoolList = null;
+
+    // loading
+    this.modalLoading = true;
+
     this.getStorageList();
   }
   // 获取所有存储数据
@@ -265,12 +272,15 @@ export class AddComponent implements OnInit{
       console.log(result);
       if (result.code === '200' && result.data !== null) {
         this.storageList = result.data;
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        this.getStoragePoolsByStorId();
       }
+      this.modalLoading = false;
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
   // 获取存储池数据
   getStoragePoolsByStorId() {
+    this.form.pool_raw_id = undefined;
     console.log('selectSotrageId' + this.form.storage_id);
     if (null !== this.form.storage_id && '' !== this.form.storage_id) {
       this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, 'block').subscribe((result: any) => {

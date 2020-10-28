@@ -203,7 +203,6 @@
         <clr-select-container>
           <label style="color: #9F9F9F;">{{'vmfs.storageDevice' | translate}}</label>
           <select clrSelect  [(ngModel)]="form.storage_id" name="storage_id" (ngModelChange)="getStoragePoolsByStorId();" required>
-            <option value=""></option>
             <option *ngFor="let item of storageList" value="{{item.id}}">{{item.name}}</option>
           </select>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
@@ -211,7 +210,6 @@
         <clr-select-container>
           <label style="color: #9F9F9F;">{{'vmfs.storagePool' | translate}}</label>
           <select clrSelect [(ngModel)]="form.pool_raw_id" name="pool_raw_id" required>
-            <option value=""></option>
             <option *ngFor="let item of storagePoolList" value="{{item.poolId}}">{{item.name}}</option>
           </select>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
