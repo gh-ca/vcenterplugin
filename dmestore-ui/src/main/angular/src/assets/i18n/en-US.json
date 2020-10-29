@@ -711,7 +711,8 @@
        "linkDown":"Link Down",
        "linkUp":"Link Up",
        "activated":"Activated",
-       "unActivated":"unActivated"
+       "unActivated":"unActivated",
+       "all":"ALL"
      },
      "type":{
       "block":"Block",

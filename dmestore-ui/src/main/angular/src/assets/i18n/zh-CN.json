@@ -147,11 +147,11 @@
       "mountObj":"挂载对象"
     },
     "del":{
-      "title":"提示",
+      "title":"删除",
       "content":"确认要删除吗?"
     },
     "unmount":{
-      "title":"提示",
+      "title":"卸载",
       "content":"确认要卸载吗?"
     }
   },
@@ -715,7 +715,8 @@
       "linkDown":"未连接",
       "linkUp":"已连接",
       "activated":"已激活",
-      "unActivated":"未激活"
+      "unActivated":"未激活",
+      "all":"所有"
     },
     "type":{
       "block":"块",
