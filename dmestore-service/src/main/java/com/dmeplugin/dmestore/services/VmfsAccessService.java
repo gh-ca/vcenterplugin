@@ -1,8 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.exception.DMEException;
-import com.dmeplugin.dmestore.exception.DmeSqlException;
-import com.dmeplugin.dmestore.exception.VcenterException;
 import com.dmeplugin.dmestore.model.VmfsDataInfo;
 import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
 
@@ -115,16 +113,16 @@ public interface VmfsAccessService {
     boolean scanVmfs() throws DMEException;
 
     /**
-     * 通过vmfs storageId查询DME侧关联的主机信息
-     * @return 返回主机列表，单个主机的信息以map方式存储属性和属性值
+     * 通过vmfs storageId查询VC的主机 (DME侧关联的主机的启动器和VC主机的启动器要一致)
+     * @return 返回VC主机列表，单个主机的信息以map方式存储属性和属性值
      * @throws Exception
      */
     List<Map<String, Object>> getHostsByStorageId(String storageId) throws DMEException;
 
     /**
-     * 通过vmfs storageId查询DME侧关联的主机组信息
+     * 通过vmfs storageId查询vc 集群信息 （DME侧关联的主机组信息下所有主机的启动器和集群下的主机的启动器一致）
      * @param storageId
-     * @return 返回主机组列表，单个主机组的信息以map方式存储属性和属性值
+     * @return 返回集群列表，单个集群的信息以map方式存储属性和属性值
      * @throws Exception
      */
     List<Map<String, Object>> getHostGroupsByStorageId(String storageId) throws DMEException;

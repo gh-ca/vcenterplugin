@@ -3,20 +3,14 @@ package com.dmeplugin.dmestore.mvc;
 import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.services.DmeStorageService;
-import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.google.gson.Gson;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author lianq
@@ -143,10 +137,10 @@ public class DmeStorageController extends BaseController{
     }
     @GetMapping("/dtrees")
     @ResponseBody
-    public ResponseBodyBean getDTrees(@RequestParam(name = "storageId") String storageId){
+    public ResponseBodyBean getDtrees(@RequestParam(name = "storageId") String storageId){
 
         try {
-            return success(dmeStorageService.getDTrees(storageId));
+            return success(dmeStorageService.getDtrees(storageId));
         } catch (DMEException e) {
             e.printStackTrace();
             return failure(e.getMessage());

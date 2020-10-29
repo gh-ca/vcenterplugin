@@ -21,7 +21,8 @@
     "search": "Search",
     "refresh": "Refresh",
     "synSPolicy": "Synchronize VM Storage Policies",
-    "tip": "Tip"
+    "tip": "Tip",
+    "back":"Back"
   },
   "validations": {
     "required": "This field is required!",
@@ -228,10 +229,11 @@
     "startTime": "Start Time",
     "endTime": "End Time",
     "timeInputTips": "Please enter start-end time！",
-    "capacityTips": "If the version is VMFS5, the minimum capacity is 1.3G, and if the version is VMFS6, the minimum capacity is 2G.",
+    "capacityTips": "If the version is VMFS5, the minimum capacity is 1G, if the version is VMFS6, the minimum capacity is 2G, and the capacity must be a positive integer in G, and the quantity must be a positive integer!",
     "serviceLevelCantBeNull": "The service level is a must, and you can only choose the service level whose capacity is not 0!",
-    "expandTips": "The expansion capacity can only be a positive integer, and the smallest unit is GB.",
+    "expandTips": "Expansion capacity can only be a positive integer of GB",
     "loadingTips": "Data loading, please wait",
+    "listNullTips": "We couldn't find any users",
     "mount":{
       "mount":"Mount",
       "host":"Host",
@@ -241,7 +243,8 @@
       "readOnly":"Read Only",
       "readWrite":"Read Write",
       "mountObj":"Mount Object",
-      "notChooseDataStoreTips":"Please select the DataStore to be mounted！"
+      "notChooseDataStoreTips":"Please select the DataStore to be mounted！",
+      "mountErr":"Please select the host/cluster to be mounted!"
     },
     "del":{
       "title":"Tips",
@@ -252,7 +255,9 @@
       "content":"Are you sure to unmount?",
       "notChooseDeviceTips":"Please select the host or cluster to be uninstalled!",
       "notChooseDataStoreTips":"Please select the DataStore to be unmounted！",
-      "tips":"If all the hosts/clusters mounted by VMFS are unmounted, the VMFS device will be deleted automatically！"
+      "tips":"If all the hosts/clusters mounted by VMFS are unmounted, the VMFS device will be deleted automatically！",
+      "notHaveCluster":"该VMFS未绑定集群",
+      "notHaveHost":"该VMFS未绑定主机"
     },
     "reclaim": {
       "title":"Tips",
@@ -473,9 +478,16 @@
           "dataProtocol":"Data Protocol",
           "manageAccess":"Manage Access",
           "vStoreName":"VStore Name",
-          "type":"类型"
+          "type":"类型",
+          "fc":"FC Ports",
+          "eth":"Ethernet Port",
+          "fcoe":"FCoE Port",
+          "bond":"Bond Port",
+          "logic":"Logical Port",
+          "fail":"Failover Group"
         }
-      }
+      },
+      "perPage":"perPage"
     }
   },
   "overview": {
@@ -590,7 +602,12 @@
     "default": "Default",
     "enable": "Enable",
     "disable": "Disable",
-    "host": "Host"
+    "host": "Host",
+
+    "atOne": "Please Select one!",
+    "bandNotNull": "BandWidth not be empty!",
+    "IOPSNotNull": "IOPS not be empty!",
+    "latencyNotNull": "Latency not be empty!"
   },
   "tier": {
     "name": "Name",
@@ -669,7 +686,31 @@
   },
    "enum":{
      "status":{
-
+       "disconnected":"Disconnected",
+       "connected":"Connected",
+       "creating":"Creating",
+       "normal":"Normal",
+       "mapping":"Mapping",
+       "unmapping":"Unmapping",
+       "deleting":"Deleting",
+       "error":"Error",
+       "expanding":"Expanding",
+       "unmapped":"Unmapped",
+       "mapped":"Mapped",
+       "unprotected":"Unprotected",
+       "protected":"Protected",
+       "notEnabled":"Not Enabled",
+       "enabled":"Enabled",
+       "normalFs":"Normal FileSystem",
+       "wormFs":"WORM FileSystem",
+       "unknown":"Unknown",
+       "running":"Running",
+       "fault":"Fault",
+       "member":"Member",
+       "linkDown":"Link Down",
+       "linkUp":"Link Up",
+       "activated":"Activated",
+       "unActivated":"unActivated"
      },
      "type":{
       "block":"Block",
@@ -683,6 +724,12 @@
     "reduceError":"Reduce failed!Please contact management!",
     "deleteError":"Delete failed!Please contact management!",
     "addError":"Delete failed!Please contact management!",
-    "modifyError":"Delete failed!Please contact management!"
+    "modifyError":"Delete failed!Please contact management!",
+    "reclaimError":"Space reclamation failed! Please contact the administrator!",
+    "serviceLevelError":"Service level change failed! Please contact the administrator!"
+  },
+  "page": {
+    "perPage": "Per Page",
+    "of": "of"
   }
 }

@@ -189,9 +189,18 @@
   }
 }
 .datagrid{
-  overflow: hidden;
+  //overflow: hidden;
+  //border: 1px black solid;
+  //width: 100%;
 }
 // 隐藏表格过滤的关闭按钮
 .datagrid-filter-close-wrapper{
   display: none;
 }
+//#nfs-grid clr-dg-column{
+//  width: 8%;
+//}
+////#nfs-grid clr-dg-cell{
+////  //width: 10%;
+////  border: 1px red solid;
+////}

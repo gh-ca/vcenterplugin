@@ -93,4 +93,8 @@ public class VmwarePluginContextFactory {
 
         return vmwareContexts.toArray(new VmwareContext[0]);
     }
+
+    public static void closeAll(){
+       s_pool.closeAll();
+    }
 }

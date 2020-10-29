@@ -25,6 +25,7 @@ export class NfsService {
   static nfsLatency: Array<string> = ['1126179079716869', '1126179079716872'];
   // NFS  url
   static nfsUrl = 'datastorestatistichistrory/nfs';
+  static storageUrl = 'datastorestatistichistrory/storageDevice';
 
   // Storage Detail 0Read 1Write
   static storageIOPS: Array<string> = ['1125904201875461', '1125904201875462'];
@@ -153,7 +154,11 @@ export class CapacityAutonegotiation{
 export class FileSystem{
   capacity: number;
   name: string;
+  allocType: string;
+  availableCapacity: string;
+  healthStatus: string;
   count: number;
+  dtreeCount: number;
 }
 export class Autonegotiation{
   auto_size_enable: boolean;

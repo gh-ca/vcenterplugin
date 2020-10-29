@@ -40,11 +40,17 @@ export class RdmComponent implements OnInit {
 
   vmObjectId = '';
 
-  options1 = "";
-  options2 = "";
-  options3 = "";
-  options4 = "";
-  options5= "";
+  //qos 框控制
+  options1 = null;
+  options2 = null;
+  options3 = null;
+  options4 = null;
+  options5= null;
+
+  qos1Show = false;
+  qos2Show = false;
+  qos3Show = false;
+  qos4Show = false;
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
               private commonService: CommonService,
@@ -104,13 +110,55 @@ export class RdmComponent implements OnInit {
     }
   }
 
+  changeQosRedio(){
+    this.qos1Show = false;
+    this.qos2Show = false;
+    this.qos3Show = false;
+    this.qos4Show = false;
+  }
+
+  changeQosInput(type: string){
+    const c = this.configModel.tuning.smartqos;
+    if(c.control_policy == '1'){
+      if(type == 'box'){
+        this.qos1Show = (!this.options1 && !this.options2);
+        return this.qos1Show;
+      }
+      if(type == 'band'){
+        this.qos2Show = this.options1 && (c.maxbandwidth == '' || c.maxbandwidth == null);
+        return this.qos2Show;
+      }
+      if(type == 'iops'){
+        this.qos3Show = this.options2 && (c.maxiops == '' || c.maxiops == null);
+        return this.qos3Show;
+      }
+    }
+    if(this.configModel.tuning.smartqos.control_policy == '0'){
+      if(type == 'box'){
+        this.qos1Show = (!this.options3 && !this.options4 && !this.options5);
+        return this.qos1Show;
+      }
+      if(type == 'band') {
+        this.qos2Show = this.options3 && (c.minbandwidth == '' || c.minbandwidth == null);
+        return this.qos2Show;
+      }
+      if(type == 'iops'){
+        this.qos3Show = this.options4 && (c.miniops == '' || c.miniops == null);
+        return this.qos3Show;
+      }
+      if(type == 'latency'){
+        this.qos4Show = this.options5 && (c.latency == '' || c.latency == null);
+        return this.qos4Show;
+      }
+    }
+  }
+
   submit(): void {
     if (this.rdmForm.form.invalid) {
       this.rdmFormGroup.markAsTouched();
       return;
     }
     let b = JSON.parse(JSON.stringify(this.configModel));
-    console.log(b);
     let body = {};
     if (this.configModel.storageType == '2'){
       if(!this.policyEnable.smartTier){
@@ -118,6 +166,21 @@ export class RdmComponent implements OnInit {
       }
       if(!this.policyEnable.qosPolicy){
         b.tuning.smartqos = null;
+      } else{
+        let box = this.changeQosInput('box');
+        let band = this.changeQosInput('band');
+        let iops = this.changeQosInput('iops');
+        let latency = this.changeQosInput('latency');
+        if(box || band || iops || latency){
+          return;
+        }
+        if(this.configModel.tuning.smartqos.control_policy == '1'){
+          b.tuning.smartqos.minbandwidth = null;
+          b.tuning.smartqos.miniops = null;
+        } else{
+          b.tuning.smartqos.maxbandwidth = null;
+          b.tuning.smartqos.maxiops = null;
+        }
       }
       if(!this.policyEnable.resourceTuning){
         b.tuning.alloctype = null;
@@ -127,6 +190,7 @@ export class RdmComponent implements OnInit {
       if(!this.policyEnable.smartTier && !this.policyEnable.qosPolicy && !this.policyEnable.resourceTuning){
         b.tuning = null;
       }
+
       body = {
         customizeVolumesRequest: {
           customize_volumes: b,
@@ -147,6 +211,7 @@ export class RdmComponent implements OnInit {
         }
       };
     }
+    console.log(b);
     this.http.post('v1/vmrdm/createRdm?hostId='+this.hostSelected+'&vmObjectId='+this.vmObjectId+'&dataStoreName='+this.dataStoreName
       , body).subscribe((result: any) => {
     }, err => {
