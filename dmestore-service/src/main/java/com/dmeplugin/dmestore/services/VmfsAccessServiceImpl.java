@@ -664,20 +664,21 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return objId;
     }
 
-    private String checkToHostGroup(String clusterName, String clusterObjectId) throws DMEException {
+    private String checkToHostGroup( String clusterObjectId) throws DMEException {
         //检查集群下的所有主机是否在DME中存在
         String objId = "";
         try {
             //param str host: 主机  param str cluster: 集群
             //如果主机或主机不存在就创建并得到主机或主机组ID 如果主机组不存在就需要创建,创建前要检查集群下的所有主机是否在DME中存在
-            if (!StringUtils.isEmpty(clusterName)) {
+            String clustername=vcsdkUtils.getVcConnectionHelper().objectID2MOR(clusterObjectId).getValue();
+            if (!StringUtils.isEmpty(clustername)) {
                 List<String> objIds = new ArrayList<>();
                 //检查集群对应的主机组在DME中是否存在
-                List<Map<String, Object>> hostgrouplist = dmeAccessService.getDmeHostGroups(clusterName);
+                List<Map<String, Object>> hostgrouplist = dmeAccessService.getDmeHostGroups(clustername);
                 if (hostgrouplist != null && hostgrouplist.size() > 0) {
                     for (Map<String, Object> hostgroupmap : hostgrouplist) {
                         if (hostgroupmap != null && hostgroupmap.get("name") != null) {
-                            if (clusterName.equals(hostgroupmap.get("name").toString())) {
+                            if (clustername.equals(hostgroupmap.get("name").toString())) {
                                 String tmpObjId = ToolUtils.getStr(hostgroupmap.get("id"));
                                 objIds.add(tmpObjId);
                             }
@@ -1678,20 +1679,20 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
         List<Map<String, String>> clusters = null;
         //取得vcenter中的所有cluster
-        String listStr = vcsdkUtils.getClustersByDsObjectId(storageId);
+        String listStr = vcsdkUtils.getMountClustersByDsObjectId(storageId);
         LOG.info("host getClustersByDsObjectId==" + listStr);
         if (!StringUtils.isEmpty(listStr)) {
             clusters = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
             }.getType());
             //vcenter侧主机启动器是否和dem侧主机启动器一致
             for (Map<String, String> cluster : clusters) {
-                String hostId = ToolUtils.getStr(cluster.get("clusterId"));
-                String hostNmme = ToolUtils.getStr(cluster.get("clusterName"));
-                String initiatorId = checkToHost(hostId);
+                String clusterId = ToolUtils.getStr(cluster.get("clusterId"));
+                String clusterName = ToolUtils.getStr(cluster.get("clusterName"));
+                String initiatorId = checkToHostGroup(clusterId);
                 if (!StringUtils.isEmpty(initiatorId)) {
                     Map<String, Object> tempMap = new HashMap<>();
-                    tempMap.put("hostGroupId", hostId);
-                    tempMap.put("hostGroupName", hostNmme);
+                    tempMap.put("hostGroupId", clusterId);
+                    tempMap.put("hostGroupName", clusterName);
                     hostGroupMapList.add(tempMap);
                 }
             }
