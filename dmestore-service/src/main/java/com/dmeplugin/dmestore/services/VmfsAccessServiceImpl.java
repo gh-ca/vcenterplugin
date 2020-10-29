@@ -1432,7 +1432,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         tempParams.put("hostGroup_id", hostGroupIdDmeId);
                         tempParams.put("volumeIds", volumeIds);
                         String taskId = unmountHostGroupGetTaskId(tempParams);
-                        //taskIds.add(taskId);//若主机以卸载,获取集群的卸载任务信息会有对象不存在的提示,标记任务为失败。获取任务结果的目的时等待卸载任务执行完成，不关心任务成功失败
+                        taskIds.add(taskId);
                     }
                 }
             }
@@ -1458,13 +1458,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         tempParams.put("host_id", hostId);
                         tempParams.put("volumeIds", volumeIds);
                         String taskId = unmountHostGetTaskId(tempParams);
-                        taskIds.add(taskId);
+                        taskIds.add(taskId);//若主机组已卸载,获取主机的卸载任务信息会有对象不存在的提示,标记任务为失败。获取任务结果的目的是等待卸载任务执行完成，不关心任务成功失败
                     }
                 }
             }
         }
-
-
 
         //提取datastore的hostid
         if (hostObjIds.size() > 0) {
@@ -1558,7 +1556,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return responseEntity;
     }
-
 
     //DME侧从主机卸载卷
     private String unmountHostGetTaskId(Map<String, Object> params) {
@@ -1701,6 +1698,22 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         // 先查询vcenter侧的主机
         List<Map<String, String>> hosts = null;
         String listStr = vcsdkUtils.getHostsByDsObjectId(storageId, true);
+
+        //获取已挂载的集群，找到对应的主机，用于排除主机
+        List<Map<String,Object>> clustermaps=getHostGroupsByStorageId(storageId);
+        Map<String,String> excludehostmap = new HashMap<>();
+        for (Map<String,Object> clustermap:clustermaps){
+            String clusterid= String.valueOf(clustermap.get("hostGroupId"));
+            String vmwarehosts=vcsdkUtils.getHostsOnCluster(clusterid);
+            if (!StringUtils.isEmpty(vmwarehosts)) {
+                List<Map<String, String>> vmwarehostlists = gson.fromJson(vmwarehosts, new TypeToken<List<Map<String, String>>>() {
+                }.getType());
+
+                for (Map<String,String> vmwarehostmap:vmwarehostlists){
+                    excludehostmap.put(vmwarehostmap.get("hostId"),"true");
+                }
+            }
+        }
         LOG.info("host getHostsByDsObjectId==" + listStr);
         if (!StringUtils.isEmpty(listStr)) {
             hosts = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
@@ -1708,13 +1721,16 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             //vcenter侧主机启动器是否和dem侧主机启动器一致
             for (Map<String, String> host : hosts) {
                 String hostId = ToolUtils.getStr(host.get("hostId"));
-                String hostNmme = ToolUtils.getStr(host.get("hostName"));
-                String initiatorId = checkToHost(hostId);
-                if (!StringUtils.isEmpty(initiatorId)) {
-                    Map<String, Object> tempMap = new HashMap<>();
-                    tempMap.put("hostId", hostId);
-                    tempMap.put("hostName", hostNmme);
-                    hostMapList.add(tempMap);
+                //排除已挂载在集群中的主机
+                if (null==excludehostmap.get(hostId)) {
+                    String hostNmme = ToolUtils.getStr(host.get("hostName"));
+                    String initiatorId = checkToHost(hostId);
+                    if (!StringUtils.isEmpty(initiatorId)) {
+                        Map<String, Object> tempMap = new HashMap<>();
+                        tempMap.put("hostId", hostId);
+                        tempMap.put("hostName", hostNmme);
+                        hostMapList.add(tempMap);
+                    }
                 }
             }
         }
