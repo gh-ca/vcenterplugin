@@ -241,8 +241,11 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             for (BestPracticeUpResultResponse response : list) {
                 List<BestPracticeUpResultBase> baseList = response.getResult();
                 for (BestPracticeUpResultBase base : baseList) {
-                    String sqlTemp = String.format(sql, base.getHostObjectId(), base.getHostSetting());
-                    stm.addBatch(sqlTemp);
+                    //只有更新成功的才执行删除
+                    if(base.getUpdateResult()){
+                        String sqlTemp = String.format(sql, base.getHostObjectId(), base.getHostSetting());
+                        stm.addBatch(sqlTemp);
+                    }
                 }
             }
             stm.executeBatch();

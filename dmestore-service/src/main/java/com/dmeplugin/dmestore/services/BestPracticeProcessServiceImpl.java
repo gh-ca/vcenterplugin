@@ -122,8 +122,12 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             //对每一项进行检查
             for (BestPracticeService bestPracticeService : bestPracticeServices) {
                 try {
-                    boolean checkFlag = bestPracticeService.check(vcsdkUtils, _objectId);
                     String hostSetting = bestPracticeService.getHostSetting();
+                    if(!checkMap.containsKey(hostSetting)){
+                        checkMap.put(hostSetting, new ArrayList<>());
+                    }
+
+                    boolean checkFlag = bestPracticeService.check(vcsdkUtils, _objectId);
                     if (!checkFlag) {
                         BestPracticeBean bean = new BestPracticeBean();
                         bean.setHostSetting(hostSetting);
@@ -135,16 +139,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                         bean.setHostName(_hostName);
                         bean.setAutoRepair(String.valueOf(bestPracticeService.autoRepair()));
 
-                        //根据检查项进行归类
-                        if (!checkMap.containsKey(hostSetting)) {
-                            List<BestPracticeBean> failList = new ArrayList<>();
-                            failList.add(bean);
-                            checkMap.put(hostSetting, failList);
-                        } else {
-                            checkMap.get(hostSetting).add(bean);
-                        }
-                    }else {
-                        checkMap.put(hostSetting, null);
+                        checkMap.get(hostSetting).add(bean);
                     }
                 } catch (Exception ex) {
                     //报错，跳过当前项检查
@@ -227,9 +222,6 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
 
     @Override
     public List<BestPracticeUpResultResponse> update(List<String> objectIds, String hostSetting) throws DmeSqlException {
-        objectIds = new ArrayList();
-        objectIds.add("urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1");
-        objectIds.add("123213124");
         List<BestPracticeService> services = new ArrayList<>();
         //获取对应的service
         for (BestPracticeService bestPracticeService : bestPracticeServices) {
@@ -298,7 +290,6 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                     base.setUpdateResult(false);
                     log.error("best practice update {} {} recommend value failed!errMsg:{}", objectId, hostSetting, ex.getMessage());
                     ex.printStackTrace();
-                    continue;
                 }
                 baseList.add(base);
             }

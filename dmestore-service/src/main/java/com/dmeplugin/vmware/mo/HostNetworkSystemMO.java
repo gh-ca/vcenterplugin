@@ -38,6 +38,11 @@ public class HostNetworkSystemMO extends BaseMO {
         super(context, morType, morValue);
     }
 
+    public HostNetworkConfig getNetworkConfig() throws Exception {
+        return (HostNetworkConfig)_context.getVimClient().getDynamicProperty(_mor, "networkConfig");
+    }
+
+
     public void addPortGroup(HostPortGroupSpec spec) throws Exception {
         _context.getService().addPortGroup(_mor, spec);
     }
@@ -66,7 +71,7 @@ public class HostNetworkSystemMO extends BaseMO {
         _context.getService().refreshNetworkSystem(_mor);
     }
 
-    public void updateNetworkConfig(HostNetworkConfig config, String changeMode) throws Exception {
-        _context.getService().updateNetworkConfig(_mor, config, changeMode);
+    public HostNetworkConfigResult updateNetworkConfig(HostNetworkConfig config, String changeMode) throws Exception {
+        return _context.getService().updateNetworkConfig(_mor, config, changeMode);
     }
 }

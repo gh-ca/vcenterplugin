@@ -1,11 +1,13 @@
 package com.dmeplugin.dmestore.mvc;
 
+import com.dmeplugin.dmestore.model.BestPracticeUpResultResponse;
 import com.dmeplugin.dmestore.model.BestPracticeUpdateByTypeRequest;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.BestPracticeProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -56,11 +58,15 @@ public class BestPracticeController extends BaseController {
     @RequestMapping(value = "/update/bylist", method = RequestMethod.POST)
     public ResponseBodyBean bylist(@RequestBody List<BestPracticeUpdateByTypeRequest> list) throws Exception {
         try {
+            List<BestPracticeUpResultResponse> resultList = new ArrayList<>();
             for (int i = 0; i < list.size(); i++) {
                 BestPracticeUpdateByTypeRequest request = list.get(i);
-                upByHostSetting(request);
+                List<BestPracticeUpResultResponse> listTemp = bestPracticeProcessService.update(request.getHostObjectIds(), request.getHostSetting());
+                if(null != listTemp && listTemp.size() > 0){
+                    resultList.addAll(listTemp);
+                }
             }
-            return success();
+            return success(resultList);
         } catch (Exception ex) {
             return failure(ex.getMessage());
         }
