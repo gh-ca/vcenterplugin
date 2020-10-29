@@ -8,6 +8,10 @@ import {Subject} from "rxjs";
   template: `
       <clr-radio-container>
         <clr-radio-wrapper>
+          <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="options" value="" />
+          <label>ALL</label>
+        </clr-radio-wrapper>
+        <clr-radio-wrapper>
           <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="options" value="normal"/>
           <label>normal</label>
         </clr-radio-wrapper>
@@ -16,27 +20,20 @@ import {Subject} from "rxjs";
           <label>abnormal</label>
         </clr-radio-wrapper>
       </clr-radio-container>
-<!--      <clr-checkbox-container #myFilter style="margin-top: 0;">-->
-<!--        <clr-checkbox-wrapper>-->
-<!--          <input type="checkbox" (click)="changeFunc1()" clrCheckbox [(ngModel)]="normal" name="normal" />-->
-<!--          <label>normal</label>-->
-<!--        </clr-checkbox-wrapper>-->
-<!--        <clr-checkbox-wrapper>-->
-<!--          <input type="checkbox" (click)="changeFunc2()" clrCheckbox [(ngModel)]="abnormal" name="abnormal" />-->
-<!--          <label>abnormal</label>-->
-<!--        </clr-checkbox-wrapper>-->
-<!--      </clr-checkbox-container>-->
   `
 })
 export class ColorFilter implements ClrDatagridFilterInterface<VmfsInfo> {
   changes = new Subject<any>();
-  options = '';
+  options;
   normal = false;
   abnormal = false;
 
   readonly status: any;
 
   accepts(item: VmfsInfo): boolean {
+    if (!this.options) {
+      return true;
+    }
     const  capital  = item.status;
     console.log("capital", capital);
     if (this.options === '') {
