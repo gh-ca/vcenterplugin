@@ -680,7 +680,7 @@ export class VmfsListComponent implements OnInit {
     return new Promise((resolve, reject) => {
       // 获取集群 通过ObjectId过滤已挂载的集群
       this.remoteSrv.getClusterListByObjectId(this.rowSelected[0].objectid).subscribe((result: any) => {
-        if (result.code === '200'){
+        if (result.code === '200' && result.data !== null){
           result.data.forEach(item => {
             this.clusterList.push(item);
           });
@@ -712,7 +712,7 @@ export class VmfsListComponent implements OnInit {
   mountSubmit(){
 
     console.log('this.chooseHost', this.chooseHost);
-    if (this.chooseHost) {
+    if (this.chooseHost || this.chooseCluster) {
       this.mountErr = false;
       // 数据封装
       if (this.mountForm.mountType === '1'){ // 服务器
@@ -782,9 +782,9 @@ export class VmfsListComponent implements OnInit {
           const mountCluster: HostOrCluster [] = [];
           result.data.forEach(item => {
             const hostInfo = {
-              deviceId: item.hostId,
-              deviceName: item.hostName,
-              deviceType: 'host'
+              deviceId: item.hostGroupId,
+              deviceName: item.hostGroupName,
+              deviceType: 'cluster'
             };
             mountCluster.push(hostInfo);
           });

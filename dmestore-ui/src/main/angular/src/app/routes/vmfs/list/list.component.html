@@ -119,9 +119,9 @@
     <clr-dg-footer>
       <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="total">
         <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">{{'page.perPage' | translate}}</clr-dg-page-size>
-        {{pagination.totalItems}}
-        {{'page.of' | translate}}
         {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+        {{'page.all' | translate}}
+        {{pagination.totalItems}}
       </clr-dg-pagination>
     </clr-dg-footer>
   </clr-datagrid>
