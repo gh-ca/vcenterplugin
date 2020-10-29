@@ -730,6 +730,7 @@
   },
   "page": {
     "perPage": "Per Page",
-    "of": "of"
+    "of": "of",
+    "all": "Total"
   }
 }
