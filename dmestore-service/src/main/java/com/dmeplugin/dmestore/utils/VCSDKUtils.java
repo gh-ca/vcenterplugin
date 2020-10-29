@@ -24,8 +24,6 @@ import com.vmware.vim.binding.vim.HostSystem;
 import com.vmware.vim.binding.vim.ServiceInstance;
 import com.vmware.vim.binding.vim.ServiceInstanceContent;
 import com.vmware.vim.binding.vim.SessionManager;
-import com.vmware.vim.binding.vim.fault.InvalidLocale;
-import com.vmware.vim.binding.vim.fault.InvalidLogin;
 import com.vmware.vim.binding.vim.version.version10;
 import com.vmware.vim.binding.vmodl.reflect.ManagedMethodExecuter;
 import com.vmware.vim.vmomi.client.Client;
@@ -51,10 +49,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class VCSDKUtils {
@@ -1533,8 +1527,6 @@ public class VCSDKUtils {
                     try {
                         ManagedObjectReference objmor = vcConnectionHelper.objectID2MOR(hostObjectId);
                         HostMO hostmo = new HostMO(vmwareContext, objmor);
-                        String hostmoName = hostmo.getHostName();
-                        String hostmoName2 = hostmo.getName();
                         //从挂载的主机卸载
                         if (hostmo != null) {
                             unmountVmfs(objDataStoreName, hostmo);
@@ -1545,7 +1537,7 @@ public class VCSDKUtils {
                 }
             }
         } catch (Exception e) {
-            logger.error("mount Vmfs On Cluster error:", e);
+            logger.error("unmount Vmfs On Cluster error:", e);
             throw new VcenterException(e.getMessage());
         }
     }
@@ -1608,7 +1600,7 @@ public class VCSDKUtils {
             }
             logger.info("Hosts that need to be unmounted:" + hostMo.getName());
             //卸载前重新扫描datastore  20201019 暂时屏蔽此方法。DME侧卸载后，vcenter侧调用重新扫描接口，会直接删除此vmfs 原因不详
-            //hostMo.getHostStorageSystemMO().rescanVmfs();
+            hostMo.getHostStorageSystemMO().rescanVmfs();
             logger.info("Rescan datastore before unmounting");
             //查询指定vmfs
             for (HostFileSystemMountInfo mount : hostMo.getHostStorageSystemMO().getHostFileSystemVolumeInfo().getMountInfo()) {
@@ -1616,7 +1608,7 @@ public class VCSDKUtils {
                     HostVmfsVolume volume = (HostVmfsVolume) mount.getVolume();
                     logger.info(volume.getName() + "========" + volume.getUuid());
                     //从主机卸载vmfs(卷) (The operation is not allowed in the current state.) 暂时屏蔽此方法 勿删
-                    //hostMo.getHostStorageSystemMO().unmountVmfsVolume(volume.getUuid());
+                    hostMo.getHostStorageSystemMO().unmountVmfsVolume(volume.getUuid());
                     logger.info("unmount Vmfs success:" + volume.getName() + " : " + hostMo.getName());
                 }
             }
@@ -1888,7 +1880,7 @@ public class VCSDKUtils {
             hostMo.getHostDatastoreSystemMO().deleteDatastore(dsName);
 
             //卸载NFS
-            hostMo.unmountDatastore(nfsId);
+            //hostMo.unmountDatastore(nfsId);
             logger.info("unmount nfs success:" + hostMo.getName() + ":" + dsmo.getName());
         } catch (Exception e) {
             e.printStackTrace();
