@@ -60,24 +60,16 @@
     <clr-dg-column hidden [clrDgField]="'objectid'">objectid</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'status'">
       {{'vmfs.status' | translate}}
-      <clr-dg-filter [clrDgFilter]="myFilter">
-        <clr-checkbox-container #myFilter style="margin-top: 0;">
-          <clr-checkbox-wrapper>
-            <input type="checkbox" clrCheckbox value="normal" name="options" />
-            <label>normal</label>
-          </clr-checkbox-wrapper>
-          <clr-checkbox-wrapper>
-            <input type="checkbox" clrCheckbox value="abnormal" name="options" />
-            <label>abnormal</label>
-          </clr-checkbox-wrapper>
-        </clr-checkbox-container>
+      <clr-dg-filter [clrDgFilter]="statusFilter">
+        <color-filter #statusFilter></color-filter>
       </clr-dg-filter>
+<!--      <clr-dg-string-filter [clrDgStringFilter]="statusFilter"></clr-dg-string-filter>-->
     </clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacity'" [clrDgSortOrder]="'capacity'">{{'vmfs.capacity' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'usedCapacity'" [clrDgSortOrder]="'usedCapacity'">{{'vmfs.usedCapacity' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacity'">{{'vmfs.capacity' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'usedCapacity'">{{'vmfs.usedCapacity' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacityUsage'" [clrDgSortOrder]="'capacityUsage'">{{'vmfs.capacityUsage' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'freeSpace'" [clrDgSortOrder]="'freeSpace'">{{'vmfs.freeSpace' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'"  [clrDgField]="'reserveCapacity'" [clrDgSortOrder]="'reserveCapacity'">{{'vmfs.reserveCapacity' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'freeSpace'" [clrDgSortBy]="'freeSpace'">{{'vmfs.freeSpace' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'"  [clrDgField]="'reserveCapacity'" [clrDgSortBy]="'reserveCapacity'">{{'vmfs.reserveCapacity' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'device'">{{'vmfs.device' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'serviceLevelName'">{{'vmfs.serviceLevelName' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'protectionStatus'">{{'vmfs.protectionStatus' | translate}}</clr-dg-column>
@@ -183,7 +175,6 @@
                 <select class="capacity" (change)="form.capacity = null;" clrInput style="width: 40%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;" [(ngModel)]="form.capacityUnit" name="capacityUnit" >
                   <option value="TB">TB</option>
                   <option value="GB">GB</option>
-                  <option value="MB">MB</option>
                 </select>
               </div>
               <input clrInput style="width: 19%;text-align: center;" readonly value="{{'vmfs.multiply' | translate}}">

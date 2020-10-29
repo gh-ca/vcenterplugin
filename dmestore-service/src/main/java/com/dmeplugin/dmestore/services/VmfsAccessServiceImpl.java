@@ -1432,7 +1432,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         tempParams.put("hostGroup_id", hostGroupIdDmeId);
                         tempParams.put("volumeIds", volumeIds);
                         String taskId = unmountHostGroupGetTaskId(tempParams);
-                        //taskIds.add(taskId);//若主机以卸载,获取集群的卸载任务信息会有对象不存在的提示,标记任务为失败。获取任务结果的目的时等待卸载任务执行完成，不关心任务成功失败
+                        taskIds.add(taskId);
                     }
                 }
             }
@@ -1458,13 +1458,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         tempParams.put("host_id", hostId);
                         tempParams.put("volumeIds", volumeIds);
                         String taskId = unmountHostGetTaskId(tempParams);
-                        taskIds.add(taskId);
+                        taskIds.add(taskId);//若主机组已卸载,获取主机的卸载任务信息会有对象不存在的提示,标记任务为失败。获取任务结果的目的是等待卸载任务执行完成，不关心任务成功失败
                     }
                 }
             }
         }
-
-
 
         //提取datastore的hostid
         if (hostObjIds.size() > 0) {
@@ -1558,7 +1556,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return responseEntity;
     }
-
 
     //DME侧从主机卸载卷
     private String unmountHostGetTaskId(Map<String, Object> params) {
