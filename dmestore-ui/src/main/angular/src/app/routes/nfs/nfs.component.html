@@ -40,24 +40,24 @@
     <clr-datagrid id="nfs-grid" [(clrDgSelected)]="rowSelected" [clrDgLoading]="isLoading">
       <clr-dg-column [clrDgField]="'name'">{{'nfs.name' | translate}}</clr-dg-column>
 
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.status' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.totalCapacity' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.freeCapacity' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.capacityUsage' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.provisioningCapacity' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.device' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.logicPort' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.shareIp' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.sharePath' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.fileSystem' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'status'">{{'nfs.status' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacity'" [clrDgSortOrder]="descSort">{{'nfs.totalCapacity' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'freeCapacity'">{{'nfs.freeCapacity' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacityUsage'">{{'nfs.capacityUsage' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'provisioningCapacity'">{{'nfs.provisioningCapacity' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'device'">{{'nfs.device' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'logicPort'">{{'nfs.logicPort' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'shareIp'">{{'nfs.shareIp' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'sharePath'">{{'nfs.sharePath' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'fileSystem'">{{'nfs.fileSystem' | translate}}</clr-dg-column>
 
       <clr-dg-column [hidden]="radioCheck!=='chart'">{{'nfs.ops' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='chart'">{{'nfs.bandwidth' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='chart'">{{'nfs.respRt' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='chart'">{{'nfs.respWt' | translate}}</clr-dg-column>
 
-      <clr-dg-row *ngFor="let item of list" [clrDgItem]="item">
-        <clr-dg-cell ><span (click)="navigateTo(item.objectid)" style="color:#829DE6;cursor:pointer">{{item.name}}</span></clr-dg-cell>
+      <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
+        <clr-dg-cell (click)="navigateTo(item.objectid)" style="color:#829DE6;cursor:pointer">{{item.name}}</clr-dg-cell>
         <clr-dg-cell style="width: 5%" [hidden]="radioCheck!=='list'">{{item.status}}</clr-dg-cell>
         <clr-dg-cell [hidden]="radioCheck!=='list'">{{formatCapacity(item.capacity)}}</clr-dg-cell>
         <clr-dg-cell [hidden]="radioCheck!=='list'">{{formatCapacity(item.freeSpace)}}</clr-dg-cell>

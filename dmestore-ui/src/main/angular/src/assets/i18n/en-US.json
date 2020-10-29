@@ -686,7 +686,30 @@
    "enum":{
      "status":{
        "disconnected":"Disconnected",
-       "connected":"Connected"
+       "connected":"Connected",
+       "creating":"Creating",
+       "normal":"Normal",
+       "mapping":"Mapping",
+       "unmapping":"Unmapping",
+       "deleting":"Deleting",
+       "error":"Error",
+       "expanding":"Expanding",
+       "unmapped":"Unmapped",
+       "mapped":"Mapped",
+       "unprotected":"Unprotected",
+       "protected":"Protected",
+       "notEnabled":"Not Enabled",
+       "enabled":"Enabled",
+       "normalFs":"Normal FileSystem",
+       "wormFs":"WORM FileSystem",
+       "unknown":"Unknown",
+       "running":"Running",
+       "fault":"Fault",
+       "member":"Member",
+       "linkDown":"Link Down",
+       "linkUp":"Link Up",
+       "activated":"Activated",
+       "unActivated":"unActivated"
      },
      "type":{
       "block":"Block",
