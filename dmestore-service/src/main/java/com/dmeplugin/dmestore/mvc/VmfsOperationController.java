@@ -38,11 +38,11 @@ public class VmfsOperationController extends BaseController{
      */
     @PutMapping("/updatevmfs")
     @ResponseBody
-    public ResponseBodyBean updateVMFS(@RequestParam(value = "volumeId" ) String volumeId,
+    public ResponseBodyBean updateVmfs(@RequestParam(value = "volumeId" ) String volumeId,
                                        @RequestBody Map<String,Object> params){
 
         try {
-            vmfsOperationService.updateVMFS(volumeId,params);
+            vmfsOperationService.updateVmfs(volumeId,params);
             return success();
         } catch (DMEException e) {
             e.printStackTrace();
@@ -60,11 +60,11 @@ public class VmfsOperationController extends BaseController{
      */
     @PostMapping("/expandvmfs")
     @ResponseBody
-    public ResponseBodyBean expandVMFS(@RequestBody Map<String,String > volumes ){
+    public ResponseBodyBean expandVmfs(@RequestBody Map<String,String > volumes ){
 
         LOG.info("volumes=="+gson.toJson(volumes));
         try {
-            vmfsOperationService.expandVMFS(volumes);
+            vmfsOperationService.expandVmfs(volumes);
             return success();
         } catch (DMEException e) {
             e.printStackTrace();
@@ -78,7 +78,7 @@ public class VmfsOperationController extends BaseController{
 
     @PostMapping("/recyclevmfs")
     @ResponseBody
-    public ResponseBodyBean recycleVMFS(@RequestBody List<String> datastoreName){
+    public ResponseBodyBean recycleVmfs(@RequestBody List<String> datastoreName){
         LOG.info("recyclevmfs=="+gson.toJson(datastoreName));
         try {
             vmfsOperationService.recycleVmfsCapacity(datastoreName);
@@ -92,7 +92,7 @@ public class VmfsOperationController extends BaseController{
 
     @PostMapping("/recyclevmfsbydatastoreids")
     @ResponseBody
-    public ResponseBodyBean recycleVMFSByDatastoreIds(@RequestBody List<String> datastoreIds){
+    public ResponseBodyBean recycleVmfsByDatastoreIds(@RequestBody List<String> datastoreIds){
         LOG.info("recyclevmfsbydatastoreids=="+gson.toJson(datastoreIds));
         try {
             vmfsOperationService.recycleVmfsCapacityByDataStoreIds(datastoreIds);
@@ -106,11 +106,11 @@ public class VmfsOperationController extends BaseController{
 
     @PutMapping("/listvmfsservicelevel")
     @ResponseBody
-    public ResponseBodyBean listServiceLevelVMFS(@RequestBody(required = false) Map<String,Object> params){
+    public ResponseBodyBean listServiceLevelVmfs(@RequestBody(required = false) Map<String,Object> params){
 
         LOG.info("recyclevmfs=="+gson.toJson(params));
         try {
-            return success(vmfsOperationService.listServiceLevelVMFS(params));
+            return success(vmfsOperationService.listServiceLevelVmfs(params));
         } catch (DMEException e) {
             e.printStackTrace();
             return failure(e.getMessage());
@@ -129,7 +129,7 @@ public class VmfsOperationController extends BaseController{
      */
     @PostMapping("updatevmfsservicelevel")
     @ResponseBody
-    public ResponseBodyBean updateServiceLevelVMFS(@RequestBody Map<String,Object> params){
+    public ResponseBodyBean updateServiceLevelVmfs(@RequestBody Map<String,Object> params){
 
         LOG.info("servicelevelvmfs=="+gson.toJson(params));
         try {
