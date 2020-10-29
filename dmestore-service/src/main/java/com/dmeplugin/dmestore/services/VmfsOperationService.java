@@ -16,16 +16,16 @@ public interface VmfsOperationService {
 
     /**
      * 更新VMFS存储
-     * @param volume_id
+     * @param volumeId
      * @param params
      */
-    void updateVMFS(String volume_id, Map<String, Object> params) throws DMEException;
+    void updateVmfs(String volumeId, Map<String, Object> params) throws DMEException;
 
     /**
      * vmfs存储扩容
      * @param volumes
      */
-    void expandVMFS(Map<String,String> volumes) throws DMEException;
+    void expandVmfs(Map<String,String> volumes) throws DMEException;
 
     /**
      * vmfs存储空间回收
@@ -50,5 +50,5 @@ public interface VmfsOperationService {
      * @param params
      * @return
      */
-    List<SimpleServiceLevel> listServiceLevelVMFS(Map<String, Object> params) throws DMEException;
+    List<SimpleServiceLevel> listServiceLevelVmfs(Map<String, Object> params) throws DMEException;
 }

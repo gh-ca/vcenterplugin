@@ -30,10 +30,10 @@ public interface DmeStorageService {
     /**
      * 获取存储池列表
      * @param storageId 存储设备id
-     * @param media_type 存储池类型 file block all(默认)
+     * @param mediaType 存储池类型 file block all(默认)
      * @return
      */
-    List<StoragePool> getStoragePools(String storageId , String media_type) throws DMEException;
+    List<StoragePool> getStoragePools(String storageId , String mediaType) throws DMEException;
 
     /**
      * 获取逻辑端口列表
@@ -61,7 +61,7 @@ public interface DmeStorageService {
      * @param storageId
      * @return
      */
-    List<Dtrees> getDTrees(String storageId) throws DMEException;
+    List<Dtrees> getDtrees(String storageId) throws DMEException;
 
     /**
      * 获取share列表
@@ -116,12 +116,12 @@ public interface DmeStorageService {
 
     /**
      * 获取漂移组列表
-     * @param storage_id
+     * @param storageId
      * @return
      */
-    List<FailoverGroup> getFailoverGroups(String storage_id) throws DMEException;
+    List<FailoverGroup> getFailoverGroups(String storageId) throws DMEException;
 
-    FileSystemDetail getFileSystemDetail(String file_system_id) throws DMEException;
+    FileSystemDetail getFileSystemDetail(String fileSystemId) throws DMEException;
     /**
      * Access storage performance
      *

@@ -63,37 +63,32 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     private static final Logger LOG = LoggerFactory.getLogger(VmfsOperationServiceImpl.class);
 
     @Override
-    public void updateVMFS(String volume_id, Map<String, Object> params) throws DMEException {
-
-        //Map<String, Object> resMap = new HashMap<>(6);
-        //resMap.put("code", 202);
-        //resMap.put("msg", "update vmfsDatastore success !");
-        //resMap.put("task_id", volume_id);
+    public void updateVmfs(String volumeId, Map<String, Object> params) throws DMEException {
 
         VolumeUpdate volume = new VolumeUpdate();
 
-        Object service_level_name = params.get("service_level_name");
-        if (StringUtils.isEmpty(service_level_name)) {
+        Object serviceLevelName = params.get("service_level_name");
+        if (StringUtils.isEmpty(serviceLevelName)) {
             SmartQos smartQos = new SmartQos();
-            Object control_policy = params.get("control_policy");
-            if (!StringUtils.isEmpty(control_policy)) {
-                smartQos.setControlPolicy(control_policy.toString());
+            Object controlPolicy = params.get("control_policy");
+            if (!StringUtils.isEmpty(controlPolicy)) {
+                smartQos.setControlPolicy(controlPolicy.toString());
             }
-            Object max_iops = params.get("max_iops");
-            if (!StringUtils.isEmpty(max_iops)) {
-                smartQos.setMaxiops(Integer.valueOf(max_iops.toString()));
+            Object maxIops = params.get("max_iops");
+            if (!StringUtils.isEmpty(maxIops)) {
+                smartQos.setMaxiops(Integer.valueOf(maxIops.toString()));
             }
-            Object min_iops = params.get("min_iops");
-            if (!StringUtils.isEmpty(min_iops)) {
-                smartQos.setMiniops(Integer.valueOf(min_iops.toString()));
+            Object minIops = params.get("min_iops");
+            if (!StringUtils.isEmpty(minIops)) {
+                smartQos.setMiniops(Integer.valueOf(minIops.toString()));
             }
-            Object max_bandwidth = params.get("max_bandwidth");
-            if (!StringUtils.isEmpty(max_bandwidth)) {
-                smartQos.setMaxbandwidth(Integer.valueOf(max_bandwidth.toString()));
+            Object maxBandwidth = params.get("max_bandwidth");
+            if (!StringUtils.isEmpty(maxBandwidth)) {
+                smartQos.setMaxbandwidth(Integer.valueOf(maxBandwidth.toString()));
             }
-            Object min_bandwidth = params.get("min_bandwidth");
-            if (!StringUtils.isEmpty(min_bandwidth)) {
-                smartQos.setMinbandwidth(Integer.valueOf(min_bandwidth.toString()));
+            Object minBandwidth = params.get("min_bandwidth");
+            if (!StringUtils.isEmpty(minBandwidth)) {
+                smartQos.setMinbandwidth(Integer.valueOf(minBandwidth.toString()));
             }
             CustomizeVolumeTuning customizeVolumeTuning = new CustomizeVolumeTuning();
             customizeVolumeTuning.setSmartQos(smartQos);
@@ -107,14 +102,11 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         reqMap.put("volume", volume);
         String reqBody = gson.toJson(reqMap);
 
-        String url = API_VMFS_UPDATE + "/" + volume_id;
+        String url = API_VMFS_UPDATE + "/" + volumeId;
         try {
             Object oldDsName = params.get("oldDsName");
             Object newDsName = params.get("newDsName");
             if (StringUtils.isEmpty(oldDsName) || StringUtils.isEmpty(newDsName)) {
-                //resMap.put("code", 403);
-                //resMap.put("msg", "datastore params error");
-                //return resMap;
                 throw new DMEException("403","datastore params error");
             }
             //vcenter renameDatastore
@@ -126,29 +118,27 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, reqBody);
             int code = responseEntity.getStatusCodeValue();
             if (code != 202 ||StringUtils.isEmpty(result)||"failed".equals(result)) {
-                //resMap.put("code", code);
-                //resMap.put("msg", "update VmfsDatastore failed");
-                //return resMap;
                 throw new DMEException("503", "update VmfsDatastore failed");
             }
             String object = responseEntity.getBody();
-            //JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-            //resMap.put("task_id", jsonObject.get("task_id").getAsString());
+            JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+            String taskId = ToolUtils.jsonToStr(jsonObject.get("task_id"));
+            List<String> taskIds = new ArrayList<>(10);
+            taskIds.add(taskId);
+            Boolean flag = taskService.checkTaskStatus(taskIds);
+            if (!flag) {
+                LOG.error("update vmfs datastore error");
+                throw new DMEException("400", "update vmfs datastore error");
+            }
+
         } catch (Exception e) {
             LOG.error("update vmfsDatastore error", e);
-            //resMap.put("code", 503);
-            //resMap.put("msg", e.getMessage());
             throw new DMEException("503",e.getMessage());
         }
-    //return resMap;
     }
 
     @Override
-    public void expandVMFS(Map<String, String> volumemap) throws DMEException {
-
-        //Map<String, Object> resMap = new HashMap<>(16);
-        //resMap.put("code", 202);
-       // resMap.put("msg", "expand vmfsDatastore and volumes success !");
+    public void expandVmfs(Map<String, String> volumemap) throws DMEException {
 
         Map<String, Object> reqBody = new HashMap<>(16);
         List<Object> reqList = new ArrayList<>(10);
@@ -172,9 +162,6 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             ResponseEntity<String> responseEntity = dmeAccessService.access(API_VMFS_EXPAND, HttpMethod.POST, gson.toJson(reqMap));
             int code = responseEntity.getStatusCodeValue();
             if (code != 202) {
-                //resMap.put("code", code);
-                //resMap.put("msg", "expand vmfsDatastore failed !");
-                //return resMap;
                 throw new DMEException("503","expand vmfsDatastore failed !");
             }
             String object = responseEntity.getBody();
@@ -184,44 +171,28 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             task_ids.add(task_id);
             Boolean flag = taskService.checkTaskStatus(task_ids);
             if (!flag) {
-                //resMap.put("code", code);
-                //resMap.put("msg", "expand volume failed !");
-                //return resMap;
                 throw new DMEException("503","expand volume failed !");
             }
-            //resMap.put("task_id", task_id);
-
-            //expand vmfs datastore
 
             String ds_name = volumemap.get("ds_name");
-            //String vo_add_capacity = volumemap.get("vo_add_capacity");
-            //String hostObjectId = volumemap.get("hostObjectId");
             String result = null;
             if (!StringUtils.isEmpty(vo_add_capacity)&&!StringUtils.isEmpty(datastoreobjid)) {
                 result = vcsdkUtils.expandVmfsDatastore(ds_name, ToolUtils.getInt(vo_add_capacity),datastoreobjid);
             }
             if ("failed".equals(result)) {
-                //resMap.put("code", 403);
-                //resMap.put("msg", "expand vmfsDatastore failed !");
-               // return resMap;
                 throw new DMEException("403","expand vmfsDatastore failed !");
             }
 
 
         } catch (Exception e) {
             LOG.error("expand vmfsDatastore error !", e);
-            //resMap.put("code", 503);
-            //resMap.put("msg", e.getMessage());
             throw new DMEException("503",e.getMessage());
         }
-        //return resMap;
     }
 
     @Override
     public void recycleVmfsCapacity(List<String> dsname) throws DMEException {
-        //Map<String, Object> resMap = new HashMap<>(16);
-        ////resMap.put("code", 200);
-        //resMap.put("msg", "recycle vmfsDatastore success !");
+
         try {
             String result = null;
             if (dsname != null && dsname.size() > 0) {
@@ -230,25 +201,18 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 }
             }
             if (result == null || "error".equals(result)) {
-                //resMap.put("code", 403);
-                //resMap.put("msg", "recycle vmfsDatastore error");
-                //return resMap;
+
                 throw new DMEException("403","recycle vmfsDatastore error");
             }
         } catch (Exception e) {
             LOG.error("recycle vmfsDatastore error !", e);
-            //resMap.put("code", 503);
-           // resMap.put("msg", e.getMessage());
+
             throw new DMEException("503",e.getMessage());
         }
-        //return resMap;
     }
 
     @Override
     public void recycleVmfsCapacityByDataStoreIds(List<String> dsIds) throws DMEException {
-        //Map<String, Object> resMap = new HashMap<>(16);
-        ////resMap.put("code", 200);
-        //resMap.put("msg", "recycle vmfsDatastore success !");
         try {
             String result = null;
             if (dsIds != null && dsIds.size() > 0) {
@@ -258,33 +222,22 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 }
             }
             if (result == null || "error".equals(result)) {
-                //resMap.put("code", 403);
-                //resMap.put("msg", "recycle vmfsDatastore error");
-                //return resMap;
                 throw new DMEException("403","recycle vmfsDatastore error");
             }
         } catch (Exception e) {
             LOG.error("recycle vmfsDatastore error !", e);
-            //resMap.put("code", 503);
-            // resMap.put("msg", e.getMessage());
             throw new DMEException("503",e.getMessage());
         }
-        //return resMap;
     }
 
     @Override
     public void updateVmfsServiceLevel(Map<String, Object> params) throws DMEException {
 
-        //Map<String, Object> resMap = new HashMap<>(16);
-        //resMap.put("code", 202);
-        //resMap.put("msg", "update vmfs service level success !");
         if (params == null || params.size() == 0) {
-            //resMap.put("msg", "params error,please check your params!");
-            //resMap.put("code", 403);
             throw new DMEException("403","params error,please check your params!");
         }
 
-        Map<String, Object> reqMap = new HashMap<>();
+        Map<String, Object> reqMap = new HashMap<>(16);
         reqMap.put("service_level_id", params.get("service_level_id"));
         reqMap.put("volume_ids", params.get("volume_ids"));
 
@@ -293,31 +246,25 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             LOG.info("url:{" + API_SERVICELEVEL_UPDATE + "},响应信息：" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 202) {
-                //resMap.put("msg", "update vmfs service level error!");
-                //resMap.put("code", code);
-                //return resMap;
                 throw new DMEException("503","update vmfs service level error!");
             }
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-            String task_id = jsonObject.get("task_id").getAsString();
-            //resMap.put("task_id", task_id);
-
+            String taskId = jsonObject.get("task_id").getAsString();
+            List<String> taskIds = new ArrayList<>(10);
+            taskIds.add(taskId);
+            Boolean flag = taskService.checkTaskStatus(taskIds);
+            if (!flag) {
+                throw new DMEException("400","update vmfs service level failed");
+            }
         } catch (Exception e) {
             LOG.error("update vmfs service level error !", e);
-            //resMap.put("msg", e.getMessage());
-            //resMap.put("code", 503);
             throw new DMEException("503",e.getMessage());
         }
-        //return resMap;
     }
 
     @Override
-    public List<SimpleServiceLevel> listServiceLevelVMFS(Map<String, Object> params) throws DMEException {
-        //
-        //Map<String, Object> resMap = new HashMap<>(16);
-        //resMap.put("code", 200);
-        //resMap.put("msg", "list vmfs service level success !");
+    public List<SimpleServiceLevel> listServiceLevelVmfs(Map<String, Object> params) throws DMEException {
 
         List<SimpleServiceLevel> simpleServiceLevels = new ArrayList<>();
 
@@ -326,9 +273,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             LOG.info("{"+API_SERVICELEVEL_LIST+"}"+responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
-                //resMap.put("code", code);
-                //resMap.put("msg", "list vmfs service level error !");
-                //return resMap;
+            
                 throw new DMEException("503","list vmfs service level error !");
             }
 
@@ -383,26 +328,23 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 simpleServiceLevel.setCapabilities(capability);
                 simpleServiceLevels.add(simpleServiceLevel);
             }
-            //resMap.put("data", simpleServiceLevels);
         } catch (Exception e) {
             LOG.error("list vmfs service level success !", e);
-            //resMap.put("code", 503);
-            //resMap.put("msg", e.getMessage());
             throw new DMEException("503",e.getMessage());
         }
         return simpleServiceLevels;
     }
 
-    private Map<String, Object> getHostIpByVolume(List<String> volume_ids) throws Exception {
+    private Map<String, Object> getHostIpByVolume(List<String> volumeIds) throws Exception {
 
         String url;
         Map<String, Object> resMap = new HashMap<>(16);
         resMap.put("code", 200);
         resMap.put("msg", "search host id success ");
-        List<String> host_ids = new ArrayList<>();
-        for (int i = 0; i < volume_ids.size(); i++) {
-            String volume_id = volume_ids.get(i);
-            url = API_VOLUME_DETAIL + volume_id;
+        List<String> hostIds = new ArrayList<>();
+        for (int i = 0; i < volumeIds.size(); i++) {
+            String volumeId = volumeIds.get(i);
+            url = API_VOLUME_DETAIL + volumeId;
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -417,13 +359,13 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             //int length = attachments.getAsString().length();
             for (JsonElement jsonElement : attachments) {
                 JsonObject element = jsonElement.getAsJsonObject();
-                String host_id = ToolUtils.jsonToStr(element.get("host_id"));
-                if (!host_ids.contains(host_id)) {
-                    host_ids.add(host_id);
+                String hostId = ToolUtils.jsonToStr(element.get("host_id"));
+                if (!hostIds.contains(hostId)) {
+                    hostIds.add(hostId);
                 }
             }
         }
-        Map<String, Object> hostIp = getHostIp(host_ids);
+        Map<String, Object> hostIp = getHostIp(hostIds);
         int resCode = ToolUtils.getInt(hostIp.get("code"));
         if (resCode != 200) {
             resMap.put("code", resCode);
@@ -440,11 +382,11 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         resMap.put("code", 200);
         resMap.put("msg", "search host ip success ");
 
-        List<String> host_ips = new ArrayList<>();
+        List<String> hostIps = new ArrayList<>();
         String url;
         for (int i = 0; i < params.size(); i++) {
-            String host_id = params.get(i);
-            url = API_HOST_DETAIL + host_id + "/summary";
+            String hostId = params.get(i);
+            url = API_HOST_DETAIL + hostId + "/summary";
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -454,9 +396,9 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
             String ip = ToolUtils.jsonToStr(jsonObject.get("ip"));
-            host_ips.add(ip);
+            hostIps.add(ip);
         }
-        resMap.put("host_ips", host_ips);
+        resMap.put("host_ips", hostIps);
         return resMap;
     }
 
@@ -469,8 +411,8 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         List<Map<String, Object>> list = new ArrayList<>();
         for (int i = 0; i < volumes.size(); i++) {
             Map<String, String> reqmap = volumes.get(i);
-            String volume_id = reqmap.get("volume_id");
-            url = API_VMFS_UPDATE + volume_id;
+            String volumeId = reqmap.get("volume_id");
+            url = API_VMFS_UPDATE + volumeId;
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
@@ -483,19 +425,19 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             JsonObject volume = jsonObject.get("volume").getAsJsonObject();
             Double capacity = ToolUtils.jsonToDou(volume.get("capacity"));
             Map<String, Object> map = new HashMap<>(16);
-            map.put(volume_id, capacity);
+            map.put(volumeId, capacity);
             list.add(map);
         }
         resMap.put("data", list);
         return resMap;
     }
 
-    private Map<String, Object> getStorageDeviceByVolume(String volume_id) throws Exception {
+    private Map<String, Object> getStorageDeviceByVolume(String volumeId) throws Exception {
 
         Map<String, Object> resMap = new HashMap<>(16);
         resMap.put("code", 200);
         resMap.put("msg", "search storage device success ");
-        String url = API_STORAGE_LIST + volume_id + "/detail";
+        String url = API_STORAGE_LIST + volumeId + "/detail";
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         int code = responseEntity.getStatusCodeValue();
         if (code != 200) {
@@ -511,10 +453,10 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         storage.setStatus(ToolUtils.jsonToStr(jsonObject.get("status")));
         storage.setVendor(ToolUtils.jsonToStr(jsonObject.get("vendor")));
         storage.setProductVersion(ToolUtils.jsonToStr(jsonObject.get("product_version")));
-        Double used_capacity = ToolUtils.jsonToDou(jsonObject.get("used_capacity"), 0.0);
-        storage.setUsedCapacity(used_capacity);
-        Double total_capacity = ToolUtils.jsonToDou(jsonObject.get("total_capacity"), 0.0);
-        storage.setTotalCapacity(total_capacity);
+        Double usedCapacity = ToolUtils.jsonToDou(jsonObject.get("used_capacity"), 0.0);
+        storage.setUsedCapacity(usedCapacity);
+        Double totalCapacity = ToolUtils.jsonToDou(jsonObject.get("total_capacity"), 0.0);
+        storage.setTotalCapacity(totalCapacity);
         storage.setTotalEffectiveCapacity(ToolUtils.jsonToDou(jsonObject.get("total_effective_capacity"),0.0));
         storage.setFreeEffectiveCapacity(ToolUtils.jsonToDou(jsonObject.get("free_effective_capacity"),0.0));
         //容量利用率
