@@ -27,7 +27,7 @@
 </div>
 <div class="clr-row">
   <div class="clr-col-4" *ngFor="let item of serviceLevels" [clrDgItem]="item">
-    <div class="info-card" style="margin-left: 10px;margin-top: 30px; height: 250px">
+    <div class="info-card" style="margin-left: 10px;margin-top: 30px; height: 260px">
       <div class="info-card-header">
         <div class="info-card-title" style="cursor:pointer" (click)="clickName(item)">{{item.name}}</div>
         <!--<clr-dropdown [clrCloseMenuOnItemClick]="false">
@@ -46,7 +46,7 @@
           <div class="squre-per-box" [ngStyle]="{'height':(item.usedRate/100*200)+'px'}"></div>
           <div class="squre-num">{{item.usedRate}}</div>
         </div>
-        <div>
+        <div style="width: 70%;">
           <div class="gh-info-item">
             <span class="gh-info-lable">{{'tier.total'|translate}}</span>
             <span class="gh-info-value">{{item.totalCapacity}} GB</span>
@@ -55,10 +55,10 @@
             <span class="gh-info-lable">{{'tier.free'|translate}}</span>
             <span class="gh-info-value">{{item.freeCapacity}} GB</span>
           </div>
-          <div class="gh-info-item" style="width: 300px;">
+          <div class="gh-info-item" style="display: flex">
             <span class="gh-info-lable">{{'tier.qosP'|translate}}</span>
             <div class="gh-info-value" *ngIf="item.capabilities.qos == undefined">--</div>
-            <div style="float: right;margin-top: 5px; width: 220px" *ngIf="item.capabilities.qos != undefined
+            <div style="margin-top: 5px;" *ngIf="item.capabilities.qos != undefined
                                             && item.capabilities.qos.enabled == true">
               <div style="margin-top: 5px" *ngIf="item.capabilities.qos.qosParam.latency != undefined">{{'tier.latency'|translate}} <= {{item.capabilities.qos.qosParam.latency}} {{item.capabilities.qos.qosParam.latencyUnit}}</div>
               <div style="margin-top: 5px" *ngIf="item.capabilities.qos.qosParam.maxIOPS != undefined">IOPS <= {{item.capabilities.qos.qosParam.maxIOPS}} IOPS/TB</div>
