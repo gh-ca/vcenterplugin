@@ -607,7 +607,14 @@
     "atOne": "Please Select one!",
     "bandNotNull": "BandWidth not be empty!",
     "IOPSNotNull": "IOPS not be empty!",
-    "latencyNotNull": "Latency not be empty!"
+    "latencyNotNull": "Latency not be empty!",
+
+    "addTitle": "Create RDM",
+    "basicSet": "Volume Setting",
+    "storeSet": "Storage Setting",
+
+    "createRdmError": "Create RDM Error!",
+    "selectOneSer": "Service Level is not be Null！"
   },
   "tier": {
     "name": "Name",
