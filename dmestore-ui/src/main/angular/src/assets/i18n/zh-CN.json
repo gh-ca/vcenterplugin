@@ -229,13 +229,12 @@
     "startTime": "开始时间",
     "endTime": "结束时间",
     "timeInputTips": "请输入开始-结束时间！",
-    "capacityTips": "若版本为VMFS5则容量最小值为1G，若版本为VMFS6则容量最小值为2G。",
+    "capacityTips": "若版本为VMFS5则容量最小值为1G，若版本为VMFS6则容量最小值为2G，且容量必须为单位为G的正整数，数量必须为正整数！",
     "serviceLevelCantBeNull": "服务等级是必选项，且只能选择容量不为0的服务等级！",
-    "expandTips": "扩容容量只能为正整数,且最小单位为GB。",
+    "expandTips": "扩容容量只能单位为GB的正整数。",
     "loadingTips": "数据加载中，请稍后",
-    "add": {
-      "errorTips": "添加失败！"
-    },
+    "dataHandleLoadingTips": "数据处理中，请稍后",
+    "listNullTips": "找不到VMFS",
     "mount":{
       "mount":"挂载",
       "host":"主机",
@@ -245,7 +244,8 @@
       "readOnly":"只读",
       "readWrite":"读写",
       "mountObj":"挂载对象",
-      "notChooseDataStoreTips":"请选择需要挂载的DataStore！"
+      "notChooseDataStoreTips":"请选择需要挂载的DataStore！",
+      "mountErr":"请选择需要挂载的主机/集群！"
     },
     "del":{
       "title":"提示",
@@ -256,7 +256,9 @@
       "content":"确认要卸载吗?",
       "notChooseDeviceTips":"请选择需要卸载的主机或集群！",
       "notChooseDataStoreTips":"请选择需要卸载的DataStore！",
-      "tips":"若VMFS所挂载的主机/集群全部被卸载，则会自动删除此VMFS设备！"
+      "tips":"若VMFS所挂载的主机/集群全部被卸载，则会自动删除此VMFS设备！",
+      "notHaveCluster":"该VMFS未绑定集群",
+      "notHaveHost":"该VMFS未绑定主机"
     },
     "reclaim": {
       "title":"提示",
@@ -376,7 +378,7 @@
         "volumes":"卷",
         "name":"名称",
         "status":"状态",
-        "dataStore":"Data Store",
+        "dataStore":"所属数据存储",
         "totalCap":"总容量",
         "proType":"分配类型",
         "capUsage":"容量利用率",
@@ -689,7 +691,31 @@
   "enum":{
     "status":{
       "disconnected":"未连接",
-      "connected":"已连接"
+      "connected":"已连接",
+      "creating":"创建中",
+      "normal":"正常",
+      "mapping":"映射中",
+      "unmapping":"解除映射中",
+      "deleting":"删除中",
+      "error":"错误",
+      "expanding":"扩容中",
+      "unmapped":"未映射",
+      "mapped":"已映射",
+      "unprotected":"未保护",
+      "protected":"已保护",
+      "notEnabled":"未启用",
+      "enabled":"已启用",
+      "normalFs":"普通文件系统",
+      "wormFs":"WORM文件系统",
+      "unknown":"未知",
+      "running":"运行中",
+      "fault":"故障",
+      "faulty":"故障",
+      "member":"成员盘",
+      "linkDown":"未连接",
+      "linkUp":"已连接",
+      "activated":"已激活",
+      "unActivated":"未激活"
     },
     "type":{
       "block":"块",
@@ -703,6 +729,13 @@
     "reduceError":"缩容失败！请联系管理员！",
     "deleteError":"删除失败！请联系管理员！",
     "addError":"添加失败！请联系管理员！",
-    "modifyError":"编辑失败！请联系管理员！"
+    "modifyError":"编辑失败！请联系管理员！",
+    "reclaimError":"空间回收失败！请联系管理员！",
+    "serviceLevelError":"服务等级变更失败！请联系管理员！"
+  },
+  "page": {
+    "perPage": "每页",
+    "of": "中的",
+    "all": "共"
   }
 }

@@ -20,7 +20,7 @@ export class VmfsListService {
   }
   // 通过存储ID获取存储池数据 (vmfs添加mediaType为block)
   getStoragePoolsByStorId(storageId: string, mediaType: string) {
-    return this.http.get('dmestorage/storagepools?storageId='+ storageId + '&media_type=' + mediaType);
+    return this.http.get('dmestorage/storagepools?storageId='+ storageId + '&mediaType=' + mediaType);
   }
 
   // 获取所有的主机
@@ -126,6 +126,7 @@ export interface VmfsInfo {
   volumeId: string;
   volumeName: string;
   wwn: string;
+  usedCapacity: number;
 }
 // 存储
 export interface StorageList {
@@ -268,7 +269,7 @@ export class GetForm {
   // 扩容form（初始化的添加表单）
   getExpandForm() {
     const expandForm = {
-      vo_add_capacity: 0, // 扩容大小默认GB
+      vo_add_capacity: null, // 扩容大小默认GB
       capacityUnit: 'GB', // 容量单位 （最后需转换为GB）
       volume_id: '', // 卷ID
       ds_name: '', // vmfsName
@@ -294,7 +295,7 @@ export class GetForm {
       clusterId: null,
       cluster: null,
       dataStoreObjectIds: [], // datastore object id列表 必,
-      mountType: null // 挂载的设备类型 1 服务器、2 集群 前端自用参数
+      mountType: '1' // 挂载的设备类型 1 服务器、2 集群 前端自用参数
     };
     return mountForm;
   }

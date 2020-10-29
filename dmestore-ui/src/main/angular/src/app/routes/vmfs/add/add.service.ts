@@ -24,7 +24,7 @@ export class AddService {
   }
   // 通过存储ID获取存储池数据 (vmfs添加mediaType为block)
   getStoragePoolsByStorId(storageId: string, mediaType: string) {
-    return this.http.get('dmestorage/storagepools?storageId='+ storageId + '&media_type=' + mediaType);
+    return this.http.get('dmestorage/storagepools?storageId='+ storageId + '&mediaType=' + mediaType);
   }
 
   /**

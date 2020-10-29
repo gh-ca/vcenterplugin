@@ -51,8 +51,10 @@ export class AddComponent implements OnInit{
   // 操作来源 list:列表页面、dataStore：在DataStore菜单页面操作
   resource;
 
-  modalLoading = false; // 弹窗加载
+  modalLoading = false; // 数据加载
+  modalHandleLoading = false; // 数据处理
   isOperationErr = false; // 错误信息
+  capacityErr = false; // 容量错误信息
 
 
   // 添加页面窗口
@@ -69,7 +71,10 @@ export class AddComponent implements OnInit{
   initData() {
     // 初始化loading
     this.modalLoading = true;
+    this.modalHandleLoading = false;
     this.isOperationErr = false;
+    // 容量错误提示
+    this.capacityErr = false;
     // this.globalsService.loading = true;
     // 设备类型 操作类型初始化
     this.route.url.subscribe(url => {
@@ -355,18 +360,18 @@ export class AddComponent implements OnInit{
       console.log('addFrom', this.form);
       // 打开 loading
       // this.globalsService.loading = true;
-      this.modalLoading = true;
+      this.modalHandleLoading = true;
       this.remoteSrv.createVmfs(this.form).subscribe((result: any) => {
-        this.modalLoading = false;
+        this.modalHandleLoading = false;
         if (result.code === '200') {
           console.log('创建成功');
+          // 关闭窗口
+          this.cancel();
         } else {
           console.log('创建失败：' + result.description);
           // 失败信息
           this.isOperationErr = true;
         }
-        // 关闭窗口
-        this.cancel();
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       });
     } else {
@@ -444,58 +449,90 @@ export class AddComponent implements OnInit{
    * @param obj
    */
   capacityOnblur() {
+    // 容量
     let capacity = this.form.capacity;
-    if (capacity) {
-      if (this.form.capacityUnit === 'TB') {
-        if (capacity.toString().match(/\d+(\.\d{0,2})?/)) {
-          capacity = capacity.toString().match(/\d+(\.\d{0,2})?/)[0];
-        } else {
-          capacity = '';
+    // 标准容量 单位G
+    let capacityG;
+    console.log('capacity', capacity)
+    if (capacity && capacity !== null && capacity !== '') {
+
+      if (capacity > 0) {
+        switch (this.form.capacityUnit) {
+          case "TB":
+            capacityG = capacity * 1024 + '';
+            console.log('capacityG2', capacityG);
+            if (capacityG.indexOf(".")!==-1) { // 小数
+              this.capacityErr = true;
+              capacity = '';
+            } else{ // 整数
+              if (this.form.version === '5') {
+                if (capacity < 1/1024) {
+                  capacity = '';
+                  this.capacityErr = true;
+                } else {
+                  this.capacityErr = false;
+                }
+              } else {
+                if (capacity < 2/1024) {
+                  capacity = '';
+                  this.capacityErr = true;
+                }else {
+                  this.capacityErr = false;
+                }
+              }
+            }
+            break;
+          case "MB":
+            capacityG = capacity / 1024 + '';
+            if (capacityG.indexOf(".")!==-1) { // 小数
+              this.capacityErr = true;
+              capacity = '';
+            } else { // 整数
+              if (this.form.version === '5') {
+                if (capacity < 1*1024) {
+                  capacity = '';
+                  this.capacityErr = true;
+                }else {
+                  this.capacityErr = false;
+                }
+              } else {
+                if (capacity < 2*1024) {
+                  capacity = '';
+                  this.capacityErr = true;
+                }else {
+                  this.capacityErr = false;
+                }
+              }
+            }
+            break;
+          default:
+            capacityG = capacity + '';
+            if (capacityG.indexOf(".")!==-1) { // 小数
+              capacity = '';
+              this.capacityErr = true;
+            } else {// 整数
+              if (this.form.version === '5') {
+                if (capacity < 1) {
+                  capacity = '';
+                  this.capacityErr = true;
+                } else {
+                  this.capacityErr = false;
+                }
+              } else {
+                if (capacity < 2) {
+                  capacity = '';
+                  this.capacityErr = true;
+                } else {
+                  this.capacityErr = false;
+                }
+              }
+
+            }
+            break;
         }
       } else {
-        if(capacity.length==1)
-        {
-          capacity = capacity.toString().replace(/[^1-9]/g,'')
-        }
-        else{
-          capacity = capacity.toString().replace(/\D/g,'')
-        }
-      }
-      if (capacity !== '') {
-        if (this.form.capacityUnit === 'TB') {
-          if (this.form.version === '5') {
-            if (capacity < 1/1024) {
-              capacity = '';
-            }
-          } else {
-            if (capacity < 2/1024) {
-              capacity = '';
-            }
-          }
-        } else if (this.form.capacityUnit === 'MB') {
-          if (this.form.version === '5') {
-            if (capacity < 1*1024) {
-              capacity = '';
-            }
-          } else {
-            if (capacity < 2*1024) {
-              capacity = '';
-            }
-          }
-        } else {
-          if (this.form.version === '5') {
-            if (capacity < 1) {
-              capacity = '';
-            }
-          } else {
-            if (capacity < 2) {
-              capacity = '';
-            }
-          }
-        }
-      }
-      if (capacity !== '') {
-        capacity = Number(capacity);
+        capacity = '';
+        this.capacityErr = true;
       }
       this.form.capacity = capacity;
     }
@@ -509,16 +546,13 @@ export class AddComponent implements OnInit{
    */
   countBlur() {
     let count = this.form.count;
-    if(count.length==1)
-    {
-      count = count.toString().replace(/[^1-9]/g,'')
-    }
-    else{
-      count = count.toString().replace(/\D/g,'')
-    }
-
-    if (count !== '') {
-      count = Number(count);
+    if (count && count !== null && count !== '') {
+      if ((count+'').indexOf(".")!==-1) { // 小数
+        count = '';
+        this.capacityErr = true;
+      } else {
+        this.capacityErr = false;
+      }
     }
     this.form.count =  count;
   }

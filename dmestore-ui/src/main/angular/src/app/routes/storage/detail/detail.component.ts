@@ -30,6 +30,7 @@ import {GlobalsService} from "../../../shared/globals.service";
   providers: [DetailService, MakePerformance, NfsService],
 })
 export class DetailComponent implements OnInit, AfterViewInit {
+
   cd : CapacityDistribution;
   capSave:CapacitySavings;
   options = {
@@ -615,6 +616,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }
     this.capSave.bars=bars;
     this.capSave.rate=(this.capSave.beforeSave/this.capSave.afterSave).toFixed(0) +": 1";
+    console.log('capSave',this.capSave);
+
   }
   initCapacityDistribution(){
     this.cd = new CapacityDistribution();
@@ -622,13 +625,13 @@ export class DetailComponent implements OnInit, AfterViewInit {
     this.detail.protectionCapacity
     this.cd.protection = this.formatCapacity(this.detail.protectionCapacity);
     this.cd.fileSystem =this.formatCapacity(this.detail.fileCapacity);
-    const v = 2.024;
     this.cd.volume =this.formatCapacity(this.detail.blockCapacity);
      this.cd.freeCapacity= this.getFreeCapacity(this.detail.totalEffectiveCapacity,this.detail.usedCapacity);
 
     const cc = new CapacityChart(this.formatCapacity(this.detail.totalEffectiveCapacity));
-    const free=(this.detail.totalEffectiveCapacity-this.detail.usedCapacity)*100;
-    const cs = new CapacitySerie(this.detail.usedCapacity,free);
+    const cs = new CapacitySerie(this.detail.protectionCapacity
+      ,this.detail.fileCapacity,this.detail.blockCapacity,
+      this.detail.totalEffectiveCapacity-this.detail.usedCapacity);
     cc.series.push(cs);
     this.cd.chart = cc;
   }

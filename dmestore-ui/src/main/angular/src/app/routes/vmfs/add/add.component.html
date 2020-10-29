@@ -12,6 +12,11 @@
         {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
       </span>
   </div>
+  <div *ngIf="modalHandleLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+  </div>
   <!--Page1 -->
   <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="name.pristine || !formPageOne.valid">
     <ng-template clrPageTitle>{{'vmfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
@@ -38,7 +43,7 @@
 
 
       <!--版本 -->
-      <clr-select-container>
+      <clr-select-container class="selectClass">
         <label style="color: #9F9F9F;">{{'vmfs.version' | translate}}</label>
         <select (change)="setBlockSizeOptions();"  [(ngModel)]="form.version" clrSelect name="version" required>
           <option value='5'>VMFS 5</option>
@@ -62,12 +67,17 @@
         </div>
         <input clrInput style="width: 19%;text-align: center;" readonly value="{{'vmfs.multiply' | translate}}">
         <input clrInput (blur)="countBlur();" style="width: 27%;" type="number" [(ngModel)]="form.count" name="count" #number="ngModel" required/>
-        <clr-control-helper><clr-icon shape="exclamation-circle"></clr-icon>{{'vmfs.capacityTips' | translate}}</clr-control-helper>
+        <clr-control-helper *ngIf="!capacityErr"><clr-icon shape="exclamation-circle"></clr-icon>{{'vmfs.capacityTips' | translate}}</clr-control-helper>
+        <clr-control-helper *ngIf="capacityErr">
+          <div class="errorTips" readonly >
+            <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.capacityTips' | translate}}
+          </div>
+        </clr-control-helper>
         <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-input-container>
 
       <!-- 块大小 -->
-      <clr-select-container>
+      <clr-select-container class="selectClass">
         <label style="color: #9F9F9F;">{{'vmfs.blockSize' | translate}}</label>
         <select  clrSelect [(ngModel)]="form.blockSize" name="blockSize" (change)="setSrgOptions();" required>
           <option *ngFor="let item of blockSizeOptions" value="{{item.key}}">{{item.value}}</option>
@@ -76,7 +86,7 @@
       </clr-select-container>
 
       <!-- 空间回收粒度 -->
-      <clr-select-container>
+      <clr-select-container class="selectClass">
         <label style="color: #9F9F9F;">{{'vmfs.spaceReclamationGranularity' | translate}}</label>
         <select  clrSelect (ngModelOptions)="srgOptions"  [(ngModel)]="form.spaceReclamationGranularity" name="spaceReclamationGranularity" required>
           <option *ngFor="let item of srgOptions" value="{{item.key}}">{{item.value}}</option>
@@ -85,7 +95,7 @@
       </clr-select-container>
 
       <!-- 空间回收优先级 -->
-      <clr-select-container>
+      <clr-select-container class="selectClass">
         <label style="color: #9F9F9F;">{{'vmfs.spaceReclamationPriority' | translate}}</label>
         <select  clrSelect [(ngModel)]="form.spaceReclamationPriority" name="spaceReclamationPriority" required>
           <option value="low">{{'vmfs.low' | translate}}</option>
@@ -138,7 +148,7 @@
     <form clrForm #formPageTwo="ngForm">
       <!-- 1、选择 服务等级-->
       <div *ngIf="serviceLevelIsNull" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.serviceLevelCantBeNull' | translate}}</div>
-      <div *ngIf="isOperationErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.add.errorTips' | translate}}</div>
+      <div *ngIf="isOperationErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.addError' | translate}}</div>
       <!-- 1、选择 服务等级-->
       <ng-container *ngIf="levelCheck==='level'">
         <clr-accordion>
@@ -200,14 +210,14 @@
         <clr-input-container>
           <label>{{'vmfs.basicInformation' | translate}}</label>
         </clr-input-container>
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label style="color: #9F9F9F;">{{'vmfs.storageDevice' | translate}}</label>
           <select clrSelect  [(ngModel)]="form.storage_id" name="storage_id" (ngModelChange)="getStoragePoolsByStorId();" required>
             <option *ngFor="let item of storageList" value="{{item.id}}">{{item.name}}</option>
           </select>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-select-container>
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label style="color: #9F9F9F;">{{'vmfs.storagePool' | translate}}</label>
           <select clrSelect [(ngModel)]="form.pool_raw_id" name="pool_raw_id" required>
             <option *ngFor="let item of storagePoolList" value="{{item.poolId}}">{{item.name}}</option>
@@ -297,7 +307,7 @@
         <clr-input-container>
           <label>{{'vmfs.resourceTuning' | translate}}</label>
         </clr-input-container>
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label style="color: #9F9F9F;">{{'vmfs.provisioningType' | translate}}</label>
           <select clrSelect [(ngModel)]="form.alloctype" name="alloctype" >
             <option value="thin">thin</option>

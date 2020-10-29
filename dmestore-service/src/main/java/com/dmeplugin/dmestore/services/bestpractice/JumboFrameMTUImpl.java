@@ -1,6 +1,14 @@
 package com.dmeplugin.dmestore.services.bestpractice;
 
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
+import com.dmeplugin.vmware.mo.HostMO;
+import com.dmeplugin.vmware.mo.HostNetworkSystemMO;
+import com.dmeplugin.vmware.util.VmwareContext;
+import com.vmware.vim25.HostVirtualSwitch;
+import com.vmware.vim25.HostVirtualSwitchSpec;
+import com.vmware.vim25.ManagedObjectReference;
+
+import java.util.List;
 
 /**
  * @author wangxiangyong
@@ -38,11 +46,47 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
 
     @Override
     public boolean check(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
-        return super.check(vcsdkUtils, objectId, getRecommendValue());
+        return check(vcsdkUtils, objectId, getRecommendValue());
     }
 
     @Override
     public void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception{
-        super.update(vcsdkUtils, objectId, getRecommendValue());
+        update(vcsdkUtils, objectId, getRecommendValue());
+    }
+
+    private boolean check(VCSDKUtils vcsdkUtils, String objectId, Object recommendValue) throws Exception {
+        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
+        VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
+        HostMO hostMo = new HostMO(context, mor);
+        List<HostVirtualSwitch> virtualSwitches = hostMo.getHostNetworkInfo().getVswitch();
+        for(HostVirtualSwitch virtualSwitch : virtualSwitches){
+            HostVirtualSwitchSpec spec = virtualSwitch.getSpec();
+            Integer mtu = spec.getMtu();
+            if(null == mtu || (mtu.intValue() != ((Integer)recommendValue).intValue())){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private void update(VCSDKUtils vcsdkUtils, String objectId, Object recommendValue) throws Exception {
+        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
+        VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
+        if (check(vcsdkUtils, objectId, recommendValue)) {
+            return;
+        }
+        HostMO hostMo = new HostMO(context, mor);
+        HostNetworkSystemMO hostNetworkSystemMO = hostMo.getHostNetworkSystemMO();
+        List<HostVirtualSwitch> virtualSwitches = hostMo.getHostNetworkInfo().getVswitch();
+        for(HostVirtualSwitch virtualSwitch : virtualSwitches){
+            String name = virtualSwitch.getName();
+            HostVirtualSwitchSpec spec = virtualSwitch.getSpec();
+            Integer mtu = spec.getMtu();
+            if(null == mtu || (mtu.intValue() != ((Integer)recommendValue).intValue())){
+                spec.setMtu((Integer)recommendValue);
+                hostNetworkSystemMO.updateVirtualSwitch(name, spec);
+            }
+        }
     }
 }
