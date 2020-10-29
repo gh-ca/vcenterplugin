@@ -231,11 +231,9 @@
     "timeInputTips": "Please enter start-end time！",
     "capacityTips": "If the version is VMFS5, the minimum capacity is 1G, if the version is VMFS6, the minimum capacity is 2G, and the capacity must be a positive integer in G, and the quantity must be a positive integer!",
     "serviceLevelCantBeNull": "The service level is a must, and you can only choose the service level whose capacity is not 0!",
-    "expandTips": "The expansion capacity can only be a positive integer, and the smallest unit is GB.",
+    "expandTips": "Expansion capacity can only be a positive integer of GB",
     "loadingTips": "Data loading, please wait",
-    "add": {
-      "errorTips": "add failed！"
-    },
+    "listNullTips": "We couldn't find any users",
     "mount":{
       "mount":"Mount",
       "host":"Host",
@@ -245,7 +243,8 @@
       "readOnly":"Read Only",
       "readWrite":"Read Write",
       "mountObj":"Mount Object",
-      "notChooseDataStoreTips":"Please select the DataStore to be mounted！"
+      "notChooseDataStoreTips":"Please select the DataStore to be mounted！",
+      "mountErr":"Please select the host/cluster to be mounted!"
     },
     "del":{
       "title":"Tips",
@@ -256,7 +255,9 @@
       "content":"Are you sure to unmount?",
       "notChooseDeviceTips":"Please select the host or cluster to be uninstalled!",
       "notChooseDataStoreTips":"Please select the DataStore to be unmounted！",
-      "tips":"If all the hosts/clusters mounted by VMFS are unmounted, the VMFS device will be deleted automatically！"
+      "tips":"If all the hosts/clusters mounted by VMFS are unmounted, the VMFS device will be deleted automatically！",
+      "notHaveCluster":"该VMFS未绑定集群",
+      "notHaveHost":"该VMFS未绑定主机"
     },
     "reclaim": {
       "title":"Tips",
@@ -723,6 +724,12 @@
     "reduceError":"Reduce failed!Please contact management!",
     "deleteError":"Delete failed!Please contact management!",
     "addError":"Delete failed!Please contact management!",
-    "modifyError":"Delete failed!Please contact management!"
+    "modifyError":"Delete failed!Please contact management!",
+    "reclaimError":"Space reclamation failed! Please contact the administrator!",
+    "serviceLevelError":"Service level change failed! Please contact the administrator!"
+  },
+  "page": {
+    "perPage": "Per Page",
+    "of": "of"
   }
 }
