@@ -51,7 +51,8 @@ export class AddComponent implements OnInit{
   // 操作来源 list:列表页面、dataStore：在DataStore菜单页面操作
   resource;
 
-  modalLoading = false; // 弹窗加载
+  modalLoading = false; // 数据加载
+  modalHandleLoading = false; // 数据处理
   isOperationErr = false; // 错误信息
   capacityErr = false; // 容量错误信息
 
@@ -70,6 +71,7 @@ export class AddComponent implements OnInit{
   initData() {
     // 初始化loading
     this.modalLoading = true;
+    this.modalHandleLoading = false;
     this.isOperationErr = false;
     // 容量错误提示
     this.capacityErr = false;
@@ -358,18 +360,18 @@ export class AddComponent implements OnInit{
       console.log('addFrom', this.form);
       // 打开 loading
       // this.globalsService.loading = true;
-      this.modalLoading = true;
+      this.modalHandleLoading = true;
       this.remoteSrv.createVmfs(this.form).subscribe((result: any) => {
-        this.modalLoading = false;
+        this.modalHandleLoading = false;
         if (result.code === '200') {
           console.log('创建成功');
+          // 关闭窗口
+          this.cancel();
         } else {
           console.log('创建失败：' + result.description);
           // 失败信息
           this.isOperationErr = true;
         }
-        // 关闭窗口
-        this.cancel();
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       });
     } else {
