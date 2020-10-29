@@ -61,7 +61,7 @@ public class NfsOperationController extends BaseController{
      * vkernelIp 虚拟网卡ip
      * hostObjectId 挂载主机的Objectid
      *
-     * accessMode 挂载方式 分 只读 和读写
+     * accessMode 挂载方式 只读 "readOnly" 读写 "readWrite
      * securityType NFS41的时候，安全类型AUTH_SYS,SEC_KRB5,SEC_KRB5I
      * }
      * @param params

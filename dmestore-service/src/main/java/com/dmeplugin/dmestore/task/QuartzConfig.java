@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.task;
 
+import com.dmeplugin.vmware.util.VmwarePluginContextFactory;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
@@ -30,6 +31,7 @@ public class QuartzConfig {
     public void destory(){
         try {
             scheduler.shutdown();
+            VmwarePluginContextFactory.closeAll();
         } catch (SchedulerException e) {
             LOGGER.error("shutdown scheduler error",e);
         }

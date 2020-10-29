@@ -52,6 +52,8 @@ export class AddComponent implements OnInit{
   resource;
 
   modalLoading = false; // 弹窗加载
+  isOperationErr = false; // 错误信息
+  capacityErr = false; // 容量错误信息
 
 
   // 添加页面窗口
@@ -68,6 +70,10 @@ export class AddComponent implements OnInit{
   initData() {
     // 初始化loading
     this.modalLoading = true;
+    this.isOperationErr = false;
+    // 容量错误提示
+    this.capacityErr = false;
+    // this.globalsService.loading = true;
     // 设备类型 操作类型初始化
     this.route.url.subscribe(url => {
       console.log('url', url);
@@ -91,6 +97,9 @@ export class AddComponent implements OnInit{
 
     // 添加页面默认打开首页
     this.jumpTo(this.addPageOne);
+
+    // 容量设置
+    this.capacityOnblur();
   }
   // 页面跳转
   jumpTo(page: ClrWizardPage) {
@@ -122,6 +131,8 @@ export class AddComponent implements OnInit{
     this.form.blockSize = this.blockSizeOptions[0].key;
     // 重置空间回收粒度
     this.setSrgOptions();
+
+
   }
 
   /**
@@ -143,8 +154,9 @@ export class AddComponent implements OnInit{
     }
     this.srgOptions = options;
     this.form.spaceReclamationGranularity = this.srgOptions[0].key;;
-    console.log('this.form.blockSize:' + this.form.blockSize);
-    console.log('this.form.spaceReclamationGranularity:' + this.form.spaceReclamationGranularity);
+
+    // 容量设置
+    this.capacityOnblur();
   }
 
   // 设置设备数据
@@ -233,6 +245,7 @@ export class AddComponent implements OnInit{
         console.log('this.serviceLevelList', this.serviceLevelList);
       }
       this.modalLoading = false;
+      // this.globalsService.loading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
@@ -247,6 +260,13 @@ export class AddComponent implements OnInit{
   customerClickFunc() {
     this.levelCheck = 'customer';
     this.serviceLevelIsNull = false;
+
+    this.storageList = null;
+    this.storagePoolList = null;
+
+    // loading
+    this.modalLoading = true;
+
     this.getStorageList();
   }
   // 获取所有存储数据
@@ -255,12 +275,15 @@ export class AddComponent implements OnInit{
       console.log(result);
       if (result.code === '200' && result.data !== null) {
         this.storageList = result.data;
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        this.getStoragePoolsByStorId();
       }
+      this.modalLoading = false;
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
   // 获取存储池数据
   getStoragePoolsByStorId() {
+    this.form.pool_raw_id = undefined;
     console.log('selectSotrageId' + this.form.storage_id);
     if (null !== this.form.storage_id && '' !== this.form.storage_id) {
       this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, 'block').subscribe((result: any) => {
@@ -333,18 +356,24 @@ export class AddComponent implements OnInit{
         this.form.control_policy = null;
       }
       console.log('addFrom', this.form);
+      // 打开 loading
+      // this.globalsService.loading = true;
+      this.modalLoading = true;
       this.remoteSrv.createVmfs(this.form).subscribe((result: any) => {
+        this.modalLoading = false;
         if (result.code === '200') {
           console.log('创建成功');
         } else {
           console.log('创建失败：' + result.description);
+          // 失败信息
+          this.isOperationErr = true;
         }
         // 关闭窗口
         this.cancel();
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       });
     } else {
       this.serviceLevelIsNull = true;
-      this.wizard.open();
     }
   }
   // 容量单位转换
@@ -371,9 +400,9 @@ export class AddComponent implements OnInit{
           break;
       }
 
-      // 版本号5 最小容量为1.3G 版本号6最小2G
-      if (capatityG < 1.3 && this.form.version === '5') {
-        capatityG = 1.3;
+      // 版本号5 最小容量为1G 版本号6最小2G
+      if (capatityG < 1 && this.form.version === '5') {
+        capatityG = 1;
       } else if (capatityG < 2 && this.form.version === '6') {
         capatityG = 2;
       }
@@ -412,5 +441,177 @@ export class AddComponent implements OnInit{
       cNum = isGB ? (c/1024/1024).toFixed(3) + 'PB':(c/1024/1024).toFixed(3) + 'TB';
     }
     return cNum;
+  }
+  /**
+   * 容量
+   * @param obj
+   */
+  capacityOnblur() {
+    // 容量
+    let capacity = this.form.capacity;
+    // 标准容量 单位G
+    let capacityG;
+    console.log('capacity', capacity)
+    if (capacity && capacity !== null && capacity !== '') {
+
+      if (capacity > 0) {
+        switch (this.form.capacityUnit) {
+          case "TB":
+            capacityG = capacity * 1024 + '';
+            console.log('capacityG2', capacityG);
+            if (capacityG.indexOf(".")!==-1) { // 小数
+              this.capacityErr = true;
+              capacity = '';
+            } else{ // 整数
+              if (this.form.version === '5') {
+                if (capacity < 1/1024) {
+                  capacity = '';
+                  this.capacityErr = true;
+                } else {
+                  this.capacityErr = false;
+                }
+              } else {
+                if (capacity < 2/1024) {
+                  capacity = '';
+                  this.capacityErr = true;
+                }else {
+                  this.capacityErr = false;
+                }
+              }
+            }
+            break;
+          case "MB":
+            capacityG = capacity / 1024 + '';
+            if (capacityG.indexOf(".")!==-1) { // 小数
+              this.capacityErr = true;
+              capacity = '';
+            } else { // 整数
+              if (this.form.version === '5') {
+                if (capacity < 1*1024) {
+                  capacity = '';
+                  this.capacityErr = true;
+                }else {
+                  this.capacityErr = false;
+                }
+              } else {
+                if (capacity < 2*1024) {
+                  capacity = '';
+                  this.capacityErr = true;
+                }else {
+                  this.capacityErr = false;
+                }
+              }
+            }
+            break;
+          default:
+            capacityG = capacity + '';
+            if (capacityG.indexOf(".")!==-1) { // 小数
+              capacity = '';
+              this.capacityErr = true;
+            } else {// 整数
+              if (this.form.version === '5') {
+                if (capacity < 1) {
+                  capacity = '';
+                  this.capacityErr = true;
+                } else {
+                  this.capacityErr = false;
+                }
+              } else {
+                if (capacity < 2) {
+                  capacity = '';
+                  this.capacityErr = true;
+                } else {
+                  this.capacityErr = false;
+                }
+              }
+
+            }
+            break;
+        }
+      } else {
+        capacity = '';
+        this.capacityErr = true;
+      }
+      this.form.capacity = capacity;
+    }
+    console.log('this.form.capacityUnit', this.form.capacityUnit);
+    console.log('this.form.capacity', this.form.capacity);
+    console.log('this.form.count', this.form.count);
+  }
+
+  /**
+   * 数量变化
+   */
+  countBlur() {
+    let count = this.form.count;
+    if (count && count !== null && count !== '') {
+      if ((count+'').indexOf(".")!==-1) { // 小数
+        count = '';
+        this.capacityErr = true;
+      } else {
+        this.capacityErr = false;
+      }
+    }
+    this.form.count =  count;
+  }
+
+  /**
+   * add 下一页
+   */
+  addNextPage() {
+    if (this.form.capacity !== '' && this.form.count !== '') {
+      this.wizard.next();
+    }
+  }
+  /**
+   * 带宽 blur
+   * @param type
+   * @param operationType add modify
+   * @param valType
+   */
+  qosBlur(type:String, operationType:string) {
+
+    let objVal;
+      switch (operationType) {
+        case 'maxbandwidth':
+          objVal = this.form.maxbandwidth;
+          break;
+        case 'maxiops':
+          objVal = this.form.maxiops;
+          break;
+        case 'minbandwidth':
+          objVal = this.form.minbandwidth;
+          break;
+        case 'miniops':
+          objVal = this.form.miniops;
+          break;
+        default:
+          objVal = this.form.latency;
+          break;
+      }
+    if (objVal && objVal !== '') {
+      if (objVal.toString().match(/\d+(\.\d{0,2})?/)) {
+        objVal = objVal.toString().match(/\d+(\.\d{0,2})?/)[0];
+      } else {
+        objVal = '';
+      }
+    }
+    switch (operationType) {
+      case 'maxbandwidth':
+        this.form.maxbandwidth = objVal;
+        break;
+      case 'maxiops':
+        this.form.maxiops = objVal;
+        break;
+      case 'minbandwidth':
+        this.form.minbandwidth = objVal;
+        break;
+      case 'miniops':
+        this.form.miniops = objVal;
+        break;
+      default:
+        this.form.latency = objVal;
+        break;
+    }
   }
 }

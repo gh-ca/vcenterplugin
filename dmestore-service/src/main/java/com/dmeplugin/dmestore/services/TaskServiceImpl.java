@@ -188,7 +188,7 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public void getTaskStatus(List<String> taskIds, Map<String, Integer> taskStatusMap, int timeout, long startTime) {
         //没传开始时间或开始时间小于格林威治启用时间,初始话为当前时间
-        if (0 == startTime || startTime < 1392515067621L) {
+        if (0 == startTime) {
             startTime = System.currentTimeMillis();
         }
         List<TaskDetailInfo> detailInfos = new ArrayList<>();

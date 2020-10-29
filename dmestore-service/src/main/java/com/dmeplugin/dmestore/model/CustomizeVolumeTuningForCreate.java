@@ -12,6 +12,9 @@ public class CustomizeVolumeTuningForCreate {
     @JsonProperty("dedupe_enabled")
     private Boolean dedupeEnabled;
     private String smarttier;
+    /**
+     * 卷分配类型，取值范围 thin，thick
+     **/
     private String alloctype;
     @JsonProperty("workload_type_id")
     private Integer workloadTypeId;

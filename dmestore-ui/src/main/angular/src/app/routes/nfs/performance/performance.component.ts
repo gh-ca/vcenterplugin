@@ -42,7 +42,7 @@ export class NfsPerformanceComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.ngZone.runOutsideAngular(() => this.initChart());
+    //this.ngZone.runOutsideAngular(() => this.initChart());
   }
 
   ngOnInit(): void {
@@ -78,6 +78,7 @@ export class NfsPerformanceComponent implements OnInit, AfterViewInit {
       });
       this.defaultSelect = this.fsNames[0];
       this.chooseFs = this.getVolByName(this.defaultSelect);
+      this.ngZone.runOutsideAngular(() => this.initChart());
     });
   }
 

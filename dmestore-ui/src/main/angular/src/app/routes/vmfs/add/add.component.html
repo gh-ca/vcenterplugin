@@ -2,10 +2,10 @@
 <clr-wizard class="add-wizard-wrap" #wizard [clrWizardOpen]="true" [clrWizardClosable]="false">
   <clr-wizard-title style="font-weight: bolder">{{'vmfs.addTitle' | translate}}</clr-wizard-title>
 
-  <clr-wizard-button [type]="'cancel'" (click)="cancel();" >{{'menu.cancel' | translate}}</clr-wizard-button>
-  <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>
-  <clr-wizard-button [type]="'next'">{{'menu.next' | translate}}</clr-wizard-button>
-  <clr-wizard-button (click)="addVmfsHanlde();" [type]="'finish'">{{'menu.ok' | translate}}</clr-wizard-button>
+<!--  <clr-wizard-button [type]="'cancel'" (click)="cancel();" >{{'menu.cancel' | translate}}</clr-wizard-button>-->
+<!--  <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>-->
+<!--  <clr-wizard-button [type]="'next'">{{'menu.next' | translate}}</clr-wizard-button>-->
+<!--  <clr-wizard-button (click)="addVmfsHanlde();" [type]="'finish'">{{'menu.ok' | translate}}</clr-wizard-button>-->
 
   <div *ngIf="modalLoading" class="loadingDiv">
       <span>
@@ -53,17 +53,21 @@
         <div clrInput style="float: left;width: 54%;position: relative;">
           <!-- V5时最小值1.3G V6时最小值2G-->
           <input clrInput style="width: 60%;border-bottom: none" type="number" [(ngModel)]="form.capacity" name="capacity" #number="ngModel"
-                 (keyup)="capacityChange($event.target)" required/>
+                 (blur)="capacityOnblur()" required/>
           <select class="capacity" (change)="form.capacity = null;" clrInput style="width: 40%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;" [(ngModel)]="form.capacityUnit" name="capacityUnit" >
             <option value="TB">TB</option>
             <option value="GB">GB</option>
             <option value="MB">MB</option>
-            <option value="KB">KB</option>
           </select>
         </div>
         <input clrInput style="width: 19%;text-align: center;" readonly value="{{'vmfs.multiply' | translate}}">
-        <input clrInput style="width: 27%;" type="number" [(ngModel)]="form.count" name="count" #number="ngModel" onkeyup="if(this.value.length==1){this.value=this.value.replace(/[^1-9]/g,'')}else{this.value=this.value.replace(/\D/g,'')}" required/>
-        <clr-control-helper><clr-icon shape="exclamation-circle"></clr-icon>{{'vmfs.capacityTips' | translate}}</clr-control-helper>
+        <input clrInput (blur)="countBlur();" style="width: 27%;" type="number" [(ngModel)]="form.count" name="count" #number="ngModel" required/>
+        <clr-control-helper *ngIf="!capacityErr"><clr-icon shape="exclamation-circle"></clr-icon>{{'vmfs.capacityTips' | translate}}</clr-control-helper>
+        <clr-control-helper *ngIf="capacityErr">
+          <div class="errorTips" readonly >
+            <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.capacityTips' | translate}}
+          </div>
+        </clr-control-helper>
         <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-input-container>
 
@@ -111,6 +115,10 @@
         <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-combobox-container>
     </form>
+    <ng-template clrPageButtons>
+      <clr-wizard-button [type]="'cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
+      <clr-wizard-button (click)="addNextPage();" [type]="'custom-next'">{{'menu.next' | translate}}</clr-wizard-button>
+    </ng-template>
   </clr-wizard-page>
   <!--Page2 储存库设置-->
   <clr-wizard-page #addPageTwo [clrWizardPageNextDisabled]="number.pristine || !formPageTwo.valid">
@@ -131,9 +139,11 @@
 
     </ng-template>
 
+
     <form clrForm #formPageTwo="ngForm">
       <!-- 1、选择 服务等级-->
       <div *ngIf="serviceLevelIsNull" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.serviceLevelCantBeNull' | translate}}</div>
+      <div *ngIf="isOperationErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.add.errorTips' | translate}}</div>
       <!-- 1、选择 服务等级-->
       <ng-container *ngIf="levelCheck==='level'">
         <clr-accordion>
@@ -157,30 +167,30 @@
                 <tr>
                   <th hidden></th>
                   <th><clr-progress-bar clrValue="{{(item.usedCapacity/item.totalCapacity * 100 || 0).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></th>
-                  <th *ngIf="item.capabilities.qos !== null
+                  <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
                         && item.capabilities.qos.qosParam.maxBandWidth !== 0">{{'vmfs.bandwidth' | translate}} <= {{item.capabilities.qos.qosParam.maxBandWidth}}MBPS/TB</th>
-                  <th *ngIf="item.capabilities.qos !== null
+                  <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
                         && item.capabilities.qos.qosParam.minBandWidth !== 0">{{'vmfs.bandwidth' | translate}} >= {{item.capabilities.qos.qosParam.minBandWidth}}MBPS/TB</th>
-                  <th *ngIf="item.capabilities.qos !== null
+                  <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
                         && item.capabilities.qos.qosParam.maxIOPS !== 0">{{'vmfs.iops' | translate}} <= {{item.capabilities.qos.qosParam.minIOPS}}IOPS/TB</th>
-                  <th *ngIf="item.capabilities.qos !== null
+                  <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
                         && item.capabilities.qos.qosParam.minIOPS !== 0 ">{{'vmfs.iops' | translate}} >= {{item.capabilities.qos.qosParam.minIOPS}}IOPS/TB</th>
-                  <th *ngIf="item.capabilities.qos === null || item.capabilities.qos.qosParam === null
+                  <th *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos.qosParam === null
                         || (item.capabilities.qos.qosParam.maxBandWidth === 0 && item.capabilities.qos.qosParam.minBandWidth === 0)">--</th>
-                  <th *ngIf="item.capabilities.qos === null || item.capabilities.qos.qosParam === null
+                  <th *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos.qosParam === null
                         || (item.capabilities.qos.qosParam.minIOPS === 0 && item.capabilities.qos.qosParam.maxIOPS === 0)">--</th>
                 </tr>
                 <tr>
                   <th hidden></th>
                   <th>{{formatCapacity(item.usedCapacity, false)}} /{{formatCapacity(item.totalCapacity, false)}}</th>
-                  <th *ngIf="item.capabilities.qos !== null
+                  <th *ngIf="item.capabilities !== null && item.capabilities.qos !== null
                         && item.capabilities.qos.qosParam !== null
                         && item.capabilities.qos.qosParam.latency !== 0 ">Latency: {{item.capabilities.qos.qosParam.latency + item.capabilities.qos.qosParam.latencyUnit}}</th>
-                  <th *ngIf="item.capabilities.qos === null || item.capabilities.qos.qosParam === null || item.capabilities.qos.qosParam.latency === 0">--</th>
+                  <th *ngIf="item.capabilities === null || item.capabilities.qos === null || item.capabilities.qos.qosParam === null || item.capabilities.qos.qosParam.latency === 0">--</th>
                 </tr>
                 </tbody>
               </table>
@@ -198,7 +208,6 @@
         <clr-select-container>
           <label style="color: #9F9F9F;">{{'vmfs.storageDevice' | translate}}</label>
           <select clrSelect  [(ngModel)]="form.storage_id" name="storage_id" (ngModelChange)="getStoragePoolsByStorId();" required>
-            <option value=""></option>
             <option *ngFor="let item of storageList" value="{{item.id}}">{{item.name}}</option>
           </select>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
@@ -206,7 +215,6 @@
         <clr-select-container>
           <label style="color: #9F9F9F;">{{'vmfs.storagePool' | translate}}</label>
           <select clrSelect [(ngModel)]="form.pool_raw_id" name="pool_raw_id" required>
-            <option value=""></option>
             <option *ngFor="let item of storagePoolList" value="{{item.poolId}}">{{item.name}}</option>
           </select>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
@@ -235,7 +243,8 @@
             <input type="checkbox" [(ngModel)]="form.maxbandwidthChoose" name="maxbandwidthChoose" clrCheckbox/>
             <label>
               {{'vmfs.bandwidthLimitUpper' | translate}}
-              <input type="number" [(readOnly)]="!form.maxbandwidthChoose" class="inputOneLine" name="maxbandwidth" [(ngModel)]="form.maxbandwidth" onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/>{{'vmfs.unitM' | translate}}
+              <input type="number" [(readOnly)]="!form.maxbandwidthChoose" class="inputOneLine" name="maxbandwidth"
+                     [(ngModel)]="form.maxbandwidth" (blur)="qosBlur('add', 'maxbandwidth');"/>{{'vmfs.unitM' | translate}}
             </label>
           </clr-checkbox-wrapper>
         </clr-checkbox-container>
@@ -246,7 +255,8 @@
             <input type="checkbox" [(ngModel)]="form.maxiopsChoose" name="maxiopsChoose" clrCheckbox/>
             <label>
               {{'vmfs.IOPSLimitUpper' | translate}}
-              <input type="number" [(readOnly)]="!form.maxiopsChoose" class="inputOneLine" name="maxiops" [(ngModel)]="form.maxiops" onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/>
+              <input type="number" [(readOnly)]="!form.maxiopsChoose" class="inputOneLine" name="maxiops"
+                     [(ngModel)]="form.maxiops" (blur)="qosBlur('add', 'maxiops');"/>
             </label>
           </clr-checkbox-wrapper>
         </clr-checkbox-container>
@@ -258,7 +268,8 @@
             <input type="checkbox" [(ngModel)]="form.minbandwidthChoose" name="minbandwidthChoose" clrCheckbox/>
             <label>
               {{'vmfs.bandwidthLimitLower' | translate}}
-              <input type="number" [(readOnly)]="!form.minbandwidthChoose" class="inputOneLine" name="minbandwidth" [(ngModel)]="form.minbandwidth" onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/>{{'vmfs.unitM' | translate}}
+              <input type="number" [(readOnly)]="!form.minbandwidthChoose" class="inputOneLine" name="minbandwidth"
+                     [(ngModel)]="form.minbandwidth"  (blur)="qosBlur('add', 'minbandwidth');"/>{{'vmfs.unitM' | translate}}
             </label>
           </clr-checkbox-wrapper>
         </clr-checkbox-container>
@@ -269,7 +280,8 @@
             <input type="checkbox" [(ngModel)]="form.miniopsChoose" name="minbandwidthChoose" clrCheckbox/>
             <label>
               {{'vmfs.IOPSLimitLower' | translate}}
-              <input type="number" [(readOnly)]="!form.miniopsChoose" class="inputOneLine" name="miniops" [(ngModel)]="form.miniops" onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/>
+              <input type="number" [(readOnly)]="!form.miniopsChoose" class="inputOneLine" name="miniops"
+                     [(ngModel)]="form.miniops" (blur)="qosBlur('add', 'miniops');"/>
             </label>
           </clr-checkbox-wrapper>
         </clr-checkbox-container>
@@ -280,7 +292,8 @@
             <input type="checkbox" [(ngModel)]="form.latencyChoose" name="latencyChoose" clrCheckbox/>
             <label>
               {{'vmfs.latencyMax' | translate}}
-              <input type="number" [(readOnly)]="!form.latencyChoose" class="inputOneLine" name="latency" [(ngModel)]="form.latency" onkeyup="this.value= this.value.match(/\d+(\.\d{0,2})?/) ? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''"/>{{'vmfs.latencyUnit' | translate}}
+              <input type="number" [(readOnly)]="!form.latencyChoose" class="inputOneLine" name="latency"
+                     [(ngModel)]="form.latency" (blur)="qosBlur('add', 'latency');"/>{{'vmfs.latencyUnit' | translate}}
             </label>
           </clr-checkbox-wrapper>
         </clr-checkbox-container>
@@ -299,5 +312,10 @@
       </ng-container>
 
     </form>
+    <ng-template clrPageButtons>
+      <clr-wizard-button [type]="'cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
+      <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>
+      <clr-wizard-button (click)="addVmfsHanlde();" [type]="'custom-finish'">{{'menu.ok' | translate}}</clr-wizard-button>
+    </ng-template>
   </clr-wizard-page>
 </clr-wizard>

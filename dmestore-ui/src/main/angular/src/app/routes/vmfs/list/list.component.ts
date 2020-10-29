@@ -102,6 +102,8 @@ export class VmfsListComponent implements OnInit {
   serviceLevelIsNull = false; // 未选择服务等级true未选择 false选择 添加、服务登记变更
 
   modalLoading = true; // 弹窗加载
+  isOperationErr = false; // 错误信息
+  capacityErr = false; // 容量错误信息
 
   ngOnInit() {
     // 列表数据
@@ -241,13 +243,16 @@ export class VmfsListComponent implements OnInit {
       console.log(result);
       if (result.code === '200' && result.data !== null) {
         this.storageList = result.data;
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        this.getStoragePoolsByStorId();
       }
+      this.modalLoading = false;
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
 
   // 获取存储池数据
   getStoragePoolsByStorId() {
+    this.form.pool_raw_id = undefined;
     console.log('selectSotrageId' + this.form.storage_id);
     if (null !== this.form.storage_id && '' !== this.form.storage_id) {
       this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, 'block').subscribe((result: any) => {
@@ -302,6 +307,9 @@ export class VmfsListComponent implements OnInit {
     this.form.spaceReclamationGranularity = this.srgOptions[0].key;
     console.log('this.form.blockSize:' + this.form.blockSize);
     console.log('this.form.spaceReclamationGranularity:' + this.form.spaceReclamationGranularity);
+
+    // 容量设置
+    this.capacityOnblur();
   }
 
   // 设置设备数据
@@ -381,6 +389,10 @@ export class VmfsListComponent implements OnInit {
   addBtnClickFunc() {
     // 展示loading
     this.modalLoading = true;
+    this.isOperationErr = false;
+    // 容量错误提示
+    this.capacityErr = false;
+    // this.gs.loading = true;
 
     // 初始化表单
     this.form = new GetForm().getAddForm();
@@ -427,14 +439,15 @@ export class VmfsListComponent implements OnInit {
       }
       // 隐藏loading
       this.modalLoading = false;
+      // this.gs.loading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
   // 添加vmfs 处理
   addVmfsHanlde() {
+
     const selectResult = this.serviceLevelList.find(item => item.show === true);
     console.log('selectResult', this.levelCheck === 'level' && selectResult);
-    console.log('flagggggg', (this.levelCheck === 'level' && selectResult && selectResult.totalCapacity !== 0) || this.levelCheck !== 'level');
     if ((this.levelCheck === 'level' && selectResult && selectResult.totalCapacity !== 0) || this.levelCheck !== 'level') { // 选择服务等级
       if (selectResult) {
         this.form.service_level_id = selectResult.id;
@@ -476,18 +489,29 @@ export class VmfsListComponent implements OnInit {
         this.form.control_policy = null;
       }
       console.log('addFrom', this.form);
+
+      // 打开 loading
+      // this.gs.loading = true;
+      this.modalLoading = true;
       this.remoteSrv.createVmfs(this.form).subscribe((result: any) => {
+        // 关闭 loading
+        // this.gs.loading = false;
+        this.modalLoading = false;
         if (result.code === '200') {
           console.log('创建成功');
+          // 关闭窗口;
+          this.wizard.close();
           // 重新请求数据
           this.scanDataStore();
         } else {
           console.log('创建失败：' + result.description);
+          // 失败信息
+          this.isOperationErr = true;
         }
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       });
     } else {
       this.serviceLevelIsNull = true;
-      this.wizard.open();
     }
   }
 
@@ -515,9 +539,9 @@ export class VmfsListComponent implements OnInit {
           break;
       }
 
-      // 版本号5 最小容量为1.3G 版本号6最小2G
-      if (capatityG < 1.3 && this.form.version === '5') {
-        capatityG = 1.3;
+      // 版本号5 最小容量为1G 版本号6最小2G
+      if (capatityG < 1 && this.form.version === '5') {
+        capatityG = 1;
       } else if (capatityG < 2 && this.form.version === '6') {
         capatityG = 2;
       }
@@ -546,6 +570,12 @@ export class VmfsListComponent implements OnInit {
   customerClickFunc() {
     this.levelCheck = 'customer';
     this.serviceLevelIsNull = false;
+    this.storageList = null;
+    this.storagePoolList = null;
+
+    // loading
+    this.modalLoading = true;
+
     this.getStorageList();
   }
   // 选择服务等级时
@@ -922,5 +952,219 @@ export class VmfsListComponent implements OnInit {
       cNum = isGB ? (c/1024/1024).toFixed(3) + 'PB':(c/1024/1024).toFixed(3) + 'TB';
     }
     return cNum;
+  }
+
+  /**
+   * 容量
+   * @param obj
+   */
+  capacityOnblur() {
+    // 容量
+    let capacity = this.form.capacity;
+    // 标准容量 单位G
+    let capacityG;
+    console.log('capacity', capacity)
+    if (capacity && capacity !== null && capacity !== '') {
+
+      if (capacity > 0) {
+        switch (this.form.capacityUnit) {
+          case "TB":
+            capacityG = capacity * 1024 + '';
+            console.log('capacityG2', capacityG);
+            if (capacityG.indexOf(".")!==-1) { // 小数
+              this.capacityErr = true;
+              capacity = '';
+            } else{ // 整数
+              if (this.form.version === '5') {
+                if (capacity < 1/1024) {
+                  capacity = '';
+                  this.capacityErr = true;
+                } else {
+                  this.capacityErr = false;
+                }
+              } else {
+                if (capacity < 2/1024) {
+                  capacity = '';
+                  this.capacityErr = true;
+                }else {
+                  this.capacityErr = false;
+                }
+              }
+            }
+            break;
+          case "MB":
+            capacityG = capacity / 1024 + '';
+            if (capacityG.indexOf(".")!==-1) { // 小数
+              this.capacityErr = true;
+              capacity = '';
+            } else { // 整数
+              if (this.form.version === '5') {
+                if (capacity < 1*1024) {
+                  capacity = '';
+                  this.capacityErr = true;
+                }else {
+                  this.capacityErr = false;
+                }
+              } else {
+                if (capacity < 2*1024) {
+                  capacity = '';
+                  this.capacityErr = true;
+                }else {
+                  this.capacityErr = false;
+                }
+              }
+            }
+            break;
+          default:
+            capacityG = capacity + '';
+            if (capacityG.indexOf(".")!==-1) { // 小数
+              capacity = '';
+              this.capacityErr = true;
+            } else {// 整数
+              if (this.form.version === '5') {
+                if (capacity < 1) {
+                  capacity = '';
+                  this.capacityErr = true;
+                } else {
+                  this.capacityErr = false;
+                }
+              } else {
+                if (capacity < 2) {
+                  capacity = '';
+                  this.capacityErr = true;
+                } else {
+                  this.capacityErr = false;
+                }
+              }
+
+            }
+            break;
+        }
+      } else {
+        capacity = '';
+        this.capacityErr = true;
+      }
+      this.form.capacity = capacity;
+    }
+    console.log('this.form.capacityUnit', this.form.capacityUnit);
+    console.log('this.form.capacity', this.form.capacity);
+    console.log('this.form.count', this.form.count);
+  }
+
+  /**
+   * 数量变化
+   */
+  countBlur() {
+    let count = this.form.count;
+    if (count && count !== null && count !== '') {
+      if ((count+'').indexOf(".")!==-1) { // 小数
+        count = '';
+        this.capacityErr = true;
+      } else {
+        this.capacityErr = false;
+      }
+    }
+    this.form.count =  count;
+  }
+
+  /**
+   * add 下一页
+   */
+  addNextPage() {
+    if (this.form.capacity !== '' && this.form.count !== '' && this.form.capacity > 0 && this.form.count > 0) {
+      this.wizard.next();
+    }
+  }
+
+  /**
+   * 带宽 blur
+   * @param type
+   * @param operationType add modify
+   * @param valType
+   */
+  qosBlur(type:String, operationType:string) {
+
+    let objVal;
+    if (type === 'add') {
+      switch (operationType) {
+        case 'maxbandwidth':
+          objVal = this.form.maxbandwidth;
+          break;
+        case 'maxiops':
+          objVal = this.form.maxiops;
+          break;
+        case 'minbandwidth':
+          objVal = this.form.minbandwidth;
+          break;
+        case 'miniops':
+          objVal = this.form.miniops;
+          break;
+        default:
+          objVal = this.form.latency;
+          break;
+      }
+    } else {
+      switch (operationType) {
+        case 'max_bandwidth':
+          objVal = this.modifyForm.max_bandwidth;
+          break;
+        case 'max_iops':
+          objVal = this.modifyForm.max_iops;
+          break;
+        case 'min_bandwidth':
+          objVal = this.modifyForm.min_bandwidth;
+          break;
+        case 'min_iops':
+          objVal = this.modifyForm.min_iops;
+          break;
+        default:
+          objVal = this.modifyForm.latency;
+          break;
+      }
+    }
+    if (objVal && objVal !== '') {
+      if (objVal.toString().match(/\d+(\.\d{0,2})?/)) {
+        objVal = objVal.toString().match(/\d+(\.\d{0,2})?/)[0];
+      } else {
+        objVal = '';
+      }
+    }
+    if (type === 'add') {
+      switch (operationType) {
+        case 'maxbandwidth':
+          this.form.maxbandwidth = objVal;
+          break;
+        case 'maxiops':
+          this.form.maxiops = objVal;
+          break;
+        case 'minbandwidth':
+          this.form.minbandwidth = objVal;
+          break;
+        case 'miniops':
+          this.form.miniops = objVal;
+          break;
+        default:
+          this.form.latency = objVal;
+          break;
+      }
+    } else {
+      switch (operationType) {
+        case 'max_bandwidth':
+          this.modifyForm.max_bandwidth = objVal;
+          break;
+        case 'max_iops':
+          this.modifyForm.max_iops = objVal;
+          break;
+        case 'min_bandwidth':
+          this.modifyForm.min_bandwidth = objVal;
+          break;
+        case 'min_iops':
+          this.modifyForm.min_iops = objVal;
+          break;
+        default:
+          this.modifyForm.latency = objVal;
+          break;
+      }
+    }
   }
 }

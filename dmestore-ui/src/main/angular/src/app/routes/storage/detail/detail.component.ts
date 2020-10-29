@@ -21,6 +21,7 @@ import {ActivatedRoute, Router} from "@angular/router";
 import {CapacityChart, CapacitySerie} from "../storage.service";
 import {BondPort, EthernetPort, FailoverGroup, FCoEPort, FCPort, LogicPort} from "./port.service";
 import {FormControl, FormGroup} from "@angular/forms";
+import {GlobalsService} from "../../../shared/globals.service";
 @Component({
   selector: 'app-detail',
   templateUrl: './detail.component.html',
@@ -29,6 +30,63 @@ import {FormControl, FormGroup} from "@angular/forms";
   providers: [DetailService, MakePerformance, NfsService],
 })
 export class DetailComponent implements OnInit, AfterViewInit {
+  demochart={
+    tooltip: {
+      trigger: 'item',
+      formatter: ' {b}: {c} ({d}%)'
+    },
+    title: {
+      text: '123',
+      textAlign: 'center',
+      padding: 0,
+      textVerticalAlign: 'middle',
+      textStyle: {
+        fontSize: 22,
+        color: '#63B3F7'
+      },
+      subtextStyle: {
+        fontSize: 12,
+        color: '#c2c6dc',
+        align: 'center'
+      },
+      left: '50%',
+      top: '50%',
+      //subtext: '234'
+    },
+
+    series: [
+      {
+        name: '',
+        type: 'pie',
+        radius: ['50%', '70%'],
+        center: ['50%', '50%'],
+
+        avoidLabelOverlap: false,
+        label: {
+          show: false,
+          position: 'center'
+        },
+        emphasis: {
+          label: {
+            show: false,
+            fontSize: '30',
+            fontWeight: 'bold'
+          }
+        },
+        labelLine: {
+          show: false
+        },
+        data: [
+          {value: 335, name: '直接访问'},
+          {value: 310, name: '邮件营销'},
+          {value: 234, name: '联盟广告'},
+          {value: 135, name: '视频广告'},
+          {value: 1548, name: '搜索引擎'}
+        ]
+      }
+    ],
+    color: ['#FF0000', '#FF9538', '#63B3F7']
+  };
   cd : CapacityDistribution;
   capSave:CapacitySavings;
   options = {
@@ -99,13 +157,26 @@ export class DetailComponent implements OnInit, AfterViewInit {
   volumeRadio = 'table1'; // volume列表切换
   storageId = '1234';
   storageName= "";
-  constructor(private nfsService:NfsService, private makePerformance: MakePerformance, private detailService: DetailService, private cdr: ChangeDetectorRef, private ngZone: NgZone,
-              private activatedRoute: ActivatedRoute,private router:Router) { }
+  constructor(private nfsService:NfsService, private makePerformance: MakePerformance,
+              private detailService: DetailService, private cdr: ChangeDetectorRef, private ngZone: NgZone,
+              private gs: GlobalsService,private activatedRoute: ActivatedRoute,private router:Router) { }
   detail: StorageDetail;
   storagePool: StoragePool[];
   volumes: Volume[];
   volumeTotal=0;
-  volumeSelect = [];
+  poolTotal=0;
+  fsTotal=0;
+  dtreeTotal=0;
+  shareTotal=0;
+  conTotal=0;
+  diskTotal=0;
+  fcTotal=0;
+  ethTotal=0;
+  fcoeTotal=0;
+  bondTotal=0;
+  logicTotal=0;
+  failTotal=0;
+
   fsList: FileSystem[];
   dtrees: Dtrees[];
   shares: NfsShare[];
@@ -158,34 +229,28 @@ export class DetailComponent implements OnInit, AfterViewInit {
 
   // 初始化表格对象
   async initChart() {
+    this.gs.loading=true;
     const fsNames:string[] = [];
     fsNames.push(this.storageId);
      // IOPS
     this.setChart(150,"IOPS","IO/s",
-     NfsService.storageIOPS,fsNames,this.selectRange,NfsService.nfsUrl, this.startTime, this.endTime).then(res=>{
-      //NfsService.nfsOPS,fsNames,this.selectRange,NfsService.nfsUrl, this.startTime, this.endTime).then(res=>{
+     NfsService.storageIOPS,fsNames,this.selectRange,NfsService.storageUrl, this.startTime, this.endTime).then(res=>{
+      this.gs.loading=false;
       this.iopsChart = res;
       this.cdr.detectChanges();
     });
 
     // 带宽
     this.setChart(150,'Bandwidth', 'MB/s',
-      //NfsService.storageBDWT, fsNames, this.selectRange, NfsService.nfsUrl, this.startTime, this.endTime).then(res => {
-      NfsService.nfsBDWT, fsNames, this.selectRange, NfsService.nfsUrl, this.startTime, this.endTime).then(res => {
+      NfsService.storageBDWT, fsNames, this.selectRange, NfsService.storageUrl, this.startTime, this.endTime).then(res => {
+      this.gs.loading=false;
       this.bandwidthChart = res;
       this.cdr.detectChanges();
     });
-    // 响应时间
-    // this.latencyChart = echarts.init(document.querySelector('#latencyChart'));
-    // this.perService.getIopsChart('Latency', 'ms', this.objTypeId, this.indicatorIdsREST, this.objIds,
-    //   this.interval, this.range, this.beginTime, this.endTime).then(res => {
-    //   this.latencyChart.setOption(res, true);
-    //   this.cdr.detectChanges();
-    // });
   }
 
   changeTab(page: string){
-    console.log('点击：'+page);
+    this.gs.loading=false;
     if (page === 'conf'){
       this.getStorageDetail(false);
     }
@@ -223,7 +288,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   getStorageDetail(fresh: boolean){
     if (fresh){
+      this.gs.loading=true;
       this.detailService.getStorageDetail(this.storageId).subscribe((r: any) => {
+        this.gs.loading=false;
         if (r.code === '200'){
           this.detail = r.data;
           this.initCapacity();
@@ -235,7 +302,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.detail === null){
+        this.gs.loading=true;
         this.detailService.getStorageDetail(this.storageId).subscribe((r: any) => {
+          this.gs.loading=false;
           if (r.code === '200'){
             this.detail = r.data;
             this.initCapacity();
@@ -247,21 +316,25 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   getStoragePoolList(fresh: boolean){
     if (fresh){
+      this.gs.loading=true;
       this.detailService.getStoragePoolList(this.storageId).subscribe((r: any) =>{
+        this.gs.loading=false;
         if (r.code === '200'){
           this.storagePool = r.data;
+          this.poolTotal=this.storagePool.length==null?0:this.storagePool.length;
           this.cdr.detectChanges();
-          console.log('pool result:');
-          console.log(r);
           this.liststoragepoolperformance();
         }
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.storagePool === null){
+        this.gs.loading=true;
         this.detailService.getStoragePoolList(this.storageId).subscribe((r: any) =>{
+          this.gs.loading=false;
           if (r.code === '200'){
             this.storagePool = r.data;
+            this.poolTotal=this.storagePool.length==null?0:this.storagePool.length;
             this.cdr.detectChanges();
             this.liststoragepoolperformance();
           }
@@ -270,7 +343,6 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }
   }
   liststoragepoolperformance(){
-    console.log("storagePool",this.storagePool);
     if (this.storagePool === null || this.storagePool.length <= 0){ return; }
     this.storagePool.forEach(item => {
       this.storagePoolIds.push(item.storageInstanceId);
@@ -295,7 +367,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   getStorageVolumeList(fresh: boolean){
     if (fresh){
+      this.gs.loading=true;
       this.detailService.getVolumeListList(this.storageId).subscribe((r: any) => {
+        this.gs.loading=false;
         if (r.code === '200'){
           this.volumes = r.data;
           if(this.volumes!=null){
@@ -308,7 +382,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.volumes == null){
+        this.gs.loading=true;
         this.detailService.getVolumeListList(this.storageId).subscribe((r: any) => {
+          this.gs.loading=false;
           if (r.code === '200'){
             this.volumes = r.data;
             if(this.volumes!=null){
@@ -346,18 +422,24 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   getFileSystemList(fresh: boolean){
     if (fresh){
+      this.gs.loading=true;
       this.detailService.getFileSystemList(this.storageId).subscribe((r: any) => {
+        this.gs.loading=false;
         if (r.code === '200'){
           this.fsList = r.data;
+          this.fsTotal=this.fsList==null?0:this.fsList.length;
           this.cdr.detectChanges();
         }
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.fsList == null){
+        this.gs.loading=true;
         this.detailService.getFileSystemList(this.storageId).subscribe((r: any) => {
+          this.gs.loading=false;
           if (r.code === '200'){
             this.fsList = r.data;
+            this.fsTotal=this.fsList==null?0:this.fsList.length;
             this.cdr.detectChanges();
           }
         });
@@ -366,18 +448,24 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   getDtreeList(fresh: boolean){
     if (fresh){
+      this.gs.loading=true;
       this.detailService.getDtreeList(this.storageId).subscribe((r: any) => {
+        this.gs.loading=false;
         if (r.code === '200'){
           this.dtrees = r.data;
+          this.dtreeTotal=this.dtrees==null?0:this.dtrees.length;
           this.cdr.detectChanges();
         }
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
+      this.gs.loading=true;
       if (this.dtrees == null){
         this.detailService.getDtreeList(this.storageId).subscribe((r: any) => {
+          this.gs.loading=false;
           if (r.code === '200'){
             this.dtrees = r.data;
+            this.dtreeTotal=this.dtrees==null?0:this.dtrees.length;
             this.cdr.detectChanges();
           }
         });
@@ -385,20 +473,31 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }
   }
   getShareList(fresh: boolean){
+    console.log(11)
     if (fresh){
+      console.log(22)
+      this.gs.loading=true;
       this.detailService.getShareList(this.storageId).subscribe((r: any) => {
+        this.gs.loading=false;
+        console.log(33)
         if (r.code === '200'){
           this.shares = r.data;
+          this.shareTotal=this.shares==null?0:this.shares.length;
           this.cdr.detectChanges();
         }
       });
     }else {
+      console.log(44)
       // 此处防止重复切换tab每次都去后台请求数据
-
       if (this.shares == null){
+        console.log(55)
+        this.gs.loading=true;
         this.detailService.getShareList(this.storageId).subscribe((r: any) => {
+          this.gs.loading=false;
+          console.log(66)
           if (r.code === '200'){
             this.shares = r.data;
+            this.shareTotal=this.shares==null?0:this.shares.length;
             this.cdr.detectChanges();
           }
         });
@@ -407,18 +506,24 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   getControllerList(fresh: boolean){
     if (fresh){
+      this.gs.loading=true;
       this.detailService.getControllerList(this.storageId).subscribe((r: any) => {
+        this.gs.loading=false;
         if (r.code === '200'){
           this.controllers = r.data;
+          this.conTotal=this.controllers==null?0:this.controllers.length;
           this.cdr.detectChanges();
         }
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.controllers == null){
+        this.gs.loading=true;
         this.detailService.getControllerList(this.storageId).subscribe((r: any) => {
+          this.gs.loading=false;
           if (r.code === '200'){
             this.controllers = r.data;
+            this.conTotal=this.controllers==null?0:this.controllers.length;
             this.cdr.detectChanges();
           }
         });
@@ -427,18 +532,24 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   getDisksList(fresh: boolean){
     if (fresh){
+      this.gs.loading=true;
       this.detailService.getDiskList(this.storageId).subscribe((r: any) => {
+        this.gs.loading=false;
         if (r.code === '200'){
           this.disks = r.data;
+          this.diskTotal=this.disks==null?0:this.disks.length;
           this.cdr.detectChanges();
         }
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.disks == null){
+        this.gs.loading=true;
         this.detailService.getDiskList(this.storageId).subscribe((r: any) => {
+          this.gs.loading=false;
           if (r.code === '200'){
             this.disks = r.data;
+            this.diskTotal=this.disks==null?0:this.disks.length;
             this.cdr.detectChanges();
           }
         });
@@ -454,49 +565,67 @@ export class DetailComponent implements OnInit, AfterViewInit {
     this.getFailoverGroups();
   }
   getFCPortList(){
+    this.gs.loading=true;
       this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"FC"}).subscribe((r: any) => {
+        this.gs.loading=false;
         if (r.code === '200'){
           this.fcs = r.data;
+          this.fcTotal=this.fcs==null?0:this.fcs.length;
           this.cdr.detectChanges();
         }
       });
   }
   getFCoEPortList(){
+    this.gs.loading=true;
     this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"FCoE"}).subscribe((r: any) => {
+      this.gs.loading=false;
       if (r.code === '200'){
         this.fcoes = r.data;
+        this.fcoeTotal=this.fcoes==null?0:this.fcoes.length;
         this.cdr.detectChanges();
       }
     });
   }
   getEthernetPortList(){
+    this.gs.loading=true;
     this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"ETH"}).subscribe((r: any) => {
+      this.gs.loading=false;
       if (r.code === '200'){
         this.eths = r.data;
+        this.ethTotal=this.eths==null?0:this.eths.length;
         this.cdr.detectChanges();
       }
     });
   }
   getBondPortList(){
+    this.gs.loading=true;
     this.detailService.getBondPortList(this.storageId).subscribe((r: any) => {
+      this.gs.loading=false;
       if (r.code === '200'){
         this.bonds = r.data;
+        this.bondTotal=this.bonds==null?0:this.bonds.length;
         this.cdr.detectChanges();
       }
     });
   }
   getLogicPortsList(){
+    this.gs.loading=true;
     this.detailService.getLogicPortList(this.storageId).subscribe((r: any) => {
+      this.gs.loading=false;
       if (r.code === '200'){
         this.logicports = r.data;
+        this.logicTotal=this.logicports==null?0:this.logicports.length;
         this.cdr.detectChanges();
       }
     });
   }
   getFailoverGroups(){
+    this.gs.loading=true;
     this.detailService.getFailoverGroups(this.storageId).subscribe((r: any) => {
+      this.gs.loading=false;
       if (r.code === '200'){
         this.fgs = r.data;
+        this.failTotal=this.fgs==null?0:this.fgs.length;
         this.cdr.detectChanges();
       }
     });
@@ -550,13 +679,13 @@ export class DetailComponent implements OnInit, AfterViewInit {
     this.detail.protectionCapacity
     this.cd.protection = this.formatCapacity(this.detail.protectionCapacity);
     this.cd.fileSystem =this.formatCapacity(this.detail.fileCapacity);
-    const v = 2.024;
     this.cd.volume =this.formatCapacity(this.detail.blockCapacity);
      this.cd.freeCapacity= this.getFreeCapacity(this.detail.totalEffectiveCapacity,this.detail.usedCapacity);
 
     const cc = new CapacityChart(this.formatCapacity(this.detail.totalEffectiveCapacity));
-    const free=(this.detail.totalEffectiveCapacity-this.detail.usedCapacity)*100;
-    const cs = new CapacitySerie(this.detail.usedCapacity,free);
+    const cs = new CapacitySerie(this.detail.protectionCapacity
+      ,this.detail.fileCapacity,this.detail.blockCapacity,
+      this.detail.totalEffectiveCapacity-this.detail.usedCapacity);
     cc.series.push(cs);
     this.cd.chart = cc;
   }

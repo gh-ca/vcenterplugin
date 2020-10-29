@@ -88,7 +88,7 @@ public class VmfsAccessController extends BaseController {
      * param int version: 版本
      * param int blockSize: 块大小，单位KB
      * param int spaceReclamationGranularity   空间回收粒度 单位K
-     * param str spaceReclamationPriority: 空间回收优先权
+     * param str spaceReclamationPriority: 空间回收优先权 low->低
      * param str host: 主机  必  与cluster二选其一,不可同时存在
      * param str hostId: 主机
      * param str cluster: 集群 必 与host二选其一,不可同时存在
@@ -98,7 +98,7 @@ public class VmfsAccessController extends BaseController {
      * param integer workload_type_id 应用类型id
      * param str alloctype 卷分配类型，取值范围 thin，thick
      * 卷qos属性
-     * param str  control_policy 控制策略
+     * param str  control_policy 控制策略  0：保护IO下限，1：控制IO上限
      * param integer  latency 时延，单位ms
      * param integer  maxbandwidth 最大带宽
      * param integer  maxiops 最大iops

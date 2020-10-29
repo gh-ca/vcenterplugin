@@ -134,4 +134,55 @@ export class ModifyComponent implements OnInit{
       this.cancel();
     });
   }
+  /**
+   * 带宽 blur
+   * @param type
+   * @param operationType add modify
+   * @param valType
+   */
+  qosBlur(type:String, operationType:string) {
+
+    let objVal;
+    switch (operationType) {
+      case 'max_bandwidth':
+        objVal = this.modifyForm.max_bandwidth;
+        break;
+      case 'max_iops':
+        objVal = this.modifyForm.max_iops;
+        break;
+      case 'min_bandwidth':
+        objVal = this.modifyForm.min_bandwidth;
+        break;
+      case 'min_iops':
+        objVal = this.modifyForm.min_iops;
+        break;
+      default:
+        objVal = this.modifyForm.latency;
+        break;
+    }
+    if (objVal && objVal !== '') {
+      if (objVal.toString().match(/\d+(\.\d{0,2})?/)) {
+        objVal = objVal.toString().match(/\d+(\.\d{0,2})?/)[0];
+      } else {
+        objVal = '';
+      }
+    }
+    switch (operationType) {
+      case 'max_bandwidth':
+        this.modifyForm.max_bandwidth = objVal;
+        break;
+      case 'max_iops':
+        this.modifyForm.max_iops = objVal;
+        break;
+      case 'min_bandwidth':
+        this.modifyForm.min_bandwidth = objVal;
+        break;
+      case 'min_iops':
+        this.modifyForm.min_iops = objVal;
+        break;
+      default:
+        this.modifyForm.latency = objVal;
+        break;
+    }
+  }
 }
