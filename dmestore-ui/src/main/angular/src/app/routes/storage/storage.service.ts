@@ -8,8 +8,8 @@ export class StorageService {
   getData(){
     return this.http.get('dmestorage/storages');
   }
-  getStoragePoolListByStorageId(storageId: string){
-    return this.http.get('dmestorage/storagepools', {params: {storageId}});
+  getStoragePoolListByStorageId(mediaType:string,storageId:string){
+    return this.http.get('dmestorage/storagepools', {params: {storageId,mediaType}});
   }
   getLogicPortListByStorageId(storageId: string){
     return this.http.get('dmestorage/logicports', {params: {storageId}});
@@ -144,7 +144,6 @@ export class CapacitySerie{
     f.value=fs;
     f.name="文件系统";
     this.data.push(f);
-
     const v= new D();
     v.value=volume;
     v.name="卷";

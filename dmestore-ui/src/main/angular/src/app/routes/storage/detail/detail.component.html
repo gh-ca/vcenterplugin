@@ -532,24 +532,24 @@
                         <div class="unit-label">{{'storage.detail.cap.beforeSave' | translate}}</div>
                         <div class="unit-outer">
                           <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.beforeSave/capSave.max * 100)+'%'}"></div>
-                          <span *ngIf="capSave.dedupe!=null && capSave.dedupe!=0" class="num">{{capSave.beforeSave}}</span>
+                          <span class="num">{{capSave.beforeSave==0?'':capSave.beforeSave}}</span>
                         </div>
                       </div>
                       <div class="capacity-line">
                         <div class="unit-tips">{{'storage.detail.cap.dedupe' | translate}}</div>
                         <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.dedupe/capSave.max * 100)+'%'}"></div>
-                        <span *ngIf="capSave.dedupe!=null && capSave.dedupe!=0" class="num">{{capSave.dedupe}}</span>
+                        <span class="num">{{capSave.dedupe==0?'':capSave.dedupe}}</span>
                       </div>
                       <div class="capacity-line">
                         <div class="unit-tips">{{'storage.detail.cap.compression' | translate}}</div>
                         <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.compression/capSave.max * 100)+'%'}"></div>
-                        <span *ngIf="capSave.dedupe!=null && capSave.dedupe!=0" class="num">{{capSave.compression}}</span>
+                        <span class="num">{{capSave.compression==0?'':capSave.compression}}</span>
                       </div>
                       <div class="capacity-line">
                         <div class="unit-label">{{'storage.detail.cap.afterSave' | translate}}</div>
                         <div class="unit-outer">
                           <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.afterSave/capSave.max * 100)+'%'}"></div>
-                          <span *ngIf="capSave.dedupe!=null && capSave.dedupe!=0" class="num">{{capSave.afterSave}}</span>
+                          <span class="num">{{capSave.afterSave==0?'':capSave.afterSave}}</span>
                         </div>
                       </div>
                     </div>

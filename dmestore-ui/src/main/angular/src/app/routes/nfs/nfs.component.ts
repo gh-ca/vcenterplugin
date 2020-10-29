@@ -61,11 +61,24 @@ export class NfsComponent implements OnInit {
     this.remoteSrv.getData()
       .subscribe((result: any) => {
         this.list = result.data;
+        if (this.list!=null){
+          this.total=this.list.length;
+        }
+        //处理利用率排序问题
+        this.handleSortingFeild();
         this.isLoading = false;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         // 获取性能列表
         this.listnfsperformance();
       });
+  }
+
+  handleSortingFeild(){
+    if(this.list!=null){
+      this.list.forEach(n=>{
+        n.capacityUsage=(n.capacity - n.freeSpace)/n.capacity;
+      });
+    }
   }
 // 性能视图列表
   listnfsperformance(){
