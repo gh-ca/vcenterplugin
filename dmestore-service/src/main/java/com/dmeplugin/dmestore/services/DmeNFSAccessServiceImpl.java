@@ -541,7 +541,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                                     nfsDataInfo.setShareIp(ToolUtils.jsonToStr(jo.get("remoteHost")));
 
                                     DmeVmwareRelation dvr = dvrMap.get(vmwareObjectId);
-                                    nfsDataInfo.setSharePath(dvr.getVolumeShare());
+                                    //nfsDataInfo.setSharePath(dvr.getVolumeShare());
+                                    nfsDataInfo.setSharePath(dvr.getShareName());
                                     nfsDataInfo.setLogicPort(dvr.getLogicPortName());
                                     nfsDataInfo.setLogicPortId(dvr.getLogicPortId());
                                     nfsDataInfo.setShare(dvr.getShareName());
