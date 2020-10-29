@@ -67,7 +67,7 @@
           <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.ops' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.bandwidth' | translate}}</clr-dg-column>
 
-          <clr-dg-row *ngFor="let item of list" [clrDgItem]="item">
+          <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
             <clr-dg-cell><span (click)="toDetailView(item.id,item.name)" style="color:#829DE6;cursor:pointer">{{item.name}}</span></clr-dg-cell>
             <clr-dg-cell>{{item.ip}}</clr-dg-cell>
 
@@ -147,7 +147,7 @@
       </div>
       <div [hidden]="buttonTrigger!=='chart'" style="width: 100%">
         <div class="clr-row"  style="margin:auto;width: 98%" >
-          <div class="clr-col-6" *ngFor="let item of strorageCharts" style="margin-top: 1%">
+          <div class="clr-col-6" *clrDgItems="let item of strorageCharts" style="margin-top: 1%">
             <div class="info-card" style="margin-bottom: 2%" (click)="toDetailView(item.id)">
               <div class="info-card-header border-header">
                 <div class="info-header-left">

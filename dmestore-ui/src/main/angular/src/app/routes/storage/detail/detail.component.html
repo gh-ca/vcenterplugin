@@ -204,11 +204,38 @@
 
                       <clr-dg-row *clrDgItems="let item of volumes" [clrDgItem]="item">
                         <clr-dg-cell>{{item.name}}</clr-dg-cell>
-                        <clr-dg-cell>{{item.status}}</clr-dg-cell>
-
-
+                        <clr-dg-cell>
+                          <span *ngIf="item.status == 'creating'">
+                            <span class="color-square" style="background-color: green; margin-right: 10px"></span>{{'enum.status.creating' | translate}}
+                          </span>
+                          <span *ngIf="item.status == 'normal'">
+                            <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>{{'enum.status.normal' | translate}}
+                          </span>
+                          <span *ngIf="item.status == 'mapping'">
+                            <span class="color-square" style="background-color: gold; margin-right: 10px"></span>{{'enum.status.mapping' | translate}}
+                          </span>
+                          <span *ngIf="item.status == 'unmapping'">
+                            <span class="color-square" style="background-color: blueviolet; margin-right: 10px"></span>{{'enum.status.unmapping' | translate}}
+                          </span>
+                          <span *ngIf="item.status == 'deleting'">
+                            <span class="color-square" style="background-color: bisque; margin-right: 10px"></span>{{'enum.status.deleting' | translate}}
+                          </span>
+                          <span *ngIf="item.status == 'error'">
+                            <span class="color-square" style="background-color: red; margin-right: 10px"></span>{{'enum.status.error' | translate}}
+                          </span>
+                          <span *ngIf="item.status == 'expanding'">
+                            <span class="color-square" style="background-color: darkmagenta; margin-right: 10px"></span>{{'enum.status.expanding' | translate}}
+                          </span>
+                          <span *ngIf="!item.status">
+                            --
+                          </span>
+                        </clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{formatCapacity(item.capacity)}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.alloctype}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">
+                          <span *ngIf="item.alloctype == 'thick'">Thick</span>
+                          <span *ngIf="item.alloctype == 'thin'">Thin</span>
+                          <span *ngIf="!item.alloctype">--</span>
+                        </clr-dg-cell>
 
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'" *ngIf="!item.capacityUsage">
                           --
@@ -217,10 +244,16 @@
                           <clr-progress-bar clrValue="{{parseUsage(item.capacityUsage)}}" clrSuccess clrLabeled></clr-progress-bar>
                         </clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.attached ? "已映射":"未映射"}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">
+                          <span *ngIf="item.attached">{{'enum.status.unmapped' | translate}}</span>
+                          <span *ngIf="!item.attached">{{'enum.status.mapped' | translate}}</span>
+                        </clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.storagePoolName}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.serviceLevelName}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.protectionStatus ? "已保护":"未保护"}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">
+                          <span *ngIf="item.protectionStatus">{{'enum.status.protected' | translate}}</span>
+                          <span *ngIf="!item.protectionStatus">{{'enum.status.unprotected' | translate}}</span>
+                        </clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.datastores}}</clr-dg-cell>
 
                         <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.lantency}}</clr-dg-cell>
@@ -267,9 +300,40 @@
 
                       <clr-dg-row *clrDgItems="let item of fsList" [clrDgItem]="item">
                         <clr-dg-cell>{{item.name}}</clr-dg-cell>
-                        <clr-dg-cell>{{item.healthStatus}}</clr-dg-cell>
-                        <clr-dg-cell>{{item.allocType}}</clr-dg-cell>
-                        <clr-dg-cell>{{item.type}}</clr-dg-cell>
+                        <clr-dg-cell>
+                          <span *ngIf="item.healthStatus == 'creating'">
+                            <span class="color-square" style="background-color: green; margin-right: 10px"></span>{{'enum.status.creating' | translate}}
+                          </span>
+                          <span *ngIf="item.healthStatus == 'normal'">
+                            <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>{{'enum.status.normal' | translate}}
+                          </span>
+                          <span *ngIf="item.healthStatus == 'mapping'">
+                            <span class="color-square" style="background-color: gold; margin-right: 10px"></span>{{'enum.status.mapping' | translate}}
+                          </span>
+                          <span *ngIf="item.healthStatus == 'unmapping'">
+                            <span class="color-square" style="background-color: blueviolet; margin-right: 10px"></span>{{'enum.status.unmapping' | translate}}
+                          </span>
+                          <span *ngIf="item.healthStatus == 'deleting'">
+                            <span class="color-square" style="background-color: bisque; margin-right: 10px"></span>{{'enum.status.deleting' | translate}}
+                          </span>
+                          <span *ngIf="item.healthStatus == 'error'">
+                            <span class="color-square" style="background-color: red; margin-right: 10px"></span>{{'enum.status.error' | translate}}
+                          </span>
+                          <span *ngIf="item.healthStatus == 'expanding'">
+                            <span class="color-square" style="background-color: darkmagenta; margin-right: 10px"></span>{{'enum.status.expanding' | translate}}
+                          </span>
+                          <span *ngIf="!item.healthStatus">--</span>
+                        </clr-dg-cell>
+                        <clr-dg-cell>
+                          <span *ngIf="item.allocType == 'thick'">Thick</span>
+                          <span *ngIf="item.allocType == 'thin'">Thin</span>
+                          <span *ngIf="!item.allocType">--</span>
+                        </clr-dg-cell>
+                        <clr-dg-cell>
+                          <span *ngIf="item.type == 'normal'">{{'enum.status.normalFs' | translate}}</span>
+                          <span *ngIf="item.type == 'worm'">{{'enum.status.wormFs' | translate}}</span>
+                          <span *ngIf="!item.type">--</span>
+                        </clr-dg-cell>
                         <clr-dg-cell>{{formatCapacity(item.capacity)}}</clr-dg-cell>
                         <clr-dg-cell>{{formatCapacity(item.availableCapacity)}}</clr-dg-cell>
                         <clr-dg-cell>
@@ -280,11 +344,13 @@
                         <!--<clr-dg-cell>{{item.cifs_count}}</clr-dg-cell>-->
                         <clr-dg-cell>{{item.dtreeCount}}</clr-dg-cell>
                       </clr-dg-row>
+
                       <clr-dg-footer>
                         <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="fsTotal">
-                          <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
-                          {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-                          of {{pagination.totalItems}}
+                          <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">
+                            {{'storage.detail.perPage' | translate}}
+                          </clr-dg-page-size>
+                          {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{pagination.totalItems}}
                         </clr-dg-pagination>
                       </clr-dg-footer>
                     </clr-datagrid>
@@ -316,11 +382,20 @@
                       <clr-dg-row  *clrDgItems="let item of dtrees" [clrDgItem]="item">
                         <clr-dg-cell>{{item.name}}</clr-dg-cell>
                         <clr-dg-cell>{{item.fsName}}</clr-dg-cell>
-                        <clr-dg-cell>{{item.tierName!=null?item.tierName:'--'}}</clr-dg-cell>
-                        <clr-dg-cell>{{item.securityStyle!=null?item.securityStyle:'--'}}</clr-dg-cell>
+                        <clr-dg-cell>{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}</clr-dg-cell>
+                        <clr-dg-cell>
+                          <span *ngIf="item.securityStyle=='mixed'">Mixed</span>
+                          <span *ngIf="item.securityStyle=='native'">Native</span>
+                          <span *ngIf="item.securityStyle=='ntfs'">NTFS</span>
+                          <span *ngIf="item.securityStyle=='unix'">UNIX</span>
+                          <span *ngIf="!item.securityStyle||item.securityStyle==''">--</span>
+                        </clr-dg-cell>
                         <clr-dg-cell>{{item.nfsCount}}</clr-dg-cell>
                         <!--<clr-dg-cell>{{item.cifs_count}}</clr-dg-cell>-->
-                        <clr-dg-cell>{{item.quotaSwitch}}</clr-dg-cell>
+                        <clr-dg-cell>
+                          <span *ngIf="item.quotaSwitch">{{'enum.status.enabled' | translate}}</span>
+                          <span *ngIf="!item.quotaSwitch">{{'enum.status.notEnabled' | translate}}</span>
+                        </clr-dg-cell>
                       </clr-dg-row>
                       <clr-dg-footer>
                         <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="dtreeTotal">
@@ -378,7 +453,7 @@
           <button clrTabLink (click)="changeTab('capacity')">{{'storage.detail.cap.capacity' | translate}}</button>
           <clr-tab-content >
             <div class="detail-margin-top">
-              <div *ngIf="detail" class="clr-row">
+              <div *ngIf="detail" class="clr-row" >
                   <div class="clr-col-lg-4 clr-col-12">
                     <div class="info-content-title" style="margin-bottom: 2%">{{'storage.detail.cap.capacityUsage' | translate}}</div>
                     <div style=".data">
@@ -387,14 +462,14 @@
                         <div class="num-bar_outer">
                           <div class="num-bar_inner"></div>
                         </div>
-                        <span>{{formatCapacity(detail.totalCapacity)}}</span>
+                        <span class="capacity-span">{{formatCapacity(detail.totalCapacity)}}</span>
                       </div>
                       <div class="capacity-wrap">
                         <span class="capacity-label">{{'storage.detail.cap.totalCapacity' | translate}}</span>
                         <div class="num-bar_outer">
                           <div class="num-bar_inner total" [ngStyle]="{'width':(detail.totalEffectiveCapacity/detail.totalCapacity * 100)+'%'}"></div>
                         </div>
-                        <span>{{formatCapacity(detail.totalEffectiveCapacity)}}</span>
+                        <span class="capacity-span">{{formatCapacity(detail.totalEffectiveCapacity)}}</span>
                       </div>
                       <div class="capacity-wrap">
                         <span class="capacity-label">{{'storage.detail.cap.useFree' | translate}}</span>
@@ -402,36 +477,36 @@
                           <div class="num-bar_inner used" [ngStyle]="{'width':(detail.usedCapacity/detail.totalCapacity * 100)+'%'}"></div>
                           <div class="num-bar_inner free" [ngStyle]="{'width':((detail.totalEffectiveCapacity-detail.usedCapacity)/detail.totalCapacity * 100)+'%'}"></div>
                         </div>
-                        <span>{{formatCapacity(detail.usedCapacity)}} / {{getFreeCapacity(detail.totalEffectiveCapacity,detail.usedCapacity)}}</span>
+                        <span class="capacity-span2">{{formatCapacity(detail.usedCapacity)}} / {{getFreeCapacity(detail.totalEffectiveCapacity,detail.usedCapacity)}}</span>
                       </div>
                       <div class="capacity-wrap">
                         <span class="capacity-label">{{'storage.detail.cap.subscribe' | translate}}</span>
                         <div class="num-bar_outer">
                           <div class="num-bar_inner total" [ngStyle]="{'width':(detail.subscriptionCapacity/detail.totalCapacity * 100)+'%'}"></div>
                         </div>
-                        <span>{{formatCapacity(detail.subscriptionCapacity)}}</span>
+                        <span class="capacity-span">{{formatCapacity(detail.subscriptionCapacity)}}</span>
                       </div>
                     </div>
                   </div>
                   <div class="clr-col-lg-4 clr-col-12">
                     <div class="info-content-title">{{'storage.chart.capacity' | translate}}</div>
                     <div *ngIf="cd" class="info-charts-wrap" style=".data">
-
                       <div echarts [options]="cd.chart" id="chart3" style="width: 30%;height: 120px;"></div>
                       <div class="info-content">
                         <div class="info-content-text">
                           <span>{{'storage.chart.protection' | translate}}</span>
                           <span>{{cd.protection}}</span>
+                          <span class="squre protection"></span>
                         </div>
                         <div class="info-content-text">
                           <span>{{'storage.chart.fileSystem' | translate}}</span>
                           <span>{{cd.fileSystem}}</span>
-                          <span class="squre used"></span>
+                          <span class="squre fs"></span>
                         </div>
                         <div class="info-content-text">
                           <span>{{'storage.chart.volume' | translate}}</span>
                           <span>{{cd.volume}}</span>
-                          <span class="squre free"></span>
+                          <span class="squre volume"></span>
                         </div>
                         <div class="info-content-text">
                           <span>{{'storage.chart.freeCapacity' | translate}}</span>
@@ -491,7 +566,20 @@
                   <clr-dg-column>{{'storage.detail.capacity.pool.capacity' | translate}}</clr-dg-column>
                   <clr-dg-row *clrDgItems="let item of storagePool" [clrDgItem]="item">
                     <clr-dg-cell>{{item.name}}</clr-dg-cell>
-                    <clr-dg-cell>{{item.healthStatus}}</clr-dg-cell>
+                    <clr-dg-cell>
+                      <span *ngIf="item.healthStatus == 'normal'">
+                            <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>
+                            {{'storage.detail.storagePool.normal' | translate}}
+                          </span>
+                      <span *ngIf="item.healthStatus == 'fault'">
+                            <span class="color-square" style="background-color: red; margin-right: 10px"></span>
+                            {{'storage.detail.storagePool.fault' | translate}}
+                          </span>
+                      <span *ngIf="item.healthStatus == 'degraded'">
+                            <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>
+                            {{'storage.detail.storagePool.degraded' | translate}}
+                          </span>
+                    </clr-dg-cell>
                     <clr-dg-cell>
                       <clr-progress-bar clrValue="{{((item.consumedCapacity/item.totalCapacity) * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar>
                       <span>{{'storage.detail.cap.used' | translate}}{{formatCapacity(item.consumedCapacity)}}/{{formatCapacity(item.totalCapacity)}}</span>
@@ -543,7 +631,24 @@
                         <clr-dg-column>{{'storage.detail.hardware.controllers.bandwidth' | translate}}</clr-dg-column>
                         <clr-dg-row  *clrDgItems="let item of controllers" [clrDgItem]="item">
                           <clr-dg-cell>{{item.name}}</clr-dg-cell>
-                          <clr-dg-cell>{{item.status}}</clr-dg-cell>
+                          <clr-dg-cell>
+                            <span *ngIf="item.status == 'unknown'">
+                              <span class="color-square" style="background-color: beige; margin-right: 10px"></span>{{'enum.status.unknown' | translate}}
+                            </span>
+                            <span *ngIf="item.status == 'normal'">
+                              <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>{{'enum.status.normal' | translate}}
+                            </span>
+                            <span *ngIf="item.status == 'running'">
+                              <span class="color-square" style="background-color: green; margin-right: 10px"></span>{{'enum.status.running' | translate}}
+                            </span>
+                            <span *ngIf="item.status == 'connected'">
+                              <span class="color-square" style="background-color: yellow; margin-right: 10px"></span>{{'enum.status.connected' | translate}}
+                            </span>
+                            <span *ngIf="item.status == 'disconnected'">
+                            <span class="color-square" style="background-color: red; margin-right: 10px"></span>{{'enum.status.disconnected' | translate}}
+                          </span>
+                            <span *ngIf="!item.status">--</span>
+                          </clr-dg-cell>
                           <clr-dg-cell>{{item.softVer}}</clr-dg-cell>
                           <clr-dg-cell>{{item.cpuUsage!=null?item.cpuUsage:'--'}}</clr-dg-cell>
                           <clr-dg-cell>{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
@@ -580,10 +685,30 @@
                         <clr-dg-column >{{'storage.detail.hardware.disks.usage' | translate}}</clr-dg-column>
                         <clr-dg-row  *clrDgItems="let item of disks" [clrDgItem]="item">
                           <clr-dg-cell>{{item.name}}</clr-dg-cell>
-                          <clr-dg-cell>{{item.status}}</clr-dg-cell>
-                          <clr-dg-cell>{{item.physicalType}}</clr-dg-cell>
+                          <clr-dg-cell>
+                            <span *ngIf="item.status == 'unknown'">
+                              <span class="color-square" style="background-color: beige; margin-right: 10px"></span>{{'enum.status.unknown' | translate}}
+                            </span>
+                            <span *ngIf="item.status == 'normal'">
+                              <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>{{'enum.status.normal' | translate}}
+                            </span>
+                            <span *ngIf="item.status == 'fault'">
+                              <span class="color-square" style="background-color: red; margin-right: 10px"></span>{{'enum.status.fault' | translate}}
+                            </span>
+                            <span *ngIf="!item.status">--</span>
+                          </clr-dg-cell>
+                          <clr-dg-cell>
+                            <span *ngIf="item.physicalType == 'sata'">SATA</span>
+                            <span *ngIf="item.physicalType == 'sas'">SAS</span>
+                            <span *ngIf="item.physicalType == 'ssd'">SSD</span>
+                            <span *ngIf="item.physicalType == 'nl-sas'">NL-SAS</span>
+                            <span *ngIf="item.physicalType == 'unknown'">{{'storage.detail.storagePool.unknown' | translate}}</span>
+                          </clr-dg-cell>
                           <clr-dg-cell>{{formatCapacity(item.capacity)}}</clr-dg-cell>
-                          <clr-dg-cell>{{item.logicalType}}</clr-dg-cell>
+                          <clr-dg-cell>
+                            <span *ngIf="item.logicalType == 'member'">{{'enum.status.member' | translate}}</span>
+                            <span *ngIf="!item.logicalType">--</span>
+                          </clr-dg-cell>
                           <clr-dg-cell>{{item.diskDomain}}</clr-dg-cell>
                           <clr-dg-cell>{{item.speed}}</clr-dg-cell>
                           <clr-dg-cell>{{item.iops}}</clr-dg-cell>
@@ -621,7 +746,14 @@
                               <clr-dg-column >{{'storage.detail.hardware.ports.usage' | translate}}</clr-dg-column>
                               <clr-dg-row  *clrDgItems="let item of fcs" [clrDgItem]="item">
                                 <clr-dg-cell>{{item.location}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.status}}</clr-dg-cell>
+                                <clr-dg-cell>
+                                  <span *ngIf="item.connectStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
+                                  <span *ngIf="item.connectStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
+                                  <span *ngIf="item.connectStatus == 'running'">{{'enum.status.running' | translate}}</span>
+                                  <span *ngIf="item.connectStatus == 'connected'">{{'enum.status.connected' | translate}}</span>
+                                  <span *ngIf="item.connectStatus == 'disconnected'">{{'enum.status.disconnected' | translate}}</span>
+                                  <span *ngIf="!item.status">--</span>
+                                </clr-dg-cell>
                                 <clr-dg-cell>{{item.wwn}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.speed}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.iops}}</clr-dg-cell>
@@ -656,8 +788,11 @@
                                 <clr-dg-cell>{{item.location}}</clr-dg-cell>
 
                                 <clr-dg-cell>
-                                  <span *ngIf="item.connectStatus =='disconnected'">{{'enum.status.disconnected' | translate}}</span>
-                                  <span *ngIf="item.connectStatus =='connected'">{{'enum.status.connected' | translate}}</span>
+                                  <span *ngIf="item.connectStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
+                                  <span *ngIf="item.connectStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
+                                  <span *ngIf="item.connectStatus == 'running'">{{'enum.status.running' | translate}}</span>
+                                  <span *ngIf="item.connectStatus == 'connected'">{{'enum.status.connected' | translate}}</span>
+                                  <span *ngIf="item.connectStatus == 'disconnected'">{{'enum.status.disconnected' | translate}}</span>
                                   <span *ngIf="!item.connectStatus">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell>{{item.mgmtIp!=null?item.mgmtIp!=''?item.mgmtIp:'--':'--'}}</clr-dg-cell>
@@ -694,7 +829,14 @@
                               <clr-dg-column >{{'storage.detail.hardware.ports.usage' | translate}}</clr-dg-column>
                               <clr-dg-row  *clrDgItems="let item of fcoes" [clrDgItem]="item">
                                 <clr-dg-cell>{{item.location}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.status}}</clr-dg-cell>
+                                <clr-dg-cell>
+                                  <span *ngIf="item.connectStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
+                                  <span *ngIf="item.connectStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
+                                  <span *ngIf="item.connectStatus == 'running'">{{'enum.status.running' | translate}}</span>
+                                  <span *ngIf="item.connectStatus == 'connected'">{{'enum.status.connected' | translate}}</span>
+                                  <span *ngIf="item.connectStatus == 'disconnected'">{{'enum.status.disconnected' | translate}}</span>
+                                  <span *ngIf="!item.connectStatus">--</span>
+                                </clr-dg-cell>
                                 <clr-dg-cell>{{item.wwn}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.speed}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
@@ -725,8 +867,20 @@
                               <clr-dg-column >{{'storage.detail.hardware.ports.totalBandwidth' | translate}}</clr-dg-column>
                               <clr-dg-row  *clrDgItems="let item of bonds" [clrDgItem]="item">
                                 <clr-dg-cell>{{item.name}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.healthStatus}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.runningStatus}}</clr-dg-cell>
+                                <clr-dg-cell>
+                                  <span *ngIf="item.healthStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
+                                  <span *ngIf="item.healthStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
+                                  <span *ngIf="item.healthStatus == 'fail'">{{'enum.status.fail' | translate}}</span>
+                                  <span *ngIf="!item.healthStatus">--</span>
+                                </clr-dg-cell>
+                                <clr-dg-cell>
+                                  <span *ngIf="item.runningStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'running'">{{'enum.status.running' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'connected'">{{'enum.status.connected' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'disconnected'">{{'enum.status.disconnected' | translate}}</span>
+                                  <span *ngIf="!item.runningStatus">--</span>
+                                </clr-dg-cell>
                                 <clr-dg-cell>{{item.mtu}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.latency!=null?item.latency:'--'}}</clr-dg-cell>
@@ -759,8 +913,15 @@
                               <clr-dg-column >{{'storage.detail.hardware.ports.vStoreName' | translate}}</clr-dg-column>
                               <clr-dg-row  *clrDgItems="let item of logicports" [clrDgItem]="item">
                                 <clr-dg-cell>{{item.name}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.runningStatus}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.operationalStatus}}</clr-dg-cell>
+                                <clr-dg-cell>
+                                  <span *ngIf="item.runningStatus == 'link down'">{{'enum.status.linkDown' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'link up'">{{'enum.status.linkUp' | translate}}</span>
+                                  <span *ngIf="!item.runningStatus">--</span>
+                                </clr-dg-cell>
+                                <clr-dg-cell>
+                                  <span *ngIf="item.operationalStatus == 'activated'">{{'enum.status.activated' | translate}}</span>
+                                  <span *ngIf="item.operationalStatus != 'activated'">{{'enum.status.unActivated' | translate}}</span>
+                                </clr-dg-cell>
                                 <clr-dg-cell>{{item.mgmtIp!=null?item.mgmtIp!=''?item.mgmtIp:'--':'--'}}</clr-dg-cell>
                                 <clr-dg-cell  class="over_flow">
                                   {{item.mgmtIpv6!=null?item.mgmtIpv6!=''?item.mgmtIpv6:'--':'--'}}
