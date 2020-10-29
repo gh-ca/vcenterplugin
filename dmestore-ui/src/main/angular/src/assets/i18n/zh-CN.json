@@ -710,6 +710,7 @@
       "unknown":"未知",
       "running":"运行中",
       "fault":"故障",
+      "faulty":"故障",
       "member":"成员盘",
       "linkDown":"未连接",
       "linkUp":"已连接",
@@ -734,6 +735,7 @@
   },
   "page": {
     "perPage": "每页",
-    "of": "中的"
+    "of": "中的",
+    "all": "共"
   }
 }

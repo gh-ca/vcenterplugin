@@ -7,6 +7,9 @@ export class NfsAddService{
   getHostList(){
     return this.http.get('accessvmware/listhost');
   }
+  getStoragePoolListByStorageId(params={}){
+    return this.http.get('dmestorage/storagepools', params);
+  }
   getVmkernelListByObjectId(hostObjectId:string){
     return this.http.get('accessvmware/getvmkernelipbyhostobjectid',{params: {hostObjectId}} );
   }
