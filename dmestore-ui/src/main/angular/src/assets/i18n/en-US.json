@@ -706,6 +706,7 @@
        "unknown":"Unknown",
        "running":"Running",
        "fault":"Fault",
+       "faulty":"Faulty",
        "member":"Member",
        "linkDown":"Link Down",
        "linkUp":"Link Up",

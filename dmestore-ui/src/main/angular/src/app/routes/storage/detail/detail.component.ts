@@ -30,63 +30,7 @@ import {GlobalsService} from "../../../shared/globals.service";
   providers: [DetailService, MakePerformance, NfsService],
 })
 export class DetailComponent implements OnInit, AfterViewInit {
-  demochart={
-    tooltip: {
-      trigger: 'item',
-      formatter: ' {b}: {c} ({d}%)'
-    },
-    title: {
-      text: '123',
-      textAlign: 'center',
-      padding: 0,
-      textVerticalAlign: 'middle',
-      textStyle: {
-        fontSize: 22,
-        color: '#63B3F7'
-      },
-      subtextStyle: {
-        fontSize: 12,
-        color: '#c2c6dc',
-        align: 'center'
-      },
-      left: '50%',
-      top: '50%',
-      //subtext: '234'
-    },
 
-    series: [
-      {
-        name: '',
-        type: 'pie',
-        radius: ['50%', '70%'],
-        center: ['50%', '50%'],
-
-        avoidLabelOverlap: false,
-        label: {
-          show: false,
-          position: 'center'
-        },
-        emphasis: {
-          label: {
-            show: false,
-            fontSize: '30',
-            fontWeight: 'bold'
-          }
-        },
-        labelLine: {
-          show: false
-        },
-        data: [
-          {value: 335, name: '直接访问'},
-          {value: 310, name: '邮件营销'},
-          {value: 234, name: '联盟广告'},
-          {value: 135, name: '视频广告'},
-          {value: 1548, name: '搜索引擎'}
-        ]
-      }
-    ],
-    color: ['#FF0000', '#FF9538', '#63B3F7']
-  };
   cd : CapacityDistribution;
   capSave:CapacitySavings;
   options = {
@@ -672,6 +616,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }
     this.capSave.bars=bars;
     this.capSave.rate=(this.capSave.beforeSave/this.capSave.afterSave).toFixed(0) +": 1";
+    console.log('capSave',this.capSave);
+
   }
   initCapacityDistribution(){
     this.cd = new CapacityDistribution();

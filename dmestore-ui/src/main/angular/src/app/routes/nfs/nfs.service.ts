@@ -92,6 +92,7 @@ export interface List {
   readResponseTime: number;   // 读响应时间 单位ms
   writeResponseTime: number; // 写响应时间 单位ms
   objectid: string; //
+  capacityUsage:number;
 }
 
 

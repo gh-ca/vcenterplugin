@@ -40,16 +40,16 @@
     <clr-datagrid id="nfs-grid" [(clrDgSelected)]="rowSelected" [clrDgLoading]="isLoading">
       <clr-dg-column [clrDgField]="'name'">{{'nfs.name' | translate}}</clr-dg-column>
 
-      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'status'">{{'nfs.status' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" >{{'nfs.status' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacity'" [clrDgSortOrder]="descSort">{{'nfs.totalCapacity' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'freeCapacity'">{{'nfs.freeCapacity' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacityUsage'">{{'nfs.capacityUsage' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'provisioningCapacity'">{{'nfs.provisioningCapacity' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'device'">{{'nfs.device' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" >{{'nfs.freeCapacity' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacityUsage'" [clrDgSortOrder]="descSort">{{'nfs.capacityUsage' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" >{{'nfs.provisioningCapacity' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" >{{'nfs.device' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'logicPort'">{{'nfs.logicPort' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'shareIp'">{{'nfs.shareIp' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'sharePath'">{{'nfs.sharePath' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'fileSystem'">{{'nfs.fileSystem' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'fs'">{{'nfs.fileSystem' | translate}}</clr-dg-column>
 
       <clr-dg-column [hidden]="radioCheck!=='chart'">{{'nfs.ops' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='chart'">{{'nfs.bandwidth' | translate}}</clr-dg-column>
@@ -58,7 +58,20 @@
 
       <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
         <clr-dg-cell (click)="navigateTo(item.objectid)" style="color:#829DE6;cursor:pointer">{{item.name}}</clr-dg-cell>
-        <clr-dg-cell style="width: 5%" [hidden]="radioCheck!=='list'">{{item.status}}</clr-dg-cell>
+        <clr-dg-cell style="width: 5%" [hidden]="radioCheck!=='list'">
+          <span *ngIf="item.status == 'normal'">
+                <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>
+                <span>{{'enum.status.normal' | translate}}</span>
+          </span>
+          <span *ngIf="item.status == 'faulty'">
+                <span class="color-square" style="background-color: red; margin-right: 10px"></span>
+                <span>{{'enum.status.faulty' | translate}}</span>
+          </span>
+          <span *ngIf="item.status == 'fault'">
+                <span class="color-square" style="background-color: red; margin-right: 10px"></span>
+                <span>{{'enum.status.fault' | translate}}</span>
+          </span>
+        </clr-dg-cell>
         <clr-dg-cell [hidden]="radioCheck!=='list'">{{formatCapacity(item.capacity)}}</clr-dg-cell>
         <clr-dg-cell [hidden]="radioCheck!=='list'">{{formatCapacity(item.freeSpace)}}</clr-dg-cell>
         <clr-dg-cell [hidden]="radioCheck!=='list'">
@@ -76,6 +89,14 @@
         <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.readResponseTime}}</clr-dg-cell>
         <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.writeResponseTime}}</clr-dg-cell>
       </clr-dg-row>
+      <clr-dg-footer>
+        <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="total">
+          <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">{{'page.perPage' | translate}}</clr-dg-page-size>
+          {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+          {{'page.all' | translate}}
+          {{pagination.totalItems}}
+        </clr-dg-pagination>
+      </clr-dg-footer>
     </clr-datagrid>
   </div>
   <!--编辑弹框-->
