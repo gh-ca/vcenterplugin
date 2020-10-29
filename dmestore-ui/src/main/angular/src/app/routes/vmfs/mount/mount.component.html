@@ -28,7 +28,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel();">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="mountOrUnmountFunc();">{{'menu.ok' | translate}}</button>
+      <button type="submit" class="btn btn-primary" (click)="mountOrUnmountFunc();">{{'menu.ok' | translate}}</button>
     </div>
   </div>
 <!--  </clr-modal>-->
@@ -65,6 +65,7 @@
             </clr-options>
           </clr-combobox>
           <clr-control-helper><clr-icon shape="info-circle" class="is-solid"></clr-icon>{{'validations.comboboxTips' | translate}}</clr-control-helper>
+          <clr-control-error>{{'validations.required' | translate}}：{{'vmfs.mount.mountErr' | translate}}</clr-control-error>
         </clr-combobox-container>
 
         <clr-combobox-container *ngIf="mountForm.mountType==='2'">
@@ -77,13 +78,14 @@
             </clr-options>
           </clr-combobox>
           <clr-control-helper><clr-icon shape="info-circle" class="is-solid"></clr-icon>{{'validations.comboboxTips' | translate}}</clr-control-helper>
+          <clr-control-error>{{'validations.required' | translate}}：{{'vmfs.mount.mountErr' | translate}}</clr-control-error>
         </clr-combobox-container>
 
       </form>
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel();">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="mountOrUnmountFunc()">{{'menu.ok' | translate}}</button>
+      <button type="submit" class="btn btn-primary" (click)="mountOrUnmountFunc()">{{'menu.ok' | translate}}</button>
     </div>
   </div>
 <!--  </clr-modal>-->
@@ -135,7 +137,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel();">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="mountOrUnmountFunc();">{{'menu.ok' | translate}}</button>
+      <button type="submit" class="btn btn-primary" (click)="mountOrUnmountFunc();">{{'menu.ok' | translate}}</button>
     </div>
   </div>
 <!--  </clr-modal>-->

@@ -1,6 +1,17 @@
 <!--<clr-modal class="add-wizard-wrap" [(clrModalOpen)]="modifyShow" [clrModalClosable]="false">-->
   <div class="modal-body">
+    <div *ngIf="modalLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+    </div>
+    <div *ngIf="modalHandleLoading" class="loadingDiv">
+        <span>
+          {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+        </span>
+    </div>
     <form clrForm >
+      <div *ngIf="isOperationErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.modifyError' | translate}}</div>
       <!-- 名称 -->
       <clr-input-container>
         <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
@@ -41,7 +52,7 @@
       </clr-checkbox-container>
       <!-- 交通管制对象 IOPS 上限-->
       <clr-checkbox-container *ngIf="modifyForm.control_policy === '1' && !isServiceLevelData">
-        <label [(ngModel)]="modifyForm.maxiopsChoose" name="maxiopsChoose" clrCheckbox ></label>
+        <label></label>
         <clr-checkbox-wrapper>
           <input type="checkbox" [(ngModel)]="modifyForm.maxiopsChoose" name="maxiopsChoose" clrCheckbox/>
           <label>

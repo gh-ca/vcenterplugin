@@ -33,6 +33,9 @@ export class ModifyComponent implements OnInit{
 
   // 编辑窗口隐藏于展示
   // modifyShow:boolean;
+  modalHandleLoading = false; // 数据处理loading
+  modalLoading = false; // 数据加载loading
+  isOperationErr = false; // 错误信息
 
   ngOnInit(): void {
     this.initData();
@@ -40,6 +43,9 @@ export class ModifyComponent implements OnInit{
 
   initData() {
     // this.modifyShow = true;
+    this.modalLoading = true;
+    this.modalHandleLoading = false;
+    this.isOperationErr = false;
     // 设备类型 操作类型初始化
     this.route.url.subscribe(url => {
       console.log('url', url);
@@ -84,9 +90,11 @@ export class ModifyComponent implements OnInit{
                 this.isServiceLevelData = true;
               }
             }
+            this.modalLoading = false;
             console.log('this.modifyForm:', this.modifyForm);
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
           });
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       });
     });
 
@@ -124,14 +132,18 @@ export class ModifyComponent implements OnInit{
     }
     this.modifyForm.newDsName = this.modifyForm.name;
     console.log('this.modifyForm:', this.modifyForm);
+    this.modalHandleLoading = true;
     this.remoteSrv.updateVmfs(this.modifyForm.volumeId, this.modifyForm).subscribe((result: any) => {
+      this.modalHandleLoading = false;
       if (result.code === '200') {
         console.log('modify success:' + this.modifyForm.oldDsName);
+        // 关闭编辑窗口
+        this.cancel();
       } else {
         console.log('modify faild：' + this.modifyForm.oldDsName + result.description);
+        this.isOperationErr = true;
       }
-      // 关闭编辑窗口
-      this.cancel();
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
   /**
