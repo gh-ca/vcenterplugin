@@ -120,7 +120,7 @@ export class NfsAddComponent implements OnInit{
     this.storagePools = null;
     this.logicPorts = null;
     // 选择存储后获取存储池
-    this.storageService.getStoragePoolListByStorageId(this.addForm.storagId)
+    this.storageService.getStoragePoolListByStorageId("file",this.addForm.storagId)
       .subscribe((r: any) => {
         if (r.code === '200'){
           this.storagePools = r.data;
