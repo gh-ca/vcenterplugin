@@ -21,12 +21,23 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
 
     @Override
     public Object getRecommendValue() {
-        return new Integer(9000);
+        return "VMW_PSP_RR";
     }
 
     @Override
     public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
-        return super.getCurrentValue(vcsdkUtils, objectId, (Integer) getRecommendValue());
+        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
+        VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
+        HostMO hostMo = new HostMO(context, mor);
+        HostStorageSystemMO hostStorageSystemMo = hostMo.getHostStorageSystemMO();
+        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo().getMultipathInfo().getLun();
+        for (HostMultipathInfoLogicalUnit lun : lunList) {
+            HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
+            String policyStr = policy.getPolicy();
+            return policyStr;
+        }
+
+        return null;
     }
 
     @Override
@@ -70,6 +81,10 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
 
     @Override
     public void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
+        if (check(vcsdkUtils, objectId)) {
+            return;
+        }
+
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = new HostMO(context, mor);
@@ -83,7 +98,7 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
             if(policyStr.equals("")){
                 //policy.setPolicy("VMW_PSP_RR");
             }
-            //hostStorageSystemMo.setMultipathLunPolicy(lun.getId(), policy);
+            hostStorageSystemMo.setMultipathLunPolicy(lun.getId(), policy);
         }
     }
 }

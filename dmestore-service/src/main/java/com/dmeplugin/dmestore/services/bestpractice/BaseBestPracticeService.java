@@ -50,20 +50,6 @@ public class BaseBestPracticeService {
         return null;
     }
 
-    protected Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId, Integer recommendValue) throws Exception {
-        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
-        VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = new HostMO(context, mor);
-        List<HostVirtualSwitch>  hostVirtualSwitchList = hostMo.getHostVirtualSwitch();
-        for(HostVirtualSwitch hostVirtualSwitch : hostVirtualSwitchList){
-            if(hostVirtualSwitch.getMtu().intValue() != recommendValue.intValue()){
-                return hostVirtualSwitch.getMtu();
-            }
-        }
-
-        return null;
-    }
-
 
     protected boolean checkModuleOption(VCSDKUtils vcsdkUtils, String objectId,
                                         String optionName, Object recommendValue) throws Exception {
