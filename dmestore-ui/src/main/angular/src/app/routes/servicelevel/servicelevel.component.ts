@@ -153,6 +153,8 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   tipModalSuccess = false;
   tipModalFail = false;
 
+  tierLoading = false;
+  syncLoading = false;
   constructor(private ngZone: NgZone,
               private cdr: ChangeDetectorRef,
               private http: HttpClient,
@@ -241,9 +243,9 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // 刷新服务等级列表
   refresh(){
-    this.gs.loading = true;
+    this.tierLoading = true;
     this.http.post('servicelevel/listservicelevel', {}).subscribe((response: any) => {
-      this.gs.loading = false;
+      this.tierLoading = false;
       if(response.code == '200'){
         this.serviceLevelsRes = this.recursiveNullDelete(response.data);
         for (const i of this.serviceLevelsRes){
@@ -514,10 +516,10 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
    * 同步虚拟机存储策略
    */
   syncStoragePolicy(){
-    this.gs.loading = true;
+    this.syncLoading = true;
     const url = "servicelevel/manualupdate";
     this.http.post(url, {}).subscribe((response: any) => {
-      this.gs.loading = false;
+      this.syncLoading = false;
       if (response.code == '200'){
          this.tipModalSuccess = true;
       } else{

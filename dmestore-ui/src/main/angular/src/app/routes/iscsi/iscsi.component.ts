@@ -58,6 +58,11 @@ export class IscsiComponent implements OnInit, AfterViewInit {
   tipModalFail = false;
 
   isSubmit = false;
+
+
+  ipLoading = false;
+  dsDeviceLoading = false;
+  submitLoading = false;
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
               private commonService: CommonService,
@@ -81,9 +86,9 @@ export class IscsiComponent implements OnInit, AfterViewInit {
   }
 
   loadIps(){
-    this.gs.loading = true;
+    this.ipLoading = true;
     this.http.get(this.ipsGetUrl, this.ipsGetUrlParams).subscribe((result: any) => {
-      this.gs.loading = false;
+      this.ipLoading = false;
       if (result.code === '200'){
         this.ips = result.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -95,9 +100,9 @@ export class IscsiComponent implements OnInit, AfterViewInit {
   }
 
   loadStorageDevice(){
-    this.gs.loading = true;
+    this.dsDeviceLoading = true;
     this.http.get(this.storageGetUrl, {}).subscribe((result: any) => {
-      this.gs.loading = false;
+      this.dsDeviceLoading = false;
       if (result.code === '200'){
         this.storageDevices = result.data;
         setTimeout(() => {
@@ -116,6 +121,7 @@ export class IscsiComponent implements OnInit, AfterViewInit {
       this.portLoading = true;
       this.portGetUrlParams.params.storageSn = this.configModel.sn;
       this.http.get(this.portGetUrl, this.portGetUrlParams).subscribe((result: any) => {
+        this.portLoading = false;
         if (result.code === '200'){
           result.data.forEach((item) => {
             item.connectStatus = '';
@@ -123,7 +129,6 @@ export class IscsiComponent implements OnInit, AfterViewInit {
           this.portList = result.data;
           this.portTotal = result.data.length;
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-          this.portLoading = false;
           // 连通状态
           this.testPortConnected();
         }
@@ -174,9 +179,9 @@ export class IscsiComponent implements OnInit, AfterViewInit {
       }
     }
 
-    this.gs.loading = true;
+    this.submitLoading = true;
     this.http.post(this.configIscsiUrl, this.configModel).subscribe((result: any) => {
-      this.gs.loading = false;
+      this.submitLoading = false;
       if(result.code == '200'){
         this.tipModalSuccess = true;
       } else{
@@ -187,6 +192,10 @@ export class IscsiComponent implements OnInit, AfterViewInit {
       console.error('ERROR', err);
     });
     this.cdr.detectChanges();
+  }
+
+  closeWin(){
+    this.gs.getClientSdk().modal.close();
   }
 }
 

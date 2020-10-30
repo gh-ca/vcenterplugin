@@ -86,6 +86,9 @@
       <button type="button" style="display:block;margin:0 auto" class="btn btn-primary" (click)="submit()">{{'menu.ok' | translate}}</button>
     </div>
   </div>
+  <div class="loadingDiv" [hidden]="!ipLoading"><clr-spinner class="spinner spinner-md">Loading</clr-spinner></div>
+  <div class="loadingDiv" [hidden]="!dsDeviceLoading"><clr-spinner class="spinner spinner-md">Loading</clr-spinner></div>
+  <div class="loadingDiv" [hidden]="!submitLoading"><clr-spinner class="spinner spinner-md">Loading</clr-spinner></div>
 </div>
 
 <clr-modal [(clrModalOpen)]="tipModalSuccess" [clrModalSize]="'sm'">
@@ -94,7 +97,7 @@
     <clr-icon shape="success-standard" class="is-solid" style="color: #59A220;margin-right: 5px;"></clr-icon>{{'bestPractice.exeSuccess'|translate}}
   </div>
   <div class="modal-footer">
-    <button type="button" class="btn btn-success" (click)="tipModalSuccess=false">{{'menu.ok'|translate}}</button>
+    <button type="button" class="btn btn-success" (click)="tipModalSuccess=false;closeWin();">{{'menu.ok'|translate}}</button>
   </div>
 </clr-modal>
 
