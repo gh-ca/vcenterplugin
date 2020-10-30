@@ -99,6 +99,7 @@
     "expandSize":"扩容大小",
     "oldCapacity":"原有容量",
     "reduSize":"缩容大小",
+    "mountedHost":"已挂载主机",
     "ops":"OPS",
     "bandwidth":"带宽(MB/s)",
     "nfsStore":"NFS存储",
