@@ -186,11 +186,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                 if (statisticObject != null) {
                                     VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
                                     vmfsDataInfo.setVolumeId(volumeId);
-                                    vmfsDataInfo.setIops(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT, "max"), null));
-                                    vmfsDataInfo.setBandwidth(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH, "max"), null));
-                                    vmfsDataInfo.setReadResponseTime(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_READRESPONSETIME, "max"), null));
-                                    vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITERESPONSETIME, "max"), null));
-                                    vmfsDataInfo.setLatency(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME, "max"), null));
+                                    vmfsDataInfo.setIops(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT, "max"), null));
+                                    vmfsDataInfo.setBandwidth(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH, "max"), null));
+                                    vmfsDataInfo.setReadResponseTime(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_READRESPONSETIME, "max"), null));
+                                    vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITERESPONSETIME, "max"), null));
+                                    vmfsDataInfo.setLatency(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME, "max"), null));
                                     relists.add(vmfsDataInfo);
                                 }
                             }
@@ -1859,26 +1859,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return hostGroupMap;
     }
 
-    //从性能数据中提取对应指标的对应值
-    private JsonElement getStatistcValue(JsonObject statisticObject, String indicator, String type) {
-        JsonElement object = null;
-        if (null != statisticObject) {
-            JsonElement indicatorEl = statisticObject.get(indicator);
-            if (!ToolUtils.jsonIsNull(indicatorEl)) {
-                JsonObject indicatorJson = indicatorEl.getAsJsonObject();
-                JsonElement typeEl = indicatorJson.get(type);
-                if (!ToolUtils.jsonIsNull(typeEl)) {
-                    JsonObject typeJson = typeEl.getAsJsonObject();
-                    Set<Map.Entry<String, JsonElement>> sets = typeJson.entrySet();
-                    for (Map.Entry<String, JsonElement> set : sets) {
-                        object = set.getValue();//只取一个
-                        break;
-                    }
-                }
-            }
-        }
-        return object;
-    }
+
 
     public boolean isVmfs(String objectId) throws DmeSqlException {
         List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_VMFS);
