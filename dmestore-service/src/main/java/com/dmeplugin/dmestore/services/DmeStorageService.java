@@ -164,9 +164,15 @@ public interface DmeStorageService {
 
     /**
      *
-     * @param volumeIds volumeid
+     * @param volumeId volumeid
      * @return
      * @throws DMEException
      */
     public List<Volume> listVolumesPerformance(List<String> volumeId) throws DMEException;
+
+    Boolean queryVolumeByName(String name,String storageId) throws DMEException;
+
+    Boolean queryFsByName(String name, String storageId) throws DMEException;
+
+    Boolean queryShareByName(String name, String storageId)throws DMEException;
 }

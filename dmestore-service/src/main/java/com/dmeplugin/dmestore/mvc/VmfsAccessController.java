@@ -5,6 +5,7 @@ import com.dmeplugin.dmestore.model.VmfsDataInfo;
 import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
 import com.dmeplugin.dmestore.services.VmfsAccessService;
 import com.google.gson.Gson;
+import com.vmware.vim.binding.vmodl.name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -282,4 +283,17 @@ public class VmfsAccessController extends BaseController {
         return failure(failureStr);
     }
 
+    /**
+     * 通过名字查询vmfs中是否存在指定对象
+     * @param name vmfs name
+     * @return
+     */
+    @GetMapping("/querydatastorebyname")
+    public ResponseBodyBean queryDatastoreByName(@RequestParam("name") String name,@RequestParam("type") String type){
+        try {
+            return success(vmfsAccessService.queryDatastoreByName(name, type));
+        } catch (Exception e) {
+            return failure(e.getMessage());
+        }
+    }
 }

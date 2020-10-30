@@ -13,6 +13,7 @@ import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import org.apache.http.impl.execchain.TunnelRefusedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
@@ -2006,6 +2007,20 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         LOG.info("relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
         return relists;
+    }
+
+    @Override
+    public Boolean queryDatastoreByName(String name,String type) {
+        Boolean flag = true;
+        try {
+            String dataStoreName = dmeVmwareRalationDao.getDataStoreByName(name, type);
+            if (!StringUtils.isEmpty(dataStoreName)) {
+                flag = false;
+            }
+        } catch (DmeSqlException e) {
+            e.printStackTrace();
+        }
+        return flag;
     }
 
     //查询dataStrore上的vm 看是否关联了指定的主机或集群

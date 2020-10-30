@@ -9,6 +9,7 @@ import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.*;
+import net.bytebuddy.implementation.bytecode.Throw;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
@@ -231,6 +232,18 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         String className = "SYS_StoragePool";
         List<StoragePool> resList = new ArrayList<>();
         String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageId+"&&pageSize=1000";
+//        Map<String, Object> simple = new HashMap<>(16);
+//        Map<String, Object> reqSimple = new HashMap<>(16);
+//        Map<String, Object> constraint = new HashMap<>(16);
+//        List<Object> simples = new ArrayList<>();
+//        simple.put("name", "storageDeviceId");
+//        //simple.put("operator", "equal");
+//        simple.put("value", storageId);
+//        reqSimple.put("simple", simple);
+//        simples.add(reqSimple);
+//        constraint.put("constraint", simples);
+//        String condition = gson.toJson(constraint);
+//        String url = API_INSTANCES_LIST + "/" + className + "?pageSize=1000&condition=" + condition ;
         LOG.info(url);
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
@@ -1358,6 +1371,42 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
         LOG.info("listVolumesPerformance relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
         return relists;
+    }
+
+    @Override
+    public Boolean queryVolumeByName(String name,String storageId) throws DMEException {
+        Boolean flag = true;
+        List<Volume> volumes = getVolumes(storageId);
+        for (Volume volume : volumes) {
+            if (volume.getName().equals(name)) {
+                flag = false;
+            }
+        }
+        return flag;
+    }
+
+    @Override
+    public Boolean queryFsByName(String name, String storageId) throws DMEException {
+        Boolean flag = true;
+        List<FileSystem> fileSystems = getFileSystems(storageId);
+        for (FileSystem fileSystem : fileSystems) {
+            if (name.equals(fileSystem.getName())) {
+                flag = false;
+            }
+        }
+        return flag;
+    }
+
+    @Override
+    public Boolean queryShareByName(String name, String storageId) throws DMEException {
+        Boolean flag = true;
+        List<NfsShares> nfsShares = getNfsShares(storageId);
+        for (NfsShares nfsShare : nfsShares) {
+            if (name.equals(nfsShare.getName())) {
+                flag = false;
+            }
+        }
+        return flag;
     }
 
     /**
