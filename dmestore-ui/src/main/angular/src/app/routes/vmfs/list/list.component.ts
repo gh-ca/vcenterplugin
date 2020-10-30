@@ -794,6 +794,8 @@ export class VmfsListComponent implements OnInit {
       // 获取已挂载的集群 主机数据
       this.unmountForm = new GetForm().getUnmountForm();
       this.unmountForm.name = this.rowSelected[0].name;
+      this.mountedHost = null;
+      this.mountedCluster = null;
       // 获取主机
       this.remoteSrv.getMountHost(this.rowSelected[0].objectid).subscribe((result: any) => {
         console.log(result);

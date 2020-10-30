@@ -429,7 +429,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=iscsi</actionUrl>
-                        <dialogTitle>iscsi</dialogTitle>
+                        <dialogTitle>ISCSI</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -615,7 +615,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/delete</actionUrl>
-                        <dialogTitle>vmfs</dialogTitle>
+                        <dialogTitle>VMFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -663,7 +663,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/delete</actionUrl>
-                        <dialogTitle>nfs</dialogTitle>
+                        <dialogTitle>NFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -710,7 +710,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/expand?resource=dataStore</actionUrl>
-                        <dialogTitle>vmfs</dialogTitle>
+                        <dialogTitle>VMFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -724,7 +724,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/reclaim?resource=dataStore</actionUrl>
-                        <dialogTitle>vmfs</dialogTitle>
+                        <dialogTitle>VMFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -738,7 +738,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/serviceLevel?resource=dataStore</actionUrl>
-                        <dialogTitle>vmfs</dialogTitle>
+                        <dialogTitle>VMFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -752,7 +752,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/modify?resource=dataStore</actionUrl>
-                        <dialogTitle>vmfs</dialogTitle>
+                        <dialogTitle>VMFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -766,7 +766,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/mount?resource=dataStore</actionUrl>
-                        <dialogTitle>vmfs</dialogTitle>
+                        <dialogTitle>VMFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -780,7 +780,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/unmount?resource=dataStore</actionUrl>
-                        <dialogTitle>vmfs</dialogTitle>
+                        <dialogTitle>VMFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -821,7 +821,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/expand</actionUrl>
-                        <dialogTitle>nfs</dialogTitle>
+                        <dialogTitle>NFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -835,7 +835,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/reduce</actionUrl>
-                        <dialogTitle>nfs</dialogTitle>
+                        <dialogTitle>NFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -849,7 +849,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/modify</actionUrl>
-                        <dialogTitle>nfs</dialogTitle>
+                        <dialogTitle>NFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -863,7 +863,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/dataStore/mount</actionUrl>
-                        <dialogTitle>nfs</dialogTitle>
+                        <dialogTitle>NFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -877,7 +877,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/dataStore/unmount</actionUrl>
-                        <dialogTitle>nfs</dialogTitle>
+                        <dialogTitle>NFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -919,7 +919,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/host/mount?resource=others</actionUrl>
-                        <dialogTitle>vmfs</dialogTitle>
+                        <dialogTitle>VMFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -933,7 +933,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/host/unmount?resource=others</actionUrl>
-                        <dialogTitle>vmfs</dialogTitle>
+                        <dialogTitle>VMFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -947,7 +947,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/host/mount</actionUrl>
-                        <dialogTitle>vmfs</dialogTitle>
+                        <dialogTitle>NFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -961,7 +961,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/host/unmount</actionUrl>
-                        <dialogTitle>vmfs</dialogTitle>
+                        <dialogTitle>NFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -975,7 +975,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/add</actionUrl>
-                        <dialogTitle>nfs</dialogTitle>
+                        <dialogTitle>NFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -989,7 +989,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/add?resource=others</actionUrl>
-                        <dialogTitle>vmfs</dialogTitle>
+                        <dialogTitle>VMFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -1086,7 +1086,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/host/mount?resource=others</actionUrl>
-                        <dialogTitle>nfs</dialogTitle>
+                        <dialogTitle>VMFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -1100,7 +1100,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/cluster/unmount?resource=others</actionUrl>
-                        <dialogTitle>nfs</dialogTitle>
+                        <dialogTitle>VMFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -1114,7 +1114,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/cluster/mount</actionUrl>
-                        <dialogTitle>nfs</dialogTitle>
+                        <dialogTitle>NFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -1128,7 +1128,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/cluster/unmount</actionUrl>
-                        <dialogTitle>nfs</dialogTitle>
+                        <dialogTitle>NFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -1156,7 +1156,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/add</actionUrl>
-                        <dialogTitle>nfs</dialogTitle>
+                        <dialogTitle>NFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
                   </object>
@@ -1170,7 +1170,7 @@
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/add?resource=others</actionUrl>
-                        <dialogTitle>vmfs</dialogTitle>
+                        <dialogTitle>VMFS</dialogTitle>
                         <dialogSize>1600,600</dialogSize>
                      </root>
                   </object>
