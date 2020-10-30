@@ -71,6 +71,7 @@
     "secKrb5i":"Using Kerberos for authentication and data integrity (krb5)",
     "storageSetting":"Storage Setting",
     "fsName":"FileSystem Name",
+    "mountedHost":"Mounted Host",
     "shareName":"Share Name",
     "qosPolicy":"Qos Policy",
     "controlPolicy":"Control Policy",
