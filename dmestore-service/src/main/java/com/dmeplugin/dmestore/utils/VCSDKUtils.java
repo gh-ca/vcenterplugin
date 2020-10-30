@@ -326,7 +326,7 @@ public class VCSDKUtils {
     /**
      *得到所有集群的ID与name 只要集群下有主机挂载了该存储就显示
      **/
-    public String getMountClustersByDsObjectId(String dataStoreObjectId) throws VcenterException {
+    public String getMountClustersByDsObjectId(String dataStoreObjectId,Map<String,String> inludeclustermap) throws VcenterException {
         String listStr = "";
         try {
             String serverguid = vcConnectionHelper.objectID2Serverguid(dataStoreObjectId);
@@ -369,7 +369,7 @@ public class VCSDKUtils {
                         }
                     }
 
-                    if (isMount) {
+                    if (isMount&&(null==inludeclustermap||null!=inludeclustermap.get( cl.first().getValue()))) {
                         Map<String, String> map = new HashMap<>();
                         String objectId = vcConnectionHelper.MOR2ObjectID(cl1.getMor(), vmwareContext.getServerAddress());
                         map.put("clusterId", objectId);
