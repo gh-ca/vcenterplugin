@@ -781,8 +781,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 case RANGE_LAST_1_HOUR:
                     interval = INTERVAL_ONE_MINUTE;
                     break;
+                    //INTERVAL_ONE_MINUTE查不到值，会报错
                 case RANGE_LAST_1_DAY:
-                    interval = INTERVAL_ONE_MINUTE;
+                    interval = INTERVAL_MINUTE;
                     break;
                 case RANGE_LAST_1_WEEK:
                     interval = INTERVAL_HALF_HOUR;
