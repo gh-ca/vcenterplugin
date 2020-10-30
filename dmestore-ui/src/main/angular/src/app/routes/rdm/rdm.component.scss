@@ -191,6 +191,15 @@ input[type=number] {
   -moz-appearance: textfield;
 }
 
+.add-wizard-wrap ::ng-deep .modal-backdrop{
+  display: none;
+}
+.add-wizard-wrap ::ng-deep .modal{
+  padding: 0;
+  position: initial;
+}
+
+
 .loadingDiv {
   width: 100%;
   height: 100%;
@@ -213,5 +222,8 @@ input[type=number] {
   font-weight: bolder;
 }
 
-
+::ng-deep .clr-wizard.wizard-xl .modal-dialog {
+  height: 100vh;
+  max-height: none;
+}
 

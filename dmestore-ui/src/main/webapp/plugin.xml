@@ -1227,7 +1227,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=rdm</actionUrl>
                         <dialogTitle>RDM</dialogTitle>
-                        <dialogSize>1600,600</dialogSize>
+                        <dialogSize>1000,600</dialogSize>
                      </root>
                   </object>
                </delegate>
