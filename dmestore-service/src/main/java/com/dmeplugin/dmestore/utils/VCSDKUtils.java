@@ -2257,6 +2257,13 @@ public class VCSDKUtils {
             }
             logger.info("vmKernelDevice:" + vmKernelDevice);
             //网络端口邦定，将vmKernelDevice邦定到iscsiHbaDevice
+            List<IscsiPortInfo> iscsiPortInfos=hostmo.getIscsiManagerMO().queryBoundVnics(iscsiHbaDevice);
+            for (IscsiPortInfo info:iscsiPortInfos){
+               if (vmKernelDevice.equalsIgnoreCase(info.getVnicDevice())){
+                   logger.info("already bind Vnic! iscsiHbaDevice:" + iscsiHbaDevice + " vmKernelDevice:" + vmKernelDevice);
+                   return;
+               }
+            }
             hostmo.getIscsiManagerMO().bindVnic(iscsiHbaDevice, vmKernelDevice);
             logger.info("bind Vnic success! iscsiHbaDevice:" + iscsiHbaDevice + " vmKernelDevice:" + vmKernelDevice);
         } catch (Exception e) {
