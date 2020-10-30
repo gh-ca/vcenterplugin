@@ -11,12 +11,12 @@ import {
   StoragePoolList,
   HostList,
   ClusterList,
-  ServiceLevelList, HostOrCluster, GetForm,
+  ServiceLevelList, HostOrCluster, GetForm, Workload,
 } from './list.service';
 import {ClrWizard, ClrWizardPage} from '@clr/angular';
 import {GlobalsService} from '../../../shared/globals.service';
-import {Host} from '../../nfs/nfs.service';
 import {Router} from "@angular/router";
+import {DeviceFilter, ProtectionStatusFilter, ServiceLevelFilter, StatusFilter} from "./filter.component";
 
 
 @Component({
@@ -38,6 +38,11 @@ export class VmfsListComponent implements OnInit {
   @ViewChild('wizard') wizard: ClrWizard;
   @ViewChild('addPageOne') addPageOne: ClrWizardPage;
   @ViewChild('addPageTwo') addPageTwo: ClrWizardPage;
+
+  @ViewChild('statusFilter') statusFilter:StatusFilter;
+  @ViewChild('deviceFilter') deviceFilter:DeviceFilter;
+  @ViewChild('serviceLevelFilter') serviceLevelFilter: ServiceLevelFilter;
+  @ViewChild('protectionStatusFilter') protectionStatusFilter:ProtectionStatusFilter;
 
   expendActive = false; // 示例
   list: VmfsInfo[] = []; // 数据列表
@@ -68,6 +73,7 @@ export class VmfsListComponent implements OnInit {
   changeServiceLevelForm = new GetForm().getChangeLevelForm();
   storageList: StorageList[] = []; // 存储数据
   storagePoolList: StoragePoolList[] = []; // 存储池ID
+  workloads:Workload[] = []; // Workload
   blockSizeOptions = []; // 块大小选择
   srgOptions = []; // 空间回收粒度初始化
   deviceList: HostOrCluster[] = []; // 主机AND集群
@@ -196,7 +202,8 @@ export class VmfsListComponent implements OnInit {
               // 获取chart 数据
               const wwns = [];
               this.list.forEach(item => {
-
+                item.usedCapacity = item.capacity - item.freeSpace;
+                item.capacityUsage = ((item.capacity - item.freeSpace)/item.capacity * 100).toFixed(2);
                 wwns.push(item.wwn);
               });
               // 设置卷ID集合
@@ -234,6 +241,11 @@ export class VmfsListComponent implements OnInit {
   }
   // 点刷新那个功能是分两步，一步是刷新，然后等我们这边的扫描任务，任务完成后返回你状态，任务成功后，你再刷新列表页面。
   scanDataStore() {
+    // 初始化筛选
+    this.statusFilter.initStatus();
+    this.deviceFilter.initDevice();
+    this.serviceLevelFilter.initServiceLevel();
+    this.protectionStatusFilter.initProtectionStatus();
     this.remoteSrv.scanVMFS(this.storageType).subscribe((res: any) => {
       console.log('res');
       console.log(res);
@@ -265,11 +277,22 @@ export class VmfsListComponent implements OnInit {
     this.form.pool_raw_id = undefined;
     console.log('selectSotrageId' + this.form.storage_id);
     if (null !== this.form.storage_id && '' !== this.form.storage_id) {
+      // 存储池
       this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, 'block').subscribe((result: any) => {
         console.log('storagePools', result);
         if (result.code === '200' && result.data !== null) {
           this.storagePoolList = result.data;
           console.log('this.storagePoolList', this.storagePoolList);
+
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        }
+      });
+      // 获取workLoad
+      this.remoteSrv.getWorkLoads(this.form.storage_id).subscribe((result: any) => {
+        console.log('storagePools', result);
+        if (result.code === '200' && result.data !== null) {
+          this.workloads = result.data;
+          console.log('this.workloads', this.workloads);
 
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         }
@@ -680,7 +703,7 @@ export class VmfsListComponent implements OnInit {
     return new Promise((resolve, reject) => {
       // 获取集群 通过ObjectId过滤已挂载的集群
       this.remoteSrv.getClusterListByObjectId(this.rowSelected[0].objectid).subscribe((result: any) => {
-        if (result.code === '200'){
+        if (result.code === '200' && result.data !== null){
           result.data.forEach(item => {
             this.clusterList.push(item);
           });
@@ -712,7 +735,7 @@ export class VmfsListComponent implements OnInit {
   mountSubmit(){
 
     console.log('this.chooseHost', this.chooseHost);
-    if (this.chooseHost) {
+    if (this.chooseHost || this.chooseCluster) {
       this.mountErr = false;
       // 数据封装
       if (this.mountForm.mountType === '1'){ // 服务器
@@ -782,9 +805,9 @@ export class VmfsListComponent implements OnInit {
           const mountCluster: HostOrCluster [] = [];
           result.data.forEach(item => {
             const hostInfo = {
-              deviceId: item.hostId,
-              deviceName: item.hostName,
-              deviceType: 'host'
+              deviceId: item.hostGroupId,
+              deviceName: item.hostGroupName,
+              deviceType: 'cluster'
             };
             mountCluster.push(hostInfo);
           });

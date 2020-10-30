@@ -99,6 +99,7 @@
     "expandSize":"扩容大小",
     "oldCapacity":"原有容量",
     "reduSize":"缩容大小",
+    "mountedHost":"已挂载主机",
     "ops":"OPS",
     "bandwidth":"带宽(MB/s)",
     "nfsStore":"NFS存储",
@@ -147,11 +148,11 @@
       "mountObj":"挂载对象"
     },
     "del":{
-      "title":"提示",
+      "title":"删除",
       "content":"确认要删除吗?"
     },
     "unmount":{
-      "title":"提示",
+      "title":"卸载",
       "content":"确认要卸载吗?"
     }
   },
@@ -186,7 +187,6 @@
     "reserveCapacity": "置备容量",
     "device": "设备",
     "serviceLevelName": "服务等级",
-    "protectionStatus": "保护状态",
     "multiply": "X",
     "iops": "IOPS",
     "iopsQoSTarget": "IOPS QoS上下限",
@@ -208,7 +208,7 @@
     "provisioningType": "设置类型",
     "basicInformation": "基本信息",
     "byServiceLevel": "服务等级",
-    "customer": "客户",
+    "custom": "自定义",
     "wwn": "WWN",
     "storage": "存储",
     "smartTier": "SmartTier",
@@ -235,6 +235,12 @@
     "loadingTips": "数据加载中，请稍后",
     "dataHandleLoadingTips": "数据处理中，请稍后",
     "listNullTips": "找不到VMFS",
+    "workload": "应用类型",
+    "protectionStatus": {
+      "name": "保护状态",
+      "protected": "已保护",
+      "unprotected": "未保护"
+    },
     "mount":{
       "mount":"挂载",
       "host":"主机",
@@ -263,6 +269,16 @@
     "reclaim": {
       "title":"提示",
       "content":"确认要回收空间吗?"
+    },
+    "filter": {
+      "all": "所有",
+      "status": {
+        "normal": "正常"
+      },
+      "protectionStatus": {
+        "protected": "true",
+        "unprotected": "false"
+      }
     }
   },
   "storage":{
@@ -611,7 +627,14 @@
     "atOne": "请至少选择一项！",
     "bandNotNull": "带宽不能为空！",
     "IOPSNotNull": "IOPS不能为空！",
-    "latencyNotNull": "时延不能为空！"
+    "latencyNotNull": "时延不能为空！",
+
+    "addTitle": "创建RDM",
+    "basicSet": "卷设置",
+    "storeSet": "存储设置",
+
+    "createRdmError": "创建RDM出错!",
+    "selectOneSer": "服务等级不能为空！"
   },
   "tier": {
     "name": "名称",
@@ -710,11 +733,13 @@
       "unknown":"未知",
       "running":"运行中",
       "fault":"故障",
+      "faulty":"故障",
       "member":"成员盘",
       "linkDown":"未连接",
       "linkUp":"已连接",
       "activated":"已激活",
-      "unActivated":"未激活"
+      "unActivated":"未激活",
+      "all":"所有"
     },
     "type":{
       "block":"块",
@@ -734,6 +759,7 @@
   },
   "page": {
     "perPage": "每页",
-    "of": "中的"
+    "of": "中的",
+    "all": "共"
   }
 }

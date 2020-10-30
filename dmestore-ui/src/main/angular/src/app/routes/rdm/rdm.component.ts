@@ -2,7 +2,7 @@ import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {CommonService} from '../common.service';
 import {GlobalsService} from '../../shared/globals.service';
-import {ClrForm} from "@clr/angular";
+import {ClrForm, ClrWizard, ClrWizardPage} from "@clr/angular";
 
 @Component({
   selector: 'app-rdm',
@@ -12,10 +12,13 @@ import {ClrForm} from "@clr/angular";
 })
 export class RdmComponent implements OnInit {
 
-  @ViewChild(ClrForm, {static: true}) rdmFormGroup;
-  @ViewChild('rdmForm', {static: true}) rdmForm;
+  // 添加页面窗口
+  @ViewChild('wizard') wizard: ClrWizard;
+  @ViewChild('addPageOne') addPageOne: ClrWizardPage;
+  @ViewChild('addPageTwo') addPageTwo: ClrWizardPage;
 
-
+  serviceLevelIsNull = false;
+  isOperationErr = false;
   policyEnable = {
     smartTier: false,
     qosPolicy: false,
@@ -58,7 +61,7 @@ export class RdmComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadStorageDevice();
-    this.loadHosts();
+    // this.loadHosts();
     this.tierFresh();
     const ctx = this.gs.getClientSdk().app.getContextObjects();
     console.log(ctx);
@@ -67,6 +70,7 @@ export class RdmComponent implements OnInit {
     } else{
       this.vmObjectId = 'urn:vmomi:VirtualMachine:vm-1046:674908e5-ab21-4079-9cb1-596358ee5dd1';
     }
+    this.loadDataStore();
   }
 
   // 刷新服务等级列表
@@ -76,6 +80,7 @@ export class RdmComponent implements OnInit {
       this.gs.loading = false;
       if(response.code == '200'){
         this.serviceLevelsRes = this.recursiveNullDelete(response.data);
+        this.serviceLevelsRes = this.serviceLevelsRes.filter(item => item.totalCapacity !== 0);
         for (const i of this.serviceLevelsRes){
           if (i.totalCapacity == 0){
             i.usedRate = 0.0;
@@ -97,8 +102,9 @@ export class RdmComponent implements OnInit {
     });
   }
 
-  serviceLevelClick(id: string, name: string){
+  serviceLevelClick(id: string){
      this.service_level_id = id;
+     this.serviceLevelIsNull = false;
   }
 
   // 服务等级列表搜索
@@ -154,10 +160,6 @@ export class RdmComponent implements OnInit {
   }
 
   submit(): void {
-    if (this.rdmForm.form.invalid) {
-      this.rdmFormGroup.markAsTouched();
-      return;
-    }
     let b = JSON.parse(JSON.stringify(this.configModel));
     let body = {};
     if (this.configModel.storageType == '2'){
@@ -201,6 +203,10 @@ export class RdmComponent implements OnInit {
       };
     }
     if (this.configModel.storageType == '1'){
+      if(this.service_level_id == '' || this.service_level_id == null){
+        this.serviceLevelIsNull = true;
+        return;
+      }
       body = {
         createVolumesRequest: {
           service_level_id: this.service_level_id,
@@ -214,6 +220,11 @@ export class RdmComponent implements OnInit {
     console.log(b);
     this.http.post('v1/vmrdm/createRdm?hostId='+this.hostSelected+'&vmObjectId='+this.vmObjectId+'&dataStoreName='+this.dataStoreName
       , body).subscribe((result: any) => {
+        if (result.code == '200'){
+          this.closeWin();
+        } else{
+          this.isOperationErr = true;
+        }
     }, err => {
       console.error('ERROR', err);
     });
@@ -291,9 +302,9 @@ export class RdmComponent implements OnInit {
     });
   }
 
-  loadDataStore(id: string){
+  loadDataStore(){
     this.gs.loading = true;
-    this.http.get('v1/vmrdm/vCenter/datastoreOnHost', { params: {hostId : id}}).subscribe((result: any) => {
+    this.http.get('v1/vmrdm/vCenter/datastoreOnHost', { params: {hostId : this.vmObjectId}}).subscribe((result: any) => {
       this.gs.loading = false;
       if (result.code === '200'){
         this.dataStores = result.data;
@@ -304,6 +315,34 @@ export class RdmComponent implements OnInit {
     }, err => {
       console.error('ERROR', err);
     });
+  }
+
+  /**
+   * 容量格式化
+   * @param c 容量值
+   * @param isGB true GB、false MB
+   */
+  formatCapacity(c: number, isGB:boolean){
+    let cNum;
+    if (c < 1024){
+      cNum = isGB ? c.toFixed(3)+'GB':c.toFixed(3)+'MB';
+    }else if(c >= 1024 && c< 1048576){
+      cNum = isGB ? (c/1024).toFixed(3) + 'TB' : (c/1024).toFixed(3) + 'GB';
+    }else if(c>= 1048576){
+      cNum = isGB ? (c/1024/1024).toFixed(3) + 'PB':(c/1024/1024).toFixed(3) + 'TB';
+    }
+    return cNum;
+  }
+
+  /**
+   * add 下一页
+   */
+  addNextPage() {
+    this.wizard.next();
+  }
+
+  closeWin(){
+    this.gs.getClientSdk().modal.close();
   }
 
 }

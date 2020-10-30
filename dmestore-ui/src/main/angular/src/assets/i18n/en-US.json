@@ -71,6 +71,7 @@
     "secKrb5i":"Using Kerberos for authentication and data integrity (krb5)",
     "storageSetting":"Storage Setting",
     "fsName":"FileSystem Name",
+    "mountedHost":"Mounted Host",
     "shareName":"Share Name",
     "qosPolicy":"Qos Policy",
     "controlPolicy":"Control Policy",
@@ -208,7 +209,7 @@
     "provisioningType": "Provisioning Type",
     "basicInformation": "Basic Information",
     "byServiceLevel": "By Service Level",
-    "customer": "Customer",
+    "custom": "Custom",
     "wwn": "WWN",
     "storage": "Storage",
     "smartTier": "SmartTier",
@@ -234,6 +235,11 @@
     "expandTips": "Expansion capacity can only be a positive integer of GB",
     "loadingTips": "Data loading, please wait",
     "listNullTips": "We couldn't find any users",
+    "workload": "Workload",
+    "protectionStatus": {
+      "protected": "Protected",
+      "unprotected": "Unprotected"
+    },
     "mount":{
       "mount":"Mount",
       "host":"Host",
@@ -262,6 +268,16 @@
     "reclaim": {
       "title":"Tips",
       "content":"Are you sure to reclaim?"
+    },
+    "filter": {
+      "all": "All",
+      "status": {
+        "normal": "Normal"
+      },
+      "protectionStatus": {
+        "protected": "true",
+        "unprotected": "false"
+      }
     }
   },
   "storage":{
@@ -607,7 +623,14 @@
     "atOne": "Please Select one!",
     "bandNotNull": "BandWidth not be empty!",
     "IOPSNotNull": "IOPS not be empty!",
-    "latencyNotNull": "Latency not be empty!"
+    "latencyNotNull": "Latency not be empty!",
+
+    "addTitle": "Create RDM",
+    "basicSet": "Volume Setting",
+    "storeSet": "Storage Setting",
+
+    "createRdmError": "Create RDM Error!",
+    "selectOneSer": "Service Level is not be Null！"
   },
   "tier": {
     "name": "Name",
@@ -706,11 +729,13 @@
        "unknown":"Unknown",
        "running":"Running",
        "fault":"Fault",
+       "faulty":"Faulty",
        "member":"Member",
        "linkDown":"Link Down",
        "linkUp":"Link Up",
        "activated":"Activated",
-       "unActivated":"unActivated"
+       "unActivated":"unActivated",
+       "all":"ALL"
      },
      "type":{
       "block":"Block",
@@ -730,6 +755,7 @@
   },
   "page": {
     "perPage": "Per Page",
-    "of": "of"
+    "of": "of",
+    "all": "Total"
   }
 }

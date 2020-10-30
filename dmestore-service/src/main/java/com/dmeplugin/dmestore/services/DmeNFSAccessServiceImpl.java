@@ -183,7 +183,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 fsAttr.setController(fsDetail.get("owning_controller").getAsString());
                 //查询详情，获取tuning信息
                 JsonObject tuning = fsDetail.getAsJsonObject("tuning");
-                if(!tuning.isJsonNull()){
+                if (!tuning.isJsonNull()) {
                     fsAttr.setApplicationScenario(ToolUtils.jsonToStr(tuning.get("application_scenario"), null));
                     fsAttr.setDataDeduplication(ToolUtils.jsonToBoo(tuning.get("deduplication_enabled"), null));
                     fsAttr.setDateCompression(ToolUtils.jsonToBoo(tuning.get("compression_enabled"), null));
@@ -541,7 +541,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                                     nfsDataInfo.setShareIp(ToolUtils.jsonToStr(jo.get("remoteHost")));
 
                                     DmeVmwareRelation dvr = dvrMap.get(vmwareObjectId);
-                                    nfsDataInfo.setSharePath(dvr.getVolumeShare());
+                                    //nfsDataInfo.setSharePath(dvr.getVolumeShare());
+                                    nfsDataInfo.setSharePath(dvr.getShareName());
                                     nfsDataInfo.setLogicPort(dvr.getLogicPortName());
                                     nfsDataInfo.setLogicPortId(dvr.getLogicPortId());
                                     nfsDataInfo.setShare(dvr.getShareName());
@@ -634,10 +635,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                             if (statisticObject != null) {
                                 NfsDataInfo nfsDataInfo = new NfsDataInfo();
                                 nfsDataInfo.setFsId(fsId);
-                                nfsDataInfo.setOps(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_FS_THROUGHPUT), null));
-                                nfsDataInfo.setBandwidth(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_FS_BANDWIDTH), null));
-                                nfsDataInfo.setReadResponseTime(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_FS_READRESPONSETIME), null));
-                                nfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(statisticObject.get(DmeIndicatorConstants.COUNTER_ID_FS_WRITERESPONSETIME), null));
+                                nfsDataInfo.setOps(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_FS_THROUGHPUT, "max"), null));
+                                nfsDataInfo.setBandwidth(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_FS_BANDWIDTH, "max"), null));
+                                nfsDataInfo.setReadResponseTime(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_FS_READRESPONSETIME, "max"), null));
+                                nfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_FS_WRITERESPONSETIME, "max"), null));
                                 relists.add(nfsDataInfo);
                             }
                         }
@@ -654,8 +655,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     /**
      * Mount nfs,params中包含了 include:
-     *  dataStoreObjectId: datastore的object id
-     *  logicPortIp:存储逻辑端口IP  暂时不需要
+     * dataStoreObjectId: datastore的object id
+     * logicPortIp:存储逻辑端口IP  暂时不需要
      * hostObjectId:主机objectid
      * hostVkernelIp:主机vkernelip
      * str mountType: 挂载模式（只读或读写）  readOnly/readWrite
@@ -665,7 +666,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
      */
     @Override
     public void mountNfs(Map<String, Object> params) throws DMEException {
-        if (params != null&&null!=params.get("dataStoreObjectId") ) {
+        if (params != null && null != params.get("dataStoreObjectId")) {
             String dataStoreObjectId = ToolUtils.getStr(params.get("dataStoreObjectId"));
 
             LOG.info("dataStoreObjectId====" + dataStoreObjectId);
@@ -686,18 +687,18 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                             //调用vCenter在主机上扫描卷和Datastore，并挂载主机
                             //List<Map<String, String>> clusters = null;
                             //List<Map<String, String>> hosts = null;
-                            String hostObjectId=null;
-                            String logicPortIp=null;
+                            String hostObjectId = null;
+                            String logicPortIp = null;
                             //String mountType = null;
                             if (params.get("hostObjectId") != null) {
-                                hostObjectId= ToolUtils.getStr(params.get("hostObjectId"));
+                                hostObjectId = ToolUtils.getStr(params.get("hostObjectId"));
                                 //logicPortIp= ToolUtils.getStr( params.get("logicPortIp"));
                             }
                         /*if (params.get("clusters") != null) {
                             clusters = (List<Map<String, String>>) params.get("clusters");
                         }*/
                             vcsdkUtils.mountNfs(dataStoreObjectId,
-                                    hostObjectId,logicPortIp, ToolUtils.getStr(params.get("mountType")));
+                                    hostObjectId, logicPortIp, ToolUtils.getStr(params.get("mountType")));
 
                         } else {
                             throw new DMEException("DME mount nfs error(task status)!");
@@ -727,7 +728,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 LOG.info("mount nfs To Host fail: share Id is null");
                 throw new Exception("mount nfs To Host fail: share Id is null");
             }
-            if (params.get("hostVkernelIp") == null ) {
+            if (params.get("hostVkernelIp") == null) {
                 LOG.info("mount nfs To Host fail: vkernelIp is null");
                 throw new Exception("mount nfs To Host fail: vkernelIp is null");
             }
@@ -738,12 +739,12 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             requestbody.put("id", ToolUtils.getStr(params.get("shareId")));
 
             List<Map<String, Object>> listAddition = new ArrayList<>();
-            String vkernelIp=ToolUtils.getStr(params.get("hostVkernelIp"));
+            String vkernelIp = ToolUtils.getStr(params.get("hostVkernelIp"));
 
             Map<String, Object> addition = new HashMap<>();
             addition.put("name", vkernelIp);
-            String accessval=("readOnly".equalsIgnoreCase(ToolUtils.getStr(params.get("mountType"))))?"read-only":"read/write";
-            addition.put("accessval",accessval);
+            String accessval = ("readOnly".equalsIgnoreCase(ToolUtils.getStr(params.get("mountType")))) ? "read-only" : "read/write";
+            addition.put("accessval", accessval);
             addition.put("all_squash", "no_all_squash");
             addition.put("root_squash", "root_squash");
             addition.put("sync", "synchronization");

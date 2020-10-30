@@ -186,11 +186,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                 if (statisticObject != null) {
                                     VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
                                     vmfsDataInfo.setVolumeId(volumeId);
-                                    vmfsDataInfo.setIops(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT, "max"), null));
-                                    vmfsDataInfo.setBandwidth(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH, "max"), null));
-                                    vmfsDataInfo.setReadResponseTime(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_READRESPONSETIME, "max"), null));
-                                    vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITERESPONSETIME, "max"), null));
-                                    vmfsDataInfo.setLatency(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME, "max"), null));
+                                    vmfsDataInfo.setIops(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT, "max"), null));
+                                    vmfsDataInfo.setBandwidth(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH, "max"), null));
+                                    vmfsDataInfo.setReadResponseTime(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_READRESPONSETIME, "max"), null));
+                                    vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITERESPONSETIME, "max"), null));
+                                    vmfsDataInfo.setLatency(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME, "max"), null));
                                     relists.add(vmfsDataInfo);
                                 }
                             }
@@ -1433,7 +1433,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         tempParams.put("hostGroup_id", hostGroupIdDmeId);
                         tempParams.put("volumeIds", volumeIds);
                         String taskId = unmountHostGroupGetTaskId(tempParams);
-                        //taskIds.add(taskId);//若主机以卸载,获取集群的卸载任务信息会有对象不存在的提示,标记任务为失败。获取任务结果的目的时等待卸载任务执行完成，不关心任务成功失败
+                        taskIds.add(taskId);
                     }
                 }
             }
@@ -1459,13 +1459,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         tempParams.put("host_id", hostId);
                         tempParams.put("volumeIds", volumeIds);
                         String taskId = unmountHostGetTaskId(tempParams);
-                        taskIds.add(taskId);
+                        taskIds.add(taskId);//若主机组已卸载,获取主机的卸载任务信息会有对象不存在的提示,标记任务为失败。获取任务结果的目的是等待卸载任务执行完成，不关心任务成功失败
                     }
                 }
             }
         }
-
-
 
         //提取datastore的hostid
         if (hostObjIds.size() > 0) {
@@ -1559,7 +1557,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return responseEntity;
     }
-
 
     //DME侧从主机卸载卷
     private String unmountHostGetTaskId(Map<String, Object> params) {
@@ -1702,6 +1699,22 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         // 先查询vcenter侧的主机
         List<Map<String, String>> hosts = null;
         String listStr = vcsdkUtils.getHostsByDsObjectId(storageId, true);
+
+        //获取已挂载的集群，找到对应的主机，用于排除主机
+        List<Map<String,Object>> clustermaps=getHostGroupsByStorageId(storageId);
+        Map<String,String> excludehostmap = new HashMap<>();
+        for (Map<String,Object> clustermap:clustermaps){
+            String clusterid= String.valueOf(clustermap.get("hostGroupId"));
+            String vmwarehosts=vcsdkUtils.getHostsOnCluster(clusterid);
+            if (!StringUtils.isEmpty(vmwarehosts)) {
+                List<Map<String, String>> vmwarehostlists = gson.fromJson(vmwarehosts, new TypeToken<List<Map<String, String>>>() {
+                }.getType());
+
+                for (Map<String,String> vmwarehostmap:vmwarehostlists){
+                    excludehostmap.put(vmwarehostmap.get("hostId"),"true");
+                }
+            }
+        }
         LOG.info("host getHostsByDsObjectId==" + listStr);
         if (!StringUtils.isEmpty(listStr)) {
             hosts = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
@@ -1709,13 +1722,16 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             //vcenter侧主机启动器是否和dem侧主机启动器一致
             for (Map<String, String> host : hosts) {
                 String hostId = ToolUtils.getStr(host.get("hostId"));
-                String hostNmme = ToolUtils.getStr(host.get("hostName"));
-                String initiatorId = checkToHost(hostId);
-                if (!StringUtils.isEmpty(initiatorId)) {
-                    Map<String, Object> tempMap = new HashMap<>();
-                    tempMap.put("hostId", hostId);
-                    tempMap.put("hostName", hostNmme);
-                    hostMapList.add(tempMap);
+                //排除已挂载在集群中的主机
+                if (null==excludehostmap.get(hostId)) {
+                    String hostNmme = ToolUtils.getStr(host.get("hostName"));
+                    String initiatorId = checkToHost(hostId);
+                    if (!StringUtils.isEmpty(initiatorId)) {
+                        Map<String, Object> tempMap = new HashMap<>();
+                        tempMap.put("hostId", hostId);
+                        tempMap.put("hostName", hostNmme);
+                        hostMapList.add(tempMap);
+                    }
                 }
             }
         }
@@ -1844,26 +1860,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return hostGroupMap;
     }
 
-    //从性能数据中提取对应指标的对应值
-    private JsonElement getStatistcValue(JsonObject statisticObject, String indicator, String type) {
-        JsonElement object = null;
-        if (null != statisticObject) {
-            JsonElement indicatorEl = statisticObject.get(indicator);
-            if (!ToolUtils.jsonIsNull(indicatorEl)) {
-                JsonObject indicatorJson = indicatorEl.getAsJsonObject();
-                JsonElement typeEl = indicatorJson.get(type);
-                if (!ToolUtils.jsonIsNull(typeEl)) {
-                    JsonObject typeJson = typeEl.getAsJsonObject();
-                    Set<Map.Entry<String, JsonElement>> sets = typeJson.entrySet();
-                    for (Map.Entry<String, JsonElement> set : sets) {
-                        object = set.getValue();//只取一个
-                        break;
-                    }
-                }
-            }
-        }
-        return object;
-    }
+
 
     public boolean isVmfs(String objectId) throws DmeSqlException {
         List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_VMFS);
