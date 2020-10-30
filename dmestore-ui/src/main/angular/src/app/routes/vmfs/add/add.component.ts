@@ -57,6 +57,8 @@ export class AddComponent implements OnInit{
   isOperationErr = false; // 错误信息
   capacityErr = false; // 容量错误信息
 
+  addSuccessShow = false;
+
 
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
@@ -377,6 +379,8 @@ export class AddComponent implements OnInit{
         this.modalHandleLoading = false;
         if (result.code === '200') {
           console.log('创建成功');
+          // 打开成功提示窗口
+          this.addSuccessShow = true;
           // 关闭窗口
           this.cancel();
         } else {

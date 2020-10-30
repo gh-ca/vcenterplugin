@@ -153,7 +153,8 @@
     },
     "unmount":{
       "title":"Tips",
-      "content":"Are you sure to delete?"
+      "content":"Are you sure to delete?",
+      "tips":"If all the hosts mounted by NFS are unmounted, the NFS device will be deleted automatically！"
     }
   },
   "vmfs": {
@@ -234,8 +235,21 @@
     "serviceLevelCantBeNull": "The service level is a must, and you can only choose the service level whose capacity is not 0!",
     "expandTips": "Expansion capacity can only be a positive integer of GB",
     "loadingTips": "Data loading, please wait",
+    "dataHandleLoadingTips": "Data processing, please wait",
     "listNullTips": "We couldn't find any users",
     "workload": "Workload",
+    "add": {
+      "success": "Added successfully!"
+    },
+    "modify": {
+      "success": "Successfully modified!"
+    },
+    "expand": {
+      "success": "Successful expansion!"
+    },
+    "serviceLevel": {
+      "success": "The service level changed successfully!"
+    },
     "protectionStatus": {
       "protected": "Protected",
       "unprotected": "Unprotected"
@@ -250,11 +264,13 @@
       "readWrite":"Read Write",
       "mountObj":"Mount Object",
       "notChooseDataStoreTips":"Please select the DataStore to be mounted！",
-      "mountErr":"Please select the host/cluster to be mounted!"
+      "mountErr":"Please select the host/cluster to be mounted!",
+      "success": "Successfully mounted!"
     },
     "del":{
       "title":"Tips",
-      "content":"Are you sure to delete?"
+      "content":"Are you sure to delete?",
+      "success": "successfully deleted!"
     },
     "unmount":{
       "title":"Unmount",
@@ -262,12 +278,14 @@
       "notChooseDeviceTips":"Please select the host or cluster to be uninstalled!",
       "notChooseDataStoreTips":"Please select the DataStore to be unmounted！",
       "tips":"If all the hosts/clusters mounted by VMFS are unmounted, the VMFS device will be deleted automatically！",
-      "notHaveCluster":"该VMFS未绑定集群",
-      "notHaveHost":"该VMFS未绑定主机"
+      "notHaveCluster":"The VMFS is not bound to the cluster!",
+      "notHaveHost":"The VMFS is not bound to the host!",
+      "success": "Successfully uninstalled!"
     },
     "reclaim": {
       "title":"Tips",
-      "content":"Are you sure to reclaim?"
+      "content":"Are you sure to reclaim?",
+      "success": "Successfully reclaimed space!"
     },
     "filter": {
       "all": "All",
@@ -630,7 +648,8 @@
     "storeSet": "Storage Setting",
 
     "createRdmError": "Create RDM Error!",
-    "selectOneSer": "Service Level is not be Null！"
+    "selectOneSer": "Service Level is not be Null！",
+    "rdmSuccessMsg": "Create RDM Success!"
   },
   "tier": {
     "name": "Name",

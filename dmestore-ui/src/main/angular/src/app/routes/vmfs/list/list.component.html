@@ -625,7 +625,7 @@
           <clr-combobox [(ngModel)]="chooseHost" name="chooseHost" required>
             <clr-options *ngIf="mountHostData">
               <clr-option *clrOptionItems="let state of hostList; field:'hostName'" [clrValue]="state">
-                <clr-icon *ngIf="state.hostName !== ''" shape="sun" role="img" aria-label="Sun is shining"></clr-icon>{{state.hostName}}
+                <clr-icon *ngIf="state.hostName !== ''" shape="host" role="img" aria-label="World is turning"></clr-icon>{{state.hostName}}
               </clr-option>
             </clr-options>
           </clr-combobox>
@@ -638,7 +638,7 @@
           <clr-combobox [(ngModel)]="chooseCluster" name="chooseCluster" required>
             <clr-options *ngIf="mountClusterData">
               <clr-option *clrOptionItems="let state of clusterList; field:'clusterName'" [clrValue]="state">
-                <clr-icon *ngIf="state.clusterName !== ''" shape="sun" role="img" aria-label="Sun is shining"></clr-icon>{{state.clusterName}}
+                <clr-icon *ngIf="state.clusterName !== ''" shape="host-group" role="img" aria-label="World is turning"></clr-icon>{{state.clusterName}}
               </clr-option>
             </clr-options>
           </clr-combobox>
@@ -769,6 +769,7 @@
       <button type="submit" class="btn btn-primary" (click)="reclaimHandleFunc()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
+
   <!--变更服务等级-->
   <clr-modal [(clrModalOpen)]="changeServiceLevelShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
     <h3 class="modal-title modelTile">{{'vmfs.changeServiceLevel' | translate}}</h3>
@@ -886,6 +887,26 @@
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="expandShow = false;">{{'menu.cancel' | translate}}</button>
       <button type="submit" class="btn btn-primary" (click)="expandHandleFunc();">{{'menu.ok' | translate}}</button>
+    </div>
+  </clr-modal>
+
+  <!--成功提示窗口-->
+  <clr-modal [(clrModalOpen)]="addSuccessShow || modifySuccessShow
+  || expandSuccessShow || reclaimSuccessShow ||  changeServiceLevelSuccessShow
+  || mountSuccessShow || unmountSuccessShow || delSuccessShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+    <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+    <div class="modal-body">
+      <p *ngIf="addSuccessShow">{{'vmfs.add.success' | translate}}</p>
+      <p *ngIf="modifySuccessShow">{{'vmfs.modify.success' | translate}}</p>
+      <p *ngIf="expandSuccessShow">{{'vmfs.expand.success' | translate}}</p>
+      <p *ngIf="reclaimSuccessShow">{{'vmfs.reclaim.success' | translate}}</p>
+      <p *ngIf="changeServiceLevelSuccessShow">{{'vmfs.serviceLevel.success' | translate}}</p>
+      <p *ngIf="mountSuccessShow">{{'vmfs.mount.success' | translate}}</p>
+      <p *ngIf="unmountSuccessShow">{{'vmfs.unmount.success' | translate}}</p>
+      <p *ngIf="delSuccessShow">{{'vmfs.del.success' | translate}}</p>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-primary" (click)="closeSuccessTips();">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 </div>

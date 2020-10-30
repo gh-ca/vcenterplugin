@@ -37,6 +37,7 @@ export class ExpandComponent implements OnInit{
   modalHandleLoading = false; // 数据处理loading
   modalLoading = false; // 数据加载loading
   expandErr = false; // 扩容容量错误信息
+  expandSuccessShow = false; // 扩容成功提示
 
   ngOnInit(): void {
     this.initData();
@@ -120,6 +121,7 @@ export class ExpandComponent implements OnInit{
           console.log('expand success:' + name);
           // 隐藏扩容页面
           this.cancel();
+          this.expandSuccessShow = true; // 扩容成功提示
         }else {
           console.log('expand: ' + name  + ' Reason:' + result.description);
           // 错误信息 展示
