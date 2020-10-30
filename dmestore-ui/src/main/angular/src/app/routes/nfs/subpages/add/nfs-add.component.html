@@ -22,7 +22,7 @@
                   name="storagId" class="clr-select" (change)="selectStoragePool()" required>
             <option *ngFor="let item of storageList" value="{{item.id}}">{{item.name}}</option>
           </select>
-          <clr-control-error>This field is required!</clr-control-error>
+          <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
         </clr-select-container>
         <clr-combobox-container>
           <label>{{'nfs.storagePool' | translate}}</label>
@@ -44,7 +44,17 @@
         <!--名称-->
         <clr-input-container>
           <label>{{'nfs.datastoreName' | translate}}</label>
-          <input clrInput class="inputWidth100Percent" [(ngModel)]="addForm.nfsName" name="nfsName" required/>
+          <input clrInput class="inputWidth100Percent" [(ngModel)]="addForm.nfsName" name="nfsName" (blur)="checkNfsName();" required/>
+          <clr-control-error>
+            <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="nfsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+            <p *ngIf="addForm.sameName">
+              <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+              <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
+            </p>
+
+          </clr-control-error>
         </clr-input-container>
         <clr-checkbox-container>
           <label></label>
@@ -55,11 +65,21 @@
         </clr-checkbox-container>
         <clr-input-container *ngIf="!addForm.sameName">
           <label>{{'nfs.fsName' | translate}}</label>
-          <input class="inputWidth100Percent" clrInput [(ngModel)]="addForm.fsName" name="fsName" />
+          <input class="inputWidth100Percent" clrInput [(ngModel)]="addForm.fsName" name="fsName" (blur)="checkFsName();" />
+          <clr-control-error>
+            <p *ngIf="!oldFsName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+          </clr-control-error>
         </clr-input-container>
         <clr-input-container *ngIf="!addForm.sameName">
           <label>{{'nfs.shareName' | translate}}</label>
-          <input class="inputWidth100Percent" clrInput [(ngModel)]="addForm.shareName" name="shareName" />
+          <input class="inputWidth100Percent" clrInput [(ngModel)]="addForm.shareName" name="shareName" (blur)="checkShareName();"/>
+          <clr-control-error>
+            <p *ngIf="!oldShareName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
+          </clr-control-error>
         </clr-input-container>
         <!--大小-->
         <clr-input-container>
@@ -250,6 +270,16 @@
   <clr-wizard class="add-wizard-wrap" #wizard [clrWizardOpen]="viewPage=='add_vcenter'" [clrWizardClosable]="false">
     <clr-wizard-title>{{'nfs.add_title' | translate}}</clr-wizard-title>
     <p *ngIf="errorMsg" style="color: red">{{'errorMsg.addError' | translate}}</p>
+    <div *ngIf="modalLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+    </div>
+    <div *ngIf="modalHandleLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+    </div>
     <clr-wizard-page [clrWizardPageNextDisabled]="!formPageOne.valid">
       <ng-template clrPageTitle>{{'nfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
       <form clrForm #formPageOne="ngForm">
@@ -260,7 +290,7 @@
                   name="storagId" class="clr-select" (change)="selectStoragePool()" required>
             <option *ngFor="let item of storageList" value="{{item.id}}">{{item.name}}</option>
           </select>
-          <clr-control-error>This field is required!</clr-control-error>
+          <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
         </clr-select-container>
 
         <clr-combobox-container>
@@ -283,7 +313,15 @@
         <!--名称-->
         <clr-input-container>
           <label>{{'nfs.datastoreName' | translate}}</label>
-          <input clrInput class="inputWidth100Percent" [(ngModel)]="addForm.nfsName" name="nfsName" required/>
+          <input clrInput class="inputWidth100Percent" [(ngModel)]="addForm.nfsName" name="nfsName" required (blur)="checkNfsName();"/>
+          <clr-control-error>
+            <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="addForm.sameName">
+            <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+            <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
+            </p>
+          </clr-control-error>
         </clr-input-container>
         <clr-checkbox-container>
           <label></label>
@@ -295,11 +333,19 @@
 
         <clr-input-container *ngIf="!addForm.sameName">
           <label>{{'nfs.fsName' | translate}}</label>
-          <input class="inputWidth100Percent" clrInput [(ngModel)]="addForm.fsName" name="fsName" />
+          <input class="inputWidth100Percent" clrInput [(ngModel)]="addForm.fsName" name="fsName" (blur)="checkFsName();" />
+          <clr-control-error>
+            <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+          </clr-control-error>
         </clr-input-container>
         <clr-input-container *ngIf="!addForm.sameName">
           <label>{{'nfs.shareName' | translate}}</label>
-          <input class="inputWidth100Percent" clrInput [(ngModel)]="addForm.shareName" name="shareName" />
+          <input class="inputWidth100Percent" clrInput [(ngModel)]="addForm.shareName" name="shareName" (blur)="checkShareName();" />
+          <clr-control-error>
+            <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+          </clr-control-error>
         </clr-input-container>
         <!--大小-->
         <clr-input-container>
