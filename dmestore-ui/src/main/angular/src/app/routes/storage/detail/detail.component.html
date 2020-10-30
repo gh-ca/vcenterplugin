@@ -138,7 +138,16 @@
                           <span *ngIf="item.mediaType == 'block'">{{'enum.type.block' | translate}}</span>
                         </clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">{{formatArry(item.serviceLevelName)}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table1'">{{item.tier0RaidLv}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table1'">
+                          <span *ngIf="item.tier1RaidLv == 1">RAID10</span>
+                          <span *ngIf="item.tier1RaidLv == 2">RAID5</span>
+                          <span *ngIf="item.tier1RaidLv == 3">RAID0</span>
+                          <span *ngIf="item.tier1RaidLv == 4">RAID1</span>
+                          <span *ngIf="item.tier1RaidLv == 5">RAID6</span>
+                          <span *ngIf="item.tier1RaidLv == 6">RAID50</span>
+                          <span *ngIf="item.tier1RaidLv == 7">RAID3</span>
+                          <span *ngIf="item.tier1RaidLv == 11">RAIDTP</span>
+                        </clr-dg-cell>
 
                         <clr-dg-cell [hidden]="poolRadio!=='table2'">{{formatCapacity(item.totalCapacity)}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table2'">{{formatCapacity(item.consumedCapacity)}}</clr-dg-cell>

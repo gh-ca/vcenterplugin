@@ -6,7 +6,7 @@
       <form clrForm>
         <p *ngIf="errorMsg" style="color: red">{{'errorMsg.unMountError' | translate}}</p>
         <clr-select-container>
-          <label>{{'nfs.mountHost' | translate}}</label>
+          <label>{{'nfs.mountedHost' | translate}}</label>
           <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="hostId"
                   required name="hostId" class="clr-select">
             <option *ngFor="let item of hostList" value="{{item.hostId}}">{{item.hostName}}</option>
@@ -24,7 +24,7 @@
       <form clrForm>
         <p *ngIf="errorMsg" style="color: red">{{'errorMsg.unMountError' | translate}}</p>
         <clr-select-container>
-          <label>{{'nfs.mountHost' | translate}}</label>
+          <label>{{'nfs.mountedHost' | translate}}</label>
           <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="hostId"
                   required name="hostId" class="clr-select">
             <option *ngFor="let item of hostList" value="{{item.hostId}}">{{item.hostName}}</option>
