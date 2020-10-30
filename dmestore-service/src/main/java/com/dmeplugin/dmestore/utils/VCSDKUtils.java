@@ -2304,6 +2304,8 @@ public class VCSDKUtils {
                     hostmo.getHostStorageSystemMO().addInternetScsiSendTargets(iscsiHbaDevice, targets);
                     logger.info("add Iscsi Send Targets success! iscsiHbaDevice:" + iscsiHbaDevice + " targets:" + gson.toJson(targets));
                 }
+                //添加完成后，重新扫描hba
+                hostmo.getHostStorageSystemMO().rescanHba(iscsiHbaDevice);
             }
         } catch (Exception e) {
             e.printStackTrace();
