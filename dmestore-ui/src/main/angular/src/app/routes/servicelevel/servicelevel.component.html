@@ -1,106 +1,108 @@
-<!-- 头部按钮组 -->
-<div class="gh-btngroup-header">
-  <div class="gh-btngroup-left">
+<div>
+  <!-- 头部按钮组 -->
+  <div class="gh-btngroup-header">
+    <div class="gh-btngroup-left">
 
-  </div>
-  <div class="btn-group btn-icon">
-  </div>
-</div>
-<div class="clr-row">
-  <div class="clr-col-8">
-    <button class="btn btn-primary" (click)="syncStoragePolicy()" style="margin-left: 10px">{{'menu.synSPolicy' | translate}}</button>
-  </div>
-  <div class="clr-col-4">
-    <div style="position:absolute;right:50px;">
-      <input (input)="search()"  style="height: 35px;width: 200px;"
-             [(ngModel)]="searchName" placeholder="{{'tier.namep'|translate}}" type="search" name="name"/>
-      <select style="height: 35px; margin-left: 10px; margin-right: 10px;width: 150px;" (ngModelOptions)="sortItems" [(ngModel)]="sortItem" name="sort" (change)="sortItemsChange();">
-        <option *ngFor="let item of sortItems" value="{{item.id}}">{{item.value|translate}}</option>
-      </select>
-      <button class="btn btn-icon" (click)="sortBtnClick();">
-        <clr-icon [hidden] ="sortUpDown.s == 'asc'" shape="angle-double down"></clr-icon>
-        <clr-icon [hidden] ="sortUpDown.s == 'desc'" shape="angle-double up"></clr-icon>
-      </button>
-      <button class="btn btn-icon" (click)="refresh();"><clr-icon shape="refresh"></clr-icon></button>
+    </div>
+    <div class="btn-group btn-icon">
     </div>
   </div>
-</div>
-<div class="clr-row">
-  <div class="clr-col-4" *ngFor="let item of serviceLevels" [clrDgItem]="item">
-    <div class="info-card" style="margin-left: 10px;margin-top: 30px; height: 260px">
-      <div class="info-card-header">
-        <div class="info-card-title" style="cursor:pointer" (click)="clickName(item)">{{item.name}}</div>
-        <!--<clr-dropdown [clrCloseMenuOnItemClick]="false">
-          <button clrDropdownTrigger class="dropdown-toggle btn btn-link">
-            Operation
-            <clr-icon shape="caret down"></clr-icon>
-          </button>
-          <clr-dropdown-menu *clrIfOpen>
-            <div clrDropdownItem>Link 1</div>
-            <div clrDropdownItem>Link 2</div>
-          </clr-dropdown-menu>
-        </clr-dropdown>-->
+  <div class="clr-row">
+    <div class="clr-col-8">
+      <button class="btn btn-primary" (click)="syncStoragePolicy()" style="margin-left: 10px">{{'menu.synSPolicy' | translate}}</button>
+    </div>
+    <div class="clr-col-4">
+      <div style="position:absolute;right:50px;">
+        <input (input)="search()"  style="height: 35px;width: 200px;"
+               [(ngModel)]="searchName" placeholder="{{'tier.namep'|translate}}" type="search" name="name"/>
+        <select style="height: 35px; margin-left: 10px; margin-right: 10px;width: 150px;" (ngModelOptions)="sortItems" [(ngModel)]="sortItem" name="sort" (change)="sortItemsChange();">
+          <option *ngFor="let item of sortItems" value="{{item.id}}">{{item.value|translate}}</option>
+        </select>
+        <button class="btn btn-icon" (click)="sortBtnClick();">
+          <clr-icon [hidden] ="sortUpDown.s == 'asc'" shape="angle-double down"></clr-icon>
+          <clr-icon [hidden] ="sortUpDown.s == 'desc'" shape="angle-double up"></clr-icon>
+        </button>
+        <button class="btn btn-icon" (click)="refresh();"><clr-icon shape="refresh"></clr-icon></button>
       </div>
-      <div class="info-card-content">
-        <div class="info-card-squre">
-          <div class="squre-per-box" [ngStyle]="{'height':(item.usedRate/100*200)+'px'}"></div>
-          <div class="squre-num">{{item.usedRate}}</div>
+    </div>
+  </div>
+  <div class="clr-row">
+    <div class="clr-col-4" *ngFor="let item of serviceLevels" [clrDgItem]="item">
+      <div class="info-card" style="margin-left: 10px;margin-top: 30px; height: 260px">
+        <div class="info-card-header">
+          <div class="info-card-title" style="cursor:pointer" (click)="clickName(item)">{{item.name}}</div>
+          <!--<clr-dropdown [clrCloseMenuOnItemClick]="false">
+            <button clrDropdownTrigger class="dropdown-toggle btn btn-link">
+              Operation
+              <clr-icon shape="caret down"></clr-icon>
+            </button>
+            <clr-dropdown-menu *clrIfOpen>
+              <div clrDropdownItem>Link 1</div>
+              <div clrDropdownItem>Link 2</div>
+            </clr-dropdown-menu>
+          </clr-dropdown>-->
         </div>
-        <div style="width: 70%;">
-          <div class="gh-info-item">
-            <span class="gh-info-lable">{{'tier.total'|translate}}</span>
-            <span class="gh-info-value">{{item.totalCapacity}} GB</span>
+        <div class="info-card-content">
+          <div class="info-card-squre">
+            <div class="squre-per-box" [ngStyle]="{'height':(item.usedRate/100*200)+'px'}"></div>
+            <div class="squre-num">{{item.usedRate}}</div>
           </div>
-          <div class="gh-info-item">
-            <span class="gh-info-lable">{{'tier.free'|translate}}</span>
-            <span class="gh-info-value">{{item.freeCapacity}} GB</span>
-          </div>
-          <div class="gh-info-item" style="display: flex">
-            <span class="gh-info-lable">{{'tier.qosP'|translate}}</span>
-            <div class="gh-info-value" *ngIf="item.capabilities.qos == undefined">--</div>
-            <div style="margin-top: 5px;" *ngIf="item.capabilities.qos != undefined
-                                            && item.capabilities.qos.enabled == true">
-              <div style="margin-top: 5px" *ngIf="item.capabilities.qos.qosParam.latency != undefined">{{'tier.latency'|translate}} <= {{item.capabilities.qos.qosParam.latency}} {{item.capabilities.qos.qosParam.latencyUnit}}</div>
-              <div style="margin-top: 5px" *ngIf="item.capabilities.qos.qosParam.maxIOPS != undefined">IOPS <= {{item.capabilities.qos.qosParam.maxIOPS}} IOPS/TB</div>
-              <div style="margin-top: 5px" *ngIf="item.capabilities.qos.qosParam.minIOPS != undefined">IOPS >= {{item.capabilities.qos.qosParam.minIOPS}} IOPS/TB</div>
-              <div style="margin-top: 5px" *ngIf="item.capabilities.qos.qosParam.maxBandWidth != undefined">{{'tier.bandwidth'|translate}} <= {{item.capabilities.qos.qosParam.maxBandWidth}} Mbps/s</div>
-              <div style="margin-top: 5px" *ngIf="item.capabilities.qos.qosParam.minBandWidth != undefined">{{'tier.bandwidth'|translate}} >= {{item.capabilities.qos.qosParam.minBandWidth}} Mbps/s</div>
+          <div style="width: 70%;">
+            <div class="gh-info-item">
+              <span class="gh-info-lable">{{'tier.total'|translate}}</span>
+              <span class="gh-info-value">{{item.totalCapacity}} GB</span>
             </div>
+            <div class="gh-info-item">
+              <span class="gh-info-lable">{{'tier.free'|translate}}</span>
+              <span class="gh-info-value">{{item.freeCapacity}} GB</span>
+            </div>
+            <div class="gh-info-item" style="display: flex">
+              <span class="gh-info-lable">{{'tier.qosP'|translate}}</span>
+              <div class="gh-info-value" *ngIf="item.capabilities.qos == undefined">--</div>
+              <div style="margin-top: 5px;" *ngIf="item.capabilities.qos != undefined
+                                            && item.capabilities.qos.enabled == true">
+                <div style="margin-top: 5px" *ngIf="item.capabilities.qos.qosParam.latency != undefined">{{'tier.latency'|translate}} <= {{item.capabilities.qos.qosParam.latency}} {{item.capabilities.qos.qosParam.latencyUnit}}</div>
+                <div style="margin-top: 5px" *ngIf="item.capabilities.qos.qosParam.maxIOPS != undefined">IOPS <= {{item.capabilities.qos.qosParam.maxIOPS}} IOPS/TB</div>
+                <div style="margin-top: 5px" *ngIf="item.capabilities.qos.qosParam.minIOPS != undefined">IOPS >= {{item.capabilities.qos.qosParam.minIOPS}} IOPS/TB</div>
+                <div style="margin-top: 5px" *ngIf="item.capabilities.qos.qosParam.maxBandWidth != undefined">{{'tier.bandwidth'|translate}} <= {{item.capabilities.qos.qosParam.maxBandWidth}} Mbps/s</div>
+                <div style="margin-top: 5px" *ngIf="item.capabilities.qos.qosParam.minBandWidth != undefined">{{'tier.bandwidth'|translate}} >= {{item.capabilities.qos.qosParam.minBandWidth}} Mbps/s</div>
+              </div>
+            </div>
+            <!--<div class="gh-info-item">
+              <span class="gh-info-lable"></span>
+              <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
+                                              && item.capabilities.qos.enabled == true
+                                              && item.capabilities.qos.qosParam.minBandWidth != undefined">
+                     {{'tier.bandwidth'|translate}} >= {{item.capabilities.qos.qosParam.minBandWidth}} Mbps/s
+              </span>
+              <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
+                                              && item.capabilities.qos.enabled == true
+                                              && item.capabilities.qos.qosParam.maxBandWidth != undefined">
+                     {{'tier.bandwidth'|translate}} <= {{item.capabilities.qos.qosParam.maxBandWidth}} Mbps/s
+              </span>
+            </div>
+            <div class="gh-info-item">
+              <span class="gh-info-lable"></span>
+              <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
+                                              && item.capabilities.qos.enabled == true
+                                              && item.capabilities.qos.qosParam.minIOPS != undefined">
+                  IOPS >= {{item.capabilities.qos.qosParam.minIOPS}} IOPS/TB
+              </span>
+              <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
+                                              && item.capabilities.qos.enabled == true
+                                              && item.capabilities.qos.qosParam.maxIOPS != undefined">
+                  IOPS <= {{item.capabilities.qos.qosParam.maxIOPS}} IOPS/TB
+              </span>
+            </div>-->
           </div>
-          <!--<div class="gh-info-item">
-            <span class="gh-info-lable"></span>
-            <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
-                                            && item.capabilities.qos.enabled == true
-                                            && item.capabilities.qos.qosParam.minBandWidth != undefined">
-                   {{'tier.bandwidth'|translate}} >= {{item.capabilities.qos.qosParam.minBandWidth}} Mbps/s
-            </span>
-            <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
-                                            && item.capabilities.qos.enabled == true
-                                            && item.capabilities.qos.qosParam.maxBandWidth != undefined">
-                   {{'tier.bandwidth'|translate}} <= {{item.capabilities.qos.qosParam.maxBandWidth}} Mbps/s
-            </span>
-          </div>
-          <div class="gh-info-item">
-            <span class="gh-info-lable"></span>
-            <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
-                                            && item.capabilities.qos.enabled == true
-                                            && item.capabilities.qos.qosParam.minIOPS != undefined">
-                IOPS >= {{item.capabilities.qos.qosParam.minIOPS}} IOPS/TB
-            </span>
-            <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
-                                            && item.capabilities.qos.enabled == true
-                                            && item.capabilities.qos.qosParam.maxIOPS != undefined">
-                IOPS <= {{item.capabilities.qos.qosParam.maxIOPS}} IOPS/TB
-            </span>
-          </div>-->
         </div>
       </div>
     </div>
   </div>
+
+  <div class="loadingDiv" [hidden]="!tierLoading"><clr-spinner class="spinner spinner-md">Loading</clr-spinner></div>
+  <div class="loadingDiv" [hidden]="!syncLoading"><clr-spinner class="spinner spinner-md">Loading</clr-spinner></div>
 </div>
-
-
-
 <clr-modal class="modal" [(clrModalOpen)]="popShow" [clrModalSize]="'lg'">
   <h3 class="modal-title">
     <span>{{selectedModel.name}}</span>

@@ -42,6 +42,9 @@ export class BestpracticeComponent implements OnInit {
 
   tipModalSuccess = false;
   tipModalFail = false;
+
+  applyLoading = false;
+  checkLoading = false;
   constructor(private cdr: ChangeDetectorRef,
               public gs: GlobalsService,
               private http: HttpClient,
@@ -96,9 +99,9 @@ export class BestpracticeComponent implements OnInit {
    * @param params
    */
   applyPractice(params){
-    this.gs.loading = true;
+    this.applyLoading = true;
     this.http.post('v1/bestpractice/update/bylist', params).subscribe((result: any) => {
-      this.gs.loading = false;
+      this.applyLoading = false;
       if (result.code == '200'){
         this.tipModalSuccess = true;
         if(this.applyType != '1'){
@@ -149,9 +152,9 @@ export class BestpracticeComponent implements OnInit {
   }
 
   recheck() {
-    this.gs.loading = true;
+    this.checkLoading = true;
     this.http.post('v1/bestpractice/check', {}).subscribe((result: any) => {
-      this.gs.loading = false;
+      this.checkLoading = false;
       if (result.code == '200'){
         this.tipModalSuccess = true;
         this.practiceRefresh();
