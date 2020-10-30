@@ -70,6 +70,9 @@ export class StatusFilter implements ClrDatagridFilterInterface<VmfsInfo> {
   changeFunc(value: any) {
     this.changes.next();
   }
+  initStatus() {
+    this.options = undefined;
+  }
 }
 
 
@@ -84,10 +87,6 @@ export class StatusFilter implements ClrDatagridFilterInterface<VmfsInfo> {
       <clr-radio-wrapper *ngFor="let item of storageList">
         <input type="radio" clrRadio name="device" (change)="changeFunc($event)" [(ngModel)]="device" value="{{item.name}}"/>
         <label>{{item.name}}</label>
-      </clr-radio-wrapper>
-      <clr-radio-wrapper>
-        <input type="radio" clrRadio name="device" (change)="changeFunc($event)" [(ngModel)]="device" value="123" />
-        <label>123</label>
       </clr-radio-wrapper>
     </clr-radio-container>
   `,
@@ -129,6 +128,10 @@ export class DeviceFilter implements ClrDatagridFilterInterface<VmfsInfo>, OnIni
     this.changes.next();
   }
 
+  initDevice() {
+    this.device = undefined;
+  }
+
 }
 
 @Component({
@@ -136,12 +139,12 @@ export class DeviceFilter implements ClrDatagridFilterInterface<VmfsInfo>, OnIni
   template: `
       <clr-radio-container>
         <clr-radio-wrapper>
-          <input type="radio" clrRadio name="serviceLevel" (change)="changeFunc($event)" [(ngModel)]="serviceLevel" value="normal"/>
-          <label>normal</label>
+          <input type="radio" clrRadio name="serviceLevel" (change)="changeFunc($event)" [(ngModel)]="serviceLevel" value="" />
+          <label>{{'vmfs.filter.all' | translate}}</label>
         </clr-radio-wrapper>
-        <clr-radio-wrapper>
-          <input type="radio" clrRadio name="serviceLevel" (change)="changeFunc($event)" [(ngModel)]="serviceLevel" value="abnormal" />
-          <label>abnormal</label>
+        <clr-radio-wrapper *ngFor="let item of serviceLevelList">
+          <input type="radio" clrRadio name="serviceLevel" (change)="changeFunc($event)" [(ngModel)]="serviceLevel" value="{{item.name}}"/>
+          <label>{{item.name}}</label>
         </clr-radio-wrapper>
       </clr-radio-container>
   `,
@@ -156,14 +159,16 @@ export class ServiceLevelFilter implements ClrDatagridFilterInterface<VmfsInfo>,
 
   readonly status: any;
 
-  constructor(private storageService: StorageService,private cdr: ChangeDetectorRef){}
+  constructor(private vmfsListService: VmfsListService,private cdr: ChangeDetectorRef){}
 
   ngOnInit(): void {
-    this.storageService.getData().subscribe((s: any) => {
-      if (s.code === '200'){
-        this.serviceLevelList = s.data;
-        this.cdr.detectChanges();
+    this.vmfsListService.getServiceLevelList().subscribe((result: any) => {
+      console.log(result);
+      if (result.code === '200' && result.data !== null) {
+        this.serviceLevelList = result.data.filter(item => item.totalCapacity !== 0);
+        console.log('this.serviceLevelList', this.serviceLevelList);
       }
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
 
@@ -171,7 +176,7 @@ export class ServiceLevelFilter implements ClrDatagridFilterInterface<VmfsInfo>,
     if (!this.serviceLevel) {
       return true;
     }
-    const  capital  = item.status;
+    const  capital  = item.serviceLevelName;
     console.log("capital", capital);
     if (this.serviceLevel === '' || this.serviceLevel === 'all') {
       return true;
@@ -188,6 +193,10 @@ export class ServiceLevelFilter implements ClrDatagridFilterInterface<VmfsInfo>,
     this.changes.next();
   }
 
+  initServiceLevel() {
+    this.serviceLevel = undefined;
+  }
+
 }
 
 @Component({
@@ -195,12 +204,16 @@ export class ServiceLevelFilter implements ClrDatagridFilterInterface<VmfsInfo>,
   template: `
       <clr-radio-container>
         <clr-radio-wrapper>
-          <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="options" value="normal"/>
-          <label>normal</label>
+          <input type="radio" clrRadio name="protectionStatus" (change)="changeFunc($event)" [(ngModel)]="protectionStatus" value=""/>
+          <label>{{'vmfs.filter.all' | translate}}</label>
         </clr-radio-wrapper>
         <clr-radio-wrapper>
-          <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="options" value="abnormal" />
-          <label>abnormal</label>
+          <input type="radio" clrRadio name="protectionStatus" (change)="changeFunc($event)" [(ngModel)]="protectionStatus" value="true" />
+          <label>{{'vmfs.protectionStatus.protected' | translate}}</label>
+        </clr-radio-wrapper>
+        <clr-radio-wrapper>
+          <input type="radio" clrRadio name="protectionStatus" (change)="changeFunc($event)" [(ngModel)]="protectionStatus" value="false" />
+          <label>{{'vmfs.protectionStatus.unprotected' | translate}}</label>
         </clr-radio-wrapper>
       </clr-radio-container>
   `,
@@ -208,20 +221,20 @@ export class ServiceLevelFilter implements ClrDatagridFilterInterface<VmfsInfo>,
 })
 export class ProtectionStatusFilter implements ClrDatagridFilterInterface<VmfsInfo>{
   changes = new Subject<any>();
-  options;
+  protectionStatus;
 
   readonly status: any;
 
   accepts(item: VmfsInfo): boolean {
-    if (!this.options) {
+    if (!this.protectionStatus) {
       return true;
     }
-    const  capital  = item.status;
+    const  capital  = item.vmfsProtected.toString();
     console.log("capital", capital);
-    if (this.options === '' || this.options === 'all') {
+    if (this.protectionStatus === '' || this.protectionStatus === 'all') {
       return true;
     } else {
-      return this.options === capital;
+      return this.protectionStatus === capital;
     }
   }
 
@@ -233,4 +246,8 @@ export class ProtectionStatusFilter implements ClrDatagridFilterInterface<VmfsIn
     this.changes.next();
   }
 
+  initProtectionStatus() {
+    this.protectionStatus = undefined;
+  }
 }
+

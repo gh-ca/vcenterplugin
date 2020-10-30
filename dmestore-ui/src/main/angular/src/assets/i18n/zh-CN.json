@@ -187,7 +187,6 @@
     "reserveCapacity": "置备容量",
     "device": "设备",
     "serviceLevelName": "服务等级",
-    "protectionStatus": "保护状态",
     "multiply": "X",
     "iops": "IOPS",
     "iopsQoSTarget": "IOPS QoS上下限",
@@ -209,7 +208,7 @@
     "provisioningType": "设置类型",
     "basicInformation": "基本信息",
     "byServiceLevel": "服务等级",
-    "customer": "客户",
+    "custom": "自定义",
     "wwn": "WWN",
     "storage": "存储",
     "smartTier": "SmartTier",
@@ -236,6 +235,12 @@
     "loadingTips": "数据加载中，请稍后",
     "dataHandleLoadingTips": "数据处理中，请稍后",
     "listNullTips": "找不到VMFS",
+    "workload": "应用类型",
+    "protectionStatus": {
+      "name": "保护状态",
+      "protected": "已保护",
+      "unprotected": "未保护"
+    },
     "mount":{
       "mount":"挂载",
       "host":"主机",
@@ -269,6 +274,10 @@
       "all": "所有",
       "status": {
         "normal": "正常"
+      },
+      "protectionStatus": {
+        "protected": "true",
+        "unprotected": "false"
       }
     }
   },

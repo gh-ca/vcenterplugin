@@ -14,6 +14,8 @@ export class NfsDeleteComponent implements OnInit{
   pluginFlag: string;//来至插件的标记
   dataStoreObjectId:string;
   errorMsg: string;
+  modalLoading = false; // 数据加载loading
+  modalHandleLoading = false; // 数据处理loading
   constructor(private deleteService: NfsDeleteService, private cdr: ChangeDetectorRef,
               private gs: GlobalsService,
               private activatedRoute: ActivatedRoute,private router:Router){
@@ -36,12 +38,12 @@ export class NfsDeleteComponent implements OnInit{
     }
   }
   delNfs(){
-    this.gs.loading=true;
+    this.modalHandleLoading=true;
     var params={
       "dataStoreObjectId": this.dataStoreObjectId
     };
     this.deleteService.delNfs(params).subscribe((result: any) => {
-      this.gs.loading=false;
+      this.modalHandleLoading=false;
       if (result.code === '200'){
         if(this.pluginFlag=='plugin'){
           this.backToNfsList();
@@ -56,12 +58,12 @@ export class NfsDeleteComponent implements OnInit{
   }
 
   backToNfsList(){
-    this.gs.loading=false;
+    this.modalHandleLoading=false;
     this.router.navigate(['nfs']);
   }
 
   closeModel(){
-    this.gs.loading=false;
+    this.modalHandleLoading=false;
     this.gs.getClientSdk().modal.close();
   }
 }

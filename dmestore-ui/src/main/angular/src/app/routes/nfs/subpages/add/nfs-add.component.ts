@@ -17,6 +17,8 @@ export class NfsAddComponent implements OnInit{
   pluginFlag: string;
   addForm = new AddNfs();
   errorMsg: string;
+  modalLoading = false; // 数据加载loading
+  modalHandleLoading = false; // 数据处理loading
   unit='GB';
   checkedPool:any;
   storageList: StorageList[] = [];
@@ -35,6 +37,7 @@ export class NfsAddComponent implements OnInit{
   }
 
   ngOnInit(): void {
+    this.modalLoading=true;
     this.viewPage='add_plugin'
     this.activatedRoute.queryParams.subscribe(queryParam => {
       this.pluginFlag =queryParam.flag;
@@ -52,14 +55,16 @@ export class NfsAddComponent implements OnInit{
       //入口来至Vcenter
       this.viewPage='add_vcenter'
     }
-    this.gs.loading=true;
+
     this.storageService.getData().subscribe((s: any) => {
+      this.modalLoading=false;
       if (s.code === '200'){
         this.storageList = s.data;
-        this.gs.loading=false;
+        this.modalLoading=false;
       }
     });
     this.addService.getHostList().subscribe((r: any) => {
+      this.modalLoading=false;
       if (r.code === '200'){
         this.hostList = r.data;
         this.cdr.detectChanges();
@@ -83,7 +88,7 @@ export class NfsAddComponent implements OnInit{
   }
   addNfs(){
     //
-    this.gs.loading=true;
+    this.modalHandleLoading=true;
     this.addForm.poolRawId=this.checkedPool.diskPoolId;
     this.addForm.storagePoolId= this.checkedPool.id;
     // 单位换算
@@ -101,7 +106,7 @@ export class NfsAddComponent implements OnInit{
         break;
     }
     this.addService.addNfs(this.addForm).subscribe((result: any) => {
-      this.gs.loading=false;
+      this.modalHandleLoading=false;
       if (result.code === '200'){
         if (this.pluginFlag=='plugin'){
           this.backToNfsList();
@@ -109,14 +114,14 @@ export class NfsAddComponent implements OnInit{
           this.closeModel();
         }
       }else{
-        this.errorMsg = '添加失败！'+result.description;
-        this.cdr.detectChanges();
-        this.wizard.open();
+        this.errorMsg = '1';
+        console.log("Delete failed:",result.description)
+
       }
     });
   }
   selectStoragePool(){
-    this.gs.loading=true;
+    this.modalLoading=true;
     this.storagePools = null;
     this.logicPorts = null;
     // 选择存储后获取存储池
@@ -133,7 +138,7 @@ export class NfsAddComponent implements OnInit{
     // 选择存储后逻辑端口
     this.storageService.getLogicPortListByStorageId(this.addForm.storagId)
       .subscribe((r: any) => {
-        this.gs.loading=false;
+        this.modalLoading=false;
         if (r.code === '200'){
           this.logicPorts = r.data;
           this.cdr.detectChanges();
@@ -141,12 +146,12 @@ export class NfsAddComponent implements OnInit{
       });
   }
   checkHost(){
-    this.gs.loading=true;
+    this.modalLoading=true;
     this.addForm.vkernelIp=null;
     //选择主机后获取虚拟网卡
     this.addService.getVmkernelListByObjectId(this.addForm.hostObjectId)
       .subscribe((r: any) => {
-        this.gs.loading=false;
+        this.modalLoading=false;
         if (r.code === '200'){
           this.vmkernelList = r.data;
           this.cdr.detectChanges();
@@ -154,11 +159,11 @@ export class NfsAddComponent implements OnInit{
       });
   }
   backToNfsList(){
-    this.gs.loading=false;
+    this.modalLoading=false;
     this.router.navigate(['nfs']);
   }
   closeModel(){
-    this.gs.loading=false;
+    this.modalLoading=false;
     this.gs.getClientSdk().modal.close();
   }
 

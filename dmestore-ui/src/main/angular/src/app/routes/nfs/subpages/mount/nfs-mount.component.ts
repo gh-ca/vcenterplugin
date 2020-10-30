@@ -24,6 +24,8 @@ export class NfsMountComponent implements OnInit{
   dataStoreList: DataStore[];
   pluginFlag: string;//来至插件的标记
   errorMsg:string;
+  modalLoading = false; // 数据加载loading
+  modalHandleLoading = false; // 数据处理loading
   logicPorts: LogicPort[] = [];
   vmkernelList: Vmkernel[]=[];
   constructor(private mountService: NfsMountService, private cdr: ChangeDetectorRef,
@@ -31,7 +33,7 @@ export class NfsMountComponent implements OnInit{
               private activatedRoute: ActivatedRoute,private router:Router){
   }
   ngOnInit(): void {
-    this.gs.loading=true;
+    this.modalHandleLoading=true;
     this.activatedRoute.url.subscribe(url => {
       this.routePath=url[0].path;
     });
@@ -56,7 +58,7 @@ export class NfsMountComponent implements OnInit{
         this.initHostAndClusterList();
         this.getLogicPortByDsId(this.dsObjectId)
       }
-      this.gs.loading=false;
+      this.modalHandleLoading=false;
     }else{
       //入口是主机或者集群
       if ('host'===this.routePath){
@@ -68,14 +70,14 @@ export class NfsMountComponent implements OnInit{
           this.getVmkernelListByObjectId(this.hostObjectId);
           this.mountForm.hostObjectId=this.hostObjectId;
         }
-        this.gs.loading=false;
+        this.modalHandleLoading=false;
       }
-      this.gs.loading=false;
+      this.modalHandleLoading=false;
     }
     this.cdr.detectChanges();
   }
   checkHost(){
-    this.gs.loading=true;
+    this.modalHandleLoading=true;
     //选择主机后获取虚拟网卡
     this.getVmkernelListByObjectId(this.mountForm.hostObjectId);
   }
@@ -84,7 +86,7 @@ export class NfsMountComponent implements OnInit{
       if (r.code === '200'){
         this.hostList = r.data;
         this.cdr.detectChanges();
-        this.gs.loading=false;
+        this.modalHandleLoading=false;
       }
     });
   }
@@ -103,10 +105,10 @@ export class NfsMountComponent implements OnInit{
   }
   getLogicPortByDsId(storagId: string){
     // 选择存储后逻辑端口
-    this.gs.loading=true;
+    this.modalHandleLoading=true;
     this.mountService.getLogicPortListByStorageId(storagId)
       .subscribe((r: any) => {
-        this.gs.loading=false;
+        this.modalHandleLoading=false;
         if (r.code === '200'){
           this.logicPorts = r.data;
           this.cdr.detectChanges();
@@ -116,7 +118,7 @@ export class NfsMountComponent implements OnInit{
   getVmkernelListByObjectId(hostObjectId:string){
     this.mountService.getVmkernelListByObjectId(hostObjectId)
       .subscribe((r: any) => {
-        this.gs.loading=false;
+        this.modalHandleLoading=false;
         if (r.code === '200'){
           this.vmkernelList = r.data;
           this.cdr.detectChanges();
@@ -124,9 +126,9 @@ export class NfsMountComponent implements OnInit{
       });
   }
   mountSubmit(){
-    this.gs.loading=true;
+    this.modalHandleLoading=true;
     this.mountService.mountNfs(this.mountForm).subscribe((result: any) => {
-      this.gs.loading=false;
+      this.modalHandleLoading=false;
       if (result.code  ===  '200'){
         this.mountForm = new Mount();
         if (this.pluginFlag=='plugin'){
@@ -141,14 +143,14 @@ export class NfsMountComponent implements OnInit{
     });
   }
   backToNfsList(){
-    this.gs.loading=false;
+    this.modalHandleLoading=false;
     this.errorMsg=null;
     this.router.navigate(['nfs']);
   }
   closeModel(){
     this.errorMsg=null;
     this.gs.getClientSdk().modal.close();
-    this.gs.loading=false;
+    this.modalHandleLoading=false;
   }
   formatCapacity(c: number){
     if (c < 1024){

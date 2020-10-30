@@ -114,7 +114,8 @@
 }
 // 示例2
 .availability-box{
-  width: 450px;
+  width: 100%;
+  //border: 1px red solid;
 }
 .unit-banner{
   display: flex;
@@ -212,6 +213,57 @@
   width: .7rem;
   border: .05rem solid #E6E6E6;
   border-radius: 2rem;
+}
+.d-info-content-title{
+  font-size: 18px;
+  color: #303133;
+}
+.d-info-charts-wrap{
+  display: flex;
+  align-items: center;
+  color: #303133;
+  font-size: 16px;
+}
+.d-info-content{
+  margin-left: 0px;
+}
+.d-info-content-text{
+ // border: 1px #6C92FA solid;
+  margin: 10px 0;
+  padding-left: 10px;
+  position: relative;
+  line-height: 22px;
+  span:first-child{
+    width: 80px;
+    display: inline-block;
+  }
+  .squre{
+    position: absolute;
+    left: -13px;
+    top: 4px;
+    width: 14px;
+    height: 14px;
+  }
+  .volume{
+    background-color: #6C92FA;
+    border-radius: 1px;
+    border-radius: 2rem;
+  }
+  .protection{
+    background-color: #3DCCA6;
+    border-radius: 1px;
+    border-radius: 2rem;
+  }
+  .fs{
+    background-color: #E5C335;
+    border-radius: 1px;
+    border-radius: 2rem;
+  }
+  .free{
+    background-color: #E6E6E6;
+    border-radius: 1px;
+    border-radius: 2rem;
+  }
 }
 .over_flow{
   text-overflow: ellipsis;
