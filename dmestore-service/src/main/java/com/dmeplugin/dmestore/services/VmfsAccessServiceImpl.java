@@ -2010,10 +2010,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     @Override
-    public Boolean queryDatastoreByName(String name,String type) {
+    public Boolean queryDatastoreByName(String name) {
         Boolean flag = true;
         try {
-            String dataStoreName = dmeVmwareRalationDao.getDataStoreByName(name, type);
+            String dataStoreName = dmeVmwareRalationDao.getDataStoreByName(name);
             if (!StringUtils.isEmpty(dataStoreName)) {
                 flag = false;
             }

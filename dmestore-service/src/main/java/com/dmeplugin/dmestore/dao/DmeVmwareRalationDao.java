@@ -514,14 +514,14 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         return vmfsDatastoreName;
     }
 
-    public String getDataStoreByName(String name,String type) throws DmeSqlException {
+    public String getDataStoreByName(String name) throws DmeSqlException {
         String vmfsDatastoreName = "";
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT * FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_TYPE='" + type + "' and STORE_NAME='" + name + "'";
+            String sql = "SELECT * FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_NAME='" + name + "'";
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {

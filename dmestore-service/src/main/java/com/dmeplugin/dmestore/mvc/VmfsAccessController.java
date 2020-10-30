@@ -289,9 +289,9 @@ public class VmfsAccessController extends BaseController {
      * @return
      */
     @GetMapping("/querydatastorebyname")
-    public ResponseBodyBean queryDatastoreByName(@RequestParam("name") String name,@RequestParam("type") String type){
+    public ResponseBodyBean queryDatastoreByName(@RequestParam("name") String name){
         try {
-            return success(vmfsAccessService.queryDatastoreByName(name, type));
+            return success(vmfsAccessService.queryDatastoreByName(name));
         } catch (Exception e) {
             return failure(e.getMessage());
         }
