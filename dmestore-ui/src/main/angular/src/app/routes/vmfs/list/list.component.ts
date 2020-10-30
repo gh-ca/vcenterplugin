@@ -213,7 +213,7 @@ export class VmfsListComponent implements OnInit {
               const wwns = [];
               this.list.forEach(item => {
                 item.usedCapacity = item.capacity - item.freeSpace;
-                item.capacityUsage = ((item.capacity - item.freeSpace)/item.capacity * 100).toFixed(2);
+                item.capacityUsage = ((item.capacity - item.freeSpace)/item.capacity);
                 wwns.push(item.wwn);
               });
               // 设置卷ID集合
