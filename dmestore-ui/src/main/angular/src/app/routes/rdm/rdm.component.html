@@ -39,8 +39,8 @@
       <!--存储-->
       <clr-select-container class="selectClass">>
         <label  style="color: #9F9F9F;">{{'rdm.dataStore' | translate}}<span style="color: red">*</span></label>
-        <select clrSelect (ngModelOptions)="dataStores" required [(ngModel)]="dataStoreName" name="dataStoreName" class="clr-select">
-          <option *ngFor="let item of dataStores" value="{{item.name}}">{{item.name}}</option>
+        <select clrSelect (ngModelOptions)="dataStores" required [(ngModel)]="dataStoreObjectId" name="dataStoreObjectId" class="clr-select">
+          <option *ngFor="let item of dataStores" value="{{item.objectId}}">{{item.name}}</option>
         </select>
         <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-select-container>
@@ -327,4 +327,30 @@
       <clr-wizard-button [type]="'custom-finish'" (click)="submit();">{{'menu.ok' | translate}}</clr-wizard-button>
     </ng-template>
   </clr-wizard-page>
+
+  <div class="loadingDiv" [hidden]="!dsLoading"><clr-spinner class="spinner spinner-md">Loading</clr-spinner></div>
+  <div class="loadingDiv" [hidden]="!dsDeviceLoading"><clr-spinner class="spinner spinner-md">Loading</clr-spinner></div>
+  <div class="loadingDiv" [hidden]="!slLoading"><clr-spinner class="spinner spinner-md">Loading</clr-spinner></div>
+  <div class="loadingDiv" [hidden]="!tierLoading"><clr-spinner class="spinner spinner-md">Loading</clr-spinner></div>
+  <div class="loadingDiv" [hidden]="!submitLoading"><clr-spinner class="spinner spinner-md">Loading</clr-spinner></div>
 </clr-wizard>
+
+<clr-modal [(clrModalOpen)]="rdmSuccess" [clrModalSize]="'sm'">
+  <h3 class="modal-title">{{'menu.tip'|translate}}</h3>
+  <div class="modal-body">
+    <clr-icon shape="success-standard" class="is-solid" style="color: #59A220;margin-right: 5px;"></clr-icon>{{'rdm.rdmSuccessMsg'|translate}}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success" (click)="rdmSuccess=false;this.closeWin();">{{'menu.ok'|translate}}</button>
+  </div>
+</clr-modal>
+
+<clr-modal [(clrModalOpen)]="rdmError" [clrModalSize]="'sm'">
+  <h3 class="modal-title">{{'menu.tip'|translate}}</h3>
+  <div class="modal-body">
+    <clr-icon shape="error-standard" class="is-solid" style="color: red;margin-right: 5px;"></clr-icon>{{'rdm.createRdmError'|translate}}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="rdmError=false">{{'menu.ok'|translate}}</button>
+  </div>
+</clr-modal>

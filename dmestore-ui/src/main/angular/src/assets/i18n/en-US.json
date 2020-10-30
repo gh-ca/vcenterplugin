@@ -630,7 +630,8 @@
     "storeSet": "Storage Setting",
 
     "createRdmError": "Create RDM Error!",
-    "selectOneSer": "Service Level is not be Null！"
+    "selectOneSer": "Service Level is not be Null！",
+    "rdmSuccessMsg": "Create RDM Success!"
   },
   "tier": {
     "name": "Name",
