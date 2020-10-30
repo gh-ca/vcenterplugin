@@ -832,7 +832,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         if (isCurrent) {
             indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT);//throughput
             indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH);//bandwidth
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME);//responsetime
         } else {
             indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_READTHROUGHPUT);//readThroughput 读IOPS
             indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITETHROUGHPUT);//writeThroughput
@@ -841,6 +840,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         }
         indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_READRESPONSETIME);//readResponseTime
         indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITERESPONSETIME);//writeResponseTime
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME);//responsetime
         return indicators;
     }
 
@@ -1129,7 +1129,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 list.add(objId);
                 count++;
             }
-        }else{
+        } else {
             objGroup.add(objIds);
         }
         return objGroup;

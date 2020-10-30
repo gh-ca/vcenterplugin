@@ -2,14 +2,13 @@ package com.dmeplugin.dmestore.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 
 /**
@@ -277,5 +276,25 @@ public class ToolUtils {
         return re;
     }
 
+    //从性能数据中提取对应指标的对应值
+    public static JsonElement getStatistcValue(JsonObject statisticObject, String indicator, String type) {
+        JsonElement object = null;
+        if (null != statisticObject) {
+            JsonElement indicatorEl = statisticObject.get(indicator);
+            if (!ToolUtils.jsonIsNull(indicatorEl)) {
+                JsonObject indicatorJson = indicatorEl.getAsJsonObject();
+                JsonElement typeEl = indicatorJson.get(type);
+                if (!ToolUtils.jsonIsNull(typeEl)) {
+                    JsonObject typeJson = typeEl.getAsJsonObject();
+                    Set<Map.Entry<String, JsonElement>> sets = typeJson.entrySet();
+                    for (Map.Entry<String, JsonElement> set : sets) {
+                        object = set.getValue();//只取一个
+                        break;
+                    }
+                }
+            }
+        }
+        return object;
+    }
 
 }
