@@ -78,8 +78,8 @@ export class PerformanceComponent implements OnInit{
   ngOnInit(): void {
     // 初始化卷信息
     const ctx = this.gs.getClientSdk().app.getContextObjects();
-    const objectId = 'urn:vmomi:Datastore:datastore-1126:674908e5-ab21-4079-9cb1-596358ee5dd1';
-    // const objectId=ctx[0].id;
+    // const objectId = 'urn:vmomi:Datastore:datastore-1126:674908e5-ab21-4079-9cb1-596358ee5dd1';
+    const objectId=ctx[0].id;
     this.getVolumeInfoByVolID(objectId);
     this.selectRange = 'LAST_1_DAY';
   }

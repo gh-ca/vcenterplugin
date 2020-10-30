@@ -1171,7 +1171,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/add?resource=others</actionUrl>
                         <dialogTitle>vmfs</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>1600,600</dialogSize>
                      </root>
                   </object>
                </delegate>

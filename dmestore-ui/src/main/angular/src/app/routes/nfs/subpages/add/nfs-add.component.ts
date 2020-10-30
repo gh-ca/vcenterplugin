@@ -26,6 +26,15 @@ export class NfsAddComponent implements OnInit{
   logicPorts: LogicPort[] = [];
   hostList: Host[] = [];
   vmkernelList: Vmkernel[]=[];
+
+
+
+  maxbandwidthChoose=false; // 最大带宽 选中
+  maxiopsChoose=false; // 最大iops 选中
+  minbandwidthChoose=false; // 最小带宽 选中
+  miniopsChoose=false; // 最小iops 选中
+  latencyChoose=false; // 时延 选中
+
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
   @ViewChild('addPageOne') addPageOne: ClrWizardPage;
@@ -166,6 +175,54 @@ export class NfsAddComponent implements OnInit{
     this.modalLoading=false;
     this.gs.getClientSdk().modal.close();
   }
+  qosBlur(type:String, operationType:string) {
 
+    let objVal;
+    if (type === 'add') {
+      switch (operationType) {
+        case 'maxbandwidth':
+          objVal = this.addForm.maxBandwidth;
+          break;
+        case 'maxiops':
+          objVal = this.addForm.maxIops;
+          break;
+        case 'minbandwidth':
+          objVal = this.addForm.minBandwidth;
+          break;
+        case 'miniops':
+          objVal = this.addForm.minIops;
+          break;
+        default:
+          objVal = this.addForm.latency;
+          break;
+      }
+    }
+    if (objVal && objVal !== '') {
+      if (objVal.toString().match(/\d+(\.\d{0,2})?/)) {
+        objVal = objVal.toString().match(/\d+(\.\d{0,2})?/)[0];
+      } else {
+        objVal = '';
+      }
+    }
+    if (type === 'add') {
+      switch (operationType) {
+        case 'maxbandwidth':
+          this.addForm.maxBandwidth = objVal;
+          break;
+        case 'maxiops':
+          this.addForm.maxIops = objVal;
+          break;
+        case 'minbandwidth':
+          this.addForm.minBandwidth = objVal;
+          break;
+        case 'miniops':
+          this.addForm.minIops = objVal;
+          break;
+        default:
+          this.addForm.latency = objVal;
+          break;
+      }
+    }
+  }
 }
 

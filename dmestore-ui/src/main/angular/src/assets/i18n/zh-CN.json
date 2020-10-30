@@ -153,7 +153,8 @@
     },
     "unmount":{
       "title":"卸载",
-      "content":"确认要卸载吗?"
+      "content":"确认要卸载吗?",
+      "tips":"若NFS所挂载的主机全部被卸载，则会自动删除此NFS设备！"
     }
   },
   "vmfs": {
@@ -236,6 +237,18 @@
     "dataHandleLoadingTips": "数据处理中，请稍后",
     "listNullTips": "找不到VMFS",
     "workload": "应用类型",
+    "add": {
+      "success": "添加成功！"
+    },
+    "modify": {
+      "success": "修改成功！"
+    },
+    "expand": {
+      "success": "扩容成功！"
+    },
+    "serviceLevel": {
+      "success": "服务等级变更成功！"
+    },
     "protectionStatus": {
       "name": "保护状态",
       "protected": "已保护",
@@ -251,11 +264,13 @@
       "readWrite":"读写",
       "mountObj":"挂载对象",
       "notChooseDataStoreTips":"请选择需要挂载的DataStore！",
-      "mountErr":"请选择需要挂载的主机/集群！"
+      "mountErr":"请选择需要挂载的主机/集群！",
+      "success": "挂载成功！"
     },
     "del":{
       "title":"提示",
-      "content":"确认要删除吗?"
+      "content":"确认要删除吗?",
+      "success": "删除成功！"
     },
     "unmount":{
       "title":"卸载",
@@ -264,11 +279,13 @@
       "notChooseDataStoreTips":"请选择需要卸载的DataStore！",
       "tips":"若VMFS所挂载的主机/集群全部被卸载，则会自动删除此VMFS设备！",
       "notHaveCluster":"该VMFS未绑定集群",
-      "notHaveHost":"该VMFS未绑定主机"
+      "notHaveHost":"该VMFS未绑定主机",
+      "success": "卸载成功！"
     },
     "reclaim": {
       "title":"提示",
-      "content":"确认要回收空间吗?"
+      "content":"确认要回收空间吗?",
+      "success": "回收空间成功！"
     },
     "filter": {
       "all": "所有",

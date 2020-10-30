@@ -4,6 +4,18 @@
   <div *ngIf="hostMountShow">
     <div class="modal-body">
       <form clrForm *ngIf="resource === 'others'">
+        <div *ngIf="modalLoading" class="loadingDiv">
+          <span>
+            {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+          </span>
+        </div>
+        <div *ngIf="modalHandleLoading" class="loadingDiv">
+          <span>
+            {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+          </span>
+        </div>
+        <div *ngIf="isOperationErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.mountError' | translate}}</div>
+
         <div *ngIf="notChooseMountDevice" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.mount.notChooseDataStoreTips' | translate}}</div>
         <div *ngIf="notChooseUnmountDevice" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.unmount.notChooseDataStoreTips' | translate}}</div>
         <clr-datagrid [(clrDgSelected)]="chooseMountDataStore" [clrDgLoading]="isLoading">
@@ -60,7 +72,7 @@
           <clr-combobox [(ngModel)]="chooseHost" name="chooseHost" required>
             <clr-options *ngIf="mountHostData">
               <clr-option *clrOptionItems="let state of hostList; field:'hostName'" [clrValue]="state">
-                <clr-icon *ngIf="state.hostName !== ''" shape="sun" role="img" aria-label="Sun is shining"></clr-icon>{{state.hostName}}
+                <clr-icon *ngIf="state.hostName !== ''" shape="host" role="img" aria-label="World is turning"></clr-icon>{{state.hostName}}
               </clr-option>
             </clr-options>
           </clr-combobox>
@@ -73,7 +85,7 @@
           <clr-combobox [(ngModel)]="chooseCluster" name="chooseCluster" required>
             <clr-options *ngIf="mountClusterData">
               <clr-option *clrOptionItems="let state of clusterList; field:'clusterName'" [clrValue]="state">
-                <clr-icon *ngIf="state.clusterName !== ''" shape="sun" role="img" aria-label="Sun is shining"></clr-icon>{{state.clusterName}}
+                <clr-icon *ngIf="state.clusterName !== ''" shape="host-group" role="img" aria-label="World is turning"></clr-icon>{{state.clusterName}}
               </clr-option>
             </clr-options>
           </clr-combobox>
@@ -142,4 +154,15 @@
   </div>
 <!--  </clr-modal>-->
 </div>
+<!--操作成功提示-->
+<clr-modal [(clrModalOpen)]="mountSuccessShow || unmountSuccessShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+  <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+  <div class="modal-body">
+    <p *ngIf="mountSuccessShow">{{'vmfs.mount.success' | translate}}</p>
+    <p *ngIf="unmountSuccessShow">{{'vmfs.unmount.success' | translate}}</p>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary" (click)="mountSuccessShow = false;unmountSuccessShow = false;">{{'menu.ok' | translate}}</button>
+  </div>
+</clr-modal>
 

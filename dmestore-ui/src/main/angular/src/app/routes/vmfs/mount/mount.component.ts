@@ -71,16 +71,25 @@ export class MountComponent implements OnInit{
   chooseUnmountCluster: HostOrCluster = null; // 已选择卸载的集群
   mountedHost: HostOrCluster[] = []; // 已挂载的主机
   mountedCluster: HostOrCluster[] = []; // 已挂载的集群
-
+  mountSuccessShow = false; // 挂载成功窗口
+  unmountSuccessShow = false; // 卸载窗口
   // vmfs数据
   vmfsInfo = {
     name: ''
   };
+
+  modalLoading = false; // 数据加载loading
+  modalHandleLoading = false; // 数据处理loading
+  isOperationErr = false; // 错误信息
+
   ngOnInit(): void {
     // 初始化隐藏窗口
     this.unmountShow = false;
     this.mountShow = false;
     this.hostMountShow = false;
+    this.modalLoading = true;
+    this.modalHandleLoading = false;
+    this.isOperationErr = false;
     this.initData();
   }
 
@@ -125,6 +134,7 @@ export class MountComponent implements OnInit{
           this.hostOrClusterId = ctx[0].id;
           this.hostMountShow = true;
         }
+
         this.cdr.detectChanges();
       });
 
@@ -220,6 +230,7 @@ export class MountComponent implements OnInit{
             });
             this.mountedHost = mountHost;
           }
+          this.modalLoading = false;
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         });
         // 获取集群
@@ -238,6 +249,7 @@ export class MountComponent implements OnInit{
             });
             this.mountedCluster = mountCluster;
           }
+          this.modalLoading = false;
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         });
         this.isLoading = false;
@@ -261,6 +273,7 @@ export class MountComponent implements OnInit{
             this.dataStores = result.data;
           }
           this.isLoading = false;
+          this.modalLoading = false;
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         });
         break;
@@ -275,6 +288,7 @@ export class MountComponent implements OnInit{
             this.dataStores = result.data;
           }
           this.isLoading = false;
+          this.modalLoading = false;
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         });
         break;
@@ -298,6 +312,7 @@ export class MountComponent implements OnInit{
             this.dataStores = result.data;
           }
           this.isLoading = false;
+          this.modalLoading = false;
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         });
         break;
@@ -309,6 +324,7 @@ export class MountComponent implements OnInit{
             this.dataStores = result.data;
           }
           this.isLoading = false;
+          this.modalLoading = false;
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         });
         break;
@@ -373,14 +389,18 @@ export class MountComponent implements OnInit{
       });
       this.mountForm.dataStoreObjectIds = dataStoreObjectIds;
 
+      this.modalHandleLoading = true;
       this.remoteSrv.mountVmfs(this.mountForm).subscribe((result: any) => {
+        this.modalHandleLoading = false;
         if (result.code  ===  '200'){
           console.log('挂载成功');
+          // 隐藏挂载页面
+          this.mountShow = false;
+          this.mountSuccessShow = true;
         } else {
           console.log('挂载异常：' + result.description);
+          this.isOperationErr = true;
         }
-        // 隐藏挂载页面
-        this.mountShow = false;
         this.cdr.detectChanges();
       });
     }
@@ -402,15 +422,18 @@ export class MountComponent implements OnInit{
       }
       const unmountObjIds = this.chooseMountDataStore.map(item => item.objectId);
       this.unmountForm.dataStoreObjectIds = unmountObjIds;
+      this.modalHandleLoading = true;
       this.remoteSrv.unmountVMFS(this.unmountForm).subscribe((result: any) => {
-
+        this.modalHandleLoading = false;
         if (result.code === '200'){
           console.log('unmount  success');
+          // 关闭卸载页面
+          this.unmountShow = false;
+          this.unmountSuccessShow = true;
         } else {
           console.log('unmount  fail：' + result.description);
+          this.isOperationErr = true;
         }
-        // 关闭卸载页面
-        this.unmountShow = false;
         this.cdr.detectChanges();
       });
     }
@@ -461,14 +484,19 @@ export class MountComponent implements OnInit{
     const objectIds = [];
     objectIds.push(this.objectId);
     this.mountForm.dataStoreObjectIds = objectIds;
+
+    this.modalHandleLoading = true;
     this.remoteSrv.mountVmfs(this.mountForm).subscribe((result: any) => {
+      this.modalHandleLoading = false;
       if (result.code  ===  '200'){
         console.log('挂载成功');
+        // 隐藏挂载页面
+        this.mountShow = false;
+        this.mountSuccessShow = true;
       } else {
         console.log('挂载异常：' + result.description);
+        this.isOperationErr = true;
       }
-      // 隐藏挂载页面
-      this.mountShow = false;
       this.cdr.detectChanges();
     });
   }
@@ -489,15 +517,19 @@ export class MountComponent implements OnInit{
       }
       console.log('this.unmountForm', this.unmountForm);
       this.notChooseUnmountDevice = false;
-      this.remoteSrv.unmountVMFS(this.unmountForm).subscribe((result: any) => {
 
+      this.modalHandleLoading = true;
+      this.remoteSrv.unmountVMFS(this.unmountForm).subscribe((result: any) => {
+        this.modalHandleLoading = false;
         if (result.code === '200'){
           console.log('unmount  success');
+          // 关闭卸载页面
+          this.unmountShow = false;
+          this.unmountSuccessShow = true;
         } else {
           console.log('unmount  fail：' + result.description);
+          this.isOperationErr = true;
         }
-        // 关闭卸载页面
-        this.unmountShow = false;
         this.cdr.detectChanges();
       });
     }

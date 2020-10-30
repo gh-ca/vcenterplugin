@@ -27,6 +27,9 @@ export class DeleteComponent implements OnInit{
   objectIds = [];
 
   // delShow:boolean;
+  delSuccessShow = false; // 删除提示窗口
+  modalHandleLoading = false; // 数据处理loading
+  isOperationErr = false; // 错误信息
 
   ngOnInit(): void {
     this.initData();
@@ -72,16 +75,20 @@ export class DeleteComponent implements OnInit{
     const delInfos = {
       dataStoreObjectIds: this.objectIds
     }
+    this.modalHandleLoading = true;
     this.remoteSrv.delVmfs(delInfos).subscribe((result: any) => {
       // 隐藏删除提示页面
+      this.modalHandleLoading = false;
       if (result.code === '200'){
         console.log('DEL success');
+        // 关闭删除页面
+        this.cancel();
+        // 删除成功提示
+        this.delSuccessShow = true;
       } else {
         console.log('DEL faild: ' + result.description);
       }
       this.cdr.detectChanges();
-      // 关闭删除页面
-      this.cancel();
     });
   }
 

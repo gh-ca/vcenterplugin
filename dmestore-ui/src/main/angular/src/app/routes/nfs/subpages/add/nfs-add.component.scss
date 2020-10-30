@@ -324,5 +324,11 @@ input[type=number] {
 
   -moz-appearance: textfield;
 }
-
+.inputOneLine{
+  border-bottom: 1px solid #dbdbdb;
+  border-top:0px;
+  border-left:0px;
+  border-right:0px;
+  width:80px;
+};
 

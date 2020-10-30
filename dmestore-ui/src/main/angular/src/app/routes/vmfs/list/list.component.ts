@@ -61,8 +61,10 @@ export class VmfsListComponent implements OnInit {
   };
 
   modifyShow = false;
+  modifySuccessShow = false; // 编辑程功窗口
 
-  popShow = false; // 弹出层显示
+  popShow = false; // 添加弹出层显示
+  addSuccessShow = false; // 添加成功弹窗
   // 添加表单数据
   form = new GetForm().getAddForm();
   // 编辑form提交数据
@@ -81,12 +83,18 @@ export class VmfsListComponent implements OnInit {
 
   serviceLevelList: ServiceLevelList[] = []; // 服务等级列表
   mountShow = false; // 挂载窗口
+  mountSuccessShow = false; // 挂载成功窗口
   delShow = false; // 删除窗口
+  delSuccessShow = false; // 删除成功窗口
   unmountShow = false; // 卸载窗口
+  unmountSuccessShow = false; // 卸载窗口
   unmountTipsShow = false; // 卸载窗口
   reclaimShow = false; // 空间回收窗口
+  reclaimSuccessShow = false; // 空间回收成功窗口
   changeServiceLevelShow = false; // 变更服务等级
-  expandShow = false; // 变更服务等级
+  changeServiceLevelSuccessShow = false; // 变更服务等级成功
+  expandShow = false; // 扩容
+  expandSuccessShow = false; // 扩容成功提示
   hostList: HostList[] = []; // 挂载页面 主机列表
   clusterList: ClusterList[] = []; // 挂载页面集群列表
   // 挂载form表单
@@ -181,6 +189,8 @@ export class VmfsListComponent implements OnInit {
         this.modifyShow = false;
         // 重新请求数据
         this.scanDataStore();
+        // 打开成功提示窗口
+        this.modifySuccessShow = true;
       } else {
         console.log('modify faild：' + this.modifyForm.oldDsName + result.description);
         this.isOperationErr = true;
@@ -537,6 +547,8 @@ export class VmfsListComponent implements OnInit {
           this.wizard.close();
           // 重新请求数据
           this.scanDataStore();
+          // 打开成功提示窗口
+          this.addSuccessShow = true;
         } else {
           console.log('创建失败：' + result.description);
           // 失败信息
@@ -646,6 +658,8 @@ export class VmfsListComponent implements OnInit {
         this.delShow = false;
         // 重新请求数据
         this.scanDataStore();
+        // 打开成功提示窗口
+        this.delShow = true;
       } else {
         console.log('DEL faild: ' + result.description);
         this.isOperationErr = true;
@@ -755,6 +769,8 @@ export class VmfsListComponent implements OnInit {
           this.mountShow = false;
           // 刷新数据
           this.scanDataStore();
+          // 打开成功提示窗口
+          this.mountSuccessShow = true;
         } else {
           console.log('挂载异常：' + result.description);
           this.isOperationErr = true;
@@ -852,8 +868,11 @@ export class VmfsListComponent implements OnInit {
           this.unmountShow = false;
           // 重新请求数据
           this.scanDataStore();
+          // 打开成功提示窗口
+          this.unmountSuccessShow = true;
         } else {
           console.log('unmount ' + this.rowSelected[0].name + ' fail：' + result.description);
+          this.isOperationErr = true;
         }
         this.cdr.detectChanges();
       });
@@ -873,6 +892,8 @@ export class VmfsListComponent implements OnInit {
         this.reclaimShow = false;
         // 空间回收完成重新请求数据
         this.scanDataStore();
+        // 打开成功提示窗口
+        this.reclaimSuccessShow = true;
       } else {
         console.log('Reclaim ' + name + ' fail：' + result.description);
         this.isOperationErr = true;
@@ -925,6 +946,8 @@ export class VmfsListComponent implements OnInit {
           this.changeServiceLevelShow = false;
           // 重新请求数据
           this.scanDataStore();
+          // 打开成功提示窗口
+          this.changeServiceLevelSuccessShow = true;
         } else {
           console.log('change service level faild: ' + name  + ' Reason:' + result.description);
           this.isOperationErr = true;
@@ -981,6 +1004,8 @@ export class VmfsListComponent implements OnInit {
           this.expandShow = false;
           // 重新请求数据
           this.scanDataStore();
+          // 打开成功提示窗口
+          this.expandSuccessShow = true;
         }else {
           console.log('expand: ' + name  + ' Reason:' + result.description);
           // 错误信息 展示
@@ -1282,5 +1307,19 @@ export class VmfsListComponent implements OnInit {
           break;
       }
     }
+  }
+
+  /**
+   * 关闭成功提示窗口
+   */
+  closeSuccessTips() {
+    this.addSuccessShow = false;
+    this.modifySuccessShow = false;
+    this.expandSuccessShow = false;
+    this.reclaimSuccessShow = false;
+    this.changeServiceLevelSuccessShow = false;
+    this.mountSuccessShow = false;
+    this.unmountSuccessShow = false;
+    this.delSuccessShow = false;
   }
 }

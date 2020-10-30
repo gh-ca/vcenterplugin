@@ -330,3 +330,13 @@
     </ng-template>
   </clr-wizard-page>
 </clr-wizard>
+<!--操作成功提示-->
+<clr-modal [(clrModalOpen)]="addSuccessShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+  <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+  <div class="modal-body">
+    <p *ngIf="addSuccessShow">{{'vmfs.add.success' | translate}}</p>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary" (click)="addSuccessShow = false;">{{'menu.ok' | translate}}</button>
+  </div>
+</clr-modal>
