@@ -634,7 +634,8 @@
     "storeSet": "存储设置",
 
     "createRdmError": "创建RDM出错!",
-    "selectOneSer": "服务等级不能为空！"
+    "selectOneSer": "服务等级不能为空！",
+    "rdmSuccessMsg": "创建RDM成功!"
   },
   "tier": {
     "name": "名称",

@@ -30,7 +30,7 @@ export class RdmComponent implements OnInit {
   storagePools = [];
   hostList = [];
   hostSelected = '';
-  dataStoreName = '';
+  dataStoreObjectId = '';
   levelCheck = 'level';
   dataStores = [];
 
@@ -54,6 +54,14 @@ export class RdmComponent implements OnInit {
   qos2Show = false;
   qos3Show = false;
   qos4Show = false;
+
+  dsLoading = false;
+  dsDeviceLoading = false;
+  slLoading = false;
+  tierLoading = false;
+  submitLoading = false;
+  rdmSuccess = false;
+  rdmError = false;
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
               private commonService: CommonService,
@@ -75,9 +83,9 @@ export class RdmComponent implements OnInit {
 
   // 刷新服务等级列表
   tierFresh(){
-    this.gs.loading = true;
+    this.tierLoading = true;
     this.http.post('servicelevel/listservicelevel', {}).subscribe((response: any) => {
-      this.gs.loading = false;
+      this.tierLoading = false;
       if(response.code == '200'){
         this.serviceLevelsRes = this.recursiveNullDelete(response.data);
         this.serviceLevelsRes = this.serviceLevelsRes.filter(item => item.totalCapacity !== 0);
@@ -210,35 +218,22 @@ export class RdmComponent implements OnInit {
       body = {
         createVolumesRequest: {
           service_level_id: this.service_level_id,
-          volumes: this.configModel.volume_specs,
-          mapping: {
-            host_id: this.hostSelected
-          }
+          volumes: this.configModel.volume_specs
         }
       };
     }
     console.log(b);
-    this.http.post('v1/vmrdm/createRdm?hostId='+this.hostSelected+'&vmObjectId='+this.vmObjectId+'&dataStoreName='+this.dataStoreName
+    this.submitLoading = true;
+    this.http.post('v1/vmrdm/createRdm?vmObjectId='+this.vmObjectId+'&dataStoreObjectId='+this.dataStoreObjectId
       , body).subscribe((result: any) => {
+        this.submitLoading = false;
         if (result.code == '200'){
-          this.closeWin();
+          this.rdmSuccess = true;
         } else{
-          this.isOperationErr = true;
+          this.rdmError = true;
         }
     }, err => {
       console.error('ERROR', err);
-    });
-  }
-
-  basAdd(){
-    this.diskNum = this.diskNum + 1;
-    const i = this.diskNum;
-    this.configModel.volume_specs.push(new volume_specs("name"+i,"unit"+i,"count"+i,"capacity"+i));
-  }
-
-  basRemove(item){
-    this.configModel.volume_specs = this.configModel.volume_specs.filter((i) => {
-        return i != item;
     });
   }
 
@@ -264,9 +259,9 @@ export class RdmComponent implements OnInit {
   }
 
   loadStorageDevice(){
-    this.gs.loading = true;
+    this.dsDeviceLoading = true;
     this.http.get('dmestorage/storages', {}).subscribe((result: any) => {
-      this.gs.loading = false;
+      this.dsDeviceLoading = false;
       if (result.code === '200'){
         this.storageDevices = result.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -277,9 +272,9 @@ export class RdmComponent implements OnInit {
   }
 
   loadStoragePool(storageId: string){
-    this.gs.loading = true;
+    this.slLoading = true;
     this.http.get('dmestorage/storagepools', {params: {storageId, media_type: "all"}}).subscribe((result: any) => {
-      this.gs.loading = false;
+      this.slLoading = false;
       if (result.code === '200'){
         this.storagePools = result.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -289,25 +284,12 @@ export class RdmComponent implements OnInit {
     });
   }
 
-  loadHosts(){
-    this.gs.loading = true;
-    this.http.get('v1/vmrdm/dmeHosts').subscribe((result: any) => {
-      this.gs.loading = false;
-      if (result.code === '200'){
-        this.hostList = result.data;
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      }
-    }, err => {
-      console.error('ERROR', err);
-    });
-  }
-
   loadDataStore(){
-    this.gs.loading = true;
-    this.http.get('v1/vmrdm/vCenter/datastoreOnHost', { params: {hostId : this.vmObjectId}}).subscribe((result: any) => {
-      this.gs.loading = false;
+    this.dsLoading = true;
+    this.http.get('v1/vmrdm/vCenter/datastoreOnHost', { params: {vmObjectId : this.vmObjectId}}).subscribe((result: any) => {
+      this.dsLoading = false;
       if (result.code === '200'){
-        this.dataStores = result.data;
+        this.dataStores = JSON.parse(result.data);
       } else{
         this.dataStores = [];
       }
