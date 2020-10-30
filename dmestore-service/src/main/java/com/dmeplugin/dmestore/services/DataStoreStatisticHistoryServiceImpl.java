@@ -783,7 +783,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                     break;
                     //INTERVAL_ONE_MINUTE查不到值，会报错
                 case RANGE_LAST_1_DAY:
-                    interval = INTERVAL_MINUTE;
+                    interval = INTERVAL_ONE_MINUTE;
                     break;
                 case RANGE_LAST_1_WEEK:
                     interval = INTERVAL_HALF_HOUR;
