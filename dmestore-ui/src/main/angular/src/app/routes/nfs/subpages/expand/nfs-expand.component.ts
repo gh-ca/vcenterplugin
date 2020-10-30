@@ -17,6 +17,8 @@ export class NfsExpandComponent implements OnInit{
   fsId:string;
   errorMsg: string;
   storeObjectId:string; //当入口为vcenter的时候需要获取此值
+  modalLoading = false; // 数据加载loading
+  modalHandleLoading = false; // 数据处理loading
   constructor(private expandService: NfsExpandService, private gs: GlobalsService,
               private activatedRoute: ActivatedRoute,private router:Router){
   }
@@ -36,7 +38,7 @@ export class NfsExpandComponent implements OnInit{
       }
   }
   expandData(){
-    this.gs.loading=true;
+    this.modalHandleLoading=true;
     switch (this.unit) {
       case 'TB':
         this.newCapacity = this.newCapacity * 1024;
@@ -67,7 +69,7 @@ export class NfsExpandComponent implements OnInit{
       }
     }
     this.expandService.changeCapacity(params).subscribe((result: any) => {
-      this.gs.loading=false;
+      this.modalHandleLoading=false;
       if (result.code === '200'){
         if(this.pluginFlag=='plugin'){
           this.backToNfsList();
@@ -81,12 +83,12 @@ export class NfsExpandComponent implements OnInit{
     });
   }
   backToNfsList(){
-    this.gs.loading=false;
+    this.modalLoading=false;
     this.errorMsg=null;
     this.router.navigate(['nfs']);
   }
   closeModel(){
-    this.gs.loading=false;
+    this.modalLoading=false;
     this.errorMsg=null;
     this.gs.getClientSdk().modal.close();
   }
