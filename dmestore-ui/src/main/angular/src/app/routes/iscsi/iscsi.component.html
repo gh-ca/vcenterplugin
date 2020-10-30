@@ -1,5 +1,5 @@
 <div>
-  <div style="margin-left: 30px">
+  <div style="margin-left: 30px;margin-right: 30px">
     <div>
       <form clrForm #myForm="ngForm">
         <clr-select-container>
@@ -82,7 +82,7 @@
       </ng-container>
       <p><span [hidden]="configModel.ethPorts.length != 0 || !isSubmit" style="color: #c61d00;">{{'iscsi.portNullMessage'|translate}}</span></p>
     </div>
-    <div style="margin-top: 20px">
+    <div style="margin-top: 20px;margin-bottom: 40px">
       <button type="button" style="display:block;margin:0 auto" class="btn btn-primary" (click)="submit()">{{'menu.ok' | translate}}</button>
     </div>
   </div>
