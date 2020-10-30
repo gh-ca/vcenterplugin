@@ -137,7 +137,7 @@
               <!-- 服务等级 -->
               <span (click)="serviceLevelBtnFunc();" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'level'}">{{'vmfs.byServiceLevel' | translate}}</span>
           <!-- 非服务等级 -->
-              <span (click)="customerClickFunc();" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'customer'}">{{'vmfs.customer' | translate}}</span>
+              <span (click)="customerClickFunc();" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'customer'}">{{'vmfs.custom' | translate}}</span>
             </span>
       </div>
 
@@ -223,7 +223,14 @@
           </select>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-select-container>
-
+        <!--workload -->
+        <clr-select-container class="selectClass">
+          <label style="color: #9F9F9F;">{{'vmfs.workload' | translate}}</label>
+          <select clrSelect [(ngModel)]="form.workload_type_id" name="workload_type_id">
+            <option *ngFor="let item of workloads" value="{{item.id}}">{{item.name}}</option>
+          </select>
+          <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+        </clr-select-container>
         <!--b.QoS 设置 -->
         <clr-input-container>
           <label>{{'vmfs.qosPolicy' | translate}}</label>

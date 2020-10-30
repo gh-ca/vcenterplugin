@@ -220,6 +220,11 @@ export class RdmComponent implements OnInit {
     console.log(b);
     this.http.post('v1/vmrdm/createRdm?hostId='+this.hostSelected+'&vmObjectId='+this.vmObjectId+'&dataStoreName='+this.dataStoreName
       , body).subscribe((result: any) => {
+        if (result.code == '200'){
+          this.closeWin();
+        } else{
+          this.isOperationErr = true;
+        }
     }, err => {
       console.error('ERROR', err);
     });
@@ -334,6 +339,10 @@ export class RdmComponent implements OnInit {
    */
   addNextPage() {
     this.wizard.next();
+  }
+
+  closeWin(){
+    this.gs.getClientSdk().modal.close();
   }
 
 }

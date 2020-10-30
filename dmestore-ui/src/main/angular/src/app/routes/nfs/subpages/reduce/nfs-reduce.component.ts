@@ -16,6 +16,8 @@ export class NfsReduceComponent implements OnInit{
   pluginFlag: string;//来至插件的标记
   rowSelected = []; // 当前选中数据
   errorMsg: string;
+  modalLoading = false; // 数据加载loading
+  modalHandleLoading = false; // 数据处理loading
   fsId:string;
   constructor(private reduceService: NfsReduceService, private gs: GlobalsService,
               private activatedRoute: ActivatedRoute,private router:Router){
@@ -38,17 +40,17 @@ export class NfsReduceComponent implements OnInit{
     }
   }
   backToNfsList(){
-    this.gs.loading=false;
+    this.modalLoading=false;
     this.errorMsg=null;
     this.router.navigate(['nfs']);
   }
   closeModel(){
     this.errorMsg=null;
-    this.gs.loading=false;
+    this.modalLoading=false;
     this.gs.getClientSdk().modal.close();
   }
   reduceCommit(){
-    this.gs.loading=true;
+    this.modalHandleLoading=true;
     switch (this.unit) {
       case 'TB':
         this.newCapacity = this.newCapacity * 1024;
@@ -79,7 +81,7 @@ export class NfsReduceComponent implements OnInit{
       }
     }
     this.reduceService.changeCapacity(params).subscribe((result: any) => {
-      this.gs.loading=false;
+      this.modalHandleLoading=false;
       if (result.code === '200'){
         if(this.pluginFlag=='plugin'){
           this.backToNfsList();

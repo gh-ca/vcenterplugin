@@ -204,10 +204,16 @@ export class NfsComponent implements OnInit {
     this.vmfsListService.scanVMFS('nfs').subscribe((res: any) => {
       this.isLoading = false;
       if (res.code === '200') {
-        this.getNfsList();
+        //this.getNfsList();
         console.log('Scan success');
+        this.router.navigate(['nfs'], {
+          queryParams: {t: new Date().getTime()}
+        });
       } else {
         console.log('Scan faild');
+        this.router.navigate(['nfs'], {
+          queryParams: {t: new Date().getTime()}
+        });
       }
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });

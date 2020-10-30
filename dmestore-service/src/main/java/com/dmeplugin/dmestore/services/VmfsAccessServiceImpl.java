@@ -528,7 +528,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return objId;
     }
 
-    private String checkOrCreateToHost(String hostIp, String hostId) throws DMEException {
+    @Override
+    public String checkOrCreateToHost(String hostIp, String hostId) throws DMEException {
         //判断主机在DME中是否存在 如果主机不存在就创建并得到主机ID
         String objId = "";
         try {
