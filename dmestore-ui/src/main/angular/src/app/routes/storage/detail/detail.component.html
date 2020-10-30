@@ -463,7 +463,7 @@
           <clr-tab-content >
             <div class="detail-margin-top">
               <div *ngIf="detail" class="clr-row" >
-                  <div class="clr-col-lg-4 clr-col-12">
+                  <div class="clr-col-4">
                     <div class="info-content-title" style="margin-bottom: 2%">{{'storage.detail.cap.capacityUsage' | translate}}</div>
                     <div style=".data">
                       <div class="capacity-wrap">
@@ -497,27 +497,27 @@
                       </div>
                     </div>
                   </div>
-                  <div class="clr-col-lg-4 clr-col-12">
-                    <div class="info-content-title">{{'storage.chart.capacity' | translate}}</div>
-                    <div *ngIf="cd" class="info-charts-wrap" style=".data">
+                  <div class="clr-col-4">
+                    <div class=" d-info-content-title">{{'storage.chart.capacity' | translate}}</div>
+                    <div *ngIf="cd" class="d-info-charts-wrap" style=".data">
                       <div echarts [options]="cd.chart" id="chart3" style="width: 30%;height: 120px;"></div>
-                      <div class="info-content">
-                        <div class="info-content-text">
+                      <div class="d-info-content">
+                        <div class="d-info-content-text">
                           <span>{{'storage.chart.protection' | translate}}</span>
                           <span>{{cd.protection}}</span>
                           <span class="squre protection"></span>
                         </div>
-                        <div class="info-content-text">
+                        <div class="d-info-content-text">
                           <span>{{'storage.chart.fileSystem' | translate}}</span>
                           <span>{{cd.fileSystem}}</span>
                           <span class="squre fs"></span>
                         </div>
-                        <div class="info-content-text">
+                        <div class="d-info-content-text">
                           <span>{{'storage.chart.volume' | translate}}</span>
                           <span>{{cd.volume}}</span>
                           <span class="squre volume"></span>
                         </div>
-                        <div class="info-content-text">
+                        <div class="d-info-content-text">
                           <span>{{'storage.chart.freeCapacity' | translate}}</span>
                           <span>{{cd.freeCapacity}}</span>
                           <span class="squre free"></span>
@@ -525,7 +525,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="clr-col-lg-4 clr-col-12">
+                  <div class="clr-col-4">
                     <div class="info-content-title">{{'storage.detail.cap.capacitySavings' | translate}}</div>
                     <div *ngIf="capSave" class="availability-box"  style=".data">
                       <div class="unit-banner">

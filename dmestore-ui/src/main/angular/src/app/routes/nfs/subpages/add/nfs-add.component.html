@@ -1,7 +1,17 @@
 <div>
   <clr-wizard #wizard [clrWizardOpen]="viewPage=='add_plugin'" [clrWizardClosable]="false">
     <clr-wizard-title>{{'nfs.add_title' | translate}}</clr-wizard-title>
-    <p *ngIf="errorMsg" style="color: red">{{errorMsg}}</p>
+    <p *ngIf="errorMsg" style="color: red">{{'errorMsg.addError' | translate}}</p>
+    <div *ngIf="modalLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+    </div>
+    <div *ngIf="modalHandleLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+    </div>
     <clr-wizard-page [clrWizardPageNextDisabled]="!formPageOne.valid">
       <ng-template clrPageTitle>{{'nfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
       <form clrForm #formPageOne="ngForm">
@@ -58,8 +68,8 @@
           <select clrInput  [(ngModel)]="unit" name="unit" >
             <option value="TB">TB</option>
             <option value="GB">GB</option>
-            <option value="MB">MB</option>
-            <option value="KB">KB</option>
+            <!--<option value="MB">MB</option>-->
+            <!--<option value="KB">KB</option>-->
           </select>
         </clr-input-container>
         <clr-select-container>
@@ -203,7 +213,7 @@
   </clr-wizard>
   <clr-wizard class="add-wizard-wrap" #wizard [clrWizardOpen]="viewPage=='add_vcenter'" [clrWizardClosable]="false">
     <clr-wizard-title>{{'nfs.add_title' | translate}}</clr-wizard-title>
-    <p *ngIf="errorMsg!==''" style="color: red">{{errorMsg}}</p>
+    <p *ngIf="errorMsg" style="color: red">{{'errorMsg.addError' | translate}}</p>
     <clr-wizard-page [clrWizardPageNextDisabled]="!formPageOne.valid">
       <ng-template clrPageTitle>{{'nfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
       <form clrForm #formPageOne="ngForm">
@@ -262,8 +272,8 @@
           <select clrInput  [(ngModel)]="unit" name="unit" >
             <option value="TB">TB</option>
             <option value="GB">GB</option>
-            <option value="MB">MB</option>
-            <option value="KB">KB</option>
+            <!--<option value="MB">MB</option>-->
+            <!--<option value="KB">KB</option>-->
           </select>
         </clr-input-container>
 

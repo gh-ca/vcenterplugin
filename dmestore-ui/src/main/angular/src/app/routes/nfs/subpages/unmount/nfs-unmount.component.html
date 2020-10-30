@@ -5,6 +5,16 @@
     <div class="modal-body">
       <form clrForm>
         <p *ngIf="errorMsg" style="color: red">{{'errorMsg.unMountError' | translate}}</p>
+        <div *ngIf="modalLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+        </div>
+        <div *ngIf="modalHandleLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+        </div>
         <clr-select-container>
           <label>{{'nfs.mountedHost' | translate}}</label>
           <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="hostId"
@@ -23,6 +33,16 @@
     <div>
       <form clrForm>
         <p *ngIf="errorMsg" style="color: red">{{'errorMsg.unMountError' | translate}}</p>
+        <div *ngIf="modalLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+        </div>
+        <div *ngIf="modalHandleLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+        </div>
         <clr-select-container>
           <label>{{'nfs.mountedHost' | translate}}</label>
           <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="hostId"
