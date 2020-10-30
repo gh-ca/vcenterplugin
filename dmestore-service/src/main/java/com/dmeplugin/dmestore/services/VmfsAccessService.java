@@ -135,4 +135,16 @@ public interface VmfsAccessService {
      */
     List<VmfsDataInfo> queryVmfs(String dataStoreObjectId) throws Exception;
 
+
+    /**
+     * DME侧主机检查
+     * @author wangxy
+     * @date 14:00 2020/10/30
+     * @param hostIp
+     * @param hostId
+     * @throws DMEException
+     * @return java.lang.String
+     **/
+    String checkOrCreateToHost(String hostIp, String hostId) throws DMEException;
+
 }

@@ -36,6 +36,16 @@ public class VmRdmServiceImpl implements VmRdmService {
 
     private VCSDKUtils vcsdkUtils;
 
+    private VmfsAccessService vmfsAccessService;
+
+    public VmfsAccessService getVmfsAccessService() {
+        return vmfsAccessService;
+    }
+
+    public void setVmfsAccessService(VmfsAccessService vmfsAccessService) {
+        this.vmfsAccessService = vmfsAccessService;
+    }
+
     public VCSDKUtils getVcsdkUtils() {
         return vcsdkUtils;
     }
@@ -61,7 +71,7 @@ public class VmRdmServiceImpl implements VmRdmService {
     }
 
     @Override
-    public void createRdm(String dataStoreName, String vmObjectId, String hostId, VmRdmCreateBean createBean) throws DMEException {
+    public void createRdm(String dataStoreObjectId, String vmObjectId, VmRdmCreateBean createBean) throws DMEException {
         createDmeRdm(createBean);
         LOG.info("create DME disk succeeded!");
         String requestVolumeName;
@@ -86,6 +96,12 @@ public class VmRdmServiceImpl implements VmRdmService {
             volumeIds.add(volumeArr.get(i).getAsJsonObject().get("id").getAsString());
         }
 
+        //获取vCenter主机信息
+        Map<String, String> vCenterHostMap = vcsdkUtils.getHostByVmObjectId(vmObjectId);
+        String hostIp = vCenterHostMap.get("hostName");
+        String hostObjectId = vCenterHostMap.get("hostObjectId");
+        //
+        String hostId = vmfsAccessService.checkOrCreateToHost(hostIp, hostObjectId);
         if (null == mapping) {
             //将卷映射给主机
             dmeAccessService.hostMapping(hostId, volumeIds);
@@ -93,14 +109,16 @@ public class VmRdmServiceImpl implements VmRdmService {
         LOG.info("disk mapping to host succeeded!");
 
         //查询主机信息
-        Map<String, Object> hostMap = dmeAccessService.getDmeHost(hostId);
-        String hostIp = hostMap.get("ip").toString();
+        //Map<String, Object> hostMap = dmeAccessService.getDmeHost(hostId);
+        //String hostIp = hostMap.get("ip").toString();
         //调用vCenter扫描卷
         vcsdkUtils.hostRescanVmfs(hostIp);
         LOG.info("scan vmfs succeeded!");
 
         //扫描hba，已发现新的卷
         vcsdkUtils.hostRescanHba(hostIp);
+        //vcsdkUtils.refreshStorageSystem(hostObjectId);
+        LOG.info("refreshStorageSystem succeeded!");
 
         //获取LUN信息.有扫描需要一定的时间才能发现得了LUN信息，这里等待两分钟
         String lunStr = "";
@@ -150,7 +168,7 @@ public class VmRdmServiceImpl implements VmRdmService {
                 JsonObject object = entry.getValue();
                 //调用vCenter创建磁盘
                 try {
-                    vcsdkUtils.createDisk(dataStoreName, vmObjectId, object.get("devicePath").getAsString(), size);
+                    vcsdkUtils.createDisk(dataStoreObjectId, vmObjectId, object.get("devicePath").getAsString(), size);
                 } catch (Exception ex) {
                     failList.add(volumeId);
                     errorMsg = ex.getMessage();
@@ -251,10 +269,7 @@ public class VmRdmServiceImpl implements VmRdmService {
     }
 
     @Override
-    public List<DatastoreSummary> getDatastoreMountsOnHost(String hostId) throws DMEException {
-        //查询主机信息
-        Map<String, Object> hostMap = dmeAccessService.getDmeHost(hostId);
-        String hostIp = hostMap.get("ip").toString();
-        return vcsdkUtils.getDatastoreMountsOnHost(hostId, hostIp);
+    public List<Object> getDatastoreMountsOnHost(String vmObjectId) throws DMEException {
+        return vcsdkUtils.getDatastoreMountsOnHost(vmObjectId);
     }
 }
