@@ -18,6 +18,13 @@ export class NfsModifyComponent implements OnInit{
   objectId: string;
   updateNfs=new UpdateNfs();
   errorMsg: string;
+
+  maxbandwidthChoose=false; // 最大带宽 选中
+  maxiopsChoose=false; // 最大iops 选中
+  minbandwidthChoose=false; // 最小带宽 选中
+  miniopsChoose=false; // 最小iops 选中
+  latencyChoose=false; // 时延 选中
+
   constructor(private modifyService: NfsModifyService, private cdr: ChangeDetectorRef,
               private gs: GlobalsService,
               private activatedRoute: ActivatedRoute,private router:Router){
@@ -75,5 +82,54 @@ export class NfsModifyComponent implements OnInit{
   closeModel(){
     this.modalLoading=false;
     this.gs.getClientSdk().modal.close();
+  }
+  qosBlur(type:String, operationType:string) {
+
+    let objVal;
+    if (type === 'add') {
+      switch (operationType) {
+        case 'maxbandwidth':
+          objVal = this.updateNfs.maxBandwidth;
+          break;
+        case 'maxiops':
+          objVal = this.updateNfs.maxIops;
+          break;
+        case 'minbandwidth':
+          objVal = this.updateNfs.minBandwidth;
+          break;
+        case 'miniops':
+          objVal = this.updateNfs.minIops;
+          break;
+        default:
+          objVal = this.updateNfs.latency;
+          break;
+      }
+    }
+    if (objVal && objVal !== '') {
+      if (objVal.toString().match(/\d+(\.\d{0,2})?/)) {
+        objVal = objVal.toString().match(/\d+(\.\d{0,2})?/)[0];
+      } else {
+        objVal = '';
+      }
+    }
+    if (type === 'add') {
+      switch (operationType) {
+        case 'maxbandwidth':
+          this.updateNfs.maxBandwidth = objVal;
+          break;
+        case 'maxiops':
+          this.updateNfs.maxIops = objVal;
+          break;
+        case 'minbandwidth':
+          this.updateNfs.minBandwidth = objVal;
+          break;
+        case 'miniops':
+          this.updateNfs.minIops = objVal;
+          break;
+        default:
+          this.updateNfs.latency = objVal;
+          break;
+      }
+    }
   }
 }
