@@ -264,6 +264,12 @@
     "reclaim": {
       "title":"提示",
       "content":"确认要回收空间吗?"
+    },
+    "filter": {
+      "all": "所有",
+      "status": {
+        "normal": "正常"
+      }
     }
   },
   "storage":{

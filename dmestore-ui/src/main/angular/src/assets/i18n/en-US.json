@@ -263,6 +263,12 @@
     "reclaim": {
       "title":"Tips",
       "content":"Are you sure to reclaim?"
+    },
+    "filter": {
+      "all": "All",
+      "status": {
+        "normal": "Normal"
+      }
     }
   },
   "storage":{

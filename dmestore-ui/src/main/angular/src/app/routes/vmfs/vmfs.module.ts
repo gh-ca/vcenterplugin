@@ -18,6 +18,7 @@ import {ModifyComponent} from "./modify/modify.component";
 import {ReclaimComponent} from "./reclaim/reclaim.component";
 import {DeleteComponent} from "./delete/delete.component";
 import {DeviceFilter, ProtectionStatusFilter, ServiceLevelFilter, StatusFilter} from "./list/filter.component";
+import {StorageService} from "../storage/storage.service";
 
 const COMPONENTS = [VmfsListComponent];
 const COMPONENTS_DYNAMIC = [];
@@ -28,5 +29,6 @@ const COMPONENTS_DYNAMIC = [];
     ServiceLevelComponent, ExpandComponent, ModifyComponent, DeleteComponent, ReclaimComponent, StatusFilter, DeviceFilter,
     ServiceLevelFilter, ProtectionStatusFilter],
   entryComponents: COMPONENTS_DYNAMIC,
+  providers: [StorageService]
 })
 export class VmfsModule {}
