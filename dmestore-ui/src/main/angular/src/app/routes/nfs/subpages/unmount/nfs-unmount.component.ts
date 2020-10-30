@@ -21,6 +21,7 @@ export class NfsUnmountComponent implements OnInit{
   hostId:string;
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
+  unmountTipsShow=false;
   constructor(private unmountService: NfsUnmountService, private gs: GlobalsService,
               private activatedRoute: ActivatedRoute,private router:Router, private cdr: ChangeDetectorRef){
   }
@@ -64,24 +65,15 @@ export class NfsUnmountComponent implements OnInit{
     this.router.navigate(['nfs']);
   }
   unMount(){
-    var params={
-        "dataStoreObjectId": this.dataStoreObjectId,
-        "hostId":this.hostId
-      };
-    this.modalHandleLoading=true;
-    this.unmountService.unmount(params).subscribe((result: any) => {
-      this.modalHandleLoading=false;
-      if (result.code === '200'){
-        if(this.pluginFlag=='plugin'){
-          this.backToNfsList();
-        }else{
-          this.closeModel();
-        }
+    if(this.viewPage=='unmount_vcenter'||this.viewPage=='unmount_pugin'){
+      if (this.hostList.length==1){
+        this.unmountTipsShow=true;
       }else{
-        this.errorMsg = '1';
-        console.log("unMount Failed:",result.description)
+        this.unmountHandleFunc();
       }
-    });
+    }else{
+      this.unmountHandleFunc();
+    }
   }
   closeModel(){
     this.errorMsg = null;
@@ -114,6 +106,26 @@ export class NfsUnmountComponent implements OnInit{
       if (r.code=='200'){
         this.hostList=r.data;
         this.cdr.detectChanges();
+      }
+    });
+  }
+  unmountHandleFunc(){
+    var params={
+      "dataStoreObjectId": this.dataStoreObjectId,
+      "hostId":this.hostId
+    };
+    this.modalHandleLoading=true;
+    this.unmountService.unmount(params).subscribe((result: any) => {
+      this.modalHandleLoading=false;
+      if (result.code === '200'){
+        if(this.pluginFlag=='plugin'){
+          this.backToNfsList();
+        }else{
+          this.closeModel();
+        }
+      }else{
+        this.errorMsg = '1';
+        console.log("unMount Failed:",result.description)
       }
     });
   }
