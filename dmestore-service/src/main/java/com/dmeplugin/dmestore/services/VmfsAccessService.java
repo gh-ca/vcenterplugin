@@ -142,7 +142,7 @@ public interface VmfsAccessService {
      * @param name
      * @return
      */
-    Boolean queryDatastoreByName(String name, String type);
+    Boolean queryDatastoreByName(String name);
 
 
     /**
@@ -155,7 +155,5 @@ public interface VmfsAccessService {
      * @return java.lang.String
      **/
     String checkOrCreateToHost(String hostIp, String hostId) throws DMEException;
-
-	 Boolean queryDatastoreByName(String name, String type);
 
 }
