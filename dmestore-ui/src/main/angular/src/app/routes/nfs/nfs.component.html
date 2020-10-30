@@ -40,12 +40,22 @@
     <clr-datagrid id="nfs-grid" [(clrDgSelected)]="rowSelected" [clrDgLoading]="isLoading">
       <clr-dg-column [clrDgField]="'name'">{{'nfs.name' | translate}}</clr-dg-column>
 
-      <clr-dg-column [hidden]="radioCheck!=='list'" >{{'nfs.status' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" >
+        {{'nfs.status' | translate}}
+        <clr-dg-filter [clrDgFilter]="statusFilter">
+          <status-filter #statusFilter></status-filter>
+        </clr-dg-filter>
+      </clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacity'" [clrDgSortOrder]="descSort">{{'nfs.totalCapacity' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='list'" >{{'nfs.freeCapacity' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacityUsage'" [clrDgSortOrder]="descSort">{{'nfs.capacityUsage' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='list'" >{{'nfs.provisioningCapacity' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" >{{'nfs.device' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" >
+        {{'nfs.device' | translate}}
+        <clr-dg-filter [clrDgFilter]="deviceFilter">
+          <device-filter #deviceFilter></device-filter>
+        </clr-dg-filter>
+      </clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'logicPort'">{{'nfs.logicPort' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'shareIp'">{{'nfs.shareIp' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'sharePath'">{{'nfs.sharePath' | translate}}</clr-dg-column>
