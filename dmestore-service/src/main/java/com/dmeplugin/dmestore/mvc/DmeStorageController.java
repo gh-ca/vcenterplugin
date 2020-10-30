@@ -69,9 +69,6 @@ public class DmeStorageController extends BaseController{
             e.printStackTrace();
             return failure(e.getMessage());
         }
-
-
-
     }
 
     /**
@@ -393,6 +390,36 @@ public class DmeStorageController extends BaseController{
         }
         return failure(failureStr);
     }
+    /**
+     * 通过名字查询DME中是否存在指定volume
+     * @param name volume name
+     * @return
+     */
+    @GetMapping("/queryvolumebyname")
+    public ResponseBodyBean queryVolumeByName(@RequestParam("name") String name,@RequestParam("storageId") String storageId){
+        try {
+            return success(dmeStorageService.queryVolumeByName(name, storageId));
+        } catch (DMEException e) {
+            return failure(e.getMessage());
+        }
+    }
+    @GetMapping("/queryfsbyname")
+    public ResponseBodyBean queryFsByName(@RequestParam("name") String name,@RequestParam("storageId") String storageId){
+        try {
+            return success(dmeStorageService.queryFsByName(name, storageId));
+        } catch (DMEException e) {
+            return failure(e.getMessage());
+        }
+    }
+    @GetMapping("/querysharebyname")
+    public ResponseBodyBean queryShareByName(@RequestParam("name") String name,@RequestParam("storageId") String storageId){
+        try {
+            return success(dmeStorageService.queryShareByName("/"+name, storageId));
+        } catch (DMEException e) {
+            return failure(e.getMessage());
+        }
+    }
+
     /*@GetMapping("/filesystemdetail")
     @ResponseBody
     public ResponseBodyBean getFileSystemDetail(@RequestParam(name = "fileSystemId")String fileSystemId) {

@@ -1,6 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.model.VmfsDataInfo;
 import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
 
@@ -129,10 +130,16 @@ public interface VmfsAccessService {
 
     /**
      * query vmfs
-
      * @return List<VmfsDataInfo>
      * @throws Exception when error
      */
     List<VmfsDataInfo> queryVmfs(String dataStoreObjectId) throws Exception;
 
+    /**
+     * 根据vmfs名字查询指定vmfs
+     *
+     * @param name
+     * @return
+     */
+    Boolean queryDatastoreByName(String name, String type);
 }
