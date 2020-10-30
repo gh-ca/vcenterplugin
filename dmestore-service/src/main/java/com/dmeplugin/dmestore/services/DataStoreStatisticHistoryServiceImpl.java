@@ -937,7 +937,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private List<String> initStorageDiskIndicator(boolean isCurrent) {
         List<String> indicators = new ArrayList<>();
         if (isCurrent) {
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_THROUGHPUT);//IOPS
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_READTHROUGHPUT);//读IOPS
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_BANDWIDTH);//bandwidth
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_UTILITY);//使用率
         } else {
