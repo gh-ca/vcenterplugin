@@ -40,6 +40,7 @@ export class ServiceLevelComponent implements OnInit{
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
   isOperationErr = false; // 错误信息
+  changeServiceLevelSuccessShow = false; // 变更服务等级成功
 
   ngOnInit(): void {
     // this.changeServiceLevelShow = false;
@@ -129,6 +130,7 @@ export class ServiceLevelComponent implements OnInit{
           console.log('change service level success:' + name);
           // 关闭
           this.cancel();
+          this.changeServiceLevelSuccessShow = true;
         } else {
           console.log('change service level faild: ' + name  + ' Reason:' + result.description);
           this.isOperationErr = true;

@@ -31,6 +31,7 @@ export class ReclaimComponent implements OnInit{
   modalHandleLoading = false; // 数据处理loading
   isOperationErr = false; // 错误信息
   modalLoading = false; // 数据加载loading
+  reclaimSuccessShow = false; // 空间回收成功窗口
 
   ngOnInit(): void {
     // this.reclaimShow = false;
@@ -85,6 +86,8 @@ export class ReclaimComponent implements OnInit{
         console.log('Reclaim success');
 
         this.cancel();
+
+        this.reclaimSuccessShow = true;
       } else {
         console.log('Reclaim fail：' + result.description);
         this.isOperationErr = true;
