@@ -139,7 +139,7 @@
       <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.serviceLevelName}}</clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='list'">
         <span *ngIf="item.vmfsProtected">
-          <span class="color-square" style="background-color: green; margin-right: 10px"></span>{{'vmfs.protectionStatus.protected' | translate}}
+          <img src="./assets/images/icon-unprotected.svg">{{'vmfs.protectionStatus.protected' | translate}}
         </span>
         <span *ngIf="!item.vmfsProtected">
           <span class="color-square" style="background-color: green; margin-right: 10px"></span>{{'vmfs.protectionStatus.unprotected' | translate}}
@@ -713,7 +713,7 @@
           <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
           <clr-dg-column [clrDgField]="'type'">{{'vmfs.type' | translate}}</clr-dg-column>
 
-          <clr-dg-placeholder>{{'vmfs.unmount.host' | translate}}</clr-dg-placeholder>
+          <clr-dg-placeholder>{{'vmfs.unmount.notHaveHost' | translate}}</clr-dg-placeholder>
 
           <clr-dg-row *clrDgItems="let item of mountedHost" [clrDgItem]="item">
             <clr-dg-cell hidden>{{item.deviceId}}</clr-dg-cell>
