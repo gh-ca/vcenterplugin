@@ -190,14 +190,16 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         PreparedStatement pstm = null;
         try {
             con = getConnection();
-            String sql = "UPDATE " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " SET STORE_NAME=?,VOLUME_NAME=?,UPDATETIME=? where VOLUME_WWN=?";
+            String sql = "UPDATE " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " SET STORE_ID=?,VOLUME_ID=?,STORE_NAME=?,VOLUME_NAME=?,UPDATETIME=? where VOLUME_WWN=?";
             pstm = con.prepareStatement(sql);
             con.setAutoCommit(false);
             for (DmeVmwareRelation o : list) {
-                pstm.setString(1, o.getStoreName());
-                pstm.setString(2, o.getVolumeName());
-                pstm.setDate(3, new Date(System.currentTimeMillis()));
-                pstm.setString(4, o.getVolumeWwn());
+                pstm.setString(1, o.getStoreId());
+                pstm.setString(2, o.getVolumeId());
+                pstm.setString(3, o.getStoreName());
+                pstm.setString(4, o.getVolumeName());
+                pstm.setDate(5, new Date(System.currentTimeMillis()));
+                pstm.setString(6, o.getVolumeWwn());
                 pstm.addBatch();
             }
             pstm.executeBatch();
