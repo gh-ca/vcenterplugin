@@ -69,6 +69,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private final String CREATE_VOLUME_UNSERVICE_URL = "/rest/blockservice/v1/volumes/customize-volumes";
     private final String MOUNT_VOLUME_TO_HOST_URL = "/rest/blockservice/v1/volumes/host-mapping";
     private final String MOUNT_VOLUME_TO_HOSTGROUP_URL = "/rest/blockservice/v1/volumes/hostgroup-mapping";
+    private final String API_VOLUME_DETAIL = "/rest/blockservice/v1/volumes/";
 
 
     @Override
@@ -187,11 +188,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                 if (statisticObject != null) {
                                     VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
                                     vmfsDataInfo.setVolumeId(volumeId);
-                                    vmfsDataInfo.setIops(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT, "max"), null));
-                                    vmfsDataInfo.setBandwidth(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH, "max"), null));
-                                    vmfsDataInfo.setReadResponseTime(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_READRESPONSETIME, "max"), null));
-                                    vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITERESPONSETIME, "max"), null));
-                                    vmfsDataInfo.setLatency(ToolUtils.jsonToFloat(getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME, "max"), null));
+                                    vmfsDataInfo.setIops(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT, "max"), null));
+                                    vmfsDataInfo.setBandwidth(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH, "max"), null));
+                                    vmfsDataInfo.setReadResponseTime(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_READRESPONSETIME, "max"), null));
+                                    vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITERESPONSETIME, "max"), null));
+                                    vmfsDataInfo.setLatency(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME, "max"), null));
                                     relists.add(vmfsDataInfo);
                                 }
                             }
@@ -529,7 +530,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return objId;
     }
 
-    private String checkOrCreateToHost(String hostIp, String hostId) throws DMEException {
+    @Override
+    public String checkOrCreateToHost(String hostIp, String hostId) throws DMEException {
         //判断主机在DME中是否存在 如果主机不存在就创建并得到主机ID
         String objId = "";
         try {
@@ -1744,7 +1746,18 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
         List<Map<String, String>> clusters = null;
         //取得vcenter中的所有cluster
-        String listStr = vcsdkUtils.getMountClustersByDsObjectId(storageId);
+        DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(storageId);
+        if (null==dvr){
+            throw new DMEException("存储关联关系为空");
+        }
+        LOG.info("getVolumeId==" + dvr.getVolumeId());
+        List<String> hostgroupids=getDmeAttachHostGroupByVolumeId(dvr.getVolumeId());
+        Map<String,String> mappeddmegroups=new HashMap<>();
+        for (String hostgroupid:hostgroupids){
+            Map<String,Object> hostgroupmap=dmeAccessService.getDmeHostGroup(hostgroupid);
+            mappeddmegroups.put(String.valueOf(hostgroupmap.get("name")),"has");
+        }
+        String listStr = vcsdkUtils.getMountClustersByDsObjectId(storageId,mappeddmegroups);
         LOG.info("host getClustersByDsObjectId==" + listStr);
         if (!StringUtils.isEmpty(listStr)) {
             clusters = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
@@ -1786,6 +1799,33 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }*/
         return hostGroupMapList;
     }
+
+    private List<String> getDmeAttachHostGroupByVolumeId(String volumeId) throws DMEException {
+
+        String url;
+        List<String> groupids=new ArrayList<>();
+        url = API_VOLUME_DETAIL + volumeId;
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+        int code = responseEntity.getStatusCodeValue();
+        if (code != 200) {
+            throw new DMEException( "search host id error");
+        }
+        String object = responseEntity.getBody();
+        JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+        JsonObject volume = jsonObject.get("volume").getAsJsonObject();
+        JsonArray attachments = volume.get("attachments").getAsJsonArray();
+        //int length = attachments.getAsString().length();
+        for (JsonElement jsonElement : attachments) {
+            JsonObject element = jsonElement.getAsJsonObject();
+            String attachedHostGroupId = ToolUtils.jsonToStr(element.get("attached_host_group"));
+            if (!"".equalsIgnoreCase(attachedHostGroupId)) {
+                groupids.add(attachedHostGroupId);
+            }
+        }
+
+        return groupids;
+    }
+
 
     private List<String> getDmeStorageIdsByStorageId(String storageId) throws DmeSqlException {
         //通过v魔法师DATa StorageId查询关联的dmeStorageIds集合(即卷id集合)
@@ -1860,26 +1900,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return hostGroupMap;
     }
 
-    //从性能数据中提取对应指标的对应值
-    private JsonElement getStatistcValue(JsonObject statisticObject, String indicator, String type) {
-        JsonElement object = null;
-        if (null != statisticObject) {
-            JsonElement indicatorEl = statisticObject.get(indicator);
-            if (!ToolUtils.jsonIsNull(indicatorEl)) {
-                JsonObject indicatorJson = indicatorEl.getAsJsonObject();
-                JsonElement typeEl = indicatorJson.get(type);
-                if (!ToolUtils.jsonIsNull(typeEl)) {
-                    JsonObject typeJson = typeEl.getAsJsonObject();
-                    Set<Map.Entry<String, JsonElement>> sets = typeJson.entrySet();
-                    for (Map.Entry<String, JsonElement> set : sets) {
-                        object = set.getValue();//只取一个
-                        break;
-                    }
-                }
-            }
-        }
-        return object;
-    }
+
 
     public boolean isVmfs(String objectId) throws DmeSqlException {
         List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_VMFS);

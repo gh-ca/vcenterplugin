@@ -19,6 +19,9 @@ export class NfsUnmountComponent implements OnInit{
   hostList: Host[];
   dataStoreObjectId:string;
   hostId:string;
+  modalLoading = false; // 数据加载loading
+  modalHandleLoading = false; // 数据处理loading
+  unmountTipsShow=false;
   constructor(private unmountService: NfsUnmountService, private gs: GlobalsService,
               private activatedRoute: ActivatedRoute,private router:Router, private cdr: ChangeDetectorRef){
   }
@@ -28,7 +31,7 @@ export class NfsUnmountComponent implements OnInit{
     });
     if ("dataStore"===this.routePath){
       //入口是DataSource
-      this.gs.loading=true;
+      this.modalLoading=true;
       this.viewPage='unmount_pugin'
       this.activatedRoute.queryParams.subscribe(queryParam => {
         this.dataStoreObjectId = queryParam.objectId;
@@ -46,44 +49,35 @@ export class NfsUnmountComponent implements OnInit{
       this.getMountedHostList(this.dataStoreObjectId);
     }
     else if("host"=== this.routePath){
-      this.gs.loading=true;
+      this.modalLoading=true;
       this.viewPage='unmount_host';
       const ctx = this.gs.getClientSdk().app.getContextObjects();
       if (ctx!=null){
         this.hostId=ctx[0].id;
         this.getDataStoreByHostId(this.hostId);
       }
-      this.gs.loading=false;
+      this.modalLoading=false;
     }
   }
   backToNfsList(){
     this.errorMsg = null;
-    this.gs.loading=false;
+    this.modalLoading=false;
     this.router.navigate(['nfs']);
   }
   unMount(){
-    var params={
-        "dataStoreObjectId": this.dataStoreObjectId,
-        "hostId":this.hostId
-      };
-    this.gs.loading=true;
-    this.unmountService.unmount(params).subscribe((result: any) => {
-      this.gs.loading=false;
-      if (result.code === '200'){
-        if(this.pluginFlag=='plugin'){
-          this.backToNfsList();
-        }else{
-          this.closeModel();
-        }
+    if(this.viewPage=='unmount_vcenter'||this.viewPage=='unmount_pugin'){
+      if (this.hostList.length==1){
+        this.unmountTipsShow=true;
       }else{
-        this.errorMsg = '1';
-        console.log("unMount Failed:",result.description)
+        this.unmountHandleFunc();
       }
-    });
+    }else{
+      this.unmountHandleFunc();
+    }
   }
   closeModel(){
     this.errorMsg = null;
-    this.gs.loading=false;
+    this.modalLoading=false;
     this.gs.getClientSdk().modal.close();
   }
   formatCapacity(c: number){
@@ -98,7 +92,7 @@ export class NfsUnmountComponent implements OnInit{
   //获取NFS下挂载的主机列表
   getMountedHostList(hostId:string){
     this.unmountService.getMountedHostList(hostId).subscribe((r: any) => {
-      this.gs.loading=false;
+      this.modalLoading=false;
       if (r.code=='200'){
         this.hostList=r.data;
         this.cdr.detectChanges();
@@ -108,10 +102,30 @@ export class NfsUnmountComponent implements OnInit{
   //获取主机下一挂载的NFS列表
   getDataStoreByHostId(hostId:string){
     this.unmountService.getMountedHostList(hostId).subscribe((r: any) => {
-      this.gs.loading=false;
+      this.modalLoading=false;
       if (r.code=='200'){
         this.hostList=r.data;
         this.cdr.detectChanges();
+      }
+    });
+  }
+  unmountHandleFunc(){
+    var params={
+      "dataStoreObjectId": this.dataStoreObjectId,
+      "hostId":this.hostId
+    };
+    this.modalHandleLoading=true;
+    this.unmountService.unmount(params).subscribe((result: any) => {
+      this.modalHandleLoading=false;
+      if (result.code === '200'){
+        if(this.pluginFlag=='plugin'){
+          this.backToNfsList();
+        }else{
+          this.closeModel();
+        }
+      }else{
+        this.errorMsg = '1';
+        console.log("unMount Failed:",result.description)
       }
     });
   }

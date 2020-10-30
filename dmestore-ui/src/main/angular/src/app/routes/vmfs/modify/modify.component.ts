@@ -36,6 +36,7 @@ export class ModifyComponent implements OnInit{
   modalHandleLoading = false; // 数据处理loading
   modalLoading = false; // 数据加载loading
   isOperationErr = false; // 错误信息
+  modifySuccessShow = false; // 编辑程功窗口
 
   ngOnInit(): void {
     this.initData();
@@ -70,6 +71,7 @@ export class ModifyComponent implements OnInit{
               this.modifyForm.volumeId = this.vmfsInfo.volumeId;
               this.modifyForm.oldDsName = this.vmfsInfo.name;
               this.modifyForm.dataStoreObjectId = this.vmfsInfo.objectid;
+              this.modifyForm.service_level_name = this.vmfsInfo.serviceLevelName;
               if (this.vmfsInfo.serviceLevelName === '') { // 非服务等级
                 this.isServiceLevelData = false;
                 const wwns = [];
@@ -139,6 +141,7 @@ export class ModifyComponent implements OnInit{
         console.log('modify success:' + this.modifyForm.oldDsName);
         // 关闭编辑窗口
         this.cancel();
+        this.modifySuccessShow = true;
       } else {
         console.log('modify faild：' + this.modifyForm.oldDsName + result.description);
         this.isOperationErr = true;

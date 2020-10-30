@@ -17,6 +17,8 @@ export class NfsAddComponent implements OnInit{
   pluginFlag: string;
   addForm = new AddNfs();
   errorMsg: string;
+  modalLoading = false; // 数据加载loading
+  modalHandleLoading = false; // 数据处理loading
   unit='GB';
   checkedPool:any;
   storageList: StorageList[] = [];
@@ -24,6 +26,15 @@ export class NfsAddComponent implements OnInit{
   logicPorts: LogicPort[] = [];
   hostList: Host[] = [];
   vmkernelList: Vmkernel[]=[];
+
+
+
+  maxbandwidthChoose=false; // 最大带宽 选中
+  maxiopsChoose=false; // 最大iops 选中
+  minbandwidthChoose=false; // 最小带宽 选中
+  miniopsChoose=false; // 最小iops 选中
+  latencyChoose=false; // 时延 选中
+
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
   @ViewChild('addPageOne') addPageOne: ClrWizardPage;
@@ -35,6 +46,7 @@ export class NfsAddComponent implements OnInit{
   }
 
   ngOnInit(): void {
+    this.modalLoading=true;
     this.viewPage='add_plugin'
     this.activatedRoute.queryParams.subscribe(queryParam => {
       this.pluginFlag =queryParam.flag;
@@ -52,14 +64,16 @@ export class NfsAddComponent implements OnInit{
       //入口来至Vcenter
       this.viewPage='add_vcenter'
     }
-    this.gs.loading=true;
+
     this.storageService.getData().subscribe((s: any) => {
+      this.modalLoading=false;
       if (s.code === '200'){
         this.storageList = s.data;
-        this.gs.loading=false;
+        this.modalLoading=false;
       }
     });
     this.addService.getHostList().subscribe((r: any) => {
+      this.modalLoading=false;
       if (r.code === '200'){
         this.hostList = r.data;
         this.cdr.detectChanges();
@@ -83,7 +97,7 @@ export class NfsAddComponent implements OnInit{
   }
   addNfs(){
     //
-    this.gs.loading=true;
+    this.modalHandleLoading=true;
     this.addForm.poolRawId=this.checkedPool.diskPoolId;
     this.addForm.storagePoolId= this.checkedPool.id;
     // 单位换算
@@ -101,7 +115,7 @@ export class NfsAddComponent implements OnInit{
         break;
     }
     this.addService.addNfs(this.addForm).subscribe((result: any) => {
-      this.gs.loading=false;
+      this.modalHandleLoading=false;
       if (result.code === '200'){
         if (this.pluginFlag=='plugin'){
           this.backToNfsList();
@@ -109,14 +123,14 @@ export class NfsAddComponent implements OnInit{
           this.closeModel();
         }
       }else{
-        this.errorMsg = '添加失败！'+result.description;
-        this.cdr.detectChanges();
-        this.wizard.open();
+        this.errorMsg = '1';
+        console.log("Delete failed:",result.description)
+
       }
     });
   }
   selectStoragePool(){
-    this.gs.loading=true;
+    this.modalLoading=true;
     this.storagePools = null;
     this.logicPorts = null;
     // 选择存储后获取存储池
@@ -133,7 +147,7 @@ export class NfsAddComponent implements OnInit{
     // 选择存储后逻辑端口
     this.storageService.getLogicPortListByStorageId(this.addForm.storagId)
       .subscribe((r: any) => {
-        this.gs.loading=false;
+        this.modalLoading=false;
         if (r.code === '200'){
           this.logicPorts = r.data;
           this.cdr.detectChanges();
@@ -141,12 +155,12 @@ export class NfsAddComponent implements OnInit{
       });
   }
   checkHost(){
-    this.gs.loading=true;
+    this.modalLoading=true;
     this.addForm.vkernelIp=null;
     //选择主机后获取虚拟网卡
     this.addService.getVmkernelListByObjectId(this.addForm.hostObjectId)
       .subscribe((r: any) => {
-        this.gs.loading=false;
+        this.modalLoading=false;
         if (r.code === '200'){
           this.vmkernelList = r.data;
           this.cdr.detectChanges();
@@ -154,13 +168,61 @@ export class NfsAddComponent implements OnInit{
       });
   }
   backToNfsList(){
-    this.gs.loading=false;
+    this.modalLoading=false;
     this.router.navigate(['nfs']);
   }
   closeModel(){
-    this.gs.loading=false;
+    this.modalLoading=false;
     this.gs.getClientSdk().modal.close();
   }
+  qosBlur(type:String, operationType:string) {
 
+    let objVal;
+    if (type === 'add') {
+      switch (operationType) {
+        case 'maxbandwidth':
+          objVal = this.addForm.maxBandwidth;
+          break;
+        case 'maxiops':
+          objVal = this.addForm.maxIops;
+          break;
+        case 'minbandwidth':
+          objVal = this.addForm.minBandwidth;
+          break;
+        case 'miniops':
+          objVal = this.addForm.minIops;
+          break;
+        default:
+          objVal = this.addForm.latency;
+          break;
+      }
+    }
+    if (objVal && objVal !== '') {
+      if (objVal.toString().match(/\d+(\.\d{0,2})?/)) {
+        objVal = objVal.toString().match(/\d+(\.\d{0,2})?/)[0];
+      } else {
+        objVal = '';
+      }
+    }
+    if (type === 'add') {
+      switch (operationType) {
+        case 'maxbandwidth':
+          this.addForm.maxBandwidth = objVal;
+          break;
+        case 'maxiops':
+          this.addForm.maxIops = objVal;
+          break;
+        case 'minbandwidth':
+          this.addForm.minBandwidth = objVal;
+          break;
+        case 'miniops':
+          this.addForm.minIops = objVal;
+          break;
+        default:
+          this.addForm.latency = objVal;
+          break;
+      }
+    }
+  }
 }
 

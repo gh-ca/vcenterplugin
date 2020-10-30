@@ -2,6 +2,17 @@
   <clr-modal [clrModalOpen]="viewPage=='delete_plugin'" [clrModalSize]="'sm'">
     <h3 class="modal-title">{{'nfs.del.title' | translate}}</h3>
     <div class="modal-body">
+      <p *ngIf="errorMsg" style="color: red">{{'errorMsg.deleteError' | translate}}</p>
+      <div *ngIf="modalLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+      </div>
+      <div *ngIf="modalHandleLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+      </div>
       <p>{{'nfs.del.content' | translate}}</p>
     </div>
     <div class="modal-footer">
@@ -11,7 +22,17 @@
   </clr-modal>
   <div *ngIf="viewPage=='delete_vcenter'">
     <div>
-      <p *ngIf="errorMsg" style="color: red">{{'errorMsg.reduceError' | translate}}</p>
+      <p *ngIf="errorMsg" style="color: red">{{'errorMsg.deleteError' | translate}}</p>
+      <div *ngIf="modalLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+      </div>
+      <div *ngIf="modalHandleLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+      </div>
       <p>{{'nfs.del.content' | translate}}</p>
     </div>
     <div style="float: right">

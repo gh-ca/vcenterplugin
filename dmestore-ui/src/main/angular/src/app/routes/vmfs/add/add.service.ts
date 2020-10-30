@@ -34,5 +34,10 @@ export class AddService {
   getServiceLevelList(params = {}) {
     return this.http.post('servicelevel/listservicelevel', params);
   }
+
+  // 获取WorkLoads
+  getWorkLoads(storageId: string) {
+    return  this.http.get('accessdme/getworkloads', {params: {storageId}});
+  }
 }
 

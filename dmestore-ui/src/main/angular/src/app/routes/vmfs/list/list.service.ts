@@ -101,6 +101,11 @@ export class VmfsListService {
     return  this.http.get('accessdme/scandatastore', {params: {storageType}});
   }
 
+  // 获取WorkLoads
+  getWorkLoads(storageId: string) {
+    return  this.http.get('accessdme/getworkloads', {params: {storageId}});
+  }
+
 }
 // vmfs列表
 export interface VmfsInfo {
@@ -126,7 +131,8 @@ export interface VmfsInfo {
   volumeId: string;
   volumeName: string;
   wwn: string;
-  usedCapacity: number;
+  usedCapacity: number; // 使用容量
+  capacityUsage: string; // 利用率
 }
 // 存储
 export interface StorageList {
@@ -198,7 +204,15 @@ export interface HostOrCluster {
   deviceName: string;
   deviceType: string;
 }
-
+export interface Workload{
+    id: string;
+    name: string;
+    type: string;
+    block_size: string;
+    create_type: string;
+    enable_compress: string;
+    enable_dedup: string;
+}
 export class GetForm {
   // 获取添加form表单（初始化的添加表单）
   getAddForm() {

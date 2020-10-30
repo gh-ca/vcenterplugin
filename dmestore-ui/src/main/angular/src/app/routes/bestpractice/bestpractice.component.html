@@ -1,4 +1,4 @@
-<div>
+<div style="height: 100%;">
   <!-- 头部按钮组 -->
   <div>
     <button class="btn btn-primary" [disabled]="rowSelected.length === 0" (click)="applyClick('1')">{{'bestPractice.apply'|translate}}</button>
@@ -78,6 +78,9 @@
     </div>
   </clr-modal>
 
+
+  <div class="loadingDiv" [hidden]="!applyLoading"><clr-spinner class="spinner spinner-md">Loading</clr-spinner></div>
+  <div class="loadingDiv" [hidden]="!checkLoading"><clr-spinner class="spinner spinner-md">Loading</clr-spinner></div>
 </div>
 
 

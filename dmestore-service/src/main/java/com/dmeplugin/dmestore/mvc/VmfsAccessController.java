@@ -246,6 +246,12 @@ public class VmfsAccessController extends BaseController {
         }
     }
 
+    /**
+     * 获取已经挂载的存储
+     * @param storageId
+     * @return
+     * @throws Exception
+     */
     @RequestMapping(value = "/gethostgroupsbystorageid/{storageId}", method = RequestMethod.GET)
     public ResponseBodyBean getHostGroupsByStorageId(@PathVariable(value = "storageId") String storageId) throws Exception {
         try {

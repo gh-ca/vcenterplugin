@@ -781,6 +781,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 case RANGE_LAST_1_HOUR:
                     interval = INTERVAL_ONE_MINUTE;
                     break;
+                    //INTERVAL_ONE_MINUTE查不到值，会报错
                 case RANGE_LAST_1_DAY:
                     interval = INTERVAL_ONE_MINUTE;
                     break;
@@ -832,7 +833,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         if (isCurrent) {
             indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT);//throughput
             indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH);//bandwidth
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME);//responsetime
         } else {
             indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_READTHROUGHPUT);//readThroughput 读IOPS
             indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITETHROUGHPUT);//writeThroughput
@@ -841,6 +841,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         }
         indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_READRESPONSETIME);//readResponseTime
         indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITERESPONSETIME);//writeResponseTime
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME);//responsetime
         return indicators;
     }
 
@@ -936,7 +937,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private List<String> initStorageDiskIndicator(boolean isCurrent) {
         List<String> indicators = new ArrayList<>();
         if (isCurrent) {
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_THROUGHPUT);//IOPS
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_READTHROUGHPUT);//读IOPS
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_BANDWIDTH);//bandwidth
             indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_UTILITY);//使用率
         } else {
@@ -1129,7 +1130,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 list.add(objId);
                 count++;
             }
-        }else{
+        } else {
             objGroup.add(objIds);
         }
         return objGroup;

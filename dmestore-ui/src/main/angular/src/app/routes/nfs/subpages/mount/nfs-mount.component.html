@@ -3,6 +3,17 @@
   <clr-modal [clrModalOpen]="viewPage=='mount_plugin'" [clrModalClosable]="false">
     <h3 class="modal-title modelTile">{{'vmfs.mount.mount' | translate}}</h3>
     <div class="modal-body">
+      <p *ngIf="errorMsg" style="color: red">{{'errorMsg.mountError' | translate}}</p>
+      <div *ngIf="modalLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+      </div>
+      <div *ngIf="modalHandleLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+      </div>
       <form clrForm>
         <!--<clr-radio-container clrInline>-->
           <!--<label class="floatleft">{{'nfs.mount.mountObj' | translate}}</label>-->
@@ -15,7 +26,6 @@
             <!--<label>{{'nfs.mount.cluster' | translate}}</label>-->
           <!--</clr-radio-wrapper>-->
         <!--</clr-radio-container>-->
-        <p *ngIf="errorMsg" style="color: red">{{'errorMsg.mountError' | translate}}</p>
         <!--主机-->
         <clr-select-container>
           <label>{{'nfs.mountHost' | translate}}</label>
@@ -51,6 +61,26 @@
     <div>
       <form clrForm>
         <p *ngIf="errorMsg" style="color: red">{{'errorMsg.mountError' | translate}}</p>
+        <div *ngIf="modalLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+        </div>
+        <div *ngIf="modalHandleLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+        </div>
+        <div *ngIf="modalLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+        </div>
+        <div *ngIf="modalHandleLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+        </div>
         <!--主机-->
         <clr-select-container>
           <label>{{'nfs.mountHost' | translate}}</label>
@@ -85,6 +115,16 @@
     <div>
       <form clrForm>
         <p *ngIf="errorMsg" style="color: red">{{'errorMsg.mountError' | translate}}</p>
+        <div *ngIf="modalLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+        </div>
+        <div *ngIf="modalHandleLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+        </div>
         <!--虚拟网卡IP-->
         <clr-select-container>
           <label>{{'nfs.vkernel' | translate}}</label>

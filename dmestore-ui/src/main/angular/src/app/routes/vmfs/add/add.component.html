@@ -62,7 +62,6 @@
           <select class="capacity" (change)="form.capacity = null;" clrInput style="width: 40%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;" [(ngModel)]="form.capacityUnit" name="capacityUnit" >
             <option value="TB">TB</option>
             <option value="GB">GB</option>
-            <option value="MB">MB</option>
           </select>
         </div>
         <input clrInput style="width: 19%;text-align: center;" readonly value="{{'vmfs.multiply' | translate}}">
@@ -138,7 +137,7 @@
               <!-- 服务等级 -->
               <span (click)="serviceLevelBtnFunc();" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'level'}">{{'vmfs.byServiceLevel' | translate}}</span>
           <!-- 非服务等级 -->
-              <span (click)="customerClickFunc();" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'customer'}">{{'vmfs.customer' | translate}}</span>
+              <span (click)="customerClickFunc();" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'customer'}">{{'vmfs.custom' | translate}}</span>
             </span>
       </div>
 
@@ -224,7 +223,14 @@
           </select>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-select-container>
-
+        <!--workload -->
+        <clr-select-container class="selectClass">
+          <label style="color: #9F9F9F;">{{'vmfs.workload' | translate}}</label>
+          <select clrSelect [(ngModel)]="form.workload_type_id" name="workload_type_id">
+            <option *ngFor="let item of workloads" value="{{item.id}}">{{item.name}}</option>
+          </select>
+          <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+        </clr-select-container>
         <!--b.QoS 设置 -->
         <clr-input-container>
           <label>{{'vmfs.qosPolicy' | translate}}</label>
@@ -324,3 +330,13 @@
     </ng-template>
   </clr-wizard-page>
 </clr-wizard>
+<!--操作成功提示-->
+<clr-modal [(clrModalOpen)]="addSuccessShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+  <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+  <div class="modal-body">
+    <p *ngIf="addSuccessShow">{{'vmfs.add.success' | translate}}</p>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary" (click)="addSuccessShow = false;">{{'menu.ok' | translate}}</button>
+  </div>
+</clr-modal>

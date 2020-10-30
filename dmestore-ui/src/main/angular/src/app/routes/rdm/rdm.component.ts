@@ -2,7 +2,7 @@ import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {CommonService} from '../common.service';
 import {GlobalsService} from '../../shared/globals.service';
-import {ClrForm} from "@clr/angular";
+import {ClrForm, ClrWizard, ClrWizardPage} from "@clr/angular";
 
 @Component({
   selector: 'app-rdm',
@@ -12,10 +12,13 @@ import {ClrForm} from "@clr/angular";
 })
 export class RdmComponent implements OnInit {
 
-  @ViewChild(ClrForm, {static: true}) rdmFormGroup;
-  @ViewChild('rdmForm', {static: true}) rdmForm;
+  // 添加页面窗口
+  @ViewChild('wizard') wizard: ClrWizard;
+  @ViewChild('addPageOne') addPageOne: ClrWizardPage;
+  @ViewChild('addPageTwo') addPageTwo: ClrWizardPage;
 
-
+  serviceLevelIsNull = false;
+  isOperationErr = false;
   policyEnable = {
     smartTier: false,
     qosPolicy: false,
@@ -27,7 +30,7 @@ export class RdmComponent implements OnInit {
   storagePools = [];
   hostList = [];
   hostSelected = '';
-  dataStoreName = '';
+  dataStoreObjectId = '';
   levelCheck = 'level';
   dataStores = [];
 
@@ -51,6 +54,14 @@ export class RdmComponent implements OnInit {
   qos2Show = false;
   qos3Show = false;
   qos4Show = false;
+
+  dsLoading = false;
+  dsDeviceLoading = false;
+  slLoading = false;
+  tierLoading = false;
+  submitLoading = false;
+  rdmSuccess = false;
+  rdmError = false;
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
               private commonService: CommonService,
@@ -58,7 +69,7 @@ export class RdmComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadStorageDevice();
-    this.loadHosts();
+    // this.loadHosts();
     this.tierFresh();
     const ctx = this.gs.getClientSdk().app.getContextObjects();
     console.log(ctx);
@@ -67,15 +78,17 @@ export class RdmComponent implements OnInit {
     } else{
       this.vmObjectId = 'urn:vmomi:VirtualMachine:vm-1046:674908e5-ab21-4079-9cb1-596358ee5dd1';
     }
+    this.loadDataStore();
   }
 
   // 刷新服务等级列表
   tierFresh(){
-    this.gs.loading = true;
+    this.tierLoading = true;
     this.http.post('servicelevel/listservicelevel', {}).subscribe((response: any) => {
-      this.gs.loading = false;
+      this.tierLoading = false;
       if(response.code == '200'){
         this.serviceLevelsRes = this.recursiveNullDelete(response.data);
+        this.serviceLevelsRes = this.serviceLevelsRes.filter(item => item.totalCapacity !== 0);
         for (const i of this.serviceLevelsRes){
           if (i.totalCapacity == 0){
             i.usedRate = 0.0;
@@ -97,8 +110,9 @@ export class RdmComponent implements OnInit {
     });
   }
 
-  serviceLevelClick(id: string, name: string){
+  serviceLevelClick(id: string){
      this.service_level_id = id;
+     this.serviceLevelIsNull = false;
   }
 
   // 服务等级列表搜索
@@ -154,10 +168,6 @@ export class RdmComponent implements OnInit {
   }
 
   submit(): void {
-    if (this.rdmForm.form.invalid) {
-      this.rdmFormGroup.markAsTouched();
-      return;
-    }
     let b = JSON.parse(JSON.stringify(this.configModel));
     let body = {};
     if (this.configModel.storageType == '2'){
@@ -193,41 +203,34 @@ export class RdmComponent implements OnInit {
 
       body = {
         customizeVolumesRequest: {
-          customize_volumes: b,
-            mapping: {
-            host_id: this.hostSelected
-          }
+          customize_volumes: b
         }
       };
     }
     if (this.configModel.storageType == '1'){
+      if(this.service_level_id == '' || this.service_level_id == null){
+        this.serviceLevelIsNull = true;
+        return;
+      }
       body = {
         createVolumesRequest: {
           service_level_id: this.service_level_id,
-          volumes: this.configModel.volume_specs,
-          mapping: {
-            host_id: this.hostSelected
-          }
+          volumes: this.configModel.volume_specs
         }
       };
     }
     console.log(b);
-    this.http.post('v1/vmrdm/createRdm?hostId='+this.hostSelected+'&vmObjectId='+this.vmObjectId+'&dataStoreName='+this.dataStoreName
+    this.submitLoading = true;
+    this.http.post('v1/vmrdm/createRdm?vmObjectId='+this.vmObjectId+'&dataStoreObjectId='+this.dataStoreObjectId
       , body).subscribe((result: any) => {
+        this.submitLoading = false;
+        if (result.code == '200'){
+          this.rdmSuccess = true;
+        } else{
+          this.rdmError = true;
+        }
     }, err => {
       console.error('ERROR', err);
-    });
-  }
-
-  basAdd(){
-    this.diskNum = this.diskNum + 1;
-    const i = this.diskNum;
-    this.configModel.volume_specs.push(new volume_specs("name"+i,"unit"+i,"count"+i,"capacity"+i));
-  }
-
-  basRemove(item){
-    this.configModel.volume_specs = this.configModel.volume_specs.filter((i) => {
-        return i != item;
     });
   }
 
@@ -253,9 +256,9 @@ export class RdmComponent implements OnInit {
   }
 
   loadStorageDevice(){
-    this.gs.loading = true;
+    this.dsDeviceLoading = true;
     this.http.get('dmestorage/storages', {}).subscribe((result: any) => {
-      this.gs.loading = false;
+      this.dsDeviceLoading = false;
       if (result.code === '200'){
         this.storageDevices = result.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -266,9 +269,9 @@ export class RdmComponent implements OnInit {
   }
 
   loadStoragePool(storageId: string){
-    this.gs.loading = true;
+    this.slLoading = true;
     this.http.get('dmestorage/storagepools', {params: {storageId, media_type: "all"}}).subscribe((result: any) => {
-      this.gs.loading = false;
+      this.slLoading = false;
       if (result.code === '200'){
         this.storagePools = result.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -278,25 +281,12 @@ export class RdmComponent implements OnInit {
     });
   }
 
-  loadHosts(){
-    this.gs.loading = true;
-    this.http.get('v1/vmrdm/dmeHosts').subscribe((result: any) => {
-      this.gs.loading = false;
+  loadDataStore(){
+    this.dsLoading = true;
+    this.http.get('v1/vmrdm/vCenter/datastoreOnHost', { params: {vmObjectId : this.vmObjectId}}).subscribe((result: any) => {
+      this.dsLoading = false;
       if (result.code === '200'){
-        this.hostList = result.data;
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      }
-    }, err => {
-      console.error('ERROR', err);
-    });
-  }
-
-  loadDataStore(id: string){
-    this.gs.loading = true;
-    this.http.get('v1/vmrdm/vCenter/datastoreOnHost', { params: {hostId : id}}).subscribe((result: any) => {
-      this.gs.loading = false;
-      if (result.code === '200'){
-        this.dataStores = result.data;
+        this.dataStores = JSON.parse(result.data);
       } else{
         this.dataStores = [];
       }
@@ -304,6 +294,34 @@ export class RdmComponent implements OnInit {
     }, err => {
       console.error('ERROR', err);
     });
+  }
+
+  /**
+   * 容量格式化
+   * @param c 容量值
+   * @param isGB true GB、false MB
+   */
+  formatCapacity(c: number, isGB:boolean){
+    let cNum;
+    if (c < 1024){
+      cNum = isGB ? c.toFixed(3)+'GB':c.toFixed(3)+'MB';
+    }else if(c >= 1024 && c< 1048576){
+      cNum = isGB ? (c/1024).toFixed(3) + 'TB' : (c/1024).toFixed(3) + 'GB';
+    }else if(c>= 1048576){
+      cNum = isGB ? (c/1024/1024).toFixed(3) + 'PB':(c/1024/1024).toFixed(3) + 'TB';
+    }
+    return cNum;
+  }
+
+  /**
+   * add 下一页
+   */
+  addNextPage() {
+    this.wizard.next();
+  }
+
+  closeWin(){
+    this.gs.getClientSdk().modal.close();
   }
 
 }

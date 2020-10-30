@@ -54,32 +54,46 @@
 
 
     <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
-    <clr-dg-column hidden [clrDgField]="'volumeId'">volumeId</clr-dg-column>
-    <clr-dg-column hidden [clrDgField]="'wwn'">wwn</clr-dg-column>
-    <clr-dg-column hidden [clrDgField]="'volumeName'">volumeName</clr-dg-column>
-    <clr-dg-column hidden [clrDgField]="'objectid'">objectid</clr-dg-column>
+    <clr-dg-column hidden>volumeId</clr-dg-column>
+    <clr-dg-column hidden>wwn</clr-dg-column>
+    <clr-dg-column hidden>volumeName</clr-dg-column>
+    <clr-dg-column hidden>objectid</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'status'">
       {{'vmfs.status' | translate}}
       <clr-dg-filter [clrDgFilter]="statusFilter">
-        <color-filter #statusFilter></color-filter>
+        <vmfs-filter #statusFilter></vmfs-filter>
       </clr-dg-filter>
-<!--      <clr-dg-string-filter [clrDgStringFilter]="statusFilter"></clr-dg-string-filter>-->
     </clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacity'">{{'vmfs.capacity' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'usedCapacity'">{{'vmfs.usedCapacity' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'">{{'vmfs.usedCapacity' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacityUsage'" [clrDgSortOrder]="'capacityUsage'">{{'vmfs.capacityUsage' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'freeSpace'" [clrDgSortBy]="'freeSpace'">{{'vmfs.freeSpace' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'"  [clrDgField]="'reserveCapacity'" [clrDgSortBy]="'reserveCapacity'">{{'vmfs.reserveCapacity' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'device'">{{'vmfs.device' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'serviceLevelName'">{{'vmfs.serviceLevelName' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'protectionStatus'">{{'vmfs.protectionStatus' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='chart'" [clrDgField]="'iops'">{{'vmfs.iops' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'">{{'vmfs.freeSpace' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'">{{'vmfs.reserveCapacity' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'device'">
+      {{'vmfs.device' | translate}}
+      <clr-dg-filter [clrDgFilter]="deviceFilter">
+        <device-filter #deviceFilter></device-filter>
+      </clr-dg-filter>
+    </clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'serviceLevelName'">
+      {{'vmfs.serviceLevelName' | translate}}
+      <clr-dg-filter [clrDgFilter]="serviceLevelFilter">
+        <serviceLevel-filter #serviceLevelFilter></serviceLevel-filter>
+      </clr-dg-filter>
+    </clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'protectionStatus'">
+      {{'vmfs.protectionStatus.name' | translate}}
+      <clr-dg-filter [clrDgFilter]="protectionStatusFilter">
+        <protection-status-filter #protectionStatusFilter></protection-status-filter>
+      </clr-dg-filter>
+    </clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.iops' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.iopsQoSTarget' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='chart'" [clrDgField]="'bandwidth'">{{'vmfs.bandwidth' | translate}}(MB/s)</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.bandwidth' | translate}}(MB/s)</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.bandwidthQoSTarget' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='chart'" [clrDgField]="'readResponseTime'">{{'vmfs.readResponseTime' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='chart'" [clrDgField]="'writeResponseTime'">{{'vmfs.writeResponseTime' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='chart'" [clrDgField]="'latency'">{{'vmfs.latency' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.readResponseTime' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.writeResponseTime' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.latency' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.latencyQoSTarget' | translate}}</clr-dg-column>
 
     <clr-dg-placeholder>{{'vmfs.listNullTips' | translate}}</clr-dg-placeholder>
@@ -90,7 +104,32 @@
       <clr-dg-cell hidden>{{item.wwn}}</clr-dg-cell>
       <clr-dg-cell hidden>{{item.volumeName}}</clr-dg-cell>
       <clr-dg-cell hidden>{{item.objectid}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.status}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='list'">
+                          <span *ngIf="item.status == 'creating'">
+                            <span class="color-square" style="background-color: green; margin-right: 10px"></span>{{'enum.status.creating' | translate}}
+                          </span>
+        <span *ngIf="item.status == 'normal'">
+                            <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>{{'enum.status.normal' | translate}}
+                          </span>
+        <span *ngIf="item.status == 'mapping'">
+                            <span class="color-square" style="background-color: gold; margin-right: 10px"></span>{{'enum.status.mapping' | translate}}
+                          </span>
+        <span *ngIf="item.status == 'unmapping'">
+                            <span class="color-square" style="background-color: blueviolet; margin-right: 10px"></span>{{'enum.status.unmapping' | translate}}
+                          </span>
+        <span *ngIf="item.status == 'deleting'">
+                            <span class="color-square" style="background-color: bisque; margin-right: 10px"></span>{{'enum.status.deleting' | translate}}
+                          </span>
+        <span *ngIf="item.status == 'error'">
+                            <span class="color-square" style="background-color: red; margin-right: 10px"></span>{{'enum.status.error' | translate}}
+                          </span>
+        <span *ngIf="item.status == 'expanding'">
+                            <span class="color-square" style="background-color: darkmagenta; margin-right: 10px"></span>{{'enum.status.expanding' | translate}}
+                          </span>
+        <span *ngIf="!item.status">
+                            --
+                          </span>
+      </clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='list'">{{formatCapacity(item.capacity, true)}}</clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='list'">{{formatCapacity(item.capacity - item.freeSpace, true)}}</clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='list'"><clr-progress-bar clrValue="{{((item.capacity - item.freeSpace)/item.capacity * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar></clr-dg-cell>
@@ -98,7 +137,14 @@
       <clr-dg-cell [hidden]="radioCheck!=='list'">{{formatCapacity(item.reserveCapacity, true)}}</clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.device}}</clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.serviceLevelName}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.vmfsProtected ? '保护':'未保护'}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='list'">
+        <span *ngIf="item.vmfsProtected">
+          <img src="./assets/images/icon-unprotected.svg">{{'vmfs.protectionStatus.protected' | translate}}
+        </span>
+        <span *ngIf="!item.vmfsProtected">
+          <span class="color-square" style="background-color: green; margin-right: 10px"></span>{{'vmfs.protectionStatus.unprotected' | translate}}
+        </span>
+      </clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.iops}}</clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='chart'">{{('vmfs.upper' | translate)+' '+ (item.maxIops || "--")+' | '+('vmfs.lower' | translate)+' '+(item.minIops || "--")}}</clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.bandwidth}}</clr-dg-cell>
@@ -249,7 +295,7 @@
               <!-- 服务等级 -->
               <span (click)="serviceLevelBtnFunc();" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'level'}">{{'vmfs.byServiceLevel' | translate}}</span>
                 <!-- 非服务等级 -->
-              <span (click)="customerClickFunc();" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'customer'}">{{'vmfs.customer' | translate}}</span>
+              <span (click)="customerClickFunc();" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'customer'}">{{'vmfs.custom' | translate}}</span>
             </span>
           </div>
 
@@ -334,7 +380,13 @@
               </select>
               <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
             </clr-select-container>
-
+            <clr-select-container class="selectClass">
+              <label style="color: #9F9F9F;">{{'vmfs.workload' | translate}}</label>
+              <select clrSelect [(ngModel)]="form.workload_type_id" name="workload_type_id">
+                <option *ngFor="let item of workloads" value="{{item.id}}">{{item.name}}</option>
+              </select>
+              <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+            </clr-select-container>
             <!--b.QoS 设置 -->
             <clr-input-container>
               <label>{{'vmfs.qosPolicy' | translate}}</label>
@@ -573,7 +625,7 @@
           <clr-combobox [(ngModel)]="chooseHost" name="chooseHost" required>
             <clr-options *ngIf="mountHostData">
               <clr-option *clrOptionItems="let state of hostList; field:'hostName'" [clrValue]="state">
-                <clr-icon *ngIf="state.hostName !== ''" shape="sun" role="img" aria-label="Sun is shining"></clr-icon>{{state.hostName}}
+                <clr-icon *ngIf="state.hostName !== ''" shape="host" role="img" aria-label="World is turning"></clr-icon>{{state.hostName}}
               </clr-option>
             </clr-options>
           </clr-combobox>
@@ -586,7 +638,7 @@
           <clr-combobox [(ngModel)]="chooseCluster" name="chooseCluster" required>
             <clr-options *ngIf="mountClusterData">
               <clr-option *clrOptionItems="let state of clusterList; field:'clusterName'" [clrValue]="state">
-                <clr-icon *ngIf="state.clusterName !== ''" shape="sun" role="img" aria-label="Sun is shining"></clr-icon>{{state.clusterName}}
+                <clr-icon *ngIf="state.clusterName !== ''" shape="host-group" role="img" aria-label="World is turning"></clr-icon>{{state.clusterName}}
               </clr-option>
             </clr-options>
           </clr-combobox>
@@ -604,16 +656,14 @@
   <!--删除提示-->
   <clr-modal [(clrModalOpen)]="delShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
     <div class="modal-body">
-      <p>{{'vmfs.del.content' | translate}}</p>
-
       <div *ngIf="modalHandleLoading" class="loadingDiv">
         <span>
           {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
         </span>
       </div>
       <div *ngIf="isOperationErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.deleteError' | translate}}</div>
-
       <h3 class="modal-title modelTile">{{'vmfs.del.title' | translate}}</h3>
+      <p>{{'vmfs.del.content' | translate}}</p>
     </div>
 
     <div class="modal-footer">
@@ -663,7 +713,7 @@
           <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
           <clr-dg-column [clrDgField]="'type'">{{'vmfs.type' | translate}}</clr-dg-column>
 
-          <clr-dg-placeholder>{{'vmfs.unmount.host' | translate}}</clr-dg-placeholder>
+          <clr-dg-placeholder>{{'vmfs.unmount.notHaveHost' | translate}}</clr-dg-placeholder>
 
           <clr-dg-row *clrDgItems="let item of mountedHost" [clrDgItem]="item">
             <clr-dg-cell hidden>{{item.deviceId}}</clr-dg-cell>
@@ -719,6 +769,7 @@
       <button type="submit" class="btn btn-primary" (click)="reclaimHandleFunc()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
+
   <!--变更服务等级-->
   <clr-modal [(clrModalOpen)]="changeServiceLevelShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
     <h3 class="modal-title modelTile">{{'vmfs.changeServiceLevel' | translate}}</h3>
@@ -836,6 +887,26 @@
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="expandShow = false;">{{'menu.cancel' | translate}}</button>
       <button type="submit" class="btn btn-primary" (click)="expandHandleFunc();">{{'menu.ok' | translate}}</button>
+    </div>
+  </clr-modal>
+
+  <!--成功提示窗口-->
+  <clr-modal [(clrModalOpen)]="addSuccessShow || modifySuccessShow
+  || expandSuccessShow || reclaimSuccessShow ||  changeServiceLevelSuccessShow
+  || mountSuccessShow || unmountSuccessShow || delSuccessShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+    <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+    <div class="modal-body">
+      <p *ngIf="addSuccessShow">{{'vmfs.add.success' | translate}}</p>
+      <p *ngIf="modifySuccessShow">{{'vmfs.modify.success' | translate}}</p>
+      <p *ngIf="expandSuccessShow">{{'vmfs.expand.success' | translate}}</p>
+      <p *ngIf="reclaimSuccessShow">{{'vmfs.reclaim.success' | translate}}</p>
+      <p *ngIf="changeServiceLevelSuccessShow">{{'vmfs.serviceLevel.success' | translate}}</p>
+      <p *ngIf="mountSuccessShow">{{'vmfs.mount.success' | translate}}</p>
+      <p *ngIf="unmountSuccessShow">{{'vmfs.unmount.success' | translate}}</p>
+      <p *ngIf="delSuccessShow">{{'vmfs.del.success' | translate}}</p>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-primary" (click)="closeSuccessTips();">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 </div>

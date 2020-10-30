@@ -135,6 +135,7 @@ public interface VmfsAccessService {
      */
     List<VmfsDataInfo> queryVmfs(String dataStoreObjectId) throws Exception;
 
+
     /**
      * 根据vmfs名字查询指定vmfs
      *
@@ -142,4 +143,19 @@ public interface VmfsAccessService {
      * @return
      */
     Boolean queryDatastoreByName(String name, String type);
+
+
+    /**
+     * DME侧主机检查
+     * @author wangxy
+     * @date 14:00 2020/10/30
+     * @param hostIp
+     * @param hostId
+     * @throws DMEException
+     * @return java.lang.String
+     **/
+    String checkOrCreateToHost(String hostIp, String hostId) throws DMEException;
+
+	 Boolean queryDatastoreByName(String name, String type);
+
 }

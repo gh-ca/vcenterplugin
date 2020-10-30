@@ -71,6 +71,7 @@
     "secKrb5i":"Using Kerberos for authentication and data integrity (krb5)",
     "storageSetting":"Storage Setting",
     "fsName":"FileSystem Name",
+    "mountedHost":"Mounted Host",
     "shareName":"Share Name",
     "qosPolicy":"Qos Policy",
     "controlPolicy":"Control Policy",
@@ -152,7 +153,8 @@
     },
     "unmount":{
       "title":"Tips",
-      "content":"Are you sure to delete?"
+      "content":"Are you sure to delete?",
+      "tips":"If all the hosts mounted by NFS are unmounted, the NFS device will be deleted automatically！"
     }
   },
   "vmfs": {
@@ -208,7 +210,7 @@
     "provisioningType": "Provisioning Type",
     "basicInformation": "Basic Information",
     "byServiceLevel": "By Service Level",
-    "customer": "Customer",
+    "custom": "Custom",
     "wwn": "WWN",
     "storage": "Storage",
     "smartTier": "SmartTier",
@@ -233,7 +235,25 @@
     "serviceLevelCantBeNull": "The service level is a must, and you can only choose the service level whose capacity is not 0!",
     "expandTips": "Expansion capacity can only be a positive integer of GB",
     "loadingTips": "Data loading, please wait",
+    "dataHandleLoadingTips": "Data processing, please wait",
     "listNullTips": "We couldn't find any users",
+    "workload": "Workload",
+    "add": {
+      "success": "Added successfully!"
+    },
+    "modify": {
+      "success": "Successfully modified!"
+    },
+    "expand": {
+      "success": "Successful expansion!"
+    },
+    "serviceLevel": {
+      "success": "The service level changed successfully!"
+    },
+    "protectionStatus": {
+      "protected": "Protected",
+      "unprotected": "Unprotected"
+    },
     "mount":{
       "mount":"Mount",
       "host":"Host",
@@ -244,11 +264,13 @@
       "readWrite":"Read Write",
       "mountObj":"Mount Object",
       "notChooseDataStoreTips":"Please select the DataStore to be mounted！",
-      "mountErr":"Please select the host/cluster to be mounted!"
+      "mountErr":"Please select the host/cluster to be mounted!",
+      "success": "Successfully mounted!"
     },
     "del":{
       "title":"Tips",
-      "content":"Are you sure to delete?"
+      "content":"Are you sure to delete?",
+      "success": "successfully deleted!"
     },
     "unmount":{
       "title":"Unmount",
@@ -256,12 +278,24 @@
       "notChooseDeviceTips":"Please select the host or cluster to be uninstalled!",
       "notChooseDataStoreTips":"Please select the DataStore to be unmounted！",
       "tips":"If all the hosts/clusters mounted by VMFS are unmounted, the VMFS device will be deleted automatically！",
-      "notHaveCluster":"该VMFS未绑定集群",
-      "notHaveHost":"该VMFS未绑定主机"
+      "notHaveCluster":"The VMFS is not bound to the cluster!",
+      "notHaveHost":"The VMFS is not bound to the host!",
+      "success": "Successfully uninstalled!"
     },
     "reclaim": {
       "title":"Tips",
-      "content":"Are you sure to reclaim?"
+      "content":"Are you sure to reclaim?",
+      "success": "Successfully reclaimed space!"
+    },
+    "filter": {
+      "all": "All",
+      "status": {
+        "normal": "Normal"
+      },
+      "protectionStatus": {
+        "protected": "true",
+        "unprotected": "false"
+      }
     }
   },
   "storage":{
@@ -607,7 +641,15 @@
     "atOne": "Please Select one!",
     "bandNotNull": "BandWidth not be empty!",
     "IOPSNotNull": "IOPS not be empty!",
-    "latencyNotNull": "Latency not be empty!"
+    "latencyNotNull": "Latency not be empty!",
+
+    "addTitle": "Create RDM",
+    "basicSet": "Volume Setting",
+    "storeSet": "Storage Setting",
+
+    "createRdmError": "Create RDM Error!",
+    "selectOneSer": "Service Level is not be Null！",
+    "rdmSuccessMsg": "Create RDM Success!"
   },
   "tier": {
     "name": "Name",
@@ -711,7 +753,8 @@
        "linkDown":"Link Down",
        "linkUp":"Link Up",
        "activated":"Activated",
-       "unActivated":"unActivated"
+       "unActivated":"unActivated",
+       "all":"ALL"
      },
      "type":{
       "block":"Block",

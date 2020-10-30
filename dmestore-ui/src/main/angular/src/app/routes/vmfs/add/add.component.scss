@@ -185,3 +185,8 @@ input[type=number] {
   color: white;
   font-weight: bolder;
 }
+
+::ng-deep .clr-wizard.wizard-xl .modal-dialog {
+  height: 100vh;
+  max-height: none;
+}

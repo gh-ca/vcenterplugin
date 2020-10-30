@@ -1,14 +1,12 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
-import {
-  Host, List, NfsService,UpdateNfs,
-
-} from './nfs.service';
+import {Host, List, NfsService,UpdateNfs} from './nfs.service';
 import {GlobalsService} from '../../shared/globals.service';
 import {StorageService} from '../storage/storage.service';
 import {StoragePool} from "../storage/detail/detail.service";
 import {ClrDatagridSortOrder, ClrWizard, ClrWizardPage} from "@clr/angular";
 import {VmfsListService} from "../vmfs/list/list.service";
 import {Router} from "@angular/router";
+
 @Component({
   selector: 'app-nfs',
   templateUrl: './nfs.component.html',
@@ -18,17 +16,6 @@ import {Router} from "@angular/router";
 })
 export class NfsComponent implements OnInit {
   descSort = ClrDatagridSortOrder.DESC;
-  query = { // 查询数据
-    name: 'name',
-    sort: 'stars',
-    order: 'desc',
-    page: 0,
-    per_page: 5,
-  };
-  get params() { // 对query进行处理
-    const p = Object.assign({}, this.query);
-    return p;
-  }
   list: List[] = []; // 数据列表
   radioCheck = 'list'; // 切换列表页显示
   total = 0; // 总数据数量
@@ -217,10 +204,16 @@ export class NfsComponent implements OnInit {
     this.vmfsListService.scanVMFS('nfs').subscribe((res: any) => {
       this.isLoading = false;
       if (res.code === '200') {
-        this.getNfsList();
+        //this.getNfsList();
         console.log('Scan success');
+        this.router.navigate(['nfs'], {
+          queryParams: {t: new Date().getTime()}
+        });
       } else {
         console.log('Scan faild');
+        this.router.navigate(['nfs'], {
+          queryParams: {t: new Date().getTime()}
+        });
       }
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
