@@ -611,7 +611,14 @@
     "atOne": "请至少选择一项！",
     "bandNotNull": "带宽不能为空！",
     "IOPSNotNull": "IOPS不能为空！",
-    "latencyNotNull": "时延不能为空！"
+    "latencyNotNull": "时延不能为空！",
+
+    "addTitle": "创建RDM",
+    "basicSet": "卷设置",
+    "storeSet": "存储设置",
+
+    "createRdmError": "创建RDM出错!",
+    "selectOneSer": "服务等级不能为空！"
   },
   "tier": {
     "name": "名称",
