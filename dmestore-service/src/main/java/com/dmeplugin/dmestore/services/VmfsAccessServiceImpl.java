@@ -1746,6 +1746,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         List<Map<String, String>> clusters = null;
         //取得vcenter中的所有cluster
         DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(storageId);
+        if (null==dvr){
+            throw new DMEException("存储关联关系为空");
+        }
         LOG.info("getVolumeId==" + dvr.getVolumeId());
         List<String> hostgroupids=getDmeAttachHostGroupByVolumeId(dvr.getVolumeId());
         Map<String,String> mappeddmegroups=new HashMap<>();
@@ -1814,8 +1817,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         for (JsonElement jsonElement : attachments) {
             JsonObject element = jsonElement.getAsJsonObject();
             String attachedHostGroupId = ToolUtils.jsonToStr(element.get("attached_host_group"));
-            groupids.add(attachedHostGroupId);
-
+            if (!"".equalsIgnoreCase(attachedHostGroupId)) {
+                groupids.add(attachedHostGroupId);
+            }
         }
 
         return groupids;
