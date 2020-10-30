@@ -203,10 +203,7 @@ export class RdmComponent implements OnInit {
 
       body = {
         customizeVolumesRequest: {
-          customize_volumes: b,
-            mapping: {
-            host_id: this.hostSelected
-          }
+          customize_volumes: b
         }
       };
     }
