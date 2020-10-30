@@ -15,7 +15,6 @@ import {
 } from './list.service';
 import {ClrWizard, ClrWizardPage} from '@clr/angular';
 import {GlobalsService} from '../../../shared/globals.service';
-import {Host} from '../../nfs/nfs.service';
 import {Router} from "@angular/router";
 
 
@@ -196,7 +195,8 @@ export class VmfsListComponent implements OnInit {
               // 获取chart 数据
               const wwns = [];
               this.list.forEach(item => {
-
+                item.usedCapacity = item.capacity - item.freeSpace;
+                item.capacityUsage = ((item.capacity - item.freeSpace)/item.capacity * 100).toFixed(2);
                 wwns.push(item.wwn);
               });
               // 设置卷ID集合

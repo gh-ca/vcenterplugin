@@ -180,3 +180,12 @@ input[type=number] {
   color: white;
   font-weight: bolder;
 }
+
+.color-square {
+  display: inline-block;
+  vertical-align: text-bottom;
+  height: .6rem;
+  width: .6rem;
+  border-radius: 2rem;
+  margin-bottom: 0.1rem;
+}

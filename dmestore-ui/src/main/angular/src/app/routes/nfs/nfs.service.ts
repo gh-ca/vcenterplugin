@@ -11,8 +11,8 @@ export class NfsService {
   static vmfsIOPS: Array<string> = ['1125921381744648', '1125921381744649'];
   // VMFS  bandwidth 0Read 1Write
   static vmfsBDWT: Array<string> = ['1125921381744646', '1125921381744647'];
-  // VMFS  latency 0Read 1Write
-  static vmfsLatency: Array<string> = ['1125921381744656', '1125921381744657'];
+  // VMFS  latency 0Read 1Write 2总计
+  static vmfsLatency: Array<string> = ['1125921381744656', '1125921381744657', '1125921381744642'];
   static COUNTER_ID_VOLUME_RESPONSETIME: Array<string> = ['1125921381744642'];
   // VMFS  url
   static vmfsUrl = 'datastorestatistichistrory/vmfs';
