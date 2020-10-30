@@ -49,10 +49,9 @@
             <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
             <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
             <p *ngIf="nfsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
-            <p *ngIf="addForm.sameName">
-              <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
-              <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
-            </p>
+            <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+            <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
+
 
           </clr-control-error>
         </clr-input-container>
@@ -317,10 +316,9 @@
           <clr-control-error>
             <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
             <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
-            <p *ngIf="addForm.sameName">
+
             <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
             <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
-            </p>
           </clr-control-error>
         </clr-input-container>
         <clr-checkbox-container>
