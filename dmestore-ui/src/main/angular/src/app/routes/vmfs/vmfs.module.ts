@@ -10,13 +10,14 @@ import { AddComponent } from './add/add.component';
 import { ServiceLevelComponent } from './serviceLevel/serviceLevel.component';
 import { NgxEchartsModule } from 'ngx-echarts';
 import {FormsModule} from "@angular/forms";
-import {ClarityModule} from "@clr/angular";
+import {ClarityModule, ClrCheckbox} from "@clr/angular";
 import {CommonModule} from "@angular/common";
 import {TranslateModule} from "@ngx-translate/core";
 import {ExpandComponent} from "./expand/expand.component";
 import {ModifyComponent} from "./modify/modify.component";
 import {ReclaimComponent} from "./reclaim/reclaim.component";
 import {DeleteComponent} from "./delete/delete.component";
+import {DeviceFilter, ProtectionStatusFilter, ServiceLevelFilter, StatusFilter} from "./list/filter.component";
 
 const COMPONENTS = [VmfsListComponent];
 const COMPONENTS_DYNAMIC = [];
@@ -24,7 +25,8 @@ const COMPONENTS_DYNAMIC = [];
 @NgModule({
   imports: [SharedModule, VmfsRoutingModule, NgxEchartsModule, FormsModule, ClarityModule, CommonModule, TranslateModule],
   declarations: [...COMPONENTS, ...COMPONENTS_DYNAMIC, AttributeComponent, PerformanceComponent, MountComponent, AddComponent,
-    ServiceLevelComponent, ExpandComponent, ModifyComponent, DeleteComponent, ReclaimComponent],
+    ServiceLevelComponent, ExpandComponent, ModifyComponent, DeleteComponent, ReclaimComponent, StatusFilter, DeviceFilter,
+    ServiceLevelFilter, ProtectionStatusFilter],
   entryComponents: COMPONENTS_DYNAMIC,
 })
 export class VmfsModule {}
