@@ -232,7 +232,9 @@ public class VmRdmServiceImpl implements VmRdmService {
     private String createDmeVolumeByServiceLevel(CreateVolumesRequest createVolumesRequest) throws DMEException {
         String url = DmeConstants.DME_VOLUME_BASE_URL;
         Gson gsonTemp = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gsonTemp.toJson(createVolumesRequest));
+        String params = gsonTemp.toJson(createVolumesRequest);
+        LOG.info(params);
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, params);
         if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
             LOG.error("Failed to create RDM on DME!errorMsg:{}", responseEntity.getBody());
             throw new DMEException("Failed to create RDM on DME!");
@@ -252,7 +254,9 @@ public class VmRdmServiceImpl implements VmRdmService {
             customizeVolumesRequest.getCustomizeVolumes().setOwnerController(null);
         }
         Gson gsonTemp = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
-        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gsonTemp.toJson(customizeVolumesRequest));
+        String params = gsonTemp.toJson(customizeVolumesRequest);
+        LOG.info(params);
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, params);
         if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
             LOG.error("Failed to create RDM on DME!errorMsg:{}", responseEntity.getBody());
             throw new DMEException("Failed to create RDM on DME!");
