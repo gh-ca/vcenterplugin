@@ -8,7 +8,7 @@ import {
   HostOrCluster,
   ServiceLevelList, StorageList,
   StoragePoolList,
-  VmfsListService
+  VmfsListService, Workload
 } from '../list/list.service';
 import {ClrWizard, ClrWizardPage} from "@clr/angular";
 import {GlobalsService} from "../../../shared/globals.service";
@@ -39,6 +39,7 @@ export class AddComponent implements OnInit{
 
   // 服务等级列表
   serviceLevelList: ServiceLevelList[] = [];
+  workloads:Workload[] = []; // Workload
   // 未选择服务等级true未选择 false选择 添加、服务登记变更
   serviceLevelIsNull = false;
   // 是否选择服务等级：level 选择服务器等级 customer 未选择服务等级
@@ -288,12 +289,23 @@ export class AddComponent implements OnInit{
     this.form.pool_raw_id = undefined;
     console.log('selectSotrageId' + this.form.storage_id);
     if (null !== this.form.storage_id && '' !== this.form.storage_id) {
+      // 获取存储池数据
       this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, 'block').subscribe((result: any) => {
         console.log('storagePools', result);
         console.log('result.code === \'200\' && result.data !== null', result.code === '200' && result.data !== null);
         if (result.code === '200' && result.data !== null) {
           this.storagePoolList = result.data;
           console.log('this.storagePoolList', this.storagePoolList);
+
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        }
+      });
+      // 获取workLoad
+      this.remoteSrv.getWorkLoads(this.form.storage_id).subscribe((result: any) => {
+        console.log('storagePools', result);
+        if (result.code === '200' && result.data !== null) {
+          this.workloads = result.data;
+          console.log('this.workloads', this.workloads);
 
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         }

@@ -209,7 +209,7 @@
     "provisioningType": "Provisioning Type",
     "basicInformation": "Basic Information",
     "byServiceLevel": "By Service Level",
-    "customer": "Customer",
+    "custom": "Custom",
     "wwn": "WWN",
     "storage": "Storage",
     "smartTier": "SmartTier",
@@ -235,6 +235,11 @@
     "expandTips": "Expansion capacity can only be a positive integer of GB",
     "loadingTips": "Data loading, please wait",
     "listNullTips": "We couldn't find any users",
+    "workload": "Workload",
+    "protectionStatus": {
+      "protected": "Protected",
+      "unprotected": "Unprotected"
+    },
     "mount":{
       "mount":"Mount",
       "host":"Host",
@@ -268,6 +273,10 @@
       "all": "All",
       "status": {
         "normal": "Normal"
+      },
+      "protectionStatus": {
+        "protected": "true",
+        "unprotected": "false"
       }
     }
   },

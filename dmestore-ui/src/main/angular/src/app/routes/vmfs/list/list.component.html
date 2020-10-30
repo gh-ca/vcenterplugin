@@ -63,10 +63,9 @@
       <clr-dg-filter [clrDgFilter]="statusFilter">
         <vmfs-filter #statusFilter></vmfs-filter>
       </clr-dg-filter>
-<!--      <clr-dg-string-filter [clrDgStringFilter]="statusFilter"></clr-dg-string-filter>-->
     </clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacity'">{{'vmfs.capacity' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'usedCapacity'">{{'vmfs.usedCapacity' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'">{{'vmfs.usedCapacity' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacityUsage'" [clrDgSortOrder]="'capacityUsage'">{{'vmfs.capacityUsage' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'">{{'vmfs.freeSpace' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'">{{'vmfs.reserveCapacity' | translate}}</clr-dg-column>
@@ -83,7 +82,7 @@
       </clr-dg-filter>
     </clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'protectionStatus'">
-      {{'vmfs.protectionStatus' | translate}}
+      {{'vmfs.protectionStatus.name' | translate}}
       <clr-dg-filter [clrDgFilter]="protectionStatusFilter">
         <protection-status-filter #protectionStatusFilter></protection-status-filter>
       </clr-dg-filter>
@@ -138,7 +137,14 @@
       <clr-dg-cell [hidden]="radioCheck!=='list'">{{formatCapacity(item.reserveCapacity, true)}}</clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.device}}</clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.serviceLevelName}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.vmfsProtected ? '保护':'未保护'}}</clr-dg-cell>
+      <clr-dg-cell [hidden]="radioCheck!=='list'">
+        <span *ngIf="item.vmfsProtected">
+          <span class="color-square" style="background-color: green; margin-right: 10px"></span>{{'vmfs.protectionStatus.protected' | translate}}
+        </span>
+        <span *ngIf="!item.vmfsProtected">
+          <span class="color-square" style="background-color: green; margin-right: 10px"></span>{{'vmfs.protectionStatus.unprotected' | translate}}
+        </span>
+      </clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.iops}}</clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='chart'">{{('vmfs.upper' | translate)+' '+ (item.maxIops || "--")+' | '+('vmfs.lower' | translate)+' '+(item.minIops || "--")}}</clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.bandwidth}}</clr-dg-cell>
@@ -289,7 +295,7 @@
               <!-- 服务等级 -->
               <span (click)="serviceLevelBtnFunc();" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'level'}">{{'vmfs.byServiceLevel' | translate}}</span>
                 <!-- 非服务等级 -->
-              <span (click)="customerClickFunc();" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'customer'}">{{'vmfs.customer' | translate}}</span>
+              <span (click)="customerClickFunc();" class="tabs-btn" [ngClass]="{'tabs-btn_active': levelCheck === 'customer'}">{{'vmfs.custom' | translate}}</span>
             </span>
           </div>
 
@@ -374,7 +380,13 @@
               </select>
               <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
             </clr-select-container>
-
+            <clr-select-container class="selectClass">
+              <label style="color: #9F9F9F;">{{'vmfs.workload' | translate}}</label>
+              <select clrSelect [(ngModel)]="form.workload_type_id" name="workload_type_id">
+                <option *ngFor="let item of workloads" value="{{item.id}}">{{item.name}}</option>
+              </select>
+              <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+            </clr-select-container>
             <!--b.QoS 设置 -->
             <clr-input-container>
               <label>{{'vmfs.qosPolicy' | translate}}</label>
