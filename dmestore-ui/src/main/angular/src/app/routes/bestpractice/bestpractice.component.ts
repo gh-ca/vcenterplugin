@@ -51,6 +51,7 @@ export class BestpracticeComponent implements OnInit {
               private commonService: CommonService) { }
 
   ngOnInit(): void {
+    this.practiceRefresh();
   }
 
   /**
