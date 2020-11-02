@@ -26,7 +26,7 @@ export class NfsAddComponent implements OnInit{
   logicPorts: LogicPort[] = [];
   hostList: Host[] = [];
   vmkernelList: Vmkernel[]=[];
-
+  capacityErr=true;
 
 
   maxbandwidthChoose=false; // 最大带宽 选中
@@ -224,5 +224,105 @@ export class NfsAddComponent implements OnInit{
       }
     }
   }
+  matchErr=false;
+  nfsNameRepeatErr=false;
+  shareNameRepeatErr=false;
+  fsNameRepeatErr=false;
+  oldNfsName:string;
+  oldShareName:string;
+  oldFsName:string;
+  checkNfsName(){
+    if(this.addForm.nfsName==null) return false;
+    if(this.oldNfsName==this.addForm.nfsName) return false;
+    this.oldNfsName=this.addForm.nfsName;
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z]*$');
+    if(reg5.test(this.addForm.nfsName)){
+      //验证重复
+      this.matchErr=false;
+      if (this.addForm.sameName){
+        this.checkNfsNameExist(this.addForm.nfsName);
+        this.checkShareNameExist(this.addForm.nfsName);
+        this.checkFsNameExist(this.addForm.nfsName);
+      }else{
+        this.checkNfsNameExist(this.addForm.nfsName);
+      }
+    }else{
+      //
+      this.matchErr=true;
+      //不满足的时候置空
+      this.addForm.nfsName=null;
+      console.log('验证不通过');
+    }
+  }
+  checkShareName(){
+    if(this.addForm.shareName==null) return false;
+    if(this.oldShareName=this.addForm.shareName) return false;
+
+    this.oldShareName=this.addForm.shareName;
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z]*$');
+    if(reg5.test(this.addForm.shareName)){
+      //验证重复
+      this.matchErr=false;
+        this.checkShareNameExist(this.addForm.shareName);
+    }else{
+      this.matchErr=true;
+      this.addForm.shareName=null;
+    }
+  }
+  checkFsName(){
+    if(this.addForm.fsName==null) return false;
+    if(this.oldFsName=this.addForm.fsName) return false;
+
+    this.oldFsName=this.addForm.fsName;
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z]*$');
+    if(reg5.test(this.addForm.fsName)){
+      //验证重复
+      this.matchErr=false;
+      this.checkShareNameExist(this.addForm.fsName);
+    }else{
+      this.matchErr=true;
+      this.addForm.fsName=null;
+    }
+  }
+  checkNfsNameExist(name:string){
+    this.addService.checkNfsNameExist(name).subscribe((r:any)=>{
+        if (r.code=='200'){
+          if(r.data){
+            this.nfsNameRepeatErr=false;
+          }else{
+            this.nfsNameRepeatErr=true;
+            this.addForm.nfsName=null;
+          }
+        }
+    });
+  }
+  checkShareNameExist(name:string){
+    this.addService.checkShareNameExist(name).subscribe((r:any)=>{
+      if (r.code=='200'){
+        if(r.data){
+          this.shareNameRepeatErr=false;
+        }else{
+          this.shareNameRepeatErr=true;
+          this.addForm.nfsName=null;
+        }
+      }
+    });
+  }
+  checkFsNameExist(name:string){
+    this.addService.checkFsNameExist(name).subscribe((r:any)=>{
+      if (r.code=='200'){
+        if(r.data){
+          this.shareNameRepeatErr=false;
+        }else{
+          this.shareNameRepeatErr=true;
+          this.addForm.nfsName=null;
+        }
+      }
+    });
+  }
+
+
+
+
 }
 

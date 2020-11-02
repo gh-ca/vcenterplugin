@@ -394,8 +394,7 @@ export class MountComponent implements OnInit{
         this.modalHandleLoading = false;
         if (result.code  ===  '200'){
           console.log('挂载成功');
-          // 隐藏挂载页面
-          this.mountShow = false;
+          this.cancel();
           this.mountSuccessShow = true;
         } else {
           console.log('挂载异常：' + result.description);
@@ -533,5 +532,22 @@ export class MountComponent implements OnInit{
         this.cdr.detectChanges();
       });
     }
+  }
+  /**
+   * 容量格式化
+   * @param c 容量值
+   * @param isGB true GB、false MB
+   */
+  formatCapacity(c: number, isGB:boolean){
+    c = Number(c);
+    let cNum;
+    if (c < 1024){
+      cNum = isGB ? c.toFixed(3)+'GB':c.toFixed(3)+'MB';
+    }else if(c >= 1024 && c< 1048576){
+      cNum = isGB ? (c/1024).toFixed(3) + 'TB' : (c/1024).toFixed(3) + 'GB';
+    }else if(c>= 1048576){
+      cNum = isGB ? (c/1024/1024).toFixed(3) + 'PB':(c/1024/1024).toFixed(3) + 'TB';
+    }
+    return cNum;
   }
 }

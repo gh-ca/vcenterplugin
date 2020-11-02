@@ -514,5 +514,27 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         return vmfsDatastoreName;
     }
 
+    public String getDataStoreByName(String name) throws DmeSqlException {
+        String vmfsDatastoreName = "";
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            String sql = "SELECT * FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_NAME='" + name + "'";
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                vmfsDatastoreName = rs.getString("STORE_NAME");
+                break;
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("Failed to get vmfs datastore on: " + name + "," + e.getMessage());
+            throw new DmeSqlException(e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return vmfsDatastoreName;
+    }
 
 }

@@ -1,5 +1,5 @@
 <div>
-  <clr-modal [clrModalOpen]="viewPage=='delete_plugin'" [clrModalSize]="'sm'">
+  <clr-modal [clrModalOpen]="viewPage=='delete_plugin'" [clrModalSize]="'sm'" [clrModalClosable]="false">
     <h3 class="modal-title">{{'nfs.del.title' | translate}}</h3>
     <div class="modal-body">
       <p *ngIf="errorMsg" style="color: red">{{'errorMsg.deleteError' | translate}}</p>
