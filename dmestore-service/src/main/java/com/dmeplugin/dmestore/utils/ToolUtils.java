@@ -34,7 +34,11 @@ public class ToolUtils {
     public static Gson gson = new Gson();
 
     public static String getStr(Object obj) {
-        String re = null;
+        return getStr(obj, null);
+    }
+
+    public static String getStr(Object obj, String defaultValue) {
+        String re = defaultValue;
         try {
             if (!StringUtils.isEmpty(obj)) {
                 re = obj.toString();
