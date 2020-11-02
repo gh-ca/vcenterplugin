@@ -436,7 +436,7 @@
         "capacityUsage":"Capacity Usage"
       },
       "dtrees":{
-        "dtrees":"Dtrees",
+        "dtrees":"DTrees",
         "name":"Name",
         "ofs":"Owning File System",
         "osl":"Owning Service Level",
