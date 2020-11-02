@@ -104,6 +104,11 @@ public class DmeConstants {
     public static final String DME_STORAGE_DETAIL_URL = "/rest/storagemgmt/v1/storages/%s/detail";
 
     /**
+     * host summary
+     */
+    public static final String DME_HOST_SUMMARY_URL = "/rest/hostmgmt/v1/hosts/summary";
+
+    /**
      * Constant definition
      */
     public static final int MAXLEN = 255;

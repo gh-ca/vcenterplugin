@@ -1,12 +1,9 @@
 package com.dmeplugin.dmestore.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
  * @author wangxiangyong
  **/
 public class CustomizeVolumesRequest {
-    @JsonProperty("customize_volumes")
     private CustomizeVolumes customizeVolumes;
     private ServiceVolumeMapping mapping;
 

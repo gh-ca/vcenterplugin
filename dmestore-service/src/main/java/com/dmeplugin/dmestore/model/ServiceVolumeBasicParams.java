@@ -1,7 +1,5 @@
 package com.dmeplugin.dmestore.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
  * @author wangxiangyong
  **/
@@ -9,8 +7,8 @@ public class ServiceVolumeBasicParams {
     private String name;
     private Integer capacity;
     private Integer count;
-    @JsonProperty("start_suffix")
     private Integer startSuffix;
+    private String unit;
 
     public String getName() {
         return name;
@@ -42,5 +40,13 @@ public class ServiceVolumeBasicParams {
 
     public void setStartSuffix(Integer startSuffix) {
         this.startSuffix = startSuffix;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 }
