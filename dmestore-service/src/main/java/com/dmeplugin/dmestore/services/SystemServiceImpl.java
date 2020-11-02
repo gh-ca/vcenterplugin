@@ -48,6 +48,8 @@ public class SystemServiceImpl implements SystemService {
 
       systemDao.initData(DPSqlFileConstant.DP_DME_TASK_DATA_SCANDATASTORE_SQL);
 
+      systemDao.initData(DPSqlFileConstant.DP_DME_TASK_DATA_REFRESHRESOURCEINSTANCE_SQL);
+
       LOGGER.info("init data over...");
     } catch (Exception e) {
       LOGGER.error("Failed to init DB: " + e.getMessage());

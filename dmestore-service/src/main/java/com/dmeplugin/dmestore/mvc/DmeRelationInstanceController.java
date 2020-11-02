@@ -32,7 +32,7 @@ public class DmeRelationInstanceController extends BaseController {
 
         List<RelationInstance> ris = null;
         try {
-           return success( dmeRelationInstanceService.queryRelationByRelationName(relationName));
+            return success(dmeRelationInstanceService.queryRelationByRelationName(relationName));
         } catch (Exception e) {
             e.printStackTrace();
             String errMsg = "queryRelationInstanceByRelationName error,relationName:" + relationName;
@@ -58,15 +58,27 @@ public class DmeRelationInstanceController extends BaseController {
     public ResponseBodyBean queryByRelationNameInstanceIdCondition(@RequestParam(name = "relationName") String relationName, @RequestParam(name = "instanceId") String instanceId) {
         LOG.info("getbyrelationname instanceid:" + relationName + " , " + instanceId);
         try {
-            return  success(dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(relationName, instanceId));
+            return success(dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(relationName, instanceId));
         } catch (Exception e) {
             e.printStackTrace();
             String errMsg = "queryRelationInstanceByRelationNameInstanceId error,relationName:" + relationName + " , " + instanceId;
             return failure(errMsg);
         }
-
     }
 
+    @GetMapping("/refreshresourceinstance")
+    @ResponseBody
+    public ResponseBodyBean refreshResourceInstance() {
+        LOG.info("refreshresourceinstance instance start!");
+        try {
+            dmeRelationInstanceService.refreshResourceInstance();
+            return success(null, "refreshresourceinstance success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            String errMsg = "refreshresourceinstance success error!";
+            return failure(errMsg);
+        }
+    }
 
 
 }
