@@ -1,4 +1,4 @@
-<!--<clr-modal class="add-wizard-wrap" [(clrModalOpen)]="changeServiceLevelShow" [clrModalSize]="'lg'" [clrModalClosable]="false">-->
+<clr-modal class="add-wizard-wrap" [(clrModalOpen)]="changeServiceLevelShow" [clrModalSize]="'lg'" [clrModalClosable]="false">
   <div class="modal-body">
     <form clrForm>
 
@@ -76,7 +76,7 @@
     <button type="button" class="btn btn-outline" (click)="cancel()">{{'menu.cancel' | translate}}</button>
     <button type="button" class="btn btn-primary" (click)="changeSLHandleFunc()">{{'menu.ok' | translate}}</button>
   </div>
-<!--</clr-modal>-->
+</clr-modal>
 <!--操作成功提示-->
 <clr-modal [(clrModalOpen)]="changeServiceLevelSuccessShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
   <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
