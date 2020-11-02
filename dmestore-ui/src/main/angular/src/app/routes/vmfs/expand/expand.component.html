@@ -1,4 +1,4 @@
-<!--<clr-modal class="add-wizard-wrap" [(clrModalOpen)]="expandShow" [clrModalClosable]="false">-->
+<clr-modal class="add-wizard-wrap" [(clrModalOpen)]="expandShow" [clrModalClosable]="false">
   <div class="modal-body">
     <div *ngIf="modalLoading" class="loadingDiv">
       <span>
@@ -38,7 +38,7 @@
     <button type="button" class="btn btn-outline" (click)="cancel()">{{'menu.cancel' | translate}}</button>
     <button type="button" class="btn btn-primary" (click)="expandHandleFunc();">{{'menu.ok' | translate}}</button>
   </div>
-<!--</clr-modal>-->
+</clr-modal>
 <!--操作成功提示-->
 <clr-modal [(clrModalOpen)]="expandSuccessShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
   <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
@@ -46,6 +46,6 @@
     <p *ngIf="expandSuccessShow">{{'vmfs.expand.success' | translate}}</p>
   </div>
   <div class="modal-footer">
-    <button type="submit" class="btn btn-primary" (click)="expandSuccessShow = false;">{{'menu.ok' | translate}}</button>
+    <button type="submit" class="btn btn-primary" (click)="expandSuccessShow = false;confirmActResult();">{{'menu.ok' | translate}}</button>
   </div>
 </clr-modal>
