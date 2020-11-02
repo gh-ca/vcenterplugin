@@ -74,6 +74,7 @@ export class ModifyComponent implements OnInit{
               this.modifyForm.service_level_name = this.vmfsInfo.serviceLevelName;
               if (this.vmfsInfo.serviceLevelName === '') { // 非服务等级
                 this.isServiceLevelData = false;
+                this.modifyForm.control_policy = '';
                 const wwns = [];
                 wwns.push(this.vmfsInfo.wwn)
                 this.remoteSrv.getChartData(wwns).subscribe((chartResult: any) => {
@@ -139,8 +140,6 @@ export class ModifyComponent implements OnInit{
       this.modalHandleLoading = false;
       if (result.code === '200') {
         console.log('modify success:' + this.modifyForm.oldDsName);
-        // 关闭编辑窗口
-        this.cancel();
         this.modifySuccessShow = true;
       } else {
         console.log('modify faild：' + this.modifyForm.oldDsName + result.description);
@@ -199,5 +198,12 @@ export class ModifyComponent implements OnInit{
         this.modifyForm.latency = objVal;
         break;
     }
+  }
+
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    this.cancel();
   }
 }
