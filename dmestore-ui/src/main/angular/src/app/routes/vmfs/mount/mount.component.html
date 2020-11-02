@@ -23,7 +23,6 @@
           <clr-dg-column hidden>objectId</clr-dg-column>
           <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
           <clr-dg-column [clrDgField]="'type'">{{'vmfs.type' | translate}}</clr-dg-column>
-          <clr-dg-column [clrDgField]="'status'">{{'vmfs.status' | translate}}</clr-dg-column>
           <clr-dg-column [clrDgField]="'capacity'">{{'vmfs.capacity' | translate}}</clr-dg-column>
           <clr-dg-column [clrDgField]="'freeSpace'">{{'vmfs.freeSpace' | translate}}</clr-dg-column>
           <clr-dg-row *clrDgItems="let item of dataStores" [clrDgItem]="item">
@@ -31,9 +30,8 @@
             <clr-dg-cell hidden>{{item.objectId}}</clr-dg-cell>
             <clr-dg-cell>{{item.name}}</clr-dg-cell>
             <clr-dg-cell>{{item.type}}</clr-dg-cell>
-            <clr-dg-cell>{{item.status}}</clr-dg-cell>
-            <clr-dg-cell>{{item.capacity}}</clr-dg-cell>
-            <clr-dg-cell>{{item.freeSpace}}</clr-dg-cell>
+            <clr-dg-cell>{{formatCapacity(item.capacity, true)}}</clr-dg-cell>
+            <clr-dg-cell>{{formatCapacity(item.freeSpace, true)}}</clr-dg-cell>
           </clr-dg-row>
         </clr-datagrid>
       </form>
