@@ -969,7 +969,7 @@
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
                <uid>com.dmeplugin.dmestore.datastore.hostcreatenfsaction</uid>
-               <label>#{create.label}</label>
+               <label>#{createnfs.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
                   <object>
@@ -983,7 +983,7 @@
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
                <uid>com.dmeplugin.dmestore.datastore.hostcreatevmfsaction</uid>
-               <label>#{create.label}</label>
+               <label>#{createvmfs.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
                   <object>
@@ -1150,7 +1150,7 @@
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
                <uid>com.dmeplugin.dmestore.datastore.clustercreatenfsaction</uid>
-               <label>#{create.label}</label>
+               <label>#{createnfs.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
                   <object>
@@ -1164,7 +1164,7 @@
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
                <uid>com.dmeplugin.dmestore.datastore.clustercreatevmfsaction</uid>
-               <label>#{create.label}</label>
+               <label>#{createvmfs.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
                   <object>

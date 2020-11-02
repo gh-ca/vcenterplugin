@@ -45,7 +45,7 @@
         <div class="info-card-content">
           <div class="info-card-squre">
             <div class="squre-per-box" [ngStyle]="{'height':(item.usedRate/100*200)+'px'}"></div>
-            <div class="squre-num">{{item.usedRate}}</div>
+            <div class="squre-num">{{item.usedRate}}%</div>
           </div>
           <div style="width: 70%;">
             <div class="gh-info-item">
@@ -68,32 +68,6 @@
                 <div style="margin-top: 5px" *ngIf="item.capabilities.qos.qosParam.minBandWidth != undefined">{{'tier.bandwidth'|translate}} >= {{item.capabilities.qos.qosParam.minBandWidth}} Mbps/s</div>
               </div>
             </div>
-            <!--<div class="gh-info-item">
-              <span class="gh-info-lable"></span>
-              <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
-                                              && item.capabilities.qos.enabled == true
-                                              && item.capabilities.qos.qosParam.minBandWidth != undefined">
-                     {{'tier.bandwidth'|translate}} >= {{item.capabilities.qos.qosParam.minBandWidth}} Mbps/s
-              </span>
-              <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
-                                              && item.capabilities.qos.enabled == true
-                                              && item.capabilities.qos.qosParam.maxBandWidth != undefined">
-                     {{'tier.bandwidth'|translate}} <= {{item.capabilities.qos.qosParam.maxBandWidth}} Mbps/s
-              </span>
-            </div>
-            <div class="gh-info-item">
-              <span class="gh-info-lable"></span>
-              <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
-                                              && item.capabilities.qos.enabled == true
-                                              && item.capabilities.qos.qosParam.minIOPS != undefined">
-                  IOPS >= {{item.capabilities.qos.qosParam.minIOPS}} IOPS/TB
-              </span>
-              <span class="gh-info-value" *ngIf="item.capabilities.qos != undefined
-                                              && item.capabilities.qos.enabled == true
-                                              && item.capabilities.qos.qosParam.maxIOPS != undefined">
-                  IOPS <= {{item.capabilities.qos.qosParam.maxIOPS}} IOPS/TB
-              </span>
-            </div>-->
           </div>
         </div>
       </div>
@@ -258,7 +232,7 @@
         </clr-tab-content>
       </clr-tab>
       <clr-tab>
-        <button clrTabLink>{{'tier.storagep'|translate}}</button>
+        <button clrTabLink (click)="storagePoolRefresh()">{{'tier.storagep'|translate}}</button>
         <clr-tab-content *clrIfActive>
 
             <div class="gh-info-head"></div>
@@ -277,12 +251,12 @@
                 <label for="btn-demo-radio-3"><clr-icon shape="radar" size="20"></clr-icon></label>
               </div>
               <div class="radio btn merginLeft">
-                <label><clr-icon shape="refresh" size="20" (click)="storagePoolRefresh($event)"></clr-icon></label>
+                <label><clr-icon shape="refresh" size="20" (click)="storagePoolRefresh()"></clr-icon></label>
               </div>
             </div>
 
             <!-- 列表页 -->
-            <clr-datagrid  (clrDgRefresh)="storagePoolRefresh($event)" [clrDgLoading]="storeagePoolIsloading">
+            <clr-datagrid [clrDgLoading]="storeagePoolIsloading">
 
               <clr-dg-column [clrDgField]="'name'">{{'tier.name'|translate}}</clr-dg-column>
 
@@ -300,11 +274,27 @@
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'iops'">IOPS</clr-dg-column>
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'bandwidth'">{{'tier.bandwidthm'|translate}}</clr-dg-column>
 
-              <clr-dg-row *ngFor="let item of storagePoolList" [clrDgItem]="item">
+              <clr-dg-row *clrDgItems="let item of storagePoolList" [clrDgItem]="item">
 
                 <clr-dg-cell>{{item.name}}</clr-dg-cell>
 
-                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='basic'">{{item.runningStatus}}</clr-dg-cell>
+                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='basic'">
+                  <span *ngIf="item.runningStatus == 'offline'">
+                    <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>{{'tier.offLine' | translate}}
+                  </span>
+                  <span *ngIf="item.runningStatus == 'normal'">
+                    <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px;"></span>{{'tier.normal' | translate}}
+                  </span>
+                  <span *ngIf="item.runningStatus == 'abnormal'">
+                    <span class="color-square" style="background-color: red; margin-right: 10px"></span>{{'tier.fault' | translate}}
+                  </span>
+                  <span *ngIf="item.runningStatus == 'unknown'">
+                    <span class="color-square" style="background-color: yellow; margin-right: 10px"></span>{{'tier.unknown' | translate}}
+                  </span>
+                  <span *ngIf="!item.runningStatus">
+                    <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>--
+                  </span>
+                </clr-dg-cell>
                 <clr-dg-cell [hidden]="storagePoolRadioCheck!=='basic'">{{item.physicalType}}</clr-dg-cell>
                 <clr-dg-cell [hidden]="storagePoolRadioCheck!=='basic'">{{item.storageName}}</clr-dg-cell>
 
@@ -315,7 +305,23 @@
                 </clr-dg-cell>
                 <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">{{item.freeCapacity}} GB</clr-dg-cell>
 
-                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='performance'">{{item.runningStatus}}</clr-dg-cell>
+                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='performance'">
+                  <span *ngIf="item.runningStatus == 'offline'">
+                    <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>{{'tier.offLine' | translate}}
+                  </span>
+                  <span *ngIf="item.runningStatus == 'normal'">
+                    <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px;"></span>{{'tier.normal' | translate}}
+                  </span>
+                  <span *ngIf="item.runningStatus == 'abnormal'">
+                    <span class="color-square" style="background-color: red; margin-right: 10px"></span>{{'tier.fault' | translate}}
+                  </span>
+                  <span *ngIf="item.runningStatus == 'unknown'">
+                    <span class="color-square" style="background-color: yellow; margin-right: 10px"></span>{{'tier.unknown' | translate}}
+                  </span>
+                  <span *ngIf="!item.runningStatus">
+                    <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>--
+                  </span>
+                </clr-dg-cell>
                 <clr-dg-cell [hidden]="storagePoolRadioCheck!=='performance'">
                   <span *ngIf="item.latency != undefined">{{item.latency}}</span>
                   <span *ngIf="item.latency == undefined">--</span>
@@ -331,20 +337,21 @@
 
               </clr-dg-row>
 
-              <!--<clr-dg-footer>
+              <clr-dg-footer>
                 <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="storagePoolTotal">
-                  <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">per page</clr-dg-page-size>
+                  <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">{{'page.perPage' | translate}}</clr-dg-page-size>
                   {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-                  of {{pagination.totalItems}}
+                  {{'page.all' | translate}}
+                  {{pagination.totalItems}}
                 </clr-dg-pagination>
-              </clr-dg-footer>-->
+              </clr-dg-footer>
 
 
           </clr-datagrid>
         </clr-tab-content>
       </clr-tab>
       <clr-tab>
-        <button clrTabLink>{{'tier.volume'|translate}}</button>
+        <button clrTabLink (click)="volumeRefresh()">{{'tier.volume'|translate}}</button>
         <clr-tab-content *clrIfActive>
 
           <div class="gh-info-head"></div>
@@ -359,11 +366,11 @@
               <label for="btn-demo-radio-5"><clr-icon shape="dashboard" size="20"></clr-icon></label>
             </div>
             <div class="radio btn merginLeft">
-              <label><clr-icon shape="refresh" size="20" (click)="volumeRefresh($event)"></clr-icon></label>
+              <label><clr-icon shape="refresh" size="20" (click)="volumeRefresh()"></clr-icon></label>
             </div>
           </div>
 
-          <clr-datagrid  (clrDgRefresh)="volumeRefresh($event)" [clrDgLoading]="volumeIsloading">
+          <clr-datagrid [clrDgLoading]="volumeIsloading">
             <clr-dg-column [clrDgField]="'name'">{{'tier.name'|translate}}</clr-dg-column>
             <clr-dg-column [clrDgField]="'status'">{{'tier.status'|translate}}</clr-dg-column>
             <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" [clrDgField]="'capacity'">{{'tier.total'|translate}}</clr-dg-column>
@@ -374,10 +381,20 @@
             <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" [clrDgField]="'iops'">IOPS</clr-dg-column>
             <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" [clrDgField]="'bandwidth'">{{'tier.bandwidthm'|translate}}</clr-dg-column>
 
-            <clr-dg-row *ngFor="let item of volumeList" [clrDgItem]="item">
+            <clr-dg-row *clrDgItems="let item of volumeList" [clrDgItem]="item">
 
                 <clr-dg-cell>{{item.name}}</clr-dg-cell>
-                <clr-dg-cell>{{item.status}}</clr-dg-cell>
+                <clr-dg-cell>
+                  <span *ngIf="item.status == 'deleted'">
+                    <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>{{'tier.offLine' | translate}}
+                  </span>
+                  <span *ngIf="item.status == 'normal'">
+                    <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px;"></span>{{'tier.normal' | translate}}
+                  </span>
+                  <span *ngIf="item.status == 'na'">
+                    --
+                  </span>
+                </clr-dg-cell>
 
                 <clr-dg-cell [hidden]="volumeRadioCheck!=='basic'">{{item.capacity}} GB</clr-dg-cell>
                 <clr-dg-cell [hidden]="volumeRadioCheck!=='basic'">{{item.alloctype}}</clr-dg-cell>
@@ -401,14 +418,14 @@
 
             </clr-dg-row>
 
-            <!--<clr-dg-footer>
+            <clr-dg-footer>
               <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="volumeTotal">
-                <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">per page</clr-dg-page-size>
+                <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">{{'page.perPage' | translate}}</clr-dg-page-size>
                 {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-                of {{pagination.totalItems}}
+                {{'page.all' | translate}}
+                {{pagination.totalItems}}
               </clr-dg-pagination>
-            </clr-dg-footer>-->
-
+            </clr-dg-footer>
           </clr-datagrid>
 
         </clr-tab-content>
@@ -453,23 +470,24 @@
       <clr-tab>
         <button clrTabLink>{{'tier.appType'|translate}}</button>
         <clr-tab-content *clrIfActive>
-          <clr-datagrid [(clrDgSelected)]="applicationTypeSelected"   (clrDgRefresh)="applicationTypeRefresh($event)" [clrDgLoading]="applicationTypeIsloading">
+          <clr-datagrid [(clrDgSelected)]="applicationTypeSelected"  [clrDgLoading]="applicationTypeIsloading">
 
             <clr-dg-column [clrDgField]="'storageDevice'">{{'tier.storage'|translate}}</clr-dg-column>
             <clr-dg-column [clrDgField]="'applicationType'">{{'tier.appType'|translate}}</clr-dg-column>
 
-            <clr-dg-row *ngFor="let item of applicationTypeList" [clrDgItem]="item">
+            <clr-dg-row *clrDgItems="let item of applicationTypeList" [clrDgItem]="item">
               <clr-dg-cell>{{item.storageDevice}}</clr-dg-cell>
               <clr-dg-cell>{{item.applicationType}}</clr-dg-cell>
             </clr-dg-row>
 
-            <!--<clr-dg-footer>
+            <clr-dg-footer>
               <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="applicationTypeTotal">
-                <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">per page</clr-dg-page-size>
+                <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">{{'page.perPage' | translate}}</clr-dg-page-size>
                 {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-                of {{pagination.totalItems}}
+                {{'page.all' | translate}}
+                {{pagination.totalItems}}
               </clr-dg-pagination>
-            </clr-dg-footer>-->
+            </clr-dg-footer>
 
           </clr-datagrid>
         </clr-tab-content>
