@@ -5,8 +5,16 @@ import {HttpClient} from "@angular/common/http";
 export class NfsModifyService{
   constructor(private http: HttpClient) {}
   getNfsDetailById(storeObjectId:string){
-    console.log(123)
     return this.http.get('operatenfs/editnfsstore',{params: {storeObjectId}} );
+  }
+  checkNfsNameExist(name:string){
+    return this.http.get('accessvmfs/querydatastorebyname',{params: {name}} );
+  }
+  checkShareNameExist(name:string){
+    return this.http.get('dmestorage/querysharebyname',{params: {name}} );
+  }
+  checkFsNameExist(name:string){
+    return this.http.get('dmestorage/queryfsbyname',{params: {name}} );
   }
   updateNfs(params= {}){
     return this.http.post('operatenfs/updatenfsdatastore', params);
