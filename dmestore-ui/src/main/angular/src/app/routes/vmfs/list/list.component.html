@@ -142,7 +142,7 @@
           <img src="./assets/images/icon-unprotected.svg">{{'vmfs.protectionStatus.protected' | translate}}
         </span>
         <span *ngIf="!item.vmfsProtected">
-          <span class="color-square" style="background-color: green; margin-right: 10px"></span>{{'vmfs.protectionStatus.unprotected' | translate}}
+          {{'vmfs.protectionStatus.unprotected' | translate}}
         </span>
       </clr-dg-cell>
       <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.iops}}</clr-dg-cell>
@@ -165,7 +165,7 @@
   </clr-datagrid>
 
   <!-- 弹出form提交框 添加 -->
-  <clr-wizard #wizard [(clrWizardOpen)]="popShow" [clrWizardClosable]="false">
+  <clr-wizard #wizard [(clrWizardOpen)]="popListShow" [clrWizardClosable]="false">
     <clr-wizard-title style="font-weight: bolder">{{'vmfs.addTitle' | translate}}</clr-wizard-title>
     <div *ngIf="modalLoading" class="loadingDiv">
       <span>
@@ -710,8 +710,8 @@
 
         <clr-datagrid *ngIf="unmountForm.mountType === '1'" [(clrDgSingleSelected)]="chooseUnmountHost" [clrDgLoading]="isLoading">
           <clr-dg-column hidden></clr-dg-column>
-          <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
-          <clr-dg-column [clrDgField]="'type'">{{'vmfs.type' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'deviceName'">{{'vmfs.name' | translate}}</clr-dg-column>
+          <clr-dg-column>{{'vmfs.type' | translate}}</clr-dg-column>
 
           <clr-dg-placeholder>{{'vmfs.unmount.notHaveHost' | translate}}</clr-dg-placeholder>
 
@@ -723,8 +723,8 @@
         </clr-datagrid>
         <clr-datagrid *ngIf="unmountForm.mountType === '2'" [(clrDgSingleSelected)]="chooseUnmountCluster" [clrDgLoading]="isLoading">
           <clr-dg-column hidden></clr-dg-column>
-          <clr-dg-column [clrDgField]="'name'">{{'vmfs.name' | translate}}</clr-dg-column>
-          <clr-dg-column [clrDgField]="'type'">{{'vmfs.type' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'deviceName'">{{'vmfs.name' | translate}}</clr-dg-column>
+          <clr-dg-column>{{'vmfs.type' | translate}}</clr-dg-column>
 
           <clr-dg-placeholder>{{'vmfs.unmount.notHaveCluster' | translate}}</clr-dg-placeholder>
 
