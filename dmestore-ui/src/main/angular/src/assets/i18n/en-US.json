@@ -717,7 +717,12 @@
     "maxIOPSs": "OrderBy MaxIOPS",
     "minIOPSs": "OrderBy MinIOPS",
     "maxBandWidths": "OrderBy MaxBandWidth",
-    "minBandWidths": "OrderBy MinBandWidth"
+    "minBandWidths": "OrderBy MinBandWidth",
+
+    "offLine": "Offline",
+    "normal": "Normal",
+    "abnormal": "Abnormal",
+    "unknown": "Unknown"
   },
   "applybp": {
     "ing": "Best Practice is Executing",

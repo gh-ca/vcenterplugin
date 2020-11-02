@@ -2,7 +2,7 @@ import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {CommonService} from '../common.service';
 import {GlobalsService} from '../../shared/globals.service';
-import {ClrForm, ClrWizard, ClrWizardPage} from "@clr/angular";
+import {ClrWizard, ClrWizardPage} from "@clr/angular";
 
 @Component({
   selector: 'app-rdm',
@@ -25,11 +25,10 @@ export class RdmComponent implements OnInit {
     resourceTuning: false
   };
 
-  configModel = new customize_volumes();
+  configModel = new customizeVolumes();
   storageDevices = [];
   storagePools = [];
   hostList = [];
-  hostSelected = '';
   dataStoreObjectId = '';
   levelCheck = 'level';
   dataStores = [];
@@ -37,9 +36,7 @@ export class RdmComponent implements OnInit {
   searchName = '';
   serviceLevelsRes = [];
   serviceLevels = [];
-  service_level_id = '';
-
-  diskNum = 1;
+  serviceLevelId = '';
 
   vmObjectId = '';
 
@@ -111,7 +108,7 @@ export class RdmComponent implements OnInit {
   }
 
   serviceLevelClick(id: string){
-     this.service_level_id = id;
+     this.serviceLevelId = id;
      this.serviceLevelIsNull = false;
   }
 
@@ -133,7 +130,7 @@ export class RdmComponent implements OnInit {
 
   changeQosInput(type: string){
     const c = this.configModel.tuning.smartqos;
-    if(c.control_policy == '1'){
+    if(c.controlPolicy == '1'){
       if(type == 'box'){
         this.qos1Show = (!this.options1 && !this.options2);
         return this.qos1Show;
@@ -147,7 +144,7 @@ export class RdmComponent implements OnInit {
         return this.qos3Show;
       }
     }
-    if(this.configModel.tuning.smartqos.control_policy == '0'){
+    if(this.configModel.tuning.smartqos.controlPolicy == '0'){
       if(type == 'box'){
         this.qos1Show = (!this.options3 && !this.options4 && !this.options5);
         return this.qos1Show;
@@ -184,9 +181,10 @@ export class RdmComponent implements OnInit {
         if(box || band || iops || latency){
           return;
         }
-        if(this.configModel.tuning.smartqos.control_policy == '1'){
+        if(this.configModel.tuning.smartqos.controlPolicy == '1'){
           b.tuning.smartqos.minbandwidth = null;
           b.tuning.smartqos.miniops = null;
+          b.tuning.smartqos.latency = null;
         } else{
           b.tuning.smartqos.maxbandwidth = null;
           b.tuning.smartqos.maxiops = null;
@@ -194,8 +192,8 @@ export class RdmComponent implements OnInit {
       }
       if(!this.policyEnable.resourceTuning){
         b.tuning.alloctype = null;
-        b.tuning.dedupe_enabled = null;
-        b.tuning.compression_enabled = null;
+        b.tuning.dedupeEnabled = null;
+        b.tuning.compressionEnabled = null;
       }
       if(!this.policyEnable.smartTier && !this.policyEnable.qosPolicy && !this.policyEnable.resourceTuning){
         b.tuning = null;
@@ -203,19 +201,19 @@ export class RdmComponent implements OnInit {
 
       body = {
         customizeVolumesRequest: {
-          customize_volumes: b
+          customizeVolumes: b
         }
       };
     }
     if (this.configModel.storageType == '1'){
-      if(this.service_level_id == '' || this.service_level_id == null){
+      if(this.serviceLevelId == '' || this.serviceLevelId == null){
         this.serviceLevelIsNull = true;
         return;
       }
       body = {
         createVolumesRequest: {
-          service_level_id: this.service_level_id,
-          volumes: this.configModel.volume_specs
+          serviceLevelId: this.serviceLevelId,
+          volumes: this.configModel.volumeSpecs
         }
       };
     }
@@ -327,44 +325,33 @@ export class RdmComponent implements OnInit {
 }
 
 
-class customize_volumes{
+class customizeVolumes{
   storageType: string;
-  availability_zone: string;
-  initial_distribute_policy: string;
-  owner_controller: string;
-  pool_raw_id: string;
-  prefetch_policy: string;
-  prefetch_value: string;
-  storage_id: string;
+  availabilityZone: string;
+  initialDistributePolicy: string;
+  ownerController: string;
+  poolRawId: string;
+  prefetchPolicy: string;
+  prefetchValue: string;
+  storageId: string;
   tuning: any;
-  volume_specs: volume_specs[];
+  volumeSpecs: volumeSpecs[];
   constructor(){
     this.storageType = '1';
-    this.volume_specs = [new volume_specs("name1","unit1","count1", "capacity1")];
+    this.volumeSpecs = [new volumeSpecs()];
     this.tuning = new tuning();
-    this.initial_distribute_policy = '0';
-    this.owner_controller = '0';
-    this.prefetch_policy = '3';
+    this.initialDistributePolicy = '0';
+    this.ownerController = '0';
+    this.prefetchPolicy = '3';
   }
 }
 
-class volume_specs{
+class volumeSpecs{
   capacity: number;
   count: number;
   name: string;
   unit: string;
-  start_lun_id: number;
-  start_suffix: number;
-  inputName: string;
-  inputUnit: string;
-  inputCount: string;
-  inputCapacity: string;
-  constructor(inputName, inputUnit, inputCount, inputCapacity){
-     this.inputCapacity = inputCapacity;
-     this.inputCount = inputCount;
-     this.inputName = inputName;
-     this.inputUnit = inputUnit;
-
+  constructor(){
      this.name = '';
      this.capacity = null;
      this.count = 1;
@@ -375,22 +362,22 @@ class volume_specs{
 
 class tuning{
   alloctype:string;
-  compression_enabled: boolean;
-  dedupe_enabled: boolean;
+  compressionEnabled: boolean;
+  dedupeEnabled: boolean;
   smartqos: smartqos;
   smarttier: string;
-  workload_type_id: string;
+  workloadTypeId: string;
   constructor(){
     this.smartqos = new smartqos();
     this.alloctype = 'thick';
     this.smarttier = '0';
-    this.compression_enabled = null;
-    this.dedupe_enabled = null;
+    this.compressionEnabled = null;
+    this.dedupeEnabled = null;
   }
 }
 
 class smartqos{
-  control_policy: string;
+  controlPolicy: string;
   latency: number;
   maxbandwidth: number;
   maxiops: number;
@@ -398,14 +385,6 @@ class smartqos{
   miniops: number;
   name:string;
   constructor(){
-    this.control_policy = '1'
-  }
-}
-
-class mapping{
-  auto_zoning: boolean;
-  host_id: string;
-  hostgroup_id: string;
-  constructor(){
+    this.controlPolicy = '1'
   }
 }

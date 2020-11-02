@@ -5,7 +5,7 @@
     <button class="btn btn-primary" (click)="recheck()">{{'bestPractice.check'|translate}}</button>
   </div>
   <!-- 列表页 -->
-  <clr-datagrid [(clrDgSelected)]="rowSelected"   (clrDgRefresh)="practiceRefresh()" [clrDgLoading]="isLoading">
+  <clr-datagrid [(clrDgSelected)]="rowSelected" [clrDgLoading]="isLoading">
 
     <clr-dg-column [clrDgField]="'hostSetting'">{{'bestPractice.hostSetting'|translate}}</clr-dg-column>
     <clr-dg-column [clrDgField]="'recommendValue'">{{'bestPractice.recommend'|translate}}</clr-dg-column>
@@ -34,9 +34,10 @@
 
     <clr-dg-footer>
       <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="total">
-        <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]"></clr-dg-page-size>
+        <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">{{'page.perPage' | translate}}</clr-dg-page-size>
         {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-        of {{pagination.totalItems}}
+        {{'page.all' | translate}}
+        {{pagination.totalItems}}
       </clr-dg-pagination>
     </clr-dg-footer>
 
@@ -51,7 +52,7 @@
         <button class="btn btn-primary" [disabled]="hostSelected.length === 0" (click)="applyClick('2')">{{'bestPractice.apply'|translate}}</button>
       </div>
       <!-- 列表页 -->
-      <clr-datagrid [(clrDgSelected)]="hostSelected"   (clrDgRefresh)="hostRefresh()" [clrDgLoading]="hostIsLoading">
+      <clr-datagrid [(clrDgSelected)]="hostSelected"  (clrDgRefresh)="hostRefresh()" [clrDgLoading]="hostIsLoading">
 
         <clr-dg-column [clrDgField]="'hostName'">{{'bestPractice.host'|translate}}</clr-dg-column>
         <clr-dg-column [clrDgField]="'actualValue'">{{'bestPractice.actual'|translate}}</clr-dg-column>
@@ -63,13 +64,14 @@
           <clr-dg-cell>{{item.recommendValue}}</clr-dg-cell>
         </clr-dg-row>
 
-        <!--<clr-dg-footer>
-          <clr-dg-pagination #pagination1 [clrDgPageSize]="5" [clrDgTotalItems]="hostTotal">
-            <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]"></clr-dg-page-size>
-            {{pagination1.firstItem + 1}} - {{pagination1.lastItem + 1}}
-            of {{pagination1.totalItems}}
+        <clr-dg-footer>
+          <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="hostTotal">
+            <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">{{'page.perPage' | translate}}</clr-dg-page-size>
+            {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+            {{'page.all' | translate}}
+            {{pagination.totalItems}}
           </clr-dg-pagination>
-        </clr-dg-footer>-->
+        </clr-dg-footer>
 
       </clr-datagrid>
     </div>

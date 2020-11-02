@@ -112,6 +112,11 @@ export class MountComponent implements OnInit{
           } else { // 以dataStore为入口
             this.objectId = ctx[0].id;
           }
+          if (this.operationType === 'mount') {
+            this.mountShow = true;
+          } else {
+            this.unmountShow = true;
+          }
 
           // 获取vmfs数据
           this.remoteSrv.getVmfsById(this.objectId)
@@ -121,11 +126,6 @@ export class MountComponent implements OnInit{
                 this.vmfsInfo = result.data.filter(item => item.objectid === this.objectId)[0];
               }
               console.log('this.vmfsInfo ', this.vmfsInfo );
-              if (this.operationType === 'mount') {
-                this.mountShow = true;
-              } else {
-                this.unmountShow = true;
-              }
 
               this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
             });
@@ -133,6 +133,7 @@ export class MountComponent implements OnInit{
         } else { // 以集群为入口
           this.hostOrClusterId = ctx[0].id;
           this.hostMountShow = true;
+          console.log("this.hostMountShow", this.hostMountShow)
         }
 
         this.cdr.detectChanges();
@@ -173,8 +174,6 @@ export class MountComponent implements OnInit{
     }
     // 挂载、卸载 数据初始化
     if (this.resource === 'others') { // 以主机/集群为入口
-      this.mountShow = false;
-      this.unmountShow = false;
       if (this.operationType === 'mount') {
         this.mountDataStore();
       } else {
@@ -186,25 +185,11 @@ export class MountComponent implements OnInit{
         // 初始化主机
         this.mountHostData = false;
         this.hostList = [];
-        const hostNullInfo = {
-          hostId: '',
-          hostName: ''
-        };
-        this.hostList.push(hostNullInfo);
+
+        this.chooseCluster = undefined;
+        this.chooseHost =  undefined;
         this.initMountHost();
 
-        // 初始化集群
-        this.mountClusterData = false;
-        this.clusterList = [];
-        const clusterNullInfo = {
-          clusterId: '',
-          clusterName: ''
-        };
-        this.clusterList.push(clusterNullInfo);
-
-        this.initMountCluster().then(res => {
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        });
       } else { // 卸载
 
         this.isLoading = true;
@@ -230,29 +215,28 @@ export class MountComponent implements OnInit{
             });
             this.mountedHost = mountHost;
           }
-          this.modalLoading = false;
+          // 获取集群
+          this.remoteSrv.getMountCluster(this.objectId).subscribe((result: any) => {
+            console.log(result);
+            if (result.code === '200' && result.data !== null && result.data.length >= 1) {
+              this.unmountForm.mountType = '2';
+              const mountCluster: HostOrCluster [] = [];
+              result.data.forEach(item => {
+                const hostInfo = {
+                  deviceId: item.hostGroupId,
+                  deviceName: item.hostGroupName,
+                  deviceType: 'cluster'
+                };
+                mountCluster.push(hostInfo);
+              });
+              this.mountedCluster = mountCluster;
+            }
+            this.modalLoading = false;
+            this.isLoading = false;
+            this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+          });
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         });
-        // 获取集群
-        this.remoteSrv.getMountCluster(this.objectId).subscribe((result: any) => {
-          console.log(result);
-          if (result.code === '200' && result.data !== null && result.data.length >= 1) {
-            this.unmountForm.mountType = '2';
-            const mountCluster: HostOrCluster [] = [];
-            result.data.forEach(item => {
-              const hostInfo = {
-                deviceId: item.hostId,
-                deviceName: item.hostName,
-                deviceType: 'host'
-              };
-              mountCluster.push(hostInfo);
-            });
-            this.mountedCluster = mountCluster;
-          }
-          this.modalLoading = false;
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        });
-        this.isLoading = false;
       }
     }
   }
@@ -360,6 +344,9 @@ export class MountComponent implements OnInit{
   cancel() {
 
     // dataStore/列表入口 窗口隐藏
+    this.hostMountShow = false;
+    this.mountShow = false;
+    this.unmountShow = false;
     if (this.resource !== 'others') {
       if (this.operationType === 'mount') {
         this.mountShow = false;
@@ -427,7 +414,7 @@ export class MountComponent implements OnInit{
         if (result.code === '200'){
           console.log('unmount  success');
           // 关闭卸载页面
-          this.unmountShow = false;
+          this.cancel();
           this.unmountSuccessShow = true;
         } else {
           console.log('unmount  fail：' + result.description);
@@ -448,8 +435,17 @@ export class MountComponent implements OnInit{
             this.hostList.push(item);
           });
         }
-        this.chooseHost =  this.hostList[0];
+
         this.mountHostData = true;
+
+        // 初始化集群
+        this.mountClusterData = false;
+        this.clusterList = [];
+
+        this.initMountCluster().then(res => {
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        });
+
         this.cdr.detectChanges();
       });
     });
@@ -464,7 +460,7 @@ export class MountComponent implements OnInit{
             this.clusterList.push(item);
           });
         }
-        this.chooseCluster = this.clusterList[0];
+        this.modalLoading = false;
         this.mountClusterData = true;
         this.cdr.detectChanges();
       });
@@ -490,7 +486,7 @@ export class MountComponent implements OnInit{
       if (result.code  ===  '200'){
         console.log('挂载成功');
         // 隐藏挂载页面
-        this.mountShow = false;
+        this.cancel();
         this.mountSuccessShow = true;
       } else {
         console.log('挂载异常：' + result.description);
@@ -523,7 +519,7 @@ export class MountComponent implements OnInit{
         if (result.code === '200'){
           console.log('unmount  success');
           // 关闭卸载页面
-          this.unmountShow = false;
+          this.cancel();
           this.unmountSuccessShow = true;
         } else {
           console.log('unmount  fail：' + result.description);

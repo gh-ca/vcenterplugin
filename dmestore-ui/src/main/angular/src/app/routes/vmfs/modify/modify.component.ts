@@ -24,7 +24,7 @@ export class ModifyComponent implements OnInit{
   isServiceLevelData = true;
 
   // 存储ID
-  objectId = 'urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1';
+  objectId;
   // vmfs数据
   vmfsInfo: VmfsInfo;
 
@@ -32,7 +32,7 @@ export class ModifyComponent implements OnInit{
   resource;
 
   // 编辑窗口隐藏于展示
-  // modifyShow:boolean;
+  modifyShow = false;
   modalHandleLoading = false; // 数据处理loading
   modalLoading = false; // 数据加载loading
   isOperationErr = false; // 错误信息
@@ -43,7 +43,7 @@ export class ModifyComponent implements OnInit{
   }
 
   initData() {
-    // this.modifyShow = true;
+    this.modifyShow = true;
     this.modalLoading = true;
     this.modalHandleLoading = false;
     this.isOperationErr = false;
@@ -108,7 +108,7 @@ export class ModifyComponent implements OnInit{
    */
   cancel() {
     console.log('this.resource', this.resource);
-    // this.modifyShow = false;
+    this.modifyShow = false;
     if (this.resource === 'list') { // 列表入口
       this.router.navigate(['vmfs/list']);
     } else { // dataStore入口
