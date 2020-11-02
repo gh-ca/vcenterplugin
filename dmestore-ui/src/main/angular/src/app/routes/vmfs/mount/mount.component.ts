@@ -223,9 +223,9 @@ export class MountComponent implements OnInit{
               const mountCluster: HostOrCluster [] = [];
               result.data.forEach(item => {
                 const hostInfo = {
-                  deviceId: item.hostId,
-                  deviceName: item.hostName,
-                  deviceType: 'host'
+                  deviceId: item.hostGroupId,
+                  deviceName: item.hostGroupName,
+                  deviceType: 'cluster'
                 };
                 mountCluster.push(hostInfo);
               });
