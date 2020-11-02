@@ -150,6 +150,7 @@
 
 .add-wizard-wrap ::ng-deep .modal-backdrop{
   display: none;
+  border: none;
 }
 .add-wizard-wrap ::ng-deep .modal{
   padding: 0;
@@ -157,8 +158,9 @@
 }
 
 ::ng-deep .add-wizard-wrap .modal-dialog {
-  height: 100vh;
+  height: 100%;
   max-height: none;
+  width: 100%;
 }
 .loadingDiv {
   width: 100%;

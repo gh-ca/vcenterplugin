@@ -84,6 +84,6 @@
     <p *ngIf="changeServiceLevelSuccessShow">{{'vmfs.serviceLevel.success' | translate}}</p>
   </div>
   <div class="modal-footer">
-    <button type="submit" class="btn btn-primary" (click)="changeServiceLevelSuccessShow = false;">{{'menu.ok' | translate}}</button>
+    <button type="submit" class="btn btn-primary" (click)="changeServiceLevelSuccessShow = false;confirmActResult();">{{'menu.ok' | translate}}</button>
   </div>
 </clr-modal>

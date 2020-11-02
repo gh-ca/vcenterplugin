@@ -128,8 +128,6 @@ export class ServiceLevelComponent implements OnInit{
         this.modalHandleLoading = false;
         if (result.code === '200'){
           console.log('change service level success:' + name);
-          // 关闭
-          this.cancel();
           this.changeServiceLevelSuccessShow = true;
         } else {
           console.log('change service level faild: ' + name  + ' Reason:' + result.description);
@@ -157,5 +155,11 @@ export class ServiceLevelComponent implements OnInit{
       cNum = isGB ? (c/1024/1024).toFixed(3) + 'PB':(c/1024/1024).toFixed(3) + 'TB';
     }
     return cNum;
+  }
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    this.cancel();
   }
 }

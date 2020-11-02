@@ -81,8 +81,6 @@ export class DeleteComponent implements OnInit{
       this.modalHandleLoading = false;
       if (result.code === '200'){
         console.log('DEL success');
-        // 关闭删除页面
-        this.cancel();
         // 删除成功提示
         this.delSuccessShow = true;
       } else {
@@ -91,6 +89,13 @@ export class DeleteComponent implements OnInit{
       }
       this.cdr.detectChanges();
     });
+  }
+
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    this.cancel();
   }
 
 }

@@ -119,8 +119,6 @@ export class ExpandComponent implements OnInit{
         this.modalHandleLoading = false;
         if (result.code === '200'){
           console.log('expand success:' + name);
-          // 隐藏扩容页面
-          this.cancel();
           this.expandSuccessShow = true; // 扩容成功提示
         }else {
           console.log('expand: ' + name  + ' Reason:' + result.description);
@@ -169,5 +167,11 @@ export class ExpandComponent implements OnInit{
     console.log('expand2', expand);
     console.log('this.expandErr', this.expandErr);
     this.expandForm.vo_add_capacity = expand;
+  }
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    this.cancel();
   }
 }

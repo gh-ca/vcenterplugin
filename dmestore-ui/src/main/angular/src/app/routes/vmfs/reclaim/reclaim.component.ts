@@ -85,8 +85,6 @@ export class ReclaimComponent implements OnInit{
       if (result.code === '200'){
         console.log('Reclaim success');
 
-        this.cancel();
-
         this.reclaimSuccessShow = true;
       } else {
         console.log('Reclaim fail：' + result.description);
@@ -96,5 +94,10 @@ export class ReclaimComponent implements OnInit{
       this.cdr.detectChanges();
     });
   }
-
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    this.cancel();
+  }
 }

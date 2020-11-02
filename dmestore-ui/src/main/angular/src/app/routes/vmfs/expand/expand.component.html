@@ -46,6 +46,6 @@
     <p *ngIf="expandSuccessShow">{{'vmfs.expand.success' | translate}}</p>
   </div>
   <div class="modal-footer">
-    <button type="submit" class="btn btn-primary" (click)="expandSuccessShow = false;">{{'menu.ok' | translate}}</button>
+    <button type="submit" class="btn btn-primary" (click)="expandSuccessShow = false;confirmActResult();">{{'menu.ok' | translate}}</button>
   </div>
 </clr-modal>

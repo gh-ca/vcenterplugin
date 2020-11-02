@@ -325,6 +325,7 @@ export class MountComponent implements OnInit{
       if (this.operationType === 'unmount') {
         this.unMountHandleFunc();
       } else {
+        console.log("开始挂载");
         this.mountHandleFunc();
       }
     } else {
@@ -334,15 +335,13 @@ export class MountComponent implements OnInit{
         this.mountSubmit();
       }
     }
-    // 关闭窗口
-    this.cancel();
   }
 
   /**
    * 取消/关闭函数
    */
   cancel() {
-
+    console.log("关闭页面");
     // dataStore/列表入口 窗口隐藏
     this.hostMountShow = false;
     this.mountShow = false;
@@ -377,11 +376,12 @@ export class MountComponent implements OnInit{
       this.mountForm.dataStoreObjectIds = dataStoreObjectIds;
 
       this.modalHandleLoading = true;
+      console.log('开始挂载。。。。');
       this.remoteSrv.mountVmfs(this.mountForm).subscribe((result: any) => {
         this.modalHandleLoading = false;
+        console.log("result:", result)
         if (result.code  ===  '200'){
           console.log('挂载成功');
-          this.cancel();
           this.mountSuccessShow = true;
         } else {
           console.log('挂载异常：' + result.description);
@@ -413,8 +413,6 @@ export class MountComponent implements OnInit{
         this.modalHandleLoading = false;
         if (result.code === '200'){
           console.log('unmount  success');
-          // 关闭卸载页面
-          this.cancel();
           this.unmountSuccessShow = true;
         } else {
           console.log('unmount  fail：' + result.description);
@@ -485,8 +483,6 @@ export class MountComponent implements OnInit{
       this.modalHandleLoading = false;
       if (result.code  ===  '200'){
         console.log('挂载成功');
-        // 隐藏挂载页面
-        this.cancel();
         this.mountSuccessShow = true;
       } else {
         console.log('挂载异常：' + result.description);
@@ -518,8 +514,6 @@ export class MountComponent implements OnInit{
         this.modalHandleLoading = false;
         if (result.code === '200'){
           console.log('unmount  success');
-          // 关闭卸载页面
-          this.cancel();
           this.unmountSuccessShow = true;
         } else {
           console.log('unmount  fail：' + result.description);
@@ -545,5 +539,12 @@ export class MountComponent implements OnInit{
       cNum = isGB ? (c/1024/1024).toFixed(3) + 'PB':(c/1024/1024).toFixed(3) + 'TB';
     }
     return cNum;
+  }
+
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    this.cancel();
   }
 }
