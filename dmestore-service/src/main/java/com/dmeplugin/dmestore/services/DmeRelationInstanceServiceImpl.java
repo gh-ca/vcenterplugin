@@ -195,7 +195,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         }
     }
 
-    public void listInstanceStoragePool(){
+    public void listInstanceStoragePool() {
         String instanceName = "SYS_StoragePool";
         JsonObject jsonObject = listInstancdByInstanceName(instanceName);
         if (null != jsonObject) {
@@ -216,7 +216,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         }
     }
 
-    public void listInstanceStorageDevcie(){
+    public void listInstanceStorageDevcie() {
         String instanceName = "SYS_StorDevice";
         JsonObject jsonObject = listInstancdByInstanceName(instanceName);
         if (null != jsonObject) {
@@ -269,6 +269,14 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
             listInstanceStorageDevcie();
         }
         return storageDevcieInstance;
+    }
+
+    //刷新资源
+    public void refreshResourceInstance() {
+        listInstanceStorageDevcie();
+        listInstanceStoragePool();
+        listInstanceLun();
+        listInstanceServiceLevel();
     }
 
     private JsonObject listInstancdByInstanceName(String instanceName) {
