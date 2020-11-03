@@ -439,7 +439,7 @@
         "capacityUsage":"容量利用率"
       },
       "dtrees":{
-        "dtrees":"Dtrees",
+        "dtrees":"DTrees",
         "name":"名称",
         "ofs":"所属文件系统",
         "osl":"所属服务等级",
@@ -449,7 +449,7 @@
         "quota":"配额"
       },
       "shares":{
-        "shares":"Shares",
+        "shares":"共享",
         "name":"名称",
         "sharePath":"共享路径",
         "ofs":"所属文件系统",
