@@ -13,6 +13,15 @@ export class NfsAddService{
   getVmkernelListByObjectId(hostObjectId:string){
     return this.http.get('accessvmware/getvmkernelipbyhostobjectid',{params: {hostObjectId}} );
   }
+  checkNfsNameExist(name:string){
+    return this.http.get('accessvmfs/querydatastorebyname',{params: {name}} );
+  }
+  checkShareNameExist(name:string){
+    return this.http.get('dmestorage/querysharebyname',{params: {name}} );
+  }
+  checkFsNameExist(name:string){
+    return this.http.get('dmestorage/queryfsbyname',{params: {name}} );
+  }
   addNfs(params= {}){
     return this.http.post('operatenfs/createnfsdatastore', params);
   }

@@ -47,7 +47,7 @@ public class BaseBestPracticeService {
         for (OptionValue value : values) {
             return value.getValue();
         }
-        return null;
+        return "--";
     }
 
 

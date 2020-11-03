@@ -26,7 +26,7 @@ export class DeleteComponent implements OnInit{
   // 待删除VMFS的卷ID
   objectIds = [];
 
-  // delShow:boolean;
+  delShow = false;
   delSuccessShow = false; // 删除提示窗口
   modalHandleLoading = false; // 数据处理loading
   isOperationErr = false; // 错误信息
@@ -36,7 +36,7 @@ export class DeleteComponent implements OnInit{
   }
 
   initData() {
-    // this.delShow = true;
+    this.delShow = true;
     // 设备类型 操作类型初始化
     this.route.url.subscribe(url => {
       console.log('url', url);
@@ -62,7 +62,7 @@ export class DeleteComponent implements OnInit{
    */
   cancel() {
 
-    // this.delShow = false;
+    this.delShow = false;
     if (this.resource === 'list') { // 列表入口
       this.router.navigate(['vmfs/list']);
     } else { // dataStore入口
@@ -81,15 +81,21 @@ export class DeleteComponent implements OnInit{
       this.modalHandleLoading = false;
       if (result.code === '200'){
         console.log('DEL success');
-        // 关闭删除页面
-        this.cancel();
         // 删除成功提示
         this.delSuccessShow = true;
       } else {
         console.log('DEL faild: ' + result.description);
+        this.isOperationErr = true;
       }
       this.cdr.detectChanges();
     });
+  }
+
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    this.cancel();
   }
 
 }

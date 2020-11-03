@@ -24,7 +24,7 @@ export class ModifyComponent implements OnInit{
   isServiceLevelData = true;
 
   // 存储ID
-  objectId = 'urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1';
+  objectId;
   // vmfs数据
   vmfsInfo: VmfsInfo;
 
@@ -32,7 +32,7 @@ export class ModifyComponent implements OnInit{
   resource;
 
   // 编辑窗口隐藏于展示
-  // modifyShow:boolean;
+  modifyShow = false;
   modalHandleLoading = false; // 数据处理loading
   modalLoading = false; // 数据加载loading
   isOperationErr = false; // 错误信息
@@ -43,7 +43,7 @@ export class ModifyComponent implements OnInit{
   }
 
   initData() {
-    // this.modifyShow = true;
+    this.modifyShow = true;
     this.modalLoading = true;
     this.modalHandleLoading = false;
     this.isOperationErr = false;
@@ -74,6 +74,7 @@ export class ModifyComponent implements OnInit{
               this.modifyForm.service_level_name = this.vmfsInfo.serviceLevelName;
               if (this.vmfsInfo.serviceLevelName === '') { // 非服务等级
                 this.isServiceLevelData = false;
+                this.modifyForm.control_policy = '';
                 const wwns = [];
                 wwns.push(this.vmfsInfo.wwn)
                 this.remoteSrv.getChartData(wwns).subscribe((chartResult: any) => {
@@ -108,7 +109,7 @@ export class ModifyComponent implements OnInit{
    */
   cancel() {
     console.log('this.resource', this.resource);
-    // this.modifyShow = false;
+    this.modifyShow = false;
     if (this.resource === 'list') { // 列表入口
       this.router.navigate(['vmfs/list']);
     } else { // dataStore入口
@@ -139,8 +140,6 @@ export class ModifyComponent implements OnInit{
       this.modalHandleLoading = false;
       if (result.code === '200') {
         console.log('modify success:' + this.modifyForm.oldDsName);
-        // 关闭编辑窗口
-        this.cancel();
         this.modifySuccessShow = true;
       } else {
         console.log('modify faild：' + this.modifyForm.oldDsName + result.description);
@@ -199,5 +198,12 @@ export class ModifyComponent implements OnInit{
         this.modifyForm.latency = objVal;
         break;
     }
+  }
+
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    this.cancel();
   }
 }

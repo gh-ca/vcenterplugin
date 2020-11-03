@@ -381,8 +381,7 @@ export class AddComponent implements OnInit{
           console.log('创建成功');
           // 打开成功提示窗口
           this.addSuccessShow = true;
-          // 关闭窗口
-          this.cancel();
+
         } else {
           console.log('创建失败：' + result.description);
           // 失败信息
@@ -631,5 +630,12 @@ export class AddComponent implements OnInit{
         this.form.latency = objVal;
         break;
     }
+  }
+
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    this.cancel();
   }
 }

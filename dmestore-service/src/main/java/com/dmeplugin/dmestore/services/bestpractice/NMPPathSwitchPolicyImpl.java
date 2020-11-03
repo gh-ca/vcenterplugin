@@ -37,7 +37,7 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
             return policyStr;
         }
 
-        return null;
+        return "--";
     }
 
     @Override
@@ -67,11 +67,11 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
             String policyStr = policy.getPolicy();
             //多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
             //TODO
-            if(policyStr.contains("_PSP_") && !policy.equals("VMW_PSP_RR")){
+            if(policyStr.contains("_PSP_") && !"VMW_PSP_RR".equals(policy)){
                 //return false;
             }
 
-            if(policyStr.contains("_SATP_") && !policy.equals("VMW_SATP_ALUA")){
+            if(policyStr.contains("_SATP_") && !"VMW_SATP_ALUA".equals(policy)){
                 //return false;
             }
         }
@@ -95,7 +95,7 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
             String policyStr = policy.getPolicy();
             //TODO
             //多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
-            if(policyStr.equals("")){
+            if("".equals(policyStr)){
                 //policy.setPolicy("VMW_PSP_RR");
             }
             hostStorageSystemMo.setMultipathLunPolicy(lun.getId(), policy);

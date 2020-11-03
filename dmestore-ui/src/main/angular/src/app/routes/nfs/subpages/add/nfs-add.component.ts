@@ -26,7 +26,7 @@ export class NfsAddComponent implements OnInit{
   logicPorts: LogicPort[] = [];
   hostList: Host[] = [];
   vmkernelList: Vmkernel[]=[];
-
+  capacityErr=true;
 
 
   maxbandwidthChoose=false; // 最大带宽 选中
@@ -98,6 +98,9 @@ export class NfsAddComponent implements OnInit{
   addNfs(){
     //
     this.modalHandleLoading=true;
+
+    this.checkedPool = this.storagePools.filter(item => item.id === this.addForm.storagePoolId)[0];
+
     this.addForm.poolRawId=this.checkedPool.diskPoolId;
     this.addForm.storagePoolId= this.checkedPool.id;
     // 单位换算
@@ -125,21 +128,21 @@ export class NfsAddComponent implements OnInit{
       }else{
         this.errorMsg = '1';
         console.log("Delete failed:",result.description)
-
       }
+      this.cdr.detectChanges();
     });
   }
   selectStoragePool(){
     this.modalLoading=true;
-    this.storagePools = null;
+    // this.storagePools = [];
     this.logicPorts = null;
     // 选择存储后获取存储池
     this.storageService.getStoragePoolListByStorageId("file",this.addForm.storagId)
       .subscribe((r: any) => {
         if (r.code === '200'){
           this.storagePools = r.data;
-          this.cdr.detectChanges();
         }
+        this.cdr.detectChanges();
       });
     this.selectLogicPort();
   }
@@ -150,8 +153,8 @@ export class NfsAddComponent implements OnInit{
         this.modalLoading=false;
         if (r.code === '200'){
           this.logicPorts = r.data;
-          this.cdr.detectChanges();
         }
+        this.cdr.detectChanges();
       });
   }
   checkHost(){
@@ -224,5 +227,105 @@ export class NfsAddComponent implements OnInit{
       }
     }
   }
+  matchErr=false;
+  nfsNameRepeatErr=false;
+  shareNameRepeatErr=false;
+  fsNameRepeatErr=false;
+  oldNfsName:string;
+  oldShareName:string;
+  oldFsName:string;
+  checkNfsName(){
+    if(this.addForm.nfsName==null) return false;
+    if(this.oldNfsName==this.addForm.nfsName) return false;
+    this.oldNfsName=this.addForm.nfsName;
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z]*$');
+    if(reg5.test(this.addForm.nfsName)){
+      //验证重复
+      this.matchErr=false;
+      if (this.addForm.sameName){
+        this.checkNfsNameExist(this.addForm.nfsName);
+        this.checkShareNameExist(this.addForm.nfsName);
+        this.checkFsNameExist(this.addForm.nfsName);
+      }else{
+        this.checkNfsNameExist(this.addForm.nfsName);
+      }
+    }else{
+      //
+      this.matchErr=true;
+      //不满足的时候置空
+      this.addForm.nfsName=null;
+      console.log('验证不通过');
+    }
+  }
+  checkShareName(){
+    if(this.addForm.shareName==null) return false;
+    if(this.oldShareName=this.addForm.shareName) return false;
+
+    this.oldShareName=this.addForm.shareName;
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z]*$');
+    if(reg5.test(this.addForm.shareName)){
+      //验证重复
+      this.matchErr=false;
+        this.checkShareNameExist(this.addForm.shareName);
+    }else{
+      this.matchErr=true;
+      this.addForm.shareName=null;
+    }
+  }
+  checkFsName(){
+    if(this.addForm.fsName==null) return false;
+    if(this.oldFsName=this.addForm.fsName) return false;
+
+    this.oldFsName=this.addForm.fsName;
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z]*$');
+    if(reg5.test(this.addForm.fsName)){
+      //验证重复
+      this.matchErr=false;
+      this.checkShareNameExist(this.addForm.fsName);
+    }else{
+      this.matchErr=true;
+      this.addForm.fsName=null;
+    }
+  }
+  checkNfsNameExist(name:string){
+    this.addService.checkNfsNameExist(name).subscribe((r:any)=>{
+        if (r.code=='200'){
+          if(r.data){
+            this.nfsNameRepeatErr=false;
+          }else{
+            this.nfsNameRepeatErr=true;
+            this.addForm.nfsName=null;
+          }
+        }
+    });
+  }
+  checkShareNameExist(name:string){
+    this.addService.checkShareNameExist(name).subscribe((r:any)=>{
+      if (r.code=='200'){
+        if(r.data){
+          this.shareNameRepeatErr=false;
+        }else{
+          this.shareNameRepeatErr=true;
+          this.addForm.nfsName=null;
+        }
+      }
+    });
+  }
+  checkFsNameExist(name:string){
+    this.addService.checkFsNameExist(name).subscribe((r:any)=>{
+      if (r.code=='200'){
+        if(r.data){
+          this.shareNameRepeatErr=false;
+        }else{
+          this.shareNameRepeatErr=true;
+          this.addForm.nfsName=null;
+        }
+      }
+    });
+  }
+
+
+
+
 }
 

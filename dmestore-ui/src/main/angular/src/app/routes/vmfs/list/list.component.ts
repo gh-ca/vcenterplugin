@@ -63,7 +63,7 @@ export class VmfsListComponent implements OnInit {
   modifyShow = false;
   modifySuccessShow = false; // 编辑程功窗口
 
-  popShow = false; // 添加弹出层显示
+  popListShow = false; // 添加弹出层显示
   addSuccessShow = false; // 添加成功弹窗
   // 添加表单数据
   form = new GetForm().getAddForm();
@@ -213,7 +213,7 @@ export class VmfsListComponent implements OnInit {
               const wwns = [];
               this.list.forEach(item => {
                 item.usedCapacity = item.capacity - item.freeSpace;
-                item.capacityUsage = ((item.capacity - item.freeSpace)/item.capacity * 100).toFixed(2);
+                item.capacityUsage = ((item.capacity - item.freeSpace)/item.capacity);
                 wwns.push(item.wwn);
               });
               // 设置卷ID集合
@@ -441,7 +441,7 @@ export class VmfsListComponent implements OnInit {
     // 初始化表单
     this.form = new GetForm().getAddForm();
     // 添加页面显示
-    this.popShow = true;
+    this.popListShow = true;
     // 添加页面默认打开首页
     this.jumpTo(this.addPageOne);
     // 版本、块大小、粒度下拉框初始化
@@ -813,25 +813,25 @@ export class VmfsListComponent implements OnInit {
           this.mountedHost = mountHost;
           console.log('this.serviceLevelList', this.serviceLevelList);
         }
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      });
-      // 获取集群
-      this.remoteSrv.getMountCluster(this.rowSelected[0].objectid).subscribe((result: any) => {
-        console.log(result);
-        if (result.code === '200' && result.data !== null && result.data.length >= 1) {
-          this.unmountForm.mountType = '2';
-          const mountCluster: HostOrCluster [] = [];
-          result.data.forEach(item => {
-            const hostInfo = {
-              deviceId: item.hostGroupId,
-              deviceName: item.hostGroupName,
-              deviceType: 'cluster'
-            };
-            mountCluster.push(hostInfo);
-          });
-          this.mountedCluster = mountCluster;
-        }
-        this.modalLoading = false;
+        // 获取集群
+        this.remoteSrv.getMountCluster(this.rowSelected[0].objectid).subscribe((result: any) => {
+          console.log(result);
+          if (result.code === '200' && result.data !== null && result.data.length >= 1) {
+            this.unmountForm.mountType = '2';
+            const mountCluster: HostOrCluster [] = [];
+            result.data.forEach(item => {
+              const hostInfo = {
+                deviceId: item.hostGroupId,
+                deviceName: item.hostGroupName,
+                deviceType: 'cluster'
+              };
+              mountCluster.push(hostInfo);
+            });
+            this.mountedCluster = mountCluster;
+          }
+          this.modalLoading = false;
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        });
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       });
 

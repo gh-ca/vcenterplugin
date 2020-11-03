@@ -47,7 +47,7 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
             reObject.add("dataStores", array);
             return reObject.toString();
         }
-        return null;
+        return "--";
     }
 
     @Override

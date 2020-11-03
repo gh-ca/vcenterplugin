@@ -649,15 +649,15 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                         resultmap.putAll(objectMap);
                         if (null == objectMap || objectMap.size() == 0) {
                             log.error("query " + relationOrInstance + " current statistic error:", bodyJson.get("error_msg").getAsString());
-                            throw new DMEException("503", "query " + relationOrInstance + " current statistic error:" + bodyJson.get("error_msg").getAsString());
+                            //throw new DMEException("503", "query " + relationOrInstance + " current statistic error:" + bodyJson.get("error_msg").getAsString());
                         }
                     } else {
                         log.error("query " + relationOrInstance + " current statistic error,the params is:{}", gson.toJson(params));
-                        throw new DMEException("503", "query " + relationOrInstance + " current statistic error,the params is:{}" + gson.toJson(params));
+                        //throw new DMEException("503", "query " + relationOrInstance + " current statistic error,the params is:{}" + gson.toJson(params));
                     }
                 } catch (Exception e) {
                     log.error("query " + relationOrInstance + " current statistic exception.", e);
-                    throw new DMEException("503", "query " + relationOrInstance + " current statistic exception." + e.getMessage());
+                    //throw new DMEException("503", "query " + relationOrInstance + " current statistic exception." + e.getMessage());
                 }
             }
         }
@@ -1110,9 +1110,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         return result;
     }
 
-    //将对象分组:当对象数*指标数 > 100 时分组
+    //将对象分组:当对象数*指标数 > 100 时分组，数量太多会造成查询出错，先50
     private List<List<String>> groupObjIds(Map<String, Object> params) {
-        int maxObjIndicator = 100;
+        int maxObjIndicator = 50;
         List<List<String>> objGroup = new ArrayList<>();
         List<String> objIds = (List<String>) params.get("obj_ids");
         List<String> indicator_ids = (List<String>) params.get("indicator_ids");

@@ -48,11 +48,7 @@ public interface DmeRelationInstanceService {
      */
     Object queryInstanceByInstanceNameId(String instanceName, String instanceId) throws DMEException;
 
-    /**
-     *
-     */
     Map<String, Map<String, Object>> getServiceLevelInstance();
-
 
     Map<String, Map<String, Object>> getLunInstance();
 
@@ -60,7 +56,9 @@ public interface DmeRelationInstanceService {
 
     Map<String, Map<String, Object>> getStoragePoolInstance();
 
-
-
+    /**
+     * 资源实例刷新
+     */
+    void refreshResourceInstance();
 }
 

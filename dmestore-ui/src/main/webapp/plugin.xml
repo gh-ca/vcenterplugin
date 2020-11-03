@@ -616,7 +616,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/delete</actionUrl>
                         <dialogTitle>VMFS</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>300,200</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -711,7 +711,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/expand?resource=dataStore</actionUrl>
                         <dialogTitle>VMFS</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>580,290</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -725,7 +725,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/reclaim?resource=dataStore</actionUrl>
                         <dialogTitle>VMFS</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>300,200</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -739,7 +739,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/serviceLevel?resource=dataStore</actionUrl>
                         <dialogTitle>VMFS</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>800,435</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -753,7 +753,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/modify?resource=dataStore</actionUrl>
                         <dialogTitle>VMFS</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>600,500</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -767,7 +767,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/mount?resource=dataStore</actionUrl>
                         <dialogTitle>VMFS</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>570,300</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -781,7 +781,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/unmount?resource=dataStore</actionUrl>
                         <dialogTitle>VMFS</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>1000,330</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -920,7 +920,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/host/mount?resource=others</actionUrl>
                         <dialogTitle>VMFS</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>900,600</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -934,7 +934,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/host/unmount?resource=others</actionUrl>
                         <dialogTitle>VMFS</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>900,600</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -969,7 +969,7 @@
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
                <uid>com.dmeplugin.dmestore.datastore.hostcreatenfsaction</uid>
-               <label>#{create.label}</label>
+               <label>#{createnfs.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
                   <object>
@@ -983,7 +983,7 @@
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
                <uid>com.dmeplugin.dmestore.datastore.hostcreatevmfsaction</uid>
-               <label>#{create.label}</label>
+               <label>#{createvmfs.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
                   <object>
@@ -1150,7 +1150,7 @@
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
                <uid>com.dmeplugin.dmestore.datastore.clustercreatenfsaction</uid>
-               <label>#{create.label}</label>
+               <label>#{createnfs.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
                   <object>
@@ -1164,14 +1164,14 @@
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
                <uid>com.dmeplugin.dmestore.datastore.clustercreatevmfsaction</uid>
-               <label>#{create.label}</label>
+               <label>#{createvmfs.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/add?resource=others</actionUrl>
                         <dialogTitle>VMFS</dialogTitle>
-                        <dialogSize>1600,600</dialogSize>
+                        <dialogSize>1000,600</dialogSize>
                      </root>
                   </object>
                </delegate>

@@ -78,7 +78,7 @@ export class MountService {
 }
 
 export interface DataStore {
-  'freeSpace': string;
+  'freeSpace': number;
   'name': string;
   'id': string;
   'type': string;

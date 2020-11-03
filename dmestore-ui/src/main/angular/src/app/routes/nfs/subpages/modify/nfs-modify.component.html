@@ -17,7 +17,14 @@
         <!--名称-->
         <clr-input-container>
           <label>{{'nfs.name' | translate}}</label>
-          <input clrInput name="nfsName" [(ngModel)]="updateNfs.nfsName"/>
+          <input clrInput name="nfsName" [(ngModel)]="updateNfs.nfsName" (blur)="checkNfsName();"/>
+          <clr-control-error>
+            <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="nfsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+              <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+              <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
+          </clr-control-error>
         </clr-input-container>
         <clr-checkbox-container>
           <label></label>
@@ -28,11 +35,21 @@
         </clr-checkbox-container>
         <clr-input-container *ngIf="!updateNfs.sameName">
           <label>{{'nfs.fsName' | translate}}</label>
-          <input clrInput [(ngModel)]="updateNfs.fsName" name="fsName" />
+          <input clrInput [(ngModel)]="updateNfs.fsName" name="fsName" (blur)="checkFsName();"/>
+          <clr-control-error>
+            <p *ngIf="!oldFsName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+          </clr-control-error>
         </clr-input-container>
         <clr-input-container *ngIf="!updateNfs.sameName">
           <label>{{'nfs.shareName' | translate}}</label>
-          <input clrInput [(ngModel)]="updateNfs.shareName" name="shareName" />
+          <input clrInput [(ngModel)]="updateNfs.shareName" name="shareName" (blur)="checkShareName();" />
+          <clr-control-error>
+            <p *ngIf="!oldShareName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
+          </clr-control-error>
         </clr-input-container>
         <!--qos-->
         <clr-toggle-wrapper>
@@ -193,7 +210,14 @@
         <!--名称-->
         <clr-input-container>
           <label>{{'nfs.name' | translate}}</label>
-          <input clrInput name="nfsName" [(ngModel)]="updateNfs.nfsName"/>
+          <input clrInput name="nfsName" [(ngModel)]="updateNfs.nfsName" (blur)="checkNfsName();"/>
+          <clr-control-error>
+            <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="nfsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+            <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+            <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
+          </clr-control-error>
         </clr-input-container>
         <clr-checkbox-container>
           <label></label>
@@ -204,11 +228,21 @@
         </clr-checkbox-container>
         <clr-input-container *ngIf="!updateNfs.sameName">
           <label>{{'nfs.fsName' | translate}}</label>
-          <input clrInput [(ngModel)]="updateNfs.fsName" name="fsName" />
+          <input clrInput [(ngModel)]="updateNfs.fsName" name="fsName" (blur)="checkFsName();"/>
+          <clr-control-error>
+            <p *ngIf="!oldFsName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+          </clr-control-error>
         </clr-input-container>
         <clr-input-container *ngIf="!updateNfs.sameName">
           <label>{{'nfs.shareName' | translate}}</label>
-          <input clrInput [(ngModel)]="updateNfs.shareName" name="shareName" />
+          <input clrInput [(ngModel)]="updateNfs.shareName" name="shareName" (blur)="checkShareName();" />
+          <clr-control-error>
+            <p *ngIf="!oldShareName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
+          </clr-control-error>
         </clr-input-container>
         <!--qos-->
         <clr-toggle-wrapper>

@@ -436,7 +436,7 @@
         "capacityUsage":"Capacity Usage"
       },
       "dtrees":{
-        "dtrees":"Dtrees",
+        "dtrees":"DTrees",
         "name":"Name",
         "ofs":"Owning File System",
         "osl":"Owning Service Level",
@@ -717,7 +717,12 @@
     "maxIOPSs": "OrderBy MaxIOPS",
     "minIOPSs": "OrderBy MinIOPS",
     "maxBandWidths": "OrderBy MaxBandWidth",
-    "minBandWidths": "OrderBy MinBandWidth"
+    "minBandWidths": "OrderBy MinBandWidth",
+
+    "offLine": "Offline",
+    "normal": "Normal",
+    "abnormal": "Abnormal",
+    "unknown": "Unknown"
   },
   "applybp": {
     "ing": "Best Practice is Executing",
@@ -770,7 +775,12 @@
     "addError":"Delete failed!Please contact management!",
     "modifyError":"Delete failed!Please contact management!",
     "reclaimError":"Space reclamation failed! Please contact the administrator!",
-    "serviceLevelError":"Service level change failed! Please contact the administrator!"
+    "serviceLevelError":"Service level change failed! Please contact the administrator!",
+    "require":"This field is required!",
+    "nfsrepeat":"NFS name already exists!",
+    "sharerepeat":"Share name already exists!",
+    "fsrepeat":"FileSystem name already exists!",
+    "numberAndLetter":"Only numbers and letters can be entered!"
   },
   "page": {
     "perPage": "Per Page",
