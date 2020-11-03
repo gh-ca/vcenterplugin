@@ -29,7 +29,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     private final String API_STORAGES = "/rest/storagemgmt/v1/storages";
     private final String API_FAILOVERGROUPS = "/rest/storagemgmt/v1/storage-port/failover-groups?storage_id=";
     private final String API_LOGICPORTS_LIST = "/rest/storagemgmt/v1/storage-port/logic-ports?storage_id=";
-    private final String API_VOLUME_LIST = "/rest/blockservice/v1/volumes?storageId =";
+    private final String API_VOLUME_LIST = "/rest/blockservice/v1/volumes";
     private final String API_FILESYSTEMS_LIST = "/rest/fileservice/v1/filesystems/query";
     private final String API_DTREES_LIST = "/rest/fileservice/v1/dtrees/summary";
     private final String API_NFSSHARE_LIST = "/rest/fileservice/v1/nfs-shares/summary";
@@ -381,7 +381,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     public List<Volume> getVolumes(String storageId) throws DMEException {
 
         List<Volume> volumes = new ArrayList<>(10);
-        String url = API_VOLUME_LIST + storageId;
+        String url = API_VOLUME_LIST;
+        if (!"".equals(storageId)) {
+            url = API_VOLUME_LIST + "?storageId =" + storageId;
+        }
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             LOG.info("DmeStorageServiceImpl/getVolumes/responseEntity==" + responseEntity);
