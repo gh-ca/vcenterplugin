@@ -17,75 +17,75 @@
 package com.dmeplugin.vmware.mo;
 
 public class DatastoreFile {
-    private String _path;
+    private String path;
 
     public DatastoreFile(String path) {
         assert (path != null);
-        _path = path;
+        this.path = path;
     }
 
     public DatastoreFile(String datastoreName, String pathWithoutDatastoreName) {
-        _path = String.format("[%s] %s", datastoreName, pathWithoutDatastoreName);
+        path = String.format("[%s] %s", datastoreName, pathWithoutDatastoreName);
     }
 
     public DatastoreFile(String datastoreName, String dir, String fileName) {
         if (dir == null || dir.isEmpty()) {
-            _path = String.format("[%s] %s", datastoreName, fileName);
+            path = String.format("[%s] %s", datastoreName, fileName);
         } else {
-            _path = String.format("[%s] %s/%s", datastoreName, dir, fileName);
+            path = String.format("[%s] %s/%s", datastoreName, dir, fileName);
         }
     }
 
     public String getDatastoreName() {
-        return getDatastoreNameFromPath(_path);
+        return getDatastoreNameFromPath(path);
     }
 
     public String getPath() {
-        return _path;
+        return path;
     }
 
     public String getRelativePath() {
-        int pos = _path.indexOf(']');
+        int pos = path.indexOf(']');
         if (pos < 0) {
             pos = 0;
         } else {
             pos++;
         }
 
-        return _path.substring(pos).trim();
+        return path.substring(pos).trim();
     }
 
     public String getDir() {
-        int startPos = _path.indexOf("]");
+        int startPos = path.indexOf("]");
         if (startPos < 0) {
             startPos = 0;
         }
 
-        int endPos = _path.lastIndexOf('/');
+        int endPos = path.lastIndexOf('/');
         if (endPos < 0) {
             endPos = 0;
         }
 
         if (endPos > startPos) {
-            return _path.substring(startPos + 1, endPos).trim();
+            return path.substring(startPos + 1, endPos).trim();
         }
 
         return "";
     }
 
     public String getFileName() {
-        int startPos = _path.indexOf("]");
+        int startPos = path.indexOf("]");
         if (startPos < 0) {
             startPos = 0;
         } else {
             startPos++;
         }
 
-        int endPos = _path.lastIndexOf('/');
+        int endPos = path.lastIndexOf('/');
         if (endPos < 0) {
-            return _path.substring(startPos).trim();
+            return path.substring(startPos).trim();
         } else {
-            return _path.substring(endPos + 1);
+            return path.substring(endPos + 1);
         }
     }
 
@@ -109,7 +109,7 @@ public class DatastoreFile {
     }
 
     public String getCompanionPath(String companionFileName) {
-        return getCompanionDatastorePath(_path, companionFileName);
+        return getCompanionDatastorePath(path, companionFileName);
     }
 
     public static boolean isFullDatastorePath(String path) {

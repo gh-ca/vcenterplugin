@@ -242,16 +242,19 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         return queryCurrentStatistic("volume", params, idInstancdIdMap);
     }
 
+    @Override
     public Map<String, Object> queryControllerCurrentStatistic(Map<String, Object> params) throws DMEException {
         Map<String, String> idInstancdIdMap = initParamController(params, true);
         return queryCurrentStatistic("controller", params, idInstancdIdMap);
     }
 
+    @Override
     public Map<String, Object> queryStoragePortCurrentStatistic(Map<String, Object> params) throws DMEException {
         Map<String, String> idInstancdIdMap = initParamStoragePort(params, true);
         return queryCurrentStatistic("storageport", params, idInstancdIdMap);
     }
 
+    @Override
     public Map<String, Object> queryStorageDiskCurrentStatistic(Map<String, Object> params) throws DMEException {
         Map<String, String> idInstancdIdMap = initParamStorageDisk(params, true);
         return queryCurrentStatistic("storagedisk", params, idInstancdIdMap);

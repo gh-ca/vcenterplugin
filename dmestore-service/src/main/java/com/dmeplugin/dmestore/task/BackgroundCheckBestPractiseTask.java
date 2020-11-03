@@ -2,13 +2,11 @@ package com.dmeplugin.dmestore.task;
 
 
 import com.dmeplugin.dmestore.services.BestPracticeProcessService;
-import com.dmeplugin.dmestore.services.ServiceLevelService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.StatefulJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component

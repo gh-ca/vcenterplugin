@@ -20,10 +20,12 @@ public class VcenterException extends DMEException {
         this.message = message;
     }
 
+    @Override
     public String getCode() {
         return code;
     }
 
+    @Override
     public void setCode(String code) {
         this.code = code;
     }
@@ -33,6 +35,7 @@ public class VcenterException extends DMEException {
         return message;
     }
 
+    @Override
     public void setMessage(String message) {
         this.message = message;
     }

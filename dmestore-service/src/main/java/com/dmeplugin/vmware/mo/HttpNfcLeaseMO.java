@@ -137,19 +137,19 @@ public class HttpNfcLeaseMO extends BaseMO {
     }
 
     public class ProgressReporter extends Thread {
-        volatile int _percent;
-        volatile boolean _done;
+        volatile int percent;
+        volatile boolean done;
 
         public ProgressReporter() {
-            _percent = 0;
-            _done = false;
+            percent = 0;
+            done = false;
 
             setDaemon(true);
             start();
         }
 
         public void reportProgress(int percent) {
-            _percent = percent;
+            this.percent = percent;
         }
 
         public void close() {
@@ -157,16 +157,16 @@ public class HttpNfcLeaseMO extends BaseMO {
                 s_logger.info("close ProgressReporter, interrupt reporter runner to let it quit");
             }
 
-            _done = true;
+            done = true;
             interrupt();
         }
 
         @Override
         public void run() {
-            while (!_done) {
+            while (!done) {
                 try {
                     Thread.sleep(1000);            // update progess every 1 second
-                    updateLeaseProgress(_percent);
+                    updateLeaseProgress(percent);
                 } catch (InterruptedException e) {
                     if (s_logger.isInfoEnabled()) {
                         s_logger.info("ProgressReporter is interrupted, quiting");

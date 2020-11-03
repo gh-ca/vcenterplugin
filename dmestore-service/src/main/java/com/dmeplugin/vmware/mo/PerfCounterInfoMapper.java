@@ -26,7 +26,7 @@ import com.vmware.vim25.PerfSummaryType;
 
 public class PerfCounterInfoMapper {
     // map <group name, counter name, list of PerfCounterInfo based on rollupType>
-    Map<String, Map<String, List<PerfCounterInfo>>> _mapCounterInfos = new HashMap<String, Map<String, List<PerfCounterInfo>>>();
+    Map<String, Map<String, List<PerfCounterInfo>>> mapCounterInfos = new HashMap<String, Map<String, List<PerfCounterInfo>>>();
 
     public PerfCounterInfoMapper(PerfCounterInfo[] counterInfos) {
         if (counterInfos != null) {
@@ -41,7 +41,7 @@ public class PerfCounterInfoMapper {
         assert (groupName != null);
         assert (counterName != null);
 
-        Map<String, List<PerfCounterInfo>> groupMap = _mapCounterInfos.get(groupName);
+        Map<String, List<PerfCounterInfo>> groupMap = mapCounterInfos.get(groupName);
         if (groupMap == null) {
             return null;
         }
@@ -74,10 +74,10 @@ public class PerfCounterInfoMapper {
     }
 
     private Map<String, List<PerfCounterInfo>> getSafeGroupMap(String groupName) {
-        Map<String, List<PerfCounterInfo>> groupMap = _mapCounterInfos.get(groupName);
+        Map<String, List<PerfCounterInfo>> groupMap = mapCounterInfos.get(groupName);
         if (groupMap == null) {
             groupMap = new HashMap<String, List<PerfCounterInfo>>();
-            _mapCounterInfos.put(groupName, groupMap);
+            mapCounterInfos.put(groupName, groupMap);
         }
         return groupMap;
     }
