@@ -98,6 +98,9 @@ export class NfsAddComponent implements OnInit{
   addNfs(){
     //
     this.modalHandleLoading=true;
+
+    this.checkedPool = this.storagePools.filter(item => item.id === this.addForm.storagePoolId)[0];
+
     this.addForm.poolRawId=this.checkedPool.diskPoolId;
     this.addForm.storagePoolId= this.checkedPool.id;
     // 单位换算
@@ -125,21 +128,21 @@ export class NfsAddComponent implements OnInit{
       }else{
         this.errorMsg = '1';
         console.log("Delete failed:",result.description)
-
       }
+      this.cdr.detectChanges();
     });
   }
   selectStoragePool(){
     this.modalLoading=true;
-    this.storagePools = null;
+    // this.storagePools = [];
     this.logicPorts = null;
     // 选择存储后获取存储池
     this.storageService.getStoragePoolListByStorageId("file",this.addForm.storagId)
       .subscribe((r: any) => {
         if (r.code === '200'){
           this.storagePools = r.data;
-          this.cdr.detectChanges();
         }
+        this.cdr.detectChanges();
       });
     this.selectLogicPort();
   }
@@ -150,8 +153,8 @@ export class NfsAddComponent implements OnInit{
         this.modalLoading=false;
         if (r.code === '200'){
           this.logicPorts = r.data;
-          this.cdr.detectChanges();
         }
+        this.cdr.detectChanges();
       });
   }
   checkHost(){

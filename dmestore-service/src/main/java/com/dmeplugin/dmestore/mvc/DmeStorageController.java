@@ -108,7 +108,7 @@ public class DmeStorageController extends BaseController{
     }
     @GetMapping("/volumes")
     @ResponseBody
-    public ResponseBodyBean getVolumes(@RequestParam(name = "storageId") String storageId){
+    public ResponseBodyBean getVolumes(@RequestParam(name = "storageId",required = false,defaultValue = "") String storageId){
 
         try {
             return success(dmeStorageService.getVolumes(storageId));
@@ -396,7 +396,7 @@ public class DmeStorageController extends BaseController{
      * @return
      */
     @GetMapping("/queryvolumebyname")
-    public ResponseBodyBean queryVolumeByName(@RequestParam("name") String name,@RequestParam("storageId") String storageId){
+    public ResponseBodyBean queryVolumeByName(@RequestParam("name") String name,@RequestParam(name = "storageId",required = false,defaultValue = "") String storageId){
         try {
             return success(dmeStorageService.queryVolumeByName(name, storageId));
         } catch (DMEException e) {
