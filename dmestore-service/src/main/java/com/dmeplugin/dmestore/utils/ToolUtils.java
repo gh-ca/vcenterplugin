@@ -30,7 +30,7 @@ public class ToolUtils {
     public final static int MI = 1024 * 1024;
     public final static int GI = 1024 * 1024 * 1024;
 
-    public final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     public static Gson gson = new Gson();
 
     public static String getStr(Object obj) {
@@ -272,7 +272,7 @@ public class ToolUtils {
         String re = defaultValue;
         try {
             if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
-                re = sdf.format(new Date(Long.parseLong(String.valueOf(obj.getAsBigInteger()))));
+                re = SIMPLE_DATE_FORMAT.format(new Date(Long.parseLong(String.valueOf(obj.getAsBigInteger()))));
             }
         } catch (Exception e) {
             LOG.error("jsonToDateStr error:" + e.toString());

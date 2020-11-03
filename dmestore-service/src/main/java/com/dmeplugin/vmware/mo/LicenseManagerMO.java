@@ -28,7 +28,7 @@ public class LicenseManagerMO extends BaseMO {
 
     @SuppressWarnings("unused")
     private static final Logger s_logger = LoggerFactory.getLogger(LicenseManagerMO.class);
-    private ManagedObjectReference _licenseAssignmentManager = null;
+    private ManagedObjectReference licenseAssignmentManager = null;
 
     public LicenseManagerMO(VmwareContext context, ManagedObjectReference mor) {
         super(context, mor);
@@ -39,9 +39,9 @@ public class LicenseManagerMO extends BaseMO {
     }
 
     public ManagedObjectReference getLicenseAssignmentManager() throws Exception {
-        if (_licenseAssignmentManager == null) {
-            _licenseAssignmentManager = (ManagedObjectReference)_context.getVimClient().getDynamicProperty(_mor, "licenseAssignmentManager");
+        if (licenseAssignmentManager == null) {
+            licenseAssignmentManager = (ManagedObjectReference)_context.getVimClient().getDynamicProperty(_mor, "licenseAssignmentManager");
         }
-        return _licenseAssignmentManager;
+        return licenseAssignmentManager;
     }
 }

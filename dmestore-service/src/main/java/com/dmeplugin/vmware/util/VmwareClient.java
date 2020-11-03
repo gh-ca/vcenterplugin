@@ -632,10 +632,10 @@ public class VmwareClient {
         rpToVm.setSkip(Boolean.FALSE);
 
         // VirtualApp to VM: vApp -> VM
-        TraversalSpec vAppToVM = new TraversalSpec();
-        vAppToVM.setName("vAppToVM");
-        vAppToVM.setType("VirtualApp");
-        vAppToVM.setPath("vm");
+        TraversalSpec vAppToVm = new TraversalSpec();
+        vAppToVm.setName("vAppToVM");
+        vAppToVm.setType("VirtualApp");
+        vAppToVm.setPath("vm");
 
         // Host to VM: HostSystem -> VM
         TraversalSpec hToVm = new TraversalSpec();
@@ -713,14 +713,14 @@ public class VmwareClient {
 
         visitFolders.getSelectSet().addAll(sspecarrvf);
 
-        List<SelectionSpec> resultspec = new ArrayList<SelectionSpec>();
+        List<SelectionSpec> resultspec = new ArrayList<>();
         resultspec.add(visitFolders);
         resultspec.add(crToRp);
         resultspec.add(crToH);
         resultspec.add(dcToVmf);
         resultspec.add(dcToHf);
         resultspec.add(vAppToRp);
-        resultspec.add(vAppToVM);
+        resultspec.add(vAppToVm);
         resultspec.add(dcToDs);
         resultspec.add(hToVm);
         resultspec.add(rpToVm);
