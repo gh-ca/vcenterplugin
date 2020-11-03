@@ -271,7 +271,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         return storageDevcieInstance;
     }
 
-    //刷新资源
+    @Override
     public void refreshResourceInstance() {
         listInstanceStorageDevcie();
         listInstanceStoragePool();
