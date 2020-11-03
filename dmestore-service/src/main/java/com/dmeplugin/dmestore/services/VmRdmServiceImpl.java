@@ -74,15 +74,25 @@ public class VmRdmServiceImpl implements VmRdmService {
         createDmeRdm(createBean);
         LOG.info("create DME disk succeeded!");
         String requestVolumeName;
-        int size;
+        int capacity;
         ServiceVolumeMapping mapping;
+        final String unitTb = "TB";
+        ServiceVolumeBasicParams params;
         if (createBean.getCreateVolumesRequest() != null) {
             requestVolumeName = createBean.getCreateVolumesRequest().getVolumes().get(0).getName();
-            size = createBean.getCreateVolumesRequest().getVolumes().get(0).getCapacity();
+            params = createBean.getCreateVolumesRequest().getVolumes().get(0);
+            capacity = params.getCapacity();
+            if(unitTb.equals(params.getUnit())){
+                capacity = capacity * 1024;
+            }
             mapping = createBean.getCreateVolumesRequest().getMapping();
         } else {
             requestVolumeName = createBean.getCustomizeVolumesRequest().getCustomizeVolumes().getVolumeSpecs().get(0).getName();
-            size = createBean.getCustomizeVolumesRequest().getCustomizeVolumes().getVolumeSpecs().get(0).getCapacity();
+            params = createBean.getCustomizeVolumesRequest().getCustomizeVolumes().getVolumeSpecs().get(0);
+            capacity = params.getCapacity();
+            if(unitTb.equals(params.getUnit())){
+                capacity = capacity * 1024;
+            }
             mapping = createBean.getCustomizeVolumesRequest().getMapping();
         }
         //根据卷名称查询已创建的卷信息
@@ -91,10 +101,11 @@ public class VmRdmServiceImpl implements VmRdmService {
         JsonObject jsonObject = gson.fromJson(responseEntity.getBody(), JsonObject.class);
         JsonArray volumeArr = jsonObject.getAsJsonArray("volumes");
         List<String> volumeIds = new ArrayList<>();
+        List<String> volumeWwns = new ArrayList<>();
         for (int i = 0; i < volumeArr.size(); i++) {
             volumeIds.add(volumeArr.get(i).getAsJsonObject().get("id").getAsString());
+            volumeWwns.add(volumeArr.get(i).getAsJsonObject().get("volume_wwn").getAsString());
         }
-
         //获取vCenter主机信息
         Map<String, String> vCenterHostMap = vcsdkUtils.getHostByVmObjectId(vmObjectId);
         String hostIp = vCenterHostMap.get("hostName");
@@ -112,50 +123,24 @@ public class VmRdmServiceImpl implements VmRdmService {
                 hostId = hostObject.get("id").getAsString();
             }
         }
-
         if (null == hostId) {
             hostId = vmfsAccessService.checkOrCreateToHost(hostIp, hostObjectId);
         }
-
         if (null == mapping) {
             //将卷映射给主机
             dmeAccessService.hostMapping(hostId, volumeIds);
         }
         LOG.info("disk mapping to host succeeded!");
-
-        //查询主机信息
-        //Map<String, Object> hostMap = dmeAccessService.getDmeHost(hostId);
-        //String hostIp = hostMap.get("ip").toString();
         //调用vCenter扫描卷
         vcsdkUtils.hostRescanVmfs(hostIp);
         LOG.info("scan vmfs succeeded!");
-
         long t1 = System.currentTimeMillis();
         //扫描hba，已发现新的卷
         vcsdkUtils.hostRescanHba(hostIp);
         long t2 = System.currentTimeMillis();
         //vcsdkUtils.refreshStorageSystem(hostObjectId);
         LOG.info("hostRescanHba succeeded, take {} seconds!", (t2 - t1)/1000);
-
-        //获取LUN信息.有扫描需要一定的时间才能发现得了LUN信息，这里等待两分钟
-        String lunStr = "";
-        int times = 0;
-        //获取LUN信息重试次数
-        final int retryTimes = 60;
-        while (times++ < retryTimes) {
-            lunStr = vcsdkUtils.getLunsOnHost(hostIp);
-            if (StringUtil.isNotBlank(lunStr)) {
-                break;
-            } else {
-                try {
-                    Thread.sleep(2 * 1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    throw new DMEException(e.getMessage());
-                }
-            }
-        }
-
+        String lunStr =  vcsdkUtils.getLunsOnHost(hostIp);
         if (StringUtil.isBlank(lunStr)) {
             LOG.error("获取目标LUN失败！");
             //将已经创建好的卷删除
@@ -164,7 +149,7 @@ public class VmRdmServiceImpl implements VmRdmService {
         }
         LOG.info("get LUN information succeeded!");
         JsonArray lunArray = gson.fromJson(lunStr, JsonArray.class);
-        Map<String, JsonObject> lunMap = new HashMap<>();
+        Map<String, JsonObject> lunMap = new HashMap<>(16);
         for (int i = 0; i < lunArray.size(); i++) {
             JsonObject lunObject = lunArray.get(i).getAsJsonObject();
             for (int j = 0; j < volumeArr.size(); j++) {
@@ -175,7 +160,6 @@ public class VmRdmServiceImpl implements VmRdmService {
                 }
             }
         }
-
         String errorMsg = "";
         int lunSize = lunMap.size();
         if (lunSize > 0) {
@@ -185,13 +169,12 @@ public class VmRdmServiceImpl implements VmRdmService {
                 JsonObject object = entry.getValue();
                 //调用vCenter创建磁盘
                 try {
-                    vcsdkUtils.createDisk(dataStoreObjectId, vmObjectId, object.get("devicePath").getAsString(), size);
+                    vcsdkUtils.createDisk(dataStoreObjectId, vmObjectId, object.get("devicePath").getAsString(), capacity);
                 } catch (Exception ex) {
                     failList.add(volumeId);
                     errorMsg = ex.getMessage();
                 }
             }
-
             if (failList.size() > 0) {
                 deleteVolumes(hostId, failList);
                 //完全失败
@@ -250,11 +233,11 @@ public class VmRdmServiceImpl implements VmRdmService {
 
     private String createDmeVolumeByServiceLevel(CreateVolumesRequest createVolumesRequest) throws DMEException {
         final String unitTb = "TB";
-        Map<String, Object> requestbody = new HashMap<>();
+        Map<String, Object> requestbody = new HashMap<>(16);
         List<ServiceVolumeBasicParams> requestVolumes = createVolumesRequest.getVolumes();
         List<Map<String, Object>> volumes = new ArrayList<>();
         for (ServiceVolumeBasicParams volume : requestVolumes) {
-            Map<String, Object> svbp = new HashMap<>();
+            Map<String, Object> svbp = new HashMap<>(16);
             svbp.put("name", volume.getName());
             int capacity = volume.getCapacity();
             if (unitTb.equals(volume.getUnit())) {
@@ -294,7 +277,7 @@ public class VmRdmServiceImpl implements VmRdmService {
         }
         Map<String, Object> requestbody = new HashMap<>(16);
         //判断该集群下有多少主机，如果主机在DME不存在就需要创建
-        Map<String, Object> cv = new HashMap<>();
+        Map<String, Object> cv = new HashMap<>(16);
         CustomizeVolumes customizeVolumes = customizeVolumesRequest.getCustomizeVolumes();
         putNotNull(cv, "initial_distribute_policy", customizeVolumes.getInitialDistributePolicy());
         putNotNull(cv, "owner_controller", customizeVolumes.getOwnerController());
@@ -305,7 +288,7 @@ public class VmRdmServiceImpl implements VmRdmService {
 
         CustomizeVolumeTuningForCreate tuningBean = customizeVolumes.getTuning();
         if (null != tuningBean) {
-            Map<String, Object> tuning = new HashMap<>();
+            Map<String, Object> tuning = new HashMap<>(16);
             putNotNull(tuning, "alloctype", tuningBean.getAlloctype());
             putNotNull(tuning, "smarttier", tuningBean.getSmarttier());
             putNotNull(tuning, "workload_type_id", tuningBean.getWorkloadTypeId());
@@ -314,7 +297,7 @@ public class VmRdmServiceImpl implements VmRdmService {
 
             SmartQosForRdmCreate smartqosBean = tuningBean.getSmartqos();
             if (null != smartqosBean) {
-                Map<String, Object> smartqos = new HashMap<>();
+                Map<String, Object> smartqos = new HashMap<>(16);
                 putNotNull(smartqos, "control_policy", smartqosBean.getControlPolicy());
                 putNotNull(smartqos, "latency", smartqosBean.getLatency());
                 putNotNull(smartqos, "maxbandwidth", smartqosBean.getMaxbandwidth());
@@ -331,7 +314,7 @@ public class VmRdmServiceImpl implements VmRdmService {
         List<Map<String, Object>> volumeSpecs = new ArrayList<>();
         final String unitTb = "TB";
         for (ServiceVolumeBasicParams volumeSpec : volumeSpecList) {
-            Map<String, Object> vs = new HashMap<>();
+            Map<String, Object> vs = new HashMap<>(16);
             putNotNull(vs, "name", volumeSpec.getName());
             int capacity = volumeSpec.getCapacity();
             if (unitTb.equals(volumeSpec.getUnit())) {
@@ -350,7 +333,7 @@ public class VmRdmServiceImpl implements VmRdmService {
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(requestbody));
         if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
             LOG.error("Failed to create RDM on DME!errorMsg:{}", responseEntity.getBody());
-            throw new DMEException("Failed to create RDM on DME!");
+            throw new DMEException(responseEntity.getBody());
         }
         JsonObject task = gson.fromJson(responseEntity.getBody(), JsonObject.class);
         String taskId = task.get("task_id").getAsString();
