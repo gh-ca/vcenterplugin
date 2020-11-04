@@ -169,8 +169,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 storageObj.setSynStatus(ToolUtils.jsonToStr(element.get("syn_status")));
                 storageObj.setVendor(ToolUtils.jsonToStr(element.get("vendor")));
                 storageObj.setModel(ToolUtils.jsonToStr(element.get("model")));
-                storageObj.setUsedCapacity(ToolUtils.jsonToDou(element.get("used_capacity"), 0.0)/1024);
-                storageObj.setTotalCapacity(ToolUtils.jsonToDou(element.get("total_capacity"), 0.0)/1024);
+                storageObj.setUsedCapacity(ToolUtils.jsonToDou(element.get("used_capacity"), 0.0) / 1024);
+                storageObj.setTotalCapacity(ToolUtils.jsonToDou(element.get("total_capacity"), 0.0) / 1024);
                 storageObj.setTotalEffectiveCapacity(ToolUtils.jsonToDou(element.get("total_effective_capacity"), 0.0));
                 storageObj.setFreeEffectiveCapacity(ToolUtils.jsonToDou(element.get("free_effective_capacity"), 0.0));
                 storageObj.setLocation(ToolUtils.jsonToStr(element.get("location"), null));
@@ -180,36 +180,36 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 storageObj.setProductVersion(ToolUtils.jsonToStr(element.get("product_version")));
                 storageObj.setSn(ToolUtils.jsonToStr(element.get("sn"), null));
 
-                List<StoragePool> storagePools=getStoragePools(storageId,"all");
-                Double totalPoolCapicity=0.0;
-                Double subscriptionCapacity=0.0;
-                Double protectionCapacity=0.0;
-                Double fileCapacity=0.0;
-                Double blockCapacity=0.0;
-                Double dedupedCapacity=0.0;
-                Double compressedCapacity=0.0;
-                for (StoragePool storagePool:storagePools){
-                    totalPoolCapicity+=storagePool.getTotalCapacity();
-                    subscriptionCapacity+=storagePool.getSubscribedCapacity();
-                    protectionCapacity+=storagePool.getProtectionCapacity();
-                    if ("file".equalsIgnoreCase(storagePool.getMediaType())){
-                        fileCapacity+=storagePool.getConsumedCapacity();
+                List<StoragePool> storagePools = getStoragePools(storageId, "all");
+                Double totalPoolCapicity = 0.0;
+                Double subscriptionCapacity = 0.0;
+                Double protectionCapacity = 0.0;
+                Double fileCapacity = 0.0;
+                Double blockCapacity = 0.0;
+                Double dedupedCapacity = 0.0;
+                Double compressedCapacity = 0.0;
+                for (StoragePool storagePool : storagePools) {
+                    totalPoolCapicity += storagePool.getTotalCapacity();
+                    subscriptionCapacity += storagePool.getSubscribedCapacity();
+                    protectionCapacity += storagePool.getProtectionCapacity();
+                    if ("file".equalsIgnoreCase(storagePool.getMediaType())) {
+                        fileCapacity += storagePool.getConsumedCapacity();
                     }
-                    if ("block".equalsIgnoreCase(storagePool.getMediaType())){
-                        blockCapacity+=storagePool.getConsumedCapacity();
+                    if ("block".equalsIgnoreCase(storagePool.getMediaType())) {
+                        blockCapacity += storagePool.getConsumedCapacity();
                     }
-                    dedupedCapacity+=storagePool.getDedupedCapacity();
-                    compressedCapacity+=storagePool.getCompressedCapacity();
+                    dedupedCapacity += storagePool.getDedupedCapacity();
+                    compressedCapacity += storagePool.getCompressedCapacity();
                 }
                 storageObj.setTotalEffectiveCapacity(totalPoolCapicity);
-                storageObj.setFreeEffectiveCapacity(totalPoolCapicity- fileCapacity-blockCapacity-protectionCapacity);
+                storageObj.setFreeEffectiveCapacity(totalPoolCapicity - fileCapacity - blockCapacity - protectionCapacity);
                 storageObj.setSubscriptionCapacity(subscriptionCapacity);
                 storageObj.setProtectionCapacity(protectionCapacity);
                 storageObj.setFileCapacity(fileCapacity);
                 storageObj.setBlockCapacity(blockCapacity);
                 storageObj.setDedupedCapacity(dedupedCapacity);
                 storageObj.setCompressedCapacity(compressedCapacity);
-                storageObj.setOptimizeCapacity(storageObj.getUsedCapacity()-dedupedCapacity-compressedCapacity);
+                storageObj.setOptimizeCapacity(storageObj.getUsedCapacity() - dedupedCapacity - compressedCapacity);
                 JsonArray ids = element.get("az_ids").getAsJsonArray();
                 if (ids.size() != 0) {
                     String[] azIdsArr = {ToolUtils.jsonToStr(ids)};
@@ -231,7 +231,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
         String className = "SYS_StoragePool";
         List<StoragePool> resList = new ArrayList<>();
-        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageId+"&&pageSize=1000";
+        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageId + "&&pageSize=1000";
 //        Map<String, Object> simple = new HashMap<>(16);
 //        Map<String, Object> reqSimple = new HashMap<>(16);
 //        Map<String, Object> constraint = new HashMap<>(16);
@@ -377,17 +377,26 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return resList;
     }
 
-    @Override
-    public List<Volume> getVolumes(String storageId) throws DMEException {
 
+    @Override
+    public VolumeListRestponse getVolumesByPage(String storageId, String pageSize, String pageNo) throws DMEException {
+        VolumeListRestponse volumeListRestponse = new VolumeListRestponse();
         List<Volume> volumes = new ArrayList<>(10);
-        String url = API_VOLUME_LIST;
+        String url = API_VOLUME_LIST + "?";
         if (!"".equals(storageId)) {
-            url = API_VOLUME_LIST + "?storageId =" + storageId;
+            url = url + "storageId=" + storageId + "&";
         }
+
+        if(!StringUtils.isEmpty(pageSize)){
+            url = url + "limit=" + pageSize + "&";
+        }
+
+        if(!StringUtils.isEmpty(pageNo)){
+            url = url + "offset=" + pageNo;
+        }
+
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            LOG.info("DmeStorageServiceImpl/getVolumes/responseEntity==" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != 200) {
                 throw new DMEException("503", "list volumes error!");
@@ -395,8 +404,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             Object object = responseEntity.getBody();
             if (object != null) {
                 JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
+                int count = jsonObject.get("count").getAsInt();
                 JsonArray jsonArray = jsonObject.get("volumes").getAsJsonArray();
-                Map<String,String> poolnamecacheMap=new HashMap<>();
+                Map<String, String> poolnamecacheMap = new HashMap<>();
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
                     Volume volume = new Volume();
@@ -415,19 +425,26 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     volume.setProtectionStatus(ToolUtils.jsonToBoo(element.get("protected")));
                     volume.setCapacity(ToolUtils.jsonToInt(element.get("capacity"), 0));
                     volume.setDatastores(getDataStoreOnVolume(volumeId));
-                    String poolname="";
-                    if (null==poolnamecacheMap.get(poolRawId)){
-                        poolnamecacheMap.put(poolRawId,getStorageByPoolRawId(poolRawId));
+                    if (null == poolnamecacheMap.get(poolRawId)) {
+                        poolnamecacheMap.put(poolRawId, getStorageByPoolRawId(poolRawId));
                     }
                     volume.setStoragePoolName(poolnamecacheMap.get(poolRawId));
                     volumes.add(volume);
                 }
+
+                volumeListRestponse.setVolumeList(volumes);
+                volumeListRestponse.setCount(count);
             }
         } catch (Exception e) {
             LOG.error("list volume error!", e);
             throw new DMEException("503", e.getMessage());
         }
-        return volumes;
+        return volumeListRestponse;
+    }
+
+    @Override
+    public List<Volume> getVolumes(String storageId) throws DMEException {
+        return getVolumesByPage(storageId, null, null).getVolumeList();
     }
 
     @Override
@@ -464,10 +481,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     fileSystem.setCapacity(ToolUtils.jsonToDou(element.get("capacity"), 0.0));
                     fileSystem.setCapacityUsageRatio(ToolUtils.jsonToInt(element.get("capacity_usage_ratio"), 0));
                     fileSystem.setStoragePoolName(ToolUtils.jsonToStr(element.get("storage_pool_name")));
-                    fileSystem.setNfsCount(ToolUtils.jsonToInt(element.get("nfs_count"),0));
-                    fileSystem.setCifsCount(ToolUtils.jsonToInt(element.get("cifs_count"),0));
-                    fileSystem.setDtreeCount(ToolUtils.jsonToInt(element.get("dtree_count"),0));
-                    fileSystem.setAvailableCapacity(ToolUtils.jsonToDou(element.get("available_capacity"),0.0));
+                    fileSystem.setNfsCount(ToolUtils.jsonToInt(element.get("nfs_count"), 0));
+                    fileSystem.setCifsCount(ToolUtils.jsonToInt(element.get("cifs_count"), 0));
+                    fileSystem.setDtreeCount(ToolUtils.jsonToInt(element.get("dtree_count"), 0));
+                    fileSystem.setAvailableCapacity(ToolUtils.jsonToDou(element.get("available_capacity"), 0.0));
                     fileSystems.add(fileSystem);
                 }
             }
@@ -593,7 +610,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
         String className = "SYS_Controller";
         List<StorageControllers> resList = new ArrayList<>();
-        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageDeviceId+"&&pageSize=1000";
+        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageDeviceId + "&&pageSize=1000";
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             LOG.info("DmeStorageServiceImpl/getStorageControllers/responseEntity==" + responseEntity);
@@ -606,17 +623,17 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
 
-                List<String> resids=new ArrayList<>();
+                List<String> resids = new ArrayList<>();
 
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
                     String id = ToolUtils.jsonToStr(element.get("id"));
                     resids.add(id);
                 }
-                List<StorageControllers> storageControllersperf=listStorageControllerPerformance(resids);
-                Map<String,StorageControllers> storageControllersMap=new HashMap<>();
-                for (StorageControllers storageControllers:storageControllersperf){
-                    storageControllersMap.put(storageControllers.getId(),storageControllers);
+                List<StorageControllers> storageControllersperf = listStorageControllerPerformance(resids);
+                Map<String, StorageControllers> storageControllersMap = new HashMap<>();
+                for (StorageControllers storageControllers : storageControllersperf) {
+                    storageControllersMap.put(storageControllers.getId(), storageControllers);
                 }
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
@@ -626,8 +643,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storageControllers.setSoftVer(ToolUtils.jsonToStr(element.get("softVer")));
                     storageControllers.setStatus(ToolUtils.jsonToStr(element.get("status")));
                     storageControllers.setCpuInfo(ToolUtils.jsonToStr(element.get("cpuInfo")));
-                    if(null!=storageControllersMap.get(storageControllers.getId()))
-                    {
+                    if (null != storageControllersMap.get(storageControllers.getId())) {
                         storageControllers.setLantency(storageControllersMap.get(storageControllers.getId()).getLantency());
                         storageControllers.setBandwith(storageControllersMap.get(storageControllers.getId()).getBandwith());
                         storageControllers.setIops(storageControllersMap.get(storageControllers.getId()).getIops());
@@ -648,7 +664,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
         String className = "SYS_StorageDisk";
         List<StorageDisk> resList = new ArrayList<>();
-        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageDeviceId+"&&pageSize=1000";
+        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageDeviceId + "&&pageSize=1000";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -664,17 +680,17 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
 
-                List<String> resids=new ArrayList<>();
+                List<String> resids = new ArrayList<>();
 
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
                     String id = ToolUtils.jsonToStr(element.get("id"));
                     resids.add(id);
                 }
-                List<StorageDisk> storageDiskperf=listStorageDiskPerformance(resids);
-                Map<String,StorageDisk> storageDiskMap=new HashMap<>();
-                for (StorageDisk storageDisk:storageDiskperf){
-                    storageDiskMap.put(storageDisk.getId(),storageDisk);
+                List<StorageDisk> storageDiskperf = listStorageDiskPerformance(resids);
+                Map<String, StorageDisk> storageDiskMap = new HashMap<>();
+                for (StorageDisk storageDisk : storageDiskperf) {
+                    storageDiskMap.put(storageDisk.getId(), storageDisk);
                 }
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject element = jsonElement.getAsJsonObject();
@@ -691,8 +707,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     storageDisk.setStorageDeviceId(ToolUtils.jsonToStr(element.get("storageDeviceId")));
                     //storageDisk.setDiskPools(getDiskPoolByPoolId(poolId));
                     storageDisk.setDiskDomain(getDiskPoolByPoolId(poolId).getName());
-                    if(null!=storageDiskMap.get(storageDisk.getId()))
-                    {
+                    if (null != storageDiskMap.get(storageDisk.getId())) {
                         storageDisk.setLantency(storageDiskMap.get(storageDisk.getId()).getLantency());
                         storageDisk.setBandwith(storageDiskMap.get(storageDisk.getId()).getBandwith());
                         storageDisk.setIops(storageDiskMap.get(storageDisk.getId()).getIops());
@@ -939,7 +954,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
         List<StoragePort> storagePorts = new ArrayList<>(10);
         String className = "SYS_StoragePort";
-        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageDeviceId+"&&pageSize=1000";
+        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageDeviceId + "&&pageSize=1000";
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
@@ -949,16 +964,16 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
             JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
-            List<String> resids=new ArrayList<>();
+            List<String> resids = new ArrayList<>();
             for (JsonElement jsonElement : jsonArray) {
                 JsonObject element = jsonElement.getAsJsonObject();
                 String id = ToolUtils.jsonToStr(element.get("id"));
                 resids.add(id);
             }
-            List<StoragePort> storagePortperf=listStoragePortPerformance(resids);
-            Map<String,StoragePort> storagePortMap=new HashMap<>();
-            for (StoragePort storagePort:storagePortperf){
-                storagePortMap.put(storagePort.getId(),storagePort);
+            List<StoragePort> storagePortperf = listStoragePortPerformance(resids);
+            Map<String, StoragePort> storagePortMap = new HashMap<>();
+            for (StoragePort storagePort : storagePortperf) {
+                storagePortMap.put(storagePort.getId(), storagePort);
             }
 
             for (JsonElement jsonElement : jsonArray) {
@@ -992,8 +1007,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 storagePort.setSpeed(ToolUtils.jsonToInt(element.get("speed")));
                 storagePort.setMaxSpeed(ToolUtils.jsonToInt(element.get("maxSpeed")));
                 storagePort.setStorageDeviceId(ToolUtils.jsonToStr(element.get("storageDeviceId")));
-                if(null!=storagePortMap.get(storagePort.getId()))
-                {
+                if (null != storagePortMap.get(storagePort.getId())) {
                     storagePort.setLantency(storagePortMap.get(storagePort.getId()).getLantency());
                     storagePort.setBandwith(storagePortMap.get(storagePort.getId()).getBandwith());
                     storagePort.setIops(storagePortMap.get(storagePort.getId()).getIops());
@@ -1101,7 +1115,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     private String getDiskType(String storageDeviceId, String diskPoolId, String poolId) throws DMEException {
         String result = "";
         String className = "SYS_StorageDisk";
-        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageDeviceId+"&&pageSize=1000";
+        String url = API_INSTANCES_LIST + "/" + className + "?storageDeviceId=" + storageDeviceId + "&&pageSize=1000";
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         int code = responseEntity.getStatusCodeValue();
         if (code == 200) {
@@ -1377,7 +1391,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public Boolean queryVolumeByName(String name,String storageId) throws DMEException {
+    public Boolean queryVolumeByName(String name, String storageId) throws DMEException {
         Boolean flag = true;
         List<Volume> volumes = getVolumes(storageId);
         for (Volume volume : volumes) {
@@ -1526,7 +1540,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
         String className = "SYS_StoragePool";
         String poolName = "";
-        String url = API_INSTANCES_LIST + "/" + className+"?pageSize=1000";
+        String url = API_INSTANCES_LIST + "/" + className + "?pageSize=1000";
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
             String object = responseEntity.getBody();
@@ -1545,7 +1559,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     private DiskPool getDiskPoolByPoolId(String poolId) throws DMEException {
         String className = "SYS_DiskPool";
-        String url = API_INSTANCES_LIST + "/" + className+"?pageSize=1000";
+        String url = API_INSTANCES_LIST + "/" + className + "?pageSize=1000";
         DiskPool retdiskPool = new DiskPool();
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
@@ -1582,7 +1596,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 diskPool.setUsageRate(usageCapacityRate);
                 diskPool.setStorageDeviceId(ToolUtils.jsonToStr(element.get("storageDeviceId")));
                 if (poolId.equals(poolId1)) {
-                    retdiskPool=diskPool;
+                    retdiskPool = diskPool;
                 }
             }
         }

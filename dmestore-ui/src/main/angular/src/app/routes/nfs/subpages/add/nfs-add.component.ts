@@ -159,15 +159,16 @@ export class NfsAddComponent implements OnInit{
   }
   checkHost(){
     this.modalLoading=true;
-    this.addForm.vkernelIp=null;
+
     //选择主机后获取虚拟网卡
     this.addService.getVmkernelListByObjectId(this.addForm.hostObjectId)
       .subscribe((r: any) => {
         this.modalLoading=false;
         if (r.code === '200'){
           this.vmkernelList = r.data;
-          this.cdr.detectChanges();
+          this.addForm.vkernelIp=this.vmkernelList[0].ipAddress;
         }
+        this.cdr.detectChanges();
       });
   }
   backToNfsList(){
