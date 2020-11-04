@@ -692,7 +692,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                             //String mountType = null;
                             if (params.get("hostObjectId") != null) {
                                 hostObjectId = ToolUtils.getStr(params.get("hostObjectId"));
-                                //logicPortIp= ToolUtils.getStr( params.get("logicPortIp"));
+                                logicPortIp= ToolUtils.getStr( params.get("hostVkernelIp"));
                             }
                         /*if (params.get("clusters") != null) {
                             clusters = (List<Map<String, String>>) params.get("clusters");
