@@ -56,7 +56,7 @@ public class PerfManagerMO extends BaseMO {
      * @param calendar Object to be converted
      * @return XMLGregorianCalendar
      */
-    private XMLGregorianCalendar calendarToXMLGregorianCalendar(Calendar calendar) throws DatatypeConfigurationException {
+    private XMLGregorianCalendar calendarToXmlGregorianCalendar(Calendar calendar) throws DatatypeConfigurationException {
 
         DatatypeFactory dtf = DatatypeFactory.newInstance();
         XMLGregorianCalendar xgc = dtf.newXMLGregorianCalendar();
@@ -76,7 +76,7 @@ public class PerfManagerMO extends BaseMO {
 
     public List<PerfMetricId> queryAvailablePerfMetric(ManagedObjectReference morEntity, Calendar beginTime, Calendar endTime, Integer intervalId) throws Exception {
 
-        return _context.getService().queryAvailablePerfMetric(_mor, morEntity, calendarToXMLGregorianCalendar(beginTime), calendarToXMLGregorianCalendar(endTime),
+        return _context.getService().queryAvailablePerfMetric(_mor, morEntity, calendarToXmlGregorianCalendar(beginTime), calendarToXmlGregorianCalendar(endTime),
                 intervalId);
     }
 

@@ -54,7 +54,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     @Override
     public Map<String, Object> queryVmfsStatisticCurrent(Map<String, Object> params) throws DMEException {
-        Map<String, String> idInstancdIdMap = new HashMap<>();
+        Map<String, String> idInstancdIdMap = new HashMap<>(16);
         List<String> instanceIds = new ArrayList<>();
         Object indicatorIds = params.get("indicator_ids");
         List<String> ids = (List<String>) params.get("obj_ids");
@@ -80,8 +80,8 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicatorIds = initVolumeIndicator(true);
             params.put("indicator_ids", indicatorIds);
         }
-        String obj_type_id = "1125921381679104";//SYS_Lun
-        params.put("obj_type_id", obj_type_id);
+        String objTypeId = "1125921381679104";//SYS_Lun
+        params.put("obj_type_id", objTypeId);
         return queryHistoryStatistic("queryVmfsStatisticCurrent", params, idInstancdIdMap);
     }
 
@@ -97,8 +97,8 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicatorIds = initFsIndicator(true);
             params.put("indicator_ids", indicatorIds);
         }
-        String obj_type_id = "1126179079716864";//SYS_StorageFileSystem
-        params.put("obj_type_id", obj_type_id);
+        String objTypeId = "1126179079716864";//SYS_StorageFileSystem
+        params.put("obj_type_id", objTypeId);
         return queryHistoryStatistic("queryNfsStatisticCurrent", params, null);
     }
 
@@ -145,9 +145,10 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     @Override
     public Map<String, Object> queryServiceLevelLunStatistic(Map<String, Object> params) throws DMEException {
-        Map<String, String> idInstanceIdMap = new HashMap<>();
+        Map<String, String> idInstanceIdMap = new HashMap<>(16);
         List<String> instanceIds = new ArrayList<>();
-        String obj_type_id = "1125921381679104";//SYS_LUN
+        //SYS_LUN
+        String objTypeId = "1125921381679104";
         String relationName = "M_DjTierContainsLun";
         Object indicatorIds = params.get("indicator_ids");
         Object objIds = params.get("obj_ids");
@@ -165,7 +166,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 params.put("obj_ids", instanceIds);
             }
         }
-        params.put("obj_type_id", obj_type_id);
+        params.put("obj_type_id", objTypeId);
         if (null == indicatorIds) {
             indicatorIds = initServiceLevelLunIndicator();
             params.put("indicator_ids", indicatorIds);
@@ -175,9 +176,10 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     @Override
     public Map<String, Object> queryServiceLevelStoragePoolStatistic(Map<String, Object> params) throws DMEException {
-        Map<String, String> idInstanceIdMap = new HashMap<>();
+        Map<String, String> idInstanceIdMap = new HashMap<>(16);
         List<String> instanceIds = new ArrayList<>();
-        String obj_type_id = "1125912791744512";//SYS_StoragePool
+        //SYS_StoragePool
+        String objTypeId = "1125912791744512";
         String relationName = "M_DjTierContainsStoragePool";
         Object indicatorIds = params.get("indicator_ids");
         Object objIds = params.get("obj_ids");
@@ -195,7 +197,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 params.put("obj_ids", instanceIds);
             }
         }
-        params.put("obj_type_id", obj_type_id);
+        params.put("obj_type_id", objTypeId);
         if (null == indicatorIds) {
             indicatorIds = initServiceLevelStoragePoolIndicator();
             params.put("indicator_ids", indicatorIds);
@@ -263,7 +265,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     @Override
     public Map<String, Object> queryHistoryStatistic(String relationOrInstance, Map<String, Object> params) throws DMEException {
-        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<>(16);
         if (!StringUtils.isEmpty(relationOrInstance)) {
             switch (relationOrInstance) {
                 case DmeIndicatorConstants.RESOURCE_TYPE_NAME_STORAGEDEVICE:
@@ -303,7 +305,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     @Override
     public Map<String, Object> queryCurrentStatistic(String relationOrInstance, Map<String, Object> params) throws DMEException {
-        Map<String, Object> resultMap = new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<>(16);
         if (!StringUtils.isEmpty(relationOrInstance)) {
             switch (relationOrInstance) {
                 case DmeIndicatorConstants.RESOURCE_TYPE_NAME_STORAGEDEVICE:
@@ -345,7 +347,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         if (null == params || params.size() == 0) {
             return null;
         }
-        Map<String, String> idInstancdIdMap = new HashMap<>();
+        Map<String, String> idInstancdIdMap = new HashMap<>(16);
         List<String> instanceIds = new ArrayList<>();
         List<String> ids = (List<String>) params.get("obj_ids");
         Object indicatorIds = params.get("indicator_ids");
@@ -368,8 +370,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicatorIds = initStorageDeviceIndicator();
             params.put("indicator_ids", indicatorIds);
         }
-        String obj_type_id = "1125904201809920";//SYS_StorDevice
-        params.put("obj_type_id", obj_type_id);
+        //SYS_StorDevice
+        String objTypeId = "1125904201809920";
+        params.put("obj_type_id", objTypeId);
         return idInstancdIdMap;
     }
 
@@ -378,7 +381,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         if (null == params || params.size() == 0) {
             return null;
         }
-        Map<String, String> idInstancdIdMap = new HashMap<>();
+        Map<String, String> idInstancdIdMap = new HashMap<>(16);
         List<String> instanceIds = new ArrayList<>();
         List<String> ids = (List<String>) params.get("obj_ids");
         Object indicatorIds = params.get("indicator_ids");
@@ -401,8 +404,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicatorIds = initStoragePoolIndicator();
             params.put("indicator_ids", indicatorIds);
         }
-        String obj_type_id = "1125912791744512";//SYS_StoragePool
-        params.put("obj_type_id", obj_type_id);
+        //SYS_StoragePool
+        String objTypeId = "1125912791744512";
+        params.put("obj_type_id", objTypeId);
         return idInstancdIdMap;
     }
 
@@ -411,7 +415,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         if (null == params || params.size() == 0) {
             return null;
         }
-        Map<String, String> idInstancdIdMap = new HashMap<>();
+        Map<String, String> idInstancdIdMap = new HashMap<>(16);
         List<String> instanceIds = new ArrayList<>();
         Object indicatorIds = params.get("indicator_ids");
         Object objIds = params.get("obj_ids");
@@ -434,8 +438,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 params.put("obj_ids", instanceIds);
             }
         }
-        String obj_type_id = "1125921381679104";//SYS_Lun
-        params.put("obj_type_id", obj_type_id);
+        //SYS_Lun
+        String objTypeId = "1125921381679104";
+        params.put("objTypeId", objTypeId);
         if (null == indicatorIds) {
             indicatorIds = initVolumeIndicator(isCurrent);
             params.put("indicator_ids", indicatorIds);
@@ -447,8 +452,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private Map<String, String> initParamServiceLevel(Map<String, Object> params) {
         Map<String, String> idInstanceIdMap = new HashMap<>();
         Object indicatorIds = params.get("indicator_ids");
-        String obj_type_id = "1126174784749568";//SYS_DjTier
-        params.put("obj_type_id", obj_type_id);
+        //SYS_DjTier
+        String objTypeId = "1126174784749568";
+        params.put("obj_type_id", objTypeId);
         if (null == indicatorIds) {
             indicatorIds = initServiceLevelIndicator();
             params.put("indicator_ids", indicatorIds);
@@ -460,8 +466,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private Map<String, String> initParamFs(Map<String, Object> params, boolean isCurrent) {
         Map<String, String> idInstanceIdMap = new HashMap<>();
         Object indicatorIds = params.get("indicator_ids");
-        String obj_type_id = "1126179079716864";//SYS_StorageFileSystem
-        params.put("obj_type_id", obj_type_id);
+        //SYS_StorageFileSystem
+        String objTypeId = "1126179079716864";
+        params.put("obj_type_id", objTypeId);
         if (null == indicatorIds) {
             indicatorIds = initFsIndicator(isCurrent);
             params.put("indicator_ids", indicatorIds);
@@ -473,8 +480,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private Map<String, String> initParamController(Map<String, Object> params, boolean isCurrent) {
         Map<String, String> idInstanceIdMap = new HashMap<>();
         Object indicatorIds = params.get("indicator_ids");
-        String obj_type_id = "1125908496777216";//SYS_Contorller
-        params.put("obj_type_id", obj_type_id);
+        //SYS_Contorller
+        String objTypeId = "1125908496777216";
+        params.put("obj_type_id", objTypeId);
         if (null == indicatorIds) {
             indicatorIds = initControllerIndicator(isCurrent);
             params.put("indicator_ids", indicatorIds);
@@ -486,8 +494,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private Map<String, String> initParamStoragePort(Map<String, Object> params, boolean isCurrent) {
         Map<String, String> idInstanceIdMap = new HashMap<>();
         Object indicatorIds = params.get("indicator_ids");
-        String obj_type_id = "1125925676646400";//SYS_StoragePort
-        params.put("obj_type_id", obj_type_id);
+        //SYS_StoragePort
+        String objTypeId = "1125925676646400";
+        params.put("obj_type_id", objTypeId);
         if (null == indicatorIds) {
             indicatorIds = initStoragePortIndicator(isCurrent);
             params.put("indicator_ids", indicatorIds);
@@ -499,8 +508,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private Map<String, String> initParamStorageDisk(Map<String, Object> params, boolean isCurrent) {
         Map<String, String> idInstanceIdMap = new HashMap<>();
         Object indicatorIds = params.get("indicator_ids");
-        String obj_type_id = "1125917086711808";//SYS_StorageDisk
-        params.put("obj_type_id", obj_type_id);
+        //SYS_StorageDisk
+        String objTypeId = "1125917086711808";
+        params.put("obj_type_id", objTypeId);
         if (null == indicatorIds) {
             indicatorIds = initStorageDiskIndicator(isCurrent);
             params.put("indicator_ids", indicatorIds);
@@ -704,9 +714,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             for (JsonElement element : dataJsonArray) {
                 JsonObject dataJson = new JsonParser().parse(element.toString()).getAsJsonObject();
                 String objId = dataJson.get("obj_type_id").getAsString();
-                String resource_category = dataJson.get("resource_category").getAsString();
-                objtypeIdNampMap.put(objId, resource_category);
-                objtypeNameIdMap.put(resource_category, objId);
+                String resourceCategory = dataJson.get("resource_category").getAsString();
+                objtypeIdNampMap.put(objId, resourceCategory);
+                objtypeNameIdMap.put(resourceCategory, objId);
             }
         }
     }
@@ -806,6 +816,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 case RANG_BEGIN_END_TIME:
                     interval = INTERVAL_ONE_MINUTE;
                     break;
+                default:
             }
             params.put("interval", interval);
         }
@@ -959,11 +970,11 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         Set<Map.Entry<String, JsonElement>> volumeSet = dataJson.getAsJsonObject().entrySet();
         for (Map.Entry<String, JsonElement> volume : volumeSet) {
             JsonObject countRes = new JsonObject();
-            String volume_id = volume.getKey();
+            String volumeId = volume.getKey();
             JsonObject counterObj = volume.getValue().getAsJsonObject();
             Set<Map.Entry<String, JsonElement>> counterSet = counterObj.getAsJsonObject().entrySet();
             for (Map.Entry<String, JsonElement> countere : counterSet) {
-                String counter_id = countere.getKey();
+                String counterId = countere.getKey();
                 JsonObject counterjson = countere.getValue().getAsJsonObject();
                 JsonArray series = counterjson.getAsJsonArray("series");
                 for (JsonElement elment : series) {
@@ -971,13 +982,13 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                     Set<Map.Entry<String, JsonElement>> serieJsonSet = serieJson.getAsJsonObject().entrySet();
                     for (Map.Entry<String, JsonElement> serie : serieJsonSet) {
                         String value = serie.getValue().getAsString();
-                        countRes.addProperty(counter_id, value);
+                        countRes.addProperty(counterId, value);
                         break;
                     }
                     break;
                 }
             }
-            data.add(volume_id, countRes);
+            data.add(volumeId, countRes);
         }
         return data;
     }
@@ -1118,9 +1129,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         int maxObjIndicator = 50;
         List<List<String>> objGroup = new ArrayList<>();
         List<String> objIds = (List<String>) params.get("obj_ids");
-        List<String> indicator_ids = (List<String>) params.get("indicator_ids");
+        List<String> indicatorIds = (List<String>) params.get("indicator_ids");
         int objSize = objIds.size();
-        int indicatorSize = indicator_ids.size();
+        int indicatorSize = indicatorIds.size();
         if (objSize * indicatorSize > maxObjIndicator) {
             int length = maxObjIndicator / indicatorSize;
             int count = 0;

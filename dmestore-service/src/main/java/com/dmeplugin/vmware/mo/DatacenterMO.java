@@ -128,7 +128,7 @@ public class DatacenterMO extends BaseMO {
         return list;
     }
 
-    public VirtualMachineMO checkIfVmAlreadyExistsInVcenter(String vmNameOnVcenter, String vmNameInCS) throws Exception {
+    public VirtualMachineMO checkIfVmAlreadyExistsInVcenter(String vmNameOnVcenter, String vmNameInCs) throws Exception {
         int key = getCustomFieldKey("VirtualMachine", CustomFieldConstants.CLOUD_VM_INTERNAL_NAME);
         if (key == 0) {
             s_logger.warn("Custom field " + CustomFieldConstants.CLOUD_VM_INTERNAL_NAME + " is not registered ?!");
@@ -140,17 +140,17 @@ public class DatacenterMO extends BaseMO {
                 List<DynamicProperty> props = oc.getPropSet();
                 if (props != null) {
                     String vmVcenterName = null;
-                    String vmInternalCSName = null;
+                    String vmInternalCsName = null;
                     for (DynamicProperty prop : props) {
                         if ("name".equals(prop.getName())) {
                             vmVcenterName = prop.getVal().toString();
                         }
                         if (prop.getName().startsWith("value[") && prop.getVal() != null) {
-                            vmInternalCSName = ((CustomFieldStringValue)prop.getVal()).getValue();
+                            vmInternalCsName = ((CustomFieldStringValue)prop.getVal()).getValue();
                         }
                     }
                     if (vmNameOnVcenter.equals(vmVcenterName)) {
-                        if (vmInternalCSName != null && !vmInternalCSName.isEmpty() && !vmNameInCS.equals(vmInternalCSName)) {
+                        if (vmInternalCsName != null && !vmInternalCsName.isEmpty() && !vmNameInCs.equals(vmInternalCsName)) {
                             return (new VirtualMachineMO(_context, oc.getObj()));
                         }
                     }

@@ -35,7 +35,6 @@ import javax.xml.transform.stream.StreamResult;
 
 
 import com.dmeplugin.dmestore.exception.VcenterException;
-import com.dmeplugin.dmestore.exception.VcenterRuntimeException;
 import com.dmeplugin.dmestore.utils.StringUtil;
 import com.dmeplugin.vmware.util.Pair;
 import com.dmeplugin.vmware.util.VmwareContext;
@@ -109,8 +108,6 @@ import java.util.UUID;
 public class HypervisorHostHelper {
     private static final Logger s_logger = LoggerFactory.getLogger(HypervisorHostHelper.class);
     private static final int DEFAULT_LOCK_TIMEOUT_SECONDS = 600;
-    private static final String s_policyNamePrefix = "cloud.policy.";
-
     // make vmware-base loosely coupled with cloud-specific stuff, duplicate VLAN.UNTAGGED constant here
     private static final String UNTAGGED_VLAN_NAME = "untagged";
     private static final String VMDK_PACK_DIR = "ova";
@@ -280,12 +277,12 @@ public class HypervisorHostHelper {
             // We have something to configure on the DVS... so send it the command.
             // When reconfiguring a vmware DVSwitch, we need to send in the configVersion in the spec.
             // Let's retrieve this switch's configVersion first.
-            String dvsConfigVersion = dvSwitchMo.getDVSConfigVersion(morDvSwitch);
+            String dvsConfigVersion = dvSwitchMo.getDvsConfigVersion(morDvSwitch);
             dvsSpec.setConfigVersion(dvsConfigVersion);
 
             // Reconfigure the dvs using this spec.
             try {
-                dvSwitchMo.updateVMWareDVSwitchGetTask(morDvSwitch, dvsSpec);
+                dvSwitchMo.updateVmWareDvSwitchGetTask(morDvSwitch, dvsSpec);
             } catch (AlreadyExistsFaultMsg e) {
                 s_logger.info("Specified vlan id (" + vid + ") private vlan id (" + spvlanid + ") tuple already configured on VMWare DVSwitch");
                 // Do nothing, good if the tuple's already configured on the dvswitch.

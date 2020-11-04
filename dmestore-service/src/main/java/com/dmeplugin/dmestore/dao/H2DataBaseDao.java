@@ -50,7 +50,7 @@ public class H2DataBaseDao {
     return buff.toString();
   }
 
-  protected String getSQLIn(int len) {
+  protected String getSqlIn(int len) {
     StringBuilder builder = new StringBuilder();
     while (len-- > 0) {
       if (builder.length() != 0) {
@@ -126,11 +126,11 @@ public class H2DataBaseDao {
     }
   }
 
-  public static String getDBFileName() {
+  public static String getDbFileName() {
     return DB_FILE + DB_FILE_SUFFIX;
   }
 
-  public static String getDBFileNamePrefix() {
+  public static String getDbFileNamePrefix() {
     return DB_FILE;
   }
 
@@ -158,7 +158,7 @@ public class H2DataBaseDao {
     }
   }
 
-  public static String getDBFileDir() {
+  public static String getDbFileDir() {
     String vmwareDataPath = getVmwareRuntimeDataDir();
     if (vmwareDataPath != null && !"".equals(vmwareDataPath)) {
       if (isWindows()) {

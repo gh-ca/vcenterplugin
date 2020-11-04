@@ -20,8 +20,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.URLEncoder;
@@ -45,16 +43,10 @@ import com.vmware.vim25.DynamicProperty;
 import com.vmware.vim25.ElementDescription;
 import com.vmware.vim25.GuestInfo;
 import com.vmware.vim25.GuestOsDescriptor;
-import com.vmware.vim25.HttpNfcLeaseDeviceUrl;
-import com.vmware.vim25.HttpNfcLeaseInfo;
-import com.vmware.vim25.HttpNfcLeaseState;
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.ObjectContent;
 import com.vmware.vim25.ObjectSpec;
 import com.vmware.vim25.OptionValue;
-import com.vmware.vim25.OvfCreateDescriptorParams;
-import com.vmware.vim25.OvfCreateDescriptorResult;
-import com.vmware.vim25.OvfFile;
 import com.vmware.vim25.ParaVirtualSCSIController;
 import com.vmware.vim25.PropertyFilterSpec;
 import com.vmware.vim25.PropertySpec;
@@ -62,7 +54,6 @@ import com.vmware.vim25.TraversalSpec;
 import com.vmware.vim25.VirtualBusLogicController;
 import com.vmware.vim25.VirtualCdrom;
 import com.vmware.vim25.VirtualCdromIsoBackingInfo;
-import com.vmware.vim25.VirtualCdromRemotePassthroughBackingInfo;
 import com.vmware.vim25.VirtualController;
 import com.vmware.vim25.VirtualDevice;
 import com.vmware.vim25.VirtualDeviceBackingInfo;
@@ -113,7 +104,7 @@ import org.slf4j.LoggerFactory;
 
 public class VirtualMachineMO extends BaseMO {
     private static final Logger s_logger = LoggerFactory.getLogger(VirtualMachineMO.class);
-    private static final ExecutorService MonitorServiceExecutor = Executors.newCachedThreadPool();
+    private static final ExecutorService MONITOR_SERVICE_EXECUTOR = Executors.newCachedThreadPool();
 
     public static final String ANSWER_YES = "0";
     public static final String ANSWER_NO = "1";
@@ -212,7 +203,7 @@ public class VirtualMachineMO extends BaseMO {
         // Monitor VM questions
         final Boolean[] flags = {false};
         final VirtualMachineMO vmMo = this;
-        Future<?> future = MonitorServiceExecutor.submit(new Runnable() {
+        Future<?> future = MONITOR_SERVICE_EXECUTOR.submit(new Runnable() {
             @Override
             public void run() {
                 s_logger.info("VM Question monitor started...");
@@ -2883,7 +2874,7 @@ public class VirtualMachineMO extends BaseMO {
         final VirtualMachineMO vmMo = this;
         final boolean[] encounterQuestion = new boolean[1];
         encounterQuestion[0] = false;
-        Future<?> future = MonitorServiceExecutor.submit(new Runnable() {
+        Future<?> future = MONITOR_SERVICE_EXECUTOR.submit(new Runnable() {
             @Override
             public void run() {
                 s_logger.info("VM Question monitor started...");

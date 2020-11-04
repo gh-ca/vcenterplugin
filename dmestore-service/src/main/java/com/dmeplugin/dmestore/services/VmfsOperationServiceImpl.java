@@ -143,16 +143,16 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         Map<String, Object> reqBody = new HashMap<>(16);
         List<Object> reqList = new ArrayList<>(10);
         Map<String, Object> reqMap = new HashMap<>(16);
-        List<String> volume_ids = new ArrayList<>(10);
+        List<String> volumeIds = new ArrayList<>(10);
 
-        String volume_id = volumemap.get("volume_id");
+        String volumeId = volumemap.get("volume_id");
         String datastoreobjid = volumemap.get("obj_id");
-        String vo_add_capacity = volumemap.get("vo_add_capacity");
-        if (!StringUtils.isEmpty(volume_id) && !StringUtils.isEmpty(vo_add_capacity)) {
-            volume_ids.add(volume_id);
+        String voAddCapacity = volumemap.get("vo_add_capacity");
+        if (!StringUtils.isEmpty(volumeId) && !StringUtils.isEmpty(voAddCapacity)) {
+            volumeIds.add(volumeId);
         }
-        volume_ids.add(volume_id);
-        reqBody.put("volume_id", volume_id);
+        volumeIds.add(volumeId);
+        reqBody.put("volume_id", volumeId);
         reqBody.put("added_capacity", Integer.valueOf(volumemap.get("vo_add_capacity")));
         reqList.add(reqBody);
 
@@ -166,18 +166,18 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             }
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-            String task_id = ToolUtils.jsonToStr(jsonObject.get("task_id"));
-            List<String> task_ids = new ArrayList<>(10);
-            task_ids.add(task_id);
-            Boolean flag = taskService.checkTaskStatus(task_ids);
+            String taskId = ToolUtils.jsonToStr(jsonObject.get("task_id"));
+            List<String> taskIds = new ArrayList<>(10);
+            taskIds.add(taskId);
+            Boolean flag = taskService.checkTaskStatus(taskIds);
             if (!flag) {
                 throw new DMEException("503","expand volume failed !");
             }
 
-            String ds_name = volumemap.get("ds_name");
+            String dsName = volumemap.get("ds_name");
             String result = null;
-            if (!StringUtils.isEmpty(vo_add_capacity)&&!StringUtils.isEmpty(datastoreobjid)) {
-                result = vcsdkUtils.expandVmfsDatastore(ds_name, ToolUtils.getInt(vo_add_capacity),datastoreobjid);
+            if (!StringUtils.isEmpty(voAddCapacity)&&!StringUtils.isEmpty(datastoreobjid)) {
+                result = vcsdkUtils.expandVmfsDatastore(dsName, ToolUtils.getInt(voAddCapacity),datastoreobjid);
             }
             if ("failed".equals(result)) {
                 throw new DMEException("403","expand vmfsDatastore failed !");

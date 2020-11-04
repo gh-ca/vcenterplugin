@@ -7,7 +7,7 @@ public interface SystemService {
     /**
      * init table structures and data
      */
-    void initDB();
+    void initDb();
 
     /**
      * check if table exists in DB

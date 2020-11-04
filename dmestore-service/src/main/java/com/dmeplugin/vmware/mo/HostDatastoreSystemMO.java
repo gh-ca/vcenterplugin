@@ -69,12 +69,12 @@ public class HostDatastoreSystemMO extends BaseMO {
         return _context.getService().queryUnresolvedVmfsVolumes(_mor);
     }
 
-    public List<VmfsDatastoreOption> queryVmfsDatastoreExpandOptions(DatastoreMO datastoreMO) throws Exception {
-        return _context.getService().queryVmfsDatastoreExpandOptions(_mor, datastoreMO.getMor());
+    public List<VmfsDatastoreOption> queryVmfsDatastoreExpandOptions(DatastoreMO datastoreMo) throws Exception {
+        return _context.getService().queryVmfsDatastoreExpandOptions(_mor, datastoreMo.getMor());
     }
 
-    public void expandVmfsDatastore(DatastoreMO datastoreMO, VmfsDatastoreExpandSpec vmfsDatastoreExpandSpec) throws Exception {
-        _context.getService().expandVmfsDatastore(_mor, datastoreMO.getMor(), vmfsDatastoreExpandSpec);
+    public void expandVmfsDatastore(DatastoreMO datastoreMo, VmfsDatastoreExpandSpec vmfsDatastoreExpandSpec) throws Exception {
+        _context.getService().expandVmfsDatastore(_mor, datastoreMo.getMor(), vmfsDatastoreExpandSpec);
     }
 
     // storeUrl in nfs://host/exportpath format
@@ -239,9 +239,9 @@ public class HostDatastoreSystemMO extends BaseMO {
         if (result) {
             _context.waitForTaskProgressDone(task);
 
-            TaskMO taskMO = new TaskMO(_context, task);
+            TaskMO taskMo = new TaskMO(_context, task);
 
-            return (HostResignatureRescanResult)taskMO.getTaskInfo().getResult();
+            return (HostResignatureRescanResult)taskMo.getTaskInfo().getResult();
         } else {
             throw new Exception("Unable to register vm due to " + TaskMO.getTaskFailureInfo(_context, task));
         }
