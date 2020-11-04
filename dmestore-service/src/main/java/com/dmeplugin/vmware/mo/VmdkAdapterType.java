@@ -17,6 +17,9 @@
 package com.dmeplugin.vmware.mo;
 
 public enum VmdkAdapterType {
+    /**
+     * ide
+     **/
     ide,
     lsilogic,
     buslogic,

@@ -78,7 +78,6 @@ public interface VmwareHypervisorHost {
 
     ManagedObjectReference findDatastoreByName(String datastoreName) throws Exception;
 
-    @Deprecated
     ManagedObjectReference findDatastoreByExportPath(String exportPath) throws Exception;
 
     ManagedObjectReference findMigrationTarget(VirtualMachineMO vmMo) throws Exception;

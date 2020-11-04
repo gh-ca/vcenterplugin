@@ -558,11 +558,21 @@ public class HypervisorHostHelper {
     }
 
     public enum PvlanOperation {
-        add, edit, remove
+        /**
+         * add
+         **/
+        add,
+        edit,
+        remove
     }
 
     public enum PvlanType {
-        promiscuous, isolated, community;
+        /**
+         * promiscuous
+         **/
+        promiscuous,
+        isolated,
+        community;
 
         public static PvlanType fromStr(String val) {
             if (StringUtil.isBlank(val)) {
