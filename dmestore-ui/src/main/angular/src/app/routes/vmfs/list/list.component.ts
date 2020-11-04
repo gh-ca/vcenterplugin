@@ -126,6 +126,8 @@ export class VmfsListComponent implements OnInit {
   vmfsNameRepeatErr = false; // vmfs名称是否重复 true：是 false 否
   volNameRepeatErr = false; // Vol名称是否重复 true：是 false 否
 
+  isFirstLoadChartData = true;
+
 
   ngOnInit() {
     // 列表数据
@@ -228,28 +230,8 @@ export class VmfsListComponent implements OnInit {
               });
               // 设置卷ID集合
               this.wwns = wwns;
-
-              if (this.wwns.length > 0) {
-                this.remoteSrv.getChartData(this.wwns).subscribe((chartResult: any) => {
-                  console.log('chartResult', chartResult);
-                  if (chartResult.code === '200' && chartResult.data != null) {
-                    const chartList: VmfsInfo [] = chartResult.data;
-                    this.list.forEach(item => {
-                      chartList.forEach(charItem => {
-                        // 若属同一个卷则将chartItem的带宽、iops、读写相应时间 值赋予列表
-                        if (item.wwn === charItem.volumeId) {
-                          item.iops = charItem.iops;
-                          item.bandwidth = charItem.bandwidth;
-                          item.readResponseTime = charItem.readResponseTime;
-                          item.writeResponseTime = charItem.writeResponseTime;
-                        }
-                      });
-                    });
-                    this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-                  } else {
-                    console.log(chartResult.description);
-                  }
-                });
+              if (this.radioCheck === 'chart') {
+                this.getPerformanceData();
               }
             }
           } else {
@@ -279,6 +261,52 @@ export class VmfsListComponent implements OnInit {
     });
   }
 
+  /**
+   * 性能数据点击事件
+   */
+  charBtnClickFunc() {
+    if (this.isFirstLoadChartData) {
+      this.getPerformanceData();
+    }
+  }
+
+  /**
+   * 获取性能数据
+   */
+  getPerformanceData() {
+    // 获取chart 数据
+    const wwns = [];
+    this.list.forEach(item => {
+      wwns.push(item.wwn);
+    });
+    // 设置卷ID集合
+    this.wwns = wwns;
+    if (this.wwns.length > 0) {
+      this.isLoading = true;
+      this.remoteSrv.getChartData(this.wwns).subscribe((chartResult: any) => {
+        console.log('chartResult', chartResult);
+        if (chartResult.code === '200' && chartResult.data != null) {
+          const chartList: VmfsInfo [] = chartResult.data;
+          this.list.forEach(item => {
+            chartList.forEach(charItem => {
+              // 若属同一个卷则将chartItem的带宽、iops、读写相应时间 值赋予列表
+              if (item.wwn === charItem.volumeId) {
+                item.iops = charItem.iops;
+                item.bandwidth = charItem.bandwidth;
+                item.readResponseTime = charItem.readResponseTime;
+                item.writeResponseTime = charItem.writeResponseTime;
+              }
+            });
+          });
+        } else {
+          console.log(chartResult.description);
+        }
+        this.isLoading = false;
+        this.isFirstLoadChartData = false; // 非第一次加载chartData 后续点击性能图标将不发送请求
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+      });
+    }
+  }
   // 获取所有存储数据
   getStorageList() {
     this.remoteSrv.getStorages().subscribe((result: any) => {
