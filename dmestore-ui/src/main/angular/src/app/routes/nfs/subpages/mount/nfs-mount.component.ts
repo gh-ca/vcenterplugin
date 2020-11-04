@@ -92,10 +92,7 @@ export class NfsMountComponent implements OnInit{
   }
   getDataStoreList(hostObjectId: string){
     this.dataStoreList=null;
-      let params=
-        {"hostObjectId":hostObjectId,
-          "dataStoreType": "NFS"}
-      this.mountService.getDatastoreListByHostObjectId(params).subscribe((r: any)=>{
+      this.mountService.getDatastoreListByHostObjectId(hostObjectId, "NFS").subscribe((r: any)=>{
         if (r.code==='200'){
           this.dataStoreList=r.data;
         }
