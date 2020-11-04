@@ -38,6 +38,10 @@ export class ModifyComponent implements OnInit{
   isOperationErr = false; // 错误信息
   modifySuccessShow = false; // 编辑程功窗口
 
+  matchErr = false; // 名称校验 是否只由字母与数字组成 true：是 false 否
+  vmfsNameRepeatErr = false; // vmfs名称是否重复 true：是 false 否
+  volNameRepeatErr = false; // Vol名称是否重复 true：是 false 否
+
   ngOnInit(): void {
     this.initData();
   }
@@ -47,6 +51,12 @@ export class ModifyComponent implements OnInit{
     this.modalLoading = true;
     this.modalHandleLoading = false;
     this.isOperationErr = false;
+
+    // 名称错误提示初始化
+    this.vmfsNameRepeatErr = false;
+    this.volNameRepeatErr = false;
+    this.matchErr = false;
+
     // 设备类型 操作类型初始化
     this.route.url.subscribe(url => {
       console.log('url', url);
@@ -205,5 +215,60 @@ export class ModifyComponent implements OnInit{
    */
   confirmActResult() {
     this.cancel();
+  }
+
+  /**
+   * 编辑功能名称校验
+   */
+  modifyNameCheck() {
+    this.vmfsNameRepeatErr = false;
+    this.volNameRepeatErr = false;
+    this.matchErr = false;
+
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+
+    if (this.modifyForm.name) {
+      if (reg5.test(this.modifyForm.name)) {
+        // 校验VMFS名称重复
+        this.modalHandleLoading = true;
+        this.remoteSrv.checkVmfsName(this.modifyForm.name).subscribe((result: any) => {
+          this.modalHandleLoading = false;
+          if (result.code === '200') { // result.data true 不重复 false 重复
+            this.vmfsNameRepeatErr = !result.data;
+            if (this.vmfsNameRepeatErr) { // 名称重复
+              this.modifyForm.name = null;
+              this.volNameRepeatErr = false;
+              this.matchErr = false;
+            } else {
+              if (this.modifyForm.isSameName) {
+                this.modalHandleLoading = true;
+                // 校验VMFS名称重复
+                this.remoteSrv.checkVolName(this.modifyForm.name).subscribe((result: any) => {
+                  this.modalHandleLoading = false;
+                  if (result.code === '200') { // result.data true 不重复 false 重复
+                    this.volNameRepeatErr = !result.data;
+                    if (!this.vmfsNameRepeatErr && this.volNameRepeatErr) {
+                      this.modifyForm.name = null;
+                    }
+                    if (this.volNameRepeatErr) {
+                      this.modifyForm.name = null;
+                      this.vmfsNameRepeatErr = false;
+                      this.matchErr = false;
+                    }
+                  }
+                  this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+                });
+              }
+            }
+          }
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        });
+
+      } else {
+        this.matchErr = true;
+        this.modifyForm.name = null;
+      }
+    }
+    console.log("this.vmfsNameRepeatErr, this.volNameRepeatErr", this.vmfsNameRepeatErr, this.volNameRepeatErr)
   }
 }
