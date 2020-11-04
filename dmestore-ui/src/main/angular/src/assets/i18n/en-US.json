@@ -26,6 +26,7 @@
   },
   "validations": {
     "required": "This field is required!",
+    "nameRequired": "This field is required! And can only contain half-width letters, half-width numbers, “_”、“-”、“.”、, Chinese characters.",
     "minlength": "Should have atleast {{number}} characters",
     "maxlength": "This value should be less than {{number}} characters",
     "min": "This value should be more than {{number}}",
@@ -780,6 +781,8 @@
     "nfsrepeat":"NFS name already exists!",
     "sharerepeat":"Share name already exists!",
     "fsrepeat":"FileSystem name already exists!",
+    "vmfsNameRepeat":"VMFS name already exists!",
+    "volNameRepeat":"volume name already exists!",
     "numberAndLetter":"Only numbers and letters can be entered!"
   },
   "page": {
