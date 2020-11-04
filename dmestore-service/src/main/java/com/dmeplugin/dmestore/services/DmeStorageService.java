@@ -50,6 +50,18 @@ public interface DmeStorageService {
     List<Volume> getVolumes(String storageId) throws DMEException;
 
     /**
+     * 分页获取卷列表
+     * @author wangxy
+     * @date 14:13 2020/11/4
+     * @param storageId
+     * @param pageSize
+     * @param pageNo
+     * @throws DMEException
+     * @return com.dmeplugin.dmestore.model.VolumeListRestponse
+     **/
+    VolumeListRestponse getVolumesByPage(String storageId, String pageSize, String pageNo) throws DMEException;
+
+    /**
      * 获取文件系统列表
      * @param storageId
      * @return
