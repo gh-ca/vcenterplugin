@@ -3,7 +3,6 @@ package com.dmeplugin.dmestore.services.bestpractice;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.dmeplugin.vmware.mo.HostMO;
 import com.dmeplugin.vmware.util.VmwareContext;
-import com.vmware.vim25.HostVirtualSwitch;
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.OptionValue;
 
@@ -36,7 +35,7 @@ public class BaseBestPracticeService {
         for (OptionValue value : values) {
             value.setValue(recommendValue);
         }
-        hostMo.getHostAdvanceOptionMO().UpdateOptions(values);
+        hostMo.getHostAdvanceOptionMO().updateOptions(values);
     }
 
     protected Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId, String hostSetting) throws Exception {

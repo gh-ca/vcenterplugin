@@ -35,8 +35,8 @@ public class VmdkFileDescriptor {
     private static final String VMDK_CREATE_TYPE_VMFSSPARSE = "vmfsSparse";
     private static final String VMDK_PROPERTY_ADAPTER_TYPE = "ddb.adapterType";
 
-    private Properties _properties = new Properties();
-    private String _baseFileName;
+    private Properties properties = new Properties();
+    private String baseFileName;
 
     public VmdkFileDescriptor() {
     }
@@ -64,7 +64,7 @@ public class VmdkFileDescriptor {
                         value = value.substring(1, value.length() - 1);
                     }
 
-                    _properties.put(name, value);
+                    properties.put(name, value);
                 } else {
                     if (line.startsWith("RW")) {
                         int startPos = line.indexOf('\"');
@@ -72,7 +72,7 @@ public class VmdkFileDescriptor {
                         assert (startPos > 0);
                         assert (endPos > 0);
 
-                        _baseFileName = line.substring(startPos + 1, endPos);
+                        baseFileName = line.substring(startPos + 1, endPos);
                     } else {
                         s_logger.warn("Unrecognized vmdk line content: " + line);
                     }
@@ -86,15 +86,15 @@ public class VmdkFileDescriptor {
     }
 
     public String getBaseFileName() {
-        return _baseFileName;
+        return baseFileName;
     }
 
     public String getParentFileName() {
-        return _properties.getProperty("parentFileNameHint");
+        return properties.getProperty("parentFileNameHint");
     }
 
     public boolean isVmfsSparseFile() {
-        String vmdkCreateType = _properties.getProperty(VMDK_PROPERTY_CREATE_TYPE);
+        String vmdkCreateType = properties.getProperty(VMDK_PROPERTY_CREATE_TYPE);
         if (vmdkCreateType.equalsIgnoreCase(VMDK_CREATE_TYPE_VMFSSPARSE)) {
             return true;
         }
@@ -102,7 +102,7 @@ public class VmdkFileDescriptor {
     }
 
     public String getAdapterType() {
-        return _properties.getProperty(VMDK_PROPERTY_ADAPTER_TYPE);
+        return properties.getProperty(VMDK_PROPERTY_ADAPTER_TYPE);
     }
 
 

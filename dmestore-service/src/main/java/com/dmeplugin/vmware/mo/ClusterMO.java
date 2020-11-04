@@ -24,7 +24,6 @@ import java.util.List;
 
 
 import com.dmeplugin.dmestore.exception.VcenterException;
-import com.dmeplugin.dmestore.exception.VcenterRuntimeException;
 import com.dmeplugin.dmestore.utils.StringUtil;
 import com.dmeplugin.vmware.util.Pair;
 import com.dmeplugin.vmware.util.VmwareContext;
@@ -70,7 +69,7 @@ import org.slf4j.LoggerFactory;
 //
 public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     private static final Logger s_logger = LoggerFactory.getLogger(ClusterMO.class);
-    private ManagedObjectReference _environmentBrowser = null;
+    private ManagedObjectReference environmentBrowser = null;
 
     public ClusterMO(VmwareContext context, ManagedObjectReference morCluster) {
         super(context, morCluster);
@@ -102,7 +101,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     }
 
     @Override
-    public boolean isHAEnabled() throws Exception {
+    public boolean isHaEnabled() throws Exception {
         ClusterDasConfigInfo dasConfig = getDasConfig();
         if (dasConfig != null && dasConfig.isEnabled() != null && dasConfig.isEnabled().booleanValue()) {
             return true;
@@ -111,7 +110,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         return false;
     }
 
-    private String getRestartPriorityForVM(VirtualMachineMO vmMo) throws Exception {
+    private String getRestartPriorityForVm(VirtualMachineMO vmMo) throws Exception {
         if (vmMo == null) {
             s_logger.debug("Failed to get restart priority for VM, invalid VM object reference");
             return null;
@@ -148,12 +147,12 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     }
 
     @Override
-    public void setRestartPriorityForVM(VirtualMachineMO vmMo, String priority) throws Exception {
+    public void setRestartPriorityForVm(VirtualMachineMO vmMo, String priority) throws Exception {
         if (vmMo == null || StringUtil.isBlank(priority)) {
             return;
         }
 
-        if (!isHAEnabled()) {
+        if (!isHaEnabled()) {
             s_logger.debug("Couldn't set restart priority for VM: " + vmMo.getName() + ", HA disabled in the cluster");
             return;
         }
@@ -164,7 +163,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
             return;
         }
 
-        String currentVmRestartPriority = getRestartPriorityForVM(vmMo);
+        String currentVmRestartPriority = getRestartPriorityForVm(vmMo);
         if (StringUtil.isNotBlank(currentVmRestartPriority) && currentVmRestartPriority.equalsIgnoreCase(priority)) {
             return;
         }
@@ -399,17 +398,17 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
 
 
     @Override
-    public boolean createBlankVm(String vmName, String vmInternalCSName, int cpuCount, int cpuSpeedMHz, int cpuReservedMHz, boolean limitCpuUse, int memoryMB,
-                                 int memoryReserveMB, String guestOsIdentifier, ManagedObjectReference morDs, boolean snapshotDirToParent, Pair<String, String> controllerInfo, Boolean systemVm) throws Exception {
+    public boolean createBlankVm(String vmName, String vmInternalCsName, int cpuCount, int cpuSpeedMhz, int cpuReservedMhz, boolean limitCpuUse, int memoryMb,
+                                 int memoryReserveMb, String guestOsIdentifier, ManagedObjectReference morDs, boolean snapshotDirToParent, Pair<String, String> controllerInfo, Boolean systemVm) throws Exception {
 
         if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - createBlankVm(). target MOR: " + _mor.getValue() + ", vmName: " + vmName + ", cpuCount: " + cpuCount + ", cpuSpeedMhz: " +
-                    cpuSpeedMHz + ", cpuReservedMHz: " + cpuReservedMHz + ", limitCpu: " + limitCpuUse + ", memoryMB: " + memoryMB + ", guestOS: " + guestOsIdentifier +
+                    cpuSpeedMhz + ", cpuReservedMHz: " + cpuReservedMhz + ", limitCpu: " + limitCpuUse + ", memoryMB: " + memoryMb + ", guestOS: " + guestOsIdentifier +
                     ", datastore: " + morDs.getValue() + ", snapshotDirToParent: " + snapshotDirToParent);
         }
 
         boolean result =
-                HypervisorHostHelper.createBlankVm(this, vmName, vmInternalCSName, cpuCount, cpuSpeedMHz, cpuReservedMHz, limitCpuUse, memoryMB, memoryReserveMB,
+                HypervisorHostHelper.createBlankVm(this, vmName, vmInternalCsName, cpuCount, cpuSpeedMhz, cpuReservedMhz, limitCpuUse, memoryMb, memoryReserveMb,
                         guestOsIdentifier, morDs, snapshotDirToParent, controllerInfo, systemVm);
 
         if (s_logger.isTraceEnabled()) {
@@ -741,10 +740,10 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         throw new VcenterException("Unable to get LicenseAssignmentManager at cluster level");
     }
     private ManagedObjectReference getEnvironmentBrowser() throws Exception {
-        if (_environmentBrowser == null) {
-            _environmentBrowser = _context.getVimClient().getMoRefProp(_mor, "environmentBrowser");
+        if (environmentBrowser == null) {
+            environmentBrowser = _context.getVimClient().getMoRefProp(_mor, "environmentBrowser");
         }
-        return _environmentBrowser;
+        return environmentBrowser;
     }
     @Override
     public String getRecommendedDiskController(String guestOsId) throws Exception {

@@ -109,7 +109,7 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
         }
         HostMO hostMo = new HostMO(context, mor);
         HostNetworkInfo networkInfo = hostMo.getHostNetworkInfo();
-        HostNetworkSystemMO hostNetworkSystemMO = hostMo.getHostNetworkSystemMO();
+        HostNetworkSystemMO hostNetworkSystemMo = hostMo.getHostNetworkSystemMO();
         List<HostVirtualSwitch> virtualSwitches = networkInfo.getVswitch();
         for (HostVirtualSwitch virtualSwitch : virtualSwitches) {
             String name = virtualSwitch.getName();
@@ -117,12 +117,12 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
             Integer mtu = spec.getMtu();
             if (null == mtu || (mtu.intValue() != ((Integer) recommendValue).intValue())) {
                 spec.setMtu((Integer) recommendValue);
-                hostNetworkSystemMO.updateVirtualSwitch(name, spec);
+                hostNetworkSystemMo.updateVirtualSwitch(name, spec);
             }
         }
 
         try {
-            HostNetworkConfig networkConfig = hostNetworkSystemMO.getNetworkConfig();
+            HostNetworkConfig networkConfig = hostNetworkSystemMo.getNetworkConfig();
             List<HostVirtualSwitchConfig> list = networkConfig.getVswitch();
             for (HostVirtualSwitchConfig vSwitchConfig : list) {
                 HostVirtualSwitchSpec spec = vSwitchConfig.getSpec();
@@ -131,7 +131,7 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
                     spec.setMtu((Integer) recommendValue);
                 }
             }
-            hostNetworkSystemMO.updateNetworkConfig(networkConfig, HostConfigChangeMode.MODIFY.value());
+            hostNetworkSystemMo.updateNetworkConfig(networkConfig, HostConfigChangeMode.MODIFY.value());
         } catch (Exception ex) {
 
         }

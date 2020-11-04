@@ -39,7 +39,7 @@ public class HostDatastoreBrowserMO extends BaseMO {
         super(context, morType, morValue);
     }
 
-    public void DeleteFile(String datastoreFullPath) throws Exception {
+    public void deleteFile(String datastoreFullPath) throws Exception {
         if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - deleteFile(). target mor: " + _mor.getValue() + ", file datastore path: " + datastoreFullPath);
         }

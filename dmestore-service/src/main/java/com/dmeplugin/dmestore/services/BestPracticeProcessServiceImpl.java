@@ -236,7 +236,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             }
         }
 
-        Map<String, String> hostMap = new HashMap<>();
+        Map<String, String> hostMap = new HashMap<>(16);
         if (null == objectIds || objectIds.size() == 0) {
             int pageNo = 0;
             int pageSize = 100;

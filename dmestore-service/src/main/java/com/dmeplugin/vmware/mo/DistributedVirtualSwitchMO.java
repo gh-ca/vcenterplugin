@@ -50,7 +50,7 @@ public class DistributedVirtualSwitchMO extends BaseMO {
         s_dvPortGroupCacheMap = new ConcurrentHashMap<String, List<String>>();
     }
 
-    public void createDVPortGroup(DVPortgroupConfigSpec dvPortGroupSpec) throws Exception {
+    public void createDvPortGroup(DVPortgroupConfigSpec dvPortGroupSpec) throws Exception {
         List<DVPortgroupConfigSpec> dvPortGroupSpecArray = new ArrayList<DVPortgroupConfigSpec>();
         dvPortGroupSpecArray.add(dvPortGroupSpec);
         boolean dvPortGroupExists = false;
@@ -101,20 +101,20 @@ public class DistributedVirtualSwitchMO extends BaseMO {
         }
     }
 
-    public void updateVMWareDVSwitch(ManagedObjectReference dvSwitchMor, VMwareDVSConfigSpec dvsSpec) throws Exception {
+    public void updateVmWareDvSwitch(ManagedObjectReference dvSwitchMor, VMwareDVSConfigSpec dvsSpec) throws Exception {
         _context.getService().reconfigureDvsTask(dvSwitchMor, dvsSpec);
     }
 
-    public TaskInfo updateVMWareDVSwitchGetTask(ManagedObjectReference dvSwitchMor, VMwareDVSConfigSpec dvsSpec) throws Exception {
+    public TaskInfo updateVmWareDvSwitchGetTask(ManagedObjectReference dvSwitchMor, VMwareDVSConfigSpec dvsSpec) throws Exception {
         ManagedObjectReference task = _context.getService().reconfigureDvsTask(dvSwitchMor, dvsSpec);
         TaskInfo info = (TaskInfo)(_context.getVimClient().getDynamicProperty(task, "info"));
         _context.getVimClient().waitForTask(task);
         return info;
     }
 
-    public String getDVSConfigVersion(ManagedObjectReference dvSwitchMor) throws Exception {
+    public String getDvsConfigVersion(ManagedObjectReference dvSwitchMor) throws Exception {
         assert (dvSwitchMor != null);
-        DVSConfigInfo dvsConfigInfo = (DVSConfigInfo)_context.getVimClient().getDynamicProperty(dvSwitchMor, "config");
+        DVSConfigInfo dvsConfigInfo = _context.getVimClient().getDynamicProperty(dvSwitchMor, "config");
         return dvsConfigInfo.getConfigVersion();
     }
 

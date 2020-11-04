@@ -32,7 +32,7 @@ public class BaseMO {
     protected VmwareContext _context;
     protected ManagedObjectReference _mor;
 
-    private String _name;
+    private String name;
 
     public BaseMO(VmwareContext context, ManagedObjectReference mor) {
         assert (context != null);
@@ -66,11 +66,11 @@ public class BaseMO {
     }
 
     public String getName() throws Exception {
-        if (_name == null) {
-            _name = (String)_context.getVimClient().getDynamicProperty(_mor, "name");
+        if (name == null) {
+            name = (String)_context.getVimClient().getDynamicProperty(_mor, "name");
         }
 
-        return _name;
+        return name;
     }
 
     public void unregisterVm() throws Exception {

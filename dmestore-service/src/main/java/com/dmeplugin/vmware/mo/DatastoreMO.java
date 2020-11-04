@@ -21,7 +21,6 @@ import java.util.List;
 
 
 import com.dmeplugin.dmestore.exception.VcenterException;
-import com.dmeplugin.dmestore.exception.VcenterRuntimeException;
 import com.dmeplugin.vmware.util.Pair;
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.vmware.vim25.*;
@@ -36,8 +35,8 @@ import org.slf4j.LoggerFactory;
 public class DatastoreMO extends BaseMO {
     private static final Logger s_logger = LoggerFactory.getLogger(DatastoreMO.class);
 
-    private String _name;
-    private Pair<DatacenterMO, String> _ownerDc;
+    private String name;
+    private Pair<DatacenterMO, String> ownerDc;
 
     public DatastoreMO(VmwareContext context, ManagedObjectReference morDatastore) {
         super(context, morDatastore);
@@ -49,11 +48,11 @@ public class DatastoreMO extends BaseMO {
 
     @Override
     public String getName() throws Exception {
-        if (_name == null) {
-            _name = _context.getVimClient().getDynamicProperty(_mor, "name");
+        if (name == null) {
+            name = _context.getVimClient().getDynamicProperty(_mor, "name");
         }
 
-        return _name;
+        return name;
     }
 
     public DatastoreMO(VmwareContext context, String dsName) throws Exception {
@@ -77,11 +76,11 @@ public class DatastoreMO extends BaseMO {
         return (DatastoreSummary)_context.getVimClient().getDynamicProperty(_mor, "summary");
     }
 
-    public List<ManagedObjectReference> getVM()throws Exception {
+    public List<ManagedObjectReference> getVm()throws Exception {
         return _context.getVimClient().getDynamicProperty(_mor, "vm");
     }
 
-    public HostDatastoreBrowserMO getHostDatastoreBrowserMO() throws Exception {
+    public HostDatastoreBrowserMO getHostDatastoreBrowserMo() throws Exception {
         return new HostDatastoreBrowserMO(_context, (ManagedObjectReference)_context.getVimClient().getDynamicProperty(_mor, "browser"));
     }
 
@@ -95,8 +94,8 @@ public class DatastoreMO extends BaseMO {
     }
 
     public Pair<DatacenterMO, String> getOwnerDatacenter() throws Exception {
-        if (_ownerDc != null) {
-            return _ownerDc;
+        if (ownerDc != null) {
+            return ownerDc;
         }
 
         PropertySpec pSpec = new PropertySpec();
@@ -134,8 +133,8 @@ public class DatastoreMO extends BaseMO {
         assert (ocs.get(0).getObj() != null);
         assert (ocs.get(0).getPropSet() != null);
         String dcName = ocs.get(0).getPropSet().get(0).getVal().toString();
-        _ownerDc = new Pair<>(new DatacenterMO(_context, ocs.get(0).getObj()), dcName);
-        return _ownerDc;
+        ownerDc = new Pair<>(new DatacenterMO(_context, ocs.get(0).getObj()), dcName);
+        return ownerDc;
     }
 
     public void renameDatastore(String newDatastoreName) throws Exception {
@@ -356,7 +355,7 @@ public class DatastoreMO extends BaseMO {
         DatastoreFile file = new DatastoreFile(fileFullPath);
         DatastoreFile dirFile = new DatastoreFile(file.getDatastoreName(), file.getDir());
 
-        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMO();
+        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMo();
 
         s_logger.info("Search file " + file.getFileName() + " on " + dirFile.getPath());
         HostDatastoreBrowserSearchResults results = browserMo.searchDatastore(dirFile.getPath(), file.getFileName(), true);
@@ -377,7 +376,7 @@ public class DatastoreMO extends BaseMO {
         DatastoreFile file = new DatastoreFile(fileFullPath);
         DatastoreFile dirFile = new DatastoreFile(file.getDatastoreName(), file.getDir());
 
-        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMO();
+        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMo();
 
         HostDatastoreBrowserSearchSpec searchSpec = new HostDatastoreBrowserSearchSpec();
         FileQueryFlags fqf = new FileQueryFlags();
@@ -404,7 +403,7 @@ public class DatastoreMO extends BaseMO {
     }
 
     public boolean folderExists(String folderParentDatastorePath, String folderName) throws Exception {
-        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMO();
+        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMo();
 
         HostDatastoreBrowserSearchResults results = browserMo.searchDatastore(folderParentDatastorePath, folderName, true);
         if (results != null) {
@@ -435,7 +434,7 @@ public class DatastoreMO extends BaseMO {
         String absoluteFileName = null;
         s_logger.info("Searching file " + fileName + " in " + datastorePath);
 
-        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMO();
+        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMo();
         ArrayList<HostDatastoreBrowserSearchResults> results = browserMo.searchDatastoreSubFolders("[" + getName() + "]", fileName, caseInsensitive);
         if (results != null && results.size() > 1) {
             s_logger.warn("Multiple files with name " + fileName + " exists in datastore " + datastorePath + ". Trying to choose first file found in search attempt.");

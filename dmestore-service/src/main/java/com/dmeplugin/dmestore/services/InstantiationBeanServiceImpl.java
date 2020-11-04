@@ -53,11 +53,11 @@ public class InstantiationBeanServiceImpl implements
       // (linux only) MV files
       if (!FileUtils.isWindows()) { // Linux
         try {
-          File newDbFile = new File(FileUtils.getPath(true) + "/" + H2DataBaseDao.getDBFileName());
-          String oldDbFile = FileUtils.getOldDBFolder() + "/" + H2DataBaseDao.getDBFileName();
+          File newDbFile = new File(FileUtils.getPath(true) + "/" + H2DataBaseDao.getDbFileName());
+          String oldDbFile = FileUtils.getOldDbFolder() + "/" + H2DataBaseDao.getDbFileName();
           if (new File(oldDbFile).exists() && !newDbFile.exists()) { // no DB file in new path
             // move db file
-            LOGGER.info("Copying DB file from " + H2DataBaseDao.getDBFileName() + " to " + newDbFile
+            LOGGER.info("Copying DB file from " + H2DataBaseDao.getDbFileName() + " to " + newDbFile
                 .getName());
             Files.copy(Paths.get(oldDbFile),
                 Paths.get(newDbFile.getAbsolutePath()), StandardCopyOption.REPLACE_EXISTING);
@@ -79,7 +79,7 @@ public class InstantiationBeanServiceImpl implements
         }
       }
 
-      systemService.initDB();
+      systemService.initDb();
 
       //ThumbprintsUtils.updateContextTrustThumbprints(vCenterInfoService.getThumbprints());
 
