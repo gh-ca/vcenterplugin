@@ -16,7 +16,13 @@
 // under the License.
 package com.dmeplugin.vmware.mo;
 
+/**
+ * @author ghca
+ **/
 public enum DiskControllerType {
+    /**
+     * ide
+     **/
     ide,
     scsi,
     osdefault,
