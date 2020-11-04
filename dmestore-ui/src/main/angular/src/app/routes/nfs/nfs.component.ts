@@ -70,9 +70,11 @@ export class NfsComponent implements OnInit {
 // 性能视图列表
   listnfsperformance(){
     if (this.list === null || this.list.length <= 0){ return; }
+    const fsIds = [];
     this.list.forEach(item => {
-      this.fsIds.push(item.fsId);
+      fsIds.push(item.fsId);
     });
+    this.fsIds = fsIds;
     this.remoteSrv.getChartData(this.fsIds).subscribe((result: any) => {
       if (result.code === '200'){
         const chartList: List [] = result.data;

@@ -26,4 +26,20 @@ export class ModifyService {
   getChartData(volumeIds: string[] ) {
     return this.http.get('accessvmfs/listvmfsperformance', {params: {volumeIds}});
   }
+
+  /**
+   * 校验vmfs名称
+   * @param name
+   */
+  checkVmfsName(name: string) {
+    return this.http.get('accessvmfs/querydatastorebyname', {params: {name}});
+  }
+
+  /**
+   * 校验卷名称
+   * @param volName
+   */
+  checkVolName(volName: string) {
+    return this.http.get('dmestorage/queryvolumebyname', {params: {name:volName}});
+  }
 }
