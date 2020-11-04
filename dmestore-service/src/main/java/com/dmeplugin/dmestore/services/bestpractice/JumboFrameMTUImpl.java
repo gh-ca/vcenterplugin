@@ -47,7 +47,7 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
         }
 
 
-        return null;
+        return "--";
     }
 
     @Override

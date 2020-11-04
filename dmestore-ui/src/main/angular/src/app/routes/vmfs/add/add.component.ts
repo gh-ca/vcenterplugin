@@ -27,7 +27,7 @@ export class AddComponent implements OnInit{
 
   }
   // 初始化表单
-  form;
+  form = new GetForm().getAddForm();
   // 块大小选择
   blockSizeOptions = [];
   // 空间回收粒度初始化
@@ -59,6 +59,10 @@ export class AddComponent implements OnInit{
 
   addSuccessShow = false;
 
+  matchErr = false; // 名称校验 是否只由字母与数字组成 true：是 false 否
+  vmfsNameRepeatErr = false; // vmfs名称是否重复 true：是 false 否
+  volNameRepeatErr = false; // 卷名称是否重复 true：是 false 否
+
 
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
@@ -78,6 +82,11 @@ export class AddComponent implements OnInit{
     this.isOperationErr = false;
     // 容量错误提示
     this.capacityErr = false;
+    // 名称错误提示初始化
+    this.vmfsNameRepeatErr = false;
+    this.volNameRepeatErr = false;
+    this.matchErr = false;
+
     // this.globalsService.loading = true;
     // 设备类型 操作类型初始化
     this.route.url.subscribe(url => {
@@ -637,5 +646,91 @@ export class AddComponent implements OnInit{
    */
   confirmActResult() {
     this.cancel();
+  }
+
+  /**
+   * 名称校验
+   * @param isVmfs true vmfs、false volume
+   */
+  nameCheck(isVmfs: boolean) {
+    // 初始化
+    this.vmfsNameRepeatErr = false;
+    this.volNameRepeatErr = false;
+    this.matchErr = false;
+
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    if (isVmfs) {
+      if (this.form.name) {
+        if (reg5.test(this.form.name)) {
+          // 校验VMFS名称重复
+          this.checkVmfsName(this.form.name);
+
+        } else {
+          this.matchErr = true;
+          this.form.name = null;
+        }
+      } else {
+        this.matchErr = true;
+      }
+    } else {
+      if (this.form.volumeName) {
+        if (reg5.test(this.form.volumeName)) {
+          // 校验Vol名称重复
+          this.checkVolName(this.form.volumeName);
+        } else {
+          this.matchErr = true;
+          this.form.volumeName = null;
+        }
+      } else {
+        this.matchErr = true;
+      }
+    }
+  }
+
+  /**
+   * vmfs重名校验
+   */
+  checkVmfsName(name: string) {
+    this.modalHandleLoading = true;
+    this.remoteSrv.checkVmfsName(name).subscribe((result: any) => {
+      this.modalHandleLoading = false;
+      if (result.code === '200') { // result.data true 不重复 false 重复
+        this.vmfsNameRepeatErr = !result.data;
+        if (this.vmfsNameRepeatErr) { // 名称重复
+          this.form.name = null;
+          this.volNameRepeatErr = false;
+          this.matchErr = false;
+        } else {
+          if (this.form.isSameName) {
+            this.checkVolName(name);
+          }
+        }
+      }
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    });
+  }
+
+  /**
+   * vol重名校验
+   */
+  checkVolName(name: string) {
+    this.modalHandleLoading = true;
+    // 校验VMFS名称重复
+    this.remoteSrv.checkVolName(name).subscribe((result: any) => {
+      this.modalHandleLoading = false;
+      if (result.code === '200') { // result.data true 不重复 false 重复
+        this.volNameRepeatErr = !result.data;
+        if (!this.vmfsNameRepeatErr && this.volNameRepeatErr) {
+          this.form.name = null;
+        }
+        if (this.volNameRepeatErr) {
+          this.form.volumeName = null;
+          this.vmfsNameRepeatErr = false;
+          this.matchErr = false;
+        }
+      }
+      console.log("this.modalHandleLoading", this.modalHandleLoading)
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    });
   }
 }

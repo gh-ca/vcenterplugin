@@ -811,10 +811,11 @@ public class VCSDKUtils {
         } catch (Exception e) {
             result = "failed";
             logger.error("vmware error:", e);
-            throw new VcenterException(e.getMessage());
+            //throw new VcenterException(e.getMessage());
         } finally {
-            return result;
+
         }
+        return result;
     }
     /**
      *get oriented datastore capacity
@@ -834,10 +835,10 @@ public class VCSDKUtils {
         } catch (Exception e) {
             resMap.put("msg", "failed");
             logger.error("vmware error:", e);
-            throw e;
         } finally {
-            return resMap;
+
         }
+        return resMap;
     }
     /**
      *expand oriented datastore capacity
@@ -891,10 +892,10 @@ public class VCSDKUtils {
         } catch (Exception e) {
             result = "failed";
             logger.error("vmware error:", e);
-            throw e;
         } finally {
-            return result;
+
         }
+        return result;
     }
     /**
      *recycle vmfs datastore capacity

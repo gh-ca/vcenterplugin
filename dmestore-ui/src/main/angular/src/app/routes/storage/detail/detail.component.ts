@@ -288,9 +288,11 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   liststoragepoolperformance(){
     if (this.storagePool === null || this.storagePool.length <= 0){ return; }
+    const storagePoolIds = [];
     this.storagePool.forEach(item => {
-      this.storagePoolIds.push(item.storageInstanceId);
+      storagePoolIds.push(item.storageInstanceId);
     });
+    this.storagePoolIds = storagePoolIds;
     this.detailService.liststoragepoolperformance(this.storagePoolIds).subscribe((result: any) => {
       if (result.code === '200'){
         const chartList: StoragePool [] = result.data;
@@ -343,9 +345,11 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   listVolumesperformance(){
     if (this.volumes === null || this.volumes.length <= 0){ return; }
+    const volumeIds = [];
     this.volumes.forEach(item => {
-      this.volumeIds.push(item.wwn);
+      volumeIds.push(item.wwn);
     });
+    this.volumeIds = volumeIds;
     this.detailService.listVolumesperformance(this.volumeIds).subscribe((result: any) => {
       if (result.code === '200'){
         const chartList: Volume [] = result.data;
