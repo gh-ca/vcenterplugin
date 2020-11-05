@@ -74,7 +74,7 @@
         <clr-select-container>
           <label>{{'nfs.nfsStore' | translate}}</label>
           <select clrSelect (ngModelOptions)="dataStoreList" [(ngModel)]="dataStoreObjectId"
-                  required name="dataStoreObjectId" class="clr-select" (change)="checkHost()">
+                  required name="dataStoreObjectId" class="clr-select">
             <option *ngFor="let item of dataStoreList" value="{{item.objectId}}">{{item.name}}</option>
           </select>
         </clr-select-container>

@@ -114,7 +114,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     public void updateVmwarePolicy() throws DMEException {
         try {
             SessionHelper sessionHelper = new SessionHelper();
-            VCenterInfo vCenterInfo = vCenterInfoService.getVCenterInfo();
+            VCenterInfo vCenterInfo = vCenterInfoService.getVcenterInfo();
             if (null != vCenterInfo) {
                 sessionHelper.login(vCenterInfo.getHostIp(), String.valueOf(vCenterInfo.getHostPort()), vCenterInfo.getUserName(), CipherUtils.decryptString(vCenterInfo.getPassword()));
 

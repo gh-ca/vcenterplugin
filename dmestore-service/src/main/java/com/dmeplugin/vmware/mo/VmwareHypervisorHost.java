@@ -62,8 +62,8 @@ public interface VmwareHypervisorHost {
 
     boolean createVm(VirtualMachineConfigSpec vmSpec) throws Exception;
 
-    boolean createBlankVm(String vmName, String vmInternalCSName, int cpuCount, int cpuSpeedMHz, int cpuReservedMHz, boolean limitCpuUse, int memoryMB,
-                          int memoryReserveMB, String guestOsIdentifier, ManagedObjectReference morDs, boolean snapshotDirToParent,
+    boolean createBlankVm(String vmName, String vmInternalCsName, int cpuCount, int cpuSpeedMhz, int cpuReservedMhz, boolean limitCpuUse, int memoryMb,
+                          int memoryReserveMb, String guestOsIdentifier, ManagedObjectReference morDs, boolean snapshotDirToParent,
                           Pair<String, String> controllerInfo, Boolean systemVm) throws Exception;
 
     ObjectContent[] getVmPropertiesOnHyperHost(String[] propertyPaths) throws Exception;

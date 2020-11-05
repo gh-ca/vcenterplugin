@@ -89,7 +89,7 @@ public class DatastoreCustomProperter implements PropertyProviderAdapter {
                 ManagedObjectReference mor=new ManagedObjectReference();
                 mor.setType(entityType);
                 mor.setValue(entityName);
-                String objectid=vcConnectionHelper.MOR2ObjectID(mor,serverGuid);
+                String objectid=vcConnectionHelper.mor2ObjectId(mor,serverGuid);
 
                 boolean isVmfs=vmfsAccessService.isVmfs(objectid);
                 isVmfsDataStore.value = isVmfs;

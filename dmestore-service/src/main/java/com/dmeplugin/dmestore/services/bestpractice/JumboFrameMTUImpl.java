@@ -24,7 +24,7 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
 
     @Override
     public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
-        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
+        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = new HostMO(context, mor);
         List<HostVirtualSwitch> virtualSwitches = hostMo.getHostNetworkInfo().getVswitch();
@@ -76,7 +76,7 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
     }
 
     private boolean check(VCSDKUtils vcsdkUtils, String objectId, Object recommendValue) throws Exception {
-        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
+        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = new HostMO(context, mor);
         List<HostVirtualSwitch> virtualSwitches = hostMo.getHostNetworkInfo().getVswitch();
@@ -102,7 +102,7 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
     }
 
     private void update(VCSDKUtils vcsdkUtils, String objectId, Object recommendValue) throws Exception {
-        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
+        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         if (check(vcsdkUtils, objectId, recommendValue)) {
             return;
