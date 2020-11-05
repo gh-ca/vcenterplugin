@@ -13,7 +13,6 @@ import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import org.apache.http.impl.execchain.TunnelRefusedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
@@ -256,7 +255,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         if (volumelist != null && volumelist.size() > 0) {
                             VCenterInfo vCenterInfo = null;
                             if (!StringUtils.isEmpty(params.get(DmeConstants.SERVICELEVELID))) {
-                                vCenterInfo = vCenterInfoService.getVCenterInfo();
+                                vCenterInfo = vCenterInfoService.getVcenterInfo();
                             }
                             for (Map<String, Object> volumemap : volumelist) {
                                 //创建vmware中的vmfs存储。
@@ -601,7 +600,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         try {
             //param str host: 主机  param str cluster: 集群
             //如果主机或主机不存在就创建并得到主机或主机组ID 如果主机组不存在就需要创建,创建前要检查集群下的所有主机是否在DME中存在
-            String clustername=vcsdkUtils.getVcConnectionHelper().objectID2MOR(clusterObjectId).getValue();
+            String clustername=vcsdkUtils.getVcConnectionHelper().objectId2Mor(clusterObjectId).getValue();
             if (!StringUtils.isEmpty(clusterObjectId)) {
                 List<String> objIds = new ArrayList<>();
                 //检查集群对应的主机组在DME中是否存在
@@ -650,7 +649,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             //在DME中创建主机组
                             if (hostlists.size() > 0) {
                                 Map<String, Object> params = new HashMap<>();
-                                params.put("cluster", vcsdkUtils.getVcConnectionHelper().objectID2MOR(clusterObjectId).getValue());
+                                params.put("cluster", vcsdkUtils.getVcConnectionHelper().objectId2Mor(clusterObjectId).getValue());
                                 params.put("hostids", hostlists);
                                 Map<String, Object> hostmap = dmeAccessService.createHostGroup(params);
                                 if (null != hostmap && null != hostmap.get(DmeConstants.ID)) {
@@ -676,7 +675,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         try {
             //param str host: 主机  param str cluster: 集群
             //如果主机或主机不存在就创建并得到主机或主机组ID 如果主机组不存在就需要创建,创建前要检查集群下的所有主机是否在DME中存在
-            String clustername=vcsdkUtils.getVcConnectionHelper().objectID2MOR(clusterObjectId).getValue();
+            String clustername=vcsdkUtils.getVcConnectionHelper().objectId2Mor(clusterObjectId).getValue();
             if (!StringUtils.isEmpty(clustername)) {
                 List<String> objIds = new ArrayList<>();
                 //检查集群对应的主机组在DME中是否存在

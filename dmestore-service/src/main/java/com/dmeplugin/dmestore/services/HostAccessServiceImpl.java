@@ -3,7 +3,6 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.EthPortInfo;
-import com.dmeplugin.dmestore.utils.CipherUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -86,7 +85,7 @@ public class HostAccessServiceImpl implements HostAccessService {
                 LOG.info("ethPorts=="+gson.toJson(ethPorts));
                 LOG.info("vmKernel=="+gson.toJson(vmKernel));
 
-                VCenterInfo vCenterInfo= vCenterInfoService.getVCenterInfo();
+                VCenterInfo vCenterInfo= vCenterInfoService.getVcenterInfo();
                 LOG.info("vCenterInfo=="+gson.toJson(vCenterInfo));
                 if (null!=vCenterInfo) {
                     String conStr = vcsdkUtils.testConnectivity(hostObjectId,ethPorts,vmKernel,vCenterInfo);

@@ -770,7 +770,7 @@ public class HypervisorHostHelper {
             s_logger.debug("Add USB Controller device for blank Mac OS VM " + vmName);
 
             //For Mac OS X systems, the EHCI+UHCI controller is enabled by default and is required for USB mouse and keyboard access.
-            VirtualDevice usbControllerDevice = VmwareHelper.prepareUSBControllerDevice();
+            VirtualDevice usbControllerDevice = VmwareHelper.prepareUsbControllerDevice();
             VirtualDeviceConfigSpec usbControllerSpec = new VirtualDeviceConfigSpec();
             usbControllerSpec.setDevice(usbControllerDevice);
             usbControllerSpec.setOperation(VirtualDeviceConfigSpecOperation.ADD);

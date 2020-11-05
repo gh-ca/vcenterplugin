@@ -36,7 +36,7 @@ public class PluginRegisterServiceImpl implements PluginRegisterService{
             vCenterInfo.setUserName(vcenterUsername);
             vCenterInfo.setPassword(CipherUtils.encryptString(vcenterPassword));
             vCenterInfo.setHostPort(Integer.parseInt(vcenterPort));
-            vCenterInfoService.saveVCenterInfo(vCenterInfo);
+            vCenterInfoService.saveVcenterInfo(vCenterInfo);
 
             vcConnectionHelper.setServerurl("https://" + vcenterIp + ":" + vcenterPort + "/sdk");
             vcConnectionHelper.setUsername(vcenterUsername);
