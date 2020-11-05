@@ -42,3 +42,7 @@
   width: 100%;
 }
 
+::ng-deep .modal-dialog .modal-content{
+  box-shadow: none;
+}
+

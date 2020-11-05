@@ -150,7 +150,7 @@
       </clr-combobox-container>
     </form>
     <ng-template clrPageButtons>
-      <clr-wizard-button [type]="'cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
+      <clr-wizard-button [type]="'cancel'" (click)="cancel();">{{'menu.cancel' | translate}}</clr-wizard-button>
       <clr-wizard-button (click)="addNextPage();" [type]="'custom-next'">{{'menu.next' | translate}}</clr-wizard-button>
     </ng-template>
   </clr-wizard-page>
@@ -354,7 +354,7 @@
 
     </form>
     <ng-template clrPageButtons>
-      <clr-wizard-button [type]="'cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
+      <clr-wizard-button [type]="'cancel'" (click)="cancel();">{{'menu.cancel' | translate}}</clr-wizard-button>
       <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>
       <clr-wizard-button (click)="addVmfsHanlde();" [type]="'custom-finish'">{{'menu.ok' | translate}}</clr-wizard-button>
     </ng-template>
