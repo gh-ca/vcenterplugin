@@ -183,3 +183,7 @@
   color: white;
   font-weight: bolder;
 }
+
+::ng-deep .modal-dialog .modal-content{
+  box-shadow: none;
+}
