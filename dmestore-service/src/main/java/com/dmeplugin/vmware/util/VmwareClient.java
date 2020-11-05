@@ -129,7 +129,8 @@ public class VmwareClient {
     private final static String SVC_INST_NAME = "ServiceInstance";
     private static final String PBMSERVICEINSTANCETYPE = "PbmServiceInstance";
     private static final String PBMSERVICEINSTANCEVALUE = "ServiceInstance";
-    private int vCenterSessionTimeout = 1200000; // Timeout in milliseconds
+    // Timeout in milliseconds
+    private int vCenterSessionTimeout = 1200000;
 
     private boolean isConnected = false;
 
@@ -452,8 +453,8 @@ public class VmwareClient {
             // info has a property - state for state of the task
             Object[] result = waitForValues(task, new String[] { "info.state", "info.error" }, new String[] { "state" }, new Object[][] { new Object[] {
                     TaskInfoState.SUCCESS, TaskInfoState.ERROR } });
-
-            if (result != null && result.length == 2) { //result for 2 properties: info.state, info.error
+            //result for 2 properties: info.state, info.error
+            if (result != null && result.length == 2) {
                 if (result[0].equals(TaskInfoState.SUCCESS)) {
                     retVal = true;
                 }
@@ -476,8 +477,8 @@ public class VmwareClient {
             // Since task cancellation is asynchronous, wait for the task to be cancelled
             Object[] result = waitForValues(task, new String[] {"info.state", "info.error"}, new String[] {"state"},
                     new Object[][] {new Object[] {TaskInfoState.SUCCESS, TaskInfoState.ERROR}});
-
-            if (result != null && result.length == 2) { //result for 2 properties: info.state, info.error
+            //result for 2 properties: info.state, info.error
+            if (result != null && result.length == 2) {
                 if (result[0].equals(TaskInfoState.SUCCESS)) {
                     s_logger.warn("Failed to cancel vCenter task: " + taskInfo.getName() + "(" + taskInfo.getKey() + ")" + " and the task successfully completed");
                     retVal = true;

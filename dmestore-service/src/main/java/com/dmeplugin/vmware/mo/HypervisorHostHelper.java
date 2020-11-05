@@ -1098,13 +1098,14 @@ public class HypervisorHostHelper {
         String[] virtualNodeInfo = deviceLocation.split(":");
 
         if (deviceLocation.startsWith("scsi")) {
-           controllerNumber = Integer.parseInt(virtualNodeInfo[0].substring(4)); // get substring excluding prefix scsi
+            // get substring excluding prefix scsi
+           controllerNumber = Integer.parseInt(virtualNodeInfo[0].substring(4));
            deviceNodeNumber = Integer.parseInt(virtualNodeInfo[1]);
 
            for (VirtualDeviceConfigSpec deviceConfig : deviceConfigList) {
                VirtualDevice device = deviceConfig.getDevice();
                if (device instanceof VirtualSCSIController) {
-                   if (controllerNumber == controllerCount) { //((VirtualSCSIController)device).getBusNumber()) {
+                   if (controllerNumber == controllerCount) {
                        controllerKey = device.getKey();
                        break;
                    }
@@ -1112,14 +1113,15 @@ public class HypervisorHostHelper {
                }
            }
        } else {
-           controllerNumber = Integer.parseInt(virtualNodeInfo[0].substring(3)); // get substring excluding prefix ide
+            // get substring excluding prefix ide
+           controllerNumber = Integer.parseInt(virtualNodeInfo[0].substring(3));
            deviceNodeNumber = Integer.parseInt(virtualNodeInfo[1]);
            controllerCount = 0;
 
            for (VirtualDeviceConfigSpec deviceConfig : deviceConfigList) {
                VirtualDevice device = deviceConfig.getDevice();
                if (device instanceof VirtualIDEController) {
-                   if (controllerNumber == controllerCount) { //((VirtualIDEController)device).getBusNumber()) {
+                   if (controllerNumber == controllerCount) {
                        // Only 2 IDE controllers supported and they will have bus numbers 0 and 1
                        controllerKey = device.getKey();
                        break;
@@ -1165,8 +1167,8 @@ public class HypervisorHostHelper {
         if (VmwareHelper.isControllerOsRecommended(dataDiskController)) {
             dataDiskController = recommendedController;
         }
-
-        String scsiDiskController = null; //If any of the controller provided is SCSI then return it's sub-type.
+        //If any of the controller provided is SCSI then return it's sub-type.
+        String scsiDiskController = null;
         if (isIdeController(rootDiskController) && isIdeController(dataDiskController)) {
             //Default controllers would exist
             return null;

@@ -851,7 +851,6 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
                 try {
                     nasDS = hostDatastoreSystemMo.getNasDatastoreInfo(morArray.get(i));
                     if (nasDS != null) {
-                        //DatastoreInfo info = (DatastoreInfo)_context.getServiceUtil().getDynamicProperty(morDatastore, "info");
                         if (nasDS.getNas().getRemoteHost().equalsIgnoreCase(hostAddress) && nasDS.getNas().getRemotePath().equalsIgnoreCase(path)) {
                             return morArray.get(i);
                         }

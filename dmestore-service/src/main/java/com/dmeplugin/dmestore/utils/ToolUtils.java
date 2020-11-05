@@ -292,7 +292,8 @@ public class ToolUtils {
                     JsonObject typeJson = typeEl.getAsJsonObject();
                     Set<Map.Entry<String, JsonElement>> sets = typeJson.entrySet();
                     for (Map.Entry<String, JsonElement> set : sets) {
-                        object = set.getValue();//只取一个
+                        //只取一个
+                        object = set.getValue();
                         break;
                     }
                 }

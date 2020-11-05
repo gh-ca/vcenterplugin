@@ -85,7 +85,8 @@ public class VmwareHelper {
     public static final int MAX_IDE_CONTROLLER_COUNT = 2;
     public static final int MAX_ALLOWED_DEVICES_IDE_CONTROLLER = 2;
     public static final int MAX_ALLOWED_DEVICES_SCSI_CONTROLLER = 16;
-    public static final int MAX_SUPPORTED_DEVICES_SCSI_CONTROLLER = MAX_ALLOWED_DEVICES_SCSI_CONTROLLER - 1; // One device node is unavailable for hard disks or SCSI devices
+    // One device node is unavailable for hard disks or SCSI devices
+    public static final int MAX_SUPPORTED_DEVICES_SCSI_CONTROLLER = MAX_ALLOWED_DEVICES_SCSI_CONTROLLER - 1;
     public static final int MAX_USABLE_SCSI_CONTROLLERS = 2;
     public static final String MIN_VERSION_UEFI_LEGACY = "5.5";
 
