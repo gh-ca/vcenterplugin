@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 
@@ -30,9 +31,8 @@ public class TaskServiceImpl implements TaskService {
 
     private final String LIST_TASK_URL = "/rest/taskmgmt/v1/tasks";
     private final String QUERY_TASK_URL = "/rest/taskmgmt/v1/tasks/{task_id}";
-
-    private final int taskTimeOut = 10 * 60 * 1000;//轮询任务状态的超值时间
-
+    //轮询任务状态的超值时间
+    private final int taskTimeOut = 10 * 60 * 1000;
     Gson gson = new Gson();
 
     @Override
@@ -40,7 +40,7 @@ public class TaskServiceImpl implements TaskService {
         ResponseEntity<String> responseEntity;
         try {
             responseEntity = dmeAccessService.access(LIST_TASK_URL, HttpMethod.GET, null);
-            if (responseEntity.getStatusCodeValue() / 100 != 2) {
+            if (responseEntity.getStatusCodeValue() != HttpStatus.OK.value()) {
                 LOG.error("查询指定任务列表失败!错误信息:{}", responseEntity.getBody());
                 return null;
             }
@@ -60,7 +60,7 @@ public class TaskServiceImpl implements TaskService {
         ResponseEntity<String> responseEntity;
         try {
             responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            if (responseEntity.getStatusCodeValue() / 100 != 2) {
+            if (responseEntity.getStatusCodeValue() != HttpStatus.OK.value()) {
                 LOG.error("查询指定任务信息失败!错误信息:{}", responseEntity.getBody());
                 return null;
             }
@@ -246,7 +246,6 @@ public class TaskServiceImpl implements TaskService {
             getTaskStatus(taskIds, taskStatusMap, taskTimeOut, System.currentTimeMillis());
             LOG.info("taskStatusMap===" + (taskStatusMap == null ? "null" : gson.toJson(taskStatusMap)));
             for (Map.Entry<String, Integer> entry : taskStatusMap.entrySet()) {
-                //String taskId = entry.getKey();
                 int status = entry.getValue();
                 if (3 == status) {
                     flag = true;

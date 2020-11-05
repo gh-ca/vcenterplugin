@@ -16,6 +16,7 @@ import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 
@@ -1806,8 +1807,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         url = API_VOLUME_DETAIL + volumeId;
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         int code = responseEntity.getStatusCodeValue();
-        if (code != 200) {
-            throw new DMEException( "search host id error");
+        if (code != HttpStatus.OK.value()) {
+            throw new DMEException("search host id error");
         }
         String object = responseEntity.getBody();
         JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();

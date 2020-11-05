@@ -45,10 +45,12 @@ public class CipherUtils {
       raw = key.getBytes("utf-8");
       SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
       byte[] ivBytes = getSafeRandom(IV_SIZE);
-      IvParameterSpec iv = new IvParameterSpec(ivBytes);// 使用CBC模式，需要一个向量iv，可增加加密算法的强度
+      // 使用CBC模式，需要一个向量iv，可增加加密算法的强度
+      IvParameterSpec iv = new IvParameterSpec(ivBytes);
       cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
       byte[] encrypted = cipher.doFinal(sSrc.getBytes("utf-8"));
-      return new BASE64Encoder().encode(unitByteArray(ivBytes, encrypted));// 此处使用BASE64做转码。
+      // 此处使用BASE64做转码。
+      return new BASE64Encoder().encode(unitByteArray(ivBytes, encrypted));
     } catch (Exception e) {
       LOGGER.error("Failed to encode AES");
     }
@@ -65,7 +67,8 @@ public class CipherUtils {
       byte[] raw = key.getBytes("utf-8");
       SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
       Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-      byte[] sSrcByte = new BASE64Decoder().decodeBuffer(sSrc);// 先用base64解密
+      // 先用base64解密
+      byte[] sSrcByte = new BASE64Decoder().decodeBuffer(sSrc);
       byte[] ivBytes = splitByteArray(sSrcByte, 0, 16);
       byte[] encrypted = splitByteArray(sSrcByte, 16, sSrcByte.length - 16);
       IvParameterSpec iv = new IvParameterSpec(ivBytes);

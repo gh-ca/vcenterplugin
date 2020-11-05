@@ -42,8 +42,8 @@ public class TaggingWorkflow {
         createSpec.setName(name);
         createSpec.setDescription(description);
         createSpec.setCardinality(cardinality);
-
-        Set<String> associableTypes = new HashSet<String>(); // empty hash set
+        // empty hash set
+        Set<String> associableTypes = new HashSet<String>();
         createSpec.setAssociableTypes(associableTypes);
         return this.categoryService.create(createSpec);
     }

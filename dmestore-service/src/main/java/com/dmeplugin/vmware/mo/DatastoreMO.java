@@ -387,7 +387,8 @@ public class DatastoreMO extends BaseMO {
         searchSpec.setDetails(fqf);
         searchSpec.setSearchCaseInsensitive(false);
         searchSpec.getMatchPattern().add(file.getFileName());
-        s_logger.debug("Search file " + file.getFileName() + " on " + dirFile.getPath()); //ROOT-2.vmdk, [3ecf7a579d3b3793b86d9d019a97ae27] s-2-VM
+        //ROOT-2.vmdk, [3ecf7a579d3b3793b86d9d019a97ae27] s-2-VM
+        s_logger.debug("Search file " + file.getFileName() + " on " + dirFile.getPath());
         HostDatastoreBrowserSearchResults result = browserMo.searchDatastore(dirFile.getPath(), searchSpec);
         if (result != null) {
             List<FileInfo> info = result.getFile();

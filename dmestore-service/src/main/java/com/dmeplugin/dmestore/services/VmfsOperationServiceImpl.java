@@ -24,9 +24,6 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     private final String API_VMFS_EXPAND = "/rest/blockservice/v1/volumes/expand";
     private final String API_SERVICELEVEL_UPDATE = "/rest/blockservice/v1/volumes/update-service-level";
     private final String API_SERVICELEVEL_LIST = "/rest/service-policy/v1/service-levels";
-    private final String API_VOLUME_DETAIL = "/rest/blockservice/v1/volumes/";
-    private final String API_HOST_DETAIL = "/rest/hostmgmt/v1/hosts/";
-    private final String API_STORAGE_LIST = "/rest/storagemgmt/v1/storages/";
 
     private DmeAccessService dmeAccessService;
 
@@ -117,7 +114,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             }
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, reqBody);
             int code = responseEntity.getStatusCodeValue();
-            if (code != 202 ||StringUtils.isEmpty(result)||"failed".equals(result)) {
+            if (code != HttpStatus.ACCEPTED.value() ||StringUtils.isEmpty(result)||"failed".equals(result)) {
                 throw new DMEException("503", "update VmfsDatastore failed");
             }
             String object = responseEntity.getBody();
@@ -161,7 +158,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(API_VMFS_EXPAND, HttpMethod.POST, gson.toJson(reqMap));
             int code = responseEntity.getStatusCodeValue();
-            if (code != 202) {
+            if (code != HttpStatus.ACCEPTED.value()) {
                 throw new DMEException("503","expand vmfsDatastore failed !");
             }
             String object = responseEntity.getBody();
@@ -245,7 +242,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             ResponseEntity<String> responseEntity = dmeAccessService.access(API_SERVICELEVEL_UPDATE, HttpMethod.POST, gson.toJson(reqMap));
             LOG.info("url:{" + API_SERVICELEVEL_UPDATE + "},响应信息：" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
-            if (code != 202) {
+            if (code != HttpStatus.ACCEPTED.value()) {
                 throw new DMEException("503","update vmfs service level error!");
             }
             String object = responseEntity.getBody();
@@ -272,7 +269,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             ResponseEntity<String> responseEntity = dmeAccessService.access(API_SERVICELEVEL_LIST, HttpMethod.GET, gson.toJson(params));
             LOG.info("{"+API_SERVICELEVEL_LIST+"}"+responseEntity);
             int code = responseEntity.getStatusCodeValue();
-            if (code != 200) {
+            if (code != HttpStatus.OK.value()) {
             
                 throw new DMEException("503","list vmfs service level error !");
             }
@@ -333,136 +330,6 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             throw new DMEException("503",e.getMessage());
         }
         return simpleServiceLevels;
-    }
-
-    private Map<String, Object> getHostIpByVolume(List<String> volumeIds) throws Exception {
-
-        String url;
-        Map<String, Object> resMap = new HashMap<>(16);
-        resMap.put("code", 200);
-        resMap.put("msg", "search host id success ");
-        List<String> hostIds = new ArrayList<>();
-        for (int i = 0; i < volumeIds.size(); i++) {
-            String volumeId = volumeIds.get(i);
-            url = API_VOLUME_DETAIL + volumeId;
-            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            int code = responseEntity.getStatusCodeValue();
-            if (code != 200) {
-                resMap.put("code", code);
-                resMap.put("msg", "search host id error");
-                return resMap;
-            }
-            String object = responseEntity.getBody();
-            JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-            JsonObject volume = jsonObject.get("volume").getAsJsonObject();
-            JsonArray attachments = volume.get("attachments").getAsJsonArray();
-            //int length = attachments.getAsString().length();
-            for (JsonElement jsonElement : attachments) {
-                JsonObject element = jsonElement.getAsJsonObject();
-                String hostId = ToolUtils.jsonToStr(element.get("host_id"));
-                if (!hostIds.contains(hostId)) {
-                    hostIds.add(hostId);
-                }
-            }
-        }
-        Map<String, Object> hostIp = getHostIp(hostIds);
-        int resCode = ToolUtils.getInt(hostIp.get("code"));
-        if (resCode != 200) {
-            resMap.put("code", resCode);
-            resMap.put("msg", "search host ip error");
-            return resMap;
-        }
-        resMap.put("msg", "search host ip success");
-        resMap.put("host_ips", hostIp.get("host_ips"));
-        return resMap;
-    }
-
-    private Map<String, Object> getHostIp(List<String> params) throws Exception {
-        Map<String, Object> resMap = new HashMap<>(16);
-        resMap.put("code", 200);
-        resMap.put("msg", "search host ip success ");
-
-        List<String> hostIps = new ArrayList<>();
-        String url;
-        for (int i = 0; i < params.size(); i++) {
-            String hostId = params.get(i);
-            url = API_HOST_DETAIL + hostId + "/summary";
-            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            int code = responseEntity.getStatusCodeValue();
-            if (code != 200) {
-                resMap.put("code", code);
-                resMap.put("msg", "search host ip error ");
-            }
-            String object = responseEntity.getBody();
-            JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-            String ip = ToolUtils.jsonToStr(jsonObject.get("ip"));
-            hostIps.add(ip);
-        }
-        resMap.put("host_ips", hostIps);
-        return resMap;
-    }
-
-    private Map<String, Object> getVolumeCapacity(List<Map<String, String>> volumes) throws Exception {
-
-        Map<String, Object> resMap = new HashMap<>(16);
-        resMap.put("code", 200);
-        resMap.put("msg", "search volume capacity success ");
-        String url;
-        List<Map<String, Object>> list = new ArrayList<>();
-        for (int i = 0; i < volumes.size(); i++) {
-            Map<String, String> reqmap = volumes.get(i);
-            String volumeId = reqmap.get("volume_id");
-            url = API_VMFS_UPDATE + volumeId;
-            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            int code = responseEntity.getStatusCodeValue();
-            if (code != 200) {
-                resMap.put("code", code);
-                resMap.put("msg", "search volume capacity error ");
-                return resMap;
-            }
-            String object = responseEntity.getBody();
-            JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-            JsonObject volume = jsonObject.get("volume").getAsJsonObject();
-            Double capacity = ToolUtils.jsonToDou(volume.get("capacity"));
-            Map<String, Object> map = new HashMap<>(16);
-            map.put(volumeId, capacity);
-            list.add(map);
-        }
-        resMap.put("data", list);
-        return resMap;
-    }
-
-    private Map<String, Object> getStorageDeviceByVolume(String volumeId) throws Exception {
-
-        Map<String, Object> resMap = new HashMap<>(16);
-        resMap.put("code", 200);
-        resMap.put("msg", "search storage device success ");
-        String url = API_STORAGE_LIST + volumeId + "/detail";
-        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-        int code = responseEntity.getStatusCodeValue();
-        if (code != 200) {
-            resMap.put("code", 200);
-            resMap.put("msg", "search storage device error ");
-        }
-        String object = responseEntity.getBody();
-        JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-        Storage storage = new Storage();
-        storage.setId(ToolUtils.jsonToStr(jsonObject.get("id")));
-        storage.setName(ToolUtils.jsonToStr(jsonObject.get("name")));
-        storage.setIp(ToolUtils.jsonToStr(jsonObject.get("ip")));
-        storage.setStatus(ToolUtils.jsonToStr(jsonObject.get("status")));
-        storage.setVendor(ToolUtils.jsonToStr(jsonObject.get("vendor")));
-        storage.setProductVersion(ToolUtils.jsonToStr(jsonObject.get("product_version")));
-        Double usedCapacity = ToolUtils.jsonToDou(jsonObject.get("used_capacity"), 0.0);
-        storage.setUsedCapacity(usedCapacity);
-        Double totalCapacity = ToolUtils.jsonToDou(jsonObject.get("total_capacity"), 0.0);
-        storage.setTotalCapacity(totalCapacity);
-        storage.setTotalEffectiveCapacity(ToolUtils.jsonToDou(jsonObject.get("total_effective_capacity"),0.0));
-        storage.setFreeEffectiveCapacity(ToolUtils.jsonToDou(jsonObject.get("free_effective_capacity"),0.0));
-        //容量利用率
-
-        resMap.put("data", storage);
-        return resMap;
     }
 
 }

@@ -10,6 +10,7 @@ import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
@@ -114,7 +115,7 @@ public class VmRdmServiceImpl implements VmRdmService {
         queryHostParams.put("ip", hostIp);
         responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(queryHostParams));
         String hostId = null;
-        if (responseEntity.getStatusCodeValue() == 200) {
+        if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
             JsonObject dmeHost = gson.fromJson(responseEntity.getBody(), JsonObject.class);
             if (dmeHost.get("total").getAsInt() > 0) {
                 JsonObject hostObject = dmeHost.getAsJsonArray("hosts").get(0).getAsJsonObject();
@@ -136,7 +137,6 @@ public class VmRdmServiceImpl implements VmRdmService {
         //扫描hba，已发现新的卷
         vcsdkUtils.hostRescanHba(hostIp);
         long t2 = System.currentTimeMillis();
-        //vcsdkUtils.refreshStorageSystem(hostObjectId);
         LOG.info("hostRescanHba succeeded, take {} seconds!", (t2 - t1) / 1000);
         String lunStr = vcsdkUtils.getLunsOnHost(hostIp);
         if (StringUtil.isBlank(lunStr)) {
