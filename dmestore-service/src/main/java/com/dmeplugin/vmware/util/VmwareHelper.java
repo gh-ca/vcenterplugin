@@ -592,16 +592,16 @@ public class VmwareHelper {
         return options;
     }
 
-    public static void setVmScaleUpConfig(VirtualMachineConfigSpec vmConfig, int cpuCount, int cpuSpeedMHz, int cpuReservedMhz, int memoryMB, int memoryReserveMB,
+    public static void setVmScaleUpConfig(VirtualMachineConfigSpec vmConfig, int cpuCount, int cpuSpeedMhz, int cpuReservedMhz, int memoryMb, int memoryReserveMb,
             boolean limitCpuUse) {
 
         // VM config for scaling up
-        vmConfig.setMemoryMB((long)memoryMB);
+        vmConfig.setMemoryMB((long)memoryMb);
         vmConfig.setNumCPUs(cpuCount);
 
         ResourceAllocationInfo cpuInfo = new ResourceAllocationInfo();
         if (limitCpuUse) {
-            cpuInfo.setLimit((long)(cpuSpeedMHz * cpuCount));
+            cpuInfo.setLimit((long)(cpuSpeedMhz * cpuCount));
         } else {
             cpuInfo.setLimit(-1L);
         }
@@ -610,43 +610,43 @@ public class VmwareHelper {
         vmConfig.setCpuAllocation(cpuInfo);
 
         ResourceAllocationInfo memInfo = new ResourceAllocationInfo();
-        memInfo.setLimit((long)memoryMB);
-        memInfo.setReservation((long)memoryReserveMB);
+        memInfo.setLimit((long)memoryMb);
+        memInfo.setReservation((long)memoryReserveMb);
         vmConfig.setMemoryAllocation(memInfo);
 
     }
 
-    public static void setBasicVmConfig(VirtualMachineConfigSpec vmConfig, int cpuCount, int cpuSpeedMHz, int cpuReservedMhz, int memoryMB, int memoryReserveMB,
+    public static void setBasicVmConfig(VirtualMachineConfigSpec vmConfig, int cpuCount, int cpuSpeedMhz, int cpuReservedMhz, int memoryMb, int memoryReserveMb,
             String guestOsIdentifier, boolean limitCpuUse) {
 
         // VM config basics
-        vmConfig.setMemoryMB((long)memoryMB);
+        vmConfig.setMemoryMB((long)memoryMb);
         vmConfig.setNumCPUs(cpuCount);
 
         ResourceAllocationInfo cpuInfo = new ResourceAllocationInfo();
         if (limitCpuUse) {
-            cpuInfo.setLimit(((long)cpuSpeedMHz * cpuCount));
+            cpuInfo.setLimit(((long)cpuSpeedMhz * cpuCount));
         } else {
             cpuInfo.setLimit(-1L);
         }
 
         cpuInfo.setReservation((long)cpuReservedMhz);
         vmConfig.setCpuAllocation(cpuInfo);
-        if (cpuSpeedMHz != cpuReservedMhz) {
+        if (cpuSpeedMhz != cpuReservedMhz) {
             vmConfig.setCpuHotAddEnabled(true);
         }
-        if (memoryMB != memoryReserveMB) {
+        if (memoryMb != memoryReserveMb) {
             vmConfig.setMemoryHotAddEnabled(true);
         }
         ResourceAllocationInfo memInfo = new ResourceAllocationInfo();
-        memInfo.setLimit((long)memoryMB);
-        memInfo.setReservation((long)memoryReserveMB);
+        memInfo.setLimit((long)memoryMb);
+        memInfo.setReservation((long)memoryReserveMb);
         vmConfig.setMemoryAllocation(memInfo);
 
         vmConfig.setGuestId(guestOsIdentifier);
     }
 
-    public static VirtualDevice prepareUSBControllerDevice() {
+    public static VirtualDevice prepareUsbControllerDevice() {
         s_logger.debug("Preparing USB controller(EHCI+UHCI) device");
         VirtualUSBController usbController = new VirtualUSBController(); //EHCI+UHCI
         usbController.setEhciEnabled(true);
@@ -782,7 +782,7 @@ public class VmwareHelper {
         return hotplugSupportedByLicense;
     }
 
-    public static String getVCenterSafeUuid() {
+    public static String getVcenterSafeUuid() {
         // Object name that is greater than 32 is not safe in vCenter
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
@@ -816,7 +816,7 @@ public class VmwareHelper {
         return DiskControllerType.getType(dataDiskController) == DiskControllerType.osdefault;
     }
 
-    public static XMLGregorianCalendar getXMLGregorianCalendar(final Date date, final int offsetSeconds) throws DatatypeConfigurationException {
+    public static XMLGregorianCalendar getXmlGregorianCalendar(final Date date, final int offsetSeconds) throws DatatypeConfigurationException {
         if (offsetSeconds > 0) {
             date.setTime(date.getTime() - offsetSeconds * 1000);
         }

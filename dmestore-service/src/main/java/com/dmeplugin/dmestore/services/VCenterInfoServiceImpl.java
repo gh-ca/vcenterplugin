@@ -3,11 +3,8 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.dao.VCenterInfoDao;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.exception.DmeSqlException;
-import com.dmeplugin.dmestore.utils.CipherUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.servlet.http.HttpSession;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,15 +27,15 @@ public class VCenterInfoServiceImpl extends DMEOpenApiService implements VCenter
   private VCenterInfoService vCenterInfoService;
 
   @Override
-  public int addVCenterInfo(VCenterInfo vCenterInfo) throws DmeSqlException {
-    return vCenterInfoDao.addVCenterInfo(vCenterInfo);
+  public int addVcenterInfo(VCenterInfo vCenterInfo) throws DmeSqlException {
+    return vCenterInfoDao.addVcenterInfo(vCenterInfo);
   }
 
 
 
   @Override
-  public int saveVCenterInfo(final VCenterInfo vCenterInfo) throws DmeSqlException {
-    VCenterInfo vCenterInfo1 = vCenterInfoDao.getVCenterInfo();
+  public int saveVcenterInfo(final VCenterInfo vCenterInfo) throws DmeSqlException {
+    VCenterInfo vCenterInfo1 = vCenterInfoDao.getVcenterInfo();
     int returnValue = 0;
     boolean supportHa = true;
     boolean isAlarmNewEnabled = false;
@@ -60,10 +57,10 @@ public class VCenterInfoServiceImpl extends DMEOpenApiService implements VCenter
 
         }
 
-        returnValue = vCenterInfoDao.updateVCenterInfo(vCenterInfo1);
+        returnValue = vCenterInfoDao.updateVcenterInfo(vCenterInfo1);
       } else {
 
-        returnValue = addVCenterInfo(vCenterInfo);
+        returnValue = addVcenterInfo(vCenterInfo);
       }
 
 
@@ -72,9 +69,9 @@ public class VCenterInfoServiceImpl extends DMEOpenApiService implements VCenter
   }
 
   @Override
-  public Map<String, Object> findVCenterInfo() throws DmeSqlException {
+  public Map<String, Object> findVcenterInfo() throws DmeSqlException {
     Map<String, Object> returnMap = new HashMap<>();
-    VCenterInfo vCenterInfo = vCenterInfoDao.getVCenterInfo();
+    VCenterInfo vCenterInfo = vCenterInfoDao.getVcenterInfo();
     if (vCenterInfo != null) {
       returnMap.put("USER_NAME", vCenterInfo.getUserName());
       returnMap.put("STATE", vCenterInfo.isState());
@@ -87,8 +84,8 @@ public class VCenterInfoServiceImpl extends DMEOpenApiService implements VCenter
   }
 
   @Override
-  public VCenterInfo getVCenterInfo() throws DmeSqlException {
-    return vCenterInfoDao.getVCenterInfo();
+  public VCenterInfo getVcenterInfo() throws DmeSqlException {
+    return vCenterInfoDao.getVcenterInfo();
   }
 
 
