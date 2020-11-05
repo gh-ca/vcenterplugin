@@ -54,7 +54,17 @@ export class NfsUnmountComponent implements OnInit{
       const ctx = this.gs.getClientSdk().app.getContextObjects();
       if (ctx!=null){
         this.hostId=ctx[0].id;
+        // this.hostId='urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1';
         this.getDataStoreByHostId(this.hostId);
+      }
+      this.modalLoading=false;
+    } else if ("cluster"=== this.routePath) {
+      this.modalLoading=true;
+      this.viewPage='unmount_host';
+      const ctx = this.gs.getClientSdk().app.getContextObjects();
+      if (ctx!=null){
+        this.hostId=ctx[0].id;
+        this.getDataStoreByClusterId(this.hostId);
       }
       this.modalLoading=false;
     }
@@ -101,10 +111,25 @@ export class NfsUnmountComponent implements OnInit{
   }
   //获取主机下一挂载的NFS列表
   getDataStoreByHostId(hostId:string){
-    this.unmountService.getMountedHostList(hostId).subscribe((r: any) => {
+    this.unmountService.getMountedByHostObjId(hostId, 'NFS').subscribe((r: any) => {
       this.modalLoading=false;
       if (r.code=='200'){
-        this.hostList=r.data;
+        r.data.forEach(item => {
+          // const data = {
+          //   objectId: item.
+          // }
+        })
+        this.dataStoreList=r.data;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+  //获取集群下一挂载的NFS列表
+  getDataStoreByClusterId(hostId:string){
+    this.unmountService.getMountedByClusterObjId(hostId, 'NFS').subscribe((r: any) => {
+      this.modalLoading=false;
+      if (r.code=='200'){
+        this.dataStoreList=r.data;
         this.cdr.detectChanges();
       }
     });
@@ -127,6 +152,23 @@ export class NfsUnmountComponent implements OnInit{
         this.errorMsg = '1';
         console.log("unMount Failed:",result.description)
       }
+      this.cdr.detectChanges();
     });
   }
+  // checkHost(){
+  //   this.modalHandleLoading=true;
+  //   //选择主机后获取虚拟网卡
+  //   this.getVmkernelListByObjectId(this.hostId);
+  // }
+  //
+  // getVmkernelListByObjectId(hostObjectId:string){
+  //   this.unmountService.getVmkernelListByObjectId(hostObjectId)
+  //     .subscribe((r: any) => {
+  //       this.modalHandleLoading=false;
+  //       if (r.code === '200'){
+  //         this.dataStoreList = r.data;
+  //         this.cdr.detectChanges();
+  //       }
+  //     });
+  // }
 }

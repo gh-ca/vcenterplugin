@@ -156,7 +156,7 @@ export class FileSystem{
   capacity: number;
   name: string;
   allocType: string;
-  availableCapacity: string;
+  availableCapacity: number;
   healthStatus: string;
   count: number;
   dtreeCount: number;
