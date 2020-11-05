@@ -250,9 +250,6 @@ public class BaseController {
     if (failure) {
       return failure(CODE_ALL_FAILURE, errorDescription, dataMapList);
     }
-//    else if (failure) {
-//      return failure(prefix + String.valueOf(errorCode), errorDescription, dataMapList);
-//    }
 
     return success(dataMapList);
   }

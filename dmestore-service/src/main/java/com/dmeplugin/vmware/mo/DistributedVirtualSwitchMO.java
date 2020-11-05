@@ -76,7 +76,8 @@ public class DistributedVirtualSwitchMO extends BaseMO {
                         if (dvPortGroupList == null) {
                             dvPortGroupList = new ArrayList<String>();
                         }
-                        dvPortGroupList.add(dvPortGroupName); //does this update map?
+                        //does this update map?
+                        dvPortGroupList.add(dvPortGroupName);
                     } else {
                         dvPortGroupList = new ArrayList<String>();
                         dvPortGroupList.add(dvPortGroupName);

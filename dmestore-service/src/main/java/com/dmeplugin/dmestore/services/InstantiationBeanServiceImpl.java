@@ -51,11 +51,13 @@ public class InstantiationBeanServiceImpl implements
       LOGGER.info("Is Flash client: " + VCClientUtils.isFlashClient());
 
       // (linux only) MV files
-      if (!FileUtils.isWindows()) { // Linux
+      // Linux
+      if (!FileUtils.isWindows()) {
         try {
           File newDbFile = new File(FileUtils.getPath(true) + "/" + H2DataBaseDao.getDbFileName());
           String oldDbFile = FileUtils.getOldDbFolder() + "/" + H2DataBaseDao.getDbFileName();
-          if (new File(oldDbFile).exists() && !newDbFile.exists()) { // no DB file in new path
+          // no DB file in new path
+          if (new File(oldDbFile).exists() && !newDbFile.exists()) {
             // move db file
             LOGGER.info("Copying DB file from " + H2DataBaseDao.getDbFileName() + " to " + newDbFile
                 .getName());
@@ -81,7 +83,6 @@ public class InstantiationBeanServiceImpl implements
 
       systemService.initDb();
 
-      //ThumbprintsUtils.updateContextTrustThumbprints(vCenterInfoService.getThumbprints());
 
 
 

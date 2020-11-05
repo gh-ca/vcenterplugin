@@ -9,7 +9,6 @@ public abstract class VCConnectionHelper {
 
     private UserSessionService userSessionService;
     private VimObjectReferenceService vimObjectReferenceService;
-    //private ManagedObjectReference mor;
 
     private String serverurl;
     private int serverport;
@@ -31,14 +30,6 @@ public abstract class VCConnectionHelper {
     public void setVimObjectReferenceService(VimObjectReferenceService vimObjectReferenceService) {
         this.vimObjectReferenceService = vimObjectReferenceService;
     }
-
-  /*  public ManagedObjectReference getMor() {
-        return mor;
-    }
-
-    public void setMor(ManagedObjectReference mor) {
-        this.mor = mor;
-    }*/
 
     public String getServerurl() {
         return serverurl;

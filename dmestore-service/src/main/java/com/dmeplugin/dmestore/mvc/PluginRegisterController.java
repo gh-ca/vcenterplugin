@@ -16,8 +16,9 @@ import javax.servlet.http.HttpServletRequest;
 public class PluginRegisterController extends BaseController {
     public static final Logger LOG = LoggerFactory.getLogger(PluginRegisterController.class);
     private static Object lock = new Object();
-
     private Gson gson = new Gson();
+    private final String ACTION_INSTALL = "install";
+    private final String ACTION_UNINSTALL = "uninstall";
 
     @Autowired
     private PluginRegisterService pluginRegisterService;
@@ -40,11 +41,11 @@ public class PluginRegisterController extends BaseController {
         boolean isRemoveData = false;
         synchronized (lock) {
             try {
-                if ("install".equals(action)) {
+                if (ACTION_INSTALL.equals(action)) {
                     pluginRegisterService.installService(vcenterIp, vcenterPort, vcenterUsername, vcenterPassword, dmeIp, dmePort, dmeUsername, dmePassword);
 
                 }
-                if ("uninstall".equals(action)) {
+                if (ACTION_UNINSTALL.equals(action)) {
                     //调用接口，删除数据
                     isRemoveData = (removeData != null && ("1".equals(removeData) || Boolean
                             .valueOf(removeData)));
