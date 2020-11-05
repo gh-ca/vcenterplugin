@@ -1391,13 +1391,16 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public Boolean queryVolumeByName(String name, String storageId) throws DMEException {
+    public Boolean queryVolumeByName(String name) throws DMEException {
+
         Boolean flag = true;
-        List<Volume> volumes = getVolumes(storageId);
-        for (Volume volume : volumes) {
-            if (volume.getName().equals(name)) {
+        String url = API_VOLUME_LIST + "?name=" + name;
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+        if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
+            String body = responseEntity.getBody();
+            JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();
+            if (ToolUtils.jsonToInt(jsonObject.get("count"))!= 0) {
                 flag = false;
-                break;
             }
         }
         return flag;
