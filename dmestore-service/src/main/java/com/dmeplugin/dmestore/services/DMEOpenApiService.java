@@ -32,14 +32,14 @@ public class DMEOpenApiService {
 
   protected static final String CODE_SUCCESS_DOUBLE = String.valueOf(RESULT_SUCCESS_CODE_DOUBLE);
 
-  protected Map<String, Object> getNoDMEMap() {
+  protected Map<String, Object> getNoDmeMap() {
     Map<String, Object> map = new HashMap();
     map.put("code", FAIL_CODE);
     map.put("description", "No dme data in DB");
     return map;
   }
 
-  protected Map<String, Object> getDMEExceptionMap(DMEException e) {
+  protected Map<String, Object> getDmeExceptionMap(DMEException e) {
     Map<String, Object> map = new HashMap<String, Object>();
     map.put("code", Integer.valueOf(e.getCode()));
     map.put("description", e.getMessage());

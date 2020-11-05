@@ -70,7 +70,7 @@ import org.slf4j.LoggerFactory;
 
 public class HostMO extends BaseMO implements VmwareHypervisorHost {
     private static final Logger s_logger = LoggerFactory.getLogger(HostMO.class);
-    Map<String, VirtualMachineMO> _vmCache = new HashMap<String, VirtualMachineMO>();
+    Map<String, VirtualMachineMO> vmCache = new HashMap<>();
 
     //Map<String, String> _vmInternalNameMapCache = new HashMap<String, String>();
 
@@ -155,22 +155,22 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     }
 
     @Override
-    public boolean isHAEnabled() throws Exception {
+    public boolean isHaEnabled() throws Exception {
         ManagedObjectReference morParent = getParentMor();
         if ("ClusterComputeResource".equals(morParent.getType())) {
             ClusterMO clusterMo = new ClusterMO(_context, morParent);
-            return clusterMo.isHAEnabled();
+            return clusterMo.isHaEnabled();
         }
 
         return false;
     }
 
     @Override
-    public void setRestartPriorityForVM(VirtualMachineMO vmMo, String priority) throws Exception {
+    public void setRestartPriorityForVm(VirtualMachineMO vmMo, String priority) throws Exception {
         ManagedObjectReference morParent = getParentMor();
         if ("ClusterComputeResource".equals(morParent.getType())) {
             ClusterMO clusterMo = new ClusterMO(_context, morParent);
-            clusterMo.setRestartPriorityForVM(vmMo, priority);
+            clusterMo.setRestartPriorityForVm(vmMo, priority);
         }
     }
 
@@ -544,7 +544,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
             vms.add(findVmOnHyperHost(vmName));
         } else {
             loadVmCache();
-            vms.addAll(_vmCache.values());
+            vms.addAll(vmCache.values());
         }
         return vms;
     }
@@ -555,7 +555,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
             s_logger.debug("find VM " + vmName + " on host");
         }
 
-        VirtualMachineMO vmMo = _vmCache.get(vmName);
+        VirtualMachineMO vmMo = vmCache.get(vmName);
         if (vmMo != null) {
             if (s_logger.isDebugEnabled()) {
                 s_logger.debug("VM " + vmName + " found in host cache");
@@ -566,7 +566,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         s_logger.info("VM " + vmName + " not found in host cache");
         loadVmCache();
 
-        return _vmCache.get(vmName);
+        return vmCache.get(vmName);
     }
 
     private boolean isUserVMInternalCSName(String vmInternalCSName) {
@@ -587,7 +587,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
             s_logger.debug("load VM cache on host");
         }
 
-        _vmCache.clear();
+        vmCache.clear();
 
         int key = getCustomFieldKey("VirtualMachine", CustomFieldConstants.CLOUD_VM_INTERNAL_NAME);
         if (key == 0) {
@@ -623,7 +623,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
                         s_logger.trace("put " + vmName + " into host cache");
                     }
 
-                    _vmCache.put(vmName, new VirtualMachineMO(_context, oc.getObj()));
+                    vmCache.put(vmName, new VirtualMachineMO(_context, oc.getObj()));
                 }
             }
         }

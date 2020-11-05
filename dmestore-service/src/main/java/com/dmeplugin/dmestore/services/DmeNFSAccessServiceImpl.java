@@ -98,7 +98,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         shareAttr.setOwning_dtree_name(ToolUtils.jsonToStr(share.get("owning_dtree_name"), null));
         shareAttr.setOwning_dtree_id(ToolUtils.jsonToStr(share.get("owning_dtree_id"), null));
         //查询客户端列表
-        List<AuthClient> authClientList = getNFSDatastoreShareAuthClients(nfsShareId);
+        List<AuthClient> authClientList = getNfsDatastoreShareAuthClients(nfsShareId);
         if (null != authClientList && authClientList.size() > 0) {
             shareAttr.setAuth_client_list(authClientList);
         }
@@ -106,7 +106,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     //通过nfs shareId 查询关联的客户端访问列表
-    private List<AuthClient> getNFSDatastoreShareAuthClients(String shareId) throws DMEException {
+    private List<AuthClient> getNfsDatastoreShareAuthClients(String shareId) throws DMEException {
         List<AuthClient> clientList = new ArrayList<>();
         String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_SHARE_AUTH_CLIENTS_URL, "nfs_share_id", shareId);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(new HashMap<>()));
@@ -207,8 +207,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         // DME share, 通过sharePath(可加storageId)查询share 提取fs_name
         // DME FileService, 通过fs_name和storageId查询fs (需求文档说明是通过share path, 但API不支持)
 
-        String store_type = ToolUtils.STORE_TYPE_NFS;
-        String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(store_type);
+        String storeType = ToolUtils.STORE_TYPE_NFS;
+        String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(storeType);
         LOG.info("===list nfs datastore success====\n{}", listStr);
         if (StringUtils.isEmpty(listStr)) {
             return false;
@@ -237,17 +237,16 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             if (null != storageMap && storageMap.size() > 0) {
                 for (Map.Entry<String, Storage> entry : storageMap.entrySet()) {
                     Storage storageInfo = entry.getValue();
-                    String storage_id = storageInfo.getId();
-                    String storage_name = storageInfo.getName();
+                    String storageId = storageInfo.getId();
                     DmeVmwareRelation relation = new DmeVmwareRelation();
                     relation.setStoreId(nfsStorageId);
-                    relation.setStorageDeviceId(storage_id);
+                    relation.setStorageDeviceId(storageId);
                     relation.setStoreName(nfsDataStorageName);
-                    relation.setStoreType(store_type);
+                    relation.setStoreType(storeType);
 
                     //获取logicPort信息
                     boolean withLogicPort = false;
-                    List<Map<String, Object>> logicPortInfos = queryLogicPortInfo(storage_id);
+                    List<Map<String, Object>> logicPortInfos = queryLogicPortInfo(storageId);
                     if (null != logicPortInfos && logicPortInfos.size() > 0) {
                         for (Map<String, Object> logicPortInfo : logicPortInfos) {
                             String id = ToolUtils.getStr(logicPortInfo.get("id"));
@@ -262,7 +261,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                             }
                         }
                     } else {
-                        LOG.warn("NFSDATASTORE id:" + storage_id + " contains logicport is null!");
+                        LOG.warn("NFSDATASTORE id:" + storageId + " contains logicport is null!");
                     }
 
                     //获取share信息 (条件:sharePath  可加 storageId)
@@ -277,13 +276,13 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                         relation.setShareName(name);
                         withShare = true;
                     } else {
-                        LOG.warn("NFSDATASTORE id:" + storage_id + " contains share is null!");
+                        LOG.warn("NFSDATASTORE id:" + storageId + " contains share is null!");
                     }
 
                     //获取fs信息
                     boolean withFs = false;
                     if (!StringUtils.isEmpty(fsName)) {
-                        Map<String, Object> fsInfo = queryFsInfo(storage_id, fsName);
+                        Map<String, Object> fsInfo = queryFsInfo(storageId, fsName);
                         if (null != fsInfo && fsInfo.size() > 0) {
                             String id = ToolUtils.getStr(fsInfo.get("id"));
                             String name = ToolUtils.getStr(fsInfo.get("name"));
@@ -291,7 +290,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                             relation.setFsName(name);
                             withFs = true;
                         } else {
-                            LOG.warn("NFSDATASTORE id:" + storage_id + " contains fs is null!");
+                            LOG.warn("NFSDATASTORE id:" + storageId + " contains fs is null!");
                         }
                     }
 
@@ -304,21 +303,21 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
         //数据库保存datastorage 与nfs的 share fs logicPort关系信息
         if (relationList.size() > 0) {
-            return dmeVmwareRelationDBProcess(relationList, store_type);
+            return dmeVmWareRelationDbProcess(relationList, storeType);
         }
         return false;
     }
 
-    private boolean dmeVmwareRelationDBProcess(List<DmeVmwareRelation> relationList, String storeType) throws DmeSqlException {
+    private boolean dmeVmWareRelationDbProcess(List<DmeVmwareRelation> relationList, String storeType) throws DmeSqlException {
         //本地全量查询NFS
         List<String> storageIds = dmeVmwareRalationDao.getAllStorageIdByType(storeType);
         List<DmeVmwareRelation> newList = new ArrayList<>();
         List<DmeVmwareRelation> upList = new ArrayList<>();
         for (DmeVmwareRelation relation : relationList) {
-            String storege_id = relation.getStoreId();
-            if (storageIds.contains(storege_id)) {
+            String storegeId = relation.getStoreId();
+            if (storageIds.contains(storegeId)) {
                 upList.add(relation);
-                storageIds.remove(storege_id);
+                storageIds.remove(storegeId);
             } else {
                 newList.add(relation);
             }
@@ -807,7 +806,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             //***dme侧卸载
             if (null != dvr) {
                 String shareId = dvr.getShareId();
-                List<AuthClient> authClientList = getNFSDatastoreShareAuthClients(shareId);
+                List<AuthClient> authClientList = getNfsDatastoreShareAuthClients(shareId);
                 if (null != authClientList && authClientList.size() > 0) {
                     //卸载
                     Map<String, String> authIdIpMap = new HashMap<>();

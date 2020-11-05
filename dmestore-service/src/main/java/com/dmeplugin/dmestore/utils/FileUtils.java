@@ -192,14 +192,14 @@ public class FileUtils {
 
   private static AclEntry buildUserAclEntry(UserPrincipal user) {
     try {
-      return defaultPermissionAEBuilder().setPrincipal(user).build();
+      return defaultPermissionAeBuilder().setPrincipal(user).build();
     } catch (Exception e) {
       LOGGER.warn("Cannot set AclEntry on " + user);
       return null;
     }
   }
 
-  private static Builder defaultPermissionAEBuilder() {
+  private static Builder defaultPermissionAeBuilder() {
     return AclEntry.newBuilder().setPermissions(EnumSet.of(
         AclEntryPermission.READ_NAMED_ATTRS,
         AclEntryPermission.WRITE_NAMED_ATTRS,
@@ -307,7 +307,7 @@ public class FileUtils {
     }
   }
 
-  public static String getOldDBFolder() {
+  public static String getOldDbFolder() {
     return VMWARE_LINUX60_DB_DIR;
   }
 

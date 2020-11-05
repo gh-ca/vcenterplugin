@@ -40,9 +40,9 @@ public interface VmwareHypervisorHost {
 
     ClusterDasConfigInfo getDasConfig() throws Exception;
 
-    boolean isHAEnabled() throws Exception;
+    boolean isHaEnabled() throws Exception;
 
-    void setRestartPriorityForVM(VirtualMachineMO vmMo, String priority) throws Exception;
+    void setRestartPriorityForVm(VirtualMachineMO vmMo, String priority) throws Exception;
 
     ManagedObjectReference getHyperHostDatacenter() throws Exception;
 

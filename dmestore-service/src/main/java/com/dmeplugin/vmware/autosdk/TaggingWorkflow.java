@@ -115,8 +115,8 @@ public class TaggingWorkflow {
     }
 
     // tag the Object
-    public void attachTag(String tagId,DynamicID objDynamicID){
-        this.tagAssociation.attach(tagId,objDynamicID);
+    public void attachTag(String tagId,DynamicID objDynamicId){
+        this.tagAssociation.attach(tagId,objDynamicId);
     }
 
     //list tags

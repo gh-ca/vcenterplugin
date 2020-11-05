@@ -11,8 +11,8 @@ export class NfsMountService{
     return this.http.get('accessvmware/getclustersbydsobjectid', {params: {dataStoreObjectId}});
   }
 
-  getDatastoreListByHostObjectId(params:{}){
-    return this.http.get('accessvmware/getdatastoresbyhostobjectid', params);
+  getDatastoreListByHostObjectId(hostObjectId:string, dataStoreType:string){
+    return this.http.get('accessvmware/getdatastoresbyhostobjectid', {params:{hostObjectId, dataStoreType}});
   }
   getDatastoreListByClusterObjectId(params:{}){
     return this.http.get('accessvmware/getdatastoresbyclusterobjectid', params);

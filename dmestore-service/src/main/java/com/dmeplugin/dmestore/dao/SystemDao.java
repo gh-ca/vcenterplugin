@@ -28,17 +28,17 @@ public class SystemDao extends H2DataBaseDao {
 
   public boolean checkTable(String sqlFile) throws SQLException {
     Connection con = null;
-    ResultSet ResultSet = null;
+    ResultSet resultSet = null;
     boolean tableExist;
     try {
       con = getConnection();
-      ResultSet = con.getMetaData().getTables(null, null, sqlFile, null);
-      tableExist = ResultSet.next();
+      resultSet = con.getMetaData().getTables(null, null, sqlFile, null);
+      tableExist = resultSet.next();
     } catch (SQLException e) {
       LOGGER.error("Failed to check table: " + e.getMessage());
       throw e;
     } finally {
-      closeConnection(con, null, ResultSet);
+      closeConnection(con, null, resultSet);
     }
 
     return tableExist;
@@ -48,9 +48,9 @@ public class SystemDao extends H2DataBaseDao {
    * 判断表是否存在，不存在则创建表
    *
    * @param tableName 表名
-   * @param createTableSQL 创建表的SQL
+   * @param createTableSql 创建表的SQL
    */
-  public void checkExistAndCreateTable(String tableName, String createTableSQL) throws Exception {
+  public void checkExistAndCreateTable(String tableName, String createTableSql) throws Exception {
     Connection con = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
@@ -58,7 +58,7 @@ public class SystemDao extends H2DataBaseDao {
       con = getConnection();
       rs = con.getMetaData().getTables(null, null, tableName, null);
       if (!rs.next()) {
-        ps = con.prepareStatement(createTableSQL);
+        ps = con.prepareStatement(createTableSql);
         ps.executeUpdate();
       }
     } catch (Exception e) {
@@ -88,14 +88,14 @@ public class SystemDao extends H2DataBaseDao {
   /**
    * get h2 DB file path from URL
    */
-  public static String getDBFileFromURL(String url) {
+  public static String getDbFileFromUrl(String url) {
     return url.replaceAll("jdbc:h2:", "");
   }
 
   /**
    * load file content from resources/db folder
    */
-  public static String getDBScript(String sqlFile) throws IOException {
+  public static String getDbScript(String sqlFile) throws IOException {
     InputStream inputStream = null;
     try {
       inputStream = Thread.currentThread().getContextClassLoader()

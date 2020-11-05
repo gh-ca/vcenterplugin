@@ -3,16 +3,14 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.utils.StringUtil;
-import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import com.google.gson.*;
-import com.vmware.vim25.DatastoreSummary;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -82,7 +80,7 @@ public class VmRdmServiceImpl implements VmRdmService {
             requestVolumeName = createBean.getCreateVolumesRequest().getVolumes().get(0).getName();
             params = createBean.getCreateVolumesRequest().getVolumes().get(0);
             capacity = params.getCapacity();
-            if(unitTb.equals(params.getUnit())){
+            if (unitTb.equals(params.getUnit())) {
                 capacity = capacity * 1024;
             }
             mapping = createBean.getCreateVolumesRequest().getMapping();
@@ -90,7 +88,7 @@ public class VmRdmServiceImpl implements VmRdmService {
             requestVolumeName = createBean.getCustomizeVolumesRequest().getCustomizeVolumes().getVolumeSpecs().get(0).getName();
             params = createBean.getCustomizeVolumesRequest().getCustomizeVolumes().getVolumeSpecs().get(0);
             capacity = params.getCapacity();
-            if(unitTb.equals(params.getUnit())){
+            if (unitTb.equals(params.getUnit())) {
                 capacity = capacity * 1024;
             }
             mapping = createBean.getCustomizeVolumesRequest().getMapping();
@@ -139,8 +137,8 @@ public class VmRdmServiceImpl implements VmRdmService {
         vcsdkUtils.hostRescanHba(hostIp);
         long t2 = System.currentTimeMillis();
         //vcsdkUtils.refreshStorageSystem(hostObjectId);
-        LOG.info("hostRescanHba succeeded, take {} seconds!", (t2 - t1)/1000);
-        String lunStr =  vcsdkUtils.getLunsOnHost(hostIp);
+        LOG.info("hostRescanHba succeeded, take {} seconds!", (t2 - t1) / 1000);
+        String lunStr = vcsdkUtils.getLunsOnHost(hostIp);
         if (StringUtil.isBlank(lunStr)) {
             LOG.error("获取目标LUN失败！");
             //将已经创建好的卷删除
@@ -199,20 +197,12 @@ public class VmRdmServiceImpl implements VmRdmService {
      * @date 11:04 2020/10/14
      **/
     private void deleteVolumes(String hostId, List<String> ids) {
-        ThreadFactory namedThreadFactory = new ThreadFactoryBuilder()
-                .setNameFormat("volumeDelete-pool-%d").build();
-        ExecutorService singleThreadPool = new ThreadPoolExecutor(1, 1,
-                0L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<Runnable>(1024), namedThreadFactory, new ThreadPoolExecutor.AbortPolicy());
-        singleThreadPool.execute(() -> {
-            try {
-                dmeAccessService.unMapHost(hostId, ids);
-                dmeAccessService.deleteVolumes(ids);
-            } catch (Exception ex) {
-                LOG.error("deleteVolumes error!{}", ex.getMessage());
-            }
-        });
-        singleThreadPool.shutdown();
+        try {
+            dmeAccessService.unMapHost(hostId, ids);
+            dmeAccessService.deleteVolumes(ids);
+        } catch (Exception ex) {
+            LOG.error("delete volumes failed!");
+        }
     }
 
     public void createDmeRdm(VmRdmCreateBean vmRdmCreateBean) throws DMEException {

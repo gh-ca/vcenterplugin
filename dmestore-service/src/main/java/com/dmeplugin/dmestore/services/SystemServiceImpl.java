@@ -17,7 +17,7 @@ public class SystemServiceImpl implements SystemService {
   private VCenterInfoService vCenterInfoService;
 
   @Override
-  public void initDB() {
+  public void initDb() {
     try {
 
       // 20200904 add table DP_DME_ACCESS_INFO

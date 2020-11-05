@@ -44,7 +44,7 @@ public class HostAdvanceOptionMO extends BaseMO {
     }
 
 
-    public void UpdateOptions(List<OptionValue> optionValues) throws Exception {
+    public void updateOptions(List<OptionValue> optionValues) throws Exception {
           _context.getService().updateOptions(_mor, optionValues);
     }
 }

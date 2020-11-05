@@ -3,7 +3,6 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.exception.VcenterException;
-import com.dmeplugin.dmestore.exception.VcenterRuntimeException;
 import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.utils.CipherUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
@@ -136,7 +135,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             if (null != vCenterInfo) {
                 sessionHelper.login(vCenterInfo.getHostIp(), String.valueOf(vCenterInfo.getHostPort()), vCenterInfo.getUserName(), CipherUtils.decryptString(vCenterInfo.getPassword()));
 
-                String categoryid = vcsdkUtils.getCategoryID(sessionHelper);
+                String categoryid = vcsdkUtils.getCategoryId(sessionHelper);
                 List<TagModel> tagModels = vcsdkUtils.getAllTagsByCategoryId(categoryid, sessionHelper);
                 List<PbmProfile> pbmProfiles = vcsdkUtils.getAllSelfPolicyInallcontext();
                 ResponseEntity responseEntity = dmeAccessService.access(LIST_SERVICE_LEVEL_URL, HttpMethod.GET, null);
@@ -253,15 +252,15 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                             String latencyUnit = ToolUtils.jsonToStr(qosParamJsonObj.get("latencyUnit"));
                             int latnecy = ToolUtils.jsonToInt(qosParamJsonObj.get("latency"));
                             int minBandWidth = ToolUtils.jsonToInt(qosParamJsonObj.get("minBandWidth"));
-                            int minIOPS = ToolUtils.jsonToInt(qosParamJsonObj.get("minIOPS"));
+                            int minIops = ToolUtils.jsonToInt(qosParamJsonObj.get("minIOPS"));
                             int maxBandWidth = ToolUtils.jsonToInt(qosParamJsonObj.get("maxBandWidth"));
-                            int maxIOPS = ToolUtils.jsonToInt(qosParamJsonObj.get("maxIOPS"));
+                            int maxIops = ToolUtils.jsonToInt(qosParamJsonObj.get("maxIOPS"));
                             qp.setLatency(latnecy);
                             qp.setLatencyUnit(latencyUnit);
                             qp.setMinBandWidth(minBandWidth);
-                            qp.setMinIOPS(minIOPS);
+                            qp.setMinIOPS(minIops);
                             qp.setMaxBandWidth(maxBandWidth);
-                            qp.setMaxIOPS(maxIOPS);
+                            qp.setMaxIOPS(maxIops);
                             cq.setQosParam(qp);
                         }
                         scb.setQos(cq);

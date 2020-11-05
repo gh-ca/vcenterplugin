@@ -40,13 +40,13 @@ public class VCenterInfoServiceImpl extends DMEOpenApiService implements VCenter
   public int saveVCenterInfo(final VCenterInfo vCenterInfo) throws DmeSqlException {
     VCenterInfo vCenterInfo1 = vCenterInfoDao.getVCenterInfo();
     int returnValue = 0;
-    boolean supportHA = true;
+    boolean supportHa = true;
     boolean isAlarmNewEnabled = false;
-    boolean isHANewEnabled = false;
+    boolean isHaNewEnabled = false;
 
 
       if (vCenterInfo1 != null) {
-        isHANewEnabled = (vCenterInfo.isState() && !vCenterInfo1.isState());
+        isHaNewEnabled = (vCenterInfo.isState() && !vCenterInfo1.isState());
         isAlarmNewEnabled = (vCenterInfo.isPushEvent() && !vCenterInfo1.isPushEvent());
         // update
         vCenterInfo1.setUserName(vCenterInfo.getUserName());

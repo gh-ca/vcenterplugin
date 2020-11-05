@@ -144,8 +144,8 @@ public class VCSDKUtils {
             String serverguid = vcConnectionHelper.objectID2Serverguid(objectid);
             VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
             ManagedObjectReference datastoremor = vcConnectionHelper.objectID2MOR(objectid);
-            DatastoreMO datastoreMO = new DatastoreMO(vmwareContext, datastoremor);
-            dsmap = gson.fromJson(gson.toJson(datastoreMO.getSummary()), new TypeToken<Map<String, Object>>() {
+            DatastoreMO datastoreMo = new DatastoreMO(vmwareContext, datastoremor);
+            dsmap = gson.fromJson(gson.toJson(datastoreMo.getSummary()), new TypeToken<Map<String, Object>>() {
             }.getType());
         } catch (Exception e) {
             e.printStackTrace();
@@ -1814,16 +1814,16 @@ public class VCSDKUtils {
             }
             String serverguid = vcConnectionHelper.objectID2Serverguid(datastoreobjectid);
             VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
-            DatastoreMO datastoreMO=new DatastoreMO(vmwareContext,vcConnectionHelper.objectID2MOR(datastoreobjectid));
-            HostMO hostMO=new HostMO(vmwareContext,vcConnectionHelper.objectID2MOR(hostobjectid));
-            logger.info("Hosts that need to be mounted:" + hostMO.getName());
+            DatastoreMO datastoreMo = new DatastoreMO(vmwareContext,vcConnectionHelper.objectID2MOR(datastoreobjectid));
+            HostMO hostMo = new HostMO(vmwareContext,vcConnectionHelper.objectID2MOR(hostobjectid));
+            logger.info("Hosts that need to be mounted:" + hostMo.getName());
             //挂载前重新扫描datastore
-            hostMO.getHostStorageSystemMO().refreshStorageSystem();
+            hostMo.getHostStorageSystemMO().refreshStorageSystem();
             logger.info("Rescan datastore before mounting");
             //挂载NFS
-            NasDatastoreInfo nasdsinfo = (NasDatastoreInfo) datastoreMO.getInfo();
-            hostMO.getHostDatastoreSystemMO().createNfsDatastore(nasdsinfo.getNas().getRemoteHost(), 0, nasdsinfo.getNas().getRemotePath(), datastoreMO.getName(), mountType,  nasdsinfo.getNas().getType(),nasdsinfo.getNas().getSecurityType());
-            logger.info("mount nfs success:" + hostMO.getName() + ":" + datastoreMO.getName());
+            NasDatastoreInfo nasdsinfo = (NasDatastoreInfo) datastoreMo.getInfo();
+            hostMo.getHostDatastoreSystemMO().createNfsDatastore(nasdsinfo.getNas().getRemoteHost(), 0, nasdsinfo.getNas().getRemotePath(), datastoreMo.getName(), mountType,  nasdsinfo.getNas().getType(),nasdsinfo.getNas().getSecurityType());
+            logger.info("mount nfs success:" + hostMo.getName() + ":" + datastoreMo.getName());
         } catch (Exception e) {
             e.printStackTrace();
             logger.error("mount nfs error:", e);
@@ -2046,7 +2046,7 @@ public class VCSDKUtils {
 
     }
 
-    public String getCategoryID(SessionHelper sessionHelper) throws VcenterException {
+    public String getCategoryId(SessionHelper sessionHelper) throws VcenterException {
         String categoryid = "";
 
         TaggingWorkflow taggingWorkflow = new TaggingWorkflow(sessionHelper);
@@ -2166,7 +2166,7 @@ public class VCSDKUtils {
 
         try {
             TaggingWorkflow taggingWorkflow = new TaggingWorkflow(sessionHelper);
-            taggingWorkflow.createTag(tagName, "", getCategoryID(sessionHelper));
+            taggingWorkflow.createTag(tagName, "", getCategoryId(sessionHelper));
             sessionHelper.logout();
         } catch (Exception e) {
             e.printStackTrace();
@@ -2885,7 +2885,7 @@ public class VCSDKUtils {
             VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
 
             DatastoreMO ds1 = new DatastoreMO(vmwareContext, vcConnectionHelper.objectID2MOR(objectid));
-            List<ManagedObjectReference> vms = ds1.getVM();
+            List<ManagedObjectReference> vms = ds1.getVm();
             if (null != vms && vms.size() > 0) {
                 return true;
             }
