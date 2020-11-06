@@ -438,7 +438,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         }
         //SYS_Lun
         String objTypeId = "1125921381679104";
-        params.put("objTypeId", objTypeId);
+        params.put("obj_type_id", objTypeId);
         if (null == indicatorIds) {
             indicatorIds = initVolumeIndicator(isCurrent);
             params.put("indicator_ids", indicatorIds);
