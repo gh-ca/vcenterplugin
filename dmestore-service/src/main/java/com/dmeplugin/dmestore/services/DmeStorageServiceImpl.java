@@ -228,11 +228,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     @Override
     public List<StoragePool> getStoragePools(String storageId, String mediaType) throws DMEException {
-
+        String replace = storageId.replace("-", "");
         String className = "SYS_StoragePool";
         List<StoragePool> resList = new ArrayList<>();
         String url = API_INSTANCES_LIST + "/" + className + "?condition={json}"+"&&pageSize=1000";
-        String params = ToolUtils.getRequsetParams("storageDeviceId", storageId);
+        String params = ToolUtils.getRequsetParams("storageDeviceId", replace);
         LOG.info(url);
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
@@ -369,13 +369,12 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     @Override
     public VolumeListRestponse getVolumesByPage(String storageId, String pageSize, String pageNo) throws DMEException {
+        
         VolumeListRestponse volumeListRestponse = new VolumeListRestponse();
         List<Volume> volumes = new ArrayList<>(10);
         String url = API_VOLUME_LIST + "?";
-        String params = null;
         if (!"".equals(storageId)) {
-            url = url + "condition={json}" + "&";
-            params = ToolUtils.getRequsetParams("storage_id", storageId);
+            url = url + "storage_id="+storageId + "&";
         }
 
         if(!StringUtils.isEmpty(pageSize)){
@@ -387,7 +386,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
 
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
                 throw new DMEException("503", "list volumes error!");
@@ -595,11 +594,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     @Override
     public List<StorageControllers> getStorageControllers(String storageDeviceId) throws DMEException {
-
+        String replace = storageDeviceId.replace("-", "");
         String className = "SYS_Controller";
         List<StorageControllers> resList = new ArrayList<>();
         String url = API_INSTANCES_LIST + "/" + className + "?condition={json}"+"&&pageSize=1000";
-        String params = ToolUtils.getRequsetParams("storageDeviceId", storageDeviceId);
+        String params = ToolUtils.getRequsetParams("storageDeviceId", replace);
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
             LOG.info("DmeStorageServiceImpl/getStorageControllers/responseEntity==" + responseEntity);
@@ -650,11 +649,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     @Override
     public List<StorageDisk> getStorageDisks(String storageDeviceId) throws DMEException {
-
+        String replace = storageDeviceId.replace("-", "");
         String className = "SYS_StorageDisk";
         List<StorageDisk> resList = new ArrayList<>();
         String url = API_INSTANCES_LIST + "/" + className + "?condition={json} "+"&&pageSize=1000";
-        String params = ToolUtils.getRequsetParams("storageDeviceId", storageDeviceId);
+        String params = ToolUtils.getRequsetParams("storageDeviceId", replace);
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
             LOG.info("DmeStorageServiceImpl/getStorageDisks/responseEntity==" + responseEntity);
@@ -920,13 +919,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     @Override
     public List<StoragePort> getStoragePort(String storageDeviceId, String portType) throws DMEException {
 
+        String replace = storageDeviceId.replace("-", "");
         if (StringUtils.isEmpty(storageDeviceId) || StringUtils.isEmpty(portType)) {
             throw new DMEException("403", "request storageDeviceId or portType error!");
         }
         List<StoragePort> storagePorts = new ArrayList<>(10);
         String className = "SYS_StoragePort";
         String url = API_INSTANCES_LIST + "/" + className + "?condition={json}" + "&&pageSize=1000";
-        String params = ToolUtils.getRequsetParams("storageDeviceId", storageDeviceId);
+        String params = ToolUtils.getRequsetParams("storageDeviceId", replace);
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
             int code = responseEntity.getStatusCodeValue();
@@ -1085,10 +1085,12 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     private String getDiskType(String storageDeviceId, String diskPoolId, String poolId) throws DMEException {
+
+        String replace = storageDeviceId.replace("-", "");
         String result = "";
         String className = "SYS_StorageDisk";
         String url = API_INSTANCES_LIST + "/" + className + "?condition=" + "&&pageSize=1000";
-        String params = ToolUtils.getRequsetParams("storageDeviceId", storageDeviceId);
+        String params = ToolUtils.getRequsetParams("storageDeviceId", replace);
         ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
         int code = responseEntity.getStatusCodeValue();
         if (code == HttpStatus.OK.value()) {
