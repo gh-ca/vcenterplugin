@@ -22,7 +22,7 @@ public class DatastoreCustomProperter implements PropertyProviderAdapter {
     private VmfsAccessServiceImpl vmfsAccessService;
 
     @Autowired
-    private DmeNFSAccessServiceImpl dmeNFSAccessService;
+    private DmeNFSAccessServiceImpl dmeNfsAccessService;
 
     @Autowired
     private DmeStorageServiceImpl dmeStorageService;
@@ -94,7 +94,7 @@ public class DatastoreCustomProperter implements PropertyProviderAdapter {
                 boolean isVmfs=vmfsAccessService.isVmfs(objectid);
                 isVmfsDataStore.value = isVmfs;
 
-                boolean isNfs=dmeNFSAccessService.isNfs(objectid);
+                boolean isNfs= dmeNfsAccessService.isNfs(objectid);
                 isNfsDataStore.value= isNfs;
 
                 boolean hasVm=dmeStorageService.hasVmOnDatastore(objectid);

@@ -78,7 +78,7 @@ public class VmwareContext {
             javax.net.ssl.TrustManager[] trustAllCerts = new javax.net.ssl.TrustManager[1];
             javax.net.ssl.TrustManager tm = new TrustAllManager();
             trustAllCerts[0] = tm;
-            javax.net.ssl.SSLContext sc = SSLUtils.getSSLContext();
+            javax.net.ssl.SSLContext sc = SSLUtils.getSslContext();
             sc.init(null, trustAllCerts, null);
             javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(new SecureSSLSocketFactory(sc));
 

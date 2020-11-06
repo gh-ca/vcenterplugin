@@ -13,25 +13,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class NfsDataStoreController extends BaseController{
 
     @Autowired
-    private DmeNFSAccessService dmeNFSAccessService;
+    private DmeNFSAccessService dmeNfsAccessService;
 
     @RequestMapping(value = "/logicport/{storageObjectId}", method = RequestMethod.GET)
     public ResponseBodyBean portAttr(@PathVariable("storageObjectId") String storageObjectId) throws Exception {
-        return success(dmeNFSAccessService.getNfsDatastoreLogicPortAttr(storageObjectId));
+        return success(dmeNfsAccessService.getNfsDatastoreLogicPortAttr(storageObjectId));
     }
 
     @RequestMapping(value = "/share/{storageObjectId}", method = RequestMethod.GET)
     public ResponseBodyBean shareAttr(@PathVariable("storageObjectId") String storageObjectId) throws Exception {
-        return success(dmeNFSAccessService.getNfsDatastoreShareAttr(storageObjectId));
+        return success(dmeNfsAccessService.getNfsDatastoreShareAttr(storageObjectId));
     }
 
     @RequestMapping(value = "/fileservice/{storageObjectId}", method = RequestMethod.GET)
     public ResponseBodyBean fsAttr(@PathVariable("storageObjectId") String storageObjectId) throws Exception {
-        return success(dmeNFSAccessService.getNfsDatastoreFsAttr(storageObjectId));
+        return success(dmeNfsAccessService.getNfsDatastoreFsAttr(storageObjectId));
     }
 
     @RequestMapping(value = "/scannfs", method = RequestMethod.GET)
     public ResponseBodyBean scannfs() throws Exception {
-        return success(dmeNFSAccessService.scanNfs());
+        return success(dmeNfsAccessService.scanNfs());
     }
 }

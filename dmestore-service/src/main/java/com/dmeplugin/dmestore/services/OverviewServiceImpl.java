@@ -27,7 +27,7 @@ public class OverviewServiceImpl implements OverviewService {
     private static final String INFO = "Info";
 
     private VmfsAccessService vmfsAccessService;
-    private DmeNFSAccessService dmeNFSAccessService;
+    private DmeNFSAccessService dmeNfsAccessService;
     private DmeStorageService dmeStorageService;
     private BestPracticeProcessService bestPracticeProcessService;
 
@@ -180,7 +180,7 @@ public class OverviewServiceImpl implements OverviewService {
         double freeCapacity = 0;
         double usedCapacity;
         double utilization;
-        List<NfsDataInfo> nfsDataInfos = dmeNFSAccessService.listNfs();
+        List<NfsDataInfo> nfsDataInfos = dmeNfsAccessService.listNfs();
         if (nfsDataInfos != null && nfsDataInfos.size() > 0){
             for (NfsDataInfo nfsDataInfo : nfsDataInfos){
                 totalCapacity += nfsDataInfo.getCapacity();
@@ -221,7 +221,7 @@ public class OverviewServiceImpl implements OverviewService {
 
     private List<Map<String, Object>> getNfsInfos() throws Exception {
         List<Map<String, Object>> r = new ArrayList<>();
-        List<NfsDataInfo> nfsDataInfos = dmeNFSAccessService.listNfs();
+        List<NfsDataInfo> nfsDataInfos = dmeNfsAccessService.listNfs();
         if (nfsDataInfos != null){
             for (NfsDataInfo nfsDataInfo : nfsDataInfos){
                 Map<String, Object> t = new HashMap();
@@ -249,12 +249,12 @@ public class OverviewServiceImpl implements OverviewService {
         this.vmfsAccessService = vmfsAccessService;
     }
 
-    public DmeNFSAccessService getDmeNFSAccessService() {
-        return dmeNFSAccessService;
+    public DmeNFSAccessService getDmeNfsAccessService() {
+        return dmeNfsAccessService;
     }
 
-    public void setDmeNFSAccessService(DmeNFSAccessService dmeNFSAccessService) {
-        this.dmeNFSAccessService = dmeNFSAccessService;
+    public void setDmeNfsAccessService(DmeNFSAccessService dmeNfsAccessService) {
+        this.dmeNfsAccessService = dmeNfsAccessService;
     }
 
     public DmeStorageService getDmeStorageService() {
