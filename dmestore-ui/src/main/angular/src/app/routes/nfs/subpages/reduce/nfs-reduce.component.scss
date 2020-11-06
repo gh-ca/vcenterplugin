@@ -1,0 +1,16 @@
+::ng-deep .modal-dialog .modal-content{
+  box-shadow: none;
+}
+
+.add-wizard-wrap ::ng-deep .modal{
+  padding: 0;
+  position: initial;
+}
+::ng-deep .add-wizard-wrap .modal-dialog {
+  height: 100vh;
+  max-height: none;
+  width: 100%;
+}
+.add-wizard-wrap ::ng-deep .modal-backdrop{
+  display: none;
+}

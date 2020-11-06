@@ -55,7 +55,7 @@
           <input clrInput class="inputWidth100Percent" [(ngModel)]="addForm.nfsName" name="nfsName" (blur)="checkNfsName();" required/>
           <clr-control-error>
             <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
-            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'validations.nameRequired' | translate}}</p>
             <p *ngIf="nfsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
             <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
             <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
@@ -95,13 +95,11 @@
           <select clrInput  [(ngModel)]="unit" name="unit" >
             <option value="TB">TB</option>
             <option value="GB">GB</option>
-            <!--<option value="MB">MB</option>-->
-            <!--<option value="KB">KB</option>-->
           </select>
         </clr-input-container>
         <clr-select-container>
           <label>{{'nfs.nfsProtocol' | translate}}</label>
-          <select clrSelect [(ngModel)]="addForm.type" name="type" ng-selected="v3">
+          <select clrSelect [(ngModel)]="addForm.type" name="type">
             <option value="NFS">v3</option>
             <option value="NFS41">v4.1</option>
           </select>
@@ -300,16 +298,24 @@
           <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
         </clr-select-container>
 
-        <clr-combobox-container>
+        <clr-select-container>
           <label>{{'nfs.storagePool' | translate}}</label>
-          <clr-combobox  [(ngModel)]="checkedPool" name="checkedPool" required>
-            <clr-options>
-              <clr-option *clrOptionItems="let device of storagePools; field:'name'" [clrValue]="device">
-                {{device.name}}
-              </clr-option>
-            </clr-options>
-          </clr-combobox>
-        </clr-combobox-container>
+          <select class="inputWidth100Percent" clrSelect (ngModelOptions)="storagePools" [(ngModel)]="addForm.storagePoolId"
+                  name="storagePoolId" class="clr-select" required>
+            <option *ngFor="let item of storagePools" value="{{item.id}}">{{item.name}}</option>
+          </select>
+          <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
+        </clr-select-container>
+<!--        <clr-combobox-container>-->
+<!--          <label>{{'nfs.storagePool' | translate}}</label>-->
+<!--          <clr-combobox  [(ngModel)]="checkedPool" name="checkedPool" required>-->
+<!--            <clr-options>-->
+<!--              <clr-option *clrOptionItems="let device of storagePools; field:'name'" [clrValue]="device">-->
+<!--                {{device.name}}-->
+<!--              </clr-option>-->
+<!--            </clr-options>-->
+<!--          </clr-combobox>-->
+<!--        </clr-combobox-container>-->
         <!--逻辑端口-->
         <clr-select-container>
           <label>{{'nfs.logicPort' | translate}}</label>
@@ -323,7 +329,7 @@
           <input clrInput class="inputWidth100Percent" [(ngModel)]="addForm.nfsName" name="nfsName" required (blur)="checkNfsName();"/>
           <clr-control-error>
             <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
-            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'validations.nameRequired' | translate}}</p>
 
             <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
             <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
@@ -367,11 +373,26 @@
 
         <clr-select-container>
           <label>{{'nfs.nfsProtocol' | translate}}</label>
-          <select clrSelect [(ngModel)]="addForm.type" name="type" ng-selected="v3">
+          <select clrSelect [(ngModel)]="addForm.type" name="type">
             <option value="NFS">v3</option>
             <option value="NFS41">v4.1</option>
           </select>
         </clr-select-container>
+        <clr-radio-container *ngIf="addForm.type=='NFS41'">
+          <label>{{'nfs.securityType' | translate}}</label>
+          <clr-radio-wrapper>
+            <input type="radio" clrRadio name="securityType" [(ngModel)]="addForm.securityType" value="AUTH_SYS"/>
+            <label>{{'nfs.authSys' | translate}}</label>
+          </clr-radio-wrapper>
+          <clr-radio-wrapper>
+            <input type="radio" clrRadio name="securityType" [(ngModel)]="addForm.securityType" value="SEC_KRB5"/>
+            <label>{{'nfs.secKrb5' | translate}}</label>
+          </clr-radio-wrapper>
+          <clr-radio-wrapper>
+            <input type="radio" clrRadio name="securityType" [(ngModel)]="addForm.securityType" value="SEC_KRB5I"/>
+            <label>{{'nfs.secKrb5i' | translate}}</label>
+          </clr-radio-wrapper>
+        </clr-radio-container>
         <!--主机-->
         <clr-select-container>
           <label>{{'nfs.mountHost' | translate}}</label>

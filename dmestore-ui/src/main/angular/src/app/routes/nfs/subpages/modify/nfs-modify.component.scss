@@ -331,5 +331,13 @@ input[type=number] {
   border-right:0px;
   width:80px;
 };
+::ng-deep .modal-dialog .modal-content{
+  box-shadow: none;
+}
 
+::ng-deep .add-wizard-wrap .modal-dialog {
+  height: 100vh;
+  max-height: none;
+  width: 100%;
+}
 
