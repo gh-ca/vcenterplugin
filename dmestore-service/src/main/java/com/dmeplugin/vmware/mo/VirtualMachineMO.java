@@ -16,92 +16,23 @@
 // under the License.
 package com.dmeplugin.vmware.mo;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import com.dmeplugin.vmware.util.*;
+import com.google.gson.Gson;
+import com.vmware.vim25.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import com.dmeplugin.vmware.util.*;
 
-import com.google.gson.Gson;
-import com.vmware.vim25.ArrayOfManagedObjectReference;
-import com.vmware.vim25.ChoiceOption;
-import com.vmware.vim25.CustomFieldStringValue;
-import com.vmware.vim25.DistributedVirtualSwitchPortConnection;
-import com.vmware.vim25.DynamicProperty;
-import com.vmware.vim25.ElementDescription;
-import com.vmware.vim25.GuestInfo;
-import com.vmware.vim25.GuestOsDescriptor;
-import com.vmware.vim25.ManagedObjectReference;
-import com.vmware.vim25.ObjectContent;
-import com.vmware.vim25.ObjectSpec;
-import com.vmware.vim25.OptionValue;
-import com.vmware.vim25.ParaVirtualSCSIController;
-import com.vmware.vim25.PropertyFilterSpec;
-import com.vmware.vim25.PropertySpec;
-import com.vmware.vim25.TraversalSpec;
-import com.vmware.vim25.VirtualBusLogicController;
-import com.vmware.vim25.VirtualCdrom;
-import com.vmware.vim25.VirtualCdromIsoBackingInfo;
-import com.vmware.vim25.VirtualController;
-import com.vmware.vim25.VirtualDevice;
-import com.vmware.vim25.VirtualDeviceBackingInfo;
-import com.vmware.vim25.VirtualDeviceConfigSpec;
-import com.vmware.vim25.VirtualDeviceConfigSpecFileOperation;
-import com.vmware.vim25.VirtualDeviceConfigSpecOperation;
-import com.vmware.vim25.VirtualDeviceConnectInfo;
-import com.vmware.vim25.VirtualDisk;
-import com.vmware.vim25.VirtualDiskFlatVer1BackingInfo;
-import com.vmware.vim25.VirtualDiskFlatVer2BackingInfo;
-import com.vmware.vim25.VirtualDiskMode;
-import com.vmware.vim25.VirtualDiskRawDiskMappingVer1BackingInfo;
-import com.vmware.vim25.VirtualDiskSparseVer1BackingInfo;
-import com.vmware.vim25.VirtualDiskSparseVer2BackingInfo;
-import com.vmware.vim25.VirtualDiskType;
-import com.vmware.vim25.VirtualEthernetCard;
-import com.vmware.vim25.VirtualEthernetCardDistributedVirtualPortBackingInfo;
-import com.vmware.vim25.VirtualHardwareOption;
-import com.vmware.vim25.VirtualIDEController;
-import com.vmware.vim25.VirtualLsiLogicController;
-import com.vmware.vim25.VirtualLsiLogicSASController;
-import com.vmware.vim25.VirtualMachineCloneSpec;
-import com.vmware.vim25.VirtualMachineConfigInfo;
-import com.vmware.vim25.VirtualMachineConfigOption;
-import com.vmware.vim25.VirtualMachineConfigSpec;
-import com.vmware.vim25.VirtualMachineConfigSummary;
-import com.vmware.vim25.VirtualMachineFileInfo;
-import com.vmware.vim25.VirtualMachineFileLayoutEx;
-import com.vmware.vim25.VirtualMachineMessage;
-import com.vmware.vim25.VirtualMachineMovePriority;
-import com.vmware.vim25.VirtualMachinePowerState;
-import com.vmware.vim25.VirtualMachineQuestionInfo;
-import com.vmware.vim25.VirtualMachineRelocateDiskMoveOptions;
-import com.vmware.vim25.VirtualMachineRelocateSpec;
-import com.vmware.vim25.VirtualMachineRelocateSpecDiskLocator;
-import com.vmware.vim25.VirtualMachineRuntimeInfo;
-import com.vmware.vim25.VirtualMachineSnapshotInfo;
-import com.vmware.vim25.VirtualMachineSnapshotTree;
-import com.vmware.vim25.VirtualSCSIController;
-import com.vmware.vim25.VirtualSCSISharing;
-
-
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-
-
+/**
+ * @author xxxx
+ **/
 public class VirtualMachineMO extends BaseMO {
     private static final Logger s_logger = LoggerFactory.getLogger(VirtualMachineMO.class);
     private static final ExecutorService MONITOR_SERVICE_EXECUTOR = Executors.newCachedThreadPool();
@@ -109,7 +40,7 @@ public class VirtualMachineMO extends BaseMO {
     public static final String ANSWER_YES = "0";
     public static final String ANSWER_NO = "1";
 
-    private ManagedObjectReference _vmEnvironmentBrowser = null;
+    private ManagedObjectReference vmEnvironmentBrowser = null;
 
     public VirtualMachineMO(VmwareContext context, ManagedObjectReference morVm) {
         super(context, morVm);
@@ -996,9 +927,12 @@ public class VirtualMachineMO extends BaseMO {
         String vmxFilePath = fileInfo.getVmPathName();
         String[] vmxPathTokens = vmxFilePath.split("\\[|\\]|/");
         assert (vmxPathTokens.length == 4);
-        pathInfo[1] = vmxPathTokens[1].trim();                            // vSphere vm name
-        pathInfo[2] = dcInfo.second();                                    // vSphere datacenter name
-        pathInfo[3] = vmxPathTokens[0].trim();                            // vSphere datastore name
+        // vSphere vm name
+        pathInfo[1] = vmxPathTokens[1].trim();
+        // vSphere datacenter name
+        pathInfo[2] = dcInfo.second();
+        // vSphere datastore name
+        pathInfo[3] = vmxPathTokens[0].trim();
         return pathInfo;
     }
 
@@ -1116,7 +1050,9 @@ public class VirtualMachineMO extends BaseMO {
         assert (vmdkDatastorePath != null);
         assert (morDs != null);
 
-        int ideControllerKey = getIDEDeviceControllerKey();
+        //2020-11-06 wangxiangyong 修改为SCSI
+        //int ideControllerKey = getIDEDeviceControllerKey();
+        int ideControllerKey = getLsiLogicControllerKey();
         if (controllerKey < 0) {
             controllerKey = ideControllerKey;
         }
@@ -2640,7 +2576,22 @@ public class VirtualMachineMO extends BaseMO {
         if (devices != null && devices.size() > 0) {
             for (VirtualDevice device : devices) {
                 if (device instanceof VirtualIDEController) {
-                    return ((VirtualIDEController)device).getKey();
+                    return device.getKey();
+                }
+            }
+        }
+
+        assert (false);
+        throw new Exception("IDE Controller Not Found");
+    }
+
+    public int getLsiLogicControllerKey() throws Exception {
+        List<VirtualDevice> devices = _context.getVimClient().getDynamicProperty(_mor, "config.hardware.device");
+
+        if (devices != null && devices.size() > 0) {
+            for (VirtualDevice device : devices) {
+                if (device instanceof VirtualLsiLogicController) {
+                    return device.getKey();
                 }
             }
         }
@@ -3024,10 +2975,10 @@ public class VirtualMachineMO extends BaseMO {
     }
 
     private ManagedObjectReference getEnvironmentBrowser() throws Exception {
-        if (_vmEnvironmentBrowser == null) {
-            _vmEnvironmentBrowser = _context.getVimClient().getMoRefProp(_mor, "environmentBrowser");
+        if (vmEnvironmentBrowser == null) {
+            vmEnvironmentBrowser = _context.getVimClient().getMoRefProp(_mor, "environmentBrowser");
         }
-        return _vmEnvironmentBrowser;
+        return vmEnvironmentBrowser;
     }
 
     public boolean isCpuHotAddSupported(String guestOsId) throws Exception {

@@ -22,7 +22,10 @@
     "refresh": "刷新",
     "synSPolicy": "同步虚拟机存储策略",
     "tip": "提示",
-    "back":"返回"
+    "back":"返回",
+    "performance": "性能",
+    "conventional": "常规",
+    "capacity": "容量"
   },
   "validations": {
     "required": "该字段必填!",
