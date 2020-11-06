@@ -277,13 +277,16 @@
 <!--                        </clr-dg-pagination>-->
 <!--                      </clr-dg-footer>-->
                     </clr-datagrid>
-                    <mat-paginator #matPaginator [showFirstLastButtons]="true" [hidePageSize]="false"
-                                   [length]="volumeTotal"
-                                   [pageSize]="10"
-                                   [pageSizeOptions]="[10,20]"
-                                   (page)="pageEvent = getVolDataByPage($event)">
-<!--                        {{matPaginator.pageIndex + 1}}-->
-                    </mat-paginator>
+                    <div>
+                      <mat-paginator #matPaginator [showFirstLastButtons]="true" [hidePageSize]="false"
+                                     [length]="volumeTotal"
+                                     [pageSize]="10"
+                                     [pageSizeOptions]="[10,20]"
+                                     (page)="pageEvent = getVolDataByPage($event)">
+                        <!--                        {{matPaginator.pageIndex + 1}}-->
+                      </mat-paginator>
+<!--                      <input>-->
+                    </div>
                   </div>
                 </clr-tab-content>
               </clr-tab>
