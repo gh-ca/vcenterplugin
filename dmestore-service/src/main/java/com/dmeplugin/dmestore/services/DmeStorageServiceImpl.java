@@ -384,7 +384,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         List<Volume> volumes = new ArrayList<>(10);
         String url = API_VOLUME_LIST + "?";
         if (!"".equals(storageId)) {
-            url = url + "storageId=" + storageId + "&";
+            url = url + "storage_id=" + storageId + "&";    
         }
 
         if(!StringUtils.isEmpty(pageSize)){
@@ -1391,11 +1391,15 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public Boolean queryVolumeByName(String name, String storageId) throws DMEException {
+    public Boolean queryVolumeByName(String name) throws DMEException {
+
         Boolean flag = true;
-        List<Volume> volumes = getVolumes(storageId);
-        for (Volume volume : volumes) {
-            if (volume.getName().equals(name)) {
+        String url = API_VOLUME_LIST + "?name=" + name;
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+        if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
+            String body = responseEntity.getBody();
+            JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();
+            if (ToolUtils.jsonToInt(jsonObject.get("count"))!= 0) {
                 flag = false;
             }
         }
@@ -1409,6 +1413,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         for (FileSystem fileSystem : fileSystems) {
             if (name.equals(fileSystem.getName())) {
                 flag = false;
+                break;
             }
         }
         return flag;
@@ -1421,6 +1426,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         for (NfsShares nfsShare : nfsShares) {
             if (name.equals(nfsShare.getName())) {
                 flag = false;
+                break;
             }
         }
         return flag;

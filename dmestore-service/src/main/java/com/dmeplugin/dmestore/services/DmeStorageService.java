@@ -182,7 +182,7 @@ public interface DmeStorageService {
      */
     public List<Volume> listVolumesPerformance(List<String> volumeId) throws DMEException;
 
-    Boolean queryVolumeByName(String name,String storageId) throws DMEException;
+    Boolean queryVolumeByName(String name) throws DMEException;
 
     Boolean queryFsByName(String name, String storageId) throws DMEException;
 
