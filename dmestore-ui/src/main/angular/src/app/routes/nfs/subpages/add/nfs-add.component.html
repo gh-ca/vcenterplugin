@@ -16,7 +16,7 @@
       <ng-template clrPageTitle>{{'nfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
       <form clrForm #formPageOne="ngForm">
         <!--存储设备-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.storeageDevice' | translate}}</label>
           <select class="inputWidth100Percent" clrSelect (ngModelOptions)="storageList" [(ngModel)]="addForm.storagId"
                   name="storagId" class="clr-select" (change)="selectStoragePool()" required>
@@ -24,7 +24,7 @@
           </select>
           <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
         </clr-select-container>
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.storagePool' | translate}}</label>
           <select class="inputWidth100Percent" clrSelect (ngModelOptions)="storagePools" [(ngModel)]="addForm.storagePoolId"
                   name="storagePoolId" class="clr-select" required>
@@ -43,7 +43,7 @@
 <!--          </clr-combobox>-->
 <!--        </clr-combobox-container>-->
         <!--逻辑端口-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.logicPort' | translate}}</label>
           <select clrSelect (ngModelOptions)="logicPorts" [(ngModel)]="addForm.currentPortId" name="currentPortId" class="clr-select" required>
             <option *ngFor="let item of logicPorts" value="{{item.currentPortId}}">{{item.name+'_'+item.currentPortName+'('+item.mgmtIp+')'}}</option>
@@ -97,7 +97,7 @@
             <option value="GB">GB</option>
           </select>
         </clr-input-container>
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.nfsProtocol' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.type" name="type">
             <option value="NFS">v3</option>
@@ -120,20 +120,20 @@
           </clr-radio-wrapper>
         </clr-radio-container>
         <!--主机-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.mountHost' | translate}}</label>
           <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="addForm.hostObjectId" required name="hostObjectId" class="clr-select" (change)="checkHost()">
             <option *ngFor="let item of hostList" value="{{item.objectId}}">{{item.hostName}}</option>
           </select>
         </clr-select-container>
         <!--虚拟网卡IP-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.vkernel' | translate}}</label>
           <select clrSelect (ngModelOptions)="vmkernelList" required [(ngModel)]="addForm.vkernelIp" name="vkernelIp" class="clr-select">
             <option *ngFor="let item of vmkernelList" value="{{item.ipAddress}}">{{item.ipAddress}}</option>
           </select>
         </clr-select-container>
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.mountType' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.accessMode" required name="accessMode">
             <option value="readOnly">{{'nfs.readOnly' | translate}}</option>
@@ -244,7 +244,7 @@
             <input type="checkbox" name="thin" clrToggle [(ngModel)]="addForm.thin"/>
           </clr-toggle-wrapper>
           <!--重删-->
-          <clr-select-container>
+          <clr-select-container class="selectClass">
             <label>{{'nfs.dataDedu' | translate}}</label>
             <select clrSelect [(ngModel)]="addForm.deduplicationEnabled" name="deduplicationEnabled">
               <option value="false">{{'nfs.disable' | translate}}</option>
@@ -252,7 +252,7 @@
             </select>
           </clr-select-container>
           <!--压缩-->
-          <clr-select-container>
+          <clr-select-container class="selectClass">
             <label>{{'nfs.dataCompre' | translate}}</label>
             <select clrSelect [(ngModel)]="addForm.compressionEnabled" name="compressionEnabled">
               <option value="false">{{'nfs.disable' | translate}}</option>
@@ -289,7 +289,7 @@
       <ng-template clrPageTitle>{{'nfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
       <form clrForm #formPageOne="ngForm">
         <!--存储设备-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.storeageDevice' | translate}}</label>
           <select class="inputWidth100Percent" clrSelect (ngModelOptions)="storageList" [(ngModel)]="addForm.storagId"
                   name="storagId" class="clr-select" (change)="selectStoragePool()" required>
@@ -298,7 +298,7 @@
           <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
         </clr-select-container>
 
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.storagePool' | translate}}</label>
           <select class="inputWidth100Percent" clrSelect (ngModelOptions)="storagePools" [(ngModel)]="addForm.storagePoolId"
                   name="storagePoolId" class="clr-select" required>
@@ -317,7 +317,7 @@
 <!--          </clr-combobox>-->
 <!--        </clr-combobox-container>-->
         <!--逻辑端口-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.logicPort' | translate}}</label>
           <select clrSelect (ngModelOptions)="logicPorts" [(ngModel)]="addForm.currentPortId" name="currentPortId" class="clr-select" required>
             <option *ngFor="let item of logicPorts" value="{{item.currentPortId}}">{{item.name+'_'+item.currentPortName+'('+item.mgmtIp+')'}}</option>
@@ -371,7 +371,7 @@
           </select>
         </clr-input-container>
 
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.nfsProtocol' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.type" name="type">
             <option value="NFS">v3</option>
@@ -394,20 +394,20 @@
           </clr-radio-wrapper>
         </clr-radio-container>
         <!--主机-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.mountHost' | translate}}</label>
           <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="addForm.hostObjectId" required name="hostObjectId" class="clr-select" (change)="checkHost()">
             <option *ngFor="let item of hostList" value="{{item.objectId}}">{{item.hostName}}</option>
           </select>
         </clr-select-container>
         <!--虚拟网卡IP-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.vkernel' | translate}}</label>
           <select clrSelect (ngModelOptions)="vmkernelList" required [(ngModel)]="addForm.vkernelIp" name="vkernelIp" class="clr-select">
             <option *ngFor="let item of vmkernelList" value="{{item.ipAddress}}">{{item.ipAddress}}</option>
           </select>
         </clr-select-container>
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.mountType' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.accessMode" required name="accessMode">
             <option value="readOnly">{{'nfs.readOnly' | translate}}</option>
@@ -518,7 +518,7 @@
             <input type="checkbox" name="thin" clrToggle [(ngModel)]="addForm.thin"/>
           </clr-toggle-wrapper>
           <!--重删-->
-          <clr-select-container>
+          <clr-select-container class="selectClass">
             <label>{{'nfs.dataDedu' | translate}}</label>
             <select clrSelect [(ngModel)]="addForm.deduplicationEnabled" name="deduplicationEnabled">
               <option value="false">{{'nfs.disable' | translate}}</option>
@@ -526,7 +526,7 @@
             </select>
           </clr-select-container>
           <!--压缩-->
-          <clr-select-container>
+          <clr-select-container class="selectClass">
             <label>{{'nfs.dataCompre' | translate}}</label>
             <select clrSelect [(ngModel)]="addForm.compressionEnabled" name="compressionEnabled">
               <option value="false">{{'nfs.disable' | translate}}</option>

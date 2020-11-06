@@ -15,7 +15,7 @@
         {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
       </span>
         </div>
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.mountedHost' | translate}}</label>
           <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="hostId"
                   required name="hostId" class="clr-select">
@@ -43,7 +43,7 @@
       {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
     </span>
         </div>
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.mountedHost' | translate}}</label>
           <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="hostId"
                   required name="hostId" class="clr-select">
@@ -71,7 +71,7 @@
       {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
     </span>
         </div>
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.nfsStore' | translate}}</label>
           <select clrSelect (ngModelOptions)="dataStoreList" [(ngModel)]="dataStoreObjectId"
                   required name="dataStoreObjectId" class="clr-select">

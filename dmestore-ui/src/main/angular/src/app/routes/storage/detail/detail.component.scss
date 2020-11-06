@@ -272,5 +272,12 @@
   white-space: nowrap;
 }
 
+::ng-deep .mat-focus-indicator .mat-tooltip-trigger .mat-paginator-navigation-next .mat-icon-button .mat-button-base{
+  margin-left: 20px;
+}
+
+::ng-deep .mat-focus-indicator .mat-tooltip-trigger .mat-paginator-navigation-previous .mat-icon-button .mat-button-base{
+  margin-right: 20px;
+}
 
 
