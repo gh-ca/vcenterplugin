@@ -1841,7 +1841,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return new ArrayList<>(dmeStorageIds);
     }
 
-    private List<Volume> getVolumesByDmeStorageIds(List<String> dmeStorageIds) {
+    private List<Volume> getVolumesByDmeStorageIds(List<String> dmeStorageIds) throws DMEException {
         //通过dmeStorageIds查询卷信息
         List<Volume> volumes = new ArrayList<>();
         for (String id : dmeStorageIds) {

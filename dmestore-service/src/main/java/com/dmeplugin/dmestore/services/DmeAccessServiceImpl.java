@@ -72,10 +72,6 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     @Override
     public void accessDme(Map<String, Object> params) throws DMEException {
-        //Map<String, Object> remap = new HashMap<>(16);
-        //remap.put("code", 200);
-        //remap.put("message", "连接成功");
-        //remap.put("data", params);
         try {
             LOG.info("params==" + (params == null ? "null" : gson.toJson(params)));
             if (params != null) {
@@ -90,49 +86,33 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                         LOG.info("re==" + re);
                     } catch (Exception ex) {
                         ex.printStackTrace();
-                        //remap.put("code", 503);
-                        //remap.put("message", "连接信息保存失败:" + ex.getMessage());
                         throw new DMEException("503","连接信息保存失败:" + ex.getMessage());
                     }
                 } else {
-                    //remap.put("code", 503);
-                   // remap.put("message", "连接失败:" + responseEntity.toString());
                     throw new DMEException("503","连接信息保存失败:" + responseEntity.toString());
                 }
             }
         } catch (Exception e) {
-            //remap.put("code", 503);
-            //remap.put("message", "连接失败:" + e.getMessage());
             throw new DMEException("503","连接信息保存失败:" + e.getMessage());
         }
-
-        //return remap;
     }
 
     @Override
     public Map<String, Object> refreshDme() throws DMEException {
-        //Map<String, Object> remap = new HashMap<>(16);
-        //remap.put("code", 200);
-        //remap.put("message", "更新连接状态成功");
         try {
             //判断与服务器的连接
             ResponseEntity responseEntity = access(REFRES_STATE_URL, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() != RestUtils.RES_STATE_I_200) {
-                //remap.put("code", 503);
-                //remap.put("message", "更新连接状态失败:" + responseEntity.toString());
                 throw new DMEException("503","更新连接状态失败:" + responseEntity.toString());
             }
 
         } catch (Exception e) {
-            //remap.put("code", 503);
-            //remap.put("message", "更新连接状态失败:" + e.toString());
             throw new DMEException("503", "更新连接状态失败:" + e.toString());
         }
 
         Map<String, Object> params = new HashMap<>(16);
         params.put("hostIp", dmeHostIp);
         params.put("hostPort", dmeHostPort);
-        //remap.put("data", params);
 
         return params;
     }

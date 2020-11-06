@@ -108,19 +108,17 @@ public class DmeStorageController extends BaseController {
 
     }
 
-    @GetMapping("/volumes")
-    @ResponseBody
-    public ResponseBodyBean getVolumes(@RequestParam(name = "storageId", required = false, defaultValue = "") String storageId) {
-
-        try {
-            return success(dmeStorageService.getVolumes(storageId));
-        } catch (DMEException e) {
-            e.printStackTrace();
-            return failure(e.getMessage());
-        }
-
-
-    }
+//    @GetMapping("/volumes")
+//    @ResponseBody
+//    public ResponseBodyBean getVolumes(@RequestParam(name = "storageId", required = false, defaultValue = "") String storageId) {
+//
+//        try {
+//            return success(dmeStorageService.getVolumes(storageId));
+//        } catch (DMEException e) {
+//            e.printStackTrace();
+//            return failure(e.getMessage());
+//        }
+//    }
 
     @GetMapping("/volumes/byPage")
     @ResponseBody

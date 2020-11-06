@@ -47,7 +47,7 @@ public interface DmeStorageService {
      * @param storageId
      * @return
      */
-    List<Volume> getVolumes(String storageId) throws DMEException;
+    //List<Volume> getVolumes(String storageId) throws DMEException;
 
     /**
      * 分页获取卷列表
@@ -116,7 +116,7 @@ public interface DmeStorageService {
      * @param volumeId
      * @return
      */
-    Map<String, Object> getVolume(String volumeId);
+    Map<String, Object> getVolume(String volumeId) throws DMEException;
 
     /**
      * 获取存储端口列表
