@@ -34,8 +34,8 @@
       <button type="button" class="btn btn-primary" (click)="expandData()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
-  <div *ngIf="viewPage=='expand_vcenter'">
-    <div>
+  <clr-modal class="add-wizard-wrap" [clrModalOpen]="viewPage=='expand_vcenter'" [clrModalClosable]="false">
+    <div class="modal-body">
       <form  clrForm>
         <p *ngIf="errorMsg" style="color: red">{{'errorMsg.expandError' | translate}}</p>
         <div *ngIf="modalLoading" class="loadingDiv">
@@ -63,9 +63,9 @@
         </clr-input-container>
       </form>
     </div>
-    <div>
+    <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="closeModel()">{{'menu.cancel' | translate}}</button>
       <button type="button" class="btn btn-primary" (click)="expandData()">{{'menu.ok' | translate}}</button>
     </div>
-  </div>
+  </clr-modal>
 </div>

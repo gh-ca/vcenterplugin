@@ -61,7 +61,7 @@ export class NfsMountComponent implements OnInit{
       this.modalHandleLoading=false;
     }else{
       //入口是主机或者集群
-      if ('host'===this.routePath){
+      if ('host'===this.routePath || 'cluster'===this.routePath){
         this.viewPage='mount_host';
         const ctx = this.gs.getClientSdk().app.getContextObjects();
         if(ctx!=null){

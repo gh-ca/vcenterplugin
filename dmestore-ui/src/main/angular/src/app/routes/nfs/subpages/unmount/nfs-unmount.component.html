@@ -29,19 +29,19 @@
       <button type="button" class="btn btn-primary" (click)="unMount()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
-  <div *ngIf="viewPage=='unmount_vcenter'">
-    <div>
+  <clr-modal class="add-wizard-wrap" [clrModalOpen]="viewPage=='unmount_vcenter'" [clrModalSize]="'md'" [clrModalClosable]="false">
+    <div class="modal-body">
       <form clrForm>
         <p *ngIf="errorMsg" style="color: red">{{'errorMsg.unMountError' | translate}}</p>
         <div *ngIf="modalLoading" class="loadingDiv">
-      <span>
-        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
-      </span>
+    <span>
+      {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+    </span>
         </div>
         <div *ngIf="modalHandleLoading" class="loadingDiv">
-      <span>
-        {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
-      </span>
+    <span>
+      {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+    </span>
         </div>
         <clr-select-container>
           <label>{{'nfs.mountedHost' | translate}}</label>
@@ -52,24 +52,24 @@
         </clr-select-container>
       </form>
     </div>
-    <div style="float:right;">
+    <div style="float:right;" class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="closeModel()">{{'menu.cancel' | translate}}</button>
       <button type="button" class="btn btn-primary" (click)="unMount()">{{'menu.ok' | translate}}</button>
     </div>
-  </div>
-  <div *ngIf="viewPage=='unmount_host'">
-    <div>
+  </clr-modal>
+  <clr-modal class="add-wizard-wrap" [clrModalOpen]="viewPage=='unmount_host'" [clrModalSize]="'md'" [clrModalClosable]="false">
+    <div class="modal-body">
       <form clrForm>
         <p *ngIf="errorMsg" style="color: red">{{'errorMsg.unMountError' | translate}}</p>
         <div *ngIf="modalLoading" class="loadingDiv">
-      <span>
-        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
-      </span>
+    <span>
+      {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+    </span>
         </div>
         <div *ngIf="modalHandleLoading" class="loadingDiv">
-      <span>
-        {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
-      </span>
+    <span>
+      {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+    </span>
         </div>
         <clr-select-container>
           <label>{{'nfs.nfsStore' | translate}}</label>
@@ -80,11 +80,12 @@
         </clr-select-container>
       </form>
     </div>
-    <div style="float: right">
+    <div style="float: right" class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="closeModel()">{{'menu.cancel' | translate}}</button>
       <button type="button" class="btn btn-primary" (click)="unMount()">{{'menu.ok' | translate}}</button>
     </div>
-  </div>
+  </clr-modal>
+
   <!--卸载提示-->
   <clr-modal [(clrModalOpen)]="unmountTipsShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
     <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
