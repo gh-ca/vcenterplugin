@@ -1,6 +1,7 @@
 package com.dmeplugin.dmestore.utils;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
@@ -301,5 +302,28 @@ public class ToolUtils {
         }
         return object;
     }
+
+    public static String getRequsetParams(String paramName,String paramValue){
+        JsonObject condition = new JsonObject();
+        JsonArray constraint = new JsonArray();
+        JsonObject consObj = new JsonObject();
+        JsonObject simple = new JsonObject();
+        simple.addProperty("name", "dataStatus");
+        simple.addProperty("operator", "equal");
+        simple.addProperty("value", "normal");
+        consObj.add("simple", simple);
+        constraint.add(consObj);
+        JsonObject consObj1 = new JsonObject();
+        JsonObject simple1 = new JsonObject();
+        simple1.addProperty("name", paramName);
+        simple1.addProperty("operator", "equal");
+        simple1.addProperty("value", paramValue);
+        consObj1.add("simple", simple1);
+        consObj1.addProperty("logOp", "and");
+        constraint.add(consObj1);
+        condition.add("constraint", constraint);
+        return condition.toString();
+    }
+
 
 }
