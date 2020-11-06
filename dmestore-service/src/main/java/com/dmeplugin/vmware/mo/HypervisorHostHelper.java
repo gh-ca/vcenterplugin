@@ -118,7 +118,7 @@ public class HypervisorHostHelper {
         if (ocs != null && ocs.length > 0) {
             for (ObjectContent oc : ocs) {
                 String vmNameInvCenter = null;
-                String vmInternalCSName = null;
+                String vmInternalCsName = null;
                 List<DynamicProperty> objProps = oc.getPropSet();
                 if (objProps != null) {
                     for (DynamicProperty objProp : objProps) {
@@ -126,11 +126,11 @@ public class HypervisorHostHelper {
                             vmNameInvCenter = (String)objProp.getVal();
                         } else if (objProp.getName().contains(instanceNameCustomField)) {
                             if (objProp.getVal() != null) {
-                                vmInternalCSName = ((CustomFieldStringValue)objProp.getVal()).getValue();
+                                vmInternalCsName = ((CustomFieldStringValue)objProp.getVal()).getValue();
                             }
                         }
 
-                        if ((vmNameInvCenter != null && name.equalsIgnoreCase(vmNameInvCenter)) || (vmInternalCSName != null && name.equalsIgnoreCase(vmInternalCSName))) {
+                        if ((vmNameInvCenter != null && name.equalsIgnoreCase(vmNameInvCenter)) || (vmInternalCsName != null && name.equalsIgnoreCase(vmInternalCsName))) {
                             VirtualMachineMO vmMo = new VirtualMachineMO(context, oc.getObj());
                             return vmMo;
                         }
@@ -720,23 +720,23 @@ public class HypervisorHostHelper {
         return morNetwork;
     }
 
-    public static boolean createBlankVm(VmwareHypervisorHost host, String vmName, String vmInternalCSName, int cpuCount, int cpuSpeedMHz, int cpuReservedMHz,
-                                        boolean limitCpuUse, int memoryMB, int memoryReserveMB, String guestOsIdentifier, ManagedObjectReference morDs, boolean snapshotDirToParent,
+    public static boolean createBlankVm(VmwareHypervisorHost host, String vmName, String vmInternalCsName, int cpuCount, int cpuSpeedMhz, int cpuReservedMhz,
+                                        boolean limitCpuUse, int memoryMb, int memoryReserveMb, String guestOsIdentifier, ManagedObjectReference morDs, boolean snapshotDirToParent,
                                         Pair<String, String> controllerInfo, Boolean systemVm) throws Exception {
 
         if (s_logger.isInfoEnabled()) {
-            s_logger.info("Create blank VM. cpuCount: " + cpuCount + ", cpuSpeed(MHz): " + cpuSpeedMHz + ", mem(Mb): " + memoryMB);
+            s_logger.info("Create blank VM. cpuCount: " + cpuCount + ", cpuSpeed(MHz): " + cpuSpeedMhz + ", mem(Mb): " + memoryMb);
         }
 
         VirtualDeviceConfigSpec controllerSpec = null;
         // VM config basics
         VirtualMachineConfigSpec vmConfig = new VirtualMachineConfigSpec();
         vmConfig.setName(vmName);
-        if (vmInternalCSName == null) {
-            vmInternalCSName = vmName;
+        if (vmInternalCsName == null) {
+            vmInternalCsName = vmName;
         }
 
-        VmwareHelper.setBasicVmConfig(vmConfig, cpuCount, cpuSpeedMHz, cpuReservedMHz, memoryMB, memoryReserveMB, guestOsIdentifier, limitCpuUse);
+        VmwareHelper.setBasicVmConfig(vmConfig, cpuCount, cpuSpeedMhz, cpuReservedMhz, memoryMb, memoryReserveMb, guestOsIdentifier, limitCpuUse);
 
         String recommendedController = host.getRecommendedDiskController(guestOsIdentifier);
         String newRootDiskController = controllerInfo.first();
@@ -808,7 +808,7 @@ public class HypervisorHostHelper {
             VirtualMachineMO vmMo = host.findVmOnHyperHost(vmName);
             assert (vmMo != null);
 
-            vmMo.setCustomFieldValue(CustomFieldConstants.CLOUD_VM_INTERNAL_NAME, vmInternalCSName);
+            vmMo.setCustomFieldValue(CustomFieldConstants.CLOUD_VM_INTERNAL_NAME, vmInternalCsName);
 
             int ideControllerKey = -1;
             while (ideControllerKey < 0) {
@@ -817,7 +817,7 @@ public class HypervisorHostHelper {
                     break;
                 }
 
-                s_logger.info("Waiting for IDE controller be ready in VM: " + vmInternalCSName);
+                s_logger.info("Waiting for IDE controller be ready in VM: " + vmInternalCsName);
                 Thread.sleep(1000);
             }
 
@@ -832,14 +832,14 @@ public class HypervisorHostHelper {
      * - If the cluster hardware version is not set, check datacenter hardware version. If it is set, then it is set to vmConfig
      * - In case both cluster and datacenter hardware version are not set, hardware version is not set to vmConfig
      */
-    protected static void setVMHardwareVersion(VirtualMachineConfigSpec vmConfig, ClusterMO clusterMO, DatacenterMO datacenterMO) throws Exception {
-        ClusterConfigInfoEx clusterConfigInfo = clusterMO != null ? clusterMO.getClusterConfigInfo() : null;
+    protected static void setVMHardwareVersion(VirtualMachineConfigSpec vmConfig, ClusterMO clusterMo, DatacenterMO datacenterMo) throws Exception {
+        ClusterConfigInfoEx clusterConfigInfo = clusterMo != null ? clusterMo.getClusterConfigInfo() : null;
         String clusterHardwareVersion = clusterConfigInfo != null ? clusterConfigInfo.getDefaultHardwareVersionKey() : null;
         if (StringUtil.isNotBlank(clusterHardwareVersion)) {
             s_logger.debug("Cluster hardware version found: " + clusterHardwareVersion + ". Creating VM with this hardware version");
             vmConfig.setVersion(clusterHardwareVersion);
         } else {
-            DatacenterConfigInfo datacenterConfigInfo = datacenterMO != null ? datacenterMO.getDatacenterConfigInfo() : null;
+            DatacenterConfigInfo datacenterConfigInfo = datacenterMo != null ? datacenterMo.getDatacenterConfigInfo() : null;
             String datacenterHardwareVersion = datacenterConfigInfo != null ? datacenterConfigInfo.getDefaultHardwareVersionKey() : null;
             if (StringUtil.isNotBlank(datacenterHardwareVersion)) {
                 s_logger.debug("Datacenter hardware version found: " + datacenterHardwareVersion + ". Creating VM with this hardware version");
@@ -885,7 +885,7 @@ public class HypervisorHostHelper {
             hyperHost = new ClusterMO(hyperHost.getContext(), morCluster);
         }
 
-        VirtualMachineMO workingVM = null;
+        VirtualMachineMO workingVm = null;
         VirtualMachineConfigSpec vmConfig = new VirtualMachineConfigSpec();
         vmConfig.setName(vmName);
         vmConfig.setMemoryMB((long)4);
@@ -906,8 +906,8 @@ public class HypervisorHostHelper {
         vmConfig.getDeviceChange().add(scsiControllerSpec);
         if (hyperHost.createVm(vmConfig)) {
             // Ugly work-around, it takes time for newly created VM to appear
-            for (int i = 0; i < 10 && workingVM == null; i++) {
-                workingVM = hyperHost.findVmOnHyperHost(vmName);
+            for (int i = 0; i < 10 && workingVm == null; i++) {
+                workingVm = hyperHost.findVmOnHyperHost(vmName);
 
                 try {
                     Thread.sleep(1000);
@@ -917,12 +917,12 @@ public class HypervisorHostHelper {
             }
         }
 
-        if (workingVM != null) {
-            workingVM.setCustomFieldValue(CustomFieldConstants.CLOUD_WORKER, "true");
+        if (workingVm != null) {
+            workingVm.setCustomFieldValue(CustomFieldConstants.CLOUD_WORKER, "true");
             String workerTag = String.format("%d-%s", System.currentTimeMillis(), hyperHost.getContext().getStockObject("noderuninfo"));
-            workingVM.setCustomFieldValue(CustomFieldConstants.CLOUD_WORKER_TAG, workerTag);
+            workingVm.setCustomFieldValue(CustomFieldConstants.CLOUD_WORKER_TAG, workerTag);
         }
-        return workingVM;
+        return workingVm;
     }
 
 

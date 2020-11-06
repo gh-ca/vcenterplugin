@@ -22,13 +22,13 @@ public class NetworkDetails {
 
     private String name;
     private ManagedObjectReference morNetwork;
-    private ManagedObjectReference[] morVMsOnNetwork;
+    private ManagedObjectReference[] morVmsOnNetwork;
     private String gcTag;
 
-    public NetworkDetails(String name, ManagedObjectReference morNetwork, ManagedObjectReference[] morVMsOnNetwork, String gcTag) {
+    public NetworkDetails(String name, ManagedObjectReference morNetwork, ManagedObjectReference[] morVmsOnNetwork, String gcTag) {
         this.name = name;
         this.morNetwork = morNetwork;
-        this.morVMsOnNetwork = morVMsOnNetwork;
+        this.morVmsOnNetwork = morVmsOnNetwork;
         this.gcTag = gcTag;
     }
 
@@ -40,11 +40,11 @@ public class NetworkDetails {
         return morNetwork;
     }
 
-    public ManagedObjectReference[] getVMMorsOnNetwork() {
-        return morVMsOnNetwork;
+    public ManagedObjectReference[] getVmMorsOnNetwork() {
+        return morVmsOnNetwork;
     }
 
-    public String getGCTag() {
+    public String getGcTag() {
         return gcTag;
     }
 }
