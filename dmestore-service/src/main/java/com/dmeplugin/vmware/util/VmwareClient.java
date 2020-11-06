@@ -17,7 +17,6 @@
 package com.dmeplugin.vmware.util;
 
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.*;
 
 import javax.net.ssl.HostnameVerifier;
@@ -112,7 +111,7 @@ public class VmwareClient {
         javax.net.ssl.TrustManager[] trustAllCerts = new javax.net.ssl.TrustManager[1];
         javax.net.ssl.TrustManager tm = new TrustAllTrustManager();
         trustAllCerts[0] = tm;
-        javax.net.ssl.SSLContext sc = SSLUtils.getSSLContext();
+        javax.net.ssl.SSLContext sc = SSLUtils.getSslContext();
         javax.net.ssl.SSLSessionContext sslsc = sc.getServerSessionContext();
         sslsc.setSessionTimeout(0);
         sc.init(null, trustAllCerts, null);
