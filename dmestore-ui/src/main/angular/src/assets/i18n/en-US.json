@@ -22,7 +22,10 @@
     "refresh": "Refresh",
     "synSPolicy": "Synchronize VM Storage Policies",
     "tip": "Tip",
-    "back":"Back"
+    "back":"Back",
+    "performance": "Performance",
+    "conventional": "Conventional",
+    "capacity": "Capacity"
   },
   "validations": {
     "required": "This field is required!",

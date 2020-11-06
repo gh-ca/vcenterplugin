@@ -22,19 +22,19 @@
           <div class="gh-btngroup-left"></div>
           <!-- 基本视图、性能视图、刷新 -->
           <div class="btn-group btn-icon">
-            <div class="radio btn">
+            <div class="radio btn" title="{{'menu.conventional' | translate}}">
               <input (click)="radioCheck = 'table1'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-1" checked>
               <label for="btn-demo-radio-1"><clr-icon shape="list" size="20"></clr-icon></label>
             </div>
-            <div class="radio btn">
+            <div class="radio btn" title="{{'menu.capacity' | translate}}">
               <input (click)="radioCheck = 'table2'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-2">
               <label for="btn-demo-radio-2"><clr-icon shape="dashboard" size="20"></clr-icon></label>
             </div>
-            <div class="radio btn">
+            <div class="radio btn" title="{{'menu.performance' | translate}}">
               <input (click)="radioCheck = 'table3'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3">
               <label for="btn-demo-radio-3"><clr-icon shape="radar" size="15"></clr-icon></label>
             </div>
-            <div class="radio btn merginLeft">
+            <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
               <label><clr-icon shape="refresh" size="20" (click)="refresh()"></clr-icon></label>
             </div>
           </div>

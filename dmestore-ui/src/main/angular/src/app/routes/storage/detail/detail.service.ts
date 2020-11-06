@@ -26,6 +26,9 @@ export class DetailService {
   getVolumeListList(storageId: string){
     return this.http.get('dmestorage/volumes', {params: {storageId}});
   }
+  getVolumeListListByPage(params:any){
+    return this.http.get('dmestorage/volumes/byPage?storageId='+params.storageId+'&pageSize='+params.pageSize+'&pageNo='+params.pageNo);
+  }
   getFileSystemList(storageId: string){
     return this.http.get('dmestorage/filesystems', {params: {storageId}});
   }
