@@ -10,7 +10,7 @@
       <!--扩容-->
       <button class="btn btn-primary" (click)="expandBtnFunc();" [disabled]="rowSelected.length !== 1">{{'menu.expand' | translate}}</button>
       <!-- 更多操作 -->
-      <clr-dropdown [clrCloseMenuOnItemClick]="false">
+      <clr-dropdown [clrCloseMenuOnItemClick]="true">
         <button clrDropdownTrigger class="btn btn-primary" aria-label="Dropdown demo button">
           {{'menu.more' | translate}}
           <clr-icon shape="caret down"></clr-icon>

@@ -5,7 +5,7 @@
       <button class="btn btn-primary" (click)="addView()">{{'menu.add' | translate}}</button>
       <button class="btn btn-primary" [disabled]="rowSelected.length !== 1" (click)="modifyData()">{{'menu.modify' | translate}}</button>
       <button class="btn btn-primary" [disabled]="rowSelected.length !== 1" (click)="expandView()">{{'menu.expand' | translate}}</button>
-      <clr-dropdown [clrCloseMenuOnItemClick]="false">
+      <clr-dropdown [clrCloseMenuOnItemClick]="true">
         <button clrDropdownTrigger class="btn btn-primary" aria-label="Dropdown demo button">
           {{'menu.more' | translate}}
           <clr-icon shape="caret down"></clr-icon>
