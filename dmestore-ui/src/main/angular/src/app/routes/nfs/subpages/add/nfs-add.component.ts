@@ -64,7 +64,6 @@ export class NfsAddComponent implements OnInit{
       //入口来至Vcenter
       this.viewPage='add_vcenter'
     }
-
     this.storageService.getData().subscribe((s: any) => {
       this.modalLoading=false;
       if (s.code === '200'){
