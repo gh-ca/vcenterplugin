@@ -27,7 +27,7 @@
           <!--</clr-radio-wrapper>-->
         <!--</clr-radio-container>-->
         <!--主机-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.mountHost' | translate}}</label>
           <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="mountForm.hostObjectId"
                   required name="hostObjectId" class="clr-select" (change)="checkHost()">
@@ -35,14 +35,14 @@
           </select>
         </clr-select-container>
         <!--虚拟网卡IP-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.vkernel' | translate}}</label>
           <select clrSelect (ngModelOptions)="vmkernelList" required [(ngModel)]="mountForm.hostVkernelIp" name="hostVkernelIp"
                   class="clr-select">
             <option *ngFor="let item of vmkernelList" value="{{item.ipAddress}}">{{item.ipAddress}}</option>
           </select>
         </clr-select-container>
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.mount.mountType' | translate}}</label>
           <select clrSelect [(ngModel)]="mountForm.mountType" name="mountType">
             <option value="readOnly">{{'nfs.mount.readOnly' | translate}}</option>
@@ -82,7 +82,7 @@
       </span>
         </div>
         <!--主机-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.mountHost' | translate}}</label>
           <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="mountForm.hostObjectId"
                   required name="hostObjectId" class="clr-select" (change)="checkHost()">
@@ -90,14 +90,14 @@
           </select>
         </clr-select-container>
         <!--虚拟网卡IP-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.vkernel' | translate}}</label>
           <select clrSelect (ngModelOptions)="vmkernelList" required [(ngModel)]="mountForm.hostVkernelIp" name="hostVkernelIp"
                   class="clr-select">
             <option *ngFor="let item of vmkernelList" value="{{item.ipAddress}}">{{item.ipAddress}}</option>
           </select>
         </clr-select-container>
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.mount.mountType' | translate}}</label>
           <select clrSelect [(ngModel)]="mountForm.mountType" name="mountType">
             <option value="readOnly">{{'nfs.mount.readOnly' | translate}}</option>
@@ -127,7 +127,7 @@
       </span>
         </div>
         <!--虚拟网卡IP-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.vkernel' | translate}}</label>
           <select clrSelect (ngModelOptions)="vmkernelList" required [(ngModel)]="mountForm.hostVkernelIp" name="hostVkernelIp"
                   class="clr-select">
@@ -135,14 +135,14 @@
           </select>
         </clr-select-container>
         <!--data store-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.nfsStore' | translate}}</label>
           <select clrSelect (ngModelOptions)="dataStoreList" required [(ngModel)]="mountForm.dataStoreObjectId" name="dataStoreObjectId"
                   class="clr-select">
             <option *ngFor="let item of dataStoreList" value="{{item.objectId}}">{{item.name}}</option>
           </select>
         </clr-select-container>
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.mount.mountType' | translate}}</label>
           <select clrSelect [(ngModel)]="mountForm.mountType" name="mountType">
             <option value="readOnly">{{'nfs.mount.readOnly' | translate}}</option>
