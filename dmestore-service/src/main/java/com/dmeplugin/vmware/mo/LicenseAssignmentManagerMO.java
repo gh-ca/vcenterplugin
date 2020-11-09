@@ -44,7 +44,7 @@ public class LicenseAssignmentManagerMO extends BaseMO {
     }
 
     public LicenseAssignmentManagerLicenseAssignment getAssignedLicenseToHost(ManagedObjectReference hostMor) throws Exception {
-        List<LicenseAssignmentManagerLicenseAssignment> licenses = _context.getVimClient().getService().queryAssignedLicenses(_mor, hostMor.getValue());
+        List<LicenseAssignmentManagerLicenseAssignment> licenses = context.getVimClient().getService().queryAssignedLicenses(mor, hostMor.getValue());
         return licenses.get(0);
     }
 

@@ -56,31 +56,31 @@ public class DatacenterMO extends BaseMO {
     public DatacenterMO(VmwareContext context, String dcName) throws Exception {
         super(context, null);
 
-        _mor = _context.getVimClient().getDecendentMoRef(_context.getRootFolder(), "Datacenter", dcName);
-        if (_mor == null) {
+        mor = this.context.getVimClient().getDecendentMoRef(this.context.getRootFolder(), "Datacenter", dcName);
+        if (mor == null) {
             s_logger.error("Unable to locate DC " + dcName);
         }
     }
 
     @Override
     public String getName() throws Exception {
-        return (String)_context.getVimClient().getDynamicProperty(_mor, "name");
+        return (String) context.getVimClient().getDynamicProperty(mor, "name");
     }
 
     public void registerTemplate(ManagedObjectReference morHost, String datastoreName, String templateName, String templateFileName) throws Exception {
 
-        ManagedObjectReference morFolder = (ManagedObjectReference)_context.getVimClient().getDynamicProperty(_mor, "vmFolder");
+        ManagedObjectReference morFolder = (ManagedObjectReference) context.getVimClient().getDynamicProperty(mor, "vmFolder");
         assert (morFolder != null);
 
         ManagedObjectReference morTask =
-            _context.getService()
+            context.getService()
                 .registerVMTask(morFolder, String.format("[%s] %s/%s", datastoreName, templateName, templateFileName), templateName, true, null, morHost);
 
-        boolean result = _context.getVimClient().waitForTask(morTask);
+        boolean result = context.getVimClient().waitForTask(morTask);
         if (!result) {
-            throw new Exception("Unable to register template due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+            throw new Exception("Unable to register template due to " + TaskMO.getTaskFailureInfo(context, morTask));
         } else {
-            _context.waitForTaskProgressDone(morTask);
+            context.waitForTaskProgressDone(morTask);
         }
     }
 
@@ -91,11 +91,11 @@ public class DatacenterMO extends BaseMO {
         }
         String instanceNameCustomField = "value[" + key + "]";
         List<ObjectContent> ocs = getVmPropertiesOnDatacenterVmFolder(new String[] {"name", instanceNameCustomField});
-        return HypervisorHostHelper.findVmFromObjectContent(_context, ocs.toArray(new ObjectContent[0]), vmName, instanceNameCustomField);
+        return HypervisorHostHelper.findVmFromObjectContent(context, ocs.toArray(new ObjectContent[0]), vmName, instanceNameCustomField);
     }
 
     public List<VirtualMachineMO> findVmByNameAndLabel(String vmLabel) throws Exception {
-        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(_context, _context.getServiceContent().getCustomFieldsManager());
+        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context, context.getServiceContent().getCustomFieldsManager());
         int key = cfmMo.getCustomFieldKey("VirtualMachine", CustomFieldConstants.CLOUD_UUID);
         assert (key != 0);
 
@@ -110,13 +110,13 @@ public class DatacenterMO extends BaseMO {
                         if (prop.getVal() != null) {
                             if ("name".equalsIgnoreCase(prop.getName())) {
                                 if (prop.getVal().toString().equals(vmLabel)) {
-                                    list.add(new VirtualMachineMO(_context, oc.getObj()));
+                                    list.add(new VirtualMachineMO(context, oc.getObj()));
                                     break;        // break out inner loop
                                 }
                             } else if (prop.getVal() instanceof CustomFieldStringValue) {
                                 String val = ((CustomFieldStringValue)prop.getVal()).getValue();
                                 if (val.equals(vmLabel)) {
-                                    list.add(new VirtualMachineMO(_context, oc.getObj()));
+                                    list.add(new VirtualMachineMO(context, oc.getObj()));
                                     break;        // break out inner loop
                                 }
                             }
@@ -151,7 +151,7 @@ public class DatacenterMO extends BaseMO {
                     }
                     if (vmNameOnVcenter.equals(vmVcenterName)) {
                         if (vmInternalCsName != null && !vmInternalCsName.isEmpty() && !vmNameInCs.equals(vmInternalCsName)) {
-                            return (new VirtualMachineMO(_context, oc.getObj()));
+                            return (new VirtualMachineMO(context, oc.getObj()));
                         }
                     }
                 }
@@ -222,7 +222,7 @@ public class DatacenterMO extends BaseMO {
     }
 
     public ManagedObjectReference getVmFolder() throws Exception {
-        return (ManagedObjectReference)_context.getVimClient().getDynamicProperty(_mor, "vmFolder");
+        return (ManagedObjectReference) context.getVimClient().getDynamicProperty(mor, "vmFolder");
     }
 
     public List<ObjectContent> getHostPropertiesOnDatacenterHostFolder(String[] propertyPaths) throws Exception {
@@ -252,7 +252,7 @@ public class DatacenterMO extends BaseMO {
         dc2HostFolderTraversal.getSelectSet().add(folder2childEntity);
 
         ObjectSpec oSpec = new ObjectSpec();
-        oSpec.setObj(_mor);
+        oSpec.setObj(mor);
         oSpec.setSkip(Boolean.TRUE);
         oSpec.getSelectSet().add(dc2HostFolderTraversal);
 
@@ -262,7 +262,7 @@ public class DatacenterMO extends BaseMO {
         List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
         pfSpecArr.add(pfSpec);
 
-        return _context.getService().retrieveProperties(_context.getPropertyCollector(), pfSpecArr);
+        return context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
 
     }
 
@@ -278,7 +278,7 @@ public class DatacenterMO extends BaseMO {
         dc2DatastoreTraversal.setName("dc2DatastoreTraversal");
 
         ObjectSpec oSpec = new ObjectSpec();
-        oSpec.setObj(_mor);
+        oSpec.setObj(mor);
         oSpec.setSkip(Boolean.TRUE);
         oSpec.getSelectSet().add(dc2DatastoreTraversal);
 
@@ -288,7 +288,7 @@ public class DatacenterMO extends BaseMO {
         List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
         pfSpecArr.add(pfSpec);
 
-        return _context.getService().retrieveProperties(_context.getPropertyCollector(), pfSpecArr);
+        return context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
 
     }
 
@@ -313,7 +313,7 @@ public class DatacenterMO extends BaseMO {
         dc2VmFolderTraversal.getSelectSet().add(folder2childEntity);
 
         ObjectSpec oSpec = new ObjectSpec();
-        oSpec.setObj(_mor);
+        oSpec.setObj(mor);
         oSpec.setSkip(Boolean.TRUE);
         oSpec.getSelectSet().add(dc2VmFolderTraversal);
 
@@ -323,7 +323,7 @@ public class DatacenterMO extends BaseMO {
         List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
         pfSpecArr.add(pfSpec);
 
-        return _context.getService().retrieveProperties(_context.getPropertyCollector(), pfSpecArr);
+        return context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
     }
 
     public static Pair<DatacenterMO, String> getOwnerDatacenter(VmwareContext context, ManagedObjectReference morEntity) throws Exception {
@@ -373,7 +373,7 @@ public class DatacenterMO extends BaseMO {
         datacenter2DvPortGroupTraversal.setName("datacenter2DvPortgroupTraversal");
 
         ObjectSpec oSpec = new ObjectSpec();
-        oSpec.setObj(_mor);
+        oSpec.setObj(mor);
         oSpec.setSkip(Boolean.TRUE);
         oSpec.getSelectSet().add(datacenter2DvPortGroupTraversal);
 
@@ -383,7 +383,7 @@ public class DatacenterMO extends BaseMO {
         List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
         pfSpecArr.add(pfSpec);
 
-        List<ObjectContent> ocs = _context.getService().retrieveProperties(_context.getPropertyCollector(), pfSpecArr);
+        List<ObjectContent> ocs = context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
 
         if (ocs != null) {
             for (ObjectContent oc : ocs) {
@@ -419,7 +419,7 @@ public class DatacenterMO extends BaseMO {
         datacenter2DvPortGroupTraversal.setName("datacenter2DvPortgroupTraversal");
 
         ObjectSpec oSpec = new ObjectSpec();
-        oSpec.setObj(_mor);
+        oSpec.setObj(mor);
         oSpec.setSkip(Boolean.TRUE);
         oSpec.getSelectSet().add(datacenter2DvPortGroupTraversal);
 
@@ -429,7 +429,7 @@ public class DatacenterMO extends BaseMO {
         List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
         pfSpecArr.add(pfSpec);
 
-        List<ObjectContent> ocs = _context.getService().retrieveProperties(_context.getPropertyCollector(), pfSpecArr);
+        List<ObjectContent> ocs = context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
 
         if (ocs != null) {
             for (ObjectContent oc : ocs) {
@@ -466,7 +466,7 @@ public class DatacenterMO extends BaseMO {
         datacenter2DvPortGroupTraversal.setName("datacenter2DvPortgroupTraversal");
 
         ObjectSpec oSpec = new ObjectSpec();
-        oSpec.setObj(_mor);
+        oSpec.setObj(mor);
         oSpec.setSkip(Boolean.TRUE);
         oSpec.getSelectSet().add(datacenter2DvPortGroupTraversal);
 
@@ -476,7 +476,7 @@ public class DatacenterMO extends BaseMO {
         List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
         pfSpecArr.add(pfSpec);
 
-        List<ObjectContent> ocs = _context.getService().retrieveProperties(_context.getPropertyCollector(), pfSpecArr);
+        List<ObjectContent> ocs = context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
 
         if (ocs != null) {
             for (ObjectContent oc : ocs) {
@@ -501,7 +501,7 @@ public class DatacenterMO extends BaseMO {
 
     public String getDvSwitchUuid(ManagedObjectReference dvSwitchMor) throws Exception {
         assert (dvSwitchMor != null);
-        return (String)_context.getVimClient().getDynamicProperty(dvSwitchMor, "uuid");
+        return (String) context.getVimClient().getDynamicProperty(dvSwitchMor, "uuid");
     }
 
     public VirtualEthernetCardDistributedVirtualPortBackingInfo getDvPortBackingInfo(Pair<ManagedObjectReference, String> networkInfo) throws Exception {
@@ -521,18 +521,18 @@ public class DatacenterMO extends BaseMO {
     public ManagedObjectReference getDvSwitchMor(String dvSwitchName) throws Exception {
         ManagedObjectReference dvSwitchMor = null;
         ManagedObjectReference networkFolderMor = null;
-        networkFolderMor = _context.getVimClient().getMoRefProp(_mor, "networkFolder");
-        dvSwitchMor = _context.getVimClient().getDecendentMoRef(networkFolderMor, "VmwareDistributedVirtualSwitch", dvSwitchName);
+        networkFolderMor = context.getVimClient().getMoRefProp(mor, "networkFolder");
+        dvSwitchMor = context.getVimClient().getDecendentMoRef(networkFolderMor, "VmwareDistributedVirtualSwitch", dvSwitchName);
         return dvSwitchMor;
     }
 
     public boolean ensureCustomFieldDef(String fieldName) throws Exception {
-        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(_context, _context.getServiceContent().getCustomFieldsManager());
+        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context, context.getServiceContent().getCustomFieldsManager());
         return cfmMo.ensureCustomFieldDef("Datacenter", fieldName) > 0;
     }
 
     public DatacenterConfigInfo getDatacenterConfigInfo() throws Exception {
-        DatacenterConfigInfo configInfo = (DatacenterConfigInfo)_context.getVimClient().getDynamicProperty(_mor, "configuration");
+        DatacenterConfigInfo configInfo = (DatacenterConfigInfo) context.getVimClient().getDynamicProperty(mor, "configuration");
         return configInfo;
     }
 }

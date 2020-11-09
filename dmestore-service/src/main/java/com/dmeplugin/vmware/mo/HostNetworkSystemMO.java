@@ -23,8 +23,6 @@ import com.vmware.vim25.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
 
 public class HostNetworkSystemMO extends BaseMO {
     @SuppressWarnings("unused")
@@ -39,39 +37,39 @@ public class HostNetworkSystemMO extends BaseMO {
     }
 
     public HostNetworkConfig getNetworkConfig() throws Exception {
-        return (HostNetworkConfig)_context.getVimClient().getDynamicProperty(_mor, "networkConfig");
+        return (HostNetworkConfig) context.getVimClient().getDynamicProperty(mor, "networkConfig");
     }
 
 
     public void addPortGroup(HostPortGroupSpec spec) throws Exception {
-        _context.getService().addPortGroup(_mor, spec);
+        context.getService().addPortGroup(mor, spec);
     }
 
     public void updatePortGroup(String portGroupName, HostPortGroupSpec spec) throws Exception {
-        _context.getService().updatePortGroup(_mor, portGroupName, spec);
+        context.getService().updatePortGroup(mor, portGroupName, spec);
     }
 
     public void removePortGroup(String portGroupName) throws Exception {
-        _context.getService().removePortGroup(_mor, portGroupName);
+        context.getService().removePortGroup(mor, portGroupName);
     }
 
     public void addVirtualSwitch(String vSwitchName, HostVirtualSwitchSpec spec) throws Exception {
-        _context.getService().addVirtualSwitch(_mor, vSwitchName, spec);
+        context.getService().addVirtualSwitch(mor, vSwitchName, spec);
     }
 
     public void updateVirtualSwitch(String vSwitchName, HostVirtualSwitchSpec spec) throws Exception {
-        _context.getService().updateVirtualSwitch(_mor, vSwitchName, spec);
+        context.getService().updateVirtualSwitch(mor, vSwitchName, spec);
     }
 
     public void removeVirtualSwitch(String vSwitchName) throws Exception {
-        _context.getService().removeVirtualSwitch(_mor, vSwitchName);
+        context.getService().removeVirtualSwitch(mor, vSwitchName);
     }
 
     public void refresh() throws Exception {
-        _context.getService().refreshNetworkSystem(_mor);
+        context.getService().refreshNetworkSystem(mor);
     }
 
     public HostNetworkConfigResult updateNetworkConfig(HostNetworkConfig config, String changeMode) throws Exception {
-        return _context.getService().updateNetworkConfig(_mor, config, changeMode);
+        return context.getService().updateNetworkConfig(mor, config, changeMode);
     }
 }

@@ -134,7 +134,7 @@ public class VmwareHelper {
     public static VirtualDevice prepareNicOpaque(VirtualMachineMO vmMo, VirtualEthernetCardType deviceType, String portGroupName,
                                                  String macAddress, int contextNumber, boolean connected, boolean connectOnStart) throws Exception {
 
-        assert(vmMo.getRunningHost().hasOpaqueNSXNetwork());
+        assert(vmMo.getRunningHost().hasOpaqueNsxNetwork());
 
         VirtualEthernetCard nic = createVirtualEthernetCard(deviceType);
 
@@ -219,7 +219,7 @@ public class VmwareHelper {
         backingInfo.setFileName(vmdkDatastorePath);
         disk.setBacking(backingInfo);
 
-        int ideControllerKey = vmMo.getIDEDeviceControllerKey();
+        int ideControllerKey = vmMo.getIdeDeviceControllerKey();
         if (controllerKey < 0) {
             controllerKey = ideControllerKey;
         }
@@ -290,7 +290,7 @@ public class VmwareHelper {
             throw new Exception("Unsupported disk backing: " + parentBacking.getClass().getCanonicalName());
         }
 
-        int ideControllerKey = vmMo.getIDEDeviceControllerKey();
+        int ideControllerKey = vmMo.getIdeDeviceControllerKey();
         if (controllerKey < 0) {
             controllerKey = ideControllerKey;
         }
@@ -329,7 +329,7 @@ public class VmwareHelper {
             backingInfo.setDiskMode(VirtualDiskMode.PERSISTENT.value());
             disk.setBacking(backingInfo);
 
-            int ideControllerKey = vmMo.getIDEDeviceControllerKey();
+            int ideControllerKey = vmMo.getIdeDeviceControllerKey();
             if (controllerKey < 0) {
                 controllerKey = ideControllerKey;
             }
@@ -384,7 +384,7 @@ public class VmwareHelper {
 
         disk.setBacking(backingInfo);
 
-        int ideControllerKey = vmMo.getIDEDeviceControllerKey();
+        int ideControllerKey = vmMo.getIdeDeviceControllerKey();
         if (controllerKey < 0) {
             controllerKey = ideControllerKey;
         }
@@ -450,10 +450,10 @@ public class VmwareHelper {
             newCdRom = true;
             cdRom = new VirtualCdrom();
 
-            assert (vmMo.getIDEDeviceControllerKey() >= 0);
-            cdRom.setControllerKey(vmMo.getIDEDeviceControllerKey());
+            assert (vmMo.getIdeDeviceControllerKey() >= 0);
+            cdRom.setControllerKey(vmMo.getIdeDeviceControllerKey());
             if (deviceNumber < 0) {
-                deviceNumber = vmMo.getNextIDEDeviceNumber();
+                deviceNumber = vmMo.getNextIdeDeviceNumber();
             }
 
             cdRom.setUnitNumber(deviceNumber);

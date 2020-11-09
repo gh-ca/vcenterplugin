@@ -40,7 +40,7 @@ public class LicenseManagerMO extends BaseMO {
 
     public ManagedObjectReference getLicenseAssignmentManager() throws Exception {
         if (licenseAssignmentManager == null) {
-            licenseAssignmentManager = (ManagedObjectReference)_context.getVimClient().getDynamicProperty(_mor, "licenseAssignmentManager");
+            licenseAssignmentManager = (ManagedObjectReference) context.getVimClient().getDynamicProperty(mor, "licenseAssignmentManager");
         }
         return licenseAssignmentManager;
     }
