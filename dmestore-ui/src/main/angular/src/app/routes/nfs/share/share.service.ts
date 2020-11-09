@@ -10,26 +10,26 @@ export class ShareService {
   }
 }
 export class ShareDetail{
-  fs_name: string;
+  fsName: string;
   name: string;
-  share_path: string;
+  sharePath: string;
   description: string;
-  owning_dtree_id: string;
-  owning_dtree_name: string;
-  device_name: string;
-  auth_client_list: AuthClient[];
+  owningDtreeId: string;
+  owningDtreeName: string;
+  deviceName: string;
+  authClientList: AuthClient[];
 }
 export class AuthClient{
    accessval: string;
-   all_squash: string;
+   allSquash: string;
    id: string;
    name: string;
-   parent_id: string;
-   root_squash: string;
+   parentId: string;
+   rootSquash: string;
    secure: string;
    sync: string;
    type: string;
-   vstore_id_in_storage: string;
-   vstore_name: string;
+   vstoreIdInStorage: string;
+   vstoreName: string;
 }
 
