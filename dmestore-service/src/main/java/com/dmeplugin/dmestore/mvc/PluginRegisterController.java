@@ -27,7 +27,7 @@ public class PluginRegisterController extends BaseController {
     @RequestMapping(value = "/pluginaction", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean pluginaction(HttpServletRequest request,
-                                         @RequestParam String vcenterIP,
+                                         @RequestParam(name = "vcenterIP") String vcenterIp,
                                          @RequestParam String vcenterPort,
                                          @RequestParam String vcenterUsername, @RequestParam String vcenterPassword,
                                          @RequestParam(required = false) String action,
@@ -42,7 +42,7 @@ public class PluginRegisterController extends BaseController {
         synchronized (lock) {
             try {
                 if (ACTION_INSTALL.equals(action)) {
-                    pluginRegisterService.installService(vcenterIP, vcenterPort, vcenterUsername, vcenterPassword, dmeIp, dmePort, dmeUsername, dmePassword);
+                    pluginRegisterService.installService(vcenterIp, vcenterPort, vcenterUsername, vcenterPassword, dmeIp, dmePort, dmeUsername, dmePassword);
 
                 }
                 if (ACTION_UNINSTALL.equals(action)) {

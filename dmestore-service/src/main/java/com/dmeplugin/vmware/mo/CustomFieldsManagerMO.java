@@ -36,23 +36,23 @@ public class CustomFieldsManagerMO extends BaseMO {
     }
 
     public CustomFieldDef addCustomerFieldDef(String fieldName, String morType, PrivilegePolicyDef fieldDefPolicy, PrivilegePolicyDef fieldPolicy) throws Exception {
-        return _context.getService().addCustomFieldDef(getMor(), fieldName, morType, fieldDefPolicy, fieldPolicy);
+        return context.getService().addCustomFieldDef(getMor(), fieldName, morType, fieldDefPolicy, fieldPolicy);
     }
 
     public void removeCustomFieldDef(int key) throws Exception {
-        _context.getService().removeCustomFieldDef(getMor(), key);
+        context.getService().removeCustomFieldDef(getMor(), key);
     }
 
     public void renameCustomFieldDef(int key, String name) throws Exception {
-        _context.getService().renameCustomFieldDef(getMor(), key, name);
+        context.getService().renameCustomFieldDef(getMor(), key, name);
     }
 
     public void setField(ManagedObjectReference morEntity, int key, String value) throws Exception {
-        _context.getService().setField(getMor(), morEntity, key, value);
+        context.getService().setField(getMor(), morEntity, key, value);
     }
 
     public List<CustomFieldDef> getFields() throws Exception {
-        return _context.getVimClient().getDynamicProperty(getMor(), "field");
+        return context.getVimClient().getDynamicProperty(getMor(), "field");
     }
 
     @Override

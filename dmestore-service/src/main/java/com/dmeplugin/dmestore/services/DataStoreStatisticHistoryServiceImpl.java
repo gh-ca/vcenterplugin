@@ -80,7 +80,8 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicatorIds = initVolumeIndicator(true);
             params.put("indicator_ids", indicatorIds);
         }
-        String objTypeId = "1125921381679104";//SYS_Lun
+        //SYS_Lun
+        String objTypeId = "1125921381679104";
         params.put("obj_type_id", objTypeId);
         return queryHistoryStatistic("queryVmfsStatisticCurrent", params, idInstancdIdMap);
     }
@@ -97,40 +98,36 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             indicatorIds = initFsIndicator(true);
             params.put("indicator_ids", indicatorIds);
         }
-        String objTypeId = "1126179079716864";//SYS_StorageFileSystem
+        //SYS_StorageFileSystem
+        String objTypeId = "1126179079716864";
         params.put("obj_type_id", objTypeId);
         return queryHistoryStatistic("queryNfsStatisticCurrent", params, null);
     }
 
-    //查询卷的性能
     @Override
     public Map<String, Object> queryVolumeStatistic(Map<String, Object> params) throws DMEException {
         Map<String, String> idInstancdIdMap = initParamVolume(params, false);
         return queryHistoryStatistic("volume", params, idInstancdIdMap);
     }
 
-    //查询Controller的性能(SYS_Controller)
     @Override
     public Map<String, Object> queryControllerStatistic(Map<String, Object> params) throws DMEException {
         Map<String, String> idInstancdIdMap = initParamController(params, false);
         return queryHistoryStatistic("controller", params, idInstancdIdMap);
     }
 
-    //查询StoragePort的性能(SYS_StoragePort)
     @Override
     public Map<String, Object> queryStoragePortStatistic(Map<String, Object> params) throws DMEException {
         Map<String, String> idInstancdIdMap = initParamStoragePort(params, false);
         return queryHistoryStatistic("storagePort", params, idInstancdIdMap);
     }
 
-    //查询StorageDisk的性能(SYS_StorageDisk)
     @Override
     public Map<String, Object> queryStorageDiskStatistic(Map<String, Object> params) throws DMEException {
         Map<String, String> idInstancdIdMap = initParamStorageDisk(params, false);
         return queryHistoryStatistic("storageDisk", params, idInstancdIdMap);
     }
 
-    //查询FS的性能(NFS)
     @Override
     public Map<String, Object> queryFsStatistic(Map<String, Object> params) throws DMEException {
         Map<String, String> idInstancdIdMap = initParamFs(params, false);
@@ -596,16 +593,16 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                         }
                         Map<String, Object> objectMap = convertMap(statisticElement);
                         resultmap.putAll(objectMap);
-                        if (null == objectMap || objectMap.size() == 0) {
+                        if (objectMap.size() == 0) {
                             log.error("query " + relationOrInstance + "Statistic error:", bodyJson.get("error_msg").getAsString());
-                            throw new DMEException("503", "query " + relationOrInstance + "Statistic error:" + bodyJson.get("error_msg").getAsString());
                         }
+                    }else{
                         log.error("query " + relationOrInstance + " statistic error,the params is:{}", gson.toJson(params));
-                        throw new DMEException("503", "query " + relationOrInstance + " statistic error,the params is:{}" + gson.toJson(params));
+                        throw new DMEException("503", responseEntity.getBody().toString());
                     }
                 } catch (Exception e) {
                     log.error("query " + relationOrInstance + " statistic exception.", e);
-                    throw new DMEException("503", "query " + relationOrInstance + " statistic exception." + e.getMessage());
+                    throw new DMEException("503", e.getMessage());
                 }
             }
         }
@@ -800,16 +797,16 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private List<String> initFsIndicator(boolean wetherCurrent) {
         List<String> indicators = new ArrayList<>();
         if (wetherCurrent) {
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_THROUGHPUT);//ops
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_BANDWIDTH);//bandwith
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_THROUGHPUT);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_BANDWIDTH);
         } else {
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_READTHROUGHPUT);//readThroughput
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_WRITETHROUGHPUT);//writeThroughput
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_READBANDWIDTH);//readBandwidth
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_WRITEBANDWIDTH);//writeBandwidth
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_READTHROUGHPUT);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_WRITETHROUGHPUT);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_READBANDWIDTH);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_WRITEBANDWIDTH);
         }
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_READRESPONSETIME);//reedresponseTime 读IO响应时间
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_WRITERESPONSETIME);//writeresponseTime 写IO响应时间
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_READRESPONSETIME);
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_FS_WRITERESPONSETIME);
 
         return indicators;
     }
@@ -818,53 +815,53 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private List<String> initVolumeIndicator(boolean isCurrent) {
         List<String> indicators = new ArrayList<>();
         if (isCurrent) {
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT);//throughput
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH);//bandwidth
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH);
         } else {
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_READTHROUGHPUT);//readThroughput 读IOPS
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITETHROUGHPUT);//writeThroughput
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_READBANDWIDTH);//readBandwidth
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITEBANDWIDTH);//writeBandwidth
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_READTHROUGHPUT);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITETHROUGHPUT);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_READBANDWIDTH);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITEBANDWIDTH);
         }
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_READRESPONSETIME);//readResponseTime
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITERESPONSETIME);//writeResponseTime
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME);//responsetime
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_READRESPONSETIME);
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITERESPONSETIME);
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME);
         return indicators;
     }
 
     //serviceLevel默认指标集合
     private List<String> initServiceLevelIndicator() {
         List<String> indicators = new ArrayList<>();
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_SERVICELECVEL_MAXRESPONSETIME);//maxResponseTime
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_SERVICELEVEL_BANDWIDTHTIB);//bandwidthTiB
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_SERVICELEVEL_THROUGHPUTTIB);//throughputTiB
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_SERVICELECVEL_MAXRESPONSETIME);
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_SERVICELEVEL_BANDWIDTHTIB);
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_SERVICELEVEL_THROUGHPUTTIB);
         return indicators;
     }
 
     //serivceLevelLun默认指标集合
     private List<String> initServiceLevelLunIndicator() {
         List<String> indicators = new ArrayList<>();
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME);//ResponseTime
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH);//bandwidthTiB
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT);//throughput
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME);
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_BANDWIDTH);
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_VOLUME_THROUGHPUT);
         return indicators;
     }
 
     //serviceLevelStoragepool 默认指标集合
     private List<String> initServiceLevelStoragePoolIndicator() {
         List<String> indicators = new ArrayList<>();
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT);//IOPS
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH);//带宽
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME);//时延
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT);
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH);
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME);
         return indicators;
     }
 
     //Storagepool 默认指标集合
     private List<String> initStoragePoolIndicator() {
         List<String> indicators = new ArrayList<>();
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT);//IOPS
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME);//时延
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH);//带宽
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_THROUGHPUT);
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_RESPONSETIME);
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPOOL_BANDWIDTH);
         return indicators;
     }
 
@@ -874,11 +871,11 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_CPUUSAGE);
         indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_RESPONSETIME);
         indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_BANDWIDTH);
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_READTHROUGHPUT);//读IOPS
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_WRITETHROUGHPUT);//写IOPS
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_READBANDWIDTH);//带宽
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_WRITEBANDWIDTH);//带宽
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_THROUGHPUT);//IOPS
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_READTHROUGHPUT);
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_WRITETHROUGHPUT);
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_READBANDWIDTH);
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_WRITEBANDWIDTH);
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORDEVICE_THROUGHPUT);
         return indicators;
     }
 
@@ -886,17 +883,17 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private List<String> initControllerIndicator(boolean isCurrent) {
         List<String> indicators = new ArrayList<>();
         if (isCurrent) {
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_THROUGHPUT);//throughput
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_BANDWIDTH);//bandwidth
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_CPUUSAGE);//cpu usedrate
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_RESPONSETIME);//时延
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_THROUGHPUT);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_BANDWIDTH);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_CPUUSAGE);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_RESPONSETIME);
         } else {
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_READTHROUGHPUT);//readThroughput 读IOPS
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_WRITETHROUGHPUT);//writeThroughput
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_READBANDWIDTH);//readBandwidth
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_WRITEBANDWIDTH);//writeBandwidth
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_READRESPONSETIME);//readResponseTime
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_WRITERESPONSETIME);//writeResponseTime
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_READTHROUGHPUT);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_WRITETHROUGHPUT);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_READBANDWIDTH);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_WRITEBANDWIDTH);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_READRESPONSETIME);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_CONTROLLER_WRITERESPONSETIME);
         }
         return indicators;
     }
@@ -905,17 +902,17 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private List<String> initStoragePortIndicator(boolean isCurrent) {
         List<String> indicators = new ArrayList<>();
         if (isCurrent) {
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_THROUGHPUT);//IOPS
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_BANDWIDTH);//bandwidth
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_UTILITY);//利用率
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_RESPONSETIME);//responsetime
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_THROUGHPUT);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_BANDWIDTH);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_UTILITY);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_RESPONSETIME);
         } else {
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_READTHROUGHPUT);//readThroughput 读IOPS
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_WRITETHROUGHPUT);//writeThroughput
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_READBANDWIDTH);//readBandwidth
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_WRITEBANDWIDTH);//writeBandwidth
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_READRESPONSETIME);//readResponseTime
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_WRITERESPONSETIME);//writeResponseTime
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_READTHROUGHPUT);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_WRITETHROUGHPUT);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_READBANDWIDTH);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_WRITEBANDWIDTH);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_READRESPONSETIME);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEPORT_WRITERESPONSETIME);
         }
         return indicators;
     }
@@ -924,15 +921,15 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private List<String> initStorageDiskIndicator(boolean isCurrent) {
         List<String> indicators = new ArrayList<>();
         if (isCurrent) {
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_READTHROUGHPUT);//读IOPS
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_BANDWIDTH);//bandwidth
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_UTILITY);//使用率
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_READTHROUGHPUT);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_BANDWIDTH);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_UTILITY);
         } else {
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_READTHROUGHPUT);//readThroughput 读IOPS
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_WRITETHROUGHPUT);//writeThroughput
-            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_BANDWIDTH);//writeBandwidth
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_READTHROUGHPUT);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_WRITETHROUGHPUT);
+            indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_BANDWIDTH);
         }
-        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_RESPONSETIME);//时延
+        indicators.add(DmeIndicatorConstants.COUNTER_ID_STORAGEDISK_RESPONSETIME);
         return indicators;
     }
 
@@ -1053,21 +1050,17 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             for (Map.Entry<String, JsonElement> objectEntry : objectSet) {
                 String objectId = objectEntry.getKey();
                 JsonElement objectElement = objectEntry.getValue();
-                //Map<String,Object> objectValueMap = new HashMap<>();
                 if (!ToolUtils.jsonIsNull(objectElement)) {
                     Set<Map.Entry<String, JsonElement>> objectValueSet = objectElement.getAsJsonObject().entrySet();
                     Map<String, Object> indicatorMap = new HashMap<>();
                     for (Map.Entry<String, JsonElement> indicaterEntry : objectValueSet) {
-                        Map<String, Object> indicatorValueMap = new HashMap<>();
                         String indicatoerId = indicaterEntry.getKey();
                         JsonElement indicatorElement = indicaterEntry.getValue();
                         JsonObject indicatorValueObject = indicatorElement.getAsJsonObject();
                         JsonElement maxElement = indicatorValueObject.get(label);
                         if (!ToolUtils.jsonIsNull(maxElement)) {
-                            Map<String, String> maxValueMap = new HashMap<>();
                             Set<Map.Entry<String, JsonElement>> maxSet = maxElement.getAsJsonObject().entrySet();
                             for (Map.Entry<String, JsonElement> maxEntry : maxSet) {
-                                String time = maxEntry.getKey();
                                 String value = ToolUtils.jsonToStr(maxEntry.getValue());
                                 indicatorMap.put(indicatoerId, value);
                                 break;

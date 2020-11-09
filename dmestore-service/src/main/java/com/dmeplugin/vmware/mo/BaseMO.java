@@ -29,16 +29,16 @@ import org.slf4j.LoggerFactory;
 public class BaseMO {
     private static final Logger s_logger = LoggerFactory.getLogger(BaseMO.class);
 
-    protected VmwareContext _context;
-    protected ManagedObjectReference _mor;
+    protected VmwareContext context;
+    protected ManagedObjectReference mor;
 
     private String name;
 
     public BaseMO(VmwareContext context, ManagedObjectReference mor) {
         assert (context != null);
 
-        _context = context;
-        _mor = mor;
+        this.context = context;
+        this.mor = mor;
     }
 
     public BaseMO(VmwareContext context, String morType, String morValue) {
@@ -46,69 +46,69 @@ public class BaseMO {
         assert (morType != null);
         assert (morValue != null);
 
-        _context = context;
-        _mor = new ManagedObjectReference();
-        _mor.setType(morType);
-        _mor.setValue(morValue);
+        this.context = context;
+        mor = new ManagedObjectReference();
+        mor.setType(morType);
+        mor.setValue(morValue);
     }
 
     public VmwareContext getContext() {
-        return _context;
+        return context;
     }
 
     public ManagedObjectReference getMor() {
-        assert (_mor != null);
-        return _mor;
+        assert (mor != null);
+        return mor;
     }
 
     public ManagedObjectReference getParentMor() throws Exception {
-        return (ManagedObjectReference)_context.getVimClient().getDynamicProperty(_mor, "parent");
+        return (ManagedObjectReference) context.getVimClient().getDynamicProperty(mor, "parent");
     }
 
     public String getName() throws Exception {
         if (name == null) {
-            name = (String)_context.getVimClient().getDynamicProperty(_mor, "name");
+            name = (String) context.getVimClient().getDynamicProperty(mor, "name");
         }
 
         return name;
     }
 
     public void unregisterVm() throws Exception {
-        _context.getService().unregisterVM(_mor);
+        context.getService().unregisterVM(mor);
     }
 
     public boolean destroy() throws Exception {
-        ManagedObjectReference morTask = _context.getService().destroyTask(_mor);
+        ManagedObjectReference morTask = context.getService().destroyTask(mor);
 
-        boolean result = _context.getVimClient().waitForTask(morTask);
+        boolean result = context.getVimClient().waitForTask(morTask);
         if (result) {
-            _context.waitForTaskProgressDone(morTask);
+            context.waitForTaskProgressDone(morTask);
             return true;
         } else {
-            s_logger.error("VMware destroy_Task failed due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+            s_logger.error("VMware destroy_Task failed due to " + TaskMO.getTaskFailureInfo(context, morTask));
         }
         return false;
     }
 
     public void reload() throws Exception {
-        _context.getService().reload(_mor);
+        context.getService().reload(mor);
     }
 
     public boolean rename(String newName) throws Exception {
-        ManagedObjectReference morTask = _context.getService().renameTask(_mor, newName);
+        ManagedObjectReference morTask = context.getService().renameTask(mor, newName);
 
-        boolean result = _context.getVimClient().waitForTask(morTask);
+        boolean result = context.getVimClient().waitForTask(morTask);
         if (result) {
-            _context.waitForTaskProgressDone(morTask);
+            context.waitForTaskProgressDone(morTask);
             return true;
         } else {
-            s_logger.error("VMware rename_Task failed due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+            s_logger.error("VMware rename_Task failed due to " + TaskMO.getTaskFailureInfo(context, morTask));
         }
         return false;
     }
 
     public void setCustomFieldValue(String fieldName, String value) throws Exception {
-        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(_context, _context.getServiceContent().getCustomFieldsManager());
+        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context, context.getServiceContent().getCustomFieldsManager());
 
         int key = getCustomFieldKey(fieldName);
         if (key == 0) {
@@ -135,7 +135,7 @@ public class BaseMO {
             return null;
         }
 
-        CustomFieldStringValue cfValue = (CustomFieldStringValue)_context.getVimClient().getDynamicProperty(getMor(), String.format("value[%d]", key));
+        CustomFieldStringValue cfValue = (CustomFieldStringValue) context.getVimClient().getDynamicProperty(getMor(), String.format("value[%d]", key));
         if (cfValue != null) {
             return cfValue.getValue();
         }
@@ -150,7 +150,7 @@ public class BaseMO {
     public int getCustomFieldKey(String morType, String fieldName) throws Exception {
         assert (morType != null);
 
-        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(_context, _context.getServiceContent().getCustomFieldsManager());
+        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context, context.getServiceContent().getCustomFieldsManager());
 
         return cfmMo.getCustomFieldKey(morType, fieldName);
     }

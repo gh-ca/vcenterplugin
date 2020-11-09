@@ -54,7 +54,7 @@ public class DistributedVirtualSwitchMO extends BaseMO {
         List<DVPortgroupConfigSpec> dvPortGroupSpecArray = new ArrayList<DVPortgroupConfigSpec>();
         dvPortGroupSpecArray.add(dvPortGroupSpec);
         boolean dvPortGroupExists = false;
-        String dvSwitchInstance = _mor.getValue();
+        String dvSwitchInstance = mor.getValue();
         String dvPortGroupName = dvPortGroupSpec.getName();
         String uniquedvPortGroupPerDvs = dvSwitchInstance + dvPortGroupName;
         List<String> dvPortGroupList = null;
@@ -67,8 +67,8 @@ public class DistributedVirtualSwitchMO extends BaseMO {
                 }
             }
             if (!dvPortGroupExists) {
-                ManagedObjectReference task = _context.getService().addDVPortgroupTask(_mor, dvPortGroupSpecArray);
-                if (!_context.getVimClient().waitForTask(task)) {
+                ManagedObjectReference task = context.getService().addDVPortgroupTask(mor, dvPortGroupSpecArray);
+                if (!context.getVimClient().waitForTask(task)) {
                     throw new Exception("Failed to create dvPortGroup " + dvPortGroupSpec.getName());
                 } else {
                     if (s_dvPortGroupCacheMap.containsKey(dvSwitchInstance)) {
@@ -95,27 +95,27 @@ public class DistributedVirtualSwitchMO extends BaseMO {
 
     public void updateDvPortGroup(ManagedObjectReference dvPortGroupMor, DVPortgroupConfigSpec dvPortGroupSpec) throws Exception {
         synchronized (dvPortGroupMor.getValue().intern()) {
-            ManagedObjectReference task = _context.getService().reconfigureDVPortgroupTask(dvPortGroupMor, dvPortGroupSpec);
-            if (!_context.getVimClient().waitForTask(task)) {
+            ManagedObjectReference task = context.getService().reconfigureDVPortgroupTask(dvPortGroupMor, dvPortGroupSpec);
+            if (!context.getVimClient().waitForTask(task)) {
                 throw new Exception("Failed to update dvPortGroup " + dvPortGroupMor.getValue());
             }
         }
     }
 
     public void updateVmWareDvSwitch(ManagedObjectReference dvSwitchMor, VMwareDVSConfigSpec dvsSpec) throws Exception {
-        _context.getService().reconfigureDvsTask(dvSwitchMor, dvsSpec);
+        context.getService().reconfigureDvsTask(dvSwitchMor, dvsSpec);
     }
 
     public TaskInfo updateVmWareDvSwitchGetTask(ManagedObjectReference dvSwitchMor, VMwareDVSConfigSpec dvsSpec) throws Exception {
-        ManagedObjectReference task = _context.getService().reconfigureDvsTask(dvSwitchMor, dvsSpec);
-        TaskInfo info = (TaskInfo)(_context.getVimClient().getDynamicProperty(task, "info"));
-        _context.getVimClient().waitForTask(task);
+        ManagedObjectReference task = context.getService().reconfigureDvsTask(dvSwitchMor, dvsSpec);
+        TaskInfo info = (TaskInfo)(context.getVimClient().getDynamicProperty(task, "info"));
+        context.getVimClient().waitForTask(task);
         return info;
     }
 
     public String getDvsConfigVersion(ManagedObjectReference dvSwitchMor) throws Exception {
         assert (dvSwitchMor != null);
-        DVSConfigInfo dvsConfigInfo = _context.getVimClient().getDynamicProperty(dvSwitchMor, "config");
+        DVSConfigInfo dvsConfigInfo = context.getVimClient().getDynamicProperty(dvSwitchMor, "config");
         return dvsConfigInfo.getConfigVersion();
     }
 
@@ -124,7 +124,7 @@ public class DistributedVirtualSwitchMO extends BaseMO {
 
         Map<Integer, HypervisorHostHelper.PvlanType> result = new HashMap<Integer, HypervisorHostHelper.PvlanType>();
 
-        VMwareDVSConfigInfo configinfo = (VMwareDVSConfigInfo)_context.getVimClient().getDynamicProperty(dvSwitchMor, "config");
+        VMwareDVSConfigInfo configinfo = (VMwareDVSConfigInfo) context.getVimClient().getDynamicProperty(dvSwitchMor, "config");
         List<VMwareDVSPvlanMapEntry> pvlanconfig = null;
         pvlanconfig = configinfo.getPvlanConfig();
 
@@ -178,7 +178,7 @@ public class DistributedVirtualSwitchMO extends BaseMO {
 
         Pair<Integer, HypervisorHostHelper.PvlanType> result = null;
 
-        VMwareDVSConfigInfo configinfo = (VMwareDVSConfigInfo)_context.getVimClient().getDynamicProperty(dvSwitchMor, "config");
+        VMwareDVSConfigInfo configinfo = (VMwareDVSConfigInfo) context.getVimClient().getDynamicProperty(dvSwitchMor, "config");
         List<VMwareDVSPvlanMapEntry> pvlanConfig = null;
         pvlanConfig = configinfo.getPvlanConfig();
 

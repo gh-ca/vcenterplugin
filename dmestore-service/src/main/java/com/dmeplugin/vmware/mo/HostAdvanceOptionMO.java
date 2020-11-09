@@ -40,11 +40,11 @@ public class HostAdvanceOptionMO extends BaseMO {
     }
 
     public List<OptionValue> queryOptions(String name) throws Exception {
-        return _context.getService().queryOptions(_mor, name);
+        return context.getService().queryOptions(mor, name);
     }
 
 
     public void updateOptions(List<OptionValue> optionValues) throws Exception {
-          _context.getService().updateOptions(_mor, optionValues);
+          context.getService().updateOptions(mor, optionValues);
     }
 }

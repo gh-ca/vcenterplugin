@@ -36,7 +36,7 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
             }
         }
 
-        HostNetworkConfig networkConfig = hostMo.getHostNetworkSystemMO().getNetworkConfig();
+        HostNetworkConfig networkConfig = hostMo.getHostNetworkSystemMo().getNetworkConfig();
         List<HostVirtualSwitchConfig> list = networkConfig.getVswitch();
         for (HostVirtualSwitchConfig vSwitchConfig : list) {
             HostVirtualSwitchSpec spec = vSwitchConfig.getSpec();
@@ -88,7 +88,7 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
             }
         }
 
-        HostNetworkConfig networkConfig = hostMo.getHostNetworkSystemMO().getNetworkConfig();
+        HostNetworkConfig networkConfig = hostMo.getHostNetworkSystemMo().getNetworkConfig();
         List<HostVirtualSwitchConfig> list = networkConfig.getVswitch();
         for (HostVirtualSwitchConfig vSwitchConfig : list) {
             HostVirtualSwitchSpec spec = vSwitchConfig.getSpec();
@@ -109,7 +109,7 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
         }
         HostMO hostMo = new HostMO(context, mor);
         HostNetworkInfo networkInfo = hostMo.getHostNetworkInfo();
-        HostNetworkSystemMO hostNetworkSystemMo = hostMo.getHostNetworkSystemMO();
+        HostNetworkSystemMO hostNetworkSystemMo = hostMo.getHostNetworkSystemMo();
         List<HostVirtualSwitch> virtualSwitches = networkInfo.getVswitch();
         for (HostVirtualSwitch virtualSwitch : virtualSwitches) {
             String name = virtualSwitch.getName();
