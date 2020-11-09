@@ -45,125 +45,125 @@ public class VirtualDiskManagerMO extends BaseMO {
     public void copyVirtualDisk(String srcName, ManagedObjectReference morSrcDc, String destName, ManagedObjectReference morDestDc, VirtualDiskSpec diskSpec,
             boolean force) throws Exception {
 
-        ManagedObjectReference morTask = _context.getService().copyVirtualDiskTask(_mor, srcName, morSrcDc, destName, morDestDc, diskSpec, force);
+        ManagedObjectReference morTask = context.getService().copyVirtualDiskTask(mor, srcName, morSrcDc, destName, morDestDc, diskSpec, force);
 
-        boolean result = _context.getVimClient().waitForTask(morTask);
+        boolean result = context.getVimClient().waitForTask(morTask);
         if (!result) {
-            throw new Exception("Unable to copy virtual disk " + srcName + " to " + destName + " due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+            throw new Exception("Unable to copy virtual disk " + srcName + " to " + destName + " due to " + TaskMO.getTaskFailureInfo(context, morTask));
         }
 
-        _context.waitForTaskProgressDone(morTask);
+        context.waitForTaskProgressDone(morTask);
     }
 
     public void createVirtualDisk(String name, ManagedObjectReference morDc, VirtualDiskSpec diskSpec) throws Exception {
-        ManagedObjectReference morTask = _context.getService().createVirtualDiskTask(_mor, name, morDc, diskSpec);
+        ManagedObjectReference morTask = context.getService().createVirtualDiskTask(mor, name, morDc, diskSpec);
 
-        boolean result = _context.getVimClient().waitForTask(morTask);
+        boolean result = context.getVimClient().waitForTask(morTask);
         if (!result) {
-            throw new Exception("Unable to create virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+            throw new Exception("Unable to create virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(context, morTask));
         }
 
-        _context.waitForTaskProgressDone(morTask);
+        context.waitForTaskProgressDone(morTask);
     }
 
     public void defragmentVirtualDisk(String name, ManagedObjectReference morDc) throws Exception {
-        ManagedObjectReference morTask = _context.getService().defragmentVirtualDiskTask(_mor, name, morDc);
+        ManagedObjectReference morTask = context.getService().defragmentVirtualDiskTask(mor, name, morDc);
 
-        boolean result = _context.getVimClient().waitForTask(morTask);
+        boolean result = context.getVimClient().waitForTask(morTask);
         if (!result) {
             throw new Exception("Unable to defragment virtual disk " + name + " due to " + result);
         }
 
-        _context.waitForTaskProgressDone(morTask);
+        context.waitForTaskProgressDone(morTask);
     }
 
     public void deleteVirtualDisk(String name, ManagedObjectReference morDc) throws Exception {
-        ManagedObjectReference morTask = _context.getService().deleteVirtualDiskTask(_mor, name, morDc);
+        ManagedObjectReference morTask = context.getService().deleteVirtualDiskTask(mor, name, morDc);
 
-        boolean result = _context.getVimClient().waitForTask(morTask);
+        boolean result = context.getVimClient().waitForTask(morTask);
         if (!result) {
-            throw new Exception("Unable to delete virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+            throw new Exception("Unable to delete virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(context, morTask));
         }
 
-        _context.waitForTaskProgressDone(morTask);
+        context.waitForTaskProgressDone(morTask);
     }
 
     public void eagerZeroVirtualDisk(String name, ManagedObjectReference morDc) throws Exception {
-        ManagedObjectReference morTask = _context.getService().eagerZeroVirtualDiskTask(_mor, name, morDc);
+        ManagedObjectReference morTask = context.getService().eagerZeroVirtualDiskTask(mor, name, morDc);
 
-        boolean result = _context.getVimClient().waitForTask(morTask);
+        boolean result = context.getVimClient().waitForTask(morTask);
         if (!result) {
-            throw new Exception("Unable to eager zero virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+            throw new Exception("Unable to eager zero virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(context, morTask));
         }
 
-        _context.waitForTaskProgressDone(morTask);
+        context.waitForTaskProgressDone(morTask);
     }
 
     public void extendVirtualDisk(String name, ManagedObjectReference morDc, long newCapacityKb, boolean eagerZero) throws Exception {
-        ManagedObjectReference morTask = _context.getService().extendVirtualDiskTask(_mor, name, morDc, newCapacityKb, eagerZero);
+        ManagedObjectReference morTask = context.getService().extendVirtualDiskTask(mor, name, morDc, newCapacityKb, eagerZero);
 
-        boolean result = _context.getVimClient().waitForTask(morTask);
+        boolean result = context.getVimClient().waitForTask(morTask);
         if (!result) {
-            throw new Exception("Unable to extend virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+            throw new Exception("Unable to extend virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(context, morTask));
         }
 
-        _context.waitForTaskProgressDone(morTask);
+        context.waitForTaskProgressDone(morTask);
     }
 
     public void inflateVirtualDisk(String name, ManagedObjectReference morDc) throws Exception {
-        ManagedObjectReference morTask = _context.getService().inflateVirtualDiskTask(_mor, name, morDc);
+        ManagedObjectReference morTask = context.getService().inflateVirtualDiskTask(mor, name, morDc);
 
-        boolean result = _context.getVimClient().waitForTask(morTask);
+        boolean result = context.getVimClient().waitForTask(morTask);
         if (!result) {
-            throw new Exception("Unable to inflate virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+            throw new Exception("Unable to inflate virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(context, morTask));
         }
-        _context.waitForTaskProgressDone(morTask);
+        context.waitForTaskProgressDone(morTask);
     }
 
     public void shrinkVirtualDisk(String name, ManagedObjectReference morDc, boolean copy) throws Exception {
-        ManagedObjectReference morTask = _context.getService().shrinkVirtualDiskTask(_mor, name, morDc, copy);
+        ManagedObjectReference morTask = context.getService().shrinkVirtualDiskTask(mor, name, morDc, copy);
 
-        boolean result = _context.getVimClient().waitForTask(morTask);
+        boolean result = context.getVimClient().waitForTask(morTask);
         if (!result) {
-            throw new Exception("Unable to shrink virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+            throw new Exception("Unable to shrink virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(context, morTask));
         }
-        _context.waitForTaskProgressDone(morTask);
+        context.waitForTaskProgressDone(morTask);
     }
 
     public void zeroFillVirtualDisk(String name, ManagedObjectReference morDc) throws Exception {
-        ManagedObjectReference morTask = _context.getService().zeroFillVirtualDiskTask(_mor, name, morDc);
+        ManagedObjectReference morTask = context.getService().zeroFillVirtualDiskTask(mor, name, morDc);
 
-        boolean result = _context.getVimClient().waitForTask(morTask);
+        boolean result = context.getVimClient().waitForTask(morTask);
         if (!result) {
-            throw new Exception("Unable to zero fill virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+            throw new Exception("Unable to zero fill virtual disk " + name + " due to " + TaskMO.getTaskFailureInfo(context, morTask));
         }
-        _context.waitForTaskProgressDone(morTask);
+        context.waitForTaskProgressDone(morTask);
     }
 
     public void moveVirtualDisk(String srcName, ManagedObjectReference morSrcDc, String destName, ManagedObjectReference morDestDc, boolean force) throws Exception {
 
-        ManagedObjectReference morTask = _context.getService().moveVirtualDiskTask(_mor, srcName, morSrcDc, destName, morDestDc, force, null);
+        ManagedObjectReference morTask = context.getService().moveVirtualDiskTask(mor, srcName, morSrcDc, destName, morDestDc, force, null);
 
-        boolean result = _context.getVimClient().waitForTask(morTask);
+        boolean result = context.getVimClient().waitForTask(morTask);
         if (!result) {
-            throw new Exception("Unable to move virtual disk " + srcName + " to " + destName + " due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+            throw new Exception("Unable to move virtual disk " + srcName + " to " + destName + " due to " + TaskMO.getTaskFailureInfo(context, morTask));
         }
-        _context.waitForTaskProgressDone(morTask);
+        context.waitForTaskProgressDone(morTask);
     }
 
     public int queryVirtualDiskFragmentation(String name, ManagedObjectReference morDc) throws Exception {
-        return _context.getService().queryVirtualDiskFragmentation(_mor, name, morDc);
+        return context.getService().queryVirtualDiskFragmentation(mor, name, morDc);
     }
 
     public HostDiskDimensionsChs queryVirtualDiskGeometry(String name, ManagedObjectReference morDc) throws Exception {
-        return _context.getService().queryVirtualDiskGeometry(_mor, name, morDc);
+        return context.getService().queryVirtualDiskGeometry(mor, name, morDc);
     }
 
     public String queryVirtualDiskUuid(String name, ManagedObjectReference morDc) throws Exception {
-        return _context.getService().queryVirtualDiskUuid(_mor, name, morDc);
+        return context.getService().queryVirtualDiskUuid(mor, name, morDc);
     }
 
     public void setVirtualDiskUuid(String name, ManagedObjectReference morDc, String uuid) throws Exception {
-        _context.getService().setVirtualDiskUuid(_mor, name, morDc, uuid);
+        context.getService().setVirtualDiskUuid(mor, name, morDc, uuid);
     }
 }

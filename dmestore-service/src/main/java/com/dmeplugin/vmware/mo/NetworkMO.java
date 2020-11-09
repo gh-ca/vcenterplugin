@@ -33,19 +33,19 @@ public class NetworkMO extends BaseMO {
     }
 
     public void destroyNetwork() throws Exception {
-        _context.getService().destroyNetwork(_mor);
+        context.getService().destroyNetwork(mor);
     }
 
     public List<ManagedObjectReference> getVmsOnNetwork() throws Exception {
-        return _context.getVimClient().getDynamicProperty(_mor, "vm");
+        return context.getVimClient().getDynamicProperty(mor, "vm");
     }
 
     @Override
     public String getName() throws Exception {
-        return _context.getVimClient().getDynamicProperty(_mor, "name");
+        return context.getVimClient().getDynamicProperty(mor, "name");
     }
 
     public NetworkSummary getSummary() throws Exception {
-        return _context.getVimClient().getDynamicProperty(_mor, "summary");
+        return context.getVimClient().getDynamicProperty(mor, "summary");
     }
 }

@@ -150,11 +150,11 @@ public class HypervisorHostHelper {
         return morDs;
     }
 
-    public static String getSecondaryDatastoreUUID(String storeUrl) {
+    public static String getSecondaryDatastoreUuid(String storeUrl) {
         return UUID.nameUUIDFromBytes(storeUrl.getBytes()).toString();
     }
 
-    public static DatastoreMO getHyperHostDatastoreMO(VmwareHypervisorHost hyperHost, String datastoreName) throws Exception {
+    public static DatastoreMO getHyperHostDatastoreMo(VmwareHypervisorHost hyperHost, String datastoreName) throws Exception {
         ObjectContent[] ocs = hyperHost.getDatastorePropertiesOnHyperHost(new String[] {"name"});
         if (ocs != null && ocs.length > 0) {
             for (ObjectContent oc : ocs) {
@@ -237,7 +237,7 @@ public class HypervisorHostHelper {
         return vCenterApiVersion.compareTo(minVcenterApiVersionForFeature) >= 0 ? true : false;
     }
 
-    private static void setupPVlanPair(DistributedVirtualSwitchMO dvSwitchMo, ManagedObjectReference morDvSwitch, Integer vid, Integer spvlanid, String pvlanType) throws Exception {
+    private static void setupPvLanPair(DistributedVirtualSwitchMO dvSwitchMo, ManagedObjectReference morDvSwitch, Integer vid, Integer spvlanid, String pvlanType) throws Exception {
         s_logger.debug(String.format("Setting up PVLAN on dvSwitch %s with the following information: %s %s %s", dvSwitchMo.getName(), vid, spvlanid, pvlanType));
         Map<Integer, HypervisorHostHelper.PvlanType> vlanmap = dvSwitchMo.retrieveVlanPvlan(vid, spvlanid, morDvSwitch);
         if (!vlanmap.isEmpty()) {
@@ -264,12 +264,12 @@ public class HypervisorHostHelper {
         // Next, add the required primary and secondary vlan config specs to the dvs config spec.
 
         if (!vlanmap.containsKey(vid)) {
-            VMwareDVSPvlanConfigSpec ppvlanConfigSpec = createDVPortPvlanConfigSpec(vid, vid, PvlanType.promiscuous, PvlanOperation.add);
+            VMwareDVSPvlanConfigSpec ppvlanConfigSpec = createDvPortPvlanConfigSpec(vid, vid, PvlanType.promiscuous, PvlanOperation.add);
             dvsSpec.getPvlanConfigSpec().add(ppvlanConfigSpec);
         }
         if (!vid.equals(spvlanid) && !vlanmap.containsKey(spvlanid)) {
             PvlanType selectedType = StringUtil.isNotBlank(pvlanType) ? PvlanType.fromStr(pvlanType) : PvlanType.isolated;
-            VMwareDVSPvlanConfigSpec spvlanConfigSpec = createDVPortPvlanConfigSpec(vid, spvlanid, selectedType, PvlanOperation.add);
+            VMwareDVSPvlanConfigSpec spvlanConfigSpec = createDvPortPvlanConfigSpec(vid, spvlanid, selectedType, PvlanOperation.add);
             dvsSpec.getPvlanConfigSpec().add(spvlanConfigSpec);
         }
 
@@ -510,8 +510,8 @@ public class HypervisorHostHelper {
         return spec;
     }
 
-    public static VMwareDVSPortSetting createVmwareDVPortSettingSpec(DVSTrafficShapingPolicy shapingPolicy, DVSSecurityPolicy secPolicy,
-            VmwareDistributedVirtualSwitchVlanSpec vlanSpec) {
+    public static VMwareDVSPortSetting createVmwareDvPortSettingSpec(DVSTrafficShapingPolicy shapingPolicy, DVSSecurityPolicy secPolicy,
+                                                                     VmwareDistributedVirtualSwitchVlanSpec vlanSpec) {
         VMwareDVSPortSetting dvsPortSetting = new VMwareDVSPortSetting();
         dvsPortSetting.setVlan(vlanSpec);
         dvsPortSetting.setSecurityPolicy(secPolicy);
@@ -520,7 +520,7 @@ public class HypervisorHostHelper {
         return dvsPortSetting;
     }
 
-    public static DVSTrafficShapingPolicy getDVSShapingPolicy(Integer networkRateMbps) {
+    public static DVSTrafficShapingPolicy getDvsShapingPolicy(Integer networkRateMbps) {
         DVSTrafficShapingPolicy shapingPolicy = new DVSTrafficShapingPolicy();
         BoolPolicy isEnabled = new BoolPolicy();
         if (networkRateMbps == null || networkRateMbps.intValue() <= 0) {
@@ -548,7 +548,7 @@ public class HypervisorHostHelper {
         return shapingPolicy;
     }
 
-    public static VmwareDistributedVirtualSwitchPvlanSpec createDVPortPvlanIdSpec(int pvlanId) {
+    public static VmwareDistributedVirtualSwitchPvlanSpec createDvPortPvlanIdSpec(int pvlanId) {
         VmwareDistributedVirtualSwitchPvlanSpec pvlanIdSpec = new VmwareDistributedVirtualSwitchPvlanSpec();
         pvlanIdSpec.setPvlanId(pvlanId);
         return pvlanIdSpec;
@@ -585,7 +585,7 @@ public class HypervisorHostHelper {
         }
     }
 
-    public static VMwareDVSPvlanConfigSpec createDVPortPvlanConfigSpec(int vlanId, int secondaryVlanId, PvlanType pvlantype, PvlanOperation operation) {
+    public static VMwareDVSPvlanConfigSpec createDvPortPvlanConfigSpec(int vlanId, int secondaryVlanId, PvlanType pvlantype, PvlanOperation operation) {
         VMwareDVSPvlanConfigSpec pvlanConfigSpec = new VMwareDVSPvlanConfigSpec();
         VMwareDVSPvlanMapEntry map = new VMwareDVSPvlanMapEntry();
         map.setPvlanType(pvlantype.toString());
@@ -795,7 +795,7 @@ public class HypervisorHostHelper {
 
         ClusterMO clusterMo = new ClusterMO(host.getContext(), host.getHyperHostCluster());
         DatacenterMO dataCenterMo = new DatacenterMO(host.getContext(), host.getHyperHostDatacenter());
-        setVMHardwareVersion(vmConfig, clusterMo, dataCenterMo);
+        setVmHardwareVersion(vmConfig, clusterMo, dataCenterMo);
 
         if (host.createVm(vmConfig)) {
             // Here, when attempting to find the VM, we need to use the name
@@ -812,7 +812,7 @@ public class HypervisorHostHelper {
 
             int ideControllerKey = -1;
             while (ideControllerKey < 0) {
-                ideControllerKey = vmMo.tryGetIDEDeviceControllerKey();
+                ideControllerKey = vmMo.tryGetIdeDeviceControllerKey();
                 if (ideControllerKey >= 0) {
                     break;
                 }
@@ -832,7 +832,7 @@ public class HypervisorHostHelper {
      * - If the cluster hardware version is not set, check datacenter hardware version. If it is set, then it is set to vmConfig
      * - In case both cluster and datacenter hardware version are not set, hardware version is not set to vmConfig
      */
-    protected static void setVMHardwareVersion(VirtualMachineConfigSpec vmConfig, ClusterMO clusterMo, DatacenterMO datacenterMo) throws Exception {
+    protected static void setVmHardwareVersion(VirtualMachineConfigSpec vmConfig, ClusterMO clusterMo, DatacenterMO datacenterMo) throws Exception {
         ClusterConfigInfoEx clusterConfigInfo = clusterMo != null ? clusterMo.getClusterConfigInfo() : null;
         String clusterHardwareVersion = clusterConfigInfo != null ? clusterConfigInfo.getDefaultHardwareVersionKey() : null;
         if (StringUtil.isNotBlank(clusterHardwareVersion)) {
@@ -876,7 +876,7 @@ public class HypervisorHostHelper {
 
         return controllerSpec;
     }
-    public static VirtualMachineMO createWorkerVM(VmwareHypervisorHost hyperHost, DatastoreMO dsMo, String vmName) throws Exception {
+    public static VirtualMachineMO createWorkerVm(VmwareHypervisorHost hyperHost, DatastoreMO dsMo, String vmName) throws Exception {
 
         // Allow worker VM to float within cluster so that we will have better chance to
         // create it successfully
@@ -926,7 +926,7 @@ public class HypervisorHostHelper {
     }
 
 
-    public static String removeOVFNetwork(final String ovfString)  {
+    public static String removeOvfNetwork(final String ovfString)  {
         if (ovfString == null || ovfString.isEmpty()) {
             return ovfString;
         }
@@ -960,7 +960,7 @@ public class HypervisorHostHelper {
         return ovfString;
     }
 
-    public static List<Pair<String, Boolean>> readOVF(VmwareHypervisorHost host, String ovfFilePath, DatastoreMO dsMo) throws Exception {
+    public static List<Pair<String, Boolean>> readOvf(VmwareHypervisorHost host, String ovfFilePath, DatastoreMO dsMo) throws Exception {
         List<Pair<String, Boolean>> ovfVolumeInfos = new ArrayList<Pair<String, Boolean>>();
         List<String> files = new ArrayList<String>();
 
@@ -974,7 +974,7 @@ public class HypervisorHostHelper {
         importSpecParams.setEntityName(importEntityName);
         importSpecParams.setDeploymentOption("");
 
-        String ovfDescriptor = removeOVFNetwork(HttpNfcLeaseMO.readOvfContent(ovfFilePath));
+        String ovfDescriptor = removeOvfNetwork(HttpNfcLeaseMO.readOvfContent(ovfFilePath));
         VmwareContext context = host.getContext();
         OvfCreateImportSpecResult ovfImportResult = context.getService().createImportSpec(context.getServiceContent().getOvfManager(), ovfDescriptor, morRp, dsMo.getMor(),
                 importSpecParams);
@@ -1014,7 +1014,7 @@ public class HypervisorHostHelper {
 
        int osDiskSeqNumber = 0;
        VirtualMachineConfigSpec config = importSpec.getConfigSpec();
-       String paramVal = getOVFParamValue(config);
+       String paramVal = getOvfParamValue(config);
        if (paramVal != null && !paramVal.isEmpty()) {
            try {
                osDiskSeqNumber = getOsDiskFromOvfConf(config, paramVal);
@@ -1046,7 +1046,7 @@ public class HypervisorHostHelper {
             ManagedObjectReference morDs) throws Exception {
         VmwareContext context = host.getContext();
         ManagedObjectReference morOvf = context.getServiceContent().getOvfManager();
-        VirtualMachineMO workerVmMo = HypervisorHostHelper.createWorkerVM(host, new DatastoreMO(context, morDs), ovfName);
+        VirtualMachineMO workerVmMo = HypervisorHostHelper.createWorkerVm(host, new DatastoreMO(context, morDs), ovfName);
         if (workerVmMo == null) {
             throw new Exception("Unable to find just-created worker VM");
         }
@@ -1143,7 +1143,7 @@ public class HypervisorHostHelper {
        return deviceSeqNumber;
    }
 
-   public static String getOVFParamValue(VirtualMachineConfigSpec config) {
+   public static String getOvfParamValue(VirtualMachineConfigSpec config) {
        String paramVal = "";
        List<OptionValue> options = config.getExtraConfig();
        for (OptionValue option : options) {
