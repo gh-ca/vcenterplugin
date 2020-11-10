@@ -244,7 +244,6 @@ public class VmRdmServiceImpl implements VmRdmService {
 
         requestbody.put("volumes", volumes);
         requestbody.put("service_level_id", createVolumesRequest.getServiceLevelId());
-        LOG.info("Create RDM by ServiceLevel requestbody:{}", gson.toJson(requestbody));
         String url = DmeConstants.DME_VOLUME_BASE_URL;
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(requestbody));
         if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
@@ -315,11 +314,7 @@ public class VmRdmServiceImpl implements VmRdmService {
             volumeSpecs.add(vs);
         }
         cv.put("volume_specs", volumeSpecs);
-
         requestbody.put("customize_volumes", cv);
-
-        LOG.info("Create RDM by unserviceLevel requestbody:{}", gson.toJson(requestbody));
-
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(requestbody));
         if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
             LOG.error("Failed to create RDM on DME!errorMsg:{}", responseEntity.getBody());

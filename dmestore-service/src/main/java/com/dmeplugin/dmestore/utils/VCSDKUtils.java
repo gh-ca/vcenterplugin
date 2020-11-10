@@ -405,7 +405,6 @@ public class VCSDKUtils {
             if (hostmo != null) {
                 objHostId = hostmo.getMor().getValue();
             }
-            logger.info("objHostId==" + objHostId);
             //取得所有主机，并通过mounthostids进行过滤，过滤掉已经挂载的主机
             List<Pair<ManagedObjectReference, String>> dss = rootFsMo.getAllDatastoreOnRootFs();
             if (dss != null && dss.size() > 0) {
@@ -413,7 +412,6 @@ public class VCSDKUtils {
                 for (Pair<ManagedObjectReference, String> ds : dss) {
                     DatastoreMO dsmo = new DatastoreMO(vmwareContext, ds.first());
                     if (dsmo != null && dataStoreType.equals(dsmo.getSummary().getType())) {
-                        logger.info("dsmo.getName==" + dsmo.getName());
                         boolean isMount = true;
                         List<DatastoreHostMount> dhms = dsmo.getHostMounts();
                         if (dhms != null && dhms.size() > 0) {
@@ -473,7 +471,6 @@ public class VCSDKUtils {
             if (hostmo != null) {
                 objHostId = hostmo.getMor().getValue();
             }
-            logger.info("HostObjId==" + objHostId);
             //取得所有主机，并通过mounthostids进行过滤，过滤掉已经挂载的主机
             List<Pair<ManagedObjectReference, String>> dss = rootFsMo.getAllDatastoreOnRootFs();
             if (dss != null && dss.size() > 0) {
@@ -481,7 +478,6 @@ public class VCSDKUtils {
                 for (Pair<ManagedObjectReference, String> ds : dss) {
                     DatastoreMO dsmo = new DatastoreMO(vmwareContext, ds.first());
                     if (dsmo != null && dataStoreType.equals(dsmo.getSummary().getType())) {
-                        logger.info("dsmo.getName==" + dsmo.getName());
                         List<DatastoreHostMount> dhms = dsmo.getHostMounts();
                         if (dhms != null && dhms.size() > 0) {
                             for (DatastoreHostMount dhm : dhms) {
@@ -541,7 +537,6 @@ public class VCSDKUtils {
                     }
                 }
             }
-            logger.info("objHostId==" + hostids);
             //取得所有主机，并通过mounthostids进行过滤，过滤掉已经挂载的主机
             List<Pair<ManagedObjectReference, String>> dss = rootFsMo.getAllDatastoreOnRootFs();
             if (dss != null && dss.size() > 0) {
@@ -549,7 +544,6 @@ public class VCSDKUtils {
                 for (Pair<ManagedObjectReference, String> ds : dss) {
                     DatastoreMO dsmo = new DatastoreMO(vmwareContext, ds.first());
                     if (dsmo != null && dataStoreType.equals(dsmo.getSummary().getType())) {
-                        logger.info("dsmo.getName==" + dsmo.getName());
                         boolean isMount = false;
                         List<DatastoreHostMount> dhms = dsmo.getHostMounts();
                         if (dhms != null && dhms.size() > 0) {
@@ -562,7 +556,6 @@ public class VCSDKUtils {
                                     }
                                 }
                             }
-                            logger.info("dsmo.dsHostIds==" + dsHostIds);
                             for (String hostid : hostids) {
                                 if (!dsHostIds.contains(hostid)) {
                                     isMount = true;
@@ -623,7 +616,6 @@ public class VCSDKUtils {
                     }
                 }
             }
-            logger.info("objHostId==" + hostids);
             //取得所有主机，并通过mounthostids进行过滤，过滤掉已经挂载的主机
             List<Pair<ManagedObjectReference, String>> dss = rootFsMo.getAllDatastoreOnRootFs();
             if (dss != null && dss.size() > 0) {
@@ -631,7 +623,6 @@ public class VCSDKUtils {
                 for (Pair<ManagedObjectReference, String> ds : dss) {
                     DatastoreMO dsmo = new DatastoreMO(vmwareContext, ds.first());
                     if (dsmo != null && dataStoreType.equals(dsmo.getSummary().getType())) {
-                        logger.info("dsmo.getName==" + dsmo.getName());
                         boolean isMount = false;
                         List<DatastoreHostMount> dhms = dsmo.getHostMounts();
                         if (dhms != null && dhms.size() > 0) {
@@ -644,7 +635,6 @@ public class VCSDKUtils {
                                     }
                                 }
                             }
-                            logger.info("dsmo.dsHostIds==" + dsHostIds);
                             for (String hostid : hostids) {
                                 if (dsHostIds.contains(hostid)) {
                                     String objectId = vcConnectionHelper.mor2ObjectId(dsmo.getMor(), vmwareContext.getServerAddress());
