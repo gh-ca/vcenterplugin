@@ -34,6 +34,7 @@ export class NfsAddComponent implements OnInit{
   minbandwidthChoose=false; // 最小带宽 选中
   miniopsChoose=false; // 最小iops 选中
   latencyChoose=false; // 时延 选中
+  addSuccessShow = false; // 添加成功提示
 
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
@@ -119,11 +120,8 @@ export class NfsAddComponent implements OnInit{
     this.addService.addNfs(this.addForm).subscribe((result: any) => {
       this.modalHandleLoading=false;
       if (result.code === '200'){
-        if (this.pluginFlag=='plugin'){
-          this.backToNfsList();
-        }else{
-          this.closeModel();
-        }
+        // 打开成功提示窗口
+        this.addSuccessShow = true;
       }else{
         this.errorMsg = '1';
         console.log("Delete failed:",result.description)
@@ -325,7 +323,17 @@ export class NfsAddComponent implements OnInit{
   }
 
 
-
+  /**
+   * 确认关闭窗口
+   */
+  confirmActResult() {
+    this.wizard.close();// 关闭弹窗
+    if (this.pluginFlag=='plugin'){
+      this.backToNfsList();
+    }else{
+      this.closeModel();
+    }
+  }
 
 }
 
