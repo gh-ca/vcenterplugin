@@ -152,6 +152,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
   // endTime
   endTime = null;
 
+  totalPageNum = '/' + ' ' + '0'; // 卷信息分页个数
+
   rangeTime = new FormGroup({
     start: new FormControl(),
     end: new FormControl()
@@ -329,8 +331,6 @@ export class DetailComponent implements OnInit, AfterViewInit {
     const reqParams = {
       storageId: this.storageId,
       pageSize: query ? query.pageSize:10,
-      // pageSize: 10,
-      // pageNo: 0,
       pageNo: query ? query.pageIndex*query.pageSize:0,
     }
     console.log('reqParams', reqParams)
@@ -343,6 +343,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
 
           this.volumes = r.data.volumeList;
           this.volumeTotal=r.data.count;
+
+          this.totalPageNum = '/' + ' ' + Math.ceil(this.volumeTotal/(query ? query.pageSize:10));
+          console.log('this.totalPageNum', this.totalPageNum);
           if (this.volumeRadio === 'table2') {
             this.listVolumesperformance();
           }
@@ -359,6 +362,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
           if (r.code === '200'){
             this.volumes = r.data.volumeList;
             this.volumeTotal=r.data.count;
+
+            this.totalPageNum = '/' + ' ' + Math.ceil(this.volumeTotal/(query ? query.pageSize:10));
+            console.log('this.totalPageNum', this.totalPageNum);
+
             if (this.volumeRadio === 'table2') {
               this.listVolumesperformance();
             }
@@ -886,10 +893,36 @@ export class DetailComponent implements OnInit, AfterViewInit {
     return p;
   }
   getVolDataByPage(pagination:any) {
-    console.log('testFunc', pagination);
     this.getStorageVolumeList(true, pagination);
     return pagination;
   }
   // MatPaginator Output
   pageEvent: PageEvent;
+
+  /**
+   * 卷翻页
+   * @param object
+   * @param pageObj
+   */
+  jumpPage(object:any, pageObj:any) {
+    console.log("object", object)
+    const obj = object.target;
+    if (object.keyCode === 13 || object.keyCode === 108 || object.type === 'blur') { // 按下enter键触发
+      console.log('obj.value', obj.value)
+      console.log('obj.value', obj.value && obj.value > 0 && obj.value -1 !== pageObj.pageIndex)
+      if(obj.value && obj.value > 0 && obj.value -1 !== pageObj.pageIndex) {
+        obj.value=obj.value.replace(/[^1-9]/g,'');
+
+        if (obj.value <= Math.ceil(pageObj.length/pageObj.pageSize)) {
+          pageObj.pageIndex = obj.value - 1;
+        } else {
+          pageObj.pageIndex = Math.ceil(pageObj.length/pageObj.pageSize) - 1;
+          obj.value =  Math.ceil(pageObj.length/pageObj.pageSize);
+        }
+        this.getStorageVolumeList(true, pageObj);
+      }else{
+        obj.value=pageObj.pageIndex + 1;
+      }
+    }
+  }
 }
