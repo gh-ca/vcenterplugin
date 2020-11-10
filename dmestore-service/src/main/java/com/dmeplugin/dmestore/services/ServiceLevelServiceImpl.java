@@ -319,9 +319,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     public List<Volume> getVolumeInfosByServiceLevelId(String serviceLevelId) throws DMEException {
         List<Volume> volumes = new ArrayList<>();
         String url = QUERY_SERVICE_LEVEL_VOLUME_URL.replace("{serviceLevelId}", serviceLevelId);
-
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-        log.info("ServiceLevelServiceImpl/getVolumeInfosByServiceLevelId/responseEntity==" + responseEntity);
         int code = responseEntity.getStatusCodeValue();
         if (code != HttpStatus.OK.value()) {
             return volumes;

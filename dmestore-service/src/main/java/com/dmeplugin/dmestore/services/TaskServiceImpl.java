@@ -244,7 +244,7 @@ public class TaskServiceImpl implements TaskService {
         if(null !=taskIds && taskIds.size() >0){
             Map<String, Integer> taskStatusMap = new HashMap<>(16);
             getTaskStatus(taskIds, taskStatusMap, taskTimeOut, System.currentTimeMillis());
-            LOG.info("taskStatusMap===" + (taskStatusMap == null ? "null" : gson.toJson(taskStatusMap)));
+            LOG.info("taskStatusMap===" + (taskStatusMap == null ? "null" : taskStatusMap.size()));
             for (Map.Entry<String, Integer> entry : taskStatusMap.entrySet()) {
                 int status = entry.getValue();
                 if (3 == status) {
