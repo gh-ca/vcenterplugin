@@ -6,12 +6,13 @@ import { NgxEchartsModule } from 'ngx-echarts';
 import {GlobalsService} from "../../../shared/globals.service";
 import {FileSystemService, FsDetail} from "../file-system/file-system.service";
 import {FormControl, FormGroup} from "@angular/forms";
+import {TranslatePipe} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-nfsperformance',
   templateUrl: './performance.component.html',
   styleUrls: ['./performance.component.scss'],
-  providers: [PerformanceService, MakePerformance, NfsService,NgxEchartsModule,FileSystemService],
+  providers: [PerformanceService, TranslatePipe,MakePerformance, NfsService,NgxEchartsModule,FileSystemService],
 })
 export class NfsPerformanceComponent implements OnInit, AfterViewInit {
   fsDetails: FsDetail[];
@@ -38,7 +39,7 @@ export class NfsPerformanceComponent implements OnInit, AfterViewInit {
   endTime = null;
   constructor(private makePerformance: MakePerformance, private perService: PerformanceService,
               private ngZone: NgZone, private cdr: ChangeDetectorRef, private fsService: FileSystemService,
-              private gs: GlobalsService) {
+              private gs: GlobalsService, private translatePipe:TranslatePipe) {
   }
 
   ngAfterViewInit() {
@@ -88,18 +89,18 @@ export class NfsPerformanceComponent implements OnInit, AfterViewInit {
     // fsNames.push('A7213075B5EE3AF3989D7DB938ED2CF8');
     fsNames.push(this.chooseFs.fileSystemId);
     //ops
-    this.makePerformance.setChart(300,"OPS","IO/s",
+    this.makePerformance.setChart(300,this.translatePipe.transform('nfs.ops'),"IO/s",
       NfsService.nfsOPS,fsNames,this.selectRange,NfsService.nfsUrl, this.startTime, this.endTime).then(res=>{
       this.opsChart = res;
       this.cdr.detectChanges();
     });
     // 带宽
-    this.makePerformance.setChart(300,'Bandwidth', 'MB/s', NfsService.nfsBDWT,
+    this.makePerformance.setChart(300,this.translatePipe.transform('nfs.qos_bandwidth'), 'MB/s', NfsService.nfsBDWT,
       fsNames, this.selectRange, NfsService.nfsUrl, this.startTime, this.endTime).then(res => {
       this.bandwidthChart = res;
       this.cdr.detectChanges();
     });
-    this.makePerformance.setChart(300,'Latency', 'ms', NfsService.nfsLatency, fsNames,
+    this.makePerformance.setChart(300,this.translatePipe.transform('nfs.qos_latency'), 'ms', NfsService.nfsLatency, fsNames,
       this.selectRange, NfsService.nfsUrl, this.startTime, this.endTime).then(res => {
       this.latencyChart = res;
       this.cdr.detectChanges();
