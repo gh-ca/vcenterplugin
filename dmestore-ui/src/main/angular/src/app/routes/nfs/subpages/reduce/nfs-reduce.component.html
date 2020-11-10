@@ -37,7 +37,7 @@
   <clr-modal class="add-wizard-wrap" [clrModalOpen]="viewPage=='reduce_vcenter'" [clrModalClosable]="false">
     <div class="modal-body">
       <form  clrForm>
-        <p *ngIf="errorMsg" style="color: red">{{'errorMsg.deleteError' | translate}}</p>
+        <p *ngIf="errorMsg" style="color: red">{{'errorMsg.reduceError' | translate}}</p>
         <div *ngIf="modalLoading" class="loadingDiv">
         <span>
           {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
@@ -66,5 +66,14 @@
       <button type="button" class="btn btn-primary" (click)="reduceCommit()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
-
+  <!--操作成功提示-->
+  <clr-modal [(clrModalOpen)]="reduceSuccessShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+    <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+    <div class="modal-body">
+      <p *ngIf="reduceSuccessShow">{{'nfs.reduce.success' | translate}}</p>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-primary" (click)="reduceSuccessShow = false;confirmActResult();">{{'menu.ok' | translate}}</button>
+    </div>
+  </clr-modal>
 </div>
