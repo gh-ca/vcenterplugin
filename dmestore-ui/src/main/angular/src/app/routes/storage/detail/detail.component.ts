@@ -25,7 +25,6 @@ import {
   XAxis,
   YAxis
 } from '../../nfs/nfs.service';
-import {ClrDatagridStateInterface} from '@clr/angular';
 import {ActivatedRoute, Router} from "@angular/router";
 import {CapacityChart, CapacitySerie} from "../storage.service";
 import {BondPort, EthernetPort, FailoverGroup, FCoEPort, FCPort, LogicPort} from "./port.service";
@@ -33,12 +32,13 @@ import {FormControl, FormGroup} from "@angular/forms";
 import {GlobalsService} from "../../../shared/globals.service";
 import {ClrDatagridPagination} from "@clr/angular";
 import {PageEvent} from "@angular/material/paginator";
+import {TranslatePipe} from "@ngx-translate/core";
 @Component({
   selector: 'app-detail',
   templateUrl: './detail.component.html',
   styleUrls: ['./detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [DetailService, MakePerformance, NfsService],
+  providers: [DetailService, TranslatePipe, MakePerformance, NfsService],
 })
 export class DetailComponent implements OnInit, AfterViewInit {
 
@@ -114,7 +114,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
   storageName= "";
   constructor(private nfsService:NfsService, private makePerformance: MakePerformance,
               private detailService: DetailService, private cdr: ChangeDetectorRef, private ngZone: NgZone,
-              private gs: GlobalsService,private activatedRoute: ActivatedRoute,private router:Router) { }
+              private gs: GlobalsService,private activatedRoute: ActivatedRoute,private router:Router,
+              private translatePipe:TranslatePipe) { }
   detail: StorageDetail;
   storagePool: StoragePool[];
   volumes: Volume[];
@@ -151,6 +152,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
   startTime = null;
   // endTime
   endTime = null;
+
+  totalPageNum = '/' + ' ' + '0'; // 卷信息分页个数
 
   rangeTime = new FormGroup({
     start: new FormControl(),
@@ -190,7 +193,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     const fsNames:string[] = [];
     fsNames.push(this.storageId);
      // IOPS
-    this.setChart(150,"IOPS","IO/s",
+    this.setChart(150,this.translatePipe.transform('vmfs.iops'),"IO/s",
      NfsService.storageIOPS,fsNames,this.selectRange,NfsService.storageUrl, this.startTime, this.endTime).then(res=>{
       this.gs.loading=false;
       this.iopsChart = res;
@@ -198,7 +201,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
 
     // 带宽
-    this.setChart(150,'Bandwidth', 'MB/s',
+    this.setChart(150, this.translatePipe.transform('nfs.qos_bandwidth'), 'MB/s',
       NfsService.storageBDWT, fsNames, this.selectRange, NfsService.storageUrl, this.startTime, this.endTime).then(res => {
       this.gs.loading=false;
       this.bandwidthChart = res;
@@ -329,8 +332,6 @@ export class DetailComponent implements OnInit, AfterViewInit {
     const reqParams = {
       storageId: this.storageId,
       pageSize: query ? query.pageSize:10,
-      // pageSize: 10,
-      // pageNo: 0,
       pageNo: query ? query.pageIndex*query.pageSize:0,
     }
     console.log('reqParams', reqParams)
@@ -343,6 +344,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
 
           this.volumes = r.data.volumeList;
           this.volumeTotal=r.data.count;
+
+          this.totalPageNum = '/' + ' ' + Math.ceil(this.volumeTotal/(query ? query.pageSize:10));
+          console.log('this.totalPageNum', this.totalPageNum);
           if (this.volumeRadio === 'table2') {
             this.listVolumesperformance();
           }
@@ -359,6 +363,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
           if (r.code === '200'){
             this.volumes = r.data.volumeList;
             this.volumeTotal=r.data.count;
+
+            this.totalPageNum = '/' + ' ' + Math.ceil(this.volumeTotal/(query ? query.pageSize:10));
+            console.log('this.totalPageNum', this.totalPageNum);
+
             if (this.volumeRadio === 'table2') {
               this.listVolumesperformance();
             }
@@ -886,10 +894,36 @@ export class DetailComponent implements OnInit, AfterViewInit {
     return p;
   }
   getVolDataByPage(pagination:any) {
-    console.log('testFunc', pagination);
     this.getStorageVolumeList(true, pagination);
     return pagination;
   }
   // MatPaginator Output
   pageEvent: PageEvent;
+
+  /**
+   * 卷翻页
+   * @param object
+   * @param pageObj
+   */
+  jumpPage(object:any, pageObj:any) {
+    console.log("object", object)
+    const obj = object.target;
+    if (object.keyCode === 13 || object.keyCode === 108 || object.type === 'blur') { // 按下enter键触发
+      console.log('obj.value', obj.value)
+      console.log('obj.value', obj.value && obj.value > 0 && obj.value -1 !== pageObj.pageIndex)
+      if(obj.value && obj.value > 0 && obj.value -1 !== pageObj.pageIndex) {
+        obj.value=obj.value.replace(/[^1-9]/g,'');
+
+        if (obj.value <= Math.ceil(pageObj.length/pageObj.pageSize)) {
+          pageObj.pageIndex = obj.value - 1;
+        } else {
+          pageObj.pageIndex = Math.ceil(pageObj.length/pageObj.pageSize) - 1;
+          obj.value =  Math.ceil(pageObj.length/pageObj.pageSize);
+        }
+        this.getStorageVolumeList(true, pageObj);
+      }else{
+        obj.value=pageObj.pageIndex + 1;
+      }
+    }
+  }
 }

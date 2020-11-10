@@ -795,5 +795,12 @@
     "perPage": "Per Page",
     "of": "of",
     "all": "Total"
+  },
+  "performance": {
+    "volumeMaximumIORespTime": "Volume maximum I/O response time (ms)",
+    "volumeIODensity": "Volume I/O density (IOPS/TB)",
+    "totalVolumeThroughput": "Total volume throughput(IOPS)",
+    "volumeTotalBandwidth": "Volume total bandwidth(MB/s)",
+    "storagePoolIODensity": "Storage pool I/O density(IOPS/TB)"
   }
 }
