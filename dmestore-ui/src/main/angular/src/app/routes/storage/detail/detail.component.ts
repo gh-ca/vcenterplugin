@@ -25,7 +25,6 @@ import {
   XAxis,
   YAxis
 } from '../../nfs/nfs.service';
-import {ClrDatagridStateInterface} from '@clr/angular';
 import {ActivatedRoute, Router} from "@angular/router";
 import {CapacityChart, CapacitySerie} from "../storage.service";
 import {BondPort, EthernetPort, FailoverGroup, FCoEPort, FCPort, LogicPort} from "./port.service";
@@ -33,12 +32,13 @@ import {FormControl, FormGroup} from "@angular/forms";
 import {GlobalsService} from "../../../shared/globals.service";
 import {ClrDatagridPagination} from "@clr/angular";
 import {PageEvent} from "@angular/material/paginator";
+import {TranslatePipe} from "@ngx-translate/core";
 @Component({
   selector: 'app-detail',
   templateUrl: './detail.component.html',
   styleUrls: ['./detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [DetailService, MakePerformance, NfsService],
+  providers: [DetailService, TranslatePipe, MakePerformance, NfsService],
 })
 export class DetailComponent implements OnInit, AfterViewInit {
 
@@ -114,7 +114,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
   storageName= "";
   constructor(private nfsService:NfsService, private makePerformance: MakePerformance,
               private detailService: DetailService, private cdr: ChangeDetectorRef, private ngZone: NgZone,
-              private gs: GlobalsService,private activatedRoute: ActivatedRoute,private router:Router) { }
+              private gs: GlobalsService,private activatedRoute: ActivatedRoute,private router:Router,
+              private translatePipe:TranslatePipe) { }
   detail: StorageDetail;
   storagePool: StoragePool[];
   volumes: Volume[];
@@ -192,7 +193,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     const fsNames:string[] = [];
     fsNames.push(this.storageId);
      // IOPS
-    this.setChart(150,"IOPS","IO/s",
+    this.setChart(150,this.translatePipe.transform('vmfs.iops'),"IO/s",
      NfsService.storageIOPS,fsNames,this.selectRange,NfsService.storageUrl, this.startTime, this.endTime).then(res=>{
       this.gs.loading=false;
       this.iopsChart = res;
@@ -200,7 +201,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
 
     // 带宽
-    this.setChart(150,'Bandwidth', 'MB/s',
+    this.setChart(150, this.translatePipe.transform('nfs.qos_bandwidth'), 'MB/s',
       NfsService.storageBDWT, fsNames, this.selectRange, NfsService.storageUrl, this.startTime, this.endTime).then(res => {
       this.gs.loading=false;
       this.bandwidthChart = res;
