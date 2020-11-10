@@ -41,7 +41,6 @@ public class VmwareAccessController extends BaseController {
         String failureStr = "";
         try {
             List<Map<String, String>> lists = vmwareAccessService.listHosts();
-            LOG.info("listhost vmware lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {
             LOG.error("list vmware host failure:", e);

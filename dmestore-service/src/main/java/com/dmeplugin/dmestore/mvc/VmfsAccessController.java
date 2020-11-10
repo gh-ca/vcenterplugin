@@ -45,7 +45,6 @@ public class VmfsAccessController extends BaseController {
         String failureStr = "";
         try {
             List<VmfsDataInfo> lists = vmfsAccessService.listVmfs();
-            LOG.info("listvmfs lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {
             LOG.error("list vmfs failure:", e);

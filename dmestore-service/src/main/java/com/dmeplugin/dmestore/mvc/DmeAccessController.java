@@ -90,7 +90,6 @@ public class DmeAccessController extends BaseController {
         String failureStr = "";
         try {
             List<Map<String, Object>> lists = dmeAccessService.getWorkLoads(storageId);
-            LOG.info("getWorkLoads lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {
             LOG.error("get WorkLoads failure:", e);
