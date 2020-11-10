@@ -159,6 +159,9 @@
       "title":"Tips",
       "content":"Are you sure to delete?",
       "tips":"If all the hosts mounted by NFS are unmounted, the NFS device will be deleted automatically！"
+    },
+    "reduce": {
+      "success": "Successfully reduce!"
     }
   },
   "vmfs": {
@@ -249,7 +252,7 @@
       "success": "Successfully modified!"
     },
     "expand": {
-      "success": "Successful expansion!"
+      "success": "Successfully expansion!"
     },
     "serviceLevel": {
       "success": "The service level changed successfully!"

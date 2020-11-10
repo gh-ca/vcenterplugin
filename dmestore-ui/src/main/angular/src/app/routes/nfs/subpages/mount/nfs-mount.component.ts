@@ -28,6 +28,7 @@ export class NfsMountComponent implements OnInit{
   modalHandleLoading = false; // 数据处理loading
   logicPorts: LogicPort[] = [];
   vmkernelList: Vmkernel[]=[];
+  mountSuccessShow = false; // 挂载成功窗口
   constructor(private mountService: NfsMountService, private cdr: ChangeDetectorRef,
               private gs: GlobalsService,
               private activatedRoute: ActivatedRoute,private router:Router){
@@ -128,15 +129,12 @@ export class NfsMountComponent implements OnInit{
       this.modalHandleLoading=false;
       if (result.code  ===  '200'){
         this.mountForm = new Mount();
-        if (this.pluginFlag=='plugin'){
-          this.backToNfsList();
-        }else {
-         this.closeModel();
-        }
+        this.mountSuccessShow = true;
       }else{
         console.log('mount failed:',result.description);
         this.errorMsg='1';
       }
+      this.cdr.detectChanges();
     });
   }
   backToNfsList(){
@@ -156,6 +154,16 @@ export class NfsMountComponent implements OnInit{
       return (c/1024).toFixed(3) +" TB";
     }else if(c>= 1048576){
       return (c/1024/1024).toFixed(3)+" PB"
+    }
+  }
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    if (this.pluginFlag=='plugin'){
+      this.backToNfsList();
+    }else {
+      this.closeModel();
     }
   }
 }

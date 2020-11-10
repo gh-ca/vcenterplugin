@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {ChangeDetectorRef, Component, OnInit} from "@angular/core";
 import {GlobalsService} from "../../../../shared/globals.service";
 import {NfsExpandService} from "./nfs-expand.service";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -19,8 +19,9 @@ export class NfsExpandComponent implements OnInit{
   storeObjectId:string; //当入口为vcenter的时候需要获取此值
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
+  expandSuccessShow = false; // 扩容成功提示
   constructor(private expandService: NfsExpandService, private gs: GlobalsService,
-              private activatedRoute: ActivatedRoute,private router:Router){
+              private activatedRoute: ActivatedRoute,private router:Router, private cdr: ChangeDetectorRef){
   }
   ngOnInit(): void {
       //入口是DataSource
@@ -71,15 +72,12 @@ export class NfsExpandComponent implements OnInit{
     this.expandService.changeCapacity(params).subscribe((result: any) => {
       this.modalHandleLoading=false;
       if (result.code === '200'){
-        if(this.pluginFlag=='plugin'){
-          this.backToNfsList();
-        }else{
-          this.closeModel();
-        }
+        this.expandSuccessShow = true; // 扩容成功提示
       }else{
         this.errorMsg = '1';
         console.log('Expand failed:',result.description)
       }
+      this.cdr.detectChanges();
     });
   }
   backToNfsList(){
@@ -91,5 +89,16 @@ export class NfsExpandComponent implements OnInit{
     this.modalLoading=false;
     this.errorMsg=null;
     this.gs.getClientSdk().modal.close();
+  }
+
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    if(this.pluginFlag=='plugin'){
+      this.backToNfsList();
+    }else{
+      this.closeModel();
+    }
   }
 }
