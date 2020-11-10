@@ -91,16 +91,16 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         JsonObject share = gson.fromJson(resBody, JsonObject.class);
         NfsDataStoreShareAttr shareAttr = new NfsDataStoreShareAttr();
         shareAttr.setName(share.get("name").getAsString());
-        shareAttr.setFs_name(ToolUtils.jsonToStr(share.get("fs_name"), null));
-        shareAttr.setShare_path(share.get("share_path").getAsString());
+        shareAttr.setFsName(ToolUtils.jsonToStr(share.get("fs_name"), null));
+        shareAttr.setSharePath(share.get("share_path").getAsString());
         shareAttr.setDescription(share.get("description").getAsString());
-        shareAttr.setDevice_name(ToolUtils.jsonToStr(share.get("device_name"), null));
-        shareAttr.setOwning_dtree_name(ToolUtils.jsonToStr(share.get("owning_dtree_name"), null));
-        shareAttr.setOwning_dtree_id(ToolUtils.jsonToStr(share.get("owning_dtree_id"), null));
+        shareAttr.setDeviceName(ToolUtils.jsonToStr(share.get("device_name"), null));
+        shareAttr.setOwningDtreeName(ToolUtils.jsonToStr(share.get("owning_dtree_name"), null));
+        shareAttr.setOwningDtreeId(ToolUtils.jsonToStr(share.get("owning_dtree_id"), null));
         //查询客户端列表
         List<AuthClient> authClientList = getNfsDatastoreShareAuthClients(nfsShareId);
         if (null != authClientList && authClientList.size() > 0) {
-            shareAttr.setAuth_client_list(authClientList);
+            shareAttr.setAuthClientList(authClientList);
         }
         return shareAttr;
     }

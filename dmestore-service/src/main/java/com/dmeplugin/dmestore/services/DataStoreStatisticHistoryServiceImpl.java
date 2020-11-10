@@ -571,8 +571,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     //query statistic by objType(methodName)
     private Map<String, Object> queryHistoryStatistic(String relationOrInstance, Map<String, Object> params, Map<String, String> idInstanceIdMap) throws DMEException {
-        Map<String, Object> resultmap = new HashMap<>();
-
+        Map<String, Object> resultmap = new HashMap<>(16);
         ResponseEntity responseEntity;
         JsonElement statisticElement;
         List<List<String>> objIdGroup = groupObjIds(params);

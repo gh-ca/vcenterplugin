@@ -6,15 +6,22 @@ import java.util.List;
  * @author wangxiangyong
  **/
 public class NfsDataStoreShareAttr {
-    private String fs_name;
+    private String fsName;
     private String name;
-    private String share_path;
+    private String sharePath;
     private String description;
-    private String owning_dtree_id;
-    private String owning_dtree_name;
-    private String device_name;
-    private List<AuthClient> auth_client_list;
+    private String owningDtreeId;
+    private String owningDtreeName;
+    private String deviceName;
+    private List<AuthClient> authClientList;
 
+    public String getFsName() {
+        return fsName;
+    }
+
+    public void setFsName(String fsName) {
+        this.fsName = fsName;
+    }
 
     public String getName() {
         return name;
@@ -24,44 +31,12 @@ public class NfsDataStoreShareAttr {
         this.name = name;
     }
 
-    public String getFs_name() {
-        return fs_name;
+    public String getSharePath() {
+        return sharePath;
     }
 
-    public void setFs_name(String fs_name) {
-        this.fs_name = fs_name;
-    }
-
-    public String getShare_path() {
-        return share_path;
-    }
-
-    public void setShare_path(String share_path) {
-        this.share_path = share_path;
-    }
-
-    public String getOwning_dtree_id() {
-        return owning_dtree_id;
-    }
-
-    public void setOwning_dtree_id(String owning_dtree_id) {
-        this.owning_dtree_id = owning_dtree_id;
-    }
-
-    public String getOwning_dtree_name() {
-        return owning_dtree_name;
-    }
-
-    public void setOwning_dtree_name(String owning_dtree_name) {
-        this.owning_dtree_name = owning_dtree_name;
-    }
-
-    public String getDevice_name() {
-        return device_name;
-    }
-
-    public void setDevice_name(String device_name) {
-        this.device_name = device_name;
+    public void setSharePath(String sharePath) {
+        this.sharePath = sharePath;
     }
 
     public String getDescription() {
@@ -72,11 +47,35 @@ public class NfsDataStoreShareAttr {
         this.description = description;
     }
 
-    public List<AuthClient> getAuth_client_list() {
-        return auth_client_list;
+    public String getOwningDtreeId() {
+        return owningDtreeId;
     }
 
-    public void setAuth_client_list(List<AuthClient> auth_client_list) {
-        this.auth_client_list = auth_client_list;
+    public void setOwningDtreeId(String owningDtreeId) {
+        this.owningDtreeId = owningDtreeId;
+    }
+
+    public String getOwningDtreeName() {
+        return owningDtreeName;
+    }
+
+    public void setOwningDtreeName(String owningDtreeName) {
+        this.owningDtreeName = owningDtreeName;
+    }
+
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
+    }
+
+    public List<AuthClient> getAuthClientList() {
+        return authClientList;
+    }
+
+    public void setAuthClientList(List<AuthClient> authClientList) {
+        this.authClientList = authClientList;
     }
 }
