@@ -1,15 +1,9 @@
-
-<clr-select-container *ngIf="fsNames.length>0">
-  <select clrSelect (ngModelOptions)="fsNames" [(ngModel)]="defaultSelect" name="defaultSelect" class="clr-select" (change)="changeFs()">
-    <option *ngFor="let item of fsNames" value="{{item}}">{{item}}</option>
-  </select>
-</clr-select-container>
 <table class="searchtable" cellpadding="5" >
   <tr>
     <td>
-      <clr-select-container>
-        <select clrSelect (ngModelOptions)="ranges" [(ngModel)]="selectRange" name="defaultSelect" class="clr-select" (change)="changeFs()">
-          <option *ngFor="let item of ranges" value="{{item.key}}">{{item.value}}</option>
+      <clr-select-container *ngIf="fsNames.length>0">
+        <select clrSelect (ngModelOptions)="fsNames" [(ngModel)]="defaultSelect" name="defaultSelect" class="clr-select" (change)="changeFs()">
+          <option *ngFor="let item of fsNames" value="{{item}}">{{item}}</option>
         </select>
       </clr-select-container>
     </td>
@@ -25,6 +19,13 @@
         <mat-error *ngIf="rangeTime.controls.start.hasError('matStartDateInvalid')">Invalid start date</mat-error>
         <mat-error *ngIf="rangeTime.controls.end.hasError('matEndDateInvalid')">Invalid end date</mat-error>
       </mat-form-field>
+    </td>
+    <td>
+      <clr-select-container>
+        <select clrSelect (ngModelOptions)="ranges" [(ngModel)]="selectRange" name="defaultSelect" class="clr-select" (change)="changeFs()">
+          <option *ngFor="let item of ranges" value="{{item.key}}">{{item.value}}</option>
+        </select>
+      </clr-select-container>
     </td>
   </tr>
 </table>
