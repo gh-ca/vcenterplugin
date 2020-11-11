@@ -209,7 +209,6 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
         String storeType = ToolUtils.STORE_TYPE_NFS;
         String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(storeType);
-        LOG.info("===list nfs datastore success====\n{}", listStr);
         if (StringUtils.isEmpty(listStr)) {
             return false;
         }
