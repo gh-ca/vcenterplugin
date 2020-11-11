@@ -26,7 +26,6 @@ public class DmeStorageController extends BaseController {
 
 
     public static final Logger LOG = LoggerFactory.getLogger(DmeStorageController.class);
-    private final String API_RESP_CODE = "code";
     private Gson gson = new Gson();
 
     @Autowired
@@ -285,7 +284,7 @@ public class DmeStorageController extends BaseController {
         String failureStr = "";
         try {
             List<Storage> lists = dmeStorageService.listStoragePerformance(storageIds);
-            LOG.info("liststorageperformance lists==" + gson.toJson(lists));
+            //LOG.info("liststorageperformance lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {
             LOG.error("get Storage performance failure:", e);
@@ -308,7 +307,7 @@ public class DmeStorageController extends BaseController {
         String failureStr = "";
         try {
             List<StoragePool> lists = dmeStorageService.listStoragePoolPerformance(storagePoolIds);
-            LOG.info("liststorageperformance lists==" + gson.toJson(lists));
+            //LOG.info("liststorageperformance lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {
             LOG.error("get Storage Pool performance failure:", e);
@@ -331,7 +330,7 @@ public class DmeStorageController extends BaseController {
         String failureStr = "";
         try {
             List<StorageControllers> lists = dmeStorageService.listStorageControllerPerformance(storageControllerIds);
-            LOG.info("listStorageControllerPerformance lists==" + gson.toJson(lists));
+            //LOG.info("listStorageControllerPerformance lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {
             LOG.error("get Storage controller performance failure:", e);
@@ -354,7 +353,7 @@ public class DmeStorageController extends BaseController {
         String failureStr = "";
         try {
             List<StorageDisk> lists = dmeStorageService.listStorageDiskPerformance(storageDiskIds);
-            LOG.info("listStorageDiskPerformance lists==" + gson.toJson(lists));
+            //LOG.info("listStorageDiskPerformance lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {
             LOG.error("get Storage disk performance failure:", e);
@@ -377,7 +376,7 @@ public class DmeStorageController extends BaseController {
         String failureStr = "";
         try {
             List<StoragePort> lists = dmeStorageService.listStoragePortPerformance(storagePortIds);
-            LOG.info("listStoragePortPerformance lists==" + gson.toJson(lists));
+            //LOG.info("listStoragePortPerformance lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {
             LOG.error("get Storage port performance failure:", e);
@@ -400,7 +399,7 @@ public class DmeStorageController extends BaseController {
         String failureStr = "";
         try {
             List<Volume> lists = dmeStorageService.listVolumesPerformance(volumeId);
-            LOG.info("listVolumesPerformance lists==" + gson.toJson(lists));
+            //LOG.info("listVolumesPerformance lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {
             LOG.error("get Storage volume performance failure:", e);
