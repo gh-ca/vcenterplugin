@@ -172,8 +172,8 @@ public class NfsOperationController extends BaseController{
      *      "maxBandwidth": "1",
      *      "maxIops": "2"
      *      "minBandwidth"
-     * 	 "minIops"
-     * 	 "latency"
+     * 	    "minIops"
+     * 	    "latency"
      *      "shareId":"70C9358F595B3AA5A1DB2464F72AF0DA"
      *      "advance"false true  true 是有高级选项
      *      "qosFlag"qos策略开关 false true false关闭

@@ -708,7 +708,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     public HashMap<String, Integer> getVmVncPortsOnCluster() throws Exception {
         ObjectContent[] ocs = getVmPropertiesOnHyperHost(new String[] {"name", "config.extraConfig[\"RemoteDisplay.vnc.port\"]"});
 
-        HashMap<String, Integer> portInfo = new HashMap<String, Integer>();
+        HashMap<String, Integer> portInfo = new HashMap<String, Integer>(16);
         if (ocs != null && ocs.length > 0) {
             for (ObjectContent oc : ocs) {
                 List<DynamicProperty> objProps = oc.getPropSet();
