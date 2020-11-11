@@ -272,12 +272,42 @@
   white-space: nowrap;
 }
 
-::ng-deep .mat-focus-indicator .mat-tooltip-trigger .mat-paginator-navigation-next .mat-icon-button .mat-button-base{
+::ng-deep .mat-paginator-navigation-previous{
+  margin-right: 44px;
+}
+
+::ng-deep .mat-paginator-navigation-next{
   margin-left: 20px;
 }
 
-::ng-deep .mat-focus-indicator .mat-tooltip-trigger .mat-paginator-navigation-previous .mat-icon-button .mat-button-base{
-  margin-right: 20px;
+.jumpPageClass{
+  position: absolute;
+  top: 18px;
+  right: 120px;
+  width: 31px;
+  text-align: center;
+  font-size: 12px;
 }
 
+.totalPageClass{
+  border: none;
+  width: 31px;
+  position: absolute;
+  text-align: center;
+  top: 20px;
+  right: 89px;
+  background-color: white;
+  font-size: 12px;
+}
+
+// 隐藏input标签箭头
+input[type=number] {
+
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+
+  -moz-appearance: textfield;
+}
 

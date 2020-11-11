@@ -22,6 +22,7 @@ export class NfsUnmountComponent implements OnInit{
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
   unmountTipsShow=false;
+  unmountSuccessShow = false; // 卸载成功窗口
   constructor(private unmountService: NfsUnmountService, private gs: GlobalsService,
               private activatedRoute: ActivatedRoute,private router:Router, private cdr: ChangeDetectorRef){
   }
@@ -143,11 +144,7 @@ export class NfsUnmountComponent implements OnInit{
     this.unmountService.unmount(params).subscribe((result: any) => {
       this.modalHandleLoading=false;
       if (result.code === '200'){
-        if(this.pluginFlag=='plugin'){
-          this.backToNfsList();
-        }else{
-          this.closeModel();
-        }
+       this.unmountSuccessShow = true;
       }else{
         this.errorMsg = '1';
         console.log("unMount Failed:",result.description)
@@ -171,4 +168,15 @@ export class NfsUnmountComponent implements OnInit{
   //       }
   //     });
   // }
+
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    if(this.pluginFlag=='plugin'){
+      this.backToNfsList();
+    }else{
+      this.closeModel();
+    }
+  }
 }

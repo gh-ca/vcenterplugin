@@ -359,4 +359,15 @@
       <button type="button" class="btn btn-primary" (click)="modifyCommit()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
+
+  <!--操作成功提示-->
+  <clr-modal [(clrModalOpen)]="modifySuccessShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+    <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+    <div class="modal-body">
+      <p *ngIf="modifySuccessShow">{{'vmfs.modify.success' | translate}}</p>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-primary" (click)="modifySuccessShow = false;confirmActResult();">{{'menu.ok' | translate}}</button>
+    </div>
+  </clr-modal>
 </div>

@@ -159,6 +159,9 @@
       "title":"卸载",
       "content":"确认要卸载吗?",
       "tips":"若NFS所挂载的主机全部被卸载，则会自动删除此NFS设备！"
+    },
+    "reduce": {
+      "success": "添加成功！"
     }
   },
   "vmfs": {
@@ -795,5 +798,12 @@
     "perPage": "每页",
     "of": "中的",
     "all": "共"
+  },
+  "performance": {
+    "volumeMaximumIORespTime": "卷最大I/O响应时间(ms)",
+    "volumeIODensity": "卷I/O密度(IOPS/TB)",
+    "totalVolumeThroughput": "卷总吞吐量(IOPS)",
+    "volumeTotalBandwidth": "卷总带宽(MB/s)",
+    "storagePoolIODensity": "存储池I/O密度(IOPS/TB)"
   }
 }

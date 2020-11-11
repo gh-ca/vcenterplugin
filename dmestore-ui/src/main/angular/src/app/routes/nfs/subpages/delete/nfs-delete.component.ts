@@ -16,6 +16,7 @@ export class NfsDeleteComponent implements OnInit{
   errorMsg: string;
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
+  delSuccessShow = false; // 删除提示窗口
   constructor(private deleteService: NfsDeleteService, private cdr: ChangeDetectorRef,
               private gs: GlobalsService,
               private activatedRoute: ActivatedRoute,private router:Router){
@@ -45,15 +46,13 @@ export class NfsDeleteComponent implements OnInit{
     this.deleteService.delNfs(params).subscribe((result: any) => {
       this.modalHandleLoading=false;
       if (result.code === '200'){
-        if(this.pluginFlag=='plugin'){
-          this.backToNfsList();
-        }else{
-          this.closeModel();
-        }
+        // 删除成功提示
+        this.delSuccessShow = true;
       }else{
         this.errorMsg = '1';
         console.log("Delete failed:",result.description)
       }
+      this.cdr.detectChanges();
     });
   }
 
@@ -65,5 +64,16 @@ export class NfsDeleteComponent implements OnInit{
   closeModel(){
     this.modalHandleLoading=false;
     this.gs.getClientSdk().modal.close();
+  }
+
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    if(this.pluginFlag=='plugin'){
+      this.backToNfsList();
+    }else{
+      this.closeModel();
+    }
   }
 }

@@ -24,6 +24,7 @@ export class NfsModifyComponent implements OnInit{
   minbandwidthChoose=false; // 最小带宽 选中
   miniopsChoose=false; // 最小iops 选中
   latencyChoose=false; // 时延 选中
+  modifySuccessShow = false; // 编辑程功窗口
 
   constructor(private modifyService: NfsModifyService, private cdr: ChangeDetectorRef,
               private gs: GlobalsService,
@@ -67,15 +68,12 @@ export class NfsModifyComponent implements OnInit{
     this.modifyService.updateNfs(this.updateNfs).subscribe((result: any) => {
       this.modalHandleLoading=false;
       if (result.code === '200'){
-        if (this.pluginFlag=='plugin'){
-          this.backToNfsList();
-        }else{
-          this.closeModel();
-        }
+        this.modifySuccessShow = true;
       }else{
         this.errorMsg = '1';
         console.log("Delete failed:",result.description)
       }
+      this.cdr.detectChanges();
     });
   }
   backToNfsList(){
@@ -230,5 +228,16 @@ export class NfsModifyComponent implements OnInit{
         }
       }
     });
+  }
+
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    if (this.pluginFlag=='plugin'){
+      this.backToNfsList();
+    }else{
+      this.closeModel();
+    }
   }
 }
