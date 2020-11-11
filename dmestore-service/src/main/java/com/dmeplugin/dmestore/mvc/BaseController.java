@@ -103,7 +103,7 @@ public class BaseController {
   protected Map<String, Object> handleException(SQLException exception,
       HttpServletRequest request) {
     LOGGER.error("DB Exception!" + exception.getMessage());
-    Map<String, Object> errorMap = new HashMap<>();
+    Map<String, Object> errorMap = new HashMap<>(16);
     errorMap.put(FIELD_CODE, CODE_DB_EXCEPTION);
     errorMap.put(FIELD_DESCRIPTION, exception.getMessage());
     errorMap.put(FIELD_DATA, null);
@@ -120,7 +120,7 @@ public class BaseController {
 
   private Map<String, Object> generateError(HttpServletRequest request, String code, String message,
       Object data) {
-    Map<String, Object> errorMap = new HashMap<>();
+    Map<String, Object> errorMap = new HashMap<>(16);
     errorMap.put(FIELD_CODE, code);
     errorMap.put(FIELD_DESCRIPTION, message);
     errorMap.put(FIELD_DATA, data);
