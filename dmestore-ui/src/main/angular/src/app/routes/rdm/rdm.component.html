@@ -18,7 +18,7 @@
         <label  style="color: #9F9F9F;">{{'rdm.capacity' | translate}}<span style="color: red">*</span></label>
         <div clrInput style="float: left;width: 54%;position: relative;">
           <!-- V5时最小值1.3G V6时最小值2G-->
-          <input clrInput style="width: 60%;border-bottom: none" type="number" [(ngModel)]="configModel.volumeSpecs[0].capacity" name="capacity" #number="ngModel"
+          <input clrInput style="width: 60%;border-bottom: none" min="0" type="number" [(ngModel)]="configModel.volumeSpecs[0].capacity" name="capacity" #number="ngModel"
                   required/>
           <select class="capacity" (change)="configModel.volumeSpecs[0].capacity = null;" clrInput style="width: 40%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;"
                   [(ngModel)]="configModel.volumeSpecs[0].unit" name="unit" >
@@ -27,7 +27,7 @@
           </select>
         </div>
         <input clrInput style="width: 19%;text-align: center;" readonly name="ss" value="{{'vmfs.multiply' | translate}}"/>
-        <input clrInput style="width: 27%;" type="number" [(ngModel)]="configModel.volumeSpecs[0].count" name="count" #number="ngModel" required/>
+        <input clrInput style="width: 27%;" min="1" type="number" [(ngModel)]="configModel.volumeSpecs[0].count" name="count" #number="ngModel" required/>
         <!--<clr-control-helper>
           <div class="errorTips" readonly >
             <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.capacityTips' | translate}}

@@ -73,7 +73,6 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     @Override
     public void accessDme(Map<String, Object> params) throws DMEException {
         try {
-            LOG.info("params==" + (params == null ? "null" : gson.toJson(params)));
             if (params != null) {
                 //判断与服务器的连接
                 ResponseEntity responseEntity = login(params);
