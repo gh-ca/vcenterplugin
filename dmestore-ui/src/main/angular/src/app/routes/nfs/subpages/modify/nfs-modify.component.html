@@ -102,7 +102,7 @@
                 <input type="checkbox" [(ngModel)]="maxbandwidthChoose" name="maxbandwidthChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.bandwidthLimitUpper' | translate}}
-                  <input type="number" [(readOnly)]="!maxbandwidthChoose" class="inputOneLine" name="maxBandwidth"
+                  <input type="number" min="0" [(readOnly)]="!maxbandwidthChoose" class="inputOneLine" name="maxBandwidth"
                          [(ngModel)]="updateNfs.maxBandwidth" (blur)="qosBlur('add', 'maxbandwidth');"/>
                   {{'vmfs.unitM' | translate}}
                 </label>
@@ -115,7 +115,7 @@
                 <input type="checkbox" [(ngModel)]="maxiopsChoose" name="maxiopsChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.IOPSLimitUpper' | translate}}
-                  <input type="number" [(readOnly)]="!maxiopsChoose" class="inputOneLine" name="maxIops"
+                  <input type="number" min="0" [(readOnly)]="!maxiopsChoose" class="inputOneLine" name="maxIops"
                          [(ngModel)]="updateNfs.maxIops" (blur)="qosBlur('add', 'maxiops');"/>
                 </label>
               </clr-checkbox-wrapper>
@@ -128,7 +128,7 @@
                 <input type="checkbox" [(ngModel)]="minbandwidthChoose" name="minbandwidthChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.bandwidthLimitLower' | translate}}
-                  <input type="number" [(readOnly)]="!minbandwidthChoose" class="inputOneLine"
+                  <input type="number" min="0" [(readOnly)]="!minbandwidthChoose" class="inputOneLine"
                          name="minBandwidth" [(ngModel)]="updateNfs.minBandwidth" (blur)="qosBlur('add', 'minbandwidth');"/>
                   {{'vmfs.unitM' | translate}}
                 </label>
@@ -141,7 +141,7 @@
                 <input type="checkbox" [(ngModel)]="miniopsChoose" name="minbandwidthChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.IOPSLimitLower' | translate}}
-                  <input type="number" [(readOnly)]="!miniopsChoose" class="inputOneLine" name="minIops"
+                  <input type="number" min="0" [(readOnly)]="!miniopsChoose" class="inputOneLine" name="minIops"
                          [(ngModel)]="updateNfs.minIops" (blur)="qosBlur('add', 'miniops');"/>
                 </label>
               </clr-checkbox-wrapper>
@@ -153,7 +153,7 @@
                 <input type="checkbox" [(ngModel)]="latencyChoose" name="latencyChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.latencyMax' | translate}}
-                  <input type="number" [(readOnly)]="!latencyChoose" class="inputOneLine" name="latency"
+                  <input type="number" min="0" [(readOnly)]="!latencyChoose" class="inputOneLine" name="latency"
                          [(ngModel)]="updateNfs.latency" (blur)="qosBlur('add', 'latency');"/>{{'vmfs.latencyUnit' | translate}}
                 </label>
               </clr-checkbox-wrapper>
@@ -269,7 +269,7 @@
                 <input type="checkbox" [(ngModel)]="maxbandwidthChoose" name="maxbandwidthChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.bandwidthLimitUpper' | translate}}
-                  <input type="number" [(readOnly)]="!maxbandwidthChoose" class="inputOneLine" name="maxBandwidth"
+                  <input type="number" min="0" [(readOnly)]="!maxbandwidthChoose" class="inputOneLine" name="maxBandwidth"
                          [(ngModel)]="updateNfs.maxBandwidth" (blur)="qosBlur('add', 'maxbandwidth');"/>
                   {{'vmfs.unitM' | translate}}
                 </label>
@@ -282,7 +282,7 @@
                 <input type="checkbox" [(ngModel)]="maxiopsChoose" name="maxiopsChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.IOPSLimitUpper' | translate}}
-                  <input type="number" [(readOnly)]="!maxiopsChoose" class="inputOneLine" name="maxIops"
+                  <input type="number" min="0" [(readOnly)]="!maxiopsChoose" class="inputOneLine" name="maxIops"
                          [(ngModel)]="updateNfs.maxIops" (blur)="qosBlur('add', 'maxiops');"/>
                 </label>
               </clr-checkbox-wrapper>
@@ -295,7 +295,7 @@
                 <input type="checkbox" [(ngModel)]="minbandwidthChoose" name="minbandwidthChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.bandwidthLimitLower' | translate}}
-                  <input type="number" [(readOnly)]="!minbandwidthChoose" class="inputOneLine"
+                  <input type="number" min="0" [(readOnly)]="!minbandwidthChoose" class="inputOneLine"
                          name="minBandwidth" [(ngModel)]="updateNfs.minBandwidth" (blur)="qosBlur('add', 'minbandwidth');"/>
                   {{'vmfs.unitM' | translate}}
                 </label>
@@ -308,7 +308,7 @@
                 <input type="checkbox" [(ngModel)]="miniopsChoose" name="minbandwidthChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.IOPSLimitLower' | translate}}
-                  <input type="number" [(readOnly)]="!miniopsChoose" class="inputOneLine" name="minIops"
+                  <input type="number" min="0" [(readOnly)]="!miniopsChoose" class="inputOneLine" name="minIops"
                          [(ngModel)]="updateNfs.minIops" (blur)="qosBlur('add', 'miniops');"/>
                 </label>
               </clr-checkbox-wrapper>
@@ -320,7 +320,7 @@
                 <input type="checkbox" [(ngModel)]="latencyChoose" name="latencyChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.latencyMax' | translate}}
-                  <input type="number" [(readOnly)]="!latencyChoose" class="inputOneLine" name="latency"
+                  <input type="number" min="0" [(readOnly)]="!latencyChoose" class="inputOneLine" name="latency"
                          [(ngModel)]="updateNfs.latency" (blur)="qosBlur('add', 'latency');"/>{{'vmfs.latencyUnit' | translate}}
                 </label>
               </clr-checkbox-wrapper>
