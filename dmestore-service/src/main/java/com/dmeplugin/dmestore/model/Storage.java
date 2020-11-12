@@ -1,5 +1,7 @@
 package com.dmeplugin.dmestore.model;
 
+import java.util.Arrays;
+
 /**
  * @author lianq
  * @ClassName: Storage

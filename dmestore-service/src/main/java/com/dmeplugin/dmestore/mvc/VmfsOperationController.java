@@ -20,7 +20,6 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/operatevmfs")
-@Api
 public class VmfsOperationController extends BaseController{
 
     public static final Logger LOG = LoggerFactory.getLogger(VmfsOperationController.class);

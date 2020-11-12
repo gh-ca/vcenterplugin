@@ -134,13 +134,6 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/log4j-1.2.14.jar</systemPath>
         </dependency>
-<!--        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.26</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/extlib/slf4j-log4j12-1.7.26.jar</systemPath>
-        </dependency>-->
         <dependency>
             <groupId>com.apache</groupId>
             <artifactId>httpclient</artifactId>
@@ -175,12 +168,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <version>1.5.21.RELEASE</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>classmate</artifactId>
-                    <groupId>com.fasterxml</groupId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -261,21 +248,21 @@
             <artifactId>jackson-databind</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/jackson-databind.jar</systemPath>
+            <systemPath>${project.basedir}/lib/jackson-databind-2.8.11.3.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>jackson</groupId>
             <artifactId>jackson-core</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/jackson-core.jar</systemPath>
+            <systemPath>${project.basedir}/lib/jackson-core-2.8.10.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>jackson</groupId>
             <artifactId>jackson-annotation</artifactId>
             <version>1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/jackson-annotations.jar</systemPath>
+            <systemPath>${project.basedir}/lib/jackson-annotations-2.8.0.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.apache</groupId>
@@ -298,9 +285,6 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/commons-logging.jar</systemPath>
         </dependency>
-
-
-
         <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>vmvmodl</artifactId>
@@ -329,9 +313,6 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/vlsiClient.jar</systemPath>
         </dependency>
-
-
-
         <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>queryVmodl</artifactId>
@@ -352,12 +333,6 @@
             <version>1.0</version>
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/stax2-api-3.0.1.jar</systemPath>
-        </dependency>
-        <dependency>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/lib/hamcrest-all-1.3.jar</systemPath>
         </dependency>
     </dependencies>
     <build>

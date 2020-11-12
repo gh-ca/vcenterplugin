@@ -21,7 +21,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/dmestorage")
-@Api
 public class DmeStorageController extends BaseController {
 
 
