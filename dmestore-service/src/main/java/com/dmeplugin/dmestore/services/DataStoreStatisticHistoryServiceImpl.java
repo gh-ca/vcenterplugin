@@ -59,7 +59,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         Object indicatorIds = params.get("indicator_ids");
         List<String> ids = (List<String>) params.get("obj_ids");
         //ids若为wwn的集合则转换为对应的instanceId集合,也有可能ids直接就是volume的instanceId集合
-        if (ids.size() > 0) {
+        if (null != ids && ids.size() > 0) {
             Map<String, Map<String, Object>> sysLunMap = dmeRelationInstanceService.getLunInstance();
             for (String id : ids) {
                 try {
@@ -1111,5 +1111,21 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             objGroup.add(objIds);
         }
         return objGroup;
+    }
+
+    public DmeAccessService getDmeAccessService() {
+        return dmeAccessService;
+    }
+
+    public void setDmeAccessService(DmeAccessService dmeAccessService) {
+        this.dmeAccessService = dmeAccessService;
+    }
+
+    public DmeRelationInstanceService getDmeRelationInstanceService() {
+        return dmeRelationInstanceService;
+    }
+
+    public void setDmeRelationInstanceService(DmeRelationInstanceService dmeRelationInstanceService) {
+        this.dmeRelationInstanceService = dmeRelationInstanceService;
     }
 }
