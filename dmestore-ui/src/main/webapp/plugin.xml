@@ -616,7 +616,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/delete</actionUrl>
                         <dialogTitle>VMFS</dialogTitle>
-                        <dialogSize>400,280</dialogSize>
+                        <dialogSize>400,200</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -664,7 +664,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/delete</actionUrl>
                         <dialogTitle>NFS</dialogTitle>
-                        <dialogSize>400,280</dialogSize>
+                        <dialogSize>400,200</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -725,7 +725,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/reclaim?resource=dataStore</actionUrl>
                         <dialogTitle>VMFS</dialogTitle>
-                        <dialogSize>300,150</dialogSize>
+                        <dialogSize>400,200</dialogSize>
                      </root>
                   </object>
                </delegate>
