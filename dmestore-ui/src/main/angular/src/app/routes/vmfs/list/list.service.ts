@@ -11,8 +11,8 @@ export class VmfsListService {
     return this.http.get('accessvmfs/listvmfs');
   }
   // 附列表数据
-  getChartData(volumeIds: string[] ) {
-    return this.http.get('accessvmfs/listvmfsperformance', {params: {volumeIds}});
+  getChartData(wwns: string[] ) {
+    return this.http.get('accessvmfs/listvmfsperformance', {params: {wwns}});
   }
   // 获取存储
   getStorages() {
