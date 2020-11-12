@@ -27,11 +27,11 @@ public interface VmfsAccessService {
     /**
      * List vmfs Performance
      *
-     * @param  volumeIds volumes id
+     * @param  wwns
      * @return List<VmfsDataInfo>
      * @throws Exception when error
      */
-    List<VmfsDataInfo> listVmfsPerformance(List<String> volumeIds) throws DMEException;
+    List<VmfsDataInfo> listVmfsPerformance(List<String> wwns) throws DMEException;
 
     /**
      * Create vmfs include:

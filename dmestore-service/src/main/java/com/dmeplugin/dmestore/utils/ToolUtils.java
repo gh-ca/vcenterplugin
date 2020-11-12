@@ -138,7 +138,7 @@ public class ToolUtils {
     public static Integer jsonToInt(JsonElement obj, Integer defaultValue) {
         Integer re = defaultValue;
         try {
-            if (!StringUtils.isEmpty(obj)) {
+            if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsInt();
             }
         } catch (Exception e) {
@@ -150,7 +150,7 @@ public class ToolUtils {
     public static Integer jsonToInt(JsonElement obj) {
         Integer re = 0;
         try {
-            if (!StringUtils.isEmpty(obj)) {
+            if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsInt();
             }
         } catch (Exception e) {
