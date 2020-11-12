@@ -558,8 +558,10 @@ export class AddComponent implements OnInit{
         capacity = '';
         this.capacityErr = true;
       }
-      this.form.capacity = capacity;
+    } else {
+      capacity = '';
     }
+    this.form.capacity = capacity;
     console.log('this.form.capacityUnit', this.form.capacityUnit);
     console.log('this.form.capacity', this.form.capacity);
     console.log('this.form.count', this.form.count);
@@ -577,6 +579,8 @@ export class AddComponent implements OnInit{
       } else {
         this.capacityErr = false;
       }
+    } else {
+      count = '';
     }
     this.form.count =  count;
   }
