@@ -272,11 +272,11 @@
   white-space: nowrap;
 }
 
-::ng-deep .mat-paginator-navigation-previous{
+::ng-deep .pageSet .mat-paginator-navigation-previous{
   margin-right: 44px;
 }
 
-::ng-deep .mat-paginator-navigation-next{
+::ng-deep .pageSet .mat-paginator-navigation-next{
   margin-left: 20px;
 }
 
