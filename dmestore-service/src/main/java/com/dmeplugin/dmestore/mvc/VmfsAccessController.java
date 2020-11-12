@@ -56,18 +56,17 @@ public class VmfsAccessController extends BaseController {
     /**
      * Access vmfs performance
      *
-     * @param volumeIds volumes id
+     * @param wwns wwns
      * @return: ResponseBodyBean
      */
     @RequestMapping(value = "/listvmfsperformance", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseBodyBean listVmfsPerformance(@RequestParam("volumeIds") List<String> volumeIds)
+    public ResponseBodyBean listVmfsPerformance(@RequestParam("wwns") List<String> wwns)
             throws Exception {
-        LOG.info("accessvmfs/listvmfsperformance volumeIds==" + gson.toJson(volumeIds));
+        LOG.info("accessvmfs/listvmfsperformance volumeIds==" + gson.toJson(wwns));
         String failureStr = "";
         try {
-            List<VmfsDataInfo> lists = vmfsAccessService.listVmfsPerformance(volumeIds);
-            LOG.info("listvmfsperformance lists==" + gson.toJson(lists));
+            List<VmfsDataInfo> lists = vmfsAccessService.listVmfsPerformance(wwns);
             return success(lists);
         } catch (Exception e) {
             LOG.error("get vmfs performance failure:", e);

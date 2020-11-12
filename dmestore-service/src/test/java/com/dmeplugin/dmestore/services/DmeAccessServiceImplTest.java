@@ -7,13 +7,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.HttpMethod;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * DmeAccessServiceImpl Tester.
  *
- * @author <Authors name>
+ * @author wangxiangyong
  * @version 1.0
  * @since <pre>十一月 11, 2020</pre>
  */
@@ -29,7 +32,7 @@ public class DmeAccessServiceImplTest {
         dmeInfoDao.setUrl("jdbc:h2://C:/ProgramData/VMware/vCenterServer/runtime/");
         dmeAccessService.setDmeInfoDao(dmeInfoDao);
         VmfsAccessServiceImpl vmfsAccessService = new VmfsAccessServiceImpl();
-        vmfsAccessService.setVcsdkUtils( new VCSDKUtils());
+        vmfsAccessService.setVcsdkUtils(new VCSDKUtils());
         dmeAccessService.setVmfsAccessService(vmfsAccessService);
     }
 
@@ -208,6 +211,7 @@ public class DmeAccessServiceImplTest {
      */
     @Test
     public void testConfigureTaskTime() throws Exception {
+        return;
     }
 
     /**
@@ -215,6 +219,8 @@ public class DmeAccessServiceImplTest {
      */
     @Test
     public void testGetDmeHostGroup() throws Exception {
+        String hostGroupId = "123cfad3-2ddf-4b47-9772-675c6ad770b8";
+        dmeAccessService.getDmeHostGroup(hostGroupId);
     }
 
     /**
@@ -222,6 +228,8 @@ public class DmeAccessServiceImplTest {
      */
     @Test
     public void testGetDmeHostInHostGroup() throws Exception {
+        String hostGroupId = "123cfad3-2ddf-4b47-9772-675c6ad770b8";
+        dmeAccessService.getDmeHostInHostGroup(hostGroupId);
     }
 
     /**
@@ -229,6 +237,9 @@ public class DmeAccessServiceImplTest {
      */
     @Test
     public void testDeleteVolumes() throws Exception {
+        List<String> ids = new ArrayList<>();
+        ids.add("59582fc9-d05c-4e28-8c50-da32d2a49e1b");
+        dmeAccessService.deleteVolumes(ids);
     }
 
     /**
@@ -236,6 +247,10 @@ public class DmeAccessServiceImplTest {
      */
     @Test
     public void testUnMapHost() throws Exception {
+        String hostId = "9cbd24b5-fb5b-4ad9-9393-cf05b9b97339";
+        List<String> ids = new ArrayList<>();
+        ids.add("59582fc9-d05c-4e28-8c50-da32d2a49e1b");
+        dmeAccessService.unMapHost(hostId, ids);
     }
 
     /**
@@ -243,6 +258,10 @@ public class DmeAccessServiceImplTest {
      */
     @Test
     public void testHostMapping() throws Exception {
+        String hostId = "9cbd24b5-fb5b-4ad9-9393-cf05b9b97339";
+        List<String> volumeIds = new ArrayList<>();
+        volumeIds.add("589e368c-6f08-45c8-a75c-b4dc28a6dcca");
+        dmeAccessService.hostMapping(hostId, volumeIds);
     }
 
 
@@ -251,7 +270,16 @@ public class DmeAccessServiceImplTest {
      */
     @Test
     public void testLogin() throws Exception {
-
+        Map<String, Object> params = new HashMap<>();
+        params.put("userName", "evuser");
+        params.put("password", "Pbu4@123");
+        params.put("hostIp", "10.143.133.199");
+        params.put("hostPort", "26335");
+        Class class1 = dmeAccessService.getClass();
+        Method format = class1.getDeclaredMethod("login", Map.class);
+        //设为可见
+        format.setAccessible(true);
+        format.invoke(dmeAccessService, params);
     }
 
     /**
@@ -259,7 +287,11 @@ public class DmeAccessServiceImplTest {
      */
     @Test
     public void testGetHeaders() throws Exception {
-
+        Class class1 = dmeAccessService.getClass();
+        Method format = class1.getDeclaredMethod("getHeaders");
+        //设为可见
+        format.setAccessible(true);
+        format.invoke(dmeAccessService);
     }
 
     /**
@@ -267,7 +299,11 @@ public class DmeAccessServiceImplTest {
      */
     @Test
     public void testIniLogin() throws Exception {
-
+        Class class1 = dmeAccessService.getClass();
+        Method format = class1.getDeclaredMethod("iniLogin");
+        //设为可见
+        format.setAccessible(true);
+        format.invoke(dmeAccessService);
     }
 
 } 

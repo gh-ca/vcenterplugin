@@ -324,7 +324,7 @@ input[type=number] {
   width:80px;
 };
 
-.add-wizard-wrap ::ng-deep .clr-wizard.wizard-xl .modal-dialog {
+::ng-deep .clr-wizard.wizard-xl .modal-dialog {
   height: 100vh;
   max-height: none;
 }
