@@ -50,7 +50,6 @@
 
     <bean name="SystemServiceImpl" class="com.dmeplugin.dmestore.services.SystemServiceImpl">
         <property name="systemDao" ref="systemDao"/>
-        <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
     </bean>
 
     <bean name="VCenterInfoServiceImpl"
@@ -62,6 +61,7 @@
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="dmeStorageService" ref="DmeStorageServiceImpl"/>
         <property name="dmeRelationInstanceService" ref="DmeRelationInstanceServiceImpl"/>
+        <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
 
