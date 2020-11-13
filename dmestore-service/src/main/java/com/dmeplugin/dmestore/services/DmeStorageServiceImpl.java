@@ -1072,7 +1072,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         String replace = storageDeviceId.replace("-", "");
         String result = "";
         String className = "SYS_StorageDisk";
-        String url = API_INSTANCES_LIST + "/" + className + "?condition=" + "&&pageSize=1000";
+        String url = API_INSTANCES_LIST + "/" + className + "?condition={json}" + "&&pageSize=1000";
         String params = ToolUtils.getRequsetParams("storageDeviceId", replace);
         ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
         int code = responseEntity.getStatusCodeValue();

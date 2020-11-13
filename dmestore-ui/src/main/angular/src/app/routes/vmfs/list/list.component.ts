@@ -290,7 +290,7 @@ export class VmfsListComponent implements OnInit {
           this.list.forEach(item => {
             chartList.forEach(charItem => {
               // 若属同一个卷则将chartItem的带宽、iops、读写相应时间 值赋予列表
-              if (item.wwn === charItem.volumeId) {
+              if (item.wwn === charItem.wwn) {
                 item.iops = charItem.iops;
                 item.bandwidth = charItem.bandwidth;
                 item.readResponseTime = charItem.readResponseTime;

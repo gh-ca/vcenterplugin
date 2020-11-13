@@ -19,7 +19,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/operatenfs")
-@Api
 public class NfsOperationController extends BaseController{
 
     public static final Logger LOG = LoggerFactory.getLogger(NfsOperationController.class);
