@@ -278,15 +278,50 @@
 <!--                      </clr-dg-footer>-->
                     </clr-datagrid>
                     <div style="position: relative">
-                      <mat-paginator class="pageSet" #matPaginator [showFirstLastButtons]="true" [hidePageSize]="false"
-                                     [length]="volumeTotal"
-                                     [pageSize]="10"
-                                     [pageSizeOptions]="[10,20]"
-                                     (page)="pageEvent = getVolDataByPage($event)">
-                      </mat-paginator>
-                      <input type="number" (blur)="jumpPage($event, matPaginator);" value="{{matPaginator.pageIndex + 1}}" (keydown)="jumpPage($event, matPaginator);"
-                             class="jumpPageClass">
-                      <input class="totalPageClass" [value]="totalPageNum" disabled>
+<!--                      <mat-paginator class="pageSet" #matPaginator [showFirstLastButtons]="true" [hidePageSize]="false"-->
+<!--                                     [length]="volumeTotal"-->
+<!--                                     [pageSize]="10"-->
+<!--                                     [pageSizeOptions]="[10,20]"-->
+<!--                                     (page)="pageEvent = getVolDataByPage($event)">-->
+<!--                        <MatPaginatorIntl></MatPaginatorIntl>-->
+<!--                      </mat-paginator>-->
+<!--                      <input type="number" (blur)="jumpPage($event, matPaginator);" value="{{matPaginator.pageIndex + 1}}" (keydown)="jumpPage($event, matPaginator);"-->
+<!--                             class="jumpPageClass">-->
+<!--                      <input class="totalPageClass" [value]="totalPageNum" disabled>-->
+                      <div class="datagrid-footer">
+                        <div class="pagination-size ng-star-inserted">
+                          <div class="datagrid-footer-select" _ngcontent-ohg-c584="" ng-reflect-page-size-options="10,20">
+                            每页
+                            <div class="clr-select-wrapper">
+                              <select class="clr-page-size-select ng-untouched ng-pristine ng-valid" ng-reflect-model="10" [(ngModel)]="volumePageSize" (change)="pageSizeChange($event.target);">
+                                <option value="10" ng-reflect-ng-value="10" class="ng-star-inserted">10</option>
+                                <option value="20" ng-reflect-ng-value="20" class="ng-star-inserted">20</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="pagination-description ng-star-inserted"> {{volumeFooter}} {{'page.all' | translate}} {{volumeTotal}} </div>
+                        <div class="pagination">
+                          <div class="pagination-description ng-star-inserted"></div>
+                          <div class="pagination-list ng-star-inserted" *ngIf="volumeTotalPage > 1">
+                            <button type="button" (click)="volmeFirstPage();" class="pagination-first" aria-label="First Page" [disabled]="volumeCurrentPage == 1">
+                              <clr-icon shape="step-forward-2 down"></clr-icon>
+                            </button>
+                            <button type="button" (click)="volumePreviousPage();" class="pagination-previous" aria-label="Previous Page" [disabled]="volumeCurrentPage == 1">
+                              <clr-icon shape="angle left"></clr-icon>
+                            </button>
+                            <input type="text" (blur)="jumpPage($event);" [value]="volumeCurrentPage" class="pagination-current clr-input ng-star-inserted" size="2" aria-label="Current Page">
+                            &nbsp;/&nbsp;
+                            <span aria-label="Total Pages">{{volumeTotalPage}}</span>
+                            <button type="button" (click)="volumeNextPage();" class="pagination-next" aria-label="Next Page" [disabled]="volumeCurrentPage == volumeTotalPage">
+                              <clr-icon shape="angle right"></clr-icon>
+                            </button>
+                            <button type="button" (click)="volmeLastPage();" class="pagination-last" aria-label="Last Page" [disabled]="volumeCurrentPage == volumeTotalPage">
+                              <clr-icon shape="step-forward-2 up"></clr-icon>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </clr-tab-content>
