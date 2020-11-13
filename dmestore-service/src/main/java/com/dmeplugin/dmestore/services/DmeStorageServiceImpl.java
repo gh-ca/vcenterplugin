@@ -427,11 +427,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return volumeListRestponse;
     }
 
-//    @Override
-//    public List<Volume> getVolumes(String storageId) throws DMEException {
-//        return getVolumesByPage(storageId, null, null).getVolumeList();
-//    }
-
     @Override
     public List<FileSystem> getFileSystems(String storageId) throws DMEException {
 
@@ -1045,8 +1040,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             fileSystemTurning.setCompressionEnabled(ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
             fileSystemTurning.setDeduplicationEnabled(ToolUtils.jsonToBoo(tuning.get("deduplication_enabled")));
             SmartQos smartQos = new SmartQos();
-            String smartQosStr = ToolUtils.jsonToStr(tuning.get("smart_qos"));
-            if (!StringUtils.isEmpty(smartQos)) {
+            JsonObject jsonSmartQos = tuning.get("smart_qos").getAsJsonObject();
+            String smartQosStr = gson.toJson(jsonSmartQos);
+            if (!StringUtils.isEmpty(smartQosStr)) {
                 JsonObject qosPolicy = new JsonParser().parse(smartQosStr).getAsJsonObject();
                 smartQos.setMaxbandwidth(ToolUtils.jsonToInt(qosPolicy.get("max_bandwidth")));
                 smartQos.setMaxiops(ToolUtils.jsonToInt(qosPolicy.get("max_iops")));
