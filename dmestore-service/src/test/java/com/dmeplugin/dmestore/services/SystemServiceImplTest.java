@@ -1,9 +1,14 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.DMEServiceApplication;
 import com.dmeplugin.dmestore.dao.SystemDao;
 import org.junit.Test;
 import org.junit.Before;
 import org.junit.After;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * SystemServiceImpl Tester.
@@ -12,15 +17,14 @@ import org.junit.After;
  * @version 1.0
  * @since <pre>十一月 11, 2020</pre>
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = DMEServiceApplication.class)
 public class SystemServiceImplTest {
+    @Autowired
     private SystemServiceImpl systemService;
 
     @Before
     public void before() throws Exception {
-        systemService = new SystemServiceImpl();
-        SystemDao systemDao = new SystemDao();
-        systemDao.setUrl("jdbc:h2://C:/ProgramData/VMware/vCenterServer/runtime/");
-        systemService.setSystemDao(systemDao);
     }
 
     @After
@@ -58,7 +62,7 @@ public class SystemServiceImplTest {
      */
     @Test
     public void testCleanData() throws Exception {
-        return;
+        assert true;
     }
 
     /**
@@ -66,15 +70,7 @@ public class SystemServiceImplTest {
      */
     @Test
     public void testSetSystemDao() throws Exception {
-        systemService.setSystemDao(null);
-    }
-
-    /**
-     * Method: setvCenterInfoService(VCenterInfoService vCenterInfoService)
-     */
-    @Test
-    public void testSetvCenterInfoService() throws Exception {
-        systemService.setvCenterInfoService(null);
+      assert true;
     }
 
 } 

@@ -34,15 +34,10 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     public static Map<String, Map<String, Object>> serviceLevelInstance = new HashMap<>();
 
     private Gson gson = new Gson();
-    @Autowired
     private DmeAccessService dmeAccessService;
-    @Autowired
     private DmeRelationInstanceService dmeRelationInstanceService;
     private DmeStorageService dmeStorageService;
-
-    @Autowired
     private VCenterInfoService vCenterInfoService;
-
     private VCSDKUtils vcsdkUtils;
 
     private static final String POLICY_DESC = "policy created by dme";
@@ -175,7 +170,13 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         }
     }
 
-    // convert the api responseBody to SimpleServiceLevel Bean list
+    /**
+     * convert the api responseBody to SimpleServiceLevel Bean list
+     * @author wangxy
+     * @date 11:21 2020/11/13
+     * @param object
+     * @return java.util.List<com.dmeplugin.dmestore.model.SimpleServiceLevel>
+     **/
     private List<SimpleServiceLevel> convertBean(Object object) {
         List<SimpleServiceLevel> ssls = new ArrayList<>();
         JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
@@ -257,7 +258,14 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return ssls;
     }
 
-    //扫描服务等级 发现服务等级下的存储池,磁盘,(存储端口)
+    /**
+     * 扫描服务等级 发现服务等级下的存储池,磁盘,(存储端口)
+     * @author wangxy
+     * @date 11:21 2020/11/13
+     * @param serivceLevelId
+     * @throws DMEException
+     * @return java.util.List<com.dmeplugin.dmestore.model.StoragePool>
+     **/
     @Override
     public List<StoragePool> getStoragePoolInfosByServiceLevelId(String serivceLevelId) throws DMEException {
         List<StoragePool> storagePools = new ArrayList<>();
@@ -383,13 +391,27 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return sps;
     }
 
-    //服务等级 发现服务等级下的存储池 serviceLevelId和sourceInstanceId一样?
+    /**
+     * 服务等级 发现服务等级下的存储池 serviceLevelId和sourceInstanceId一样?
+     * @author wangxy
+     * @date 11:19 2020/11/13
+     * @param serviceLevelId
+     * @throws DMEException
+     * @return java.util.List<java.lang.String>
+     **/
     public List<String> getStoragePoolIdsByServiceLevelId(String serviceLevelId) throws DMEException {
         String relatinName = "M_DjTierContainsStoragePool";
         return getContainIdsByRelationNameLevelId(relatinName, serviceLevelId);
     }
 
-    //服务等级 发现服务等级下的卷实例ID
+    /**
+     * 服务等级 发现服务等级下的卷实例ID
+     * @author wangxy
+     * @date 11:20 2020/11/13
+     * @param serviceLevelId
+     * @throws DMEException
+     * @return java.util.List<java.lang.String>
+     **/
     public List<String> getVolumeIdsByServiceLivelId(String serviceLevelId) throws DMEException {
         String relationName = "M_DjTierContainsLun";
         return getContainIdsByRelationNameLevelId(relationName, serviceLevelId);
@@ -406,21 +428,13 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return new ArrayList<>(ids);
     }
 
-    //存储池的详情需要通过存储设备ID和存储池在设备上的ID联合来查询
-    private void getStoragePoolDevcieIdRelationByRelationNameLevelId(String storageDeviceId, String storagePoolId) {
-
-    }
-
-    //查询服务等级性能
-    public Object getStatisticByServiceLevelId(String serviceLevelId) {
-        //1 获取服务等级下的磁盘Id
-
-        //2 获取磁盘性能
-
-        return null;
-    }
-
-    //将instance转换为storagepool信息
+    /**
+     * 将instance转换为storagepool信息
+     * @author wangxy
+     * @date 11:20 2020/11/13
+     * @param instanceObj
+     * @return com.dmeplugin.dmestore.model.StoragePool
+     **/
     private StoragePool convertInstanceToStoragePool(Object instanceObj) {
         StoragePool sp = new StoragePool();
         JsonObject jsonObject = new JsonParser().parse(instanceObj.toString()).getAsJsonObject();
