@@ -9,13 +9,8 @@ import org.slf4j.LoggerFactory;
 import java.sql.SQLException;
 
 public class SystemServiceImpl implements SystemService {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(SystemServiceImpl.class);
-
   private SystemDao systemDao;
-
-  private VCenterInfoService vCenterInfoService;
-
   @Override
   public void initDb() {
     try {
@@ -86,7 +81,7 @@ public class SystemServiceImpl implements SystemService {
     this.systemDao = systemDao;
   }
 
-  public void setvCenterInfoService(VCenterInfoService vCenterInfoService) {
-    this.vCenterInfoService = vCenterInfoService;
+  public SystemDao getSystemDao() {
+    return systemDao;
   }
 }

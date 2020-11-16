@@ -1,3 +1,5 @@
+package com.dmeplugin.dmestore.mvc;
+
 import static org.junit.Assert.*;
 /**
  *@className NfsAccessControllerTest

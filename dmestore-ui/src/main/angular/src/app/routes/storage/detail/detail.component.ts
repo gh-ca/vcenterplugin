@@ -31,7 +31,6 @@ import {BondPort, EthernetPort, FailoverGroup, FCoEPort, FCPort, LogicPort} from
 import {FormControl, FormGroup} from "@angular/forms";
 import {GlobalsService} from "../../../shared/globals.service";
 import {ClrDatagridPagination} from "@clr/angular";
-import {PageEvent} from "@angular/material/paginator";
 import {TranslatePipe} from "@ngx-translate/core";
 @Component({
   selector: 'app-detail',
@@ -173,6 +172,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
   isLoading = false;
   @ViewChild('paginationVolume')pagination:ClrDatagridPagination;
 
+  volumeFooter = '1 - 10'; // 卷信息当前页数据
+  volumeTotalPage = 10;// 卷信息总页数
+  volumeCurrentPage = 1;// 卷信息当前页
+  volumePageSize = 10; // 当前页数据数
 
   //portList:
   ngOnInit(): void {
@@ -218,7 +221,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       this.getStoragePoolList(false);
     }
     if (page === 'volume'){
-      this.getStorageVolumeList(false, null);
+      this.getStorageVolumeList(false);
     }
     if (page === 'fs'){
       this.getFileSystemList(false);
@@ -327,12 +330,12 @@ export class DetailComponent implements OnInit, AfterViewInit {
       }
     });
   }
-  getStorageVolumeList(fresh: boolean, query: any){
-    console.log('paginationVolume', query);
+  getStorageVolumeList(fresh: boolean){
+    console.log('paginationVolume');
     const reqParams = {
       storageId: this.storageId,
-      pageSize: query ? query.pageSize:10,
-      pageNo: query ? query.pageIndex*query.pageSize:0,
+      pageSize: this.volumePageSize,
+      pageNo: (this.volumeCurrentPage - 1) * this.volumePageSize,
     }
     console.log('reqParams', reqParams)
     if (fresh){
@@ -345,7 +348,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
           this.volumes = r.data.volumeList;
           this.volumeTotal=r.data.count;
 
-          this.totalPageNum = '/' + ' ' + Math.ceil(this.volumeTotal/(query ? query.pageSize:10));
+          // 设置总页数、footer
+          this.setVolumeTotalAndFooter();
+
+          // this.totalPageNum = '/' + ' ' + Math.ceil(this.volumeTotal/(query ? query.pageSize:10));
           console.log('this.totalPageNum', this.totalPageNum);
           if (this.volumeRadio === 'table2') {
             this.listVolumesperformance();
@@ -364,7 +370,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
             this.volumes = r.data.volumeList;
             this.volumeTotal=r.data.count;
 
-            this.totalPageNum = '/' + ' ' + Math.ceil(this.volumeTotal/(query ? query.pageSize:10));
+            // 设置总页数、footer
+            this.setVolumeTotalAndFooter();
+            // this.totalPageNum = '/' + ' ' + Math.ceil(this.volumeTotal/(query ? query.pageSize:10));
             console.log('this.totalPageNum', this.totalPageNum);
 
             if (this.volumeRadio === 'table2') {
@@ -894,36 +902,92 @@ export class DetailComponent implements OnInit, AfterViewInit {
     return p;
   }
   getVolDataByPage(pagination:any) {
-    this.getStorageVolumeList(true, pagination);
+    this.getStorageVolumeList(true);
     return pagination;
   }
-  // MatPaginator Output
-  pageEvent: PageEvent;
 
   /**
    * 卷翻页
    * @param object
    * @param pageObj
    */
-  jumpPage(object:any, pageObj:any) {
-    console.log("object", object)
+  jumpPage(object:any) {
     const obj = object.target;
     if (object.keyCode === 13 || object.keyCode === 108 || object.type === 'blur') { // 按下enter键触发
-      console.log('obj.value', obj.value)
-      console.log('obj.value', obj.value && obj.value > 0 && obj.value -1 !== pageObj.pageIndex)
-      if(obj.value && obj.value > 0 && obj.value -1 !== pageObj.pageIndex) {
+      if(obj.value && obj.value > 0 && obj.value  != this.volumeCurrentPage) {
         obj.value=obj.value.replace(/[^1-9]/g,'');
 
-        if (obj.value <= Math.ceil(pageObj.length/pageObj.pageSize)) {
-          pageObj.pageIndex = obj.value - 1;
+        if (obj.value <= this.volumeTotalPage) {
+          this.volumeCurrentPage = obj.value;
         } else {
-          pageObj.pageIndex = Math.ceil(pageObj.length/pageObj.pageSize) - 1;
-          obj.value =  Math.ceil(pageObj.length/pageObj.pageSize);
+          this.volumeCurrentPage = this.volumeTotalPage;
+          obj.value =  this.volumeCurrentPage;
         }
-        this.getStorageVolumeList(true, pageObj);
+        this.getStorageVolumeList(true);
       }else{
-        obj.value=pageObj.pageIndex + 1;
+        obj.value=this.volumeCurrentPage;
       }
     }
+  }
+
+  /**
+   * 卷信息列表 当前页显示数据change函数
+   * @param object
+   */
+  pageSizeChange(object:any) {
+    this.volumeCurrentPage = 1;
+    this.getStorageVolumeList(true);
+  }
+  /**
+   * 卷信息列表 首页
+   * @param object
+   */
+  volmeFirstPage() {
+    if (this.volumeCurrentPage !== 1) {
+      this.volumeCurrentPage = 1;
+      this.getStorageVolumeList(true);
+    }
+  }
+
+  /**
+   * 卷信息列表 尾页
+   * @param object
+   */
+  volmeLastPage() {
+    if (this.volumeCurrentPage !== this.volumeTotalPage) {
+      this.volumeCurrentPage = this.volumeTotalPage;
+      this.getStorageVolumeList(true);
+    }
+  }
+
+  /**
+   * 卷信息列表 上一页
+   */
+  volumePreviousPage() {
+    if (this.volumeCurrentPage !== 1) {
+      this.volumeCurrentPage = this.volumeCurrentPage - 1;
+      this.getStorageVolumeList(true);
+    }
+  }
+
+  /**
+   * 卷信息列表 下一页
+   */
+  volumeNextPage() {
+    if (this.volumeCurrentPage !== this.volumeTotalPage) {
+      this.volumeCurrentPage = this.volumeCurrentPage + 1;
+      this.getStorageVolumeList(true);
+    }
+  }
+
+  /**
+   * 卷信息列表 设置页码总数、footer
+   */
+  setVolumeTotalAndFooter() {
+    this.volumeTotalPage = Math.ceil(this.volumeTotal/this.volumePageSize);
+    const last = this.volumeTotalPage === this.volumeCurrentPage ?
+      this.volumeTotal:this.volumeCurrentPage*this.volumePageSize;
+    const first = (this.volumeCurrentPage - 1)*this.volumePageSize + 1;
+    this.volumeFooter = first + ' - ' + last;
   }
 }

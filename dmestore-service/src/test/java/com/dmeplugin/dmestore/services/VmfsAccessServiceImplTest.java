@@ -44,10 +44,6 @@ public class VmfsAccessServiceImplTest {
         vmfsAccessService.setDmeStorageService(dmeStorageService);
         VCSDKUtils vcsdkUtils = new VCSDKUtils();
         SpringBootConnectionHelper helper = new SpringBootConnectionHelper();
-        /*helper.setServerurl("www.evvcenter.com");
-        helper.setServerport(20443);
-        helper.setUsername("administrator@vsphere.local");
-        helper.setPassword("Pbu4@123");*/
         VCenterInfoServiceImpl vCenterInfoService = new VCenterInfoServiceImpl();
         vCenterInfoService.setvCenterInfoDao(vCenterInfoDao);
         helper.setvCenterInfoService(vCenterInfoService);
