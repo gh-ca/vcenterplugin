@@ -218,7 +218,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             }
             String exportPath = (String)params.get("exportPath");
             String type = (String)params.get("type");
-            String securityType = ToolUtils.getStr(params.get("securityType"));
+            String securityType = ToolUtils.getStr(params.get("securityType"), "");
             String accessMode = (String)params.get("accessMode");
 
             if (StringUtils.isEmpty(serverHost) || StringUtils.isEmpty(exportPath) || StringUtils.isEmpty(accessMode) || mounts.size() == 0) {
@@ -459,15 +459,46 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     private Double getDataspaceOfStoragepool(String storagePoolName,String poolId,String storageId) throws Exception {
         Double dataSpace = 0.0;
         String className = "SYS_StoragePool";
-        String url = API_STORAGEPOOL_LIST + className + "?storageDeviceId=" + storageId;
+        String url = API_STORAGEPOOL_LIST +className +"?condition={json}";
+        JsonObject condition = new JsonObject();
+        JsonArray constraint = new JsonArray();
 
+        JsonObject consObj = new JsonObject();
+        JsonObject simple = new JsonObject();
+        simple.addProperty("name", "dataStatus");
+        simple.addProperty("operator", "equal");
+        simple.addProperty("value", "normal");
+        consObj.add("simple", simple);
+        constraint.add(consObj);
+
+        JsonObject consObj2 = new JsonObject();
+        JsonObject simple2 = new JsonObject();
+        simple2.addProperty("name", "storageDeviceId");
+        simple2.addProperty("operator", "storageDeviceId");
+        simple2.addProperty("value", storageId);
+        consObj2.add("simple", simple2);
+        consObj2.addProperty("logOp", "and");
+        constraint.add(consObj2);
+        JsonObject consObj1 = new JsonObject();
+        JsonObject simple1 = new JsonObject();
         if (!StringUtils.isEmpty(poolId)) {
-            url += " and pool_id=" + poolId;
+            simple1.addProperty("name", "pool_id");
+            simple1.addProperty("operator", "equal");
+            simple1.addProperty("value", poolId);
+            consObj1.add("simple", simple1);
+            consObj1.addProperty("logOp", "and");
+            constraint.add(consObj1);
         }
         if (!StringUtils.isEmpty(storagePoolName)) {
-            url += " and storage_pool_name=" + storagePoolName;
+            simple1.addProperty("name", "storage_pool_name");
+            simple1.addProperty("operator", "equal");
+            simple1.addProperty("value", storagePoolName);
+            consObj1.add("simple", simple1);
+            consObj1.addProperty("logOp", "and");
+            constraint.add(consObj1);
         }
-        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET,null);
+        condition.add("constraint", constraint);
+        ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, gson.toJson(condition));
         LOG.info("url:{" + API_STORAGEPOOL_LIST + "},responseEntity:" + responseEntity);
         int code = responseEntity.getStatusCodeValue();
         if (code == HttpStatus.ACCEPTED.value()) {
@@ -577,7 +608,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         resMap.put("code", "200");
         resMap.put("msg", "list filesystem success!");
 
-        String url = API_FILESYSTEMS_DETAIL + "/" + fileSystemId;
+        String url = API_FILESYSTEMS_DETAIL + fileSystemId;
 
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         int code = responseEntity.getStatusCodeValue();
@@ -601,8 +632,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     }
 
     private void saveNfsInfoToDmeVmwareRelation(String params, String currentPortId, String logicPortName,
-                                                String fsId, String shareName, String shareId, String fsName) {
+                                                String fsId, String shareName, String shareId, String fsName) throws DMEException {
 
+        if (!StringUtils.isEmpty(params)) {
         DmeVmwareRelation datastoreInfo = gson.fromJson(params, DmeVmwareRelation.class);
         datastoreInfo.setLogicPortId(currentPortId);
         datastoreInfo.setLogicPortName(logicPortName);
@@ -613,6 +645,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         List<DmeVmwareRelation> dmeVmwareRelations = new ArrayList<>();
         dmeVmwareRelations.add(datastoreInfo);
         dmeVmwareRalationDao.save(dmeVmwareRelations);
+        }else {
+            throw new DMEException("save nfs datastoreInfo error");
+        }
     }
 
     @Override

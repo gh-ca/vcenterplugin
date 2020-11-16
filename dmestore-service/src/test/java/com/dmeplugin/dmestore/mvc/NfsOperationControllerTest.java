@@ -107,6 +107,7 @@ public class NfsOperationControllerTest {
         params.put("capacity",2.0);
         params.put("expand",true);
         params.put("fileSystemId","0C9A60E0A51C3AD38567C21B6881371C");
+        params.put("storeObjectId","0C9A60E0A51C3AD38567C21B6881371C");
         mockMvc.perform(MockMvcRequestBuilders.put("/operatenfs/changenfsdatastore").contentType(MediaType.APPLICATION_JSON)
                 .content(gson.toJson(params))).andExpect(MockMvcResultMatchers.status().isOk());
     }
