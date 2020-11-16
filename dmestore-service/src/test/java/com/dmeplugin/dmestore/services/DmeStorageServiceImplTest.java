@@ -180,27 +180,27 @@ public class DmeStorageServiceImplTest {
     public void getLogicPorts() throws DMEException {
         String storageId = "123";
         url = "/rest/storagemgmt/v1/storage-port/logic-ports?storage_id="+storageId;
-        String data = "{\n" +
-                "    \"id\" : \"string\",\n" +
-                "    \"name\" : \"string\",\n" +
-                "    \"running_status\" : \"string\",\n" +
-                "    \"operational_status\" : \"string\",\n" +
-                "    \"mgmt_ip\" : \"string\",\n" +
-                "    \"mgmt_ipv6\" : \"string\",\n" +
-                "    \"home_port_id\" : \"string\",\n" +
-                "    \"home_port_name\" : \"string\",\n" +
-                "    \"current_port_id\" : \"string\",\n" +
-                "    \"current_port_name\" : \"string\",\n" +
-                "    \"role\" : \"string\",\n" +
-                "    \"ddns_status\" : \"string\",\n" +
-                "    \"failover_group_id\" : \"string\",\n" +
-                "    \"failover_group_name\" : \"string\",\n" +
-                "    \"support_protocol\" : \"string\",\n" +
-                "    \"listen_dns_query_enabled\" : \"string\",\n" +
-                "    \"management_access\" : \"string\",\n" +
-                "    \"vstore_id\" : \"string\",\n" +
-                "    \"vstore_name\" : \"string\"\n" +
-                "  }";
+        String data = " {\n" +
+                "            \"id\": \"E25D7ED5FF043E66A32B96A6E7367AF4\", \n" +
+                "            \"name\": \"test1\", \n" +
+                "            \"running_status\": \"link down\", \n" +
+                "            \"operational_status\": \"activated\", \n" +
+                "            \"mgmt_ip\": \"192.169.200.4\", \n" +
+                "            \"mgmt_ipv6\": \"\", \n" +
+                "            \"home_port_id\": \"549772730374\", \n" +
+                "            \"home_port_name\": \"CTE0.B.H3\", \n" +
+                "            \"current_port_id\": \"549772730374\", \n" +
+                "            \"current_port_name\": \"CTE0.B.H3\", \n" +
+                "            \"role\": \"service\", \n" +
+                "            \"ddns_status\": \"Enable\", \n" +
+                "            \"failover_group_id\": \"0\", \n" +
+                "            \"failover_group_name\": \"System-defined\", \n" +
+                "            \"support_protocol\": \"NFS + CIFS\", \n" +
+                "            \"listen_dns_query_enabled\": \"NO\", \n" +
+                "            \"management_access\": \"--\", \n" +
+                "            \"vstore_id\": null, \n" +
+                "            \"vstore_name\": null\n" +
+                "        }";
         JsonObject jsonObject = new JsonParser().parse(data).getAsJsonObject();
         List<JsonObject> list = new ArrayList<>();
         list.add(jsonObject);

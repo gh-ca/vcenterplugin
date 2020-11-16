@@ -205,7 +205,6 @@ public class HostDatastoreSystemMO extends BaseMO {
         spec.setType(type);
         //需要设置datastore名称
         spec.setLocalPath(uuid);
-
         // readOnly/readWrite
         if (!StringUtils.isEmpty(accessMode)) {
             spec.setAccessMode(accessMode);
