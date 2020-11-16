@@ -647,7 +647,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             LOG.error("list nfs performance error:", e);
             throw new DMEException(e.getMessage());
         }
-        LOG.info("listNfsPerformance relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        //LOG.info("listNfsPerformance relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
         return relists;
     }
 
