@@ -65,6 +65,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         VolumeUpdate volume = new VolumeUpdate();
 
         Object serviceLevelName = params.get("service_level_name");
+        //TODO if (!StringUtils.isEmpty(serviceLevelName)) { 有高级选项环境需要开启这个
         if (StringUtils.isEmpty(serviceLevelName)) {
             SmartQos smartQos = new SmartQos();
             Object controlPolicy = params.get("control_policy");
@@ -152,8 +153,6 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         reqBody.put("volume_id", volumeId);
         reqBody.put("added_capacity", Integer.valueOf(volumemap.get("vo_add_capacity")));
         reqList.add(reqBody);
-
-
         reqMap.put("volumes", reqList);
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(API_VMFS_EXPAND, HttpMethod.POST, gson.toJson(reqMap));
@@ -237,7 +236,6 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         Map<String, Object> reqMap = new HashMap<>(16);
         reqMap.put("service_level_id", params.get("service_level_id"));
         reqMap.put("volume_ids", params.get("volume_ids"));
-
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(API_SERVICELEVEL_UPDATE, HttpMethod.POST, gson.toJson(reqMap));
             LOG.info("url:{" + API_SERVICELEVEL_UPDATE + "},响应信息：" + responseEntity);
@@ -264,7 +262,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     public List<SimpleServiceLevel> listServiceLevelVmfs(Map<String, Object> params) throws DMEException {
 
         List<SimpleServiceLevel> simpleServiceLevels = new ArrayList<>();
-
+        String s = gson.toJson(params);
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(API_SERVICELEVEL_LIST, HttpMethod.GET, gson.toJson(params));
             LOG.info("{"+API_SERVICELEVEL_LIST+"}"+responseEntity);
@@ -306,13 +304,13 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
                 CapabilitiesQos capabilitiesQos = new CapabilitiesQos();
                 JsonObject qos = null;
-                    if (!"".equals(ToolUtils.jsonToStr(capabilities.get("qos")))) {
+                if (!"".equals(ToolUtils.getStr(capabilities.get("qos")))) {
                     qos = capabilities.get("qos").getAsJsonObject();
                     capabilitiesQos.setEnabled(ToolUtils.jsonToBoo(qos.get("enabled")));
                 }
                 SmartQos smartQos = new SmartQos();
                 JsonObject jsonObject1 = null;
-                if (qos != null && !"".equals(ToolUtils.jsonToStr(qos.get("qos_param")))) {
+                if (qos != null && !"".equals(ToolUtils.getStr(qos.get("qos_param")))) {
                     jsonObject1 = qos.get("qos_param").getAsJsonObject();
                     smartQos.setLatency(ToolUtils.jsonToInt(jsonObject1.get("latency"), 0));
                     smartQos.setMinbandwidth(ToolUtils.jsonToInt(jsonObject1.get("minBandWidth"), 0));

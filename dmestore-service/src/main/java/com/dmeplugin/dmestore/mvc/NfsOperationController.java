@@ -152,7 +152,6 @@ public class NfsOperationController extends BaseController{
             nfsOperationService.createNfsDatastore(param);
             return success();
         } catch (DMEException e) {
-            e.printStackTrace();
             return failure(e.getMessage());
         }
 
@@ -231,7 +230,6 @@ public class NfsOperationController extends BaseController{
             nfsOperationService.updateNfsDatastore(param);
             return success();
         } catch (DMEException e) {
-            e.printStackTrace();
             return failure(e.getMessage());
         }
 
@@ -253,7 +251,6 @@ public class NfsOperationController extends BaseController{
             nfsOperationService.changeNfsCapacity(params);
             return success();
         } catch (DMEException e) {
-            e.printStackTrace();
             return failure(e.getMessage());
         }
 
@@ -271,7 +268,6 @@ public class NfsOperationController extends BaseController{
         try {
             return success(nfsOperationService.getEditNfsStore(storeObjectId));
         } catch (DMEException e) {
-            e.printStackTrace();
             return failure(e.getMessage());
         }
 
