@@ -56,8 +56,7 @@ public class PluginRegisterController extends BaseController {
                 return success();
             } catch (Exception e) {
                 LOG.error("installplugin for dme failure:", e);
-                failureStr = e.getMessage();
-                return failure(failureStr);
+                return failure(e.getMessage());
             }
         }
     }
