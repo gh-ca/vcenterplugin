@@ -7,7 +7,6 @@ import {
   ChangeDetectionStrategy,
   ViewEncapsulation,
 } from '@angular/core';
-import * as screenfull from 'screenfull';
 
 @Component({
   selector: 'app-header',
@@ -23,17 +22,12 @@ export class HeaderComponent implements OnInit {
   @Output() toggleSidenav = new EventEmitter<void>();
   @Output() toggleSidenavNotice = new EventEmitter<void>();
 
-  private get screenfull(): screenfull.Screenfull {
-    return screenfull as screenfull.Screenfull;
-  }
 
   constructor() {}
 
   ngOnInit() {}
 
   toggleFullscreen() {
-    if (this.screenfull.isEnabled) {
-      this.screenfull.toggle();
-    }
+    
   }
 }
