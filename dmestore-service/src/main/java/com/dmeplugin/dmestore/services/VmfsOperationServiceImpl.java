@@ -66,7 +66,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
         Object serviceLevelName = params.get("service_level_name");
         //TODO if (!StringUtils.isEmpty(serviceLevelName)) { 有高级选项环境需要开启这个
-        if (!StringUtils.isEmpty(serviceLevelName)) {
+        if (StringUtils.isEmpty(serviceLevelName)) {
             SmartQos smartQos = new SmartQos();
             Object controlPolicy = params.get("control_policy");
             if (!StringUtils.isEmpty(controlPolicy)) {
