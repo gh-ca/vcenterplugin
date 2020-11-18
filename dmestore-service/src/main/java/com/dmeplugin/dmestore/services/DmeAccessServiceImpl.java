@@ -5,7 +5,6 @@ import com.dmeplugin.dmestore.dao.DmeInfoDao;
 import com.dmeplugin.dmestore.dao.ScheduleDao;
 import com.dmeplugin.dmestore.entity.DmeInfo;
 import com.dmeplugin.dmestore.exception.DMEException;
-import com.dmeplugin.dmestore.model.DMEHostInfo;
 import com.dmeplugin.dmestore.task.ScheduleSetting;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
@@ -14,7 +13,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.reflect.TypeToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +21,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 /**
@@ -77,12 +72,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     @Override
     public void accessDme(Map<String, Object> params) throws DMEException {
-        //Map<String, Object> remap = new HashMap<>(16);
-        //remap.put("code", 200);
-        //remap.put("message", "连接成功");
-        //remap.put("data", params);
         try {
-            LOG.info("params==" + (params == null ? "null" : gson.toJson(params)));
             if (params != null) {
                 //判断与服务器的连接
                 ResponseEntity responseEntity = login(params);
@@ -90,61 +80,44 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                     //连接成功后，数据入库
                     try {
                         DmeInfo dmeInfo = new Gson().fromJson(params.toString(), DmeInfo.class);
-                        LOG.info("dmeInfo==" + gson.toJson(dmeInfo));
                         int re = dmeInfoDao.addDmeInfo(dmeInfo);
-                        LOG.info("re==" + re);
+                        LOG.info("accessDme re==" + re);
                     } catch (Exception ex) {
                         ex.printStackTrace();
-                        //remap.put("code", 503);
-                        //remap.put("message", "连接信息保存失败:" + ex.getMessage());
                         throw new DMEException("503","连接信息保存失败:" + ex.getMessage());
                     }
                 } else {
-                    //remap.put("code", 503);
-                   // remap.put("message", "连接失败:" + responseEntity.toString());
                     throw new DMEException("503","连接信息保存失败:" + responseEntity.toString());
                 }
             }
         } catch (Exception e) {
-            //remap.put("code", 503);
-            //remap.put("message", "连接失败:" + e.getMessage());
             throw new DMEException("503","连接信息保存失败:" + e.getMessage());
         }
-
-        //return remap;
     }
 
     @Override
     public Map<String, Object> refreshDme() throws DMEException {
-        //Map<String, Object> remap = new HashMap<>(16);
-        //remap.put("code", 200);
-        //remap.put("message", "更新连接状态成功");
         try {
             //判断与服务器的连接
             ResponseEntity responseEntity = access(REFRES_STATE_URL, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() != RestUtils.RES_STATE_I_200) {
-                //remap.put("code", 503);
-                //remap.put("message", "更新连接状态失败:" + responseEntity.toString());
                 throw new DMEException("503","更新连接状态失败:" + responseEntity.toString());
             }
 
         } catch (Exception e) {
-            //remap.put("code", 503);
-            //remap.put("message", "更新连接状态失败:" + e.toString());
             throw new DMEException("503", "更新连接状态失败:" + e.toString());
         }
 
         Map<String, Object> params = new HashMap<>(16);
         params.put("hostIp", dmeHostIp);
         params.put("hostPort", dmeHostPort);
-        //remap.put("data", params);
 
         return params;
     }
 
     @Override
     public ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws DMEException {
-        ResponseEntity<String> responseEntity = null;
+        ResponseEntity<String> responseEntity;
 
         if (StringUtils.isEmpty(dmeToken)) {
             //如果token为空，就自动登录，获取token
@@ -165,7 +138,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             responseEntity = restTemplate.exchange(url, method, entity, String.class);
         }catch (HttpClientErrorException e){
             LOG.error("HttpClientErrorException:"+e.toString());
-            responseEntity = new ResponseEntity<String>(e.getStatusCode());
+            responseEntity = new ResponseEntity(e.getStatusCode());
 
         }
         LOG.info(url + "==responseEntity==" + (responseEntity == null ? "null" : responseEntity.getStatusCodeValue()));
@@ -176,17 +149,21 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             LOG.info("token失效，重新登录，获取token");
             iniLogin();
             //得到新token后，重新执行上次任务
-            LOG.info("得到新token后，重新执行上次任务，dmeToken==" + dmeToken);
+            LOG.info("得到新token成功，重新执行上次任务！url={}", url);
             headers = getHeaders();
             entity = new HttpEntity<>(requestBody, headers);
             responseEntity = restTemplate.exchange(url, method, entity, String.class);
+        }
+
+        if(responseEntity.getStatusCodeValue()/100 != 2){
+            LOG.info("{} {}==执行失败，response={}, requestBody={}", url, method.name(), gson.toJson(responseEntity), gson.toJson(requestBody));
         }
         return responseEntity;
     }
 
     @Override
     public ResponseEntity<String> accessByJson(String url, HttpMethod method, String jsonBody) throws DMEException {
-        ResponseEntity<String> responseEntity = null;
+        ResponseEntity<String> responseEntity;
 
         if (StringUtils.isEmpty(dmeToken)) {
             //如果token为空，就自动登录，获取token
@@ -210,7 +187,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             responseEntity = new ResponseEntity<String>(e.getStatusCode());
 
         }
-        LOG.info(url + "==responseEntity==" + (responseEntity == null ? "null" : responseEntity.getStatusCodeValue()));
+        LOG.info(url + "==accessByJson responseEntity==" + (responseEntity == null ? "null" : responseEntity.getStatusCodeValue()));
         if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_401 ||
                 responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_403) {
             //如果token失效，重新登录
@@ -222,6 +199,10 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             headers = getHeaders();
             entity = new HttpEntity<>(null, headers);
             responseEntity = restTemplate.exchange(url, method, entity, String.class, jsonBody);
+        }
+
+        if(responseEntity.getStatusCodeValue()/100 != 2){
+            LOG.info("{} {}==执行失败，response={}, jsonBody={}", url, method.name(), gson.toJson(responseEntity), jsonBody);
         }
         return responseEntity;
     }
@@ -239,27 +220,23 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             requestbody.put("grantType", "password");
             requestbody.put("userName", params.get("userName"));
             requestbody.put("value", params.get("password"));
-            LOG.info("requestbody==" + gson.toJson(requestbody));
 
             String hostUrl = "https://" + params.get("hostIp") + ":" + params.get("hostPort");
-            LOG.info("hostUrl==" + hostUrl);
 
             HttpEntity<String> entity = new HttpEntity<>(gson.toJson(requestbody), headers);
             responseEntity = restTemplate.exchange(hostUrl + LOGIN_DME_URL
                     , HttpMethod.PUT, entity, String.class);
 
-            LOG.info("responseEntity==" + responseEntity);
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
-                LOG.info("jsonObject==" + jsonObject);
                 if (jsonObject != null && jsonObject.get(DmeConstants.ACCESSSESSION) != null) {
                     dmeToken = jsonObject.get("accessSession").getAsString();
-                    LOG.info("dmeToken===" + dmeToken);
                     dmeHostUrl = hostUrl;
                     dmeHostIp = params.get("hostIp").toString();
                     dmeHostPort = Integer.parseInt(params.get("hostPort").toString());
-                    LOG.info("dmeHostUrl==" + dmeHostUrl + "==dmeHostIp==" + dmeHostIp + "==dmeHostPort==" + dmeHostPort);
                 }
+            }else {
+                LOG.info("hostUrl:{},userName={},password={}鉴权失败！", hostUrl, params.get("userName"), params.get("password"));
             }
         }
 
@@ -274,7 +251,6 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         if (!StringUtils.isEmpty(dmeToken)) {
             headers.set("X-Auth-Token", dmeToken);
         }
-        LOG.info("headers==" + gson.toJson(headers));
         return headers;
     }
 
@@ -282,14 +258,12 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         if (StringUtils.isEmpty(dmeToken)) {
             //查询数据库
             DmeInfo dmeInfo = dmeInfoDao.getDmeInfo();
-            LOG.info("dmeinfo==" + gson.toJson(dmeInfo));
             if (dmeInfo != null && dmeInfo.getHostIp() != null) {
                 Map<String, Object> params = new HashMap<>(16);
                 params.put("hostIp", dmeInfo.getHostIp());
                 params.put("hostPort", dmeInfo.getHostPort());
                 params.put("userName", dmeInfo.getUserName());
                 params.put("password", dmeInfo.getPassword());
-                LOG.info("params==" + gson.toJson(params));
                 //登录
                 login(params);
             } else {
@@ -304,10 +278,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         try {
             if (!StringUtils.isEmpty(storageId)) {
                 String workloadsUrl = GET_WORKLOADS_URL.replace("{storage_id}", storageId);
-                LOG.info("workloadsUrl===" + workloadsUrl);
                 try {
                     ResponseEntity responseEntity = access(workloadsUrl, HttpMethod.GET, null);
-                    LOG.info("getWorkLoads responseEntity==" + responseEntity.toString());
                     if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                         JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                         if (jsonObject != null && jsonObject.get(DmeConstants.DATAS) != null) {
@@ -341,7 +313,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             LOG.error("get WorkLoads error:", e);
             throw new DMEException("503","get WorkLoads error:"+e.getMessage());
         }
-        LOG.info("getWorkLoads relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        LOG.info("getWorkLoads relists===" + (relists == null ? "null" : relists.size()));
         return relists;
     }
 
@@ -354,10 +326,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             if (!StringUtils.isEmpty(hostIp)) {
                 requestbody.put("ip", hostIp);
             }
-            LOG.info("requestbody==" + gson.toJson(requestbody));
-            LOG.info("getDmeHosts_url===" + getHostsUrl);
             ResponseEntity responseEntity = access(getHostsUrl, HttpMethod.POST, (requestbody == null ? null : gson.toJson(requestbody)));
-            LOG.info("getDmeHosts responseEntity==" + responseEntity.toString());
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 if (jsonObject != null && jsonObject.get(DmeConstants.HOSTS) != null) {
@@ -400,7 +369,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             LOG.error("DME link error url:" + getHostsUrl + ",error:" + e.toString());
             throw new DMEException(e.getMessage());
         }
-        LOG.info("getDmeHosts relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        LOG.info("getDmeHosts relists===" + (relists == null ? "null" : (relists.size())));
         return relists;
     }
 
@@ -410,9 +379,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         String getHostsInitiatorUrl = GET_DME_HOSTS_INITIATORS_URL;
         getHostsInitiatorUrl = getHostsInitiatorUrl.replace("{host_id}", hostId);
         try {
-            LOG.info("getHostsInitiatorUrl===" + getHostsInitiatorUrl);
             ResponseEntity responseEntity = access(getHostsInitiatorUrl, HttpMethod.GET, null);
-            LOG.info("getDmeHostInitiators responseEntity==" + responseEntity.toString());
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 if (jsonObject != null && jsonObject.get(DmeConstants.INITIATORS) != null) {
@@ -438,7 +405,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             LOG.error("DME link error url:" + getHostsInitiatorUrl + ",error:" + e.toString());
             throw new DMEException(e.getMessage());
         }
-        LOG.info("getHostsInitiator relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        LOG.info("getHostsInitiator relists===" + (relists == null ? "null" : (relists.size())));
         return relists;
     }
 
@@ -451,11 +418,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             if (!StringUtils.isEmpty(hostGroupName)) {
                 requestbody = new HashMap<>(16);
                 requestbody.put("name", hostGroupName);
-                LOG.info("requestbody==" + gson.toJson(requestbody));
             }
-            LOG.info("gethostgroups_url===" + getHostGroupsUrl);
             ResponseEntity responseEntity = access(getHostGroupsUrl, HttpMethod.POST, (requestbody == null ? null : gson.toJson(requestbody)));
-            LOG.info("getDmeHostgroups responseEntity==" + responseEntity.toString());
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 if (jsonObject != null && jsonObject.get(DmeConstants.HOSTGROUPS) != null) {
@@ -483,7 +447,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             LOG.error("DME link error url:" + getHostGroupsUrl + ",error:" + e.toString());
             throw new DMEException(e.getMessage());
         }
-        LOG.info("getDmeHostgroups relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        LOG.info("getDmeHostgroups relists===" + (relists == null ? "null" : relists.size()));
         return relists;
     }
 
@@ -508,11 +472,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 initiator.put("port_name",ToolUtils.getStr(hbamap.get("name")));
                 initiators.add(initiator);
                 requestbody.put("initiator",initiators);
-                LOG.info("requestbody==" + gson.toJson(requestbody));
-
-                LOG.info("createHost_url===" + createHostUrl);
                 ResponseEntity responseEntity = access(createHostUrl, HttpMethod.POST, gson.toJson(requestbody));
-                LOG.info("getDmeHostgroups responseEntity==" + responseEntity.toString());
                 if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                     if (jsonObject != null && jsonObject.get(DmeConstants.ID) != null) {
@@ -529,7 +489,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             LOG.error("DME link error url:" + createHostUrl + ",error:" + e.toString());
             throw new DMEException(e.getMessage());
         }
-        LOG.info("createHost hostmap===" + (hostmap == null ? "null" : (hostmap.size() + "==" + gson.toJson(hostmap))));
+        LOG.info("createHost hostmap===" + (hostmap == null ? "null" : hostmap.size()));
         return hostmap;
     }
 
@@ -538,17 +498,14 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         Map<String, Object> hostgroupmap = null;
         String createHostGroupUrl = CREATE_DME_HOSTGROUP_URL;
         try {
-            Map<String, Object> requestbody = null;
+            Map<String, Object> requestbody;
             if (params != null && params.get(DmeConstants.CLUSTER) != null && params.get(DmeConstants.HOSTIDS) != null) {
                 //判断该集群下有多少主机，如果主机在DME不存在就需要创建
                 requestbody = new HashMap<>(16);
                 requestbody.put("name", params.get("cluster").toString());
-                requestbody.put("host_ids", (List<String>) params.get("hostids"));
-                LOG.info("requestbody==" + gson.toJson(requestbody));
+                requestbody.put("host_ids", params.get("hostids"));
 
-                LOG.info("createHostGroup_url===" + createHostGroupUrl);
                 ResponseEntity responseEntity = access(createHostGroupUrl, HttpMethod.POST, gson.toJson(requestbody));
-                LOG.info("getDmeHostgroups responseEntity==" + responseEntity.toString());
                 if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                     if (jsonObject != null && jsonObject.get(DmeConstants.ID) != null) {
@@ -562,7 +519,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             LOG.error("DME link error url:" + createHostGroupUrl + ",error:" + e.toString());
             throw new DMEException(e.getMessage());
         }
-        LOG.info("createHostGroup hostmap===" + (hostgroupmap == null ? "null" : (hostgroupmap.size() + "==" + gson.toJson(hostgroupmap))));
+        LOG.info("createHostGroup hostmap===" + (hostgroupmap == null ? "null" : (hostgroupmap.size())));
         return hostgroupmap;
     }
 
@@ -601,9 +558,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         String getHostUrl = GET_DME_HOST_URL;
         getHostUrl = getHostUrl.replace("{host_id}", hostId);
         try {
-            LOG.info("getDmeHost_url===" + getHostUrl);
             ResponseEntity responseEntity = access(getHostUrl, HttpMethod.GET, null);
-            LOG.info("getDmeHost responseEntity==" + responseEntity.toString());
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject vjson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 if (vjson != null) {
@@ -617,24 +572,13 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                     map.put("os_type", ToolUtils.jsonToStr(vjson.get("os_type")));
                     map.put("initiator_count", ToolUtils.jsonToInt(vjson.get("initiator_count"), null));
                     map.put("access_mode", ToolUtils.jsonToStr(vjson.get("access_mode")));
-                    JsonArray hostgroups = vjson.getAsJsonArray("hostGroups");
-                    /*if (hostgroups != null && hostgroups.size() > 0) {
-                        List<Map<String, Object>> hglists = new ArrayList<>();
-                        for (int y = 0; y < hostgroups.size(); y++) {
-                            Map<String, Object> hgmap = new HashMap<>(16);
-                            hgmap.put("id", ToolUtils.jsonToStr(vjson.get("id")));
-                            hgmap.put("name", ToolUtils.jsonToStr(vjson.get("name")));
-                            hglists.add(hgmap);
-                        }
-                        map.put("hostGroups", hglists);
-                    }*/
                 }
             }
         } catch (Exception e) {
             LOG.error("DME link error url:" + getHostUrl + ",error:" + e.toString());
             throw new DMEException(e.getMessage());
         }
-        LOG.info("getDmeHost relists===" + (gson.toJson(map)));
+        LOG.info("getDmeHost relists===size={}", map.size());
         return map;
     }
 
@@ -693,9 +637,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         String getHostGroupUrl = GET_DME_HOSTGROUP_URL;
         getHostGroupUrl = getHostGroupUrl.replace("{hostgroup_id}", hostGroupId);
         try {
-            LOG.info("getDmeHostGroup_url===" + getHostGroupUrl);
             ResponseEntity responseEntity = access(getHostGroupUrl, HttpMethod.GET, null);
-            LOG.info("getDmeHostGroup responseEntity==" + responseEntity.toString());
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject vjson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 if (vjson != null) {
@@ -709,7 +651,6 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             LOG.error("DME link error url:" + getHostGroupUrl + ",error:" + e.getMessage());
             throw new DMEException(e.getMessage());
         }
-        LOG.info("getDmeHostGroup relists===" + (gson.toJson(map)));
         return map;
     }
 
@@ -720,9 +661,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         getHostInHostGroupUrl = getHostInHostGroupUrl.replace("{hostgroup_id}", hostGroupId);
         try {
             Map<String, Object> requestbody = new HashMap<>(16);
-            LOG.info("getHostInHostGroup_Url===" + getHostInHostGroupUrl);
             ResponseEntity responseEntity = access(getHostInHostGroupUrl, HttpMethod.POST, gson.toJson(requestbody));
-            LOG.info("getDmeHostGroup responseEntity==" + responseEntity.toString());
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 list = new ArrayList<>();
                 JsonObject datajson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -744,7 +683,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             LOG.error("DME link error url:" + getHostInHostGroupUrl + ",error:" + e.getMessage());
             throw new DMEException(e.getMessage());
         }
-        LOG.info("getDmeHostInHostGroup relists===" + (gson.toJson(list)));
+        LOG.info("getDmeHostInHostGroup relists===" + (null == list? null : list.size()));
         return list;
     }
 

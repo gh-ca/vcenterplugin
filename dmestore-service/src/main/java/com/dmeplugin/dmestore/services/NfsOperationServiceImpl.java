@@ -29,12 +29,15 @@ import java.util.*;
 public class NfsOperationServiceImpl implements NfsOperationService {
 
     private final String API_FS_CREATE = "/rest/fileservice/v1/filesystems/customize";
-    private static final String API_NFSSHARE_CREATE = "/rest/fileservice/v1/nfs-shares";
+    private final String API_NFSSHARE_CREATE = "/rest/fileservice/v1/nfs-shares";
     private final String API_STORAGEPOOL_LIST = "/rest/resourcedb/v1/instances/";
     private final String API_FS_UPDATE = "/rest/fileservice/v1/filesystems";
     private final String API_FS_QUERYONE = "/rest/fileservice/v1/filesystems/query";
     private final String API_FILESYSTEMS_DETAIL = "/rest/fileservice/v1/filesystems/";
     private final String API_SHARE_QUERYONE = "/rest/fileservice/v1/nfs-shares/summary";
+
+    private final String RESULT_FAIL = "failed";
+    private final String RESULT_SUCCESS = "success";
 
     public static final Logger LOG = LoggerFactory.getLogger(VmfsOperationController.class);
     private DmeAccessService dmeAccessService;
@@ -215,14 +218,14 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             }
             String exportPath = (String)params.get("exportPath");
             String type = (String)params.get("type");
-            String securityType = ToolUtils.getStr(params.get("securityType"));
+            String securityType = ToolUtils.getStr(params.get("securityType"), "");
             String accessMode = (String)params.get("accessMode");
 
             if (StringUtils.isEmpty(serverHost) || StringUtils.isEmpty(exportPath) || StringUtils.isEmpty(accessMode) || mounts.size() == 0) {
                 throw new DMEException("403","params error , please check your params !");
             }
             String result = vcsdkUtils.createNfsDatastore(serverHost, exportPath, nfsName, accessMode, mounts, type,securityType);
-            if ("failed".equals(result)) {
+            if (RESULT_FAIL.equals(result)) {
                 throw new VcenterRuntimeException("403","create nfs datastore error!");
             }
             //save datastore info to DP_DME_VMWARE_RELATION
@@ -282,7 +285,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             }
             //update nfs datastore
             String result = vcsdkUtils.renameDataStore(nfsName, dataStoreObjectId);
-            if ("success".equals(result)) {
+            if (RESULT_SUCCESS.equals(result)) {
                 LOG.info("{"+nfsName+"}rename nfs datastore success!");
             }
         } catch (Exception e) {
@@ -372,7 +375,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 reqParam.put("capacity",exchangedCapacity);
                 ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(reqParam));
                 code = responseEntity.getStatusCodeValue();
-                if (code != 202) {
+                if (code != HttpStatus.ACCEPTED.value()) {
                     throw new DMEException(String.valueOf(code),"expand or recycle nfs storage capacity error!");
                 }
                 String object = responseEntity.getBody();
@@ -432,7 +435,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         params.put("filesystem_specs",filesystemSpecsLists);
         ResponseEntity<String> responseEntity = dmeAccessService.access(API_FS_CREATE, HttpMethod.POST , gson.toJson(params));
         int code = responseEntity.getStatusCodeValue();
-        if (code != 202) {
+        if (code != HttpStatus.ACCEPTED.value()) {
             throw new DMEException("503","create file system error !");
         }
         String object = responseEntity.getBody();
@@ -445,7 +448,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         LOG.info("{"+params+"}");
         ResponseEntity<String> responseEntity = dmeAccessService.access(API_NFSSHARE_CREATE, HttpMethod.POST, gson.toJson(params));
         int code = responseEntity.getStatusCodeValue();
-        if (code != 202) {
+        if (code != HttpStatus.ACCEPTED.value()) {
             throw new DMEException("503","create nfs share error !");
         }
         String object = responseEntity.getBody();
@@ -456,18 +459,49 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     private Double getDataspaceOfStoragepool(String storagePoolName,String poolId,String storageId) throws Exception {
         Double dataSpace = 0.0;
         String className = "SYS_StoragePool";
-        String url = API_STORAGEPOOL_LIST + className + "?storageDeviceId=" + storageId;
+        String url = API_STORAGEPOOL_LIST +className +"?condition={json}";
+        JsonObject condition = new JsonObject();
+        JsonArray constraint = new JsonArray();
 
+        JsonObject consObj = new JsonObject();
+        JsonObject simple = new JsonObject();
+        simple.addProperty("name", "dataStatus");
+        simple.addProperty("operator", "equal");
+        simple.addProperty("value", "normal");
+        consObj.add("simple", simple);
+        constraint.add(consObj);
+
+        JsonObject consObj2 = new JsonObject();
+        JsonObject simple2 = new JsonObject();
+        simple2.addProperty("name", "storageDeviceId");
+        simple2.addProperty("operator", "storageDeviceId");
+        simple2.addProperty("value", storageId);
+        consObj2.add("simple", simple2);
+        consObj2.addProperty("logOp", "and");
+        constraint.add(consObj2);
+        JsonObject consObj1 = new JsonObject();
+        JsonObject simple1 = new JsonObject();
         if (!StringUtils.isEmpty(poolId)) {
-            url += " and pool_id=" + poolId;
+            simple1.addProperty("name", "pool_id");
+            simple1.addProperty("operator", "equal");
+            simple1.addProperty("value", poolId);
+            consObj1.add("simple", simple1);
+            consObj1.addProperty("logOp", "and");
+            constraint.add(consObj1);
         }
         if (!StringUtils.isEmpty(storagePoolName)) {
-            url += " and storage_pool_name=" + storagePoolName;
+            simple1.addProperty("name", "storage_pool_name");
+            simple1.addProperty("operator", "equal");
+            simple1.addProperty("value", storagePoolName);
+            consObj1.add("simple", simple1);
+            consObj1.addProperty("logOp", "and");
+            constraint.add(consObj1);
         }
-        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET,null);
+        condition.add("constraint", constraint);
+        ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, gson.toJson(condition));
         LOG.info("url:{" + API_STORAGEPOOL_LIST + "},responseEntity:" + responseEntity);
         int code = responseEntity.getStatusCodeValue();
-        if (code == 200) {
+        if (code == HttpStatus.ACCEPTED.value()) {
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
             JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
@@ -492,7 +526,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(params));
         int code = responseEntity.getStatusCodeValue();
-        if (code!=202) {
+        if (code!=HttpStatus.ACCEPTED.value()) {
             throw new DMEException("503","update nfs datastore error !"+responseEntity.getBody());
         }
         String object = responseEntity.getBody();
@@ -506,7 +540,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         if (!StringUtils.isEmpty(fsname)) {
             reqMap.put("name", fsname);
             ResponseEntity<String> responseEntity = dmeAccessService.access(API_FS_QUERYONE, HttpMethod.POST, gson.toJson(reqMap));
-            if (responseEntity.getStatusCodeValue() == 200) {
+            if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 String object = responseEntity.getBody();
                 JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.get("data").getAsJsonArray();
@@ -530,7 +564,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             reqMap.put("name", shareName);
             reqMap.put("fs_name", fsname);
             ResponseEntity<String> responseEntity = dmeAccessService.access(API_SHARE_QUERYONE, HttpMethod.POST, gson.toJson(reqMap));
-            if (responseEntity.getStatusCodeValue() == 200) {
+            if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 String object = responseEntity.getBody();
                 JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.get("nfs_share_info_list").getAsJsonArray();
@@ -551,7 +585,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         String mgmt = "";
         String logicName = "";
         List<LogicPorts> logicPort = dmeStorageService.getLogicPorts(storageId);
-       // List<LogicPorts> logicPort = (List)logicPorts.get("data");
         if (logicPort != null) {
             JsonArray jsonArray = new JsonParser().parse(gson.toJson(logicPort)).getAsJsonArray();
             for (JsonElement jsonElement : jsonArray) {
@@ -575,11 +608,11 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         resMap.put("code", "200");
         resMap.put("msg", "list filesystem success!");
 
-        String url = API_FILESYSTEMS_DETAIL + "/" + fileSystemId;
+        String url = API_FILESYSTEMS_DETAIL + fileSystemId;
 
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         int code = responseEntity.getStatusCodeValue();
-        if (code != 200) {
+        if (code != HttpStatus.OK.value()) {
             throw new DMEException(String.valueOf(code),"list filesystem error!");
         }
         String object = responseEntity.getBody();
@@ -599,8 +632,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     }
 
     private void saveNfsInfoToDmeVmwareRelation(String params, String currentPortId, String logicPortName,
-                                                String fsId, String shareName, String shareId, String fsName) {
+                                                String fsId, String shareName, String shareId, String fsName) throws DMEException {
 
+        if (!StringUtils.isEmpty(params)) {
         DmeVmwareRelation datastoreInfo = gson.fromJson(params, DmeVmwareRelation.class);
         datastoreInfo.setLogicPortId(currentPortId);
         datastoreInfo.setLogicPortName(logicPortName);
@@ -611,6 +645,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         List<DmeVmwareRelation> dmeVmwareRelations = new ArrayList<>();
         dmeVmwareRelations.add(datastoreInfo);
         dmeVmwareRalationDao.save(dmeVmwareRelations);
+        }else {
+            throw new DMEException("save nfs datastoreInfo error");
+        }
     }
 
     @Override
@@ -637,7 +674,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 fsname=ToolUtils.jsonToStr(fsDetail.get("name"));
                 resultMap.put("fileSystemId",fileSystemId);
                 JsonObject json = fsDetail.get("capacity_auto_negotiation").getAsJsonObject();
-                //fileSystemDetail.setCapacityAutonegotiation(capacityAutonegotiation);
                 resultMap.put("autoSizeEnable",ToolUtils.jsonToBoo(json.get("auto_size_enable")));
                 boolean isThin=("thin".equalsIgnoreCase(ToolUtils.jsonToStr(fsDetail.get("alloc_type"))))?true:false;
                 resultMap.put("thin",isThin);
@@ -671,7 +707,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_SHARE_DETAIL_URL,
                 "nfs_share_id", nfsShareId);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-        if (responseEntity.getStatusCodeValue() / 100 != 2) {
+        if (responseEntity.getStatusCodeValue() != HttpStatus.OK.value()) {
             LOG.error("获取 NFS Share 信息失败！返回信息：{}", responseEntity.getBody());
             return null;
         }

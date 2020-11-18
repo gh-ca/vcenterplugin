@@ -34,6 +34,7 @@ export class NfsAddComponent implements OnInit{
   minbandwidthChoose=false; // 最小带宽 选中
   miniopsChoose=false; // 最小iops 选中
   latencyChoose=false; // 时延 选中
+  addSuccessShow = false; // 添加成功提示
 
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
@@ -64,7 +65,6 @@ export class NfsAddComponent implements OnInit{
       //入口来至Vcenter
       this.viewPage='add_vcenter'
     }
-
     this.storageService.getData().subscribe((s: any) => {
       this.modalLoading=false;
       if (s.code === '200'){
@@ -98,6 +98,9 @@ export class NfsAddComponent implements OnInit{
   addNfs(){
     //
     this.modalHandleLoading=true;
+
+    this.checkedPool = this.storagePools.filter(item => item.id === this.addForm.storagePoolId)[0];
+
     this.addForm.poolRawId=this.checkedPool.diskPoolId;
     this.addForm.storagePoolId= this.checkedPool.id;
     // 单位换算
@@ -117,29 +120,26 @@ export class NfsAddComponent implements OnInit{
     this.addService.addNfs(this.addForm).subscribe((result: any) => {
       this.modalHandleLoading=false;
       if (result.code === '200'){
-        if (this.pluginFlag=='plugin'){
-          this.backToNfsList();
-        }else{
-          this.closeModel();
-        }
+        // 打开成功提示窗口
+        this.addSuccessShow = true;
       }else{
         this.errorMsg = '1';
         console.log("Delete failed:",result.description)
-
       }
+      this.cdr.detectChanges();
     });
   }
   selectStoragePool(){
     this.modalLoading=true;
-    this.storagePools = null;
+    // this.storagePools = [];
     this.logicPorts = null;
     // 选择存储后获取存储池
     this.storageService.getStoragePoolListByStorageId("file",this.addForm.storagId)
       .subscribe((r: any) => {
         if (r.code === '200'){
           this.storagePools = r.data;
-          this.cdr.detectChanges();
         }
+        this.cdr.detectChanges();
       });
     this.selectLogicPort();
   }
@@ -150,21 +150,22 @@ export class NfsAddComponent implements OnInit{
         this.modalLoading=false;
         if (r.code === '200'){
           this.logicPorts = r.data;
-          this.cdr.detectChanges();
         }
+        this.cdr.detectChanges();
       });
   }
   checkHost(){
     this.modalLoading=true;
-    this.addForm.vkernelIp=null;
+
     //选择主机后获取虚拟网卡
     this.addService.getVmkernelListByObjectId(this.addForm.hostObjectId)
       .subscribe((r: any) => {
         this.modalLoading=false;
         if (r.code === '200'){
           this.vmkernelList = r.data;
-          this.cdr.detectChanges();
+          this.addForm.vkernelIp=this.vmkernelList[0].ipAddress;
         }
+        this.cdr.detectChanges();
       });
   }
   backToNfsList(){
@@ -235,7 +236,7 @@ export class NfsAddComponent implements OnInit{
     if(this.addForm.nfsName==null) return false;
     if(this.oldNfsName==this.addForm.nfsName) return false;
     this.oldNfsName=this.addForm.nfsName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
     if(reg5.test(this.addForm.nfsName)){
       //验证重复
       this.matchErr=false;
@@ -259,7 +260,7 @@ export class NfsAddComponent implements OnInit{
     if(this.oldShareName=this.addForm.shareName) return false;
 
     this.oldShareName=this.addForm.shareName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
     if(reg5.test(this.addForm.shareName)){
       //验证重复
       this.matchErr=false;
@@ -274,7 +275,7 @@ export class NfsAddComponent implements OnInit{
     if(this.oldFsName=this.addForm.fsName) return false;
 
     this.oldFsName=this.addForm.fsName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
     if(reg5.test(this.addForm.fsName)){
       //验证重复
       this.matchErr=false;
@@ -322,7 +323,17 @@ export class NfsAddComponent implements OnInit{
   }
 
 
-
+  /**
+   * 确认关闭窗口
+   */
+  confirmActResult() {
+    this.wizard.close();// 关闭弹窗
+    if (this.pluginFlag=='plugin'){
+      this.backToNfsList();
+    }else{
+      this.closeModel();
+    }
+  }
 
 }
 

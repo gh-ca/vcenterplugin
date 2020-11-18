@@ -13,15 +13,15 @@ import java.util.Map;
 
 public interface VCenterInfoService {
 
-    int addVCenterInfo(VCenterInfo vCenterInfo) throws DmeSqlException;
+    int addVcenterInfo(VCenterInfo vCenterInfo) throws DmeSqlException;
 
-    int saveVCenterInfo(VCenterInfo vCenterInfo) throws DmeSqlException;
+    int saveVcenterInfo(VCenterInfo vCenterInfo) throws DmeSqlException;
 
 
 
-    Map<String, Object> findVCenterInfo() throws DmeSqlException;
+    Map<String, Object> findVcenterInfo() throws DmeSqlException;
 
-    VCenterInfo getVCenterInfo() throws DmeSqlException;
+    VCenterInfo getVcenterInfo() throws DmeSqlException;
 
 
 

@@ -47,7 +47,7 @@ public class PerfManagerMO extends BaseMO {
     }
 
     public void createPerfInterval(PerfInterval interval) throws Exception {
-        _context.getService().createPerfInterval(_mor, interval);
+        context.getService().createPerfInterval(mor, interval);
     }
 
     /**
@@ -56,7 +56,7 @@ public class PerfManagerMO extends BaseMO {
      * @param calendar Object to be converted
      * @return XMLGregorianCalendar
      */
-    private XMLGregorianCalendar calendarToXMLGregorianCalendar(Calendar calendar) throws DatatypeConfigurationException {
+    private XMLGregorianCalendar calendarToXmlGregorianCalendar(Calendar calendar) throws DatatypeConfigurationException {
 
         DatatypeFactory dtf = DatatypeFactory.newInstance();
         XMLGregorianCalendar xgc = dtf.newXMLGregorianCalendar();
@@ -76,12 +76,12 @@ public class PerfManagerMO extends BaseMO {
 
     public List<PerfMetricId> queryAvailablePerfMetric(ManagedObjectReference morEntity, Calendar beginTime, Calendar endTime, Integer intervalId) throws Exception {
 
-        return _context.getService().queryAvailablePerfMetric(_mor, morEntity, calendarToXMLGregorianCalendar(beginTime), calendarToXMLGregorianCalendar(endTime),
+        return context.getService().queryAvailablePerfMetric(mor, morEntity, calendarToXmlGregorianCalendar(beginTime), calendarToXmlGregorianCalendar(endTime),
                 intervalId);
     }
 
     public PerfCompositeMetric queryPerfComposite(PerfQuerySpec spec) throws Exception {
-        return _context.getService().queryPerfComposite(_mor, spec);
+        return context.getService().queryPerfComposite(mor, spec);
     }
 
     public List<PerfCounterInfo> queryPerfCounter(int[] counterId) throws Exception {
@@ -91,34 +91,34 @@ public class PerfManagerMO extends BaseMO {
                 counterArr.add(counterId[i]);
             }
         }
-        return _context.getService().queryPerfCounter(_mor, counterArr);
+        return context.getService().queryPerfCounter(mor, counterArr);
     }
 
     public List<PerfCounterInfo> queryPerfCounterByLevel(int level) throws Exception {
-        return _context.getService().queryPerfCounterByLevel(_mor, level);
+        return context.getService().queryPerfCounterByLevel(mor, level);
     }
 
     public PerfProviderSummary queryPerfProviderSummary(ManagedObjectReference morEntity) throws Exception {
-        return _context.getService().queryPerfProviderSummary(_mor, morEntity);
+        return context.getService().queryPerfProviderSummary(mor, morEntity);
     }
 
     public List<PerfEntityMetricBase> queryPerf(PerfQuerySpec[] specs) throws Exception {
-        return _context.getService().queryPerf(_mor, Arrays.asList(specs));
+        return context.getService().queryPerf(mor, Arrays.asList(specs));
     }
 
     public void removePerfInterval(int samplePeriod) throws Exception {
-        _context.getService().removePerfInterval(_mor, samplePeriod);
+        context.getService().removePerfInterval(mor, samplePeriod);
     }
 
     public void updatePerfInterval(PerfInterval interval) throws Exception {
-        _context.getService().updatePerfInterval(_mor, interval);
+        context.getService().updatePerfInterval(mor, interval);
     }
 
     public List<PerfCounterInfo> getCounterInfo() throws Exception {
-        return _context.getVimClient().getDynamicProperty(_mor, "perfCounter");
+        return context.getVimClient().getDynamicProperty(mor, "perfCounter");
     }
 
     public List<PerfInterval> getIntervalInfo() throws Exception {
-        return _context.getVimClient().getDynamicProperty(_mor, "historicalInterval");
+        return context.getVimClient().getDynamicProperty(mor, "historicalInterval");
     }
 }

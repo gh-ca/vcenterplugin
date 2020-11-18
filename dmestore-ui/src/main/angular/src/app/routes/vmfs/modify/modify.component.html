@@ -15,8 +15,26 @@
       <!-- 名称 -->
       <clr-input-container>
         <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
-        <input clrInput  [(ngModel)]="modifyForm.name" name="name" #name="ngModel" required/><br>
-        <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+        <input clrInput  [(ngModel)]="modifyForm.name" name="name" #name="ngModel" (blur)="modifyNameCheck();" required/><br>
+        <clr-control-helper *ngIf="matchErr">
+          <div class="errorTips" readonly >
+            <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+            {{'validations.nameRequired' | translate}}
+          </div>
+        </clr-control-helper>
+        <clr-control-helper *ngIf="vmfsNameRepeatErr">
+          <div class="errorTips" readonly >
+            <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+            {{'errorMsg.vmfsNameRepeat' | translate}}
+          </div>
+        </clr-control-helper>
+        <clr-control-helper *ngIf="volNameRepeatErr">
+          <div class="errorTips" readonly >
+            <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+            {{'errorMsg.volNameRepeat' | translate}}
+          </div>
+        </clr-control-helper>
+        <clr-control-error>{{'validations.nameRequired' | translate}}</clr-control-error>
       </clr-input-container>
       <clr-checkbox-container>
         <label></label>
@@ -45,7 +63,7 @@
           <input type="checkbox" [(ngModel)]="modifyForm.maxbandwidthChoose" name="maxbandwidthChoose" clrCheckbox/>
           <label>
             {{'vmfs.bandwidthLimitUpper' | translate}}
-            <input type="number" [(readOnly)]="!modifyForm.maxbandwidthChoose" class="inputOneLine" name="max_bandwidth"
+            <input type="number" min="0" [(readOnly)]="!modifyForm.maxbandwidthChoose" class="inputOneLine" name="max_bandwidth"
                    [(ngModel)]="modifyForm.max_bandwidth" (blur)="qosBlur('modify', 'max_bandwidth');"/>{{'vmfs.unitM' | translate}}
           </label>
         </clr-checkbox-wrapper>
@@ -57,7 +75,7 @@
           <input type="checkbox" [(ngModel)]="modifyForm.maxiopsChoose" name="maxiopsChoose" clrCheckbox/>
           <label>
             {{'vmfs.IOPSLimitUpper' | translate}}
-            <input type="number" [(readOnly)]="!modifyForm.maxiopsChoose" class="inputOneLine" name="max_iops"
+            <input type="number" min="0" [(readOnly)]="!modifyForm.maxiopsChoose" class="inputOneLine" name="max_iops"
                    [(ngModel)]="modifyForm.max_iops" (blur)="qosBlur('modify', 'max_iops');"/>
           </label>
         </clr-checkbox-wrapper>
@@ -70,7 +88,7 @@
           <input type="checkbox" [(ngModel)]="modifyForm.minbandwidthChoose" name="minbandwidthChoose" clrCheckbox/>
           <label>
             {{'vmfs.bandwidthLimitLower' | translate}}
-            <input type="number" [(readOnly)]="!modifyForm.minbandwidthChoose" class="inputOneLine" name="min_bandwidth"
+            <input type="number" min="0" [(readOnly)]="!modifyForm.minbandwidthChoose" class="inputOneLine" name="min_bandwidth"
                    [(ngModel)]="modifyForm.min_bandwidth" (blur)="qosBlur('modify', 'min_bandwidth');"/>{{'vmfs.unitM' | translate}}
           </label>
         </clr-checkbox-wrapper>
@@ -82,7 +100,7 @@
           <input type="checkbox" [(ngModel)]="modifyForm.miniopsChoose" name="miniopsChoose" clrCheckbox/>
           <label>
             {{'vmfs.IOPSLimitLower' | translate}}
-            <input type="number" [(readOnly)]="!modifyForm.miniopsChoose" class="inputOneLine" name="min_iops"
+            <input type="number" min="0" [(readOnly)]="!modifyForm.miniopsChoose" class="inputOneLine" name="min_iops"
                    [(ngModel)]="modifyForm.min_iops" (blur)="qosBlur('modify', 'min_iops');"/>
           </label>
         </clr-checkbox-wrapper>
@@ -94,7 +112,7 @@
           <input type="checkbox" [(ngModel)]="modifyForm.latencyChoose" name="latencyChoose" clrCheckbox/>
           <label>
             {{'vmfs.latencyMax' | translate}}
-            <input type="number" [(readOnly)]="!modifyForm.latencyChoose" class="inputOneLine" name="latency"
+            <input type="number" min="0" [(readOnly)]="!modifyForm.latencyChoose" class="inputOneLine" name="latency"
                    [(ngModel)]="modifyForm.latency" (blur)="qosBlur('modify', 'latency');"/>{{'vmfs.latencyUnit' | translate}}
           </label>
         </clr-checkbox-wrapper>

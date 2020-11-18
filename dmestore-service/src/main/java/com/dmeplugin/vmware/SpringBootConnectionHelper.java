@@ -5,7 +5,6 @@ import com.dmeplugin.dmestore.services.VCenterInfoService;
 import com.dmeplugin.dmestore.utils.CipherUtils;
 import com.dmeplugin.vmware.util.TestVmwareContextFactory;
 import com.dmeplugin.vmware.util.VmwareContext;
-import com.dmeplugin.vmware.util.VmwarePluginContextFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +28,7 @@ public class SpringBootConnectionHelper extends VCConnectionHelper{
     @Override
     public VmwareContext getServerContext(String serverguid) throws Exception {
         try {
-            VCenterInfo vCenterInfo= vCenterInfoService.getVCenterInfo();
+            VCenterInfo vCenterInfo= vCenterInfoService.getVcenterInfo();
             if (null!=vCenterInfo) {
                 this.setServerurl(vCenterInfo.getHostIp());
                 this.setServerport(vCenterInfo.getHostPort());
@@ -46,7 +45,7 @@ public class SpringBootConnectionHelper extends VCConnectionHelper{
     @Override
     public VmwareContext[] getAllContext() throws Exception {
         try {
-            VCenterInfo vCenterInfo= vCenterInfoService.getVCenterInfo();
+            VCenterInfo vCenterInfo= vCenterInfoService.getVcenterInfo();
             if (null!=vCenterInfo) {
                 this.setServerurl(vCenterInfo.getHostIp());
                 this.setServerport(vCenterInfo.getHostPort());

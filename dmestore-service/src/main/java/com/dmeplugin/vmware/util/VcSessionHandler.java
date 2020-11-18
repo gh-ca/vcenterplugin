@@ -46,7 +46,7 @@ public final class VcSessionHandler implements SOAPHandler<SOAPMessageContext> {
    public boolean handleMessage(SOAPMessageContext smc) {
       if (isOutgoingMessage(smc)) {
          try {
-            SOAPHeader header = getSOAPHeader(smc);
+            SOAPHeader header = getSoapHeader(smc);
 
             SOAPElement vcsessionHeader =
                   header.addChildElement(new QName("#",
@@ -85,7 +85,7 @@ public final class VcSessionHandler implements SOAPHandler<SOAPMessageContext> {
     * @return
     * @throws SOAPException
     */
-   SOAPHeader getSOAPHeader(SOAPMessageContext smc) throws SOAPException {
+   SOAPHeader getSoapHeader(SOAPMessageContext smc) throws SOAPException {
       return smc.getMessage().getSOAPPart().getEnvelope().getHeader() == null ? smc
             .getMessage().getSOAPPart().getEnvelope().addHeader()
             : smc.getMessage().getSOAPPart().getEnvelope().getHeader();

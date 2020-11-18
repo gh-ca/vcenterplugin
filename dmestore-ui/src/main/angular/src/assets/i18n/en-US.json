@@ -22,10 +22,14 @@
     "refresh": "Refresh",
     "synSPolicy": "Synchronize VM Storage Policies",
     "tip": "Tip",
-    "back":"Back"
+    "back":"Back",
+    "performance": "Performance",
+    "conventional": "Conventional",
+    "capacity": "Capacity"
   },
   "validations": {
     "required": "This field is required!",
+    "nameRequired": "This field is required! And can only contain half-width letters, half-width numbers, “_”、“-”、“.”、, Chinese characters.",
     "minlength": "Should have atleast {{number}} characters",
     "maxlength": "This value should be less than {{number}} characters",
     "min": "This value should be more than {{number}}",
@@ -155,6 +159,9 @@
       "title":"Tips",
       "content":"Are you sure to delete?",
       "tips":"If all the hosts mounted by NFS are unmounted, the NFS device will be deleted automatically！"
+    },
+    "reduce": {
+      "success": "Successfully reduce!"
     }
   },
   "vmfs": {
@@ -245,7 +252,7 @@
       "success": "Successfully modified!"
     },
     "expand": {
-      "success": "Successful expansion!"
+      "success": "Successfully expansion!"
     },
     "serviceLevel": {
       "success": "The service level changed successfully!"
@@ -780,11 +787,20 @@
     "nfsrepeat":"NFS name already exists!",
     "sharerepeat":"Share name already exists!",
     "fsrepeat":"FileSystem name already exists!",
+    "vmfsNameRepeat":"VMFS name already exists!",
+    "volNameRepeat":"volume name already exists!",
     "numberAndLetter":"Only numbers and letters can be entered!"
   },
   "page": {
     "perPage": "Per Page",
     "of": "of",
     "all": "Total"
+  },
+  "performance": {
+    "volumeMaximumIORespTime": "Volume maximum I/O response time (ms)",
+    "volumeIODensity": "Volume I/O density (IOPS/TB)",
+    "totalVolumeThroughput": "Total volume throughput(IOPS)",
+    "volumeTotalBandwidth": "Volume total bandwidth(MB/s)",
+    "storagePoolIODensity": "Storage pool I/O density(IOPS/TB)"
   }
 }

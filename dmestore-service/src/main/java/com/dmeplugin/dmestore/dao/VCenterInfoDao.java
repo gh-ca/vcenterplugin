@@ -9,7 +9,6 @@ import com.dmeplugin.dmestore.exception.DmeSqlException;
 import com.dmeplugin.dmestore.services.DmeConstants;
 
 import java.sql.*;
-import java.util.*;
 
 /**
  * @Description: TODO
@@ -20,8 +19,8 @@ import java.util.*;
  **/
 public class VCenterInfoDao extends H2DataBaseDao {
 
-  public int addVCenterInfo(VCenterInfo vCenterInfo) throws DmeSqlException {
-    checkVCenterInfo(vCenterInfo);
+  public int addVcenterInfo(VCenterInfo vCenterInfo) throws DmeSqlException {
+    checkVcenterInfo(vCenterInfo);
     Connection con = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
@@ -51,9 +50,9 @@ public class VCenterInfoDao extends H2DataBaseDao {
     }
   }
 
-  public int updateVCenterInfo(VCenterInfo vCenterInfo) throws DmeSqlException {
-    checkVCenterInfo(vCenterInfo);
-    checkID(vCenterInfo.getId());
+  public int updateVcenterInfo(VCenterInfo vCenterInfo) throws DmeSqlException {
+    checkVcenterInfo(vCenterInfo);
+    checkId(vCenterInfo.getId());
     Connection con = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
@@ -78,7 +77,7 @@ public class VCenterInfoDao extends H2DataBaseDao {
     }
   }
 
-  public VCenterInfo getVCenterInfo() throws DmeSqlException {
+  public VCenterInfo getVcenterInfo() throws DmeSqlException {
     Connection con = null;
     PreparedStatement ps = null;
     ResultSet rs = null;
@@ -129,14 +128,14 @@ public class VCenterInfoDao extends H2DataBaseDao {
     }
   }
 
-  private void checkID(int id) throws  DmeSqlException {
+  private void checkId(int id) throws  DmeSqlException {
     if (id < 1) {
       throw new DmeSqlException("parameter is is not correct");
     }
 
   }
 
-  private void checkVCenterInfo(VCenterInfo vCenterInfo) throws DmeSqlException {
+  private void checkVcenterInfo(VCenterInfo vCenterInfo) throws DmeSqlException {
     checkIp(vCenterInfo.getHostIp());
     checkUserName(vCenterInfo.getUserName());
     checkPassword(vCenterInfo.getPassword());

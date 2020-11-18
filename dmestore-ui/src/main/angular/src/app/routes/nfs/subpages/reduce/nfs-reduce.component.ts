@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {ChangeDetectorRef, Component, OnInit} from "@angular/core";
 import {GlobalsService} from "../../../../shared/globals.service";
 import {NfsReduceService} from "./nfs-reduce.service";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -19,8 +19,9 @@ export class NfsReduceComponent implements OnInit{
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
   fsId:string;
+  reduceSuccessShow = false;// 缩容成功窗口
   constructor(private reduceService: NfsReduceService, private gs: GlobalsService,
-              private activatedRoute: ActivatedRoute,private router:Router){
+              private activatedRoute: ActivatedRoute,private router:Router, private cdr: ChangeDetectorRef){
   }
   ngOnInit(): void {
     //入口是DataSource
@@ -83,15 +84,22 @@ export class NfsReduceComponent implements OnInit{
     this.reduceService.changeCapacity(params).subscribe((result: any) => {
       this.modalHandleLoading=false;
       if (result.code === '200'){
-        if(this.pluginFlag=='plugin'){
-          this.backToNfsList();
-        }else{
-          this.closeModel();
-        }
+        this.reduceSuccessShow = true;
       }else{
         this.errorMsg = '1';
         console.log("Reduce failed:",result.description);
       }
+      this.cdr.detectChanges();
     });
+  }
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    if(this.pluginFlag=='plugin'){
+      this.backToNfsList();
+    }else{
+      this.closeModel();
+    }
   }
 }

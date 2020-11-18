@@ -27,7 +27,7 @@
           <!--</clr-radio-wrapper>-->
         <!--</clr-radio-container>-->
         <!--主机-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.mountHost' | translate}}</label>
           <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="mountForm.hostObjectId"
                   required name="hostObjectId" class="clr-select" (change)="checkHost()">
@@ -35,14 +35,14 @@
           </select>
         </clr-select-container>
         <!--虚拟网卡IP-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.vkernel' | translate}}</label>
           <select clrSelect (ngModelOptions)="vmkernelList" required [(ngModel)]="mountForm.hostVkernelIp" name="hostVkernelIp"
                   class="clr-select">
             <option *ngFor="let item of vmkernelList" value="{{item.ipAddress}}">{{item.ipAddress}}</option>
           </select>
         </clr-select-container>
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.mount.mountType' | translate}}</label>
           <select clrSelect [(ngModel)]="mountForm.mountType" name="mountType">
             <option value="readOnly">{{'nfs.mount.readOnly' | translate}}</option>
@@ -57,8 +57,8 @@
     </div>
   </clr-modal>
   <!--vcenter-datastore-->
-  <div *ngIf="viewPage=='mount_dataStore'">
-    <div>
+  <clr-modal  class="add-wizard-wrap" [clrModalOpen]="viewPage=='mount_dataStore'" [clrModalClosable]="false">
+    <div class="modal-body">
       <form clrForm>
         <p *ngIf="errorMsg" style="color: red">{{'errorMsg.mountError' | translate}}</p>
         <div *ngIf="modalLoading" class="loadingDiv">
@@ -82,7 +82,7 @@
       </span>
         </div>
         <!--主机-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.mountHost' | translate}}</label>
           <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="mountForm.hostObjectId"
                   required name="hostObjectId" class="clr-select" (change)="checkHost()">
@@ -90,14 +90,14 @@
           </select>
         </clr-select-container>
         <!--虚拟网卡IP-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.vkernel' | translate}}</label>
           <select clrSelect (ngModelOptions)="vmkernelList" required [(ngModel)]="mountForm.hostVkernelIp" name="hostVkernelIp"
                   class="clr-select">
             <option *ngFor="let item of vmkernelList" value="{{item.ipAddress}}">{{item.ipAddress}}</option>
           </select>
         </clr-select-container>
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.mount.mountType' | translate}}</label>
           <select clrSelect [(ngModel)]="mountForm.mountType" name="mountType">
             <option value="readOnly">{{'nfs.mount.readOnly' | translate}}</option>
@@ -106,13 +106,14 @@
         </clr-select-container>
       </form>
     </div>
-    <div style="float: right;">
-      <button type="button" class="btn btn-outline" (click)="backToNfsList()">{{'menu.cancel' | translate}}</button>
+    <div style="float: right;" class="modal-footer">
+      <button type="button" class="btn btn-outline" (click)="closeModel()">{{'menu.cancel' | translate}}</button>
       <button type="button" class="btn btn-primary" (click)="mountSubmit()">{{'menu.ok' | translate}}</button>
     </div>
-  </div>
-  <div *ngIf="viewPage=='mount_host'">
-    <div>
+  </clr-modal>
+  <!--vcenter-host-->
+  <clr-modal  class="add-wizard-wrap" [clrModalOpen]="viewPage=='mount_host'" [clrModalClosable]="false">
+    <div class="modal-body">
       <form clrForm>
         <p *ngIf="errorMsg" style="color: red">{{'errorMsg.mountError' | translate}}</p>
         <div *ngIf="modalLoading" class="loadingDiv">
@@ -126,7 +127,7 @@
       </span>
         </div>
         <!--虚拟网卡IP-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.vkernel' | translate}}</label>
           <select clrSelect (ngModelOptions)="vmkernelList" required [(ngModel)]="mountForm.hostVkernelIp" name="hostVkernelIp"
                   class="clr-select">
@@ -134,14 +135,14 @@
           </select>
         </clr-select-container>
         <!--data store-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.nfsStore' | translate}}</label>
           <select clrSelect (ngModelOptions)="dataStoreList" required [(ngModel)]="mountForm.dataStoreObjectId" name="dataStoreObjectId"
                   class="clr-select">
             <option *ngFor="let item of dataStoreList" value="{{item.objectId}}">{{item.name}}</option>
           </select>
         </clr-select-container>
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.mount.mountType' | translate}}</label>
           <select clrSelect [(ngModel)]="mountForm.mountType" name="mountType">
             <option value="readOnly">{{'nfs.mount.readOnly' | translate}}</option>
@@ -150,10 +151,21 @@
         </clr-select-container>
       </form>
     </div>
-    <div style="float: right;">
+    <div style="float: right;" class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="closeModel()">{{'menu.cancel' | translate}}</button>
       <button type="button" class="btn btn-primary" (click)="mountSubmit()">{{'menu.ok' | translate}}</button>
     </div>
-  </div>
+  </clr-modal>
 
+
+  <!--操作成功提示-->
+  <clr-modal [(clrModalOpen)]="mountSuccessShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+    <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+    <div class="modal-body">
+      <p *ngIf="mountSuccessShow">{{'vmfs.mount.success' | translate}}</p>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-primary" (click)="mountSuccessShow = false;confirmActResult();">{{'menu.ok' | translate}}</button>
+    </div>
+  </clr-modal>
 </div>

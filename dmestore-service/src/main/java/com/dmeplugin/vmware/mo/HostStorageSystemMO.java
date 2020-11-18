@@ -32,54 +32,54 @@ public class HostStorageSystemMO extends BaseMO {
     }
 
     public HostStorageDeviceInfo getStorageDeviceInfo() throws Exception {
-        return (HostStorageDeviceInfo)_context.getVimClient().getDynamicProperty(_mor, "storageDeviceInfo");
+        return (HostStorageDeviceInfo) context.getVimClient().getDynamicProperty(mor, "storageDeviceInfo");
     }
 
     public HostFileSystemVolumeInfo getHostFileSystemVolumeInfo() throws Exception {
-        return _context.getVimClient().getDynamicProperty(_mor, "fileSystemVolumeInfo");
+        return context.getVimClient().getDynamicProperty(mor, "fileSystemVolumeInfo");
     }
 
     public void addInternetScsiStaticTargets(String iScsiHbaDevice, List<HostInternetScsiHbaStaticTarget> lstTargets) throws Exception {
-        _context.getService().addInternetScsiStaticTargets(_mor, iScsiHbaDevice, lstTargets);
+        context.getService().addInternetScsiStaticTargets(mor, iScsiHbaDevice, lstTargets);
     }
 
     public void removeInternetScsiStaticTargets(String iScsiHbaDevice, List<HostInternetScsiHbaStaticTarget> lstTargets) throws Exception {
-        _context.getService().removeInternetScsiStaticTargets(_mor, iScsiHbaDevice, lstTargets);
+        context.getService().removeInternetScsiStaticTargets(mor, iScsiHbaDevice, lstTargets);
     }
 
     public void rescanHba(String iScsiHbaDevice) throws Exception {
-        _context.getService().rescanHba(_mor, iScsiHbaDevice);
+        context.getService().rescanHba(mor, iScsiHbaDevice);
     }
 
     public void rescanVmfs() throws Exception {
-        _context.getService().rescanVmfs(_mor);
+        context.getService().rescanVmfs(mor);
     }
 
     public void refreshStorageSystem() throws Exception{
-        _context.getService().refreshStorageSystem(_mor);
+        context.getService().refreshStorageSystem(mor);
     }
 
     public void mountVmfsVolume(String datastoreUuid) throws Exception {
-        _context.getService().mountVmfsVolume(_mor, datastoreUuid);
+        context.getService().mountVmfsVolume(mor, datastoreUuid);
     }
 
     public void unmountVmfsVolume(String datastoreUuid) throws Exception {
-        _context.getService().unmountVmfsVolume(_mor, datastoreUuid);
+        context.getService().unmountVmfsVolume(mor, datastoreUuid);
     }
 
     public void unmapVmfsVolumeExTask(List<String> vmfsUuids) throws Exception {
-        _context.getService().unmapVmfsVolumeExTask(_mor, vmfsUuids);
+        context.getService().unmapVmfsVolumeExTask(mor, vmfsUuids);
     }
 
     public void setMultipathLunPolicy(String lunId, HostMultipathInfoLogicalUnitPolicy hostMultipathInfoLogicalUnitPolicy ) throws Exception {
-        _context.getService().setMultipathLunPolicy(_mor, lunId,hostMultipathInfoLogicalUnitPolicy);
+        context.getService().setMultipathLunPolicy(mor, lunId,hostMultipathInfoLogicalUnitPolicy);
     }
 
     public List<HostUnresolvedVmfsVolume> queryUnresolvedVmfsVolume() throws Exception {
-        return _context.getService().queryUnresolvedVmfsVolume(_mor);
+        return context.getService().queryUnresolvedVmfsVolume(mor);
     }
 
     public void addInternetScsiSendTargets(String iScsiHbaDevice, List<HostInternetScsiHbaSendTarget> targets) throws HostConfigFaultFaultMsg, NotFoundFaultMsg, RuntimeFaultFaultMsg {
-        _context.getService().addInternetScsiSendTargets(_mor, iScsiHbaDevice, targets);
+        context.getService().addInternetScsiSendTargets(mor, iScsiHbaDevice, targets);
     }
 }

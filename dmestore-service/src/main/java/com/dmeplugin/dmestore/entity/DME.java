@@ -21,16 +21,19 @@ public class DME extends DMEbase implements Serializable {
 	private int id;
 	private String aliasName;
 	private String latestStatus;
-	private String reservedInt1; // -- HA状态：0/null-未同步 1-已同步 2-未同步(取消订阅)
-	private String reservedInt2; // -- 保活状态: 0/null-未订阅 1-已订阅 2-未订阅(取消订阅)
+	// -- HA状态：0/null-未同步 1-已同步 2-未同步(取消订阅)
+	private String reservedInt1;
+	// -- 保活状态: 0/null-未订阅 1-已订阅 2-未订阅(取消订阅)
+	private String reservedInt2;
 	private String reservedStr1;
 	private String reservedStr2;
 	private String lastModify;
 	private String createTime;
 	private String systemId;
-
-	private int haProvider; // -- HA Provider状态：0/null-未创建 1-已创建 2-创建失败
-	private int alarmDefinition; // -- 告警订阅创建状态：0/null-未创建 1-已创建 2-创建有失败
+	// -- HA Provider状态：0/null-未创建 1-已创建 2-创建失败
+	private int haProvider;
+	// -- 告警订阅创建状态：0/null-未创建 1-已创建 2-创建有失败
+	private int alarmDefinition;
 
 	public int getHaProvider() {
 		return haProvider;

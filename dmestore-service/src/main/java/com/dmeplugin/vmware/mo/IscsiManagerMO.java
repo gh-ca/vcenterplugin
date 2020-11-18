@@ -30,9 +30,6 @@ import java.util.List;
 
 
 public class IscsiManagerMO extends BaseMO {
-    @SuppressWarnings("unused")
-    private static final Logger s_logger = LoggerFactory.getLogger(IscsiManagerMO.class);
-
     public IscsiManagerMO(VmwareContext context, ManagedObjectReference morFirewallSystem) {
         super(context, morFirewallSystem);
     }
@@ -42,31 +39,31 @@ public class IscsiManagerMO extends BaseMO {
     }
 
     public void bindVnic(String iScsiHbaName,String vnicDevice ) throws Exception {
-          _context.getService().bindVnic(_mor, iScsiHbaName,vnicDevice);
+          context.getService().bindVnic(mor, iScsiHbaName,vnicDevice);
     }
 
 
     public List<IscsiPortInfo> queryBoundVnics(String iScsiHbaName ) throws Exception {
-         return _context.getService().queryBoundVnics(_mor, iScsiHbaName);
+         return context.getService().queryBoundVnics(mor, iScsiHbaName);
     }
 
     public List<IscsiPortInfo> queryCandidateNics(String iScsiHbaName ) throws Exception {
-        return _context.getService().queryCandidateNics(_mor, iScsiHbaName);
+        return context.getService().queryCandidateNics(mor, iScsiHbaName);
     }
 
     public IscsiMigrationDependency queryMigrationDependencies(List<String> pnicDevice  ) throws Exception {
-        return _context.getService().queryMigrationDependencies(_mor, pnicDevice );
+        return context.getService().queryMigrationDependencies(mor, pnicDevice );
     }
 
     public IscsiStatus queryPnicStatus(String pnicDevice ) throws Exception {
-        return _context.getService().queryPnicStatus(_mor, pnicDevice);
+        return context.getService().queryPnicStatus(mor, pnicDevice);
     }
 
     public IscsiStatus queryVnicStatus(String vnicDevice  ) throws Exception {
-        return _context.getService().queryVnicStatus(_mor, vnicDevice );
+        return context.getService().queryVnicStatus(mor, vnicDevice );
     }
 
     public void unbindVnic(String iScsiHbaName,String vnicDevice ,boolean force   ) throws Exception {
-          _context.getService().unbindVnic(_mor, iScsiHbaName ,vnicDevice,force  );
+          context.getService().unbindVnic(mor, iScsiHbaName ,vnicDevice,force  );
     }
 }

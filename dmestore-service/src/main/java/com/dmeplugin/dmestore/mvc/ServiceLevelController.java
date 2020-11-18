@@ -38,7 +38,6 @@ public class ServiceLevelController extends BaseController {
         try {
             return success(serviceLevelService.listServiceLevel(params));
         } catch (DMEException e) {
-            e.printStackTrace();
             return failure(e.getMessage());
         }
 
@@ -87,10 +86,8 @@ public class ServiceLevelController extends BaseController {
             serviceLevelService.updateVmwarePolicy();
             return success();
         } catch (DMEException e) {
-            e.printStackTrace();
             return failure(e.getMessage());
         }
     }
-
     //查询服务等级下的存储池
 }

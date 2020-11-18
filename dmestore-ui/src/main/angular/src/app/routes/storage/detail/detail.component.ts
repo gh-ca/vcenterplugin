@@ -1,4 +1,12 @@
-import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone, OnInit} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  NgZone,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import {
   CapacityDistribution, CapacitySavings, DetailService, Dtrees, NfsShare, PoolList, StorageController, StorageDetail,
   StorageDisk,
@@ -22,12 +30,14 @@ import {CapacityChart, CapacitySerie} from "../storage.service";
 import {BondPort, EthernetPort, FailoverGroup, FCoEPort, FCPort, LogicPort} from "./port.service";
 import {FormControl, FormGroup} from "@angular/forms";
 import {GlobalsService} from "../../../shared/globals.service";
+import {ClrDatagridPagination} from "@clr/angular";
+import {TranslatePipe} from "@ngx-translate/core";
 @Component({
   selector: 'app-detail',
   templateUrl: './detail.component.html',
   styleUrls: ['./detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [DetailService, MakePerformance, NfsService],
+  providers: [DetailService, TranslatePipe, MakePerformance, NfsService],
 })
 export class DetailComponent implements OnInit, AfterViewInit {
 
@@ -103,7 +113,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
   storageName= "";
   constructor(private nfsService:NfsService, private makePerformance: MakePerformance,
               private detailService: DetailService, private cdr: ChangeDetectorRef, private ngZone: NgZone,
-              private gs: GlobalsService,private activatedRoute: ActivatedRoute,private router:Router) { }
+              private gs: GlobalsService,private activatedRoute: ActivatedRoute,private router:Router,
+              private translatePipe:TranslatePipe) { }
   detail: StorageDetail;
   storagePool: StoragePool[];
   volumes: Volume[];
@@ -141,6 +152,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
   // endTime
   endTime = null;
 
+  totalPageNum = '/' + ' ' + '0'; // 卷信息分页个数
+
   rangeTime = new FormGroup({
     start: new FormControl(),
     end: new FormControl()
@@ -156,6 +169,13 @@ export class DetailComponent implements OnInit, AfterViewInit {
     {key: 'HALF_1_YEAR', value: '最近半年'},
     {key: 'LAST_1_YEAR', value: '最近1年'},
   ];
+  isLoading = false;
+  @ViewChild('paginationVolume')pagination:ClrDatagridPagination;
+
+  volumeFooter = '1 - 10'; // 卷信息当前页数据
+  volumeTotalPage = 10;// 卷信息总页数
+  volumeCurrentPage = 1;// 卷信息当前页
+  volumePageSize = 10; // 当前页数据数
 
   //portList:
   ngOnInit(): void {
@@ -170,14 +190,13 @@ export class DetailComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.ngZone.runOutsideAngular(() => this.initChart());
   }
-
   // 初始化表格对象
   async initChart() {
     this.gs.loading=true;
     const fsNames:string[] = [];
     fsNames.push(this.storageId);
      // IOPS
-    this.setChart(150,"IOPS","IO/s",
+    this.setChart(150,this.translatePipe.transform('vmfs.iops'),"IO/s",
      NfsService.storageIOPS,fsNames,this.selectRange,NfsService.storageUrl, this.startTime, this.endTime).then(res=>{
       this.gs.loading=false;
       this.iopsChart = res;
@@ -185,7 +204,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
 
     // 带宽
-    this.setChart(150,'Bandwidth', 'MB/s',
+    this.setChart(150, this.translatePipe.transform('nfs.qos_bandwidth'), 'MB/s',
       NfsService.storageBDWT, fsNames, this.selectRange, NfsService.storageUrl, this.startTime, this.endTime).then(res => {
       this.gs.loading=false;
       this.bandwidthChart = res;
@@ -288,9 +307,11 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   liststoragepoolperformance(){
     if (this.storagePool === null || this.storagePool.length <= 0){ return; }
+    const storagePoolIds = [];
     this.storagePool.forEach(item => {
-      this.storagePoolIds.push(item.storageInstanceId);
+      storagePoolIds.push(item.storageInstanceId);
     });
+    this.storagePoolIds = storagePoolIds;
     this.detailService.liststoragepoolperformance(this.storagePoolIds).subscribe((result: any) => {
       if (result.code === '200'){
         const chartList: StoragePool [] = result.data;
@@ -310,42 +331,68 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
   }
   getStorageVolumeList(fresh: boolean){
+    console.log('paginationVolume');
+    const reqParams = {
+      storageId: this.storageId,
+      pageSize: this.volumePageSize,
+      pageNo: (this.volumeCurrentPage - 1) * this.volumePageSize,
+    }
+    console.log('reqParams', reqParams)
     if (fresh){
       this.gs.loading=true;
-      this.detailService.getVolumeListList(this.storageId).subscribe((r: any) => {
+      this.detailService.getVolumeListListByPage(reqParams).subscribe((r: any) => {
         this.gs.loading=false;
+        console.log("result", r);
         if (r.code === '200'){
-          this.volumes = r.data;
-          if(this.volumes!=null){
-            this.volumeTotal=this.volumes.length;
+
+          this.volumes = r.data.volumeList;
+          this.volumeTotal=r.data.count;
+
+          // 设置总页数、footer
+          this.setVolumeTotalAndFooter();
+
+          // this.totalPageNum = '/' + ' ' + Math.ceil(this.volumeTotal/(query ? query.pageSize:10));
+          console.log('this.totalPageNum', this.totalPageNum);
+          if (this.volumeRadio === 'table2') {
+            this.listVolumesperformance();
           }
-          this.cdr.detectChanges();
-          this.listVolumesperformance();
         }
+        this.cdr.detectChanges();
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.volumes == null){
         this.gs.loading=true;
-        this.detailService.getVolumeListList(this.storageId).subscribe((r: any) => {
+        this.detailService.getVolumeListListByPage(reqParams).subscribe((r: any) => {
           this.gs.loading=false;
+          console.log("result", r);
           if (r.code === '200'){
-            this.volumes = r.data;
-            if(this.volumes!=null){
-              this.volumeTotal=this.volumes.length;
+            this.volumes = r.data.volumeList;
+            this.volumeTotal=r.data.count;
+
+            // 设置总页数、footer
+            this.setVolumeTotalAndFooter();
+            // this.totalPageNum = '/' + ' ' + Math.ceil(this.volumeTotal/(query ? query.pageSize:10));
+            console.log('this.totalPageNum', this.totalPageNum);
+
+            if (this.volumeRadio === 'table2') {
+              this.listVolumesperformance();
             }
-            this.cdr.detectChanges();
-            this.listVolumesperformance();
           }
+          this.cdr.detectChanges();
         });
       }
     }
   }
   listVolumesperformance(){
     if (this.volumes === null || this.volumes.length <= 0){ return; }
+
+    const volumeIds = [];
     this.volumes.forEach(item => {
-      this.volumeIds.push(item.wwn);
+      volumeIds.push(item.wwn);
     });
+    this.volumeIds = volumeIds;
+    this.gs.loading=true;
     this.detailService.listVolumesperformance(this.volumeIds).subscribe((result: any) => {
       if (result.code === '200'){
         const chartList: Volume [] = result.data;
@@ -359,6 +406,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
               }
             });
           });
+          this.gs.loading=false;
           this.cdr.detectChanges();
         }
       }
@@ -848,5 +896,98 @@ export class DetailComponent implements OnInit, AfterViewInit {
     } else {
       console.log('未选择卷或range');
     }
+  }
+  params(query: any = {}) { // 对query进行处理
+    const p = Object.assign({}, query);
+    return p;
+  }
+  getVolDataByPage(pagination:any) {
+    this.getStorageVolumeList(true);
+    return pagination;
+  }
+
+  /**
+   * 卷翻页
+   * @param object
+   * @param pageObj
+   */
+  jumpPage(object:any) {
+    const obj = object.target;
+    if (object.keyCode === 13 || object.keyCode === 108 || object.type === 'blur') { // 按下enter键触发
+      if(obj.value && obj.value > 0 && obj.value  != this.volumeCurrentPage) {
+        obj.value=obj.value.replace(/[^1-9]/g,'');
+
+        if (obj.value <= this.volumeTotalPage) {
+          this.volumeCurrentPage = obj.value;
+        } else {
+          this.volumeCurrentPage = this.volumeTotalPage;
+          obj.value =  this.volumeCurrentPage;
+        }
+        this.getStorageVolumeList(true);
+      }else{
+        obj.value=this.volumeCurrentPage;
+      }
+    }
+  }
+
+  /**
+   * 卷信息列表 当前页显示数据change函数
+   * @param object
+   */
+  pageSizeChange(object:any) {
+    this.volumeCurrentPage = 1;
+    this.getStorageVolumeList(true);
+  }
+  /**
+   * 卷信息列表 首页
+   * @param object
+   */
+  volmeFirstPage() {
+    if (this.volumeCurrentPage !== 1) {
+      this.volumeCurrentPage = 1;
+      this.getStorageVolumeList(true);
+    }
+  }
+
+  /**
+   * 卷信息列表 尾页
+   * @param object
+   */
+  volmeLastPage() {
+    if (this.volumeCurrentPage !== this.volumeTotalPage) {
+      this.volumeCurrentPage = this.volumeTotalPage;
+      this.getStorageVolumeList(true);
+    }
+  }
+
+  /**
+   * 卷信息列表 上一页
+   */
+  volumePreviousPage() {
+    if (this.volumeCurrentPage !== 1) {
+      this.volumeCurrentPage = this.volumeCurrentPage - 1;
+      this.getStorageVolumeList(true);
+    }
+  }
+
+  /**
+   * 卷信息列表 下一页
+   */
+  volumeNextPage() {
+    if (this.volumeCurrentPage !== this.volumeTotalPage) {
+      this.volumeCurrentPage = this.volumeCurrentPage + 1;
+      this.getStorageVolumeList(true);
+    }
+  }
+
+  /**
+   * 卷信息列表 设置页码总数、footer
+   */
+  setVolumeTotalAndFooter() {
+    this.volumeTotalPage = Math.ceil(this.volumeTotal/this.volumePageSize);
+    const last = this.volumeTotalPage === this.volumeCurrentPage ?
+      this.volumeTotal:this.volumeCurrentPage*this.volumePageSize;
+    const first = (this.volumeCurrentPage - 1)*this.volumePageSize + 1;
+    this.volumeFooter = first + ' - ' + last;
   }
 }

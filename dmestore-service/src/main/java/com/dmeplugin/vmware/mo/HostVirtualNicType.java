@@ -17,5 +17,10 @@
 package com.dmeplugin.vmware.mo;
 
 public enum HostVirtualNicType {
-    management, vmotion, faultToleranceLogging
+    /**
+     * management
+     **/
+    management,
+    vmotion,
+    faultToleranceLogging
 }

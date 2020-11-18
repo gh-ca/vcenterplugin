@@ -122,6 +122,13 @@ export class VmfsListComponent implements OnInit {
   expandErr = false; // 扩容容量错误信息
   mountErr = false; // 扩容容量错误信息
 
+  matchErr = false; // 名称校验 是否只由字母与数字组成 true：是 false 否
+  vmfsNameRepeatErr = false; // vmfs名称是否重复 true：是 false 否
+  volNameRepeatErr = false; // Vol名称是否重复 true：是 false 否
+
+  isFirstLoadChartData = true;
+
+
   ngOnInit() {
     // 列表数据
     this.refresh();
@@ -135,6 +142,10 @@ export class VmfsListComponent implements OnInit {
       this.modalLoading = false;
       this.modalHandleLoading = false;
       this.isOperationErr = false;
+      // 名称错误提示初始化
+      this.vmfsNameRepeatErr = false;
+      this.volNameRepeatErr = false;
+      this.matchErr = false;
 
       this.modifyForm.name = this.rowSelected[0].name;
       this.modifyForm.oldDsName = this.rowSelected[0].name;
@@ -178,6 +189,7 @@ export class VmfsListComponent implements OnInit {
         this.modifyForm.control_policy = null;
       }
     }
+
     this.modifyForm.newDsName = this.modifyForm.name;
     console.log('this.modifyForm:', this.modifyForm);
     this.modalHandleLoading = true;
@@ -218,28 +230,8 @@ export class VmfsListComponent implements OnInit {
               });
               // 设置卷ID集合
               this.wwns = wwns;
-
-              if (this.wwns.length > 0) {
-                this.remoteSrv.getChartData(this.wwns).subscribe((chartResult: any) => {
-                  console.log('chartResult', chartResult);
-                  if (chartResult.code === '200' && chartResult.data != null) {
-                    const chartList: VmfsInfo [] = chartResult.data;
-                    this.list.forEach(item => {
-                      chartList.forEach(charItem => {
-                        // 若属同一个卷则将chartItem的带宽、iops、读写相应时间 值赋予列表
-                        if (item.wwn === charItem.volumeId) {
-                          item.iops = charItem.iops;
-                          item.bandwidth = charItem.bandwidth;
-                          item.readResponseTime = charItem.readResponseTime;
-                          item.writeResponseTime = charItem.writeResponseTime;
-                        }
-                      });
-                    });
-                    this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-                  } else {
-                    console.log(chartResult.description);
-                  }
-                });
+              if (this.radioCheck === 'chart') {
+                this.getPerformanceData();
               }
             }
           } else {
@@ -269,6 +261,52 @@ export class VmfsListComponent implements OnInit {
     });
   }
 
+  /**
+   * 性能数据点击事件
+   */
+  charBtnClickFunc() {
+    if (this.isFirstLoadChartData) {
+      this.getPerformanceData();
+    }
+  }
+
+  /**
+   * 获取性能数据
+   */
+  getPerformanceData() {
+    // 获取chart 数据
+    const wwns = [];
+    this.list.forEach(item => {
+      wwns.push(item.wwn);
+    });
+    // 设置卷ID集合
+    this.wwns = wwns;
+    if (this.wwns.length > 0) {
+      this.isLoading = true;
+      this.remoteSrv.getChartData(this.wwns).subscribe((chartResult: any) => {
+        console.log('chartResult', chartResult);
+        if (chartResult.code === '200' && chartResult.data != null) {
+          const chartList: VmfsInfo [] = chartResult.data;
+          this.list.forEach(item => {
+            chartList.forEach(charItem => {
+              // 若属同一个卷则将chartItem的带宽、iops、读写相应时间 值赋予列表
+              if (item.wwn === charItem.wwn) {
+                item.iops = charItem.iops;
+                item.bandwidth = charItem.bandwidth;
+                item.readResponseTime = charItem.readResponseTime;
+                item.writeResponseTime = charItem.writeResponseTime;
+              }
+            });
+          });
+        } else {
+          console.log(chartResult.description);
+        }
+        this.isLoading = false;
+        this.isFirstLoadChartData = false; // 非第一次加载chartData 后续点击性能图标将不发送请求
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+      });
+    }
+  }
   // 获取所有存储数据
   getStorageList() {
     this.remoteSrv.getStorages().subscribe((result: any) => {
@@ -437,6 +475,10 @@ export class VmfsListComponent implements OnInit {
     // 容量错误提示
     this.capacityErr = false;
     // this.gs.loading = true;
+    // 名称错误提示初始化
+    this.vmfsNameRepeatErr = false;
+    this.volNameRepeatErr = false;
+    this.matchErr = false;
 
     // 初始化表单
     this.form = new GetForm().getAddForm();
@@ -1323,5 +1365,148 @@ export class VmfsListComponent implements OnInit {
     this.mountSuccessShow = false;
     this.unmountSuccessShow = false;
     this.delSuccessShow = false;
+  }
+
+  /**
+   * 名称校验
+   * @param isVmfs true vmfs、false volume
+   */
+  nameCheck(isVmfs: boolean) {
+    // 初始化
+    this.vmfsNameRepeatErr = false;
+    this.volNameRepeatErr = false;
+    this.matchErr = false;
+
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    if (isVmfs) {
+      if (this.form.name) {
+        if (reg5.test(this.form.name)) {
+          // 校验VMFS名称重复
+          this.checkVmfsName(this.form.name);
+
+        } else {
+          this.matchErr = true;
+          this.form.name = null;
+        }
+      } else {
+        this.matchErr = true;
+      }
+    } else {
+      if (this.form.volumeName) {
+        if (reg5.test(this.form.volumeName)) {
+          // 校验Vol名称重复
+          this.checkVolName(this.form.volumeName);
+        } else {
+          this.matchErr = true;
+          this.form.volumeName = null;
+        }
+      } else {
+        this.matchErr = true;
+      }
+    }
+  }
+
+  /**
+   * vmfs重名校验
+   */
+  checkVmfsName(name: string) {
+    this.modalHandleLoading = true;
+    this.remoteSrv.checkVmfsName(name).subscribe((result: any) => {
+      this.modalHandleLoading = false;
+      if (result.code === '200') { // result.data true 不重复 false 重复
+        this.vmfsNameRepeatErr = !result.data;
+        if (this.vmfsNameRepeatErr) { // 名称重复
+          this.form.name = null;
+          this.volNameRepeatErr = false;
+          this.matchErr = false;
+        } else {
+          if (this.form.isSameName) {
+            this.checkVolName(name);
+          }
+        }
+      }
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    });
+  }
+
+  /**
+   * vol重名校验
+   */
+  checkVolName(name: string) {
+    this.modalHandleLoading = true;
+    // 校验VMFS名称重复
+    this.remoteSrv.checkVolName(name).subscribe((result: any) => {
+      this.modalHandleLoading = false;
+      if (result.code === '200') { // result.data true 不重复 false 重复
+        this.volNameRepeatErr = !result.data;
+        if (!this.vmfsNameRepeatErr && this.volNameRepeatErr) {
+          this.form.name = null;
+        }
+        if (this.volNameRepeatErr) {
+          this.form.volumeName = null;
+          this.vmfsNameRepeatErr = false;
+          this.matchErr = false;
+        }
+      }
+      console.log("this.modalHandleLoading", this.modalHandleLoading)
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    });
+  }
+
+  /**
+   * 编辑功能名称校验
+   */
+  modifyNameCheck() {
+    this.vmfsNameRepeatErr = false;
+    this.volNameRepeatErr = false;
+    this.matchErr = false;
+
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+
+    if (this.modifyForm.name) {
+      if (reg5.test(this.modifyForm.name)) {
+        // 校验VMFS名称重复
+        this.modalHandleLoading = true;
+        this.remoteSrv.checkVmfsName(this.modifyForm.name).subscribe((result: any) => {
+          this.modalHandleLoading = false;
+          if (result.code === '200') { // result.data true 不重复 false 重复
+            this.vmfsNameRepeatErr = !result.data;
+            if (this.vmfsNameRepeatErr) { // 名称重复
+              this.modifyForm.name = null;
+              this.volNameRepeatErr = false;
+              this.matchErr = false;
+            } else {
+              if (this.modifyForm.isSameName) {
+                this.modalHandleLoading = true;
+                // 校验VMFS名称重复
+                this.remoteSrv.checkVolName(this.modifyForm.name).subscribe((result: any) => {
+                  this.modalHandleLoading = false;
+                  if (result.code === '200') { // result.data true 不重复 false 重复
+                    this.volNameRepeatErr = !result.data;
+                    if (!this.vmfsNameRepeatErr && this.volNameRepeatErr) {
+                      this.modifyForm.name = null;
+                    }
+                    if (this.volNameRepeatErr) {
+                      this.modifyForm.name = null;
+                      this.vmfsNameRepeatErr = false;
+                      this.matchErr = false;
+                    }
+                  }
+                  this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+                });
+              }
+            }
+          }
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        });
+
+      } else {
+        this.matchErr = true;
+        this.modifyForm.name = null;
+      }
+    } else {
+      this.matchErr = true;
+    }
+    console.log("this.vmfsNameRepeatErr, this.volNameRepeatErr", this.vmfsNameRepeatErr, this.volNameRepeatErr)
   }
 }

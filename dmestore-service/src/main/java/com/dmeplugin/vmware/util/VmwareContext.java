@@ -27,7 +27,6 @@ import com.vmware.connection.helpers.builders.TraversalSpecBuilder;
 import com.vmware.pbm.PbmPortType;
 import com.vmware.pbm.PbmServiceInstanceContent;
 import com.vmware.vim25.*;
-import com.vmware.vise.usersession.UserSessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,17 +58,18 @@ public class VmwareContext {
     private static final int MAX_CONNECT_RETRY = 5;
     private static final int CONNECT_RETRY_INTERVAL = 1000;
 
-    private static final int ChunkSize = 1 * 1024 * 1024;        // 1M
+    /**
+     * 1M
+     **/
+    private static final int CHUNK_SIZE = 1 * 1024 * 1024;
 
-    private final VmwareClient _vimClient;
-    private final String _serverAddress;
+    private final VmwareClient vimClient;
+    private final String serverAddress;
 
-    private final Map<String, Object> _stockMap = new HashMap<String, Object>();
+    private final Map<String, Object> stockMap = new HashMap<String, Object>();
 
-    private VmwareContextPool _pool;
-    private String _poolKey;
-
-    private UserSessionService _userSessionService;
+    private VmwareContextPool pool;
+    private String poolKey;
 
     private static volatile int s_outstandingCount = 0;
 
@@ -78,7 +78,7 @@ public class VmwareContext {
             javax.net.ssl.TrustManager[] trustAllCerts = new javax.net.ssl.TrustManager[1];
             javax.net.ssl.TrustManager tm = new TrustAllManager();
             trustAllCerts[0] = tm;
-            javax.net.ssl.SSLContext sc = SSLUtils.getSSLContext();
+            javax.net.ssl.SSLContext sc = SSLUtils.getSslContext();
             sc.init(null, trustAllCerts, null);
             javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(new SecureSSLSocketFactory(sc));
 
@@ -97,8 +97,8 @@ public class VmwareContext {
     public VmwareContext(VmwareClient client, String address) {
         assert (client != null) : "Invalid parameter in constructing VmwareContext object";
 
-        _vimClient = client;
-        _serverAddress = address;
+        vimClient = client;
+        serverAddress = address;
 
         registerOutstandingContext();
         if (s_logger.isInfoEnabled()) {
@@ -107,82 +107,82 @@ public class VmwareContext {
     }
 
     public VmwareContext() {
-        _vimClient=new VmwareClient("vcentercontext");
-        _serverAddress="";
+        vimClient =new VmwareClient("vcentercontext");
+        serverAddress ="";
     }
 
     public boolean validate() {
-        return _vimClient.validate();
+        return vimClient.validate();
     }
 
     public void registerStockObject(String name, Object obj) {
-        synchronized (_stockMap) {
-            _stockMap.put(name, obj);
+        synchronized (stockMap) {
+            stockMap.put(name, obj);
         }
     }
 
     public void uregisterStockObject(String name) {
-        synchronized (_stockMap) {
-            _stockMap.remove(name);
+        synchronized (stockMap) {
+            stockMap.remove(name);
         }
     }
 
     public void clearStockObjects() {
-        synchronized (_stockMap) {
-            _stockMap.clear();
+        synchronized (stockMap) {
+            stockMap.clear();
         }
     }
 
     @SuppressWarnings("unchecked")
     public <T> T getStockObject(String name) {
-        synchronized (_stockMap) {
-            return (T)_stockMap.get(name);
+        synchronized (stockMap) {
+            return (T) stockMap.get(name);
         }
     }
 
     public String getServerAddress() {
-        return _serverAddress;
+        return serverAddress;
     }
 
     public VimPortType getService() {
-        return _vimClient.getService();
+        return vimClient.getService();
     }
 
     public PbmPortType getPbmService() {
-        return _vimClient.getPbmService();
+        return vimClient.getPbmService();
     }
 
     public ServiceContent getServiceContent() {
-        return _vimClient.getServiceContent();
+        return vimClient.getServiceContent();
     }
 
     public PbmServiceInstanceContent getPbmServiceContent() {
-        return _vimClient.getPbmServiceContent();
+        return vimClient.getPbmServiceContent();
     }
 
     public ManagedObjectReference getPropertyCollector() {
-        return _vimClient.getPropCol();
+        return vimClient.getPropCol();
     }
 
     public ManagedObjectReference getRootFolder() {
-        return _vimClient.getRootFolder();
+        return vimClient.getRootFolder();
     }
 
     public VmwareClient getVimClient() {
-        return _vimClient;
+        return vimClient;
     }
 
     public void setPoolInfo(VmwareContextPool pool, String poolKey) {
-        _pool = pool;
-        _poolKey = poolKey;
+        this.pool = pool;
+        this.poolKey = poolKey;
     }
 
     public VmwareContextPool getPool() {
-        return _pool;
+        return pool;
     }
 
     public String getPoolKey() {
-        return _poolKey;
+        return poolKey;
     }
 
     public void idleCheck() throws Exception {
@@ -328,7 +328,7 @@ public class VmwareContext {
 
     public void waitForTaskProgressDone(ManagedObjectReference morTask) throws Exception {
         while (true) {
-            TaskInfo tinfo = (TaskInfo)_vimClient.getDynamicProperty(morTask, "info");
+            TaskInfo tinfo = (TaskInfo) vimClient.getDynamicProperty(morTask, "info");
             Integer progress = tinfo.getProgress();
             if (progress == null) {
                 break;
@@ -343,11 +343,11 @@ public class VmwareContext {
     }
 
     public void getFile(String urlString, String localFileFullName) throws Exception {
-        HttpURLConnection conn = getHTTPConnection(urlString);
+        HttpURLConnection conn = getHttpConnection(urlString);
 
         InputStream in = conn.getInputStream();
         OutputStream out = new FileOutputStream(new File(localFileFullName));
-        byte[] buf = new byte[ChunkSize];
+        byte[] buf = new byte[CHUNK_SIZE];
         int len = 0;
         while ((len = in.read(buf)) > 0) {
             out.write(buf, 0, len);
@@ -361,7 +361,7 @@ public class VmwareContext {
     }
 
     public void uploadFile(String urlString, File localFile) throws Exception {
-        HttpURLConnection conn = getHTTPConnection(urlString, "PUT");
+        HttpURLConnection conn = getHttpConnection(urlString, "PUT");
         OutputStream out = null;
         InputStream in = null;
         BufferedReader br = null;
@@ -369,7 +369,7 @@ public class VmwareContext {
         try {
             out = conn.getOutputStream();
             in = new FileInputStream(localFile);
-            byte[] buf = new byte[ChunkSize];
+            byte[] buf = new byte[CHUNK_SIZE];
             int len = 0;
             while ((len = in.read(buf)) > 0) {
                 out.write(buf, 0, len);
@@ -412,12 +412,12 @@ public class VmwareContext {
 
     public void uploadVmdkFile(String httpMethod, String urlString, String localFileName, long totalBytesUpdated, ActionDelegate<Long> progressUpdater) throws Exception {
 
-        HttpURLConnection conn = getRawHTTPConnection(urlString);
+        HttpURLConnection conn = getRawHttpConnection(urlString);
 
         conn.setDoOutput(true);
         conn.setUseCaches(false);
 
-        conn.setChunkedStreamingMode(ChunkSize);
+        conn.setChunkedStreamingMode(CHUNK_SIZE);
         conn.setRequestMethod(httpMethod);
         conn.setRequestProperty("Connection", "Keep-Alive");
         conn.setRequestProperty("Content-Type", "application/x-vnd.vmware-streamVmdk");
@@ -429,7 +429,7 @@ public class VmwareContext {
         try {
             bos = new BufferedOutputStream(conn.getOutputStream());
             is = new BufferedInputStream(new FileInputStream(localFileName));
-            int bufferSize = ChunkSize;
+            int bufferSize = CHUNK_SIZE;
             byte[] buffer = new byte[bufferSize];
             while (true) {
                 int bytesRead = is.read(buffer, 0, bufferSize);
@@ -457,9 +457,9 @@ public class VmwareContext {
     }
 
     public long downloadVmdkFile(String urlString, String localFileName, long totalBytesDownloaded, ActionDelegate<Long> progressUpdater) throws Exception {
-        HttpURLConnection conn = getRawHTTPConnection(urlString);
+        HttpURLConnection conn = getRawHttpConnection(urlString);
 
-        String cookie = _vimClient.getServiceCookie();
+        String cookie = vimClient.getServiceCookie();
         if (cookie == null) {
             s_logger.error("No cookie is found in vwware web service request context!");
             throw new Exception("No cookie is found in vmware web service request context!");
@@ -477,7 +477,7 @@ public class VmwareContext {
             in = conn.getInputStream();
             out = new FileOutputStream(new File(localFileName));
 
-            byte[] buf = new byte[ChunkSize];
+            byte[] buf = new byte[CHUNK_SIZE];
             int len = 0;
             while ((len = in.read(buf)) > 0) {
                 out.write(buf, 0, len);
@@ -502,11 +502,11 @@ public class VmwareContext {
     }
 
     public byte[] getResourceContent(String urlString) throws Exception {
-        HttpURLConnection conn = getHTTPConnection(urlString);
+        HttpURLConnection conn = getHttpConnection(urlString);
         InputStream in = conn.getInputStream();
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        byte[] buf = new byte[ChunkSize];
+        byte[] buf = new byte[CHUNK_SIZE];
         int len = 0;
         while ((len = in.read(buf)) > 0) {
             out.write(buf, 0, len);
@@ -518,7 +518,7 @@ public class VmwareContext {
 
     public void uploadResourceContent(String urlString, byte[] content) throws Exception {
         // vSphere does not support POST
-        HttpURLConnection conn = getHTTPConnection(urlString, "PUT");
+        HttpURLConnection conn = getHttpConnection(urlString, "PUT");
 
         OutputStream out = conn.getOutputStream();
         out.write(content);
@@ -623,7 +623,7 @@ public class VmwareContext {
 
         StringBuffer sb = new StringBuffer();
         sb.append("https://");
-        sb.append(_serverAddress);
+        sb.append(serverAddress);
         sb.append("/folder/");
         sb.append(relativePath);
         try {
@@ -635,12 +635,12 @@ public class VmwareContext {
         return sb.toString();
     }
 
-    public HttpURLConnection getHTTPConnection(String urlString) throws Exception {
-        return getHTTPConnection(urlString, "GET");
+    public HttpURLConnection getHttpConnection(String urlString) throws Exception {
+        return getHttpConnection(urlString, "GET");
     }
 
-    public HttpURLConnection getHTTPConnection(String urlString, String httpMethod) throws Exception {
-        String cookie = _vimClient.getServiceCookie();
+    public HttpURLConnection getHttpConnection(String urlString, String httpMethod) throws Exception {
+        String cookie = vimClient.getServiceCookie();
         if (cookie == null) {
             s_logger.error("No cookie is found in vmware web service request context!");
             throw new Exception("No cookie is found in vmware web service request context!");
@@ -657,7 +657,7 @@ public class VmwareContext {
         return conn;
     }
 
-    public HttpURLConnection getRawHTTPConnection(String urlString) throws Exception {
+    public HttpURLConnection getRawHttpConnection(String urlString) throws Exception {
         URL url = new URL(urlString);
         return (HttpURLConnection)url.openConnection();
     }
@@ -689,14 +689,14 @@ public class VmwareContext {
         clearStockObjects();
         try {
             s_logger.info("Disconnecting VMware session");
-            _vimClient.disconnect();
+            vimClient.disconnect();
         } catch(SOAPFaultException sfe) {
             s_logger.debug("Tried to disconnect a session that is no longer valid");
         } catch (Exception e) {
             s_logger.warn("Unexpected exception: ", e);
         } finally {
-            if (_pool != null) {
-                _pool.unregisterContext(this);
+            if (pool != null) {
+                pool.unregisterContext(this);
             }
             unregisterOutstandingContext();
         }

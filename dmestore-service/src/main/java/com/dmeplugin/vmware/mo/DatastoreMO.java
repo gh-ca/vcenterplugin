@@ -21,7 +21,6 @@ import java.util.List;
 
 
 import com.dmeplugin.dmestore.exception.VcenterException;
-import com.dmeplugin.dmestore.exception.VcenterRuntimeException;
 import com.dmeplugin.vmware.util.Pair;
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.vmware.vim25.*;
@@ -36,8 +35,8 @@ import org.slf4j.LoggerFactory;
 public class DatastoreMO extends BaseMO {
     private static final Logger s_logger = LoggerFactory.getLogger(DatastoreMO.class);
 
-    private String _name;
-    private Pair<DatacenterMO, String> _ownerDc;
+    private String name;
+    private Pair<DatacenterMO, String> ownerDc;
 
     public DatastoreMO(VmwareContext context, ManagedObjectReference morDatastore) {
         super(context, morDatastore);
@@ -49,44 +48,44 @@ public class DatastoreMO extends BaseMO {
 
     @Override
     public String getName() throws Exception {
-        if (_name == null) {
-            _name = _context.getVimClient().getDynamicProperty(_mor, "name");
+        if (name == null) {
+            name = context.getVimClient().getDynamicProperty(mor, "name");
         }
 
-        return _name;
+        return name;
     }
 
     public DatastoreMO(VmwareContext context, String dsName) throws Exception {
         super(context, null);
 
-        _mor = _context.getVimClient().getDecendentMoRef(_context.getRootFolder(), "Datastore", dsName);
-        if (_mor == null) {
+        mor = this.context.getVimClient().getDecendentMoRef(this.context.getRootFolder(), "Datastore", dsName);
+        if (mor == null) {
             s_logger.error("Unable to locate ds " + dsName);
         }
     }
 
     public DatastoreInfo getInfo() throws Exception {
-        return (DatastoreInfo)_context.getVimClient().getDynamicProperty(_mor, "info");
+        return (DatastoreInfo) context.getVimClient().getDynamicProperty(mor, "info");
     }
 
     public VmfsDatastoreInfo getVmfsDatastoreInfo() throws Exception {
-        return (VmfsDatastoreInfo)_context.getVimClient().getDynamicProperty(_mor, "info");
+        return (VmfsDatastoreInfo) context.getVimClient().getDynamicProperty(mor, "info");
     }
 
     public DatastoreSummary getSummary() throws Exception {
-        return (DatastoreSummary)_context.getVimClient().getDynamicProperty(_mor, "summary");
+        return (DatastoreSummary) context.getVimClient().getDynamicProperty(mor, "summary");
     }
 
-    public List<ManagedObjectReference> getVM()throws Exception {
-        return _context.getVimClient().getDynamicProperty(_mor, "vm");
+    public List<ManagedObjectReference> getVm()throws Exception {
+        return context.getVimClient().getDynamicProperty(mor, "vm");
     }
 
-    public HostDatastoreBrowserMO getHostDatastoreBrowserMO() throws Exception {
-        return new HostDatastoreBrowserMO(_context, (ManagedObjectReference)_context.getVimClient().getDynamicProperty(_mor, "browser"));
+    public HostDatastoreBrowserMO getHostDatastoreBrowserMo() throws Exception {
+        return new HostDatastoreBrowserMO(context, (ManagedObjectReference) context.getVimClient().getDynamicProperty(mor, "browser"));
     }
 
     public List<DatastoreHostMount> getHostMounts() throws Exception {
-        return _context.getVimClient().getDynamicProperty(_mor, "host");
+        return context.getVimClient().getDynamicProperty(mor, "host");
     }
 
     public String getInventoryPath() throws Exception {
@@ -95,8 +94,8 @@ public class DatastoreMO extends BaseMO {
     }
 
     public Pair<DatacenterMO, String> getOwnerDatacenter() throws Exception {
-        if (_ownerDc != null) {
-            return _ownerDc;
+        if (ownerDc != null) {
+            return ownerDc;
         }
 
         PropertySpec pSpec = new PropertySpec();
@@ -128,30 +127,30 @@ public class DatastoreMO extends BaseMO {
         List<PropertyFilterSpec> pfSpecArr = new ArrayList<>();
         pfSpecArr.add(pfSpec);
 
-        List<ObjectContent> ocs = _context.getService().retrieveProperties(_context.getPropertyCollector(), pfSpecArr);
+        List<ObjectContent> ocs = context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
 
         assert (ocs != null && ocs.size() > 0);
         assert (ocs.get(0).getObj() != null);
         assert (ocs.get(0).getPropSet() != null);
         String dcName = ocs.get(0).getPropSet().get(0).getVal().toString();
-        _ownerDc = new Pair<>(new DatacenterMO(_context, ocs.get(0).getObj()), dcName);
-        return _ownerDc;
+        ownerDc = new Pair<>(new DatacenterMO(context, ocs.get(0).getObj()), dcName);
+        return ownerDc;
     }
 
     public void renameDatastore(String newDatastoreName) throws Exception {
-        _context.getService().renameDatastore(_mor, newDatastoreName);
+        context.getService().renameDatastore(mor, newDatastoreName);
     }
 
     public void makeDirectory(String path, ManagedObjectReference morDc) throws Exception {
         String datastoreName = getName();
-        ManagedObjectReference morFileManager = _context.getServiceContent().getFileManager();
+        ManagedObjectReference morFileManager = context.getServiceContent().getFileManager();
 
         String fullPath = path;
         if (!DatastoreFile.isFullDatastorePath(fullPath)) {
             fullPath = String.format("[%s] %s", datastoreName, path);
         }
 
-        _context.getService().makeDirectory(morFileManager, fullPath, morDc, true);
+        context.getService().makeDirectory(morFileManager, fullPath, morDc, true);
     }
 
     String getDatastoreRootPath() throws Exception {
@@ -173,17 +172,17 @@ public class DatastoreMO extends BaseMO {
     }
 
     public boolean deleteFolder(String folder, ManagedObjectReference morDc) throws Exception {
-        ManagedObjectReference morFileManager = _context.getServiceContent().getFileManager();
-        ManagedObjectReference morTask = _context.getService().deleteDatastoreFileTask(morFileManager, folder, morDc);
+        ManagedObjectReference morFileManager = context.getServiceContent().getFileManager();
+        ManagedObjectReference morTask = context.getService().deleteDatastoreFileTask(morFileManager, folder, morDc);
 
-        boolean result = _context.getVimClient().waitForTask(morTask);
+        boolean result = context.getVimClient().waitForTask(morTask);
 
         if (result) {
-            _context.waitForTaskProgressDone(morTask);
+            context.waitForTaskProgressDone(morTask);
 
             return true;
         } else {
-            s_logger.error("VMware deleteDatastoreFile_Task failed due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+            s_logger.error("VMware deleteDatastoreFile_Task failed due to " + TaskMO.getTaskFailureInfo(context, morTask));
         }
 
         return false;
@@ -195,7 +194,7 @@ public class DatastoreMO extends BaseMO {
 
     public boolean deleteFile(String path, ManagedObjectReference morDc, boolean testExistence, String excludeFolders) throws Exception {
         String datastoreName = getName();
-        ManagedObjectReference morFileManager = _context.getServiceContent().getFileManager();
+        ManagedObjectReference morFileManager = context.getServiceContent().getFileManager();
 
         String fullPath = path;
         if (!DatastoreFile.isFullDatastorePath(fullPath)) {
@@ -221,14 +220,14 @@ public class DatastoreMO extends BaseMO {
             return true;
         }
 
-        ManagedObjectReference morTask = _context.getService().deleteDatastoreFileTask(morFileManager, fullPath, morDc);
+        ManagedObjectReference morTask = context.getService().deleteDatastoreFileTask(morFileManager, fullPath, morDc);
 
-        boolean result = _context.getVimClient().waitForTask(morTask);
+        boolean result = context.getVimClient().waitForTask(morTask);
         if (result) {
-            _context.waitForTaskProgressDone(morTask);
+            context.waitForTaskProgressDone(morTask);
             return true;
         } else {
-            s_logger.error("VMware deleteDatastoreFile_Task failed due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+            s_logger.error("VMware deleteDatastoreFile_Task failed due to " + TaskMO.getTaskFailureInfo(context, morTask));
         }
         return false;
     }
@@ -237,10 +236,10 @@ public class DatastoreMO extends BaseMO {
                                      ManagedObjectReference morDestDc, boolean forceOverwrite) throws Exception {
 
         String srcDsName = getName();
-        DatastoreMO destDsMo = new DatastoreMO(_context, morDestDs);
+        DatastoreMO destDsMo = new DatastoreMO(context, morDestDs);
         String destDsName = destDsMo.getName();
 
-        ManagedObjectReference morFileManager = _context.getServiceContent().getFileManager();
+        ManagedObjectReference morFileManager = context.getServiceContent().getFileManager();
         String srcFullPath = srcFilePath;
         if (!DatastoreFile.isFullDatastorePath(srcFullPath)) {
             srcFullPath = String.format("[%s] %s", srcDsName, srcFilePath);
@@ -251,14 +250,14 @@ public class DatastoreMO extends BaseMO {
             destFullPath = String.format("[%s] %s", destDsName, destFilePath);
         }
 
-        ManagedObjectReference morTask = _context.getService().copyDatastoreFileTask(morFileManager, srcFullPath, morSrcDc, destFullPath, morDestDc, forceOverwrite);
+        ManagedObjectReference morTask = context.getService().copyDatastoreFileTask(morFileManager, srcFullPath, morSrcDc, destFullPath, morDestDc, forceOverwrite);
 
-        boolean result = _context.getVimClient().waitForTask(morTask);
+        boolean result = context.getVimClient().waitForTask(morTask);
         if (result) {
-            _context.waitForTaskProgressDone(morTask);
+            context.waitForTaskProgressDone(morTask);
             return true;
         } else {
-            s_logger.error("VMware copyDatastoreFile_Task failed due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+            s_logger.error("VMware copyDatastoreFile_Task failed due to " + TaskMO.getTaskFailureInfo(context, morTask));
         }
         return false;
     }
@@ -267,10 +266,10 @@ public class DatastoreMO extends BaseMO {
                                      ManagedObjectReference morDestDc, boolean forceOverwrite) throws Exception {
 
         String srcDsName = getName();
-        DatastoreMO destDsMo = new DatastoreMO(_context, morDestDs);
+        DatastoreMO destDsMo = new DatastoreMO(context, morDestDs);
         String destDsName = destDsMo.getName();
 
-        ManagedObjectReference morFileManager = _context.getServiceContent().getFileManager();
+        ManagedObjectReference morFileManager = context.getServiceContent().getFileManager();
         String srcFullPath = srcFilePath;
         if (!DatastoreFile.isFullDatastorePath(srcFullPath)) {
             srcFullPath = String.format("[%s] %s", srcDsName, srcFilePath);
@@ -281,14 +280,14 @@ public class DatastoreMO extends BaseMO {
             destFullPath = String.format("[%s] %s", destDsName, destFilePath);
         }
 
-        ManagedObjectReference morTask = _context.getService().moveDatastoreFileTask(morFileManager, srcFullPath, morSrcDc, destFullPath, morDestDc, forceOverwrite);
+        ManagedObjectReference morTask = context.getService().moveDatastoreFileTask(morFileManager, srcFullPath, morSrcDc, destFullPath, morDestDc, forceOverwrite);
 
-        boolean result = _context.getVimClient().waitForTask(morTask);
+        boolean result = context.getVimClient().waitForTask(morTask);
         if (result) {
-            _context.waitForTaskProgressDone(morTask);
+            context.waitForTaskProgressDone(morTask);
             return true;
         } else {
-            s_logger.error("VMware moveDatgastoreFile_Task failed due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+            s_logger.error("VMware moveDatgastoreFile_Task failed due to " + TaskMO.getTaskFailureInfo(context, morTask));
         }
         return false;
     }
@@ -349,14 +348,14 @@ public class DatastoreMO extends BaseMO {
 
         // TODO, VMware currently does not have a formal API to list Datastore directory content,
         // folloing hacking may have performance hit if datastore has a large number of files
-        return _context.listDatastoreDirContent(url);
+        return context.listDatastoreDirContent(url);
     }
 
     public boolean fileExists(String fileFullPath) throws Exception {
         DatastoreFile file = new DatastoreFile(fileFullPath);
         DatastoreFile dirFile = new DatastoreFile(file.getDatastoreName(), file.getDir());
 
-        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMO();
+        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMo();
 
         s_logger.info("Search file " + file.getFileName() + " on " + dirFile.getPath());
         HostDatastoreBrowserSearchResults results = browserMo.searchDatastore(dirFile.getPath(), file.getFileName(), true);
@@ -377,7 +376,7 @@ public class DatastoreMO extends BaseMO {
         DatastoreFile file = new DatastoreFile(fileFullPath);
         DatastoreFile dirFile = new DatastoreFile(file.getDatastoreName(), file.getDir());
 
-        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMO();
+        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMo();
 
         HostDatastoreBrowserSearchSpec searchSpec = new HostDatastoreBrowserSearchSpec();
         FileQueryFlags fqf = new FileQueryFlags();
@@ -388,7 +387,8 @@ public class DatastoreMO extends BaseMO {
         searchSpec.setDetails(fqf);
         searchSpec.setSearchCaseInsensitive(false);
         searchSpec.getMatchPattern().add(file.getFileName());
-        s_logger.debug("Search file " + file.getFileName() + " on " + dirFile.getPath()); //ROOT-2.vmdk, [3ecf7a579d3b3793b86d9d019a97ae27] s-2-VM
+        //ROOT-2.vmdk, [3ecf7a579d3b3793b86d9d019a97ae27] s-2-VM
+        s_logger.debug("Search file " + file.getFileName() + " on " + dirFile.getPath());
         HostDatastoreBrowserSearchResults result = browserMo.searchDatastore(dirFile.getPath(), searchSpec);
         if (result != null) {
             List<FileInfo> info = result.getFile();
@@ -404,7 +404,7 @@ public class DatastoreMO extends BaseMO {
     }
 
     public boolean folderExists(String folderParentDatastorePath, String folderName) throws Exception {
-        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMO();
+        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMo();
 
         HostDatastoreBrowserSearchResults results = browserMo.searchDatastore(folderParentDatastorePath, folderName, true);
         if (results != null) {
@@ -435,7 +435,7 @@ public class DatastoreMO extends BaseMO {
         String absoluteFileName = null;
         s_logger.info("Searching file " + fileName + " in " + datastorePath);
 
-        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMO();
+        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMo();
         ArrayList<HostDatastoreBrowserSearchResults> results = browserMo.searchDatastoreSubFolders("[" + getName() + "]", fileName, caseInsensitive);
         if (results != null && results.size() > 1) {
             s_logger.warn("Multiple files with name " + fileName + " exists in datastore " + datastorePath + ". Trying to choose first file found in search attempt.");
@@ -493,6 +493,6 @@ public class DatastoreMO extends BaseMO {
     }
 
     public void refreshDatastore() throws Exception {
-         _context.getService().refreshDatastore(_mor);
+         context.getService().refreshDatastore(mor);
     }
 }

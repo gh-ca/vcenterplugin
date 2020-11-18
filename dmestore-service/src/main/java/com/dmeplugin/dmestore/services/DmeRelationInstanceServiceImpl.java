@@ -7,6 +7,7 @@ import com.google.gson.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
@@ -52,7 +53,6 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         Map<String, Object> remap = new HashMap<>();
         remap.put("code", 200);
         remap.put("message", "queryRelationByRelationName success!");
-        //remap.put("data", params);
 
         String url = LIST_RELATION_URL;
         url = url.replace("{relationName}", relationName);
@@ -60,7 +60,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         ResponseEntity responseEntity;
         try {
             responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            if (responseEntity.getStatusCodeValue() == 200) {
+            if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 ris = converRelations(responseEntity.getBody());
             }
         } catch (Exception e) {
@@ -75,7 +75,6 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         Map<String, Object> remap = new HashMap<>();
         remap.put("code", 200);
         remap.put("message", "queryRelationByRelationName success!");
-        //remap.put("data", params);
 
         String url = LIST_RELATION_URL;
         url = url.replace("{relationName}", relationName);
@@ -92,7 +91,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         ResponseEntity responseEntity;
         try {
             responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, constraint.toString());
-            if (responseEntity.getStatusCodeValue() == 200) {
+            if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 ris = converRelations(responseEntity.getBody());
             }
         } catch (Exception e) {
@@ -116,7 +115,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         ResponseEntity responseEntity;
         try {
             responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            if (responseEntity.getStatusCodeValue() == 200) {
+            if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 ri = converRelation(responseEntity.getBody());
             }
         } catch (Exception e) {
@@ -132,7 +131,6 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         Map<String, Object> remap = new HashMap<>();
         remap.put("code", 200);
         remap.put("message", "queryInstanceByInstanceNameId success!");
-        //remap.put("data", params);
 
         String url = QUERY_INSTANCE_URL;
         url = url.replace("{className}", instanceName);
@@ -141,7 +139,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         ResponseEntity responseEntity;
         try {
             responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            if (responseEntity.getStatusCodeValue() == 200) {
+            if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 obj = responseEntity.getBody();
             }
         } catch (Exception e) {
@@ -271,7 +269,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         return storageDevcieInstance;
     }
 
-    //刷新资源
+    @Override
     public void refreshResourceInstance() {
         listInstanceStorageDevcie();
         listInstanceStoragePool();
@@ -284,7 +282,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         String url = LIST_INSTANCE_URL.replace("{className}", instanceName);
         try {
             ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
+            if (null != responseEntity && HttpStatus.OK.value() == responseEntity.getStatusCodeValue()) {
                 Object object = responseEntity.getBody();
                 jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
             }

@@ -35,7 +35,6 @@ import javax.xml.transform.stream.StreamResult;
 
 
 import com.dmeplugin.dmestore.exception.VcenterException;
-import com.dmeplugin.dmestore.exception.VcenterRuntimeException;
 import com.dmeplugin.dmestore.utils.StringUtil;
 import com.dmeplugin.vmware.util.Pair;
 import com.dmeplugin.vmware.util.VmwareContext;
@@ -109,8 +108,6 @@ import java.util.UUID;
 public class HypervisorHostHelper {
     private static final Logger s_logger = LoggerFactory.getLogger(HypervisorHostHelper.class);
     private static final int DEFAULT_LOCK_TIMEOUT_SECONDS = 600;
-    private static final String s_policyNamePrefix = "cloud.policy.";
-
     // make vmware-base loosely coupled with cloud-specific stuff, duplicate VLAN.UNTAGGED constant here
     private static final String UNTAGGED_VLAN_NAME = "untagged";
     private static final String VMDK_PACK_DIR = "ova";
@@ -121,7 +118,7 @@ public class HypervisorHostHelper {
         if (ocs != null && ocs.length > 0) {
             for (ObjectContent oc : ocs) {
                 String vmNameInvCenter = null;
-                String vmInternalCSName = null;
+                String vmInternalCsName = null;
                 List<DynamicProperty> objProps = oc.getPropSet();
                 if (objProps != null) {
                     for (DynamicProperty objProp : objProps) {
@@ -129,11 +126,11 @@ public class HypervisorHostHelper {
                             vmNameInvCenter = (String)objProp.getVal();
                         } else if (objProp.getName().contains(instanceNameCustomField)) {
                             if (objProp.getVal() != null) {
-                                vmInternalCSName = ((CustomFieldStringValue)objProp.getVal()).getValue();
+                                vmInternalCsName = ((CustomFieldStringValue)objProp.getVal()).getValue();
                             }
                         }
 
-                        if ((vmNameInvCenter != null && name.equalsIgnoreCase(vmNameInvCenter)) || (vmInternalCSName != null && name.equalsIgnoreCase(vmInternalCSName))) {
+                        if ((vmNameInvCenter != null && name.equalsIgnoreCase(vmNameInvCenter)) || (vmInternalCsName != null && name.equalsIgnoreCase(vmInternalCsName))) {
                             VirtualMachineMO vmMo = new VirtualMachineMO(context, oc.getObj());
                             return vmMo;
                         }
@@ -153,11 +150,11 @@ public class HypervisorHostHelper {
         return morDs;
     }
 
-    public static String getSecondaryDatastoreUUID(String storeUrl) {
+    public static String getSecondaryDatastoreUuid(String storeUrl) {
         return UUID.nameUUIDFromBytes(storeUrl.getBytes()).toString();
     }
 
-    public static DatastoreMO getHyperHostDatastoreMO(VmwareHypervisorHost hyperHost, String datastoreName) throws Exception {
+    public static DatastoreMO getHyperHostDatastoreMo(VmwareHypervisorHost hyperHost, String datastoreName) throws Exception {
         ObjectContent[] ocs = hyperHost.getDatastorePropertiesOnHyperHost(new String[] {"name"});
         if (ocs != null && ocs.length > 0) {
             for (ObjectContent oc : ocs) {
@@ -240,7 +237,7 @@ public class HypervisorHostHelper {
         return vCenterApiVersion.compareTo(minVcenterApiVersionForFeature) >= 0 ? true : false;
     }
 
-    private static void setupPVlanPair(DistributedVirtualSwitchMO dvSwitchMo, ManagedObjectReference morDvSwitch, Integer vid, Integer spvlanid, String pvlanType) throws Exception {
+    private static void setupPvLanPair(DistributedVirtualSwitchMO dvSwitchMo, ManagedObjectReference morDvSwitch, Integer vid, Integer spvlanid, String pvlanType) throws Exception {
         s_logger.debug(String.format("Setting up PVLAN on dvSwitch %s with the following information: %s %s %s", dvSwitchMo.getName(), vid, spvlanid, pvlanType));
         Map<Integer, HypervisorHostHelper.PvlanType> vlanmap = dvSwitchMo.retrieveVlanPvlan(vid, spvlanid, morDvSwitch);
         if (!vlanmap.isEmpty()) {
@@ -267,12 +264,12 @@ public class HypervisorHostHelper {
         // Next, add the required primary and secondary vlan config specs to the dvs config spec.
 
         if (!vlanmap.containsKey(vid)) {
-            VMwareDVSPvlanConfigSpec ppvlanConfigSpec = createDVPortPvlanConfigSpec(vid, vid, PvlanType.promiscuous, PvlanOperation.add);
+            VMwareDVSPvlanConfigSpec ppvlanConfigSpec = createDvPortPvlanConfigSpec(vid, vid, PvlanType.promiscuous, PvlanOperation.add);
             dvsSpec.getPvlanConfigSpec().add(ppvlanConfigSpec);
         }
         if (!vid.equals(spvlanid) && !vlanmap.containsKey(spvlanid)) {
             PvlanType selectedType = StringUtil.isNotBlank(pvlanType) ? PvlanType.fromStr(pvlanType) : PvlanType.isolated;
-            VMwareDVSPvlanConfigSpec spvlanConfigSpec = createDVPortPvlanConfigSpec(vid, spvlanid, selectedType, PvlanOperation.add);
+            VMwareDVSPvlanConfigSpec spvlanConfigSpec = createDvPortPvlanConfigSpec(vid, spvlanid, selectedType, PvlanOperation.add);
             dvsSpec.getPvlanConfigSpec().add(spvlanConfigSpec);
         }
 
@@ -280,12 +277,12 @@ public class HypervisorHostHelper {
             // We have something to configure on the DVS... so send it the command.
             // When reconfiguring a vmware DVSwitch, we need to send in the configVersion in the spec.
             // Let's retrieve this switch's configVersion first.
-            String dvsConfigVersion = dvSwitchMo.getDVSConfigVersion(morDvSwitch);
+            String dvsConfigVersion = dvSwitchMo.getDvsConfigVersion(morDvSwitch);
             dvsSpec.setConfigVersion(dvsConfigVersion);
 
             // Reconfigure the dvs using this spec.
             try {
-                dvSwitchMo.updateVMWareDVSwitchGetTask(morDvSwitch, dvsSpec);
+                dvSwitchMo.updateVmWareDvSwitchGetTask(morDvSwitch, dvsSpec);
             } catch (AlreadyExistsFaultMsg e) {
                 s_logger.info("Specified vlan id (" + vid + ") private vlan id (" + spvlanid + ") tuple already configured on VMWare DVSwitch");
                 // Do nothing, good if the tuple's already configured on the dvswitch.
@@ -513,8 +510,8 @@ public class HypervisorHostHelper {
         return spec;
     }
 
-    public static VMwareDVSPortSetting createVmwareDVPortSettingSpec(DVSTrafficShapingPolicy shapingPolicy, DVSSecurityPolicy secPolicy,
-            VmwareDistributedVirtualSwitchVlanSpec vlanSpec) {
+    public static VMwareDVSPortSetting createVmwareDvPortSettingSpec(DVSTrafficShapingPolicy shapingPolicy, DVSSecurityPolicy secPolicy,
+                                                                     VmwareDistributedVirtualSwitchVlanSpec vlanSpec) {
         VMwareDVSPortSetting dvsPortSetting = new VMwareDVSPortSetting();
         dvsPortSetting.setVlan(vlanSpec);
         dvsPortSetting.setSecurityPolicy(secPolicy);
@@ -523,7 +520,7 @@ public class HypervisorHostHelper {
         return dvsPortSetting;
     }
 
-    public static DVSTrafficShapingPolicy getDVSShapingPolicy(Integer networkRateMbps) {
+    public static DVSTrafficShapingPolicy getDvsShapingPolicy(Integer networkRateMbps) {
         DVSTrafficShapingPolicy shapingPolicy = new DVSTrafficShapingPolicy();
         BoolPolicy isEnabled = new BoolPolicy();
         if (networkRateMbps == null || networkRateMbps.intValue() <= 0) {
@@ -551,18 +548,28 @@ public class HypervisorHostHelper {
         return shapingPolicy;
     }
 
-    public static VmwareDistributedVirtualSwitchPvlanSpec createDVPortPvlanIdSpec(int pvlanId) {
+    public static VmwareDistributedVirtualSwitchPvlanSpec createDvPortPvlanIdSpec(int pvlanId) {
         VmwareDistributedVirtualSwitchPvlanSpec pvlanIdSpec = new VmwareDistributedVirtualSwitchPvlanSpec();
         pvlanIdSpec.setPvlanId(pvlanId);
         return pvlanIdSpec;
     }
 
     public enum PvlanOperation {
-        add, edit, remove
+        /**
+         * add
+         **/
+        add,
+        edit,
+        remove
     }
 
     public enum PvlanType {
-        promiscuous, isolated, community;
+        /**
+         * promiscuous
+         **/
+        promiscuous,
+        isolated,
+        community;
 
         public static PvlanType fromStr(String val) {
             if (StringUtil.isBlank(val)) {
@@ -578,7 +585,7 @@ public class HypervisorHostHelper {
         }
     }
 
-    public static VMwareDVSPvlanConfigSpec createDVPortPvlanConfigSpec(int vlanId, int secondaryVlanId, PvlanType pvlantype, PvlanOperation operation) {
+    public static VMwareDVSPvlanConfigSpec createDvPortPvlanConfigSpec(int vlanId, int secondaryVlanId, PvlanType pvlantype, PvlanOperation operation) {
         VMwareDVSPvlanConfigSpec pvlanConfigSpec = new VMwareDVSPvlanConfigSpec();
         VMwareDVSPvlanMapEntry map = new VMwareDVSPvlanMapEntry();
         map.setPvlanType(pvlantype.toString());
@@ -713,23 +720,23 @@ public class HypervisorHostHelper {
         return morNetwork;
     }
 
-    public static boolean createBlankVm(VmwareHypervisorHost host, String vmName, String vmInternalCSName, int cpuCount, int cpuSpeedMHz, int cpuReservedMHz,
-                                        boolean limitCpuUse, int memoryMB, int memoryReserveMB, String guestOsIdentifier, ManagedObjectReference morDs, boolean snapshotDirToParent,
+    public static boolean createBlankVm(VmwareHypervisorHost host, String vmName, String vmInternalCsName, int cpuCount, int cpuSpeedMhz, int cpuReservedMhz,
+                                        boolean limitCpuUse, int memoryMb, int memoryReserveMb, String guestOsIdentifier, ManagedObjectReference morDs, boolean snapshotDirToParent,
                                         Pair<String, String> controllerInfo, Boolean systemVm) throws Exception {
 
         if (s_logger.isInfoEnabled()) {
-            s_logger.info("Create blank VM. cpuCount: " + cpuCount + ", cpuSpeed(MHz): " + cpuSpeedMHz + ", mem(Mb): " + memoryMB);
+            s_logger.info("Create blank VM. cpuCount: " + cpuCount + ", cpuSpeed(MHz): " + cpuSpeedMhz + ", mem(Mb): " + memoryMb);
         }
 
         VirtualDeviceConfigSpec controllerSpec = null;
         // VM config basics
         VirtualMachineConfigSpec vmConfig = new VirtualMachineConfigSpec();
         vmConfig.setName(vmName);
-        if (vmInternalCSName == null) {
-            vmInternalCSName = vmName;
+        if (vmInternalCsName == null) {
+            vmInternalCsName = vmName;
         }
 
-        VmwareHelper.setBasicVmConfig(vmConfig, cpuCount, cpuSpeedMHz, cpuReservedMHz, memoryMB, memoryReserveMB, guestOsIdentifier, limitCpuUse);
+        VmwareHelper.setBasicVmConfig(vmConfig, cpuCount, cpuSpeedMhz, cpuReservedMhz, memoryMb, memoryReserveMb, guestOsIdentifier, limitCpuUse);
 
         String recommendedController = host.getRecommendedDiskController(guestOsIdentifier);
         String newRootDiskController = controllerInfo.first();
@@ -763,7 +770,7 @@ public class HypervisorHostHelper {
             s_logger.debug("Add USB Controller device for blank Mac OS VM " + vmName);
 
             //For Mac OS X systems, the EHCI+UHCI controller is enabled by default and is required for USB mouse and keyboard access.
-            VirtualDevice usbControllerDevice = VmwareHelper.prepareUSBControllerDevice();
+            VirtualDevice usbControllerDevice = VmwareHelper.prepareUsbControllerDevice();
             VirtualDeviceConfigSpec usbControllerSpec = new VirtualDeviceConfigSpec();
             usbControllerSpec.setDevice(usbControllerDevice);
             usbControllerSpec.setOperation(VirtualDeviceConfigSpecOperation.ADD);
@@ -788,7 +795,7 @@ public class HypervisorHostHelper {
 
         ClusterMO clusterMo = new ClusterMO(host.getContext(), host.getHyperHostCluster());
         DatacenterMO dataCenterMo = new DatacenterMO(host.getContext(), host.getHyperHostDatacenter());
-        setVMHardwareVersion(vmConfig, clusterMo, dataCenterMo);
+        setVmHardwareVersion(vmConfig, clusterMo, dataCenterMo);
 
         if (host.createVm(vmConfig)) {
             // Here, when attempting to find the VM, we need to use the name
@@ -801,16 +808,16 @@ public class HypervisorHostHelper {
             VirtualMachineMO vmMo = host.findVmOnHyperHost(vmName);
             assert (vmMo != null);
 
-            vmMo.setCustomFieldValue(CustomFieldConstants.CLOUD_VM_INTERNAL_NAME, vmInternalCSName);
+            vmMo.setCustomFieldValue(CustomFieldConstants.CLOUD_VM_INTERNAL_NAME, vmInternalCsName);
 
             int ideControllerKey = -1;
             while (ideControllerKey < 0) {
-                ideControllerKey = vmMo.tryGetIDEDeviceControllerKey();
+                ideControllerKey = vmMo.tryGetIdeDeviceControllerKey();
                 if (ideControllerKey >= 0) {
                     break;
                 }
 
-                s_logger.info("Waiting for IDE controller be ready in VM: " + vmInternalCSName);
+                s_logger.info("Waiting for IDE controller be ready in VM: " + vmInternalCsName);
                 Thread.sleep(1000);
             }
 
@@ -825,14 +832,14 @@ public class HypervisorHostHelper {
      * - If the cluster hardware version is not set, check datacenter hardware version. If it is set, then it is set to vmConfig
      * - In case both cluster and datacenter hardware version are not set, hardware version is not set to vmConfig
      */
-    protected static void setVMHardwareVersion(VirtualMachineConfigSpec vmConfig, ClusterMO clusterMO, DatacenterMO datacenterMO) throws Exception {
-        ClusterConfigInfoEx clusterConfigInfo = clusterMO != null ? clusterMO.getClusterConfigInfo() : null;
+    protected static void setVmHardwareVersion(VirtualMachineConfigSpec vmConfig, ClusterMO clusterMo, DatacenterMO datacenterMo) throws Exception {
+        ClusterConfigInfoEx clusterConfigInfo = clusterMo != null ? clusterMo.getClusterConfigInfo() : null;
         String clusterHardwareVersion = clusterConfigInfo != null ? clusterConfigInfo.getDefaultHardwareVersionKey() : null;
         if (StringUtil.isNotBlank(clusterHardwareVersion)) {
             s_logger.debug("Cluster hardware version found: " + clusterHardwareVersion + ". Creating VM with this hardware version");
             vmConfig.setVersion(clusterHardwareVersion);
         } else {
-            DatacenterConfigInfo datacenterConfigInfo = datacenterMO != null ? datacenterMO.getDatacenterConfigInfo() : null;
+            DatacenterConfigInfo datacenterConfigInfo = datacenterMo != null ? datacenterMo.getDatacenterConfigInfo() : null;
             String datacenterHardwareVersion = datacenterConfigInfo != null ? datacenterConfigInfo.getDefaultHardwareVersionKey() : null;
             if (StringUtil.isNotBlank(datacenterHardwareVersion)) {
                 s_logger.debug("Datacenter hardware version found: " + datacenterHardwareVersion + ". Creating VM with this hardware version");
@@ -869,7 +876,7 @@ public class HypervisorHostHelper {
 
         return controllerSpec;
     }
-    public static VirtualMachineMO createWorkerVM(VmwareHypervisorHost hyperHost, DatastoreMO dsMo, String vmName) throws Exception {
+    public static VirtualMachineMO createWorkerVm(VmwareHypervisorHost hyperHost, DatastoreMO dsMo, String vmName) throws Exception {
 
         // Allow worker VM to float within cluster so that we will have better chance to
         // create it successfully
@@ -878,7 +885,7 @@ public class HypervisorHostHelper {
             hyperHost = new ClusterMO(hyperHost.getContext(), morCluster);
         }
 
-        VirtualMachineMO workingVM = null;
+        VirtualMachineMO workingVm = null;
         VirtualMachineConfigSpec vmConfig = new VirtualMachineConfigSpec();
         vmConfig.setName(vmName);
         vmConfig.setMemoryMB((long)4);
@@ -899,8 +906,8 @@ public class HypervisorHostHelper {
         vmConfig.getDeviceChange().add(scsiControllerSpec);
         if (hyperHost.createVm(vmConfig)) {
             // Ugly work-around, it takes time for newly created VM to appear
-            for (int i = 0; i < 10 && workingVM == null; i++) {
-                workingVM = hyperHost.findVmOnHyperHost(vmName);
+            for (int i = 0; i < 10 && workingVm == null; i++) {
+                workingVm = hyperHost.findVmOnHyperHost(vmName);
 
                 try {
                     Thread.sleep(1000);
@@ -910,16 +917,16 @@ public class HypervisorHostHelper {
             }
         }
 
-        if (workingVM != null) {
-            workingVM.setCustomFieldValue(CustomFieldConstants.CLOUD_WORKER, "true");
+        if (workingVm != null) {
+            workingVm.setCustomFieldValue(CustomFieldConstants.CLOUD_WORKER, "true");
             String workerTag = String.format("%d-%s", System.currentTimeMillis(), hyperHost.getContext().getStockObject("noderuninfo"));
-            workingVM.setCustomFieldValue(CustomFieldConstants.CLOUD_WORKER_TAG, workerTag);
+            workingVm.setCustomFieldValue(CustomFieldConstants.CLOUD_WORKER_TAG, workerTag);
         }
-        return workingVM;
+        return workingVm;
     }
 
 
-    public static String removeOVFNetwork(final String ovfString)  {
+    public static String removeOvfNetwork(final String ovfString)  {
         if (ovfString == null || ovfString.isEmpty()) {
             return ovfString;
         }
@@ -953,7 +960,7 @@ public class HypervisorHostHelper {
         return ovfString;
     }
 
-    public static List<Pair<String, Boolean>> readOVF(VmwareHypervisorHost host, String ovfFilePath, DatastoreMO dsMo) throws Exception {
+    public static List<Pair<String, Boolean>> readOvf(VmwareHypervisorHost host, String ovfFilePath, DatastoreMO dsMo) throws Exception {
         List<Pair<String, Boolean>> ovfVolumeInfos = new ArrayList<Pair<String, Boolean>>();
         List<String> files = new ArrayList<String>();
 
@@ -967,7 +974,7 @@ public class HypervisorHostHelper {
         importSpecParams.setEntityName(importEntityName);
         importSpecParams.setDeploymentOption("");
 
-        String ovfDescriptor = removeOVFNetwork(HttpNfcLeaseMO.readOvfContent(ovfFilePath));
+        String ovfDescriptor = removeOvfNetwork(HttpNfcLeaseMO.readOvfContent(ovfFilePath));
         VmwareContext context = host.getContext();
         OvfCreateImportSpecResult ovfImportResult = context.getService().createImportSpec(context.getServiceContent().getOvfManager(), ovfDescriptor, morRp, dsMo.getMor(),
                 importSpecParams);
@@ -1007,7 +1014,7 @@ public class HypervisorHostHelper {
 
        int osDiskSeqNumber = 0;
        VirtualMachineConfigSpec config = importSpec.getConfigSpec();
-       String paramVal = getOVFParamValue(config);
+       String paramVal = getOvfParamValue(config);
        if (paramVal != null && !paramVal.isEmpty()) {
            try {
                osDiskSeqNumber = getOsDiskFromOvfConf(config, paramVal);
@@ -1039,7 +1046,7 @@ public class HypervisorHostHelper {
             ManagedObjectReference morDs) throws Exception {
         VmwareContext context = host.getContext();
         ManagedObjectReference morOvf = context.getServiceContent().getOvfManager();
-        VirtualMachineMO workerVmMo = HypervisorHostHelper.createWorkerVM(host, new DatastoreMO(context, morDs), ovfName);
+        VirtualMachineMO workerVmMo = HypervisorHostHelper.createWorkerVm(host, new DatastoreMO(context, morDs), ovfName);
         if (workerVmMo == null) {
             throw new Exception("Unable to find just-created worker VM");
         }
@@ -1091,13 +1098,14 @@ public class HypervisorHostHelper {
         String[] virtualNodeInfo = deviceLocation.split(":");
 
         if (deviceLocation.startsWith("scsi")) {
-           controllerNumber = Integer.parseInt(virtualNodeInfo[0].substring(4)); // get substring excluding prefix scsi
+            // get substring excluding prefix scsi
+           controllerNumber = Integer.parseInt(virtualNodeInfo[0].substring(4));
            deviceNodeNumber = Integer.parseInt(virtualNodeInfo[1]);
 
            for (VirtualDeviceConfigSpec deviceConfig : deviceConfigList) {
                VirtualDevice device = deviceConfig.getDevice();
                if (device instanceof VirtualSCSIController) {
-                   if (controllerNumber == controllerCount) { //((VirtualSCSIController)device).getBusNumber()) {
+                   if (controllerNumber == controllerCount) {
                        controllerKey = device.getKey();
                        break;
                    }
@@ -1105,14 +1113,15 @@ public class HypervisorHostHelper {
                }
            }
        } else {
-           controllerNumber = Integer.parseInt(virtualNodeInfo[0].substring(3)); // get substring excluding prefix ide
+            // get substring excluding prefix ide
+           controllerNumber = Integer.parseInt(virtualNodeInfo[0].substring(3));
            deviceNodeNumber = Integer.parseInt(virtualNodeInfo[1]);
            controllerCount = 0;
 
            for (VirtualDeviceConfigSpec deviceConfig : deviceConfigList) {
                VirtualDevice device = deviceConfig.getDevice();
                if (device instanceof VirtualIDEController) {
-                   if (controllerNumber == controllerCount) { //((VirtualIDEController)device).getBusNumber()) {
+                   if (controllerNumber == controllerCount) {
                        // Only 2 IDE controllers supported and they will have bus numbers 0 and 1
                        controllerKey = device.getKey();
                        break;
@@ -1134,7 +1143,7 @@ public class HypervisorHostHelper {
        return deviceSeqNumber;
    }
 
-   public static String getOVFParamValue(VirtualMachineConfigSpec config) {
+   public static String getOvfParamValue(VirtualMachineConfigSpec config) {
        String paramVal = "";
        List<OptionValue> options = config.getExtraConfig();
        for (OptionValue option : options) {
@@ -1158,8 +1167,8 @@ public class HypervisorHostHelper {
         if (VmwareHelper.isControllerOsRecommended(dataDiskController)) {
             dataDiskController = recommendedController;
         }
-
-        String scsiDiskController = null; //If any of the controller provided is SCSI then return it's sub-type.
+        //If any of the controller provided is SCSI then return it's sub-type.
+        String scsiDiskController = null;
         if (isIdeController(rootDiskController) && isIdeController(dataDiskController)) {
             //Default controllers would exist
             return null;

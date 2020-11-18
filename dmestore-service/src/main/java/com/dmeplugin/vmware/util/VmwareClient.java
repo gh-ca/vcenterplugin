@@ -17,7 +17,6 @@
 package com.dmeplugin.vmware.util;
 
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.*;
 
 import javax.net.ssl.HostnameVerifier;
@@ -112,7 +111,7 @@ public class VmwareClient {
         javax.net.ssl.TrustManager[] trustAllCerts = new javax.net.ssl.TrustManager[1];
         javax.net.ssl.TrustManager tm = new TrustAllTrustManager();
         trustAllCerts[0] = tm;
-        javax.net.ssl.SSLContext sc = SSLUtils.getSSLContext();
+        javax.net.ssl.SSLContext sc = SSLUtils.getSslContext();
         javax.net.ssl.SSLSessionContext sslsc = sc.getServerSessionContext();
         sslsc.setSessionTimeout(0);
         sc.init(null, trustAllCerts, null);
@@ -129,7 +128,8 @@ public class VmwareClient {
     private final static String SVC_INST_NAME = "ServiceInstance";
     private static final String PBMSERVICEINSTANCETYPE = "PbmServiceInstance";
     private static final String PBMSERVICEINSTANCEVALUE = "ServiceInstance";
-    private int vCenterSessionTimeout = 1200000; // Timeout in milliseconds
+    // Timeout in milliseconds
+    private int vCenterSessionTimeout = 1200000;
 
     private boolean isConnected = false;
 
@@ -452,8 +452,8 @@ public class VmwareClient {
             // info has a property - state for state of the task
             Object[] result = waitForValues(task, new String[] { "info.state", "info.error" }, new String[] { "state" }, new Object[][] { new Object[] {
                     TaskInfoState.SUCCESS, TaskInfoState.ERROR } });
-
-            if (result != null && result.length == 2) { //result for 2 properties: info.state, info.error
+            //result for 2 properties: info.state, info.error
+            if (result != null && result.length == 2) {
                 if (result[0].equals(TaskInfoState.SUCCESS)) {
                     retVal = true;
                 }
@@ -476,8 +476,8 @@ public class VmwareClient {
             // Since task cancellation is asynchronous, wait for the task to be cancelled
             Object[] result = waitForValues(task, new String[] {"info.state", "info.error"}, new String[] {"state"},
                     new Object[][] {new Object[] {TaskInfoState.SUCCESS, TaskInfoState.ERROR}});
-
-            if (result != null && result.length == 2) { //result for 2 properties: info.state, info.error
+            //result for 2 properties: info.state, info.error
+            if (result != null && result.length == 2) {
                 if (result[0].equals(TaskInfoState.SUCCESS)) {
                     s_logger.warn("Failed to cancel vCenter task: " + taskInfo.getName() + "(" + taskInfo.getKey() + ")" + " and the task successfully completed");
                     retVal = true;
@@ -632,10 +632,10 @@ public class VmwareClient {
         rpToVm.setSkip(Boolean.FALSE);
 
         // VirtualApp to VM: vApp -> VM
-        TraversalSpec vAppToVM = new TraversalSpec();
-        vAppToVM.setName("vAppToVM");
-        vAppToVM.setType("VirtualApp");
-        vAppToVM.setPath("vm");
+        TraversalSpec vAppToVm = new TraversalSpec();
+        vAppToVm.setName("vAppToVM");
+        vAppToVm.setType("VirtualApp");
+        vAppToVm.setPath("vm");
 
         // Host to VM: HostSystem -> VM
         TraversalSpec hToVm = new TraversalSpec();
@@ -713,14 +713,14 @@ public class VmwareClient {
 
         visitFolders.getSelectSet().addAll(sspecarrvf);
 
-        List<SelectionSpec> resultspec = new ArrayList<SelectionSpec>();
+        List<SelectionSpec> resultspec = new ArrayList<>();
         resultspec.add(visitFolders);
         resultspec.add(crToRp);
         resultspec.add(crToH);
         resultspec.add(dcToVmf);
         resultspec.add(dcToHf);
         resultspec.add(vAppToRp);
-        resultspec.add(vAppToVM);
+        resultspec.add(vAppToVm);
         resultspec.add(dcToDs);
         resultspec.add(hToVm);
         resultspec.add(rpToVm);

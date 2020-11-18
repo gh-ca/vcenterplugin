@@ -24,6 +24,7 @@ export class NfsModifyComponent implements OnInit{
   minbandwidthChoose=false; // 最小带宽 选中
   miniopsChoose=false; // 最小iops 选中
   latencyChoose=false; // 时延 选中
+  modifySuccessShow = false; // 编辑程功窗口
 
   constructor(private modifyService: NfsModifyService, private cdr: ChangeDetectorRef,
               private gs: GlobalsService,
@@ -67,15 +68,12 @@ export class NfsModifyComponent implements OnInit{
     this.modifyService.updateNfs(this.updateNfs).subscribe((result: any) => {
       this.modalHandleLoading=false;
       if (result.code === '200'){
-        if (this.pluginFlag=='plugin'){
-          this.backToNfsList();
-        }else{
-          this.closeModel();
-        }
+        this.modifySuccessShow = true;
       }else{
         this.errorMsg = '1';
         console.log("Delete failed:",result.description)
       }
+      this.cdr.detectChanges();
     });
   }
   backToNfsList(){
@@ -146,7 +144,7 @@ export class NfsModifyComponent implements OnInit{
     if(this.updateNfs.nfsName==null) return false;
     if(this.oldNfsName==this.updateNfs.nfsName) return false;
     this.oldNfsName=this.updateNfs.nfsName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
     if(reg5.test(this.updateNfs.nfsName)){
       //验证重复
       this.matchErr=false;
@@ -170,7 +168,7 @@ export class NfsModifyComponent implements OnInit{
     if(this.oldShareName=this.updateNfs.shareName) return false;
 
     this.oldShareName=this.updateNfs.shareName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
     if(reg5.test(this.updateNfs.shareName)){
       //验证重复
       this.matchErr=false;
@@ -185,7 +183,7 @@ export class NfsModifyComponent implements OnInit{
     if(this.oldFsName=this.updateNfs.fsName) return false;
 
     this.oldFsName=this.updateNfs.fsName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
     if(reg5.test(this.updateNfs.fsName)){
       //验证重复
       this.matchErr=false;
@@ -230,5 +228,16 @@ export class NfsModifyComponent implements OnInit{
         }
       }
     });
+  }
+
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    if (this.pluginFlag=='plugin'){
+      this.backToNfsList();
+    }else{
+      this.closeModel();
+    }
   }
 }

@@ -19,6 +19,7 @@ import {NfsDeleteComponent} from "./subpages/delete/nfs-delete.component";
 import {NfsModifyComponent} from "./subpages/modify/nfs-modify.component";
 import {StatusFilter} from "./status.filter";
 import {DeviceFilter} from "./device.filter";
+import {TranslateModule} from "@ngx-translate/core";
 
 
 @NgModule({
@@ -33,7 +34,8 @@ import {DeviceFilter} from "./device.filter";
     NgxEchartsModule,
     FormsModule,
     ClarityModule,
-    NfsRoutingModule
+    NfsRoutingModule,
+    TranslateModule
   ]
 })
 export class NfsModule { }

@@ -616,7 +616,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/delete</actionUrl>
                         <dialogTitle>VMFS</dialogTitle>
-                        <dialogSize>300,200</dialogSize>
+                        <dialogSize>400,200</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -664,7 +664,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/delete</actionUrl>
                         <dialogTitle>NFS</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>400,200</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -725,7 +725,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/reclaim?resource=dataStore</actionUrl>
                         <dialogTitle>VMFS</dialogTitle>
-                        <dialogSize>300,200</dialogSize>
+                        <dialogSize>400,200</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -822,7 +822,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/expand</actionUrl>
                         <dialogTitle>NFS</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>580,290</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -836,7 +836,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/reduce</actionUrl>
                         <dialogTitle>NFS</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>580,290</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -850,7 +850,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/modify</actionUrl>
                         <dialogTitle>NFS</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>580,600</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -864,7 +864,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/dataStore/mount</actionUrl>
                         <dialogTitle>NFS</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>600,400</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -878,7 +878,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/dataStore/unmount</actionUrl>
                         <dialogTitle>NFS</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>400,280</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -948,7 +948,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/host/mount</actionUrl>
                         <dialogTitle>NFS</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>600,400</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -962,7 +962,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/host/unmount</actionUrl>
                         <dialogTitle>NFS</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>400,300</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -1115,7 +1115,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/cluster/mount</actionUrl>
                         <dialogTitle>NFS</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>600,400</dialogSize>
                      </root>
                   </object>
                </delegate>
@@ -1129,7 +1129,7 @@
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=nfs/cluster/unmount</actionUrl>
                         <dialogTitle>NFS</dialogTitle>
-                        <dialogSize>1800,600</dialogSize>
+                        <dialogSize>400,300</dialogSize>
                      </root>
                   </object>
                </delegate>

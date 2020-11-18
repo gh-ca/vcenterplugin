@@ -10,8 +10,10 @@ import java.util.List;
  * @create: 2020-09-08
  **/
 public class TaskDetailInfo {
-    String id;// taskID
-    String taskName;// task name;
+    // taskID
+    String id;
+    // task name;
+    String taskName;
     int status;
     int progress;
     String ownerName;

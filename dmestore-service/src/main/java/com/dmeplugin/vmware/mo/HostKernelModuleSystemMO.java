@@ -40,15 +40,15 @@ public class HostKernelModuleSystemMO extends BaseMO {
     }
 
     public String queryConfiguredModuleOptionString(String name) throws Exception {
-        return _context.getService().queryConfiguredModuleOptionString(_mor, name);
+        return context.getService().queryConfiguredModuleOptionString(mor, name);
     }
 
 
     public List<KernelModuleInfo> queryModules() throws Exception {
-        return  _context.getService().queryModules(_mor);
+        return  context.getService().queryModules(mor);
     }
 
     public void updateModuleOptionString(String name ,String options) throws Exception {
-           _context.getService().updateModuleOptionString(_mor,name,options);
+           context.getService().updateModuleOptionString(mor,name,options);
     }
 }

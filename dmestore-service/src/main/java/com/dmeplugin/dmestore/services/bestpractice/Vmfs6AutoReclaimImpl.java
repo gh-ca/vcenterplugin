@@ -47,7 +47,7 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
             reObject.add("dataStores", array);
             return reObject.toString();
         }
-        return null;
+        return "--";
     }
 
     @Override
@@ -81,7 +81,7 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
     }
 
     private List<VmfsDatastoreInfo> getVmfs6DatastoreInfo(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
-        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
+        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = new HostMO(context, mor);
         List<VmfsDatastoreInfo> list = new ArrayList<>();

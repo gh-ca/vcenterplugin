@@ -117,8 +117,8 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
         Map<String, List<BestPracticeBean>> checkMap = new HashMap<>(16);
         for (int i = 0; i < hostArray.size(); i++) {
             JsonObject hostObject = hostArray.get(i).getAsJsonObject();
-            String _hostName = hostObject.get("hostName").getAsString();
-            String _objectId = hostObject.get("objectId").getAsString();
+            String hostName = hostObject.get("hostName").getAsString();
+            String hostObjectId = hostObject.get("objectId").getAsString();
             //对每一项进行检查
             for (BestPracticeService bestPracticeService : bestPracticeServices) {
                 try {
@@ -127,23 +127,23 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                         checkMap.put(hostSetting, new ArrayList<>());
                     }
 
-                    boolean checkFlag = bestPracticeService.check(vcsdkUtils, _objectId);
+                    boolean checkFlag = bestPracticeService.check(vcsdkUtils, hostObjectId);
                     if (!checkFlag) {
                         BestPracticeBean bean = new BestPracticeBean();
                         bean.setHostSetting(hostSetting);
                         bean.setRecommendValue(String.valueOf(bestPracticeService.getRecommendValue()));
                         bean.setLevel(bestPracticeService.getLevel());
                         bean.setNeedReboot(String.valueOf(bestPracticeService.needReboot()));
-                        bean.setActualValue(String.valueOf(bestPracticeService.getCurrentValue(vcsdkUtils, _objectId)));
-                        bean.setHostObjectId(_objectId);
-                        bean.setHostName(_hostName);
+                        bean.setActualValue(String.valueOf(bestPracticeService.getCurrentValue(vcsdkUtils, hostObjectId)));
+                        bean.setHostObjectId(hostObjectId);
+                        bean.setHostName(hostName);
                         bean.setAutoRepair(String.valueOf(bestPracticeService.autoRepair()));
 
                         checkMap.get(hostSetting).add(bean);
                     }
                 } catch (Exception ex) {
                     //报错，跳过当前项检查
-                    log.error("{} check failed! hostSetting={}", _hostName, bestPracticeService.getHostSetting());
+                    log.error("{} check failed! hostSetting={}", hostName, bestPracticeService.getHostSetting());
                     continue;
                 }
             }
@@ -236,7 +236,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             }
         }
 
-        Map<String, String> hostMap = new HashMap<>();
+        Map<String, String> hostMap = new HashMap<>(16);
         if (null == objectIds || objectIds.size() == 0) {
             int pageNo = 0;
             int pageSize = 100;

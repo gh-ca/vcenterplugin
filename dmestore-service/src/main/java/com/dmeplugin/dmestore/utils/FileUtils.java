@@ -153,32 +153,27 @@ public class FileUtils {
     // Read Acl
     AclFileAttributeView view = Files.getFileAttributeView(path, AclFileAttributeView.class);
     List<AclEntry> acl = view.getAcl();
-//    for (AclEntry ace : acl) {
-//      StringBuffer permsStr = new StringBuffer();
-//      for (AclEntryPermission perm : ace.permissions()) {
-//        permsStr.append(perm.name() + " ");
-//      }
-//      LOGGER.info("Ace Permissions: " + permsStr.toString().trim());
-//    }
     acl.clear();
-    // Add Acl
-    // Get user
     FileSystem fileSystem = path.getFileSystem();
     if (fileSystem != null) {
       UserPrincipalLookupService userPrincipalLookupService = fileSystem
           .getUserPrincipalLookupService();
       if (userPrincipalLookupService != null) {
         Collection<String> users = new LinkedHashSet<>();
-        users.add(System.getProperty("user.name")); // current user
-        users.add("vsphere-client"); // default flash user
-        users.add("vsphere-ui"); // default h5 user
+        // current user
+        users.add(System.getProperty("user.name"));
+        // default flash user
+        users.add("vsphere-client");
+        // default h5 user
+        users.add("vsphere-ui");
         for (String userName : users) {
           try {
             UserPrincipal user = userPrincipalLookupService
                 .lookupPrincipalByName(userName);
             AclEntry ae = buildUserAclEntry(user);
             if (ae != null) {
-              acl.add(0, ae); // insert before any DENY entries
+              // insert before any DENY entries
+              acl.add(0, ae);
             }
           } catch (Exception e) {
             LOGGER.warn("Cannot set file permission on user: " + userName);
@@ -192,14 +187,14 @@ public class FileUtils {
 
   private static AclEntry buildUserAclEntry(UserPrincipal user) {
     try {
-      return defaultPermissionAEBuilder().setPrincipal(user).build();
+      return defaultPermissionAeBuilder().setPrincipal(user).build();
     } catch (Exception e) {
       LOGGER.warn("Cannot set AclEntry on " + user);
       return null;
     }
   }
 
-  private static Builder defaultPermissionAEBuilder() {
+  private static Builder defaultPermissionAeBuilder() {
     return AclEntry.newBuilder().setPermissions(EnumSet.of(
         AclEntryPermission.READ_NAMED_ATTRS,
         AclEntryPermission.WRITE_NAMED_ATTRS,
@@ -250,10 +245,7 @@ public class FileUtils {
     if (isWindows()) {
       return VMWARE_WINDOWS_DIR;
     } else {
-      // /etc/vmware/service-state
       String huaweiParentDir = System.getenv().get(VMWARE_LINUX_PATH_SYS_PROP);
-      // LOGGER.info(VMWARE_LINUX_PATH_SYS_PROP + ": " + huaweiParentDir);
-      // if environment exists
       String linuxDir;
       if (StringUtils.hasText(huaweiParentDir)) {
         try {
@@ -275,7 +267,6 @@ public class FileUtils {
         // 6.0 doesn't support H5, so return flash version path
         linuxDir = (isDbPath ? VMWARE_LINUX60_DB_DIR : VMWARE_LINUX60_DIR);
       }
-      // LOGGER.info("Linux file path: " + linuxDir);
       return linuxDir;
     }
   }
@@ -290,7 +281,8 @@ public class FileUtils {
     if (!destDirName.endsWith(File.separator)) {// 结尾是否以"/"结束
       destDirName = destDirName + File.separator;
     }
-    if (dir.mkdirs()) {// 创建目标目录
+    // 创建目标目录
+    if (dir.mkdirs()) {
       LOGGER.info("Folder created!" + dir.getName());
       if (!isWindows()) {
         try {
@@ -307,7 +299,7 @@ public class FileUtils {
     }
   }
 
-  public static String getOldDBFolder() {
+  public static String getOldDbFolder() {
     return VMWARE_LINUX60_DB_DIR;
   }
 

@@ -4,7 +4,6 @@ import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.VmfsOperationService;
 import com.google.gson.Gson;
-import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +19,9 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/operatevmfs")
-@Api
 public class VmfsOperationController extends BaseController{
 
     public static final Logger LOG = LoggerFactory.getLogger(VmfsOperationController.class);
-    private final String API_RESP_CODE = "code";
-
     private Gson gson=new Gson();
     @Autowired
     private VmfsOperationService vmfsOperationService;
@@ -67,7 +63,6 @@ public class VmfsOperationController extends BaseController{
             vmfsOperationService.expandVmfs(volumes);
             return success();
         } catch (DMEException e) {
-            e.printStackTrace();
             return failure(e.getMessage());
         }
 
@@ -84,7 +79,6 @@ public class VmfsOperationController extends BaseController{
             vmfsOperationService.recycleVmfsCapacity(datastoreName);
             return success();
         } catch (DMEException e) {
-            e.printStackTrace();
             return failure(e.getMessage());
         }
 
@@ -98,7 +92,6 @@ public class VmfsOperationController extends BaseController{
             vmfsOperationService.recycleVmfsCapacityByDataStoreIds(datastoreIds);
             return success();
         } catch (DMEException e) {
-            e.printStackTrace();
             return failure(e.getMessage());
         }
 
@@ -112,7 +105,6 @@ public class VmfsOperationController extends BaseController{
         try {
             return success(vmfsOperationService.listServiceLevelVmfs(params));
         } catch (DMEException e) {
-            e.printStackTrace();
             return failure(e.getMessage());
         }
 
@@ -136,11 +128,7 @@ public class VmfsOperationController extends BaseController{
             vmfsOperationService.updateVmfsServiceLevel(params);
             return success();
         } catch (DMEException e) {
-            e.printStackTrace();
             return failure(e.getMessage());
         }
-
-
     }
-
 }
