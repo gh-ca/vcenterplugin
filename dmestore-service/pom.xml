@@ -153,10 +153,10 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
             <exclusions>
-                <exclusion>
+  <!--              <exclusion>
                     <artifactId>hamcrest-core</artifactId>
                     <groupId>org.hamcrest</groupId>
-                </exclusion>
+                </exclusion>-->
                 <exclusion>
                     <artifactId>slf4j-api</artifactId>
                     <groupId>org.slf4j</groupId>
