@@ -30,6 +30,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 /**
@@ -47,8 +49,6 @@ public class ServiceLevelServiceImplTest {
     DmeRelationInstanceService dmeRelationInstanceService;
     @Mock
     private DmeStorageService dmeStorageService;
-    @Mock
-    private SessionHelper sessionHelper;
     @Mock
     private VCenterInfoService vCenterInfoService;
     @Mock
@@ -94,19 +94,13 @@ public class ServiceLevelServiceImplTest {
         vCenterInfo.setUserName(username);
         vCenterInfo.setPassword(password);
         when(vCenterInfoService.getVcenterInfo()).thenReturn(vCenterInfo);
-        Mockito.doAnswer(new Answer<Object>() {
-            public Object answer(InvocationOnMock invocation) {
-                Object[] args = invocation.getArguments();
-                return "called with arguments: " + args;
-            }
-        }).when(sessionHelper).login(vCenterInfo.getHostIp(),String.valueOf(vCenterInfo.getHostPort()),vCenterInfo.getUserName(),vCenterInfo.getPassword());
-        when(vcsdkUtils.getCategoryId(sessionHelper)).thenReturn("1123");
+        when(vcsdkUtils.getCategoryId(anyObject())).thenReturn("1123");
         String name = "D新策略-3";
         List<TagModel> tagModels = new ArrayList<>();
         TagModel tagModel = new TagModel();
         tagModel.setName(name);
         tagModels.add(tagModel);
-        when(vcsdkUtils.getAllTagsByCategoryId("1123", sessionHelper)).thenReturn(tagModels);
+        when(vcsdkUtils.getAllTagsByCategoryId(anyObject(), anyObject())).thenReturn(tagModels);
         List<PbmProfile> pbmProfiles = new ArrayList<>();
         PbmProfile pbmProfile = new PbmProfile();
         pbmProfile.setName(name);
@@ -116,21 +110,8 @@ public class ServiceLevelServiceImplTest {
         String jsonData = "{\"service-levels\":[{\"id\":\"354a2dec-5d84-4e66-afc5-f3564f087c3f\",\"name\":\"D新策略-3\",\"description\":\"blockservice-levelfordj\",\"type\":\"BLOCK\",\"protocol\":null,\"total_capacity\":0.0,\"used_capacity\":0.0,\"free_capacity\":0.0,\"capabilities\":{\"resource_type\":\"thin\",\"compression\":null,\"deduplication\":null,\"iopriority\":null,\"smarttier\":null,\"qos\":{\"qos_param\":{\"latency\":null,\"latencyUnit\":\"ms\",\"minBandWidth\":null,\"minIOPS\":null,\"maxBandWidth\":2333,\"maxIOPS\":null},\"enabled\":true}}}]}";
         ResponseEntity<String> responseEntity = new ResponseEntity(gson.fromJson(jsonData, JsonObject.class), null, HttpStatus.OK);
         when(dmeAccessService.access(url, HttpMethod.GET, null)).thenReturn(responseEntity);
-
-        Mockito.doAnswer(new Answer<Object>() {
-            public Object answer(InvocationOnMock invocation) {
-                Object[] args = invocation.getArguments();
-                return "called with arguments: " + args;
-            }
-        }).when(vcsdkUtils).removePbmProfileInAllContext(pbmProfiles);
-
-        Mockito.doAnswer(new Answer<Object>() {
-            public Object answer(InvocationOnMock invocation) {
-                Object[] args = invocation.getArguments();
-                return "called with arguments: " + args;
-            }
-        }).when(vcsdkUtils).removeAllTags(tagModels, sessionHelper);
-
+        doNothing().when(vcsdkUtils).removePbmProfileInAllContext(pbmProfiles);
+        doNothing().when(vcsdkUtils).removeAllTags(anyObject(), anyObject());
         serviceLevelService.updateVmwarePolicy();
     }
 

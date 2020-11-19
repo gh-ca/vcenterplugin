@@ -1,13 +1,25 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.DMEServiceApplication;
+import com.dmeplugin.dmestore.dao.BestPracticeCheckDao;
 import com.dmeplugin.dmestore.model.BestPracticeBean;
 import com.dmeplugin.dmestore.model.BestPracticeCheckRecordBean;
-import com.dmeplugin.dmestore.services.bestpractice.BestPracticeService;
+import com.dmeplugin.dmestore.services.bestpractice.*;
+import com.dmeplugin.dmestore.utils.VCSDKUtils;
+import com.dmeplugin.vmware.VCConnectionHelper;
+import com.dmeplugin.vmware.VmwarePluginConnectionHelper;
+import com.dmeplugin.vmware.mo.HostAdvanceOptionMO;
+import com.dmeplugin.vmware.mo.HostMO;
+import com.dmeplugin.vmware.util.VmwareContext;
+import com.google.gson.Gson;
+import com.vmware.vim25.ManagedObjectReference;
 import org.junit.Test;
 import org.junit.Before;
 import org.junit.After;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -19,6 +31,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 /**
  * BestPracticeProcessServiceImpl Tester.
  *
@@ -26,14 +42,35 @@ import java.util.Map;
  * @version 1.0
  * @since <pre>十一月 13, 2020</pre>
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = DMEServiceApplication.class)
 public class BestPracticeProcessServiceImplTest {
-    @Autowired
-    private BestPracticeProcessServiceImpl bestPracticeProcessService;
+    private Gson gson = new Gson();
+    @Mock
+    private VCSDKUtils vcsdkUtils;
+    @Mock
+    private BestPracticeCheckDao bestPracticeCheckDao;
+    @InjectMocks
+    private BestPracticeProcessServiceImpl bestPracticeProcessService = new BestPracticeProcessServiceImpl();
 
     @Before
     public void before() throws Exception {
+        MockitoAnnotations.initMocks(this);
+
+        List<BestPracticeService> bestPracticeServices = new ArrayList<>();
+        bestPracticeServices.add(new Vmfs3EnableBlockDeleteImpl());
+        bestPracticeServices.add(new Vmfs3HardwareAcceleratedLockingImpl());
+        bestPracticeServices.add(new VMFS3UseATSForHBOnVMFS5Impl());
+        bestPracticeServices.add(new DiskSchedQuantumImpl());
+        bestPracticeServices.add(new DiskDiskMaxIOSizeImpl());
+        bestPracticeServices.add(new DataMoverHardwareAcceleratedInitImpl());
+        bestPracticeServices.add(new DataMoverHardwareAcceleratedMoveImpl());
+        bestPracticeServices.add(new LunQueueDepthForEmulexImpl());
+        bestPracticeServices.add(new LunQueueDepthForQlogicImpl());
+        bestPracticeServices.add(new JumboFrameMTUImpl());
+        bestPracticeServices.add(new NumberOfVolumesInDatastoreImpl());
+        bestPracticeServices.add(new Vmfs6AutoReclaimImpl());
+        bestPracticeServices.add(new NMPPathSwitchPolicyImpl());
+        bestPracticeProcessService.setBestPracticeServices(bestPracticeServices);
+        vcsdkUtils.setVcConnectionHelper(new VmwarePluginConnectionHelper());
     }
 
     @After
@@ -41,126 +78,72 @@ public class BestPracticeProcessServiceImplTest {
     }
 
     /**
-     * Method: getBestPracticeServices()
-     */
-    @Test
-    public void testGetBestPracticeServices() throws Exception {
-        List<BestPracticeService> list = bestPracticeProcessService.getBestPracticeServices();
-        assert list.size() > 0;
-    }
-
-    /**
-     * Method: setBestPracticeServices(List<BestPracticeService> bestPracticeServices)
-     */
-    @Test
-    public void testSetBestPracticeServices() throws Exception {
-        assert true;
-    }
-
-    /**
-     * Method: getVcsdkUtils()
-     */
-    @Test
-    public void testGetVcsdkUtils() throws Exception {
-        assert null != bestPracticeProcessService.getVcsdkUtils();
-    }
-
-    /**
-     * Method: setVcsdkUtils(VCSDKUtils vcsdkUtils)
-     */
-    @Test
-    public void testSetVcsdkUtils() throws Exception {
-        assert true;
-    }
-
-    /**
-     * Method: getBestPracticeCheckDao()
-     */
-    @Test
-    public void testGetBestPracticeCheckDao() throws Exception {
-        assert null != bestPracticeProcessService.getBestPracticeCheckDao();
-    }
-
-    /**
-     * Method: setBestPracticeCheckDao(BestPracticeCheckDao bestPracticeCheckDao)
-     */
-    @Test
-    public void testSetBestPracticeCheckDao() throws Exception {
-        assert true;
-    }
-
-    /**
      * Method: getCheckRecord()
      */
     @Test
     public void testGetCheckRecord() throws Exception {
+        List<BestPracticeBean> hostBeanList = new ArrayList<>();
+        BestPracticeBean bestPracticeBean = new BestPracticeBean();
+        hostBeanList.add(bestPracticeBean);
+        when(bestPracticeCheckDao.getRecordBeanByHostsetting(anyString())).thenReturn(hostBeanList);
         bestPracticeProcessService.getCheckRecord();
     }
 
     /**
-     * Method: getCheckRecordBy(String hostSetting, int pageNo, int pageSize)
+     * Method: getCheckRecordBy()
      */
     @Test
-    public void testGetCheckRecordBy() throws Exception {
-        String hostSetting = "Jumbo Frame (MTU)";
-        bestPracticeProcessService.getCheckRecordBy(hostSetting, 0, 20);
-    }
-
-
-    /**
-     * Method: check(String objectId)
-     */
-    @Test
-    public void testCheck() throws Exception {
-        bestPracticeProcessService.check(null);
+    public void testGetCheckRecordBy() throws Exception{
+        List<BestPracticeBean> list = new ArrayList<>();
+        list.add(new BestPracticeBean());
+        when(bestPracticeCheckDao.getRecordByPage("test", 0, 100)).thenReturn(list);
+        bestPracticeProcessService.getCheckRecordBy("test", 0, 100);
     }
 
     /**
-     * Method: update(List<String> objectIds)
+     * Method: check()
      */
     @Test
-    public void testUpdateObjectIds() throws Exception {
-        bestPracticeProcessService.update(null);
-        Map<String, String> map = bestPracticeProcessService.getBestPracticeCheckDao().getAllHostIds(0, 1);
+    public void testCheck() throws Exception{
+        String objectId = "123";
+        List<Map<String, String>> lists = new ArrayList<>();
+        Map<String, String> map = new HashMap<>();
+        map.put("hostId", objectId);
+        map.put("objectId", "123");
+        map.put("hostName", "testHost");
+        lists.add(map);
+        when(vcsdkUtils.findHostById(objectId)).thenReturn(gson.toJson(lists));
+        when(vcsdkUtils.getAllHosts()).thenReturn(gson.toJson(lists));
+        ManagedObjectReference mor = mock(ManagedObjectReference.class);
+        VCConnectionHelper vcConnectionHelper = mock(VmwarePluginConnectionHelper.class);
+        when(vcsdkUtils.getVcConnectionHelper()).thenReturn(vcConnectionHelper);
+        when(vcConnectionHelper.objectId2Mor(objectId)).thenReturn(mor);
+        VmwareContext context = mock(VmwareContext.class);
+        when(vcConnectionHelper.getServerContext(objectId)).thenReturn(context);
+        HostMO hostMO = mock(HostMO.class);
+        HostAdvanceOptionMO hostAdvanceOptionMO = mock(HostAdvanceOptionMO.class);
+        when(hostMO.getHostAdvanceOptionMo()).thenReturn(hostAdvanceOptionMO);
+        when(hostAdvanceOptionMO.queryOptions(anyString())).thenReturn(new ArrayList<>());
+        bestPracticeProcessService.check(objectId);
+    }
+
+    @Test
+    public void testUpdate() throws Exception{
+        String objectId = "123";
+        List<Map<String, String>> lists = new ArrayList<>();
+        Map<String, String> map = new HashMap<>();
+        map.put("hostId", objectId);
+        map.put("objectId", "123");
+        map.put("hostName", "testHost");
+        lists.add(map);
+        when(vcsdkUtils.findHostById(objectId)).thenReturn(gson.toJson(lists));
+        when(vcsdkUtils.getAllHosts()).thenReturn(gson.toJson(lists));
+        bestPracticeProcessService.update(null,null);
         List<String> objectIds = new ArrayList<>();
-        map.forEach((k, v) -> objectIds.add(k));
+        objectIds.add(objectId);
         bestPracticeProcessService.update(objectIds);
     }
 
-    /**
-     * Method: updateByCluster(String clusterobjectid)
-     */
-    @Test
-    public void testUpdateByCluster() throws Exception {
-        String clusterobjectid = "urn:vmomi:ClusterComputeResource:domain-c1087:674908e5-ab21-4079-9cb1-596358ee5dd1";
-        bestPracticeProcessService.updateByCluster(clusterobjectid);
-    }
 
-    /**
-     * Method: update(List<String> objectIds, String hostSetting)
-     */
-    @Test
-    public void testUpdateForObjectIdsHostSetting() throws Exception {
-        List<BestPracticeCheckRecordBean> checkRecordBeans = bestPracticeProcessService.getCheckRecord();
-        if(checkRecordBeans.size() > 0){
-            BestPracticeCheckRecordBean checkRecordBean = checkRecordBeans.get(0);
-            List<String> objectIds = new ArrayList<>();
-            for (BestPracticeBean bestPracticeBean : checkRecordBean.getHostList()) {
-                objectIds.add(bestPracticeBean.getHostObjectId());
-            }
-            bestPracticeProcessService.update(objectIds, checkRecordBean.getHostSetting());
-        }
-
-        assert true;
-    }
-
-
-    /**
-     * Method: bachDbProcess(Map<String, List<BestPracticeBean>> map)
-     */
-    @Test
-    public void testBachDbProcess() throws Exception {
-        assert true;
-    }
 
 } 

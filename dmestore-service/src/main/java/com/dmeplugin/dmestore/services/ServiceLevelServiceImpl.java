@@ -39,11 +39,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     private DmeStorageService dmeStorageService;
     private VCenterInfoService vCenterInfoService;
     private VCSDKUtils vcsdkUtils;
-
-    private SessionHelper sessionHelper;
-
     private static final String POLICY_DESC = "policy created by dme";
-
     private final String LIST_SERVICE_LEVEL_URL = "/rest/service-policy/v1/service-levels";
     private final String QUERY_SERVICE_LEVEL_VOLUME_URL = "/rest/blockservice/v1/volumes?service_level_id={serviceLevelId}";
 
@@ -110,11 +106,14 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     @Override
     public void updateVmwarePolicy() throws DMEException {
         try {
-            sessionHelper = new SessionHelper();
             VCenterInfo vCenterInfo = vCenterInfoService.getVcenterInfo();
             if (null != vCenterInfo) {
-                sessionHelper.login(vCenterInfo.getHostIp(), String.valueOf(vCenterInfo.getHostPort()), vCenterInfo.getUserName(), CipherUtils.decryptString(vCenterInfo.getPassword()));
-
+                SessionHelper sessionHelper = new SessionHelper();
+                try {
+                    sessionHelper.login(vCenterInfo.getHostIp(), String.valueOf(vCenterInfo.getHostPort()), vCenterInfo.getUserName(), CipherUtils.decryptString(vCenterInfo.getPassword()));
+                }catch (Exception ex){
+                    log.error(ex.getMessage());
+                }
                 String categoryid = vcsdkUtils.getCategoryId(sessionHelper);
                 List<TagModel> tagModels = vcsdkUtils.getAllTagsByCategoryId(categoryid, sessionHelper);
                 List<PbmProfile> pbmProfiles = vcsdkUtils.getAllSelfPolicyInallcontext();
