@@ -12,7 +12,6 @@ import { Observable, of, throwError } from 'rxjs';
 import { mergeMap, catchError } from 'rxjs/operators';
 import { environment } from '@env/environment';
 
-import { ToastrService } from 'ngx-toastr';
 import { TokenService } from '../authentication/token.service';
 import { SettingsService } from '@core/bootstrap/settings.service';
 
@@ -20,7 +19,6 @@ import { SettingsService } from '@core/bootstrap/settings.service';
 export class DefaultInterceptor implements HttpInterceptor {
   constructor(
     private router: Router,
-    private toastr: ToastrService,
     private token: TokenService,
     private settings: SettingsService
   ) {}
