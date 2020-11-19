@@ -9,6 +9,7 @@ import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.vmware.vim.binding.vmodl.list;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -67,7 +68,7 @@ public class NfsOperationServiceImplTest {
         String taskId = "123";
         JsonObject jsonObject1 = new JsonObject();
         jsonObject1.addProperty("task_id", taskId);
-        url = "/rest/resourcedb/v1/instances/SYS_StoragePool?storageDeviceId=b94bff9d-0dfb-11eb-bd3d-0050568491c9 and pool_id=0";
+        url = "/rest/resourcedb/v1/instances/SYS_StoragePool?condition={json}";
         String data = "{\n" +
                 "            \"ownerType\": \"eSight_Storage\", \n" +
                 "            \"tier0RaidLv\": 0, \n" +
@@ -109,9 +110,9 @@ public class NfsOperationServiceImplTest {
         list.add(jsonObject);
         Map<String, Object> map1 = new HashMap<>();
         map1.put("objList", list);
+        String param1 = "{\"constraint\":[{\"simple\":{\"name\":\"dataStatus\",\"operator\":\"equal\",\"value\":\"normal\"}},{\"simple\":{\"name\":\"storageDeviceId\",\"operator\":\"storageDeviceId\",\"value\":\"b94bff9d-0dfb-11eb-bd3d-0050568491c9\"},\"logOp\":\"and\"},{\"simple\":{\"name\":\"pool_id\",\"operator\":\"equal\",\"value\":\"0\"},\"logOp\":\"and\"}]}";
         ResponseEntity<String> responseEntity = new ResponseEntity<>(gson.toJson(map1), null, HttpStatus.OK);
-        when(dmeAccessService.access(url, HttpMethod.GET, null)).thenReturn(responseEntity);
-
+        when(dmeAccessService.accessByJson(url, HttpMethod.GET, param1)).thenReturn(responseEntity);
         url = "/rest/fileservice/v1/filesystems/customize";
         ResponseEntity<String> responseEntity2 = new ResponseEntity<>(gson.toJson(jsonObject1), null, HttpStatus.ACCEPTED);
         String param2 = "{\"tuning\":{\"allocation_type\":\"thin\",\"compression_enabled\":false,\"deduplication_enabled\":false,\"qos_policy\":{\"max_bandwidth\":\"2\",\"max_iops\":\"1\"}},\"storage_id\":\"b94bff9d-0dfb-11eb-bd3d-0050568491c9\",\"capacity_autonegotiation\":{\"capacity_self_adjusting_mode\":\"off\",\"auto_size_enable\":false},\"filesystem_specs\":[{\"name\":\"lqtestnfs00007\",\"count\":1,\"capacity\":1.0}],\"pool_raw_id\":\"1\"}";
@@ -154,9 +155,9 @@ public class NfsOperationServiceImplTest {
         List<LogicPorts> list4 = new ArrayList<>();
         list4.add(logicPorts);
         when(dmeStorageService.getLogicPorts(storageId)).thenReturn(list4);
-        List<Map<String, String>> list5 = new ArrayList<>();
         Map<String, String> map4 = new HashMap<>();
-        map.put("urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1","192.168.200.13");
+        map4.put("urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1","192.168.200.13");
+        List<Map<String, String>> list5 = new ArrayList<>();
         list5.add(map4);
         DmeVmwareRelation dmeVmwareRelation = new DmeVmwareRelation();
         dmeVmwareRelation.setStoreId("datastoreObjectId");
@@ -256,8 +257,12 @@ public class NfsOperationServiceImplTest {
                 "            \"tier2Capacity\": 0, \n" +
                 "            \"status\": \"normal\"\n" +
                 "        }";
-
-        ResponseEntity<String> responseEntity2 = new ResponseEntity<>(param2, null, HttpStatus.OK);
+        JsonObject jsonObject1 = gson.fromJson(param2, JsonObject.class);
+        List<JsonObject> list2 = new ArrayList<>();
+        list2.add(jsonObject1);
+        Map<String, Object> map1 = new HashMap<>();
+        map1.put("objList", list2);
+        ResponseEntity<String> responseEntity2 = new ResponseEntity<>(gson.toJson(map1), null, HttpStatus.OK);
         String param3 = "{\"constraint\":[{\"simple\":{\"name\":\"dataStatus\",\"operator\":\"equal\",\"value\":\"normal\"}},{\"simple\":{\"name\":\"storageDeviceId\",\"operator\":\"storageDeviceId\",\"value\":\"b94bff9d-0dfb-11eb-bd3d-0050568491c9\"},\"logOp\":\"and\"},{\"simple\":{\"name\":\"storage_pool_name\",\"operator\":\"equal\",\"value\":\"fileStoragePool002\"},\"logOp\":\"and\"}]}";
         when(dmeAccessService.accessByJson("/rest/resourcedb/v1/instances/SYS_StoragePool?condition={json}", HttpMethod.GET, param3)).thenReturn(responseEntity2);
         String param4 = "{\"file_system_id\":\"0C9A60E0A51C3AD38567C21B6881371C\",\"capacity\":3.0}";
