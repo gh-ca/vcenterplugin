@@ -40,6 +40,8 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     private VCenterInfoService vCenterInfoService;
     private VCSDKUtils vcsdkUtils;
 
+    private SessionHelper sessionHelper;
+
     private static final String POLICY_DESC = "policy created by dme";
 
     private final String LIST_SERVICE_LEVEL_URL = "/rest/service-policy/v1/service-levels";
@@ -108,7 +110,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     @Override
     public void updateVmwarePolicy() throws DMEException {
         try {
-            SessionHelper sessionHelper = new SessionHelper();
+            sessionHelper = new SessionHelper();
             VCenterInfo vCenterInfo = vCenterInfoService.getVcenterInfo();
             if (null != vCenterInfo) {
                 sessionHelper.login(vCenterInfo.getHostIp(), String.valueOf(vCenterInfo.getHostPort()), vCenterInfo.getUserName(), CipherUtils.decryptString(vCenterInfo.getPassword()));
