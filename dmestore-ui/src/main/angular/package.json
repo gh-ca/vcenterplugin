@@ -43,7 +43,6 @@
     "@mat-datetimepicker/moment": "^5.0.1",
     "@ngx-translate/core": "^12.1.2",
     "@ngx-translate/http-loader": "^6.0.0",
-    "@types/echarts": "^4.6.5",
     "@webcomponents/webcomponentsjs": "^2.4.4",
     "core-js": "^3.6.4",
     "echarts": "^4.8.0",
