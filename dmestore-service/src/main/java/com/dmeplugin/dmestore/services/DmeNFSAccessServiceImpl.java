@@ -92,8 +92,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         NfsDataStoreShareAttr shareAttr = new NfsDataStoreShareAttr();
         shareAttr.setName(share.get("name").getAsString());
         shareAttr.setFsName(ToolUtils.jsonToStr(share.get("fs_name"), null));
-        shareAttr.setSharePath(share.get("share_path").getAsString());
-        shareAttr.setDescription(share.get("description").getAsString());
+        shareAttr.setSharePath(ToolUtils.jsonToStr(share.get("share_path")));
+        shareAttr.setDescription(ToolUtils.jsonToStr(share.get("description")));
         shareAttr.setDeviceName(ToolUtils.jsonToStr(share.get("device_name"), null));
         shareAttr.setOwningDtreeName(ToolUtils.jsonToStr(share.get("owning_dtree_name"), null));
         shareAttr.setOwningDtreeId(ToolUtils.jsonToStr(share.get("owning_dtree_id"), null));
@@ -145,16 +145,16 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         }
         JsonObject logicPort = gson.fromJson(responseEntity.getBody(), JsonObject.class);
         NfsDataStoreLogicPortAttr logicPortAttr = new NfsDataStoreLogicPortAttr();
-        logicPortAttr.setName(logicPort.get("name").getAsString());
+        logicPortAttr.setName(ToolUtils.jsonToStr(logicPort.get("name")));
         String ipv4 = ToolUtils.jsonToStr(logicPort.get("mgmt_ip"), null);
         ipv4 = (null == ipv4 ? "" : ipv4.trim());
         String ipv6 = ToolUtils.jsonToStr(logicPort.get("mgmt_ipv6"), null);
         logicPortAttr.setIp(!StringUtils.isEmpty(ipv4) ? ipv4 : ipv6);
-        String runningStatus = logicPort.get("running_status").getAsString();
+        String runningStatus = ToolUtils.jsonToStr(logicPort.get("running_status"));
         logicPortAttr.setStatus(ToolUtils.jsonToStr(logicPort.get("operational_status"), null));
         logicPortAttr.setRunningStatus(runningStatus);
-        logicPortAttr.setCurrentPort(logicPort.get("current_port_name").getAsString());
-        logicPortAttr.setActivePort(logicPort.get("home_port_name").getAsString());
+        logicPortAttr.setCurrentPort(ToolUtils.jsonToStr(logicPort.get("current_port_name")));
+        logicPortAttr.setActivePort(ToolUtils.jsonToStr(logicPort.get("home_port_name")));
         logicPortAttr.setFailoverGroup(ToolUtils.jsonToStr(logicPort.get("failover_group_name"), null));
         return logicPortAttr;
     }
