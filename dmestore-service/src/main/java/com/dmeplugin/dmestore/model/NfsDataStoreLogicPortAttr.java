@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * @author wangxiangyong
  **/
-public class NfsDataStoreLogicPortAttr implements Serializable{
+    public class NfsDataStoreLogicPortAttr implements Serializable{
     private String name;
     private String ip;
     private String status;
