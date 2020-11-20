@@ -1,6 +1,7 @@
 package com.dmeplugin.dmestore.services.bestpractice;
 
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
+import com.dmeplugin.vmware.mo.HostAdvanceOptionMO;
 import com.dmeplugin.vmware.mo.HostMO;
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.vmware.vim25.ManagedObjectReference;
@@ -42,7 +43,8 @@ public class BaseBestPracticeService {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = new HostMO(context, mor);
-        List<OptionValue> values = hostMo.getHostAdvanceOptionMo().queryOptions(hostSetting);
+        HostAdvanceOptionMO hostAdvanceOptionMO = hostMo.getHostAdvanceOptionMo();
+        List<OptionValue> values = hostAdvanceOptionMO.queryOptions(hostSetting);
         for (OptionValue value : values) {
             return value.getValue();
         }
