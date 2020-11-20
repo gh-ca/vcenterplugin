@@ -80,7 +80,7 @@ public class VmfsOperationServiceImplTest {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("task_id", "123");
         ResponseEntity<String> responseEntity = new ResponseEntity<>(gson.toJson(jsonObject), null, HttpStatus.ACCEPTED);
-        when(dmeAccessService.access(url, HttpMethod.PUT, "{\"volume\":{\"name\":\"Dvmfs999\",\"tuning\":{\"smartQos\":{}}}}")).thenReturn(responseEntity);
+        when(dmeAccessService.access(url, HttpMethod.PUT, "{\"volume\":{\"name\":\"Dvmfs999\"}}")).thenReturn(responseEntity);
         List<String> list = new ArrayList<>();
         list.add("123");
         when(taskService.checkTaskStatus(list)).thenReturn(true);

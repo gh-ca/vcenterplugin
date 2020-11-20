@@ -3,6 +3,7 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.utils.StringUtil;
+import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -113,13 +114,14 @@ public class VmRdmServiceImpl implements VmRdmService {
         url = DmeConstants.DME_HOST_SUMMARY_URL;
         Map<String, String> queryHostParams = new HashMap<>(16);
         queryHostParams.put("ip", hostIp);
+        String s = gson.toJson(queryHostParams);
         responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(queryHostParams));
         String hostId = null;
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
             JsonObject dmeHost = gson.fromJson(responseEntity.getBody(), JsonObject.class);
             if (dmeHost.get("total").getAsInt() > 0) {
                 JsonObject hostObject = dmeHost.getAsJsonArray("hosts").get(0).getAsJsonObject();
-                hostId = hostObject.get("id").getAsString();
+                hostId = ToolUtils.jsonToStr(hostObject.get("id"));
             }
         }
         if (null == hostId) {
@@ -153,8 +155,8 @@ public class VmRdmServiceImpl implements VmRdmService {
             for (int j = 0; j < volumeArr.size(); j++) {
                 JsonObject volume = volumeArr.get(j).getAsJsonObject();
                 String wwn = volume.get("volume_wwn").getAsString();
-                if (lunObject.get("deviceName").getAsString().endsWith(wwn)) {
-                    lunMap.put(volume.get("id").getAsString(), lunObject);
+                if (ToolUtils.jsonToStr(lunObject.get("deviceName")).endsWith(wwn)) {
+                    lunMap.put(ToolUtils.jsonToStr(volume.get("id")), lunObject);
                 }
             }
         }

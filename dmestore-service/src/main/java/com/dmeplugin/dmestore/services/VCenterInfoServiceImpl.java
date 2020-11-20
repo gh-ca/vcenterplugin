@@ -3,6 +3,7 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.dao.VCenterInfoDao;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.exception.DmeSqlException;
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.HashMap;
