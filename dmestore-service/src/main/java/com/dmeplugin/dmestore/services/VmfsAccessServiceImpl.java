@@ -258,6 +258,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                 //创建vmware中的vmfs存储。
                                 params.put("volume_wwn", volumemap.get("volume_wwn"));
                                 params.put("volume_name", volumemap.get("volume_name"));
+                                String ss = new Gson().toJson(params);
                                 String dataStoreStr = createVmfsOnVmware(params);
                                 if (!StringUtils.isEmpty(dataStoreStr)) {
                                     Map<String, Object> dataStoreMap = gson.fromJson(dataStoreStr, new TypeToken<Map<String, Object>>() {
@@ -372,7 +373,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 requestbody.put("mapping", mapping);
 
                 ResponseEntity responseEntity = dmeAccessService.access(CREATE_VOLUME_URL, HttpMethod.POST, gson.toJson(requestbody));
-
+                String s = new Gson().toJson(responseEntity);
                 if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_202) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                     if (null != jsonObject && !ToolUtils.jsonIsNull(jsonObject.get(DmeConstants.TASKID))) {
@@ -524,6 +525,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             if (!StringUtils.isEmpty(hostId)) {
                 //通过主机的objectid查到主机上所有的hba的wwn或者iqn
                 List<Map<String, Object>> hbas = vcsdkUtils.getHbasByHostObjectId(hostId);
+                String s = new Gson().toJson(hbas);
                 if (hbas != null && hbas.size() > 0) {
                     List<String> wwniqns = new ArrayList<>();
                     for (Map<String, Object> hba : hbas) {
@@ -532,6 +534,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
                     //取出所有主机
                     List<Map<String, Object>> hostlist = dmeAccessService.getDmeHosts(null);
+                    String s1 = new Gson().toJson(hostlist);
                     if (hostlist != null && hostlist.size() > 0) {
                         for (Map<String, Object> hostmap : hostlist) {
                             if (hostmap != null && hostmap.get("id") != null) {
@@ -539,6 +542,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                 String demHostId = ToolUtils.getStr(hostmap.get("id"));
                                 //得到主机的启动器
                                 List<Map<String, Object>> initiators = dmeAccessService.getDmeHostInitiators(demHostId);
+                                String ss = new Gson().toJson(initiators);
                                 if (initiators != null && initiators.size() > 0) {
                                     for (Map<String, Object> inimap : initiators) {
                                         String portName = ToolUtils.getStr(inimap.get("port_name"));
@@ -564,6 +568,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         if (null != hostmap && null != hostmap.get(DmeConstants.ID)) {
                             objId = hostmap.get("id").toString();
                         }
+                        String s2 = new Gson().toJson(hostmap);
                     }
                 } else {
                     throw new Exception(hostIp + " The host did not find a valid HbA");
@@ -806,6 +811,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         try {
             ResponseEntity responseEntity = dmeAccessService.access(listVolumeUrl, HttpMethod.GET, null);
+            String s = new Gson().toJson(responseEntity);
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
 
