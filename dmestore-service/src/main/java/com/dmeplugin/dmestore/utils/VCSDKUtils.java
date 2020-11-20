@@ -2971,7 +2971,7 @@ public class VCSDKUtils {
 
     //通过vmObjId获取所属主机信息
     public Map<String, String> getHostByVmObjectId(String vmObjectId) {
-        Map<String, String> map = null;
+        Map <String, String> map = null;
         try {
             String serverguid = vcConnectionHelper.objectId2Serverguid(vmObjectId);
             VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
