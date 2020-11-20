@@ -459,7 +459,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     private Double getDataspaceOfStoragepool(String storagePoolName,String poolId,String storageId) throws Exception {
         Double dataSpace = 0.0;
         String className = "SYS_StoragePool";
-        String url = API_STORAGEPOOL_LIST +className +"?condition={json}";
+        String url = API_STORAGEPOOL_LIST + className + "?condition={json}";
         JsonObject condition = new JsonObject();
         JsonArray constraint = new JsonArray();
 
@@ -498,10 +498,11 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             constraint.add(consObj1);
         }
         condition.add("constraint", constraint);
+        String s = gson.toJson(condition);
         ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, gson.toJson(condition));
-        LOG.info("url:{" + API_STORAGEPOOL_LIST + "},responseEntity:" + responseEntity);
+        LOG.info("url:{" + url + "},responseEntity:" + responseEntity);
         int code = responseEntity.getStatusCodeValue();
-        if (code == HttpStatus.ACCEPTED.value()) {
+        if (code == HttpStatus.OK.value()) {
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
             JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();

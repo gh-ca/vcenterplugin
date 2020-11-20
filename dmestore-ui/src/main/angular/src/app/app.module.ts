@@ -9,7 +9,6 @@ import { RoutesModule } from './routes/routes.module';
 import { SharedModule } from './shared/shared.module';
 import { AppComponent } from './app.component';
 
-import { ToastrModule } from 'ngx-toastr';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 // Required for AOT compilation
@@ -19,7 +18,6 @@ export function TranslateHttpLoaderFactory(http: HttpClient) {
 
 import { httpInterceptorProviders } from '@core/interceptors';
 import { appInitializerProviders } from '@core/initializers';
-import { FormlyConfigModule } from './formly-config.module';
 import { Globals, GlobalsService } from "./shared/globals.service";
 
 @NgModule({
@@ -32,8 +30,6 @@ import { Globals, GlobalsService } from "./shared/globals.service";
     ThemeModule,
     RoutesModule,
     SharedModule,
-    FormlyConfigModule.forRoot(),
-    ToastrModule.forRoot(),
     TranslateModule.forRoot({
       loader: {
         provide: TranslateLoader,
