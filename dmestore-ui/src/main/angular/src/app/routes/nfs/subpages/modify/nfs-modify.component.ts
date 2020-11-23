@@ -1,8 +1,8 @@
 import {ChangeDetectorRef, Component, OnInit} from "@angular/core";
 import {GlobalsService} from "../../../../shared/globals.service";
 import {ActivatedRoute, Router} from "@angular/router";
-import {NfsModify, NfsModifyService} from "./nfs-modify.service";
-import {ModifyNfs, UpdateNfs} from "../../nfs.service";
+import {NfsModifyService} from "./nfs-modify.service";
+import {UpdateNfs} from "../../nfs.service";
 
 @Component({
   selector: 'app-add',
@@ -24,6 +24,7 @@ export class NfsModifyComponent implements OnInit{
   minbandwidthChoose=false; // 最小带宽 选中
   miniopsChoose=false; // 最小iops 选中
   latencyChoose=false; // 时延 选中
+  modifySuccessShow = false; // 编辑程功窗口
 
   constructor(private modifyService: NfsModifyService, private cdr: ChangeDetectorRef,
               private gs: GlobalsService,
@@ -50,6 +51,9 @@ export class NfsModifyComponent implements OnInit{
         this.updateNfs=result.data;
         this.updateNfs.sameName=true;
         this.updateNfs.dataStoreObjectId=this.objectId;
+        this.oldNfsName=this.updateNfs.nfsName;
+        this.oldFsName=this.updateNfs.fsName;
+        this.oldShareName=this.updateNfs.shareName
         this.modalLoading=false;
       }
     });
@@ -64,15 +68,12 @@ export class NfsModifyComponent implements OnInit{
     this.modifyService.updateNfs(this.updateNfs).subscribe((result: any) => {
       this.modalHandleLoading=false;
       if (result.code === '200'){
-        if (this.pluginFlag=='plugin'){
-          this.backToNfsList();
-        }else{
-          this.closeModel();
-        }
+        this.modifySuccessShow = true;
       }else{
         this.errorMsg = '1';
         console.log("Delete failed:",result.description)
       }
+      this.cdr.detectChanges();
     });
   }
   backToNfsList(){
@@ -130,6 +131,113 @@ export class NfsModifyComponent implements OnInit{
           this.updateNfs.latency = objVal;
           break;
       }
+    }
+  }
+  matchErr=false;
+  nfsNameRepeatErr=false;
+  shareNameRepeatErr=false;
+  fsNameRepeatErr=false;
+  oldNfsName:string;
+  oldShareName:string;
+  oldFsName:string;
+  checkNfsName(){
+    if(this.updateNfs.nfsName==null) return false;
+    if(this.oldNfsName==this.updateNfs.nfsName) return false;
+    this.oldNfsName=this.updateNfs.nfsName;
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    if(reg5.test(this.updateNfs.nfsName)){
+      //验证重复
+      this.matchErr=false;
+      if (this.updateNfs.sameName){
+        this.checkNfsNameExist(this.updateNfs.nfsName);
+        this.checkShareNameExist(this.updateNfs.nfsName);
+        this.checkFsNameExist(this.updateNfs.nfsName);
+      }else{
+        this.checkNfsNameExist(this.updateNfs.nfsName);
+      }
+    }else{
+      //
+      this.matchErr=true;
+      //不满足的时候置空
+      this.updateNfs.nfsName=null;
+      console.log('验证不通过');
+    }
+  }
+  checkShareName(){
+    if(this.updateNfs.shareName==null) return false;
+    if(this.oldShareName=this.updateNfs.shareName) return false;
+
+    this.oldShareName=this.updateNfs.shareName;
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    if(reg5.test(this.updateNfs.shareName)){
+      //验证重复
+      this.matchErr=false;
+      this.checkShareNameExist(this.updateNfs.shareName);
+    }else{
+      this.matchErr=true;
+      this.updateNfs.shareName=null;
+    }
+  }
+  checkFsName(){
+    if(this.updateNfs.fsName==null) return false;
+    if(this.oldFsName=this.updateNfs.fsName) return false;
+
+    this.oldFsName=this.updateNfs.fsName;
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    if(reg5.test(this.updateNfs.fsName)){
+      //验证重复
+      this.matchErr=false;
+      this.checkShareNameExist(this.updateNfs.fsName);
+    }else{
+      this.matchErr=true;
+      this.updateNfs.fsName=null;
+    }
+  }
+  checkNfsNameExist(name:string){
+    this.modifyService.checkNfsNameExist(name).subscribe((r:any)=>{
+      if (r.code=='200'){
+        if(r.data){
+          this.nfsNameRepeatErr=false;
+        }else{
+          this.nfsNameRepeatErr=true;
+          this.updateNfs.nfsName=null;
+        }
+      }
+    });
+  }
+  checkShareNameExist(name:string){
+    this.modifyService.checkShareNameExist(name).subscribe((r:any)=>{
+      if (r.code=='200'){
+        if(r.data){
+          this.shareNameRepeatErr=false;
+        }else{
+          this.shareNameRepeatErr=true;
+          this.updateNfs.nfsName=null;
+        }
+      }
+    });
+  }
+  checkFsNameExist(name:string){
+    this.modifyService.checkFsNameExist(name).subscribe((r:any)=>{
+      if (r.code=='200'){
+        if(r.data){
+          this.shareNameRepeatErr=false;
+        }else{
+          this.shareNameRepeatErr=true;
+          this.updateNfs.nfsName=null;
+        }
+      }
+    });
+  }
+
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    if (this.pluginFlag=='plugin'){
+      this.backToNfsList();
+    }else{
+      this.closeModel();
     }
   }
 }

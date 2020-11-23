@@ -17,7 +17,14 @@
         <!--名称-->
         <clr-input-container>
           <label>{{'nfs.name' | translate}}</label>
-          <input clrInput name="nfsName" [(ngModel)]="updateNfs.nfsName"/>
+          <input clrInput name="nfsName" [(ngModel)]="updateNfs.nfsName" (blur)="checkNfsName();"/>
+          <clr-control-error>
+            <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="nfsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+              <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+              <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
+          </clr-control-error>
         </clr-input-container>
         <clr-checkbox-container>
           <label></label>
@@ -28,11 +35,21 @@
         </clr-checkbox-container>
         <clr-input-container *ngIf="!updateNfs.sameName">
           <label>{{'nfs.fsName' | translate}}</label>
-          <input clrInput [(ngModel)]="updateNfs.fsName" name="fsName" />
+          <input clrInput [(ngModel)]="updateNfs.fsName" name="fsName" (blur)="checkFsName();"/>
+          <clr-control-error>
+            <p *ngIf="!oldFsName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+          </clr-control-error>
         </clr-input-container>
         <clr-input-container *ngIf="!updateNfs.sameName">
           <label>{{'nfs.shareName' | translate}}</label>
-          <input clrInput [(ngModel)]="updateNfs.shareName" name="shareName" />
+          <input clrInput [(ngModel)]="updateNfs.shareName" name="shareName" (blur)="checkShareName();" />
+          <clr-control-error>
+            <p *ngIf="!oldShareName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
+          </clr-control-error>
         </clr-input-container>
         <!--qos-->
         <clr-toggle-wrapper>
@@ -85,7 +102,7 @@
                 <input type="checkbox" [(ngModel)]="maxbandwidthChoose" name="maxbandwidthChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.bandwidthLimitUpper' | translate}}
-                  <input type="number" [(readOnly)]="!maxbandwidthChoose" class="inputOneLine" name="maxBandwidth"
+                  <input type="number" min="0" [(readOnly)]="!maxbandwidthChoose" class="inputOneLine" name="maxBandwidth"
                          [(ngModel)]="updateNfs.maxBandwidth" (blur)="qosBlur('add', 'maxbandwidth');"/>
                   {{'vmfs.unitM' | translate}}
                 </label>
@@ -98,7 +115,7 @@
                 <input type="checkbox" [(ngModel)]="maxiopsChoose" name="maxiopsChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.IOPSLimitUpper' | translate}}
-                  <input type="number" [(readOnly)]="!maxiopsChoose" class="inputOneLine" name="maxIops"
+                  <input type="number" min="0" [(readOnly)]="!maxiopsChoose" class="inputOneLine" name="maxIops"
                          [(ngModel)]="updateNfs.maxIops" (blur)="qosBlur('add', 'maxiops');"/>
                 </label>
               </clr-checkbox-wrapper>
@@ -111,7 +128,7 @@
                 <input type="checkbox" [(ngModel)]="minbandwidthChoose" name="minbandwidthChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.bandwidthLimitLower' | translate}}
-                  <input type="number" [(readOnly)]="!minbandwidthChoose" class="inputOneLine"
+                  <input type="number" min="0" [(readOnly)]="!minbandwidthChoose" class="inputOneLine"
                          name="minBandwidth" [(ngModel)]="updateNfs.minBandwidth" (blur)="qosBlur('add', 'minbandwidth');"/>
                   {{'vmfs.unitM' | translate}}
                 </label>
@@ -124,7 +141,7 @@
                 <input type="checkbox" [(ngModel)]="miniopsChoose" name="minbandwidthChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.IOPSLimitLower' | translate}}
-                  <input type="number" [(readOnly)]="!miniopsChoose" class="inputOneLine" name="minIops"
+                  <input type="number" min="0" [(readOnly)]="!miniopsChoose" class="inputOneLine" name="minIops"
                          [(ngModel)]="updateNfs.minIops" (blur)="qosBlur('add', 'miniops');"/>
                 </label>
               </clr-checkbox-wrapper>
@@ -136,7 +153,7 @@
                 <input type="checkbox" [(ngModel)]="latencyChoose" name="latencyChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.latencyMax' | translate}}
-                  <input type="number" [(readOnly)]="!latencyChoose" class="inputOneLine" name="latency"
+                  <input type="number" min="0" [(readOnly)]="!latencyChoose" class="inputOneLine" name="latency"
                          [(ngModel)]="updateNfs.latency" (blur)="qosBlur('add', 'latency');"/>{{'vmfs.latencyUnit' | translate}}
                 </label>
               </clr-checkbox-wrapper>
@@ -149,7 +166,7 @@
           <input type="checkbox" name="thin" clrToggle [(ngModel)]="updateNfs.thin"/>
         </clr-toggle-wrapper>
         <!--重删-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.dataDedu' | translate}}</label>
           <select clrSelect [(ngModel)]="updateNfs.deduplicationEnabled" name="deduplicationEnabled">
             <option value="false">{{'nfs.disable' | translate}}</option>
@@ -157,7 +174,7 @@
           </select>
         </clr-select-container>
         <!--压缩-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.dataCompre' | translate}}</label>
           <select clrSelect [(ngModel)]="updateNfs.compressionEnabled" name="compressionEnabled">
             <option value="false">{{'nfs.disable' | translate}}</option>
@@ -193,7 +210,14 @@
         <!--名称-->
         <clr-input-container>
           <label>{{'nfs.name' | translate}}</label>
-          <input clrInput name="nfsName" [(ngModel)]="updateNfs.nfsName"/>
+          <input clrInput name="nfsName" [(ngModel)]="updateNfs.nfsName" (blur)="checkNfsName();"/>
+          <clr-control-error>
+            <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="nfsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+            <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+            <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
+          </clr-control-error>
         </clr-input-container>
         <clr-checkbox-container>
           <label></label>
@@ -204,11 +228,21 @@
         </clr-checkbox-container>
         <clr-input-container *ngIf="!updateNfs.sameName">
           <label>{{'nfs.fsName' | translate}}</label>
-          <input clrInput [(ngModel)]="updateNfs.fsName" name="fsName" />
+          <input clrInput [(ngModel)]="updateNfs.fsName" name="fsName" (blur)="checkFsName();"/>
+          <clr-control-error>
+            <p *ngIf="!oldFsName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+          </clr-control-error>
         </clr-input-container>
         <clr-input-container *ngIf="!updateNfs.sameName">
           <label>{{'nfs.shareName' | translate}}</label>
-          <input clrInput [(ngModel)]="updateNfs.shareName" name="shareName" />
+          <input clrInput [(ngModel)]="updateNfs.shareName" name="shareName" (blur)="checkShareName();" />
+          <clr-control-error>
+            <p *ngIf="!oldShareName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
+          </clr-control-error>
         </clr-input-container>
         <!--qos-->
         <clr-toggle-wrapper>
@@ -235,7 +269,7 @@
                 <input type="checkbox" [(ngModel)]="maxbandwidthChoose" name="maxbandwidthChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.bandwidthLimitUpper' | translate}}
-                  <input type="number" [(readOnly)]="!maxbandwidthChoose" class="inputOneLine" name="maxBandwidth"
+                  <input type="number" min="0" [(readOnly)]="!maxbandwidthChoose" class="inputOneLine" name="maxBandwidth"
                          [(ngModel)]="updateNfs.maxBandwidth" (blur)="qosBlur('add', 'maxbandwidth');"/>
                   {{'vmfs.unitM' | translate}}
                 </label>
@@ -248,7 +282,7 @@
                 <input type="checkbox" [(ngModel)]="maxiopsChoose" name="maxiopsChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.IOPSLimitUpper' | translate}}
-                  <input type="number" [(readOnly)]="!maxiopsChoose" class="inputOneLine" name="maxIops"
+                  <input type="number" min="0" [(readOnly)]="!maxiopsChoose" class="inputOneLine" name="maxIops"
                          [(ngModel)]="updateNfs.maxIops" (blur)="qosBlur('add', 'maxiops');"/>
                 </label>
               </clr-checkbox-wrapper>
@@ -261,7 +295,7 @@
                 <input type="checkbox" [(ngModel)]="minbandwidthChoose" name="minbandwidthChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.bandwidthLimitLower' | translate}}
-                  <input type="number" [(readOnly)]="!minbandwidthChoose" class="inputOneLine"
+                  <input type="number" min="0" [(readOnly)]="!minbandwidthChoose" class="inputOneLine"
                          name="minBandwidth" [(ngModel)]="updateNfs.minBandwidth" (blur)="qosBlur('add', 'minbandwidth');"/>
                   {{'vmfs.unitM' | translate}}
                 </label>
@@ -274,7 +308,7 @@
                 <input type="checkbox" [(ngModel)]="miniopsChoose" name="minbandwidthChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.IOPSLimitLower' | translate}}
-                  <input type="number" [(readOnly)]="!miniopsChoose" class="inputOneLine" name="minIops"
+                  <input type="number" min="0" [(readOnly)]="!miniopsChoose" class="inputOneLine" name="minIops"
                          [(ngModel)]="updateNfs.minIops" (blur)="qosBlur('add', 'miniops');"/>
                 </label>
               </clr-checkbox-wrapper>
@@ -286,7 +320,7 @@
                 <input type="checkbox" [(ngModel)]="latencyChoose" name="latencyChoose" clrCheckbox/>
                 <label>
                   {{'vmfs.latencyMax' | translate}}
-                  <input type="number" [(readOnly)]="!latencyChoose" class="inputOneLine" name="latency"
+                  <input type="number" min="0" [(readOnly)]="!latencyChoose" class="inputOneLine" name="latency"
                          [(ngModel)]="updateNfs.latency" (blur)="qosBlur('add', 'latency');"/>{{'vmfs.latencyUnit' | translate}}
                 </label>
               </clr-checkbox-wrapper>
@@ -299,7 +333,7 @@
           <input type="checkbox" name="thin" clrToggle [(ngModel)]="updateNfs.thin"/>
         </clr-toggle-wrapper>
         <!--重删-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.dataDedu' | translate}}</label>
           <select clrSelect [(ngModel)]="updateNfs.deduplicationEnabled" name="deduplicationEnabled">
             <option value="false">{{'nfs.disable' | translate}}</option>
@@ -307,7 +341,7 @@
           </select>
         </clr-select-container>
         <!--压缩-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.dataCompre' | translate}}</label>
           <select clrSelect [(ngModel)]="updateNfs.compressionEnabled" name="compressionEnabled">
             <option value="false">{{'nfs.disable' | translate}}</option>
@@ -323,6 +357,17 @@
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="closeModel()">{{'menu.cancel' | translate}}</button>
       <button type="button" class="btn btn-primary" (click)="modifyCommit()">{{'menu.ok' | translate}}</button>
+    </div>
+  </clr-modal>
+
+  <!--操作成功提示-->
+  <clr-modal [(clrModalOpen)]="modifySuccessShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+    <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+    <div class="modal-body">
+      <p *ngIf="modifySuccessShow">{{'vmfs.modify.success' | translate}}</p>
+    </div>
+    <div class="modal-footer">
+      <button type="submit" class="btn btn-primary" (click)="modifySuccessShow = false;confirmActResult();">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 </div>

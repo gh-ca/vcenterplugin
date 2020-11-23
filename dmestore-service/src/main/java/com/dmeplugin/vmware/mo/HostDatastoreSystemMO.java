@@ -38,7 +38,7 @@ public class HostDatastoreSystemMO extends BaseMO {
 
     public ManagedObjectReference findDatastore(String name) throws Exception {
         // added Apache CloudStack specific name convention, we will use custom field "cloud.uuid" as datastore name as well
-        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(_context, _context.getServiceContent().getCustomFieldsManager());
+        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context, context.getServiceContent().getCustomFieldsManager());
         int key = cfmMo.getCustomFieldKey("Datastore", CustomFieldConstants.CLOUD_UUID);
         assert (key != 0);
 
@@ -66,15 +66,15 @@ public class HostDatastoreSystemMO extends BaseMO {
     }
 
     public List<HostUnresolvedVmfsVolume> queryUnresolvedVmfsVolumes() throws Exception {
-        return _context.getService().queryUnresolvedVmfsVolumes(_mor);
+        return context.getService().queryUnresolvedVmfsVolumes(mor);
     }
 
-    public List<VmfsDatastoreOption> queryVmfsDatastoreExpandOptions(DatastoreMO datastoreMO) throws Exception {
-        return _context.getService().queryVmfsDatastoreExpandOptions(_mor, datastoreMO.getMor());
+    public List<VmfsDatastoreOption> queryVmfsDatastoreExpandOptions(DatastoreMO datastoreMo) throws Exception {
+        return context.getService().queryVmfsDatastoreExpandOptions(mor, datastoreMo.getMor());
     }
 
-    public void expandVmfsDatastore(DatastoreMO datastoreMO, VmfsDatastoreExpandSpec vmfsDatastoreExpandSpec) throws Exception {
-        _context.getService().expandVmfsDatastore(_mor, datastoreMO.getMor(), vmfsDatastoreExpandSpec);
+    public void expandVmfsDatastore(DatastoreMO datastoreMo, VmfsDatastoreExpandSpec vmfsDatastoreExpandSpec) throws Exception {
+        context.getService().expandVmfsDatastore(mor, datastoreMo.getMor(), vmfsDatastoreExpandSpec);
     }
 
     // storeUrl in nfs://host/exportpath format
@@ -126,7 +126,7 @@ public class HostDatastoreSystemMO extends BaseMO {
         List<ManagedObjectReference> datastores = getDatastores();
         if (datastores != null && datastores.size() > 0) {
             for (ManagedObjectReference morDatastore : datastores) {
-                DatastoreMO dsMo = new DatastoreMO(_context, morDatastore);
+                DatastoreMO dsMo = new DatastoreMO(context, morDatastore);
                 if (dsMo.getInventoryPath().equals(exportPath)) {
                     return morDatastore;
                 }
@@ -150,7 +150,7 @@ public class HostDatastoreSystemMO extends BaseMO {
     }
 
     public List<HostScsiDisk> queryAvailableDisksForVmfs() throws Exception {
-        return _context.getService().queryAvailableDisksForVmfs(_mor, null);
+        return context.getService().queryAvailableDisksForVmfs(mor, null);
     }
 
     public ManagedObjectReference createVmfsDatastore(String datastoreName,
@@ -161,7 +161,7 @@ public class HostDatastoreSystemMO extends BaseMO {
                                                       int unmapGranularity,
                                                       String unmapPriority) throws Exception {
         // just grab the first instance of VmfsDatastoreOption
-        VmfsDatastoreOption vmfsDatastoreOption = _context.getService().queryVmfsDatastoreCreateOptions(_mor, hostScsiDisk.getDevicePath(), vmfsMajorVersion).get(0);
+        VmfsDatastoreOption vmfsDatastoreOption = context.getService().queryVmfsDatastoreCreateOptions(mor, hostScsiDisk.getDevicePath(), vmfsMajorVersion).get(0);
 
         VmfsDatastoreCreateSpec vmfsDatastoreCreateSpec = (VmfsDatastoreCreateSpec)vmfsDatastoreOption.getSpec();
 
@@ -172,13 +172,13 @@ public class HostDatastoreSystemMO extends BaseMO {
         vmfsDatastoreCreateSpec.getVmfs().setUnmapPriority(unmapPriority);
         vmfsDatastoreCreateSpec.getPartition().setTotalSectors(totalSectors);
 
-        return _context.getService().createVmfsDatastore(_mor, vmfsDatastoreCreateSpec);
+        return context.getService().createVmfsDatastore(mor, vmfsDatastoreCreateSpec);
     }
 
     public boolean deleteDatastore(String name) throws Exception {
         ManagedObjectReference morDatastore = findDatastore(name);
         if (morDatastore != null) {
-            _context.getService().removeDatastore(_mor, morDatastore);
+            context.getService().removeDatastore(mor, morDatastore);
             return true;
         }
         return false;
@@ -205,26 +205,25 @@ public class HostDatastoreSystemMO extends BaseMO {
         spec.setType(type);
         //需要设置datastore名称
         spec.setLocalPath(uuid);
-
         // readOnly/readWrite
         if (!StringUtils.isEmpty(accessMode)) {
             spec.setAccessMode(accessMode);
         } else {
             spec.setAccessMode("readWrite");
         }
-        return _context.getService().createNasDatastore(_mor, spec);
+        return context.getService().createNasDatastore(mor, spec);
     }
 
     public List<ManagedObjectReference> getDatastores() throws Exception {
-        return _context.getVimClient().getDynamicProperty(_mor, "datastore");
+        return context.getVimClient().getDynamicProperty(mor, "datastore");
     }
 
     public DatastoreInfo getDatastoreInfo(ManagedObjectReference morDatastore) throws Exception {
-        return (DatastoreInfo)_context.getVimClient().getDynamicProperty(morDatastore, "info");
+        return (DatastoreInfo) context.getVimClient().getDynamicProperty(morDatastore, "info");
     }
 
     public NasDatastoreInfo getNasDatastoreInfo(ManagedObjectReference morDatastore) throws Exception {
-        DatastoreInfo info = (DatastoreInfo)_context.getVimClient().getDynamicProperty(morDatastore, "info");
+        DatastoreInfo info = (DatastoreInfo) context.getVimClient().getDynamicProperty(morDatastore, "info");
         if (info instanceof NasDatastoreInfo) {
             return (NasDatastoreInfo)info;
         }
@@ -232,18 +231,18 @@ public class HostDatastoreSystemMO extends BaseMO {
     }
 
     public HostResignatureRescanResult resignatureUnresolvedVmfsVolume(HostUnresolvedVmfsResignatureSpec resolutionSpec) throws Exception {
-        ManagedObjectReference task = _context.getService().resignatureUnresolvedVmfsVolumeTask(_mor, resolutionSpec);
+        ManagedObjectReference task = context.getService().resignatureUnresolvedVmfsVolumeTask(mor, resolutionSpec);
 
-        boolean result = _context.getVimClient().waitForTask(task);
+        boolean result = context.getVimClient().waitForTask(task);
 
         if (result) {
-            _context.waitForTaskProgressDone(task);
+            context.waitForTaskProgressDone(task);
 
-            TaskMO taskMO = new TaskMO(_context, task);
+            TaskMO taskMo = new TaskMO(context, task);
 
-            return (HostResignatureRescanResult)taskMO.getTaskInfo().getResult();
+            return (HostResignatureRescanResult)taskMo.getTaskInfo().getResult();
         } else {
-            throw new Exception("Unable to register vm due to " + TaskMO.getTaskFailureInfo(_context, task));
+            throw new Exception("Unable to register vm due to " + TaskMO.getTaskFailureInfo(context, task));
         }
     }
 
@@ -259,7 +258,7 @@ public class HostDatastoreSystemMO extends BaseMO {
         hostDsSys2DatastoreTraversal.setName("hostDsSys2DatastoreTraversal");
 
         ObjectSpec oSpec = new ObjectSpec();
-        oSpec.setObj(_mor);
+        oSpec.setObj(mor);
         oSpec.setSkip(Boolean.TRUE);
         oSpec.getSelectSet().add(hostDsSys2DatastoreTraversal);
 
@@ -269,9 +268,9 @@ public class HostDatastoreSystemMO extends BaseMO {
         List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
         pfSpecArr.add(pfSpec);
 
-        return _context.getService().retrieveProperties(_context.getPropertyCollector(), pfSpecArr);
+        return context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
     }
     public void unmapVmfsVolumeExTask(List<String> vmfsUuids) throws Exception {
-        _context.getService().unmapVmfsVolumeExTask(_mor, vmfsUuids);
+        context.getService().unmapVmfsVolumeExTask(mor, vmfsUuids);
     }
 }

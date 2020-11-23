@@ -39,12 +39,12 @@ public class HostDatastoreBrowserMO extends BaseMO {
         super(context, morType, morValue);
     }
 
-    public void DeleteFile(String datastoreFullPath) throws Exception {
+    public void deleteFile(String datastoreFullPath) throws Exception {
         if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - deleteFile(). target mor: " + _mor.getValue() + ", file datastore path: " + datastoreFullPath);
+            s_logger.trace("vCenter API trace - deleteFile(). target mor: " + mor.getValue() + ", file datastore path: " + datastoreFullPath);
         }
 
-        _context.getService().deleteFile(_mor, datastoreFullPath);
+        context.getService().deleteFile(mor, datastoreFullPath);
 
         if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - deleteFile() done");
@@ -53,19 +53,19 @@ public class HostDatastoreBrowserMO extends BaseMO {
 
     public HostDatastoreBrowserSearchResults searchDatastore(String datastorePath, HostDatastoreBrowserSearchSpec searchSpec) throws Exception {
         if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - searchDatastore(). target mor: " + _mor.getValue() + ", file datastore path: " + datastorePath);
+            s_logger.trace("vCenter API trace - searchDatastore(). target mor: " + mor.getValue() + ", file datastore path: " + datastorePath);
         }
 
         try {
-            ManagedObjectReference morTask = _context.getService().searchDatastoreTask(_mor, datastorePath, searchSpec);
+            ManagedObjectReference morTask = context.getService().searchDatastoreTask(mor, datastorePath, searchSpec);
 
-            boolean result = _context.getVimClient().waitForTask(morTask);
+            boolean result = context.getVimClient().waitForTask(morTask);
             if (result) {
-                _context.waitForTaskProgressDone(morTask);
+                context.waitForTaskProgressDone(morTask);
 
-                return (HostDatastoreBrowserSearchResults)_context.getVimClient().getDynamicProperty(morTask, "info.result");
+                return (HostDatastoreBrowserSearchResults) context.getVimClient().getDynamicProperty(morTask, "info.result");
             } else {
-                s_logger.error("VMware searchDaastore_Task failed due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+                s_logger.error("VMware searchDaastore_Task failed due to " + TaskMO.getTaskFailureInfo(context, morTask));
             }
         } finally {
             if (s_logger.isTraceEnabled()) {
@@ -87,19 +87,19 @@ public class HostDatastoreBrowserMO extends BaseMO {
     @SuppressWarnings("unchecked")
     public ArrayList<HostDatastoreBrowserSearchResults> searchDatastoreSubFolders(String datastorePath, HostDatastoreBrowserSearchSpec searchSpec) throws Exception {
         if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - searchDatastoreSubFolders(). target mor: " + _mor.getValue() + ", file datastore path: " + datastorePath);
+            s_logger.trace("vCenter API trace - searchDatastoreSubFolders(). target mor: " + mor.getValue() + ", file datastore path: " + datastorePath);
         }
 
         try {
-            ManagedObjectReference morTask = _context.getService().searchDatastoreSubFoldersTask(_mor, datastorePath, searchSpec);
+            ManagedObjectReference morTask = context.getService().searchDatastoreSubFoldersTask(mor, datastorePath, searchSpec);
 
-            boolean result = _context.getVimClient().waitForTask(morTask);
+            boolean result = context.getVimClient().waitForTask(morTask);
             if (result) {
-                _context.waitForTaskProgressDone(morTask);
+                context.waitForTaskProgressDone(morTask);
 
-                return (ArrayList<HostDatastoreBrowserSearchResults>)_context.getVimClient().getDynamicProperty(morTask, "info.result");
+                return (ArrayList<HostDatastoreBrowserSearchResults>) context.getVimClient().getDynamicProperty(morTask, "info.result");
             } else {
-                s_logger.error("VMware searchDaastoreSubFolders_Task failed due to " + TaskMO.getTaskFailureInfo(_context, morTask));
+                s_logger.error("VMware searchDaastoreSubFolders_Task failed due to " + TaskMO.getTaskFailureInfo(context, morTask));
             }
         } finally {
             if (s_logger.isTraceEnabled()) {

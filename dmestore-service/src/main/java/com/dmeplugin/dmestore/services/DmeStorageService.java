@@ -47,7 +47,19 @@ public interface DmeStorageService {
      * @param storageId
      * @return
      */
-    List<Volume> getVolumes(String storageId) throws DMEException;
+    //List<Volume> getVolumes(String storageId) throws DMEException;
+
+    /**
+     * 分页获取卷列表
+     * @author wangxy
+     * @date 14:13 2020/11/4
+     * @param storageId
+     * @param pageSize
+     * @param pageNo
+     * @throws DMEException
+     * @return com.dmeplugin.dmestore.model.VolumeListRestponse
+     **/
+    VolumeListRestponse getVolumesByPage(String storageId, String pageSize, String pageNo) throws DMEException;
 
     /**
      * 获取文件系统列表
@@ -104,7 +116,7 @@ public interface DmeStorageService {
      * @param volumeId
      * @return
      */
-    Map<String, Object> getVolume(String volumeId);
+    Map<String, Object> getVolume(String volumeId) throws DMEException;
 
     /**
      * 获取存储端口列表
@@ -170,7 +182,7 @@ public interface DmeStorageService {
      */
     public List<Volume> listVolumesPerformance(List<String> volumeId) throws DMEException;
 
-    Boolean queryVolumeByName(String name,String storageId) throws DMEException;
+    Boolean queryVolumeByName(String name) throws DMEException;
 
     Boolean queryFsByName(String name, String storageId) throws DMEException;
 

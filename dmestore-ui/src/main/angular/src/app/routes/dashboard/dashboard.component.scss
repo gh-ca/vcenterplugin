@@ -130,3 +130,7 @@
   margin-top: -15px;
   margin-left: -15px;
 }
+
+::ng-deep body, html {
+  overflow: scroll;
+}

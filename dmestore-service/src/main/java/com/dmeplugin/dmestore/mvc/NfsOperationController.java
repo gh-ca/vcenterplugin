@@ -19,11 +19,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/operatenfs")
-@Api
 public class NfsOperationController extends BaseController{
 
     public static final Logger LOG = LoggerFactory.getLogger(NfsOperationController.class);
-    private final String API_RESP_CODE = "code";
+    //QOS策略上限标识
+    private final String CONTROL_UP = "up";
+    //QOS策略下限标识
+    private final String CONTROL_LOW = "low";
     private Gson gson=new Gson();
 
     @Autowired
@@ -52,15 +54,12 @@ public class NfsOperationController extends BaseController{
      * minBandwidth
      * minIops
      * latency
-     *
      * thin true  代表thin false代表thick
      * deduplicationEnabled 重删 true false
      * compressionEnabled 压缩 true false
      * autoSizeEnable 自动扩容 true false
-     *
      * vkernelIp 虚拟网卡ip
      * hostObjectId 挂载主机的Objectid
-     *
      * accessMode 挂载方式 只读 "readOnly" 读写 "readWrite
      * securityType NFS41的时候，安全类型AUTH_SYS,SEC_KRB5,SEC_KRB5I
      * }
@@ -118,10 +117,10 @@ public class NfsOperationController extends BaseController{
             if (qosFlag) {
                 Map<String, Object> qosPolicy = new HashMap<>(16);
                 String contolPolicy = (String) params.get("contolPolicy");
-                if ("up".equals(contolPolicy)) {
+                if (CONTROL_UP.equals(contolPolicy)) {
                     qosPolicy.put("max_bandwidth", params.get("maxBandwidth"));
                     qosPolicy.put("max_iops", params.get("maxIops"));
-                } else if ("low".equals(contolPolicy)) {
+                } else if (CONTROL_LOW.equals(contolPolicy)) {
                     qosPolicy.put("min_bandwidth", params.get("minBandwidth"));
                     qosPolicy.put("min_iops", params.get("minIops"));
                     qosPolicy.put("latency", params.get("latency"));
@@ -153,7 +152,6 @@ public class NfsOperationController extends BaseController{
             nfsOperationService.createNfsDatastore(param);
             return success();
         } catch (DMEException e) {
-            e.printStackTrace();
             return failure(e.getMessage());
         }
 
@@ -172,8 +170,8 @@ public class NfsOperationController extends BaseController{
      *      "maxBandwidth": "1",
      *      "maxIops": "2"
      *      "minBandwidth"
-     * 	 "minIops"
-     * 	 "latency"
+     * 	    "minIops"
+     * 	    "latency"
      *      "shareId":"70C9358F595B3AA5A1DB2464F72AF0DA"
      *      "advance"false true  true 是有高级选项
      *      "qosFlag"qos策略开关 false true false关闭
@@ -218,11 +216,11 @@ public class NfsOperationController extends BaseController{
         if (qosFlag) {
             Map<String, Object> qosPolicy = new HashMap<>(16);
             String contolPolicy = (String)params.get("contolPolicy");
-            if ("low".equals(contolPolicy)) {
+            if (CONTROL_LOW.equals(contolPolicy)) {
                 qosPolicy.put("min_bandwidth", params.get("minBandwidth"));
                 qosPolicy.put("min_iops", params.get("minIops"));
                 qosPolicy.put("latency", params.get("latency"));
-            } else if ("up".equals(contolPolicy)) {
+            } else if (CONTROL_UP.equals(contolPolicy)) {
                 qosPolicy.put("max_bandwidth", params.get("maxBandwidth"));
                 qosPolicy.put("max_iops", params.get("maxIops"));
             }
@@ -232,7 +230,6 @@ public class NfsOperationController extends BaseController{
             nfsOperationService.updateNfsDatastore(param);
             return success();
         } catch (DMEException e) {
-            e.printStackTrace();
             return failure(e.getMessage());
         }
 
@@ -254,7 +251,6 @@ public class NfsOperationController extends BaseController{
             nfsOperationService.changeNfsCapacity(params);
             return success();
         } catch (DMEException e) {
-            e.printStackTrace();
             return failure(e.getMessage());
         }
 
@@ -272,7 +268,6 @@ public class NfsOperationController extends BaseController{
         try {
             return success(nfsOperationService.getEditNfsStore(storeObjectId));
         } catch (DMEException e) {
-            e.printStackTrace();
             return failure(e.getMessage());
         }
 

@@ -31,7 +31,7 @@ export class ExpandComponent implements OnInit{
   vmfsInfo: VmfsInfo;
 
   // 弹窗隐藏/显示
-  // expandShow = false;
+  expandShow = false;
   isOperationErr = false; // 错误信息
   capacityErr = false; // 扩容容量错误信息
   modalHandleLoading = false; // 数据处理loading
@@ -47,7 +47,7 @@ export class ExpandComponent implements OnInit{
    * 初始化数据
    */
   initData() {
-    // this.expandShow = false;
+    this.expandShow = true;
     this.modalHandleLoading = false;
     this.modalLoading = true;
     this.expandErr = false;
@@ -70,7 +70,6 @@ export class ExpandComponent implements OnInit{
             this.expandForm.volume_id = this.vmfsInfo.volumeId;
             this.expandForm.ds_name = this.vmfsInfo.name;
           }
-          // this.expandShow = true;
           this.modalLoading = false;
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         });
@@ -85,6 +84,7 @@ export class ExpandComponent implements OnInit{
    * 取消/关闭页面
    */
   cancel() {
+    this.expandShow = false;
     if (this.resource === 'list') { // 列表入口
       this.router.navigate(['vmfs/list']);
     } else { // dataStore入口
@@ -119,8 +119,6 @@ export class ExpandComponent implements OnInit{
         this.modalHandleLoading = false;
         if (result.code === '200'){
           console.log('expand success:' + name);
-          // 隐藏扩容页面
-          this.cancel();
           this.expandSuccessShow = true; // 扩容成功提示
         }else {
           console.log('expand: ' + name  + ' Reason:' + result.description);
@@ -169,5 +167,11 @@ export class ExpandComponent implements OnInit{
     console.log('expand2', expand);
     console.log('this.expandErr', this.expandErr);
     this.expandForm.vo_add_capacity = expand;
+  }
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    this.cancel();
   }
 }

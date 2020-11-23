@@ -63,16 +63,16 @@ public class SSLUtils {
     }
 
     public static String[] getSupportedCiphers() throws NoSuchAlgorithmException {
-        String[] availableCiphers = getSSLContext().getSocketFactory().getSupportedCipherSuites();
+        String[] availableCiphers = getSslContext().getSocketFactory().getSupportedCipherSuites();
         Arrays.sort(availableCiphers);
         return availableCiphers;
     }
 
-    public static SSLContext getSSLContext() throws NoSuchAlgorithmException {
+    public static SSLContext getSslContext() throws NoSuchAlgorithmException {
         return SSLContext.getInstance("TLSv1.2");
     }
 
-    public static SSLContext getSSLContext(String provider) throws NoSuchAlgorithmException, NoSuchProviderException {
+    public static SSLContext getSslContext(String provider) throws NoSuchAlgorithmException, NoSuchProviderException {
         return SSLContext.getInstance("TLSv1.2", provider);
     }
 }

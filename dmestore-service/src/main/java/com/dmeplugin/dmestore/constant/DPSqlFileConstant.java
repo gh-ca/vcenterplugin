@@ -1,10 +1,12 @@
 package com.dmeplugin.dmestore.constant;
 
 public class DPSqlFileConstant {
-
-  public static final String DP_DME_ACCESS_INFO = "DP_DME_ACCESS_INFO"; //DME访问信息表
-  public static final String DP_DME_TASK_INFO = "DP_DME_TASK_INFO"; //DME任务表
-  public static final String DP_DME_VMWARE_RELATION = "DP_DME_VMWARE_RELATION"; //DME与VMWARE对应关系表
+  //DME访问信息表
+  public static final String DP_DME_ACCESS_INFO = "DP_DME_ACCESS_INFO";
+  //DME任务表
+  public static final String DP_DME_TASK_INFO = "DP_DME_TASK_INFO";
+  //DME与VMWARE对应关系表
+  public static final String DP_DME_VMWARE_RELATION = "DP_DME_VMWARE_RELATION";
   public static final String DP_DME_VCENTER_INFO = "DP_DME_VCENTER_INFO";
 
   public static final String[] ALL_TABLES = {DPSqlFileConstant.DP_DME_ACCESS_INFO,
@@ -66,6 +68,9 @@ public class DPSqlFileConstant {
 
   public static final String DP_DME_TASK_DATA_SCANDATASTORE_SQL = "INSERT INTO DP_DME_TASK_INFO (ID, CLASS_NAME, CRON, JOB_NAME, METHOD) " +
           "VALUES (3, 'com.dmeplugin.dmestore.task.BackgroundScanDatastoreTask', '0 0 0/6 * * ?', 'scanDatastore', 'scanDatastore');";
+
+  public static final String DP_DME_TASK_DATA_REFRESHRESOURCEINSTANCE_SQL = "INSERT INTO DP_DME_TASK_INFO (ID, CLASS_NAME, CRON, JOB_NAME, METHOD) " +
+          "VALUES (4, 'com.dmeplugin.dmestore.task.BackGroundRefreshResourceInstanceTask', '0 */1 * * * ?', 'refreshResourceInstance', 'refreshResourceInstance');";
 
   public static final String DP_DME_BEST_PRACTICE_CHECK = "DP_DME_BEST_PRACTICE_CHECK";
   public static final String DP_DME_BEST_PRACTICE_CHECK_SQL ="DROP TABLE IF EXISTS \"DP_DME_BEST_PRACTICE_CHECK\";\n" +

@@ -20,9 +20,9 @@ public class DmeAccessControllerTest {
     public void controller_accessTest() throws Exception {
         DmeAccessController controller = new DmeAccessController();
         Map<String, Object> params = new HashMap<>();
-        params.put("hostIp", "192.168.3.203");
+        params.put("hostIp", "10.143.133.200");
         params.put("hostPort", 26335);
-        params.put("userName", "testadmin001");
+        params.put("userName", "evuser");
         params.put("password", "Pbu421234");
         System.out.println(gson.toJson(params));
         MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
@@ -44,9 +44,9 @@ public class DmeAccessControllerTest {
         DmeInfoDao dmeInfoDao = new DmeInfoDao();
         dmeAccessService.setDmeInfoDao(dmeInfoDao);
         Map<String, Object> params = new HashMap<>();
-        params.put("hostIp", "192.168.3.203");
+        params.put("hostIp", "10.143.133.200");
         params.put("hostPort", 26335);
-        params.put("userName", "testadmin001");
+        params.put("userName", "evuser");
         params.put("password", "Pbu421234");
         dmeAccessService.accessDme(params);
     }

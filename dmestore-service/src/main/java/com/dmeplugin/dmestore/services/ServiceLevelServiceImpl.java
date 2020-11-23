@@ -3,7 +3,6 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.exception.VcenterException;
-import com.dmeplugin.dmestore.exception.VcenterRuntimeException;
 import com.dmeplugin.dmestore.model.*;
 import com.dmeplugin.dmestore.utils.CipherUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
@@ -16,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 
@@ -34,19 +34,12 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     public static Map<String, Map<String, Object>> serviceLevelInstance = new HashMap<>();
 
     private Gson gson = new Gson();
-    @Autowired
     private DmeAccessService dmeAccessService;
-    @Autowired
     private DmeRelationInstanceService dmeRelationInstanceService;
     private DmeStorageService dmeStorageService;
-
-    @Autowired
     private VCenterInfoService vCenterInfoService;
-
     private VCSDKUtils vcsdkUtils;
-
     private static final String POLICY_DESC = "policy created by dme";
-
     private final String LIST_SERVICE_LEVEL_URL = "/rest/service-policy/v1/service-levels";
     private final String QUERY_SERVICE_LEVEL_VOLUME_URL = "/rest/blockservice/v1/volumes?service_level_id={serviceLevelId}";
 
@@ -92,37 +85,19 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
     @Override
     public List<SimpleServiceLevel> listServiceLevel(Map<String, Object> params) throws DMEException {
-        //Map<String, Object> remap = new HashMap<>();
-        //remap.put("code", 200);
-        //remap.put("message", "list serviceLevel success!");
-        //remap.put("data", params);
 
         ResponseEntity responseEntity;
         List<SimpleServiceLevel> slis;
         try {
             responseEntity = dmeAccessService.access(LIST_SERVICE_LEVEL_URL, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
-            if (200 != code) {
-                //remap.put("code", 503);
-                //remap.put("message", "list serviceLevel response error!");
-                //return remap;
+            if (HttpStatus.OK.value() != code) {
                 throw new DMEException("503","list serviceLevel response error!");
             }
             Object object = responseEntity.getBody();
             slis = convertBean(object);
-           /* if (slis.size() > 0) {
-                Map<String, List<SimpleServiceLevel>> slMap = new HashMap<>();
-                slMap.put("service-levels", slis);
-                remap.put("data", slMap);
-            } else {
-                remap.put("data", object);
-            }*/
         } catch (Exception e) {
             log.error("list serviceLevel error", e);
-            String message = e.getMessage();
-            //remap.put("code", 503);
-            //remap.put("message", message);
-            //return remap;
             throw new DMEException("503",e.getMessage());
         }
         return slis;
@@ -131,12 +106,15 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     @Override
     public void updateVmwarePolicy() throws DMEException {
         try {
-            SessionHelper sessionHelper = new SessionHelper();
-            VCenterInfo vCenterInfo = vCenterInfoService.getVCenterInfo();
+            VCenterInfo vCenterInfo = vCenterInfoService.getVcenterInfo();
             if (null != vCenterInfo) {
-                sessionHelper.login(vCenterInfo.getHostIp(), String.valueOf(vCenterInfo.getHostPort()), vCenterInfo.getUserName(), CipherUtils.decryptString(vCenterInfo.getPassword()));
-
-                String categoryid = vcsdkUtils.getCategoryID(sessionHelper);
+                SessionHelper sessionHelper = new SessionHelper();
+                try {
+                    sessionHelper.login(vCenterInfo.getHostIp(), String.valueOf(vCenterInfo.getHostPort()), vCenterInfo.getUserName(), CipherUtils.decryptString(vCenterInfo.getPassword()));
+                }catch (Exception ex){
+                    log.error(ex.getMessage());
+                }
+                String categoryid = vcsdkUtils.getCategoryId(sessionHelper);
                 List<TagModel> tagModels = vcsdkUtils.getAllTagsByCategoryId(categoryid, sessionHelper);
                 List<PbmProfile> pbmProfiles = vcsdkUtils.getAllSelfPolicyInallcontext();
                 ResponseEntity responseEntity = dmeAccessService.access(LIST_SERVICE_LEVEL_URL, HttpMethod.GET, null);
@@ -193,7 +171,13 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         }
     }
 
-    // convert the api responseBody to SimpleServiceLevel Bean list
+    /**
+     * convert the api responseBody to SimpleServiceLevel Bean list
+     * @author wangxy
+     * @date 11:21 2020/11/13
+     * @param object
+     * @return java.util.List<com.dmeplugin.dmestore.model.SimpleServiceLevel>
+     **/
     private List<SimpleServiceLevel> convertBean(Object object) {
         List<SimpleServiceLevel> ssls = new ArrayList<>();
         JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
@@ -228,7 +212,6 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                     scb.setCompression(compression);
 
                     //报文中暂未出现此属性,暂不处理
-                    //JsonElement iopriorityObj = capJsonObj.get("iopriority");
                     JsonElement smarttierObj = capJsonObj.get("smarttier");
                     if (!ToolUtils.jsonIsNull(smarttierObj)) {
                         CapabilitiesSmarttier cbs = new CapabilitiesSmarttier();
@@ -253,15 +236,15 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                             String latencyUnit = ToolUtils.jsonToStr(qosParamJsonObj.get("latencyUnit"));
                             int latnecy = ToolUtils.jsonToInt(qosParamJsonObj.get("latency"));
                             int minBandWidth = ToolUtils.jsonToInt(qosParamJsonObj.get("minBandWidth"));
-                            int minIOPS = ToolUtils.jsonToInt(qosParamJsonObj.get("minIOPS"));
+                            int minIops = ToolUtils.jsonToInt(qosParamJsonObj.get("minIOPS"));
                             int maxBandWidth = ToolUtils.jsonToInt(qosParamJsonObj.get("maxBandWidth"));
-                            int maxIOPS = ToolUtils.jsonToInt(qosParamJsonObj.get("maxIOPS"));
+                            int maxIops = ToolUtils.jsonToInt(qosParamJsonObj.get("maxIOPS"));
                             qp.setLatency(latnecy);
                             qp.setLatencyUnit(latencyUnit);
                             qp.setMinBandWidth(minBandWidth);
-                            qp.setMinIOPS(minIOPS);
+                            qp.setMinIOPS(minIops);
                             qp.setMaxBandWidth(maxBandWidth);
-                            qp.setMaxIOPS(maxIOPS);
+                            qp.setMaxIOPS(maxIops);
                             cq.setQosParam(qp);
                         }
                         scb.setQos(cq);
@@ -276,7 +259,14 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return ssls;
     }
 
-    //扫描服务等级 发现服务等级下的存储池,磁盘,(存储端口)
+    /**
+     * 扫描服务等级 发现服务等级下的存储池,磁盘,(存储端口)
+     * @author wangxy
+     * @date 11:21 2020/11/13
+     * @param serivceLevelId
+     * @throws DMEException
+     * @return java.util.List<com.dmeplugin.dmestore.model.StoragePool>
+     **/
     @Override
     public List<StoragePool> getStoragePoolInfosByServiceLevelId(String serivceLevelId) throws DMEException {
         List<StoragePool> storagePools = new ArrayList<>();
@@ -338,11 +328,9 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     public List<Volume> getVolumeInfosByServiceLevelId(String serviceLevelId) throws DMEException {
         List<Volume> volumes = new ArrayList<>();
         String url = QUERY_SERVICE_LEVEL_VOLUME_URL.replace("{serviceLevelId}", serviceLevelId);
-
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-        log.info("ServiceLevelServiceImpl/getVolumeInfosByServiceLevelId/responseEntity==" + responseEntity);
         int code = responseEntity.getStatusCodeValue();
-        if (code != 200) {
+        if (code != HttpStatus.OK.value()) {
             return volumes;
         }
         Object object = responseEntity.getBody();
@@ -371,7 +359,6 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                 if (!StringUtils.isEmpty(instanceId)) {
                     volume.setInstanceId(instanceId);
                 }
-                //JsonArray jsonArray = element.get("attachments").getAsJsonArray();
                 volumes.add(volume);
             }
         }
@@ -397,7 +384,6 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         List<StoragePool> storagePools = dmeStorageService.getStoragePools(storageDeviceId, "all");
 
             for (StoragePool sp : storagePools) {
-                // String poolId = sp.getStorage_pool_id();
                 String poolId = sp.getStorageInstanceId();
                 if (storagePoolIds.contains(poolId)) {
                     sps.add(sp);
@@ -406,13 +392,27 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return sps;
     }
 
-    //服务等级 发现服务等级下的存储池 serviceLevelId和sourceInstanceId一样?
+    /**
+     * 服务等级 发现服务等级下的存储池 serviceLevelId和sourceInstanceId一样?
+     * @author wangxy
+     * @date 11:19 2020/11/13
+     * @param serviceLevelId
+     * @throws DMEException
+     * @return java.util.List<java.lang.String>
+     **/
     public List<String> getStoragePoolIdsByServiceLevelId(String serviceLevelId) throws DMEException {
         String relatinName = "M_DjTierContainsStoragePool";
         return getContainIdsByRelationNameLevelId(relatinName, serviceLevelId);
     }
 
-    //服务等级 发现服务等级下的卷实例ID
+    /**
+     * 服务等级 发现服务等级下的卷实例ID
+     * @author wangxy
+     * @date 11:20 2020/11/13
+     * @param serviceLevelId
+     * @throws DMEException
+     * @return java.util.List<java.lang.String>
+     **/
     public List<String> getVolumeIdsByServiceLivelId(String serviceLevelId) throws DMEException {
         String relationName = "M_DjTierContainsLun";
         return getContainIdsByRelationNameLevelId(relationName, serviceLevelId);
@@ -429,27 +429,21 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return new ArrayList<>(ids);
     }
 
-    //存储池的详情需要通过存储设备ID和存储池在设备上的ID联合来查询
-    private void getStoragePoolDevcieIdRelationByRelationNameLevelId(String storageDeviceId, String storagePoolId) {
-
-    }
-
-    //查询服务等级性能
-    public Object getStatisticByServiceLevelId(String serviceLevelId) {
-        //1 获取服务等级下的磁盘Id
-
-        //2 获取磁盘性能
-
-        return null;
-    }
-
-    //将instance转换为storagepool信息
+    /**
+     * 将instance转换为storagepool信息
+     * @author wangxy
+     * @date 11:20 2020/11/13
+     * @param instanceObj
+     * @return com.dmeplugin.dmestore.model.StoragePool
+     **/
     private StoragePool convertInstanceToStoragePool(Object instanceObj) {
         StoragePool sp = new StoragePool();
         JsonObject jsonObject = new JsonParser().parse(instanceObj.toString()).getAsJsonObject();
         String name = ToolUtils.jsonToStr(jsonObject.get("name"));
-        String status = ToolUtils.jsonToStr(jsonObject.get("status"));// runningStatus?
-        String type = ToolUtils.jsonToStr(jsonObject.get("type"));// SYS_StorageDisk中取磁盘类型?
+        // runningStatus?
+        String status = ToolUtils.jsonToStr(jsonObject.get("status"));
+        // SYS_StorageDisk中取磁盘类型?
+        String type = ToolUtils.jsonToStr(jsonObject.get("type"));
         String poolId = ToolUtils.jsonToStr(jsonObject.get("poolId"));
         String storageDeviceId = ToolUtils.jsonToStr(jsonObject.get("storageDeviceId"));
         String storagePoolInstanceId = ToolUtils.jsonToStr(jsonObject.get("id"));
@@ -461,10 +455,4 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
         return sp;
     }
-
-    /*public static void main(String[] args) {
-        String str = "{\"service-levels\":[{\"id\": \"UUID\",\"name\": \"service-level_block\",\"description\": \"block service-level for dj\",\"type\":\"BLOCK\",\"protocol\": \"FC\",\"total_capacity\": 200,\"free_capacity\": 200,\"used_capacity\":100,\"capabilities\": {\"resource_type\": \"thin\",\"compression\": true,\"deduplication\": true,\"smarttier\": {\"policy\": \"1\",\"enabled\": true},\"qos\": {\"enabled\": true,\"qos_param\":{\"latency\":\"10\",\"latencyUnit\": \"ms\",\"minBandWidth\": 1000,\"minIOPS\": 1000}}}}]}";
-        ServiceLevelServiceImpl sls = new ServiceLevelServiceImpl();
-        sls.convertBean(str);
-    }*/
 }

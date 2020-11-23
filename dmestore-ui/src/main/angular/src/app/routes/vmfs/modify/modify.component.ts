@@ -24,7 +24,7 @@ export class ModifyComponent implements OnInit{
   isServiceLevelData = true;
 
   // 存储ID
-  objectId = 'urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1';
+  objectId;
   // vmfs数据
   vmfsInfo: VmfsInfo;
 
@@ -32,21 +32,31 @@ export class ModifyComponent implements OnInit{
   resource;
 
   // 编辑窗口隐藏于展示
-  // modifyShow:boolean;
+  modifyShow = false;
   modalHandleLoading = false; // 数据处理loading
   modalLoading = false; // 数据加载loading
   isOperationErr = false; // 错误信息
   modifySuccessShow = false; // 编辑程功窗口
+
+  matchErr = false; // 名称校验 是否只由字母与数字组成 true：是 false 否
+  vmfsNameRepeatErr = false; // vmfs名称是否重复 true：是 false 否
+  volNameRepeatErr = false; // Vol名称是否重复 true：是 false 否
 
   ngOnInit(): void {
     this.initData();
   }
 
   initData() {
-    // this.modifyShow = true;
+    this.modifyShow = true;
     this.modalLoading = true;
     this.modalHandleLoading = false;
     this.isOperationErr = false;
+
+    // 名称错误提示初始化
+    this.vmfsNameRepeatErr = false;
+    this.volNameRepeatErr = false;
+    this.matchErr = false;
+
     // 设备类型 操作类型初始化
     this.route.url.subscribe(url => {
       console.log('url', url);
@@ -74,6 +84,7 @@ export class ModifyComponent implements OnInit{
               this.modifyForm.service_level_name = this.vmfsInfo.serviceLevelName;
               if (this.vmfsInfo.serviceLevelName === '') { // 非服务等级
                 this.isServiceLevelData = false;
+                this.modifyForm.control_policy = '';
                 const wwns = [];
                 wwns.push(this.vmfsInfo.wwn)
                 this.remoteSrv.getChartData(wwns).subscribe((chartResult: any) => {
@@ -108,7 +119,7 @@ export class ModifyComponent implements OnInit{
    */
   cancel() {
     console.log('this.resource', this.resource);
-    // this.modifyShow = false;
+    this.modifyShow = false;
     if (this.resource === 'list') { // 列表入口
       this.router.navigate(['vmfs/list']);
     } else { // dataStore入口
@@ -139,8 +150,6 @@ export class ModifyComponent implements OnInit{
       this.modalHandleLoading = false;
       if (result.code === '200') {
         console.log('modify success:' + this.modifyForm.oldDsName);
-        // 关闭编辑窗口
-        this.cancel();
         this.modifySuccessShow = true;
       } else {
         console.log('modify faild：' + this.modifyForm.oldDsName + result.description);
@@ -199,5 +208,67 @@ export class ModifyComponent implements OnInit{
         this.modifyForm.latency = objVal;
         break;
     }
+  }
+
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    this.cancel();
+  }
+
+  /**
+   * 编辑功能名称校验
+   */
+  modifyNameCheck() {
+    this.vmfsNameRepeatErr = false;
+    this.volNameRepeatErr = false;
+    this.matchErr = false;
+
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+
+    if (this.modifyForm.name) {
+      if (reg5.test(this.modifyForm.name)) {
+        // 校验VMFS名称重复
+        this.modalHandleLoading = true;
+        this.remoteSrv.checkVmfsName(this.modifyForm.name).subscribe((result: any) => {
+          this.modalHandleLoading = false;
+          if (result.code === '200') { // result.data true 不重复 false 重复
+            this.vmfsNameRepeatErr = !result.data;
+            if (this.vmfsNameRepeatErr) { // 名称重复
+              this.modifyForm.name = null;
+              this.volNameRepeatErr = false;
+              this.matchErr = false;
+            } else {
+              if (this.modifyForm.isSameName) {
+                this.modalHandleLoading = true;
+                // 校验VMFS名称重复
+                this.remoteSrv.checkVolName(this.modifyForm.name).subscribe((result: any) => {
+                  this.modalHandleLoading = false;
+                  if (result.code === '200') { // result.data true 不重复 false 重复
+                    this.volNameRepeatErr = !result.data;
+                    if (!this.vmfsNameRepeatErr && this.volNameRepeatErr) {
+                      this.modifyForm.name = null;
+                    }
+                    if (this.volNameRepeatErr) {
+                      this.modifyForm.name = null;
+                      this.vmfsNameRepeatErr = false;
+                      this.matchErr = false;
+                    }
+                  }
+                  this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+                });
+              }
+            }
+          }
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        });
+
+      } else {
+        this.matchErr = true;
+        this.modifyForm.name = null;
+      }
+    }
+    console.log("this.vmfsNameRepeatErr, this.volNameRepeatErr", this.vmfsNameRepeatErr, this.volNameRepeatErr)
   }
 }

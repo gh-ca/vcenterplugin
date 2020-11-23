@@ -42,8 +42,8 @@ public class TaggingWorkflow {
         createSpec.setName(name);
         createSpec.setDescription(description);
         createSpec.setCardinality(cardinality);
-
-        Set<String> associableTypes = new HashSet<String>(); // empty hash set
+        // empty hash set
+        Set<String> associableTypes = new HashSet<String>();
         createSpec.setAssociableTypes(associableTypes);
         return this.categoryService.create(createSpec);
     }
@@ -115,8 +115,8 @@ public class TaggingWorkflow {
     }
 
     // tag the Object
-    public void attachTag(String tagId,DynamicID objDynamicID){
-        this.tagAssociation.attach(tagId,objDynamicID);
+    public void attachTag(String tagId,DynamicID objDynamicId){
+        this.tagAssociation.attach(tagId,objDynamicId);
     }
 
     //list tags

@@ -29,7 +29,7 @@ public class NumberOfVolumesInDatastoreImpl extends BaseBestPracticeService impl
 
     @Override
     public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
-        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
+        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = new HostMO(context, mor);
         List<Pair<ManagedObjectReference, String>> datastoreMountsOnHost = hostMo.getDatastoreMountsOnHost();
@@ -71,7 +71,7 @@ public class NumberOfVolumesInDatastoreImpl extends BaseBestPracticeService impl
 
     @Override
     public boolean check(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
-        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
+        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = new HostMO(context, mor);
         List<Pair<ManagedObjectReference, String>> datastoreMountsOnHost = hostMo.getDatastoreMountsOnHost();

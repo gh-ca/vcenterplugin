@@ -50,7 +50,7 @@ public class HttpNfcLeaseMO extends BaseMO {
     }
 
     public HttpNfcLeaseState getState() throws Exception {
-        Object stateProp = _context.getVimClient().getDynamicProperty(_mor, "state");
+        Object stateProp = context.getVimClient().getDynamicProperty(mor, "state");
         // Due to some issue in JAX-WS De-serialization getting the information
         // from the nodes
         assert (stateProp.toString().contains("val: null"));
@@ -79,23 +79,23 @@ public class HttpNfcLeaseMO extends BaseMO {
     }
 
     public HttpNfcLeaseInfo getLeaseInfo() throws Exception {
-        return (HttpNfcLeaseInfo)_context.getVimClient().getDynamicProperty(_mor, "info");
+        return (HttpNfcLeaseInfo) context.getVimClient().getDynamicProperty(mor, "info");
     }
 
     public LocalizedMethodFault getLeaseError() throws Exception {
-        return (LocalizedMethodFault)_context.getVimClient().getDynamicProperty(_mor, "error");
+        return (LocalizedMethodFault) context.getVimClient().getDynamicProperty(mor, "error");
     }
 
     public List<HttpNfcLeaseManifestEntry> getLeaseManifest() throws Exception {
-        return _context.getService().httpNfcLeaseGetManifest(_mor);
+        return context.getService().httpNfcLeaseGetManifest(mor);
     }
 
     public void completeLease() throws Exception {
-        _context.getService().httpNfcLeaseComplete(_mor);
+        context.getService().httpNfcLeaseComplete(mor);
     }
 
     public void abortLease() throws Exception {
-        _context.getService().httpNfcLeaseAbort(_mor, null);
+        context.getService().httpNfcLeaseAbort(mor, null);
     }
 
     public void updateLeaseProgress(int percent) throws Exception {
@@ -106,7 +106,7 @@ public class HttpNfcLeaseMO extends BaseMO {
             percent = 100;
         }
 
-        _context.getService().httpNfcLeaseProgress(_mor, percent);
+        context.getService().httpNfcLeaseProgress(mor, percent);
     }
 
     public ProgressReporter createProgressReporter() {
@@ -137,19 +137,19 @@ public class HttpNfcLeaseMO extends BaseMO {
     }
 
     public class ProgressReporter extends Thread {
-        volatile int _percent;
-        volatile boolean _done;
+        volatile int percent;
+        volatile boolean done;
 
         public ProgressReporter() {
-            _percent = 0;
-            _done = false;
+            percent = 0;
+            done = false;
 
             setDaemon(true);
             start();
         }
 
         public void reportProgress(int percent) {
-            _percent = percent;
+            this.percent = percent;
         }
 
         public void close() {
@@ -157,16 +157,16 @@ public class HttpNfcLeaseMO extends BaseMO {
                 s_logger.info("close ProgressReporter, interrupt reporter runner to let it quit");
             }
 
-            _done = true;
+            done = true;
             interrupt();
         }
 
         @Override
         public void run() {
-            while (!_done) {
+            while (!done) {
                 try {
                     Thread.sleep(1000);            // update progess every 1 second
-                    updateLeaseProgress(_percent);
+                    updateLeaseProgress(percent);
                 } catch (InterruptedException e) {
                     if (s_logger.isInfoEnabled()) {
                         s_logger.info("ProgressReporter is interrupted, quiting");

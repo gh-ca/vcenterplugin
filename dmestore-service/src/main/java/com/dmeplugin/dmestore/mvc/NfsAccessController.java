@@ -42,7 +42,7 @@ public class NfsAccessController extends BaseController {
         String failureStr = "";
         try {
             List<NfsDataInfo> lists = dmeNfsAccessService.listNfs();
-            LOG.info("listnfs lists==" + gson.toJson(lists));
+            //LOG.info("listnfs lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {
             LOG.error("list nfs failure:", e);
@@ -65,7 +65,7 @@ public class NfsAccessController extends BaseController {
         String failureStr = "";
         try {
             List<NfsDataInfo> lists = dmeNfsAccessService.listNfsPerformance(fsIds);
-            LOG.info("listnfsperformance lists==" + gson.toJson(lists));
+            //LOG.info("listnfsperformance lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {
             LOG.error("get nfs performance failure:", e);

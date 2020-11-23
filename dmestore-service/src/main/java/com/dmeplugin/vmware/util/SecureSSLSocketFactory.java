@@ -39,23 +39,23 @@ import java.security.SecureRandom;
 public class SecureSSLSocketFactory extends SSLSocketFactory {
 
     public static final Logger s_logger = LoggerFactory.getLogger(SecureSSLSocketFactory.class);
-    private SSLContext _sslContext;
+    private SSLContext sslContext;
 
     public SecureSSLSocketFactory() throws NoSuchAlgorithmException {
-        _sslContext = SSLUtils.getSSLContext();
+        sslContext = SSLUtils.getSslContext();
     }
 
     public SecureSSLSocketFactory(SSLContext sslContext) throws NoSuchAlgorithmException {
         if (sslContext != null) {
-            _sslContext = sslContext;
+            this.sslContext = sslContext;
         } else {
-            _sslContext = SSLUtils.getSSLContext();
+            this.sslContext = SSLUtils.getSslContext();
         }
     }
 
     public SecureSSLSocketFactory(KeyManager[] km, TrustManager[] tm, SecureRandom random) throws NoSuchAlgorithmException, KeyManagementException, IOException {
-        _sslContext = SSLUtils.getSSLContext();
-        _sslContext.init(km, tm, random);
+        sslContext = SSLUtils.getSslContext();
+        sslContext.init(km, tm, random);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class SecureSSLSocketFactory extends SSLSocketFactory {
 
     @Override
     public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
-        SSLSocketFactory factory = _sslContext.getSocketFactory();
+        SSLSocketFactory factory = sslContext.getSocketFactory();
         Socket socket = factory.createSocket(s, host, port, autoClose);
         if (socket instanceof SSLSocket) {
             ((SSLSocket)socket).setEnabledProtocols(SSLUtils.getSupportedProtocols(((SSLSocket)socket).getEnabledProtocols()));
@@ -86,7 +86,7 @@ public class SecureSSLSocketFactory extends SSLSocketFactory {
 
     @Override
     public Socket createSocket(String host, int port) throws IOException, UnknownHostException {
-        SSLSocketFactory factory = _sslContext.getSocketFactory();
+        SSLSocketFactory factory = sslContext.getSocketFactory();
         Socket socket = factory.createSocket(host, port);
         if (socket instanceof SSLSocket) {
             ((SSLSocket)socket).setEnabledProtocols(SSLUtils.getSupportedProtocols(((SSLSocket)socket).getEnabledProtocols()));
@@ -96,7 +96,7 @@ public class SecureSSLSocketFactory extends SSLSocketFactory {
 
     @Override
     public Socket createSocket(String host, int port, InetAddress inetAddress, int localPort) throws IOException, UnknownHostException {
-        SSLSocketFactory factory = _sslContext.getSocketFactory();
+        SSLSocketFactory factory = sslContext.getSocketFactory();
         Socket socket = factory.createSocket(host, port, inetAddress, localPort);
         if (socket instanceof SSLSocket) {
             ((SSLSocket)socket).setEnabledProtocols(SSLUtils.getSupportedProtocols(((SSLSocket)socket).getEnabledProtocols()));
@@ -106,7 +106,7 @@ public class SecureSSLSocketFactory extends SSLSocketFactory {
 
     @Override
     public Socket createSocket(InetAddress inetAddress, int localPort) throws IOException {
-        SSLSocketFactory factory = _sslContext.getSocketFactory();
+        SSLSocketFactory factory = sslContext.getSocketFactory();
         Socket socket = factory.createSocket(inetAddress, localPort);
         if (socket instanceof SSLSocket) {
             ((SSLSocket)socket).setEnabledProtocols(SSLUtils.getSupportedProtocols(((SSLSocket)socket).getEnabledProtocols()));
@@ -116,7 +116,7 @@ public class SecureSSLSocketFactory extends SSLSocketFactory {
 
     @Override
     public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
-        SSLSocketFactory factory = this._sslContext.getSocketFactory();
+        SSLSocketFactory factory = this.sslContext.getSocketFactory();
         Socket socket = factory.createSocket(address, port, localAddress, localPort);
         if (socket instanceof SSLSocket) {
             ((SSLSocket)socket).setEnabledProtocols(SSLUtils.getSupportedProtocols(((SSLSocket)socket).getEnabledProtocols()));

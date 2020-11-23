@@ -39,22 +39,22 @@ public class HostFirewallSystemMO extends BaseMO {
     }
 
     public HostFirewallInfo getFirewallInfo() throws Exception {
-        return (HostFirewallInfo)_context.getVimClient().getDynamicProperty(_mor, "firewallInfo");
+        return (HostFirewallInfo) context.getVimClient().getDynamicProperty(mor, "firewallInfo");
     }
 
     public void updateDefaultPolicy(HostFirewallDefaultPolicy policy) throws Exception {
-        _context.getService().updateDefaultPolicy(_mor, policy);
+        context.getService().updateDefaultPolicy(mor, policy);
     }
 
     public void enableRuleset(String rulesetName) throws Exception {
-        _context.getService().enableRuleset(_mor, rulesetName);
+        context.getService().enableRuleset(mor, rulesetName);
     }
 
     public void disableRuleset(String rulesetName) throws Exception {
-        _context.getService().disableRuleset(_mor, rulesetName);
+        context.getService().disableRuleset(mor, rulesetName);
     }
 
     public void refreshFirewall() throws Exception {
-        _context.getService().refreshFirewall(_mor);
+        context.getService().refreshFirewall(mor);
     }
 }

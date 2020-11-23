@@ -180,30 +180,11 @@ public class VapiAuthenticationHelper {
    */
   private SslConfiguration buildSslConfiguration(boolean skipServerVerification) throws Exception {
 	  SslConfiguration sslConfig;
-	  //if(skipServerVerification) {
-          SslUtil.trustAllHttpsCertificates();
-          sslConfig = new SslConfiguration.Builder()
-      		.disableCertificateValidation()
-      		.disableHostnameVerification()
-      		.getConfig();
-	  //}else {
-            /*
-             * Set the system property "javax.net.ssl.trustStore" to
-             * the truststorePath
-             
-            System.setProperty("javax.net.ssl.trustStore", this.truststorePath);
-            KeyStore trustStore =
-                SslUtil.loadTrustStore(this.truststorePath,
-                		this.truststorePassword);
-            KeyStoreConfig keyStoreConfig =
-            		new KeyStoreConfig("", this.truststorePassword);
-            sslConfig =
-            		new SslConfiguration.Builder()
-            		.setKeyStore(trustStore)
-            		.setKeyStoreConfig(keyStoreConfig)
-            		.getConfig();*/
-        //}
-
+      SslUtil.trustAllHttpsCertificates();
+      sslConfig = new SslConfiguration.Builder()
+              .disableCertificateValidation()
+              .disableHostnameVerification()
+              .getConfig();
       return sslConfig;
   }
 }

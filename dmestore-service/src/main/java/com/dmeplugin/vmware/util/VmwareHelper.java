@@ -85,7 +85,8 @@ public class VmwareHelper {
     public static final int MAX_IDE_CONTROLLER_COUNT = 2;
     public static final int MAX_ALLOWED_DEVICES_IDE_CONTROLLER = 2;
     public static final int MAX_ALLOWED_DEVICES_SCSI_CONTROLLER = 16;
-    public static final int MAX_SUPPORTED_DEVICES_SCSI_CONTROLLER = MAX_ALLOWED_DEVICES_SCSI_CONTROLLER - 1; // One device node is unavailable for hard disks or SCSI devices
+    // One device node is unavailable for hard disks or SCSI devices
+    public static final int MAX_SUPPORTED_DEVICES_SCSI_CONTROLLER = MAX_ALLOWED_DEVICES_SCSI_CONTROLLER - 1;
     public static final int MAX_USABLE_SCSI_CONTROLLERS = 2;
     public static final String MIN_VERSION_UEFI_LEGACY = "5.5";
 
@@ -133,7 +134,7 @@ public class VmwareHelper {
     public static VirtualDevice prepareNicOpaque(VirtualMachineMO vmMo, VirtualEthernetCardType deviceType, String portGroupName,
                                                  String macAddress, int contextNumber, boolean connected, boolean connectOnStart) throws Exception {
 
-        assert(vmMo.getRunningHost().hasOpaqueNSXNetwork());
+        assert(vmMo.getRunningHost().hasOpaqueNsxNetwork());
 
         VirtualEthernetCard nic = createVirtualEthernetCard(deviceType);
 
@@ -218,7 +219,7 @@ public class VmwareHelper {
         backingInfo.setFileName(vmdkDatastorePath);
         disk.setBacking(backingInfo);
 
-        int ideControllerKey = vmMo.getIDEDeviceControllerKey();
+        int ideControllerKey = vmMo.getIdeDeviceControllerKey();
         if (controllerKey < 0) {
             controllerKey = ideControllerKey;
         }
@@ -289,7 +290,7 @@ public class VmwareHelper {
             throw new Exception("Unsupported disk backing: " + parentBacking.getClass().getCanonicalName());
         }
 
-        int ideControllerKey = vmMo.getIDEDeviceControllerKey();
+        int ideControllerKey = vmMo.getIdeDeviceControllerKey();
         if (controllerKey < 0) {
             controllerKey = ideControllerKey;
         }
@@ -328,7 +329,7 @@ public class VmwareHelper {
             backingInfo.setDiskMode(VirtualDiskMode.PERSISTENT.value());
             disk.setBacking(backingInfo);
 
-            int ideControllerKey = vmMo.getIDEDeviceControllerKey();
+            int ideControllerKey = vmMo.getIdeDeviceControllerKey();
             if (controllerKey < 0) {
                 controllerKey = ideControllerKey;
             }
@@ -383,7 +384,7 @@ public class VmwareHelper {
 
         disk.setBacking(backingInfo);
 
-        int ideControllerKey = vmMo.getIDEDeviceControllerKey();
+        int ideControllerKey = vmMo.getIdeDeviceControllerKey();
         if (controllerKey < 0) {
             controllerKey = ideControllerKey;
         }
@@ -449,10 +450,10 @@ public class VmwareHelper {
             newCdRom = true;
             cdRom = new VirtualCdrom();
 
-            assert (vmMo.getIDEDeviceControllerKey() >= 0);
-            cdRom.setControllerKey(vmMo.getIDEDeviceControllerKey());
+            assert (vmMo.getIdeDeviceControllerKey() >= 0);
+            cdRom.setControllerKey(vmMo.getIdeDeviceControllerKey());
             if (deviceNumber < 0) {
-                deviceNumber = vmMo.getNextIDEDeviceNumber();
+                deviceNumber = vmMo.getNextIdeDeviceNumber();
             }
 
             cdRom.setUnitNumber(deviceNumber);
@@ -592,16 +593,16 @@ public class VmwareHelper {
         return options;
     }
 
-    public static void setVmScaleUpConfig(VirtualMachineConfigSpec vmConfig, int cpuCount, int cpuSpeedMHz, int cpuReservedMhz, int memoryMB, int memoryReserveMB,
+    public static void setVmScaleUpConfig(VirtualMachineConfigSpec vmConfig, int cpuCount, int cpuSpeedMhz, int cpuReservedMhz, int memoryMb, int memoryReserveMb,
             boolean limitCpuUse) {
 
         // VM config for scaling up
-        vmConfig.setMemoryMB((long)memoryMB);
+        vmConfig.setMemoryMB((long)memoryMb);
         vmConfig.setNumCPUs(cpuCount);
 
         ResourceAllocationInfo cpuInfo = new ResourceAllocationInfo();
         if (limitCpuUse) {
-            cpuInfo.setLimit((long)(cpuSpeedMHz * cpuCount));
+            cpuInfo.setLimit((long)(cpuSpeedMhz * cpuCount));
         } else {
             cpuInfo.setLimit(-1L);
         }
@@ -610,43 +611,43 @@ public class VmwareHelper {
         vmConfig.setCpuAllocation(cpuInfo);
 
         ResourceAllocationInfo memInfo = new ResourceAllocationInfo();
-        memInfo.setLimit((long)memoryMB);
-        memInfo.setReservation((long)memoryReserveMB);
+        memInfo.setLimit((long)memoryMb);
+        memInfo.setReservation((long)memoryReserveMb);
         vmConfig.setMemoryAllocation(memInfo);
 
     }
 
-    public static void setBasicVmConfig(VirtualMachineConfigSpec vmConfig, int cpuCount, int cpuSpeedMHz, int cpuReservedMhz, int memoryMB, int memoryReserveMB,
+    public static void setBasicVmConfig(VirtualMachineConfigSpec vmConfig, int cpuCount, int cpuSpeedMhz, int cpuReservedMhz, int memoryMb, int memoryReserveMb,
             String guestOsIdentifier, boolean limitCpuUse) {
 
         // VM config basics
-        vmConfig.setMemoryMB((long)memoryMB);
+        vmConfig.setMemoryMB((long)memoryMb);
         vmConfig.setNumCPUs(cpuCount);
 
         ResourceAllocationInfo cpuInfo = new ResourceAllocationInfo();
         if (limitCpuUse) {
-            cpuInfo.setLimit(((long)cpuSpeedMHz * cpuCount));
+            cpuInfo.setLimit(((long)cpuSpeedMhz * cpuCount));
         } else {
             cpuInfo.setLimit(-1L);
         }
 
         cpuInfo.setReservation((long)cpuReservedMhz);
         vmConfig.setCpuAllocation(cpuInfo);
-        if (cpuSpeedMHz != cpuReservedMhz) {
+        if (cpuSpeedMhz != cpuReservedMhz) {
             vmConfig.setCpuHotAddEnabled(true);
         }
-        if (memoryMB != memoryReserveMB) {
+        if (memoryMb != memoryReserveMb) {
             vmConfig.setMemoryHotAddEnabled(true);
         }
         ResourceAllocationInfo memInfo = new ResourceAllocationInfo();
-        memInfo.setLimit((long)memoryMB);
-        memInfo.setReservation((long)memoryReserveMB);
+        memInfo.setLimit((long)memoryMb);
+        memInfo.setReservation((long)memoryReserveMb);
         vmConfig.setMemoryAllocation(memInfo);
 
         vmConfig.setGuestId(guestOsIdentifier);
     }
 
-    public static VirtualDevice prepareUSBControllerDevice() {
+    public static VirtualDevice prepareUsbControllerDevice() {
         s_logger.debug("Preparing USB controller(EHCI+UHCI) device");
         VirtualUSBController usbController = new VirtualUSBController(); //EHCI+UHCI
         usbController.setEhciEnabled(true);
@@ -782,7 +783,7 @@ public class VmwareHelper {
         return hotplugSupportedByLicense;
     }
 
-    public static String getVCenterSafeUuid() {
+    public static String getVcenterSafeUuid() {
         // Object name that is greater than 32 is not safe in vCenter
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
@@ -816,7 +817,7 @@ public class VmwareHelper {
         return DiskControllerType.getType(dataDiskController) == DiskControllerType.osdefault;
     }
 
-    public static XMLGregorianCalendar getXMLGregorianCalendar(final Date date, final int offsetSeconds) throws DatatypeConfigurationException {
+    public static XMLGregorianCalendar getXmlGregorianCalendar(final Date date, final int offsetSeconds) throws DatatypeConfigurationException {
         if (offsetSeconds > 0) {
             date.setTime(date.getTime() - offsetSeconds * 1000);
         }
