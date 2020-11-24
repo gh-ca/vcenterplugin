@@ -78,4 +78,18 @@ public class NfsDataStoreShareAttr {
     public void setAuthClientList(List<AuthClient> authClientList) {
         this.authClientList = authClientList;
     }
+
+    @Override
+    public String toString() {
+        return "NfsDataStoreShareAttr{" +
+            "fsName='" + fsName + '\'' +
+            ", name='" + name + '\'' +
+            ", sharePath='" + sharePath + '\'' +
+            ", description='" + description + '\'' +
+            ", owningDtreeId='" + owningDtreeId + '\'' +
+            ", owningDtreeName='" + owningDtreeName + '\'' +
+            ", deviceName='" + deviceName + '\'' +
+            ", authClientList=" + authClientList +
+            '}';
+    }
 }

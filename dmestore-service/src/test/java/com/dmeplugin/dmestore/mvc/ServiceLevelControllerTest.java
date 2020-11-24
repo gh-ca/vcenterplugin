@@ -31,13 +31,11 @@ public class ServiceLevelControllerTest {
     private Gson gson = new Gson();
     private ServiceLevelController serviceLevelController;
     private MockMvc mockMvc;
-    private ServiceLevelService serviceLevelService;
 
     @Before
     public void setUp() throws Exception {
         serviceLevelController = new ServiceLevelController();
         mockMvc = MockMvcBuilders.standaloneSetup(serviceLevelController).build();
-        serviceLevelService = new ServiceLevelServiceImpl();
     }
 
     @Test
