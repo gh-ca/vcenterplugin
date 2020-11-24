@@ -3,6 +3,10 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.model.NfsDataInfo;
+import com.dmeplugin.dmestore.model.NfsDataStoreFsAttr;
+import com.dmeplugin.dmestore.model.NfsDataStoreLogicPortAttr;
+import com.dmeplugin.dmestore.model.NfsDataStoreShareAttr;
 import com.dmeplugin.dmestore.model.Storage;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
@@ -100,7 +104,9 @@ public class DmeNFSAccessServiceImplTest {
         map.put("total",1);
         ResponseEntity<String> responseEntity2 = new ResponseEntity<>(gson.toJson(map), null, HttpStatus.OK);
         when(dmeAccessService.access("/rest/fileservice/v1/nfs-shares/321/auth_clients", HttpMethod.POST, gson.toJson(new HashMap<>()))).thenReturn(responseEntity2);
-        dmeNFSAccessService.getNfsDatastoreShareAttr("321");
+        NfsDataStoreShareAttr nfsDatastoreShareAttr = dmeNFSAccessService.getNfsDatastoreShareAttr("321");
+        System.out.println(nfsDatastoreShareAttr);
+
     }
 
     @Test
@@ -129,7 +135,8 @@ public class DmeNFSAccessServiceImplTest {
                 "}\n";
         ResponseEntity<String> responseEntity = new ResponseEntity<>(resp, null, HttpStatus.OK);
         when(dmeAccessService.access("/rest/storagemgmt/v1/storage-port/logic-ports/321", HttpMethod.GET, null)).thenReturn(responseEntity);
-        dmeNFSAccessService.getNfsDatastoreLogicPortAttr("321");
+        NfsDataStoreLogicPortAttr nfsDatastoreLogicPortAttr = dmeNFSAccessService.getNfsDatastoreLogicPortAttr("321");
+        System.out.println(nfsDatastoreLogicPortAttr);
 
     }
 
@@ -215,7 +222,8 @@ public class DmeNFSAccessServiceImplTest {
                 "}\n";
         ResponseEntity<String> responseEntity = new ResponseEntity<>(resp, null, HttpStatus.OK);
         when(dmeAccessService.access("/rest/fileservice/v1/filesystems/321", HttpMethod.GET, null)).thenReturn(responseEntity);
-        dmeNFSAccessService.getNfsDatastoreFsAttr("321");
+        List<NfsDataStoreFsAttr> nfsDatastoreFsAttr = dmeNFSAccessService.getNfsDatastoreFsAttr("321");
+        System.out.println(nfsDatastoreFsAttr);
 
     }
 
@@ -434,7 +442,8 @@ public class DmeNFSAccessServiceImplTest {
                 "}\n";
         ResponseEntity<String> responseEntity = new ResponseEntity<>(resp, null, HttpStatus.OK);
         when(dmeAccessService.access("/rest/fileservice/v1/filesystems/321", HttpMethod.GET, null)).thenReturn(responseEntity);
-        dmeNFSAccessService.listNfs();
+        List<NfsDataInfo> nfsDataInfos = dmeNFSAccessService.listNfs();
+        System.out.println(nfsDataInfos);
     }
 
     @Test
@@ -487,7 +496,8 @@ public class DmeNFSAccessServiceImplTest {
         String param = "{\"obj_ids\":[\"321\"]}";
         Map<String, Object> params = gson.fromJson(param, Map.class);
         when(dataStoreStatisticHistoryService.queryNfsStatisticCurrent(params)).thenReturn(map);
-        dmeNFSAccessService.listNfsPerformance(list);
+        List<NfsDataInfo> nfsDataInfos = dmeNFSAccessService.listNfsPerformance(list);
+        System.out.println(nfsDataInfos);
 
     }
 
@@ -629,6 +639,8 @@ public class DmeNFSAccessServiceImplTest {
         List<Map<String, String>> lists = new ArrayList<>();
         lists.add(map);
         when(vcsdkUtils.getClustersByDsObjectId("321")).thenReturn(gson.toJson(lists));
-        dmeNFSAccessService.getClusterMountDataStoreByDsObjectId("321");
+        List<Map<String, Object>> clusterMountDataStoreByDsObjectId =
+            dmeNFSAccessService.getClusterMountDataStoreByDsObjectId("321");
+        System.out.println(clusterMountDataStoreByDsObjectId);
     }
 }

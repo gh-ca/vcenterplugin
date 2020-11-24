@@ -30,10 +30,10 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     @Autowired
     private DmeRelationInstanceService dmeRelationInstanceService;
 
-    private final String STATISTIC_QUERY = "/rest/metrics/v1/data-svc/history-data/action/query";
-    private final String OBJ_TYPES_LIST = "/rest/metrics/v1/mgr-svc/obj-types";
-    private final String INDICATORS_LIST = "/rest/metrics/v1/mgr-svc/indicators";
-    private final String OBJ_TYPE_INDICATORS_QUERY = "/rest/metrics/v1/mgr-svc/obj-types/{obj-type-id}/indicators";
+    private static final String STATISTIC_QUERY = "/rest/metrics/v1/data-svc/history-data/action/query";
+    private static final String OBJ_TYPES_LIST = "/rest/metrics/v1/mgr-svc/obj-types";
+    private static final String INDICATORS_LIST = "/rest/metrics/v1/mgr-svc/indicators";
+    private static final String OBJ_TYPE_INDICATORS_QUERY = "/rest/metrics/v1/mgr-svc/obj-types/{obj-type-id}/indicators";
 
     //性能指标 id和name的映射关系
     private static Map<String, String> indicatorNameIdMap = new HashMap<>();
@@ -597,7 +597,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                         }
                     }else{
                         log.error("query " + relationOrInstance + " statistic error,the params is:{}", gson.toJson(params));
-                        throw new DMEException("503", responseEntity.getBody().toString());
+                        throw new DMEException("503", relationOrInstance + " statistic error,the params is:{}");
                     }
                 } catch (Exception e) {
                     log.error("query " + relationOrInstance + " statistic exception.", e);
@@ -674,7 +674,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     // query obj_types
-    private void queryObjtypes() throws Exception {
+    /*private void queryObjtypes() throws Exception {
         ResponseEntity responseEntity = dmeAccessService.access(OBJ_TYPES_LIST, HttpMethod.GET, null);
         if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
             Object body = responseEntity.getBody();
@@ -688,10 +688,10 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 objtypeNameIdMap.put(resourceCategory, objId);
             }
         }
-    }
+    }*/
 
     // query obj_type indicators
-    private void queryIndicatorsByObjetypeId(String objtypeId) throws Exception {
+    /*private void queryIndicatorsByObjetypeId(String objtypeId) throws Exception {
         String apiUrl = OBJ_TYPE_INDICATORS_QUERY;
         apiUrl = apiUrl.replace("{obj-type-id}", objtypeId);
         if (apiUrl.indexOf("{obj-type-id}") > 0) {
@@ -712,10 +712,10 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             }
             objTypeCountersMap.put(objtypeId, indicatorIds);
         }
-    }
+    }*/
 
     // query indicators
-    private void queryIndicators() throws Exception {
+    /*private void queryIndicators() throws Exception {
         ResponseEntity responseEntity = dmeAccessService.access(INDICATORS_LIST, HttpMethod.POST, null);
         if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
             Object body = responseEntity.getBody();
@@ -730,7 +730,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 indicatorNameIdMap.put(counterName, counterId);
             }
         }
-    }
+    }*/
 
     //性能查询条件参数初始化
     private Map<String, Object> initParams(Map<String, Object> params) {
@@ -933,7 +933,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     //消息转换  提取实时性能数据
-    private JsonObject getCurrentStatistic(Object object) {
+   /* private JsonObject getCurrentStatistic(Object object) {
         JsonObject data = new JsonObject();
         JsonObject dataJson = new JsonParser().parse(object.toString()).getAsJsonObject();
         Set<Map.Entry<String, JsonElement>> volumeSet = dataJson.getAsJsonObject().entrySet();
@@ -960,7 +960,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             data.add(volumeId, countRes);
         }
         return data;
-    }
+    }*/
 
     //消息转换 object---map
     private Map<String, Object> convertMap(JsonElement jsonElement) {

@@ -113,7 +113,8 @@ public class DataStoreStatisticHistoryServiceImplTest {
         String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"321\"],\"range\":\"[321]\",\"interval\":\"321\",\"obj_type_id\":\"1125921381679104\"}";
         ResponseEntity responseEntity = new ResponseEntity(gson.toJson(map3), null, HttpStatus.OK);
         when(dmeAccessService.access("/rest/metrics/v1/data-svc/history-data/action/query", HttpMethod.POST, param)).thenReturn(responseEntity);
-        dataStoreStatisticHistoryService.queryVmfsStatistic(map);
+        Map<String, Object> map = dataStoreStatisticHistoryService.queryVmfsStatistic(this.map);
+        System.out.println(gson.toJson(map));
     }
 
     @Test
@@ -279,9 +280,9 @@ public class DataStoreStatisticHistoryServiceImplTest {
 
     @Test
     public void queryHistoryStatistic() throws DMEException {
-        String relationOrInstance = "SYS_StorDevice";
+        String relationOrInstance = "SYS_StoragePool";
         when(dmeRelationInstanceService.getLunInstance()).thenReturn(map2);
-        String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"321\"],\"range\":\"[321]\",\"interval\":\"321\",\"obj_type_id\":\"1125904201809920\"}";
+        String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"321\"],\"range\":\"[321]\",\"interval\":\"321\",\"obj_type_id\":\"1125912791744512\"}";
         ResponseEntity responseEntity = new ResponseEntity(gson.toJson(map3), null, HttpStatus.OK);
         when(dmeAccessService.access("/rest/metrics/v1/data-svc/history-data/action/query", HttpMethod.POST, param)).thenReturn(responseEntity);
         dataStoreStatisticHistoryService.queryHistoryStatistic(relationOrInstance,map);
@@ -290,11 +291,13 @@ public class DataStoreStatisticHistoryServiceImplTest {
 
     @Test
     public void queryCurrentStatistic() throws DMEException {
-        String relationOrInstance = "SYS_StorageDisk";
-        when(dmeRelationInstanceService.getLunInstance()).thenReturn(map2);
-        String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"321\"],\"range\":\"[321]\",\"interval\":\"321\",\"obj_type_id\":\"1125904201809920\"}";
-        ResponseEntity responseEntity = new ResponseEntity(gson.toJson(map3), null, HttpStatus.OK);
-        when(dmeAccessService.access("/rest/metrics/v1/data-svc/history-data/action/query", HttpMethod.POST, param)).thenReturn(responseEntity);
-        dataStoreStatisticHistoryService.queryCurrentStatistic(relationOrInstance,map);
+        String[] relationOrInstances = {"SYS_StorageDisk","SYS_StoragePool","SYS_DjTier","SYS_Lun","SYS_StorageFileSystem","SYS_Controller","SYS_StoragePort","SYS_StorDevice"};
+        for (int i = 0; i < 7; i++) {
+            when(dmeRelationInstanceService.getLunInstance()).thenReturn(map2);
+            String param = "{\"obj_ids\":[\"321\"],\"indicator_ids\":[\"321\"],\"range\":\"[321]\",\"interval\":\"321\",\"obj_type_id\":\"1125904201809920\"}";
+            ResponseEntity responseEntity = new ResponseEntity(gson.toJson(map3), null, HttpStatus.OK);
+            when(dmeAccessService.access("/rest/metrics/v1/data-svc/history-data/action/query", HttpMethod.POST, param)).thenReturn(responseEntity);
+            dataStoreStatisticHistoryService.queryCurrentStatistic(relationOrInstances[i], map);
+        }
     }
 }
