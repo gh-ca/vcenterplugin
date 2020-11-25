@@ -155,7 +155,7 @@ public class NfsOperationController extends BaseController{
         try {
             nfsOperationService.createNfsDatastore(param);
             return success();
-        } catch (DMEException e) {
+        } catch (Exception e) {
             return failure(e.getMessage());
         }
 
@@ -233,7 +233,7 @@ public class NfsOperationController extends BaseController{
         try {
             nfsOperationService.updateNfsDatastore(param);
             return success();
-        } catch (DMEException e) {
+        } catch (Exception e) {
             return failure(e.getMessage());
         }
 
@@ -255,7 +255,7 @@ public class NfsOperationController extends BaseController{
         try {
             nfsOperationService.changeNfsCapacity(params);
             return success();
-        } catch (DMEException e) {
+        } catch (Exception e) {
             return failure(e.getMessage());
         }
 
@@ -272,7 +272,7 @@ public class NfsOperationController extends BaseController{
     public ResponseBodyBean getEditNfsStore(@RequestParam(name = "storeObjectId")String storeObjectId) {
         try {
             return success(nfsOperationService.getEditNfsStore(storeObjectId));
-        } catch (DMEException e) {
+        } catch (Exception e) {
             return failure(e.getMessage());
         }
 
