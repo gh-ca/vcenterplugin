@@ -47,7 +47,7 @@ public class VmfsOperationController extends BaseController {
         try {
             vmfsOperationService.updateVmfs(volumeId, params);
             return success();
-        } catch (DMEException e) {
+        } catch (Exception e) {
             return failure(e.getMessage());
         }
 
@@ -68,7 +68,7 @@ public class VmfsOperationController extends BaseController {
         try {
             vmfsOperationService.expandVmfs(volumes);
             return success();
-        } catch (DMEException e) {
+        } catch (Exception e) {
             return failure(e.getMessage());
         }
 
@@ -83,7 +83,7 @@ public class VmfsOperationController extends BaseController {
         try {
             vmfsOperationService.recycleVmfsCapacity(datastoreName);
             return success();
-        } catch (DMEException e) {
+        } catch (Exception e) {
             return failure(e.getMessage());
         }
 
@@ -96,7 +96,7 @@ public class VmfsOperationController extends BaseController {
         try {
             vmfsOperationService.recycleVmfsCapacityByDataStoreIds(datastoreIds);
             return success();
-        } catch (DMEException e) {
+        } catch (Exception e) {
             return failure(e.getMessage());
         }
 
@@ -109,7 +109,7 @@ public class VmfsOperationController extends BaseController {
         LOG.info("recyclevmfs==" + gson.toJson(params));
         try {
             return success(vmfsOperationService.listServiceLevelVmfs(params));
-        } catch (DMEException e) {
+        } catch (Exception e) {
             return failure(e.getMessage());
         }
 
@@ -133,7 +133,7 @@ public class VmfsOperationController extends BaseController {
         try {
             vmfsOperationService.updateVmfsServiceLevel(params);
             return success();
-        } catch (DMEException e) {
+        } catch (Exception e) {
             return failure(e.getMessage());
         }
     }

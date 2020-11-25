@@ -37,7 +37,7 @@ public class ServiceLevelController extends BaseController {
         LOG.info("servicelevel/listservicelevel params==" + gson.toJson(params));
         try {
             return success(serviceLevelService.listServiceLevel(params));
-        } catch (DMEException e) {
+        } catch (Exception e) {
             return failure(e.getMessage());
         }
 
@@ -85,7 +85,7 @@ public class ServiceLevelController extends BaseController {
         try {
             serviceLevelService.updateVmwarePolicy();
             return success();
-        } catch (DMEException e) {
+        } catch (Exception e) {
             return failure(e.getMessage());
         }
     }

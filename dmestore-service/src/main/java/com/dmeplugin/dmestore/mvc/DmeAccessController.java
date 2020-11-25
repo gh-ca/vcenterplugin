@@ -52,7 +52,7 @@ public class DmeAccessController extends BaseController {
         try {
             dmeAccessService.accessDme(params);
             return success();
-        } catch (DMEException e) {
+        } catch (Exception e) {
             return failure(e.getMessage());
         }
     }
@@ -67,7 +67,7 @@ public class DmeAccessController extends BaseController {
         LOG.info("accessdme/refreshaccess==");
         try {
             return success(dmeAccessService.refreshDme());
-        } catch (DMEException e) {
+        } catch (Exception e) {
             return failure(e.getMessage());
         }
 
