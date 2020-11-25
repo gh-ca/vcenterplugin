@@ -654,9 +654,12 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         Object objIds = params.get("obj_ids");
         params = initParams(params);
 
-        String interval = params.get("interval").toString();
-        String range = params.get("range").toString();
-
+        String interval = ToolUtils.getStr(params.get("interval"));
+        List<String> ranges = (List<String>)params.get("range");
+        String range = "";
+        if (ranges != null && ranges.size() > 0) {
+            range = ranges.get(0);
+        }
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("obj_type_id", objTypeId);
         requestbody.put("indicator_ids", indicatorIds);
@@ -669,72 +672,18 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             requestbody.put("begin_time", beginTime);
             requestbody.put("end_time", endTime);
         }
+        String s = gson.toJson(requestbody);
         responseEntity = dmeAccessService.access(STATISTIC_QUERY, HttpMethod.POST, gson.toJson(requestbody));
         return responseEntity;
     }
 
-    // query obj_types
-    /*private void queryObjtypes() throws Exception {
-        ResponseEntity responseEntity = dmeAccessService.access(OBJ_TYPES_LIST, HttpMethod.GET, null);
-        if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
-            Object body = responseEntity.getBody();
-            JsonObject bodyJson = new JsonParser().parse(body.toString()).getAsJsonObject();
-            JsonArray dataJsonArray = bodyJson.get("data").getAsJsonArray();
-            for (JsonElement element : dataJsonArray) {
-                JsonObject dataJson = new JsonParser().parse(element.toString()).getAsJsonObject();
-                String objId = dataJson.get("obj_type_id").getAsString();
-                String resourceCategory = dataJson.get("resource_category").getAsString();
-                objtypeIdNampMap.put(objId, resourceCategory);
-                objtypeNameIdMap.put(resourceCategory, objId);
-            }
-        }
-    }*/
-
-    // query obj_type indicators
-    /*private void queryIndicatorsByObjetypeId(String objtypeId) throws Exception {
-        String apiUrl = OBJ_TYPE_INDICATORS_QUERY;
-        apiUrl = apiUrl.replace("{obj-type-id}", objtypeId);
-        if (apiUrl.indexOf("{obj-type-id}") > 0) {
-            log.error("DataStoreStatistic query,the url is error, required \"obj-type-id\"!{}", apiUrl);
-            return;
-        }
-        ResponseEntity responseEntity = dmeAccessService.access(apiUrl, HttpMethod.GET, null);
-
-        if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
-            Object body = responseEntity.getBody();
-            JsonObject bodyJson = new JsonParser().parse(body.toString()).getAsJsonObject();
-            JsonObject dataJson = bodyJson.get("data").getAsJsonObject();
-            JsonArray ids = dataJson.get("indicator_ids").getAsJsonArray();
-            List<String> indicatorIds = new ArrayList<>();
-            for (JsonElement element : ids) {
-                String id = element.toString();
-                indicatorIds.add(id);
-            }
-            objTypeCountersMap.put(objtypeId, indicatorIds);
-        }
-    }*/
-
-    // query indicators
-    /*private void queryIndicators() throws Exception {
-        ResponseEntity responseEntity = dmeAccessService.access(INDICATORS_LIST, HttpMethod.POST, null);
-        if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
-            Object body = responseEntity.getBody();
-            JsonObject bodyJson = new JsonParser().parse(body.toString()).getAsJsonObject();
-            JsonObject dataJson = bodyJson.get("data").getAsJsonObject();
-            Iterator iter = dataJson.entrySet().iterator();
-            while (iter.hasNext()) {
-                String counterId = iter.toString();
-                JsonObject counterJson = dataJson.get(counterId).getAsJsonObject();
-                String counterName = counterJson.get("indicator_name").getAsString();
-                indicatorIdNameMap.put(counterId, counterName);
-                indicatorNameIdMap.put(counterName, counterId);
-            }
-        }
-    }*/
-
     //性能查询条件参数初始化
     private Map<String, Object> initParams(Map<String, Object> params) {
-        String rang = ToolUtils.getStr(params.get("range"));
+        List<String> ranges = (List<String>)params.get("range");
+        String rang = "";
+        if (ranges != null && ranges.size() > 0) {
+            rang = ranges.get(0);
+        }
         String interval = ToolUtils.getStr(params.get("interval"));
         long beginTime = ToolUtils.getLong(params.get("begin_time"));
         long endTime = ToolUtils.getLong(params.get("end_time"));
@@ -932,35 +881,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         return indicators;
     }
 
-    //消息转换  提取实时性能数据
-   /* private JsonObject getCurrentStatistic(Object object) {
-        JsonObject data = new JsonObject();
-        JsonObject dataJson = new JsonParser().parse(object.toString()).getAsJsonObject();
-        Set<Map.Entry<String, JsonElement>> volumeSet = dataJson.getAsJsonObject().entrySet();
-        for (Map.Entry<String, JsonElement> volume : volumeSet) {
-            JsonObject countRes = new JsonObject();
-            String volumeId = volume.getKey();
-            JsonObject counterObj = volume.getValue().getAsJsonObject();
-            Set<Map.Entry<String, JsonElement>> counterSet = counterObj.getAsJsonObject().entrySet();
-            for (Map.Entry<String, JsonElement> countere : counterSet) {
-                String counterId = countere.getKey();
-                JsonObject counterjson = countere.getValue().getAsJsonObject();
-                JsonArray series = counterjson.getAsJsonArray("series");
-                for (JsonElement elment : series) {
-                    JsonObject serieJson = elment.getAsJsonObject();
-                    Set<Map.Entry<String, JsonElement>> serieJsonSet = serieJson.getAsJsonObject().entrySet();
-                    for (Map.Entry<String, JsonElement> serie : serieJsonSet) {
-                        String value = serie.getValue().getAsString();
-                        countRes.addProperty(counterId, value);
-                        break;
-                    }
-                    break;
-                }
-            }
-            data.add(volumeId, countRes);
-        }
-        return data;
-    }*/
 
     //消息转换 object---map
     private Map<String, Object> convertMap(JsonElement jsonElement) {

@@ -25,7 +25,6 @@ import static org.junit.Assert.*;
 public class DmeStorageControllerTest {
 
     DmeStorageController dmeStorageController;
-    private Gson gson = new Gson();
     MockMvc mockMvc;
     Map<String, Object> params;
 
