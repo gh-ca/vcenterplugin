@@ -12,13 +12,9 @@ import java.util.Map;
  */
 public class DMEOpenApiService {
 
-
-
   protected static final int FAIL_CODE = -99999;
 
   private static final int CODE_DME_CONNECT_EXCEPTION = -80010;
-
-  protected static final int RESULT_READ_CERT_ERROR = -90008;
 
   protected static final int RESULT_SUCCESS_CODE = 0;
 
