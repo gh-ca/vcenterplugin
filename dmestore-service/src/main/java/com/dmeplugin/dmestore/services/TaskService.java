@@ -16,10 +16,9 @@ import java.util.Map;
  * @create: 2020-09-08
  **/
 public interface TaskService {
+    List<TaskDetailInfo> listTasks();
 
-    List<TaskDetailInfo> listTasks() ;
-
-    TaskDetailInfo queryTaskById(String taskId) ;
+    TaskDetailInfo queryTaskById(String taskId);
 
     void getTaskStatus(List<String> taskIds, Map<String, Integer> taskStatusMap, int timeout, long startTime);
 

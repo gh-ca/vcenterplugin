@@ -11,31 +11,44 @@ import java.util.List;
 public class StorageDisk {
 
     private String name;
+
     private String status;
+
     private Double capacity;
+
     private String poolId;
+
     private String id;
+
     private String storageDeviceId;
 
     private Float iops;
+
     private Float lantency;
+
     private Float bandwith;
+
     private Float useage;
+
     //硬盘域
     private List<DiskPool> diskPools;
     //补充字段
+
     /**
      * 类型
      */
     private String physicalType;
+
     /**
      * 角色
      */
     private String logicalType;
+
     /**
      * 磁盘域
      */
     private String diskDomain;
+
     /**
      * 转速
      */
@@ -45,7 +58,6 @@ public class StorageDisk {
      * 性能
      */
     private String performance;
-
 
     public List<DiskPool> getDiskPools() {
         return diskPools;
