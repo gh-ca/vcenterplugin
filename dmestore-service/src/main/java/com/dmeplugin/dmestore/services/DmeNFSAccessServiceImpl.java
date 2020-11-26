@@ -108,7 +108,11 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private List<AuthClient> getNfsDatastoreShareAuthClients(String shareId) throws DMEException {
         List<AuthClient> clientList = new ArrayList<>();
         String url = DmeConstants.DME_NFS_SHARE_AUTH_CLIENTS_URL.replace("{nfs_share_id}", shareId);
-        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(new HashMap<>()));
+        Map<String, Object> body = new HashMap<>();
+        body.put("nfs_share_id", shareId);
+        body.put("page_no", 1);
+        body.put("page_size", 1000);
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(body));
         if (responseEntity.getStatusCodeValue() / 100 == 2) {
             String resBody = responseEntity.getBody();
             JsonObject resObject = gson.fromJson(resBody, JsonObject.class);
@@ -121,7 +125,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                     AuthClient authClient = new AuthClient();
                     authClient.setName(ToolUtils.jsonToStr(client.get("name")));
                     authClient.setType(ToolUtils.jsonToStr(client.get("type")));
-                    authClient.setAccessval(ToolUtils.jsonToStr(client.get("accessval")));
+                    authClient.setAccessval(ToolUtils.jsonToStr(client.get("permission")));
                     authClient.setId(ToolUtils.jsonToStr(client.get("id")));
                     clientList.add(authClient);
                 }
@@ -920,7 +924,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private String deleteNfsShare(List<String> shareIds) {
         String taskId = "";
         Map<String, Object> requestbody = new HashMap<>();
-        requestbody.put("id_list", shareIds);
+        requestbody.put("nfs_share_ids", shareIds);
         LOG.info("delete nfs share requestbody==" + gson.toJson(requestbody));
         try {
             ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
