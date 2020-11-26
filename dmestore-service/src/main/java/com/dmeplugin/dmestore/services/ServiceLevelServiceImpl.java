@@ -3,23 +3,39 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.exception.VcenterException;
-import com.dmeplugin.dmestore.model.*;
+import com.dmeplugin.dmestore.model.CapabilitiesQos;
+import com.dmeplugin.dmestore.model.CapabilitiesSmarttier;
+import com.dmeplugin.dmestore.model.QosParam;
+import com.dmeplugin.dmestore.model.RelationInstance;
+import com.dmeplugin.dmestore.model.SimpleCapabilities;
+import com.dmeplugin.dmestore.model.SimpleServiceLevel;
+import com.dmeplugin.dmestore.model.StoragePool;
+import com.dmeplugin.dmestore.model.Volume;
 import com.dmeplugin.dmestore.utils.CipherUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.dmeplugin.vmware.autosdk.SessionHelper;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.vmware.cis.tagging.TagModel;
 import com.vmware.pbm.PbmProfile;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @Description: TODO
@@ -34,14 +50,16 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     public static Map<String, Map<String, Object>> serviceLevelInstance = new HashMap<>();
 
     private Gson gson = new Gson();
+
     private DmeAccessService dmeAccessService;
+
     private DmeRelationInstanceService dmeRelationInstanceService;
+
     private DmeStorageService dmeStorageService;
+
     private VCenterInfoService vCenterInfoService;
+
     private VCSDKUtils vcsdkUtils;
-    private static final String POLICY_DESC = "policy created by dme";
-    private final String LIST_SERVICE_LEVEL_URL = "/rest/service-policy/v1/service-levels";
-    private final String QUERY_SERVICE_LEVEL_VOLUME_URL = "/rest/blockservice/v1/volumes?service_level_id={serviceLevelId}";
 
     public DmeAccessService getDmeAccessService() {
         return dmeAccessService;
@@ -89,16 +107,16 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         ResponseEntity responseEntity;
         List<SimpleServiceLevel> slis;
         try {
-            responseEntity = dmeAccessService.access(LIST_SERVICE_LEVEL_URL, HttpMethod.GET, null);
+            responseEntity = dmeAccessService.access(DmeConstants.LIST_SERVICE_LEVEL_URL, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (HttpStatus.OK.value() != code) {
-                throw new DMEException("503","list serviceLevel response error!");
+                throw new DMEException("503", "list serviceLevel response error!");
             }
             Object object = responseEntity.getBody();
             slis = convertBean(object);
         } catch (Exception e) {
             log.error("list serviceLevel error", e);
-            throw new DMEException("503",e.getMessage());
+            throw new DMEException("503", e.getMessage());
         }
         return slis;
     }
@@ -110,14 +128,16 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             if (null != vCenterInfo) {
                 SessionHelper sessionHelper = new SessionHelper();
                 try {
-                    sessionHelper.login(vCenterInfo.getHostIp(), String.valueOf(vCenterInfo.getHostPort()), vCenterInfo.getUserName(), CipherUtils.decryptString(vCenterInfo.getPassword()));
-                }catch (Exception ex){
+                    sessionHelper.login(vCenterInfo.getHostIp(), String.valueOf(vCenterInfo.getHostPort()),
+                        vCenterInfo.getUserName(), CipherUtils.decryptString(vCenterInfo.getPassword()));
+                } catch (Exception ex) {
                     log.error(ex.getMessage());
                 }
                 String categoryid = vcsdkUtils.getCategoryId(sessionHelper);
                 List<TagModel> tagModels = vcsdkUtils.getAllTagsByCategoryId(categoryid, sessionHelper);
                 List<PbmProfile> pbmProfiles = vcsdkUtils.getAllSelfPolicyInallcontext();
-                ResponseEntity responseEntity = dmeAccessService.access(LIST_SERVICE_LEVEL_URL, HttpMethod.GET, null);
+                ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.LIST_SERVICE_LEVEL_URL,
+                    HttpMethod.GET, null);
                 Object object = responseEntity.getBody();
                 JsonObject jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.get("service-levels").getAsJsonArray();
@@ -167,16 +187,17 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             }
         } catch (Exception e) {
             log.error("list serviceLevel error", e);
-            throw new DMEException("503","update service level error"+e.getMessage());
+            throw new DMEException("503", "update service level error" + e.getMessage());
         }
     }
 
     /**
      * convert the api responseBody to SimpleServiceLevel Bean list
-     * @author wangxy
-     * @date 11:21 2020/11/13
+     *
      * @param object
      * @return java.util.List<com.dmeplugin.dmestore.model.SimpleServiceLevel>
+     * @author wangxy
+     * @date 11:21 2020/11/13
      **/
     private List<SimpleServiceLevel> convertBean(Object object) {
         List<SimpleServiceLevel> ssls = new ArrayList<>();
@@ -261,25 +282,26 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
     /**
      * 扫描服务等级 发现服务等级下的存储池,磁盘,(存储端口)
+     *
+     * @param serivceLevelId
+     * @return java.util.List<com.dmeplugin.dmestore.model.StoragePool>
+     * @throws DMEException
      * @author wangxy
      * @date 11:21 2020/11/13
-     * @param serivceLevelId
-     * @throws DMEException
-     * @return java.util.List<com.dmeplugin.dmestore.model.StoragePool>
      **/
     @Override
     public List<StoragePool> getStoragePoolInfosByServiceLevelId(String serivceLevelId) throws DMEException {
         List<StoragePool> storagePools = new ArrayList<>();
         // servicLevelId对应的serviceLevelInstanceId
         Map<String, Map<String, Object>> serviceLevelMap = dmeRelationInstanceService.getServiceLevelInstance();
-        if(null!= serviceLevelMap && serviceLevelMap.size()>0){
+        if (null != serviceLevelMap && serviceLevelMap.size() > 0) {
             try {
                 String serviceLevelInstanceId = serviceLevelMap.get(serivceLevelId).get("resId").toString();
-                if(!StringUtils.isEmpty(serviceLevelInstanceId)){
+                if (!StringUtils.isEmpty(serviceLevelInstanceId)) {
                     serivceLevelId = serviceLevelInstanceId;
                 }
             } catch (Exception e) {
-                log.warn("获取服务等级关联的存储池,查询服务等级instanceId异常,servcieLevelId:"+serivceLevelId);
+                log.warn("获取服务等级关联的存储池,查询服务等级instanceId异常,servcieLevelId:" + serivceLevelId);
             }
         }
 
@@ -313,7 +335,8 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             for (Map.Entry<String, Set<String>> entry : storageDevicePoolIds.entrySet()) {
                 String storageDevcieId = entry.getKey();
                 Set<String> storagePoolIds = entry.getValue();
-                List<StoragePool> storageDevicePools = getStoragePoolInfosByStorageIdStoragePoolIds(storageDevcieId, new ArrayList<>(storagePoolIds));
+                List<StoragePool> storageDevicePools = getStoragePoolInfosByStorageIdStoragePoolIds(storageDevcieId,
+                    new ArrayList<>(storagePoolIds));
                 if (null != storageDevicePoolIds && storageDevicePoolIds.size() > 0) {
                     storagePools.addAll(storageDevicePools);
                 } else {
@@ -327,7 +350,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     @Override
     public List<Volume> getVolumeInfosByServiceLevelId(String serviceLevelId) throws DMEException {
         List<Volume> volumes = new ArrayList<>();
-        String url = QUERY_SERVICE_LEVEL_VOLUME_URL.replace("{serviceLevelId}", serviceLevelId);
+        String url = DmeConstants.QUERY_SERVICE_LEVEL_VOLUME_URL.replace("{serviceLevelId}", serviceLevelId);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         int code = responseEntity.getStatusCodeValue();
         if (code != HttpStatus.OK.value()) {
@@ -379,26 +402,28 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return value;
     }
 
-    private List<StoragePool> getStoragePoolInfosByStorageIdStoragePoolIds(String storageDeviceId, List<String> storagePoolIds) throws DMEException {
+    private List<StoragePool> getStoragePoolInfosByStorageIdStoragePoolIds(String storageDeviceId,
+        List<String> storagePoolIds) throws DMEException {
         List<StoragePool> sps = new ArrayList<>();
         List<StoragePool> storagePools = dmeStorageService.getStoragePools(storageDeviceId, "all");
 
-            for (StoragePool sp : storagePools) {
-                String poolId = sp.getStorageInstanceId();
-                if (storagePoolIds.contains(poolId)) {
-                    sps.add(sp);
-                }
+        for (StoragePool sp : storagePools) {
+            String poolId = sp.getStorageInstanceId();
+            if (storagePoolIds.contains(poolId)) {
+                sps.add(sp);
             }
+        }
         return sps;
     }
 
     /**
      * 服务等级 发现服务等级下的存储池 serviceLevelId和sourceInstanceId一样?
+     *
+     * @param serviceLevelId
+     * @return java.util.List<java.lang.String>
+     * @throws DMEException
      * @author wangxy
      * @date 11:19 2020/11/13
-     * @param serviceLevelId
-     * @throws DMEException
-     * @return java.util.List<java.lang.String>
      **/
     public List<String> getStoragePoolIdsByServiceLevelId(String serviceLevelId) throws DMEException {
         String relatinName = "M_DjTierContainsStoragePool";
@@ -407,20 +432,23 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
     /**
      * 服务等级 发现服务等级下的卷实例ID
+     *
+     * @param serviceLevelId
+     * @return java.util.List<java.lang.String>
+     * @throws DMEException
      * @author wangxy
      * @date 11:20 2020/11/13
-     * @param serviceLevelId
-     * @throws DMEException
-     * @return java.util.List<java.lang.String>
      **/
     public List<String> getVolumeIdsByServiceLivelId(String serviceLevelId) throws DMEException {
         String relationName = "M_DjTierContainsLun";
         return getContainIdsByRelationNameLevelId(relationName, serviceLevelId);
     }
 
-    private List<String> getContainIdsByRelationNameLevelId(String relationName, String serviceLevelId) throws DMEException {
+    private List<String> getContainIdsByRelationNameLevelId(String relationName, String serviceLevelId)
+        throws DMEException {
         Set<String> ids = new HashSet<>();
-        List<RelationInstance> ris = dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(relationName, serviceLevelId);
+        List<RelationInstance> ris = dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(
+            relationName, serviceLevelId);
         if (null != ris && ris.size() > 0) {
             for (RelationInstance ri : ris) {
                 ids.add(ri.getTargetInstanceId());
@@ -431,10 +459,11 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
     /**
      * 将instance转换为storagepool信息
-     * @author wangxy
-     * @date 11:20 2020/11/13
+     *
      * @param instanceObj
      * @return com.dmeplugin.dmestore.model.StoragePool
+     * @author wangxy
+     * @date 11:20 2020/11/13
      **/
     private StoragePool convertInstanceToStoragePool(Object instanceObj) {
         StoragePool sp = new StoragePool();

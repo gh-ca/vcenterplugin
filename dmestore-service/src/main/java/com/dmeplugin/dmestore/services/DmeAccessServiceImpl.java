@@ -16,12 +16,20 @@ import com.google.gson.JsonParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @Description: TODO
@@ -59,28 +67,6 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     private static Integer dmeHostPort;
 
-    private final String LOGIN_DME_URL = "/rest/plat/smapp/v1/sessions";
-
-    private final String REFRES_STATE_URL = "/rest/blockservice/v1/volumes?limit=1";
-
-    private final String GET_WORKLOADS_URL = "/rest/storagemgmt/v1/storages/{storage_id}/workloads";
-
-    private final String GET_DME_HOSTS_URL = "/rest/hostmgmt/v1/hosts/summary";
-
-    private final String GET_DME_HOSTGROUPS_URL = "/rest/hostmgmt/v1/hostgroups/summary";
-
-    private final String CREATE_DME_HOST_URL = "/rest/hostmgmt/v1/hosts";
-
-    private final String CREATE_DME_HOSTGROUP_URL = "/rest/hostmgmt/v1/hostgroups";
-
-    private final String GET_DME_HOST_URL = "/rest/hostmgmt/v1/hosts/{host_id}/summary";
-
-    private final String GET_DME_HOSTGROUP_URL = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}/summary";
-
-    private final String GET_DME_HOSTS_INITIATORS_URL = "/rest/hostmgmt/v1/hosts/{host_id}/initiators";
-
-    private final String GET_DME_HOSTS_IN_HOSTGROUP_URL = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}/hosts/list";
-
     @Autowired
     private RestTemplate restTemplate;
 
@@ -113,7 +99,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     public Map<String, Object> refreshDme() throws DMEException {
         try {
             //判断与服务器的连接
-            ResponseEntity responseEntity = access(REFRES_STATE_URL, HttpMethod.GET, null);
+            ResponseEntity responseEntity = access(DmeConstants.REFRES_STATE_URL, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() != RestUtils.RES_STATE_I_200) {
                 throw new DMEException("503", "更新连接状态失败:" + responseEntity.toString());
             }
@@ -241,7 +227,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             String hostUrl = "https://" + params.get("hostIp") + ":" + params.get("hostPort");
 
             HttpEntity<String> entity = new HttpEntity<>(gson.toJson(requestbody), headers);
-            responseEntity = restTemplate.exchange(hostUrl + LOGIN_DME_URL, HttpMethod.PUT, entity, String.class);
+            responseEntity = restTemplate.exchange(hostUrl + DmeConstants.LOGIN_DME_URL, HttpMethod.PUT, entity,
+                String.class);
 
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -294,7 +281,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         List<Map<String, Object>> relists = null;
         try {
             if (!StringUtils.isEmpty(storageId)) {
-                String workloadsUrl = GET_WORKLOADS_URL.replace("{storage_id}", storageId);
+                String workloadsUrl = DmeConstants.GET_WORKLOADS_URL.replace("{storage_id}", storageId);
                 try {
                     ResponseEntity responseEntity = access(workloadsUrl, HttpMethod.GET, null);
                     if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
@@ -338,7 +325,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     @Override
     public List<Map<String, Object>> getDmeHosts(String hostIp) throws DMEException {
         List<Map<String, Object>> relists = null;
-        String getHostsUrl = GET_DME_HOSTS_URL;
+        String getHostsUrl = DmeConstants.DME_HOST_SUMMARY_URL;
         try {
             Map<String, Object> requestbody = new HashMap<>(16);
             if (!StringUtils.isEmpty(hostIp)) {
@@ -395,10 +382,9 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     @Override
     public List<Map<String, Object>> getDmeHostInitiators(String hostId) throws DMEException {
         List<Map<String, Object>> relists = null;
-        String getHostsInitiatorUrl = GET_DME_HOSTS_INITIATORS_URL;
-        getHostsInitiatorUrl = getHostsInitiatorUrl.replace("{host_id}", hostId);
+        String url = DmeConstants.GET_DME_HOSTS_INITIATORS_URL.replace("{host_id}", hostId);
         try {
-            ResponseEntity responseEntity = access(getHostsInitiatorUrl, HttpMethod.GET, null);
+            ResponseEntity responseEntity = access(url, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 if (jsonObject != null && jsonObject.get(DmeConstants.INITIATORS) != null) {
@@ -421,7 +407,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 }
             }
         } catch (Exception e) {
-            LOG.error("DME link error url:" + getHostsInitiatorUrl + ",error:" + e.toString());
+            LOG.error("DME link error url:" + url + ",error:" + e.toString());
             throw new DMEException(e.getMessage());
         }
         LOG.info("getHostsInitiator relists===" + (relists == null ? "null" : (relists.size())));
@@ -431,7 +417,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     @Override
     public List<Map<String, Object>> getDmeHostGroups(String hostGroupName) throws DMEException {
         List<Map<String, Object>> relists = null;
-        String getHostGroupsUrl = GET_DME_HOSTGROUPS_URL;
+        String getHostGroupsUrl = DmeConstants.GET_DME_HOSTGROUPS_URL;
         try {
             Map<String, Object> requestbody = null;
             if (!StringUtils.isEmpty(hostGroupName)) {
@@ -468,7 +454,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     @Override
     public Map<String, Object> createHost(Map<String, Object> params) throws DMEException {
         Map<String, Object> hostmap = null;
-        String createHostUrl = CREATE_DME_HOST_URL;
+        String createHostUrl = DmeConstants.CREATE_DME_HOST_URL;
         try {
             Map<String, Object> requestbody = null;
             if (params != null && params.get(DmeConstants.HOST) != null) {
@@ -509,7 +495,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     @Override
     public Map<String, Object> createHostGroup(Map<String, Object> params) throws DMEException {
         Map<String, Object> hostgroupmap = null;
-        String createHostGroupUrl = CREATE_DME_HOSTGROUP_URL;
+        String createHostGroupUrl = DmeConstants.CREATE_DME_HOSTGROUP_URL;
         try {
             Map<String, Object> requestbody;
             if (params != null && params.get(DmeConstants.CLUSTER) != null
@@ -569,8 +555,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     @Override
     public Map<String, Object> getDmeHost(String hostId) throws DMEException {
         Map<String, Object> map = new HashMap<>(16);
-        String getHostUrl = GET_DME_HOST_URL;
-        getHostUrl = getHostUrl.replace("{host_id}", hostId);
+        String getHostUrl = DmeConstants.GET_DME_HOST_URL.replace("{host_id}", hostId);
         try {
             ResponseEntity responseEntity = access(getHostUrl, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
@@ -645,8 +630,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     @Override
     public Map<String, Object> getDmeHostGroup(String hostGroupId) throws DMEException {
         Map<String, Object> map = new HashMap<>(16);
-        String getHostGroupUrl = GET_DME_HOSTGROUP_URL;
-        getHostGroupUrl = getHostGroupUrl.replace("{hostgroup_id}", hostGroupId);
+        String getHostGroupUrl = DmeConstants.GET_DME_HOSTGROUP_URL.replace("{hostgroup_id}", hostGroupId);
         try {
             ResponseEntity responseEntity = access(getHostGroupUrl, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
@@ -667,8 +651,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     @Override
     public List<Map<String, Object>> getDmeHostInHostGroup(String hostGroupId) throws DMEException {
         List<Map<String, Object>> list = null;
-        String getHostInHostGroupUrl = GET_DME_HOSTS_IN_HOSTGROUP_URL;
-        getHostInHostGroupUrl = getHostInHostGroupUrl.replace("{hostgroup_id}", hostGroupId);
+        String getHostInHostGroupUrl = DmeConstants.GET_DME_HOSTS_IN_HOSTGROUP_URL.replace("{hostgroup_id}", hostGroupId);
         try {
             Map<String, Object> requestbody = new HashMap<>(16);
             ResponseEntity responseEntity = access(getHostInHostGroupUrl, HttpMethod.POST, gson.toJson(requestbody));
