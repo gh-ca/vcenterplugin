@@ -610,7 +610,7 @@ public class DmeNFSAccessServiceImplTest {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("task_id", "321");
         ResponseEntity<String> responseEntity = new ResponseEntity<>(gson.toJson(jsonObject), null, HttpStatus.ACCEPTED);
-        when(dmeAccessService.access(DmeConstants.DME_NFS_SHARE_DELETE_URL, HttpMethod.POST, "{\"id_list\":[\"321\"]}")).thenReturn(responseEntity);
+        when(dmeAccessService.access(DmeConstants.DME_NFS_SHARE_DELETE_URL, HttpMethod.POST, "{\"nfs_share_ids\":[\"321\"]}")).thenReturn(responseEntity);
         when(dmeAccessService.access(DmeConstants.DME_NFS_FS_DELETE_URL, HttpMethod.POST, "{\"file_system_ids\":[\"321\"]}")).thenReturn(responseEntity);
         List<String> list = new ArrayList<>();
         list.add("321");

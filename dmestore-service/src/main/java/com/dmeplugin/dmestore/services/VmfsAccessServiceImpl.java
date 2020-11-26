@@ -1073,7 +1073,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             if (!volume.get("storage_id").isJsonNull()) {
                 String storageId = volume.get("storage_id").getAsString();
                 //根据存储ID查询存储信息
-                url = String.format(DmeConstants.DME_STORAGE_DETAIL_URL, storageId);
+                url = DmeConstants.DME_STORAGE_DETAIL_URL.replace("{storage_id}", storageId);
                 responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
                 if (responseEntity.getStatusCodeValue() / 100 == 2) {
                     JsonObject storeageDetail = gson.fromJson(responseEntity.getBody(), JsonObject.class);

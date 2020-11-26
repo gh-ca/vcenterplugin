@@ -157,11 +157,16 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                         && shareClientHostMap.get("objectId") != null) {
                         reqNfsShareClientArrayAddition.put("name", shareClientHostMap.get("name"));
                         //设置创建nfs默认值
-                        reqNfsShareClientArrayAddition.put("accessval", "read-only");
+                        /*reqNfsShareClientArrayAddition.put("accessval", "read-only");
                         reqNfsShareClientArrayAddition.put("sync", "synchronization");
                         reqNfsShareClientArrayAddition.put("all_squash", "all_squash");
                         reqNfsShareClientArrayAddition.put("root_squash", "root_squash");
-                        reqNfsShareClientArrayAddition.put("secure", "insecure");
+                        reqNfsShareClientArrayAddition.put("secure", "insecure");*/
+                        reqNfsShareClientArrayAddition.put("permission", "read-only");
+                        reqNfsShareClientArrayAddition.put("write_mode", "synchronization");
+                        reqNfsShareClientArrayAddition.put("permission_constraint", "all_squash");
+                        reqNfsShareClientArrayAddition.put("root_permission_constraint", "root_squash");
+                        reqNfsShareClientArrayAddition.put("source_port_verification", "insecure");
                         mount.put((String) shareClientHostMap.get("objectId"), (String) shareClientHostMap.get("name"));
                     }
                     reqNfsShareClientArrayAdditions.add(reqNfsShareClientArrayAddition);
@@ -178,6 +183,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                         if (!StringUtils.isEmpty(showSnapshotEnable)) {
                             createNfsShareParams.put("show_snapshot_enable", gson.toJson(showSnapshotEnable));
                         }
+                        // TODO 缺值
+                        nfsShareMap.put("share_path", "");
                         nfsShareMap.put("create_nfs_share_param", createNfsShareParams);
                     }
                 }
@@ -324,7 +331,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 fileSystemId = fsIds.get(0);
             }
         }
-        String url = DmeConstants.API_FILESYSTEM_DETAIL + fileSystemId;
+        String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace( "{file_system_id}", fileSystemId);
         //查询指定fs拿对应的信息
         Integer code = 0;
         try {
@@ -542,7 +549,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
         if (StringUtils.isEmpty(fileSystemId)) {
         }
-        String url = DmeConstants.API_FILESYSTEM_DETAIL + fileSystemId;
+        String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace( "{file_system_id}",  fileSystemId);
 
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(params));
         int code = responseEntity.getStatusCodeValue();
@@ -630,7 +637,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         resMap.put("code", "200");
         resMap.put("msg", "list filesystem success!");
 
-        String url = DmeConstants.API_FILESYSTEM_DETAIL + fileSystemId;
+        String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace( "{file_system_id}", fileSystemId);
 
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         int code = responseEntity.getStatusCodeValue();
