@@ -4,7 +4,12 @@ import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.RelationInstance;
 import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.ToolUtils;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +17,11 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @Description: TODO
@@ -25,22 +34,21 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private static final Logger log = LoggerFactory.getLogger(DataStoreStatisticHistoryService.class);
 
     private Gson gson = new Gson();
+
     @Autowired
     private DmeAccessService dmeAccessService;
+
     @Autowired
     private DmeRelationInstanceService dmeRelationInstanceService;
 
-    private static final String STATISTIC_QUERY = "/rest/metrics/v1/data-svc/history-data/action/query";
-    private static final String OBJ_TYPES_LIST = "/rest/metrics/v1/mgr-svc/obj-types";
-    private static final String INDICATORS_LIST = "/rest/metrics/v1/mgr-svc/indicators";
-    private static final String OBJ_TYPE_INDICATORS_QUERY = "/rest/metrics/v1/mgr-svc/obj-types/{obj-type-id}/indicators";
-
     //性能指标 id和name的映射关系
     private static Map<String, String> indicatorNameIdMap = new HashMap<>();
+
     private static Map<String, String> indicatorIdNameMap = new HashMap<>();
 
     //资源对象类型 id和name的映射关系
     private static Map<String, String> objtypeIdNampMap = new HashMap<>();
+
     private static Map<String, String> objtypeNameIdMap = new HashMap<>();
 
     //资源对象类型支持指标 对象类型id和指标id集合关系
@@ -259,9 +267,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         return queryCurrentStatistic("storagedisk", params, idInstancdIdMap);
     }
 
-
     @Override
-    public Map<String, Object> queryHistoryStatistic(String relationOrInstance, Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryHistoryStatistic(String relationOrInstance, Map<String, Object> params)
+        throws DMEException {
         Map<String, Object> resultMap = new HashMap<>(16);
         if (!StringUtils.isEmpty(relationOrInstance)) {
             switch (relationOrInstance) {
@@ -290,8 +298,12 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                     resultMap = queryStorageDiskStatistic(params);
                     break;
                 default:
-                    log.error("query " + relationOrInstance + " statistic error, non-supported relation and instance.the params is:{}", gson.toJson(params));
-                    throw new DMEException("503", "query " + relationOrInstance + " statistic error, non-supported relation and instance.the params is:{}" + gson.toJson(params));
+                    log.error("query " + relationOrInstance
+                            + " statistic error, non-supported relation and instance.the params is:{}",
+                        gson.toJson(params));
+                    throw new DMEException("503", "query " + relationOrInstance
+                        + " statistic error, non-supported relation and instance.the params is:{}" + gson.toJson(
+                        params));
             }
 
         }
@@ -299,7 +311,8 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     @Override
-    public Map<String, Object> queryCurrentStatistic(String relationOrInstance, Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryCurrentStatistic(String relationOrInstance, Map<String, Object> params)
+        throws DMEException {
         Map<String, Object> resultMap = new HashMap<>(16);
         if (!StringUtils.isEmpty(relationOrInstance)) {
             switch (relationOrInstance) {
@@ -329,8 +342,11 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                     break;
                 default:
                     resultMap.put("code", 503);
-                    resultMap.put("message", "query " + relationOrInstance + " current statistic error, non-supported relation and instance!");
-                    log.error("query " + relationOrInstance + " current statistic error, non-supported relation and instance.the params is:{}", gson.toJson(params));
+                    resultMap.put("message", "query " + relationOrInstance
+                        + " current statistic error, non-supported relation and instance!");
+                    log.error("query " + relationOrInstance
+                            + " current statistic error, non-supported relation and instance.the params is:{}",
+                        gson.toJson(params));
                     throw new DMEException(gson.toJson(resultMap));
             }
         }
@@ -517,7 +533,9 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private RelationInstance getInstance(String relationName, String sourceId) {
         RelationInstance relationInstance = null;
         try {
-            List<RelationInstance> instances = dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(relationName, sourceId);
+            List<RelationInstance> instances
+                = dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(relationName,
+                sourceId);
             if (instances.size() > 0) {
                 relationInstance = instances.get(0);
             }
@@ -570,7 +588,8 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     //query statistic by objType(methodName)
-    private Map<String, Object> queryHistoryStatistic(String relationOrInstance, Map<String, Object> params, Map<String, String> idInstanceIdMap) throws DMEException {
+    private Map<String, Object> queryHistoryStatistic(String relationOrInstance, Map<String, Object> params,
+        Map<String, String> idInstanceIdMap) throws DMEException {
         Map<String, Object> resultmap = new HashMap<>(16);
         ResponseEntity responseEntity;
         JsonElement statisticElement;
@@ -587,16 +606,20 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                         JsonObject bodyJson = new JsonParser().parse(bodyStr).getAsJsonObject();
                         statisticElement = bodyJson.get("data");
                         if (ToolUtils.jsonIsNull(statisticElement)) {
-                            log.error("query " + relationOrInstance + "objid: " + gson.toJson(objids) + "Statistic is null:", bodyJson.get("error_msg").getAsString());
+                            log.error(
+                                "query " + relationOrInstance + "objid: " + gson.toJson(objids) + "Statistic is null:",
+                                bodyJson.get("error_msg").getAsString());
                             continue;
                         }
                         Map<String, Object> objectMap = convertMap(statisticElement);
                         resultmap.putAll(objectMap);
                         if (objectMap.size() == 0) {
-                            log.error("query " + relationOrInstance + "Statistic error:", bodyJson.get("error_msg").getAsString());
+                            log.error("query " + relationOrInstance + "Statistic error:",
+                                bodyJson.get("error_msg").getAsString());
                         }
-                    }else{
-                        log.error("query " + relationOrInstance + " statistic error,the params is:{}", gson.toJson(params));
+                    } else {
+                        log.error("query " + relationOrInstance + " statistic error,the params is:{}",
+                            gson.toJson(params));
                         throw new DMEException("503", relationOrInstance + " statistic error,the params is:{}");
                     }
                 } catch (Exception e) {
@@ -608,7 +631,8 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         return resultmap;
     }
 
-    private Map<String, Object> queryCurrentStatistic(String relationOrInstance, Map<String, Object> params, Map<String, String> idInstanceIdMap) throws DMEException {
+    private Map<String, Object> queryCurrentStatistic(String relationOrInstance, Map<String, Object> params,
+        Map<String, String> idInstanceIdMap) throws DMEException {
         Map<String, Object> resultmap = new HashMap<>();
 
         String label = "max";
@@ -627,16 +651,19 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                         JsonObject bodyJson = new JsonParser().parse(bodyStr).getAsJsonObject();
                         statisticElement = bodyJson.get("data");
                         if (ToolUtils.jsonIsNull(statisticElement)) {
-                            log.error("query " + relationOrInstance + "objid: " + gson.toJson(objids) + "currentStatistic is null:", bodyJson.get("error_msg").getAsString());
+                            log.error("query " + relationOrInstance + "objid: " + gson.toJson(objids)
+                                + "currentStatistic is null:", bodyJson.get("error_msg").getAsString());
                             continue;
                         }
                         Map<String, Object> objectMap = convertMap(statisticElement, label);
                         resultmap.putAll(objectMap);
                         if (null == objectMap || objectMap.size() == 0) {
-                            log.error("query " + relationOrInstance + " current statistic error:", bodyJson.get("error_msg").getAsString());
+                            log.error("query " + relationOrInstance + " current statistic error:",
+                                bodyJson.get("error_msg").getAsString());
                         }
                     } else {
-                        log.error("query " + relationOrInstance + " current statistic error,the params is:{}", gson.toJson(params));
+                        log.error("query " + relationOrInstance + " current statistic error,the params is:{}",
+                            gson.toJson(params));
                     }
                 } catch (Exception e) {
                     log.error("query " + relationOrInstance + " current statistic exception.", e);
@@ -655,7 +682,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         params = initParams(params);
 
         String interval = ToolUtils.getStr(params.get("interval"));
-        List<String> ranges = (List<String>)params.get("range");
+        List<String> ranges = (List<String>) params.get("range");
         String range = "";
         if (ranges != null && ranges.size() > 0) {
             range = ranges.get(0);
@@ -673,13 +700,14 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             requestbody.put("end_time", endTime);
         }
         String s = gson.toJson(requestbody);
-        responseEntity = dmeAccessService.access(STATISTIC_QUERY, HttpMethod.POST, gson.toJson(requestbody));
+        responseEntity = dmeAccessService.access(DmeConstants.STATISTIC_QUERY, HttpMethod.POST,
+            gson.toJson(requestbody));
         return responseEntity;
     }
 
     //性能查询条件参数初始化
     private Map<String, Object> initParams(Map<String, Object> params) {
-        List<String> ranges = (List<String>)params.get("range");
+        List<String> ranges = (List<String>) params.get("range");
         String rang = "";
         if (ranges != null && ranges.size() > 0) {
             rang = ranges.get(0);
@@ -712,7 +740,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 case RANGE_LAST_1_HOUR:
                     interval = INTERVAL_ONE_MINUTE;
                     break;
-                    //INTERVAL_ONE_MINUTE查不到值，会报错
+                //INTERVAL_ONE_MINUTE查不到值，会报错
                 case RANGE_LAST_1_DAY:
                     interval = INTERVAL_ONE_MINUTE;
                     break;
@@ -881,7 +909,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         return indicators;
     }
 
-
     //消息转换 object---map
     private Map<String, Object> convertMap(JsonElement jsonElement) {
         Map<String, Object> objectMap = new HashMap<>();
@@ -904,7 +931,8 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                             for (JsonElement serieCellElemt : seriesArray) {
                                 Map<String, String> seriesMap = new HashMap<>();
                                 if (!ToolUtils.jsonIsNull(serieCellElemt)) {
-                                    Set<Map.Entry<String, JsonElement>> cellSet = serieCellElemt.getAsJsonObject().entrySet();
+                                    Set<Map.Entry<String, JsonElement>> cellSet = serieCellElemt.getAsJsonObject()
+                                        .entrySet();
                                     for (Map.Entry<String, JsonElement> cellEntry : cellSet) {
                                         String time = cellEntry.getKey();
                                         String value = cellEntry.getValue().getAsString();
