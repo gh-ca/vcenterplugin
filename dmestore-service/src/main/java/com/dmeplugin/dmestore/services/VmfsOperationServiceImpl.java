@@ -1,16 +1,32 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.exception.DMEException;
-import com.dmeplugin.dmestore.model.*;
+import com.dmeplugin.dmestore.model.CapabilitiesQos;
+import com.dmeplugin.dmestore.model.CapabilitiesSmarttier;
+import com.dmeplugin.dmestore.model.CustomizeVolumeTuning;
+import com.dmeplugin.dmestore.model.SimpleCapabilities;
+import com.dmeplugin.dmestore.model.SimpleServiceLevel;
+import com.dmeplugin.dmestore.model.SmartQos;
+import com.dmeplugin.dmestore.model.VolumeUpdate;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author lianq
@@ -19,15 +35,9 @@ import java.util.*;
  * @date 2020/9/9 10:23
  */
 public class VmfsOperationServiceImpl implements VmfsOperationService {
-
-    private final String API_VMFS_UPDATE = "/rest/blockservice/v1/volumes";
-    private final String API_VMFS_EXPAND = "/rest/blockservice/v1/volumes/expand";
-    private final String API_SERVICELEVEL_UPDATE = "/rest/blockservice/v1/volumes/update-service-level";
-    private final String API_SERVICELEVEL_LIST = "/rest/service-policy/v1/service-levels";
-
     private DmeAccessService dmeAccessService;
 
-    private Gson gson=new Gson();
+    private Gson gson = new Gson();
 
     private VCSDKUtils vcsdkUtils;
 
@@ -100,12 +110,12 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         reqMap.put("volume", volume);
         String reqBody = gson.toJson(reqMap);
 
-        String url = API_VMFS_UPDATE + "/" + volumeId;
+        String url = DmeConstants.DME_VOLUME_BASE_URL + "/" + volumeId;
         try {
             Object oldDsName = params.get("oldDsName");
             Object newDsName = params.get("newDsName");
             if (StringUtils.isEmpty(oldDsName) || StringUtils.isEmpty(newDsName)) {
-                throw new DMEException("403","datastore params error");
+                throw new DMEException("403", "datastore params error");
             }
             //vcenter renameDatastore
             Object dataStoreObjectId = params.get("dataStoreObjectId");
@@ -115,7 +125,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             }
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, reqBody);
             int code = responseEntity.getStatusCodeValue();
-            if (code != HttpStatus.ACCEPTED.value() ||StringUtils.isEmpty(result)||"failed".equals(result)) {
+            if (code != HttpStatus.ACCEPTED.value() || StringUtils.isEmpty(result) || "failed".equals(result)) {
                 throw new DMEException("503", "update VmfsDatastore failed");
             }
             String object = responseEntity.getBody();
@@ -131,7 +141,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
         } catch (Exception e) {
             LOG.error("update vmfsDatastore error", e);
-            throw new DMEException("503",e.getMessage());
+            throw new DMEException("503", e.getMessage());
         }
     }
 
@@ -155,10 +165,11 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         reqList.add(reqBody);
         reqMap.put("volumes", reqList);
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.access(API_VMFS_EXPAND, HttpMethod.POST, gson.toJson(reqMap));
+            ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.API_VMFS_EXPAND,
+                HttpMethod.POST, gson.toJson(reqMap));
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.ACCEPTED.value()) {
-                throw new DMEException("503","expand vmfsDatastore failed !");
+                throw new DMEException("503", "expand vmfsDatastore failed !");
             }
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
@@ -167,22 +178,21 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             taskIds.add(taskId);
             Boolean flag = taskService.checkTaskStatus(taskIds);
             if (!flag) {
-                throw new DMEException("503","expand volume failed !");
+                throw new DMEException("503", "expand volume failed !");
             }
 
             String dsName = volumemap.get("ds_name");
             String result = null;
-            if (!StringUtils.isEmpty(voAddCapacity)&&!StringUtils.isEmpty(datastoreobjid)) {
-                result = vcsdkUtils.expandVmfsDatastore(dsName, ToolUtils.getInt(voAddCapacity),datastoreobjid);
+            if (!StringUtils.isEmpty(voAddCapacity) && !StringUtils.isEmpty(datastoreobjid)) {
+                result = vcsdkUtils.expandVmfsDatastore(dsName, ToolUtils.getInt(voAddCapacity), datastoreobjid);
             }
             if ("failed".equals(result)) {
-                throw new DMEException("403","expand vmfsDatastore failed !");
+                throw new DMEException("403", "expand vmfsDatastore failed !");
             }
-
 
         } catch (Exception e) {
             LOG.error("expand vmfsDatastore error !", e);
-            throw new DMEException("503",e.getMessage());
+            throw new DMEException("503", e.getMessage());
         }
     }
 
@@ -198,12 +208,12 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             }
             if (result == null || "error".equals(result)) {
 
-                throw new DMEException("403","recycle vmfsDatastore error");
+                throw new DMEException("403", "recycle vmfsDatastore error");
             }
         } catch (Exception e) {
             LOG.error("recycle vmfsDatastore error !", e);
 
-            throw new DMEException("503",e.getMessage());
+            throw new DMEException("503", e.getMessage());
         }
     }
 
@@ -218,11 +228,11 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 }
             }
             if (result == null || "error".equals(result)) {
-                throw new DMEException("403","recycle vmfsDatastore error");
+                throw new DMEException("403", "recycle vmfsDatastore error");
             }
         } catch (Exception e) {
             LOG.error("recycle vmfsDatastore error !", e);
-            throw new DMEException("503",e.getMessage());
+            throw new DMEException("503", e.getMessage());
         }
     }
 
@@ -230,18 +240,19 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     public void updateVmfsServiceLevel(Map<String, Object> params) throws DMEException {
 
         if (params == null || params.size() == 0) {
-            throw new DMEException("403","params error,please check your params!");
+            throw new DMEException("403", "params error,please check your params!");
         }
 
         Map<String, Object> reqMap = new HashMap<>(16);
         reqMap.put("service_level_id", params.get("service_level_id"));
         reqMap.put("volume_ids", params.get("volume_ids"));
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.access(API_SERVICELEVEL_UPDATE, HttpMethod.POST, gson.toJson(reqMap));
-            LOG.info("url:{" + API_SERVICELEVEL_UPDATE + "},响应信息：" + responseEntity);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.API_SERVICELEVEL_UPDATE,
+                HttpMethod.POST, gson.toJson(reqMap));
+            LOG.info("url:{" + DmeConstants.API_SERVICELEVEL_UPDATE + "},响应信息：" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.ACCEPTED.value()) {
-                throw new DMEException("503","update vmfs service level error!");
+                throw new DMEException("503", "update vmfs service level error!");
             }
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
@@ -250,11 +261,11 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             taskIds.add(taskId);
             Boolean flag = taskService.checkTaskStatus(taskIds);
             if (!flag) {
-                throw new DMEException("400","update vmfs service level failed");
+                throw new DMEException("400", "update vmfs service level failed");
             }
         } catch (Exception e) {
             LOG.error("update vmfs service level error !", e);
-            throw new DMEException("503",e.getMessage());
+            throw new DMEException("503", e.getMessage());
         }
     }
 
@@ -264,12 +275,13 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         List<SimpleServiceLevel> simpleServiceLevels = new ArrayList<>();
         String s = gson.toJson(params);
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.access(API_SERVICELEVEL_LIST, HttpMethod.GET, gson.toJson(params));
-            LOG.info("{"+API_SERVICELEVEL_LIST+"}"+responseEntity);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.LIST_SERVICE_LEVEL_URL,
+                HttpMethod.GET, gson.toJson(params));
+            LOG.info("{" + DmeConstants.LIST_SERVICE_LEVEL_URL + "}" + responseEntity);
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
-            
-                throw new DMEException("503","list vmfs service level error !");
+
+                throw new DMEException("503", "list vmfs service level error !");
             }
 
             String object = responseEntity.getBody();
@@ -283,9 +295,9 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
                 simpleServiceLevel.setDescription(ToolUtils.jsonToStr(element.get("description")));
                 simpleServiceLevel.setType(ToolUtils.jsonToStr(element.get("type")));
                 simpleServiceLevel.setProtocol(ToolUtils.jsonToStr(element.get("protocol")));
-                simpleServiceLevel.setTotalCapacity(ToolUtils.jsonToDou(element.get("total_capacity"),0.0));
-                simpleServiceLevel.setFreeCapacity(ToolUtils.jsonToDou(element.get("free_capacity"),0.0));
-                simpleServiceLevel.setUsedCapacity(ToolUtils.jsonToDou(element.get("used_capacity"),0.0));
+                simpleServiceLevel.setTotalCapacity(ToolUtils.jsonToDou(element.get("total_capacity"), 0.0));
+                simpleServiceLevel.setFreeCapacity(ToolUtils.jsonToDou(element.get("free_capacity"), 0.0));
+                simpleServiceLevel.setUsedCapacity(ToolUtils.jsonToDou(element.get("used_capacity"), 0.0));
 
                 SimpleCapabilities capability = new SimpleCapabilities();
                 JsonObject capabilities = element.get("capabilities").getAsJsonObject();
@@ -325,7 +337,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             }
         } catch (Exception e) {
             LOG.error("list vmfs service level success !", e);
-            throw new DMEException("503",e.getMessage());
+            throw new DMEException("503", e.getMessage());
         }
         return simpleServiceLevels;
     }

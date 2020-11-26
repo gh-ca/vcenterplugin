@@ -80,8 +80,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     public NfsDataStoreShareAttr getNfsDatastoreShareAttr(String storageObjectId) throws DMEException {
         //根据存储ID 获取逻nfs_share_id
         String nfsShareId = dmeVmwareRalationDao.getShareIdByStorageId(storageObjectId);
-        String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_SHARE_DETAIL_URL,
-                "nfs_share_id", nfsShareId);
+        String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace("{nfs_share_id}", nfsShareId);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         if (responseEntity.getStatusCodeValue() / 100 != 2) {
             LOG.error("获取 NFS Share 信息失败！返回信息：{}", responseEntity.getBody());
@@ -108,7 +107,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     //通过nfs shareId 查询关联的客户端访问列表
     private List<AuthClient> getNfsDatastoreShareAuthClients(String shareId) throws DMEException {
         List<AuthClient> clientList = new ArrayList<>();
-        String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_SHARE_AUTH_CLIENTS_URL, "nfs_share_id", shareId);
+        String url = DmeConstants.DME_NFS_SHARE_AUTH_CLIENTS_URL.replace("{nfs_share_id}", shareId);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(new HashMap<>()));
         if (responseEntity.getStatusCodeValue() / 100 == 2) {
             String resBody = responseEntity.getBody();
@@ -136,8 +135,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         //根据存储ID 获取逻辑端口ID
         String logicPortId = dmeVmwareRalationDao.getLogicPortIdByStorageId(storageObjectId);
 
-        String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_LOGICPORT_DETAIL_URL,
-                "logic_port_id", logicPortId);
+        String url = DmeConstants.DME_NFS_LOGICPORT_DETAIL_URL.replace("{logic_port_id}", logicPortId);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         if (responseEntity.getStatusCodeValue() / 100 != 2) {
             LOG.error("NFS 逻辑端口详细信息获取失败！logic_port_id={},返回信息：{}", logicPortId, responseEntity.getBody());
@@ -170,8 +168,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             if (StringUtils.isEmpty(fileSystemId)) {
                 continue;
             }
-            String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL,
-                    "file_system_id", fileSystemId);
+            String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace("{file_system_id}", fileSystemId);
             ResponseEntity<String> responseTuning = dmeAccessService.access(url, HttpMethod.GET, null);
             if (responseTuning.getStatusCodeValue() / 100 == 2) {
                 fsAttr.setFileSystemId(fileSystemId);
@@ -352,14 +349,6 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return null;
     }
 
-    //通过storageId查询share信息
-    private ResponseEntity listShareByStorageId(String storageId) throws DMEException {
-        Map<String, Object> requestbody = new HashMap<>();
-        requestbody.put("storage_id", storageId);
-        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL, HttpMethod.POST, gson.toJson(requestbody));
-        return responseEntity;
-    }
-
     //通过share_path查询share信息
     private ResponseEntity listShareBySharePath(String sharePath) throws DMEException {
         Map<String, Object> requestbody = new HashMap<>();
@@ -460,7 +449,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     //通过storageId查询logicPort信息
     private ResponseEntity listLogicPortByStorageId(String storageId) throws DMEException {
-        String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_LOGICPORT_QUERY_URL, "storage_id", storageId);
+        String url = DmeConstants.API_LOGICPORTS_LIST + storageId;
         ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         return responseEntity;
     }
@@ -551,8 +540,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
                                     String fsUrl = "";
                                     try {
-                                        fsUrl = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL,
-                                                "file_system_id", dvr.getFsId());
+                                        fsUrl = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace("{file_system_id}", dvr.getFsId());
                                         ResponseEntity<String> responseTuning = dmeAccessService.access(fsUrl, HttpMethod.GET, null);
                                         if (responseTuning.getStatusCodeValue() / 100 == 2) {
                                             JsonObject fsDetail = gson.fromJson(responseTuning.getBody(), JsonObject.class);
@@ -753,8 +741,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
             LOG.info("mountnfs requestbody==" + gson.toJson(requestbody));
 
-            String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_SHARE_DETAIL_URL,
-                    "nfs_share_id", ToolUtils.getStr(params.get("shareId")));
+            String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace("{nfs_share_id}", ToolUtils.getStr(params.get("shareId")));
             LOG.info("mountnfs URL===" + url);
             ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(requestbody));
 
@@ -913,7 +900,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         requestbody.put("nfs_share_client_deletion", listAddition);
         LOG.info("unmountnfs authClient requestbody==" + gson.toJson(requestbody));
         try {
-            String url = StringUtil.stringFormat(DmeConstants.DEFAULT_PATTERN, DmeConstants.DME_NFS_SHARE_DETAIL_URL, "nfs_share_id", shareId);
+            String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace("{nfs_share_id}", shareId);
             ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(requestbody));
 
             LOG.info("unmountnfs authClient responseEntity==" + responseEntity.toString());
