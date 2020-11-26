@@ -317,6 +317,7 @@ public class VmRdmServiceImpl implements VmRdmService {
         }
         cv.put("volume_specs", volumeSpecs);
         requestbody.put("customize_volumes", cv);
+        String s = gson.toJson(requestbody);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(requestbody));
         if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
             LOG.error("Failed to create RDM on DME!errorMsg:{}", responseEntity.getBody());

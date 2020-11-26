@@ -14,14 +14,8 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+
 package com.dmeplugin.vmware.mo;
-
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
 
 import com.dmeplugin.dmestore.exception.VcenterException;
 import com.dmeplugin.dmestore.utils.StringUtil;
@@ -33,7 +27,11 @@ import com.vmware.vim25.ArrayOfHostIpRouteEntry;
 import com.vmware.vim25.ArrayUpdateOperation;
 import com.vmware.vim25.ClusterComputeResourceSummary;
 import com.vmware.vim25.ClusterConfigInfoEx;
+import com.vmware.vim25.ClusterConfigSpecEx;
 import com.vmware.vim25.ClusterDasConfigInfo;
+import com.vmware.vim25.ClusterDasVmConfigInfo;
+import com.vmware.vim25.ClusterDasVmConfigSpec;
+import com.vmware.vim25.ClusterDasVmSettings;
 import com.vmware.vim25.ClusterDasVmSettingsRestartPriority;
 import com.vmware.vim25.ClusterHostRecommendation;
 import com.vmware.vim25.ComputeResourceSummary;
@@ -56,10 +54,13 @@ import com.vmware.vim25.PropertySpec;
 import com.vmware.vim25.TraversalSpec;
 import com.vmware.vim25.VirtualMachineConfigOption;
 import com.vmware.vim25.VirtualMachineConfigSpec;
-import com.vmware.vim25.ClusterDasVmConfigInfo;
-import com.vmware.vim25.ClusterDasVmConfigSpec;
-import com.vmware.vim25.ClusterDasVmSettings;
-import com.vmware.vim25.ClusterConfigSpecEx;
+
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,7 +97,8 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     }
 
     public ClusterConfigInfoEx getClusterConfigInfo() throws Exception {
-        ClusterConfigInfoEx configInfo = (ClusterConfigInfoEx) context.getVimClient().getDynamicProperty(mor, "configurationEx");
+        ClusterConfigInfoEx configInfo =
+            (ClusterConfigInfoEx) context.getVimClient().getDynamicProperty(mor, "configurationEx");
         return configInfo;
     }
 
@@ -118,13 +120,15 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
 
         ManagedObjectReference vmMor = vmMo.getMor();
         if (vmMor == null || !"VirtualMachine".equals(vmMor.getType())) {
-            s_logger.debug("Failed to get restart priority for VM: " + vmMo.getName() + ", invalid VM object reference");
+            s_logger
+                .debug("Failed to get restart priority for VM: " + vmMo.getName() + ", invalid VM object reference");
             return null;
         }
 
         ClusterConfigInfoEx configInfo = getClusterConfigInfo();
         if (configInfo == null) {
-            s_logger.debug("Failed to get restart priority for VM: " + vmMo.getName() + ", no cluster config information");
+            s_logger
+                .debug("Failed to get restart priority for VM: " + vmMo.getName() + ", no cluster config information");
             return null;
         }
 
@@ -159,7 +163,8 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
 
         ManagedObjectReference vmMor = vmMo.getMor();
         if (vmMor == null || !"VirtualMachine".equals(vmMor.getType())) {
-            s_logger.debug("Failed to set restart priority for VM: " + vmMo.getName() + ", invalid VM object reference");
+            s_logger
+                .debug("Failed to set restart priority for VM: " + vmMo.getName() + ", invalid VM object reference");
             return;
         }
 
@@ -176,7 +181,8 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         clusterDasVmConfigInfo.setDasSettings(clusterDasVmSettings);
 
         ClusterDasVmConfigSpec clusterDasVmConfigSpec = new ClusterDasVmConfigSpec();
-        clusterDasVmConfigSpec.setOperation((StringUtil.isNotBlank(currentVmRestartPriority)) ? ArrayUpdateOperation.EDIT : ArrayUpdateOperation.ADD);
+        clusterDasVmConfigSpec.setOperation(
+            (StringUtil.isNotBlank(currentVmRestartPriority)) ? ArrayUpdateOperation.EDIT : ArrayUpdateOperation.ADD);
         clusterDasVmConfigSpec.setInfo(clusterDasVmConfigInfo);
 
         ClusterConfigSpecEx clusterConfigSpecEx = new ClusterConfigSpecEx();
@@ -184,7 +190,8 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         clusterConfigSpecEx.setDasConfig(clusterDasConfigInfo);
         clusterConfigSpecEx.getDasVmConfigSpec().add(clusterDasVmConfigSpec);
 
-        ManagedObjectReference morTask = context.getService().reconfigureComputeResourceTask(mor, clusterConfigSpecEx, true);
+        ManagedObjectReference morTask =
+            context.getService().reconfigureComputeResourceTask(mor, clusterConfigSpecEx, true);
 
         boolean result = context.getVimClient().waitForTask(morTask);
 
@@ -198,7 +205,8 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
             if (s_logger.isTraceEnabled()) {
                 s_logger.trace("vCenter API trace - setRestartPriority done(failed)");
             }
-            s_logger.error("Set restart priority failed for VM: " + vmMo.getName() + " due to " + TaskMO.getTaskFailureInfo(context, morTask));
+            s_logger.error("Set restart priority failed for VM: " + vmMo.getName() + " due to " +
+                TaskMO.getTaskFailureInfo(context, morTask));
         }
     }
 
@@ -261,7 +269,8 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public ObjectContent[] getVmPropertiesOnHyperHost(String[] propertyPaths) throws Exception {
         if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - retrieveProperties() for VM properties. target MOR: " + mor.getValue() + ", properties: " + new Gson().toJson(propertyPaths));
+            s_logger.trace("vCenter API trace - retrieveProperties() for VM properties. target MOR: " + mor.getValue() +
+                ", properties: " + new Gson().toJson(propertyPaths));
         }
 
         PropertySpec pSpec = new PropertySpec();
@@ -290,7 +299,8 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
         pfSpecArr.add(pfSpec);
 
-        List<ObjectContent> properties = context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
+        List<ObjectContent> properties =
+            context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
 
         if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - retrieveProperties() done");
@@ -301,7 +311,9 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public ObjectContent[] getDatastorePropertiesOnHyperHost(String[] propertyPaths) throws Exception {
         if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - retrieveProperties() on Datastore properties. target MOR: " + mor.getValue() + ", properties: " + new Gson().toJson(propertyPaths));
+            s_logger.trace(
+                "vCenter API trace - retrieveProperties() on Datastore properties. target MOR: " + mor.getValue() +
+                    ", properties: " + new Gson().toJson(propertyPaths));
         }
 
         PropertySpec pSpec = new PropertySpec();
@@ -324,7 +336,8 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
         pfSpecArr.add(pfSpec);
 
-        List<ObjectContent> properties = context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
+        List<ObjectContent> properties =
+            context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
 
         if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - retrieveProperties() done");
@@ -334,7 +347,9 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
 
     public ObjectContent[] getHostPropertiesOnCluster(String[] propertyPaths) throws Exception {
         if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - retrieveProperties() on Host properties. target MOR: " + mor.getValue() + ", properties: " + new Gson().toJson(propertyPaths));
+            s_logger.trace(
+                "vCenter API trace - retrieveProperties() on Host properties. target MOR: " + mor.getValue() +
+                    ", properties: " + new Gson().toJson(propertyPaths));
         }
 
         PropertySpec pSpec = new PropertySpec();
@@ -358,7 +373,8 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
         pfSpecArr.add(pfSpec);
 
-        List<ObjectContent> properties = context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
+        List<ObjectContent> properties =
+            context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
 
         if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - retrieveProperties() done");
@@ -369,7 +385,9 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public boolean createVm(VirtualMachineConfigSpec vmSpec) throws Exception {
         if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - createVM_Task(). target MOR: " + mor.getValue() + ", VirtualMachineConfigSpec: " + new Gson().toJson(vmSpec));
+            s_logger.trace(
+                "vCenter API trace - createVM_Task(). target MOR: " + mor.getValue() + ", VirtualMachineConfigSpec: " +
+                    new Gson().toJson(vmSpec));
         }
 
         assert (vmSpec != null);
@@ -398,18 +416,26 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
 
 
     @Override
-    public boolean createBlankVm(String vmName, String vmInternalCsName, int cpuCount, int cpuSpeedMhz, int cpuReservedMhz, boolean limitCpuUse, int memoryMb,
-                                 int memoryReserveMb, String guestOsIdentifier, ManagedObjectReference morDs, boolean snapshotDirToParent, Pair<String, String> controllerInfo, Boolean systemVm) throws Exception {
+    public boolean createBlankVm(String vmName, String vmInternalCsName, int cpuCount, int cpuSpeedMhz,
+                                 int cpuReservedMhz, boolean limitCpuUse, int memoryMb,
+                                 int memoryReserveMb, String guestOsIdentifier, ManagedObjectReference morDs,
+                                 boolean snapshotDirToParent, Pair<String, String> controllerInfo, Boolean systemVm)
+        throws Exception {
 
         if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - createBlankVm(). target MOR: " + mor.getValue() + ", vmName: " + vmName + ", cpuCount: " + cpuCount + ", cpuSpeedMhz: " +
-                    cpuSpeedMhz + ", cpuReservedMHz: " + cpuReservedMhz + ", limitCpu: " + limitCpuUse + ", memoryMB: " + memoryMb + ", guestOS: " + guestOsIdentifier +
+            s_logger.trace(
+                "vCenter API trace - createBlankVm(). target MOR: " + mor.getValue() + ", vmName: " + vmName +
+                    ", cpuCount: " + cpuCount + ", cpuSpeedMhz: " +
+                    cpuSpeedMhz + ", cpuReservedMHz: " + cpuReservedMhz + ", limitCpu: " + limitCpuUse +
+                    ", memoryMB: " + memoryMb + ", guestOS: " + guestOsIdentifier +
                     ", datastore: " + morDs.getValue() + ", snapshotDirToParent: " + snapshotDirToParent);
         }
 
         boolean result =
-                HypervisorHostHelper.createBlankVm(this, vmName, vmInternalCsName, cpuCount, cpuSpeedMhz, cpuReservedMhz, limitCpuUse, memoryMb, memoryReserveMb,
-                        guestOsIdentifier, morDs, snapshotDirToParent, controllerInfo, systemVm);
+            HypervisorHostHelper
+                .createBlankVm(this, vmName, vmInternalCsName, cpuCount, cpuSpeedMhz, cpuReservedMhz, limitCpuUse,
+                    memoryMb, memoryReserveMb,
+                    guestOsIdentifier, morDs, snapshotDirToParent, controllerInfo, systemVm);
 
         if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - createBlankVm() done");
@@ -419,10 +445,13 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     }
 
     @Override
-    public ManagedObjectReference mountDatastore(boolean vmfsDatastore, String poolHostAddress, int poolHostPort, String poolPath, String poolUuid) throws Exception {
+    public ManagedObjectReference mountDatastore(boolean vmfsDatastore, String poolHostAddress, int poolHostPort,
+                                                 String poolPath, String poolUuid) throws Exception {
 
         if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - mountDatastore(). target MOR: " + mor.getValue() + ", vmfs: " + vmfsDatastore + ", poolHost: " + poolHostAddress +
+            s_logger.trace(
+                "vCenter API trace - mountDatastore(). target MOR: " + mor.getValue() + ", vmfs: " + vmfsDatastore +
+                    ", poolHost: " + poolHostAddress +
                     ", poolHostPort: " + poolHostPort + ", poolPath: " + poolPath + ", poolUuid: " + poolUuid);
         }
 
@@ -462,7 +491,8 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public void unmountDatastore(String poolUuid) throws Exception {
         if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - unmountDatastore(). target MOR: " + mor.getValue() + ", poolUuid: " + poolUuid);
+            s_logger.trace(
+                "vCenter API trace - unmountDatastore(). target MOR: " + mor.getValue() + ", poolUuid: " + poolUuid);
         }
 
         List<ManagedObjectReference> hosts = context.getVimClient().getDynamicProperty(mor, "host");
@@ -482,10 +512,12 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     public ManagedObjectReference findDatastore(String poolUuid) throws Exception {
 
         if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - findDatastore(). target MOR: " + mor.getValue() + ", poolUuid: " + poolUuid);
+            s_logger.trace(
+                "vCenter API trace - findDatastore(). target MOR: " + mor.getValue() + ", poolUuid: " + poolUuid);
         }
 
-        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context, context.getServiceContent().getCustomFieldsManager());
+        CustomFieldsManagerMO cfmMo =
+            new CustomFieldsManagerMO(context, context.getServiceContent().getCustomFieldsManager());
         int key = cfmMo.getCustomFieldKey("Datastore", CustomFieldConstants.CLOUD_UUID);
         assert (key != 0);
 
@@ -500,7 +532,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
                     DynamicProperty prop = oc.getPropSet().get(1);
                     if (prop != null && prop.getVal() != null) {
                         if (prop.getVal() instanceof CustomFieldStringValue) {
-                            String val = ((CustomFieldStringValue)prop.getVal()).getValue();
+                            String val = ((CustomFieldStringValue) prop.getVal()).getValue();
                             if (val.equalsIgnoreCase(poolUuid)) {
 
                                 if (s_logger.isTraceEnabled()) {
@@ -528,15 +560,17 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public ManagedObjectReference findDatastoreByExportPath(String exportPath) throws Exception {
         if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - findDatastoreByExportPath(). target MOR: " + mor.getValue() + ", exportPath: " + exportPath);
+            s_logger.trace(
+                "vCenter API trace - findDatastoreByExportPath(). target MOR: " + mor.getValue() + ", exportPath: " +
+                    exportPath);
         }
 
         ObjectContent[] ocs = getDatastorePropertiesOnHyperHost(new String[] {"info"});
         if (ocs != null && ocs.length > 0) {
             for (ObjectContent oc : ocs) {
-                DatastoreInfo dsInfo = (DatastoreInfo)oc.getPropSet().get(0).getVal();
+                DatastoreInfo dsInfo = (DatastoreInfo) oc.getPropSet().get(0).getVal();
                 if (dsInfo != null && dsInfo instanceof NasDatastoreInfo) {
-                    NasDatastoreInfo info = (NasDatastoreInfo)dsInfo;
+                    NasDatastoreInfo info = (NasDatastoreInfo) dsInfo;
                     if (info != null) {
                         String vmwareUrl = info.getUrl();
                         if (vmwareUrl.charAt(vmwareUrl.length() - 1) == '/') {
@@ -565,7 +599,8 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public ManagedObjectReference findMigrationTarget(VirtualMachineMO vmMo) throws Exception {
         if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - findMigrationTarget(). target MOR: " + mor.getValue() + ", vm: " + vmMo.getName());
+            s_logger.trace(
+                "vCenter API trace - findMigrationTarget(). target MOR: " + mor.getValue() + ", vm: " + vmMo.getName());
         }
 
         List<ClusterHostRecommendation> candidates = recommendHostsForVm(vmMo);
@@ -587,7 +622,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         ObjectContent[] ocs = getHostPropertiesOnCluster(new String[] {"runtime"});
         if (ocs != null && ocs.length > 0) {
             for (ObjectContent oc : ocs) {
-                HostRuntimeInfo runtimeInfo = (HostRuntimeInfo)oc.getPropSet().get(0).getVal();
+                HostRuntimeInfo runtimeInfo = (HostRuntimeInfo) oc.getPropSet().get(0).getVal();
                 // as long as we have one host connected, we assume the cluster is up
                 if (runtimeInfo.getConnectionState() == HostSystemConnectionState.CONNECTED) {
                     return true;
@@ -602,7 +637,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         ObjectContent[] ocs = getHostPropertiesOnCluster(new String[] {"config.network.routeTableInfo.ipRoute"});
         if (ocs != null && ocs.length > 0) {
             for (ObjectContent oc : ocs) {
-                ArrayOfHostIpRouteEntry entries = (ArrayOfHostIpRouteEntry)oc.getPropSet().get(0).getVal();
+                ArrayOfHostIpRouteEntry entries = (ArrayOfHostIpRouteEntry) oc.getPropSet().get(0).getVal();
                 if (entries != null) {
                     for (HostIpRouteEntry entry : entries.getHostIpRouteEntry()) {
                         if ("0.0.0.0".equalsIgnoreCase(entry.getNetwork())) {
@@ -624,7 +659,8 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
 
         VmwareHypervisorHostResourceSummary summary = new VmwareHypervisorHostResourceSummary();
 
-        ComputeResourceSummary vmwareSummary = (ComputeResourceSummary) context.getVimClient().getDynamicProperty(mor, "summary");
+        ComputeResourceSummary vmwareSummary =
+            (ComputeResourceSummary) context.getVimClient().getDynamicProperty(mor, "summary");
 
         // TODO, need to use traversal to optimize retrieve of
         int cpuNumInCpuThreads = 1;
@@ -650,15 +686,18 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     }
 
     @Override
-    public VmwareHypervisorHostNetworkSummary getHyperHostNetworkSummary(String esxServiceConsolePort) throws Exception {
+    public VmwareHypervisorHostNetworkSummary getHyperHostNetworkSummary(String esxServiceConsolePort)
+        throws Exception {
 
         if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - getHyperHostNetworkSummary(). target MOR: " + mor.getValue() + ", mgmtPortgroup: " + esxServiceConsolePort);
+            s_logger.trace("vCenter API trace - getHyperHostNetworkSummary(). target MOR: " + mor.getValue() +
+                ", mgmtPortgroup: " + esxServiceConsolePort);
         }
 
         List<ManagedObjectReference> hosts = context.getVimClient().getDynamicProperty(mor, "host");
         if (hosts != null && hosts.size() > 0) {
-            VmwareHypervisorHostNetworkSummary summary = new HostMO(context, hosts.get(0)).getHyperHostNetworkSummary(esxServiceConsolePort);
+            VmwareHypervisorHostNetworkSummary summary =
+                new HostMO(context, hosts.get(0)).getHyperHostNetworkSummary(esxServiceConsolePort);
 
             if (s_logger.isTraceEnabled()) {
                 s_logger.trace("vCenter API trace - getHyperHostResourceSummary() done(successfully)");
@@ -678,7 +717,8 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
             s_logger.trace("vCenter API trace - getHyperHostHardwareSummary(). target MOR: " + mor.getValue());
         }
 
-        ClusterComputeResourceSummary hardwareSummary = (ClusterComputeResourceSummary) context.getVimClient().getDynamicProperty(mor, "summary");
+        ClusterComputeResourceSummary hardwareSummary =
+            (ClusterComputeResourceSummary) context.getVimClient().getDynamicProperty(mor, "summary");
 
         if (s_logger.isTraceEnabled()) {
             s_logger.trace("vCenter API trace - getHyperHostHardwareSummary() done");
@@ -697,7 +737,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         if (ocs != null) {
             for (ObjectContent oc : ocs) {
                 ManagedObjectReference morHost = oc.getObj();
-                String name = (String)oc.getPropSet().get(0).getVal();
+                String name = (String) oc.getPropSet().get(0).getVal();
 
                 hosts.add(new Pair<ManagedObjectReference, String>(morHost, name));
             }
@@ -706,7 +746,8 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     }
 
     public HashMap<String, Integer> getVmVncPortsOnCluster() throws Exception {
-        ObjectContent[] ocs = getVmPropertiesOnHyperHost(new String[] {"name", "config.extraConfig[\"RemoteDisplay.vnc.port\"]"});
+        ObjectContent[] ocs =
+            getVmPropertiesOnHyperHost(new String[] {"name", "config.extraConfig[\"RemoteDisplay.vnc.port\"]"});
 
         HashMap<String, Integer> portInfo = new HashMap<String, Integer>(16);
         if (ocs != null && ocs.length > 0) {
@@ -717,10 +758,10 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
                     String value = null;
                     for (DynamicProperty objProp : objProps) {
                         if ("name".equals(objProp.getName())) {
-                            name = (String)objProp.getVal();
+                            name = (String) objProp.getVal();
                         } else {
-                            OptionValue optValue = (OptionValue)objProp.getVal();
-                            value = (String)optValue.getValue();
+                            OptionValue optValue = (OptionValue) objProp.getVal();
+                            value = (String) optValue.getValue();
                         }
                     }
 
@@ -739,15 +780,18 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         // LicenseAssignmentManager deals with only host/vcenter licenses only. Has nothing todo with cluster
         throw new VcenterException("Unable to get LicenseAssignmentManager at cluster level");
     }
+
     private ManagedObjectReference getEnvironmentBrowser() throws Exception {
         if (environmentBrowser == null) {
             environmentBrowser = context.getVimClient().getMoRefProp(mor, "environmentBrowser");
         }
         return environmentBrowser;
     }
+
     @Override
     public String getRecommendedDiskController(String guestOsId) throws Exception {
-        VirtualMachineConfigOption vmConfigOption = context.getService().queryConfigOption(getEnvironmentBrowser(), null, null);
+        VirtualMachineConfigOption vmConfigOption =
+            context.getService().queryConfigOption(getEnvironmentBrowser(), null, null);
         GuestOsDescriptor guestOsDescriptor = null;
         String diskController = null;
         List<GuestOsDescriptor> guestDescriptors = vmConfigOption.getGuestOSDescriptor();
@@ -759,10 +803,12 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         }
         if (guestOsDescriptor != null) {
             diskController = VmwareHelper.getRecommendedDiskControllerFromDescriptor(guestOsDescriptor);
-            s_logger.debug("Retrieved recommended disk controller for guest OS : " + guestOsId + " in cluster " + getHyperHostName() + " : " + diskController);
+            s_logger.debug("Retrieved recommended disk controller for guest OS : " + guestOsId + " in cluster " +
+                getHyperHostName() + " : " + diskController);
             return diskController;
         } else {
-            String msg = "Unable to retrieve recommended disk controller for guest OS : " + guestOsId + " in cluster " + getHyperHostName();
+            String msg = "Unable to retrieve recommended disk controller for guest OS : " + guestOsId + " in cluster " +
+                getHyperHostName();
             s_logger.error(msg);
             throw new VcenterException(msg);
         }
