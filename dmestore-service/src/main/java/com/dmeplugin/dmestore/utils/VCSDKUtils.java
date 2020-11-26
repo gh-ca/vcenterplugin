@@ -15,8 +15,12 @@ import com.dmeplugin.vmware.mo.HostMO;
 import com.dmeplugin.vmware.mo.HostStorageSystemMO;
 import com.dmeplugin.vmware.mo.RootFsMO;
 import com.dmeplugin.vmware.mo.VirtualMachineMO;
+import com.dmeplugin.vmware.util.ClusterMOFactory;
+import com.dmeplugin.vmware.util.DatastoreMOFactory;
+import com.dmeplugin.vmware.util.HostMOFactory;
 import com.dmeplugin.vmware.util.Pair;
 import com.dmeplugin.vmware.util.PbmUtil;
+import com.dmeplugin.vmware.util.RootFsMOFactory;
 import com.dmeplugin.vmware.util.TestVmwareContextFactory;
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.google.gson.Gson;
@@ -123,6 +127,14 @@ public class VCSDKUtils {
 
     private static final Class<?> VERSION = version10.class;
 
+    private RootFsMOFactory rootFsMOFactory = RootFsMOFactory.getInstance();
+
+    private DatastoreMOFactory datastoreMOFactory = DatastoreMOFactory.getInstance();
+
+    private HostMOFactory hostMOFactory = HostMOFactory.getInstance();
+
+    private ClusterMOFactory clusterMOFactory = ClusterMOFactory.getInstance();
+
     private static VmodlContext context;
 
     private Gson gson = new Gson();
@@ -135,13 +147,15 @@ public class VCSDKUtils {
         try {
             VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
             for (VmwareContext vmwareContext : vmwareContexts) {
-                RootFsMO rootFsMo = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+                RootFsMO rootFsMo = rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder());
+                //RootFsMO rootFsMo = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
                 List<Pair<ManagedObjectReference, String>> dss = rootFsMo.getAllDatastoreOnRootFs();
                 if (dss != null && dss.size() > 0) {
                     List<Map<String, Object>> lists = new ArrayList<>();
 
                     for (Pair<ManagedObjectReference, String> ds : dss) {
-                        DatastoreMO ds1 = new DatastoreMO(vmwareContext, ds.first());
+                        DatastoreMO ds1 = datastoreMOFactory.build(vmwareContext, ds.first());
+                        //DatastoreMO ds1 = new DatastoreMO(vmwareContext, ds.first());
                         Map<String, Object> dsmap =
                             gson.fromJson(gson.toJson(ds1.getSummary()), new TypeToken<Map<String, Object>>() {
                             }.getType());
@@ -181,7 +195,6 @@ public class VCSDKUtils {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error("vmware error:", e);
             throw new VcenterException(e.getMessage());
         }
@@ -197,7 +210,8 @@ public class VCSDKUtils {
             String serverguid = vcConnectionHelper.objectId2Serverguid(objectid);
             VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
             ManagedObjectReference datastoremor = vcConnectionHelper.objectId2Mor(objectid);
-            DatastoreMO datastoreMo = new DatastoreMO(vmwareContext, datastoremor);
+            //DatastoreMO datastoreMo = new DatastoreMO(vmwareContext, datastoremor);
+            DatastoreMO datastoreMo = datastoreMOFactory.build(vmwareContext, datastoremor);
             dsmap = gson.fromJson(gson.toJson(datastoreMo.getSummary()), new TypeToken<Map<String, Object>>() {
             }.getType());
         } catch (Exception e) {
@@ -217,13 +231,14 @@ public class VCSDKUtils {
         try {
             VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
             for (VmwareContext vmwareContext : vmwareContexts) {
-                RootFsMO rootFsMo = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+                RootFsMO rootFsMo = rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder());
+                //RootFsMO rootFsMo = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
                 List<Pair<ManagedObjectReference, String>> hosts = rootFsMo.getAllHostOnRootFs();
                 if (hosts != null && hosts.size() > 0) {
                     List<Map<String, String>> lists = new ArrayList<>();
                     for (Pair<ManagedObjectReference, String> host : hosts) {
-                        HostMO host1 = new HostMO(vmwareContext, host.first());
-
+                        //HostMO host1 = new HostMO(vmwareContext, host.first());
+                        HostMO host1 = hostMOFactory.build(vmwareContext, host.first());
                         Map<String, String> map = new HashMap<>();
                         String objectId =
                             vcConnectionHelper.mor2ObjectId(host1.getMor(), vmwareContext.getServerAddress());
@@ -238,7 +253,6 @@ public class VCSDKUtils {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error("vmware error:", e);
             throw new VcenterException(e.getLocalizedMessage());
         }
@@ -252,7 +266,8 @@ public class VCSDKUtils {
             VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
             List<Map<String, String>> lists = new ArrayList<>();
             for (VmwareContext vmwareContext : vmwareContexts) {
-                RootFsMO rootFsMo = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+                //RootFsMO rootFsMo = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+                RootFsMO rootFsMo = rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder());
                 HostMO hostMo = rootFsMo.findHostById(objectId);
                 Map<String, String> map = new HashMap<>();
                 map.put("hostId", objectId);
@@ -262,7 +277,6 @@ public class VCSDKUtils {
             }
             hostlist = gson.toJson(lists);
         } catch (Exception e) {
-            e.printStackTrace();
             throw new VcenterException(e.getMessage());
         }
 
@@ -277,13 +291,14 @@ public class VCSDKUtils {
         try {
             VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
             for (VmwareContext vmwareContext : vmwareContexts) {
-                RootFsMO rootFsMo = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+                //RootFsMO rootFsMo = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+                RootFsMO rootFsMo = rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder());
                 List<Pair<ManagedObjectReference, String>> cls = rootFsMo.getAllClusterOnRootFs();
                 if (cls != null && cls.size() > 0) {
                     List<Map<String, String>> lists = new ArrayList<>();
                     for (Pair<ManagedObjectReference, String> cl : cls) {
-                        ClusterMO cl1 = new ClusterMO(vmwareContext, cl.first());
-
+                        //ClusterMO cl1 = new ClusterMO(vmwareContext, cl.first());
+                        ClusterMO cl1 = clusterMOFactory.build(vmwareContext, cl.first());
                         Map<String, String> map = new HashMap<>();
                         String objectId =
                             vcConnectionHelper.mor2ObjectId(cl1.getMor(), vmwareContext.getServerAddress());
@@ -297,7 +312,6 @@ public class VCSDKUtils {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             logger.error("vmware error:", e);
             throw new VcenterException(e.getMessage());
         }
@@ -2535,18 +2549,20 @@ public class VCSDKUtils {
             String serverguid = vcConnectionHelper.objectId2Serverguid(dataStoreObjectId);
             VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
 
-            RootFsMO rootFsMo = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
-
+            //RootFsMO rootFsMo = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
+            RootFsMO rootFsMo = rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder());
             ManagedObjectReference dsmor = vcConnectionHelper.objectId2Mor(dataStoreObjectId);
             //取得该存储下所有已经挂载的主机ID
             List<String> mounthostids = new ArrayList<>();
-            DatastoreMO dsmo = new DatastoreMO(vmwareContext, dsmor);
+            //DatastoreMO dsmo = new DatastoreMO(vmwareContext, dsmor);
+            DatastoreMO dsmo = datastoreMOFactory.build(vmwareContext, dsmor);
             if (dsmo != null) {
                 List<DatastoreHostMount> dhms = dsmo.getHostMounts();
                 if (dhms != null && dhms.size() > 0) {
                     for (DatastoreHostMount dhm : dhms) {
                         if (dhm != null) {
                             if (dhm.getMountInfo() != null && dhm.getMountInfo().isMounted()) {
+                                String value = dhm.getKey().getValue();
                                 mounthostids.add(dhm.getKey().getValue());
                             }
                         }
@@ -2558,8 +2574,10 @@ public class VCSDKUtils {
             if (hosts != null && hosts.size() > 0) {
                 List<Map<String, String>> lists = new ArrayList<>();
                 for (Pair<ManagedObjectReference, String> host : hosts) {
-                    HostMO host1 = new HostMO(vmwareContext, host.first());
+                    //HostMO host1 = new HostMO(vmwareContext, host.first());
+                    HostMO host1 = hostMOFactory.build(vmwareContext, host.first());
                     if (mount) {
+                        String value = host1.getMor().getValue();
                         if (mounthostids.contains(host1.getMor().getValue())) {
                             Map<String, String> map = new HashMap<>();
                             String objectId =
