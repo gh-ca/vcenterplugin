@@ -512,7 +512,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     dtrees.setName(ToolUtils.jsonToStr(element.get("name")));
                     dtrees.setFsName(ToolUtils.jsonToStr(element.get("fs_name")));
                     dtrees.setQuotaSwitch(ToolUtils.jsonToBoo(element.get("quota_switch")));
-                    dtrees.setSecurityStyle(ToolUtils.jsonToStr(element.get("security_style")));
+                    dtrees.setSecurityStyle(ToolUtils.jsonToStr(element.get("security_mode")));
                     dtrees.setTierName(ToolUtils.jsonToStr(element.get("tier_name")));
                     dtrees.setNfsCount(ToolUtils.jsonToInt(element.get("nfs_count"), 0));
                     dtrees.setCifsCount(ToolUtils.jsonToInt(element.get("cifs_count"), 0));
@@ -1045,7 +1045,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             throw new DMEException("403", "param error!");
         }
         FileSystemDetail fileSystemDetail = new FileSystemDetail();
-        String url = DmeConstants.API_FILESYSTEM_DETAIL + fileSystemId;
+        String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace("{file_system_id}", fileSystemId);
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();

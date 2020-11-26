@@ -496,7 +496,7 @@ public class VmfsAccessServiceTest {
         ResponseEntity<String> responseEntity = new ResponseEntity<>(s, null, HttpStatus.OK);
         when(dmeAccessService.access(url, HttpMethod.GET, null)).thenReturn(responseEntity);
         s = "{\"name\":\"test\"}";
-        url = String.format(DmeConstants.DME_STORAGE_DETAIL_URL, "b94bff9d-0dfb-11eb-bd3d-0050568491c9");
+        url = DmeConstants.DME_STORAGE_DETAIL_URL.replace("{storage_id}","b94bff9d-0dfb-11eb-bd3d-0050568491c9");
         responseEntity = new ResponseEntity<>(s, null, HttpStatus.OK);
         when(dmeAccessService.access(url, HttpMethod.GET, null)).thenReturn(responseEntity);
         url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, "SYS_StoragePool");
