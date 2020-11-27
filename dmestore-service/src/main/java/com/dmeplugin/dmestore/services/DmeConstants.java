@@ -5,21 +5,28 @@ package com.dmeplugin.dmestore.services;
  **/
 public class DmeConstants {
     public static final String DME_NFS_SHARE_DETAIL_URL = "/rest/fileservice/v1/nfs-shares/{nfs_share_id}";
-    //public static final String DME_NFS_SHARE_AUTH_CLIENTS_URL = "/rest/fileservice/v1/nfs-shares/{nfs_share_id}/auth_clients";
+    /**
+     *  旧URL ："/rest/fileservice/v1/nfs-shares/{nfs_share_id}/auth_clients"
+     **/
     public static final String DME_NFS_SHARE_AUTH_CLIENTS_URL = "/rest/fileservice/v1/nfs-auth-clients/query";
-    //public static final String DME_NFS_SHARE_URL = "/rest/fileservice/v1/nfs-shares/summary";
+    /**
+     *  旧URL ："/rest/fileservice/v1/nfs-shares/summary"
+     **/
     public static final String DME_NFS_SHARE_URL = "/rest/fileservice/v1/nfs-shares/query";
     public static final String DME_NFS_SHARE_DELETE_URL = "/rest/fileservice/v1/nfs-shares/delete";
-    // TODO 创建参数变化很大，需要重构
+    /**
+     *  新版本参数有变更，已修正
+     **/
     public static final String API_NFSSHARE_CREATE = "/rest/fileservice/v1/nfs-shares";
 
     public static final String DME_NFS_FILESERVICE_QUERY_URL = "/rest/fileservice/v1/filesystems/query";
     public static final String DME_NFS_FILESERVICE_DETAIL_URL = "/rest/fileservice/v1/filesystems/{file_system_id}";
     public static final String DME_NFS_FS_DELETE_URL = "/rest/fileservice/v1/filesystems/delete";
-    // TODO 需对参数
     public static final String API_FS_CREATE = "/rest/fileservice/v1/filesystems/customize";
 
-    // TODO 未找到接口/rest/storagemgmt/v1/storage-port以下都没有找到
+    /**
+     *  TODO 逻辑端口api，新版本暂未提供
+     **/
     public static final String DME_NFS_LOGICPORT_DETAIL_URL = "/rest/storagemgmt/v1/storage-port/logic-ports/{logic_port_id}";
     public static final String API_FAILOVERGROUPS = "/rest/storagemgmt/v1/storage-port/failover-groups?storage_id=";
     public static final String API_LOGICPORTS_LIST = "/rest/storagemgmt/v1/storage-port/logic-ports?storage_id=";
@@ -28,8 +35,10 @@ public class DmeConstants {
     public static final String DME_VOLUME_BASE_URL = "/rest/blockservice/v1/volumes";
     public static final String REFRES_STATE_URL = "/rest/blockservice/v1/volumes?limit=1";
     public static final String DME_VOLUME_DELETE_URL = "/rest/blockservice/v1/volumes/delete";
-    //public static final String DME_CREATE_VOLUME_UNLEVEL_URL = "/rest/blockservice/v1/volumes/customize-volumes";
-    // TODO 参数变更大
+    /**
+     * 旧URL /rest/blockservice/v1/volumes/customize-volumes
+     * 新的参数结构和参数有变更，已修改为最新匹配
+     **/
     public static final String DME_CREATE_VOLUME_UNLEVEL_URL = "/rest/blockservice/v1/volumes/customize";
     public static final String QUERY_SERVICE_LEVEL_VOLUME_URL = "/rest/blockservice/v1/volumes?service_level_id={serviceLevelId}";
     public static final String DME_HOST_MAPPING_URL = "/rest/blockservice/v1/volumes/host-mapping";
@@ -67,7 +76,9 @@ public class DmeConstants {
     public static final String LIST_RELATION_URL = "/rest/resourcedb/v1/relations/{relationName}/instances";
     public static final String QUERY_RELATION_URL = "/rest/resourcedb/v1/relations/{relationName}/instances/{instanceId}";
 
-    //public static final String API_DTREES_LIST = "/rest/fileservice/v1/dtrees/summary";
+    /**
+     * 旧版本url : /rest/fileservice/v1/dtrees/summary
+     */
     public static final String API_DTREES_LIST = "/rest/fileservice/v1/dtrees/query";
 
     public static final String LIST_SERVICE_LEVEL_URL = "/rest/service-policy/v1/service-levels";

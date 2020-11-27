@@ -183,8 +183,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                         if (!StringUtils.isEmpty(showSnapshotEnable)) {
                             createNfsShareParams.put("show_snapshot_enable", gson.toJson(showSnapshotEnable));
                         }
-                        // TODO 缺值
-                        nfsShareMap.put("share_path", "");
                         nfsShareMap.put("create_nfs_share_param", createNfsShareParams);
                     }
                 }
