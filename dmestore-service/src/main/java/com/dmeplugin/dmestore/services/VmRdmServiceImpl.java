@@ -214,7 +214,7 @@ public class VmRdmServiceImpl implements VmRdmService {
             taskId = createDmeVolumeByServiceLevel(vmRdmCreateBean.getCreateVolumesRequest());
         } else {
             //用户自定义创建卷
-            taskId = createDmeVolumeByUnServiceLevel(vmRdmCreateBean.getCustomizeVolumesRequest());
+            taskId = createDmeVolumeByUnServiceLevelNew(vmRdmCreateBean.getCustomizeVolumesRequest());
         }
         JsonObject taskDetail = taskService.queryTaskByIdUntilFinish(taskId);
         if (taskDetail.get(DmeConstants.TASK_DETAIL_STATUS_FILE).getAsInt() != DmeConstants.TASK_SUCCESS) {
@@ -317,7 +317,6 @@ public class VmRdmServiceImpl implements VmRdmService {
         }
         cv.put("volume_specs", volumeSpecs);
         requestbody.put("customize_volumes", cv);
-        String s = gson.toJson(requestbody);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(requestbody));
         if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
             LOG.error("Failed to create RDM on DME!errorMsg:{}", responseEntity.getBody());
@@ -328,6 +327,75 @@ public class VmRdmServiceImpl implements VmRdmService {
 
         return taskId;
     }
+
+    private String createDmeVolumeByUnServiceLevelNew(CustomizeVolumesRequest customizeVolumesRequest) throws DMEException {
+        String url = DmeConstants.DME_CREATE_VOLUME_UNLEVEL_URL;
+        String ownerController = customizeVolumesRequest.getCustomizeVolumes().getOwnerController();
+        //归属控制器自动则不下发参数
+        final String ownerControllerAuto = "0";
+        if (ownerControllerAuto.equals(ownerController)) {
+            customizeVolumesRequest.getCustomizeVolumes().setOwnerController(null);
+        }
+        Map<String, Object> requestbody = new HashMap<>(16);
+        //判断该集群下有多少主机，如果主机在DME不存在就需要创建
+        CustomizeVolumes customizeVolumes = customizeVolumesRequest.getCustomizeVolumes();
+        putNotNull(requestbody, "initial_distribute_policy", customizeVolumes.getInitialDistributePolicy());
+        putNotNull(requestbody, "prefetch_value", customizeVolumes.getPrefetchValue());
+        putNotNull(requestbody, "prefetch_policy", customizeVolumes.getPrefetchPolicy());
+        putNotNull(requestbody, "owner_controller", customizeVolumes.getOwnerController());
+        putNotNull(requestbody, "pool_id", customizeVolumes.getPoolRawId());
+        putNotNull(requestbody, "storage_id", customizeVolumes.getStorageId());
+
+        CustomizeVolumeTuningForCreate tuningBean = customizeVolumes.getTuning();
+        if (null != tuningBean) {
+            Map<String, Object> tuning = new HashMap<>(16);
+            putNotNull(tuning, "alloctype", tuningBean.getAlloctype());
+            putNotNull(tuning, "smarttier", tuningBean.getSmarttier());
+            putNotNull(tuning, "workload_type_raw_id", tuningBean.getWorkloadTypeId());
+            putNotNull(tuning, "compression_enabled", tuningBean.getCompressionEnabled());
+            putNotNull(tuning, "deduplication_enabled", tuningBean.getDedupeEnabled());
+
+            SmartQosForRdmCreate smartqosBean = tuningBean.getSmartqos();
+            if (null != smartqosBean) {
+                Map<String, Object> smartqos = new HashMap<>(16);
+                putNotNull(smartqos, "control_policy", smartqosBean.getControlPolicy());
+                putNotNull(smartqos, "latency", smartqosBean.getLatency());
+                putNotNull(smartqos, "maxbandwidth", smartqosBean.getMaxbandwidth());
+                putNotNull(smartqos, "maxiops", smartqosBean.getMaxiops());
+                putNotNull(smartqos, "minbandwidth", smartqosBean.getMinbandwidth());
+                putNotNull(smartqos, "miniops", smartqosBean.getMiniops());
+                putNotNull(smartqos, "name", smartqosBean.getName());
+                tuning.put("smart_qos", smartqos);
+            }
+            requestbody.put("tuning", tuning);
+        }
+
+        List<ServiceVolumeBasicParams> volumeSpecList = customizeVolumes.getVolumeSpecs();
+        List<Map<String, Object>> volumeSpecs = new ArrayList<>();
+        final String unitTb = "TB";
+        for (ServiceVolumeBasicParams volumeSpec : volumeSpecList) {
+            Map<String, Object> vs = new HashMap<>(16);
+            putNotNull(vs, "name", volumeSpec.getName());
+            int capacity = volumeSpec.getCapacity();
+            if (unitTb.equals(volumeSpec.getUnit())) {
+                capacity = capacity * 1024;
+            }
+            vs.put("capacity", capacity);
+            vs.put("count", volumeSpec.getCount());
+            volumeSpecs.add(vs);
+        }
+        requestbody.put("lun_specs", volumeSpecs);
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(requestbody));
+        if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
+            LOG.error("Failed to create RDM on DME!errorMsg:{}", responseEntity.getBody());
+            throw new DMEException(responseEntity.getBody());
+        }
+        JsonObject task = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+        String taskId = task.get("task_id").getAsString();
+
+        return taskId;
+    }
+
 
     @Override
     public List<Map<String, Object>> getAllDmeHost() throws DMEException {
