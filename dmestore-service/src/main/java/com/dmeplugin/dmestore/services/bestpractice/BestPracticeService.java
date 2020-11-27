@@ -1,6 +1,7 @@
 package com.dmeplugin.dmestore.services.bestpractice;
 
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
+import com.dmeplugin.vmware.util.HostMOFactory;
 import com.dmeplugin.vmware.util.VmwareContext;
 
 /**
@@ -90,4 +91,15 @@ public interface BestPracticeService {
      * @return void
      **/
     void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception;
+
+    /**
+     * 最佳实践实施
+     * @author wangxy
+     * @date 9:59 2020/10/27
+     * @throws Exception
+     * @return void
+     **/
+    default HostMOFactory getHostMoFactory() throws Exception{
+        return HostMOFactory.getInstance();
+    }
 }
