@@ -88,13 +88,13 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
         List<Pair<ManagedObjectReference, String>> datastoreMountsOnHost = hostMo.getDatastoreMountsOnHost();
         for (Pair<ManagedObjectReference, String> pair : datastoreMountsOnHost) {
             ManagedObjectReference dsMor = pair.first();
-            DatastoreMO datastoreMo = new DatastoreMO(context, dsMor);
+            DatastoreMO datastoreMo = this.getDatastoreMoFactory().build(context, dsMor);
             DatastoreSummary summary = datastoreMo.getSummary();
             if (summary.getType().equals(ToolUtils.STORE_TYPE_VMFS)) {
                 VmfsDatastoreInfo vmfsDatastoreInfo = datastoreMo.getVmfsDatastoreInfo();
                 HostVmfsVolume hostVmfsVolume = vmfsDatastoreInfo.getVmfs();
                 String version = hostVmfsVolume.getVersion();
-                //只对VMFS6进行处理
+                // 只对VMFS6进行处理
                 if (version.startsWith("6")) {
                     list.add(vmfsDatastoreInfo);
                 }
