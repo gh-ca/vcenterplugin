@@ -22,54 +22,6 @@ import java.util.List;
  * 
  */
 public class PbmUtil {
-   /**
-    * Returns the Capability Metadata for the specified capability name
-    * 
-    * @param capabilityName
-    * @param schema
-    * @return
-    */
-   public static PbmCapabilityMetadata getCapabilityMeta(String capabilityName,
-         List<PbmCapabilityMetadataPerCategory> schema) {
-      for (PbmCapabilityMetadataPerCategory cat : schema) {
-         for (PbmCapabilityMetadata cap : cat.getCapabilityMetadata()) {
-            if (cap.getId().getId().equals(capabilityName)) {
-               return cap;
-            }
-         }
-      }
-      return null;
-   }
-
-   /**
-    * This method returns the Profile Spec for the given Storage Profile name
-    * 
-    * @return
-    * @throws InvalidArgumentFaultMsg
-    * @throws RuntimeFaultFaultMsg
-    * @throws RuntimeFaultFaultMsg
-    */
-   public static PbmCapabilityProfile getPbmProfile(PbmServiceInstanceContent spbmsc, PbmPortType pbmPortType,
-                                                    String name) throws InvalidArgumentFaultMsg,
-         RuntimeFaultFaultMsg, RuntimeFaultFaultMsg {
-      ManagedObjectReference profileMgr = spbmsc.getProfileManager();
-      List<PbmProfileId> profileIds =
-           pbmPortType.pbmQueryProfile(profileMgr,
-                  PbmUtil.getStorageResourceType(), null);
-
-      if (profileIds == null || profileIds.isEmpty()) {
-         throw new RuntimeFaultFaultMsg("No storage Profiles exist.", null);
-      }
-      List<PbmProfile> pbmProfiles =
-            pbmPortType.pbmRetrieveContent(profileMgr, profileIds);
-      for (PbmProfile pbmProfile : pbmProfiles) {
-         if (pbmProfile.getName().equals(name)) {
-            PbmCapabilityProfile profile = (PbmCapabilityProfile) pbmProfile;
-            return profile;
-         }
-      }
-      throw new RuntimeFaultFaultMsg("Profile with the given name does not exist", null);
-   }
 
    /**
     * Returns the Storage Resource Type Object

@@ -27,7 +27,6 @@ import com.vmware.vim25.ObjectContent;
 import com.vmware.vim25.VirtualMachineConfigSpec;
 
 
-
 /**
  * Interface to consolidate ESX(i) hosts and HA/FT clusters into a common interface used by CloudStack Hypervisor resources
  */
@@ -52,19 +51,11 @@ public interface VmwareHypervisorHost {
 
     boolean isHyperHostConnected() throws Exception;
 
-    String getHyperHostDefaultGateway() throws Exception;
-
     List<VirtualMachineMO> listVmsOnHyperHost(String name) throws Exception;
 
     VirtualMachineMO findVmOnHyperHost(String name) throws Exception;
 
-    VirtualMachineMO findVmOnPeerHyperHost(String name) throws Exception;
-
     boolean createVm(VirtualMachineConfigSpec vmSpec) throws Exception;
-
-    boolean createBlankVm(String vmName, String vmInternalCsName, int cpuCount, int cpuSpeedMhz, int cpuReservedMhz, boolean limitCpuUse, int memoryMb,
-                          int memoryReserveMb, String guestOsIdentifier, ManagedObjectReference morDs, boolean snapshotDirToParent,
-                          Pair<String, String> controllerInfo, Boolean systemVm) throws Exception;
 
     ObjectContent[] getVmPropertiesOnHyperHost(String[] propertyPaths) throws Exception;
 
@@ -74,20 +65,9 @@ public interface VmwareHypervisorHost {
 
     void unmountDatastore(String poolUuid) throws Exception;
 
-    ManagedObjectReference findDatastore(String poolUuid) throws Exception;
-
-    ManagedObjectReference findDatastoreByName(String datastoreName) throws Exception;
-
-    ManagedObjectReference findDatastoreByExportPath(String exportPath) throws Exception;
-
-    ManagedObjectReference findMigrationTarget(VirtualMachineMO vmMo) throws Exception;
-
-    VmwareHypervisorHostResourceSummary getHyperHostResourceSummary() throws Exception;
-
     VmwareHypervisorHostNetworkSummary getHyperHostNetworkSummary(String esxServiceConsolePort) throws Exception;
 
-    ComputeResourceSummary getHyperHostHardwareSummary() throws Exception;
-
     LicenseAssignmentManagerMO getLicenseAssignmentManager() throws Exception;
+
     String getRecommendedDiskController(String guestOsId) throws Exception;
 }

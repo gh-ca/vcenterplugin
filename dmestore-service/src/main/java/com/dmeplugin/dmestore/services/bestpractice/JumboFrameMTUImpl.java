@@ -26,7 +26,7 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
     public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = new HostMO(context, mor);
+        HostMO hostMo = this.getHostMoFactory().build(context, mor);
         List<HostVirtualSwitch> virtualSwitches = hostMo.getHostNetworkInfo().getVswitch();
         for (HostVirtualSwitch virtualSwitch : virtualSwitches) {
             HostVirtualSwitchSpec spec = virtualSwitch.getSpec();
@@ -38,8 +38,8 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
 
         HostNetworkConfig networkConfig = hostMo.getHostNetworkSystemMo().getNetworkConfig();
         List<HostVirtualSwitchConfig> list = networkConfig.getVswitch();
-        for (HostVirtualSwitchConfig vSwitchConfig : list) {
-            HostVirtualSwitchSpec spec = vSwitchConfig.getSpec();
+        for (HostVirtualSwitchConfig config : list) {
+            HostVirtualSwitchSpec spec = config.getSpec();
             Integer mtu = spec.getMtu();
             if (null == mtu || (mtu.intValue() != getRecommendValue().intValue())) {
                 return null == mtu ? "--" : mtu.intValue();
@@ -78,8 +78,9 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
     private boolean check(VCSDKUtils vcsdkUtils, String objectId, Object recommendValue) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = new HostMO(context, mor);
-        List<HostVirtualSwitch> virtualSwitches = hostMo.getHostNetworkInfo().getVswitch();
+        HostMO hostMo = this.getHostMoFactory().build(context, mor);
+        HostNetworkInfo networkInfo = hostMo.getHostNetworkInfo();
+        List<HostVirtualSwitch> virtualSwitches = networkInfo.getVswitch();
         for (HostVirtualSwitch virtualSwitch : virtualSwitches) {
             HostVirtualSwitchSpec spec = virtualSwitch.getSpec();
             Integer mtu = spec.getMtu();
@@ -90,8 +91,8 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
 
         HostNetworkConfig networkConfig = hostMo.getHostNetworkSystemMo().getNetworkConfig();
         List<HostVirtualSwitchConfig> list = networkConfig.getVswitch();
-        for (HostVirtualSwitchConfig vSwitchConfig : list) {
-            HostVirtualSwitchSpec spec = vSwitchConfig.getSpec();
+        for (HostVirtualSwitchConfig config : list) {
+            HostVirtualSwitchSpec spec = config.getSpec();
             Integer mtu = spec.getMtu();
             if (null == mtu || (mtu.intValue() != ((Integer) recommendValue).intValue())) {
                 return false;
@@ -107,7 +108,7 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
         if (check(vcsdkUtils, objectId, recommendValue)) {
             return;
         }
-        HostMO hostMo = new HostMO(context, mor);
+        HostMO hostMo = this.getHostMoFactory().build(context, mor);
         HostNetworkInfo networkInfo = hostMo.getHostNetworkInfo();
         HostNetworkSystemMO hostNetworkSystemMo = hostMo.getHostNetworkSystemMo();
         List<HostVirtualSwitch> virtualSwitches = networkInfo.getVswitch();
@@ -124,8 +125,8 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
         try {
             HostNetworkConfig networkConfig = hostNetworkSystemMo.getNetworkConfig();
             List<HostVirtualSwitchConfig> list = networkConfig.getVswitch();
-            for (HostVirtualSwitchConfig vSwitchConfig : list) {
-                HostVirtualSwitchSpec spec = vSwitchConfig.getSpec();
+            for (HostVirtualSwitchConfig config : list) {
+                HostVirtualSwitchSpec spec = config.getSpec();
                 Integer mtu = spec.getMtu();
                 if (null == mtu || (mtu.intValue() != ((Integer) recommendValue).intValue())) {
                     spec.setMtu((Integer) recommendValue);

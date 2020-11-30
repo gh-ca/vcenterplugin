@@ -16,15 +16,13 @@
 // under the License.
 package com.dmeplugin.vmware.mo;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.vmware.vim25.*;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class HostDatastoreSystemMO extends BaseMO {
 
@@ -32,17 +30,12 @@ public class HostDatastoreSystemMO extends BaseMO {
         super(context, morHostDatastore);
     }
 
-    public HostDatastoreSystemMO(VmwareContext context, String morType, String morValue) {
-        super(context, morType, morValue);
-    }
-
     public ManagedObjectReference findDatastore(String name) throws Exception {
-        // added Apache CloudStack specific name convention, we will use custom field "cloud.uuid" as datastore name as well
         CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context, context.getServiceContent().getCustomFieldsManager());
         int key = cfmMo.getCustomFieldKey("Datastore", CustomFieldConstants.CLOUD_UUID);
         assert (key != 0);
 
-        List<ObjectContent> ocs = getDatastorePropertiesOnHostDatastoreSystem(new String[] {"name", String.format("value[%d]", key)});
+        List<ObjectContent> ocs = getDatastorePropertiesOnHostDatastoreSystem(new String[]{"name", String.format("value[%d]", key)});
         if (ocs != null) {
             for (ObjectContent oc : ocs) {
                 if (oc.getPropSet().get(0).getVal().equals(name)) {
@@ -53,7 +46,7 @@ public class HostDatastoreSystemMO extends BaseMO {
                     DynamicProperty prop = oc.getPropSet().get(1);
                     if (prop != null && prop.getVal() != null) {
                         if (prop.getVal() instanceof CustomFieldStringValue) {
-                            String val = ((CustomFieldStringValue)prop.getVal()).getValue();
+                            String val = ((CustomFieldStringValue) prop.getVal()).getValue();
                             if (val.equalsIgnoreCase(name)) {
                                 return oc.getObj();
                             }
@@ -65,88 +58,12 @@ public class HostDatastoreSystemMO extends BaseMO {
         return null;
     }
 
-    public List<HostUnresolvedVmfsVolume> queryUnresolvedVmfsVolumes() throws Exception {
-        return context.getService().queryUnresolvedVmfsVolumes(mor);
-    }
-
     public List<VmfsDatastoreOption> queryVmfsDatastoreExpandOptions(DatastoreMO datastoreMo) throws Exception {
         return context.getService().queryVmfsDatastoreExpandOptions(mor, datastoreMo.getMor());
     }
 
     public void expandVmfsDatastore(DatastoreMO datastoreMo, VmfsDatastoreExpandSpec vmfsDatastoreExpandSpec) throws Exception {
         context.getService().expandVmfsDatastore(mor, datastoreMo.getMor(), vmfsDatastoreExpandSpec);
-    }
-
-    // storeUrl in nfs://host/exportpath format
-    public ManagedObjectReference findDatastoreByUrl(String storeUrl) throws Exception {
-        assert (storeUrl != null);
-
-        List<ManagedObjectReference> datastores = getDatastores();
-        if (datastores != null && datastores.size() > 0) {
-            for (ManagedObjectReference morDatastore : datastores) {
-                NasDatastoreInfo info = getNasDatastoreInfo(morDatastore);
-                if (info != null) {
-                    URI uri = new URI(storeUrl);
-                    String vmwareStyleUrl = "netfs://" + uri.getHost() + "/" + uri.getPath() + "/";
-                    if (info.getUrl().equals(vmwareStyleUrl)) {
-                        return morDatastore;
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
-    public ManagedObjectReference findDatastoreByName(String datastoreName) throws Exception {
-        assert (datastoreName != null);
-
-        List<ManagedObjectReference> datastores = getDatastores();
-
-        if (datastores != null) {
-            for (ManagedObjectReference morDatastore : datastores) {
-                DatastoreInfo info = getDatastoreInfo(morDatastore);
-
-                if (info != null) {
-                    if (info.getName().equals(datastoreName)) {
-                        return morDatastore;
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
-    // TODO this is a hacking helper method, when we can pass down storage pool info along with volume
-    // we should be able to find the datastore by name
-    public ManagedObjectReference findDatastoreByExportPath(String exportPath) throws Exception {
-        assert (exportPath != null);
-
-        List<ManagedObjectReference> datastores = getDatastores();
-        if (datastores != null && datastores.size() > 0) {
-            for (ManagedObjectReference morDatastore : datastores) {
-                DatastoreMO dsMo = new DatastoreMO(context, morDatastore);
-                if (dsMo.getInventoryPath().equals(exportPath)) {
-                    return morDatastore;
-                }
-
-                NasDatastoreInfo info = getNasDatastoreInfo(morDatastore);
-                if (info != null) {
-                    String vmwareUrl = info.getUrl();
-                    if (vmwareUrl.charAt(vmwareUrl.length() - 1) == '/') {
-                        vmwareUrl = vmwareUrl.substring(0, vmwareUrl.length() - 1);
-                    }
-
-                    URI uri = new URI(vmwareUrl);
-                    if (uri.getPath().equals("/" + exportPath)) {
-                        return morDatastore;
-                    }
-                }
-            }
-        }
-
-        return null;
     }
 
     public List<HostScsiDisk> queryAvailableDisksForVmfs() throws Exception {
@@ -160,12 +77,10 @@ public class HostDatastoreSystemMO extends BaseMO {
                                                       long totalSectors,
                                                       int unmapGranularity,
                                                       String unmapPriority) throws Exception {
-        // just grab the first instance of VmfsDatastoreOption
         VmfsDatastoreOption vmfsDatastoreOption = context.getService().queryVmfsDatastoreCreateOptions(mor, hostScsiDisk.getDevicePath(), vmfsMajorVersion).get(0);
 
-        VmfsDatastoreCreateSpec vmfsDatastoreCreateSpec = (VmfsDatastoreCreateSpec)vmfsDatastoreOption.getSpec();
+        VmfsDatastoreCreateSpec vmfsDatastoreCreateSpec = (VmfsDatastoreCreateSpec) vmfsDatastoreOption.getSpec();
 
-        // set the name of the datastore to be created
         vmfsDatastoreCreateSpec.getVmfs().setVolumeName(datastoreName);
         vmfsDatastoreCreateSpec.getVmfs().setBlockSize(blockSize);
         vmfsDatastoreCreateSpec.getVmfs().setUnmapGranularity(unmapGranularity);
@@ -184,7 +99,7 @@ public class HostDatastoreSystemMO extends BaseMO {
         return false;
     }
 
-    public ManagedObjectReference createNfsDatastore(String host, int port, String exportPath, String uuid, String accessMode,String type,String securityType) throws Exception {
+    public ManagedObjectReference createNfsDatastore(String host, int port, String exportPath, String uuid, String accessMode, String type, String securityType) throws Exception {
 
         HostNasVolumeSpec spec = new HostNasVolumeSpec();
         spec.setRemoteHost(host);
@@ -225,25 +140,9 @@ public class HostDatastoreSystemMO extends BaseMO {
     public NasDatastoreInfo getNasDatastoreInfo(ManagedObjectReference morDatastore) throws Exception {
         DatastoreInfo info = (DatastoreInfo) context.getVimClient().getDynamicProperty(morDatastore, "info");
         if (info instanceof NasDatastoreInfo) {
-            return (NasDatastoreInfo)info;
+            return (NasDatastoreInfo) info;
         }
         return null;
-    }
-
-    public HostResignatureRescanResult resignatureUnresolvedVmfsVolume(HostUnresolvedVmfsResignatureSpec resolutionSpec) throws Exception {
-        ManagedObjectReference task = context.getService().resignatureUnresolvedVmfsVolumeTask(mor, resolutionSpec);
-
-        boolean result = context.getVimClient().waitForTask(task);
-
-        if (result) {
-            context.waitForTaskProgressDone(task);
-
-            TaskMO taskMo = new TaskMO(context, task);
-
-            return (HostResignatureRescanResult)taskMo.getTaskInfo().getResult();
-        } else {
-            throw new Exception("Unable to register vm due to " + TaskMO.getTaskFailureInfo(context, task));
-        }
     }
 
     public List<ObjectContent> getDatastorePropertiesOnHostDatastoreSystem(String[] propertyPaths) throws Exception {
@@ -270,6 +169,7 @@ public class HostDatastoreSystemMO extends BaseMO {
 
         return context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
     }
+
     public void unmapVmfsVolumeExTask(List<String> vmfsUuids) throws Exception {
         context.getService().unmapVmfsVolumeExTask(mor, vmfsUuids);
     }

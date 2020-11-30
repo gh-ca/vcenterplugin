@@ -28,7 +28,7 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
     public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = new HostMO(context, mor);
+        HostMO hostMo = this.getHostMoFactory().build(context, mor);
         HostStorageSystemMO hostStorageSystemMo = hostMo.getHostStorageSystemMo();
         List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo().getMultipathInfo().getLun();
         for (HostMultipathInfoLogicalUnit lun : lunList) {
@@ -59,7 +59,7 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
     public boolean check(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = new HostMO(context, mor);
+        HostMO hostMo = this.getHostMoFactory().build(context, mor);
         HostStorageSystemMO hostStorageSystemMo = hostMo.getHostStorageSystemMo();
         List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo().getMultipathInfo().getLun();
         for (HostMultipathInfoLogicalUnit lun : lunList) {
@@ -87,7 +87,7 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
 
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = new HostMO(context, mor);
+        HostMO hostMo = this.getHostMoFactory().build(context, mor);
         HostStorageSystemMO hostStorageSystemMo = hostMo.getHostStorageSystemMo();
         List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo().getMultipathInfo().getLun();
         for (HostMultipathInfoLogicalUnit lun : lunList) {

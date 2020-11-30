@@ -63,9 +63,8 @@ import com.vmware.vim25.WaitOptions;
 
 /**
  * A wrapper class to handle Vmware vsphere connection and disconnection.
- *
+ * <p>
  * DISCLAIMER: This code is partly copied from sample codes that come along with Vmware web service 5.1 SDK.
- *
  */
 public class VmwareClient {
     private static final Logger s_logger = LoggerFactory.getLogger(VmwareClient.class);
@@ -139,8 +138,7 @@ public class VmwareClient {
     /**
      * Establishes session with the virtual center server.
      *
-     * @throws Exception
-     *             the exception
+     * @throws Exception the exception
      */
     public void connect(ServerInfo serverInfo) throws Exception {
         svcInstRef.setType(SVC_INST_NAME);
@@ -149,15 +147,15 @@ public class VmwareClient {
         pbmInstRef.setValue(PBMSERVICEINSTANCEVALUE);
 
         vimPort = vimService.getVimPort();
-        Map<String, Object> ctxt = ((BindingProvider)vimPort).getRequestContext();
+        Map<String, Object> ctxt = ((BindingProvider) vimPort).getRequestContext();
 
-        String sessionCookie=serverInfo.sessionCookie;
+        String sessionCookie = serverInfo.sessionCookie;
         List<String> values = new ArrayList<>();
         values.add("vmware_soap_session=" + sessionCookie);
         Map<String, List<String>> reqHeadrs =
                 new HashMap<>();
         reqHeadrs.put("Cookie", values);
-        serviceCookie=serverInfo.sessionCookie;
+        serviceCookie = serverInfo.sessionCookie;
 
         ctxt.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, serverInfo.serviceUrl);
         ctxt.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
@@ -167,7 +165,7 @@ public class VmwareClient {
         ctxt.put("com.sun.xml.internal.ws.connect.timeout", vCenterSessionTimeout);
 
         pbmPortType = pbmService.getPbmPort();
-        Map<String, Object> pbmctxt = ((BindingProvider)vimPort).getRequestContext();
+        Map<String, Object> pbmctxt = ((BindingProvider) vimPort).getRequestContext();
 
 
         List<String> pbmvalues = new ArrayList<>();
@@ -194,7 +192,7 @@ public class VmwareClient {
 
         vimPort = vimService.getVimPort();
 
-        Map<String, Object> ctxt = ((BindingProvider)vimPort).getRequestContext();
+        Map<String, Object> ctxt = ((BindingProvider) vimPort).getRequestContext();
 
         ctxt.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
         ctxt.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
@@ -202,22 +200,15 @@ public class VmwareClient {
         ctxt.put("com.sun.xml.internal.ws.request.timeout", vCenterSessionTimeout);
         ctxt.put("com.sun.xml.internal.ws.connect.timeout", vCenterSessionTimeout);
 
-
         ServiceContent serviceContent = vimPort.retrieveServiceContent(svcInstRef);
 
-
-
-        // Extract a cookie. See vmware sample program com.vmware.httpfileaccess.GetVMFiles
-        @SuppressWarnings("unchecked")
-        Map<String, List<String>> headers = (Map<String, List<String>>)((BindingProvider)vimPort).getResponseContext().get(MessageContext.HTTP_RESPONSE_HEADERS);
+        Map<String, List<String>> headers = (Map<String, List<String>>) ((BindingProvider) vimPort).getResponseContext().get(MessageContext.HTTP_RESPONSE_HEADERS);
         List<String> cookies = headers.get("Set-cookie");
 
         vimPort.login(serviceContent.getSessionManager(), userName, password, null);
 
         if (cookies == null) {
-            // Get the cookie from the response header. See vmware sample program com.vmware.httpfileaccess.GetVMFiles
-            @SuppressWarnings("unchecked")
-            Map<String, List<String>> responseHeaders = (Map<String, List<String>>)((BindingProvider)vimPort).getResponseContext().get(MessageContext.HTTP_RESPONSE_HEADERS);
+            Map<String, List<String>> responseHeaders = (Map<String, List<String>>) ((BindingProvider) vimPort).getResponseContext().get(MessageContext.HTTP_RESPONSE_HEADERS);
             cookies = responseHeaders.get("Set-cookie");
             if (cookies == null) {
                 String msg = "Login successful, but failed to get server cookies from url :[" + url + "]";
@@ -230,16 +221,12 @@ public class VmwareClient {
         StringTokenizer tokenizer = new StringTokenizer(cookieValue, ";");
         cookieValue = tokenizer.nextToken();
         String pathData = "$" + tokenizer.nextToken();
-        //serviceCookie = "$Version=\"1\"; " + cookieValue + "; " + pathData;
-
-
-
         String[] tokens = cookieValue.split(";");
         tokens = tokens[0].split("=");
         String extractedCookie = tokens[1];
-        extractedCookie=extractedCookie.replace("\"","");
+        extractedCookie = extractedCookie.replace("\"", "");
 
-        serviceCookie=extractedCookie;
+        serviceCookie = extractedCookie;
         pbmService = new PbmService();
 
         HeaderHandlerResolver headerResolver = new HeaderHandlerResolver();
@@ -247,9 +234,9 @@ public class VmwareClient {
         pbmService.setHandlerResolver(headerResolver);
 
 
-        pbmPortType=pbmService.getPbmPort();
+        pbmPortType = pbmService.getPbmPort();
 
-        Map<String, Object> pbmctxt = ((BindingProvider)pbmPortType).getRequestContext();
+        Map<String, Object> pbmctxt = ((BindingProvider) pbmPortType).getRequestContext();
 
         pbmctxt.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url.replace("/sdk", "/pbm"));
         pbmctxt.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
@@ -374,13 +361,10 @@ public class VmwareClient {
     /**
      * Get the property value of a managed object.
      *
-     * @param mor
-     *            managed object reference
-     * @param propertyName
-     *            property name.
+     * @param mor          managed object reference
+     * @param propertyName property name.
      * @return property value.
-     * @throws Exception
-     *             in case of error.
+     * @throws Exception in case of error.
      */
     @SuppressWarnings("unchecked")
     public <T> T getDynamicProperty(ManagedObjectReference mor, String propertyName) throws Exception {
@@ -407,11 +391,11 @@ public class VmwareClient {
                     String methodName = "get" + dynamicPropertyName.substring(dynamicPropertyName.indexOf("ArrayOf") + "ArrayOf".length(), dynamicPropertyName.length());
 
                     Method getMorMethod = dpCls.getDeclaredMethod(methodName, null);
-                    propertyValue = getMorMethod.invoke(propertyValue, (Object[])null);
+                    propertyValue = getMorMethod.invoke(propertyValue, (Object[]) null);
                 }
             }
         }
-        return (T)propertyValue;
+        return (T) propertyValue;
     }
 
     private List<ObjectContent> retrieveMoRefProperties(ManagedObjectReference mObj, List<String> props) throws Exception {
@@ -436,9 +420,7 @@ public class VmwareClient {
      * This method returns a boolean value specifying whether the Task is
      * succeeded or failed.
      *
-     * @param task
-     *            ManagedObjectReference representing the Task.
-     *
+     * @param task ManagedObjectReference representing the Task.
      * @return boolean value representing the Task result.
      * @throws InvalidCollectorVersionFaultMsg
      * @throws RuntimeFaultFaultMsg
@@ -450,21 +432,21 @@ public class VmwareClient {
 
         try {
             // info has a property - state for state of the task
-            Object[] result = waitForValues(task, new String[] { "info.state", "info.error" }, new String[] { "state" }, new Object[][] { new Object[] {
-                    TaskInfoState.SUCCESS, TaskInfoState.ERROR } });
+            Object[] result = waitForValues(task, new String[]{"info.state", "info.error"}, new String[]{"state"}, new Object[][]{new Object[]{
+                    TaskInfoState.SUCCESS, TaskInfoState.ERROR}});
             //result for 2 properties: info.state, info.error
             if (result != null && result.length == 2) {
                 if (result[0].equals(TaskInfoState.SUCCESS)) {
                     retVal = true;
                 }
                 if (result[1] instanceof LocalizedMethodFault) {
-                    throw new RuntimeException(((LocalizedMethodFault)result[1]).getLocalizedMessage());
+                    throw new RuntimeException(((LocalizedMethodFault) result[1]).getLocalizedMessage());
                 }
             }
         } catch (WebServiceException we) {
             s_logger.warn("Session to vCenter failed with: " + we.getLocalizedMessage());
 
-            TaskInfo taskInfo = (TaskInfo)getDynamicProperty(task, "info");
+            TaskInfo taskInfo = (TaskInfo) getDynamicProperty(task, "info");
             if (!taskInfo.isCancelable()) {
                 s_logger.warn("vCenter task: " + taskInfo.getName() + "(" + taskInfo.getKey() + ")" + " will continue to run on vCenter because the task cannot be cancelled");
                 throw new RuntimeException(we.getLocalizedMessage());
@@ -474,8 +456,8 @@ public class VmwareClient {
             getService().cancelTask(task);
 
             // Since task cancellation is asynchronous, wait for the task to be cancelled
-            Object[] result = waitForValues(task, new String[] {"info.state", "info.error"}, new String[] {"state"},
-                    new Object[][] {new Object[] {TaskInfoState.SUCCESS, TaskInfoState.ERROR}});
+            Object[] result = waitForValues(task, new String[]{"info.state", "info.error"}, new String[]{"state"},
+                    new Object[][]{new Object[]{TaskInfoState.SUCCESS, TaskInfoState.ERROR}});
             //result for 2 properties: info.state, info.error
             if (result != null && result.length == 2) {
                 if (result[0].equals(TaskInfoState.SUCCESS)) {
@@ -484,13 +466,13 @@ public class VmwareClient {
                 }
 
                 if (result[1] instanceof LocalizedMethodFault) {
-                    MethodFault fault = ((LocalizedMethodFault)result[1]).getFault();
+                    MethodFault fault = ((LocalizedMethodFault) result[1]).getFault();
                     if (fault instanceof RequestCanceled) {
                         s_logger.debug("vCenter task " + taskInfo.getName() + "(" + taskInfo.getKey() + ")" + " was successfully cancelled");
                         throw new RuntimeException(we.getLocalizedMessage());
                     }
                 } else {
-                    throw new RuntimeException(((LocalizedMethodFault)result[1]).getLocalizedMessage());
+                    throw new RuntimeException(((LocalizedMethodFault) result[1]).getLocalizedMessage());
                 }
             }
         }
@@ -501,15 +483,11 @@ public class VmwareClient {
      * Handle Updates for a single object. waits till expected values of
      * properties to check are reached Destroys the ObjectFilter when done.
      *
-     * @param objmor
-     *            MOR of the Object to wait for
-     * @param filterProps
-     *            Properties list to filter
-     * @param endWaitProps
-     *            Properties list to check for expected values these be
-     *            properties of a property in the filter properties list
-     * @param expectedVals
-     *            values for properties to end the wait
+     * @param objmor       MOR of the Object to wait for
+     * @param filterProps  Properties list to filter
+     * @param endWaitProps Properties list to check for expected values these be
+     *                     properties of a property in the filter properties list
+     * @param expectedVals values for properties to end the wait
      * @return true indicating expected values were met, and false otherwise
      * @throws RuntimeFaultFaultMsg
      * @throws InvalidPropertyFaultMsg
@@ -595,7 +573,7 @@ public class VmwareClient {
 
         Object[] retVal = filterVals;
         if (stateVal != null && "success".equalsIgnoreCase(stateVal)) {
-            retVal = new Object[] { TaskInfoState.SUCCESS, null };
+            retVal = new Object[]{TaskInfoState.SUCCESS, null};
         }
 
         return retVal;
@@ -619,10 +597,6 @@ public class VmwareClient {
         return genericSpec;
     }
 
-    /*
-     * @return An array of SelectionSpec covering VM, Host, Resource pool,
-     * Cluster Compute Resource and Datastore.
-     */
     private List<SelectionSpec> constructCompleteTraversalSpec() {
         // ResourcePools to VM: RP -> VM
         TraversalSpec rpToVm = new TraversalSpec();
@@ -736,7 +710,6 @@ public class VmwareClient {
      * @param root a root folder if available, or null for default
      * @param type type of the managed object
      * @param name name to match
-     *
      * @return First ManagedObjectReference of the type / name pair found
      */
     public ManagedObjectReference getDecendentMoRef(ManagedObjectReference root, String type, String name) throws Exception {
@@ -775,7 +748,7 @@ public class VmwareClient {
                 List<DynamicProperty> propary = oc.getPropSet();
                 if (type == null || type.equals(mor.getType())) {
                     if (propary.size() > 0) {
-                        String propval = (String)propary.get(0).getVal();
+                        String propval = (String) propary.get(0).getVal();
                         if (propval != null && name.equalsIgnoreCase(propval)) {
                             return mor;
                         }
@@ -796,7 +769,7 @@ public class VmwareClient {
     /**
      * Get a MORef from the property returned.
      *
-     * @param objMor Object to get a reference property from
+     * @param objMor   Object to get a reference property from
      * @param propName name of the property that is the MORef
      * @return the ManagedObjectReference for that property.
      */
@@ -804,7 +777,7 @@ public class VmwareClient {
         Object props = getDynamicProperty(objMor, propName);
         ManagedObjectReference propmor = null;
         if (!props.getClass().isArray()) {
-            propmor = (ManagedObjectReference)props;
+            propmor = (ManagedObjectReference) props;
         }
         return propmor;
     }

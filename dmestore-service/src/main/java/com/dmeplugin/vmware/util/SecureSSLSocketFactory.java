@@ -41,21 +41,12 @@ public class SecureSSLSocketFactory extends SSLSocketFactory {
     public static final Logger s_logger = LoggerFactory.getLogger(SecureSSLSocketFactory.class);
     private SSLContext sslContext;
 
-    public SecureSSLSocketFactory() throws NoSuchAlgorithmException {
-        sslContext = SSLUtils.getSslContext();
-    }
-
     public SecureSSLSocketFactory(SSLContext sslContext) throws NoSuchAlgorithmException {
         if (sslContext != null) {
             this.sslContext = sslContext;
         } else {
             this.sslContext = SSLUtils.getSslContext();
         }
-    }
-
-    public SecureSSLSocketFactory(KeyManager[] km, TrustManager[] tm, SecureRandom random) throws NoSuchAlgorithmException, KeyManagementException, IOException {
-        sslContext = SSLUtils.getSslContext();
-        sslContext.init(km, tm, random);
     }
 
     @Override

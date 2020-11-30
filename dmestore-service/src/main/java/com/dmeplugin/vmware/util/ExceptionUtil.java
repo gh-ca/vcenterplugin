@@ -47,9 +47,4 @@ public class ExceptionUtil {
         }
     }
 
-    public static <T extends Throwable> void rethrowRuntime(Throwable t) {
-        rethrow(t, RuntimeException.class);
-        rethrow(t, Error.class);
-    }
-
 }
