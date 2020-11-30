@@ -16,31 +16,17 @@
 //under the License.
 package com.dmeplugin.vmware.mo;
 
-import java.util.List;
-
-
 import com.dmeplugin.vmware.util.VmwareContext;
-import com.vmware.vim25.KeyAnyValue;
-import com.vmware.vim25.KeyValue;
-import com.vmware.vim25.LicenseAssignmentManagerLicenseAssignment;
-import com.vmware.vim25.LicenseManagerLicenseInfo;
-import com.vmware.vim25.ManagedObjectReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.vmware.vim25.*;
 
+import java.util.List;
 
 public class LicenseAssignmentManagerMO extends BaseMO {
 
-    @SuppressWarnings("unused")
-    private static final Logger s_logger = LoggerFactory.getLogger(LicenseAssignmentManagerMO.class);
     private static final String LICENSE_INFO_FEATURE = "feature";
 
     public LicenseAssignmentManagerMO(VmwareContext context, ManagedObjectReference mor) {
         super(context, mor);
-    }
-
-    public LicenseAssignmentManagerMO(VmwareContext context, String morType, String morValue) {
-        super(context, morType, morValue);
     }
 
     public LicenseAssignmentManagerLicenseAssignment getAssignedLicenseToHost(ManagedObjectReference hostMor) throws Exception {
@@ -50,11 +36,7 @@ public class LicenseAssignmentManagerMO extends BaseMO {
 
     public boolean isFeatureSupported(String featureKey, ManagedObjectReference hostMor) throws Exception {
         boolean featureSupported = false;
-
-        // Retrieve host license properties
         List<KeyAnyValue> props = getHostLicenseProperties(hostMor);
-
-        // Check host license properties to see if specified feature is supported by the license.
         for (KeyAnyValue prop : props) {
             String key = prop.getKey();
             if (key.equalsIgnoreCase(LICENSE_INFO_FEATURE)) {
@@ -70,7 +52,6 @@ public class LicenseAssignmentManagerMO extends BaseMO {
     }
 
     public LicenseManagerLicenseInfo getHostLicenseInfo(ManagedObjectReference hostMor) throws Exception {
-        // Retrieve license assigned to specified host
         LicenseAssignmentManagerLicenseAssignment license = getAssignedLicenseToHost(hostMor);
         return license.getAssignedLicense();
     }

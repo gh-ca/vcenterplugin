@@ -50,7 +50,7 @@ public class VmwareContextPool {
     }
 
     public VmwareContextPool(int maxIdleQueueLength, Duration idleCheckInterval) {
-        pool = new ConcurrentHashMap<String, Queue<VmwareContext>>();
+        pool = new ConcurrentHashMap<>();
 
         this.maxIdleQueueLength = maxIdleQueueLength;
         this.idleCheckInterval = idleCheckInterval;

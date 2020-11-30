@@ -20,21 +20,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.Properties;
 
 
 public class VmdkFileDescriptor {
     private static final Logger s_logger = LoggerFactory.getLogger(VmdkFileDescriptor.class);
-    private static final String VMDK_PROPERTY_CREATE_TYPE = "createType";
-    private static final String VMDK_CREATE_TYPE_VMFSSPARSE = "vmfsSparse";
-    private static final String VMDK_PROPERTY_ADAPTER_TYPE = "ddb.adapterType";
-
     private Properties properties = new Properties();
     private String baseFileName;
 
@@ -44,10 +37,9 @@ public class VmdkFileDescriptor {
     public void parse(byte[] vmdkFileContent) throws IOException {
         BufferedReader in = null;
         try {
-            in = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(vmdkFileContent),"UTF-8"));
+            in = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(vmdkFileContent), "UTF-8"));
             String line;
             while ((line = in.readLine()) != null) {
-                // ignore empty and comment lines
                 line = line.trim();
                 if (line.isEmpty()) {
                     continue;
@@ -91,149 +83,5 @@ public class VmdkFileDescriptor {
 
     public String getParentFileName() {
         return properties.getProperty("parentFileNameHint");
-    }
-
-    public boolean isVmfsSparseFile() {
-        String vmdkCreateType = properties.getProperty(VMDK_PROPERTY_CREATE_TYPE);
-        if (vmdkCreateType.equalsIgnoreCase(VMDK_CREATE_TYPE_VMFSSPARSE)) {
-            return true;
-        }
-        return false;
-    }
-
-    public String getAdapterType() {
-        return properties.getProperty(VMDK_PROPERTY_ADAPTER_TYPE);
-    }
-
-
-    public static byte[] changeVmdkAdapterType(byte[] vmdkContent, String newAdapterType) throws IOException {
-        assert (vmdkContent != null);
-
-        BufferedReader in = null;
-        BufferedWriter out = null;
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        try {
-            in = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(vmdkContent)));
-            out = new BufferedWriter(new OutputStreamWriter(bos));
-            String line;
-            while ((line = in.readLine()) != null) {
-                // ignore empty and comment lines
-                line = line.trim();
-                if (line.isEmpty()) {
-                    out.newLine();
-                    continue;
-                }
-                if (line.charAt(0) == '#') {
-                    out.write(line);
-                    out.newLine();
-                    continue;
-                }
-
-                String[] tokens = line.split("=");
-                if (tokens.length == 2) {
-                    String name = tokens[0].trim();
-                    String value = tokens[1].trim();
-                    if (value.charAt(0) == '\"') {
-                        value = value.substring(1, value.length() - 1);
-                    }
-
-                    if (newAdapterType != null && name.equals(VMDK_PROPERTY_ADAPTER_TYPE)) {
-                        out.write(name + "=\"" + newAdapterType + "\"");
-                        out.newLine();
-                    } else {
-                        out.write(line);
-                        out.newLine();
-                    }
-                } else {
-                    out.write(line);
-                    out.newLine();
-                }
-            }
-        } finally {
-            if (in != null) {
-                in.close();
-            }
-            if (out != null) {
-                out.close();
-            }
-        }
-
-        return bos.toByteArray();
-
-    }
-
-    public static byte[] changeVmdkContentBaseInfo(byte[] vmdkContent, String baseFileName, String parentFileName) throws IOException {
-
-        assert (vmdkContent != null);
-
-        BufferedReader in = null;
-        BufferedWriter out = null;
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        try {
-            in = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(vmdkContent),"UTF-8"));
-            out = new BufferedWriter(new OutputStreamWriter(bos,"UTF-8"));
-            String line;
-            while ((line = in.readLine()) != null) {
-                // ignore empty and comment lines
-                line = line.trim();
-                if (line.isEmpty()) {
-                    out.newLine();
-                    continue;
-                }
-                if (line.charAt(0) == '#') {
-                    out.write(line);
-                    out.newLine();
-                    continue;
-                }
-
-                String[] tokens = line.split("=");
-                if (tokens.length == 2) {
-                    String name = tokens[0].trim();
-                    String value = tokens[1].trim();
-                    if (value.charAt(0) == '\"') {
-                        value = value.substring(1, value.length() - 1);
-                    }
-
-                    if (parentFileName != null && "parentFileNameHint".equals(name)) {
-                        out.write(name + "=\"" + parentFileName + "\"");
-                        out.newLine();
-                    } else {
-                        out.write(line);
-                        out.newLine();
-                    }
-                } else {
-                    if (line.startsWith("RW")) {
-                        if (baseFileName != null) {
-                            int startPos = line.indexOf('\"');
-                            int endPos = line.lastIndexOf('\"');
-                            assert (startPos > 0);
-                            assert (endPos > 0);
-
-                            // replace it with base file name
-                            out.write(line.substring(0, startPos + 1));
-                            out.write(baseFileName);
-                            out.write(line.substring(endPos));
-                            out.newLine();
-                        } else {
-                            out.write(line);
-                            out.newLine();
-                        }
-                    } else {
-                        s_logger.warn("Unrecognized vmdk line content: " + line);
-                    }
-                }
-            }
-        } finally {
-            if (in != null) {
-                in.close();
-            }
-            if (out != null) {
-                out.close();
-            }
-        }
-
-        return bos.toByteArray();
     }
 }

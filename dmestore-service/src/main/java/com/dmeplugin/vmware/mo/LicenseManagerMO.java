@@ -16,26 +16,15 @@
 //under the License.
 package com.dmeplugin.vmware.mo;
 
-
-
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.vmware.vim25.ManagedObjectReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 public class LicenseManagerMO extends BaseMO {
 
-    @SuppressWarnings("unused")
-    private static final Logger s_logger = LoggerFactory.getLogger(LicenseManagerMO.class);
     private ManagedObjectReference licenseAssignmentManager = null;
 
     public LicenseManagerMO(VmwareContext context, ManagedObjectReference mor) {
         super(context, mor);
-    }
-
-    public LicenseManagerMO(VmwareContext context, String morType, String morValue) {
-        super(context, morType, morValue);
     }
 
     public ManagedObjectReference getLicenseAssignmentManager() throws Exception {

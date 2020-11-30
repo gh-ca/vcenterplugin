@@ -28,24 +28,12 @@ import java.util.List;
 
 
 public class HostKernelModuleSystemMO extends BaseMO {
-    @SuppressWarnings("unused")
-    private static final Logger s_logger = LoggerFactory.getLogger(HostKernelModuleSystemMO.class);
-
     public HostKernelModuleSystemMO(VmwareContext context, ManagedObjectReference morFirewallSystem) {
         super(context, morFirewallSystem);
     }
 
-    public HostKernelModuleSystemMO(VmwareContext context, String morType, String morValue) {
-        super(context, morType, morValue);
-    }
-
     public String queryConfiguredModuleOptionString(String name) throws Exception {
         return context.getService().queryConfiguredModuleOptionString(mor, name);
-    }
-
-
-    public List<KernelModuleInfo> queryModules() throws Exception {
-        return  context.getService().queryModules(mor);
     }
 
     public void updateModuleOptionString(String name ,String options) throws Exception {

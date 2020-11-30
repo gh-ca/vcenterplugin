@@ -16,21 +16,14 @@
 // under the License.
 package com.dmeplugin.vmware.mo;
 
-import java.util.ArrayList;
-import java.util.List;
-
-
-import com.dmeplugin.dmestore.exception.VcenterException;
 import com.dmeplugin.vmware.util.Pair;
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.vmware.vim25.*;
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatastoreMO extends BaseMO {
     private static final Logger s_logger = LoggerFactory.getLogger(DatastoreMO.class);
@@ -76,12 +69,8 @@ public class DatastoreMO extends BaseMO {
         return (DatastoreSummary) context.getVimClient().getDynamicProperty(mor, "summary");
     }
 
-    public List<ManagedObjectReference> getVm()throws Exception {
+    public List<ManagedObjectReference> getVm() throws Exception {
         return context.getVimClient().getDynamicProperty(mor, "vm");
-    }
-
-    public HostDatastoreBrowserMO getHostDatastoreBrowserMo() throws Exception {
-        return new HostDatastoreBrowserMO(context, (ManagedObjectReference) context.getVimClient().getDynamicProperty(mor, "browser"));
     }
 
     public List<DatastoreHostMount> getHostMounts() throws Exception {
@@ -141,95 +130,8 @@ public class DatastoreMO extends BaseMO {
         context.getService().renameDatastore(mor, newDatastoreName);
     }
 
-    public void makeDirectory(String path, ManagedObjectReference morDc) throws Exception {
-        String datastoreName = getName();
-        ManagedObjectReference morFileManager = context.getServiceContent().getFileManager();
-
-        String fullPath = path;
-        if (!DatastoreFile.isFullDatastorePath(fullPath)) {
-            fullPath = String.format("[%s] %s", datastoreName, path);
-        }
-
-        context.getService().makeDirectory(morFileManager, fullPath, morDc, true);
-    }
-
     String getDatastoreRootPath() throws Exception {
         return String.format("[%s]", getName());
-    }
-
-    public String getDatastorePath(String relativePathWithoutDatastoreName) throws Exception {
-        return getDatastorePath(relativePathWithoutDatastoreName, false);
-    }
-
-    public String getDatastorePath(String relativePathWithoutDatastoreName, boolean endWithPathDelimiter) throws Exception {
-        String path = String.format("[%s] %s", getName(), relativePathWithoutDatastoreName);
-        if (endWithPathDelimiter) {
-            if (!path.endsWith("/")) {
-                return path + "/";
-            }
-        }
-        return path;
-    }
-
-    public boolean deleteFolder(String folder, ManagedObjectReference morDc) throws Exception {
-        ManagedObjectReference morFileManager = context.getServiceContent().getFileManager();
-        ManagedObjectReference morTask = context.getService().deleteDatastoreFileTask(morFileManager, folder, morDc);
-
-        boolean result = context.getVimClient().waitForTask(morTask);
-
-        if (result) {
-            context.waitForTaskProgressDone(morTask);
-
-            return true;
-        } else {
-            s_logger.error("VMware deleteDatastoreFile_Task failed due to " + TaskMO.getTaskFailureInfo(context, morTask));
-        }
-
-        return false;
-    }
-
-    public boolean deleteFile(String path, ManagedObjectReference morDc, boolean testExistence) throws Exception {
-        return deleteFile(path, morDc, testExistence, null);
-    }
-
-    public boolean deleteFile(String path, ManagedObjectReference morDc, boolean testExistence, String excludeFolders) throws Exception {
-        String datastoreName = getName();
-        ManagedObjectReference morFileManager = context.getServiceContent().getFileManager();
-
-        String fullPath = path;
-        if (!DatastoreFile.isFullDatastorePath(fullPath)) {
-            fullPath = String.format("[%s] %s", datastoreName, path);
-        }
-        DatastoreFile file = new DatastoreFile(fullPath);
-        // Test if file specified is null or empty. We don't need to attempt to delete and return success.
-        if (file.getFileName() == null || file.getFileName().isEmpty()) {
-            return true;
-        }
-
-        try {
-            if (testExistence && !fileExists(fullPath)) {
-                String searchResult = searchFileInSubFolders(file.getFileName(), true, excludeFolders);
-                if (searchResult == null) {
-                    return true;
-                } else {
-                    fullPath = searchResult;
-                }
-            }
-        } catch (Exception e) {
-            s_logger.info("Unable to test file existence due to exception " + e.getClass().getName() + ", skip deleting of it");
-            return true;
-        }
-
-        ManagedObjectReference morTask = context.getService().deleteDatastoreFileTask(morFileManager, fullPath, morDc);
-
-        boolean result = context.getVimClient().waitForTask(morTask);
-        if (result) {
-            context.waitForTaskProgressDone(morTask);
-            return true;
-        } else {
-            s_logger.error("VMware deleteDatastoreFile_Task failed due to " + TaskMO.getTaskFailureInfo(context, morTask));
-        }
-        return false;
     }
 
     public boolean copyDatastoreFile(String srcFilePath, ManagedObjectReference morSrcDc, ManagedObjectReference morDestDs, String destFilePath,
@@ -292,50 +194,6 @@ public class DatastoreMO extends BaseMO {
         return false;
     }
 
-    public String[] getVmdkFileChain(String rootVmdkDatastoreFullPath) throws Exception {
-        Pair<DatacenterMO, String> dcPair = getOwnerDatacenter();
-
-        List<String> files = new ArrayList<>();
-        files.add(rootVmdkDatastoreFullPath);
-
-        String currentVmdkFullPath = rootVmdkDatastoreFullPath;
-        while (true) {
-            String url = getContext().composeDatastoreBrowseUrl(dcPair.second(), currentVmdkFullPath);
-            byte[] content = getContext().getResourceContent(url);
-            if (content == null || content.length == 0) {
-                break;
-            }
-
-            VmdkFileDescriptor descriptor = new VmdkFileDescriptor();
-            descriptor.parse(content);
-
-            String parentFileName = descriptor.getParentFileName();
-            if (parentFileName == null) {
-                break;
-            }
-
-            if (parentFileName.startsWith("/")) {
-                // when parent file is not at the same directory as it is, assume it is at parent directory
-                // this is only valid in Apache CloudStack primary storage deployment
-                DatastoreFile dsFile = new DatastoreFile(currentVmdkFullPath);
-                String dir = dsFile.getDir();
-                if (dir != null && dir.lastIndexOf('/') > 0) {
-                    dir = dir.substring(0, dir.lastIndexOf('/'));
-                } else {
-                    dir = "";
-                }
-
-                currentVmdkFullPath = new DatastoreFile(dsFile.getDatastoreName(), dir, parentFileName.substring(parentFileName.lastIndexOf('/') + 1)).getPath();
-                files.add(currentVmdkFullPath);
-            } else {
-                currentVmdkFullPath = DatastoreFile.getCompanionDatastorePath(currentVmdkFullPath, parentFileName);
-                files.add(currentVmdkFullPath);
-            }
-        }
-
-        return files.toArray(new String[0]);
-    }
-
     @Deprecated
     public String[] listDirContent(String path) throws Exception {
         String fullPath = path;
@@ -346,153 +204,10 @@ public class DatastoreMO extends BaseMO {
         Pair<DatacenterMO, String> dcPair = getOwnerDatacenter();
         String url = getContext().composeDatastoreBrowseUrl(dcPair.second(), fullPath);
 
-        // TODO, VMware currently does not have a formal API to list Datastore directory content,
-        // folloing hacking may have performance hit if datastore has a large number of files
         return context.listDatastoreDirContent(url);
     }
 
-    public boolean fileExists(String fileFullPath) throws Exception {
-        DatastoreFile file = new DatastoreFile(fileFullPath);
-        DatastoreFile dirFile = new DatastoreFile(file.getDatastoreName(), file.getDir());
-
-        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMo();
-
-        s_logger.info("Search file " + file.getFileName() + " on " + dirFile.getPath());
-        HostDatastoreBrowserSearchResults results = browserMo.searchDatastore(dirFile.getPath(), file.getFileName(), true);
-        if (results != null) {
-            List<FileInfo> info = results.getFile();
-            if (info != null && info.size() > 0) {
-                s_logger.info("File " + fileFullPath + " exists on datastore");
-                return true;
-            }
-        }
-
-        s_logger.info("File " + fileFullPath + " does not exist on datastore");
-        return false;
-    }
-
-    public long fileDiskSize(String fileFullPath) throws Exception {
-        long size = 0;
-        DatastoreFile file = new DatastoreFile(fileFullPath);
-        DatastoreFile dirFile = new DatastoreFile(file.getDatastoreName(), file.getDir());
-
-        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMo();
-
-        HostDatastoreBrowserSearchSpec searchSpec = new HostDatastoreBrowserSearchSpec();
-        FileQueryFlags fqf = new FileQueryFlags();
-        fqf.setFileSize(true);
-        fqf.setFileOwner(true);
-        fqf.setFileType(true);
-        fqf.setModification(true);
-        searchSpec.setDetails(fqf);
-        searchSpec.setSearchCaseInsensitive(false);
-        searchSpec.getMatchPattern().add(file.getFileName());
-        //ROOT-2.vmdk, [3ecf7a579d3b3793b86d9d019a97ae27] s-2-VM
-        s_logger.debug("Search file " + file.getFileName() + " on " + dirFile.getPath());
-        HostDatastoreBrowserSearchResults result = browserMo.searchDatastore(dirFile.getPath(), searchSpec);
-        if (result != null) {
-            List<FileInfo> info = result.getFile();
-            for (FileInfo fi : info) {
-                if (file.getFileName().equals(fi.getPath())) {
-                    s_logger.debug("File found = " + fi.getPath() + ", size=" + fi.getFileSize());
-                    return fi.getFileSize();
-                }
-            }
-        }
-        s_logger.debug("File " + fileFullPath + " does not exist on datastore");
-        return size;
-    }
-
-    public boolean folderExists(String folderParentDatastorePath, String folderName) throws Exception {
-        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMo();
-
-        HostDatastoreBrowserSearchResults results = browserMo.searchDatastore(folderParentDatastorePath, folderName, true);
-        if (results != null) {
-            List<FileInfo> info = results.getFile();
-            if (info != null && info.size() > 0) {
-                s_logger.info("Folder " + folderName + " exists on datastore");
-                return true;
-            }
-        }
-
-        s_logger.info("Folder " + folderName + " does not exist on datastore");
-        return false;
-    }
-
-    public String searchFileInSubFolders(String fileName, boolean caseInsensitive) throws Exception {
-        return searchFileInSubFolders(fileName,caseInsensitive,null);
-    }
-
-    public String searchFileInSubFolders(String fileName, boolean caseInsensitive, String excludeFolders) throws Exception {
-        String datastorePath = "[" + getName() + "]";
-        String rootDirectoryFilePath = String.format("%s %s", datastorePath, fileName);
-        String[] searchExcludedFolders = getSearchExcludedFolders(excludeFolders);
-        if (fileExists(rootDirectoryFilePath)) {
-            return rootDirectoryFilePath;
-        }
-
-        String parentFolderPath;
-        String absoluteFileName = null;
-        s_logger.info("Searching file " + fileName + " in " + datastorePath);
-
-        HostDatastoreBrowserMO browserMo = getHostDatastoreBrowserMo();
-        ArrayList<HostDatastoreBrowserSearchResults> results = browserMo.searchDatastoreSubFolders("[" + getName() + "]", fileName, caseInsensitive);
-        if (results != null && results.size() > 1) {
-            s_logger.warn("Multiple files with name " + fileName + " exists in datastore " + datastorePath + ". Trying to choose first file found in search attempt.");
-        } else if (results == null) {
-            String msg = "No file found with name " + fileName + " found in datastore " + datastorePath;
-            s_logger.error(msg);
-            throw new VcenterException(msg);
-        }
-        for (HostDatastoreBrowserSearchResults result : results) {
-            List<FileInfo> info = result.getFile();
-            if (info != null && info.size() > 0) {
-                for (FileInfo fi : info) {
-                    absoluteFileName = parentFolderPath = result.getFolderPath();
-                    s_logger.info("Found file " + fileName + " in datastore at " + absoluteFileName);
-                    if (parentFolderPath.endsWith("]")) {
-                        absoluteFileName += " ";
-                    }
-                    absoluteFileName += fi.getPath();
-                    if(isValidCloudStackFolderPath(parentFolderPath, searchExcludedFolders)) {
-                        return absoluteFileName;
-                    }
-                    break;
-                }
-            }
-        }
-        return absoluteFileName;
-    }
-
-    private String[] getSearchExcludedFolders(String excludeFolders) {
-        return excludeFolders != null ?  excludeFolders.replaceAll("\\s","").split(",") : new String[] {};
-    }
-
-    private boolean isValidCloudStackFolderPath(String dataStoreFolderPath, String[] searchExcludedFolders) throws Exception {
-        String dsFolder = dataStoreFolderPath.replaceFirst("\\[" + getName() + "\\]", "").trim();
-        for( String excludedFolder : searchExcludedFolders) {
-            if (dsFolder.startsWith(excludedFolder)) {
-                return  false;
-            }
-        }
-        return true;
-    }
-
-    public boolean isAccessibleToHost(String hostValue) throws Exception {
-        boolean isAccessible = true;
-        List<DatastoreHostMount> hostMounts = getHostMounts();
-        for (DatastoreHostMount hostMount : hostMounts) {
-            String hostMountValue = hostMount.getKey().getValue();
-            if (hostMountValue.equalsIgnoreCase(hostValue)) {
-                HostMountInfo mountInfo = hostMount.getMountInfo();
-                isAccessible = mountInfo.isAccessible();
-                break;
-            }
-        }
-        return isAccessible;
-    }
-
     public void refreshDatastore() throws Exception {
-         context.getService().refreshDatastore(mor);
+        context.getService().refreshDatastore(mor);
     }
 }

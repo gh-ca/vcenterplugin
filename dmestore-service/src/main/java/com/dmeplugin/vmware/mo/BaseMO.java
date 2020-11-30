@@ -73,10 +73,6 @@ public class BaseMO {
         return name;
     }
 
-    public void unregisterVm() throws Exception {
-        context.getService().unregisterVM(mor);
-    }
-
     public boolean destroy() throws Exception {
         ManagedObjectReference morTask = context.getService().destroyTask(mor);
 
@@ -90,34 +86,14 @@ public class BaseMO {
         return false;
     }
 
-    public void reload() throws Exception {
-        context.getService().reload(mor);
-    }
-
-    public boolean rename(String newName) throws Exception {
-        ManagedObjectReference morTask = context.getService().renameTask(mor, newName);
-
-        boolean result = context.getVimClient().waitForTask(morTask);
-        if (result) {
-            context.waitForTaskProgressDone(morTask);
-            return true;
-        } else {
-            s_logger.error("VMware rename_Task failed due to " + TaskMO.getTaskFailureInfo(context, morTask));
-        }
-        return false;
-    }
-
     public void setCustomFieldValue(String fieldName, String value) throws Exception {
         CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context, context.getServiceContent().getCustomFieldsManager());
-
         int key = getCustomFieldKey(fieldName);
         if (key == 0) {
             try {
                 CustomFieldDef field = cfmMo.addCustomerFieldDef(fieldName, getMor().getType(), null, null);
                 key = field.getKey();
             } catch (Exception e) {
-                // assuming the exception is caused by concurrent operation from other places
-                // so we retieve the key again
                 key = getCustomFieldKey(fieldName);
             }
         }

@@ -16,54 +16,23 @@
 // under the License.
 package com.dmeplugin.vmware.mo;
 
-
-
 import com.dmeplugin.vmware.util.VmwareContext;
-import com.vmware.vim25.IscsiMigrationDependency;
 import com.vmware.vim25.IscsiPortInfo;
-import com.vmware.vim25.IscsiStatus;
 import com.vmware.vim25.ManagedObjectReference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.List;
-
 
 public class IscsiManagerMO extends BaseMO {
     public IscsiManagerMO(VmwareContext context, ManagedObjectReference morFirewallSystem) {
         super(context, morFirewallSystem);
     }
 
-    public IscsiManagerMO(VmwareContext context, String morType, String morValue) {
-        super(context, morType, morValue);
+    public void bindVnic(String iScsiHbaName, String vnicDevice) throws Exception {
+        context.getService().bindVnic(mor, iScsiHbaName, vnicDevice);
     }
 
-    public void bindVnic(String iScsiHbaName,String vnicDevice ) throws Exception {
-          context.getService().bindVnic(mor, iScsiHbaName,vnicDevice);
+    public List<IscsiPortInfo> queryBoundVnics(String iScsiHbaName) throws Exception {
+        return context.getService().queryBoundVnics(mor, iScsiHbaName);
     }
 
-
-    public List<IscsiPortInfo> queryBoundVnics(String iScsiHbaName ) throws Exception {
-         return context.getService().queryBoundVnics(mor, iScsiHbaName);
-    }
-
-    public List<IscsiPortInfo> queryCandidateNics(String iScsiHbaName ) throws Exception {
-        return context.getService().queryCandidateNics(mor, iScsiHbaName);
-    }
-
-    public IscsiMigrationDependency queryMigrationDependencies(List<String> pnicDevice  ) throws Exception {
-        return context.getService().queryMigrationDependencies(mor, pnicDevice );
-    }
-
-    public IscsiStatus queryPnicStatus(String pnicDevice ) throws Exception {
-        return context.getService().queryPnicStatus(mor, pnicDevice);
-    }
-
-    public IscsiStatus queryVnicStatus(String vnicDevice  ) throws Exception {
-        return context.getService().queryVnicStatus(mor, vnicDevice );
-    }
-
-    public void unbindVnic(String iScsiHbaName,String vnicDevice ,boolean force   ) throws Exception {
-          context.getService().unbindVnic(mor, iScsiHbaName ,vnicDevice,force  );
-    }
 }

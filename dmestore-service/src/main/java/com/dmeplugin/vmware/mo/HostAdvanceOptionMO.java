@@ -28,15 +28,8 @@ import java.util.List;
 
 
 public class HostAdvanceOptionMO extends BaseMO {
-    @SuppressWarnings("unused")
-    private static final Logger s_logger = LoggerFactory.getLogger(HostAdvanceOptionMO.class);
-
     public HostAdvanceOptionMO(VmwareContext context, ManagedObjectReference morFirewallSystem) {
         super(context, morFirewallSystem);
-    }
-
-    public HostAdvanceOptionMO(VmwareContext context, String morType, String morValue) {
-        super(context, morType, morValue);
     }
 
     public List<OptionValue> queryOptions(String name) throws Exception {

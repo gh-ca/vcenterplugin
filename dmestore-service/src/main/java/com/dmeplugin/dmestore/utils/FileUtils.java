@@ -82,44 +82,6 @@ public class FileUtils {
     return null;
   }
 
-  public static void saveKey(String key, String fileName) {
-    File file = new File(getPath() + File.separator + fileName);
-    createFile(file);
-    FileOutputStream f = null;
-    OutputStreamWriter out = null;
-    BufferedWriter bw = null;
-    try {
-      f = new FileOutputStream(file, false);
-      out = new OutputStreamWriter(f, "utf-8");
-      bw = new BufferedWriter(out);
-      bw.write(key);
-    } catch (IOException e) {
-      LOGGER.error("Cannot save key: " + fileName);
-    } finally {
-      if (bw != null) {
-        try {
-          bw.close();
-        } catch (IOException e) {
-          LOGGER.error(e.getMessage());
-        }
-      }
-      if (out != null) {
-        try {
-          out.close();
-        } catch (IOException e) {
-          LOGGER.error(e.getMessage());
-        }
-      }
-      if (f != null) {
-        try {
-          f.close();
-        } catch (IOException e) {
-          LOGGER.error(e.getMessage());
-        }
-      }
-    }
-  }
-
   private static void createFile(File file) {
     // 判断文件是否存在
     if (!file.exists()) {
@@ -274,11 +236,13 @@ public class FileUtils {
   // 创建目录
   public static boolean createDir(String destDirName) {
     File dir = new File(destDirName);
-    if (dir.exists()) {// 判断目录是否存在
+    // 判断目录是否存在
+    if (dir.exists()) {
       LOGGER.info("Do not to create folder. It does exist!");
       return false;
     }
-    if (!destDirName.endsWith(File.separator)) {// 结尾是否以"/"结束
+    // 结尾是否以"/"结束
+    if (!destDirName.endsWith(File.separator)) {
       destDirName = destDirName + File.separator;
     }
     // 创建目标目录

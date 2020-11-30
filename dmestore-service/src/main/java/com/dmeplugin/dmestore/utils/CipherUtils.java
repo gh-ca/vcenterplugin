@@ -18,16 +18,6 @@ public class CipherUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(CipherUtils.class);
   private static final int IV_SIZE = 16;
-
-  public static final int KEY_SIZE = 8;
-
-  public static final int BIT_SIZE = 32;
-
-  /**
-   * 迭代次数
-   */
-  public static final int PBKDF2_ITERATIONS = 10000;
-
   private static final String KEY = "668DAFB758034A97";
 
 
@@ -36,8 +26,6 @@ public class CipherUtils {
     return aesEncode(sSrc, KEY);
   }
 
-  //    * 加密用的Key 可以用26个字母和数字组成
-//    * 此处使用AES-128-CBC加密模式，key需要为16位。
   public static String aesEncode(String sSrc, String key) {
     try {
       Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");

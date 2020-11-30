@@ -31,20 +31,8 @@ public class CustomFieldsManagerMO extends BaseMO {
         super(context, mor);
     }
 
-    public CustomFieldsManagerMO(VmwareContext context, String morType, String morValue) {
-        super(context, morType, morValue);
-    }
-
     public CustomFieldDef addCustomerFieldDef(String fieldName, String morType, PrivilegePolicyDef fieldDefPolicy, PrivilegePolicyDef fieldPolicy) throws Exception {
         return context.getService().addCustomFieldDef(getMor(), fieldName, morType, fieldDefPolicy, fieldPolicy);
-    }
-
-    public void removeCustomFieldDef(int key) throws Exception {
-        context.getService().removeCustomFieldDef(getMor(), key);
-    }
-
-    public void renameCustomFieldDef(int key, String name) throws Exception {
-        context.getService().renameCustomFieldDef(getMor(), key, name);
     }
 
     public void setField(ManagedObjectReference morEntity, int key, String value) throws Exception {
@@ -78,7 +66,6 @@ public class CustomFieldsManagerMO extends BaseMO {
             CustomFieldDef field = addCustomerFieldDef(fieldName, morType, null, null);
             return field.getKey();
         } catch (Exception e) {
-            // assuming that someone is adding it
             key = getCustomFieldKey(morType, fieldName);
         }
 
