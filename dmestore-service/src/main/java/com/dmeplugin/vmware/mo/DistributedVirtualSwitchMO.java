@@ -47,64 +47,9 @@ public class DistributedVirtualSwitchMO extends BaseMO {
 
     public DistributedVirtualSwitchMO(VmwareContext context, String morType, String morValue) {
         super(context, morType, morValue);
-        s_dvPortGroupCacheMap = new ConcurrentHashMap<String, List<String>>();
+        s_dvPortGroupCacheMap = new ConcurrentHashMap<>();
     }
 
-    public void createDvPortGroup(DVPortgroupConfigSpec dvPortGroupSpec) throws Exception {
-        List<DVPortgroupConfigSpec> dvPortGroupSpecArray = new ArrayList<DVPortgroupConfigSpec>();
-        dvPortGroupSpecArray.add(dvPortGroupSpec);
-        boolean dvPortGroupExists = false;
-        String dvSwitchInstance = mor.getValue();
-        String dvPortGroupName = dvPortGroupSpec.getName();
-        String uniquedvPortGroupPerDvs = dvSwitchInstance + dvPortGroupName;
-        List<String> dvPortGroupList = null;
-        synchronized (uniquedvPortGroupPerDvs.intern()) {
-            // Looking up local cache rather than firing another API call to see if dvPortGroup exists already.
-            if (s_dvPortGroupCacheMap.containsKey(dvSwitchInstance)) {
-                dvPortGroupList = s_dvPortGroupCacheMap.get(dvSwitchInstance);
-                if (dvPortGroupList != null && dvPortGroupList.contains(dvPortGroupName)) {
-                    dvPortGroupExists = true;
-                }
-            }
-            if (!dvPortGroupExists) {
-                ManagedObjectReference task = context.getService().addDVPortgroupTask(mor, dvPortGroupSpecArray);
-                if (!context.getVimClient().waitForTask(task)) {
-                    throw new Exception("Failed to create dvPortGroup " + dvPortGroupSpec.getName());
-                } else {
-                    if (s_dvPortGroupCacheMap.containsKey(dvSwitchInstance)) {
-                        dvPortGroupList = s_dvPortGroupCacheMap.get(dvSwitchInstance);
-                        if (dvPortGroupList == null) {
-                            dvPortGroupList = new ArrayList<String>();
-                        }
-                        //does this update map?
-                        dvPortGroupList.add(dvPortGroupName);
-                    } else {
-                        dvPortGroupList = new ArrayList<String>();
-                        dvPortGroupList.add(dvPortGroupName);
-                        s_dvPortGroupCacheMap.put(dvSwitchInstance, dvPortGroupList);
-                    }
-                }
-                if (s_logger.isTraceEnabled()) {
-                    s_logger.trace("Created dvPortGroup. dvPortGroup cache is :" + s_dvPortGroupCacheMap);
-                }
-            } else if (s_logger.isDebugEnabled()) {
-                s_logger.debug("Detected dvPortGroup [" + dvPortGroupName + "] already present. Not attempting to create again.");
-            }
-        }
-    }
-
-    public void updateDvPortGroup(ManagedObjectReference dvPortGroupMor, DVPortgroupConfigSpec dvPortGroupSpec) throws Exception {
-        synchronized (dvPortGroupMor.getValue().intern()) {
-            ManagedObjectReference task = context.getService().reconfigureDVPortgroupTask(dvPortGroupMor, dvPortGroupSpec);
-            if (!context.getVimClient().waitForTask(task)) {
-                throw new Exception("Failed to update dvPortGroup " + dvPortGroupMor.getValue());
-            }
-        }
-    }
-
-    public void updateVmWareDvSwitch(ManagedObjectReference dvSwitchMor, VMwareDVSConfigSpec dvsSpec) throws Exception {
-        context.getService().reconfigureDvsTask(dvSwitchMor, dvsSpec);
-    }
 
     public TaskInfo updateVmWareDvSwitchGetTask(ManagedObjectReference dvSwitchMor, VMwareDVSConfigSpec dvsSpec) throws Exception {
         ManagedObjectReference task = context.getService().reconfigureDvsTask(dvSwitchMor, dvsSpec);
@@ -124,48 +69,39 @@ public class DistributedVirtualSwitchMO extends BaseMO {
 
         Map<Integer, HypervisorHostHelper.PvlanType> result = new HashMap<Integer, HypervisorHostHelper.PvlanType>();
 
-        VMwareDVSConfigInfo configinfo = (VMwareDVSConfigInfo) context.getVimClient().getDynamicProperty(dvSwitchMor, "config");
-        List<VMwareDVSPvlanMapEntry> pvlanconfig = null;
+        VMwareDVSConfigInfo configinfo = context.getVimClient().getDynamicProperty(dvSwitchMor, "config");
+        List<VMwareDVSPvlanMapEntry> pvlanconfig;
         pvlanconfig = configinfo.getPvlanConfig();
 
         if (null == pvlanconfig || 0 == pvlanconfig.size()) {
             return result;
         }
-        // Iterate through the pvlanMapList and check if the specified vlan id and pvlan id exist. If they do, set the fields in result accordingly.
-
         for (VMwareDVSPvlanMapEntry mapEntry : pvlanconfig) {
             int entryVlanid = mapEntry.getPrimaryVlanId();
             int entryPvlanid = mapEntry.getSecondaryVlanId();
             if (entryVlanid == entryPvlanid) {
-                // promiscuous
                 if (vlanid == entryVlanid) {
-                    // pvlan type will always be promiscuous in this case.
                     result.put(vlanid, HypervisorHostHelper.PvlanType.valueOf(mapEntry.getPvlanType()));
                 } else if ((vlanid != secondaryvlanid) && secondaryvlanid == entryVlanid) {
                     result.put(secondaryvlanid, HypervisorHostHelper.PvlanType.valueOf(mapEntry.getPvlanType()));
                 }
             } else {
                 if (vlanid == entryVlanid) {
-                    // vlan id in entry is promiscuous
                     result.put(vlanid, HypervisorHostHelper.PvlanType.promiscuous);
                 } else if (vlanid == entryPvlanid) {
                     result.put(vlanid, HypervisorHostHelper.PvlanType.valueOf(mapEntry.getPvlanType()));
                 }
                 if ((vlanid != secondaryvlanid) && secondaryvlanid == entryVlanid) {
-                    //promiscuous
                     result.put(secondaryvlanid, HypervisorHostHelper.PvlanType.promiscuous);
                 } else if (secondaryvlanid == entryPvlanid) {
                     result.put(secondaryvlanid, HypervisorHostHelper.PvlanType.valueOf(mapEntry.getPvlanType()));
                 }
 
             }
-            // If we already know that the vlanid is being used as a non primary vlan, it's futile to
-            // go over the entire list. Return.
             if (result.containsKey(vlanid) && result.get(vlanid) != HypervisorHostHelper.PvlanType.promiscuous) {
                 return result;
             }
 
-            // If we've already found both vlanid and pvlanid, we have enough info to make a decision. Return.
             if (result.containsKey(vlanid) && result.containsKey(secondaryvlanid)) {
                 return result;
             }
@@ -186,7 +122,6 @@ public class DistributedVirtualSwitchMO extends BaseMO {
             return result;
         }
 
-        // Iterate through the pvlanMapList and check if the specified pvlan id exist. If it does, set the fields in result accordingly.
         for (VMwareDVSPvlanMapEntry mapEntry : pvlanConfig) {
             int entryVlanid = mapEntry.getPrimaryVlanId();
             int entryPvlanid = mapEntry.getSecondaryVlanId();

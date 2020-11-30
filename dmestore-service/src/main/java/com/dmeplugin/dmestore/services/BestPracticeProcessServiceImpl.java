@@ -142,7 +142,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                         checkMap.get(hostSetting).add(bean);
                     }
                 } catch (Exception ex) {
-                    //报错，跳过当前项检查
+                    // 报错，跳过当前项检查
                     log.error("{} check failed! hostSetting={}", hostName, bestPracticeService.getHostSetting());
                     continue;
                 }

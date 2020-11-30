@@ -23,10 +23,6 @@ public class JsonUtil {
     return GSON.fromJson(json, new TypeToken<Map<String, Object>>(){}.getType());
   }
   
-  public static String writeAsString(Map object) {
-    return GSON.toJson(object);
-  }
-  
   public static class MapDeserializerDoubleAsIntFix 
       implements JsonDeserializer<Map<String, Object>> {
     
@@ -76,27 +72,10 @@ public class JsonUtil {
   }
   
   public static class StringDeserializer implements JsonDeserializer<String> {
-    
     @Override
     public String deserialize(JsonElement jsonElement, Type type, 
         JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
       return jsonElement.toString();
     }
-  }
-  
-  /**
-   * 对象转换为Map.
-   * @param obj 待转换对象
-   * @return map
-   */
-  public static Map<String,Object> object2Map(Object obj) {
-    String jsonString;
-    if (obj instanceof String) {
-      jsonString = (String) obj;
-    } else {
-      jsonString = GSON.toJson(obj);
-    }
-    Map<String, Object> map = GSON.fromJson(jsonString, new TypeToken<Map<String, Object>>(){}.getType());
-    return map;
   }
 }

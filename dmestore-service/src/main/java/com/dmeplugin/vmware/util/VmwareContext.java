@@ -34,17 +34,7 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSession;
 import javax.xml.ws.soap.SOAPFaultException;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -107,24 +97,8 @@ public class VmwareContext {
     }
 
     public VmwareContext() {
-        vimClient =new VmwareClient("vcentercontext");
-        serverAddress ="";
-    }
-
-    public boolean validate() {
-        return vimClient.validate();
-    }
-
-    public void registerStockObject(String name, Object obj) {
-        synchronized (stockMap) {
-            stockMap.put(name, obj);
-        }
-    }
-
-    public void uregisterStockObject(String name) {
-        synchronized (stockMap) {
-            stockMap.remove(name);
-        }
+        vimClient = new VmwareClient("vcentercontext");
+        serverAddress = "";
     }
 
     public void clearStockObjects() {
@@ -201,106 +175,6 @@ public class VmwareContext {
         s_outstandingCount--;
     }
 
-    public ManagedObjectReference getHostMorByPath(String inventoryPath) throws Exception {
-        assert (inventoryPath != null);
-
-        String[] tokens;
-        if (inventoryPath.startsWith("/")) {
-            tokens = inventoryPath.substring(1).split("/");
-        } else {
-            tokens = inventoryPath.split("/");
-        }
-
-        ManagedObjectReference mor = getRootFolder();
-        for (int i = 0; i < tokens.length; i++) {
-            String token = tokens[i];
-            List<ObjectContent> ocs;
-            PropertySpec pSpec = null;
-            ObjectSpec oSpec = null;
-            if ("Datacenter".equalsIgnoreCase(mor.getType())) {
-                pSpec = new PropertySpec();
-                pSpec.setAll(false);
-                pSpec.setType("ManagedEntity");
-                pSpec.getPathSet().add("name");
-
-                TraversalSpec dcHostFolderTraversal = new TraversalSpec();
-                dcHostFolderTraversal.setType("Datacenter");
-                dcHostFolderTraversal.setPath("hostFolder");
-                dcHostFolderTraversal.setName("dcHostFolderTraversal");
-
-                oSpec = new ObjectSpec();
-                oSpec.setObj(mor);
-                oSpec.setSkip(Boolean.TRUE);
-                oSpec.getSelectSet().add(dcHostFolderTraversal);
-
-            } else if ("Folder".equalsIgnoreCase(mor.getType())) {
-                pSpec = new PropertySpec();
-                pSpec.setAll(false);
-                pSpec.setType("ManagedEntity");
-                pSpec.getPathSet().add("name");
-
-                TraversalSpec folderChildrenTraversal = new TraversalSpec();
-                folderChildrenTraversal.setType("Folder");
-                folderChildrenTraversal.setPath("childEntity");
-                folderChildrenTraversal.setName("folderChildrenTraversal");
-
-                oSpec = new ObjectSpec();
-                oSpec.setObj(mor);
-                oSpec.setSkip(Boolean.TRUE);
-                oSpec.getSelectSet().add(folderChildrenTraversal);
-
-            } else if ("ClusterComputeResource".equalsIgnoreCase(mor.getType())) {
-                pSpec = new PropertySpec();
-                pSpec.setType("ManagedEntity");
-                pSpec.getPathSet().add("name");
-
-                TraversalSpec clusterHostTraversal = new TraversalSpec();
-                clusterHostTraversal.setType("ClusterComputeResource");
-                clusterHostTraversal.setPath("host");
-                clusterHostTraversal.setName("folderChildrenTraversal");
-
-                oSpec = new ObjectSpec();
-                oSpec.setObj(mor);
-                oSpec.setSkip(Boolean.TRUE);
-                oSpec.getSelectSet().add(clusterHostTraversal);
-
-            } else {
-                s_logger.error("Invalid inventory path, path element can only be datacenter and folder");
-                return null;
-            }
-
-            PropertyFilterSpec pfSpec = new PropertyFilterSpec();
-            pfSpec.getPropSet().add(pSpec);
-            pfSpec.getObjectSet().add(oSpec);
-            List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
-            pfSpecArr.add(pfSpec);
-            ocs = getService().retrieveProperties(getPropertyCollector(), pfSpecArr);
-
-            if (ocs != null && ocs.size() > 0) {
-                boolean found = false;
-                for (ObjectContent oc : ocs) {
-                    String name = oc.getPropSet().get(0).getVal().toString();
-                    if (name.equalsIgnoreCase(token) || "host".equalsIgnoreCase(name)) {
-                        mor = oc.getObj();
-                        found = true;
-                        if ("host".equalsIgnoreCase(name)) {
-                            i--;
-                        }
-                        break;
-                    }
-                }
-                if (!found) {
-                    s_logger.error("Path element points to an un-existing inventory entity");
-                    return null;
-                }
-            } else {
-                s_logger.error("Path element points to an un-existing inventory entity");
-                return null;
-            }
-        }
-        return mor;
-    }
-
     // path in format of <datacenter name>/<datastore name>
     public ManagedObjectReference getDatastoreMorByPath(String inventoryPath) throws Exception {
         assert (inventoryPath != null);
@@ -342,62 +216,6 @@ public class VmwareContext {
         }
     }
 
-    public void getFile(String urlString, String localFileFullName) throws Exception {
-        HttpURLConnection conn = getHttpConnection(urlString);
-
-        InputStream in = conn.getInputStream();
-        OutputStream out = new FileOutputStream(new File(localFileFullName));
-        byte[] buf = new byte[CHUNK_SIZE];
-        int len = 0;
-        while ((len = in.read(buf)) > 0) {
-            out.write(buf, 0, len);
-        }
-        in.close();
-        out.close();
-    }
-
-    public void uploadFile(String urlString, String localFileFullName) throws Exception {
-        uploadFile(urlString, new File(localFileFullName));
-    }
-
-    public void uploadFile(String urlString, File localFile) throws Exception {
-        HttpURLConnection conn = getHttpConnection(urlString, "PUT");
-        OutputStream out = null;
-        InputStream in = null;
-        BufferedReader br = null;
-
-        try {
-            out = conn.getOutputStream();
-            in = new FileInputStream(localFile);
-            byte[] buf = new byte[CHUNK_SIZE];
-            int len = 0;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-            }
-            out.flush();
-
-            br = new BufferedReader(new InputStreamReader(conn.getInputStream(), getCharSetFromConnection(conn)));
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (s_logger.isTraceEnabled()) {
-                    s_logger.trace("Upload " + urlString + " response: " + line);
-                }
-            }
-        } finally {
-            if (in != null) {
-                in.close();
-            }
-
-            if (out != null) {
-                out.close();
-            }
-
-            if (br != null) {
-                br.close();
-            }
-        }
-    }
-
     private Charset getCharSetFromConnection(HttpURLConnection conn) {
         String charsetName = conn.getContentEncoding();
         Charset charset;
@@ -408,97 +226,6 @@ public class VmwareContext {
             charset = StringUtil.getPreferredCharset();
         }
         return charset;
-    }
-
-    public void uploadVmdkFile(String httpMethod, String urlString, String localFileName, long totalBytesUpdated, ActionDelegate<Long> progressUpdater) throws Exception {
-
-        HttpURLConnection conn = getRawHttpConnection(urlString);
-
-        conn.setDoOutput(true);
-        conn.setUseCaches(false);
-
-        conn.setChunkedStreamingMode(CHUNK_SIZE);
-        conn.setRequestMethod(httpMethod);
-        conn.setRequestProperty("Connection", "Keep-Alive");
-        conn.setRequestProperty("Content-Type", "application/x-vnd.vmware-streamVmdk");
-        conn.setRequestProperty("Content-Length", Long.toString(new File(localFileName).length()));
-        connectWithRetry(conn);
-
-        BufferedOutputStream bos = null;
-        BufferedInputStream is = null;
-        try {
-            bos = new BufferedOutputStream(conn.getOutputStream());
-            is = new BufferedInputStream(new FileInputStream(localFileName));
-            int bufferSize = CHUNK_SIZE;
-            byte[] buffer = new byte[bufferSize];
-            while (true) {
-                int bytesRead = is.read(buffer, 0, bufferSize);
-                if (bytesRead == -1) {
-                    break;
-                }
-                bos.write(buffer, 0, bytesRead);
-                totalBytesUpdated += bytesRead;
-                bos.flush();
-                if (progressUpdater != null) {
-                    progressUpdater.action(new Long(totalBytesUpdated));
-                }
-            }
-            bos.flush();
-        } finally {
-            if (is != null) {
-                is.close();
-            }
-            if (bos != null) {
-                bos.close();
-            }
-
-            conn.disconnect();
-        }
-    }
-
-    public long downloadVmdkFile(String urlString, String localFileName, long totalBytesDownloaded, ActionDelegate<Long> progressUpdater) throws Exception {
-        HttpURLConnection conn = getRawHttpConnection(urlString);
-
-        String cookie = vimClient.getServiceCookie();
-        if (cookie == null) {
-            s_logger.error("No cookie is found in vwware web service request context!");
-            throw new Exception("No cookie is found in vmware web service request context!");
-        }
-        conn.addRequestProperty("Cookie", cookie);
-        conn.setDoInput(true);
-        conn.setDoOutput(true);
-        conn.setAllowUserInteraction(true);
-        connectWithRetry(conn);
-
-        long bytesWritten = 0;
-        InputStream in = null;
-        OutputStream out = null;
-        try {
-            in = conn.getInputStream();
-            out = new FileOutputStream(new File(localFileName));
-
-            byte[] buf = new byte[CHUNK_SIZE];
-            int len = 0;
-            while ((len = in.read(buf)) > 0) {
-                out.write(buf, 0, len);
-                bytesWritten += len;
-                totalBytesDownloaded += len;
-
-                if (progressUpdater != null) {
-                    progressUpdater.action(new Long(totalBytesDownloaded));
-                }
-            }
-        } finally {
-            if (in != null) {
-                in.close();
-            }
-            if (out != null) {
-                out.close();
-            }
-
-            conn.disconnect();
-        }
-        return bytesWritten;
     }
 
     public byte[] getResourceContent(String urlString) throws Exception {
@@ -535,64 +262,9 @@ public class VmwareContext {
         in.close();
     }
 
-    /*
-     * Sample content returned by query a datastore directory
-     *
-     * Url for the query
-     *     https://vsphere-1.lab.vmops.com/folder/Fedora-clone-test?dcPath=cupertino&dsName=NFS+datastore
-     *
-     * Returned conent from vSphere
-     *
-        <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-        <html>
-          <head>
-            <meta http-equiv="content-type" content="text/html; charset=utf-8">
-            <title>Index of Fedora-clone-test on datastore NFS datastore in datacenter cupertino</title></head>
-          <body>
-        <h1>Index of Fedora-clone-test on datastore NFS datastore in datacenter cupertino</h1>
-        <table>
-            <tr><th>Name</th><th>Last modified</th><th>Size</th></tr><tr><th colspan="3"><hr></th></tr>
-            <tr><td><a href="/folder?dcPath=cupertino&amp;dsName=NFS%20datastore">Parent Directory</a></td><td>&nbsp;</td><td align="right">  - </td></tr>
-            <tr><td><a href="/folder/Fedora%2dclone%2dtest/Fedora%2dclone%2dtest%2da2013465%2ehlog?dcPath=cupertino&amp;dsName=NFS%20datastore">
-            Fedora-clone-test-a2013465.hlog</a></td><td align="right">15-Aug-2010 00:13</td><td align="right">1</td></tr>
-            <tr><td><a href="/folder/Fedora%2dclone%2dtest/Fedora%2dclone%2dtest%2da2013465%2evswp?dcPath=cupertino&amp;dsName=NFS%20datastore">
-            Fedora-clone-test-a2013465.vswp</a></td><td align="right">14-Aug-2010 23:01</td><td align="right">402653184</td></tr>
-            <tr><td><a href="/folder/Fedora%2dclone%2dtest/Fedora%2dclone%2dtest%2dflat%2evmdk?dcPath=cupertino&amp;dsName=NFS%20datastore">
-            Fedora-clone-test-flat.vmdk</a></td><td align="right">26-Aug-2010 18:43</td><td align="right">17179869184</td></tr>
-            <tr><td><a href="/folder/Fedora%2dclone%2dtest/Fedora%2dclone%2dtest%2envram?dcPath=cupertino&amp;dsName=NFS%20datastore">
-            Fedora-clone-test.nvram</a></td><td align="right">15-Aug-2010 00:13</td><td align="right">8684</td></tr>
-            <tr><td><a href="/folder/Fedora%2dclone%2dtest/Fedora%2dclone%2dtest%2evmdk?dcPath=cupertino&amp;dsName=NFS%20datastore">
-            Fedora-clone-test.vmdk</a></td><td align="right">15-Aug-2010 00:13</td><td align="right">479</td></tr>
-            <tr><td><a href="/folder/Fedora%2dclone%2dtest/Fedora%2dclone%2dtest%2evmsd?dcPath=cupertino&amp;dsName=NFS%20datastore">
-            Fedora-clone-test.vmsd</a></td><td align="right">14-Aug-2010 16:59</td><td align="right">0</td></tr>
-            <tr><td><a href="/folder/Fedora%2dclone%2dtest/Fedora%2dclone%2dtest%2evmx?dcPath=cupertino&amp;dsName=NFS%20datastore">
-            Fedora-clone-test.vmx</a></td><td align="right">15-Aug-2010 00:13</td><td align="right">3500</td></tr>
-            <tr><td><a href="/folder/Fedora%2dclone%2dtest/Fedora%2dclone%2dtest%2evmxf?dcPath=cupertino&amp;dsName=NFS%20datastore">
-            Fedora-clone-test.vmxf</a></td><td align="right">15-Aug-2010 00:13</td><td align="right">272</td></tr>
-            <tr><td><a href="/folder/Fedora%2dclone%2dtest/test%2etxt?dcPath=cupertino&amp;dsName=NFS%20datastore">test.txt</a></td>
-            <td align="right">24-Aug-2010 01:03</td><td align="right">12</td></tr>
-            <tr><td><a href="/folder/Fedora%2dclone%2dtest/vmware%2d2%2elog?dcPath=cupertino&amp;dsName=NFS%20datastore">
-            vmware-2.log</a></td><td align="right">14-Aug-2010 16:51</td><td align="right">80782</td></tr>
-            <tr><td><a href="/folder/Fedora%2dclone%2dtest/vmware%2d3%2elog?dcPath=cupertino&amp;dsName=NFS%20datastore">
-            vmware-3.log</a></td><td align="right">14-Aug-2010 19:07</td><td align="right">58573</td></tr>
-            <tr><td><a href="/folder/Fedora%2dclone%2dtest/vmware%2d4%2elog?dcPath=cupertino&amp;dsName=NFS%20datastore">
-            vmware-4.log</a></td><td align="right">14-Aug-2010 23:00</td><td align="right">49751</td></tr>
-            <tr><td><a href="/folder/Fedora%2dclone%2dtest/vmware%2d5%2elog?dcPath=cupertino&amp;dsName=NFS%20datastore">
-            vmware-5.log</a></td><td align="right">15-Aug-2010 00:04</td><td align="right">64024</td></tr>
-            <tr><td><a href="/folder/Fedora%2dclone%2dtest/vmware%2d6%2elog?dcPath=cupertino&amp;dsName=NFS%20datastore">
-            vmware-6.log</a></td><td align="right">15-Aug-2010 00:11</td><td align="right">59742</td></tr>
-            <tr><td><a href="/folder/Fedora%2dclone%2dtest/vmware%2d7%2elog?dcPath=cupertino&amp;dsName=NFS%20datastore">
-            vmware-7.log</a></td><td align="right">15-Aug-2010 00:13</td><td align="right">59859</td></tr>
-            <tr><td><a href="/folder/Fedora%2dclone%2dtest/vmware%2elog?dcPath=cupertino&amp;dsName=NFS%20datastore">
-            vmware.log</a></td><td align="right">15-Aug-2010 00:23</td><td align="right">47157</td></tr>
-            <tr><th colspan="5"><hr></th></tr>
-        </table>
-          </body>
-        </html>
-     */
     public String[] listDatastoreDirContent(String urlString) throws Exception {
         List<String> fileList = new ArrayList<String>();
-        String content = new String(getResourceContent(urlString),"UTF-8");
+        String content = new String(getResourceContent(urlString), "UTF-8");
         String marker = "</a></td><td ";
         int parsePos = -1;
         do {
@@ -646,7 +318,7 @@ public class VmwareContext {
             throw new Exception("No cookie is found in vmware web service request context!");
         }
         URL url = new URL(urlString);
-        HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
         conn.setDoInput(true);
         conn.setDoOutput(true);
@@ -655,11 +327,6 @@ public class VmwareContext {
         conn.setRequestMethod(httpMethod);
         connectWithRetry(conn);
         return conn;
-    }
-
-    public HttpURLConnection getRawHttpConnection(String urlString) throws Exception {
-        URL url = new URL(urlString);
-        return (HttpURLConnection)url.openConnection();
     }
 
     private static void connectWithRetry(HttpURLConnection conn) throws Exception {
@@ -690,7 +357,7 @@ public class VmwareContext {
         try {
             s_logger.info("Disconnecting VMware session");
             vimClient.disconnect();
-        } catch(SOAPFaultException sfe) {
+        } catch (SOAPFaultException sfe) {
             s_logger.debug("Tried to disconnect a session that is no longer valid");
         } catch (Exception e) {
             s_logger.warn("Unexpected exception: ", e);
@@ -706,14 +373,6 @@ public class VmwareContext {
         @Override
         public java.security.cert.X509Certificate[] getAcceptedIssuers() {
             return null;
-        }
-
-        public boolean isServerTrusted(java.security.cert.X509Certificate[] certs) {
-            return true;
-        }
-
-        public boolean isClientTrusted(java.security.cert.X509Certificate[] certs) {
-            return true;
         }
 
         @Override
@@ -735,11 +394,9 @@ public class VmwareContext {
      *                  from
      * @param morefType Type of the managed entity that needs to be searched
      * @return Map of name and MOREF of the managed objects present. If none
-     *         exist then empty Map is returned
+     * exist then empty Map is returned
      * @throws com.vmware.vim25.InvalidPropertyFaultMsg
-     *
      * @throws com.vmware.vim25.RuntimeFaultFaultMsg
-     *
      */
     public List<Pair<ManagedObjectReference, String>> inFolderByType(
             final ManagedObjectReference folder, final String morefType, final RetrieveOptions retrieveOptions
@@ -756,20 +413,20 @@ public class VmwareContext {
 
         final List<Pair<ManagedObjectReference, String>> tgtMoref =
                 new ArrayList<>();
-        while(results != null && !results.getObjects().isEmpty()) {
+        while (results != null && !results.getObjects().isEmpty()) {
             resultsToTgtMorefList(results, tgtMoref);
             final String token = results.getToken();
             // if we have a token, we can scroll through additional results, else there's nothing to do.
             results =
                     (token != null) ?
-                            getService().continueRetrievePropertiesEx(propertyCollector,token) : null;
+                            getService().continueRetrievePropertiesEx(propertyCollector, token) : null;
         }
 
         return tgtMoref;
     }
 
     public List<Pair<ManagedObjectReference, String>> inFolderByType(ManagedObjectReference folder, String morefType) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
-        return inFolderByType(folder,morefType, new RetrieveOptions());
+        return inFolderByType(folder, morefType, new RetrieveOptions());
     }
 
     /**
@@ -781,8 +438,8 @@ public class VmwareContext {
      * @param morefType       Type of the managed entity that needs to be searched
      * @param morefProperties Array of properties to be fetched for the moref
      * @return Map of MOREF and Map of name value pair of properties requested of
-     *         the managed objects present. If none exist then empty Map is
-     *         returned
+     * the managed objects present. If none exist then empty Map is
+     * returned
      * @throws InvalidPropertyFaultMsg
      * @throws RuntimeFaultFaultMsg
      */
@@ -818,7 +475,7 @@ public class VmwareContext {
      *                  search from
      * @param morefType Type of the managed entity that needs to be searched
      * @return Map of name and MOREF of the managed objects present. If none
-     *         exist then empty Map is returned
+     * exist then empty Map is returned
      * @throws InvalidPropertyFaultMsg
      * @throws RuntimeFaultFaultMsg
      */
@@ -835,7 +492,7 @@ public class VmwareContext {
         String token = null;
         token = populate(rslts, tgtMoref);
 
-        while ( token != null && !token.isEmpty() ) {
+        while (token != null && !token.isEmpty()) {
             // fetch results based on new token
             rslts = getService().continueRetrievePropertiesEx(
                     getServiceContent().getPropertyCollector(), token);
@@ -870,7 +527,7 @@ public class VmwareContext {
 
         PropertyFilterSpec[] propertyFilterSpecs = propertyFilterSpecs(container, morefType, morefProperties);
 
-        return containerViewByType(container,morefType,morefProperties,retrieveOptions,propertyFilterSpecs);
+        return containerViewByType(container, morefType, morefProperties, retrieveOptions, propertyFilterSpecs);
     }
 
     public RetrieveResult containerViewByType(
@@ -892,25 +549,7 @@ public class VmwareContext {
             final String morefType,
             final RetrieveOptions retrieveOptions
     ) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
-        return this.containerViewByType(container,morefType,retrieveOptions,"name");
-    }
-
-    private void resultsToTgtMorefMap(RetrieveResult results, Map<String, ManagedObjectReference> tgtMoref) {
-        List<ObjectContent> oCont = (results != null) ? results.getObjects() : null;
-
-        if (oCont != null) {
-            for (ObjectContent oc : oCont) {
-                ManagedObjectReference mr = oc.getObj();
-                String entityNm = null;
-                List<DynamicProperty> dps = oc.getPropSet();
-                if (dps != null) {
-                    for (DynamicProperty dp : dps) {
-                        entityNm = (String) dp.getVal();
-                    }
-                }
-                tgtMoref.put(entityNm, mr);
-            }
-        }
+        return this.containerViewByType(container, morefType, retrieveOptions, "name");
     }
 
     private void resultsToTgtMorefList(RetrieveResult results, List<Pair<ManagedObjectReference, String>> tgtMoref) {
@@ -969,7 +608,7 @@ public class VmwareContext {
         String token = null;
         if (rslts != null) {
             token = rslts.getToken();
-            for(ObjectContent oc : rslts.getObjects()) {
+            for (ObjectContent oc : rslts.getObjects()) {
                 ManagedObjectReference mr = oc.getObj();
                 String entityNm = null;
                 List<DynamicProperty> dps = oc.getPropSet();

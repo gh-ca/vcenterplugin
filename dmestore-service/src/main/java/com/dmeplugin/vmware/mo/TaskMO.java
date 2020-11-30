@@ -17,13 +17,10 @@
 package com.dmeplugin.vmware.mo;
 
 
-
 import com.dmeplugin.vmware.util.VmwareContext;
-import com.vmware.vim25.LocalizableMessage;
 import com.vmware.vim25.LocalizedMethodFault;
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.TaskInfo;
-import com.vmware.vim25.TaskInfoState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,40 +31,19 @@ public class TaskMO extends BaseMO {
         super(context, morTask);
     }
 
-    public TaskMO(VmwareContext context, String morType, String morValue) {
-        super(context, morType, morValue);
-    }
-
     public TaskInfo getTaskInfo() throws Exception {
         return (TaskInfo)getContext().getVimClient().getDynamicProperty(mor, "info");
-    }
-
-    public void setTaskDescription(LocalizableMessage description) throws Exception {
-        context.getService().setTaskDescription(mor, description);
-    }
-
-    public void setTaskState(TaskInfoState state, Object result, LocalizedMethodFault fault) throws Exception {
-        context.getService().setTaskState(mor, state, result, fault);
-    }
-
-    public void updateProgress(int percentDone) throws Exception {
-        context.getService().updateProgress(mor, percentDone);
-    }
-
-    public void cancelTask() throws Exception {
-        context.getService().cancelTask(mor);
     }
 
     public static String getTaskFailureInfo(VmwareContext context, ManagedObjectReference morTask) {
         StringBuffer sb = new StringBuffer();
 
         try {
-            TaskInfo info = (TaskInfo)context.getVimClient().getDynamicProperty(morTask, "info");
+            TaskInfo info = context.getVimClient().getDynamicProperty(morTask, "info");
             if (info != null) {
                 LocalizedMethodFault fault = info.getError();
                 if (fault != null) {
                     sb.append(fault.getLocalizedMessage()).append(" ");
-
                     if (fault.getFault() != null) {
                         sb.append(fault.getFault().getClass().getName());
                     }
