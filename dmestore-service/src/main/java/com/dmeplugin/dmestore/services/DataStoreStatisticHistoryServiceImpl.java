@@ -682,11 +682,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         params = initParams(params);
 
         String interval = ToolUtils.getStr(params.get("interval"));
-        List<String> ranges = (List<String>) params.get("range");
-        String range = "";
-        if (ranges != null && ranges.size() > 0) {
-            range = ranges.get(0);
-        }
+        String range = (String) params.get("range");
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("obj_type_id", objTypeId);
         requestbody.put("indicator_ids", indicatorIds);
@@ -707,11 +703,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     //性能查询条件参数初始化
     private Map<String, Object> initParams(Map<String, Object> params) {
-        List<String> ranges = (List<String>) params.get("range");
-        String rang = "";
-        if (ranges != null && ranges.size() > 0) {
-            rang = ranges.get(0);
-        }
+        String rang = (String) params.get("range");
         String interval = ToolUtils.getStr(params.get("interval"));
         long beginTime = ToolUtils.getLong(params.get("begin_time"));
         long endTime = ToolUtils.getLong(params.get("end_time"));
