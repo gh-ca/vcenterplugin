@@ -14,6 +14,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+
 package com.dmeplugin.vmware.mo;
 
 import com.dmeplugin.vmware.util.Pair;
@@ -29,6 +30,7 @@ public class DatastoreMO extends BaseMO {
     private static final Logger s_logger = LoggerFactory.getLogger(DatastoreMO.class);
 
     private String name;
+
     private Pair<DatacenterMO, String> ownerDc;
 
     public DatastoreMO(VmwareContext context, ManagedObjectReference morDatastore) {
@@ -75,11 +77,6 @@ public class DatastoreMO extends BaseMO {
 
     public List<DatastoreHostMount> getHostMounts() throws Exception {
         return context.getVimClient().getDynamicProperty(mor, "host");
-    }
-
-    public String getInventoryPath() throws Exception {
-        Pair<DatacenterMO, String> dcInfo = getOwnerDatacenter();
-        return dcInfo.second() + "/" + getName();
     }
 
     public Pair<DatacenterMO, String> getOwnerDatacenter() throws Exception {
@@ -130,12 +127,9 @@ public class DatastoreMO extends BaseMO {
         context.getService().renameDatastore(mor, newDatastoreName);
     }
 
-    String getDatastoreRootPath() throws Exception {
-        return String.format("[%s]", getName());
-    }
-
-    public boolean copyDatastoreFile(String srcFilePath, ManagedObjectReference morSrcDc, ManagedObjectReference morDestDs, String destFilePath,
-                                     ManagedObjectReference morDestDc, boolean forceOverwrite) throws Exception {
+    public boolean moveDatastoreFile(String srcFilePath, ManagedObjectReference morSrcDc,
+        ManagedObjectReference morDestDs, String destFilePath, ManagedObjectReference morDestDc, boolean forceOverwrite)
+        throws Exception {
 
         String srcDsName = getName();
         DatastoreMO destDsMo = new DatastoreMO(context, morDestDs);
@@ -152,44 +146,16 @@ public class DatastoreMO extends BaseMO {
             destFullPath = String.format("[%s] %s", destDsName, destFilePath);
         }
 
-        ManagedObjectReference morTask = context.getService().copyDatastoreFileTask(morFileManager, srcFullPath, morSrcDc, destFullPath, morDestDc, forceOverwrite);
+        ManagedObjectReference morTask = context.getService()
+            .moveDatastoreFileTask(morFileManager, srcFullPath, morSrcDc, destFullPath, morDestDc, forceOverwrite);
 
         boolean result = context.getVimClient().waitForTask(morTask);
         if (result) {
             context.waitForTaskProgressDone(morTask);
             return true;
         } else {
-            s_logger.error("VMware copyDatastoreFile_Task failed due to " + TaskMO.getTaskFailureInfo(context, morTask));
-        }
-        return false;
-    }
-
-    public boolean moveDatastoreFile(String srcFilePath, ManagedObjectReference morSrcDc, ManagedObjectReference morDestDs, String destFilePath,
-                                     ManagedObjectReference morDestDc, boolean forceOverwrite) throws Exception {
-
-        String srcDsName = getName();
-        DatastoreMO destDsMo = new DatastoreMO(context, morDestDs);
-        String destDsName = destDsMo.getName();
-
-        ManagedObjectReference morFileManager = context.getServiceContent().getFileManager();
-        String srcFullPath = srcFilePath;
-        if (!DatastoreFile.isFullDatastorePath(srcFullPath)) {
-            srcFullPath = String.format("[%s] %s", srcDsName, srcFilePath);
-        }
-
-        String destFullPath = destFilePath;
-        if (!DatastoreFile.isFullDatastorePath(destFullPath)) {
-            destFullPath = String.format("[%s] %s", destDsName, destFilePath);
-        }
-
-        ManagedObjectReference morTask = context.getService().moveDatastoreFileTask(morFileManager, srcFullPath, morSrcDc, destFullPath, morDestDc, forceOverwrite);
-
-        boolean result = context.getVimClient().waitForTask(morTask);
-        if (result) {
-            context.waitForTaskProgressDone(morTask);
-            return true;
-        } else {
-            s_logger.error("VMware moveDatgastoreFile_Task failed due to " + TaskMO.getTaskFailureInfo(context, morTask));
+            s_logger.error(
+                "VMware moveDatgastoreFile_Task failed due to " + TaskMO.getTaskFailureInfo(context, morTask));
         }
         return false;
     }

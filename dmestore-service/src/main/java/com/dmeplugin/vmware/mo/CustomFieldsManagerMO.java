@@ -14,6 +14,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+
 package com.dmeplugin.vmware.mo;
 
 import java.util.List;
@@ -23,15 +24,14 @@ import com.vmware.vim25.CustomFieldDef;
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.PrivilegePolicyDef;
 
-
-
 public class CustomFieldsManagerMO extends BaseMO {
 
     public CustomFieldsManagerMO(VmwareContext context, ManagedObjectReference mor) {
         super(context, mor);
     }
 
-    public CustomFieldDef addCustomerFieldDef(String fieldName, String morType, PrivilegePolicyDef fieldDefPolicy, PrivilegePolicyDef fieldPolicy) throws Exception {
+    public CustomFieldDef addCustomerFieldDef(String fieldName, String morType, PrivilegePolicyDef fieldDefPolicy,
+        PrivilegePolicyDef fieldPolicy) throws Exception {
         return context.getService().addCustomFieldDef(getMor(), fieldName, morType, fieldDefPolicy, fieldPolicy);
     }
 
@@ -54,25 +54,5 @@ public class CustomFieldsManagerMO extends BaseMO {
             }
         }
         return 0;
-    }
-
-    public int ensureCustomFieldDef(String morType, String fieldName) throws Exception {
-        int key = getCustomFieldKey(morType, fieldName);
-        if (key > 0) {
-            return key;
-        }
-
-        try {
-            CustomFieldDef field = addCustomerFieldDef(fieldName, morType, null, null);
-            return field.getKey();
-        } catch (Exception e) {
-            key = getCustomFieldKey(morType, fieldName);
-        }
-
-        if (key == 0) {
-            throw new Exception("Unable to setup custom field facility for " + morType + ":" + fieldName);
-        }
-
-        return key;
     }
 }

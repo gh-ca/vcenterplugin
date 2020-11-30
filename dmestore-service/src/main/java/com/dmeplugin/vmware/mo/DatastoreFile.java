@@ -24,10 +24,6 @@ public class DatastoreFile {
         this.path = path;
     }
 
-    public DatastoreFile(String datastoreName, String pathWithoutDatastoreName) {
-        path = String.format("[%s] %s", datastoreName, pathWithoutDatastoreName);
-    }
-
     public DatastoreFile(String datastoreName, String dir, String fileName) {
         if (dir == null || dir.isEmpty()) {
             path = String.format("[%s] %s", datastoreName, fileName);
@@ -55,24 +51,6 @@ public class DatastoreFile {
         return path.substring(pos).trim();
     }
 
-    public String getDir() {
-        int startPos = path.indexOf("]");
-        if (startPos < 0) {
-            startPos = 0;
-        }
-
-        int endPos = path.lastIndexOf('/');
-        if (endPos < 0) {
-            endPos = 0;
-        }
-
-        if (endPos > startPos) {
-            return path.substring(startPos + 1, endPos).trim();
-        }
-
-        return "";
-    }
-
     public String getFileName() {
         int startPos = path.indexOf("]");
         if (startPos < 0) {
@@ -87,25 +65,6 @@ public class DatastoreFile {
         } else {
             return path.substring(endPos + 1);
         }
-    }
-
-    public String getFileBaseName() {
-        String name = getFileName();
-        int endPos = name.lastIndexOf('.');
-        if (endPos < 0) {
-            return name;
-        }
-        return name.substring(0, endPos);
-    }
-
-    public String getFileExtName() {
-        String name = getFileName();
-        int endPos = name.lastIndexOf('.');
-        if (endPos < 0) {
-            return "";
-        }
-
-        return name.substring(endPos);
     }
 
     public String getCompanionPath(String companionFileName) {

@@ -104,7 +104,6 @@ public class DatacenterMO extends BaseMO {
         pfSpecArr.add(pfSpec);
 
         return context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
-
     }
 
 
@@ -141,116 +140,5 @@ public class DatacenterMO extends BaseMO {
 
         String dcName = ocs.get(0).getPropSet().get(0).getVal().toString();
         return new Pair<>(new DatacenterMO(context, ocs.get(0).getObj()), dcName);
-    }
-
-    public ManagedObjectReference getDvPortGroupMor(String dvPortGroupName) throws Exception {
-        PropertySpec pSpec = new PropertySpec();
-        pSpec.setType("DistributedVirtualPortgroup");
-        pSpec.getPathSet().add("name");
-
-        TraversalSpec datacenter2DvPortGroupTraversal = new TraversalSpec();
-        datacenter2DvPortGroupTraversal.setType("Datacenter");
-        datacenter2DvPortGroupTraversal.setPath("network");
-        datacenter2DvPortGroupTraversal.setName("datacenter2DvPortgroupTraversal");
-
-        ObjectSpec oSpec = new ObjectSpec();
-        oSpec.setObj(mor);
-        oSpec.setSkip(Boolean.TRUE);
-        oSpec.getSelectSet().add(datacenter2DvPortGroupTraversal);
-
-        PropertyFilterSpec pfSpec = new PropertyFilterSpec();
-        pfSpec.getPropSet().add(pSpec);
-        pfSpec.getObjectSet().add(oSpec);
-        List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
-        pfSpecArr.add(pfSpec);
-
-        List<ObjectContent> ocs = context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
-
-        if (ocs != null) {
-            for (ObjectContent oc : ocs) {
-                List<DynamicProperty> props = oc.getPropSet();
-                if (props != null) {
-                    for (DynamicProperty prop : props) {
-                        if (prop.getVal().equals(dvPortGroupName)) {
-                            return oc.getObj();
-                        }
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    public ManagedObjectReference getDvSwitchMor(ManagedObjectReference dvPortGroupMor) throws Exception {
-        String dvPortGroupKey = null;
-        ManagedObjectReference dvSwitchMor = null;
-        PropertySpec pSpec = new PropertySpec();
-        pSpec.setType("DistributedVirtualPortgroup");
-        pSpec.getPathSet().add("key");
-        pSpec.getPathSet().add("config.distributedVirtualSwitch");
-
-        TraversalSpec datacenter2DvPortGroupTraversal = new TraversalSpec();
-        datacenter2DvPortGroupTraversal.setType("Datacenter");
-        datacenter2DvPortGroupTraversal.setPath("network");
-        datacenter2DvPortGroupTraversal.setName("datacenter2DvPortgroupTraversal");
-
-        ObjectSpec oSpec = new ObjectSpec();
-        oSpec.setObj(mor);
-        oSpec.setSkip(Boolean.TRUE);
-        oSpec.getSelectSet().add(datacenter2DvPortGroupTraversal);
-
-        PropertyFilterSpec pfSpec = new PropertyFilterSpec();
-        pfSpec.getPropSet().add(pSpec);
-        pfSpec.getObjectSet().add(oSpec);
-        List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
-        pfSpecArr.add(pfSpec);
-
-        List<ObjectContent> ocs = context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
-
-        if (ocs != null) {
-            for (ObjectContent oc : ocs) {
-                List<DynamicProperty> props = oc.getPropSet();
-                if (props != null) {
-                    assert (props.size() == 2);
-                    for (DynamicProperty prop : props) {
-                        if ("key".equals(prop.getName())) {
-                            dvPortGroupKey = (String)prop.getVal();
-                        } else {
-                            dvSwitchMor = (ManagedObjectReference)prop.getVal();
-                        }
-                    }
-                    if ((dvPortGroupKey != null) && dvPortGroupKey.equals(dvPortGroupMor.getValue())) {
-                        return dvSwitchMor;
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
-    public String getDvSwitchUuid(ManagedObjectReference dvSwitchMor) throws Exception {
-        assert (dvSwitchMor != null);
-        return (String) context.getVimClient().getDynamicProperty(dvSwitchMor, "uuid");
-    }
-
-    public VirtualEthernetCardDistributedVirtualPortBackingInfo getDvPortBackingInfo(Pair<ManagedObjectReference, String> networkInfo) throws Exception {
-        assert (networkInfo != null);
-        assert (networkInfo.first() != null && "DistributedVirtualPortgroup".equalsIgnoreCase(networkInfo.first().getType()));
-        final VirtualEthernetCardDistributedVirtualPortBackingInfo dvPortBacking = new VirtualEthernetCardDistributedVirtualPortBackingInfo();
-        final DistributedVirtualSwitchPortConnection dvPortConnection = new DistributedVirtualSwitchPortConnection();
-        ManagedObjectReference dvsMor = getDvSwitchMor(networkInfo.first());
-        String dvSwitchUuid = getDvSwitchUuid(dvsMor);
-        dvPortConnection.setSwitchUuid(dvSwitchUuid);
-        dvPortConnection.setPortgroupKey(networkInfo.first().getValue());
-        dvPortBacking.setPort(dvPortConnection);
-        System.out.println("Plugging NIC device into network " + networkInfo.second() + " backed by dvSwitch: " + dvSwitchUuid);
-        return dvPortBacking;
-    }
-
-
-
-    public DatacenterConfigInfo getDatacenterConfigInfo() throws Exception {
-        DatacenterConfigInfo configInfo =  context.getVimClient().getDynamicProperty(mor, "configuration");
-        return configInfo;
     }
 }

@@ -14,6 +14,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+
 package com.dmeplugin.vmware.mo;
 
 import com.dmeplugin.vmware.util.VmwareContext;
@@ -25,17 +26,18 @@ import java.util.Arrays;
 import java.util.List;
 
 public class HostDatastoreSystemMO extends BaseMO {
-
     public HostDatastoreSystemMO(VmwareContext context, ManagedObjectReference morHostDatastore) {
         super(context, morHostDatastore);
     }
 
     public ManagedObjectReference findDatastore(String name) throws Exception {
-        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context, context.getServiceContent().getCustomFieldsManager());
+        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context,
+            context.getServiceContent().getCustomFieldsManager());
         int key = cfmMo.getCustomFieldKey("Datastore", CustomFieldConstants.CLOUD_UUID);
         assert (key != 0);
 
-        List<ObjectContent> ocs = getDatastorePropertiesOnHostDatastoreSystem(new String[]{"name", String.format("value[%d]", key)});
+        List<ObjectContent> ocs = getDatastorePropertiesOnHostDatastoreSystem(
+            new String[] {"name", String.format("value[%d]", key)});
         if (ocs != null) {
             for (ObjectContent oc : ocs) {
                 if (oc.getPropSet().get(0).getVal().equals(name)) {
@@ -62,7 +64,8 @@ public class HostDatastoreSystemMO extends BaseMO {
         return context.getService().queryVmfsDatastoreExpandOptions(mor, datastoreMo.getMor());
     }
 
-    public void expandVmfsDatastore(DatastoreMO datastoreMo, VmfsDatastoreExpandSpec vmfsDatastoreExpandSpec) throws Exception {
+    public void expandVmfsDatastore(DatastoreMO datastoreMo, VmfsDatastoreExpandSpec vmfsDatastoreExpandSpec)
+        throws Exception {
         context.getService().expandVmfsDatastore(mor, datastoreMo.getMor(), vmfsDatastoreExpandSpec);
     }
 
@@ -70,14 +73,12 @@ public class HostDatastoreSystemMO extends BaseMO {
         return context.getService().queryAvailableDisksForVmfs(mor, null);
     }
 
-    public ManagedObjectReference createVmfsDatastore(String datastoreName,
-                                                      HostScsiDisk hostScsiDisk,
-                                                      int vmfsMajorVersion,
-                                                      int blockSize,
-                                                      long totalSectors,
-                                                      int unmapGranularity,
-                                                      String unmapPriority) throws Exception {
-        VmfsDatastoreOption vmfsDatastoreOption = context.getService().queryVmfsDatastoreCreateOptions(mor, hostScsiDisk.getDevicePath(), vmfsMajorVersion).get(0);
+    public ManagedObjectReference createVmfsDatastore(String datastoreName, HostScsiDisk hostScsiDisk,
+        int vmfsMajorVersion, int blockSize, long totalSectors, int unmapGranularity, String unmapPriority)
+        throws Exception {
+        VmfsDatastoreOption vmfsDatastoreOption = context.getService()
+            .queryVmfsDatastoreCreateOptions(mor, hostScsiDisk.getDevicePath(), vmfsMajorVersion)
+            .get(0);
 
         VmfsDatastoreCreateSpec vmfsDatastoreCreateSpec = (VmfsDatastoreCreateSpec) vmfsDatastoreOption.getSpec();
 
@@ -99,7 +100,8 @@ public class HostDatastoreSystemMO extends BaseMO {
         return false;
     }
 
-    public ManagedObjectReference createNfsDatastore(String host, int port, String exportPath, String uuid, String accessMode, String type, String securityType) throws Exception {
+    public ManagedObjectReference createNfsDatastore(String host, int port, String exportPath, String uuid,
+        String accessMode, String type, String securityType) throws Exception {
 
         HostNasVolumeSpec spec = new HostNasVolumeSpec();
         spec.setRemoteHost(host);
@@ -138,7 +140,7 @@ public class HostDatastoreSystemMO extends BaseMO {
     }
 
     public NasDatastoreInfo getNasDatastoreInfo(ManagedObjectReference morDatastore) throws Exception {
-        DatastoreInfo info = (DatastoreInfo) context.getVimClient().getDynamicProperty(morDatastore, "info");
+        DatastoreInfo info = context.getVimClient().getDynamicProperty(morDatastore, "info");
         if (info instanceof NasDatastoreInfo) {
             return (NasDatastoreInfo) info;
         }
@@ -146,7 +148,6 @@ public class HostDatastoreSystemMO extends BaseMO {
     }
 
     public List<ObjectContent> getDatastorePropertiesOnHostDatastoreSystem(String[] propertyPaths) throws Exception {
-
         PropertySpec pSpec = new PropertySpec();
         pSpec.setType("Datastore");
         pSpec.getPathSet().addAll(Arrays.asList(propertyPaths));

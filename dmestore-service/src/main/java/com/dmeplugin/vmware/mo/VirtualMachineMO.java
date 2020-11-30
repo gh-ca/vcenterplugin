@@ -29,7 +29,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * @author xxxx
  **/
@@ -63,8 +62,7 @@ public class VirtualMachineMO extends BaseMO {
     }
 
     public void createDisk(String vmdkDatastorePath, VirtualDiskType diskType, VirtualDiskMode diskMode,
-                           String rdmDeviceName, long sizeInMb,
-                           ManagedObjectReference morDs, int controllerKey) throws Exception {
+        String rdmDeviceName, long sizeInMb, ManagedObjectReference morDs, int controllerKey) throws Exception {
         assert (vmdkDatastorePath != null);
         assert (morDs != null);
 
@@ -76,8 +74,8 @@ public class VirtualMachineMO extends BaseMO {
         }
 
         VirtualDisk newDisk = new VirtualDisk();
-        if (diskType == VirtualDiskType.THIN || diskType == VirtualDiskType.PREALLOCATED ||
-                diskType == VirtualDiskType.EAGER_ZEROED_THICK) {
+        if (diskType == VirtualDiskType.THIN || diskType == VirtualDiskType.PREALLOCATED
+            || diskType == VirtualDiskType.EAGER_ZEROED_THICK) {
 
             VirtualDiskFlatVer2BackingInfo backingInfo = new VirtualDiskFlatVer2BackingInfo();
             backingInfo.setDiskMode(VirtualDiskMode.PERSISTENT.value());
@@ -133,8 +131,9 @@ public class VirtualMachineMO extends BaseMO {
         boolean result = context.getVimClient().waitForTask(morTask);
 
         if (!result) {
-            throw new Exception("Unable to create disk " + vmdkDatastorePath + " due to " +
-                    TaskMO.getTaskFailureInfo(context, morTask));
+            throw new Exception(
+                "Unable to create disk " + vmdkDatastorePath + " due to " + TaskMO.getTaskFailureInfo(context,
+                    morTask));
         }
 
         context.waitForTaskProgressDone(morTask);
@@ -199,15 +198,14 @@ public class VirtualMachineMO extends BaseMO {
         context.uploadResourceContent(vmxUrl, bos.toByteArray());
     }
 
-
     @Deprecated
     public void moveAllVmDiskFiles(DatastoreMO destDsMo, String destDsDir, boolean followDiskChain) throws Exception {
         VirtualDevice[] disks = getAllDiskDevice();
         DatacenterMO dcMo = getOwnerDatacenter().first();
         if (disks != null) {
             for (VirtualDevice disk : disks) {
-                List<Pair<String, ManagedObjectReference>> vmdkFiles =
-                        getDiskDatastorePathChain((VirtualDisk) disk, followDiskChain);
+                List<Pair<String, ManagedObjectReference>> vmdkFiles = getDiskDatastorePathChain((VirtualDisk) disk,
+                    followDiskChain);
                 for (Pair<String, ManagedObjectReference> fileItem : vmdkFiles) {
                     DatastoreMO srcDsMo = new DatastoreMO(context, fileItem.second());
 
@@ -219,7 +217,7 @@ public class VirtualMachineMO extends BaseMO {
 
                     s_logger.info("Move VM disk file " + srcFile.getPath() + " to " + destFile.getPath());
                     srcDsMo.moveDatastoreFile(fileItem.first(), dcMo.getMor(), destDsMo.getMor(), destFile.getPath(),
-                            dcMo.getMor(), true);
+                        dcMo.getMor(), true);
 
                     if (vmdkDescriptor != null) {
                         String vmdkBaseFileName = vmdkDescriptor.first().getBaseFileName();
@@ -228,7 +226,7 @@ public class VirtualMachineMO extends BaseMO {
 
                         s_logger.info("Move VM disk file " + baseFilePath + " to " + destFile.getPath());
                         srcDsMo.moveDatastoreFile(baseFilePath, dcMo.getMor(), destDsMo.getMor(), destFile.getPath(),
-                                dcMo.getMor(), true);
+                            dcMo.getMor(), true);
                     }
                 }
             }
@@ -240,8 +238,8 @@ public class VirtualMachineMO extends BaseMO {
 
         if (devices != null && devices.size() > 0) {
             for (VirtualDevice device : devices) {
-                if (device instanceof VirtualSCSIController &&
-                        isValidScsiDiskController((VirtualSCSIController) device)) {
+                if (device instanceof VirtualSCSIController && isValidScsiDiskController(
+                    (VirtualSCSIController) device)) {
                     return device.getKey();
                 }
             }
@@ -250,15 +248,14 @@ public class VirtualMachineMO extends BaseMO {
         return -1;
     }
 
-
     private boolean isValidScsiDiskController(VirtualSCSIController scsiDiskController) {
         if (scsiDiskController == null) {
             return false;
         }
 
         List<Integer> scsiDiskDevicesOnController = scsiDiskController.getDevice();
-        if (scsiDiskDevicesOnController == null ||
-                scsiDiskDevicesOnController.size() >= (VmwareHelper.MAX_SUPPORTED_DEVICES_SCSI_CONTROLLER)) {
+        if (scsiDiskDevicesOnController == null
+            || scsiDiskDevicesOnController.size() >= (VmwareHelper.MAX_SUPPORTED_DEVICES_SCSI_CONTROLLER)) {
             return false;
         }
 
@@ -269,10 +266,9 @@ public class VirtualMachineMO extends BaseMO {
         return true;
     }
 
-
     @Deprecated
     public List<Pair<String, ManagedObjectReference>> getDiskDatastorePathChain(VirtualDisk disk, boolean followChain)
-            throws Exception {
+        throws Exception {
         VirtualDeviceBackingInfo backingInfo = disk.getBacking();
         if (!(backingInfo instanceof VirtualDiskFlatVer2BackingInfo)) {
             throw new Exception("Unsupported VirtualDeviceBackingInfo");
@@ -282,8 +278,7 @@ public class VirtualMachineMO extends BaseMO {
         VirtualDiskFlatVer2BackingInfo diskBackingInfo = (VirtualDiskFlatVer2BackingInfo) backingInfo;
 
         if (!followChain) {
-            pathList.add(new Pair<>(diskBackingInfo.getFileName(),
-                    diskBackingInfo.getDatastore()));
+            pathList.add(new Pair<>(diskBackingInfo.getFileName(), diskBackingInfo.getDatastore()));
             return pathList;
         }
 
@@ -294,8 +289,7 @@ public class VirtualMachineMO extends BaseMO {
 
         do {
             if (diskBackingInfo.getParent() != null) {
-                pathList.add(new Pair<>(diskBackingInfo.getFileName(),
-                        diskBackingInfo.getDatastore()));
+                pathList.add(new Pair<>(diskBackingInfo.getFileName(), diskBackingInfo.getDatastore()));
                 diskBackingInfo = diskBackingInfo.getParent();
             } else {
                 byte[] content;
@@ -358,22 +352,6 @@ public class VirtualMachineMO extends BaseMO {
         return deviceList.toArray(new VirtualDisk[0]);
     }
 
-
-    public int getIdeDeviceControllerKey() throws Exception {
-        List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, "config.hardware.device");
-
-        if (devices != null && devices.size() > 0) {
-            for (VirtualDevice device : devices) {
-                if (device instanceof VirtualIDEController) {
-                    return device.getKey();
-                }
-            }
-        }
-
-        assert (false);
-        throw new Exception("IDE Controller Not Found");
-    }
-
     public int getLsiLogicControllerKey() throws Exception {
         List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, "config.hardware.device");
 
@@ -387,23 +365,6 @@ public class VirtualMachineMO extends BaseMO {
 
         assert (false);
         throw new Exception("IDE Controller Not Found");
-    }
-
-    public int getNextIdeDeviceNumber() throws Exception {
-        int controllerKey = getIdeDeviceControllerKey();
-        return getNextDeviceNumber(controllerKey);
-    }
-
-    public VirtualDevice getIsoDevice() throws Exception {
-        List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, "config.hardware.device");
-        if (devices != null && devices.size() > 0) {
-            for (VirtualDevice device : devices) {
-                if (device instanceof VirtualCdrom) {
-                    return device;
-                }
-            }
-        }
-        return null;
     }
 
     public int getNextDeviceNumber(int controllerKey) throws Exception {
