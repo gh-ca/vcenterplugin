@@ -29,4 +29,7 @@ public class HostMOFactory {
     public HostMO build(VmwareContext context, ManagedObjectReference morHost) throws Exception {
         return new HostMO(context, morHost);
     }
+    public HostMO build(VmwareContext context, String hostName) throws Exception {
+        return new HostMO(context, hostName);
+    }
 }

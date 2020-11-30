@@ -4,12 +4,17 @@ import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.model.VmRdmCreateBean;
 import com.dmeplugin.dmestore.services.VmRdmService;
 import com.google.gson.Gson;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author wangxiangyong
@@ -29,7 +34,7 @@ public class VmRdmController extends BaseController {
         try {
             vmRdmService.createRdm(dataStoreObjectId, vmObjectId, createBean);
             return success();
-        }catch (Exception e){
+        } catch (Exception e) {
             LOG.error(e.getMessage());
             return failure(e.getMessage());
         }
@@ -39,7 +44,7 @@ public class VmRdmController extends BaseController {
     public ResponseBodyBean dmeHosts() throws Exception {
         try {
             return success(vmRdmService.getAllDmeHost());
-        }catch (Exception e){
+        } catch (Exception e) {
             LOG.error(e.getMessage());
             return failure(e.getMessage());
         }
@@ -49,9 +54,8 @@ public class VmRdmController extends BaseController {
     public ResponseBodyBean getDatastoreMountsOnHost(@RequestParam("vmObjectId") String vmObjectId) throws Exception {
         try {
             List<Object> objects = vmRdmService.getDatastoreMountsOnHost(vmObjectId);
-
             return success(new Gson().toJson(objects));
-        }catch (Exception e){
+        } catch (Exception e) {
             LOG.error(e.getMessage());
             return failure(e.getMessage());
         }
