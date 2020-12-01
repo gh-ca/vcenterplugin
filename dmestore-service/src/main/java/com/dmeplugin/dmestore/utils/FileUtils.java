@@ -3,11 +3,8 @@ package com.dmeplugin.dmestore.utils;
 
 import com.dmeplugin.dmestore.exception.VcenterRuntimeException;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -51,25 +48,6 @@ public class FileUtils {
     public static final String WORK_FILE_NAME = "workV3.txt";
 
     private static String PATH = null;
-
-    private static void createFile(File file) {
-        // 判断文件是否存在
-        if (!file.exists()) {
-            LOGGER.info("key file not exists, create it ...");
-            try {
-                createDir(getPath());
-                boolean re = file.createNewFile();
-                if (re) {
-                    //设置权限
-                    setFilePermission(file);
-                } else {
-                    LOGGER.info("create file failed");
-                }
-            } catch (IOException e) {
-                LOGGER.error("Failed to create file " + file.getName());
-            }
-        }
-    }
 
     public static void setFilePermission(File file) throws IOException {
         if (isWindows()) {
