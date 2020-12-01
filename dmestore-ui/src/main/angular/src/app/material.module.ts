@@ -42,8 +42,8 @@ import { MatTreeModule } from '@angular/material/tree';
 import { MatMomentDateModule } from '@angular/material-moment-adapter';
 
 // 3rd library
-import { MatDatetimepickerModule } from '@mat-datetimepicker/core';
-import { MatMomentDatetimeModule } from '@mat-datetimepicker/moment';
+// import { MatDatetimepickerModule } from '@mat-datetimepicker/core';
+// import { MatMomentDatetimeModule } from '@mat-datetimepicker/moment';
 import { ClarityModule } from "@clr/angular";
 import { NgxEchartsModule } from "ngx-echarts";
 
@@ -92,8 +92,8 @@ import { materialProviders } from './material-config';
     MatToolbarModule,
     MatTooltipModule,
     MatTreeModule,
-    MatMomentDatetimeModule,
-    MatDatetimepickerModule,
+    // MatMomentDatetimeModule,
+    // MatDatetimepickerModule,
     ClarityModule,
     NgxEchartsModule
   ],
