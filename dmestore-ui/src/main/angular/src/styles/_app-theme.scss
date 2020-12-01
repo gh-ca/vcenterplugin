@@ -1,4 +1,4 @@
-@import '~@mat-datetimepicker/core/datetimepicker/datetimepicker-theme.scss';
+//@import '~@mat-datetimepicker/core/datetimepicker/datetimepicker-theme.scss';
 
 @import '../app/theme/style/reboot-theme';
 @import '../app/theme/header/header-theme';
@@ -12,7 +12,7 @@
 
 // Styles for the app that are based on the current theme.
 @mixin matero-admin-theme($theme) {
-  @include mat-datetimepicker-theme($theme);
+  //@include mat-datetimepicker-theme($theme);
 
   @include matero-reboot-theme($theme);
   @include matero-header-theme($theme);
