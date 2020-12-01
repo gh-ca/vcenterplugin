@@ -17,9 +17,12 @@
 
 package com.dmeplugin.vmware.mo;
 
+import com.dmeplugin.vmware.util.ClusterMOFactory;
 import com.dmeplugin.vmware.util.Pair;
+import com.dmeplugin.vmware.util.VmwareClient;
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.vmware.vim25.*;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +32,14 @@ import java.util.regex.Pattern;
 public class HostMO extends BaseMO implements VmwareHypervisorHost {
     private static final Logger logger = LoggerFactory.getLogger(HostMO.class);
 
+    private static final String CLUSTER_COMPUTE_RESOURCE = "ClusterComputeResource";
+
     Map<String, VirtualMachineMO> vmCache = new HashMap<>();
+
+    private ClusterMOFactory clusterMOFactory = ClusterMOFactory.getInstance();
+
+    public HostMO() {
+    }
 
     public HostMO(VmwareContext context, ManagedObjectReference morHost) {
         super(context, morHost);
@@ -41,7 +51,6 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
     public HostMO(VmwareContext context, String hostName) throws Exception {
         super(context, null);
-
         mor = this.context.getVimClient().getDecendentMoRef(this.context.getRootFolder(), "HostSystem", hostName);
         if (mor == null) {
             logger.error("Unable to locate host " + hostName);
@@ -57,7 +66,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     }
 
     public HostNetworkInfo getHostNetworkInfo() throws Exception {
-        return (HostNetworkInfo) context.getVimClient().getDynamicProperty(mor, "config.network");
+        VmwareClient vmwareClient = context.getVimClient();
+        HostNetworkInfo hostNetworkInfo = vmwareClient.getDynamicProperty(mor, "config.network");
+        return hostNetworkInfo;
     }
 
     @Override
@@ -68,8 +79,8 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public ClusterDasConfigInfo getDasConfig() throws Exception {
         ManagedObjectReference morParent = getParentMor();
-        if ("ClusterComputeResource".equals(morParent.getType())) {
-            ClusterMO clusterMo = new ClusterMO(context, morParent);
+        if (CLUSTER_COMPUTE_RESOURCE.equals(morParent.getType())) {
+            ClusterMO clusterMo = clusterMOFactory.build(context, morParent);
             return clusterMo.getDasConfig();
         }
 
@@ -79,8 +90,8 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public boolean isHaEnabled() throws Exception {
         ManagedObjectReference morParent = getParentMor();
-        if ("ClusterComputeResource".equals(morParent.getType())) {
-            ClusterMO clusterMo = new ClusterMO(context, morParent);
+        if (CLUSTER_COMPUTE_RESOURCE.equals(morParent.getType())) {
+            ClusterMO clusterMo = clusterMOFactory.build(context, morParent);
             return clusterMo.isHaEnabled();
         }
 
@@ -90,7 +101,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public void setRestartPriorityForVm(VirtualMachineMO vmMo, String priority) throws Exception {
         ManagedObjectReference morParent = getParentMor();
-        if ("ClusterComputeResource".equals(morParent.getType())) {
+        if (CLUSTER_COMPUTE_RESOURCE.equals(morParent.getType())) {
             ClusterMO clusterMo = new ClusterMO(context, morParent);
             clusterMo.setRestartPriorityForVm(vmMo, priority);
         }
@@ -142,8 +153,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public ManagedObjectReference getHyperHostCluster() throws Exception {
         ManagedObjectReference morParent = context.getVimClient().getDynamicProperty(mor, "parent");
-
-        if ("ClusterComputeResource".equalsIgnoreCase(morParent.getType())) {
+        if (CLUSTER_COMPUTE_RESOURCE.equalsIgnoreCase(morParent.getType())) {
             return morParent;
         }
 
@@ -157,9 +167,10 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
     public VmwareHostType getHostType() throws Exception {
         AboutInfo aboutInfo = getHostAboutInfo();
-        if ("VMware ESXi".equals(aboutInfo.getName())) {
+        String flag = "VMware ESXi";
+        if (flag.equals(aboutInfo.getName())) {
             return VmwareHostType.ESXi;
-        } else if ("VMware ESX".equals(aboutInfo.getName())) {
+        } else if (flag.equals(aboutInfo.getName())) {
             return VmwareHostType.ESX;
         }
 
@@ -241,7 +252,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
                             }
                         }
                     }
-                    String vmName = null;
+                    String vmName;
                     if (vmInternalCsName != null && isUserVmInternalCsName(vmInternalCsName)) {
                         vmName = vmInternalCsName;
                     } else {
@@ -313,10 +324,6 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
         List<ObjectContent> properties = context.getService()
             .retrieveProperties(context.getPropertyCollector(), pfSpecArr);
-
-        if (logger.isTraceEnabled()) {
-            logger.trace("vCenter API trace - retrieveProperties() done");
-        }
         return properties.toArray(new ObjectContent[properties.size()]);
     }
 
@@ -470,7 +477,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public String getRecommendedDiskController(String guestOsId) throws Exception {
         ManagedObjectReference morParent = getParentMor();
-        if ("ClusterComputeResource".equals(morParent.getType())) {
+        if (CLUSTER_COMPUTE_RESOURCE.equals(morParent.getType())) {
             ClusterMO clusterMo = new ClusterMO(context, morParent);
             return clusterMo.getRecommendedDiskController(guestOsId);
         }

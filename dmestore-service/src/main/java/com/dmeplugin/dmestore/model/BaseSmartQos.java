@@ -1,4 +1,5 @@
 package com.dmeplugin.dmestore.model;
+
 /**
  * @author lianq
  * @ClassName: BaseSmartQos
@@ -7,13 +8,19 @@ package com.dmeplugin.dmestore.model;
  */
 public class BaseSmartQos {
     protected String name;
-    //控制策略,0：保护IO下限，1：控制IO上限
+
     protected Integer latency;
+
     protected Integer maxbandwidth;
+
     protected Integer maxiops;
+
     protected Integer minbandwidth;
+
     protected Integer miniops;
+
     protected Boolean enabled;
+
     protected String latencyUnit;
 
     public String getLatencyUnit() {
@@ -23,7 +30,6 @@ public class BaseSmartQos {
     public void setLatencyUnit(String latencyUnit) {
         this.latencyUnit = latencyUnit;
     }
-
 
     public Boolean getEnabled() {
         return enabled;

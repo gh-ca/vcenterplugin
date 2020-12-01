@@ -7,12 +7,19 @@ import java.util.List;
  **/
 public class NfsDataStoreShareAttr {
     private String fsName;
+
     private String name;
+
     private String sharePath;
+
     private String description;
+
     private String owningDtreeId;
+
     private String owningDtreeName;
+
     private String deviceName;
+
     private List<AuthClient> authClientList;
 
     public String getFsName() {
@@ -81,15 +88,9 @@ public class NfsDataStoreShareAttr {
 
     @Override
     public String toString() {
-        return "NfsDataStoreShareAttr{" +
-            "fsName='" + fsName + '\'' +
-            ", name='" + name + '\'' +
-            ", sharePath='" + sharePath + '\'' +
-            ", description='" + description + '\'' +
-            ", owningDtreeId='" + owningDtreeId + '\'' +
-            ", owningDtreeName='" + owningDtreeName + '\'' +
-            ", deviceName='" + deviceName + '\'' +
-            ", authClientList=" + authClientList +
-            '}';
+        return "NfsDataStoreShareAttr{" + "fsName='" + fsName + '\'' + ", name='" + name + '\'' + ", sharePath='"
+            + sharePath + '\'' + ", description='" + description + '\'' + ", owningDtreeId='" + owningDtreeId + '\''
+            + ", owningDtreeName='" + owningDtreeName + '\'' + ", deviceName='" + deviceName + '\''
+            + ", authClientList=" + authClientList + '}';
     }
 }

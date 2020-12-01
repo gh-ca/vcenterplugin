@@ -7,6 +7,7 @@ import java.util.List;
  **/
 public class CustomizeVolumes {
     private String availabilityZone;
+
     /**
      * 0：自动，1：高性能层，2：性能层，3：容量层 默认值：自动
      **/
@@ -16,14 +17,20 @@ public class CustomizeVolumes {
      * OA、OB，默认为空代表自动
      **/
     private String ownerController;
+
     private String poolRawId;
+
     /**
      * 预取策略，影响磁盘读取。取值范围 0: 不预取，1：固定预取，2：可变预取，3：智能预取 默认值：智能预取
      **/
     private String prefetchPolicy;
+
     private String prefetchValue;
+
     private String storageId;
+
     private CustomizeVolumeTuningForCreate tuning;
+
     private List<ServiceVolumeBasicParams> volumeSpecs;
 
     public String getAvailabilityZone() {

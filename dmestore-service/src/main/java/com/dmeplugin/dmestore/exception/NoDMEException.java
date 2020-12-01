@@ -7,5 +7,4 @@ public class NoDMEException extends IgnorableException {
     public NoDMEException() {
         super("-90002", "no esight in DB");
     }
-
 }

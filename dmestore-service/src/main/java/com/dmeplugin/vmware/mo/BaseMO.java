@@ -14,23 +14,22 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
-package com.dmeplugin.vmware.mo;
 
+package com.dmeplugin.vmware.mo;
 
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.vmware.vim25.CustomFieldDef;
-import com.vmware.vim25.CustomFieldStringValue;
 import com.vmware.vim25.ManagedObjectReference;
-
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class BaseMO {
     protected VmwareContext context;
+
     protected ManagedObjectReference mor;
 
     private String name;
+
+    public BaseMO() {
+    }
 
     public BaseMO(VmwareContext context, ManagedObjectReference mor) {
         assert (context != null);
@@ -72,7 +71,8 @@ public class BaseMO {
     }
 
     public void setCustomFieldValue(String fieldName, String value) throws Exception {
-        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context, context.getServiceContent().getCustomFieldsManager());
+        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context,
+            context.getServiceContent().getCustomFieldsManager());
         int key = getCustomFieldKey(fieldName);
         if (key == 0) {
             try {
@@ -97,7 +97,8 @@ public class BaseMO {
     public int getCustomFieldKey(String morType, String fieldName) throws Exception {
         assert (morType != null);
 
-        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context, context.getServiceContent().getCustomFieldsManager());
+        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context,
+            context.getServiceContent().getCustomFieldsManager());
 
         return cfmMo.getCustomFieldKey(morType, fieldName);
     }

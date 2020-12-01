@@ -8,11 +8,15 @@ package com.dmeplugin.dmestore.model;
  */
 public class BandPorts {
 
-   private String id;
-   private String name;
-   private String healthStatus;
-   private String runningStatus;
-   private String mtu;
+    private String id;
+
+    private String name;
+
+    private String healthStatus;
+
+    private String runningStatus;
+
+    private String mtu;
 
     public String getId() {
         return id;
