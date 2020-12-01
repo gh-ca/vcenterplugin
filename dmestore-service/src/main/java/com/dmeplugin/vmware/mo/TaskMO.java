@@ -31,10 +31,6 @@ public class TaskMO extends BaseMO {
         super(context, morTask);
     }
 
-    public TaskInfo getTaskInfo() throws Exception {
-        return (TaskInfo)getContext().getVimClient().getDynamicProperty(mor, "info");
-    }
-
     public static String getTaskFailureInfo(VmwareContext context, ManagedObjectReference morTask) {
         StringBuffer sb = new StringBuffer();
 

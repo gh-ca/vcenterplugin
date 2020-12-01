@@ -553,10 +553,10 @@ public class VmwareContext {
     }
 
     private void resultsToTgtMorefList(RetrieveResult results, List<Pair<ManagedObjectReference, String>> tgtMoref) {
-        List<ObjectContent> oCont = (results != null) ? results.getObjects() : null;
+        List<ObjectContent> objectCont = (results != null) ? results.getObjects() : null;
 
-        if (oCont != null) {
-            for (ObjectContent oc : oCont) {
+        if (objectCont != null) {
+            for (ObjectContent oc : objectCont) {
                 ManagedObjectReference mr = oc.getObj();
                 String entityNm = null;
                 List<DynamicProperty> dps = oc.getPropSet();

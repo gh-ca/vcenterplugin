@@ -27,8 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BaseMO {
-    private static final Logger s_logger = LoggerFactory.getLogger(BaseMO.class);
-
     protected VmwareContext context;
     protected ManagedObjectReference mor;
 
@@ -73,19 +71,6 @@ public class BaseMO {
         return name;
     }
 
-    public boolean destroy() throws Exception {
-        ManagedObjectReference morTask = context.getService().destroyTask(mor);
-
-        boolean result = context.getVimClient().waitForTask(morTask);
-        if (result) {
-            context.waitForTaskProgressDone(morTask);
-            return true;
-        } else {
-            s_logger.error("VMware destroy_Task failed due to " + TaskMO.getTaskFailureInfo(context, morTask));
-        }
-        return false;
-    }
-
     public void setCustomFieldValue(String fieldName, String value) throws Exception {
         CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context, context.getServiceContent().getCustomFieldsManager());
         int key = getCustomFieldKey(fieldName);
@@ -103,20 +88,6 @@ public class BaseMO {
         }
 
         cfmMo.setField(getMor(), key, value);
-    }
-
-    public String getCustomFieldValue(String fieldName) throws Exception {
-        int key = getCustomFieldKey(fieldName);
-        if (key == 0) {
-            return null;
-        }
-
-        CustomFieldStringValue cfValue = (CustomFieldStringValue) context.getVimClient().getDynamicProperty(getMor(), String.format("value[%d]", key));
-        if (cfValue != null) {
-            return cfValue.getValue();
-        }
-
-        return null;
     }
 
     public int getCustomFieldKey(String fieldName) throws Exception {
