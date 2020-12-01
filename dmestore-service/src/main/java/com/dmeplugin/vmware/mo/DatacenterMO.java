@@ -77,10 +77,6 @@ public class DatacenterMO extends BaseMO {
         return null;
     }
 
-    public ManagedObjectReference getVmFolder() throws Exception {
-        return (ManagedObjectReference) context.getVimClient().getDynamicProperty(mor, "vmFolder");
-    }
-
     public List<ObjectContent> getDatastorePropertiesOnDatacenter(String[] propertyPaths) throws Exception {
 
         PropertySpec pSpec = new PropertySpec();

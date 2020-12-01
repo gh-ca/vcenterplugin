@@ -32,7 +32,6 @@ public class BackgroundScanDatastoreTask implements StatefulJob {
             Object obj = ApplicationContextHelper.getBean("VmfsAccessServiceImpl");
             ((VmfsAccessService) obj).scanVmfs();
         } catch (Exception e) {
-            e.printStackTrace();
             LOGGER.error("scanDatastore vmfs error", e);
         }
         //扫描nfs
@@ -40,7 +39,6 @@ public class BackgroundScanDatastoreTask implements StatefulJob {
             Object obj = ApplicationContextHelper.getBean("DmeNFSAccessServiceImpl");
             ((DmeNFSAccessService) obj).scanNfs();
         } catch (Exception e) {
-            e.printStackTrace();
             LOGGER.error("scanDatastore nfs error", e);
         }
         LOGGER.info("scanDatastore end");

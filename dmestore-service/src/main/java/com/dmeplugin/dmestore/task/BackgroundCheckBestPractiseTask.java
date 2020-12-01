@@ -14,12 +14,6 @@ public class BackgroundCheckBestPractiseTask implements StatefulJob {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BackgroundCheckBestPractiseTask.class);
 
-
-
-  public void execute() {
-    LOGGER.info("CheckBestPractise start");
-  }
-
   @Override
   public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
     LOGGER.info("CheckBestPractise start");

@@ -12,14 +12,6 @@ public class RootFsMO extends BaseMO {
     public RootFsMO(VmwareContext context, ManagedObjectReference mor) {
         super(context, mor);
     }
-
-    public List<Pair<ManagedObjectReference, String>> getAllDatacenterOnRootFs() throws Exception {
-        //查找datacenters
-        List<Pair<ManagedObjectReference, String>> datacenters = context.inFolderByType(context.getRootFolder(),
-                "Datacenter");
-        return datacenters;
-    }
-
     /**
      * 获取host主机列表
      */
@@ -51,21 +43,6 @@ public class RootFsMO extends BaseMO {
         List<Pair<ManagedObjectReference, String>> hosts = context.inFolderByType(context.getRootFolder(),
                 "Datastore");
         return hosts;
-    }
-
-    public HostMO findHost(String name) throws Exception {
-        HostMO objmo = null;
-        List<Pair<ManagedObjectReference, String>> objs = getAllHostOnRootFs();
-        if (objs != null && objs.size() > 0) {
-            for (Pair<ManagedObjectReference, String> obj : objs) {
-                HostMO submo = new HostMO(context, obj.first());
-                if (name.equals(submo.getName())) {
-                    objmo = submo;
-                    break;
-                }
-            }
-        }
-        return objmo;
     }
 
     public HostMO findHostById(String id) throws Exception {

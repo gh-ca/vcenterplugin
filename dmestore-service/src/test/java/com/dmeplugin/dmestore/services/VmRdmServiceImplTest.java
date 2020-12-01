@@ -47,8 +47,6 @@ public class VmRdmServiceImplTest {
     private Gson gson = new Gson();
     @Mock
     private VCSDKUtils vcsdkUtils;
-    @Mock
-    private VmfsAccessService vmfsAccessService;
     @InjectMocks
     VmRdmService vmRdmService = new VmRdmServiceImpl();
 

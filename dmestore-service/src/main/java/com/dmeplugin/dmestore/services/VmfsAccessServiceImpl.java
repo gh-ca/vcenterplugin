@@ -277,7 +277,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                 //创建vmware中的vmfs存储。
                                 params.put("volume_wwn", volumemap.get("volume_wwn"));
                                 params.put("volume_name", volumemap.get("volume_name"));
-                                String ss = new Gson().toJson(params);
                                 String dataStoreStr = createVmfsOnVmware(params);
                                 if (!StringUtils.isEmpty(dataStoreStr)) {
                                     Map<String, Object> dataStoreMap = gson.fromJson(dataStoreStr,
@@ -290,7 +289,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                         if (!StringUtils.isEmpty(params.get("service_level_id"))) {
                                             String serviceLevelName = ToolUtils.getStr(
                                                 params.get("service_level_name"));
-                                            String attachTagStr = vcsdkUtils.attachTag(
+                                            vcsdkUtils.attachTag(
                                                 ToolUtils.getStr(dataStoreMap.get("type")),
                                                 ToolUtils.getStr(dataStoreMap.get("id")), serviceLevelName,
                                                 vCenterInfo);
