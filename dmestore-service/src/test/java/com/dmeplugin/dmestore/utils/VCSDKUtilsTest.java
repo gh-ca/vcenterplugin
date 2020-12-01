@@ -16,6 +16,7 @@ import com.dmeplugin.vmware.mo.DatastoreMO;
 import com.dmeplugin.vmware.mo.HostDatastoreSystemMO;
 import com.dmeplugin.vmware.mo.HostMO;
 import com.dmeplugin.vmware.mo.HostStorageSystemMO;
+import com.dmeplugin.vmware.mo.IscsiManagerMO;
 import com.dmeplugin.vmware.mo.RootFsMO;
 import com.dmeplugin.vmware.mo.VirtualMachineMO;
 import com.dmeplugin.vmware.util.ClusterMOFactory;
@@ -60,6 +61,7 @@ import com.vmware.vim25.HostVirtualNic;
 import com.vmware.vim25.HostVirtualNicSpec;
 import com.vmware.vim25.HostVmfsVolume;
 import com.vmware.vim25.InvalidPropertyFaultMsg;
+import com.vmware.vim25.IscsiPortInfo;
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.NasDatastoreInfo;
 import com.vmware.vim25.RuntimeFaultFaultMsg;
@@ -71,9 +73,11 @@ import com.vmware.vim25.VmfsDatastoreSpec;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -84,6 +88,10 @@ import org.mockito.stubbing.OngoingStubbing;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.web.servlet.result.FlashAttributeResultMatchers;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * @author lianq
@@ -111,6 +119,7 @@ public class VCSDKUtilsTest {
     private VirtualMachineMOFactory virtualMachineMOFactory;
     private Gson gson = new Gson();
     private PbmUtil pbmUtil;
+    private static VmodlContext context;
 
     @InjectMocks
     VCSDKUtils vcsdkUtils = new VCSDKUtils();;
@@ -143,6 +152,10 @@ public class VCSDKUtilsTest {
     SessionHelper sessionHelper;
     TaggingWorkflow taggingWorkflow;
     VirtualMachineMO virtualMachineMo;
+    List<PbmProfile> pbmprofiles;
+    PbmProfile pbmProfile;
+    PbmServiceInstanceContent spbmsc ;
+    PbmPortType pbmService ;
 
     @Before
     public void setUp() throws Exception {
@@ -213,7 +226,7 @@ public class VCSDKUtilsTest {
         hsdmap.put("host", hostMO);
         hsdmap.put("hostScsiDisk", hostScsiDisk);
 
-        vCenterInfo = spy(VCenterInfo.class);
+        vCenterInfo = new VCenterInfo();
         vCenterInfo.setHostIp("321");
         vCenterInfo.setHostPort(321);
         vCenterInfo.setUserName("321");
@@ -222,6 +235,15 @@ public class VCSDKUtilsTest {
         sessionHelper = mock(SessionHelper.class);
         taggingWorkflow = mock(TaggingWorkflow.class);
         virtualMachineMo = mock(VirtualMachineMO.class);
+
+        pbmprofiles = spy(ArrayList.class);
+        pbmProfile = spy(PbmProfile.class);
+        pbmProfile.setDescription("policy created by dme");
+        pbmprofiles.add(pbmProfile);
+        spbmsc = spy(PbmServiceInstanceContent.class);
+        pbmService = spy(PbmPortType.class);
+        spbmsc.setProfileManager(managedObjectReference);
+        context = spy(VmodlContext.class);
 
     }
 
@@ -479,18 +501,20 @@ public class VCSDKUtilsTest {
 
     @Test
     //todo 调其他方法 留后面弄
-    public void getUnmoutHostsOnCluster() throws VcenterException {
+    public void getUnmoutHostsOnCluster() throws Exception {
         Map<String, String> map = new HashMap<>();
         map.put("321", "321");
-        List<Map<String, String>> list = new ArrayList<>();
-        list.add(map);
+        List<Map<String, String>> l1 = new ArrayList<>();
+        l1.add(map);
+        getHostsOnCluster();
+        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(clusterMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
+        when(clusterMO.getClusterHosts()).thenReturn(list);
 
 
-
-
-
-
-        vcsdkUtils.getUnmoutHostsOnCluster("321", list);
+        vcsdkUtils.getUnmoutHostsOnCluster("321", l1);
     }
 
     @Test
@@ -976,9 +1000,6 @@ public class VCSDKUtilsTest {
     public void getAllSelfPolicyInallcontext() throws Exception {
         VmwareContext[] vmodlContexts = {vmwareContext};
         when(vcConnectionHelper.getAllContext()).thenReturn(vmodlContexts);
-        PbmServiceInstanceContent spbmsc = spy(PbmServiceInstanceContent.class);
-        PbmPortType pbmService = spy(PbmPortType.class);
-        spbmsc.setProfileManager(managedObjectReference);
         when(vmwareContext.getPbmServiceContent()).thenReturn(spbmsc);
         when(vmwareContext.getPbmService()).thenReturn(pbmService);
         PbmProfileResourceType pbmProfileResourceType = spy(PbmProfileResourceType.class);
@@ -990,9 +1011,6 @@ public class VCSDKUtilsTest {
         when(pbmService.pbmQueryProfile(managedObjectReference, pbmProfileResourceType, null))
             .thenReturn(pbmProfileIds);
         when(vmwareContext.getPbmService()).thenReturn(pbmService);
-        List<PbmProfile> pbmprofiles = spy(ArrayList.class);
-        PbmProfile pbmProfile = spy(PbmProfile.class);
-        pbmProfile.setDescription("policy created by dme");
         when(pbmService.pbmRetrieveContent(spbmsc.getProfileManager(), pbmProfileIds)).thenReturn(pbmprofiles);
         vcsdkUtils.getAllSelfPolicyInallcontext();
     }
@@ -1012,103 +1030,368 @@ public class VCSDKUtilsTest {
 
     @Test
     public void getCategoryId() throws Exception {
-
         when(taggingWorkflowFactory.build(sessionHelper)).thenReturn(taggingWorkflow);
         List<String> list = spy(ArrayList.class);
         list.add("321");
-        when(taggingWorkflow.listTagsForCategory("321")).thenReturn(list);
-        CategoryModel categoryModel = spy(CategoryModel.class);
+        when(taggingWorkflow.listTagCategory()).thenReturn(list);
+        CategoryModel categoryModel = new CategoryModel();
         categoryModel.setName("DME Service Level");
-        categoryModel.setId("321");
-        when(taggingWorkflow.getTagCategory("321"));
-        CategoryTypes.CreateSpec createSpec = spy(CategoryTypes.CreateSpec.class);
+        categoryModel.setId("");
+        CategoryTypes.CreateSpec createSpec = new CategoryTypes.CreateSpec();
+        taggingWorkflow.createTagCategory(createSpec);
+        when(taggingWorkflow.getTagCategory("321")).thenReturn(categoryModel);
         createSpec.setName("DME Service Level");
         createSpec.setDescription("DME Service Level");
         createSpec.setCardinality(CategoryModel.Cardinality.SINGLE);
+        Set<String> associableTypes = spy(HashSet.class); // empty hash set
+        associableTypes.add("Datastore");
+        createSpec.setAssociableTypes(associableTypes);
+        when(taggingWorkflow.createTagCategory(createSpec)).thenReturn("321");
         vcsdkUtils.getCategoryId(sessionHelper);
     }
 
     @Test
-    public void createPbmProfileInAllContext() {
+    public void createPbmProfileInAllContext() throws Exception {
+        VmwareContext[] vmodlContexts = {vmwareContext};
+        when(vcConnectionHelper.getAllContext()).thenReturn(vmodlContexts);
+        vcsdkUtils.createPbmProfileInAllContext("321", "321");
     }
 
     @Test
-    public void createTag() {
+    public void createTag() throws Exception {
+        when(taggingWorkflowFactory.build(sessionHelper)).thenReturn(taggingWorkflow);
+        getCategoryId();
+        vcsdkUtils.createTag("321", sessionHelper);
+
     }
 
     @Test
-    public void removePbmProfileInAllContext() {
+    public void removePbmProfileInAllContext() throws Exception {
+        VmwareContext[] vmodlContexts = {vmwareContext};
+        when(vcConnectionHelper.getAllContext()).thenReturn(vmodlContexts);
+        when(vmwareContext.getPbmServiceContent()).thenReturn(spbmsc);
+        when(vmwareContext.getPbmService()).thenReturn(pbmService);
+        vcsdkUtils.removePbmProfileInAllContext(pbmprofiles);
     }
 
     @Test
-    public void removeAllTags() {
+    public void removeAllTags() throws Exception {
+        List<TagModel> tagModels = spy(ArrayList.class);
+        TagModel tagModel = new TagModel();
+        tagModel.setName("321");
+        tagModels.add(tagModel);
+        when(taggingWorkflowFactory.build(sessionHelper)).thenReturn(taggingWorkflow);
+        vcsdkUtils.removeAllTags(tagModels,sessionHelper);
     }
 
     @Test
-    public void configureIscsi() {
+    public void configureIscsi() throws Exception {
+        Map<String, String> vmKernel = spy(HashMap.class);
+        vmKernel.put("device", "321");
+        List<Map<String, Object>> ethPorts = spy(ArrayList.class);
+        Map<String, Object> ethPort = spy(HashMap.class);
+        ethPort.put("321", "321");
+        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
+        HostStorageDeviceInfo storageDeviceInfo = spy(HostStorageDeviceInfo.class);
+        when(hostStorageSystemMO.getStorageDeviceInfo()).thenReturn(storageDeviceInfo);
+        List<HostHostBusAdapter> hostBusAdapter = spy(ArrayList.class);
+        HostInternetScsiHba hostHostBusAdapter = new HostInternetScsiHba();
+        hostHostBusAdapter.setDevice("321");
+        hostBusAdapter.add(hostHostBusAdapter);
+        when(storageDeviceInfo.getHostBusAdapter()).thenReturn(hostBusAdapter);
+        boundVmKernel();
+        addIscsiSendTargets();
+        when(hostMO.getName()).thenReturn("321");
+        vcsdkUtils.configureIscsi("321", vmKernel, ethPorts);
     }
 
     @Test
-    public void boundVmKernel() {
+    public void boundVmKernel() throws Exception {
+        Map<String, String> vmKernel = spy(HashMap.class);
+        vmKernel.put("device", "321");
+        IscsiManagerMO iscsiManagerMo = mock(IscsiManagerMO.class);
+        for (int i = 0; i <2 ; i++) {
+            if (i == 0) {
+                when(hostMO.getIscsiManagerMo()).thenReturn(iscsiManagerMo);
+                List<IscsiPortInfo> iscsiPortInfos = spy(ArrayList.class);
+                IscsiPortInfo iscsiPortInfo = spy(IscsiPortInfo.class);
+                iscsiPortInfo.setVnicDevice("321");
+                iscsiPortInfos.add(iscsiPortInfo);
+                when(iscsiManagerMo.queryBoundVnics("321")).thenReturn(iscsiPortInfos);
+                vcsdkUtils.boundVmKernel(hostMO, vmKernel, "321");
+            }
+            if (i==1) {
+                when(hostMO.getIscsiManagerMo()).thenReturn(iscsiManagerMo);
+                List<IscsiPortInfo> iscsiPortInfos = spy(ArrayList.class);
+                IscsiPortInfo iscsiPortInfo = spy(IscsiPortInfo.class);
+                iscsiPortInfo.setVnicDevice("456");
+                when(iscsiManagerMo.queryBoundVnics("321")).thenReturn(iscsiPortInfos);
+                when(hostMO.getIscsiManagerMo()).thenReturn(iscsiManagerMo);
+                vcsdkUtils.boundVmKernel(hostMO, vmKernel, "321");
+            }
+        }
     }
 
     @Test
-    public void addIscsiSendTargets() {
+    public void addIscsiSendTargets() throws Exception {
+        List<Map<String, Object>> ethPorts = spy(ArrayList.class);
+        Map<String, Object> ethPort = spy(HashMap.class);
+        ethPort.put("mgmtIp", "321");
+        ethPorts.add(ethPort);
+        when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
+        when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
+        vcsdkUtils.addIscsiSendTargets(hostMO, ethPorts, "321");
     }
 
     @Test
-    public void deleteNfs() {
+    public void deleteNfs() throws Exception {
+
+        List<String> hostObjIds = spy(ArrayList.class);
+        hostObjIds.add("321");
+        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
+        when(rootFsMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(rootFsMo);
+        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(hostMO.getName()).thenReturn("321");
+        testDeleteNfs();
+        vcsdkUtils.deleteNfs("321", hostObjIds);
     }
 
     @Test
-    public void testDeleteNfs() {
+    public void testDeleteNfs() throws Exception {
+        when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
+        NasDatastoreInfo nasDatastoreInfo = spy(NasDatastoreInfo.class);
+        nasDatastoreInfo.setName("321");
+        when(datastoreMO.getInfo()).thenReturn(nasDatastoreInfo);
+        when(hostMO.getHostDatastoreSystemMo()).thenReturn(hostDatastoreSystemMO);
+        when(hostMO.getName()).thenReturn("321");
+        when(datastoreMO.getName()).thenReturn("321");
+        vcsdkUtils.deleteNfs(datastoreMO, hostMO, "321");
     }
 
     @Test
-    public void getHbaByHostObjectId() {
+    public void getHbaByHostObjectId() throws Exception {
+        for (int i = 0; i <2 ; i++) {
+            if (i == 0) {
+                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
+                HostStorageDeviceInfo storageDeviceInfo = spy(HostStorageDeviceInfo.class);
+                when(hostStorageSystemMO.getStorageDeviceInfo()).thenReturn(storageDeviceInfo);
+                List<HostHostBusAdapter> hostBusAdapter = spy(ArrayList.class);
+                HostInternetScsiHba hostHostBusAdapter = new HostInternetScsiHba();
+                hostHostBusAdapter.setDevice("321");
+                hostHostBusAdapter.setIScsiName("321");
+                hostBusAdapter.add(hostHostBusAdapter);
+                when(storageDeviceInfo.getHostBusAdapter()).thenReturn(hostBusAdapter);
+                vcsdkUtils.getHbaByHostObjectId("321");
+
+            }
+            if (i == 1) {
+                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
+                HostStorageDeviceInfo storageDeviceInfo = spy(HostStorageDeviceInfo.class);
+                when(hostStorageSystemMO.getStorageDeviceInfo()).thenReturn(storageDeviceInfo);
+                List<HostHostBusAdapter> hostBusAdapter = spy(ArrayList.class);
+                HostFibreChannelHba hostHostBusAdapter = new HostFibreChannelHba();
+                hostHostBusAdapter.setDevice("321");
+                hostHostBusAdapter.setNodeWorldWideName(21l);
+                hostBusAdapter.add(hostHostBusAdapter);
+                when(storageDeviceInfo.getHostBusAdapter()).thenReturn(hostBusAdapter);
+                vcsdkUtils.getHbaByHostObjectId("321");
+            }
+        }
     }
 
     @Test
-    public void getHbasByHostObjectId() {
+    public void getHbasByHostObjectId() throws Exception {
+
+        for (int i = 0; i <2 ; i++) {
+            if (i == 0) {
+                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
+                when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
+                HostStorageDeviceInfo storageDeviceInfo = spy(HostStorageDeviceInfo.class);
+                when(hostStorageSystemMO.getStorageDeviceInfo()).thenReturn(storageDeviceInfo);
+                List<HostHostBusAdapter> hostBusAdapter = spy(ArrayList.class);
+                HostInternetScsiHba hostHostBusAdapter = new HostInternetScsiHba();
+                hostHostBusAdapter.setDevice("321");
+                hostHostBusAdapter.setIScsiName("321");
+                hostBusAdapter.add(hostHostBusAdapter);
+                when(storageDeviceInfo.getHostBusAdapter()).thenReturn(hostBusAdapter);
+                vcsdkUtils.getHbasByHostObjectId("321");
+            }
+            if (i == 1) {
+                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
+                HostStorageDeviceInfo storageDeviceInfo = spy(HostStorageDeviceInfo.class);
+                when(hostStorageSystemMO.getStorageDeviceInfo()).thenReturn(storageDeviceInfo);
+                List<HostHostBusAdapter> hostBusAdapter = spy(ArrayList.class);
+                HostFibreChannelHba hostHostBusAdapter = new HostFibreChannelHba();
+                hostHostBusAdapter.setDevice("321");
+                hostHostBusAdapter.setNodeWorldWideName(21l);
+                hostBusAdapter.add(hostHostBusAdapter);
+                when(storageDeviceInfo.getHostBusAdapter()).thenReturn(hostBusAdapter);
+                vcsdkUtils.getHbasByHostObjectId("321");
+            }
+        }
+
     }
 
     @Test
-    public void getHbasByClusterObjectId() {
+    public void getHbasByClusterObjectId() throws Exception {
+        for (int i = 0; i <2 ; i++) {
+            if (i == 0) {
+                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(clusterMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
+                when(clusterMO.getClusterHosts()).thenReturn(list);
+                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
+                HostStorageDeviceInfo storageDeviceInfo = spy(HostStorageDeviceInfo.class);
+                when(hostStorageSystemMO.getStorageDeviceInfo()).thenReturn(storageDeviceInfo);
+                List<HostHostBusAdapter> hostBusAdapter = spy(ArrayList.class);
+                HostInternetScsiHba hostHostBusAdapter = new HostInternetScsiHba();
+                hostHostBusAdapter.setDevice("321");
+                hostHostBusAdapter.setIScsiName("321");
+                hostBusAdapter.add(hostHostBusAdapter);
+                when(storageDeviceInfo.getHostBusAdapter()).thenReturn(hostBusAdapter);
+                vcsdkUtils.getHbasByClusterObjectId("321");
+            }
+            if (i == 1) {
+                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(clusterMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
+                when(clusterMO.getClusterHosts()).thenReturn(list);
+                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
+                HostStorageDeviceInfo storageDeviceInfo = spy(HostStorageDeviceInfo.class);
+                when(hostStorageSystemMO.getStorageDeviceInfo()).thenReturn(storageDeviceInfo);
+                List<HostHostBusAdapter> hostBusAdapter = spy(ArrayList.class);
+                HostFibreChannelHba hostHostBusAdapter = new HostFibreChannelHba();
+                hostHostBusAdapter.setDevice("321");
+                hostHostBusAdapter.setNodeWorldWideName(21l);
+                hostBusAdapter.add(hostHostBusAdapter);
+                when(storageDeviceInfo.getHostBusAdapter()).thenReturn(hostBusAdapter);
+                vcsdkUtils.getHbasByClusterObjectId("321");
+            }
+        }
     }
 
     @Test
-    public void testConnectivity() {
+    public void testConnectivity() throws VcenterException {
+        List<Map<String, Object>> ethPorts = spy(ArrayList.class);
+        Map<String, Object> ethPort = spy(HashMap.class);
+        ethPort.put("mgmtIp", "321");
+        ethPorts.add(ethPort);
+        Map<String, String> vmKernel = spy(HashMap.class);
+        vmKernel.put("device", "321");
+        when(VmodlContext
+            .initContext(new String[] {"com.vmware.vim.binding.vim", "com.vmware.vim.binding.vmodl.reflect"})).thenReturn(context);
+        vcsdkUtils.testConnectivity("321", ethPorts, vmKernel, vCenterInfo);
     }
 
     @Test
-    public void xmlFormat() {
+    public void xmlFormat() throws ParserConfigurationException {
+        String xml = "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n" +
+            "\t<returnsms>\n" +
+            "\t\t\t <returnstatus>Success</returnstatus>\n" +
+            "\t\t\t <message>ok</message>\n" +
+            "\t\t\t <remainpoint>9118</remainpoint>\n" +
+            "\t\t\t <taskID>4197401</taskID>\n" +
+            "\t\t\t <successCounts>1</successCounts>\n" +
+            "\t </returnsms>";
+        vcsdkUtils.xmlFormat(xml);
     }
 
     @Test
-    public void hasVmOnDatastore() {
+    public void hasVmOnDatastore() throws Exception {
+        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        List<ManagedObjectReference> vms = spy(ArrayList.class);
+        vms.add(managedObjectReference);
+        when(datastoreMO.getVm()).thenReturn(vms);
+        vcsdkUtils.hasVmOnDatastore("321");
     }
 
     @Test
-    public void getHostName() {
+    public void getHostName() throws Exception {
+        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(hostMO.getName()).thenReturn("321");
+        vcsdkUtils.getHostName("321");
+
     }
 
     @Test
-    public void getClusterName() {
+    public void getClusterName() throws Exception {
+        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(clusterMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
+        when(clusterMO.getName()).thenReturn("321");
+        vcsdkUtils.getClusterName("321");
     }
 
     @Test
-    public void getDataStoreName() {
+    public void getDataStoreName() throws Exception {
+        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(datastoreMO.getName()).thenReturn("321");
+        vcsdkUtils.getDataStoreName("321");
     }
 
     @Test
-    public void refreshDatastore() {
+    public void refreshDatastore() throws Exception {
+        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        vcsdkUtils.refreshDatastore("321");
     }
 
     @Test
-    public void refreshStorageSystem() {
+    public void refreshStorageSystem() throws Exception {
+        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+        vcsdkUtils.refreshStorageSystem("321");
     }
 
     @Test
-    public void getHostByVmObjectId() {
+    public void getHostByVmObjectId() throws Exception {
+        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(virtualMachineMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(virtualMachineMo);
+        when(virtualMachineMo.getRunningHost()).thenReturn(hostMO);
+        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(hostMO.getName()).thenReturn("321");
+        vcsdkUtils.getHostByVmObjectId("321");
     }
 }
