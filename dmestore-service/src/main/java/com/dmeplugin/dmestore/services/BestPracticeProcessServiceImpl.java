@@ -202,25 +202,6 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     }
 
     @Override
-    public List<BestPracticeUpResultResponse> updateByCluster(String clusterobjectid) throws VcenterException, DmeSqlException {
-        String vmwarehosts= vcsdkUtils.getHostsOnCluster(clusterobjectid);
-        if (!StringUtils.isEmpty(vmwarehosts)) {
-            List<Map<String, String>> vmwarehostlists = gson.fromJson(vmwarehosts, new TypeToken<List<Map<String, String>>>() {
-            }.getType());
-            List<String> hostlists = new ArrayList<>();
-            if (vmwarehostlists != null && vmwarehostlists.size() > 0) {
-                //分别检查每一个主机是否存在，如果不存在就创建
-
-                for (Map<String, String> hostmap : vmwarehostlists) {
-                   hostlists.add(hostmap.get("hostId"));
-                }
-            }
-            return update(hostlists);
-        }
-        return new ArrayList<>();
-    }
-
-    @Override
     public List<BestPracticeUpResultResponse> update(List<String> objectIds, String hostSetting) throws DmeSqlException {
         List<BestPracticeService> services = new ArrayList<>();
         //获取对应的service

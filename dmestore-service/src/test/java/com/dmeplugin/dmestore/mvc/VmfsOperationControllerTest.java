@@ -25,10 +25,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
  */
 public class VmfsOperationControllerTest {
 
-    Gson gson = new Gson();
     VmfsOperationController vmfsOperationController;
-    @Mock
-    VmfsOperationService vmfsOperationService;
     MockMvc mockMvc;
 
     @Before

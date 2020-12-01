@@ -1,17 +1,19 @@
 package com.dmeplugin.dmestore.utils;
 
 import com.dmeplugin.dmestore.exception.DMEException;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
-import org.apache.http.conn.ssl.*;
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
+
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContexts;
+import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
@@ -20,12 +22,6 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
-
-import java.io.IOException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 
 /**
  * @Description: TODO
@@ -36,9 +32,6 @@ import java.security.cert.X509Certificate;
  **/
 @Component
 public class RestUtils {
-    public final static String RESPONSE_STATE_CODE = "code";
-
-    public final static String RESPONSE_STATE_200 = "200";
 
     public final static int RES_STATE_I_200 = 200;
 
@@ -53,7 +46,6 @@ public class RestUtils {
         RestTemplate restTemplate;
         try {
             TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-            HostnameVerifier hostnameVerifier = (s, sslSession) -> true;
             SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
             SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext,
                 SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);

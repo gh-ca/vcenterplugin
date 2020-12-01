@@ -54,14 +54,4 @@ public class HypervisorHostHelper {
         }
         return null;
     }
-
-    public enum PvlanType {
-        /**
-         * promiscuous
-         **/
-        promiscuous,
-        isolated,
-        community;
-    }
-
 }

@@ -14,6 +14,7 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+
 package com.dmeplugin.vmware.util;
 
 
@@ -26,7 +27,34 @@ import com.vmware.connection.helpers.builders.PropertySpecBuilder;
 import com.vmware.connection.helpers.builders.TraversalSpecBuilder;
 import com.vmware.pbm.PbmPortType;
 import com.vmware.pbm.PbmServiceInstanceContent;
-import com.vmware.vim25.*;
+import com.vmware.vim25.DynamicProperty;
+import com.vmware.vim25.InvalidPropertyFaultMsg;
+import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.ObjectContent;
+import com.vmware.vim25.PropertyFilterSpec;
+import com.vmware.vim25.RetrieveOptions;
+import com.vmware.vim25.RetrieveResult;
+import com.vmware.vim25.RuntimeFaultFaultMsg;
+import com.vmware.vim25.ServiceContent;
+import com.vmware.vim25.TaskInfo;
+import com.vmware.vim25.VimPortType;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,12 +62,6 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSession;
 import javax.xml.ws.soap.SOAPFaultException;
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-import java.util.*;
 
 public class VmwareContext {
 
@@ -104,13 +126,6 @@ public class VmwareContext {
     public void clearStockObjects() {
         synchronized (stockMap) {
             stockMap.clear();
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> T getStockObject(String name) {
-        synchronized (stockMap) {
-            return (T) stockMap.get(name);
         }
     }
 
@@ -222,7 +237,8 @@ public class VmwareContext {
         try {
             charset = Charset.forName(charsetName);
         } catch (IllegalArgumentException e) {
-            s_logger.warn("Illegal/unsupported/null charset name from connection. charsetname from connection is " + charsetName);
+            s_logger.warn(
+                "Illegal/unsupported/null charset name from connection. charsetname from connection is " + charsetName);
             charset = StringUtil.getPreferredCharset();
         }
         return charset;
@@ -251,7 +267,8 @@ public class VmwareContext {
         out.write(content);
         out.flush();
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), getCharSetFromConnection(conn)));
+        BufferedReader in =
+            new BufferedReader(new InputStreamReader(conn.getInputStream(), getCharSetFromConnection(conn)));
         String line;
         while ((in.ready()) && (line = in.readLine()) != null) {
             if (s_logger.isTraceEnabled()) {
@@ -337,7 +354,8 @@ public class VmwareContext {
                 connected = true;
                 s_logger.info("Connected, conn: " + conn.toString() + ", retry: " + i);
             } catch (Exception e) {
-                s_logger.warn("Unable to connect, conn: " + conn.toString() + ", message: " + e.toString() + ", retry: " + i);
+                s_logger.warn(
+                    "Unable to connect, conn: " + conn.toString() + ", message: " + e.toString() + ", retry: " + i);
 
                 try {
                     Thread.sleep(CONNECT_RETRY_INTERVAL);
@@ -376,12 +394,14 @@ public class VmwareContext {
         }
 
         @Override
-        public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) throws java.security.cert.CertificateException {
+        public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType)
+            throws java.security.cert.CertificateException {
             return;
         }
 
         @Override
-        public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) throws java.security.cert.CertificateException {
+        public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType)
+            throws java.security.cert.CertificateException {
             return;
         }
     }
@@ -399,7 +419,7 @@ public class VmwareContext {
      * @throws com.vmware.vim25.RuntimeFaultFaultMsg
      */
     public List<Pair<ManagedObjectReference, String>> inFolderByType(
-            final ManagedObjectReference folder, final String morefType, final RetrieveOptions retrieveOptions
+        final ManagedObjectReference folder, final String morefType, final RetrieveOptions retrieveOptions
     ) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
         final PropertyFilterSpec[] propertyFilterSpecs = propertyFilterSpecs(folder, morefType, "name");
 
@@ -407,65 +427,29 @@ public class VmwareContext {
         final ManagedObjectReference propertyCollector = getPropertyCollector();
 
         RetrieveResult results = getService().retrievePropertiesEx(
-                propertyCollector,
-                Arrays.asList(propertyFilterSpecs),
-                retrieveOptions);
+            propertyCollector,
+            Arrays.asList(propertyFilterSpecs),
+            retrieveOptions);
 
         final List<Pair<ManagedObjectReference, String>> tgtMoref =
-                new ArrayList<>();
+            new ArrayList<>();
         while (results != null && !results.getObjects().isEmpty()) {
             resultsToTgtMorefList(results, tgtMoref);
             final String token = results.getToken();
             // if we have a token, we can scroll through additional results, else there's nothing to do.
             results =
-                    (token != null) ?
-                            getService().continueRetrievePropertiesEx(propertyCollector, token) : null;
+                (token != null) ?
+                    getService().continueRetrievePropertiesEx(propertyCollector, token) : null;
         }
 
         return tgtMoref;
     }
 
-    public List<Pair<ManagedObjectReference, String>> inFolderByType(ManagedObjectReference folder, String morefType) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
+    public List<Pair<ManagedObjectReference, String>> inFolderByType(ManagedObjectReference folder, String morefType)
+        throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
         return inFolderByType(folder, morefType, new RetrieveOptions());
     }
 
-    /**
-     * Returns all the MOREFs of the specified type that are present under the
-     * container
-     *
-     * @param container       {@link ManagedObjectReference} of the container to begin the
-     *                        search from
-     * @param morefType       Type of the managed entity that needs to be searched
-     * @param morefProperties Array of properties to be fetched for the moref
-     * @return Map of MOREF and Map of name value pair of properties requested of
-     * the managed objects present. If none exist then empty Map is
-     * returned
-     * @throws InvalidPropertyFaultMsg
-     * @throws RuntimeFaultFaultMsg
-     */
-    public Map<ManagedObjectReference, Map<String, Object>> inContainerByType(
-            ManagedObjectReference container, String morefType,
-            String[] morefProperties, RetrieveOptions retrieveOptions) throws InvalidPropertyFaultMsg,
-            RuntimeFaultFaultMsg {
-        List<ObjectContent> oCont = containerViewByType(container, morefType, retrieveOptions, morefProperties).getObjects();
-
-        Map<ManagedObjectReference, Map<String, Object>> tgtMoref =
-                new HashMap<ManagedObjectReference, Map<String, Object>>();
-
-        if (oCont != null) {
-            for (ObjectContent oc : oCont) {
-                Map<String, Object> propMap = new HashMap<String, Object>();
-                List<DynamicProperty> dps = oc.getPropSet();
-                if (dps != null) {
-                    for (DynamicProperty dp : dps) {
-                        propMap.put(dp.getName(), dp.getVal());
-                    }
-                }
-                tgtMoref.put(oc.getObj(), propMap);
-            }
-        }
-        return tgtMoref;
-    }
 
     /**
      * Returns all the MOREFs of the specified type that are present under the
@@ -480,14 +464,15 @@ public class VmwareContext {
      * @throws RuntimeFaultFaultMsg
      */
     public List<Pair<ManagedObjectReference, String>> inContainerByType(
-            ManagedObjectReference folder, String morefType, RetrieveOptions retrieveOptions)
-            throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
+        ManagedObjectReference folder, String morefType, RetrieveOptions retrieveOptions)
+        throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
 
         RetrieveResult rslts = containerViewByType(folder, morefType, retrieveOptions);
         return toList(rslts);
     }
 
-    public List<Pair<ManagedObjectReference, String>> toList(RetrieveResult rslts) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
+    public List<Pair<ManagedObjectReference, String>> toList(RetrieveResult rslts)
+        throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
         final List<Pair<ManagedObjectReference, String>> tgtMoref = new ArrayList<>();
         String token = null;
         token = populate(rslts, tgtMoref);
@@ -495,17 +480,12 @@ public class VmwareContext {
         while (token != null && !token.isEmpty()) {
             // fetch results based on new token
             rslts = getService().continueRetrievePropertiesEx(
-                    getServiceContent().getPropertyCollector(), token);
+                getServiceContent().getPropertyCollector(), token);
 
             token = populate(rslts, tgtMoref);
         }
 
         return tgtMoref;
-    }
-
-
-    public List<Pair<ManagedObjectReference, String>> inContainerByType(ManagedObjectReference container, String morefType) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
-        return inContainerByType(container, morefType, new RetrieveOptions());
     }
 
     /**
@@ -519,10 +499,10 @@ public class VmwareContext {
      * @throws InvalidPropertyFaultMsg
      */
     public RetrieveResult containerViewByType(
-            final ManagedObjectReference container,
-            final String morefType,
-            final RetrieveOptions retrieveOptions,
-            final String... morefProperties
+        final ManagedObjectReference container,
+        final String morefType,
+        final RetrieveOptions retrieveOptions,
+        final String... morefProperties
     ) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
 
         PropertyFilterSpec[] propertyFilterSpecs = propertyFilterSpecs(container, morefType, morefProperties);
@@ -531,23 +511,23 @@ public class VmwareContext {
     }
 
     public RetrieveResult containerViewByType(
-            final ManagedObjectReference container,
-            final String morefType,
-            final String[] morefProperties,
-            final RetrieveOptions retrieveOptions,
-            final PropertyFilterSpec... propertyFilterSpecs
+        final ManagedObjectReference container,
+        final String morefType,
+        final String[] morefProperties,
+        final RetrieveOptions retrieveOptions,
+        final PropertyFilterSpec... propertyFilterSpecs
     ) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
         return getService().retrievePropertiesEx(
-                getServiceContent().getPropertyCollector(),
-                Arrays.asList(propertyFilterSpecs),
-                retrieveOptions
+            getServiceContent().getPropertyCollector(),
+            Arrays.asList(propertyFilterSpecs),
+            retrieveOptions
         );
     }
 
     public RetrieveResult containerViewByType(
-            final ManagedObjectReference container,
-            final String morefType,
-            final RetrieveOptions retrieveOptions
+        final ManagedObjectReference container,
+        final String morefType,
+        final RetrieveOptions retrieveOptions
     ) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
         return this.containerViewByType(container, morefType, retrieveOptions, "name");
     }
@@ -571,40 +551,41 @@ public class VmwareContext {
     }
 
     public PropertyFilterSpec[] propertyFilterSpecs(
-            ManagedObjectReference container,
-            String morefType,
-            String... morefProperties
+        ManagedObjectReference container,
+        String morefType,
+        String... morefProperties
     ) throws RuntimeFaultFaultMsg {
 
         ManagedObjectReference viewManager = getServiceContent().getViewManager();
         ManagedObjectReference containerView =
-                getService().createContainerView(viewManager, container,
-                        Arrays.asList(morefType), true);
+            getService().createContainerView(viewManager, container,
+                Arrays.asList(morefType), true);
 
-        return new PropertyFilterSpec[]{
-                new PropertyFilterSpecBuilder()
-                        .propSet(
-                                new PropertySpecBuilder()
-                                        .all(Boolean.FALSE)
-                                        .type(morefType)
-                                        .pathSet(morefProperties)
-                        )
-                        .objectSet(
-                        new ObjectSpecBuilder()
-                                .obj(containerView)
-                                .skip(Boolean.TRUE)
-                                .selectSet(
-                                        new TraversalSpecBuilder()
-                                                .name("view")
-                                                .path("view")
-                                                .skip(false)
-                                                .type("ContainerView")
-                                )
+        return new PropertyFilterSpec[] {
+            new PropertyFilterSpecBuilder()
+                .propSet(
+                    new PropertySpecBuilder()
+                        .all(Boolean.FALSE)
+                        .type(morefType)
+                        .pathSet(morefProperties)
                 )
+                .objectSet(
+                new ObjectSpecBuilder()
+                    .obj(containerView)
+                    .skip(Boolean.TRUE)
+                    .selectSet(
+                        new TraversalSpecBuilder()
+                            .name("view")
+                            .path("view")
+                            .skip(false)
+                            .type("ContainerView")
+                    )
+            )
         };
     }
 
-    public static String populate(final RetrieveResult rslts, final List<Pair<ManagedObjectReference, String>> tgtMoref) {
+    public static String populate(final RetrieveResult rslts,
+                                  final List<Pair<ManagedObjectReference, String>> tgtMoref) {
         String token = null;
         if (rslts != null) {
             token = rslts.getToken();

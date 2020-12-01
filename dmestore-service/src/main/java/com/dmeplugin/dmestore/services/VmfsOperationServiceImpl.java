@@ -273,7 +273,6 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     public List<SimpleServiceLevel> listServiceLevelVmfs(Map<String, Object> params) throws DMEException {
 
         List<SimpleServiceLevel> simpleServiceLevels = new ArrayList<>();
-        String s = gson.toJson(params);
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.LIST_SERVICE_LEVEL_URL,
                 HttpMethod.GET, gson.toJson(params));

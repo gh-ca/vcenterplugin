@@ -16,9 +16,6 @@ public class OverviewServiceImpl implements OverviewService {
     private static final String STORAGE_TYPE_VMFS = "1";
     private static final String STORAGE_TYPE_NFS = "2";
 
-    private static final String SUCCESS_CODE = "200";
-    private static final String COLUMN_CODE = "code";
-
     private static final String STORAGE_DEVICE_STATUS_NORMAL = "1";
 
     private static final String CRITICAL = "Critical";

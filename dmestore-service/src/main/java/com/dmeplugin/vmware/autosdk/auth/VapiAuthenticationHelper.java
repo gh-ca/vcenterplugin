@@ -129,27 +129,6 @@ public class VapiAuthenticationHelper {
     }
 
     /**
-     * 
-     * @param server
-     * @param httpConfig
-     * @throws Exception
-     */
-    public void createStubFactory(String server,String port, HttpConfiguration httpConfig) throws Exception {
-        this.stubFactory = createApiStubFactory(server,port, httpConfig);
-
-    }
-    
-    /**
-     * 
-     * @param server
-     * @param skipServerVerification
-     * @throws Exception
-     */
-    public void createStubFactory(String server,String port, boolean skipServerVerification) throws Exception {
-        this.stubFactory = createApiStubFactory(server,port, buildHttpConfiguration(skipServerVerification));
-
-    }
-    /**
      * Returns the stub factory for the api endpoint
      *
      * @return
