@@ -49,13 +49,9 @@ public interface VmwareHypervisorHost {
 
     ManagedObjectReference getHyperHostCluster() throws Exception;
 
-    boolean isHyperHostConnected() throws Exception;
-
     List<VirtualMachineMO> listVmsOnHyperHost(String name) throws Exception;
 
     VirtualMachineMO findVmOnHyperHost(String name) throws Exception;
-
-    boolean createVm(VirtualMachineConfigSpec vmSpec) throws Exception;
 
     ObjectContent[] getVmPropertiesOnHyperHost(String[] propertyPaths) throws Exception;
 
@@ -66,8 +62,6 @@ public interface VmwareHypervisorHost {
     void unmountDatastore(String poolUuid) throws Exception;
 
     VmwareHypervisorHostNetworkSummary getHyperHostNetworkSummary(String esxServiceConsolePort) throws Exception;
-
-    LicenseAssignmentManagerMO getLicenseAssignmentManager() throws Exception;
 
     String getRecommendedDiskController(String guestOsId) throws Exception;
 }

@@ -28,10 +28,6 @@ public class HostNetworkSystemMO extends BaseMO {
         return (HostNetworkConfig) context.getVimClient().getDynamicProperty(mor, "networkConfig");
     }
 
-    public void addPortGroup(HostPortGroupSpec spec) throws Exception {
-        context.getService().addPortGroup(mor, spec);
-    }
-
     public void updateVirtualSwitch(String vSwitchName, HostVirtualSwitchSpec spec) throws Exception {
         context.getService().updateVirtualSwitch(mor, vSwitchName, spec);
     }
