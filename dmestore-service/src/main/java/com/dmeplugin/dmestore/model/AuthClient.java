@@ -5,10 +5,15 @@ package com.dmeplugin.dmestore.model;
  **/
 public class AuthClient {
     private String accessval;
+
     private String id;
+
     private String name;
+
     private String secure;
+
     private String sync;
+
     private String type;
 
     public String getAccessval() {

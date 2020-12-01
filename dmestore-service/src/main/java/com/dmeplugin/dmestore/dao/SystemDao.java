@@ -29,7 +29,7 @@ public class SystemDao extends H2DataBaseDao {
     /**
      * 判断表是否存在，不存在则创建表
      *
-     * @param tableName      表名
+     * @param tableName 表名
      * @param createTableSql 创建表的SQL
      */
     public void checkExistAndCreateTable(String tableName, String createTableSql) throws Exception {

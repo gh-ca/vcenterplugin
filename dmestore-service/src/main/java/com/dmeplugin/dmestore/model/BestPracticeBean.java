@@ -5,12 +5,19 @@ package com.dmeplugin.dmestore.model;
  **/
 public class BestPracticeBean {
     private String hostSetting;
+
     private String recommendValue;
+
     private String level;
+
     private String actualValue;
+
     private String needReboot;
+
     private String hostObjectId;
+
     private String hostName;
+
     private String autoRepair;
 
     public String getHostSetting() {

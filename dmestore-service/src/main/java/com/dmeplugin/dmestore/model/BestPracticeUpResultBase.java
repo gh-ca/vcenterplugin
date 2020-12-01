@@ -5,8 +5,11 @@ package com.dmeplugin.dmestore.model;
  **/
 public class BestPracticeUpResultBase {
     private String hostSetting;
+
     private boolean needReboot;
+
     private String hostObjectId;
+
     private boolean updateResult;
 
     public String getHostSetting() {

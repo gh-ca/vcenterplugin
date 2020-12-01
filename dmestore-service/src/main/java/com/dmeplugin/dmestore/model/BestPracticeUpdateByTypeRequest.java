@@ -7,7 +7,8 @@ import java.util.List;
  **/
 public class BestPracticeUpdateByTypeRequest {
     private String hostSetting;
-    private List<String>  hostObjectIds;
+
+    private List<String> hostObjectIds;
 
     public String getHostSetting() {
         return hostSetting;

@@ -9,7 +9,9 @@ package com.dmeplugin.dmestore.model;
 public class CapabilitiesQos {
 
     private SmartQos smartQos;
+
     private QosParam qosParam;
+
     private Boolean enabled;
 
     public SmartQos getSmartQos() {

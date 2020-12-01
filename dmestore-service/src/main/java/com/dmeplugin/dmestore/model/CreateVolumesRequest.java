@@ -7,7 +7,9 @@ import java.util.List;
  **/
 public class CreateVolumesRequest {
     private String serviceLevelId;
+
     private List<ServiceVolumeBasicParams> volumes;
+
     private ServiceVolumeMapping mapping;
 
     public String getServiceLevelId() {

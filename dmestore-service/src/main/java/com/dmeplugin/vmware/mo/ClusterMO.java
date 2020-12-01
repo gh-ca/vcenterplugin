@@ -242,12 +242,6 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
 
     @Override
     public ObjectContent[] getDatastorePropertiesOnHyperHost(String[] propertyPaths) throws Exception {
-        if (s_logger.isTraceEnabled()) {
-            s_logger.trace(
-                "vCenter API trace - retrieveProperties() on Datastore properties. target MOR: " + mor.getValue()
-                    + ", properties: " + new Gson().toJson(propertyPaths));
-        }
-
         PropertySpec pSpec = new PropertySpec();
         pSpec.setType("Datastore");
         pSpec.getPathSet().addAll(Arrays.asList(propertyPaths));
@@ -271,18 +265,10 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         List<ObjectContent> properties = context.getService()
             .retrieveProperties(context.getPropertyCollector(), pfSpecArr);
 
-        if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - retrieveProperties() done");
-        }
         return properties.toArray(new ObjectContent[properties.size()]);
     }
 
     public ObjectContent[] getHostPropertiesOnCluster(String[] propertyPaths) throws Exception {
-        if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - retrieveProperties() on Host properties. target MOR: " + mor.getValue()
-                + ", properties: " + new Gson().toJson(propertyPaths));
-        }
-
         PropertySpec pSpec = new PropertySpec();
         pSpec.setType("HostSystem");
         pSpec.getPathSet().addAll(Arrays.asList(propertyPaths));
@@ -306,24 +292,12 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
 
         List<ObjectContent> properties = context.getService()
             .retrieveProperties(context.getPropertyCollector(), pfSpecArr);
-
-        if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - retrieveProperties() done");
-        }
         return properties.toArray(new ObjectContent[properties.size()]);
     }
 
     @Override
     public ManagedObjectReference mountDatastore(boolean vmfsDatastore, String poolHostAddress, int poolHostPort,
         String poolPath, String poolUuid) throws Exception {
-
-        if (s_logger.isTraceEnabled()) {
-            s_logger.trace(
-                "vCenter API trace - mountDatastore(). target MOR: " + mor.getValue() + ", vmfs: " + vmfsDatastore
-                    + ", poolHost: " + poolHostAddress + ", poolHostPort: " + poolHostPort + ", poolPath: " + poolPath
-                    + ", poolUuid: " + poolUuid);
-        }
-
         ManagedObjectReference morDs = null;
         ManagedObjectReference morDsFirst = null;
         List<ManagedObjectReference> hosts = context.getVimClient().getDynamicProperty(mor, "host");

@@ -3,7 +3,6 @@ import { EChartOption } from 'echarts';
 import { VmfsPerformanceService } from './performance.service';
 import {NfsService, MakePerformance} from "../../nfs/nfs.service";
 import {VolumeInfo} from "../volume-attribute/attribute.service";
-import {MAT_DATE_LOCALE} from "@angular/material/core";
 import {FormControl, FormGroup} from "@angular/forms";
 import {GlobalsService} from "@shared/globals.service";
 import {TranslatePipe} from "@ngx-translate/core";
@@ -12,7 +11,7 @@ import {TranslatePipe} from "@ngx-translate/core";
   selector: 'app-performance',
   templateUrl: './performance.component.html',
   styleUrls: ['./performance.component.scss'],
-  providers: [VmfsPerformanceService, MakePerformance, NfsService, TranslatePipe,{provide: MAT_DATE_LOCALE, useValue: 'en-GB'}],
+  providers: [VmfsPerformanceService, MakePerformance, NfsService, TranslatePipe],
 })
 export class PerformanceComponent implements OnInit{
 
