@@ -2,12 +2,16 @@ package com.dmeplugin.dmestore.entity;
 
 public class DMEbase {
     private String hostIp;
+
     private int hostPort;
+
     private String loginAccount;
+
     private String loginPwd;
 
     /**
      * 构造方法.
+     *
      * @param hostIp 服务器IP
      * @param hostPort 端口
      * @param loginAccount 登录账号
@@ -54,10 +58,7 @@ public class DMEbase {
 
     @Override
     public String toString() {
-        return "Esight{"
-                + "hostIp='" + hostIp + '\''
-                + ", hostPort=" + hostPort
-                + ", loginAccount='" + loginAccount + '\''
-                + ", loginPwd='******'" + '}';
+        return "Esight{" + "hostIp='" + hostIp + '\'' + ", hostPort=" + hostPort + ", loginAccount='" + loginAccount
+            + '\'' + ", loginPwd='******'" + '}';
     }
 }

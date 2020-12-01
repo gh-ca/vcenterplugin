@@ -3,93 +3,100 @@ package com.dmeplugin.dmestore.entity;
 import java.io.Serializable;
 import java.util.Date;
 
-
 public class VCenterInfo implements Serializable {
 
-  private static final long serialVersionUID = 3811172759222907501L;
+    private static final long serialVersionUID = 3811172759222907501L;
 
-  private int id;
-  private String hostIp;
-  private int hostPort;
-  private String userName;
-  private String password;
-  private Date createTime;
-  // HA status
-  private boolean state;
-  // Alarm status
-  private boolean pushEvent;
-  // 1:crtical 2:majorandcritical 3:all
-  private int pushEventLevel;
+    private int id;
 
-  public int getPushEventLevel() {
-    return pushEventLevel;
-  }
+    private String hostIp;
 
-  public void setPushEventLevel(int pushEventLevel) {
-    this.pushEventLevel = pushEventLevel;
-  }
+    private int hostPort;
 
-  public int getId() {
-    return id;
-  }
+    private String userName;
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    private String password;
 
-  public String getHostIp() {
-    return hostIp;
-  }
+    private Date createTime;
 
-  public void setHostIp(String hostIp) {
-    this.hostIp = hostIp;
-  }
+    // HA status
+    private boolean state;
 
-  public String getUserName() {
-    return userName;
-  }
+    // Alarm status
+    private boolean pushEvent;
 
-  public void setUserName(String userName) {
-    this.userName = userName;
-  }
+    // 1:crtical 2:majorandcritical 3:all
+    private int pushEventLevel;
 
-  public String getPassword() {
-    return password;
-  }
+    public int getPushEventLevel() {
+        return pushEventLevel;
+    }
 
-  public void setPassword(String password) {
-    this.password = password;
-  }
+    public void setPushEventLevel(int pushEventLevel) {
+        this.pushEventLevel = pushEventLevel;
+    }
 
-  public Date getCreateTime() {
-    return createTime;
-  }
+    public int getId() {
+        return id;
+    }
 
-  public void setCreateTime(Date createTime) {
-    this.createTime = createTime;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  public boolean isState() {
-    return state;
-  }
+    public String getHostIp() {
+        return hostIp;
+    }
 
-  public void setState(boolean state) {
-    this.state = state;
-  }
+    public void setHostIp(String hostIp) {
+        this.hostIp = hostIp;
+    }
 
-  public boolean isPushEvent() {
-    return pushEvent;
-  }
+    public String getUserName() {
+        return userName;
+    }
 
-  public void setPushEvent(boolean pushEvent) {
-    this.pushEvent = pushEvent;
-  }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-  public int getHostPort() {
-    return hostPort == 0 ? 443 : hostPort;
-  }
+    public String getPassword() {
+        return password;
+    }
 
-  public void setHostPort(int hostPort) {
-    this.hostPort = hostPort;
-  }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public boolean isState() {
+        return state;
+    }
+
+    public void setState(boolean state) {
+        this.state = state;
+    }
+
+    public boolean isPushEvent() {
+        return pushEvent;
+    }
+
+    public void setPushEvent(boolean pushEvent) {
+        this.pushEvent = pushEvent;
+    }
+
+    public int getHostPort() {
+        return hostPort == 0 ? 443 : hostPort;
+    }
+
+    public void setHostPort(int hostPort) {
+        this.hostPort = hostPort;
+    }
 }

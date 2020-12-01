@@ -7,9 +7,13 @@ import java.util.List;
  **/
 public class BestPracticeCheckRecordBean {
     private String hostSetting;
+
     private String recommendValue;
+
     private String level;
+
     private int count;
+
     private List<BestPracticeBean> hostList;
 
     public String getHostSetting() {

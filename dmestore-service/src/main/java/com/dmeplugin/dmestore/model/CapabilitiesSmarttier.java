@@ -9,6 +9,7 @@ package com.dmeplugin.dmestore.model;
 public class CapabilitiesSmarttier {
 
     private Boolean enabled;
+
     private Integer policy;
 
     public Boolean getEnabled() {

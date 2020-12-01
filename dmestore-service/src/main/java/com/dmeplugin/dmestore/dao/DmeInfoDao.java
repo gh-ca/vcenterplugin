@@ -1,6 +1,5 @@
 package com.dmeplugin.dmestore.dao;
 
-
 import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
 import com.dmeplugin.dmestore.entity.DmeInfo;
 import com.dmeplugin.dmestore.exception.DMEException;
@@ -30,8 +29,8 @@ public class DmeInfoDao extends H2DataBaseDao {
         try {
             con = getConnection();
             ps = con.prepareStatement(
-                    "INSERT INTO " + DPSqlFileConstant.DP_DME_ACCESS_INFO + " (hostIp,hostPort,username,password) " +
-                            "VALUES (?,?,?,?)");
+                "INSERT INTO " + DPSqlFileConstant.DP_DME_ACCESS_INFO + " (hostIp,hostPort,username,password) "
+                    + "VALUES (?,?,?,?)");
             ps.setString(1, dmeInfo.getHostIp());
             ps.setInt(2, dmeInfo.getHostPort());
             ps.setString(3, dmeInfo.getUserName());
@@ -57,8 +56,7 @@ public class DmeInfoDao extends H2DataBaseDao {
         DmeInfo dmeInfo = null;
         try {
             con = getConnection();
-            ps = con.prepareStatement("SELECT * FROM " + DPSqlFileConstant.DP_DME_ACCESS_INFO
-                    + " WHERE state=1");
+            ps = con.prepareStatement("SELECT * FROM " + DPSqlFileConstant.DP_DME_ACCESS_INFO + " WHERE state=1");
             rs = ps.executeQuery();
             if (rs.next()) {
                 dmeInfo = new DmeInfo();
@@ -74,13 +72,12 @@ public class DmeInfoDao extends H2DataBaseDao {
         } catch (Exception e) {
             e.printStackTrace();
             LOGGER.error("Failed to get dme access info: " + e.toString());
-            throw new DMEException("503",e.getMessage());
+            throw new DMEException("503", e.getMessage());
         } finally {
             closeConnection(con, ps, rs);
         }
         return dmeInfo;
     }
-
 
     private void checkIp(String ip) throws SQLException {
         if (ip == null || ip.length() > DmeConstants.MAXLEN) {
@@ -99,7 +96,6 @@ public class DmeInfoDao extends H2DataBaseDao {
             throw new SQLException("parameter password is not correct");
         }
     }
-
 
     private void checkDmeInfo(DmeInfo dmeInfo) throws SQLException {
         checkIp(dmeInfo.getHostIp());

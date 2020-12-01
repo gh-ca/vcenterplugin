@@ -3,7 +3,11 @@ package com.dmeplugin.dmestore.model;
 import java.util.List;
 
 /**
+ * BestPracticeUpResultResponse
+ *
  * @author wangxiangyong
+ *
+ * @since 2020-12-01
  *
  **/
 public class BestPracticeUpResultResponse {

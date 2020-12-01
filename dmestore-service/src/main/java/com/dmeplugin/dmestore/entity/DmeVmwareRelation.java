@@ -11,180 +11,193 @@ import java.util.Date;
  * @create: 2020-09-02
  **/
 public class DmeVmwareRelation implements Serializable {
+    private int id;
 
-  private int id;
-  private String storeId;
-  private String storeName;
+    private String storeId;
 
-  private String volumeId;
-  private String volumeName;
-  private String volumeWwn;
+    private String storeName;
 
-  private String volumeShare;
-  private String volumeFs;
+    private String volumeId;
 
-  private String storageDeviceId;
-  private String shareId;
-  private String shareName;
-  private String fsId;
-  private String fsName;
-  private String logicPortId;
-  private String logicPortName;
+    private String volumeName;
 
-  private String storeType;
-  private Date createTime;
-  private Date updateTime;
-  private int state;
+    private String volumeWwn;
 
-  public int getId() {
-    return id;
-  }
+    private String volumeShare;
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    private String volumeFs;
 
-  public String getStoreId() {
-    return storeId;
-  }
+    private String storageDeviceId;
 
-  public void setStoreId(String storeId) {
-    this.storeId = storeId;
-  }
+    private String shareId;
 
-  public String getStoreName() {
-    return storeName;
-  }
+    private String shareName;
 
-  public void setStoreName(String storeName) {
-    this.storeName = storeName;
-  }
+    private String fsId;
 
-  public String getVolumeId() {
-    return volumeId;
-  }
+    private String fsName;
 
-  public void setVolumeId(String volumeId) {
-    this.volumeId = volumeId;
-  }
+    private String logicPortId;
 
-  public String getVolumeName() {
-    return volumeName;
-  }
+    private String logicPortName;
 
-  public void setVolumeName(String volumeName) {
-    this.volumeName = volumeName;
-  }
+    private String storeType;
 
-  public String getVolumeWwn() {
-    return volumeWwn;
-  }
+    private Date createTime;
 
-  public void setVolumeWwn(String volumeWwn) {
-    this.volumeWwn = volumeWwn;
-  }
+    private Date updateTime;
 
-  public String getVolumeShare() {
-    return volumeShare;
-  }
+    private int state;
 
-  public void setVolumeShare(String volumeShare) {
-    this.volumeShare = volumeShare;
-  }
+    public int getId() {
+        return id;
+    }
 
-  public String getVolumeFs() {
-    return volumeFs;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  public void setVolumeFs(String volumeFs) {
-    this.volumeFs = volumeFs;
-  }
+    public String getStoreId() {
+        return storeId;
+    }
 
-  public String getShareId() {
-    return shareId;
-  }
+    public void setStoreId(String storeId) {
+        this.storeId = storeId;
+    }
 
-  public void setShareId(String shareId) {
-    this.shareId = shareId;
-  }
+    public String getStoreName() {
+        return storeName;
+    }
 
-  public String getShareName() {
-    return shareName;
-  }
+    public void setStoreName(String storeName) {
+        this.storeName = storeName;
+    }
 
-  public void setShareName(String shareName) {
-    this.shareName = shareName;
-  }
+    public String getVolumeId() {
+        return volumeId;
+    }
 
-  public String getFsId() {
-    return fsId;
-  }
+    public void setVolumeId(String volumeId) {
+        this.volumeId = volumeId;
+    }
 
-  public void setFsId(String fsId) {
-    this.fsId = fsId;
-  }
+    public String getVolumeName() {
+        return volumeName;
+    }
 
-  public String getFsName() {
-    return fsName;
-  }
+    public void setVolumeName(String volumeName) {
+        this.volumeName = volumeName;
+    }
 
-  public void setFsName(String fsName) {
-    this.fsName = fsName;
-  }
+    public String getVolumeWwn() {
+        return volumeWwn;
+    }
 
-  public String getLogicPortId() {
-    return logicPortId;
-  }
+    public void setVolumeWwn(String volumeWwn) {
+        this.volumeWwn = volumeWwn;
+    }
 
-  public void setLogicPortId(String logicPortId) {
-    this.logicPortId = logicPortId;
-  }
+    public String getVolumeShare() {
+        return volumeShare;
+    }
 
-  public String getLogicPortName() {
-    return logicPortName;
-  }
+    public void setVolumeShare(String volumeShare) {
+        this.volumeShare = volumeShare;
+    }
 
-  public void setLogicPortName(String logicPortName) {
-    this.logicPortName = logicPortName;
-  }
+    public String getVolumeFs() {
+        return volumeFs;
+    }
 
-  public String getStoreType() {
-    return storeType;
-  }
+    public void setVolumeFs(String volumeFs) {
+        this.volumeFs = volumeFs;
+    }
 
-  public void setStoreType(String storeType) {
-    this.storeType = storeType;
-  }
+    public String getShareId() {
+        return shareId;
+    }
 
-  public Date getCreateTime() {
-    return createTime;
-  }
+    public void setShareId(String shareId) {
+        this.shareId = shareId;
+    }
 
-  public void setCreateTime(Date createTime) {
-    this.createTime = createTime;
-  }
+    public String getShareName() {
+        return shareName;
+    }
 
-  public Date getUpdateTime() {
-    return updateTime;
-  }
+    public void setShareName(String shareName) {
+        this.shareName = shareName;
+    }
 
-  public void setUpdateTime(Date updateTime) {
-    this.updateTime = updateTime;
-  }
+    public String getFsId() {
+        return fsId;
+    }
 
-  public int getState() {
-    return state;
-  }
+    public void setFsId(String fsId) {
+        this.fsId = fsId;
+    }
 
-  public void setState(int state) {
-    this.state = state;
-  }
+    public String getFsName() {
+        return fsName;
+    }
 
-  public String getStorageDeviceId() {
-    return storageDeviceId;
-  }
+    public void setFsName(String fsName) {
+        this.fsName = fsName;
+    }
 
-  public void setStorageDeviceId(String storageDeviceId) {
-    this.storageDeviceId = storageDeviceId;
-  }
+    public String getLogicPortId() {
+        return logicPortId;
+    }
+
+    public void setLogicPortId(String logicPortId) {
+        this.logicPortId = logicPortId;
+    }
+
+    public String getLogicPortName() {
+        return logicPortName;
+    }
+
+    public void setLogicPortName(String logicPortName) {
+        this.logicPortName = logicPortName;
+    }
+
+    public String getStoreType() {
+        return storeType;
+    }
+
+    public void setStoreType(String storeType) {
+        this.storeType = storeType;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
+    public String getStorageDeviceId() {
+        return storageDeviceId;
+    }
+
+    public void setStorageDeviceId(String storageDeviceId) {
+        this.storageDeviceId = storageDeviceId;
+    }
 }

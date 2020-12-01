@@ -1,11 +1,13 @@
 package com.dmeplugin.dmestore.model;
 
 /**
- * @author lianq
- * @className CapabilitiesIopriority
- * @description TODO
- * @date 2020/9/29 11:26
- */
+ * xxx
+ *
+ * @author ghca
+ *
+ * @since 2020-12-01
+ *
+ **/
 public class CapabilitiesIopriority {
     /**
      * IO优先级，默认false
