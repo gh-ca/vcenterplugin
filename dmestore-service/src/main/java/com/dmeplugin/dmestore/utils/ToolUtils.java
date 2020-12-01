@@ -4,12 +4,17 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 
 /**
@@ -303,7 +308,7 @@ public class ToolUtils {
         return object;
     }
 
-    public static String getRequsetParams(String paramName,String paramValue){
+    public static String getRequsetParams(String paramName, String paramValue) {
         JsonObject condition = new JsonObject();
         JsonArray constraint = new JsonArray();
         JsonObject consObj = new JsonObject();

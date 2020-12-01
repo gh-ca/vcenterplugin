@@ -84,7 +84,6 @@ public class DmeAccessController extends BaseController {
     @ResponseBody
     public ResponseBodyBean getWorkLoads(@RequestParam("storageId") String storageId) {
         LOG.info("accessdme/getworkloads storageId==" + storageId);
-        String failureStr = "";
         try {
             List<Map<String, Object>> lists = dmeAccessService.getWorkLoads(storageId);
             return success(lists);

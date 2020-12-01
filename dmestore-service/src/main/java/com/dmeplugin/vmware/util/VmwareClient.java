@@ -14,26 +14,12 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+
 package com.dmeplugin.vmware.util;
-
-import java.lang.reflect.Method;
-import java.util.*;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.WebServiceException;
-import javax.xml.ws.handler.MessageContext;
 
 import com.vmware.pbm.PbmPortType;
 import com.vmware.pbm.PbmService;
 import com.vmware.pbm.PbmServiceInstanceContent;
-import com.vmware.vise.usersession.ServerInfo;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
-
 import com.vmware.vim25.DynamicProperty;
 import com.vmware.vim25.InvalidCollectorVersionFaultMsg;
 import com.vmware.vim25.InvalidPropertyFaultMsg;
@@ -60,6 +46,26 @@ import com.vmware.vim25.UpdateSet;
 import com.vmware.vim25.VimPortType;
 import com.vmware.vim25.VimService;
 import com.vmware.vim25.WaitOptions;
+import com.vmware.vise.usersession.ServerInfo;
+
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
+import javax.xml.ws.BindingProvider;
+import javax.xml.ws.WebServiceException;
+import javax.xml.ws.handler.MessageContext;
 
 /**
  * A wrapper class to handle Vmware vsphere connection and disconnection.
@@ -77,12 +83,14 @@ public class VmwareClient {
         }
 
         @Override
-        public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) throws java.security.cert.CertificateException {
+        public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType)
+            throws java.security.cert.CertificateException {
             return;
         }
 
         @Override
-        public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) throws java.security.cert.CertificateException {
+        public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType)
+            throws java.security.cert.CertificateException {
             return;
         }
     }
@@ -101,7 +109,7 @@ public class VmwareClient {
             vimService = new VimService();
         } catch (Exception e) {
             s_logger.info("[ignored]"
-                    + "failed to trust all certificates blindly: ", e);
+                + "failed to trust all certificates blindly: ", e);
         }
     }
 
@@ -153,7 +161,7 @@ public class VmwareClient {
         List<String> values = new ArrayList<>();
         values.add("vmware_soap_session=" + sessionCookie);
         Map<String, List<String>> reqHeadrs =
-                new HashMap<>();
+            new HashMap<>();
         reqHeadrs.put("Cookie", values);
         serviceCookie = serverInfo.sessionCookie;
 
@@ -171,7 +179,7 @@ public class VmwareClient {
         List<String> pbmvalues = new ArrayList<>();
         values.add("vcSessionCookie=" + sessionCookie);
         Map<String, List<String>> pbmreqHeadrs =
-                new HashMap<>();
+            new HashMap<>();
         pbmreqHeadrs.put("Cookie", pbmvalues);
 
         pbmctxt.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, serverInfo.serviceUrl.replace("/sdk", "/pbm"));
@@ -202,13 +210,16 @@ public class VmwareClient {
 
         ServiceContent serviceContent = vimPort.retrieveServiceContent(svcInstRef);
 
-        Map<String, List<String>> headers = (Map<String, List<String>>) ((BindingProvider) vimPort).getResponseContext().get(MessageContext.HTTP_RESPONSE_HEADERS);
+        Map<String, List<String>> headers = (Map<String, List<String>>) ((BindingProvider) vimPort).getResponseContext()
+            .get(MessageContext.HTTP_RESPONSE_HEADERS);
         List<String> cookies = headers.get("Set-cookie");
 
         vimPort.login(serviceContent.getSessionManager(), userName, password, null);
 
         if (cookies == null) {
-            Map<String, List<String>> responseHeaders = (Map<String, List<String>>) ((BindingProvider) vimPort).getResponseContext().get(MessageContext.HTTP_RESPONSE_HEADERS);
+            Map<String, List<String>> responseHeaders =
+                (Map<String, List<String>>) ((BindingProvider) vimPort).getResponseContext()
+                    .get(MessageContext.HTTP_RESPONSE_HEADERS);
             cookies = responseHeaders.get("Set-cookie");
             if (cookies == null) {
                 String msg = "Login successful, but failed to get server cookies from url :[" + url + "]";
@@ -320,44 +331,6 @@ public class VmwareClient {
         return getServiceContent().getRootFolder();
     }
 
-    public boolean validate() {
-        //
-        // There is no official API to validate an open vCenter API session. This is hacking way to tell if
-        // an open vCenter API session is still valid for making calls.
-        //
-        // It will give false result if there really does not exist data-center in the inventory, however, I consider
-        // this really is not possible in production deployment
-        //
-
-        // Create PropertySpecs
-        PropertySpec pSpec = new PropertySpec();
-        pSpec.setType("Datacenter");
-        pSpec.setAll(false);
-        pSpec.getPathSet().add("name");
-
-        ObjectSpec oSpec = new ObjectSpec();
-        oSpec.setObj(getRootFolder());
-        oSpec.setSkip(false);
-        oSpec.getSelectSet().addAll(constructCompleteTraversalSpec());
-
-        PropertyFilterSpec spec = new PropertyFilterSpec();
-        spec.getPropSet().add(pSpec);
-        spec.getObjectSet().add(oSpec);
-        List<PropertyFilterSpec> specArr = new ArrayList<PropertyFilterSpec>();
-        specArr.add(spec);
-
-        try {
-            List<ObjectContent> ocary = vimPort.retrieveProperties(getPropCol(), specArr);
-            if (ocary != null && ocary.size() > 0) {
-                return true;
-            }
-        } catch (Exception e) {
-            return false;
-        }
-
-        return false;
-    }
-
     /**
      * Get the property value of a managed object.
      *
@@ -388,7 +361,9 @@ public class VmwareClient {
                 Class dpCls = propertyValue.getClass();
                 String dynamicPropertyName = dpCls.getName();
                 if (dynamicPropertyName.indexOf("ArrayOf") != -1) {
-                    String methodName = "get" + dynamicPropertyName.substring(dynamicPropertyName.indexOf("ArrayOf") + "ArrayOf".length(), dynamicPropertyName.length());
+                    String methodName = "get" + dynamicPropertyName
+                        .substring(dynamicPropertyName.indexOf("ArrayOf") + "ArrayOf".length(),
+                            dynamicPropertyName.length());
 
                     Method getMorMethod = dpCls.getDeclaredMethod(methodName, null);
                     propertyValue = getMorMethod.invoke(propertyValue, (Object[]) null);
@@ -398,7 +373,8 @@ public class VmwareClient {
         return (T) propertyValue;
     }
 
-    private List<ObjectContent> retrieveMoRefProperties(ManagedObjectReference mObj, List<String> props) throws Exception {
+    private List<ObjectContent> retrieveMoRefProperties(ManagedObjectReference mObj, List<String> props)
+        throws Exception {
         PropertySpec pSpec = new PropertySpec();
         pSpec.setAll(false);
         pSpec.setType(mObj.getType());
@@ -426,13 +402,15 @@ public class VmwareClient {
      * @throws RuntimeFaultFaultMsg
      * @throws InvalidPropertyFaultMsg
      */
-    public boolean waitForTask(ManagedObjectReference task) throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg, InvalidCollectorVersionFaultMsg, Exception {
+    public boolean waitForTask(ManagedObjectReference task)
+        throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg, InvalidCollectorVersionFaultMsg, Exception {
 
         boolean retVal = false;
 
         try {
             // info has a property - state for state of the task
-            Object[] result = waitForValues(task, new String[]{"info.state", "info.error"}, new String[]{"state"}, new Object[][]{new Object[]{
+            Object[] result = waitForValues(task, new String[] {"info.state", "info.error"}, new String[] {"state"},
+                new Object[][] {new Object[] {
                     TaskInfoState.SUCCESS, TaskInfoState.ERROR}});
             //result for 2 properties: info.state, info.error
             if (result != null && result.length == 2) {
@@ -448,7 +426,8 @@ public class VmwareClient {
 
             TaskInfo taskInfo = (TaskInfo) getDynamicProperty(task, "info");
             if (!taskInfo.isCancelable()) {
-                s_logger.warn("vCenter task: " + taskInfo.getName() + "(" + taskInfo.getKey() + ")" + " will continue to run on vCenter because the task cannot be cancelled");
+                s_logger.warn("vCenter task: " + taskInfo.getName() + "(" + taskInfo.getKey() + ")" +
+                    " will continue to run on vCenter because the task cannot be cancelled");
                 throw new RuntimeException(we.getLocalizedMessage());
             }
 
@@ -456,19 +435,22 @@ public class VmwareClient {
             getService().cancelTask(task);
 
             // Since task cancellation is asynchronous, wait for the task to be cancelled
-            Object[] result = waitForValues(task, new String[]{"info.state", "info.error"}, new String[]{"state"},
-                    new Object[][]{new Object[]{TaskInfoState.SUCCESS, TaskInfoState.ERROR}});
+            Object[] result = waitForValues(task, new String[] {"info.state", "info.error"}, new String[] {"state"},
+                new Object[][] {new Object[] {TaskInfoState.SUCCESS, TaskInfoState.ERROR}});
             //result for 2 properties: info.state, info.error
             if (result != null && result.length == 2) {
                 if (result[0].equals(TaskInfoState.SUCCESS)) {
-                    s_logger.warn("Failed to cancel vCenter task: " + taskInfo.getName() + "(" + taskInfo.getKey() + ")" + " and the task successfully completed");
+                    s_logger.warn(
+                        "Failed to cancel vCenter task: " + taskInfo.getName() + "(" + taskInfo.getKey() + ")" +
+                            " and the task successfully completed");
                     retVal = true;
                 }
 
                 if (result[1] instanceof LocalizedMethodFault) {
                     MethodFault fault = ((LocalizedMethodFault) result[1]).getFault();
                     if (fault instanceof RequestCanceled) {
-                        s_logger.debug("vCenter task " + taskInfo.getName() + "(" + taskInfo.getKey() + ")" + " was successfully cancelled");
+                        s_logger.debug("vCenter task " + taskInfo.getName() + "(" + taskInfo.getKey() + ")" +
+                            " was successfully cancelled");
                         throw new RuntimeException(we.getLocalizedMessage());
                     }
                 } else {
@@ -493,8 +475,10 @@ public class VmwareClient {
      * @throws InvalidPropertyFaultMsg
      * @throws InvalidCollectorVersionFaultMsg
      */
-    private synchronized Object[] waitForValues(ManagedObjectReference objmor, String[] filterProps, String[] endWaitProps, Object[][] expectedVals) throws InvalidPropertyFaultMsg,
-            RuntimeFaultFaultMsg, InvalidCollectorVersionFaultMsg {
+    private synchronized Object[] waitForValues(ManagedObjectReference objmor, String[] filterProps,
+                                                String[] endWaitProps, Object[][] expectedVals)
+        throws InvalidPropertyFaultMsg,
+        RuntimeFaultFaultMsg, InvalidCollectorVersionFaultMsg {
         // version string is initially null
         String version = "";
         Object[] endVals = new Object[endWaitProps.length];
@@ -534,7 +518,8 @@ public class VmwareClient {
             for (PropertyFilterUpdate filtup : filtupary) {
                 objupary = filtup.getObjectSet();
                 for (ObjectUpdate objup : objupary) {
-                    if (objup.getKind() == ObjectUpdateKind.MODIFY || objup.getKind() == ObjectUpdateKind.ENTER || objup.getKind() == ObjectUpdateKind.LEAVE) {
+                    if (objup.getKind() == ObjectUpdateKind.MODIFY || objup.getKind() == ObjectUpdateKind.ENTER ||
+                        objup.getKind() == ObjectUpdateKind.LEAVE) {
                         propchgary = objup.getChangeSet();
                         for (PropertyChange propchg : propchgary) {
                             updateValues(endWaitProps, endVals, propchg);
@@ -573,7 +558,7 @@ public class VmwareClient {
 
         Object[] retVal = filterVals;
         if (stateVal != null && "success".equalsIgnoreCase(stateVal)) {
-            retVal = new Object[]{TaskInfoState.SUCCESS, null};
+            retVal = new Object[] {TaskInfoState.SUCCESS, null};
         }
 
         return retVal;
@@ -712,7 +697,8 @@ public class VmwareClient {
      * @param name name to match
      * @return First ManagedObjectReference of the type / name pair found
      */
-    public ManagedObjectReference getDecendentMoRef(ManagedObjectReference root, String type, String name) throws Exception {
+    public ManagedObjectReference getDecendentMoRef(ManagedObjectReference root, String type, String name)
+        throws Exception {
         if (name == null || name.length() == 0) {
             return null;
         }
@@ -756,10 +742,14 @@ public class VmwareClient {
                 }
             }
         } catch (InvalidPropertyFaultMsg invalidPropertyException) {
-            s_logger.debug("Failed to get Vmware ManagedObjectReference for name: " + name + " and type: " + type + " due to " + invalidPropertyException.getMessage());
+            s_logger.debug(
+                "Failed to get Vmware ManagedObjectReference for name: " + name + " and type: " + type + " due to " +
+                    invalidPropertyException.getMessage());
             throw invalidPropertyException;
         } catch (RuntimeFaultFaultMsg runtimeFaultException) {
-            s_logger.debug("Failed to get Vmware ManagedObjectReference for name: " + name + " and type: " + type + " due to " + runtimeFaultException.getMessage());
+            s_logger.debug(
+                "Failed to get Vmware ManagedObjectReference for name: " + name + " and type: " + type + " due to " +
+                    runtimeFaultException.getMessage());
             throw runtimeFaultException;
         }
 

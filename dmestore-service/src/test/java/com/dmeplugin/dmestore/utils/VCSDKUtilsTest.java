@@ -118,7 +118,6 @@ public class VCSDKUtilsTest {
     @Mock
     private VirtualMachineMOFactory virtualMachineMOFactory;
     private Gson gson = new Gson();
-    private PbmUtil pbmUtil;
     private static VmodlContext context;
 
     @InjectMocks
@@ -598,7 +597,6 @@ public class VCSDKUtilsTest {
         when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getHostDatastoreSystemMo()).thenReturn(hostDatastoreSystemMO);
         when(vcConnectionHelper.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
-
         vcsdkUtils.createNfsDatastore("321","321","321","321",list,"321","321");
     }
 

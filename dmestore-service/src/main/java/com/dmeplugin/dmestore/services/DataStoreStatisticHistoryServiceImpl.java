@@ -41,19 +41,6 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     @Autowired
     private DmeRelationInstanceService dmeRelationInstanceService;
 
-    //性能指标 id和name的映射关系
-    private static Map<String, String> indicatorNameIdMap = new HashMap<>();
-
-    private static Map<String, String> indicatorIdNameMap = new HashMap<>();
-
-    //资源对象类型 id和name的映射关系
-    private static Map<String, String> objtypeIdNampMap = new HashMap<>();
-
-    private static Map<String, String> objtypeNameIdMap = new HashMap<>();
-
-    //资源对象类型支持指标 对象类型id和指标id集合关系
-    private static Map<String, List<String>> objTypeCountersMap = new HashMap<>();
-
     @Override
     public Map<String, Object> queryVmfsStatistic(Map<String, Object> params) throws DMEException {
         //通过存储ID查卷ID 实际获取卷的性能数据
@@ -1053,16 +1040,8 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
         return objGroup;
     }
 
-    public DmeAccessService getDmeAccessService() {
-        return dmeAccessService;
-    }
-
     public void setDmeAccessService(DmeAccessService dmeAccessService) {
         this.dmeAccessService = dmeAccessService;
-    }
-
-    public DmeRelationInstanceService getDmeRelationInstanceService() {
-        return dmeRelationInstanceService;
     }
 
     public void setDmeRelationInstanceService(DmeRelationInstanceService dmeRelationInstanceService) {

@@ -32,19 +32,19 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
-
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 
 /**
  * @author lianq
@@ -246,7 +246,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         String replace = storageId.replace("-", "");
         String className = "SYS_StoragePool";
         List<StoragePool> resList = new ArrayList<>();
-        String url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + "?condition={json}" + "&&pageSize=1000";
+        String url =
+            String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + "?condition={json}" + "&&pageSize=1000";
         String params = ToolUtils.getRequsetParams("storageDeviceId", replace);
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
@@ -602,7 +603,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         String replace = storageDeviceId.replace("-", "");
         String className = "SYS_Controller";
         List<StorageControllers> resList = new ArrayList<>();
-        String url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + "?condition={json}" + "&&pageSize=1000";
+        String url =
+            String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + "?condition={json}" + "&&pageSize=1000";
         String params = ToolUtils.getRequsetParams("storageDeviceId", replace);
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
@@ -659,7 +661,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         String replace = storageDeviceId.replace("-", "");
         String className = "SYS_StorageDisk";
         List<StorageDisk> resList = new ArrayList<>();
-        String url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + "?condition={json} " + "&&pageSize=1000";
+        String url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + "?condition={json} " +
+            "&&pageSize=1000";
         String params = ToolUtils.getRequsetParams("storageDeviceId", replace);
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
@@ -931,7 +934,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
         List<StoragePort> storagePorts = new ArrayList<>(10);
         String className = "SYS_StoragePort";
-        String url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + "?condition={json}" + "&&pageSize=1000";
+        String url =
+            String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + "?condition={json}" + "&&pageSize=1000";
         String params = ToolUtils.getRequsetParams("storageDeviceId", replace);
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
@@ -1095,7 +1099,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         String replace = storageDeviceId.replace("-", "");
         String result = "";
         String className = "SYS_StorageDisk";
-        String url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + "?condition={json}" + "&&pageSize=1000";
+        String url =
+            String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + "?condition={json}" + "&&pageSize=1000";
         String params = ToolUtils.getRequsetParams("storageDeviceId", replace);
         ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
         int code = responseEntity.getStatusCodeValue();
@@ -1443,7 +1448,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         Map<String, Object> map = new HashMap<>(16);
         String url = DmeConstants.LIST_RELATION_URL.replace("{relationName}", "M_DjTierContainsStoragePool");
         try {
-            ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.GET,null);
+            ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 JsonObject vjson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 if (null != vjson && !vjson.isJsonNull()) {
@@ -1482,7 +1487,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
      **/
     public Map<String, Object> getDjtier() throws DMEException {
         Map<String, Object> map = new HashMap<>(16);
-        String getDjtierUrl =  String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, "SYS_DjTier");
+        String getDjtierUrl = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, "SYS_DjTier");
         try {
             LOG.info("getDjtierUrl===" + getDjtierUrl);
             ResponseEntity responseEntity = dmeAccessService.access(getDjtierUrl, HttpMethod.GET, null);
@@ -1543,7 +1548,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
         String className = "SYS_StoragePool";
         String poolName = "";
-        String url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + "?condition={json}" + "&&pageSize=1000";
+        String url =
+            String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + "?condition={json}" + "&&pageSize=1000";
         String params = ToolUtils.getRequsetParams("poolId", poolRawId);
         ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
@@ -1561,7 +1567,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     private DiskPool getDiskPoolByPoolId(String poolId) throws DMEException {
         String className = "SYS_DiskPool";
-        String url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + "?condition={json}" + "pageSize=1000";
+        String url =
+            String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + "?condition={json}" + "pageSize=1000";
         String params = ToolUtils.getRequsetParams("poolId", poolId);
         DiskPool retdiskPool = new DiskPool();
         ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);

@@ -21,7 +21,6 @@ import static org.junit.Assert.*;
 public class DmeRelationInstanceControllerTest {
 
     private DmeRelationInstanceController dmeRelationInstanceController;
-    DmeRelationInstanceService dmeRelationInstanceService = new DmeRelationInstanceServiceImpl();
     private MockMvc mockMvc;
 
     @Before

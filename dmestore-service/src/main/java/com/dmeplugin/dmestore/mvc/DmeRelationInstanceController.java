@@ -29,8 +29,6 @@ public class DmeRelationInstanceController extends BaseController {
     @ResponseBody
     public ResponseBodyBean queryByRelationName(@RequestParam(name = "relationName") String relationName) {
         LOG.info("listbyrelationname:" + relationName);
-
-        List<RelationInstance> ris = null;
         try {
             return success(dmeRelationInstanceService.queryRelationByRelationName(relationName));
         } catch (Exception e) {

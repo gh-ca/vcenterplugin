@@ -458,7 +458,6 @@ public class VCSDKUtils {
                             }
                         }
                     }
-                    String value = cl.first().getValue();
                     if (isMount && (null == inludeclustermap || null != inludeclustermap.get(cl.first().getValue()))) {
                         Map<String, String> map = new HashMap<>();
                         String objectId =
@@ -571,7 +570,6 @@ public class VCSDKUtils {
                 for (Pair<ManagedObjectReference, String> ds : dss) {
                     //DatastoreMO dsmo = new DatastoreMO(vmwareContext, ds.first());
                     DatastoreMO dsmo = datastoreMOFactory.build(vmwareContext, ds.first());
-                    String type = dsmo.getSummary().getType();
                     if (dsmo != null && dataStoreType.equals(dsmo.getSummary().getType())) {
                         List<DatastoreHostMount> dhms = dsmo.getHostMounts();
                         if (dhms != null && dhms.size() > 0) {
@@ -624,7 +622,6 @@ public class VCSDKUtils {
             ManagedObjectReference objmor = vcConnectionHelper.objectId2Mor(clusterObjectId);
             //ClusterMO clusterMo = new ClusterMO(vmwareContext, objmor);
             ClusterMO clusterMo = clusterMOFactory.build(vmwareContext, objmor);
-            String objHostId = null;
             if (clusterMo != null) {
                 List<Pair<ManagedObjectReference, String>> hosts = clusterMo.getClusterHosts();
                 if (hosts != null && hosts.size() > 0) {
@@ -650,7 +647,6 @@ public class VCSDKUtils {
                             List<String> dsHostIds = new ArrayList<>();
                             for (DatastoreHostMount dhm : dhms) {
                                 if (dhm != null) {
-                                    String value = dhm.getKey().getValue();
                                     if (dhm.getMountInfo().isMounted()) {
                                         dsHostIds.add(dhm.getKey().getValue());
                                     }
@@ -709,7 +705,6 @@ public class VCSDKUtils {
             ManagedObjectReference objmor = vcConnectionHelper.objectId2Mor(clusterObjectId);
             //ClusterMO clusterMo = new ClusterMO(vmwareContext, objmor);
             ClusterMO clusterMo = clusterMOFactory.build(vmwareContext, objmor);
-            String objHostId = null;
             if (clusterMo != null) {
                 List<Pair<ManagedObjectReference, String>> hosts = clusterMo.getClusterHosts();
                 if (hosts != null && hosts.size() > 0) {
@@ -961,7 +956,6 @@ public class VCSDKUtils {
                             for (DatastoreHostMount datastoreHostMount : hostMountInfos) {
                                 //HostMO hostmo = new HostMO(vmwareContext, datastoreHostMount.getKey());
                                 HostMO hostmo = hostMOFactory.build(vmwareContext, datastoreHostMount.getKey());
-                                HostStorageSystemMO hostStorageSystemMo = hostmo.getHostStorageSystemMo();
                                 hostmo.getHostStorageSystemMo().refreshStorageSystem();
                             }
                             Thread.sleep(2000);
@@ -1396,12 +1390,8 @@ public class VCSDKUtils {
                             //DatastoreMO dsMo = new DatastoreMO(hostMo.getContext(), datastore);
                             DatastoreMO dsMo = datastoreMOFactory.build(hostMo.getContext(), datastore);
                             Map<String, Object> dataStoremap = new HashMap<>();
-                            VmwareContext context = dsMo.getContext();
-                            String serverAddress = dsMo.getContext().getServerAddress();
-                            ManagedObjectReference mor = dsMo.getMor();
                             String objectId =
                                 vcConnectionHelper.mor2ObjectId(dsMo.getMor(), dsMo.getContext().getServerAddress());
-                            String name = dsMo.getName();
                             dataStoremap.put("name", dsMo.getName());
                             dataStoremap.put("id", dsMo.getMor().getValue());
                             dataStoremap.put("objectId", objectId);
@@ -1497,12 +1487,10 @@ public class VCSDKUtils {
                 RootFsMO rootFsMo = rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder());
                 List<Pair<ManagedObjectReference, String>> hosts = rootFsMo.getAllHostOnRootFs();
                 if (hosts != null && hosts.size() > 0) {
-                    List<Map<String, String>> lists = new ArrayList<>();
                     for (Pair<ManagedObjectReference, String> host : hosts) {
                         //HostMO host1 = new HostMO(vmwareContext, host.first());
                         HostMO host1 = hostMOFactory.build(vmwareContext, host.first());
                         HostDatastoreSystemMO hdsMo = host1.getHostDatastoreSystemMo();
-                        ManagedObjectReference datastore = hdsMo.findDatastore(name);
                         if (null != hdsMo.findDatastore(name)) {
                             deleteFlag = hdsMo.deleteDatastore(name);
                             break;
@@ -1890,8 +1878,6 @@ public class VCSDKUtils {
             String serverguid = vcConnectionHelper.objectId2Serverguid(dataStoreObjectId);
             VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
 
-            //RootFsMO rootFsMo = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
-            RootFsMO rootFsMo = rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder());
             ManagedObjectReference dsmor = vcConnectionHelper.objectId2Mor(dataStoreObjectId);
             //DatastoreMO dsmo = new DatastoreMO(vmwareContext, dsmor);
             DatastoreMO dsmo = datastoreMOFactory.build(vmwareContext, dsmor);
@@ -2103,7 +2089,6 @@ public class VCSDKUtils {
         List<String> categorylist = taggingWorkflow.listTagCategory();
         for (String category : categorylist) {
             CategoryModel categoryModel = taggingWorkflow.getTagCategory(category);
-            String name = categoryModel.getName();
             if (categoryModel.getName().equalsIgnoreCase(CATEGORY_NAME)) {
                 categoryid = categoryModel.getId();
             }
@@ -2210,7 +2195,7 @@ public class VCSDKUtils {
         spec.setConstraints(constraints);
 
         // Step 7: Create Storage Profile
-        PbmProfileId profile = vmwareContext.getPbmService().pbmCreate(profileMgr, spec);
+        vmwareContext.getPbmService().pbmCreate(profileMgr, spec);
     }
 
     public void createTag(String tagName, SessionHelper sessionHelper) {
@@ -2414,9 +2399,6 @@ public class VCSDKUtils {
         String serverguid = vcConnectionHelper.objectId2Serverguid(dataStoreObjectId);
         try {
             VmwareContext vmwareContext = vcConnectionHelper.getServerContext(serverguid);
-
-            //RootFsMO rootFsMo = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
-            RootFsMO rootFsMo = rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder());
             //存储下的所有主机
             ManagedObjectReference dsmor = vcConnectionHelper.objectId2Mor(dataStoreObjectId);
             //DatastoreMO dsmo = new DatastoreMO(vmwareContext, dsmor);
@@ -2536,7 +2518,6 @@ public class VCSDKUtils {
             //HostMO hostmo = new HostMO(vmwareContext, objmor);
             HostMO hostmo = hostMOFactory.build(vmwareContext, objmor);
             //查找对应的iscsi适配器
-            String iscsiHbaDevice = null;
             List<HostHostBusAdapter> hbas = hostmo.getHostStorageSystemMo().getStorageDeviceInfo().getHostBusAdapter();
             for (HostHostBusAdapter hba : hbas) {
                 if (hba instanceof HostInternetScsiHba) {
@@ -2575,7 +2556,6 @@ public class VCSDKUtils {
             //HostMO hostmo = new HostMO(vmwareContext, objmor);
             HostMO hostmo = hostMOFactory.build(vmwareContext, objmor);
             //查找对应的iscsi适配器
-            String iscsiHbaDevice = null;
             List<HostHostBusAdapter> hbas = hostmo.getHostStorageSystemMo().getStorageDeviceInfo().getHostBusAdapter();
             for (HostHostBusAdapter hba : hbas) {
                 if (hba instanceof HostInternetScsiHba) {
@@ -2619,7 +2599,6 @@ public class VCSDKUtils {
             List<Pair<ManagedObjectReference, String>> hosts = objmo.getClusterHosts();
 
             if (hosts != null && hosts.size() > 0) {
-                List<Map<String, String>> lists = new ArrayList<>();
                 for (Pair<ManagedObjectReference, String> host : hosts) {
 
                     List<Map<String, Object>> subhbalist = new ArrayList<>();
@@ -2704,7 +2683,6 @@ public class VCSDKUtils {
             svcRef.setType("ServiceInstance");
             svcRef.setValue("ServiceInstance");
             ServiceInstance instance = vmomiClient.createStub(ServiceInstance.class, svcRef);
-            String s = gson.toJson(instance);
             ServiceInstanceContent serviceInstanceContent = instance.retrieveContent();
 
             sessionManager = vmomiClient.createStub(SessionManager.class,

@@ -211,33 +211,4 @@ public class BestPracticeProcessServiceImplTest {
         when(hostVmfsVolume.getExtent()).thenReturn(extentList);
         doNothing().when(hostVmfsVolume).setUnmapPriority(anyString());
     }
-
-    @Test
-    public void testUpdate() throws Exception {
-        vCenterInit();
-        String objectId = "123";
-        List<Map<String, String>> lists = new ArrayList<>();
-        Map<String, String> map = new HashMap<>();
-        map.put(objectId, "hostName");
-        lists.add(map);
-        when(vcsdkUtils.findHostById(objectId)).thenReturn(gson.toJson(lists));
-        when(vcsdkUtils.getAllHosts()).thenReturn(gson.toJson(lists));
-        List<String> objectIds = new ArrayList<>();
-        objectIds.add(objectId);
-        when(bestPracticeCheckDao.getByHostIds(objectIds)).thenReturn(map);
-        //bestPracticeProcessService.update(objectIds);
-        when(bestPracticeCheckDao.getAllHostIds(0, 100)).thenReturn(map);
-        //bestPracticeProcessService.update(null, null);
-
-        String clusterobjectid = "1212";
-        List<Map<String, String>> vmwarehostlists = new ArrayList<>();
-        Map<String, String> map1 = new HashMap<>();
-        map1.put("hostId", objectId);
-        vmwarehostlists.add(map1);
-        String vmwarehosts = gson.toJson(vmwarehostlists);
-        when(vcsdkUtils.getHostsOnCluster(clusterobjectid)).thenReturn(vmwarehosts);
-        bestPracticeProcessService.updateByCluster(clusterobjectid);
-    }
-
-
 }
