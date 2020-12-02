@@ -32,9 +32,13 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
-    private static final Logger s_logger = LoggerFactory.getLogger(ClusterMO.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ClusterMO.class);
 
     private static final String VIRTUAL_MACHINE = "VirtualMachine";
+
+    private static final String HOST_PROPERTY = "host";
+
+    private static final String CLUSTERCOMPUTERESOURCE_TYPE = "ClusterComputeResource";
 
     private ManagedObjectReference environmentBrowser = null;
 
@@ -67,7 +71,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public boolean isHaEnabled() throws Exception {
         ClusterDasConfigInfo dasConfig = getDasConfig();
-        if (dasConfig != null && dasConfig.isEnabled() != null && dasConfig.isEnabled().booleanValue()) {
+        if (dasConfig != null && dasConfig.isEnabled() != null && dasConfig.isEnabled()) {
             return true;
         }
 
@@ -113,8 +117,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
 
         ManagedObjectReference vmMor = vmMo.getMor();
         if (vmMor == null || !VIRTUAL_MACHINE.equals(vmMor.getType())) {
-            s_logger.debug(
-                "Failed to set restart priority for VM: " + vmMo.getName() + ", invalid VM object reference");
+            LOGGER.debug("Failed to set restart priority for VM: " + vmMo.getName() + ", invalid VM object reference");
             return;
         }
 
@@ -148,7 +151,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         if (result) {
             context.waitForTaskProgressDone(morTask);
         } else {
-            s_logger.error(
+            LOGGER.error(
                 "Set restart priority failed for VM: " + vmMo.getName() + " due to " + TaskMO.getTaskFailureInfo(
                     context, morTask));
         }
@@ -157,7 +160,6 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public ManagedObjectReference getHyperHostDatacenter() throws Exception {
         Pair<DatacenterMO, String> dcPair = DatacenterMO.getOwnerDatacenter(getContext(), getMor());
-        assert (dcPair != null);
         return dcPair.first().getMor();
     }
 
@@ -167,14 +169,14 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     }
 
     @Override
-    public ManagedObjectReference getHyperHostCluster() throws Exception {
+    public ManagedObjectReference getHyperHostCluster() {
         return mor;
     }
 
     @Override
     public synchronized List<VirtualMachineMO> listVmsOnHyperHost(String vmName) throws Exception {
         List<VirtualMachineMO> vms = new ArrayList<>();
-        List<ManagedObjectReference> hosts = context.getVimClient().getDynamicProperty(mor, "host");
+        List<ManagedObjectReference> hosts = context.getVimClient().getDynamicProperty(mor, HOST_PROPERTY);
         if (hosts != null && hosts.size() > 0) {
             for (ManagedObjectReference morHost : hosts) {
                 HostMO hostMo = hostFactory.build(context, morHost);
@@ -194,9 +196,9 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
 
     @Override
     public ObjectContent[] getVmPropertiesOnHyperHost(String[] propertyPaths) throws Exception {
-        PropertySpec pSpec = new PropertySpec();
-        pSpec.setType(VIRTUAL_MACHINE);
-        pSpec.getPathSet().addAll(Arrays.asList(propertyPaths));
+        PropertySpec pspec = new PropertySpec();
+        pspec.setType(VIRTUAL_MACHINE);
+        pspec.getPathSet().addAll(Arrays.asList(propertyPaths));
 
         TraversalSpec host2VmFolderTraversal = new TraversalSpec();
         host2VmFolderTraversal.setType("HostSystem");
@@ -204,19 +206,19 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         host2VmFolderTraversal.setName("host2VmFolderTraversal");
 
         TraversalSpec cluster2HostFolderTraversal = new TraversalSpec();
-        cluster2HostFolderTraversal.setType("ClusterComputeResource");
-        cluster2HostFolderTraversal.setPath("host");
+        cluster2HostFolderTraversal.setType(CLUSTERCOMPUTERESOURCE_TYPE);
+        cluster2HostFolderTraversal.setPath(HOST_PROPERTY);
         cluster2HostFolderTraversal.setName("cluster2HostFolderTraversal");
         cluster2HostFolderTraversal.getSelectSet().add(host2VmFolderTraversal);
 
-        ObjectSpec oSpec = new ObjectSpec();
-        oSpec.setObj(getMor());
-        oSpec.setSkip(Boolean.TRUE);
-        oSpec.getSelectSet().add(cluster2HostFolderTraversal);
+        ObjectSpec ospec = new ObjectSpec();
+        ospec.setObj(getMor());
+        ospec.setSkip(true);
+        ospec.getSelectSet().add(cluster2HostFolderTraversal);
 
         PropertyFilterSpec pfSpec = new PropertyFilterSpec();
-        pfSpec.getPropSet().add(pSpec);
-        pfSpec.getObjectSet().add(oSpec);
+        pfSpec.getPropSet().add(pspec);
+        pfSpec.getObjectSet().add(ospec);
         List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
         pfSpecArr.add(pfSpec);
 
@@ -227,24 +229,24 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
 
     @Override
     public ObjectContent[] getDatastorePropertiesOnHyperHost(String[] propertyPaths) throws Exception {
-        PropertySpec pSpec = new PropertySpec();
-        pSpec.setType("Datastore");
-        pSpec.getPathSet().addAll(Arrays.asList(propertyPaths));
+        PropertySpec pspec = new PropertySpec();
+        pspec.setType("Datastore");
+        pspec.getPathSet().addAll(Arrays.asList(propertyPaths));
 
         TraversalSpec cluster2DatastoreTraversal = new TraversalSpec();
-        cluster2DatastoreTraversal.setType("ClusterComputeResource");
+        cluster2DatastoreTraversal.setType(CLUSTERCOMPUTERESOURCE_TYPE);
         cluster2DatastoreTraversal.setPath("datastore");
         cluster2DatastoreTraversal.setName("cluster2DatastoreTraversal");
 
-        ObjectSpec oSpec = new ObjectSpec();
-        oSpec.setObj(mor);
-        oSpec.setSkip(Boolean.TRUE);
-        oSpec.getSelectSet().add(cluster2DatastoreTraversal);
+        ObjectSpec ospec = new ObjectSpec();
+        ospec.setObj(mor);
+        ospec.setSkip(Boolean.TRUE);
+        ospec.getSelectSet().add(cluster2DatastoreTraversal);
 
         PropertyFilterSpec pfSpec = new PropertyFilterSpec();
-        pfSpec.getPropSet().add(pSpec);
-        pfSpec.getObjectSet().add(oSpec);
-        List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
+        pfSpec.getPropSet().add(pspec);
+        pfSpec.getObjectSet().add(ospec);
+        List<PropertyFilterSpec> pfSpecArr = new ArrayList<>();
         pfSpecArr.add(pfSpec);
 
         List<ObjectContent> properties = context.getService()
@@ -254,25 +256,25 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     }
 
     public ObjectContent[] getHostPropertiesOnCluster(String[] propertyPaths) throws Exception {
-        PropertySpec pSpec = new PropertySpec();
-        pSpec.setType("HostSystem");
-        pSpec.getPathSet().addAll(Arrays.asList(propertyPaths));
+        PropertySpec pspec = new PropertySpec();
+        pspec.setType("HostSystem");
+        pspec.getPathSet().addAll(Arrays.asList(propertyPaths));
 
         TraversalSpec cluster2HostTraversal = new TraversalSpec();
-        cluster2HostTraversal.setType("ClusterComputeResource");
-        cluster2HostTraversal.setPath("host");
+        cluster2HostTraversal.setType(CLUSTERCOMPUTERESOURCE_TYPE);
+        cluster2HostTraversal.setPath(HOST_PROPERTY);
         cluster2HostTraversal.setName("cluster2HostTraversal");
 
-        ObjectSpec oSpec = new ObjectSpec();
-        oSpec.setObj(mor);
-        oSpec.setSkip(Boolean.TRUE);
-        oSpec.getSelectSet().add(cluster2HostTraversal);
+        ObjectSpec ospec = new ObjectSpec();
+        ospec.setObj(mor);
+        ospec.setSkip(Boolean.TRUE);
+        ospec.getSelectSet().add(cluster2HostTraversal);
 
         PropertyFilterSpec pfSpec = new PropertyFilterSpec();
-        pfSpec.getPropSet().add(pSpec);
-        pfSpec.getObjectSet().add(oSpec);
+        pfSpec.getPropSet().add(pspec);
+        pfSpec.getObjectSet().add(ospec);
 
-        List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
+        List<PropertyFilterSpec> pfSpecArr = new ArrayList<>();
         pfSpecArr.add(pfSpec);
 
         List<ObjectContent> properties = context.getService()
@@ -285,7 +287,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         String poolPath, String poolUuid) throws Exception {
         ManagedObjectReference morDs = null;
         ManagedObjectReference morDsFirst = null;
-        List<ManagedObjectReference> hosts = context.getVimClient().getDynamicProperty(mor, "host");
+        List<ManagedObjectReference> hosts = context.getVimClient().getDynamicProperty(mor, HOST_PROPERTY);
         if (hosts != null && hosts.size() > 0) {
             for (ManagedObjectReference morHost : hosts) {
                 HostMO hostMo = new HostMO(context, morHost);
@@ -294,22 +296,14 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
                     morDsFirst = morDs;
                 }
 
-                assert (morDsFirst.getValue().equals(morDs.getValue()));
+                assert morDsFirst.getValue().equals(morDs.getValue());
             }
         }
 
         if (morDs == null) {
             String msg = "Failed to mount datastore in all hosts within the cluster";
-            s_logger.error(msg);
-
-            if (s_logger.isTraceEnabled()) {
-                s_logger.trace("vCenter API trace - mountDatastore() done(failed)");
-            }
+            LOGGER.error(msg);
             throw new Exception(msg);
-        }
-
-        if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - mountDatastore() done(successfully)");
         }
 
         return morDs;
@@ -317,7 +311,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
 
     @Override
     public void unmountDatastore(String poolUuid) throws Exception {
-        List<ManagedObjectReference> hosts = context.getVimClient().getDynamicProperty(mor, "host");
+        List<ManagedObjectReference> hosts = context.getVimClient().getDynamicProperty(mor, HOST_PROPERTY);
         if (hosts != null && hosts.size() > 0) {
             for (ManagedObjectReference morHost : hosts) {
                 HostMO hostMo = new HostMO(context, morHost);
@@ -329,17 +323,15 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public VmwareHypervisorHostNetworkSummary getHyperHostNetworkSummary(String esxServiceConsolePort)
         throws Exception {
-        List<ManagedObjectReference> hosts = context.getVimClient().getDynamicProperty(mor, "host");
+        List<ManagedObjectReference> hosts = context.getVimClient().getDynamicProperty(mor, HOST_PROPERTY);
         if (hosts != null && hosts.size() > 0) {
-            VmwareHypervisorHostNetworkSummary summary = new HostMO(context, hosts.get(0)).getHyperHostNetworkSummary(
-                esxServiceConsolePort);
-            return summary;
+            return new HostMO(context, hosts.get(0)).getHyperHostNetworkSummary(esxServiceConsolePort);
         }
         return null;
     }
 
     public List<Pair<ManagedObjectReference, String>> getClusterHosts() throws Exception {
-        List<Pair<ManagedObjectReference, String>> hosts = new ArrayList<Pair<ManagedObjectReference, String>>();
+        List<Pair<ManagedObjectReference, String>> hosts = new ArrayList<>();
 
         ObjectContent[] ocs = getHostPropertiesOnCluster(new String[] {"name"});
         if (ocs != null) {
@@ -379,7 +371,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         } else {
             String msg = "Unable to retrieve recommended disk controller for guest OS : " + guestOsId + " in cluster "
                 + getHyperHostName();
-            s_logger.error(msg);
+            LOGGER.error(msg);
             throw new VcenterException(msg);
         }
     }

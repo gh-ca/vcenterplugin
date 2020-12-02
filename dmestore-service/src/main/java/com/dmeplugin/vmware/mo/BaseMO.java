@@ -54,7 +54,7 @@ public class BaseMO {
     }
 
     public ManagedObjectReference getMor() {
-        assert (mor != null);
+        assert mor != null;
         return mor;
     }
 
