@@ -1,29 +1,29 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.dmeplugin.vmware.mo;
 
 import com.dmeplugin.dmestore.exception.VcenterException;
 import com.dmeplugin.dmestore.utils.StringUtil;
+import com.dmeplugin.vmware.util.HostMOFactory;
 import com.dmeplugin.vmware.util.Pair;
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.dmeplugin.vmware.util.VmwareHelper;
-import com.google.gson.Gson;
-import com.vmware.vim25.*;
+import com.vmware.vim25.ArrayUpdateOperation;
+import com.vmware.vim25.ClusterConfigInfoEx;
+import com.vmware.vim25.ClusterConfigSpecEx;
+import com.vmware.vim25.ClusterDasConfigInfo;
+import com.vmware.vim25.ClusterDasVmConfigInfo;
+import com.vmware.vim25.ClusterDasVmConfigSpec;
+import com.vmware.vim25.ClusterDasVmSettings;
+import com.vmware.vim25.ClusterDasVmSettingsRestartPriority;
+import com.vmware.vim25.DasVmPriority;
+import com.vmware.vim25.GuestOsDescriptor;
+import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.ObjectContent;
+import com.vmware.vim25.ObjectSpec;
+import com.vmware.vim25.PropertyFilterSpec;
+import com.vmware.vim25.PropertySpec;
+import com.vmware.vim25.TraversalSpec;
+import com.vmware.vim25.VirtualMachineConfigOption;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,7 +34,11 @@ import java.util.List;
 public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     private static final Logger s_logger = LoggerFactory.getLogger(ClusterMO.class);
 
+    private static final String VIRTUAL_MACHINE = "VirtualMachine";
+
     private ManagedObjectReference environmentBrowser = null;
+
+    private HostMOFactory hostFactory = HostMOFactory.getInstance();
 
     public ClusterMO(VmwareContext context, ManagedObjectReference morCluster) {
         super(context, morCluster);
@@ -72,21 +76,16 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
 
     private String getRestartPriorityForVm(VirtualMachineMO vmMo) throws Exception {
         if (vmMo == null) {
-            s_logger.debug("Failed to get restart priority for VM, invalid VM object reference");
             return null;
         }
 
         ManagedObjectReference vmMor = vmMo.getMor();
-        if (vmMor == null || !"VirtualMachine".equals(vmMor.getType())) {
-            s_logger.debug(
-                "Failed to get restart priority for VM: " + vmMo.getName() + ", invalid VM object reference");
+        if (vmMor == null || !VIRTUAL_MACHINE.equals(vmMor.getType())) {
             return null;
         }
 
         ClusterConfigInfoEx configInfo = getClusterConfigInfo();
         if (configInfo == null) {
-            s_logger.debug(
-                "Failed to get restart priority for VM: " + vmMo.getName() + ", no cluster config information");
             return null;
         }
 
@@ -103,7 +102,6 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
             }
         }
 
-        s_logger.debug("VM: " + vmMo.getName() + " uses default restart priority in the cluster: " + getName());
         return null;
     }
 
@@ -113,13 +111,8 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
             return;
         }
 
-        if (!isHaEnabled()) {
-            s_logger.debug("Couldn't set restart priority for VM: " + vmMo.getName() + ", HA disabled in the cluster");
-            return;
-        }
-
         ManagedObjectReference vmMor = vmMo.getMor();
-        if (vmMor == null || !"VirtualMachine".equals(vmMor.getType())) {
+        if (vmMor == null || !VIRTUAL_MACHINE.equals(vmMor.getType())) {
             s_logger.debug(
                 "Failed to set restart priority for VM: " + vmMo.getName() + ", invalid VM object reference");
             return;
@@ -170,7 +163,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
 
     @Override
     public ManagedObjectReference getHyperHostOwnerResourcePool() throws Exception {
-        return (ManagedObjectReference) context.getVimClient().getDynamicProperty(getMor(), "resourcePool");
+        return context.getVimClient().getDynamicProperty(getMor(), "resourcePool");
     }
 
     @Override
@@ -184,7 +177,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         List<ManagedObjectReference> hosts = context.getVimClient().getDynamicProperty(mor, "host");
         if (hosts != null && hosts.size() > 0) {
             for (ManagedObjectReference morHost : hosts) {
-                HostMO hostMo = new HostMO(context, morHost);
+                HostMO hostMo = hostFactory.build(context, morHost);
                 vms.addAll(hostMo.listVmsOnHyperHost(vmName));
             }
         }
@@ -193,11 +186,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
 
     @Override
     public VirtualMachineMO findVmOnHyperHost(String name) throws Exception {
-        int key = getCustomFieldKey("VirtualMachine", CustomFieldConstants.CLOUD_VM_INTERNAL_NAME);
-        if (key == 0) {
-            s_logger.warn("Custom field " + CustomFieldConstants.CLOUD_VM_INTERNAL_NAME + " is not registered ?!");
-        }
-
+        int key = getCustomFieldKey(VIRTUAL_MACHINE, CustomFieldConstants.CLOUD_VM_INTERNAL_NAME);
         String instanceNameCustomField = "value[" + key + "]";
         ObjectContent[] ocs = getVmPropertiesOnHyperHost(new String[] {"name", instanceNameCustomField});
         return HypervisorHostHelper.findVmFromObjectContent(context, ocs, name, instanceNameCustomField);
@@ -206,7 +195,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     @Override
     public ObjectContent[] getVmPropertiesOnHyperHost(String[] propertyPaths) throws Exception {
         PropertySpec pSpec = new PropertySpec();
-        pSpec.setType("VirtualMachine");
+        pSpec.setType(VIRTUAL_MACHINE);
         pSpec.getPathSet().addAll(Arrays.asList(propertyPaths));
 
         TraversalSpec host2VmFolderTraversal = new TraversalSpec();
@@ -233,10 +222,6 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
 
         List<ObjectContent> properties = context.getService()
             .retrieveProperties(context.getPropertyCollector(), pfSpecArr);
-
-        if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - retrieveProperties() done");
-        }
         return properties.toArray(new ObjectContent[properties.size()]);
     }
 
@@ -390,8 +375,6 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         }
         if (guestOsDescriptor != null) {
             diskController = VmwareHelper.getRecommendedDiskControllerFromDescriptor(guestOsDescriptor);
-            s_logger.debug("Retrieved recommended disk controller for guest OS : " + guestOsId + " in cluster "
-                + getHyperHostName() + " : " + diskController);
             return diskController;
         } else {
             String msg = "Unable to retrieve recommended disk controller for guest OS : " + guestOsId + " in cluster "
