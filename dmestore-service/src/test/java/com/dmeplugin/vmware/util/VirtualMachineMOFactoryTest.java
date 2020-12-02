@@ -4,7 +4,6 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
-import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
 import com.vmware.vim25.ManagedObjectReference;
 
 import org.junit.Before;
@@ -14,14 +13,14 @@ import org.mockito.MockitoAnnotations;
 
 /**
  * @author lianq
- * @className ClusterMOFactoryTest
+ * @className VirtualMachineMOFactoryTest
  * @description TODO
- * @date 2020/12/1 20:31
+ * @date 2020/12/2 11:17
  */
-public class ClusterMOFactoryTest {
+public class VirtualMachineMOFactoryTest {
 
     @InjectMocks
-    ClusterMOFactory factory;
+    VirtualMachineMOFactory factory;
 
     VmwareContext vmwareContext;
     ManagedObjectReference managedObjectReference;
@@ -31,13 +30,11 @@ public class ClusterMOFactoryTest {
         MockitoAnnotations.initMocks(this);
         vmwareContext = mock(VmwareContext.class);
         managedObjectReference = spy(ManagedObjectReference.class);
-        String[] ALL_TABLES = DPSqlFileConstant.ALL_TABLES;
-        System.out.println(ALL_TABLES);
     }
 
     @Test
     public void getInstance() {
-        ClusterMOFactory.getInstance();
+        VirtualMachineMOFactory.getInstance();
     }
 
     @Test
