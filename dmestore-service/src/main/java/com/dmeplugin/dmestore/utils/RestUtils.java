@@ -30,7 +30,6 @@ import javax.net.ssl.SSLContext;
  * @author: yy
  * @create: 2020-09-02
  **/
-@Component
 public class RestUtils {
 
     public final static int RES_STATE_I_200 = 200;
@@ -41,7 +40,6 @@ public class RestUtils {
 
     public final static int RES_STATE_I_403 = 403;
 
-    @Bean
     public RestTemplate getRestTemplate() throws DMEException {
         RestTemplate restTemplate;
         try {
