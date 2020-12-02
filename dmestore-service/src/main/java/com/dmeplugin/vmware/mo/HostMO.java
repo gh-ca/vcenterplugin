@@ -386,7 +386,6 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
                 if (morDatastore == null) {
                     String msg = "Unable to create NFS datastore. host: " + poolHostAddress + ", port: " + poolHostPort
                         + ", path: " + poolPath + ", uuid: " + poolUuid;
-                    logger.error(msg);
                     throw new Exception(msg);
                 }
             } else {
@@ -410,10 +409,6 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         if (!hostDatastoreSystemMo.deleteDatastore(uuid)) {
             String msg = "Unable to unmount datastore. uuid: " + uuid;
             logger.error(msg);
-
-            if (logger.isTraceEnabled()) {
-                logger.trace("vCenter API trace - unmountDatastore() done(failed)");
-            }
             throw new Exception(msg);
         }
     }
