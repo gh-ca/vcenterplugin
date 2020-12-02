@@ -1,3 +1,5 @@
+package com.dmeplugin.vmware.util;
+
 import static org.junit.Assert.*;
 
 import org.junit.Before;
