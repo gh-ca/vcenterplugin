@@ -1,34 +1,23 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.dmeplugin.vmware.mo;
 
 import com.dmeplugin.vmware.util.Pair;
 import com.dmeplugin.vmware.util.VmwareContext;
-import com.vmware.vim25.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.vmware.vim25.DatastoreHostMount;
+import com.vmware.vim25.DatastoreInfo;
+import com.vmware.vim25.DatastoreSummary;
+import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.ObjectContent;
+import com.vmware.vim25.ObjectSpec;
+import com.vmware.vim25.PropertyFilterSpec;
+import com.vmware.vim25.PropertySpec;
+import com.vmware.vim25.SelectionSpec;
+import com.vmware.vim25.TraversalSpec;
+import com.vmware.vim25.VmfsDatastoreInfo;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class DatastoreMO extends BaseMO {
-    private static final Logger s_logger = LoggerFactory.getLogger(DatastoreMO.class);
-
     private String name;
 
     private Pair<DatacenterMO, String> ownerDc;
@@ -52,23 +41,19 @@ public class DatastoreMO extends BaseMO {
 
     public DatastoreMO(VmwareContext context, String dsName) throws Exception {
         super(context, null);
-
         mor = this.context.getVimClient().getDecendentMoRef(this.context.getRootFolder(), "Datastore", dsName);
-        if (mor == null) {
-            s_logger.error("Unable to locate ds " + dsName);
-        }
     }
 
     public DatastoreInfo getInfo() throws Exception {
-        return (DatastoreInfo) context.getVimClient().getDynamicProperty(mor, "info");
+        return context.getVimClient().getDynamicProperty(mor, "info");
     }
 
     public VmfsDatastoreInfo getVmfsDatastoreInfo() throws Exception {
-        return (VmfsDatastoreInfo) context.getVimClient().getDynamicProperty(mor, "info");
+        return context.getVimClient().getDynamicProperty(mor, "info");
     }
 
     public DatastoreSummary getSummary() throws Exception {
-        return (DatastoreSummary) context.getVimClient().getDynamicProperty(mor, "summary");
+        return context.getVimClient().getDynamicProperty(mor, "summary");
     }
 
     public List<ManagedObjectReference> getVm() throws Exception {
@@ -84,9 +69,9 @@ public class DatastoreMO extends BaseMO {
             return ownerDc;
         }
 
-        PropertySpec pSpec = new PropertySpec();
-        pSpec.setType("Datacenter");
-        pSpec.getPathSet().add("name");
+        PropertySpec propertySpec = new PropertySpec();
+        propertySpec.setType("Datacenter");
+        propertySpec.getPathSet().add("name");
 
         TraversalSpec folderParentTraversal = new TraversalSpec();
         folderParentTraversal.setType("Folder");
@@ -102,22 +87,22 @@ public class DatastoreMO extends BaseMO {
         dsParentTraversal.setName("dsParentTraversal");
         dsParentTraversal.getSelectSet().add(folderParentTraversal);
 
-        ObjectSpec oSpec = new ObjectSpec();
-        oSpec.setObj(getMor());
-        oSpec.setSkip(Boolean.TRUE);
-        oSpec.getSelectSet().add(dsParentTraversal);
+        ObjectSpec objectSpec = new ObjectSpec();
+        objectSpec.setObj(getMor());
+        objectSpec.setSkip(true);
+        objectSpec.getSelectSet().add(dsParentTraversal);
 
         PropertyFilterSpec pfSpec = new PropertyFilterSpec();
-        pfSpec.getPropSet().add(pSpec);
-        pfSpec.getObjectSet().add(oSpec);
+        pfSpec.getPropSet().add(propertySpec);
+        pfSpec.getObjectSet().add(objectSpec);
         List<PropertyFilterSpec> pfSpecArr = new ArrayList<>();
         pfSpecArr.add(pfSpec);
 
         List<ObjectContent> ocs = context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
 
-        assert (ocs != null && ocs.size() > 0);
-        assert (ocs.get(0).getObj() != null);
-        assert (ocs.get(0).getPropSet() != null);
+        assert ocs != null && ocs.size() > 0;
+        assert ocs.get(0).getObj() != null;
+        assert ocs.get(0).getPropSet() != null;
         String dcName = ocs.get(0).getPropSet().get(0).getVal().toString();
         ownerDc = new Pair<>(new DatacenterMO(context, ocs.get(0).getObj()), dcName);
         return ownerDc;
@@ -130,7 +115,6 @@ public class DatastoreMO extends BaseMO {
     public boolean moveDatastoreFile(String srcFilePath, ManagedObjectReference morSrcDc,
         ManagedObjectReference morDestDs, String destFilePath, ManagedObjectReference morDestDc, boolean forceOverwrite)
         throws Exception {
-
         String srcDsName = getName();
         DatastoreMO destDsMo = new DatastoreMO(context, morDestDs);
         String destDsName = destDsMo.getName();
@@ -153,11 +137,21 @@ public class DatastoreMO extends BaseMO {
         if (result) {
             context.waitForTaskProgressDone(morTask);
             return true;
-        } else {
-            s_logger.error(
-                "VMware moveDatgastoreFile_Task failed due to " + TaskMO.getTaskFailureInfo(context, morTask));
         }
         return false;
+    }
+
+    public String[] listDirContent(String path) throws Exception {
+        String fullPath = path;
+        if (!DatastoreFile.isFullDatastorePath(fullPath)) {
+            fullPath = String.format("[%s] %s", getName(), fullPath);
+        }
+
+        Pair<DatacenterMO, String> dcPair = getOwnerDatacenter();
+        String dcName = dcPair.second();
+        String url = context.composeDatastoreBrowseUrl(dcName, fullPath);
+
+        return context.listDatastoreDirContent(url);
     }
 
     public void refreshDatastore() throws Exception {

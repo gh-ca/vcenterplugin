@@ -1,145 +1,254 @@
 package com.dmeplugin.vmware.mo;
 
-import static org.junit.Assert.*;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.notNull;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
+import com.dmeplugin.vmware.util.HostMOFactory;
+import com.dmeplugin.vmware.util.VmwareClient;
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.dmeplugin.vmware.util.VmwareContextPool;
+import com.vmware.vim25.ClusterConfigInfoEx;
+import com.vmware.vim25.ClusterDasConfigInfo;
+import com.vmware.vim25.ClusterDasVmConfigInfo;
+import com.vmware.vim25.DasVmPriority;
+import com.vmware.vim25.DynamicProperty;
+import com.vmware.vim25.GuestOsDescriptor;
 import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.ObjectContent;
+import com.vmware.vim25.VimPortType;
+import com.vmware.vim25.VirtualMachineConfigOption;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * @author lianq
+ * @author wangxiangyong
  * @className ClusterMOTest
  * @description TODO
  * @date 2020/11/25 15:28
  */
 public class ClusterMOTest {
+    @Mock
+    private VmwareContext context;
+
+    @Mock
+    private HostMOFactory hostFactory;
+
+    private VmwareClient vmwareClient;
 
     @InjectMocks
     ClusterMO clusterMO;
 
     @Before
     public void setUp() throws Exception {
-        VmwareContext context = mock(VmwareContext.class);
-        context.setPoolInfo(new VmwareContextPool(),"321");
-        ManagedObjectReference managedObjectReference = mock(ManagedObjectReference.class);
-        managedObjectReference.setType("321");
-        managedObjectReference.setValue("321");
-        clusterMO = new ClusterMO(context,managedObjectReference);
         MockitoAnnotations.initMocks(this);
+
+        vmwareClient = mock(VmwareClient.class);
+        when(context.getVimClient()).thenReturn(vmwareClient);
     }
 
     @Test
     public void getHyperHostName() throws Exception {
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("name"))).thenReturn("sss");
         clusterMO.getHyperHostName();
     }
 
     @Test
-    public void getDasConfig() {
+    public void getDasConfig() throws Exception {
+        ClusterConfigInfoEx clusterConfigInfoEx = mock(ClusterConfigInfoEx.class);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("configurationEx"))).thenReturn(clusterConfigInfoEx);
+        when(clusterConfigInfoEx.getDasConfig()).thenReturn(mock(ClusterDasConfigInfo.class));
+        clusterMO.getDasConfig();
     }
 
     @Test
-    public void isHaEnabled() {
+    public void isHaEnabled() throws Exception {
+        ClusterConfigInfoEx clusterConfigInfoEx = mock(ClusterConfigInfoEx.class);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("configurationEx"))).thenReturn(clusterConfigInfoEx);
+        ClusterDasConfigInfo clusterDasConfigInfo = mock(ClusterDasConfigInfo.class);
+        when(clusterConfigInfoEx.getDasConfig()).thenReturn(clusterDasConfigInfo);
+        when(clusterDasConfigInfo.isEnabled()).thenReturn(true);
+        clusterMO.isHaEnabled();
     }
 
     @Test
-    public void setRestartPriorityForVm() {
+    public void setRestartPriorityForVm() throws Exception {
+        String priority = "high";
+        String vmName = "123";
+        VirtualMachineMO vmMo = mock(VirtualMachineMO.class);
+        ManagedObjectReference vmMor = mock(ManagedObjectReference.class);
+        when(vmMo.getMor()).thenReturn(vmMor);
+        when(vmMor.getType()).thenReturn("VirtualMachine");
+        when(vmMor.getValue()).thenReturn(vmName);
+        ClusterConfigInfoEx configInfoEx = mock(ClusterConfigInfoEx.class);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("configurationEx"))).thenReturn(configInfoEx);
+        List<ClusterDasVmConfigInfo> dasVmConfigs = new ArrayList<>();
+        ClusterDasVmConfigInfo vmConfigInfo = mock(ClusterDasVmConfigInfo.class);
+        dasVmConfigs.add(vmConfigInfo);
+        when(configInfoEx.getDasVmConfig()).thenReturn(dasVmConfigs);
+        ManagedObjectReference vmConfigInfoKey = mock(ManagedObjectReference.class);
+        when(vmConfigInfo.getKey()).thenReturn(vmConfigInfoKey);
+        when(vmConfigInfoKey.getValue()).thenReturn(vmName);
+        DasVmPriority dasVmPriority = DasVmPriority.fromValue("low");
+        when(vmConfigInfo.getRestartPriority()).thenReturn(dasVmPriority);
+
+        VimPortType vimPortType = mock(VimPortType.class);
+        when(context.getService()).thenReturn(vimPortType);
+        ManagedObjectReference morTask = mock(ManagedObjectReference.class);
+        when(vimPortType.reconfigureComputeResourceTask(anyObject(), anyObject(), anyBoolean())).thenReturn(morTask);
+        when(vmwareClient.waitForTask(morTask)).thenReturn(true);
+        doNothing().when(context).waitForTaskProgressDone(morTask);
+
+        clusterMO.setRestartPriorityForVm(vmMo, priority);
     }
 
     @Test
-    public void getHyperHostDatacenter() {
+    public void getHyperHostDatacenter() throws Exception {
+        List<ObjectContent> ocs = new ArrayList<>();
+        ObjectContent objectContent = mock(ObjectContent.class);
+        ocs.add(objectContent);
+        VimPortType service = mock(VimPortType.class);
+        when(context.getService()).thenReturn(service);
+        when(service.retrieveProperties(anyObject(), anyObject())).thenReturn(ocs);
+        List<DynamicProperty> dynamicPropertyList = new ArrayList<>();
+        DynamicProperty dynamicProperty = mock(DynamicProperty.class);
+        dynamicPropertyList.add(dynamicProperty);
+        when(objectContent.getPropSet()).thenReturn(dynamicPropertyList);
+        when(dynamicProperty.getVal()).thenReturn("sa");
+
+        clusterMO.getHyperHostDatacenter();
     }
 
     @Test
-    public void getHyperHostOwnerResourcePool() {
+    public void getHyperHostOwnerResourcePool() throws Exception {
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("resourcePool"))).thenReturn(
+            mock(ManagedObjectReference.class));
+        clusterMO.getHyperHostOwnerResourcePool();
     }
 
     @Test
-    public void getHyperHostCluster() {
+    public void getHyperHostCluster() throws Exception {
+        clusterMO.getHyperHostCluster();
     }
 
     @Test
-    public void listVmsOnHyperHost() {
+    public void listVmsOnHyperHost() throws Exception {
+        String vmName = "123";
+        List<ManagedObjectReference> hosts = new ArrayList<>();
+        ManagedObjectReference host = mock(ManagedObjectReference.class);
+        hosts.add(host);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("host"))).thenReturn(hosts);
+
+        HostMO hostMo = mock(HostMO.class);
+        when(hostFactory.build(anyObject(), anyString())).thenReturn(hostMo);
+        List<VirtualMachineMO> vms = new ArrayList<>();
+        VirtualMachineMO vm = mock(VirtualMachineMO.class);
+        vms.add(vm);
+        when(hostMo.listVmsOnHyperHost(vmName)).thenReturn(vms);
+        try {
+            clusterMO.listVmsOnHyperHost(vmName);
+        } catch (Exception ex) {
+
+        }
     }
 
     @Test
-    public void findVmOnHyperHost() {
+    public void findVmOnHyperHost() throws Exception {
+        String name = "123";
+        clusterMO.findVmOnHyperHost(name);
     }
 
     @Test
-    public void findVmOnPeerHyperHost() {
+    public void getVmPropertiesOnHyperHost() throws Exception {
+        String[] propertyPaths = {"123"};
+        VimPortType service = mock(VimPortType.class);
+        when(context.getService()).thenReturn(service);
+        List<ObjectContent> list = new ArrayList<>();
+        ObjectContent objectContent = mock(ObjectContent.class);
+        list.add(objectContent);
+        when(service.retrieveProperties(anyObject(), anyObject())).thenReturn(list);
+        clusterMO.getVmPropertiesOnHyperHost(propertyPaths);
     }
 
     @Test
-    public void getVmPropertiesOnHyperHost() {
-    }
-
-    @Test
-    public void getDatastorePropertiesOnHyperHost() {
-    }
-
-    @Test
-    public void createVm() {
-    }
-
-    @Test
-    public void createBlankVm() {
+    public void getDatastorePropertiesOnHyperHost() throws Exception {
+        String[] propertyPaths = {"123"};
+        VimPortType service = mock(VimPortType.class);
+        when(context.getService()).thenReturn(service);
+        List<ObjectContent> list = new ArrayList<>();
+        ObjectContent objectContent = mock(ObjectContent.class);
+        list.add(objectContent);
+        when(service.retrieveProperties(anyObject(), anyObject())).thenReturn(list);
+        clusterMO.getDatastorePropertiesOnHyperHost(propertyPaths);
     }
 
     @Test
     public void mountDatastore() {
+        boolean vmfsDatastore = true;
+        String poolHostAddress = "";
+        int poolHostPort = 26335;
+        String poolPath = "/123";
+        String poolUuid = "123214";
+        try {
+            clusterMO.mountDatastore(vmfsDatastore, poolHostAddress, poolHostPort, poolPath, poolUuid);
+        } catch (Exception ex) {
+
+        }
     }
 
     @Test
     public void unmountDatastore() {
+        String poolUuid = "2312";
+        try {
+            clusterMO.unmountDatastore(poolUuid);
+        } catch (Exception ex) {
+
+        }
     }
 
     @Test
-    public void findDatastore() {
+    public void getHyperHostNetworkSummary() throws Exception {
+        String esxServiceConsolePort = "200";
+        List<ManagedObjectReference> hosts = new ArrayList<>();
+        ManagedObjectReference host = mock(ManagedObjectReference.class);
+        hosts.add(host);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("host"))).thenReturn(hosts);
+        try {
+            clusterMO.getHyperHostNetworkSummary(esxServiceConsolePort);
+        } catch (Exception ex) {
+
+        }
     }
 
     @Test
-    public void findDatastoreByName() {
-    }
+    public void getRecommendedDiskController() throws Exception {
+        String guestOsId = "1232";
+        ManagedObjectReference environmentBrowser = mock(ManagedObjectReference.class);
+        when(vmwareClient.getMoRefProp(anyObject(), eq("environmentBrowser"))).thenReturn(environmentBrowser);
+        VimPortType service = mock(VimPortType.class);
+        when(context.getService()).thenReturn(service);
+        VirtualMachineConfigOption vmConfigOption = mock(VirtualMachineConfigOption.class);
+        when(service.queryConfigOption(environmentBrowser, null, null)).thenReturn(vmConfigOption);
+        List<GuestOsDescriptor> guestDescriptors = new ArrayList<>();
+        GuestOsDescriptor guestOsDescriptor = mock(GuestOsDescriptor.class);
+        guestDescriptors.add(guestOsDescriptor);
+        when(vmConfigOption.getGuestOSDescriptor()).thenReturn(guestDescriptors);
+        when(guestOsDescriptor.getId()).thenReturn(guestOsId);
+        when(guestOsDescriptor.getRecommendedDiskController()).thenReturn("ParaVirtualSCSIController");
 
-    @Test
-    public void findDatastoreByExportPath() {
-    }
-
-    @Test
-    public void findMigrationTarget() {
-    }
-
-    @Test
-    public void isHyperHostConnected() {
-    }
-
-    @Test
-    public void getHyperHostDefaultGateway() {
-    }
-
-    @Test
-    public void getHyperHostResourceSummary() {
-    }
-
-    @Test
-    public void getHyperHostNetworkSummary() {
-    }
-
-    @Test
-    public void getHyperHostHardwareSummary() {
-    }
-
-    @Test
-    public void getLicenseAssignmentManager() {
-    }
-
-    @Test
-    public void getRecommendedDiskController() {
+        clusterMO.getRecommendedDiskController(guestOsId);
     }
 }

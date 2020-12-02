@@ -1,24 +1,8 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.dmeplugin.vmware.mo;
 
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.vmware.vim25.*;
+
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -34,24 +18,25 @@ public class HostDatastoreSystemMO extends BaseMO {
         CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context,
             context.getServiceContent().getCustomFieldsManager());
         int key = cfmMo.getCustomFieldKey("Datastore", CustomFieldConstants.CLOUD_UUID);
-        assert (key != 0);
+        assert key != 0;
 
         List<ObjectContent> ocs = getDatastorePropertiesOnHostDatastoreSystem(
             new String[] {"name", String.format("value[%d]", key)});
-        if (ocs != null) {
-            for (ObjectContent oc : ocs) {
-                if (oc.getPropSet().get(0).getVal().equals(name)) {
-                    return oc.getObj();
-                }
+        if (ocs == null) {
+            return null;
+        }
+        for (ObjectContent oc : ocs) {
+            if (oc.getPropSet().get(0).getVal().equals(name)) {
+                return oc.getObj();
+            }
 
-                if (oc.getPropSet().size() > 1) {
-                    DynamicProperty prop = oc.getPropSet().get(1);
-                    if (prop != null && prop.getVal() != null) {
-                        if (prop.getVal() instanceof CustomFieldStringValue) {
-                            String val = ((CustomFieldStringValue) prop.getVal()).getValue();
-                            if (val.equalsIgnoreCase(name)) {
-                                return oc.getObj();
-                            }
+            if (oc.getPropSet().size() > 1) {
+                DynamicProperty prop = oc.getPropSet().get(1);
+                if (prop != null && prop.getVal() != null) {
+                    if (prop.getVal() instanceof CustomFieldStringValue) {
+                        String val = ((CustomFieldStringValue) prop.getVal()).getValue();
+                        if (val.equalsIgnoreCase(name)) {
+                            return oc.getObj();
                         }
                     }
                 }
@@ -102,25 +87,17 @@ public class HostDatastoreSystemMO extends BaseMO {
 
     public ManagedObjectReference createNfsDatastore(String host, int port, String exportPath, String uuid,
         String accessMode, String type, String securityType) throws Exception {
-
         HostNasVolumeSpec spec = new HostNasVolumeSpec();
         spec.setRemoteHost(host);
         spec.setRemotePath(exportPath);
-        //NFS41  NFS 默认NFS
         if (StringUtils.isEmpty(type)) {
             spec.setType("NFS");
         }
-        /**
-         * 版本 4.1 需要设置安全类型，默认AUTH_SYS
-         * AUTH_SYS	 无域环境
-         * SEC_KRB5
-         * SEC_KRB5I
-         */
         if (!StringUtils.isEmpty(securityType)) {
             spec.setSecurityType(securityType);
         }
         spec.setType(type);
-        //需要设置datastore名称
+        // 需要设置datastore名称
         spec.setLocalPath(uuid);
         // readOnly/readWrite
         if (!StringUtils.isEmpty(accessMode)) {
@@ -148,24 +125,24 @@ public class HostDatastoreSystemMO extends BaseMO {
     }
 
     public List<ObjectContent> getDatastorePropertiesOnHostDatastoreSystem(String[] propertyPaths) throws Exception {
-        PropertySpec pSpec = new PropertySpec();
-        pSpec.setType("Datastore");
-        pSpec.getPathSet().addAll(Arrays.asList(propertyPaths));
+        PropertySpec propertySpec = new PropertySpec();
+        propertySpec.setType("Datastore");
+        propertySpec.getPathSet().addAll(Arrays.asList(propertyPaths));
 
         TraversalSpec hostDsSys2DatastoreTraversal = new TraversalSpec();
         hostDsSys2DatastoreTraversal.setType("HostDatastoreSystem");
         hostDsSys2DatastoreTraversal.setPath("datastore");
         hostDsSys2DatastoreTraversal.setName("hostDsSys2DatastoreTraversal");
 
-        ObjectSpec oSpec = new ObjectSpec();
-        oSpec.setObj(mor);
-        oSpec.setSkip(Boolean.TRUE);
-        oSpec.getSelectSet().add(hostDsSys2DatastoreTraversal);
+        ObjectSpec objectSpec = new ObjectSpec();
+        objectSpec.setObj(mor);
+        objectSpec.setSkip(Boolean.TRUE);
+        objectSpec.getSelectSet().add(hostDsSys2DatastoreTraversal);
 
         PropertyFilterSpec pfSpec = new PropertyFilterSpec();
-        pfSpec.getPropSet().add(pSpec);
-        pfSpec.getObjectSet().add(oSpec);
-        List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
+        pfSpec.getPropSet().add(propertySpec);
+        pfSpec.getObjectSet().add(objectSpec);
+        List<PropertyFilterSpec> pfSpecArr = new ArrayList<>();
         pfSpecArr.add(pfSpec);
 
         return context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
