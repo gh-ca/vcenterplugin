@@ -28,20 +28,17 @@ public class BaseMO {
 
     private String name;
 
-    public BaseMO() {
-    }
-
     public BaseMO(VmwareContext context, ManagedObjectReference mor) {
-        assert (context != null);
+        assert context != null;
 
         this.context = context;
         this.mor = mor;
     }
 
     public BaseMO(VmwareContext context, String morType, String morValue) {
-        assert (context != null);
-        assert (morType != null);
-        assert (morValue != null);
+        assert context != null;
+        assert morType != null;
+        assert morValue != null;
 
         this.context = context;
         mor = new ManagedObjectReference();

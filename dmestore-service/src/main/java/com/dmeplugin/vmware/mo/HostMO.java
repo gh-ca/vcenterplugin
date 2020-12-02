@@ -56,9 +56,6 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
     private ClusterMOFactory clusterMOFactory = ClusterMOFactory.getInstance();
 
-    public HostMO() {
-    }
-
     public HostMO(VmwareContext context, ManagedObjectReference morHost) {
         super(context, morHost);
     }

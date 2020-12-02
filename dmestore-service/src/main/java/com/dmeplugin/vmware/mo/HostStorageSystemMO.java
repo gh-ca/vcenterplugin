@@ -18,8 +18,8 @@ public class HostStorageSystemMO extends BaseMO {
         return context.getVimClient().getDynamicProperty(mor, "fileSystemVolumeInfo");
     }
 
-    public void rescanHba(String iScsiHbaDevice) throws Exception {
-        context.getService().rescanHba(mor, iScsiHbaDevice);
+    public void rescanHba(String isCsiHbaDevice) throws Exception {
+        context.getService().rescanHba(mor, isCsiHbaDevice);
     }
 
     public void rescanVmfs() throws Exception {
