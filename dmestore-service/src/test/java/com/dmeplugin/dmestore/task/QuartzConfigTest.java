@@ -1,9 +1,43 @@
+package com.dmeplugin.dmestore.task;
+
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+
+import com.dmeplugin.vmware.util.VmwarePluginContextFactory;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.MockitoAnnotations;
+import org.quartz.Scheduler;
+
 /**
- *@className QuartzConfigTest
- *@description  TODO
- *@author lianq
- *@date 2020/12/2 19:55
- */public class QuartzConfigTest {
-  
+ * @author lianq
+ * @className QuartzConfigTest
+ * @description TODO
+ * @date 2020/12/2 19:55
+ */
+public class QuartzConfigTest {
+
+    @InjectMocks
+    QuartzConfig quartzConfig = new QuartzConfig();
+    private Scheduler scheduler;
+
+    @Before
+    public void setUp() throws Exception {
+        MockitoAnnotations.initMocks(this);
+        scheduler = spy(Scheduler.class);
+    }
+
+    @Test
+    public void getScheduler() {
+        quartzConfig.getScheduler();
+    }
+
+    @Test
+    public void destory() {
+        quartzConfig.destory();
+    }
 }
