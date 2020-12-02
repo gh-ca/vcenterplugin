@@ -87,7 +87,6 @@ public class HostDatastoreSystemMO extends BaseMO {
 
     public ManagedObjectReference createNfsDatastore(String host, int port, String exportPath, String uuid,
         String accessMode, String type, String securityType) throws Exception {
-
         HostNasVolumeSpec spec = new HostNasVolumeSpec();
         spec.setRemoteHost(host);
         spec.setRemotePath(exportPath);
@@ -143,7 +142,7 @@ public class HostDatastoreSystemMO extends BaseMO {
         PropertyFilterSpec pfSpec = new PropertyFilterSpec();
         pfSpec.getPropSet().add(propertySpec);
         pfSpec.getObjectSet().add(objectSpec);
-        List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
+        List<PropertyFilterSpec> pfSpecArr = new ArrayList<>();
         pfSpecArr.add(pfSpec);
 
         return context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
