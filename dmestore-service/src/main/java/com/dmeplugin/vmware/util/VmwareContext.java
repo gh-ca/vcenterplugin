@@ -21,6 +21,7 @@ package com.dmeplugin.vmware.util;
 import com.dmeplugin.dmestore.utils.StringUtil;
 import com.dmeplugin.vmware.mo.DatacenterMO;
 import com.dmeplugin.vmware.mo.DatastoreFile;
+import com.dmeplugin.vmware.mo.DatastoreMO;
 import com.vmware.connection.helpers.builders.ObjectSpecBuilder;
 import com.vmware.connection.helpers.builders.PropertyFilterSpecBuilder;
 import com.vmware.connection.helpers.builders.PropertySpecBuilder;
@@ -77,6 +78,7 @@ public class VmwareContext {
 
     private final VmwareClient vimClient;
     private final String serverAddress;
+    private DatacenterMOFactory datacenterMOFactory;
 
     private final Map<String, Object> stockMap = new HashMap<String, Object>();
 
@@ -206,7 +208,9 @@ public class VmwareContext {
             return null;
         }
 
-        DatacenterMO dcMo = new DatacenterMO(this, tokens[0]);
+        //DatacenterMO dcMo = new DatacenterMO(this, tokens[0]);
+        String token = tokens[0];
+        DatacenterMO dcMo = datacenterMOFactory.build(this, tokens[0]);
         if (dcMo.getMor() == null) {
             s_logger.error("Unable to locate the datacenter specified in path: " + inventoryPath);
             return null;
@@ -231,19 +235,6 @@ public class VmwareContext {
         }
     }
 
-    private Charset getCharSetFromConnection(HttpURLConnection conn) {
-        String charsetName = conn.getContentEncoding();
-        Charset charset;
-        try {
-            charset = Charset.forName(charsetName);
-        } catch (IllegalArgumentException e) {
-            s_logger.warn(
-                "Illegal/unsupported/null charset name from connection. charsetname from connection is " + charsetName);
-            charset = StringUtil.getPreferredCharset();
-        }
-        return charset;
-    }
-
     public byte[] getResourceContent(String urlString) throws Exception {
         HttpURLConnection conn = getHttpConnection(urlString);
         InputStream in = conn.getInputStream();
@@ -257,48 +248,6 @@ public class VmwareContext {
         in.close();
         out.close();
         return out.toByteArray();
-    }
-
-    public void uploadResourceContent(String urlString, byte[] content) throws Exception {
-        // vSphere does not support POST
-        HttpURLConnection conn = getHttpConnection(urlString, "PUT");
-
-        OutputStream out = conn.getOutputStream();
-        out.write(content);
-        out.flush();
-
-        BufferedReader in =
-            new BufferedReader(new InputStreamReader(conn.getInputStream(), getCharSetFromConnection(conn)));
-        String line;
-        while ((in.ready()) && (line = in.readLine()) != null) {
-            if (s_logger.isTraceEnabled()) {
-                s_logger.trace("Upload " + urlString + " response: " + line);
-            }
-        }
-        out.close();
-        in.close();
-    }
-
-    public String[] listDatastoreDirContent(String urlString) throws Exception {
-        List<String> fileList = new ArrayList<String>();
-        String content = new String(getResourceContent(urlString), "UTF-8");
-        String marker = "</a></td><td ";
-        int parsePos = -1;
-        do {
-            parsePos = content.indexOf(marker, parsePos < 0 ? 0 : parsePos);
-            if (parsePos > 0) {
-                int beginPos = content.lastIndexOf('>', parsePos - 1);
-                if (beginPos < 0) {
-                    beginPos = 0;
-                }
-
-                fileList.add((content.substring(beginPos + 1, parsePos)));
-                parsePos += marker.length();
-            } else {
-                break;
-            }
-        } while (parsePos > 0);
-        return fileList.toArray(new String[0]);
     }
 
     public String composeDatastoreBrowseUrl(String dcName, String fullPath) {
@@ -323,7 +272,6 @@ public class VmwareContext {
         }
         return sb.toString();
     }
-
     public HttpURLConnection getHttpConnection(String urlString) throws Exception {
         return getHttpConnection(urlString, "GET");
     }
@@ -450,88 +398,6 @@ public class VmwareContext {
         return inFolderByType(folder, morefType, new RetrieveOptions());
     }
 
-
-    /**
-     * Returns all the MOREFs of the specified type that are present under the
-     * container
-     *
-     * @param folder    {@link ManagedObjectReference} of the container to begin the
-     *                  search from
-     * @param morefType Type of the managed entity that needs to be searched
-     * @return Map of name and MOREF of the managed objects present. If none
-     * exist then empty Map is returned
-     * @throws InvalidPropertyFaultMsg
-     * @throws RuntimeFaultFaultMsg
-     */
-    public List<Pair<ManagedObjectReference, String>> inContainerByType(
-        ManagedObjectReference folder, String morefType, RetrieveOptions retrieveOptions)
-        throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
-
-        RetrieveResult rslts = containerViewByType(folder, morefType, retrieveOptions);
-        return toList(rslts);
-    }
-
-    public List<Pair<ManagedObjectReference, String>> toList(RetrieveResult rslts)
-        throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
-        final List<Pair<ManagedObjectReference, String>> tgtMoref = new ArrayList<>();
-        String token = null;
-        token = populate(rslts, tgtMoref);
-
-        while (token != null && !token.isEmpty()) {
-            // fetch results based on new token
-            rslts = getService().continueRetrievePropertiesEx(
-                getServiceContent().getPropertyCollector(), token);
-
-            token = populate(rslts, tgtMoref);
-        }
-
-        return tgtMoref;
-    }
-
-    /**
-     * Returns the raw RetrieveResult object for the provided container filtered on properties list
-     *
-     * @param container       - container to look in
-     * @param morefType       - type to filter for
-     * @param morefProperties - properties to include
-     * @return com.vmware.vim25.RetrieveResult for this query
-     * @throws RuntimeFaultFaultMsg
-     * @throws InvalidPropertyFaultMsg
-     */
-    public RetrieveResult containerViewByType(
-        final ManagedObjectReference container,
-        final String morefType,
-        final RetrieveOptions retrieveOptions,
-        final String... morefProperties
-    ) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
-
-        PropertyFilterSpec[] propertyFilterSpecs = propertyFilterSpecs(container, morefType, morefProperties);
-
-        return containerViewByType(container, morefType, morefProperties, retrieveOptions, propertyFilterSpecs);
-    }
-
-    public RetrieveResult containerViewByType(
-        final ManagedObjectReference container,
-        final String morefType,
-        final String[] morefProperties,
-        final RetrieveOptions retrieveOptions,
-        final PropertyFilterSpec... propertyFilterSpecs
-    ) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
-        return getService().retrievePropertiesEx(
-            getServiceContent().getPropertyCollector(),
-            Arrays.asList(propertyFilterSpecs),
-            retrieveOptions
-        );
-    }
-
-    public RetrieveResult containerViewByType(
-        final ManagedObjectReference container,
-        final String morefType,
-        final RetrieveOptions retrieveOptions
-    ) throws RuntimeFaultFaultMsg, InvalidPropertyFaultMsg {
-        return this.containerViewByType(container, morefType, retrieveOptions, "name");
-    }
-
     private void resultsToTgtMorefList(RetrieveResult results, List<Pair<ManagedObjectReference, String>> tgtMoref) {
         List<ObjectContent> objectCont = (results != null) ? results.getObjects() : null;
 
@@ -582,25 +448,5 @@ public class VmwareContext {
                     )
             )
         };
-    }
-
-    public static String populate(final RetrieveResult rslts,
-                                  final List<Pair<ManagedObjectReference, String>> tgtMoref) {
-        String token = null;
-        if (rslts != null) {
-            token = rslts.getToken();
-            for (ObjectContent oc : rslts.getObjects()) {
-                ManagedObjectReference mr = oc.getObj();
-                String entityNm = null;
-                List<DynamicProperty> dps = oc.getPropSet();
-                if (dps != null) {
-                    for (DynamicProperty dp : dps) {
-                        entityNm = (String) dp.getVal();
-                    }
-                }
-                tgtMoref.add(new Pair<>(mr, entityNm));
-            }
-        }
-        return token;
     }
 }
