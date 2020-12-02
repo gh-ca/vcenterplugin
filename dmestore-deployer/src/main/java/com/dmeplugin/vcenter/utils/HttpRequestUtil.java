@@ -149,11 +149,6 @@ public class HttpRequestUtil {
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         }
 
-        public static void turnOnSslChecking() throws KeyManagementException, NoSuchAlgorithmException {
-            // Return it to the initial state (discovered by reflection, now hardcoded)
-            SSLContext.getInstance("TLS").init(null, null, null);
-        }
-
         private SslUtil() {
             throw new UnsupportedOperationException("Do not instantiate libraries.");
         }

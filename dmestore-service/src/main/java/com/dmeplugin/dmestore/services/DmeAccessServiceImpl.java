@@ -67,8 +67,9 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     private static Integer dmeHostPort;
 
-    @Autowired
-    private RestTemplate restTemplate;
+//    @Autowired
+//    private RestTemplate restTemplate;
+    private RestUtils restUtils = new RestUtils();
 
     @Override
     public void accessDme(Map<String, Object> params) throws DMEException {
@@ -125,8 +126,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             iniLogin();
         }
 
-        /*RestUtils restUtils = new RestUtils();
-        RestTemplate restTemplate = restUtils.getRestTemplate();*/
+        RestTemplate restTemplate = restUtils.getRestTemplate();
 
         HttpHeaders headers = getHeaders();
 
@@ -172,8 +172,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             iniLogin();
         }
 
-        /*RestUtils restUtils = new RestUtils();
-        RestTemplate restTemplate = restUtils.getRestTemplate();*/
+        RestTemplate restTemplate = restUtils.getRestTemplate();
 
         HttpHeaders headers = getHeaders();
 
@@ -210,12 +209,11 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         return responseEntity;
     }
 
-    private synchronized ResponseEntity login(Map<String, Object> params) {
+    private synchronized ResponseEntity login(Map<String, Object> params) throws DMEException {
         ResponseEntity responseEntity = null;
         dmeToken = null;
         if (params != null && params.get(DmeConstants.HOSTIP) != null) {
-            /*RestUtils restUtils = new RestUtils();
-            RestTemplate restTemplate = restUtils.getRestTemplate();*/
+            RestTemplate restTemplate = restUtils.getRestTemplate();
 
             HttpHeaders headers = getHeaders();
 
