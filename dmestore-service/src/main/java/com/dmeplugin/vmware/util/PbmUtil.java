@@ -12,46 +12,47 @@
 
 package com.dmeplugin.vmware.util;
 
-import com.vmware.pbm.*;
-import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.pbm.PbmCapabilityMetadata;
+import com.vmware.pbm.PbmCapabilityMetadataPerCategory;
+import com.vmware.pbm.PbmProfileResourceType;
+import com.vmware.pbm.PbmProfileResourceTypeEnum;
 
 import java.util.List;
 
 /**
  * Utility class for PBM Samples
- * 
  */
 public class PbmUtil {
 
-   /**
-    * Returns the Storage Resource Type Object
-    * 
-    * @return
-    */
-   public static PbmProfileResourceType getStorageResourceType() {
-      PbmProfileResourceType resourceType = new PbmProfileResourceType();
-      resourceType.setResourceType(PbmProfileResourceTypeEnum.STORAGE.value());
-      return resourceType;
-   }
+    /**
+     * Returns the Storage Resource Type Object
+     *
+     * @return
+     */
+    public static PbmProfileResourceType getStorageResourceType() {
+        PbmProfileResourceType resourceType = new PbmProfileResourceType();
+        resourceType.setResourceType(PbmProfileResourceTypeEnum.STORAGE.value());
+        return resourceType;
+    }
 
-   /**
-    * Returns the Capability Metadata associated to a Tag Category
-    * 
-    * @param tagCategoryName
-    * @param schema
-    * @return
-    */
-   public static PbmCapabilityMetadata getTagCategoryMeta(
-         String tagCategoryName, List<PbmCapabilityMetadataPerCategory> schema) {
-      for (PbmCapabilityMetadataPerCategory cat : schema) {
-         if ("tag".equals(cat.getSubCategory())) {
-            for (PbmCapabilityMetadata cap : cat.getCapabilityMetadata()) {
-               if (cap.getId().getId().equals(tagCategoryName)) {
-                  return cap;
-               }
+    /**
+     * Returns the Capability Metadata associated to a Tag Category
+     *
+     * @param tagCategoryName tagCategory的名称
+     * @param schema
+     * @return
+     */
+    public static PbmCapabilityMetadata getTagCategoryMeta(
+        String tagCategoryName, List<PbmCapabilityMetadataPerCategory> schema) {
+        for (PbmCapabilityMetadataPerCategory cat : schema) {
+            if ("tag".equals(cat.getSubCategory())) {
+                for (PbmCapabilityMetadata cap : cat.getCapabilityMetadata()) {
+                    if (cap.getId().getId().equals(tagCategoryName)) {
+                        return cap;
+                    }
+                }
             }
-         }
-      }
-      return null;
-   }
+        }
+        return null;
+    }
 }
