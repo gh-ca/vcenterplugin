@@ -141,19 +141,6 @@ public class DatastoreMO extends BaseMO {
         return false;
     }
 
-    public String[] listDirContent(String path) throws Exception {
-        String fullPath = path;
-        if (!DatastoreFile.isFullDatastorePath(fullPath)) {
-            fullPath = String.format("[%s] %s", getName(), fullPath);
-        }
-
-        Pair<DatacenterMO, String> dcPair = getOwnerDatacenter();
-        String dcName = dcPair.second();
-        String url = context.composeDatastoreBrowseUrl(dcName, fullPath);
-
-        return context.listDatastoreDirContent(url);
-    }
-
     public void refreshDatastore() throws Exception {
         context.getService().refreshDatastore(mor);
     }
