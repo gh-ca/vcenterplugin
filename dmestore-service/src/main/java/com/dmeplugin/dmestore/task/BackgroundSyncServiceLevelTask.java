@@ -6,19 +6,15 @@ import com.dmeplugin.dmestore.services.ServiceLevelService;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.quartz.StatefulJob;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import org.springframework.stereotype.Component;
 
 /**
  * BackgroundSyncServiceLevelTask
  *
  * @author wangxy
- *
- * @since  2020-11-30
- *
+ * @since 2020-11-30
  **/
 @Component
 public class BackgroundSyncServiceLevelTask implements StatefulJob {

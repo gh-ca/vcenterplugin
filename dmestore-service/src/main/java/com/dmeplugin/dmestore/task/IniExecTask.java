@@ -36,12 +36,6 @@ public class IniExecTask implements ApplicationListener<ContextRefreshedEvent> {
     private BackgroundScanDatastoreTask backgroundScanDatastoreTask;
 
     @Autowired
-    private ServiceLevelService serviceLevelService;
-
-    @Autowired
-    private BestPracticeProcessService bestPracticeProcessService;
-
-    @Autowired
     private SystemServiceImpl systemService;
 
 
