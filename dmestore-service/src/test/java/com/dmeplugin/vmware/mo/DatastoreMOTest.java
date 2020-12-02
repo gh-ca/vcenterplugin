@@ -141,28 +141,6 @@ public class DatastoreMOTest {
         doNothing().when(context).waitForTaskProgressDone(morTask);
         datastoreMO.moveDatastoreFile(srcFilePath, morSrcDc, morDestDs, destFilePath, morDestDc, true);
     }
-
-    @Test
-    public void listDirContent() throws Exception {
-        String path = "13";
-        List<ObjectContent> ocs = new ArrayList<>();
-        ObjectContent objectContent = mock(ObjectContent.class);
-        ocs.add(objectContent);
-        when(service.retrieveProperties(anyObject(), anyObject())).thenReturn(ocs);
-        List<DynamicProperty> dynamicPropertyList = new ArrayList<>();
-        DynamicProperty dynamicProperty = mock(DynamicProperty.class);
-        dynamicPropertyList.add(dynamicProperty);
-        when(objectContent.getPropSet()).thenReturn(dynamicPropertyList);
-        when(dynamicProperty.getVal()).thenReturn("123");
-        when(vmwareClient.getDynamicProperty(anyObject(), eq("name"))).thenReturn("11");
-        String fullPath = String.format("[%s] %s", "11", path);
-        String url = "11113";
-        when(context.composeDatastoreBrowseUrl("123", fullPath)).thenReturn(url);
-        String[] re = {"131"};
-        when(context.listDatastoreDirContent(url)).thenReturn(re);
-        datastoreMO.listDirContent(path);
-    }
-
     @Test
     public void refreshDatastore() throws Exception {
        doNothing().when(service).refreshDatastore(anyObject());
