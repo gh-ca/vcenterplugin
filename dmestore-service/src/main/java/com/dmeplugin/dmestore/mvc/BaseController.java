@@ -60,7 +60,7 @@ public class BaseController {
 
     @ExceptionHandler(NoDMEException.class)
     @ResponseStatus(HttpStatus.OK)
-    protected Map<String, Object> handleException(NoDMEException exception) {
+    protected Map<String, Object> handleException(final NoDMEException exception) {
         LOGGER.debug("No eSight configuration!" + exception.getMessage());
         return generateError(generateCode(exception.getCode()), exception.getMessage(),
             Collections.emptyList());
@@ -69,8 +69,8 @@ public class BaseController {
 
     @ExceptionHandler(RestClientException.class)
     @ResponseStatus(HttpStatus.OK)
-    protected Map<String, Object> handleException(RestClientException exception,
-                                                  HttpServletRequest request) {
+    protected Map<String, Object> handleException(final RestClientException exception,
+                                                  final HttpServletRequest request) {
         LOGGER.error("Rest client Exception!" + exception.getMessage());
         Throwable rootCause = exception.getRootCause();
         if (rootCause instanceof CertificateException) {
@@ -81,8 +81,8 @@ public class BaseController {
 
     @ExceptionHandler(VcenterRuntimeException.class)
     @ResponseStatus(HttpStatus.OK)
-    protected Map<String, Object> handleException(VcenterRuntimeException exception,
-                                                  HttpServletRequest request) {
+    protected Map<String, Object> handleException(final VcenterRuntimeException exception,
+                                                  final HttpServletRequest request) {
         LOGGER.error("vCenter plugin exception!" + exception.getMessage());
         return generateError(request, generateCode(exception.getCode()), exception.getMessage(), null);
     }
@@ -90,8 +90,8 @@ public class BaseController {
 
     @ExceptionHandler(DMEException.class)
     @ResponseStatus(HttpStatus.OK)
-    protected Map<String, Object> handleException(DMEException exception,
-                                                  HttpServletRequest request) {
+    protected Map<String, Object> handleException(final DMEException exception,
+                                                  final HttpServletRequest request) {
         LOGGER.error("eSight Exception!" + exception.getMessage());
         if (CODE_NO_ESIGHT_EXCEPTION.equals(exception.getCode())) {
             return generateError(request, exception.getCode(), exception.getMessage(), null);
@@ -101,8 +101,8 @@ public class BaseController {
 
     @ExceptionHandler(SQLException.class)
     @ResponseStatus(HttpStatus.OK)
-    protected Map<String, Object> handleException(SQLException exception,
-                                                  HttpServletRequest request) {
+    protected Map<String, Object> handleException(final SQLException exception,
+                                                  final HttpServletRequest request) {
         LOGGER.error("DB Exception!" + exception.getMessage());
         Map<String, Object> errorMap = new HashMap<>(16);
         errorMap.put(FIELD_CODE, CODE_DB_EXCEPTION);
@@ -113,14 +113,14 @@ public class BaseController {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.OK)
-    protected Map<String, Object> handleException(Exception exception,
-                                                  HttpServletRequest request) {
+    protected Map<String, Object> handleException(final Exception exception,
+                                                  final HttpServletRequest request) {
         LOGGER.error("System Exception!" + exception.getMessage());
         return generateError(request, CODE_FAILURE, exception.getMessage(), null);
     }
 
-    private Map<String, Object> generateError(HttpServletRequest request, String code, String message,
-                                              Object data) {
+    private Map<String, Object> generateError(final HttpServletRequest request, final String code, final String message,
+                                              final Object data) {
         Map<String, Object> errorMap = new HashMap<>(16);
         errorMap.put(FIELD_CODE, code);
         errorMap.put(FIELD_DESCRIPTION, message);
@@ -135,7 +135,7 @@ public class BaseController {
         return errorMap;
     }
 
-    private Map<String, Object> generateError(String code, String message, Object data) {
+    private Map<String, Object> generateError(final String code, final String message, final Object data) {
         return generateError(null, code, message, data);
     }
 
@@ -143,11 +143,11 @@ public class BaseController {
         return generateCode(null);
     }
 
-    public String generateCode(String code) {
+    public String generateCode(final String code) {
         return (code == null || code.isEmpty()) ? CODE_FAILURE : code;
     }
 
-    public boolean isSuccessResponse(Object code) {
+    public boolean isSuccessResponse(final Object code) {
         return DMEOpenApiService.isSuccessResponse(code);
     }
 

@@ -21,7 +21,7 @@ public class BackgroundSyncServiceLevelTask implements StatefulJob {
     private static final Logger LOGGER = LoggerFactory.getLogger(BackgroundSyncServiceLevelTask.class);
 
     @Override
-    public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
+    public void execute(final JobExecutionContext jobExecutionContext) throws JobExecutionException {
         LOGGER.info("updateVmwarePolicy start");
         try {
             Object obj = ApplicationContextHelper.getBean("ServiceLevelServiceImpl");

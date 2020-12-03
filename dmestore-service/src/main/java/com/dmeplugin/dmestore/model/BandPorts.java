@@ -2,8 +2,6 @@ package com.dmeplugin.dmestore.model;
 
 /**
  * @author lianq
- * @className BandPort
- * @description TODO
  * @date 2020/9/7 15:35
  */
 public class BandPorts {

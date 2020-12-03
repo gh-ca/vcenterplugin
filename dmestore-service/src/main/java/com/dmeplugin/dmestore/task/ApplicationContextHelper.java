@@ -13,11 +13,11 @@ public class ApplicationContextHelper implements ApplicationContextAware {
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
         ApplicationContextHelper.applicationContext = applicationContext;
     }
 
-    public static Object getBean(String beanName) {
-        return applicationContext != null?applicationContext.getBean(beanName):null;
+    public static Object getBean(final String beanName) {
+        return applicationContext != null ? applicationContext.getBean(beanName) : null;
     }
 }

@@ -12,14 +12,14 @@ import com.vmware.vim25.OptionValue;
 import java.util.List;
 
 /**
- *
  * 最佳实践检查
  * * @author wangxiangyong
+ *
  * @since 2020-11-30
  **/
 public class BaseBestPracticeService {
-    protected boolean check(VCSDKUtils vcsdkUtils, String objectId,
-                            String hostSetting, Object recommendValue) throws Exception {
+    protected boolean check(final VCSDKUtils vcsdkUtils, final String objectId,
+                            final String hostSetting, final Object recommendValue) throws Exception {
         Object v = getCurrentValue(vcsdkUtils, objectId, hostSetting);
         if (String.valueOf(v).equals(String.valueOf(recommendValue))) {
             return true;
@@ -28,8 +28,8 @@ public class BaseBestPracticeService {
         return false;
     }
 
-    protected void update(VCSDKUtils vcsdkUtils, String objectId,
-                          String hostSetting, Object recommendValue) throws Exception {
+    protected void update(final VCSDKUtils vcsdkUtils, final String objectId,
+                          final String hostSetting, final Object recommendValue) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         if (check(vcsdkUtils, objectId, hostSetting, recommendValue)) {
@@ -43,7 +43,7 @@ public class BaseBestPracticeService {
         hostMo.getHostAdvanceOptionMo().updateOptions(values);
     }
 
-    protected Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId, String hostSetting) throws Exception {
+    protected Object getCurrentValue(final VCSDKUtils vcsdkUtils, final String objectId, final String hostSetting) throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = this.getHostMoFactory().build(context, mor);
@@ -56,8 +56,8 @@ public class BaseBestPracticeService {
     }
 
 
-    protected boolean checkModuleOption(VCSDKUtils vcsdkUtils, String objectId,
-                                        String optionName, Object recommendValue) throws Exception {
+    protected boolean checkModuleOption(final VCSDKUtils vcsdkUtils, final String objectId,
+                                        final String optionName, final Object recommendValue) throws Exception {
         String currentValue = getCurrentModuleOption(vcsdkUtils, objectId, optionName);
         if (currentValue.equals(String.valueOf(recommendValue))) {
             return true;
@@ -65,7 +65,8 @@ public class BaseBestPracticeService {
         return false;
     }
 
-    protected String getCurrentModuleOption(VCSDKUtils vcsdkUtils, String objectId, String optionName) throws Exception {
+    protected String getCurrentModuleOption(final VCSDKUtils vcsdkUtils, final String objectId, final String optionName)
+        throws Exception {
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = this.getHostMoFactory().build(context, mor);
@@ -75,8 +76,8 @@ public class BaseBestPracticeService {
         return s[1];
     }
 
-    protected void updateModuleOption(VCSDKUtils vcsdkUtils, String objectId,
-                                      String optionName, Object recommendValue) throws Exception {
+    protected void updateModuleOption(final VCSDKUtils vcsdkUtils, final String objectId,
+                                      final String optionName, final Object recommendValue) throws Exception {
         if (checkModuleOption(vcsdkUtils, objectId, optionName, recommendValue)) {
             return;
         }
@@ -87,11 +88,11 @@ public class BaseBestPracticeService {
         hostMo.getHostKernelModuleSystemMo().updateModuleOptionString(optionName, v);
     }
 
-    public HostMOFactory getHostMoFactory(){
+    public HostMOFactory getHostMoFactory() {
         return HostMOFactory.getInstance();
     }
 
-    public DatastoreMOFactory getDatastoreMoFactory(){
+    public DatastoreMOFactory getDatastoreMoFactory() {
         return DatastoreMOFactory.getInstance();
     }
 
