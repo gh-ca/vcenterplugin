@@ -15,6 +15,7 @@ import com.dmeplugin.vmware.util.VmwareContext;
 import com.vmware.vim25.AboutInfo;
 import com.vmware.vim25.ClusterDasConfigInfo;
 import com.vmware.vim25.CustomFieldDef;
+import com.vmware.vim25.CustomFieldStringValue;
 import com.vmware.vim25.DynamicProperty;
 import com.vmware.vim25.HostConfigManager;
 import com.vmware.vim25.HostIpConfig;
@@ -137,16 +138,16 @@ public class HostMOTest {
     @Test
     public void getHostStorageSystemMo() throws Exception {
         ManagedObjectReference managedObjectReference = mock(ManagedObjectReference.class);
-        when(vmwareClient.getDynamicProperty(anyObject(), eq("configManager.storageSystem")))
-            .thenReturn(managedObjectReference);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("configManager.storageSystem"))).thenReturn(
+            managedObjectReference);
         hostMo.getHostStorageSystemMo();
     }
 
     @Test
     public void getHostDatastoreSystemMo() throws Exception {
         ManagedObjectReference managedObjectReference = mock(ManagedObjectReference.class);
-        when(vmwareClient.getDynamicProperty(anyObject(), eq("configManager.datastoreSystem")))
-            .thenReturn(managedObjectReference);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("configManager.datastoreSystem"))).thenReturn(
+            managedObjectReference);
         hostMo.getHostDatastoreSystemMo();
     }
 
@@ -184,16 +185,27 @@ public class HostMOTest {
 
     @Test
     public void getHyperHostDatacenter() throws Exception {
-        when(vmwareClient.getDynamicProperty(anyObject(), eq("name"))).thenReturn("cc");
-        hostMo.getHyperHostName();
+        List<ObjectContent> objectContentList = new ArrayList<>();
+        ObjectContent objectContent = mock(ObjectContent.class);
+        objectContentList.add(objectContent);
+        VimPortType service = mock(VimPortType.class);
+        when(context.getService()).thenReturn(service);
+        when(service.retrieveProperties(anyObject(), anyObject())).thenReturn(objectContentList);
+        when(objectContent.getObj()).thenReturn(mock(ManagedObjectReference.class));
+        List<DynamicProperty> dynamicPropertieList = new ArrayList<>();
+        DynamicProperty dynamicProperty = mock(DynamicProperty.class);
+        dynamicPropertieList.add(dynamicProperty);
+        when(objectContent.getPropSet()).thenReturn(dynamicPropertieList);
+        when(dynamicProperty.getVal()).thenReturn("cc");
+        hostMo.getHyperHostDatacenter();
     }
 
     @Test
     public void getHyperHostOwnerResourcePool() throws Exception {
         ManagedObjectReference morComputerResource = mock(ManagedObjectReference.class);
         when(vmwareClient.getDynamicProperty(anyObject(), eq("parent"))).thenReturn(morComputerResource);
-        when(vmwareClient.getDynamicProperty(anyObject(), eq("resourcePool")))
-            .thenReturn(mock(ManagedObjectReference.class));
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("resourcePool"))).thenReturn(
+            mock(ManagedObjectReference.class));
         hostMo.getHyperHostOwnerResourcePool();
     }
 
@@ -246,12 +258,36 @@ public class HostMOTest {
         properties.add(content);
         when(vimPortType.retrieveProperties(anyObject(), anyObject())).thenReturn(properties);
         List<DynamicProperty> props = new ArrayList<>();
-        DynamicProperty dynamicProperty = new DynamicProperty();
-        dynamicProperty.setName("name");
-        dynamicProperty.setVal(vmName);
+        DynamicProperty dynamicProperty = mock(DynamicProperty.class);
         props.add(dynamicProperty);
         when(content.getPropSet()).thenReturn(props);
+        when(dynamicProperty.getName()).thenReturn("name");
+        when(dynamicProperty.getVal()).thenReturn(vmName);
         hostMo.listVmsOnHyperHost(vmName);
+    }
+
+    @Test
+    public void listVmsOnHyperHost2() throws Exception {
+        String vmName = "12";
+        ServiceContent serviceContent = mock(ServiceContent.class);
+        when(context.getServiceContent()).thenReturn(serviceContent);
+        when(serviceContent.getCustomFieldsManager()).thenReturn(mock(ManagedObjectReference.class));
+        VimPortType vimPortType = mock(VimPortType.class);
+        when(context.getService()).thenReturn(vimPortType);
+        List<ObjectContent> properties = new ArrayList();
+        ObjectContent content = mock(ObjectContent.class);
+        properties.add(content);
+        when(vimPortType.retrieveProperties(anyObject(), anyObject())).thenReturn(properties);
+        List<DynamicProperty> props = new ArrayList<>();
+        DynamicProperty dynamicProperty = mock(DynamicProperty.class);
+        props.add(dynamicProperty);
+        when(content.getPropSet()).thenReturn(props);
+        when(dynamicProperty.getName()).thenReturn("value[11]");
+        CustomFieldStringValue fieldStringValue = mock(CustomFieldStringValue.class);
+        when(dynamicProperty.getVal()).thenReturn(fieldStringValue);
+        String vmInternalCsName = "i-9-9-";
+        when(fieldStringValue.getValue()).thenReturn(vmInternalCsName);
+        hostMo.listVmsOnHyperHost(null);
     }
 
     @Test
@@ -366,8 +402,8 @@ public class HostMOTest {
         ManagedObjectReference vmfsDatastore = mock(ManagedObjectReference.class);
         when(context.getDatastoreMorByPath(poolPath)).thenReturn(vmfsDatastore);
         CustomFieldDef field1 = mock(CustomFieldDef.class);
-        when(service.addCustomFieldDef(anyObject(), anyString(), anyString(),
-            anyObject(), anyObject())).thenReturn(field1);
+        when(service.addCustomFieldDef(anyObject(), anyString(), anyString(), anyObject(), anyObject())).thenReturn(
+            field1);
         when(field1.getKey()).thenReturn(201);
         doNothing().when(service).setField(anyObject(), anyObject(), anyInt(), anyString());
         hostMo.mountDatastore(true, poolHostAddress, poolHostPort, poolPath, uuid);
@@ -411,11 +447,11 @@ public class HostMOTest {
     @Test
     public void getHyperHostNetworkSummary() throws Exception {
         String managementPortGroup = "123";
-        AboutInfo aboutInfo = spy(AboutInfo.class);
-        aboutInfo.setName("VMware ESXi");
+        AboutInfo aboutInfo = mock(AboutInfo.class);
         when(vmwareClient.getDynamicProperty(anyObject(), eq("config.product"))).thenReturn(aboutInfo);
+        when(aboutInfo.getName()).thenReturn("VMware ESXi");
         List<VirtualNicManagerNetConfig> netConfigList = new ArrayList<>();
-        VirtualNicManagerNetConfig netConfig = spy(VirtualNicManagerNetConfig.class);
+        VirtualNicManagerNetConfig netConfig = mock(VirtualNicManagerNetConfig.class);
         netConfigList.add(netConfig);
         when(vmwareClient.getDynamicProperty(anyObject(), eq("config.virtualNicManagerInfo.netConfig"))).thenReturn(
             netConfigList);
@@ -432,6 +468,27 @@ public class HostMOTest {
         when(hostIpConfig.getIpAddress()).thenReturn("192.168.1.5");
         when(hostIpConfig.getSubnetMask()).thenReturn("192.168.1.1");
         when(spec.getMac()).thenReturn("192:168:1:1");
+        hostMo.getHyperHostNetworkSummary(managementPortGroup);
+    }
+
+    @Test
+    public void getHyperHostNetworkSummary1() throws Exception {
+        String managementPortGroup = "123";
+        AboutInfo aboutInfo = mock(AboutInfo.class);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("config.product"))).thenReturn(aboutInfo);
+        when(aboutInfo.getName()).thenReturn("VMware ESX");
+        List<HostVirtualNic> hostNics = new ArrayList<>();
+        HostVirtualNic vnic = mock(HostVirtualNic.class);
+        hostNics.add(vnic);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("config.network.consoleVnic"))).thenReturn(hostNics);
+        when(vnic.getPortgroup()).thenReturn(managementPortGroup);
+        HostVirtualNicSpec nicSpec =  mock(HostVirtualNicSpec.class);
+        when(vnic.getSpec()).thenReturn(nicSpec);
+        HostIpConfig hostIpConfig = mock(HostIpConfig.class);
+        when(nicSpec.getIp()).thenReturn(hostIpConfig);
+        when(hostIpConfig.getIpAddress()).thenReturn("192.168.3.112");
+        when(hostIpConfig.getSubnetMask()).thenReturn("11:112:33");
+        when(nicSpec.getMac()).thenReturn("s");
 
         hostMo.getHyperHostNetworkSummary(managementPortGroup);
     }

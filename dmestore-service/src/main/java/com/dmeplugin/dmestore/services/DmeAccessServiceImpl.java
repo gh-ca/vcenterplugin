@@ -67,8 +67,6 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     private static Integer dmeHostPort;
 
-//    @Autowired
-//    private RestTemplate restTemplate;
     private RestUtils restUtils = new RestUtils();
 
     @Override

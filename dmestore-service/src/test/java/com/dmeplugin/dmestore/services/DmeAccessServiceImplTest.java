@@ -2,12 +2,14 @@ package com.dmeplugin.dmestore.services;
 
 import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.dmeplugin.dmestore.dao.DmeInfoDao;
 import com.dmeplugin.dmestore.dao.ScheduleDao;
 import com.dmeplugin.dmestore.entity.DmeInfo;
 import com.dmeplugin.dmestore.task.ScheduleSetting;
+import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -28,7 +30,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -46,18 +47,20 @@ import java.util.Map;
 public class DmeAccessServiceImplTest {
     private Gson gson = new Gson();
 
-    private String hostIp = "10.143.133.199";
+    private String hostIp = "10.143.133.12";
 
     private int hostPort = 26335;
 
     private String userName = "evuser";
 
-    private String password = "Pbu4@123";
+    private String password = "Pbu4@1234";
 
     private String baseUrl = "https://" + hostIp + ":" + hostPort;
 
-    @Mock
     private RestTemplate restTemplate;
+
+    @Mock
+    private RestUtils restUtils;
 
     @Mock
     private VCSDKUtils vcsdkUtils;
@@ -86,6 +89,8 @@ public class DmeAccessServiceImplTest {
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
+        restTemplate = mock(RestTemplate.class);
+        when(restUtils.getRestTemplate()).thenReturn(restTemplate);
         login();
     }
 
@@ -490,7 +495,6 @@ public class DmeAccessServiceImplTest {
         String hostId = "9cbd24b5-fb5b-4ad9-9393-cf05b9b97339";
         List<String> volumeIds = new ArrayList<>();
         volumeIds.add("589e368c-6f08-45c8-a75c-b4dc28a6dcca");
-
         String url = baseUrl + "/rest/blockservice/v1/volumes/host-mapping";
         JsonObject body = new JsonObject();
         body.addProperty("host_id", hostId);

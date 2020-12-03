@@ -278,4 +278,21 @@ public class ClusterMOTest {
 
         clusterMO.getRecommendedDiskController(guestOsId);
     }
+
+    @Test
+    public void getClusterHosts() throws Exception {
+        List<ObjectContent> ocs = new ArrayList<>();
+        ObjectContent oc = mock(ObjectContent.class);
+        ocs.add(oc);
+        when(service.retrieveProperties(anyObject(), anyObject())).thenReturn(ocs);
+        ManagedObjectReference morHost = mock(ManagedObjectReference.class);
+        when(oc.getObj()).thenReturn(morHost);
+        List<DynamicProperty> dynamicPropertyList = new ArrayList<>();
+        DynamicProperty dynamicProperty = mock(DynamicProperty.class);
+        dynamicPropertyList.add(dynamicProperty);
+        when(oc.getPropSet()).thenReturn(dynamicPropertyList);
+        when(dynamicProperty.getVal()).thenReturn("cc");
+
+        clusterMO.getClusterHosts();
+    }
 }
