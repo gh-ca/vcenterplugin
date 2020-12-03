@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.dmeplugin.vmware.mo;
 
 import org.slf4j.Logger;
@@ -29,24 +13,24 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Properties;
 
-
 public class SnapshotDescriptor {
-    private static final Logger s_logger = LoggerFactory.getLogger(SnapshotDescriptor.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SnapshotDescriptor.class);
 
     private final Properties properties = new Properties();
 
     public SnapshotDescriptor() {
     }
 
+    public Properties getProperties() {
+        return properties;
+    }
+
     public void parse(byte[] vmsdFileContent) throws IOException {
         BufferedReader in = null;
         try {
-            in = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(vmsdFileContent),"UTF-8"));
+            in = new BufferedReader(new InputStreamReader(new ByteArrayInputStream(vmsdFileContent), "UTF-8"));
             String line;
             while ((line = in.readLine()) != null) {
-                // TODO, remember to remove this log, temporarily added for debugging purpose
-                s_logger.info("Parse snapshot file content: " + line);
-
                 String[] tokens = line.split("=");
                 if (tokens.length == 2) {
                     String name = tokens[0].trim();
@@ -96,9 +80,8 @@ public class SnapshotDescriptor {
 
     public byte[] getVmsdContent() {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-
-        try (BufferedWriter out = new BufferedWriter(new OutputStreamWriter(bos, "UTF-8"));) {
-
+        try {
+            BufferedWriter out = new BufferedWriter(new OutputStreamWriter(bos, "UTF-8"));
             out.write(".encoding = \"UTF-8\"");
             out.newLine();
             out.write(String.format("snapshot.lastUID = \"%s\"", properties.getProperty("snapshot.lastUID")));
@@ -168,7 +151,7 @@ public class SnapshotDescriptor {
             }
         } catch (IOException e) {
             assert (false);
-            s_logger.error("Unexpected exception ", e);
+            LOGGER.error("Unexpected exception ", e);
         }
 
         return bos.toByteArray();
@@ -202,9 +185,8 @@ public class SnapshotDescriptor {
                 numDisks = Integer.parseInt(numDisksStr);
                 DiskInfo[] disks = new DiskInfo[numDisks];
                 for (int i = 0; i < numDisks; i++) {
-                    disks[i] =
-                        new DiskInfo(properties.getProperty(String.format("snapshot%d.disk%d.fileName", id, i)), properties.getProperty(String.format(
-                            "snapshot%d.disk%d.node", id, i)));
+                    disks[i] = new DiskInfo(properties.getProperty(String.format("snapshot%d.disk%d.fileName", id, i)),
+                        properties.getProperty(String.format("snapshot%d.disk%d.node", id, i)));
                 }
 
                 SnapshotInfo info = new SnapshotInfo();
@@ -223,8 +205,11 @@ public class SnapshotDescriptor {
 
     public static class SnapshotInfo {
         private int id;
+
         private String displayName;
+
         private int numOfDisks;
+
         private DiskInfo[] disks;
 
         public SnapshotInfo() {
@@ -288,6 +273,7 @@ public class SnapshotDescriptor {
 
     public static class DiskInfo {
         private final String diskFileName;
+
         private final String deviceName;
 
         public DiskInfo(String diskFileName, String deviceName) {

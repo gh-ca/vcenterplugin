@@ -12,36 +12,24 @@ public class RootFsMO extends BaseMO {
     public RootFsMO(VmwareContext context, ManagedObjectReference mor) {
         super(context, mor);
     }
-    /**
-     * 获取host主机列表
-     */
+
     public List<Pair<ManagedObjectReference, String>> getAllHostOnRootFs()
-            throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
-        //查找hosts
+        throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
         List<Pair<ManagedObjectReference, String>> hosts = context.inFolderByType(context.getRootFolder(),
-                "HostSystem");
+            "HostSystem");
         return hosts;
     }
 
-    /**
-     * 获取集群列表
-     */
     public List<Pair<ManagedObjectReference, String>> getAllClusterOnRootFs()
-            throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
-        //查找clusters
+        throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
         List<Pair<ManagedObjectReference, String>> clusters = context.inFolderByType(context.getRootFolder(),
-                "ClusterComputeResource");
+            "ClusterComputeResource");
         return clusters;
     }
 
-    /**
-     * 获取datastore列表
-     */
     public List<Pair<ManagedObjectReference, String>> getAllDatastoreOnRootFs()
-            throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
-        //查找datastores
-        List<Pair<ManagedObjectReference, String>> hosts = context.inFolderByType(context.getRootFolder(),
-                "Datastore");
+        throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
+        List<Pair<ManagedObjectReference, String>> hosts = context.inFolderByType(context.getRootFolder(), "Datastore");
         return hosts;
     }
 
