@@ -43,4 +43,14 @@ public class BestPracticeUpResultBase {
     public void setUpdateResult(boolean updateResult) {
         this.updateResult = updateResult;
     }
+
+    @Override
+    public String toString() {
+        return "BestPracticeUpResultBase{" +
+            "hostSetting='" + hostSetting + '\'' +
+            ", needReboot=" + needReboot +
+            ", hostObjectId='" + hostObjectId + '\'' +
+            ", updateResult=" + updateResult +
+            '}';
+    }
 }

@@ -64,4 +64,15 @@ public class AuthClient {
         this.type = type;
     }
 
+    @Override
+    public String toString() {
+        return "AuthClient{" +
+            "accessval='" + accessval + '\'' +
+            ", id='" + id + '\'' +
+            ", name='" + name + '\'' +
+            ", secure='" + secure + '\'' +
+            ", sync='" + sync + '\'' +
+            ", type='" + type + '\'' +
+            '}';
+    }
 }

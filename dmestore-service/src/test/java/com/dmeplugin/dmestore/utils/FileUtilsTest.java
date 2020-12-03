@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.nio.file.attribute.UserPrincipal;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
@@ -66,6 +67,7 @@ public class FileUtilsTest {
     }
 
     @Test
+    @Ignore
     public void createDir() {
         fileUtils.createDir("321");
     }

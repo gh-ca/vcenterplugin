@@ -58,4 +58,15 @@ public class VolumeUpdate {
     public void setTuning(CustomizeVolumeTuning tuning) {
         this.tuning = tuning;
     }
+
+    @Override
+    public String toString() {
+        return "VolumeUpdate{" +
+            "name='" + name + '\'' +
+            ", ownerController='" + ownerController + '\'' +
+            ", prefetchPolicy='" + prefetchPolicy + '\'' +
+            ", prefetchValue='" + prefetchValue + '\'' +
+            ", tuning=" + tuning +
+            '}';
+    }
 }
