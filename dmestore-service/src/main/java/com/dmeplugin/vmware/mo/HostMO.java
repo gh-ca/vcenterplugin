@@ -79,7 +79,6 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
             ClusterMO clusterMo = clusterMOFactory.build(context, morParent);
             return clusterMo.getDasConfig();
         }
-
         return null;
     }
 
@@ -90,7 +89,6 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
             ClusterMO clusterMo = clusterMOFactory.build(context, morParent);
             return clusterMo.isHaEnabled();
         }
-
         return false;
     }
 
@@ -152,8 +150,6 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         if (CLUSTER_COMPUTE_RESOURCE.equalsIgnoreCase(morParent.getType())) {
             return morParent;
         }
-
-        assert false;
         throw new Exception("Standalone host is not supported");
     }
 
@@ -168,7 +164,6 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         } else if ("VMware ESX".equals(aboutInfo.getName())) {
             return VmwareHostType.ESX;
         }
-
         throw new Exception("Unrecognized VMware host type " + aboutInfo.getName());
     }
 
@@ -194,10 +189,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         if (vmMo != null) {
             return vmMo;
         }
-
-        logger.info("VM " + vmName + " not found in host cache");
         loadVmCache();
-
         return vmCache.get(vmName);
     }
 
@@ -214,12 +206,10 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
     private void loadVmCache() throws Exception {
         vmCache.clear();
-
         int key = getCustomFieldKey("VirtualMachine", CustomFieldConstants.CLOUD_VM_INTERNAL_NAME);
         if (key == 0) {
             logger.warn("Custom field " + CustomFieldConstants.CLOUD_VM_INTERNAL_NAME + " is not registered ?!");
         }
-
         ObjectContent[] ocs = getVmPropertiesOnHyperHost(new String[] {"name", "value[" + key + "]"});
         if (ocs != null && ocs.length > 0) {
             for (ObjectContent oc : ocs) {
@@ -242,7 +232,6 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
                     } else {
                         vmName = vmVcenterName;
                     }
-
                     vmCache.put(vmName, new VirtualMachineMO(context, oc.getObj()));
                 }
             }
@@ -254,26 +243,21 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         PropertySpec pSpec = new PropertySpec();
         pSpec.setType("VirtualMachine");
         pSpec.getPathSet().addAll(Arrays.asList(propertyPaths));
-
         TraversalSpec host2VmTraversal = new TraversalSpec();
         host2VmTraversal.setType("HostSystem");
         host2VmTraversal.setPath("vm");
         host2VmTraversal.setName("host2VmTraversal");
-
         ObjectSpec oSpec = new ObjectSpec();
         oSpec.setObj(mor);
         oSpec.setSkip(Boolean.TRUE);
         oSpec.getSelectSet().add(host2VmTraversal);
-
         PropertyFilterSpec pfSpec = new PropertyFilterSpec();
         pfSpec.getPropSet().add(pSpec);
         pfSpec.getObjectSet().add(oSpec);
         List<PropertyFilterSpec> pfSpecArr = new ArrayList<>();
         pfSpecArr.add(pfSpec);
-
         List<ObjectContent> properties = context.getService()
             .retrieveProperties(context.getPropertyCollector(), pfSpecArr);
-
         return properties.toArray(new ObjectContent[properties.size()]);
     }
 
@@ -282,23 +266,19 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         PropertySpec pSpec = new PropertySpec();
         pSpec.setType("Datastore");
         pSpec.getPathSet().addAll(Arrays.asList(propertyPaths));
-
         TraversalSpec host2DatastoreTraversal = new TraversalSpec();
         host2DatastoreTraversal.setType("HostSystem");
         host2DatastoreTraversal.setPath("datastore");
         host2DatastoreTraversal.setName("host2DatastoreTraversal");
-
         ObjectSpec oSpec = new ObjectSpec();
         oSpec.setObj(mor);
         oSpec.setSkip(Boolean.TRUE);
         oSpec.getSelectSet().add(host2DatastoreTraversal);
-
         PropertyFilterSpec pfSpec = new PropertyFilterSpec();
         pfSpec.getPropSet().add(pSpec);
         pfSpec.getObjectSet().add(oSpec);
         List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
         pfSpecArr.add(pfSpec);
-
         List<ObjectContent> properties = context.getService()
             .retrieveProperties(context.getPropertyCollector(), pfSpecArr);
         return properties.toArray(new ObjectContent[properties.size()]);
@@ -306,7 +286,6 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
     public List<Pair<ManagedObjectReference, String>> getDatastoreMountsOnHost() throws Exception {
         List<Pair<ManagedObjectReference, String>> mounts = new ArrayList<Pair<ManagedObjectReference, String>>();
-
         ObjectContent[] ocs = getDatastorePropertiesOnHyperHost(
             new String[] {String.format("host[\"%s\"].mountInfo.path", mor.getValue())});
         if (ocs != null) {
@@ -370,15 +349,12 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
             } else {
                 morDatastore = context.getDatastoreMorByPath(poolPath);
                 if (morDatastore == null) {
-                    String msg = "Unable to create VMFS datastore.";
-                    throw new Exception(msg);
+                    throw new Exception("Unable to create VMFS datastore.");
                 }
-
                 DatastoreMO dsMo = new DatastoreMO(context, morDatastore);
                 dsMo.setCustomFieldValue(CustomFieldConstants.CLOUD_UUID, poolUuid);
             }
         }
-
         return morDatastore;
     }
 
@@ -386,8 +362,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     public void unmountDatastore(String uuid) throws Exception {
         HostDatastoreSystemMO hostDatastoreSystemMo = getHostDatastoreSystemMo();
         if (!hostDatastoreSystemMo.deleteDatastore(uuid)) {
-            String msg = "Unable to unmount datastore. uuid: " + uuid;
-            throw new Exception(msg);
+            throw new Exception("Unable to unmount datastore. uuid: " + uuid);
         }
     }
 
@@ -422,7 +397,6 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         } else {
             List<HostVirtualNic> hostNics = context.getVimClient()
                 .getDynamicProperty(mor, "config.network.consoleVnic");
-
             if (hostNics != null) {
                 for (HostVirtualNic vnic : hostNics) {
                     if (vnic.getPortgroup().equals(managementPortGroup)) {
