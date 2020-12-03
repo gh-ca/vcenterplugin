@@ -17,11 +17,13 @@ import com.dmeplugin.vmware.util.VmwareContextPool;
 import com.vmware.vim25.ClusterConfigInfoEx;
 import com.vmware.vim25.ClusterDasConfigInfo;
 import com.vmware.vim25.ClusterDasVmConfigInfo;
+import com.vmware.vim25.CustomFieldDef;
 import com.vmware.vim25.DasVmPriority;
 import com.vmware.vim25.DynamicProperty;
 import com.vmware.vim25.GuestOsDescriptor;
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.ObjectContent;
+import com.vmware.vim25.ServiceContent;
 import com.vmware.vim25.VimPortType;
 import com.vmware.vim25.VirtualMachineConfigOption;
 
@@ -49,6 +51,8 @@ public class ClusterMOTest {
 
     private VmwareClient vmwareClient;
 
+    private VimPortType service;
+
     @InjectMocks
     ClusterMO clusterMO;
 
@@ -58,6 +62,9 @@ public class ClusterMOTest {
 
         vmwareClient = mock(VmwareClient.class);
         when(context.getVimClient()).thenReturn(vmwareClient);
+
+        service = mock(VimPortType.class);
+        when(context.getService()).thenReturn(service);
     }
 
     @Test
@@ -168,6 +175,26 @@ public class ClusterMOTest {
     @Test
     public void findVmOnHyperHost() throws Exception {
         String name = "123";
+        int key = 11;
+        String instanceNameCustomField = "value[" + key + "]";
+        ServiceContent content = mock(ServiceContent.class);
+        ManagedObjectReference customFieldsManager = mock(ManagedObjectReference.class);
+        when(context.getServiceContent()).thenReturn(content);
+        when(content.getCustomFieldsManager()).thenReturn(customFieldsManager);
+
+        List<CustomFieldDef> fields = new ArrayList<>();
+        CustomFieldDef field = mock(CustomFieldDef.class);
+        fields.add(field);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("field"))).thenReturn(fields);
+        String fieldName = "cloud.vm.internal.name";
+        when(field.getName()).thenReturn(fieldName);
+        String vmType = "VirtualMachine";
+        when(field.getManagedObjectType()).thenReturn(vmType);
+        when(field.getKey()).thenReturn(key);
+        List<ObjectContent> ocs = new ArrayList<>();
+        ObjectContent oc = mock(ObjectContent.class);
+        ocs.add(oc);
+        when(service.retrieveProperties(anyObject(), anyObject())).thenReturn(ocs);
         clusterMO.findVmOnHyperHost(name);
     }
 

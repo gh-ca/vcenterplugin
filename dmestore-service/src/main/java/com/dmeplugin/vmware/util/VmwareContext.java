@@ -279,7 +279,6 @@ public class VmwareContext {
     public HttpURLConnection getHttpConnection(String urlString, String httpMethod) throws Exception {
         String cookie = vimClient.getServiceCookie();
         if (cookie == null) {
-            s_logger.error("No cookie is found in vmware web service request context!");
             throw new Exception("No cookie is found in vmware web service request context!");
         }
         URL url = new URL(urlString);
