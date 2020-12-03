@@ -47,4 +47,14 @@ public class BestPracticeUpResultResponse {
     public void setNeedReboot(boolean needReboot) {
         this.needReboot = needReboot;
     }
+
+    @Override
+    public String toString() {
+        return "BestPracticeUpResultResponse{" +
+            "hostObjectId='" + hostObjectId + '\'' +
+            ", hostName='" + hostName + '\'' +
+            ", result=" + result +
+            ", needReboot=" + needReboot +
+            '}';
+    }
 }

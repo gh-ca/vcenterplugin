@@ -78,4 +78,17 @@ public class NfsShares {
     public void setOwningDtreeId(String owningDtreeId) {
         this.owningDtreeId = owningDtreeId;
     }
+
+    @Override
+    public String toString() {
+        return "NfsShares{" +
+            "name='" + name + '\'' +
+            ", sharePath='" + sharePath + '\'' +
+            ", storageId='" + storageId + '\'' +
+            ", tierName='" + tierName + '\'' +
+            ", owningDtreeName='" + owningDtreeName + '\'' +
+            ", fsName='" + fsName + '\'' +
+            ", owningDtreeId='" + owningDtreeId + '\'' +
+            '}';
+    }
 }
