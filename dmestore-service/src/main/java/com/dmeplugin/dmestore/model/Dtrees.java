@@ -76,4 +76,17 @@ public class Dtrees {
     public void setCifsCount(Integer cifsCount) {
         this.cifsCount = cifsCount;
     }
+
+    @Override
+    public String toString() {
+        return "Dtrees{" +
+            "name='" + name + '\'' +
+            ", fsName='" + fsName + '\'' +
+            ", quotaSwitch=" + quotaSwitch +
+            ", securityStyle='" + securityStyle + '\'' +
+            ", tierName='" + tierName + '\'' +
+            ", nfsCount=" + nfsCount +
+            ", cifsCount=" + cifsCount +
+            '}';
+    }
 }

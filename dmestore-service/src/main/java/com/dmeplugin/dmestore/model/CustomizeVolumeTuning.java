@@ -49,4 +49,14 @@ public class CustomizeVolumeTuning {
     public void setSmarttier(Integer smarttier) {
         this.smarttier = smarttier;
     }
+
+    @Override
+    public String toString() {
+        return "CustomizeVolumeTuning{" +
+            "smartQos=" + smartQos +
+            ", compressionEnabled=" + compressionEnabled +
+            ", dedupeEnabled=" + dedupeEnabled +
+            ", smarttier=" + smarttier +
+            '}';
+    }
 }

@@ -82,4 +82,18 @@ public class QosParam {
     public void setSmartQos(SmartQos smartQos) {
         this.smartQos = smartQos;
     }
+
+    @Override
+    public String toString() {
+        return "QosParam{" +
+            "enabled=" + enabled +
+            ", latency=" + latency +
+            ", latencyUnit='" + latencyUnit + '\'' +
+            ", minBandWidth=" + minBandWidth +
+            ", minIOPS=" + minIOPS +
+            ", maxBandWidth=" + maxBandWidth +
+            ", maxIOPS=" + maxIOPS +
+            ", smartQos=" + smartQos +
+            '}';
+    }
 }

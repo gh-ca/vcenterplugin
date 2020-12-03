@@ -25,4 +25,12 @@ public class BestPracticeUpdateByTypeRequest {
     public void setHostObjectIds(List<String> hostObjectIds) {
         this.hostObjectIds = hostObjectIds;
     }
+
+    @Override
+    public String toString() {
+        return "BestPracticeUpdateByTypeRequest{" +
+            "hostSetting='" + hostSetting + '\'' +
+            ", hostObjectIds=" + hostObjectIds +
+            '}';
+    }
 }

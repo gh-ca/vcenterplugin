@@ -1,6 +1,8 @@
 package com.dmeplugin.dmestore.model;
 
 
+import java.util.Arrays;
+
 /**
  * @author lianq
  * @className StorageDetail
@@ -382,5 +384,47 @@ public class StorageDetail {
 
     public void setOptimizeCapacity(Double optimizeCapacity) {
         this.optimizeCapacity = optimizeCapacity;
+    }
+
+    @Override
+    public String toString() {
+        return "StorageDetail{" +
+            "id='" + id + '\'' +
+            ", name='" + name + '\'' +
+            ", ip='" + ip + '\'' +
+            ", status='" + status + '\'' +
+            ", synStatus='" + synStatus + '\'' +
+            ", sn='" + sn + '\'' +
+            ", vendor='" + vendor + '\'' +
+            ", model='" + model + '\'' +
+            ", usedCapacity=" + usedCapacity +
+            ", totalCapacity=" + totalCapacity +
+            ", totalEffectiveCapacity=" + totalEffectiveCapacity +
+            ", freeEffectiveCapacity=" + freeEffectiveCapacity +
+            ", subscriptionCapacity=" + subscriptionCapacity +
+            ", protectionCapacity=" + protectionCapacity +
+            ", fileCapacity=" + fileCapacity +
+            ", blockCapacity=" + blockCapacity +
+            ", dedupedCapacity=" + dedupedCapacity +
+            ", compressedCapacity=" + compressedCapacity +
+            ", optimizeCapacity=" + optimizeCapacity +
+            ", azIds=" + Arrays.toString(azIds) +
+            ", storagePool='" + storagePool + '\'' +
+            ", volume='" + volume + '\'' +
+            ", fileSystem='" + fileSystem + '\'' +
+            ", dTrees='" + dTrees + '\'' +
+            ", nfsShares='" + nfsShares + '\'' +
+            ", bandPorts='" + bandPorts + '\'' +
+            ", logicPorts='" + logicPorts + '\'' +
+            ", storageControllers='" + storageControllers + '\'' +
+            ", storageDisks='" + storageDisks + '\'' +
+            ", productVersion='" + productVersion + '\'' +
+            ", warning='" + warning + '\'' +
+            ", event='" + event + '\'' +
+            ", location='" + location + '\'' +
+            ", patchVersion='" + patchVersion + '\'' +
+            ", maintenanceStart='" + maintenanceStart + '\'' +
+            ", maintenanceOvertime='" + maintenanceOvertime + '\'' +
+            '}';
     }
 }

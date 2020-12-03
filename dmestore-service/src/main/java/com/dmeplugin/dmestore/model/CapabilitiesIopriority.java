@@ -33,4 +33,12 @@ public class CapabilitiesIopriority {
     public void setPolicy(Integer policy) {
         this.policy = policy;
     }
+
+    @Override
+    public String toString() {
+        return "CapabilitiesIopriority{" +
+            "enabled=" + enabled +
+            ", policy=" + policy +
+            '}';
+    }
 }
