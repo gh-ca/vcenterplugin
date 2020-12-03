@@ -18,10 +18,8 @@
 package com.dmeplugin.vmware.util;
 
 
-import com.dmeplugin.dmestore.utils.StringUtil;
 import com.dmeplugin.vmware.mo.DatacenterMO;
 import com.dmeplugin.vmware.mo.DatastoreFile;
-import com.dmeplugin.vmware.mo.DatastoreMO;
 import com.vmware.connection.helpers.builders.ObjectSpecBuilder;
 import com.vmware.connection.helpers.builders.PropertyFilterSpecBuilder;
 import com.vmware.connection.helpers.builders.PropertySpecBuilder;
@@ -40,16 +38,12 @@ import com.vmware.vim25.ServiceContent;
 import com.vmware.vim25.TaskInfo;
 import com.vmware.vim25.VimPortType;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -209,7 +203,6 @@ public class VmwareContext {
         }
 
         //DatacenterMO dcMo = new DatacenterMO(this, tokens[0]);
-        String token = tokens[0];
         DatacenterMO dcMo = datacenterMOFactory.build(this, tokens[0]);
         if (dcMo.getMor() == null) {
             s_logger.error("Unable to locate the datacenter specified in path: " + inventoryPath);
@@ -272,6 +265,7 @@ public class VmwareContext {
         }
         return sb.toString();
     }
+
     public HttpURLConnection getHttpConnection(String urlString) throws Exception {
         return getHttpConnection(urlString, "GET");
     }

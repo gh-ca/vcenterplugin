@@ -3,12 +3,10 @@ package com.dmeplugin.vmware.mo;
 import com.dmeplugin.vmware.util.Pair;
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.dmeplugin.vmware.util.VmwareHelper;
-import com.google.gson.Gson;
 import com.vmware.vim25.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 

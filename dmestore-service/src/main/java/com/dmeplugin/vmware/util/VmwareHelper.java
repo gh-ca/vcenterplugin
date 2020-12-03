@@ -15,7 +15,8 @@ public class VmwareHelper {
         return (deviceNumber % VmwareHelper.MAX_ALLOWED_DEVICES_SCSI_CONTROLLER) == 7;
     }
 
-    public static String getRecommendedDiskControllerFromDescriptor(GuestOsDescriptor guestOsDescriptor) throws Exception {
+    public static String getRecommendedDiskControllerFromDescriptor(GuestOsDescriptor guestOsDescriptor)
+        throws Exception {
         String recommendedController = guestOsDescriptor.getRecommendedDiskController();
         if (DiskControllerType.getType(recommendedController) == DiskControllerType.pvscsi) {
             recommendedController = DiskControllerType.lsilogic.toString();

@@ -5,20 +5,33 @@ import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.exception.DmeSqlException;
 import com.dmeplugin.dmestore.exception.VcenterException;
-import com.dmeplugin.dmestore.model.*;
+import com.dmeplugin.dmestore.model.AuthClient;
+import com.dmeplugin.dmestore.model.NfsDataInfo;
+import com.dmeplugin.dmestore.model.NfsDataStoreFsAttr;
+import com.dmeplugin.dmestore.model.NfsDataStoreLogicPortAttr;
+import com.dmeplugin.dmestore.model.NfsDataStoreShareAttr;
+import com.dmeplugin.dmestore.model.Storage;
 import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
-import com.dmeplugin.dmestore.utils.StringUtil;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-
-import java.util.*;
 
 /**
  * @author wangxiangyong
@@ -308,7 +321,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return false;
     }
 
-    private boolean dmeVmWareRelationDbProcess(List<DmeVmwareRelation> relationList, String storeType) throws DmeSqlException {
+    private boolean dmeVmWareRelationDbProcess(List<DmeVmwareRelation> relationList, String storeType)
+        throws DmeSqlException {
         //本地全量查询NFS
         List<String> storageIds = dmeVmwareRalationDao.getAllStorageIdByType(storeType);
         List<DmeVmwareRelation> newList = new ArrayList<>();
@@ -357,7 +371,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private ResponseEntity listShareBySharePath(String sharePath) throws DMEException {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("share_path", sharePath);
-        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL, HttpMethod.POST, gson.toJson(requestbody));
+        ResponseEntity responseEntity =
+            dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL, HttpMethod.POST, gson.toJson(requestbody));
         return responseEntity;
     }
 
@@ -408,7 +423,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         if (!StringUtils.isEmpty(fsName)) {
             requestbody.put("name", fsName);
         }
-        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_FILESERVICE_QUERY_URL, HttpMethod.POST, gson.toJson(requestbody));
+        ResponseEntity responseEntity = dmeAccessService
+            .access(DmeConstants.DME_NFS_FILESERVICE_QUERY_URL, HttpMethod.POST, gson.toJson(requestbody));
         return responseEntity;
     }
 
@@ -523,7 +539,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                                     NfsDataInfo nfsDataInfo = new NfsDataInfo();
                                     double capacity = ToolUtils.getDouble(jo.get("capacity")) / ToolUtils.GI;
                                     double freeSpace = ToolUtils.getDouble(jo.get("freeSpace")) / ToolUtils.GI;
-                                    double reserveCapacity = (ToolUtils.getDouble(jo.get("capacity")) - ToolUtils.getDouble(jo.get("freeSpace"))) / ToolUtils.GI;
+                                    double reserveCapacity = (ToolUtils.getDouble(jo.get("capacity")) -
+                                        ToolUtils.getDouble(jo.get("freeSpace"))) / ToolUtils.GI;
 
                                     nfsDataInfo.setName(ToolUtils.jsonToStr(jo.get("name")));
                                     nfsDataInfo.setCapacity(capacity);
@@ -544,10 +561,13 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
                                     String fsUrl = "";
                                     try {
-                                        fsUrl = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace("{file_system_id}", dvr.getFsId());
-                                        ResponseEntity<String> responseTuning = dmeAccessService.access(fsUrl, HttpMethod.GET, null);
+                                        fsUrl = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL
+                                            .replace("{file_system_id}", dvr.getFsId());
+                                        ResponseEntity<String> responseTuning =
+                                            dmeAccessService.access(fsUrl, HttpMethod.GET, null);
                                         if (responseTuning.getStatusCodeValue() / 100 == 2) {
-                                            JsonObject fsDetail = gson.fromJson(responseTuning.getBody(), JsonObject.class);
+                                            JsonObject fsDetail =
+                                                gson.fromJson(responseTuning.getBody(), JsonObject.class);
 
                                             nfsDataInfo.setStatus(ToolUtils.jsonToStr(fsDetail.get("health_status")));
                                             nfsDataInfo.setDeviceId(ToolUtils.jsonToStr(fsDetail.get("storage_id")));
@@ -625,10 +645,18 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                             if (statisticObject != null) {
                                 NfsDataInfo nfsDataInfo = new NfsDataInfo();
                                 nfsDataInfo.setFsId(fsId);
-                                nfsDataInfo.setOps(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_FS_THROUGHPUT, "max"), null));
-                                nfsDataInfo.setBandwidth(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_FS_BANDWIDTH, "max"), null));
-                                nfsDataInfo.setReadResponseTime(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_FS_READRESPONSETIME, "max"), null));
-                                nfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_FS_WRITERESPONSETIME, "max"), null));
+                                nfsDataInfo.setOps(ToolUtils.jsonToFloat(ToolUtils
+                                    .getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_FS_THROUGHPUT,
+                                        "max"), null));
+                                nfsDataInfo.setBandwidth(ToolUtils.jsonToFloat(ToolUtils
+                                    .getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_FS_BANDWIDTH,
+                                        "max"), null));
+                                nfsDataInfo.setReadResponseTime(ToolUtils.jsonToFloat(ToolUtils
+                                    .getStatistcValue(statisticObject,
+                                        DmeIndicatorConstants.COUNTER_ID_FS_READRESPONSETIME, "max"), null));
+                                nfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(ToolUtils
+                                    .getStatistcValue(statisticObject,
+                                        DmeIndicatorConstants.COUNTER_ID_FS_WRITERESPONSETIME, "max"), null));
                                 relists.add(nfsDataInfo);
                             }
                         }
@@ -682,13 +710,13 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                             //String mountType = null;
                             if (params.get("hostObjectId") != null) {
                                 hostObjectId = ToolUtils.getStr(params.get("hostObjectId"));
-                                logicPortIp= ToolUtils.getStr( params.get("hostVkernelIp"));
+                                logicPortIp = ToolUtils.getStr(params.get("hostVkernelIp"));
                             }
                         /*if (params.get("clusters") != null) {
                             clusters = (List<Map<String, String>>) params.get("clusters");
                         }*/
                             vcsdkUtils.mountNfs(dataStoreObjectId,
-                                    hostObjectId, logicPortIp, ToolUtils.getStr(params.get("mountType")));
+                                hostObjectId, logicPortIp, ToolUtils.getStr(params.get("mountType")));
 
                         } else {
                             throw new DMEException("DME mount nfs error(task status)!");
@@ -733,7 +761,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
             Map<String, Object> addition = new HashMap<>();
             addition.put("name", vkernelIp);
-            String accessval = ("readOnly".equalsIgnoreCase(ToolUtils.getStr(params.get("mountType")))) ? "read-only" : "read/write";
+            String accessval =
+                ("readOnly".equalsIgnoreCase(ToolUtils.getStr(params.get("mountType")))) ? "read-only" : "read/write";
             addition.put("accessval", accessval);
             addition.put("all_squash", "no_all_squash");
             addition.put("root_squash", "root_squash");
@@ -745,7 +774,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
             LOG.info("mountnfs requestbody==" + gson.toJson(requestbody));
 
-            String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace("{nfs_share_id}", ToolUtils.getStr(params.get("shareId")));
+            String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL
+                .replace("{nfs_share_id}", ToolUtils.getStr(params.get("shareId")));
             LOG.info("mountnfs URL===" + url);
             ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(requestbody));
 
@@ -927,7 +957,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         requestbody.put("nfs_share_ids", shareIds);
         LOG.info("delete nfs share requestbody==" + gson.toJson(requestbody));
         try {
-            ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
+            ResponseEntity responseEntity = dmeAccessService
+                .access(DmeConstants.DME_NFS_SHARE_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
             LOG.info("delete nfs share responseEntity==" + responseEntity.toString());
             if (responseEntity.getStatusCodeValue() == 202) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -948,7 +979,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         requestbody.put("file_system_ids", fsIds);
         LOG.info("delete nfs fs requestbody==" + gson.toJson(requestbody));
         try {
-            ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_FS_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
+            ResponseEntity responseEntity =
+                dmeAccessService.access(DmeConstants.DME_NFS_FS_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
             LOG.info("delete nfs fs responseEntity==" + responseEntity.toString());
             if (responseEntity.getStatusCodeValue() == 202) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -978,12 +1010,14 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             LOG.error("get Hosts MountDataStore By DsObjectId error:", e);
             throw new DMEException(e.getMessage());
         }
-        LOG.info("getHostsMountDataStoreByDsObjectId===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
+        LOG.info("getHostsMountDataStoreByDsObjectId===" +
+            (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
 
     @Override
-    public List<Map<String, Object>> getClusterMountDataStoreByDsObjectId(String dataStoreObjectId) throws DMEException {
+    public List<Map<String, Object>> getClusterMountDataStoreByDsObjectId(String dataStoreObjectId)
+        throws DMEException {
         List<Map<String, Object>> lists = null;
         try {
             //取得vcenter中的所有挂载了当前存储的host
@@ -997,7 +1031,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             LOG.error("get Clusters MountDataStore By DsObjectId error:", e);
             throw new DMEException(e.getMessage());
         }
-        LOG.info("getClustersMountDataStoreByDsObjectId===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
+        LOG.info("getClustersMountDataStoreByDsObjectId===" +
+            (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
 
