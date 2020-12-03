@@ -1,6 +1,8 @@
 package com.dmeplugin.vmware.mo;
 
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyObject;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
@@ -12,6 +14,7 @@ import com.dmeplugin.vmware.util.VmwareClient;
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.vmware.vim25.AboutInfo;
 import com.vmware.vim25.ClusterDasConfigInfo;
+import com.vmware.vim25.CustomFieldDef;
 import com.vmware.vim25.DynamicProperty;
 import com.vmware.vim25.HostConfigManager;
 import com.vmware.vim25.HostIpConfig;
@@ -48,13 +51,9 @@ public class HostMOTest {
     private VmwareContext context;
 
     @Mock
-    private ManagedObjectReference mor;
-
-    @Mock
     private ClusterMOFactory clusterMOFactory;
 
-    @Mock
-    Map<String, VirtualMachineMO> vmCache;
+    private VimPortType service;
 
     @InjectMocks
     private HostMO hostMo;
@@ -66,6 +65,9 @@ public class HostMOTest {
         MockitoAnnotations.initMocks(this);
         vmwareClient = mock(VmwareClient.class);
         when(context.getVimClient()).thenReturn(vmwareClient);
+        service = mock(VimPortType.class);
+        when(context.getService()).thenReturn(service);
+
     }
 
     @Test
@@ -78,7 +80,8 @@ public class HostMOTest {
     @Test
     public void getHostVirtualNicManagerNetConfig() throws Exception {
         List<VirtualNicManagerNetConfig> list = new ArrayList<>();
-        when(vmwareClient.getDynamicProperty(anyObject(), eq("config.virtualNicManagerInfo.netConfig"))).thenReturn(list);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("config.virtualNicManagerInfo.netConfig"))).thenReturn(
+            list);
         hostMo.getHostVirtualNicManagerNetConfig();
     }
 
@@ -133,11 +136,17 @@ public class HostMOTest {
 
     @Test
     public void getHostStorageSystemMo() throws Exception {
+        ManagedObjectReference managedObjectReference = mock(ManagedObjectReference.class);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("configManager.storageSystem")))
+            .thenReturn(managedObjectReference);
         hostMo.getHostStorageSystemMo();
     }
 
     @Test
     public void getHostDatastoreSystemMo() throws Exception {
+        ManagedObjectReference managedObjectReference = mock(ManagedObjectReference.class);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("configManager.datastoreSystem")))
+            .thenReturn(managedObjectReference);
         hostMo.getHostDatastoreSystemMo();
     }
 
@@ -175,41 +184,52 @@ public class HostMOTest {
 
     @Test
     public void getHyperHostDatacenter() throws Exception {
-        when(vmwareClient.getDynamicProperty(mor, "name")).thenReturn("cc");
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("name"))).thenReturn("cc");
         hostMo.getHyperHostName();
     }
 
     @Test
     public void getHyperHostOwnerResourcePool() throws Exception {
-        when(vmwareClient.getDynamicProperty(mor, "parent")).thenReturn(mock(ManagedObjectReference.class));
+        ManagedObjectReference morComputerResource = mock(ManagedObjectReference.class);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("parent"))).thenReturn(morComputerResource);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("resourcePool")))
+            .thenReturn(mock(ManagedObjectReference.class));
         hostMo.getHyperHostOwnerResourcePool();
     }
 
     @Test
     public void getHyperHostCluster() throws Exception {
         ManagedObjectReference parent = mock(ManagedObjectReference.class);
-        parent.setType("ClusterComputeResource");
-        when(vmwareClient.getDynamicProperty(mor, "parent")).thenReturn(parent);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("parent"))).thenReturn(parent);
+        when(parent.getType()).thenReturn("ClusterComputeResource");
         hostMo.getHyperHostCluster();
     }
 
     @Test
     public void getHostAboutInfo() throws Exception {
-        when(vmwareClient.getDynamicProperty(mor, "config.product")).thenReturn(mock(AboutInfo.class));
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("config.product"))).thenReturn(mock(AboutInfo.class));
         hostMo.getHostAboutInfo();
     }
 
     @Test
     public void getHostType() throws Exception {
         AboutInfo aboutInfo = mock(AboutInfo.class);
-        aboutInfo.setName("VMware ESXi");
-        when(vmwareClient.getDynamicProperty(mor, "config.product")).thenReturn(aboutInfo);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("config.product"))).thenReturn(aboutInfo);
+        when(aboutInfo.getName()).thenReturn("VMware ESX");
+        hostMo.getHostType();
+    }
+
+    @Test
+    public void getHostType2() throws Exception {
+        AboutInfo aboutInfo = mock(AboutInfo.class);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("config.product"))).thenReturn(aboutInfo);
+        when(aboutInfo.getName()).thenReturn("VMware ESXi");
         hostMo.getHostType();
     }
 
     @Test
     public void getHostName() throws Exception {
-        when(vmwareClient.getDynamicProperty(mor, "name")).thenReturn("cc");
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("name"))).thenReturn("cc");
         hostMo.getHostName();
     }
 
@@ -270,19 +290,19 @@ public class HostMOTest {
 
     @Test
     public void getDatastoreMountsOnHost() throws Exception {
-        when(mor.getValue()).thenReturn("cc");
-        List<ObjectContent> properties = new ArrayList();
-        ObjectContent content = spy(ObjectContent.class);
-        content.setObj(spy(ManagedObjectReference.class));
+        List<ObjectContent> ocs = new ArrayList();
+        ObjectContent oc = mock(ObjectContent.class);
+        ocs.add(oc);
+        ManagedObjectReference ocObj = mock(ManagedObjectReference.class);
+        when(oc.getObj()).thenReturn(ocObj);
         List<DynamicProperty> list = new ArrayList<>();
         DynamicProperty dynamicProperty = spy(DynamicProperty.class);
-        dynamicProperty.setVal("kk");
         list.add(dynamicProperty);
-        when(content.getPropSet()).thenReturn(list);
-        properties.add(content);
+        when(dynamicProperty.getVal()).thenReturn("kk");
+        when(oc.getPropSet()).thenReturn(list);
         VimPortType vimPortType = mock(VimPortType.class);
         when(context.getService()).thenReturn(vimPortType);
-        when(vimPortType.retrieveProperties(anyObject(), anyObject())).thenReturn(properties);
+        when(vimPortType.retrieveProperties(anyObject(), anyObject())).thenReturn(ocs);
 
         hostMo.getDatastoreMountsOnHost();
     }
@@ -291,14 +311,14 @@ public class HostMOTest {
     public void getExistingDataStoreOnHost() throws Exception {
         String hostAddress = "122";
         String path = "12";
-        HostDatastoreSystemMO hostDatastoreSystemMo = new HostDatastoreSystemMO(context, mor);
+        HostDatastoreSystemMO hostDatastoreSystemMo = mock(HostDatastoreSystemMO.class);
         List<ManagedObjectReference> morArray = new ArrayList<>();
-        ManagedObjectReference managedObjectReference = spy(ManagedObjectReference.class);
+        ManagedObjectReference managedObjectReference = mock(ManagedObjectReference.class);
         morArray.add(managedObjectReference);
         when(hostDatastoreSystemMo.getDatastores()).thenReturn(morArray);
-        NasDatastoreInfo nasDatastoreInfo = spy(NasDatastoreInfo.class);
-        when(hostDatastoreSystemMo.getNasDatastoreInfo(managedObjectReference)).thenReturn(nasDatastoreInfo);
-        HostNasVolume hostNasVolume = spy(HostNasVolume.class);
+        NasDatastoreInfo nasDatastoreInfo = mock(NasDatastoreInfo.class);
+        when(hostDatastoreSystemMo.getNasDatastoreInfo(anyObject())).thenReturn(nasDatastoreInfo);
+        HostNasVolume hostNasVolume = mock(HostNasVolume.class);
         when(nasDatastoreInfo.getNas()).thenReturn(hostNasVolume);
         when(hostNasVolume.getRemoteHost()).thenReturn(hostAddress);
         when(hostNasVolume.getRemotePath()).thenReturn(path);
@@ -308,18 +328,84 @@ public class HostMOTest {
 
     @Test
     public void mountDatastore() throws Exception {
-        boolean vmfsDatastore = false;
         String poolHostAddress = "10.143.132.11";
         int poolHostPort = 22;
         String poolPath = "123";
-        String poolUuid = "121";
-        hostMo.mountDatastore(vmfsDatastore, poolHostAddress, poolHostPort, poolPath, poolUuid);
+        String uuid = "123";
+        ManagedObjectReference datastoreSystemMo = mock(ManagedObjectReference.class);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("configManager.datastoreSystem"))).thenReturn(
+            datastoreSystemMo);
+        ServiceContent serviceContent = mock(ServiceContent.class);
+        when(context.getServiceContent()).thenReturn(serviceContent);
+        ManagedObjectReference customFieldsManager = mock(ManagedObjectReference.class);
+        when(serviceContent.getCustomFieldsManager()).thenReturn(customFieldsManager);
+
+        List<CustomFieldDef> fields = new ArrayList<>();
+        CustomFieldDef field = mock(CustomFieldDef.class);
+        fields.add(field);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("field"))).thenReturn(fields);
+        when(field.getName()).thenReturn("cloud.uuid");
+        when(field.getManagedObjectType()).thenReturn("Datastore");
+        when(field.getKey()).thenReturn(10);
+
+        List<ObjectContent> ocs = new ArrayList<>();
+        ObjectContent oc = mock(ObjectContent.class);
+        ocs.add(oc);
+        when(service.retrieveProperties(anyObject(), anyObject())).thenReturn(ocs);
+        List<DynamicProperty> dynamicPropertyList = new ArrayList<>();
+        DynamicProperty dynamicProperty = mock(DynamicProperty.class);
+        dynamicPropertyList.add(dynamicProperty);
+        when(oc.getPropSet()).thenReturn(dynamicPropertyList);
+        when(dynamicProperty.getVal()).thenReturn("11");
+        ManagedObjectReference morDatastore = mock(ManagedObjectReference.class);
+        when(oc.getObj()).thenReturn(morDatastore);
+        ManagedObjectReference nfsStore = mock(ManagedObjectReference.class);
+        when(service.createNasDatastore(anyObject(), anyObject())).thenReturn(nfsStore);
+        hostMo.mountDatastore(false, poolHostAddress, poolHostPort, poolPath, uuid);
+
+        ManagedObjectReference vmfsDatastore = mock(ManagedObjectReference.class);
+        when(context.getDatastoreMorByPath(poolPath)).thenReturn(vmfsDatastore);
+        CustomFieldDef field1 = mock(CustomFieldDef.class);
+        when(service.addCustomFieldDef(anyObject(), anyString(), anyString(),
+            anyObject(), anyObject())).thenReturn(field1);
+        when(field1.getKey()).thenReturn(201);
+        doNothing().when(service).setField(anyObject(), anyObject(), anyInt(), anyString());
+        hostMo.mountDatastore(true, poolHostAddress, poolHostPort, poolPath, uuid);
     }
 
     @Test
     public void unmountDatastore() throws Exception {
         String uuid = "123";
+        ManagedObjectReference datastoreSystemMo = mock(ManagedObjectReference.class);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("configManager.datastoreSystem"))).thenReturn(
+            datastoreSystemMo);
+        ServiceContent serviceContent = mock(ServiceContent.class);
+        when(context.getServiceContent()).thenReturn(serviceContent);
+        ManagedObjectReference customFieldsManager = mock(ManagedObjectReference.class);
+        when(serviceContent.getCustomFieldsManager()).thenReturn(customFieldsManager);
+
+        List<CustomFieldDef> fields = new ArrayList<>();
+        CustomFieldDef field = mock(CustomFieldDef.class);
+        fields.add(field);
+        when(vmwareClient.getDynamicProperty(anyObject(), eq("field"))).thenReturn(fields);
+        when(field.getName()).thenReturn("cloud.uuid");
+        when(field.getManagedObjectType()).thenReturn("Datastore");
+        when(field.getKey()).thenReturn(10);
+
+        List<ObjectContent> ocs = new ArrayList<>();
+        ObjectContent oc = mock(ObjectContent.class);
+        ocs.add(oc);
+        when(service.retrieveProperties(anyObject(), anyObject())).thenReturn(ocs);
+        List<DynamicProperty> dynamicPropertyList = new ArrayList<>();
+        DynamicProperty dynamicProperty = mock(DynamicProperty.class);
+        dynamicPropertyList.add(dynamicProperty);
+        when(oc.getPropSet()).thenReturn(dynamicPropertyList);
+        when(dynamicProperty.getVal()).thenReturn(uuid);
+        ManagedObjectReference morDatastore = mock(ManagedObjectReference.class);
+        when(oc.getObj()).thenReturn(morDatastore);
+        doNothing().when(service).removeDatastore(anyObject(), anyObject());
         hostMo.unmountDatastore(uuid);
+
     }
 
     @Test
