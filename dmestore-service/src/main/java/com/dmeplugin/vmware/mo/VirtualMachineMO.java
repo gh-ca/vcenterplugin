@@ -1,20 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-
 package com.dmeplugin.vmware.mo;
 
 import com.dmeplugin.vmware.util.Pair;
@@ -40,7 +23,7 @@ public class VirtualMachineMO extends BaseMO {
     }
 
     public Pair<DatacenterMO, String> getOwnerDatacenter() throws Exception {
-        return DatacenterMO.getOwnerDatacenter(getContext(), getMor());
+        return DatacenterMO.getOwnerDatacenter(context, mor);
     }
 
     public HostMO getRunningHost() throws Exception {
@@ -141,17 +124,13 @@ public class VirtualMachineMO extends BaseMO {
 
     public Pair<VmdkFileDescriptor, byte[]> getVmdkFileInfo(String vmdkDatastorePath) throws Exception {
         Pair<DatacenterMO, String> dcPair = getOwnerDatacenter();
-
-        String url = getContext().composeDatastoreBrowseUrl(dcPair.second(), vmdkDatastorePath);
-        byte[] content = getContext().getResourceContent(url);
+        String url = context.composeDatastoreBrowseUrl(dcPair.second(), vmdkDatastorePath);
+        byte[] content = context.getResourceContent(url);
         VmdkFileDescriptor descriptor = new VmdkFileDescriptor();
         descriptor.parse(content);
 
-        Pair<VmdkFileDescriptor, byte[]> result = new Pair<VmdkFileDescriptor, byte[]>(descriptor, content);
-        if (s_logger.isTraceEnabled()) {
-            s_logger.trace("vCenter API trace - getVmdkFileInfo() done");
-            s_logger.trace("VMDK file descriptor: " + new Gson().toJson(result.first()));
-        }
+        Pair<VmdkFileDescriptor, byte[]> result = new Pair<>(descriptor, content);
+
         return result;
     }
 
@@ -160,8 +139,8 @@ public class VirtualMachineMO extends BaseMO {
 
         if (devices != null && devices.size() > 0) {
             for (VirtualDevice device : devices) {
-                if (device instanceof VirtualSCSIController && isValidScsiDiskController(
-                    (VirtualSCSIController) device)) {
+                if (device instanceof VirtualSCSIController &&
+                    isValidScsiDiskController((VirtualSCSIController) device)) {
                     return device.getKey();
                 }
             }
@@ -186,92 +165,6 @@ public class VirtualMachineMO extends BaseMO {
         }
 
         return true;
-    }
-
-    @Deprecated
-    public List<Pair<String, ManagedObjectReference>> getDiskDatastorePathChain(VirtualDisk disk, boolean followChain)
-        throws Exception {
-        VirtualDeviceBackingInfo backingInfo = disk.getBacking();
-        if (!(backingInfo instanceof VirtualDiskFlatVer2BackingInfo)) {
-            throw new Exception("Unsupported VirtualDeviceBackingInfo");
-        }
-
-        List<Pair<String, ManagedObjectReference>> pathList = new ArrayList<Pair<String, ManagedObjectReference>>();
-        VirtualDiskFlatVer2BackingInfo diskBackingInfo = (VirtualDiskFlatVer2BackingInfo) backingInfo;
-
-        if (!followChain) {
-            pathList.add(new Pair<>(diskBackingInfo.getFileName(), diskBackingInfo.getDatastore()));
-            return pathList;
-        }
-
-        Pair<DatacenterMO, String> dcPair = getOwnerDatacenter();
-        VirtualMachineFileInfo vmFilesInfo = getFileInfo();
-        DatastoreFile snapshotDirFile = new DatastoreFile(vmFilesInfo.getSnapshotDirectory());
-        DatastoreFile vmxDirFile = new DatastoreFile(vmFilesInfo.getVmPathName());
-
-        do {
-            if (diskBackingInfo.getParent() != null) {
-                pathList.add(new Pair<>(diskBackingInfo.getFileName(), diskBackingInfo.getDatastore()));
-                diskBackingInfo = diskBackingInfo.getParent();
-            } else {
-                byte[] content;
-                try {
-                    String url = getContext().composeDatastoreBrowseUrl(dcPair.second(), diskBackingInfo.getFileName());
-                    content = getContext().getResourceContent(url);
-                    if (content == null || content.length == 0) {
-                        break;
-                    }
-
-                    pathList.add(new Pair<>(diskBackingInfo.getFileName(), diskBackingInfo.getDatastore()));
-                } catch (Exception e) {
-                    DatastoreFile currentFile = new DatastoreFile(diskBackingInfo.getFileName());
-                    String vmdkFullDsPath = snapshotDirFile.getCompanionPath(currentFile.getFileName());
-
-                    String url = getContext().composeDatastoreBrowseUrl(dcPair.second(), vmdkFullDsPath);
-                    content = getContext().getResourceContent(url);
-                    if (content == null || content.length == 0) {
-                        break;
-                    }
-
-                    pathList.add(new Pair<>(vmdkFullDsPath, diskBackingInfo.getDatastore()));
-                }
-
-                VmdkFileDescriptor descriptor = new VmdkFileDescriptor();
-                descriptor.parse(content);
-                if (descriptor.getParentFileName() != null && !descriptor.getParentFileName().isEmpty()) {
-                    VirtualDiskFlatVer2BackingInfo parentDiskBackingInfo = new VirtualDiskFlatVer2BackingInfo();
-                    parentDiskBackingInfo.setDatastore(diskBackingInfo.getDatastore());
-
-                    String parentFileName = descriptor.getParentFileName();
-                    if (parentFileName.startsWith("/")) {
-                        int fileNameStartPos = parentFileName.lastIndexOf("/");
-                        parentFileName = parentFileName.substring(fileNameStartPos + 1);
-                        parentDiskBackingInfo.setFileName(vmxDirFile.getCompanionPath(parentFileName));
-                    } else {
-                        parentDiskBackingInfo.setFileName(snapshotDirFile.getCompanionPath(parentFileName));
-                    }
-                    diskBackingInfo = parentDiskBackingInfo;
-                } else {
-                    break;
-                }
-            }
-        } while (diskBackingInfo != null);
-
-        return pathList;
-    }
-
-    public VirtualDisk[] getAllDiskDevice() throws Exception {
-        List<VirtualDisk> deviceList = new ArrayList<VirtualDisk>();
-        List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, "config.hardware.device");
-        if (devices != null && devices.size() > 0) {
-            for (VirtualDevice device : devices) {
-                if (device instanceof VirtualDisk) {
-                    deviceList.add((VirtualDisk) device);
-                }
-            }
-        }
-
-        return deviceList.toArray(new VirtualDisk[0]);
     }
 
     public int getLsiLogicControllerKey() throws Exception {

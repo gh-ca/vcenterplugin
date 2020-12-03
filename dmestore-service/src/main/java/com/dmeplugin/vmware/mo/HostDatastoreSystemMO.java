@@ -15,8 +15,9 @@ public class HostDatastoreSystemMO extends BaseMO {
     }
 
     public ManagedObjectReference findDatastore(String name) throws Exception {
-        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context,
-            context.getServiceContent().getCustomFieldsManager());
+        ServiceContent serviceContent = context.getServiceContent();
+        ManagedObjectReference customFieldsManager = serviceContent.getCustomFieldsManager();
+        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context, customFieldsManager);
         int key = cfmMo.getCustomFieldKey("Datastore", CustomFieldConstants.CLOUD_UUID);
         assert key != 0;
 
