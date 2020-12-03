@@ -96,4 +96,20 @@ public class NfsDataStoreFsAttr implements Serializable {
     public void setFileSystemId(String fileSystemId) {
         this.fileSystemId = fileSystemId;
     }
+
+    @Override
+    public String toString() {
+        return "NfsDataStoreFsAttr{" +
+            "name='" + name + '\'' +
+            ", description='" + description + '\'' +
+            ", device='" + device + '\'' +
+            ", storagePoolName='" + storagePoolName + '\'' +
+            ", provisionType='" + provisionType + '\'' +
+            ", applicationScenario='" + applicationScenario + '\'' +
+            ", dataDeduplication=" + dataDeduplication +
+            ", dateCompression=" + dateCompression +
+            ", controller='" + controller + '\'' +
+            ", fileSystemId='" + fileSystemId + '\'' +
+            '}';
+    }
 }

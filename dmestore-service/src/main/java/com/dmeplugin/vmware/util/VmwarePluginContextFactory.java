@@ -54,7 +54,6 @@ public class VmwarePluginContextFactory {
         if (context == null) {
             context = create(userSessionService, vimObjectReferenceService, serverguid);
         }
-
         if (context != null) {
             context.setPoolInfo(s_pool, VmwareContextPool.composePoolKey(serverguid, ""));
             s_pool.registerContext(context);
@@ -62,12 +61,6 @@ public class VmwarePluginContextFactory {
 
         return context;
     }
-
-    public static VmwareContext getServerContext(UserSessionService userSessionService, VimObjectReferenceService vimObjectReferenceService, ManagedObjectReference mor) throws Exception {
-        String serverguid = vimObjectReferenceService.getServerGuid(mor);
-        return getServerContext(userSessionService, vimObjectReferenceService, serverguid);
-    }
-
     public static VmwareContext[] getAllContext(UserSessionService userSessionService, VimObjectReferenceService vimObjectReferenceService) throws Exception {
         ServerInfo[] serverInfoList = userSessionService.getUserSession().serversInfo;
         List<VmwareContext> vmwareContexts = new ArrayList<>();

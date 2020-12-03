@@ -143,4 +143,24 @@ public class VmfsDatastoreVolumeDetail {
     public void setTrafficControl(String trafficControl) {
         this.trafficControl = trafficControl;
     }
+
+    @Override
+    public String toString() {
+        return "VmfsDatastoreVolumeDetail{" +
+            "name='" + name + '\'' +
+            ", wwn='" + wwn + '\'' +
+            ", smartTier='" + smartTier + '\'' +
+            ", evolutionaryInfo='" + evolutionaryInfo + '\'' +
+            ", device='" + device + '\'' +
+            ", storagePool='" + storagePool + '\'' +
+            ", serviceLevel='" + serviceLevel + '\'' +
+            ", storage='" + storage + '\'' +
+            ", dudeplication=" + dudeplication +
+            ", provisionType='" + provisionType + '\'' +
+            ", compression=" + compression +
+            ", applicationType='" + applicationType + '\'' +
+            ", controlPolicy='" + controlPolicy + '\'' +
+            ", trafficControl='" + trafficControl + '\'' +
+            '}';
+    }
 }
