@@ -1,3 +1,4 @@
+
 package com.dmeplugin.dmestore.model;
 
 import java.util.List;
@@ -6,40 +7,67 @@ import java.util.List;
  * @author lianq
  * @ClassName: Volume
  * @Company: GH-CA
- * @create 2020-09-03
  */
 public class Volume {
-    //卷的唯一标识
+    /**
+     * 卷的唯一标识
+     */
     private String id;
-    //名称
+    /**
+     * 名称
+     */
     private String name;
-    //状态
+    /**
+     * 状态
+     */
     private String status;
     private Boolean attached;
-    //分配类型
+    /**
+     * 分配类型
+     */
     private String alloctype;
-    //服务等级
+    /**
+     * 服务等级
+     */
     private String serviceLevelName;
-    //存储设备id
+    /**
+     * 存储设备id
+     */
     private String storageId;
-    //存储池id
+    /**
+     * 存储池id
+     */
     private String poolRawId;
-    //容量利用率
+    /**
+     * 容量利用率
+     */
     private String capacityUsage;
-    //保护状态
+    /**
+     * 保护状态
+     */
     private Boolean protectionStatus;
     private List<String> hostIds;
     private List<String> hostGroupIds;
-    //存储池名称
+    /**
+     * 存储池名称
+     */
     private String storagePoolName;
-    //总容量 单位GB
+    /**
+     * 总容量 单位GB
+     */
     private Integer capacity;
-    //关联的datastore
+    /**
+     * 关联的datastore
+     */
     private String datastores;
-    //volume对应的instanceId
+    /**
+     * volume对应的instanceId
+     */
     private String instanceId;
 
-    //wwn标识
+    /**
+     * wwn标识
+     */
     private String wwn;
 
     private Float iops;
@@ -170,7 +198,7 @@ public class Volume {
         return instanceId;
     }
 
-    public void setInstanceId(String instanceId) {
+    public void setInstanceId(final String instanceId) {
         this.instanceId = instanceId;
     }
 
@@ -194,7 +222,7 @@ public class Volume {
         return bandwith;
     }
 
-    public void setBandwith(Float bandwith) {
+    public void setBandwith( Float bandwith) {
         this.bandwith = bandwith;
     }
 
