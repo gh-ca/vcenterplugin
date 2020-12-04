@@ -2,23 +2,36 @@ package com.dmeplugin.dmestore.model;
 
 /**
  * @author lianq
- * @className CapacityAutonegotiation
- * @description TODO
- * @date 2020/10/15 16:28
+ * @since  2020/10/15 16:28
  */
 public class CapacityAutonegotiation {
-
+    /**
+     * capacitymodeoff .
+     */
     public static String capacitymodeoff = "off";
-
+    /**
+     * capacitymodeauto .
+     */
     public static String capacitymodeauto = "grow_shrink";
 
+    /**
+     * autoSizeEnable .
+     */
     private Boolean autoSizeEnable;
 
+    /**
+     * getAutoSizeEnable .
+     * @return Boolean .
+     */
     public Boolean getAutoSizeEnable() {
         return autoSizeEnable;
     }
 
-    public void setAutoSizeEnable(Boolean autoSizeEnable) {
-        this.autoSizeEnable = autoSizeEnable;
+    /**
+     * setAutoSizeEnable .
+     * @param param .
+     */
+    public void setAutoSizeEnable(final Boolean param) {
+        this.autoSizeEnable = param;
     }
 }
