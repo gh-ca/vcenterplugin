@@ -6,22 +6,42 @@ import java.util.List;
  * @author Administrator
  **/
 public class VolumeListRestponse {
+    /**
+     * volumeList .
+     */
     private List<Volume> volumeList;
+    /**
+     * count .
+     */
     private int count;
 
+    /**
+     * getVolumeList .
+     * @return List<Volume> .
+     */
     public List<Volume> getVolumeList() {
         return volumeList;
     }
 
-    public void setVolumeList(List<Volume> volumeList) {
-        this.volumeList = volumeList;
+    /**
+     * setVolumeList .
+     * @param param .
+     */
+    public void setVolumeList(final List<Volume> param) {
+        this.volumeList = param;
     }
-
+    /**
+     * getCount .
+     * @return int .
+     */
     public int getCount() {
         return count;
     }
-
-    public void setCount(int count) {
-        this.count = count;
+    /**
+     * setCount .
+     * @param param .
+     */
+    public void setCount(final int param) {
+        this.count = param;
     }
 }
