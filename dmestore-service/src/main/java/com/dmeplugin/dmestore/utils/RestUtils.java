@@ -2,25 +2,22 @@ package com.dmeplugin.dmestore.utils;
 
 import com.dmeplugin.dmestore.exception.DMEException;
 
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContexts;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.springframework.http.client.ClientHttpResponse;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.web.client.ResponseErrorHandler;
+import org.springframework.web.client.RestTemplate;
+
 import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContexts;
-import org.apache.http.conn.ssl.TrustStrategy;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.client.ClientHttpResponse;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.ResponseErrorHandler;
-import org.springframework.web.client.RestTemplate;
-
-import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 
 /**
@@ -57,25 +54,22 @@ public class RestUtils {
             requestFactory.setReadTimeout(10000);
             requestFactory.setConnectTimeout(3000);
             restTemplate = new RestTemplate(requestFactory);
-            restTemplate.setErrorHandler(new CustomErrorHandler());
+            restTemplate.setErrorHandler(new ResponseErrorHandler(){
+                @Override
+                public boolean hasError(ClientHttpResponse response) throws IOException {
+                    return true;
+                }
+
+                @Override
+                public void handleError(ClientHttpResponse response) throws IOException {
+
+                }
+            });
 
         } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
             e.printStackTrace();
             throw new DMEException("初始化resttemplate错误");
         }
         return restTemplate;
-    }
-
-    class CustomErrorHandler implements ResponseErrorHandler {
-
-        @Override
-        public boolean hasError(ClientHttpResponse response) throws IOException {
-            return true;
-        }
-
-        @Override
-        public void handleError(ClientHttpResponse response) throws IOException {
-
-        }
     }
 }

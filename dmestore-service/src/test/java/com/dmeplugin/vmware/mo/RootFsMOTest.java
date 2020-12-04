@@ -33,9 +33,6 @@ public class RootFsMOTest {
     @Mock
     private VmwareContext context;
 
-    @Mock
-    private ManagedObjectReference mor;
-
     private VmwareClient vmwareClient;
 
     private VimPortType service;

@@ -32,9 +32,6 @@ public class IscsiManagerMOTest {
     @Mock
     private VmwareContext context;
 
-    @Mock
-    private ManagedObjectReference mor;
-
     private VmwareClient vmwareClient;
 
     private VimPortType service;

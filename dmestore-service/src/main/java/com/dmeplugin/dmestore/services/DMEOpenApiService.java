@@ -1,12 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DMEException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A class that support basic dme API
