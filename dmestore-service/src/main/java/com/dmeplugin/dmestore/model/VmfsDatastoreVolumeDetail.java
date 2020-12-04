@@ -209,7 +209,7 @@ public class VmfsDatastoreVolumeDetail {
      * setDudeplication .
      * @return String .
      */
-    public boolean setDudeplication() {
+    public boolean getDudeplication() {
         return dudeplication;
     }
     /**
