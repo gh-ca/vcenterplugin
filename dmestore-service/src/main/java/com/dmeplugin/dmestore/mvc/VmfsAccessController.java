@@ -5,6 +5,7 @@ import com.dmeplugin.dmestore.model.VmfsDataInfo;
 import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
 import com.dmeplugin.dmestore.services.VmfsAccessService;
 import com.google.gson.Gson;
+import com.vmware.vim.binding.vmodl.name;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,6 @@ public class VmfsAccessController extends BaseController {
         String failureStr = "";
         try {
             List<VmfsDataInfo> lists = vmfsAccessService.listVmfs();
-            LOG.info("listvmfs lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {
             LOG.error("list vmfs failure:", e);
@@ -56,18 +56,17 @@ public class VmfsAccessController extends BaseController {
     /**
      * Access vmfs performance
      *
-     * @param volumeIds volumes id
+     * @param wwns wwns
      * @return: ResponseBodyBean
      */
     @RequestMapping(value = "/listvmfsperformance", method = RequestMethod.GET)
     @ResponseBody
-    public ResponseBodyBean listVmfsPerformance(@RequestParam("volumeIds") List<String> volumeIds)
+    public ResponseBodyBean listVmfsPerformance(@RequestParam("wwns") List<String> wwns)
             throws Exception {
-        LOG.info("accessvmfs/listvmfsperformance volumeIds==" + gson.toJson(volumeIds));
+        LOG.info("accessvmfs/listvmfsperformance volumeIds==" + gson.toJson(wwns));
         String failureStr = "";
         try {
-            List<VmfsDataInfo> lists = vmfsAccessService.listVmfsPerformance(volumeIds);
-            LOG.info("listvmfsperformance lists==" + gson.toJson(lists));
+            List<VmfsDataInfo> lists = vmfsAccessService.listVmfsPerformance(wwns);
             return success(lists);
         } catch (Exception e) {
             LOG.error("get vmfs performance failure:", e);
@@ -88,7 +87,7 @@ public class VmfsAccessController extends BaseController {
      * param int version: 版本
      * param int blockSize: 块大小，单位KB
      * param int spaceReclamationGranularity   空间回收粒度 单位K
-     * param str spaceReclamationPriority: 空间回收优先权
+     * param str spaceReclamationPriority: 空间回收优先权 low->低
      * param str host: 主机  必  与cluster二选其一,不可同时存在
      * param str hostId: 主机
      * param str cluster: 集群 必 与host二选其一,不可同时存在
@@ -98,7 +97,7 @@ public class VmfsAccessController extends BaseController {
      * param integer workload_type_id 应用类型id
      * param str alloctype 卷分配类型，取值范围 thin，thick
      * 卷qos属性
-     * param str  control_policy 控制策略
+     * param str  control_policy 控制策略  0：保护IO下限，1：控制IO上限
      * param integer  latency 时延，单位ms
      * param integer  maxbandwidth 最大带宽
      * param integer  maxiops 最大iops
@@ -182,8 +181,6 @@ public class VmfsAccessController extends BaseController {
     /**
      * Delete vmfs
      * param list<str> dataStoreObjectIds: datastore object id列表 必
-     * param str host_id: 主机id 必
-     * param str hostGroup_id: 主机id 必
      * return: Return execution status and information
      * code:Status code 202 or 503
      * message:Information
@@ -247,11 +244,52 @@ public class VmfsAccessController extends BaseController {
         }
     }
 
+    /**
+     * 获取已经挂载的存储
+     * @param storageId
+     * @return
+     * @throws Exception
+     */
     @RequestMapping(value = "/gethostgroupsbystorageid/{storageId}", method = RequestMethod.GET)
     public ResponseBodyBean getHostGroupsByStorageId(@PathVariable(value = "storageId") String storageId) throws Exception {
         try {
             List<Map<String, Object>> hosts = vmfsAccessService.getHostGroupsByStorageId(storageId);
             return success(hosts);
+        } catch (Exception e) {
+            return failure(e.getMessage());
+        }
+    }
+
+    /**
+     * Access vmfs
+     *
+     * @return: ResponseBodyBean
+     */
+    @RequestMapping(value = "/queryvmfs", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseBodyBean queryVmfs(@RequestParam("dataStoreObjectId") String dataStoreObjectId) throws Exception {
+        LOG.info("accessvmfs/queryvmfs");
+        String failureStr = "";
+        try {
+            List<VmfsDataInfo> lists = vmfsAccessService.queryVmfs(dataStoreObjectId);
+            LOG.info("listvmfs lists==" + gson.toJson(lists));
+            return success(lists);
+        } catch (Exception e) {
+            LOG.error("list vmfs failure:", e);
+            failureStr = "list vmfs failure:" + e.toString();
+        }
+        return failure(failureStr);
+    }
+
+    /**
+     * 通过名字查询vmfs中是否存在指定对象
+     * @param name vmfs name
+     * @return
+     */
+    @GetMapping("/querydatastorebyname")
+    public ResponseBodyBean queryDatastoreByName(@RequestParam("name") String name){
+        try {
+            return success(vmfsAccessService.queryDatastoreByName(name));
         } catch (Exception e) {
             return failure(e.getMessage());
         }

@@ -14,81 +14,178 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+//
+
 package com.dmeplugin.vmware.mo;
+
+import com.dmeplugin.vmware.util.VmwareContext;
+import com.vmware.vim25.ClusterDasConfigInfo;
+import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.ObjectContent;
 
 import java.util.List;
 
-import com.dmeplugin.vmware.util.Pair;
-import com.dmeplugin.vmware.util.VmwareContext;
-import com.vmware.vim25.ClusterDasConfigInfo;
-import com.vmware.vim25.ComputeResourceSummary;
-import com.vmware.vim25.ManagedObjectReference;
-import com.vmware.vim25.ObjectContent;
-import com.vmware.vim25.VirtualMachineConfigSpec;
-
-
 
 /**
- * Interface to consolidate ESX(i) hosts and HA/FT clusters into a common interface used by CloudStack Hypervisor resources
+ * Interface to consolidate ESX(i) hosts and HA/FT clusters into ,
+ * a common interface used by CloudStack Hypervisor resources.
+ *
+ * @author .
  */
 public interface VmwareHypervisorHost {
+    /**
+     * getContext.
+     *
+     * @return VmwareContext .
+     */
     VmwareContext getContext();
 
+    /**
+     * getMor.
+     *
+     * @return ManagedObjectReference .
+     */
     ManagedObjectReference getMor();
 
+    /**
+     * getHyperHostName.
+     *
+     * @return String .
+     * @throws Exception .
+     */
     String getHyperHostName() throws Exception;
 
+    /**
+     * getDasConfig.
+     *
+     * @return ClusterDasConfigInfo .
+     * @throws Exception .
+     */
     ClusterDasConfigInfo getDasConfig() throws Exception;
 
-    boolean isHAEnabled() throws Exception;
+    /**
+     * isHaEnabled.
+     *
+     * @return boolean .
+     * @throws Exception .
+     */
+    boolean isHaEnabled() throws Exception;
 
-    void setRestartPriorityForVM(VirtualMachineMO vmMo, String priority) throws Exception;
+    /**
+     * setRestartPriorityForVm.
+     *
+     * @param vmMo     .
+     * @param priority .
+     * @throws Exception .
+     */
+    void setRestartPriorityForVm(VirtualMachineMO vmMo, String priority)
+        throws Exception;
 
+
+    /**
+     * getHyperHostDatacenter.
+     *
+     * @return ManagedObjectReference .
+     * @throws Exception .
+     */
     ManagedObjectReference getHyperHostDatacenter() throws Exception;
 
+    /**
+     * getHyperHostOwnerResourcePool.
+     *
+     * @return ManagedObjectReference .
+     * @throws Exception .
+     */
     ManagedObjectReference getHyperHostOwnerResourcePool() throws Exception;
 
+    /**
+     * getHyperHostCluster.
+     *
+     * @return ManagedObjectReference.
+     * @throws Exception .
+     */
     ManagedObjectReference getHyperHostCluster() throws Exception;
 
-    boolean isHyperHostConnected() throws Exception;
-
-    String getHyperHostDefaultGateway() throws Exception;
-
+    /**
+     * listVmsOnHyperHost.
+     *
+     * @param name .
+     * @return List<VirtualMachineMO>.
+     * @throws Exception .
+     */
     List<VirtualMachineMO> listVmsOnHyperHost(String name) throws Exception;
 
+    /**
+     * findVmOnHyperHost.
+     *
+     * @param name .
+     * @return VirtualMachineMO.
+     * @throws Exception .
+     */
     VirtualMachineMO findVmOnHyperHost(String name) throws Exception;
 
-    VirtualMachineMO findVmOnPeerHyperHost(String name) throws Exception;
+    /**
+     * getVmPropertiesOnHyperHost.
+     *
+     * @param propertyPaths .
+     * @return ObjectContent[] .
+     * @throws Exception .
+     */
+    ObjectContent[] getVmPropertiesOnHyperHost(String[] propertyPaths)
+        throws Exception;
 
-    boolean createVm(VirtualMachineConfigSpec vmSpec) throws Exception;
+    /**
+     * getDatastorePropertiesOnHyperHost.
+     *
+     * @param propertyPaths .
+     * @return ObjectContent[] .
+     * @throws Exception .
+     */
+    ObjectContent[] getDatastorePropertiesOnHyperHost(String[] propertyPaths)
+        throws Exception;
 
-    boolean createBlankVm(String vmName, String vmInternalCSName, int cpuCount, int cpuSpeedMHz, int cpuReservedMHz, boolean limitCpuUse, int memoryMB,
-                          int memoryReserveMB, String guestOsIdentifier, ManagedObjectReference morDs, boolean snapshotDirToParent,
-                          Pair<String, String> controllerInfo, Boolean systemVm) throws Exception;
+    /**
+     * mountDatastore.
+     *
+     * @param vmfsDatastore   .
+     * @param poolHostAddress .
+     * @param poolHostPort    .
+     * @param poolPath        .
+     * @param poolUuid        .
+     * @return ManagedObjectReference .
+     * @throws Exception .
+     */
+    ManagedObjectReference mountDatastore(boolean vmfsDatastore,
+                                          String poolHostAddress,
+                                          int poolHostPort,
+                                          String poolPath,
+                                          String poolUuid)
+        throws Exception;
 
-    ObjectContent[] getVmPropertiesOnHyperHost(String[] propertyPaths) throws Exception;
-
-    ObjectContent[] getDatastorePropertiesOnHyperHost(String[] propertyPaths) throws Exception;
-
-    ManagedObjectReference mountDatastore(boolean vmfsDatastore, String poolHostAddress, int poolHostPort, String poolPath, String poolUuid) throws Exception;
-
+    /**
+     * unmountDatastore.
+     *
+     * @param poolUuid .
+     * @throws Exception .
+     */
     void unmountDatastore(String poolUuid) throws Exception;
 
-    ManagedObjectReference findDatastore(String poolUuid) throws Exception;
+    /**
+     * unmountDatastore.
+     *
+     * @param esxServiceConsolePort .
+     * @return VmwareHypervisorHostNetworkSummary.
+     * @throws Exception .
+     */
+    VmwareHypervisorHostNetworkSummary getHyperHostNetworkSummary(
+        String esxServiceConsolePort) throws Exception;
 
-    ManagedObjectReference findDatastoreByName(String datastoreName) throws Exception;
-
-    @Deprecated
-    ManagedObjectReference findDatastoreByExportPath(String exportPath) throws Exception;
-
-    ManagedObjectReference findMigrationTarget(VirtualMachineMO vmMo) throws Exception;
-
-    VmwareHypervisorHostResourceSummary getHyperHostResourceSummary() throws Exception;
-
-    VmwareHypervisorHostNetworkSummary getHyperHostNetworkSummary(String esxServiceConsolePort) throws Exception;
-
-    ComputeResourceSummary getHyperHostHardwareSummary() throws Exception;
-
-    LicenseAssignmentManagerMO getLicenseAssignmentManager() throws Exception;
+    /**
+     * getRecommendedDiskController.
+     *
+     * @param guestOsId .
+     * @return String .
+     * @throws Exception .
+     */
     String getRecommendedDiskController(String guestOsId) throws Exception;
 }

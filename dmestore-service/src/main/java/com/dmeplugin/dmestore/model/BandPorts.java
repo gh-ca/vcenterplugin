@@ -2,55 +2,113 @@ package com.dmeplugin.dmestore.model;
 
 /**
  * @author lianq
- * @className BandPort
- * @description TODO
- * @date 2020/9/7 15:35
  */
 public class BandPorts {
+    /**
+     * id .
+     */
+    private String id;
 
-   private String id;
-   private String name;
-   private String healthStatus;
-   private String runningStatus;
-   private String mtu;
+    /**
+     * name .
+     */
+    private String name;
+    /**
+     * healthStatus .
+     */
+    private String healthStatus;
 
+    /**
+     * runningStatus .
+     */
+    private String runningStatus;
+    /**
+     * mtu.
+     */
+    private String mtu;
+
+    /**
+     * getId .
+     *
+     * @return .
+     */
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    /**
+     * setId .
+     * @param param .
+     */
+    public void setId(final String param) {
+        this.id = param;
     }
 
+    /**
+     * getName .
+     *
+     * @return .
+     */
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setName .
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
 
+    /**
+     * getHealthStatus .
+     *
+     * @return .
+     */
     public String getHealthStatus() {
         return healthStatus;
     }
 
-    public void setHealthStatus(String healthStatus) {
-        this.healthStatus = healthStatus;
+    /**
+     * setHealthStatus .
+     * @param param .
+     */
+    public void setHealthStatus(final String param) {
+        this.healthStatus = param;
     }
 
+    /**
+     * getRunningStatus .
+     *
+     * @return String .
+     */
     public String getRunningStatus() {
         return runningStatus;
     }
 
-    public void setRunningStatus(String runningStatus) {
-        this.runningStatus = runningStatus;
+    /**
+     * setRunningStatus .
+     * @param param .
+     */
+    public void setRunningStatus(final String param) {
+        this.runningStatus = param;
     }
 
+    /**
+     * getMtu .
+     *
+     * @return .
+     */
     public String getMtu() {
         return mtu;
     }
 
-    public void setMtu(String mtu) {
-        this.mtu = mtu;
+    /**
+     * setMtu .
+     * @param param .
+     */
+    public void setMtu(final String param) {
+        this.mtu = param;
     }
 }

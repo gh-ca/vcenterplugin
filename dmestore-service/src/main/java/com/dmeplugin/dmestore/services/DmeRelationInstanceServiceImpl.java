@@ -1,11 +1,17 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.RelationInstance;
 import com.dmeplugin.dmestore.utils.ToolUtils;
-import com.google.gson.*;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
@@ -23,16 +29,12 @@ import java.util.Map;
 public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceService {
     private static final Logger LOG = LoggerFactory.getLogger(DmeRelationInstanceServiceImpl.class);
 
-    Gson gson = new Gson();
-
-    private final String LIST_RELATION_URL = "/rest/resourcedb/v1/relations/{relationName}/instances";
-    private final String QUERY_RELATION_URL = "/rest/resourcedb/v1/relations/{relationName}/instances/{instanceId}";
-    private final String QUERY_INSTANCE_URL = "/rest/resourcedb/v1/instances/{className}/{instanceId}";
-    private final String LIST_INSTANCE_URL = "/rest/resourcedb/v1/instances/{className}?pageSize=1000";
-
     private static Map<String, Map<String, Object>> serviceLevelInstance = new HashMap<>();
+
     private static Map<String, Map<String, Object>> lunInstance = new HashMap<>();
+
     private static Map<String, Map<String, Object>> storagePoolInstance = new HashMap<>();
+
     private static Map<String, Map<String, Object>> storageDevcieInstance = new HashMap<>();
 
     private DmeAccessService dmeAccessService;
@@ -46,37 +48,35 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     }
 
     @Override
-    public List<RelationInstance> queryRelationByRelationName(String relationName) throws Exception {
+    public List<RelationInstance> queryRelationByRelationName(String relationName) throws DMEException {
         List<RelationInstance> ris = new ArrayList<>();
         Map<String, Object> remap = new HashMap<>();
         remap.put("code", 200);
         remap.put("message", "queryRelationByRelationName success!");
-        //remap.put("data", params);
 
-        String url = LIST_RELATION_URL;
-        url = url.replace("{relationName}", relationName);
+        String url = DmeConstants.LIST_RELATION_URL.replace("{relationName}", relationName);
 
         ResponseEntity responseEntity;
         try {
             responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            if (responseEntity.getStatusCodeValue() == 200) {
+            if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 ris = converRelations(responseEntity.getBody());
             }
         } catch (Exception e) {
-            throw e;
+            throw new DMEException(e.getMessage());
         }
         return ris;
     }
 
     @Override
-    public List<RelationInstance> queryRelationByRelationNameConditionSourceInstanceId(String relationName, String sourceInstanceId) throws Exception {
+    public List<RelationInstance> queryRelationByRelationNameConditionSourceInstanceId(String relationName,
+        String sourceInstanceId) throws DMEException {
         List<RelationInstance> ris = new ArrayList<>();
         Map<String, Object> remap = new HashMap<>();
         remap.put("code", 200);
         remap.put("message", "queryRelationByRelationName success!");
-        //remap.put("data", params);
 
-        String url = LIST_RELATION_URL;
+        String url = DmeConstants.LIST_RELATION_URL;
         url = url.replace("{relationName}", relationName);
         url = url + "?condition={json}";
 
@@ -91,61 +91,62 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         ResponseEntity responseEntity;
         try {
             responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, constraint.toString());
-            if (responseEntity.getStatusCodeValue() == 200) {
+            if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 ris = converRelations(responseEntity.getBody());
             }
         } catch (Exception e) {
-            LOG.warn("通过关系类型名称和源实例ID查询对应关系异常,url:{},condition:{},relationName:{},sourceInstancId:{}!", url, constraint.toString(), relationName, sourceInstanceId);
-            throw e;
+            LOG.warn("通过关系类型名称和源实例ID查询对应关系异常,url:{},condition:{},relationName:{},sourceInstancId:{}!", url,
+                constraint.toString(), relationName, sourceInstanceId);
+            throw new DMEException(e.getMessage());
         }
         return ris;
     }
 
     @Override
-    public RelationInstance queryRelationByRelationNameInstanceId(String relationName, String instanceId) throws Exception {
+    public RelationInstance queryRelationByRelationNameInstanceId(String relationName, String instanceId)
+        throws DMEException {
         RelationInstance ri = new RelationInstance();
         Map<String, Object> remap = new HashMap<>();
         remap.put("code", 200);
         remap.put("message", "queryRelationByRelationName success!");
 
-        String url = QUERY_RELATION_URL;
+        String url = DmeConstants.QUERY_RELATION_URL;
         url = url.replace("{relationName}", relationName);
         url = url.replace("{instanceId}", relationName);
 
         ResponseEntity responseEntity;
         try {
             responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            if (responseEntity.getStatusCodeValue() == 200) {
+            if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 ri = converRelation(responseEntity.getBody());
             }
         } catch (Exception e) {
             LOG.warn("通过关系类型名称和源实例ID查询对应关系异常,url:{},relationName:{},InstancId:{}!", url, relationName, instanceId);
-            throw e;
+            throw new DMEException(e.getMessage());
         }
         return ri;
     }
 
     @Override
-    public Object queryInstanceByInstanceNameId(String instanceName, String instanceId) throws Exception {
+    public Object queryInstanceByInstanceNameId(String instanceName, String instanceId) throws DMEException {
         Object obj = new Object();
         Map<String, Object> remap = new HashMap<>();
         remap.put("code", 200);
         remap.put("message", "queryInstanceByInstanceNameId success!");
-        //remap.put("data", params);
 
-        String url = QUERY_INSTANCE_URL;
+        String url = DmeConstants.QUERY_INSTANCE_URL;
         url = url.replace("{className}", instanceName);
         url = url.replace("{instanceId}", instanceId);
 
         ResponseEntity responseEntity;
         try {
             responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            if (responseEntity.getStatusCodeValue() == 200) {
+            if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 obj = responseEntity.getBody();
             }
         } catch (Exception e) {
             LOG.warn("通过资源类型名称和资源实例ID查询对应资源实例异常,className:{},instancId:{}!", instanceName, instanceId);
-            throw e;
+            throw new DMEException(e.getMessage());
         }
         return obj;
     }
@@ -194,7 +195,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         }
     }
 
-    public void listInstanceStoragePool(){
+    public void listInstanceStoragePool() {
         String instanceName = "SYS_StoragePool";
         JsonObject jsonObject = listInstancdByInstanceName(instanceName);
         if (null != jsonObject) {
@@ -215,7 +216,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         }
     }
 
-    public void listInstanceStorageDevcie(){
+    public void listInstanceStorageDevcie() {
         String instanceName = "SYS_StorDevice";
         JsonObject jsonObject = listInstancdByInstanceName(instanceName);
         if (null != jsonObject) {
@@ -270,12 +271,20 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         return storageDevcieInstance;
     }
 
+    @Override
+    public void refreshResourceInstance() {
+        listInstanceStorageDevcie();
+        listInstanceStoragePool();
+        listInstanceLun();
+        listInstanceServiceLevel();
+    }
+
     private JsonObject listInstancdByInstanceName(String instanceName) {
         JsonObject jsonObject = null;
-        String url = LIST_INSTANCE_URL.replace("{className}", instanceName);
+        String url = DmeConstants.LIST_INSTANCE_URL.replace("{className}", instanceName);
         try {
             ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            if (null != responseEntity && 200 == responseEntity.getStatusCodeValue()) {
+            if (null != responseEntity && HttpStatus.OK.value() == responseEntity.getStatusCodeValue()) {
                 Object object = responseEntity.getBody();
                 jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
             }

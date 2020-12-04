@@ -1,4 +1,4 @@
-<div *ngIf="fsDetails">
+<div *ngIf="fsDetails && fsDetails.length!=0">
   <clr-select-container>
     <select clrSelect (ngModelOptions)="fsNames" [(ngModel)]="defaultSelect" name="defaultSelect" class="clr-select" (change)="changeFs()">
       <option *ngFor="let item of fsNames" value="{{item}}">{{item}}</option>

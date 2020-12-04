@@ -4,103 +4,147 @@ package com.dmeplugin.dmestore.model;
  * @author wangxiangyong
  **/
 public class AuthClient {
+    /**
+     * accessval .
+     */
     private String accessval;
-    private String all_squash;
-    private String id;
-    private String name;
-    private String parent_id;
-    private String root_squash;
-    private String secure;
-    private String sync;
-    private String type;
-    private String vstore_id_in_storage;
-    private String vstore_name;
 
+    /**
+     * id .
+     */
+    private String id;
+
+    /**
+     * name .
+     */
+    private String name;
+
+    /**
+     * secure .
+     */
+    private String secure;
+
+    /**
+     * sync .
+     */
+    private String sync;
+
+    /**
+     * type .
+     */
+    private String type;
+
+    /**
+     * getAccessval .
+     *
+     * @return .
+     */
     public String getAccessval() {
         return accessval;
     }
 
-    public void setAccessval(String accessval) {
-        this.accessval = accessval;
+    /**
+     * setAccessval .
+     * @param param .
+     */
+    public void setAccessval(final String param) {
+        this.accessval = param;
     }
 
-    public String getAll_squash() {
-        return all_squash;
-    }
-
-    public void setAll_squash(String all_squash) {
-        this.all_squash = all_squash;
-    }
-
+    /**
+     * getId .
+     *
+     * @return String .
+     */
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    /**
+     * setId .
+     * @param param .
+     */
+    public void setId(final String param) {
+        this.id = param;
     }
 
+    /**
+     * getName .
+     *
+     * @return .
+     */
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setName .
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
 
-    public String getParent_id() {
-        return parent_id;
-    }
-
-    public void setParent_id(String parent_id) {
-        this.parent_id = parent_id;
-    }
-
-    public String getRoot_squash() {
-        return root_squash;
-    }
-
-    public void setRoot_squash(String root_squash) {
-        this.root_squash = root_squash;
-    }
-
+    /**
+     * getSecure .
+     *
+     * @return .
+     */
     public String getSecure() {
         return secure;
     }
 
-    public void setSecure(String secure) {
-        this.secure = secure;
+    /**
+     * setSecure .
+     * @param param .
+     */
+    public void setSecure(final String param) {
+        this.secure = param;
     }
 
+    /**
+     * getSync .
+     *
+     * @return .
+     */
     public String getSync() {
         return sync;
     }
 
-    public void setSync(String sync) {
-        this.sync = sync;
+    /**
+     * setSync .
+     * @param param .
+     */
+    public void setSync(final String param) {
+        this.sync = param;
     }
 
+    /**
+     * getType .
+     *
+     * @return String .
+     */
     public String getType() {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    /**
+     * setType .
+     * @param param .
+     */
+    public void setType(final String param) {
+        this.type = param;
     }
 
-    public String getVstore_id_in_storage() {
-        return vstore_id_in_storage;
-    }
-
-    public void setVstore_id_in_storage(String vstore_id_in_storage) {
-        this.vstore_id_in_storage = vstore_id_in_storage;
-    }
-
-    public String getVstore_name() {
-        return vstore_name;
-    }
-
-    public void setVstore_name(String vstore_name) {
-        this.vstore_name = vstore_name;
+    @Override
+    public final String toString() {
+        return "AuthClient{"
+            + "accessval='" + accessval + '\''
+            + ", id='" + id + '\''
+            + ", name='" + name + '\''
+            + ", secure='" + secure + '\''
+            + ", sync='" + sync + '\''
+            + ", type='" + type + '\''
+            + '}';
     }
 }

@@ -12,7 +12,7 @@ export class AttributeComponent implements OnInit {
   // 卷信息
   volumeInfoList: VolumeInfo[];
   // 选中的卷数据
-  selectVolume: VolumeInfo;
+  selectVolume: VolumeInfo = new VolumeInfo();
   // 选中的卷名称
   selectVolName: string;
   // 卷名称集合
@@ -21,9 +21,11 @@ export class AttributeComponent implements OnInit {
   constructor(private attribute: AttributeService, private cdr: ChangeDetectorRef, private gs: GlobalsService) { }
 
   ngOnInit(): void {
+    // this.gs.loading=true;
     const ctx = this.gs.getClientSdk().app.getContextObjects();
-    // const objectId=ctx[0].id;
-    const objectId = 'urn:vmomi:Datastore:datastore-183:f8e381d7-074b-4fa9-9962-9a68ab6106e1';
+    // const objectId = 'urn:vmomi:Datastore:datastore-1126:674908e5-ab21-4079-9cb1-596358ee5dd1';
+    const objectId=ctx[0].id;
+    console.log('objectId:', objectId);
     this.getVolumeInfoByVolID(objectId);
   }
 
@@ -39,10 +41,13 @@ export class AttributeComponent implements OnInit {
         // 设置默认选中数据
         this.selectVolName = this.volNames[0];
         this.selectVolume = this.getVolByName(this.selectVolName);
+
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       } else {
         console.log(result.description);
       }
+      // this.gs.loading=false;
+      console.log('this.selectVolName', this.selectVolume);
     });
   }
 

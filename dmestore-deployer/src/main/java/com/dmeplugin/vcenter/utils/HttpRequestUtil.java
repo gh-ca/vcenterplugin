@@ -144,14 +144,9 @@ public class HttpRequestUtil {
         public static void turnOffSslChecking()
             throws NoSuchAlgorithmException, KeyManagementException {
             // Install the all-trusting trust manager
-            final SSLContext sc = SSLContext.getInstance("SSL");
+            final SSLContext sc = SSLContext.getInstance("TLS");
             sc.init(null, UNQUESTIONING_TRUST_MANAGER, null);
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        }
-
-        public static void turnOnSslChecking() throws KeyManagementException, NoSuchAlgorithmException {
-            // Return it to the initial state (discovered by reflection, now hardcoded)
-            SSLContext.getInstance("SSL").init(null, null, null);
         }
 
         private SslUtil() {

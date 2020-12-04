@@ -1,6 +1,14 @@
 package com.dmeplugin.dmestore.services.bestpractice;
 
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
+import com.dmeplugin.vmware.mo.HostMO;
+import com.dmeplugin.vmware.mo.HostStorageSystemMO;
+import com.dmeplugin.vmware.util.VmwareContext;
+import com.vmware.vim25.HostMultipathInfoLogicalUnit;
+import com.vmware.vim25.HostMultipathInfoLogicalUnitPolicy;
+import com.vmware.vim25.ManagedObjectReference;
+
+import java.util.List;
 
 /**
  * @author wangxiangyong
@@ -13,12 +21,23 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
 
     @Override
     public Object getRecommendValue() {
-        return new Integer(9000);
+        return "VMW_PSP_RR";
     }
 
     @Override
-    public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception{
-        return super.getCurrentValue(vcsdkUtils, objectId, (Integer)getRecommendValue());
+    public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
+        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
+        VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
+        HostMO hostMo = this.getHostMoFactory().build(context, mor);
+        HostStorageSystemMO hostStorageSystemMo = hostMo.getHostStorageSystemMo();
+        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo().getMultipathInfo().getLun();
+        for (HostMultipathInfoLogicalUnit lun : lunList) {
+            HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
+            String policyStr = policy.getPolicy();
+            return policyStr;
+        }
+
+        return "--";
     }
 
     @Override
@@ -38,11 +57,48 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
 
     @Override
     public boolean check(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
-        return super.check(vcsdkUtils, objectId, getRecommendValue());
+        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
+        VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
+        HostMO hostMo = this.getHostMoFactory().build(context, mor);
+        HostStorageSystemMO hostStorageSystemMo = hostMo.getHostStorageSystemMo();
+        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo().getMultipathInfo().getLun();
+        for (HostMultipathInfoLogicalUnit lun : lunList) {
+            HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
+            String policyStr = policy.getPolicy();
+            //多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
+            //TODO
+            if(policyStr.contains("_PSP_") && !"VMW_PSP_RR".equals(policy)){
+                //return false;
+            }
+
+            if(policyStr.contains("_SATP_") && !"VMW_SATP_ALUA".equals(policy)){
+                //return false;
+            }
+        }
+
+        return true;
     }
 
     @Override
-    public void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception{
-        super.update(vcsdkUtils, objectId);
+    public void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
+        if (check(vcsdkUtils, objectId)) {
+            return;
+        }
+
+        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
+        VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
+        HostMO hostMo = this.getHostMoFactory().build(context, mor);
+        HostStorageSystemMO hostStorageSystemMo = hostMo.getHostStorageSystemMo();
+        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo().getMultipathInfo().getLun();
+        for (HostMultipathInfoLogicalUnit lun : lunList) {
+            HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
+            String policyStr = policy.getPolicy();
+            //TODO
+            //多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
+            if("".equals(policyStr)){
+                //policy.setPolicy("VMW_PSP_RR");
+            }
+            hostStorageSystemMo.setMultipathLunPolicy(lun.getId(), policy);
+        }
     }
 }

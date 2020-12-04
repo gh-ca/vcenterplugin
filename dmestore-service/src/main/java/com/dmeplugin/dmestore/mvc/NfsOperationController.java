@@ -1,33 +1,41 @@
 package com.dmeplugin.dmestore.mvc;
 
+import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.model.CapacityAutonegotiation;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.NfsOperationService;
 import com.google.gson.Gson;
-import io.swagger.annotations.Api;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("checkstyle:JavadocStyle")
 @RestController
 @RequestMapping("/operatenfs")
-@Api
 public class NfsOperationController extends BaseController{
 
-    public static final Logger LOG = LoggerFactory.getLogger(NfsOperationController.class);
-    private final String API_RESP_CODE = "code";
+    private final Logger LOG = LoggerFactory.getLogger(NfsOperationController.class);
+    //QOS策略上限标识
+    private final String CONTROL_UP = "up";
+    //QOS策略下限标识
+    private final String CONTROL_LOW = "low";
     private Gson gson=new Gson();
 
     @Autowired
     private NfsOperationService nfsOperationService;
-
-
     /**
      * {
      * storagId 存储设备id
@@ -39,7 +47,7 @@ public class NfsOperationController extends BaseController{
      * shareName 共享名称
      * fsName 文件系统名称
      * size  ?待确认默认单位（界面可选。前端可转换）
-     * type nfs协议版本
+     * type nfs协议版本   NFS以及NFS41
      * advance false true  true 是有高级选项
      * qosFlag qos策略开关 false true false关闭
      * contolPolicy 上下线选择标记  枚举值 up low
@@ -50,16 +58,14 @@ public class NfsOperationController extends BaseController{
      * minBandwidth
      * minIops
      * latency
-     *
      * thin true  代表thin false代表thick
      * deduplicationEnabled 重删 true false
      * compressionEnabled 压缩 true false
      * autoSizeEnable 自动扩容 true false
-     *
      * vkernelIp 虚拟网卡ip
      * hostObjectId 挂载主机的Objectid
-     *
-     * accessMode 挂载方式 分 只读 和读写
+     * accessMode 挂载方式 只读 "readOnly" 读写 "readWrite
+     * securityType NFS41的时候，安全类型AUTH_SYS,SEC_KRB5,SEC_KRB5I
      * }
      * @param params
      * @return
@@ -68,7 +74,7 @@ public class NfsOperationController extends BaseController{
     @ResponseBody
     public ResponseBodyBean createNfsDatastore(@RequestBody Map<String,Object> params){
 
-        LOG.info("url:{/operatenfs/createnfsdatastore},"+gson.toJson(params));
+        LOG.info("url:{/operatenfs/createnfsdatastore}," + gson.toJson(params));
         //入参调整
         Map<String, Object> param = new HashMap<>(16);
         Map<String, Object> createNfsShareParam = new HashMap<>(16);
@@ -85,15 +91,16 @@ public class NfsOperationController extends BaseController{
         param.put("nfsName", nfsName);
         Boolean sameName = (Boolean)params.get("sameName");
         param.put("type", params.get("type"));
+        param.put("securityType", params.get("securityType"));
         filesystemSpec.put("capacity", params.get("size"));
         filesystemSpec.put("count", 1);
         if (sameName) {
-            createNfsShareParam.put("name", "/"+nfsName);
+            createNfsShareParam.put("name", "/" +nfsName);
             createNfsShareParam.put("share_path", "/" + nfsName + "/");
             filesystemSpec.put("name", nfsName);
             param.put("exportPath", "/" + nfsName);
         } else {
-            createNfsShareParam.put("name", "/"+params.get("shareName"));
+            createNfsShareParam.put("name", "/" +params.get("shareName"));
             createNfsShareParam.put("share_path", "/" + params.get("fsName") + "/");
             filesystemSpec.put("name", params.get("fsName"));
             param.put("exportPath", "/" + params.get("fsName"));
@@ -114,10 +121,10 @@ public class NfsOperationController extends BaseController{
             if (qosFlag) {
                 Map<String, Object> qosPolicy = new HashMap<>(16);
                 String contolPolicy = (String) params.get("contolPolicy");
-                if ("up".equals(contolPolicy)) {
+                if (CONTROL_UP.equals(contolPolicy)) {
                     qosPolicy.put("max_bandwidth", params.get("maxBandwidth"));
                     qosPolicy.put("max_iops", params.get("maxIops"));
-                } else if ("low".equals(contolPolicy)) {
+                } else if (CONTROL_LOW.equals(contolPolicy)) {
                     qosPolicy.put("min_bandwidth", params.get("minBandwidth"));
                     qosPolicy.put("min_iops", params.get("minIops"));
                     qosPolicy.put("latency", params.get("latency"));
@@ -132,48 +139,56 @@ public class NfsOperationController extends BaseController{
             }
             tuning.put("compression_enabled", params.get("compressionEnabled"));
             tuning.put("deduplication_enabled", params.get("deduplicationEnabled"));
+
+            String capacitymode=(Boolean.parseBoolean(String.valueOf(params.get("autoSizeEnable")))? CapacityAutonegotiation.capacitymodeauto:CapacityAutonegotiation.capacitymodeoff);
+            capacityAutonegotiation.put("capacity_self_adjusting_mode", capacitymode);
             capacityAutonegotiation.put("auto_size_enable", params.get("autoSizeEnable"));
         } else {
             tuning.put("allocation_type", "thin");
             tuning.put("compression_enabled", false);
             tuning.put("deduplication_enabled", false);
             capacityAutonegotiation.put("auto_size_enable", false);
+            capacityAutonegotiation.put("capacity_self_adjusting_mode", CapacityAutonegotiation.capacitymodeoff);
         }
         param.put("tuning", tuning);
-        Map<String,Object> resMap = nfsOperationService.createNfsDatastore(param);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.OK.value())) {
-            return success(resMap);
+        param.put("capacity_autonegotiation", capacityAutonegotiation);
+        try {
+            nfsOperationService.createNfsDatastore(param);
+            return success();
+        } catch (Exception e) {
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
+
     }
 
     /**
      * {
-     *      "dataStoreObjectId":"urn:vmomi:Datastore:datastore-1060:674908e5-ab21-4079-9cb1-596358ee5dd1" ,
-     *      "nfsName": "fs0001",
-     *      "fileSystemId":"0C9A60E0A51C3AD38567C21B6881371C",
-     *      "autoSizeEnable": true,
-     *      "deduplicationEnabled": "false",
-     *      "compressionEnabled": "false",
-     *      "thin": "thin",
-     *      "maxBandwidth": "1",
-     *      "maxIops": "2"
-     *      "minBandwidth"
-     * 	 "minIops"
-     * 	 "latency"
-     *      "shareId":"70C9358F595B3AA5A1DB2464F72AF0DA"
-     *      "advance"false true  true 是有高级选项
-     *      "qosFlag"qos策略开关 false true false关闭
-     *      "contolPolicy"上下线选择标记  枚举值 up low
-     *
+     * "dataStoreObjectId":"urn:vmomi:Datastore:datastore-1060:674908e5-ab21-4079-9cb1-596358ee5dd1" ,
+     * "nfsName": "fs0001",
+     * "fileSystemId":"0C9A60E0A51C3AD38567C21B6881371C",
+     * "autoSizeEnable": true,
+     * "deduplicationEnabled": "false",
+     * "compressionEnabled": "false",
+     * "thin": "thin",
+     * "maxBandwidth": "1",
+     * "maxIops": "2"
+     * "minBandwidth"
+     * "minIops"
+     * "latency"
+     * "shareId":"70C9358F595B3AA5A1DB2464F72AF0DA"
+     * "advance"false true  true 是有高级选项
+     * "qosFlag"qos策略开关 false true false关闭
+     * "contolPolicy"上下线选择标记  枚举值 up low
+     * <p>
      * }
+     *
      * @param params
      * @return
      */
     @PostMapping("/updatenfsdatastore")
     @ResponseBody
-    public ResponseBodyBean updateNfsDatastore(@RequestBody Map<String,Object> params){
-
+    public ResponseBodyBean updateNfsDatastore(final @RequestBody Map<String, Object> params) {
 
         Map<String, Object> param = new HashMap<>(16);
         param.put("dataStoreObjectId", params.get("dataStoreObjectId"));
@@ -182,9 +197,11 @@ public class NfsOperationController extends BaseController{
         param.put("nfs_share_id", params.get("shareId"));
         Map<String, Object> capacityAutonegotiation = new HashMap<>(16);
         Object autoSizeEnable = params.get("autoSizeEnable");
-        if (autoSizeEnable!=null) {
+        if (autoSizeEnable != null) {
             capacityAutonegotiation.put("auto_size_enable", params.get("autoSizeEnable"));
-            param.put("capacity_autonegotiation",capacityAutonegotiation);
+            String capacitymode = (Boolean.parseBoolean(String.valueOf(params.get("autoSizeEnable"))) ? CapacityAutonegotiation.capacitymodeauto : CapacityAutonegotiation.capacitymodeoff);
+            capacityAutonegotiation.put("capacity_self_adjusting_mode", capacitymode);
+            param.put("capacity_autonegotiation", capacityAutonegotiation);
         }
         Map<String, Object> tuning = new HashMap<>(16);
         tuning.put("deduplication_enabled", params.get("deduplicationEnabled"));
@@ -192,51 +209,73 @@ public class NfsOperationController extends BaseController{
         param.put("name", params.get("name"));
         Object thin = params.get("thin");
         if (thin != null) {
-            if ((Boolean) thin ) {
+            if ((Boolean) thin) {
                 tuning.put("allocation_type", "thin");
-            } else if (!(Boolean) thin){
+            } else if (!(Boolean) thin) {
                 tuning.put("allocation_type", "thick");
             }
-            param.put("tuning",tuning);
+            param.put("tuning", tuning);
         }
-        Boolean qosFlag = (Boolean)params.get("qosFlag");
+        Boolean qosFlag = (Boolean) params.get("qosFlag");
         if (qosFlag) {
             Map<String, Object> qosPolicy = new HashMap<>(16);
-            String contolPolicy = (String)params.get("contolPolicy");
-            if ("low".equals(contolPolicy)) {
+            String contolPolicy = (String) params.get("contolPolicy");
+            if (CONTROL_LOW.equals(contolPolicy)) {
                 qosPolicy.put("min_bandwidth", params.get("minBandwidth"));
                 qosPolicy.put("min_iops", params.get("minIops"));
                 qosPolicy.put("latency", params.get("latency"));
-            } else if ("up".equals(contolPolicy)) {
+            } else if (CONTROL_UP.equals(contolPolicy)) {
                 qosPolicy.put("max_bandwidth", params.get("maxBandwidth"));
                 qosPolicy.put("max_iops", params.get("maxIops"));
             }
             param.put("qos_policy", qosPolicy);
         }
-        Map<String,Object> resMap = nfsOperationService.updateNfsDatastore(param);
-        if (null != resMap && null != resMap.get(API_RESP_CODE) && resMap.get(API_RESP_CODE).equals(HttpStatus.ACCEPTED.value())) {
-            return success(resMap);
+        try {
+            nfsOperationService.updateNfsDatastore(param);
+            return success();
+        } catch (Exception e) {
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(resMap));
+
     }
 
     /**
      * {
-     *     fileSystemId string 文件系统唯一标识 必
-     *     expand boolean 扩容 is_expand=true  缩容 is_expand = false 必
-     *     capacity double 该规格文件系统容量，单位GB 必
+     * fileSystemId string 文件系统唯一标识 必
+     * expand boolean 扩容 is_expand=true  缩容 is_expand = false 必
+     * capacity double 该规格文件系统容量，单位GB 必
      * }
-     * @param params
+     *
+     * @params params
      * @return
      */
     @PutMapping("/changenfsdatastore")
     @ResponseBody
-    public ResponseBodyBean changeNfsCapacity(@RequestBody Map<String,Object> params){
-
-        ResponseBodyBean responseBodyBean = nfsOperationService.changeNfsCapacity(params);
-        if (null != responseBodyBean && null != responseBodyBean.getCode() && "202".equals(responseBodyBean.getCode())) {
-            return success(responseBodyBean);
+    public ResponseBodyBean changeNfsCapacity(final @RequestBody Map<String, Object> params) {
+        try {
+            nfsOperationService.changeNfsCapacity(params);
+            return success();
+        } catch (Exception e) {
+            return failure(e.getMessage());
         }
-        return failure(gson.toJson(responseBodyBean));
+
+    }
+
+
+    /**
+     * 通过storeobjectid来获取存储编译所需要的信息
+     * @param storeObjectId  存储的objectid
+     * @return 根据页面参数来确定的map
+     */
+    @GetMapping("/editnfsstore")
+    @ResponseBody
+    public ResponseBodyBean getEditNfsStore(@RequestParam(name = "storeObjectId")String storeObjectId) {
+        try {
+            return success(nfsOperationService.getEditNfsStore(storeObjectId));
+        } catch (Exception e) {
+            return failure(e.getMessage());
+        }
+
+
     }
 }

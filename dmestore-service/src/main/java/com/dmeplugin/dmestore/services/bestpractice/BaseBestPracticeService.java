@@ -1,23 +1,25 @@
 package com.dmeplugin.dmestore.services.bestpractice;
 
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
+import com.dmeplugin.vmware.mo.HostAdvanceOptionMO;
 import com.dmeplugin.vmware.mo.HostMO;
-import com.dmeplugin.vmware.mo.HostStorageSystemMO;
+import com.dmeplugin.vmware.util.DatastoreMOFactory;
+import com.dmeplugin.vmware.util.HostMOFactory;
 import com.dmeplugin.vmware.util.VmwareContext;
-import com.vmware.vim25.HostMultipathInfoLogicalUnit;
-import com.vmware.vim25.HostVirtualSwitch;
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.OptionValue;
 
 import java.util.List;
 
 /**
- * @author wangxiangyong
+ * 最佳实践检查
+ * * @author wangxiangyong
+ *
+ * @since 2020-11-30
  **/
 public class BaseBestPracticeService {
-
-    protected boolean check(VCSDKUtils vcsdkUtils, String objectId,
-                            String hostSetting, Object recommendValue) throws Exception {
+    protected boolean check(final VCSDKUtils vcsdkUtils, final String objectId,
+                            final String hostSetting, final Object recommendValue) throws Exception {
         Object v = getCurrentValue(vcsdkUtils, objectId, hostSetting);
         if (String.valueOf(v).equals(String.valueOf(recommendValue))) {
             return true;
@@ -26,77 +28,36 @@ public class BaseBestPracticeService {
         return false;
     }
 
-    protected void update(VCSDKUtils vcsdkUtils, String objectId,
-                          String hostSetting, Object recommendValue) throws Exception {
-        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
+    protected void update(final VCSDKUtils vcsdkUtils, final String objectId,
+                          final String hostSetting, final Object recommendValue) throws Exception {
+        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         if (check(vcsdkUtils, objectId, hostSetting, recommendValue)) {
             return;
         }
-        HostMO hostMo = new HostMO(context, mor);
-        List<OptionValue> values = hostMo.getHostAdvanceOptionMO().queryOptions(hostSetting);
+        HostMO hostMo = this.getHostMoFactory().build(context, mor);
+        List<OptionValue> values = hostMo.getHostAdvanceOptionMo().queryOptions(hostSetting);
         for (OptionValue value : values) {
             value.setValue(recommendValue);
         }
-        hostMo.getHostAdvanceOptionMO().UpdateOptions(values);
+        hostMo.getHostAdvanceOptionMo().updateOptions(values);
     }
 
-    protected Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId, String hostSetting) throws Exception {
-        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
+    protected Object getCurrentValue(final VCSDKUtils vcsdkUtils, final String objectId, final String hostSetting) throws Exception {
+        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = new HostMO(context, mor);
-        List<OptionValue> values = hostMo.getHostAdvanceOptionMO().queryOptions(hostSetting);
+        HostMO hostMo = this.getHostMoFactory().build(context, mor);
+        HostAdvanceOptionMO hostAdvanceOptionMo = hostMo.getHostAdvanceOptionMo();
+        List<OptionValue> values = hostAdvanceOptionMo.queryOptions(hostSetting);
         for (OptionValue value : values) {
             return value.getValue();
         }
-        return null;
+        return "--";
     }
 
-    protected Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId, Integer recommendValue) throws Exception {
-        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
-        VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = new HostMO(context, mor);
-        List<HostVirtualSwitch>  hostVirtualSwitchList = hostMo.getHostVirtualSwitch();
-        for(HostVirtualSwitch hostVirtualSwitch : hostVirtualSwitchList){
-            if(hostVirtualSwitch.getMtu().intValue() != recommendValue.intValue()){
-                return hostVirtualSwitch.getMtu();
-            }
-        }
 
-        return null;
-    }
-
-    protected boolean check(VCSDKUtils vcsdkUtils, String objectId, Object recommendValue) throws Exception {
-        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
-        VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = new HostMO(context, mor);
-        List<HostVirtualSwitch>  hostVirtualSwitchList = hostMo.getHostVirtualSwitch();
-        for(HostVirtualSwitch hostVirtualSwitch : hostVirtualSwitchList){
-            if(hostVirtualSwitch.getMtu().intValue() != ((Integer)recommendValue).intValue()){
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    protected void update(VCSDKUtils vcsdkUtils, String objectId, Object recommendValue) throws Exception {
-        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
-        VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        if (check(vcsdkUtils, objectId, recommendValue)) {
-            return;
-        }
-        HostMO hostMo = new HostMO(context, mor);
-        List<HostVirtualSwitch>  hostVirtualSwitchList = hostMo.getHostVirtualSwitch();
-        for(HostVirtualSwitch hostVirtualSwitch : hostVirtualSwitchList){
-            if(hostVirtualSwitch.getMtu().intValue() != ((Integer)recommendValue).intValue()){
-                hostVirtualSwitch.setMtu((Integer)recommendValue);
-            }
-        }
-    }
-
-    protected boolean checkModuleOption(VCSDKUtils vcsdkUtils, String objectId,
-                                        String optionName, Object recommendValue) throws Exception {
+    protected boolean checkModuleOption(final VCSDKUtils vcsdkUtils, final String objectId,
+                                        final String optionName, final Object recommendValue) throws Exception {
         String currentValue = getCurrentModuleOption(vcsdkUtils, objectId, optionName);
         if (currentValue.equals(String.valueOf(recommendValue))) {
             return true;
@@ -104,38 +65,35 @@ public class BaseBestPracticeService {
         return false;
     }
 
-    protected String getCurrentModuleOption(VCSDKUtils vcsdkUtils, String objectId, String optionName) throws Exception {
-        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
+    protected String getCurrentModuleOption(final VCSDKUtils vcsdkUtils, final String objectId, final String optionName)
+        throws Exception {
+        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = new HostMO(context, mor);
-        String modlueOption = hostMo.getHostKernelModuleSystemMO().queryConfiguredModuleOptionString(optionName);
+        HostMO hostMo = this.getHostMoFactory().build(context, mor);
+        String modlueOption = hostMo.getHostKernelModuleSystemMo().queryConfiguredModuleOptionString(optionName);
         //拆分值
         String[] s = modlueOption.split("=");
         return s[1];
     }
 
-    protected void updateModuleOption(VCSDKUtils vcsdkUtils, String objectId,
-                                      String optionName, Object recommendValue) throws Exception {
+    protected void updateModuleOption(final VCSDKUtils vcsdkUtils, final String objectId,
+                                      final String optionName, final Object recommendValue) throws Exception {
         if (checkModuleOption(vcsdkUtils, objectId, optionName, recommendValue)) {
             return;
         }
-        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
+        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = new HostMO(context, mor);
+        HostMO hostMo = this.getHostMoFactory().build(context, mor);
         String v = optionName + "=" + String.valueOf(recommendValue);
-        hostMo.getHostKernelModuleSystemMO().updateModuleOptionString(optionName, v);
+        hostMo.getHostKernelModuleSystemMo().updateModuleOptionString(optionName, v);
     }
 
-    protected void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
-        ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectID2MOR(objectId);
-        VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
-        HostMO hostMo = new HostMO(context, mor);
-        HostStorageSystemMO hostStorageSystemMo = hostMo.getHostStorageSystemMO();
-        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo().getMultipathInfo().getLun();
-        for(HostMultipathInfoLogicalUnit hostMultipathInfoLogicalUnit : lunList){
-            //多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
-            hostMultipathInfoLogicalUnit.getPolicy().setPolicy("VMW_PSP_RR");
-        }
+    public HostMOFactory getHostMoFactory() {
+        return HostMOFactory.getInstance();
+    }
+
+    public DatastoreMOFactory getDatastoreMoFactory() {
+        return DatastoreMOFactory.getInstance();
     }
 
 }

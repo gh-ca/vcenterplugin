@@ -10,94 +10,185 @@ import java.util.List;
  * @create: 2020-09-08
  **/
 public class TaskDetailInfo {
-    String id;// taskID
-    String taskName;// task name;
-    int status;
-    int progress;
-    String ownerName;
-    long createTiem;
-    long startTime;
-    long endTime;
-    String detail;
-    List<TaskDetailResource> resources;
+    /**
+     * taskID.
+     */
+    private String id;
+    /**
+     * task name.
+     */
+    private String taskName;
+    /**
+     * status.
+     */
+    private int status;
+    /**
+     * progress.
+     */
+    private int progress;
+    /**
+     * ownerName.
+     */
+    private String ownerName;
+    /**
+     * createTiem.
+     */
+    private long createTiem;
+    /**
+     * startTime.
+     */
+    private long startTime;
+    /**
+     * endTime.
+     */
+    private long endTime;
+    /**
+     * detail.
+     */
+    private String detail;
+    /**
+     * resources.
+     */
+    private List<TaskDetailResource> resources;
 
+    /**
+     * getId .
+     * @return String .
+     */
     public String getId() {
         return id;
     }
-
-    public void setId(String id) {
-        this.id = id;
+    /**
+     * setId .
+     * @param param .
+     */
+    public void setId(final String param) {
+        this.id = param;
     }
-
+    /**
+     * getTaskName .
+     * @return String .
+     */
     public String getTaskName() {
         return taskName;
     }
-
-    public void setTaskName(String taskName) {
-        this.taskName = taskName;
+    /**
+     * setTaskName .
+     * @param param .
+     */
+    public void setTaskName(final String param) {
+        this.taskName = param;
     }
-
+    /**
+     * getStatus .
+     * @return String .
+     */
     public int getStatus() {
         return status;
     }
-
-    public void setStatus(int status) {
-        this.status = status;
+    /**
+     * setStatus .
+     * @param param .
+     */
+    public void setStatus(final int param) {
+        this.status = param;
     }
-
+    /**
+     * getProgress .
+     * @return int .
+     */
     public int getProgress() {
         return progress;
     }
-
-    public void setProgress(int progress) {
-        this.progress = progress;
+    /**
+     * setProgress .
+     * @param param .
+     */
+    public void setProgress(final int param) {
+        this.progress = param;
     }
-
+    /**
+     * getOwnerName .
+     * @return String .
+     */
     public String getOwnerName() {
         return ownerName;
     }
-
-    public void setOwnerName(String ownerName) {
-        this.ownerName = ownerName;
+    /**
+     * setOwnerName .
+     * @param param .
+     */
+    public void setOwnerName(final String param) {
+        this.ownerName = param;
     }
-
+    /**
+     * getCreateTiem .
+     * @return long .
+     */
     public long getCreateTiem() {
         return createTiem;
     }
-
-    public void setCreateTiem(long createTiem) {
-        this.createTiem = createTiem;
+    /**
+     * setCreateTiem .
+     * @param param .
+     */
+    public void setCreateTiem(final long param) {
+        this.createTiem = param;
     }
-
+    /**
+     * getStartTime .
+     * @return long .
+     */
     public long getStartTime() {
         return startTime;
     }
-
-    public void setStartTime(long startTime) {
-        this.startTime = startTime;
+    /**
+     * setStartTime .
+     * @param param .
+     */
+    public void setStartTime(final long param) {
+        this.startTime = param;
     }
-
+    /**
+     * getEndTime .
+     * @return long .
+     */
     public long getEndTime() {
         return endTime;
     }
-
-    public void setEndTime(long endTime) {
-        this.endTime = endTime;
+    /**
+     * setEndTime .
+     * @param param .
+     */
+    public void setEndTime(final long param) {
+        this.endTime = param;
     }
-
+    /**
+     * getDetail .
+     * @return String .
+     */
     public String getDetail() {
         return detail;
     }
-
-    public void setDetail(String detail) {
-        this.detail = detail;
+    /**
+     * setDetail .
+     * @param param .
+     */
+    public void setDetail(final String param) {
+        this.detail = param;
     }
-
+    /**
+     *getResources .
+     * @return List<TaskDetailResource> .
+     */
     public List<TaskDetailResource> getResources() {
         return resources;
     }
-
-    public void setResources(List<TaskDetailResource> resources) {
-        this.resources = resources;
+    /**
+     * setResources .
+     * @param param .
+     */
+    public void setResources(final List<TaskDetailResource> param) {
+        this.resources = param;
     }
 }

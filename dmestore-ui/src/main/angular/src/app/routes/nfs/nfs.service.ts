@@ -11,19 +11,27 @@ export class NfsService {
   static vmfsIOPS: Array<string> = ['1125921381744648', '1125921381744649'];
   // VMFS  bandwidth 0Read 1Write
   static vmfsBDWT: Array<string> = ['1125921381744646', '1125921381744647'];
-  // VMFS  latency 0Read 1Write
-  static vmfsLatency: Array<string> = ['1125921381744656', '1125921381744657'];
+  // VMFS  latency 0Read 1Write 2总计
+  static vmfsLatency: Array<string> = ['1125921381744656', '1125921381744657', '1125921381744642'];
+  static COUNTER_ID_VOLUME_RESPONSETIME: Array<string> = ['1125921381744642'];
   // VMFS  url
   static vmfsUrl = 'datastorestatistichistrory/vmfs';
 
   // NFS IOPS 0Read 1Write
-  static nfsOPS: Array<string> = ['1125921381744648', '1125921381744649'];
+  static nfsOPS: Array<string> = ['1126179079716867', '1126179079716870'];
   // NFS  bandwidth 0Read 1Write
-  static nfsBDWT: Array<string> = ['1125921381744646', '1125921381744647'];
+  static nfsBDWT: Array<string> = ['1126179079716868', '1126179079716871'];
   // NFS  latency 0Read 1Write
-  static nfsLatency: Array<string> = ['1125921381744656', '1125921381744657'];
+  static nfsLatency: Array<string> = ['1126179079716869', '1126179079716872'];
   // NFS  url
   static nfsUrl = 'datastorestatistichistrory/nfs';
+  static storageUrl = 'datastorestatistichistrory/storageDevice';
+
+  // Storage Detail 0Read 1Write
+  static storageIOPS: Array<string> = ['1125904201875461', '1125904201875462'];
+  // Storage bandwidth 0Read 1Write
+  static storageBDWT: Array<string> = ['1125904201875459', '1125904201875460'];
+
   // 性能图可选range LAST_5_MINUTE LAST_1_HOUR LAST_1_DAY LAST_1_WEEK LAST_1_MONTH LAST_1_QUARTER HALF_1_YEAR LAST_1_YEAR BEGIN_END_TIME INVALID
   static perRanges = [
     {key: 'LAST_5_MINUTE', value: '最近5分钟'},
@@ -34,9 +42,9 @@ export class NfsService {
     {key: 'LAST_1_QUARTER', value: '最近1个季度'},
     {key: 'HALF_1_YEAR', value: '最近半年'},
     {key: 'LAST_1_YEAR', value: '最近1年'},
-    {key: 'BEGIN_END_TIME', value: '开始-结束时间'},
+    // {key: 'BEGIN_END_TIME', value: '开始-结束时间'},
     {key: 'INVALID', value: '无效'},
-    ];
+  ];
   constructor(private http: HttpClient) {}
 
   getData() {
@@ -45,43 +53,14 @@ export class NfsService {
   getChartData(fsIds: string[] ) {
     return this.http.get('accessnfs/listnfsperformance', {params: {fsIds}});
   }
-  addNfs(params= {}){
-    console.log("addNfs")
-    console.log(params)
-    return this.http.post('operatenfs/createnfsdatastore', params);
-  }
+
   updateNfs(params= {}){
     return this.http.post('operatenfs/updatenfsdatastore', params);
   }
-  mountNfs(params= {}){
-    return this.http.post('accessnfs/mountnfs', params);
-  }
-  delNfs(param: string){
-    return this.http.post('accessnfs/delnfs', param);
-  }
-  getHostListByObjectId(dataStoreObjectId: string){
-    return this.http.get('accessvmware/gethostsbydsobjectid', {params: {dataStoreObjectId}});
-  }
-  getHostList(){
-    return this.http.get('accessvmware/listhost');
-  }
-  getClusterListByObjectId(dataStoreObjectId: string){
-    return this.http.get('accessvmware/getclustersbydsobjectid', {params: {dataStoreObjectId}});
-  }
+
   getVolsByObjId(objId: string) {
     return this.http.get('accessvmfs/volume/' + objId );
   }
-  getVmkernelListByObjectId(hostObjectId:string){
-    return this.http.get('accessvmware/getvmkernelipbyhostobjectid',{params: {hostObjectId}} );
-  }
-  getNfsDetailById(fileSystemId:string){
-    return this.http.get('dmestorage/filesystemdetail',{params: {fileSystemId}} );
-  }
-  changeCapacity(params= {}){
-    return this.http.post('operatenfs/changenfsdatastore', params);
-  }
-
-
 
   /**
    * 获取折线图
@@ -93,66 +72,29 @@ export class NfsService {
   }
 }
 export interface List {
-   name: string;    // 名称
-   status: string;  // 状态
+  name: string;    // 名称
+  status: string;  // 状态
   capacity: number;  // 总容量 单位GB
   freeSpace: number; // 空闲容量 单位GB
   reserveCapacity: number; // 置备容量  capacity+uncommitted-freeSpace 单位GB
-   deviceId: string; // 存储设备ID
-   device: string; // 存储设备名称
-   logicPort: string; // 逻辑端口
-   logicPortId: string; // 逻辑端口 id
-   shareIp: string; // share ip
-   sharePath: string; // share path
-   share: string; // share 名称
-   shareId: string; // share id
-   fs: string; // fs
-   fsId: string; // fs id
+  deviceId: string; // 存储设备ID
+  device: string; // 存储设备名称
+  logicPort: string; // 逻辑端口
+  logicPortId: string; // 逻辑端口 id
+  shareIp: string; // share ip
+  sharePath: string; // share path
+  share: string; // share 名称
+  shareId: string; // share id
+  fs: string; // fs
+  fsId: string; // fs id
   ops: number; // OPS
   bandwidth: number;   // 带宽 单位MB/s
   readResponseTime: number;   // 读响应时间 单位ms
   writeResponseTime: number; // 写响应时间 单位ms
   objectid: string; //
+  capacityUsage:number;
 }
-// =================添加NFS参数 start=========
-export class AddNfs{
-  storagId:string;// 存储设备id
-  storagePoolId:string;//  存储池id (storage_pool_id)
-  poolRawId:string;//  存储池在指定存储设备上的id（poolId）
-  currentPortId:string;//  逻辑端口id
-  nfsName:string;//   DataStoname
-  sameName:boolean;// false true 如果是false就传
-  shareName:string;//  共享名称
-  fsName:string;//  文件系统名称
-  size: number; //  ?待确认默认单位（界面可选。前端可转换）
-  type:string;//  nfs协议版本
-  advance :boolean;//false true  true 是有高级选项
-  qosFlag:boolean;// qos策略开关 false true false关闭
-  contolPolicy :string;//  上下线选择标记  枚举值 up low
-// up 取值如下
-  maxBandwidth: number; //
-  maxIops: number; //
-//low取值
-  minBandwidth: number; //
-  minIops: number; //
-  latency: number; //
-  thin:boolean;// true  代表thin false代表thick
-  deduplicationEnabled:boolean;// 重删 true false
-  compressionEnabled:boolean;// 压缩 true false
-  autoSizeEnable:boolean;// 自动扩容 true false
-  vkernelIp:string;//  虚拟网卡ip
-  hostObjectId:string;//  挂载主机的Objectid
-  accessMode:string;//  挂载方式 分 只读 和读写
-  constructor(){
-    this.sameName = true;
-    this.advance = false;
-    this.qosFlag = false;
-    this.deduplicationEnabled = false;
-    this.compressionEnabled = false;
-    this.autoSizeEnable = false;
-    this.thin = true;
-  }
-}
+
 
 export class UpdateNfs{
   dataStoreObjectId: string;
@@ -213,7 +155,11 @@ export class CapacityAutonegotiation{
 export class FileSystem{
   capacity: number;
   name: string;
+  allocType: string;
+  availableCapacity: number;
+  healthStatus: string;
   count: number;
+  dtreeCount: number;
 }
 export class Autonegotiation{
   auto_size_enable: boolean;
@@ -397,7 +343,8 @@ export class MakePerformance {
    * @param range 时间段 LAST_5_MINUTE LAST_1_HOUR LAST_1_DAY LAST_1_WEEK LAST_1_MONTH LAST_1_QUARTER HALF_1_YEAR LAST_1_YEAR BEGIN_END_TIME INVALID
    * @param url 请求url
    */
-  setChart(height: number, title: string, subtext: string, indicatorIds: any[], objIds: any[], range: string, url: string, startTime:string, endTime:string) {
+  setChart(height: number, title: string, subtext: string, indicatorIds: any[], objIds: any[], range: string,
+           url: string, startTime:string, endTime:string) {
     // 生成chart optiond对象
     const chart:ChartOptions = this.getNewChart(height, title, subtext);
     return new Promise((resolve, reject) => {
@@ -410,20 +357,20 @@ export class MakePerformance {
       }
       this.remoteSrv.getLineChartData(url, params).subscribe((result: any) => {
         console.log('chartData: ', title, result);
-        if (result.code === '200' && result.data !== null && result.data.data !== null) {
+        if (result.code === '200' && result.data !== null && result.data !== null) {
           const resData = result.data;
-            // 设置标题
+          // 设置标题
           chart.title.text = title;
-            // 设置副标题
+          // 设置副标题
           chart.title.subtext = subtext;
           // 上限对象
           const upperData = resData[objIds[0]][indicatorIds[0]];
           // 下限对象
           const lowerData = resData[objIds[0]][indicatorIds[1]];
           // 上限最大值
-          const pmaxData = this.getUpperOrLower(upperData, 'upper');
+          let pmaxData = this.getUpperOrLower(upperData, 'upper');
           // 下限最大值
-          let lmaxData = this.getUpperOrLower(lowerData, 'lower');
+          let lmaxData = this.getUpperOrLower(lowerData, 'upper');
           // 上限最小值
           let pminData = this.getUpperOrLower(upperData, 'lower');
           // 下限最小值
@@ -443,20 +390,23 @@ export class MakePerformance {
           // 设置上限、均值 折线图数据
           uppers.forEach(item => {
             for (const key of Object.keys(item)) {
-              // chartData.value = item[key];
-              chart.series[2].data.push({value: Number(item[key]), symbol: 'none'});
+              const value = Number(Number(item[key]).toFixed(4));
+              chart.series[2].data.push({value: value, symbol: 'none'});
             }
             for (const key of Object.keys(pavgData)) {
-              chart.series[0].data.push({value:  Number(pavgData[key]), symbol: 'none'});
+              const value = Number(Number(pavgData[key]).toFixed(4));
+              chart.series[0].data.push({value: value, symbol: 'none'});
             }
           });
           // 设置下限、均值 折线图数据
           lower.forEach(item => {
             for (const key of Object.keys(item)) {
-              chart.series[3].data.push({value: Number(item[key]), symbol: 'none'});
+              const value = Number(Number(item[key]).toFixed(4));
+              chart.series[3].data.push({value: value, symbol: 'none'});
             }
             for (const key of Object.keys(lavgData)) {
-              chart.series[1].data.push({value: Number(lavgData[key]), symbol: 'none'});
+              const value = Number(Number(lavgData[key]).toFixed(4));
+              chart.series[1].data.push({value: value, symbol: 'none'});
             }
           });
           resolve(chart);
@@ -491,29 +441,29 @@ export class MakePerformance {
         end_time: endTime,
       }
       this.remoteSrv.getLineChartData(url, params).subscribe((result: any) => {
-          console.log('chartData: ', title, result);
-          // 设置标题
-          chart.title.text = title;
-          // 设置副标题
-          chart.title.subtext = subtext;
-          if (result.code === '200' && result.data !== null && result.data.data !== null) {
-            let resData = result.data;
-            if (result.data.data){
-              resData = result.data.data
-            }
-            const seriesData = resData[objIds[0]][indicatorIds[0]].series;
-            // 设置X轴
-            this.setXAxisData(seriesData, chart);
-            seriesData.forEach(item => {
-              for (const key of Object.keys(item)) {
-                // chartData.value = item[key];
-                chart.series[0].data.push({value: Number(item[key]), symbol: 'none'});
-              }
-            });
-          } else {
-            console.log('get chartData fail: ', result.description);
+        console.log('chartData: ', title, result);
+        // 设置标题
+        chart.title.text = title;
+        // 设置副标题
+        chart.title.subtext = subtext;
+        if (result.code === '200' && result.data !== null && result.data !== null) {
+          let resData = result.data;
+          if (result.data){
+            resData = result.data
           }
-          resolve(chart);
+          const seriesData = resData[objIds[0]][indicatorIds[0]].series;
+          // 设置X轴
+          this.setXAxisData(seriesData, chart);
+          seriesData.forEach(item => {
+            for (const key of Object.keys(item)) {
+              // chartData.value = item[key];
+              chart.series[0].data.push({value: Number(item[key]), symbol: 'none'});
+            }
+          });
+        } else {
+          console.log('get chartData fail: ', result.description);
+        }
+        resolve(chart);
       });
     });
   }
@@ -734,10 +684,11 @@ export class MakePerformance {
   setXAxisData(data: any[], chart:ChartOptions) {
     console.log('data', data);
     data.forEach(item => {
+
       for (const key of Object.keys(item)) {
         let numKey = + key;
         const date = new Date(numKey);
-        const dateStr = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDay() + ' ' + date.getHours() + ':' + date.getMinutes();
+        const dateStr = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' ' + date.getHours() + ':' + date.getMinutes();
         chart.xAxis.data.push(dateStr);
       }
     });
@@ -749,17 +700,18 @@ export class MakePerformance {
    * @param type upper 最大 lower最小
    */
   getUpperOrLower(data: any, type: string) {
+    console.log("data", data)
     let result;
     if (type === 'lower') {
-      for (const key of Object.keys(data.max)) {
-        result = Number(data.max[key]);
+      for (const key of Object.keys(data.min)) {
+        result = Number(data.min[key]);
       }
     } else {
       for (const key of Object.keys(data.max)) {
-        result = Number(data.min[key]);
+        result = Number(data.max[key]);
       }
     }
-    return result;
+    return Number(result.toFixed(4));
   }
 
   /**

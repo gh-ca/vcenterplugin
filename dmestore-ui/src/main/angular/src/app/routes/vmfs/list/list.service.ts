@@ -7,12 +7,12 @@ export class VmfsListService {
   constructor(private http: HttpClient) {}
 
   // 主列表数据
-  getData(params = {}) {
-    return this.http.get('accessvmfs/listvmfs', params );
+  getData() {
+    return this.http.get('accessvmfs/listvmfs');
   }
   // 附列表数据
-  getChartData(volumeIds: string[] ) {
-    return this.http.get('accessvmfs/listvmfsperformance', {params: {volumeIds}});
+  getChartData(wwns: string[] ) {
+    return this.http.get('accessvmfs/listvmfsperformance', {params: {wwns}});
   }
   // 获取存储
   getStorages() {
@@ -20,7 +20,7 @@ export class VmfsListService {
   }
   // 通过存储ID获取存储池数据 (vmfs添加mediaType为block)
   getStoragePoolsByStorId(storageId: string, mediaType: string) {
-    return this.http.get('dmestorage/storagepools?storageId='+ storageId + '&media_type=' + mediaType);
+    return this.http.get('dmestorage/storagepools?storageId='+ storageId + '&mediaType=' + mediaType);
   }
 
   // 获取所有的主机
@@ -50,7 +50,7 @@ export class VmfsListService {
 
   // 获取所有的服务等级数据
   getServiceLevelList(params = {}) {
-    return this.http.put('operatevmfs/listvmfsservicelevel', params);
+    return this.http.post('servicelevel/listservicelevel', params);
   }
 
   // 创建vmfs
@@ -60,7 +60,7 @@ export class VmfsListService {
 
   // 修改VMFS
   updateVmfs(volumeId: string, params = {}) {
-    return  this.http.put('operatevmfs/updatevmfs?volume_id=' + volumeId, params);
+    return  this.http.put('operatevmfs/updatevmfs?volumeId=' + volumeId, params);
   }
   // 删除
   delVmfs(params = {}) {
@@ -76,7 +76,7 @@ export class VmfsListService {
   }
   // 卸载
   unmountVMFS(params = {}) {
-    return  this.http.post('/accessvmfs/ummountvmfs', params);
+    return  this.http.post('accessvmfs/ummountvmfs', params);
   }
   // 挂载
   mountVmfs(params = {}) {
@@ -101,9 +101,29 @@ export class VmfsListService {
     return  this.http.get('accessdme/scandatastore', {params: {storageType}});
   }
 
+  // 获取WorkLoads
+  getWorkLoads(storageId: string) {
+    return  this.http.get('accessdme/getworkloads', {params: {storageId}});
+  }
+
+  /**
+   * 校验vmfs名称
+   * @param name
+   */
+  checkVmfsName(name: string) {
+    return this.http.get('accessvmfs/querydatastorebyname', {params: {name}});
+  }
+
+  /**
+   * 校验卷名称
+   * @param volName
+   */
+  checkVolName(volName: string) {
+    return this.http.get('dmestorage/queryvolumebyname', {params: {name:volName}});
+  }
 }
 // vmfs列表
-export interface List {
+export interface VmfsInfo {
   objectid: string; // 跳转用唯一id
   name: string;
   status: string;
@@ -126,6 +146,8 @@ export interface List {
   volumeId: string;
   volumeName: string;
   wwn: string;
+  usedCapacity: number; // 使用容量
+  capacityUsage: number; // 利用率
 }
 // 存储
 export interface StorageList {
@@ -153,14 +175,14 @@ export interface ClusterList {
 export interface ServiceLevelList {
   id: string;
   name: string;
-  free_capacity: number;
-  used_capacity: number;
-  total_capacity: number;
+  freeCapacity: number;
+  usedCapacity: number;
+  totalCapacity: number;
   description: string;
   type: string;
   protocol: string;
   capabilities: {
-    resource_type: string;
+    resourceType: string;
     compression: boolean;
     deduplication: boolean;
     smarttier: {
@@ -169,13 +191,23 @@ export interface ServiceLevelList {
     };
     qos: {
       enabled: boolean;
+      "qosParam": {
+        "enabled": boolean;
+        "latency": number;
+        "latencyUnit": string;
+        "minBandWidth": number;
+        "minIOPS": number;
+        "maxBandWidth": number;
+        "maxIOPS": number;
+        "smartQos": string;
+      },
       smartQos: {
         latency: string;
         latencyUnit: string;
-        minbandwidth: string;
-        miniops: string;
-        maxbandwidth: string;
-        maxiops: string;
+        minBandWidth: number;
+        minIOPS: number;
+        maxBandWidth: number;
+        maxIOPS: number;
         control_policy: string;
       };
     };
@@ -187,7 +219,15 @@ export interface HostOrCluster {
   deviceName: string;
   deviceType: string;
 }
-
+export interface Workload{
+    id: string;
+    name: string;
+    type: string;
+    block_size: string;
+    create_type: string;
+    enable_compress: string;
+    enable_dedup: string;
+}
 export class GetForm {
   // 获取添加form表单（初始化的添加表单）
   getAddForm() {
@@ -235,28 +275,34 @@ export class GetForm {
     const editForm = {
       name: null,
       isSameName: true, // 卷名称与vmfs名称是否相同
-      volume_id: null, // 卷ID
+      volumeId: null, // 卷ID
       control_policy: '1', // 控制策略,
       max_iops: null,
+      maxiopsChoose: false, // 最大iops 选中
       max_bandwidth: null,
+      maxbandwidthChoose: false, // 最大带宽 选中
       newVoName: null, // 新卷名称
       oldDsName: null, // 旧VMFS名称
       newDsName: null, // 新VMFS名称
       min_iops: null,
+      miniopsChoose: false, // 最小iops 选中
       min_bandwidth: null,
+      minbandwidthChoose: false, // 最小带宽 选中
       dataStoreObjectId: null, // objectID,
       service_level_name: null, // 服务等级名称
-      latency: null
+      latency: null,
+      latencyChoose: false, // 时延 选中
     };
     return editForm;
   }
   // 扩容form（初始化的添加表单）
   getExpandForm() {
     const expandForm = {
-      vo_add_capacity: 0, // 扩容大小默认GB
+      vo_add_capacity: null, // 扩容大小默认GB
       capacityUnit: 'GB', // 容量单位 （最后需转换为GB）
       volume_id: '', // 卷ID
-      ds_name: '' // vmfsName
+      ds_name: '', // vmfsName
+      obj_id: '' // dataStoreObjectId
     };
     return expandForm;
   }
@@ -278,17 +324,15 @@ export class GetForm {
       clusterId: null,
       cluster: null,
       dataStoreObjectIds: [], // datastore object id列表 必,
-      mountType: null // 挂载的设备类型 1 服务器、2 集群 前端自用参数
+      mountType: '1' // 挂载的设备类型 1 服务器、2 集群 前端自用参数
     };
     return mountForm;
   }
   getUnmountForm() {
     const unmount = {
       name: null,
-      hostName: null,
       hostId: null,
-      hostGroupId: null,
-      hostGroupName: null,
+      clusterId: null,
       dataStoreObjectIds: [],
       mountType: '1' // 挂载的设备类型 1 服务器、0 集群 前端自用参数
     };

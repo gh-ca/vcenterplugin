@@ -50,7 +50,7 @@
         <div class="clr-col-12">
           <div class="info-charts-wrap">
             <div echarts [options]="{}" (chartInit)= "storageNumChartInit($event)" style="width: 30%;height: 150px;margin-right: 20%;"></div>
-            <div class="info-content" style="cursor:pointer" (click)="toDatastoreDeviceView()">
+            <div class="info-content" style="cursor:pointer" (click)="toDatastoreDeviceViewSdk()">
               <div class="info-content-text">
                 <span>{{'overview.total' | translate}}</span>
                 <span>{{storageNum.total}}</span>
@@ -72,36 +72,37 @@
     </div>
   </div>
   <div class="clr-col-5">
-    <div class="info-card">
+    <div class="info-card loading">
       <div class="info-card-header">
         <div class="info-header-left">
           <span class="card-title">{{'overview.violations' | translate}}</span>
         </div>
       </div>
-      <div class="info-card-content bestprac">
+      <div class="info-card-content bestprac" [hidden]="bestShowLoading">
         <div class="count-wrap clr-row">
           <div class="count-item clr-col-3">
-            <div (click)="toBestParcticeView('critical')"  style="cursor:pointer" class="num">{{bestPracticeViolations.critical || 0}}</div>
+            <div (click)="toBestParcticeViewSdk('critical')"  style="cursor:pointer" class="num">{{bestPracticeViolations.critical || 0}}</div>
             <div class="color-divide critical"></div>
             <div class="text">{{'overview.critical' | translate}}</div>
           </div>
           <div class="count-item clr-col-3">
-            <div (click)="toBestParcticeView('major')" style="cursor:pointer" class="num">{{bestPracticeViolations.major || 0}}</div>
+            <div (click)="toBestParcticeViewSdk('major')" style="cursor:pointer" class="num">{{bestPracticeViolations.major || 0}}</div>
             <div class="color-divide major"></div>
             <div class="text">{{'overview.major' | translate}}</div>
           </div>
           <div class="count-item clr-col-3">
-            <div (click)="toBestParcticeView('warning')" style="cursor:pointer" class="num">{{bestPracticeViolations.warning || 0}}</div>
+            <div (click)="toBestParcticeViewSdk('warning')" style="cursor:pointer" class="num">{{bestPracticeViolations.warning || 0}}</div>
             <div class="color-divide warning"></div>
             <div class="text">{{'overview.warning' | translate}}</div>
           </div>
           <div class="count-item clr-col-3">
-            <div (click)="toBestParcticeView('info')" style="cursor:pointer" class="num">{{bestPracticeViolations.info || 0}}</div>
+            <div (click)="toBestParcticeViewSdk('info')" style="cursor:pointer" class="num">{{bestPracticeViolations.info || 0}}</div>
             <div class="color-divide info"></div>
             <div class="text">{{'overview.info' | translate}}</div>
           </div>
         </div>
       </div>
+      <img [hidden]="!bestShowLoading" src="./assets/images/loading.gif" >
     </div>
   </div>
 </div>
@@ -167,9 +168,8 @@
             <div>{{'overview.top5T' | translate}}</div>
           </div>
         </div>
-        <div class="info-card-content clr-row">
-          <div class="clr-col-12">
-            <div></div>
+        <div class="info-card-content clr-row loading">
+          <div class="clr-col-12" [hidden]="top5ShowLoading">
             <div class="progress-container" *ngFor="let item of storeageTopN" [clrDgItem]="item">
               <div class="progress-item">
                 <div class="progress-label" title="{{item.name}}">{{item.name}}</div>
@@ -183,6 +183,7 @@
               </div>
             </div>
           </div>
+          <img [hidden]="!top5ShowLoading" src="./assets/images/loading.gif" >
         </div>
       </div>
     </div>
@@ -199,7 +200,7 @@
       </clr-input-container>
       <clr-input-container>
         <label>{{'overview.port' | translate}}</label>
-        <input clrInput formControlName="port" type="text" [(ngModel)]="connectModel.hostPort" name="port" />
+        <input clrInput formControlName="port" type="text" placeholder="{{'overview.portholder'|translate}}" [(ngModel)]="connectModel.hostPort" name="port" />
       </clr-input-container>
       <clr-input-container>
         <label>{{'overview.user' | translate}}</label>
@@ -207,7 +208,7 @@
       </clr-input-container>
       <clr-password-container>
         <label>{{'overview.password' | translate}}</label>
-        <input clrPassword formControlName="password" placeholder="Password" name="password" [(ngModel)]="connectModel.password" />
+        <input clrPassword formControlName="password" name="password" [(ngModel)]="connectModel.password" />
       </clr-password-container>
     </form>
   </div>
@@ -217,88 +218,22 @@
   </div>
 </clr-modal>
 
-<!--连接失败提示-->
-<clr-modal [(clrModalOpen)]="connectAlertFail" [clrModalSize]="'sm'">
-  <h3 class="modal-title">tip</h3>
+<clr-modal [(clrModalOpen)]="connectAlertSuccess" [clrModalSize]="'sm'" style="height: 100px;">
+  <h3 class="modal-title">{{'menu.tip'|translate}}</h3>
   <div class="modal-body">
-    {{'menu.connectFail' | translate}}
+    <clr-icon shape="success-standard" class="is-solid" style="color: #59A220;margin-right: 5px;"></clr-icon>{{'overview.connectSuccess'|translate}}
   </div>
-  <!--<div class="modal-footer">
-    <button type="button" class="btn btn-outline" (click)="delShow=false">{{'menu.cancel' | translate}}</button>
-    <button type="button" class="btn btn-primary" (click)="delNfs()">{{'menu.ok' | translate}}</button>
-  </div>-->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success" (click)="connectAlertSuccess=false">{{'menu.ok'|translate}}</button>
+  </div>
 </clr-modal>
 
-
-<!-- 示例20200922 -->
-<div class="clr-row" [hidden]="true">
-  <div class="info-card clr-col-6">
-    <div class="info-card-header border-header">
-      <div class="info-header-left">
-        <clr-icon size="36" shape="network-switch"></clr-icon>
-        <div class="info-header-content">
-          <div class="title">122</div>
-          <div class="text">
-            <span>8.46.8.122</span>
-            <span><clr-icon shape="display" class="is-solid is-highlight"></clr-icon></span>
-            <span class="header-divide"></span>
-            <span>OceanStor</span>
-          </div>
-        </div>
-      </div>
-      <clr-dropdown [clrCloseMenuOnItemClick]="false">
-        <button clrDropdownTrigger class="dropdown-toggle  btn btn-link">
-          Operation
-          <clr-icon shape="caret down"></clr-icon>
-        </button>
-        <clr-dropdown-menu *clrIfOpen>
-          <div clrDropdownItem>Link 1</div>
-          <div clrDropdownItem>Link 2</div>
-        </clr-dropdown-menu>
-      </clr-dropdown>
-    </div>
-    <div class="info-card-content clr-row">
-      <div class="clr-col-6">
-        <div class="info-content-title">Capacity</div>
-        <div class="info-charts-wrap">
-          <div echarts [options]="charts[2]" id="chart3" style="width: 30%;height: 120px;"></div>
-          <div class="info-content">
-            <div class="info-content-text">
-              <span>Total</span>
-              <span>11 TB</span>
-            </div>
-            <div class="info-content-text">
-              <span>Used</span>
-              <span>11 TB</span>
-              <span class="squre used"></span>
-            </div>
-            <div class="info-content-text">
-              <span>Free</span>
-              <span>11 TB</span>
-              <span class="squre free"></span>
-            </div>
-          </div>
-        </div>
-        <div class="info-content-title">Health</div>
-        <div class="info-content-bottom">
-          <div class="info-bottom-box">
-            <div class="num">219</div>
-            <div class="bottom-label">Alarms</div>
-          </div>
-          <div class="info-bottom-box">
-            <div class="num">219</div>
-            <div class="bottom-label">Alarms</div>
-          </div>
-        </div>
-      </div>
-      <div class="clr-col-6">
-        <div class="info-content-title" style="margin-bottom: 20px;">Performance - Last 24 Hours</div>
-        <div class="info-content-title">IOPS</div>
-        <div echarts [options]="charts[3]" id="chart4" style="width: 100%;height: 100px;"></div>
-        <div class="info-content-title">IOPS</div>
-        <div echarts [options]="charts[3]" id="chart5" style="width: 100%;height: 100px;"></div>
-      </div>
-    </div>
+<clr-modal [(clrModalOpen)]="connectAlertFail" [clrModalSize]="'sm'">
+  <h3 class="modal-title">{{'menu.tip'|translate}}</h3>
+  <div class="modal-body">
+    <clr-icon shape="error-standard" class="is-solid" style="color: red;margin-right: 5px;"></clr-icon>{{'overview.connectFail'|translate}}
   </div>
-</div>
-<!-- 示例20200922 -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="connectAlertFail=false">{{'menu.ok'|translate}}</button>
+  </div>
+</clr-modal>

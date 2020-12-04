@@ -9,7 +9,7 @@ export class AttributeService {
     return this.http.get('accessvmfs/volume/' + storageObjectId );
   }
 }
-export interface VolumeInfo{
+export class VolumeInfo{
   name: string;
   wwn: string;
   storage: string;

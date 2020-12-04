@@ -2,28 +2,55 @@ package com.dmeplugin.dmestore.model;
 
 /**
  * @author lianq
- * @className CapabilitiesIopriority
- * @description TODO
- * @date 2020/9/29 11:26
- */
+ * @since 2020-12-01
+ *
+ **/
 public class CapabilitiesIopriority {
+    /**
+     * IO优先级，默认false .
+     */
+    private Boolean enabled;
+    /**
+     * IO优先级枚举值, 取值范围：1：低；2：中；3：高 .
+     */
+    private Integer policy;
 
-    private Boolean enabled; //IO优先级，默认false
-    private Integer policy; //IO优先级枚举值, 取值范围：1：低；2：中；3：高
-
+    /**
+     * getEnabled .
+     * @return Boolean .
+     */
     public Boolean getEnabled() {
         return enabled;
     }
 
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+    /**
+     * setEnabled .
+     * @param param .
+     */
+    public void setEnabled(final Boolean param) {
+        this.enabled = param;
     }
-
+    /**
+     * getPolicy .
+     * @return Integer .
+     */
     public Integer getPolicy() {
         return policy;
     }
 
-    public void setPolicy(Integer policy) {
-        this.policy = policy;
+    /**
+     * setPolicy .
+     * @param param .
+     */
+    public void setPolicy(final Integer param) {
+        this.policy = param;
+    }
+
+    @Override
+    public final String toString() {
+        return "CapabilitiesIopriority{"
+            + "enabled=" + enabled
+            + ", policy=" + policy
+            + '}';
     }
 }

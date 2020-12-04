@@ -22,33 +22,22 @@ import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vise.usersession.ServerInfo;
 import com.vmware.vise.usersession.UserSessionService;
 import com.vmware.vise.vim.data.VimObjectReferenceService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class VmwarePluginContextFactory {
-
-
-
-    private static final Logger s_logger = LoggerFactory.getLogger(VmwarePluginContextFactory.class);
-
-    private static volatile int s_seq = 1;
     private static VmwareContextPool s_pool;
 
     static {
-        // skip certificate check
         System.setProperty("axis.socketSecureFactory", "org.apache.axis.components.net.SunFakeTrustSocketFactory");
         s_pool = new VmwareContextPool();
     }
 
     private static VmwareContext create(UserSessionService userSessionService, VimObjectReferenceService vimObjectReferenceService, String serverguid) throws Exception {
-
-        VmwareContext context=null;
-        ServerInfo[] serverInfoList=userSessionService.getUserSession().serversInfo;
-
-        for (ServerInfo serverInfo:serverInfoList){
+        VmwareContext context = null;
+        ServerInfo[] serverInfoList = userSessionService.getUserSession().serversInfo;
+        for (ServerInfo serverInfo : serverInfoList) {
             VmwareClient vimClient = new VmwareClient(serverInfo.serviceGuid);
             vimClient.setVcenterSessionTimeout(1200000);
             vimClient.connect(serverInfo);
@@ -61,11 +50,10 @@ public class VmwarePluginContextFactory {
     }
 
     public static VmwareContext getServerContext(UserSessionService userSessionService, VimObjectReferenceService vimObjectReferenceService, String serverguid) throws Exception {
-        VmwareContext context = s_pool.getContext(serverguid,"");
+        VmwareContext context = s_pool.getContext(serverguid, "");
         if (context == null) {
             context = create(userSessionService, vimObjectReferenceService, serverguid);
         }
-
         if (context != null) {
             context.setPoolInfo(s_pool, VmwareContextPool.composePoolKey(serverguid, ""));
             s_pool.registerContext(context);
@@ -73,24 +61,16 @@ public class VmwarePluginContextFactory {
 
         return context;
     }
-
-    public static VmwareContext getServerContext(UserSessionService userSessionService, VimObjectReferenceService vimObjectReferenceService, ManagedObjectReference mor) throws Exception {
-        String serverguid=vimObjectReferenceService.getServerGuid(mor);
-
-        return getServerContext(userSessionService,vimObjectReferenceService,serverguid);
+    public static VmwareContext[] getAllContext(UserSessionService userSessionService, VimObjectReferenceService vimObjectReferenceService) throws Exception {
+        ServerInfo[] serverInfoList = userSessionService.getUserSession().serversInfo;
+        List<VmwareContext> vmwareContexts = new ArrayList<>();
+        for (ServerInfo serverInfo : serverInfoList) {
+            vmwareContexts.add(getServerContext(userSessionService, vimObjectReferenceService, serverInfo.serviceGuid));
+        }
+        return vmwareContexts.toArray(new VmwareContext[0]);
     }
 
-    public static VmwareContext[] getAllContext(UserSessionService userSessionService, VimObjectReferenceService vimObjectReferenceService) throws Exception {
-        ServerInfo[] serverInfoList=userSessionService.getUserSession().serversInfo;
-        List<VmwareContext> vmwareContexts=new ArrayList<>();
-
-
-        for (ServerInfo serverInfo:serverInfoList){
-            vmwareContexts.add(getServerContext(userSessionService,vimObjectReferenceService, serverInfo.serviceGuid));
-        }
-
-
-
-        return vmwareContexts.toArray(new VmwareContext[0]);
+    public static void closeAll() {
+        s_pool.closeAll();
     }
 }

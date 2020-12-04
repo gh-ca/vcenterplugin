@@ -10,10 +10,23 @@ import {FormsModule} from '@angular/forms';
 import {NfsPerformanceComponent} from "./performance/performance.component";
 import {NgxEchartsModule} from "ngx-echarts";
 import {ClarityModule} from "@clr/angular";
+import {NfsMountComponent} from "./subpages/mount/nfs-mount.component";
+import {NfsUnmountComponent} from "./subpages/unmount/nfs-unmount.component";
+import {NfsReduceComponent} from "./subpages/reduce/nfs-reduce.component";
+import {NfsExpandComponent} from "./subpages/expand/nfs-expand.component";
+import {NfsAddComponent} from "./subpages/add/nfs-add.component";
+import {NfsDeleteComponent} from "./subpages/delete/nfs-delete.component";
+import {NfsModifyComponent} from "./subpages/modify/nfs-modify.component";
+import {StatusFilter} from "./status.filter";
+import {DeviceFilter} from "./device.filter";
+import {TranslateModule} from "@ngx-translate/core";
 
 
 @NgModule({
-  declarations: [NfsComponent, LogicportComponent, ShareComponent, FileSystemComponent,NfsPerformanceComponent],
+  declarations: [NfsComponent, LogicportComponent, ShareComponent,
+    FileSystemComponent,NfsPerformanceComponent,NfsMountComponent,NfsUnmountComponent
+    ,NfsReduceComponent,NfsExpandComponent,NfsAddComponent,NfsDeleteComponent,NfsModifyComponent,StatusFilter,DeviceFilter
+  ],
   imports: [
     FormsModule,
     CommonModule,
@@ -21,7 +34,8 @@ import {ClarityModule} from "@clr/angular";
     NgxEchartsModule,
     FormsModule,
     ClarityModule,
-    NfsRoutingModule
+    NfsRoutingModule,
+    TranslateModule
   ]
 })
 export class NfsModule { }

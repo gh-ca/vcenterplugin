@@ -20,17 +20,24 @@
     "submit": "Submit",
     "search": "Search",
     "refresh": "Refresh",
-    "synSPolicy": "Synchronize VM Storage Policies"
+    "synSPolicy": "Synchronize VM Storage Policies",
+    "tip": "Tip",
+    "back":"Back",
+    "performance": "Performance",
+    "conventional": "Conventional",
+    "capacity": "Capacity"
   },
   "validations": {
     "required": "This field is required!",
+    "nameRequired": "This field is required! And can only contain half-width letters, half-width numbers, “_”、“-”、“.”、, Chinese characters.",
     "minlength": "Should have atleast {{number}} characters",
     "maxlength": "This value should be less than {{number}} characters",
     "min": "This value should be more than {{number}}",
     "max": "This value should be less than {{number}}",
     "exist": "The {{value}} has exists",
     "inconsistent": "Inconsistent with {{value}}",
-    "invalid_email": "Invalid email"
+    "invalid_email": "Invalid email",
+    "comboboxTips": "If you need to reselect the host/cluster, please delete the data in the input box first."
   },
   "table": {
     "name": "Name",
@@ -62,8 +69,13 @@
     "datastoreName":"Datastore Name",
     "size":"Size",
     "nfsProtocol":"NFS Protocol",
+    "securityType":"Security Type",
+    "authSys":"Do not use Kerberos authentication.",
+    "secKrb5":"Use Kerberos only for authentication (krb5)",
+    "secKrb5i":"Using Kerberos for authentication and data integrity (krb5)",
     "storageSetting":"Storage Setting",
     "fsName":"FileSystem Name",
+    "mountedHost":"Mounted Host",
     "shareName":"Share Name",
     "qosPolicy":"Qos Policy",
     "controlPolicy":"Control Policy",
@@ -94,6 +106,7 @@
     "reduSize":"Reduction Size",
     "ops":"OPS",
     "bandwidth":"Bandwidth",
+    "nfsStore":"NFS DataStore",
     "respRt":"Response Time-Read(ms)",
     "respWt":"Response Time-Write(ms)",
     "logic":{
@@ -144,7 +157,11 @@
     },
     "unmount":{
       "title":"Tips",
-      "content":"Are you sure to delete?"
+      "content":"Are you sure to delete?",
+      "tips":"If all the hosts mounted by NFS are unmounted, the NFS device will be deleted automatically！"
+    },
+    "reduce": {
+      "success": "Successfully reduce!"
     }
   },
   "vmfs": {
@@ -182,7 +199,7 @@
     "multiply": "X",
     "IOPS": "IOPS",
     "IOPSQoSTarget": "IOPS QoS Target",
-    "bandwidth": "Bandwidth(MB/s)",
+    "bandwidth": "Bandwidth",
     "bandwidthQoSTarget": "Bandwidth QoS Target",
     "readResponseTime": "Read Response Time(ms)",
     "writeResponseTime": "Write Response Time(ms)",
@@ -200,7 +217,7 @@
     "provisioningType": "Provisioning Type",
     "basicInformation": "Basic Information",
     "byServiceLevel": "By Service Level",
-    "customer": "Customer",
+    "custom": "Custom",
     "wwn": "WWN",
     "storage": "Storage",
     "smartTier": "SmartTier",
@@ -221,8 +238,29 @@
     "startTime": "Start Time",
     "endTime": "End Time",
     "timeInputTips": "Please enter start-end time！",
-    "capacityTips": "If the version is VMFS5, the minimum capacity is 1.3G, and if the version is VMFS6, the minimum capacity is 2G.",
-    "serviceLevelCantBeNull": "Service level is a must！",
+    "capacityTips": "If the version is VMFS5, the minimum capacity is 1G, if the version is VMFS6, the minimum capacity is 2G, and the capacity must be a positive integer in G, and the quantity must be a positive integer!",
+    "serviceLevelCantBeNull": "The service level is a must, and you can only choose the service level whose capacity is not 0!",
+    "expandTips": "Expansion capacity can only be a positive integer of GB",
+    "loadingTips": "Data loading, please wait",
+    "dataHandleLoadingTips": "Data processing, please wait",
+    "listNullTips": "We couldn't find any users",
+    "workload": "Workload",
+    "add": {
+      "success": "Added successfully!"
+    },
+    "modify": {
+      "success": "Successfully modified!"
+    },
+    "expand": {
+      "success": "Successfully expansion!"
+    },
+    "serviceLevel": {
+      "success": "The service level changed successfully!"
+    },
+    "protectionStatus": {
+      "protected": "Protected",
+      "unprotected": "Unprotected"
+    },
     "mount":{
       "mount":"Mount",
       "host":"Host",
@@ -231,20 +269,40 @@
       "mountType":"Mount Type",
       "readOnly":"Read Only",
       "readWrite":"Read Write",
-      "mountObj":"Mount Object"
+      "mountObj":"Mount Object",
+      "notChooseDataStoreTips":"Please select the DataStore to be mounted！",
+      "mountErr":"Please select the host/cluster to be mounted!",
+      "success": "Successfully mounted!"
     },
     "del":{
       "title":"Tips",
-      "content":"Are you sure to delete?"
+      "content":"Are you sure to delete?",
+      "success": "successfully deleted!"
     },
     "unmount":{
       "title":"Unmount",
       "content":"Are you sure to unmount?",
-      "notChooseDeviceTips":"Please select the host or cluster to be uninstalled!"
+      "notChooseDeviceTips":"Please select the host or cluster to be uninstalled!",
+      "notChooseDataStoreTips":"Please select the DataStore to be unmounted！",
+      "tips":"If all the hosts/clusters mounted by VMFS are unmounted, the VMFS device will be deleted automatically！",
+      "notHaveCluster":"The VMFS is not bound to the cluster!",
+      "notHaveHost":"The VMFS is not bound to the host!",
+      "success": "Successfully uninstalled!"
     },
     "reclaim": {
       "title":"Tips",
-      "content":"Are you sure to reclaim?"
+      "content":"Are you sure to reclaim?",
+      "success": "Successfully reclaimed space!"
+    },
+    "filter": {
+      "all": "All",
+      "status": {
+        "normal": "Normal"
+      },
+      "protectionStatus": {
+        "protected": "true",
+        "unprotected": "false"
+      }
     }
   },
   "storage":{
@@ -273,10 +331,21 @@
       "latency":"Latency(ms)",
       "iops":"IOPS",
       "ops":"OPS",
-      "bandwidth":"Bandwith(MB/s)"
+      "bandwidth":"Bandwith(MB/s)",
+      "offLine":"Off Line",
+      "normal": "Normal",
+      "fault": "fault",
+      "notMgr": "Not Manage",
+      "notSync": "Not Sync",
+      "inSync": "in Sync",
+      "synced": "Synchronized"
     },
     "chart":{
       "total":" Total",
+      "protection":" Protection",
+      "fileSystem":" File System",
+      "volume":" Volume",
+      "freeCapacity":" Free Capacity",
       "used":" Used",
       "free":" Free",
       "alarms":" Alarms",
@@ -303,9 +372,24 @@
         "location":"Location"
       },
       "cap":{
-        "capacity":"Capacity"
+        "capacity":"Capacity",
+        "capacityUsage":"Capacity Usage",
+        "bareCapacity":"Bare Capacity",
+        "totalCapacity":"Total Capacity",
+        "useFree":"Use/Free",
+        "subscribe":"Subscribed",
+        "storagePool":"Storage Pool List",
+        "used":"Used:",
+        "capacitySavings":"Capacity Savings",
+        "beforeSave":"Before Savings",
+        "afterSave":"After Savings",
+        "dedupe": "Dedupe",
+        "compression": "Compression"
       },
-      "performance":{},
+      "performance":{
+        "performance":"Performance",
+        "ptc":"Performance Trend Chart"
+      },
       "storagePool":{
         "storagePool":"Storage Pools",
         "name":"Name",
@@ -321,7 +405,11 @@
         "supRate":"supscription Rate",
         "latency": "Latency(ms)",
         "iops": "IOPS",
-        "bandwidth": "Bandwidth(MB/s)"
+        "bandwidth": "Bandwidth(MB/s)",
+        "normal":"Normal",
+        "fault":"Fault",
+        "degraded":"Degraded",
+        "unknown":"Unknown"
       },
       "volumes":{
         "volumes":"Volumes",
@@ -355,7 +443,7 @@
         "capacityUsage":"Capacity Usage"
       },
       "dtrees":{
-        "dtrees":"Dtrees",
+        "dtrees":"DTrees",
         "name":"Name",
         "ofs":"Owning File System",
         "osl":"Owning Service Level",
@@ -431,9 +519,16 @@
           "dataProtocol":"Data Protocol",
           "manageAccess":"Manage Access",
           "vStoreName":"VStore Name",
-          "type":"类型"
+          "type":"类型",
+          "fc":"FC Ports",
+          "eth":"Ethernet Port",
+          "fcoe":"FCoE Port",
+          "bond":"Bond Port",
+          "logic":"Logical Port",
+          "fail":"Failover Group"
         }
-      }
+      },
+      "perPage":"perPage"
     }
   },
   "overview": {
@@ -460,7 +555,9 @@
     "free": "Free",
     "top5T": "Top 5 DataStore",
     "connectT": "DME Connect",
-    "connectFail": "connect failed."
+    "connectFail": "Connect Failed!",
+    "connectSuccess": "Connect Success!",
+    "portholder": "Port Default 26335"
   },
   "bestPractice": {
     "apply": "Apply Best Practice",
@@ -475,7 +572,12 @@
     "critical": "Critical",
     "info": "Info",
     "warning": "Warning",
-    "major": "Major"
+    "major": "Major",
+    "tipmessage": "Modify Host Config,You need Reboot Host,IP:",
+    "syncSuccess": "Sync Success",
+    "syncFail": "Sync Failed",
+    "exeSuccess": "Execute Success",
+    "exeFail": "Execute Failed"
   },
   "iscsi": {
     "hostIp": "Host VmKernel IP",
@@ -489,7 +591,8 @@
     "speed": "Working Rate(Mbps)",
     "hStatus": "Health Status",
     "cStatus": "Connect Status",
-    "ports": "Please Select Storage Device Ports"
+    "ports": "Please Select Storage Device Ports",
+    "portNullMessage": "Port is not be Empty!"
   },
   "rdm": {
     "name": "Name",
@@ -540,7 +643,20 @@
     "default": "Default",
     "enable": "Enable",
     "disable": "Disable",
-    "host": "Host"
+    "host": "Host",
+
+    "atOne": "Please Select one!",
+    "bandNotNull": "BandWidth not be empty!",
+    "IOPSNotNull": "IOPS not be empty!",
+    "latencyNotNull": "Latency not be empty!",
+
+    "addTitle": "Create RDM",
+    "basicSet": "Volume Setting",
+    "storeSet": "Storage Setting",
+
+    "createRdmError": "Create RDM Error!",
+    "selectOneSer": "Service Level is not be Null！",
+    "rdmSuccessMsg": "Create RDM Success!"
   },
   "tier": {
     "name": "Name",
@@ -608,6 +724,83 @@
     "maxIOPSs": "OrderBy MaxIOPS",
     "minIOPSs": "OrderBy MinIOPS",
     "maxBandWidths": "OrderBy MaxBandWidth",
-    "minBandWidths": "OrderBy MinBandWidth"
+    "minBandWidths": "OrderBy MinBandWidth",
+
+    "offLine": "Offline",
+    "normal": "Normal",
+    "abnormal": "Abnormal",
+    "unknown": "Unknown"
+  },
+  "applybp": {
+    "ing": "Best Practice is Executing",
+    "ed": "Best Practice is Finished",
+    "error": "Best Practice occur Error",
+    "boot": "You need reboot host",
+    "eff": "Host Config is effective!"
+  },
+   "enum":{
+     "status":{
+       "disconnected":"Disconnected",
+       "connected":"Connected",
+       "creating":"Creating",
+       "normal":"Normal",
+       "mapping":"Mapping",
+       "unmapping":"Unmapping",
+       "deleting":"Deleting",
+       "error":"Error",
+       "expanding":"Expanding",
+       "unmapped":"Unmapped",
+       "mapped":"Mapped",
+       "unprotected":"Unprotected",
+       "protected":"Protected",
+       "notEnabled":"Not Enabled",
+       "enabled":"Enabled",
+       "normalFs":"Normal FileSystem",
+       "wormFs":"WORM FileSystem",
+       "unknown":"Unknown",
+       "running":"Running",
+       "fault":"Fault",
+       "faulty":"Faulty",
+       "member":"Member",
+       "linkDown":"Link Down",
+       "linkUp":"Link Up",
+       "activated":"Activated",
+       "unActivated":"unActivated",
+       "all":"ALL"
+     },
+     "type":{
+      "block":"Block",
+      "file":"File"
+     }
+  },
+  "errorMsg":{
+    "mountError":"Mount failed!Please contact management!",
+    "unMountError":"UnMount failed!Please contact management!",
+    "expandError":"Expand failed!Please contact management!",
+    "reduceError":"Reduce failed!Please contact management!",
+    "deleteError":"Delete failed!Please contact management!",
+    "addError":"Delete failed!Please contact management!",
+    "modifyError":"Delete failed!Please contact management!",
+    "reclaimError":"Space reclamation failed! Please contact the administrator!",
+    "serviceLevelError":"Service level change failed! Please contact the administrator!",
+    "require":"This field is required!",
+    "nfsrepeat":"NFS name already exists!",
+    "sharerepeat":"Share name already exists!",
+    "fsrepeat":"FileSystem name already exists!",
+    "vmfsNameRepeat":"VMFS name already exists!",
+    "volNameRepeat":"volume name already exists!",
+    "numberAndLetter":"Only numbers and letters can be entered!"
+  },
+  "page": {
+    "perPage": "Per Page",
+    "of": "of",
+    "all": "Total"
+  },
+  "performance": {
+    "volumeMaximumIORespTime": "Volume maximum I/O response time (ms)",
+    "volumeIODensity": "Volume I/O density (IOPS/TB)",
+    "totalVolumeThroughput": "Total volume throughput(IOPS)",
+    "volumeTotalBandwidth": "Volume total bandwidth(MB/s)",
+    "storagePoolIODensity": "Storage pool I/O density(IOPS/TB)"
   }
 }

@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.model.StoragePool;
 import com.dmeplugin.dmestore.model.Volume;
@@ -32,16 +33,14 @@ public class ServiceLevelController extends BaseController {
 
     @RequestMapping(value = "/listservicelevel", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseBodyBean listServiceLevel(@RequestBody Map<String, Object> params) throws Exception {
+    public ResponseBodyBean listServiceLevel(@RequestBody Map<String, Object> params)   {
         LOG.info("servicelevel/listservicelevel params==" + gson.toJson(params));
-        Map<String, Object> resMap = serviceLevelService.listServiceLevel(params);
-        if (null != resMap && null != resMap.get("code") && "200".equals(resMap.get("code").toString())) {
-            Object data = resMap.get("data");
-            //JsonObject jsonObject = new JsonParser().parse(resMap.get("data").toString()).getAsJsonObject();//先转成json,则调用success()方法返回会报错
-            return success(data);
+        try {
+            return success(serviceLevelService.listServiceLevel(params));
+        } catch (Exception e) {
+            return failure(e.getMessage());
         }
-        String errMsg = resMap.get("message").toString();
-        return failure(errMsg);
+
     }
 
     @RequestMapping(value = "/listStoragePoolsByServiceLevelId", method = RequestMethod.POST)
@@ -63,7 +62,7 @@ public class ServiceLevelController extends BaseController {
     //查询服务等级下的卷
     @RequestMapping(value = "/listVolumesByServiceLevelId", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseBodyBean listVolumesByServiceLevelId(@RequestBody String serviceLevelId) throws Exception {
+    public ResponseBodyBean listVolumesByServiceLevelId(@RequestBody String serviceLevelId) throws DMEException {
         LOG.info("servicelevel/listVolumesByServiceLevelId params==" + serviceLevelId);
         String errMsg = "listVolumesByServiceLevelId error, the serviceLevel is: " + serviceLevelId;
         try {
@@ -72,7 +71,7 @@ public class ServiceLevelController extends BaseController {
                 return success(volumes);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new DMEException(e.getMessage());
         }
         return failure(errMsg);
     }
@@ -83,10 +82,12 @@ public class ServiceLevelController extends BaseController {
     @RequestMapping(value = "/manualupdate", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean manualupdate() {
-        serviceLevelService.updateVmwarePolicy();
-
-        return success();
+        try {
+            serviceLevelService.updateVmwarePolicy();
+            return success();
+        } catch (Exception e) {
+            return failure(e.getMessage());
+        }
     }
-
     //查询服务等级下的存储池
 }

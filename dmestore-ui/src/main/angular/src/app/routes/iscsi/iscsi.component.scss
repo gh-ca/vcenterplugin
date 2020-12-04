@@ -1,7 +1,3 @@
-::ng-deep .modal-dialog.modal-lg {
-  width: 1280px;
-}
-
 .color-square {
   display: inline-block;
   vertical-align: text-bottom;
@@ -9,4 +5,9 @@
   width: .7rem;
   border: .05rem solid #000;
   border-radius: .2rem;
+}
+
+
+::ng-deep .clr-select-wrapper select{
+  width: 200px;
 }

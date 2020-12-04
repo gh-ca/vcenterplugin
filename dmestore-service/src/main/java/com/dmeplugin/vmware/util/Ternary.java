@@ -57,8 +57,7 @@ public class Ternary<T, U, V> {
     @Override
     // Note: This means any two pairs with null for both values will match each
     // other but what can I do?  This is due to stupid type erasure.
-        public
-        int hashCode() {
+    public int hashCode() {
         return (t != null ? t.hashCode() : 0) | (u != null ? u.hashCode() : 0) | (v != null ? v.hashCode() : 0);
     }
 
@@ -67,8 +66,9 @@ public class Ternary<T, U, V> {
         if (!(obj instanceof Ternary)) {
             return false;
         }
-        Ternary<?, ?, ?> that = (Ternary<?, ?, ?>)obj;
-        return (t != null ? t.equals(that.t) : that.t == null) && (u != null ? u.equals(that.u) : that.u == null) && (v != null ? v.equals(that.v) : that.v == null);
+        Ternary<?, ?, ?> that = (Ternary<?, ?, ?>) obj;
+        return (t != null ? t.equals(that.t) : that.t == null) && (u != null ? u.equals(that.u) : that.u == null) &&
+            (v != null ? v.equals(that.v) : that.v == null);
     }
 
     @Override

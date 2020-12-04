@@ -17,8 +17,17 @@ export class DetailService {
   getStoragePoolList(storageId: string){
     return this.http.get('dmestorage/storagepools', {params: {storageId}});
   }
+  liststoragepoolperformance(storagePoolIds:string[]) {
+    return this.http.get('dmestorage/liststoragepoolperformance', {params: {storagePoolIds}});
+  }
+  listVolumesperformance(volumeId:string[]) {
+    return this.http.get('dmestorage/listVolumesPerformance', {params: {volumeId}});
+  }
   getVolumeListList(storageId: string){
     return this.http.get('dmestorage/volumes', {params: {storageId}});
+  }
+  getVolumeListListByPage(params:any){
+    return this.http.get('dmestorage/volumes/byPage?storageId='+params.storageId+'&pageSize='+params.pageSize+'&pageNo='+params.pageNo);
   }
   getFileSystemList(storageId: string){
     return this.http.get('dmestorage/filesystems', {params: {storageId}});
@@ -38,45 +47,54 @@ export class DetailService {
   getFCPortList(param: any){
     return this.http.get('dmestorage/storageport', {params: param});
   }
-  getBondPortList(storage_id: string){
-    return this.http.get('dmestorage/bandports', {params: {storage_id}});
+  getBondPortList(storageId: string){
+    return this.http.get('dmestorage/bandports', {params: {storageId}});
   }
   getLogicPortList(storageId: string){
     return this.http.get('dmestorage/logicports', {params: {storageId}});
   }
-  getFailoverGroups(storage_id: string){
-    return this.http.get('dmestorage/failovergroups', {params: {storage_id}});
+  getFailoverGroups(storageId: string){
+    return this.http.get('dmestorage/failovergroups', {params: {storageId}});
   }
 }
 
 export class StorageDetail{
-  id: string;
-  name: string;//名称
-  ip: string;//ip地址
-  status: string;//状态
-  synStatus: string;//同步状态
-  sn: string;//设备序列号。
-  vendor: string;//厂商
-  model: string;//产品型号
-  productVersion: string;//产品版本号
-  usedCapacity: number;//已用容量 （单位:MB）
-  totalCapacity: number; //裸容量（单位:MB）。
-  totalEffectiveCapacity: number;//可得容量 （总容量）
-  freeEffectiveCapacity: number;//空闲容量
-  location: string;
   azIds: string[];
-  storagePool: string;
-  volume: string;
-  fileSystem: string;
-  dTrees: string;
-  nfsShares: string;
   bandPorts: string;
+  blockCapacity: number;
+  compressedCapacity: number;
+  dTrees:string;
+  dedupedCapacity: number;
+  event: number;
+  fileCapacity: number;
+  fileSystem: string;
+  freeEffectiveCapacity: number;
+  id: string;
+  ip: string;
+  location: string;
   logicPorts: string;
-  storageControllers: string;
-  storageDisks: string;
-  patchVersion:string;
   maintenanceOvertime: string;
   maintenanceStart: string;
+  model: string;
+  name: string;
+  nfsShares: string;
+  optimizeCapacity: number;
+  patchVersion: string;
+  productVersion: string;
+  protectionCapacity: number;
+  sn: string;
+  status: string;
+  storageControllers: string;
+  storageDisks: string;
+  storagePool:string;
+  subscriptionCapacity: number;
+  synStatus: string;
+  totalCapacity: number;
+  totalEffectiveCapacity: number;
+  usedCapacity: number;
+  vendor: string;
+  volume: string;
+  warning: number;
 }
 export class StoragePool{
   freeCapacity: number;// 空闲容量
@@ -86,7 +104,7 @@ export class StoragePool{
   healthStatus: string;// 健康状态
   totalCapacity: number;// 总容量
   consumedCapacity: number;//已用容量
-  consumedCapacity_percentage: string;// 已用容量百分比(容量利用率)
+  consumedCapacityPercentage: string;// 已用容量百分比(容量利用率)
   storagePoolId: string;
   storageInstanceId: string;
   storageDeviceId: string;
@@ -101,94 +119,66 @@ export class StoragePool{
   subscribedCapacity: number; //订阅容量
   physicalType: string;//硬盘类型
   diskPoolId:string;//存储池所处硬盘id
+  maxBandwidth: number;
+  maxIops: number;
+  maxLatency: number;
+  serviceLevelName: string;//服务等级
 }
 export class Volume{
   id: string; //卷的唯一标识
   name: string; //名称
   status: string; //状态
-  attached: boolean;
+  attached: boolean;// 映射状态
   alloctype: string;//分配类型
-  service_level_name: string;//服务等级
-  storage_id: string;//存储设备id
-  pool_raw_id: string;//存储池id
-  capacity_usage: string;//容量利用率
+  serviceLevelName: string;//服务等级
+  storageId: string;//存储设备id
+  poolRawId: string;//存储池id
+  capacityUsage: string;//容量利用率
   protectionStatus: boolean;//保护状态
   hostIds: string[];
   hostGroupIds: string;
-  storage_pool_name: string;//存储池名称
+  storagePoolName: string;//存储池名称
   capacity: number;//总容量 单位GB
   //关联的datastore
   datastores: string;
-}
-export class FileSystem{
-  id: string; //id
-  name: string;//名称
-  health_status: string; //状态
-  alloc_type: string; //分配策略
-  capacity_usage_ratio: number; //容量使用率
-  storage_pool_name: string;//存储池名字
-  nfs_count: number; //nfs
-  cifs_count: number;//cifs
-  dtree_count: number; //dtree
-  capacity: number;//总容量
-  allocate_quota_in_pool: number;
-  available_capacity: number;
-  min_size_fs_capacity: number;
-  storage_id: string;
+  bandwith: number;
+  iops: number;
+  lantency: number;
+  wwn:string;
 }
 export class Dtrees{
   name: string;
-  fs_name: string; //所属文件系统名称
-  quota_switch: boolean; //配额
-  security_style: string;//安全模式
-  tier_name: string;//服务等级名称
-  nfs_count: number;//nfs
-  cifs_count: number;
+  fsName: string; //所属文件系统名称
+  quotaSwitch: boolean; //配额
+  securityStyle: string;//安全模式
+  tierName: string;//服务等级名称
+  nfsCount: number;//nfs
+  cifsCount: number;
 }
 export class NfsShare {
   name: string; //名称
-  share_path: string; //共享路径
-  storage_id: string; //存储设备id
-  tier_name: string; //服务等级
-  owning_dtree_name: string;//所属dtree
-  fs_name: string; //所属文件系统名字在
-  owning_dtree_id: string; //所属dtreeid
-}
-export class BandPorts{
-  id: string;
-  name: string;
-  health_status: string;
-  running_status: string;
-  mtu: string;
-}
-export class LogicPorts{
-  id: string;
-  name: string;
-  running_status: string;
-  operational_status: string;
-  mgmt_ip: string;
-  mgmt_ipv6: string;
-  home_port_id: string;
-  home_port_name: string;
-  current_port_id: string;
-  current_port_name: string;
-  role: string;
-  ddns_status: string;
-  support_protocol: string;
-  management_access: string;
-  vstore_id: string;
-  vstore_name: string;
-}
-export class StorageControllers{
-  name: string;
-  status: string;
-  softVer: string;
-  cpuInfo: string;
+  sharePath: string; //共享路径
+  storageId: string; //存储设备id
+  tierName: string; //服务等级
+  owningDtreeName: string;//所属dtree
+  fsName: string; //所属文件系统名字在
+  owningDtreeId: string; //所属dtreeid
 }
 export class StorageDisk{
+  capacity: number;
+  diskDomain: string;
+  logicalType:string;
   name: string;
+  performance: string;
+  physicalType: string;
+  poolId: string;
+  speed: number
   status: string;
-  capacity: string;
+  storageDeviceId: string;
+  iops:number;
+  useage:number;
+  bandwith:number;
+  lantency:number;
 }
 export interface PoolList {
    name: string;
@@ -210,5 +200,23 @@ export class StorageController{
   status:string;
   softVer:string;
   cpuInfo:string;
+  cpuUsage:number;
+  iops:number;
+  ops:number;
+  bandwith:number;
+  lantency:number;
+}
+export class CapacitySavings{
+  bars:number[];
+  unit:string;
+  beforeSave:number;
+  dedupe:number;
+  compression:number;
+  afterSave:number;
+  max:number;
+  rate:string;
+  constructor(){
+    this.bars=[];
+  }
 }
 

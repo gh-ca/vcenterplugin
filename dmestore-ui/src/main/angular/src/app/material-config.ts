@@ -4,8 +4,8 @@ import {
   MomentDateAdapter,
   MAT_MOMENT_DATE_ADAPTER_OPTIONS,
 } from '@angular/material-moment-adapter';
-import { MomentDatetimeAdapter } from '@mat-datetimepicker/moment';
-import { DatetimeAdapter, MAT_DATETIME_FORMATS } from '@mat-datetimepicker/core';
+// import { MomentDatetimeAdapter } from '@mat-datetimepicker/moment';
+// import { DatetimeAdapter, MAT_DATETIME_FORMATS } from '@mat-datetimepicker/core';
 
 export const materialProviders = [
   {
@@ -35,13 +35,13 @@ export const materialProviders = [
       },
     },
   },
-  MomentDatetimeAdapter,
+  // MomentDatetimeAdapter,
+  // {
+  //   provide: DatetimeAdapter,
+  //   useClass: MomentDatetimeAdapter,
+  // },
   {
-    provide: DatetimeAdapter,
-    useClass: MomentDatetimeAdapter,
-  },
-  {
-    provide: MAT_DATETIME_FORMATS,
+    // provide: MAT_DATETIME_FORMATS,
     useValue: {
       parse: {
         dateInput: 'YYYY-MM-DD HH:mm',

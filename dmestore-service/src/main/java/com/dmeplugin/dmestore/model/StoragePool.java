@@ -5,311 +5,538 @@ package com.dmeplugin.dmestore.model;
  * @author lianq
  * @ClassName: StoragePool
  * @Company: GH-CA
- * @create 2020-09-03
+ * @since  2020-09-03
  */
 public class StoragePool   {
     /**
-     *空闲容量
+     *空闲容量.
     **/
     private Double freeCapacity;
     /**
-     *名称
+     *名称.
     **/
     private String name;
     /**
-     *存储池id
+     *存储池id.
     **/
     private String id;
     /**
-     *运行状态
+     *运行状态.
     **/
     private String runningStatus;
     /**
-     *健康状态
+     *健康状态.
     **/
     private String healthStatus;
     /**
-     *总容量
+     *总容量.
     **/
     private Double totalCapacity;
     /**
-     *已用容量
+     *已用容量.
     **/
     private Double consumedCapacity;
     /**
-     *已用容量百分比(容量利用率)
+     *已用容量百分比(容量利用率).
     **/
     private String consumedCapacityPercentage;
+    /**
+     *storagePoolId.
+     **/
     private String storagePoolId;
+    /**
+     *storageInstanceId.
+     **/
     private String storageInstanceId;
+    /**
+     *storageDeviceId.
+     **/
     private String storageDeviceId;
     /**
-     *订阅率 = 订阅容量/总容量
+     *订阅率 = 订阅容量/总容量.
     **/
     private Double subscriptionRate;
     /**
-     *类型（块）
+     *类型（块）file 或者 block.
     **/
     private String mediaType;
     /**
-     *0-无效，1-RAID 10，2-RAID 5，3-RAID 0，4-RAID 1，5-RAID 6，6-RAID 50，7-RAID 3。
-     /**
-     *RAID级别
-    **/
+     *0-无效，1-RAID 10，2-RAID 5，3-RAID 0，
+     * 4-RAID 1，5-RAID 6，6-RAID 50，7-RAID 3.
+     * RAID级别
+     */
     private String tier0RaidLv;
+    /**
+     * tier1RaidLv .
+     */
     private String tier1RaidLv;
+    /**
+     * tier2RaidLv .
+     */
     private String tier2RaidLv;
     /**
-     *存储设备id
+     *存储设备id.
     **/
     private String storageId;
     /**
-     *存储池上创建LUN或者文件系统时的可用容量 单位MB
+     *存储池上创建LUN或者文件系统时的可用容量 单位MB.
     **/
     private Double dataSpace;
     /**
-     *时延 iops 带宽 公用存储设备的
+     *时延 iops 带宽 公用存储设备的.
      *订阅容量
     **/
     private Double subscribedCapacity;
     /**
-     *硬盘类型
+     *去重容量.
+     **/
+    private Double dedupedCapacity;
+    /**
+     *压缩容量.
+     **/
+    private Double compressedCapacity;
+    /**
+     *保护容量.
+     **/
+    private Double protectionCapacity;
+    /**
+     *硬盘类型.
     **/
     private String physicalType;
     /**
-     *存储池所处硬盘id
+     *存储池所处硬盘id.
     **/
     private String diskPoolId;
 
     /**
-     *存储池所在存储中的ID
+     *存储池所在存储中的ID.
      **/
     private String poolId;
     /**
-     *服务等级
+     *服务等级.
      **/
     private String serviceLevelName;
 
     /**
-     *iops
+     *iops.
      **/
     private Float maxIops;
 
     /**
-     *带宽
+     *带宽.
      **/
     private Float maxBandwidth;
 
     /**
-     *时延
+     *时延.
      **/
     private Float maxLatency;
 
+    /**
+     * getFreeCapacity .
+     * @return Double.
+     */
     public Double getFreeCapacity() {
         return freeCapacity;
     }
 
-    public void setFreeCapacity(Double freeCapacity) {
-        this.freeCapacity = freeCapacity;
+    /**
+     * setFreeCapacity .
+     * @param param .
+     */
+    public void setFreeCapacity(final Double param) {
+        this.freeCapacity = param;
     }
-
+    /**
+     * getName .
+     * @return String.
+     */
     public String getName() {
         return name;
     }
-
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setName .
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
-
+    /**
+     * getId .
+     * @return String.
+     */
     public String getId() {
         return id;
     }
-
-    public void setId(String id) {
-        this.id = id;
+    /**
+     * setId .
+     * @param param .
+     */
+    public void setId(final String param) {
+        this.id = param;
     }
-
+    /**
+     * getRunningStatus .
+     * @return String.
+     */
     public String getRunningStatus() {
         return runningStatus;
     }
-
-    public void setRunningStatus(String runningStatus) {
-        this.runningStatus = runningStatus;
+    /**
+     * setRunningStatus .
+     * @param param .
+     */
+    public void setRunningStatus(final String param) {
+        this.runningStatus = param;
     }
-
+    /**
+     * getHealthStatus .
+     * @return String.
+     */
     public String getHealthStatus() {
         return healthStatus;
     }
-
-    public void setHealthStatus(String healthStatus) {
-        this.healthStatus = healthStatus;
+    /**
+     * setHealthStatus .
+     * @param param .
+     */
+    public void setHealthStatus(final String param) {
+        this.healthStatus = param;
     }
-
+    /**
+     * getTotalCapacity .
+     * @return Double.
+     */
     public Double getTotalCapacity() {
         return totalCapacity;
     }
-
-    public void setTotalCapacity(Double totalCapacity) {
-        this.totalCapacity = totalCapacity;
+    /**
+     * setTotalCapacity .
+     * @param param .
+     */
+    public void setTotalCapacity(final Double param) {
+        this.totalCapacity = param;
     }
-
+    /**
+     * getConsumedCapacity .
+     * @return Double.
+     */
     public Double getConsumedCapacity() {
         return consumedCapacity;
     }
-
-    public void setConsumedCapacity(Double consumedCapacity) {
-        this.consumedCapacity = consumedCapacity;
+    /**
+     * setConsumedCapacity .
+     * @param param .
+     */
+    public void setConsumedCapacity(final Double param) {
+        this.consumedCapacity = param;
     }
-
+    /**
+     * getConsumedCapacityPercentage .
+     * @return String.
+     */
     public String getConsumedCapacityPercentage() {
         return consumedCapacityPercentage;
     }
-
-    public void setConsumedCapacityPercentage(String consumedCapacityPercentage) {
-        this.consumedCapacityPercentage = consumedCapacityPercentage;
+    /**
+     * setConsumedCapacityPercentage .
+     * @param param .
+     */
+    public void setConsumedCapacityPercentage(final String param) {
+        this.consumedCapacityPercentage = param;
     }
-
+    /**
+     * getStoragePoolId .
+     * @return String.
+     */
     public String getStoragePoolId() {
         return storagePoolId;
     }
-
-    public void setStoragePoolId(String storagePoolId) {
-        this.storagePoolId = storagePoolId;
+    /**
+     * setStoragePoolId .
+     * @param param .
+     */
+    public void setStoragePoolId(final String param) {
+        this.storagePoolId = param;
     }
-
+    /**
+     * getStorageInstanceId .
+     * @return String.
+     */
     public String getStorageInstanceId() {
         return storageInstanceId;
     }
-
-    public void setStorageInstanceId(String storageInstanceId) {
-        this.storageInstanceId = storageInstanceId;
+    /**
+     * setStorageInstanceId .
+     * @param param .
+     */
+    public void setStorageInstanceId(final String param) {
+        this.storageInstanceId = param;
     }
-
+    /**
+     * getStorageDeviceId .
+     * @return String.
+     */
     public String getStorageDeviceId() {
         return storageDeviceId;
     }
-
-    public void setStorageDeviceId(String storageDeviceId) {
-        this.storageDeviceId = storageDeviceId;
+    /**
+     * setStorageDeviceId .
+     * @param param .
+     */
+    public void setStorageDeviceId(final String param) {
+        this.storageDeviceId = param;
     }
-
+    /**
+     * getSubscriptionRate .
+     * @return String.
+     */
     public Double getSubscriptionRate() {
         return subscriptionRate;
     }
-
-    public void setSubscriptionRate(Double subscriptionRate) {
-        this.subscriptionRate = subscriptionRate;
+    /**
+     * setSubscriptionRate .
+     * @param param .
+     */
+    public void setSubscriptionRate(final Double param) {
+        this.subscriptionRate = param;
     }
-
+    /**
+     * getMediaType .
+     * @return String.
+     */
     public String getMediaType() {
         return mediaType;
     }
-
-    public void setMediaType(String mediaType) {
-        this.mediaType = mediaType;
+    /**
+     * setMediaType .
+     * @param param .
+     */
+    public void setMediaType(final String param) {
+        this.mediaType = param;
     }
-
+    /**
+     * getTier0RaidLv .
+     * @return String.
+     */
     public String getTier0RaidLv() {
         return tier0RaidLv;
     }
-
-    public void setTier0RaidLv(String tier0RaidLv) {
-        this.tier0RaidLv = tier0RaidLv;
+    /**
+     * setTier0RaidLv .
+     * @param param .
+     */
+    public void setTier0RaidLv(final String param) {
+        this.tier0RaidLv = param;
     }
-
+    /**
+     * getTier1RaidLv .
+     * @return String.
+     */
     public String getTier1RaidLv() {
         return tier1RaidLv;
     }
-
-    public void setTier1RaidLv(String tier1RaidLv) {
-        this.tier1RaidLv = tier1RaidLv;
+    /**
+     * setTier1RaidLv .
+     * @param param .
+     */
+    public void setTier1RaidLv(final String param) {
+        this.tier1RaidLv = param;
     }
-
+    /**
+     * getTier2RaidLv .
+     * @return String.
+     */
     public String getTier2RaidLv() {
         return tier2RaidLv;
     }
-
-    public void setTier2RaidLv(String tier2RaidLv) {
-        this.tier2RaidLv = tier2RaidLv;
+    /**
+     * setTier2RaidLv .
+     * @param param .
+     */
+    public void setTier2RaidLv(final String param) {
+        this.tier2RaidLv = param;
     }
-
+    /**
+     * getStorageId .
+     * @return String.
+     */
     public String getStorageId() {
         return storageId;
     }
-
-    public void setStorageId(String storageId) {
-        this.storageId = storageId;
+    /**
+     * setStorageId .
+     * @param param .
+     */
+    public void setStorageId(final String param) {
+        this.storageId = param;
     }
-
+    /**
+     * getDataSpace .
+     * @return Double.
+     */
     public Double getDataSpace() {
         return dataSpace;
     }
-
-    public void setDataSpace(Double dataSpace) {
-        this.dataSpace = dataSpace;
+    /**
+     * setDataSpace .
+     * @param param .
+     */
+    public void setDataSpace(final Double param) {
+        this.dataSpace = param;
     }
-
+    /**
+     * getSubscribedCapacity .
+     * @return Double.
+     */
     public Double getSubscribedCapacity() {
         return subscribedCapacity;
     }
-
-    public void setSubscribedCapacity(Double subscribedCapacity) {
-        this.subscribedCapacity = subscribedCapacity;
+    /**
+     * setSubscribedCapacity .
+     * @param param .
+     */
+    public void setSubscribedCapacity(final Double param) {
+        this.subscribedCapacity = param;
     }
-
+    /**
+     * getPhysicalType .
+     * @return String.
+     */
     public String getPhysicalType() {
         return physicalType;
     }
-
-    public void setPhysicalType(String physicalType) {
-        this.physicalType = physicalType;
+    /**
+     * setPhysicalType .
+     * @param param .
+     */
+    public void setPhysicalType(final String param) {
+        this.physicalType = param;
     }
-
+    /**
+     * getDiskPoolId .
+     * @return String.
+     */
     public String getDiskPoolId() {
         return diskPoolId;
     }
-
-    public void setDiskPoolId(String diskPoolId) {
-        this.diskPoolId = diskPoolId;
+    /**
+     * setDiskPoolId .
+     * @param param .
+     */
+    public void setDiskPoolId(final String param) {
+        this.diskPoolId = param;
     }
-
+    /**
+     * setPoolId .
+     * @return String.
+     */
     public String getPoolId() {
         return poolId;
     }
-
-    public void setPoolId(String poolId) {
-        this.poolId = poolId;
+    /**
+     * setPoolId .
+     * @param param .
+     */
+    public void setPoolId(final String param) {
+        this.poolId = param;
     }
-
+    /**
+     * getServiceLevelName .
+     * @return String.
+     */
     public String getServiceLevelName() {
         return serviceLevelName;
     }
-
-    public void setServiceLevelName(String serviceLevelName) {
-        this.serviceLevelName = serviceLevelName;
+    /**
+     * setServiceLevelName .
+     * @param param .
+     */
+    public void setServiceLevelName(final String param) {
+        this.serviceLevelName = param;
     }
-
+    /**
+     * getMaxIops .
+     * @return Float.
+     */
     public Float getMaxIops() {
         return maxIops;
     }
-
-    public void setMaxIops(Float maxIops) {
-        this.maxIops = maxIops;
+    /**
+     * setMaxIops .
+     * @param param .
+     */
+    public void setMaxIops(final Float param) {
+        this.maxIops = param;
     }
-
+    /**
+     * getMaxBandwidth .
+     * @return Float.
+     */
     public Float getMaxBandwidth() {
         return maxBandwidth;
     }
-
-    public void setMaxBandwidth(Float maxBandwidth) {
-        this.maxBandwidth = maxBandwidth;
+    /**
+     * setMaxBandwidth .
+     * @param param .
+     */
+    public void setMaxBandwidth(final Float param) {
+        this.maxBandwidth = param;
     }
-
+    /**
+     * getMaxLatency .
+     * @return Float.
+     */
     public Float getMaxLatency() {
         return maxLatency;
     }
-
-    public void setMaxLatency(Float maxLatency) {
-        this.maxLatency = maxLatency;
+    /**
+     * setMaxLatency .
+     * @param param .
+     */
+    public void setMaxLatency(final Float param) {
+        this.maxLatency = param;
+    }
+    /**
+     * getDedupedCapacity .
+     * @return Double.
+     */
+    public Double getDedupedCapacity() {
+        return dedupedCapacity;
+    }
+    /**
+     * setDedupedCapacity .
+     * @param param .
+     */
+    public void setDedupedCapacity(final Double param) {
+        this.dedupedCapacity = param;
+    }
+    /**
+     * getCompressedCapacity .
+     * @return Double.
+     */
+    public Double getCompressedCapacity() {
+        return compressedCapacity;
+    }
+    /**
+     * setCompressedCapacity .
+     * @param param .
+     */
+    public void setCompressedCapacity(final Double param) {
+        this.compressedCapacity = param;
+    }
+    /**
+     * getProtectionCapacity .
+     * @return Double.
+     */
+    public Double getProtectionCapacity() {
+        return protectionCapacity;
+    }
+    /**
+     * setProtectionCapacity .
+     * @param param .
+     */
+    public void setProtectionCapacity(final Double param) {
+        this.protectionCapacity = param;
     }
 }

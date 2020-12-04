@@ -17,7 +17,7 @@ public class Vmfs3EnableBlockDeleteImpl extends BaseBestPracticeService implemen
     }
 
     @Override
-    public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception{
+    public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         return super.getCurrentValue(vcsdkUtils, objectId, getHostSetting());
     }
 
@@ -42,7 +42,7 @@ public class Vmfs3EnableBlockDeleteImpl extends BaseBestPracticeService implemen
     }
 
     @Override
-    public void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception{
+    public void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         super.update(vcsdkUtils, objectId, getHostSetting(), getRecommendValue());
     }
 }

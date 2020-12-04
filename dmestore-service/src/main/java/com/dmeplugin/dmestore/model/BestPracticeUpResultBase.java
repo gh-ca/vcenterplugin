@@ -4,40 +4,88 @@ package com.dmeplugin.dmestore.model;
  * @author wangxiangyong
  **/
 public class BestPracticeUpResultBase {
+    /**
+     * hostSetting .
+     */
     private String hostSetting;
+    /**
+     * needReboot .
+     */
     private boolean needReboot;
+    /**
+     * hostObjectId .
+     */
     private String hostObjectId;
+    /**
+     * updateResult .
+     */
     private boolean updateResult;
 
+    /**
+     * getHostSetting .
+     * @return String .
+     */
     public String getHostSetting() {
         return hostSetting;
     }
 
-    public void setHostSetting(String hostSetting) {
-        this.hostSetting = hostSetting;
+    /**
+     * setHostSetting .
+     * @param param .
+     */
+    public void setHostSetting(final String param) {
+        this.hostSetting = param;
     }
-
+    /**
+     * getNeedReboot .
+     * @return boolean .
+     */
     public boolean getNeedReboot() {
         return needReboot;
     }
-
-    public void setNeedReboot(boolean needReboot) {
-        this.needReboot = needReboot;
+    /**
+     * setHostSetting .
+     * @param param .
+     */
+    public void setNeedReboot(final boolean param) {
+        this.needReboot = param;
     }
-
+    /**
+     * getHostObjectId .
+     * @return String .
+     */
     public String getHostObjectId() {
         return hostObjectId;
     }
-
-    public void setHostObjectId(String hostObjectId) {
-        this.hostObjectId = hostObjectId;
+    /**
+     * setHostSetting .
+     * @param param .
+     */
+    public void setHostObjectId(final String param) {
+        this.hostObjectId = param;
     }
-
+    /**
+     * getUpdateResult .
+     * @return boolean .
+     */
     public boolean getUpdateResult() {
         return updateResult;
     }
+    /**
+     * setHostSetting .
+     * @param param .
+     */
+    public void setUpdateResult(final boolean param) {
+        this.updateResult = param;
+    }
 
-    public void setUpdateResult(boolean updateResult) {
-        this.updateResult = updateResult;
+    @Override
+    public final String toString() {
+        return "BestPracticeUpResultBase{"
+            + "hostSetting='" + hostSetting + '\''
+            + ", needReboot=" + needReboot
+            + ", hostObjectId='" + hostObjectId + '\''
+            + ", updateResult=" + updateResult
+            + '}';
     }
 }

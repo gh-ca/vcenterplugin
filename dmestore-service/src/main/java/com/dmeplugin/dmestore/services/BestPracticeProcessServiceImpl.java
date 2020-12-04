@@ -1,6 +1,9 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.dao.BestPracticeCheckDao;
+import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeSqlException;
+import com.dmeplugin.dmestore.exception.VcenterException;
 import com.dmeplugin.dmestore.model.BestPracticeBean;
 import com.dmeplugin.dmestore.model.BestPracticeCheckRecordBean;
 import com.dmeplugin.dmestore.model.BestPracticeUpResultBase;
@@ -61,7 +64,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     }
 
     @Override
-    public List<BestPracticeCheckRecordBean> getCheckRecord() throws Exception {
+    public List<BestPracticeCheckRecordBean> getCheckRecord()   {
         List<BestPracticeCheckRecordBean> list = new ArrayList<>();
         for (BestPracticeService bestPracticeService : bestPracticeServices) {
             BestPracticeCheckRecordBean bean = new BestPracticeCheckRecordBean();
@@ -83,7 +86,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     }
 
     @Override
-    public List<BestPracticeBean> getCheckRecordBy(String hostSetting, int pageNo, int pageSize) throws Exception {
+    public List<BestPracticeBean> getCheckRecordBy(String hostSetting, int pageNo, int pageSize) throws DMEException {
         List<BestPracticeBean> list = new ArrayList<>();
         for (BestPracticeService bestPracticeService : bestPracticeServices) {
             String s = bestPracticeService.getHostSetting();
@@ -91,7 +94,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                 try {
                     list = bestPracticeCheckDao.getRecordByPage(hostSetting, pageNo, pageSize);
                 } catch (Exception ex) {
-                    throw new Exception(ex.getMessage());
+                    throw new DMEException(ex.getMessage());
                 }
                 break;
             }
@@ -100,7 +103,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     }
 
     @Override
-    public void check(String objectId) throws Exception {
+    public void check(String objectId) throws VcenterException {
         log.info("checkstart ");
         String hostsStr;
         if (null != objectId) {
@@ -114,36 +117,33 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
         Map<String, List<BestPracticeBean>> checkMap = new HashMap<>(16);
         for (int i = 0; i < hostArray.size(); i++) {
             JsonObject hostObject = hostArray.get(i).getAsJsonObject();
-            String _hostName = hostObject.get("hostName").getAsString();
-            String _objectId = hostObject.get("objectId").getAsString();
+            String hostName = hostObject.get("hostName").getAsString();
+            String hostObjectId = hostObject.get("objectId").getAsString();
             //对每一项进行检查
             for (BestPracticeService bestPracticeService : bestPracticeServices) {
                 try {
-                    boolean checkFlag = bestPracticeService.check(vcsdkUtils, _objectId);
+                    String hostSetting = bestPracticeService.getHostSetting();
+                    if(!checkMap.containsKey(hostSetting)){
+                        checkMap.put(hostSetting, new ArrayList<>());
+                    }
+
+                    boolean checkFlag = bestPracticeService.check(vcsdkUtils, hostObjectId);
                     if (!checkFlag) {
                         BestPracticeBean bean = new BestPracticeBean();
-                        String hostSetting = bestPracticeService.getHostSetting();
                         bean.setHostSetting(hostSetting);
                         bean.setRecommendValue(String.valueOf(bestPracticeService.getRecommendValue()));
                         bean.setLevel(bestPracticeService.getLevel());
                         bean.setNeedReboot(String.valueOf(bestPracticeService.needReboot()));
-                        bean.setActualValue(String.valueOf(bestPracticeService.getCurrentValue(vcsdkUtils, _objectId)));
-                        bean.setHostObjectId(_objectId);
-                        bean.setHostName(_hostName);
+                        bean.setActualValue(String.valueOf(bestPracticeService.getCurrentValue(vcsdkUtils, hostObjectId)));
+                        bean.setHostObjectId(hostObjectId);
+                        bean.setHostName(hostName);
                         bean.setAutoRepair(String.valueOf(bestPracticeService.autoRepair()));
 
-                        //根据检查项进行归类
-                        if (!checkMap.containsKey(hostSetting)) {
-                            List<BestPracticeBean> failList = new ArrayList<>();
-                            failList.add(bean);
-                            checkMap.put(hostSetting, failList);
-                        } else {
-                            checkMap.get(hostSetting).add(bean);
-                        }
+                        checkMap.get(hostSetting).add(bean);
                     }
                 } catch (Exception ex) {
-                    //报错，跳过当前项检查
-                    log.error("{} check failed! hostSetting={}", _hostName, bestPracticeService.getHostSetting());
+                    // 报错，跳过当前项检查
+                    log.error("{} check failed! hostSetting={}", hostName, bestPracticeService.getHostSetting());
                     continue;
                 }
             }
@@ -168,19 +168,21 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
 
             List<BestPracticeBean> newList = new ArrayList<>();
             List<BestPracticeBean> upList = new ArrayList<>();
-            for (BestPracticeBean o : v) {
-                String hostName = o.getHostName();
-                if (localHostNames.contains(hostName)) {
-                    upList.add(o);
-                    localHostNames.remove(hostName);
-                } else {
-                    newList.add(o);
+            if(null != v && v.size() > 0){
+                for (BestPracticeBean o : v) {
+                    String hostName = o.getHostName();
+                    if (localHostNames.contains(hostName)) {
+                        upList.add(o);
+                        localHostNames.remove(hostName);
+                    } else {
+                        newList.add(o);
+                    }
                 }
             }
 
             //更新
             if (!upList.isEmpty()) {
-                //bestPracticeCheckDao.update(upList);
+                bestPracticeCheckDao.update(upList);
             }
 
             //新增
@@ -195,31 +197,12 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     }
 
     @Override
-    public List<BestPracticeUpResultResponse> update(List<String> objectIds) throws Exception {
+    public List<BestPracticeUpResultResponse> update(List<String> objectIds) throws DmeSqlException {
         return update(objectIds, null);
     }
 
     @Override
-    public List<BestPracticeUpResultResponse> updateByCluster(String clusterobjectid) throws Exception {
-        String vmwarehosts= vcsdkUtils.getHostsOnCluster(clusterobjectid);
-        if (!StringUtils.isEmpty(vmwarehosts)) {
-            List<Map<String, String>> vmwarehostlists = gson.fromJson(vmwarehosts, new TypeToken<List<Map<String, String>>>() {
-            }.getType());
-            List<String> hostlists = new ArrayList<>();
-            if (vmwarehostlists != null && vmwarehostlists.size() > 0) {
-                //分别检查每一个主机是否存在，如果不存在就创建
-
-                for (Map<String, String> hostmap : vmwarehostlists) {
-                   hostlists.add(hostmap.get("hostId"));
-                }
-            }
-            return update(hostlists);
-        }
-        return new ArrayList<>();
-    }
-
-    @Override
-    public List<BestPracticeUpResultResponse> update(List<String> objectIds, String hostSetting) throws Exception {
+    public List<BestPracticeUpResultResponse> update(List<String> objectIds, String hostSetting) throws DmeSqlException {
         List<BestPracticeService> services = new ArrayList<>();
         //获取对应的service
         for (BestPracticeService bestPracticeService : bestPracticeServices) {
@@ -234,27 +217,42 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             }
         }
 
+        Map<String, String> hostMap = new HashMap<>(16);
         if (null == objectIds || objectIds.size() == 0) {
-            objectIds = new ArrayList<>();
             int pageNo = 0;
             int pageSize = 100;
             //获取本地所有
-            while (true){
-                List<String> hostIdList = bestPracticeCheckDao.getAllHostIds(pageNo++,  pageSize);
-                objectIds.addAll(hostIdList);
+            try {
+                while (true) {
+                    Map<String, String> hostMapTemp = bestPracticeCheckDao.getAllHostIds(pageNo++, pageSize);
+                    hostMap.putAll(hostMapTemp);
 
-                if(hostIdList.size() != pageSize){
-                    break;
+                    if (hostMapTemp.size() != pageSize) {
+                        break;
+                    }
                 }
+            }catch (SQLException e){
+                e.printStackTrace();
+                throw new DmeSqlException(e.getMessage());
+            }
+        }else {
+            try {
+                //从本地数据库查询指定的主机信息
+                hostMap = bestPracticeCheckDao.getByHostIds(objectIds);
+            } catch (SQLException e) {
+                e.printStackTrace();
             }
         }
 
         List<BestPracticeUpResultResponse> responses = new ArrayList<>();
         List<String> successList = new ArrayList<>();
-        for (String objectId : objectIds) {
+        for (Map.Entry<String, String> entry : hostMap.entrySet()) {
+            String objectId = entry.getKey();
+            String hostName = entry.getValue();
             BestPracticeUpResultResponse response = new BestPracticeUpResultResponse();
             List<BestPracticeUpResultBase> baseList = new ArrayList();
             response.setHostObjectId(objectId);
+            response.setHostName(hostName);
             boolean needReboot = false;
             for (BestPracticeService service : services) {
                 BestPracticeUpResultBase base = new BestPracticeUpResultBase();
@@ -273,7 +271,6 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                     base.setUpdateResult(false);
                     log.error("best practice update {} {} recommend value failed!errMsg:{}", objectId, hostSetting, ex.getMessage());
                     ex.printStackTrace();
-                    continue;
                 }
                 baseList.add(base);
             }

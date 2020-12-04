@@ -5,7 +5,7 @@
       <button class="btn btn-primary" (click)="addView()">{{'menu.add' | translate}}</button>
       <button class="btn btn-primary" [disabled]="rowSelected.length !== 1" (click)="modifyData()">{{'menu.modify' | translate}}</button>
       <button class="btn btn-primary" [disabled]="rowSelected.length !== 1" (click)="expandView()">{{'menu.expand' | translate}}</button>
-      <clr-dropdown [clrCloseMenuOnItemClick]="false">
+      <clr-dropdown [clrCloseMenuOnItemClick]="true">
         <button clrDropdownTrigger class="btn btn-primary" aria-label="Dropdown demo button">
           {{'menu.more' | translate}}
           <clr-icon shape="caret down"></clr-icon>
@@ -20,49 +20,73 @@
         </clr-dropdown-menu>
       </clr-dropdown>
     </div>
-    <div class="btn-group btn-icon">
+    <div class="btn-group btn-icon" title="{{'menu.conventional' | translate}}">
       <div class="radio btn">
         <input (click)="radioCheck = 'list'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-1" checked>
         <label for="btn-demo-radio-1"><clr-icon shape="list" size="20"></clr-icon></label>
       </div>
-      <div class="radio btn">
+      <div class="radio btn" title="{{'menu.performance' | translate}}">
         <input (click)="radioCheck = 'chart'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-2">
         <label for="btn-demo-radio-2"><clr-icon shape="dashboard" size="20"></clr-icon></label>
       </div>
-      <div class="radio btn merginLeft">
+      <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
         <!--<input type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3">-->
         <label><clr-icon shape="refresh" size="20" (click)="scanDataStore()"></clr-icon></label>
       </div>
     </div>
   </div>
   <!-- 列表页 -->
-  <clr-datagrid [(clrDgSelected)]="rowSelected"   (clrDgRefresh)="getNfsList()" [clrDgLoading]="isLoading" class="datagrid-compact">
-      <clr-dg-column>{{'nfs.name' | translate}}</clr-dg-column>
+  <div style="width: 100%;">
+    <clr-datagrid id="nfs-grid" [(clrDgSelected)]="rowSelected" [clrDgLoading]="isLoading">
+      <clr-dg-column [clrDgField]="'name'">{{'nfs.name' | translate}}</clr-dg-column>
 
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.status' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.totalCapacity' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.freeCapacity' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.capacityUsage' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.provisioningCapacity' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.device' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.logicPort' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.shareIp' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.sharePath' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'">{{'nfs.fileSystem' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" >
+        {{'nfs.status' | translate}}
+        <clr-dg-filter [clrDgFilter]="statusFilter">
+          <status-filter #statusFilter></status-filter>
+        </clr-dg-filter>
+      </clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacity'" [clrDgSortOrder]="descSort">{{'nfs.totalCapacity' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" >{{'nfs.freeCapacity' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacityUsage'" [clrDgSortOrder]="descSort">{{'nfs.capacityUsage' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" >{{'nfs.provisioningCapacity' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" >
+        {{'nfs.device' | translate}}
+        <clr-dg-filter [clrDgFilter]="deviceFilter">
+          <device-filter #deviceFilter></device-filter>
+        </clr-dg-filter>
+      </clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'logicPort'">{{'nfs.logicPort' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'shareIp'">{{'nfs.shareIp' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'sharePath'">{{'nfs.sharePath' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'fs'">{{'nfs.fileSystem' | translate}}</clr-dg-column>
 
       <clr-dg-column [hidden]="radioCheck!=='chart'">{{'nfs.ops' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='chart'">{{'nfs.bandwidth' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='chart'">{{'nfs.respRt' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='chart'">{{'nfs.respWt' | translate}}</clr-dg-column>
 
-    <clr-dg-row *ngFor="let item of list" [clrDgItem]="item">
-        <clr-dg-cell (click)="navigateTo(item.objectid)">{{item.name}}</clr-dg-cell>
-        <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.status}}</clr-dg-cell>
+      <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
+        <clr-dg-cell (click)="navigateTo(item.objectid)" style="color:#829DE6;cursor:pointer">{{item.name}}</clr-dg-cell>
+        <clr-dg-cell style="width: 5%" [hidden]="radioCheck!=='list'">
+          <span *ngIf="item.status == 'normal'">
+                <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>
+                <span>{{'enum.status.normal' | translate}}</span>
+          </span>
+          <span *ngIf="item.status == 'faulty'">
+                <span class="color-square" style="background-color: red; margin-right: 10px"></span>
+                <span>{{'enum.status.faulty' | translate}}</span>
+          </span>
+          <span *ngIf="item.status == 'fault'">
+                <span class="color-square" style="background-color: red; margin-right: 10px"></span>
+                <span>{{'enum.status.fault' | translate}}</span>
+          </span>
+        </clr-dg-cell>
         <clr-dg-cell [hidden]="radioCheck!=='list'">{{formatCapacity(item.capacity)}}</clr-dg-cell>
         <clr-dg-cell [hidden]="radioCheck!=='list'">{{formatCapacity(item.freeSpace)}}</clr-dg-cell>
         <clr-dg-cell [hidden]="radioCheck!=='list'">
-      <clr-progress-bar clrValue="{{((item.capacity - item.freeSpace)/item.capacity * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar>
-    </clr-dg-cell>
+          <clr-progress-bar clrValue="{{((item.capacity - item.freeSpace)/item.capacity * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar>
+        </clr-dg-cell>
         <clr-dg-cell [hidden]="radioCheck!=='list'">{{formatCapacity(item.reserveCapacity)}}</clr-dg-cell>
         <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.device}}</clr-dg-cell>
         <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.logicPort}}</clr-dg-cell>
@@ -74,68 +98,81 @@
         <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.bandwidth}}</clr-dg-cell>
         <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.readResponseTime}}</clr-dg-cell>
         <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.writeResponseTime}}</clr-dg-cell>
-    </clr-dg-row>
-  </clr-datagrid>
-  <!-- 添加nsf data store -->
-  <clr-wizard #wizard [(clrWizardOpen)]="popShow">
+      </clr-dg-row>
+      <clr-dg-footer>
+        <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="total">
+          <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">{{'page.perPage' | translate}}</clr-dg-page-size>
+          {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+          {{'page.all' | translate}}
+          {{pagination.totalItems}}
+        </clr-dg-pagination>
+      </clr-dg-footer>
+    </clr-datagrid>
+  </div>
+  <!--添加弹框-->
+  <clr-wizard #wizard [clrWizardOpen]="addModelShow" [clrWizardClosable]="false">
     <clr-wizard-title>{{'nfs.add_title' | translate}}</clr-wizard-title>
-    <p *ngIf="errMessage!==''" style="color: red">{{errMessage}}</p>
-    <clr-wizard-button [type]="'cancel'">{{'nfs.button_close' | translate}}</clr-wizard-button>
-    <clr-wizard-button [type]="'previous'">{{'nfs.button_previous' | translate}}</clr-wizard-button>
-    <clr-wizard-button [type]="'next'">{{'nfs.button_next' | translate}}</clr-wizard-button>
-    <clr-wizard-button  (click)="addNfs();">{{'nfs.button_done' | translate}}</clr-wizard-button>
+    <p *ngIf="errorMsg" style="color: red">{{'errorMsg.addError' | translate}}</p>
+    <div *ngIf="modalLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+    </div>
+    <div *ngIf="modalHandleLoading" class="loadingDiv">
+      <span>
+        {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+    </div>
     <clr-wizard-page [clrWizardPageNextDisabled]="!formPageOne.valid">
       <ng-template clrPageTitle>{{'nfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
       <form clrForm #formPageOne="ngForm">
         <!--存储设备-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.storeageDevice' | translate}}</label>
-          <select clrSelect (ngModelOptions)="storageList" [(ngModel)]="addForm.storagId" name="storagId" class="clr-select" (change)="selectStoragePool()">
+          <select class="inputWidth100Percent" clrSelect (ngModelOptions)="storageList" [(ngModel)]="addForm.storagId"
+                  name="storagId" class="clr-select" (change)="selectStoragePool()" required>
             <option *ngFor="let item of storageList" value="{{item.id}}">{{item.name}}</option>
           </select>
+          <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
         </clr-select-container>
-        <!--存储池-->
-        <!--<clr-select-container>-->
-          <!--<label>{{'nfs.storagePool' | translate}}</label>-->
-          <!--<select clrSelect (ngModelOptions)="storagePools" [(ngModel)]="addForm.storagePoolId" name="storagePoolId" class="clr-select">-->
-            <!--<option *ngFor="let item of storagePools" value="{{item.storageId}}">{{item.name}}</option>-->
-          <!--</select>-->
-        <!--</clr-select-container>-->
-        <clr-combobox-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.storagePool' | translate}}</label>
-          <clr-combobox  [(ngModel)]="checkedPool" name="checkedPool" required>
-            <clr-options>
-              <clr-option *clrOptionItems="let device of storagePools; field:'name'" [clrValue]="device">
-                <!--<clr-icon *ngIf="device.deviceName !== '' && device.deviceType === 'host'" shape="host" role="img" aria-label="World is turning"></clr-icon>-->
-                <!--<clr-icon *ngIf="device.deviceName !== '' && device.deviceType !== 'host'" shape="host-group" role="img" aria-label="World is turning"></clr-icon>-->
-                {{device.name}}
-              </clr-option>
-            </clr-options>
-          </clr-combobox>
-        </clr-combobox-container>
+          <select class="inputWidth100Percent" clrSelect (ngModelOptions)="storagePools" [(ngModel)]="addForm.storagePoolId"
+                  name="storagePoolId" class="clr-select" required>
+            <option *ngFor="let item of storagePools" value="{{item.id}}">{{item.name}}</option>
+          </select>
+          <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
+        </clr-select-container>
+        <!--        <clr-combobox-container>-->
+        <!--          <label>{{'nfs.storagePool' | translate}}</label>-->
+        <!--          <clr-combobox  [(ngModel)]="checkedPool" name="checkedPool" required>-->
+        <!--            <clr-options>-->
+        <!--              <clr-option *clrOptionItems="let device of storagePools; field:'name'" [clrValue]="device">-->
+        <!--                {{device.name}}-->
+        <!--              </clr-option>-->
+        <!--            </clr-options>-->
+        <!--          </clr-combobox>-->
+        <!--        </clr-combobox-container>-->
         <!--逻辑端口-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.logicPort' | translate}}</label>
-          <select clrSelect (ngModelOptions)="logicPorts" [(ngModel)]="addForm.currentPortId" name="currentPortId" class="clr-select">
-            <option *ngFor="let item of logicPorts" value="{{item.currentPortId}}">{{item.currentPortName}}</option>
+          <select clrSelect (ngModelOptions)="logicPorts" [(ngModel)]="addForm.currentPortId" name="currentPortId" class="clr-select" required>
+            <option *ngFor="let item of logicPorts" value="{{item.currentPortId}}">{{item.name+'_'+item.currentPortName+'('+item.mgmtIp+')'}}</option>
           </select>
         </clr-select-container>
-        <!--<clr-combobox-container>-->
-          <!--<label style="color: #9F9F9F;">{{'nfs.logicPort' | translate}}</label>-->
-          <!--<clr-combobox  [(ngModel)]="checkedLogic" name="checkedLogic" required>-->
-            <!--<clr-options>-->
-              <!--<clr-option *clrOptionItems="let device of logicPorts; field:'currentPortName'" [clrValue]="device">-->
-                <!--&lt;!&ndash;<clr-icon *ngIf="device.deviceName !== '' && device.deviceType === 'host'" shape="host" role="img" aria-label="World is turning"></clr-icon>&ndash;&gt;-->
-                <!--&lt;!&ndash;<clr-icon *ngIf="device.deviceName !== '' && device.deviceType !== 'host'" shape="host-group" role="img" aria-label="World is turning"></clr-icon>&ndash;&gt;-->
-                <!--{{device.currentPortName}}-->
-              <!--</clr-option>-->
-            <!--</clr-options>-->
-          <!--</clr-combobox>-->
-        <!--</clr-combobox-container>-->
         <!--名称-->
         <clr-input-container>
           <label>{{'nfs.datastoreName' | translate}}</label>
-          <input clrInput [(ngModel)]="addForm.nfsName" name="nfsName" />
+          <input clrInput class="inputWidth100Percent" [(ngModel)]="addForm.nfsName" name="nfsName" (blur)="checkNfsName();" required/>
+          <clr-control-error>
+            <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'validations.nameRequired' | translate}}</p>
+            <p *ngIf="nfsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+            <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+            <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
+
+
+          </clr-control-error>
         </clr-input-container>
         <clr-checkbox-container>
           <label></label>
@@ -144,75 +181,87 @@
             <label>{{'nfs.sameName' | translate}}</label>
           </clr-checkbox-wrapper>
         </clr-checkbox-container>
-
         <clr-input-container *ngIf="!addForm.sameName">
           <label>{{'nfs.fsName' | translate}}</label>
-          <input clrInput [(ngModel)]="addForm.fsName" name="fsName" />
+          <input class="inputWidth100Percent" clrInput [(ngModel)]="addForm.fsName" name="fsName" (blur)="checkFsName();" />
+          <clr-control-error>
+            <p *ngIf="!oldFsName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
+          </clr-control-error>
         </clr-input-container>
         <clr-input-container *ngIf="!addForm.sameName">
           <label>{{'nfs.shareName' | translate}}</label>
-          <input clrInput [(ngModel)]="addForm.shareName" name="shareName" />
+          <input class="inputWidth100Percent" clrInput [(ngModel)]="addForm.shareName" name="shareName" (blur)="checkShareName();"/>
+          <clr-control-error>
+            <p *ngIf="!oldShareName" style="color: red">{{'errorMsg.require' | translate}}</p>
+            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
+            <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
+          </clr-control-error>
         </clr-input-container>
         <!--大小-->
         <clr-input-container>
           <label>{{'nfs.size' | translate}}</label>
-          <input clrInput  class="inputOneLine" type="number" [(ngModel)]="addForm.size" name="size" #number="ngModel" />
+          <input style="width: 80%" clrInput  class="inputOneLine" type="number" min="0" [(ngModel)]="addForm.size" name="size" #number="ngModel" required />
           <select clrInput  [(ngModel)]="unit" name="unit" >
             <option value="TB">TB</option>
             <option value="GB">GB</option>
-            <option value="MB">MB</option>
-            <option value="KB">KB</option>
           </select>
         </clr-input-container>
-
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.nfsProtocol' | translate}}</label>
-          <select clrSelect [(ngModel)]="addForm.type" name="type" ng-selected="v3">
+          <select clrSelect [(ngModel)]="addForm.type" name="type">
             <option value="NFS">v3</option>
             <option value="NFS41">v4.1</option>
           </select>
         </clr-select-container>
-        <!--<p style="margin-top: 2%">{{'nfs.hostTip' | translate}}</p>-->
+        <clr-radio-container *ngIf="addForm.type=='NFS41'">
+          <label>{{'nfs.securityType' | translate}}</label>
+          <clr-radio-wrapper>
+            <input type="radio" clrRadio name="securityType" [(ngModel)]="addForm.securityType" value="AUTH_SYS"/>
+            <label>{{'nfs.authSys' | translate}}</label>
+          </clr-radio-wrapper>
+          <clr-radio-wrapper>
+            <input type="radio" clrRadio name="securityType" [(ngModel)]="addForm.securityType" value="SEC_KRB5"/>
+            <label>{{'nfs.secKrb5' | translate}}</label>
+          </clr-radio-wrapper>
+          <clr-radio-wrapper>
+            <input type="radio" clrRadio name="securityType" [(ngModel)]="addForm.securityType" value="SEC_KRB5I"/>
+            <label>{{'nfs.secKrb5i' | translate}}</label>
+          </clr-radio-wrapper>
+        </clr-radio-container>
         <!--主机-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.mountHost' | translate}}</label>
-          <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="addForm.hostObjectId" name="hostObjectId" class="clr-select" (change)="checkHost()">
+          <select clrSelect (ngModelOptions)="hostList" [(ngModel)]="addForm.hostObjectId" required name="hostObjectId" class="clr-select" (change)="checkHost()">
             <option *ngFor="let item of hostList" value="{{item.objectId}}">{{item.hostName}}</option>
           </select>
         </clr-select-container>
-        <!--<clr-combobox-container>-->
-          <!--<label style="color: #9F9F9F;">{{'nfs.vkernel' | translate}}</label>-->
-          <!--<clr-combobox  [(ngModel)]="vmkernel" name="vmkernel" required>-->
-            <!--<clr-options>-->
-              <!--<clr-option *clrOptionItems="let device of vmkernelList; field:'ipAddress'" [clrValue]="device">-->
-                <!--&lt;!&ndash;<clr-icon *ngIf="device.deviceName !== '' && device.deviceType === 'host'" shape="host" role="img" aria-label="World is turning"></clr-icon>&ndash;&gt;-->
-                <!--&lt;!&ndash;<clr-icon *ngIf="device.deviceName !== '' && device.deviceType !== 'host'" shape="host-group" role="img" aria-label="World is turning"></clr-icon>&ndash;&gt;-->
-                <!--{{device.ipAddress}}-->
-              <!--</clr-option>-->
-            <!--</clr-options>-->
-          <!--</clr-combobox>-->
-        <!--</clr-combobox-container>-->
         <!--虚拟网卡IP-->
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.vkernel' | translate}}</label>
-          <select clrSelect (ngModelOptions)="vmkernelList" [(ngModel)]="addForm.vkernelIp" name="vkernelIp" class="clr-select">
+          <select clrSelect (ngModelOptions)="vmkernelList" required [(ngModel)]="addForm.vkernelIp" name="vkernelIp" class="clr-select">
             <option *ngFor="let item of vmkernelList" value="{{item.ipAddress}}">{{item.ipAddress}}</option>
           </select>
         </clr-select-container>
-        <clr-select-container>
+        <clr-select-container class="selectClass">
           <label>{{'nfs.mountType' | translate}}</label>
-          <select clrSelect [(ngModel)]="addForm.accessMode" name="accessMode">
+          <select clrSelect [(ngModel)]="addForm.accessMode" required name="accessMode">
             <option value="readOnly">{{'nfs.readOnly' | translate}}</option>
             <option value="readWrite">{{'nfs.readWrite' | translate}}</option>
           </select>
         </clr-select-container>
       </form>
+      <ng-template clrPageButtons>
+        <clr-wizard-button (click)="backToNfsList()" [type]="'custom-cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
+        <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>
+        <clr-wizard-button [type]="'next'">{{'nfs.button_next' | translate}}</clr-wizard-button>
+      </ng-template>
     </clr-wizard-page>
     <clr-wizard-page [clrWizardPageNextDisabled]="!formPageTwo.valid">
       <ng-template clrPageTitle>{{'nfs.storageSetting' | translate}}</ng-template> <!-- mandatory -->
       <ng-template clrPageNavTitle>{{'nfs.storageSetting' | translate}}</ng-template> <!-- optional -->
       <form clrForm #formPageTwo="ngForm">
-
         <clr-toggle-wrapper>
           <label>{{'nfs.add_advance' | translate}}</label>
           <input type="checkbox" clrToggle name="advance" [(ngModel)]="addForm.advance"/>
@@ -236,33 +285,69 @@
               </clr-radio-wrapper>
             </clr-radio-container>
             <div *ngIf="addForm.contolPolicy">
-              <clr-radio-container *ngIf="addForm.contolPolicy==='up'">
-                <label>{{'nfs.tfo' | translate}}</label>
-                <clr-radio-wrapper>
-                  <input type="radio" clrRadio required value="1" />
-                  <label>{{'nfs.qos_bandwidth' | translate}}<=<input class="inputOneLine" type="text" name="maxBandwidth" [(ngModel)]="addForm.maxBandwidth"> MB/s</label>
-                </clr-radio-wrapper>
-                <clr-radio-wrapper>
-                  <input type="radio" clrRadio name="tfo" required value="2"/>
-                  <label>{{'nfs.qos_iops' | translate}}<=<input class="inputOneLine" type="text" [(ngModel)]="addForm.maxIops" name="maxIops"> MB/s</label>
-                </clr-radio-wrapper>
-              </clr-radio-container>
+              <!-- 交通管制对象 带宽 上限-->
+              <clr-checkbox-container *ngIf="addForm.contolPolicy==='up'">
+                <label>{{'vmfs.trafficControlObject' | translate}}</label>
+                <clr-checkbox-wrapper>
+                  <input type="checkbox" [(ngModel)]="maxbandwidthChoose" name="maxbandwidthChoose" clrCheckbox/>
+                  <label>
+                    {{'vmfs.bandwidthLimitUpper' | translate}}
+                    <input type="number"  min="0" [(readOnly)]="!maxbandwidthChoose" class="inputOneLine" name="maxBandwidth"
+                           [(ngModel)]="addForm.maxBandwidth" (blur)="qosBlur('add', 'maxbandwidth');"/>
+                    {{'vmfs.unitM' | translate}}
+                  </label>
+                </clr-checkbox-wrapper>
+              </clr-checkbox-container>
+              <!-- 交通管制对象 IOPS 上限-->
+              <clr-checkbox-container *ngIf="addForm.contolPolicy==='up'">
+                <label></label>
+                <clr-checkbox-wrapper>
+                  <input type="checkbox" [(ngModel)]="maxiopsChoose" name="maxiopsChoose" clrCheckbox/>
+                  <label>
+                    {{'vmfs.IOPSLimitUpper' | translate}}
+                    <input type="number" min="0" [(readOnly)]="!maxiopsChoose" class="inputOneLine" name="maxIops"
+                           [(ngModel)]="addForm.maxIops" (blur)="qosBlur('add', 'maxiops');"/>
+                  </label>
+                </clr-checkbox-wrapper>
+              </clr-checkbox-container>
 
-              <clr-radio-container *ngIf="addForm.contolPolicy==='low'">
-                <label>{{'nfs.tfo' | translate}}</label>
-                <clr-radio-wrapper>
-                  <input type="radio" clrRadio name="tfo" required value="1"/>
-                  <label>{{'nfs.qos_bandwidth' | translate}}>=<input class="inputOneLine" type="text" name="minBandwidth" [(ngModel)]="addForm.minBandwidth"> MB/s</label>
-                </clr-radio-wrapper>
-                <clr-radio-wrapper>
-                  <input type="radio" clrRadio name="tfo" required/>
-                  <label>{{'nfs.qos_iops' | translate}}>=<input class="inputOneLine" type="text" [(ngModel)]="addForm.minIops" name="minIops"> MB/s</label>
-                </clr-radio-wrapper>
-                <clr-radio-wrapper>
-                  <input type="radio" clrRadio name="tfo" required value="3"/>
-                  <label>{{'nfs.qos_latency' | translate}}<=<input class="inputOneLine" type="text" [(ngModel)]="addForm.latency" name="latency"> ms</label>
-                </clr-radio-wrapper>
-              </clr-radio-container>
+              <!-- 交通管制对象 带宽 下限-->
+              <clr-checkbox-container *ngIf="addForm.contolPolicy==='low'">
+                <label>{{'vmfs.trafficControlObject' | translate}}</label>
+                <clr-checkbox-wrapper>
+                  <input type="checkbox" [(ngModel)]="minbandwidthChoose" name="minbandwidthChoose" clrCheckbox/>
+                  <label>
+                    {{'vmfs.bandwidthLimitLower' | translate}}
+                    <input type="number" min="0" [(readOnly)]="!minbandwidthChoose" class="inputOneLine"
+                           name="minBandwidth" [(ngModel)]="addForm.minBandwidth" (blur)="qosBlur('add', 'minbandwidth');"/>
+                    {{'vmfs.unitM' | translate}}
+                  </label>
+                </clr-checkbox-wrapper>
+              </clr-checkbox-container>
+              <!-- 交通管制对象 IOPS 下限-->
+              <clr-checkbox-container *ngIf="addForm.contolPolicy==='low'">
+                <label></label>
+                <clr-checkbox-wrapper>
+                  <input type="checkbox" [(ngModel)]="miniopsChoose" name="minbandwidthChoose" clrCheckbox/>
+                  <label>
+                    {{'vmfs.IOPSLimitLower' | translate}}
+                    <input type="number" min="0" [(readOnly)]="!miniopsChoose" class="inputOneLine" name="minIops"
+                           [(ngModel)]="addForm.minIops" (blur)="qosBlur('add', 'miniops');"/>
+                  </label>
+                </clr-checkbox-wrapper>
+              </clr-checkbox-container>
+              <!-- 交通管制对象 latency 时延-->
+              <clr-checkbox-container *ngIf="addForm.contolPolicy==='low'">
+                <label></label>
+                <clr-checkbox-wrapper>
+                  <input type="checkbox" [(ngModel)]="latencyChoose" name="latencyChoose" clrCheckbox/>
+                  <label>
+                    {{'vmfs.latencyMax' | translate}}
+                    <input type="number" min="0" [(readOnly)]="!latencyChoose" class="inputOneLine" name="latency"
+                           [(ngModel)]="addForm.latency" (blur)="qosBlur('add', 'latency');"/>{{'vmfs.latencyUnit' | translate}}
+                  </label>
+                </clr-checkbox-wrapper>
+              </clr-checkbox-container>
             </div>
           </div>
           <clr-toggle-wrapper>
@@ -270,7 +355,7 @@
             <input type="checkbox" name="thin" clrToggle [(ngModel)]="addForm.thin"/>
           </clr-toggle-wrapper>
           <!--重删-->
-          <clr-select-container>
+          <clr-select-container class="selectClass">
             <label>{{'nfs.dataDedu' | translate}}</label>
             <select clrSelect [(ngModel)]="addForm.deduplicationEnabled" name="deduplicationEnabled">
               <option value="false">{{'nfs.disable' | translate}}</option>
@@ -278,7 +363,7 @@
             </select>
           </clr-select-container>
           <!--压缩-->
-          <clr-select-container>
+          <clr-select-container class="selectClass">
             <label>{{'nfs.dataCompre' | translate}}</label>
             <select clrSelect [(ngModel)]="addForm.compressionEnabled" name="compressionEnabled">
               <option value="false">{{'nfs.disable' | translate}}</option>
@@ -291,8 +376,14 @@
           </clr-toggle-wrapper>
         </div>
       </form>
+      <ng-template clrPageButtons>
+        <clr-wizard-button (click)="backToNfsList()" [type]="'custom-cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
+        <clr-wizard-button [type]="'previous'">{{'menu.previous' | translate}}</clr-wizard-button>
+        <clr-wizard-button (click)="addNfs();" [type]="'custom-finish'">{{'menu.ok' | translate}}</clr-wizard-button>
+      </ng-template>
     </clr-wizard-page>
   </clr-wizard>
+
   <!--编辑弹框-->
   <clr-modal [(clrModalOpen)]="modifyShow">
     <h3 class="modal-title">{{'menu.modify' | translate}}</h3>
@@ -395,148 +486,6 @@
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="modifyShow = false">{{'menu.cancel' | translate}}</button>
       <button type="button" class="btn btn-primary" (click)="modifyCommit()">{{'menu.ok' | translate}}</button>
-    </div>
-  </clr-modal>
-  <!--扩容弹窗-->
-  <clr-modal [(clrModalOpen)]="expand">
-    <h3 class="modal-title">{{'menu.expand' | translate}}</h3>
-    <div class="modal-body">
-      <form  clrForm>
-        <clr-input-container>
-          <label>{{'nfs.oldCapacity' | translate}}</label>
-          <input clrInput name="oldCapacity" [(ngModel)]="oldCapacity" [readonly]="true"/>
-        </clr-input-container>
-        <clr-input-container>
-          <label>{{'nfs.expandSize' | translate}}</label>
-          <div clrInput style="float: left;position: relative;">
-            <input clrInput style="width: 70%;border-bottom: none" type="number" [(ngModel)]="newCapacity" name="newCapacity" #number="ngModel"
-                   onkeyup="this.value.match(/\d+(\.\d{0,2})?/)? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''" required/>
-            <select class="capacity" [(ngModel)]="unit" clrInput style="width: 30%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;"  name="unit" >
-              <option value="TB">TB</option>
-              <option value="GB">GB</option>
-              <option value="MB">MB</option>
-              <option value="KB">KB</option>
-            </select>
-          </div>
-        </clr-input-container>
-      </form>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-outline" (click)="expand = false">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="expandData()">{{'menu.ok' | translate}}</button>
-    </div>
-  </clr-modal>
-  <!--缩容弹窗-->
-  <clr-modal [(clrModalOpen)]="reduceOpen">
-    <h3 class="modal-title">{{'menu.expand' | translate}}</h3>
-    <div class="modal-body">
-      <form  clrForm>
-        <clr-input-container>
-          <label>{{'nfs.oldCapacity' | translate}}</label>
-          <input clrInput name="oldCapacity" [(ngModel)]="oldCapacity" [readonly]="true"/>
-        </clr-input-container>
-        <clr-input-container>
-          <label>{{'nfs.expandSize' | translate}}</label>
-          <div clrInput style="float: left;position: relative;">
-            <input clrInput style="width: 70%;border-bottom: none" type="number" [(ngModel)]="newCapacity" name="newCapacity" #number="ngModel"
-                   onkeyup="this.value.match(/\d+(\.\d{0,2})?/)? this.value.match(/\d+(\.\d{0,2})?/)[0] : ''" required/>
-            <select class="capacity" [(ngModel)]="unit" clrInput style="width: 30%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;"  name="unit" >
-              <option value="TB">TB</option>
-              <option value="GB">GB</option>
-              <option value="MB">MB</option>
-              <option value="KB">KB</option>
-            </select>
-          </div>
-        </clr-input-container>
-      </form>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-outline" (click)="expand = false">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="reduceCommit()">{{'menu.ok' | translate}}</button>
-    </div>
-  </clr-modal>
-  <!--挂载弹窗-->
-  <clr-modal [(clrModalOpen)]="mountShow">
-    <h3 class="modal-title">{{'nfs.mount.mount' | translate}}</h3>
-    <div class="modal-body">
-      <form *ngIf="rowSelected.length === 1" clrForm>
-
-        <clr-radio-container clrInline>
-          <label class="floatleft">{{'nfs.mount.mountObj' | translate}}</label>
-          <clr-radio-wrapper>
-            <input type="radio" clrRadio name="controlPolicy" value="1" [(ngModel)]="mountObj" ng-checked="true"/>
-            <label>{{'nfs.mount.host' | translate}}</label>
-          </clr-radio-wrapper>
-          <clr-radio-wrapper>
-            <input type="radio" clrRadio name="controlPolicy" value="2"  [(ngModel)]="mountObj" />
-            <label>{{'nfs.mount.cluster' | translate}}</label>
-          </clr-radio-wrapper>
-        </clr-radio-container>
-
-
-
-        <clr-combobox-container *ngIf="mountObj==='1'">
-          <label>{{'nfs.mount.host' | translate}}</label>
-          <clr-combobox [(ngModel)]="mountForm.hosts" name="hosts" clrMulti="true" required>
-            <ng-container *clrOptionSelected="let selected">
-              <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon> {{selected?.hostName}}
-            </ng-container>
-            <clr-options>
-              <clr-option *clrOptionItems="let state of hostList; field:'hostName'" [clrValue]="state">
-                <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon>{{state.hostName}}
-              </clr-option>
-            </clr-options>
-          </clr-combobox>
-        </clr-combobox-container>
-
-        <clr-combobox-container *ngIf="mountObj==='2'">
-          <label>{{'nfs.mount.cluster' | translate}}</label>
-          <clr-combobox [(ngModel)]="mountForm.clusters" name="clusters" clrMulti="true" required>
-            <ng-container *clrOptionSelected="let selected">
-              <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon> {{selected?.clusterName}}
-            </ng-container>
-            <clr-options>
-              <clr-option *clrOptionItems="let state of clusterList; field:'clusterName'" [clrValue]="state">
-                <clr-icon shape="sun" role="img" aria-label="Sun is shining"></clr-icon>{{state.clusterName}}
-              </clr-option>
-            </clr-options>
-          </clr-combobox>
-        </clr-combobox-container>
-
-        <clr-select-container>
-          <label>{{'nfs.mount.mountType' | translate}}</label>
-          <select clrSelect [(ngModel)]="mountForm.mountType" name="mountType">
-            <option value="readOnly">{{'nfs.mount.readOnly' | translate}}</option>
-            <option value="readWrite">{{'nfs.mount.readWrite' | translate}}</option>
-          </select>
-        </clr-select-container>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline" (click)="mountShow = false">{{'menu.cancel' | translate}}</button>
-          <button type="button" class="btn btn-primary" (click)="mountSubmit()">{{'menu.ok' | translate}}</button>
-        </div>
-      </form>
-    </div>
-  </clr-modal>
-  <!--删除提示-->
-  <clr-modal [(clrModalOpen)]="delShow" [clrModalSize]="'sm'">
-    <h3 class="modal-title">{{'nfs.del.title' | translate}}</h3>
-    <div class="modal-body">
-      <p>{{'nfs.del.content' | translate}}</p>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-outline" (click)="delShow=false">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="delNfs()">{{'menu.ok' | translate}}</button>
-    </div>
-  </clr-modal>
-<!--卸载提示-->
-  <clr-modal [(clrModalOpen)]="unmountShow" [clrModalSize]="'sm'">
-    <h3 class="modal-title">{{'nfs.unmount.title' | translate}}</h3>
-    <div class="modal-body">
-      <p>{{'nfs.unmount.content' | translate}}</p>
-    </div>
-    <div class="modal-footer">
-      <button type="button" class="btn btn-outline" (click)="unmountShow=false">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="unmount()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 </div>

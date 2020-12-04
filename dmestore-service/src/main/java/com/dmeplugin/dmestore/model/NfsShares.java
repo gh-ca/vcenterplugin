@@ -4,78 +4,148 @@ package com.dmeplugin.dmestore.model;
  * @author lianq
  * @ClassName: NfsShare
  * @Company: GH-CA
- * @create 2020-09-03
+ * @since  2020-09-03
  */
 public class NfsShares {
-
-    //名称
+    /**
+     * 名称 .
+     */
     private String name;
-    //共享路径
+    /**
+     * 共享路径 .
+     */
     private String sharePath;
-    //存储设备id
+    /**
+     * 存储设备id .
+     */
     private String storageId;
-    //服务等级
+    /**
+     * 服务等级 .
+     */
     private String tierName;
-    //所属dtree
+    /**
+     * 所属dtree .
+     */
     private String owningDtreeName;
-    //所属文件系统名字在
+    /**
+     * 所属文件系统名字在 .
+     */
     private String fsName;
-    //所属dtreeid
+    /**
+     * 所属dtreeid .
+     */
     private String owningDtreeId;
 
+    /**
+     * getName .
+     * @return String .
+     */
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setName .
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
-
+    /**
+     * getSharePath .
+     * @return String .
+     */
     public String getSharePath() {
         return sharePath;
     }
-
-    public void setSharePath(String sharePath) {
-        this.sharePath = sharePath;
+    /**
+     * setSharePath .
+     * @param param .
+     */
+    public void setSharePath(final String param) {
+        this.sharePath = param;
     }
-
+    /**
+     * getStorageId .
+     * @return String .
+     */
     public String getStorageId() {
         return storageId;
     }
-
-    public void setStorageId(String storageId) {
-        this.storageId = storageId;
+    /**
+     * setStorageId .
+     * @param param .
+     */
+    public void setStorageId(final String param) {
+        this.storageId = param;
     }
-
+    /**
+     * getTierName .
+     * @return String .
+     */
     public String getTierName() {
         return tierName;
     }
-
-    public void setTierName(String tierName) {
-        this.tierName = tierName;
+    /**
+     * setName .
+     * @param param .
+     */
+    public void setTierName(final String param) {
+        this.tierName = param;
     }
-
+    /**
+     * getOwningDtreeName .
+     * @return String .
+     */
     public String getOwningDtreeName() {
         return owningDtreeName;
     }
-
-    public void setOwningDtreeName(String owningDtreeName) {
-        this.owningDtreeName = owningDtreeName;
+    /**
+     * setOwningDtreeName .
+     * @param param .
+     */
+    public void setOwningDtreeName(final String param) {
+        this.owningDtreeName = param;
     }
-
+    /**
+     * getFsName .
+     * @return String .
+     */
     public String getFsName() {
         return fsName;
     }
-
-    public void setFsName(String fsName) {
-        this.fsName = fsName;
+    /**
+     * setFsName .
+     * @param param .
+     */
+    public void setFsName(final String param) {
+        this.fsName = param;
     }
-
+    /**
+     * getOwningDtreeId .
+     * @return String .
+     */
     public String getOwningDtreeId() {
         return owningDtreeId;
     }
+    /**
+     * setOwningDtreeId .
+     * @param param .
+     */
+    public void setOwningDtreeId(final String param) {
+        this.owningDtreeId = param;
+    }
 
-    public void setOwningDtreeId(String owningDtreeId) {
-        this.owningDtreeId = owningDtreeId;
+    @Override
+    public final String toString() {
+        return "NfsShares{"
+            + "name='" + name + '\''
+            + ", sharePath='" + sharePath + '\''
+            + ", storageId='" + storageId + '\''
+            + ", tierName='" + tierName + '\''
+            + ", owningDtreeName='" + owningDtreeName + '\''
+            + ", fsName='" + fsName + '\''
+            + ", owningDtreeId='" + owningDtreeId + '\''
+            + '}';
     }
 }

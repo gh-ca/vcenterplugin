@@ -2,20 +2,31 @@ package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
-import com.dmeplugin.dmestore.model.*;
+import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.VcenterRuntimeException;
+import com.dmeplugin.dmestore.model.FileSystem;
+import com.dmeplugin.dmestore.model.LogicPorts;
 import com.dmeplugin.dmestore.mvc.VmfsOperationController;
-import com.dmeplugin.dmestore.utils.RestUtils;
+import com.dmeplugin.dmestore.utils.StringUtil;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author lianq
@@ -24,21 +35,22 @@ import java.util.*;
  * @date 2020/9/16 16:25
  */
 public class NfsOperationServiceImpl implements NfsOperationService {
+    private final String RESULT_FAIL = "failed";
 
-    private final String API_FS_CREATE = "/rest/fileservice/v1/filesystems/customize";
-    private static final String API_NFSSHARE_CREATE = "/rest/fileservice/v1/nfs-shares";
-    private final String API_STORAGEPOOL_LIST = "/rest/resourcedb/v1/instances/";
-    private final String API_FS_UPDATE = "/rest/fileservice/v1/filesystems";
-    private final String API_FS_QUERYONE = "/rest/fileservice/v1/filesystems/query";
-    private final String API_FILESYSTEMS_DETAIL = "/rest/fileservice/v1/filesystems/";
-    private final String API_SHARE_QUERYONE = "/rest/fileservice/v1/nfs-shares/summary";
+    private final String RESULT_SUCCESS = "success";
 
     public static final Logger LOG = LoggerFactory.getLogger(VmfsOperationController.class);
+
     private DmeAccessService dmeAccessService;
+
     private TaskService taskService;
+
     private DmeStorageService dmeStorageService;
+
     private Gson gson = new Gson();
+
     private VCSDKUtils vcsdkUtils;
+
     private DmeVmwareRalationDao dmeVmwareRalationDao;
 
     public DmeVmwareRalationDao getDmeVmwareRalationDao() {
@@ -86,126 +98,123 @@ public class NfsOperationServiceImpl implements NfsOperationService {
      * @return
      */
     @Override
-    public Map<String, Object> createNfsDatastore(Map<String, Object> params) {
+    public void createNfsDatastore(Map<String, Object> params) throws DMEException {
 
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put("code", 200);
-        resMap.put("msg", "create nfs datastore success !");
         if (params == null || params.size() == 0) {
-            resMap.put("code", 403);
-            resMap.put("msg", "params error , please check your params !");
-            return resMap;
+            throw new DMEException("403", "params error , please check your params !");
         }
         try {
             //创建fs
             Map<String, Object> fsMap = new HashMap<>();
             Map<String, Object> nfsShareMap = new HashMap<>();
-            Object filesystem_specs = params.get("filesystem_specs");
-            if (StringUtils.isEmpty(filesystem_specs)) {
-                LOG.error("{filesystem_specs}={"+filesystem_specs+"}");
+            Object filesystemSpecs = params.get("filesystem_specs");
+            if (StringUtils.isEmpty(filesystemSpecs)) {
+                LOG.error("{filesystem_specs}={" + filesystemSpecs + "}");
+                throw new DMEException("403", "{filesystem_specs}={" + filesystemSpecs + "}");
             }
 
-            String fs_name = "";
-            JsonArray jsonArray1 = gson.fromJson(gson.toJson(filesystem_specs), JsonArray.class);
+            String fsName = "";
+            JsonArray jsonArray1 = gson.fromJson(gson.toJson(filesystemSpecs), JsonArray.class);
             for (JsonElement jsonElement : jsonArray1) {
                 JsonObject element = jsonElement.getAsJsonObject();
-                fs_name = ToolUtils.jsonToStr(element.get("name"));
+                fsName = ToolUtils.jsonToStr(element.get("name"));
             }
-            fsMap.put("filesystem_specs", gson.toJson(filesystem_specs));
-            String pool_raw_id = (String)params.get("pool_raw_id");
-            String storage_id = (String)params.get("storage_id");
-            if (StringUtils.isEmpty(storage_id) || StringUtils.isEmpty(storage_id)) {
-                LOG.error("{pool_raw_id/storage_id}={"+pool_raw_id+"/"+storage_id+"}");
+            fsMap.put("filesystem_specs", gson.toJson(filesystemSpecs));
+            String poolRawId = (String) params.get("pool_raw_id");
+            String storageId = (String) params.get("storage_id");
+            if (StringUtils.isEmpty(storageId) || StringUtils.isEmpty(storageId)) {
+                LOG.error("{pool_raw_id/storage_id}={" + poolRawId + "/" + storageId + "}");
+                throw new DMEException("403", "{pool_raw_id/storage_id}={" + poolRawId + "/" + storageId + "}");
             }
-            fsMap.put("pool_raw_id", pool_raw_id);
-            fsMap.put("storage_id", storage_id);
-            //todo 存储池不具备smartQut功能
+            fsMap.put("pool_raw_id", poolRawId);
+            fsMap.put("storage_id", storageId);
             Object tuning = params.get("tuning");
             if (!StringUtils.isEmpty(tuning)) {
-                fsMap.put("tuning", tuning);
+                Map<String, Object> tuningMap = gson.fromJson(tuning.toString(), Map.class);
+                Object qoPolicy = params.get("qos_policy");
+                if (qoPolicy != null) {
+                    tuningMap.put("qos_policy", qoPolicy);
+                }
+                fsMap.put("tuning", tuningMap);
+            }
+
+            Object capacityAutonegotiation = params.get("capacity_autonegotiation");
+            if (!StringUtils.isEmpty(capacityAutonegotiation)) {
+                fsMap.put("capacity_autonegotiation", capacityAutonegotiation);
             }
             //可以挂载多个
-            List<Map<String,String>> mounts = new ArrayList<>();
+            List<Map<String, String>> mounts = new ArrayList<>();
             Map<String, String> mount = new HashMap<>();
             List<Object> reqNfsShareClientArrayAdditions = new ArrayList<>();
-            Object nfs_share_client_addition = params.get("nfs_share_client_addition");
-            List<Map<String, Object>> nfsShareClientArrayAddition = (List<Map<String, Object>>) nfs_share_client_addition;
-            String share_name = "";
-            if (nfs_share_client_addition != null) {
+            Object nfsShareClientAddition = params.get("nfs_share_client_addition");
+            List<Map<String, Object>> nfsShareClientArrayAddition = (List<Map<String, Object>>) nfsShareClientAddition;
+            String shareName = "";
+            if (nfsShareClientAddition != null) {
                 Map<String, Object> reqNfsShareClientArrayAddition = new HashMap<>();
                 for (int i = 0; i < nfsShareClientArrayAddition.size(); i++) {
                     Map<String, Object> shareClientHostMap = nfsShareClientArrayAddition.get(i);
-                    if (shareClientHostMap != null && shareClientHostMap.size() > 0 && shareClientHostMap.get("objectId") != null) {
+                    if (shareClientHostMap != null && shareClientHostMap.size() > 0
+                        && shareClientHostMap.get("objectId") != null) {
                         reqNfsShareClientArrayAddition.put("name", shareClientHostMap.get("name"));
                         //设置创建nfs默认值
-                        reqNfsShareClientArrayAddition.put("accessval", "read-only");
+                        /*reqNfsShareClientArrayAddition.put("accessval", "read-only");
                         reqNfsShareClientArrayAddition.put("sync", "synchronization");
                         reqNfsShareClientArrayAddition.put("all_squash", "all_squash");
                         reqNfsShareClientArrayAddition.put("root_squash", "root_squash");
-                        reqNfsShareClientArrayAddition.put("secure", "insecure");
+                        reqNfsShareClientArrayAddition.put("secure", "insecure");*/
+                        reqNfsShareClientArrayAddition.put("permission", "read-only");
+                        reqNfsShareClientArrayAddition.put("write_mode", "synchronization");
+                        reqNfsShareClientArrayAddition.put("permission_constraint", "all_squash");
+                        reqNfsShareClientArrayAddition.put("root_permission_constraint", "root_squash");
+                        reqNfsShareClientArrayAddition.put("source_port_verification", "insecure");
                         mount.put((String) shareClientHostMap.get("objectId"), (String) shareClientHostMap.get("name"));
                     }
                     reqNfsShareClientArrayAdditions.add(reqNfsShareClientArrayAddition);
                 }
                 mounts.add(mount);
-                Object create_nfs_share_param = params.get("create_nfs_share_param");
-                Map<String, Object> create_nfs_share_params = null;
-                if (!StringUtils.isEmpty(create_nfs_share_param)) {
-                    create_nfs_share_params = gson.fromJson(gson.toJson(create_nfs_share_param), Map.class);
-                    if (create_nfs_share_params != null && create_nfs_share_params.size() > 0) {
-                        create_nfs_share_params.put("nfs_share_client_addition", reqNfsShareClientArrayAdditions);
-                        share_name = (String) create_nfs_share_params.get("name");
-                        Object show_snapshot_enable = params.get("show_snapshot_enable");
-                        if (!StringUtils.isEmpty(show_snapshot_enable)) {
-                            create_nfs_share_params.put("show_snapshot_enable", gson.toJson(show_snapshot_enable));
+                Object createNfsShareParam = params.get("create_nfs_share_param");
+                Map<String, Object> createNfsShareParams = null;
+                if (!StringUtils.isEmpty(createNfsShareParam)) {
+                    createNfsShareParams = gson.fromJson(gson.toJson(createNfsShareParam), Map.class);
+                    if (createNfsShareParams != null && createNfsShareParams.size() > 0) {
+                        createNfsShareParams.put("nfs_share_client_addition", reqNfsShareClientArrayAdditions);
+                        shareName = (String) createNfsShareParams.get("name");
+                        Object showSnapshotEnable = params.get("show_snapshot_enable");
+                        if (!StringUtils.isEmpty(showSnapshotEnable)) {
+                            createNfsShareParams.put("show_snapshot_enable", gson.toJson(showSnapshotEnable));
                         }
-                        nfsShareMap.put("create_nfs_share_param", create_nfs_share_params);
+                        nfsShareMap.put("create_nfs_share_param", createNfsShareParams);
                     }
                 }
             }
-            String storage_pool_id =(String) params.get("storage_pool_id");
-            if (StringUtils.isEmpty(storage_pool_id)) {
-                LOG.error("storage_pool_id={"+storage_pool_id+"}");
+            String storagePoolId = (String) params.get("storage_pool_id");
+            if (StringUtils.isEmpty(storagePoolId)) {
+                LOG.error("storage_pool_id={" + storagePoolId + "}");
             }
-            String task_id = "";
-            Map<String, Object> fileSystem = createFileSystem(fsMap, storage_pool_id);
-            int fsCode = ToolUtils.getInt(fileSystem.get("code"));
-            if (fsCode == 202) {
-                task_id = fileSystem.get("data").toString();
-            }
-            String nfsName = (String)params.get("nfsName");
+            String taskId = createFileSystem(fsMap, storagePoolId);
+            String nfsName = (String) params.get("nfsName");
             if (StringUtils.isEmpty(nfsName)) {
-                LOG.error("nfsName={"+nfsName+"}");
+                LOG.error("nfsName={" + nfsName + "}");
             }
             String fsId = "";
-            String share_id = "";
-            List<String> task_ids = new ArrayList<>();
-            if (!StringUtils.isEmpty(task_id)) {
-                task_ids.add(task_id);
-                Boolean flag = taskService.checkTaskStatus(task_ids);
-                if (flag) {
-                    fsId = getFsIdByName(fs_name);
-                }else {
-                    resMap.put("code", 403);
-                    resMap.put("msg", "create FileSystem fail");
-                    return resMap;
+            String shareId = "";
+            List<String> taskIds = new ArrayList<>();
+            if (!StringUtils.isEmpty(taskId)) {
+                taskIds.add(taskId);
+                if (taskService.checkTaskStatus(taskIds)) {
+                    fsId = getFsIdByName(fsName);
+                } else {
+                    throw new DMEException("403", "create FileSystem fail");
                 }
                 if (!"".equals(fsId)) {
                     nfsShareMap.put("fs_id", fsId);
-                    Map<String, Object> nfsShare = createNfsShare(nfsShareMap);
-                    if (ToolUtils.getInt(nfsShare.get("code"))==202) {
-                        String nfsShareTaskId = (String) nfsShare.get("data");
-                        List<String> shareIds = new ArrayList<>();
-                        if (!StringUtils.isEmpty(nfsShareTaskId)) {
-                            shareIds.add(nfsShareTaskId);
-                            Boolean share_flag = taskService.checkTaskStatus(shareIds);
-                            if (share_flag) {
-                                //查询shareId
-                                share_id = getShareIdByName(share_name, fs_name);
-                            }
-                        }
-                        if (!StringUtils.isEmpty(share_id)) {
-                            resMap.put("share_id", share_id);
+                    String nfsShareTaskId = createNfsShare(nfsShareMap);
+                    List<String> shareIds = new ArrayList<>();
+                    if (!StringUtils.isEmpty(nfsShareTaskId)) {
+                        shareIds.add(nfsShareTaskId);
+                        if (taskService.checkTaskStatus(shareIds)) {
+                            //查询shareId
+                            shareId = getShareIdByName(shareName, fsName);
                         }
                     }
                 }
@@ -213,161 +222,119 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             //query oriented logic portv by storage_id
             String serverHost = "";
             String logicPortName = "";
-            String current_port_id = String.valueOf(params.get("current_port_id"));
-            Map<String, String> logicMap = getMgmtByStorageId(storage_id, current_port_id);
+            String currentPortId = String.valueOf(params.get("current_port_id"));
+            Map<String, String> logicMap = getMgmtByStorageId(storageId, currentPortId);
             if (logicMap != null && logicMap.size() != 0) {
                 serverHost = logicMap.get("mgmt");
                 logicPortName = logicMap.get("logicPortName");
             }
-            String exportPath = (String)params.get("exportPath");
-            String type = (String)params.get("type");
-            String accessMode = (String)params.get("accessMode");
+            String exportPath = (String) params.get("exportPath");
+            String type = (String) params.get("type");
+            String securityType = ToolUtils.getStr(params.get("securityType"), "");
+            String accessMode = (String) params.get("accessMode");
 
-            if (StringUtils.isEmpty(serverHost) || StringUtils.isEmpty(exportPath) || StringUtils.isEmpty(accessMode) || mounts.size() == 0) {
-                resMap.put("code", 403);
-                resMap.put("msg", "params error , please check your params !");
-                return resMap;
+            if (StringUtils.isEmpty(serverHost) || StringUtils.isEmpty(exportPath) || StringUtils.isEmpty(accessMode)
+                || mounts.size() == 0) {
+                throw new DMEException("403", "params error , please check your params !");
             }
-            String result = vcsdkUtils.createNfsDatastore(serverHost, exportPath, nfsName, accessMode, mounts, type);
-            if ("failed".equals(result)) {
-                resMap.put("code", 403);
-                resMap.put("msg", "create nfs datastore error!");
-                return resMap;
+            String result = vcsdkUtils.createNfsDatastore(serverHost, exportPath, nfsName, accessMode, mounts, type,
+                securityType);
+            if (RESULT_FAIL.equals(result)) {
+                throw new VcenterRuntimeException("403", "create nfs datastore error!");
             }
             //save datastore info to DP_DME_VMWARE_RELATION
-            saveNfsInfoToDmeVmwareRelation(result,current_port_id,logicPortName,storage_id,fsId,share_name,share_id,fs_name);
+            saveNfsInfoToDmeVmwareRelation(result, currentPortId, logicPortName, fsId, shareName, shareId, fsName);
         } catch (Exception e) {
             LOG.error("create nfs datastore error", e);
-            resMap.put("code", 403);
-            resMap.put("msg", e.getMessage());
-            return resMap;
+            throw new DMEException("403", e.getMessage());
         }
-        return resMap;
     }
 
-    /** request params
-     *  {
-     *      String dataStoreObjectId 跳转用唯一id  必
-     *      String nfsShareName nfsShare的名字 （不能修改share的名字）
-     *      String nfsName nfsDataStore名字 必
-     *
-     *      fs params:
-     *      file_system_id String 文件系统唯一标识 必
-     *      capacity_autonegotiation 自动扩缩容 相关属性{
-     *          auto_size_enable  boolean 自动调整容量开关。 false: 关闭；true：打开。默认打开
-     *       },
-     *       name String fs名字
-     *       tuning属性 （高级属性设置）{
-     *             deduplication_enabled  boolean 重复数据删除。默认关闭
-     *             compression_enabled  boolean 数据压缩。默认关闭
-     *             allocation_type str 文件系统分配类型，取值范围 thin，thick。默认为thin
-     *        }
-     *       qos_policy 属性(开启后 需要参数){
-     *             max_bandwidth int 最大带宽，在控制上限的时候有效,与minbandwidth,miniops互斥
-     *             max_iops int 最大iops，在控制上限的时候有效,与minbandwidth,miniops互斥
-     *             min_bandwidth  int 最小带宽，在保护下限的时候有效，与maxbandwidth,maxiops互斥
-     *             min_iops  int 最小iops，在保护下限的时候有效, 与maxbandwidth,maxiops互斥
-     *             latency int 时延，单位ms 仅保护下限支持该参数
-     *             }
-     *
-     *       nfs share :
-     *       nfs_share_id string NFS共享的唯一标识 必  (id) 暂时不能确定是否需要，需要等dme能创建share时候才能确定是否需要修改share
-     *  }
-     *
+    /**
      * @param params
-     * @return
      */
     @Override
-    public Map<String, Object> updateNfsDatastore(Map<String, Object> params) {
-
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put("code", 202);
-        resMap.put("msg", "update nfs datastore success !");
+    public void updateNfsDatastore(Map<String, Object> params) throws DMEException {
 
         if (params == null || params.size() == 0) {
             LOG.error("params error , please check it! reqParams=" + params);
-            resMap.put("code", 403);
-            resMap.put("msg", "params error , please check it!");
-            return resMap;
+            throw new DMEException("403", "params error , please check it!");
         }
         String dataStoreObjectId = (String) params.get("dataStoreObjectId");
         String nfsName = (String) params.get("nfsName");
-        if (StringUtils.isEmpty(dataStoreObjectId)||StringUtils.isEmpty(nfsName)) {
+        if (StringUtils.isEmpty(dataStoreObjectId) || StringUtils.isEmpty(nfsName)) {
             LOG.error("params error , please check it! dataStoreObjectId=" + dataStoreObjectId);
-            resMap.put("code", 403);
-            resMap.put("msg", "params error , please check it!");
-            return resMap;
+            throw new DMEException("403", "params error , please check it!");
         }
         //update fs
         Map<String, Object> fsReqBody = new HashMap<>();
-        Map<String,Object> tuning = gson.fromJson(gson.toJson(params.get("tuning")), Map.class);
-        Map<String,Object> qos_policy = gson.fromJson(gson.toJson(params.get("qos_policy")), Map.class);
-        String name = (String)params.get("name");
+        Map<String, Object> tuning = gson.fromJson(gson.toJson(params.get("tuning")), Map.class);
+        Map<String, Object> qosPolicy = gson.fromJson(gson.toJson(params.get("qos_policy")), Map.class);
+        String name = (String) params.get("name");
         if (!StringUtils.isEmpty(name)) {
             fsReqBody.put("name", name);
         }
-
-        if (tuning!=null&&tuning.size()!=0) {
-            if (qos_policy!=null&&qos_policy.size()!=0) {
-                tuning.put("qos_policy", qos_policy);
+        if (tuning != null && tuning.size() != 0) {
+            if (qosPolicy != null && qosPolicy.size() != 0) {
+                tuning.put("qos_policy", qosPolicy);
             }
             fsReqBody.put("tuning", tuning);
         }
-
-        String file_system_id = (String) params.get("file_system_id");
-        Object capacity_autonegotiation = params.get("capacity_autonegotiation");
-        if (capacity_autonegotiation != null) {
-            fsReqBody.put("capacity_autonegotiation", capacity_autonegotiation);
+        String fileSystemId = (String) params.get("file_system_id");
+        Object capacityAutonegotiation = params.get("capacity_autonegotiation");
+        if (capacityAutonegotiation != null) {
+            fsReqBody.put("capacity_autonegotiation", capacityAutonegotiation);
         }
         try {
-            if (!StringUtils.isEmpty(file_system_id)) {
-                Map<String, Object> stringObjectMap = updateFileSystem(fsReqBody,file_system_id);
-                int code = ToolUtils.getInt(stringObjectMap.get("code"));
-                if (code == 202) {
-                    LOG.info("{fs}"+stringObjectMap.get("msg"));
-                } else {
-                    LOG.info("{fs}"+stringObjectMap.get("msg"));
-                    resMap.put("msg",stringObjectMap.get("msg"));
+            if (!StringUtils.isEmpty(fileSystemId)) {
+                String taskId = updateFileSystem(fsReqBody, fileSystemId);
+                //检查任务状态
+                List<String> taskIds = new ArrayList<>(10);
+                taskIds.add(taskId);
+                Boolean flag = taskService.checkTaskStatus(taskIds);
+                if (!flag) {
+                    LOG.info("{" + fileSystemId + "}update file system failed!");
+                    throw new DMEException("400", "update file system failed");
                 }
             }
             //update nfs datastore
             String result = vcsdkUtils.renameDataStore(nfsName, dataStoreObjectId);
-            if ("success".equals(result)) {
-                LOG.info("{"+nfsName+"}rename nfs datastore success!");
+            if (RESULT_SUCCESS.equals(result)) {
+                LOG.info("{" + nfsName + "}rename nfs datastore success!");
             }
         } catch (Exception e) {
-            LOG.error( "update nfs datastore error !",e);
-            resMap.put("code", 503);
-            resMap.put("msg", e.getMessage());
+            LOG.error("update nfs datastore error !", e);
+            throw new DMEException("503", e.getMessage());
         }
-        return resMap;
     }
 
     @Override
-    public ResponseBodyBean changeNfsCapacity(Map<String, Object> params) {
+    public void changeNfsCapacity(Map<String, Object> params) throws DMEException {
 
-        ResponseBodyBean responseBodyBean = new ResponseBodyBean();
-        responseBodyBean.setCode("202");
-        responseBodyBean.setDescription("change nfs storage capacity success!");
         if (params == null || params.size() == 0) {
-            responseBodyBean.setCode("202");
-            responseBodyBean.setDescription("change nfs storage capacity error,params error!");
-            return responseBodyBean;
+            throw new DMEException("503", "change nfs storage capacity error,params error!");
         }
-        String file_system_id = (String) params.get("fileSystemId");
-        Boolean is_expand = (Boolean) params.get("expand");
+        String storeObjectId = (String) params.get("storeObjectId");
+        String fileSystemId = (String) params.get("fileSystemId");
+        Boolean isExpand = (Boolean) params.get("expand");
         Double capacity = Double.valueOf(params.get("capacity").toString());
-        if (StringUtils.isEmpty(file_system_id) ||StringUtils.isEmpty(is_expand)||StringUtils.isEmpty(capacity)) {
-            responseBodyBean.setCode("202");
-            responseBodyBean.setDescription("change nfs storage capacity error,params error!");
-            return responseBodyBean;
+        if ((StringUtils.isEmpty(storeObjectId) || StringUtils.isEmpty(fileSystemId)) || StringUtils.isEmpty(isExpand)
+            || StringUtils.isEmpty(capacity)) {
+            throw new DMEException("400", "change nfs storage capacity error,params error!");
         }
-        String url = API_FS_UPDATE + "/" + file_system_id;
+        if (!StringUtils.isEmpty(storeObjectId)) {
+            List<String> fsIds = dmeVmwareRalationDao.getFsIdsByStorageId(storeObjectId);
+            if (fsIds.size() > 0) {
+                //如果objectid存在，则通过objectid的关系表来获取fsid
+                fileSystemId = fsIds.get(0);
+            }
+        }
+        String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace( "{file_system_id}", fileSystemId);
         //查询指定fs拿对应的信息
         Integer code = 0;
         try {
             FileSystem fileSystem = null;
-            Map<String, String> orientedFileSystem = getOrientedFs(file_system_id);
+            Map<String, String> orientedFileSystem = getOrientedFs(fileSystemId);
             if ("200".equals(orientedFileSystem.get("code"))) {
                 String fs = orientedFileSystem.get("data");
                 if (!StringUtils.isEmpty(fs)) {
@@ -375,100 +342,96 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 }
             }
             if (fileSystem != null) {
-                String storage_id = fileSystem.getStorageId();
-                String storage_pool_name = fileSystem.getStoragePoolName();
-                Double min_size_fs_capacity = fileSystem.getMinSizeFsCapacity();
-                Double available_capacity = fileSystem.getAvailableCapacity();
-                String alloc_type = fileSystem.getAllocType();
+                String storageId = fileSystem.getStorageId();
+                String storagePoolName = fileSystem.getStoragePoolName();
+                Double minSizeFsCapacity = fileSystem.getMinSizeFsCapacity();
+                Double availableCapacity = fileSystem.getAvailableCapacity();
+                String allocType = fileSystem.getAllocType();
                 Double currentCapacity = fileSystem.getCapacity();
                 //查询存储池可用空间
-                Double data_space = getDataspaceOfStoragepool(storage_pool_name, null, storage_id);
+                Double dataSpace = getDataspaceOfStoragepool(storagePoolName, null, storageId);
                 Double exchangedCapacity = 0.0;
                 Double changeCapacity = capacity;
-                if (is_expand) {
+                if (isExpand) {
                     //扩容
-                    if (data_space != null && Double.compare(changeCapacity, data_space) > 1) {
+                    if (dataSpace != null && Double.compare(changeCapacity, dataSpace) > 1) {
                         LOG.info("扩容量超出存储池可用容量，将当前存储池可用容量当做扩容量!");
-                        changeCapacity = data_space;
+                        changeCapacity = dataSpace;
                     }
                     exchangedCapacity = changeCapacity + currentCapacity;
-                } else if(!is_expand) {
+                } else if (!isExpand) {
                     //缩容
-                    if (!StringUtils.isEmpty(alloc_type) && "thin".equals(alloc_type)) {
+                    if (!StringUtils.isEmpty(allocType) && "thin".equals(allocType)) {
                         //thin 分配策略缩容
                         // 该文件系统总容量-可用容量-文件系统能缩容的最小空间=实际可用缩小容量    与变化量进行比较
-                        if (currentCapacity - changeCapacity >= min_size_fs_capacity) {
-                            if (Double.compare(changeCapacity, available_capacity) > 1) {
+                        if (currentCapacity - changeCapacity >= minSizeFsCapacity) {
+                            if (Double.compare(changeCapacity, availableCapacity) > 1) {
                                 LOG.info("thin策略：nfs预计缩容到Thin文件系统能缩容的最小空间!");
-                                exchangedCapacity = currentCapacity - available_capacity;
+                                exchangedCapacity = currentCapacity - availableCapacity;
                             } else {
                                 exchangedCapacity = currentCapacity - changeCapacity;
                             }
-                        }else {
+                        } else {
                             exchangedCapacity = currentCapacity;
-                            responseBodyBean.setCode("400");
-                            responseBodyBean.setDescription("FileSystem:{id:"+file_system_id+"}未达到能缩容条件,FileSystem缩容后容量不得小于:"+min_size_fs_capacity+"GB");
-                            LOG.info("FileSystem:{"+file_system_id+"}未达到能缩容条件,FileSystem缩容后条件容量不得小于:"+min_size_fs_capacity+"GB");
+                            LOG.info(
+                                "FileSystem:{" + fileSystemId + "}未达到能缩容条件,FileSystem缩容后条件容量不得小于:" + minSizeFsCapacity
+                                    + "GB");
+                            throw new DMEException("400",
+                                "FileSystem:{id:" + fileSystemId + "}未达到能缩容条件,FileSystem缩容后容量不得小于:" + minSizeFsCapacity
+                                    + "GB");
                         }
                     } else {
-                        if (Double.compare(available_capacity, changeCapacity) > 1) {
+                        if (Double.compare(availableCapacity, changeCapacity) > 1) {
                             exchangedCapacity = currentCapacity - changeCapacity;
                         } else {
-                            exchangedCapacity = currentCapacity - available_capacity;
+                            exchangedCapacity = currentCapacity - availableCapacity;
                         }
                     }
                 }
                 Map<String, Object> reqParam = new HashMap<>();
-                reqParam.put("file_system_id", file_system_id);
-                reqParam.put("capacity",exchangedCapacity);
-                ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(reqParam));
+                reqParam.put("file_system_id", fileSystemId);
+                reqParam.put("capacity", exchangedCapacity);
+                ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT,
+                    gson.toJson(reqParam));
                 code = responseEntity.getStatusCodeValue();
-                if (code != 202) {
-                    responseBodyBean.setCode(code.toString());
-                    responseBodyBean.setDescription("expand or recycle nfs storage capacity error!");
-                    return responseBodyBean;
+                if (code != HttpStatus.ACCEPTED.value()) {
+                    throw new DMEException(String.valueOf(code), "expand or recycle nfs storage capacity error!");
                 }
                 String object = responseEntity.getBody();
                 JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-                String task_id = jsonObject.get("task_id").getAsString();
-                List<String> task_ids = new ArrayList<>();
-                task_ids.add(task_id);
-                Boolean flag = taskService.checkTaskStatus(task_ids);
+                String taskId = ToolUtils.jsonToStr(jsonObject.get("task_id"));
+                List<String> taskIds = new ArrayList<>();
+                taskIds.add(taskId);
+                Boolean flag = taskService.checkTaskStatus(taskIds);
                 if (!flag) {
-                    responseBodyBean.setDescription("expand or recycle nfs storage capacity failed!");
+                    throw new DMEException("503", "expand or recycle nfs storage capacity failed!");
                 }
-                responseBodyBean.setData("task_id:"+task_id);
+                //刷新datastore容量
+                vcsdkUtils.refreshDatastore(storeObjectId);
             }
         } catch (Exception e) {
-            LOG.error("change nfs storage capacity error!",e);
-            responseBodyBean.setCode(code.toString());
-            responseBodyBean.setDescription("change nfs storage capacity error!"+e.getMessage());
+            LOG.error("change nfs storage capacity error!", e);
+            throw new DMEException("503", "change nfs storage capacity error!" + e.getMessage());
         }
-        return responseBodyBean;
     }
 
     //create file system
-    private Map<String, Object> createFileSystem(Map<String, Object> params, String storage_pool_id) throws Exception {
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put("code", 202);
-        resMap.put("msg", "create file system success !");
+    private String createFileSystem(Map<String, Object> params, String storagePoolId) throws Exception {
         LOG.info("{params}:" + params);
 
         if (params == null || params.size() == 0) {
-            LOG.error("url:{" + API_FS_CREATE + "},param error,please check it!");
-            resMap.put("code", 403);
-            resMap.put("msg", "create file system error !");
-            return resMap;
+            LOG.error("url:{" + DmeConstants.API_FS_CREATE + "},param error,please check it!");
+            throw new DMEException("403", "create file system error !");
         }
-        String storage_id = (String) params.get("storage_id");
-        Map<String, Object> filesystem_specs = new HashMap<>();
+        String storageId = (String) params.get("storage_id");
+        Map<String, Object> filesystemSpecsMap = new HashMap<>();
         List<Map<String, Object>> filesystemSpecsLists = new ArrayList<>();
 
         Double capacity = null;
         int count = 1;
-        Double data_space = null;
-        if (!StringUtils.isEmpty(storage_id) || !StringUtils.isEmpty(storage_pool_id)) {
-            data_space = getDataspaceOfStoragepool(null, storage_pool_id, storage_id);
+        Double dataSpace = null;
+        if (!StringUtils.isEmpty(storageId) || !StringUtils.isEmpty(storagePoolId)) {
+            dataSpace = getDataspaceOfStoragepool(null, storagePoolId, storageId);
         }
         //目前一个nfs 对应一个fs (一对多通用)
         String filesystemSpecs = (String) params.get("filesystem_specs");
@@ -478,108 +441,122 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             Object objCapacity = filesystemSpec.get("capacity");
             if (objCapacity != null) {
                 capacity = Double.valueOf(objCapacity.toString());
-                if (Double.compare(capacity * count, data_space) > 1) {
-                    capacity = data_space / count;
+                if (Double.compare(capacity * count, dataSpace) > 1) {
+                    capacity = dataSpace / count;
                 }
-                filesystem_specs.put("capacity", capacity);
-                filesystem_specs.put("name", filesystemSpec.get("name"));
-                filesystem_specs.put("count", count);
-                filesystem_specs.put("start_suffix", filesystemSpec.get("start_suffix"));
+                filesystemSpecsMap.put("capacity", capacity);
+                filesystemSpecsMap.put("name", filesystemSpec.get("name"));
+                filesystemSpecsMap.put("count", count);
+                filesystemSpecsMap.put("start_suffix", filesystemSpec.get("start_suffix"));
             }
-            filesystemSpecsLists.add(filesystem_specs);
+            filesystemSpecsLists.add(filesystemSpecsMap);
         }
-        params.put("filesystem_specs",filesystemSpecsLists);
-        ResponseEntity<String> responseEntity = dmeAccessService.access(API_FS_CREATE, HttpMethod.POST , gson.toJson(params));
+        params.put("filesystem_specs", filesystemSpecsLists);
+        ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.API_FS_CREATE, HttpMethod.POST,
+            gson.toJson(params));
         int code = responseEntity.getStatusCodeValue();
-        if (code != 202) {
-            resMap.put("code", code);
-            resMap.put("msg", "create file system error !");
+        if (code != HttpStatus.ACCEPTED.value()) {
+            throw new DMEException("503", "create file system error !");
         }
         String object = responseEntity.getBody();
         JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-        String task_id = jsonObject.get("task_id").getAsString();
-        resMap.put("data", task_id);
-        return resMap;
+        return ToolUtils.jsonToStr(jsonObject.get("task_id"));
     }
+
     //create nfs share
-    private Map<String,Object> createNfsShare(Map<String,Object> params) throws Exception {
+    private String createNfsShare(Map<String, Object> params) throws Exception {
 
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put("code", 202);
-        resMap.put("msg", "create nfs share success !");
-        LOG.info("{"+params+"}");
-        ResponseEntity<String> responseEntity = dmeAccessService.access(API_NFSSHARE_CREATE, HttpMethod.POST, gson.toJson(params));
+        LOG.info("{" + params + "}");
+        ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.API_NFSSHARE_CREATE,
+            HttpMethod.POST, gson.toJson(params));
         int code = responseEntity.getStatusCodeValue();
-        if (code != 202) {
-            resMap.put("code", code);
-            resMap.put("msg", "create nfs share error !");
-            return resMap;
+        if (code != HttpStatus.ACCEPTED.value()) {
+            throw new DMEException("503", "create nfs share error !");
         }
         String object = responseEntity.getBody();
         JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-        resMap.put("data", ToolUtils.jsonToStr(jsonObject.get("task_id")));
-        return resMap;
+        return ToolUtils.jsonToStr(jsonObject.get("task_id"));
     }
-    //get oriented storage pool data_space
-    private Double getDataspaceOfStoragepool(String storage_pool_name,String pool_id,String storage_id) throws Exception {
-        Double data_space = 0.0;
-        String className = "SYS_StoragePool";
-        String url = API_STORAGEPOOL_LIST + className + "?storageDeviceId=" + storage_id;
 
-        Map<String, String> reqBody = new HashMap<>();
-        if (!StringUtils.isEmpty(pool_id)) {
-            reqBody.put("pool_id", pool_id);
-            url = url + " and pool_id=" + pool_id;
+    //get oriented storage pool data_space
+    private Double getDataspaceOfStoragepool(String storagePoolName, String poolId, String storageId) throws Exception {
+        Double dataSpace = 0.0;
+        String className = "SYS_StoragePool";
+        String url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + "?condition={json}";
+        JsonObject condition = new JsonObject();
+        JsonArray constraint = new JsonArray();
+
+        JsonObject consObj = new JsonObject();
+        JsonObject simple = new JsonObject();
+        simple.addProperty("name", "dataStatus");
+        simple.addProperty("operator", "equal");
+        simple.addProperty("value", "normal");
+        consObj.add("simple", simple);
+        constraint.add(consObj);
+
+        JsonObject consObj2 = new JsonObject();
+        JsonObject simple2 = new JsonObject();
+        simple2.addProperty("name", "storageDeviceId");
+        simple2.addProperty("operator", "storageDeviceId");
+        simple2.addProperty("value", storageId);
+        consObj2.add("simple", simple2);
+        consObj2.addProperty("logOp", "and");
+        constraint.add(consObj2);
+        JsonObject consObj1 = new JsonObject();
+        JsonObject simple1 = new JsonObject();
+        if (!StringUtils.isEmpty(poolId)) {
+            simple1.addProperty("name", "pool_id");
+            simple1.addProperty("operator", "equal");
+            simple1.addProperty("value", poolId);
+            consObj1.add("simple", simple1);
+            consObj1.addProperty("logOp", "and");
+            constraint.add(consObj1);
         }
-        if (!StringUtils.isEmpty(storage_pool_name)) {
-            reqBody.put("storage_pool_name", storage_pool_name);
-            url = url + " and storage_pool_name=" + storage_pool_name;
+        if (!StringUtils.isEmpty(storagePoolName)) {
+            simple1.addProperty("name", "storage_pool_name");
+            simple1.addProperty("operator", "equal");
+            simple1.addProperty("value", storagePoolName);
+            consObj1.add("simple", simple1);
+            consObj1.addProperty("logOp", "and");
+            constraint.add(consObj1);
         }
-        reqBody.put("storage_id",storage_id);
-        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET,null);
-        LOG.info("url:{" + API_STORAGEPOOL_LIST + "},responseEntity:" + responseEntity);
+        condition.add("constraint", constraint);
+        String s = gson.toJson(condition);
+        ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET,
+            gson.toJson(condition));
+        LOG.info("url:{" + url + "},responseEntity:" + responseEntity);
         int code = responseEntity.getStatusCodeValue();
-        if (code == 200) {
+        if (code == HttpStatus.OK.value()) {
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
             JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
             for (JsonElement jsonElement : jsonArray) {
                 JsonObject element = jsonElement.getAsJsonObject();
                 //可用空间=总容量-已用容量
-                Double total_capacity =ToolUtils.jsonToDou(element.get("totalCapacity"),0.0);
-                Double consumed_capacity = ToolUtils.jsonToDou(element.get("usedCapacity"), 0.0);
-                if (Double.max(total_capacity,consumed_capacity)==total_capacity) {
-                    data_space = total_capacity - consumed_capacity;
+                Double totalCapacity = ToolUtils.jsonToDou(element.get("totalCapacity"), 0.0);
+                Double consumedCapacity = ToolUtils.jsonToDou(element.get("usedCapacity"), 0.0);
+                if (Double.max(totalCapacity, consumedCapacity) == totalCapacity) {
+                    dataSpace = totalCapacity - consumedCapacity;
                 }
             }
         }
-        return data_space;
+        return dataSpace;
     }
 
-    private Map<String,Object> updateFileSystem(Map<String,Object> params,String file_system_id) throws Exception {
+    private String updateFileSystem(Map<String, Object> params, String fileSystemId) throws Exception {
 
-        Map<String, Object> resMap = new HashMap<>();
-        resMap.put("code", 202);
-        resMap.put("msg", "update nfs datastore success !");
-
-        if (StringUtils.isEmpty(file_system_id)) {
-            resMap.put("code", 403);
-            resMap.put("msg", "update nfs datastore error !");
-            return resMap;
+        if (StringUtils.isEmpty(fileSystemId)) {
         }
-        String url = API_FS_UPDATE + "/" + file_system_id;
+        String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace( "{file_system_id}",  fileSystemId);
 
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(params));
         int code = responseEntity.getStatusCodeValue();
-        if (code!=202) {
-            resMap.put("code", code);
-            resMap.put("msg", "update nfs datastore error !");
-            return resMap;
+        if (code != HttpStatus.ACCEPTED.value()) {
+            throw new DMEException("503", "update nfs datastore error !" + responseEntity.getBody());
         }
         String object = responseEntity.getBody();
         JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-        resMap.put("data", ToolUtils.jsonToStr(jsonObject.get("task_id")));
-        return resMap;
+        return ToolUtils.jsonToStr(jsonObject.get("task_id"));
     }
 
     private String getFsIdByName(String fsname) throws Exception {
@@ -587,8 +564,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         Map<String, String> reqMap = new HashMap<>();
         if (!StringUtils.isEmpty(fsname)) {
             reqMap.put("name", fsname);
-            ResponseEntity<String> responseEntity = dmeAccessService.access(API_FS_QUERYONE, HttpMethod.POST, gson.toJson(reqMap));
-            if (responseEntity.getStatusCodeValue() == 200) {
+            ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_FILESERVICE_QUERY_URL,
+                HttpMethod.POST, gson.toJson(reqMap));
+            if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 String object = responseEntity.getBody();
                 JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.get("data").getAsJsonArray();
@@ -605,14 +583,15 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         return fsId;
     }
 
-    private String getShareIdByName(String shareName,String fsname) throws Exception {
+    private String getShareIdByName(String shareName, String fsname) throws Exception {
         String shareId = "";
         Map<String, String> reqMap = new HashMap<>();
         if (!StringUtils.isEmpty(shareName) && !StringUtils.isEmpty(fsname)) {
             reqMap.put("name", shareName);
             reqMap.put("fs_name", fsname);
-            ResponseEntity<String> responseEntity = dmeAccessService.access(API_SHARE_QUERYONE, HttpMethod.POST, gson.toJson(reqMap));
-            if (responseEntity.getStatusCodeValue() == 200) {
+            ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL,
+                HttpMethod.POST, gson.toJson(reqMap));
+            if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 String object = responseEntity.getBody();
                 JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.get("nfs_share_info_list").getAsJsonArray();
@@ -623,24 +602,22 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                         break;
                     }
                 }
-
             }
         }
         return shareId;
     }
 
-    private Map<String,String> getMgmtByStorageId(String storage_id,String current_port_id){
+    private Map<String, String> getMgmtByStorageId(String storageId, String currentPortId) throws DMEException {
         Map<String, String> respMap = new HashMap<>();
         String mgmt = "";
         String logicName = "";
-        Map<String, Object> logicPorts = dmeStorageService.getLogicPorts(storage_id);
-        List<LogicPorts> logicPort = (List)logicPorts.get("data");
+        List<LogicPorts> logicPort = dmeStorageService.getLogicPorts(storageId);
         if (logicPort != null) {
             JsonArray jsonArray = new JsonParser().parse(gson.toJson(logicPort)).getAsJsonArray();
             for (JsonElement jsonElement : jsonArray) {
                 JsonObject element = jsonElement.getAsJsonObject();
-                String current_port_id1 = element.get("homePortId").getAsString();
-                if (!StringUtils.isEmpty(current_port_id) && current_port_id1.equals(current_port_id)) {
+                String currentPortId1 = element.get("homePortId").getAsString();
+                if (!StringUtils.isEmpty(currentPortId) && currentPortId1.equals(currentPortId)) {
                     mgmt = ToolUtils.jsonToStr(element.get("mgmtIp"));
                     logicName = ToolUtils.jsonToStr(element.get("name"));
                     break;
@@ -652,20 +629,18 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         return respMap;
     }
 
-    private Map<String, String> getOrientedFs(String file_system_id) throws Exception {
+    private Map<String, String> getOrientedFs(String fileSystemId) throws Exception {
 
         Map<String, String> resMap = new HashMap<>();
         resMap.put("code", "200");
         resMap.put("msg", "list filesystem success!");
 
-        String url = API_FILESYSTEMS_DETAIL + "/" + file_system_id;
+        String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace( "{file_system_id}", fileSystemId);
 
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         int code = responseEntity.getStatusCodeValue();
-        if (code != 200) {
-            resMap.put("code", String.valueOf(code));
-            resMap.put("msg", "list filesystem success!");
-            return resMap;
+        if (code != HttpStatus.OK.value()) {
+            throw new DMEException(String.valueOf(code), "list filesystem error!");
         }
         String object = responseEntity.getBody();
         JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
@@ -683,35 +658,95 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
     }
 
-    private void saveNfsInfoToDmeVmwareRelation(String params, String current_port_id, String logicPortName, String storage_id,
-                                                String fsId, String share_name, String share_id, String fs_name) {
+    private void saveNfsInfoToDmeVmwareRelation(String params, String currentPortId, String logicPortName, String fsId,
+        String shareName, String shareId, String fsName) throws DMEException {
 
-        DmeVmwareRelation datastoreInfo = gson.fromJson(params, DmeVmwareRelation.class);
-        datastoreInfo.setLogicPortId(current_port_id);
-        datastoreInfo.setLogicPortName(logicPortName);
-        datastoreInfo.setFsId(fsId);
-        datastoreInfo.setFsName(fs_name);
-        datastoreInfo.setShareName(share_name);
-        datastoreInfo.setShareId(share_id);
-        List<DmeVmwareRelation> dmeVmwareRelations = new ArrayList<>();
-        dmeVmwareRelations.add(datastoreInfo);
-        dmeVmwareRalationDao.save(dmeVmwareRelations);
+        if (!StringUtils.isEmpty(params)) {
+            DmeVmwareRelation datastoreInfo = gson.fromJson(params, DmeVmwareRelation.class);
+            datastoreInfo.setLogicPortId(currentPortId);
+            datastoreInfo.setLogicPortName(logicPortName);
+            datastoreInfo.setFsId(fsId);
+            datastoreInfo.setFsName(fsName);
+            datastoreInfo.setShareName(shareName);
+            datastoreInfo.setShareId(shareId);
+            List<DmeVmwareRelation> dmeVmwareRelations = new ArrayList<>();
+            dmeVmwareRelations.add(datastoreInfo);
+            dmeVmwareRalationDao.save(dmeVmwareRelations);
+        } else {
+            throw new DMEException("save nfs datastoreInfo error");
+        }
     }
 
-    private static ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws Exception {
+    @Override
+    public Map<String, Object> getEditNfsStore(String storeObjectId) throws DMEException {
+        List<String> fsIds = dmeVmwareRalationDao.getFsIdsByStorageId(storeObjectId);
+        Map<String, Object> summaryMap = vcsdkUtils.getDataStoreSummaryByObjectId(storeObjectId);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("nfsName", String.valueOf(summaryMap.get("name")));
+        String fsname = "";
+        if (fsIds.size() <= 0) {
+            throw new DMEException("没有对应的文件系统");
+        }
+        for (int i = 0; i < fsIds.size(); i++) {
+            String fileSystemId = fsIds.get(i);
+            if (StringUtils.isEmpty(fileSystemId)) {
+                continue;
+            }
+            String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace("{file_system_id}", fileSystemId);
+            ResponseEntity<String> responseTuning = dmeAccessService.access(url, HttpMethod.GET, null);
+            if (responseTuning.getStatusCodeValue() / 100 == 2) {
+                JsonObject fsDetail = gson.fromJson(responseTuning.getBody(), JsonObject.class);
+                resultMap.put("fsName", ToolUtils.jsonToStr(fsDetail.get("name")));
+                fsname = ToolUtils.jsonToStr(fsDetail.get("name"));
+                resultMap.put("fileSystemId", fileSystemId);
+                JsonObject json = fsDetail.get("capacity_auto_negotiation").getAsJsonObject();
+                resultMap.put("autoSizeEnable", ToolUtils.jsonToBoo(json.get("auto_size_enable")));
+                boolean isThin = ("thin".equalsIgnoreCase(ToolUtils.jsonToStr(fsDetail.get("alloc_type"))))
+                    ? true
+                    : false;
+                resultMap.put("thin", isThin);
 
-        RestUtils restUtils = new RestUtils();
-        RestTemplate restTemplate = restUtils.getRestTemplate();
+                JsonObject tuning = fsDetail.get("tuning").getAsJsonObject();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+                resultMap.put("compressionEnabled", ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
+                resultMap.put("deduplicationEnabled", ToolUtils.jsonToBoo(tuning.get("deduplication_enabled")));
+                String smartQos = ToolUtils.jsonToStr(tuning.get("smart_qos"));
+                if (!StringUtils.isEmpty(smartQos)) {
+                    resultMap.put("qosFlag", true);
+                    JsonObject qosPolicy = new JsonParser().parse(smartQos).getAsJsonObject();
+                    resultMap.put("maxBandwidth", ToolUtils.jsonToInt(qosPolicy.get("max_bandwidth")));
+                    resultMap.put("maxIops", ToolUtils.jsonToInt(qosPolicy.get("max_iops")));
+                    resultMap.put("latency", ToolUtils.jsonToInt(qosPolicy.get("latency")));
+                    resultMap.put("minBandwidth", ToolUtils.jsonToInt(qosPolicy.get("min_bandwidth")));
+                    resultMap.put("minIops", ToolUtils.jsonToInt(qosPolicy.get("min_iops")));
+                } else {
+                    resultMap.put("qosFlag", false);
+                }
+            }
+            break;
+        }
 
-        ResponseEntity<String> responseEntity = restTemplate.exchange(url, method, entity, String.class);
-        LOG.info(url + "==responseEntity==" + (responseEntity == null ? "null" : responseEntity.getStatusCodeValue()));
-
-        return responseEntity;
+        //根据存储ID 获取逻nfs_share_id
+        String nfsShareId = dmeVmwareRalationDao.getShareIdByStorageId(storeObjectId);
+        if (null == nfsShareId) {
+            throw new DMEException("没有对应的共享");
+        }
+        String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace("{nfs_share_id}", nfsShareId);
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+        if (responseEntity.getStatusCodeValue() != HttpStatus.OK.value()) {
+            LOG.error("获取 NFS Share 信息失败！返回信息：{}", responseEntity.getBody());
+            return null;
+        }
+        String resBody = responseEntity.getBody();
+        JsonObject share = gson.fromJson(resBody, JsonObject.class);
+        resultMap.put("shareName", ToolUtils.jsonToStr(share.get("name")));
+        if (String.valueOf(summaryMap.get("name")).equalsIgnoreCase(fsname) && ("/" + summaryMap.get(
+            "name")).equalsIgnoreCase(ToolUtils.jsonToStr(share.get("name")))) {
+            resultMap.put("sameName", true);
+        } else {
+            resultMap.put("sameName", false);
+        }
+        return resultMap;
     }
 
 }

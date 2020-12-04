@@ -1,7 +1,6 @@
 package com.dmeplugin.dmestore.exception;
 
-
-public class IgnorableException extends VcenterException {
+public class IgnorableException extends VcenterRuntimeException {
     public IgnorableException() {
         super();
     }

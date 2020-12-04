@@ -4,26 +4,45 @@ package com.dmeplugin.dmestore.model;
  * @author lianq
  * @ClassName: CapabilitiesSmarttier
  * @Company: GH-CA
- * @create 2020-09-03
+ * @since  2020-09-03
  */
 public class CapabilitiesSmarttier {
-
+    /**
+     * enabled .
+     */
     private Boolean enabled;
+    /**
+     * policy .
+     */
     private Integer policy;
 
+    /**
+     * getEnabled .
+     * @return Boolean .
+     */
     public Boolean getEnabled() {
         return enabled;
     }
 
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+    /**
+     * setEnabled .
+     * @param param .
+     */
+    public void setEnabled(final Boolean param) {
+        this.enabled = param;
     }
-
+    /**
+     * getPolicy .
+     * @return Integer .
+     */
     public Integer getPolicy() {
         return policy;
     }
-
-    public void setPolicy(Integer policy) {
-        this.policy = policy;
+    /**
+     * setPolicy .
+     * @param param .
+     */
+    public void setPolicy(final Integer param) {
+        this.policy = param;
     }
 }

@@ -1,8 +1,8 @@
 package com.dmeplugin.dmestore.exception;
 
-
-public class VcenterException extends RuntimeException {
+public class VcenterException extends DMEException {
     private String code;
+
     private String message;
 
     public VcenterException() {
@@ -20,10 +20,12 @@ public class VcenterException extends RuntimeException {
         this.message = message;
     }
 
+    @Override
     public String getCode() {
         return code;
     }
 
+    @Override
     public void setCode(String code) {
         this.code = code;
     }
@@ -33,6 +35,7 @@ public class VcenterException extends RuntimeException {
         return message;
     }
 
+    @Override
     public void setMessage(String message) {
         this.message = message;
     }

@@ -8,11 +8,14 @@ export class StorageService {
   getData(){
     return this.http.get('dmestorage/storages');
   }
-  getStoragePoolListByStorageId(storageId: string){
-    return this.http.get('dmestorage/storagepools', {params: {storageId}});
+  getStoragePoolListByStorageId(mediaType:string,storageId:string){
+    return this.http.get('dmestorage/storagepools', {params: {storageId,mediaType}});
   }
   getLogicPortListByStorageId(storageId: string){
     return this.http.get('dmestorage/logicports', {params: {storageId}});
+  }
+  listperformance(storageIds:string[]) {
+    return this.http.get('dmestorage/liststorageperformance', {params: {storageIds}});
   }
 }
 export interface StorageList {
@@ -33,14 +36,14 @@ export interface StorageList {
    maxIops: number;
    maxBandwidth: number;
    maxLatency: number;
+   maxOps:number;
    azIds: string[];
-   total_pool_capacity: number;
-   subscription_capacity: number;
+   totalPoolCapacity: number;
+   subscriptionCapacity: number;
    maintenanceStart: string;
    maintenanceOvertime: string;
    location: string;
    patchVersion: string;
-  Subscription_capacity
 }
 export class LogicPort{
   id: string;
@@ -87,7 +90,7 @@ export class CapacityChart{
       textVerticalAlign: 'middle',
       textStyle: {
         fontSize: 15,
-        color: '#63B3F7'
+        color: '#6C92FA'
       },
       subtextStyle: {
         fontSize: 10,
@@ -112,7 +115,7 @@ export class CapacitySerie{
   labelLine: any;
   color: any;
   data: D[]=[];
-  constructor(use: number,free:number){
+  constructor(protection:number,fs:number,volume:number,free:number){
     this.name= "";
     this.type="pie";
     this.radius=['60%', '70%'];
@@ -129,18 +132,26 @@ export class CapacitySerie{
         fontWeight: 'bold'
       }
     };
-    this.color=['hsl(198, 100%, 32%)', 'hsl(198, 0%, 80%)'];
+    this.color=['hsl(164,58%, 52%)', 'hsl(48, 77%, 55%)', 'hsl(224, 93%, 70%)', 'hsl(0, 0%, 90%)'];
     this.labelLine = {
       show: false
     };
-    const u = new D();
-    u.value=use;
-    u.name="已使用";
-    this.data.push(u);
+    const p = new D();
+    p.value=protection;
+    p.name="保护";
+    this.data.push(p);
     const f= new D();
-    f.value=free;
-    f.name="空闲";
+    f.value=fs;
+    f.name="文件系统";
     this.data.push(f);
+    const v= new D();
+    v.value=volume;
+    v.name="卷";
+    this.data.push(v);
+    const fr= new D();
+    fr.value=free;
+    fr.name="空闲";
+    this.data.push(fr);
   }
 }
 export class D{

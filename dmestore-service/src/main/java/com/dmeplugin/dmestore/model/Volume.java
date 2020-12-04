@@ -1,3 +1,4 @@
+
 package com.dmeplugin.dmestore.model;
 
 import java.util.List;
@@ -6,164 +7,369 @@ import java.util.List;
  * @author lianq
  * @ClassName: Volume
  * @Company: GH-CA
- * @create 2020-09-03
  */
 public class Volume {
-    //卷的唯一标识
+    /**
+     * 卷的唯一标识 .
+     */
     private String id;
-    //名称
+    /**
+     * 名称.
+     */
     private String name;
-    //状态
+    /**
+     * 状态.
+     */
     private String status;
+    /**
+     * 状态.
+     */
     private Boolean attached;
-    //分配类型
+    /**
+     * 分配类型.
+     */
     private String alloctype;
-    //服务等级
+    /**
+     * 服务等级.
+     */
     private String serviceLevelName;
-    //存储设备id
+    /**
+     * 存储设备id.
+     */
     private String storageId;
-    //存储池id
+    /**
+     * 存储池id.
+     */
     private String poolRawId;
-    //容量利用率
+    /**
+     * 容量利用率.
+     */
     private String capacityUsage;
-    //保护状态
+    /**
+     * 保护状态.
+     */
     private Boolean protectionStatus;
+    /**
+     * hostIds.
+     */
     private List<String> hostIds;
+    /**
+     * hostGroupIds.
+     */
     private List<String> hostGroupIds;
-    //存储池名称
+    /**
+     * 存储池名称.
+     */
     private String storagePoolName;
-    //总容量 单位GB
+    /**
+     * 总容量 单位GB.
+     */
     private Integer capacity;
-    //关联的datastore
+    /**
+     * 关联的datastore.
+     */
     private String datastores;
-    //volume对应的instanceId
+    /**
+     * volume对应的instanceId.
+     */
     private String instanceId;
 
+    /**
+     * wwn标识.
+     */
+    private String wwn;
+    /**
+     * iops .
+     */
+    private Float iops;
+    /**
+     * lantency .
+     */
+    private Float lantency;
+    /**
+     * bandwith .
+     */
+    private Float bandwith;
+
+    /**
+     * getId .
+     * @return String .
+     */
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    /**
+     * setId .
+     * @param param .
+     */
+    public void setId(final String param) {
+        this.id = param;
     }
-
+    /**
+     * getName .
+     * @return String .
+     */
     public String getName() {
         return name;
     }
-
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setName .
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
-
+    /**
+     * getStatus .
+     * @return String .
+     */
     public String getStatus() {
         return status;
     }
-
-    public void setStatus(String status) {
-        this.status = status;
+    /**
+     * setStatus .
+     * @param param .
+     */
+    public void setStatus(final String param) {
+        this.status = param;
     }
-
+    /**
+     * getAttached .
+     * @return Boolean .
+     */
     public Boolean getAttached() {
         return attached;
     }
-
-    public void setAttached(Boolean attached) {
-        this.attached = attached;
+    /**
+     * setAttached .
+     * @param param .
+     */
+    public void setAttached(final Boolean param) {
+        this.attached = param;
     }
-
+    /**
+     * getAlloctype .
+     * @return String .
+     */
     public String getAlloctype() {
         return alloctype;
     }
-
-    public void setAlloctype(String alloctype) {
-        this.alloctype = alloctype;
+    /**
+     * setAlloctype .
+     * @param param .
+     */
+    public void setAlloctype(final String param) {
+        this.alloctype = param;
     }
-
+    /**
+     * getServiceLevelName .
+     * @return String .
+     */
     public String getServiceLevelName() {
         return serviceLevelName;
     }
-
-    public void setServiceLevelName(String serviceLevelName) {
-        this.serviceLevelName = serviceLevelName;
+    /**
+     * setServiceLevelName .
+     * @param param .
+     */
+    public void setServiceLevelName(final String param) {
+        this.serviceLevelName = param;
     }
-
+    /**
+     * getStorageId .
+     * @return String .
+     */
     public String getStorageId() {
         return storageId;
     }
-
-    public void setStorageId(String storageId) {
-        this.storageId = storageId;
+    /**
+     * setStorageId .
+     * @param param .
+     */
+    public void setStorageId(final String param) {
+        this.storageId = param;
     }
-
+    /**
+     * getPoolRawId .
+     * @return String .
+     */
     public String getPoolRawId() {
         return poolRawId;
     }
-
-    public void setPoolRawId(String poolRawId) {
-        this.poolRawId = poolRawId;
+    /**
+     * setPoolRawId .
+     * @param param .
+     */
+    public void setPoolRawId(final String param) {
+        this.poolRawId = param;
     }
-
+    /**
+     * getCapacityUsage .
+     * @return String .
+     */
     public String getCapacityUsage() {
         return capacityUsage;
     }
-
-    public void setCapacityUsage(String capacityUsage) {
-        this.capacityUsage = capacityUsage;
+    /**
+     * setCapacityUsage .
+     * @param param .
+     */
+    public void setCapacityUsage(final String param) {
+        this.capacityUsage = param;
     }
-
+    /**
+     * getProtectionStatus .
+     * @return String .
+     */
     public Boolean getProtectionStatus() {
         return protectionStatus;
     }
-
-    public void setProtectionStatus(Boolean protectionStatus) {
-        this.protectionStatus = protectionStatus;
+    /**
+     * setProtectionStatus .
+     * @param param .
+     */
+    public void setProtectionStatus(final Boolean param) {
+        this.protectionStatus = param;
     }
-
+    /**
+     * getHostIds .
+     * @return String .
+     */
     public List<String> getHostIds() {
         return hostIds;
     }
-
-    public void setHostIds(List<String> hostIds) {
-        this.hostIds = hostIds;
+    /**
+     * setHostIds .
+     * @param param .
+     */
+    public void setHostIds(final List<String> param) {
+        this.hostIds = param;
     }
-
+    /**
+     * gegetHostGroupIdstId .
+     * @return String .
+     */
     public List<String> getHostGroupIds() {
         return hostGroupIds;
     }
-
-    public void setHostGroupIds(List<String> hostGroupIds) {
-        this.hostGroupIds = hostGroupIds;
+    /**
+     * setHostGroupIds .
+     * @param param .
+     */
+    public void setHostGroupIds(final List<String> param) {
+        this.hostGroupIds = param;
     }
-
+    /**
+     * getStoragePoolName .
+     * @return String .
+     */
     public String getStoragePoolName() {
         return storagePoolName;
     }
-
-    public void setStoragePoolName(String storagePoolName) {
-        this.storagePoolName = storagePoolName;
+    /**
+     * setStoragePoolName .
+     * @param param .
+     */
+    public void setStoragePoolName(final String param) {
+        this.storagePoolName = param;
     }
-
+    /**
+     * getCapacity .
+     * @return Integer .
+     */
     public Integer getCapacity() {
         return capacity;
     }
-
-    public void setCapacity(Integer capacity) {
-        this.capacity = capacity;
+    /**
+     * setId .
+     * @param param .
+     */
+    public void setCapacity(final Integer param) {
+        this.capacity = param;
     }
-
+    /**
+     * getDatastores .
+     * @return String .
+     */
     public String getDatastores() {
         return datastores;
     }
-
-    public void setDatastores(String datastores) {
-        this.datastores = datastores;
+    /**
+     * setId .
+     * @param param .
+     */
+    public void setDatastores(final String param) {
+        this.datastores = param;
     }
-
+    /**
+     * getInstanceId .
+     * @return String .
+     */
     public String getInstanceId() {
         return instanceId;
     }
-
-    public void setInstanceId(String instanceId) {
-        this.instanceId = instanceId;
+    /**
+     * setInstanceId .
+     * @param param .
+     */
+    public void setInstanceId(final String param) {
+        this.instanceId = param;
+    }
+    /**
+     * getId .
+     * @return Float .
+     */
+    public Float getIops() {
+        return iops;
+    }
+    /**
+     * setIops .
+     * @param param .
+     */
+    public void setIops(final Float param) {
+        this.iops = param;
+    }
+    /**
+     * getLantency .
+     * @return Float .
+     */
+    public Float getLantency() {
+        return lantency;
+    }
+    /**
+     * setLantency .
+     * @param param .
+     */
+    public void setLantency(final Float param) {
+        this.lantency = param;
+    }
+    /**
+     * getBandwith .
+     * @return Float .
+     */
+    public Float getBandwith() {
+        return bandwith;
+    }
+    /**
+     * setBandwith .
+     * @param param .
+     */
+    public void setBandwith(final Float param) {
+        this.bandwith = param;
+    }
+    /**
+     * getWwn .
+     * @return String .
+     */
+    public String getWwn() {
+        return wwn;
+    }
+    /**
+     * setWwn .
+     * @param param .
+     */
+    public void setWwn(final String param) {
+        this.wwn = param;
     }
 }

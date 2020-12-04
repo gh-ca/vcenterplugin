@@ -2,40 +2,63 @@ package com.dmeplugin.dmestore.model;
 
 /**
  * @author lianq
- * @className FailoverGroup
- * @description TODO
- * @date 2020/10/14 15:32
+ * @since  2020/10/14 15:32
  */
 public class FailoverGroup {
-
-    //漂移组类型，枚举（system、VLAN、customized）
+    /**
+     * 漂移组类型，枚举（system、VLAN、customized） .
+     */
     private String failoverGroupType;
-    //漂移组id
+    /**
+     * 漂移组id .
+     */
     private String id;
-    //漂移组名称
+    /**
+     * 漂移组名称 .
+     */
     private String name;
 
+    /**
+     * getFailoverGroupType .
+     * @return String .
+     */
     public String getFailoverGroupType() {
         return failoverGroupType;
     }
 
-    public void setFailoverGroupType(String failoverGroupType) {
-        this.failoverGroupType = failoverGroupType;
+    /**
+     * setFailoverGroupType .
+     * @param param .
+     */
+    public void setFailoverGroupType(final String param) {
+        this.failoverGroupType = param;
     }
-
+    /**
+     * getId .
+     * @return String .
+     */
     public String getId() {
         return id;
     }
-
-    public void setId(String id) {
-        this.id = id;
+    /**
+     * setFailoverGroupType .
+     * @param param .
+     */
+    public void setId(final String param) {
+        this.id = param;
     }
-
+    /**
+     * getName .
+     * @return String .
+     */
     public String getName() {
         return name;
     }
-
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setName .
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
 }

@@ -1,8 +1,14 @@
 package com.dmeplugin.dmestore.mvc;
 
-import com.dmeplugin.dmestore.dao.DmeInfoDao;
-import com.dmeplugin.dmestore.services.DmeAccessServiceImpl;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+
 import com.google.gson.Gson;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.junit.Before;
 import org.junit.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -10,54 +16,64 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.HashMap;
-import java.util.Map;
-
+/**
+ * @author lianq
+ * @className DmeAccessControllerTest
+ * @description TODO
+ * @date 2020/11/24 11:45
+ */
 public class DmeAccessControllerTest {
     private Gson gson = new Gson();
+    DmeAccessController dmeAccessController;
+    MockMvc mockMvc;
 
-    @Test
-    public void controller_accessTest() throws Exception {
-        DmeAccessController controller = new DmeAccessController();
-        Map<String, Object> params = new HashMap<>();
-        params.put("hostIp", "192.168.3.203");
-        params.put("hostPort", 26335);
-        params.put("userName", "testadmin001");
-        params.put("password", "Pbu421234");
-        System.out.println(gson.toJson(params));
-        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-        mockMvc.perform(MockMvcRequestBuilders.post("/accessdme/access").contentType(MediaType.APPLICATION_JSON).content(gson.toJson(params)))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+    @Before
+    public void setUp() throws Exception {
+        dmeAccessController = new DmeAccessController();
+        mockMvc = MockMvcBuilders.standaloneSetup(dmeAccessController).build();
     }
 
     @Test
-    public void controller_refreshaccessTest() throws Exception {
-        DmeAccessController controller = new DmeAccessController();
-        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-        mockMvc.perform(MockMvcRequestBuilders.get("/accessdme/refreshaccess"))
-                .andExpect(MockMvcResultMatchers.status().isOk());
+    public void accessDme() throws Exception {
+        Map params = mock(Map.class);
+        mockMvc.perform(MockMvcRequestBuilders.post("/accessdme/access")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(gson.toJson(params)))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+
     }
 
     @Test
-    public void service_accessDme_Test() throws Exception {
-        DmeAccessServiceImpl dmeAccessService = new DmeAccessServiceImpl();
-        DmeInfoDao dmeInfoDao = new DmeInfoDao();
-        dmeAccessService.setDmeInfoDao(dmeInfoDao);
-        Map<String, Object> params = new HashMap<>();
-        params.put("hostIp", "192.168.3.203");
-        params.put("hostPort", 26335);
-        params.put("userName", "testadmin001");
-        params.put("password", "Pbu421234");
-        Map<String, Object> remap = dmeAccessService.accessDme(params);
-        System.out.println("remap==" + remap);
+    public void refreshDme() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/accessdme/refreshaccess")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test
-    public void service_refreshDme_Test() throws Exception {
-        DmeAccessServiceImpl dmeAccessService = new DmeAccessServiceImpl();
-        DmeInfoDao dmeInfoDao = new DmeInfoDao();
-        dmeAccessService.setDmeInfoDao(dmeInfoDao);
-        Map<String, Object> remap = dmeAccessService.refreshDme();
-        System.out.println("remap==" + remap);
+    public void getWorkLoads() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/accessdme/getworkloads")
+            .contentType(MediaType.APPLICATION_JSON)
+            .param("storageId","321"))
+            .andExpect(MockMvcResultMatchers.status().isOk());
     }
+
+    @Test
+    public void scanDatastore() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/accessdme/scandatastore")
+            .contentType(MediaType.APPLICATION_JSON)
+            .param("storageType","321"))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    public void configureTaskTime() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/accessdme/configuretasktime")
+            .contentType(MediaType.APPLICATION_JSON)
+            .param("taskId","321")
+            .param("taskCron","321"))
+            .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+
 }

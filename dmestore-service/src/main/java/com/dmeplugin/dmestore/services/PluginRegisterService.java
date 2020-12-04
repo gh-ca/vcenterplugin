@@ -1,10 +1,10 @@
 package com.dmeplugin.dmestore.services;
 
-import java.util.Map;
+import com.dmeplugin.dmestore.exception.DMEException;
 
 public interface PluginRegisterService {
-    public Map<String, Object> installService(String vcenterIP,String vcenterPort,String vcenterUsername,String vcenterPassword,String dmeIp,
-                                              String dmePort,String dmeUsername,String dmePassword);
+    void installService(String vcenterIp, String vcenterPort, String vcenterUsername, String vcenterPassword, String dmeIp,
+                        String dmePort, String dmeUsername, String dmePassword) throws DMEException;
 
-    public void uninstallService();
+    void uninstallService();
 }

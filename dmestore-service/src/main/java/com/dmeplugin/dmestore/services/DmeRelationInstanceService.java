@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.RelationInstance;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public interface DmeRelationInstanceService {
      * @return
      * @throws Exception
      */
-    List<RelationInstance> queryRelationByRelationName(String relationName) throws Exception;
+    List<RelationInstance> queryRelationByRelationName(String relationName) throws DMEException;
 
     /**
      * 按资源关系类型名称和条件sourceInstanceId查询资源关系实例
@@ -28,7 +29,7 @@ public interface DmeRelationInstanceService {
      * @param sourceInstanceId 源实例ID
      * @return
      */
-    List<RelationInstance> queryRelationByRelationNameConditionSourceInstanceId(String relationName, String sourceInstanceId) throws Exception;
+    List<RelationInstance> queryRelationByRelationNameConditionSourceInstanceId(String relationName, String sourceInstanceId) throws DMEException;
 
     /**
      * 按资源关系类型名称和实例ID查询资源关系实例
@@ -37,7 +38,7 @@ public interface DmeRelationInstanceService {
      * @return
      * @throws Exception
      */
-    RelationInstance queryRelationByRelationNameInstanceId(String relationName, String instanceId) throws Exception;
+    RelationInstance queryRelationByRelationNameInstanceId(String relationName, String instanceId) throws DMEException;
 
     /**
      * 按资源类型和资源实例查询单个资源实例
@@ -45,13 +46,9 @@ public interface DmeRelationInstanceService {
      * @param instanceId
      * @return
      */
-    Object queryInstanceByInstanceNameId(String instanceName, String instanceId) throws Exception;
+    Object queryInstanceByInstanceNameId(String instanceName, String instanceId) throws DMEException;
 
-    /**
-     *
-     */
     Map<String, Map<String, Object>> getServiceLevelInstance();
-
 
     Map<String, Map<String, Object>> getLunInstance();
 
@@ -59,7 +56,9 @@ public interface DmeRelationInstanceService {
 
     Map<String, Map<String, Object>> getStoragePoolInstance();
 
-
-
+    /**
+     * 资源实例刷新
+     */
+    void refreshResourceInstance();
 }
 

@@ -44,6 +44,7 @@ export class GlobalsService {
 
    // The locale id of the vSphere Client, or "en" by default in standalone
    public locale = "en";
+   public loading: boolean = false; // 全局loading变量
 
    constructor(private globals: Globals) {
    }

@@ -42,7 +42,7 @@ public class NfsAccessController extends BaseController {
         String failureStr = "";
         try {
             List<NfsDataInfo> lists = dmeNfsAccessService.listNfs();
-            LOG.info("listnfs lists==" + gson.toJson(lists));
+            //LOG.info("listnfs lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {
             LOG.error("list nfs failure:", e);
@@ -65,7 +65,7 @@ public class NfsAccessController extends BaseController {
         String failureStr = "";
         try {
             List<NfsDataInfo> lists = dmeNfsAccessService.listNfsPerformance(fsIds);
-            LOG.info("listnfsperformance lists==" + gson.toJson(lists));
+            //LOG.info("listnfsperformance lists==" + gson.toJson(lists));
             return success(lists);
         } catch (Exception e) {
             LOG.error("get nfs performance failure:", e);
@@ -77,13 +77,13 @@ public class NfsAccessController extends BaseController {
 
     /**
      * Mount nfs,params中包含了 include:
-     * dataStoreObjectId: datastore的object id
-     * dataStoreName: datastore名称  必
-     * list<map<str,str>> hosts: 主机hostId,主机名称hostName 必 （主机与集群二选一）
-     * list<map<str,str>>  clusters: 集群clusterId,集群名称clusterName 必（主机与集群二选一）
+     *  dataStoreObjectId: datastore的object id
+     *  logicPortIp:存储逻辑端口IP  暂时不需要
+     * hostObjectId:主机objectid
+     * hostVkernelIp:主机vkernelip
      * str mountType: 挂载模式（只读或读写）  readOnly/readWrite
      *
-     * @param params: include dataStoreName,hosts,clusters,mountType
+     * @param params: include dataStoreObjectId,hosts,mountType
      * @return: ResponseBodyBean
      */
     @RequestMapping(value = "/mountnfs", method = RequestMethod.POST)
@@ -146,7 +146,25 @@ public class NfsAccessController extends BaseController {
         return failure(failureStr);
     }
 
+    @RequestMapping(value = "/gethostsbystorageid/{storageId}", method = RequestMethod.GET)
+    public ResponseBodyBean getHostsByStorageId(@PathVariable(value = "storageId") String storageId) throws Exception {
+        try {
+            List<Map<String, Object>> hosts = dmeNfsAccessService.getHostsMountDataStoreByDsObjectId(storageId);
+            return success(hosts);
+        } catch (Exception e) {
+            return failure(e.getMessage());
+        }
+    }
 
+    @RequestMapping(value = "/gethostgroupsbystorageid/{storageId}", method = RequestMethod.GET)
+    public ResponseBodyBean getHostGroupsByStorageId(@PathVariable(value = "storageId") String storageId) throws Exception {
+        try {
+            List<Map<String, Object>> hosts = dmeNfsAccessService.getClusterMountDataStoreByDsObjectId(storageId);
+            return success(hosts);
+        } catch (Exception e) {
+            return failure(e.getMessage());
+        }
+    }
 
 
 }

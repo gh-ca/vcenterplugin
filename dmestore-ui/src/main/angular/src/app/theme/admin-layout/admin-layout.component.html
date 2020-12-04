@@ -24,12 +24,24 @@
         <a clrVerticalNavLink routerLink="./credit" routerLinkActive="active">Best Practice</a>
         <a clrVerticalNavLink routerLink="./nfs" routerLinkActive="active">NFS list</a>
       </clr-vertical-nav>
-      <div class="content-area">
+      <div class="content-area loading-wrap">
         <router-outlet></router-outlet>
+        <!-- 全局loading层 -->
+        <div *ngIf="gs.loading" class="loading-content">
+          <span class="spinner">
+            Loading...
+          </span>
+        </div>
       </div>
     </div>
   </div>
 </div>
-<div *ngIf="env.production">
+<div class="loading-wrap" *ngIf="env.production">
   <router-outlet></router-outlet>
+  <!-- 全局loading层 -->
+  <div *ngIf="loading" class="loading-content">
+    <span class="spinner">
+      Loading...
+    </span>
+  </div>
 </div>

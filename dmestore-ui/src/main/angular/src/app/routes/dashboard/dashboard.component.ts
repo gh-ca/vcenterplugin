@@ -13,7 +13,7 @@ import {ClrForm} from '@clr/angular';
 import {HttpClient} from '@angular/common/http';
 import {Router} from "@angular/router";
 import { TranslateService } from "@ngx-translate/core";
-
+import { GlobalsService }     from "../../shared/globals.service";
 
 @Component({
   selector: 'app-dashboard',
@@ -32,7 +32,6 @@ import { TranslateService } from "@ngx-translate/core";
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  charts = this.dashboardSrv.getCharts();
   storageNumChart = null;
   storageNum = {
     total: 0,
@@ -65,6 +64,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   connectAlertFail = false;
   connectModel = { hostIp: '', hostPort: '', userName: '', password: ''};
   hostModel = { hostIp: '', hostPort: ''};
+
+  bestShowLoading = true;
+  top5ShowLoading = true;
+
   connectForm = new FormGroup({
     port: new FormControl('', [
         Validators.required,
@@ -87,7 +90,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     private ngZone: NgZone,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
-    private router:Router
+    private router:Router,
+    public gs: GlobalsService
   ) {}
 
   ngOnInit() {}
@@ -101,15 +105,19 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   refresh(){
+    this.gs.loading = true;
     this.http.get('accessdme/refreshaccess', {}).subscribe((result: any) => {
-      if (result.code === '0' || result.code === '200'){
-        this.hostModel = result.data.data;
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+      if (result.code === '200'){
+        this.gs.loading = false  // 设置全局loading 为 FALSE
+        this.hostModel = result.data;
         this.loadStorageNum();
         this.loadstorageCapacity('0', 'overview.allDataStore');
         this.loadBestPracticeViolations();
         this.loadTop5DataStore('0', 'overview.allDataStore');
+      } else{
+        this.gs.loading = false;
       }
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     }, err => {
       console.error('ERROR', err);
     });
@@ -118,8 +126,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   // //type 0 :VMFS and NFS, 1:VMFS, 2:NFS
   loadTop5DataStore(type: string, name: string){
     this.top5dataStoreName = this.translateService.instant(name);
+    this.top5ShowLoading = true;
     this.http.get('overview/getdatastoretopn', { params: {type: type}}).subscribe((result: any) => {
-      if (result.code === '0' || result.code === '200'){
+      this.top5ShowLoading = false;
+      if (result.code === '200'){
         result.data.forEach((item) => {
           item.totalCapacity = item.totalCapacity.toFixed(2);
           item.usedCapacity = item.usedCapacity.toFixed(2);
@@ -142,7 +152,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.capadataStoreName = this.translateService.instant(name);
     this.storageCapacityChart.showLoading();
     this.http.get('overview/getdatastoreoverview', { params: {type: type}}).subscribe((result: any) => {
-      if (result.code === '0' || result.code === '200'){
+      if (result.code === '200'){
         result.data.totalCapacity = result.data.totalCapacity.toFixed(2);
         result.data.usedCapacity = result.data.usedCapacity.toFixed(2);
         result.data.freeCapacity = result.data.freeCapacity.toFixed(2);
@@ -176,7 +186,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   loadStorageNum(){
     this.storageNumChart.showLoading();
     this.http.get('overview/getstoragenum', {}).subscribe((result: any) => {
-      if (result.code === '0' || result.code === '200'){
+      if (result.code === '200'){
         this.storageNum = result.data;
         const os = [
           {
@@ -199,9 +209,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   loadBestPracticeViolations(){
+    this.bestShowLoading = true;
     this.http.get('overview/getbestpracticeviolations', {}).subscribe((result: any) => {
-      if (result.code === '0' || result.code === '200'){
-         this.bestPracticeViolations = result.data;
+      this.bestShowLoading = false;
+      if (result.code === '200'){
+        this.bestPracticeViolations = result.data;
         this.cdr.detectChanges();
       }
     }, err => {
@@ -214,22 +226,17 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.connectForm.invalid) {
       this.clrForm.markAsTouched();
     } else {
-      // Do submit logic
-      this.popShow = false;
-      console.log(this.connectModel);
+      this.gs.loading = true;
       this.http.post('accessdme/access', this.connectModel).subscribe((result: any) => {
-        if (result.code !== '0' && result.code !== '200'){
-             this.connectAlertFail = true;
-             /*setTimeout(() => {
-               this.connectAlertFail = false;
-             }, 1000);*/
-        } else{
+        this.gs.loading = false;
+        if (result.code == '200'){
           this.refresh();
           this.connectAlertSuccess = true;
-          /*setTimeout(() => {
-            this.connectAlertSuccess = false;
-          }, 1000);*/
+          this.popShow = false;
+        } else{
+          this.connectAlertFail = true;
         }
+        this.cdr.detectChanges();
       });
       this.resetForm();
     }
@@ -257,6 +264,19 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.router.navigate(['storage'],{
       queryParams:{
       }
+    });
+  }
+
+
+  toBestParcticeViewSdk(type: string){
+    this.gs.getClientSdk().app.navigateTo({
+      targetViewId: 'com.dmeplugin.dmestore.bestpractiseView'
+    });
+  }
+
+  toDatastoreDeviceViewSdk(){
+    this.gs.getClientSdk().app.navigateTo({
+      targetViewId: 'com.dmeplugin.dmestore.storageView'
     });
   }
 }

@@ -28,10 +28,8 @@ public class OverviewController extends BaseController{
     @ResponseBody
     public ResponseBodyBean getStorageNum(){
         try {
-            Map<String, Object> resMap = overviewService.getStorageNum();
-            return success(resMap);
+            return success(overviewService.getStorageNum());
         } catch (Exception e) {
-            e.printStackTrace();
             return failure();
         }
     }
@@ -53,10 +51,8 @@ public class OverviewController extends BaseController{
     @ResponseBody
     public ResponseBodyBean getDataStoreOverview(@RequestParam String type){
         try {
-            Map<String, Object> resMap = overviewService.getDataStoreCapacitySummary(type);
-            return success(resMap);
+            return success(overviewService.getDataStoreCapacitySummary(type));
         } catch (Exception e) {
-            e.printStackTrace();
             return failure();
         }
     }
@@ -88,10 +84,8 @@ public class OverviewController extends BaseController{
         }
         //type 0 :VMFS and NFS, 1:VMFS, 2:NFS
         try {
-            List<Map<String, Object>> resMap = overviewService.getDataStoreCapacityTopN(type, topn);
-            return success(resMap);
+            return success(overviewService.getDataStoreCapacityTopN(type, topn));
         } catch (Exception e) {
-            e.printStackTrace();
             return failure();
         }
     }
@@ -112,10 +106,8 @@ public class OverviewController extends BaseController{
     public ResponseBodyBean getBestPracticeViolations(){
         //type 0 :critical, 1:major, 2:warning, 3: info
         try {
-            Map<String, Object> resMap = overviewService.getBestPracticeViolations();
-            return success(resMap);
+            return success(overviewService.getBestPracticeViolations());
         } catch (Exception e) {
-            e.printStackTrace();
             return failure();
         }
     }

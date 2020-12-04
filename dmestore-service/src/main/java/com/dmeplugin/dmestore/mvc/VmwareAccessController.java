@@ -40,9 +40,7 @@ public class VmwareAccessController extends BaseController {
         LOG.info("accessvmware/listhost");
         String failureStr = "";
         try {
-            List<Map<String, String>> lists = vmwareAccessService.listHosts();
-            LOG.info("listhost vmware lists==" + gson.toJson(lists));
-            return success(lists);
+            return success(vmwareAccessService.listHosts());
         } catch (Exception e) {
             LOG.error("list vmware host failure:", e);
             failureStr = "list vmware host failure:"+e.toString();
@@ -190,7 +188,51 @@ public class VmwareAccessController extends BaseController {
         return failure(failureStr);
     }
 
+    /**
+     * Access datastore
+     *
+     * @param  hostObjectId host ObjectId
+     * @param  dataStoreType dataStore Type
+     * @return ResponseBodyBean List<Map<String, String>> include id name status type capacity freeSpace
+     * @throws Exception when error
+     */
+    @RequestMapping(value = "/getmountdatastoresbyhostobjectid", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseBodyBean getMountDataStoresByHostObjectId(@RequestParam("hostObjectId") String hostObjectId, @RequestParam("dataStoreType") String dataStoreType) throws Exception {
+        LOG.info("accessvmware/listMountDataStoreByHostObjectId");
+        String failureStr = "";
+        try {
+            List<Map<String, String>> lists = vmwareAccessService.getMountDataStoresByHostObjectId(hostObjectId, dataStoreType);
+            LOG.info("getMountDataStoresByHostObjectId vmware lists==" + gson.toJson(lists));
+            return success(lists);
+        } catch (Exception e) {
+            LOG.error("getMountDataStoresByHostObjectId vmware host failure:", e);
+            failureStr = "getMountDataStoresByHostObjectId vmware host failure:"+e.toString();
+        }
+        return failure(failureStr);
+    }
 
-
-
+    /**
+     * Access datastore
+     *
+     * @param  clusterObjectId cluster ObjectId
+     * @param  dataStoreType dataStore Type
+     * @return ResponseBodyBean List<Map<String, String>> include id name status type capacity freeSpace
+     * @throws Exception when error
+     */
+    @RequestMapping(value = "/getmountdatastoresbyclusterobjectid", method = RequestMethod.GET)
+    @ResponseBody
+    public ResponseBodyBean getMountDataStoresByClusterObjectId(@RequestParam("clusterObjectId") String clusterObjectId, @RequestParam("dataStoreType") String dataStoreType) throws Exception {
+        LOG.info("accessvmware/listMountDataStoreByClusterObjectId");
+        String failureStr = "";
+        try {
+            List<Map<String, String>> lists = vmwareAccessService.getMountDataStoresByClusterObjectId(clusterObjectId, dataStoreType);
+            LOG.info("getDataStoresByClusterObjectId vmware lists==" + gson.toJson(lists));
+            return success(lists);
+        } catch (Exception e) {
+            LOG.error("getDataStoresByClusterObjectId vmware host failure:", e);
+            failureStr = "getDataStoresByClusterObjectId vmware host failure:"+e.toString();
+        }
+        return failure(failureStr);
+    }
 }

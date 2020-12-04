@@ -1,12 +1,11 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.entity.VCenterInfo;
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.utils.CipherUtils;
-import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.vmware.VCConnectionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,20 +25,20 @@ public class PluginRegisterServiceImpl implements PluginRegisterService{
     private VCConnectionHelper vcConnectionHelper;
 
     @Override
-    public Map<String, Object> installService(String vcenterIP,String vcenterPort,String vcenterUsername,String vcenterPassword,String dmeIp,
-                                              String dmePort,String dmeUsername,String dmePassword) {
+    public void installService(String vcenterIp, String vcenterPort, String vcenterUsername, String vcenterPassword, String dmeIp,
+                               String dmePort, String dmeUsername, String dmePassword) throws DMEException {
 
-        Map<String, Object> remap=new HashMap<>(16);
+        //Map<String, Object> remap=new HashMap<>(16);
         try {
             //保存vcenter信息,如有已有vcenter信息，需要更新
             VCenterInfo vCenterInfo = new VCenterInfo();
-            vCenterInfo.setHostIp(vcenterIP);
+            vCenterInfo.setHostIp(vcenterIp);
             vCenterInfo.setUserName(vcenterUsername);
             vCenterInfo.setPassword(CipherUtils.encryptString(vcenterPassword));
             vCenterInfo.setHostPort(Integer.parseInt(vcenterPort));
-            vCenterInfoService.saveVCenterInfo(vCenterInfo);
+            vCenterInfoService.saveVcenterInfo(vCenterInfo);
 
-            vcConnectionHelper.setServerurl("https://" + vcenterIP + ":" + vcenterPort + "/sdk");
+            vcConnectionHelper.setServerurl("https://" + vcenterIp + ":" + vcenterPort + "/sdk");
             vcConnectionHelper.setUsername(vcenterUsername);
             vcConnectionHelper.setPassword(vcenterPassword);
 
@@ -50,16 +49,15 @@ public class PluginRegisterServiceImpl implements PluginRegisterService{
                 params.put("hostPort", dmePort);
                 params.put("userName", dmeUsername);
                 params.put("password", dmePassword);
-                remap = dmeAccessService.accessDme(params);
+                dmeAccessService.accessDme(params);
 
             }
 
-        }catch (SQLException throwables) {
-            throwables.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
+            throw new DMEException("503",e.getMessage());
         }
-        return remap;
+       // return remap;
     }
 
     @Override

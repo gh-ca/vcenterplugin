@@ -9,7 +9,6 @@ public abstract class VCConnectionHelper {
 
     private UserSessionService userSessionService;
     private VimObjectReferenceService vimObjectReferenceService;
-    //private ManagedObjectReference mor;
 
     private String serverurl;
     private int serverport;
@@ -31,14 +30,6 @@ public abstract class VCConnectionHelper {
     public void setVimObjectReferenceService(VimObjectReferenceService vimObjectReferenceService) {
         this.vimObjectReferenceService = vimObjectReferenceService;
     }
-
-  /*  public ManagedObjectReference getMor() {
-        return mor;
-    }
-
-    public void setMor(ManagedObjectReference mor) {
-        this.mor = mor;
-    }*/
 
     public String getServerurl() {
         return serverurl;
@@ -85,7 +76,7 @@ public abstract class VCConnectionHelper {
      */
     public abstract VmwareContext[] getAllContext() throws Exception;
 
-    public  ManagedObjectReference objectID2MOR(String objectid){
+    public  ManagedObjectReference objectId2Mor(String objectid){
         String[] objectarry=objectid.split(":");
         String type=objectarry[2];
         String value=objectarry[3];
@@ -96,16 +87,14 @@ public abstract class VCConnectionHelper {
         return mor;
     }
 
-    public  String objectID2Serverguid(String objectid){
-        String[] objectarry=objectid.split(":");
-        String type=objectarry[2];
-        String value=objectarry[3];
+    public  String objectId2Serverguid(String objectId){
+        String[] objectarry=objectId.split(":");
         String serverguid=objectarry[4];
 
         return serverguid;
     }
 
-    public  String MOR2ObjectID(ManagedObjectReference mor,String serverguid){
+    public  String mor2ObjectId(ManagedObjectReference mor, String serverguid){
         String type=mor.getType();
         String value=mor.getValue();
         String objectid="urn:vmomi:"+type+":"+value+":"+serverguid;

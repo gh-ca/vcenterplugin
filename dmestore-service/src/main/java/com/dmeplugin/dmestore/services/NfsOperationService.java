@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.model.ResponseBodyBean;
+import com.dmeplugin.dmestore.exception.DMEException;
 
 import java.util.Map;
 
@@ -15,21 +15,27 @@ public interface NfsOperationService {
     /**
      * 创建nfs存储
      * @param params
-     * @return
      */
-    Map<String,Object> createNfsDatastore(Map<String, Object> params);
+    void createNfsDatastore(Map<String, Object> params) throws DMEException;
 
     /**
      * 更新NFS存储
      * @param params
-     * @return
+     * @throws DMEException
      */
-    Map<String,Object> updateNfsDatastore(Map<String, Object> params);
+    void updateNfsDatastore(Map<String, Object> params) throws DMEException;
 
     /**
      * NFS存储扩容和缩容
      * @param params
-     * @return
      */
-    ResponseBodyBean changeNfsCapacity(Map<String, Object> params);
+    void changeNfsCapacity(Map<String, Object> params) throws DMEException;
+
+    /**
+     *
+     * @param storeObjectId
+     * @return
+     * @throws DMEException
+     */
+    Map<String,Object> getEditNfsStore(String storeObjectId) throws DMEException;
 }

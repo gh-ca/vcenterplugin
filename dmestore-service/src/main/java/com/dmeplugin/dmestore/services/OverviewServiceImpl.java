@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.BestPracticeCheckRecordBean;
 import com.dmeplugin.dmestore.model.NfsDataInfo;
 import com.dmeplugin.dmestore.model.Storage;
@@ -15,9 +16,6 @@ public class OverviewServiceImpl implements OverviewService {
     private static final String STORAGE_TYPE_VMFS = "1";
     private static final String STORAGE_TYPE_NFS = "2";
 
-    private static final String SUCCESS_CODE = "200";
-    private static final String COLUMN_CODE = "code";
-
     private static final String STORAGE_DEVICE_STATUS_NORMAL = "1";
 
     private static final String CRITICAL = "Critical";
@@ -26,21 +24,17 @@ public class OverviewServiceImpl implements OverviewService {
     private static final String INFO = "Info";
 
     private VmfsAccessService vmfsAccessService;
-    private DmeNFSAccessService dmeNFSAccessService;
+    private DmeNFSAccessService dmeNfsAccessService;
     private DmeStorageService dmeStorageService;
     private BestPracticeProcessService bestPracticeProcessService;
 
     @Override
-    public Map<String, Object> getStorageNum() {
+    public Map<String, Object> getStorageNum() throws DMEException {
         Map<String, Object> r = new HashMap<>(16);
         int normal = 0;
         int abnormal = 0;
         int total;
-        Map<String, Object> storageOriginal = dmeStorageService.getStorages();
-        if (null == storageOriginal || !SUCCESS_CODE.equals(storageOriginal.get(COLUMN_CODE).toString())) {
-            throw new RuntimeException("query storage error.");
-        } else{
-            List<Storage> storages = (List<Storage>) storageOriginal.get("data");
+        List<Storage> storages = dmeStorageService.getStorages();
             total = storages.size();
             for (Storage storage : storages) {
                 // 运行状态 0-离线 1-正常 2-故障 9-未管理。
@@ -53,7 +47,6 @@ public class OverviewServiceImpl implements OverviewService {
             r.put("total", total);
             r.put("normal", normal);
             r.put("abnormal", abnormal);
-        }
         return r;
     }
 
@@ -68,13 +61,13 @@ public class OverviewServiceImpl implements OverviewService {
         try {
             double[] ds;
             if (STORAGE_TYPE_VMFS.equals(type)){
-                ds = computeVMFsDataStoreCapacity();
+                ds = computeVmfsDataStoreCapacity();
             } else if (STORAGE_TYPE_NFS.equals(type)){
-                ds = computeNFSDataStoreCapacity();
+                ds = computeNfsDataStoreCapacity();
             } else {
                 ds = new double[4];
-                double[] ds1 = computeVMFsDataStoreCapacity();
-                double[] ds2 = computeNFSDataStoreCapacity();
+                double[] ds1 = computeVmfsDataStoreCapacity();
+                double[] ds2 = computeNfsDataStoreCapacity();
                 ds[0] = ds1[0] + ds2[0];
                 ds[1] = ds1[1] + ds2[1];
                 ds[2] = ds1[2] + ds2[2];
@@ -102,12 +95,12 @@ public class OverviewServiceImpl implements OverviewService {
         List<Map<String, Object>> r;
         try {
             if (STORAGE_TYPE_VMFS.equals(type)){
-                r = getVMFSInfos();
+                r = getVmfsInfos();
             } else if (STORAGE_TYPE_NFS.equals(type)){
-                r = getNFSInfos();
+                r = getNfsInfos();
             } else {
-                r = getVMFSInfos();
-                r.addAll(getNFSInfos());
+                r = getVmfsInfos();
+                r.addAll(getNfsInfos());
             }
             r.sort(Comparator.comparing(o->(double)((Map)o).get("utilization")).reversed());
         } catch (Exception e) {
@@ -155,7 +148,7 @@ public class OverviewServiceImpl implements OverviewService {
         return r;
     }
 
-    private double[] computeVMFsDataStoreCapacity() throws Exception{
+    private double[] computeVmfsDataStoreCapacity() throws Exception{
         double[] ds = new double[4];
         double totalCapacity = 0;
         double freeCapacity = 0;
@@ -178,13 +171,13 @@ public class OverviewServiceImpl implements OverviewService {
         return ds;
     }
 
-    private double[] computeNFSDataStoreCapacity() throws Exception{
+    private double[] computeNfsDataStoreCapacity() throws Exception{
         double[] ds = new double[4];
         double totalCapacity = 0;
         double freeCapacity = 0;
         double usedCapacity;
         double utilization;
-        List<NfsDataInfo> nfsDataInfos = dmeNFSAccessService.listNfs();
+        List<NfsDataInfo> nfsDataInfos = dmeNfsAccessService.listNfs();
         if (nfsDataInfos != null && nfsDataInfos.size() > 0){
             for (NfsDataInfo nfsDataInfo : nfsDataInfos){
                 totalCapacity += nfsDataInfo.getCapacity();
@@ -201,7 +194,7 @@ public class OverviewServiceImpl implements OverviewService {
         return ds;
     }
 
-    private List<Map<String, Object>> getVMFSInfos() throws Exception {
+    private List<Map<String, Object>> getVmfsInfos() throws Exception {
         List<Map<String, Object>> r = new ArrayList<>();
         List<VmfsDataInfo> vmfsDataInfos = vmfsAccessService.listVmfs();
         if (vmfsDataInfos != null){
@@ -223,9 +216,9 @@ public class OverviewServiceImpl implements OverviewService {
         return r;
     }
 
-    private List<Map<String, Object>> getNFSInfos() throws Exception {
+    private List<Map<String, Object>> getNfsInfos() throws Exception {
         List<Map<String, Object>> r = new ArrayList<>();
-        List<NfsDataInfo> nfsDataInfos = dmeNFSAccessService.listNfs();
+        List<NfsDataInfo> nfsDataInfos = dmeNfsAccessService.listNfs();
         if (nfsDataInfos != null){
             for (NfsDataInfo nfsDataInfo : nfsDataInfos){
                 Map<String, Object> t = new HashMap();
@@ -253,12 +246,12 @@ public class OverviewServiceImpl implements OverviewService {
         this.vmfsAccessService = vmfsAccessService;
     }
 
-    public DmeNFSAccessService getDmeNFSAccessService() {
-        return dmeNFSAccessService;
+    public DmeNFSAccessService getDmeNfsAccessService() {
+        return dmeNfsAccessService;
     }
 
-    public void setDmeNFSAccessService(DmeNFSAccessService dmeNFSAccessService) {
-        this.dmeNFSAccessService = dmeNFSAccessService;
+    public void setDmeNfsAccessService(DmeNFSAccessService dmeNfsAccessService) {
+        this.dmeNfsAccessService = dmeNfsAccessService;
     }
 
     public DmeStorageService getDmeStorageService() {

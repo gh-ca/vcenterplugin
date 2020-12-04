@@ -1,29 +1,46 @@
 package com.dmeplugin.dmestore.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
  * @author wangxiangyong
  **/
 public class ServiceVolumeMapping {
-    @JsonProperty("host_id")
+    /**
+     * hostId .
+     */
     private String hostId;
-    @JsonProperty("hostgroup_id")
+    /**
+     * hostgroupId .
+     */
     private String hostgroupId;
 
+    /**
+     * getHostId .
+     * @return String .
+     */
     public String getHostId() {
         return hostId;
     }
 
-    public void setHostId(String hostId) {
-        this.hostId = hostId;
+    /**
+     * setHostId .
+     * @param param .
+     */
+    public void setHostId(final String param) {
+        this.hostId = param;
     }
-
+    /**
+     * getHostgroupId .
+     * @return String .
+     */
     public String getHostgroupId() {
         return hostgroupId;
     }
 
-    public void setHostgroupId(String hostgroupId) {
-        this.hostgroupId = hostgroupId;
+    /**
+     * setHostgroupId .
+     * @param param .
+     */
+    public void setHostgroupId(final String param) {
+        this.hostgroupId = param;
     }
 }
