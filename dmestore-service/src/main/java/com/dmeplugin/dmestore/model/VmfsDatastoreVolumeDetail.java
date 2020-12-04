@@ -1,166 +1,298 @@
 package com.dmeplugin.dmestore.model;
 
 /**
- * @Author Administrator
- * @Description vmfs Datastore劵详情
- * @Date 16:01 2020/9/2
- * @Param
- * @Return
+ * @author Administrator .
+ * @Description:  vmfs Datastore劵详情
+ * @since  16:01 2020/9/2
  **/
 public class VmfsDatastoreVolumeDetail {
+    /**
+     * name .
+     */
     private String name;
+    /**
+     * wwn .
+     */
     private String wwn;
+    /**
+     * smartTier .
+     */
     private String smartTier;
+    /**
+     * evolutionaryInfo .
+     */
     private String evolutionaryInfo;
+    /**
+     * device .
+     */
     private String device;
+    /**
+     * storagePool .
+     */
     private String storagePool;
+    /**
+     * serviceLevel .
+     */
     private String serviceLevel;
+    /**
+     * storage .
+     */
     private String storage;
+    /**
+     * dudeplication .
+     */
     private boolean dudeplication;
+    /**
+     * provisionType .
+     */
     private String provisionType;
+    /**
+     * compression .
+     */
     private boolean compression;
+    /**
+     * applicationType .
+     */
     private String applicationType;
+    /**
+     * controlPolicy .
+     */
     private String controlPolicy;
+    /**
+     * trafficControl .
+     */
     private String trafficControl;
 
-
+    /**
+     * getCompression .
+     * @return boolean .
+     */
     public boolean getCompression() {
         return compression;
     }
 
-    public void setCompression(boolean compression) {
-        this.compression = compression;
+    /**
+     * setCompression .
+     * @param param .
+     */
+    public void setCompression(final boolean param) {
+        this.compression = param;
     }
-
+    /**
+     * getProvisionType .
+     * @return String .
+     */
     public String getProvisionType() {
         return provisionType;
     }
 
-    public void setProvisionType(String provisionType) {
-        this.provisionType = provisionType;
+    /**
+     * setProvisionType .
+     * @param param .
+     */
+    public void setProvisionType(final String param) {
+        this.provisionType = param;
     }
-
+    /**
+     * getName .
+     * @return String .
+     */
     public String getName() {
         return name;
     }
-
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setName .
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
-
+    /**
+     * getWwn .
+     * @return String .
+     */
     public String getWwn() {
         return wwn;
     }
-
-    public void setWwn(String wwn) {
-        this.wwn = wwn;
+    /**
+     * setWwn .
+     * @param param .
+     */
+    public void setWwn(final String param) {
+        this.wwn = param;
     }
-
+    /**
+     * getSmartTier .
+     * @return String .
+     */
     public String getSmartTier() {
         return smartTier;
     }
-
-    public void setSmartTier(String smartTier) {
-        this.smartTier = smartTier;
+    /**
+     * setSmartTier .
+     * @param param .
+     */
+    public void setSmartTier(final String param) {
+        this.smartTier = param;
     }
-
+    /**
+     * getEvolutionaryInfo .
+     * @return String .
+     */
     public String getEvolutionaryInfo() {
         return evolutionaryInfo;
     }
-
-    public void setEvolutionaryInfo(String evolutionaryInfo) {
-        this.evolutionaryInfo = evolutionaryInfo;
+    /**
+     * setEvolutionaryInfo .
+     * @param param .
+     */
+    public void setEvolutionaryInfo(final String param) {
+        this.evolutionaryInfo = param;
     }
-
+    /**
+     * getDevice .
+     * @return String .
+     */
     public String getDevice() {
         return device;
     }
-
-    public void setDevice(String device) {
-        this.device = device;
+    /**
+     * setDevice .
+     * @param param .
+     */
+    public void setDevice(final String param) {
+        this.device = param;
     }
-
+    /**
+     * getStoragePool .
+     * @return String .
+     */
     public String getStoragePool() {
         return storagePool;
     }
-
-    public void setStoragePool(String storagePool) {
-        this.storagePool = storagePool;
+    /**
+     * setStoragePool .
+     * @param param .
+     */
+    public void setStoragePool(final String param) {
+        this.storagePool = param;
     }
-
+    /**
+     * getServiceLevel .
+     * @return String .
+     */
     public String getServiceLevel() {
         return serviceLevel;
     }
-
-    public void setServiceLevel(String serviceLevel) {
-        this.serviceLevel = serviceLevel;
+    /**
+     * setServiceLevel .
+     * @param param .
+     */
+    public void setServiceLevel(final String param) {
+        this.serviceLevel = param;
     }
-
+    /**
+     * getStorage .
+     * @return String .
+     */
     public String getStorage() {
         return storage;
     }
-
-    public void setStorage(String storage) {
-        this.storage = storage;
+    /**
+     * setStorage .
+     * @param param .
+     */
+    public void setStorage(final String param) {
+        this.storage = param;
     }
-
-    public boolean getDudeplication() {
+    /**
+     * setDudeplication .
+     * @return String .
+     */
+    public boolean setDudeplication() {
         return dudeplication;
     }
-
-    public void setDudeplication(boolean dudeplication) {
-        this.dudeplication = dudeplication;
+    /**
+     * setDudeplication .
+     * @param param .
+     */
+    public void setDudeplication(final boolean param) {
+        this.dudeplication = param;
     }
-
+    /**
+     * getProvisionType .
+     * @return String .
+     */
     public boolean isDudeplication() {
         return dudeplication;
     }
-
+    /**
+     * isCompression .
+     * @return String .
+     */
     public boolean isCompression() {
         return compression;
     }
-
+    /**
+     * getApplicationType .
+     * @return String .
+     */
     public String getApplicationType() {
         return applicationType;
     }
-
-    public void setApplicationType(String applicationType) {
-        this.applicationType = applicationType;
+    /**
+     * setApplicationType .
+     * @param param .
+     */
+    public void setApplicationType(final String param) {
+        this.applicationType = param;
     }
-
+    /**
+     * getControlPolicy .
+     * @return String .
+     */
     public String getControlPolicy() {
         return controlPolicy;
     }
-
-    public void setControlPolicy(String controlPolicy) {
-        this.controlPolicy = controlPolicy;
+    /**
+     * setControlPolicy .
+     * @param param .
+     */
+    public void setControlPolicy(final String param) {
+        this.controlPolicy = param;
     }
-
+    /**
+     * getTrafficControl .
+     * @return String .
+     */
     public String getTrafficControl() {
         return trafficControl;
     }
-
-    public void setTrafficControl(String trafficControl) {
-        this.trafficControl = trafficControl;
+    /**
+     * setTrafficControl .
+     * @param param .
+     */
+    public void setTrafficControl(final String param) {
+        this.trafficControl = param;
     }
 
     @Override
-    public String toString() {
-        return "VmfsDatastoreVolumeDetail{" +
-            "name='" + name + '\'' +
-            ", wwn='" + wwn + '\'' +
-            ", smartTier='" + smartTier + '\'' +
-            ", evolutionaryInfo='" + evolutionaryInfo + '\'' +
-            ", device='" + device + '\'' +
-            ", storagePool='" + storagePool + '\'' +
-            ", serviceLevel='" + serviceLevel + '\'' +
-            ", storage='" + storage + '\'' +
-            ", dudeplication=" + dudeplication +
-            ", provisionType='" + provisionType + '\'' +
-            ", compression=" + compression +
-            ", applicationType='" + applicationType + '\'' +
-            ", controlPolicy='" + controlPolicy + '\'' +
-            ", trafficControl='" + trafficControl + '\'' +
-            '}';
+    public final String toString() {
+        return "VmfsDatastoreVolumeDetail{"
+            + "name='" + name + '\''
+            + ", wwn='" + wwn + '\''
+            + ", smartTier='" + smartTier + '\''
+            + ", evolutionaryInfo='" + evolutionaryInfo + '\''
+            + ", device='" + device + '\''
+            + ", storagePool='" + storagePool + '\''
+            + ", serviceLevel='" + serviceLevel + '\''
+            + ", storage='" + storage + '\''
+            + ", dudeplication=" + dudeplication
+            + ", provisionType='" + provisionType + '\''
+            + ", compression=" + compression
+            + ", applicationType='" + applicationType + '\''
+            + ", controlPolicy='" + controlPolicy + '\''
+            + ", trafficControl='" + trafficControl + '\''
+            + '}';
     }
 }

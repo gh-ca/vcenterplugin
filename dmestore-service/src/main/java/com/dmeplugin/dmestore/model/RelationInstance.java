@@ -8,67 +8,132 @@ package com.dmeplugin.dmestore.model;
  * @create: 2020-09-15
  **/
 public class RelationInstance {
-    String sourceInstanceId;
-    String targetInstanceId;
-    String relationName;
-    String id;
-    long lastModified;
-    String resId;
-    int relationId;
+    /**
+     * sourceInstanceId .
+     */
+    private String sourceInstanceId;
+    /**
+     * targetInstanceId .
+     */
+    private String targetInstanceId;
+    /**
+     * relationName .
+     */
+    private String relationName;
+    /**
+     * id .
+     */
+    private String id;
+    /**
+     * lastModified .
+     */
+    private long lastModified;
+    /**
+     * resId .
+     */
+    private String resId;
+    /**
+     * relationId .
+     */
+    private int relationId;
 
+    /**
+     * getSourceInstanceId .
+     * @return String.
+     */
     public String getSourceInstanceId() {
         return sourceInstanceId;
     }
 
-    public void setSourceInstanceId(String sourceInstanceId) {
-        this.sourceInstanceId = sourceInstanceId;
+    /**
+     * setSourceInstanceId .
+     * @param param .
+     */
+    public void setSourceInstanceId(final String param) {
+        this.sourceInstanceId = param;
     }
-
+    /**
+     * getTargetInstanceId .
+     * @return String.
+     */
     public String getTargetInstanceId() {
         return targetInstanceId;
     }
-
-    public void setTargetInstanceId(String targetInstanceId) {
-        this.targetInstanceId = targetInstanceId;
+    /**
+     * setTargetInstanceId .
+     * @param param .
+     */
+    public void setTargetInstanceId(final String param) {
+        this.targetInstanceId = param;
     }
-
+    /**
+     * getRelationName .
+     * @return String.
+     */
     public String getRelationName() {
         return relationName;
     }
-
-    public void setRelationName(String relationName) {
-        this.relationName = relationName;
+    /**
+     * setRelationName .
+     * @param param .
+     */
+    public void setRelationName(final String param) {
+        this.relationName = param;
     }
-
+    /**
+     * getId .
+     * @return String.
+     */
     public String getId() {
         return id;
     }
-
-    public void setId(String id) {
-        this.id = id;
+    /**
+     * setId .
+     * @param param .
+     */
+    public void setId(final String param) {
+        this.id = param;
     }
-
+    /**
+     * getLastModified .
+     * @return long.
+     */
     public long getLastModified() {
         return lastModified;
     }
-
-    public void setLastModified(long lastModified) {
-        this.lastModified = lastModified;
+    /**
+     * setSourceInstanceId .
+     * @param param .
+     */
+    public void setLastModified(final long param) {
+        this.lastModified = param;
     }
-
+    /**
+     * getResId .
+     * @return String.
+     */
     public String getResId() {
         return resId;
     }
-
-    public void setResId(String resId) {
-        this.resId = resId;
+    /**
+     * setResId .
+     * @param param .
+     */
+    public void setResId(final String param) {
+        this.resId = param;
     }
-
+    /**
+     * getRelationId .
+     * @return int.
+     */
     public int getRelationId() {
         return relationId;
     }
-
-    public void setRelationId(int relationId) {
-        this.relationId = relationId;
+    /**
+     * setRelationId .
+     * @param param .
+     */
+    public void setRelationId(final int param) {
+        this.relationId = param;
     }
 }

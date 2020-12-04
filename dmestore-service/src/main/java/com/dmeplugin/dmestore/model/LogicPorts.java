@@ -2,153 +2,298 @@ package com.dmeplugin.dmestore.model;
 
 /**
  * @author lianq
- * @className LogicPort
- * @description TODO
- * @date 2020/9/7 15:40
+ * @ClassName:  LogicPort
+ * @since  2020/9/7 15:40
  */
 public class LogicPorts {
+    /**
+     * id .
+     */
     private String id;
+    /**
+     * name .
+     */
     private String name;
+    /**
+     * runningStatus .
+     */
     private String runningStatus;
+    /**
+     * operationalStatus .
+     */
     private String operationalStatus;
+    /**
+     * mgmtIp .
+     */
     private String mgmtIp;
+    /**
+     * mgmtIpv6 .
+     */
     private String mgmtIpv6;
+    /**
+     * homePortId .
+     */
     private String homePortId;
+    /**
+     * homePortName .
+     */
     private String homePortName;
+    /**
+     * currentPortId .
+     */
     private String currentPortId;
+    /**
+     * currentPortName .
+     */
     private String currentPortName;
+    /**
+     * role .
+     */
     private String role;
+    /**
+     * ddnsStatus .
+     */
     private String ddnsStatus;
+    /**
+     * supportProtocol .
+     */
     private String supportProtocol;
+    /**
+     * managementAccess .
+     */
     private String managementAccess;
+    /**
+     * vstoreId .
+     */
     private String vstoreId;
+    /**
+     * vstoreName .
+     */
     private String vstoreName;
 
+    /**
+     * getId .
+     * @return String .
+     */
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    /**
+     * setId .
+     * @param param .
+     */
+    public void setId(final String param) {
+        this.id = param;
     }
-
+    /**
+     * getName .
+     * @return String .
+     */
     public String getName() {
         return name;
     }
-
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setName .
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
-
+    /**
+     * getRunningStatus .
+     * @return String .
+     */
     public String getRunningStatus() {
         return runningStatus;
     }
-
-    public void setRunningStatus(String runningStatus) {
-        this.runningStatus = runningStatus;
+    /**
+     * setRunningStatus .
+     * @param param .
+     */
+    public void setRunningStatus(final String param) {
+        this.runningStatus = param;
     }
-
+    /**
+     * getOperationalStatus .
+     * @return String .
+     */
     public String getOperationalStatus() {
         return operationalStatus;
     }
-
-    public void setOperationalStatus(String operationalStatus) {
-        this.operationalStatus = operationalStatus;
+    /**
+     * setOperationalStatus .
+     * @param param .
+     */
+    public void setOperationalStatus(final String param) {
+        this.operationalStatus = param;
     }
-
+    /**
+     * getMgmtIp .
+     * @return String .
+     */
     public String getMgmtIp() {
         return mgmtIp;
     }
-
-    public void setMgmtIp(String mgmtIp) {
-        this.mgmtIp = mgmtIp;
+    /**
+     * setId .
+     * @param param .
+     */
+    public void setMgmtIp(final String param) {
+        this.mgmtIp = param;
     }
-
+    /**
+     * getMgmtIpv6 .
+     * @return String .
+     */
     public String getMgmtIpv6() {
         return mgmtIpv6;
     }
-
-    public void setMgmtIpv6(String mgmtIpv6) {
-        this.mgmtIpv6 = mgmtIpv6;
+    /**
+     * setMgmtIpv6 .
+     * @param param .
+     */
+    public void setMgmtIpv6(final String param) {
+        this.mgmtIpv6 = param;
     }
-
+    /**
+     * getHomePortId .
+     * @return String .
+     */
     public String getHomePortId() {
         return homePortId;
     }
-
-    public void setHomePortId(String homePortId) {
-        this.homePortId = homePortId;
+    /**
+     * setHomePortId .
+     * @param param .
+     */
+    public void setHomePortId(final String param) {
+        this.homePortId = param;
     }
-
+    /**
+     * getHomePortName .
+     * @return String .
+     */
     public String getHomePortName() {
         return homePortName;
     }
-
-    public void setHomePortName(String homePortName) {
-        this.homePortName = homePortName;
+    /**
+     * setHomePortName .
+     * @param param .
+     */
+    public void setHomePortName(final String param) {
+        this.homePortName = param;
     }
-
+    /**
+     * getCurrentPortId .
+     * @return String .
+     */
     public String getCurrentPortId() {
         return currentPortId;
     }
-
-    public void setCurrentPortId(String currentPortId) {
-        this.currentPortId = currentPortId;
+    /**
+     * setCurrentPortId .
+     * @param param .
+     */
+    public void setCurrentPortId(final String param) {
+        this.currentPortId = param;
     }
-
+    /**
+     * getCurrentPortName .
+     * @return String .
+     */
     public String getCurrentPortName() {
         return currentPortName;
     }
-
-    public void setCurrentPortName(String currentPortName) {
-        this.currentPortName = currentPortName;
+    /**
+     * setCurrentPortName .
+     * @param param .
+     */
+    public void setCurrentPortName(final String param) {
+        this.currentPortName = param;
     }
-
+    /**
+     * getRole .
+     * @return String .
+     */
     public String getRole() {
         return role;
     }
-
-    public void setRole(String role) {
-        this.role = role;
+    /**
+     * setRole .
+     * @param param .
+     */
+    public void setRole(final String param) {
+        this.role = param;
     }
-
+    /**
+     * getDdnsStatus .
+     * @return String .
+     */
     public String getDdnsStatus() {
         return ddnsStatus;
     }
-
-    public void setDdnsStatus(String ddnsStatus) {
-        this.ddnsStatus = ddnsStatus;
+    /**
+     * setDdnsStatus .
+     * @param param .
+     */
+    public void setDdnsStatus(final String param) {
+        this.ddnsStatus = param;
     }
-
+    /**
+     * getSupportProtocol .
+     * @return String .
+     */
     public String getSupportProtocol() {
         return supportProtocol;
     }
-
-    public void setSupportProtocol(String supportProtocol) {
-        this.supportProtocol = supportProtocol;
+    /**
+     * setSupportProtocol .
+     * @param param .
+     */
+    public void setSupportProtocol(final String param) {
+        this.supportProtocol = param;
     }
-
+    /**
+     * getManagementAccess .
+     * @return String .
+     */
     public String getManagementAccess() {
         return managementAccess;
     }
-
-    public void setManagementAccess(String managementAccess) {
-        this.managementAccess = managementAccess;
+    /**
+     * setManagementAccess .
+     * @param param .
+     */
+    public void setManagementAccess(final String param) {
+        this.managementAccess = param;
     }
-
+    /**
+     * getVstoreId .
+     * @return String .
+     */
     public String getVstoreId() {
         return vstoreId;
     }
-
-    public void setVstoreId(String vstoreId) {
-        this.vstoreId = vstoreId;
+    /**
+     * setVstoreId .
+     * @param param .
+     */
+    public void setVstoreId(final String param) {
+        this.vstoreId = param;
     }
-
+    /**
+     * getVstoreName .
+     * @return String .
+     */
     public String getVstoreName() {
         return vstoreName;
     }
-
-    public void setVstoreName(String vstoreName) {
-        this.vstoreName = vstoreName;
+    /**
+     * setVstoreName .
+     * @param param .
+     */
+    public void setVstoreName(final String param) {
+        this.vstoreName = param;
     }
 }
