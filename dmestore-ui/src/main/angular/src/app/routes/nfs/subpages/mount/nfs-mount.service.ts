@@ -11,14 +11,21 @@ export class NfsMountService{
     return this.http.get('accessvmware/getclustersbydsobjectid', {params: {dataStoreObjectId}});
   }
 
-  getDatastoreListByHostObjectId(params:{}){
-    return this.http.get('accessvmware/getdatastoresbyhostobjectid', params);
+  getDatastoreListByHostObjectId(hostObjectId:string, dataStoreType:string){
+    return this.http.get('accessvmware/getdatastoresbyhostobjectid', {params:{hostObjectId, dataStoreType}});
   }
   getDatastoreListByClusterObjectId(params:{}){
     return this.http.get('accessvmware/getdatastoresbyclusterobjectid', params);
   }
   mountNfs(params= {}){
     return this.http.post('accessnfs/mountnfs', params);
+  }
+  //获取主机对应的虚拟ip列表
+  getVmkernelListByObjectId(hostObjectId:string){
+    return this.http.get('accessvmware/getvmkernelipbyhostobjectid',{params: {hostObjectId}} );
+  }
+  getLogicPortListByStorageId(storageId: string){
+    return this.http.get('dmestorage/logicports', {params: {storageId}});
   }
 }
 export class DataStore{
@@ -29,4 +36,17 @@ export class DataStore{
   objectId: string;
   status: string;
   capacity: string;
+}
+export class Vmkernel{
+  portgroup: string;
+  ipAddress: string;
+  device: string;
+  key: string;
+  mac: string;
+}
+export class Mount{
+  dataStoreObjectId: string;
+  hostObjectId
+  hostVkernelIp:string;//  虚拟网卡ip
+  mountType: string;
 }

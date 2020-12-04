@@ -7,8 +7,20 @@ export class NfsAddService{
   getHostList(){
     return this.http.get('accessvmware/listhost');
   }
+  getStoragePoolListByStorageId(params={}){
+    return this.http.get('dmestorage/storagepools', params);
+  }
   getVmkernelListByObjectId(hostObjectId:string){
     return this.http.get('accessvmware/getvmkernelipbyhostobjectid',{params: {hostObjectId}} );
+  }
+  checkNfsNameExist(name:string){
+    return this.http.get('accessvmfs/querydatastorebyname',{params: {name}} );
+  }
+  checkShareNameExist(name:string){
+    return this.http.get('dmestorage/querysharebyname',{params: {name}} );
+  }
+  checkFsNameExist(name:string){
+    return this.http.get('dmestorage/queryfsbyname',{params: {name}} );
   }
   addNfs(params= {}){
     return this.http.post('operatenfs/createnfsdatastore', params);
@@ -43,6 +55,7 @@ export class AddNfs{
   vkernelIp:string;//  虚拟网卡ip
   hostObjectId:string;//  挂载主机的Objectid
   accessMode:string;//  挂载方式 分 只读 和读写
+  securityType:string;//安全类型
   constructor(){
     this.sameName = true;
     this.advance = false;

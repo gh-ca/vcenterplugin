@@ -5,15 +5,26 @@ import com.dmeplugin.dmestore.exception.DmeSqlException;
 import com.dmeplugin.dmestore.model.TaskDetailInfo;
 import com.dmeplugin.dmestore.model.TaskDetailResource;
 import com.dmeplugin.dmestore.utils.ToolUtils;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @Description: TODO
@@ -28,19 +39,17 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     private DmeAccessService dmeAccessService;
 
-    private final String LIST_TASK_URL = "/rest/taskmgmt/v1/tasks";
-    private final String QUERY_TASK_URL = "/rest/taskmgmt/v1/tasks/{task_id}";
-
-    private final int taskTimeOut = 10 * 60 * 1000;//轮询任务状态的超值时间
+    //轮询任务状态的超值时间
+    private final int taskTimeOut = 10 * 60 * 1000;
 
     Gson gson = new Gson();
 
     @Override
-    public List<TaskDetailInfo> listTasks()  {
+    public List<TaskDetailInfo> listTasks() {
         ResponseEntity<String> responseEntity;
         try {
-            responseEntity = dmeAccessService.access(LIST_TASK_URL, HttpMethod.GET, null);
-            if (responseEntity.getStatusCodeValue() / 100 != 2) {
+            responseEntity = dmeAccessService.access(DmeConstants.DME_TASK_BASE_URL, HttpMethod.GET, null);
+            if (responseEntity.getStatusCodeValue() != HttpStatus.OK.value()) {
                 LOG.error("查询指定任务列表失败!错误信息:{}", responseEntity.getBody());
                 return null;
             }
@@ -55,12 +64,12 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskDetailInfo queryTaskById(String taskId)  {
-        String url = QUERY_TASK_URL.replace("{task_id}", taskId);
+    public TaskDetailInfo queryTaskById(String taskId) {
+        String url = DmeConstants.QUERY_TASK_URL.replace("{task_id}", taskId);
         ResponseEntity<String> responseEntity;
         try {
             responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            if (responseEntity.getStatusCodeValue() / 100 != 2) {
+            if (responseEntity.getStatusCodeValue() != HttpStatus.OK.value()) {
                 LOG.error("查询指定任务信息失败!错误信息:{}", responseEntity.getBody());
                 return null;
             }
@@ -80,7 +89,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public JsonObject queryTaskByIdUntilFinish(String taskId) throws DMEException {
-        String url = QUERY_TASK_URL.replace("{task_id}", taskId);
+        String url = DmeConstants.QUERY_TASK_URL.replace("{task_id}", taskId);
         boolean loopFlag = true;
         int waitTime = 2 * 1000;
         int times = taskTimeOut / waitTime;
@@ -109,7 +118,7 @@ public class TaskServiceImpl implements TaskService {
                 throw new DmeSqlException(responseEntity.getBody());
             }
 
-            if((times--) < 0){
+            if ((times--) < 0) {
                 throw new DmeSqlException("查询任务状态超时！");
             }
         }
@@ -180,15 +189,15 @@ public class TaskServiceImpl implements TaskService {
     }
 
     /**
-     * @param taskIds       待查询的任务id集合
+     * @param taskIds 待查询的任务id集合
      * @param taskStatusMap 结束任务对应的状态集合
-     * @param timeout       任务查询超时时间 单位ms
-     * @param startTime     任务查询开始时间 单位ms
+     * @param timeout 任务查询超时时间 单位ms
+     * @param startTime 任务查询开始时间 单位ms
      */
     @Override
     public void getTaskStatus(List<String> taskIds, Map<String, Integer> taskStatusMap, int timeout, long startTime) {
         //没传开始时间或开始时间小于格林威治启用时间,初始话为当前时间
-        if (0 == startTime || startTime < 1392515067621L) {
+        if (0 == startTime) {
             startTime = System.currentTimeMillis();
         }
         List<TaskDetailInfo> detailInfos = new ArrayList<>();
@@ -196,7 +205,7 @@ public class TaskServiceImpl implements TaskService {
         for (String taskId : taskIds) {
             try {
                 TaskDetailInfo taskDetailInfo = queryTaskById(taskId);
-                if(taskDetailInfo!=null) {
+                if (taskDetailInfo != null) {
                     detailInfos.add(taskDetailInfo);
                 }
             } catch (Exception e) {
@@ -204,7 +213,7 @@ public class TaskServiceImpl implements TaskService {
             }
         }
         for (TaskDetailInfo taskInfo : detailInfos) {
-            if(taskInfo!=null) {
+            if (taskInfo != null) {
                 String taskId = taskInfo.getId();
                 //过滤子任务
                 if (!taskIds.contains(taskId)) {
@@ -241,12 +250,11 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Boolean checkTaskStatus(List<String> taskIds) {
         boolean flag = false;
-        if(null !=taskIds && taskIds.size() >0){
+        if (null != taskIds && taskIds.size() > 0) {
             Map<String, Integer> taskStatusMap = new HashMap<>(16);
             getTaskStatus(taskIds, taskStatusMap, taskTimeOut, System.currentTimeMillis());
-            LOG.info("taskStatusMap===" + (taskStatusMap == null ? "null" : gson.toJson(taskStatusMap)));
+            LOG.info("taskStatusMap===" + (taskStatusMap == null ? "null" : taskStatusMap.size()));
             for (Map.Entry<String, Integer> entry : taskStatusMap.entrySet()) {
-                //String taskId = entry.getKey();
                 int status = entry.getValue();
                 if (3 == status) {
                     flag = true;
@@ -261,11 +269,4 @@ public class TaskServiceImpl implements TaskService {
         this.dmeAccessService = dmeAccessService;
     }
 
-    /* public static void main(String[] args) {
-        //String str = "[{\"id\":\"564537e8-295b-4cb6-8484-171ea552cb40\",\"name_en\":\"Createvolume\",\"name_cn\":\"创建卷\",\"description\":null,\"parent_id\":\"564537e8-295b-4cb6-8484-171ea552cb40\",\"seq_no\":1,\"status\":3,\"progress\":100,\"owner_name\":\"admin\",\"owner_id\":\"1\",\"create_time\":1580953613057,\"start_time\":1580953613091,\"end_time\":1580953615050,\"detail_en\":null,\"detail_cn\":null,\"resources\":[{\"operate\":\"MODIFY\",\"type\":\"Device\",\"id\":\"4e1db765-4882-11ea-95d0-00505691e086\",\"name\":\"Huawei.Storage\"}]}]";
-        String str = "{\"total\":1,\"tasks\":[{\"id\":\"564537e8-295b-4cb6-8484-171ea552cb40\",\"name_en\":\"Createvolume\",\"name_cn\":\"创建卷\",\"description\":\"createavolume.\",\"parent_id\":\"564537e8-295b-4cb6-8484-171ea552cb40\",\"seq_no\":1,\"status\":3,\"progress\":100,\"owner_name\":\"admin\",\"owner_id\":\"1\",\"create_time\":1580953613057,\"start_time\":1580953613091,\"end_time\":1580953615050,\"detail_en\":null,\"detail_cn\":null,\"resources\":[]}]}";
-        TaskServiceImpl taskService = new TaskServiceImpl();
-        List<TaskDetailInfo> list = taskService.converBean(str);
-        System.out.println((new Gson()).toJson(list));
-    }*/
 }

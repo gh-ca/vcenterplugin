@@ -11,8 +11,8 @@ export class VmfsListService {
     return this.http.get('accessvmfs/listvmfs');
   }
   // 附列表数据
-  getChartData(volumeIds: string[] ) {
-    return this.http.get('accessvmfs/listvmfsperformance', {params: {volumeIds}});
+  getChartData(wwns: string[] ) {
+    return this.http.get('accessvmfs/listvmfsperformance', {params: {wwns}});
   }
   // 获取存储
   getStorages() {
@@ -20,7 +20,7 @@ export class VmfsListService {
   }
   // 通过存储ID获取存储池数据 (vmfs添加mediaType为block)
   getStoragePoolsByStorId(storageId: string, mediaType: string) {
-    return this.http.get('dmestorage/storagepools?storageId='+ storageId + '&media_type=' + mediaType);
+    return this.http.get('dmestorage/storagepools?storageId='+ storageId + '&mediaType=' + mediaType);
   }
 
   // 获取所有的主机
@@ -101,6 +101,26 @@ export class VmfsListService {
     return  this.http.get('accessdme/scandatastore', {params: {storageType}});
   }
 
+  // 获取WorkLoads
+  getWorkLoads(storageId: string) {
+    return  this.http.get('accessdme/getworkloads', {params: {storageId}});
+  }
+
+  /**
+   * 校验vmfs名称
+   * @param name
+   */
+  checkVmfsName(name: string) {
+    return this.http.get('accessvmfs/querydatastorebyname', {params: {name}});
+  }
+
+  /**
+   * 校验卷名称
+   * @param volName
+   */
+  checkVolName(volName: string) {
+    return this.http.get('dmestorage/queryvolumebyname', {params: {name:volName}});
+  }
 }
 // vmfs列表
 export interface VmfsInfo {
@@ -126,6 +146,8 @@ export interface VmfsInfo {
   volumeId: string;
   volumeName: string;
   wwn: string;
+  usedCapacity: number; // 使用容量
+  capacityUsage: number; // 利用率
 }
 // 存储
 export interface StorageList {
@@ -197,7 +219,15 @@ export interface HostOrCluster {
   deviceName: string;
   deviceType: string;
 }
-
+export interface Workload{
+    id: string;
+    name: string;
+    type: string;
+    block_size: string;
+    create_type: string;
+    enable_compress: string;
+    enable_dedup: string;
+}
 export class GetForm {
   // 获取添加form表单（初始化的添加表单）
   getAddForm() {
@@ -268,7 +298,7 @@ export class GetForm {
   // 扩容form（初始化的添加表单）
   getExpandForm() {
     const expandForm = {
-      vo_add_capacity: 0, // 扩容大小默认GB
+      vo_add_capacity: null, // 扩容大小默认GB
       capacityUnit: 'GB', // 容量单位 （最后需转换为GB）
       volume_id: '', // 卷ID
       ds_name: '', // vmfsName
@@ -294,7 +324,7 @@ export class GetForm {
       clusterId: null,
       cluster: null,
       dataStoreObjectIds: [], // datastore object id列表 必,
-      mountType: null // 挂载的设备类型 1 服务器、2 集群 前端自用参数
+      mountType: '1' // 挂载的设备类型 1 服务器、2 集群 前端自用参数
     };
     return mountForm;
   }

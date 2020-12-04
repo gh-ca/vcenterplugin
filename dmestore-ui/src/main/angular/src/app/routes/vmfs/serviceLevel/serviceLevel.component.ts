@@ -37,10 +37,17 @@ export class ServiceLevelComponent implements OnInit{
 
   // 变更服务等级 隐藏/展示
   changeServiceLevelShow = false;
+  modalLoading = false; // 数据加载loading
+  modalHandleLoading = false; // 数据处理loading
+  isOperationErr = false; // 错误信息
+  changeServiceLevelSuccessShow = false; // 变更服务等级成功
 
   ngOnInit(): void {
     this.changeServiceLevelShow = false;
-    // 获取vmfsInfo
+    this.modalLoading = true;
+    this.modalHandleLoading = false;
+    this.isOperationErr = false;
+
     // 初始化表单
     this.changeServiceLevelForm = new GetForm().getChangeLevelForm();
     this.route.url.subscribe(url => {
@@ -51,7 +58,9 @@ export class ServiceLevelComponent implements OnInit{
           this.objectId = queryParam.objectId;
         } else { // 以dataStore为入口
           const ctx = this.globalsService.getClientSdk().app.getContextObjects();
+          console.log('ctx', ctx);
           this.objectId = ctx[0].id;
+
         }
 
         // todo 获取vmfs数据
@@ -65,6 +74,7 @@ export class ServiceLevelComponent implements OnInit{
             this.changeServiceLevelForm.volume_ids = volumeIds;
             this.changeServiceLevelForm.ds_name = this.vmfsInfo.name;
           }
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         });
       });
     });
@@ -86,6 +96,7 @@ export class ServiceLevelComponent implements OnInit{
         console.log('this.serviceLevelList', this.serviceLevelList);
       }
       this.changeServiceLevelShow = true;
+      this.modalLoading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
@@ -112,15 +123,16 @@ export class ServiceLevelComponent implements OnInit{
       this.changeServiceLevelForm.service_level_id = selectResult.id;
       this.changeServiceLevelForm.service_level_name = selectResult.name;
 
-
+      this.modalHandleLoading = true;
       this.remoteSrv.changeServiceLevel(this.changeServiceLevelForm).subscribe((result: any) => {
+        this.modalHandleLoading = false;
         if (result.code === '200'){
           console.log('change service level success:' + name);
-          // 重新请求数据
+          this.changeServiceLevelSuccessShow = true;
         } else {
           console.log('change service level faild: ' + name  + ' Reason:' + result.description);
+          this.isOperationErr = true;
         }
-        // 关闭修改服务等级页面
         this.cdr.detectChanges();
       });
     } else {
@@ -143,5 +155,11 @@ export class ServiceLevelComponent implements OnInit{
       cNum = isGB ? (c/1024/1024).toFixed(3) + 'PB':(c/1024/1024).toFixed(3) + 'TB';
     }
     return cNum;
+  }
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    this.cancel();
   }
 }

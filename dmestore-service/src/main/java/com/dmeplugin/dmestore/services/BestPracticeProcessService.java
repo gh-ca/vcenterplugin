@@ -28,8 +28,6 @@ public interface BestPracticeProcessService {
      **/
     List<BestPracticeUpResultResponse> update(List<String> objectIds) throws DmeSqlException;
 
-    List<BestPracticeUpResultResponse> updateByCluster(String clusterobjectid) throws VcenterException, DmeSqlException;
-
     /**
      * @Author Administrator
      * @Description 更新主机的某一检查项

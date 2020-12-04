@@ -4,76 +4,150 @@ package com.dmeplugin.dmestore.model;
  * @author wangxiangyong
  **/
 public class BestPracticeBean {
+    /**
+     * hostSetting .
+     */
     private String hostSetting;
+    /**
+     * recommendValue .
+     */
     private String recommendValue;
+    /**
+     * level .
+     */
     private String level;
+    /**
+     * actualValue .
+     */
     private String actualValue;
+    /**
+     * needReboot .
+     */
     private String needReboot;
+    /**
+     * hostObjectId .
+     */
     private String hostObjectId;
+    /**
+     * hostName .
+     */
     private String hostName;
+    /**
+     * autoRepair .
+     */
     private String autoRepair;
 
+    /**
+     * getHostSetting .
+     * @return .
+     */
     public String getHostSetting() {
         return hostSetting;
     }
-
-    public void setHostSetting(String hostSetting) {
-        this.hostSetting = hostSetting;
+    /**
+     * setRecommendValue .
+     * @param param .
+     */
+    public void setHostSetting(final String param) {
+        this.hostSetting = param;
     }
-
+    /**
+     * getRecommendValue .
+     * @return .
+     */
     public String getRecommendValue() {
         return recommendValue;
     }
 
-    public void setRecommendValue(String recommendValue) {
-        this.recommendValue = recommendValue;
+    /**
+     * setRecommendValue .
+     * @param param .
+     */
+    public void setRecommendValue(final String param) {
+        this.recommendValue = param;
     }
-
+    /**
+     * getLevel .
+     * @return .
+     */
     public String getLevel() {
         return level;
     }
-
-    public void setLevel(String level) {
-        this.level = level;
+    /**
+     * setRecommendValue .
+     * @param param .
+     */
+    public void setLevel(final String param) {
+        this.level = param;
     }
-
+    /**
+     * getActualValue .
+     * @return .
+     */
     public String getActualValue() {
         return actualValue;
     }
-
-    public void setActualValue(String actualValue) {
-        this.actualValue = actualValue;
+    /**
+     * setRecommendValue .
+     * @param param .
+     */
+    public void setActualValue(final String param) {
+        this.actualValue = param;
     }
-
+    /**
+     * getNeedReboot .
+     * @return .
+     */
     public String getNeedReboot() {
         return needReboot;
     }
-
-    public void setNeedReboot(String needReboot) {
-        this.needReboot = needReboot;
+    /**
+     * setRecommendValue .
+     * @param param .
+     */
+    public void setNeedReboot(final String param) {
+        this.needReboot = param;
     }
-
+    /**
+     * getHostObjectId .
+     * @return .
+     */
     public String getHostObjectId() {
         return hostObjectId;
     }
-
-    public void setHostObjectId(String hostObjectId) {
-        this.hostObjectId = hostObjectId;
+    /**
+     * setRecommendValue .
+     * @param param .
+     */
+    public void setHostObjectId(final String param) {
+        this.hostObjectId = param;
     }
-
+    /**
+     * getHostName .
+     * @return .
+     */
     public String getHostName() {
         return hostName;
     }
-
-    public void setHostName(String hostName) {
-        this.hostName = hostName;
+    /**
+     * setRecommendValue .
+     * @param param .
+     */
+    public void setHostName(final String param) {
+        this.hostName = param;
     }
-
+    /**
+     * getAutoRepair .
+     * @return .
+     */
     public String getAutoRepair() {
         return autoRepair;
     }
-
-    public void setAutoRepair(String autoRepair) {
-        this.autoRepair = autoRepair;
+    /**
+     * setRecommendValue .
+     * @param param .
+     */
+    public void setAutoRepair(final String param) {
+        this.autoRepair = param;
     }
 }

@@ -24,7 +24,7 @@ export class AddService {
   }
   // 通过存储ID获取存储池数据 (vmfs添加mediaType为block)
   getStoragePoolsByStorId(storageId: string, mediaType: string) {
-    return this.http.get('dmestorage/storagepools?storageId='+ storageId + '&media_type=' + mediaType);
+    return this.http.get('dmestorage/storagepools?storageId='+ storageId + '&mediaType=' + mediaType);
   }
 
   /**
@@ -33,6 +33,27 @@ export class AddService {
    */
   getServiceLevelList(params = {}) {
     return this.http.post('servicelevel/listservicelevel', params);
+  }
+
+  // 获取WorkLoads
+  getWorkLoads(storageId: string) {
+    return  this.http.get('accessdme/getworkloads', {params: {storageId}});
+  }
+
+  /**
+   * 校验vmfs名称
+   * @param name
+   */
+  checkVmfsName(name: string) {
+    return this.http.get('accessvmfs/querydatastorebyname', {params: {name}});
+  }
+
+  /**
+   * 校验卷名称
+   * @param volName
+   */
+  checkVolName(volName: string) {
+    return this.http.get('dmestorage/queryvolumebyname', {params: {name:volName}});
   }
 }
 

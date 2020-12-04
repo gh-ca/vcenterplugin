@@ -1,10 +1,10 @@
 package com.dmeplugin.dmestore.dao;
 
-
 import com.dmeplugin.dmestore.exception.DataBaseException;
 import com.dmeplugin.dmestore.model.BestPracticeBean;
 import com.dmeplugin.dmestore.model.BestPracticeUpResultBase;
 import com.dmeplugin.dmestore.model.BestPracticeUpResultResponse;
+
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
@@ -26,7 +26,8 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         PreparedStatement pstm = null;
         try {
             con = getConnection();
-            String sql = "insert into DP_DME_BEST_PRACTICE_CHECK(HOST_ID,HOST_NAME,HOST_SETTING,RECOMMEND_VALUE,ACTUAL_VALUE,HINT_LEVEL,NEED_REBOOT,AUTO_REPAIR,CREATE_TIME) values(?,?,?,?,?,?,?,?,?)";
+            String sql
+                = "insert into DP_DME_BEST_PRACTICE_CHECK(HOST_ID,HOST_NAME,HOST_SETTING,RECOMMEND_VALUE,ACTUAL_VALUE,HINT_LEVEL,NEED_REBOOT,AUTO_REPAIR,CREATE_TIME) values(?,?,?,?,?,?,?,?,?)";
             pstm = con.prepareStatement(sql);
             //不自动提交
             con.setAutoCommit(false);
@@ -109,7 +110,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
 
     public Map<String, String> getByHostIds(List<String> ids) throws SQLException {
         Map<String, String> map = new HashMap<>(16);
-        if(null == ids || ids.size() == 0){
+        if (null == ids || ids.size() == 0) {
             return map;
         }
         Connection con = null;
@@ -119,9 +120,9 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             con = getConnection();
             String sql = "SELECT HOST_ID,HOST_NAME from DP_DME_BEST_PRACTICE_CHECK where 1=1 AND HOST_ID in(%s)";
             StringBuilder stringBuilder = new StringBuilder();
-            for(int i = 0; i < ids.size(); i++){
+            for (int i = 0; i < ids.size(); i++) {
                 stringBuilder.append("'").append(ids.get(i)).append("'");
-                if(i < ids.size() -1){
+                if (i < ids.size() - 1) {
                     stringBuilder.append(",");
                 }
             }
@@ -148,7 +149,8 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT HOST_ID,HOST_NAME,HOST_SETTING,RECOMMEND_VALUE,ACTUAL_VALUE,HINT_LEVEL,NEED_REBOOT,AUTO_REPAIR from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
+            String sql
+                = "SELECT HOST_ID,HOST_NAME,HOST_SETTING,RECOMMEND_VALUE,ACTUAL_VALUE,HINT_LEVEL,NEED_REBOOT,AUTO_REPAIR from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
             if (!StringUtils.isEmpty(hostSetting)) {
                 sql = sql + " and HOST_SETTING='" + hostSetting + "'";
             }
@@ -176,7 +178,8 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT HOST_ID,HOST_NAME,HOST_SETTING,RECOMMEND_VALUE,ACTUAL_VALUE,HINT_LEVEL,NEED_REBOOT,AUTO_REPAIR from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
+            String sql
+                = "SELECT HOST_ID,HOST_NAME,HOST_SETTING,RECOMMEND_VALUE,ACTUAL_VALUE,HINT_LEVEL,NEED_REBOOT,AUTO_REPAIR from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
             if (!StringUtils.isEmpty(hostSetting)) {
                 sql = sql + " and HOST_SETTING='" + hostSetting + "'";
             }
@@ -241,8 +244,11 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             for (BestPracticeUpResultResponse response : list) {
                 List<BestPracticeUpResultBase> baseList = response.getResult();
                 for (BestPracticeUpResultBase base : baseList) {
-                    String sqlTemp = String.format(sql, base.getHostObjectId(), base.getHostSetting());
-                    stm.addBatch(sqlTemp);
+                    //只有更新成功的才执行删除
+                    if (base.getUpdateResult()) {
+                        String sqlTemp = String.format(sql, base.getHostObjectId(), base.getHostSetting());
+                        stm.addBatch(sqlTemp);
+                    }
                 }
             }
             stm.executeBatch();
@@ -258,7 +264,6 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             closeConnection(con, stm, null);
         }
     }
-
 
     public void deleteByHostNameAndHostsetting(List<String> list, String hostSetting) {
         if (null == list || list.size() == 0) {
@@ -297,7 +302,8 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         PreparedStatement pstm = null;
         try {
             con = getConnection();
-            String sql = "UPDATE DP_DME_BEST_PRACTICE_CHECK SET ACTUAL_VALUE=?,CREATE_TIME=? where HOST_NAME=? and HOST_SETTING=?";
+            String sql
+                = "UPDATE DP_DME_BEST_PRACTICE_CHECK SET ACTUAL_VALUE=?,CREATE_TIME=? where HOST_NAME=? and HOST_SETTING=?";
             pstm = con.prepareStatement(sql);
             //不自动提交
             con.setAutoCommit(false);

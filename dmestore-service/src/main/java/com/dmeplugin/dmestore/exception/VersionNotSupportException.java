@@ -1,8 +1,6 @@
 package com.dmeplugin.dmestore.exception;
 
-
 public class VersionNotSupportException extends IgnorableException {
-
     private static final String RETURN_CODE = "-90006";
 
     public VersionNotSupportException(String currentVersion) {

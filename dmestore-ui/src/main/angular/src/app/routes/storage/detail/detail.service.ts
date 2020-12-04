@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {CapacityChart} from "../storage.service";
-import {Warnings} from "@angular/cli/lib/config/schema";
 
 @Injectable()
 export class DetailService {
@@ -26,6 +25,9 @@ export class DetailService {
   }
   getVolumeListList(storageId: string){
     return this.http.get('dmestorage/volumes', {params: {storageId}});
+  }
+  getVolumeListListByPage(params:any){
+    return this.http.get('dmestorage/volumes/byPage?storageId='+params.storageId+'&pageSize='+params.pageSize+'&pageNo='+params.pageNo);
   }
   getFileSystemList(storageId: string){
     return this.http.get('dmestorage/filesystems', {params: {storageId}});

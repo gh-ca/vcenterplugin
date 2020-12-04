@@ -4,35 +4,63 @@ package com.dmeplugin.dmestore.model;
  * @author lianq
  * @ClassName: CapabilitiesQos
  * @Company: GH-CA
- * @create 2020-09-03
+ * @since  2020-09-03
  */
 public class CapabilitiesQos {
-
+    /**
+     * smartQos .
+     */
     private SmartQos smartQos;
+    /**
+     * qosParam .
+     */
     private QosParam qosParam;
+    /**
+     * enabled .
+     */
     private Boolean enabled;
 
+    /**
+     * getSmartQos .
+     * @return SmartQos .
+     */
     public SmartQos getSmartQos() {
         return smartQos;
     }
-
+    /**
+     * getQosParam .
+     * @return QosParam .
+     */
     public QosParam getQosParam() {
         return qosParam;
     }
 
-    public void setQosParam(QosParam qosParam) {
-        this.qosParam = qosParam;
+    /**
+     * setQosParam .
+     * @param param .
+     */
+    public void setQosParam(final QosParam param) {
+        this.qosParam = param;
     }
-
-    public void setSmartQos(SmartQos smartQos) {
-        this.smartQos = smartQos;
+    /**
+     * setSmartQos .
+     * @param param .
+     */
+    public void setSmartQos(final SmartQos param) {
+        this.smartQos = param;
     }
-
+    /**
+     * getEnabled .
+     * @return Boolean .
+     */
     public Boolean getEnabled() {
         return enabled;
     }
-
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+    /**
+     * setQosParam .
+     * @param param .
+     */
+    public void setEnabled(final Boolean param) {
+        this.enabled = param;
     }
 }

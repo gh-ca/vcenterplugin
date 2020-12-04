@@ -10,7 +10,7 @@ export class FCPort{
 }
 export class EthernetPort{
   location:string;
-  status:string;
+  connectStatus:string;
   ipv4:string;
   ipv6: number;
   speed: number;

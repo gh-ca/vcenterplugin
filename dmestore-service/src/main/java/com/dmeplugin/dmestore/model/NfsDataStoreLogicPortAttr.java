@@ -5,68 +5,133 @@ import java.io.Serializable;
 /**
  * @author wangxiangyong
  **/
-public class NfsDataStoreLogicPortAttr implements Serializable{
+public class NfsDataStoreLogicPortAttr implements Serializable {
+    /**
+     * name .
+     */
     private String name;
+    /**
+     * ip .
+     */
     private String ip;
+    /**
+     * status .
+     */
     private String status;
+    /**
+     * runningStatus .
+     */
     private String runningStatus;
+    /**
+     * activePort .
+     */
     private String activePort;
+    /**
+     * currentPort .
+     */
     private String currentPort;
+    /**
+     * failoverGroup .
+     */
     private String failoverGroup;
 
+    /**
+     * getName .
+     * @return String 。
+     */
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setName .
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
-
+    /**
+     * getIp .
+     * @return String 。
+     */
     public String getIp() {
         return ip;
     }
-
-    public void setIp(String ip) {
-        this.ip = ip;
+    /**
+     * setIp .
+     * @param param .
+     */
+    public void setIp(final String param) {
+        this.ip = param;
     }
-
+    /**
+     * getStatus .
+     * @return String 。
+     */
     public String getStatus() {
         return status;
     }
-
-    public void setStatus(String status) {
-        this.status = status;
+    /**
+     * setName .
+     * @param param .
+     */
+    public void setStatus(final String param) {
+        this.status = param;
     }
-
+    /**
+     * getRunningStatus .
+     * @return String 。
+     */
     public String getRunningStatus() {
         return runningStatus;
     }
-
-    public void setRunningStatus(String runningStatus) {
-        this.runningStatus = runningStatus;
+    /**
+     * setRunningStatus .
+     * @param param .
+     */
+    public void setRunningStatus(final String param) {
+        this.runningStatus = param;
     }
-
+    /**
+     * getActivePort .
+     * @return String 。
+     */
     public String getActivePort() {
         return activePort;
     }
-
-    public void setActivePort(String activePort) {
-        this.activePort = activePort;
+    /**
+     * setActivePort .
+     * @param param .
+     */
+    public void setActivePort(final String param) {
+        this.activePort = param;
     }
-
+    /**
+     * getCurrentPort .
+     * @return String 。
+     */
     public String getCurrentPort() {
         return currentPort;
     }
-
-    public void setCurrentPort(String currentPort) {
-        this.currentPort = currentPort;
+    /**
+     * setCurrentPort .
+     * @param param .
+     */
+    public void setCurrentPort(final String param) {
+        this.currentPort = param;
     }
-
+    /**
+     * getFailoverGroup .
+     * @return String 。
+     */
     public String getFailoverGroup() {
         return failoverGroup;
     }
-
-    public void setFailoverGroup(String failoverGroup) {
-        this.failoverGroup = failoverGroup;
+    /**
+     * setFailoverGroup .
+     * @param param .
+     */
+    public void setFailoverGroup(final String param) {
+        this.failoverGroup = param;
     }
 }

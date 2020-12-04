@@ -7,17 +7,17 @@ import {
   NgZone
 } from '@angular/core';
 
-import {ClrDatagridStateInterface} from '@clr/angular';
 import {HttpClient} from '@angular/common/http';
 import { CommonService } from '../common.service';
 import {MakePerformance, NfsService} from "../nfs/nfs.service";
 import { GlobalsService }     from "../../shared/globals.service";
+import {TranslatePipe} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-servicelevel',
   templateUrl: './servicelevel.component.html',
   styleUrls: ['./servicelevel.component.scss'],
-  providers: [ CommonService, MakePerformance, NfsService ]
+  providers: [ CommonService, TranslatePipe,MakePerformance, NfsService ]
 })
 export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -129,6 +129,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   storeagePoolIsloading = false;
   // 数据列表
   storagePoolList: StoragePool[] = [];
+  storagePoolTotal = 0;
   // ===============storage pool end==============
 
   // ===============volume==============
@@ -136,6 +137,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   volumeIsloading = false;
   // 数据列表
   volumeList: Volume[] = [];
+  volumeTotal = 0;
 
   // ===============volume end==============
 
@@ -153,11 +155,13 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   tipModalSuccess = false;
   tipModalFail = false;
 
+  tierLoading = false;
+  syncLoading = false;
   constructor(private ngZone: NgZone,
               private cdr: ChangeDetectorRef,
               private http: HttpClient,
               private gs: GlobalsService,
-              private makePerformance: MakePerformance) { }
+              private makePerformance: MakePerformance, private translatePipe:TranslatePipe) { }
 
   ngOnInit(): void {
   }
@@ -186,7 +190,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // ===============storage pool==============
-  storagePoolRefresh(state: ClrDatagridStateInterface){
+  storagePoolRefresh(){
     setTimeout(()=>{
       this.storeagePoolIsloading = true;
       this.http.post('servicelevel/listStoragePoolsByServiceLevelId', this.selectedModel.id).subscribe((response: any) => {
@@ -195,6 +199,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
         } else{
           this.storagePoolList = [];
         }
+        this.storagePoolTotal = this.storagePoolList.length;
         this.storeagePoolIsloading = false;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
 
@@ -208,7 +213,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   // ===============storage pool end==============
 
   // ===============volume pool==============
-  volumeRefresh(state: ClrDatagridStateInterface){
+  volumeRefresh(){
     setTimeout(()=>{
       this.volumeIsloading = true;
       this.http.post('servicelevel/listVolumesByServiceLevelId', this.selectedModel.id).subscribe((response: any) => {
@@ -217,6 +222,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
         } else{
           this.volumeList = [];
         }
+        this.volumeTotal = this.volumeList.length;
         this.volumeIsloading = false;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
 
@@ -230,7 +236,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   // ===============volume pool end==============
 
   // ===============applicationType pool==============
-  applicationTypeRefresh(state: ClrDatagridStateInterface){
+  applicationTypeRefresh(){
     this.applicationTypeIsloading = true;
     this.applicationTypeList = [];
     this.applicationTypeTotal = 0;
@@ -241,9 +247,9 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // 刷新服务等级列表
   refresh(){
-    this.gs.loading = true;
+    this.tierLoading = true;
     this.http.post('servicelevel/listservicelevel', {}).subscribe((response: any) => {
-      this.gs.loading = false;
+      this.tierLoading = false;
       if(response.code == '200'){
         this.serviceLevelsRes = this.recursiveNullDelete(response.data);
         for (const i of this.serviceLevelsRes){
@@ -255,6 +261,10 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
           i.usedCapacity = (i.usedCapacity/1024).toFixed(2);
           i.totalCapacity = (i.totalCapacity/1024).toFixed(2);
           i.freeCapacity = (i.freeCapacity/1024).toFixed(2);
+
+          if(!i.capabilities){
+            i.capabilities = {};
+          }
         }
         this.search();
       }
@@ -413,7 +423,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     this.http.post('datastorestatistichistrory/servicelevelStoragePool', p).subscribe((response: any) => {
       if (response.code == '200'){
         this.storagePoolList.forEach((item)=>{
-          let i = response.data.data[item.storage_instance_id];
+          let i = response.data[item.storage_instance_id];
           if (i != undefined){
             let iops = i['1125912791810049'].max;
             let latency = i['1125912791810050'].max;
@@ -436,7 +446,8 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   async initChart(range: Range) {
     this.makePerformance.setChartSingle(
       300,
-      '卷最大I/O响应时间(ms)',
+      // '卷最大I/O响应时间(ms)',
+      this.translatePipe.transform('performance.volumeMaximumIORespTime'),
       '',
       ["1125921381744655"],
       [this.selectedModel.id],
@@ -450,7 +461,8 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.makePerformance.setChartSingle(
       300,
-      '卷I/O密度(IOPS/TB)',
+      // '卷I/O密度(IOPS/TB)',
+      this.translatePipe.transform('performance.volumeIODensity'),
       '',
       ["1223"],
       [this.selectedModel.id],
@@ -464,7 +476,8 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     this.makePerformance.setChartSingle(
       300,
-      '卷总吞吐量(IOPS)',
+      // '卷总吞吐量(IOPS)',
+      this.translatePipe.transform('performance.totalVolumeThroughput'),
       '',
       ["1125921381744641"],
       [this.selectedModel.id],
@@ -478,7 +491,8 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     this.makePerformance.setChartSingle(
       300,
-      '卷总带宽(MB/s)',
+      // '卷总带宽(MB/s)',
+      this.translatePipe.transform('performance.volumeTotalBandwidth'),
       '',
       ["1125921381744643"],
       [this.selectedModel.id],
@@ -492,7 +506,8 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
       });
     this.makePerformance.setChartSingle(
       300,
-      '存储池I/O密度(IOPS/TB)',
+      // '存储池I/O密度(IOPS/TB)',
+      this.translatePipe.transform('performance.storagePoolIODensity'),
       '',
       ["111"],
       [this.selectedModel.id],
@@ -510,10 +525,10 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
    * 同步虚拟机存储策略
    */
   syncStoragePolicy(){
-    this.gs.loading = true;
+    this.syncLoading = true;
     const url = "servicelevel/manualupdate";
     this.http.post(url, {}).subscribe((response: any) => {
-      this.gs.loading = false;
+      this.syncLoading = false;
       if (response.code == '200'){
          this.tipModalSuccess = true;
       } else{

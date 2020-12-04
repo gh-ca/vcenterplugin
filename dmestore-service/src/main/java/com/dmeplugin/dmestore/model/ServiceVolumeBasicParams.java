@@ -1,46 +1,99 @@
 package com.dmeplugin.dmestore.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
  * @author wangxiangyong
  **/
 public class ServiceVolumeBasicParams {
+    /**
+     * name .
+     */
     private String name;
+    /**
+     * capacity .
+     */
     private Integer capacity;
+    /**
+     * count .
+     */
     private Integer count;
-    @JsonProperty("start_suffix")
+    /**
+     * startSuffix .
+     */
     private Integer startSuffix;
+    /**
+     * unit .
+     */
+    private String unit;
 
+    /**
+     * getName .
+     * @return String.
+     */
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setName .
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
-
+    /**
+     * getCapacity .
+     * @return int.
+     */
     public int getCapacity() {
         return capacity;
     }
-
-    public void setCapacity(Integer capacity) {
-        this.capacity = capacity;
+    /**
+     * setCapacity .
+     * @param param .
+     */
+    public void setCapacity(final Integer param) {
+        this.capacity = param;
     }
-
+    /**
+     * getCount .
+     * @return int.
+     */
     public int getCount() {
         return count;
     }
-
-    public void setCount(Integer count) {
-        this.count = count;
+    /**
+     * setCount .
+     * @param param .
+     */
+    public void setCount(final Integer param) {
+        this.count = param;
     }
-
+    /**
+     * getStartSuffix .
+     * @return Integer.
+     */
     public Integer getStartSuffix() {
         return startSuffix;
     }
-
-    public void setStartSuffix(Integer startSuffix) {
-        this.startSuffix = startSuffix;
+    /**
+     * setStartSuffix .
+     * @param param .
+     */
+    public void setStartSuffix(final Integer param) {
+        this.startSuffix = param;
+    }
+    /**
+     * getUnit .
+     * @return String.
+     */
+    public String getUnit() {
+        return unit;
+    }
+    /**
+     * setUnit .
+     * @param param .
+     */
+    public void setUnit(final String param) {
+        this.unit = param;
     }
 }

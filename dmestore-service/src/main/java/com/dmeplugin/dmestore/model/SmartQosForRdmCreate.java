@@ -1,19 +1,27 @@
 package com.dmeplugin.dmestore.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
  * @author wangxiangyong
  */
 public class SmartQosForRdmCreate extends BaseSmartQos {
-    @JsonProperty("control_policy")
+    /**
+     * 控制策略， 0：保护IO下限，1：控制IO上限.
+     **/
     private String controlPolicy;
 
+    /**
+     * getControlPolicy .
+     * @return String .
+     */
     public String getControlPolicy() {
         return controlPolicy;
     }
 
-    public void setControlPolicy(String controlPolicy) {
-        this.controlPolicy = controlPolicy;
+    /**
+     * setControlPolicy .
+     * @param param .
+     */
+    public void setControlPolicy(final String param) {
+        this.controlPolicy = param;
     }
 }

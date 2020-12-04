@@ -1,100 +1,177 @@
 package com.dmeplugin.dmestore.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 
 /**
  * @author wangxiangyong
  **/
 public class CustomizeVolumes {
-    @JsonProperty("availability_zone")
+    /**
+     * availabilityZone .
+     */
     private String availabilityZone;
-    @JsonProperty("initial_distribute_policy")
+
+    /**
+     * 0：自动，1：高性能层，2：性能层，3：容量层 默认值：自动 .
+     **/
     private String initialDistributePolicy;
-    @JsonProperty("owner_controller")
+
+    /**
+     * OA、OB，默认为空代表自动 .
+     **/
     private String ownerController;
-    @JsonProperty("pool_raw_id")
+    /**
+     * poolRawId .
+     */
     private String poolRawId;
-    @JsonProperty("prefetch_policy")
+
+    /**
+     * 预取策略，影响磁盘读取。取值范围 0: 不预取，1：固定预取，
+     * 2：可变预取，3：智能预取 默认值：智能预取.
+     **/
     private String prefetchPolicy;
-    @JsonProperty("prefetch_value")
+    /**
+     * prefetchValue .
+     */
     private String prefetchValue;
-    @JsonProperty("storage_id")
+    /**
+     * storageId .
+     */
     private String storageId;
+    /**
+     * tuning .
+     */
     private CustomizeVolumeTuningForCreate tuning;
-    @JsonProperty("volume_specs")
+    /**
+     * volumeSpecs .
+     */
     private List<ServiceVolumeBasicParams> volumeSpecs;
 
+    /**
+     * getAvailabilityZone .
+     * @return String .
+     */
     public String getAvailabilityZone() {
         return availabilityZone;
     }
 
-    public void setAvailabilityZone(String availabilityZone) {
-        this.availabilityZone = availabilityZone;
+    /**
+     * setAvailabilityZone .
+     * @param param .
+     */
+    public void setAvailabilityZone(final String param) {
+        this.availabilityZone = param;
     }
-
+    /**
+     * getInitialDistributePolicy .
+     * @return String .
+     */
     public String getInitialDistributePolicy() {
         return initialDistributePolicy;
     }
-
-    public void setInitialDistributePolicy(String initialDistributePolicy) {
-        this.initialDistributePolicy = initialDistributePolicy;
+    /**
+     * setAvailabilityZone .
+     * @param param .
+     */
+    public void setInitialDistributePolicy(final String param) {
+        this.initialDistributePolicy = param;
     }
-
+    /**
+     * getOwnerController .
+     * @return String .
+     */
     public String getOwnerController() {
         return ownerController;
     }
-
-    public void setOwnerController(String ownerController) {
-        this.ownerController = ownerController;
+    /**
+     * setAvailabilityZone .
+     * @param param .
+     */
+    public void setOwnerController(final String param) {
+        this.ownerController = param;
     }
-
+    /**
+     * getPoolRawId .
+     * @return String .
+     */
     public String getPoolRawId() {
         return poolRawId;
     }
-
-    public void setPoolRawId(String poolRawId) {
-        this.poolRawId = poolRawId;
+    /**
+     * setAvailabilityZone .
+     * @param param .
+     */
+    public void setPoolRawId(final String param) {
+        this.poolRawId = param;
     }
-
+    /**
+     * getPrefetchPolicy .
+     * @return String .
+     */
     public String getPrefetchPolicy() {
         return prefetchPolicy;
     }
-
-    public void setPrefetchPolicy(String prefetchPolicy) {
-        this.prefetchPolicy = prefetchPolicy;
+    /**
+     * setAvailabilityZone .
+     * @param param .
+     */
+    public void setPrefetchPolicy(final String param) {
+        this.prefetchPolicy = param;
     }
-
+    /**
+     * getPrefetchValue .
+     * @return String .
+     */
     public String getPrefetchValue() {
         return prefetchValue;
     }
-
-    public void setPrefetchValue(String prefetchValue) {
-        this.prefetchValue = prefetchValue;
+    /**
+     * setAvailabilityZone .
+     * @param param .
+     */
+    public void setPrefetchValue(final String param) {
+        this.prefetchValue = param;
     }
-
+    /**
+     * getStorageId .
+     * @return String .
+     */
     public String getStorageId() {
         return storageId;
     }
-
-    public void setStorageId(String storageId) {
-        this.storageId = storageId;
+    /**
+     * setAvailabilityZone .
+     * @param param .
+     */
+    public void setStorageId(final String param) {
+        this.storageId = param;
     }
-
+    /**
+     * getTuning .
+     * @return CustomizeVolumeTuningForCreate .
+     */
     public CustomizeVolumeTuningForCreate getTuning() {
         return tuning;
     }
-
-    public void setTuning(CustomizeVolumeTuningForCreate tuning) {
-        this.tuning = tuning;
+    /**
+     * setAvailabilityZone .
+     * @param param .
+     */
+    public void setTuning(final CustomizeVolumeTuningForCreate param) {
+        this.tuning = param;
     }
-
+    /**
+     * getVolumeSpecs .
+     * @return List<ServiceVolumeBasicParams> .
+     */
     public List<ServiceVolumeBasicParams> getVolumeSpecs() {
         return volumeSpecs;
     }
-
-    public void setVolumeSpecs(List<ServiceVolumeBasicParams> volumeSpecs) {
-        this.volumeSpecs = volumeSpecs;
+    /**
+     * setAvailabilityZone .
+     * @param param .
+     */
+    public void setVolumeSpecs(final List<ServiceVolumeBasicParams> param) {
+        this.volumeSpecs = param;
     }
 }

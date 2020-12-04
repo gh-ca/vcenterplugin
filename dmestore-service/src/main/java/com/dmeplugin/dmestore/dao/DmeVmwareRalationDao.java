@@ -1,11 +1,11 @@
 package com.dmeplugin.dmestore.dao;
 
-
 import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.exception.DataBaseException;
 import com.dmeplugin.dmestore.exception.DmeSqlException;
 import com.dmeplugin.dmestore.utils.ToolUtils;
+
 import org.springframework.util.StringUtils;
 
 import java.sql.*;
@@ -30,8 +30,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT * FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION
-                    + " WHERE state=1 ";
+            String sql = "SELECT * FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 ";
             if (!StringUtils.isEmpty(storeType)) {
                 sql = sql + " and STORE_TYPE='" + storeType + "'";
             }
@@ -78,8 +77,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT * FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION
-                    + " WHERE state=1 ";
+            String sql = "SELECT * FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 ";
             if (!StringUtils.isEmpty(storeId)) {
                 sql = sql + " and STORE_ID='" + storeId + "'";
             }
@@ -124,8 +122,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT VOLUME_WWN FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION
-                    + " WHERE state=1 ";
+            String sql = "SELECT VOLUME_WWN FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 ";
             if (!StringUtils.isEmpty(storeType)) {
                 sql = sql + " and STORE_TYPE='" + storeType + "'";
             }
@@ -151,8 +148,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT STORE_ID FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION
-                    + " WHERE state=1 ";
+            String sql = "SELECT STORE_ID FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 ";
             if (!StringUtils.isEmpty(storeType)) {
                 sql = sql + " and STORE_TYPE='" + storeType + "'";
             }
@@ -176,12 +172,12 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
     }
 
     public void update(List<DmeVmwareRelation> list, String storeType) {
-        if(null != storeType && storeType.equals(ToolUtils.STORE_TYPE_VMFS)){
+        if (null != storeType && storeType.equals(ToolUtils.STORE_TYPE_VMFS)) {
             updateVmfs(list);
         }
     }
 
-    private void updateVmfs(List<DmeVmwareRelation> list){
+    private void updateVmfs(List<DmeVmwareRelation> list) {
         if (null == list || list.size() == 0) {
             return;
         }
@@ -190,14 +186,17 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         PreparedStatement pstm = null;
         try {
             con = getConnection();
-            String sql = "UPDATE " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " SET STORE_NAME=?,VOLUME_NAME=?,UPDATETIME=? where VOLUME_WWN=?";
+            String sql = "UPDATE " + DPSqlFileConstant.DP_DME_VMWARE_RELATION
+                + " SET STORE_ID=?,VOLUME_ID=?,STORE_NAME=?,VOLUME_NAME=?,UPDATETIME=? where VOLUME_WWN=?";
             pstm = con.prepareStatement(sql);
             con.setAutoCommit(false);
             for (DmeVmwareRelation o : list) {
-                pstm.setString(1, o.getStoreName());
-                pstm.setString(2, o.getVolumeName());
-                pstm.setDate(3, new Date(System.currentTimeMillis()));
-                pstm.setString(4, o.getVolumeWwn());
+                pstm.setString(1, o.getStoreId());
+                pstm.setString(2, o.getVolumeId());
+                pstm.setString(3, o.getStoreName());
+                pstm.setString(4, o.getVolumeName());
+                pstm.setDate(5, new Date(System.currentTimeMillis()));
+                pstm.setString(6, o.getVolumeWwn());
                 pstm.addBatch();
             }
             pstm.executeBatch();
@@ -223,7 +222,8 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         PreparedStatement pstm = null;
         try {
             con = getConnection();
-            String sql = "insert into DP_DME_VMWARE_RELATION(STORE_ID,STORE_NAME,VOLUME_ID,VOLUME_NAME,VOLUME_WWN,VOLUME_SHARE,VOLUME_FS,STORE_TYPE,SHARE_ID,SHARE_NAME,FS_ID,FS_NAME,LOGICPORT_ID,LOGICPORT_NAME,STORAGE_DEVICE_ID) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+            String sql
+                = "insert into DP_DME_VMWARE_RELATION(STORE_ID,STORE_NAME,VOLUME_ID,VOLUME_NAME,VOLUME_WWN,VOLUME_SHARE,VOLUME_FS,STORE_TYPE,SHARE_ID,SHARE_NAME,FS_ID,FS_NAME,LOGICPORT_ID,LOGICPORT_NAME,STORAGE_DEVICE_ID) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             pstm = con.prepareStatement(sql);
             //不自动提交
             con.setAutoCommit(false);
@@ -372,7 +372,8 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT " + fileId + " FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_TYPE='" + ToolUtils.STORE_TYPE_NFS + "'and STORE_ID='" + storeId + "'";
+            String sql = "SELECT " + fileId + " FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION
+                + " WHERE state=1 and STORE_TYPE='" + ToolUtils.STORE_TYPE_NFS + "'and STORE_ID='" + storeId + "'";
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -402,7 +403,6 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         return getFileIdsByCondition(storeId, "volume_id", ToolUtils.STORE_TYPE_VMFS);
     }
 
-
     private List<String> getFileIdsByCondition(String storeId, String fileId, String storeType) throws DmeSqlException {
         List<String> lists = new ArrayList<>();
         Connection con = null;
@@ -410,7 +410,8 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT " + fileId + " FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_TYPE='" + storeType + "'and STORE_ID='" + storeId + "'";
+            String sql = "SELECT " + fileId + " FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION
+                + " WHERE state=1 and STORE_TYPE='" + storeType + "'and STORE_ID='" + storeId + "'";
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -425,7 +426,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         return lists;
 
     }
-    
+
     /**
      * VMFS 通过vmfsDataStorageIds查询关联的DME存储的信息
      */
@@ -438,7 +439,8 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             con = getConnection();
             String condition = concatValues(storageIds);
 
-            String sql = "SELECT * FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_ID IN (" + condition + ")";
+            String sql = "SELECT * FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION
+                + " WHERE state=1 and STORE_ID IN (" + condition + ")";
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -476,7 +478,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             buff.append("'" + value + "'");
         }
         String sql = buff.toString();
-        if(sql.length()>0){
+        if (sql.length() > 0) {
             sql = sql.substring(1);
         }
         return sql;
@@ -496,7 +498,8 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            String sql = "SELECT * FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_TYPE='" + ToolUtils.STORE_TYPE_VMFS + "'and VOLUME_ID='" + volumeId + "'";
+            String sql = "SELECT * FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_TYPE='"
+                + ToolUtils.STORE_TYPE_VMFS + "'and VOLUME_ID='" + volumeId + "'";
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -512,5 +515,28 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         return vmfsDatastoreName;
     }
 
+    public String getDataStoreByName(String name) throws DmeSqlException {
+        String vmfsDatastoreName = "";
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            con = getConnection();
+            String sql = "SELECT * FROM " + DPSqlFileConstant.DP_DME_VMWARE_RELATION + " WHERE state=1 and STORE_NAME='"
+                + name + "'";
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                vmfsDatastoreName = rs.getString("STORE_NAME");
+                break;
+            }
+        } catch (DataBaseException | SQLException e) {
+            LOGGER.error("Failed to get vmfs datastore on: " + name + "," + e.getMessage());
+            throw new DmeSqlException(e.getMessage());
+        } finally {
+            closeConnection(con, ps, rs);
+        }
+        return vmfsDatastoreName;
+    }
 
 }

@@ -50,7 +50,6 @@
 
     <bean name="SystemServiceImpl" class="com.dmeplugin.dmestore.services.SystemServiceImpl">
         <property name="systemDao" ref="systemDao"/>
-        <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
     </bean>
 
     <bean name="VCenterInfoServiceImpl"
@@ -62,6 +61,7 @@
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="dmeStorageService" ref="DmeStorageServiceImpl"/>
         <property name="dmeRelationInstanceService" ref="DmeRelationInstanceServiceImpl"/>
+        <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
 
@@ -123,6 +123,7 @@
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="taskService" ref="taskService"/>
+        <property name="vmfsAccessService" ref="VmfsAccessServiceImpl"/>
     </bean>
 
     <bean name="BestPracticeProcessServiceImpl" class="com.dmeplugin.dmestore.services.BestPracticeProcessServiceImpl">
@@ -142,6 +143,7 @@
                 <ref bean="JumboFrameMTUImpl"/>
                 <ref bean="NumberOfVolumesInDatastoreImpl"/>
                 <ref bean="Vmfs6AutoReclaimImpl"/>
+                <ref bean="NMPPathSwitchPolicyImpl"/>
             </list>
         </property>
     </bean>
@@ -159,6 +161,7 @@
     <bean name="JumboFrameMTUImpl" class="com.dmeplugin.dmestore.services.bestpractice.JumboFrameMTUImpl"/>
     <bean name="NumberOfVolumesInDatastoreImpl" class="com.dmeplugin.dmestore.services.bestpractice.NumberOfVolumesInDatastoreImpl"/>
     <bean name="Vmfs6AutoReclaimImpl" class="com.dmeplugin.dmestore.services.bestpractice.Vmfs6AutoReclaimImpl"/>
+    <bean name="NMPPathSwitchPolicyImpl" class="com.dmeplugin.dmestore.services.bestpractice.NMPPathSwitchPolicyImpl"/>
 
     <bean name="bestPracticeCheckDao" class="com.dmeplugin.dmestore.dao.BestPracticeCheckDao">
         <property name="url" value="${h2.url}"/>
@@ -198,14 +201,9 @@
 
     <bean name="OverviewServiceImpl" class="com.dmeplugin.dmestore.services.OverviewServiceImpl">
         <property name="vmfsAccessService" ref="VmfsAccessServiceImpl"/>
-        <property name="dmeNFSAccessService" ref="DmeNFSAccessServiceImpl"/>
+        <property name="dmeNfsAccessService" ref="DmeNFSAccessServiceImpl"/>
         <property name="dmeStorageService" ref="DmeStorageServiceImpl"/>
         <property name="bestPracticeProcessService" ref="BestPracticeProcessServiceImpl"/>
-    </bean>
-
-    <bean name="datastoreCustomPropertey" class="com.dmeplugin.dmestore.utils.DatastoreCustomProperter" autowire="constructor">
-     <!--   <property name="vimObjectReferenceService" ref="vimObjectReferenceService"/>-->
-        <!--<constructor-arg index="0" ref="dataServiceExtensionRegistry"></constructor-arg>-->
     </bean>
 
     <context:annotation-config/>

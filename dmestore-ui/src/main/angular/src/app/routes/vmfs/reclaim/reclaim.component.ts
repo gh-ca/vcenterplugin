@@ -28,6 +28,10 @@ export class ReclaimComponent implements OnInit{
 
   // 空间回收 隐藏/显示
   reclaimShow = false;
+  modalHandleLoading = false; // 数据处理loading
+  isOperationErr = false; // 错误信息
+  modalLoading = false; // 数据加载loading
+  reclaimSuccessShow = false; // 空间回收成功窗口
 
   ngOnInit(): void {
     this.reclaimShow = false;
@@ -37,10 +41,11 @@ export class ReclaimComponent implements OnInit{
   }
 
   initData() {
+    this.modalHandleLoading = false;
+    this.isOperationErr = false;
+    this.modalLoading = true;
     // 设备类型 操作类型初始化
     this.route.url.subscribe(url => {
-      console.log('url', url);
-      console.log('url', url);
       this.route.queryParams.subscribe(queryParam => {
         this.resource = queryParam.resource;
         let objIds = [];
@@ -52,6 +57,7 @@ export class ReclaimComponent implements OnInit{
           objIds.push(this.objectId);
         }
         this.reclaimShow = true;
+        this.modalLoading = false;
         this.objectIds = objIds;
         console.log('del vmfs objectIds:' + objIds);
       });
@@ -73,16 +79,25 @@ export class ReclaimComponent implements OnInit{
 
   // 回收空间 处理
   reclaimHandleFunc() {
+    this.modalHandleLoading = true;
     this.remoteSrv.reclaimVmfs(this.objectIds).subscribe((result: any) => {
+      this.modalHandleLoading = false;
       if (result.code === '200'){
         console.log('Reclaim success');
-        // 空间回收完成重新请求数据
+
+        this.reclaimSuccessShow = true;
       } else {
         console.log('Reclaim fail：' + result.description);
+        this.isOperationErr = true;
       }
       // 关闭回收空间页面
       this.cdr.detectChanges();
     });
   }
-
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    this.cancel();
+  }
 }

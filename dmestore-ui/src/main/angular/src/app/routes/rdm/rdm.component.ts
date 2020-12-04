@@ -2,7 +2,7 @@ import {ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {CommonService} from '../common.service';
 import {GlobalsService} from '../../shared/globals.service';
-import {ClrForm} from "@clr/angular";
+import {ClrWizard, ClrWizardPage} from "@clr/angular";
 
 @Component({
   selector: 'app-rdm',
@@ -12,33 +12,53 @@ import {ClrForm} from "@clr/angular";
 })
 export class RdmComponent implements OnInit {
 
-  @ViewChild(ClrForm, {static: true}) rdmFormGroup;
-  @ViewChild('rdmForm', {static: true}) rdmForm;
+  // 添加页面窗口
+  @ViewChild('wizard') wizard: ClrWizard;
+  @ViewChild('addPageOne') addPageOne: ClrWizardPage;
+  @ViewChild('addPageTwo') addPageTwo: ClrWizardPage;
 
-
+  serviceLevelIsNull = false;
+  isOperationErr = false;
   policyEnable = {
     smartTier: false,
     qosPolicy: false,
     resourceTuning: false
   };
 
-  configModel = new customize_volumes();
+  configModel = new customizeVolumes();
   storageDevices = [];
   storagePools = [];
   hostList = [];
-  hostSelected = '';
-  dataStoreName = '';
+  dataStoreObjectId = '';
   levelCheck = 'level';
   dataStores = [];
 
   searchName = '';
   serviceLevelsRes = [];
   serviceLevels = [];
-  service_level_id = '';
-
-  diskNum = 1;
+  serviceLevelId = '';
 
   vmObjectId = '';
+
+  //qos 框控制
+  options1 = null;
+  options2 = null;
+  options3 = null;
+  options4 = null;
+  options5= null;
+
+  qos1Show = false;
+  qos2Show = false;
+  qos3Show = false;
+  qos4Show = false;
+
+  dsLoading = false;
+  dsDeviceLoading = false;
+  slLoading = false;
+  tierLoading = false;
+  submitLoading = false;
+  rdmSuccess = false;
+  rdmError = false;
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
               private commonService: CommonService,
@@ -46,7 +66,7 @@ export class RdmComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadStorageDevice();
-    this.loadHosts();
+    // this.loadHosts();
     this.tierFresh();
     const ctx = this.gs.getClientSdk().app.getContextObjects();
     console.log(ctx);
@@ -55,15 +75,17 @@ export class RdmComponent implements OnInit {
     } else{
       this.vmObjectId = 'urn:vmomi:VirtualMachine:vm-1046:674908e5-ab21-4079-9cb1-596358ee5dd1';
     }
+    this.loadDataStore();
   }
 
   // 刷新服务等级列表
   tierFresh(){
-    this.gs.loading = true;
+    this.tierLoading = true;
     this.http.post('servicelevel/listservicelevel', {}).subscribe((response: any) => {
-      this.gs.loading = false;
+      this.tierLoading = false;
       if(response.code == '200'){
         this.serviceLevelsRes = this.recursiveNullDelete(response.data);
+        this.serviceLevelsRes = this.serviceLevelsRes.filter(item => item.totalCapacity !== 0);
         for (const i of this.serviceLevelsRes){
           if (i.totalCapacity == 0){
             i.usedRate = 0.0;
@@ -73,6 +95,10 @@ export class RdmComponent implements OnInit {
           i.usedCapacity = (i.usedCapacity/1024).toFixed(2);
           i.totalCapacity = (i.totalCapacity/1024).toFixed(2);
           i.freeCapacity = (i.freeCapacity/1024).toFixed(2);
+
+          if(!i.capabilities){
+            i.capabilities = {};
+          }
         }
         this.search();
       }
@@ -81,8 +107,9 @@ export class RdmComponent implements OnInit {
     });
   }
 
-  serviceLevelClick(id: string, name: string){
-     this.service_level_id = id;
+  serviceLevelClick(id: string){
+     this.serviceLevelId = id;
+     this.serviceLevelIsNull = false;
   }
 
   // 服务等级列表搜索
@@ -94,13 +121,51 @@ export class RdmComponent implements OnInit {
     }
   }
 
-  submit(): void {
-    if (this.rdmForm.form.invalid) {
-      this.rdmFormGroup.markAsTouched();
-      return;
+  changeQosRedio(){
+    this.qos1Show = false;
+    this.qos2Show = false;
+    this.qos3Show = false;
+    this.qos4Show = false;
+  }
+
+  changeQosInput(type: string){
+    const c = this.configModel.tuning.smartqos;
+    if(c.controlPolicy == '1'){
+      if(type == 'box'){
+        this.qos1Show = (!this.options1 && !this.options2);
+        return this.qos1Show;
+      }
+      if(type == 'band'){
+        this.qos2Show = this.options1 && (c.maxbandwidth == '' || c.maxbandwidth == null);
+        return this.qos2Show;
+      }
+      if(type == 'iops'){
+        this.qos3Show = this.options2 && (c.maxiops == '' || c.maxiops == null);
+        return this.qos3Show;
+      }
     }
+    if(this.configModel.tuning.smartqos.controlPolicy == '0'){
+      if(type == 'box'){
+        this.qos1Show = (!this.options3 && !this.options4 && !this.options5);
+        return this.qos1Show;
+      }
+      if(type == 'band') {
+        this.qos2Show = this.options3 && (c.minbandwidth == '' || c.minbandwidth == null);
+        return this.qos2Show;
+      }
+      if(type == 'iops'){
+        this.qos3Show = this.options4 && (c.miniops == '' || c.miniops == null);
+        return this.qos3Show;
+      }
+      if(type == 'latency'){
+        this.qos4Show = this.options5 && (c.latency == '' || c.latency == null);
+        return this.qos4Show;
+      }
+    }
+  }
+
+  submit(): void {
     let b = JSON.parse(JSON.stringify(this.configModel));
-    console.log(b);
     let body = {};
     if (this.configModel.storageType == '2'){
       if(!this.policyEnable.smartTier){
@@ -108,51 +173,62 @@ export class RdmComponent implements OnInit {
       }
       if(!this.policyEnable.qosPolicy){
         b.tuning.smartqos = null;
+      } else{
+        let box = this.changeQosInput('box');
+        let band = this.changeQosInput('band');
+        let iops = this.changeQosInput('iops');
+        let latency = this.changeQosInput('latency');
+        if(box || band || iops || latency){
+          return;
+        }
+        if(this.configModel.tuning.smartqos.controlPolicy == '1'){
+          b.tuning.smartqos.minbandwidth = null;
+          b.tuning.smartqos.miniops = null;
+          b.tuning.smartqos.latency = null;
+        } else{
+          b.tuning.smartqos.maxbandwidth = null;
+          b.tuning.smartqos.maxiops = null;
+        }
       }
       if(!this.policyEnable.resourceTuning){
         b.tuning.alloctype = null;
-        b.tuning.dedupe_enabled = null;
-        b.tuning.compression_enabled = null;
+        b.tuning.dedupeEnabled = null;
+        b.tuning.compressionEnabled = null;
       }
       if(!this.policyEnable.smartTier && !this.policyEnable.qosPolicy && !this.policyEnable.resourceTuning){
         b.tuning = null;
       }
+
       body = {
         customizeVolumesRequest: {
-          customize_volumes: b,
-            mapping: {
-            host_id: this.hostSelected
-          }
+          customizeVolumes: b
         }
       };
     }
     if (this.configModel.storageType == '1'){
+      if(this.serviceLevelId == '' || this.serviceLevelId == null){
+        this.serviceLevelIsNull = true;
+        return;
+      }
       body = {
         createVolumesRequest: {
-          service_level_id: this.service_level_id,
-          volumes: this.configModel.volume_specs,
-          mapping: {
-            host_id: this.hostSelected
-          }
+          serviceLevelId: this.serviceLevelId,
+          volumes: this.configModel.volumeSpecs
         }
       };
     }
-    this.http.post('v1/vmrdm/createRdm?hostId='+this.hostSelected+'&vmObjectId='+this.vmObjectId+'&dataStoreName='+this.dataStoreName
+    console.log(b);
+    this.submitLoading = true;
+    this.http.post('v1/vmrdm/createRdm?vmObjectId='+this.vmObjectId+'&dataStoreObjectId='+this.dataStoreObjectId
       , body).subscribe((result: any) => {
+        this.submitLoading = false;
+        if (result.code == '200'){
+          this.rdmSuccess = true;
+        } else{
+          this.rdmError = true;
+        }
     }, err => {
       console.error('ERROR', err);
-    });
-  }
-
-  basAdd(){
-    this.diskNum = this.diskNum + 1;
-    const i = this.diskNum;
-    this.configModel.volume_specs.push(new volume_specs("name"+i,"unit"+i,"count"+i,"capacity"+i));
-  }
-
-  basRemove(item){
-    this.configModel.volume_specs = this.configModel.volume_specs.filter((i) => {
-        return i != item;
     });
   }
 
@@ -178,9 +254,9 @@ export class RdmComponent implements OnInit {
   }
 
   loadStorageDevice(){
-    this.gs.loading = true;
+    this.dsDeviceLoading = true;
     this.http.get('dmestorage/storages', {}).subscribe((result: any) => {
-      this.gs.loading = false;
+      this.dsDeviceLoading = false;
       if (result.code === '200'){
         this.storageDevices = result.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -191,9 +267,9 @@ export class RdmComponent implements OnInit {
   }
 
   loadStoragePool(storageId: string){
-    this.gs.loading = true;
+    this.slLoading = true;
     this.http.get('dmestorage/storagepools', {params: {storageId, media_type: "all"}}).subscribe((result: any) => {
-      this.gs.loading = false;
+      this.slLoading = false;
       if (result.code === '200'){
         this.storagePools = result.data;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -203,25 +279,12 @@ export class RdmComponent implements OnInit {
     });
   }
 
-  loadHosts(){
-    this.gs.loading = true;
-    this.http.get('v1/vmrdm/dmeHosts').subscribe((result: any) => {
-      this.gs.loading = false;
+  loadDataStore(){
+    this.dsLoading = true;
+    this.http.get('v1/vmrdm/vCenter/datastoreOnHost', { params: {vmObjectId : this.vmObjectId}}).subscribe((result: any) => {
+      this.dsLoading = false;
       if (result.code === '200'){
-        this.hostList = result.data;
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      }
-    }, err => {
-      console.error('ERROR', err);
-    });
-  }
-
-  loadDataStore(id: string){
-    this.gs.loading = true;
-    this.http.get('v1/vmrdm/vCenter/datastoreOnHost', { params: {hostId : id}}).subscribe((result: any) => {
-      this.gs.loading = false;
-      if (result.code === '200'){
-        this.dataStores = result.data;
+        this.dataStores = JSON.parse(result.data);
       } else{
         this.dataStores = [];
       }
@@ -231,47 +294,64 @@ export class RdmComponent implements OnInit {
     });
   }
 
+  /**
+   * 容量格式化
+   * @param c 容量值
+   * @param isGB true GB、false MB
+   */
+  formatCapacity(c: number, isGB:boolean){
+    let cNum;
+    if (c < 1024){
+      cNum = isGB ? c.toFixed(3)+'GB':c.toFixed(3)+'MB';
+    }else if(c >= 1024 && c< 1048576){
+      cNum = isGB ? (c/1024).toFixed(3) + 'TB' : (c/1024).toFixed(3) + 'GB';
+    }else if(c>= 1048576){
+      cNum = isGB ? (c/1024/1024).toFixed(3) + 'PB':(c/1024/1024).toFixed(3) + 'TB';
+    }
+    return cNum;
+  }
+
+  /**
+   * add 下一页
+   */
+  addNextPage() {
+    this.wizard.next();
+  }
+
+  closeWin(){
+    this.gs.getClientSdk().modal.close();
+  }
+
 }
 
 
-class customize_volumes{
+class customizeVolumes{
   storageType: string;
-  availability_zone: string;
-  initial_distribute_policy: string;
-  owner_controller: string;
-  pool_raw_id: string;
-  prefetch_policy: string;
-  prefetch_value: string;
-  storage_id: string;
+  availabilityZone: string;
+  initialDistributePolicy: string;
+  ownerController: string;
+  poolRawId: string;
+  prefetchPolicy: string;
+  prefetchValue: string;
+  storageId: string;
   tuning: any;
-  volume_specs: volume_specs[];
+  volumeSpecs: volumeSpecs[];
   constructor(){
     this.storageType = '1';
-    this.volume_specs = [new volume_specs("name1","unit1","count1", "capacity1")];
+    this.volumeSpecs = [new volumeSpecs()];
     this.tuning = new tuning();
-    this.initial_distribute_policy = '0';
-    this.owner_controller = '0';
-    this.prefetch_policy = '3';
+    this.initialDistributePolicy = '0';
+    this.ownerController = '0';
+    this.prefetchPolicy = '3';
   }
 }
 
-class volume_specs{
+class volumeSpecs{
   capacity: number;
   count: number;
   name: string;
   unit: string;
-  start_lun_id: number;
-  start_suffix: number;
-  inputName: string;
-  inputUnit: string;
-  inputCount: string;
-  inputCapacity: string;
-  constructor(inputName, inputUnit, inputCount, inputCapacity){
-     this.inputCapacity = inputCapacity;
-     this.inputCount = inputCount;
-     this.inputName = inputName;
-     this.inputUnit = inputUnit;
-
+  constructor(){
      this.name = '';
      this.capacity = null;
      this.count = 1;
@@ -282,22 +362,22 @@ class volume_specs{
 
 class tuning{
   alloctype:string;
-  compression_enabled: boolean;
-  dedupe_enabled: boolean;
+  compressionEnabled: boolean;
+  dedupeEnabled: boolean;
   smartqos: smartqos;
   smarttier: string;
-  workload_type_id: string;
+  workloadTypeId: string;
   constructor(){
     this.smartqos = new smartqos();
     this.alloctype = 'thick';
     this.smarttier = '0';
-    this.compression_enabled = null;
-    this.dedupe_enabled = null;
+    this.compressionEnabled = null;
+    this.dedupeEnabled = null;
   }
 }
 
 class smartqos{
-  control_policy: string;
+  controlPolicy: string;
   latency: number;
   maxbandwidth: number;
   maxiops: number;
@@ -305,14 +385,6 @@ class smartqos{
   miniops: number;
   name:string;
   constructor(){
-    this.control_policy = '1'
-  }
-}
-
-class mapping{
-  auto_zoning: boolean;
-  host_id: string;
-  hostgroup_id: string;
-  constructor(){
+    this.controlPolicy = '1'
   }
 }

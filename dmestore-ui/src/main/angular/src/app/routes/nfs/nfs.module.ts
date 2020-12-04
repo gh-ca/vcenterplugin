@@ -17,12 +17,15 @@ import {NfsExpandComponent} from "./subpages/expand/nfs-expand.component";
 import {NfsAddComponent} from "./subpages/add/nfs-add.component";
 import {NfsDeleteComponent} from "./subpages/delete/nfs-delete.component";
 import {NfsModifyComponent} from "./subpages/modify/nfs-modify.component";
+import {StatusFilter} from "./status.filter";
+import {DeviceFilter} from "./device.filter";
+import {TranslateModule} from "@ngx-translate/core";
 
 
 @NgModule({
   declarations: [NfsComponent, LogicportComponent, ShareComponent,
     FileSystemComponent,NfsPerformanceComponent,NfsMountComponent,NfsUnmountComponent
-    ,NfsReduceComponent,NfsExpandComponent,NfsAddComponent,NfsDeleteComponent,NfsModifyComponent
+    ,NfsReduceComponent,NfsExpandComponent,NfsAddComponent,NfsDeleteComponent,NfsModifyComponent,StatusFilter,DeviceFilter
   ],
   imports: [
     FormsModule,
@@ -31,7 +34,8 @@ import {NfsModifyComponent} from "./subpages/modify/nfs-modify.component";
     NgxEchartsModule,
     FormsModule,
     ClarityModule,
-    NfsRoutingModule
+    NfsRoutingModule,
+    TranslateModule
   ]
 })
 export class NfsModule { }

@@ -3,85 +3,84 @@ package com.dmeplugin.dmestore.entity;
 import java.io.Serializable;
 import java.util.Date;
 
-/**
- * @Description: TODO
- * @ClassName: DmeInfo
- * @Company: GH-CA
- * @author: yy
- * @create: 2020-09-02
- **/
 public class DmeInfo implements Serializable {
+    private int id;
 
-  private int id;
-  private String hostIp;
-  private int hostPort;
-  private String userName;
-  private String password;
-  private Date createTime;
-  private Date updateTime;
-  private int state; 
+    private String hostIp;
 
-  public int getId() {
-    return id;
-  }
+    private int hostPort;
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    private String userName;
 
-  public String getHostIp() {
-    return hostIp;
-  }
+    private String password;
 
-  public void setHostIp(String hostIp) {
-    this.hostIp = hostIp;
-  }
+    private Date createTime;
 
-  public int getHostPort() {
-    return hostPort;
-  }
+    private Date updateTime;
 
-  public void setHostPort(int hostPort) {
-    this.hostPort = hostPort;
-  }
+    private int state;
 
-  public String getUserName() {
-    return userName;
-  }
+    public int getId() {
+        return id;
+    }
 
-  public void setUserName(String userName) {
-    this.userName = userName;
-  }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-  public String getPassword() {
-    return password;
-  }
+    public String getHostIp() {
+        return hostIp;
+    }
 
-  public void setPassword(String password) {
-    this.password = password;
-  }
+    public void setHostIp(String hostIp) {
+        this.hostIp = hostIp;
+    }
 
-  public Date getCreateTime() {
-    return createTime;
-  }
+    public int getHostPort() {
+        return hostPort;
+    }
 
-  public void setCreateTime(Date createTime) {
-    this.createTime = createTime;
-  }
+    public void setHostPort(int hostPort) {
+        this.hostPort = hostPort;
+    }
 
-  public Date getUpdateTime() {
-    return updateTime;
-  }
+    public String getUserName() {
+        return userName;
+    }
 
-  public void setUpdateTime(Date updateTime) {
-    this.updateTime = updateTime;
-  }
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-  public int getState() {
-    return state;
-  }
+    public String getPassword() {
+        return password;
+    }
 
-  public void setState(int state) {
-    this.state = state;
-  }
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
 }

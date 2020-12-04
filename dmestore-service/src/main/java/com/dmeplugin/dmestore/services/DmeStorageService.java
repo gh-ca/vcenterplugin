@@ -30,10 +30,10 @@ public interface DmeStorageService {
     /**
      * 获取存储池列表
      * @param storageId 存储设备id
-     * @param media_type 存储池类型 file block all(默认)
+     * @param mediaType 存储池类型 file block all(默认)
      * @return
      */
-    List<StoragePool> getStoragePools(String storageId , String media_type) throws DMEException;
+    List<StoragePool> getStoragePools(String storageId , String mediaType) throws DMEException;
 
     /**
      * 获取逻辑端口列表
@@ -47,7 +47,19 @@ public interface DmeStorageService {
      * @param storageId
      * @return
      */
-    List<Volume> getVolumes(String storageId) throws DMEException;
+    //List<Volume> getVolumes(String storageId) throws DMEException;
+
+    /**
+     * 分页获取卷列表
+     * @author wangxy
+     * @date 14:13 2020/11/4
+     * @param storageId
+     * @param pageSize
+     * @param pageNo
+     * @throws DMEException
+     * @return com.dmeplugin.dmestore.model.VolumeListRestponse
+     **/
+    VolumeListRestponse getVolumesByPage(String storageId, String pageSize, String pageNo) throws DMEException;
 
     /**
      * 获取文件系统列表
@@ -61,7 +73,7 @@ public interface DmeStorageService {
      * @param storageId
      * @return
      */
-    List<Dtrees> getDTrees(String storageId) throws DMEException;
+    List<Dtrees> getDtrees(String storageId) throws DMEException;
 
     /**
      * 获取share列表
@@ -104,7 +116,7 @@ public interface DmeStorageService {
      * @param volumeId
      * @return
      */
-    Map<String, Object> getVolume(String volumeId);
+    Map<String, Object> getVolume(String volumeId) throws DMEException;
 
     /**
      * 获取存储端口列表
@@ -116,12 +128,12 @@ public interface DmeStorageService {
 
     /**
      * 获取漂移组列表
-     * @param storage_id
+     * @param storageId
      * @return
      */
-    List<FailoverGroup> getFailoverGroups(String storage_id) throws DMEException;
+    List<FailoverGroup> getFailoverGroups(String storageId) throws DMEException;
 
-    FileSystemDetail getFileSystemDetail(String file_system_id) throws DMEException;
+    FileSystemDetail getFileSystemDetail(String fileSystemId) throws DMEException;
     /**
      * Access storage performance
      *
@@ -164,9 +176,15 @@ public interface DmeStorageService {
 
     /**
      *
-     * @param volumeIds volumeid
+     * @param volumeId volumeid
      * @return
      * @throws DMEException
      */
     public List<Volume> listVolumesPerformance(List<String> volumeId) throws DMEException;
+
+    Boolean queryVolumeByName(String name) throws DMEException;
+
+    Boolean queryFsByName(String name, String storageId) throws DMEException;
+
+    Boolean queryShareByName(String name, String storageId)throws DMEException;
 }

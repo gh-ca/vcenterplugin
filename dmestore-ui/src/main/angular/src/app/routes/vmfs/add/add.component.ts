@@ -8,7 +8,7 @@ import {
   HostOrCluster,
   ServiceLevelList, StorageList,
   StoragePoolList,
-  VmfsListService
+  VmfsListService, Workload
 } from '../list/list.service';
 import {ClrWizard, ClrWizardPage} from "@clr/angular";
 import {GlobalsService} from "../../../shared/globals.service";
@@ -27,7 +27,7 @@ export class AddComponent implements OnInit{
 
   }
   // 初始化表单
-  form;
+  form = new GetForm().getAddForm();
   // 块大小选择
   blockSizeOptions = [];
   // 空间回收粒度初始化
@@ -39,6 +39,7 @@ export class AddComponent implements OnInit{
 
   // 服务等级列表
   serviceLevelList: ServiceLevelList[] = [];
+  workloads:Workload[] = []; // Workload
   // 未选择服务等级true未选择 false选择 添加、服务登记变更
   serviceLevelIsNull = false;
   // 是否选择服务等级：level 选择服务器等级 customer 未选择服务等级
@@ -50,6 +51,17 @@ export class AddComponent implements OnInit{
 
   // 操作来源 list:列表页面、dataStore：在DataStore菜单页面操作
   resource;
+
+  modalLoading = false; // 数据加载
+  modalHandleLoading = false; // 数据处理
+  isOperationErr = false; // 错误信息
+  capacityErr = false; // 容量错误信息
+
+  addSuccessShow = false;
+
+  matchErr = false; // 名称校验 是否只由字母与数字组成 true：是 false 否
+  vmfsNameRepeatErr = false; // vmfs名称是否重复 true：是 false 否
+  volNameRepeatErr = false; // 卷名称是否重复 true：是 false 否
 
 
   // 添加页面窗口
@@ -64,6 +76,18 @@ export class AddComponent implements OnInit{
   }
 
   initData() {
+    // 初始化loading
+    this.modalLoading = true;
+    this.modalHandleLoading = false;
+    this.isOperationErr = false;
+    // 容量错误提示
+    this.capacityErr = false;
+    // 名称错误提示初始化
+    this.vmfsNameRepeatErr = false;
+    this.volNameRepeatErr = false;
+    this.matchErr = false;
+
+    // this.globalsService.loading = true;
     // 设备类型 操作类型初始化
     this.route.url.subscribe(url => {
       console.log('url', url);
@@ -87,6 +111,9 @@ export class AddComponent implements OnInit{
 
     // 添加页面默认打开首页
     this.jumpTo(this.addPageOne);
+
+    // 容量设置
+    this.capacityOnblur();
   }
   // 页面跳转
   jumpTo(page: ClrWizardPage) {
@@ -118,6 +145,8 @@ export class AddComponent implements OnInit{
     this.form.blockSize = this.blockSizeOptions[0].key;
     // 重置空间回收粒度
     this.setSrgOptions();
+
+
   }
 
   /**
@@ -139,21 +168,22 @@ export class AddComponent implements OnInit{
     }
     this.srgOptions = options;
     this.form.spaceReclamationGranularity = this.srgOptions[0].key;;
-    console.log('this.form.blockSize:' + this.form.blockSize);
-    console.log('this.form.spaceReclamationGranularity:' + this.form.spaceReclamationGranularity);
+
+    // 容量设置
+    this.capacityOnblur();
   }
 
   // 设置设备数据
   setDeviceList() {
     // 初始化数据
     this.deviceList = [];
-    const nullDevice =  {
-      deviceId: '',
-      deviceName: '',
-      deviceType: '',
-    };
-    this.deviceList.push(nullDevice);
-    this.chooseDevice = this.deviceList[0];
+    // const nullDevice =  {
+    //   deviceId: '',
+    //   deviceName: '',
+    //   deviceType: '',
+    // };
+    // this.deviceList.push(nullDevice);
+    this.chooseDevice = undefined;
 
     console.log('this.chooseDevice', this.chooseDevice);
     // 初始添加页面的主机集群信息
@@ -175,13 +205,6 @@ export class AddComponent implements OnInit{
         if (result.code === '200' && result.data !== null) {
           hostList = result.data;
           hostList.forEach(item => {
-            // const hostData = {
-            //   icon: 'map',
-            //   id: item.hostId,
-            //   name: item.hostName,
-            //   active: false
-            // };
-            // this.hostRootDirectory[0].files.push(hostData);
 
             const hostInfo = {
               deviceId: item.hostId,
@@ -191,8 +214,6 @@ export class AddComponent implements OnInit{
             this.deviceList.push(hostInfo);
           });
         }
-        /*console.log('this.deviceList  host::');
-        console.log(this.deviceList);*/
         this.form.hostDataloadSuccess = true;
         resolve(this.deviceList);
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -209,13 +230,6 @@ export class AddComponent implements OnInit{
         if (result.code === '200' && result.data !== null) {
           clusterList = result.data;
           clusterList.forEach(item => {
-            // const culData = {
-            //   icon: 'map',
-            //   id: item.clusterId,
-            //   name: item.clusterName,
-            //   active: false
-            // };
-            // this.clusterRootDirectory[0].files.push(culData);
 
             const clusterInfo = {
               deviceId: item.clusterId,
@@ -243,8 +257,10 @@ export class AddComponent implements OnInit{
       if (result.code === '200' && result.data !== null) {
         this.serviceLevelList = result.data.filter(item => item.totalCapacity !== 0);
         console.log('this.serviceLevelList', this.serviceLevelList);
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       }
+      this.modalLoading = false;
+      // this.globalsService.loading = false;
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
 
@@ -258,6 +274,13 @@ export class AddComponent implements OnInit{
   customerClickFunc() {
     this.levelCheck = 'customer';
     this.serviceLevelIsNull = false;
+
+    this.storageList = null;
+    this.storagePoolList = null;
+
+    // loading
+    this.modalLoading = true;
+
     this.getStorageList();
   }
   // 获取所有存储数据
@@ -266,20 +289,34 @@ export class AddComponent implements OnInit{
       console.log(result);
       if (result.code === '200' && result.data !== null) {
         this.storageList = result.data;
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        this.getStoragePoolsByStorId();
       }
+      this.modalLoading = false;
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
   // 获取存储池数据
   getStoragePoolsByStorId() {
+    this.form.pool_raw_id = undefined;
     console.log('selectSotrageId' + this.form.storage_id);
     if (null !== this.form.storage_id && '' !== this.form.storage_id) {
+      // 获取存储池数据
       this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, 'block').subscribe((result: any) => {
         console.log('storagePools', result);
         console.log('result.code === \'200\' && result.data !== null', result.code === '200' && result.data !== null);
         if (result.code === '200' && result.data !== null) {
           this.storagePoolList = result.data;
           console.log('this.storagePoolList', this.storagePoolList);
+
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        }
+      });
+      // 获取workLoad
+      this.remoteSrv.getWorkLoads(this.form.storage_id).subscribe((result: any) => {
+        console.log('storagePools', result);
+        if (result.code === '200' && result.data !== null) {
+          this.workloads = result.data;
+          console.log('this.workloads', this.workloads);
 
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         }
@@ -344,18 +381,25 @@ export class AddComponent implements OnInit{
         this.form.control_policy = null;
       }
       console.log('addFrom', this.form);
+      // 打开 loading
+      // this.globalsService.loading = true;
+      this.modalHandleLoading = true;
       this.remoteSrv.createVmfs(this.form).subscribe((result: any) => {
+        this.modalHandleLoading = false;
         if (result.code === '200') {
           console.log('创建成功');
+          // 打开成功提示窗口
+          this.addSuccessShow = true;
+
         } else {
           console.log('创建失败：' + result.description);
+          // 失败信息
+          this.isOperationErr = true;
         }
-        // 关闭窗口
-        this.cancel();
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       });
     } else {
       this.serviceLevelIsNull = true;
-      this.wizard.open();
     }
   }
   // 容量单位转换
@@ -382,9 +426,9 @@ export class AddComponent implements OnInit{
           break;
       }
 
-      // 版本号5 最小容量为1.3G 版本号6最小2G
-      if (capatityG < 1.3 && this.form.version === '5') {
-        capatityG = 1.3;
+      // 版本号5 最小容量为1G 版本号6最小2G
+      if (capatityG < 1 && this.form.version === '5') {
+        capatityG = 1;
       } else if (capatityG < 2 && this.form.version === '6') {
         capatityG = 2;
       }
@@ -423,5 +467,274 @@ export class AddComponent implements OnInit{
       cNum = isGB ? (c/1024/1024).toFixed(3) + 'PB':(c/1024/1024).toFixed(3) + 'TB';
     }
     return cNum;
+  }
+  /**
+   * 容量
+   * @param obj
+   */
+  capacityOnblur() {
+    // 容量
+    let capacity = this.form.capacity;
+    // 标准容量 单位G
+    let capacityG;
+    console.log('capacity', capacity)
+    if (capacity && capacity !== null && capacity !== '') {
+
+      if (capacity > 0) {
+        switch (this.form.capacityUnit) {
+          case "TB":
+            capacityG = capacity * 1024 + '';
+            console.log('capacityG2', capacityG);
+            if (capacityG.indexOf(".")!==-1) { // 小数
+              this.capacityErr = true;
+              capacity = '';
+            } else{ // 整数
+              if (this.form.version === '5') {
+                if (capacity < 1/1024) {
+                  capacity = '';
+                  this.capacityErr = true;
+                } else {
+                  this.capacityErr = false;
+                }
+              } else {
+                if (capacity < 2/1024) {
+                  capacity = '';
+                  this.capacityErr = true;
+                }else {
+                  this.capacityErr = false;
+                }
+              }
+            }
+            break;
+          case "MB":
+            capacityG = capacity / 1024 + '';
+            if (capacityG.indexOf(".")!==-1) { // 小数
+              this.capacityErr = true;
+              capacity = '';
+            } else { // 整数
+              if (this.form.version === '5') {
+                if (capacity < 1*1024) {
+                  capacity = '';
+                  this.capacityErr = true;
+                }else {
+                  this.capacityErr = false;
+                }
+              } else {
+                if (capacity < 2*1024) {
+                  capacity = '';
+                  this.capacityErr = true;
+                }else {
+                  this.capacityErr = false;
+                }
+              }
+            }
+            break;
+          default:
+            capacityG = capacity + '';
+            if (capacityG.indexOf(".")!==-1) { // 小数
+              capacity = '';
+              this.capacityErr = true;
+            } else {// 整数
+              if (this.form.version === '5') {
+                if (capacity < 1) {
+                  capacity = '';
+                  this.capacityErr = true;
+                } else {
+                  this.capacityErr = false;
+                }
+              } else {
+                if (capacity < 2) {
+                  capacity = '';
+                  this.capacityErr = true;
+                } else {
+                  this.capacityErr = false;
+                }
+              }
+
+            }
+            break;
+        }
+      } else {
+        capacity = '';
+        this.capacityErr = true;
+      }
+    } else {
+      capacity = '';
+    }
+    this.form.capacity = capacity;
+    console.log('this.form.capacityUnit', this.form.capacityUnit);
+    console.log('this.form.capacity', this.form.capacity);
+    console.log('this.form.count', this.form.count);
+  }
+
+  /**
+   * 数量变化
+   */
+  countBlur() {
+    let count = this.form.count;
+    if (count && count !== null && count !== '') {
+      if ((count+'').indexOf(".")!==-1) { // 小数
+        count = '';
+        this.capacityErr = true;
+      } else {
+        this.capacityErr = false;
+      }
+    } else {
+      count = '';
+    }
+    this.form.count =  count;
+  }
+
+  /**
+   * add 下一页
+   */
+  addNextPage() {
+    if (this.form.capacity !== '' && this.form.count !== '') {
+      this.wizard.next();
+    }
+  }
+  /**
+   * 带宽 blur
+   * @param type
+   * @param operationType add modify
+   * @param valType
+   */
+  qosBlur(type:String, operationType:string) {
+
+    let objVal;
+      switch (operationType) {
+        case 'maxbandwidth':
+          objVal = this.form.maxbandwidth;
+          break;
+        case 'maxiops':
+          objVal = this.form.maxiops;
+          break;
+        case 'minbandwidth':
+          objVal = this.form.minbandwidth;
+          break;
+        case 'miniops':
+          objVal = this.form.miniops;
+          break;
+        default:
+          objVal = this.form.latency;
+          break;
+      }
+    if (objVal && objVal !== '') {
+      if (objVal.toString().match(/\d+(\.\d{0,2})?/)) {
+        objVal = objVal.toString().match(/\d+(\.\d{0,2})?/)[0];
+      } else {
+        objVal = '';
+      }
+    }
+    switch (operationType) {
+      case 'maxbandwidth':
+        this.form.maxbandwidth = objVal;
+        break;
+      case 'maxiops':
+        this.form.maxiops = objVal;
+        break;
+      case 'minbandwidth':
+        this.form.minbandwidth = objVal;
+        break;
+      case 'miniops':
+        this.form.miniops = objVal;
+        break;
+      default:
+        this.form.latency = objVal;
+        break;
+    }
+  }
+
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    this.cancel();
+  }
+
+  /**
+   * 名称校验
+   * @param isVmfs true vmfs、false volume
+   */
+  nameCheck(isVmfs: boolean) {
+    // 初始化
+    this.vmfsNameRepeatErr = false;
+    this.volNameRepeatErr = false;
+    this.matchErr = false;
+
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    if (isVmfs) {
+      if (this.form.name) {
+        if (reg5.test(this.form.name)) {
+          // 校验VMFS名称重复
+          this.checkVmfsName(this.form.name);
+
+        } else {
+          this.matchErr = true;
+          this.form.name = null;
+        }
+      } else {
+        this.matchErr = true;
+      }
+    } else {
+      if (this.form.volumeName) {
+        if (reg5.test(this.form.volumeName)) {
+          // 校验Vol名称重复
+          this.checkVolName(this.form.volumeName);
+        } else {
+          this.matchErr = true;
+          this.form.volumeName = null;
+        }
+      } else {
+        this.matchErr = true;
+      }
+    }
+  }
+
+  /**
+   * vmfs重名校验
+   */
+  checkVmfsName(name: string) {
+    this.modalHandleLoading = true;
+    this.remoteSrv.checkVmfsName(name).subscribe((result: any) => {
+      this.modalHandleLoading = false;
+      if (result.code === '200') { // result.data true 不重复 false 重复
+        this.vmfsNameRepeatErr = !result.data;
+        if (this.vmfsNameRepeatErr) { // 名称重复
+          this.form.name = null;
+          this.volNameRepeatErr = false;
+          this.matchErr = false;
+        } else {
+          if (this.form.isSameName) {
+            this.checkVolName(name);
+          }
+        }
+      }
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    });
+  }
+
+  /**
+   * vol重名校验
+   */
+  checkVolName(name: string) {
+    this.modalHandleLoading = true;
+    // 校验VMFS名称重复
+    this.remoteSrv.checkVolName(name).subscribe((result: any) => {
+      this.modalHandleLoading = false;
+      if (result.code === '200') { // result.data true 不重复 false 重复
+        this.volNameRepeatErr = !result.data;
+        if (!this.vmfsNameRepeatErr && this.volNameRepeatErr) {
+          this.form.name = null;
+        }
+        if (this.volNameRepeatErr) {
+          this.form.volumeName = null;
+          this.vmfsNameRepeatErr = false;
+          this.matchErr = false;
+        }
+      }
+      console.log("this.modalHandleLoading", this.modalHandleLoading)
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    });
   }
 }

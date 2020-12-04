@@ -32,6 +32,12 @@ export class ExpandComponent implements OnInit{
 
   // 弹窗隐藏/显示
   expandShow = false;
+  isOperationErr = false; // 错误信息
+  capacityErr = false; // 扩容容量错误信息
+  modalHandleLoading = false; // 数据处理loading
+  modalLoading = false; // 数据加载loading
+  expandErr = false; // 扩容容量错误信息
+  expandSuccessShow = false; // 扩容成功提示
 
   ngOnInit(): void {
     this.initData();
@@ -41,7 +47,10 @@ export class ExpandComponent implements OnInit{
    * 初始化数据
    */
   initData() {
-    this.expandShow = false;
+    this.expandShow = true;
+    this.modalHandleLoading = false;
+    this.modalLoading = true;
+    this.expandErr = false;
     // 设备类型 操作类型初始化
     this.route.url.subscribe(url => {
       console.log('url', url);
@@ -61,9 +70,10 @@ export class ExpandComponent implements OnInit{
             this.expandForm.volume_id = this.vmfsInfo.volumeId;
             this.expandForm.ds_name = this.vmfsInfo.name;
           }
-          this.expandShow = true;
+          this.modalLoading = false;
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         });
+        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       });
     });
     // 初始化form表单
@@ -74,6 +84,7 @@ export class ExpandComponent implements OnInit{
    * 取消/关闭页面
    */
   cancel() {
+    this.expandShow = false;
     if (this.resource === 'list') { // 列表入口
       this.router.navigate(['vmfs/list']);
     } else { // dataStore入口
@@ -85,32 +96,82 @@ export class ExpandComponent implements OnInit{
    * 扩容
    */
   expandHandleFunc() {
-    // 容量单位转换
-    switch (this.expandForm.capacityUnit) {
-      case 'TB':
-        this.expandForm.vo_add_capacity = this.expandForm.vo_add_capacity * 1024;
-        break;
-      case 'MB':
-        this.expandForm.vo_add_capacity = this.expandForm.vo_add_capacity / 1024;
-        break;
-      case 'KB':
-        this.expandForm.vo_add_capacity = this.expandForm.vo_add_capacity / (1024 * 1024);
-        break;
-      default: // 默认GB 不变
-        break;
-    }
-    this.expandForm.obj_id = this.objectId;
-    // 参数封装
-    this.remoteSrv.expandVMFS(this.expandForm).subscribe((result: any) => {
-      if (result.code === '200'){
-        console.log('expand success:' + name);
-        // 重新请求数据
-      }else {
-        console.log('expand: ' + name  + ' Reason:' + result.description);
+    if (this.expandForm.vo_add_capacity) {
+      // 容量单位转换
+      switch (this.expandForm.capacityUnit) {
+        case 'TB':
+          this.expandForm.vo_add_capacity = this.expandForm.vo_add_capacity * 1024;
+          break;
+        case 'MB':
+          this.expandForm.vo_add_capacity = this.expandForm.vo_add_capacity / 1024;
+          break;
+        // case 'KB':
+        //   this.expandForm.vo_add_capacity = this.expandForm.vo_add_capacity / (1024 * 1024);
+        //   break;
+        default: // 默认GB 不变
+          break;
       }
-      this.cdr.detectChanges();
-      // 隐藏扩容页面
-      this.cancel();
-    });
+      this.expandForm.capacityUnit = 'GB';
+      this.expandForm.obj_id = this.objectId;
+      this.modalHandleLoading = true;
+      // 参数封装
+      this.remoteSrv.expandVMFS(this.expandForm).subscribe((result: any) => {
+        this.modalHandleLoading = false;
+        if (result.code === '200'){
+          console.log('expand success:' + name);
+          this.expandSuccessShow = true; // 扩容成功提示
+        }else {
+          console.log('expand: ' + name  + ' Reason:' + result.description);
+          // 错误信息 展示
+          this.isOperationErr = true;
+        }
+        this.cdr.detectChanges();
+
+      });
+    }
+  }
+
+  /**
+   * 扩容容量校验
+   */
+  expandOnblur() {
+    let expand = this.expandForm.vo_add_capacity;
+    console.log('expand', expand);
+    if (expand && expand !== null && expand !== '') {
+      if (expand > 0) {
+        switch (this.expandForm.capacityUnit) {
+          case 'TB':
+            if ((expand*1024).toString().indexOf(".")!==-1) { // 小数
+              this.expandErr = true;
+              expand = '';
+            } else {
+              this.expandErr = false;
+            }
+            break;
+          default: // 默认GB 不变
+            if (expand.toString().indexOf(".")!==-1) { // 小数
+              this.expandErr = true;
+              expand = '';
+            } else {
+              this.expandErr = false;
+            }
+            break;
+        }
+      } else {
+        this.expandErr = true;
+        expand = '';
+      }
+    } else {
+      expand = '';
+    }
+    console.log('expand2', expand);
+    console.log('this.expandErr', this.expandErr);
+    this.expandForm.vo_add_capacity = expand;
+  }
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    this.cancel();
   }
 }

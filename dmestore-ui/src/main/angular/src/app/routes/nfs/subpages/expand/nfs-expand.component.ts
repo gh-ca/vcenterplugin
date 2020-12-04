@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {ChangeDetectorRef, Component, OnInit} from "@angular/core";
 import {GlobalsService} from "../../../../shared/globals.service";
 import {NfsExpandService} from "./nfs-expand.service";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -17,8 +17,11 @@ export class NfsExpandComponent implements OnInit{
   fsId:string;
   errorMsg: string;
   storeObjectId:string; //当入口为vcenter的时候需要获取此值
+  modalLoading = false; // 数据加载loading
+  modalHandleLoading = false; // 数据处理loading
+  expandSuccessShow = false; // 扩容成功提示
   constructor(private expandService: NfsExpandService, private gs: GlobalsService,
-              private activatedRoute: ActivatedRoute,private router:Router){
+              private activatedRoute: ActivatedRoute,private router:Router, private cdr: ChangeDetectorRef){
   }
   ngOnInit(): void {
       //入口是DataSource
@@ -31,14 +34,12 @@ export class NfsExpandComponent implements OnInit{
       if(this.pluginFlag==null){
         //入口来至Vcenter
         const ctx = this.gs.getClientSdk().app.getContextObjects();
-        if(ctx!=null){
-          this.storeObjectId=ctx[0].id;
-        }
+        this.storeObjectId=ctx[0].id;
         this.viewPage='expand_vcenter'
       }
   }
   expandData(){
-    this.gs.loading=true;
+    this.modalHandleLoading=true;
     switch (this.unit) {
       case 'TB':
         this.newCapacity = this.newCapacity * 1024;
@@ -69,24 +70,35 @@ export class NfsExpandComponent implements OnInit{
       }
     }
     this.expandService.changeCapacity(params).subscribe((result: any) => {
-      this.gs.loading=false;
+      this.modalHandleLoading=false;
       if (result.code === '200'){
-        if(this.pluginFlag=='plugin'){
-          this.backToNfsList();
-        }else{
-          this.closeModel();
-        }
+        this.expandSuccessShow = true; // 扩容成功提示
       }else{
-        this.errorMsg = '扩容失败！'+result.description;
+        this.errorMsg = '1';
+        console.log('Expand failed:',result.description)
       }
+      this.cdr.detectChanges();
     });
   }
   backToNfsList(){
-    this.gs.loading=false;
+    this.modalLoading=false;
+    this.errorMsg=null;
     this.router.navigate(['nfs']);
   }
   closeModel(){
-    this.gs.loading=false;
+    this.modalLoading=false;
+    this.errorMsg=null;
     this.gs.getClientSdk().modal.close();
+  }
+
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    if(this.pluginFlag=='plugin'){
+      this.backToNfsList();
+    }else{
+      this.closeModel();
+    }
   }
 }

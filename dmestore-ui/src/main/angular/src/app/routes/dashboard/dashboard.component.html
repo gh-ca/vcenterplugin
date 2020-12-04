@@ -72,13 +72,13 @@
     </div>
   </div>
   <div class="clr-col-5">
-    <div class="info-card">
+    <div class="info-card loading">
       <div class="info-card-header">
         <div class="info-header-left">
           <span class="card-title">{{'overview.violations' | translate}}</span>
         </div>
       </div>
-      <div class="info-card-content bestprac">
+      <div class="info-card-content bestprac" [hidden]="bestShowLoading">
         <div class="count-wrap clr-row">
           <div class="count-item clr-col-3">
             <div (click)="toBestParcticeViewSdk('critical')"  style="cursor:pointer" class="num">{{bestPracticeViolations.critical || 0}}</div>
@@ -102,6 +102,7 @@
           </div>
         </div>
       </div>
+      <img [hidden]="!bestShowLoading" src="./assets/images/loading.gif" >
     </div>
   </div>
 </div>
@@ -167,9 +168,8 @@
             <div>{{'overview.top5T' | translate}}</div>
           </div>
         </div>
-        <div class="info-card-content clr-row">
-          <div class="clr-col-12">
-            <div></div>
+        <div class="info-card-content clr-row loading">
+          <div class="clr-col-12" [hidden]="top5ShowLoading">
             <div class="progress-container" *ngFor="let item of storeageTopN" [clrDgItem]="item">
               <div class="progress-item">
                 <div class="progress-label" title="{{item.name}}">{{item.name}}</div>
@@ -183,6 +183,7 @@
               </div>
             </div>
           </div>
+          <img [hidden]="!top5ShowLoading" src="./assets/images/loading.gif" >
         </div>
       </div>
     </div>

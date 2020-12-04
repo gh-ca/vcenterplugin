@@ -1,22 +1,22 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild} from '@angular/core';
-import {
-  Host, List,NfsDetail, NfsService,UpdateNfs,
-
-} from './nfs.service';
+import {Host, List, NfsService,UpdateNfs} from './nfs.service';
 import {GlobalsService} from '../../shared/globals.service';
-import {StorageService} from '../storage/storage.service';
+import {LogicPort, StorageList, StorageService} from '../storage/storage.service';
 import {StoragePool} from "../storage/detail/detail.service";
-import {ClrWizard, ClrWizardPage} from "@clr/angular";
+import {ClrDatagridSortOrder, ClrWizard, ClrWizardPage} from "@clr/angular";
 import {VmfsListService} from "../vmfs/list/list.service";
 import {Router} from "@angular/router";
+import {AddNfs, NfsAddService, Vmkernel} from "./subpages/add/nfs-add.service";
+
 @Component({
   selector: 'app-nfs',
   templateUrl: './nfs.component.html',
   styleUrls: ['./nfs.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [NfsService,StorageService,VmfsListService],
+  providers: [NfsService,StorageService,VmfsListService,NfsAddService],
 })
 export class NfsComponent implements OnInit {
+  descSort = ClrDatagridSortOrder.DESC;
   list: List[] = []; // 数据列表
   radioCheck = 'list'; // 切换列表页显示
   total = 0; // 总数据数量
@@ -29,17 +29,43 @@ export class NfsComponent implements OnInit {
   fsIds = [];
   unit='GB';
   hostList: Host[] = [];
+  addForm = new AddNfs();
+  storageList: StorageList[] = [];
   storagePools: StoragePool[] = [];
   updateNfs: UpdateNfs = new UpdateNfs();
+  addModelShow = false; // 添加窗口
+  errorMsg: string;
+  modalLoading = false; // 数据加载loading
+  modalHandleLoading = false; // 数据处理loading
+  checkedPool:any;
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
   @ViewChild('addPageOne') addPageOne: ClrWizardPage;
   @ViewChild('addPageTwo') addPageTwo: ClrWizardPage;
+  addSuccessShow = false; // 添加成功提示
+
+  logicPorts: LogicPort[] = [];
+  oldNfsName:string;
+  oldShareName:string;
+  oldFsName:string;
+  matchErr=false;
+  nfsNameRepeatErr=false;
+  shareNameRepeatErr=false;
+  fsNameRepeatErr=false;
+
+  vmkernelList: Vmkernel[]=[];
+
+  maxbandwidthChoose=false; // 最大带宽 选中
+  maxiopsChoose=false; // 最大iops 选中
+  minbandwidthChoose=false; // 最小带宽 选中
+  miniopsChoose=false; // 最小iops 选中
+  latencyChoose=false; // 时延 选中
 
   errMessage = '';
-  constructor(private remoteSrv: NfsService, private cdr: ChangeDetectorRef, public gs: GlobalsService ,
+  constructor(private addService: NfsAddService, private remoteSrv: NfsService, private cdr: ChangeDetectorRef, public gs: GlobalsService ,
               private storageService: StorageService,private vmfsListService: VmfsListService,private router:Router) { }
   ngOnInit(): void {
+    this.getNfsList();
   }
   // 获取nfs列表
   getNfsList() {
@@ -48,18 +74,33 @@ export class NfsComponent implements OnInit {
     this.remoteSrv.getData()
       .subscribe((result: any) => {
         this.list = result.data;
+        if (this.list!=null){
+          this.total=this.list.length;
+        }
+        //处理利用率排序问题
+        this.handleSortingFeild();
         this.isLoading = false;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         // 获取性能列表
         this.listnfsperformance();
       });
   }
+
+  handleSortingFeild(){
+    if(this.list!=null){
+      this.list.forEach(n=>{
+        n.capacityUsage=(n.capacity - n.freeSpace)/n.capacity;
+      });
+    }
+  }
 // 性能视图列表
   listnfsperformance(){
     if (this.list === null || this.list.length <= 0){ return; }
+    const fsIds = [];
     this.list.forEach(item => {
-      this.fsIds.push(item.fsId);
+      fsIds.push(item.fsId);
     });
+    this.fsIds = fsIds;
     this.remoteSrv.getChartData(this.fsIds).subscribe((result: any) => {
       if (result.code === '200'){
         const chartList: List [] = result.data;
@@ -81,12 +122,32 @@ export class NfsComponent implements OnInit {
   }
 
   addView(){
-    const flag = 'plugin';
-    this.router.navigate(['nfs/add'],{
-      queryParams:{
-        flag
+    // const flag = 'plugin';
+    // this.router.navigate(['nfs/add'],{
+    //   queryParams:{
+    //     flag
+    //   }
+    // });
+    this.addModelShow = true;
+    this.storageService.getData().subscribe((s: any) => {
+      this.modalLoading=false;
+      if (s.code === '200'){
+        this.storageList = s.data;
+        this.modalLoading=false;
       }
     });
+    this.addService.getHostList().subscribe((r: any) => {
+      this.modalLoading=false;
+      if (r.code === '200'){
+        this.hostList = r.data;
+        this.cdr.detectChanges();
+      }
+    });
+    this.addForm = new AddNfs();
+    this.checkedPool= null;
+    this.errorMsg='';
+    // 获取存储列表
+    this.cdr.detectChanges();
   }
   modifyData() {
     const flag="plugin";
@@ -120,6 +181,67 @@ export class NfsComponent implements OnInit {
       }
     });
   }
+
+  addNfs(){
+    //
+    this.modalHandleLoading=true;
+
+    this.checkedPool = this.storagePools.filter(item => item.id === this.addForm.storagePoolId)[0];
+
+    this.addForm.poolRawId=this.checkedPool.diskPoolId;
+    this.addForm.storagePoolId= this.checkedPool.id;
+    // 单位换算
+    switch (this.unit) {
+      case 'TB':
+        this.addForm.size = this.addForm.size * 1024;
+        break;
+      case 'MB':
+        this.addForm.size = this.addForm.size / 1024;
+        break;
+      case 'KB':
+        this.addForm.size = this.addForm.size / (1024 * 1024);
+        break;
+      default: // 默认GB 不变
+        break;
+    }
+    this.addService.addNfs(this.addForm).subscribe((result: any) => {
+      this.modalHandleLoading=false;
+      if (result.code === '200'){
+        // 打开成功提示窗口
+        this.addSuccessShow = true;
+      }else{
+        this.errorMsg = '1';
+        console.log("Delete failed:",result.description)
+      }
+      this.cdr.detectChanges();
+    });
+  }
+  selectStoragePool(){
+    this.modalLoading=true;
+    // this.storagePools = [];
+    this.logicPorts = null;
+    // 选择存储后获取存储池
+    this.storageService.getStoragePoolListByStorageId("file",this.addForm.storagId)
+      .subscribe((r: any) => {
+        if (r.code === '200'){
+          this.storagePools = r.data;
+        }
+        this.cdr.detectChanges();
+      });
+    this.selectLogicPort();
+  }
+  selectLogicPort(){
+    // 选择存储后逻辑端口
+    this.storageService.getLogicPortListByStorageId(this.addForm.storagId)
+      .subscribe((r: any) => {
+        this.modalLoading=false;
+        if (r.code === '200'){
+          this.logicPorts = r.data;
+        }
+        this.cdr.detectChanges();
+      });
+  }
+
   // 弹出缩容页面
   reduceView(){
     const flag = 'plugin';
@@ -134,6 +256,14 @@ export class NfsComponent implements OnInit {
   // 挂载
   mount(){
     this.jumpPage(this.rowSelected[0].objectid,"nfs/dataStore/mount");
+    const flag = 'plugin';
+    const objectId=this.rowSelected[0].objectid;
+    const dsName=this.rowSelected[0].name;
+    this.router.navigate(["nfs/dataStore/mount"],{
+      queryParams:{
+        objectId,flag,dsName
+      }
+    });
   }
   jumpPage(objectId:string,url:string){
     const flag = 'plugin';
@@ -183,12 +313,185 @@ export class NfsComponent implements OnInit {
     this.vmfsListService.scanVMFS('nfs').subscribe((res: any) => {
       this.isLoading = false;
       if (res.code === '200') {
-        this.getNfsList();
+        //this.getNfsList();
         console.log('Scan success');
+        this.router.navigate(['nfs'], {
+          queryParams: {t: new Date().getTime()}
+        });
       } else {
         console.log('Scan faild');
+        this.router.navigate(['nfs'], {
+          queryParams: {t: new Date().getTime()}
+        });
       }
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
+  }
+
+  checkNfsName(){
+    if(this.addForm.nfsName==null) return false;
+    if(this.oldNfsName==this.addForm.nfsName) return false;
+    this.oldNfsName=this.addForm.nfsName;
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    if(reg5.test(this.addForm.nfsName)){
+      //验证重复
+      this.matchErr=false;
+      if (this.addForm.sameName){
+        this.checkNfsNameExist(this.addForm.nfsName);
+        this.checkShareNameExist(this.addForm.nfsName);
+        this.checkFsNameExist(this.addForm.nfsName);
+      }else{
+        this.checkNfsNameExist(this.addForm.nfsName);
+      }
+    }else{
+      //
+      this.matchErr=true;
+      //不满足的时候置空
+      this.addForm.nfsName=null;
+      console.log('验证不通过');
+    }
+  }
+
+  checkShareName(){
+    if(this.addForm.shareName==null) return false;
+    if(this.oldShareName=this.addForm.shareName) return false;
+
+    this.oldShareName=this.addForm.shareName;
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    if(reg5.test(this.addForm.shareName)){
+      //验证重复
+      this.matchErr=false;
+      this.checkShareNameExist(this.addForm.shareName);
+    }else{
+      this.matchErr=true;
+      this.addForm.shareName=null;
+    }
+  }
+
+  checkFsName(){
+    if(this.addForm.fsName==null) return false;
+    if(this.oldFsName=this.addForm.fsName) return false;
+
+    this.oldFsName=this.addForm.fsName;
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    if(reg5.test(this.addForm.fsName)){
+      //验证重复
+      this.matchErr=false;
+      this.checkShareNameExist(this.addForm.fsName);
+    }else{
+      this.matchErr=true;
+      this.addForm.fsName=null;
+    }
+  }
+  checkNfsNameExist(name:string){
+    this.addService.checkNfsNameExist(name).subscribe((r:any)=>{
+      if (r.code=='200'){
+        if(r.data){
+          this.nfsNameRepeatErr=false;
+        }else{
+          this.nfsNameRepeatErr=true;
+          this.addForm.nfsName=null;
+        }
+      }
+    });
+  }
+  checkShareNameExist(name:string){
+    this.addService.checkShareNameExist(name).subscribe((r:any)=>{
+      if (r.code=='200'){
+        if(r.data){
+          this.shareNameRepeatErr=false;
+        }else{
+          this.shareNameRepeatErr=true;
+          this.addForm.nfsName=null;
+        }
+      }
+    });
+  }
+  checkFsNameExist(name:string){
+    this.addService.checkFsNameExist(name).subscribe((r:any)=>{
+      if (r.code=='200'){
+        if(r.data){
+          this.shareNameRepeatErr=false;
+        }else{
+          this.shareNameRepeatErr=true;
+          this.addForm.nfsName=null;
+        }
+      }
+    });
+  }
+
+  backToNfsList(){
+    this.modalLoading=false;
+    this.confirmActResult();
+  }
+  checkHost(){
+    this.modalLoading=true;
+
+    //选择主机后获取虚拟网卡
+    this.addService.getVmkernelListByObjectId(this.addForm.hostObjectId)
+      .subscribe((r: any) => {
+        this.modalLoading=false;
+        if (r.code === '200'){
+          this.vmkernelList = r.data;
+          this.addForm.vkernelIp=this.vmkernelList[0].ipAddress;
+        }
+        this.cdr.detectChanges();
+      });
+  }
+  qosBlur(type:String, operationType:string) {
+
+    let objVal;
+    if (type === 'add') {
+      switch (operationType) {
+        case 'maxbandwidth':
+          objVal = this.addForm.maxBandwidth;
+          break;
+        case 'maxiops':
+          objVal = this.addForm.maxIops;
+          break;
+        case 'minbandwidth':
+          objVal = this.addForm.minBandwidth;
+          break;
+        case 'miniops':
+          objVal = this.addForm.minIops;
+          break;
+        default:
+          objVal = this.addForm.latency;
+          break;
+      }
+    }
+    if (objVal && objVal !== '') {
+      if (objVal.toString().match(/\d+(\.\d{0,2})?/)) {
+        objVal = objVal.toString().match(/\d+(\.\d{0,2})?/)[0];
+      } else {
+        objVal = '';
+      }
+    }
+    if (type === 'add') {
+      switch (operationType) {
+        case 'maxbandwidth':
+          this.addForm.maxBandwidth = objVal;
+          break;
+        case 'maxiops':
+          this.addForm.maxIops = objVal;
+          break;
+        case 'minbandwidth':
+          this.addForm.minBandwidth = objVal;
+          break;
+        case 'miniops':
+          this.addForm.minIops = objVal;
+          break;
+        default:
+          this.addForm.latency = objVal;
+          break;
+      }
+    }
+  }
+
+  /**
+   * 确认关闭窗口
+   */
+  confirmActResult() {
+    this.addModelShow = false;
   }
 }

@@ -28,7 +28,7 @@ public class SpringBootConnectionHelper extends VCConnectionHelper{
     @Override
     public VmwareContext getServerContext(String serverguid) throws Exception {
         try {
-            VCenterInfo vCenterInfo= vCenterInfoService.getVCenterInfo();
+            VCenterInfo vCenterInfo= vCenterInfoService.getVcenterInfo();
             if (null!=vCenterInfo) {
                 this.setServerurl(vCenterInfo.getHostIp());
                 this.setServerport(vCenterInfo.getHostPort());
@@ -45,7 +45,7 @@ public class SpringBootConnectionHelper extends VCConnectionHelper{
     @Override
     public VmwareContext[] getAllContext() throws Exception {
         try {
-            VCenterInfo vCenterInfo= vCenterInfoService.getVCenterInfo();
+            VCenterInfo vCenterInfo= vCenterInfoService.getVcenterInfo();
             if (null!=vCenterInfo) {
                 this.setServerurl(vCenterInfo.getHostIp());
                 this.setServerport(vCenterInfo.getHostPort());

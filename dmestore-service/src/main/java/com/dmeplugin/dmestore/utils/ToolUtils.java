@@ -1,15 +1,20 @@
 package com.dmeplugin.dmestore.utils;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
+import com.google.gson.JsonObject;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 
 /**
@@ -31,11 +36,15 @@ public class ToolUtils {
     public final static int MI = 1024 * 1024;
     public final static int GI = 1024 * 1024 * 1024;
 
-    public final static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    public final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     public static Gson gson = new Gson();
 
     public static String getStr(Object obj) {
-        String re = null;
+        return getStr(obj, null);
+    }
+
+    public static String getStr(Object obj, String defaultValue) {
+        String re = defaultValue;
         try {
             if (!StringUtils.isEmpty(obj)) {
                 re = obj.toString();
@@ -134,7 +143,7 @@ public class ToolUtils {
     public static Integer jsonToInt(JsonElement obj, Integer defaultValue) {
         Integer re = defaultValue;
         try {
-            if (!StringUtils.isEmpty(obj)) {
+            if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsInt();
             }
         } catch (Exception e) {
@@ -146,7 +155,7 @@ public class ToolUtils {
     public static Integer jsonToInt(JsonElement obj) {
         Integer re = 0;
         try {
-            if (!StringUtils.isEmpty(obj)) {
+            if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsInt();
             }
         } catch (Exception e) {
@@ -227,6 +236,18 @@ public class ToolUtils {
         return re;
     }
 
+    public static Boolean jsonToBoo(JsonElement obj, Boolean defaultVal) {
+        Boolean re = defaultVal;
+        try {
+            if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
+                re = obj.getAsBoolean();
+            }
+        } catch (Exception e) {
+            LOG.error("jsonToBoo error:" + e.toString());
+        }
+        return re;
+    }
+
     public static <T extends Comparable<T>> boolean compare(List<T> a, List<T> b) {
         if (a.size() != b.size()) {
             return false;
@@ -257,12 +278,56 @@ public class ToolUtils {
         String re = defaultValue;
         try {
             if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
-                re = sdf.format(new Date(Long.parseLong(String.valueOf(obj.getAsBigInteger()))));
+                re = SIMPLE_DATE_FORMAT.format(new Date(Long.parseLong(String.valueOf(obj.getAsBigInteger()))));
             }
         } catch (Exception e) {
             LOG.error("jsonToDateStr error:" + e.toString());
         }
         return re;
+    }
+
+    //从性能数据中提取对应指标的对应值
+    public static JsonElement getStatistcValue(JsonObject statisticObject, String indicator, String type) {
+        JsonElement object = null;
+        if (null != statisticObject) {
+            JsonElement indicatorEl = statisticObject.get(indicator);
+            if (!ToolUtils.jsonIsNull(indicatorEl)) {
+                JsonObject indicatorJson = indicatorEl.getAsJsonObject();
+                JsonElement typeEl = indicatorJson.get(type);
+                if (!ToolUtils.jsonIsNull(typeEl)) {
+                    JsonObject typeJson = typeEl.getAsJsonObject();
+                    Set<Map.Entry<String, JsonElement>> sets = typeJson.entrySet();
+                    for (Map.Entry<String, JsonElement> set : sets) {
+                        //只取一个
+                        object = set.getValue();
+                        break;
+                    }
+                }
+            }
+        }
+        return object;
+    }
+
+    public static String getRequsetParams(String paramName, String paramValue) {
+        JsonObject condition = new JsonObject();
+        JsonArray constraint = new JsonArray();
+        JsonObject consObj = new JsonObject();
+        JsonObject simple = new JsonObject();
+        simple.addProperty("name", "dataStatus");
+        simple.addProperty("operator", "equal");
+        simple.addProperty("value", "normal");
+        consObj.add("simple", simple);
+        constraint.add(consObj);
+        JsonObject consObj1 = new JsonObject();
+        JsonObject simple1 = new JsonObject();
+        simple1.addProperty("name", paramName);
+        simple1.addProperty("operator", "equal");
+        simple1.addProperty("value", paramValue);
+        consObj1.add("simple", simple1);
+        consObj1.addProperty("logOp", "and");
+        constraint.add(consObj1);
+        condition.add("constraint", constraint);
+        return condition.toString();
     }
 
 

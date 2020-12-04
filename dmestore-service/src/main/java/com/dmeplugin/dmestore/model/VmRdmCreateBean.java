@@ -4,22 +4,45 @@ package com.dmeplugin.dmestore.model;
  * @author wangxiangyong
  **/
 public class VmRdmCreateBean {
+    /**
+     * createVolumesRequest .
+     */
     private CreateVolumesRequest createVolumesRequest;
+    /**
+     * customizeVolumesRequest .
+     */
     private CustomizeVolumesRequest customizeVolumesRequest;
 
+    /**
+     *  getCreateVolumesRequest .
+     * @return CreateVolumesRequest .
+     */
     public CreateVolumesRequest getCreateVolumesRequest() {
         return createVolumesRequest;
     }
 
-    public void setCreateVolumesRequest(CreateVolumesRequest createVolumesRequest) {
-        this.createVolumesRequest = createVolumesRequest;
+    /**
+     * setCreateVolumesRequest .
+     * @param param .
+     */
+    public void setCreateVolumesRequest(final CreateVolumesRequest param) {
+        this.createVolumesRequest = param;
     }
-
+    /**
+     *  getCustomizeVolumesRequest .
+     * @return CustomizeVolumesRequest .
+     */
     public CustomizeVolumesRequest getCustomizeVolumesRequest() {
         return customizeVolumesRequest;
     }
 
-    public void setCustomizeVolumesRequest(CustomizeVolumesRequest customizeVolumesRequest) {
-        this.customizeVolumesRequest = customizeVolumesRequest;
+    /**
+     * setCustomizeVolumesRequest .
+     *
+     * @param param .
+     */
+    public void setCustomizeVolumesRequest(
+        final CustomizeVolumesRequest param) {
+        this.customizeVolumesRequest = param;
     }
 }

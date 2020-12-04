@@ -37,8 +37,7 @@ public class ServiceLevelController extends BaseController {
         LOG.info("servicelevel/listservicelevel params==" + gson.toJson(params));
         try {
             return success(serviceLevelService.listServiceLevel(params));
-        } catch (DMEException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
             return failure(e.getMessage());
         }
 
@@ -63,7 +62,7 @@ public class ServiceLevelController extends BaseController {
     //查询服务等级下的卷
     @RequestMapping(value = "/listVolumesByServiceLevelId", method = RequestMethod.POST)
     @ResponseBody
-    public ResponseBodyBean listVolumesByServiceLevelId(@RequestBody String serviceLevelId) throws Exception {
+    public ResponseBodyBean listVolumesByServiceLevelId(@RequestBody String serviceLevelId) throws DMEException {
         LOG.info("servicelevel/listVolumesByServiceLevelId params==" + serviceLevelId);
         String errMsg = "listVolumesByServiceLevelId error, the serviceLevel is: " + serviceLevelId;
         try {
@@ -72,7 +71,7 @@ public class ServiceLevelController extends BaseController {
                 return success(volumes);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new DMEException(e.getMessage());
         }
         return failure(errMsg);
     }
@@ -86,11 +85,9 @@ public class ServiceLevelController extends BaseController {
         try {
             serviceLevelService.updateVmwarePolicy();
             return success();
-        } catch (DMEException e) {
-            e.printStackTrace();
+        } catch (Exception e) {
             return failure(e.getMessage());
         }
     }
-
     //查询服务等级下的存储池
 }

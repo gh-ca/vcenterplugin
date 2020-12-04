@@ -1,4 +1,4 @@
-import {Component, OnInit} from "@angular/core";
+import {ChangeDetectorRef, Component, OnInit} from "@angular/core";
 import {GlobalsService} from "../../../../shared/globals.service";
 import {NfsReduceService} from "./nfs-reduce.service";
 import {ActivatedRoute, Router} from "@angular/router";
@@ -6,7 +6,7 @@ import {ActivatedRoute, Router} from "@angular/router";
   selector: 'app-reduce',
   templateUrl: './nfs-reduce.component.html',
   styleUrls: ['./nfs-reduce.component.scss'],
-  providers: [GlobalsService,NfsReduceService]
+  providers: [NfsReduceService]
 })
 export class NfsReduceComponent implements OnInit{
   storeObjectId:string;
@@ -16,12 +16,14 @@ export class NfsReduceComponent implements OnInit{
   pluginFlag: string;//来至插件的标记
   rowSelected = []; // 当前选中数据
   errorMsg: string;
+  modalLoading = false; // 数据加载loading
+  modalHandleLoading = false; // 数据处理loading
   fsId:string;
+  reduceSuccessShow = false;// 缩容成功窗口
   constructor(private reduceService: NfsReduceService, private gs: GlobalsService,
-              private activatedRoute: ActivatedRoute,private router:Router){
+              private activatedRoute: ActivatedRoute,private router:Router, private cdr: ChangeDetectorRef){
   }
   ngOnInit(): void {
-
     //入口是DataSource
     this.viewPage='reduce_plugin'
     this.activatedRoute.queryParams.subscribe(queryParam => {
@@ -32,20 +34,24 @@ export class NfsReduceComponent implements OnInit{
     if(this.pluginFlag==null){
       //入口来至Vcenter
       const ctx = this.gs.getClientSdk().app.getContextObjects();
-      this.storeObjectId=ctx[0].id;
+      if(ctx!=null){
+        this.storeObjectId=ctx[0].id;
+      }
       this.viewPage='reduce_vcenter'
     }
   }
   backToNfsList(){
-    this.gs.loading=false;
+    this.modalLoading=false;
+    this.errorMsg=null;
     this.router.navigate(['nfs']);
   }
   closeModel(){
-    this.gs.loading=false;
+    this.errorMsg=null;
+    this.modalLoading=false;
     this.gs.getClientSdk().modal.close();
   }
   reduceCommit(){
-    this.gs.loading=true;
+    this.modalHandleLoading=true;
     switch (this.unit) {
       case 'TB':
         this.newCapacity = this.newCapacity * 1024;
@@ -76,16 +82,24 @@ export class NfsReduceComponent implements OnInit{
       }
     }
     this.reduceService.changeCapacity(params).subscribe((result: any) => {
-      this.gs.loading=false;
+      this.modalHandleLoading=false;
       if (result.code === '200'){
-        if(this.pluginFlag=='plugin'){
-          this.backToNfsList();
-        }else{
-          this.closeModel();
-        }
+        this.reduceSuccessShow = true;
       }else{
-        this.errorMsg = '缩容失败！'+result.description;
+        this.errorMsg = '1';
+        console.log("Reduce failed:",result.description);
       }
+      this.cdr.detectChanges();
     });
+  }
+  /**
+   * 确认操作结果并关闭窗口
+   */
+  confirmActResult() {
+    if(this.pluginFlag=='plugin'){
+      this.backToNfsList();
+    }else{
+      this.closeModel();
+    }
   }
 }
