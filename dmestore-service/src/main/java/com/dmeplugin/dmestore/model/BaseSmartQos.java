@@ -4,87 +4,155 @@ package com.dmeplugin.dmestore.model;
  * @author lianq
  * @ClassName: BaseSmartQos
  * @Company: GH-CA
- * @create 2020-09-03
  */
 public class BaseSmartQos {
-    protected String name;
+    /**
+     * latencyUnit .
+     */
+    private String name;
+    /**
+     * latency .
+     */
+    private Integer latency;
+    /**
+     * maxbandwidth .
+     */
+    private Integer maxbandwidth;
+    /**
+     * maxiops .
+     */
+    private Integer maxiops;
+    /**
+     * minbandwidth .
+     */
+    private Integer minbandwidth;
+    /**
+     * miniops .
+     */
+    private Integer miniops;
+    /**
+     * enabled .
+     */
+    private Boolean enabled;
+    /**
+     * latencyUnit .
+     */
+    private String latencyUnit;
 
-    protected Integer latency;
-
-    protected Integer maxbandwidth;
-
-    protected Integer maxiops;
-
-    protected Integer minbandwidth;
-
-    protected Integer miniops;
-
-    protected Boolean enabled;
-
-    protected String latencyUnit;
-
+    /**
+     * getLatencyUnit.
+     * @return .
+     */
     public String getLatencyUnit() {
         return latencyUnit;
     }
 
-    public void setLatencyUnit(String latencyUnit) {
-        this.latencyUnit = latencyUnit;
+    /**
+     * setLatencyUnit .
+     * @param param .
+     */
+    public void setLatencyUnit(final String param) {
+        this.latencyUnit = param;
     }
-
+    /**
+     *getEnabled .
+     * @return .
+     */
     public Boolean getEnabled() {
         return enabled;
     }
-
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+    /**
+     * setLatencyUnit .
+     * @param param .
+     */
+    public void setEnabled(final Boolean param) {
+        this.enabled = param;
     }
-
+    /**
+     * getName .
+     * @return .
+     */
     public String getName() {
         return name;
     }
-
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setLatencyUnit .
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
-
+    /**
+     * getLatency .
+     * @return .
+     */
     public Integer getLatency() {
         return latency;
     }
-
-    public void setLatency(Integer latency) {
-        this.latency = latency;
+    /**
+     * setLatencyUnit .
+     * @param param .
+     */
+    public void setLatency(final Integer param) {
+        this.latency = param;
     }
-
+    /**
+     * getMaxbandwidth .
+     * @return .
+     */
     public Integer getMaxbandwidth() {
         return maxbandwidth;
     }
-
-    public void setMaxbandwidth(Integer maxbandwidth) {
-        this.maxbandwidth = maxbandwidth;
+    /**
+     * setLatencyUnit .
+     * @param param .
+     */
+    public void setMaxbandwidth(final Integer param) {
+        this.maxbandwidth = param;
     }
-
+    /**
+     * getMaxiops .
+     * @return .
+     */
     public Integer getMaxiops() {
         return maxiops;
     }
-
-    public void setMaxiops(Integer maxiops) {
-        this.maxiops = maxiops;
+    /**
+     * setLatencyUnit .
+     * @param param .
+     */
+    public void setMaxiops(final Integer param) {
+        this.maxiops = param;
     }
 
+    /**
+     * getMinbandwidth .
+     *
+     * @return .
+     */
     public Integer getMinbandwidth() {
         return minbandwidth;
     }
-
-    public void setMinbandwidth(Integer minbandwidth) {
-        this.minbandwidth = minbandwidth;
+    /**
+     * setLatencyUnit .
+     * @param param .
+     */
+    public void setMinbandwidth(final Integer param) {
+        this.minbandwidth = param;
     }
-
+    /**
+     *  getMiniops .
+     * @return .
+     */
     public Integer getMiniops() {
         return miniops;
     }
-
-    public void setMiniops(Integer miniops) {
-        this.miniops = miniops;
+    /**
+     * setLatencyUnit .
+     * @param param .
+     */
+    public void setMiniops(final Integer param) {
+        this.miniops = param;
     }
 
 }

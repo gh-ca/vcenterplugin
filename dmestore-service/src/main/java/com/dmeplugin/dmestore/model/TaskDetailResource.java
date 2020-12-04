@@ -8,40 +8,78 @@ package com.dmeplugin.dmestore.model;
  * @create: 2020-09-18
  **/
 public class TaskDetailResource {
-    String operate;
-    String type;
-    String id;
-    String name;
+    /**
+     * operate .
+     */
+    private String operate;
+    /**
+     * type .
+     */
+    private String type;
+    /**
+     * id .
+     */
+    private String id;
+    /**
+     * name .
+     */
+    private String name;
 
+    /**
+     * getOperate .
+     * @return String .
+     */
     public String getOperate() {
         return operate;
     }
 
-    public void setOperate(String operate) {
-        this.operate = operate;
+    /**
+     * setOperate .
+     * @param param .
+     */
+    public void setOperate(final String param) {
+        this.operate = param;
     }
-
+    /**
+     * getType .
+     * @return String .
+     */
     public String getType() {
         return type;
     }
-
-    public void setType(String type) {
-        this.type = type;
+    /**
+     * setType .
+     * @param param .
+     */
+    public void setType(final String param) {
+        this.type = param;
     }
-
+    /**
+     * getId .
+     * @return String .
+     */
     public String getId() {
         return id;
     }
-
-    public void setId(String id) {
-        this.id = id;
+    /**
+     * setId .
+     * @param param .
+     */
+    public void setId(final String param) {
+        this.id = param;
     }
-
+    /**
+     * getName .
+     * @return String .
+     */
     public String getName() {
         return name;
     }
-
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setName .
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
 }

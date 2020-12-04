@@ -6,95 +6,174 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author lianq
  * @ClassName: SmartQos
  * @Company: GH-CA
- * @create 2020-09-03
+ * @since  2020-09-03
  */
 public class SmartQos {
-
+    /**
+     * name.
+     */
     private String name;
-    //控制策略,0：保护IO下限，1：控制IO上限
+    /**
+     * 控制策略,0：保护IO下限，1：控制IO上限.
+     */
     private Integer latency;
+    /**
+     * maxbandwidth.
+     */
     private Integer maxbandwidth;
+    /**
+     * maxiops.
+     */
     private Integer maxiops;
+    /**
+     * minbandwidth.
+     */
     private Integer minbandwidth;
+    /**
+     * miniops.
+     */
     private Integer miniops;
+    /**
+     * enabled.
+     */
     private Boolean enabled;
-    //for update
+    /**
+     * for update.
+     */
     @JsonProperty(value = "control_policy")
     private String controlPolicy;
-
+    /**
+     * latencyUnit.
+     */
     private String latencyUnit;
 
+    /**
+     * getLatencyUnit .
+     * @return String .
+     */
     public String getLatencyUnit() {
         return latencyUnit;
     }
 
-    public void setLatencyUnit(String latencyUnit) {
-        this.latencyUnit = latencyUnit;
+    /**
+     * setLatencyUnit .
+     * @param param .
+     */
+    public void setLatencyUnit(final String param) {
+        this.latencyUnit = param;
     }
 
-
+    /**
+     * getEnabled .
+     * @return Boolean .
+     */
     public Boolean getEnabled() {
         return enabled;
     }
-
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
+    /**
+     * setEnabled .
+     * @param param .
+     */
+    public void setEnabled(final Boolean param) {
+        this.enabled = param;
     }
-
+    /**
+     * getControlPolicy .
+     * @return String .
+     */
     public String getControlPolicy() {
         return controlPolicy;
     }
-
-    public void setControlPolicy(String controlPolicy) {
-        this.controlPolicy = controlPolicy;
+    /**
+     * setControlPolicy .
+     * @param param .
+     */
+    public void setControlPolicy(final String param) {
+        this.controlPolicy = param;
     }
-
+    /**
+     * getName .
+     * @return String .
+     */
     public String getName() {
         return name;
     }
-
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setName .
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
-
+    /**
+     * getLatency .
+     * @return Integer .
+     */
     public Integer getLatency() {
         return latency;
     }
-
-    public void setLatency(Integer latency) {
-        this.latency = latency;
+    /**
+     * setLatency .
+     * @param param .
+     */
+    public void setLatency(final Integer param) {
+        this.latency = param;
     }
-
+    /**
+     * getMaxbandwidth .
+     * @return Integer .
+     */
     public Integer getMaxbandwidth() {
         return maxbandwidth;
     }
-
-    public void setMaxbandwidth(Integer maxbandwidth) {
-        this.maxbandwidth = maxbandwidth;
+    /**
+     * setMaxbandwidth .
+     * @param param .
+     */
+    public void setMaxbandwidth(final Integer param) {
+        this.maxbandwidth = param;
     }
-
+    /**
+     * getMaxiops .
+     * @return Integer .
+     */
     public Integer getMaxiops() {
         return maxiops;
     }
-
-    public void setMaxiops(Integer maxiops) {
-        this.maxiops = maxiops;
+    /**
+     * setMaxiops .
+     * @param param .
+     */
+    public void setMaxiops(final Integer param) {
+        this.maxiops = param;
     }
-
+    /**
+     * getMinbandwidth .
+     * @return Integer .
+     */
     public Integer getMinbandwidth() {
         return minbandwidth;
     }
-
-    public void setMinbandwidth(Integer minbandwidth) {
-        this.minbandwidth = minbandwidth;
+    /**
+     * setMinbandwidth .
+     * @param param .
+     */
+    public void setMinbandwidth(final Integer param) {
+        this.minbandwidth = param;
     }
-
+    /**
+     * getMiniops .
+     * @return Integer .
+     */
     public Integer getMiniops() {
         return miniops;
     }
-
-    public void setMiniops(Integer miniops) {
-        this.miniops = miniops;
+    /**
+     * setMiniops .
+     * @param param .
+     */
+    public void setMiniops(final Integer param) {
+        this.miniops = param;
     }
 
 }
