@@ -1,53 +1,100 @@
 package com.dmeplugin.dmestore.entity;
 
+/**
+ * ScheduleConfig.
+ * @author Administrator .
+ */
 public class ScheduleConfig {
+    /**
+     * id .
+     */
     private int id;
-
+    /**
+     * jobName .
+     */
     private String jobName;
-
+    /**
+     * className .
+     */
     private String className;
-
+    /**
+     * method .
+     */
     private String method;
-
+    /**
+     * cron .
+     */
     private String cron;
 
+    /**
+     * getId .
+     * @return int .
+     */
     public int getId() {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    /**
+     * setId .
+     * @param param .
+     */
+    public void setId(final int param) {
+        this.id = param;
     }
-
+    /**
+     * getJobName .
+     * @return String .
+     */
     public String getJobName() {
         return jobName;
     }
-
-    public void setJobName(String jobName) {
-        this.jobName = jobName;
+    /**
+     * setJobName .
+     * @param param .
+     */
+    public void setJobName(final String param) {
+        this.jobName = param;
     }
-
+    /**
+     * getClassName .
+     * @return String .
+     */
     public String getClassName() {
         return className;
     }
-
-    public void setClassName(String className) {
-        this.className = className;
+    /**
+     * setClassName .
+     * @param param .
+     */
+    public void setClassName(final String param) {
+        this.className = param;
     }
-
+    /**
+     * getMethod .
+     * @return String .
+     */
     public String getMethod() {
         return method;
     }
-
-    public void setMethod(String method) {
-        this.method = method;
+    /**
+     * setMethod .
+     * @param param .
+     */
+    public void setMethod(final String param) {
+        this.method = param;
     }
-
+    /**
+     * getCron .
+     * @return String .
+     */
     public String getCron() {
         return cron;
     }
-
-    public void setCron(String cron) {
-        this.cron = cron;
+    /**
+     * setCron .
+     * @param param .
+     */
+    public void setCron(final String param) {
+        this.cron = param;
     }
 }

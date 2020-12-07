@@ -588,7 +588,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             LOG.error("list nfs error:", e);
             throw new DMEException(e.getMessage());
         }
-        LOG.info("relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        LOG.info("relists===" + (relists == null ? "null" : (relists.size())));
         return relists;
     }
 
@@ -1011,7 +1011,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             throw new DMEException(e.getMessage());
         }
         LOG.info("getHostsMountDataStoreByDsObjectId===" +
-            (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
+            (lists == null ? "null" : (lists.size())));
         return lists;
     }
 
@@ -1032,7 +1032,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             throw new DMEException(e.getMessage());
         }
         LOG.info("getClustersMountDataStoreByDsObjectId===" +
-            (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
+            (lists == null ? "null" : (lists.size())));
         return lists;
     }
 
