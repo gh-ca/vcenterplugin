@@ -3,100 +3,181 @@ package com.dmeplugin.dmestore.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * VCenterInfo .
+ * @author Administrator .
+ */
 public class VCenterInfo implements Serializable {
-
+    /**
+     * hostPortConstant = 443 .
+     */
+    private final Integer hostPortConstant = 443;
     private static final long serialVersionUID = 3811172759222907501L;
-
+    /**
+     * id .
+     */
     private int id;
-
+    /**
+     * hostIp .
+     */
     private String hostIp;
-
+    /**
+     * hostPort .
+     */
     private int hostPort;
-
+    /**
+     * userName .
+     */
     private String userName;
-
+    /**
+     * password .
+     */
     private String password;
-
+    /**
+     * createTime .
+     */
     private Date createTime;
-
-    // HA status
+    /**
+     * HA status .
+     */
     private boolean state;
-
-    // Alarm status
+    /**
+     * Alarm status .
+     */
     private boolean pushEvent;
-
-    // 1:crtical 2:majorandcritical 3:all
+    /**
+     * 1:crtical 2:majorandcritical 3:all .
+     */
     private int pushEventLevel;
 
+    /**
+     * getPushEventLevel .
+     * @return int .
+     */
     public int getPushEventLevel() {
         return pushEventLevel;
     }
 
-    public void setPushEventLevel(int pushEventLevel) {
-        this.pushEventLevel = pushEventLevel;
+    /**
+     * setPushEventLevel .
+     * @param param .
+     */
+    public void setPushEventLevel(final int param) {
+        this.pushEventLevel = param;
     }
-
+    /**
+     * getId .
+     * @return int .
+     */
     public int getId() {
         return id;
     }
-
-    public void setId(int id) {
-        this.id = id;
+    /**
+     * setPushEventLevel .
+     * @param param .
+     */
+    public void setId(final int param) {
+        this.id = param;
     }
-
+    /**
+     * getHostIp .
+     * @return String .
+     */
     public String getHostIp() {
         return hostIp;
     }
-
-    public void setHostIp(String hostIp) {
-        this.hostIp = hostIp;
+    /**
+     * setPushEventLevel .
+     * @param param .
+     */
+    public void setHostIp(final String param) {
+        this.hostIp = param;
     }
-
+    /**
+     * getUserName .
+     * @return String .
+     */
     public String getUserName() {
         return userName;
     }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
+    /**
+     * setPushEventLevel .
+     * @param param .
+     */
+    public void setUserName(final String param) {
+        this.userName = param;
     }
-
+    /**
+     * getPassword .
+     * @return String .
+     */
     public String getPassword() {
         return password;
     }
-
-    public void setPassword(String password) {
-        this.password = password;
+    /**
+     * setPassword .
+     * @param param .
+     */
+    public void setPassword(final String param) {
+        this.password = param;
     }
-
+    /**
+     * getCreateTime .
+     * @return Date .
+     */
     public Date getCreateTime() {
         return createTime;
     }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
+    /**
+     * setCreateTime .
+     * @param param .
+     */
+    public void setCreateTime(final Date param) {
+        this.createTime = param;
     }
-
+    /**
+     * isState .
+     * @return boolean .
+     */
     public boolean isState() {
         return state;
     }
-
-    public void setState(boolean state) {
-        this.state = state;
+    /**
+     * setState .
+     * @param param .
+     */
+    public void setState(final boolean param) {
+        this.state = param;
     }
-
+    /**
+     * isPushEvent .
+     * @return boolean .
+     */
     public boolean isPushEvent() {
         return pushEvent;
     }
-
-    public void setPushEvent(boolean pushEvent) {
-        this.pushEvent = pushEvent;
+    /**
+     * setPushEvent .
+     * @param param .
+     */
+    public void setPushEvent(final boolean param) {
+        this.pushEvent = param;
     }
-
+    /**
+     * getHostPort .
+     * @return int .
+     */
     public int getHostPort() {
-        return hostPort == 0 ? 443 : hostPort;
+        if (hostPort == 0) {
+            return hostPortConstant;
+        }
+        return hostPort;
     }
-
-    public void setHostPort(int hostPort) {
-        this.hostPort = hostPort;
+    /**
+     * setHostPort .
+     * @param param .
+     */
+    public void setHostPort(final int param) {
+        this.hostPort = param;
     }
 }
