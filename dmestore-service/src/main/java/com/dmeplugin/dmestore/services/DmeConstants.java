@@ -117,4 +117,6 @@ public class DmeConstants {
     public static final int TASK_SUCCESS = 3;
     public static final int HTTPS_STATUS_CHECK_FLAG = 100;
     public static final int HTTPS_STATUS_SUCCESS_PRE = 2;
+
+    public static final int COLLECTION_CAPACITY_16 = 16;
 }

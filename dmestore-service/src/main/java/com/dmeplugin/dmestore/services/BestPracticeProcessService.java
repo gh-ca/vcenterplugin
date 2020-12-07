@@ -13,11 +13,11 @@ import java.util.List;
  * @author wangxiangyong
  */
 public interface BestPracticeProcessService {
-    List<BestPracticeCheckRecordBean> getCheckRecord()  ;
+    List<BestPracticeCheckRecordBean> getCheckRecord() throws DMEException ;
 
     List<BestPracticeBean> getCheckRecordBy(String hostSetting, int pageNo, int pageSize) throws DMEException;
 
-    void check(String objectId) throws Exception;
+    void check(String objectId) throws VcenterException;
 
     /**
      * @Author Administrator

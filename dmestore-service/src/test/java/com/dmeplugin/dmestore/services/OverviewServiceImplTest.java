@@ -95,7 +95,7 @@ public class OverviewServiceImplTest {
     }
 
     @Test
-    public void getBestPracticeViolations() {
+    public void getBestPracticeViolations() throws DMEException{
         BestPracticeBean bestPracticeBean = new BestPracticeBean();
         bestPracticeBean.setActualValue("321");
         bestPracticeBean.setAutoRepair("321");
