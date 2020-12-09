@@ -30,20 +30,26 @@ import com.vmware.vapi.security.SessionSecurityContext;
  * Helper class which provides methods for
  * 1. login/logout using username, password authentication.
  * 2. getting authenticated stubs for client-side interfaces.
+ *
+ * @author Administrator
+ * @since 2020-12-08
  */
 public class VapiAuthenticationHelper {
+    /**
+     * String
+     */
+    public static final String VAPI_PATH = "/api";
     private Session sessionSvc;
     private StubFactory stubFactory;
-    public static final String VAPI_PATH = "/api";
 
     /**
-     * Creates a session with the server using username and password
+     * Creates session with the server using username and password
      *
      * @param server     hostname or ip address of the server to log in to
      * @param username   username for login
      * @param password   password for login
-     * @param httpConfig HTTP configuration settings to be applied
-     *                   for the connection to the server.
+     * @param httpConfig HTTP configuration settings to be applied for the connection to the server.
+     * @param port       port
      * @return the stub configuration configured with an authenticated session
      * @throws Exception if there is an existing session
      */
@@ -57,22 +63,22 @@ public class VapiAuthenticationHelper {
 
         this.stubFactory = createApiStubFactory(server, port, httpConfig);
 
-        // Create a security context for username/password authentication
+        // Create security context for username/password authentication
         SecurityContext securityContext =
             SecurityContextFactory.createUserPassSecurityContext(
                 username, password.toCharArray());
 
-        // Create a stub configuration with username/password security context
+        // Create stub configuration with username/password security context
         StubConfiguration stubConfig = new StubConfiguration(securityContext);
 
-        // Create a session stub using the stub configuration.
+        // Create session stub using the stub configuration.
         Session session =
             this.stubFactory.createStub(Session.class, stubConfig);
 
-        // Login and create a session
+        // Login and create session
         char[] sessionId = session.create();
 
-        // Initialize a session security context from the generated session id
+        // Initialize session security context from the generated session id
         SessionSecurityContext sessionSecurityContext =
             new SessionSecurityContext(sessionId);
 
@@ -80,7 +86,7 @@ public class VapiAuthenticationHelper {
         stubConfig.setSecurityContext(sessionSecurityContext);
 
         /*
-         * Create a stub for the session service using the authenticated
+         * Create stub for the session service using the authenticated
          * session
          */
         this.sessionSvc =
@@ -104,31 +110,31 @@ public class VapiAuthenticationHelper {
      * instance that can be used for creating the client side stubs.
      *
      * @param server     hostname or ip address of the server
-     * @param httpConfig HTTP configuration settings to be applied
-     *                   for the connection to the server.
+     * @param httpConfig HTTP configuration settings to be applied for the connection to the server.
+     * @param port       port
      * @return factory for the client side stubs
+     * @throws Exception Exception
      */
     public StubFactory createApiStubFactory(String server, String port,
                                             HttpConfiguration httpConfig)
         throws Exception {
-        // Create a https connection with the vapi url
+        // Create https connection with the vapi url
         ProtocolFactory pf = new ProtocolFactory();
         String apiUrl = "https://" + server + ":" + port + VAPI_PATH;
 
-        // Get a connection to the vapi url
+        // Get  connection to the vapi url
         ProtocolConnection connection =
             pf.getHttpConnection(apiUrl, null, httpConfig);
 
         // Initialize the stub factory with the api provider
         ApiProvider provider = connection.getApiProvider();
-        StubFactory stubFactory = new StubFactory(provider);
-        return stubFactory;
+        return new StubFactory(provider);
     }
 
     /**
      * Returns the stub factory for the api endpoint
      *
-     * @return
+     * @return StubFactory StubFactory
      */
     public StubFactory getStubFactory() {
         return this.stubFactory;
@@ -137,6 +143,7 @@ public class VapiAuthenticationHelper {
     /**
      * Builds the http configuration.
      *
+     * @param skipServerVerification skipServerVerification
      * @return the http configuration
      * @throws Exception the exception
      */
@@ -151,6 +158,7 @@ public class VapiAuthenticationHelper {
     /**
      * Builds the ssl configuration.
      *
+     * @param skipServerVerification skipServerVerification
      * @return the ssl configuration
      * @throws Exception the exception
      */
