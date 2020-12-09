@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.VmRdmCreateBean;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public interface VmRdmService {
      * @param createBean    DME卷创建基础信息
      * @return void
      **/
-    void createRdm(String dataStoreObjectId, String vmObjectId, VmRdmCreateBean createBean) throws DMEException;
+    void createRdm(String dataStoreObjectId, String vmObjectId, VmRdmCreateBean createBean) throws DmeException;
 
     /**
      * @author wangxy
@@ -32,7 +32,7 @@ public interface VmRdmService {
      * @date 17:43 2020/10/13
      * @return java.util.List<java.util.Map<java.lang.String,java.lang.Object>>
      **/
-    List<Map<String, Object>> getAllDmeHost() throws DMEException;
+    List<Map<String, Object>> getAllDmeHost() throws DmeException;
 
     /**
      * 获取虚拟机对应主机的存储信息
@@ -43,5 +43,5 @@ public interface VmRdmService {
      * @return java.util.List<Object>
      * @throw DMEException
      **/
-    List<Object> getDatastoreMountsOnHost(String vmObjectId) throws DMEException;
+    List<Object> getDatastoreMountsOnHost(String vmObjectId) throws DmeException;
 }

@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.SimpleServiceLevel;
 
 import java.util.List;
@@ -19,36 +19,36 @@ public interface VmfsOperationService {
      * @param volumeId
      * @param params
      */
-    void updateVmfs(String volumeId, Map<String, Object> params) throws DMEException;
+    void updateVmfs(String volumeId, Map<String, Object> params) throws DmeException;
 
     /**
      * vmfs存储扩容
      * @param volumes
      */
-    void expandVmfs(Map<String,String> volumes) throws DMEException;
+    void expandVmfs(Map<String,String> volumes) throws DmeException;
 
     /**
      * vmfs存储空间回收
      * @param vmfsUuids
      */
-    void recycleVmfsCapacity(List<String> vmfsUuids) throws DMEException;
+    void recycleVmfsCapacity(List<String> vmfsUuids) throws DmeException;
 
     /**
      * vmfs存储空间回收
      * @param vmfsObjIds
      */
-    void recycleVmfsCapacityByDataStoreIds(List<String> vmfsObjIds) throws DMEException;
+    void recycleVmfsCapacityByDataStoreIds(List<String> vmfsObjIds) throws DmeException;
 
     /**
      * 更新vmfs存储
      * @param params
      */
-    void updateVmfsServiceLevel(Map<String, Object> params) throws DMEException;
+    void updateVmfsServiceLevel(Map<String, Object> params) throws DmeException;
 
     /**
      * 获取服务等级列表
      * @param params
      * @return
      */
-    List<SimpleServiceLevel> listServiceLevelVmfs(Map<String, Object> params) throws DMEException;
+    List<SimpleServiceLevel> listServiceLevelVmfs(Map<String, Object> params) throws DmeException;
 }

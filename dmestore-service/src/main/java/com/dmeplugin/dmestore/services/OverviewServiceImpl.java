@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.BestPracticeCheckRecordBean;
 import com.dmeplugin.dmestore.model.NfsDataInfo;
 import com.dmeplugin.dmestore.model.Storage;
@@ -29,7 +29,7 @@ public class OverviewServiceImpl implements OverviewService {
     private BestPracticeProcessService bestPracticeProcessService;
 
     @Override
-    public Map<String, Object> getStorageNum() throws DMEException {
+    public Map<String, Object> getStorageNum() throws DmeException {
         Map<String, Object> r = new HashMap<>(16);
         int normal = 0;
         int abnormal = 0;

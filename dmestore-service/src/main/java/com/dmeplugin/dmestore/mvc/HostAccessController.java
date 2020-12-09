@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.EthPortInfo;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.HostAccessService;
@@ -45,7 +45,7 @@ public class HostAccessController extends BaseController {
         try {
             hostAccessService.configureIscsi(params);
             return success(null, "configure iscsi success");
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("configure iscsi failure:", e);
             failureStr = "configure iscsi failure:" + e.toString();
         }
@@ -60,7 +60,7 @@ public class HostAccessController extends BaseController {
         try {
             List<EthPortInfo> lists = hostAccessService.testConnectivity(params);
             return success(lists);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("Test connectivity failure:", e);
             failureStr = "Test connectivity failure:" + e.toString();
         }

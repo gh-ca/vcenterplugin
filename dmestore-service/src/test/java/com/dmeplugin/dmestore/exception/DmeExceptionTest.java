@@ -1,7 +1,5 @@
 package com.dmeplugin.dmestore.exception;
 
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -13,15 +11,15 @@ import org.mockito.MockitoAnnotations;
  * @description TODO
  * @date 2020/12/3 10:12
  */
-public class DMEExceptionTest {
+public class DmeExceptionTest {
 
     @InjectMocks
-    DMEException dmeException = new DMEException();
+    DmeException dmeException = new DmeException();
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        dmeException = new DMEException("321", "321");
+        dmeException = new DmeException("321", "321");
     }
 
     @Test
@@ -43,7 +41,7 @@ public class DMEExceptionTest {
 
     @Test
     public void setMessage() {
-        dmeException = new DMEException("321");
+        dmeException = new DmeException("321");
         dmeException.setMessage("321");
 
     }

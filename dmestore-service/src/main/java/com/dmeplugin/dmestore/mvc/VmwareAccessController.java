@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.VmwareAccessService;
 
@@ -39,7 +39,7 @@ public class VmwareAccessController extends BaseController {
         String failureStr = "";
         try {
             return success(vmwareAccessService.listHosts());
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("list vmware host failure:", e);
             failureStr = "list vmware host failure:" + e.toString();
         }
@@ -58,7 +58,7 @@ public class VmwareAccessController extends BaseController {
         try {
             List<Map<String, String>> lists = vmwareAccessService.getHostsByDsObjectId(dataStoreObjectId);
             return success(lists);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("getHostsByDsObjectId vmware host failure:", e);
             failureStr = "getHostsByDsObjectId vmware host failure:" + e.toString();
         }
@@ -76,7 +76,7 @@ public class VmwareAccessController extends BaseController {
         try {
             List<Map<String, String>> lists = vmwareAccessService.listClusters();
             return success(lists);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             failureStr = "list vmware cluster failure:" + e.toString();
         }
         return failure(failureStr);
@@ -95,7 +95,7 @@ public class VmwareAccessController extends BaseController {
         try {
             List<Map<String, String>> lists = vmwareAccessService.getClustersByDsObjectId(dataStoreObjectId);
             return success(lists);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("getClustersByDsObjectId vmware host failure:", e);
             failureStr = e.getMessage();
         }
@@ -118,7 +118,7 @@ public class VmwareAccessController extends BaseController {
             List<Map<String, String>> lists = vmwareAccessService.getDataStoresByHostObjectId(hostObjectId,
                 dataStoreType);
             return success(lists);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("getDataStoresByHostObjectId vmware host failure:", e);
             failureStr = e.getMessage();
         }
@@ -141,7 +141,7 @@ public class VmwareAccessController extends BaseController {
             List<Map<String, String>> lists = vmwareAccessService.getDataStoresByClusterObjectId(clusterObjectId,
                 dataStoreType);
             return success(lists);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("getDataStoresByClusterObjectId vmware host failure:", e);
             failureStr = e.getMessage();
         }
@@ -161,7 +161,7 @@ public class VmwareAccessController extends BaseController {
         try {
             List<Map<String, String>> lists = vmwareAccessService.getVmKernelIpByHostObjectId(hostObjectId);
             return success(lists);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("get vmkernel ip by hostobjectid failure:", e);
             failureStr = "get vmkernel ip by hostobjectid failure:" + e.toString();
         }
@@ -185,7 +185,7 @@ public class VmwareAccessController extends BaseController {
             List<Map<String, String>> lists = vmwareAccessService.getMountDataStoresByHostObjectId(hostObjectId,
                 dataStoreType);
             return success(lists);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("getMountDataStoresByHostObjectId vmware host failure:", e);
             failureStr = "getMountDataStoresByHostObjectId vmware host failure:" + e.toString();
         }
@@ -208,7 +208,7 @@ public class VmwareAccessController extends BaseController {
             List<Map<String, String>> lists = vmwareAccessService.getMountDataStoresByClusterObjectId(clusterObjectId,
                 dataStoreType);
             return success(lists);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("getDataStoresByClusterObjectId vmware host failure:", e);
             failureStr = e.getMessage();
         }

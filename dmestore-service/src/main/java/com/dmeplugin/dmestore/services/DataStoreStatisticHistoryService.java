@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 
 import java.util.Map;
 
@@ -74,9 +74,9 @@ public interface DataStoreStatisticHistoryService {
      * @author wangxy
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryVmfsStatistic(Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryVmfsStatistic(Map<String, Object> params) throws DmeException;
 
     /**
      * 获取VMFS当前性能数据值
@@ -84,9 +84,9 @@ public interface DataStoreStatisticHistoryService {
      * @author wangxy
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryVmfsStatisticCurrent(Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryVmfsStatisticCurrent(Map<String, Object> params) throws DmeException;
 
     /**
      * 获取NFS历史性能数据值
@@ -94,9 +94,9 @@ public interface DataStoreStatisticHistoryService {
      * @author wangxy
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryNfsStatistic(Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryNfsStatistic(Map<String, Object> params) throws DmeException;
 
     /**
      * 获取NFS当前性能数据
@@ -104,9 +104,9 @@ public interface DataStoreStatisticHistoryService {
      * @author liuxh
      * @param params key required: obj_ids
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryNfsStatisticCurrent(Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryNfsStatisticCurrent(Map<String, Object> params) throws DmeException;
 
     /**
      * 查询磁盘(卷)历史性能数据
@@ -114,9 +114,9 @@ public interface DataStoreStatisticHistoryService {
      * @author liuxh
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryVolumeStatistic(Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryVolumeStatistic(Map<String, Object> params) throws DmeException;
 
     /**
      * 查询fileSystem历史性能数据(Nfsdatasotrage)
@@ -124,9 +124,9 @@ public interface DataStoreStatisticHistoryService {
      * @author liuxh
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryFsStatistic(Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryFsStatistic(Map<String, Object> params) throws DmeException;
 
     /**
      * 查询controller历史性能数据(SYS_Controller)
@@ -134,9 +134,9 @@ public interface DataStoreStatisticHistoryService {
      * @author liuxh
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryControllerStatistic(Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryControllerStatistic(Map<String, Object> params) throws DmeException;
 
     /**
      * 查询StoragePort历史性能数据(SYS_StoragePort)
@@ -144,9 +144,9 @@ public interface DataStoreStatisticHistoryService {
      * @author liuxh
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryStoragePortStatistic(Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryStoragePortStatistic(Map<String, Object> params) throws DmeException;
 
     /**
      * 查询storageDisk历史性能数据(SYS_StorageDisk)
@@ -154,9 +154,9 @@ public interface DataStoreStatisticHistoryService {
      * @author liuxh
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryStorageDiskStatistic(Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryStorageDiskStatistic(Map<String, Object> params) throws DmeException;
 
     /**
      * 查询服务等级历史性能数据
@@ -164,9 +164,9 @@ public interface DataStoreStatisticHistoryService {
      * @author liuxh
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryServiceLevelStatistic(Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryServiceLevelStatistic(Map<String, Object> params) throws DmeException;
 
     /**
      * 查询服务等级卷历史性能数据
@@ -174,9 +174,9 @@ public interface DataStoreStatisticHistoryService {
      * @author liuxh
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryServiceLevelLunStatistic(Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryServiceLevelLunStatistic(Map<String, Object> params) throws DmeException;
 
     /**
      * 查询服务等级存储池历史性能数据
@@ -184,9 +184,9 @@ public interface DataStoreStatisticHistoryService {
      * @author liuxh
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryServiceLevelStoragePoolStatistic(Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryServiceLevelStoragePoolStatistic(Map<String, Object> params) throws DmeException;
 
     /**
      * 查询存储池历史性能数据
@@ -194,9 +194,9 @@ public interface DataStoreStatisticHistoryService {
      * @author liuxh
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryStoragePoolStatistic(Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryStoragePoolStatistic(Map<String, Object> params) throws DmeException;
 
     /**
      * 查询存储池当前性能数据
@@ -204,9 +204,9 @@ public interface DataStoreStatisticHistoryService {
      * @author liuxh
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryStoragePoolCurrentStatistic(Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryStoragePoolCurrentStatistic(Map<String, Object> params) throws DmeException;
 
     /**
      * 查询存储设备历史性能数据
@@ -214,9 +214,9 @@ public interface DataStoreStatisticHistoryService {
      * @author liuxh
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryStorageDevcieStatistic(Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryStorageDevcieStatistic(Map<String, Object> params) throws DmeException;
 
     /**
      * 查询存储设备当前性能数据
@@ -224,9 +224,9 @@ public interface DataStoreStatisticHistoryService {
      * @author liuxh
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryStorageDevcieCurrentStatistic(Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryStorageDevcieCurrentStatistic(Map<String, Object> params) throws DmeException;
 
     /**
      * 查询控制器当前性能数据
@@ -234,9 +234,9 @@ public interface DataStoreStatisticHistoryService {
      * @author liuxh
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryControllerCurrentStatistic(Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryControllerCurrentStatistic(Map<String, Object> params) throws DmeException;
 
     /**
      * 查询存储端口当前性能数据
@@ -244,9 +244,9 @@ public interface DataStoreStatisticHistoryService {
      * @author liuxh
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryStoragePortCurrentStatistic(Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryStoragePortCurrentStatistic(Map<String, Object> params) throws DmeException;
 
     /**
      * 查询存储磁盘当前性能数据
@@ -254,9 +254,9 @@ public interface DataStoreStatisticHistoryService {
      * @author liuxh
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryStorageDiskCurrentStatistic(Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryStorageDiskCurrentStatistic(Map<String, Object> params) throws DmeException;
 
     /**
      * 查询指定资源类型的历史性能数据
@@ -265,9 +265,9 @@ public interface DataStoreStatisticHistoryService {
      * @param resType 实例类型
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryHistoryStatistic(String resType, Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryHistoryStatistic(String resType, Map<String, Object> params) throws DmeException;
 
     /**
      * 查询指定资源类型的当前性能数据
@@ -276,7 +276,7 @@ public interface DataStoreStatisticHistoryService {
      * @param resType 实例类型
      * @param params key required: obj_ids, indicator_ids, range
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> queryCurrentStatistic(String resType, Map<String, Object> params) throws DMEException;
+    Map<String, Object> queryCurrentStatistic(String resType, Map<String, Object> params) throws DmeException;
 }

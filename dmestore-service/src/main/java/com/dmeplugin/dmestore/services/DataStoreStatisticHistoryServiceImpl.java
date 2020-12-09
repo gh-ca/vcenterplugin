@@ -2,7 +2,7 @@ package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.constant.DmeConstants;
 import com.dmeplugin.dmestore.constant.DmeIndicatorConstants;
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.RelationInstance;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.google.gson.Gson;
@@ -71,13 +71,13 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     private DmeRelationInstanceService dmeRelationInstanceService;
 
     @Override
-    public Map<String, Object> queryVmfsStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryVmfsStatistic(Map<String, Object> params) throws DmeException {
         // 通过存储ID查卷ID 实际获取卷的性能数据
         return queryVolumeStatistic(params);
     }
 
     @Override
-    public Map<String, Object> queryVmfsStatisticCurrent(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryVmfsStatisticCurrent(Map<String, Object> params) throws DmeException {
         Map<String, String> idInstancdIdMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         List<String> instanceIds = new ArrayList<>();
         Object indicatorIds = params.get(INDICATOR_IDS_FIELD);
@@ -107,12 +107,12 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     @Override
-    public Map<String, Object> queryNfsStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryNfsStatistic(Map<String, Object> params) throws DmeException {
         return queryFsStatistic(params);
     }
 
     @Override
-    public Map<String, Object> queryNfsStatisticCurrent(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryNfsStatisticCurrent(Map<String, Object> params) throws DmeException {
         // SYS_StorageFileSystem
         Object indicatorIds = params.get(INDICATOR_IDS_FIELD);
         if (null == indicatorIds) {
@@ -125,43 +125,43 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     @Override
-    public Map<String, Object> queryVolumeStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryVolumeStatistic(Map<String, Object> params) throws DmeException {
         Map<String, String> idInstancdIdMap = initParamVolume(params, false);
         return queryHistoryStatistic(VOLUME_INSTANCE, params, idInstancdIdMap);
     }
 
     @Override
-    public Map<String, Object> queryControllerStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryControllerStatistic(Map<String, Object> params) throws DmeException {
         Map<String, String> idInstancdIdMap = initParamController(params, false);
         return queryHistoryStatistic("controller", params, idInstancdIdMap);
     }
 
     @Override
-    public Map<String, Object> queryStoragePortStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryStoragePortStatistic(Map<String, Object> params) throws DmeException {
         Map<String, String> idInstancdIdMap = initParamStoragePort(params, false);
         return queryHistoryStatistic("storagePort", params, idInstancdIdMap);
     }
 
     @Override
-    public Map<String, Object> queryStorageDiskStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryStorageDiskStatistic(Map<String, Object> params) throws DmeException {
         Map<String, String> idInstancdIdMap = initParamStorageDisk(params, false);
         return queryHistoryStatistic("storageDisk", params, idInstancdIdMap);
     }
 
     @Override
-    public Map<String, Object> queryFsStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryFsStatistic(Map<String, Object> params) throws DmeException {
         Map<String, String> idInstancdIdMap = initParamFs(params, false);
         return queryHistoryStatistic("storageFileSystem", params, idInstancdIdMap);
     }
 
     @Override
-    public Map<String, Object> queryServiceLevelStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryServiceLevelStatistic(Map<String, Object> params) throws DmeException {
         Map<String, String> idInstancdIdMap = initParamServiceLevel(params);
         return queryHistoryStatistic("serviceLevel", params, idInstancdIdMap);
     }
 
     @Override
-    public Map<String, Object> queryServiceLevelLunStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryServiceLevelLunStatistic(Map<String, Object> params) throws DmeException {
         // SYS_LUN
         Map<String, String> idInstanceIdMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         List<String> instanceIds = new ArrayList<>();
@@ -192,7 +192,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     @Override
-    public Map<String, Object> queryServiceLevelStoragePoolStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryServiceLevelStoragePoolStatistic(Map<String, Object> params) throws DmeException {
         // SYS_StoragePool
         Map<String, String> idInstanceIdMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         List<String> instanceIds = new ArrayList<>();
@@ -223,65 +223,65 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     @Override
-    public Map<String, Object> queryStoragePoolStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryStoragePoolStatistic(Map<String, Object> params) throws DmeException {
         Map<String, String> idInstancdIdMap = initParamStoragePool(params);
         return queryHistoryStatistic("queryStoragePoolStatistic", params, idInstancdIdMap);
     }
 
     @Override
-    public Map<String, Object> queryStorageDevcieStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryStorageDevcieStatistic(Map<String, Object> params) throws DmeException {
         Map<String, String> idInstancdIdMap = initParamStorageDevice(params);
         return queryHistoryStatistic("queryStorageDevcieStatistic", params, idInstancdIdMap);
     }
 
     @Override
-    public Map<String, Object> queryStorageDevcieCurrentStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryStorageDevcieCurrentStatistic(Map<String, Object> params) throws DmeException {
         Map<String, String> idInstancdIdMap = initParamStorageDevice(params);
         return queryCurrentStatistic("StorageDevcie", params, idInstancdIdMap);
     }
 
     @Override
-    public Map<String, Object> queryStoragePoolCurrentStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryStoragePoolCurrentStatistic(Map<String, Object> params) throws DmeException {
         Map<String, String> idInstancdIdMap = initParamStoragePool(params);
         return queryCurrentStatistic("StoragePool", params, idInstancdIdMap);
     }
 
-    public Map<String, Object> queryVolumeCurrentStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryVolumeCurrentStatistic(Map<String, Object> params) throws DmeException {
         Map<String, String> idInstancdIdMap = initParamVolume(params, true);
         return queryCurrentStatistic(VOLUME_INSTANCE, params, idInstancdIdMap);
     }
 
-    public Map<String, Object> queryServiceLevelCurrentStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryServiceLevelCurrentStatistic(Map<String, Object> params) throws DmeException {
         Map<String, String> idInstancdIdMap = initParamServiceLevel(params);
         return queryCurrentStatistic(VOLUME_INSTANCE, params, idInstancdIdMap);
     }
 
-    public Map<String, Object> queryFsCurrentStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryFsCurrentStatistic(Map<String, Object> params) throws DmeException {
         Map<String, String> idInstancdIdMap = initParamFs(params, true);
         return queryCurrentStatistic(VOLUME_INSTANCE, params, idInstancdIdMap);
     }
 
     @Override
-    public Map<String, Object> queryControllerCurrentStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryControllerCurrentStatistic(Map<String, Object> params) throws DmeException {
         Map<String, String> idInstancdIdMap = initParamController(params, true);
         return queryCurrentStatistic("controller", params, idInstancdIdMap);
     }
 
     @Override
-    public Map<String, Object> queryStoragePortCurrentStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryStoragePortCurrentStatistic(Map<String, Object> params) throws DmeException {
         Map<String, String> idInstancdIdMap = initParamStoragePort(params, true);
         return queryCurrentStatistic("storageport", params, idInstancdIdMap);
     }
 
     @Override
-    public Map<String, Object> queryStorageDiskCurrentStatistic(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> queryStorageDiskCurrentStatistic(Map<String, Object> params) throws DmeException {
         Map<String, String> idInstancdIdMap = initParamStorageDisk(params, true);
         return queryCurrentStatistic("storagedisk", params, idInstancdIdMap);
     }
 
     @Override
     public Map<String, Object> queryHistoryStatistic(String relationOrInstance, Map<String, Object> params)
-        throws DMEException {
+        throws DmeException {
         Map<String, Object> resultMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         if (!StringUtils.isEmpty(relationOrInstance)) {
             switch (relationOrInstance) {
@@ -318,7 +318,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     private Map<String, Object> queryHistoryStatistic(String relationOrInstance, Map<String, Object> params,
-        Map<String, String> idInstanceIdMap) throws DMEException {
+        Map<String, String> idInstanceIdMap) throws DmeException {
         Map<String, Object> resultmap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         ResponseEntity responseEntity;
         JsonElement statisticElement;
@@ -341,11 +341,11 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                         resultmap.putAll(objectMap);
                     } else {
                         log.error("{} statistic error,the params is:{}", relationOrInstance, gson.toJson(params));
-                        throw new DMEException("503", relationOrInstance + " statistic error,the params is:{}");
+                        throw new DmeException("503", relationOrInstance + " statistic error,the params is:{}");
                     }
-                } catch (DMEException e) {
+                } catch (DmeException e) {
                     log.error("{} statistic exception.{}", relationOrInstance, e);
-                    throw new DMEException("503", e.getMessage());
+                    throw new DmeException("503", e.getMessage());
                 }
             }
         }
@@ -354,7 +354,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
 
     @Override
     public Map<String, Object> queryCurrentStatistic(String relationOrInstance, Map<String, Object> params)
-        throws DMEException {
+        throws DmeException {
         Map<String, Object> resultMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         if (!StringUtils.isEmpty(relationOrInstance)) {
             switch (relationOrInstance) {
@@ -388,7 +388,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                         relationOrInstance + " current statistic error, non-supported relation and instance!");
                     log.error("{} current statistic error, non-supported relation and instance.the params is:{}",
                         relationOrInstance, gson.toJson(params));
-                    throw new DMEException(gson.toJson(resultMap));
+                    throw new DmeException(gson.toJson(resultMap));
             }
         }
         return resultMap;
@@ -429,7 +429,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                         log.error("{} current statistic error,the params is:{}", relationOrInstance,
                             gson.toJson(params));
                     }
-                } catch (DMEException e) {
+                } catch (DmeException e) {
                     log.error("{} current statistic exception.{}", relationOrInstance, e);
                 }
             }
@@ -608,7 +608,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             if (instances.size() > 0) {
                 relationInstance = instances.get(0);
             }
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             log.warn("get RelationInstance error!{}", e.getMessage());
         }
         return relationInstance;
@@ -651,7 +651,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     // query statistic
-    private ResponseEntity queryStatistic(Map<String, Object> paramMap) throws DMEException {
+    private ResponseEntity queryStatistic(Map<String, Object> paramMap) throws DmeException {
         Map<String, Object> params = initParams(paramMap);
         String objTypeId = params.get(OBJ_TYPE_ID_FIELD).toString();
         Object indicatorIds = params.get(INDICATOR_IDS_FIELD);

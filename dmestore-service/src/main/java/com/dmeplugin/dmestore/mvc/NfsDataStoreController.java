@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.DmeNFSAccessService;
 
@@ -27,7 +27,7 @@ public class NfsDataStoreController extends BaseController {
         String failureStr;
         try {
             return success(dmeNfsAccessService.getNfsDatastoreLogicPortAttr(storageObjectId));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             failureStr = e.getMessage();
         }
         return failure(failureStr);
@@ -38,7 +38,7 @@ public class NfsDataStoreController extends BaseController {
         String failureStr;
         try {
             return success(dmeNfsAccessService.getNfsDatastoreShareAttr(storageObjectId));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             failureStr = e.getMessage();
         }
         return failure(failureStr);
@@ -49,7 +49,7 @@ public class NfsDataStoreController extends BaseController {
         String failureStr;
         try {
             return success(dmeNfsAccessService.getNfsDatastoreFsAttr(storageObjectId));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             failureStr = e.getMessage();
         }
         return failure(failureStr);
@@ -60,7 +60,7 @@ public class NfsDataStoreController extends BaseController {
         String failureStr;
         try {
             return success(dmeNfsAccessService.scanNfs());
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             failureStr = e.getMessage();
         }
         return failure(failureStr);

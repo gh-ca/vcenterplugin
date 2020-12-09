@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.task;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.services.ServiceLevelService;
 
 import org.quartz.JobExecutionContext;
@@ -26,7 +26,7 @@ public class BackgroundSyncServiceLevelTask implements StatefulJob {
         try {
             Object obj = ApplicationContextHelper.getBean("ServiceLevelServiceImpl");
             ((ServiceLevelService) obj).updateVmwarePolicy();
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOGGER.error("updateVmwarePolicy error", e);
         }
         LOGGER.info("updateVmwarePolicy end");

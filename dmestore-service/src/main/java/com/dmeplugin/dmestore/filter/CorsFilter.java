@@ -3,7 +3,6 @@ package com.dmeplugin.dmestore.filter;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -15,15 +14,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
+ * CORSFilter
+ *
  * @author wei.yuan
- * @create 2020-09-09 16:50
+ * @since  2020-09-09
  */
 @Component
-public class CORSFilter implements Filter {
+public class CorsFilter implements Filter {
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
-
-    }
+    public void init(FilterConfig filterConfig) throws ServletException { }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain)
@@ -39,9 +38,6 @@ public class CORSFilter implements Filter {
         }
         filterChain.doFilter(request, response);
     }
-
     @Override
-    public void destroy() {
-
-    }
+    public void destroy() { }
 }

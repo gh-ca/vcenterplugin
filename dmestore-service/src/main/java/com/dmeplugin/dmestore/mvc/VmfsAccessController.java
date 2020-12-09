@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.model.VmfsDataInfo;
 import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
@@ -47,7 +47,7 @@ public class VmfsAccessController extends BaseController {
         try {
             List<VmfsDataInfo> lists = vmfsAccessService.listVmfs();
             return success(lists);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             failureStr = e.getMessage();
         }
         return failure(failureStr);
@@ -61,7 +61,7 @@ public class VmfsAccessController extends BaseController {
         try {
             List<VmfsDataInfo> lists = vmfsAccessService.listVmfsPerformance(wwns);
             return success(lists);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("get vmfs performance failure:", e);
             failureStr = "get vmfs performance failure:" + e.getMessage();
         }
@@ -75,7 +75,7 @@ public class VmfsAccessController extends BaseController {
         try {
             vmfsAccessService.createVmfs(params);
             return success(null, "Create vmfs success");
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             failureStr = "create vmfs failure:" + e.getMessage();
         }
         return failure(failureStr);
@@ -89,7 +89,7 @@ public class VmfsAccessController extends BaseController {
         try {
             vmfsAccessService.mountVmfs(params);
             return success(null, "Mount vmfs success");
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("mount vmfs failure:", e);
             failureStr = "mount vmfs failure:" + e.getMessage();
         }
@@ -103,7 +103,7 @@ public class VmfsAccessController extends BaseController {
         try {
             vmfsAccessService.unmountVmfs(params);
             return success(null, "unmount vmfs success");
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("unmount vmfs failure:", e);
             failureStr = "unmount vmfs failure:" + e.getMessage();
         }
@@ -117,7 +117,7 @@ public class VmfsAccessController extends BaseController {
         try {
             vmfsAccessService.deleteVmfs(params);
             return success();
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             failureStr = e.getMessage();
         }
         return failure(failureStr);
@@ -136,7 +136,7 @@ public class VmfsAccessController extends BaseController {
         try {
             List<VmfsDatastoreVolumeDetail> detail = vmfsAccessService.volumeDetail(storageObjectId);
             return success(detail);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -153,7 +153,7 @@ public class VmfsAccessController extends BaseController {
         try {
             vmfsAccessService.scanVmfs();
             return success();
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -171,7 +171,7 @@ public class VmfsAccessController extends BaseController {
         try {
             List<Map<String, Object>> hosts = vmfsAccessService.getHostsByStorageId(storageId);
             return success(hosts);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -181,7 +181,7 @@ public class VmfsAccessController extends BaseController {
         try {
             List<Map<String, Object>> hosts = vmfsAccessService.getHostGroupsByStorageId(storageId);
             return success(hosts);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -193,7 +193,7 @@ public class VmfsAccessController extends BaseController {
             List<VmfsDataInfo> lists = vmfsAccessService.queryVmfs(dataStoreObjectId);
             LOG.info("listvmfs lists=={}", gson.toJson(lists));
             return success(lists);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("list vmfs failure:", e);
             failureStr = "list vmfs failure:" + e.toString();
         }

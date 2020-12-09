@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.RelationInstance;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public interface DmeRelationInstanceService {
      * @return
      * @throws Exception
      */
-    List<RelationInstance> queryRelationByRelationName(String relationName) throws DMEException;
+    List<RelationInstance> queryRelationByRelationName(String relationName) throws DmeException;
 
     /**
      * 按资源关系类型名称和条件sourceInstanceId查询资源关系实例
@@ -29,7 +29,8 @@ public interface DmeRelationInstanceService {
      * @param sourceInstanceId 源实例ID
      * @return
      */
-    List<RelationInstance> queryRelationByRelationNameConditionSourceInstanceId(String relationName, String sourceInstanceId) throws DMEException;
+    List<RelationInstance> queryRelationByRelationNameConditionSourceInstanceId(String relationName, String sourceInstanceId) throws
+        DmeException;
 
     /**
      * 按资源关系类型名称和实例ID查询资源关系实例
@@ -38,7 +39,7 @@ public interface DmeRelationInstanceService {
      * @return
      * @throws Exception
      */
-    RelationInstance queryRelationByRelationNameInstanceId(String relationName, String instanceId) throws DMEException;
+    RelationInstance queryRelationByRelationNameInstanceId(String relationName, String instanceId) throws DmeException;
 
     /**
      * 按资源类型和资源实例查询单个资源实例
@@ -46,7 +47,7 @@ public interface DmeRelationInstanceService {
      * @param instanceId
      * @return
      */
-    Object queryInstanceByInstanceNameId(String instanceName, String instanceId) throws DMEException;
+    Object queryInstanceByInstanceNameId(String instanceName, String instanceId) throws DmeException;
 
     Map<String, Map<String, Object>> getServiceLevelInstance();
 

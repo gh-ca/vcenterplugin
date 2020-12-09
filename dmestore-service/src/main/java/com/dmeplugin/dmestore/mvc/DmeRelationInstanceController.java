@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.DmeRelationInstanceService;
 
@@ -34,7 +34,7 @@ public class DmeRelationInstanceController extends BaseController {
         LOG.info("listbyrelationname:{}", relationName);
         try {
             return success(dmeRelationInstanceService.queryRelationByRelationName(relationName));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             String errMsg = "queryRelationInstanceByRelationName error,relationName:" + relationName;
             return failure(errMsg);
         }
@@ -46,7 +46,7 @@ public class DmeRelationInstanceController extends BaseController {
         LOG.info("getbyrelationname instanceid:{}, {}", relationName, instanceId);
         try {
             return success(dmeRelationInstanceService.queryRelationByRelationNameInstanceId(relationName, instanceId));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             String errMsg = "queryRelationInstanceByRelationNameInstanceId error,relationName:" + relationName;
             return failure(errMsg);
         }
@@ -60,7 +60,7 @@ public class DmeRelationInstanceController extends BaseController {
         try {
             return success(dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(relationName,
                 instanceId));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             String errMsg = "queryRelationInstanceByRelationNameInstanceId error,relationName:" + relationName + " , "
                 + instanceId;
             return failure(errMsg);

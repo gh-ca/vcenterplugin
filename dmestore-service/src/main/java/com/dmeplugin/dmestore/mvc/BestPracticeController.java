@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.exception.DmeSqlException;
 import com.dmeplugin.dmestore.exception.VcenterException;
 import com.dmeplugin.dmestore.model.BestPracticeUpResultResponse;
@@ -54,7 +54,7 @@ public class BestPracticeController extends BaseController {
             return success(bestPracticeProcessService.getCheckRecord());
         } catch (DmeSqlException ex) {
             return failure(ex.getMessage());
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -64,7 +64,7 @@ public class BestPracticeController extends BaseController {
         @RequestParam int pageSize) {
         try {
             return success(bestPracticeProcessService.getCheckRecordBy(hostSetting, pageNo, pageSize));
-        } catch (DMEException ex) {
+        } catch (DmeException ex) {
             return failure(ex.getMessage());
         }
     }
@@ -82,7 +82,7 @@ public class BestPracticeController extends BaseController {
                 }
             }
             return success(resultList);
-        } catch (DMEException ex) {
+        } catch (DmeException ex) {
             return failure(ex.getMessage());
         }
     }
@@ -91,7 +91,7 @@ public class BestPracticeController extends BaseController {
     public ResponseBodyBean upByHostSetting(@RequestBody BestPracticeUpdateByTypeRequest request) {
         try {
             return success(bestPracticeProcessService.update(request.getHostObjectIds(), request.getHostSetting()));
-        } catch (DMEException ex) {
+        } catch (DmeException ex) {
             return failure(ex.getMessage());
         }
     }

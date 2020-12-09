@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.vmware.VCConnectionHelper;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,9 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.HashMap;
-import java.util.Map;
-import static org.mockito.Mockito.when;
 /**
  * @author lianq
  * @className PluginRegisterServiceImplTest
@@ -37,7 +34,7 @@ public class PluginRegisterServiceImplTest {
     }
 
     @Test
-    public void installService() throws DMEException {
+    public void installService() throws DmeException {
         pluginRegisterService.installService("321","321","321","321","321","321","321","321");
     }
 

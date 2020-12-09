@@ -1,8 +1,8 @@
 package com.dmeplugin.dmestore.mvc;
 
 import com.dmeplugin.dmestore.constant.DmeConstants;
-import com.dmeplugin.dmestore.exception.DMEException;
-import com.dmeplugin.dmestore.exception.NoDMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
+import com.dmeplugin.dmestore.exception.NoDmeException;
 import com.dmeplugin.dmestore.exception.VcenterRuntimeException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.DMEOpenApiService;
@@ -61,9 +61,9 @@ public class BaseController {
 
     private static final ResponseBodyBean SUCCESS_BEAN = new ResponseBodyBean(CODE_SUCCESS, null, null);
 
-    @ExceptionHandler(NoDMEException.class)
+    @ExceptionHandler(NoDmeException.class)
     @ResponseStatus(HttpStatus.OK)
-    protected Map<String, Object> handleException(final NoDMEException exception) {
+    protected Map<String, Object> handleException(final NoDmeException exception) {
         LOGGER.debug("No eSight configuration!{}", exception.getMessage());
         return generateError(generateCode(exception.getCode()), exception.getMessage(), Collections.emptyList());
     }
@@ -88,9 +88,9 @@ public class BaseController {
         return generateError(request, generateCode(exception.getCode()), exception.getMessage(), null);
     }
 
-    @ExceptionHandler(DMEException.class)
+    @ExceptionHandler(DmeException.class)
     @ResponseStatus(HttpStatus.OK)
-    protected Map<String, Object> handleException(final DMEException exception, final HttpServletRequest request) {
+    protected Map<String, Object> handleException(final DmeException exception, final HttpServletRequest request) {
         LOGGER.error("eSight Exception!{}", exception.getMessage());
         if (CODE_NO_ESIGHT_EXCEPTION.equals(exception.getCode())) {
             return generateError(request, exception.getCode(), exception.getMessage(), null);

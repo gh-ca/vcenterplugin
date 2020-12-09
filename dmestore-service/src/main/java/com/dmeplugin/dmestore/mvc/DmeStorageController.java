@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.DmeStorageService;
 
@@ -37,7 +37,7 @@ public class DmeStorageController extends BaseController {
     public ResponseBodyBean getStorages() {
         try {
             return success(dmeStorageService.getStorages());
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -46,7 +46,7 @@ public class DmeStorageController extends BaseController {
     public ResponseBodyBean getStorageDetail(@RequestParam(name = "storageId") String storageId) {
         try {
             return success(dmeStorageService.getStorageDetail(storageId));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -56,7 +56,7 @@ public class DmeStorageController extends BaseController {
         @RequestParam(name = "mediaType", defaultValue = "all", required = false) String mediaType) {
         try {
             return success(dmeStorageService.getStoragePools(storageId, mediaType));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -66,7 +66,7 @@ public class DmeStorageController extends BaseController {
     public ResponseBodyBean getLogicPorts(@RequestParam(name = "storageId") String storageId) {
         try {
             return success(dmeStorageService.getLogicPorts(storageId));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -79,7 +79,7 @@ public class DmeStorageController extends BaseController {
         @RequestParam(name = "pageNo", required = false, defaultValue = "0") String pageNo) {
         try {
             return success(dmeStorageService.getVolumesByPage(storageId, pageSize, pageNo));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -89,7 +89,7 @@ public class DmeStorageController extends BaseController {
     public ResponseBodyBean getFileSystems(@RequestParam(name = "storageId") String storageId) {
         try {
             return success(dmeStorageService.getFileSystems(storageId));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -99,7 +99,7 @@ public class DmeStorageController extends BaseController {
     public ResponseBodyBean getDtrees(@RequestParam(name = "storageId") String storageId) {
         try {
             return success(dmeStorageService.getDtrees(storageId));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -108,7 +108,7 @@ public class DmeStorageController extends BaseController {
     public ResponseBodyBean getNfsShares(@RequestParam(name = "storageId") String storageId) {
         try {
             return success(dmeStorageService.getNfsShares(storageId));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -118,7 +118,7 @@ public class DmeStorageController extends BaseController {
     public ResponseBodyBean getBandPorts(@RequestParam(name = "storageId") String storageId) {
         try {
             return success(dmeStorageService.getBandPorts(storageId));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -127,7 +127,7 @@ public class DmeStorageController extends BaseController {
     public ResponseBodyBean getStorageControllers(@RequestParam(name = "storageDeviceId") String storageDeviceId) {
         try {
             return success(dmeStorageService.getStorageControllers(storageDeviceId));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -136,7 +136,7 @@ public class DmeStorageController extends BaseController {
     public ResponseBodyBean getStorageDisks(@RequestParam(name = "storageDeviceId") String storageDeviceId) {
         try {
             return success(dmeStorageService.getStorageDisks(storageDeviceId));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -145,7 +145,7 @@ public class DmeStorageController extends BaseController {
     public ResponseBodyBean getStorageEthPorts(@RequestParam(name = "storageSn") String storageSn) throws Exception {
         try {
             return success(dmeStorageService.getStorageEthPorts(storageSn));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure("get Storage Eth Ports failure:" + e.toString());
         }
     }
@@ -155,7 +155,7 @@ public class DmeStorageController extends BaseController {
         @RequestParam(name = "portType", defaultValue = "ALL", required = false) String portType) {
         try {
             return success(dmeStorageService.getStoragePort(storageDeviceId, portType));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -165,7 +165,7 @@ public class DmeStorageController extends BaseController {
     public ResponseBodyBean getFailoverGroups(@RequestParam(name = "storageId") String storageId) {
         try {
             return success(dmeStorageService.getFailoverGroups(storageId));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -174,7 +174,7 @@ public class DmeStorageController extends BaseController {
     public ResponseBodyBean listStoragePerformance(@RequestParam("storageIds") List<String> storageIds) {
         try {
             return success(dmeStorageService.listStoragePerformance(storageIds));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("get Storage performance failure:", e);
             return failure("get Storage performance failure:" + e.toString());
         }
@@ -184,7 +184,7 @@ public class DmeStorageController extends BaseController {
     public ResponseBodyBean listStoragePoolPerformance(@RequestParam("storagePoolIds") List<String> storagePoolIds) {
         try {
             return success(dmeStorageService.listStoragePoolPerformance(storagePoolIds));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("get Storage Pool performance failure:", e);
             return failure("get Storage Pool performance failure:" + e.toString());
         }
@@ -195,7 +195,7 @@ public class DmeStorageController extends BaseController {
         @RequestParam("storageControllerIds") List<String> storageControllerIds) throws Exception {
         try {
             return success(dmeStorageService.listStorageControllerPerformance(storageControllerIds));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("get Storage controller performance failure:", e);
             return failure("get Storage controller performance failure:" + e.toString());
         }
@@ -206,7 +206,7 @@ public class DmeStorageController extends BaseController {
     public ResponseBodyBean listStorageDiskPerformance(@RequestParam("storageDiskIds") List<String> storageDiskIds) {
         try {
             return success(dmeStorageService.listStorageDiskPerformance(storageDiskIds));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("get Storage disk performance failure:", e);
             return failure("get Storage disk performance failure:" + e.toString());
         }
@@ -216,7 +216,7 @@ public class DmeStorageController extends BaseController {
     public ResponseBodyBean listStoragePortPerformance(@RequestParam("storagePortIds") List<String> storagePortIds) {
         try {
             return success(dmeStorageService.listStoragePortPerformance(storagePortIds));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("get Storage port performance failure:", e);
             return failure("get Storage port performance failure:" + e.toString());
         }
@@ -226,7 +226,7 @@ public class DmeStorageController extends BaseController {
     public ResponseBodyBean listVolumesPerformance(@RequestParam("volumeId") List<String> volumeId) {
         try {
             return success(dmeStorageService.listVolumesPerformance(volumeId));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("get Storage volume performance failure:", e);
             return failure("get Storage volume performance failure:" + e.toString());
         }
@@ -236,7 +236,7 @@ public class DmeStorageController extends BaseController {
     public ResponseBodyBean queryVolumeByName(@RequestParam("name") String name) {
         try {
             return success(dmeStorageService.queryVolumeByName(name));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -246,7 +246,7 @@ public class DmeStorageController extends BaseController {
         @RequestParam("storageId") String storageId) {
         try {
             return success(dmeStorageService.queryFsByName(name, storageId));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -256,7 +256,7 @@ public class DmeStorageController extends BaseController {
         @RequestParam("storageId") String storageId) {
         try {
             return success(dmeStorageService.queryShareByName("/" + name, storageId));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
