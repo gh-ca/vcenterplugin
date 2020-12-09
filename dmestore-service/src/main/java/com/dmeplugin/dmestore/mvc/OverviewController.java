@@ -1,114 +1,58 @@
 package com.dmeplugin.dmestore.mvc;
 
-
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.OverviewService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
- * overview controller
- */
+ * OverviewController
+ *
+ * @author liuxh
+ * @since 2020-09-02
+ **/
 @RestController
 @RequestMapping("/overview")
-public class OverviewController extends BaseController{
-
+public class OverviewController extends BaseController {
+    private static final int DEFAULT_TOPN = 5;
 
     @Autowired
     private OverviewService overviewService;
-    /**
-     * get storage device num from dme(total,normal,abnormal)
-     * @return ResponseBodyBean
-     * data like {"total": 100,"normal": 90,"abnormal", 10}
-     */
+
     @RequestMapping(value = "/getstoragenum", method = RequestMethod.GET)
-    @ResponseBody
-    public ResponseBodyBean getStorageNum(){
+    public ResponseBodyBean getStorageNum() {
         try {
             return success(overviewService.getStorageNum());
-        } catch (Exception e) {
-            return failure();
+        } catch (DMEException e) {
+            return failure(e.getMessage());
         }
     }
 
-
-    /**
-     * get dataStorage overview
-     * @param type 0 :VMFS and NFS, 1:VMFS, 2:NFS
-     * @return ResponseBodyBean
-     * data like {
-     *             "totalCapacity": 100,
-     *             "usedCapacity": 20,
-     *             "freeCapacity": 80,
-     *             "utilization": 20,
-     *             "capacityUnit": "TB"
-     *           }
-     */
     @RequestMapping(value = "/getdatastoreoverview", method = RequestMethod.GET)
-    @ResponseBody
-    public ResponseBodyBean getDataStoreOverview(@RequestParam String type){
-        try {
-            return success(overviewService.getDataStoreCapacitySummary(type));
-        } catch (Exception e) {
-            return failure();
-        }
+    public ResponseBodyBean getDataStoreOverview(@RequestParam String type) {
+        return success(overviewService.getDataStoreCapacitySummary(type));
     }
 
-    /**
-     * get dataStorage overview
-     * @param type 0 :VMFS and NFS, 1:VMFS, 2:NFS
-     * @param topn top n
-     * @param orderBy order by this column desc
-     * @return ResponseBodyBean
-     * data like [{
-     *             "id": "5BDCCE7C4DF74E47AA3F042ED95D60909290",
-     *             "name": "dataStore1"
-     *             "totalCapacity": 100,
-     *             "usedCapacity": 20,
-     *             "freeCapacity": 80,
-     *             "utilization": 20,
-     *             "capacityUnit": "TB"
-     *           }]
-     */
     @RequestMapping(value = "/getdatastoretopn", method = RequestMethod.GET)
-    @ResponseBody
-    public ResponseBodyBean getDataStoreTopN(@RequestParam String type,
-                                             @RequestParam(required = false) Integer topn,
-                                             @RequestParam(defaultValue = "utilization", required = false) String orderBy,
-                                             @RequestParam(defaultValue = "desc", required = false) String desc){
-        if (topn == null){
-            topn = 5;
+    public ResponseBodyBean getDataStoreTopN(@RequestParam String type, @RequestParam(required = false) Integer topn,
+        @RequestParam(defaultValue = "utilization", required = false) String orderBy,
+        @RequestParam(defaultValue = "desc", required = false) String desc) {
+        int topnDefault = DEFAULT_TOPN;
+        if (null != topn) {
+            topnDefault = topn.intValue();
         }
-        //type 0 :VMFS and NFS, 1:VMFS, 2:NFS
-        try {
-            return success(overviewService.getDataStoreCapacityTopN(type, topn));
-        } catch (Exception e) {
-            return failure();
-        }
+
+        return success(overviewService.getDataStoreCapacityTopN(type, topnDefault));
     }
 
-
-    /**
-     * get best practice violations
-     * @return ResponseBodyBean
-     * data like {
-     *        critical : 5,
-     *        major: 2,
-     *        warning: 3,
-     *        info: 44
-     *        }
-     */
     @RequestMapping(value = "/getbestpracticeviolations", method = RequestMethod.GET)
-    @ResponseBody
-    public ResponseBodyBean getBestPracticeViolations(){
-        //type 0 :critical, 1:major, 2:warning, 3: info
-        try {
-            return success(overviewService.getBestPracticeViolations());
-        } catch (Exception e) {
-            return failure();
-        }
+    public ResponseBodyBean getBestPracticeViolations() {
+        // type 0 :critical, 1:major, 2:warning, 3: info
+        return success(overviewService.getBestPracticeViolations());
     }
 }

@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.constant.DmeConstants;
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.exception.DmeSqlException;
@@ -23,7 +24,7 @@ import com.dmeplugin.dmestore.model.StoragePool;
 import com.dmeplugin.dmestore.model.StoragePort;
 import com.dmeplugin.dmestore.model.Volume;
 import com.dmeplugin.dmestore.model.VolumeListRestponse;
-import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
+import com.dmeplugin.dmestore.constant.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;

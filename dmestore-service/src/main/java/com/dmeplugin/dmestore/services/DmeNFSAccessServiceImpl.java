@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.constant.DmeConstants;
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.exception.DMEException;
@@ -11,7 +12,7 @@ import com.dmeplugin.dmestore.model.NfsDataStoreFsAttr;
 import com.dmeplugin.dmestore.model.NfsDataStoreLogicPortAttr;
 import com.dmeplugin.dmestore.model.NfsDataStoreShareAttr;
 import com.dmeplugin.dmestore.model.Storage;
-import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
+import com.dmeplugin.dmestore.constant.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;

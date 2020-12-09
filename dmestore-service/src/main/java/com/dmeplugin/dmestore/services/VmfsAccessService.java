@@ -1,7 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.exception.DMEException;
-import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.model.VmfsDataInfo;
 import com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail;
 

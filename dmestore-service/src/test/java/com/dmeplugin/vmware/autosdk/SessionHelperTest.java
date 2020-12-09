@@ -10,6 +10,8 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
 
+import java.io.File;
+
 /**
  * @author lianq
  * @className SessionHelperTest
@@ -37,5 +39,9 @@ public class SessionHelperTest {
     @Test
     public void logout() {
         sessionHelper.logout();
+    }
+
+    @Test
+    public void fil() {
     }
 }
