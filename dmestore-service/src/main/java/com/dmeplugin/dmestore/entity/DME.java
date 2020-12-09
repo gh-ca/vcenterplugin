@@ -4,10 +4,15 @@ import com.dmeplugin.dmestore.utils.CipherUtils;
 
 import java.io.Serializable;
 
+import net.bytebuddy.implementation.bytecode.Throw;
+
 /**
+ * DME
+ *
  * @Description: DME entity.
+ * @since 2020-12-08
  */
-public class DME extends DMEbase implements Serializable {
+public class DME extends Dmebase implements Serializable {
     private static final long serialVersionUID = -9063117479397179007L;
     /**
      * id .
@@ -82,104 +87,133 @@ public class DME extends DMEbase implements Serializable {
 
     /**
      * getHaProvider .
+     *
      * @return int.
      */
     public int getHaProvider() {
         return haProvider;
     }
+
     /**
      * setHaProvider .
+     *
      * @param param .
      */
     public void setHaProvider(final int param) {
         this.haProvider = param;
     }
+
     /**
      * getAlarmDefinition .
+     *
      * @return int.
      */
     public int getAlarmDefinition() {
         return alarmDefinition;
     }
+
     /**
      * setAlarmDefinition .
+     *
      * @param param .
      */
     public void setAlarmDefinition(final int param) {
         this.alarmDefinition = param;
     }
+
     /**
      * getHaProvider .
+     *
      * @return String.
      */
     public String getLatestStatus() {
         return latestStatus;
     }
+
     /**
      * setLatestStatus .
+     *
      * @param param .
      */
     public void setLatestStatus(final String param) {
         this.latestStatus = param;
     }
+
     /**
      * getHaProvider .
+     *
      * @return String.
      */
     public String getReservedInt1() {
         return reservedInt1;
     }
+
     /**
      * setReservedInt1 .
+     *
      * @param param .
      */
     public void setReservedInt1(final String param) {
         this.reservedInt1 = param;
     }
+
     /**
      * getHaProvider .
+     *
      * @return String.
      */
     public String getReservedInt2() {
         return reservedInt2;
     }
+
     /**
      * setReservedInt2 .
+     *
      * @param param .
      */
     public void setReservedInt2(final String param) {
         this.reservedInt2 = param;
     }
+
     /**
      * getHaProvider .
+     *
      * @return String.
      */
     public String getReservedStr1() {
         return reservedStr1;
     }
+
     /**
      * setReservedStr1 .
+     *
      * @param param .
      */
     public void setReservedStr1(final String param) {
         this.reservedStr1 = param;
     }
+
     /**
      * getHaProvider .
+     *
      * @return String.
      */
     public String getReservedStr2() {
         return reservedStr2;
     }
+
     /**
      * setReservedStr2 .
+     *
      * @param param .
      */
     public void setReservedStr2(final String param) {
         this.reservedStr2 = param;
     }
+
     /**
      * getHaProvider .
+     *
      * @return String.
      */
     public int getId() {
@@ -188,62 +222,79 @@ public class DME extends DMEbase implements Serializable {
 
     /**
      * setId .
+     *
      * @param param .
      */
     public void setId(final int param) {
         this.id = param;
     }
+
     /**
      * getAliasName .
+     *
      * @return String.
      */
     public String getAliasName() {
         return aliasName;
     }
+
     /**
      * setAliasName .
+     *
      * @param param .
      */
     public void setAliasName(final String param) {
         this.aliasName = param;
     }
+
     /**
      * getLastModify .
+     *
      * @return String.
      */
     public String getLastModify() {
         return lastModify;
     }
+
     /**
      * setLastModify .
+     *
      * @param param .
      */
     public void setLastModify(final String param) {
         this.lastModify = param;
     }
+
     /**
      * getCreateTime .
+     *
      * @return String.
      */
     public String getCreateTime() {
         return createTime;
     }
+
     /**
      * setCreateTime .
+     *
      * @param param .
      */
     public void setCreateTime(final String param) {
         this.createTime = param;
     }
+
     /**
      * setSystemId .
+     *
      * @param param .
      */
     public void setSystemId(final String param) {
         this.systemId = param;
     }
+
     /**
      * getSystemId .
+     *
      * @return String.
      */
     public String getSystemId() {
@@ -270,7 +321,7 @@ public class DME extends DMEbase implements Serializable {
      *
      * @param param dme
      */
-    public static void updateEsightWithEncryptedPassword(final DME param) {
+    public static void updateEsightWithEncryptedPassword (final DME param) {
         if (param != null) {
             try {
                 param.setLoginPwd(CipherUtils.encryptString(

@@ -1,8 +1,11 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * FailoverGroup
+ *
  * @author lianq
- * @since  2020/10/14 15:32
+ * @Description: FailoverGroup
+ * @since 2020-10-14
  */
 public class FailoverGroup {
     /**
@@ -20,6 +23,7 @@ public class FailoverGroup {
 
     /**
      * getFailoverGroupType .
+     *
      * @return String .
      */
     public String getFailoverGroupType() {
@@ -28,34 +32,43 @@ public class FailoverGroup {
 
     /**
      * setFailoverGroupType .
+     *
      * @param param .
      */
     public void setFailoverGroupType(final String param) {
         this.failoverGroupType = param;
     }
+
     /**
      * getId .
+     *
      * @return String .
      */
     public String getId() {
         return id;
     }
+
     /**
      * setFailoverGroupType .
+     *
      * @param param .
      */
     public void setId(final String param) {
         this.id = param;
     }
+
     /**
      * getName .
+     *
      * @return String .
      */
     public String getName() {
         return name;
     }
+
     /**
      * setName .
+     *
      * @param param .
      */
     public void setName(final String param) {

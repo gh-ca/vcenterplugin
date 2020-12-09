@@ -4,6 +4,8 @@ import java.util.List;
 
 /**
  * @author wangxiangyong
+ * @Description: BestPracticeCheckRecordBean
+ * @since 2020-12-08
  **/
 public class BestPracticeCheckRecordBean {
     /**
@@ -29,6 +31,7 @@ public class BestPracticeCheckRecordBean {
 
     /**
      * getHostSetting .
+     *
      * @return String .
      */
     public String getHostSetting() {
@@ -37,13 +40,16 @@ public class BestPracticeCheckRecordBean {
 
     /**
      * setHostSetting .
+     *
      * @param param .
      */
     public void setHostSetting(final String param) {
         this.hostSetting = param;
     }
+
     /**
      * getRecommendValue .
+     *
      * @return String .
      */
     public String getRecommendValue() {
@@ -52,48 +58,61 @@ public class BestPracticeCheckRecordBean {
 
     /**
      * setRecommendValue .
+     *
      * @param param .
      */
     public void setRecommendValue(final String param) {
         this.recommendValue = param;
     }
+
     /**
      * getLevel .
+     *
      * @return String .
      */
     public String getLevel() {
         return level;
     }
+
     /**
      * setRecommendValue .
+     *
      * @param param .
      */
     public void setLevel(final String param) {
         this.level = param;
     }
+
     /**
      * getCount .
+     *
      * @return int .
      */
     public int getCount() {
         return count;
     }
+
     /**
      * setRecommendValue .
+     *
      * @param param .
      */
     public void setCount(final int param) {
         this.count = param;
     }
+
     /**
      * getHostList .
-     * @return List<BestPracticeBean> .
+     *
+     * @return List<>.
      */
     public List<BestPracticeBean> getHostList() {
         return hostList;
     }
+
     /**
      * setRecommendValue .
+     *
      * @param param .
      */
     public void setHostList(final List<BestPracticeBean> param) {

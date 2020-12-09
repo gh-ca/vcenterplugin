@@ -3,7 +3,10 @@ package com.dmeplugin.dmestore.model;
 import java.util.List;
 
 /**
+ * VolumeListRestponse
+ *
  * @author Administrator
+ * @since 2020-12-08
  **/
 public class VolumeListRestponse {
     /**
@@ -17,7 +20,8 @@ public class VolumeListRestponse {
 
     /**
      * getVolumeList .
-     * @return List<Volume> .
+     *
+     * @return List<> .
      */
     public List<Volume> getVolumeList() {
         return volumeList;
@@ -25,20 +29,25 @@ public class VolumeListRestponse {
 
     /**
      * setVolumeList .
+     *
      * @param param .
      */
     public void setVolumeList(final List<Volume> param) {
         this.volumeList = param;
     }
+
     /**
      * getCount .
+     *
      * @return int .
      */
     public int getCount() {
         return count;
     }
+
     /**
      * setCount .
+     *
      * @param param .
      */
     public void setCount(final int param) {

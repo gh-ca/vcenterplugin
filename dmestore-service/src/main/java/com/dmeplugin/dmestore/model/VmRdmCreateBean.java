@@ -1,7 +1,10 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * VmRdmCreateBean
+ *
  * @author wangxiangyong
+ * @since 2020-12-08
  **/
 public class VmRdmCreateBean {
     /**
@@ -14,7 +17,8 @@ public class VmRdmCreateBean {
     private CustomizeVolumesRequest customizeVolumesRequest;
 
     /**
-     *  getCreateVolumesRequest .
+     * getCreateVolumesRequest .
+     *
      * @return CreateVolumesRequest .
      */
     public CreateVolumesRequest getCreateVolumesRequest() {
@@ -23,13 +27,16 @@ public class VmRdmCreateBean {
 
     /**
      * setCreateVolumesRequest .
+     *
      * @param param .
      */
     public void setCreateVolumesRequest(final CreateVolumesRequest param) {
         this.createVolumesRequest = param;
     }
+
     /**
-     *  getCustomizeVolumesRequest .
+     * getCustomizeVolumesRequest .
+     *
      * @return CustomizeVolumesRequest .
      */
     public CustomizeVolumesRequest getCustomizeVolumesRequest() {

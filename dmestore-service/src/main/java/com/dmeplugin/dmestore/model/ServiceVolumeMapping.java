@@ -1,7 +1,10 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * ServiceVolumeMapping
+ *
  * @author wangxiangyong
+ * @since 2020-12-08
  **/
 public class ServiceVolumeMapping {
     /**
@@ -15,6 +18,7 @@ public class ServiceVolumeMapping {
 
     /**
      * getHostId .
+     *
      * @return String .
      */
     public String getHostId() {
@@ -23,13 +27,16 @@ public class ServiceVolumeMapping {
 
     /**
      * setHostId .
+     *
      * @param param .
      */
     public void setHostId(final String param) {
         this.hostId = param;
     }
+
     /**
      * getHostgroupId .
+     *
      * @return String .
      */
     public String getHostgroupId() {
@@ -38,6 +45,7 @@ public class ServiceVolumeMapping {
 
     /**
      * setHostgroupId .
+     *
      * @param param .
      */
     public void setHostgroupId(final String param) {

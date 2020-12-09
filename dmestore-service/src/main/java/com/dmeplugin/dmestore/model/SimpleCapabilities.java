@@ -1,10 +1,12 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * SimpleCapabilities
+ *
  * @author lianq
  * @ClassName: SimpleCapabilities
  * @Company: GH-CA
- * @since  2020-09-03
+ * @since 2020-09-03
  */
 public class SimpleCapabilities {
     /**
@@ -34,6 +36,7 @@ public class SimpleCapabilities {
 
     /**
      * getIopriority .
+     *
      * @return CapabilitiesIopriority .
      */
     public CapabilitiesIopriority getIopriority() {
@@ -41,81 +44,101 @@ public class SimpleCapabilities {
     }
 
     /**
-     *  setIopriority .
+     * setIopriority .
+     *
      * @param param .
      */
     public void setIopriority(final CapabilitiesIopriority param) {
         this.iopriority = param;
     }
+
     /**
      * getQos .
+     *
      * @return CapabilitiesQos .
      */
     public CapabilitiesQos getQos() {
         return qos;
     }
+
     /**
-     *  setQos .
+     * setQos .
+     *
      * @param param .
      */
     public void setQos(final CapabilitiesQos param) {
         this.qos = param;
     }
+
     /**
      * getResourceType .
+     *
      * @return String .
      */
     public String getResourceType() {
         return resourceType;
     }
+
     /**
-     *  setResourceType .
+     * setResourceType .
+     *
      * @param param .
      */
     public void setResourceType(final String param) {
         this.resourceType = param;
     }
+
     /**
      * getCompression .
+     *
      * @return Boolean .
      */
     public Boolean getCompression() {
         return compression;
     }
+
     /**
-     *  setCompression .
+     * setCompression .
+     *
      * @param param .
      */
     public void setCompression(final Boolean param) {
         this.compression = param;
     }
+
     /**
      * getDeduplication .
+     *
      * @return Boolean .
      */
     public Boolean getDeduplication() {
         return deduplication;
     }
+
     /**
-     *  setDeduplication .
+     * setDeduplication .
+     *
      * @param param .
      */
     public void setDeduplication(final Boolean param) {
         this.deduplication = param;
     }
+
     /**
      * getSmarttier .
+     *
      * @return CapabilitiesSmarttier .
      */
     public CapabilitiesSmarttier getSmarttier() {
         return smarttier;
     }
+
     /**
-     *  setSmarttier .
+     * setSmarttier .
+     *
      * @param param .
      */
     public void setSmarttier(final CapabilitiesSmarttier param) {
         this.smarttier = param;
     }
-
 }

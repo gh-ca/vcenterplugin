@@ -1,9 +1,11 @@
 package com.dmeplugin.dmestore.model;
 
 /**
- * @author lianq
- * @since 2020-12-01
+ * CapabilitiesIopriority
  *
+ * @author lianq
+ * @Description: CapabilitiesIopriority
+ * @since 2020-12-01
  **/
 public class CapabilitiesIopriority {
     /**
@@ -17,6 +19,7 @@ public class CapabilitiesIopriority {
 
     /**
      * getEnabled .
+     *
      * @return Boolean .
      */
     public Boolean getEnabled() {
@@ -25,13 +28,16 @@ public class CapabilitiesIopriority {
 
     /**
      * setEnabled .
+     *
      * @param param .
      */
     public void setEnabled(final Boolean param) {
         this.enabled = param;
     }
+
     /**
      * getPolicy .
+     *
      * @return Integer .
      */
     public Integer getPolicy() {
@@ -40,6 +46,7 @@ public class CapabilitiesIopriority {
 
     /**
      * setPolicy .
+     *
      * @param param .
      */
     public void setPolicy(final Integer param) {

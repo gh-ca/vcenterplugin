@@ -1,7 +1,11 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * CustomizeVolumesRequest
+ *
  * @author wangxiangyong
+ * @Description: CustomizeVolumesRequest
+ * @since 2020-12-08
  **/
 public class CustomizeVolumesRequest {
     /**
@@ -15,20 +19,25 @@ public class CustomizeVolumesRequest {
 
     /**
      * getCustomizeVolumes .
+     *
      * @return CustomizeVolumes .
      */
     public CustomizeVolumes getCustomizeVolumes() {
         return customizeVolumes;
     }
+
     /**
      * setMapping .
+     *
      * @param param .
      */
     public void setCustomizeVolumes(final CustomizeVolumes param) {
         this.customizeVolumes = param;
     }
+
     /**
      * getMapping .
+     *
      * @return ServiceVolumeMapping .
      */
     public ServiceVolumeMapping getMapping() {
@@ -37,6 +46,7 @@ public class CustomizeVolumesRequest {
 
     /**
      * setMapping .
+     *
      * @param param .
      */
     public void setMapping(final ServiceVolumeMapping param) {

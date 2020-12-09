@@ -3,7 +3,11 @@ package com.dmeplugin.dmestore.model;
 import java.util.List;
 
 /**
+ * CreateVolumesRequest
+ *
  * @author wangxiangyong
+ * @Description: CreateVolumesRequest
+ * @since 2020-12-08
  **/
 public class CreateVolumesRequest {
     /**
@@ -21,34 +25,43 @@ public class CreateVolumesRequest {
 
     /**
      * getServiceLevelId .
+     *
      * @return String .
      */
     public String getServiceLevelId() {
         return serviceLevelId;
     }
+
     /**
      * setMapping .
+     *
      * @param param .
      */
     public void setServiceLevelId(final String param) {
         this.serviceLevelId = param;
     }
+
     /**
      * getVolumes .
-     * @return List<ServiceVolumeBasicParams> .
+     *
+     * @return List<> .
      */
     public List<ServiceVolumeBasicParams> getVolumes() {
         return volumes;
     }
+
     /**
      * setMapping .
+     *
      * @param param .
      */
     public void setVolumes(final List<ServiceVolumeBasicParams> param) {
         this.volumes = param;
     }
+
     /**
      * getMapping .
+     *
      * @return ServiceVolumeMapping .
      */
     public ServiceVolumeMapping getMapping() {
@@ -57,6 +70,7 @@ public class CreateVolumesRequest {
 
     /**
      * setMapping .
+     *
      * @param param .
      */
     public void setMapping(final ServiceVolumeMapping param) {
