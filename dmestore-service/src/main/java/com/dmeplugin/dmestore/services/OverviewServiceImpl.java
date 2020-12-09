@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.BestPracticeCheckRecordBean;
 import com.dmeplugin.dmestore.model.NfsDataInfo;
 import com.dmeplugin.dmestore.model.Storage;
@@ -16,9 +16,6 @@ public class OverviewServiceImpl implements OverviewService {
     private static final String STORAGE_TYPE_VMFS = "1";
     private static final String STORAGE_TYPE_NFS = "2";
 
-    private static final String SUCCESS_CODE = "200";
-    private static final String COLUMN_CODE = "code";
-
     private static final String STORAGE_DEVICE_STATUS_NORMAL = "1";
 
     private static final String CRITICAL = "Critical";
@@ -32,7 +29,7 @@ public class OverviewServiceImpl implements OverviewService {
     private BestPracticeProcessService bestPracticeProcessService;
 
     @Override
-    public Map<String, Object> getStorageNum() throws DMEException {
+    public Map<String, Object> getStorageNum() throws DmeException {
         Map<String, Object> r = new HashMap<>(16);
         int normal = 0;
         int abnormal = 0;

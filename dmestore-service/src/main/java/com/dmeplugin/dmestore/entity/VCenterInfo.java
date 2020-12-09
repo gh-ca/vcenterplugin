@@ -3,93 +3,217 @@ package com.dmeplugin.dmestore.entity;
 import java.io.Serializable;
 import java.util.Date;
 
-
+/**
+ * VCenterInfo .
+ *
+ * @author Administrator .
+ * @since 2020-12-08
+ */
 public class VCenterInfo implements Serializable {
+    private static final long serialVersionUID = 3811172759222907501L;
+    /**
+     * hostPortConstant = 443 .
+     */
+    private final Integer hostPortConstant = 443;
+    /**
+     * id .
+     */
+    private int id;
+    /**
+     * hostIp .
+     */
+    private String hostIp;
+    /**
+     * hostPort .
+     */
+    private int hostPort;
+    /**
+     * userName .
+     */
+    private String userName;
+    /**
+     * password .
+     */
+    private String password;
+    /**
+     * createTime .
+     */
+    private Date createTime;
+    /**
+     * HA status .
+     */
+    private boolean state;
+    /**
+     * Alarm status .
+     */
+    private boolean pushEvent;
+    /**
+     * 1:crtical 2:majorandcritical 3:all .
+     */
+    private int pushEventLevel;
 
-  private static final long serialVersionUID = 3811172759222907501L;
+    /**
+     * getPushEventLevel .
+     *
+     * @return int .
+     */
+    public int getPushEventLevel() {
+        return pushEventLevel;
+    }
 
-  private int id;
-  private String hostIp;
-  private int hostPort;
-  private String userName;
-  private String password;
-  private Date createTime;
-  // HA status
-  private boolean state;
-  // Alarm status
-  private boolean pushEvent;
-  // 1:crtical 2:majorandcritical 3:all
-  private int pushEventLevel;
+    /**
+     * setPushEventLevel .
+     *
+     * @param param .
+     */
+    public void setPushEventLevel(final int param) {
+        this.pushEventLevel = param;
+    }
 
-  public int getPushEventLevel() {
-    return pushEventLevel;
-  }
+    /**
+     * getId .
+     *
+     * @return int .
+     */
+    public int getId() {
+        return id;
+    }
 
-  public void setPushEventLevel(int pushEventLevel) {
-    this.pushEventLevel = pushEventLevel;
-  }
+    /**
+     * setPushEventLevel .
+     *
+     * @param param .
+     */
+    public void setId(final int param) {
+        this.id = param;
+    }
 
-  public int getId() {
-    return id;
-  }
+    /**
+     * getHostIp .
+     *
+     * @return String .
+     */
+    public String getHostIp() {
+        return hostIp;
+    }
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    /**
+     * setPushEventLevel .
+     *
+     * @param param .
+     */
+    public void setHostIp(final String param) {
+        this.hostIp = param;
+    }
 
-  public String getHostIp() {
-    return hostIp;
-  }
+    /**
+     * getUserName .
+     *
+     * @return String .
+     */
+    public String getUserName() {
+        return userName;
+    }
 
-  public void setHostIp(String hostIp) {
-    this.hostIp = hostIp;
-  }
+    /**
+     * setPushEventLevel .
+     *
+     * @param param .
+     */
+    public void setUserName(final String param) {
+        this.userName = param;
+    }
 
-  public String getUserName() {
-    return userName;
-  }
+    /**
+     * getPassword .
+     *
+     * @return String .
+     */
+    public String getPassword() {
+        return password;
+    }
 
-  public void setUserName(String userName) {
-    this.userName = userName;
-  }
+    /**
+     * setPassword .
+     *
+     * @param param .
+     */
+    public void setPassword(final String param) {
+        this.password = param;
+    }
 
-  public String getPassword() {
-    return password;
-  }
+    /**
+     * getCreateTime .
+     *
+     * @return Date .
+     */
+    public Date getCreateTime() {
+        return createTime;
+    }
 
-  public void setPassword(String password) {
-    this.password = password;
-  }
+    /**
+     * setCreateTime .
+     *
+     * @param param .
+     */
+    public void setCreateTime(final Date param) {
+        this.createTime = param;
+    }
 
-  public Date getCreateTime() {
-    return createTime;
-  }
+    /**
+     * isState .
+     *
+     * @return boolean .
+     */
+    public boolean isState() {
+        return state;
+    }
 
-  public void setCreateTime(Date createTime) {
-    this.createTime = createTime;
-  }
+    /**
+     * setState .
+     *
+     * @param param .
+     */
+    public void setState(final boolean param) {
+        this.state = param;
+    }
 
-  public boolean isState() {
-    return state;
-  }
+    /**
+     * isPushEvent .
+     *
+     * @return boolean .
+     */
+    public boolean isPushEvent() {
+        return pushEvent;
+    }
 
-  public void setState(boolean state) {
-    this.state = state;
-  }
+    /**
+     * setPushEvent .
+     *
+     * @param param .
+     */
+    public void setPushEvent(final boolean param) {
+        this.pushEvent = param;
+    }
 
-  public boolean isPushEvent() {
-    return pushEvent;
-  }
+    /**
+     * getHostPort .
+     *
+     * @return int .
+     */
+    public int getHostPort() {
+        if (hostPort == 0) {
+            return hostPortConstant;
+        }
+        return hostPort;
+    }
 
-  public void setPushEvent(boolean pushEvent) {
-    this.pushEvent = pushEvent;
-  }
-
-  public int getHostPort() {
-    return hostPort == 0 ? 443 : hostPort;
-  }
-
-  public void setHostPort(int hostPort) {
-    this.hostPort = hostPort;
-  }
+    /**
+     * setHostPort .
+     *
+     * @param param .
+     */
+    public void setHostPort(final int param) {
+        this.hostPort = param;
+    }
 }

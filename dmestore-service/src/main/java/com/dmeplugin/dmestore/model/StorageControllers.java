@@ -1,102 +1,231 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * StorageControllers
+ *
  * @author lianq
- * @className StorageDisk
- * @description TODO
- * @date 2020/9/7 16:46
+ * @ClassName: StorageDisk
+ * @since 2020-12-08
  */
 public class StorageControllers {
-
+    /**
+     * id .
+     */
     private String id;
+    /**
+     * name .
+     */
     private String name;
+    /**
+     * status .
+     */
     private String status;
+    /**
+     * softVer .
+     */
     private String softVer;
+    /**
+     * cpuInfo .
+     */
     private String cpuInfo;
-
+    /**
+     * cpuUsage .
+     */
     private Float cpuUsage;
+    /**
+     * iops .
+     */
     private Float iops;
+    /**
+     * ops .
+     */
     private Float ops;
+    /**
+     * lantency .
+     */
     private Float lantency;
+    /**
+     * bandwith .
+     */
     private Float bandwith;
 
+    /**
+     * getName .
+     *
+     * @return String 。
+     */
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setName .
+     *
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
 
+    /**
+     * getStatus .
+     *
+     * @return String 。
+     */
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    /**
+     * setStatus .
+     *
+     * @param param .
+     */
+    public void setStatus(final String param) {
+        this.status = param;
     }
 
+    /**
+     * getSoftVer .
+     *
+     * @return String 。
+     */
     public String getSoftVer() {
         return softVer;
     }
 
-    public void setSoftVer(String softVer) {
-        this.softVer = softVer;
+    /**
+     * setSoftVer .
+     *
+     * @param param .
+     */
+    public void setSoftVer(final String param) {
+        this.softVer = param;
     }
 
+    /**
+     * getCpuInfo .
+     *
+     * @return String 。
+     */
     public String getCpuInfo() {
         return cpuInfo;
     }
 
-    public void setCpuInfo(String cpuInfo) {
-        this.cpuInfo = cpuInfo;
+    /**
+     * setCpuInfo .
+     *
+     * @param param .
+     */
+    public void setCpuInfo(final String param) {
+        this.cpuInfo = param;
     }
 
+    /**
+     * getCpuUsage .
+     *
+     * @return Float 。
+     */
     public Float getCpuUsage() {
         return cpuUsage;
     }
 
-    public void setCpuUsage(Float cpuUsage) {
-        this.cpuUsage = cpuUsage;
+    /**
+     * setCpuUsage .
+     *
+     * @param param .
+     */
+    public void setCpuUsage(final Float param) {
+        this.cpuUsage = param;
     }
 
+    /**
+     * getIops .
+     *
+     * @return Float 。
+     */
     public Float getIops() {
         return iops;
     }
 
-    public void setIops(Float iops) {
-        this.iops = iops;
+    /**
+     * setIops .
+     *
+     * @param param .
+     */
+    public void setIops(final Float param) {
+        this.iops = param;
     }
 
+    /**
+     * getOps .
+     *
+     * @return Float 。
+     */
     public Float getOps() {
         return ops;
     }
 
-    public void setOps(Float ops) {
-        this.ops = ops;
+    /**
+     * setOps .
+     *
+     * @param param .
+     */
+    public void setOps(final Float param) {
+        this.ops = param;
     }
 
+    /**
+     * getLantency .
+     *
+     * @return Float 。
+     */
     public Float getLantency() {
         return lantency;
     }
 
-    public void setLantency(Float lantency) {
-        this.lantency = lantency;
+    /**
+     * setLantency .
+     *
+     * @param param .
+     */
+    public void setLantency(final Float param) {
+        this.lantency = param;
     }
 
+    /**
+     * getBandwith .
+     *
+     * @return Float 。
+     */
     public Float getBandwith() {
         return bandwith;
     }
 
-    public void setBandwith(Float bandwith) {
-        this.bandwith = bandwith;
+    /**
+     * setBandwith .
+     *
+     * @param param .
+     */
+    public void setBandwith(final Float param) {
+        this.bandwith = param;
     }
 
+    /**
+     * getId .
+     *
+     * @return String 。
+     */
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setId(final String param) {
+        this.id = param;
     }
 }

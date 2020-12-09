@@ -1,161 +1,342 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * FileSystem
+ *
  * @author lianq
  * @ClassName: FileSystem
  * @Company: GH-CA
- * @create 2020-09-03
+ * @since 2020-09-03
  */
-public class FileSystem  {
-
-    //id
+public class FileSystem {
+    /**
+     * id .
+     */
     private String id;
-    //名称
+    /**
+     * 名称 .
+     */
     private String name;
-    //文件系统类型
+    /**
+     * 文件系统类型 .
+     */
     private String type;
-    //状态
+    /**
+     * 状态 .
+     */
     private String healthStatus;
-    //分配策略(分配类型)
+    /**
+     * 分配策略(分配类型) .
+     */
     private String allocType;
-    //容量使用率
+    /**
+     * 容量使用率 .
+     */
     private Integer capacityUsageRatio;
-    //存储池名字
+    /**
+     * 存储池名字 .
+     */
     private String storagePoolName;
-    //nfs
+    /**
+     * nfs .
+     */
     private Integer nfsCount;
-    //cifs
+    /**
+     * cifs .
+     */
     private Integer cifsCount;
-    //dtree
+    /**
+     * dtree .
+     */
     private Integer dtreeCount;
-    //总容量
+    /**
+     * 总容量 .
+     */
     private Double capacity;
-    //文件系统在存储池上已经分配的容量
+    /**
+     * 文件系统在存储池上已经分配的容量 .
+     */
     private Double allocateQuotaInPool;
-    //可用容量
+    /**
+     * 可用容量 .
+     */
     private Double availableCapacity;
-    //Thin文件系统能缩容的最小空间。单位GB，保留三位小数
+    /**
+     * Thin文件系统能缩容的最小空间。单位GB，保留三位小数 .
+     */
     private Double minSizeFsCapacity;
-    //存储设备Id
+    /**
+     * 存储设备Id .
+     */
     private String storageId;
 
+    /**
+     * getId .
+     *
+     * @return String .
+     */
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setId(final String param) {
+        this.id = param;
     }
 
+    /**
+     * getName .
+     *
+     * @return String .
+     */
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
 
+    /**
+     * getHealthStatus .
+     *
+     * @return String .
+     */
     public String getHealthStatus() {
         return healthStatus;
     }
 
-    public void setHealthStatus(String healthStatus) {
-        this.healthStatus = healthStatus;
+    /**
+     * setHealthStatus .
+     *
+     * @param param .
+     */
+    public void setHealthStatus(final String param) {
+        this.healthStatus = param;
     }
 
+    /**
+     * getAllocType .
+     *
+     * @return String .
+     */
     public String getAllocType() {
         return allocType;
     }
 
-    public void setAllocType(String allocType) {
-        this.allocType = allocType;
+    /**
+     * setAllocType .
+     *
+     * @param param .
+     */
+    public void setAllocType(final String param) {
+        this.allocType = param;
     }
 
+    /**
+     * getCapacityUsageRatio .
+     *
+     * @return Integer .
+     */
     public Integer getCapacityUsageRatio() {
         return capacityUsageRatio;
     }
 
-    public void setCapacityUsageRatio(Integer capacityUsageRatio) {
-        this.capacityUsageRatio = capacityUsageRatio;
+    /**
+     * setCapacityUsageRatio .
+     *
+     * @param param .
+     */
+    public void setCapacityUsageRatio(final Integer param) {
+        this.capacityUsageRatio = param;
     }
 
+    /**
+     * getStoragePoolName .
+     *
+     * @return String .
+     */
     public String getStoragePoolName() {
         return storagePoolName;
     }
 
-    public void setStoragePoolName(String storagePoolName) {
-        this.storagePoolName = storagePoolName;
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setStoragePoolName(final String param) {
+        this.storagePoolName = param;
     }
 
+    /**
+     * getNfsCount .
+     *
+     * @return Integer .
+     */
     public Integer getNfsCount() {
         return nfsCount;
     }
 
-    public void setNfsCount(Integer nfsCount) {
-        this.nfsCount = nfsCount;
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setNfsCount(final Integer param) {
+        this.nfsCount = param;
     }
 
+    /**
+     * getCifsCount .
+     *
+     * @return Integer .
+     */
     public Integer getCifsCount() {
         return cifsCount;
     }
 
-    public void setCifsCount(Integer cifsCount) {
-        this.cifsCount = cifsCount;
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setCifsCount(final Integer param) {
+        this.cifsCount = param;
     }
 
+    /**
+     * getDtreeCount .
+     *
+     * @return Integer .
+     */
     public Integer getDtreeCount() {
         return dtreeCount;
     }
 
-    public void setDtreeCount(Integer dtreeCount) {
-        this.dtreeCount = dtreeCount;
+    /**
+     * setDtreeCount .
+     *
+     * @param param .
+     */
+    public void setDtreeCount(final Integer param) {
+        this.dtreeCount = param;
     }
 
+    /**
+     * getCapacity .
+     *
+     * @return Double .
+     */
     public Double getCapacity() {
         return capacity;
     }
 
-    public void setCapacity(Double capacity) {
-        this.capacity = capacity;
+    /**
+     * setCapacity .
+     *
+     * @param param .
+     */
+    public void setCapacity(final Double param) {
+        this.capacity = param;
     }
 
+    /**
+     * getAllocateQuotaInPool .
+     *
+     * @return Double .
+     */
     public Double getAllocateQuotaInPool() {
         return allocateQuotaInPool;
     }
 
-    public void setAllocateQuotaInPool(Double allocateQuotaInPool) {
-        this.allocateQuotaInPool = allocateQuotaInPool;
+    /**
+     * setAllocateQuotaInPool .
+     *
+     * @param param .
+     */
+    public void setAllocateQuotaInPool(final Double param) {
+        this.allocateQuotaInPool = param;
     }
 
+    /**
+     * getAvailableCapacity .
+     *
+     * @return Double .
+     */
     public Double getAvailableCapacity() {
         return availableCapacity;
     }
 
-    public void setAvailableCapacity(Double availableCapacity) {
-        this.availableCapacity = availableCapacity;
+    /**
+     * setAvailableCapacity .
+     *
+     * @param param .
+     */
+    public void setAvailableCapacity(final Double param) {
+        this.availableCapacity = param;
     }
 
+    /**
+     * getMinSizeFsCapacity .
+     *
+     * @return Double .
+     */
     public Double getMinSizeFsCapacity() {
         return minSizeFsCapacity;
     }
 
-    public void setMinSizeFsCapacity(Double minSizeFsCapacity) {
-        this.minSizeFsCapacity = minSizeFsCapacity;
+    /**
+     * setMinSizeFsCapacity .
+     *
+     * @param param .
+     */
+    public void setMinSizeFsCapacity(final Double param) {
+        this.minSizeFsCapacity = param;
     }
 
+    /**
+     * getStorageId .
+     *
+     * @return String .
+     */
     public String getStorageId() {
         return storageId;
     }
 
-    public void setStorageId(String storageId) {
-        this.storageId = storageId;
+    /**
+     * setStorageId .
+     *
+     * @param param .
+     */
+    public void setStorageId(final String param) {
+        this.storageId = param;
     }
 
+    /**
+     * getType .
+     *
+     * @return String .
+     */
     public String getType() {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    /**
+     * setType .
+     *
+     * @param param .
+     */
+    public void setType(final String param) {
+        this.type = param;
     }
 }

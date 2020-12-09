@@ -5,8 +5,6 @@ import com.vmware.vapi.bindings.StubConfiguration;
 import com.vmware.vapi.protocol.HttpConfiguration;
 
 public class SessionHelper {
-
-
     protected VapiAuthenticationHelper vapiAuthHelper;
     protected StubConfiguration sessionStubConfig;
 
@@ -14,10 +12,8 @@ public class SessionHelper {
         this.vapiAuthHelper = new VapiAuthenticationHelper();
 
         HttpConfiguration httpConfig = buildHttpConfiguration();
-        this.sessionStubConfig =
-                vapiAuthHelper.loginByUsernameAndPassword(
+        this.sessionStubConfig = vapiAuthHelper.loginByUsernameAndPassword(
                         server,port, username, password, httpConfig);
-
     }
 
     protected HttpConfiguration buildHttpConfiguration() throws Exception {
@@ -59,7 +55,7 @@ public class SessionHelper {
         return sslConfig;
     }
 
-    public void logout()  {
+    public void logout() {
         this.vapiAuthHelper.logout();
     }
 }

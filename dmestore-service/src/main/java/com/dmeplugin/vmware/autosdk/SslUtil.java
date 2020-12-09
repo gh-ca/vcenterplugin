@@ -13,26 +13,11 @@
 
 package com.dmeplugin.vmware.autosdk;
 
-
-
 import com.dmeplugin.vmware.util.VmwareClient;
 
 import javax.net.ssl.*;
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.security.KeyManagementException;
-import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 
 /**
  * Retrieves the SSL certificate chain of an HTTPS server and stores the root
@@ -43,65 +28,6 @@ import java.security.cert.X509Certificate;
  * </p>
  */
 public class SslUtil {
-
-    public static KeyStore createTrustStoreForServer(String url) {
-        URI uri;
-        try {
-            uri = new URI(url);
-        } catch (URISyntaxException ex) {
-            throw new IllegalArgumentException(ex);
-        }
-        String host = uri.getHost();
-        int port = uri.getPort();
-        if (port == -1) {
-            port = 443;
-        }
-        return createTrustStoreForServer(host, port);
-    }
-
-    public static KeyStore createTrustStoreForServer(String host, int port) {
-        TrustManager trustAll = new X509TrustManager() {
-            @Override
-            public void checkServerTrusted(X509Certificate[] chain,
-                                           String authType)
-                                                   throws CertificateException {
-                // accept all
-            }
-
-            @Override
-            public void checkClientTrusted(X509Certificate[] chain,
-                                           String authType)
-                                                   throws CertificateException {
-                // server-side only; irrelevant for clients
-            }
-
-            @Override
-            public X509Certificate[] getAcceptedIssuers() {
-                // server-side only; irrelevant for clients
-                return null;
-            }
-        };
-
-        try {
-            SSLContext ctx = SSLContext.getInstance("TLS");
-            ctx.init(null, new TrustManager[] { trustAll }, null);
-            SSLSocket s =
-                    (SSLSocket) ctx.getSocketFactory().createSocket(host, port);
-            Certificate[] chain = s.getSession().getPeerCertificates();
-
-            // last one is the root certificate
-            Certificate rootCert = chain[chain.length - 1];
-            KeyStore trustStore =
-                    KeyStore.getInstance(KeyStore.getDefaultType());
-            trustStore.load(null, null);
-            trustStore.setCertificateEntry(host, rootCert);
-
-            return trustStore;
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
     /**
      * Method to trust all the HTTPS certificates. To be used only in the
      * development environment for convenience.
@@ -109,18 +35,15 @@ public class SslUtil {
     public static void trustAllHttpsCertificates() {
         try {
             // Create the trust manager.
-            TrustManager[] trustAllCerts =
-                    new TrustManager[1];
+            TrustManager[] trustAllCerts = new TrustManager[1];
             TrustManager tm = new VmwareClient.TrustAllTrustManager();
             trustAllCerts[0] = tm;
 
             // Create the SSL context
-            SSLContext sc =
-                    SSLContext.getInstance("TLS");
+            SSLContext sc = SSLContext.getInstance("TLS");
 
             // Create the session context
-            javax.net.ssl.SSLSessionContext sslsc =
-                    sc.getServerSessionContext();
+            javax.net.ssl.SSLSessionContext sslsc = sc.getServerSessionContext();
             /*
              * Initialize the contexts; the session context takes the trust
              * manager.
@@ -132,8 +55,7 @@ public class SslUtil {
              * Use the default socket factory to create the socket for the
              * secure connection
              */
-            HttpsURLConnection
-                    .setDefaultSSLSocketFactory(sc.getSocketFactory());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
             /*
              * Declare a host name verifier that will automatically enable the
@@ -156,43 +78,6 @@ public class SslUtil {
             throw new RuntimeException(e);
         } catch (IllegalArgumentException e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Load the certificate from file.
-     *
-     * @param filePath
-     * @return {@link X509Certificate}
-     * @throws IOException
-     * @throws CertificateException
-     */
-    public static X509Certificate loadCertificate(String filePath)
-            throws IOException, CertificateException {
-        ByteArrayInputStream bis = new ByteArrayInputStream(Files
-                .readAllBytes(Paths.get(filePath)));
-        CertificateFactory cf = CertificateFactory.getInstance("X.509");
-        return (X509Certificate) cf.generateCertificate(bis);
-    }
-
-    /**
-     * Loads the truststore containing the trusted server certificates.
-     *
-     * @param filePath path to the truststore file
-     * @param password password for the truststore.
-     * @return an instance of KeyStore object containing the trusted server
-     *         certificates
-     * @throws Exception
-     */
-    public static KeyStore loadTrustStore(String filePath, String password)
-            throws Exception {
-        KeyStore trustStore = KeyStore.getInstance("JKS");
-        InputStream truststoreStream = new FileInputStream(filePath);
-        try {
-            trustStore.load(truststoreStream, password.toCharArray());
-            return trustStore;
-        } finally {
-            truststoreStream.close();
         }
     }
 }

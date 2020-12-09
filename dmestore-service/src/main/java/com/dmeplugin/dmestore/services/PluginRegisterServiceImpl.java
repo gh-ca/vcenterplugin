@@ -1,7 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.entity.VCenterInfo;
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.utils.CipherUtils;
 import com.dmeplugin.vmware.VCConnectionHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +26,7 @@ public class PluginRegisterServiceImpl implements PluginRegisterService{
 
     @Override
     public void installService(String vcenterIp, String vcenterPort, String vcenterUsername, String vcenterPassword, String dmeIp,
-                               String dmePort, String dmeUsername, String dmePassword) throws DMEException {
+                               String dmePort, String dmeUsername, String dmePassword) throws DmeException {
 
         //Map<String, Object> remap=new HashMap<>(16);
         try {
@@ -55,7 +55,7 @@ public class PluginRegisterServiceImpl implements PluginRegisterService{
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new DMEException("503",e.getMessage());
+            throw new DmeException("503",e.getMessage());
         }
        // return remap;
     }

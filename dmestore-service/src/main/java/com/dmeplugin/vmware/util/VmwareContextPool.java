@@ -14,14 +14,11 @@
 // KIND, either express or implied.  See the License for the
 // specific language governing permissions and limitations
 // under the License.
+
 package com.dmeplugin.vmware.util;
 
 
-
 import com.dmeplugin.dmestore.utils.StringUtil;
-import org.joda.time.Duration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -32,6 +29,10 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
+
+import org.joda.time.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VmwareContextPool {
     private static final Logger s_logger = LoggerFactory.getLogger(VmwareContextPool.class);
@@ -50,12 +51,13 @@ public class VmwareContextPool {
     }
 
     public VmwareContextPool(int maxIdleQueueLength, Duration idleCheckInterval) {
-        pool = new ConcurrentHashMap<String, Queue<VmwareContext>>();
+        pool = new ConcurrentHashMap<>();
 
         this.maxIdleQueueLength = maxIdleQueueLength;
         this.idleCheckInterval = idleCheckInterval;
 
-        timer.scheduleAtFixedRate(getTimerTask(), this.idleCheckInterval.getMillis(), this.idleCheckInterval.getMillis());
+        timer.scheduleAtFixedRate(getTimerTask(), this.idleCheckInterval.getMillis(),
+            this.idleCheckInterval.getMillis());
     }
 
     public VmwareContext getContext(final String vCenterAddress, final String vCenterUserName) {
@@ -71,8 +73,9 @@ public class VmwareContextPool {
                     context.setPoolInfo(this, poolKey);
                 }
                 if (s_logger.isTraceEnabled()) {
-                    s_logger.trace("Return a VmwareContext from the idle pool: " + poolKey + ". current pool size: " + ctxList.size() + ", outstanding count: " +
-                            VmwareContext.getOutstandingContextCount());
+                    s_logger.trace("Return a VmwareContext from the idle pool: " + poolKey + ". current pool size: " +
+                        ctxList.size() + ", outstanding count: " +
+                        VmwareContext.getOutstandingContextCount());
                 }
                 return context;
             }
@@ -107,7 +110,9 @@ public class VmwareContextPool {
             ctxQueue.add(context);
 
             if (s_logger.isTraceEnabled()) {
-                s_logger.trace("Recycle VmwareContext into idle pool: " + context.getPoolKey() + ", current idle pool size: " + ctxQueue.size() + ", outstanding count: "
+                s_logger.trace(
+                    "Recycle VmwareContext into idle pool: " + context.getPoolKey() + ", current idle pool size: " +
+                        ctxQueue.size() + ", outstanding count: "
                         + VmwareContext.getOutstandingContextCount());
             }
         }
@@ -141,7 +146,7 @@ public class VmwareContextPool {
     private void doKeepAlive() {
         final List<VmwareContext> closableCtxList = new ArrayList<>();
         for (final Queue<VmwareContext> ctxQueue : pool.values()) {
-            for (Iterator<VmwareContext> iterator = ctxQueue.iterator(); iterator.hasNext();) {
+            for (Iterator<VmwareContext> iterator = ctxQueue.iterator(); iterator.hasNext(); ) {
                 final VmwareContext context = iterator.next();
                 if (context == null) {
                     iterator.remove();
@@ -167,9 +172,9 @@ public class VmwareContextPool {
         return vCenterUserName + "@" + vCenterAddress;
     }
 
-    public void closeAll(){
+    public void closeAll() {
         for (final Queue<VmwareContext> ctxQueue : pool.values()) {
-            for (Iterator<VmwareContext> iterator = ctxQueue.iterator(); iterator.hasNext();) {
+            for (Iterator<VmwareContext> iterator = ctxQueue.iterator(); iterator.hasNext(); ) {
                 final VmwareContext context = iterator.next();
                 if (context == null) {
                     iterator.remove();

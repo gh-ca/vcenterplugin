@@ -3,187 +3,365 @@ package com.dmeplugin.dmestore.model;
 import java.util.List;
 
 /**
+ * StorageDisk
+ *
  * @author lianq
- * @className StorageDisk
- * @description TODO
- * @date 2020/9/7 19:33
+ * @ClassName: StorageDisk
+ * @since 2020-12-08
  */
 public class StorageDisk {
-
-    private String name;
-
-    private String status;
-
-    private Double capacity;
-
-    private String poolId;
-
-    private String id;
-
-    private String storageDeviceId;
-
-    private Float iops;
-
-    private Float lantency;
-
-    private Float bandwith;
-
-    private Float useage;
-
-    //硬盘域
-    private List<DiskPool> diskPools;
-    //补充字段
-
     /**
-     * 类型
+     * name .
+     */
+    private String name;
+    /**
+     * status .
+     */
+    private String status;
+    /**
+     * capacity .
+     */
+    private Double capacity;
+    /**
+     * poolId .
+     */
+    private String poolId;
+    /**
+     * id .
+     */
+    private String id;
+    /**
+     * storageDeviceId .
+     */
+    private String storageDeviceId;
+    /**
+     * iops .
+     */
+    private Float iops;
+    /**
+     * lantency .
+     */
+    private Float lantency;
+    /**
+     * bandwith .
+     */
+    private Float bandwith;
+    /**
+     * useage .
+     */
+    private Float useage;
+    /**
+     * 硬盘域 .
+     */
+    private List<DiskPool> diskPools;
+    /**
+     * 类型.
      */
     private String physicalType;
 
     /**
-     * 角色
+     * 角色.
      */
     private String logicalType;
 
     /**
-     * 磁盘域
+     * 磁盘域.
      */
     private String diskDomain;
-
     /**
-     * 转速
+     * 转速.
      */
     private Long speed;
-
     /**
-     * 性能
+     * 性能.
      */
     private String performance;
 
+    /**
+     * getDiskPools .
+     *
+     * @return List<> .
+     */
     public List<DiskPool> getDiskPools() {
         return diskPools;
     }
 
-    public void setDiskPools(List<DiskPool> diskPools) {
-        this.diskPools = diskPools;
+    /**
+     * setDiskPools .
+     *
+     * @param param .
+     */
+    public void setDiskPools(final List<DiskPool> param) {
+        this.diskPools = param;
     }
 
+    /**
+     * getPoolId .
+     *
+     * @return String .
+     */
     public String getPoolId() {
         return poolId;
     }
 
-    public void setPoolId(String poolId) {
-        this.poolId = poolId;
+    /**
+     * setPoolId .
+     *
+     * @param param .
+     */
+    public void setPoolId(final String param) {
+        this.poolId = param;
     }
 
+    /**
+     * getStorageDeviceId .
+     *
+     * @return String .
+     */
     public String getStorageDeviceId() {
         return storageDeviceId;
     }
 
-    public void setStorageDeviceId(String storageDeviceId) {
-        this.storageDeviceId = storageDeviceId;
+    /**
+     * setStorageDeviceId .
+     *
+     * @param param .
+     */
+    public void setStorageDeviceId(final String param) {
+        this.storageDeviceId = param;
     }
 
+    /**
+     * getLogicalType .
+     *
+     * @return String .
+     */
     public String getLogicalType() {
         return logicalType;
     }
 
-    public void setLogicalType(String logicalType) {
-        this.logicalType = logicalType;
+    /**
+     * setLogicalType .
+     *
+     * @param param .
+     */
+    public void setLogicalType(final String param) {
+        this.logicalType = param;
     }
 
+    /**
+     * getDiskDomain .
+     *
+     * @return String .
+     */
     public String getDiskDomain() {
         return diskDomain;
     }
 
-    public void setDiskDomain(String diskDomain) {
-        this.diskDomain = diskDomain;
+    /**
+     * setDiskDomain .
+     *
+     * @param param .
+     */
+    public void setDiskDomain(final String param) {
+        this.diskDomain = param;
     }
 
+    /**
+     * getSpeed .
+     *
+     * @return String .
+     */
     public Long getSpeed() {
         return speed;
     }
 
-    public void setSpeed(Long speed) {
-        this.speed = speed;
+    /**
+     * setSpeed .
+     *
+     * @param param .
+     */
+    public void setSpeed(final Long param) {
+        this.speed = param;
     }
 
+    /**
+     * getPerformance .
+     *
+     * @return String .
+     */
     public String getPerformance() {
         return performance;
     }
 
-    public void setPerformance(String performance) {
-        this.performance = performance;
+    /**
+     * setPerformance .
+     *
+     * @param param .
+     */
+    public void setPerformance(final String param) {
+        this.performance = param;
     }
 
+    /**
+     * getPhysicalType .
+     *
+     * @return String .
+     */
     public String getPhysicalType() {
         return physicalType;
     }
 
-    public void setPhysicalType(String physicalType) {
-        this.physicalType = physicalType;
+    /**
+     * setPhysicalType .
+     *
+     * @param param .
+     */
+    public void setPhysicalType(final String param) {
+        this.physicalType = param;
     }
 
+    /**
+     * getName .
+     *
+     * @return String .
+     */
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setName .
+     *
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
 
+    /**
+     * getStatus .
+     *
+     * @return String .
+     */
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    /**
+     * setStatus .
+     *
+     * @param param .
+     */
+    public void setStatus(final String param) {
+        this.status = param;
     }
 
+    /**
+     * getCapacity .
+     *
+     * @return Double .
+     */
     public Double getCapacity() {
         return capacity;
     }
 
-    public void setCapacity(Double capacity) {
-        this.capacity = capacity;
+    /**
+     * setCapacity .
+     *
+     * @param param .
+     */
+    public void setCapacity(final Double param) {
+        this.capacity = param;
     }
 
+    /**
+     * getIops .
+     *
+     * @return Float .
+     */
     public Float getIops() {
         return iops;
     }
 
-    public void setIops(Float iops) {
-        this.iops = iops;
+    /**
+     * setIops .
+     *
+     * @param param .
+     */
+    public void setIops(final Float param) {
+        this.iops = param;
     }
 
+    /**
+     * getLantency .
+     *
+     * @return Float .
+     */
     public Float getLantency() {
         return lantency;
     }
 
-    public void setLantency(Float lantency) {
-        this.lantency = lantency;
+    /**
+     * setLantency .
+     *
+     * @param param .
+     */
+    public void setLantency(final Float param) {
+        this.lantency = param;
     }
 
+    /**
+     * getBandwith .
+     *
+     * @return Float .
+     */
     public Float getBandwith() {
         return bandwith;
     }
 
-    public void setBandwith(Float bandwith) {
-        this.bandwith = bandwith;
+    /**
+     * setBandwith .
+     *
+     * @param param .
+     */
+    public void setBandwith(final Float param) {
+        this.bandwith = param;
     }
 
+    /**
+     * getUseage .
+     *
+     * @return Float .
+     */
     public Float getUseage() {
         return useage;
     }
 
-    public void setUseage(Float useage) {
-        this.useage = useage;
+    /**
+     * setUseage .
+     *
+     * @param param .
+     */
+    public void setUseage(final Float param) {
+        this.useage = param;
     }
 
+    /**
+     * getId .
+     *
+     * @return String .
+     */
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setId(final String param) {
+        this.id = param;
     }
 }

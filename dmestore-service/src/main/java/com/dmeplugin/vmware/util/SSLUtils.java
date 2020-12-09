@@ -25,6 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocketFactory;
+
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.util.Arrays;
@@ -45,23 +47,6 @@ public class SSLUtils {
         return set.toArray(new String[set.size()]);
     }
 
-    /**
-     * It returns recommended protocols that are considered secure.
-     */
-    public static String[] getRecommendedProtocols() {
-        return new String[] { "TLSv1", "TLSv1.1", "TLSv1.2" };
-    }
-
-    /**
-     * It returns recommended ciphers that are considered secure.
-     */
-    public static String[] getRecommendedCiphers() {
-        return new String[] { "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA", "TLS_DHE_RSA_WITH_AES_128_GCM_SHA256", "TLS_DHE_RSA_WITH_AES_128_CBC_SHA256",
-                "TLS_RSA_WITH_AES_128_GCM_SHA256", "TLS_RSA_WITH_AES_128_CBC_SHA256", "TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256", "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256",
-                "TLS_DHE_RSA_WITH_AES_256_CBC_SHA", "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA", "TLS_DHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_DHE_RSA_WITH_AES_256_CBC_SHA256",
-                "TLS_RSA_WITH_AES_256_GCM_SHA384", "TLS_RSA_WITH_AES_256_CBC_SHA256", "TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384", "TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384" };
-    }
-
     public static String[] getSupportedCiphers() throws NoSuchAlgorithmException {
         String[] availableCiphers = getSslContext().getSocketFactory().getSupportedCipherSuites();
         Arrays.sort(availableCiphers);
@@ -72,7 +57,4 @@ public class SSLUtils {
         return SSLContext.getInstance("TLSv1.2");
     }
 
-    public static SSLContext getSslContext(String provider) throws NoSuchAlgorithmException, NoSuchProviderException {
-        return SSLContext.getInstance("TLSv1.2", provider);
-    }
 }

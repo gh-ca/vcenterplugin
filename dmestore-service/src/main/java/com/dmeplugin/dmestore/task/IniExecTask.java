@@ -1,8 +1,7 @@
 package com.dmeplugin.dmestore.task;
 
-import com.dmeplugin.dmestore.services.BestPracticeProcessService;
-import com.dmeplugin.dmestore.services.ServiceLevelService;
 import com.dmeplugin.dmestore.services.SystemServiceImpl;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,21 +13,20 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static org.quartz.CronScheduleBuilder.cronSchedule;
-import static org.quartz.JobBuilder.newJob;
-
 /**
- * @ClassName IniExecTask
- * @Description TODO
- * @Author yuanqi
- * @Date 2020/9/24 9:48
- * @Version V1.0
+ * ApplicationListener
+ *
+ * @author yuanqi
+ * @version V1.0
+ * @ClassName: IniExecTask
+ * @since 2020-09-24
  **/
 
 @Component
 public class IniExecTask implements ApplicationListener<ContextRefreshedEvent> {
     private static final Logger LOG = LoggerFactory.getLogger(BackgroundScanDatastoreTask.class);
 
+    private final int daLay = 10;
     @Autowired
     private ScheduleSetting scheduleSetting;
 
@@ -36,19 +34,12 @@ public class IniExecTask implements ApplicationListener<ContextRefreshedEvent> {
     private BackgroundScanDatastoreTask backgroundScanDatastoreTask;
 
     @Autowired
-    private ServiceLevelService serviceLevelService;
-
-    @Autowired
-    private BestPracticeProcessService bestPracticeProcessService;
-
-    @Autowired
     private SystemServiceImpl systemService;
-
 
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        //重启插件时执行一次
+        // 重启插件时执行一次
         if (event.getApplicationContext().getParent() == null) {
             systemService.initDb();
             initTask();
@@ -65,19 +56,17 @@ public class IniExecTask implements ApplicationListener<ContextRefreshedEvent> {
                 backgroundScanDatastoreTask.scanDatastore();
                 LOG.info("--->ini Scan Datastore Task...end");
             }
-        }, 10, TimeUnit.SECONDS);
+        }, daLay, TimeUnit.SECONDS);
     }
 
     private void iniScheduleTask() {
-
-                LOG.info("--->ini iniScheduleTask Task...start");
-                try {
-                    scheduleSetting.reconfigureTasks();
-                }catch (Exception e){
-                    LOG.error("--->err",e);
-                }
-                LOG.info("--->ini iniScheduleTask Task...end");
-            }
-
+        LOG.info("--->ini iniScheduleTask Task...start");
+        try {
+            scheduleSetting.reconfigureTasks();
+        } catch (Exception e) {
+            LOG.error("--->err", e);
+        }
+        LOG.info("--->ini iniScheduleTask Task...end");
+    }
 }
 

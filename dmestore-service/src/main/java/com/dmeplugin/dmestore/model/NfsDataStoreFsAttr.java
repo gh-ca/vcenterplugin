@@ -3,97 +3,246 @@ package com.dmeplugin.dmestore.model;
 import java.io.Serializable;
 
 /**
+ * NfsDataStoreFsAttr
+ *
  * @author wangxiangyong
+ * @since 2020-12-08
  **/
 public class NfsDataStoreFsAttr implements Serializable {
+    /**
+     * name .
+     */
     private String name;
+    /**
+     * description .
+     */
     private String description;
+    /**
+     * device .
+     */
     private String device;
+    /**
+     * storagePoolName .
+     */
     private String storagePoolName;
+    /**
+     * provisionType .
+     */
     private String provisionType;
+    /**
+     * applicationScenario .
+     */
     private String applicationScenario;
+    /**
+     * dataDeduplication .
+     */
     private Boolean dataDeduplication;
+    /**
+     * dateCompression .
+     */
     private Boolean dateCompression;
+    /**
+     * controller .
+     */
     private String controller;
+    /**
+     * fileSystemId .
+     */
     private String fileSystemId;
 
+    /**
+     * getController .
+     *
+     * @return String .
+     */
     public String getController() {
         return controller;
     }
 
-    public void setController(String controller) {
-        this.controller = controller;
+    /**
+     * setController .
+     *
+     * @param param .
+     */
+    public void setController(final String param) {
+        this.controller = param;
     }
 
+    /**
+     * getName .
+     *
+     * @return String .
+     */
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setName .
+     *
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
 
+    /**
+     * getDescription .
+     *
+     * @return String .
+     */
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    /**
+     * setDescription .
+     *
+     * @param param .
+     */
+    public void setDescription(final String param) {
+        this.description = param;
     }
 
+    /**
+     * getDevice .
+     *
+     * @return String .
+     */
     public String getDevice() {
         return device;
     }
 
-    public void setDevice(String device) {
-        this.device = device;
+    /**
+     * setDevice .
+     *
+     * @param param .
+     */
+    public void setDevice(final String param) {
+        this.device = param;
     }
 
+    /**
+     * getStoragePoolName .
+     *
+     * @return String .
+     */
     public String getStoragePoolName() {
         return storagePoolName;
     }
 
-    public void setStoragePoolName(String storagePoolName) {
-        this.storagePoolName = storagePoolName;
+    /**
+     * setStoragePoolName .
+     *
+     * @param param .
+     */
+    public void setStoragePoolName(final String param) {
+        this.storagePoolName = param;
     }
 
+    /**
+     * getProvisionType .
+     *
+     * @return String .
+     */
     public String getProvisionType() {
         return provisionType;
     }
 
-    public void setProvisionType(String provisionType) {
-        this.provisionType = provisionType;
+    /**
+     * setProvisionType .
+     *
+     * @param param .
+     */
+    public void setProvisionType(final String param) {
+        this.provisionType = param;
     }
 
+    /**
+     * getApplicationScenario .
+     *
+     * @return String .
+     */
     public String getApplicationScenario() {
         return applicationScenario;
     }
 
-    public void setApplicationScenario(String applicationScenario) {
-        this.applicationScenario = applicationScenario;
+    /**
+     * setApplicationScenario .
+     *
+     * @param param .
+     */
+    public void setApplicationScenario(final String param) {
+        this.applicationScenario = param;
     }
 
+    /**
+     * getDataDeduplication .
+     *
+     * @return Boolean .
+     */
     public Boolean getDataDeduplication() {
         return dataDeduplication;
     }
 
-    public void setDataDeduplication(Boolean dataDeduplication) {
-        this.dataDeduplication = dataDeduplication;
+    /**
+     * setDataDeduplication .
+     *
+     * @param param .
+     */
+    public void setDataDeduplication(final Boolean param) {
+        this.dataDeduplication = param;
     }
 
+    /**
+     * getDateCompression .
+     *
+     * @return Boolean .
+     */
     public Boolean getDateCompression() {
         return dateCompression;
     }
 
-    public void setDateCompression(Boolean dateCompression) {
-        this.dateCompression = dateCompression;
+    /**
+     * setDateCompression .
+     *
+     * @param param .
+     */
+    public void setDateCompression(final Boolean param) {
+        this.dateCompression = param;
     }
 
+    /**
+     * getFileSystemId .
+     *
+     * @return String .
+     */
     public String getFileSystemId() {
         return fileSystemId;
     }
 
-    public void setFileSystemId(String fileSystemId) {
-        this.fileSystemId = fileSystemId;
+    /**
+     * setFileSystemId .
+     *
+     * @param param .
+     */
+    public void setFileSystemId(final String param) {
+        this.fileSystemId = param;
+    }
+
+    @Override
+    public final String toString() {
+        return "NfsDataStoreFsAttr{"
+            + "name='" + name + '\''
+            + ", description='" + description + '\''
+            + ", device='" + device + '\''
+            + ", storagePoolName='" + storagePoolName + '\''
+            + ", provisionType='" + provisionType + '\''
+            + ", applicationScenario='" + applicationScenario + '\''
+            + ", dataDeduplication=" + dataDeduplication
+            + ", dateCompression=" + dateCompression
+            + ", controller='" + controller + '\''
+            + ", fileSystemId='" + fileSystemId + '\''
+            + '}';
     }
 }

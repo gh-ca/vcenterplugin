@@ -42,7 +42,7 @@ export class NfsService {
     {key: 'LAST_1_QUARTER', value: '最近1个季度'},
     {key: 'HALF_1_YEAR', value: '最近半年'},
     {key: 'LAST_1_YEAR', value: '最近1年'},
-    {key: 'BEGIN_END_TIME', value: '开始-结束时间'},
+    // {key: 'BEGIN_END_TIME', value: '开始-结束时间'},
     {key: 'INVALID', value: '无效'},
   ];
   constructor(private http: HttpClient) {}

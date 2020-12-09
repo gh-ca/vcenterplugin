@@ -1,19 +1,38 @@
 package com.dmeplugin.dmestore.exception;
 
-
+/**
+ * VcenterRuntimeException
+ *
+ * @author Administrator
+ * @since 2020-12-08
+ */
 public class VcenterRuntimeException extends RuntimeException {
     private String code;
     private String message;
 
+    /**
+     * VcenterRuntimeException
+     */
     public VcenterRuntimeException() {
         super();
     }
 
+    /**
+     * VcenterRuntimeException
+     *
+     * @param message message
+     */
     public VcenterRuntimeException(String message) {
         super(message);
         this.message = message;
     }
 
+    /**
+     * VcenterRuntimeException
+     *
+     * @param code  code
+     * @param message message
+     */
     public VcenterRuntimeException(String code, String message) {
         super(message);
         this.code = code;

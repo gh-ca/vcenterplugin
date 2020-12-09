@@ -1,29 +1,25 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.vmware.vim.binding.vmodl.list;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.omg.PortableServer.LIFESPAN_POLICY_ID;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import springfox.documentation.spring.web.json.Json;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -52,7 +48,7 @@ public class VmfsOperationServiceImplTest {
     }
 
     @Test
-    public void updateVmfs() throws DMEException {
+    public void updateVmfs() throws DmeException {
         String param = "{\n" +
                 "    \"name\": \"Dvmfs999\", \n" +
                 "    \"isSameName\": true, \n" +
@@ -89,7 +85,7 @@ public class VmfsOperationServiceImplTest {
     }
 
     @Test
-    public void expandVmfs() throws DMEException {
+    public void expandVmfs() throws DmeException {
         String param = "{\n" +
                 "    \"vo_add_capacity\": \"2\", \n" +
                 "    \"capacityUnit\": \"GB\", \n" +
@@ -112,7 +108,7 @@ public class VmfsOperationServiceImplTest {
     }
 
     @Test
-    public void recycleVmfsCapacity() throws DMEException {
+    public void recycleVmfsCapacity() throws DmeException {
         List<String> list = new ArrayList<>();
         list.add("Dvmfs999");
         when(vcsdkUtils.recycleVmfsCapacity("Dvmfs999")).thenReturn("success");
@@ -121,7 +117,7 @@ public class VmfsOperationServiceImplTest {
     }
 
     @Test
-    public void recycleVmfsCapacityByDataStoreIds() throws DMEException {
+    public void recycleVmfsCapacityByDataStoreIds() throws DmeException {
         List<String> list = new ArrayList<>();
         list.add("Dvmfs999");
         when(vcsdkUtils.getDataStoreName("Dvmfs999")).thenReturn("success");
@@ -131,7 +127,7 @@ public class VmfsOperationServiceImplTest {
     }
 
     @Test
-    public void updateVmfsServiceLevel() throws DMEException {
+    public void updateVmfsServiceLevel() throws DmeException {
         String param = "{\n" +
                 "    \"vo_add_capacity\": 2, \n" +
                 "    \"capacityUnit\": \"GB\", \n" +
@@ -152,7 +148,7 @@ public class VmfsOperationServiceImplTest {
     }
 
     @Test
-    public void listServiceLevelVmfs() throws DMEException {
+    public void listServiceLevelVmfs() throws DmeException {
         String param = "{\"vo_add_capacity\":2.0,\"capacityUnit\":\"GB\",\"volume_id\":\"d6a20f27-fe4c-4a40-ac28-529aad1a7550\",\"ds_name\":\"Dvmfs999\",\"obj_id\":\"urn:vmomi:Datastore:datastore-1233:674908e5-ab21-4079-9cb1-596358ee5dd1\"}";
         Map<String, Object> map = gson.fromJson(param, Map.class);
         String resp = " {\n" +

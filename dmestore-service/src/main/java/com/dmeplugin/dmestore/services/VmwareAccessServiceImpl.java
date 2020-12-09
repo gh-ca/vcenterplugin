@@ -2,19 +2,19 @@ package com.dmeplugin.dmestore.services;
 
 
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
-import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 /**
  * @Description: TODO
@@ -46,7 +46,7 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
     }
 
     @Override
-    public List<Map<String, String>> listHosts() throws DMEException {
+    public List<Map<String, String>> listHosts() throws DmeException {
         List<Map<String, String>> lists = null;
         try {
             //取得vcenter中的所有host。
@@ -58,14 +58,14 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             }
         } catch (Exception e) {
             LOG.error("list hosts error:", e);
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
         LOG.info("listHosts===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
 
     @Override
-    public List<Map<String,String>> getHostsByDsObjectId(String dataStoreObjectId) throws DMEException {
+    public List<Map<String, String>> getHostsByDsObjectId(String dataStoreObjectId) throws DmeException {
         List<Map<String, String>> lists = null;
         try {
             //取得vcenter中的所有host。
@@ -77,14 +77,14 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             }
         } catch (Exception e) {
             LOG.error("get Hosts By DsObjectId error:", e);
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
         LOG.info("getHostsByDsObjectId===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
 
     @Override
-    public List<Map<String,String>> listClusters() throws DMEException {
+    public List<Map<String, String>> listClusters() throws DmeException {
         List<Map<String, String>> lists = null;
         try {
             //取得vcenter中的所有host。
@@ -96,14 +96,14 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             }
         } catch (Exception e) {
             LOG.error("list listClusters error:", e);
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
         LOG.info("listClusters===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
 
     @Override
-    public List<Map<String,String>> getClustersByDsObjectId(String dataStoreObjectId) throws DMEException {
+    public List<Map<String, String>> getClustersByDsObjectId(String dataStoreObjectId) throws DmeException {
         List<Map<String, String>> lists = null;
         try {
             //取得vcenter中的所有host。
@@ -115,14 +115,15 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             }
         } catch (Exception e) {
             LOG.error("get Clusters By DsObjectId error:", e);
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
         LOG.info("getClustersByDsObjectId===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
 
     @Override
-    public List<Map<String,String>> getDataStoresByHostObjectId(String hostObjectId, String dataStoreType) throws DMEException {
+    public List<Map<String, String>> getDataStoresByHostObjectId(String hostObjectId, String dataStoreType)
+        throws DmeException {
         List<Map<String, String>> lists = null;
         try {
             //根据存储类型，取得vcenter中的所有存储。
@@ -136,8 +137,9 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
                 List<String> dvrlist = dmeVmwareRalationDao.getAllStorageIdByType(dataStoreType);
                 LOG.info("dvrlist==" + gson.toJson(dvrlist));
                 if (dvrlist != null && dvrlist.size() > 0) {
-                    for(Map<String, String> dsmap:tmplists){
-                        if(dsmap!=null && dsmap.get("objectId")!=null && dvrlist.contains(ToolUtils.getStr(dsmap.get("objectId")))){
+                    for (Map<String, String> dsmap : tmplists) {
+                        if (dsmap != null && dsmap.get("objectId") != null &&
+                            dvrlist.contains(ToolUtils.getStr(dsmap.get("objectId")))) {
                             lists.add(dsmap);
                         }
                     }
@@ -145,14 +147,16 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             }
         } catch (Exception e) {
             LOG.error("get DataStores By HostObjectId error:", e);
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
-        LOG.info("getDataStoresByHostObjectId===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
+        LOG.info(
+            "getDataStoresByHostObjectId===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
 
     @Override
-    public List<Map<String,String>> getDataStoresByClusterObjectId(String clusterObjectId, String dataStoreType) throws DMEException {
+    public List<Map<String, String>> getDataStoresByClusterObjectId(String clusterObjectId, String dataStoreType)
+        throws DmeException {
         List<Map<String, String>> lists = null;
         try {
             //根据存储类型，取得vcenter中的所有存储。
@@ -166,8 +170,9 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
                 List<String> dvrlist = dmeVmwareRalationDao.getAllStorageIdByType(dataStoreType);
                 LOG.info("dvrlist==" + gson.toJson(dvrlist));
                 if (dvrlist != null && dvrlist.size() > 0) {
-                    for(Map<String, String> dsmap:tmplists){
-                        if(dsmap!=null && dsmap.get("objectId")!=null && dvrlist.contains(ToolUtils.getStr(dsmap.get("objectId")))){
+                    for (Map<String, String> dsmap : tmplists) {
+                        if (dsmap != null && dsmap.get("objectId") != null &&
+                            dvrlist.contains(ToolUtils.getStr(dsmap.get("objectId")))) {
                             lists.add(dsmap);
                         }
                     }
@@ -175,34 +180,36 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             }
         } catch (Exception e) {
             LOG.error("get DataStores By ClusterObjectId error:", e);
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
-        LOG.info("getDataStoresByClusterObjectId===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
+        LOG.info("getDataStoresByClusterObjectId===" +
+            (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
 
     @Override
-    public List<Map<String,String>> getVmKernelIpByHostObjectId(String hostObjectId) throws DMEException {
+    public List<Map<String, String>> getVmKernelIpByHostObjectId(String hostObjectId) throws DmeException {
         List<Map<String, String>> lists = null;
         try {
             //根据存储类型，取得vcenter中的所有存储。
             String listStr = vcsdkUtils.getVmKernelIpByHostObjectId(hostObjectId);
             LOG.info("host getVmKernelIpByHostObjectId==" + listStr);
             if (!StringUtils.isEmpty(listStr)) {
-                lists = new ArrayList<>();
                 lists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
                 }.getType());
             }
         } catch (Exception e) {
             LOG.error("get vmkernel ip by hostobjectid error:", e);
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
-        LOG.info("getVmKernelIpByHostObjectId===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
+        LOG.info(
+            "getVmKernelIpByHostObjectId===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
 
     @Override
-    public List<Map<String,String>> getMountDataStoresByHostObjectId(String hostObjectId, String dataStoreType) throws Exception {
+    public List<Map<String, String>> getMountDataStoresByHostObjectId(String hostObjectId, String dataStoreType)
+        throws Exception {
         List<Map<String, String>> lists = null;
         try {
             //根据存储类型，取得vcenter中的所有存储。
@@ -216,8 +223,9 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
                 List<String> dvrlist = dmeVmwareRalationDao.getAllStorageIdByType(dataStoreType);
                 LOG.info("dmevmvarerelations==" + gson.toJson(dvrlist));
                 if (dvrlist != null && dvrlist.size() > 0) {
-                    for(Map<String, String> dsmap:tmplists){
-                        if(dsmap!=null && dsmap.get("objectId")!=null && dvrlist.contains(ToolUtils.getStr(dsmap.get("objectId")))){
+                    for (Map<String, String> dsmap : tmplists) {
+                        if (dsmap != null && dsmap.get("objectId") != null &&
+                            dvrlist.contains(ToolUtils.getStr(dsmap.get("objectId")))) {
                             lists.add(dsmap);
                         }
                     }
@@ -227,12 +235,14 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             LOG.error("get mount DataStores By HostObjectId error:", e);
             throw e;
         }
-        LOG.info("getMountDataStoresByHostObjectId===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
+        LOG.info("getMountDataStoresByHostObjectId===" +
+            (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
 
     @Override
-    public List<Map<String,String>> getMountDataStoresByClusterObjectId(String clusterObjectId, String dataStoreType) throws Exception {
+    public List<Map<String, String>> getMountDataStoresByClusterObjectId(String clusterObjectId, String dataStoreType)
+        throws Exception {
         List<Map<String, String>> lists = null;
         try {
             //根据存储类型，取得vcenter中的所有存储。
@@ -246,8 +256,9 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
                 List<String> dvrlist = dmeVmwareRalationDao.getAllStorageIdByType(dataStoreType);
                 LOG.info("dmevmvarerlist==" + gson.toJson(dvrlist));
                 if (dvrlist != null && dvrlist.size() > 0) {
-                    for(Map<String, String> dsmap:tmplists){
-                        if(dsmap!=null && dsmap.get("objectId")!=null && dvrlist.contains(ToolUtils.getStr(dsmap.get("objectId")))){
+                    for (Map<String, String> dsmap : tmplists) {
+                        if (dsmap != null && dsmap.get("objectId") != null &&
+                            dvrlist.contains(ToolUtils.getStr(dsmap.get("objectId")))) {
                             lists.add(dsmap);
                         }
                     }
@@ -257,7 +268,8 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             LOG.error("get mount DataStores By ClusterObjectId error:", e);
             throw e;
         }
-        LOG.info("getMountDataStoresByHostObjectId===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
+        LOG.info("getMountDataStoresByHostObjectId===" +
+            (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
 

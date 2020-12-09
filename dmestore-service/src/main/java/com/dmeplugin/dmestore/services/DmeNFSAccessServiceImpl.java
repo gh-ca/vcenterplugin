@@ -1,24 +1,38 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.constant.DmeConstants;
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.exception.DmeSqlException;
 import com.dmeplugin.dmestore.exception.VcenterException;
-import com.dmeplugin.dmestore.model.*;
-import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
-import com.dmeplugin.dmestore.utils.StringUtil;
+import com.dmeplugin.dmestore.model.AuthClient;
+import com.dmeplugin.dmestore.model.NfsDataInfo;
+import com.dmeplugin.dmestore.model.NfsDataStoreFsAttr;
+import com.dmeplugin.dmestore.model.NfsDataStoreLogicPortAttr;
+import com.dmeplugin.dmestore.model.NfsDataStoreShareAttr;
+import com.dmeplugin.dmestore.model.Storage;
+import com.dmeplugin.dmestore.constant.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
-
-import java.util.*;
 
 /**
  * @author wangxiangyong
@@ -77,7 +91,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     @Override
-    public NfsDataStoreShareAttr getNfsDatastoreShareAttr(String storageObjectId) throws DMEException {
+    public NfsDataStoreShareAttr getNfsDatastoreShareAttr(String storageObjectId) throws DmeException {
         //根据存储ID 获取逻nfs_share_id
         String nfsShareId = dmeVmwareRalationDao.getShareIdByStorageId(storageObjectId);
         String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace("{nfs_share_id}", nfsShareId);
@@ -105,7 +119,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     //通过nfs shareId 查询关联的客户端访问列表
-    private List<AuthClient> getNfsDatastoreShareAuthClients(String shareId) throws DMEException {
+    private List<AuthClient> getNfsDatastoreShareAuthClients(String shareId) throws DmeException {
         List<AuthClient> clientList = new ArrayList<>();
         String url = DmeConstants.DME_NFS_SHARE_AUTH_CLIENTS_URL.replace("{nfs_share_id}", shareId);
         Map<String, Object> body = new HashMap<>();
@@ -135,7 +149,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     @Override
-    public NfsDataStoreLogicPortAttr getNfsDatastoreLogicPortAttr(String storageObjectId) throws DMEException {
+    public NfsDataStoreLogicPortAttr getNfsDatastoreLogicPortAttr(String storageObjectId) throws DmeException {
         //根据存储ID 获取逻辑端口ID
         String logicPortId = dmeVmwareRalationDao.getLogicPortIdByStorageId(storageObjectId);
 
@@ -162,7 +176,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     @Override
-    public List<NfsDataStoreFsAttr> getNfsDatastoreFsAttr(String storageObjectId) throws DMEException {
+    public List<NfsDataStoreFsAttr> getNfsDatastoreFsAttr(String storageObjectId) throws DmeException {
         //根据存储ID获取fs
         List<String> fsIds = dmeVmwareRalationDao.getFsIdsByStorageId(storageObjectId);
         List<NfsDataStoreFsAttr> list = new ArrayList<>();
@@ -201,7 +215,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     @Override
-    public boolean scanNfs() throws DMEException {
+    public boolean scanNfs() throws DmeException {
         // vcenter侧获取nfsStrorge信息列表 (提取shareIp,sharePath 与dem(ip)发生关联关系)
         // DEM 获取所有存储设备信息 通过ip过滤提取存储ID storageId
         // DME logicPort, 通过存储IDstroage id查询逻辑端口 (需求文档说明通过share ip,但API不支持)
@@ -308,7 +322,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return false;
     }
 
-    private boolean dmeVmWareRelationDbProcess(List<DmeVmwareRelation> relationList, String storeType) throws DmeSqlException {
+    private boolean dmeVmWareRelationDbProcess(List<DmeVmwareRelation> relationList, String storeType)
+        throws DmeSqlException {
         //本地全量查询NFS
         List<String> storageIds = dmeVmwareRalationDao.getAllStorageIdByType(storeType);
         List<DmeVmwareRelation> newList = new ArrayList<>();
@@ -340,7 +355,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     //按条件查询share 暂认为 storage与share是一对一的关系
-    private Map<String, Object> queryShareInfo(String sharePath) throws DMEException {
+    private Map<String, Object> queryShareInfo(String sharePath) throws DmeException {
         //ResponseEntity responseEntity = listShareByStorageId(storageId);
         ResponseEntity responseEntity = listShareBySharePath(sharePath);
         if (responseEntity.getStatusCodeValue() / 100 == 2) {
@@ -354,10 +369,11 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     //通过share_path查询share信息
-    private ResponseEntity listShareBySharePath(String sharePath) throws DMEException {
+    private ResponseEntity listShareBySharePath(String sharePath) throws DmeException {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("share_path", sharePath);
-        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL, HttpMethod.POST, gson.toJson(requestbody));
+        ResponseEntity responseEntity =
+            dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL, HttpMethod.POST, gson.toJson(requestbody));
         return responseEntity;
     }
 
@@ -389,7 +405,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     //DME按条件获取fs 暂只考虑一对一关系 存储设备下多个FS只取第一个
-    private Map<String, Object> queryFsInfo(String storageId, String fsName) throws DMEException {
+    private Map<String, Object> queryFsInfo(String storageId, String fsName) throws DmeException {
         ResponseEntity responseEntity = listFsByStorageId(storageId, fsName);
         if (responseEntity.getStatusCodeValue() / 100 == 2) {
             Object object = responseEntity.getBody();
@@ -402,13 +418,14 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     //DME通过storageId获取fs信息
-    private ResponseEntity listFsByStorageId(String storageId, String fsName) throws DMEException {
+    private ResponseEntity listFsByStorageId(String storageId, String fsName) throws DmeException {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("storage_id", storageId);
         if (!StringUtils.isEmpty(fsName)) {
             requestbody.put("name", fsName);
         }
-        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_FILESERVICE_QUERY_URL, HttpMethod.POST, gson.toJson(requestbody));
+        ResponseEntity responseEntity = dmeAccessService
+            .access(DmeConstants.DME_NFS_FILESERVICE_QUERY_URL, HttpMethod.POST, gson.toJson(requestbody));
         return responseEntity;
     }
 
@@ -439,7 +456,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     //按条件查询logicPort
-    private List<Map<String, Object>> queryLogicPortInfo(String storageId) throws DMEException {
+    private List<Map<String, Object>> queryLogicPortInfo(String storageId) throws DmeException {
         ResponseEntity responseEntity = listLogicPortByStorageId(storageId);
         if (responseEntity.getStatusCodeValue() / 100 == 2) {
             Object object = responseEntity.getBody();
@@ -452,7 +469,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     //通过storageId查询logicPort信息
-    private ResponseEntity listLogicPortByStorageId(String storageId) throws DMEException {
+    private ResponseEntity listLogicPortByStorageId(String storageId) throws DmeException {
         String url = DmeConstants.API_LOGICPORTS_LIST + storageId;
         ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         return responseEntity;
@@ -497,7 +514,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
 
     @Override
-    public List<NfsDataInfo> listNfs() throws DMEException {
+    public List<NfsDataInfo> listNfs() throws DmeException {
         List<NfsDataInfo> relists = null;
         try {
             //从关系表中取得DME卷与vcenter存储的对应关系
@@ -523,7 +540,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                                     NfsDataInfo nfsDataInfo = new NfsDataInfo();
                                     double capacity = ToolUtils.getDouble(jo.get("capacity")) / ToolUtils.GI;
                                     double freeSpace = ToolUtils.getDouble(jo.get("freeSpace")) / ToolUtils.GI;
-                                    double reserveCapacity = (ToolUtils.getDouble(jo.get("capacity")) - ToolUtils.getDouble(jo.get("freeSpace"))) / ToolUtils.GI;
+                                    double reserveCapacity = (ToolUtils.getDouble(jo.get("capacity")) -
+                                        ToolUtils.getDouble(jo.get("freeSpace"))) / ToolUtils.GI;
 
                                     nfsDataInfo.setName(ToolUtils.jsonToStr(jo.get("name")));
                                     nfsDataInfo.setCapacity(capacity);
@@ -544,10 +562,13 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
                                     String fsUrl = "";
                                     try {
-                                        fsUrl = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace("{file_system_id}", dvr.getFsId());
-                                        ResponseEntity<String> responseTuning = dmeAccessService.access(fsUrl, HttpMethod.GET, null);
+                                        fsUrl = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL
+                                            .replace("{file_system_id}", dvr.getFsId());
+                                        ResponseEntity<String> responseTuning =
+                                            dmeAccessService.access(fsUrl, HttpMethod.GET, null);
                                         if (responseTuning.getStatusCodeValue() / 100 == 2) {
-                                            JsonObject fsDetail = gson.fromJson(responseTuning.getBody(), JsonObject.class);
+                                            JsonObject fsDetail =
+                                                gson.fromJson(responseTuning.getBody(), JsonObject.class);
 
                                             nfsDataInfo.setStatus(ToolUtils.jsonToStr(fsDetail.get("health_status")));
                                             nfsDataInfo.setDeviceId(ToolUtils.jsonToStr(fsDetail.get("storage_id")));
@@ -566,9 +587,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             }
         } catch (Exception e) {
             LOG.error("list nfs error:", e);
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
-        LOG.info("relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
+        LOG.info("relists===" + (relists == null ? "null" : (relists.size())));
         return relists;
     }
 
@@ -608,7 +629,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     @Override
-    public List<NfsDataInfo> listNfsPerformance(List<String> fsIds) throws DMEException {
+    public List<NfsDataInfo> listNfsPerformance(List<String> fsIds) throws DmeException {
         List<NfsDataInfo> relists = null;
         try {
             if (fsIds != null && fsIds.size() > 0) {
@@ -625,10 +646,18 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                             if (statisticObject != null) {
                                 NfsDataInfo nfsDataInfo = new NfsDataInfo();
                                 nfsDataInfo.setFsId(fsId);
-                                nfsDataInfo.setOps(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_FS_THROUGHPUT, "max"), null));
-                                nfsDataInfo.setBandwidth(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_FS_BANDWIDTH, "max"), null));
-                                nfsDataInfo.setReadResponseTime(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_FS_READRESPONSETIME, "max"), null));
-                                nfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_FS_WRITERESPONSETIME, "max"), null));
+                                nfsDataInfo.setOps(ToolUtils.jsonToFloat(ToolUtils
+                                    .getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_FS_THROUGHPUT,
+                                        "max"), null));
+                                nfsDataInfo.setBandwidth(ToolUtils.jsonToFloat(ToolUtils
+                                    .getStatistcValue(statisticObject, DmeIndicatorConstants.COUNTER_ID_FS_BANDWIDTH,
+                                        "max"), null));
+                                nfsDataInfo.setReadResponseTime(ToolUtils.jsonToFloat(ToolUtils
+                                    .getStatistcValue(statisticObject,
+                                        DmeIndicatorConstants.COUNTER_ID_FS_READRESPONSETIME, "max"), null));
+                                nfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(ToolUtils
+                                    .getStatistcValue(statisticObject,
+                                        DmeIndicatorConstants.COUNTER_ID_FS_WRITERESPONSETIME, "max"), null));
                                 relists.add(nfsDataInfo);
                             }
                         }
@@ -637,7 +666,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             }
         } catch (Exception e) {
             LOG.error("list nfs performance error:", e);
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
         //LOG.info("listNfsPerformance relists===" + (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
         return relists;
@@ -655,7 +684,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
      * @return: ResponseBodyBean
      */
     @Override
-    public void mountNfs(Map<String, Object> params) throws DMEException {
+    public void mountNfs(Map<String, Object> params) throws DmeException {
         if (params != null && null != params.get("dataStoreObjectId")) {
             String dataStoreObjectId = ToolUtils.getStr(params.get("dataStoreObjectId"));
 
@@ -682,27 +711,27 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                             //String mountType = null;
                             if (params.get("hostObjectId") != null) {
                                 hostObjectId = ToolUtils.getStr(params.get("hostObjectId"));
-                                logicPortIp= ToolUtils.getStr( params.get("hostVkernelIp"));
+                                logicPortIp = ToolUtils.getStr(params.get("hostVkernelIp"));
                             }
                         /*if (params.get("clusters") != null) {
                             clusters = (List<Map<String, String>>) params.get("clusters");
                         }*/
                             vcsdkUtils.mountNfs(dataStoreObjectId,
-                                    hostObjectId, logicPortIp, ToolUtils.getStr(params.get("mountType")));
+                                hostObjectId, logicPortIp, ToolUtils.getStr(params.get("mountType")));
 
                         } else {
-                            throw new DMEException("DME mount nfs error(task status)!");
+                            throw new DmeException("DME mount nfs error(task status)!");
                         }
                     } else {
-                        throw new DMEException("DME mount nfs error(task is null)!");
+                        throw new DmeException("DME mount nfs error(task is null)!");
                     }
                 }
             } else {
-                throw new DMEException("DME dataStore ObjectId is null!");
+                throw new DmeException("DME dataStore ObjectId is null!");
             }
 
         } else {
-            throw new DMEException("Mount nfs parameter exception:" + params);
+            throw new DmeException("Mount nfs parameter exception:" + params);
         }
     }
 
@@ -733,7 +762,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
             Map<String, Object> addition = new HashMap<>();
             addition.put("name", vkernelIp);
-            String accessval = ("readOnly".equalsIgnoreCase(ToolUtils.getStr(params.get("mountType")))) ? "read-only" : "read/write";
+            String accessval =
+                ("readOnly".equalsIgnoreCase(ToolUtils.getStr(params.get("mountType")))) ? "read-only" : "read/write";
             addition.put("accessval", accessval);
             addition.put("all_squash", "no_all_squash");
             addition.put("root_squash", "root_squash");
@@ -745,7 +775,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
             LOG.info("mountnfs requestbody==" + gson.toJson(requestbody));
 
-            String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace("{nfs_share_id}", ToolUtils.getStr(params.get("shareId")));
+            String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL
+                .replace("{nfs_share_id}", ToolUtils.getStr(params.get("shareId")));
             LOG.info("mountnfs URL===" + url);
             ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(requestbody));
 
@@ -766,7 +797,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     //卸载NFS
     @Override
-    public void unmountNfs(Map<String, Object> params) throws DMEException {
+    public void unmountNfs(Map<String, Object> params) throws DmeException {
         // 过滤vm注册的主机和集群,此步骤暂未处理
         if (null != params) {
             String dataStoreObjectId = ToolUtils.getStr(params.get("dataStoreObjectId"));
@@ -818,10 +849,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                             if (unmountFlag) { //DME NFS SHAER 删除authClient完成
                                 LOG.info("unmountNfs delete authClient success!");
                             } else {
-                                throw new DMEException("DME mount nfs error(task status)!");
+                                throw new DmeException("DME mount nfs error(task status)!");
                             }
                         } else {
-                            throw new DMEException("DME mount nfs error(task is null)!");
+                            throw new DmeException("DME mount nfs error(task is null)!");
                         }
                     } else {
                         LOG.info("unmount nfs dme fs authClient is null!!!");
@@ -830,12 +861,12 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 }
             }
         } else {
-            throw new DMEException("unmount nfs parameter exception:" + params);
+            throw new DmeException("unmount nfs parameter exception:" + params);
         }
     }
 
     @Override
-    public void deleteNfs(Map<String, Object> params) throws DMEException {
+    public void deleteNfs(Map<String, Object> params) throws DmeException {
         if (null != params) {
             String dataStorageId = ToolUtils.getStr(params.get("dataStoreObjectId"));
             List<Map<String, Object>> hosts = getHostsMountDataStoreByDsObjectId(dataStorageId);
@@ -873,7 +904,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                     if (deleteFlag) { //DME NFS 删除 SHAER FS
                         LOG.info("Nfs delete share fs success!");
                     } else {
-                        throw new DMEException("DME delete nfs error(task status)!");
+                        throw new DmeException("DME delete nfs error(task status)!");
                     }
                 }
             }
@@ -927,7 +958,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         requestbody.put("nfs_share_ids", shareIds);
         LOG.info("delete nfs share requestbody==" + gson.toJson(requestbody));
         try {
-            ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
+            ResponseEntity responseEntity = dmeAccessService
+                .access(DmeConstants.DME_NFS_SHARE_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
             LOG.info("delete nfs share responseEntity==" + responseEntity.toString());
             if (responseEntity.getStatusCodeValue() == 202) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -948,7 +980,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         requestbody.put("file_system_ids", fsIds);
         LOG.info("delete nfs fs requestbody==" + gson.toJson(requestbody));
         try {
-            ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_FS_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
+            ResponseEntity responseEntity =
+                dmeAccessService.access(DmeConstants.DME_NFS_FS_DELETE_URL, HttpMethod.POST, gson.toJson(requestbody));
             LOG.info("delete nfs fs responseEntity==" + responseEntity.toString());
             if (responseEntity.getStatusCodeValue() == 202) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -964,7 +997,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     @Override
-    public List<Map<String, Object>> getHostsMountDataStoreByDsObjectId(String dataStoreObjectId) throws DMEException {
+    public List<Map<String, Object>> getHostsMountDataStoreByDsObjectId(String dataStoreObjectId) throws DmeException {
         List<Map<String, Object>> lists = null;
         try {
             //取得vcenter中的所有挂载了当前存储的host
@@ -976,14 +1009,16 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             }
         } catch (Exception e) {
             LOG.error("get Hosts MountDataStore By DsObjectId error:", e);
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
-        LOG.info("getHostsMountDataStoreByDsObjectId===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
+        LOG.info("getHostsMountDataStoreByDsObjectId===" +
+            (lists == null ? "null" : (lists.size())));
         return lists;
     }
 
     @Override
-    public List<Map<String, Object>> getClusterMountDataStoreByDsObjectId(String dataStoreObjectId) throws DMEException {
+    public List<Map<String, Object>> getClusterMountDataStoreByDsObjectId(String dataStoreObjectId)
+        throws DmeException {
         List<Map<String, Object>> lists = null;
         try {
             //取得vcenter中的所有挂载了当前存储的host
@@ -995,9 +1030,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             }
         } catch (Exception e) {
             LOG.error("get Clusters MountDataStore By DsObjectId error:", e);
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
-        LOG.info("getClustersMountDataStoreByDsObjectId===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
+        LOG.info("getClustersMountDataStoreByDsObjectId===" +
+            (lists == null ? "null" : (lists.size())));
         return lists;
     }
 

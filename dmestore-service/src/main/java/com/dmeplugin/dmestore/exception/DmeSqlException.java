@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.exception;
 
-public class DmeSqlException extends DMEException{
+public class DmeSqlException extends DmeException {
     public DmeSqlException() {
         super();
     }
@@ -11,10 +11,11 @@ public class DmeSqlException extends DMEException{
 
     /**
      * 构造方法.
+     *
      * @param code 错误编码
      * @param message 错误信息
      */
     public DmeSqlException(String code, String message) {
-        super(code,message);
+        super(code, message);
     }
 }

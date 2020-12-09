@@ -1,120 +1,106 @@
 package com.dmeplugin.dmestore.task;
 
+import static org.quartz.CronScheduleBuilder.cronSchedule;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.TriggerBuilder.newTrigger;
+
 import com.dmeplugin.dmestore.dao.ScheduleDao;
 import com.dmeplugin.dmestore.entity.ScheduleConfig;
-import org.quartz.*;
-import org.quartz.impl.StdSchedulerFactory;
+
+import org.quartz.CronTrigger;
+import org.quartz.JobDetail;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.util.List;
 
-import static org.quartz.CronScheduleBuilder.cronSchedule;
-import static org.quartz.JobBuilder.newJob;
-import static org.quartz.TriggerBuilder.newTrigger;
-
+/**
+ * ScheduleSetting
+ *
+ * @author Administrator
+ * @since 2020-12-08
+ */
 @Component
-public class ScheduleSetting   {
+public class ScheduleSetting {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleSetting.class);
-
+    private static List<ScheduleConfig> scheduleList;
+    private static final int CHARLENGTH = 32;
     @Autowired
     private ScheduleDao scheduleDao;
-
-
     @Autowired
     private QuartzConfig quartzConfig;
 
-
-    private static List<ScheduleConfig> scheduleList;
-
-
-
+    /**
+     * reconfigureTasks
+     */
     public void reconfigureTasks() {
-
         // 获取所有任务
         scheduleList = scheduleDao.getScheduleList();
-        LOGGER.info("schedule size="+scheduleList.size());
-        for (ScheduleConfig s : scheduleList){
+        LOGGER.info("schedule size:{}",scheduleList.size());
+        for (ScheduleConfig scheduleConfig : scheduleList) {
             try {
                 Class clazz;
-                clazz = Class.forName(s.getClassName());
+                clazz = Class.forName(scheduleConfig.getClassName());
                 JobDetail job = newJob(clazz)
-                        .withIdentity(s.getClassName(), "group1")
-                        .build();
-                quartzConfig.getScheduler().scheduleJob(job, getTrigger(s));
-            }catch (Exception e){
-                LOGGER.error("job error",e);
+                    .withIdentity(scheduleConfig.getClassName(), "group1")
+                    .build();
+                quartzConfig.getScheduler().scheduleJob(job, getTrigger(scheduleConfig));
+            } catch (ClassNotFoundException | SchedulerException e) {
+                LOGGER.error("job error", e);
             }
         }
     }
 
-    //刷新任务
-    public void refreshTasks(Integer taskId,String cron){
+    /**
+     * 刷新任务
+     *
+     * @param taskId taskId
+     * @param cron cron
+     */
+    public void refreshTasks(Integer taskId, String cron) {
         // 获取所有任务
-        if(scheduleList!=null) {
-            LOGGER.info("schedule size=" + scheduleList.size());
-            for (ScheduleConfig s : scheduleList) {
-                if (s.getId() == taskId) {
-                    s.setCron(cron);
+        if (scheduleList != null) {
+            LOGGER.info("schedule size:{}",scheduleList.size());
+            for (ScheduleConfig scheduleConfig : scheduleList) {
+                if (scheduleConfig.getId() == taskId) {
+                    scheduleConfig.setCron(cron);
                 }
             }
         }
         try {
             quartzConfig.getScheduler().clear();
         } catch (SchedulerException e) {
-            LOGGER.error("quartzConfig job error",e);
+            LOGGER.error("quartzConfig job error", e);
         }
         reconfigureTasks();
     }
 
-
     /**
      * 转换首字母小写
      *
-     * @param str
-     * @return
+     * @param str str
+     * @return String
      */
     public static String lowerFirstCapse(String str) {
         char[] chars = str.toCharArray();
-        chars[0] += 32;
+        chars[0] += CHARLENGTH;
         return String.valueOf(chars);
     }
 
     /**
-     * runnable
-     * @param scheduleConfig
-     * @return
-     */
-    private Job getRunnable(ScheduleConfig scheduleConfig){
-        Class<?> clazz;
-        Object bean = null;
-        try {
-            clazz = Class.forName(scheduleConfig.getClassName());
-            String className = lowerFirstCapse(clazz.getSimpleName());
-              bean = ApplicationContextHelper.getBean(className);
-
-        }catch (ClassNotFoundException e){
-            LOGGER.error("ClassNotFoundException",e);
-        }
-
-        return (Job) bean;
-    }
-
-    /**
      * Trigger
+     *
      * @param scheduleConfig
      * @return
      */
-    private CronTrigger getTrigger(ScheduleConfig scheduleConfig){
+    private CronTrigger getTrigger(ScheduleConfig scheduleConfig) {
         return newTrigger()
-                .withIdentity(scheduleConfig.getClassName(), "group1")
-                .startNow()
-                .withSchedule(cronSchedule(scheduleConfig.getCron()))
-                .build();
-
-
+            .withIdentity(scheduleConfig.getClassName(), "group1")
+            .startNow()
+            .withSchedule(cronSchedule(scheduleConfig.getCron()))
+            .build();
     }
 }

@@ -1,386 +1,848 @@
 package com.dmeplugin.dmestore.model;
 
 
+import java.util.Arrays;
+
 /**
+ * StorageDetail
+ *
  * @author lianq
- * @className StorageDetail
- * @description TODO
- * @date 2020/9/4 10:11
+ * @ClassName: StorageDetail
+ * @since 2020-12-08
  */
 public class StorageDetail {
-
-    private String id;
-    //名称
-    private String name;
-    //ip地址
-    private String ip;
-    //状态 运行状态 0-离线 1-正常 2-故障 9-未管理。
-    private String status;
-    //同步状态 同步状态 0-未同步 1-同步中 2-同步完成。
-    private String synStatus;
-    //设备序列号。
-    private String sn;
-    //厂商
-    private String vendor;
-    //产品型号
-    private String model;
-    //已用容量 （单位:MB）
-    private Double usedCapacity;
-    //裸容量（单位:MB）。
-    private Double totalCapacity;
-    //可得容量 （总容量）
-    private Double totalEffectiveCapacity;
-    //空闲容量
-    private Double freeEffectiveCapacity;
-
-    //订阅容量
-    private Double subscriptionCapacity;
-
-    //容量分布
-    //保护容量
-    private Double protectionCapacity;
-    //文件系统
-    private Double fileCapacity;
-    //卷
-    private Double blockCapacity;
-
     /**
-     *去重容量
+     * id .
+     */
+    private String id;
+    /**
+     * 名称 .
+     */
+    private String name;
+    /**
+     * ip地址 .
+     */
+    private String ip;
+    /**
+     * 状态 运行状态 0-离线 1-正常 2-故障 9-未管理 .
+     */
+    private String status;
+    /**
+     * 同步状态 同步状态 0-未同步 1-同步中 2-同步完成.
+     */
+    private String synStatus;
+    /**
+     * 设备序列号 .
+     */
+    private String sn;
+    /**
+     * 厂商 .
+     */
+    private String vendor;
+    /**
+     * 产品型号 .
+     */
+    private String model;
+    /**
+     * 已用容量 （单位:MB） .
+     */
+    private Double usedCapacity;
+    /**
+     * 裸容量（单位:MB）.
+     */
+    private Double totalCapacity;
+    /**
+     * 可得容量 .
+     */
+    private Double totalEffectiveCapacity;
+    /**
+     * 空闲容量 .
+     */
+    private Double freeEffectiveCapacity;
+    /**
+     * 订阅容量 .
+     */
+    private Double subscriptionCapacity;
+    /**
+     * 保护容量 /容量分布.
+     */
+    private Double protectionCapacity;
+    /**
+     * 文件系统 .
+     */
+    private Double fileCapacity;
+    /**
+     * 卷 .
+     */
+    private Double blockCapacity;
+    /**
+     * 去重容量.
      **/
     private Double dedupedCapacity;
     /**
-     *压缩容量
+     * 压缩容量.
      **/
     private Double compressedCapacity;
-
     /**
-     *节省后容量
+     * 节省后容量.
      **/
     private Double optimizeCapacity;
-
-    private String[] azIds;
-    private String storagePool;
-    private String volume;
-    private String fileSystem;
-    private String dTrees;
-    private String nfsShares;
-    private String bandPorts;
-    private String logicPorts;
-    private String storageControllers;
-    private String storageDisks;
-
-    //补充字段
-    //固件版本
-    private String productVersion;
-    //警告
-    private String warning;
-    //事件
-    private String event;
-
     /**
-     *位置
+     * azIds .
+     */
+    private String[] azIds;
+    /**
+     * storagePool .
+     */
+    private String storagePool;
+    /**
+     * volume .
+     */
+    private String volume;
+    /**
+     * fileSystem .
+     */
+    private String fileSystem;
+    /**
+     * dTrees .
+     */
+    private String dTrees;
+    /**
+     * nfsShares .
+     */
+    private String nfsShares;
+    /**
+     * bandPorts .
+     */
+    private String bandPorts;
+    /**
+     * logicPorts .
+     */
+    private String logicPorts;
+    /**
+     * storageControllers .
+     */
+    private String storageControllers;
+    /**
+     * storageDisks .
+     */
+    private String storageDisks;
+    /**
+     * productVersion .
+     */
+    private String productVersion;
+    /**
+     * 警告 .
+     */
+    private String warning;
+    /**
+     * 事件 .
+     */
+    private String event;
+    /**
+     * 位置.
      **/
     private String location;
     /**
-     *补丁版本
+     * 补丁版本.
      **/
     private String patchVersion;
     /**
-     *维保开始时间
+     * 维保开始时间.
      **/
     private String maintenanceStart;
     /**
-     *维保结束时间
+     * 维保结束时间.
      **/
     private String maintenanceOvertime;
 
+    /**
+     * getPatchVersion .
+     *
+     * @return String .
+     */
     public String getPatchVersion() {
         return patchVersion;
     }
 
-    public void setPatchVersion(String patchVersion) {
-        this.patchVersion = patchVersion;
+    /**
+     * setPatchVersion .
+     *
+     * @param param .
+     */
+    public void setPatchVersion(final String param) {
+        this.patchVersion = param;
     }
 
+    /**
+     * getMaintenanceStart .
+     *
+     * @return String .
+     */
     public String getMaintenanceStart() {
         return maintenanceStart;
     }
 
-    public void setMaintenanceStart(String maintenanceStart) {
-        this.maintenanceStart = maintenanceStart;
+    /**
+     * setMaintenanceStart .
+     *
+     * @param param .
+     */
+    public void setMaintenanceStart(final String param) {
+        this.maintenanceStart = param;
     }
 
+    /**
+     * getMaintenanceOvertime .
+     *
+     * @return String .
+     */
     public String getMaintenanceOvertime() {
         return maintenanceOvertime;
     }
 
-    public void setMaintenanceOvertime(String maintenanceOvertime) {
-        this.maintenanceOvertime = maintenanceOvertime;
+    /**
+     * setMaintenanceOvertime .
+     *
+     * @param param .
+     */
+    public void setMaintenanceOvertime(final String param) {
+        this.maintenanceOvertime = param;
     }
 
+    /**
+     * getWarning .
+     *
+     * @return String .
+     */
     public String getWarning() {
         return warning;
     }
 
-    public void setWarning(String warning) {
-        this.warning = warning;
+    /**
+     * setWarning .
+     *
+     * @param param .
+     */
+    public void setWarning(final String param) {
+        this.warning = param;
     }
 
+    /**
+     * getEvent .
+     *
+     * @return String .
+     */
     public String getEvent() {
         return event;
     }
 
-    public void setEvent(String event) {
-        this.event = event;
+    /**
+     * setEvent .
+     *
+     * @param param .
+     */
+    public void setEvent(final String param) {
+        this.event = param;
     }
 
+    /**
+     * getStoragePool .
+     *
+     * @return String .
+     */
     public String getStoragePool() {
         return storagePool;
     }
 
-    public void setStoragePool(String storagePool) {
-        this.storagePool = storagePool;
+    /**
+     * setStoragePool .
+     *
+     * @param param .
+     */
+    public void setStoragePool(final String param) {
+        this.storagePool = param;
     }
 
+    /**
+     * getVolume .
+     *
+     * @return String .
+     */
     public String getVolume() {
         return volume;
     }
 
-    public void setVolume(String volume) {
-        this.volume = volume;
+    /**
+     * setVolume .
+     *
+     * @param param .
+     */
+    public void setVolume(final String param) {
+        this.volume = param;
     }
 
+    /**
+     * getFileSystem .
+     *
+     * @return String .
+     */
     public String getFileSystem() {
         return fileSystem;
     }
 
-    public void setFileSystem(String fileSystem) {
-        this.fileSystem = fileSystem;
+    /**
+     * setFileSystem .
+     *
+     * @param param .
+     */
+    public void setFileSystem(final String param) {
+        this.fileSystem = param;
     }
 
+    /**
+     * getdTrees .
+     *
+     * @return String .
+     */
     public String getdTrees() {
         return dTrees;
     }
 
-    public void setdTrees(String dTrees) {
-        this.dTrees = dTrees;
+    /**
+     * setdTrees .
+     *
+     * @param param .
+     */
+    public void setdTrees(final String param) {
+        this.dTrees = param;
     }
 
+    /**
+     * getNfsShares .
+     *
+     * @return String .
+     */
     public String getNfsShares() {
         return nfsShares;
     }
 
-    public void setNfsShares(String nfsShares) {
-        this.nfsShares = nfsShares;
+    /**
+     * setNfsShares .
+     *
+     * @param param .
+     */
+    public void setNfsShares(final String param) {
+        this.nfsShares = param;
     }
 
+    /**
+     * getBandPorts .
+     *
+     * @return String .
+     */
     public String getBandPorts() {
         return bandPorts;
     }
 
-    public void setBandPorts(String bandPorts) {
-        this.bandPorts = bandPorts;
+    /**
+     * setBandPorts .
+     *
+     * @param param .
+     */
+    public void setBandPorts(final String param) {
+        this.bandPorts = param;
     }
 
+    /**
+     * getLogicPorts .
+     *
+     * @return String .
+     */
     public String getLogicPorts() {
         return logicPorts;
     }
 
-    public void setLogicPorts(String logicPorts) {
-        this.logicPorts = logicPorts;
+    /**
+     * setLogicPorts .
+     *
+     * @param param .
+     */
+    public void setLogicPorts(final String param) {
+        this.logicPorts = param;
     }
 
+    /**
+     * getStorageControllers .
+     *
+     * @return String .
+     */
     public String getStorageControllers() {
         return storageControllers;
     }
 
-    public void setStorageControllers(String storageControllers) {
-        this.storageControllers = storageControllers;
+    /**
+     * setStorageControllers .
+     *
+     * @param param .
+     */
+    public void setStorageControllers(final String param) {
+        this.storageControllers = param;
     }
 
+    /**
+     * getStorageDisks .
+     *
+     * @return String .
+     */
     public String getStorageDisks() {
         return storageDisks;
     }
 
-    public void setStorageDisks(String storageDisks) {
-        this.storageDisks = storageDisks;
+    /**
+     * setStorageDisks .
+     *
+     * @param param .
+     */
+    public void setStorageDisks(final String param) {
+        this.storageDisks = param;
     }
 
+    /**
+     * getId .
+     *
+     * @return String .
+     */
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setId(final String param) {
+        this.id = param;
     }
 
+    /**
+     * getName .
+     *
+     * @return String .
+     */
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setName .
+     *
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
 
+    /**
+     * getIp .
+     *
+     * @return String .
+     */
     public String getIp() {
         return ip;
     }
 
-    public void setIp(String ip) {
-        this.ip = ip;
+    /**
+     * setIp .
+     *
+     * @param param .
+     */
+    public void setIp(final String param) {
+        this.ip = param;
     }
 
+    /**
+     * getStatus .
+     *
+     * @return String .
+     */
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    /**
+     * setStatus .
+     *
+     * @param param .
+     */
+    public void setStatus(final String param) {
+        this.status = param;
     }
 
+    /**
+     * getSynStatus .
+     *
+     * @return String .
+     */
     public String getSynStatus() {
         return synStatus;
     }
 
-    public void setSynStatus(String synStatus) {
-        this.synStatus = synStatus;
+    /**
+     * setSynStatus .
+     *
+     * @param param .
+     */
+    public void setSynStatus(final String param) {
+        this.synStatus = param;
     }
 
+    /**
+     * getSn .
+     *
+     * @return String .
+     */
     public String getSn() {
         return sn;
     }
 
-    public void setSn(String sn) {
-        this.sn = sn;
+    /**
+     * setSn .
+     *
+     * @param param .
+     */
+    public void setSn(final String param) {
+        this.sn = param;
     }
 
+    /**
+     * getVendor .
+     *
+     * @return String .
+     */
     public String getVendor() {
         return vendor;
     }
 
-    public void setVendor(String vendor) {
-        this.vendor = vendor;
+    /**
+     * setVendor .
+     *
+     * @param param .
+     */
+    public void setVendor(final String param) {
+        this.vendor = param;
     }
 
+    /**
+     * getModel .
+     *
+     * @return String .
+     */
     public String getModel() {
         return model;
     }
 
-    public void setModel(String model) {
-        this.model = model;
+    /**
+     * setModel .
+     *
+     * @param param .
+     */
+    public void setModel(final String param) {
+        this.model = param;
     }
 
+    /**
+     * getProductVersion .
+     *
+     * @return String .
+     */
     public String getProductVersion() {
         return productVersion;
     }
 
-    public void setProductVersion(String productVersion) {
-        this.productVersion = productVersion;
+    /**
+     * setProductVersion .
+     *
+     * @param param .
+     */
+    public void setProductVersion(final String param) {
+        this.productVersion = param;
     }
 
-
+    /**
+     * getLocation .
+     *
+     * @return String .
+     */
     public String getLocation() {
         return location;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    /**
+     * setLocation .
+     *
+     * @param param .
+     */
+    public void setLocation(final String param) {
+        this.location = param;
     }
 
+    /**
+     * getAzIds .
+     *
+     * @return String[] .
+     */
     public String[] getAzIds() {
         return azIds;
     }
 
-    public void setAzIds(String[] azIds) {
-        this.azIds = azIds;
+    /**
+     * setAzIds .
+     *
+     * @param param .
+     */
+    public void setAzIds(final String[] param) {
+        this.azIds = param;
     }
 
+    /**
+     * getUsedCapacity .
+     *
+     * @return Double .
+     */
     public Double getUsedCapacity() {
         return usedCapacity;
     }
 
-    public void setUsedCapacity(Double usedCapacity) {
-        this.usedCapacity = usedCapacity;
+    /**
+     * setUsedCapacity .
+     *
+     * @param param .
+     */
+    public void setUsedCapacity(final Double param) {
+        this.usedCapacity = param;
     }
 
+    /**
+     * getTotalCapacity .
+     *
+     * @return Double .
+     */
     public Double getTotalCapacity() {
         return totalCapacity;
     }
 
-    public void setTotalCapacity(Double totalCapacity) {
-        this.totalCapacity = totalCapacity;
+    /**
+     * setTotalCapacity .
+     *
+     * @param param .
+     */
+    public void setTotalCapacity(final Double param) {
+        this.totalCapacity = param;
     }
 
+    /**
+     * getTotalEffectiveCapacity .
+     *
+     * @return Double .
+     */
     public Double getTotalEffectiveCapacity() {
         return totalEffectiveCapacity;
     }
 
-    public void setTotalEffectiveCapacity(Double totalEffectiveCapacity) {
-        this.totalEffectiveCapacity = totalEffectiveCapacity;
+    /**
+     * setTotalEffectiveCapacity .
+     *
+     * @param param .
+     */
+    public void setTotalEffectiveCapacity(final Double param) {
+        this.totalEffectiveCapacity = param;
     }
 
+    /**
+     * getFreeEffectiveCapacity .
+     *
+     * @return Double .
+     */
     public Double getFreeEffectiveCapacity() {
         return freeEffectiveCapacity;
     }
 
-    public void setFreeEffectiveCapacity(Double freeEffectiveCapacity) {
-        this.freeEffectiveCapacity = freeEffectiveCapacity;
+    /**
+     * setFreeEffectiveCapacity .
+     *
+     * @param param .
+     */
+    public void setFreeEffectiveCapacity(final Double param) {
+        this.freeEffectiveCapacity = param;
     }
 
-
+    /**
+     * getSubscriptionCapacity .
+     *
+     * @return Double .
+     */
     public Double getSubscriptionCapacity() {
         return subscriptionCapacity;
     }
 
-    public void setSubscriptionCapacity(Double subscriptionCapacity) {
-        this.subscriptionCapacity = subscriptionCapacity;
+    /**
+     * setSubscriptionCapacity .
+     *
+     * @param param .
+     */
+    public void setSubscriptionCapacity(final Double param) {
+        this.subscriptionCapacity = param;
     }
 
+    /**
+     * getProtectionCapacity .
+     *
+     * @return Double .
+     */
     public Double getProtectionCapacity() {
         return protectionCapacity;
     }
 
-    public void setProtectionCapacity(Double protectionCapacity) {
-        this.protectionCapacity = protectionCapacity;
+    /**
+     * setProtectionCapacity .
+     *
+     * @param param .
+     */
+    public void setProtectionCapacity(final Double param) {
+        this.protectionCapacity = param;
     }
 
+    /**
+     * getFileCapacity .
+     *
+     * @return String .
+     */
     public Double getFileCapacity() {
         return fileCapacity;
     }
 
-    public void setFileCapacity(Double fileCapacity) {
-        this.fileCapacity = fileCapacity;
+    /**
+     * setFileCapacity .
+     *
+     * @param param .
+     */
+    public void setFileCapacity(final Double param) {
+        this.fileCapacity = param;
     }
 
+    /**
+     * getBlockCapacity .
+     *
+     * @return Double .
+     */
     public Double getBlockCapacity() {
         return blockCapacity;
     }
 
-    public void setBlockCapacity(Double blockCapacity) {
-        this.blockCapacity = blockCapacity;
+    /**
+     * setBlockCapacity .
+     *
+     * @param param .
+     */
+    public void setBlockCapacity(final Double param) {
+        this.blockCapacity = param;
     }
 
+    /**
+     * getDedupedCapacity .
+     *
+     * @return Double .
+     */
     public Double getDedupedCapacity() {
         return dedupedCapacity;
     }
 
-    public void setDedupedCapacity(Double dedupedCapacity) {
-        this.dedupedCapacity = dedupedCapacity;
+    /**
+     * setDedupedCapacity .
+     *
+     * @param param .
+     */
+    public void setDedupedCapacity(final Double param) {
+        this.dedupedCapacity = param;
     }
 
+    /**
+     * getCompressedCapacity .
+     *
+     * @return Double .
+     */
     public Double getCompressedCapacity() {
         return compressedCapacity;
     }
 
-    public void setCompressedCapacity(Double compressedCapacity) {
-        this.compressedCapacity = compressedCapacity;
+    /**
+     * setCompressedCapacity .
+     *
+     * @param param .
+     */
+    public void setCompressedCapacity(final Double param) {
+        this.compressedCapacity = param;
     }
 
+    /**
+     * getOptimizeCapacity .
+     *
+     * @return Double .
+     */
     public Double getOptimizeCapacity() {
         return optimizeCapacity;
     }
 
-    public void setOptimizeCapacity(Double optimizeCapacity) {
-        this.optimizeCapacity = optimizeCapacity;
+    /**
+     * setOptimizeCapacity .
+     *
+     * @param param .
+     */
+    public void setOptimizeCapacity(final Double param) {
+        this.optimizeCapacity = param;
+    }
+
+    @Override
+    public final String toString() {
+        return "StorageDetail{"
+            + "id='" + id + '\''
+            + ", name='" + name + '\''
+            + ", ip='" + ip + '\''
+            + ", status='" + status + '\''
+            + ", synStatus='" + synStatus + '\''
+            + ", sn='" + sn + '\''
+            + ", vendor='" + vendor + '\''
+            + ", model='" + model + '\''
+            + ", usedCapacity=" + usedCapacity
+            + ", totalCapacity=" + totalCapacity
+            + ", totalEffectiveCapacity=" + totalEffectiveCapacity
+            + ", freeEffectiveCapacity=" + freeEffectiveCapacity
+            + ", subscriptionCapacity=" + subscriptionCapacity
+            + ", protectionCapacity=" + protectionCapacity
+            + ", fileCapacity=" + fileCapacity
+            + ", blockCapacity=" + blockCapacity
+            + ", dedupedCapacity=" + dedupedCapacity
+            + ", compressedCapacity=" + compressedCapacity
+            + ", optimizeCapacity=" + optimizeCapacity
+            + ", azIds=" + Arrays.toString(azIds)
+            + ", storagePool='" + storagePool + '\''
+            + ", volume='" + volume + '\''
+            + ", fileSystem='" + fileSystem + '\''
+            + ", dTrees='" + dTrees + '\''
+            + ", nfsShares='" + nfsShares + '\''
+            + ", bandPorts='" + bandPorts + '\''
+            + ", logicPorts='" + logicPorts + '\''
+            + ", storageControllers='" + storageControllers + '\''
+            + ", storageDisks='" + storageDisks + '\''
+            + ", productVersion='" + productVersion + '\''
+            + ", warning='" + warning + '\''
+            + ", event='" + event + '\''
+            + ", location='" + location + '\''
+            + ", patchVersion='" + patchVersion + '\''
+            + ", maintenanceStart='" + maintenanceStart + '\''
+            + ", maintenanceOvertime='" + maintenanceOvertime + '\''
+            + '}';
     }
 }

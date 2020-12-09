@@ -1,19 +1,3 @@
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
 package com.dmeplugin.vmware.mo;
 
 public class DatastoreFile {
@@ -22,10 +6,6 @@ public class DatastoreFile {
     public DatastoreFile(String path) {
         assert (path != null);
         this.path = path;
-    }
-
-    public DatastoreFile(String datastoreName, String pathWithoutDatastoreName) {
-        path = String.format("[%s] %s", datastoreName, pathWithoutDatastoreName);
     }
 
     public DatastoreFile(String datastoreName, String dir, String fileName) {
@@ -44,6 +24,10 @@ public class DatastoreFile {
         return path;
     }
 
+    public void setPath(String path) {
+       this.path = path;
+    }
+
     public String getRelativePath() {
         int pos = path.indexOf(']');
         if (pos < 0) {
@@ -53,24 +37,6 @@ public class DatastoreFile {
         }
 
         return path.substring(pos).trim();
-    }
-
-    public String getDir() {
-        int startPos = path.indexOf("]");
-        if (startPos < 0) {
-            startPos = 0;
-        }
-
-        int endPos = path.lastIndexOf('/');
-        if (endPos < 0) {
-            endPos = 0;
-        }
-
-        if (endPos > startPos) {
-            return path.substring(startPos + 1, endPos).trim();
-        }
-
-        return "";
     }
 
     public String getFileName() {
@@ -87,29 +53,6 @@ public class DatastoreFile {
         } else {
             return path.substring(endPos + 1);
         }
-    }
-
-    public String getFileBaseName() {
-        String name = getFileName();
-        int endPos = name.lastIndexOf('.');
-        if (endPos < 0) {
-            return name;
-        }
-        return name.substring(0, endPos);
-    }
-
-    public String getFileExtName() {
-        String name = getFileName();
-        int endPos = name.lastIndexOf('.');
-        if (endPos < 0) {
-            return "";
-        }
-
-        return name.substring(endPos);
-    }
-
-    public String getCompanionPath(String companionFileName) {
-        return getCompanionDatastorePath(path, companionFileName);
     }
 
     public static boolean isFullDatastorePath(String path) {

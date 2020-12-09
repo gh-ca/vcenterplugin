@@ -1,6 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.constant.DmeConstants;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.exception.DmeSqlException;
 import com.dmeplugin.dmestore.model.TaskDetailInfo;
 import com.dmeplugin.dmestore.model.TaskDetailResource;
@@ -88,7 +89,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public JsonObject queryTaskByIdUntilFinish(String taskId) throws DMEException {
+    public JsonObject queryTaskByIdUntilFinish(String taskId) throws DmeException {
         String url = DmeConstants.QUERY_TASK_URL.replace("{task_id}", taskId);
         boolean loopFlag = true;
         int waitTime = 2 * 1000;
@@ -109,7 +110,7 @@ public class TaskServiceImpl implements TaskService {
                                 Thread.sleep(waitTime);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
-                                throw new DMEException(e.getMessage());
+                                throw new DmeException(e.getMessage());
                             }
                         }
                     }

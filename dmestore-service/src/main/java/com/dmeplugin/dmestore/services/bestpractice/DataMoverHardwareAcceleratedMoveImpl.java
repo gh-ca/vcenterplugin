@@ -3,7 +3,10 @@ package com.dmeplugin.dmestore.services.bestpractice;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 
 /**
+ * DataMoverHardwareAcceleratedMoveImpl
+ *
  * @author wangxiangyong
+ * @since 2020-11-30
  **/
 public class DataMoverHardwareAcceleratedMoveImpl extends BaseBestPracticeService implements BestPracticeService {
     @Override
@@ -17,7 +20,7 @@ public class DataMoverHardwareAcceleratedMoveImpl extends BaseBestPracticeServic
     }
 
     @Override
-    public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception{
+    public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         return super.getCurrentValue(vcsdkUtils, objectId, getHostSetting());
     }
 
@@ -42,7 +45,7 @@ public class DataMoverHardwareAcceleratedMoveImpl extends BaseBestPracticeServic
     }
 
     @Override
-    public void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception{
+    public void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         super.update(vcsdkUtils, objectId, getHostSetting(), getRecommendValue());
     }
 }

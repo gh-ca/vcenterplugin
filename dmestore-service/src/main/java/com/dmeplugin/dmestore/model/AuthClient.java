@@ -1,62 +1,161 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * BestPracticeUpResultResponse
+ *
  * @author wangxiangyong
+ *
+ * @since 2020-11-10
+ *
  **/
 public class AuthClient {
+    /**
+     * accessval .
+     */
     private String accessval;
+
+    /**
+     * id .
+     */
     private String id;
+
+    /**
+     * name .
+     */
     private String name;
+
+    /**
+     * secure .
+     */
     private String secure;
+
+    /**
+     * sync .
+     */
     private String sync;
+
+    /**
+     * type .
+     */
     private String type;
 
+    /**
+     * getAccessval .
+     *
+     * @return .
+     */
     public String getAccessval() {
         return accessval;
     }
 
-    public void setAccessval(String accessval) {
-        this.accessval = accessval;
+    /**
+     * setAccessval .
+     *
+     * @param param .
+     */
+    public void setAccessval(final String param) {
+        this.accessval = param;
     }
 
+    /**
+     * getId .
+     *
+     * @return String .
+     */
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setId(final String param) {
+        this.id = param;
     }
 
+    /**
+     * getName .
+     *
+     * @return .
+     */
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setName .
+     *
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
 
+    /**
+     * getSecure .
+     *
+     * @return .
+     */
     public String getSecure() {
         return secure;
     }
 
-    public void setSecure(String secure) {
-        this.secure = secure;
+    /**
+     * setSecure .
+     *
+     * @param param .
+     */
+    public void setSecure(final String param) {
+        this.secure = param;
     }
 
+    /**
+     * getSync .
+     *
+     * @return .
+     */
     public String getSync() {
         return sync;
     }
 
-    public void setSync(String sync) {
-        this.sync = sync;
+    /**
+     * setSync .
+     *
+     * @param param .
+     */
+    public void setSync(final String param) {
+        this.sync = param;
     }
 
+    /**
+     * getType .
+     *
+     * @return String .
+     */
     public String getType() {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    /**
+     * setType .
+     *
+     * @param param .
+     */
+    public void setType(final String param) {
+        this.type = param;
     }
 
+    @Override
+    public final String toString() {
+        return "AuthClient{"
+            + "accessval='" + accessval + '\''
+            + ", id='" + id + '\''
+            + ", name='" + name + '\''
+            + ", secure='" + secure + '\''
+            + ", sync='" + sync + '\''
+            + ", type='" + type + '\''
+            + '}';
+    }
 }

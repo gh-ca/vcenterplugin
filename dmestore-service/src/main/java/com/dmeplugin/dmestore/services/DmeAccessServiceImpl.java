@@ -1,9 +1,10 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.constant.DmeConstants;
 import com.dmeplugin.dmestore.dao.DmeInfoDao;
 import com.dmeplugin.dmestore.dao.ScheduleDao;
 import com.dmeplugin.dmestore.entity.DmeInfo;
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.task.ScheduleSetting;
 import com.dmeplugin.dmestore.utils.RestUtils;
 import com.dmeplugin.dmestore.utils.ToolUtils;
@@ -25,6 +26,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -32,15 +34,51 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Description: TODO
- * @ClassName: DmeAccessServiceImpl
- * @Company: GH-CA
- * @author: yy
- * @create: 2020-09-02
+ * DmeAccessServiceImpl
+ *
+ * @author yy
+ * @since 2020-09-03
  **/
 public class DmeAccessServiceImpl implements DmeAccessService {
-
     private static final Logger LOG = LoggerFactory.getLogger(DmeAccessServiceImpl.class);
+
+    private static final String NULL_STRING = "null";
+
+    private static final String HOST_IP = "hostIp";
+
+    private static final String HOST_PORT = "hostPort";
+
+    private static final String USER_NAME = "userName";
+
+    private static final String PASSWORD = "password";
+
+    private static final String TASK_DETAIL_CN = "detail_cn";
+
+    private static final String TASK_ID = "task_id";
+
+    private static final String VOLUME_IDS = "volume_ids";
+
+    private static final String HOST_COUNT = "host_count";
+
+    private static final String PORT_NAME = "port_name";
+
+    private static final String PROTOCOL = "protocol";
+
+    private static final String STATUS = "status";
+
+    private static final String ID_FIELD = "id";
+
+    private static final String NAME_FIELD = "name";
+
+    private static final String TYPE_FIELD = "type";
+
+    private static String dmeToken;
+
+    private static String dmeHostUrl;
+
+    private static String dmeHostIp;
+
+    private static Integer dmeHostPort;
 
     private DmeInfoDao dmeInfoDao;
 
@@ -59,74 +97,56 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     private Gson gson = new Gson();
 
-    private static String dmeToken;
-
-    private static String dmeHostUrl;
-
-    private static String dmeHostIp;
-
-    private static Integer dmeHostPort;
-
-    @Autowired
-    private RestTemplate restTemplate;
+    private RestUtils restUtils = new RestUtils();
 
     @Override
-    public void accessDme(Map<String, Object> params) throws DMEException {
-        try {
-            if (params != null) {
-                //判断与服务器的连接
-                ResponseEntity responseEntity = login(params);
-                if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
-                    //连接成功后，数据入库
-                    try {
-                        DmeInfo dmeInfo = new Gson().fromJson(params.toString(), DmeInfo.class);
-                        int re = dmeInfoDao.addDmeInfo(dmeInfo);
-                        LOG.info("accessDme re==" + re);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                        throw new DMEException("503", "连接信息保存失败:" + ex.getMessage());
-                    }
-                } else {
-                    throw new DMEException("503", "连接信息保存失败:" + responseEntity.toString());
+    public void accessDme(Map<String, Object> params) throws DmeException {
+        if (params != null) {
+            // 判断与服务器的连接
+            ResponseEntity responseEntity = login(params);
+            if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
+                // 连接成功后，数据入库
+                try {
+                    DmeInfo dmeInfo = new Gson().fromJson(params.toString(), DmeInfo.class);
+                    dmeInfoDao.addDmeInfo(dmeInfo);
+                } catch (DmeException ex) {
+                    throw new DmeException(DmeConstants.ERROR_CODE_503, "连接信息保存失败:" + ex.getMessage());
                 }
+            } else {
+                throw new DmeException(DmeConstants.ERROR_CODE_503, "连接信息保存失败:" + responseEntity.toString());
             }
-        } catch (Exception e) {
-            throw new DMEException("503", "连接信息保存失败:" + e.getMessage());
         }
     }
 
     @Override
-    public Map<String, Object> refreshDme() throws DMEException {
+    public Map<String, Object> refreshDme() throws DmeException {
         try {
-            //判断与服务器的连接
+            // 判断与服务器的连接
             ResponseEntity responseEntity = access(DmeConstants.REFRES_STATE_URL, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() != RestUtils.RES_STATE_I_200) {
-                throw new DMEException("503", "更新连接状态失败:" + responseEntity.toString());
+                throw new DmeException(DmeConstants.ERROR_CODE_503, "更新连接状态失败:" + responseEntity.toString());
             }
-
-        } catch (Exception e) {
-            throw new DMEException("503", "更新连接状态失败:" + e.toString());
+        } catch (DmeException e) {
+            throw new DmeException(DmeConstants.ERROR_CODE_503, "failed to update connection status:" + e.toString());
         }
 
-        Map<String, Object> params = new HashMap<>(16);
-        params.put("hostIp", dmeHostIp);
-        params.put("hostPort", dmeHostPort);
+        Map<String, Object> params = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+        params.put(HOST_IP, dmeHostIp);
+        params.put(HOST_PORT, dmeHostPort);
 
         return params;
     }
 
     @Override
-    public ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws DMEException {
-        ResponseEntity<String> responseEntity;
-
+    public ResponseEntity<String> access(String requestUrl, HttpMethod method, String requestBody) throws DmeException {
+        String url = requestUrl;
         if (StringUtils.isEmpty(dmeToken)) {
-            //如果token为空，就自动登录，获取token
-            LOG.info("token为空，自动登录，获取token");
+            // 如果token为空，就自动登录，获取token
+            LOG.info("token is null，automatic login to get token");
             iniLogin();
         }
 
-        /*RestUtils restUtils = new RestUtils();
-        RestTemplate restTemplate = restUtils.getRestTemplate();*/
+        RestTemplate restTemplate = restUtils.getRestTemplate();
 
         HttpHeaders headers = getHeaders();
 
@@ -134,49 +154,43 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         if (url.indexOf(DmeConstants.HTTP) < 0) {
             url = dmeHostUrl + url;
         }
+        ResponseEntity<String> responseEntity;
         try {
             responseEntity = restTemplate.exchange(url, method, entity, String.class);
         } catch (HttpClientErrorException e) {
-            LOG.error("HttpClientErrorException:" + e.toString());
+            LOG.error("HttpClientErrorException:{}", e.toString());
             responseEntity = new ResponseEntity(e.getStatusCode());
-
         }
-        LOG.info(url + "==responseEntity==" + (responseEntity == null ? "null" : responseEntity.getStatusCodeValue()));
+        LOG.info("{},==responseEntity==return:{}", url,
+            responseEntity == null ? NULL_STRING : responseEntity.getStatusCodeValue());
         if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_401
             || responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_403) {
-            //如果token失效，重新登录
+            LOG.info("token invalid, login again!");
             dmeToken = null;
-            LOG.info("token失效，重新登录，获取token");
             iniLogin();
-            //得到新token后，重新执行上次任务
-            LOG.info("得到新token成功，重新执行上次任务！url={}", url);
+            LOG.info("get the new token successfully, reexecute the previous task！url={}", url);
             headers = getHeaders();
             entity = new HttpEntity<>(requestBody, headers);
             responseEntity = restTemplate.exchange(url, method, entity, String.class);
         }
 
-        if (responseEntity.getStatusCodeValue() / 100 != 2) {
-            LOG.info("{} {}==执行失败，response={}, requestBody={}", url, method.name(), gson.toJson(responseEntity),
+        if (!String.valueOf(responseEntity.getStatusCodeValue()).startsWith("2")) {
+            LOG.info("{} {}==failed!，response={}, requestBody={}", url, method.name(), gson.toJson(responseEntity),
                 gson.toJson(requestBody));
         }
         return responseEntity;
     }
 
     @Override
-    public ResponseEntity<String> accessByJson(String url, HttpMethod method, String jsonBody) throws DMEException {
-        ResponseEntity<String> responseEntity;
-
+    public ResponseEntity<String> accessByJson(String requestUrl, HttpMethod method, String jsonBody)
+        throws DmeException {
+        String url = requestUrl;
         if (StringUtils.isEmpty(dmeToken)) {
-            //如果token为空，就自动登录，获取token
-            LOG.info("token为空，自动登录，获取token");
             iniLogin();
         }
-
-        /*RestUtils restUtils = new RestUtils();
-        RestTemplate restTemplate = restUtils.getRestTemplate();*/
-
+        RestTemplate restTemplate = restUtils.getRestTemplate();
         HttpHeaders headers = getHeaders();
-
+        ResponseEntity<String> responseEntity;
         HttpEntity<String> entity = new HttpEntity<>(null, headers);
         if (url.indexOf(DmeConstants.HTTP) < 0) {
             url = dmeHostUrl + url;
@@ -184,48 +198,38 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         try {
             responseEntity = restTemplate.exchange(url, method, entity, String.class, jsonBody);
         } catch (HttpClientErrorException e) {
-            LOG.error("HttpClientErrorException:" + e.toString());
+            LOG.error("HttpClientErrorException:{}", e.toString());
             responseEntity = new ResponseEntity<String>(e.getStatusCode());
-
         }
-        LOG.info(url + "==accessByJson responseEntity==" + (responseEntity == null
-            ? "null"
-            : responseEntity.getStatusCodeValue()));
+        LOG.info("{},==accessByJson responseEntity=={}", url,
+            responseEntity == null ? NULL_STRING : responseEntity.getStatusCodeValue());
         if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_401
             || responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_403) {
-            //如果token失效，重新登录
             dmeToken = null;
-            LOG.info("token失效，重新登录，获取token");
             iniLogin();
-            //得到新token后，重新执行上次任务
-            LOG.info("得到新token后，重新执行上次任务，dmeToken==" + dmeToken);
             headers = getHeaders();
             entity = new HttpEntity<>(null, headers);
             responseEntity = restTemplate.exchange(url, method, entity, String.class, jsonBody);
         }
 
-        if (responseEntity.getStatusCodeValue() / 100 != 2) {
-            LOG.info("{} {}==执行失败，response={}, jsonBody={}", url, method.name(), gson.toJson(responseEntity), jsonBody);
+        if (!String.valueOf(responseEntity.getStatusCodeValue()).startsWith("2")) {
+            LOG.info("{},{}==execution，response={}, jsonBody={}", url, method.name(), gson.toJson(responseEntity),
+                jsonBody);
         }
         return responseEntity;
     }
 
-    private synchronized ResponseEntity login(Map<String, Object> params) {
+    private synchronized ResponseEntity login(Map<String, Object> params) throws DmeException {
         ResponseEntity responseEntity = null;
         dmeToken = null;
         if (params != null && params.get(DmeConstants.HOSTIP) != null) {
-            /*RestUtils restUtils = new RestUtils();
-            RestTemplate restTemplate = restUtils.getRestTemplate();*/
-
+            RestTemplate restTemplate = restUtils.getRestTemplate();
             HttpHeaders headers = getHeaders();
-
-            Map<String, Object> requestbody = new HashMap<>(16);
-            requestbody.put("grantType", "password");
-            requestbody.put("userName", params.get("userName"));
-            requestbody.put("value", params.get("password"));
-
-            String hostUrl = "https://" + params.get("hostIp") + ":" + params.get("hostPort");
-
+            Map<String, Object> requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+            requestbody.put("grantType", PASSWORD);
+            requestbody.put(USER_NAME, params.get(USER_NAME));
+            requestbody.put("value", params.get(PASSWORD));
+            String hostUrl = "https:// " + params.get(HOST_IP) + ":" + params.get(HOST_PORT);
             HttpEntity<String> entity = new HttpEntity<>(gson.toJson(requestbody), headers);
             responseEntity = restTemplate.exchange(hostUrl + DmeConstants.LOGIN_DME_URL, HttpMethod.PUT, entity,
                 String.class);
@@ -235,12 +239,12 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 if (jsonObject != null && jsonObject.get(DmeConstants.ACCESSSESSION) != null) {
                     dmeToken = jsonObject.get("accessSession").getAsString();
                     dmeHostUrl = hostUrl;
-                    dmeHostIp = params.get("hostIp").toString();
-                    dmeHostPort = Integer.parseInt(params.get("hostPort").toString());
+                    dmeHostIp = params.get(HOST_IP).toString();
+                    dmeHostPort = Integer.parseInt(params.get(HOST_PORT).toString());
                 }
             } else {
-                LOG.info("hostUrl:{},userName={},password={}鉴权失败！", hostUrl, params.get("userName"),
-                    params.get("password"));
+                LOG.info("hostUrl:{},userName={},password={},authentication failed！", hostUrl, params.get(USER_NAME),
+                    params.get(PASSWORD));
             }
         }
 
@@ -258,26 +262,27 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         return headers;
     }
 
-    private synchronized void iniLogin() throws DMEException {
+    private synchronized void iniLogin() throws DmeException {
         if (StringUtils.isEmpty(dmeToken)) {
-            //查询数据库
+            // 查询数据库
             DmeInfo dmeInfo = dmeInfoDao.getDmeInfo();
             if (dmeInfo != null && dmeInfo.getHostIp() != null) {
-                Map<String, Object> params = new HashMap<>(16);
-                params.put("hostIp", dmeInfo.getHostIp());
-                params.put("hostPort", dmeInfo.getHostPort());
-                params.put("userName", dmeInfo.getUserName());
-                params.put("password", dmeInfo.getPassword());
-                //登录
+                Map<String, Object> params = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+                params.put(HOST_IP, dmeInfo.getHostIp());
+                params.put(HOST_PORT, dmeInfo.getHostPort());
+                params.put(USER_NAME, dmeInfo.getUserName());
+                params.put(PASSWORD, dmeInfo.getPassword());
+
+                // 登录
                 login(params);
             } else {
-                throw new DMEException("目前没有DME接入信息");
+                throw new DmeException("目前没有DME接入信息");
             }
         }
     }
 
     @Override
-    public List<Map<String, Object>> getWorkLoads(String storageId) throws DMEException {
+    public List<Map<String, Object>> getWorkLoads(String storageId) throws DmeException {
         List<Map<String, Object>> relists = null;
         try {
             if (!StringUtils.isEmpty(storageId)) {
@@ -289,98 +294,88 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                             .getAsJsonObject();
                         if (jsonObject != null && jsonObject.get(DmeConstants.DATAS) != null) {
                             JsonArray jsonArray = jsonObject.getAsJsonArray(DmeConstants.DATAS);
-                            if (jsonArray != null && jsonArray.size() > 0) {
-                                relists = new ArrayList<>();
-                                for (int i = 0; i < jsonArray.size(); i++) {
-                                    JsonObject vjson = jsonArray.get(i).getAsJsonObject();
-                                    if (vjson != null) {
-                                        Map<String, Object> map = new HashMap<>(16);
-                                        map.put("block_size", ToolUtils.jsonToStr(vjson.get("block_size")));
-                                        map.put("create_type", ToolUtils.jsonToStr(vjson.get("create_type")));
-                                        map.put("enable_compress", ToolUtils.jsonToBoo(vjson.get("enable_compress")));
-                                        map.put("enable_dedup", ToolUtils.jsonToBoo(vjson.get("enable_dedup")));
-                                        map.put("id", ToolUtils.jsonToStr(vjson.get("id")));
-                                        map.put("name", ToolUtils.jsonToStr(vjson.get("name")));
-                                        map.put("type", ToolUtils.jsonToStr(vjson.get("type")));
+                            relists = new ArrayList<>();
+                            for (int index = 0; index < jsonArray.size(); index++) {
+                                JsonObject vjson = jsonArray.get(index).getAsJsonObject();
+                                Map<String, Object> map = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+                                map.put("block_size", ToolUtils.jsonToStr(vjson.get("block_size")));
+                                map.put("create_type", ToolUtils.jsonToStr(vjson.get("create_type")));
+                                map.put("enable_compress", ToolUtils.jsonToBoo(vjson.get("enable_compress")));
+                                map.put("enable_dedup", ToolUtils.jsonToBoo(vjson.get("enable_dedup")));
+                                map.put(ID_FIELD, ToolUtils.jsonToStr(vjson.get(ID_FIELD)));
+                                map.put(NAME_FIELD, ToolUtils.jsonToStr(vjson.get(NAME_FIELD)));
+                                map.put(TYPE_FIELD, ToolUtils.jsonToStr(vjson.get(TYPE_FIELD)));
 
-                                        relists.add(map);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    LOG.error("DME link error url:" + workloadsUrl + ",error:" + e.toString());
-                    throw new DMEException("503", "DME link error url:" + workloadsUrl + ",error:" + e.toString());
-                }
-            }
-        } catch (Exception e) {
-            LOG.error("get WorkLoads error:", e);
-            throw new DMEException("503", "get WorkLoads error:" + e.getMessage());
-        }
-        LOG.info("getWorkLoads relists===" + (relists == null ? "null" : relists.size()));
-        return relists;
-    }
-
-    @Override
-    public List<Map<String, Object>> getDmeHosts(String hostIp) throws DMEException {
-        List<Map<String, Object>> relists = null;
-        String getHostsUrl = DmeConstants.DME_HOST_SUMMARY_URL;
-        try {
-            Map<String, Object> requestbody = new HashMap<>(16);
-            if (!StringUtils.isEmpty(hostIp)) {
-                requestbody.put("ip", hostIp);
-            }
-            ResponseEntity responseEntity = access(getHostsUrl, HttpMethod.POST,
-                (requestbody == null ? null : gson.toJson(requestbody)));
-            if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
-                JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
-                if (jsonObject != null && jsonObject.get(DmeConstants.HOSTS) != null) {
-                    JsonArray jsonArray = jsonObject.getAsJsonArray(DmeConstants.HOSTS);
-                    if (jsonArray != null && jsonArray.size() > 0) {
-                        relists = new ArrayList<>();
-                        for (int i = 0; i < jsonArray.size(); i++) {
-                            JsonObject vjson = jsonArray.get(i).getAsJsonObject();
-                            if (vjson != null) {
-                                Map<String, Object> map = new HashMap<>(16);
-                                map.put("id", ToolUtils.jsonToStr(vjson.get("id")));
-                                map.put("project_id", ToolUtils.jsonToStr(vjson.get("project_id")));
-                                map.put("name", ToolUtils.jsonToStr(vjson.get("name")));
-                                map.put("ip", ToolUtils.jsonToStr(vjson.get("ip")));
-                                map.put("display_status", ToolUtils.jsonToStr(vjson.get("display_status")));
-                                map.put("managed_status", ToolUtils.jsonToStr(vjson.get("managed_status")));
-                                map.put("os_status", ToolUtils.jsonToStr(vjson.get("os_status")));
-                                map.put("overall_status", ToolUtils.jsonToStr(vjson.get("overall_status")));
-                                map.put("os_type", ToolUtils.jsonToStr(vjson.get("os_type")));
-                                map.put("initiator_count", ToolUtils.jsonToInt(vjson.get("initiator_count"), null));
-                                map.put("access_mode", ToolUtils.jsonToStr(vjson.get("access_mode")));
-                                JsonArray hostgroups = vjson.getAsJsonArray("hostGroups");
-                                if (hostgroups != null && hostgroups.size() > 0) {
-                                    List<Map<String, Object>> hglists = new ArrayList<>();
-                                    for (int y = 0; y < hostgroups.size(); y++) {
-                                        Map<String, Object> hgmap = new HashMap<>(16);
-                                        hgmap.put("id", ToolUtils.jsonToStr(vjson.get("id")));
-                                        hgmap.put("name", ToolUtils.jsonToStr(vjson.get("name")));
-                                        hglists.add(hgmap);
-                                    }
-                                    map.put("hostGroups", hglists);
-                                }
                                 relists.add(map);
                             }
                         }
                     }
+                } catch (DmeException e) {
+                    LOG.error("getWorkLoads error url:{},error:{}", workloadsUrl, e.toString());
+                    throw new DmeException(DmeConstants.ERROR_CODE_503,
+                        "DME link error url:" + workloadsUrl + ",error:" + e.toString());
                 }
             }
-        } catch (Exception e) {
-            LOG.error("DME link error url:" + getHostsUrl + ",error:" + e.toString());
-            throw new DMEException(e.getMessage());
+        } catch (DmeException e) {
+            LOG.error("get WorkLoads error:", e);
+            throw new DmeException(DmeConstants.ERROR_CODE_503, "get WorkLoads error:" + e.getMessage());
         }
-        LOG.info("getDmeHosts relists===" + (relists == null ? "null" : (relists.size())));
         return relists;
     }
 
     @Override
-    public List<Map<String, Object>> getDmeHostInitiators(String hostId) throws DMEException {
+    public List<Map<String, Object>> getDmeHosts(String hostIp) throws DmeException {
+        List<Map<String, Object>> relists = null;
+        String getHostsUrl = DmeConstants.DME_HOST_SUMMARY_URL;
+        try {
+            Map<String, Object> requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+            if (!StringUtils.isEmpty(hostIp)) {
+                requestbody.put("ip", hostIp);
+            }
+            ResponseEntity responseEntity = access(getHostsUrl, HttpMethod.POST,
+                requestbody == null ? null : gson.toJson(requestbody));
+            if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
+                JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
+                JsonArray jsonArray = jsonObject.getAsJsonArray(DmeConstants.HOSTS);
+                if (jsonArray != null && jsonArray.size() > 0) {
+                    relists = new ArrayList<>();
+                    for (int index = 0; index < jsonArray.size(); index++) {
+                        JsonObject vjson = jsonArray.get(index).getAsJsonObject();
+                        Map<String, Object> map = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+                        map.put(ID_FIELD, ToolUtils.jsonToStr(vjson.get(ID_FIELD)));
+                        map.put("project_id", ToolUtils.jsonToStr(vjson.get("project_id")));
+                        map.put(NAME_FIELD, ToolUtils.jsonToStr(vjson.get(NAME_FIELD)));
+                        map.put("ip", ToolUtils.jsonToStr(vjson.get("ip")));
+                        map.put("display_status", ToolUtils.jsonToStr(vjson.get("display_status")));
+                        map.put("managed_status", ToolUtils.jsonToStr(vjson.get("managed_status")));
+                        map.put("os_status", ToolUtils.jsonToStr(vjson.get("os_status")));
+                        map.put("overall_status", ToolUtils.jsonToStr(vjson.get("overall_status")));
+                        map.put("os_type", ToolUtils.jsonToStr(vjson.get("os_type")));
+                        map.put("initiator_count", ToolUtils.jsonToInt(vjson.get("initiator_count"), null));
+                        map.put("access_mode", ToolUtils.jsonToStr(vjson.get("access_mode")));
+                        JsonArray hostgroups = vjson.getAsJsonArray("hostGroups");
+                        if (hostgroups != null && hostgroups.size() > 0) {
+                            List<Map<String, Object>> hglists = new ArrayList<>();
+                            for (int indext2 = 0; indext2 < hostgroups.size(); indext2++) {
+                                Map<String, Object> hgmap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+                                hgmap.put(ID_FIELD, ToolUtils.jsonToStr(vjson.get(ID_FIELD)));
+                                hgmap.put(NAME_FIELD, ToolUtils.jsonToStr(vjson.get(NAME_FIELD)));
+                                hglists.add(hgmap);
+                            }
+                            map.put("hostGroups", hglists);
+                        }
+                        relists.add(map);
+                    }
+                }
+            }
+        } catch (DmeException e) {
+            throw new DmeException(e.getMessage());
+        }
+        return relists;
+    }
+
+    @Override
+    public List<Map<String, Object>> getDmeHostInitiators(String hostId) throws DmeException {
         List<Map<String, Object>> relists = null;
         String url = DmeConstants.GET_DME_HOSTS_INITIATORS_URL.replace("{host_id}", hostId);
         try {
@@ -391,51 +386,48 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                     JsonArray jsonArray = jsonObject.getAsJsonArray("initiators");
                     if (jsonArray != null && jsonArray.size() > 0) {
                         relists = new ArrayList<>();
-                        for (int i = 0; i < jsonArray.size(); i++) {
-                            JsonObject vjson = jsonArray.get(i).getAsJsonObject();
-                            if (vjson != null) {
-                                Map<String, Object> map = new HashMap<>(16);
-                                map.put("id", ToolUtils.jsonToStr(vjson.get("id")));
-                                map.put("port_name", ToolUtils.jsonToStr(vjson.get("port_name")));
-                                map.put("status", ToolUtils.jsonToStr(vjson.get("status")));
-                                map.put("protocol", ToolUtils.jsonToStr(vjson.get("protocol")));
+                        for (int index = 0; index < jsonArray.size(); index++) {
+                            JsonObject vjson = jsonArray.get(index).getAsJsonObject();
+                            Map<String, Object> map = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+                            map.put(ID_FIELD, ToolUtils.jsonToStr(vjson.get(ID_FIELD)));
+                            map.put(PORT_NAME, ToolUtils.jsonToStr(vjson.get(PORT_NAME)));
+                            map.put(STATUS, ToolUtils.jsonToStr(vjson.get(STATUS)));
+                            map.put(PROTOCOL, ToolUtils.jsonToStr(vjson.get(PROTOCOL)));
 
-                                relists.add(map);
-                            }
+                            relists.add(map);
                         }
                     }
                 }
             }
-        } catch (Exception e) {
-            LOG.error("DME link error url:" + url + ",error:" + e.toString());
-            throw new DMEException(e.getMessage());
+        } catch (DmeException e) {
+            LOG.error("url:{},error:{}", url, e.toString());
+            throw new DmeException(e.getMessage());
         }
-        LOG.info("getHostsInitiator relists===" + (relists == null ? "null" : (relists.size())));
         return relists;
     }
 
     @Override
-    public List<Map<String, Object>> getDmeHostGroups(String hostGroupName) throws DMEException {
+    public List<Map<String, Object>> getDmeHostGroups(String hostGroupName) throws DmeException {
         List<Map<String, Object>> relists = null;
         String getHostGroupsUrl = DmeConstants.GET_DME_HOSTGROUPS_URL;
         try {
             Map<String, Object> requestbody = null;
             if (!StringUtils.isEmpty(hostGroupName)) {
-                requestbody = new HashMap<>(16);
-                requestbody.put("name", hostGroupName);
+                requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+                requestbody.put(NAME_FIELD, hostGroupName);
             }
             ResponseEntity responseEntity = access(getHostGroupsUrl, HttpMethod.POST,
-                (requestbody == null ? null : gson.toJson(requestbody)));
+                requestbody == null ? null : gson.toJson(requestbody));
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.getAsJsonArray(DmeConstants.HOSTGROUPS);
                 relists = new ArrayList<>();
-                for (int i = 0; i < jsonArray.size(); i++) {
-                    JsonObject object = jsonArray.get(i).getAsJsonObject();
-                    Map<String, Object> map = new HashMap<>(16);
-                    map.put("id", ToolUtils.jsonToStr(object.get("id")));
-                    map.put("name", ToolUtils.jsonToStr(object.get("name")));
-                    map.put("host_count", ToolUtils.jsonToInt(object.get("ip"), 0));
+                for (int index = 0; index < jsonArray.size(); index++) {
+                    JsonObject object = jsonArray.get(index).getAsJsonObject();
+                    Map<String, Object> map = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+                    map.put(ID_FIELD, ToolUtils.jsonToStr(object.get(ID_FIELD)));
+                    map.put(NAME_FIELD, ToolUtils.jsonToStr(object.get(NAME_FIELD)));
+                    map.put(HOST_COUNT, ToolUtils.jsonToInt(object.get("ip"), 0));
                     map.put("source_type", ToolUtils.jsonToStr(object.get("source_type")));
                     map.put("managed_status", ToolUtils.jsonToStr(object.get("managed_status")));
                     map.put("project_id", ToolUtils.jsonToStr(object.get("project_id")));
@@ -443,66 +435,64 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                     relists.add(map);
                 }
             }
-        } catch (Exception e) {
-            LOG.error("DME link error url:" + getHostGroupsUrl + ",error:" + e.toString());
-            throw new DMEException(e.getMessage());
+        } catch (DmeException e) {
+            LOG.error("url:{},error:{}", getHostGroupsUrl, e.toString());
+            throw new DmeException(e.getMessage());
         }
-        LOG.info("getDmeHostgroups relists===" + (relists == null ? "null" : relists.size()));
+        LOG.info("getDmeHostgroups relists==={}", relists == null ? NULL_STRING : relists.size());
         return relists;
     }
 
     @Override
-    public Map<String, Object> createHost(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> createHost(Map<String, Object> params) throws DmeException {
         Map<String, Object> hostmap = null;
         String createHostUrl = DmeConstants.CREATE_DME_HOST_URL;
         try {
-            Map<String, Object> requestbody = null;
             if (params != null && params.get(DmeConstants.HOST) != null) {
-                //得到主机的hba信息
+                // 得到主机的hba信息
                 Map<String, Object> hbamap = vcsdkUtils.getHbaByHostObjectId(ToolUtils.getStr(params.get("hostId")));
-
-                requestbody = new HashMap<>(16);
+                List<Map<String, Object>> initiators = new ArrayList<>();
+                Map<String, Object> initiator = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+                initiator.put(PROTOCOL, ToolUtils.getStr(hbamap.get(TYPE_FIELD)));
+                initiator.put(PORT_NAME, ToolUtils.getStr(hbamap.get(NAME_FIELD)));
+                initiators.add(initiator);
+                Map<String, Object> requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
                 requestbody.put("access_mode", "NONE");
-                requestbody.put("type", "VMWAREESX");
+                requestbody.put(TYPE_FIELD, "VMWAREESX");
                 requestbody.put("ip", params.get("host"));
                 requestbody.put("host_name", params.get("host"));
-                List<Map<String, Object>> initiators = new ArrayList<>();
-                Map<String, Object> initiator = new HashMap<>(16);
-                initiator.put("protocol", ToolUtils.getStr(hbamap.get("type")));
-                initiator.put("port_name", ToolUtils.getStr(hbamap.get("name")));
-                initiators.add(initiator);
                 requestbody.put("initiator", initiators);
                 ResponseEntity responseEntity = access(createHostUrl, HttpMethod.POST, gson.toJson(requestbody));
                 if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString())
                         .getAsJsonObject();
-                    hostmap = new HashMap<>(16);
-                    hostmap.put("id", ToolUtils.jsonToStr(jsonObject.get(DmeConstants.ID)));
+                    hostmap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+                    hostmap.put(ID_FIELD, ToolUtils.jsonToStr(jsonObject.get(DmeConstants.ID)));
                     hostmap.put("ip", ToolUtils.jsonToStr(jsonObject.get("ip")));
                     hostmap.put("access_mode", ToolUtils.jsonToStr(jsonObject.get("access_mode")));
-                    hostmap.put("type", ToolUtils.jsonToStr(jsonObject.get("type")));
+                    hostmap.put(TYPE_FIELD, ToolUtils.jsonToStr(jsonObject.get(TYPE_FIELD)));
                     hostmap.put("port", ToolUtils.jsonToInt(jsonObject.get("port"), 0));
                 }
             }
-        } catch (Exception e) {
-            LOG.error("DME link error url:" + createHostUrl + ",error:" + e.toString());
-            throw new DMEException(e.getMessage());
+        } catch (DmeException e) {
+            LOG.error("DME link error url:{},error:", createHostUrl, e.toString());
+            throw new DmeException(e.getMessage());
         }
-        LOG.info("createHost hostmap===" + (hostmap == null ? "null" : hostmap.size()));
+        LOG.info("createHost hostmap==={}", hostmap == null ? NULL_STRING : hostmap.size());
         return hostmap;
     }
 
     @Override
-    public Map<String, Object> createHostGroup(Map<String, Object> params) throws DMEException {
+    public Map<String, Object> createHostGroup(Map<String, Object> params) throws DmeException {
         Map<String, Object> hostgroupmap = null;
         String createHostGroupUrl = DmeConstants.CREATE_DME_HOSTGROUP_URL;
         try {
             Map<String, Object> requestbody;
             if (params != null && params.get(DmeConstants.CLUSTER) != null
                 && params.get(DmeConstants.HOSTIDS) != null) {
-                //判断该集群下有多少主机，如果主机在DME不存在就需要创建
-                requestbody = new HashMap<>(16);
-                requestbody.put("name", params.get("cluster").toString());
+                // 判断该集群下有多少主机，如果主机在DME不存在就需要创建
+                requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+                requestbody.put(NAME_FIELD, params.get("cluster").toString());
                 requestbody.put("host_ids", params.get("hostids"));
 
                 ResponseEntity responseEntity = access(createHostGroupUrl, HttpMethod.POST, gson.toJson(requestbody));
@@ -510,17 +500,17 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                     JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString())
                         .getAsJsonObject();
                     if (jsonObject != null && jsonObject.get(DmeConstants.ID) != null) {
-                        hostgroupmap = new HashMap<>(16);
-                        hostgroupmap.put("id", ToolUtils.jsonToStr(jsonObject.get("id")));
-                        hostgroupmap.put("name", ToolUtils.jsonToStr(jsonObject.get("name")));
+                        hostgroupmap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+                        hostgroupmap.put(ID_FIELD, ToolUtils.jsonToStr(jsonObject.get(ID_FIELD)));
+                        hostgroupmap.put(NAME_FIELD, ToolUtils.jsonToStr(jsonObject.get(NAME_FIELD)));
                     }
                 }
             }
-        } catch (Exception e) {
-            LOG.error("DME link error url:" + createHostGroupUrl + ",error:" + e.toString());
-            throw new DMEException(e.getMessage());
+        } catch (DmeException e) {
+            LOG.error("DME link error url:{},error:", createHostGroupUrl, e.toString());
+            throw new DmeException(e.getMessage());
         }
-        LOG.info("createHostGroup hostmap===" + (hostgroupmap == null ? "null" : (hostgroupmap.size())));
+        LOG.info("createHostGroup hostmap==={}", hostgroupmap == null ? NULL_STRING : (hostgroupmap.size()));
         return hostgroupmap;
     }
 
@@ -553,15 +543,15 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     }
 
     @Override
-    public Map<String, Object> getDmeHost(String hostId) throws DMEException {
-        Map<String, Object> map = new HashMap<>(16);
+    public Map<String, Object> getDmeHost(String hostId) throws DmeException {
+        Map<String, Object> map = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         String getHostUrl = DmeConstants.GET_DME_HOST_URL.replace("{host_id}", hostId);
         try {
             ResponseEntity responseEntity = access(getHostUrl, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject vjson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
-                map.put("id", ToolUtils.jsonToStr(vjson.get("id")));
-                map.put("name", ToolUtils.jsonToStr(vjson.get("name")));
+                map.put(ID_FIELD, ToolUtils.jsonToStr(vjson.get(ID_FIELD)));
+                map.put(NAME_FIELD, ToolUtils.jsonToStr(vjson.get(NAME_FIELD)));
                 map.put("ip", ToolUtils.jsonToStr(vjson.get("ip")));
                 map.put("display_status", ToolUtils.jsonToStr(vjson.get("display_status")));
                 map.put("managed_status", ToolUtils.jsonToStr(vjson.get("managed_status")));
@@ -571,16 +561,16 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 map.put("initiator_count", ToolUtils.jsonToInt(vjson.get("initiator_count"), null));
                 map.put("access_mode", ToolUtils.jsonToStr(vjson.get("access_mode")));
             }
-        } catch (Exception e) {
-            LOG.error("DME link error url:" + getHostUrl + ",error:" + e.toString());
-            throw new DMEException(e.getMessage());
+        } catch (DmeException e) {
+            LOG.error("DME link error url:{},error:{}", getHostUrl, e.toString());
+            throw new DmeException(e.getMessage());
         }
         LOG.info("getDmeHost relists===size={}", map.size());
         return map;
     }
 
     @Override
-    public void scanDatastore(String storageType) throws DMEException {
+    public void scanDatastore(String storageType) throws DmeException {
         if (!StringUtils.isEmpty(storageType)) {
             if (storageType.equals(ToolUtils.STORE_TYPE_VMFS)) {
                 LOG.info("scan VMFS Datastore start");
@@ -591,28 +581,28 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 dmeNfsAccessService.scanNfs();
                 LOG.info("scan NFS Datastore end");
             } else if (storageType.equals(ToolUtils.STORE_TYPE_ALL)) {
-                //扫描vmfs
                 try {
+                    // 扫描vmfs
                     LOG.info("scan VMFS Datastore start");
                     vmfsAccessService.scanVmfs();
                     LOG.info("scan VMFS Datastore end");
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (DmeException e) {
+                    LOG.error("scan VMFS failed！error:{}", e.getMessage());
                 }
-                //扫描nfs
                 try {
+                    // 扫描nfs
                     LOG.info("scan NFS Datastore start");
                     dmeNfsAccessService.scanNfs();
                     LOG.info("scan NFS Datastore end");
-                } catch (Exception e) {
-                    e.printStackTrace();
+                } catch (DmeException e) {
+                    LOG.error("scan NFS failed！error:{}", e.getMessage());
                 }
             }
         }
     }
 
     @Override
-    public void configureTaskTime(Integer taskId, String taskCron) throws DMEException {
+    public void configureTaskTime(Integer taskId, String taskCron) throws DmeException {
         try {
             if (!StringUtils.isEmpty(taskId) && !StringUtils.isEmpty(taskCron)) {
                 int re = scheduleDao.updateTaskTime(taskId, taskCron);
@@ -620,126 +610,127 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                     scheduleSetting.refreshTasks(taskId, taskCron);
                 }
             } else {
-                throw new DMEException("configure Task Time error:taskId or taskCorn is null");
+                throw new DmeException("configure Task Time error:taskId or taskCorn is null");
             }
-        } catch (Exception e) {
-            throw new DMEException(e.getMessage());
+        } catch (SQLException e) {
+            throw new DmeException(e.getMessage());
         }
     }
 
     @Override
-    public Map<String, Object> getDmeHostGroup(String hostGroupId) throws DMEException {
-        Map<String, Object> map = new HashMap<>(16);
+    public Map<String, Object> getDmeHostGroup(String hostGroupId) throws DmeException {
+        Map<String, Object> map = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         String getHostGroupUrl = DmeConstants.GET_DME_HOSTGROUP_URL.replace("{hostgroup_id}", hostGroupId);
         try {
             ResponseEntity responseEntity = access(getHostGroupUrl, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject vjson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 if (vjson != null) {
-                    map.put("id", ToolUtils.jsonToStr(vjson.get("id")));
-                    map.put("name", ToolUtils.jsonToStr(vjson.get("name")));
-                    map.put("host_count", ToolUtils.jsonToStr(vjson.get("host_count")));
+                    map.put(ID_FIELD, ToolUtils.jsonToStr(vjson.get(ID_FIELD)));
+                    map.put(NAME_FIELD, ToolUtils.jsonToStr(vjson.get(NAME_FIELD)));
+                    map.put(HOST_COUNT, ToolUtils.jsonToStr(vjson.get(HOST_COUNT)));
                     map.put("project_id", ToolUtils.jsonToStr(vjson.get("project_id")));
                 }
             }
-        } catch (Exception e) {
-            throw new DMEException(e.getMessage());
+        } catch (DmeException e) {
+            throw new DmeException(e.getMessage());
         }
         return map;
     }
 
     @Override
-    public List<Map<String, Object>> getDmeHostInHostGroup(String hostGroupId) throws DMEException {
+    public List<Map<String, Object>> getDmeHostInHostGroup(String hostGroupId) throws DmeException {
         List<Map<String, Object>> list = null;
-        String getHostInHostGroupUrl = DmeConstants.GET_DME_HOSTS_IN_HOSTGROUP_URL.replace("{hostgroup_id}", hostGroupId);
+        String getHostInHostGroupUrl = DmeConstants.GET_DME_HOSTS_IN_HOSTGROUP_URL.replace("{hostgroup_id}",
+            hostGroupId);
         try {
-            Map<String, Object> requestbody = new HashMap<>(16);
+            Map<String, Object> requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
             ResponseEntity responseEntity = access(getHostInHostGroupUrl, HttpMethod.POST, gson.toJson(requestbody));
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 list = new ArrayList<>();
                 JsonObject datajson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 JsonArray hostsja = datajson.getAsJsonArray(DmeConstants.HOSTS);
                 if (hostsja != null && hostsja.size() > 0) {
-                    for (int i = 0; i < hostsja.size(); i++) {
-                        JsonObject hostjs = hostsja.get(i).getAsJsonObject();
-                        Map<String, Object> hostmap = new HashMap<>(16);
-                        hostmap.put("id", ToolUtils.jsonToStr(hostjs.get("id")));
-                        hostmap.put("name", ToolUtils.jsonToStr(hostjs.get("name")));
-                        hostmap.put("host_count", ToolUtils.jsonToStr(hostjs.get("ip")));
+                    for (int index = 0; index < hostsja.size(); index++) {
+                        JsonObject hostjs = hostsja.get(index).getAsJsonObject();
+                        Map<String, Object> hostmap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+                        hostmap.put(ID_FIELD, ToolUtils.jsonToStr(hostjs.get(ID_FIELD)));
+                        hostmap.put(NAME_FIELD, ToolUtils.jsonToStr(hostjs.get(NAME_FIELD)));
+                        hostmap.put(HOST_COUNT, ToolUtils.jsonToStr(hostjs.get("ip")));
                         list.add(hostmap);
                     }
                 }
             }
-        } catch (Exception e) {
-            LOG.error("DME link error url:" + getHostInHostGroupUrl + ",error:" + e.getMessage());
-            throw new DMEException(e.getMessage());
+        } catch (DmeException e) {
+            LOG.error("DME link error url:{},error:{}", getHostInHostGroupUrl, e.getMessage());
+            throw new DmeException(e.getMessage());
         }
-        LOG.info("getDmeHostInHostGroup relists===" + (null == list ? null : list.size()));
+        LOG.info("getDmeHostInHostGroup relists==={}", null == list ? 0 : list.size());
         return list;
     }
 
     @Override
-    public void deleteVolumes(List<String> ids) throws DMEException {
+    public void deleteVolumes(List<String> ids) throws DmeException {
         String url = DmeConstants.DME_VOLUME_DELETE_URL;
         JsonObject body = new JsonObject();
         JsonArray array = new JsonParser().parse(gson.toJson(ids)).getAsJsonArray();
-        body.add("volume_ids", array);
+        body.add(VOLUME_IDS, array);
         ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, body.toString());
         if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG
             != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
-            throw new DMEException(responseEntity.getBody());
+            throw new DmeException(responseEntity.getBody());
         }
 
         JsonObject task = gson.fromJson(responseEntity.getBody(), JsonObject.class);
-        String taskId = task.get("task_id").getAsString();
+        String taskId = task.get(TASK_ID).getAsString();
         JsonObject taskDetail = taskService.queryTaskByIdUntilFinish(taskId);
         if (taskDetail.get(DmeConstants.TASK_DETAIL_STATUS_FILE).getAsInt() != DmeConstants.TASK_SUCCESS) {
-            LOG.error("delete volumes failed!task status={}", task.get("status").getAsInt());
-            throw new DMEException(task.get("detail_cn").getAsString());
+            LOG.error("delete volumes failed!task status={}", task.get(STATUS).getAsInt());
+            throw new DmeException(task.get(TASK_DETAIL_CN).getAsString());
         }
     }
 
     @Override
-    public void unMapHost(String hostId, List<String> ids) throws DMEException {
+    public void unMapHost(String hostId, List<String> ids) throws DmeException {
         String url = DmeConstants.DME_HOST_UNMAPPING_URL;
         JsonObject body = new JsonObject();
         JsonArray array = new JsonParser().parse(gson.toJson(ids)).getAsJsonArray();
-        body.add("volume_ids", array);
+        body.add(VOLUME_IDS, array);
         body.addProperty("host_id", hostId);
         ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, body.toString());
         if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG
             != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
-            throw new DMEException(responseEntity.getBody());
+            throw new DmeException(responseEntity.getBody());
         }
 
         JsonObject task = gson.fromJson(responseEntity.getBody(), JsonObject.class);
-        String taskId = task.get("task_id").getAsString();
+        String taskId = task.get(TASK_ID).getAsString();
         JsonObject taskDetail = taskService.queryTaskByIdUntilFinish(taskId);
         if (taskDetail.get(DmeConstants.TASK_DETAIL_STATUS_FILE).getAsInt() != DmeConstants.TASK_SUCCESS) {
-            LOG.error("host unmapping failed!task status={}", task.get("status").getAsInt());
-            throw new DMEException(task.get("detail_cn").getAsString());
+            LOG.error("host unmapping failed!task status={}", task.get(STATUS).getAsInt());
+            throw new DmeException(task.get(TASK_DETAIL_CN).getAsString());
         }
     }
 
     @Override
-    public void hostMapping(String hostId, List<String> volumeIds) throws DMEException {
+    public void hostMapping(String hostId, List<String> volumeIds) throws DmeException {
         String url = DmeConstants.DME_HOST_MAPPING_URL;
         JsonObject body = new JsonObject();
         body.addProperty("host_id", hostId);
         JsonArray volumeIdArray = gson.fromJson(gson.toJson(volumeIds), JsonArray.class);
-        body.add("volume_ids", volumeIdArray);
+        body.add(VOLUME_IDS, volumeIdArray);
         ResponseEntity<String> responseEntity = access(url, HttpMethod.POST, body.toString());
         if (responseEntity.getStatusCodeValue() / DmeConstants.HTTPS_STATUS_CHECK_FLAG
             != DmeConstants.HTTPS_STATUS_SUCCESS_PRE) {
             LOG.error("host mapping failed!errorMsg:{}", responseEntity.getBody());
-            throw new DMEException(responseEntity.getBody());
+            throw new DmeException(responseEntity.getBody());
         }
         JsonObject task = gson.fromJson(responseEntity.getBody(), JsonObject.class);
-        String taskId = task.get("task_id").getAsString();
+        String taskId = task.get(TASK_ID).getAsString();
         JsonObject taskDetail = taskService.queryTaskByIdUntilFinish(taskId);
         if (taskDetail.get(DmeConstants.TASK_DETAIL_STATUS_FILE).getAsInt() != DmeConstants.TASK_SUCCESS) {
-            LOG.error("host mapping failed!task status={}", task.get("status").getAsInt());
-            throw new DMEException(task.get("detail_cn").getAsString());
+            LOG.error("host mapping failed!task status={}", task.get(STATUS).getAsInt());
+            throw new DmeException(task.get(TASK_DETAIL_CN).getAsString());
         }
     }
 }

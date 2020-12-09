@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 
 import java.util.List;
 import java.util.Map;
@@ -12,7 +12,7 @@ public interface OverviewService {
      * @return
      * data like {"total": 100,"normal": 90,"abnormal", 10}
      */
-    Map<String, Object> getStorageNum() throws DMEException;
+    Map<String, Object> getStorageNum() throws DmeException;
 
 
     /**

@@ -89,8 +89,6 @@ public abstract class VCConnectionHelper {
 
     public  String objectId2Serverguid(String objectId){
         String[] objectarry=objectId.split(":");
-        String type=objectarry[2];
-        String value=objectarry[3];
         String serverguid=objectarry[4];
 
         return serverguid;

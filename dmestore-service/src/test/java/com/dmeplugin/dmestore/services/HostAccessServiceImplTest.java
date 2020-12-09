@@ -1,7 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.entity.VCenterInfo;
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import org.junit.Before;
@@ -12,7 +12,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.*;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -53,13 +52,13 @@ public class HostAccessServiceImplTest {
     }
 
     @Test
-    public void configureIscsi() throws DMEException {
+    public void configureIscsi() throws DmeException {
         hostAccessService.configureIscsi(params);
 
     }
 
     @Test
-    public void testConnectivity() throws DMEException {
+    public void testConnectivity() throws DmeException {
         vCenterInfo = new VCenterInfo();
         vCenterInfo.setCreateTime(new Date());
         vCenterInfo.setHostIp("321");

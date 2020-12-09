@@ -4,20 +4,33 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-//@Component
+/**
+ * ApplicationContextHelper
+ *
+ * @author Administrator
+ * @since 2020-12-08
+ */
 public class ApplicationContextHelper implements ApplicationContextAware {
-
     private static ApplicationContext applicationContext;
 
+    /**
+     * ApplicationContextHelper
+     */
     public ApplicationContextHelper() {
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(final ApplicationContext applicationContext) throws BeansException {
         ApplicationContextHelper.applicationContext = applicationContext;
     }
 
-    public static Object getBean(String beanName) {
-        return applicationContext != null?applicationContext.getBean(beanName):null;
+    /**
+     * getBean
+     *
+     * @param param beanName
+     * @return Object
+     */
+    public static Object getBean(final String param) {
+        return applicationContext != null ? applicationContext.getBean(param) : null;
     }
 }

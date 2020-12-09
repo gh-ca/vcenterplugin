@@ -1,39 +1,51 @@
 package com.dmeplugin.dmestore.task;
 
 import com.dmeplugin.vmware.util.VmwarePluginContextFactory;
+
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
-
+/**
+ * QuartzConfig
+ *
+ * @author Administrator
+ * @since 2020-12-08
+ */
 public class QuartzConfig {
     private static final Logger LOGGER = LoggerFactory.getLogger(QuartzConfig.class);
     private Scheduler scheduler;
-    public Scheduler getScheduler(){
-        StdSchedulerFactory stdSchedulerFactory=new StdSchedulerFactory();
+
+    /**
+     * getScheduler
+     *
+     * @return Scheduler
+     */
+    public Scheduler getScheduler() {
+        StdSchedulerFactory stdSchedulerFactory = new StdSchedulerFactory();
         try {
-            if (null==scheduler) {
+            if (null == scheduler) {
                 scheduler = stdSchedulerFactory.getScheduler();
             }
             scheduler.start();
-        }catch (Exception e){
-            LOGGER.error("get scheduler error",e);
+        } catch (SchedulerException e) {
+            LOGGER.error("get scheduler error", e);
         }
 
         return scheduler;
     }
 
-    public void destory(){
+    /**
+     * destory
+     */
+    public void destory() {
         try {
             scheduler.shutdown();
             VmwarePluginContextFactory.closeAll();
         } catch (SchedulerException e) {
-            LOGGER.error("shutdown scheduler error",e);
+            LOGGER.error("shutdown scheduler error", e);
         }
     }
 }

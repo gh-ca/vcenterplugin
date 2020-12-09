@@ -4,187 +4,430 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Description: TODO
+ * DmeVmwareRelation
+ *
  * @ClassName: DmeVmwareRelation
  * @Company: GH-CA
  * @author: yy
- * @create: 2020-09-02
+ * @since 2020-09-02
  **/
 public class DmeVmwareRelation implements Serializable {
+    /**
+     * id .
+     */
+    private int id;
+    /**
+     * storeId .
+     */
+    private String storeId;
+    /**
+     * storeName .
+     */
+    private String storeName;
+    /**
+     * volumeId .
+     */
+    private String volumeId;
+    /**
+     * volumeName .
+     */
+    private String volumeName;
+    /**
+     * volumeWwn .
+     */
+    private String volumeWwn;
+    /**
+     * volumeShare .
+     */
+    private String volumeShare;
+    /**
+     * volumeFs .
+     */
+    private String volumeFs;
+    /**
+     * storageDeviceId .
+     */
+    private String storageDeviceId;
+    /**
+     * shareId .
+     */
+    private String shareId;
+    /**
+     * shareName .
+     */
+    private String shareName;
+    /**
+     * fsId .
+     */
+    private String fsId;
+    /**
+     * fsName .
+     */
+    private String fsName;
+    /**
+     * logicPortId .
+     */
+    private String logicPortId;
+    /**
+     * logicPortName .
+     */
+    private String logicPortName;
+    /**
+     * storeType .
+     */
+    private String storeType;
+    /**
+     * createTime .
+     */
+    private Date createTime;
+    /**
+     * updateTime .
+     */
+    private Date updateTime;
+    /**
+     * state .
+     */
+    private int state;
 
-  private int id;
-  private String storeId;
-  private String storeName;
+    /**
+     * getId .
+     *
+     * @return int .
+     */
+    public int getId() {
+        return id;
+    }
 
-  private String volumeId;
-  private String volumeName;
-  private String volumeWwn;
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setId(final int param) {
+        this.id = param;
+    }
 
-  private String volumeShare;
-  private String volumeFs;
+    /**
+     * getStoreId .
+     *
+     * @return String .
+     */
+    public String getStoreId() {
+        return storeId;
+    }
 
-  private String storageDeviceId;
-  private String shareId;
-  private String shareName;
-  private String fsId;
-  private String fsName;
-  private String logicPortId;
-  private String logicPortName;
+    /**
+     * setStoreId .
+     *
+     * @param param .
+     */
+    public void setStoreId(final String param) {
+        this.storeId = param;
+    }
 
-  private String storeType;
-  private Date createTime;
-  private Date updateTime;
-  private int state;
+    /**
+     * getStoreName .
+     *
+     * @return String .
+     */
+    public String getStoreName() {
+        return storeName;
+    }
 
-  public int getId() {
-    return id;
-  }
+    /**
+     * setStoreName .
+     *
+     * @param param .
+     */
+    public void setStoreName(final String param) {
+        this.storeName = param;
+    }
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    /**
+     * getVolumeId .
+     *
+     * @return String .
+     */
+    public String getVolumeId() {
+        return volumeId;
+    }
 
-  public String getStoreId() {
-    return storeId;
-  }
+    /**
+     * setVolumeId .
+     *
+     * @param param .
+     */
+    public void setVolumeId(final String param) {
+        this.volumeId = param;
+    }
 
-  public void setStoreId(String storeId) {
-    this.storeId = storeId;
-  }
+    /**
+     * getVolumeName .
+     *
+     * @return String .
+     */
+    public String getVolumeName() {
+        return volumeName;
+    }
 
-  public String getStoreName() {
-    return storeName;
-  }
+    /**
+     * setVolumeName .
+     *
+     * @param param .
+     */
+    public void setVolumeName(final String param) {
+        this.volumeName = param;
+    }
 
-  public void setStoreName(String storeName) {
-    this.storeName = storeName;
-  }
+    /**
+     * getVolumeWwn .
+     *
+     * @return String .
+     */
+    public String getVolumeWwn() {
+        return volumeWwn;
+    }
 
-  public String getVolumeId() {
-    return volumeId;
-  }
+    /**
+     * setVolumeWwn .
+     *
+     * @param param .
+     */
+    public void setVolumeWwn(final String param) {
+        this.volumeWwn = param;
+    }
 
-  public void setVolumeId(String volumeId) {
-    this.volumeId = volumeId;
-  }
+    /**
+     * getVolumeShare .
+     *
+     * @return String .
+     */
+    public String getVolumeShare() {
+        return volumeShare;
+    }
 
-  public String getVolumeName() {
-    return volumeName;
-  }
+    /**
+     * setVolumeShare .
+     *
+     * @param param .
+     */
+    public void setVolumeShare(final String param) {
+        this.volumeShare = param;
+    }
 
-  public void setVolumeName(String volumeName) {
-    this.volumeName = volumeName;
-  }
+    /**
+     * getVolumeFs .
+     *
+     * @return String .
+     */
+    public String getVolumeFs() {
+        return volumeFs;
+    }
 
-  public String getVolumeWwn() {
-    return volumeWwn;
-  }
+    /**
+     * setVolumeFs .
+     *
+     * @param param .
+     */
+    public void setVolumeFs(final String param) {
+        this.volumeFs = param;
+    }
 
-  public void setVolumeWwn(String volumeWwn) {
-    this.volumeWwn = volumeWwn;
-  }
+    /**
+     * getShareId .
+     *
+     * @return String .
+     */
+    public String getShareId() {
+        return shareId;
+    }
 
-  public String getVolumeShare() {
-    return volumeShare;
-  }
+    /**
+     * setShareId .
+     *
+     * @param param .
+     */
+    public void setShareId(final String param) {
+        this.shareId = param;
+    }
 
-  public void setVolumeShare(String volumeShare) {
-    this.volumeShare = volumeShare;
-  }
+    /**
+     * getShareName .
+     *
+     * @return String .
+     */
+    public String getShareName() {
+        return shareName;
+    }
 
-  public String getVolumeFs() {
-    return volumeFs;
-  }
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setShareName(final String param) {
+        this.shareName = param;
+    }
 
-  public void setVolumeFs(String volumeFs) {
-    this.volumeFs = volumeFs;
-  }
+    /**
+     * getFsId .
+     *
+     * @return String .
+     */
+    public String getFsId() {
+        return fsId;
+    }
 
-  public String getShareId() {
-    return shareId;
-  }
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setFsId(final String param) {
+        this.fsId = param;
+    }
 
-  public void setShareId(String shareId) {
-    this.shareId = shareId;
-  }
+    /**
+     * getFsName .
+     *
+     * @return String .
+     */
+    public String getFsName() {
+        return fsName;
+    }
 
-  public String getShareName() {
-    return shareName;
-  }
+    /**
+     * setFsName .
+     *
+     * @param param .
+     */
+    public void setFsName(final String param) {
+        this.fsName = param;
+    }
 
-  public void setShareName(String shareName) {
-    this.shareName = shareName;
-  }
+    /**
+     * getLogicPortId .
+     *
+     * @return String .
+     */
+    public String getLogicPortId() {
+        return logicPortId;
+    }
 
-  public String getFsId() {
-    return fsId;
-  }
+    /**
+     * setLogicPortId .
+     *
+     * @param param .
+     */
+    public void setLogicPortId(final String param) {
+        this.logicPortId = param;
+    }
 
-  public void setFsId(String fsId) {
-    this.fsId = fsId;
-  }
+    /**
+     * getLogicPortName .
+     *
+     * @return String .
+     */
+    public String getLogicPortName() {
+        return logicPortName;
+    }
 
-  public String getFsName() {
-    return fsName;
-  }
+    /**
+     * setLogicPortName .
+     *
+     * @param param .
+     */
+    public void setLogicPortName(final String param) {
+        this.logicPortName = param;
+    }
 
-  public void setFsName(String fsName) {
-    this.fsName = fsName;
-  }
+    /**
+     * getStoreType .
+     *
+     * @return String .
+     */
+    public String getStoreType() {
+        return storeType;
+    }
 
-  public String getLogicPortId() {
-    return logicPortId;
-  }
+    /**
+     * setStoreType .
+     *
+     * @param param .
+     */
+    public void setStoreType(final String param) {
+        this.storeType = param;
+    }
 
-  public void setLogicPortId(String logicPortId) {
-    this.logicPortId = logicPortId;
-  }
+    /**
+     * getCreateTime .
+     *
+     * @return Date .
+     */
+    public Date getCreateTime() {
+        return createTime;
+    }
 
-  public String getLogicPortName() {
-    return logicPortName;
-  }
+    /**
+     * setCreateTime .
+     *
+     * @param param .
+     */
+    public void setCreateTime(final Date param) {
+        this.createTime = param;
+    }
 
-  public void setLogicPortName(String logicPortName) {
-    this.logicPortName = logicPortName;
-  }
+    /**
+     * getUpdateTime .
+     *
+     * @return Date .
+     */
+    public Date getUpdateTime() {
+        return updateTime;
+    }
 
-  public String getStoreType() {
-    return storeType;
-  }
+    /**
+     * setUpdateTime .
+     *
+     * @param param .
+     */
+    public void setUpdateTime(final Date param) {
+        this.updateTime = param;
+    }
 
-  public void setStoreType(String storeType) {
-    this.storeType = storeType;
-  }
+    /**
+     * getState .
+     *
+     * @return int .
+     */
+    public int getState() {
+        return state;
+    }
 
-  public Date getCreateTime() {
-    return createTime;
-  }
+    /**
+     * setState .
+     *
+     * @param param .
+     */
+    public void setState(final int param) {
+        this.state = param;
+    }
 
-  public void setCreateTime(Date createTime) {
-    this.createTime = createTime;
-  }
+    /**
+     * getStorageDeviceId .
+     *
+     * @return String .
+     */
+    public String getStorageDeviceId() {
+        return storageDeviceId;
+    }
 
-  public Date getUpdateTime() {
-    return updateTime;
-  }
-
-  public void setUpdateTime(Date updateTime) {
-    this.updateTime = updateTime;
-  }
-
-  public int getState() {
-    return state;
-  }
-
-  public void setState(int state) {
-    this.state = state;
-  }
-
-  public String getStorageDeviceId() {
-    return storageDeviceId;
-  }
-
-  public void setStorageDeviceId(String storageDeviceId) {
-    this.storageDeviceId = storageDeviceId;
-  }
+    /**
+     * setStorageDeviceId .
+     *
+     * @param param .
+     */
+    public void setStorageDeviceId(final String param) {
+        this.storageDeviceId = param;
+    }
 }

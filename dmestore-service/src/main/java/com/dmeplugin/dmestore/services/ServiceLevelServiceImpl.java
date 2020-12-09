@@ -1,7 +1,8 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.constant.DmeConstants;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.exception.VcenterException;
 import com.dmeplugin.dmestore.model.CapabilitiesQos;
 import com.dmeplugin.dmestore.model.CapabilitiesSmarttier;
@@ -102,7 +103,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     }
 
     @Override
-    public List<SimpleServiceLevel> listServiceLevel(Map<String, Object> params) throws DMEException {
+    public List<SimpleServiceLevel> listServiceLevel(Map<String, Object> params) throws DmeException {
 
         ResponseEntity responseEntity;
         List<SimpleServiceLevel> slis;
@@ -110,19 +111,19 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             responseEntity = dmeAccessService.access(DmeConstants.LIST_SERVICE_LEVEL_URL, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (HttpStatus.OK.value() != code) {
-                throw new DMEException("503", "list serviceLevel response error!");
+                throw new DmeException("503", "list serviceLevel response error!");
             }
             Object object = responseEntity.getBody();
             slis = convertBean(object);
         } catch (Exception e) {
             log.error("list serviceLevel error", e);
-            throw new DMEException("503", e.getMessage());
+            throw new DmeException("503", e.getMessage());
         }
         return slis;
     }
 
     @Override
-    public void updateVmwarePolicy() throws DMEException {
+    public void updateVmwarePolicy() throws DmeException {
         try {
             VCenterInfo vCenterInfo = vCenterInfoService.getVcenterInfo();
             if (null != vCenterInfo) {
@@ -187,7 +188,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             }
         } catch (Exception e) {
             log.error("list serviceLevel error", e);
-            throw new DMEException("503", "update service level error" + e.getMessage());
+            throw new DmeException("503", "update service level error" + e.getMessage());
         }
     }
 
@@ -285,12 +286,12 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
      *
      * @param serivceLevelId
      * @return java.util.List<com.dmeplugin.dmestore.model.StoragePool>
-     * @throws DMEException
+     * @throws DmeException
      * @author wangxy
      * @date 11:21 2020/11/13
      **/
     @Override
-    public List<StoragePool> getStoragePoolInfosByServiceLevelId(String serivceLevelId) throws DMEException {
+    public List<StoragePool> getStoragePoolInfosByServiceLevelId(String serivceLevelId) throws DmeException {
         List<StoragePool> storagePools = new ArrayList<>();
         // servicLevelId对应的serviceLevelInstanceId
         Map<String, Map<String, Object>> serviceLevelMap = dmeRelationInstanceService.getServiceLevelInstance();
@@ -348,7 +349,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     }
 
     @Override
-    public List<Volume> getVolumeInfosByServiceLevelId(String serviceLevelId) throws DMEException {
+    public List<Volume> getVolumeInfosByServiceLevelId(String serviceLevelId) throws DmeException {
         List<Volume> volumes = new ArrayList<>();
         String url = DmeConstants.QUERY_SERVICE_LEVEL_VOLUME_URL.replace("{serviceLevelId}", serviceLevelId);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
@@ -403,7 +404,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     }
 
     private List<StoragePool> getStoragePoolInfosByStorageIdStoragePoolIds(String storageDeviceId,
-        List<String> storagePoolIds) throws DMEException {
+        List<String> storagePoolIds) throws DmeException {
         List<StoragePool> sps = new ArrayList<>();
         List<StoragePool> storagePools = dmeStorageService.getStoragePools(storageDeviceId, "all");
 
@@ -421,11 +422,11 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
      *
      * @param serviceLevelId
      * @return java.util.List<java.lang.String>
-     * @throws DMEException
+     * @throws DmeException
      * @author wangxy
      * @date 11:19 2020/11/13
      **/
-    public List<String> getStoragePoolIdsByServiceLevelId(String serviceLevelId) throws DMEException {
+    public List<String> getStoragePoolIdsByServiceLevelId(String serviceLevelId) throws DmeException {
         String relatinName = "M_DjTierContainsStoragePool";
         return getContainIdsByRelationNameLevelId(relatinName, serviceLevelId);
     }
@@ -435,17 +436,17 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
      *
      * @param serviceLevelId
      * @return java.util.List<java.lang.String>
-     * @throws DMEException
+     * @throws DmeException
      * @author wangxy
      * @date 11:20 2020/11/13
      **/
-    public List<String> getVolumeIdsByServiceLivelId(String serviceLevelId) throws DMEException {
+    public List<String> getVolumeIdsByServiceLivelId(String serviceLevelId) throws DmeException {
         String relationName = "M_DjTierContainsLun";
         return getContainIdsByRelationNameLevelId(relationName, serviceLevelId);
     }
 
     private List<String> getContainIdsByRelationNameLevelId(String relationName, String serviceLevelId)
-        throws DMEException {
+        throws DmeException {
         Set<String> ids = new HashSet<>();
         List<RelationInstance> ris = dmeRelationInstanceService.queryRelationByRelationNameConditionSourceInstanceId(
             relationName, serviceLevelId);

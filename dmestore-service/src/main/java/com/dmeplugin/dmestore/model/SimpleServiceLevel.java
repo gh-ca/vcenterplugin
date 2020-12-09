@@ -1,92 +1,210 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * SimpleServiceLevel
+ *
  * @author lianq
  * @ClassName: SimpleServiceLevel
  * @Company: GH-CA
- * @create 2020-09-03
+ * @since 2020-09-03
  */
-public class SimpleServiceLevel{
-
+public class SimpleServiceLevel {
+    /**
+     * capabilities .
+     */
     private SimpleCapabilities capabilities;
+    /**
+     * id .
+     */
     private String id;
+    /**
+     * name .
+     */
     private String name;
+    /**
+     * description .
+     */
     private String description;
+    /**
+     * type .
+     */
     private String type;
+    /**
+     * protocol .
+     */
     private String protocol;
+    /**
+     * totalCapacity .
+     */
     private Double totalCapacity;
+    /**
+     * freeCapacity .
+     */
     private Double freeCapacity;
+    /**
+     * usedCapacity .
+     */
     private Double usedCapacity;
 
+    /**
+     * getCapabilities .
+     *
+     * @return SimpleCapabilities 。
+     */
     public SimpleCapabilities getCapabilities() {
         return capabilities;
     }
 
-    public void setCapabilities(SimpleCapabilities capabilities) {
-        this.capabilities = capabilities;
+    /**
+     * setCapabilities .
+     *
+     * @param param .
+     */
+    public void setCapabilities(final SimpleCapabilities param) {
+        this.capabilities = param;
     }
 
+    /**
+     * getId .
+     *
+     * @return String 。
+     */
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setId(final String param) {
+        this.id = param;
     }
 
+    /**
+     * getName .
+     *
+     * @return String 。
+     */
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setName .
+     *
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
 
+    /**
+     * getDescription .
+     *
+     * @return String 。
+     */
     public String getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    /**
+     * setDescription .
+     *
+     * @param param .
+     */
+    public void setDescription(final String param) {
+        this.description = param;
     }
 
+    /**
+     * getType .
+     *
+     * @return String 。
+     */
     public String getType() {
         return type;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    /**
+     * setType .
+     *
+     * @param param .
+     */
+    public void setType(final String param) {
+        this.type = param;
     }
 
+    /**
+     * getProtocol .
+     *
+     * @return String 。
+     */
     public String getProtocol() {
         return protocol;
     }
 
-    public void setProtocol(String protocol) {
-        this.protocol = protocol;
+    /**
+     * setProtocol .
+     *
+     * @param param .
+     */
+    public void setProtocol(final String param) {
+        this.protocol = param;
     }
 
+    /**
+     * getTotalCapacity .
+     *
+     * @return Double 。
+     */
     public Double getTotalCapacity() {
         return totalCapacity;
     }
 
-    public void setTotalCapacity(Double totalCapacity) {
-        this.totalCapacity = totalCapacity;
+    /**
+     * setTotalCapacity .
+     *
+     * @param param .
+     */
+    public void setTotalCapacity(final Double param) {
+        this.totalCapacity = param;
     }
 
+    /**
+     * getFreeCapacity .
+     *
+     * @return Double 。
+     */
     public Double getFreeCapacity() {
         return freeCapacity;
     }
 
-    public void setFreeCapacity(Double freeCapacity) {
-        this.freeCapacity = freeCapacity;
+    /**
+     * setFreeCapacity .
+     *
+     * @param param .
+     */
+    public void setFreeCapacity(final Double param) {
+        this.freeCapacity = param;
     }
 
+    /**
+     * getUsedCapacity .
+     *
+     * @return Double 。
+     */
     public Double getUsedCapacity() {
         return usedCapacity;
     }
 
-    public void setUsedCapacity(Double usedCapacity) {
-        this.usedCapacity = usedCapacity;
+    /**
+     * setUsedCapacity .
+     *
+     * @param param .
+     */
+    public void setUsedCapacity(final Double param) {
+        this.usedCapacity = param;
     }
 }

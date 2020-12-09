@@ -4,84 +4,186 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * @Description: TODO
- * @ClassName: DmeInfo
- * @Company: GH-CA
- * @author: yy
- * @create: 2020-09-02
- **/
+ * DmeInfo.
+ *
+ * @author Administrator
+ * @since 2020-12-08
+ */
 public class DmeInfo implements Serializable {
+    /**
+     * id .
+     */
+    private int id;
+    /**
+     * hostIp .
+     */
+    private String hostIp;
+    /**
+     * hostPort .
+     */
+    private int hostPort;
+    /**
+     * userName .
+     */
+    private String userName;
+    /**
+     * password .
+     */
+    private String password;
+    /**
+     * createTime .
+     */
+    private Date createTime;
+    /**
+     * updateTime .
+     */
+    private Date updateTime;
+    /**
+     * state .
+     */
+    private int state;
 
-  private int id;
-  private String hostIp;
-  private int hostPort;
-  private String userName;
-  private String password;
-  private Date createTime;
-  private Date updateTime;
-  private int state; 
+    /**
+     * getId .
+     *
+     * @return int .
+     */
+    public int getId() {
+        return id;
+    }
 
-  public int getId() {
-    return id;
-  }
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setId(final int param) {
+        this.id = param;
+    }
 
-  public void setId(int id) {
-    this.id = id;
-  }
+    /**
+     * getHostIp .
+     *
+     * @return String .
+     */
+    public String getHostIp() {
+        return hostIp;
+    }
 
-  public String getHostIp() {
-    return hostIp;
-  }
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setHostIp(final String param) {
+        this.hostIp = param;
+    }
 
-  public void setHostIp(String hostIp) {
-    this.hostIp = hostIp;
-  }
+    /**
+     * getHostPort .
+     *
+     * @return String .
+     */
+    public int getHostPort() {
+        return hostPort;
+    }
 
-  public int getHostPort() {
-    return hostPort;
-  }
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setHostPort(final int param) {
+        this.hostPort = param;
+    }
 
-  public void setHostPort(int hostPort) {
-    this.hostPort = hostPort;
-  }
+    /**
+     * getUserName .
+     *
+     * @return String .
+     */
+    public String getUserName() {
+        return userName;
+    }
 
-  public String getUserName() {
-    return userName;
-  }
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setUserName(final String param) {
+        this.userName = param;
+    }
 
-  public void setUserName(String userName) {
-    this.userName = userName;
-  }
+    /**
+     * getPassword .
+     *
+     * @return String .
+     */
+    public String getPassword() {
+        return password;
+    }
 
-  public String getPassword() {
-    return password;
-  }
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setPassword(final String param) {
+        this.password = param;
+    }
 
-  public void setPassword(String password) {
-    this.password = password;
-  }
+    /**
+     * getCreateTime .
+     *
+     * @return Date .
+     */
+    public Date getCreateTime() {
+        return createTime;
+    }
 
-  public Date getCreateTime() {
-    return createTime;
-  }
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setCreateTime(final Date param) {
+        this.createTime = param;
+    }
 
-  public void setCreateTime(Date createTime) {
-    this.createTime = createTime;
-  }
+    /**
+     * getUpdateTime .
+     *
+     * @return Date .
+     */
+    public Date getUpdateTime() {
+        return updateTime;
+    }
 
-  public Date getUpdateTime() {
-    return updateTime;
-  }
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setUpdateTime(final Date param) {
+        this.updateTime = param;
+    }
 
-  public void setUpdateTime(Date updateTime) {
-    this.updateTime = updateTime;
-  }
+    /**
+     * getState .
+     *
+     * @return int .
+     */
+    public int getState() {
+        return state;
+    }
 
-  public int getState() {
-    return state;
-  }
-
-  public void setState(int state) {
-    this.state = state;
-  }
+    /**
+     * setId .
+     *
+     * @param param .
+     */
+    public void setState(final int param) {
+        this.state = param;
+    }
 }

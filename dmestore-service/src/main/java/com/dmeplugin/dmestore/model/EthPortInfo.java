@@ -1,417 +1,825 @@
 package com.dmeplugin.dmestore.model;
+
 /**
+ * EthPortInfo
+ *
  * @author yy
- * @className EthPortInfo
- * @description TODO
- * @date 2020/9/3 17:43
+ * @Description: EthPortInfo
+ * @since 2020-09-03
  */
 public class EthPortInfo {
     /**
-     * DME Storage 1.0.RC1 系统资源北向模型 01.pdf 存储端口
-    **/
-    String ownerType;
-    /**
-     * IPv4掩码
+     * DME Storage 1.0.RC1 系统资源北向模型 01.pdf 存储端口.
      **/
-    String ipv4Mask;
-    String logicalType;
-    String storageDeviceId;
+    private String ownerType;
     /**
-     * 端口名称
+     * IPv4掩码 .
      **/
-    String portName;
-    String ownerId;
+    private String ipv4Mask;
     /**
-     * 端口ID
-     **/
-    String portId;
+     * logicalType .
+     */
+    private String logicalType;
     /**
-     * 绑定名称
-     **/
-    String bondName;
+     * storageDeviceId .
+     */
+    private String storageDeviceId;
     /**
-     * MAC地址
+     * 端口名称 .
      **/
-    String mac;
+    private String portName;
     /**
-     * IPv6地址
-     **/
-    String mgmtIpv6;
+     * ownerId .
+     */
+    private String ownerId;
     /**
-     * iSCSI名称
+     * 端口ID .
      **/
-    String iscsiName;
-    String ownerName;
+    private String portId;
     /**
-     * 最后监控时间
+     * 绑定名称.
      **/
-    Long lastMonitorTime;
+    private String bondName;
     /**
-     * IPv4地址
+     * MAC地址.
      **/
-    String mgmtIp;
-    String confirmStatus;
+    private String mac;
     /**
-     * CMDB 实例 ID
+     * IPv6地址.
      **/
-    String id;
+    private String mgmtIpv6;
     /**
-     * 最后修改时间
+     * iSCSI名称.
      **/
-    Long lastModified;
+    private String iscsiName;
     /**
-     * 连接状态
-     **/
-    String connectStatus;
-    Integer classId;
+     * ownerName.
+     */
+    private String ownerName;
     /**
-     * 监控状态
+     * 最后监控时间.
      **/
-    String dataStatus;
+    private Long lastMonitorTime;
     /**
-     * Mbit/s
+     * IPv4地址.
      **/
-    Integer maxSpeed;
-    String resId;
-    Boolean local;
+    private String mgmtIp;
     /**
-     * 端口类型
-     **/
-    String portType;
-    String className;
-    Integer numberOfInitiators;
+     * confirmStatus .
+     */
+    private String confirmStatus;
     /**
-     * 绑定ID
+     * CMDB 实例 ID.
      **/
-    String bondId;
-    String regionId;
+    private String id;
     /**
-     * 名称
+     * 最后修改时间.
      **/
-    String name;
+    private Long lastModified;
     /**
-     * 位置
+     * 连接状态.
      **/
-    String location;
+    private String connectStatus;
     /**
-     * 原始ID
-     **/
-    String nativeId;
-    String dataSource;
+     * classId.
+     */
+    private Integer classId;
     /**
-     * IPv6掩码
+     * 监控状态.
      **/
-    String ipv6Mask;
+    private String dataStatus;
     /**
-     * 状态
+     * Mbit/s.
      **/
-    String status;
+    private Integer maxSpeed;
     /**
-     * Mbit/s
-     **/
-    Integer speed;
+     * resId.
+     */
+    private String resId;
     /**
-     * WWN
-     **/
-    String wwn;  
+     * local.
+     */
+    private Boolean local;
     /**
-     * 光模块状态
+     * 端口类型.
      **/
-    String sfpStatus;
+    private String portType;
+    /**
+     * className .
+     */
+    private String className;
+    /**
+     * numberOfInitiators .
+     */
+    private Integer numberOfInitiators;
+    /**
+     * 绑定ID.
+     **/
+    private String bondId;
+    /**
+     * regionId .
+     */
+    private String regionId;
+    /**
+     * 名称.
+     **/
+    private String name;
+    /**
+     * 位置.
+     **/
+    private String location;
+    /**
+     * 原始ID.
+     **/
+    private String nativeId;
+    /**
+     * dataSource .
+     */
+    private String dataSource;
+    /**
+     * IPv6掩码.
+     **/
+    private String ipv6Mask;
+    /**
+     * 状态.
+     **/
+    private String status;
+    /**
+     * Mbit/s.
+     **/
+    private Integer speed;
+    /**
+     * WWN .
+     **/
+    private String wwn;
+    /**
+     * 光模块状态.
+     **/
+    private String sfpStatus;
 
+    /**
+     * getOwnerType .
+     *
+     * @return String .
+     */
     public String getOwnerType() {
         return ownerType;
     }
 
-    public void setOwnerType(String ownerType) {
-        this.ownerType = ownerType;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setOwnerType(final String param) {
+        this.ownerType = param;
     }
 
+    /**
+     * getIpv4Mask .
+     *
+     * @return String .
+     */
     public String getIpv4Mask() {
         return ipv4Mask;
     }
 
-    public void setIpv4Mask(String ipv4Mask) {
-        this.ipv4Mask = ipv4Mask;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setIpv4Mask(final String param) {
+        this.ipv4Mask = param;
     }
 
+    /**
+     * getLogicalType .
+     *
+     * @return String .
+     */
     public String getLogicalType() {
         return logicalType;
     }
 
-    public void setLogicalType(String logicalType) {
-        this.logicalType = logicalType;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setLogicalType(final String param) {
+        this.logicalType = param;
     }
 
+    /**
+     * getStorageDeviceId .
+     *
+     * @return String .
+     */
     public String getStorageDeviceId() {
         return storageDeviceId;
     }
 
-    public void setStorageDeviceId(String storageDeviceId) {
-        this.storageDeviceId = storageDeviceId;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setStorageDeviceId(final String param) {
+        this.storageDeviceId = param;
     }
 
+    /**
+     * getPortName .
+     *
+     * @return String .
+     */
     public String getPortName() {
         return portName;
     }
 
-    public void setPortName(String portName) {
-        this.portName = portName;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setPortName(final String param) {
+        this.portName = param;
     }
 
+    /**
+     * getOwnerId .
+     *
+     * @return String .
+     */
     public String getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(String ownerId) {
-        this.ownerId = ownerId;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setOwnerId(final String param) {
+        this.ownerId = param;
     }
 
+    /**
+     * getPortId .
+     *
+     * @return String .
+     */
     public String getPortId() {
         return portId;
     }
 
-    public void setPortId(String portId) {
-        this.portId = portId;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setPortId(final String param) {
+        this.portId = param;
     }
 
+    /**
+     * getBondName .
+     *
+     * @return String .
+     */
     public String getBondName() {
         return bondName;
     }
 
-    public void setBondName(String bondName) {
-        this.bondName = bondName;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setBondName(final String param) {
+        this.bondName = param;
     }
 
+    /**
+     * getMac .
+     *
+     * @return String .
+     */
     public String getMac() {
         return mac;
     }
 
-    public void setMac(String mac) {
-        this.mac = mac;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setMac(final String param) {
+        this.mac = param;
     }
 
+    /**
+     * getMgmtIpv6 .
+     *
+     * @return String .
+     */
     public String getMgmtIpv6() {
         return mgmtIpv6;
     }
 
-    public void setMgmtIpv6(String mgmtIpv6) {
-        this.mgmtIpv6 = mgmtIpv6;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setMgmtIpv6(final String param) {
+        this.mgmtIpv6 = param;
     }
 
+    /**
+     * getIscsiName .
+     *
+     * @return String .
+     */
     public String getIscsiName() {
         return iscsiName;
     }
 
-    public void setIscsiName(String iscsiName) {
-        this.iscsiName = iscsiName;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setIscsiName(final String param) {
+        this.iscsiName = param;
     }
 
+    /**
+     * getOwnerName .
+     *
+     * @return String .
+     */
     public String getOwnerName() {
         return ownerName;
     }
 
-    public void setOwnerName(String ownerName) {
-        this.ownerName = ownerName;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setOwnerName(final String param) {
+        this.ownerName = param;
     }
 
+    /**
+     * getLastMonitorTime .
+     *
+     * @return String .
+     */
     public Long getLastMonitorTime() {
         return lastMonitorTime;
     }
 
-    public void setLastMonitorTime(Long lastMonitorTime) {
-        this.lastMonitorTime = lastMonitorTime;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setLastMonitorTime(final Long param) {
+        this.lastMonitorTime = param;
     }
 
+    /**
+     * getMgmtIp .
+     *
+     * @return String .
+     */
     public String getMgmtIp() {
         return mgmtIp;
     }
 
-    public void setMgmtIp(String mgmtIp) {
-        this.mgmtIp = mgmtIp;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setMgmtIp(final String param) {
+        this.mgmtIp = param;
     }
 
+    /**
+     * getConfirmStatus .
+     *
+     * @return String .
+     */
     public String getConfirmStatus() {
         return confirmStatus;
     }
 
-    public void setConfirmStatus(String confirmStatus) {
-        this.confirmStatus = confirmStatus;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setConfirmStatus(final String param) {
+        this.confirmStatus = param;
     }
 
+    /**
+     * getId .
+     *
+     * @return String .
+     */
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setId(final String param) {
+        this.id = param;
     }
 
+    /**
+     * getLastModified .
+     *
+     * @return String .
+     */
     public Long getLastModified() {
         return lastModified;
     }
 
-    public void setLastModified(Long lastModified) {
-        this.lastModified = lastModified;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setLastModified(final Long param) {
+        this.lastModified = param;
     }
 
+    /**
+     * getConnectStatus .
+     *
+     * @return String .
+     */
     public String getConnectStatus() {
         return connectStatus;
     }
 
-    public void setConnectStatus(String connectStatus) {
-        this.connectStatus = connectStatus;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setConnectStatus(final String param) {
+        this.connectStatus = param;
     }
 
+    /**
+     * getClassId .
+     *
+     * @return Integer .
+     */
     public Integer getClassId() {
         return classId;
     }
 
-    public void setClassId(Integer classId) {
-        this.classId = classId;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setClassId(final Integer param) {
+        this.classId = param;
     }
 
+    /**
+     * getDataStatus .
+     *
+     * @return String .
+     */
     public String getDataStatus() {
         return dataStatus;
     }
 
-    public void setDataStatus(String dataStatus) {
-        this.dataStatus = dataStatus;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setDataStatus(final String param) {
+        this.dataStatus = param;
     }
 
+    /**
+     * getMaxSpeed .
+     *
+     * @return Integer .
+     */
     public Integer getMaxSpeed() {
         return maxSpeed;
     }
 
-    public void setMaxSpeed(Integer maxSpeed) {
-        this.maxSpeed = maxSpeed;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setMaxSpeed(final Integer param) {
+        this.maxSpeed = param;
     }
 
+    /**
+     * getResId .
+     *
+     * @return String .
+     */
     public String getResId() {
         return resId;
     }
 
-    public void setResId(String resId) {
-        this.resId = resId;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setResId(final String param) {
+        this.resId = param;
     }
 
+    /**
+     * getLocal .
+     *
+     * @return Boolean .
+     */
     public Boolean getLocal() {
         return local;
     }
 
-    public void setLocal(Boolean local) {
-        local = local;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setLocal(final Boolean param) {
+        this.local = param;
     }
 
+    /**
+     * getPortType .
+     *
+     * @return String .
+     */
     public String getPortType() {
         return portType;
     }
 
-    public void setPortType(String portType) {
-        this.portType = portType;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setPortType(final String param) {
+        this.portType = param;
     }
 
+    /**
+     * getClassName .
+     *
+     * @return String .
+     */
     public String getClassName() {
         return className;
     }
 
-    public void setClassName(String className) {
-        this.className = className;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setClassName(final String param) {
+        this.className = param;
     }
 
+    /**
+     * getNumberOfInitiators .
+     *
+     * @return Integer .
+     */
     public Integer getNumberOfInitiators() {
         return numberOfInitiators;
     }
 
-    public void setNumberOfInitiators(Integer numberOfInitiators) {
-        this.numberOfInitiators = numberOfInitiators;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setNumberOfInitiators(final Integer param) {
+        this.numberOfInitiators = param;
     }
 
+    /**
+     * getBondId .
+     *
+     * @return String .
+     */
     public String getBondId() {
         return bondId;
     }
 
-    public void setBondId(String bondId) {
-        this.bondId = bondId;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setBondId(final String param) {
+        this.bondId = param;
     }
 
+    /**
+     * getRegionId .
+     *
+     * @return String .
+     */
     public String getRegionId() {
         return regionId;
     }
 
-    public void setRegionId(String regionId) {
-        this.regionId = regionId;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setRegionId(final String param) {
+        this.regionId = param;
     }
 
+    /**
+     * getName .
+     *
+     * @return String .
+     */
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setName(final String param) {
+        this.name = param;
     }
 
+    /**
+     * getLocation .
+     *
+     * @return String .
+     */
     public String getLocation() {
         return location;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setLocation(final String param) {
+        this.location = param;
     }
 
+    /**
+     * getNativeId .
+     *
+     * @return String .
+     */
     public String getNativeId() {
         return nativeId;
     }
 
-    public void setNativeId(String nativeId) {
-        this.nativeId = nativeId;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setNativeId(final String param) {
+        this.nativeId = param;
     }
 
+    /**
+     * getDataSource .
+     *
+     * @return String .
+     */
     public String getDataSource() {
         return dataSource;
     }
 
-    public void setDataSource(String dataSource) {
-        this.dataSource = dataSource;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setDataSource(final String param) {
+        this.dataSource = param;
     }
 
+    /**
+     * getIpv6Mask .
+     *
+     * @return String .
+     */
     public String getIpv6Mask() {
         return ipv6Mask;
     }
 
-    public void setIpv6Mask(String ipv6Mask) {
-        this.ipv6Mask = ipv6Mask;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setIpv6Mask(final String param) {
+        this.ipv6Mask = param;
     }
 
+    /**
+     * getStatus .
+     *
+     * @return String .
+     */
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setStatus(final String param) {
+        this.status = param;
     }
 
+    /**
+     * getSpeed .
+     *
+     * @return Integer .
+     */
     public Integer getSpeed() {
         return speed;
     }
 
-    public void setSpeed(Integer speed) {
-        this.speed = speed;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setSpeed(final Integer param) {
+        this.speed = param;
     }
 
+    /**
+     * getWwn .
+     *
+     * @return String .
+     */
     public String getWwn() {
         return wwn;
     }
 
-    public void setWwn(String wwn) {
-        this.wwn = wwn;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setWwn(final String param) {
+        this.wwn = param;
     }
 
+    /**
+     * getSfpStatus .
+     *
+     * @return String .
+     */
     public String getSfpStatus() {
         return sfpStatus;
     }
 
-    public void setSfpStatus(String sfpStatus) {
-        this.sfpStatus = sfpStatus;
+    /**
+     * setOwnerType.
+     *
+     * @param param .
+     */
+    public void setSfpStatus(final String param) {
+        this.sfpStatus = param;
     }
 }
