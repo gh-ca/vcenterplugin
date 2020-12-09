@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.task;
 
-
+import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.services.DmeNFSAccessService;
 import com.dmeplugin.dmestore.services.VmfsAccessService;
 
@@ -12,39 +12,44 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * @Description: TODO
+ * BackgroundScanDatastoreTask
+ *
  * @ClassName: BackgroundScanDatastoreTask
  * @Company: GH-CA
  * @author: yy
- * @create: 2020-09-02
+ * @since 2020-09-02
  **/
 @Component
 public class BackgroundScanDatastoreTask implements StatefulJob {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(BackgroundScanDatastoreTask.class);
 
     /**
-     * 后台定时
+     * 后台定时扫描
      */
     public void scanDatastore() {
         LOGGER.info("scanDatastore start");
-        //扫描vmfs
+
+        // 扫描Vmfs
         try {
             Object obj = ApplicationContextHelper.getBean("VmfsAccessServiceImpl");
             ((VmfsAccessService) obj).scanVmfs();
-        } catch (Exception e) {
+        } catch (DMEException e) {
             LOGGER.error("scanDatastore vmfs error", e);
         }
-        //扫描nfs
+
+        // 扫描nfs
         try {
             Object obj = ApplicationContextHelper.getBean("DmeNFSAccessServiceImpl");
             ((DmeNFSAccessService) obj).scanNfs();
-        } catch (Exception e) {
+        } catch (DMEException e) {
             LOGGER.error("scanDatastore nfs error", e);
         }
         LOGGER.info("scanDatastore end");
     }
 
+    /**
+     * execute.
+     */
     public void execute() {
         LOGGER.info("scanDatastore rrr start");
     }
