@@ -22,15 +22,26 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 /**
+ * ApplicationController
+ *
  * @author andrewliu
+ * @since 2020-12-08
  */
+
 @RestController
 public class ApplicationController {
 
     private String zipFile = ".zip";
-
+    /**
+     * onload
+     *
+     * @param request  request
+     * @param response response
+     * @return Map
+     * @throws UnsupportedEncodingException UnsupportedEncodingException
+     * @Description: onload.
+     */
     @RequestMapping(value = "rest", method = RequestMethod.GET)
     public Map onload(final HttpServletRequest request, final HttpServletResponse response)
         throws UnsupportedEncodingException {
@@ -42,6 +53,12 @@ public class ApplicationController {
         return Validations.onloadChecker(request);
     }
 
+    /**
+     * onsubmit
+     *
+     * @param formData formata
+     * @return Map Map
+     */
     @RequestMapping(value = "rest", method = RequestMethod.POST)
     public Map onsubmit(final @RequestBody Map<String, String> formData) {
         return Validations.onSubmit(formData.get("packageUrl"),
