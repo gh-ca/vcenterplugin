@@ -4,8 +4,9 @@ import java.util.List;
 
 /**
  * BestPracticeUpResultResponse .
+ *
  * @author wangxiangyong .
- * @since 2020-12-01 .
+ * @since 2020-12-01
  **/
 public class BestPracticeUpResultResponse {
     /**
@@ -27,6 +28,7 @@ public class BestPracticeUpResultResponse {
 
     /**
      * getHostObjectId .
+     *
      * @return String .
      */
     public String getHostObjectId() {
@@ -35,48 +37,61 @@ public class BestPracticeUpResultResponse {
 
     /**
      * setHostObjectId .
+     *
      * @param param .
      */
     public void setHostObjectId(final String param) {
         this.hostObjectId = param;
     }
+
     /**
      * getHostName .
+     *
      * @return String .
      */
     public String getHostName() {
         return hostName;
     }
+
     /**
      * setHostObjectId .
+     *
      * @param param .
      */
     public void setHostName(final String param) {
         this.hostName = param;
     }
+
     /**
      * getResult .
-     * @return List<BestPracticeUpResultBase> .
+     *
+     * @return List<> .
      */
     public List<BestPracticeUpResultBase> getResult() {
         return result;
     }
+
     /**
      * setHostObjectId .
+     *
      * @param param .
      */
     public void setResult(final List<BestPracticeUpResultBase> param) {
         this.result = param;
     }
+
     /**
      * getNeedReboot .
+     *
      * @return boolean .
      */
     public boolean getNeedReboot() {
         return needReboot;
     }
+
     /**
      * setHostObjectId .
+     *
      * @param param .
      */
     public void setNeedReboot(final boolean param) {

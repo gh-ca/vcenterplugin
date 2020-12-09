@@ -3,10 +3,12 @@ package com.dmeplugin.dmestore.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
+ * CustomizeVolumeTuning
+ *
  * @author lianq
  * @ClassName: CustomizeVolumeTuning
  * @Company: GH-CA
- * @since  2020-09-03
+ * @since 2020-09-03
  */
 public class CustomizeVolumeTuning {
     /**
@@ -31,6 +33,7 @@ public class CustomizeVolumeTuning {
 
     /**
      * getSmartQos .
+     *
      * @return SmartQos .
      */
     public SmartQos getSmartQos() {
@@ -39,48 +42,61 @@ public class CustomizeVolumeTuning {
 
     /**
      * setSmartQos .
+     *
      * @param param .
      */
     public void setSmartQos(final SmartQos param) {
         this.smartQos = param;
     }
+
     /**
      * getCompressionEnabled .
+     *
      * @return Boolean .
      */
     public Boolean getCompressionEnabled() {
         return compressionEnabled;
     }
+
     /**
      * setSmartQos .
+     *
      * @param param .
      */
     public void setCompressionEnabled(final Boolean param) {
         this.compressionEnabled = param;
     }
+
     /**
      * getDedupeEnabled .
+     *
      * @return Boolean .
      */
     public Boolean getDedupeEnabled() {
         return dedupeEnabled;
     }
+
     /**
      * setSmartQos .
+     *
      * @param param .
      */
     public void setDedupeEnabled(final Boolean param) {
         this.dedupeEnabled = param;
     }
+
     /**
      * getSmarttier .
+     *
      * @return Integer .
      */
     public Integer getSmarttier() {
         return smarttier;
     }
+
     /**
      * setSmartQos .
+     *
      * @param param .
      */
     public void setSmarttier(final Integer param) {

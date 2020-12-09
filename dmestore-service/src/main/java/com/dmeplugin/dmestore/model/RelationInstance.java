@@ -1,11 +1,12 @@
 package com.dmeplugin.dmestore.model;
 
 /**
- * @Description: TODO
+ * RelationInstance
+ *
  * @ClassName: RelationInstance
  * @Company: GH-CA
  * @author: liuxh
- * @create: 2020-09-15
+ * @since 2020-09-15
  **/
 public class RelationInstance {
     /**
@@ -39,6 +40,7 @@ public class RelationInstance {
 
     /**
      * getSourceInstanceId .
+     *
      * @return String.
      */
     public String getSourceInstanceId() {
@@ -47,90 +49,115 @@ public class RelationInstance {
 
     /**
      * setSourceInstanceId .
+     *
      * @param param .
      */
     public void setSourceInstanceId(final String param) {
         this.sourceInstanceId = param;
     }
+
     /**
      * getTargetInstanceId .
+     *
      * @return String.
      */
     public String getTargetInstanceId() {
         return targetInstanceId;
     }
+
     /**
      * setTargetInstanceId .
+     *
      * @param param .
      */
     public void setTargetInstanceId(final String param) {
         this.targetInstanceId = param;
     }
+
     /**
      * getRelationName .
+     *
      * @return String.
      */
     public String getRelationName() {
         return relationName;
     }
+
     /**
      * setRelationName .
+     *
      * @param param .
      */
     public void setRelationName(final String param) {
         this.relationName = param;
     }
+
     /**
      * getId .
+     *
      * @return String.
      */
     public String getId() {
         return id;
     }
+
     /**
      * setId .
+     *
      * @param param .
      */
     public void setId(final String param) {
         this.id = param;
     }
+
     /**
      * getLastModified .
+     *
      * @return long.
      */
     public long getLastModified() {
         return lastModified;
     }
+
     /**
      * setSourceInstanceId .
+     *
      * @param param .
      */
     public void setLastModified(final long param) {
         this.lastModified = param;
     }
+
     /**
      * getResId .
+     *
      * @return String.
      */
     public String getResId() {
         return resId;
     }
+
     /**
      * setResId .
+     *
      * @param param .
      */
     public void setResId(final String param) {
         this.resId = param;
     }
+
     /**
      * getRelationId .
+     *
      * @return int.
      */
     public int getRelationId() {
         return relationId;
     }
+
     /**
      * setRelationId .
+     *
      * @param param .
      */
     public void setRelationId(final int param) {

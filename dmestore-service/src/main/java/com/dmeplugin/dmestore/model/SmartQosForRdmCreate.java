@@ -1,7 +1,10 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * SmartQosForRdmCreate
+ *
  * @author wangxiangyong
+ * @since 2020-12-08
  */
 public class SmartQosForRdmCreate extends BaseSmartQos {
     /**
@@ -11,6 +14,7 @@ public class SmartQosForRdmCreate extends BaseSmartQos {
 
     /**
      * getControlPolicy .
+     *
      * @return String .
      */
     public String getControlPolicy() {
@@ -19,6 +23,7 @@ public class SmartQosForRdmCreate extends BaseSmartQos {
 
     /**
      * setControlPolicy .
+     *
      * @param param .
      */
     public void setControlPolicy(final String param) {
