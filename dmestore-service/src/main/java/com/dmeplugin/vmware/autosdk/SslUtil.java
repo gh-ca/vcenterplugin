@@ -15,9 +15,14 @@ package com.dmeplugin.vmware.autosdk;
 
 import com.dmeplugin.vmware.util.VmwareClient;
 
-import javax.net.ssl.*;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
 
 /**
  * Retrieves the SSL certificate chain of an HTTPS server and stores the root
@@ -26,8 +31,16 @@ import java.security.NoSuchAlgorithmException;
  * Note: Circumventing SSL trust is unsafe and should not use these in
  * production software.
  * </p>
+ *
+ * @author Administrator
+ * @since 2020-12-08
  */
 public class SslUtil {
+    /**
+     * SslUtil
+     */
+    private SslUtil() { }
+
     /**
      * Method to trust all the HTTPS certificates. To be used only in the
      * development environment for convenience.
