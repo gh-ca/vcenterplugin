@@ -3,7 +3,10 @@ package com.dmeplugin.dmestore.services.bestpractice;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 
 /**
+ * LunQueueDepthForEmulexImpl
+ *
  * @author wangxiangyong
+ * @since 2020-11-30
  **/
 public class LunQueueDepthForEmulexImpl extends BaseBestPracticeService implements BestPracticeService {
     @Override
@@ -17,7 +20,7 @@ public class LunQueueDepthForEmulexImpl extends BaseBestPracticeService implemen
     }
 
     @Override
-    public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception{
+    public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         return super.getCurrentModuleOption(vcsdkUtils, objectId, getOptionName());
     }
 
@@ -42,11 +45,11 @@ public class LunQueueDepthForEmulexImpl extends BaseBestPracticeService implemen
     }
 
     @Override
-    public void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception{
+    public void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         super.updateModuleOption(vcsdkUtils, objectId, getOptionName(), getRecommendValue());
     }
 
-    private String getOptionName(){
+    private String getOptionName() {
         return "lpfc0_lun_queue_depth";
     }
 }

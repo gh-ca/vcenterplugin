@@ -1,12 +1,11 @@
 package com.dmeplugin.dmestore.mvc;
 
+import com.dmeplugin.dmestore.constant.DmeConstants;
 import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.exception.NoDMEException;
 import com.dmeplugin.dmestore.exception.VcenterRuntimeException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.DMEOpenApiService;
-import com.dmeplugin.dmestore.services.DmeConstants;
-import com.dmeplugin.dmestore.utils.JsonUtil;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,12 +15,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.client.RestClientException;
 
-import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,8 +42,6 @@ public class BaseController {
     private static final String CODE_FAILURE = "-99999";
 
     private static final String CODE_DB_EXCEPTION = "-70001";
-
-    private static final String CODE_ESIGHT_RETURN_PWD_EXCEPTION = "1";
 
     private static final String CODE_ESIGHT_CONNECT_EXCEPTION = "-80010";
 
@@ -162,35 +157,10 @@ public class BaseController {
     }
 
     protected ResponseBodyBean success(Object data, String description) {
-        ResponseBodyBean bodyBean = null;
-        bodyBean = new ResponseBodyBean(CODE_SUCCESS, null, null);
+        ResponseBodyBean bodyBean = new ResponseBodyBean(CODE_SUCCESS, null, null);
         bodyBean.setData(data);
         bodyBean.setDescription(description);
         return bodyBean;
-    }
-
-    protected ResponseBodyBean getResultByData(String data) throws IOException {
-        return getResultByData(data, "");
-    }
-
-    protected ResponseBodyBean getResultByData(Map dataMap) {
-        return getResultByData(dataMap, "");
-    }
-
-    protected ResponseBodyBean getResultByData(Map dataMap, String prefix) {
-        if (!isSuccessResponse(dataMap.get(FIELD_CODE))) {
-            if (dataMap.containsKey(FIELD_CODE)) {
-                return failure(prefix + dataMap.get(FIELD_CODE).toString(), dataMap.get(FIELD_DESCRIPTION).toString(),
-                    dataMap);
-            }
-            return failure(CODE_FAILURE, "eSight result exception", dataMap);
-        } else {
-            return success(dataMap, (String) dataMap.get(FIELD_DESCRIPTION));
-        }
-    }
-
-    protected ResponseBodyBean getResultByData(String data, String prefix) throws IOException {
-        return getResultByData(JsonUtil.readAsMap(data), prefix);
     }
 
     protected ResponseBodyBean failure() {
@@ -202,16 +172,14 @@ public class BaseController {
     }
 
     protected ResponseBodyBean failure(String code, String description) {
-        ResponseBodyBean bodyBean = null;
-        bodyBean = new ResponseBodyBean(CODE_FAILURE, null, null);
+        ResponseBodyBean bodyBean = new ResponseBodyBean(CODE_FAILURE, null, null);
         bodyBean.setDescription(description);
         bodyBean.setCode(code);
         return bodyBean;
     }
 
     protected ResponseBodyBean failure(String code, String description, Object data) {
-        ResponseBodyBean bodyBean = null;
-        bodyBean = new ResponseBodyBean(CODE_FAILURE, null, null);
+        ResponseBodyBean bodyBean = new ResponseBodyBean(CODE_FAILURE, null, null);
         bodyBean.setDescription(description);
         bodyBean.setCode(code);
         bodyBean.setData(data);
@@ -221,35 +189,5 @@ public class BaseController {
 
     protected ResponseBodyBean failure(String description, Object data) {
         return failure(CODE_FAILURE, description, data);
-    }
-
-    protected ResponseBodyBean listData(List<Map<String, Object>> dataMapList) {
-        return listData(dataMapList, "");
-    }
-
-    protected ResponseBodyBean listData(List<Map<String, Object>> dataMapList, String prefix) {
-        Boolean success = false;
-        Boolean failure = false;
-        String errorDescription = null;
-
-        for (Map<String, Object> dataMap : dataMapList) {
-            if (!isSuccessResponse(dataMap.get(FIELD_CODE))) {
-                if (!failure) {
-                    errorDescription = (String) dataMap.get(FIELD_DESCRIPTION);
-                }
-                dataMap.put(FIELD_CODE, prefix + (int) dataMap.get(FIELD_CODE));
-                failure = true;
-            } else {
-                success = true;
-            }
-        }
-
-        if (success && failure) {
-            return failure(CODE_NOTALL_FAILURE, errorDescription, dataMapList);
-        }
-        if (failure) {
-            return failure(CODE_ALL_FAILURE, errorDescription, dataMapList);
-        }
-        return success(dataMapList);
     }
 }

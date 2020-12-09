@@ -4,7 +4,7 @@ import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.exception.DataBaseException;
 import com.dmeplugin.dmestore.exception.DmeSqlException;
-import com.dmeplugin.dmestore.services.DmeConstants;
+import com.dmeplugin.dmestore.constant.DmeConstants;
 
 import java.sql.*;
 
