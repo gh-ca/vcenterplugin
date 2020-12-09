@@ -1,5 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.constant.DmeConstants;
 import com.dmeplugin.dmestore.dao.BestPracticeCheckDao;
 import com.dmeplugin.dmestore.exception.DMEException;
 import com.dmeplugin.dmestore.exception.DmeSqlException;
@@ -10,14 +11,12 @@ import com.dmeplugin.dmestore.model.BestPracticeUpResultBase;
 import com.dmeplugin.dmestore.model.BestPracticeUpResultResponse;
 import com.dmeplugin.dmestore.services.bestpractice.BestPracticeService;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
-import com.dmeplugin.vmware.util.VmwareContext;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -26,10 +25,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * BestPracticeProcessServiceImpl
+ *
  * @author wangxiangyong
+ * @since 2020-11-30
  **/
 public class BestPracticeProcessServiceImpl implements BestPracticeProcessService {
     private static final Logger log = LoggerFactory.getLogger(BestPracticeProcessServiceImpl.class);
+
+    private static final int PAGE_SIZE = 100;
 
     private Gson gson = new Gson();
 
@@ -64,7 +68,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     }
 
     @Override
-    public List<BestPracticeCheckRecordBean> getCheckRecord()   {
+    public List<BestPracticeCheckRecordBean> getCheckRecord() {
         List<BestPracticeCheckRecordBean> list = new ArrayList<>();
         for (BestPracticeService bestPracticeService : bestPracticeServices) {
             BestPracticeCheckRecordBean bean = new BestPracticeCheckRecordBean();
@@ -72,10 +76,11 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             bean.setLevel(bestPracticeService.getLevel());
             bean.setRecommendValue(String.valueOf(bestPracticeService.getRecommendValue()));
             try {
-                List<BestPracticeBean> hostBean = bestPracticeCheckDao.getRecordBeanByHostsetting(bestPracticeService.getHostSetting());
+                List<BestPracticeBean> hostBean = bestPracticeCheckDao.getRecordBeanByHostsetting(
+                    bestPracticeService.getHostSetting());
                 bean.setHostList(hostBean);
                 bean.setCount(hostBean.size());
-            } catch (Exception ex) {
+            } catch (SQLException ex) {
                 continue;
             }
             if (bean.getCount() > 0) {
@@ -89,11 +94,11 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     public List<BestPracticeBean> getCheckRecordBy(String hostSetting, int pageNo, int pageSize) throws DMEException {
         List<BestPracticeBean> list = new ArrayList<>();
         for (BestPracticeService bestPracticeService : bestPracticeServices) {
-            String s = bestPracticeService.getHostSetting();
-            if (hostSetting.equals(s)) {
+            String setting = bestPracticeService.getHostSetting();
+            if (hostSetting.equals(setting)) {
                 try {
                     list = bestPracticeCheckDao.getRecordByPage(hostSetting, pageNo, pageSize);
-                } catch (Exception ex) {
+                } catch (SQLException ex) {
                     throw new DMEException(ex.getMessage());
                 }
                 break;
@@ -114,16 +119,16 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
 
         JsonArray hostArray = gson.fromJson(hostsStr, JsonArray.class);
 
-        Map<String, List<BestPracticeBean>> checkMap = new HashMap<>(16);
-        for (int i = 0; i < hostArray.size(); i++) {
-            JsonObject hostObject = hostArray.get(i).getAsJsonObject();
+        Map<String, List<BestPracticeBean>> checkMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+        for (int index = 0; index < hostArray.size(); index++) {
+            // 对每一项进行检查
+            JsonObject hostObject = hostArray.get(index).getAsJsonObject();
             String hostName = hostObject.get("hostName").getAsString();
             String hostObjectId = hostObject.get("objectId").getAsString();
-            //对每一项进行检查
             for (BestPracticeService bestPracticeService : bestPracticeServices) {
                 try {
                     String hostSetting = bestPracticeService.getHostSetting();
-                    if(!checkMap.containsKey(hostSetting)){
+                    if (!checkMap.containsKey(hostSetting)) {
                         checkMap.put(hostSetting, new ArrayList<>());
                     }
 
@@ -134,7 +139,8 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                         bean.setRecommendValue(String.valueOf(bestPracticeService.getRecommendValue()));
                         bean.setLevel(bestPracticeService.getLevel());
                         bean.setNeedReboot(String.valueOf(bestPracticeService.needReboot()));
-                        bean.setActualValue(String.valueOf(bestPracticeService.getCurrentValue(vcsdkUtils, hostObjectId)));
+                        bean.setActualValue(
+                            String.valueOf(bestPracticeService.getCurrentValue(vcsdkUtils, hostObjectId)));
                         bean.setHostObjectId(hostObjectId);
                         bean.setHostName(hostName);
                         bean.setAutoRepair(String.valueOf(bestPracticeService.autoRepair()));
@@ -144,52 +150,52 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                 } catch (Exception ex) {
                     // 报错，跳过当前项检查
                     log.error("{} check failed! hostSetting={}", hostName, bestPracticeService.getHostSetting());
-                    continue;
                 }
             }
         }
 
         if (checkMap.size() > 0) {
-            //保存到数据库
+            // 保存到数据库
             bachDbProcess(checkMap);
         }
         log.info("check end ");
     }
 
     private void bachDbProcess(Map<String, List<BestPracticeBean>> map) {
-        map.forEach((k, v) -> {
-            //本地全量查询
+        map.forEach((k, bestPracticeBeans) -> {
+            // 本地全量查询
             List<String> localHostNames = null;
             try {
                 localHostNames = bestPracticeCheckDao.getHostNameByHostsetting(k);
             } catch (SQLException e) {
-                e.printStackTrace();
+                log.error(e.getMessage());
             }
 
             List<BestPracticeBean> newList = new ArrayList<>();
             List<BestPracticeBean> upList = new ArrayList<>();
-            if(null != v && v.size() > 0){
-                for (BestPracticeBean o : v) {
-                    String hostName = o.getHostName();
+            if (null != bestPracticeBeans && bestPracticeBeans.size() > 0) {
+                for (BestPracticeBean bestPracticeBean : bestPracticeBeans) {
+                    String hostName = bestPracticeBean.getHostName();
                     if (localHostNames.contains(hostName)) {
-                        upList.add(o);
+                        upList.add(bestPracticeBean);
                         localHostNames.remove(hostName);
                     } else {
-                        newList.add(o);
+                        newList.add(bestPracticeBean);
                     }
                 }
             }
 
-            //更新
+            // 更新
             if (!upList.isEmpty()) {
                 bestPracticeCheckDao.update(upList);
             }
 
-            //新增
+            // 新增
             if (!newList.isEmpty()) {
                 bestPracticeCheckDao.save(newList);
             }
-            //删除
+
+            // 删除
             if (!localHostNames.isEmpty()) {
                 bestPracticeCheckDao.deleteByHostNameAndHostsetting(localHostNames, k);
             }
@@ -202,9 +208,10 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     }
 
     @Override
-    public List<BestPracticeUpResultResponse> update(List<String> objectIds, String hostSetting) throws DmeSqlException {
+    public List<BestPracticeUpResultResponse> update(List<String> objectIds, String hostSetting)
+        throws DmeSqlException {
+        // 获取对应的service
         List<BestPracticeService> services = new ArrayList<>();
-        //获取对应的service
         for (BestPracticeService bestPracticeService : bestPracticeServices) {
             if (null != hostSetting) {
                 if (bestPracticeService.getHostSetting().equals(hostSetting)) {
@@ -217,32 +224,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             }
         }
 
-        Map<String, String> hostMap = new HashMap<>(16);
-        if (null == objectIds || objectIds.size() == 0) {
-            int pageNo = 0;
-            int pageSize = 100;
-            //获取本地所有
-            try {
-                while (true) {
-                    Map<String, String> hostMapTemp = bestPracticeCheckDao.getAllHostIds(pageNo++, pageSize);
-                    hostMap.putAll(hostMapTemp);
-
-                    if (hostMapTemp.size() != pageSize) {
-                        break;
-                    }
-                }
-            }catch (SQLException e){
-                e.printStackTrace();
-                throw new DmeSqlException(e.getMessage());
-            }
-        }else {
-            try {
-                //从本地数据库查询指定的主机信息
-                hostMap = bestPracticeCheckDao.getByHostIds(objectIds);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        }
+        Map<String, String> hostMap = getHostMap(objectIds);
 
         List<BestPracticeUpResultResponse> responses = new ArrayList<>();
         List<String> successList = new ArrayList<>();
@@ -260,17 +242,17 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                 base.setHostSetting(service.getHostSetting());
                 base.setNeedReboot(service.needReboot());
                 try {
+                    // 更新成功后，只要有一项是需要重启的则该主机需要重启后生效
                     service.update(vcsdkUtils, objectId);
                     base.setUpdateResult(true);
-                    //更新成功后，只要有一项是需要重启的则该主机需要重启后生效
                     if (service.needReboot()) {
                         needReboot = true;
                     }
                     successList.add(objectId);
                 } catch (Exception ex) {
                     base.setUpdateResult(false);
-                    log.error("best practice update {} {} recommend value failed!errMsg:{}", objectId, hostSetting, ex.getMessage());
-                    ex.printStackTrace();
+                    log.error("best practice update {} {} recommend value failed!errMsg:{}", objectId, hostSetting,
+                        ex.getMessage());
                 }
                 baseList.add(base);
             }
@@ -280,9 +262,37 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             responses.add(response);
         }
 
-        //将成功修改了最佳实践值的记录从表中删除
+        // 将成功修改了最佳实践值的记录从表中删除
         bestPracticeCheckDao.deleteBy(responses);
 
         return responses;
+    }
+
+    private Map<String, String> getHostMap(List<String> objectIds) throws DmeSqlException {
+        Map<String, String> hostMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+        if (null == objectIds || objectIds.size() == 0) {
+            // 获取本地所有
+            int pageNo = 0;
+            try {
+                while (true) {
+                    Map<String, String> hostMapTemp = bestPracticeCheckDao.getAllHostIds(pageNo++, PAGE_SIZE);
+                    hostMap.putAll(hostMapTemp);
+
+                    if (hostMapTemp.size() != PAGE_SIZE) {
+                        break;
+                    }
+                }
+            } catch (SQLException e) {
+                throw new DmeSqlException(e.getMessage());
+            }
+        } else {
+            try {
+                // 从本地数据库查询指定的主机信息
+                hostMap = bestPracticeCheckDao.getByHostIds(objectIds);
+            } catch (SQLException e) {
+                throw new DmeSqlException(e.getMessage());
+            }
+        }
+        return hostMap;
     }
 }

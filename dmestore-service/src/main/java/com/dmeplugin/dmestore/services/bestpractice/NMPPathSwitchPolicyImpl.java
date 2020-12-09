@@ -11,7 +11,10 @@ import com.vmware.vim25.ManagedObjectReference;
 import java.util.List;
 
 /**
+ * NMPPathSwitchPolicyImpl
+ *
  * @author wangxiangyong
+ * @since 2020-11-30
  **/
 public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements BestPracticeService {
     @Override
@@ -30,7 +33,9 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = this.getHostMoFactory().build(context, mor);
         HostStorageSystemMO hostStorageSystemMo = hostMo.getHostStorageSystemMo();
-        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo().getMultipathInfo().getLun();
+        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo()
+            .getMultipathInfo()
+            .getLun();
         for (HostMultipathInfoLogicalUnit lun : lunList) {
             HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
             String policyStr = policy.getPolicy();
@@ -61,17 +66,19 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = this.getHostMoFactory().build(context, mor);
         HostStorageSystemMO hostStorageSystemMo = hostMo.getHostStorageSystemMo();
-        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo().getMultipathInfo().getLun();
+        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo()
+            .getMultipathInfo()
+            .getLun();
         for (HostMultipathInfoLogicalUnit lun : lunList) {
             HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
             String policyStr = policy.getPolicy();
             //多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
             //TODO
-            if(policyStr.contains("_PSP_") && !"VMW_PSP_RR".equals(policy)){
+            if (policyStr.contains("_PSP_") && !"VMW_PSP_RR".equals(policy)) {
                 //return false;
             }
 
-            if(policyStr.contains("_SATP_") && !"VMW_SATP_ALUA".equals(policy)){
+            if (policyStr.contains("_SATP_") && !"VMW_SATP_ALUA".equals(policy)) {
                 //return false;
             }
         }
@@ -89,14 +96,15 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = this.getHostMoFactory().build(context, mor);
         HostStorageSystemMO hostStorageSystemMo = hostMo.getHostStorageSystemMo();
-        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo().getMultipathInfo().getLun();
+        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo()
+            .getMultipathInfo()
+            .getLun();
         for (HostMultipathInfoLogicalUnit lun : lunList) {
             HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
             String policyStr = policy.getPolicy();
             //TODO
             //多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
-            if("".equals(policyStr)){
-                //policy.setPolicy("VMW_PSP_RR");
+            if ("".equals(policyStr)) {
             }
             hostStorageSystemMo.setMultipathLunPolicy(lun.getId(), policy);
         }

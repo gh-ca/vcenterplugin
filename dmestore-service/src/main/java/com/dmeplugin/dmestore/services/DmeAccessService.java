@@ -1,6 +1,7 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.exception.DMEException;
+
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
@@ -8,29 +9,27 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Description: TODO
- * @ClassName: DmeAccessService
- * @Company: GH-CA
- * @author: yy
- * @create: 2020-09-02
+ * DmeAccessService
+ *
+ * @author yy
+ * @since 2020-09-02
  **/
 public interface DmeAccessService {
     /**
      * Access DME
-     * params include hostIp: Access to the IP address of the DME service
-     * hostPort: Port to access DME service
-     * userName: User name to access the DME service
-     * password: Password to access the DME service
      *
-     * @param params: include hostIp,hostPort,userName,password
-     * @return: ResponseBodyBean
+     * @author yy
+     * @param params key required: obj_ids, indicator_ids, range
+     * @throws DMEException 异常
      */
     void accessDme(Map<String, Object> params) throws DMEException;
 
     /**
-     * Refresh connection status
+     * refreshDme
      *
-     * @return ResponseBodyBean
+     * @author wangxy
+     * @return Map
+     * @throws DMEException 异常
      */
     Map<String, Object> refreshDme() throws DMEException;
 
@@ -41,7 +40,7 @@ public interface DmeAccessService {
      * @param method Http Method
      * @param requestBody request Body
      * @return ResponseBodyBean
-     * @throws Exception when error
+     * @throws DMEException when error
      */
     ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws DMEException;
 
@@ -52,7 +51,7 @@ public interface DmeAccessService {
      * @param method Http Method
      * @param jsonBody request Body
      * @return ResponseBodyBean
-     * @throws Exception when error
+     * @throws DMEException when error
      */
     ResponseEntity<String> accessByJson(String url, HttpMethod method, String jsonBody) throws DMEException;
 
@@ -61,7 +60,7 @@ public interface DmeAccessService {
      *
      * @param storageId storage id
      * @return ResponseBodyBean
-     * @throws Exception when error
+     * @throws DMEException when error
      */
     List<Map<String, Object>> getWorkLoads(String storageId) throws DMEException;
 
@@ -70,7 +69,7 @@ public interface DmeAccessService {
      *
      * @param hostIp host ip
      * @return ResponseBodyBean
-     * @throws Exception when error
+     * @throws DMEException when error
      */
     List<Map<String, Object>> getDmeHosts(String hostIp) throws DMEException;
 
@@ -79,7 +78,7 @@ public interface DmeAccessService {
      *
      * @param hostId host id
      * @return ResponseBodyBean
-     * @throws Exception when error
+     * @throws DMEException when error
      */
     List<Map<String, Object>> getDmeHostInitiators(String hostId) throws DMEException;
 
@@ -88,7 +87,7 @@ public interface DmeAccessService {
      *
      * @param hostGroupName hostGroup Name
      * @return ResponseBodyBean
-     * @throws Exception when error
+     * @throws DMEException when error
      */
     List<Map<String, Object>> getDmeHostGroups(String hostGroupName) throws DMEException;
 
@@ -97,7 +96,7 @@ public interface DmeAccessService {
      *
      * @param params create host's param
      * @return ResponseBodyBean
-     * @throws Exception when error
+     * @throws DMEException when error
      */
     Map<String, Object> createHost(Map<String, Object> params) throws DMEException;
 
@@ -106,7 +105,7 @@ public interface DmeAccessService {
      *
      * @param params create hostgroup's param
      * @return ResponseBodyBean
-     * @throws Exception when error
+     * @throws DMEException when error
      */
     Map<String, Object> createHostGroup(Map<String, Object> params) throws DMEException;
 
@@ -115,7 +114,7 @@ public interface DmeAccessService {
      *
      * @param hostId host id
      * @return ResponseBodyBean
-     * @throws Exception when error
+     * @throws DMEException when error
      */
     Map<String, Object> getDmeHost(String hostId) throws DMEException;
 
@@ -123,7 +122,7 @@ public interface DmeAccessService {
      * delete Volume
      *
      * @param ids host ids
-     * @throws Exception when error
+     * @throws DMEException when error
      */
     void deleteVolumes(List<String> ids) throws DMEException;
 
@@ -132,7 +131,7 @@ public interface DmeAccessService {
      *
      * @param hostId host id
      * @param ids datastore ids
-     * @throws Exception when error
+     * @throws DMEException when error
      */
     void unMapHost(String hostId, List<String> ids) throws DMEException;
 
@@ -140,8 +139,7 @@ public interface DmeAccessService {
      * scan Datastore
      *
      * @param storageType storage type:VMFS,NFS,ALL
-     * @return ResponseBodyBean
-     * @throws Exception when error
+     * @throws DMEException when error
      */
     void scanDatastore(String storageType) throws DMEException;
 
@@ -150,27 +148,34 @@ public interface DmeAccessService {
      *
      * @param taskId task Id
      * @param taskCron task cron
-     * @return ResponseBodyBean
-     * @throws Exception when error
+     * @throws DMEException when error
      */
     void configureTaskTime(Integer taskId,String taskCron) throws DMEException;
 
     /**
      * get hostGroup's detail
+     *
      * @param hsotGroupId hostGroups id
-     * @return
-     * @throws Exception
+     * @return Map
+     * @throws DMEException when error
      */
     Map<String,Object> getDmeHostGroup(String hsotGroupId) throws DMEException;
 
     /**
      * get hostGroup's host
+     *
      * @param hostGroupId hostGroups id
-     * @return
-     * @throws Exception
+     * @return List
+     * @throws DMEException when error
      */
     List<Map<String,Object>> getDmeHostInHostGroup(String hostGroupId) throws DMEException;
 
-
+    /**
+     * Configure task time
+     *
+     * @param hostId host Id
+     * @param volumeIds task cron
+     * @throws DMEException when error
+     */
     void hostMapping(String hostId, List<String> volumeIds) throws DMEException;
 }
