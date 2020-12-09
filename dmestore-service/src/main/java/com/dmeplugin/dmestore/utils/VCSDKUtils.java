@@ -1,9 +1,9 @@
 package com.dmeplugin.dmestore.utils;
 
+import com.dmeplugin.dmestore.constant.DmeConstants;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.exception.VcenterException;
-import com.dmeplugin.dmestore.constant.DmeConstants;
 import com.dmeplugin.vmware.VCConnectionHelper;
 import com.dmeplugin.vmware.autosdk.SessionHelper;
 import com.dmeplugin.vmware.autosdk.TaggingWorkflow;
@@ -574,7 +574,8 @@ public class VCSDKUtils {
                                 if (dhm != null) {
                                     if (dhm.getMountInfo() != null && dhm.getMountInfo().isMounted() &&
                                         dhm.getKey().getValue().equals(objHostId)) {
-                                        String objectId = vcConnectionHelper.mor2ObjectId(dsmo.getMor(), vmwareContext.getServerAddress());
+                                        String objectId = vcConnectionHelper
+                                            .mor2ObjectId(dsmo.getMor(), vmwareContext.getServerAddress());
                                         Map<String, Object> map = new HashMap<>();
                                         map.put("id", dsmo.getMor().getValue());
                                         map.put("name", dsmo.getName());
@@ -706,7 +707,7 @@ public class VCSDKUtils {
                 List<Pair<ManagedObjectReference, String>> hosts = clusterMo.getClusterHosts();
                 if (hosts != null && hosts.size() > 0) {
                     for (Pair<ManagedObjectReference, String> host : hosts) {
-                       // HostMO host1 = new HostMO(vmwareContext, host.first());
+                        // HostMO host1 = new HostMO(vmwareContext, host.first());
                         HostMO host1 = hostMOFactory.build(vmwareContext, host.first());
                         hostids.add(host1.getMor().getValue());
                     }
@@ -1120,6 +1121,7 @@ public class VCSDKUtils {
             throw new VcenterException(e.getMessage());
         }
     }
+
     /**
      * 得到主机对应的可用LUN
      **/
@@ -2812,6 +2814,7 @@ public class VCSDKUtils {
             throw new RuntimeException(e);
         }
     }
+
     /**
      * 判断数据存储中是否有注册的虚拟机，有则返回true，没有返回false
      *

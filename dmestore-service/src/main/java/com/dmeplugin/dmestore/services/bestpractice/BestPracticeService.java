@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.services.bestpractice;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.dmeplugin.vmware.util.DatastoreMOFactory;
 import com.dmeplugin.vmware.util.HostMOFactory;
@@ -35,7 +35,7 @@ public interface BestPracticeService {
      * @param vcsdkUtils vCenter工具类
      * @param objectId 存储/主机ID
      * @return Object
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
     Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception;
 

@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -20,18 +20,18 @@ public interface DmeAccessService {
      *
      * @author yy
      * @param params key required: obj_ids, indicator_ids, range
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    void accessDme(Map<String, Object> params) throws DMEException;
+    void accessDme(Map<String, Object> params) throws DmeException;
 
     /**
      * refreshDme
      *
      * @author wangxy
      * @return Map
-     * @throws DMEException 异常
+     * @throws DmeException 异常
      */
-    Map<String, Object> refreshDme() throws DMEException;
+    Map<String, Object> refreshDme() throws DmeException;
 
     /**
      * Public method access
@@ -40,9 +40,9 @@ public interface DmeAccessService {
      * @param method Http Method
      * @param requestBody request Body
      * @return ResponseBodyBean
-     * @throws DMEException when error
+     * @throws DmeException when error
      */
-    ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws DMEException;
+    ResponseEntity<String> access(String url, HttpMethod method, String requestBody) throws DmeException;
 
     /**
      * Public method access
@@ -51,131 +51,131 @@ public interface DmeAccessService {
      * @param method Http Method
      * @param jsonBody request Body
      * @return ResponseBodyBean
-     * @throws DMEException when error
+     * @throws DmeException when error
      */
-    ResponseEntity<String> accessByJson(String url, HttpMethod method, String jsonBody) throws DMEException;
+    ResponseEntity<String> accessByJson(String url, HttpMethod method, String jsonBody) throws DmeException;
 
     /**
      * Access workload info
      *
      * @param storageId storage id
      * @return ResponseBodyBean
-     * @throws DMEException when error
+     * @throws DmeException when error
      */
-    List<Map<String, Object>> getWorkLoads(String storageId) throws DMEException;
+    List<Map<String, Object>> getWorkLoads(String storageId) throws DmeException;
 
     /**
      * Query Dme Hosts
      *
      * @param hostIp host ip
      * @return ResponseBodyBean
-     * @throws DMEException when error
+     * @throws DmeException when error
      */
-    List<Map<String, Object>> getDmeHosts(String hostIp) throws DMEException;
+    List<Map<String, Object>> getDmeHosts(String hostIp) throws DmeException;
 
     /**
      * Query Dme Host's initiators
      *
      * @param hostId host id
      * @return ResponseBodyBean
-     * @throws DMEException when error
+     * @throws DmeException when error
      */
-    List<Map<String, Object>> getDmeHostInitiators(String hostId) throws DMEException;
+    List<Map<String, Object>> getDmeHostInitiators(String hostId) throws DmeException;
 
     /**
      * Query Dme hostgroup
      *
      * @param hostGroupName hostGroup Name
      * @return ResponseBodyBean
-     * @throws DMEException when error
+     * @throws DmeException when error
      */
-    List<Map<String, Object>> getDmeHostGroups(String hostGroupName) throws DMEException;
+    List<Map<String, Object>> getDmeHostGroups(String hostGroupName) throws DmeException;
 
     /**
      * create host
      *
      * @param params create host's param
      * @return ResponseBodyBean
-     * @throws DMEException when error
+     * @throws DmeException when error
      */
-    Map<String, Object> createHost(Map<String, Object> params) throws DMEException;
+    Map<String, Object> createHost(Map<String, Object> params) throws DmeException;
 
     /**
      * create hostgroup
      *
      * @param params create hostgroup's param
      * @return ResponseBodyBean
-     * @throws DMEException when error
+     * @throws DmeException when error
      */
-    Map<String, Object> createHostGroup(Map<String, Object> params) throws DMEException;
+    Map<String, Object> createHostGroup(Map<String, Object> params) throws DmeException;
 
     /**
      * get host's detailed
      *
      * @param hostId host id
      * @return ResponseBodyBean
-     * @throws DMEException when error
+     * @throws DmeException when error
      */
-    Map<String, Object> getDmeHost(String hostId) throws DMEException;
+    Map<String, Object> getDmeHost(String hostId) throws DmeException;
 
     /**
      * delete Volume
      *
      * @param ids host ids
-     * @throws DMEException when error
+     * @throws DmeException when error
      */
-    void deleteVolumes(List<String> ids) throws DMEException;
+    void deleteVolumes(List<String> ids) throws DmeException;
 
     /**
      * unMap Host
      *
      * @param hostId host id
      * @param ids datastore ids
-     * @throws DMEException when error
+     * @throws DmeException when error
      */
-    void unMapHost(String hostId, List<String> ids) throws DMEException;
+    void unMapHost(String hostId, List<String> ids) throws DmeException;
 
     /**
      * scan Datastore
      *
      * @param storageType storage type:VMFS,NFS,ALL
-     * @throws DMEException when error
+     * @throws DmeException when error
      */
-    void scanDatastore(String storageType) throws DMEException;
+    void scanDatastore(String storageType) throws DmeException;
 
     /**
      * Configure task time
      *
      * @param taskId task Id
      * @param taskCron task cron
-     * @throws DMEException when error
+     * @throws DmeException when error
      */
-    void configureTaskTime(Integer taskId,String taskCron) throws DMEException;
+    void configureTaskTime(Integer taskId,String taskCron) throws DmeException;
 
     /**
      * get hostGroup's detail
      *
      * @param hsotGroupId hostGroups id
      * @return Map
-     * @throws DMEException when error
+     * @throws DmeException when error
      */
-    Map<String,Object> getDmeHostGroup(String hsotGroupId) throws DMEException;
+    Map<String,Object> getDmeHostGroup(String hsotGroupId) throws DmeException;
 
     /**
      * get hostGroup's host
      *
      * @param hostGroupId hostGroups id
      * @return List
-     * @throws DMEException when error
+     * @throws DmeException when error
      */
-    List<Map<String,Object>> getDmeHostInHostGroup(String hostGroupId) throws DMEException;
+    List<Map<String,Object>> getDmeHostInHostGroup(String hostGroupId) throws DmeException;
 
     /**
      * Configure task time
      *
      * @param hostId host Id
      * @param volumeIds task cron
-     * @throws DMEException when error
+     * @throws DmeException when error
      */
-    void hostMapping(String hostId, List<String> volumeIds) throws DMEException;
+    void hostMapping(String hostId, List<String> volumeIds) throws DmeException;
 }

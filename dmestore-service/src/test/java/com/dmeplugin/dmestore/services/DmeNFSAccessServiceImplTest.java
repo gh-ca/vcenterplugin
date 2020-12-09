@@ -3,7 +3,7 @@ package com.dmeplugin.dmestore.services;
 import com.dmeplugin.dmestore.constant.DmeConstants;
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.NfsDataInfo;
 import com.dmeplugin.dmestore.model.NfsDataStoreFsAttr;
 import com.dmeplugin.dmestore.model.NfsDataStoreLogicPortAttr;
@@ -57,7 +57,7 @@ public class DmeNFSAccessServiceImplTest {
     }
 
     @Test
-    public void getNfsDatastoreShareAttr() throws DMEException {
+    public void getNfsDatastoreShareAttr() throws DmeException {
         when(dmeVmwareRalationDao.getShareIdByStorageId("321")).thenReturn("321");
         String resp = "{\n" +
                 "    \"id\": \"321\", \n" +
@@ -109,7 +109,7 @@ public class DmeNFSAccessServiceImplTest {
     }
 
     @Test
-    public void getNfsDatastoreLogicPortAttr() throws DMEException {
+    public void getNfsDatastoreLogicPortAttr() throws DmeException {
         when(dmeVmwareRalationDao.getLogicPortIdByStorageId("321")).thenReturn("321");
         String resp = "{\n" +
                 "    \"id\": \"string\", \n" +
@@ -140,7 +140,7 @@ public class DmeNFSAccessServiceImplTest {
     }
 
     @Test
-    public void getNfsDatastoreFsAttr() throws DMEException {
+    public void getNfsDatastoreFsAttr() throws DmeException {
         List<String> fsIds = new ArrayList<>();
         fsIds.add("321");
         when(dmeVmwareRalationDao.getFsIdsByStorageId("321")).thenReturn(fsIds);
@@ -227,7 +227,7 @@ public class DmeNFSAccessServiceImplTest {
     }
 
     @Test
-    public void scanNfs() throws DMEException {
+    public void scanNfs() throws DmeException {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("objectid","321");
         jsonObject.addProperty("remoteHost","321");
@@ -338,7 +338,7 @@ public class DmeNFSAccessServiceImplTest {
     }
 
     @Test
-    public void listNfs() throws DMEException {
+    public void listNfs() throws DmeException {
         DmeVmwareRelation dmeVmwareRelation = new DmeVmwareRelation();
         dmeVmwareRelation.setFsId("321");
         dmeVmwareRelation.setFsName("321");
@@ -446,7 +446,7 @@ public class DmeNFSAccessServiceImplTest {
     }
 
     @Test
-    public void listNfsPerformance() throws DMEException {
+    public void listNfsPerformance() throws DmeException {
         List<String> list = new ArrayList<>();
         list.add("321");
         String resp = "{\n" +
@@ -501,7 +501,7 @@ public class DmeNFSAccessServiceImplTest {
     }
 
     @Test
-    public void mountNfs() throws DMEException {
+    public void mountNfs() throws DmeException {
         Map<String, Object> params = new HashMap<>();
         params.put("hostVkernelIp", "321");
         params.put("dataStoreObjectId", "321");
@@ -533,7 +533,7 @@ public class DmeNFSAccessServiceImplTest {
     }
 
     @Test
-    public void unmountNfs() throws DMEException {
+    public void unmountNfs() throws DmeException {
         Map<String, Object> params = new HashMap<>();
         params.put("dataStoreObjectId", "321");
         params.put("hostId", "321");
@@ -584,7 +584,7 @@ public class DmeNFSAccessServiceImplTest {
     }
 
     @Test
-    public void deleteNfs() throws DMEException {
+    public void deleteNfs() throws DmeException {
 
         Map<String, Object> params = new HashMap<>();
         params.put("dataStoreObjectId", "321");
@@ -620,7 +620,7 @@ public class DmeNFSAccessServiceImplTest {
     }
 
     @Test
-    public void getHostsMountDataStoreByDsObjectId() throws DMEException {
+    public void getHostsMountDataStoreByDsObjectId() throws DmeException {
         Map<String, String> map = new HashMap<>();
         map.put("hostId", "321");
         map.put("hostName", "321");
@@ -631,7 +631,7 @@ public class DmeNFSAccessServiceImplTest {
     }
 
     @Test
-    public void getClusterMountDataStoreByDsObjectId() throws DMEException {
+    public void getClusterMountDataStoreByDsObjectId() throws DmeException {
         Map<String, String> map = new HashMap<>();
         map.put("clusterId", "321");
         map.put("clusterName", "321");

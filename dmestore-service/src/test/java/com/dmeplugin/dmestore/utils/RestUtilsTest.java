@@ -1,8 +1,6 @@
 package com.dmeplugin.dmestore.utils;
 
-import static org.junit.Assert.*;
-
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +24,7 @@ public class RestUtilsTest {
     }
 
     @Test
-    public void getRestTemplate() throws DMEException {
+    public void getRestTemplate() throws DmeException {
         restUtils.getRestTemplate();
     }
 }

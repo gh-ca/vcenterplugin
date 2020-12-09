@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.model.StoragePool;
 import com.dmeplugin.dmestore.model.Volume;
@@ -38,7 +38,7 @@ public class ServiceLevelController extends BaseController {
     public ResponseBodyBean listServiceLevel(@RequestBody Map<String, Object> params) {
         try {
             return success(serviceLevelService.listServiceLevel(params));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -51,7 +51,7 @@ public class ServiceLevelController extends BaseController {
             if (null != storagePoolList && storagePoolList.size() > 0) {
                 return success(storagePoolList);
             }
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             errMsg = e.getMessage();
         }
         return failure(errMsg);
@@ -65,7 +65,7 @@ public class ServiceLevelController extends BaseController {
             if (null != volumes && volumes.size() > 0) {
                 return success(volumes);
             }
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             errMsg = e.getMessage();
         }
         return failure(errMsg);
@@ -81,7 +81,7 @@ public class ServiceLevelController extends BaseController {
         try {
             serviceLevelService.updateVmwarePolicy();
             return success();
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }

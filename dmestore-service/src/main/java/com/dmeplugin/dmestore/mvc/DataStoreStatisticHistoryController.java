@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.DataStoreStatisticHistoryService;
 
@@ -28,7 +28,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getVmfsVolumeStatistic(@RequestBody Map<String, Object> params) {
         try {
             return success(dataSotreStatisticHistroyService.queryVmfsStatistic(params));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -37,7 +37,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getVolumeStatistic(@RequestBody Map<String, Object> params) {
         try {
             return success(dataSotreStatisticHistroyService.queryVolumeStatistic(params));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -46,7 +46,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getNfsVolumeStatistic(@RequestBody Map<String, Object> params) {
         try {
             return success(dataSotreStatisticHistroyService.queryNfsStatistic(params));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -55,7 +55,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getFsStatistic(@RequestBody Map<String, Object> params) {
         try {
             return success(dataSotreStatisticHistroyService.queryFsStatistic(params));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -64,7 +64,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getServiceLevelStatistic(@RequestBody Map<String, Object> params) {
         try {
             return success(dataSotreStatisticHistroyService.queryServiceLevelStatistic(params));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -73,7 +73,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getServiceLevelLunStatistic(@RequestBody Map<String, Object> params) {
         try {
             return success(dataSotreStatisticHistroyService.queryServiceLevelLunStatistic(params));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -82,7 +82,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getServiceLevelStoragePoolStatistic(@RequestBody Map<String, Object> params) {
         try {
             return success(dataSotreStatisticHistroyService.queryServiceLevelStoragePoolStatistic(params));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -91,7 +91,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getStoragePoolStatistic(@RequestBody Map<String, Object> params) throws Exception {
         try {
             return success(dataSotreStatisticHistroyService.queryStoragePoolStatistic(params));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -100,7 +100,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getStoragePoolCurrentStatistic(@RequestBody Map<String, Object> params) {
         try {
             return success(dataSotreStatisticHistroyService.queryStoragePoolCurrentStatistic(params));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -109,7 +109,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getStoragDeviceStatistic(@RequestBody Map<String, Object> params) {
         try {
             return success(dataSotreStatisticHistroyService.queryStorageDevcieStatistic(params));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -118,7 +118,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getStoragDeviceCurrentStatistic(@RequestBody Map<String, Object> params) {
         try {
             return success(dataSotreStatisticHistroyService.queryStorageDevcieCurrentStatistic(params));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -127,7 +127,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getControllerStatistic(@RequestBody Map<String, Object> params) {
         try {
             return success(dataSotreStatisticHistroyService.queryControllerStatistic(params));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -136,7 +136,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getControllerCurrenStatistic(@RequestBody Map<String, Object> params) {
         try {
             return success(dataSotreStatisticHistroyService.queryControllerCurrentStatistic(params));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -145,7 +145,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getStoragPortStatistic(@RequestBody Map<String, Object> params) {
         try {
             return success(dataSotreStatisticHistroyService.queryStoragePortStatistic(params));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -154,7 +154,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getStoragPortCurrentStatistic(@RequestBody Map<String, Object> params) {
         try {
             return success(dataSotreStatisticHistroyService.queryStoragePortCurrentStatistic(params));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -163,7 +163,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getStoragDiskStatistic(@RequestBody Map<String, Object> params) {
         try {
             return success(dataSotreStatisticHistroyService.queryStorageDiskStatistic(params));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -172,7 +172,7 @@ public class DataStoreStatisticHistoryController extends BaseController {
     public ResponseBodyBean getStoragDiskCurrentStatistic(@RequestBody Map<String, Object> params) {
         try {
             return success(dataSotreStatisticHistroyService.queryStorageDiskCurrentStatistic(params));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }

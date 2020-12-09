@@ -1,26 +1,39 @@
 package com.dmeplugin.dmestore.exception;
 
-public class DMEException extends Exception {
+/**
+ * DMEException
+ *
+ * @author Administrator
+ * @since 2020-12-08
+ */
+public class DmeException extends Exception {
     private String code;
 
     private String message;
 
-    public DMEException() {
+    /**
+     * DmeException
+     */
+    public DmeException() {
         super();
     }
 
-    public DMEException(String message) {
+    /**
+     * DmeException
+     *
+     * @param message message
+     */
+    public DmeException(String message) {
         super(message);
         this.message = message;
     }
-
     /**
      * 构造方法.
      *
-     * @param code 错误编码
+     * @param code    错误编码
      * @param message 错误信息
      */
-    public DMEException(String code, String message) {
+    public DmeException(String code, String message) {
         super(message);
         this.code = code;
         this.message = message;

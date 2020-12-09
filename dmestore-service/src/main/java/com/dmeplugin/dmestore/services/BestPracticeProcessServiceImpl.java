@@ -2,7 +2,7 @@ package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.constant.DmeConstants;
 import com.dmeplugin.dmestore.dao.BestPracticeCheckDao;
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.exception.DmeSqlException;
 import com.dmeplugin.dmestore.exception.VcenterException;
 import com.dmeplugin.dmestore.model.BestPracticeBean;
@@ -91,7 +91,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     }
 
     @Override
-    public List<BestPracticeBean> getCheckRecordBy(String hostSetting, int pageNo, int pageSize) throws DMEException {
+    public List<BestPracticeBean> getCheckRecordBy(String hostSetting, int pageNo, int pageSize) throws DmeException {
         List<BestPracticeBean> list = new ArrayList<>();
         for (BestPracticeService bestPracticeService : bestPracticeServices) {
             String setting = bestPracticeService.getHostSetting();
@@ -99,7 +99,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                 try {
                     list = bestPracticeCheckDao.getRecordByPage(hostSetting, pageNo, pageSize);
                 } catch (SQLException ex) {
-                    throw new DMEException(ex.getMessage());
+                    throw new DmeException(ex.getMessage());
                 }
                 break;
             }

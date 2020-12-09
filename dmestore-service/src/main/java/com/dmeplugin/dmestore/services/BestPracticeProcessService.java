@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.exception.DmeSqlException;
 import com.dmeplugin.dmestore.exception.VcenterException;
 import com.dmeplugin.dmestore.model.BestPracticeBean;
@@ -16,9 +16,9 @@ import java.util.List;
  * @since 2020-11-30
  **/
 public interface BestPracticeProcessService {
-    List<BestPracticeCheckRecordBean> getCheckRecord() throws DMEException;
+    List<BestPracticeCheckRecordBean> getCheckRecord() throws DmeException;
 
-    List<BestPracticeBean> getCheckRecordBy(String hostSetting, int pageNo, int pageSize) throws DMEException;
+    List<BestPracticeBean> getCheckRecordBy(String hostSetting, int pageNo, int pageSize) throws DmeException;
 
     void check(String objectId) throws VcenterException;
 

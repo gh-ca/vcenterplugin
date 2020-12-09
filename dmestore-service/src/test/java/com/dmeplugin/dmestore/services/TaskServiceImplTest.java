@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.junit.Before;
@@ -8,18 +8,15 @@ import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.omg.CORBA.MARSHAL;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import springfox.documentation.spring.web.json.Json;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -43,7 +40,7 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    public void listTasks() throws DMEException {
+    public void listTasks() throws DmeException {
         String resp = "{\n" +
                 "    \"id\": \"564537e8-295b-4cb6-8484-171ea552cb40\", \n" +
                 "    \"name_en\": \"Create volume\", \n" +
@@ -74,7 +71,7 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    public void queryTaskById() throws DMEException {
+    public void queryTaskById() throws DmeException {
         String resp = "{\n" +
                 "    \"id\": \"564537e8-295b-4cb6-8484-171ea552cb40\", \n" +
                 "    \"name_en\": \"Create volume\", \n" +
@@ -110,7 +107,7 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    public void queryTaskByIdUntilFinish() throws DMEException {
+    public void queryTaskByIdUntilFinish() throws DmeException {
         String resp = "{\n" +
                 "    \"id\": \"321\", \n" +
                 "    \"name_en\": \"Create volume\", \n" +
@@ -146,7 +143,7 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    public void getTaskStatus() throws DMEException {
+    public void getTaskStatus() throws DmeException {
         List<String> list = new ArrayList<>();
         list.add("321");
         Map<String, Integer> map = new HashMap<>();
@@ -186,7 +183,7 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    public void checkTaskStatus() throws DMEException {
+    public void checkTaskStatus() throws DmeException {
         List<String> list = new ArrayList<>();
         list.add("321");
         String resp = "{\n" +

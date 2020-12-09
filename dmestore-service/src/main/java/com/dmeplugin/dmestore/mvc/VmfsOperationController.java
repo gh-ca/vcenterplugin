@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.VmfsOperationService;
 import com.google.gson.Gson;
@@ -52,7 +52,7 @@ public class VmfsOperationController extends BaseController {
         try {
             vmfsOperationService.updateVmfs(volumeId, params);
             return success();
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -69,7 +69,7 @@ public class VmfsOperationController extends BaseController {
         try {
             vmfsOperationService.expandVmfs(volumes);
             return success();
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -80,7 +80,7 @@ public class VmfsOperationController extends BaseController {
         try {
             vmfsOperationService.recycleVmfsCapacity(datastoreName);
             return success();
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -91,7 +91,7 @@ public class VmfsOperationController extends BaseController {
         try {
             vmfsOperationService.recycleVmfsCapacityByDataStoreIds(datastoreIds);
             return success();
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -101,7 +101,7 @@ public class VmfsOperationController extends BaseController {
         LOG.info("recyclevmfs=={}", gson.toJson(params));
         try {
             return success(vmfsOperationService.listServiceLevelVmfs(params));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -122,7 +122,7 @@ public class VmfsOperationController extends BaseController {
         try {
             vmfsOperationService.updateVmfsServiceLevel(params);
             return success();
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }

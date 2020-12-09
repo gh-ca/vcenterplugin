@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.model.VmRdmCreateBean;
 import com.dmeplugin.dmestore.services.VmRdmService;
@@ -37,7 +37,7 @@ public class VmRdmController extends BaseController {
         try {
             vmRdmService.createRdm(dataStoreObjectId, vmObjectId, createBean);
             return success();
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error(e.getMessage());
             return failure(e.getMessage());
         }
@@ -47,7 +47,7 @@ public class VmRdmController extends BaseController {
     public ResponseBodyBean dmeHosts() {
         try {
             return success(vmRdmService.getAllDmeHost());
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error(e.getMessage());
             return failure(e.getMessage());
         }
@@ -58,7 +58,7 @@ public class VmRdmController extends BaseController {
         try {
             List<Object> objects = vmRdmService.getDatastoreMountsOnHost(vmObjectId);
             return success(new Gson().toJson(objects));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error(e.getMessage());
             return failure(e.getMessage());
         }

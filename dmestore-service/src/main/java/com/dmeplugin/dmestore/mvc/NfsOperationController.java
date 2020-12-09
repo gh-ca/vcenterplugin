@@ -1,7 +1,7 @@
 package com.dmeplugin.dmestore.mvc;
 
 import com.dmeplugin.dmestore.constant.DmeConstants;
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.CapacityAutonegotiation;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.NfsOperationService;
@@ -147,7 +147,7 @@ public class NfsOperationController extends BaseController {
         try {
             nfsOperationService.createNfsDatastore(targetParams);
             return success();
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -242,7 +242,7 @@ public class NfsOperationController extends BaseController {
         try {
             nfsOperationService.updateNfsDatastore(param);
             return success();
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -252,7 +252,7 @@ public class NfsOperationController extends BaseController {
         try {
             nfsOperationService.changeNfsCapacity(params);
             return success();
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -261,7 +261,7 @@ public class NfsOperationController extends BaseController {
     public ResponseBodyBean getEditNfsStore(@RequestParam(name = "storeObjectId") String storeObjectId) {
         try {
             return success(nfsOperationService.getEditNfsStore(storeObjectId));
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }

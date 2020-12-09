@@ -1,11 +1,10 @@
 package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
-import com.dmeplugin.dmestore.exception.DMEException;
-import com.dmeplugin.dmestore.utils.ToolUtils;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
-import com.vmware.vim.binding.vmodl.map;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -17,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -42,7 +40,7 @@ public class VmwareAccessServiceImplTest {
     }
 
     @Test
-    public void listHosts() throws DMEException {
+    public void listHosts() throws DmeException {
         List<Map<String, String>> lists = new ArrayList<>();
         Map<String, String> map = new HashMap<>();
         map.put("hostId", "321");
@@ -54,7 +52,7 @@ public class VmwareAccessServiceImplTest {
     }
 
     @Test
-    public void getHostsByDsObjectId() throws DMEException {
+    public void getHostsByDsObjectId() throws DmeException {
         List<Map<String, String>> lists = new ArrayList<>();
         Map<String, String> map = new HashMap<>();
         map.put("hostId", "321");
@@ -65,7 +63,7 @@ public class VmwareAccessServiceImplTest {
     }
 
     @Test
-    public void listClusters() throws DMEException {
+    public void listClusters() throws DmeException {
         List<Map<String, String>> lists = new ArrayList<>();
         Map<String, String> map = new HashMap<>();
         map.put("clusterId", "321");
@@ -76,7 +74,7 @@ public class VmwareAccessServiceImplTest {
     }
 
     @Test
-    public void getClustersByDsObjectId() throws DMEException {
+    public void getClustersByDsObjectId() throws DmeException {
         List<Map<String, String>> lists = new ArrayList<>();
         Map<String, String> map = new HashMap<>();
         map.put("clusterId", "321");
@@ -87,7 +85,7 @@ public class VmwareAccessServiceImplTest {
     }
 
     @Test
-    public void getDataStoresByHostObjectId() throws DMEException {
+    public void getDataStoresByHostObjectId() throws DmeException {
         List<Map<String, Object>> lists = new ArrayList<>();
         Map<String, Object> map = new HashMap<>();
         map.put("id", "321");
@@ -106,7 +104,7 @@ public class VmwareAccessServiceImplTest {
     }
 
     @Test
-    public void getDataStoresByClusterObjectId() throws DMEException {
+    public void getDataStoresByClusterObjectId() throws DmeException {
         List<Map<String, Object>> lists = new ArrayList<>();
         Map<String, Object> map = new HashMap<>();
         map.put("id", "321");
@@ -126,7 +124,7 @@ public class VmwareAccessServiceImplTest {
     }
 
     @Test
-    public void getVmKernelIpByHostObjectId() throws DMEException {
+    public void getVmKernelIpByHostObjectId() throws DmeException {
         List<Map<String, Object>> lists = new ArrayList<>();
         Map<String, Object> map = new HashMap<>();
         map.put("device", "321");

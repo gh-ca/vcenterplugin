@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.BandPorts;
 import com.dmeplugin.dmestore.model.Dtrees;
 import com.dmeplugin.dmestore.model.EthPortInfo;
@@ -63,7 +63,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void getStorages() throws DMEException {
+    public void getStorages() throws DmeException {
         url = "/rest/storagemgmt/v1/storages";
         List<JsonObject> reqList = new ArrayList<>();
         //更换设定返回的数据
@@ -116,7 +116,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void getStorageDetail() throws DMEException {
+    public void getStorageDetail() throws DmeException {
         String storageId = "123";
         url = "/rest/storagemgmt/v1/storages/123/detail";
         //更换设定返回的数据
@@ -193,7 +193,7 @@ public class DmeStorageServiceImplTest {
 
 
     @Test
-    public void getLogicPorts() throws DMEException {
+    public void getLogicPorts() throws DmeException {
         String storageId = "123";
         url = "/rest/storagemgmt/v1/storage-port/logic-ports?storage_id=" + storageId;
         String data = " {\n" +
@@ -230,7 +230,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void getVolumesByPage() throws DMEException {
+    public void getVolumesByPage() throws DmeException {
         String storageId = "123";
         String url = "/rest/blockservice/v1/volumes?storage_id=" + storageId + "&";
         String data = "{\n" +
@@ -313,7 +313,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void getFileSystems() throws DMEException {
+    public void getFileSystems() throws DmeException {
         String storageId = "123";
         url = "/rest/fileservice/v1/filesystems/query";
         String data = "{\n" +
@@ -351,7 +351,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void getDtrees() throws DMEException {
+    public void getDtrees() throws DmeException {
         String storageId = "123";
         url = "/rest/fileservice/v1/dtrees/summary";
         String data = "{\n" +
@@ -383,7 +383,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void getNfsShares() throws DMEException {
+    public void getNfsShares() throws DmeException {
         String storageId = "123";
         url = "/rest/fileservice/v1/nfs-shares/summary";
         String data = "{\n" +
@@ -419,7 +419,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void getBandPorts() throws DMEException {
+    public void getBandPorts() throws DmeException {
         String storageId = "123";
         url = "/rest/storagemgmt/v1/storage-port/bond-ports?storage_id=" + storageId;
         String data = "{\n" +
@@ -441,7 +441,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void getStorageControllers() throws DMEException {
+    public void getStorageControllers() throws DmeException {
         String storageDeviceId = "123";
         url = "/rest/resourcedb/v1/instances/SYS_Controller?condition={json}&&pageSize=1000";
         String pool = "{\n" +
@@ -557,7 +557,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void getVolume() throws DMEException {
+    public void getVolume() throws DmeException {
         String volumeId = "123";
         url = "/rest/blockservice/v1/volumes/" + volumeId;
         //更换设定返回的数据
@@ -599,7 +599,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void getStoragePort() throws DMEException {
+    public void getStoragePort() throws DmeException {
         String storageDeviceId = "123";
         url = "/rest/resourcedb/v1/instances/SYS_StoragePort?condition={json}&&pageSize=1000";
         String pool = "{\n" +
@@ -642,7 +642,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void getFailoverGroups() throws DMEException {
+    public void getFailoverGroups() throws DmeException {
         String storageId = "123";
         url = "/rest/storagemgmt/v1/storage-port/failover-groups?storage_id=" + storageId;
         String data = "{\n" +
@@ -661,7 +661,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void getFileSystemDetail() throws DMEException {
+    public void getFileSystemDetail() throws DmeException {
         String fileSystemId = "123";
         url = "/rest/fileservice/v1/filesystems/" + fileSystemId;
         String data = "{\n" +
@@ -746,7 +746,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void listStoragePerformance() throws DMEException {
+    public void listStoragePerformance() throws DmeException {
 
         String param1 = "SYS_StorDevice";
         String storageId = "123";
@@ -766,7 +766,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void listStoragePoolPerformance() throws DMEException {
+    public void listStoragePoolPerformance() throws DmeException {
         String param1 = "SYS_StoragePool";
         String storageId = "123";
         List<String> list = new ArrayList<>();
@@ -785,7 +785,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void listStorageControllerPerformance() throws DMEException {
+    public void listStorageControllerPerformance() throws DmeException {
         String param1 = "SYS_Controller";
         String storageId = "123";
         List<String> list = new ArrayList<>();
@@ -804,7 +804,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void listStorageDiskPerformance() throws DMEException {
+    public void listStorageDiskPerformance() throws DmeException {
         String param1 = "SYS_StorageDisk";
         String storageId = "123";
         List<String> list = new ArrayList<>();
@@ -823,7 +823,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void listStoragePortPerformance() throws DMEException {
+    public void listStoragePortPerformance() throws DmeException {
         String param1 = "SYS_StoragePort";
         String storageId = "123";
         List<String> list = new ArrayList<>();
@@ -842,7 +842,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void listVolumesPerformance() throws DMEException {
+    public void listVolumesPerformance() throws DmeException {
         String param1 = "SYS_Lun";
         String storageId = "123";
         List<String> list = new ArrayList<>();
@@ -861,7 +861,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void queryVolumeByName() throws DMEException {
+    public void queryVolumeByName() throws DmeException {
         String name = "123";
         url = "/rest/blockservice/v1/volumes?name=" + name;
         JsonObject jsonObject = new JsonObject();
@@ -872,7 +872,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void queryFsByName() throws DMEException {
+    public void queryFsByName() throws DmeException {
         String storageId = "123";
         String name = "123";
         url = "/rest/fileservice/v1/filesystems/query";
@@ -894,7 +894,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void queryShareByName() throws DMEException {
+    public void queryShareByName() throws DmeException {
         String storageId = "123";
         String name = "123";
         url = "/rest/fileservice/v1/nfs-shares/summary";
@@ -916,7 +916,7 @@ public class DmeStorageServiceImplTest {
     }
 
     @Test
-    public void getStorageDisks() throws DMEException {
+    public void getStorageDisks() throws DmeException {
         String storageDeviceId = "123";
         String pool = "{\n" +
             " \"ownerType\": \"eSight_Storage\",\n" +

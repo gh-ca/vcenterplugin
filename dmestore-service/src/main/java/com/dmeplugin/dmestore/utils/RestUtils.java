@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.utils;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
@@ -35,7 +35,7 @@ public class RestUtils {
 
     public static final int RES_STATE_I_403 = 403;
 
-    public RestTemplate getRestTemplate() throws DMEException {
+    public RestTemplate getRestTemplate() throws DmeException {
         RestTemplate restTemplate;
         try {
             TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
@@ -63,7 +63,7 @@ public class RestUtils {
                 }
             });
         } catch (NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-            throw new DMEException("初始化resttemplate错误");
+            throw new DmeException("初始化resttemplate错误");
         }
         return restTemplate;
     }

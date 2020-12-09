@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class CORSFilterTest {
     @InjectMocks
-    CORSFilter corsFilter = new CORSFilter();
+    CorsFilter corsFilter = new CorsFilter();
 
     FilterConfig filterConfig;
 

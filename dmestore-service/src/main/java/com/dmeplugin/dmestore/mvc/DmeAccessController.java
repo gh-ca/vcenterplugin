@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.DmeAccessService;
 import com.google.gson.Gson;
@@ -43,7 +43,7 @@ public class DmeAccessController extends BaseController {
         try {
             dmeAccessService.accessDme(params);
             return success();
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -53,7 +53,7 @@ public class DmeAccessController extends BaseController {
         LOG.info("accessdme/refreshaccess==");
         try {
             return success(dmeAccessService.refreshDme());
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -63,7 +63,7 @@ public class DmeAccessController extends BaseController {
         try {
             List<Map<String, Object>> lists = dmeAccessService.getWorkLoads(storageId);
             return success(lists);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure("get WorkLoads failure:" + e.toString());
         }
     }
@@ -73,7 +73,7 @@ public class DmeAccessController extends BaseController {
         try {
             dmeAccessService.scanDatastore(storageType);
             return success(null, "scan datastore complete!");
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure("scan datastore failure:" + e.toString());
         }
     }
@@ -84,7 +84,7 @@ public class DmeAccessController extends BaseController {
         try {
             dmeAccessService.configureTaskTime(taskId, taskCron);
             return success(null, "configure task time complete!");
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure("configure task time failure:" + e.toString());
         }
     }

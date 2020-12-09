@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.OverviewService;
 
@@ -28,7 +28,7 @@ public class OverviewController extends BaseController {
     public ResponseBodyBean getStorageNum() {
         try {
             return success(overviewService.getStorageNum());
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }

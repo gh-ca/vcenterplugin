@@ -1,6 +1,5 @@
 package com.dmeplugin.dmestore.task;
 
-
 import com.dmeplugin.dmestore.exception.VcenterException;
 import com.dmeplugin.dmestore.services.BestPracticeProcessService;
 

@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.mvc;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.NfsDataInfo;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.services.DmeNFSAccessService;
@@ -46,7 +46,7 @@ public class NfsAccessController extends BaseController {
         try {
             List<NfsDataInfo> lists = dmeNfsAccessService.listNfs();
             return success(lists);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("list nfs failure:", e);
             failureStr = "list nfs failure:" + e.toString();
         }
@@ -60,7 +60,7 @@ public class NfsAccessController extends BaseController {
         try {
             List<NfsDataInfo> lists = dmeNfsAccessService.listNfsPerformance(fsIds);
             return success(lists);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("get nfs performance failure:", e);
             failureStr = "get nfs performance failure:" + e.toString();
         }
@@ -75,7 +75,7 @@ public class NfsAccessController extends BaseController {
         try {
             dmeNfsAccessService.mountNfs(params);
             return success(null, "Mount nfs success");
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("mount nfs failure:", e);
             failureStr = "mount nfs failure:" + e.toString();
         }
@@ -90,7 +90,7 @@ public class NfsAccessController extends BaseController {
         try {
             dmeNfsAccessService.unmountNfs(params);
             return success(null, "unmount nfs success");
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("unmount nfs failure:", e);
             failureStr = "unmount nfs failure:" + e.toString();
         }
@@ -105,7 +105,7 @@ public class NfsAccessController extends BaseController {
         try {
             dmeNfsAccessService.deleteNfs(params);
             return success(null, "delete nfs success");
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("delte nfs failure:", e);
             failureStr = "delete nfs failure:" + e.toString();
         }
@@ -117,7 +117,7 @@ public class NfsAccessController extends BaseController {
         try {
             List<Map<String, Object>> hosts = dmeNfsAccessService.getHostsMountDataStoreByDsObjectId(storageId);
             return success(hosts);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
@@ -127,7 +127,7 @@ public class NfsAccessController extends BaseController {
         try {
             List<Map<String, Object>> hosts = dmeNfsAccessService.getClusterMountDataStoreByDsObjectId(storageId);
             return success(hosts);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }
