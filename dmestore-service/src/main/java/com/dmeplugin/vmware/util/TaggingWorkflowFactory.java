@@ -4,18 +4,23 @@ import com.dmeplugin.vmware.autosdk.SessionHelper;
 import com.dmeplugin.vmware.autosdk.TaggingWorkflow;
 
 /**
+ * TaggingWorkflowFactory
+ *
  * @author lianq
- * @className TaggingWorkflowFactory
- * @description TODO
- * @date 2020/11/30 10:54
+ * @ClassName: TaggingWorkflowFactory
+ * @since 2020-12-10
  */
 public class TaggingWorkflowFactory {
-
     private static TaggingWorkflowFactory taggingWorkflowFactory;
 
     private TaggingWorkflowFactory() {
     }
 
+    /**
+     * getInstance
+     *
+     * @return TaggingWorkflowFactory
+     */
     public static TaggingWorkflowFactory getInstance() {
         if (taggingWorkflowFactory == null) {
             synchronized (TaggingWorkflowFactory.class) {
@@ -27,6 +32,13 @@ public class TaggingWorkflowFactory {
         return taggingWorkflowFactory;
     }
 
+    /**
+     * build
+     *
+     * @param sessionHelper sessionHelper
+     * @return TaggingWorkflow
+     * @throws Exception Exception
+     */
     public TaggingWorkflow build(SessionHelper sessionHelper) throws Exception {
         return new TaggingWorkflow(sessionHelper);
     }

@@ -4,7 +4,7 @@
 //regarding copyright ownership.  The ASF licenses this file
 //to you under the Apache License, Version 2.0 (the
 //"License"); you may not use this file except in compliance
-//with the License.  You may obtain a copy of the License at
+//with the License.  You may obtain copy of the License at
 //
 //http://www.apache.org/licenses/LICENSE-2.0
 //
@@ -17,56 +17,85 @@
 
 package com.dmeplugin.vmware.util;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * TestVmwareContextFactory
+ *
+ * @author Administrator
+ * @since 2020-12-10
+ */
 public class TestVmwareContextFactory {
+    private static final Logger S_LOGGER = LoggerFactory.getLogger(TestVmwareContextFactory.class);
 
-    private static final Logger s_logger = LoggerFactory.getLogger(TestVmwareContextFactory.class);
+    private static volatile int seq = 1;
+    private static VmwareContextPool pool;
 
-    private static volatile int s_seq = 1;
-    private static VmwareContextPool s_pool;
+    private static final int TIMEOUT = 1200000;
+
+    private TestVmwareContextFactory() {
+    }
 
     static {
         // skip certificate check
         System.setProperty("axis.socketSecureFactory", "org.apache.axis.components.net.SunFakeTrustSocketFactory");
-        s_pool = new VmwareContextPool();
+        pool = new VmwareContextPool();
     }
 
-    public static VmwareContext create(String vCenterAddress, int vCenterPort, String vCenterUserName,
-                                       String vCenterPassword) throws Exception {
-        assert (vCenterAddress != null);
-        assert (vCenterUserName != null);
-        assert (vCenterPassword != null);
+    /**
+     * create
+     *
+     * @param vcenterAddress  vcenterAddress
+     * @param vcenterPort     vcenterPort
+     * @param vcenterUserName vcenterUserName
+     * @param vcenterPassword vcenterPassword
+     * @return VmwareContext
+     * @throws Exception Exception
+     */
+    public static VmwareContext create(String vcenterAddress, int vcenterPort, String vcenterUserName,
+                                       String vcenterPassword) throws Exception {
+        assert vcenterAddress != null;
+        assert vcenterUserName != null;
+        assert vcenterPassword != null;
 
-        String serviceUrl = "https://" + vCenterAddress + ":" + vCenterPort + "/sdk/vimService";
+        String serviceUrl = "https://" + vcenterAddress + ":" + vcenterPort + "/sdk/vimService";
 
-        if (s_logger.isDebugEnabled()) {
-            s_logger.debug(
-                "initialize VmwareContext. url: " + serviceUrl + ", username: " + vCenterUserName + ", password: " +
-                    vCenterPassword);
+        if (S_LOGGER.isDebugEnabled()) {
+            S_LOGGER.debug(
+                "initialize VmwareContext. url: " + serviceUrl + ", username: " + vcenterUserName + ", password: "
+                    + vcenterPassword);
         }
 
-        VmwareClient vimClient = new VmwareClient(vCenterAddress + "-" + s_seq++);
-        vimClient.setVcenterSessionTimeout(1200000);
-        vimClient.connect(serviceUrl, vCenterUserName, vCenterPassword);
+        VmwareClient vimClient = new VmwareClient(vcenterAddress + "-" + seq++);
+        vimClient.setVcenterSessionTimeout(TIMEOUT);
+        vimClient.connect(serviceUrl, vcenterUserName, vcenterPassword);
 
         VmwareContext context =
             new VmwareContext(vimClient, vimClient.getServiceContent().getAbout().getInstanceUuid());
         return context;
     }
 
-    public static VmwareContext getContext(String vCenterAddress, int vCenterPort, String vCenterUserName,
-                                           String vCenterPassword) throws Exception {
-        VmwareContext context = s_pool.getContext(vCenterAddress, vCenterUserName);
+    /**
+     * getContext
+     *
+     * @param vcenterAddress  vcenterAddress
+     * @param vcenterPort     vcenterPort
+     * @param vcenterUserName vcenterUserName
+     * @param vcenterPassword vcenterPassword
+     * @return VmwareContext
+     * @throws Exception Exception
+     */
+    public static VmwareContext getContext(String vcenterAddress, int vcenterPort, String vcenterUserName,
+                                           String vcenterPassword) throws Exception {
+        VmwareContext context = pool.getContext(vcenterAddress, vcenterUserName);
         if (context == null) {
-            context = create(vCenterAddress, vCenterPort, vCenterUserName, vCenterPassword);
+            context = create(vcenterAddress, vcenterPort, vcenterUserName, vcenterPassword);
         }
 
         if (context != null) {
-            context.setPoolInfo(s_pool, VmwareContextPool.composePoolKey(vCenterAddress, vCenterUserName));
-            s_pool.registerContext(context);
+            context.setPoolInfo(pool, VmwareContextPool.composePoolKey(vcenterAddress, vcenterUserName));
+            pool.registerContext(context);
         }
 
         return context;
