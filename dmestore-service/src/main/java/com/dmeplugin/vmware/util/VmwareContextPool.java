@@ -34,8 +34,14 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * VmwareContextPool
+ *
+ * @author Administrator 
+ * @since 2020-12-10
+ */
 public class VmwareContextPool {
-    private static final Logger s_logger = LoggerFactory.getLogger(VmwareContextPool.class);
+    private static final Logger logger = LoggerFactory.getLogger(VmwareContextPool.class);
 
     private static final Duration DEFAULT_CHECK_INTERVAL = Duration.millis(10000L);
     private static final int DEFAULT_IDLE_QUEUE_LENGTH = 4;
@@ -46,10 +52,19 @@ public class VmwareContextPool {
 
     private Timer timer = new Timer();
 
+    /**
+     * VmwareContextPool
+     */
     public VmwareContextPool() {
         this(DEFAULT_IDLE_QUEUE_LENGTH, DEFAULT_CHECK_INTERVAL);
     }
 
+    /**
+     * VmwareContextPool
+     *
+     * @param maxIdleQueueLength maxIdleQueueLength
+     * @param idleCheckInterval idleCheckInterval
+     */
     public VmwareContextPool(int maxIdleQueueLength, Duration idleCheckInterval) {
         pool = new ConcurrentHashMap<>();
 
@@ -60,8 +75,15 @@ public class VmwareContextPool {
             this.idleCheckInterval.getMillis());
     }
 
-    public VmwareContext getContext(final String vCenterAddress, final String vCenterUserName) {
-        final String poolKey = composePoolKey(vCenterAddress, vCenterUserName).intern();
+    /**
+     * getContext
+     *
+     * @param vcenterAddress vcenterAddress
+     * @param vcenterUserName vcenterUserName
+     * @return VmwareContext
+     */
+    public VmwareContext getContext(final String vcenterAddress, final String vcenterUserName) {
+        final String poolKey = composePoolKey(vcenterAddress, vcenterUserName).intern();
         if (StringUtil.isNullOrEmpty(poolKey)) {
             return null;
         }
@@ -72,10 +94,10 @@ public class VmwareContextPool {
                 if (context != null) {
                     context.setPoolInfo(this, poolKey);
                 }
-                if (s_logger.isTraceEnabled()) {
-                    s_logger.trace("Return a VmwareContext from the idle pool: " + poolKey + ". current pool size: " +
-                        ctxList.size() + ", outstanding count: " +
-                        VmwareContext.getOutstandingContextCount());
+                if (logger.isTraceEnabled()) {
+                    logger.trace("Return an VmwareContext from the idle pool: " + poolKey
+                        + ". current pool size: " + ctxList.size()
+                        + ", outstanding count: " + VmwareContext.getOutstandingContextCount());
                 }
                 return context;
             }
@@ -83,9 +105,14 @@ public class VmwareContextPool {
         }
     }
 
+    /**
+     * registerContext
+     *
+     * @param context context
+     */
     public void registerContext(final VmwareContext context) {
-        assert (context.getPool() == this);
-        assert (context.getPoolKey() != null);
+        assert context.getPool() == this;
+        assert context.getPoolKey() != null;
 
         final String poolKey = context.getPoolKey().intern();
         synchronized (poolKey) {
@@ -102,24 +129,30 @@ public class VmwareContextPool {
                     try {
                         oldestContext.close();
                     } catch (Throwable t) {
-                        s_logger.error("Unexpected exception caught while trying to purge oldest VmwareContext", t);
+                        logger.error("Unexpected exception caught while trying to purge oldest VmwareContext", t);
                     }
                 }
             }
             context.clearStockObjects();
             ctxQueue.add(context);
 
-            if (s_logger.isTraceEnabled()) {
-                s_logger.trace(
-                    "Recycle VmwareContext into idle pool: " + context.getPoolKey() + ", current idle pool size: " +
-                        ctxQueue.size() + ", outstanding count: "
+            if (logger.isTraceEnabled()) {
+                logger.trace(
+                    "Recycle VmwareContext into idle pool: " + context.getPoolKey()
+                        + ", current idle pool size: " + ctxQueue.size()
+                        + ", outstanding count: "
                         + VmwareContext.getOutstandingContextCount());
             }
         }
     }
 
+    /**
+     * unregisterContext
+     *
+     * @param context context
+     */
     public void unregisterContext(final VmwareContext context) {
-        assert (context != null);
+        assert context != null;
         final String poolKey = context.getPoolKey().intern();
         final Queue<VmwareContext> ctxList = pool.get(poolKey);
         synchronized (poolKey) {
@@ -136,10 +169,9 @@ public class VmwareContextPool {
                 try {
                     doKeepAlive();
                 } catch (Throwable e) {
-                    s_logger.error("Unexpected exception", e);
+                    logger.error("Unexpected exception", e);
                 }
             }
-
         };
     }
 
@@ -155,7 +187,7 @@ public class VmwareContextPool {
                 try {
                     context.idleCheck();
                 } catch (Throwable e) {
-                    s_logger.warn("Exception caught during VmwareContext idle check, close and discard the context", e);
+                    logger.warn("Exception caught during VmwareContext idle check, close and discard the context", e);
                     closableCtxList.add(context);
                     iterator.remove();
                 }
@@ -166,12 +198,22 @@ public class VmwareContextPool {
         }
     }
 
-    public static String composePoolKey(final String vCenterAddress, final String vCenterUserName) {
-        assert (vCenterUserName != null);
-        assert (vCenterAddress != null);
-        return vCenterUserName + "@" + vCenterAddress;
+    /**
+     * composePoolKey
+     *
+     * @param vcenterAddress  vcenterAddress
+     * @param vcenterUserName vcenterUserName
+     * @return String
+     */
+    public static String composePoolKey(final String vcenterAddress, final String vcenterUserName) {
+        assert vcenterUserName != null;
+        assert vcenterAddress != null;
+        return vcenterUserName + "@" + vcenterAddress;
     }
 
+    /**
+     * closeAll
+     */
     public void closeAll() {
         for (final Queue<VmwareContext> ctxQueue : pool.values()) {
             for (Iterator<VmwareContext> iterator = ctxQueue.iterator(); iterator.hasNext(); ) {
@@ -183,6 +225,5 @@ public class VmwareContextPool {
                 context.close();
             }
         }
-
     }
 }
