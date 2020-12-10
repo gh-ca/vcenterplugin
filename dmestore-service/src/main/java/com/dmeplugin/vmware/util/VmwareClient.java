@@ -90,7 +90,7 @@ public class VmwareClient {
     private VimPortType vimPort;
     private String serviceCookie;
     // Timeout in milliseconds
-    private final int vcenterSessionTimeOut = 1200000;
+    private int vcenterSessionTimeOut = 1200000;
 
     private boolean isConnected = false;
 
