@@ -1,14 +1,13 @@
 package com.dmeplugin.vmware.util;
 
 import com.dmeplugin.vmware.mo.DatacenterMO;
-import com.dmeplugin.vmware.mo.DatastoreMO;
-import com.vmware.vim25.ManagedObjectReference;
 
 /**
+ * DatacenterMOFactory
+ *
  * @author lianq
- * @className DatacenterMOFactory
- * @description TODO
- * @date 2020/12/2 17:11
+ * @ClassName: DatacenterMOFactory
+ * @since 2020-12-09
  */
 public class DatacenterMOFactory {
 
@@ -17,6 +16,11 @@ public class DatacenterMOFactory {
     private DatacenterMOFactory() {
     }
 
+    /**
+     * getInstance
+     *
+     * @return DatacenterMOFactory
+     */
     public static DatacenterMOFactory getInstance() {
         if (datacenterMOFactory == null) {
             synchronized (DatacenterMOFactory.class) {
@@ -28,6 +32,14 @@ public class DatacenterMOFactory {
         return datacenterMOFactory;
     }
 
+    /**
+     * build
+     *
+     * @param context context
+     * @param dcName  dcName
+     * @return DatacenterMO
+     * @throws Exception Exception
+     */
     public DatacenterMO build(VmwareContext context, String dcName) throws Exception {
         return new DatacenterMO(context, dcName);
     }
