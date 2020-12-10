@@ -5,7 +5,7 @@
 // regarding copyright ownership.  The ASF licenses this file
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
+// with the License.  You may obtain copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
@@ -19,28 +19,39 @@
 
 package com.dmeplugin.vmware.util;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.KeyManager;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
+
+/**
+ * SecureSSLSocketFactory
+ *
+ * @author Administrator
+ * @since 2020-12-09
+ */
 public class SecureSSLSocketFactory extends SSLSocketFactory {
-
-    public static final Logger s_logger = LoggerFactory.getLogger(SecureSSLSocketFactory.class);
+    /**
+     * logger
+     */
+    public static final Logger logger = LoggerFactory.getLogger(SecureSSLSocketFactory.class);
     private SSLContext sslContext;
 
+    /**
+     * SecureSSLSocketFactory
+     *
+     * @param sslContext sslContext
+     * @throws NoSuchAlgorithmException NoSuchAlgorithmException
+     */
     public SecureSSLSocketFactory(SSLContext sslContext) throws NoSuchAlgorithmException {
         if (sslContext != null) {
             this.sslContext = sslContext;
@@ -60,7 +71,7 @@ public class SecureSSLSocketFactory extends SSLSocketFactory {
         try {
             ciphers = SSLUtils.getSupportedCiphers();
         } catch (NoSuchAlgorithmException e) {
-            s_logger.error("SecureSSLSocketFactory::getDefaultCipherSuites found no cipher suites");
+            logger.error("SecureSSLSocketFactory::getDefaultCipherSuites found no cipher suites");
         }
         return ciphers;
     }
@@ -70,7 +81,8 @@ public class SecureSSLSocketFactory extends SSLSocketFactory {
         SSLSocketFactory factory = sslContext.getSocketFactory();
         Socket socket = factory.createSocket(s, host, port, autoClose);
         if (socket instanceof SSLSocket) {
-            ((SSLSocket)socket).setEnabledProtocols(SSLUtils.getSupportedProtocols(((SSLSocket)socket).getEnabledProtocols()));
+            ((SSLSocket) socket).setEnabledProtocols(
+                SSLUtils.getSupportedProtocols(((SSLSocket) socket).getEnabledProtocols()));
         }
         return socket;
     }
@@ -80,17 +92,22 @@ public class SecureSSLSocketFactory extends SSLSocketFactory {
         SSLSocketFactory factory = sslContext.getSocketFactory();
         Socket socket = factory.createSocket(host, port);
         if (socket instanceof SSLSocket) {
-            ((SSLSocket)socket).setEnabledProtocols(SSLUtils.getSupportedProtocols(((SSLSocket)socket).getEnabledProtocols()));
+            ((SSLSocket) socket).setEnabledProtocols(
+                SSLUtils.getSupportedProtocols(((SSLSocket) socket).getEnabledProtocols()));
         }
         return socket;
     }
 
     @Override
-    public Socket createSocket(String host, int port, InetAddress inetAddress, int localPort) throws IOException, UnknownHostException {
+    public Socket createSocket(String host,
+                               int port,
+                               InetAddress inetAddress,
+                               int localPort) throws IOException, UnknownHostException {
         SSLSocketFactory factory = sslContext.getSocketFactory();
         Socket socket = factory.createSocket(host, port, inetAddress, localPort);
         if (socket instanceof SSLSocket) {
-            ((SSLSocket)socket).setEnabledProtocols(SSLUtils.getSupportedProtocols(((SSLSocket)socket).getEnabledProtocols()));
+            ((SSLSocket) socket)
+                .setEnabledProtocols(SSLUtils.getSupportedProtocols(((SSLSocket) socket).getEnabledProtocols()));
         }
         return socket;
     }
@@ -100,17 +117,20 @@ public class SecureSSLSocketFactory extends SSLSocketFactory {
         SSLSocketFactory factory = sslContext.getSocketFactory();
         Socket socket = factory.createSocket(inetAddress, localPort);
         if (socket instanceof SSLSocket) {
-            ((SSLSocket)socket).setEnabledProtocols(SSLUtils.getSupportedProtocols(((SSLSocket)socket).getEnabledProtocols()));
+            ((SSLSocket) socket)
+                .setEnabledProtocols(SSLUtils.getSupportedProtocols(((SSLSocket) socket).getEnabledProtocols()));
         }
         return socket;
     }
 
     @Override
-    public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
+    public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort)
+        throws IOException {
         SSLSocketFactory factory = this.sslContext.getSocketFactory();
         Socket socket = factory.createSocket(address, port, localAddress, localPort);
         if (socket instanceof SSLSocket) {
-            ((SSLSocket)socket).setEnabledProtocols(SSLUtils.getSupportedProtocols(((SSLSocket)socket).getEnabledProtocols()));
+            ((SSLSocket) socket)
+                .setEnabledProtocols(SSLUtils.getSupportedProtocols(((SSLSocket) socket).getEnabledProtocols()));
         }
         return socket;
     }
