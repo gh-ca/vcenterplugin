@@ -29,17 +29,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author lianq
- * @className NfsOperationServiceImpl
- * @description TODO
- * @date 2020/9/16 16:25
- */
+ * NfsOperationServiceImpl
+ *
+ * @author lianqiang
+ * @since 2020-09-15
+ **/
 public class NfsOperationServiceImpl implements NfsOperationService {
-    private final String RESULT_FAIL = "failed";
+    private static final Logger LOG = LoggerFactory.getLogger(NfsOperationServiceImpl.class);
 
-    private final String RESULT_SUCCESS = "success";
+    private static final String RESULT_FAIL = "failed";
 
-    public static final Logger LOG = LoggerFactory.getLogger(VmfsOperationController.class);
+    private static final String RESULT_SUCCESS = "success";
 
     private DmeAccessService dmeAccessService;
 
@@ -188,9 +188,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 }
             }
             String storagePoolId = (String) params.get("storage_pool_id");
-            if (StringUtils.isEmpty(storagePoolId)) {
-                LOG.error("storage_pool_id={" + storagePoolId + "}");
-            }
             String taskId = createFileSystem(fsMap, storagePoolId);
             String nfsName = (String) params.get("nfsName");
             if (StringUtils.isEmpty(nfsName)) {
@@ -329,7 +326,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 fileSystemId = fsIds.get(0);
             }
         }
-        String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace( "{file_system_id}", fileSystemId);
+        String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace("{file_system_id}", fileSystemId);
         //查询指定fs拿对应的信息
         Integer code = 0;
         try {
@@ -547,7 +544,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
         if (StringUtils.isEmpty(fileSystemId)) {
         }
-        String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace( "{file_system_id}",  fileSystemId);
+        String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace("{file_system_id}", fileSystemId);
 
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(params));
         int code = responseEntity.getStatusCodeValue();
@@ -635,7 +632,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         resMap.put("code", "200");
         resMap.put("msg", "list filesystem success!");
 
-        String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace( "{file_system_id}", fileSystemId);
+        String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace("{file_system_id}", fileSystemId);
 
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         int code = responseEntity.getStatusCodeValue();

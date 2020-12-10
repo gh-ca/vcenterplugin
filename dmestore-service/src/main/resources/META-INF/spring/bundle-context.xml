@@ -54,7 +54,7 @@
 
     <bean name="VCenterInfoServiceImpl"
           class="com.dmeplugin.dmestore.services.VCenterInfoServiceImpl">
-        <property name="vCenterInfoDao" ref="vcenterInfoDao"/>
+        <property name="vcenterInfoDao" ref="vcenterInfoDao"/>
     </bean>
 
     <bean name="ServiceLevelServiceImpl" class="com.dmeplugin.dmestore.services.ServiceLevelServiceImpl">

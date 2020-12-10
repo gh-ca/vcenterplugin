@@ -4,49 +4,42 @@ import com.dmeplugin.dmestore.dao.VCenterInfoDao;
 import com.dmeplugin.dmestore.entity.VCenterInfo;
 import com.dmeplugin.dmestore.exception.DmeSqlException;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import java.util.HashMap;
 import java.util.Map;
 
 public class VCenterInfoServiceImpl extends DMEOpenApiService implements VCenterInfoService {
-    @Autowired
-    private VCenterInfoDao vCenterInfoDao;
+    private VCenterInfoDao vcenterInfoDao;
 
-    public VCenterInfoDao getvCenterInfoDao() {
-        return vCenterInfoDao;
+    public VCenterInfoDao getVcenterInfoDao() {
+        return vcenterInfoDao;
     }
 
-    public void setvCenterInfoDao(VCenterInfoDao vCenterInfoDao) {
-        this.vCenterInfoDao = vCenterInfoDao;
-    }
-
-    @Override
-    public int addVcenterInfo(VCenterInfo vCenterInfo) throws DmeSqlException {
-        return vCenterInfoDao.addVcenterInfo(vCenterInfo);
+    public void setVcenterInfoDao(VCenterInfoDao vcenterInfoDao) {
+        this.vcenterInfoDao = vcenterInfoDao;
     }
 
     @Override
-    public int saveVcenterInfo(final VCenterInfo vCenterInfo) throws DmeSqlException {
-        VCenterInfo vCenterInfo1 = vCenterInfoDao.getVcenterInfo();
-        int returnValue = 0;
-        if (vCenterInfo1 != null) {
-            // update
-            vCenterInfo1.setUserName(vCenterInfo.getUserName());
-            vCenterInfo1.setState(vCenterInfo.isState());
-            vCenterInfo1.setPushEvent(vCenterInfo.isPushEvent());
-            vCenterInfo1.setPushEventLevel(vCenterInfo.getPushEventLevel());
-            vCenterInfo1.setHostIp(vCenterInfo.getHostIp());
-            vCenterInfo1.setHostPort(vCenterInfo.getHostPort());
-            if (vCenterInfo.getPassword() != null && !"".equals(vCenterInfo.getPassword())) {
-                vCenterInfo1.setPassword(vCenterInfo.getPassword());
+    public int addVcenterInfo(VCenterInfo info) throws DmeSqlException {
+        return vcenterInfoDao.addVcenterInfo(info);
+    }
 
+    @Override
+    public int saveVcenterInfo(final VCenterInfo info) throws DmeSqlException {
+        VCenterInfo vcenterInfo = vcenterInfoDao.getVcenterInfo();
+        int returnValue;
+        if (vcenterInfo != null) {
+            vcenterInfo.setUserName(info.getUserName());
+            vcenterInfo.setState(info.isState());
+            vcenterInfo.setPushEvent(info.isPushEvent());
+            vcenterInfo.setPushEventLevel(info.getPushEventLevel());
+            vcenterInfo.setHostIp(info.getHostIp());
+            vcenterInfo.setHostPort(info.getHostPort());
+            if (info.getPassword() != null && !"".equals(info.getPassword())) {
+                vcenterInfo.setPassword(info.getPassword());
             }
-
-            returnValue = vCenterInfoDao.updateVcenterInfo(vCenterInfo1);
+            returnValue = vcenterInfoDao.updateVcenterInfo(vcenterInfo);
         } else {
-
-            returnValue = addVcenterInfo(vCenterInfo);
+            returnValue = addVcenterInfo(info);
         }
 
         return returnValue;
@@ -55,21 +48,20 @@ public class VCenterInfoServiceImpl extends DMEOpenApiService implements VCenter
     @Override
     public Map<String, Object> findVcenterInfo() throws DmeSqlException {
         Map<String, Object> returnMap = new HashMap<>();
-        VCenterInfo vCenterInfo = vCenterInfoDao.getVcenterInfo();
-        if (vCenterInfo != null) {
-            returnMap.put("USER_NAME", vCenterInfo.getUserName());
-            returnMap.put("STATE", vCenterInfo.isState());
-            returnMap.put("HOST_IP", vCenterInfo.getHostIp());
-            returnMap.put("HOST_PORT", vCenterInfo.getHostPort());
-            returnMap.put("PUSH_EVENT", vCenterInfo.isPushEvent());
-            returnMap.put("PUSH_EVENT_LEVEL", vCenterInfo.getPushEventLevel());
+        VCenterInfo vcenterInfo = vcenterInfoDao.getVcenterInfo();
+        if (vcenterInfo != null) {
+            returnMap.put("USER_NAME", vcenterInfo.getUserName());
+            returnMap.put("STATE", vcenterInfo.isState());
+            returnMap.put("HOST_IP", vcenterInfo.getHostIp());
+            returnMap.put("HOST_PORT", vcenterInfo.getHostPort());
+            returnMap.put("PUSH_EVENT", vcenterInfo.isPushEvent());
+            returnMap.put("PUSH_EVENT_LEVEL", vcenterInfo.getPushEventLevel());
         }
         return returnMap;
     }
 
     @Override
     public VCenterInfo getVcenterInfo() throws DmeSqlException {
-        return vCenterInfoDao.getVcenterInfo();
+        return vcenterInfoDao.getVcenterInfo();
     }
-
 }
