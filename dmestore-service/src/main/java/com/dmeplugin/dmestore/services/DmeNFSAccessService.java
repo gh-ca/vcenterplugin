@@ -77,7 +77,7 @@ public interface DmeNFSAccessService {
     void mountNfs(Map<String, Object> params) throws DmeException;
 
     /**
-     * NFS DataStore fielsystem attribute
+     * unmount NFS
      *
      * @param params storage object id
      * @throws DmeException when error
@@ -85,19 +85,19 @@ public interface DmeNFSAccessService {
     void unmountNfs(Map<String, Object> params) throws DmeException;
 
     /**
-     * delete nfs
+     * delete NFS
      *
-     * @param params
+     * @param params storage object id
      * @throws DmeException when error
      */
     void deleteNfs(Map<String, Object> params) throws DmeException;
 
     /**
-     * get Hosts which are mount on dataStore
+     * List nfs Performance
      *
-     * @param storageId storage object id
+     * @param storageId storageId
      * @return List
-     * @throws DmeException
+     * @throws DmeException when error
      */
     List<Map<String, Object>> getHostsMountDataStoreByDsObjectId(String storageId) throws DmeException;
 

@@ -4,8 +4,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A class that support basic dme API
- */
+ * DMEOpenApiService
+ *
+ * @author yy
+ * @since 2020-09-03
+ **/
 public class DMEOpenApiService {
     protected static final int FAIL_CODE = -99999;
 
@@ -15,11 +18,11 @@ public class DMEOpenApiService {
 
     protected static final int RESULT_ERROR_CODE = 10000;
 
-    protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
-
     protected static final String CODE_SUCCESS = String.valueOf(RESULT_SUCCESS_CODE);
 
     protected static final String CODE_SUCCESS_DOUBLE = String.valueOf(RESULT_SUCCESS_CODE_DOUBLE);
+
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     public static boolean isSuccessResponse(Object code) {
         if (code != null) {
@@ -33,5 +36,4 @@ public class DMEOpenApiService {
         }
         return false;
     }
-
 }

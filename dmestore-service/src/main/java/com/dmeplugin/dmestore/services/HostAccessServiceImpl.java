@@ -8,15 +8,18 @@ import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import java.util.List;
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+import java.util.Map;
+
 /**
- * @author wangxiangyong
+ * DmeNFSAccessService
+ *
+ * @author yy
+ * @since 2020-09-03
  **/
 public class HostAccessServiceImpl implements HostAccessService {
     private static final Logger LOG = LoggerFactory.getLogger(HostAccessServiceImpl.class);
@@ -25,10 +28,10 @@ public class HostAccessServiceImpl implements HostAccessService {
 
     private VCSDKUtils vcsdkUtils;
 
-    private VCenterInfoService vCenterInfoService;
+    private VCenterInfoService vcenterinfoservice;
 
-    public void setvCenterInfoService(VCenterInfoService vCenterInfoService) {
-        this.vCenterInfoService = vCenterInfoService;
+    public void setvCenterInfoService(VCenterInfoService vcenterService) {
+        this.vcenterinfoservice = vcenterService;
     }
 
     public VCSDKUtils getVcsdkUtils() {
@@ -57,7 +60,6 @@ public class HostAccessServiceImpl implements HostAccessService {
             List<Map<String, Object>> ethPorts = (List<Map<String, Object>>) params.get("ethPorts");
             Map<String, String> vmKernel = (Map<String, String>) params.get("vmKernel");
             String hostObjectId = params.get("hostObjectId").toString();
-            LOG.info("params==" + gson.toJson(params));
             vcsdkUtils.configureIscsi(hostObjectId, vmKernel, ethPorts);
         } else {
             throw new DmeException("configure Iscsi parameter exception:" + params);
@@ -83,30 +85,21 @@ public class HostAccessServiceImpl implements HostAccessService {
                 if (null != params.get(DmeConstants.VMKERNEL)) {
                     vmKernel = (Map<String, String>) params.get("vmKernel");
                 }
-                LOG.info("params==" + gson.toJson(params));
-                LOG.info("ethPorts==" + gson.toJson(ethPorts));
-                LOG.info("vmKernel==" + gson.toJson(vmKernel));
-
-                VCenterInfo vCenterInfo = vCenterInfoService.getVcenterInfo();
-                LOG.info("vCenterInfo==" + gson.toJson(vCenterInfo));
-                if (null != vCenterInfo) {
-                    String conStr = vcsdkUtils.testConnectivity(hostObjectId, ethPorts, vmKernel, vCenterInfo);
+                VCenterInfo vcenterInfo = vcenterinfoservice.getVcenterInfo();
+                if (null != vcenterInfo) {
+                    String conStr = vcsdkUtils.testConnectivity(hostObjectId, ethPorts, vmKernel, vcenterInfo);
                     if (!StringUtils.isEmpty(conStr)) {
                         relists = gson.fromJson(conStr, new TypeToken<List<EthPortInfo>>() {
                         }.getType());
                     }
                 }
             } else {
-                throw new Exception("test connectivity parameter exception:" + params);
+                throw new DmeException("test connectivity parameter exception:" + params);
             }
-        } catch (Exception e) {
+        } catch (DmeException e) {
             LOG.error("test connectivity error:", e);
             throw new DmeException(e.getMessage());
         }
-        LOG.info("test connectivity relists===" +
-            (relists == null ? "null" : (relists.size() + "==" + gson.toJson(relists))));
         return relists;
     }
-
-
 }
