@@ -72,6 +72,24 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     private static final String TYPE_FIELD = "type";
 
+    private static final String IP_FIELD = "ip";
+
+    private static final String PROJECT_ID_FIELD = "project_id";
+
+    private static final String DISPLAY_STATUS_FIELD = "display_status";
+
+    private static final String MANAGED_STATUS_FIELD = "managed_status";
+
+    private static final String OS_STATUS_FIELD = "os_status";
+
+    private static final String OVERALL_STATUS_FIELD = "overall_status";
+
+    private static final String OS_TYPE_FIELD = "os_type";
+
+    private static final String INITIATOR_COUNT_FIELD = "initiator_count";
+
+    private static final String ACCESS_MODE_FIELD = "access_mode";
+
     private static String dmeToken;
 
     private static String dmeHostUrl;
@@ -223,7 +241,6 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         ResponseEntity responseEntity = null;
         dmeToken = null;
         if (params != null && params.get(DmeConstants.HOSTIP) != null) {
-            RestTemplate restTemplate = restUtils.getRestTemplate();
             HttpHeaders headers = getHeaders();
             Map<String, Object> requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
             requestbody.put("grantType", PASSWORD);
@@ -231,6 +248,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             requestbody.put("value", params.get(PASSWORD));
             String hostUrl = "https:// " + params.get(HOST_IP) + ":" + params.get(HOST_PORT);
             HttpEntity<String> entity = new HttpEntity<>(gson.toJson(requestbody), headers);
+            RestTemplate restTemplate = restUtils.getRestTemplate();
             responseEntity = restTemplate.exchange(hostUrl + DmeConstants.LOGIN_DME_URL, HttpMethod.PUT, entity,
                 String.class);
 
@@ -330,10 +348,9 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         try {
             Map<String, Object> requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
             if (!StringUtils.isEmpty(hostIp)) {
-                requestbody.put("ip", hostIp);
+                requestbody.put(IP_FIELD, hostIp);
             }
-            ResponseEntity responseEntity = access(getHostsUrl, HttpMethod.POST,
-                requestbody == null ? null : gson.toJson(requestbody));
+            ResponseEntity responseEntity = access(getHostsUrl, HttpMethod.POST, gson.toJson(requestbody));
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.getAsJsonArray(DmeConstants.HOSTS);
@@ -343,16 +360,16 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                         JsonObject vjson = jsonArray.get(index).getAsJsonObject();
                         Map<String, Object> map = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
                         map.put(ID_FIELD, ToolUtils.jsonToStr(vjson.get(ID_FIELD)));
-                        map.put("project_id", ToolUtils.jsonToStr(vjson.get("project_id")));
+                        map.put(PROJECT_ID_FIELD, ToolUtils.jsonToStr(vjson.get(PROJECT_ID_FIELD)));
                         map.put(NAME_FIELD, ToolUtils.jsonToStr(vjson.get(NAME_FIELD)));
-                        map.put("ip", ToolUtils.jsonToStr(vjson.get("ip")));
-                        map.put("display_status", ToolUtils.jsonToStr(vjson.get("display_status")));
-                        map.put("managed_status", ToolUtils.jsonToStr(vjson.get("managed_status")));
-                        map.put("os_status", ToolUtils.jsonToStr(vjson.get("os_status")));
-                        map.put("overall_status", ToolUtils.jsonToStr(vjson.get("overall_status")));
-                        map.put("os_type", ToolUtils.jsonToStr(vjson.get("os_type")));
-                        map.put("initiator_count", ToolUtils.jsonToInt(vjson.get("initiator_count"), null));
-                        map.put("access_mode", ToolUtils.jsonToStr(vjson.get("access_mode")));
+                        map.put(IP_FIELD, ToolUtils.jsonToStr(vjson.get(IP_FIELD)));
+                        map.put(DISPLAY_STATUS_FIELD, ToolUtils.jsonToStr(vjson.get(DISPLAY_STATUS_FIELD)));
+                        map.put(MANAGED_STATUS_FIELD, ToolUtils.jsonToStr(vjson.get(MANAGED_STATUS_FIELD)));
+                        map.put(OS_STATUS_FIELD, ToolUtils.jsonToStr(vjson.get(OS_STATUS_FIELD)));
+                        map.put(OVERALL_STATUS_FIELD, ToolUtils.jsonToStr(vjson.get(OVERALL_STATUS_FIELD)));
+                        map.put(OS_TYPE_FIELD, ToolUtils.jsonToStr(vjson.get(OS_TYPE_FIELD)));
+                        map.put(INITIATOR_COUNT_FIELD, ToolUtils.jsonToInt(vjson.get(INITIATOR_COUNT_FIELD), null));
+                        map.put(ACCESS_MODE_FIELD, ToolUtils.jsonToStr(vjson.get(ACCESS_MODE_FIELD)));
                         JsonArray hostgroups = vjson.getAsJsonArray("hostGroups");
                         if (hostgroups != null && hostgroups.size() > 0) {
                             List<Map<String, Object>> hglists = new ArrayList<>();
@@ -427,10 +444,10 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                     Map<String, Object> map = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
                     map.put(ID_FIELD, ToolUtils.jsonToStr(object.get(ID_FIELD)));
                     map.put(NAME_FIELD, ToolUtils.jsonToStr(object.get(NAME_FIELD)));
-                    map.put(HOST_COUNT, ToolUtils.jsonToInt(object.get("ip"), 0));
+                    map.put(HOST_COUNT, ToolUtils.jsonToInt(object.get(IP_FIELD), 0));
                     map.put("source_type", ToolUtils.jsonToStr(object.get("source_type")));
-                    map.put("managed_status", ToolUtils.jsonToStr(object.get("managed_status")));
-                    map.put("project_id", ToolUtils.jsonToStr(object.get("project_id")));
+                    map.put(MANAGED_STATUS_FIELD, ToolUtils.jsonToStr(object.get(MANAGED_STATUS_FIELD)));
+                    map.put(PROJECT_ID_FIELD, ToolUtils.jsonToStr(object.get(PROJECT_ID_FIELD)));
 
                     relists.add(map);
                 }
@@ -457,9 +474,9 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 initiator.put(PORT_NAME, ToolUtils.getStr(hbamap.get(NAME_FIELD)));
                 initiators.add(initiator);
                 Map<String, Object> requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
-                requestbody.put("access_mode", "NONE");
+                requestbody.put(ACCESS_MODE_FIELD, "NONE");
                 requestbody.put(TYPE_FIELD, "VMWAREESX");
-                requestbody.put("ip", params.get("host"));
+                requestbody.put(IP_FIELD, params.get("host"));
                 requestbody.put("host_name", params.get("host"));
                 requestbody.put("initiator", initiators);
                 ResponseEntity responseEntity = access(createHostUrl, HttpMethod.POST, gson.toJson(requestbody));
@@ -468,8 +485,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                         .getAsJsonObject();
                     hostmap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
                     hostmap.put(ID_FIELD, ToolUtils.jsonToStr(jsonObject.get(DmeConstants.ID)));
-                    hostmap.put("ip", ToolUtils.jsonToStr(jsonObject.get("ip")));
-                    hostmap.put("access_mode", ToolUtils.jsonToStr(jsonObject.get("access_mode")));
+                    hostmap.put(IP_FIELD, ToolUtils.jsonToStr(jsonObject.get(IP_FIELD)));
+                    hostmap.put(ACCESS_MODE_FIELD, ToolUtils.jsonToStr(jsonObject.get(ACCESS_MODE_FIELD)));
                     hostmap.put(TYPE_FIELD, ToolUtils.jsonToStr(jsonObject.get(TYPE_FIELD)));
                     hostmap.put("port", ToolUtils.jsonToInt(jsonObject.get("port"), 0));
                 }
@@ -552,14 +569,14 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 JsonObject vjson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 map.put(ID_FIELD, ToolUtils.jsonToStr(vjson.get(ID_FIELD)));
                 map.put(NAME_FIELD, ToolUtils.jsonToStr(vjson.get(NAME_FIELD)));
-                map.put("ip", ToolUtils.jsonToStr(vjson.get("ip")));
-                map.put("display_status", ToolUtils.jsonToStr(vjson.get("display_status")));
-                map.put("managed_status", ToolUtils.jsonToStr(vjson.get("managed_status")));
-                map.put("os_status", ToolUtils.jsonToStr(vjson.get("os_status")));
-                map.put("overall_status", ToolUtils.jsonToStr(vjson.get("overall_status")));
-                map.put("os_type", ToolUtils.jsonToStr(vjson.get("os_type")));
-                map.put("initiator_count", ToolUtils.jsonToInt(vjson.get("initiator_count"), null));
-                map.put("access_mode", ToolUtils.jsonToStr(vjson.get("access_mode")));
+                map.put(IP_FIELD, ToolUtils.jsonToStr(vjson.get(IP_FIELD)));
+                map.put(DISPLAY_STATUS_FIELD, ToolUtils.jsonToStr(vjson.get(DISPLAY_STATUS_FIELD)));
+                map.put(MANAGED_STATUS_FIELD, ToolUtils.jsonToStr(vjson.get(MANAGED_STATUS_FIELD)));
+                map.put(OS_STATUS_FIELD, ToolUtils.jsonToStr(vjson.get(OS_STATUS_FIELD)));
+                map.put(OVERALL_STATUS_FIELD, ToolUtils.jsonToStr(vjson.get(OVERALL_STATUS_FIELD)));
+                map.put(OS_TYPE_FIELD, ToolUtils.jsonToStr(vjson.get(OS_TYPE_FIELD)));
+                map.put(INITIATOR_COUNT_FIELD, ToolUtils.jsonToInt(vjson.get(INITIATOR_COUNT_FIELD), null));
+                map.put(ACCESS_MODE_FIELD, ToolUtils.jsonToStr(vjson.get(ACCESS_MODE_FIELD)));
             }
         } catch (DmeException e) {
             LOG.error("DME link error url:{},error:{}", getHostUrl, e.toString());
@@ -629,7 +646,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                     map.put(ID_FIELD, ToolUtils.jsonToStr(vjson.get(ID_FIELD)));
                     map.put(NAME_FIELD, ToolUtils.jsonToStr(vjson.get(NAME_FIELD)));
                     map.put(HOST_COUNT, ToolUtils.jsonToStr(vjson.get(HOST_COUNT)));
-                    map.put("project_id", ToolUtils.jsonToStr(vjson.get("project_id")));
+                    map.put(PROJECT_ID_FIELD, ToolUtils.jsonToStr(vjson.get(PROJECT_ID_FIELD)));
                 }
             }
         } catch (DmeException e) {
@@ -656,7 +673,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                         Map<String, Object> hostmap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
                         hostmap.put(ID_FIELD, ToolUtils.jsonToStr(hostjs.get(ID_FIELD)));
                         hostmap.put(NAME_FIELD, ToolUtils.jsonToStr(hostjs.get(NAME_FIELD)));
-                        hostmap.put(HOST_COUNT, ToolUtils.jsonToStr(hostjs.get("ip")));
+                        hostmap.put(HOST_COUNT, ToolUtils.jsonToStr(hostjs.get(IP_FIELD)));
                         list.add(hostmap);
                     }
                 }
