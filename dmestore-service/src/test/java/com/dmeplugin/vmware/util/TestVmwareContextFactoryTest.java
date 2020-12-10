@@ -16,7 +16,7 @@ import org.mockito.MockitoAnnotations;
 public class TestVmwareContextFactoryTest {
 
     @InjectMocks
-    TestVmwareContextFactory testVmwareContextFactory = new TestVmwareContextFactory();
+    TestVmwareContextFactory testVmwareContextFactory;
 
     @Before
     public void setUp() throws Exception {

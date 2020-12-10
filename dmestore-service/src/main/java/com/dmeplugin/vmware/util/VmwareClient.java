@@ -4,7 +4,7 @@
 // regarding copyright ownership.  The ASF licenses this file
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
+// with the License.  You may obtain copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
@@ -48,6 +48,10 @@ import com.vmware.vim25.VimService;
 import com.vmware.vim25.WaitOptions;
 import com.vmware.vise.usersession.ServerInfo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -56,9 +60,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -71,10 +72,36 @@ import javax.xml.ws.handler.MessageContext;
  * A wrapper class to handle Vmware vsphere connection and disconnection.
  * <p>
  * DISCLAIMER: This code is partly copied from sample codes that come along with Vmware web service 5.1 SDK.
+ *
+ * @author Administrator 
+ * @since 2020-12-10
  */
 public class VmwareClient {
-    private static final Logger s_logger = LoggerFactory.getLogger(VmwareClient.class);
+    private static final Logger logger = LoggerFactory.getLogger(VmwareClient.class);
 
+    private static VimService vimService;
+    private static PbmService pbmService;
+    private static final String SVC_INST_NAME = "ServiceInstance";
+    private static final String PBMSERVICEINSTANCETYPE = "PbmServiceInstance";
+    private static final String PBMSERVICEINSTANCEVALUE = "ServiceInstance";
+    private final ManagedObjectReference svcInstRef = new ManagedObjectReference();
+    private final ManagedObjectReference pbmInstRef = new ManagedObjectReference();
+    private PbmPortType pbmPortType;
+    private VimPortType vimPort;
+    private String serviceCookie;
+    // Timeout in milliseconds
+    private final int vcenterSessionTimeOut = 1200000;
+
+    private boolean isConnected = false;
+
+    public VmwareClient(String name) {
+    }
+
+    /**
+     * TrustAllTrustManager
+     *
+     * @since 2020-12-10
+     */
     public static class TrustAllTrustManager implements javax.net.ssl.TrustManager, javax.net.ssl.X509TrustManager {
 
         @Override
@@ -108,13 +135,12 @@ public class VmwareClient {
 
             vimService = new VimService();
         } catch (Exception e) {
-            s_logger.info("[ignored]"
-                + "failed to trust all certificates blindly: ", e);
+            logger.info("[ignored]" + "failed to trust all certificates blindly: ", e);
         }
     }
 
     private static void trustAllHttpsCertificates() throws Exception {
-        // Create a trust manager that does not validate certificate chains:
+        // Create trust manager that does not validate certificate chains:
         javax.net.ssl.TrustManager[] trustAllCerts = new javax.net.ssl.TrustManager[1];
         javax.net.ssl.TrustManager tm = new TrustAllTrustManager();
         trustAllCerts[0] = tm;
@@ -125,23 +151,7 @@ public class VmwareClient {
         javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(new SecureSSLSocketFactory(sc));
     }
 
-    private final ManagedObjectReference svcInstRef = new ManagedObjectReference();
-    private final ManagedObjectReference pbmInstRef = new ManagedObjectReference();
-    private static VimService vimService;
-    private static PbmService pbmService;
-    private PbmPortType pbmPortType;
-    private VimPortType vimPort;
-    private String serviceCookie;
-    private final static String SVC_INST_NAME = "ServiceInstance";
-    private static final String PBMSERVICEINSTANCETYPE = "PbmServiceInstance";
-    private static final String PBMSERVICEINSTANCEVALUE = "ServiceInstance";
-    // Timeout in milliseconds
-    private int vCenterSessionTimeout = 1200000;
 
-    private boolean isConnected = false;
-
-    public VmwareClient(String name) {
-    }
 
     /**
      * Establishes session with the virtual center server.
@@ -169,8 +179,8 @@ public class VmwareClient {
         ctxt.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
         ctxt.put(MessageContext.HTTP_REQUEST_HEADERS, reqHeadrs);
 
-        ctxt.put("com.sun.xml.internal.ws.request.timeout", vCenterSessionTimeout);
-        ctxt.put("com.sun.xml.internal.ws.connect.timeout", vCenterSessionTimeout);
+        ctxt.put("com.sun.xml.internal.ws.request.timeout", vcenterSessionTimeOut);
+        ctxt.put("com.sun.xml.internal.ws.connect.timeout", vcenterSessionTimeOut);
 
         pbmPortType = pbmService.getPbmPort();
         Map<String, Object> pbmctxt = ((BindingProvider) vimPort).getRequestContext();
@@ -186,8 +196,8 @@ public class VmwareClient {
         pbmctxt.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
         pbmctxt.put(MessageContext.HTTP_REQUEST_HEADERS, pbmreqHeadrs);
 
-        pbmctxt.put("com.sun.xml.internal.ws.request.timeout", vCenterSessionTimeout);
-        pbmctxt.put("com.sun.xml.internal.ws.connect.timeout", vCenterSessionTimeout);
+        pbmctxt.put("com.sun.xml.internal.ws.request.timeout", vcenterSessionTimeOut);
+        pbmctxt.put("com.sun.xml.internal.ws.connect.timeout", vcenterSessionTimeOut);
 
         isConnected = true;
     }
@@ -205,8 +215,8 @@ public class VmwareClient {
         ctxt.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
         ctxt.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
 
-        ctxt.put("com.sun.xml.internal.ws.request.timeout", vCenterSessionTimeout);
-        ctxt.put("com.sun.xml.internal.ws.connect.timeout", vCenterSessionTimeout);
+        ctxt.put("com.sun.xml.internal.ws.request.timeout", vcenterSessionTimeOut);
+        ctxt.put("com.sun.xml.internal.ws.connect.timeout", vcenterSessionTimeOut);
 
         ServiceContent serviceContent = vimPort.retrieveServiceContent(svcInstRef);
 
@@ -223,7 +233,7 @@ public class VmwareClient {
             cookies = responseHeaders.get("Set-cookie");
             if (cookies == null) {
                 String msg = "Login successful, but failed to get server cookies from url :[" + url + "]";
-                s_logger.error(msg);
+                logger.error(msg);
                 throw new Exception(msg);
             }
         }
@@ -252,8 +262,8 @@ public class VmwareClient {
         pbmctxt.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url.replace("/sdk", "/pbm"));
         pbmctxt.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
 
-        pbmctxt.put("com.sun.xml.internal.ws.request.timeout", vCenterSessionTimeout);
-        pbmctxt.put("com.sun.xml.internal.ws.connect.timeout", vCenterSessionTimeout);
+        pbmctxt.put("com.sun.xml.internal.ws.request.timeout", vcenterSessionTimeOut);
+        pbmctxt.put("com.sun.xml.internal.ws.connect.timeout", vcenterSessionTimeOut);
 
         PbmServiceInstanceContent pbmserviceContent = pbmPortType.pbmRetrieveServiceContent(pbmInstRef);
         isConnected = true;
@@ -422,16 +432,16 @@ public class VmwareClient {
                 }
             }
         } catch (WebServiceException we) {
-            s_logger.warn("Session to vCenter failed with: " + we.getLocalizedMessage());
+            logger.warn("Session to vCenter failed with: " + we.getLocalizedMessage());
 
             TaskInfo taskInfo = (TaskInfo) getDynamicProperty(task, "info");
             if (!taskInfo.isCancelable()) {
-                s_logger.warn("vCenter task: " + taskInfo.getName() + "(" + taskInfo.getKey() + ")" +
+                logger.warn("vCenter task: " + taskInfo.getName() + "(" + taskInfo.getKey() + ")" +
                     " will continue to run on vCenter because the task cannot be cancelled");
                 throw new RuntimeException(we.getLocalizedMessage());
             }
 
-            s_logger.debug("Cancelling vCenter task: " + taskInfo.getName() + "(" + taskInfo.getKey() + ")");
+            logger.debug("Cancelling vCenter task: " + taskInfo.getName() + "(" + taskInfo.getKey() + ")");
             getService().cancelTask(task);
 
             // Since task cancellation is asynchronous, wait for the task to be cancelled
@@ -440,7 +450,7 @@ public class VmwareClient {
             //result for 2 properties: info.state, info.error
             if (result != null && result.length == 2) {
                 if (result[0].equals(TaskInfoState.SUCCESS)) {
-                    s_logger.warn(
+                    logger.warn(
                         "Failed to cancel vCenter task: " + taskInfo.getName() + "(" + taskInfo.getKey() + ")" +
                             " and the task successfully completed");
                     retVal = true;
@@ -449,7 +459,7 @@ public class VmwareClient {
                 if (result[1] instanceof LocalizedMethodFault) {
                     MethodFault fault = ((LocalizedMethodFault) result[1]).getFault();
                     if (fault instanceof RequestCanceled) {
-                        s_logger.debug("vCenter task " + taskInfo.getName() + "(" + taskInfo.getKey() + ")" +
+                        logger.debug("vCenter task " + taskInfo.getName() + "(" + taskInfo.getKey() + ")" +
                             " was successfully cancelled");
                         throw new RuntimeException(we.getLocalizedMessage());
                     }
@@ -742,12 +752,12 @@ public class VmwareClient {
                 }
             }
         } catch (InvalidPropertyFaultMsg invalidPropertyException) {
-            s_logger.debug(
+            logger.debug(
                 "Failed to get Vmware ManagedObjectReference for name: " + name + " and type: " + type + " due to " +
                     invalidPropertyException.getMessage());
             throw invalidPropertyException;
         } catch (RuntimeFaultFaultMsg runtimeFaultException) {
-            s_logger.debug(
+            logger.debug(
                 "Failed to get Vmware ManagedObjectReference for name: " + name + " and type: " + type + " due to " +
                     runtimeFaultException.getMessage());
             throw runtimeFaultException;
@@ -772,12 +782,12 @@ public class VmwareClient {
         return propmor;
     }
 
-    public void setVcenterSessionTimeout(int vCenterSessionTimeout) {
-        this.vCenterSessionTimeout = vCenterSessionTimeout;
+    public void setVcenterSessionTimeout(int vcenterSessionTimeOut) {
+        this.vcenterSessionTimeOut = vcenterSessionTimeOut;
     }
 
     public int getVcenterSessionTimeout() {
-        return vCenterSessionTimeout;
+        return vcenterSessionTimeOut;
     }
 
 }
