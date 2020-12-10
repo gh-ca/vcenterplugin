@@ -5,58 +5,75 @@ import com.dmeplugin.dmestore.services.VCenterInfoService;
 import com.dmeplugin.dmestore.utils.CipherUtils;
 import com.dmeplugin.vmware.util.TestVmwareContextFactory;
 import com.dmeplugin.vmware.util.VmwareContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class SpringBootConnectionHelper extends VCConnectionHelper{
 
+/**
+ * SpringBootConnectionHelper
+ *
+ * @author Administrator
+ * @since 2020-12-10
+ */
+public class SpringBootConnectionHelper extends VCConnectionHelper {
     private static final Logger log = LoggerFactory.getLogger(SpringBootConnectionHelper.class);
-    private VCenterInfoService vCenterInfoService;
+    private VCenterInfoService vcenterInfoService;
 
+    /**
+     * getvCenterInfoService
+     *
+     * @return VCenterInfoService
+     */
     public VCenterInfoService getvCenterInfoService() {
-        return vCenterInfoService;
+        return vcenterInfoService;
     }
 
-    public void setvCenterInfoService(VCenterInfoService vCenterInfoService) {
-        this.vCenterInfoService = vCenterInfoService;
+    /**
+     * setvCenterInfoService
+     *
+     * @param param vcenterInfoService
+     */
+    public void setvCenterInfoService(VCenterInfoService param) {
+        this.vcenterInfoService = param;
     }
 
 
     @Override
     public VmwareContext getServerContext(String serverguid) throws Exception {
         try {
-            VCenterInfo vCenterInfo= vCenterInfoService.getVcenterInfo();
-            if (null!=vCenterInfo) {
-                this.setServerurl(vCenterInfo.getHostIp());
-                this.setServerport(vCenterInfo.getHostPort());
-                this.setUsername(vCenterInfo.getUserName());
-                this.setPassword(CipherUtils.decryptString(vCenterInfo.getPassword()));
+            VCenterInfo vcenterInfo = vcenterInfoService.getVcenterInfo();
+            if (null != vcenterInfo) {
+                this.setServerurl(vcenterInfo.getHostIp());
+                this.setServerport(vcenterInfo.getHostPort());
+                this.setUsername(vcenterInfo.getUserName());
+                this.setPassword(CipherUtils.decryptString(vcenterInfo.getPassword()));
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            log.error("获取本地vcenter信息出错");
+            log.error("get local vcenter info error",e.getMessage());
         }
-        return TestVmwareContextFactory.getContext(getServerurl(),getServerport(),getUsername(),getPassword());
+        return TestVmwareContextFactory.getContext(getServerurl(), getServerport(), getUsername(), getPassword());
     }
 
     @Override
     public VmwareContext[] getAllContext() throws Exception {
         try {
-            VCenterInfo vCenterInfo= vCenterInfoService.getVcenterInfo();
-            if (null!=vCenterInfo) {
-                this.setServerurl(vCenterInfo.getHostIp());
-                this.setServerport(vCenterInfo.getHostPort());
-                this.setUsername(vCenterInfo.getUserName());
-                this.setPassword(CipherUtils.decryptString(vCenterInfo.getPassword()));
+            VCenterInfo vcenterInfo = vcenterInfoService.getVcenterInfo();
+            if (null != vcenterInfo) {
+                this.setServerurl(vcenterInfo.getHostIp());
+                this.setServerport(vcenterInfo.getHostPort());
+                this.setUsername(vcenterInfo.getUserName());
+                this.setPassword(CipherUtils.decryptString(vcenterInfo.getPassword()));
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
-        VmwareContext vmwareContext=TestVmwareContextFactory.getContext(getServerurl(),getServerport(),getUsername(),getPassword());
-        List<VmwareContext> vmwareContextList=new ArrayList<>();
+        VmwareContext vmwareContext =
+            TestVmwareContextFactory.getContext(getServerurl(), getServerport(), getUsername(), getPassword());
+        List<VmwareContext> vmwareContextList = new ArrayList<>();
         vmwareContextList.add(vmwareContext);
         return vmwareContextList.toArray(new VmwareContext[0]);
     }
