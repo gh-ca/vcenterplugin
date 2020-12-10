@@ -60,7 +60,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLSession;
@@ -73,7 +72,7 @@ import javax.xml.ws.handler.MessageContext;
  * <p>
  * DISCLAIMER: This code is partly copied from sample codes that come along with Vmware web service 5.1 SDK.
  *
- * @author Administrator 
+ * @author Administrator
  * @since 2020-12-10
  */
 public class VmwareClient {
@@ -89,11 +88,18 @@ public class VmwareClient {
     private PbmPortType pbmPortType;
     private VimPortType vimPort;
     private String serviceCookie;
+
     // Timeout in milliseconds
     private int vcenterSessionTimeOut = 1200000;
-
+    private final String reqTimeOut = "com.sun.xml.internal.ws.request.timeout";
+    private final String conTimeOut = "com.sun.xml.internal.ws.connect.timeout";
     private boolean isConnected = false;
 
+    /**
+     * VmwareClient
+     *
+     * @param name name
+     */
     public VmwareClient(String name) {
     }
 
@@ -152,10 +158,10 @@ public class VmwareClient {
     }
 
 
-
     /**
      * Establishes session with the virtual center server.
      *
+     * @param serverInfo serverInfo
      * @throws Exception the exception
      */
     public void connect(ServerInfo serverInfo) throws Exception {
@@ -179,8 +185,8 @@ public class VmwareClient {
         ctxt.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
         ctxt.put(MessageContext.HTTP_REQUEST_HEADERS, reqHeadrs);
 
-        ctxt.put("com.sun.xml.internal.ws.request.timeout", vcenterSessionTimeOut);
-        ctxt.put("com.sun.xml.internal.ws.connect.timeout", vcenterSessionTimeOut);
+        ctxt.put(reqTimeOut, vcenterSessionTimeOut);
+        ctxt.put(conTimeOut, vcenterSessionTimeOut);
 
         pbmPortType = pbmService.getPbmPort();
         Map<String, Object> pbmctxt = ((BindingProvider) vimPort).getRequestContext();
@@ -196,12 +202,20 @@ public class VmwareClient {
         pbmctxt.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
         pbmctxt.put(MessageContext.HTTP_REQUEST_HEADERS, pbmreqHeadrs);
 
-        pbmctxt.put("com.sun.xml.internal.ws.request.timeout", vcenterSessionTimeOut);
-        pbmctxt.put("com.sun.xml.internal.ws.connect.timeout", vcenterSessionTimeOut);
+        pbmctxt.put(reqTimeOut, vcenterSessionTimeOut);
+        pbmctxt.put(conTimeOut, vcenterSessionTimeOut);
 
         isConnected = true;
     }
 
+    /**
+     * public
+     *
+     * @param url      url
+     * @param userName userName
+     * @param password password
+     * @throws Exception Exception
+     */
     public void connect(String url, String userName, String password) throws Exception {
         svcInstRef.setType(SVC_INST_NAME);
         svcInstRef.setValue(SVC_INST_NAME);
@@ -215,8 +229,8 @@ public class VmwareClient {
         ctxt.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
         ctxt.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
 
-        ctxt.put("com.sun.xml.internal.ws.request.timeout", vcenterSessionTimeOut);
-        ctxt.put("com.sun.xml.internal.ws.connect.timeout", vcenterSessionTimeOut);
+        ctxt.put(reqTimeOut, vcenterSessionTimeOut);
+        ctxt.put(conTimeOut, vcenterSessionTimeOut);
 
         ServiceContent serviceContent = vimPort.retrieveServiceContent(svcInstRef);
 
@@ -262,17 +276,17 @@ public class VmwareClient {
         pbmctxt.put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url.replace("/sdk", "/pbm"));
         pbmctxt.put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
 
-        pbmctxt.put("com.sun.xml.internal.ws.request.timeout", vcenterSessionTimeOut);
-        pbmctxt.put("com.sun.xml.internal.ws.connect.timeout", vcenterSessionTimeOut);
+        pbmctxt.put(reqTimeOut, vcenterSessionTimeOut);
+        pbmctxt.put(conTimeOut, vcenterSessionTimeOut);
 
-        PbmServiceInstanceContent pbmserviceContent = pbmPortType.pbmRetrieveServiceContent(pbmInstRef);
+        pbmPortType.pbmRetrieveServiceContent(pbmInstRef);
         isConnected = true;
     }
 
     /**
      * Disconnects the user session.
      *
-     * @throws Exception
+     * @throws Exception Exception
      */
     public void disconnect() throws Exception {
         if (isConnected) {
@@ -282,6 +296,8 @@ public class VmwareClient {
     }
 
     /**
+     * getService
+     *
      * @return Service instance
      */
     public VimPortType getService() {
@@ -289,6 +305,8 @@ public class VmwareClient {
     }
 
     /**
+     * getPbmService
+     *
      * @return Service instance
      */
     public PbmPortType getPbmService() {
@@ -296,18 +314,22 @@ public class VmwareClient {
     }
 
     /**
+     * getServiceContent
+     *
      * @return Service instance content
      */
     public ServiceContent getServiceContent() {
-
         try {
             return vimPort.retrieveServiceContent(svcInstRef);
         } catch (RuntimeFaultFaultMsg e) {
+            logger.error(e.getMessage());
         }
         return null;
     }
 
     /**
+     * getPbmServiceContent
+     *
      * @return pbm Service instance content
      */
     public PbmServiceInstanceContent getPbmServiceContent() {
@@ -315,12 +337,14 @@ public class VmwareClient {
         try {
             return pbmPortType.pbmRetrieveServiceContent(pbmInstRef);
         } catch (com.vmware.pbm.RuntimeFaultFaultMsg runtimeFaultFaultMsg) {
-            runtimeFaultFaultMsg.printStackTrace();
+            logger.error(runtimeFaultFaultMsg.getMessage());
         }
         return null;
     }
 
     /**
+     * getServiceCookie
+     *
      * @return cookie used in service connection
      */
     public String getServiceCookie() {
@@ -328,6 +352,8 @@ public class VmwareClient {
     }
 
     /**
+     * getPropCol
+     *
      * @return Service property collector
      */
     public ManagedObjectReference getPropCol() {
@@ -335,6 +361,8 @@ public class VmwareClient {
     }
 
     /**
+     * getRootFolder
+     *
      * @return Root folder
      */
     public ManagedObjectReference getRootFolder() {
@@ -342,11 +370,12 @@ public class VmwareClient {
     }
 
     /**
-     * Get the property value of a managed object.
+     * Get the property value of managed object
      *
      * @param mor          managed object reference
      * @param propertyName property name.
-     * @return property value.
+     * @param <T>          T
+     * @return T property value.
      * @throws Exception in case of error.
      */
     @SuppressWarnings("unchecked")
@@ -370,9 +399,10 @@ public class VmwareClient {
                  */
                 Class dpCls = propertyValue.getClass();
                 String dynamicPropertyName = dpCls.getName();
-                if (dynamicPropertyName.indexOf("ArrayOf") != -1) {
+                String arrayOf = "ArrayOf";
+                if (dynamicPropertyName.indexOf(arrayOf) != -1) {
                     String methodName = "get" + dynamicPropertyName
-                        .substring(dynamicPropertyName.indexOf("ArrayOf") + "ArrayOf".length(),
+                        .substring(dynamicPropertyName.indexOf(arrayOf) + arrayOf.length(),
                             dynamicPropertyName.length());
 
                     Method getMorMethod = dpCls.getDeclaredMethod(methodName, null);
@@ -383,46 +413,54 @@ public class VmwareClient {
         return (T) propertyValue;
     }
 
-    private List<ObjectContent> retrieveMoRefProperties(ManagedObjectReference mObj, List<String> props)
+    /**
+     * retrieveMoRefProperties
+     *
+     * @param mobj  mobj
+     * @param props props
+     * @return List
+     * @throws Exception Exception
+     */
+    private List<ObjectContent> retrieveMoRefProperties(ManagedObjectReference mobj, List<String> props)
         throws Exception {
-        PropertySpec pSpec = new PropertySpec();
-        pSpec.setAll(false);
-        pSpec.setType(mObj.getType());
-        pSpec.getPathSet().addAll(props);
+        PropertySpec pspec = new PropertySpec();
+        pspec.setAll(false);
+        pspec.setType(mobj.getType());
+        pspec.getPathSet().addAll(props);
 
-        ObjectSpec oSpec = new ObjectSpec();
-        oSpec.setObj(mObj);
-        oSpec.setSkip(false);
+        ObjectSpec ospec = new ObjectSpec();
+        ospec.setObj(mobj);
+        ospec.setSkip(false);
         PropertyFilterSpec spec = new PropertyFilterSpec();
-        spec.getPropSet().add(pSpec);
-        spec.getObjectSet().add(oSpec);
-        List<PropertyFilterSpec> specArr = new ArrayList<PropertyFilterSpec>();
+        spec.getPropSet().add(pspec);
+        spec.getObjectSet().add(ospec);
+        List<PropertyFilterSpec> specArr = new ArrayList<>();
         specArr.add(spec);
 
         return vimPort.retrieveProperties(getPropCol(), specArr);
     }
 
     /**
-     * This method returns a boolean value specifying whether the Task is
+     * This method returns boolean value specifying whether the Task is
      * succeeded or failed.
      *
      * @param task ManagedObjectReference representing the Task.
      * @return boolean value representing the Task result.
-     * @throws InvalidCollectorVersionFaultMsg
-     * @throws RuntimeFaultFaultMsg
-     * @throws InvalidPropertyFaultMsg
+     * @throws InvalidCollectorVersionFaultMsg InvalidCollectorVersionFaultMsg
+     * @throws RuntimeFaultFaultMsg            RuntimeFaultFaultMsg
+     * @throws InvalidPropertyFaultMsg         InvalidPropertyFaultMsg
+     * @throws Exception                       Exception
      */
     public boolean waitForTask(ManagedObjectReference task)
         throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg, InvalidCollectorVersionFaultMsg, Exception {
-
         boolean retVal = false;
 
         try {
-            // info has a property - state for state of the task
+            // info has property - state for state of the task
             Object[] result = waitForValues(task, new String[] {"info.state", "info.error"}, new String[] {"state"},
                 new Object[][] {new Object[] {
                     TaskInfoState.SUCCESS, TaskInfoState.ERROR}});
-            //result for 2 properties: info.state, info.error
+            // result for two properties: info.state, info.error
             if (result != null && result.length == 2) {
                 if (result[0].equals(TaskInfoState.SUCCESS)) {
                     retVal = true;
@@ -432,35 +470,47 @@ public class VmwareClient {
                 }
             }
         } catch (WebServiceException we) {
-            logger.warn("Session to vCenter failed with: " + we.getLocalizedMessage());
+            logger.warn("Session to vCenter failed with: ", we.getLocalizedMessage());
 
             TaskInfo taskInfo = (TaskInfo) getDynamicProperty(task, "info");
             if (!taskInfo.isCancelable()) {
-                logger.warn("vCenter task: " + taskInfo.getName() + "(" + taskInfo.getKey() + ")" +
-                    " will continue to run on vCenter because the task cannot be cancelled");
+                logger.warn("vCenter task: "
+                    + taskInfo.getName()
+                    + "{"
+                    + taskInfo.getKey()
+                    + "}"
+                    + " will continue to run on vCenter because the task cannot be cancelled");
                 throw new RuntimeException(we.getLocalizedMessage());
             }
 
-            logger.debug("Cancelling vCenter task: " + taskInfo.getName() + "(" + taskInfo.getKey() + ")");
+            logger.debug("Cancelling vCenter task: " + taskInfo.getName() + "{" + taskInfo.getKey() + "}");
             getService().cancelTask(task);
 
             // Since task cancellation is asynchronous, wait for the task to be cancelled
             Object[] result = waitForValues(task, new String[] {"info.state", "info.error"}, new String[] {"state"},
                 new Object[][] {new Object[] {TaskInfoState.SUCCESS, TaskInfoState.ERROR}});
-            //result for 2 properties: info.state, info.error
+            // result for 2 properties: info.state, info.error
             if (result != null && result.length == 2) {
                 if (result[0].equals(TaskInfoState.SUCCESS)) {
                     logger.warn(
-                        "Failed to cancel vCenter task: " + taskInfo.getName() + "(" + taskInfo.getKey() + ")" +
-                            " and the task successfully completed");
+                        "Failed to cancel vCenter task: "
+                            + taskInfo.getName()
+                            + "("
+                            + taskInfo.getKey()
+                            + ")"
+                            + " and the task successfully completed");
                     retVal = true;
                 }
 
                 if (result[1] instanceof LocalizedMethodFault) {
                     MethodFault fault = ((LocalizedMethodFault) result[1]).getFault();
                     if (fault instanceof RequestCanceled) {
-                        logger.debug("vCenter task " + taskInfo.getName() + "(" + taskInfo.getKey() + ")" +
-                            " was successfully cancelled");
+                        logger.debug("vCenter task "
+                            + taskInfo.getName()
+                            + "("
+                            + taskInfo.getKey()
+                            + ")"
+                            + " was successfully cancelled");
                         throw new RuntimeException(we.getLocalizedMessage());
                     }
                 } else {
@@ -472,13 +522,13 @@ public class VmwareClient {
     }
 
     /**
-     * Handle Updates for a single object. waits till expected values of
+     * Handle Updates for single object. waits till expected values of
      * properties to check are reached Destroys the ObjectFilter when done.
      *
      * @param objmor       MOR of the Object to wait for
      * @param filterProps  Properties list to filter
-     * @param endWaitProps Properties list to check for expected values these be
-     *                     properties of a property in the filter properties list
+     * @param endWaitProps Properties list to check for expected values these
+     *                     beproperties of property in the filter properties list
      * @param expectedVals values for properties to end the wait
      * @return true indicating expected values were met, and false otherwise
      * @throws RuntimeFaultFaultMsg
@@ -487,8 +537,7 @@ public class VmwareClient {
      */
     private synchronized Object[] waitForValues(ManagedObjectReference objmor, String[] filterProps,
                                                 String[] endWaitProps, Object[][] expectedVals)
-        throws InvalidPropertyFaultMsg,
-        RuntimeFaultFaultMsg, InvalidCollectorVersionFaultMsg {
+        throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg, InvalidCollectorVersionFaultMsg {
         // version string is initially null
         String version = "";
         Object[] endVals = new Object[endWaitProps.length];
@@ -496,15 +545,15 @@ public class VmwareClient {
         String stateVal = null;
 
         PropertyFilterSpec spec = new PropertyFilterSpec();
-        ObjectSpec oSpec = new ObjectSpec();
-        oSpec.setObj(objmor);
-        oSpec.setSkip(Boolean.FALSE);
-        spec.getObjectSet().add(oSpec);
+        ObjectSpec ospec = new ObjectSpec();
+        ospec.setObj(objmor);
+        ospec.setSkip(Boolean.FALSE);
+        spec.getObjectSet().add(ospec);
 
-        PropertySpec pSpec = new PropertySpec();
-        pSpec.getPathSet().addAll(Arrays.asList(filterProps));
-        pSpec.setType(objmor.getType());
-        spec.getPropSet().add(pSpec);
+        PropertySpec pspec = new PropertySpec();
+        pspec.getPathSet().addAll(Arrays.asList(filterProps));
+        pspec.setType(objmor.getType());
+        spec.getPropSet().add(pspec);
 
         ManagedObjectReference propertyCollector = getPropCol();
         ManagedObjectReference filterSpecRef = vimPort.createFilter(propertyCollector, spec, true);
@@ -521,15 +570,13 @@ public class VmwareClient {
                 continue;
             }
             version = updateset.getVersion();
-
             // Make this code more general purpose when PropCol changes later.
             filtupary = updateset.getFilterSet();
-
             for (PropertyFilterUpdate filtup : filtupary) {
                 objupary = filtup.getObjectSet();
                 for (ObjectUpdate objup : objupary) {
-                    if (objup.getKind() == ObjectUpdateKind.MODIFY || objup.getKind() == ObjectUpdateKind.ENTER ||
-                        objup.getKind() == ObjectUpdateKind.LEAVE) {
+                    if (objup.getKind() == ObjectUpdateKind.MODIFY || objup.getKind() == ObjectUpdateKind.ENTER
+                        || objup.getKind() == ObjectUpdateKind.LEAVE) {
                         propchgary = objup.getChangeSet();
                         for (PropertyChange propchg : propchgary) {
                             updateValues(endWaitProps, endVals, propchg);
@@ -538,16 +585,15 @@ public class VmwareClient {
                     }
                 }
             }
-
             Object expctdval = null;
             // Check if the expected values have been reached and exit the loop if done.
             // Also exit the WaitForUpdates loop if this is the case.
             for (int chgi = 0; chgi < endVals.length && !reached; chgi++) {
                 for (int vali = 0; vali < expectedVals[chgi].length && !reached; vali++) {
                     expctdval = expectedVals[chgi][vali];
-
                     if (endVals[chgi] == null) {
                         // Do nothing
+                        continue;
                     } else if (endVals[chgi].toString().contains("val: null")) {
                         // Handle JAX-WS De-serialization issue, by parsing nodes
                         Element stateElement = (Element) endVals[chgi];
@@ -594,29 +640,34 @@ public class VmwareClient {
 
     private List<SelectionSpec> constructCompleteTraversalSpec() {
         // ResourcePools to VM: RP -> VM
+        String vm = "vm";
+        final String strVisitFolders = "VisitFolders";
+        final String strDatacenter = "Datacenter";
+        final String strResourcePool = "resourcePool";
+        final String strRpToRp = "rpToRp";
         TraversalSpec rpToVm = new TraversalSpec();
         rpToVm.setName("rpToVm");
         rpToVm.setType("ResourcePool");
-        rpToVm.setPath("vm");
+        rpToVm.setPath(vm);
         rpToVm.setSkip(Boolean.FALSE);
 
         // VirtualApp to VM: vApp -> VM
-        TraversalSpec vAppToVm = new TraversalSpec();
-        vAppToVm.setName("vAppToVM");
-        vAppToVm.setType("VirtualApp");
-        vAppToVm.setPath("vm");
+        TraversalSpec vappToVm = new TraversalSpec();
+        vappToVm.setName("vAppToVM");
+        vappToVm.setType("VirtualApp");
+        vappToVm.setPath(vm);
 
         // Host to VM: HostSystem -> VM
-        TraversalSpec hToVm = new TraversalSpec();
-        hToVm.setType("HostSystem");
-        hToVm.setPath("vm");
-        hToVm.setName("hToVm");
-        hToVm.getSelectSet().add(getSelectionSpec("VisitFolders"));
-        hToVm.setSkip(Boolean.FALSE);
+        TraversalSpec htoVm = new TraversalSpec();
+        htoVm.setType("HostSystem");
+        htoVm.setPath(vm);
+        htoVm.setName("hToVm");
+        htoVm.getSelectSet().add(getSelectionSpec(strVisitFolders));
+        htoVm.setSkip(Boolean.FALSE);
 
         // DataCenter to DataStore: DC -> DS
         TraversalSpec dcToDs = new TraversalSpec();
-        dcToDs.setType("Datacenter");
+        dcToDs.setType(strDatacenter);
         dcToDs.setPath("datastore");
         dcToDs.setName("dcToDs");
         dcToDs.setSkip(Boolean.FALSE);
@@ -624,17 +675,17 @@ public class VmwareClient {
         // Recurse through all ResourcePools
         TraversalSpec rpToRp = new TraversalSpec();
         rpToRp.setType("ResourcePool");
-        rpToRp.setPath("resourcePool");
+        rpToRp.setPath(strResourcePool);
         rpToRp.setSkip(Boolean.FALSE);
-        rpToRp.setName("rpToRp");
-        rpToRp.getSelectSet().add(getSelectionSpec("rpToRp"));
+        rpToRp.setName(strRpToRp);
+        rpToRp.getSelectSet().add(getSelectionSpec(strRpToRp));
 
         TraversalSpec crToRp = new TraversalSpec();
         crToRp.setType("ComputeResource");
-        crToRp.setPath("resourcePool");
+        crToRp.setPath(strResourcePool);
         crToRp.setSkip(Boolean.FALSE);
         crToRp.setName("crToRp");
-        crToRp.getSelectSet().add(getSelectionSpec("rpToRp"));
+        crToRp.getSelectSet().add(getSelectionSpec(strRpToRp));
 
         TraversalSpec crToH = new TraversalSpec();
         crToH.setSkip(Boolean.FALSE);
@@ -644,30 +695,30 @@ public class VmwareClient {
 
         TraversalSpec dcToHf = new TraversalSpec();
         dcToHf.setSkip(Boolean.FALSE);
-        dcToHf.setType("Datacenter");
+        dcToHf.setType(strDatacenter);
         dcToHf.setPath("hostFolder");
         dcToHf.setName("dcToHf");
-        dcToHf.getSelectSet().add(getSelectionSpec("VisitFolders"));
+        dcToHf.getSelectSet().add(getSelectionSpec(strVisitFolders));
 
-        TraversalSpec vAppToRp = new TraversalSpec();
-        vAppToRp.setName("vAppToRp");
-        vAppToRp.setType("VirtualApp");
-        vAppToRp.setPath("resourcePool");
-        vAppToRp.getSelectSet().add(getSelectionSpec("rpToRp"));
+        TraversalSpec vappToRp = new TraversalSpec();
+        vappToRp.setName("vAppToRp");
+        vappToRp.setType("VirtualApp");
+        vappToRp.setPath(strResourcePool);
+        vappToRp.getSelectSet().add(getSelectionSpec(strRpToRp));
 
         TraversalSpec dcToVmf = new TraversalSpec();
-        dcToVmf.setType("Datacenter");
+        dcToVmf.setType(strDatacenter);
         dcToVmf.setSkip(Boolean.FALSE);
         dcToVmf.setPath("vmFolder");
         dcToVmf.setName("dcToVmf");
-        dcToVmf.getSelectSet().add(getSelectionSpec("VisitFolders"));
+        dcToVmf.getSelectSet().add(getSelectionSpec(strVisitFolders));
 
         // For Folder -> Folder recursion
         TraversalSpec visitFolders = new TraversalSpec();
         visitFolders.setType("Folder");
         visitFolders.setPath("childEntity");
         visitFolders.setSkip(Boolean.FALSE);
-        visitFolders.setName("VisitFolders");
+        visitFolders.setName(strVisitFolders);
         List<SelectionSpec> sspecarrvf = new ArrayList<SelectionSpec>();
         sspecarrvf.add(getSelectionSpec("crToRp"));
         sspecarrvf.add(getSelectionSpec("crToH"));
@@ -678,7 +729,7 @@ public class VmwareClient {
         sspecarrvf.add(getSelectionSpec("dcToDs"));
         sspecarrvf.add(getSelectionSpec("hToVm"));
         sspecarrvf.add(getSelectionSpec("rpToVm"));
-        sspecarrvf.add(getSelectionSpec("VisitFolders"));
+        sspecarrvf.add(getSelectionSpec(strVisitFolders));
 
         visitFolders.getSelectSet().addAll(sspecarrvf);
 
@@ -688,10 +739,10 @@ public class VmwareClient {
         resultspec.add(crToH);
         resultspec.add(dcToVmf);
         resultspec.add(dcToHf);
-        resultspec.add(vAppToRp);
-        resultspec.add(vAppToVm);
+        resultspec.add(vappToRp);
+        resultspec.add(vappToVm);
         resultspec.add(dcToDs);
-        resultspec.add(hToVm);
+        resultspec.add(htoVm);
         resultspec.add(rpToVm);
         resultspec.add(rpToRp);
 
@@ -702,10 +753,11 @@ public class VmwareClient {
      * Get the ManagedObjectReference for an item under the
      * specified root folder that has the type and name specified.
      *
-     * @param root a root folder if available, or null for default
+     * @param root root folder if available, or null for default
      * @param type type of the managed object
      * @param name name to match
      * @return First ManagedObjectReference of the type / name pair found
+     * @throws Exception Exception
      */
     public ManagedObjectReference getDecendentMoRef(ManagedObjectReference root, String type, String name)
         throws Exception {
@@ -715,19 +767,19 @@ public class VmwareClient {
 
         try {
             // Create PropertySpecs
-            PropertySpec pSpec = new PropertySpec();
-            pSpec.setType(type);
-            pSpec.setAll(false);
-            pSpec.getPathSet().add("name");
+            PropertySpec pspec = new PropertySpec();
+            pspec.setType(type);
+            pspec.setAll(false);
+            pspec.getPathSet().add("name");
 
-            ObjectSpec oSpec = new ObjectSpec();
-            oSpec.setObj(root);
-            oSpec.setSkip(false);
-            oSpec.getSelectSet().addAll(constructCompleteTraversalSpec());
+            ObjectSpec ospec = new ObjectSpec();
+            ospec.setObj(root);
+            ospec.setSkip(false);
+            ospec.getSelectSet().addAll(constructCompleteTraversalSpec());
 
             PropertyFilterSpec spec = new PropertyFilterSpec();
-            spec.getPropSet().add(pSpec);
-            spec.getObjectSet().add(oSpec);
+            spec.getPropSet().add(pspec);
+            spec.getObjectSet().add(ospec);
             List<PropertyFilterSpec> specArr = new ArrayList<PropertyFilterSpec>();
             specArr.add(spec);
 
@@ -753,13 +805,15 @@ public class VmwareClient {
             }
         } catch (InvalidPropertyFaultMsg invalidPropertyException) {
             logger.debug(
-                "Failed to get Vmware ManagedObjectReference for name: " + name + " and type: " + type + " due to " +
-                    invalidPropertyException.getMessage());
+                "Failed to get Vmware ManagedObjectReference for name: " + name
+                    + " and type: " + type
+                    + " due to " + invalidPropertyException.getMessage());
             throw invalidPropertyException;
         } catch (RuntimeFaultFaultMsg runtimeFaultException) {
             logger.debug(
-                "Failed to get Vmware ManagedObjectReference for name: " + name + " and type: " + type + " due to " +
-                    runtimeFaultException.getMessage());
+                "Failed to get Vmware ManagedObjectReference for name: " + name
+                    + " and type: " + type
+                    + " due to " + runtimeFaultException.getMessage());
             throw runtimeFaultException;
         }
 
@@ -767,11 +821,12 @@ public class VmwareClient {
     }
 
     /**
-     * Get a MORef from the property returned.
+     * Get MORef from the property returned.
      *
-     * @param objMor   Object to get a reference property from
+     * @param objMor   Object to get reference property from
      * @param propName name of the property that is the MORef
      * @return the ManagedObjectReference for that property.
+     * @throws Exception Exception
      */
     public ManagedObjectReference getMoRefProp(ManagedObjectReference objMor, String propName) throws Exception {
         Object props = getDynamicProperty(objMor, propName);
@@ -782,12 +837,16 @@ public class VmwareClient {
         return propmor;
     }
 
-    public void setVcenterSessionTimeout(int vcenterSessionTimeOut) {
-        this.vcenterSessionTimeOut = vcenterSessionTimeOut;
+    /**
+     * setVcenterSessionTimeout
+     *
+     * @param param vcenterSessionTimeOut
+     */
+    public void setVcenterSessionTimeout(int param) {
+        this.vcenterSessionTimeOut = param;
     }
 
     public int getVcenterSessionTimeout() {
         return vcenterSessionTimeOut;
     }
-
 }
