@@ -9,18 +9,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Description: TODO
- * @ClassName: ServiceLevelService
- * @Company: GH-CA
- * @author: liuxh
- * @create: 2020-09-02
+ * ServiceLevelService
+ *
+ * @author liuxh
+ * @since 2020-09-15
  **/
 public interface ServiceLevelService {
- //服务等级列表
     List<SimpleServiceLevel> listServiceLevel(Map<String, Object> params) throws DmeException;
 
-
-     //服务等级关联的storagePool
     List<StoragePool> getStoragePoolInfosByServiceLevelId(String serviceLevelId) throws DmeException;
 
     List<Volume> getVolumeInfosByServiceLevelId(String serviceLevelId) throws DmeException;

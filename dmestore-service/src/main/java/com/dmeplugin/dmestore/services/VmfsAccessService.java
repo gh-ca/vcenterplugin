@@ -8,27 +8,26 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Description: TODO
- * @ClassName: VmfsAccessService
- * @Company: GH-CA
- * @author: yy
- * @create: 2020-09-02
+ * VmfsAccessService
+ *
+ * @author lianqiang
+ * @since 2020-09-15
  **/
 public interface VmfsAccessService {
     /**
      * List vmfs
-
-     * @return List<VmfsDataInfo>
-     * @throws Exception when error
+     *
+     * @return List
+     * @throws DmeException when error
      */
     List<VmfsDataInfo> listVmfs() throws DmeException;
 
     /**
      * List vmfs Performance
      *
-     * @param  wwns
-     * @return List<VmfsDataInfo>
-     * @throws Exception when error
+     * @param wwns wwn
+     * @return List
+     * @throws DmeException when error
      */
     List<VmfsDataInfo> listVmfsPerformance(List<String> wwns) throws DmeException;
 
@@ -63,96 +62,98 @@ public interface VmfsAccessService {
      * param str qosname Smart QoS名称
      *
      * @param params include Parameters above
-     * @return Return ResponseBodyBean
-     * @return: ResponseBodyBean
-     * @throws Exception when error
+     * @throws DmeException when error
      */
     void createVmfs(Map<String, Object> params) throws DmeException;
 
     /**
      * Mount vmfs include
-     * param list<str> dataStoreObjectIds: datastore object id列表 必
+     * param list dataStoreObjectIds: datastore object id列表 必
      * param str host: 主机名称 必 （主机与集群二选一）
      * param str hostId: 主机
      * param str cluster: 集群名称 必（主机与集群二选一）
      * param str clusterId: 集群
      *
-     * @param params: include dataStoreObjectIds,host,hostId,cluster,clusterId
-     * @return: ResponseBodyBean
-     * @throws Exception when error
+     * @param params include dataStoreObjectIds,host,hostId,cluster,clusterId
+     * @throws DmeException when error
      */
     void mountVmfs(Map<String, Object> params) throws DmeException;
 
     /**
-     * unmounted vmfs
+     * unmount Vmfs
+     *
+     * @param params include dataStoreObjectIds,host,hostId,cluster,clusterId
+     * @throws DmeException when error
      */
     void unmountVmfs(Map<String, Object> params) throws DmeException;
 
     /**
      * delete vmfs
+     *
+     * @param params include dataStoreObjectIds,host,hostId,cluster,clusterId
+     * @throws DmeException when error
      */
     void deleteVmfs(Map<String, Object> params) throws DmeException;
 
     /**
      * vCenter VMFS存储卷详细信息查询
-     * @author wangxy
-     * @date 10:05 2020/10/14
+     *
      * @param storageObjectId VMFS存储ID
-     * @throws Exception always
-     * @return java.util.List<com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail>
+     * @return java.util.List com.dmeplugin.dmestore.model.VmfsDatastoreVolumeDetail
+     * @throws DmeException always
      **/
     List<VmfsDatastoreVolumeDetail> volumeDetail(String storageObjectId) throws DmeException;
 
     /**
      * vCenter VMFS存储扫描发现
-     * @author wangxy
-     * @date 10:03 2020/10/14
-     * @throws Exception always
+     *
      * @return boolean
+     * @throws DmeException always
      **/
     boolean scanVmfs() throws DmeException;
 
     /**
      * 通过vmfs storageId查询VC的主机 (DME侧关联的主机的启动器和VC主机的启动器要一致)
-     * @return 返回VC主机列表，单个主机的信息以map方式存储属性和属性值
-     * @throws Exception
+     *
+     * @param storageId storageId
+     * @return List 返回VC主机列表，单个主机的信息以map方式存储属性和属性值
+     * @throws DmeException DmeException
      */
     List<Map<String, Object>> getHostsByStorageId(String storageId) throws DmeException;
 
     /**
      * 通过vmfs storageId查询vc 集群信息 （DME侧关联的主机组信息下所有主机的启动器和集群下的主机的启动器一致）
-     * @param storageId
+     *
+     * @param storageId storageId
      * @return 返回集群列表，单个集群的信息以map方式存储属性和属性值
-     * @throws Exception
+     * @throws DmeException DmeException
      */
     List<Map<String, Object>> getHostGroupsByStorageId(String storageId) throws DmeException;
 
     /**
      * query vmfs
-     * @return List<VmfsDataInfo>
+     *
+     * @param dataStoreObjectId dataStoreObjectId
+     * @return List VmfsDataInfo
      * @throws Exception when error
      */
     List<VmfsDataInfo> queryVmfs(String dataStoreObjectId) throws Exception;
 
-
     /**
      * 根据vmfs名字查询指定vmfs
      *
-     * @param name
-     * @return
+     * @param name name
+     * @return Boolean
      */
     Boolean queryDatastoreByName(String name);
 
-
     /**
      * DME侧主机检查
-     * @author wangxy
-     * @date 14:00 2020/10/30
-     * @param hostIp
-     * @param hostId
-     * @throws DmeException
+     *
+     * @param hostIp hostIp
+     * @param hostId hostId
      * @return java.lang.String
+     * @throws DmeException DmeException
      **/
     String checkOrCreateToHost(String hostIp, String hostId) throws DmeException;
-
 }

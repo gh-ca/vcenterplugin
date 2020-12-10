@@ -7,48 +7,59 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author lianq
- * @className VmfsOperationService
- * @description TODO
- * @date 2020/9/9 10:21
- */
+ * VmfsOperationService
+ *
+ * @author lianqiang
+ * @since 2020-09-15
+ **/
 public interface VmfsOperationService {
-
     /**
      * 更新VMFS存储
-     * @param volumeId
-     * @param params
+     *
+     * @param volumeId volumeId
+     * @param params params
+     * @throws DmeException DmeException
      */
     void updateVmfs(String volumeId, Map<String, Object> params) throws DmeException;
 
     /**
      * vmfs存储扩容
-     * @param volumes
+     *
+     * @param volumes volumes
+     * @throws DmeException DmeException
      */
-    void expandVmfs(Map<String,String> volumes) throws DmeException;
+    void expandVmfs(Map<String, String> volumes) throws DmeException;
 
     /**
      * vmfs存储空间回收
-     * @param vmfsUuids
+     *
+     * @param vmfsUuids vmfsUuids
+     * @throws DmeException DmeException
      */
     void recycleVmfsCapacity(List<String> vmfsUuids) throws DmeException;
 
     /**
      * vmfs存储空间回收
-     * @param vmfsObjIds
+     *
+     * @param vmfsObjIds vmfsObjIds
+     * @throws DmeException DmeException
      */
     void recycleVmfsCapacityByDataStoreIds(List<String> vmfsObjIds) throws DmeException;
 
     /**
      * 更新vmfs存储
-     * @param params
+     *
+     * @param params params
+     * @throws DmeException DmeException
      */
     void updateVmfsServiceLevel(Map<String, Object> params) throws DmeException;
 
     /**
      * 获取服务等级列表
-     * @param params
-     * @return
+     *
+     * @param params params
+     * @return List SimpleServiceLevel
+     * @throws DmeException DmeException
      */
     List<SimpleServiceLevel> listServiceLevelVmfs(Map<String, Object> params) throws DmeException;
 }
