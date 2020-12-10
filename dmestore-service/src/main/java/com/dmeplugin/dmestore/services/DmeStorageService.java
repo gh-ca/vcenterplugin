@@ -1,191 +1,260 @@
 package com.dmeplugin.dmestore.services;
 
-
 import com.dmeplugin.dmestore.exception.DmeException;
-import com.dmeplugin.dmestore.model.*;
+import com.dmeplugin.dmestore.model.BandPorts;
+import com.dmeplugin.dmestore.model.Dtrees;
+import com.dmeplugin.dmestore.model.EthPortInfo;
+import com.dmeplugin.dmestore.model.FailoverGroup;
+import com.dmeplugin.dmestore.model.FileSystem;
+import com.dmeplugin.dmestore.model.FileSystemDetail;
+import com.dmeplugin.dmestore.model.LogicPorts;
+import com.dmeplugin.dmestore.model.NfsShares;
+import com.dmeplugin.dmestore.model.Storage;
+import com.dmeplugin.dmestore.model.StorageControllers;
+import com.dmeplugin.dmestore.model.StorageDetail;
+import com.dmeplugin.dmestore.model.StorageDisk;
+import com.dmeplugin.dmestore.model.StoragePool;
+import com.dmeplugin.dmestore.model.StoragePort;
+import com.dmeplugin.dmestore.model.Volume;
+import com.dmeplugin.dmestore.model.VolumeListRestponse;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * @author lianq
- * @className DmeStorageService
- * @description TODO
- * @date 2020/9/3 17:48
- */
+ * DmeStorageService
+ *
+ * @author liuxh
+ * @since 2020-09-15
+ **/
 public interface DmeStorageService {
-
     /**
-     * 存储设备列表
-     * @return
+     * list storage
+     *
+     * @return List
+     * @throws DmeException when error
      */
     List<Storage> getStorages() throws DmeException;
+
     /**
-     * 获取存储详情
-     * @param storageId
-     * @return
+     * get storage detail
+     *
+     * @param storageId storage id
+     * @return StorageDetail
+     * @throws DmeException when error
      */
     StorageDetail getStorageDetail(String storageId) throws DmeException;
 
     /**
-     * 获取存储池列表
-     * @param storageId 存储设备id
-     * @param mediaType 存储池类型 file block all(默认)
-     * @return
+     * list storage pool
+     *
+     * @param storageId storage id
+     * @param mediaType media type
+     * @return List
+     * @throws DmeException when error
      */
-    List<StoragePool> getStoragePools(String storageId , String mediaType) throws DmeException;
+    List<StoragePool> getStoragePools(String storageId, String mediaType) throws DmeException;
 
     /**
-     * 获取逻辑端口列表
-     * @param storageId
-     * @return
+     * list logic ports
+     *
+     * @param storageId storage id
+     * @return List
+     * @throws DmeException when error
      */
     List<LogicPorts> getLogicPorts(String storageId) throws DmeException;
 
     /**
-     * 获取卷列表
-     * @param storageId
-     * @return
+     * list volumes by page
+     *
+     * @param storageId storage id
+     * @param pageSize pageSize
+     * @param pageNo pageNo
+     * @return VolumeListRestponse
+     * @throws DmeException when error
      */
-    //List<Volume> getVolumes(String storageId) throws DMEException;
-
-    /**
-     * 分页获取卷列表
-     * @author wangxy
-     * @date 14:13 2020/11/4
-     * @param storageId
-     * @param pageSize
-     * @param pageNo
-     * @throws DmeException
-     * @return com.dmeplugin.dmestore.model.VolumeListRestponse
-     **/
     VolumeListRestponse getVolumesByPage(String storageId, String pageSize, String pageNo) throws DmeException;
 
     /**
-     * 获取文件系统列表
-     * @param storageId
-     * @return
+     * list FileSystem
+     *
+     * @param storageId storage id
+     * @return List
+     * @throws DmeException when error
      */
     List<FileSystem> getFileSystems(String storageId) throws DmeException;
 
     /**
-     * 获取Dtree列表
-     * @param storageId
-     * @return
+     * list dtree
+     *
+     * @param storageId storage id
+     * @return List
+     * @throws DmeException when error
      */
     List<Dtrees> getDtrees(String storageId) throws DmeException;
 
     /**
-     * 获取share列表
-     * @param storageId
-     * @return
+     * list NFS share
+     *
+     * @param storageId storage id
+     * @return List
+     * @throws DmeException when error
      */
     List<NfsShares> getNfsShares(String storageId) throws DmeException;
 
     /**
-     * 获取绑定端口列表
-     * @param storageId
-     * @return
+     * list band ports
+     *
+     * @param storageId storage id
+     * @return List
+     * @throws DmeException when error
      */
     List<BandPorts> getBandPorts(String storageId) throws DmeException;
 
     /**
-     * 获取控制器列表
-     * @param storageDeviceId
-     * @return
+     * list storage controller
+     *
+     * @param storageDeviceId storage device id
+     * @return List
+     * @throws DmeException when error
      */
     List<StorageControllers> getStorageControllers(String storageDeviceId) throws DmeException;
 
     /**
-     * 获取存储硬盘列表
-     * @param storageDeviceId
-     * @return
+     * list storage disk
+     *
+     * @param storageDeviceId storage device id
+     * @return List
+     * @throws DmeException when error
      */
     List<StorageDisk> getStorageDisks(String storageDeviceId) throws DmeException;
 
     /**
-     * 获取StorageEthPorts列表
-     * @param storageSn
-     * @return
-     * @throws Exception
+     * list storage disk
+     *
+     * @param storageSn storage sn
+     * @return List
+     * @throws DmeException when error
      */
-    List<EthPortInfo> getStorageEthPorts(String storageSn) throws Exception;
+    List<EthPortInfo> getStorageEthPorts(String storageSn) throws DmeException;
 
     /**
-     * 获取指定卷
-     * @param volumeId
-     * @return
+     * get volume detail
+     *
+     * @param volumeId volume id
+     * @return Map
+     * @throws DmeException when error
      */
     Map<String, Object> getVolume(String volumeId) throws DmeException;
 
     /**
-     * 获取存储端口列表
-     * @param storageDeviceId
-     * @param portType
-     * @return
+     * get storage port
+     *
+     * @param storageDeviceId storage Device Id
+     * @param portType port Type
+     * @return List
+     * @throws DmeException when error
      */
     List<StoragePort> getStoragePort(String storageDeviceId, String portType) throws DmeException;
 
     /**
-     * 获取漂移组列表
-     * @param storageId
-     * @return
+     * get Failover Groups
+     *
+     * @param storageId storage Id
+     * @return List
+     * @throws DmeException when error
      */
     List<FailoverGroup> getFailoverGroups(String storageId) throws DmeException;
 
-    FileSystemDetail getFileSystemDetail(String fileSystemId) throws DmeException;
     /**
-     * Access storage performance
+     * get fs detail
      *
-     * @param storageIds storage id
-     * @return: ResponseBodyBean
+     * @param fileSystemId fs Id
+     * @return FileSystemDetail
+     * @throws DmeException when error
+     */
+    FileSystemDetail getFileSystemDetail(String fileSystemId) throws DmeException;
+
+    /**
+     * list StoragePer formance
+     *
+     * @param storageIds storage Ids
+     * @return List
+     * @throws DmeException when error
      */
     List<Storage> listStoragePerformance(List<String> storageIds) throws DmeException;
 
     /**
-     * Access storage pool performance
+     * list Storage Pool Performance
      *
-     * @param storagePoolIds storage pool res Id
-     * @return: ResponseBodyBean
+     * @param storagePoolIds storage Pool Ids
+     * @return List
+     * @throws DmeException when error
      */
     List<StoragePool> listStoragePoolPerformance(List<String> storagePoolIds) throws DmeException;
 
     /**
+     * list Storage Controller Performance
      *
-     * @param storageControllerIds  controllerid
-     * @return
-     * @throws DmeException
+     * @param storageControllerIds storage Controller Ids
+     * @return List
+     * @throws DmeException when error
      */
-    public List<StorageControllers> listStorageControllerPerformance(List<String> storageControllerIds) throws
-        DmeException;
+    List<StorageControllers> listStorageControllerPerformance(List<String> storageControllerIds) throws DmeException;
 
     /**
+     * list Storage Disk Performance
      *
-     * @param storageDiskIds  diskid
-     * @return
-     * @throws DmeException
+     * @param storageDiskIds storage Disk Ids
+     * @return List
+     * @throws DmeException when error
      */
-    public List<StorageDisk> listStorageDiskPerformance(List<String> storageDiskIds) throws DmeException;
+    List<StorageDisk> listStorageDiskPerformance(List<String> storageDiskIds) throws DmeException;
 
     /**
+     * list Storage PortPer Performance
      *
-     * @param storagePortIds portid
-     * @return
-     * @throws DmeException
+     * @param storagePortIds storage Port Ids
+     * @return List
+     * @throws DmeException when error
      */
-    public List<StoragePort> listStoragePortPerformance(List<String> storagePortIds) throws DmeException;
+    List<StoragePort> listStoragePortPerformance(List<String> storagePortIds) throws DmeException;
 
     /**
+     * list Volume Performance
      *
-     * @param volumeId volumeid
-     * @return
-     * @throws DmeException
+     * @param volumeId volume Id
+     * @return List
+     * @throws DmeException when error
      */
-    public List<Volume> listVolumesPerformance(List<String> volumeId) throws DmeException;
+    List<Volume> listVolumesPerformance(List<String> volumeId) throws DmeException;
 
+    /**
+     * get volume by name
+     *
+     * @param name volume name
+     * @return Boolean
+     * @throws DmeException when error
+     */
     Boolean queryVolumeByName(String name) throws DmeException;
 
+    /**
+     * list Volume Performance
+     *
+     * @param name fs name
+     * @param storageId storage Id
+     * @return Boolean
+     * @throws DmeException when error
+     */
     Boolean queryFsByName(String name, String storageId) throws DmeException;
 
-    Boolean queryShareByName(String name, String storageId)throws DmeException;
+    /**
+     * list Volume Performance
+     *
+     * @param name fs name
+     * @param storageId storage Id
+     * @return Boolean
+     * @throws DmeException when error
+     */
+    Boolean queryShareByName(String name, String storageId) throws DmeException;
 }
