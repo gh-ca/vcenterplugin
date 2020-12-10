@@ -5,7 +5,7 @@
 // regarding copyright ownership.  The ASF licenses this file
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
+// with the License.  You may obtain copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
@@ -19,37 +19,83 @@
 
 package com.dmeplugin.vmware.util;
 
+/**
+ * Ternary
+ *
+ * @param <T> T
+ * @param <U> U
+ * @param <V> V
+ * @since 2020-12-10
+ */
 public class Ternary<T, U, V> {
     private T t;
     private U u;
     private V v;
+    private final String strNull = "null";
 
+    /**
+     * Ternary
+     *
+     * @param t t
+     * @param u u
+     * @param v v
+     */
     public Ternary(T t, U u, V v) {
         this.t = t;
         this.u = u;
         this.v = v;
     }
 
+    /**
+     * first
+     *
+     * @return T
+     */
     public T first() {
         return t;
     }
 
+    /**
+     * first
+     *
+     * @param t t
+     */
     public void first(T t) {
         this.t = t;
     }
 
+    /**
+     * second
+     *
+     * @return U
+     */
     public U second() {
         return u;
     }
 
+    /**
+     * second
+     *
+     * @param u u
+     */
     public void second(U u) {
         this.u = u;
     }
 
+    /**
+     * third
+     *
+     * @return V
+     */
     public V third() {
         return v;
     }
 
+    /**
+     * third
+     *
+     * @param v v
+     */
     public void third(V v) {
         this.v = v;
     }
@@ -67,18 +113,18 @@ public class Ternary<T, U, V> {
             return false;
         }
         Ternary<?, ?, ?> that = (Ternary<?, ?, ?>) obj;
-        return (t != null ? t.equals(that.t) : that.t == null) && (u != null ? u.equals(that.u) : that.u == null) &&
-            (v != null ? v.equals(that.v) : that.v == null);
+        return (t != null ? t.equals(that.t) : that.t == null) && (u != null ? u.equals(that.u) : that.u == null)
+            && (v != null ? v.equals(that.v) : that.v == null);
     }
 
     @Override
     public String toString() {
         StringBuilder b = new StringBuilder("T[");
-        b.append(t != null ? t.toString() : "null");
+        b.append(t != null ? t.toString() : strNull);
         b.append(":");
-        b.append(u != null ? u.toString() : "null");
+        b.append(u != null ? u.toString() : strNull);
         b.append(":");
-        b.append(v != null ? v.toString() : "null");
+        b.append(v != null ? v.toString() : strNull);
         b.append("]");
         return b.toString();
     }

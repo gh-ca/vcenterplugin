@@ -5,7 +5,7 @@
 // regarding copyright ownership.  The ASF licenses this file
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
+// with the License.  You may obtain copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
@@ -41,25 +41,45 @@ public class SSLUtils {
      */
     public static final Logger logger = LoggerFactory.getLogger(SSLUtils.class);
 
+    private SSLUtils() {
+    }
+
+    /**
+     * getSupportedProtocols
+     *
+     * @param protocols protocols
+     * @return String[]
+     */
     public static String[] getSupportedProtocols(String[] protocols) {
         Set<String> set = new HashSet<String>();
-        for (String s : protocols) {
-            if ("SSLv3".equals(s) || "SSLv2Hello".equals(s)) {
+        for (String string : protocols) {
+            if ("SSLv3".equals(string) || "SSLv2Hello".equals(string)) {
                 continue;
             }
-            set.add(s);
+            set.add(string);
         }
         return set.toArray(new String[set.size()]);
     }
 
+    /**
+     * getSupportedCiphers
+     *
+     * @return String[]
+     * @throws NoSuchAlgorithmException NoSuchAlgorithmException
+     */
     public static String[] getSupportedCiphers() throws NoSuchAlgorithmException {
         String[] availableCiphers = getSslContext().getSocketFactory().getSupportedCipherSuites();
         Arrays.sort(availableCiphers);
         return availableCiphers;
     }
 
+    /**
+     * getSslContext
+     *
+     * @return SSLContext
+     * @throws NoSuchAlgorithmException NoSuchAlgorithmException
+     */
     public static SSLContext getSslContext() throws NoSuchAlgorithmException {
         return SSLContext.getInstance("TLSv1.2");
     }
-
 }
