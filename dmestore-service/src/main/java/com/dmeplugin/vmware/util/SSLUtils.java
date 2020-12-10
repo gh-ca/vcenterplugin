@@ -19,22 +19,27 @@
 
 package com.dmeplugin.vmware.util;
 
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSocketFactory;
-
 import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.net.ssl.SSLContext;
+
+/**
+ * SSLUtils
+ *
+ * @author Administrator
+ * @since 2020-12-09
+ */
 public class SSLUtils {
-    public static final Logger s_logger = LoggerFactory.getLogger(SSLUtils.class);
+    /**
+     * logger
+     */
+    public static final Logger logger = LoggerFactory.getLogger(SSLUtils.class);
 
     public static String[] getSupportedProtocols(String[] protocols) {
         Set<String> set = new HashSet<String>();

@@ -1,10 +1,22 @@
 package com.dmeplugin.vmware.autosdk;
 
-import com.vmware.cis.tagging.*;
+import com.vmware.cis.tagging.Category;
+import com.vmware.cis.tagging.CategoryModel;
+import com.vmware.cis.tagging.CategoryTypes;
+import com.vmware.cis.tagging.Tag;
+import com.vmware.cis.tagging.TagAssociation;
+import com.vmware.cis.tagging.TagModel;
+import com.vmware.cis.tagging.TagTypes;
 import com.vmware.vapi.std.DynamicID;
 
 import java.util.List;
 
+/**
+ * TaggingWorkflow
+ *
+ * @author Administrator
+ * @since 2020-12-08
+ */
 public class TaggingWorkflow {
     private Category categoryService;
 
@@ -14,6 +26,11 @@ public class TaggingWorkflow {
 
     private SessionHelper sessionHelper;
 
+    /**
+     * TaggingWorkflow
+     *
+     * @param sessionHelper sessionHelper
+     */
     public TaggingWorkflow(SessionHelper sessionHelper) {
         this.sessionHelper = sessionHelper;
         this.categoryService = this.sessionHelper.vapiAuthHelper.getStubFactory()
@@ -24,20 +41,37 @@ public class TaggingWorkflow {
             .createStub(TagAssociation.class, sessionHelper.sessionStubConfig);
     }
 
+    /**
+     * createTagCategory
+     *
+     * @param createSpec createSpec
+     * @return String
+     */
     public String createTagCategory(CategoryTypes.CreateSpec createSpec) {
         return this.categoryService.create(createSpec);
     }
 
+    /**
+     * listTagCategory
+     *
+     * @return List
+     */
     public List<String> listTagCategory() {
         return this.categoryService.list();
     }
 
+    /**
+     * getTagCategory
+     *
+     * @param categoryid categoryid
+     * @return CategoryModel
+     */
     public CategoryModel getTagCategory(String categoryid) {
         return this.categoryService.get(categoryid);
     }
 
     /**
-     * Creates a tag
+     * Creates tag
      *
      * @param name        Display name of the tag.
      * @param description Tag description.
@@ -63,22 +97,42 @@ public class TaggingWorkflow {
         this.taggingService.delete(tagId);
     }
 
-    // tag the Object
+    /**
+     * tag the Object
+     *
+     * @param tagId        tagId
+     * @param objDynamicId objDynamicId
+     */
     public void attachTag(String tagId, DynamicID objDynamicId) {
         this.tagAssociation.attach(tagId, objDynamicId);
     }
 
-    //list tags
+    /**
+     * list tags
+     *
+     * @return List
+     */
     public List<String> listTags() {
         return this.taggingService.list();
     }
 
+    /**
+     * listTagsForCategory
+     *
+     * @param categoryid categoryid
+     * @return List
+     */
     public List<String> listTagsForCategory(String categoryid) {
         return this.taggingService.listTagsForCategory(categoryid);
     }
 
+    /**
+     * TagModel
+     *
+     * @param tagId tagId
+     * @return TagModel
+     */
     public TagModel getTag(String tagId) {
         return this.taggingService.get(tagId);
     }
-
 }

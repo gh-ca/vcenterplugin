@@ -1,14 +1,13 @@
 package com.dmeplugin.vmware.util;
 
 import com.dmeplugin.vmware.autosdk.SessionHelper;
-import com.dmeplugin.vmware.mo.HostMO;
-import com.vmware.vim25.ManagedObjectReference;
 
 /**
+ * SessionHelperFactorY
+ *
  * @author lianq
- * @className SessionHelperFactory
- * @description TODO
- * @date 2020/11/30 10:47
+ * @ClassName: SessionHelperFactory
+ * @since 2020-12-09
  */
 public class SessionHelperFactory {
     private static SessionHelperFactory sessionHelperFactory;
@@ -16,6 +15,11 @@ public class SessionHelperFactory {
     private SessionHelperFactory() {
     }
 
+    /**
+     * getInstance
+     *
+     * @return SessionHelperFactory
+     */
     public static SessionHelperFactory getInstance() {
         if (sessionHelperFactory == null) {
             synchronized (SessionHelperFactory.class) {
@@ -27,6 +31,12 @@ public class SessionHelperFactory {
         return sessionHelperFactory;
     }
 
+    /**
+     * build
+     *
+     * @return SessionHelper
+     * @throws Exception Exception
+     */
     public SessionHelper build() throws Exception {
         return new SessionHelper();
     }

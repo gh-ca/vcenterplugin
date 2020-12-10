@@ -4,18 +4,23 @@ import com.dmeplugin.vmware.mo.RootFsMO;
 import com.vmware.vim25.ManagedObjectReference;
 
 /**
+ * RootFsMOFactory
+ *
  * @author lianq
- * @className RootFsMOFactory
- * @description TODO
- * @date 2020/11/26 11:12
+ * @ClassName: RootFsMOFactory
+ * @since 2020-12-09
  */
 public class RootFsMOFactory {
-
     private static RootFsMOFactory rootFsMOFactory;
 
     private RootFsMOFactory() {
     }
 
+    /**
+     * getInstance
+     *
+     * @return RootFsMOFactory
+     */
     public static RootFsMOFactory getInstance() {
         if (rootFsMOFactory == null) {
             synchronized (RootFsMOFactory.class) {
@@ -27,8 +32,14 @@ public class RootFsMOFactory {
         return rootFsMOFactory;
     }
 
-    public RootFsMO build(VmwareContext context, ManagedObjectReference mor){
+    /**
+     * build
+     *
+     * @param context context
+     * @param mor     mor
+     * @return RootFsMO
+     */
+    public RootFsMO build(VmwareContext context, ManagedObjectReference mor) {
         return new RootFsMO(context, mor);
     }
-
 }

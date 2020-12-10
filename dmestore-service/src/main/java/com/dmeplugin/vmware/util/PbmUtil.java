@@ -21,13 +21,18 @@ import java.util.List;
 
 /**
  * Utility class for PBM Samples
+ *
+ * @author Administrator
+ * @since 2020-12-09
  */
 public class PbmUtil {
+//    private PbmUtil() {
+//    }
 
     /**
      * Returns the Storage Resource Type Object
      *
-     * @return
+     * @return PbmProfileResourceType
      */
     public static PbmProfileResourceType getStorageResourceType() {
         PbmProfileResourceType resourceType = new PbmProfileResourceType();
@@ -36,11 +41,11 @@ public class PbmUtil {
     }
 
     /**
-     * Returns the Capability Metadata associated to a Tag Category
+     * Returns the Capability Metadata associated to Tag Category
      *
      * @param tagCategoryName tagCategory的名称
-     * @param schema
-     * @return
+     * @param schema          schema
+     * @return PbmCapabilityMetadata
      */
     public static PbmCapabilityMetadata getTagCategoryMeta(
         String tagCategoryName, List<PbmCapabilityMetadataPerCategory> schema) {
