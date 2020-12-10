@@ -7,58 +7,86 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Description: TODO
- * @ClassName: DmeRelationInstanceService
- * @Company: GH-CA
- * @author: liuxh
- * @create: 2020-09-15
+ * DmeRelationInstanceService
+ *
+ * @author liuxh
+ * @since 2020-09-15
  **/
 public interface DmeRelationInstanceService {
-
     /**
-     * 按资源关系类型名称查询资源关系实例
-     * @param relationName enum:M_DjTierContainsLun M_DjTierContainsStoragePool M_DjTierContainsStoragePort
-     * @return
-     * @throws Exception
+     * list relation instance
+     *
+     * @param relationName relation name
+     * @return List
+     * @throws DmeException when error
      */
     List<RelationInstance> queryRelationByRelationName(String relationName) throws DmeException;
 
     /**
      * 按资源关系类型名称和条件sourceInstanceId查询资源关系实例
+     *
      * @param relationName 资源关系类型名称
      * @param sourceInstanceId 源实例ID
-     * @return
+     * @return List
+     * @throws DmeException when error
      */
-    List<RelationInstance> queryRelationByRelationNameConditionSourceInstanceId(String relationName, String sourceInstanceId) throws
-        DmeException;
+    List<RelationInstance> queryRelationByRelationNameConditionSourceInstanceId(String relationName,
+        String sourceInstanceId) throws DmeException;
 
     /**
      * 按资源关系类型名称和实例ID查询资源关系实例
+     *
      * @param relationName enum:M_DjTierContainsLun M_DjTierContainsStoragePool M_DjTierContainsStoragePort
      * @param instanceId uuid
-     * @return
-     * @throws Exception
+     * @return RelationInstance
+     * @throws DmeException when error
      */
     RelationInstance queryRelationByRelationNameInstanceId(String relationName, String instanceId) throws DmeException;
 
     /**
      * 按资源类型和资源实例查询单个资源实例
+     *
      * @param instanceName enum:SYS_Lun SYS_StorageDevice
-     * @param instanceId
-     * @return
+     * @param instanceId instance id
+     * @return String
+     * @throws DmeException when error
      */
     Object queryInstanceByInstanceNameId(String instanceName, String instanceId) throws DmeException;
 
+    /**
+     * list instance
+     *
+     * @return Map
+     * @throws DmeException when error
+     */
     Map<String, Map<String, Object>> getServiceLevelInstance();
 
+    /**
+     * list lun instance
+     *
+     * @return Map
+     * @throws DmeException when error
+     */
     Map<String, Map<String, Object>> getLunInstance();
 
+    /**
+     * list device instance
+     *
+     * @return Map
+     * @throws DmeException when error
+     */
     Map<String, Map<String, Object>> getStorageDeviceInstance();
 
+    /**
+     * list pool instance
+     *
+     * @return Map
+     * @throws DmeException when error
+     */
     Map<String, Map<String, Object>> getStoragePoolInstance();
 
     /**
-     * 资源实例刷新
+     * refresh instance
      */
     void refreshResourceInstance();
 }

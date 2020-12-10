@@ -21,22 +21,43 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @Description: TODO
- * @ClassName: DmeRelationInstanceServiceImpl
- * @Company: GH-CA
- * @author: liuxh
- * @create: 2020-09-15
+ * DMEOpenApiService
+ *
+ * @author liuxh
+ * @since 2020-09-15
  **/
 public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceService {
     private static final Logger LOG = LoggerFactory.getLogger(DmeRelationInstanceServiceImpl.class);
 
-    private static Map<String, Map<String, Object>> serviceLevelInstance = new HashMap<>();
+    private static final Map<String, Map<String, Object>> SERVICE_LEVEL_INSTANCE = new HashMap<>();
 
-    private static Map<String, Map<String, Object>> lunInstance = new HashMap<>();
+    private static final Map<String, Map<String, Object>> LUN_INSTANCE = new HashMap<>();
 
-    private static Map<String, Map<String, Object>> storagePoolInstance = new HashMap<>();
+    private static final Map<String, Map<String, Object>> STORAGE_POOL_INSTANCE = new HashMap<>();
 
-    private static Map<String, Map<String, Object>> storageDevcieInstance = new HashMap<>();
+    private static final Map<String, Map<String, Object>> STORAGE_DEVCIE_INSTANCE = new HashMap<>();
+
+    private static final String WWN_FIELD = "wwn";
+
+    private static final String CODE = "code";
+
+    private static final int CODE_VALUE_200 = 200;
+
+    private static final String ID_FIELD = "id";
+
+    private static final String NATIVE_ID_FIELD = "nativeId";
+
+    private static final String RES_ID_FIELD = "resId";
+
+    private static final String OBJ_LIST = "objList";
+
+    private static final String MESSAGE = "message";
+
+    private static final String NAME_FIELD = "name";
+
+    private static final String SOURCE_INSTANCE_ID = "source_Instance_Id";
+
+    private static final String RELATION_NAME = "{relationName}";
 
     private DmeAccessService dmeAccessService;
 
@@ -52,10 +73,10 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     public List<RelationInstance> queryRelationByRelationName(String relationName) throws DmeException {
         List<RelationInstance> ris = new ArrayList<>();
         Map<String, Object> remap = new HashMap<>();
-        remap.put("code", 200);
-        remap.put("message", "queryRelationByRelationName success!");
+        remap.put(CODE, CODE_VALUE_200);
+        remap.put(MESSAGE, "queryRelationByRelationName success!");
 
-        String url = DmeConstants.LIST_RELATION_URL.replace("{relationName}", relationName);
+        String url = DmeConstants.LIST_RELATION_URL.replace(RELATION_NAME, relationName);
 
         ResponseEntity responseEntity;
         try {
@@ -63,7 +84,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
             if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 ris = converRelations(responseEntity.getBody());
             }
-        } catch (Exception e) {
+        } catch (DmeException e) {
             throw new DmeException(e.getMessage());
         }
         return ris;
@@ -74,19 +95,19 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         String sourceInstanceId) throws DmeException {
         List<RelationInstance> ris = new ArrayList<>();
         Map<String, Object> remap = new HashMap<>();
-        remap.put("code", 200);
-        remap.put("message", "queryRelationByRelationName success!");
+        remap.put(CODE, CODE_VALUE_200);
+        remap.put(MESSAGE, "queryRelationByRelationNameConditionSourceInstanceId success!");
 
         String url = DmeConstants.LIST_RELATION_URL;
-        url = url.replace("{relationName}", relationName);
+        url = url.replace(RELATION_NAME, relationName);
         url = url + "?condition={json}";
 
-        JsonArray constraint = new JsonArray();
         JsonObject consObj2 = new JsonObject();
         JsonObject simple2 = new JsonObject();
-        simple2.addProperty("name", "source_Instance_Id");
+        simple2.addProperty(NAME_FIELD, SOURCE_INSTANCE_ID);
         simple2.addProperty("value", sourceInstanceId);
         consObj2.add("simple", simple2);
+        JsonArray constraint = new JsonArray();
         constraint.add(consObj2);
 
         ResponseEntity responseEntity;
@@ -95,9 +116,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
             if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 ris = converRelations(responseEntity.getBody());
             }
-        } catch (Exception e) {
-            LOG.warn("通过关系类型名称和源实例ID查询对应关系异常,url:{},condition:{},relationName:{},sourceInstancId:{}!", url,
-                constraint.toString(), relationName, sourceInstanceId);
+        } catch (DmeException e) {
             throw new DmeException(e.getMessage());
         }
         return ris;
@@ -108,11 +127,11 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         throws DmeException {
         RelationInstance ri = new RelationInstance();
         Map<String, Object> remap = new HashMap<>();
-        remap.put("code", 200);
-        remap.put("message", "queryRelationByRelationName success!");
+        remap.put(CODE, CODE_VALUE_200);
+        remap.put(MESSAGE, "queryRelationByRelationName success!");
 
         String url = DmeConstants.QUERY_RELATION_URL;
-        url = url.replace("{relationName}", relationName);
+        url = url.replace(RELATION_NAME, relationName);
         url = url.replace("{instanceId}", relationName);
 
         ResponseEntity responseEntity;
@@ -121,8 +140,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
             if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 ri = converRelation(responseEntity.getBody());
             }
-        } catch (Exception e) {
-            LOG.warn("通过关系类型名称和源实例ID查询对应关系异常,url:{},relationName:{},InstancId:{}!", url, relationName, instanceId);
+        } catch (DmeException e) {
             throw new DmeException(e.getMessage());
         }
         return ri;
@@ -132,21 +150,19 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     public Object queryInstanceByInstanceNameId(String instanceName, String instanceId) throws DmeException {
         Object obj = new Object();
         Map<String, Object> remap = new HashMap<>();
-        remap.put("code", 200);
-        remap.put("message", "queryInstanceByInstanceNameId success!");
+        remap.put(CODE, CODE_VALUE_200);
+        remap.put(MESSAGE, "queryInstanceByInstanceNameId success!");
 
         String url = DmeConstants.QUERY_INSTANCE_URL;
         url = url.replace("{className}", instanceName);
         url = url.replace("{instanceId}", instanceId);
 
-        ResponseEntity responseEntity;
         try {
-            responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 obj = responseEntity.getBody();
             }
-        } catch (Exception e) {
-            LOG.warn("通过资源类型名称和资源实例ID查询对应资源实例异常,className:{},instancId:{}!", instanceName, instanceId);
+        } catch (DmeException e) {
             throw new DmeException(e.getMessage());
         }
         return obj;
@@ -156,20 +172,20 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         String instanceName = "SYS_DjTier";
         JsonObject jsonObject = listInstancdByInstanceName(instanceName);
         if (null != jsonObject) {
-            JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
+            JsonArray jsonArray = jsonObject.get(OBJ_LIST).getAsJsonArray();
             Map<String, Map<String, Object>> map = new HashMap<>();
             for (JsonElement element : jsonArray) {
                 Map<String, Object> slMap = new HashMap<>();
                 JsonObject slJson = element.getAsJsonObject();
-                slMap.put("resId", ToolUtils.jsonToOriginalStr(slJson.get("resId")));
-                slMap.put("name", ToolUtils.jsonToOriginalStr(slJson.get("name")));
-                slMap.put("id", ToolUtils.jsonToOriginalStr(slJson.get("id")));
-                slMap.put("nativeId", ToolUtils.jsonToOriginalStr(slJson.get("nativeId")));
-                map.put(ToolUtils.jsonToOriginalStr(slJson.get("nativeId")), slMap);
+                slMap.put(RES_ID_FIELD, ToolUtils.jsonToOriginalStr(slJson.get(RES_ID_FIELD)));
+                slMap.put(NAME_FIELD, ToolUtils.jsonToOriginalStr(slJson.get(NAME_FIELD)));
+                slMap.put(ID_FIELD, ToolUtils.jsonToOriginalStr(slJson.get(ID_FIELD)));
+                slMap.put(NATIVE_ID_FIELD, ToolUtils.jsonToOriginalStr(slJson.get(NATIVE_ID_FIELD)));
+                map.put(ToolUtils.jsonToOriginalStr(slJson.get(NATIVE_ID_FIELD)), slMap);
             }
             if (map.size() > 0) {
-                serviceLevelInstance.clear();
-                serviceLevelInstance.putAll(map);
+                SERVICE_LEVEL_INSTANCE.clear();
+                SERVICE_LEVEL_INSTANCE.putAll(map);
             }
         }
     }
@@ -178,20 +194,20 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         String instanceName = "SYS_Lun";
         JsonObject jsonObject = listInstancdByInstanceName(instanceName);
         if (null != jsonObject) {
-            JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
+            JsonArray jsonArray = jsonObject.get(OBJ_LIST).getAsJsonArray();
             Map<String, Map<String, Object>> map = new HashMap<>();
             for (JsonElement element : jsonArray) {
                 Map<String, Object> lunMap = new HashMap<>();
                 JsonObject slJson = element.getAsJsonObject();
-                lunMap.put("resId", ToolUtils.jsonToOriginalStr(slJson.get("resId")));
-                lunMap.put("name", ToolUtils.jsonToOriginalStr(slJson.get("name")));
-                lunMap.put("id", ToolUtils.jsonToOriginalStr(slJson.get("id")));
-                lunMap.put("wwn", ToolUtils.jsonToOriginalStr(slJson.get("wwn")));
-                map.put(ToolUtils.jsonToOriginalStr(slJson.get("wwn")), lunMap);
+                lunMap.put(RES_ID_FIELD, ToolUtils.jsonToOriginalStr(slJson.get(RES_ID_FIELD)));
+                lunMap.put(NAME_FIELD, ToolUtils.jsonToOriginalStr(slJson.get(NAME_FIELD)));
+                lunMap.put(ID_FIELD, ToolUtils.jsonToOriginalStr(slJson.get(ID_FIELD)));
+                lunMap.put(WWN_FIELD, ToolUtils.jsonToOriginalStr(slJson.get(WWN_FIELD)));
+                map.put(ToolUtils.jsonToOriginalStr(slJson.get(WWN_FIELD)), lunMap);
             }
             if (map.size() > 0) {
-                lunInstance.clear();
-                lunInstance.putAll(map);
+                LUN_INSTANCE.clear();
+                LUN_INSTANCE.putAll(map);
             }
         }
     }
@@ -200,19 +216,19 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         String instanceName = "SYS_StoragePool";
         JsonObject jsonObject = listInstancdByInstanceName(instanceName);
         if (null != jsonObject) {
-            JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
+            JsonArray jsonArray = jsonObject.get(OBJ_LIST).getAsJsonArray();
             Map<String, Map<String, Object>> map = new HashMap<>();
             for (JsonElement element : jsonArray) {
                 Map<String, Object> lunMap = new HashMap<>();
                 JsonObject slJson = element.getAsJsonObject();
-                lunMap.put("resId", ToolUtils.jsonToOriginalStr(slJson.get("resId")));
-                lunMap.put("name", ToolUtils.jsonToOriginalStr(slJson.get("name")));
-                lunMap.put("id", ToolUtils.jsonToOriginalStr(slJson.get("id")));
-                map.put(ToolUtils.jsonToOriginalStr(slJson.get("id")), lunMap);
+                lunMap.put(RES_ID_FIELD, ToolUtils.jsonToOriginalStr(slJson.get(RES_ID_FIELD)));
+                lunMap.put(NAME_FIELD, ToolUtils.jsonToOriginalStr(slJson.get(NAME_FIELD)));
+                lunMap.put(ID_FIELD, ToolUtils.jsonToOriginalStr(slJson.get(ID_FIELD)));
+                map.put(ToolUtils.jsonToOriginalStr(slJson.get(ID_FIELD)), lunMap);
             }
             if (map.size() > 0) {
-                storagePoolInstance.clear();
-                storagePoolInstance.putAll(map);
+                STORAGE_POOL_INSTANCE.clear();
+                STORAGE_POOL_INSTANCE.putAll(map);
             }
         }
     }
@@ -221,55 +237,55 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         String instanceName = "SYS_StorDevice";
         JsonObject jsonObject = listInstancdByInstanceName(instanceName);
         if (null != jsonObject) {
-            JsonArray jsonArray = jsonObject.get("objList").getAsJsonArray();
+            JsonArray jsonArray = jsonObject.get(OBJ_LIST).getAsJsonArray();
             Map<String, Map<String, Object>> map = new HashMap<>();
             for (JsonElement element : jsonArray) {
                 Map<String, Object> lunMap = new HashMap<>();
                 JsonObject slJson = element.getAsJsonObject();
-                lunMap.put("resId", ToolUtils.jsonToOriginalStr(slJson.get("resId")));
-                lunMap.put("name", ToolUtils.jsonToOriginalStr(slJson.get("name")));
-                lunMap.put("id", ToolUtils.jsonToOriginalStr(slJson.get("id")));
-                lunMap.put("nativeId", ToolUtils.jsonToOriginalStr(slJson.get("nativeId")));
+                lunMap.put(RES_ID_FIELD, ToolUtils.jsonToOriginalStr(slJson.get(RES_ID_FIELD)));
+                lunMap.put(NAME_FIELD, ToolUtils.jsonToOriginalStr(slJson.get(NAME_FIELD)));
+                lunMap.put(ID_FIELD, ToolUtils.jsonToOriginalStr(slJson.get(ID_FIELD)));
+                lunMap.put(NATIVE_ID_FIELD, ToolUtils.jsonToOriginalStr(slJson.get(NATIVE_ID_FIELD)));
                 lunMap.put("sn", ToolUtils.jsonToOriginalStr(slJson.get("sn")));
-                map.put(ToolUtils.jsonToOriginalStr(slJson.get("nativeId")), lunMap);
+                map.put(ToolUtils.jsonToOriginalStr(slJson.get(NATIVE_ID_FIELD)), lunMap);
             }
             if (map.size() > 0) {
-                storageDevcieInstance.clear();
-                storageDevcieInstance.putAll(map);
+                STORAGE_DEVCIE_INSTANCE.clear();
+                STORAGE_DEVCIE_INSTANCE.putAll(map);
             }
         }
     }
 
     @Override
     public Map<String, Map<String, Object>> getServiceLevelInstance() {
-        if (serviceLevelInstance.size() == 0) {
+        if (SERVICE_LEVEL_INSTANCE.size() == 0) {
             listInstanceServiceLevel();
         }
-        return serviceLevelInstance;
+        return SERVICE_LEVEL_INSTANCE;
     }
 
     @Override
     public Map<String, Map<String, Object>> getLunInstance() {
-        if (lunInstance.size() == 0) {
+        if (LUN_INSTANCE.size() == 0) {
             listInstanceLun();
         }
-        return lunInstance;
+        return LUN_INSTANCE;
     }
 
     @Override
     public Map<String, Map<String, Object>> getStoragePoolInstance() {
-        if (storagePoolInstance.size() == 0) {
+        if (STORAGE_POOL_INSTANCE.size() == 0) {
             listInstanceStoragePool();
         }
-        return storagePoolInstance;
+        return STORAGE_POOL_INSTANCE;
     }
 
     @Override
     public Map<String, Map<String, Object>> getStorageDeviceInstance() {
-        if (storageDevcieInstance.size() == 0) {
+        if (STORAGE_DEVCIE_INSTANCE.size() == 0) {
             listInstanceStorageDevcie();
         }
-        return storageDevcieInstance;
+        return STORAGE_DEVCIE_INSTANCE;
     }
 
     @Override
@@ -289,8 +305,8 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
                 Object object = responseEntity.getBody();
                 jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
             }
-        } catch (Exception e) {
-            LOG.warn("List instance error by instanceName:" + instanceName, e);
+        } catch (DmeException e) {
+            LOG.warn("List instance error by instanceName:{},{}", instanceName, e);
         }
         return jsonObject;
     }
@@ -298,16 +314,16 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     private List<RelationInstance> converRelations(Object object) {
         List<RelationInstance> ris = new ArrayList<>();
         JsonObject bodyJson = new JsonParser().parse(object.toString()).getAsJsonObject();
-        JsonArray objList = bodyJson.get("objList").getAsJsonArray();
+        JsonArray objList = bodyJson.get(OBJ_LIST).getAsJsonArray();
         for (JsonElement element : objList) {
             RelationInstance ri = new RelationInstance();
             JsonObject objJson = element.getAsJsonObject();
-            ri.setSourceInstanceId(ToolUtils.jsonToStr(objJson.get("source_Instance_Id")));
+            ri.setSourceInstanceId(ToolUtils.jsonToStr(objJson.get(SOURCE_INSTANCE_ID)));
             ri.setTargetInstanceId(ToolUtils.jsonToStr(objJson.get("target_Instance_Id")));
             ri.setRelationName(ToolUtils.jsonToStr(objJson.get("relation_Name")));
-            ri.setId(ToolUtils.jsonToStr(objJson.get("id")));
+            ri.setId(ToolUtils.jsonToStr(objJson.get(ID_FIELD)));
             ri.setLastModified(ToolUtils.jsonToLon(objJson.get("last_Modified"), null));
-            ri.setResId(ToolUtils.jsonToStr(objJson.get("resId")));
+            ri.setResId(ToolUtils.jsonToStr(objJson.get(RES_ID_FIELD)));
             ri.setRelationId(ToolUtils.jsonToInt(objJson.get("relation_Id"), 0));
 
             ris.add(ri);
@@ -319,15 +335,14 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         RelationInstance ri = new RelationInstance();
         JsonObject objJson = new JsonParser().parse(object.toString()).getAsJsonObject();
         if (null != objJson) {
-            ri.setSourceInstanceId(ToolUtils.getStr(objJson.get("source_Instance_Id")));
+            ri.setSourceInstanceId(ToolUtils.getStr(objJson.get(SOURCE_INSTANCE_ID)));
             ri.setTargetInstanceId(ToolUtils.getStr(objJson.get("target_Instance_Id")));
             ri.setRelationName(ToolUtils.getStr(objJson.get("relation_Name")));
-            ri.setId(ToolUtils.getStr(objJson.get("id")));
+            ri.setId(ToolUtils.getStr(objJson.get(ID_FIELD)));
             ri.setLastModified(ToolUtils.getLong(objJson.get("last_Modified")));
-            ri.setResId(ToolUtils.getStr(objJson.get("resId")));
+            ri.setResId(ToolUtils.getStr(objJson.get(RES_ID_FIELD)));
             ri.setRelationId(ToolUtils.getInt(objJson.get("relation_Id")));
         }
         return ri;
     }
-
 }
