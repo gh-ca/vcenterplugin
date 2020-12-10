@@ -4,7 +4,7 @@
 //regarding copyright ownership.  The ASF licenses this file
 //to you under the Apache License, Version 2.0 (the
 //"License"); you may not use this file except in compliance
-//with the License.  You may obtain a copy of the License at
+//with the License.  You may obtain copy of the License at
 //
 //http://www.apache.org/licenses/LICENSE-2.0
 //
@@ -18,7 +18,6 @@
 package com.dmeplugin.vmware.util;
 
 
-import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vise.usersession.ServerInfo;
 import com.vmware.vise.usersession.UserSessionService;
 import com.vmware.vise.vim.data.VimObjectReferenceService;
@@ -26,42 +25,72 @@ import com.vmware.vise.vim.data.VimObjectReferenceService;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * VmwarePluginContextFactory
+ *
+ * @author Administrator 
+ * @since 2020-12-10
+ */
 public class VmwarePluginContextFactory {
-    private static VmwareContextPool s_pool;
+    private static VmwareContextPool pool;
+    private static final int TIMEOUT = 1200000;
 
     static {
         System.setProperty("axis.socketSecureFactory", "org.apache.axis.components.net.SunFakeTrustSocketFactory");
-        s_pool = new VmwareContextPool();
+        pool = new VmwareContextPool();
     }
 
-    private static VmwareContext create(UserSessionService userSessionService, VimObjectReferenceService vimObjectReferenceService, String serverguid) throws Exception {
+    private VmwarePluginContextFactory() { }
+
+    private static VmwareContext create(UserSessionService userSessionService,
+                                        VimObjectReferenceService vimObjectReferenceService,
+                                        String serverguid) throws Exception {
         VmwareContext context = null;
         ServerInfo[] serverInfoList = userSessionService.getUserSession().serversInfo;
         for (ServerInfo serverInfo : serverInfoList) {
             VmwareClient vimClient = new VmwareClient(serverInfo.serviceGuid);
-            vimClient.setVcenterSessionTimeout(1200000);
+            vimClient.setVcenterSessionTimeout(TIMEOUT);
             vimClient.connect(serverInfo);
             if (serverguid.equalsIgnoreCase(serverInfo.serviceGuid)) {
                 context = new VmwareContext(vimClient, serverInfo.serviceGuid);
             }
         }
-
         return context;
     }
 
-    public static VmwareContext getServerContext(UserSessionService userSessionService, VimObjectReferenceService vimObjectReferenceService, String serverguid) throws Exception {
-        VmwareContext context = s_pool.getContext(serverguid, "");
+    /**
+     * getServerContext
+     *
+     * @param userSessionService userSessionService
+     * @param vimObjectReferenceService vimObjectReferenceService
+     * @param serverguid serverguid
+     * @return VmwareContext
+     * @throws Exception Exception
+     */
+    public static VmwareContext getServerContext(UserSessionService userSessionService,
+                                                 VimObjectReferenceService vimObjectReferenceService,
+                                                 String serverguid) throws Exception {
+        VmwareContext context = pool.getContext(serverguid, "");
         if (context == null) {
             context = create(userSessionService, vimObjectReferenceService, serverguid);
         }
         if (context != null) {
-            context.setPoolInfo(s_pool, VmwareContextPool.composePoolKey(serverguid, ""));
-            s_pool.registerContext(context);
+            context.setPoolInfo(pool, VmwareContextPool.composePoolKey(serverguid, ""));
+            pool.registerContext(context);
         }
-
         return context;
     }
-    public static VmwareContext[] getAllContext(UserSessionService userSessionService, VimObjectReferenceService vimObjectReferenceService) throws Exception {
+
+    /**
+     * getAllContext
+     *
+     * @param userSessionService userSessionService
+     * @param vimObjectReferenceService vimObjectReferenceService
+     * @return VmwareContext[]
+     * @throws Exception Exception
+     */
+    public static VmwareContext[] getAllContext(UserSessionService userSessionService,
+                                                VimObjectReferenceService vimObjectReferenceService) throws Exception {
         ServerInfo[] serverInfoList = userSessionService.getUserSession().serversInfo;
         List<VmwareContext> vmwareContexts = new ArrayList<>();
         for (ServerInfo serverInfo : serverInfoList) {
@@ -70,7 +99,10 @@ public class VmwarePluginContextFactory {
         return vmwareContexts.toArray(new VmwareContext[0]);
     }
 
+    /**
+     * closeAll
+     */
     public static void closeAll() {
-        s_pool.closeAll();
+        pool.closeAll();
     }
 }
