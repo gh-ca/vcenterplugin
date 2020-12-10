@@ -14,7 +14,10 @@ import com.vmware.vim25.ManagedObjectReference;
 import java.util.List;
 
 /**
+ * NumberOfVolumesInDatastoreImpl
+ *
  * @author wangxiangyong
+ * @since 2020-11-30
  **/
 public class NumberOfVolumesInDatastoreImpl extends BaseBestPracticeService implements BestPracticeService {
     @Override
@@ -81,6 +84,7 @@ public class NumberOfVolumesInDatastoreImpl extends BaseBestPracticeService impl
             DatastoreSummary summary = datastoreMo.getSummary();
             if (summary.getType().equals(ToolUtils.STORE_TYPE_VMFS)) {
                 int volumeSize = datastoreMo.getVmfsDatastoreInfo().getVmfs().getExtent().size();
+
                 // 只要有一个存储对应的卷超过推荐值就认为该主机不满足最佳实践
                 if (volumeSize > Integer.parseInt(getRecommendValue().toString())) {
                     return false;

@@ -2,14 +2,14 @@ package com.dmeplugin.dmestore.services;
 
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
 import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.LogicPorts;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.vmware.vim.binding.vmodl.list;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -18,8 +18,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.w3c.dom.ls.LSException;
-import springfox.documentation.spring.web.json.Json;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,7 +57,7 @@ public class NfsOperationServiceImplTest {
     }
 
     @Test
-    public void createNfsDatastore() throws DMEException {
+    public void createNfsDatastore() throws DmeException {
         String param = "{\"tuning\":{\"allocation_type\":\"thin\",\"compression_enabled\":false,\"deduplication_enabled\":false},\"qos_policy\":{\"max_bandwidth\":\"2\",\"max_iops\":\"1\"},\"storage_pool_id\":\"0\",\"accessMode\":\"readWrite\",\"type\":\"NFS\"," +
                 "\"exportPath\":\"/lqtestnfs00007\",\"filesystem_specs\":[{\"count\":1,\"name\":\"lqtestnfs00007\",\"capacity\":\"1\"}],\"pool_raw_id\":\"1\",\"nfs_share_client_addition\":[{\"name\":\"192.168.200.13\",\"objectId\":\"urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1\"}]," +
                 "\"nfsName\":\"lqtestnfs00007\",\"current_port_id\":\"139269\",\"storage_id\":\"b94bff9d-0dfb-11eb-bd3d-0050568491c9\",\"capacity_autonegotiation\":{\"capacity_self_adjusting_mode\":\"off\",\"auto_size_enable\":false},\"create_nfs_share_param\":{\"character_encoding\":\"utf-8\"," +
@@ -173,7 +171,7 @@ public class NfsOperationServiceImplTest {
     }
 
     @Test
-    public void updateNfsDatastore() throws DMEException {
+    public void updateNfsDatastore() throws DmeException {
         String param = "{\"nfsName\":\"lqtestnfs00007\",\"tuning\":{\"allocation_type\":\"thin\",\"compression_enabled\":false," +
                 "\"deduplication_enabled\":false},\"qos_policy\":{}," + "\"capacity_autonegotiation\":{\"capacity_self_adjusting_mode\":\"off\"," +
                 "\"auto_size_enable\":false},\"dataStoreObjectId\":\"urn:vmomi:Datastore:datastore-1060:674908e5-ab21-4079-9cb1-596358ee5dd1\"," +
@@ -195,7 +193,7 @@ public class NfsOperationServiceImplTest {
     }
 
     @Test
-    public void changeNfsCapacity() throws DMEException {
+    public void changeNfsCapacity() throws DmeException {
         String param = "{\"expand\":true,\"fileSystemId\":\"0C9A60E0A51C3AD38567C21B6881371C\",\"storeObjectId\":\"0C9A60E0A51C3AD38567C21B6881371C\",\"capacity\":2.0}";
         Map<String,Object> map = gson.fromJson(param, Map.class);
         String resp = " {\n" +
@@ -277,7 +275,7 @@ public class NfsOperationServiceImplTest {
     }
 
     @Test
-    public void getEditNfsStore() throws DMEException {
+    public void getEditNfsStore() throws DmeException {
 //        String storeObjectId = "123";
 //        when(dmeAccessService.access());
 //        nfsOperationService.getEditNfsStore(storeObjectId);

@@ -1,11 +1,10 @@
 package com.dmeplugin.dmestore.mvc;
 
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.ResponseBodyBean;
 import com.dmeplugin.dmestore.model.VmRdmCreateBean;
 import com.dmeplugin.dmestore.services.VmRdmService;
 import com.google.gson.Gson;
-
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +15,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 /**
+ * VmRdmController
+ *
  * @author wangxiangyong
- */
+ * @since 2020-09-03
+ **/
 @RestController
 @RequestMapping(value = "v1/vmrdm")
 public class VmRdmController extends BaseController {
@@ -29,33 +33,32 @@ public class VmRdmController extends BaseController {
 
     @RequestMapping(value = "createRdm", method = RequestMethod.POST)
     public ResponseBodyBean createRdm(@RequestParam("vmObjectId") String vmObjectId,
-                                      @RequestBody VmRdmCreateBean createBean,
-                                      @RequestParam("dataStoreObjectId") String dataStoreObjectId) throws Exception {
+        @RequestBody VmRdmCreateBean createBean, @RequestParam("dataStoreObjectId") String dataStoreObjectId) {
         try {
             vmRdmService.createRdm(dataStoreObjectId, vmObjectId, createBean);
             return success();
-        } catch (Exception e) {
+        } catch (DmeException e) {
             LOG.error(e.getMessage());
             return failure(e.getMessage());
         }
     }
 
     @RequestMapping(value = "dmeHosts", method = RequestMethod.GET)
-    public ResponseBodyBean dmeHosts() throws Exception {
+    public ResponseBodyBean dmeHosts() {
         try {
             return success(vmRdmService.getAllDmeHost());
-        } catch (Exception e) {
+        } catch (DmeException e) {
             LOG.error(e.getMessage());
             return failure(e.getMessage());
         }
     }
 
     @RequestMapping(value = "vCenter/datastoreOnHost", method = RequestMethod.GET)
-    public ResponseBodyBean getDatastoreMountsOnHost(@RequestParam("vmObjectId") String vmObjectId) throws Exception {
+    public ResponseBodyBean getDatastoreMountsOnHost(@RequestParam("vmObjectId") String vmObjectId) {
         try {
             List<Object> objects = vmRdmService.getDatastoreMountsOnHost(vmObjectId);
             return success(new Gson().toJson(objects));
-        } catch (Exception e) {
+        } catch (DmeException e) {
             LOG.error(e.getMessage());
             return failure(e.getMessage());
         }

@@ -1,7 +1,12 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * BestPracticeUpResultResponse
+ *
  * @author wangxiangyong
+ *
+ * @since 2020-11-10
+ *
  **/
 public class AuthClient {
     /**
@@ -45,6 +50,7 @@ public class AuthClient {
 
     /**
      * setAccessval .
+     *
      * @param param .
      */
     public void setAccessval(final String param) {
@@ -62,6 +68,7 @@ public class AuthClient {
 
     /**
      * setId .
+     *
      * @param param .
      */
     public void setId(final String param) {
@@ -79,6 +86,7 @@ public class AuthClient {
 
     /**
      * setName .
+     *
      * @param param .
      */
     public void setName(final String param) {
@@ -96,6 +104,7 @@ public class AuthClient {
 
     /**
      * setSecure .
+     *
      * @param param .
      */
     public void setSecure(final String param) {
@@ -113,6 +122,7 @@ public class AuthClient {
 
     /**
      * setSync .
+     *
      * @param param .
      */
     public void setSync(final String param) {
@@ -130,6 +140,7 @@ public class AuthClient {
 
     /**
      * setType .
+     *
      * @param param .
      */
     public void setType(final String param) {

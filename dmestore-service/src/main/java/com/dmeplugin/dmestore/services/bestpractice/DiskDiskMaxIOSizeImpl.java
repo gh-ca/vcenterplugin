@@ -3,9 +3,14 @@ package com.dmeplugin.dmestore.services.bestpractice;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 
 /**
+ * DiskDiskMaxIOSizeImpl
+ *
  * @author wangxiangyong
+ * @since 2020-11-30
  **/
 public class DiskDiskMaxIOSizeImpl extends BaseBestPracticeService implements BestPracticeService {
+    private static final long RECOMMEND_VALUE = 1024L;
+
     @Override
     public String getHostSetting() {
         return "Disk.DiskMaxIOSize";
@@ -13,11 +18,11 @@ public class DiskDiskMaxIOSizeImpl extends BaseBestPracticeService implements Be
 
     @Override
     public Object getRecommendValue() {
-        return 1024L;
+        return RECOMMEND_VALUE;
     }
 
     @Override
-    public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception{
+    public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         return super.getCurrentValue(vcsdkUtils, objectId, getHostSetting());
     }
 
@@ -42,7 +47,7 @@ public class DiskDiskMaxIOSizeImpl extends BaseBestPracticeService implements Be
     }
 
     @Override
-    public void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception{
+    public void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
         super.update(vcsdkUtils, objectId, getHostSetting(), getRecommendValue());
     }
 }

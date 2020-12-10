@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -62,7 +62,7 @@ public class OverviewServiceImplTest {
     }
 
     @Test
-    public void getStorageNum() throws DMEException {
+    public void getStorageNum() throws DmeException {
         Storage storage = new Storage();
         List<Storage> storages = new ArrayList<>();
         storages.add(storage);
@@ -71,7 +71,7 @@ public class OverviewServiceImplTest {
     }
 
     @Test
-    public void getDataStoreCapacitySummary() throws DMEException {
+    public void getDataStoreCapacitySummary() throws DmeException {
         List<VmfsDataInfo> vmfsDataInfos = new ArrayList<>();
         vmfsDataInfos.add(vmfsDataInfo);
         when(vmfsAccessService.listVmfs()).thenReturn(vmfsDataInfos);
@@ -83,7 +83,7 @@ public class OverviewServiceImplTest {
     }
 
     @Test
-    public void getDataStoreCapacityTopN() throws DMEException {
+    public void getDataStoreCapacityTopN() throws DmeException {
         List<VmfsDataInfo> vmfsDataInfos = new ArrayList<>();
         vmfsDataInfos.add(vmfsDataInfo);
         when(vmfsAccessService.listVmfs()).thenReturn(vmfsDataInfos);
@@ -95,7 +95,7 @@ public class OverviewServiceImplTest {
     }
 
     @Test
-    public void getBestPracticeViolations() {
+    public void getBestPracticeViolations() throws DmeException {
         BestPracticeBean bestPracticeBean = new BestPracticeBean();
         bestPracticeBean.setActualValue("321");
         bestPracticeBean.setAutoRepair("321");

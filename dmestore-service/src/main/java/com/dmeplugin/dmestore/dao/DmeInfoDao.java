@@ -1,10 +1,9 @@
 package com.dmeplugin.dmestore.dao;
 
 import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
+import com.dmeplugin.dmestore.constant.DmeConstants;
 import com.dmeplugin.dmestore.entity.DmeInfo;
-import com.dmeplugin.dmestore.exception.DMEException;
-import com.dmeplugin.dmestore.exception.DataBaseException;
-import com.dmeplugin.dmestore.services.DmeConstants;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.utils.CipherUtils;
 
 import java.sql.Connection;
@@ -21,12 +20,12 @@ import java.sql.SQLException;
  **/
 public class DmeInfoDao extends H2DataBaseDao {
 
-    public int addDmeInfo(DmeInfo dmeInfo) throws Exception {
-        checkDmeInfo(dmeInfo);
+    public int addDmeInfo(DmeInfo dmeInfo) throws DmeException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
+            checkDmeInfo(dmeInfo);
             con = getConnection();
             ps = con.prepareStatement(
                 "INSERT INTO " + DPSqlFileConstant.DP_DME_ACCESS_INFO + " (hostIp,hostPort,username,password) "
@@ -41,15 +40,15 @@ public class DmeInfoDao extends H2DataBaseDao {
                 dmeInfo.setId(rs.getInt(1));
             }
             return row;
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOGGER.error("Failed to add vCenter info: " + e.toString());
-            throw e;
+            throw new DmeException(e.getMessage());
         } finally {
             closeConnection(con, ps, rs);
         }
     }
 
-    public DmeInfo getDmeInfo() throws DMEException {
+    public DmeInfo getDmeInfo() throws DmeException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -72,7 +71,7 @@ public class DmeInfoDao extends H2DataBaseDao {
         } catch (Exception e) {
             e.printStackTrace();
             LOGGER.error("Failed to get dme access info: " + e.toString());
-            throw new DMEException("503", e.getMessage());
+            throw new DmeException("503", e.getMessage());
         } finally {
             closeConnection(con, ps, rs);
         }

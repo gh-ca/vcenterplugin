@@ -2,8 +2,11 @@ package com.dmeplugin.dmestore.entity;
 
 /**
  * DMEbase.
+ *
+ * @author Administrator
+ * @since 2020-12-08
  */
-public class DMEbase {
+public class Dmebase {
     /**
      * hostIp.
      */
@@ -29,7 +32,7 @@ public class DMEbase {
      * @param param3 loginAccount 登录账号
      * @param param4 loginPwd 登录密码
      */
-    public DMEbase(final String param1,
+    public Dmebase(final String param1,
                    final int param2,
                    final String param3,
                    final String param4) {
@@ -41,6 +44,7 @@ public class DMEbase {
 
     /**
      * getHostIp .
+     *
      * @return String .
      */
     public String getHostIp() {
@@ -49,48 +53,61 @@ public class DMEbase {
 
     /**
      * setHostIp .
+     *
      * @param param .
      */
     public void setHostIp(final String param) {
         this.hostIp = param;
     }
+
     /**
      * getHostPort .
+     *
      * @return int .
      */
     public int getHostPort() {
         return hostPort;
     }
+
     /**
      * setHostIp .
+     *
      * @param param .
      */
     public void setHostPort(final int param) {
         this.hostPort = param;
     }
+
     /**
      * getLoginAccount .
+     *
      * @return String .
      */
     public String getLoginAccount() {
         return loginAccount;
     }
+
     /**
      * setLoginAccount .
+     *
      * @param param .
      */
     public void setLoginAccount(final String param) {
         this.loginAccount = param;
     }
+
     /**
      * getLoginPwd .
+     *
      * @return String .
      */
     public String getLoginPwd() {
         return loginPwd;
     }
+
     /**
      * setHostIp .
+     *
      * @param param .
      */
     public void setLoginPwd(final String param) {
@@ -99,6 +116,7 @@ public class DMEbase {
 
     /**
      * toString .
+     *
      * @return
      */
     @Override

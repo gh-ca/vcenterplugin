@@ -7,8 +7,6 @@ import static org.quartz.TriggerBuilder.newTrigger;
 import com.dmeplugin.dmestore.dao.ScheduleDao;
 import com.dmeplugin.dmestore.entity.ScheduleConfig;
 
-import java.util.List;
-
 import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
 import org.quartz.SchedulerException;
@@ -17,48 +15,58 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
+/**
+ * ScheduleSetting
+ *
+ * @author Administrator
+ * @since 2020-12-08
+ */
 @Component
 public class ScheduleSetting {
     private static final Logger LOGGER = LoggerFactory.getLogger(ScheduleSetting.class);
-
+    private static List<ScheduleConfig> scheduleList;
+    private static final int CHARLENGTH = 32;
     @Autowired
     private ScheduleDao scheduleDao;
-
-
     @Autowired
     private QuartzConfig quartzConfig;
 
-
-    private static List<ScheduleConfig> scheduleList;
-
-
+    /**
+     * reconfigureTasks
+     */
     public void reconfigureTasks() {
-
         // 获取所有任务
         scheduleList = scheduleDao.getScheduleList();
-        LOGGER.info("schedule size=" + scheduleList.size());
-        for (ScheduleConfig s : scheduleList) {
+        LOGGER.info("schedule size:{}",scheduleList.size());
+        for (ScheduleConfig scheduleConfig : scheduleList) {
             try {
                 Class clazz;
-                clazz = Class.forName(s.getClassName());
+                clazz = Class.forName(scheduleConfig.getClassName());
                 JobDetail job = newJob(clazz)
-                    .withIdentity(s.getClassName(), "group1")
+                    .withIdentity(scheduleConfig.getClassName(), "group1")
                     .build();
-                quartzConfig.getScheduler().scheduleJob(job, getTrigger(s));
-            } catch (Exception e) {
+                quartzConfig.getScheduler().scheduleJob(job, getTrigger(scheduleConfig));
+            } catch (ClassNotFoundException | SchedulerException e) {
                 LOGGER.error("job error", e);
             }
         }
     }
 
-    //刷新任务
+    /**
+     * 刷新任务
+     *
+     * @param taskId taskId
+     * @param cron cron
+     */
     public void refreshTasks(Integer taskId, String cron) {
         // 获取所有任务
         if (scheduleList != null) {
-            LOGGER.info("schedule size=" + scheduleList.size());
-            for (ScheduleConfig s : scheduleList) {
-                if (s.getId() == taskId) {
-                    s.setCron(cron);
+            LOGGER.info("schedule size:{}",scheduleList.size());
+            for (ScheduleConfig scheduleConfig : scheduleList) {
+                if (scheduleConfig.getId() == taskId) {
+                    scheduleConfig.setCron(cron);
                 }
             }
         }
@@ -70,16 +78,15 @@ public class ScheduleSetting {
         reconfigureTasks();
     }
 
-
     /**
      * 转换首字母小写
      *
-     * @param str
-     * @return
+     * @param str str
+     * @return String
      */
     public static String lowerFirstCapse(String str) {
         char[] chars = str.toCharArray();
-        chars[0] += 32;
+        chars[0] += CHARLENGTH;
         return String.valueOf(chars);
     }
 
@@ -95,7 +102,5 @@ public class ScheduleSetting {
             .startNow()
             .withSchedule(cronSchedule(scheduleConfig.getCron()))
             .build();
-
-
     }
 }

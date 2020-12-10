@@ -1,8 +1,10 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * ResponseBodyBean
+ *
  * @author Administrator .
- * ResponseBodyBean.
+ * @since 2020-12-08
  */
 public class ResponseBodyBean {
     /**
@@ -41,6 +43,7 @@ public class ResponseBodyBean {
 
     /**
      * getData .
+     *
      * @return Object .
      */
     public Object getData() {
@@ -49,34 +52,43 @@ public class ResponseBodyBean {
 
     /**
      * setData .
+     *
      * @param param .
      */
     public void setData(final Object param) {
         this.data = param;
     }
+
     /**
      * getDescription .
+     *
      * @return String .
      */
     public String getDescription() {
         return description;
     }
+
     /**
      * setDescription .
+     *
      * @param param .
      */
     public void setDescription(final String param) {
         this.description = param;
     }
+
     /**
      * getCode .
+     *
      * @return String .
      */
     public String getCode() {
         return code;
     }
+
     /**
      * setCode .
+     *
      * @param param .
      */
     public void setCode(final String param) {

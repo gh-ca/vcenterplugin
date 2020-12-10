@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.EthPortInfo;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public interface HostAccessService {
      * @return: ResponseBodyBean
      * @throws Exception when error
      */
-    void configureIscsi(Map<String, Object> params) throws DMEException;
+    void configureIscsi(Map<String, Object> params) throws DmeException;
 
     /**
      * Test Connectivity:
@@ -37,5 +37,5 @@ public interface HostAccessService {
      * @return: ResponseBodyBean
      * @throws Exception when error
      */
-    List<EthPortInfo> testConnectivity(Map<String, Object> params) throws DMEException;
+    List<EthPortInfo> testConnectivity(Map<String, Object> params) throws DmeException;
 }

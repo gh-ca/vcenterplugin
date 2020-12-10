@@ -1,7 +1,8 @@
 package com.dmeplugin.dmestore.services;
 
+import com.dmeplugin.dmestore.constant.DmeConstants;
 import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.exception.DmeSqlException;
 import com.dmeplugin.dmestore.model.BandPorts;
 import com.dmeplugin.dmestore.model.CapacityAutonegotiation;
@@ -23,7 +24,7 @@ import com.dmeplugin.dmestore.model.StoragePool;
 import com.dmeplugin.dmestore.model.StoragePort;
 import com.dmeplugin.dmestore.model.Volume;
 import com.dmeplugin.dmestore.model.VolumeListRestponse;
-import com.dmeplugin.dmestore.services.bestpractice.DmeIndicatorConstants;
+import com.dmeplugin.dmestore.constant.DmeIndicatorConstants;
 import com.dmeplugin.dmestore.utils.ToolUtils;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
@@ -94,7 +95,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public List<Storage> getStorages() throws DMEException {
+    public List<Storage> getStorages() throws DmeException {
 
         List<Storage> list = new ArrayList<>();
 
@@ -103,7 +104,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 null);
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
-                throw new DMEException("503", "list storage error !");
+                throw new DmeException("503", "list storage error !");
             }
             Object object = responseEntity.getBody();
             if (object != null) {
@@ -157,20 +158,20 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         } catch (Exception e) {
             LOG.error("list storage error", e);
             String message = e.getMessage();
-            throw new DMEException("503", message);
+            throw new DmeException("503", message);
         }
         return list;
     }
 
     @Override
-    public StorageDetail getStorageDetail(String storageId) throws DMEException {
+    public StorageDetail getStorageDetail(String storageId) throws DmeException {
         StorageDetail storageObj = null;
         String url = DmeConstants.API_STORAGES + "/" + storageId + "/detail";
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
-                throw new DMEException("503", "search oriented storage error");
+                throw new DmeException("503", "search oriented storage error");
             }
             String object = responseEntity.getBody();
             if (object != null) {
@@ -236,13 +237,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("search oriented storage error!", e);
-            throw new DMEException("503", e.getMessage());
+            throw new DmeException("503", e.getMessage());
         }
         return storageObj;
     }
 
     @Override
-    public List<StoragePool> getStoragePools(String storageId, String mediaType) throws DMEException {
+    public List<StoragePool> getStoragePools(String storageId, String mediaType) throws DmeException {
         String replace = storageId.replace("-", "");
         String className = "SYS_StoragePool";
         List<StoragePool> resList = new ArrayList<>();
@@ -253,7 +254,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
-                throw new DMEException("503", "search oriented storage pool error");
+                throw new DmeException("503", "search oriented storage pool error");
             }
             String object = responseEntity.getBody();
             if (!StringUtils.isEmpty(object)) {
@@ -330,13 +331,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("search oriented storage pool error", e);
-            throw new DMEException("503", e.getMessage());
+            throw new DmeException("503", e.getMessage());
         }
         return resList;
     }
 
     @Override
-    public List<LogicPorts> getLogicPorts(String storageId) throws DMEException {
+    public List<LogicPorts> getLogicPorts(String storageId) throws DmeException {
 
         List<LogicPorts> resList = new ArrayList<>();
         String url = DmeConstants.API_LOGICPORTS_LIST + storageId;
@@ -344,7 +345,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
-                throw new DMEException("503", "list bandports error!");
+                throw new DmeException("503", "list bandports error!");
             }
             String object = responseEntity.getBody();
             if (!StringUtils.isEmpty(object)) {
@@ -374,13 +375,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("list bandports error", e);
-            throw new DMEException("503", e.getMessage());
+            throw new DmeException("503", e.getMessage());
         }
         return resList;
     }
 
     @Override
-    public VolumeListRestponse getVolumesByPage(String storageId, String pageSize, String pageNo) throws DMEException {
+    public VolumeListRestponse getVolumesByPage(String storageId, String pageSize, String pageNo) throws DmeException {
 
         VolumeListRestponse volumeListRestponse = new VolumeListRestponse();
         List<Volume> volumes = new ArrayList<>(10);
@@ -401,7 +402,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
-                throw new DMEException("503", "list volumes error!");
+                throw new DmeException("503", "list volumes error!");
             }
             Object object = responseEntity.getBody();
             if (object != null) {
@@ -439,13 +440,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("list volume error!", e);
-            throw new DMEException("503", e.getMessage());
+            throw new DmeException("503", e.getMessage());
         }
         return volumeListRestponse;
     }
 
     @Override
-    public List<FileSystem> getFileSystems(String storageId) throws DMEException {
+    public List<FileSystem> getFileSystems(String storageId) throws DmeException {
 
         List<FileSystem> fileSystems = new ArrayList<>();
 
@@ -458,7 +459,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 HttpMethod.POST, jsonParams);
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
-                throw new DMEException("503", "list filesystem error!");
+                throw new DmeException("503", "list filesystem error!");
             }
             String respObject = responseEntity.getBody();
             if (!StringUtils.isEmpty(respObject)) {
@@ -484,13 +485,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("list filesystem error!", e);
-            throw new DMEException("503", e.getMessage());
+            throw new DmeException("503", e.getMessage());
         }
         return fileSystems;
     }
 
     @Override
-    public List<Dtrees> getDtrees(String storageId) throws DMEException {
+    public List<Dtrees> getDtrees(String storageId) throws DmeException {
 
         List<Dtrees> resList = new ArrayList<>();
         Map<String, String> params = new HashMap<>();
@@ -501,7 +502,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 HttpMethod.POST, gson.toJson(params));
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
-                throw new DMEException("503", "list dtree error!");
+                throw new DmeException("503", "list dtree error!");
             }
             String object = responseEntity.getBody();
             if (!StringUtils.isEmpty(object)) {
@@ -522,13 +523,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("list dtree error!", e);
-            throw new DMEException("503", e.getMessage());
+            throw new DmeException("503", e.getMessage());
         }
         return resList;
     }
 
     @Override
-    public List<NfsShares> getNfsShares(String storageId) throws DMEException {
+    public List<NfsShares> getNfsShares(String storageId) throws DmeException {
 
         List<NfsShares> resList = new ArrayList<>();
 
@@ -539,7 +540,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 HttpMethod.POST, gson.toJson(params));
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
-                throw new DMEException("503", "list nfsshares error!");
+                throw new DmeException("503", "list nfsshares error!");
             }
             String object = responseEntity.getBody();
             if (!StringUtils.isEmpty(object)) {
@@ -560,13 +561,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("list nfsshares error!", e);
-            throw new DMEException("503", e.getMessage());
+            throw new DmeException("503", e.getMessage());
         }
         return resList;
     }
 
     @Override
-    public List<BandPorts> getBandPorts(String storageId) throws DMEException {
+    public List<BandPorts> getBandPorts(String storageId) throws DmeException {
 
         List<BandPorts> resList = new ArrayList<>();
         String url = DmeConstants.API_BANDPORTS_LIST + storageId;
@@ -574,7 +575,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
-                throw new DMEException("503", "list bandports error!");
+                throw new DmeException("503", "list bandports error!");
             }
             String object = responseEntity.getBody();
             if (!StringUtils.isEmpty(object)) {
@@ -593,13 +594,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("list bandports error!", e);
-            throw new DMEException("503", e.getMessage());
+            throw new DmeException("503", e.getMessage());
         }
         return resList;
     }
 
     @Override
-    public List<StorageControllers> getStorageControllers(String storageDeviceId) throws DMEException {
+    public List<StorageControllers> getStorageControllers(String storageDeviceId) throws DmeException {
         String replace = storageDeviceId.replace("-", "");
         String className = "SYS_Controller";
         List<StorageControllers> resList = new ArrayList<>();
@@ -610,7 +611,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
-                throw new DMEException("503", "list storage controller error!");
+                throw new DmeException("503", "list storage controller error!");
             }
             Object object = responseEntity.getBody();
             if (!StringUtils.isEmpty(object)) {
@@ -651,13 +652,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("list storage controller error!");
-            throw new DMEException("503", e.getMessage());
+            throw new DmeException("503", e.getMessage());
         }
         return resList;
     }
 
     @Override
-    public List<StorageDisk> getStorageDisks(String storageDeviceId) throws DMEException {
+    public List<StorageDisk> getStorageDisks(String storageDeviceId) throws DmeException {
         String replace = storageDeviceId.replace("-", "");
         String className = "SYS_StorageDisk";
         List<StorageDisk> resList = new ArrayList<>();
@@ -668,7 +669,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
-                throw new DMEException("503", "list storage disk error!");
+                throw new DmeException("503", "list storage disk error!");
             }
             Object object = responseEntity.getBody();
             if (!StringUtils.isEmpty(object)) {
@@ -718,13 +719,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("list storage disk error!", e);
-            throw new DMEException("503", e.getMessage());
+            throw new DmeException("503", e.getMessage());
         }
         return resList;
     }
 
     @Override
-    public List<EthPortInfo> getStorageEthPorts(String storageSn) throws DMEException {
+    public List<EthPortInfo> getStorageEthPorts(String storageSn) throws DmeException {
         List<EthPortInfo> relists = null;
         try {
             if (!StringUtils.isEmpty(storageSn)) {
@@ -738,7 +739,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("get Storage Eth Ports error:", e);
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
         return relists;
     }
@@ -886,7 +887,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public Map<String, Object> getVolume(String volumeId) throws DMEException {
+    public Map<String, Object> getVolume(String volumeId) throws DmeException {
         Map<String, Object> resMap = new HashMap<>();
         resMap.put("code", HttpStatus.OK.value());
         resMap.put("msg", "get volume success!");
@@ -897,7 +898,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
-                throw new DMEException(String.valueOf(code), "get volume error!");
+                throw new DmeException(String.valueOf(code), "get volume error!");
             }
             Object object = responseEntity.getBody();
             if (object != null) {
@@ -918,19 +919,19 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 volumeAttachments(jsonArray, volume);
                 resMap.put("data", volume);
             }
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("get volume error!");
-            throw new DMEException("503", e.getMessage());
+            throw new DmeException("503", e.getMessage());
         }
         return resMap;
     }
 
     @Override
-    public List<StoragePort> getStoragePort(String storageDeviceId, String portType) throws DMEException {
+    public List<StoragePort> getStoragePort(String storageDeviceId, String portType) throws DmeException {
 
         String replace = storageDeviceId.replace("-", "");
         if (StringUtils.isEmpty(storageDeviceId) || StringUtils.isEmpty(portType)) {
-            throw new DMEException("403", "request storageDeviceId or portType error!");
+            throw new DmeException("403", "request storageDeviceId or portType error!");
         }
         List<StoragePort> storagePorts = new ArrayList<>(10);
         String className = "SYS_StoragePort";
@@ -941,7 +942,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
-                throw new DMEException("503", "get storage port failed!");
+                throw new DmeException("503", "get storage port failed!");
             }
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
@@ -1003,17 +1004,17 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("list storage port error!");
-            throw new DMEException("503", e.getMessage());
+            throw new DmeException("503", e.getMessage());
         }
 
         return storagePorts;
     }
 
     @Override
-    public List<FailoverGroup> getFailoverGroups(String storageId) throws DMEException {
+    public List<FailoverGroup> getFailoverGroups(String storageId) throws DmeException {
 
         if (StringUtils.isEmpty(storageId)) {
-            throw new DMEException("403", "request param storage_id error!");
+            throw new DmeException("403", "request param storage_id error!");
         }
         List<FailoverGroup> failoverGroups = new ArrayList<>(10);
         String url = DmeConstants.API_FAILOVERGROUPS + storageId;
@@ -1021,7 +1022,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
-                throw new DMEException("503", "list failover group failed!");
+                throw new DmeException("503", "list failover group failed!");
             }
             String body = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();
@@ -1035,18 +1036,18 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 failoverGroup.setName(ToolUtils.jsonToStr(element.get("name")));
                 failoverGroups.add(failoverGroup);
             }
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("list failover group error!");
-            throw new DMEException("503", e.getMessage());
+            throw new DmeException("503", e.getMessage());
         }
         return failoverGroups;
     }
 
     @Override
-    public FileSystemDetail getFileSystemDetail(String fileSystemId) throws DMEException {
+    public FileSystemDetail getFileSystemDetail(String fileSystemId) throws DmeException {
 
         if (StringUtils.isEmpty(fileSystemId)) {
-            throw new DMEException("403", "param error!");
+            throw new DmeException("403", "param error!");
         }
         FileSystemDetail fileSystemDetail = new FileSystemDetail();
         String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace("{file_system_id}", fileSystemId);
@@ -1054,7 +1055,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
-                throw new DMEException("503", "get file system detail error!");
+                throw new DmeException("503", "get file system detail error!");
             }
 
             String object = responseEntity.getBody();
@@ -1083,9 +1084,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
             fileSystemTurning.setSmartQos(smartQos);
             fileSystemDetail.setFileSystemTurning(fileSystemTurning);
-        } catch (DMEException e) {
+        } catch (DmeException e) {
             LOG.error("get file system detail error");
-            throw new DMEException("503", e.getMessage());
+            throw new DmeException("503", e.getMessage());
         }
         return fileSystemDetail;
     }
@@ -1094,7 +1095,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return dmeVmwareRalationDao.getVmfsNameByVolumeId(volumeId);
     }
 
-    private String getDiskType(String storageDeviceId, String diskPoolId, String poolId) throws DMEException {
+    private String getDiskType(String storageDeviceId, String diskPoolId, String poolId) throws DmeException {
 
         String replace = storageDeviceId.replace("-", "");
         String result = "";
@@ -1138,7 +1139,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public List<Storage> listStoragePerformance(List<String> storageIds) throws DMEException {
+    public List<Storage> listStoragePerformance(List<String> storageIds) throws DmeException {
         List<Storage> relists = new ArrayList<>();
         try {
             if (storageIds != null && storageIds.size() > 0) {
@@ -1176,14 +1177,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("list Storage performance error:", e);
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
         LOG.info("listStoragePerformance relists===" + (relists == null ? "null" : relists.size()));
         return relists;
     }
 
     @Override
-    public List<StoragePool> listStoragePoolPerformance(List<String> storagePoolIds) throws DMEException {
+    public List<StoragePool> listStoragePoolPerformance(List<String> storagePoolIds) throws DmeException {
         List<StoragePool> relists = new ArrayList<>();
         try {
             if (storagePoolIds != null && storagePoolIds.size() > 0) {
@@ -1218,7 +1219,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("list StoragePool performance error:", e);
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
         LOG.info("listStoragePoolPerformance relists===" + (relists == null ? "null" : relists.size()));
         return relists;
@@ -1226,7 +1227,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     @Override
     public List<StorageControllers> listStorageControllerPerformance(List<String> storageControllerIds)
-        throws DMEException {
+        throws DmeException {
         List<StorageControllers> relists = new ArrayList<>();
         try {
             if (storageControllerIds != null && storageControllerIds.size() > 0) {
@@ -1263,14 +1264,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("list StorageController performance error:", e);
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
         LOG.info("listStorageControllerPerformance relists===" + (relists == null ? "null" : relists.size()));
         return relists;
     }
 
     @Override
-    public List<StorageDisk> listStorageDiskPerformance(List<String> storageDiskIds) throws DMEException {
+    public List<StorageDisk> listStorageDiskPerformance(List<String> storageDiskIds) throws DmeException {
         List<StorageDisk> relists = new ArrayList<>();
         try {
             if (storageDiskIds != null && storageDiskIds.size() > 0) {
@@ -1307,14 +1308,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("list StorageDisk performance error:", e);
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
         LOG.info("listStorageDiskPerformance relists===" + (relists == null ? "null" : relists.size()));
         return relists;
     }
 
     @Override
-    public List<StoragePort> listStoragePortPerformance(List<String> storagePortIds) throws DMEException {
+    public List<StoragePort> listStoragePortPerformance(List<String> storagePortIds) throws DmeException {
         List<StoragePort> relists = new ArrayList<>();
         try {
             if (storagePortIds != null && storagePortIds.size() > 0) {
@@ -1351,14 +1352,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("list StoragePort performance error:", e);
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
         LOG.info("listStoragePortPerformance relists===" + (relists == null ? "null" : (relists.size())));
         return relists;
     }
 
     @Override
-    public List<Volume> listVolumesPerformance(List<String> volumeWwns) throws DMEException {
+    public List<Volume> listVolumesPerformance(List<String> volumeWwns) throws DmeException {
         List<Volume> relists = new ArrayList<>();
         try {
             if (volumeWwns != null && volumeWwns.size() > 0) {
@@ -1393,14 +1394,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("list volume performance error:", e);
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
         LOG.info("listVolumesPerformance relists===" + (relists == null ? "null" : (relists.size())));
         return relists;
     }
 
     @Override
-    public Boolean queryVolumeByName(String name) throws DMEException {
+    public Boolean queryVolumeByName(String name) throws DmeException {
 
         Boolean flag = true;
         String url = DmeConstants.DME_VOLUME_BASE_URL + "?name=" + name;
@@ -1416,7 +1417,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public Boolean queryFsByName(String name, String storageId) throws DMEException {
+    public Boolean queryFsByName(String name, String storageId) throws DmeException {
         Boolean flag = true;
         List<FileSystem> fileSystems = getFileSystems(storageId);
         for (FileSystem fileSystem : fileSystems) {
@@ -1429,7 +1430,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public Boolean queryShareByName(String name, String storageId) throws DMEException {
+    public Boolean queryShareByName(String name, String storageId) throws DmeException {
         Boolean flag = true;
         List<NfsShares> nfsShares = getNfsShares(storageId);
         for (NfsShares nfsShare : nfsShares) {
@@ -1444,7 +1445,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     /**
      * 得到存储池与服务等级的关系信息
      **/
-    public Map<String, Object> getDjTierContainsStoragePool() throws DMEException {
+    public Map<String, Object> getDjTierContainsStoragePool() throws DmeException {
         Map<String, Object> map = new HashMap<>(16);
         String url = DmeConstants.LIST_RELATION_URL.replace("{relationName}", "M_DjTierContainsStoragePool");
         try {
@@ -1477,7 +1478,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("DME link error url:" + url + ",error:" + e.getMessage());
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
         return map;
     }
@@ -1485,7 +1486,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     /**
      * 得到服务等级的实例信息
      **/
-    public Map<String, Object> getDjtier() throws DMEException {
+    public Map<String, Object> getDjtier() throws DmeException {
         Map<String, Object> map = new HashMap<>(16);
         String getDjtierUrl = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, "SYS_DjTier");
         try {
@@ -1511,7 +1512,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         } catch (Exception e) {
             LOG.error("DME link error url:" + getDjtierUrl + ",error:" + e.getMessage());
-            throw new DMEException(e.getMessage());
+            throw new DmeException(e.getMessage());
         }
         return map;
     }
@@ -1544,7 +1545,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return map;
     }
 
-    private String getStorageByPoolRawId(String poolRawId) throws DMEException {
+    private String getStorageByPoolRawId(String poolRawId) throws DmeException {
 
         String className = "SYS_StoragePool";
         String poolName = "";
@@ -1565,7 +1566,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return poolName;
     }
 
-    private DiskPool getDiskPoolByPoolId(String poolId) throws DMEException {
+    private DiskPool getDiskPoolByPoolId(String poolId) throws DmeException {
         String className = "SYS_DiskPool";
         String url =
             String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + "?condition={json}" + "pageSize=1000";

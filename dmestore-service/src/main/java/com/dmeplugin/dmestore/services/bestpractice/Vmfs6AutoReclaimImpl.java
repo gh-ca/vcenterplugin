@@ -17,7 +17,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Vmfs6AutoReclaimImpl
+ *
  * @author wangxiangyong
+ * @since 2020-11-30
  **/
 public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements BestPracticeService {
     @Override
@@ -93,8 +96,9 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
             if (summary.getType().equals(ToolUtils.STORE_TYPE_VMFS)) {
                 VmfsDatastoreInfo vmfsDatastoreInfo = datastoreMo.getVmfsDatastoreInfo();
                 HostVmfsVolume hostVmfsVolume = vmfsDatastoreInfo.getVmfs();
-                String version = hostVmfsVolume.getVersion();
+
                 // 只对VMFS6进行处理
+                String version = hostVmfsVolume.getVersion();
                 if (version.startsWith("6")) {
                     list.add(vmfsDatastoreInfo);
                 }

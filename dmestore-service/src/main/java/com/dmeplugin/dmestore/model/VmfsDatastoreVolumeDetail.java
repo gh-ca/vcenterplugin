@@ -1,9 +1,11 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * VmfsDatastoreVolumeDetail
+ *
  * @author Administrator .
- * @Description:  vmfs Datastore劵详情
- * @since  16:01 2020/9/2
+ * @Description: vmfs Datastore劵详情
+ * @since 2020-12-08
  **/
 public class VmfsDatastoreVolumeDetail {
     /**
@@ -65,6 +67,7 @@ public class VmfsDatastoreVolumeDetail {
 
     /**
      * getCompression .
+     *
      * @return boolean .
      */
     public boolean getCompression() {
@@ -73,13 +76,16 @@ public class VmfsDatastoreVolumeDetail {
 
     /**
      * setCompression .
+     *
      * @param param .
      */
     public void setCompression(final boolean param) {
         this.compression = param;
     }
+
     /**
      * getProvisionType .
+     *
      * @return String .
      */
     public String getProvisionType() {
@@ -88,188 +94,241 @@ public class VmfsDatastoreVolumeDetail {
 
     /**
      * setProvisionType .
+     *
      * @param param .
      */
     public void setProvisionType(final String param) {
         this.provisionType = param;
     }
+
     /**
      * getName .
+     *
      * @return String .
      */
     public String getName() {
         return name;
     }
+
     /**
      * setName .
+     *
      * @param param .
      */
     public void setName(final String param) {
         this.name = param;
     }
+
     /**
      * getWwn .
+     *
      * @return String .
      */
     public String getWwn() {
         return wwn;
     }
+
     /**
      * setWwn .
+     *
      * @param param .
      */
     public void setWwn(final String param) {
         this.wwn = param;
     }
+
     /**
      * getSmartTier .
+     *
      * @return String .
      */
     public String getSmartTier() {
         return smartTier;
     }
+
     /**
      * setSmartTier .
+     *
      * @param param .
      */
     public void setSmartTier(final String param) {
         this.smartTier = param;
     }
+
     /**
      * getEvolutionaryInfo .
+     *
      * @return String .
      */
     public String getEvolutionaryInfo() {
         return evolutionaryInfo;
     }
+
     /**
      * setEvolutionaryInfo .
+     *
      * @param param .
      */
     public void setEvolutionaryInfo(final String param) {
         this.evolutionaryInfo = param;
     }
+
     /**
      * getDevice .
+     *
      * @return String .
      */
     public String getDevice() {
         return device;
     }
+
     /**
      * setDevice .
+     *
      * @param param .
      */
     public void setDevice(final String param) {
         this.device = param;
     }
+
     /**
      * getStoragePool .
+     *
      * @return String .
      */
     public String getStoragePool() {
         return storagePool;
     }
+
     /**
      * setStoragePool .
+     *
      * @param param .
      */
     public void setStoragePool(final String param) {
         this.storagePool = param;
     }
+
     /**
      * getServiceLevel .
+     *
      * @return String .
      */
     public String getServiceLevel() {
         return serviceLevel;
     }
+
     /**
      * setServiceLevel .
+     *
      * @param param .
      */
     public void setServiceLevel(final String param) {
         this.serviceLevel = param;
     }
+
     /**
      * getStorage .
+     *
      * @return String .
      */
     public String getStorage() {
         return storage;
     }
+
     /**
      * setStorage .
+     *
      * @param param .
      */
     public void setStorage(final String param) {
         this.storage = param;
     }
+
     /**
      * setDudeplication .
+     *
      * @return String .
      */
     public boolean getDudeplication() {
         return dudeplication;
     }
+
     /**
      * setDudeplication .
+     *
      * @param param .
      */
     public void setDudeplication(final boolean param) {
         this.dudeplication = param;
     }
+
     /**
      * getProvisionType .
+     *
      * @return String .
      */
     public boolean isDudeplication() {
         return dudeplication;
     }
+
     /**
      * isCompression .
+     *
      * @return String .
      */
     public boolean isCompression() {
         return compression;
     }
+
     /**
      * getApplicationType .
+     *
      * @return String .
      */
     public String getApplicationType() {
         return applicationType;
     }
+
     /**
      * setApplicationType .
+     *
      * @param param .
      */
     public void setApplicationType(final String param) {
         this.applicationType = param;
     }
+
     /**
      * getControlPolicy .
+     *
      * @return String .
      */
     public String getControlPolicy() {
         return controlPolicy;
     }
+
     /**
      * setControlPolicy .
+     *
      * @param param .
      */
     public void setControlPolicy(final String param) {
         this.controlPolicy = param;
     }
+
     /**
      * getTrafficControl .
+     *
      * @return String .
      */
     public String getTrafficControl() {
         return trafficControl;
     }
+
     /**
      * setTrafficControl .
+     *
      * @param param .
      */
     public void setTrafficControl(final String param) {

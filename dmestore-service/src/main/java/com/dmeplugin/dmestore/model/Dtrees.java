@@ -1,8 +1,11 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * Dtrees
+ *
  * @author lianq
- * @since  2020/9/7 9:42
+ * @Description: Dtrees
+ * @since 2020-12-08
  */
 public class Dtrees {
     /**
@@ -36,6 +39,7 @@ public class Dtrees {
 
     /**
      * getName .
+     *
      * @return String .
      */
     public String getName() {
@@ -44,90 +48,115 @@ public class Dtrees {
 
     /**
      * setName .
+     *
      * @param param .
      */
     public void setName(final String param) {
         this.name = param;
     }
+
     /**
      * getFsName .
+     *
      * @return String .
      */
     public String getFsName() {
         return fsName;
     }
+
     /**
      * setName .
+     *
      * @param param .
      */
     public void setFsName(final String param) {
         this.fsName = param;
     }
+
     /**
      * isQuotaSwitch .
+     *
      * @return boolean .
      */
     public boolean isQuotaSwitch() {
         return quotaSwitch;
     }
+
     /**
      * setName .
+     *
      * @param param .
      */
     public void setQuotaSwitch(final boolean param) {
         this.quotaSwitch = param;
     }
+
     /**
      * getSecurityStyle .
+     *
      * @return String .
      */
     public String getSecurityStyle() {
         return securityStyle;
     }
+
     /**
      * setName .
+     *
      * @param param .
      */
     public void setSecurityStyle(final String param) {
         this.securityStyle = param;
     }
+
     /**
      * getTierName .
+     *
      * @return String .
      */
     public String getTierName() {
         return tierName;
     }
+
     /**
      * setName .
+     *
      * @param param .
      */
     public void setTierName(final String param) {
         this.tierName = param;
     }
+
     /**
      * getNfsCount .
+     *
      * @return Integer .
      */
     public Integer getNfsCount() {
         return nfsCount;
     }
+
     /**
      * setName .
+     *
      * @param param .
      */
     public void setNfsCount(final Integer param) {
         this.nfsCount = param;
     }
+
     /**
      * getCifsCount .
+     *
      * @return Integer .
      */
     public Integer getCifsCount() {
         return cifsCount;
     }
+
     /**
      * setCifsCount .
+     *
      * @param param .
      */
     public void setCifsCount(final Integer param) {
@@ -138,7 +167,7 @@ public class Dtrees {
     public final String toString() {
         return "Dtrees{"
             + "name='" + name + '\''
-            + ", fsName='" + fsName +  '\''
+            + ", fsName='" + fsName + '\''
             + ", quotaSwitch=" + quotaSwitch
             + ", securityStyle='" + securityStyle + '\''
             + ", tierName='" + tierName + '\''

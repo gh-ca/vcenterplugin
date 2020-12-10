@@ -1,10 +1,8 @@
 package com.dmeplugin.dmestore.dao;
 
-import static org.junit.Assert.*;
-
 import com.dmeplugin.dmestore.DMEServiceApplication;
 import com.dmeplugin.dmestore.entity.DmeInfo;
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 
 import java.util.Date;
 
@@ -54,7 +52,7 @@ public class DmeInfoDaoTest {
     }
 
     @Test
-    public void getDmeInfo() throws DMEException {
+    public void getDmeInfo() throws DmeException {
         dmeInfoDao.getDmeInfo();
 
     }

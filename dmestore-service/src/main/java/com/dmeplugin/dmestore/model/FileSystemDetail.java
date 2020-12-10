@@ -1,8 +1,10 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * FileSystemDetail
+ *
  * @author lianq
- * @since  2020/10/15 15:41
+ * @since 2020-10-15
  */
 public class FileSystemDetail {
     /**
@@ -24,6 +26,7 @@ public class FileSystemDetail {
 
     /**
      * getId .
+     *
      * @return String .
      */
     public String getId() {
@@ -32,41 +35,52 @@ public class FileSystemDetail {
 
     /**
      * setId .
+     *
      * @param param .
      */
     public void setId(final String param) {
         this.id = param;
     }
+
     /**
      * getName .
+     *
      * @return String .
      */
     public String getName() {
         return name;
     }
+
     /**
      * setName .
+     *
      * @param param .
      */
     public void setName(final String param) {
         this.name = param;
     }
+
     /**
      * getFileSystemTurning .
+     *
      * @return FileSystemTurning .
      */
     public FileSystemTurning getFileSystemTurning() {
         return fileSystemTurning;
     }
+
     /**
      * setFileSystemTurning .
+     *
      * @param param .
      */
     public void setFileSystemTurning(final FileSystemTurning param) {
         this.fileSystemTurning = param;
     }
+
     /**
      * getCapacityAutonegotiation .
+     *
      * @return CapacityAutonegotiation .
      */
     public CapacityAutonegotiation getCapacityAutonegotiation() {
@@ -75,6 +89,7 @@ public class FileSystemDetail {
 
     /**
      * setCapacityAutonegotiation .
+     *
      * @param param .
      */
     public void setCapacityAutonegotiation(

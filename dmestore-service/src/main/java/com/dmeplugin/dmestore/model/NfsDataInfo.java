@@ -1,10 +1,12 @@
 package com.dmeplugin.dmestore.model;
+
 /**
- * @Description: TODO
+ * NfsDataInfo
+ *
  * @ClassName: NfsDataInfo
  * @Company: GH-CA
  * @author: yy
- * @create: 2020-09-02
+ * @since 2020-12-08
  **/
 public final class NfsDataInfo {
     /**
@@ -90,6 +92,7 @@ public final class NfsDataInfo {
 
     /**
      * getObjectid.
+     *
      * @return String.
      */
     public String getObjectid() {
@@ -98,6 +101,7 @@ public final class NfsDataInfo {
 
     /**
      * setObjectid .
+     *
      * @param objectId .
      */
     public void setObjectid(final String objectId) {
@@ -106,6 +110,7 @@ public final class NfsDataInfo {
 
     /**
      * getName.
+     *
      * @return String.
      */
     public String getName() {
@@ -114,6 +119,7 @@ public final class NfsDataInfo {
 
     /**
      * setName.
+     *
      * @param param .
      */
     public void setName(final String param) {
@@ -131,6 +137,7 @@ public final class NfsDataInfo {
 
     /**
      * setStatus.
+     *
      * @param param .
      */
     public void setStatus(final String param) {
@@ -139,6 +146,7 @@ public final class NfsDataInfo {
 
     /**
      * getCapacity.
+     *
      * @return Double .
      */
     public Double getCapacity() {
@@ -147,6 +155,7 @@ public final class NfsDataInfo {
 
     /**
      * setCapacity.
+     *
      * @param param .
      */
     public void setCapacity(final Double param) {
@@ -155,6 +164,7 @@ public final class NfsDataInfo {
 
     /**
      * getFreeSpace .
+     *
      * @return Double.
      */
     public Double getFreeSpace() {
@@ -163,6 +173,7 @@ public final class NfsDataInfo {
 
     /**
      * setFreeSpace.
+     *
      * @param param .
      */
     public void setFreeSpace(final Double param) {
@@ -180,6 +191,7 @@ public final class NfsDataInfo {
 
     /**
      * setReserveCapacity .
+     *
      * @param param .
      */
     public void setReserveCapacity(final Double param) {
@@ -197,6 +209,7 @@ public final class NfsDataInfo {
 
     /**
      * setDeviceId.
+     *
      * @param param .
      */
     public void setDeviceId(final String param) {
@@ -214,6 +227,7 @@ public final class NfsDataInfo {
 
     /**
      * setDevice .
+     *
      * @param param .
      */
     public void setDevice(final String param) {
@@ -231,6 +245,7 @@ public final class NfsDataInfo {
 
     /**
      * setLogicPort .
+     *
      * @param param .
      */
     public void setLogicPort(final String param) {
@@ -248,6 +263,7 @@ public final class NfsDataInfo {
 
     /**
      * setLogicPortId .
+     *
      * @param param .
      */
     public void setLogicPortId(final String param) {
@@ -255,7 +271,8 @@ public final class NfsDataInfo {
     }
 
     /**
-     *  getShareIp .
+     * getShareIp .
+     *
      * @return String .
      */
     public String getShareIp() {
@@ -264,6 +281,7 @@ public final class NfsDataInfo {
 
     /**
      * setShareIp .
+     *
      * @param param .
      */
     public void setShareIp(final String param) {
@@ -271,7 +289,8 @@ public final class NfsDataInfo {
     }
 
     /**
-     *  getSharePath .
+     * getSharePath .
+     *
      * @return String .
      */
     public String getSharePath() {
@@ -280,6 +299,7 @@ public final class NfsDataInfo {
 
     /**
      * setSharePath.
+     *
      * @param param .
      */
     public void setSharePath(final String param) {
@@ -297,6 +317,7 @@ public final class NfsDataInfo {
 
     /**
      * setShare .
+     *
      * @param param .
      */
     public void setShare(final String param) {
@@ -313,7 +334,8 @@ public final class NfsDataInfo {
     }
 
     /**
-     *  setShareId .
+     * setShareId .
+     *
      * @param param .
      */
     public void setShareId(final String param) {
@@ -322,6 +344,7 @@ public final class NfsDataInfo {
 
     /**
      * getFs.
+     *
      * @return .
      */
     public String getFs() {
@@ -330,6 +353,7 @@ public final class NfsDataInfo {
 
     /**
      * setFs .
+     *
      * @param param .
      */
     public void setFs(final String param) {
@@ -338,6 +362,7 @@ public final class NfsDataInfo {
 
     /**
      * getFsId.
+     *
      * @return .
      */
     public String getFsId() {
@@ -346,6 +371,7 @@ public final class NfsDataInfo {
 
     /**
      * setFsId .
+     *
      * @param param .
      */
     public void setFsId(final String param) {
@@ -353,8 +379,9 @@ public final class NfsDataInfo {
     }
 
     /**
-     *  getOps .
-     * @return ,.
+     * getOps .
+     *
+     * @return , .
      */
     public Float getOps() {
         return ops;
@@ -362,6 +389,7 @@ public final class NfsDataInfo {
 
     /**
      * setOps .
+     *
      * @param param 。
      */
     public void setOps(final Float param) {
@@ -370,6 +398,7 @@ public final class NfsDataInfo {
 
     /**
      * getBandwidth .
+     *
      * @return .
      */
     public Float getBandwidth() {
@@ -378,6 +407,7 @@ public final class NfsDataInfo {
 
     /**
      * setBandwidth .
+     *
      * @param param .
      */
     public void setBandwidth(final Float param) {
@@ -386,6 +416,7 @@ public final class NfsDataInfo {
 
     /**
      * getReadResponseTime .
+     *
      * @return .
      */
     public Float getReadResponseTime() {
@@ -394,6 +425,7 @@ public final class NfsDataInfo {
 
     /**
      * setReadResponseTime .
+     *
      * @param param .
      */
     public void setReadResponseTime(final Float param) {
@@ -411,6 +443,7 @@ public final class NfsDataInfo {
 
     /**
      * setWriteResponseTime .
+     *
      * @param param .
      */
     public void setWriteResponseTime(final Float param) {

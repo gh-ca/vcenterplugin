@@ -4,10 +4,11 @@ import com.dmeplugin.vmware.mo.DatastoreMO;
 import com.vmware.vim25.ManagedObjectReference;
 
 /**
+ * DatastoreMOFactory
+ *
  * @author lianq
- * @className DatastoreMOFactory
- * @description TODO
- * @date 2020/11/26 14:44
+ * @ClassName: DatastoreMOFactory
+ * @since 2020-12-09
  */
 public class DatastoreMOFactory {
 
@@ -16,6 +17,11 @@ public class DatastoreMOFactory {
     private DatastoreMOFactory() {
     }
 
+    /**
+     * getInstance
+     *
+     * @return DatastoreMOFactory
+     */
     public static DatastoreMOFactory getInstance() {
         if (datastoreMOFactory == null) {
             synchronized (DatastoreMOFactory.class) {
@@ -27,6 +33,14 @@ public class DatastoreMOFactory {
         return datastoreMOFactory;
     }
 
+    /**
+     * build
+     *
+     * @param context      context
+     * @param morDatastore morDatastore
+     * @return DatastoreMO
+     * @throws Exception Exception
+     */
     public DatastoreMO build(VmwareContext context, ManagedObjectReference morDatastore) throws Exception {
         return new DatastoreMO(context, morDatastore);
     }

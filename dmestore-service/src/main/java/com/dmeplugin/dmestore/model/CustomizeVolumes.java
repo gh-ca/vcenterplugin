@@ -3,7 +3,11 @@ package com.dmeplugin.dmestore.model;
 import java.util.List;
 
 /**
+ * CustomizeVolumes
+ *
  * @author wangxiangyong
+ * @Description: CustomizeVolumes
+ * @since 2020-12-08
  **/
 public class CustomizeVolumes {
     /**
@@ -49,6 +53,7 @@ public class CustomizeVolumes {
 
     /**
      * getAvailabilityZone .
+     *
      * @return String .
      */
     public String getAvailabilityZone() {
@@ -57,118 +62,151 @@ public class CustomizeVolumes {
 
     /**
      * setAvailabilityZone .
+     *
      * @param param .
      */
     public void setAvailabilityZone(final String param) {
         this.availabilityZone = param;
     }
+
     /**
      * getInitialDistributePolicy .
+     *
      * @return String .
      */
     public String getInitialDistributePolicy() {
         return initialDistributePolicy;
     }
+
     /**
      * setAvailabilityZone .
+     *
      * @param param .
      */
     public void setInitialDistributePolicy(final String param) {
         this.initialDistributePolicy = param;
     }
+
     /**
      * getOwnerController .
+     *
      * @return String .
      */
     public String getOwnerController() {
         return ownerController;
     }
+
     /**
      * setAvailabilityZone .
+     *
      * @param param .
      */
     public void setOwnerController(final String param) {
         this.ownerController = param;
     }
+
     /**
      * getPoolRawId .
+     *
      * @return String .
      */
     public String getPoolRawId() {
         return poolRawId;
     }
+
     /**
      * setAvailabilityZone .
+     *
      * @param param .
      */
     public void setPoolRawId(final String param) {
         this.poolRawId = param;
     }
+
     /**
      * getPrefetchPolicy .
+     *
      * @return String .
      */
     public String getPrefetchPolicy() {
         return prefetchPolicy;
     }
+
     /**
      * setAvailabilityZone .
+     *
      * @param param .
      */
     public void setPrefetchPolicy(final String param) {
         this.prefetchPolicy = param;
     }
+
     /**
      * getPrefetchValue .
+     *
      * @return String .
      */
     public String getPrefetchValue() {
         return prefetchValue;
     }
+
     /**
      * setAvailabilityZone .
+     *
      * @param param .
      */
     public void setPrefetchValue(final String param) {
         this.prefetchValue = param;
     }
+
     /**
      * getStorageId .
+     *
      * @return String .
      */
     public String getStorageId() {
         return storageId;
     }
+
     /**
      * setAvailabilityZone .
+     *
      * @param param .
      */
     public void setStorageId(final String param) {
         this.storageId = param;
     }
+
     /**
      * getTuning .
+     *
      * @return CustomizeVolumeTuningForCreate .
      */
     public CustomizeVolumeTuningForCreate getTuning() {
         return tuning;
     }
+
     /**
      * setAvailabilityZone .
+     *
      * @param param .
      */
     public void setTuning(final CustomizeVolumeTuningForCreate param) {
         this.tuning = param;
     }
+
     /**
      * getVolumeSpecs .
-     * @return List<ServiceVolumeBasicParams> .
+     *
+     * @return List<> .
      */
     public List<ServiceVolumeBasicParams> getVolumeSpecs() {
         return volumeSpecs;
     }
+
     /**
      * setAvailabilityZone .
+     *
      * @param param .
      */
     public void setVolumeSpecs(final List<ServiceVolumeBasicParams> param) {

@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DMEException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.CreateVolumesRequest;
 import com.dmeplugin.dmestore.model.CustomizeVolumeTuningForCreate;
 import com.dmeplugin.dmestore.model.CustomizeVolumes;
@@ -12,7 +12,7 @@ import com.dmeplugin.dmestore.model.VmRdmCreateBean;
 import com.dmeplugin.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import javafx.beans.binding.When;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -21,15 +21,12 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import springfox.documentation.spring.web.json.Json;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.booleanThat;
 import static org.mockito.Mockito.when;
 
 /**
@@ -56,7 +53,7 @@ public class VmRdmServiceImplTest {
     }
 
     @Test
-    public void createRdm() throws DMEException {
+    public void createRdm() throws DmeException {
         VmRdmCreateBean vmRdmCreateBean = new VmRdmCreateBean();
         List<ServiceVolumeBasicParams> volumes = new ArrayList<>();
         ServiceVolumeBasicParams serviceVolumeBasicParams = new ServiceVolumeBasicParams();
@@ -172,7 +169,7 @@ public class VmRdmServiceImplTest {
     }
 
     @Test
-    public void createRdm1() throws DMEException {
+    public void createRdm1() throws DmeException {
         VmRdmCreateBean vmRdmCreateBean = new VmRdmCreateBean();
         List<ServiceVolumeBasicParams> volumes = new ArrayList<>();
         ServiceVolumeBasicParams serviceVolumeBasicParams = new ServiceVolumeBasicParams();
@@ -317,14 +314,14 @@ public class VmRdmServiceImplTest {
     }
 
     @Test
-    public void getAllDmeHost() throws DMEException {
+    public void getAllDmeHost() throws DmeException {
         List<Map<String, Object>> list = new ArrayList<>();
         when(dmeAccessService.getDmeHosts(null)).thenReturn(list);
         vmRdmService.getAllDmeHost();
     }
 
     @Test
-    public void getDatastoreMountsOnHost() throws DMEException {
+    public void getDatastoreMountsOnHost() throws DmeException {
         when(vcsdkUtils.getDatastoreMountsOnHost("321")).thenReturn(new ArrayList<>());
         vmRdmService.getDatastoreMountsOnHost("321");
     }

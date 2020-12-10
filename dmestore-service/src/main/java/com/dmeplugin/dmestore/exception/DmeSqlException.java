@@ -1,6 +1,6 @@
 package com.dmeplugin.dmestore.exception;
 
-public class DmeSqlException extends DMEException {
+public class DmeSqlException extends DmeException {
     public DmeSqlException() {
         super();
     }

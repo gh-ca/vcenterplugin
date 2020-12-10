@@ -1,9 +1,11 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * QosParam
+ *
  * @author lianq
- * @ClassName:  QosParam
- * @since  2020/9/15 14:57
+ * @ClassName: QosParam
+ * @since 2020-09-15
  */
 public class QosParam {
     /**
@@ -15,7 +17,7 @@ public class QosParam {
      */
     private Integer latency;
     /**
-     * Unit of response time eg:ms s .
+     * Unit of response time eg:ms s.
      */
     private String latencyUnit;
     /**
@@ -41,6 +43,7 @@ public class QosParam {
 
     /**
      * getLatency .
+     *
      * @return Integer .
      */
     public Integer getLatency() {
@@ -49,104 +52,133 @@ public class QosParam {
 
     /**
      * setLatency .
+     *
      * @param param .
      */
     public void setLatency(final Integer param) {
         this.latency = param;
     }
+
     /**
      * getLatencyUnit .
+     *
      * @return String .
      */
     public String getLatencyUnit() {
         return latencyUnit;
     }
+
     /**
      * setLatencyUnit .
+     *
      * @param param .
      */
     public void setLatencyUnit(final String param) {
         this.latencyUnit = param;
     }
+
     /**
      * getMinBandWidth .
+     *
      * @return Integer .
      */
     public Integer getMinBandWidth() {
         return minBandWidth;
     }
+
     /**
      * setMinBandWidth .
+     *
      * @param param .
      */
     public void setMinBandWidth(final Integer param) {
         this.minBandWidth = param;
     }
+
     /**
      * getMinIOPS .
+     *
      * @return Integer .
      */
     public Integer getMinIOPS() {
         return minIOPS;
     }
+
     /**
      * setMinIOPS .
+     *
      * @param param .
      */
     public void setMinIOPS(final Integer param) {
         this.minIOPS = param;
     }
+
     /**
      * getMaxBandWidth .
+     *
      * @return Integer .
      */
     public Integer getMaxBandWidth() {
         return maxBandWidth;
     }
+
     /**
      * setMaxBandWidth .
+     *
      * @param param .
      */
     public void setMaxBandWidth(final Integer param) {
         this.maxBandWidth = param;
     }
+
     /**
-     * getMaxIOPS .
-     * @return Integer .
+     * getMaxIOPS.
+     *
+     * @return Integer.
      */
     public Integer getMaxIOPS() {
         return maxIOPS;
     }
+
     /**
      * setMaxIOPS .
+     *
      * @param param .
      */
     public void setMaxIOPS(final Integer param) {
         this.maxIOPS = param;
     }
+
     /**
      * getEnabled .
-     * @return Boolean .
+     *
+     * @return Boolean.
      */
     public Boolean getEnabled() {
         return enabled;
     }
+
     /**
      * setLatency .
+     *
      * @param param .
      */
     public void setEnabled(final Boolean param) {
         this.enabled = param;
     }
+
     /**
      * getSmartQos .
+     *
      * @return SmartQos .
      */
     public SmartQos getSmartQos() {
         return smartQos;
     }
+
     /**
      * setSmartQos .
+     *
      * @param param .
      */
     public void setSmartQos(final SmartQos param) {

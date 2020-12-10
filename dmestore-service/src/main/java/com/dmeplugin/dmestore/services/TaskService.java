@@ -1,7 +1,6 @@
 package com.dmeplugin.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DMEException;
-import com.dmeplugin.dmestore.exception.DmeSqlException;
+import com.dmeplugin.dmestore.exception.DmeException;
 import com.dmeplugin.dmestore.model.TaskDetailInfo;
 import com.google.gson.JsonObject;
 
@@ -31,5 +30,5 @@ public interface TaskService {
      * @Param [taskId]
      * @Return com.google.gson.JsonObject
      **/
-    JsonObject queryTaskByIdUntilFinish(String taskId) throws DMEException;
+    JsonObject queryTaskByIdUntilFinish(String taskId) throws DmeException;
 }

@@ -1,9 +1,13 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * BaseSmartQos .
+ *
  * @author lianq
+ * @Description: BaseSmartQos
  * @ClassName: BaseSmartQos
  * @Company: GH-CA
+ * @since 2020-12-07
  */
 public class BaseSmartQos {
     /**
@@ -41,6 +45,7 @@ public class BaseSmartQos {
 
     /**
      * getLatencyUnit.
+     *
      * @return .
      */
     public String getLatencyUnit() {
@@ -49,76 +54,97 @@ public class BaseSmartQos {
 
     /**
      * setLatencyUnit .
+     *
      * @param param .
      */
     public void setLatencyUnit(final String param) {
         this.latencyUnit = param;
     }
+
     /**
-     *getEnabled .
+     * getEnabled .
+     *
      * @return .
      */
     public Boolean getEnabled() {
         return enabled;
     }
+
     /**
      * setLatencyUnit .
+     *
      * @param param .
      */
     public void setEnabled(final Boolean param) {
         this.enabled = param;
     }
+
     /**
      * getName .
+     *
      * @return .
      */
     public String getName() {
         return name;
     }
+
     /**
      * setLatencyUnit .
+     *
      * @param param .
      */
     public void setName(final String param) {
         this.name = param;
     }
+
     /**
      * getLatency .
+     *
      * @return .
      */
     public Integer getLatency() {
         return latency;
     }
+
     /**
      * setLatencyUnit .
+     *
      * @param param .
      */
     public void setLatency(final Integer param) {
         this.latency = param;
     }
+
     /**
      * getMaxbandwidth .
+     *
      * @return .
      */
     public Integer getMaxbandwidth() {
         return maxbandwidth;
     }
+
     /**
      * setLatencyUnit .
+     *
      * @param param .
      */
     public void setMaxbandwidth(final Integer param) {
         this.maxbandwidth = param;
     }
+
     /**
      * getMaxiops .
+     *
      * @return .
      */
     public Integer getMaxiops() {
         return maxiops;
     }
+
     /**
      * setLatencyUnit .
+     *
      * @param param .
      */
     public void setMaxiops(final Integer param) {
@@ -133,26 +159,31 @@ public class BaseSmartQos {
     public Integer getMinbandwidth() {
         return minbandwidth;
     }
+
     /**
      * setLatencyUnit .
+     *
      * @param param .
      */
     public void setMinbandwidth(final Integer param) {
         this.minbandwidth = param;
     }
+
     /**
-     *  getMiniops .
+     * getMiniops .
+     *
      * @return .
      */
     public Integer getMiniops() {
         return miniops;
     }
+
     /**
      * setLatencyUnit .
+     *
      * @param param .
      */
     public void setMiniops(final Integer param) {
         this.miniops = param;
     }
-
 }

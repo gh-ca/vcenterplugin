@@ -1,8 +1,11 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * CapacityAutonegotiation
+ *
  * @author lianq
- * @since  2020/10/15 16:28
+ * @Description: CapacityAutonegotiation
+ * @since 2020-10-15
  */
 public class CapacityAutonegotiation {
     /**
@@ -21,6 +24,7 @@ public class CapacityAutonegotiation {
 
     /**
      * getAutoSizeEnable .
+     *
      * @return Boolean .
      */
     public Boolean getAutoSizeEnable() {
@@ -29,6 +33,7 @@ public class CapacityAutonegotiation {
 
     /**
      * setAutoSizeEnable .
+     *
      * @param param .
      */
     public void setAutoSizeEnable(final Boolean param) {

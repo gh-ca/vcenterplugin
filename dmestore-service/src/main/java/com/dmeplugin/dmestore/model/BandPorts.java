@@ -1,7 +1,11 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * BandPorts
+ *
  * @author lianq
+ *
+ * @since 2020-12-07
  */
 public class BandPorts {
     /**
@@ -13,6 +17,7 @@ public class BandPorts {
      * name .
      */
     private String name;
+
     /**
      * healthStatus .
      */
@@ -22,6 +27,7 @@ public class BandPorts {
      * runningStatus .
      */
     private String runningStatus;
+
     /**
      * mtu.
      */
@@ -38,6 +44,7 @@ public class BandPorts {
 
     /**
      * setId .
+     *
      * @param param .
      */
     public void setId(final String param) {
@@ -55,6 +62,7 @@ public class BandPorts {
 
     /**
      * setName .
+     *
      * @param param .
      */
     public void setName(final String param) {
@@ -72,6 +80,7 @@ public class BandPorts {
 
     /**
      * setHealthStatus .
+     *
      * @param param .
      */
     public void setHealthStatus(final String param) {
@@ -89,6 +98,7 @@ public class BandPorts {
 
     /**
      * setRunningStatus .
+     *
      * @param param .
      */
     public void setRunningStatus(final String param) {
@@ -106,6 +116,7 @@ public class BandPorts {
 
     /**
      * setMtu .
+     *
      * @param param .
      */
     public void setMtu(final String param) {

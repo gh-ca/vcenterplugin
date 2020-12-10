@@ -1,9 +1,11 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * FileSystemTurning
+ *
  * @author lianq
- * @ClassName:  FileSystemTurning
- * @since  2020/10/15 15:48
+ * @ClassName: FileSystemTurning
+ * @since 2020-10-15
  */
 public class FileSystemTurning {
     /**
@@ -25,6 +27,7 @@ public class FileSystemTurning {
 
     /**
      * getDeduplicationEnabled .
+     *
      * @return Boolean .
      */
     public Boolean getDeduplicationEnabled() {
@@ -33,48 +36,61 @@ public class FileSystemTurning {
 
     /**
      * setDeduplicationEnabled .
+     *
      * @param param .
      */
     public void setDeduplicationEnabled(final Boolean param) {
         this.deduplicationEnabled = param;
     }
+
     /**
      * getCompressionEnabled .
+     *
      * @return Boolean .
      */
     public Boolean getCompressionEnabled() {
         return compressionEnabled;
     }
+
     /**
      * setCompressionEnabled .
+     *
      * @param param .
      */
     public void setCompressionEnabled(final Boolean param) {
         this.compressionEnabled = param;
     }
+
     /**
      * getAllocationType .
+     *
      * @return String .
      */
     public String getAllocationType() {
         return allocationType;
     }
+
     /**
      * setAllocationType .
+     *
      * @param param .
      */
     public void setAllocationType(final String param) {
         this.allocationType = param;
     }
+
     /**
      * getSmartQos .
+     *
      * @return SmartQos .
      */
     public SmartQos getSmartQos() {
         return smartQos;
     }
+
     /**
      * setSmartQos .
+     *
      * @param param .
      */
     public void setSmartQos(final SmartQos param) {

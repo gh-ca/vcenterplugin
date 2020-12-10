@@ -1,14 +1,14 @@
 package com.dmeplugin.vmware.util;
 
 import com.dmeplugin.vmware.mo.ClusterMO;
-import com.dmeplugin.vmware.mo.DatastoreMO;
 import com.vmware.vim25.ManagedObjectReference;
 
 /**
+ * ClusterMOFactory
+ *
  * @author lianq
- * @className ClusterMOFactory
- * @description TODO
- * @date 2020/11/26 16:46
+ * @ClassName: ClusterMOFactory
+ * @since 2020-12-09
  */
 public class ClusterMOFactory {
     private static ClusterMOFactory clusterMOFactory;
@@ -16,6 +16,11 @@ public class ClusterMOFactory {
     private ClusterMOFactory() {
     }
 
+    /**
+     * getInstance
+     *
+     * @return ClusterMOFactory
+     */
     public static ClusterMOFactory getInstance() {
         if (clusterMOFactory == null) {
             synchronized (ClusterMOFactory.class) {
@@ -27,6 +32,14 @@ public class ClusterMOFactory {
         return clusterMOFactory;
     }
 
+    /**
+     * build
+     *
+     * @param context context
+     * @param morCluster morCluster
+     * @return ClusterMO
+     * @throws Exception Exception
+     */
     public ClusterMO build(VmwareContext context, ManagedObjectReference morCluster) throws Exception {
         return new ClusterMO(context, morCluster);
     }

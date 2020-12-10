@@ -1,7 +1,11 @@
 package com.dmeplugin.dmestore.model;
 
 /**
+ * BestPracticeUpResultBase
+ *
  * @author wangxiangyong
+ * @Description: BestPracticeUpResultBase
+ * @since 2020-12-08
  **/
 public class BestPracticeUpResultBase {
     /**
@@ -23,6 +27,7 @@ public class BestPracticeUpResultBase {
 
     /**
      * getHostSetting .
+     *
      * @return String .
      */
     public String getHostSetting() {
@@ -31,48 +36,61 @@ public class BestPracticeUpResultBase {
 
     /**
      * setHostSetting .
+     *
      * @param param .
      */
     public void setHostSetting(final String param) {
         this.hostSetting = param;
     }
+
     /**
      * getNeedReboot .
+     *
      * @return boolean .
      */
     public boolean getNeedReboot() {
         return needReboot;
     }
+
     /**
      * setHostSetting .
+     *
      * @param param .
      */
     public void setNeedReboot(final boolean param) {
         this.needReboot = param;
     }
+
     /**
      * getHostObjectId .
+     *
      * @return String .
      */
     public String getHostObjectId() {
         return hostObjectId;
     }
+
     /**
      * setHostSetting .
+     *
      * @param param .
      */
     public void setHostObjectId(final String param) {
         this.hostObjectId = param;
     }
+
     /**
      * getUpdateResult .
+     *
      * @return boolean .
      */
     public boolean getUpdateResult() {
         return updateResult;
     }
+
     /**
      * setHostSetting .
+     *
      * @param param .
      */
     public void setUpdateResult(final boolean param) {
