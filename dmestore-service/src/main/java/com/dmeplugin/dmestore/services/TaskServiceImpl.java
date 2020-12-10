@@ -190,6 +190,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     /**
+     * getTaskStatus
+     *
      * @param taskIds 待查询的任务id集合
      * @param taskStatusMap 结束任务对应的状态集合
      * @param timeout 任务查询超时时间 单位ms
@@ -269,5 +271,4 @@ public class TaskServiceImpl implements TaskService {
     public void setDmeAccessService(DmeAccessService dmeAccessService) {
         this.dmeAccessService = dmeAccessService;
     }
-
 }

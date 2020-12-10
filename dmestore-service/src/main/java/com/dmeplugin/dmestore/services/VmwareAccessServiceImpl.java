@@ -60,7 +60,6 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             LOG.error("list hosts error:", e);
             throw new DmeException(e.getMessage());
         }
-        LOG.info("listHosts===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
 
@@ -79,7 +78,6 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             LOG.error("get Hosts By DsObjectId error:", e);
             throw new DmeException(e.getMessage());
         }
-        LOG.info("getHostsByDsObjectId===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
 
@@ -98,7 +96,6 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             LOG.error("list listClusters error:", e);
             throw new DmeException(e.getMessage());
         }
-        LOG.info("listClusters===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
 
@@ -117,7 +114,6 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             LOG.error("get Clusters By DsObjectId error:", e);
             throw new DmeException(e.getMessage());
         }
-        LOG.info("getClustersByDsObjectId===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
 
@@ -149,8 +145,6 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             LOG.error("get DataStores By HostObjectId error:", e);
             throw new DmeException(e.getMessage());
         }
-        LOG.info(
-            "getDataStoresByHostObjectId===" + (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
 
@@ -182,8 +176,6 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             LOG.error("get DataStores By ClusterObjectId error:", e);
             throw new DmeException(e.getMessage());
         }
-        LOG.info("getDataStoresByClusterObjectId===" +
-            (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
 
@@ -209,7 +201,7 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
 
     @Override
     public List<Map<String, String>> getMountDataStoresByHostObjectId(String hostObjectId, String dataStoreType)
-        throws Exception {
+        throws DmeException {
         List<Map<String, String>> lists = null;
         try {
             //根据存储类型，取得vcenter中的所有存储。
@@ -233,16 +225,14 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             }
         } catch (Exception e) {
             LOG.error("get mount DataStores By HostObjectId error:", e);
-            throw e;
+            throw new DmeException(e.getMessage());
         }
-        LOG.info("getMountDataStoresByHostObjectId===" +
-            (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
 
     @Override
     public List<Map<String, String>> getMountDataStoresByClusterObjectId(String clusterObjectId, String dataStoreType)
-        throws Exception {
+        throws DmeException {
         List<Map<String, String>> lists = null;
         try {
             //根据存储类型，取得vcenter中的所有存储。
@@ -266,11 +256,8 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
             }
         } catch (Exception e) {
             LOG.error("get mount DataStores By ClusterObjectId error:", e);
-            throw e;
+            throw new DmeException(e.getMessage());
         }
-        LOG.info("getMountDataStoresByHostObjectId===" +
-            (lists == null ? "null" : (lists.size() + "==" + gson.toJson(lists))));
         return lists;
     }
-
 }
