@@ -1,6 +1,21 @@
 package com.dmeplugin.vmware.mo;
 
-public interface CustomFieldConstants {
-    String CLOUD_UUID = "cloud.uuid";
-    String CLOUD_VM_INTERNAL_NAME = "cloud.vm.internal.name";
+/**
+ * CustomFieldConstants
+ *
+ * @author Administrator
+ * @since 2020-12-11
+ */
+public class CustomFieldConstants {
+    /**
+     * CLOUD_UUID
+     */
+    public static final String CLOUD_UUID = "cloud.uuid";
+
+    /**
+     * CLOUD_VM_INTERNAL_NAME
+     */
+    public static final String CLOUD_VM_INTERNAL_NAME = "cloud.vm.internal.name";
+
+    private CustomFieldConstants() { }
 }

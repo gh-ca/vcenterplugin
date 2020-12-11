@@ -1,13 +1,32 @@
 package com.dmeplugin.vmware.mo;
 
+/**
+ * DatastoreFile
+ *
+ * @author Administrator
+ * @since 2020-12-11
+ */
 public class DatastoreFile {
+    private static final String INDEXSTR = "]";
     private String path;
 
+    /**
+     * DatastoreFile
+     *
+     * @param path path
+     */
     public DatastoreFile(String path) {
-        assert (path != null);
+        assert path != null;
         this.path = path;
     }
 
+    /**
+     * DatastoreFile
+     *
+     * @param datastoreName datastoreName
+     * @param dir           dir
+     * @param fileName      fileName
+     */
     public DatastoreFile(String datastoreName, String dir, String fileName) {
         if (dir == null || dir.isEmpty()) {
             path = String.format("[%s] %s", datastoreName, fileName);
@@ -25,9 +44,14 @@ public class DatastoreFile {
     }
 
     public void setPath(String path) {
-       this.path = path;
+        this.path = path;
     }
 
+    /**
+     * getRelativePath
+     *
+     * @return String
+     */
     public String getRelativePath() {
         int pos = path.indexOf(']');
         if (pos < 0) {
@@ -39,8 +63,13 @@ public class DatastoreFile {
         return path.substring(pos).trim();
     }
 
+    /**
+     * getFileName
+     *
+     * @return String
+     */
     public String getFileName() {
-        int startPos = path.indexOf("]");
+        int startPos = path.indexOf(INDEXSTR);
         if (startPos < 0) {
             startPos = 0;
         } else {
@@ -55,21 +84,40 @@ public class DatastoreFile {
         }
     }
 
+    /**
+     * isFullDatastorePath
+     *
+     * @param path path
+     * @return boolean
+     */
     public static boolean isFullDatastorePath(String path) {
         return path.matches("^\\[.*\\].*");
     }
 
+    /**
+     * getDatastoreNameFromPath
+     *
+     * @param path path
+     * @return String
+     */
     public static String getDatastoreNameFromPath(String path) {
         if (isFullDatastorePath(path)) {
-            int endPos = path.indexOf("]");
+            int endPos = path.indexOf(INDEXSTR);
             return path.substring(1, endPos).trim();
         }
         return null;
     }
 
+    /**
+     * getCompanionDatastorePath
+     *
+     * @param path path
+     * @param companionFileName companionFileName
+     * @return String
+     */
     public static String getCompanionDatastorePath(String path, String companionFileName) {
         if (isFullDatastorePath(path)) {
-            int endPos = path.indexOf("]");
+            int endPos = path.indexOf(INDEXSTR);
             String dsName = path.substring(1, endPos);
             String dsRelativePath = path.substring(endPos + 1).trim();
 
