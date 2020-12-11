@@ -445,7 +445,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         return ToolUtils.jsonToStr(jsonObject.get("task_id"));
     }
 
-    private String createNfsShare(Map<String, Object> params) throws Exception {
+    private String createNfsShare(Map<String, Object> params) throws DmeException {
         ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.API_NFSSHARE_CREATE,
             HttpMethod.POST, gson.toJson(params));
         int code = responseEntity.getStatusCodeValue();
@@ -556,7 +556,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         return fsId;
     }
 
-    private String getShareIdByName(String shareName, String fsname) throws Exception {
+    private String getShareIdByName(String shareName, String fsname) throws DmeException {
         String shareId = "";
         Map<String, String> reqMap = new HashMap<>();
         if (!StringUtils.isEmpty(shareName) && !StringUtils.isEmpty(fsname)) {
