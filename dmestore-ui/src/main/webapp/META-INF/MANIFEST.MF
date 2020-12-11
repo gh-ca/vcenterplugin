@@ -1,15 +1,15 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: dmestore-ui
-Bundle-SymbolicName: com.dmeplugin.dmestore.dmestore-ui
+Bundle-SymbolicName: com.huawei.dmestore.dmestore-ui
 Bundle-Version: 1.0.0
 Bundle-Vendor: VMware
 Web-ContextPath: ui/dmestore
-Import-Package: com.dmeplugin.dmestore.services;version="1.0.0",
- com.dmeplugin.dmestore.mvc;version="1.0.0",
- com.dmeplugin.dmestore.entity;version="1.0.0",
- com.dmeplugin.dmestore.model;version="1.0.0",
- com.dmeplugin.dmestore.exception;version="1.0.0",
+Import-Package: com.huawei.dmestore.services;version="1.0.0",
+ com.huawei.dmestore.mvc;version="1.0.0",
+ com.huawei.dmestore.entity;version="1.0.0",
+ com.huawei.dmestore.model;version="1.0.0",
+ com.huawei.dmestore.exception;version="1.0.0",
  com.vmware.vise.data;version="0",
  com.vmware.vise.data.query;version="0",
  com.vmware.vise.usersession;version="0",
