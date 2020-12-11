@@ -4,7 +4,7 @@
 // regarding copyright ownership.  The ASF licenses this file
 // to you under the Apache License, Version 2.0 (the
 // "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
+// with the License.  You may obtain copy of the License at
 //
 //   http://www.apache.org/licenses/LICENSE-2.0
 //
@@ -21,13 +21,24 @@ import com.dmeplugin.vmware.util.VmwareContext;
 import com.vmware.vim25.CustomFieldDef;
 import com.vmware.vim25.ManagedObjectReference;
 
+/**
+ * BaseMO
+ *
+ * @author Administrator
+ * @since 2020-12-11
+ */
 public class BaseMO {
     protected VmwareContext context;
-
     protected ManagedObjectReference mor;
 
     private String name;
 
+    /**
+     * BaseMO
+     *
+     * @param context context
+     * @param mor     mor
+     */
     public BaseMO(VmwareContext context, ManagedObjectReference mor) {
         assert context != null;
 
@@ -35,6 +46,13 @@ public class BaseMO {
         this.mor = mor;
     }
 
+    /**
+     * BaseMO
+     *
+     * @param context  context
+     * @param morType  morType
+     * @param morValue morValue
+     */
     public BaseMO(VmwareContext context, String morType, String morValue) {
         assert context != null;
         assert morType != null;
@@ -50,15 +68,32 @@ public class BaseMO {
         return context;
     }
 
+    /**
+     * getMor
+     *
+     * @return ManagedObjectReference
+     */
     public ManagedObjectReference getMor() {
         assert mor != null;
         return mor;
     }
 
+    /**
+     * getParentMor
+     *
+     * @return ManagedObjectReference
+     * @throws Exception Exception
+     */
     public ManagedObjectReference getParentMor() throws Exception {
         return (ManagedObjectReference) context.getVimClient().getDynamicProperty(mor, "parent");
     }
 
+    /**
+     * getName
+     *
+     * @return String
+     * @throws Exception Exception
+     */
     public String getName() throws Exception {
         if (name == null) {
             name = (String) context.getVimClient().getDynamicProperty(mor, "name");
@@ -67,6 +102,13 @@ public class BaseMO {
         return name;
     }
 
+    /**
+     * setCustomFieldValue
+     *
+     * @param fieldName fieldName
+     * @param value value
+     * @throws Exception Exception
+     */
     public void setCustomFieldValue(String fieldName, String value) throws Exception {
         CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context,
             context.getServiceContent().getCustomFieldsManager());
@@ -87,12 +129,27 @@ public class BaseMO {
         cfmMo.setField(getMor(), key, value);
     }
 
+    /**
+     * getCustomFieldKey
+     *
+     * @param fieldName fieldName
+     * @return int
+     * @throws Exception Exception
+     */
     public int getCustomFieldKey(String fieldName) throws Exception {
         return getCustomFieldKey(getMor().getType(), fieldName);
     }
 
+    /**
+     * getCustomFieldKey
+     *
+     * @param morType morType
+     * @param fieldName fieldName
+     * @return int
+     * @throws Exception Exception
+     */
     public int getCustomFieldKey(String morType, String fieldName) throws Exception {
-        assert (morType != null);
+        assert morType != null;
 
         CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context,
             context.getServiceContent().getCustomFieldsManager());

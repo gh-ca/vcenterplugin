@@ -20,7 +20,7 @@ import org.mockito.Spy;
 public class VmwareHelperTest {
 
     @InjectMocks
-    VmwareHelper vmwareHelper = new VmwareHelper();
+    VmwareHelper vmwareHelper;
 
     @Before
     public void setUp() throws Exception {

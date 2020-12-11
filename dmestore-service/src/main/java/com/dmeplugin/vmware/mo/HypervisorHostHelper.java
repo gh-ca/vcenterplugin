@@ -7,10 +7,24 @@ import com.vmware.vim25.ObjectContent;
 
 import java.util.List;
 
+/**
+ * HypervisorHostHelper
+ *
+ * @author Administrator
+ * @since 2020-12-11
+ */
 public class HypervisorHostHelper {
-
+    /**
+     * findVmFromObjectContent
+     *
+     * @param context                 context
+     * @param ocs                     ocs
+     * @param name                    name
+     * @param instanceNameCustomField instanceNameCustomField
+     * @return VirtualMachineMO
+     */
     public static VirtualMachineMO findVmFromObjectContent(VmwareContext context, ObjectContent[] ocs, String name,
-        String instanceNameCustomField) {
+                                                           String instanceNameCustomField) {
         if (ocs != null && ocs.length > 0) {
             for (ObjectContent oc : ocs) {
                 String vmNameInvCenter = null;
@@ -25,7 +39,6 @@ public class HypervisorHostHelper {
                                 vmInternalCsName = ((CustomFieldStringValue) objProp.getVal()).getValue();
                             }
                         }
-
                         if ((vmNameInvCenter != null && name.equalsIgnoreCase(vmNameInvCenter)) || (
                             vmInternalCsName != null && name.equalsIgnoreCase(vmInternalCsName))) {
                             VirtualMachineMO vmMo = new VirtualMachineMO(context, oc.getObj());

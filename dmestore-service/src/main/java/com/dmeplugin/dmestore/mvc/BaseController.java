@@ -61,6 +61,12 @@ public class BaseController {
 
     private static final ResponseBodyBean SUCCESS_BEAN = new ResponseBodyBean(CODE_SUCCESS, null, null);
 
+    /**
+     * handleException
+     *
+     * @param exception exception
+     * @return Map
+     */
     @ExceptionHandler(NoDmeException.class)
     @ResponseStatus(HttpStatus.OK)
     protected Map<String, Object> handleException(final NoDmeException exception) {
@@ -68,6 +74,13 @@ public class BaseController {
         return generateError(generateCode(exception.getCode()), exception.getMessage(), Collections.emptyList());
     }
 
+    /**
+     * handleException
+     *
+     * @param exception exception
+     * @param request request
+     * @return Map
+     */
     @ExceptionHandler(RestClientException.class)
     @ResponseStatus(HttpStatus.OK)
     protected Map<String, Object> handleException(final RestClientException exception,
@@ -80,6 +93,13 @@ public class BaseController {
         return generateError(request, CODE_ESIGHT_CONNECT_EXCEPTION, exception.getMessage(), null);
     }
 
+    /**
+     * handleException
+     *
+     * @param exception exception
+     * @param request request
+     * @return Map
+     */
     @ExceptionHandler(VcenterRuntimeException.class)
     @ResponseStatus(HttpStatus.OK)
     protected Map<String, Object> handleException(final VcenterRuntimeException exception,
@@ -88,6 +108,13 @@ public class BaseController {
         return generateError(request, generateCode(exception.getCode()), exception.getMessage(), null);
     }
 
+    /**
+     * handleException
+     *
+     * @param exception exception
+     * @param request request
+     * @return Map
+     */
     @ExceptionHandler(DmeException.class)
     @ResponseStatus(HttpStatus.OK)
     protected Map<String, Object> handleException(final DmeException exception, final HttpServletRequest request) {
@@ -98,6 +125,13 @@ public class BaseController {
         return generateError(request, PREFIX + exception.getCode(), exception.getMessage(), null);
     }
 
+    /**
+     * handleException
+     *
+     * @param exception exception
+     * @param request request
+     * @return Map
+     */
     @ExceptionHandler(SQLException.class)
     @ResponseStatus(HttpStatus.OK)
     protected Map<String, Object> handleException(final SQLException exception, final HttpServletRequest request) {
@@ -109,6 +143,13 @@ public class BaseController {
         return errorMap;
     }
 
+    /**
+     * handleException
+     *
+     * @param exception exception
+     * @param request request
+     * @return Map
+     */
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.OK)
     protected Map<String, Object> handleException(final Exception exception, final HttpServletRequest request) {
@@ -136,26 +177,61 @@ public class BaseController {
         return generateError(null, code, message, data);
     }
 
+    /**
+     * generateCode
+     *
+     * @return String
+     */
     public String generateCode() {
         return generateCode(null);
     }
 
+    /**
+     * generateCode
+     *
+     * @param code code
+     * @return String
+     */
     public String generateCode(final String code) {
         return (code == null || code.isEmpty()) ? CODE_FAILURE : code;
     }
 
+    /**
+     * isSuccessResponse
+     *
+     * @param code code
+     * @return boolean
+     */
     public boolean isSuccessResponse(final Object code) {
         return DMEOpenApiService.isSuccessResponse(code);
     }
 
+    /**
+     * success
+     *
+     * @return ResponseBodyBean
+     */
     protected ResponseBodyBean success() {
         return SUCCESS_BEAN;
     }
 
+    /**
+     * success
+     *
+     * @param data data
+     * @return ResponseBodyBean
+     */
     protected ResponseBodyBean success(Object data) {
         return success(data, null);
     }
 
+    /**
+     * success
+     *
+     * @param data data
+     * @param description description
+     * @return ResponseBodyBean
+     */
     protected ResponseBodyBean success(Object data, String description) {
         ResponseBodyBean bodyBean = new ResponseBodyBean(CODE_SUCCESS, null, null);
         bodyBean.setData(data);
@@ -163,14 +239,32 @@ public class BaseController {
         return bodyBean;
     }
 
+    /**
+     * failure
+     *
+     * @return ResponseBodyBean
+     */
     protected ResponseBodyBean failure() {
         return FAILURE_BEAN;
     }
 
+    /**
+     * failure
+     *
+     * @param description description
+     * @return ResponseBodyBean
+     */
     protected ResponseBodyBean failure(String description) {
         return failure(CODE_FAILURE, description);
     }
 
+    /**
+     * failure
+     *
+     * @param code code
+     * @param description description
+     * @return ResponseBodyBean
+     */
     protected ResponseBodyBean failure(String code, String description) {
         ResponseBodyBean bodyBean = new ResponseBodyBean(CODE_FAILURE, null, null);
         bodyBean.setDescription(description);
@@ -178,6 +272,14 @@ public class BaseController {
         return bodyBean;
     }
 
+    /**
+     * failure
+     *
+     * @param code code
+     * @param description description
+     * @param data data
+     * @return ResponseBodyBean
+     */
     protected ResponseBodyBean failure(String code, String description, Object data) {
         ResponseBodyBean bodyBean = new ResponseBodyBean(CODE_FAILURE, null, null);
         bodyBean.setDescription(description);
@@ -187,6 +289,13 @@ public class BaseController {
         return bodyBean;
     }
 
+    /**
+     * failure
+     *
+     * @param description description
+     * @param data data
+     * @return ResponseBodyBean
+     */
     protected ResponseBodyBean failure(String description, Object data) {
         return failure(CODE_FAILURE, description, data);
     }

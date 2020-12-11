@@ -7,21 +7,56 @@ import com.vmware.vim25.PrivilegePolicyDef;
 
 import java.util.List;
 
+/**
+ * CustomFieldsManagerMO
+ *
+ * @author Administrator
+ * @since 2020-12-11
+ */
 public class CustomFieldsManagerMO extends BaseMO {
-
+    /**
+     * CustomFieldsManagerMO
+     *
+     * @param context context
+     * @param mor mor
+     */
     public CustomFieldsManagerMO(VmwareContext context, ManagedObjectReference mor) {
         super(context, mor);
     }
 
+    /**
+     * addCustomerFieldDef
+     *
+     * @param fieldName fieldName
+     * @param morType morType
+     * @param fieldDefPolicy fieldDefPolicy
+     * @param fieldPolicy fieldPolicy
+     * @return CustomFieldDef
+     * @throws Exception Exception
+     */
     public CustomFieldDef addCustomerFieldDef(String fieldName, String morType, PrivilegePolicyDef fieldDefPolicy,
         PrivilegePolicyDef fieldPolicy) throws Exception {
         return context.getService().addCustomFieldDef(getMor(), fieldName, morType, fieldDefPolicy, fieldPolicy);
     }
 
+    /**
+     * setField
+     *
+     * @param morEntity morEntity
+     * @param key key
+     * @param value value
+     * @throws Exception Exception
+     */
     public void setField(ManagedObjectReference morEntity, int key, String value) throws Exception {
         context.getService().setField(getMor(), morEntity, key, value);
     }
 
+    /**
+     * getFields
+     *
+     * @return List
+     * @throws Exception Exception
+     */
     public List<CustomFieldDef> getFields() throws Exception {
         return context.getVimClient().getDynamicProperty(getMor(), "field");
     }

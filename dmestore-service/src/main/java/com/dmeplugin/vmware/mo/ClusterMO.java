@@ -24,13 +24,19 @@ import com.vmware.vim25.PropertySpec;
 import com.vmware.vim25.TraversalSpec;
 import com.vmware.vim25.VirtualMachineConfigOption;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * ClusterMO
+ *
+ * @author Administrator
+ * @since 2020-12-11
+ */
 public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
     private static final Logger LOGGER = LoggerFactory.getLogger(ClusterMO.class);
 
@@ -44,6 +50,12 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
 
     private HostMOFactory hostFactory = HostMOFactory.getInstance();
 
+    /**
+     * ClusterMO
+     *
+     * @param context    context
+     * @param morCluster morCluster
+     */
     public ClusterMO(VmwareContext context, ManagedObjectReference morCluster) {
         super(context, morCluster);
     }
@@ -63,6 +75,12 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         return null;
     }
 
+    /**
+     * getClusterConfigInfo
+     *
+     * @return ClusterConfigInfoEx
+     * @throws Exception Exception
+     */
     public ClusterConfigInfoEx getClusterConfigInfo() throws Exception {
         ClusterConfigInfoEx configInfo = context.getVimClient().getDynamicProperty(mor, "configurationEx");
         return configInfo;
@@ -255,6 +273,13 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         return properties.toArray(new ObjectContent[properties.size()]);
     }
 
+    /**
+     * getHostPropertiesOnCluster
+     *
+     * @param propertyPaths propertyPaths
+     * @return ObjectContent[] ObjectContent
+     * @throws Exception Exception
+     */
     public ObjectContent[] getHostPropertiesOnCluster(String[] propertyPaths) throws Exception {
         PropertySpec pspec = new PropertySpec();
         pspec.setType("HostSystem");
@@ -284,7 +309,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
 
     @Override
     public ManagedObjectReference mountDatastore(boolean vmfsDatastore, String poolHostAddress, int poolHostPort,
-        String poolPath, String poolUuid) throws Exception {
+                                                 String poolPath, String poolUuid) throws Exception {
         ManagedObjectReference morDs = null;
         ManagedObjectReference morDsFirst = null;
         List<ManagedObjectReference> hosts = context.getVimClient().getDynamicProperty(mor, HOST_PROPERTY);
@@ -330,6 +355,12 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         return null;
     }
 
+    /**
+     * getClusterHosts
+     *
+     * @return List
+     * @throws Exception Exception
+     */
     public List<Pair<ManagedObjectReference, String>> getClusterHosts() throws Exception {
         List<Pair<ManagedObjectReference, String>> hosts = new ArrayList<>();
 

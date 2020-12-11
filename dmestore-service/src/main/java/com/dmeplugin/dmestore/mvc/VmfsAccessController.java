@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
+
 /**
  * ServiceLevelController
  *
@@ -41,6 +42,11 @@ public class VmfsAccessController extends BaseController {
     @Autowired
     private VmfsAccessService vmfsAccessService;
 
+    /**
+     * listVmfs
+     *
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/listvmfs", method = RequestMethod.GET)
     public ResponseBodyBean listVmfs() {
         String failureStr = "";
@@ -53,6 +59,12 @@ public class VmfsAccessController extends BaseController {
         return failure(failureStr);
     }
 
+    /**
+     * listVmfsPerformance
+     *
+     * @param wwns wwns
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/listvmfsperformance", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean listVmfsPerformance(@RequestParam("wwns") List<String> wwns) {
@@ -68,6 +80,12 @@ public class VmfsAccessController extends BaseController {
         return failure(failureStr);
     }
 
+    /**
+     * createVmfs
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/createvmfs", method = RequestMethod.POST)
     public ResponseBodyBean createVmfs(@RequestBody Map<String, Object> params) {
         LOG.info("accessvmfs/createvmfs=={}", gson.toJson(params));
@@ -81,6 +99,12 @@ public class VmfsAccessController extends BaseController {
         return failure(failureStr);
     }
 
+    /**
+     * mountVmfs
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/mountvmfs", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean mountVmfs(@RequestBody Map<String, Object> params) {
@@ -96,6 +120,12 @@ public class VmfsAccessController extends BaseController {
         return failure(failureStr);
     }
 
+    /**
+     * unmountVmfs
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/ummountvmfs", method = RequestMethod.POST)
     public ResponseBodyBean unmountVmfs(@RequestBody Map<String, Object> params) {
         LOG.info("accessvmfs/unmountvmfs=={}", gson.toJson(params));
@@ -110,6 +140,12 @@ public class VmfsAccessController extends BaseController {
         return failure(failureStr);
     }
 
+    /**
+     * deleteVmfs
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/deletevmfs", method = RequestMethod.POST)
     public ResponseBodyBean deleteVmfs(@RequestBody Map<String, Object> params) {
         LOG.info("accessvmfs/deletevmfs=={}", gson.toJson(params));
@@ -161,10 +197,10 @@ public class VmfsAccessController extends BaseController {
     /**
      * 获取指定存储下的主机信息
      *
-     * @author wangxy
      * @param storageId 存储ID
-     * @date 10:25 2020/10/14
      * @return com.dmeplugin.dmestore.model.ResponseBodyBean
+     * @author wangxy
+     * @date 10:25 2020/10/14
      */
     @RequestMapping(value = "/gethostsbystorageid/{storageId}", method = RequestMethod.GET)
     public ResponseBodyBean getHostsByStorageId(@PathVariable(value = "storageId") String storageId) {
@@ -176,6 +212,12 @@ public class VmfsAccessController extends BaseController {
         }
     }
 
+    /**
+     * getHostGroupsByStorageId
+     *
+     * @param storageId storageId
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/gethostgroupsbystorageid/{storageId}", method = RequestMethod.GET)
     public ResponseBodyBean getHostGroupsByStorageId(@PathVariable(value = "storageId") String storageId) {
         try {
@@ -186,6 +228,13 @@ public class VmfsAccessController extends BaseController {
         }
     }
 
+    /**
+     * queryVmfs
+     *
+     * @param dataStoreObjectId dataStoreObjectId
+     * @return ResponseBodyBean
+     * @throws Exception Exception
+     */
     @RequestMapping(value = "/queryvmfs", method = RequestMethod.GET)
     public ResponseBodyBean queryVmfs(@RequestParam("dataStoreObjectId") String dataStoreObjectId) throws Exception {
         String failureStr = "";
@@ -200,6 +249,12 @@ public class VmfsAccessController extends BaseController {
         return failure(failureStr);
     }
 
+    /**
+     * queryDatastoreByName
+     *
+     * @param name name
+     * @return ResponseBodyBean
+     */
     @GetMapping("/querydatastorebyname")
     public ResponseBodyBean queryDatastoreByName(@RequestParam("name") String name) {
         return success(vmfsAccessService.queryDatastoreByName(name));

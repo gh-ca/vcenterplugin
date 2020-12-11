@@ -21,21 +21,31 @@ import java.util.List;
  * DatacenterMO
  *
  * @author wangxiangyong
- *
  * @since 2020-12-01
  *
  **/
 public class DatacenterMO extends BaseMO {
     private static final Logger LOGGER = LoggerFactory.getLogger(DatacenterMO.class);
-
     private static final String NAME = "name";
-
     private static final String DATACENTER_TYPE = "Datacenter";
 
+    /**
+     * DatacenterMO
+     *
+     * @param context context
+     * @param morDc morDc
+     */
     public DatacenterMO(VmwareContext context, ManagedObjectReference morDc) {
         super(context, morDc);
     }
 
+    /**
+     * DatacenterMO
+     *
+     * @param context context
+     * @param dcName dcName
+     * @throws Exception Exception
+     */
     public DatacenterMO(VmwareContext context, String dcName) throws Exception {
         super(context, null);
 
@@ -50,6 +60,13 @@ public class DatacenterMO extends BaseMO {
         return context.getVimClient().getDynamicProperty(mor, NAME);
     }
 
+    /**
+     * findDatastore
+     *
+     * @param name name
+     * @return ManagedObjectReference
+     * @throws Exception Exception
+     */
     public ManagedObjectReference findDatastore(String name) throws Exception {
         assert name != null;
 
@@ -64,6 +81,13 @@ public class DatacenterMO extends BaseMO {
         return null;
     }
 
+    /**
+     * getDatastorePropertiesOnDatacenter
+     *
+     * @param propertyPaths propertyPaths
+     * @return List
+     * @throws Exception Exception
+     */
     public List<ObjectContent> getDatastorePropertiesOnDatacenter(String[] propertyPaths) throws Exception {
         PropertySpec propertySpec = new PropertySpec();
         propertySpec.setType("Datastore");
@@ -88,6 +112,14 @@ public class DatacenterMO extends BaseMO {
         return context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
     }
 
+    /**
+     * getOwnerDatacenter
+     *
+     * @param context context
+     * @param morEntity morEntity
+     * @return Pair
+     * @throws Exception Exception
+     */
     public static Pair<DatacenterMO, String> getOwnerDatacenter(VmwareContext context, ManagedObjectReference morEntity)
         throws Exception {
         PropertySpec propertySpec = new PropertySpec();

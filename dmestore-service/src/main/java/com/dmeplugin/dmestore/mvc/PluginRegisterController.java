@@ -30,12 +30,31 @@ public class PluginRegisterController extends BaseController {
     @Autowired
     private PluginRegisterService pluginRegisterService;
 
+    /**
+     * pluginaction
+     *
+     * @param request         request
+     * @param vcenterIp       vcenterIp
+     * @param vcenterPort     vcenterPort
+     * @param vcenterUsername vcenterUsername
+     * @param vcenterPassword vcenterPassword
+     * @param action          action
+     * @param removeData      removeData
+     * @param dmeIp           dmeIp
+     * @param dmePort         dmePort
+     * @param dmeUsername     dmeUsername
+     * @param dmePassword     dmePassword
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/pluginaction", method = RequestMethod.POST)
     public ResponseBodyBean pluginaction(HttpServletRequest request, @RequestParam(name = "vcenterIP") String vcenterIp,
-        @RequestParam String vcenterPort, @RequestParam String vcenterUsername, @RequestParam String vcenterPassword,
-        @RequestParam(required = false) String action, @RequestParam(required = false) String removeData,
-        @RequestParam String dmeIp, @RequestParam String dmePort, @RequestParam String dmeUsername,
-        @RequestParam String dmePassword) {
+                                         @RequestParam String vcenterPort, @RequestParam String vcenterUsername,
+                                         @RequestParam String vcenterPassword,
+                                         @RequestParam(required = false) String action,
+                                         @RequestParam(required = false) String removeData,
+                                         @RequestParam String dmeIp, @RequestParam String dmePort,
+                                         @RequestParam String dmeUsername,
+                                         @RequestParam String dmePassword) {
         boolean isRemoveData;
         synchronized (LOCK) {
             try {

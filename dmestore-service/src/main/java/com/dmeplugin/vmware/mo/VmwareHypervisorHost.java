@@ -28,9 +28,10 @@ import java.util.List;
 
 /**
  * Interface to consolidate ESX(i) hosts and HA/FT clusters into ,
- * a common interface used by CloudStack Hypervisor resources.
+ * common interface used by CloudStack Hypervisor resources.
  *
  * @author .
+ * @since 2020-12-11
  */
 public interface VmwareHypervisorHost {
     /**

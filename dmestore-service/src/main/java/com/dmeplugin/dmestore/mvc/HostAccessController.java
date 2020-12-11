@@ -37,6 +37,12 @@ public class HostAccessController extends BaseController {
     @Autowired
     private HostAccessService hostAccessService;
 
+    /**
+     * configureIscsi
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/configureiscsi", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean configureIscsi(@RequestBody Map<String, Object> params) {
@@ -52,6 +58,12 @@ public class HostAccessController extends BaseController {
         return failure(failureStr);
     }
 
+    /**
+     * testConnectivity
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/testconnectivity", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean testConnectivity(@RequestBody Map<String, Object> params) {

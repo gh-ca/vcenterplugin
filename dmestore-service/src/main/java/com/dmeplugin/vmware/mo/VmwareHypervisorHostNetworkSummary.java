@@ -1,13 +1,19 @@
 package com.dmeplugin.vmware.mo;
 
 /**
+ * VmwareHypervisorHostNetworkSummary
+ *
  * @author Administrator
+ * @since 2020-12-11
  */
 public class VmwareHypervisorHostNetworkSummary {
     private String hostIp;
     private String hostNetmask;
     private String hostMacAddress;
 
+    /**
+     * VmwareHypervisorHostNetworkSummary
+     */
     public VmwareHypervisorHostNetworkSummary() {
     }
 

@@ -8,16 +8,34 @@ import com.vmware.vim25.TaskInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * TaskMO
+ *
+ * @author Administrator
+ * @since 2020-12-11
+ */
 public class TaskMO extends BaseMO {
-    private static final Logger s_logger = LoggerFactory.getLogger(TaskMO.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaskMO.class);
 
+    /**
+     * TaskMO
+     *
+     * @param context context
+     * @param morTask morTask
+     */
     public TaskMO(VmwareContext context, ManagedObjectReference morTask) {
         super(context, morTask);
     }
 
+    /**
+     * getTaskFailureInfo
+     *
+     * @param context context
+     * @param morTask morTask
+     * @return String
+     */
     public static String getTaskFailureInfo(VmwareContext context, ManagedObjectReference morTask) {
         StringBuffer sb = new StringBuffer();
-
         try {
             TaskInfo info = context.getVimClient().getDynamicProperty(morTask, "info");
             if (info != null) {
@@ -30,9 +48,8 @@ public class TaskMO extends BaseMO {
                 }
             }
         } catch (Exception e) {
-            s_logger.info("[ignored]" + "error retrieving failure info for task : " + e.getLocalizedMessage());
+            logger.info("[ignored]" + "error retrieving failure info for task : " + e.getLocalizedMessage());
         }
-
         return sb.toString();
     }
 }
