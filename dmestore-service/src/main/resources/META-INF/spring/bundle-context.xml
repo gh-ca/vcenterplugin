@@ -14,11 +14,11 @@
     <context:property-placeholder location="classpath:application.properties"/>
 
 
-    <bean name="dmeInfoDao" class="com.dmeplugin.dmestore.dao.DmeInfoDao">
+    <bean name="dmeInfoDao" class="com.huawei.dmestore.dao.DmeInfoDao">
         <property name="url" value="${h2.url}"/>
     </bean>
 
-    <bean name="DmeAccessServiceImpl" class="com.dmeplugin.dmestore.services.DmeAccessServiceImpl">
+    <bean name="DmeAccessServiceImpl" class="com.huawei.dmestore.services.DmeAccessServiceImpl">
         <property name="dmeInfoDao" ref="dmeInfoDao"/>
         <property name="scheduleDao" ref="scheduleDao"/>
         <property name="vmfsAccessService" ref="VmfsAccessServiceImpl"/>
@@ -27,37 +27,37 @@
         <property name="taskService" ref="taskService"/>
     </bean>
 
-    <bean name="h2DataBaseDao" class="com.dmeplugin.dmestore.dao.H2DataBaseDao">
+    <bean name="h2DataBaseDao" class="com.huawei.dmestore.dao.H2DataBaseDao">
         <property name="url" value="${h2.url}"/>
     </bean>
 
-    <bean name="systemDao" class="com.dmeplugin.dmestore.dao.SystemDao">
+    <bean name="systemDao" class="com.huawei.dmestore.dao.SystemDao">
         <property name="url" value="${h2.url}"/>
     </bean>
 
-    <bean name="vcenterInfoDao" class="com.dmeplugin.dmestore.dao.VCenterInfoDao">
+    <bean name="vcenterInfoDao" class="com.huawei.dmestore.dao.VCenterInfoDao">
         <property name="url" value="${h2.url}"/>
     </bean>
 
-    <bean name="scheduleDao" class="com.dmeplugin.dmestore.dao.ScheduleDao">
+    <bean name="scheduleDao" class="com.huawei.dmestore.dao.ScheduleDao">
         <property name="url" value="${h2.url}"/>
     </bean>
 
     <bean name="InstantiationBeanServiceImpl"
-          class="com.dmeplugin.dmestore.services.InstantiationBeanServiceImpl">
+          class="com.huawei.dmestore.services.InstantiationBeanServiceImpl">
         <property name="systemService" ref="SystemServiceImpl"/>
     </bean>
 
-    <bean name="SystemServiceImpl" class="com.dmeplugin.dmestore.services.SystemServiceImpl">
+    <bean name="SystemServiceImpl" class="com.huawei.dmestore.services.SystemServiceImpl">
         <property name="systemDao" ref="systemDao"/>
     </bean>
 
     <bean name="VCenterInfoServiceImpl"
-          class="com.dmeplugin.dmestore.services.VCenterInfoServiceImpl">
+          class="com.huawei.dmestore.services.VCenterInfoServiceImpl">
         <property name="vcenterInfoDao" ref="vcenterInfoDao"/>
     </bean>
 
-    <bean name="ServiceLevelServiceImpl" class="com.dmeplugin.dmestore.services.ServiceLevelServiceImpl">
+    <bean name="ServiceLevelServiceImpl" class="com.huawei.dmestore.services.ServiceLevelServiceImpl">
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="dmeStorageService" ref="DmeStorageServiceImpl"/>
         <property name="dmeRelationInstanceService" ref="DmeRelationInstanceServiceImpl"/>
@@ -65,21 +65,21 @@
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
 
-    <bean name="DmeRelationInstanceServiceImpl" class="com.dmeplugin.dmestore.services.DmeRelationInstanceServiceImpl">
+    <bean name="DmeRelationInstanceServiceImpl" class="com.huawei.dmestore.services.DmeRelationInstanceServiceImpl">
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
     </bean>
 
-    <bean name="DmeStorageServiceImpl" class="com.dmeplugin.dmestore.services.DmeStorageServiceImpl">
+    <bean name="DmeStorageServiceImpl" class="com.huawei.dmestore.services.DmeStorageServiceImpl">
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
         <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
         <property name="dataStoreStatisticHistoryService" ref="DataStoreStatisticHistoryServiceImpl"/>
     </bean>
-    <bean name="dmeVmwareRalationDao" class="com.dmeplugin.dmestore.dao.DmeVmwareRalationDao">
+    <bean name="dmeVmwareRalationDao" class="com.huawei.dmestore.dao.DmeVmwareRalationDao">
         <property name="url" value="${h2.url}"/>
     </bean>
 
-    <bean name="VmfsAccessServiceImpl" class="com.dmeplugin.dmestore.services.VmfsAccessServiceImpl">
+    <bean name="VmfsAccessServiceImpl" class="com.huawei.dmestore.services.VmfsAccessServiceImpl">
         <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="dataStoreStatisticHistoryService" ref="DataStoreStatisticHistoryServiceImpl"/>
@@ -90,15 +90,15 @@
     </bean>
 
     <bean name="DataStoreStatisticHistoryServiceImpl"
-          class="com.dmeplugin.dmestore.services.DataStoreStatisticHistoryServiceImpl">
+          class="com.huawei.dmestore.services.DataStoreStatisticHistoryServiceImpl">
     </bean>
 
 
-    <bean name="taskService" class="com.dmeplugin.dmestore.services.TaskServiceImpl">
+    <bean name="taskService" class="com.huawei.dmestore.services.TaskServiceImpl">
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
     </bean>
 
-    <bean name="DmeNFSAccessServiceImpl" class="com.dmeplugin.dmestore.services.DmeNFSAccessServiceImpl">
+    <bean name="DmeNFSAccessServiceImpl" class="com.huawei.dmestore.services.DmeNFSAccessServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="dmeStorageService" ref="DmeStorageServiceImpl"/>
@@ -107,26 +107,26 @@
         <property name="taskService" ref="taskService"/>
     </bean>
 
-    <bean name="VmfsOperationServiceImpl" class="com.dmeplugin.dmestore.services.VmfsOperationServiceImpl">
+    <bean name="VmfsOperationServiceImpl" class="com.huawei.dmestore.services.VmfsOperationServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="taskService" ref="taskService"/>
     </bean>
 
 
-    <bean name="VmwareAccessServiceImpl" class="com.dmeplugin.dmestore.services.VmwareAccessServiceImpl">
+    <bean name="VmwareAccessServiceImpl" class="com.huawei.dmestore.services.VmwareAccessServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
         <property name="dmeVmwareRalationDao" ref="dmeVmwareRalationDao"/>
     </bean>
 
-    <bean name="VmRdmServiceImpl" class="com.dmeplugin.dmestore.services.VmRdmServiceImpl">
+    <bean name="VmRdmServiceImpl" class="com.huawei.dmestore.services.VmRdmServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="taskService" ref="taskService"/>
         <property name="vmfsAccessService" ref="VmfsAccessServiceImpl"/>
     </bean>
 
-    <bean name="BestPracticeProcessServiceImpl" class="com.dmeplugin.dmestore.services.BestPracticeProcessServiceImpl">
+    <bean name="BestPracticeProcessServiceImpl" class="com.huawei.dmestore.services.BestPracticeProcessServiceImpl">
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
         <property name="bestPracticeCheckDao" ref="bestPracticeCheckDao"/>
         <property name="bestPracticeServices">
@@ -149,29 +149,29 @@
     </bean>
 
     <!--最佳实践后端逻辑service-->
-    <bean name="VMFS3EnableBlockDeleteImpl" class="com.dmeplugin.dmestore.services.bestpractice.Vmfs3EnableBlockDeleteImpl"/>
-    <bean name="VMFS3HardwareAcceleratedLockingImpl" class="com.dmeplugin.dmestore.services.bestpractice.Vmfs3HardwareAcceleratedLockingImpl"/>
-    <bean name="VMFS3UseATSForHBOnVMFS5Impl" class="com.dmeplugin.dmestore.services.bestpractice.VMFS3UseATSForHBOnVMFS5Impl"/>
-    <bean name="DiskSchedQuantumImpl" class="com.dmeplugin.dmestore.services.bestpractice.DiskSchedQuantumImpl"/>
-    <bean name="DiskDiskMaxIOSizeImpl" class="com.dmeplugin.dmestore.services.bestpractice.DiskDiskMaxIOSizeImpl"/>
-    <bean name="DataMoverHardwareAcceleratedInitImpl" class="com.dmeplugin.dmestore.services.bestpractice.DataMoverHardwareAcceleratedInitImpl"/>
-    <bean name="DataMoverHardwareAcceleratedMoveImpl" class="com.dmeplugin.dmestore.services.bestpractice.DataMoverHardwareAcceleratedMoveImpl"/>
-    <bean name="LunQueueDepthForEmulexImpl" class="com.dmeplugin.dmestore.services.bestpractice.LunQueueDepthForEmulexImpl"/>
-    <bean name="LunQueueDepthForQlogicImpl" class="com.dmeplugin.dmestore.services.bestpractice.LunQueueDepthForQlogicImpl"/>
-    <bean name="JumboFrameMTUImpl" class="com.dmeplugin.dmestore.services.bestpractice.JumboFrameMTUImpl"/>
-    <bean name="NumberOfVolumesInDatastoreImpl" class="com.dmeplugin.dmestore.services.bestpractice.NumberOfVolumesInDatastoreImpl"/>
-    <bean name="Vmfs6AutoReclaimImpl" class="com.dmeplugin.dmestore.services.bestpractice.Vmfs6AutoReclaimImpl"/>
-    <bean name="NMPPathSwitchPolicyImpl" class="com.dmeplugin.dmestore.services.bestpractice.NMPPathSwitchPolicyImpl"/>
+    <bean name="VMFS3EnableBlockDeleteImpl" class="com.huawei.dmestore.services.bestpractice.Vmfs3EnableBlockDeleteImpl"/>
+    <bean name="VMFS3HardwareAcceleratedLockingImpl" class="com.huawei.dmestore.services.bestpractice.Vmfs3HardwareAcceleratedLockingImpl"/>
+    <bean name="VMFS3UseATSForHBOnVMFS5Impl" class="com.huawei.dmestore.services.bestpractice.VMFS3UseATSForHBOnVMFS5Impl"/>
+    <bean name="DiskSchedQuantumImpl" class="com.huawei.dmestore.services.bestpractice.DiskSchedQuantumImpl"/>
+    <bean name="DiskDiskMaxIOSizeImpl" class="com.huawei.dmestore.services.bestpractice.DiskDiskMaxIOSizeImpl"/>
+    <bean name="DataMoverHardwareAcceleratedInitImpl" class="com.huawei.dmestore.services.bestpractice.DataMoverHardwareAcceleratedInitImpl"/>
+    <bean name="DataMoverHardwareAcceleratedMoveImpl" class="com.huawei.dmestore.services.bestpractice.DataMoverHardwareAcceleratedMoveImpl"/>
+    <bean name="LunQueueDepthForEmulexImpl" class="com.huawei.dmestore.services.bestpractice.LunQueueDepthForEmulexImpl"/>
+    <bean name="LunQueueDepthForQlogicImpl" class="com.huawei.dmestore.services.bestpractice.LunQueueDepthForQlogicImpl"/>
+    <bean name="JumboFrameMTUImpl" class="com.huawei.dmestore.services.bestpractice.JumboFrameMTUImpl"/>
+    <bean name="NumberOfVolumesInDatastoreImpl" class="com.huawei.dmestore.services.bestpractice.NumberOfVolumesInDatastoreImpl"/>
+    <bean name="Vmfs6AutoReclaimImpl" class="com.huawei.dmestore.services.bestpractice.Vmfs6AutoReclaimImpl"/>
+    <bean name="NMPPathSwitchPolicyImpl" class="com.huawei.dmestore.services.bestpractice.NMPPathSwitchPolicyImpl"/>
 
-    <bean name="bestPracticeCheckDao" class="com.dmeplugin.dmestore.dao.BestPracticeCheckDao">
+    <bean name="bestPracticeCheckDao" class="com.huawei.dmestore.dao.BestPracticeCheckDao">
         <property name="url" value="${h2.url}"/>
     </bean>
 
-    <bean name="vCSDKUtils" class="com.dmeplugin.dmestore.utils.VCSDKUtils">
+    <bean name="vCSDKUtils" class="com.huawei.dmestore.utils.VCSDKUtils">
         <property name="vcConnectionHelper" ref="springBootConnectionHelper"/>
     </bean>
 
-    <bean name="springBootConnectionHelper" class="com.dmeplugin.vmware.SpringBootConnectionHelper">
+    <bean name="springBootConnectionHelper" class="com.huawei.vmware.SpringBootConnectionHelper">
         <property name="serverurl" value="10.143.132.248"/>
         <property name="username" value="administrator@vsphere.local"/>
         <property name="password" value="Pbu4@123"/>
@@ -180,7 +180,7 @@
     </bean>
 
     
-    <bean name="NfsOperationServiceImpl" class="com.dmeplugin.dmestore.services.NfsOperationServiceImpl">
+    <bean name="NfsOperationServiceImpl" class="com.huawei.dmestore.services.NfsOperationServiceImpl">
         <property name="taskService" ref="taskService"/>
         <property name="dmeStorageService" ref="DmeStorageServiceImpl"/>
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
@@ -189,17 +189,17 @@
     </bean>
 
 
-    <bean name="PluginRegisterServiceImpl" class="com.dmeplugin.dmestore.services.PluginRegisterServiceImpl">
+    <bean name="PluginRegisterServiceImpl" class="com.huawei.dmestore.services.PluginRegisterServiceImpl">
 
     </bean>
 
-   <bean name="HostAccessServiceImpl" class="com.dmeplugin.dmestore.services.HostAccessServiceImpl">
+   <bean name="HostAccessServiceImpl" class="com.huawei.dmestore.services.HostAccessServiceImpl">
        <property name="vcsdkUtils" ref="vCSDKUtils"/>
        <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
     </bean>
 
 
-    <bean name="OverviewServiceImpl" class="com.dmeplugin.dmestore.services.OverviewServiceImpl">
+    <bean name="OverviewServiceImpl" class="com.huawei.dmestore.services.OverviewServiceImpl">
         <property name="vmfsAccessService" ref="VmfsAccessServiceImpl"/>
         <property name="dmeNfsAccessService" ref="DmeNFSAccessServiceImpl"/>
         <property name="dmeStorageService" ref="DmeStorageServiceImpl"/>
@@ -208,15 +208,15 @@
 
     <context:annotation-config/>
     <!--spring扫描注解的配置-->
-    <context:component-scan base-package="com.dmeplugin.dmestore.task"/>
+    <context:component-scan base-package="com.huawei.dmestore.task"/>
 
     <!--<bean class="org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler"/>-->
 
-    <bean name="QuartzConfig" class="com.dmeplugin.dmestore.task.QuartzConfig" destroy-method="destory">
+    <bean name="QuartzConfig" class="com.huawei.dmestore.task.QuartzConfig" destroy-method="destory">
     </bean>
 
 
-    <bean class="com.dmeplugin.dmestore.task.ApplicationContextHelper"/>
+    <bean class="com.huawei.dmestore.task.ApplicationContextHelper"/>
    <!--开启这个配置，spring才能识别@Scheduled注解-->
  <!-- <task:annotation-driven scheduler="qbScheduler"/>
     <task:scheduler id="qbScheduler" pool-size="10"/>-->
