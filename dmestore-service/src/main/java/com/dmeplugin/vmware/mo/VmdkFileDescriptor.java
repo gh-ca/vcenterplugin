@@ -9,15 +9,31 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Properties;
 
+/**
+ * VmdkFileDescriptor
+ *
+ * @author Administrator
+ * @since 2020-12-11
+ */
 public class VmdkFileDescriptor {
     private static final Logger LOGGER = LoggerFactory.getLogger(VmdkFileDescriptor.class);
 
     private Properties properties = new Properties();
     private String baseFileName;
+    private final int arrLength = 2;
 
+    /**
+     * VmdkFileDescriptor
+     */
     public VmdkFileDescriptor() {
     }
 
+    /**
+     * parse
+     *
+     * @param vmdkFileContent vmdkFileContent
+     * @throws IOException IOException
+     */
     public void parse(byte[] vmdkFileContent) throws IOException {
         BufferedReader in = null;
         try {
@@ -33,7 +49,7 @@ public class VmdkFileDescriptor {
                 }
 
                 String[] tokens = line.split("=");
-                if (tokens.length == 2) {
+                if (tokens.length == arrLength) {
                     String name = tokens[0].trim();
                     String value = tokens[1].trim();
                     if (value.charAt(0) == '\"') {
@@ -45,12 +61,12 @@ public class VmdkFileDescriptor {
                     if (line.startsWith("RW")) {
                         int startPos = line.indexOf('\"');
                         int endPos = line.lastIndexOf('\"');
-                        assert (startPos > 0);
-                        assert (endPos > 0);
+                        assert startPos > 0;
+                        assert endPos > 0;
 
                         baseFileName = line.substring(startPos + 1, endPos);
                     } else {
-                        LOGGER.warn("Unrecognized vmdk line content: " + line);
+                        LOGGER.warn("Unrecognized vmdk line content:{} ", line);
                     }
                 }
             }
