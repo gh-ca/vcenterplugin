@@ -246,7 +246,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             requestbody.put("grantType", PASSWORD);
             requestbody.put(USER_NAME, params.get(USER_NAME));
             requestbody.put("value", params.get(PASSWORD));
-            String hostUrl = "https:// " + params.get(HOST_IP) + ":" + params.get(HOST_PORT);
+            String hostUrl = "https://" + params.get(HOST_IP) + ":" + params.get(HOST_PORT);
             HttpEntity<String> entity = new HttpEntity<>(gson.toJson(requestbody), headers);
             RestTemplate restTemplate = restUtils.getRestTemplate();
             responseEntity = restTemplate.exchange(hostUrl + DmeConstants.LOGIN_DME_URL, HttpMethod.PUT, entity,

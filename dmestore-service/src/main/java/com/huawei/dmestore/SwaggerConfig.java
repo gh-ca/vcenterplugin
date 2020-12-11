@@ -22,7 +22,7 @@ public class SwaggerConfig {
     @Bean
     public Docket docketFactory() {
         return new Docket(DocumentationType.SWAGGER_2).apiInfo(
-                apiInfo() ).select().apis(RequestHandlerSelectors.basePackage("com.dmeplugin.dmestore")).paths(PathSelectors.any()).build().enable(environmentSpecificBooleanFlag);
+                apiInfo() ).select().apis(RequestHandlerSelectors.basePackage("com.huawei.dmestore")).paths(PathSelectors.any()).build().enable(environmentSpecificBooleanFlag);
     }
 
     private ApiInfo apiInfo() {
