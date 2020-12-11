@@ -29,6 +29,12 @@ public class DmeRelationInstanceController extends BaseController {
     @Autowired
     DmeRelationInstanceService dmeRelationInstanceService;
 
+    /**
+     * queryByRelationName
+     *
+     * @param relationName relationName
+     * @return ResponseBodyBean
+     */
     @GetMapping("/listbyrelationname")
     public ResponseBodyBean queryByRelationName(@RequestParam(name = "relationName") String relationName) {
         LOG.info("listbyrelationname:{}", relationName);
@@ -40,9 +46,16 @@ public class DmeRelationInstanceController extends BaseController {
         }
     }
 
+    /**
+     * queryByRelationNameInstanceId
+     *
+     * @param relationName relationName
+     * @param instanceId   instanceId
+     * @return ResponseBodyBean
+     */
     @GetMapping("/getbyrelationnameinstanceid")
     public ResponseBodyBean queryByRelationNameInstanceId(@RequestParam(name = "relationName") String relationName,
-        @RequestParam(name = "instanceId") String instanceId) {
+                                                          @RequestParam(name = "instanceId") String instanceId) {
         LOG.info("getbyrelationname instanceid:{}, {}", relationName, instanceId);
         try {
             return success(dmeRelationInstanceService.queryRelationByRelationNameInstanceId(relationName, instanceId));
@@ -52,6 +65,13 @@ public class DmeRelationInstanceController extends BaseController {
         }
     }
 
+    /**
+     * queryByRelationNameInstanceIdCondition
+     *
+     * @param relationName relationName
+     * @param instanceId   instanceId
+     * @return ResponseBodyBean
+     */
     @GetMapping("/getbyrelationnameinstanceidcondition")
     public ResponseBodyBean queryByRelationNameInstanceIdCondition(
         @RequestParam(name = "relationName") String relationName,
@@ -67,6 +87,11 @@ public class DmeRelationInstanceController extends BaseController {
         }
     }
 
+    /**
+     * refreshResourceInstance
+     *
+     * @return ResponseBodyBean
+     */
     @GetMapping("/refreshresourceinstance")
     public ResponseBodyBean refreshResourceInstance() {
         LOG.info("refreshresourceinstance instance start!");

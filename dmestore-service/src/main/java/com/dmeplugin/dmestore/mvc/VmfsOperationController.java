@@ -74,6 +74,12 @@ public class VmfsOperationController extends BaseController {
         }
     }
 
+    /**
+     * recycleVmfs
+     *
+     * @param datastoreName datastoreName
+     * @return ResponseBodyBean
+     */
     @PostMapping("/recyclevmfs")
     public ResponseBodyBean recycleVmfs(final @RequestBody List<String> datastoreName) {
         LOG.info("recyclevmfs=={}", gson.toJson(datastoreName));
@@ -85,6 +91,12 @@ public class VmfsOperationController extends BaseController {
         }
     }
 
+    /**
+     * recycleVmfsByDatastoreIds
+     *
+     * @param datastoreIds datastoreIds
+     * @return ResponseBodyBean
+     */
     @PostMapping("/recyclevmfsbydatastoreids")
     public ResponseBodyBean recycleVmfsByDatastoreIds(final @RequestBody List<String> datastoreIds) {
         LOG.info("recyclevmfsbydatastoreids=={}", gson.toJson(datastoreIds));
@@ -96,6 +108,12 @@ public class VmfsOperationController extends BaseController {
         }
     }
 
+    /**
+     * listServiceLevelVmfs
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @PutMapping("/listvmfsservicelevel")
     public ResponseBodyBean listServiceLevelVmfs(final @RequestBody(required = false) Map<String, Object> params) {
         LOG.info("recyclevmfs=={}", gson.toJson(params));

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
+
 /**
  * HostAccessController
  *
@@ -39,6 +40,11 @@ public class NfsAccessController extends BaseController {
     @Autowired
     private DmeNFSAccessService dmeNfsAccessService;
 
+    /**
+     * listNfs
+     *
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/listnfs", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean listNfs() {
@@ -53,6 +59,12 @@ public class NfsAccessController extends BaseController {
         return failure(failureStr);
     }
 
+    /**
+     * listNfsPerformance
+     *
+     * @param fsIds fsIds
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/listnfsperformance", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean listNfsPerformance(@RequestParam("fsIds") List<String> fsIds) {
@@ -67,6 +79,12 @@ public class NfsAccessController extends BaseController {
         return failure(failureStr);
     }
 
+    /**
+     * mountNfs
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/mountnfs", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean mountNfs(@RequestBody Map<String, Object> params) {
@@ -82,6 +100,12 @@ public class NfsAccessController extends BaseController {
         return failure(failureStr);
     }
 
+    /**
+     * unmountNfs
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/unmountnfs", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean unmountNfs(@RequestBody Map<String, Object> params) {
@@ -97,6 +121,12 @@ public class NfsAccessController extends BaseController {
         return failure(failureStr);
     }
 
+    /**
+     * deleteNfs
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/deletenfs", method = RequestMethod.POST)
     @ResponseBody
     public ResponseBodyBean deleteNfs(@RequestBody Map<String, Object> params) {
@@ -112,6 +142,12 @@ public class NfsAccessController extends BaseController {
         return failure(failureStr);
     }
 
+    /**
+     * getHostsByStorageId
+     *
+     * @param storageId storageId
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/gethostsbystorageid/{storageId}", method = RequestMethod.GET)
     public ResponseBodyBean getHostsByStorageId(@PathVariable(value = "storageId") String storageId) {
         try {
@@ -122,6 +158,12 @@ public class NfsAccessController extends BaseController {
         }
     }
 
+    /**
+     * getHostGroupsByStorageId
+     *
+     * @param storageId storageId
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/gethostgroupsbystorageid/{storageId}", method = RequestMethod.GET)
     public ResponseBodyBean getHostGroupsByStorageId(@PathVariable(value = "storageId") String storageId) {
         try {

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
  * BestPracticeController
  *
@@ -38,6 +39,11 @@ public class BestPracticeController extends BaseController {
         this.bestPracticeProcessService = bestPracticeProcessService;
     }
 
+    /**
+     * bestPractice
+     *
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/check", method = RequestMethod.POST)
     public ResponseBodyBean bestPractice() {
         try {
@@ -48,6 +54,11 @@ public class BestPracticeController extends BaseController {
         }
     }
 
+    /**
+     * getBestPracticeRecords
+     *
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/records/all", method = RequestMethod.GET)
     public ResponseBodyBean getBestPracticeRecords() {
         try {
@@ -59,9 +70,17 @@ public class BestPracticeController extends BaseController {
         }
     }
 
+    /**
+     * getBySettingAndPage
+     *
+     * @param hostSetting hostSetting
+     * @param pageNo      pageNo
+     * @param pageSize    pageSize
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/records/bypage", method = RequestMethod.GET)
     public ResponseBodyBean getBySettingAndPage(@RequestParam String hostSetting, @RequestParam int pageNo,
-        @RequestParam int pageSize) {
+                                                @RequestParam int pageSize) {
         try {
             return success(bestPracticeProcessService.getCheckRecordBy(hostSetting, pageNo, pageSize));
         } catch (DmeException ex) {
@@ -69,6 +88,12 @@ public class BestPracticeController extends BaseController {
         }
     }
 
+    /**
+     * bylist
+     *
+     * @param list list
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/update/bylist", method = RequestMethod.POST)
     public ResponseBodyBean bylist(@RequestBody List<BestPracticeUpdateByTypeRequest> list) {
         try {
@@ -87,6 +112,12 @@ public class BestPracticeController extends BaseController {
         }
     }
 
+    /**
+     * upByHostSetting
+     *
+     * @param request request
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/update/bytype", method = RequestMethod.POST)
     public ResponseBodyBean upByHostSetting(@RequestBody BestPracticeUpdateByTypeRequest request) {
         try {
@@ -96,6 +127,12 @@ public class BestPracticeController extends BaseController {
         }
     }
 
+    /**
+     * upByHosts
+     *
+     * @param hostObjectIds hostObjectIds
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/update/byhosts", method = RequestMethod.POST)
     public ResponseBodyBean upByHosts(@RequestBody List<String> hostObjectIds) {
         try {
@@ -105,6 +142,11 @@ public class BestPracticeController extends BaseController {
         }
     }
 
+    /**
+     * upAll
+     *
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/update/all", method = RequestMethod.POST)
     public ResponseBodyBean upAll() {
         try {
@@ -114,6 +156,11 @@ public class BestPracticeController extends BaseController {
         }
     }
 
+    /**
+     * upByCluster
+     *
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/update/byCluster", method = RequestMethod.POST)
     public ResponseBodyBean upByCluster() {
         try {
