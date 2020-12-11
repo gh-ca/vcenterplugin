@@ -1,4 +1,4 @@
-package com.dmeplugin.vcenter.utils;
+package com.huawei.vcenter.utils;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;

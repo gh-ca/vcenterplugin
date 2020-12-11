@@ -1,4 +1,4 @@
-package com.dmeplugin.vcenter.utils;
+package com.huawei.vcenter.utils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
