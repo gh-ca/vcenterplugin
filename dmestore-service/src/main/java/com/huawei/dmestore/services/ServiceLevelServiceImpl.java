@@ -17,6 +17,7 @@ import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 import com.huawei.vmware.autosdk.SessionHelper;
 import com.google.gson.Gson;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -39,18 +40,19 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * @Description: TODO
- * @ClassName: ServiceLevelServiceImpl
- * @Company: GH-CA
- * @author: liuxh
- * @create: 2020-09-02
+ * ServiceLevelService
+ *
+ * @author liuxh
+ * @since 2020-09-15
  **/
 public class ServiceLevelServiceImpl implements ServiceLevelService {
     private static final Logger log = LoggerFactory.getLogger(ServiceLevelServiceImpl.class);
 
-    public static Map<String, Map<String, Object>> serviceLevelInstance = new HashMap<>();
+    private static final String ID_FIELD = "id";
 
-    private Gson gson = new Gson();
+    private static final String NAME_FIELD = "name";
+
+    private static final String CODE_503 = "503";
 
     private DmeAccessService dmeAccessService;
 
@@ -58,7 +60,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
     private DmeStorageService dmeStorageService;
 
-    private VCenterInfoService vCenterInfoService;
+    private VCenterInfoService vcenterinfoservice;
 
     private VCSDKUtils vcsdkUtils;
 
@@ -94,30 +96,29 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         this.vcsdkUtils = vcsdkUtils;
     }
 
-    public VCenterInfoService getvCenterInfoService() {
-        return vCenterInfoService;
+    public VCenterInfoService getVcenterinfoservice() {
+        return vcenterinfoservice;
     }
 
-    public void setvCenterInfoService(VCenterInfoService vCenterInfoService) {
-        this.vCenterInfoService = vCenterInfoService;
+    public void setVcenterinfoservice(VCenterInfoService vcenterinfoservice) {
+        this.vcenterinfoservice = vcenterinfoservice;
     }
 
     @Override
     public List<SimpleServiceLevel> listServiceLevel(Map<String, Object> params) throws DmeException {
-
         ResponseEntity responseEntity;
         List<SimpleServiceLevel> slis;
         try {
             responseEntity = dmeAccessService.access(DmeConstants.LIST_SERVICE_LEVEL_URL, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (HttpStatus.OK.value() != code) {
-                throw new DmeException("503", "list serviceLevel response error!");
+                throw new DmeException(CODE_503, "list serviceLevel response error!");
             }
             Object object = responseEntity.getBody();
             slis = convertBean(object);
-        } catch (Exception e) {
+        } catch (DmeException e) {
             log.error("list serviceLevel error", e);
-            throw new DmeException("503", e.getMessage());
+            throw new DmeException(CODE_503, e.getMessage());
         }
         return slis;
     }
@@ -125,12 +126,12 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     @Override
     public void updateVmwarePolicy() throws DmeException {
         try {
-            VCenterInfo vCenterInfo = vCenterInfoService.getVcenterInfo();
-            if (null != vCenterInfo) {
+            VCenterInfo vcenterInfo = vcenterinfoservice.getVcenterInfo();
+            if (null != vcenterInfo) {
                 SessionHelper sessionHelper = new SessionHelper();
                 try {
-                    sessionHelper.login(vCenterInfo.getHostIp(), String.valueOf(vCenterInfo.getHostPort()),
-                        vCenterInfo.getUserName(), CipherUtils.decryptString(vCenterInfo.getPassword()));
+                    sessionHelper.login(vcenterInfo.getHostIp(), String.valueOf(vcenterInfo.getHostPort()),
+                        vcenterInfo.getUserName(), CipherUtils.decryptString(vcenterInfo.getPassword()));
                 } catch (Exception ex) {
                     log.error(ex.getMessage());
                 }
@@ -146,8 +147,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                 List<PbmProfile> alreadyhasPolicyList = new ArrayList<>();
                 for (JsonElement jsonElement : jsonArray) {
                     JsonObject object1 = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
-                    String name = object1.get("name").getAsString();
-                    //tag是否存在判断
+                    String name = object1.get(NAME_FIELD).getAsString();
                     boolean alreadyhas = false;
                     for (TagModel tagModel : tagModels) {
                         if (tagModel.getName().equalsIgnoreCase(name)) {
@@ -156,8 +156,6 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                             break;
                         }
                     }
-
-                    //虚拟机存储策略判断
                     boolean alreadyhasPolicy = false;
                     for (PbmProfile profile : pbmProfiles) {
                         if (profile.getName().equalsIgnoreCase(name)) {
@@ -167,28 +165,24 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                         }
                     }
                     if (!alreadyhas) {
-                        //创建tag
                         vcsdkUtils.createTag(name, sessionHelper);
                     }
-
                     if (!alreadyhasPolicy) {
-                        //创建虚拟机存储策略
                         vcsdkUtils.createPbmProfileInAllContext(VCSDKUtils.CATEGORY_NAME, name);
                     }
                 }
                 tagModels.removeAll(alreadyhasList);
                 pbmProfiles.removeAll(alreadyhasPolicyList);
-                //删除多余的tag，虚拟机存储策略
-                //先删除虚拟机存储策略
                 vcsdkUtils.removePbmProfileInAllContext(pbmProfiles);
                 vcsdkUtils.removeAllTags(tagModels, sessionHelper);
-                log.info("后台更新服务等级策略完成");
             } else {
-                throw new VcenterException("数据库中没有vcenter信息");
+                throw new VcenterException("There is no VCenter information in the database");
             }
-        } catch (Exception e) {
+        } catch (DmeException e) {
             log.error("list serviceLevel error", e);
-            throw new DmeException("503", "update service level error" + e.getMessage());
+            throw new DmeException(CODE_503, "update service level error" + e.getMessage());
+        } catch (Exception exception) {
+            log.error(exception.getMessage());
         }
     }
 
@@ -196,9 +190,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
      * convert the api responseBody to SimpleServiceLevel Bean list
      *
      * @param object
-     * @return java.util.List<com.dmeplugin.dmestore.model.SimpleServiceLevel>
-     * @author wangxy
-     * @date 11:21 2020/11/13
+     * @return java.util.List
      **/
     private List<SimpleServiceLevel> convertBean(Object object) {
         List<SimpleServiceLevel> ssls = new ArrayList<>();
@@ -206,110 +198,109 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         JsonArray jsonArray = jsonObject.get("service-levels").getAsJsonArray();
         for (JsonElement jsonElement : jsonArray) {
             SimpleServiceLevel ssl = new SimpleServiceLevel();
-            try {
-                JsonObject object1 = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
-                String id = ToolUtils.jsonToOriginalStr(object1.get("id"));
-                String name = ToolUtils.jsonToOriginalStr(object1.get("name"));
-                String descriptionn = ToolUtils.jsonToStr(object1.get("description"));
-                String type = ToolUtils.jsonToOriginalStr(object1.get("type"));
-                String protocol = ToolUtils.jsonToOriginalStr(object1.get("protocol"));
-                double totalCapacity = ToolUtils.jsonToDou(object1.get("total_capacity"));
-                double usedCapcity = ToolUtils.jsonToDou(object1.get("used_capacity"));
-                double freeCapacity = ToolUtils.jsonToDou(object1.get("free_capacity"));
-                ssl.setId(id);
-                ssl.setName(name);
-                ssl.setDescription(descriptionn);
-                ssl.setType(type);
-                ssl.setProtocol(protocol);
-                ssl.setTotalCapacity(totalCapacity);
-                ssl.setFreeCapacity(freeCapacity);
-                ssl.setUsedCapacity(usedCapcity);
-                JsonElement capObj = object1.get("capabilities");
-                if (!ToolUtils.jsonIsNull(capObj)) {
-                    SimpleCapabilities scb = new SimpleCapabilities();
-                    JsonObject capJsonObj = capObj.getAsJsonObject();
-                    String resourceType = ToolUtils.jsonToOriginalStr(capJsonObj.get("resource_type"));
-                    boolean compression = ToolUtils.jsonToBoo(capJsonObj.get("compression"));
-                    scb.setResourceType(resourceType);
-                    scb.setCompression(compression);
-
-                    //报文中暂未出现此属性,暂不处理
-                    JsonElement smarttierObj = capJsonObj.get("smarttier");
-                    if (!ToolUtils.jsonIsNull(smarttierObj)) {
-                        CapabilitiesSmarttier cbs = new CapabilitiesSmarttier();
-                        JsonObject smartJsonObj = smarttierObj.getAsJsonObject();
-                        int policy = ToolUtils.jsonToInt(smartJsonObj.get("policy"), null);
-                        boolean enabled = ToolUtils.jsonToBoo(smartJsonObj.get("enabled"));
-                        cbs.setEnabled(enabled);
-                        cbs.setPolicy(policy);
-                        scb.setSmarttier(cbs);
-                    }
-
-                    JsonElement qosObject = capJsonObj.get("qos");
-                    if (!ToolUtils.jsonIsNull(qosObject)) {
-                        CapabilitiesQos cq = new CapabilitiesQos();
-                        JsonObject qosJsonObj = qosObject.getAsJsonObject();
-                        boolean enabled = ToolUtils.jsonToBoo(qosJsonObj.get("enabled"));
-                        cq.setEnabled(enabled);
-                        JsonElement qosParamObj = qosJsonObj.get("qos_param");
-                        if (!ToolUtils.jsonIsNull(qosParamObj)) {
-                            QosParam qp = new QosParam();
-                            JsonObject qosParamJsonObj = qosParamObj.getAsJsonObject();
-                            String latencyUnit = ToolUtils.jsonToStr(qosParamJsonObj.get("latencyUnit"));
-                            int latnecy = ToolUtils.jsonToInt(qosParamJsonObj.get("latency"));
-                            int minBandWidth = ToolUtils.jsonToInt(qosParamJsonObj.get("minBandWidth"));
-                            int minIops = ToolUtils.jsonToInt(qosParamJsonObj.get("minIOPS"));
-                            int maxBandWidth = ToolUtils.jsonToInt(qosParamJsonObj.get("maxBandWidth"));
-                            int maxIops = ToolUtils.jsonToInt(qosParamJsonObj.get("maxIOPS"));
-                            qp.setLatency(latnecy);
-                            qp.setLatencyUnit(latencyUnit);
-                            qp.setMinBandWidth(minBandWidth);
-                            qp.setMinIOPS(minIops);
-                            qp.setMaxBandWidth(maxBandWidth);
-                            qp.setMaxIOPS(maxIops);
-                            cq.setQosParam(qp);
-                        }
-                        scb.setQos(cq);
-                    }
-                    ssl.setCapabilities(scb);
+            JsonObject object1 = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
+            String id = ToolUtils.jsonToOriginalStr(object1.get(ID_FIELD));
+            String name = ToolUtils.jsonToOriginalStr(object1.get(NAME_FIELD));
+            String descriptionn = ToolUtils.jsonToStr(object1.get("description"));
+            String type = ToolUtils.jsonToOriginalStr(object1.get("type"));
+            String protocol = ToolUtils.jsonToOriginalStr(object1.get("protocol"));
+            double totalCapacity = ToolUtils.jsonToDou(object1.get("total_capacity"));
+            double usedCapcity = ToolUtils.jsonToDou(object1.get("used_capacity"));
+            double freeCapacity = ToolUtils.jsonToDou(object1.get("free_capacity"));
+            ssl.setId(id);
+            ssl.setName(name);
+            ssl.setDescription(descriptionn);
+            ssl.setType(type);
+            ssl.setProtocol(protocol);
+            ssl.setTotalCapacity(totalCapacity);
+            ssl.setFreeCapacity(freeCapacity);
+            ssl.setUsedCapacity(usedCapcity);
+            JsonElement capObj = object1.get("capabilities");
+            if (!ToolUtils.jsonIsNull(capObj)) {
+                SimpleCapabilities scb = new SimpleCapabilities();
+                JsonObject capJsonObj = capObj.getAsJsonObject();
+                String resourceType = ToolUtils.jsonToOriginalStr(capJsonObj.get("resource_type"));
+                boolean compression = ToolUtils.jsonToBoo(capJsonObj.get("compression"));
+                scb.setResourceType(resourceType);
+                scb.setCompression(compression);
+                JsonElement smarttierObj = capJsonObj.get("smarttier");
+                if (!ToolUtils.jsonIsNull(smarttierObj)) {
+                    CapabilitiesSmarttier cbs = parseCapabilitiesSmarttier(smarttierObj);
+                    scb.setSmarttier(cbs);
                 }
-                ssls.add(ssl);
-            } catch (Exception e) {
-                log.warn("servicelevel convert error:", e);
+                JsonElement qosObject = capJsonObj.get("qos");
+                if (!ToolUtils.jsonIsNull(qosObject)) {
+                    CapabilitiesQos cq = qosParse(qosObject);
+                    scb.setQos(cq);
+                }
+                ssl.setCapabilities(scb);
             }
+            ssls.add(ssl);
         }
         return ssls;
+    }
+
+    private CapabilitiesSmarttier parseCapabilitiesSmarttier(JsonElement smarttierObj) {
+        CapabilitiesSmarttier cbs = new CapabilitiesSmarttier();
+        JsonObject smartJsonObj = smarttierObj.getAsJsonObject();
+        int policy = ToolUtils.jsonToInt(smartJsonObj.get("policy"), null);
+        boolean enabled = ToolUtils.jsonToBoo(smartJsonObj.get("enabled"));
+        cbs.setEnabled(enabled);
+        cbs.setPolicy(policy);
+        return cbs;
+    }
+
+    private CapabilitiesQos qosParse(JsonElement qosObject) {
+        CapabilitiesQos cq = new CapabilitiesQos();
+        JsonObject qosJsonObj = qosObject.getAsJsonObject();
+        boolean enabled = ToolUtils.jsonToBoo(qosJsonObj.get("enabled"));
+        cq.setEnabled(enabled);
+        JsonElement qosParamObj = qosJsonObj.get("qos_param");
+        if (!ToolUtils.jsonIsNull(qosParamObj)) {
+            QosParam qp = new QosParam();
+            JsonObject qosParamJsonObj = qosParamObj.getAsJsonObject();
+            String latencyUnit = ToolUtils.jsonToStr(qosParamJsonObj.get("latencyUnit"));
+            int latnecy = ToolUtils.jsonToInt(qosParamJsonObj.get("latency"));
+            int minBandWidth = ToolUtils.jsonToInt(qosParamJsonObj.get("minBandWidth"));
+            int minIops = ToolUtils.jsonToInt(qosParamJsonObj.get("minIOPS"));
+            int maxBandWidth = ToolUtils.jsonToInt(qosParamJsonObj.get("maxBandWidth"));
+            int maxIops = ToolUtils.jsonToInt(qosParamJsonObj.get("maxIOPS"));
+            qp.setLatency(latnecy);
+            qp.setLatencyUnit(latencyUnit);
+            qp.setMinBandWidth(minBandWidth);
+            qp.setMinIOPS(minIops);
+            qp.setMaxBandWidth(maxBandWidth);
+            qp.setMaxIOPS(maxIops);
+            cq.setQosParam(qp);
+        }
+        return cq;
     }
 
     /**
      * 扫描服务等级 发现服务等级下的存储池,磁盘,(存储端口)
      *
      * @param serivceLevelId
-     * @return java.util.List<com.dmeplugin.dmestore.model.StoragePool>
+     * @return java.util.List
      * @throws DmeException
-     * @author wangxy
-     * @date 11:21 2020/11/13
      **/
     @Override
     public List<StoragePool> getStoragePoolInfosByServiceLevelId(String serivceLevelId) throws DmeException {
         List<StoragePool> storagePools = new ArrayList<>();
-        // servicLevelId对应的serviceLevelInstanceId
+        String id = serivceLevelId;
+
+        //  servicLevelId对应的serviceLevelInstanceId
         Map<String, Map<String, Object>> serviceLevelMap = dmeRelationInstanceService.getServiceLevelInstance();
         if (null != serviceLevelMap && serviceLevelMap.size() > 0) {
-            try {
-                String serviceLevelInstanceId = serviceLevelMap.get(serivceLevelId).get("resId").toString();
-                if (!StringUtils.isEmpty(serviceLevelInstanceId)) {
-                    serivceLevelId = serviceLevelInstanceId;
-                }
-            } catch (Exception e) {
-                log.warn("获取服务等级关联的存储池,查询服务等级instanceId异常,servcieLevelId:" + serivceLevelId);
+            String serviceLevelInstanceId = serviceLevelMap.get(serivceLevelId).get("resId").toString();
+            if (!StringUtils.isEmpty(serviceLevelInstanceId)) {
+                id = serviceLevelInstanceId;
             }
         }
 
-        // 1 获取serviceLevelId下的StoragePool实例集合
-        List<String> storagePoolInstanceIds = getStoragePoolIdsByServiceLevelId(serivceLevelId);
+        //  1 获取serviceLevelId下的StoragePool实例集合
+        List<String> storagePoolInstanceIds = getStoragePoolIdsByServiceLevelId(id);
 
-        // 2 通过storagePoolInstanceId获取storagePoolId和storageDeviceId信息
+        //  2 通过storagePoolInstanceId获取storagePoolId和storageDeviceId信息
         List<StoragePool> sps = new ArrayList<>();
         if (null != storagePoolInstanceIds && storagePoolInstanceIds.size() > 0) {
             for (String instanceId : storagePoolInstanceIds) {
@@ -319,7 +310,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             }
         }
 
-        // 3 通过storageDeviceId和storagePoolId获取storagePool信息(这里先获取存储设备下的所有存储池,再通过storagePoolId过滤)
+        //  3 通过storageDeviceId和storagePoolId获取storagePool信息(这里先获取存储设备下的所有存储池,再通过storagePoolId过滤)
         if (sps.size() > 0) {
             Map<String, Set<String>> storageDevicePoolIds = new HashMap<>();
             for (StoragePool sp : sps) {
@@ -340,8 +331,6 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                     new ArrayList<>(storagePoolIds));
                 if (null != storageDevicePoolIds && storageDevicePoolIds.size() > 0) {
                     storagePools.addAll(storageDevicePools);
-                } else {
-                    log.warn("存储设备:{}下的存储池集合:{}的信息为空", storageDevcieId, gson.toJson(storageDevicePools));
                 }
             }
         }
@@ -366,8 +355,8 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             for (JsonElement je : array) {
                 JsonObject element = je.getAsJsonObject();
                 Volume volume = new Volume();
-                volume.setId(ToolUtils.jsonToStr(element.get("id")));
-                volume.setName(ToolUtils.jsonToStr(element.get("name")));
+                volume.setId(ToolUtils.jsonToStr(element.get(ID_FIELD)));
+                volume.setName(ToolUtils.jsonToStr(element.get(NAME_FIELD)));
                 volume.setStatus(ToolUtils.jsonToStr(element.get("status")));
                 volume.setAttached(ToolUtils.jsonToBoo(element.get("attached")));
                 volume.setAlloctype(ToolUtils.jsonToStr(element.get("alloctype")));
@@ -420,11 +409,9 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     /**
      * 服务等级 发现服务等级下的存储池 serviceLevelId和sourceInstanceId一样?
      *
-     * @param serviceLevelId
-     * @return java.util.List<java.lang.String>
-     * @throws DmeException
-     * @author wangxy
-     * @date 11:19 2020/11/13
+     * @param serviceLevelId serviceLevelId
+     * @return java.util.List
+     * @throws DmeException DmeException
      **/
     public List<String> getStoragePoolIdsByServiceLevelId(String serviceLevelId) throws DmeException {
         String relatinName = "M_DjTierContainsStoragePool";
@@ -434,11 +421,9 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     /**
      * 服务等级 发现服务等级下的卷实例ID
      *
-     * @param serviceLevelId
-     * @return java.util.List<java.lang.String>
-     * @throws DmeException
-     * @author wangxy
-     * @date 11:20 2020/11/13
+     * @param serviceLevelId serviceLevelId
+     * @return java.util.List
+     * @throws DmeException DmeException
      **/
     public List<String> getVolumeIdsByServiceLivelId(String serviceLevelId) throws DmeException {
         String relationName = "M_DjTierContainsLun";
@@ -461,28 +446,20 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     /**
      * 将instance转换为storagepool信息
      *
-     * @param instanceObj
+     * @param instanceObj instanceObj
      * @return com.dmeplugin.dmestore.model.StoragePool
-     * @author wangxy
-     * @date 11:20 2020/11/13
      **/
     private StoragePool convertInstanceToStoragePool(Object instanceObj) {
         StoragePool sp = new StoragePool();
         JsonObject jsonObject = new JsonParser().parse(instanceObj.toString()).getAsJsonObject();
-        String name = ToolUtils.jsonToStr(jsonObject.get("name"));
-        // runningStatus?
-        String status = ToolUtils.jsonToStr(jsonObject.get("status"));
-        // SYS_StorageDisk中取磁盘类型?
-        String type = ToolUtils.jsonToStr(jsonObject.get("type"));
+        String name = ToolUtils.jsonToStr(jsonObject.get(NAME_FIELD));
         String poolId = ToolUtils.jsonToStr(jsonObject.get("poolId"));
         String storageDeviceId = ToolUtils.jsonToStr(jsonObject.get("storageDeviceId"));
-        String storagePoolInstanceId = ToolUtils.jsonToStr(jsonObject.get("id"));
-
+        String storagePoolInstanceId = ToolUtils.jsonToStr(jsonObject.get(ID_FIELD));
         sp.setName(name);
         sp.setStoragePoolId(poolId);
         sp.setStorageInstanceId(storagePoolInstanceId);
         sp.setStorageDeviceId(storageDeviceId);
-
         return sp;
     }
 }

@@ -61,7 +61,7 @@
         <property name="dmeAccessService" ref="DmeAccessServiceImpl"/>
         <property name="dmeStorageService" ref="DmeStorageServiceImpl"/>
         <property name="dmeRelationInstanceService" ref="DmeRelationInstanceServiceImpl"/>
-        <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
+        <property name="vcenterinfoservice" ref="VCenterInfoServiceImpl"/>
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
     </bean>
 
@@ -86,7 +86,7 @@
         <property name="dmeStorageService" ref="DmeStorageServiceImpl"/>
         <property name="taskService" ref="taskService"/>
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
-        <property name="vCenterInfoService" ref="VCenterInfoServiceImpl"/>
+        <property name="vcenterinfoservice" ref="VCenterInfoServiceImpl"/>
     </bean>
 
     <bean name="DataStoreStatisticHistoryServiceImpl"

@@ -2,10 +2,19 @@ package com.huawei.dmestore.dao;
 
 import com.huawei.dmestore.constant.DPSqlFileConstant;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 
+/**
+ * SystemDao
+ *
+ * @author yy
+ * @since 2020-09-15
+ **/
 public class SystemDao extends H2DataBaseDao {
-
     public boolean checkTable(String sqlFile) throws SQLException {
         Connection con = null;
         ResultSet resultSet = null;
@@ -14,9 +23,9 @@ public class SystemDao extends H2DataBaseDao {
             con = getConnection();
             resultSet = con.getMetaData().getTables(null, null, sqlFile, null);
             tableExist = resultSet.next();
-        } catch (SQLException e) {
-            LOGGER.error("Failed to check table: " + e.getMessage());
-            throw e;
+        } catch (SQLException ex) {
+            LOGGER.error("Failed to check table: {}", ex.getMessage());
+            throw ex;
         } finally {
             closeConnection(con, null, resultSet);
         }
@@ -29,8 +38,9 @@ public class SystemDao extends H2DataBaseDao {
      *
      * @param tableName 表名
      * @param createTableSql 创建表的SQL
+     * @throws SQLException SQLException
      */
-    public void checkExistAndCreateTable(String tableName, String createTableSql) throws Exception {
+    public void checkExistAndCreateTable(String tableName, String createTableSql) throws SQLException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -41,15 +51,15 @@ public class SystemDao extends H2DataBaseDao {
                 ps = con.prepareStatement(createTableSql);
                 ps.executeUpdate();
             }
-        } catch (Exception e) {
-            LOGGER.error("Failed to check exist and create table: " + e.getMessage());
-            throw e;
+        } catch (SQLException ex) {
+            LOGGER.error("Failed to check exist and create table: {}", ex.getMessage());
+            throw ex;
         } finally {
             closeConnection(con, ps, rs);
         }
     }
 
-    public void initData(String datasql) throws Exception {
+    public void initData(String datasql) throws SQLException {
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
@@ -57,9 +67,9 @@ public class SystemDao extends H2DataBaseDao {
             con = getConnection();
             ps = con.prepareStatement(datasql);
             ps.executeUpdate();
-        } catch (Exception e) {
-            LOGGER.error("Failed to initData: " + e.getMessage());
-            throw e;
+        } catch (SQLException ex) {
+            LOGGER.error("Failed to initData: {}", ex.getMessage());
+            throw ex;
         } finally {
             closeConnection(con, ps, rs);
         }
@@ -75,8 +85,8 @@ public class SystemDao extends H2DataBaseDao {
             ps1 = con.prepareStatement(sql);
             rs = ps1.executeQuery();
             ResultSetMetaData resultSetMetaData = rs.getMetaData();
-            for (int i = 0; i < resultSetMetaData.getColumnCount(); i++) {
-                if (resultSetMetaData.getColumnName(i + 1).equalsIgnoreCase(columnName)) {
+            for (int index = 0; index < resultSetMetaData.getColumnCount(); index++) {
+                if (resultSetMetaData.getColumnName(index + 1).equalsIgnoreCase(columnName)) {
                     return true;
                 }
             }
@@ -98,12 +108,11 @@ public class SystemDao extends H2DataBaseDao {
                     ps1.close();
                     ps1 = null;
                 } catch (SQLException e) {
-                    LOGGER.error("Cannot delete data from " + table);
+                    LOGGER.error("Cannot delete data from {}", table);
                 }
             }
         } finally {
             closeConnection(con, ps1, null);
         }
     }
-
 }
