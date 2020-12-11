@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+
 /**
  * VmRdmController
  *
@@ -31,9 +32,18 @@ public class VmRdmController extends BaseController {
     @Autowired
     private VmRdmService vmRdmService;
 
+    /**
+     * createBean
+     *
+     * @param vmObjectId        vmObjectId
+     * @param createBean        createBean
+     * @param dataStoreObjectId dataStoreObjectId
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "createRdm", method = RequestMethod.POST)
     public ResponseBodyBean createRdm(@RequestParam("vmObjectId") String vmObjectId,
-        @RequestBody VmRdmCreateBean createBean, @RequestParam("dataStoreObjectId") String dataStoreObjectId) {
+                                      @RequestBody VmRdmCreateBean createBean,
+                                      @RequestParam("dataStoreObjectId") String dataStoreObjectId) {
         try {
             vmRdmService.createRdm(dataStoreObjectId, vmObjectId, createBean);
             return success();
@@ -43,6 +53,11 @@ public class VmRdmController extends BaseController {
         }
     }
 
+    /**
+     * dmeHosts
+     *
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "dmeHosts", method = RequestMethod.GET)
     public ResponseBodyBean dmeHosts() {
         try {
@@ -53,6 +68,12 @@ public class VmRdmController extends BaseController {
         }
     }
 
+    /**
+     * getDatastoreMountsOnHost
+     *
+     * @param vmObjectId vmObjectId
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "vCenter/datastoreOnHost", method = RequestMethod.GET)
     public ResponseBodyBean getDatastoreMountsOnHost(@RequestParam("vmObjectId") String vmObjectId) {
         try {

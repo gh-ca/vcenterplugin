@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 /**
  * NfsOperationController
  *
@@ -102,6 +103,12 @@ public class NfsOperationController extends BaseController {
     @Autowired
     private NfsOperationService nfsOperationService;
 
+    /**
+     * createNfsDatastore
+     *
+     * @param requestParams requestParams
+     * @return ResponseBodyBean
+     */
     @PostMapping("/createnfsdatastore")
     public ResponseBodyBean createNfsDatastore(@RequestBody Map<String, Object> requestParams) {
         // 入参调整
@@ -152,6 +159,13 @@ public class NfsOperationController extends BaseController {
         }
     }
 
+    /**
+     * advanceExcute
+     *
+     * @param requestParams requestParams
+     * @param targetParams  targetParams
+     * @param isAdvance     isAdvance
+     */
     private void advanceExcute(Map<String, Object> requestParams, Map<String, Object> targetParams, boolean isAdvance) {
         Map<String, Object> tuning = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         Map<String, Object> capacityAutonegotiation = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
@@ -195,6 +209,12 @@ public class NfsOperationController extends BaseController {
         targetParams.put("capacity_autonegotiation", capacityAutonegotiation);
     }
 
+    /**
+     * updateNfsDatastore
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @PostMapping("/updatenfsdatastore")
     public ResponseBodyBean updateNfsDatastore(final @RequestBody Map<String, Object> params) {
         Map<String, Object> param = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
@@ -247,6 +267,12 @@ public class NfsOperationController extends BaseController {
         }
     }
 
+    /**
+     * changeNfsCapacity
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @PutMapping("/changenfsdatastore")
     public ResponseBodyBean changeNfsCapacity(final @RequestBody Map<String, Object> params) {
         try {
@@ -257,6 +283,12 @@ public class NfsOperationController extends BaseController {
         }
     }
 
+    /**
+     * getEditNfsStore
+     *
+     * @param storeObjectId storeObjectId
+     * @return ResponseBodyBean
+     */
     @GetMapping("/editnfsstore")
     public ResponseBodyBean getEditNfsStore(@RequestParam(name = "storeObjectId") String storeObjectId) {
         try {

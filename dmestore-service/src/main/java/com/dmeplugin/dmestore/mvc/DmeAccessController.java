@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
+
 /**
  * DmeAccessController
  *
@@ -37,6 +38,12 @@ public class DmeAccessController extends BaseController {
     @Autowired
     private DmeAccessService dmeAccessService;
 
+    /**
+     * accessDme
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/access", method = RequestMethod.POST)
     public ResponseBodyBean accessDme(@RequestBody Map<String, Object> params) {
         LOG.info("accessdme/access params=={}", gson.toJson(params));
@@ -48,6 +55,11 @@ public class DmeAccessController extends BaseController {
         }
     }
 
+    /**
+     * refreshDme
+     *
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/refreshaccess", method = RequestMethod.GET)
     public ResponseBodyBean refreshDme() {
         LOG.info("accessdme/refreshaccess==");
@@ -58,6 +70,12 @@ public class DmeAccessController extends BaseController {
         }
     }
 
+    /**
+     * getWorkLoads
+     *
+     * @param storageId storageId
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/getworkloads", method = RequestMethod.GET)
     public ResponseBodyBean getWorkLoads(@RequestParam("storageId") String storageId) {
         try {
@@ -68,6 +86,12 @@ public class DmeAccessController extends BaseController {
         }
     }
 
+    /**
+     * scanDatastore
+     *
+     * @param storageType storageType
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/scandatastore", method = RequestMethod.GET)
     public ResponseBodyBean scanDatastore(@RequestParam("storageType") String storageType) {
         try {
@@ -78,9 +102,16 @@ public class DmeAccessController extends BaseController {
         }
     }
 
+    /**
+     * configureTaskTime
+     *
+     * @param taskId   taskId
+     * @param taskCron taskCron
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/configuretasktime", method = RequestMethod.GET)
     public ResponseBodyBean configureTaskTime(@RequestParam("taskId") Integer taskId,
-        @RequestParam("taskCron") String taskCron) {
+                                              @RequestParam("taskCron") String taskCron) {
         try {
             dmeAccessService.configureTaskTime(taskId, taskCron);
             return success(null, "configure task time complete!");

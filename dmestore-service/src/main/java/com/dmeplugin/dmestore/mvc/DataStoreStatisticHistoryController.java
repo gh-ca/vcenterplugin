@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
+
 /**
  * DataStoreStatisticHistoryController
  *
@@ -24,6 +25,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
     @Autowired
     DataStoreStatisticHistoryService dataSotreStatisticHistroyService;
 
+    /**
+     * getVmfsVolumeStatistic
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/vmfs", method = RequestMethod.POST)
     public ResponseBodyBean getVmfsVolumeStatistic(@RequestBody Map<String, Object> params) {
         try {
@@ -33,6 +40,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
         }
     }
 
+    /**
+     * getVolumeStatistic
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/volume", method = RequestMethod.POST)
     public ResponseBodyBean getVolumeStatistic(@RequestBody Map<String, Object> params) {
         try {
@@ -42,6 +55,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
         }
     }
 
+    /**
+     * getNfsVolumeStatistic
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/nfs", method = RequestMethod.POST)
     public ResponseBodyBean getNfsVolumeStatistic(@RequestBody Map<String, Object> params) {
         try {
@@ -51,6 +70,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
         }
     }
 
+    /**
+     * getFsStatistic
+     *
+     * @param params params
+     * @return getFsStatistic
+     */
     @RequestMapping(value = "/fs", method = RequestMethod.POST)
     public ResponseBodyBean getFsStatistic(@RequestBody Map<String, Object> params) {
         try {
@@ -60,6 +85,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
         }
     }
 
+    /**
+     * getServiceLevelStatistic
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/servicelevel", method = RequestMethod.POST)
     public ResponseBodyBean getServiceLevelStatistic(@RequestBody Map<String, Object> params) {
         try {
@@ -69,6 +100,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
         }
     }
 
+    /**
+     * getServiceLevelLunStatistic
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/servicelevelLun", method = RequestMethod.POST)
     public ResponseBodyBean getServiceLevelLunStatistic(@RequestBody Map<String, Object> params) {
         try {
@@ -78,6 +115,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
         }
     }
 
+    /**
+     * getServiceLevelStoragePoolStatistic
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/servicelevelStoragePool", method = RequestMethod.POST)
     public ResponseBodyBean getServiceLevelStoragePoolStatistic(@RequestBody Map<String, Object> params) {
         try {
@@ -87,6 +130,13 @@ public class DataStoreStatisticHistoryController extends BaseController {
         }
     }
 
+    /**
+     * getStoragePoolStatistic
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     * @throws Exception Exception
+     */
     @RequestMapping(value = "/storagePool", method = RequestMethod.POST)
     public ResponseBodyBean getStoragePoolStatistic(@RequestBody Map<String, Object> params) throws Exception {
         try {
@@ -96,6 +146,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
         }
     }
 
+    /**
+     * getStoragePoolCurrentStatistic
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/storagePoolCurrent", method = RequestMethod.POST)
     public ResponseBodyBean getStoragePoolCurrentStatistic(@RequestBody Map<String, Object> params) {
         try {
@@ -105,6 +161,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
         }
     }
 
+    /**
+     * getStoragDeviceStatistic
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/storageDevice", method = RequestMethod.POST)
     public ResponseBodyBean getStoragDeviceStatistic(@RequestBody Map<String, Object> params) {
         try {
@@ -114,6 +176,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
         }
     }
 
+    /**
+     * getStoragDeviceCurrentStatistic
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/storageDeviceCurrent", method = RequestMethod.POST)
     public ResponseBodyBean getStoragDeviceCurrentStatistic(@RequestBody Map<String, Object> params) {
         try {
@@ -123,6 +191,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
         }
     }
 
+    /**
+     * getControllerStatistic
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/controller", method = RequestMethod.POST)
     public ResponseBodyBean getControllerStatistic(@RequestBody Map<String, Object> params) {
         try {
@@ -132,6 +206,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
         }
     }
 
+    /**
+     * getControllerCurrenStatistic
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/controllerCurrent", method = RequestMethod.POST)
     public ResponseBodyBean getControllerCurrenStatistic(@RequestBody Map<String, Object> params) {
         try {
@@ -141,6 +221,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
         }
     }
 
+    /**
+     * getStoragPortStatistic
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/storagePort", method = RequestMethod.POST)
     public ResponseBodyBean getStoragPortStatistic(@RequestBody Map<String, Object> params) {
         try {
@@ -150,6 +236,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
         }
     }
 
+    /**
+     * getStoragPortCurrentStatistic
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/storagePortCurrent", method = RequestMethod.POST)
     public ResponseBodyBean getStoragPortCurrentStatistic(@RequestBody Map<String, Object> params) {
         try {
@@ -159,6 +251,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
         }
     }
 
+    /**
+     * ResponseBodyBean
+     *
+     * @param params params
+     * @return getStoragDiskStatistic
+     */
     @RequestMapping(value = "/storageDisk", method = RequestMethod.POST)
     public ResponseBodyBean getStoragDiskStatistic(@RequestBody Map<String, Object> params) {
         try {
@@ -168,6 +266,12 @@ public class DataStoreStatisticHistoryController extends BaseController {
         }
     }
 
+    /**
+     * getStoragDiskCurrentStatistic
+     *
+     * @param params params
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/storageDiskCurrent", method = RequestMethod.POST)
     public ResponseBodyBean getStoragDiskCurrentStatistic(@RequestBody Map<String, Object> params) {
         try {

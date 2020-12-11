@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+
 /**
  * DmeStorageController
  *
@@ -33,6 +34,11 @@ public class DmeStorageController extends BaseController {
     @Autowired
     private DmeStorageService dmeStorageService;
 
+    /**
+     * getStorages
+     *
+     * @return ResponseBodyBean
+     */
     @GetMapping("/storages")
     public ResponseBodyBean getStorages() {
         try {
@@ -42,6 +48,12 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * getStorageDetail
+     *
+     * @param storageId storageId
+     * @return ResponseBodyBean
+     */
     @GetMapping("/storage")
     public ResponseBodyBean getStorageDetail(@RequestParam(name = "storageId") String storageId) {
         try {
@@ -51,9 +63,17 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * getStoragePools
+     *
+     * @param storageId storageId
+     * @param mediaType mediaType
+     * @return ResponseBodyBean
+     */
     @GetMapping("/storagepools")
     public ResponseBodyBean getStoragePools(@RequestParam(name = "storageId") String storageId,
-        @RequestParam(name = "mediaType", defaultValue = "all", required = false) String mediaType) {
+                                            @RequestParam(name = "mediaType", defaultValue = "all", required = false)
+                                                String mediaType) {
         try {
             return success(dmeStorageService.getStoragePools(storageId, mediaType));
         } catch (DmeException e) {
@@ -61,6 +81,12 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * getLogicPorts
+     *
+     * @param storageId storageId
+     * @return ResponseBodyBean
+     */
     @GetMapping("/logicports")
     @ResponseBody
     public ResponseBodyBean getLogicPorts(@RequestParam(name = "storageId") String storageId) {
@@ -71,6 +97,14 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * getVolumesByPage
+     *
+     * @param storageId storageId
+     * @param pageSize  pageSize
+     * @param pageNo    pageNo
+     * @return ResponseBodyBean
+     */
     @GetMapping("/volumes/byPage")
     @ResponseBody
     public ResponseBodyBean getVolumesByPage(
@@ -84,6 +118,12 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * getFileSystems
+     *
+     * @param storageId storageId
+     * @return ResponseBodyBean
+     */
     @GetMapping("/filesystems")
     @ResponseBody
     public ResponseBodyBean getFileSystems(@RequestParam(name = "storageId") String storageId) {
@@ -94,6 +134,12 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * getDtrees
+     *
+     * @param storageId storageId
+     * @return ResponseBodyBean
+     */
     @GetMapping("/dtrees")
     @ResponseBody
     public ResponseBodyBean getDtrees(@RequestParam(name = "storageId") String storageId) {
@@ -104,6 +150,12 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * getNfsShares
+     *
+     * @param storageId storageId
+     * @return ResponseBodyBean
+     */
     @GetMapping("/nfsshares")
     public ResponseBodyBean getNfsShares(@RequestParam(name = "storageId") String storageId) {
         try {
@@ -113,6 +165,12 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * getBandPorts
+     *
+     * @param storageId storageId
+     * @return ResponseBodyBean
+     */
     @GetMapping("/bandports")
     @ResponseBody
     public ResponseBodyBean getBandPorts(@RequestParam(name = "storageId") String storageId) {
@@ -123,6 +181,12 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * getStorageControllers
+     *
+     * @param storageDeviceId storageDeviceId
+     * @return ResponseBodyBean
+     */
     @GetMapping("/storagecontrollers")
     public ResponseBodyBean getStorageControllers(@RequestParam(name = "storageDeviceId") String storageDeviceId) {
         try {
@@ -132,6 +196,12 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * getStorageDisks
+     *
+     * @param storageDeviceId storageDeviceId
+     * @return ResponseBodyBean
+     */
     @GetMapping("/storagedisks")
     public ResponseBodyBean getStorageDisks(@RequestParam(name = "storageDeviceId") String storageDeviceId) {
         try {
@@ -141,6 +211,13 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * getStorageEthPorts
+     *
+     * @param storageSn storageSn
+     * @return ResponseBodyBean
+     * @throws Exception Exception
+     */
     @GetMapping("/getstorageethports")
     public ResponseBodyBean getStorageEthPorts(@RequestParam(name = "storageSn") String storageSn) throws Exception {
         try {
@@ -150,9 +227,17 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * getStoragePort
+     *
+     * @param storageDeviceId storageDeviceId
+     * @param portType        portType
+     * @return ResponseBodyBean
+     */
     @GetMapping("/storageport")
     public ResponseBodyBean getStoragePort(@RequestParam(name = "storageDeviceId") String storageDeviceId,
-        @RequestParam(name = "portType", defaultValue = "ALL", required = false) String portType) {
+                                           @RequestParam(name = "portType", defaultValue = "ALL", required = false)
+                                               String portType) {
         try {
             return success(dmeStorageService.getStoragePort(storageDeviceId, portType));
         } catch (DmeException e) {
@@ -160,6 +245,12 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * getFailoverGroups
+     *
+     * @param storageId storageId
+     * @return ResponseBodyBean
+     */
     @GetMapping("/failovergroups")
     @ResponseBody
     public ResponseBodyBean getFailoverGroups(@RequestParam(name = "storageId") String storageId) {
@@ -170,6 +261,12 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * listStoragePerformance
+     *
+     * @param storageIds storageIds
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/liststorageperformance", method = RequestMethod.GET)
     public ResponseBodyBean listStoragePerformance(@RequestParam("storageIds") List<String> storageIds) {
         try {
@@ -180,6 +277,12 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * listStoragePoolPerformance
+     *
+     * @param storagePoolIds storagePoolIds
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/liststoragepoolperformance", method = RequestMethod.GET)
     public ResponseBodyBean listStoragePoolPerformance(@RequestParam("storagePoolIds") List<String> storagePoolIds) {
         try {
@@ -190,6 +293,13 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * listStorageControllerPerformance
+     *
+     * @param storageControllerIds storageControllerIds
+     * @return ResponseBodyBean
+     * @throws Exception Exception
+     */
     @RequestMapping(value = "/listStorageControllerPerformance", method = RequestMethod.GET)
     public ResponseBodyBean listStorageControllerPerformance(
         @RequestParam("storageControllerIds") List<String> storageControllerIds) throws Exception {
@@ -201,6 +311,12 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * listStorageDiskPerformance
+     *
+     * @param storageDiskIds storageDiskIds
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/listStorageDiskPerformance", method = RequestMethod.GET)
     @ResponseBody
     public ResponseBodyBean listStorageDiskPerformance(@RequestParam("storageDiskIds") List<String> storageDiskIds) {
@@ -212,6 +328,12 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * listStoragePortPerformance
+     *
+     * @param storagePortIds storagePortIds
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/listStoragePortPerformance", method = RequestMethod.POST)
     public ResponseBodyBean listStoragePortPerformance(@RequestParam("storagePortIds") List<String> storagePortIds) {
         try {
@@ -222,6 +344,12 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * listVolumesPerformance
+     *
+     * @param volumeId volumeId
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/listVolumesPerformance", method = RequestMethod.GET)
     public ResponseBodyBean listVolumesPerformance(@RequestParam("volumeId") List<String> volumeId) {
         try {
@@ -232,6 +360,12 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * queryVolumeByName
+     *
+     * @param name name
+     * @return ResponseBodyBean
+     */
     @GetMapping("/queryvolumebyname")
     public ResponseBodyBean queryVolumeByName(@RequestParam("name") String name) {
         try {
@@ -241,9 +375,16 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * queryFsByName
+     *
+     * @param name      name
+     * @param storageId storageId
+     * @return ResponseBodyBean
+     */
     @GetMapping("/queryfsbyname")
     public ResponseBodyBean queryFsByName(@RequestParam("name") String name,
-        @RequestParam("storageId") String storageId) {
+                                          @RequestParam("storageId") String storageId) {
         try {
             return success(dmeStorageService.queryFsByName(name, storageId));
         } catch (DmeException e) {
@@ -251,9 +392,16 @@ public class DmeStorageController extends BaseController {
         }
     }
 
+    /**
+     * queryShareByName
+     *
+     * @param name      name
+     * @param storageId storageId
+     * @return ResponseBodyBean
+     */
     @GetMapping("/querysharebyname")
     public ResponseBodyBean queryShareByName(@RequestParam("name") String name,
-        @RequestParam("storageId") String storageId) {
+                                             @RequestParam("storageId") String storageId) {
         try {
             return success(dmeStorageService.queryShareByName("/" + name, storageId));
         } catch (DmeException e) {

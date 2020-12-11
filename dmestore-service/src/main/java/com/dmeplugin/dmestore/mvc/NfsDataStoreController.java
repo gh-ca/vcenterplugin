@@ -22,6 +22,12 @@ public class NfsDataStoreController extends BaseController {
     @Autowired
     private DmeNFSAccessService dmeNfsAccessService;
 
+    /**
+     * portAttr
+     *
+     * @param storageObjectId storageObjectId
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/logicport/{storageObjectId}", method = RequestMethod.GET)
     public ResponseBodyBean portAttr(@PathVariable("storageObjectId") String storageObjectId) {
         String failureStr;
@@ -33,6 +39,12 @@ public class NfsDataStoreController extends BaseController {
         return failure(failureStr);
     }
 
+    /**
+     * shareAttr
+     *
+     * @param storageObjectId storageObjectId
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/share/{storageObjectId}", method = RequestMethod.GET)
     public ResponseBodyBean shareAttr(@PathVariable("storageObjectId") String storageObjectId) {
         String failureStr;
@@ -44,6 +56,12 @@ public class NfsDataStoreController extends BaseController {
         return failure(failureStr);
     }
 
+    /**
+     * fsAttr
+     *
+     * @param storageObjectId storageObjectId
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/fileservice/{storageObjectId}", method = RequestMethod.GET)
     public ResponseBodyBean fsAttr(@PathVariable("storageObjectId") String storageObjectId) {
         String failureStr;
@@ -55,6 +73,11 @@ public class NfsDataStoreController extends BaseController {
         return failure(failureStr);
     }
 
+    /**
+     * scannfs
+     *
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/scannfs", method = RequestMethod.GET)
     public ResponseBodyBean scannfs() {
         String failureStr;

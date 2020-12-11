@@ -24,6 +24,11 @@ public class OverviewController extends BaseController {
     @Autowired
     private OverviewService overviewService;
 
+    /**
+     * getStorageNum
+     *
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/getstoragenum", method = RequestMethod.GET)
     public ResponseBodyBean getStorageNum() {
         try {
@@ -33,11 +38,26 @@ public class OverviewController extends BaseController {
         }
     }
 
+    /**
+     * getDataStoreOverview
+     *
+     * @param type type
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/getdatastoreoverview", method = RequestMethod.GET)
     public ResponseBodyBean getDataStoreOverview(@RequestParam String type) {
         return success(overviewService.getDataStoreCapacitySummary(type));
     }
 
+    /**
+     * getDataStoreTopN
+     *
+     * @param type type
+     * @param topn topn
+     * @param orderBy orderBy
+     * @param desc desc
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/getdatastoretopn", method = RequestMethod.GET)
     public ResponseBodyBean getDataStoreTopN(@RequestParam String type, @RequestParam(required = false) Integer topn,
         @RequestParam(defaultValue = "utilization", required = false) String orderBy,
@@ -50,6 +70,11 @@ public class OverviewController extends BaseController {
         return success(overviewService.getDataStoreCapacityTopN(type, topnDefault));
     }
 
+    /**
+     * getBestPracticeViolations
+     *
+     * @return ResponseBodyBean
+     */
     @RequestMapping(value = "/getbestpracticeviolations", method = RequestMethod.GET)
     public ResponseBodyBean getBestPracticeViolations() {
         // type 0 :critical, 1:major, 2:warning, 3: info
