@@ -14,11 +14,33 @@
 //KIND, either express or implied.  See the License for the
 //specific language governing permissions and limitations
 //under the License.
+
 package com.dmeplugin.vmware.mo;
 
-public interface ScsiDiskControllerType {
-     String LSILOGIC_PARALLEL = "lsilogic";
-     String LSILOGIC_SAS = "lsisas1068";
-     String BUSLOGIC = "buslogic";
-     String VMWARE_PARAVIRTUAL = "pvscsi";
+/**
+ * ScsiDiskControllerType
+ *
+ * @author Administrator
+ * @since 2020-12-11
+ */
+public class ScsiDiskControllerType {
+    /**
+     * LSILOGIC_PARALLEL
+     */
+    public static final String LSILOGIC_PARALLEL = "lsilogic";
+    /**
+     * LSILOGIC_SAS
+     */
+    public static final String LSILOGIC_SAS = "lsisas1068";
+    /**
+     * BUSLOGIC
+     */
+    public static final String BUSLOGIC = "buslogic";
+    /**
+     * VMWARE_PARAVIRTUAL
+     */
+    public static final String VMWARE_PARAVIRTUAL = "pvscsi";
+
+    private ScsiDiskControllerType() {
+    }
 }

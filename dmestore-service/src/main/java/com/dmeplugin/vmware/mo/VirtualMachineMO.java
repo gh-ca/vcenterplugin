@@ -3,36 +3,88 @@ package com.dmeplugin.vmware.mo;
 import com.dmeplugin.vmware.util.Pair;
 import com.dmeplugin.vmware.util.VmwareContext;
 import com.dmeplugin.vmware.util.VmwareHelper;
-import com.vmware.vim25.*;
+import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.VirtualDevice;
+import com.vmware.vim25.VirtualDeviceConfigSpec;
+import com.vmware.vim25.VirtualDeviceConfigSpecFileOperation;
+import com.vmware.vim25.VirtualDeviceConfigSpecOperation;
+import com.vmware.vim25.VirtualDisk;
+import com.vmware.vim25.VirtualDiskFlatVer2BackingInfo;
+import com.vmware.vim25.VirtualDiskMode;
+import com.vmware.vim25.VirtualDiskRawDiskMappingVer1BackingInfo;
+import com.vmware.vim25.VirtualDiskType;
+import com.vmware.vim25.VirtualLsiLogicController;
+import com.vmware.vim25.VirtualMachineConfigSpec;
+import com.vmware.vim25.VirtualMachineFileInfo;
+import com.vmware.vim25.VirtualMachineRuntimeInfo;
+import com.vmware.vim25.VirtualSCSIController;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
+
 /**
+ * VirtualMachineMO
+ *
  * @author xxxx
+ * @since 2020-12-11
  **/
 public class VirtualMachineMO extends BaseMO {
-    private static final Logger s_logger = LoggerFactory.getLogger(VirtualMachineMO.class);
+    private static final Logger logger = LoggerFactory.getLogger(VirtualMachineMO.class);
+    private final String configDeviceStr = "config.hardware.device";
+    private final int unit = 1024;
+    private final int failResult = -1;
 
+    /**
+     * VirtualMachineMO
+     *
+     * @param context context
+     * @param morVm   morVm
+     */
     public VirtualMachineMO(VmwareContext context, ManagedObjectReference morVm) {
         super(context, morVm);
     }
 
+    /**
+     * getOwnerDatacenter
+     *
+     * @return Pair
+     * @throws Exception Exception
+     */
     public Pair<DatacenterMO, String> getOwnerDatacenter() throws Exception {
         return DatacenterMO.getOwnerDatacenter(context, mor);
     }
 
+    /**
+     * getRunningHost
+     *
+     * @return HostMO
+     * @throws Exception Exception
+     */
     public HostMO getRunningHost() throws Exception {
         VirtualMachineRuntimeInfo runtimeInfo = getRuntimeInfo();
         return new HostMO(context, runtimeInfo.getHost());
     }
 
+    /**
+     * getRuntimeInfo
+     *
+     * @return VirtualMachineRuntimeInfo
+     * @throws Exception Exception
+     */
     public VirtualMachineRuntimeInfo getRuntimeInfo() throws Exception {
         return (VirtualMachineRuntimeInfo) context.getVimClient().getDynamicProperty(mor, "runtime");
     }
 
+    /**
+     * getFileInfo
+     *
+     * @return VirtualMachineFileInfo
+     * @throws Exception Exception
+     */
     public VirtualMachineFileInfo getFileInfo() throws Exception {
         return (VirtualMachineFileInfo) context.getVimClient().getDynamicProperty(mor, "config.files");
     }
@@ -42,13 +94,25 @@ public class VirtualMachineMO extends BaseMO {
         return (ManagedObjectReference) context.getVimClient().getDynamicProperty(mor, "parent");
     }
 
+    /**
+     * createDisk
+     *
+     * @param vmdkDatastorePath vmdkDatastorePath
+     * @param diskType          diskType
+     * @param diskMode          diskMode
+     * @param rdmDeviceName     rdmDeviceName
+     * @param sizeInMb          sizeInMb
+     * @param morDs             morDs
+     * @param controllerKey     controllerKey
+     * @throws Exception Exception
+     */
     public void createDisk(String vmdkDatastorePath, VirtualDiskType diskType, VirtualDiskMode diskMode,
-        String rdmDeviceName, long sizeInMb, ManagedObjectReference morDs, int controllerKey) throws Exception {
-        assert (vmdkDatastorePath != null);
-        assert (morDs != null);
+                           String rdmDeviceName, long sizeInMb, ManagedObjectReference morDs, int controllerKey)
+        throws Exception {
+        assert vmdkDatastorePath != null;
+        assert morDs != null;
 
-        //2020-11-06 wangxiangyong 修改为SCSI
-        //int ideControllerKey = getIdeDeviceControllerKey();
+        // 2020-11-06 wangxiangyong 修改为SCSI
         int ideControllerKey = getLsiLogicControllerKey();
         if (controllerKey < 0) {
             controllerKey = ideControllerKey;
@@ -57,7 +121,6 @@ public class VirtualMachineMO extends BaseMO {
         VirtualDisk newDisk = new VirtualDisk();
         if (diskType == VirtualDiskType.THIN || diskType == VirtualDiskType.PREALLOCATED
             || diskType == VirtualDiskType.EAGER_ZEROED_THICK) {
-
             VirtualDiskFlatVer2BackingInfo backingInfo = new VirtualDiskFlatVer2BackingInfo();
             backingInfo.setDiskMode(VirtualDiskMode.PERSISTENT.value());
             if (diskType == VirtualDiskType.THIN) {
@@ -65,13 +128,11 @@ public class VirtualMachineMO extends BaseMO {
             } else {
                 backingInfo.setThinProvisioned(false);
             }
-
             if (diskType == VirtualDiskType.EAGER_ZEROED_THICK) {
                 backingInfo.setEagerlyScrub(true);
             } else {
                 backingInfo.setEagerlyScrub(false);
             }
-
             backingInfo.setDatastore(morDs);
             backingInfo.setFileName(vmdkDatastorePath);
             newDisk.setBacking(backingInfo);
@@ -97,15 +158,14 @@ public class VirtualMachineMO extends BaseMO {
         newDisk.setControllerKey(controllerKey);
         newDisk.setKey(-deviceNumber);
         newDisk.setUnitNumber(deviceNumber);
-        newDisk.setCapacityInKB(sizeInMb * 1024);
+        newDisk.setCapacityInKB(sizeInMb * unit);
 
-        VirtualMachineConfigSpec reConfigSpec = new VirtualMachineConfigSpec();
         VirtualDeviceConfigSpec deviceConfigSpec = new VirtualDeviceConfigSpec();
-
         deviceConfigSpec.setDevice(newDisk);
         deviceConfigSpec.setFileOperation(VirtualDeviceConfigSpecFileOperation.CREATE);
         deviceConfigSpec.setOperation(VirtualDeviceConfigSpecOperation.ADD);
 
+        VirtualMachineConfigSpec reConfigSpec = new VirtualMachineConfigSpec();
         reConfigSpec.getDeviceChange().add(deviceConfigSpec);
 
         ManagedObjectReference morTask = context.getService().reconfigVMTask(mor, reConfigSpec);
@@ -120,6 +180,13 @@ public class VirtualMachineMO extends BaseMO {
         context.waitForTaskProgressDone(morTask);
     }
 
+    /**
+     * getVmdkFileInfo
+     *
+     * @param vmdkDatastorePath vmdkDatastorePath
+     * @return Pair
+     * @throws Exception Exception
+     */
     public Pair<VmdkFileDescriptor, byte[]> getVmdkFileInfo(String vmdkDatastorePath) throws Exception {
         Pair<DatacenterMO, String> dcPair = getOwnerDatacenter();
         String url = context.composeDatastoreBrowseUrl(dcPair.second(), vmdkDatastorePath);
@@ -132,21 +199,33 @@ public class VirtualMachineMO extends BaseMO {
         return result;
     }
 
+    /**
+     * getScsiDeviceControllerKeyNoException
+     *
+     * @return int
+     * @throws Exception Exception
+     */
     public int getScsiDeviceControllerKeyNoException() throws Exception {
-        List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, "config.hardware.device");
+        List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, configDeviceStr);
 
         if (devices != null && devices.size() > 0) {
             for (VirtualDevice device : devices) {
-                if (device instanceof VirtualSCSIController &&
-                    isValidScsiDiskController((VirtualSCSIController) device)) {
+                if (device instanceof VirtualSCSIController
+                    && isValidScsiDiskController((VirtualSCSIController) device)) {
                     return device.getKey();
                 }
             }
         }
 
-        return -1;
+        return failResult;
     }
 
+    /**
+     * isValidScsiDiskController
+     *
+     * @param scsiDiskController scsiDiskController
+     * @return boolean
+     */
     private boolean isValidScsiDiskController(VirtualSCSIController scsiDiskController) {
         if (scsiDiskController == null) {
             return false;
@@ -165,8 +244,14 @@ public class VirtualMachineMO extends BaseMO {
         return true;
     }
 
+    /**
+     * getLsiLogicControllerKey
+     *
+     * @return int
+     * @throws Exception Exception
+     */
     public int getLsiLogicControllerKey() throws Exception {
-        List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, "config.hardware.device");
+        List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, configDeviceStr);
 
         if (devices != null && devices.size() > 0) {
             for (VirtualDevice device : devices) {
@@ -176,12 +261,19 @@ public class VirtualMachineMO extends BaseMO {
             }
         }
 
-        assert (false);
+        assert false;
         throw new Exception("IDE Controller Not Found");
     }
 
+    /**
+     * getNextDeviceNumber
+     *
+     * @param controllerKey controllerKey
+     * @return int
+     * @throws Exception Exception
+     */
     public int getNextDeviceNumber(int controllerKey) throws Exception {
-        List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, "config.hardware.device");
+        List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, configDeviceStr);
 
         List<Integer> existingUnitNumbers = new ArrayList<Integer>();
         int deviceNumber = 0;

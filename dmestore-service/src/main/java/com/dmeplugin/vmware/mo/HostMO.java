@@ -20,9 +20,6 @@ import com.vmware.vim25.PropertySpec;
 import com.vmware.vim25.TraversalSpec;
 import com.vmware.vim25.VirtualNicManagerNetConfig;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -30,39 +27,90 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * HostMO
+ *
+ * @author Administrator
+ * @since 2020-12-11
+ */
 public class HostMO extends BaseMO implements VmwareHypervisorHost {
     private static final Logger logger = LoggerFactory.getLogger(HostMO.class);
 
     private static final String CLUSTER_COMPUTE_RESOURCE = "ClusterComputeResource";
 
+    private final String strHostSystem = "HostSystem";
+
+    private final String strName = "name";
+
     private Map<String, VirtualMachineMO> vmCache = new HashMap<>();
 
-    private ClusterMOFactory clusterMOFactory = ClusterMOFactory.getInstance();
+    private ClusterMOFactory clusterMoFactory = ClusterMOFactory.getInstance();
 
+    /**
+     * HostMO
+     *
+     * @param context context
+     * @param morHost morHost
+     */
     public HostMO(VmwareContext context, ManagedObjectReference morHost) {
         super(context, morHost);
     }
 
+    /**
+     * HostMO
+     *
+     * @param context  context
+     * @param morType  morType
+     * @param morValue morValue
+     */
     public HostMO(VmwareContext context, String morType, String morValue) {
         super(context, morType, morValue);
     }
 
+    /**
+     * HostMO
+     *
+     * @param context  context
+     * @param hostName hostName
+     * @throws Exception Exception
+     */
     public HostMO(VmwareContext context, String hostName) throws Exception {
         super(context, null);
-        mor = this.context.getVimClient().getDecendentMoRef(this.context.getRootFolder(), "HostSystem", hostName);
+        mor = this.context.getVimClient().getDecendentMoRef(this.context.getRootFolder(), strHostSystem, hostName);
         if (mor == null) {
             logger.error("Unable to locate host " + hostName);
         }
     }
 
+    /**
+     * getHostConfigManager
+     *
+     * @return HostConfigManager
+     * @throws Exception Exception
+     */
     public HostConfigManager getHostConfigManager() throws Exception {
         return (HostConfigManager) context.getVimClient().getDynamicProperty(mor, "configManager");
     }
 
+    /**
+     * getHostVirtualNicManagerNetConfig
+     *
+     * @return List
+     * @throws Exception Exception
+     */
     public List<VirtualNicManagerNetConfig> getHostVirtualNicManagerNetConfig() throws Exception {
         return context.getVimClient().getDynamicProperty(mor, "config.virtualNicManagerInfo.netConfig");
     }
 
+    /**
+     * getHostNetworkInfo
+     *
+     * @return HostNetworkInfo
+     * @throws Exception Exception
+     */
     public HostNetworkInfo getHostNetworkInfo() throws Exception {
         return context.getVimClient().getDynamicProperty(mor, "config.network");
     }
@@ -76,7 +124,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     public ClusterDasConfigInfo getDasConfig() throws Exception {
         ManagedObjectReference morParent = getParentMor();
         if (CLUSTER_COMPUTE_RESOURCE.equals(morParent.getType())) {
-            ClusterMO clusterMo = clusterMOFactory.build(context, morParent);
+            ClusterMO clusterMo = clusterMoFactory.build(context, morParent);
             return clusterMo.getDasConfig();
         }
         return null;
@@ -86,7 +134,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     public boolean isHaEnabled() throws Exception {
         ManagedObjectReference morParent = getParentMor();
         if (CLUSTER_COMPUTE_RESOURCE.equals(morParent.getType())) {
-            ClusterMO clusterMo = clusterMOFactory.build(context, morParent);
+            ClusterMO clusterMo = clusterMoFactory.build(context, morParent);
             return clusterMo.isHaEnabled();
         }
         return false;
@@ -101,31 +149,67 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         }
     }
 
+    /**
+     * getHostStorageSystemMo
+     *
+     * @return HostStorageSystemMO
+     * @throws Exception Exception
+     */
     public HostStorageSystemMO getHostStorageSystemMo() throws Exception {
         return new HostStorageSystemMO(context,
             context.getVimClient().getDynamicProperty(mor, "configManager.storageSystem"));
     }
 
+    /**
+     * getHostDatastoreSystemMo
+     *
+     * @return HostDatastoreSystemMO
+     * @throws Exception Exception
+     */
     public HostDatastoreSystemMO getHostDatastoreSystemMo() throws Exception {
         return new HostDatastoreSystemMO(context,
             context.getVimClient().getDynamicProperty(mor, "configManager.datastoreSystem"));
     }
 
+    /**
+     * HostAdvanceOptionMO
+     *
+     * @return HostAdvanceOptionMO
+     * @throws Exception Exception
+     */
     public HostAdvanceOptionMO getHostAdvanceOptionMo() throws Exception {
         HostConfigManager configMgr = getHostConfigManager();
         return new HostAdvanceOptionMO(context, configMgr.getAdvancedOption());
     }
 
+    /**
+     * getHostKernelModuleSystemMo
+     *
+     * @return HostKernelModuleSystemMO
+     * @throws Exception
+     */
     public HostKernelModuleSystemMO getHostKernelModuleSystemMo() throws Exception {
         HostConfigManager configMgr = getHostConfigManager();
         return new HostKernelModuleSystemMO(context, configMgr.getKernelModuleSystem());
     }
 
+    /**
+     * getIscsiManagerMo
+     *
+     * @return IscsiManagerMO
+     * @throws Exception Exception
+     */
     public IscsiManagerMO getIscsiManagerMo() throws Exception {
         HostConfigManager configMgr = getHostConfigManager();
         return new IscsiManagerMO(context, configMgr.getIscsiManager());
     }
 
+    /**
+     * getHostNetworkSystemMo
+     *
+     * @return HostNetworkSystemMO
+     * @throws Exception Exception
+     */
     public HostNetworkSystemMO getHostNetworkSystemMo() throws Exception {
         HostConfigManager configMgr = getHostConfigManager();
         return new HostNetworkSystemMO(context, configMgr.getNetworkSystem());
@@ -153,10 +237,22 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         throw new Exception("Standalone host is not supported");
     }
 
+    /**
+     * getHostAboutInfo
+     *
+     * @return AboutInfo
+     * @throws Exception Exception
+     */
     public AboutInfo getHostAboutInfo() throws Exception {
         return (AboutInfo) context.getVimClient().getDynamicProperty(mor, "config.product");
     }
 
+    /**
+     * getHostType
+     *
+     * @return VmwareHostType
+     * @throws Exception Exception
+     */
     public VmwareHostType getHostType() throws Exception {
         AboutInfo aboutInfo = getHostAboutInfo();
         if ("VMware ESXi".equals(aboutInfo.getName())) {
@@ -167,8 +263,14 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         throw new Exception("Unrecognized VMware host type " + aboutInfo.getName());
     }
 
+    /**
+     * getHostName
+     *
+     * @return String
+     * @throws Exception Exception
+     */
     public String getHostName() throws Exception {
-        return (String) context.getVimClient().getDynamicProperty(mor, "name");
+        return (String) context.getVimClient().getDynamicProperty(mor, strName);
     }
 
     @Override
@@ -195,9 +297,9 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
     private boolean isUserVmInternalCsName(String vmInternalCsName) {
         String pattern = "^[i][-][0-9]+[-][0-9]+[-]";
-        Pattern p = Pattern.compile(pattern);
-        java.util.regex.Matcher m = p.matcher(vmInternalCsName);
-        if (m.find()) {
+        Pattern pattern1 = Pattern.compile(pattern);
+        java.util.regex.Matcher matcher = pattern1.matcher(vmInternalCsName);
+        if (matcher.find()) {
             return true;
         } else {
             return false;
@@ -210,7 +312,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         if (key == 0) {
             logger.warn("Custom field " + CustomFieldConstants.CLOUD_VM_INTERNAL_NAME + " is not registered ?!");
         }
-        ObjectContent[] ocs = getVmPropertiesOnHyperHost(new String[] {"name", "value[" + key + "]"});
+        ObjectContent[] ocs = getVmPropertiesOnHyperHost(new String[] {strName, "value[" + key + "]"});
         if (ocs != null && ocs.length > 0) {
             for (ObjectContent oc : ocs) {
                 List<DynamicProperty> props = oc.getPropSet();
@@ -218,7 +320,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
                     String vmVcenterName = null;
                     String vmInternalCsName = null;
                     for (DynamicProperty prop : props) {
-                        if ("name".equals(prop.getName())) {
+                        if (strName.equals(prop.getName())) {
                             vmVcenterName = prop.getVal().toString();
                         } else if (prop.getName().startsWith("value[")) {
                             if (prop.getVal() != null) {
@@ -240,20 +342,20 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
     @Override
     public ObjectContent[] getVmPropertiesOnHyperHost(String[] propertyPaths) throws Exception {
-        PropertySpec pSpec = new PropertySpec();
-        pSpec.setType("VirtualMachine");
-        pSpec.getPathSet().addAll(Arrays.asList(propertyPaths));
+        PropertySpec pspec = new PropertySpec();
+        pspec.setType("VirtualMachine");
+        pspec.getPathSet().addAll(Arrays.asList(propertyPaths));
         TraversalSpec host2VmTraversal = new TraversalSpec();
-        host2VmTraversal.setType("HostSystem");
+        host2VmTraversal.setType(strHostSystem);
         host2VmTraversal.setPath("vm");
         host2VmTraversal.setName("host2VmTraversal");
-        ObjectSpec oSpec = new ObjectSpec();
-        oSpec.setObj(mor);
-        oSpec.setSkip(Boolean.TRUE);
-        oSpec.getSelectSet().add(host2VmTraversal);
+        ObjectSpec ospec = new ObjectSpec();
+        ospec.setObj(mor);
+        ospec.setSkip(Boolean.TRUE);
+        ospec.getSelectSet().add(host2VmTraversal);
         PropertyFilterSpec pfSpec = new PropertyFilterSpec();
-        pfSpec.getPropSet().add(pSpec);
-        pfSpec.getObjectSet().add(oSpec);
+        pfSpec.getPropSet().add(pspec);
+        pfSpec.getObjectSet().add(ospec);
         List<PropertyFilterSpec> pfSpecArr = new ArrayList<>();
         pfSpecArr.add(pfSpec);
         List<ObjectContent> properties = context.getService()
@@ -263,20 +365,20 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
     @Override
     public ObjectContent[] getDatastorePropertiesOnHyperHost(String[] propertyPaths) throws Exception {
-        PropertySpec pSpec = new PropertySpec();
-        pSpec.setType("Datastore");
-        pSpec.getPathSet().addAll(Arrays.asList(propertyPaths));
+        PropertySpec pspec = new PropertySpec();
+        pspec.setType("Datastore");
+        pspec.getPathSet().addAll(Arrays.asList(propertyPaths));
         TraversalSpec host2DatastoreTraversal = new TraversalSpec();
-        host2DatastoreTraversal.setType("HostSystem");
+        host2DatastoreTraversal.setType(strHostSystem);
         host2DatastoreTraversal.setPath("datastore");
         host2DatastoreTraversal.setName("host2DatastoreTraversal");
-        ObjectSpec oSpec = new ObjectSpec();
-        oSpec.setObj(mor);
-        oSpec.setSkip(Boolean.TRUE);
-        oSpec.getSelectSet().add(host2DatastoreTraversal);
+        ObjectSpec ospec = new ObjectSpec();
+        ospec.setObj(mor);
+        ospec.setSkip(Boolean.TRUE);
+        ospec.getSelectSet().add(host2DatastoreTraversal);
         PropertyFilterSpec pfSpec = new PropertyFilterSpec();
-        pfSpec.getPropSet().add(pSpec);
-        pfSpec.getObjectSet().add(oSpec);
+        pfSpec.getPropSet().add(pspec);
+        pfSpec.getObjectSet().add(ospec);
         List<PropertyFilterSpec> pfSpecArr = new ArrayList<PropertyFilterSpec>();
         pfSpecArr.add(pfSpec);
         List<ObjectContent> properties = context.getService()
@@ -284,8 +386,14 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         return properties.toArray(new ObjectContent[properties.size()]);
     }
 
+    /**
+     * getDatastoreMountsOnHost
+     *
+     * @return List
+     * @throws Exception Exception
+     */
     public List<Pair<ManagedObjectReference, String>> getDatastoreMountsOnHost() throws Exception {
-        List<Pair<ManagedObjectReference, String>> mounts = new ArrayList<Pair<ManagedObjectReference, String>>();
+        List<Pair<ManagedObjectReference, String>> mounts = new ArrayList<>();
         ObjectContent[] ocs = getDatastorePropertiesOnHyperHost(
             new String[] {String.format("host[\"%s\"].mountInfo.path", mor.getValue())});
         if (ocs != null) {
@@ -298,8 +406,16 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         return mounts;
     }
 
+    /**
+     * getExistingDataStoreOnHost
+     *
+     * @param hostAddress           hostAddress
+     * @param path                  path
+     * @param hostDatastoreSystemMo hostDatastoreSystemMo
+     * @return
+     */
     public ManagedObjectReference getExistingDataStoreOnHost(String hostAddress, String path,
-        HostDatastoreSystemMO hostDatastoreSystemMo) {
+                                                             HostDatastoreSystemMO hostDatastoreSystemMo) {
         List<ManagedObjectReference> morArray;
         try {
             morArray = hostDatastoreSystemMo.getDatastores();
@@ -307,8 +423,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
             return null;
         }
         if (morArray.size() > 0) {
-            int i;
-            for (i = 0; i < morArray.size(); i++) {
+            for (int i = 0; i < morArray.size(); i++) {
                 NasDatastoreInfo nasDadastore;
                 try {
                     nasDadastore = hostDatastoreSystemMo.getNasDatastoreInfo(morArray.get(i));
@@ -328,7 +443,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
     @Override
     public ManagedObjectReference mountDatastore(boolean vmfsDatastore, String poolHostAddress, int poolHostPort,
-        String poolPath, String poolUuid) throws Exception {
+                                                 String poolPath, String poolUuid) throws Exception {
         HostDatastoreSystemMO hostDatastoreSystemMo = getHostDatastoreSystemMo();
         ManagedObjectReference morDatastore = hostDatastoreSystemMo.findDatastore(poolUuid);
         if (morDatastore == null) {
@@ -415,26 +530,38 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     public String getRecommendedDiskController(String guestOsId) throws Exception {
         ManagedObjectReference morParent = getParentMor();
         if (CLUSTER_COMPUTE_RESOURCE.equals(morParent.getType())) {
-            ClusterMO clusterMo = clusterMOFactory.build(context, morParent);
+            ClusterMO clusterMo = clusterMoFactory.build(context, morParent);
             return clusterMo.getRecommendedDiskController(guestOsId);
         }
         return null;
     }
 
+    /**
+     * getHostNetworks
+     *
+     * @return List
+     * @throws Exception Exception
+     */
     public List<ManagedObjectReference> getHostNetworks() throws Exception {
         return context.getVimClient().getDynamicProperty(mor, "network");
     }
 
+    /**
+     * getNetworkName
+     *
+     * @param netMorVal netMorVal
+     * @return String
+     * @throws Exception Exception
+     */
     public String getNetworkName(String netMorVal) throws Exception {
         String networkName = "";
         List<ManagedObjectReference> hostNetworks = getHostNetworks();
         for (ManagedObjectReference hostNetwork : hostNetworks) {
             if (hostNetwork.getValue().equals(netMorVal)) {
-                networkName = context.getVimClient().getDynamicProperty(hostNetwork, "name");
+                networkName = context.getVimClient().getDynamicProperty(hostNetwork, strName);
                 break;
             }
         }
         return networkName;
     }
-
 }

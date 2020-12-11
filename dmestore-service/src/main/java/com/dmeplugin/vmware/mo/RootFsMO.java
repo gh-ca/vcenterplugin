@@ -8,11 +8,30 @@ import com.vmware.vim25.RuntimeFaultFaultMsg;
 
 import java.util.List;
 
+/**
+ * RootFsMO
+ *
+ * @author Administrator
+ * @since 2020-12-11
+ */
 public class RootFsMO extends BaseMO {
+    /**
+     * RootFsMO
+     *
+     * @param context context
+     * @param mor     mor
+     */
     public RootFsMO(VmwareContext context, ManagedObjectReference mor) {
         super(context, mor);
     }
 
+    /**
+     * getAllHostOnRootFs
+     *
+     * @return List
+     * @throws InvalidPropertyFaultMsg InvalidPropertyFaultMsg
+     * @throws RuntimeFaultFaultMsg    RuntimeFaultFaultMsg
+     */
     public List<Pair<ManagedObjectReference, String>> getAllHostOnRootFs()
         throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
         List<Pair<ManagedObjectReference, String>> hosts = context.inFolderByType(context.getRootFolder(),
@@ -20,6 +39,13 @@ public class RootFsMO extends BaseMO {
         return hosts;
     }
 
+    /**
+     * getAllClusterOnRootFs
+     *
+     * @return List
+     * @throws InvalidPropertyFaultMsg InvalidPropertyFaultMsg
+     * @throws RuntimeFaultFaultMsg    RuntimeFaultFaultMsg
+     */
     public List<Pair<ManagedObjectReference, String>> getAllClusterOnRootFs()
         throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
         List<Pair<ManagedObjectReference, String>> clusters = context.inFolderByType(context.getRootFolder(),
@@ -27,12 +53,26 @@ public class RootFsMO extends BaseMO {
         return clusters;
     }
 
+    /**
+     * getAllDatastoreOnRootFs
+     *
+     * @return List
+     * @throws InvalidPropertyFaultMsg InvalidPropertyFaultMsg
+     * @throws RuntimeFaultFaultMsg    RuntimeFaultFaultMsg
+     */
     public List<Pair<ManagedObjectReference, String>> getAllDatastoreOnRootFs()
         throws InvalidPropertyFaultMsg, RuntimeFaultFaultMsg {
         List<Pair<ManagedObjectReference, String>> hosts = context.inFolderByType(context.getRootFolder(), "Datastore");
         return hosts;
     }
 
+    /**
+     * findHostById
+     *
+     * @param id id
+     * @return HostMO
+     * @throws Exception Exception
+     */
     public HostMO findHostById(String id) throws Exception {
         HostMO objmo = null;
         List<Pair<ManagedObjectReference, String>> objs = getAllHostOnRootFs();
@@ -48,6 +88,13 @@ public class RootFsMO extends BaseMO {
         return objmo;
     }
 
+    /**
+     * findClusterById
+     *
+     * @param id id
+     * @return ClusterMO
+     * @throws Exception Exception
+     */
     public ClusterMO findClusterById(String id) throws Exception {
         ClusterMO objmo = null;
         List<Pair<ManagedObjectReference, String>> objs = getAllClusterOnRootFs();
