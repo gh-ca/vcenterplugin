@@ -5,11 +5,11 @@
    The <plugin> tag doesn't contain any moduleUri property because it is an HTML plugin.
 -->
 
-<plugin id="com.dmeplugin.dmestore.dmestore"
-      defaultBundle="com_dmeplugin_dmestore">
+<plugin id="com.huawei.dmestore.dmestore"
+      defaultBundle="com_huawei_dmestore">
 
    <resources baseUrl="locales/">
-      <resource>com_dmeplugin_dmestore</resource>
+      <resource>com_huawei_dmestore</resource>
    </resources>
 
    <dependencies>
@@ -19,29 +19,29 @@
 
     <!-- Home view shortcut -->
 
-   <extension id="com.dmeplugin.dmestore.homeShortcut">
+   <extension id="com.huawei.dmestore.homeShortcut">
       <extendedPoint>vise.home.shortcuts</extendedPoint>
       <object>
          <name>#{app.name}</name>
          <icon>#{plugin-icons}</icon>
          <categoryUid>vsphere.core.controlcenter.administrationCategory</categoryUid>
-         <targetViewUid>com.dmeplugin.dmestore.mainView</targetViewUid>
+         <targetViewUid>com.huawei.dmestore.mainView</targetViewUid>
       </object>
    </extension>
 
 <!--入口设置 -->
-   <extension id="com.dmeplugin.dmestore.entryPoint">
+   <extension id="com.huawei.dmestore.entryPoint">
       <extendedPoint>vise.navigator.nodespecs</extendedPoint>
       <object>
          <title>#{app.name}</title>
          <icon>#{menu-icons}</icon>
          <parentUid>vsphere.core.navigator.solutionsCategory</parentUid>
-         <navigationTargetUid>com.dmeplugin.dmestore.mainView</navigationTargetUid>
+         <navigationTargetUid>com.huawei.dmestore.mainView</navigationTargetUid>
          <viewOpenedUponFocus className="com.vmware.ui.objectnavigator.views.CategoryNodeTreeView" />
       </object>
    </extension>
    <!--主页-->
-   <extension id="com.dmeplugin.dmestore.mainView">
+   <extension id="com.huawei.dmestore.mainView">
       <extendedPoint>vise.global.views</extendedPoint>
       <object>
          <name>#{overview}</name>
@@ -55,16 +55,16 @@
       </object>
    </extension>
    <!--overview dashboard-->
-   <extension id="com.dmeplugin.dmestore.overview">
+   <extension id="com.huawei.dmestore.overview">
       <extendedPoint>vise.navigator.nodespecs</extendedPoint>
       <object>
          <title>#{overview}</title>
          <icon>#{overview-icons}</icon>
-         <parentUid>com.dmeplugin.dmestore.entryPoint</parentUid>
-         <navigationTargetUid>com.dmeplugin.dmestore.dashboard</navigationTargetUid>
+         <parentUid>com.huawei.dmestore.entryPoint</parentUid>
+         <navigationTargetUid>com.huawei.dmestore.dashboard</navigationTargetUid>
       </object>
    </extension>
-   <extension id="com.dmeplugin.dmestore.dashboard">
+   <extension id="com.huawei.dmestore.dashboard">
       <extendedPoint>vise.global.views</extendedPoint>
       <object>
          <name>#{overview}</name>
@@ -78,16 +78,16 @@
       </object>
    </extension>
    <!--存储列表 storage-->
-   <extension id="com.dmeplugin.dmestore.storagelist">
+   <extension id="com.huawei.dmestore.storagelist">
       <extendedPoint>vise.navigator.nodespecs</extendedPoint>
       <object>
          <title>#{storagelist}</title>
          <icon>#{storage-icons}</icon>
-         <parentUid>com.dmeplugin.dmestore.entryPoint</parentUid>
-         <navigationTargetUid>com.dmeplugin.dmestore.storageView</navigationTargetUid>
+         <parentUid>com.huawei.dmestore.entryPoint</parentUid>
+         <navigationTargetUid>com.huawei.dmestore.storageView</navigationTargetUid>
       </object>
    </extension>
-   <extension id="com.dmeplugin.dmestore.storageView">
+   <extension id="com.huawei.dmestore.storageView">
       <extendedPoint>vise.global.views</extendedPoint>
       <object>
          <name>#{storagelist}</name>
@@ -101,16 +101,16 @@
       </object>
    </extension>
    <!--vmfs列表-->
-   <extension id="com.dmeplugin.dmestore.vmfsdatastorelist">
+   <extension id="com.huawei.dmestore.vmfsdatastorelist">
       <extendedPoint>vise.navigator.nodespecs</extendedPoint>
       <object>
          <title>#{vmfsdatastorelist}</title>
          <icon>#{vmfsdatastore-icons}</icon>
-         <parentUid>com.dmeplugin.dmestore.entryPoint</parentUid>
-         <navigationTargetUid>com.dmeplugin.dmestore.vmfslist</navigationTargetUid>
+         <parentUid>com.huawei.dmestore.entryPoint</parentUid>
+         <navigationTargetUid>com.huawei.dmestore.vmfslist</navigationTargetUid>
       </object>
    </extension>
-   <extension id="com.dmeplugin.dmestore.vmfslist">
+   <extension id="com.huawei.dmestore.vmfslist">
       <extendedPoint>vise.global.views</extendedPoint>
       <object>
          <name>#{vmfsdatastorelist}</name>
@@ -124,16 +124,16 @@
       </object>
    </extension>
    <!--nfs列表-->
-   <extension id="com.dmeplugin.dmestore.nfsdatastorelist">
+   <extension id="com.huawei.dmestore.nfsdatastorelist">
       <extendedPoint>vise.navigator.nodespecs</extendedPoint>
       <object>
          <title>#{nfsdatastorelist}</title>
          <icon>#{nfsdatastore-icons}</icon>
-         <parentUid>com.dmeplugin.dmestore.entryPoint</parentUid>
-         <navigationTargetUid>com.dmeplugin.dmestore.nfslist</navigationTargetUid>
+         <parentUid>com.huawei.dmestore.entryPoint</parentUid>
+         <navigationTargetUid>com.huawei.dmestore.nfslist</navigationTargetUid>
       </object>
    </extension>
-   <extension id="com.dmeplugin.dmestore.nfslist">
+   <extension id="com.huawei.dmestore.nfslist">
       <extendedPoint>vise.global.views</extendedPoint>
       <object>
          <name>#{nfsdatastorelist}</name>
@@ -147,18 +147,18 @@
       </object>
    </extension>
    <!--vmfs datastore 监控页面-->
-   <extension id="com.dmeplugin.dmestore.datastore.monitorCategory">
+   <extension id="com.huawei.dmestore.datastore.monitorCategory">
       <extendedPoint>vsphere.core.datastore.monitorCategories</extendedPoint>
       <object>
          <label>#{dmemenu.label}</label>
       </object>
    </extension>
 
-   <extension id="com.dmeplugin.dmestore.datastore.vmfsmonitorView">
+   <extension id="com.huawei.dmestore.datastore.vmfsmonitorView">
       <extendedPoint>vsphere.core.datastore.monitorViews</extendedPoint>
       <object>
          <name>#{performance.label}</name>
-         <categoryUid>com.dmeplugin.dmestore.datastore.monitorCategory</categoryUid>
+         <categoryUid>com.huawei.dmestore.datastore.monitorCategory</categoryUid>
          <contentSpec>
             <url>/ui/dmestore/index.html?view=vmfs/performance</url>
          </contentSpec>
@@ -182,11 +182,11 @@
       </metadata>
    </extension>
    <!--nfs datastore 监控页面-->
-   <extension id="com.dmeplugin.dmestore.datastore.nfsmonitorView">
+   <extension id="com.huawei.dmestore.datastore.nfsmonitorView">
       <extendedPoint>vsphere.core.datastore.monitorViews</extendedPoint>
       <object>
          <name>#{performance.label}</name>
-         <categoryUid>com.dmeplugin.dmestore.datastore.monitorCategory</categoryUid>
+         <categoryUid>com.huawei.dmestore.datastore.monitorCategory</categoryUid>
          <contentSpec>
             <url>/ui/dmestore/index.html?view=nfs/performance</url>
          </contentSpec>
@@ -210,7 +210,7 @@
       </metadata>
    </extension>
    <!--vmfs datastore 卷详情-->
-   <extension id="com.dmeplugin.dmestore.datastore.summary.lunsummary">
+   <extension id="com.huawei.dmestore.datastore.summary.lunsummary">
 
       <extendedPoint>vsphere.core.datastore.summarySectionViews</extendedPoint>
       <object>
@@ -250,7 +250,7 @@
       </metadata>
    </extension>
    <!--nfs datastore 逻辑端口详情-->
-   <extension id="com.dmeplugin.dmestore.datastore.summary.logicport">
+   <extension id="com.huawei.dmestore.datastore.summary.logicport">
 
       <extendedPoint>vsphere.core.datastore.summarySectionViews</extendedPoint>
       <object>
@@ -290,7 +290,7 @@
       </metadata>
    </extension>
    <!--nfs datastore 文件系统详情-->
-   <extension id="com.dmeplugin.dmestore.datastore.summary.fs">
+   <extension id="com.huawei.dmestore.datastore.summary.fs">
       <extendedPoint>vsphere.core.datastore.summarySectionViews</extendedPoint>
       <object>
          <name>#{summery.fs}</name>
@@ -329,7 +329,7 @@
       </metadata>
    </extension>
    <!--nfs datastore share详情-->
-   <extension id="com.dmeplugin.dmestore.datastore.summary.share">
+   <extension id="com.huawei.dmestore.datastore.summary.share">
       <extendedPoint>vsphere.core.datastore.summarySectionViews</extendedPoint>
       <object>
          <name>#{summery.share}</name>
@@ -369,16 +369,16 @@
    </extension>
 
    <!--servicelevellist-->
-   <extension id="com.dmeplugin.dmestore.servicelevellist">
+   <extension id="com.huawei.dmestore.servicelevellist">
       <extendedPoint>vise.navigator.nodespecs</extendedPoint>
       <object>
          <title>#{servicelevellist}</title>
          <icon>#{servicelevel-icons}</icon>
-         <parentUid>com.dmeplugin.dmestore.entryPoint</parentUid>
-         <navigationTargetUid>com.dmeplugin.dmestore.servicelevelView</navigationTargetUid>
+         <parentUid>com.huawei.dmestore.entryPoint</parentUid>
+         <navigationTargetUid>com.huawei.dmestore.servicelevelView</navigationTargetUid>
       </object>
    </extension>
-   <extension id="com.dmeplugin.dmestore.servicelevelView">
+   <extension id="com.huawei.dmestore.servicelevelView">
       <extendedPoint>vise.global.views</extendedPoint>
       <object>
          <name>#{servicelevellist}</name>
@@ -392,16 +392,16 @@
       </object>
    </extension>
    <!--bestpractiselist   bestpractice-->
-   <extension id="com.dmeplugin.dmestore.bestpractiselist">
+   <extension id="com.huawei.dmestore.bestpractiselist">
       <extendedPoint>vise.navigator.nodespecs</extendedPoint>
       <object>
          <title>#{bestpractiselist}</title>
          <icon>#{bestpractice-icons}</icon>
-         <parentUid>com.dmeplugin.dmestore.entryPoint</parentUid>
-         <navigationTargetUid>com.dmeplugin.dmestore.bestpractiseView</navigationTargetUid>
+         <parentUid>com.huawei.dmestore.entryPoint</parentUid>
+         <navigationTargetUid>com.huawei.dmestore.bestpractiseView</navigationTargetUid>
       </object>
    </extension>
-   <extension id="com.dmeplugin.dmestore.bestpractiseView">
+   <extension id="com.huawei.dmestore.bestpractiseView">
       <extendedPoint>vise.global.views</extendedPoint>
       <object>
          <name>#{bestpractiselist}</name>
@@ -417,12 +417,12 @@
 
 
    <!-- Sample Actions on Hosts -->
-   <extension id="com.dmeplugin.dmestore.actionSet">
+   <extension id="com.huawei.dmestore.actionSet">
       <extendedPoint>vise.actions.sets</extendedPoint>
       <object>
          <actions>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.host.iscsi</uid>
+               <uid>com.huawei.dmestore.host.iscsi</uid>
                <label>#{hostMenu.iscsi}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -436,7 +436,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.hostbestpractice.apply</uid>
+               <uid>com.huawei.dmestore.hostbestpractice.apply</uid>
                <label>#{hostMenu.applyBestPractice}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -459,59 +459,59 @@
    <!--
       This adds a sub-menu to the Host menu, using the actions defined above
    -->
-   <extension id="com.dmeplugin.dmestore.hostMenu">
+   <extension id="com.huawei.dmestore.hostMenu">
       <extendedPoint>vsphere.core.menus.solutionMenus</extendedPoint>
       <object>
          <!-- <label> is required here because it is an extension to an existing menu -->
          <label>#{dmemenu.label}</label>
          <icon>#{menu-icons}</icon>
-         <uid>com.dmeplugin.dmestore.hostMenu</uid>
+         <uid>com.huawei.dmestore.hostMenu</uid>
          <children>
             <Array>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <label>#{create.label}</label>
-                  <uid>com.dmeplugin.dmestore.createhostMenu</uid>
+                  <uid>com.huawei.dmestore.createhostMenu</uid>
                   <children>
                      <Array>
                         <com.vmware.actionsfw.ActionMenuItemSpec>
                            <type>action</type>
-                           <uid>com.dmeplugin.dmestore.datastore.hostcreatenfsaction</uid>
+                           <uid>com.huawei.dmestore.datastore.hostcreatenfsaction</uid>
                         </com.vmware.actionsfw.ActionMenuItemSpec>
                         <com.vmware.actionsfw.ActionMenuItemSpec>
                            <type>action</type>
-                           <uid>com.dmeplugin.dmestore.datastore.hostcreatevmfsaction</uid>
+                           <uid>com.huawei.dmestore.datastore.hostcreatevmfsaction</uid>
                         </com.vmware.actionsfw.ActionMenuItemSpec>
                      </Array>
                   </children>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <label>#{mount.label}</label>
-                  <uid>com.dmeplugin.dmestore.mounthostMenu</uid>
+                  <uid>com.huawei.dmestore.mounthostMenu</uid>
                   <children>
                      <Array>
                         <com.vmware.actionsfw.ActionMenuItemSpec>
                            <type>action</type>
-                           <uid>com.dmeplugin.dmestore.datastore.hostvmfsmountaction</uid>
+                           <uid>com.huawei.dmestore.datastore.hostvmfsmountaction</uid>
                         </com.vmware.actionsfw.ActionMenuItemSpec>
                         <com.vmware.actionsfw.ActionMenuItemSpec>
                            <type>action</type>
-                           <uid>com.dmeplugin.dmestore.datastore.hostnfsmountaction</uid>
+                           <uid>com.huawei.dmestore.datastore.hostnfsmountaction</uid>
                         </com.vmware.actionsfw.ActionMenuItemSpec>
                      </Array>
                   </children>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <label>#{unmount.label}</label>
-                  <uid>com.dmeplugin.dmestore.unmounthostMenu</uid>
+                  <uid>com.huawei.dmestore.unmounthostMenu</uid>
                   <children>
                      <Array>
                         <com.vmware.actionsfw.ActionMenuItemSpec>
                            <type>action</type>
-                           <uid>com.dmeplugin.dmestore.datastore.hostvmfsumountaction</uid>
+                           <uid>com.huawei.dmestore.datastore.hostvmfsumountaction</uid>
                         </com.vmware.actionsfw.ActionMenuItemSpec>
                         <com.vmware.actionsfw.ActionMenuItemSpec>
                            <type>action</type>
-                           <uid>com.dmeplugin.dmestore.datastore.hostnfsumountaction</uid>
+                           <uid>com.huawei.dmestore.datastore.hostnfsumountaction</uid>
                         </com.vmware.actionsfw.ActionMenuItemSpec>
                      </Array>
                   </children>
@@ -519,11 +519,11 @@
 
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
-                  <uid>com.dmeplugin.dmestore.host.iscsi</uid>
+                  <uid>com.huawei.dmestore.host.iscsi</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
-                  <uid>com.dmeplugin.dmestore.hostbestpractice.apply</uid>
+                  <uid>com.huawei.dmestore.hostbestpractice.apply</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
             </Array>
          </children>
@@ -536,62 +536,62 @@
    <!--
       This adds a sub-menu to the datastore menu
    -->
-   <extension id="com.dmeplugin.dmestore.datastore.datastoremenu">
+   <extension id="com.huawei.dmestore.datastore.datastoremenu">
       <extendedPoint>vsphere.core.menus.solutionMenus</extendedPoint>
       <object>
          <!-- <label> is required here because it is an extension to an existing menu -->
          <label>#{dmemenu.label}</label>
          <icon>#{menu-icons}</icon>
-         <uid>com.dmeplugin.dmestore.datastore.datastoremenu</uid>
+         <uid>com.huawei.dmestore.datastore.datastoremenu</uid>
          <children>
             <Array>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
-                  <uid>com.dmeplugin.dmestore.datastore.vmfsmodifyaction</uid>
+                  <uid>com.huawei.dmestore.datastore.vmfsmodifyaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
-                  <uid>com.dmeplugin.dmestore.datastore.vmfsexpandaction</uid>
+                  <uid>com.huawei.dmestore.datastore.vmfsexpandaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
-                  <uid>com.dmeplugin.dmestore.datastore.vmfsreclaimaction</uid>
+                  <uid>com.huawei.dmestore.datastore.vmfsreclaimaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
-                  <uid>com.dmeplugin.dmestore.datastore.vmfsservicelevelaction</uid>
+                  <uid>com.huawei.dmestore.datastore.vmfsservicelevelaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
-                  <uid>com.dmeplugin.dmestore.datastore.vmfsumountaction</uid>
+                  <uid>com.huawei.dmestore.datastore.vmfsumountaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
-                  <uid>com.dmeplugin.dmestore.datastore.nfsmodifyaction</uid>
+                  <uid>com.huawei.dmestore.datastore.nfsmodifyaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
-                  <uid>com.dmeplugin.dmestore.datastore.nfsexpandaction</uid>
+                  <uid>com.huawei.dmestore.datastore.nfsexpandaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
-                  <uid>com.dmeplugin.dmestore.datastore.nfsreduceaction</uid>
+                  <uid>com.huawei.dmestore.datastore.nfsreduceaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
-                  <uid>com.dmeplugin.dmestore.datastore.nfsmountaction</uid>
+                  <uid>com.huawei.dmestore.datastore.nfsmountaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
-                  <uid>com.dmeplugin.dmestore.datastore.nfsumountaction</uid>
+                  <uid>com.huawei.dmestore.datastore.nfsumountaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
-                  <uid>com.dmeplugin.dmestore.datastore.vmfsdeleteaction</uid>
+                  <uid>com.huawei.dmestore.datastore.vmfsdeleteaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
-                  <uid>com.dmeplugin.dmestore.datastore.nfsdeleteaction</uid>
+                  <uid>com.huawei.dmestore.datastore.nfsdeleteaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
             </Array>
          </children>
@@ -602,13 +602,13 @@
    </extension>
 
    <!-- vmfs delete action -->
-   <extension id="com.dmeplugin.dmestore.datastore.vmfsdeleteactionSet">
+   <extension id="com.huawei.dmestore.datastore.vmfsdeleteactionSet">
       <extendedPoint>vise.actions.sets</extendedPoint>
       <object>
          <actions>
 
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.vmfsdeleteaction</uid>
+               <uid>com.huawei.dmestore.datastore.vmfsdeleteaction</uid>
                <label>#{delete.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -650,13 +650,13 @@
    </extension>
 
    <!-- nfs delete action -->
-   <extension id="com.dmeplugin.dmestore.datastore.nfsdeleteactionSet">
+   <extension id="com.huawei.dmestore.datastore.nfsdeleteactionSet">
       <extendedPoint>vise.actions.sets</extendedPoint>
       <object>
          <actions>
 
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.nfsdeleteaction</uid>
+               <uid>com.huawei.dmestore.datastore.nfsdeleteaction</uid>
                <label>#{delete.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -698,12 +698,12 @@
    </extension>
 
    <!-- vmfs  action -->
-   <extension id="com.dmeplugin.dmestore.datastore.vmfsactionSet">
+   <extension id="com.huawei.dmestore.datastore.vmfsactionSet">
       <extendedPoint>vise.actions.sets</extendedPoint>
       <object>
          <actions>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.vmfsexpandaction</uid>
+               <uid>com.huawei.dmestore.datastore.vmfsexpandaction</uid>
                <label>#{expand.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -717,7 +717,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.vmfsreclaimaction</uid>
+               <uid>com.huawei.dmestore.datastore.vmfsreclaimaction</uid>
                <label>#{reclaim.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -731,7 +731,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.vmfsservicelevelaction</uid>
+               <uid>com.huawei.dmestore.datastore.vmfsservicelevelaction</uid>
                <label>#{changeservicelevel.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -745,7 +745,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.vmfsmodifyaction</uid>
+               <uid>com.huawei.dmestore.datastore.vmfsmodifyaction</uid>
                <label>#{modify.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -759,7 +759,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.vmfsmountaction</uid>
+               <uid>com.huawei.dmestore.datastore.vmfsmountaction</uid>
                <label>#{vmfsmount.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -773,7 +773,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.vmfsumountaction</uid>
+               <uid>com.huawei.dmestore.datastore.vmfsumountaction</uid>
                <label>#{vmfsumount.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -809,12 +809,12 @@
 
 
    <!-- nfs  action -->
-   <extension id="com.dmeplugin.dmestore.datastore.nfsactionSet">
+   <extension id="com.huawei.dmestore.datastore.nfsactionSet">
       <extendedPoint>vise.actions.sets</extendedPoint>
       <object>
          <actions>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.nfsexpandaction</uid>
+               <uid>com.huawei.dmestore.datastore.nfsexpandaction</uid>
                <label>#{expand.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -828,7 +828,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.nfsreduceaction</uid>
+               <uid>com.huawei.dmestore.datastore.nfsreduceaction</uid>
                <label>#{reduce.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -842,7 +842,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.nfsmodifyaction</uid>
+               <uid>com.huawei.dmestore.datastore.nfsmodifyaction</uid>
                <label>#{modify.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -856,7 +856,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.nfsmountaction</uid>
+               <uid>com.huawei.dmestore.datastore.nfsmountaction</uid>
                <label>#{nfsmount.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -870,7 +870,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.nfsumountaction</uid>
+               <uid>com.huawei.dmestore.datastore.nfsumountaction</uid>
                <label>#{nfsumount.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -906,13 +906,13 @@
 
 
    <!--   host mount unmount action -->
-   <extension id="com.dmeplugin.dmestore.datastore.hostactionSet">
+   <extension id="com.huawei.dmestore.datastore.hostactionSet">
       <extendedPoint>vise.actions.sets</extendedPoint>
       <object>
          <actions>
 
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.hostvmfsmountaction</uid>
+               <uid>com.huawei.dmestore.datastore.hostvmfsmountaction</uid>
                <label>#{vmfsmount.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -926,7 +926,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.hostvmfsumountaction</uid>
+               <uid>com.huawei.dmestore.datastore.hostvmfsumountaction</uid>
                <label>#{vmfsumount.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -940,7 +940,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.hostnfsmountaction</uid>
+               <uid>com.huawei.dmestore.datastore.hostnfsmountaction</uid>
                <label>#{nfsmount.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -954,7 +954,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.hostnfsumountaction</uid>
+               <uid>com.huawei.dmestore.datastore.hostnfsumountaction</uid>
                <label>#{nfsumount.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -968,7 +968,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.hostcreatenfsaction</uid>
+               <uid>com.huawei.dmestore.datastore.hostcreatenfsaction</uid>
                <label>#{createnfs.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -982,7 +982,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.hostcreatevmfsaction</uid>
+               <uid>com.huawei.dmestore.datastore.hostcreatevmfsaction</uid>
                <label>#{createvmfs.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -1003,59 +1003,59 @@
    </extension>
 
 
-   <extension id="com.dmeplugin.dmestore.clusterMenu">
+   <extension id="com.huawei.dmestore.clusterMenu">
       <extendedPoint>vsphere.core.menus.solutionMenus</extendedPoint>
       <object>
          <!-- <label> is required here because it is an extension to an existing menu -->
          <label>#{dmemenu.label}</label>
          <icon>#{menu-icons}</icon>
-         <uid>com.dmeplugin.dmestore.clusterMenu</uid>
+         <uid>com.huawei.dmestore.clusterMenu</uid>
          <children>
             <Array>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <label>#{create.label}</label>
-                  <uid>com.dmeplugin.dmestore.createclusterMenu</uid>
+                  <uid>com.huawei.dmestore.createclusterMenu</uid>
                   <children>
                      <Array>
                         <com.vmware.actionsfw.ActionMenuItemSpec>
                            <type>action</type>
-                           <uid>com.dmeplugin.dmestore.datastore.clustercreatenfsaction</uid>
+                           <uid>com.huawei.dmestore.datastore.clustercreatenfsaction</uid>
                         </com.vmware.actionsfw.ActionMenuItemSpec>
                         <com.vmware.actionsfw.ActionMenuItemSpec>
                            <type>action</type>
-                           <uid>com.dmeplugin.dmestore.datastore.clustercreatevmfsaction</uid>
+                           <uid>com.huawei.dmestore.datastore.clustercreatevmfsaction</uid>
                         </com.vmware.actionsfw.ActionMenuItemSpec>
                      </Array>
                   </children>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <label>#{mount.label}</label>
-                  <uid>com.dmeplugin.dmestore.mountclusterMenu</uid>
+                  <uid>com.huawei.dmestore.mountclusterMenu</uid>
                   <children>
                      <Array>
                         <com.vmware.actionsfw.ActionMenuItemSpec>
                            <type>action</type>
-                           <uid>com.dmeplugin.dmestore.datastore.clustervmfsmountaction</uid>
+                           <uid>com.huawei.dmestore.datastore.clustervmfsmountaction</uid>
                         </com.vmware.actionsfw.ActionMenuItemSpec>
                         <com.vmware.actionsfw.ActionMenuItemSpec>
                            <type>action</type>
-                           <uid>com.dmeplugin.dmestore.datastore.clusternfsmountaction</uid>
+                           <uid>com.huawei.dmestore.datastore.clusternfsmountaction</uid>
                         </com.vmware.actionsfw.ActionMenuItemSpec>
                      </Array>
                   </children>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <label>#{unmount.label}</label>
-                  <uid>com.dmeplugin.dmestore.unmountclusterMenu</uid>
+                  <uid>com.huawei.dmestore.unmountclusterMenu</uid>
                   <children>
                      <Array>
                         <com.vmware.actionsfw.ActionMenuItemSpec>
                            <type>action</type>
-                           <uid>com.dmeplugin.dmestore.datastore.clustervmfsumountaction</uid>
+                           <uid>com.huawei.dmestore.datastore.clustervmfsumountaction</uid>
                         </com.vmware.actionsfw.ActionMenuItemSpec>
                         <com.vmware.actionsfw.ActionMenuItemSpec>
                            <type>action</type>
-                           <uid>com.dmeplugin.dmestore.datastore.clusternfsumountaction</uid>
+                           <uid>com.huawei.dmestore.datastore.clusternfsumountaction</uid>
                         </com.vmware.actionsfw.ActionMenuItemSpec>
                      </Array>
                   </children>
@@ -1063,7 +1063,7 @@
 
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
-                  <uid>com.dmeplugin.dmestore.clusterbestpractice.apply</uid>
+                  <uid>com.huawei.dmestore.clusterbestpractice.apply</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
             </Array>
          </children>
@@ -1074,12 +1074,12 @@
    </extension>
 
    <!-- cluster mount unmount action -->
-   <extension id="com.dmeplugin.dmestore.datastore.clusteractionSet">
+   <extension id="com.huawei.dmestore.datastore.clusteractionSet">
       <extendedPoint>vise.actions.sets</extendedPoint>
       <object>
          <actions>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.clustervmfsmountaction</uid>
+               <uid>com.huawei.dmestore.datastore.clustervmfsmountaction</uid>
                <label>#{vmfsmount.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -1093,7 +1093,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.clustervmfsumountaction</uid>
+               <uid>com.huawei.dmestore.datastore.clustervmfsumountaction</uid>
                <label>#{vmfsumount.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -1107,7 +1107,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.clusternfsmountaction</uid>
+               <uid>com.huawei.dmestore.datastore.clusternfsmountaction</uid>
                <label>#{nfsmount.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -1121,7 +1121,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.clusternfsumountaction</uid>
+               <uid>com.huawei.dmestore.datastore.clusternfsumountaction</uid>
                <label>#{nfsumount.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -1135,7 +1135,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.clusterbestpractice.apply</uid>
+               <uid>com.huawei.dmestore.clusterbestpractice.apply</uid>
                <label>#{clusterMenu.applyBestPractice}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -1149,7 +1149,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.clustercreatenfsaction</uid>
+               <uid>com.huawei.dmestore.datastore.clustercreatenfsaction</uid>
                <label>#{createnfs.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -1163,7 +1163,7 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.datastore.clustercreatevmfsaction</uid>
+               <uid>com.huawei.dmestore.datastore.clustercreatevmfsaction</uid>
                <label>#{createvmfs.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -1185,12 +1185,12 @@
 
 
    <!-- Sample Actions on VM -->
-   <extension id="com.dmeplugin.dmestore.vm.actionSet">
+   <extension id="com.huawei.dmestore.vm.actionSet">
       <extendedPoint>vise.actions.sets</extendedPoint>
       <object>
          <actions>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.dmeplugin.dmestore.vm.rdm</uid>
+               <uid>com.huawei.dmestore.vm.rdm</uid>
                <label>#{vmMenu.createRdm}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
@@ -1210,18 +1210,18 @@
       </metadata>
    </extension>
 
-   <extension id="com.dmeplugin.dmestore.VMMenu">
+   <extension id="com.huawei.dmestore.VMMenu">
       <extendedPoint>vsphere.core.menus.solutionMenus</extendedPoint>
       <object>
          <!-- <label> is required here because it is an extension to an existing menu -->
          <label>#{dmemenu.label}</label>
          <icon>#{menu-icons}</icon>
-         <uid>com.dmeplugin.dmestore.VMMenu</uid>
+         <uid>com.huawei.dmestore.VMMenu</uid>
          <children>
             <Array>
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
-                  <uid>com.dmeplugin.dmestore.vm.rdm</uid>
+                  <uid>com.huawei.dmestore.vm.rdm</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
             </Array>
          </children>

@@ -16,7 +16,7 @@
  * Follow the SDK doc or other samples for the correct attributes based on the type of icon.
  */
 
-.com_dmeplugin_dmestore-plugin-icons {
+.com_huawei_dmestore-plugin-icons {
     background: url("../images/huaweilogo.png");
     width: 16px;
     height: 16px;
@@ -25,7 +25,7 @@
     margin: 1px 4px 0;
 }
 
-.com_dmeplugin_dmestore-menu-icons {
+.com_huawei_dmestore-menu-icons {
     background: url("../images/huaweimenu.png");
     width: 16px;
     height: 16px;
@@ -34,7 +34,7 @@
     margin: 1px 4px 0;
 }
 
-.com_dmeplugin_dmestore-overview-icons {
+.com_huawei_dmestore-overview-icons {
     background: url("../images/overviewlogo.png");
     width: 16px;
     height: 16px;
@@ -43,7 +43,7 @@
     margin: 1px 4px 0;
 }
 
-.com_dmeplugin_dmestore-storage-icons {
+.com_huawei_dmestore-storage-icons {
     background: url("../images/storagedevicelogo.png");
     width: 16px;
     height: 16px;
@@ -52,7 +52,7 @@
     margin: 1px 4px 0;
 }
 
-.com_dmeplugin_dmestore-vmfsdatastore-icons {
+.com_huawei_dmestore-vmfsdatastore-icons {
     background: url("../images/vmfsdatastorelogo.png");
     width: 16px;
     height: 16px;
@@ -61,7 +61,7 @@
     margin: 1px 4px 0;
 }
 
-.com_dmeplugin_dmestore-nfsdatastore-icons {
+.com_huawei_dmestore-nfsdatastore-icons {
     background: url("../images/nfsdatastorelogo.png");
     width: 16px;
     height: 16px;
@@ -70,7 +70,7 @@
     margin: 1px 4px 0;
 }
 
-.com_dmeplugin_dmestore-servicelevel-icons {
+.com_huawei_dmestore-servicelevel-icons {
     background: url("../images/servicelevellogo.png");
     width: 16px;
     height: 16px;
@@ -79,7 +79,7 @@
     margin: 1px 4px 0;
 }
 
-.com_dmeplugin_dmestore-bestpractice-icons {
+.com_huawei_dmestore-bestpractice-icons {
     background: url("../images/bestpracticelogo.png");
     width: 16px;
     height: 16px;
