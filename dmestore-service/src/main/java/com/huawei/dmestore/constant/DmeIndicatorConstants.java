@@ -1,4 +1,4 @@
-package com.dmeplugin.dmestore.constant;
+package com.huawei.dmestore.constant;
 
 /**
  * DmeIndicatorConstants

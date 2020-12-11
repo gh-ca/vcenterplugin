@@ -1,8 +1,8 @@
-package com.dmeplugin.vmware.mo;
+package com.huawei.vmware.mo;
 
-import com.dmeplugin.vmware.util.Pair;
-import com.dmeplugin.vmware.util.VmwareContext;
-import com.dmeplugin.vmware.util.VmwareHelper;
+import com.huawei.vmware.util.Pair;
+import com.huawei.vmware.util.VmwareContext;
+import com.huawei.vmware.util.VmwareHelper;
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.VirtualDevice;
 import com.vmware.vim25.VirtualDeviceConfigSpec;

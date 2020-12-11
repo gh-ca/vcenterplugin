@@ -1,6 +1,6 @@
-package com.dmeplugin.dmestore.services.bestpractice;
+package com.huawei.dmestore.services.bestpractice;
 
-import com.dmeplugin.dmestore.utils.VCSDKUtils;
+import com.huawei.dmestore.utils.VCSDKUtils;
 
 /**
  * DiskSchedQuantumImpl

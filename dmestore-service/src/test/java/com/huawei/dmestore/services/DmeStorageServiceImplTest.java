@@ -1,20 +1,20 @@
-package com.dmeplugin.dmestore.services;
+package com.huawei.dmestore.services;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
-import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
-import com.dmeplugin.dmestore.exception.DmeException;
-import com.dmeplugin.dmestore.model.BandPorts;
-import com.dmeplugin.dmestore.model.Dtrees;
-import com.dmeplugin.dmestore.model.EthPortInfo;
-import com.dmeplugin.dmestore.model.FileSystem;
-import com.dmeplugin.dmestore.model.LogicPorts;
-import com.dmeplugin.dmestore.model.NfsShares;
-import com.dmeplugin.dmestore.model.Storage;
-import com.dmeplugin.dmestore.model.StorageControllers;
-import com.dmeplugin.dmestore.model.StorageDetail;
-import com.dmeplugin.dmestore.model.VolumeListRestponse;
+import com.huawei.dmestore.dao.DmeVmwareRalationDao;
+import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.model.BandPorts;
+import com.huawei.dmestore.model.Dtrees;
+import com.huawei.dmestore.model.EthPortInfo;
+import com.huawei.dmestore.model.FileSystem;
+import com.huawei.dmestore.model.LogicPorts;
+import com.huawei.dmestore.model.NfsShares;
+import com.huawei.dmestore.model.Storage;
+import com.huawei.dmestore.model.StorageControllers;
+import com.huawei.dmestore.model.StorageDetail;
+import com.huawei.dmestore.model.VolumeListRestponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;

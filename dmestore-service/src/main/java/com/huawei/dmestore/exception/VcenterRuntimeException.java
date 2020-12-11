@@ -1,4 +1,4 @@
-package com.dmeplugin.dmestore.exception;
+package com.huawei.dmestore.exception;
 
 /**
  * VcenterRuntimeException

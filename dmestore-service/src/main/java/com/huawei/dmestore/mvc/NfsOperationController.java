@@ -1,10 +1,10 @@
-package com.dmeplugin.dmestore.mvc;
+package com.huawei.dmestore.mvc;
 
-import com.dmeplugin.dmestore.constant.DmeConstants;
-import com.dmeplugin.dmestore.exception.DmeException;
-import com.dmeplugin.dmestore.model.CapacityAutonegotiation;
-import com.dmeplugin.dmestore.model.ResponseBodyBean;
-import com.dmeplugin.dmestore.services.NfsOperationService;
+import com.huawei.dmestore.constant.DmeConstants;
+import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.model.CapacityAutonegotiation;
+import com.huawei.dmestore.model.ResponseBodyBean;
+import com.huawei.dmestore.services.NfsOperationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

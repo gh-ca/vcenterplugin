@@ -1,4 +1,4 @@
-package com.dmeplugin.dmestore.mvc;
+package com.huawei.dmestore.mvc;
 
 import com.google.gson.Gson;
 import org.junit.Before;
@@ -13,8 +13,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 /**
  * @author lianq

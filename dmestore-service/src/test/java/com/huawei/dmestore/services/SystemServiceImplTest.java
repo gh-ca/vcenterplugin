@@ -1,21 +1,15 @@
-package com.dmeplugin.dmestore.services;
+package com.huawei.dmestore.services;
 
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
-import com.dmeplugin.dmestore.DMEServiceApplication;
-import com.dmeplugin.dmestore.dao.SystemDao;
+import com.huawei.dmestore.dao.SystemDao;
 import org.junit.Test;
 import org.junit.Before;
-import org.junit.After;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  * SystemServiceImpl Tester.

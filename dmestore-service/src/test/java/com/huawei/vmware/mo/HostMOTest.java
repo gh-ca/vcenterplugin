@@ -1,4 +1,4 @@
-package com.dmeplugin.vmware.mo;
+package com.huawei.vmware.mo;
 
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyObject;
@@ -9,9 +9,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import com.dmeplugin.vmware.util.ClusterMOFactory;
-import com.dmeplugin.vmware.util.VmwareClient;
-import com.dmeplugin.vmware.util.VmwareContext;
+import com.huawei.vmware.util.ClusterMOFactory;
+import com.huawei.vmware.util.VmwareClient;
+import com.huawei.vmware.util.VmwareContext;
 import com.vmware.vim25.AboutInfo;
 import com.vmware.vim25.ClusterDasConfigInfo;
 import com.vmware.vim25.CustomFieldDef;
@@ -38,7 +38,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author admin

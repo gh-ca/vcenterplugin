@@ -1,11 +1,10 @@
-package com.dmeplugin.vmware.util;
+package com.huawei.vmware.util;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import com.dmeplugin.vmware.mo.DatacenterMO;
+import com.huawei.vmware.mo.DatacenterMO;
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.TaskInfo;
 

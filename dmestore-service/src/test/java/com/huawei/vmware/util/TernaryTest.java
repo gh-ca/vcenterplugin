@@ -1,6 +1,4 @@
-package com.dmeplugin.vmware.util;
-
-import static org.junit.Assert.*;
+package com.huawei.vmware.util;
 
 import org.junit.Test;
 import org.mockito.InjectMocks;

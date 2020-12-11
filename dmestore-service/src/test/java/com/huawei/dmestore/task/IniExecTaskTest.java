@@ -1,18 +1,16 @@
-package com.dmeplugin.dmestore.task;
+package com.huawei.dmestore.task;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import com.dmeplugin.dmestore.services.SystemServiceImpl;
+import com.huawei.dmestore.services.SystemServiceImpl;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 

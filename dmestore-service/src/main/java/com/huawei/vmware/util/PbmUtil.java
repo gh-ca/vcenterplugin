@@ -10,7 +10,7 @@
  * NON-INFRINGEMENT AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-package com.dmeplugin.vmware.util;
+package com.huawei.vmware.util;
 
 import com.vmware.pbm.PbmCapabilityMetadata;
 import com.vmware.pbm.PbmCapabilityMetadataPerCategory;

@@ -1,10 +1,10 @@
-package com.dmeplugin.dmestore.mvc;
+package com.huawei.dmestore.mvc;
 
-import com.dmeplugin.dmestore.exception.DmeException;
-import com.dmeplugin.dmestore.model.ResponseBodyBean;
-import com.dmeplugin.dmestore.model.StoragePool;
-import com.dmeplugin.dmestore.model.Volume;
-import com.dmeplugin.dmestore.services.ServiceLevelService;
+import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.model.ResponseBodyBean;
+import com.huawei.dmestore.model.StoragePool;
+import com.huawei.dmestore.model.Volume;
+import com.huawei.dmestore.services.ServiceLevelService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

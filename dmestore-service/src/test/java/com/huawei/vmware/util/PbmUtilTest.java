@@ -1,6 +1,5 @@
-package com.dmeplugin.vmware.util;
+package com.huawei.vmware.util;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.spy;
 
 import com.vmware.pbm.PbmCapabilityMetadata;

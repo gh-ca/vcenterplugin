@@ -1,7 +1,5 @@
-package com.dmeplugin.dmestore.mvc;
+package com.huawei.dmestore.mvc;
 
-import com.dmeplugin.dmestore.model.VmfsDataInfo;
-import com.dmeplugin.dmestore.services.VmfsAccessServiceImpl;
 import com.google.gson.Gson;
 import org.junit.Before;
 import org.junit.Test;

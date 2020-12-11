@@ -1,4 +1,4 @@
-package com.dmeplugin.dmestore.model;
+package com.huawei.dmestore.model;
 
 /**
  * CustomizeVolumesRequest

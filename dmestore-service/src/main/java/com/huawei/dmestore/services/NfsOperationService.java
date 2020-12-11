@@ -1,6 +1,6 @@
-package com.dmeplugin.dmestore.services;
+package com.huawei.dmestore.services;
 
-import com.dmeplugin.dmestore.exception.DmeException;
+import com.huawei.dmestore.exception.DmeException;
 
 import java.util.Map;
 

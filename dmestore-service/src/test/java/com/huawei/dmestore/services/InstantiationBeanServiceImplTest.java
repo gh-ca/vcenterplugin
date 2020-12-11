@@ -1,13 +1,10 @@
-package com.dmeplugin.dmestore.services;
+package com.huawei.dmestore.services;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import static org.junit.Assert.*;
 
 /**
  * @author lianq

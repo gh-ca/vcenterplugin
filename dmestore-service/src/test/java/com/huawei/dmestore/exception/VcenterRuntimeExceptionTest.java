@@ -1,6 +1,4 @@
-package com.dmeplugin.dmestore.exception;
-
-import static org.junit.Assert.*;
+package com.huawei.dmestore.exception;
 
 import org.junit.Before;
 import org.junit.Test;

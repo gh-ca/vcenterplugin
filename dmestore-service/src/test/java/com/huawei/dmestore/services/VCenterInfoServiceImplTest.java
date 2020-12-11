@@ -1,8 +1,8 @@
-package com.dmeplugin.dmestore.services;
+package com.huawei.dmestore.services;
 
-import com.dmeplugin.dmestore.dao.VCenterInfoDao;
-import com.dmeplugin.dmestore.entity.VCenterInfo;
-import com.dmeplugin.dmestore.exception.DmeSqlException;
+import com.huawei.dmestore.dao.VCenterInfoDao;
+import com.huawei.dmestore.entity.VCenterInfo;
+import com.huawei.dmestore.exception.DmeSqlException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -11,7 +11,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Date;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 /**

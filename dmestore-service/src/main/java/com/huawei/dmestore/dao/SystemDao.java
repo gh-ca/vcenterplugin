@@ -1,9 +1,7 @@
-package com.dmeplugin.dmestore.dao;
+package com.huawei.dmestore.dao;
 
-import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
+import com.huawei.dmestore.constant.DPSqlFileConstant;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.*;
 
 public class SystemDao extends H2DataBaseDao {

@@ -1,11 +1,10 @@
-package com.dmeplugin.dmestore.task;
+package com.huawei.dmestore.task;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import com.dmeplugin.dmestore.dao.ScheduleDao;
-import com.dmeplugin.dmestore.entity.ScheduleConfig;
+import com.huawei.dmestore.dao.ScheduleDao;
+import com.huawei.dmestore.entity.ScheduleConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.quartz.Scheduler;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @author lianq

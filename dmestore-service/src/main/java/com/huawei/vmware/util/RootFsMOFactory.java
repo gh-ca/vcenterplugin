@@ -1,6 +1,6 @@
-package com.dmeplugin.vmware.util;
+package com.huawei.vmware.util;
 
-import com.dmeplugin.vmware.mo.RootFsMO;
+import com.huawei.vmware.mo.RootFsMO;
 import com.vmware.vim25.ManagedObjectReference;
 
 /**

@@ -1,6 +1,4 @@
-package com.dmeplugin.dmestore.model;
-
-import static org.junit.Assert.*;
+package com.huawei.dmestore.model;
 
 import org.junit.Before;
 import org.junit.Test;

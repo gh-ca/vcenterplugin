@@ -1,10 +1,10 @@
-package com.dmeplugin.dmestore.services;
+package com.huawei.dmestore.services;
 
 
-import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
-import com.dmeplugin.dmestore.exception.DmeException;
-import com.dmeplugin.dmestore.utils.ToolUtils;
-import com.dmeplugin.dmestore.utils.VCSDKUtils;
+import com.huawei.dmestore.dao.DmeVmwareRalationDao;
+import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.utils.ToolUtils;
+import com.huawei.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 

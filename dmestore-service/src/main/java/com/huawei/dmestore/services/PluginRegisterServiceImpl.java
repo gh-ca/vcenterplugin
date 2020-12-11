@@ -1,9 +1,9 @@
-package com.dmeplugin.dmestore.services;
+package com.huawei.dmestore.services;
 
-import com.dmeplugin.dmestore.entity.VCenterInfo;
-import com.dmeplugin.dmestore.exception.DmeException;
-import com.dmeplugin.dmestore.utils.CipherUtils;
-import com.dmeplugin.vmware.VCConnectionHelper;
+import com.huawei.dmestore.entity.VCenterInfo;
+import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.utils.CipherUtils;
+import com.huawei.vmware.VCConnectionHelper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 

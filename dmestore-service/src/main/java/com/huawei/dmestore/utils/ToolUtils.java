@@ -1,4 +1,4 @@
-package com.dmeplugin.dmestore.utils;
+package com.huawei.dmestore.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;

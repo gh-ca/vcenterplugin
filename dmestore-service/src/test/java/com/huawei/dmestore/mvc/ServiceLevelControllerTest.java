@@ -1,14 +1,10 @@
-package com.dmeplugin.dmestore.mvc;
+package com.huawei.dmestore.mvc;
 
-import com.dmeplugin.dmestore.services.ServiceLevelService;
-import com.dmeplugin.dmestore.services.ServiceLevelServiceImpl;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.vmware.pbm.PbmResourceInUse;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runners.Parameterized;
-import org.mockito.Mock;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -17,8 +13,6 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 /**
  * @author lianq

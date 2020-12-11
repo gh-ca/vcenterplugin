@@ -1,4 +1,4 @@
-package com.dmeplugin.vmware.mo;
+package com.huawei.vmware.mo;
 
 /**
  * CustomFieldConstants

@@ -1,15 +1,14 @@
-package com.dmeplugin.dmestore.services;
+package com.huawei.dmestore.services;
 
-import com.dmeplugin.dmestore.constant.DmeConstants;
-import com.dmeplugin.dmestore.dao.DmeVmwareRalationDao;
-import com.dmeplugin.dmestore.entity.DmeVmwareRelation;
-import com.dmeplugin.dmestore.exception.DmeException;
-import com.dmeplugin.dmestore.exception.VcenterRuntimeException;
-import com.dmeplugin.dmestore.model.FileSystem;
-import com.dmeplugin.dmestore.model.LogicPorts;
-import com.dmeplugin.dmestore.mvc.VmfsOperationController;
-import com.dmeplugin.dmestore.utils.ToolUtils;
-import com.dmeplugin.dmestore.utils.VCSDKUtils;
+import com.huawei.dmestore.constant.DmeConstants;
+import com.huawei.dmestore.dao.DmeVmwareRalationDao;
+import com.huawei.dmestore.entity.DmeVmwareRelation;
+import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.exception.VcenterRuntimeException;
+import com.huawei.dmestore.model.FileSystem;
+import com.huawei.dmestore.model.LogicPorts;
+import com.huawei.dmestore.utils.ToolUtils;
+import com.huawei.dmestore.utils.VCSDKUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;

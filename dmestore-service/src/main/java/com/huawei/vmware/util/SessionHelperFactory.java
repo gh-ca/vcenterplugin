@@ -1,6 +1,6 @@
-package com.dmeplugin.vmware.util;
+package com.huawei.vmware.util;
 
-import com.dmeplugin.vmware.autosdk.SessionHelper;
+import com.huawei.vmware.autosdk.SessionHelper;
 
 /**
  * SessionHelperFactorY

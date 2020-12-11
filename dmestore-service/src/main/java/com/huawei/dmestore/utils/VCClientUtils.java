@@ -1,4 +1,4 @@
-package com.dmeplugin.dmestore.utils;
+package com.huawei.dmestore.utils;
 
 public class VCClientUtils {
 

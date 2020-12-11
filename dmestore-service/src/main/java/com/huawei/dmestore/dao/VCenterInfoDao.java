@@ -1,10 +1,10 @@
-package com.dmeplugin.dmestore.dao;
+package com.huawei.dmestore.dao;
 
-import com.dmeplugin.dmestore.constant.DPSqlFileConstant;
-import com.dmeplugin.dmestore.entity.VCenterInfo;
-import com.dmeplugin.dmestore.exception.DataBaseException;
-import com.dmeplugin.dmestore.exception.DmeSqlException;
-import com.dmeplugin.dmestore.constant.DmeConstants;
+import com.huawei.dmestore.constant.DPSqlFileConstant;
+import com.huawei.dmestore.entity.VCenterInfo;
+import com.huawei.dmestore.exception.DataBaseException;
+import com.huawei.dmestore.exception.DmeSqlException;
+import com.huawei.dmestore.constant.DmeConstants;
 
 import java.sql.*;
 

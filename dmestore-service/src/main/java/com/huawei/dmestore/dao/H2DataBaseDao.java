@@ -1,7 +1,7 @@
-package com.dmeplugin.dmestore.dao;
+package com.huawei.dmestore.dao;
 
-import com.dmeplugin.dmestore.exception.DataBaseException;
-import com.dmeplugin.dmestore.utils.FileUtils;
+import com.huawei.dmestore.exception.DataBaseException;
+import com.huawei.dmestore.utils.FileUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,9 +9,7 @@ import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.sql.*;
-import java.util.Collection;
 import java.util.Locale;
-import java.util.UUID;
 
 public class H2DataBaseDao {
 

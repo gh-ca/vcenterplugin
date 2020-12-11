@@ -1,8 +1,8 @@
-package com.dmeplugin.dmestore.dao;
+package com.huawei.dmestore.dao;
 
-import com.dmeplugin.dmestore.DMEServiceApplication;
-import com.dmeplugin.dmestore.entity.DmeInfo;
-import com.dmeplugin.dmestore.exception.DmeException;
+import com.huawei.dmestore.DMEServiceApplication;
+import com.huawei.dmestore.entity.DmeInfo;
+import com.huawei.dmestore.exception.DmeException;
 
 import java.util.Date;
 

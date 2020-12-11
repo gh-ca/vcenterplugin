@@ -1,10 +1,8 @@
-package com.dmeplugin.dmestore.entity;
+package com.huawei.dmestore.entity;
 
-import com.dmeplugin.dmestore.utils.CipherUtils;
+import com.huawei.dmestore.utils.CipherUtils;
 
 import java.io.Serializable;
-
-import net.bytebuddy.implementation.bytecode.Throw;
 
 /**
  * DME

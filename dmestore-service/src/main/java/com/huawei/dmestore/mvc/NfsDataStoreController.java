@@ -1,8 +1,8 @@
-package com.dmeplugin.dmestore.mvc;
+package com.huawei.dmestore.mvc;
 
-import com.dmeplugin.dmestore.exception.DmeException;
-import com.dmeplugin.dmestore.model.ResponseBodyBean;
-import com.dmeplugin.dmestore.services.DmeNFSAccessService;
+import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.model.ResponseBodyBean;
+import com.huawei.dmestore.services.DmeNFSAccessService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -1,6 +1,6 @@
-package com.dmeplugin.vmware.util;
+package com.huawei.vmware.util;
 
-import com.dmeplugin.vmware.mo.DatacenterMO;
+import com.huawei.vmware.mo.DatacenterMO;
 
 /**
  * DatacenterMOFactory

@@ -1,6 +1,5 @@
-package com.dmeplugin.vmware.util;
+package com.huawei.vmware.util;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.spy;
 
 import com.vmware.vim25.GuestOsDescriptor;
@@ -9,7 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
 
 /**
  * @author lianq

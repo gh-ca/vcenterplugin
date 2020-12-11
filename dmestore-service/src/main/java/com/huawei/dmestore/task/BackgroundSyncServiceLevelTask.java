@@ -1,7 +1,7 @@
-package com.dmeplugin.dmestore.task;
+package com.huawei.dmestore.task;
 
-import com.dmeplugin.dmestore.exception.DmeException;
-import com.dmeplugin.dmestore.services.ServiceLevelService;
+import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.services.ServiceLevelService;
 
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;

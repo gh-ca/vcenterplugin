@@ -17,7 +17,7 @@
 // under the License.
 //
 
-package com.dmeplugin.vmware.util;
+package com.huawei.vmware.util;
 
 import java.io.Serializable;
 
