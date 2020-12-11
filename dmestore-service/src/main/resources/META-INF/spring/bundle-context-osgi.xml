@@ -15,55 +15,55 @@
 
 
    <osgi:service id="SystemService" ref="SystemServiceImpl"
-                 interface="com.dmeplugin.dmestore.services.SystemService" />
+                 interface="com.huawei.dmestore.services.SystemService" />
 
    <osgi:service id="DmeAccessService" ref="DmeAccessServiceImpl"
-                 interface="com.dmeplugin.dmestore.services.DmeAccessService" />
+                 interface="com.huawei.dmestore.services.DmeAccessService" />
 
    <osgi:service id="DmeNFSAccessService" ref="DmeNFSAccessServiceImpl"
-                 interface="com.dmeplugin.dmestore.services.DmeNFSAccessService" />
+                 interface="com.huawei.dmestore.services.DmeNFSAccessService" />
 
    <osgi:service id="VmfsAccessService" ref="VmfsAccessServiceImpl"
-                   interface="com.dmeplugin.dmestore.services.VmfsAccessService" />
+                   interface="com.huawei.dmestore.services.VmfsAccessService" />
 
    <osgi:service id="PluginRegisterService" ref="PluginRegisterServiceImpl"
-                 interface="com.dmeplugin.dmestore.services.PluginRegisterService" />
+                 interface="com.huawei.dmestore.services.PluginRegisterService" />
 
    <osgi:service id="VCenterInfoService" ref="VCenterInfoServiceImpl"
-                 interface="com.dmeplugin.dmestore.services.VCenterInfoService" />
+                 interface="com.huawei.dmestore.services.VCenterInfoService" />
 
    <osgi:service id="BestPracticeProcessService" ref="BestPracticeProcessServiceImpl"
-                 interface="com.dmeplugin.dmestore.services.BestPracticeProcessService" />
+                 interface="com.huawei.dmestore.services.BestPracticeProcessService" />
 
    <osgi:service id="DataStoreStatisticHistoryService" ref="DataStoreStatisticHistoryServiceImpl"
-                 interface="com.dmeplugin.dmestore.services.DataStoreStatisticHistoryService" />
+                 interface="com.huawei.dmestore.services.DataStoreStatisticHistoryService" />
 
    <osgi:service id="DmeRelationInstanceService" ref="DmeRelationInstanceServiceImpl"
-                 interface="com.dmeplugin.dmestore.services.DmeRelationInstanceService" />
+                 interface="com.huawei.dmestore.services.DmeRelationInstanceService" />
 
    <osgi:service id="DmeStorageService" ref="DmeStorageServiceImpl"
-                 interface="com.dmeplugin.dmestore.services.DmeStorageService" />
+                 interface="com.huawei.dmestore.services.DmeStorageService" />
 
    <osgi:service id="HostAccessService" ref="HostAccessServiceImpl"
-                 interface="com.dmeplugin.dmestore.services.HostAccessService" />
+                 interface="com.huawei.dmestore.services.HostAccessService" />
 
    <osgi:service id="NfsOperationService" ref="NfsOperationServiceImpl"
-                 interface="com.dmeplugin.dmestore.services.NfsOperationService" />
+                 interface="com.huawei.dmestore.services.NfsOperationService" />
 
    <osgi:service id="OverviewService" ref="OverviewServiceImpl"
-                 interface="com.dmeplugin.dmestore.services.OverviewService" />
+                 interface="com.huawei.dmestore.services.OverviewService" />
 
    <osgi:service id="ServiceLevelService" ref="ServiceLevelServiceImpl"
-                 interface="com.dmeplugin.dmestore.services.ServiceLevelService" />
+                 interface="com.huawei.dmestore.services.ServiceLevelService" />
 
    <osgi:service id="VmfsOperationService" ref="VmfsOperationServiceImpl"
-                 interface="com.dmeplugin.dmestore.services.VmfsOperationService" />
+                 interface="com.huawei.dmestore.services.VmfsOperationService" />
 
    <osgi:service id="VmRdmService" ref="VmRdmServiceImpl"
-                 interface="com.dmeplugin.dmestore.services.VmRdmService" />
+                 interface="com.huawei.dmestore.services.VmRdmService" />
 
    <osgi:service id="VmwareAccessService" ref="VmwareAccessServiceImpl"
-                 interface="com.dmeplugin.dmestore.services.VmwareAccessService" />
+                 interface="com.huawei.dmestore.services.VmwareAccessService" />
 
   <!-- References to platform services used by the controllers -->
 
