@@ -1558,16 +1558,16 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 diskPool.setStatus(ToolUtils.jsonToStr(element.get(STATUS)));
                 diskPool.setRunningStatus(ToolUtils.jsonToStr(element.get("runningStatus")));
                 diskPool.setEncryptDiskType(ToolUtils.jsonToStr(element.get("encryptDiskType")));
-                Double totalCapacity = ToolUtils.jsonToDou(element.get("totalCapacity"));
+                double totalCapacity = ToolUtils.jsonToDou(element.get("totalCapacity"));
                 diskPool.setTotalCapacity(totalCapacity);
-                Double usedCapacity = ToolUtils.jsonToDou(element.get(USED_CAPACITY));
+                double usedCapacity = ToolUtils.jsonToDou(element.get(USED_CAPACITY));
                 diskPool.setUsedCapacity(usedCapacity);
                 diskPool.setFreeCapacity(ToolUtils.jsonToDou(element.get("freeCapacity")));
                 diskPool.setSpareCapacity(ToolUtils.jsonToDou(element.get("spareCapacity")));
                 diskPool.setUsedSpareCapacity(ToolUtils.jsonToDou(element.get("usedSpareCapacity")));
                 diskPool.setPoolId(ToolUtils.jsonToStr(element.get(POOL_ID)));
                 DecimalFormat df = new DecimalFormat("#.00");
-                Double usageCapacityRate = 0.0;
+                double usageCapacityRate = 0.0;
                 if (totalCapacity != 0) {
                     usageCapacityRate = Double.valueOf(df.format(usedCapacity / totalCapacity)) * CONSTANT_100;
                 }

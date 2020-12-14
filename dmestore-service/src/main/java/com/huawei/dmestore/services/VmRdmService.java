@@ -36,7 +36,7 @@ public interface VmRdmService {
      *
      * @param vmObjectId vCenter虚拟机objectId
      * @return java.util.List
-     * @throw DmeException DmeException
+     * @throws DmeException DmeException
      **/
     List<Object> getDatastoreMountsOnHost(String vmObjectId) throws DmeException;
 }

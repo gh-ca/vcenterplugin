@@ -152,7 +152,7 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
                 List<Map<String, String>> tmplists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
                 }.getType());
                 
-                // 根据dataStoreType取得数据库对应存储信息，然后以数据库信息为准过滤存储 objectId
+                // 根据dataStoreType取得数据库对应存储信息，然后以数据库信息为准过滤存储objectId
                 List<String> dvrlist = dmeVmwareRalationDao.getAllStorageIdByType(dataStoreType);
                 if (dvrlist != null && dvrlist.size() > 0) {
                     for (Map<String, String> dsmap : tmplists) {
@@ -199,7 +199,7 @@ public class VmwareAccessServiceImpl implements VmwareAccessService {
                 List<Map<String, String>> tmplists = gson.fromJson(listStr, new TypeToken<List<Map<String, String>>>() {
                 }.getType());
                 
-                // 根据dataStoreType取得数据库对应存储信息，然后以数据库信息为准过滤存储 objectId
+                // 根据dataStoreType取得数据库对应存储信息，然后以数据库信息为准过滤存储objectId
                 List<String> dvrlist = dmeVmwareRalationDao.getAllStorageIdByType(dataStoreType);
                 if (dvrlist != null && dvrlist.size() > 0) {
                     for (Map<String, String> dsmap : tmplists) {

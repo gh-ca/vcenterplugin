@@ -110,7 +110,7 @@ public class VmRdmServiceImpl implements VmRdmService {
         String hostIp = vcenterHostMap.get("hostName");
         String hostObjectId = vcenterHostMap.get("hostObjectId");
         String hostId = getDmeHostId(hostIp, hostObjectId);
-        if (null == paramMap.get("mapping")) {
+        if (paramMap.get("mapping") == null) {
             dmeAccessService.hostMapping(hostId, volumeIds);
         }
         vcsdkUtils.hostRescanVmfs(hostIp);
@@ -173,7 +173,7 @@ public class VmRdmServiceImpl implements VmRdmService {
         Map<String, Object> map = new HashMap<>();
         map.put("requestVolumeName", requestVolumeName);
         map.put(CAPACITY, capacity);
-        if (null != mapping) {
+        if (mapping != null) {
             map.put("mapping", mapping);
         }
 
@@ -227,7 +227,7 @@ public class VmRdmServiceImpl implements VmRdmService {
             }
         }
 
-        if (null == hostId) {
+        if (hostId == null) {
             hostId = vmfsAccessService.checkOrCreateToHost(hostIp, hostObjectId);
         }
         return hostId;
@@ -272,7 +272,7 @@ public class VmRdmServiceImpl implements VmRdmService {
             }
             svbp.put(CAPACITY, capacity);
             svbp.put("count", volume.getCount());
-            if (null != volume.getStartSuffix() && volume.getStartSuffix() > 0) {
+            if (volume.getStartSuffix() != null && volume.getStartSuffix() > 0) {
                 svbp.put("start_suffix", volume.getStartSuffix());
             }
             volumes.add(svbp);
@@ -313,7 +313,7 @@ public class VmRdmServiceImpl implements VmRdmService {
         putNotNull(requestbody, "pool_id", customizeVolumes.getPoolRawId());
         putNotNull(requestbody, "storage_id", customizeVolumes.getStorageId());
         CustomizeVolumeTuningForCreate tuningBean = customizeVolumes.getTuning();
-        if (null != tuningBean) {
+        if (tuningBean != null) {
             Map<String, Object> tuning = tuningParse(tuningBean);
             requestbody.put("tuning", tuning);
         }
@@ -354,7 +354,7 @@ public class VmRdmServiceImpl implements VmRdmService {
         putNotNull(tuning, "deduplication_enabled", tuningBean.getDedupeEnabled());
 
         SmartQosForRdmCreate smartqosBean = tuningBean.getSmartqos();
-        if (null != smartqosBean) {
+        if (smartqosBean != null) {
             Map<String, Object> smartqos = new HashMap<>(MAP_DEFAULT_CAPACITY);
             putNotNull(smartqos, "control_policy", smartqosBean.getControlPolicy());
             putNotNull(smartqos, "latency", smartqosBean.getLatency());
@@ -380,7 +380,7 @@ public class VmRdmServiceImpl implements VmRdmService {
     }
 
     private void putNotNull(Map<String, Object> map, String key, Object value) {
-        if (null != value) {
+        if (value != null) {
             if (value instanceof String) {
                 map.put(key, String.valueOf(value));
             }

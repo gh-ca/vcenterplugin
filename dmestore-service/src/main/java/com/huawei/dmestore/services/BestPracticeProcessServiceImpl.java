@@ -11,6 +11,7 @@ import com.huawei.dmestore.model.BestPracticeUpResultBase;
 import com.huawei.dmestore.model.BestPracticeUpResultResponse;
 import com.huawei.dmestore.services.bestpractice.BestPracticeService;
 import com.huawei.dmestore.utils.VCSDKUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -111,7 +112,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     public void check(String objectId) throws VcenterException {
         log.info("checkstart ");
         String hostsStr;
-        if (null != objectId) {
+        if (objectId != null) {
             hostsStr = vcsdkUtils.findHostById(objectId);
         } else {
             hostsStr = vcsdkUtils.getAllHosts();
@@ -132,8 +133,8 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                         checkMap.put(hostSetting, new ArrayList<>());
                     }
 
-                    boolean checkFlag = bestPracticeService.check(vcsdkUtils, hostObjectId);
-                    if (!checkFlag) {
+                    boolean isCheck = bestPracticeService.check(vcsdkUtils, hostObjectId);
+                    if (!isCheck) {
                         BestPracticeBean bean = new BestPracticeBean();
                         bean.setHostSetting(hostSetting);
                         bean.setRecommendValue(String.valueOf(bestPracticeService.getRecommendValue()));
@@ -173,7 +174,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
 
             List<BestPracticeBean> newList = new ArrayList<>();
             List<BestPracticeBean> upList = new ArrayList<>();
-            if (null != bestPracticeBeans && bestPracticeBeans.size() > 0) {
+            if (bestPracticeBeans != null && bestPracticeBeans.size() > 0) {
                 for (BestPracticeBean bestPracticeBean : bestPracticeBeans) {
                     String hostName = bestPracticeBean.getHostName();
                     if (localHostNames.contains(hostName)) {
@@ -213,7 +214,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
         // 获取对应的service
         List<BestPracticeService> services = new ArrayList<>();
         for (BestPracticeService bestPracticeService : bestPracticeServices) {
-            if (null != hostSetting) {
+            if (hostSetting != null) {
                 if (bestPracticeService.getHostSetting().equals(hostSetting)) {
                     services.add(bestPracticeService);
                     break;
@@ -235,7 +236,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             List<BestPracticeUpResultBase> baseList = new ArrayList();
             response.setHostObjectId(objectId);
             response.setHostName(hostName);
-            boolean needReboot = false;
+            boolean isNeedReboot = false;
             for (BestPracticeService service : services) {
                 BestPracticeUpResultBase base = new BestPracticeUpResultBase();
                 base.setHostObjectId(objectId);
@@ -246,7 +247,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                     service.update(vcsdkUtils, objectId);
                     base.setUpdateResult(true);
                     if (service.needReboot()) {
-                        needReboot = true;
+                        isNeedReboot = true;
                     }
                     successList.add(objectId);
                 } catch (Exception ex) {
@@ -256,7 +257,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                 }
                 baseList.add(base);
             }
-            response.setNeedReboot(needReboot);
+            response.setNeedReboot(isNeedReboot);
             response.setResult(baseList);
 
             responses.add(response);
@@ -270,7 +271,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
 
     private Map<String, String> getHostMap(List<String> objectIds) throws DmeSqlException {
         Map<String, String> hostMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
-        if (null == objectIds || objectIds.size() == 0) {
+        if (objectIds == null || objectIds.size() == 0) {
             // 获取本地所有
             int pageNo = 0;
             try {

@@ -171,7 +171,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     public void listInstanceServiceLevel() {
         String instanceName = "SYS_DjTier";
         JsonObject jsonObject = listInstancdByInstanceName(instanceName);
-        if (null != jsonObject) {
+        if (jsonObject != null) {
             JsonArray jsonArray = jsonObject.get(OBJ_LIST).getAsJsonArray();
             Map<String, Map<String, Object>> map = new HashMap<>();
             for (JsonElement element : jsonArray) {
@@ -193,7 +193,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     public void listInstanceLun() {
         String instanceName = "SYS_Lun";
         JsonObject jsonObject = listInstancdByInstanceName(instanceName);
-        if (null != jsonObject) {
+        if (jsonObject != null) {
             JsonArray jsonArray = jsonObject.get(OBJ_LIST).getAsJsonArray();
             Map<String, Map<String, Object>> map = new HashMap<>();
             for (JsonElement element : jsonArray) {
@@ -215,7 +215,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     public void listInstanceStoragePool() {
         String instanceName = "SYS_StoragePool";
         JsonObject jsonObject = listInstancdByInstanceName(instanceName);
-        if (null != jsonObject) {
+        if (jsonObject != null) {
             JsonArray jsonArray = jsonObject.get(OBJ_LIST).getAsJsonArray();
             Map<String, Map<String, Object>> map = new HashMap<>();
             for (JsonElement element : jsonArray) {
@@ -236,7 +236,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     public void listInstanceStorageDevcie() {
         String instanceName = "SYS_StorDevice";
         JsonObject jsonObject = listInstancdByInstanceName(instanceName);
-        if (null != jsonObject) {
+        if (jsonObject != null) {
             JsonArray jsonArray = jsonObject.get(OBJ_LIST).getAsJsonArray();
             Map<String, Map<String, Object>> map = new HashMap<>();
             for (JsonElement element : jsonArray) {
@@ -301,7 +301,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         String url = DmeConstants.LIST_INSTANCE_URL.replace("{className}", instanceName);
         try {
             ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            if (null != responseEntity && HttpStatus.OK.value() == responseEntity.getStatusCodeValue()) {
+            if (responseEntity != null && responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 Object object = responseEntity.getBody();
                 jsonObject = new JsonParser().parse(object.toString()).getAsJsonObject();
             }
@@ -334,7 +334,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     private RelationInstance converRelation(Object object) {
         RelationInstance ri = new RelationInstance();
         JsonObject objJson = new JsonParser().parse(object.toString()).getAsJsonObject();
-        if (null != objJson) {
+        if (objJson != null) {
             ri.setSourceInstanceId(ToolUtils.getStr(objJson.get(SOURCE_INSTANCE_ID)));
             ri.setTargetInstanceId(ToolUtils.getStr(objJson.get("target_Instance_Id")));
             ri.setRelationName(ToolUtils.getStr(objJson.get("relation_Name")));

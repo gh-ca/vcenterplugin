@@ -259,7 +259,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             String taskId = jsonObject.get(TASK_ID).getAsString();
             List<String> taskIds = new ArrayList<>();
             taskIds.add(taskId);
-            Boolean flag = taskService.checkTaskStatus(taskIds);
+            boolean flag = taskService.checkTaskStatus(taskIds);
             if (!flag) {
                 throw new DmeException("400", "update vmfs service level failed");
             }
