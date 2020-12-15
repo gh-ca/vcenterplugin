@@ -145,7 +145,7 @@ public interface VmfsAccessService {
      * @param name name
      * @return Boolean
      */
-    Boolean queryDatastoreByName(String name);
+    boolean queryDatastoreByName(String name);
 
     /**
      * DME侧主机检查

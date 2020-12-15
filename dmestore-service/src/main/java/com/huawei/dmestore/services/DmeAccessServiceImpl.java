@@ -96,7 +96,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     private static String dmeHostIp;
 
-    private static Integer dmeHostPort;
+    private static int dmeHostPort;
 
     private DmeInfoDao dmeInfoDao;
 
@@ -682,7 +682,6 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             LOG.error("DME link error url:{},error:{}", getHostInHostGroupUrl, e.getMessage());
             throw new DmeException(e.getMessage());
         }
-        LOG.info("getDmeHostInHostGroup relists==={}", null == list ? 0 : list.size());
         return list;
     }
 

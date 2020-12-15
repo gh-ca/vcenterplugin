@@ -11,7 +11,6 @@ import org.springframework.http.converter.xml.SourceHttpMessageConverter;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import javax.net.ssl.*;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -24,11 +23,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-/**
- * @author andrewliu
- */
-public class HttpRequestUtil {
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
+/**
+ * HttpRequestUtil
+ *
+ * @author andrewliu
+ * @since 2020-09-15
+ **/
+public class HttpRequestUtil {
     private static RestTemplate restTemplate;
 
     private static final Logger LOGGER = Logger.getLogger(HttpRequestUtil.class.getSimpleName());
@@ -60,9 +68,7 @@ public class HttpRequestUtil {
 
         SimpleClientHttpRequestFactory simpleFactory = new SimpleClientHttpRequestFactory() {
             @Override
-            protected void prepareConnection(HttpURLConnection connection, String httpMethod)
-                    throws IOException {
-
+            protected void prepareConnection(HttpURLConnection connection, String httpMethod) throws IOException {
                 if (connection instanceof HttpsURLConnection) {
                     ((HttpsURLConnection) connection).setHostnameVerifier(promiscuousverifier);
                 }
@@ -81,25 +87,24 @@ public class HttpRequestUtil {
     }
 
     /**
-     * @param url
-     * @param method
-     * @param headers
-     * @param body
-     * @param responseType
+     * requestWithBody
+     *
+     * @param url url
+     * @param method method
+     * @param headers headers
+     * @param body body
+     * @param responseType responseType
      * @param <T>
      * @return
      */
-    public static <T> ResponseEntity<T> requestWithBody(String url, HttpMethod method, MultiValueMap<String, String> headers,
-                                                        String body, Class<T> responseType) {
+    public static <T> ResponseEntity<T> requestWithBody(String url, HttpMethod method,
+        MultiValueMap<String, String> headers, String body, Class<T> responseType) {
         HttpEntity<String> requestEntity = new HttpEntity<String>(body, headers);
 
         ResponseEntity<T> responseEntity = restTemplate.exchange(url, method, requestEntity, responseType);
         return responseEntity;
     }
 
-    /**
-     * Return key=value param concat by &, value is encoded
-     */
     public static String concatParamAndEncode(Map<String, String> paramMap) {
         if (paramMap == null || paramMap.isEmpty()) {
             return "";
@@ -122,9 +127,14 @@ public class HttpRequestUtil {
         }
     }
 
+    /**
+     * SslUtil
+     *
+     * @author andrewliu
+     * @since 2020-09-15
+     **/
     static class SslUtil {
-
-        private static final TrustManager[] UNQUESTIONING_TRUST_MANAGER = new TrustManager[]{
+        private static final TrustManager[] UNQUESTIONING_TRUST_MANAGER = new TrustManager[] {
             new X509TrustManager() {
                 @Override
                 public X509Certificate[] getAcceptedIssuers() {
@@ -141,18 +151,16 @@ public class HttpRequestUtil {
             }
         };
 
-        public static void turnOffSslChecking()
-            throws NoSuchAlgorithmException, KeyManagementException {
+        private SslUtil() {
+            throw new UnsupportedOperationException("Do not instantiate libraries.");
+        }
+
+        public static void turnOffSslChecking() throws NoSuchAlgorithmException, KeyManagementException {
             // Install the all-trusting trust manager
             final SSLContext sc = SSLContext.getInstance("TLS");
             sc.init(null, UNQUESTIONING_TRUST_MANAGER, null);
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         }
-
-        private SslUtil() {
-            throw new UnsupportedOperationException("Do not instantiate libraries.");
-        }
     }
-
 }
 

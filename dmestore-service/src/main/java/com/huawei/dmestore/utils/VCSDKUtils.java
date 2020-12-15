@@ -718,7 +718,6 @@ public class VCSDKUtils {
             if (dss != null && dss.size() > 0) {
                 List<Map<String, Object>> lists = new ArrayList<>();
                 for (Pair<ManagedObjectReference, String> ds : dss) {
-                    //DatastoreMO dsmo = new DatastoreMO(vmwareContext, ds.first());
                     DatastoreMO dsmo = datastoreMOFactory.build(vmwareContext, ds.first());
                     if (dsmo != null && dataStoreType.equals(dsmo.getSummary().getType())) {
                         boolean isMount = false;

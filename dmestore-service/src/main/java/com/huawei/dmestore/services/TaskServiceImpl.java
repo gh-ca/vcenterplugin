@@ -6,6 +6,7 @@ import com.huawei.dmestore.exception.DmeSqlException;
 import com.huawei.dmestore.model.TaskDetailInfo;
 import com.huawei.dmestore.model.TaskDetailResource;
 import com.huawei.dmestore.utils.ToolUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -104,10 +105,10 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public JsonObject queryTaskByIdUntilFinish(String taskId) throws DmeException {
         String url = DmeConstants.QUERY_TASK_URL.replace("{task_id}", taskId);
-        boolean loopFlag = true;
+        boolean isLoop = true;
         int waitTime = TWO_SECEND;
         int times = taskTimeOut / waitTime;
-        while (loopFlag) {
+        while (isLoop) {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() == HTTP_STATUS_200) {
                 JsonArray taskArray = gson.fromJson(responseEntity.getBody(), JsonArray.class);
@@ -272,20 +273,20 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Boolean checkTaskStatus(List<String> taskIds) {
-        boolean flag = false;
+    public boolean checkTaskStatus(List<String> taskIds) {
+        boolean isSuccess = false;
         if (null != taskIds && taskIds.size() > 0) {
             Map<String, Integer> taskStatusMap = new HashMap<>();
             getTaskStatus(taskIds, taskStatusMap, taskTimeOut, System.currentTimeMillis());
             for (Map.Entry<String, Integer> entry : taskStatusMap.entrySet()) {
                 int status = entry.getValue();
                 if (TASK_SUCCESS == status) {
-                    flag = true;
+                    isSuccess = true;
                     break;
                 }
             }
         }
-        return flag;
+        return isSuccess;
     }
 
     public void setDmeAccessService(DmeAccessService dmeAccessService) {

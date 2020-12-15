@@ -7,6 +7,12 @@ import com.huawei.dmestore.exception.DmeSqlException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * VCenterInfoServiceImpl
+ *
+ * @author liugq
+ * @since 2020-09-15
+ **/
 public class VCenterInfoServiceImpl extends DMEOpenApiService implements VCenterInfoService {
     private VCenterInfoDao vcenterInfoDao;
 

@@ -24,7 +24,7 @@ public class PluginRegisterServiceImpl implements PluginRegisterService {
     private SystemService systemService;
 
     @Autowired
-    private VCenterInfoService vCenterInfoService;
+    private VCenterInfoService vcenterinfoservice;
 
     @Autowired
     private VCConnectionHelper vcConnectionHelper;
@@ -39,7 +39,7 @@ public class PluginRegisterServiceImpl implements PluginRegisterService {
             vcenterinfo.setUserName(vcenterUsername);
             vcenterinfo.setPassword(CipherUtils.encryptString(vcenterPassword));
             vcenterinfo.setHostPort(Integer.parseInt(vcenterPort));
-            vCenterInfoService.saveVcenterInfo(vcenterinfo);
+            vcenterinfoservice.saveVcenterInfo(vcenterinfo);
 
             vcConnectionHelper.setServerurl("https:// " + vcenterIp + ":" + vcenterPort + "/sdk");
             vcConnectionHelper.setUsername(vcenterUsername);
