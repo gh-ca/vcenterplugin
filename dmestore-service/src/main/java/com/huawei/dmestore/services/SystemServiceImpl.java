@@ -1,6 +1,5 @@
 package com.huawei.dmestore.services;
 
-
 import com.huawei.dmestore.constant.DPSqlFileConstant;
 import com.huawei.dmestore.dao.SystemDao;
 

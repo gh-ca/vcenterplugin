@@ -22,7 +22,7 @@ public interface NfsOperationService {
     /**
      * 更新NFS存储
      *
-     * @param params
+     * @param params params
      * @throws DmeException when error
      */
     void updateNfsDatastore(Map<String, Object> params) throws DmeException;
@@ -30,7 +30,7 @@ public interface NfsOperationService {
     /**
      * NFS存储扩容和缩容
      *
-     * @param params
+     * @param params params
      * @throws DmeException when error
      */
     void changeNfsCapacity(Map<String, Object> params) throws DmeException;

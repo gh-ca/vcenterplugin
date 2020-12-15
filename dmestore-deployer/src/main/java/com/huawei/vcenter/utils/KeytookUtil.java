@@ -8,22 +8,29 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-
 /**
+ * KeytookUtil
+ *
  * @author andrewliu
- */
+ * @since 2020-09-15
+ **/
 public class KeytookUtil {
+    private static final Logger LOGGER = LoggerFactory.getLogger(KeytookUtil.class);
 
-    private static final String KEY ="tomcat.keystore";
+    private static final String KEY = "tomcat.keystore";
 
-    protected static final Logger LOGGER = LoggerFactory.getLogger(KeytookUtil.class);
+    private static final String SHA = "(SHA1):";
+
+    private KeytookUtil() {
+    }
 
     public static void genKey() throws IOException {
         LOGGER.info("Checking keystore file...");
         File file = new File(KEY);
         if (!file.exists()) {
             LOGGER.info("Generating keystore file...");
-            String cmd = "keytool -genkeypair -alias tomcat -keyalg RSA  -keystore ./tomcat.keystore  -keypass changeit -storepass changeit -dname CN=localhost,OU=cn,O=cn,L=cn,ST=cn,C=cn";
+            String cmd
+                = "keytool -genkeypair -alias tomcat -keyalg RSA  -keystore ./tomcat.keystore  -keypass changeit -storepass changeit -dname CN=localhost,OU=cn,O=cn,L=cn,ST=cn,C=cn";
             Runtime.getRuntime().exec(cmd);
         } else {
             LOGGER.info("Keystore file exists");
@@ -31,18 +38,17 @@ public class KeytookUtil {
     }
 
     public static String getKeystoreServerThumbprint() throws IOException {
-        Process process = null;
         BufferedReader input = null;
         InputStreamReader inr = null;
         try {
             String cmd = "keytool -list -keypass changeit -storepass changeit -keystore ./tomcat.keystore";
-            process = Runtime.getRuntime().exec(cmd);
-            inr = new InputStreamReader(process.getInputStream(),"utf-8");
+            Process process = Runtime.getRuntime().exec(cmd);
+            inr = new InputStreamReader(process.getInputStream(), "utf-8");
             input = new BufferedReader(inr);
             String line = "";
             while ((line = input.readLine()) != null) {
-                if (line.indexOf("(SHA1):") > -1) {
-                    return line.substring(line.indexOf("(SHA1):") + "(SHA1):".length() + 1);
+                if (line.contains(SHA)) {
+                    return line.substring(line.indexOf(SHA) + SHA.length() + 1);
                 }
             }
         } finally {

@@ -5,6 +5,7 @@ import com.huawei.dmestore.entity.VCenterInfo;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.model.EthPortInfo;
 import com.huawei.dmestore.utils.VCSDKUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -45,11 +46,11 @@ public class HostAccessServiceImpl implements HostAccessService {
     @Override
     public void configureIscsi(Map<String, Object> params) throws DmeException {
         if (params != null) {
-            if (null == params.get(DmeConstants.ETHPORTS)) {
+            if (params.get(DmeConstants.ETHPORTS) == null) {
                 LOG.error("configure Iscsi error:ethPorts is null.");
                 throw new DmeException("configure Iscsi error:ethPorts is null.");
             }
-            if (null == params.get(DmeConstants.VMKERNEL)) {
+            if (params.get(DmeConstants.VMKERNEL) == null) {
                 LOG.error("configure Iscsi error:vmKernel is null.");
                 throw new DmeException("configure Iscsi error:vmKernel is null.");
             }
@@ -71,7 +72,7 @@ public class HostAccessServiceImpl implements HostAccessService {
         List<EthPortInfo> relists = null;
         try {
             if (params != null) {
-                if (null == params.get(DmeConstants.ETHPORTS)) {
+                if (params.get(DmeConstants.ETHPORTS) == null) {
                     LOG.error("test connectivity error:ethPorts is null.");
                     throw new DmeException("test connectivity error:ethPorts is null.");
                 }
@@ -82,11 +83,11 @@ public class HostAccessServiceImpl implements HostAccessService {
                 List<Map<String, Object>> ethPorts = (List<Map<String, Object>>) params.get("ethPorts");
                 String hostObjectId = params.get("hostObjectId").toString();
                 Map<String, String> vmKernel = null;
-                if (null != params.get(DmeConstants.VMKERNEL)) {
+                if (params.get(DmeConstants.VMKERNEL) != null) {
                     vmKernel = (Map<String, String>) params.get("vmKernel");
                 }
                 VCenterInfo vcenterInfo = vcenterinfoservice.getVcenterInfo();
-                if (null != vcenterInfo) {
+                if (vcenterInfo != null) {
                     String conStr = vcsdkUtils.testConnectivity(hostObjectId, ethPorts, vmKernel, vcenterInfo);
                     if (!StringUtils.isEmpty(conStr)) {
                         relists = gson.fromJson(conStr, new TypeToken<List<EthPortInfo>>() {

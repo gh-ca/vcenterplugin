@@ -16,6 +16,7 @@ import com.huawei.dmestore.utils.CipherUtils;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 import com.huawei.vmware.autosdk.SessionHelper;
+
 import com.google.gson.Gson;
 
 import com.google.gson.JsonArray;
@@ -288,7 +289,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         List<StoragePool> storagePools = new ArrayList<>();
         String id = serivceLevelId;
 
-        //  servicLevelId对应的serviceLevelInstanceId
+        // servicLevelId对应的serviceLevelInstanceId
         Map<String, Map<String, Object>> serviceLevelMap = dmeRelationInstanceService.getServiceLevelInstance();
         if (null != serviceLevelMap && serviceLevelMap.size() > 0) {
             String serviceLevelInstanceId = serviceLevelMap.get(serivceLevelId).get("resId").toString();
@@ -297,10 +298,10 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             }
         }
 
-        //  1 获取serviceLevelId下的StoragePool实例集合
+        // 1 获取serviceLevelId下的StoragePool实例集合
         List<String> storagePoolInstanceIds = getStoragePoolIdsByServiceLevelId(id);
 
-        //  2 通过storagePoolInstanceId获取storagePoolId和storageDeviceId信息
+        // 2 通过storagePoolInstanceId获取storagePoolId和storageDeviceId信息
         List<StoragePool> sps = new ArrayList<>();
         if (null != storagePoolInstanceIds && storagePoolInstanceIds.size() > 0) {
             for (String instanceId : storagePoolInstanceIds) {
@@ -310,7 +311,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
             }
         }
 
-        //  3 通过storageDeviceId和storagePoolId获取storagePool信息(这里先获取存储设备下的所有存储池,再通过storagePoolId过滤)
+        // 3 通过storageDeviceId和storagePoolId获取storagePool信息(这里先获取存储设备下的所有存储池,再通过storagePoolId过滤)
         if (sps.size() > 0) {
             Map<String, Set<String>> storageDevicePoolIds = new HashMap<>();
             for (StoragePool sp : sps) {

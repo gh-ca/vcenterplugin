@@ -1,61 +1,86 @@
 package com.huawei.vcenter.utils;
 
+import com.vmware.automatic.plugin.registration.PluginRegistrationMain;
+
 import java.util.HashMap;
 import java.util.Map;
 
-import com.vmware.automatic.plugin.registration.PluginRegistrationMain;
-
 /**
+ * VcenterRegisterRunner
+ *
  * @author andrewliu
- */
+ * @since 2020-09-15
+ **/
 public class VcenterRegisterRunner {
-	public static void run(String version, String packageUrl, String serverThumbprint, String vcenterIp,
-						   String vcenterPort, String username, String password, String key) {
-		Map<String, String> unRegParamMap = new HashMap(10);
-		unRegParamMap.put("-action", "unregisterPlugin");
-		unRegParamMap.put("-username", username);
-		unRegParamMap.put("-password", password);
-		unRegParamMap.put("-key", key);
-		unRegParamMap.put("-url", "https://" + vcenterIp + ":" + vcenterPort + "/sdk");
+    private static final int DEFAULT_LEN = 16;
 
-		PluginRegistrationMain.main(convertMapToArray(unRegParamMap));
+    private static final String ACTION = "-action";
 
-		Map<String, String> regParamMap = new HashMap(12);
-		regParamMap.put("-action", "registerPlugin");
-		regParamMap.put("-username", username);
-		regParamMap.put("-password", password);
-		regParamMap.put("-key", key);
-		regParamMap.put("-version", version);
-		regParamMap.put("-pluginUrl", packageUrl);
-		regParamMap.put("-company", "DME");
-		regParamMap.put("--serverThumbprint", serverThumbprint);
-		regParamMap.put("-url", "https://" + vcenterIp + ":" + vcenterPort + "/sdk");
+    private static final String USERNAME = "-username";
 
-		PluginRegistrationMain.main(convertMapToArray(regParamMap));
-	}
+    private static final String PASSWORD = "-password";
 
-	public static void unRegister(String vcenterIp,
-								  String vcenterPort, String username, String password, String key) {
-		Map<String, String> unRegParamMap = new HashMap(10);
-		unRegParamMap.put("-action", "unregisterPlugin");
-		unRegParamMap.put("-username", username);
-		unRegParamMap.put("-password", password);
-		unRegParamMap.put("-key", key);
-		unRegParamMap.put("-url", "https://" + vcenterIp + ":" + vcenterPort + "/sdk");
+    private static final String KEY = "-key";
 
-		PluginRegistrationMain.main(convertMapToArray(unRegParamMap));
-	}
+    private static final String URL = "-url";
 
-	private static String[] convertMapToArray(Map<String, String> map) {
-		if ((map == null) || (map.size() == 0)) {
-			return new String[0];
-		}
-		String[] args = new String[map.size() * 2];
-		int index = 0;
-		for (Map.Entry<String, String> entry : map.entrySet()) {
-			args[(index++)] = ((String) entry.getKey()).trim();
-			args[(index++)] = ((String) entry.getValue()).trim();
-		}
-		return args;
-	}
+    private static final String HTTPS_PRE = "https://";
+
+    private static final String COLON = ":";
+
+    private static final String SDK_PATH = "/sdk";
+
+    private static final int DIGIT_2 = 2;
+
+    private VcenterRegisterRunner() {
+    }
+
+    public static void run(String version, String packageUrl, String serverThumbprint, String vcenterIp,
+        String vcenterPort, String username, String password, String key) {
+        Map<String, String> unRegParamMap = new HashMap(DEFAULT_LEN);
+        unRegParamMap.put(ACTION, "unregisterPlugin");
+        unRegParamMap.put(USERNAME, username);
+        unRegParamMap.put(PASSWORD, password);
+        unRegParamMap.put(KEY, key);
+        unRegParamMap.put(URL, HTTPS_PRE + vcenterIp + COLON + vcenterPort + SDK_PATH);
+
+        PluginRegistrationMain.main(convertMapToArray(unRegParamMap));
+
+        Map<String, String> regParamMap = new HashMap(DEFAULT_LEN);
+        regParamMap.put(ACTION, "registerPlugin");
+        regParamMap.put(USERNAME, username);
+        regParamMap.put(PASSWORD, password);
+        regParamMap.put(KEY, key);
+        regParamMap.put("-version", version);
+        regParamMap.put("-pluginUrl", packageUrl);
+        regParamMap.put("-company", "DME");
+        regParamMap.put("--serverThumbprint", serverThumbprint);
+        regParamMap.put(URL, HTTPS_PRE + vcenterIp + COLON + vcenterPort + SDK_PATH);
+
+        PluginRegistrationMain.main(convertMapToArray(regParamMap));
+    }
+
+    public static void unRegister(String vcenterIp, String vcenterPort, String username, String password, String key) {
+        Map<String, String> unRegParamMap = new HashMap(DEFAULT_LEN);
+        unRegParamMap.put(ACTION, "unregisterPlugin");
+        unRegParamMap.put(USERNAME, username);
+        unRegParamMap.put(PASSWORD, password);
+        unRegParamMap.put(KEY, key);
+        unRegParamMap.put(URL, HTTPS_PRE + vcenterIp + COLON + vcenterPort + SDK_PATH);
+
+        PluginRegistrationMain.main(convertMapToArray(unRegParamMap));
+    }
+
+    private static String[] convertMapToArray(Map<String, String> map) {
+        if ((map == null) || (map.size() == 0)) {
+            return new String[0];
+        }
+        String[] args = new String[map.size() * DIGIT_2];
+        int index = 0;
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            args[index++] = entry.getKey().trim();
+            args[index++] = entry.getValue().trim();
+        }
+        return args;
+    }
 }

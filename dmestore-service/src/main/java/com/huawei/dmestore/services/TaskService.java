@@ -40,7 +40,7 @@ public interface TaskService {
      * @param taskIds taskIds
      * @return Boolean
      **/
-    Boolean checkTaskStatus(List<String> taskIds);
+    boolean checkTaskStatus(List<String> taskIds);
 
     /**
      * get task info untill finish
