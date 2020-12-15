@@ -9,7 +9,7 @@
    type: keep "html" for this plugin to be deployed in the vSphere HTML client.
    name: short name displayed in the Administration < Client plugins view
 -->
-<pluginPackage id="com.dmeplugin.dmestore" version="1.0.0" type="html" name="dmestore"
+<pluginPackage id="com.huawei.dmestore" version="1.0.0" type="html" name="dmestore"
       description="Add plugin description" vendor="Add vendor">
 
    <dependencies>
@@ -31,8 +31,8 @@
          War bundles don't need to be listed, they will be deployed afterward.
          Bundle Ids must match the Bundle-SymbolicName in each bundle's MANIFEST.MF!
       -->
-      <bundle id="com.dmeplugin.dmestore.dmestore-service" />
-      <bundle id="com.dmeplugin.dmestore.dmestore-ui" />
+      <bundle id="com.huawei.dmestore.dmestore-service" />
+      <bundle id="com.huawei.dmestore.dmestore-ui" />
    </bundlesOrder>
 
 </pluginPackage>
