@@ -12,22 +12,27 @@ public class CustomizeVolumeTuningForCreate {
      * smartqos .
      */
     private SmartQosForRdmCreate smartqos;
+
     /**
      * compressionEnabled .
      */
     private Boolean compressionEnabled;
+
     /**
      * dedupeEnabled .
      */
     private Boolean dedupeEnabled;
+
     /**
      * smarttier .
      */
     private String smarttier;
+
     /**
      * 卷分配类型，取值范围 thin，thick .
      **/
     private String alloctype;
+
     /**
      * workloadTypeId .
      */

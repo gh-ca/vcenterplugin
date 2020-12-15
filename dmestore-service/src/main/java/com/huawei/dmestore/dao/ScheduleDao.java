@@ -1,6 +1,6 @@
 package com.huawei.dmestore.dao;
 
-import com.huawei.dmestore.constant.DPSqlFileConstant;
+import com.huawei.dmestore.constant.DpSqlFileConstants;
 import com.huawei.dmestore.entity.ScheduleConfig;
 
 import java.sql.Connection;
@@ -11,11 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @Description: TODO
- * @ClassName: ScheduleDao
- * @Company: GH-CA
- * @author: yy
- * @create: 2020-09-02
+ * ScheduleDao
+ *
+ * @author yy
+ * @since 2020-09-02
  **/
 public class ScheduleDao extends H2DataBaseDao {
     public List<ScheduleConfig> getScheduleList() {
@@ -25,15 +24,14 @@ public class ScheduleDao extends H2DataBaseDao {
         List<ScheduleConfig> scheduleconfiglist = new ArrayList<>();
         try {
             con = getConnection();
-            ps = con.prepareStatement("SELECT * FROM " + DPSqlFileConstant.DP_DME_TASK_INFO);
+            ps = con.prepareStatement("SELECT * FROM " + DpSqlFileConstants.DP_DME_TASK_INFO);
             rs = ps.executeQuery();
             scheduleconfiglist = new ArrayList<>();
             while (rs.next()) {
                 scheduleconfiglist.add(buildSchedule(rs));
             }
-
         } catch (SQLException e) {
-            LOGGER.error("Failed to get dmes: " + e.getMessage());
+            LOGGER.error("Failed to get dmes: {}", e.getMessage());
         } finally {
             closeConnection(con, ps, rs);
         }
@@ -46,14 +44,14 @@ public class ScheduleDao extends H2DataBaseDao {
         ResultSet rs = null;
         try {
             con = getConnection();
-            ps = con.prepareStatement("UPDATE " + DPSqlFileConstant.DP_DME_TASK_INFO + " SET CRON=? WHERE ID=?");
-            ps.setString(1, taskCron);
-            ps.setInt(2, taskId);
+            ps = con.prepareStatement("UPDATE " + DpSqlFileConstants.DP_DME_TASK_INFO + " SET CRON=? WHERE ID=?");
+            ps.setString(DpSqlFileConstants.DIGIT_1, taskCron);
+            ps.setInt(DpSqlFileConstants.DIGIT_2, taskId);
 
             return ps.executeUpdate();
-        } catch (SQLException e) {
-            LOGGER.error("Failed to update task time: " + e.getMessage());
-            throw e;
+        } catch (SQLException ex) {
+            LOGGER.error("Failed to update task time: {}", ex.getMessage());
+            throw ex;
         } finally {
             closeConnection(con, ps, rs);
         }

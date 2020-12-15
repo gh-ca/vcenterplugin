@@ -27,12 +27,7 @@ public class DmeException extends Exception {
         super(message);
         this.message = message;
     }
-    /**
-     * 构造方法.
-     *
-     * @param code    错误编码
-     * @param message 错误信息
-     */
+
     public DmeException(String code, String message) {
         super(message);
         this.code = code;

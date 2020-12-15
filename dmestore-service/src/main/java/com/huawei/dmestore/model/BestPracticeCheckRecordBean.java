@@ -3,27 +3,32 @@ package com.huawei.dmestore.model;
 import java.util.List;
 
 /**
+ * BestPracticeCheckRecordBean
+ *
  * @author wangxiangyong
- * @Description: BestPracticeCheckRecordBean
- * @since 2020-12-08
- **/
+ * @since 2020-09-09
+ */
 public class BestPracticeCheckRecordBean {
     /**
      * hostSetting .
      */
     private String hostSetting;
+
     /**
      * recommendValue .
      */
     private String recommendValue;
+
     /**
      * level .
      */
     private String level;
+
     /**
      * count .
      */
     private int count;
+
     /**
      * hostList .
      */

@@ -1,5 +1,11 @@
 package com.huawei.dmestore.exception;
 
+/**
+ * VcenterException
+ *
+ * @author Administrator
+ * @since 2020-12-08
+ */
 public class VcenterException extends DmeException {
     private String code;
 

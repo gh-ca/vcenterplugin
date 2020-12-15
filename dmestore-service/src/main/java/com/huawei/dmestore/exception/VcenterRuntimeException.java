@@ -30,7 +30,7 @@ public class VcenterRuntimeException extends RuntimeException {
     /**
      * VcenterRuntimeException
      *
-     * @param code  code
+     * @param code code
      * @param message message
      */
     public VcenterRuntimeException(String code, String message) {

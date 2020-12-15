@@ -1,7 +1,7 @@
 package com.huawei.dmestore.dao;
 
-import com.huawei.dmestore.constant.DPSqlFileConstant;
 import com.huawei.dmestore.constant.DmeConstants;
+import com.huawei.dmestore.constant.DpSqlFileConstants;
 import com.huawei.dmestore.entity.DmeInfo;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.utils.CipherUtils;
@@ -12,14 +12,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * @Description: TODO
- * @ClassName: DmeInfoDao
- * @Company: GH-CA
- * @author: yy
- * @create: 2020-09-02
+ * DmeInfoDao
+ *
+ * @author yy
+ * @since 2020-09-02
  **/
 public class DmeInfoDao extends H2DataBaseDao {
-
     public int addDmeInfo(DmeInfo dmeInfo) throws DmeException {
         Connection con = null;
         PreparedStatement ps = null;
@@ -28,12 +26,12 @@ public class DmeInfoDao extends H2DataBaseDao {
             checkDmeInfo(dmeInfo);
             con = getConnection();
             ps = con.prepareStatement(
-                "INSERT INTO " + DPSqlFileConstant.DP_DME_ACCESS_INFO + " (hostIp,hostPort,username,password) "
+                "INSERT INTO " + DpSqlFileConstants.DP_DME_ACCESS_INFO + " (hostIp,hostPort,username,password) "
                     + "VALUES (?,?,?,?)");
-            ps.setString(1, dmeInfo.getHostIp());
-            ps.setInt(2, dmeInfo.getHostPort());
-            ps.setString(3, dmeInfo.getUserName());
-            ps.setString(4, CipherUtils.encryptString(dmeInfo.getPassword()));
+            ps.setString(DpSqlFileConstants.DIGIT_1, dmeInfo.getHostIp());
+            ps.setInt(DpSqlFileConstants.DIGIT_2, dmeInfo.getHostPort());
+            ps.setString(DpSqlFileConstants.DIGIT_3, dmeInfo.getUserName());
+            ps.setString(DpSqlFileConstants.DIGIT_4, CipherUtils.encryptString(dmeInfo.getPassword()));
             int row = ps.executeUpdate();
             rs = ps.getGeneratedKeys();
             if (rs.next()) {
@@ -41,7 +39,7 @@ public class DmeInfoDao extends H2DataBaseDao {
             }
             return row;
         } catch (SQLException e) {
-            LOGGER.error("Failed to add vCenter info: " + e.toString());
+            LOGGER.error("Failed to add vCenter info: {}", e.toString());
             throw new DmeException(e.getMessage());
         } finally {
             closeConnection(con, ps, rs);
@@ -55,7 +53,7 @@ public class DmeInfoDao extends H2DataBaseDao {
         DmeInfo dmeInfo = null;
         try {
             con = getConnection();
-            ps = con.prepareStatement("SELECT * FROM " + DPSqlFileConstant.DP_DME_ACCESS_INFO + " WHERE state=1");
+            ps = con.prepareStatement("SELECT * FROM " + DpSqlFileConstants.DP_DME_ACCESS_INFO + " WHERE state=1");
             rs = ps.executeQuery();
             if (rs.next()) {
                 dmeInfo = new DmeInfo();
@@ -68,9 +66,8 @@ public class DmeInfoDao extends H2DataBaseDao {
                 dmeInfo.setUpdateTime(rs.getTimestamp("UPDATETIME"));
                 dmeInfo.setState(rs.getInt("STATE"));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            LOGGER.error("Failed to get dme access info: " + e.toString());
+        } catch (SQLException e) {
+            LOGGER.error("Failed to get dme access info: {}", e.toString());
             throw new DmeException("503", e.getMessage());
         } finally {
             closeConnection(con, ps, rs);
