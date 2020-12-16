@@ -194,8 +194,8 @@ public class NfsOperationController extends BaseController {
             tuning.put(DEDUPLICATION_ENABLED_FIELD, requestParams.get("deduplicationEnabled"));
 
             String capacitymode = Boolean.parseBoolean((String) requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD))
-                ? CapacityAutonegotiation.capacitymodeauto
-                : CapacityAutonegotiation.capacitymodeoff;
+                ? CapacityAutonegotiation.CAPACITY_MODE_AUTO
+                : CapacityAutonegotiation.CAPACITY_MODE_OFF;
             capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
             capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
         } else {
@@ -203,7 +203,7 @@ public class NfsOperationController extends BaseController {
             tuning.put(COMPRESSION_ENABLED_FIELD, false);
             tuning.put(DEDUPLICATION_ENABLED_FIELD, false);
             capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, false);
-            capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, CapacityAutonegotiation.capacitymodeoff);
+            capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, CapacityAutonegotiation.CAPACITY_MODE_OFF);
         }
         targetParams.put("tuning", tuning);
         targetParams.put("capacity_autonegotiation", capacityAutonegotiation);
@@ -227,8 +227,8 @@ public class NfsOperationController extends BaseController {
         if (autoSizeEnable != null) {
             capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
             String capacitymode = Boolean.parseBoolean((String) params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD))
-                ? CapacityAutonegotiation.capacitymodeauto
-                : CapacityAutonegotiation.capacitymodeoff;
+                ? CapacityAutonegotiation.CAPACITY_MODE_AUTO
+                : CapacityAutonegotiation.CAPACITY_MODE_OFF;
             capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
             param.put("capacity_autonegotiation", capacityAutonegotiation);
         }

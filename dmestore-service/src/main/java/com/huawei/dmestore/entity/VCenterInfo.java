@@ -11,42 +11,52 @@ import java.util.Date;
  */
 public class VCenterInfo implements Serializable {
     private static final long serialVersionUID = 3811172759222907501L;
+
     /**
      * hostPortConstant = 443 .
      */
     private final Integer hostPortConstant = 443;
+
     /**
      * id .
      */
     private int id;
+
     /**
      * hostIp .
      */
     private String hostIp;
+
     /**
      * hostPort .
      */
     private int hostPort;
+
     /**
      * userName .
      */
     private String userName;
+
     /**
      * password .
      */
     private String password;
+
     /**
      * createTime .
      */
     private Date createTime;
+
     /**
      * HA status .
      */
     private boolean state;
+
     /**
      * Alarm status .
      */
     private boolean pushEvent;
+
     /**
      * 1:crtical 2:majorandcritical 3:all .
      */

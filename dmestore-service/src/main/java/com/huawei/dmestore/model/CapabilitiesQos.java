@@ -13,10 +13,12 @@ public class CapabilitiesQos {
      * smartQos .
      */
     private SmartQos smartQos;
+
     /**
      * qosParam .
      */
     private QosParam qosParam;
+
     /**
      * enabled .
      */

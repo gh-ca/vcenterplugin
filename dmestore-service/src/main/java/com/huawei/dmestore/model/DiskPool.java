@@ -12,66 +12,82 @@ public class DiskPool {
      * id .
      */
     private String id;
+
     /**
      * 原始id .
      */
     private String nativeId;
+
     /**
      * 上次修改时间 .
      */
     private String lastModified;
+
     /**
      * 最后监控时间 .
      */
     private String lastMonitorTime;
+
     /**
      * 监控状态 .
      */
     private String dataStatus;
+
     /**
      * name .
      */
     private String name;
+
     /**
      * 状态 .
      */
     private String status;
+
     /**
      * 运行状态 .
      */
     private String runningStatus;
+
     /**
      * 加密类型 .
      */
     private String encryptDiskType;
+
     /**
      * totalCapacity
      */
     private Double totalCapacity;
+
     /**
      * 已用容量 .
      */
     private Double usedCapacity;
+
     /**
      * 空闲容量 .
      */
     private Double freeCapacity;
+
     /**
      * 热备容量 .
      */
     private Double spareCapacity;
+
     /**
      * 已用热备容量 .
      */
     private Double usedSpareCapacity;
+
     /**
      * 在设备上的硬盘域Id .
      */
     private String poolId;
+
     /**
      * storageDeviceId .
      */
     private String storageDeviceId;
+
     /**
      * 使用率 .
      */

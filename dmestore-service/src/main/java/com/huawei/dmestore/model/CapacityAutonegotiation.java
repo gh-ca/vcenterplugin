@@ -11,11 +11,12 @@ public class CapacityAutonegotiation {
     /**
      * capacitymodeoff .
      */
-    public static String capacitymodeoff = "off";
+    public static final String CAPACITY_MODE_OFF = "off";
+
     /**
      * capacitymodeauto .
      */
-    public static String capacitymodeauto = "grow_shrink";
+    public static final String CAPACITY_MODE_AUTO = "grow_shrink";
 
     /**
      * autoSizeEnable .

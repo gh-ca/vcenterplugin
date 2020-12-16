@@ -13,6 +13,7 @@ public class CapabilitiesSmarttier {
      * enabled .
      */
     private Boolean enabled;
+
     /**
      * policy .
      */

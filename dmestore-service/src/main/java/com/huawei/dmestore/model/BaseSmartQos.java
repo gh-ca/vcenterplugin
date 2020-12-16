@@ -1,43 +1,47 @@
 package com.huawei.dmestore.model;
 
 /**
- * BaseSmartQos .
+ * BaseSmartQos
  *
- * @author lianq
- * @Description: BaseSmartQos
- * @ClassName: BaseSmartQos
- * @Company: GH-CA
- * @since 2020-12-07
+ * @author lianqiang
+ * @since 2020-09-09
  */
 public class BaseSmartQos {
     /**
      * latencyUnit .
      */
     private String name;
+
     /**
      * latency .
      */
     private Integer latency;
+
     /**
      * maxbandwidth .
      */
     private Integer maxbandwidth;
+
     /**
      * maxiops .
      */
     private Integer maxiops;
+
     /**
      * minbandwidth .
      */
     private Integer minbandwidth;
+
     /**
      * miniops .
      */
     private Integer miniops;
+
     /**
      * enabled .
      */
     private Boolean enabled;
+
     /**
      * latencyUnit .
      */

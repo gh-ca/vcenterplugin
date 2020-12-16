@@ -1,39 +1,47 @@
 package com.huawei.dmestore.model;
 
 /**
- * @author wangxiangyong
- * @Description:
- * @since 2020-12-07
- **/
+ * BestPracticeBean
+ *
+ * @author lianqiang
+ * @since 2020-09-09
+ */
 public class BestPracticeBean {
     /**
      * hostSetting .
      */
     private String hostSetting;
+
     /**
      * recommendValue .
      */
     private String recommendValue;
+
     /**
      * level .
      */
     private String level;
+
     /**
      * actualValue .
      */
     private String actualValue;
+
     /**
      * needReboot .
      */
     private String needReboot;
+
     /**
      * hostObjectId .
      */
     private String hostObjectId;
+
     /**
      * hostName .
      */
     private String hostName;
+
     /**
      * autoRepair .
      */

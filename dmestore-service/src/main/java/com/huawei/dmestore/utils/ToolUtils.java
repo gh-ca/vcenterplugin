@@ -16,28 +16,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-
 /**
- * @Description: TODO
- * @ClassName: ToolUtils
- * @Company: GH-CA
- * @author: yy
- * @create: 2020-09-02
+ * ToolUtils
+ *
+ * @author yy
+ * @since 2020-09-15
  **/
 public class ToolUtils {
+    private static final Logger LOG = LoggerFactory.getLogger(ToolUtils.class);
 
-    private final static Logger LOG = LoggerFactory.getLogger(ToolUtils.class);
+    private static final Gson GSON = new Gson();
 
-    public final static String STORE_TYPE_VMFS = "VMFS";
-    public final static String STORE_TYPE_NFS = "NFS";
-    public final static String STORE_TYPE_ALL = "ALL";
+    public static final String STORE_TYPE_VMFS = "VMFS";
 
-    public final static int KI = 1024;
-    public final static int MI = 1024 * 1024;
-    public final static int GI = 1024 * 1024 * 1024;
+    public static final String STORE_TYPE_NFS = "NFS";
 
-    public final static SimpleDateFormat SIMPLE_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    public static Gson gson = new Gson();
+    public static final String STORE_TYPE_ALL = "ALL";
+
+    public static final int GI = 1024 * 1024 * 1024;
 
     public static String getStr(Object obj) {
         return getStr(obj, null);
@@ -49,8 +45,8 @@ public class ToolUtils {
             if (!StringUtils.isEmpty(obj)) {
                 re = obj.toString();
             }
-        } catch (Exception e) {
-            LOG.error("getStr error:" + e.toString());
+        } catch (IllegalStateException e) {
+            LOG.error("getStr error:{}", e.toString());
         }
         return re;
     }
@@ -61,8 +57,8 @@ public class ToolUtils {
             if (!StringUtils.isEmpty(obj)) {
                 re = Integer.parseInt(obj.toString());
             }
-        } catch (Exception e) {
-            LOG.error("getInt error:" + e.toString());
+        } catch (IllegalStateException e) {
+            LOG.error("getInt error:{}", e.toString());
         }
         return re;
     }
@@ -73,8 +69,8 @@ public class ToolUtils {
             if (!StringUtils.isEmpty(obj)) {
                 re = Integer.parseInt(obj.toString());
             }
-        } catch (Exception e) {
-            LOG.error("getInt2 error:" + e.toString());
+        } catch (IllegalStateException e) {
+            LOG.error("getInt2 error:{}", e.toString());
         }
         return re;
     }
@@ -85,8 +81,8 @@ public class ToolUtils {
             if (!StringUtils.isEmpty(obj)) {
                 re = Double.parseDouble(obj.toString());
             }
-        } catch (Exception e) {
-            LOG.error("getDouble error:" + e.toString());
+        } catch (IllegalStateException e) {
+            LOG.error("getDouble error:{}", e.toString());
         }
         return re;
     }
@@ -97,8 +93,8 @@ public class ToolUtils {
             if (!StringUtils.isEmpty(obj)) {
                 re = Long.parseLong(obj.toString());
             }
-        } catch (Exception e) {
-            LOG.error("getLong error:" + e.toString());
+        } catch (IllegalStateException e) {
+            LOG.error("getLong error:{}", e.toString());
         }
         return re;
     }
@@ -109,8 +105,8 @@ public class ToolUtils {
             if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsString();
             }
-        } catch (Exception e) {
-            LOG.error("jsonToStr error:" + e.toString());
+        } catch (IllegalStateException e) {
+            LOG.error("jsonToStr error:{}", e.toString());
         }
         return re;
     }
@@ -121,8 +117,8 @@ public class ToolUtils {
             if (null != obj && !obj.isJsonNull()) {
                 re = obj.getAsString();
             }
-        } catch (Exception e) {
-            LOG.error("jsonToOriginalStr error:" + e.toString());
+        } catch (IllegalStateException e) {
+            LOG.error("jsonToOriginalStr error:{}", e.toString());
         }
         return re;
     }
@@ -133,12 +129,11 @@ public class ToolUtils {
             if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsString();
             }
-        } catch (Exception e) {
-            LOG.error("jsonToStr2 error:" + e.toString());
+        } catch (IllegalStateException e) {
+            LOG.error("jsonToStr2 error:{}", e.toString());
         }
         return re;
     }
-
 
     public static Integer jsonToInt(JsonElement obj, Integer defaultValue) {
         Integer re = defaultValue;
@@ -146,8 +141,8 @@ public class ToolUtils {
             if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsInt();
             }
-        } catch (Exception e) {
-            LOG.error("jsonToInt error:" + e.toString());
+        } catch (IllegalStateException e) {
+            LOG.error("jsonToInt error:{}", e.toString());
         }
         return re;
     }
@@ -158,8 +153,8 @@ public class ToolUtils {
             if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsInt();
             }
-        } catch (Exception e) {
-            LOG.error("jsonToInt2 error:" + e.toString());
+        } catch (IllegalStateException e) {
+            LOG.error("jsonToInt2 error:{}", e.toString());
         }
         return re;
     }
@@ -170,8 +165,8 @@ public class ToolUtils {
             if (!StringUtils.isEmpty(obj)) {
                 re = obj.getAsLong();
             }
-        } catch (Exception e) {
-            LOG.error("jsonToLon error:" + e.toString());
+        } catch (IllegalStateException e) {
+            LOG.error("jsonToLon error:{}", e.toString());
         }
         return re;
     }
@@ -182,8 +177,8 @@ public class ToolUtils {
             if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsDouble();
             }
-        } catch (Exception e) {
-            LOG.error("jsonToDou error:" + e.toString());
+        } catch (IllegalStateException e) {
+            LOG.error("jsonToDou error:{}", e.toString());
         }
         return re;
     }
@@ -194,8 +189,8 @@ public class ToolUtils {
             if (!StringUtils.isEmpty(obj)) {
                 re = obj.getAsDouble();
             }
-        } catch (Exception e) {
-            LOG.error("jsonToDou2 error:" + e.toString());
+        } catch (IllegalStateException e) {
+            LOG.error("jsonToDou2 error:{}", e.toString());
         }
         return re;
     }
@@ -206,8 +201,8 @@ public class ToolUtils {
             if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsFloat();
             }
-        } catch (Exception e) {
-            LOG.error("jsonToFloat error:" + e.toString());
+        } catch (IllegalStateException e) {
+            LOG.error("jsonToFloat error:{}", e.toString());
         }
         return re;
     }
@@ -218,8 +213,8 @@ public class ToolUtils {
             if (!StringUtils.isEmpty(obj)) {
                 re = obj.getAsFloat();
             }
-        } catch (Exception e) {
-            LOG.error("jsonToFloat2 error:" + e.toString());
+        } catch (IllegalStateException e) {
+            LOG.error("jsonToFloat2 error:{}", e.toString());
         }
         return re;
     }
@@ -230,8 +225,8 @@ public class ToolUtils {
             if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsBoolean();
             }
-        } catch (Exception e) {
-            LOG.error("jsonToBoo error:" + e.toString());
+        } catch (IllegalStateException e) {
+            LOG.error("jsonToBoo error:{}", e.toString());
         }
         return re;
     }
@@ -242,8 +237,8 @@ public class ToolUtils {
             if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsBoolean();
             }
-        } catch (Exception e) {
-            LOG.error("jsonToBoo error:" + e.toString());
+        } catch (IllegalStateException e) {
+            LOG.error("jsonToBoo error:{}", e.toString());
         }
         return re;
     }
@@ -254,8 +249,8 @@ public class ToolUtils {
         }
         Collections.sort(a);
         Collections.sort(b);
-        for (int i = 0; i < a.size(); i++) {
-            if (!a.get(i).equals(b.get(i))) {
+        for (int index = 0; index < a.size(); index++) {
+            if (!a.get(index).equals(b.get(index))) {
                 return false;
             }
         }
@@ -265,11 +260,11 @@ public class ToolUtils {
     public static boolean jsonIsNull(JsonElement obj) {
         boolean re = false;
         try {
-            if (StringUtils.isEmpty(obj) || obj.isJsonNull() || "{}".equals(gson.toJson(obj))) {
+            if (StringUtils.isEmpty(obj) || obj.isJsonNull() || "{}".equals(GSON.toJson(obj))) {
                 re = true;
             }
-        } catch (Exception e) {
-            LOG.error("jsonIsNull error:" + e.toString());
+        } catch (IllegalStateException e) {
+            LOG.error("jsonIsNull error:{}", e.toString());
         }
         return re;
     }
@@ -278,18 +273,18 @@ public class ToolUtils {
         String re = defaultValue;
         try {
             if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
-                re = SIMPLE_DATE_FORMAT.format(new Date(Long.parseLong(String.valueOf(obj.getAsBigInteger()))));
+                re = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(
+                    new Date(Long.parseLong(String.valueOf(obj.getAsBigInteger()))));
             }
-        } catch (Exception e) {
-            LOG.error("jsonToDateStr error:" + e.toString());
+        } catch (IllegalStateException e) {
+            LOG.error("jsonToDateStr error:{}", e.toString());
         }
         return re;
     }
 
-    //从性能数据中提取对应指标的对应值
     public static JsonElement getStatistcValue(JsonObject statisticObject, String indicator, String type) {
         JsonElement object = null;
-        if (null != statisticObject) {
+        if (statisticObject != null) {
             JsonElement indicatorEl = statisticObject.get(indicator);
             if (!ToolUtils.jsonIsNull(indicatorEl)) {
                 JsonObject indicatorJson = indicatorEl.getAsJsonObject();
@@ -298,7 +293,6 @@ public class ToolUtils {
                     JsonObject typeJson = typeEl.getAsJsonObject();
                     Set<Map.Entry<String, JsonElement>> sets = typeJson.entrySet();
                     for (Map.Entry<String, JsonElement> set : sets) {
-                        //只取一个
                         object = set.getValue();
                         break;
                     }
@@ -309,26 +303,24 @@ public class ToolUtils {
     }
 
     public static String getRequsetParams(String paramName, String paramValue) {
-        JsonObject condition = new JsonObject();
-        JsonArray constraint = new JsonArray();
-        JsonObject consObj = new JsonObject();
         JsonObject simple = new JsonObject();
         simple.addProperty("name", "dataStatus");
         simple.addProperty("operator", "equal");
         simple.addProperty("value", "normal");
+        JsonObject consObj = new JsonObject();
         consObj.add("simple", simple);
+        JsonArray constraint = new JsonArray();
         constraint.add(consObj);
-        JsonObject consObj1 = new JsonObject();
         JsonObject simple1 = new JsonObject();
         simple1.addProperty("name", paramName);
         simple1.addProperty("operator", "equal");
         simple1.addProperty("value", paramValue);
+        JsonObject consObj1 = new JsonObject();
         consObj1.add("simple", simple1);
         consObj1.addProperty("logOp", "and");
         constraint.add(consObj1);
+        JsonObject condition = new JsonObject();
         condition.add("constraint", constraint);
         return condition.toString();
     }
-
-
 }

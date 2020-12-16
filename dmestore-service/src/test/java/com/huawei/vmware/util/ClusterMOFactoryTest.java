@@ -3,7 +3,7 @@ package com.huawei.vmware.util;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
-import com.huawei.dmestore.constant.DPSqlFileConstant;
+import com.huawei.dmestore.constant.DpSqlFileConstants;
 import com.vmware.vim25.ManagedObjectReference;
 
 import org.junit.Before;
@@ -30,7 +30,7 @@ public class ClusterMOFactoryTest {
         MockitoAnnotations.initMocks(this);
         vmwareContext = mock(VmwareContext.class);
         managedObjectReference = spy(ManagedObjectReference.class);
-        String[] ALL_TABLES = DPSqlFileConstant.ALL_TABLES;
+        String[] ALL_TABLES = DpSqlFileConstants.ALL_TABLES;
         System.out.println(ALL_TABLES);
     }
 
