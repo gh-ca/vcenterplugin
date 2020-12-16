@@ -27,12 +27,6 @@ public class ServiceException extends Exception {
         this.message = message;
     }
 
-    /**
-     * 构造方法.
-     *
-     * @param code    错误编码
-     * @param message 错误信息
-     */
     public ServiceException(String code, String message) {
         super(message);
         this.code = code;

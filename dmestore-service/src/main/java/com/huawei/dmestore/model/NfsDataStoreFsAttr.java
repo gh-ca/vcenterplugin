@@ -13,38 +13,47 @@ public class NfsDataStoreFsAttr implements Serializable {
      * name .
      */
     private String name;
+
     /**
      * description .
      */
     private String description;
+
     /**
      * device .
      */
     private String device;
+
     /**
      * storagePoolName .
      */
     private String storagePoolName;
+
     /**
      * provisionType .
      */
     private String provisionType;
+
     /**
      * applicationScenario .
      */
     private String applicationScenario;
+
     /**
      * dataDeduplication .
      */
     private Boolean dataDeduplication;
+
     /**
      * dateCompression .
      */
     private Boolean dateCompression;
+
     /**
      * controller .
      */
     private String controller;
+
     /**
      * fileSystemId .
      */
@@ -232,17 +241,10 @@ public class NfsDataStoreFsAttr implements Serializable {
 
     @Override
     public final String toString() {
-        return "NfsDataStoreFsAttr{"
-            + "name='" + name + '\''
-            + ", description='" + description + '\''
-            + ", device='" + device + '\''
-            + ", storagePoolName='" + storagePoolName + '\''
-            + ", provisionType='" + provisionType + '\''
-            + ", applicationScenario='" + applicationScenario + '\''
-            + ", dataDeduplication=" + dataDeduplication
-            + ", dateCompression=" + dateCompression
-            + ", controller='" + controller + '\''
-            + ", fileSystemId='" + fileSystemId + '\''
-            + '}';
+        return "NfsDataStoreFsAttr{" + "name='" + name + '\'' + ", description='" + description + '\'' + ", device='"
+            + device + '\'' + ", storagePoolName='" + storagePoolName + '\'' + ", provisionType='" + provisionType
+            + '\'' + ", applicationScenario='" + applicationScenario + '\'' + ", dataDeduplication=" + dataDeduplication
+            + ", dateCompression=" + dateCompression + ", controller='" + controller + '\'' + ", fileSystemId='"
+            + fileSystemId + '\'' + '}';
     }
 }

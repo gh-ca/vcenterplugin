@@ -15,16 +15,19 @@ public class CustomizeVolumeTuning {
      * smartQos .
      */
     private SmartQos smartQos;
+
     /**
      * compressionEnabled .
      */
     @JsonProperty(value = "compression_enabled")
     private Boolean compressionEnabled;
+
     /**
      * dedupeEnabled .
      */
     @JsonProperty(value = "dedupe_enabled")
     private Boolean dedupeEnabled;
+
     /**
      * 数据迁移策略，取值范围 0：不迁移，1：自动迁移，
      * 2：向高性能层迁移，3：向低性能层迁移  默认值：不迁移 .
@@ -105,11 +108,7 @@ public class CustomizeVolumeTuning {
 
     @Override
     public final String toString() {
-        return "CustomizeVolumeTuning{"
-            + "smartQos=" + smartQos
-            + ", compressionEnabled=" + compressionEnabled
-            + ", dedupeEnabled=" + dedupeEnabled
-            + ", smarttier=" + smarttier
-            + '}';
+        return "CustomizeVolumeTuning{" + "smartQos=" + smartQos + ", compressionEnabled=" + compressionEnabled
+            + ", dedupeEnabled=" + dedupeEnabled + ", smarttier=" + smarttier + '}';
     }
 }

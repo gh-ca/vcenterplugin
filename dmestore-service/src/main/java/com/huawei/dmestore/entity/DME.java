@@ -12,50 +12,62 @@ import java.io.Serializable;
  */
 public class DME extends Dmebase implements Serializable {
     private static final long serialVersionUID = -9063117479397179007L;
+
     /**
      * id .
      */
     private int id;
+
     /**
      * aliasName .
      */
     private String aliasName;
+
     /**
      * latestStatus .
      */
     private String latestStatus;
+
     /**
      * HA状态：0/null-未同步 1-已同步 2-未同步(取消订阅).
      */
     private String reservedInt1;
+
     /**
      * 保活状态: 0/null-未订阅 1-已订阅 2-未订阅(取消订阅) .
      */
     private String reservedInt2;
+
     /**
      * reservedStr1 .
      */
     private String reservedStr1;
+
     /**
      * reservedStr2 .
      */
     private String reservedStr2;
+
     /**
      * lastModify .
      */
     private String lastModify;
+
     /**
      * createTime .
      */
     private String createTime;
+
     /**
      * systemId .
      */
     private String systemId;
+
     /**
      * HA Provider状态：0/null-未创建 1-已创建 2-创建失败 .
      */
     private int haProvider;
+
     /**
      * 告警订阅创建状态：0/null-未创建 1-已创建 2-创建有失败 .
      */
@@ -69,10 +81,7 @@ public class DME extends Dmebase implements Serializable {
      * @param param3 loginAccount
      * @param param4 loginPwd
      */
-    public DME(final String param1,
-               final int param2,
-               final String param3,
-               final String param4) {
+    public DME(final String param1, final int param2, final String param3, final String param4) {
         super(param1, param2, param3, param4);
     }
 
@@ -301,17 +310,10 @@ public class DME extends Dmebase implements Serializable {
 
     @Override
     public final String toString() {
-        return "dme [id=" + id
-            + ", hostIp=" + getHostIp() + ", hostPort="
-            + getHostPort() + ", loginAccount="
-            + getLoginAccount() + ", loginPwd=******"
-            + ", latestStatus=" + latestStatus
-            + ", reservedInt1=" + reservedInt1
-            + ", reservedInt2=" + reservedInt2
-            + ", reservedStr1=" + reservedStr1
-            + ", reservedStr2=" + reservedStr2
-            + ", lastModify=" + lastModify
-            + ", createTime=" + createTime + "]";
+        return "dme [id=" + id + ", hostIp=" + getHostIp() + ", hostPort=" + getHostPort() + ", loginAccount="
+            + getLoginAccount() + ", loginPwd=******" + ", latestStatus=" + latestStatus + ", reservedInt1="
+            + reservedInt1 + ", reservedInt2=" + reservedInt2 + ", reservedStr1=" + reservedStr1 + ", reservedStr2="
+            + reservedStr2 + ", lastModify=" + lastModify + ", createTime=" + createTime + "]";
     }
 
     /**
@@ -319,14 +321,9 @@ public class DME extends Dmebase implements Serializable {
      *
      * @param param dme
      */
-    public static void updateEsightWithEncryptedPassword (final DME param) {
+    public static void updateEsightWithEncryptedPassword(final DME param) {
         if (param != null) {
-            try {
-                param.setLoginPwd(CipherUtils.encryptString(
-                    param.getLoginPwd()));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            param.setLoginPwd(CipherUtils.encryptString(param.getLoginPwd()));
         }
     }
 
@@ -337,12 +334,7 @@ public class DME extends Dmebase implements Serializable {
      */
     public static void decryptedPassword(final DME param) {
         if (param != null) {
-            try {
-                param.setLoginPwd(CipherUtils.decryptString(
-                    param.getLoginPwd()));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            param.setLoginPwd(CipherUtils.decryptString(param.getLoginPwd()));
         }
     }
 }

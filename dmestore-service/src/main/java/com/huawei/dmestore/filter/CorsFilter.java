@@ -17,12 +17,13 @@ import javax.servlet.http.HttpServletResponse;
  * CORSFilter
  *
  * @author wei.yuan
- * @since  2020-09-09
+ * @since 2020-09-09
  */
 @Component
 public class CorsFilter implements Filter {
     @Override
-    public void init(FilterConfig filterConfig) throws ServletException { }
+    public void init(FilterConfig filterConfig) throws ServletException {
+    }
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain)
@@ -38,6 +39,8 @@ public class CorsFilter implements Filter {
         }
         filterChain.doFilter(request, response);
     }
+
     @Override
-    public void destroy() { }
+    public void destroy() {
+    }
 }

@@ -4,22 +4,24 @@ package com.huawei.dmestore.model;
  * BestPracticeUpResultBase
  *
  * @author wangxiangyong
- * @Description: BestPracticeUpResultBase
- * @since 2020-12-08
- **/
+ * @since 2020-09-09
+ */
 public class BestPracticeUpResultBase {
     /**
      * hostSetting .
      */
     private String hostSetting;
+
     /**
      * needReboot .
      */
     private boolean needReboot;
+
     /**
      * hostObjectId .
      */
     private String hostObjectId;
+
     /**
      * updateResult .
      */
@@ -46,7 +48,7 @@ public class BestPracticeUpResultBase {
     /**
      * getNeedReboot .
      *
-     * @return boolean .
+     * @return boolean.
      */
     public boolean getNeedReboot() {
         return needReboot;
@@ -99,11 +101,7 @@ public class BestPracticeUpResultBase {
 
     @Override
     public final String toString() {
-        return "BestPracticeUpResultBase{"
-            + "hostSetting='" + hostSetting + '\''
-            + ", needReboot=" + needReboot
-            + ", hostObjectId='" + hostObjectId + '\''
-            + ", updateResult=" + updateResult
-            + '}';
+        return "BestPracticeUpResultBase{" + "hostSetting='" + hostSetting + '\'' + ", needReboot=" + needReboot
+            + ", hostObjectId='" + hostObjectId + '\'' + ", updateResult=" + updateResult + '}';
     }
 }
