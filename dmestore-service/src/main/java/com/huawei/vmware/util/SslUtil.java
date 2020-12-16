@@ -35,13 +35,13 @@ import javax.net.ssl.SSLContext;
  * @author Administrator
  * @since 2020-12-09
  */
-public class SSLUtils {
+public class SslUtil {
     /**
      * logger
      */
-    public static final Logger logger = LoggerFactory.getLogger(SSLUtils.class);
+    public static final Logger logger = LoggerFactory.getLogger(SslUtil.class);
 
-    private SSLUtils() {
+    private SslUtil() {
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.huawei.vmware.util;
 
 import com.huawei.vmware.mo.ClusterMO;
+
 import com.vmware.vim25.ManagedObjectReference;
 
 /**
@@ -10,10 +11,10 @@ import com.vmware.vim25.ManagedObjectReference;
  * @ClassName: ClusterMOFactory
  * @since 2020-12-09
  */
-public class ClusterMOFactory {
-    private static ClusterMOFactory clusterMOFactory;
+public class ClusterVmwareMoFactory {
+    private static ClusterVmwareMoFactory clusterVmwareMoFactory;
 
-    private ClusterMOFactory() {
+    private ClusterVmwareMoFactory() {
     }
 
     /**
@@ -21,15 +22,15 @@ public class ClusterMOFactory {
      *
      * @return ClusterMOFactory
      */
-    public static ClusterMOFactory getInstance() {
-        if (clusterMOFactory == null) {
-            synchronized (ClusterMOFactory.class) {
-                if (clusterMOFactory == null) {
-                    clusterMOFactory = new ClusterMOFactory();
+    public static ClusterVmwareMoFactory getInstance() {
+        if (clusterVmwareMoFactory == null) {
+            synchronized (ClusterVmwareMoFactory.class) {
+                if (clusterVmwareMoFactory == null) {
+                    clusterVmwareMoFactory = new ClusterVmwareMoFactory();
                 }
             }
         }
-        return clusterMOFactory;
+        return clusterVmwareMoFactory;
     }
 
     /**

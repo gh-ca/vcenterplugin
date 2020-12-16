@@ -1,6 +1,7 @@
 package com.huawei.vmware;
 
 import com.huawei.vmware.util.VmwareContext;
+
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vise.usersession.UserSessionService;
 import com.vmware.vise.vim.data.VimObjectReferenceService;
@@ -11,7 +12,7 @@ import com.vmware.vise.vim.data.VimObjectReferenceService;
  * @author Administrator
  * @since 2020-12-10
  */
-public abstract class VCConnectionHelper {
+public abstract class VcConnectionHelpers {
     private UserSessionService userSessionService;
     private VimObjectReferenceService vimObjectReferenceService;
     private String serverurl;

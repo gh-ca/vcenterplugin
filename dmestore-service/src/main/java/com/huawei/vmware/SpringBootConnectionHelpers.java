@@ -19,8 +19,8 @@ import java.util.List;
  * @author Administrator
  * @since 2020-12-10
  */
-public class SpringBootConnectionHelper extends VCConnectionHelper {
-    private static final Logger log = LoggerFactory.getLogger(SpringBootConnectionHelper.class);
+public class SpringBootConnectionHelpers extends VcConnectionHelpers {
+    private static final Logger log = LoggerFactory.getLogger(SpringBootConnectionHelpers.class);
     private VCenterInfoService vcenterInfoService;
 
     /**

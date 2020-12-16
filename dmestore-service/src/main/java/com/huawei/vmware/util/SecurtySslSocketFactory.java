@@ -1,22 +1,3 @@
-//
-// Licensed to the Apache Software Foundation (ASF) under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  The ASF licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing,
-// software distributed under the License is distributed on an
-// "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-// KIND, either express or implied.  See the License for the
-// specific language governing permissions and limitations
-// under the License.
-//
-
 package com.huawei.vmware.util;
 
 import org.slf4j.Logger;
@@ -28,7 +9,6 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.NoSuchAlgorithmException;
 
-
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -39,11 +19,12 @@ import javax.net.ssl.SSLSocketFactory;
  * @author Administrator
  * @since 2020-12-09
  */
-public class SecureSSLSocketFactory extends SSLSocketFactory {
+public class SecurtySslSocketFactory extends SSLSocketFactory {
     /**
      * logger
      */
-    public static final Logger logger = LoggerFactory.getLogger(SecureSSLSocketFactory.class);
+    public static final Logger logger = LoggerFactory.getLogger(SecurtySslSocketFactory.class);
+
     private SSLContext sslContext;
 
     /**
@@ -52,11 +33,11 @@ public class SecureSSLSocketFactory extends SSLSocketFactory {
      * @param sslContext sslContext
      * @throws NoSuchAlgorithmException NoSuchAlgorithmException
      */
-    public SecureSSLSocketFactory(SSLContext sslContext) throws NoSuchAlgorithmException {
+    public SecurtySslSocketFactory(SSLContext sslContext) throws NoSuchAlgorithmException {
         if (sslContext != null) {
             this.sslContext = sslContext;
         } else {
-            this.sslContext = SSLUtils.getSslContext();
+            this.sslContext = SslUtil.getSslContext();
         }
     }
 
@@ -69,7 +50,7 @@ public class SecureSSLSocketFactory extends SSLSocketFactory {
     public String[] getSupportedCipherSuites() {
         String[] ciphers = null;
         try {
-            ciphers = SSLUtils.getSupportedCiphers();
+            ciphers = SslUtil.getSupportedCiphers();
         } catch (NoSuchAlgorithmException e) {
             logger.error("SecureSSLSocketFactory::getDefaultCipherSuites found no cipher suites");
         }
@@ -77,12 +58,12 @@ public class SecureSSLSocketFactory extends SSLSocketFactory {
     }
 
     @Override
-    public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
+    public Socket createSocket(Socket s, String host, int port, boolean isAutoClose) throws IOException {
         SSLSocketFactory factory = sslContext.getSocketFactory();
-        Socket socket = factory.createSocket(s, host, port, autoClose);
+        Socket socket = factory.createSocket(s, host, port, isAutoClose);
         if (socket instanceof SSLSocket) {
             ((SSLSocket) socket).setEnabledProtocols(
-                SSLUtils.getSupportedProtocols(((SSLSocket) socket).getEnabledProtocols()));
+                SslUtil.getSupportedProtocols(((SSLSocket) socket).getEnabledProtocols()));
         }
         return socket;
     }
@@ -93,21 +74,19 @@ public class SecureSSLSocketFactory extends SSLSocketFactory {
         Socket socket = factory.createSocket(host, port);
         if (socket instanceof SSLSocket) {
             ((SSLSocket) socket).setEnabledProtocols(
-                SSLUtils.getSupportedProtocols(((SSLSocket) socket).getEnabledProtocols()));
+                SslUtil.getSupportedProtocols(((SSLSocket) socket).getEnabledProtocols()));
         }
         return socket;
     }
 
     @Override
-    public Socket createSocket(String host,
-                               int port,
-                               InetAddress inetAddress,
-                               int localPort) throws IOException, UnknownHostException {
+    public Socket createSocket(String host, int port, InetAddress inetAddress, int localPort)
+        throws IOException, UnknownHostException {
         SSLSocketFactory factory = sslContext.getSocketFactory();
         Socket socket = factory.createSocket(host, port, inetAddress, localPort);
         if (socket instanceof SSLSocket) {
-            ((SSLSocket) socket)
-                .setEnabledProtocols(SSLUtils.getSupportedProtocols(((SSLSocket) socket).getEnabledProtocols()));
+            ((SSLSocket) socket).setEnabledProtocols(
+                SslUtil.getSupportedProtocols(((SSLSocket) socket).getEnabledProtocols()));
         }
         return socket;
     }
@@ -117,8 +96,8 @@ public class SecureSSLSocketFactory extends SSLSocketFactory {
         SSLSocketFactory factory = sslContext.getSocketFactory();
         Socket socket = factory.createSocket(inetAddress, localPort);
         if (socket instanceof SSLSocket) {
-            ((SSLSocket) socket)
-                .setEnabledProtocols(SSLUtils.getSupportedProtocols(((SSLSocket) socket).getEnabledProtocols()));
+            ((SSLSocket) socket).setEnabledProtocols(
+                SslUtil.getSupportedProtocols(((SSLSocket) socket).getEnabledProtocols()));
         }
         return socket;
     }
@@ -129,8 +108,8 @@ public class SecureSSLSocketFactory extends SSLSocketFactory {
         SSLSocketFactory factory = this.sslContext.getSocketFactory();
         Socket socket = factory.createSocket(address, port, localAddress, localPort);
         if (socket instanceof SSLSocket) {
-            ((SSLSocket) socket)
-                .setEnabledProtocols(SSLUtils.getSupportedProtocols(((SSLSocket) socket).getEnabledProtocols()));
+            ((SSLSocket) socket).setEnabledProtocols(
+                SslUtil.getSupportedProtocols(((SSLSocket) socket).getEnabledProtocols()));
         }
         return socket;
     }

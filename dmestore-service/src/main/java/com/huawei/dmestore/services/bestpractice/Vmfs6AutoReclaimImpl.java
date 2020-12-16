@@ -1,5 +1,6 @@
 package com.huawei.dmestore.services.bestpractice;
 
+import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 import com.huawei.vmware.mo.DatastoreMO;
@@ -93,7 +94,7 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
             ManagedObjectReference dsMor = pair.first();
             DatastoreMO datastoreMo = this.getDatastoreMoFactory().build(context, dsMor);
             DatastoreSummary summary = datastoreMo.getSummary();
-            if (summary.getType().equals(ToolUtils.STORE_TYPE_VMFS)) {
+            if (summary.getType().equals(DmeConstants.STORE_TYPE_VMFS)) {
                 VmfsDatastoreInfo vmfsDatastoreInfo = datastoreMo.getVmfsDatastoreInfo();
                 HostVmfsVolume hostVmfsVolume = vmfsDatastoreInfo.getVmfs();
 

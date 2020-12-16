@@ -1,12 +1,20 @@
 package com.huawei.dmestore.utils;
 
-public class VCClientUtils {
-
+/**
+ * VcClientUtil
+ *
+ * @author liuxh
+ * @since 2020-09-15
+ **/
+public class VcClientUtil {
     private static final String FLASH_CLIENT = "vsphere-client";
 
     private static final String HTML5_CLIENT = "vsphere-ui";
 
     private static final String WEB_CLIENT = System.getProperty("user.name");
+
+    private VcClientUtil() {
+    }
 
     public static boolean isFlashClient() {
         return FLASH_CLIENT.equalsIgnoreCase(getWebClient());

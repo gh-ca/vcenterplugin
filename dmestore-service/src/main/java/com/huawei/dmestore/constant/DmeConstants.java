@@ -55,21 +55,18 @@ public class DmeConstants {
     /**
      * logic port detail
      **/
-     public static final String DME_NFS_LOGICPORT_DETAIL_URL
-        = "/rest/storagemgmt/v1/logic-ports/{logic_port_id}";
+    public static final String DME_NFS_LOGICPORT_DETAIL_URL = "/rest/storagemgmt/v1/logic-ports/{logic_port_id}";
 
     /**
      * failover groups query
      **/
     public static final String API_FAILOVERGROUPS = "/rest/storagemgmt/v1/storage-port/failover-groups?storage_id=";
 
-    
     /**
      * logic ports query
      **/
-    // public static final String API_LOGICPORTS_LIST = "/rest/storagemgmt/v1/storage-port/logic-ports?storage_id=";
-
     public static final String API_LOGICPORTS_LIST = "/rest/storagemgmt/v1/logic-ports/query";
+
     /**
      * bond ports query
      **/
@@ -408,6 +405,8 @@ public class DmeConstants {
      * https status success
      **/
     public static final int HTTPS_STATUS_SUCCESS_200 = 200;
+
+    public static final String STORE_TYPE_VMFS = "VMFS";
 
     private DmeConstants() {
     }

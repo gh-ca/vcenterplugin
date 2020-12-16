@@ -2,8 +2,8 @@ package com.huawei.dmestore.services.bestpractice;
 
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.utils.VCSDKUtils;
-import com.huawei.vmware.util.DatastoreMOFactory;
-import com.huawei.vmware.util.HostMOFactory;
+import com.huawei.vmware.util.DatastoreVmwareMoFactory;
+import com.huawei.vmware.util.HostVmwareFactory;
 
 /**
  * BestPracticeService 最佳实践实现接口类
@@ -90,8 +90,8 @@ public interface BestPracticeService {
      * @author wangxy
      * @return HostMOFactory
      */
-    default HostMOFactory getHostMoFactory() {
-        return HostMOFactory.getInstance();
+    default HostVmwareFactory getHostMoFactory() {
+        return HostVmwareFactory.getInstance();
     }
 
     /**
@@ -100,7 +100,7 @@ public interface BestPracticeService {
      * @author wangxy
      * @return DatastoreMOFactory
      */
-    default DatastoreMOFactory getDatastoreMoFactory() {
-        return DatastoreMOFactory.getInstance();
+    default DatastoreVmwareMoFactory getDatastoreMoFactory() {
+        return DatastoreVmwareMoFactory.getInstance();
     }
 }

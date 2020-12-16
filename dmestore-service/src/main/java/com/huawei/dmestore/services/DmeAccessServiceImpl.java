@@ -9,6 +9,7 @@ import com.huawei.dmestore.task.ScheduleSetting;
 import com.huawei.dmestore.utils.RestUtils;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -589,7 +590,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     @Override
     public void scanDatastore(String storageType) throws DmeException {
         if (!StringUtils.isEmpty(storageType)) {
-            if (storageType.equals(ToolUtils.STORE_TYPE_VMFS)) {
+            if (storageType.equals(DmeConstants.STORE_TYPE_VMFS)) {
                 LOG.info("scan VMFS Datastore start");
                 vmfsAccessService.scanVmfs();
                 LOG.info("scan VMFS Datastore end");

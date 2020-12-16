@@ -3,6 +3,7 @@ package com.huawei.vmware.util;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 
+import com.huawei.dmestore.constant.DpSqlFileConstants;
 import com.vmware.vim25.ManagedObjectReference;
 
 import org.junit.Before;
@@ -12,14 +13,14 @@ import org.mockito.MockitoAnnotations;
 
 /**
  * @author lianq
- * @className RootFsMOFactoryTest
+ * @className ClusterMOFactoryTest
  * @description TODO
- * @date 2020/12/1 20:36
+ * @date 2020/12/1 20:31
  */
-public class RootFsMOFactoryTest {
+public class ClusterVmwareMoFactoryTest {
 
     @InjectMocks
-    RootFsMOFactory factory;
+    ClusterVmwareMoFactory factory;
 
     VmwareContext vmwareContext;
     ManagedObjectReference managedObjectReference;
@@ -29,11 +30,13 @@ public class RootFsMOFactoryTest {
         MockitoAnnotations.initMocks(this);
         vmwareContext = mock(VmwareContext.class);
         managedObjectReference = spy(ManagedObjectReference.class);
+        String[] ALL_TABLES = DpSqlFileConstants.ALL_TABLES;
+        System.out.println(ALL_TABLES);
     }
 
     @Test
     public void getInstance() {
-        RootFsMOFactory.getInstance();
+        ClusterVmwareMoFactory.getInstance();
     }
 
     @Test

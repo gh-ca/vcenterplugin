@@ -1,6 +1,7 @@
 package com.huawei.vmware.util;
 
 import com.huawei.vmware.mo.RootFsMO;
+
 import com.vmware.vim25.ManagedObjectReference;
 
 /**
@@ -10,10 +11,10 @@ import com.vmware.vim25.ManagedObjectReference;
  * @ClassName: RootFsMOFactory
  * @since 2020-12-09
  */
-public class RootFsMOFactory {
-    private static RootFsMOFactory rootFsMOFactory;
+public class RootVmwareMoFactory {
+    private static RootVmwareMoFactory rootFactory;
 
-    private RootFsMOFactory() {
+    private RootVmwareMoFactory() {
     }
 
     /**
@@ -21,22 +22,22 @@ public class RootFsMOFactory {
      *
      * @return RootFsMOFactory
      */
-    public static RootFsMOFactory getInstance() {
-        if (rootFsMOFactory == null) {
-            synchronized (RootFsMOFactory.class) {
-                if (rootFsMOFactory == null) {
-                    rootFsMOFactory = new RootFsMOFactory();
+    public static RootVmwareMoFactory getInstance() {
+        if (rootFactory == null) {
+            synchronized (RootVmwareMoFactory.class) {
+                if (rootFactory == null) {
+                    rootFactory = new RootVmwareMoFactory();
                 }
             }
         }
-        return rootFsMOFactory;
+        return rootFactory;
     }
 
     /**
      * build
      *
      * @param context context
-     * @param mor     mor
+     * @param mor mor
      * @return RootFsMO
      */
     public RootFsMO build(VmwareContext context, ManagedObjectReference mor) {

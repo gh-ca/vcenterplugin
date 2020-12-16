@@ -17,10 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @description TODO
  * @date 2020/12/3 15:29
  */
-public class VCConnectionHelperTest {
+public class VcConnectionHelpersTest {
 
     @Autowired
-    VCConnectionHelper vcConnectionHelper;
+    VcConnectionHelpers vcConnectionHelpers;
 
     UserSessionService userSessionService;
     VimObjectReferenceService vimObjectReferenceService;
@@ -36,96 +36,96 @@ public class VCConnectionHelperTest {
 
     @Test
     public void getUserSessionService() {
-        vcConnectionHelper.getUserSessionService();
+        vcConnectionHelpers.getUserSessionService();
     }
 
     @Test
     public void setUserSessionService() {
-        vcConnectionHelper.setUserSessionService(userSessionService);
+        vcConnectionHelpers.setUserSessionService(userSessionService);
 
     }
 
     @Test
     public void getVimObjectReferenceService() {
-        vcConnectionHelper.getVimObjectReferenceService();
+        vcConnectionHelpers.getVimObjectReferenceService();
 
     }
 
     @Test
     public void setVimObjectReferenceService() {
-        vcConnectionHelper.setVimObjectReferenceService(vimObjectReferenceService);
+        vcConnectionHelpers.setVimObjectReferenceService(vimObjectReferenceService);
 
     }
 
     @Test
     public void getServerurl() {
-        vcConnectionHelper.getServerurl();
+        vcConnectionHelpers.getServerurl();
 
     }
 
     @Test
     public void setServerurl() {
-        vcConnectionHelper.setServerurl("321");
+        vcConnectionHelpers.setServerurl("321");
 
     }
 
     @Test
     public void getUsername() {
-        vcConnectionHelper.getUsername();
+        vcConnectionHelpers.getUsername();
 
     }
 
     @Test
     public void setUsername() {
-        vcConnectionHelper.setUsername("321");
+        vcConnectionHelpers.setUsername("321");
 
     }
 
     @Test
     public void getPassword() {
-        vcConnectionHelper.getPassword();
+        vcConnectionHelpers.getPassword();
 
     }
 
     @Test
     public void setPassword() {
-        vcConnectionHelper.setPassword("321");
+        vcConnectionHelpers.setPassword("321");
 
     }
 
     @Test
     public void getServerport() {
-        vcConnectionHelper.getServerport();
+        vcConnectionHelpers.getServerport();
 
     }
 
     @Test
     public void setServerport() {
-        vcConnectionHelper.setServerport(321);
+        vcConnectionHelpers.setServerport(321);
 
     }
 
     @Test
     public void getServerContext() throws Exception {
-        vcConnectionHelper.getServerContext("321:321321");
+        vcConnectionHelpers.getServerContext("321:321321");
 
     }
 
     @Test
     public void objectId2Mor() {
-        vcConnectionHelper.objectId2Mor("321:321:321:321");
+        vcConnectionHelpers.objectId2Mor("321:321:321:321");
 
     }
 
     @Test
     public void objectId2Serverguid() {
-        vcConnectionHelper.objectId2Serverguid("321:321:321:321");
+        vcConnectionHelpers.objectId2Serverguid("321:321:321:321");
 
     }
 
     @Test
     public void mor2ObjectId() {
-        vcConnectionHelper.mor2ObjectId(mor, "321:213:321:321");
+        vcConnectionHelpers.mor2ObjectId(mor, "321:213:321:321");
 
     }
 }
