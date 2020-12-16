@@ -238,7 +238,9 @@ public class VCSDKUtils {
             VmwareContext[] vmwareContexts = vcConnectionHelpers.getAllContext();
             for (VmwareContext vmwareContext : vmwareContexts) {
                 RootFsMO rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
+                logger.info("rootFsMo:{}",rootFsMo);
                 List<Pair<ManagedObjectReference, String>> hosts = rootFsMo.getAllHostOnRootFs();
+                logger.info("hosts:{}",hosts);
                 if (hosts != null && hosts.size() > 0) {
                     List<Map<String, String>> lists = new ArrayList<>();
                     for (Pair<ManagedObjectReference, String> host : hosts) {
