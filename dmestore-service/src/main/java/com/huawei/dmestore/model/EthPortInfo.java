@@ -12,146 +12,182 @@ public class EthPortInfo {
      * DME Storage 1.0.RC1 系统资源北向模型 01.pdf 存储端口.
      **/
     private String ownerType;
+
     /**
      * IPv4掩码 .
      **/
     private String ipv4Mask;
+
     /**
      * logicalType .
      */
     private String logicalType;
+
     /**
      * storageDeviceId .
      */
     private String storageDeviceId;
+
     /**
      * 端口名称 .
      **/
     private String portName;
+
     /**
      * ownerId .
      */
     private String ownerId;
+
     /**
      * 端口ID .
      **/
     private String portId;
+
     /**
      * 绑定名称.
      **/
     private String bondName;
+
     /**
      * MAC地址.
      **/
     private String mac;
+
     /**
      * IPv6地址.
      **/
     private String mgmtIpv6;
+
     /**
      * iSCSI名称.
      **/
     private String iscsiName;
+
     /**
      * ownerName.
      */
     private String ownerName;
+
     /**
      * 最后监控时间.
      **/
     private Long lastMonitorTime;
+
     /**
      * IPv4地址.
      **/
     private String mgmtIp;
+
     /**
      * confirmStatus .
      */
     private String confirmStatus;
+
     /**
      * CMDB 实例 ID.
      **/
     private String id;
+
     /**
      * 最后修改时间.
      **/
     private Long lastModified;
+
     /**
      * 连接状态.
      **/
     private String connectStatus;
+
     /**
      * classId.
      */
     private Integer classId;
+
     /**
      * 监控状态.
      **/
     private String dataStatus;
+
     /**
      * Mbit/s.
      **/
     private Integer maxSpeed;
+
     /**
      * resId.
      */
     private String resId;
+
     /**
      * local.
      */
     private Boolean local;
+
     /**
      * 端口类型.
      **/
     private String portType;
+
     /**
      * className .
      */
     private String className;
+
     /**
      * numberOfInitiators .
      */
     private Integer numberOfInitiators;
+
     /**
      * 绑定ID.
      **/
     private String bondId;
+
     /**
      * regionId .
      */
     private String regionId;
+
     /**
      * 名称.
      **/
     private String name;
+
     /**
      * 位置.
      **/
     private String location;
+
     /**
      * 原始ID.
      **/
     private String nativeId;
+
     /**
      * dataSource .
      */
     private String dataSource;
+
     /**
      * IPv6掩码.
      **/
     private String ipv6Mask;
+
     /**
      * 状态.
      **/
     private String status;
+
     /**
      * Mbit/s.
      **/
     private Integer speed;
+
     /**
      * WWN .
      **/
     private String wwn;
+
     /**
      * 光模块状态.
      **/

@@ -8,18 +8,29 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.io.File;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Locale;
 
+/**
+ * H2DataBaseDao
+ *
+ * @author yy
+ * @since 2020-09-02
+ **/
 public class H2DataBaseDao {
-
-    private String url;
-
-    public final static Logger LOGGER = LoggerFactory.getLogger(H2DataBaseDao.class);
+    /**
+     * LOGGER
+     */
+    public static final Logger LOGGER = LoggerFactory.getLogger(H2DataBaseDao.class);
 
     private static final String VMWARE_RUNTIME_DATA_DIR = "VMWARE_RUNTIME_DATA_DIR";
 
-    private static final String OS = System.getProperty("os.name").toLowerCase(Locale.US);
+    private static final String OS = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
 
     private static final String URL_PREFIX = "jdbc:h2:";
 
@@ -29,22 +40,25 @@ public class H2DataBaseDao {
 
     private static final String USER = "sa";
 
+    private String url;
+
     private static String getVmwareRuntimeDataDir() {
         return System.getenv(VMWARE_RUNTIME_DATA_DIR);
     }
 
-    private static Boolean isWindows() {
+    private static boolean isWindows() {
         return OS.indexOf("windows") >= 0;
     }
 
     public Connection getConnection() throws DataBaseException {
-        Connection con;
-
+        Connection con = null;
         try {
             Class.forName("org.h2.Driver");
             con = DriverManager.getConnection(url, USER, "");
-        } catch (Exception e) {
+        } catch (SQLException e) {
             throw new DataBaseException(e.getMessage());
+        } catch (ClassNotFoundException e) {
+            LOGGER.error(e.getMessage());
         }
 
         return con;
@@ -54,8 +68,8 @@ public class H2DataBaseDao {
         if (rs != null) {
             try {
                 rs.close();
-            } catch (Exception var2) {
-                var2.printStackTrace();
+            } catch (SQLException var2) {
+                LOGGER.error(var2.getMessage());
             }
         }
         if (ps != null) {
@@ -64,16 +78,16 @@ public class H2DataBaseDao {
                     if (ps1 != null) {
                         ps1.close();
                     }
-                } catch (Exception var2) {
-                    var2.printStackTrace();
+                } catch (SQLException var2) {
+                    LOGGER.error(var2.getMessage());
                 }
             }
         }
         if (con != null) {
             try {
                 con.close();
-            } catch (Exception var2) {
-                var2.printStackTrace();
+            } catch (SQLException var2) {
+                LOGGER.error(var2.getMessage());
             }
         }
     }

@@ -3,17 +3,17 @@ package com.huawei.dmestore.model;
 import java.util.List;
 
 /**
- * BestPracticeUpdateByTypeRequest.
+ * BestPracticeUpdateByTypeRequest
  *
  * @author wangxiangyong
- * @Description: BestPracticeUpdateByTypeRequest
- * @since 2020-12-08
- **/
+ * @since 2020-09-09
+ */
 public class BestPracticeUpdateByTypeRequest {
     /**
      * hostSetting .
      */
     private String hostSetting;
+
     /**
      * hostObjectIds .
      */
@@ -57,9 +57,7 @@ public class BestPracticeUpdateByTypeRequest {
 
     @Override
     public final String toString() {
-        return "BestPracticeUpdateByTypeRequest{"
-            + "hostSetting='" + hostSetting + '\''
-            + ", hostObjectIds=" + hostObjectIds
-            + '}';
+        return "BestPracticeUpdateByTypeRequest{" + "hostSetting='" + hostSetting + '\'' + ", hostObjectIds="
+            + hostObjectIds + '}';
     }
 }

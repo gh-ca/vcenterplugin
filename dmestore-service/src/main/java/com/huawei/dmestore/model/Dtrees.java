@@ -12,26 +12,32 @@ public class Dtrees {
      * name .
      */
     private String name;
+
     /**
      * 所属文件系统名称 .
      */
     private String fsName;
+
     /**
      * 配额 .
      */
     private boolean quotaSwitch;
+
     /**
      * 安全模式 .
      */
     private String securityStyle;
+
     /**
      * 服务等级名称 .
      */
     private String tierName;
+
     /**
      * nfs .
      */
     private Integer nfsCount;
+
     /**
      * name .
      */
@@ -165,14 +171,8 @@ public class Dtrees {
 
     @Override
     public final String toString() {
-        return "Dtrees{"
-            + "name='" + name + '\''
-            + ", fsName='" + fsName + '\''
-            + ", quotaSwitch=" + quotaSwitch
-            + ", securityStyle='" + securityStyle + '\''
-            + ", tierName='" + tierName + '\''
-            + ", nfsCount=" + nfsCount
-            + ", cifsCount=" + cifsCount
-            + '}';
+        return "Dtrees{" + "name='" + name + '\'' + ", fsName='" + fsName + '\'' + ", quotaSwitch=" + quotaSwitch
+            + ", securityStyle='" + securityStyle + '\'' + ", tierName='" + tierName + '\'' + ", nfsCount=" + nfsCount
+            + ", cifsCount=" + cifsCount + '}';
     }
 }

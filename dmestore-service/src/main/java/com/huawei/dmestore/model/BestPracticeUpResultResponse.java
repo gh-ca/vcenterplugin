@@ -13,14 +13,17 @@ public class BestPracticeUpResultResponse {
      * hostObjectId .
      */
     private String hostObjectId;
+
     /**
      * hostName .
      */
     private String hostName;
+
     /**
      * result .
      */
     private List<BestPracticeUpResultBase> result;
+
     /**
      * needReboot .
      */
@@ -100,11 +103,7 @@ public class BestPracticeUpResultResponse {
 
     @Override
     public final String toString() {
-        return "BestPracticeUpResultResponse{"
-            + "hostObjectId='" + hostObjectId + '\''
-            + ", hostName='" + hostName + '\''
-            + ", result=" + result
-            + ", needReboot=" + needReboot
-            + '}';
+        return "BestPracticeUpResultResponse{" + "hostObjectId='" + hostObjectId + '\'' + ", hostName='" + hostName
+            + '\'' + ", result=" + result + ", needReboot=" + needReboot + '}';
     }
 }

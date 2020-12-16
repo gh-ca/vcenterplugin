@@ -1,5 +1,11 @@
 package com.huawei.dmestore.exception;
 
+/**
+ * DmeSqlException .
+ *
+ * @author Administrator .
+ * @since 2020-12-08
+ */
 public class DmeSqlException extends DmeException {
     public DmeSqlException() {
         super();

@@ -238,15 +238,20 @@ public class VCSDKUtils {
         String listStr = "";
         try {
             VmwareContext[] vmwareContexts = vcConnectionHelper.getAllContext();
+            logger.info("vmwareContexts:{}",vmwareContexts);
             for (VmwareContext vmwareContext : vmwareContexts) {
                 RootFsMO rootFsMo = rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder());
+                logger.info("rootFsMo:{}",rootFsMo);
                 //RootFsMO rootFsMo = new RootFsMO(vmwareContext, vmwareContext.getRootFolder());
                 List<Pair<ManagedObjectReference, String>> hosts = rootFsMo.getAllHostOnRootFs();
+                logger.info("hosts:{}",hosts);
                 if (hosts != null && hosts.size() > 0) {
                     List<Map<String, String>> lists = new ArrayList<>();
                     for (Pair<ManagedObjectReference, String> host : hosts) {
+                        logger.info("host:{}",host);
                         //HostMO host1 = new HostMO(vmwareContext, host.first());
                         HostMO host1 = hostMOFactory.build(vmwareContext, host.first());
+                        logger.info("host1:{}",host1);
                         Map<String, String> map = new HashMap<>();
                         String objectId =
                             vcConnectionHelper.mor2ObjectId(host1.getMor(), vmwareContext.getServerAddress());

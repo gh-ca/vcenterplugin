@@ -1,6 +1,6 @@
 package com.huawei.dmestore.dao;
 
-import com.huawei.dmestore.constant.DPSqlFileConstant;
+import com.huawei.dmestore.constant.DpSqlFileConstants;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,11 +18,11 @@ public class SystemDao extends H2DataBaseDao {
     public boolean checkTable(String sqlFile) throws SQLException {
         Connection con = null;
         ResultSet resultSet = null;
-        boolean tableExist;
+        boolean isTableExist;
         try {
             con = getConnection();
             resultSet = con.getMetaData().getTables(null, null, sqlFile, null);
-            tableExist = resultSet.next();
+            isTableExist = resultSet.next();
         } catch (SQLException ex) {
             LOGGER.error("Failed to check table: {}", ex.getMessage());
             throw ex;
@@ -30,7 +30,7 @@ public class SystemDao extends H2DataBaseDao {
             closeConnection(con, null, resultSet);
         }
 
-        return tableExist;
+        return isTableExist;
     }
 
     /**
@@ -101,7 +101,7 @@ public class SystemDao extends H2DataBaseDao {
         PreparedStatement ps1 = null;
         try {
             con = getConnection();
-            for (String table : DPSqlFileConstant.ALL_TABLES) {
+            for (String table : DpSqlFileConstants.ALL_TABLES) {
                 try {
                     ps1 = con.prepareStatement("DELETE FROM " + table);
                     ps1.execute();

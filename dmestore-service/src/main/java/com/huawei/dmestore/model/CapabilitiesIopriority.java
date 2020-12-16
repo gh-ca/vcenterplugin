@@ -12,6 +12,7 @@ public class CapabilitiesIopriority {
      * IO优先级，默认false .
      */
     private Boolean enabled;
+
     /**
      * IO优先级枚举值, 取值范围：1：低；2：中；3：高 .
      */
@@ -55,9 +56,6 @@ public class CapabilitiesIopriority {
 
     @Override
     public final String toString() {
-        return "CapabilitiesIopriority{"
-            + "enabled=" + enabled
-            + ", policy=" + policy
-            + '}';
+        return "CapabilitiesIopriority{" + "enabled=" + enabled + ", policy=" + policy + '}';
     }
 }

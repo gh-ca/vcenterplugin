@@ -26,7 +26,7 @@ public class IgnorableException extends VcenterRuntimeException {
     /**
      * IgnorableException
      *
-     * @param code    code
+     * @param code
      * @param message message
      */
     public IgnorableException(String code, String message) {
