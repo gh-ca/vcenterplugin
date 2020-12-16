@@ -39,8 +39,9 @@ public class DmeConstants {
 
     public static final String API_FAILOVERGROUPS = "/rest/storagemgmt/v1/storage-port/failover-groups?storage_id=";
 
-    public static final String API_LOGICPORTS_LIST = "/rest/storagemgmt/v1/storage-port/logic-ports?storage_id=";
+    // public static final String API_LOGICPORTS_LIST = "/rest/storagemgmt/v1/storage-port/logic-ports?storage_id=";
 
+    public static final String API_LOGICPORTS_LIST = "/rest/storagemgmt/v1/logic-ports/query";
     public static final String API_BANDPORTS_LIST = "/rest/storagemgmt/v1/storage-port/bond-ports?storage_id=";
 
     public static final String DME_VOLUME_BASE_URL = "/rest/blockservice/v1/volumes";

@@ -398,9 +398,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     @Override
     public List<LogicPorts> getLogicPorts(String storageId) throws DmeException {
         List<LogicPorts> resList = new ArrayList<>();
-        String url = DmeConstants.API_LOGICPORTS_LIST + storageId;
+        String url = DmeConstants.API_LOGICPORTS_LIST;
+        JsonObject param = new JsonObject();
+        param.addProperty("storage_id",storageId);
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(param));
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
                 throw new DmeException(CODE_503, "list Logic Ports error!");
