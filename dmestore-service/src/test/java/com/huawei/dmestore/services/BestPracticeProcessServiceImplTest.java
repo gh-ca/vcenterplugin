@@ -4,11 +4,11 @@ import com.huawei.dmestore.dao.BestPracticeCheckDao;
 import com.huawei.dmestore.model.BestPracticeBean;
 import com.huawei.dmestore.services.bestpractice.*;
 import com.huawei.dmestore.utils.VCSDKUtils;
-import com.huawei.vmware.VCConnectionHelper;
-import com.huawei.vmware.VmwarePluginConnectionHelper;
+import com.huawei.vmware.VcConnectionHelpers;
+import com.huawei.vmware.VmwarePluginConnectionHelpers;
 import com.huawei.vmware.mo.*;
-import com.huawei.vmware.util.DatastoreMOFactory;
-import com.huawei.vmware.util.HostMOFactory;
+import com.huawei.vmware.util.DatastoreVmwareMoFactory;
+import com.huawei.vmware.util.HostVmwareFactory;
 import com.huawei.vmware.util.Pair;
 import com.huawei.vmware.util.VmwareContext;
 import com.google.gson.Gson;
@@ -110,18 +110,18 @@ public class BestPracticeProcessServiceImplTest {
         when(vcsdkUtils.findHostById(objectId)).thenReturn(gson.toJson(lists));
         when(vcsdkUtils.getAllHosts()).thenReturn(gson.toJson(lists));
         ManagedObjectReference mor = mock(ManagedObjectReference.class);
-        VCConnectionHelper vcConnectionHelper = mock(VmwarePluginConnectionHelper.class);
-        when(vcsdkUtils.getVcConnectionHelper()).thenReturn(vcConnectionHelper);
-        when(vcConnectionHelper.objectId2Mor(objectId)).thenReturn(mor);
+        VcConnectionHelpers vcConnectionHelpers = mock(VmwarePluginConnectionHelpers.class);
+        when(vcsdkUtils.getVcConnectionHelper()).thenReturn(vcConnectionHelpers);
+        when(vcConnectionHelpers.objectId2Mor(objectId)).thenReturn(mor);
         VmwareContext context = mock(VmwareContext.class);
-        when(vcConnectionHelper.getServerContext(objectId)).thenReturn(context);
+        when(vcConnectionHelpers.getServerContext(objectId)).thenReturn(context);
         HostMO hostMo = mock(HostMO.class);
         DatastoreMO datastoreMo = mock(DatastoreMO.class);
-        HostMOFactory hostMOFactory = mock(HostMOFactory.class);
-        DatastoreMOFactory datastoreMOFactory = mock(DatastoreMOFactory.class);
+        HostVmwareFactory hostVmwareFactory = mock(HostVmwareFactory.class);
+        DatastoreVmwareMoFactory datastoreVmwareMoFactory = mock(DatastoreVmwareMoFactory.class);
         for (BestPracticeService service : bestPracticeServiceList) {
-            when(service.getHostMoFactory()).thenReturn(hostMOFactory);
-            when(hostMOFactory.build(context, mor)).thenReturn(hostMo);
+            when(service.getHostMoFactory()).thenReturn(hostVmwareFactory);
+            when(hostVmwareFactory.build(context, mor)).thenReturn(hostMo);
 
             List<Pair<ManagedObjectReference, String>> datastoreMountsOnHost = new ArrayList<>();
             Pair<ManagedObjectReference, String> pair = mock(Pair.class);
@@ -129,8 +129,8 @@ public class BestPracticeProcessServiceImplTest {
             when(hostMo.getDatastoreMountsOnHost()).thenReturn(datastoreMountsOnHost);
             ManagedObjectReference dsMor = mock(ManagedObjectReference.class);
             when(pair.first()).thenReturn(dsMor);
-            when(service.getDatastoreMoFactory()).thenReturn(datastoreMOFactory);
-            when(datastoreMOFactory.build(context, dsMor)).thenReturn(datastoreMo);
+            when(service.getDatastoreMoFactory()).thenReturn(datastoreVmwareMoFactory);
+            when(datastoreVmwareMoFactory.build(context, dsMor)).thenReturn(datastoreMo);
         }
         HostAdvanceOptionMO hostAdvanceOptionMO = mock(HostAdvanceOptionMO.class);
         when(hostMo.getHostAdvanceOptionMo()).thenReturn(hostAdvanceOptionMO);

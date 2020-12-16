@@ -1,7 +1,7 @@
 package com.huawei.dmestore.services;
 
 import com.huawei.dmestore.exception.DmeException;
-import com.huawei.vmware.VCConnectionHelper;
+import com.huawei.vmware.VcConnectionHelpers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
@@ -23,7 +23,7 @@ public class PluginRegisterServiceImplTest {
     @Mock
     private VCenterInfoService vCenterInfoService;
     @Mock
-    private VCConnectionHelper vcConnectionHelper;
+    private VcConnectionHelpers vcConnectionHelpers;
 
     @InjectMocks
     PluginRegisterService pluginRegisterService = new PluginRegisterServiceImpl();

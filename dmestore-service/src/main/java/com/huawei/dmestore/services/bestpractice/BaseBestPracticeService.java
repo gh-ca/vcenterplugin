@@ -3,8 +3,8 @@ package com.huawei.dmestore.services.bestpractice;
 import com.huawei.dmestore.utils.VCSDKUtils;
 import com.huawei.vmware.mo.HostAdvanceOptionMO;
 import com.huawei.vmware.mo.HostMO;
-import com.huawei.vmware.util.DatastoreMOFactory;
-import com.huawei.vmware.util.HostMOFactory;
+import com.huawei.vmware.util.DatastoreVmwareMoFactory;
+import com.huawei.vmware.util.HostVmwareFactory;
 import com.huawei.vmware.util.VmwareContext;
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.OptionValue;
@@ -88,11 +88,11 @@ public class BaseBestPracticeService {
         hostMo.getHostKernelModuleSystemMo().updateModuleOptionString(optionName, options);
     }
 
-    public HostMOFactory getHostMoFactory() {
-        return HostMOFactory.getInstance();
+    public HostVmwareFactory getHostMoFactory() {
+        return HostVmwareFactory.getInstance();
     }
 
-    public DatastoreMOFactory getDatastoreMoFactory() {
-        return DatastoreMOFactory.getInstance();
+    public DatastoreVmwareMoFactory getDatastoreMoFactory() {
+        return DatastoreVmwareMoFactory.getInstance();
     }
 }

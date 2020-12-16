@@ -23,17 +23,15 @@ import org.springframework.util.StringUtils;
  * @since 2020-09-15
  **/
 public class ToolUtils {
-    private static final Logger LOG = LoggerFactory.getLogger(ToolUtils.class);
-
-    private static final Gson GSON = new Gson();
-
-    public static final String STORE_TYPE_VMFS = "VMFS";
-
     public static final String STORE_TYPE_NFS = "NFS";
 
     public static final String STORE_TYPE_ALL = "ALL";
 
     public static final int GI = 1024 * 1024 * 1024;
+
+    private static final Logger LOG = LoggerFactory.getLogger(ToolUtils.class);
+
+    private static final Gson GSON = new Gson();
 
     public static String getStr(Object obj) {
         return getStr(obj, null);

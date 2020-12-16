@@ -170,13 +170,11 @@ public class VirtualMachineMO extends BaseMO {
 
         ManagedObjectReference morTask = context.getService().reconfigVMTask(mor, reConfigSpec);
         boolean result = context.getVimClient().waitForTask(morTask);
-
         if (!result) {
             throw new Exception(
                 "Unable to create disk " + vmdkDatastorePath + " due to " + TaskMO.getTaskFailureInfo(context,
                     morTask));
         }
-
         context.waitForTaskProgressDone(morTask);
     }
 

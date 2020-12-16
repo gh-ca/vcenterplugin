@@ -1,5 +1,6 @@
 package com.huawei.dmestore.dao;
 
+import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.constant.DpSqlFileConstants;
 import com.huawei.dmestore.entity.DmeVmwareRelation;
 import com.huawei.dmestore.exception.DataBaseException;
@@ -210,7 +211,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
     }
 
     public void update(List<DmeVmwareRelation> list, String storeType) {
-        if (storeType != null && storeType.equals(ToolUtils.STORE_TYPE_VMFS)) {
+        if (storeType != null && storeType.equals(DmeConstants.STORE_TYPE_VMFS)) {
             updateVmfs(list);
         }
     }
@@ -459,7 +460,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
      * @throws DmeSqlException DmeSqlException
      */
     public List<String> getVolumeIdsByStorageId(String storeId) throws DmeSqlException {
-        return getFileIdsByCondition(storeId, "volume_id", ToolUtils.STORE_TYPE_VMFS);
+        return getFileIdsByCondition(storeId, "volume_id", DmeConstants.STORE_TYPE_VMFS);
     }
 
     private List<String> getFileIdsByCondition(String storeId, String fileId, String storeType) throws DmeSqlException {
@@ -561,7 +562,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         try {
             con = getConnection();
             String sql = "SELECT * FROM " + DpSqlFileConstants.DP_DME_VMWARE_RELATION
-                + " WHERE state=1 and STORE_TYPE='" + ToolUtils.STORE_TYPE_VMFS + "'and VOLUME_ID='" + volumeId
+                + " WHERE state=1 and STORE_TYPE='" + DmeConstants.STORE_TYPE_VMFS + "'and VOLUME_ID='" + volumeId
                 + ACCENT_SIGN;
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();

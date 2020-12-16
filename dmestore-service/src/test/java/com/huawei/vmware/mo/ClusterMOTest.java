@@ -10,7 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
-import com.huawei.vmware.util.HostMOFactory;
+import com.huawei.vmware.util.HostVmwareFactory;
 import com.huawei.vmware.util.VmwareClient;
 import com.huawei.vmware.util.VmwareContext;
 
@@ -47,7 +47,7 @@ public class ClusterMOTest {
     private VmwareContext context;
 
     @Mock
-    private HostMOFactory hostFactory;
+    private HostVmwareFactory hostFactory;
 
     private VmwareClient vmwareClient;
 

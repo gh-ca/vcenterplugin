@@ -80,7 +80,7 @@ public class VmwareContext {
     private final String serverAddress;
     private final int intValue = 100;
     private final int sleep = 1000;
-    private DatacenterMOFactory datacenterMoFactory;
+    private DatacenterVmwareMoFactory datacenterVmwareMoFactory;
 
     private final Map<String, Object> stockMap = new HashMap<String, Object>();
 
@@ -93,9 +93,9 @@ public class VmwareContext {
             javax.net.ssl.TrustManager[] trustAllCerts = new javax.net.ssl.TrustManager[1];
             javax.net.ssl.TrustManager tm = new TrustAllManager();
             trustAllCerts[0] = tm;
-            javax.net.ssl.SSLContext sc = SSLUtils.getSslContext();
+            javax.net.ssl.SSLContext sc = SslUtil.getSslContext();
             sc.init(null, trustAllCerts, null);
-            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(new SecureSSLSocketFactory(sc));
+            javax.net.ssl.HttpsURLConnection.setDefaultSSLSocketFactory(new SecurtySslSocketFactory(sc));
 
             HostnameVerifier hv = new HostnameVerifier() {
                 @Override
@@ -247,7 +247,7 @@ public class VmwareContext {
             return null;
         }
 
-        DatacenterMO dcMo = datacenterMoFactory.build(this, tokens[0]);
+        DatacenterMO dcMo = datacenterVmwareMoFactory.build(this, tokens[0]);
         if (dcMo.getMor() == null) {
             logger.error("Unable to locate the datacenter specified in path: " + inventoryPath);
             return null;
@@ -485,10 +485,10 @@ public class VmwareContext {
     /**
      * inFolderByType
      *
-     * @param folder    folder
+     * @param folder folder
      * @param morefType morefType
-     * @return List<>
-     * @throws RuntimeFaultFaultMsg    RuntimeFaultFaultMsg
+     * @return List
+     * @throws RuntimeFaultFaultMsg RuntimeFaultFaultMsg
      * @throws InvalidPropertyFaultMsg InvalidPropertyFaultMsg
      */
     public List<Pair<ManagedObjectReference, String>> inFolderByType(ManagedObjectReference folder, String morefType)

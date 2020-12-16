@@ -498,7 +498,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     private ResponseEntity listLogicPortByStorageId(String storageId) throws DmeException {
-        String url = DmeConstants.API_LOGICPORTS_LIST + storageId;
+        String url = DmeConstants.API_LOGICPORTS_LIST;
+        JsonObject param = new JsonObject();
+        param.addProperty("storage_id",storageId);
         ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         return responseEntity;
     }
