@@ -49,8 +49,9 @@ public class DmeConstants {
 
     /**
      * create fs with custom
+     * old url:/rest/fileservice/v1/filesystems/customize
      **/
-    public static final String API_FS_CREATE = "/rest/fileservice/v1/filesystems/customize";
+    public static final String API_FS_CREATE = "/rest/fileservice/v1/filesystems/customize-filesystems";
 
     /**
      * logic port detail
@@ -406,6 +407,9 @@ public class DmeConstants {
      **/
     public static final int HTTPS_STATUS_SUCCESS_200 = 200;
 
+    /**
+     * VMFS type
+     **/
     public static final String STORE_TYPE_VMFS = "VMFS";
 
     private DmeConstants() {
