@@ -37,9 +37,8 @@ public class TaggingWorkflowFactory {
      *
      * @param sessionHelper sessionHelper
      * @return TaggingWorkflow
-     * @throws Exception Exception
      */
-    public TaggingWorkflow build(SessionHelper sessionHelper) throws Exception {
+    public TaggingWorkflow build(SessionHelper sessionHelper) {
         return new TaggingWorkflow(sessionHelper);
     }
 }
