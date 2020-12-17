@@ -230,7 +230,10 @@ public class VCSDKUtils {
 
     /**
      * 得到所有主机的ID与name
-     **/
+     *
+     * @return String
+     * @throws VcenterException VcenterException
+     */
     public String getAllHosts() throws VcenterException {
         logger.info("get all hosts start");
         String listStr = "";
@@ -238,9 +241,9 @@ public class VCSDKUtils {
             VmwareContext[] vmwareContexts = vcConnectionHelpers.getAllContext();
             for (VmwareContext vmwareContext : vmwareContexts) {
                 RootFsMO rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
-                logger.info("rootFsMo:{}",rootFsMo);
+                logger.info("rootFsMo:{}", rootFsMo);
                 List<Pair<ManagedObjectReference, String>> hosts = rootFsMo.getAllHostOnRootFs();
-                logger.info("hosts:{}",hosts);
+                logger.info("hosts:{}", hosts);
                 if (hosts != null && hosts.size() > 0) {
                     List<Map<String, String>> lists = new ArrayList<>();
                     for (Pair<ManagedObjectReference, String> host : hosts) {
@@ -432,8 +435,11 @@ public class VCSDKUtils {
                     }
                 }
             }
-            // 取得所有集群，并通过mounthostids进行过滤，过滤掉已经挂载的主机
-            // 扫描集群下所有主机，只有集群下所有主机都没有挂载了该存储就不显示
+
+            /*
+             * 取得所有集群，并通过mounthostids进行过滤，过滤掉已经挂载的主机
+             * 扫描集群下所有主机，只有集群下所有主机都没有挂载了该存储就不显示
+             */
             List<Pair<ManagedObjectReference, String>> cls = rootFsMo.getAllClusterOnRootFs();
             if (cls != null && cls.size() > 0) {
                 List<Map<String, String>> lists = new ArrayList<>();
@@ -877,7 +883,7 @@ public class VCSDKUtils {
                         ManagedObjectReference cluster = hostMo.getHyperHostCluster();
                         if (cluster != null) {
                             ClusterMO clusterMo = clusterVmwareMoFactory.build(hostMo.getContext(), cluster);
-                            logger.info("Host cluster name:" + clusterMo.getName());
+                            logger.info("Host cluster name:{}", clusterMo.getName());
                             hosts = clusterMo.getClusterHosts();
                         }
                     } catch (Exception e) {
@@ -940,7 +946,7 @@ public class VCSDKUtils {
                     for (Pair<ManagedObjectReference, String> host : hosts) {
                         host1 = hostVmwareFactory.build(vmwareContext, host.first());
                         hdsMo = host1.getHostDatastoreSystemMo();
-                        if (null != hdsMo.findDatastore(dsname)) {
+                        if (hdsMo.findDatastore(dsname) != null) {
                             mor = hdsMo.findDatastore(dsname);
                             break;
                         }
@@ -1111,7 +1117,6 @@ public class VCSDKUtils {
                         HostMO hostMo = hostVmwareFactory.build(vmwareContext, host.first());
                         String hostName = hostMo.getHostName();
                         if (hostIp.equals(hostName)) {
-
                             // 在查找可用LUN前先扫描hba，已发现新的卷
                             List<String> devices = getHbaDeviceByHost(hostMo);
                             if (devices != null && devices.size() > 0) {
@@ -1914,20 +1919,24 @@ public class VCSDKUtils {
             ManagedObjectReference dsmor = vcConnectionHelpers.objectId2Mor(dataStoreObjectId);
             DatastoreMO dsmo = datastoreVmwareMoFactory.build(vmwareContext, dsmor);
             ClusterMO clusterMo = rootFsMo.findClusterById(clusterId);
-            logger.info("cluster name: " + clusterMo.getName());
+            logger.info("cluster name: {}", clusterMo.getName());
+
             // 卸载
             unmountNfsOnCluster(dsmo, clusterMo, dataStoreObjectId);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("unmount nfs On cluster error:", e);
+            logger.error("unmount nfs On cluster error:{}", e.getMessage());
             throw new VcenterException(e.getMessage());
         }
     }
 
     /**
-     * 卸载Nfs存储 20200918objectId
-     **/
-    public void unmountNfsOnHost(DatastoreMO dsmo, HostMO hostMo, String nfsId) throws VcenterException {
+     * 卸载Nfs存储
+     *
+     * @param dsmo dsmo
+     * @param hostMo hostMo
+     * @param nfsId nfsId
+     */
+    public void unmountNfsOnHost(DatastoreMO dsmo, HostMO hostMo, String nfsId) {
         try {
             if (dsmo == null) {
                 logger.info("datastore is null");
@@ -1937,25 +1946,30 @@ public class VCSDKUtils {
                 logger.info("host is null");
                 return;
             }
-            logger.info("Hosts that need to be unmounted:" + hostMo.getName());
+            logger.info("Hosts that need to be unmounted:{}", hostMo.getName());
             // 卸载前重新扫描datastore
             hostMo.getHostStorageSystemMo().refreshStorageSystem();
             logger.info("Rescan datastore before unmounting");
+
             // 从主机卸载datastore
             String dsName = dsmo.getName();
             hostMo.getHostDatastoreSystemMo().deleteDatastore(dsName);
 
-            // 卸载NFS
-            // hostMo.unmountDatastore(nfsId);
-            logger.info("unmount nfs success:" + hostMo.getName() + ":" + dsmo.getName());
+            // 卸载NFS,hostMo.unmountDatastore(nfsId);
+            logger.info("unmount nfs success:hostName={},datastore name={}", hostMo.getName(), dsmo.getName());
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("unmount nfs error:", e);
+            logger.error("unmount nfs error:{}", e.getMessage());
         }
     }
 
     /**
-     * 卸载Nfs存储 20200918objectId
+     * 卸载Nfs存储
+     *
+     * @param datastoreobjectid datastoreobjectid
+     * @param hostobjectid hostobjectid
+     * @param logicPortIp logicPortIp
+     * @param mountType mountType
+     * @throws VcenterException VcenterException
      **/
     public void unmountNfsOnCluster(DatastoreMO dsmo, ClusterMO clusterMo, String nfsId) throws VcenterException {
         try {
