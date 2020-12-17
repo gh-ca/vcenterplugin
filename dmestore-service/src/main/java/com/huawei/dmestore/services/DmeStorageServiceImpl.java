@@ -27,6 +27,7 @@ import com.huawei.dmestore.model.Volume;
 import com.huawei.dmestore.model.VolumeListRestponse;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -332,7 +333,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     String diskType = getDiskType(storageId, diskPoolId);
                     storagePool.setPhysicalType(diskType);
                     String resId = ToolUtils.jsonToStr(element.get(RES_ID));
-                    if (null != djofspMap && null != djofspMap.get(resId)) {
+                    if (djofspMap != null && djofspMap.get(resId) != null) {
                         storagePool.setServiceLevelName(gson.toJson(djofspMap.get(resId)));
                     }
                     String type = ToolUtils.jsonToStr(element.get("type"));
@@ -400,7 +401,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         List<LogicPorts> resList = new ArrayList<>();
         String url = DmeConstants.API_LOGICPORTS_LIST;
         JsonObject param = new JsonObject();
-        param.addProperty("storage_id",storageId);
+        param.addProperty("storage_id", storageId);
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(param));
             int code = responseEntity.getStatusCodeValue();
@@ -420,11 +421,15 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     logicPorts.setOperationalStatus(ToolUtils.jsonToStr(element.get("operational_status")));
                     logicPorts.setMgmtIp(ToolUtils.jsonToStr(element.get("mgmt_ip")));
                     logicPorts.setMgmtIpv6(ToolUtils.jsonToStr(element.get("mgmt_ipv6")));
-                    logicPorts.setHomePortId(ToolUtils.jsonToStr(element.get("home_port_id")));
+
+                    // 老版本DEM为home_port_id
+                    logicPorts.setHomePortId(ToolUtils.jsonToStr(element.get("home_port_raw_id")));
                     logicPorts.setHomePortName(ToolUtils.jsonToStr(element.get("home_port_name")));
                     logicPorts.setRole(ToolUtils.jsonToStr(element.get("role")));
                     logicPorts.setDdnsStatus(ToolUtils.jsonToStr(element.get("ddns_status")));
-                    logicPorts.setCurrentPortId(ToolUtils.jsonToStr(element.get("current_port_id")));
+
+                    // 老版本DEM为current_port_id
+                    logicPorts.setCurrentPortId(ToolUtils.jsonToStr(element.get("current_port_raw_id")));
                     logicPorts.setCurrentPortName(ToolUtils.jsonToStr(element.get("current_port_name")));
                     logicPorts.setSupportProtocol(ToolUtils.jsonToStr(element.get("support_protocol")));
                     logicPorts.setManagementAccess(ToolUtils.jsonToStr(element.get("management_access")));
@@ -473,7 +478,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     JsonObject element = jsonElement.getAsJsonObject();
                     Volume volume = parseVolume(element);
                     String poolRawId = ToolUtils.jsonToStr(element.get(POOL_RAW_ID));
-                    if (null == poolnamecacheMap.get(poolRawId)) {
+                    if (poolnamecacheMap.get(poolRawId) == null) {
                         poolnamecacheMap.put(poolRawId, getStorageByPoolRawId(poolRawId));
                     }
                     volume.setStoragePoolName(poolnamecacheMap.get(poolRawId));
@@ -706,7 +711,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         storageControllers.setSoftVer(ToolUtils.jsonToStr(element.get("softVer")));
         storageControllers.setStatus(ToolUtils.jsonToStr(element.get(STATUS)));
         storageControllers.setCpuInfo(ToolUtils.jsonToStr(element.get("cpuInfo")));
-        if (null != storageControllersMap.get(storageControllers.getId())) {
+        if (storageControllersMap.get(storageControllers.getId()) != null) {
             storageControllers.setLantency(storageControllersMap.get(storageControllers.getId()).getLantency());
             storageControllers.setBandwith(storageControllersMap.get(storageControllers.getId()).getBandwith());
             storageControllers.setIops(storageControllersMap.get(storageControllers.getId()).getIops());
@@ -771,13 +776,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         String poolId = ToolUtils.jsonToStr(element.get(POOL_ID));
         storageDisk.setPoolId(poolId);
         storageDisk.setStorageDeviceId(ToolUtils.jsonToStr(element.get(STORAGE_DEVICE_ID)));
-        if (null == storageDiskPool.get(poolId)) {
+        if (storageDiskPool.get(poolId) == null) {
             storageDiskPool.put(poolId, getDiskPoolByPoolId(poolId).getName());
             storageDisk.setDiskDomain(storageDiskPool.get(poolId));
         } else {
             storageDisk.setDiskDomain(storageDiskPool.get(poolId));
         }
-        if (null != storageDiskMap.get(storageDisk.getId())) {
+        if (storageDiskMap.get(storageDisk.getId()) != null) {
             storageDisk.setLantency(storageDiskMap.get(storageDisk.getId()).getLantency());
             storageDisk.setBandwith(storageDiskMap.get(storageDisk.getId()).getBandwith());
             storageDisk.setIops(storageDiskMap.get(storageDisk.getId()).getIops());
@@ -1047,13 +1052,17 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         storagePort.setSpeed(ToolUtils.jsonToInt(element.get(SPEED)));
         storagePort.setMaxSpeed(ToolUtils.jsonToInt(element.get("maxSpeed")));
         storagePort.setStorageDeviceId(ToolUtils.jsonToStr(element.get(STORAGE_DEVICE_ID)));
-        if (null != storagePortMap.get(storagePort.getId())) {
+        performanceParse(storagePortMap, storagePort);
+        return storagePort;
+    }
+
+    private void performanceParse(Map<String, StoragePort> storagePortMap, StoragePort storagePort) {
+        if (storagePortMap.get(storagePort.getId()) != null) {
             storagePort.setLantency(storagePortMap.get(storagePort.getId()).getLantency());
             storagePort.setBandwith(storagePortMap.get(storagePort.getId()).getBandwith());
             storagePort.setIops(storagePortMap.get(storagePort.getId()).getIops());
             storagePort.setUseage(storagePortMap.get(storagePort.getId()).getUseage());
         }
-        return storagePort;
     }
 
     @Override
@@ -1163,9 +1172,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return result;
     }
 
-    // 从卷信息中查关联的主机和主机组
     private void volumeAttachments(JsonArray array, Volume volume) {
-        if (null != array && array.size() > 0) {
+        if (array != null && array.size() > 0) {
             List<String> hostIds = new ArrayList<>();
             List<String> hostGroupIds = new ArrayList<>();
             for (JsonElement element : array) {
@@ -1189,7 +1197,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 params.put(OBJ_IDS, storageIds);
                 Map<String, Object> remap = dataStoreStatisticHistoryService.queryCurrentStatistic(
                     DmeIndicatorConstants.RESOURCE_TYPE_NAME_STORAGEDEVICE, params);
-                if (null != remap && remap.size() > 0) {
+                if (remap != null && remap.size() > 0) {
                     JsonObject dataJson = new JsonParser().parse(remap.toString()).getAsJsonObject();
                     relists = new ArrayList<>();
                     for (String storageId : storageIds) {
@@ -1226,7 +1234,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 params.put(OBJ_IDS, storagePoolIds);
                 Map<String, Object> remap = dataStoreStatisticHistoryService.queryCurrentStatistic(
                     DmeIndicatorConstants.RESOURCE_TYPE_NAME_STORAGEPOOL, params);
-                if (null != remap && remap.size() > 0) {
+                if (remap != null && remap.size() > 0) {
                     JsonObject dataJson = new JsonParser().parse(remap.toString()).getAsJsonObject();
                     relists = new ArrayList<>();
                     for (String storagePoolId : storagePoolIds) {
@@ -1262,7 +1270,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 params.put(OBJ_IDS, storageControllerIds);
                 Map<String, Object> remap = dataStoreStatisticHistoryService.queryCurrentStatistic(
                     DmeIndicatorConstants.RESOURCE_TYPE_NAME_CONTROLLER, params);
-                if (null != remap && remap.size() > 0) {
+                if (remap != null && remap.size() > 0) {
                     JsonObject dataJson = new JsonParser().parse(remap.toString()).getAsJsonObject();
                     relists = new ArrayList<>();
                     for (String storagecontrollerid : storageControllerIds) {
@@ -1299,7 +1307,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 params.put(OBJ_IDS, storageDiskIds);
                 Map<String, Object> remap = dataStoreStatisticHistoryService.queryCurrentStatistic(
                     DmeIndicatorConstants.RESOURCE_TYPE_NAME_STORAGEDISK, params);
-                if (null != remap && remap.size() > 0) {
+                if (remap != null && remap.size() > 0) {
                     JsonObject dataJson = new JsonParser().parse(remap.toString()).getAsJsonObject();
                     relists = new ArrayList<>();
                     for (String storageDiskId : storageDiskIds) {
@@ -1335,7 +1343,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             params.put(OBJ_IDS, storagePortIds);
             Map<String, Object> remap = dataStoreStatisticHistoryService.queryCurrentStatistic(
                 DmeIndicatorConstants.RESOURCE_TYPE_NAME_STORAGEPORT, params);
-            if (null != remap && remap.size() > 0) {
+            if (remap != null && remap.size() > 0) {
                 JsonObject dataJson = new JsonParser().parse(remap.toString()).getAsJsonObject();
                 relists = new ArrayList<>();
                 for (String storagePortId : storagePortIds) {
@@ -1371,7 +1379,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 params.put(OBJ_IDS, volumeWwns);
                 Map<String, Object> remap = dataStoreStatisticHistoryService.queryCurrentStatistic(
                     DmeIndicatorConstants.RESOURCE_TYPE_NAME_LUN, params);
-                if (null != remap && remap.size() > 0) {
+                if (remap != null && remap.size() > 0) {
                     JsonObject dataJson = new JsonParser().parse(remap.toString()).getAsJsonObject();
                     relists = new ArrayList<>();
                     for (String wwnid : volumeWwns) {
@@ -1399,43 +1407,43 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     @Override
     public Boolean queryVolumeByName(String name) throws DmeException {
-        Boolean flag = true;
+        boolean isExist = true;
         String url = DmeConstants.DME_VOLUME_BASE_URL + "?name=" + name;
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
             String body = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();
             if (ToolUtils.jsonToInt(jsonObject.get("count")) != 0) {
-                flag = false;
+                isExist = false;
             }
         }
-        return flag;
+        return isExist;
     }
 
     @Override
     public Boolean queryFsByName(String name, String storageId) throws DmeException {
-        Boolean flag = true;
+        boolean isExist = true;
         List<FileSystem> fileSystems = getFileSystems(storageId);
         for (FileSystem fileSystem : fileSystems) {
             if (name.equals(fileSystem.getName())) {
-                flag = false;
+                isExist = false;
                 break;
             }
         }
-        return flag;
+        return isExist;
     }
 
     @Override
     public Boolean queryShareByName(String name, String storageId) throws DmeException {
-        Boolean flag = true;
+        boolean isExist = true;
         List<NfsShares> nfsShares = getNfsShares(storageId);
         for (NfsShares nfsShare : nfsShares) {
             if (name.equals(nfsShare.getName())) {
-                flag = false;
+                isExist = false;
                 break;
             }
         }
-        return flag;
+        return isExist;
     }
 
     public Map<String, Object> getDjTierContainsStoragePool() throws DmeException {
@@ -1451,7 +1459,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     if (!objJson.isJsonNull()) {
                         String sourceInstanceId = ToolUtils.jsonToStr(objJson.get("source_Instance_Id"));
                         String targetInstanceId = ToolUtils.jsonToStr(objJson.get("target_Instance_Id"));
-                        if (null != map.get(targetInstanceId)) {
+                        if (map.get(targetInstanceId) != null) {
                             List<String> siIds = (List<String>) map.get(targetInstanceId);
                             siIds.add(sourceInstanceId);
                         } else {
@@ -1477,7 +1485,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 JsonObject vjson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 JsonArray objList = vjson.getAsJsonArray(OBJ_LIST);
-                if (null != objList && objList.size() > 0) {
+                if (objList != null && objList.size() > 0) {
                     for (int index = 0; index < objList.size(); index++) {
                         JsonObject objJson = objList.get(index).getAsJsonObject();
                         if (!objJson.isJsonNull()) {
@@ -1502,9 +1510,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             Map<String, Object> djTierStoragePoolMap = getDjTierContainsStoragePool();
             Set<String> sps = djTierStoragePoolMap.keySet();
             for (String spkey : sps) {
-                if (null != djTierStoragePoolMap.get(spkey)) {
+                if (djTierStoragePoolMap.get(spkey) != null) {
                     List<String> djIds = (List<String>) djTierStoragePoolMap.get(spkey);
-                    if (null != djIds && djIds.size() > 0) {
+                    if (djIds != null && djIds.size() > 0) {
                         List<String> diNames = new ArrayList<>();
                         for (String djId : djIds) {
                             diNames.add(ToolUtils.getStr(djtierMap.get(djId)));
@@ -1579,15 +1587,5 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         }
         return retdiskPool;
-    }
-
-    /**
-     * 判断数据存储中是否有注册的虚拟机，有则返回true，没有返回false
-     *
-     * @param objectid 数据存储的objectid
-     * @return 是否存在vm
-     */
-    public boolean hasVmOnDatastore(String objectid) {
-        return vcsdkUtils.hasVmOnDatastore(objectid);
     }
 }

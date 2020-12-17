@@ -28,7 +28,7 @@ public class SpringBootConnectionHelperTest {
     @Mock
     private VCenterInfoService vCenterInfoService;
     @InjectMocks
-    SpringBootConnectionHelper springBootConnectionHelper = new SpringBootConnectionHelper();
+    SpringBootConnectionHelpers springBootConnectionHelper = new SpringBootConnectionHelpers();
     VCenterInfo vCenterInfo ;
     VmwareContext vmwareContext;
     @Before

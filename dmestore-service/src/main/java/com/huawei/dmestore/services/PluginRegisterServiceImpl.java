@@ -3,7 +3,7 @@ package com.huawei.dmestore.services;
 import com.huawei.dmestore.entity.VCenterInfo;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.utils.CipherUtils;
-import com.huawei.vmware.VCConnectionHelper;
+import com.huawei.vmware.VcConnectionHelpers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,7 +27,7 @@ public class PluginRegisterServiceImpl implements PluginRegisterService {
     private VCenterInfoService vcenterinfoservice;
 
     @Autowired
-    private VCConnectionHelper vcConnectionHelper;
+    private VcConnectionHelpers vcConnectionHelpers;
 
     @Override
     public void installService(String vcenterIp, String vcenterPort, String vcenterUsername, String vcenterPassword,
@@ -41,9 +41,9 @@ public class PluginRegisterServiceImpl implements PluginRegisterService {
             vcenterinfo.setHostPort(Integer.parseInt(vcenterPort));
             vcenterinfoservice.saveVcenterInfo(vcenterinfo);
 
-            vcConnectionHelper.setServerurl("https:// " + vcenterIp + ":" + vcenterPort + "/sdk");
-            vcConnectionHelper.setUsername(vcenterUsername);
-            vcConnectionHelper.setPassword(vcenterPassword);
+            vcConnectionHelpers.setServerurl("https:// " + vcenterIp + ":" + vcenterPort + "/sdk");
+            vcConnectionHelpers.setUsername(vcenterUsername);
+            vcConnectionHelpers.setPassword(vcenterPassword);
 
             if (!"".equalsIgnoreCase(dmeIp)) {
                 // 调用接口，创建dme连接信息,如有已有dme信息，需要更新

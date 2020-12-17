@@ -165,7 +165,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         List<VmfsDataInfo> relists = null;
         try {
             // 从关系表中取得DME卷与vcenter存储的对应关系
-            List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_VMFS);
+            List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(DmeConstants.STORE_TYPE_VMFS);
             if (dvrlist == null || dvrlist.size() == 0) {
                 return relists;
             }
@@ -180,7 +180,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             Map<String, String> stoNameMap = getStorNameMap(storagemap);
 
             // 取得vcenter中的所有vmfs存储。
-            String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(ToolUtils.STORE_TYPE_VMFS);
+            String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(DmeConstants.STORE_TYPE_VMFS);
             if (!StringUtils.isEmpty(listStr)) {
                 JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
                 if (jsonArray != null && jsonArray.size() > 0) {
@@ -557,7 +557,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         try {
             // 通过主机的objectid查到主机上所有的hba的wwn或者iqn
             List<Map<String, Object>> hbas = vcsdkUtils.getHbasByHostObjectId(hostId);
-            if (hbas == null || hbas.size() > 0) {
+            if (hbas == null || hbas.size() == 0) {
                 throw new DmeException(hostId + " The host did not find a valid Hba");
             }
             List<String> wwniqns = new ArrayList<>();
@@ -940,7 +940,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         dvr.setVolumeId(ToolUtils.getStr(volumeMap.get("volume_id")));
         dvr.setVolumeName(ToolUtils.getStr(volumeMap.get(VOLUME_NAME)));
         dvr.setVolumeWwn(ToolUtils.getStr(volumeMap.get(VOLUME_WWN)));
-        dvr.setStoreType(ToolUtils.STORE_TYPE_VMFS);
+        dvr.setStoreType(DmeConstants.STORE_TYPE_VMFS);
         List<DmeVmwareRelation> rallist = new ArrayList<>();
         rallist.add(dvr);
         dmeVmwareRalationDao.save(rallist);
@@ -1181,7 +1181,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     @Override
     public boolean scanVmfs() throws DmeException {
-        String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(ToolUtils.STORE_TYPE_VMFS);
+        String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(DmeConstants.STORE_TYPE_VMFS);
         if (StringUtils.isEmpty(listStr)) {
             LOG.info("===list vmfs datastore return empty");
             return false;
@@ -1190,7 +1190,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         List<DmeVmwareRelation> relationList = new ArrayList<>();
         for (int index = 0; index < jsonArray.size(); index++) {
             JsonObject vmfsDatastore = jsonArray.get(index).getAsJsonObject();
-            String storeType = ToolUtils.STORE_TYPE_VMFS;
+            String storeType = DmeConstants.STORE_TYPE_VMFS;
             String vmfsDatastoreId = vmfsDatastore.get(OBJECTID).getAsString();
             String vmfsDatastoreName = vmfsDatastore.get(NAME_FIELD).getAsString();
             JsonArray wwnArray = vmfsDatastore.getAsJsonArray("vmfsWwnList");
@@ -1225,7 +1225,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
         if (relationList.size() > 0) {
             // 数据库处理
-            return dmeVmwareRelationDbProcess(relationList, ToolUtils.STORE_TYPE_VMFS);
+            return dmeVmwareRelationDbProcess(relationList, DmeConstants.STORE_TYPE_VMFS);
         }
         return true;
     }
@@ -1879,7 +1879,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     public boolean isVmfs(String objectId) throws DmeSqlException {
-        List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_VMFS);
+        List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(DmeConstants.STORE_TYPE_VMFS);
         for (DmeVmwareRelation dmeVmwareRelation : dvrlist) {
             if (dmeVmwareRelation.getStoreId().equalsIgnoreCase(objectId)) {
                 return true;
@@ -1894,7 +1894,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         List<DmeVmwareRelation> dvrlist;
         try {
             // 从关系表中取得DME卷与vcenter存储的对应关系
-            dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_VMFS);
+            dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(DmeConstants.STORE_TYPE_VMFS);
         } catch (DmeSqlException ex) {
             LOG.error("query vmfs error:", ex);
             throw ex;
@@ -1915,7 +1915,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         Map<String, String> stoNameMap = getStorNameMap(storagemap);
 
         // 取得vcenter中的所有vmfs存储。
-        String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(ToolUtils.STORE_TYPE_VMFS);
+        String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(DmeConstants.STORE_TYPE_VMFS);
         if (StringUtils.isEmpty(listStr)) {
             return relists;
         }

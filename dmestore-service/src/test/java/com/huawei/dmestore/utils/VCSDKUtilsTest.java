@@ -7,7 +7,7 @@ import static org.mockito.Mockito.when;
 
 import com.huawei.dmestore.entity.VCenterInfo;
 import com.huawei.dmestore.exception.VcenterException;
-import com.huawei.vmware.VCConnectionHelper;
+import com.huawei.vmware.VcConnectionHelpers;
 import com.huawei.vmware.autosdk.SessionHelper;
 import com.huawei.vmware.autosdk.TaggingWorkflow;
 import com.huawei.vmware.mo.ClusterMO;
@@ -18,11 +18,11 @@ import com.huawei.vmware.mo.HostStorageSystemMO;
 import com.huawei.vmware.mo.IscsiManagerMO;
 import com.huawei.vmware.mo.RootFsMO;
 import com.huawei.vmware.mo.VirtualMachineMO;
-import com.huawei.vmware.util.ClusterMOFactory;
-import com.huawei.vmware.util.DatastoreMOFactory;
-import com.huawei.vmware.util.HostMOFactory;
+import com.huawei.vmware.util.ClusterVmwareMoFactory;
+import com.huawei.vmware.util.DatastoreVmwareMoFactory;
+import com.huawei.vmware.util.HostVmwareFactory;
 import com.huawei.vmware.util.Pair;
-import com.huawei.vmware.util.RootFsMOFactory;
+import com.huawei.vmware.util.RootVmwareMoFactory;
 import com.huawei.vmware.util.SessionHelperFactory;
 import com.huawei.vmware.util.TaggingWorkflowFactory;
 import com.huawei.vmware.util.VirtualMachineMOFactory;
@@ -88,15 +88,15 @@ import javax.xml.parsers.ParserConfigurationException;
 public class VCSDKUtilsTest {
 
     @Mock
-    private VCConnectionHelper vcConnectionHelper;
+    private VcConnectionHelpers vcConnectionHelpers;
     @Mock
-    private RootFsMOFactory rootFsMOFactory ;
+    private RootVmwareMoFactory rootVmwareMoFactory;
     @Mock
-    private DatastoreMOFactory datastoreMOFactory ;
+    private DatastoreVmwareMoFactory datastoreVmwareMoFactory;
     @Mock
-    private HostMOFactory hostMOFactory;
+    private HostVmwareFactory hostVmwareFactory;
     @Mock
-    private ClusterMOFactory clusterMOFactory;
+    private ClusterVmwareMoFactory clusterVmwareMoFactory;
     @Mock
     private SessionHelperFactory sessionHelperFactory;
     @Mock
@@ -235,22 +235,22 @@ public class VCSDKUtilsTest {
     @Test
     public void getAllVmfsDataStoreInfos() throws Exception {
         VmwareContext[] vmodlContexts = {vmwareContext};
-        when(vcConnectionHelper.getAllContext()).thenReturn(vmodlContexts);
-        when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+        when(vcConnectionHelpers.getAllContext()).thenReturn(vmodlContexts);
+        when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
         when(rootFsMo.getAllDatastoreOnRootFs()).thenReturn(list);
-        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
         when(vmwareContext.getVimClient()).thenReturn(vimClient);
         when(vimClient.getDynamicProperty(managedObjectReference, "summary")).thenReturn(datastoreSummary);
-        when(vcConnectionHelper.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
+        when(vcConnectionHelpers.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
         vcsdkUtils.getAllVmfsDataStoreInfos("321");
     }
 
     @Test
     public void getDataStoreSummaryByObjectId() throws Exception {
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
         vcsdkUtils.getDataStoreSummaryByObjectId("321");
 
     }
@@ -258,11 +258,11 @@ public class VCSDKUtilsTest {
     @Test
     public void getAllHosts() throws Exception {
         VmwareContext[] vmodlContexts = {vmwareContext};
-        when(vcConnectionHelper.getAllContext()).thenReturn(vmodlContexts);
-        when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+        when(vcConnectionHelpers.getAllContext()).thenReturn(vmodlContexts);
+        when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
         when(rootFsMo.getAllHostOnRootFs()).thenReturn(list);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
-        when(vcConnectionHelper.mor2ObjectId(hostMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(vcConnectionHelpers.mor2ObjectId(hostMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
         when(vmwareContext.getVimClient()).thenReturn(vimClient);
         when(vimClient.getDynamicProperty(managedObjectReference, "name")).thenReturn("321");
         vcsdkUtils.getAllHosts();
@@ -271,8 +271,8 @@ public class VCSDKUtilsTest {
     @Test
     public void findHostById() throws Exception {
         VmwareContext[] vmodlContexts = {vmwareContext};
-        when(vcConnectionHelper.getAllContext()).thenReturn(vmodlContexts);
-        when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+        when(vcConnectionHelpers.getAllContext()).thenReturn(vmodlContexts);
+        when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
         when(rootFsMo.findHostById("321")).thenReturn(hostMO);
         when(vmwareContext.getVimClient()).thenReturn(vimClient);
         when(vimClient.getDynamicProperty(managedObjectReference, "name")).thenReturn("321");
@@ -283,10 +283,10 @@ public class VCSDKUtilsTest {
     public void getAllClusters() throws Exception {
 
         VmwareContext[] vmodlContexts = {vmwareContext};
-        when(vcConnectionHelper.getAllContext()).thenReturn(vmodlContexts);
-        when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+        when(vcConnectionHelpers.getAllContext()).thenReturn(vmodlContexts);
+        when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
         when(rootFsMo.getAllClusterOnRootFs()).thenReturn(list);
-        when(vcConnectionHelper.mor2ObjectId(hostMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
+        when(vcConnectionHelpers.mor2ObjectId(hostMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
         when(vmwareContext.getVimClient()).thenReturn(vimClient);
         when(vimClient.getDynamicProperty(managedObjectReference, "name")).thenReturn("321");
         vcsdkUtils.getAllClusters();
@@ -297,34 +297,34 @@ public class VCSDKUtilsTest {
         Boolean flag = false;
         for (int i = 0; i <2 ; i++) {
             if (i == 0) {
-                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-                when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
-                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-                when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+                when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+                when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+                when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
                 when(datastoreMO.getHostMounts()).thenReturn(dhms);
                 when(rootFsMo.getAllHostOnRootFs()).thenReturn(list);
                 when(hostMO.getMor()).thenReturn(managedObjectReference);
                 when(managedObjectReference.getValue()).thenReturn("");
-                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
-                when(vcConnectionHelper.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress()))
+                when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(vcConnectionHelpers.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress()))
                     .thenReturn("321");
                 when(vmwareContext.getVimClient()).thenReturn(vimClient);
                 when(vimClient.getDynamicProperty(managedObjectReference, "name")).thenReturn("321");
                 vcsdkUtils.getHostsByDsObjectId("321",flag);
             }else {
                 flag = true;
-                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-                when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
-                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-                when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+                when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+                when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+                when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
                 when(datastoreMO.getHostMounts()).thenReturn(dhms);
                 when(rootFsMo.getAllHostOnRootFs()).thenReturn(list);
                 when(hostMO.getMor()).thenReturn(managedObjectReference);
                 when(managedObjectReference.getValue()).thenReturn("321");
-                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
-                when(vcConnectionHelper.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress()))
+                when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(vcConnectionHelpers.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress()))
                     .thenReturn("321");
                 when(vmwareContext.getVimClient()).thenReturn(vimClient);
                 when(vimClient.getDynamicProperty(managedObjectReference, "name")).thenReturn("321");
@@ -340,21 +340,21 @@ public class VCSDKUtilsTest {
 
     @Test
     public void getClustersByDsObjectId() throws Exception {
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
         when(datastoreMO.getHostMounts()).thenReturn(dhms);
-        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
         when(rootFsMo.getAllClusterOnRootFs()).thenReturn(list);
-        when(clusterMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
+        when(clusterVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
         when(clusterMO.getClusterHosts()).thenReturn(list);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         ManagedObjectReference mor = spy(ManagedObjectReference.class);
         mor.setValue("456");
         when(hostMO.getMor()).thenReturn(mor);
         when(managedObjectReference.getValue()).thenReturn("321");
-        when(vcConnectionHelper.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
+        when(vcConnectionHelpers.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
         vcsdkUtils.getClustersByDsObjectId("321");
     }
 
@@ -362,41 +362,41 @@ public class VCSDKUtilsTest {
     public void getMountClustersByDsObjectId() throws Exception {
         Map<String, String> map = new HashMap<>();
         map.put("321", "321");
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
         when(datastoreMO.getHostMounts()).thenReturn(dhms);
         when(rootFsMo.getAllClusterOnRootFs()).thenReturn(list);
-        when(clusterMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
+        when(clusterVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
         when(clusterMO.getClusterHosts()).thenReturn(list);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getMor()).thenReturn(managedObjectReference);
         when(managedObjectReference.getValue()).thenReturn("321");
-        when(vcConnectionHelper.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
+        when(vcConnectionHelpers.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
         vcsdkUtils.getMountClustersByDsObjectId("321", map);
     }
 
     @Test
     public void getDataStoresByHostObjectId() throws Exception {
 
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
         ManagedObjectReference mor = spy(ManagedObjectReference.class);
         mor.setValue("456");
         when(hostMO.getMor()).thenReturn(mor);
-        when(hostMOFactory.build(vmwareContext, mor)).thenReturn(hostMO);
+        when(hostVmwareFactory.build(vmwareContext, mor)).thenReturn(hostMO);
         when(hostMO.getMor()).thenReturn(managedObjectReference);
         when(managedObjectReference.getValue()).thenReturn("321");
         when(rootFsMo.getAllDatastoreOnRootFs()).thenReturn(list);
-        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
         when(datastoreMO.getMor()).thenReturn(managedObjectReference);
         when(datastoreMO.getSummary()).thenReturn(datastoreSummary);
         when(datastoreMO.getHostMounts()).thenReturn(dhms);
-        when(vcConnectionHelper.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
+        when(vcConnectionHelpers.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
         when(hostMO.getMor()).thenReturn(managedObjectReference);
         when(managedObjectReference.getValue()).thenReturn("321");
 
@@ -405,18 +405,18 @@ public class VCSDKUtilsTest {
 
     @Test
     public void getMountDataStoresByHostObjectId() throws Exception {
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getMor()).thenReturn(managedObjectReference);
         when(managedObjectReference.getValue()).thenReturn("321");
         when(rootFsMo.getAllDatastoreOnRootFs()).thenReturn(list);
-        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
         when(datastoreMO.getSummary()).thenReturn(datastoreSummary);
         when(datastoreMO.getHostMounts()).thenReturn(dhms);
-        when(vcConnectionHelper.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
+        when(vcConnectionHelpers.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
         when(datastoreMO.getMor()).thenReturn(managedObjectReference);
         when(managedObjectReference.getValue()).thenReturn("321");
         vcsdkUtils.getMountDataStoresByHostObjectId("321","321");
@@ -425,26 +425,26 @@ public class VCSDKUtilsTest {
     @Test
     public void getDataStoresByClusterObjectId() throws Exception {
 
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(clusterMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(clusterVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
         when(clusterMO.getClusterHosts()).thenReturn(list);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         ManagedObjectReference mor = spy(ManagedObjectReference.class);
         mor.setValue("456");
         when(hostMO.getMor()).thenReturn(mor);
         when(managedObjectReference.getValue()).thenReturn("456");
         when(clusterMO.getName()).thenReturn("321");
         when(rootFsMo.getAllDatastoreOnRootFs()).thenReturn(list);
-        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
         when(datastoreMO.getSummary()).thenReturn(datastoreSummary);
         when(datastoreSummary.getType()).thenReturn("321");
         when(datastoreSummary.getCapacity()).thenReturn(321l);
         when(datastoreSummary.getFreeSpace()).thenReturn(32l);
         when(datastoreMO.getHostMounts()).thenReturn(dhms);
-        when(vcConnectionHelper.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
+        when(vcConnectionHelpers.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
         when(datastoreMO.getMor()).thenReturn(managedObjectReference);
         when(managedObjectReference.getValue()).thenReturn("321");
         vcsdkUtils.getDataStoresByClusterObjectId("321", "321");
@@ -452,35 +452,35 @@ public class VCSDKUtilsTest {
 
     @Test
     public void getMountDataStoresByClusterObjectId() throws Exception {
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(clusterMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(clusterVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
         when(clusterMO.getClusterHosts()).thenReturn(list);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getMor()).thenReturn(managedObjectReference);
         when(managedObjectReference.getValue()).thenReturn("321");
         when(rootFsMo.getAllDatastoreOnRootFs()).thenReturn(list);
-        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
         when(datastoreMO.getSummary()).thenReturn(datastoreSummary);
         when(datastoreMO.getHostMounts()).thenReturn(dhms);
         when(datastoreMO.getMor()).thenReturn(managedObjectReference);
         when(managedObjectReference.getValue()).thenReturn("321");
-        when(vcConnectionHelper.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
+        when(vcConnectionHelpers.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
         vcsdkUtils.getMountDataStoresByClusterObjectId("321", "321");
     }
 
     @Test
     public void getHostsOnCluster() throws Exception {
 
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(clusterMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(clusterVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
         when(clusterMO.getClusterHosts()).thenReturn(list);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
-        when(vcConnectionHelper.mor2ObjectId(hostMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(vcConnectionHelpers.mor2ObjectId(hostMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
         vcsdkUtils.getHostsOnCluster("321");
     }
 
@@ -492,10 +492,10 @@ public class VCSDKUtilsTest {
         List<Map<String, String>> l1 = new ArrayList<>();
         l1.add(map);
         getHostsOnCluster();
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(clusterMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(clusterVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
         when(clusterMO.getClusterHosts()).thenReturn(list);
 
 
@@ -506,20 +506,20 @@ public class VCSDKUtilsTest {
     public void testGetHostsOnCluster() throws Exception {
         for (int i = 0; i <2 ; i++) {
             if (i == 0) {
-                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-                when(clusterMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
+                when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(clusterVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
                 when(clusterMO.getClusterHosts()).thenReturn(list);
                 vcsdkUtils.getHostsOnCluster("321", "");
             }
             if (i == 1) {
-                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
                 when(hostMO.getHyperHostCluster()).thenReturn(managedObjectReference);
-                when(clusterMOFactory.build(hostMO.getContext(), managedObjectReference)).thenReturn(clusterMO);
+                when(clusterVmwareMoFactory.build(hostMO.getContext(), managedObjectReference)).thenReturn(clusterMO);
                 when(clusterMO.getName()).thenReturn("321");
                 when(clusterMO.getClusterHosts()).thenReturn(list);
                 vcsdkUtils.getHostsOnCluster("", "321");
@@ -530,28 +530,28 @@ public class VCSDKUtilsTest {
     @Test
     public void renameDataStore() throws Exception {
 
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
         vcsdkUtils.renameDataStore("321","321");
     }
 
     @Test
     public void expandVmfsDatastore() throws Exception {
         VmwareContext[] vmodlContexts = {vmwareContext};
-        when(vcConnectionHelper.getAllContext()).thenReturn(vmodlContexts);
-        when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+        when(vcConnectionHelpers.getAllContext()).thenReturn(vmodlContexts);
+        when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
         when(rootFsMo.getAllHostOnRootFs()).thenReturn(list);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getHostDatastoreSystemMo()).thenReturn(hostDatastoreSystemMO);
         when(hostDatastoreSystemMO.findDatastore("321")).thenReturn(managedObjectReference);
-        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
         when(hostDatastoreSystemMO.queryVmfsDatastoreExpandOptions(datastoreMO)).thenReturn(vmfsDatastoreOptions);
         when(hostDatastoreSystemMO.getDatastoreInfo(managedObjectReference)).thenReturn(vmfsDatastoreInfo);
         when(vmfsDatastoreOption.getSpec()).thenReturn(vmfsDatastoreExpandSpec);
         when(datastoreMO.getHostMounts()).thenReturn(dhms);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
         vcsdkUtils.expandVmfsDatastore("321", 21, "321");
 
@@ -560,10 +560,10 @@ public class VCSDKUtilsTest {
     @Test
     public void recycleVmfsCapacity() throws Exception {
         VmwareContext[] vmodlContexts = {vmwareContext};
-        when(vcConnectionHelper.getAllContext()).thenReturn(vmodlContexts);
-        when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+        when(vcConnectionHelpers.getAllContext()).thenReturn(vmodlContexts);
+        when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
         when(rootFsMo.getAllHostOnRootFs()).thenReturn(list);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getHostDatastoreSystemMo()).thenReturn(hostDatastoreSystemMO);
         when(hostDatastoreSystemMO.findDatastore("321")).thenReturn(managedObjectReference);
         when(hostDatastoreSystemMO.getDatastoreInfo(managedObjectReference)).thenReturn(vmfsDatastoreInfo);
@@ -577,12 +577,12 @@ public class VCSDKUtilsTest {
         map.put("321", "321");
         List<Map<String, String>> list = new ArrayList<>();
         list.add(map);
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getHostDatastoreSystemMo()).thenReturn(hostDatastoreSystemMO);
-        when(vcConnectionHelper.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
+        when(vcConnectionHelpers.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
         vcsdkUtils.createNfsDatastore("321","321","321","321",list,"321","321");
     }
 
@@ -590,10 +590,10 @@ public class VCSDKUtilsTest {
     public void hostRescanVmfs() throws Exception {
 
         VmwareContext[] vmodlContexts = {vmwareContext};
-        when(vcConnectionHelper.getAllContext()).thenReturn(vmodlContexts);
-        when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+        when(vcConnectionHelpers.getAllContext()).thenReturn(vmodlContexts);
+        when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
         when(rootFsMo.getAllHostOnRootFs()).thenReturn(list);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getHostName()).thenReturn("321");
         when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
         vcsdkUtils.hostRescanVmfs("321");
@@ -604,10 +604,10 @@ public class VCSDKUtilsTest {
         for (int i = 0; i <2 ; i++) {
             if (i == 0) {
                 VmwareContext[] vmodlContexts = {vmwareContext};
-                when(vcConnectionHelper.getAllContext()).thenReturn(vmodlContexts);
-                when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+                when(vcConnectionHelpers.getAllContext()).thenReturn(vmodlContexts);
+                when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
                 when(rootFsMo.getAllHostOnRootFs()).thenReturn(list);
-                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
                 when(hostMO.getHostName()).thenReturn("321");
                 when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
                 HostStorageDeviceInfo storageDeviceInfo = spy(HostStorageDeviceInfo.class);
@@ -621,10 +621,10 @@ public class VCSDKUtilsTest {
             }
             if (i == 1) {
                 VmwareContext[] vmodlContexts = {vmwareContext};
-                when(vcConnectionHelper.getAllContext()).thenReturn(vmodlContexts);
-                when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+                when(vcConnectionHelpers.getAllContext()).thenReturn(vmodlContexts);
+                when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
                 when(rootFsMo.getAllHostOnRootFs()).thenReturn(list);
-                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
                 when(hostMO.getHostName()).thenReturn("321");
                 when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
                 HostStorageDeviceInfo storageDeviceInfo = spy(HostStorageDeviceInfo.class);
@@ -644,10 +644,10 @@ public class VCSDKUtilsTest {
     public void getLunsOnHost() throws Exception {
 
         VmwareContext[] vmodlContexts = {vmwareContext};
-        when(vcConnectionHelper.getAllContext()).thenReturn(vmodlContexts);
-        when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+        when(vcConnectionHelpers.getAllContext()).thenReturn(vmodlContexts);
+        when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
         when(rootFsMo.getAllHostOnRootFs()).thenReturn(list);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getName()).thenReturn("321");
         when(hostMO.getHostDatastoreSystemMo()).thenReturn(hostDatastoreSystemMO);
         when(hostDatastoreSystemMO.queryAvailableDisksForVmfs()).thenReturn(hostScsiDisks);
@@ -657,10 +657,10 @@ public class VCSDKUtilsTest {
     @Test
     public void testGetLunsOnHost() throws Exception {
 
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
         HostStorageDeviceInfo storageDeviceInfo = spy(HostStorageDeviceInfo.class);
         when(hostStorageSystemMO.getStorageDeviceInfo()).thenReturn(storageDeviceInfo);
@@ -677,12 +677,12 @@ public class VCSDKUtilsTest {
     @Test
     public void getLunsOnCluster() throws Exception {
 
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(clusterMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(clusterVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
         when(clusterMO.getClusterHosts()).thenReturn(list);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
         HostStorageDeviceInfo storageDeviceInfo = spy(HostStorageDeviceInfo.class);
         when(hostStorageSystemMO.getStorageDeviceInfo()).thenReturn(storageDeviceInfo);
@@ -706,8 +706,8 @@ public class VCSDKUtilsTest {
         when(hostMO.getHostDatastoreSystemMo()).thenReturn(hostDatastoreSystemMO);
         when(hostDatastoreSystemMO.createVmfsDatastore("321", hostScsiDisk, 321,
             321, 1073741824, 321, "321")).thenReturn(managedObjectReference);
-        when(datastoreMOFactory.build(hostMO.getContext(), managedObjectReference)).thenReturn(datastoreMO);
-        when(vcConnectionHelper.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
+        when(datastoreVmwareMoFactory.build(hostMO.getContext(), managedObjectReference)).thenReturn(datastoreMO);
+        when(vcConnectionHelpers.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
         when(datastoreMO.getContext()).thenReturn(vmwareContext);
         when(vmwareContext.getServerAddress()).thenReturn("321");
         when(datastoreMO.getName()).thenReturn("321");
@@ -736,10 +736,10 @@ public class VCSDKUtilsTest {
     public void deleteVmfsDataStore() throws Exception {
 
         VmwareContext[] vmodlContexts = {vmwareContext};
-        when(vcConnectionHelper.getAllContext()).thenReturn(vmodlContexts);
-        when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+        when(vcConnectionHelpers.getAllContext()).thenReturn(vmodlContexts);
+        when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
         when(rootFsMo.getAllHostOnRootFs()).thenReturn(list);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getHostDatastoreSystemMo()).thenReturn(hostDatastoreSystemMO);
         when(hostDatastoreSystemMO.findDatastore("321")).thenReturn(managedObjectReference);
         when(hostDatastoreSystemMO.deleteDatastore("321")).thenReturn(true);
@@ -754,19 +754,19 @@ public class VCSDKUtilsTest {
         dsmap.put("hostName", "321");
         for (int i = 0; i <2 ; i++) {
             if (i == 0) {
-                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-                when(clusterMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
+                when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(clusterVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
                 when(clusterMO.getClusterHosts()).thenReturn(list);
-                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
                 vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), "321", "");
             }
             if (i == 1) {
-                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
                 vcsdkUtils.mountVmfsOnCluster(gson.toJson(dsmap), "", "321");
             }
         }
@@ -779,21 +779,21 @@ public class VCSDKUtilsTest {
         dsmap.put("hostName", "321");
         for (int i = 0; i <2 ; i++) {
             if (i == 0) {
-                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-                when(clusterMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
+                when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(clusterVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
                 when(clusterMO.getClusterHosts()).thenReturn(list);
-                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
                 when(hostMO.getName()).thenReturn("321");
                 vcsdkUtils.unmountVmfsOnHostOrCluster(gson.toJson(dsmap),"321","");
             }
             if (i == 1) {
-                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
                 vcsdkUtils.unmountVmfsOnHostOrCluster(gson.toJson(dsmap),"","321");
             }
         }
@@ -839,21 +839,21 @@ public class VCSDKUtilsTest {
     public void scanDataStore() throws Exception {
         for (int i = 0; i <2 ; i++) {
             if (i == 0) {
-                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-                when(clusterMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
+                when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(clusterVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
                 when(clusterMO.getClusterHosts()).thenReturn(list);
-                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
                 when(hostMO.getName()).thenReturn("321");
                 vcsdkUtils.scanDataStore("321", "");
             }
             if (i == 1) {
-                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
                 vcsdkUtils.scanDataStore("", "321");
             }
         }
@@ -863,11 +863,11 @@ public class VCSDKUtilsTest {
     @Test
     public void createDisk() throws Exception {
 
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
         when(virtualMachineMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(virtualMachineMo);
         vcsdkUtils.createDisk("321", "321", "321", 21);
     }
@@ -875,14 +875,14 @@ public class VCSDKUtilsTest {
     @Test
     public void getDatastoreMountsOnHost() throws Exception {
 
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
         when(virtualMachineMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(virtualMachineMo);
         when(virtualMachineMo.getRunningHost()).thenReturn(hostMO);
         when(hostMO.getDatastoreMountsOnHost()).thenReturn(list);
-        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
-        when(vcConnectionHelper.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
+        when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(vcConnectionHelpers.mor2ObjectId(datastoreMO.getMor(), vmwareContext.getServerAddress())).thenReturn("321");
         DatastoreSummary datastoreSummary = new DatastoreSummary();//spy(DatastoreSummary.class);
         datastoreSummary.setMultipleHostAccess(true);
         datastoreSummary.setUrl("321");
@@ -897,11 +897,11 @@ public class VCSDKUtilsTest {
     }
     @Test
     public void mountNfs() throws Exception {
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
         NasDatastoreInfo datastoreInfo = spy(NasDatastoreInfo.class);
         HostNasVolume hostNasVolume = spy(HostNasVolume.class);
@@ -920,23 +920,23 @@ public class VCSDKUtilsTest {
 
     @Test
     public void unmountNfsOnHost() throws Exception {
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         vcsdkUtils.unmountNfsOnHost("321", "321");
 
     }
 
     @Test
     public void unmountNfsOnCluster() throws Exception {
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(rootFsMOFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
         when(rootFsMo.findClusterById("321")).thenReturn(clusterMO);
         when(clusterMO.getName()).thenReturn("321");
         vcsdkUtils.unmountNfsOnCluster("321", "321");
@@ -954,10 +954,10 @@ public class VCSDKUtilsTest {
     @Test
     public void getVmKernelIpByHostObjectId() throws Exception {
 
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         List<VirtualNicManagerNetConfig> nics = spy(ArrayList.class);
         VirtualNicManagerNetConfig virtualNicManagerNetConfig = spy(VirtualNicManagerNetConfig.class);
         virtualNicManagerNetConfig.setNicType("vSphereProvisioning");
@@ -983,7 +983,7 @@ public class VCSDKUtilsTest {
     @Test
     public void getAllSelfPolicyInallcontext() throws Exception {
         VmwareContext[] vmodlContexts = {vmwareContext};
-        when(vcConnectionHelper.getAllContext()).thenReturn(vmodlContexts);
+        when(vcConnectionHelpers.getAllContext()).thenReturn(vmodlContexts);
         when(vmwareContext.getPbmServiceContent()).thenReturn(spbmsc);
         when(vmwareContext.getPbmService()).thenReturn(pbmService);
         PbmProfileResourceType pbmProfileResourceType = spy(PbmProfileResourceType.class);
@@ -1037,7 +1037,7 @@ public class VCSDKUtilsTest {
     @Test
     public void createPbmProfileInAllContext() throws Exception {
         VmwareContext[] vmodlContexts = {vmwareContext};
-        when(vcConnectionHelper.getAllContext()).thenReturn(vmodlContexts);
+        when(vcConnectionHelpers.getAllContext()).thenReturn(vmodlContexts);
         vcsdkUtils.createPbmProfileInAllContext("321", "321");
     }
 
@@ -1052,7 +1052,7 @@ public class VCSDKUtilsTest {
     @Test
     public void removePbmProfileInAllContext() throws Exception {
         VmwareContext[] vmodlContexts = {vmwareContext};
-        when(vcConnectionHelper.getAllContext()).thenReturn(vmodlContexts);
+        when(vcConnectionHelpers.getAllContext()).thenReturn(vmodlContexts);
         when(vmwareContext.getPbmServiceContent()).thenReturn(spbmsc);
         when(vmwareContext.getPbmService()).thenReturn(pbmService);
         vcsdkUtils.removePbmProfileInAllContext(pbmprofiles);
@@ -1075,10 +1075,10 @@ public class VCSDKUtilsTest {
         List<Map<String, Object>> ethPorts = spy(ArrayList.class);
         Map<String, Object> ethPort = spy(HashMap.class);
         ethPort.put("321", "321");
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
         HostStorageDeviceInfo storageDeviceInfo = spy(HostStorageDeviceInfo.class);
         when(hostStorageSystemMO.getStorageDeviceInfo()).thenReturn(storageDeviceInfo);
@@ -1136,12 +1136,12 @@ public class VCSDKUtilsTest {
 
         List<String> hostObjIds = spy(ArrayList.class);
         hostObjIds.add("321");
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(rootFsMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(rootFsMo);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(rootVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(rootFsMo);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getName()).thenReturn("321");
         testDeleteNfs();
         vcsdkUtils.deleteNfs("321", hostObjIds);
@@ -1163,10 +1163,10 @@ public class VCSDKUtilsTest {
     public void getHbaByHostObjectId() throws Exception {
         for (int i = 0; i <2 ; i++) {
             if (i == 0) {
-                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
                 when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
                 HostStorageDeviceInfo storageDeviceInfo = spy(HostStorageDeviceInfo.class);
                 when(hostStorageSystemMO.getStorageDeviceInfo()).thenReturn(storageDeviceInfo);
@@ -1180,10 +1180,10 @@ public class VCSDKUtilsTest {
 
             }
             if (i == 1) {
-                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
                 when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
                 HostStorageDeviceInfo storageDeviceInfo = spy(HostStorageDeviceInfo.class);
                 when(hostStorageSystemMO.getStorageDeviceInfo()).thenReturn(storageDeviceInfo);
@@ -1203,10 +1203,10 @@ public class VCSDKUtilsTest {
 
         for (int i = 0; i <2 ; i++) {
             if (i == 0) {
-                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
                 when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
                 when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
                 HostStorageDeviceInfo storageDeviceInfo = spy(HostStorageDeviceInfo.class);
@@ -1220,10 +1220,10 @@ public class VCSDKUtilsTest {
                 vcsdkUtils.getHbasByHostObjectId("321");
             }
             if (i == 1) {
-                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
                 when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
                 HostStorageDeviceInfo storageDeviceInfo = spy(HostStorageDeviceInfo.class);
                 when(hostStorageSystemMO.getStorageDeviceInfo()).thenReturn(storageDeviceInfo);
@@ -1243,12 +1243,12 @@ public class VCSDKUtilsTest {
     public void getHbasByClusterObjectId() throws Exception {
         for (int i = 0; i <2 ; i++) {
             if (i == 0) {
-                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-                when(clusterMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
+                when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(clusterVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
                 when(clusterMO.getClusterHosts()).thenReturn(list);
-                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
                 when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
                 HostStorageDeviceInfo storageDeviceInfo = spy(HostStorageDeviceInfo.class);
                 when(hostStorageSystemMO.getStorageDeviceInfo()).thenReturn(storageDeviceInfo);
@@ -1261,12 +1261,12 @@ public class VCSDKUtilsTest {
                 vcsdkUtils.getHbasByClusterObjectId("321");
             }
             if (i == 1) {
-                when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-                when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-                when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-                when(clusterMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
+                when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+                when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+                when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+                when(clusterVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
                 when(clusterMO.getClusterHosts()).thenReturn(list);
-                when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+                when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
                 when(hostMO.getHostStorageSystemMo()).thenReturn(hostStorageSystemMO);
                 HostStorageDeviceInfo storageDeviceInfo = spy(HostStorageDeviceInfo.class);
                 when(hostStorageSystemMO.getStorageDeviceInfo()).thenReturn(storageDeviceInfo);
@@ -1309,10 +1309,10 @@ public class VCSDKUtilsTest {
 
     @Test
     public void hasVmOnDatastore() throws Exception {
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
         List<ManagedObjectReference> vms = spy(ArrayList.class);
         vms.add(managedObjectReference);
         when(datastoreMO.getVm()).thenReturn(vms);
@@ -1321,10 +1321,10 @@ public class VCSDKUtilsTest {
 
     @Test
     public void getHostName() throws Exception {
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(hostMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getName()).thenReturn("321");
         vcsdkUtils.getHostName("321");
 
@@ -1332,49 +1332,49 @@ public class VCSDKUtilsTest {
 
     @Test
     public void getClusterName() throws Exception {
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(clusterMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(clusterVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(clusterMO);
         when(clusterMO.getName()).thenReturn("321");
         vcsdkUtils.getClusterName("321");
     }
 
     @Test
     public void getDataStoreName() throws Exception {
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
         when(datastoreMO.getName()).thenReturn("321");
         vcsdkUtils.getDataStoreName("321");
     }
 
     @Test
     public void refreshDatastore() throws Exception {
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(datastoreMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
         vcsdkUtils.refreshDatastore("321");
     }
 
     @Test
     public void refreshStorageSystem() throws Exception {
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
         vcsdkUtils.refreshStorageSystem("321");
     }
 
     @Test
     public void getHostByVmObjectId() throws Exception {
-        when(vcConnectionHelper.objectId2Serverguid("321")).thenReturn("321");
-        when(vcConnectionHelper.getServerContext("321")).thenReturn(vmwareContext);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
+        when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
         when(virtualMachineMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(virtualMachineMo);
         when(virtualMachineMo.getRunningHost()).thenReturn(hostMO);
-        when(vcConnectionHelper.objectId2Mor("321")).thenReturn(managedObjectReference);
+        when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
         when(hostMO.getName()).thenReturn("321");
         vcsdkUtils.getHostByVmObjectId("321");
     }

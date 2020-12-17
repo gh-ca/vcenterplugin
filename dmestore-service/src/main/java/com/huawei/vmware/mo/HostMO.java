@@ -1,6 +1,6 @@
 package com.huawei.vmware.mo;
 
-import com.huawei.vmware.util.ClusterMOFactory;
+import com.huawei.vmware.util.ClusterVmwareMoFactory;
 import com.huawei.vmware.util.Pair;
 import com.huawei.vmware.util.VmwareContext;
 import com.vmware.vim25.AboutInfo;
@@ -47,7 +47,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
     private Map<String, VirtualMachineMO> vmCache = new HashMap<>();
 
-    private ClusterMOFactory clusterMoFactory = ClusterMOFactory.getInstance();
+    private ClusterVmwareMoFactory clusterVmwareMoFactory = ClusterVmwareMoFactory.getInstance();
 
     /**
      * HostMO
@@ -124,7 +124,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     public ClusterDasConfigInfo getDasConfig() throws Exception {
         ManagedObjectReference morParent = getParentMor();
         if (CLUSTER_COMPUTE_RESOURCE.equals(morParent.getType())) {
-            ClusterMO clusterMo = clusterMoFactory.build(context, morParent);
+            ClusterMO clusterMo = clusterVmwareMoFactory.build(context, morParent);
             return clusterMo.getDasConfig();
         }
         return null;
@@ -134,7 +134,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     public boolean isHaEnabled() throws Exception {
         ManagedObjectReference morParent = getParentMor();
         if (CLUSTER_COMPUTE_RESOURCE.equals(morParent.getType())) {
-            ClusterMO clusterMo = clusterMoFactory.build(context, morParent);
+            ClusterMO clusterMo = clusterVmwareMoFactory.build(context, morParent);
             return clusterMo.isHaEnabled();
         }
         return false;
@@ -530,7 +530,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     public String getRecommendedDiskController(String guestOsId) throws Exception {
         ManagedObjectReference morParent = getParentMor();
         if (CLUSTER_COMPUTE_RESOURCE.equals(morParent.getType())) {
-            ClusterMO clusterMo = clusterMoFactory.build(context, morParent);
+            ClusterMO clusterMo = clusterVmwareMoFactory.build(context, morParent);
             return clusterMo.getRecommendedDiskController(guestOsId);
         }
         return null;

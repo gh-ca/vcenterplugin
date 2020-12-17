@@ -2,7 +2,7 @@ package com.huawei.vmware.mo;
 
 import com.huawei.dmestore.exception.VcenterException;
 import com.huawei.dmestore.utils.StringUtil;
-import com.huawei.vmware.util.HostMOFactory;
+import com.huawei.vmware.util.HostVmwareFactory;
 import com.huawei.vmware.util.Pair;
 import com.huawei.vmware.util.VmwareContext;
 import com.huawei.vmware.util.VmwareHelper;
@@ -48,7 +48,7 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
 
     private ManagedObjectReference environmentBrowser = null;
 
-    private HostMOFactory hostFactory = HostMOFactory.getInstance();
+    private HostVmwareFactory hostFactory = HostVmwareFactory.getInstance();
 
     /**
      * ClusterMO
