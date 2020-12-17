@@ -16,10 +16,10 @@ import org.mockito.MockitoAnnotations;
  * @description TODO
  * @date 2020/12/2 11:17
  */
-public class VirtualMachineMOFactoryTest {
+public class VirtualMachineMoFactorysTest {
 
     @InjectMocks
-    VirtualMachineMOFactory factory;
+    VirtualMachineMoFactorys factory;
 
     VmwareContext vmwareContext;
     ManagedObjectReference managedObjectReference;
@@ -33,7 +33,7 @@ public class VirtualMachineMOFactoryTest {
 
     @Test
     public void getInstance() {
-        VirtualMachineMOFactory.getInstance();
+        VirtualMachineMoFactorys.getInstance();
     }
 
     @Test

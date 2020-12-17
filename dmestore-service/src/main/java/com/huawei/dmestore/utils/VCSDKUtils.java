@@ -22,7 +22,7 @@ import com.huawei.vmware.util.PbmUtil;
 import com.huawei.vmware.util.RootVmwareMoFactory;
 import com.huawei.vmware.util.SessionHelperFactory;
 import com.huawei.vmware.util.TaggingWorkflowFactory;
-import com.huawei.vmware.util.VirtualMachineMOFactory;
+import com.huawei.vmware.util.VirtualMachineMoFactorys;
 import com.huawei.vmware.util.VmwareContext;
 
 import com.google.gson.Gson;
@@ -91,6 +91,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -117,15 +118,59 @@ import javax.xml.parsers.ParserConfigurationException;
  * @since 2020-09-15
  **/
 public class VCSDKUtils {
-    private final static Logger logger = LoggerFactory.getLogger(VCSDKUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(VCSDKUtils.class);
 
     private static final Class<?> VERSION = version10.class;
 
     private static final String POLICY_DESC = "policy created by dme";
 
-    private VcConnectionHelpers vcConnectionHelpers;
+    private static final String CONNECT_STATUS = "connectStatus";
 
-    public static final String CATEGORY_NAME = "DME Service Level";
+    private static final String ISCSI_TYPE = "ISCSI";
+
+    private static final String FC_TYPE = "FC";
+
+    private static final String DEVICE_FIELD = "device";
+
+    private static final String ID = "id";
+
+    private static final String NAME = "name";
+
+    private static final String OBJECT_ID = "objectId";
+
+    private static final String STATUS = "status";
+
+    private static final String TYPE = "type";
+
+    private static final String CAPACITY = "capacity";
+
+    private static final String FREE_SPACE = "freeSpace";
+
+    private static final String CLUSTER_ID = "clusterId";
+
+    private static final String CLUSTER_NAME = "clusterName";
+
+    private static final String HOST_ID = "hostId";
+
+    private static final String SUCCESS_RESULT = "success";
+
+    private static final String FAILED_RESULT = "failed";
+
+    private static final String HOST_FIELD = "host";
+
+    private static final String HOST_SCSI_DISK = "hostScsiDisk";
+
+    private static final String HOST_NAME = "hostName";
+
+    private static final int TEST_CONNECTIVITY_TIMEOUT = 3000;
+
+    private static final int THREAD_SLEEP_2_SECENDS = 2000;
+
+    private static final int THREAD_POOL_SIZE = 5;
+
+    private static final int DIGIT_1024 = 1024;
+
+    private VcConnectionHelpers vcConnectionHelpers;
 
     private RootVmwareMoFactory rootVmwareMoFactory = RootVmwareMoFactory.getInstance();
 
@@ -139,18 +184,23 @@ public class VCSDKUtils {
 
     private TaggingWorkflowFactory taggingWorkflowFactory = TaggingWorkflowFactory.getInstance();
 
-    private VirtualMachineMOFactory virtualMachineMOFactory = VirtualMachineMOFactory.getInstance();
+    private VirtualMachineMoFactorys virtualMachineMoFactorys = VirtualMachineMoFactorys.getInstance();
 
     private static VmodlContext context;
 
     private Gson gson = new Gson();
 
+    /**
+     * CATEGORY_NAME
+     */
+    public static final String CATEGORY_NAME = "DME Service Level";
+
     public VcConnectionHelpers getVcConnectionHelper() {
         return vcConnectionHelpers;
     }
 
-    public void setVcConnectionHelper(VcConnectionHelpers vcConnectionHelpers) {
-        this.vcConnectionHelpers = vcConnectionHelpers;
+    public void setVcConnectionHelper(VcConnectionHelpers vcConnectionHelper) {
+        this.vcConnectionHelpers = vcConnectionHelper;
     }
 
     public String getAllVmfsDataStoreInfos(String storeType) throws VcenterException {
@@ -168,7 +218,7 @@ public class VCSDKUtils {
                             new TypeToken<Map<String, Object>>() { }.getType());
                         String objectid = vcConnectionHelpers.mor2ObjectId(ds1.getMor(),
                             vmwareContext.getServerAddress());
-                        dsmap.put("objectid", objectid);
+                        dsmap.put(OBJECT_ID, objectid);
                         if (storeType.equals(ToolUtils.STORE_TYPE_NFS) && ds1.getSummary()
                             .getType()
                             .equals(ToolUtils.STORE_TYPE_NFS)) {
@@ -203,7 +253,7 @@ public class VCSDKUtils {
                 }
             }
         } catch (Exception e) {
-            logger.error("vmware error:{}", e.getMessage());
+            logger.error("getAllVmfsDataStoreInfos error:{}", e.getMessage());
             throw new VcenterException(e.getMessage());
         }
         return listStr;
@@ -211,7 +261,11 @@ public class VCSDKUtils {
 
     /**
      * 得到指定objectid存储的info
-     **/
+     *
+     * @param objectid objectid
+     * @return String
+     * @throws VcenterException VcenterException
+     */
     public Map<String, Object> getDataStoreSummaryByObjectId(String objectid) throws VcenterException {
         Map<String, Object> dsmap;
         try {
@@ -222,7 +276,7 @@ public class VCSDKUtils {
             dsmap = gson.fromJson(gson.toJson(datastoreMo.getSummary()),
                 new TypeToken<Map<String, Object>>() { }.getType());
         } catch (Exception e) {
-            logger.error("vmware error:", e);
+            logger.error("getDataStoreSummaryByObjectId error!{}", e.getMessage());
             throw new VcenterException(e.getMessage());
         }
         return dsmap;
@@ -251,9 +305,9 @@ public class VCSDKUtils {
                         Map<String, String> map = new HashMap<>();
                         String objectId = vcConnectionHelpers.mor2ObjectId(host1.getMor(),
                             vmwareContext.getServerAddress());
-                        map.put("hostId", objectId);
-                        map.put("objectId", objectId);
-                        map.put("hostName", host1.getName());
+                        map.put(HOST_ID, objectId);
+                        map.put(OBJECT_ID, objectId);
+                        map.put(HOST_NAME, host1.getName());
                         lists.add(map);
                     }
                     if (lists.size() > 0) {
@@ -262,7 +316,7 @@ public class VCSDKUtils {
                 }
             }
         } catch (Exception e) {
-            logger.error("vmware error:", e);
+            logger.error("getAllHosts error:{}", e.getMessage());
             throw new VcenterException(e.getLocalizedMessage());
         }
         logger.info("get all hosts end");
@@ -278,9 +332,9 @@ public class VCSDKUtils {
                 RootFsMO rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
                 HostMO hostMo = rootFsMo.findHostById(objectId);
                 Map<String, String> map = new HashMap<>();
-                map.put("hostId", objectId);
-                map.put("objectId", objectId);
-                map.put("hostName", hostMo.getName());
+                map.put(HOST_ID, objectId);
+                map.put(OBJECT_ID, objectId);
+                map.put(HOST_NAME, hostMo.getName());
                 lists.add(map);
             }
             hostlist = gson.toJson(lists);
@@ -305,8 +359,8 @@ public class VCSDKUtils {
                         Map<String, String> map = new HashMap<>();
                         String objectId = vcConnectionHelpers.mor2ObjectId(cl1.getMor(),
                             vmwareContext.getServerAddress());
-                        map.put("clusterId", objectId);
-                        map.put("clusterName", cl1.getName());
+                        map.put(CLUSTER_ID, objectId);
+                        map.put(CLUSTER_NAME, cl1.getName());
                         lists.add(map);
                     }
                     if (lists.size() > 0) {
@@ -315,7 +369,7 @@ public class VCSDKUtils {
                 }
             }
         } catch (Exception e) {
-            logger.error("vmware error:", e);
+            logger.error("getAllClusters error:{}", e.getMessage());
             throw new VcenterException(e.getMessage());
         }
         return listStr;
@@ -330,6 +384,74 @@ public class VCSDKUtils {
      */
     public String getHostsByDsObjectId(String dataStoreObjectId) throws VcenterException {
         return getHostsByDsObjectId(dataStoreObjectId, false);
+    }
+
+    /**
+     * 得到所有主机的ID与name, boolean mount 是否已经挂载了当前存储的主机
+     *
+     * @param dataStoreObjectId dataStoreObjectId
+     * @param mount mount
+     * @return String
+     * @throws VcenterException VcenterException
+     */
+    public String getHostsByDsObjectId(String dataStoreObjectId, boolean mount) throws VcenterException {
+        String listStr = "";
+        try {
+            // 得到当前的context
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(dataStoreObjectId);
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            RootFsMO rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
+            ManagedObjectReference dsmor = vcConnectionHelpers.objectId2Mor(dataStoreObjectId);
+
+            // 取得该存储下所有已经挂载的主机ID
+            List<String> mounthostids = new ArrayList<>();
+            DatastoreMO dsmo = datastoreVmwareMoFactory.build(vmwareContext, dsmor);
+            if (dsmo != null) {
+                List<DatastoreHostMount> dhms = dsmo.getHostMounts();
+                if (dhms != null && dhms.size() > 0) {
+                    for (DatastoreHostMount dhm : dhms) {
+                        if (dhm.getMountInfo() != null && dhm.getMountInfo().isMounted()) {
+                            mounthostids.add(dhm.getKey().getValue());
+                        }
+                    }
+                }
+            }
+
+            // 取得所有主机，并通过mounthostids进行过滤，过滤掉已经挂载的主机
+            List<Pair<ManagedObjectReference, String>> hosts = rootFsMo.getAllHostOnRootFs();
+            if (hosts != null && hosts.size() > 0) {
+                List<Map<String, String>> lists = new ArrayList<>();
+                for (Pair<ManagedObjectReference, String> host : hosts) {
+                    HostMO host1 = hostVmwareFactory.build(vmwareContext, host.first());
+                    if (mount) {
+                        if (mounthostids.contains(host1.getMor().getValue())) {
+                            Map<String, String> map = new HashMap<>();
+                            String objectId = vcConnectionHelpers.mor2ObjectId(host1.getMor(),
+                                vmwareContext.getServerAddress());
+                            map.put(HOST_ID, objectId);
+                            map.put(HOST_NAME, host1.getName());
+                            lists.add(map);
+                        }
+                    } else {
+                        if (!mounthostids.contains(host1.getMor().getValue())) {
+                            Map<String, String> map = new HashMap<>();
+                            String objectId = vcConnectionHelpers.mor2ObjectId(host1.getMor(),
+                                vmwareContext.getServerAddress());
+                            map.put(HOST_ID, objectId);
+                            map.put(HOST_NAME, host1.getName());
+                            lists.add(map);
+                        }
+                    }
+                }
+                if (lists.size() > 0) {
+                    listStr = gson.toJson(lists);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("vmware error:{}", e.getMessage());
+            throw new VcenterException(e.getMessage());
+        }
+        return listStr;
     }
 
     /**
@@ -374,8 +496,8 @@ public class VCSDKUtils {
             }
 
             /**
-             *取得所有集群，并通过mounthostids进行过滤，过滤掉已经挂载的主机
-             *扫描集群下所有主机，只要有一个主机没挂当前存储就要显示，只有集群下所有主机都挂载了该存储就不显示
+             * 取得所有集群，并通过mounthostids进行过滤，过滤掉已经挂载的主机
+             * 扫描集群下所有主机，只要有一个主机没挂当前存储就要显示，只有集群下所有主机都挂载了该存储就不显示
              */
             List<Pair<ManagedObjectReference, String>> cls = rootFsMo.getAllClusterOnRootFs();
             if (cls != null && cls.size() > 0) {
@@ -397,8 +519,8 @@ public class VCSDKUtils {
                         Map<String, String> map = new HashMap<>();
                         String objectId = vcConnectionHelpers.mor2ObjectId(cl1.getMor(),
                             vmwareContext.getServerAddress());
-                        map.put("clusterId", objectId);
-                        map.put("clusterName", cl1.getName());
+                        map.put(CLUSTER_ID, objectId);
+                        map.put(CLUSTER_NAME, cl1.getName());
                         lists.add(map);
                     }
                 }
@@ -407,7 +529,7 @@ public class VCSDKUtils {
                 }
             }
         } catch (Exception e) {
-            logger.error("vmware error:", e);
+            logger.error("getClustersByDsObjectId error:{}", e.getMessage());
             throw new VcenterException(e.getMessage());
         }
         return listStr;
@@ -460,8 +582,8 @@ public class VCSDKUtils {
                         Map<String, String> map = new HashMap<>();
                         String objectId = vcConnectionHelpers.mor2ObjectId(cl1.getMor(),
                             vmwareContext.getServerAddress());
-                        map.put("clusterId", objectId);
-                        map.put("clusterName", cl1.getName());
+                        map.put(CLUSTER_ID, objectId);
+                        map.put(CLUSTER_NAME, cl1.getName());
                         lists.add(map);
                     }
                 }
@@ -501,44 +623,43 @@ public class VCSDKUtils {
 
             // 取得所有主机，并通过mounthostids进行过滤，过滤掉已经挂载的主机
             List<Pair<ManagedObjectReference, String>> dss = rootFsMo.getAllDatastoreOnRootFs();
-            if (dss != null && dss.size() > 0) {
-                List<Map<String, Object>> lists = new ArrayList<>();
-                for (Pair<ManagedObjectReference, String> ds : dss) {
-                    DatastoreMO dsmo = datastoreVmwareMoFactory.build(vmwareContext, ds.first());
-                    if (dsmo != null && dataStoreType.equals(dsmo.getSummary().getType())) {
-                        boolean isMount = true;
-                        List<DatastoreHostMount> dhms = dsmo.getHostMounts();
-                        if (dhms != null && dhms.size() > 0) {
-                            for (DatastoreHostMount dhm : dhms) {
-                                if (dhm != null) {
-                                    if (dhm.getMountInfo() != null && dhm.getMountInfo().isMounted() && dhm.getKey()
-                                        .getValue()
-                                        .equals(objHostId)) {
-                                        isMount = false;
-                                        break;
-                                    }
-                                }
+            if (dss == null || dss.size() == 0) {
+                return listStr;
+            }
+            List<Map<String, Object>> lists = new ArrayList<>();
+            for (Pair<ManagedObjectReference, String> ds : dss) {
+                DatastoreMO dsmo = datastoreVmwareMoFactory.build(vmwareContext, ds.first());
+                if (dsmo != null && dataStoreType.equals(dsmo.getSummary().getType())) {
+                    boolean isMount = true;
+                    List<DatastoreHostMount> dhms = dsmo.getHostMounts();
+                    if (dhms != null && dhms.size() > 0) {
+                        for (DatastoreHostMount dhm : dhms) {
+                            if (dhm.getMountInfo() != null && dhm.getMountInfo().isMounted() && dhm.getKey()
+                                .getValue()
+                                .equals(objHostId)) {
+                                isMount = false;
+                                break;
                             }
                         }
-                        if (isMount) {
-                            String objectId = vcConnectionHelpers.mor2ObjectId(dsmo.getMor(),
-                                vmwareContext.getServerAddress());
-                            Map<String, Object> map = new HashMap<>();
-                            map.put("id", dsmo.getMor().getValue());
-                            map.put("name", dsmo.getName());
-                            map.put("objectId", objectId);
-                            map.put("status", dsmo.getSummary().isAccessible());
-                            map.put("type", dsmo.getSummary().getType());
-                            map.put("capacity", dsmo.getSummary().getCapacity() / ToolUtils.GI);
-                            map.put("freeSpace", dsmo.getSummary().getFreeSpace() / ToolUtils.GI);
+                    }
+                    if (isMount) {
+                        String objectId = vcConnectionHelpers.mor2ObjectId(dsmo.getMor(),
+                            vmwareContext.getServerAddress());
+                        Map<String, Object> map = new HashMap<>();
+                        map.put(ID, dsmo.getMor().getValue());
+                        map.put(NAME, dsmo.getName());
+                        map.put(OBJECT_ID, objectId);
+                        map.put(STATUS, dsmo.getSummary().isAccessible());
+                        map.put(TYPE, dsmo.getSummary().getType());
+                        map.put(CAPACITY, dsmo.getSummary().getCapacity() / ToolUtils.GI);
+                        map.put(FREE_SPACE, dsmo.getSummary().getFreeSpace() / ToolUtils.GI);
 
-                            lists.add(map);
-                        }
+                        lists.add(map);
                     }
                 }
-                if (lists.size() > 0) {
-                    listStr = gson.toJson(lists);
-                }
+            }
+            if (lists.size() > 0) {
+                listStr = gson.toJson(lists);
             }
         } catch (Exception e) {
             logger.error("vmware error:", e);
@@ -587,13 +708,13 @@ public class VCSDKUtils {
                                         String objectId = vcConnectionHelpers.mor2ObjectId(dsmo.getMor(),
                                             vmwareContext.getServerAddress());
                                         Map<String, Object> map = new HashMap<>();
-                                        map.put("id", dsmo.getMor().getValue());
-                                        map.put("name", dsmo.getName());
-                                        map.put("objectId", objectId);
-                                        map.put("status", dsmo.getSummary().isAccessible());
-                                        map.put("type", dsmo.getSummary().getType());
-                                        map.put("capacity", dsmo.getSummary().getCapacity() / ToolUtils.GI);
-                                        map.put("freeSpace", dsmo.getSummary().getFreeSpace() / ToolUtils.GI);
+                                        map.put(ID, dsmo.getMor().getValue());
+                                        map.put(NAME, dsmo.getName());
+                                        map.put(OBJECT_ID, objectId);
+                                        map.put(STATUS, dsmo.getSummary().isAccessible());
+                                        map.put(TYPE, dsmo.getSummary().getType());
+                                        map.put(CAPACITY, dsmo.getSummary().getCapacity() / ToolUtils.GI);
+                                        map.put(FREE_SPACE, dsmo.getSummary().getFreeSpace() / ToolUtils.GI);
 
                                         lists.add(map);
                                         break;
@@ -607,9 +728,9 @@ public class VCSDKUtils {
                     listStr = gson.toJson(lists);
                 }
             }
-        } catch (Exception e) {
-            logger.error("vmware getMountDataStore by hostId error:", e);
-            throw e;
+        } catch (Exception ex) {
+            logger.error("vmware getMountDataStore by hostId error:", ex);
+            throw ex;
         }
         return listStr;
     }
@@ -673,13 +794,13 @@ public class VCSDKUtils {
                             String objectId = vcConnectionHelpers.mor2ObjectId(dsmo.getMor(),
                                 vmwareContext.getServerAddress());
                             Map<String, Object> map = new HashMap<>();
-                            map.put("id", dsmo.getMor().getValue());
-                            map.put("name", dsmo.getName());
-                            map.put("objectId", objectId);
-                            map.put("status", dsmo.getSummary().isAccessible());
-                            map.put("type", dsmo.getSummary().getType());
-                            map.put("capacity", dsmo.getSummary().getCapacity() / ToolUtils.GI);
-                            map.put("freeSpace", dsmo.getSummary().getFreeSpace() / ToolUtils.GI);
+                            map.put(ID, dsmo.getMor().getValue());
+                            map.put(NAME, dsmo.getName());
+                            map.put(OBJECT_ID, objectId);
+                            map.put(STATUS, dsmo.getSummary().isAccessible());
+                            map.put(TYPE, dsmo.getSummary().getType());
+                            map.put(CAPACITY, dsmo.getSummary().getCapacity() / ToolUtils.GI);
+                            map.put(FREE_SPACE, dsmo.getSummary().getFreeSpace() / ToolUtils.GI);
 
                             lists.add(map);
                         }
@@ -732,7 +853,6 @@ public class VCSDKUtils {
                 for (Pair<ManagedObjectReference, String> ds : dss) {
                     DatastoreMO dsmo = datastoreVmwareMoFactory.build(vmwareContext, ds.first());
                     if (dsmo != null && dataStoreType.equals(dsmo.getSummary().getType())) {
-                        boolean isMount = false;
                         List<DatastoreHostMount> dhms = dsmo.getHostMounts();
                         if (dhms != null && dhms.size() > 0) {
                             // 整理挂载信息
@@ -749,13 +869,13 @@ public class VCSDKUtils {
                                     String objectId = vcConnectionHelpers.mor2ObjectId(dsmo.getMor(),
                                         vmwareContext.getServerAddress());
                                     Map<String, Object> map = new HashMap<>();
-                                    map.put("id", dsmo.getMor().getValue());
-                                    map.put("name", dsmo.getName());
-                                    map.put("objectId", objectId);
-                                    map.put("status", dsmo.getSummary().isAccessible());
-                                    map.put("type", dsmo.getSummary().getType());
-                                    map.put("capacity", dsmo.getSummary().getCapacity() / ToolUtils.GI);
-                                    map.put("freeSpace", dsmo.getSummary().getFreeSpace() / ToolUtils.GI);
+                                    map.put(ID, dsmo.getMor().getValue());
+                                    map.put(NAME, dsmo.getName());
+                                    map.put(OBJECT_ID, objectId);
+                                    map.put(STATUS, dsmo.getSummary().isAccessible());
+                                    map.put(TYPE, dsmo.getSummary().getType());
+                                    map.put(CAPACITY, dsmo.getSummary().getCapacity() / ToolUtils.GI);
+                                    map.put(FREE_SPACE, dsmo.getSummary().getFreeSpace() / ToolUtils.GI);
 
                                     lists.add(map);
                                     break;
@@ -768,9 +888,9 @@ public class VCSDKUtils {
                     listStr = gson.toJson(lists);
                 }
             }
-        } catch (Exception e) {
-            logger.error("vmware  getMountDataStore by slusterObjI derror:", e);
-            throw e;
+        } catch (Exception ex) {
+            logger.error("vmware  getMountDataStore by slusterObjI derror:{}", ex.getMessage());
+            throw ex;
         }
         return listStr;
     }
@@ -798,8 +918,8 @@ public class VCSDKUtils {
                     Map<String, String> map = new HashMap<>();
                     String objectId = vcConnectionHelpers.mor2ObjectId(host1.getMor(),
                         vmwareContext.getServerAddress());
-                    map.put("hostId", objectId);
-                    map.put("hostName", host1.getName());
+                    map.put(HOST_ID, objectId);
+                    map.put(HOST_NAME, host1.getName());
                     lists.add(map);
                 }
                 if (lists.size() > 0) {
@@ -811,43 +931,6 @@ public class VCSDKUtils {
             throw new VcenterException(e.getMessage());
         }
         return listStr;
-    }
-
-    /**
-     * 得到集群下所有没有挂载的主机 20200918objectId
-     *
-     * @param dataStoreObjectId dataStoreObjectId
-     * @param clusters clusters
-     * @return String
-     * @throws VcenterException VcenterException
-     */
-    public List<String> getUnmoutHostsOnCluster(String dataStoreObjectId, List<Map<String, String>> clusters)
-        throws VcenterException {
-        List<String> hostlist = null;
-        try {
-            String unmountHostStr = getHostsByDsObjectId(dataStoreObjectId);
-            List<Map<String, String>> unmountHostlists = gson.fromJson(unmountHostStr,
-                new TypeToken<List<Map<String, String>>>() { }.getType());
-            if (clusters != null && clusters.size() > 0) {
-                hostlist = new ArrayList<>();
-                for (Map<String, String> cluster : clusters) {
-                    String hostStr = getHostsOnCluster(cluster.get("clusterId"));
-                    List<Map<String, String>> hostStrlists = gson.fromJson(hostStr,
-                        new TypeToken<List<Map<String, String>>>() { }.getType());
-                    if (hostStrlists != null && hostStrlists.size() > 0) {
-                        for (Map<String, String> hostmap : hostStrlists) {
-                            if (unmountHostlists.contains(hostmap)) {
-                                hostlist.add(ToolUtils.getStr(hostmap.get("hostName")));
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            logger.error("vmware error:", e);
-            throw new VcenterException(e.getMessage());
-        }
-        return hostlist;
     }
 
     /**
@@ -870,6 +953,7 @@ public class VCSDKUtils {
             }
             if (!StringUtils.isEmpty(serverguid)) {
                 VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+
                 // 集群下的所有主机
                 if (!StringUtils.isEmpty(clusterObjectId)) {
                     ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(clusterObjectId);
@@ -900,6 +984,43 @@ public class VCSDKUtils {
     }
 
     /**
+     * 得到集群下所有没有挂载的主机 20200918objectId
+     *
+     * @param dataStoreObjectId dataStoreObjectId
+     * @param clusters clusters
+     * @return String
+     * @throws VcenterException VcenterException
+     */
+    public List<String> getUnmoutHostsOnCluster(String dataStoreObjectId, List<Map<String, String>> clusters)
+        throws VcenterException {
+        List<String> hostlist = null;
+        try {
+            String unmountHostStr = getHostsByDsObjectId(dataStoreObjectId);
+            List<Map<String, String>> unmountHostlists = gson.fromJson(unmountHostStr,
+                new TypeToken<List<Map<String, String>>>() { }.getType());
+            if (clusters != null && clusters.size() > 0) {
+                hostlist = new ArrayList<>();
+                for (Map<String, String> cluster : clusters) {
+                    String hostStr = getHostsOnCluster(cluster.get(CLUSTER_ID));
+                    List<Map<String, String>> hostStrlists = gson.fromJson(hostStr,
+                        new TypeToken<List<Map<String, String>>>() { }.getType());
+                    if (hostStrlists != null && hostStrlists.size() > 0) {
+                        for (Map<String, String> hostmap : hostStrlists) {
+                            if (unmountHostlists.contains(hostmap)) {
+                                hostlist.add(ToolUtils.getStr(hostmap.get(HOST_NAME)));
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("vmware error:", e);
+            throw new VcenterException(e.getMessage());
+        }
+        return hostlist;
+    }
+
+    /**
      * renameDataStore
      *
      * @param newName newName
@@ -907,7 +1028,7 @@ public class VCSDKUtils {
      * @return String
      */
     public String renameDataStore(String newName, String dataStoreObjectId) {
-        String result = "success";
+        String result = SUCCESS_RESULT;
         logger.info("==start rename DataStore==");
         try {
             String serverguid = vcConnectionHelpers.objectId2Serverguid(dataStoreObjectId);
@@ -917,7 +1038,7 @@ public class VCSDKUtils {
             dsMo.renameDatastore(newName);
             logger.info("==end rename DataStore==");
         } catch (Exception e) {
-            result = "failed";
+            result = FAILED_RESULT;
             logger.error("renameDataStore error:{}", e.getMessage());
         }
         return result;
@@ -932,7 +1053,7 @@ public class VCSDKUtils {
      * @return String
      */
     public String expandVmfsDatastore(String dsname, Integer addCapacity, String datastoreobjid) {
-        String result = "success";
+        String result = SUCCESS_RESULT;
         logger.info("==start expand DataStore==");
         try {
             ManagedObjectReference mor = null;
@@ -968,7 +1089,7 @@ public class VCSDKUtils {
                                 HostMO hostmo = hostVmwareFactory.build(vmwareContext, datastoreHostMount.getKey());
                                 hostmo.getHostStorageSystemMo().refreshStorageSystem();
                             }
-                            Thread.sleep(2000);
+                            Thread.sleep(THREAD_SLEEP_2_SECENDS);
                             host1.getHostDatastoreSystemMo().expandVmfsDatastore(dsMo, spec);
                         }
                     }
@@ -976,7 +1097,7 @@ public class VCSDKUtils {
             }
             logger.info("==end expand DataStore==");
         } catch (Exception e) {
-            result = "failed";
+            result = FAILED_RESULT;
             logger.error("expandVmfsDatastore error:{}", e.getMessage());
         }
         return result;
@@ -990,7 +1111,7 @@ public class VCSDKUtils {
      * @throws VcenterException VcenterException
      */
     public String recycleVmfsCapacity(String dsname) throws VcenterException {
-        String result = "success";
+        String result = SUCCESS_RESULT;
         List<String> uuids = new ArrayList<>();
         try {
             ManagedObjectReference mor = null;
@@ -1004,7 +1125,7 @@ public class VCSDKUtils {
                     for (Pair<ManagedObjectReference, String> host : hosts) {
                         host1 = hostVmwareFactory.build(vmwareContext, host.first());
                         hdsMo = host1.getHostDatastoreSystemMo();
-                        if (null != hdsMo.findDatastore(dsname)) {
+                        if (hdsMo.findDatastore(dsname) != null) {
                             mor = hdsMo.findDatastore(dsname);
                             break;
                         }
@@ -1072,7 +1193,7 @@ public class VCSDKUtils {
                 }
                 response = gson.toJson(dmeVmwareRelation);
             } else {
-                response = "failed";
+                response = FAILED_RESULT;
             }
             logger.info("end creat nfs datastore");
         } catch (Exception e) {
@@ -1178,14 +1299,14 @@ public class VCSDKUtils {
                             lunStr = gson.toJson(lunlist);
                         }
                     } else {
-                        throw new Exception("host:" + hostName + ",No available LUN。");
+                        throw new Exception("host " + hostName + " no available LUN。");
                     }
                 } else {
-                    throw new Exception("host:" + hostName + " non-existent。");
+                    throw new Exception("has not the host!host name is " + hostName);
                 }
             }
         } catch (Exception e) {
-            logger.error("host:" + hostName + " error:", e);
+            logger.error("getLunsOnHost error!hostName={},error:{}", hostName, e.getMessage());
             throw new VcenterException(e.getMessage());
         }
         return lunStr;
@@ -1209,23 +1330,20 @@ public class VCSDKUtils {
             VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
             ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
             HostMO hostMo = hostVmwareFactory.build(vmwareContext, objmor);
-            if (hostMo != null) {
-                // 在查找可用LUN前先扫描hba，已发现新的卷
-                List<String> devices = getHbaDeviceByHost(hostMo);
-                if (devices != null && devices.size() > 0) {
-                    for (String device : devices) {
-                        hostMo.getHostStorageSystemMo().rescanHba(device);
-                    }
+
+            // 在查找可用LUN前先扫描hba，已发现新的卷
+            List<String> devices = getHbaDeviceByHost(hostMo);
+            if (devices != null && devices.size() > 0) {
+                for (String device : devices) {
+                    hostMo.getHostStorageSystemMo().rescanHba(device);
                 }
-                HostDatastoreSystemMO hostDatastoreSystem = hostMo.getHostDatastoreSystemMo();
-                List<HostScsiDisk> hostScsiDisks = hostDatastoreSystem.queryAvailableDisksForVmfs();
-                candidateHostScsiDisk = getObjectLuns(hostScsiDisks, capacity, volumeWwn);
-                remap = new HashMap<>();
-                remap.put("host", hostMo);
-                remap.put("hostScsiDisk", candidateHostScsiDisk);
-            } else {
-                throw new Exception("host:" + hostObjectId + " non-existent。");
             }
+            HostDatastoreSystemMO hostDatastoreSystem = hostMo.getHostDatastoreSystemMo();
+            List<HostScsiDisk> hostScsiDisks = hostDatastoreSystem.queryAvailableDisksForVmfs();
+            candidateHostScsiDisk = getObjectLuns(hostScsiDisks, capacity, volumeWwn);
+            remap = new HashMap<>();
+            remap.put(HOST_FIELD, hostMo);
+            remap.put(HOST_SCSI_DISK, candidateHostScsiDisk);
         } catch (Exception e) {
             logger.error("host:{}, error:{}", hostObjectId, e.getMessage());
             throw new VcenterException(e.getMessage());
@@ -1315,8 +1433,8 @@ public class VCSDKUtils {
                 if (objHostScsiDisks.size() > 0) {
                     candidateHostScsiDisk = getObjectLuns(objHostScsiDisks, capacity, volumeWwn);
                     remap = new HashMap<>();
-                    remap.put("host", hostMap.get(candidateHostScsiDisk.getDevicePath()));
-                    remap.put("hostScsiDisk", candidateHostScsiDisk);
+                    remap.put(HOST_FIELD, hostMap.get(candidateHostScsiDisk.getDevicePath()));
+                    remap.put(HOST_SCSI_DISK, candidateHostScsiDisk);
                 } else {
                     throw new Exception("cluster:" + clusterObjectId + " non-existent LUN。");
                 }
@@ -1383,8 +1501,8 @@ public class VCSDKUtils {
         String dataStoreStr = "";
         try {
             if (hsdmap != null && hsdmap.get(DmeConstants.HOST) != null) {
-                HostScsiDisk objhsd = (HostScsiDisk) hsdmap.get("hostScsiDisk");
-                HostMO hostMo = (HostMO) hsdmap.get("host");
+                HostScsiDisk objhsd = (HostScsiDisk) hsdmap.get(HOST_SCSI_DISK);
+                HostMO hostMo = (HostMO) hsdmap.get(HOST_FIELD);
                 if (hostMo != null) {
                     if (objhsd != null) {
                         long totalSectors = capacity * 1L * ToolUtils.GI / objhsd.getCapacity().getBlockSize();
@@ -1402,12 +1520,12 @@ public class VCSDKUtils {
                             Map<String, Object> dataStoremap = new HashMap<>();
                             String objectId = vcConnectionHelpers.mor2ObjectId(dsMo.getMor(),
                                 dsMo.getContext().getServerAddress());
-                            dataStoremap.put("name", dsMo.getName());
-                            dataStoremap.put("id", dsMo.getMor().getValue());
-                            dataStoremap.put("objectId", objectId);
-                            dataStoremap.put("type", dsMo.getMor().getType());
-                            dataStoremap.put("capacity", dsMo.getSummary().getCapacity());
-                            dataStoremap.put("hostName", hostMo.getName());
+                            dataStoremap.put(NAME, dsMo.getName());
+                            dataStoremap.put(ID, dsMo.getMor().getValue());
+                            dataStoremap.put(OBJECT_ID, objectId);
+                            dataStoremap.put(TYPE, dsMo.getMor().getType());
+                            dataStoremap.put(CAPACITY, dsMo.getSummary().getCapacity());
+                            dataStoremap.put(HOST_NAME, hostMo.getName());
                             dataStoreStr = gson.toJson(dataStoremap);
                         }
                     } else {
@@ -1440,21 +1558,21 @@ public class VCSDKUtils {
         String attachTagStr = "";
         if (vcenterinfo == null || StringUtils.isEmpty(vcenterinfo.getHostIp())) {
             logger.error("vCenter Info is null");
-            return null;
+            return attachTagStr;
         }
         SessionHelper sessionHelper = null;
         try {
             if (StringUtils.isEmpty(datastoreType)) {
                 logger.info("DataStore Type is null,unable tag。");
-                return null;
+                return attachTagStr;
             }
             if (StringUtils.isEmpty(datastoreId)) {
                 logger.info("DataStore Id is null,unable tag。");
-                return null;
+                return attachTagStr;
             }
             if (StringUtils.isEmpty(serviceLevelName)) {
                 logger.info("Service Level Name is null,unable tag。");
-                return null;
+                return attachTagStr;
             }
             sessionHelper = sessionHelperFactory.build();
             sessionHelper.login(vcenterinfo.getHostIp(), String.valueOf(vcenterinfo.getHostPort()),
@@ -1467,13 +1585,13 @@ public class VCSDKUtils {
                 if (tagModel.getName().equals(serviceLevelName)) {
                     DynamicID objDynamicId = new DynamicID(datastoreType, datastoreId);
                     taggingWorkflow.attachTag(tagid, objDynamicId);
-                    logger.info("Service Level:" + serviceLevelName + " Associated");
+                    logger.info("Service Level:{} Associated", serviceLevelName);
                     attachTagStr = "Associated";
                     break;
                 }
             }
         } catch (Exception e) {
-            logger.error("DataStore:" + datastoreId + " error:", e);
+            logger.error("attachTag error!datastoreId={},error:", datastoreId, e.getMessage());
         } finally {
             if (sessionHelper != null) {
                 sessionHelper.logout();
@@ -1524,62 +1642,63 @@ public class VCSDKUtils {
      **/
     public void mountVmfsOnCluster(String datastoreStr, String clusterObjectId, String hostObjectId)
         throws VcenterException {
+        if (StringUtils.isEmpty(datastoreStr)) {
+            logger.info("datastoreStr is null");
+            return;
+        }
+        if (StringUtils.isEmpty(hostObjectId) && StringUtils.isEmpty(clusterObjectId)) {
+            logger.info("host:{} and cluster:{} is null", hostObjectId, clusterObjectId);
+            return;
+        }
+        Map<String, Object> dsmap = gson.fromJson(datastoreStr, new TypeToken<Map<String, Object>>() { }.getType());
+        String objHostName = "";
+        String objDataStoreName = "";
+        if (dsmap != null) {
+            objHostName = ToolUtils.getStr(dsmap.get(HOST_NAME));
+            objHostName = objHostName == null ? "" : objHostName;
+            objDataStoreName = ToolUtils.getStr(dsmap.get(NAME));
+        }
         try {
-            if (StringUtils.isEmpty(datastoreStr)) {
-                logger.info("datastoreStr is null");
-                return;
-            }
-            if (StringUtils.isEmpty(hostObjectId) && StringUtils.isEmpty(clusterObjectId)) {
-                logger.info("host:{} and cluster:{} is null", hostObjectId, clusterObjectId);
-                return;
-            }
-            Map<String, Object> dsmap = gson.fromJson(datastoreStr, new TypeToken<Map<String, Object>>() { }.getType());
-            String objHostName = "";
-            String objDataStoreName = "";
-            if (dsmap != null) {
-                objHostName = ToolUtils.getStr(dsmap.get("hostName"));
-                objHostName = objHostName == null ? "" : objHostName;
-                objDataStoreName = ToolUtils.getStr(dsmap.get("name"));
-            }
-
             String serverguid = null;
             if (!StringUtils.isEmpty(clusterObjectId)) {
                 serverguid = vcConnectionHelpers.objectId2Serverguid(clusterObjectId);
             } else if (!StringUtils.isEmpty(hostObjectId)) {
                 serverguid = vcConnectionHelpers.objectId2Serverguid(hostObjectId);
             }
-            if (!StringUtils.isEmpty(serverguid)) {
-                VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
-                if (!StringUtils.isEmpty(clusterObjectId)) {
-                    // 集群下的所有主机
-                    List<Pair<ManagedObjectReference, String>> hosts = getHostsOnCluster(clusterObjectId, hostObjectId);
-                    if (hosts != null && hosts.size() > 0) {
-                        for (Pair<ManagedObjectReference, String> host : hosts) {
-                            try {
-                                HostMO host1 = hostVmwareFactory.build(vmwareContext, host.first());
-                                logger.info("Host under Cluster: {}", host1.getName());
+            if (StringUtils.isEmpty(serverguid)) {
+                logger.error("mountVmfsOnCluster serverguid is null");
+                throw new VcenterException("mount vmfs on cluster error!serverguid is null");
+            }
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            if (!StringUtils.isEmpty(clusterObjectId)) {
+                // 集群下的所有主机
+                List<Pair<ManagedObjectReference, String>> hosts = getHostsOnCluster(clusterObjectId, hostObjectId);
+                if (hosts != null && hosts.size() > 0) {
+                    for (Pair<ManagedObjectReference, String> host : hosts) {
+                        try {
+                            HostMO host1 = hostVmwareFactory.build(vmwareContext, host.first());
+                            logger.info("Host under Cluster: {}", host1.getName());
 
-                                // 只挂载其它的主机
-                                if (host1 != null && !objHostName.equals(host1.getName())) {
-                                    mountVmfs(objDataStoreName, host1);
-                                }
-                            } catch (Exception e) {
-                                logger.error("mount Vmfs On Cluster error:{}", e.getMessage());
+                            // 只挂载其它的主机
+                            if (host1 != null && !objHostName.equals(host1.getName())) {
+                                mountVmfs(objDataStoreName, host1);
                             }
+                        } catch (Exception e) {
+                            logger.error("mount Vmfs On Cluster error:{}", e.getMessage());
                         }
                     }
-                } else if (!StringUtils.isEmpty(hostObjectId)) {
-                    try {
-                        ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
-                        HostMO hostmo = hostVmwareFactory.build(vmwareContext, objmor);
+                }
+            } else if (!StringUtils.isEmpty(hostObjectId)) {
+                try {
+                    ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
+                    HostMO hostmo = hostVmwareFactory.build(vmwareContext, objmor);
 
-                        // 只挂载其它的主机
-                        if (hostmo != null && !objHostName.equals(hostmo.getName())) {
-                            mountVmfs(objDataStoreName, hostmo);
-                        }
-                    } catch (Exception e) {
-                        logger.error("mount Vmfs On Cluster error:{}", e.getMessage());
+                    // 只挂载其它的主机
+                    if (hostmo != null && !objHostName.equals(hostmo.getName())) {
+                        mountVmfs(objDataStoreName, hostmo);
                     }
+                } catch (Exception e) {
+                    logger.error("mount Vmfs On Cluster error:{}", e.getMessage());
                 }
             }
         } catch (Exception e) {
@@ -1611,9 +1730,9 @@ public class VCSDKUtils {
             String objHostName = "";
             String objDataStoreName = "";
             if (dsmap != null) {
-                objHostName = ToolUtils.getStr(dsmap.get("hostName"));
+                objHostName = ToolUtils.getStr(dsmap.get(HOST_NAME));
                 objHostName = objHostName == null ? "" : objHostName;
-                objDataStoreName = ToolUtils.getStr(dsmap.get("name"));
+                objDataStoreName = ToolUtils.getStr(dsmap.get(NAME));
             }
             String serverguid = null;
             if (!StringUtils.isEmpty(clusterObjectId)) {
@@ -1626,18 +1745,19 @@ public class VCSDKUtils {
                 if (!StringUtils.isEmpty(clusterObjectId)) {
                     // 集群下的所有主机
                     List<Pair<ManagedObjectReference, String>> hosts = getHostsOnCluster(clusterObjectId, hostObjectId);
-                    if (hosts != null && hosts.size() > 0) {
-                        for (Pair<ManagedObjectReference, String> host : hosts) {
-                            try {
-                                HostMO host1 = hostVmwareFactory.build(vmwareContext, host.first());
+                    if (hosts == null && hosts.size() == 0) {
+                        return;
+                    }
+                    for (Pair<ManagedObjectReference, String> host : hosts) {
+                        try {
+                            HostMO host1 = hostVmwareFactory.build(vmwareContext, host.first());
 
-                                // 从挂载的主机卸载
-                                if (host1 != null && objHostName.equals(host1.getName())) {
-                                    unmountVmfs(objDataStoreName, host1);
-                                }
-                            } catch (Exception e) {
-                                logger.error("unmount Vmfs On Cluster error:", e);
+                            // 从挂载的主机卸载
+                            if (host1 != null && objHostName.equals(host1.getName())) {
+                                unmountVmfs(objDataStoreName, host1);
                             }
+                        } catch (Exception e) {
+                            logger.error("unmount Vmfs On Cluster error:", e);
                         }
                     }
                 } else if (!StringUtils.isEmpty(hostObjectId)) {
@@ -1680,6 +1800,7 @@ public class VCSDKUtils {
 
             // 挂载前重新扫描datastore
             hostMo.getHostStorageSystemMo().refreshStorageSystem();
+
             // 查询目前未挂载的卷
             for (HostFileSystemMountInfo mount : hostMo.getHostStorageSystemMo()
                 .getHostFileSystemVolumeInfo()
@@ -1689,11 +1810,11 @@ public class VCSDKUtils {
 
                     // 挂载卷
                     hostMo.getHostStorageSystemMo().mountVmfsVolume(volume.getUuid());
-                    logger.info("mount Vmfs success:" + volume.getName() + " : " + hostMo.getName());
+                    logger.info("mount Vmfs success!");
                 }
             }
         } catch (Exception e) {
-            logger.error(" mount Vmfs Volume:" + datastoreName + "  error:" + e.toString());
+            logger.error(" mount vmfs volume error!datastoreName={},error:{}", datastoreName, e.getMessage());
         }
     }
 
@@ -1759,7 +1880,7 @@ public class VCSDKUtils {
                                 logger.info("Host under Cluster: {}", host1.getName());
                                 host1.getHostStorageSystemMo().rescanVmfs();
                             } catch (Exception ex) {
-                                logger.error("under Cluster scan Data Store error:" + ex.toString());
+                                logger.error("under Cluster scan Data Store error:{}", ex.getMessage());
                             }
                         }
                     }
@@ -1769,7 +1890,7 @@ public class VCSDKUtils {
                         HostMO hostmo = hostVmwareFactory.build(vmwareContext, objmor);
                         hostmo.getHostStorageSystemMo().rescanVmfs();
                     } catch (Exception ex) {
-                        logger.error("scan Data Store error:" + ex.toString());
+                        logger.error("scan Data Store error:{}", ex.getMessage());
                     }
                 }
             }
@@ -1796,10 +1917,10 @@ public class VCSDKUtils {
             ManagedObjectReference dsmor = vcConnectionHelpers.objectId2Mor(dataStoreObjectId);
             DatastoreMO datastoreMo = datastoreVmwareMoFactory.build(vmwareContext, dsmor);
             String vmdkDatastorePath = String.format("[%s]", datastoreMo.getName());
-            VirtualMachineMO virtualMachineMo = virtualMachineMOFactory.build(vmwareContext,
+            VirtualMachineMO virtualMachineMo = virtualMachineMoFactorys.build(vmwareContext,
                 vcConnectionHelpers.objectId2Mor(vmObjectId));
             virtualMachineMo.createDisk(vmdkDatastorePath, VirtualDiskType.RDM, VirtualDiskMode.PERSISTENT,
-                rdmDeviceName, size * 1024, datastoreMo.getMor(), -1);
+                rdmDeviceName, size * DIGIT_1024, datastoreMo.getMor(), -1);
         } catch (Exception e) {
             throw new VcenterException(e.getMessage());
         }
@@ -1810,7 +1931,7 @@ public class VCSDKUtils {
         try {
             String serverguid = vcConnectionHelpers.objectId2Serverguid(vmObjectId);
             VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
-            VirtualMachineMO virtualMachineMo = virtualMachineMOFactory.build(vmwareContext,
+            VirtualMachineMO virtualMachineMo = virtualMachineMoFactorys.build(vmwareContext,
                 vcConnectionHelpers.objectId2Mor(vmObjectId));
             HostMO hostMo = virtualMachineMo.getRunningHost();
             List<Pair<ManagedObjectReference, String>> datastoreMountsOnHost = hostMo.getDatastoreMountsOnHost();
@@ -1821,7 +1942,7 @@ public class VCSDKUtils {
                 DatastoreSummary summary = datastoreMo.getSummary();
                 if (summary.getType().equals(DmeConstants.STORE_TYPE_VMFS)) {
                     JsonObject jsonObject = gson.fromJson(gson.toJson(summary), JsonObject.class);
-                    jsonObject.addProperty("objectId", objectId);
+                    jsonObject.addProperty(OBJECT_ID, objectId);
                     list.add(jsonObject);
                 }
             }
@@ -1877,6 +1998,39 @@ public class VCSDKUtils {
         }
     }
 
+    /**
+     * 卸载Nfs存储
+     *
+     * @param dsmo dsmo
+     * @param hostMo hostMo
+     * @param nfsId nfsId
+     */
+    public void unmountNfsOnHost(DatastoreMO dsmo, HostMO hostMo, String nfsId) {
+        try {
+            if (dsmo == null) {
+                logger.info("datastore is null");
+                return;
+            }
+            if (hostMo == null) {
+                logger.info("host is null");
+                return;
+            }
+
+            // 卸载前重新扫描datastore
+            hostMo.getHostStorageSystemMo().refreshStorageSystem();
+            logger.info("Rescan datastore before unmounting");
+
+            // 从主机卸载datastore
+            String dsName = dsmo.getName();
+            hostMo.getHostDatastoreSystemMo().deleteDatastore(dsName);
+
+            // 卸载NFS,hostMo.unmountDatastore(nfsId);
+            logger.info("unmount nfs success:hostName={},datastore name={}", hostMo.getName(), dsmo.getName());
+        } catch (Exception e) {
+            logger.error("unmount nfs error:{}", e.getMessage());
+        }
+    }
+
     public void unmountNfsOnHost(String dataStoreObjectId, String hostObjId) throws VcenterException {
         try {
             if (StringUtils.isEmpty(dataStoreObjectId)) {
@@ -1905,11 +2059,11 @@ public class VCSDKUtils {
     public void unmountNfsOnCluster(String dataStoreObjectId, String clusterId) throws VcenterException {
         try {
             if (StringUtils.isEmpty(dataStoreObjectId)) {
-                logger.info("dataStore object id:" + dataStoreObjectId + " is null");
+                logger.info("unmountNfsOnCluster dataStore object id is null");
                 return;
             }
             if (StringUtils.isEmpty(clusterId)) {
-                logger.info("host:" + clusterId + " is null");
+                logger.info("unmountNfsOnCluster clusterId is null");
                 return;
             }
 
@@ -1933,39 +2087,6 @@ public class VCSDKUtils {
      * 卸载Nfs存储
      *
      * @param dsmo dsmo
-     * @param hostMo hostMo
-     * @param nfsId nfsId
-     */
-    public void unmountNfsOnHost(DatastoreMO dsmo, HostMO hostMo, String nfsId) {
-        try {
-            if (dsmo == null) {
-                logger.info("datastore is null");
-                return;
-            }
-            if (hostMo == null) {
-                logger.info("host is null");
-                return;
-            }
-            logger.info("Hosts that need to be unmounted:{}", hostMo.getName());
-            // 卸载前重新扫描datastore
-            hostMo.getHostStorageSystemMo().refreshStorageSystem();
-            logger.info("Rescan datastore before unmounting");
-
-            // 从主机卸载datastore
-            String dsName = dsmo.getName();
-            hostMo.getHostDatastoreSystemMo().deleteDatastore(dsName);
-
-            // 卸载NFS,hostMo.unmountDatastore(nfsId);
-            logger.info("unmount nfs success:hostName={},datastore name={}", hostMo.getName(), dsmo.getName());
-        } catch (Exception e) {
-            logger.error("unmount nfs error:{}", e.getMessage());
-        }
-    }
-
-    /**
-     * 卸载Nfs存储
-     *
-     * @param dsmo dsmo
      * @param clusterMo clusterMo
      * @param nfsId nfsId
      **/
@@ -1979,8 +2100,8 @@ public class VCSDKUtils {
                 logger.info("cluster is null");
                 return;
             }
-
             logger.info("Hosts that need to be unmounted:{}", clusterMo.getName());
+
             // 卸载前重新扫描datastore hostMo.getHostStorageSystemMo().rescanVmfs();
             logger.info("Rescan datastore before unmounting");
 
@@ -2022,7 +2143,7 @@ public class VCSDKUtils {
                         for (HostVirtualNic subnic : subnics) {
                             if (nic.getSelectedVnic().contains(subnic.getKey())) {
                                 Map<String, Object> map = new HashMap<>();
-                                map.put("device", subnic.getDevice());
+                                map.put(DEVICE_FIELD, subnic.getDevice());
                                 map.put("key", subnic.getKey());
                                 map.put("portgroup", subnic.getPortgroup());
                                 map.put("ipAddress", subnic.getSpec().getIp().getIpAddress());
@@ -2099,7 +2220,7 @@ public class VCSDKUtils {
     public String getCategoryId(SessionHelper sessionHelper) {
         String categoryid = "";
 
-        // TaggingWorkflow taggingWorkflow = new TaggingWorkflow(sessionHelper);
+        // TaggingWorkflow taggingWorkflow = new TaggingWorkflow(sessionHelper)
         TaggingWorkflow taggingWorkflow = taggingWorkflowFactory.build(sessionHelper);
         List<String> categorylist = taggingWorkflow.listTagCategory();
         for (String category : categorylist) {
@@ -2113,9 +2234,7 @@ public class VCSDKUtils {
             CategoryTypes.CreateSpec createSpec = new CategoryTypes.CreateSpec();
             createSpec.setName(CATEGORY_NAME);
             createSpec.setDescription(CATEGORY_NAME);
-
             createSpec.setCardinality(CategoryModel.Cardinality.SINGLE);
-
             Set<String> associableTypes = new HashSet<>();
             associableTypes.add("Datastore");
             createSpec.setAssociableTypes(associableTypes);
@@ -2155,7 +2274,7 @@ public class VCSDKUtils {
         List<PbmCapabilityPropertyMetadata> propMetaList = tagCategoryInfo.getPropertyMetadata();
         PbmCapabilityPropertyMetadata propMeta = propMetaList.get(0);
 
-        // Create a New Property Instance based on the Tag Category Id
+        // Create aa New Property Instance based on the Tag Category Id
         PbmCapabilityPropertyInstance prop = new PbmCapabilityPropertyInstance();
         prop.setId(propMeta.getId());
         PbmCapabilityDiscreteSet tagSetMeta = (PbmCapabilityDiscreteSet) propMeta.getAllowedValue();
@@ -2164,7 +2283,7 @@ public class VCSDKUtils {
                 "Specified Tag Category '" + categoryName + "' does not have any associated tags", null);
         }
 
-        // Create a New Discrete Set for holding Tag Values
+        // Create aa New Discrete Set for holding Tag Values
         PbmCapabilityDiscreteSet tagSet = new PbmCapabilityDiscreteSet();
         for (Object obj : tagSetMeta.getValues()) {
             if (tagName.equalsIgnoreCase(((PbmCapabilityDescription) obj).getValue().toString())) {
@@ -2173,16 +2292,16 @@ public class VCSDKUtils {
         }
         prop.setValue(tagSet);
 
-        // Step 2: Associate Property Instance with a Rule
+        // Step 2: Associate Property Instance with aa Rule
         PbmCapabilityConstraintInstance rule = new PbmCapabilityConstraintInstance();
         rule.getPropertyInstance().add(prop);
 
-        // Step 3: Associate Rule with a Capability Instance
+        // Step 3: Associate Rule with aa Capability Instance
         PbmCapabilityInstance capability = new PbmCapabilityInstance();
         capability.setId(tagCategoryInfo.getId());
         capability.getConstraint().add(rule);
 
-        // Step 4: Add Rule to a RuleSet
+        // Step 4: Add Rule to an RuleSet
         PbmCapabilitySubProfile ruleSet = new PbmCapabilitySubProfile();
         ruleSet.getCapability().add(capability);
 
@@ -2215,7 +2334,6 @@ public class VCSDKUtils {
             pbmProfileIds.add(profile.getProfileId());
         }
         if (pbmProfileIds.size() > 0) {
-            // Get PBM Profile Manager & Associated Capability Metadata
             PbmServiceInstanceContent spbmsc = vmwareContext.getPbmServiceContent();
             ManagedObjectReference profileMgr = spbmsc.getProfileManager();
             vmwareContext.getPbmService().pbmDelete(profileMgr, pbmProfileIds);
@@ -2316,16 +2434,16 @@ public class VCSDKUtils {
                 throw new Exception("configure Iscsi error:vmKernel is null.");
             }
             if (hostmo == null) {
-                logger.error("configure Iscsi error:host is null.");
-                throw new Exception("configure Iscsi error:host is null.");
+                logger.error("boundVmKernel:host is null.");
+                throw new Exception("host is null.");
             }
             if (StringUtils.isEmpty(iscsiHbaDevice)) {
-                logger.error("find iscsi Hba Device error:No iSCSI adapter found");
-                throw new Exception("find iscsi Hba Device error:No iSCSI adapter found");
+                logger.error("boundVmKernel param iscsiHbaDevice is null!");
+                throw new Exception("boundVmKernel param iscsiHbaDevice is null!");
             }
 
             // 得到vmKernel适配器
-            String vmKernelDevice = ToolUtils.getStr(vmKernel.get("device"));
+            String vmKernelDevice = ToolUtils.getStr(vmKernel.get(DEVICE_FIELD));
             if (StringUtils.isEmpty(vmKernelDevice)) {
                 logger.error("find vmKernel Device error:No vmKernel adapter found");
                 throw new Exception("find vmKernel Device error:No vmKernel adapter found");
@@ -2417,6 +2535,7 @@ public class VCSDKUtils {
         String serverguid = vcConnectionHelpers.objectId2Serverguid(dataStoreObjectId);
         try {
             VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+
             // 存储下的所有主机
             ManagedObjectReference dsmor = vcConnectionHelpers.objectId2Mor(dataStoreObjectId);
             DatastoreMO dsmo = datastoreVmwareMoFactory.build(vmwareContext, dsmor);
@@ -2446,103 +2565,42 @@ public class VCSDKUtils {
             hostName = hostMo.getName();
             logger.info("mount nfs success!host name={}, datastore name={}", hostMo.getName(), dsmo.getName());
         } catch (Exception e) {
-            logger.error("delete nfs error from host, hostId:" + hostName, e);
+            logger.error("delete nfs error from host, hostName={},error:{}", hostName, e.getMessage());
         }
     }
 
     /**
-     * 得到所有主机的ID与name, boolean mount 是否已经挂载了当前存储的主机
-     **/
-    public String getHostsByDsObjectId(String dataStoreObjectId, boolean mount) throws VcenterException {
-        String listStr = "";
-        try {
-            // 得到当前的context
-            String serverguid = vcConnectionHelpers.objectId2Serverguid(dataStoreObjectId);
-            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
-            RootFsMO rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
-            ManagedObjectReference dsmor = vcConnectionHelpers.objectId2Mor(dataStoreObjectId);
-
-            // 取得该存储下所有已经挂载的主机ID
-            List<String> mounthostids = new ArrayList<>();
-            DatastoreMO dsmo = datastoreVmwareMoFactory.build(vmwareContext, dsmor);
-            if (dsmo != null) {
-                List<DatastoreHostMount> dhms = dsmo.getHostMounts();
-                if (dhms != null && dhms.size() > 0) {
-                    for (DatastoreHostMount dhm : dhms) {
-                        if (dhm != null) {
-                            if (dhm.getMountInfo() != null && dhm.getMountInfo().isMounted()) {
-                                mounthostids.add(dhm.getKey().getValue());
-                            }
-                        }
-                    }
-                }
-            }
-            // 取得所有主机，并通过mounthostids进行过滤，过滤掉已经挂载的主机
-            List<Pair<ManagedObjectReference, String>> hosts = rootFsMo.getAllHostOnRootFs();
-            if (hosts != null && hosts.size() > 0) {
-                List<Map<String, String>> lists = new ArrayList<>();
-                for (Pair<ManagedObjectReference, String> host : hosts) {
-                    HostMO host1 = hostVmwareFactory.build(vmwareContext, host.first());
-                    if (mount) {
-                        if (mounthostids.contains(host1.getMor().getValue())) {
-                            Map<String, String> map = new HashMap<>();
-                            String objectId = vcConnectionHelpers.mor2ObjectId(host1.getMor(),
-                                vmwareContext.getServerAddress());
-                            map.put("hostId", objectId);
-                            map.put("hostName", host1.getName());
-                            lists.add(map);
-                        }
-                    } else {
-                        if (!mounthostids.contains(host1.getMor().getValue())) {
-                            Map<String, String> map = new HashMap<>();
-                            String objectId = vcConnectionHelpers.mor2ObjectId(host1.getMor(),
-                                vmwareContext.getServerAddress());
-                            map.put("hostId", objectId);
-                            map.put("hostName", host1.getName());
-                            lists.add(map);
-                        }
-                    }
-                }
-                if (lists.size() > 0) {
-                    listStr = gson.toJson(lists);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("vmware error:", e);
-            throw new VcenterException(e.getMessage());
-        }
-        return listStr;
-    }
-
-    /**
-     * 得到Hba信息
-     **/
+     * 通过主机ID得到主机的hba
+     *
+     * @param hostObjectId hostObjectId
+     * @return List
+     * @throws VcenterException VcenterException
+     */
     public Map<String, Object> getHbaByHostObjectId(String hostObjectId) throws VcenterException {
         Map<String, Object> map = new HashMap<>();
         try {
             if (StringUtils.isEmpty(hostObjectId)) {
-                logger.error("get Hba error:host ObjectId is null.");
-                throw new Exception("get Hba error:host ObjectId is null.");
+                logger.error("get Hba by host id error:host ObjectId is null.");
+                throw new Exception("get Hba by host id error:host ObjectId is null.");
             }
-
             String serverguid = vcConnectionHelpers.objectId2Serverguid(hostObjectId);
             VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
 
             // 取得该存储下所有已经挂载的主机ID
             ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
             HostMO hostmo = hostVmwareFactory.build(vmwareContext, objmor);
+
             // 查找对应的iscsi适配器
             List<HostHostBusAdapter> hbas = hostmo.getHostStorageSystemMo().getStorageDeviceInfo().getHostBusAdapter();
             for (HostHostBusAdapter hba : hbas) {
                 if (hba instanceof HostInternetScsiHba) {
                     HostInternetScsiHba iscsiHba = (HostInternetScsiHba) hba;
-                    map.put("type", "ISCSI");
-                    map.put("name", iscsiHba.getIScsiName());
+                    map.put(TYPE, ISCSI_TYPE);
+                    map.put(NAME, iscsiHba.getIScsiName());
                 } else if (hba instanceof HostFibreChannelHba) {
                     HostFibreChannelHba fcHba = (HostFibreChannelHba) hba;
-                    map.put("type", "FC");
-                    map.put("name", fcHba.getNodeWorldWideName());
+                    map.put(TYPE, FC_TYPE);
+                    map.put(NAME, fcHba.getNodeWorldWideName());
                 }
             }
         } catch (Exception e) {
@@ -2553,8 +2611,12 @@ public class VCSDKUtils {
     }
 
     /**
-     * 得到主机的hba
-     **/
+     * 通过主机ID得到主机的hba
+     *
+     * @param hostObjectId hostObjectId
+     * @return List
+     * @throws VcenterException VcenterException
+     */
     public List<Map<String, Object>> getHbasByHostObjectId(String hostObjectId) throws VcenterException {
         List<Map<String, Object>> hbalist = new ArrayList<>();
         try {
@@ -2562,27 +2624,27 @@ public class VCSDKUtils {
                 logger.error("get Hba error:host ObjectId is null.");
                 throw new Exception("get Hba error:host ObjectId is null.");
             }
-
             String serverguid = vcConnectionHelpers.objectId2Serverguid(hostObjectId);
             VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
 
             // 取得该存储下所有已经挂载的主机ID
             ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
             HostMO hostmo = hostVmwareFactory.build(vmwareContext, objmor);
+
             // 查找对应的iscsi适配器
             List<HostHostBusAdapter> hbas = hostmo.getHostStorageSystemMo().getStorageDeviceInfo().getHostBusAdapter();
             for (HostHostBusAdapter hba : hbas) {
                 if (hba instanceof HostInternetScsiHba) {
                     Map<String, Object> map = new HashMap<>();
                     HostInternetScsiHba iscsiHba = (HostInternetScsiHba) hba;
-                    map.put("type", "ISCSI");
-                    map.put("name", iscsiHba.getIScsiName());
+                    map.put(TYPE, ISCSI_TYPE);
+                    map.put(NAME, iscsiHba.getIScsiName());
                     hbalist.add(map);
                 } else if (hba instanceof HostFibreChannelHba) {
                     Map<String, Object> map = new HashMap<>();
                     HostFibreChannelHba fcHba = (HostFibreChannelHba) hba;
-                    map.put("type", "FC");
-                    map.put("name", fcHba.getNodeWorldWideName());
+                    map.put(TYPE, FC_TYPE);
+                    map.put(NAME, fcHba.getNodeWorldWideName());
                     hbalist.add(map);
                 }
             }
@@ -2594,8 +2656,12 @@ public class VCSDKUtils {
     }
 
     /**
-     * 得到主机的hba
-     **/
+     * 通过集群ID得到主机的hba
+     *
+     * @param clusterObjectId clusterObjectId
+     * @return List
+     * @throws VcenterException VcenterException
+     */
     public List<Map<String, Object>> getHbasByClusterObjectId(String clusterObjectId) throws VcenterException {
         List<Map<String, Object>> hbalist = new ArrayList<>();
         try {
@@ -2603,7 +2669,6 @@ public class VCSDKUtils {
                 logger.error("get Hba error:cluster ObjectId is null.");
                 throw new Exception("get Hba error:cluster ObjectId is null.");
             }
-
             String serverguid = vcConnectionHelpers.objectId2Serverguid(clusterObjectId);
             VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
 
@@ -2622,14 +2687,14 @@ public class VCSDKUtils {
                         if (hba instanceof HostInternetScsiHba) {
                             Map<String, Object> map = new HashMap<>();
                             HostInternetScsiHba iscsiHba = (HostInternetScsiHba) hba;
-                            map.put("type", "ISCSI");
-                            map.put("name", iscsiHba.getIScsiName());
+                            map.put(TYPE, ISCSI_TYPE);
+                            map.put(NAME, iscsiHba.getIScsiName());
                             subhbalist.add(map);
                         } else if (hba instanceof HostFibreChannelHba) {
                             Map<String, Object> map = new HashMap<>();
                             HostFibreChannelHba fcHba = (HostFibreChannelHba) hba;
-                            map.put("type", "FC");
-                            map.put("name", fcHba.getNodeWorldWideName());
+                            map.put(TYPE, FC_TYPE);
+                            map.put(NAME, fcHba.getNodeWorldWideName());
                             subhbalist.add(map);
                         }
                     }
@@ -2647,27 +2712,34 @@ public class VCSDKUtils {
 
     /**
      * 使用主机测试目标机的连通性
-     **/
+     *
+     * @param hostObjectId hostObjectId
+     * @param ethPorts ethPorts
+     * @param vmKernel vmKernel
+     * @param vcenterinfo vCenterInfo
+     * @return String
+     * @throws VcenterException VcenterException
+     */
     public String testConnectivity(String hostObjectId, List<Map<String, Object>> ethPorts,
-        Map<String, String> vmKernel, VCenterInfo vCenterInfo) throws VcenterException {
+        Map<String, String> vmKernel, VCenterInfo vcenterinfo) {
         String reStr = null;
         if (StringUtils.isEmpty(hostObjectId)) {
             logger.error("host object id is null");
-            return null;
+            return reStr;
         }
         if (ethPorts == null || ethPorts.size() == 0) {
             logger.error("ethPorts is null");
-            return null;
+            return reStr;
         }
-        if (vCenterInfo == null || StringUtils.isEmpty(vCenterInfo.getHostIp())) {
+        if (vcenterinfo == null || StringUtils.isEmpty(vcenterinfo.getHostIp())) {
             logger.error("vCenter Info is null");
-            return null;
+            return reStr;
         }
         Client vmomiClient = null;
         SessionManager sessionManager = null;
         try {
             HttpConfiguration httpConfig = new HttpConfigurationImpl();
-            httpConfig.setTimeoutMs(3000);
+            httpConfig.setTimeoutMs(TEST_CONNECTIVITY_TIMEOUT);
             httpConfig.setThumbprintVerifier(new AllowAllThumbprintVerifier());
 
             HttpClientConfiguration clientConfig = HttpClientConfiguration.Factory.newInstance();
@@ -2678,15 +2750,16 @@ public class VCSDKUtils {
                     context.loadVmodlPackages(new String[] {"com.vmware.vim.binding.vmodl.reflect"});
                 }
             } catch (Exception e) {
-                logger.error("context is not ready", e);
+                logger.error("context is not ready!{}", e.getMessage());
             }
             if (context == null) {
                 context = VmodlContext.initContext(
                     new String[] {"com.vmware.vim.binding.vim", "com.vmware.vim.binding.vmodl.reflect"});
             }
-            logger.info("vcenter info==" + gson.toJson(vCenterInfo));
+
+            logger.info("vcenter info=={}", gson.toJson(vcenterinfo));
             vmomiClient = Client.Factory.createClient(
-                new URI("https:// " + vCenterInfo.getHostIp() + ":" + vCenterInfo.getHostPort() + "/sdk"), VERSION,
+                new URI("https:// " + vcenterinfo.getHostIp() + ":" + vcenterinfo.getHostPort() + "/sdk"), VERSION,
                 context, clientConfig);
             com.vmware.vim.binding.vmodl.ManagedObjectReference svcRef
                 = new com.vmware.vim.binding.vmodl.ManagedObjectReference();
@@ -2696,7 +2769,7 @@ public class VCSDKUtils {
             ServiceInstanceContent serviceInstanceContent = instance.retrieveContent();
 
             sessionManager = vmomiClient.createStub(SessionManager.class, serviceInstanceContent.getSessionManager());
-            sessionManager.login(vCenterInfo.getUserName(), CipherUtils.decryptString(vCenterInfo.getPassword()), "en");
+            sessionManager.login(vcenterinfo.getUserName(), CipherUtils.decryptString(vcenterinfo.getPassword()), "en");
             ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
             com.vmware.vim.binding.vmodl.ManagedObjectReference hostmor
                 = new com.vmware.vim.binding.vmodl.ManagedObjectReference();
@@ -2711,12 +2784,14 @@ public class VCSDKUtils {
             if (ethPorts != null && ethPorts.size() > 0) {
                 String device = null;
                 if (vmKernel != null) {
-                    device = ToolUtils.getStr(vmKernel.get("device"));
+                    device = ToolUtils.getStr(vmKernel.get(DEVICE_FIELD));
                 }
 
                 List<Map<String, Object>> reEthPorts = new ArrayList<>();
-                ExecutorService taskExecutor = Executors.newFixedThreadPool(5);
-                final CountDownLatch latch = new CountDownLatch(ethPorts.size());// 用于判断所有的线程是否结束
+                ExecutorService taskExecutor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+
+                // 用于判断所有的线程是否结束
+                final CountDownLatch latch = new CountDownLatch(ethPorts.size());
                 for (Map<String, Object> ethPort : ethPorts) {
                     final String deviceFinal = device;
                     Runnable run = new Runnable() {
@@ -2728,10 +2803,11 @@ public class VCSDKUtils {
                                     try {
                                         ManagedMethodExecuter.SoapArgument soapArgument0
                                             = new ManagedMethodExecuter.SoapArgument();
-                                        soapArgument0.setName("host");
+                                        soapArgument0.setName(HOST_FIELD);
                                         soapArgument0.setVal(
-                                            "<host xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" xmlns=\"urn:vim25\">"
-                                                + mgmtIp + "</host>");
+                                            "<host xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
+                                                + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" "
+                                                + "xmlns=\"urn:vim25\">" + mgmtIp + "</host>");
                                         List<ManagedMethodExecuter.SoapArgument> soapArgumentList = new ArrayList<>();
                                         soapArgumentList.add(soapArgument0);
 
@@ -2740,8 +2816,9 @@ public class VCSDKUtils {
                                                 = new ManagedMethodExecuter.SoapArgument();
                                             soapArgument1.setName("interface");
                                             soapArgument1.setVal(
-                                                "<interface xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\" xmlns=\"urn:vim25\">"
-                                                    + deviceFinal + "</interface>");
+                                                "<interface xmlns:xsi=\"http:// www.w3.org/2001/XMLSchema-instance\" "
+                                                    + "xmlns:xsd=\"http:// www.w3.org/2001/XMLSchema\""
+                                                    + " xmlns=\"urn:vim25\">" + deviceFinal + "</interface>");
                                             soapArgumentList.add(soapArgument1);
                                         }
 
@@ -2751,16 +2828,17 @@ public class VCSDKUtils {
 
                                         String re = new String(soapResult.getResponse().getBytes("ISO-8859-1"),
                                             "UTF-8");
-                                        logger.info(mgmtIp + "==re==" + re);
+                                        logger.info("mgmtIp={},re={}", mgmtIp, re);
                                         String packetLost = xmlFormat(re);
                                         if (!StringUtils.isEmpty(packetLost) && !"100".equals(packetLost)) {
-                                            ethPort.put("connectStatus", "true");
+                                            ethPort.put(CONNECT_STATUS, "true");
                                         } else {
-                                            ethPort.put("connectStatus", "false");
+                                            ethPort.put(CONNECT_STATUS, "false");
                                         }
                                     } catch (Exception e) {
-                                        ethPort.put("connectStatus", "false");
-                                        logger.error(mgmtIp + "====" + e.toString());
+                                        ethPort.put(CONNECT_STATUS, "false");
+                                        logger.error("testConnectivity error!mgmtIp={},errMsg={}", mgmtIp,
+                                            e.getMessage());
                                     }
                                     reEthPorts.add(ethPort);
                                 }
@@ -2831,7 +2909,7 @@ public class VCSDKUtils {
      * 判断数据存储中是否有注册的虚拟机，有则返回true，没有返回false
      *
      * @param objectid 数据存储的objectid
-     * @return boolean 是否存在vm
+     * @return boolean boolean
      */
     public boolean hasVmOnDatastore(String objectid) {
         String serverguid = vcConnectionHelpers.objectId2Serverguid(objectid);
@@ -2887,8 +2965,8 @@ public class VCSDKUtils {
             String serverguid = vcConnectionHelpers.objectId2Serverguid(dsObjId);
             VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
             ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(dsObjId);
-            // DatastoreMO dataStoreMo = new DatastoreMO(vmwareContext, objmor);
             DatastoreMO dataStoreMo = datastoreVmwareMoFactory.build(vmwareContext, objmor);
+
             if (null != dataStoreMo) {
                 name = dataStoreMo.getName();
             }
@@ -2938,13 +3016,13 @@ public class VCSDKUtils {
             String serverguid = vcConnectionHelpers.objectId2Serverguid(vmObjectId);
             VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
             ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(vmObjectId);
-            VirtualMachineMO virtualMachineMo = virtualMachineMOFactory.build(vmwareContext, objmor);
+            VirtualMachineMO virtualMachineMo = virtualMachineMoFactorys.build(vmwareContext, objmor);
             if (virtualMachineMo != null) {
                 map = new HashMap<>();
                 HostMO hostMo = virtualMachineMo.getRunningHost();
                 String objectId = vcConnectionHelpers.mor2ObjectId(hostMo.getMor(), vmwareContext.getServerAddress());
                 map.put("hostObjectId", objectId);
-                map.put("hostName", hostMo.getName());
+                map.put(HOST_NAME, hostMo.getName());
             }
         } catch (Exception e) {
             logger.error("query host by vmObjectId:{},error:{}", vmObjectId, e.getMessage());

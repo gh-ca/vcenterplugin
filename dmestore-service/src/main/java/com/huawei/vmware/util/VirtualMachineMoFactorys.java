@@ -1,6 +1,7 @@
 package com.huawei.vmware.util;
 
 import com.huawei.vmware.mo.VirtualMachineMO;
+
 import com.vmware.vim25.ManagedObjectReference;
 
 /**
@@ -10,10 +11,10 @@ import com.vmware.vim25.ManagedObjectReference;
  * @ClassName: VirtualMachineMOFactory
  * @since 2020-12-10
  */
-public class VirtualMachineMOFactory {
-    private static VirtualMachineMOFactory virtualMachineMOFactory;
+public class VirtualMachineMoFactorys {
+    private static VirtualMachineMoFactorys virtualMachineMoFactorys;
 
-    private VirtualMachineMOFactory() {
+    private VirtualMachineMoFactorys() {
     }
 
     /**
@@ -21,15 +22,15 @@ public class VirtualMachineMOFactory {
      *
      * @return VirtualMachineMOFactory
      */
-    public static VirtualMachineMOFactory getInstance() {
-        if (virtualMachineMOFactory == null) {
-            synchronized (VirtualMachineMOFactory.class) {
-                if (virtualMachineMOFactory == null) {
-                    virtualMachineMOFactory = new VirtualMachineMOFactory();
+    public static VirtualMachineMoFactorys getInstance() {
+        if (virtualMachineMoFactorys == null) {
+            synchronized (VirtualMachineMoFactorys.class) {
+                if (virtualMachineMoFactorys == null) {
+                    virtualMachineMoFactorys = new VirtualMachineMoFactorys();
                 }
             }
         }
-        return virtualMachineMOFactory;
+        return virtualMachineMoFactorys;
     }
 
     /**
