@@ -1076,8 +1076,8 @@ public class VCSDKUtils {
             }
             logger.info("end creat nfs datastore");
         } catch (Exception e) {
-            logger.error("vmware error:", e);
-            throw new VcenterException("create nfs datastore error");
+            logger.error("vmware creat nfs error:", e);
+            throw new VcenterException("create nfs datastore error!" + e.getMessage());
         }
         return response;
     }
