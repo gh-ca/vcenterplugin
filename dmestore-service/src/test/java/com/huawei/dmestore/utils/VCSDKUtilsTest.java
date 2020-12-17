@@ -25,7 +25,7 @@ import com.huawei.vmware.util.Pair;
 import com.huawei.vmware.util.RootVmwareMoFactory;
 import com.huawei.vmware.util.SessionHelperFactory;
 import com.huawei.vmware.util.TaggingWorkflowFactory;
-import com.huawei.vmware.util.VirtualMachineMOFactory;
+import com.huawei.vmware.util.VirtualMachineMoFactorys;
 import com.huawei.vmware.util.VmwareClient;
 import com.huawei.vmware.util.VmwareContext;
 import com.google.gson.Gson;
@@ -102,7 +102,7 @@ public class VCSDKUtilsTest {
     @Mock
     private TaggingWorkflowFactory taggingWorkflowFactory;
     @Mock
-    private VirtualMachineMOFactory virtualMachineMOFactory;
+    private VirtualMachineMoFactorys virtualMachineMoFactorys;
     private Gson gson = new Gson();
     private static VmodlContext context;
 
@@ -868,7 +868,7 @@ public class VCSDKUtilsTest {
         when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
         when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
         when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(virtualMachineMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(virtualMachineMo);
+        when(virtualMachineMoFactorys.build(vmwareContext, managedObjectReference)).thenReturn(virtualMachineMo);
         vcsdkUtils.createDisk("321", "321", "321", 21);
     }
 
@@ -878,7 +878,7 @@ public class VCSDKUtilsTest {
         when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
         when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
         when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(virtualMachineMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(virtualMachineMo);
+        when(virtualMachineMoFactorys.build(vmwareContext, managedObjectReference)).thenReturn(virtualMachineMo);
         when(virtualMachineMo.getRunningHost()).thenReturn(hostMO);
         when(hostMO.getDatastoreMountsOnHost()).thenReturn(list);
         when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
@@ -1372,7 +1372,7 @@ public class VCSDKUtilsTest {
         when(vcConnectionHelpers.objectId2Serverguid("321")).thenReturn("321");
         when(vcConnectionHelpers.getServerContext("321")).thenReturn(vmwareContext);
         when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
-        when(virtualMachineMOFactory.build(vmwareContext, managedObjectReference)).thenReturn(virtualMachineMo);
+        when(virtualMachineMoFactorys.build(vmwareContext, managedObjectReference)).thenReturn(virtualMachineMo);
         when(virtualMachineMo.getRunningHost()).thenReturn(hostMO);
         when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
         when(hostMO.getName()).thenReturn("321");
