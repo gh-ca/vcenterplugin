@@ -421,11 +421,15 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     logicPorts.setOperationalStatus(ToolUtils.jsonToStr(element.get("operational_status")));
                     logicPorts.setMgmtIp(ToolUtils.jsonToStr(element.get("mgmt_ip")));
                     logicPorts.setMgmtIpv6(ToolUtils.jsonToStr(element.get("mgmt_ipv6")));
-                    logicPorts.setHomePortId(ToolUtils.jsonToStr(element.get("home_port_id")));
+
+                    // 老版本DEM为home_port_id
+                    logicPorts.setHomePortId(ToolUtils.jsonToStr(element.get("home_port_raw_id")));
                     logicPorts.setHomePortName(ToolUtils.jsonToStr(element.get("home_port_name")));
                     logicPorts.setRole(ToolUtils.jsonToStr(element.get("role")));
                     logicPorts.setDdnsStatus(ToolUtils.jsonToStr(element.get("ddns_status")));
-                    logicPorts.setCurrentPortId(ToolUtils.jsonToStr(element.get("current_port_id")));
+
+                    // 老版本DEM为current_port_id
+                    logicPorts.setCurrentPortId(ToolUtils.jsonToStr(element.get("current_port_raw_id")));
                     logicPorts.setCurrentPortName(ToolUtils.jsonToStr(element.get("current_port_name")));
                     logicPorts.setSupportProtocol(ToolUtils.jsonToStr(element.get("support_protocol")));
                     logicPorts.setManagementAccess(ToolUtils.jsonToStr(element.get("management_access")));

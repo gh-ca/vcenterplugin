@@ -557,7 +557,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         try {
             // 通过主机的objectid查到主机上所有的hba的wwn或者iqn
             List<Map<String, Object>> hbas = vcsdkUtils.getHbasByHostObjectId(hostId);
-            if (hbas == null || hbas.size() > 0) {
+            if (hbas == null || hbas.size() == 0) {
                 throw new DmeException(hostId + " The host did not find a valid Hba");
             }
             List<String> wwniqns = new ArrayList<>();

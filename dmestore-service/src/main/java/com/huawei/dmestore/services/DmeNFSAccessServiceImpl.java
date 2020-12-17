@@ -501,7 +501,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         String url = DmeConstants.API_LOGICPORTS_LIST;
         JsonObject param = new JsonObject();
         param.addProperty("storage_id",storageId);
-        ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+        ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.POST, null);
         return responseEntity;
     }
 
@@ -521,9 +521,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             logicPortMap.put(ID_FIELD, ToolUtils.jsonToStr(jsonObject.get(ID_FIELD)));
             logicPortMap.put(NAME_FIELD, ToolUtils.jsonToStr(jsonObject.get(NAME_FIELD)));
             logicPortMap.put(STORAGE_ID, storageId);
-            logicPortMap.put("home_port_id", ToolUtils.jsonToStr(jsonObject.get("home_port_id")));
+            logicPortMap.put("home_port_id", ToolUtils.jsonToStr(jsonObject.get("home_port_raw_id")));
             logicPortMap.put(HOME_PORT_NAME, ToolUtils.jsonToStr(jsonObject.get(HOME_PORT_NAME)));
-            logicPortMap.put("current_port_id", ToolUtils.jsonToStr(jsonObject.get("current_port_id")));
+            logicPortMap.put("current_port_id", ToolUtils.jsonToStr(jsonObject.get("current_port_raw_id")));
             logicPortMap.put(MGMT_IP, ToolUtils.jsonToStr(jsonObject.get(MGMT_IP)));
             logicPortList.add(logicPortMap);
         }
@@ -543,7 +543,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     public List<NfsDataInfo> listNfs() throws DmeException {
         // 从关系表中取得DME卷与vcenter存储的对应关系
         List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_NFS);
-        if (dvrlist == null || dvrlist.size() > 0) {
+        if (dvrlist == null || dvrlist.size() == 0) {
             throw new DmeException("get ralation failed!");
         }
         Map<String, DmeVmwareRelation> dvrMap = getDvrMap(dvrlist);
