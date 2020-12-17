@@ -50,7 +50,7 @@ public class DmeConstants {
     /**
      * create fs with custom
      **/
-    public static final String API_FS_CREATE = "/rest/fileservice/v1/filesystems/customize";
+    public static final String API_FS_CREATE = "/rest/fileservice/v1/filesystems/customize-filesystems";
 
     /**
      * logic port detail
