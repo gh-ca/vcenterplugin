@@ -1,6 +1,7 @@
 package com.huawei.dmestore.services;
 
 import com.google.gson.*;
+
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.dao.DmeVmwareRalationDao;
 import com.huawei.dmestore.entity.DmeVmwareRelation;
@@ -11,6 +12,7 @@ import com.huawei.dmestore.model.FileSystem;
 import com.huawei.dmestore.model.LogicPorts;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpMethod;
@@ -181,6 +183,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             Object nfsShareClientAddition = params.get("nfs_share_client_addition");
             List<Map<String, Object>> nfsShareClientArrayAddition = (List<Map<String, Object>>) nfsShareClientAddition;
             String shareName = "";
+            Map<String, Object> createNfsShareParams = null;
             if (nfsShareClientAddition != null) {
                 Map<String, Object> reqNfsShareClientArrayAddition = new HashMap<>();
                 for (int index = 0; index < nfsShareClientArrayAddition.size(); index++) {
@@ -207,7 +210,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 }
                 mounts.add(mount);
                 Object createNfsShareParam = params.get("create_nfs_share_param");
-                Map<String, Object> createNfsShareParams = null;
                 if (!StringUtils.isEmpty(createNfsShareParam)) {
                     createNfsShareParams = gson.fromJson(gson.toJson(createNfsShareParam), Map.class);
                     createNfsShareParams.put("nfs_share_client_addition", reqNfsShareClientArrayAdditions);
@@ -232,7 +234,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                     throw new DmeException(CODE_403, "create FileSystem fail");
                 }
                 if (!"".equals(fsId)) {
-                    nfsShareMap.put("fs_id", fsId);
+                    //nfsShareMap.put("fs_id", fsId);
+                    createNfsShareParams.put("fs_id", fsId);
                     String nfsShareTaskId = createNfsShare(nfsShareMap);
                     List<String> shareIds = new ArrayList<>();
                     shareIds.add(nfsShareTaskId);
@@ -456,7 +459,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             gson.toJson(params));
         int code = responseEntity.getStatusCodeValue();
         if (code != HttpStatus.ACCEPTED.value()) {
-            throw new DmeException(CODE_503, "create file system error !");
+            throw new DmeException(CODE_503, "create file system error!\n" + responseEntity.getBody());
         }
         String object = responseEntity.getBody();
         JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
