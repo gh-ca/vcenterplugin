@@ -36,11 +36,10 @@ public class VirtualMachineMOFactory {
      * build
      *
      * @param context context
-     * @param morVm   morVm
+     * @param morVm morVm
      * @return VirtualMachineMO
-     * @throws Exception Exception
      */
-    public VirtualMachineMO build(VmwareContext context, ManagedObjectReference morVm) throws Exception {
+    public VirtualMachineMO build(VmwareContext context, ManagedObjectReference morVm) {
         return new VirtualMachineMO(context, morVm);
     }
 }

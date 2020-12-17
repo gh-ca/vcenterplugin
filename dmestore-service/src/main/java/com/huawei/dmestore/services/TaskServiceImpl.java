@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -52,7 +53,9 @@ public class TaskServiceImpl implements TaskService {
 
     private DmeAccessService dmeAccessService;
 
-    // 轮询任务状态的超值时间
+    /**
+     * 轮询任务状态的超值时间
+     */
     private final int taskTimeOut = 10 * 60 * 1000;
 
     private Gson gson = new Gson();
@@ -64,11 +67,11 @@ public class TaskServiceImpl implements TaskService {
             responseEntity = dmeAccessService.access(DmeConstants.DME_TASK_BASE_URL, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() != HttpStatus.OK.value()) {
                 LOG.error("get task list exception:{}", responseEntity.getBody());
-                return null;
+                return Collections.EMPTY_LIST;
             }
         } catch (DmeException ex) {
             LOG.error("get task list error:{}", ex);
-            return null;
+            return Collections.EMPTY_LIST;
         }
 
         // 解析responseEntity 转换为 TaskDetailInfo
@@ -95,7 +98,7 @@ public class TaskServiceImpl implements TaskService {
         // 解析responseEntity 转换为 TaskDetailInfo
         Object object = responseEntity.getBody();
         List<TaskDetailInfo> tasks = converBean(taskId, object);
-        if (null != tasks && tasks.size() > 0) {
+        if (tasks != null && tasks.size() > 0) {
             return tasks.get(0);
         } else {
             return null;
@@ -135,7 +138,7 @@ public class TaskServiceImpl implements TaskService {
             }
 
             if ((times--) < 0) {
-                throw new DmeSqlException("查询任务状态超时！");
+                throw new DmeSqlException("query task status timeout！taskId=" + taskId);
             }
         }
         return null;
@@ -182,7 +185,7 @@ public class TaskServiceImpl implements TaskService {
             taskDetailInfo.setDetail(detail);
 
             JsonArray resourcesArray = jsonObject.getAsJsonArray("resources");
-            if (null != resourcesArray) {
+            if (resourcesArray != null) {
                 List<TaskDetailResource> resourceList = getTaskDetailResources(resourcesArray);
                 taskDetailInfo.setResources(resourceList);
             }
@@ -244,7 +247,7 @@ public class TaskServiceImpl implements TaskService {
                 }
                 int status = taskInfo.getStatus();
                 int progress = taskInfo.getProgress();
-                if (TASK_FINISH == progress || status > TASK_FLAG_2) {
+                if (progress == TASK_FINISH || status > TASK_FLAG_2) {
                     taskStatusMap.put(taskId, status);
                 } else {
                     queryTaskIds.add(taskId);
@@ -256,6 +259,7 @@ public class TaskServiceImpl implements TaskService {
         long currentTime = System.currentTimeMillis();
         long delta = currentTime - start;
         if (delta > timeout) {
+            LOG.info("query task timeout!taskIds={}", gson.toJson(taskIds));
             return;
         }
 
@@ -275,12 +279,12 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public boolean checkTaskStatus(List<String> taskIds) {
         boolean isSuccess = false;
-        if (null != taskIds && taskIds.size() > 0) {
+        if (taskIds != null && taskIds.size() > 0) {
             Map<String, Integer> taskStatusMap = new HashMap<>();
             getTaskStatus(taskIds, taskStatusMap, taskTimeOut, System.currentTimeMillis());
             for (Map.Entry<String, Integer> entry : taskStatusMap.entrySet()) {
                 int status = entry.getValue();
-                if (TASK_SUCCESS == status) {
+                if (status == TASK_SUCCESS) {
                     isSuccess = true;
                     break;
                 }
