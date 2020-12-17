@@ -9,11 +9,10 @@ import com.huawei.vmware.mo.DatacenterMO;
  * @ClassName: DatacenterMOFactory
  * @since 2020-12-09
  */
-public class DatacenterMOFactory {
+public class DatacenterVmwareMoFactory {
+    private static DatacenterVmwareMoFactory datacenterVmwareMoFactory;
 
-    private static DatacenterMOFactory datacenterMOFactory;
-
-    private DatacenterMOFactory() {
+    private DatacenterVmwareMoFactory() {
     }
 
     /**
@@ -21,22 +20,22 @@ public class DatacenterMOFactory {
      *
      * @return DatacenterMOFactory
      */
-    public static DatacenterMOFactory getInstance() {
-        if (datacenterMOFactory == null) {
-            synchronized (DatacenterMOFactory.class) {
-                if (datacenterMOFactory == null) {
-                    datacenterMOFactory = new DatacenterMOFactory();
+    public static DatacenterVmwareMoFactory getInstance() {
+        if (datacenterVmwareMoFactory == null) {
+            synchronized (DatacenterVmwareMoFactory.class) {
+                if (datacenterVmwareMoFactory == null) {
+                    datacenterVmwareMoFactory = new DatacenterVmwareMoFactory();
                 }
             }
         }
-        return datacenterMOFactory;
+        return datacenterVmwareMoFactory;
     }
 
     /**
      * build
      *
      * @param context context
-     * @param dcName  dcName
+     * @param dcName dcName
      * @return DatacenterMO
      * @throws Exception Exception
      */

@@ -9,7 +9,7 @@ import com.huawei.vmware.util.VmwarePluginContextFactory;
  * @author Administrator
  * @since 2020-12-10
  */
-public class VmwarePluginConnectionHelper extends VCConnectionHelper {
+public class VmwarePluginConnectionHelpers extends VcConnectionHelpers {
     @Override
     public VmwareContext getServerContext(String serverguid) throws Exception {
         return VmwarePluginContextFactory

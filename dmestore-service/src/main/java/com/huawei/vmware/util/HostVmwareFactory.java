@@ -1,6 +1,7 @@
 package com.huawei.vmware.util;
 
 import com.huawei.vmware.mo.HostMO;
+
 import com.vmware.vim25.ManagedObjectReference;
 
 /**
@@ -10,10 +11,10 @@ import com.vmware.vim25.ManagedObjectReference;
  * @ClassName: HostMOFactory
  * @since 2020-12-09
  */
-public class HostMOFactory {
-    private static HostMOFactory hostMOFactory;
+public class HostVmwareFactory {
+    private static HostVmwareFactory hostVmwareFactory;
 
-    private HostMOFactory() {
+    private HostVmwareFactory() {
     }
 
     /**
@@ -21,15 +22,15 @@ public class HostMOFactory {
      *
      * @return HostMOFactory
      */
-    public static HostMOFactory getInstance() {
-        if (hostMOFactory == null) {
-            synchronized (HostMOFactory.class) {
-                if (hostMOFactory == null) {
-                    hostMOFactory = new HostMOFactory();
+    public static HostVmwareFactory getInstance() {
+        if (hostVmwareFactory == null) {
+            synchronized (HostVmwareFactory.class) {
+                if (hostVmwareFactory == null) {
+                    hostVmwareFactory = new HostVmwareFactory();
                 }
             }
         }
-        return hostMOFactory;
+        return hostVmwareFactory;
     }
 
     /**

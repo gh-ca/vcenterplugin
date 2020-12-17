@@ -14,7 +14,7 @@ import org.mockito.MockitoAnnotations;
 public class VmwarePluginConnectionHelperTest {
 
     @InjectMocks
-    VmwarePluginConnectionHelper vmwarePluginConnectionHelper = new VmwarePluginConnectionHelper();
+    VmwarePluginConnectionHelpers vmwarePluginConnectionHelper = new VmwarePluginConnectionHelpers();
 
     @Before
     public void setUp() throws Exception {

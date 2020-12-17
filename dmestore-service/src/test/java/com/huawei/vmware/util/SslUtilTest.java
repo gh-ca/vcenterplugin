@@ -18,10 +18,10 @@ import javax.net.ssl.SSLContext;
  * @description TODO
  * @date 2020/12/2 10:37
  */
-public class SSLUtilsTest {
+public class SslUtilTest {
 
     @InjectMocks
-    SSLUtils sslUtils;
+    SslUtil sslUtil;
     SSLContext sslContext;
 
     @Before
@@ -33,7 +33,7 @@ public class SSLUtilsTest {
     @Test
     public void getSupportedProtocols() {
         String[] strings = {"SSLv3"};
-        sslUtils.getSupportedProtocols(strings);
+        sslUtil.getSupportedProtocols(strings);
     }
 
     @Test
@@ -43,11 +43,11 @@ public class SSLUtilsTest {
 //        when(sslContext.getSocketFactory()).thenReturn(socketFactory);
 //        String[] availableCiphers = spy(String[].class);
 //        when(socketFactory.getSupportedCipherSuites()).thenReturn(availableCiphers);
-        sslUtils.getSupportedCiphers();
+        sslUtil.getSupportedCiphers();
     }
 
     @Test
     public void getSslContext() throws NoSuchAlgorithmException {
-        sslUtils.getSslContext();
+        sslUtil.getSslContext();
     }
 }

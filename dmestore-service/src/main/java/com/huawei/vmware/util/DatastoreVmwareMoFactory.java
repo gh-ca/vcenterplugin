@@ -1,6 +1,7 @@
 package com.huawei.vmware.util;
 
 import com.huawei.vmware.mo.DatastoreMO;
+
 import com.vmware.vim25.ManagedObjectReference;
 
 /**
@@ -10,11 +11,10 @@ import com.vmware.vim25.ManagedObjectReference;
  * @ClassName: DatastoreMOFactory
  * @since 2020-12-09
  */
-public class DatastoreMOFactory {
+public class DatastoreVmwareMoFactory {
+    private static DatastoreVmwareMoFactory datastoreVmwareMoFactory;
 
-    private static DatastoreMOFactory datastoreMOFactory;
-
-    private DatastoreMOFactory() {
+    private DatastoreVmwareMoFactory() {
     }
 
     /**
@@ -22,21 +22,21 @@ public class DatastoreMOFactory {
      *
      * @return DatastoreMOFactory
      */
-    public static DatastoreMOFactory getInstance() {
-        if (datastoreMOFactory == null) {
-            synchronized (DatastoreMOFactory.class) {
-                if (datastoreMOFactory == null) {
-                    datastoreMOFactory = new DatastoreMOFactory();
+    public static DatastoreVmwareMoFactory getInstance() {
+        if (datastoreVmwareMoFactory == null) {
+            synchronized (DatastoreVmwareMoFactory.class) {
+                if (datastoreVmwareMoFactory == null) {
+                    datastoreVmwareMoFactory = new DatastoreVmwareMoFactory();
                 }
             }
         }
-        return datastoreMOFactory;
+        return datastoreVmwareMoFactory;
     }
 
     /**
      * build
      *
-     * @param context      context
+     * @param context context
      * @param morDatastore morDatastore
      * @return DatastoreMO
      * @throws Exception Exception

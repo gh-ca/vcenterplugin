@@ -15,7 +15,7 @@ import com.huawei.dmestore.entity.VCenterInfo;
 import com.huawei.dmestore.model.Storage;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
-import com.huawei.vmware.VCConnectionHelper;
+import com.huawei.vmware.VcConnectionHelpers;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.vmware.vim25.ManagedObjectReference;
@@ -82,7 +82,7 @@ public class VmfsAccessServiceTest {
         dmeVmwareRelation.setStoreId(storeObjectId);
         dmeVmwareRelation.setVolumeId(volumeId);
         dvrlist.add(dmeVmwareRelation);
-        when(dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_VMFS)).thenReturn(dvrlist);
+        when(dmeVmwareRalationDao.getDmeVmwareRelation(DmeConstants.STORE_TYPE_VMFS)).thenReturn(dvrlist);
         List<Storage> list = new ArrayList<>();
         Storage storageObj = new Storage();
         storageObj.setName("Huawei.Storage");
@@ -99,7 +99,7 @@ public class VmfsAccessServiceTest {
         dsmap.put("vmfsWwnList", wwnList);
         lists.add(dsmap);
         String listStr = gson.toJson(lists);
-        when(vcsdkUtils.getAllVmfsDataStoreInfos(ToolUtils.STORE_TYPE_VMFS)).thenReturn(listStr);
+        when(vcsdkUtils.getAllVmfsDataStoreInfos(DmeConstants.STORE_TYPE_VMFS)).thenReturn(listStr);
         String url = "/rest/blockservice/v1/volumes" + "/" + volumeId;
         String jsonData
             = "{\"volume\": {\"id\": \"955a0632-c309-4471-a116-6a059d84ade3\",\"name\": \"VMFSTest20201026\",\"description\": null,\"status\": \"normal\",\"attached\": true,\"project_id\": null,\"alloctype\": \"thick\",\"capacity\": 1,\"service_level_name\": \"cctest\",\"attachments\": [{\"id\": \"8b561dd2-03bb-4f20-98c4-8092e75fe951\",\"volume_id\": \"955a0632-c309-4471-a116-6a059d84ade3\",\"host_id\": \"9cbd24b5-fb5b-4ad9-9393-cf05b9b97339\",\"attached_at\": \"2020-10-26T06:50:20.000000\",\"attached_host_group\": null}],\"volume_raw_id\": \"174\",\"volume_wwn\": \"67c1cf11005893452a7c7314000000ae\",\"storage_id\": \"b94bff9d-0dfb-11eb-bd3d-0050568491c9\",\"storage_sn\": \"2102351QLH9WK5800028\",\"pool_raw_id\": \"0\",\"capacity_usage\": null,\"protected\": false,\"updated_at\": \"2020-10-26T06:50:20.000000\",\"created_at\": \"2020-10-26T06:50:15.000000\",\"tuning\": {\"smarttier\": \"0\",\"dedupe_enabled\": null,\"compression_enabled\": null,\"workload_type_id\": null,\"smartqos\": {\"maxiops\": 123,\"miniops\": 2134,\"maxbandwidth\": 123413,\"minbandwidth\": 1234,\"latency\": 0.48},\"alloctype\": \"thick\"},\"initial_distribute_policy\": \"0\",\"prefetch_policy\": \"3\",\"owner_controller\": \"0B\",\"prefetch_value\": \"0\"}}";
@@ -211,7 +211,7 @@ public class VmfsAccessServiceTest {
         String clusterId = "123213213";
         String clusterName = "131";
         Map<String, Object> paramsUnLevel = gson.fromJson(requestUnLevel, Map.class);
-        VCConnectionHelper helper = mock(VCConnectionHelper.class);
+        VcConnectionHelpers helper = mock(VcConnectionHelpers.class);
         when(vcsdkUtils.getVcConnectionHelper()).thenReturn(helper);
         ManagedObjectReference mor = mock(ManagedObjectReference.class);
         when(helper.objectId2Mor(clusterId)).thenReturn(mor);
@@ -529,7 +529,7 @@ public class VmfsAccessServiceTest {
         dsmap.put("vmfsWwnList", wwnList);
         lists.add(dsmap);
         String listStr = gson.toJson(lists);
-        when(vcsdkUtils.getAllVmfsDataStoreInfos(ToolUtils.STORE_TYPE_VMFS)).thenReturn(listStr);
+        when(vcsdkUtils.getAllVmfsDataStoreInfos(DmeConstants.STORE_TYPE_VMFS)).thenReturn(listStr);
         String dataJson
             = "{\"volumes\":[{\"id\":\"8f6d93f1-4214-46bc-ae7a-85f8349ebbd2\",\"name\":\"Drdm17\",\"description\":null,\"status\":\"normal\",\"attached\":true,\"project_id\":null,\"alloctype\":\"thick\",\"capacity\":1,\"service_level_name\":\"lgqtest\",\"attachments\":[{\"id\":\"caa34ee1-e935-4958-b106-022d7beef447\",\"volume_id\":\"8f6d93f1-4214-46bc-ae7a-85f8349ebbd2\",\"host_id\":\"9cbd24b5-fb5b-4ad9-9393-cf05b9b97339\",\"attached_at\":\"2020-11-12T02:27:40.000000\",\"attached_host_group\":null}],\"volume_raw_id\":\"323\",\"volume_wwn\":\"67c1cf1100589345402376ae00000143\",\"storage_id\":\"b94bff9d-0dfb-11eb-bd3d-0050568491c9\",\"storage_sn\":\"2102351QLH9WK5800028\",\"pool_raw_id\":\"0\",\"capacity_usage\":null,\"protected\":false,\"updated_at\":\"2020-11-12T02:27:40.000000\",\"created_at\":\"2020-11-12T02:27:34.000000\"}],\"count\":25}";
         ResponseEntity<String> responseEntity = new ResponseEntity(dataJson, null, HttpStatus.OK);
@@ -537,7 +537,7 @@ public class VmfsAccessServiceTest {
         when(dmeAccessService.access(volumeUrlByName, HttpMethod.GET, null)).thenReturn(responseEntity);
         List<String> localWwns = new ArrayList<>(16);
         localWwns.add("333");
-        when(dmeVmwareRalationDao.getAllWwnByType(ToolUtils.STORE_TYPE_VMFS)).thenReturn(localWwns);
+        when(dmeVmwareRalationDao.getAllWwnByType(DmeConstants.STORE_TYPE_VMFS)).thenReturn(localWwns);
         doNothing().when(dmeVmwareRalationDao).deleteByWwn(localWwns);
         vmfsAccessService.scanVmfs();
     }
@@ -580,7 +580,7 @@ public class VmfsAccessServiceTest {
         clusters.add(map);
         String listStr1 = gson.toJson(clusters);
         when(vcsdkUtils.getMountClustersByDsObjectId(storageId, mappeddmegroups)).thenReturn(listStr1);
-        VCConnectionHelper helper = mock(VCConnectionHelper.class);
+        VcConnectionHelpers helper = mock(VcConnectionHelpers.class);
         when(vcsdkUtils.getVcConnectionHelper()).thenReturn(helper);
         ManagedObjectReference mor = mock(ManagedObjectReference.class);
         when(helper.objectId2Mor(clusterId)).thenReturn(mor);
@@ -656,7 +656,7 @@ public class VmfsAccessServiceTest {
         list.add(map);
         String listStr = gson.toJson(list);
         when(vcsdkUtils.getMountClustersByDsObjectId(storageId, mappeddmegroups)).thenReturn(listStr);
-        VCConnectionHelper helper = mock(VCConnectionHelper.class);
+        VcConnectionHelpers helper = mock(VcConnectionHelpers.class);
         when(vcsdkUtils.getVcConnectionHelper()).thenReturn(helper);
         ManagedObjectReference mor = mock(ManagedObjectReference.class);
         when(helper.objectId2Mor(clusterId)).thenReturn(mor);
@@ -681,7 +681,7 @@ public class VmfsAccessServiceTest {
         dvr.setStoreId(dataStoreObjectId);
         dvr.setVolumeId(volumeId);
         dvrlist.add(dvr);
-        when(dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_VMFS)).thenReturn(dvrlist);
+        when(dmeVmwareRalationDao.getDmeVmwareRelation(DmeConstants.STORE_TYPE_VMFS)).thenReturn(dvrlist);
         List<Storage> storagemap = new ArrayList<>(16);
         Storage storage = new Storage();
         storage.setId("112");
@@ -690,7 +690,7 @@ public class VmfsAccessServiceTest {
         when(dmeStorageService.getStorages()).thenReturn(storagemap);
         String listStr
             = "[{\"objectid\": \"11\",\"capacity\": 123123141415,\"freeSpace\": 123123141415,\"uncommitted\": 123123141415,\"name\": \"11\"}]";
-        when(vcsdkUtils.getAllVmfsDataStoreInfos(ToolUtils.STORE_TYPE_VMFS)).thenReturn(listStr);
+        when(vcsdkUtils.getAllVmfsDataStoreInfos(DmeConstants.STORE_TYPE_VMFS)).thenReturn(listStr);
         String detailedVolumeUrl = "/rest/blockservice/v1/volumes" + "/" + volumeId;
         String s
             = "{\"volume\":{\"id\":\"955a0632-c309-4471-a116-6a059d84ade3\",\"name\":\"VMFSTest20201026\",\"description\":null,\"status\":\"normal\",\"attached\":true,\"project_id\":null,\"alloctype\":\"thick\",\"capacity\":1,\"service_level_name\":\"cctest\",\"attachments\":[{\"id\":\"8b561dd2-03bb-4f20-98c4-8092e75fe951\",\"volume_id\":\"955a0632-c309-4471-a116-6a059d84ade3\",\"host_id\":\"9cbd24b5-fb5b-4ad9-9393-cf05b9b97339\",\"attached_at\":\"2020-10-26T06:50:20.000000\",\"attached_host_group\":null}],\"volume_raw_id\":\"174\",\"volume_wwn\":\"67c1cf11005893452a7c7314000000ae\",\"storage_id\":\"b94bff9d-0dfb-11eb-bd3d-0050568491c9\",\"storage_sn\":\"2102351QLH9WK5800028\",\"pool_raw_id\":\"0\",\"capacity_usage\":null,\"protected\":false,\"updated_at\":\"2020-10-26T06:50:20.000000\",\"created_at\":\"2020-10-26T06:50:15.000000\",\"tuning\":{\"smarttier\":\"0\",\"dedupe_enabled\":null,\"compression_enabled\":null,\"workload_type_id\":null,\"smartqos\":{\t\t\t\t\"control_policy\":\"OA\"\t\t\t},\"alloctype\":\"thick\"},\"initial_distribute_policy\":\"0\",\"prefetch_policy\":\"3\",\"owner_controller\":\"0B\",\"prefetch_value\":\"0\"}}";

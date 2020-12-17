@@ -26,7 +26,7 @@ public class VmwareContextTest {
     VmwareContext vmwareContext = new VmwareContext();
 
     @Mock
-    private DatacenterMOFactory datacenterMOFactory = DatacenterMOFactory.getInstance();
+    private DatacenterVmwareMoFactory datacenterVmwareMoFactory = DatacenterVmwareMoFactory.getInstance();
     @Mock
     VmwareClient vimClient;
     ManagedObjectReference managedObjectReference;
@@ -124,7 +124,7 @@ public class VmwareContextTest {
 
     @Test
     public void getDatastoreMorByPath() throws Exception {
-        when(datacenterMOFactory.build(vmwareContext, "321")).thenReturn(datacenterMO);
+        when(datacenterVmwareMoFactory.build(vmwareContext, "321")).thenReturn(datacenterMO);
         when(datacenterMO.getMor()).thenReturn(managedObjectReference);
         vmwareContext.getDatastoreMorByPath("/321/456");
 

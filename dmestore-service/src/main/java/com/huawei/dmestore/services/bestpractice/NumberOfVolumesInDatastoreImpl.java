@@ -1,5 +1,6 @@
 package com.huawei.dmestore.services.bestpractice;
 
+import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 import com.huawei.vmware.mo.DatastoreMO;
@@ -41,7 +42,7 @@ public class NumberOfVolumesInDatastoreImpl extends BaseBestPracticeService impl
             ManagedObjectReference dsMor = pair.first();
             DatastoreMO datastoreMo = this.getDatastoreMoFactory().build(context, dsMor);
             DatastoreSummary summary = datastoreMo.getSummary();
-            if (summary.getType().equals(ToolUtils.STORE_TYPE_VMFS)) {
+            if (summary.getType().equals(DmeConstants.STORE_TYPE_VMFS)) {
                 JsonObject object = new JsonObject();
                 int volumeSize = datastoreMo.getVmfsDatastoreInfo().getVmfs().getExtent().size();
                 if (volumeSize > Integer.parseInt(getRecommendValue().toString())) {
@@ -82,7 +83,7 @@ public class NumberOfVolumesInDatastoreImpl extends BaseBestPracticeService impl
             ManagedObjectReference dsMor = pair.first();
             DatastoreMO datastoreMo = this.getDatastoreMoFactory().build(context, dsMor);
             DatastoreSummary summary = datastoreMo.getSummary();
-            if (summary.getType().equals(ToolUtils.STORE_TYPE_VMFS)) {
+            if (summary.getType().equals(DmeConstants.STORE_TYPE_VMFS)) {
                 int volumeSize = datastoreMo.getVmfsDatastoreInfo().getVmfs().getExtent().size();
 
                 // 只要有一个存储对应的卷超过推荐值就认为该主机不满足最佳实践
