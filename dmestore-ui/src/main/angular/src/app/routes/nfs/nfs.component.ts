@@ -130,6 +130,7 @@ export class NfsComponent implements OnInit {
     //   }
     // });
     this.addModelShow = true;
+    this.storageList = null;
     this.storageService.getData().subscribe((s: any) => {
       this.modalLoading=false;
       if (s.code === '200'){
@@ -137,6 +138,7 @@ export class NfsComponent implements OnInit {
         this.modalLoading=false;
       }
     });
+    this.hostList = null;
     this.addService.getHostList().subscribe((r: any) => {
       this.modalLoading=false;
       if (r.code === '200'){
