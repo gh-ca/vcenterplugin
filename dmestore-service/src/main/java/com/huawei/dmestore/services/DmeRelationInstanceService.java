@@ -67,7 +67,7 @@ public interface DmeRelationInstanceService {
      * @return Map
      * @throws DmeException when error
      */
-    Map<String, Map<String, Object>> getLunInstance();
+    Map<String, Map<String, Object>> getLunInstance() throws DmeException;
 
     /**
      * list device instance
@@ -88,6 +88,6 @@ public interface DmeRelationInstanceService {
     /**
      * refresh instance
      */
-    void refreshResourceInstance();
+    void refreshResourceInstance() throws DmeException;
 }
 

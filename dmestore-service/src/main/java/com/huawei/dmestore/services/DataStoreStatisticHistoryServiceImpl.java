@@ -500,7 +500,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     }
 
     // 预处理卷参数
-    private Map<String, String> initParamVolume(Map<String, Object> params, boolean isCurrent) {
+    private Map<String, String> initParamVolume(Map<String, Object> params, boolean isCurrent) throws DmeException {
         if (null == params || params.size() == 0) {
             return Collections.EMPTY_MAP;
         }

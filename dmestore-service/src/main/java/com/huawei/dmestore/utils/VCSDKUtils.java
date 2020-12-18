@@ -2117,6 +2117,7 @@ public class VCSDKUtils {
      * Get host's vmKernel IP,only provisioning provisioning
      *
      * @param hostObjectId hostObjectId
+     * @return String String
      * @throws VcenterException VcenterException
      **/
     public String getVmKernelIpByHostObjectId(String hostObjectId) throws VcenterException {
