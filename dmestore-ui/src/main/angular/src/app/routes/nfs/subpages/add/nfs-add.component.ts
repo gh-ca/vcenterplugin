@@ -101,7 +101,7 @@ export class NfsAddComponent implements OnInit{
 
     this.checkedPool = this.storagePools.filter(item => item.id === this.addForm.storagePoolId)[0];
 
-    this.addForm.poolRawId=this.checkedPool.diskPoolId;
+    this.addForm.poolRawId=this.checkedPool.poolId;
     this.addForm.storagePoolId= this.checkedPool.id;
     // 单位换算
     switch (this.unit) {
