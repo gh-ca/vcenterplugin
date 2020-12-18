@@ -91,9 +91,10 @@ public class DmeRelationInstanceController extends BaseController {
      * refreshResourceInstance
      *
      * @return ResponseBodyBean
+     * @throws DmeException DmeException
      */
     @GetMapping("/refreshresourceinstance")
-    public ResponseBodyBean refreshResourceInstance() {
+    public ResponseBodyBean refreshResourceInstance() throws DmeException {
         LOG.info("refreshresourceinstance instance start!");
         dmeRelationInstanceService.refreshResourceInstance();
         return success(null, "refreshresourceinstance success");

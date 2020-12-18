@@ -4,6 +4,7 @@ import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.model.RelationInstance;
 import com.huawei.dmestore.utils.ToolUtils;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -190,10 +191,10 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
         }
     }
 
-    public void listInstanceLun() {
+    public void listInstanceLun() throws DmeException {
         String instanceName = "SYS_Lun";
         JsonObject jsonObject = listInstancdByInstanceName(instanceName);
-        if (jsonObject != null) {
+        if (jsonObject != null && jsonObject.get("totalNum").getAsInt() > 0) {
             JsonArray jsonArray = jsonObject.get(OBJ_LIST).getAsJsonArray();
             Map<String, Map<String, Object>> map = new HashMap<>();
             for (JsonElement element : jsonArray) {
@@ -209,6 +210,9 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
                 LUN_INSTANCE.clear();
                 LUN_INSTANCE.putAll(map);
             }
+        } else {
+            LOG.error("listInstanceLun error!query instance error!className={}", instanceName);
+            throw new DmeException("500", "No instance information was found!className=" + instanceName);
         }
     }
 
@@ -265,7 +269,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     }
 
     @Override
-    public Map<String, Map<String, Object>> getLunInstance() {
+    public Map<String, Map<String, Object>> getLunInstance() throws DmeException {
         if (LUN_INSTANCE.size() == 0) {
             listInstanceLun();
         }
@@ -289,7 +293,7 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
     }
 
     @Override
-    public void refreshResourceInstance() {
+    public void refreshResourceInstance() throws DmeException {
         listInstanceStorageDevcie();
         listInstanceStoragePool();
         listInstanceLun();
