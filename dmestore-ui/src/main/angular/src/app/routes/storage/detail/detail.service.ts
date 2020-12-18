@@ -119,6 +119,7 @@ export class StoragePool{
   subscribedCapacity: number; //订阅容量
   physicalType: string;//硬盘类型
   diskPoolId:string;//存储池所处硬盘id
+  poolId:string;
   maxBandwidth: number;
   maxIops: number;
   maxLatency: number;
