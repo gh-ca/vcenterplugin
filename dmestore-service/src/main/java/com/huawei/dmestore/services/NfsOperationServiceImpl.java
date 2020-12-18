@@ -10,6 +10,7 @@ import com.huawei.dmestore.exception.VcenterException;
 import com.huawei.dmestore.exception.VcenterRuntimeException;
 import com.huawei.dmestore.model.FileSystem;
 import com.huawei.dmestore.model.LogicPorts;
+import com.huawei.dmestore.model.TaskDetailInfo;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 
@@ -231,7 +232,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 if (taskService.checkTaskStatus(taskIds)) {
                     fsId = getFsIdByName(fsName);
                 } else {
-                    throw new DmeException(CODE_403, "create FileSystem fail");
+                    // 查询任务详细信息，获取报错信息
+                    TaskDetailInfo taskDetailInfo = taskService.queryTaskById(taskId);
+                    throw new DmeException(CODE_403, "create FileSystem fail!" + taskDetailInfo.getDetail());
                 }
                 if (!"".equals(fsId)) {
                     //nfsShareMap.put("fs_id", fsId);
