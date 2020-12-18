@@ -43,6 +43,7 @@ export class NfsComponent implements OnInit {
   @ViewChild('addPageOne') addPageOne: ClrWizardPage;
   @ViewChild('addPageTwo') addPageTwo: ClrWizardPage;
   addSuccessShow = false; // 添加成功提示
+  modifySuccessShow = false; // 添加成功提示
 
   logicPorts: LogicPort[] = [];
   oldNfsName:string;
