@@ -60,7 +60,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     private static final String DATASTORE_NAMES = "dataStoreNames";
 
-    private static final String OBJECTID = "objectid";
+    private static final String OBJECTID = "objectId";
 
     private static final String CAPACITY = "capacity";
 

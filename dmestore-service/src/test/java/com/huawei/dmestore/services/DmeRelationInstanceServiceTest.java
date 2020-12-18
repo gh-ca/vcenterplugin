@@ -141,7 +141,7 @@ public class DmeRelationInstanceServiceTest {
     }
 
     @Test
-    public void getStoragePoolInstance() throws Exception{
+    public void getStoragePoolInstance() throws Exception {
         String instanceName = "SYS_StoragePool";
         String url = "/rest/resourcedb/v1/instances/{className}?pageSize=1000";
         url = url.replace("{className}", instanceName);
@@ -152,7 +152,7 @@ public class DmeRelationInstanceServiceTest {
     }
 
     @Test
-    public void refreshResourceInstance() {
+    public void refreshResourceInstance() throws Exception {
         dmeRelationInstanceService.refreshResourceInstance();
     }
 }
