@@ -1179,6 +1179,8 @@ public class VCSDKUtils {
                         vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
                         if (managedObjectReference != null && vmwareContext != null) {
                             HostMO hostMo = hostVmwareFactory.build(vmwareContext, managedObjectReference);
+
+                            logger.info("vmware create nfs datastore begin!hostName={}", hostMo.getHostName());
                             HostDatastoreSystemMO hostDatastoreSystemMo = hostMo.getHostDatastoreSystemMo();
                             ManagedObjectReference datastore = hostDatastoreSystemMo.createNfsDatastore(serverHost, 0,
                                 exportPath, nfsName, accessMode, type, securityType);
@@ -1198,7 +1200,7 @@ public class VCSDKUtils {
             logger.info("end creat nfs datastore");
         } catch (Exception e) {
             logger.error("vmware creat nfs error:", e);
-            throw new VcenterException("create nfs datastore error!" + e.getMessage());
+            throw new VcenterException("vmware create nfs datastore error!" + e.getMessage());
         }
         return response;
     }
