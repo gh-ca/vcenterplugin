@@ -91,7 +91,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     private static final String TOTAL = "total";
 
-    private static final String OBJECTID = "objectid";
+    private static final String OBJECTID = "objectId";
 
     private Gson gson = new Gson();
 
