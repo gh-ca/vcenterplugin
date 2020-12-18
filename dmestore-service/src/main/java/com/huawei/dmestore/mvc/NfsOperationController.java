@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 /**
  * NfsOperationController
  *
@@ -163,8 +162,8 @@ public class NfsOperationController extends BaseController {
      * advanceExcute
      *
      * @param requestParams requestParams
-     * @param targetParams  targetParams
-     * @param isAdvance     isAdvance
+     * @param targetParams targetParams
+     * @param isAdvance isAdvance
      */
     private void advanceExcute(Map<String, Object> requestParams, Map<String, Object> targetParams, boolean isAdvance) {
         Map<String, Object> tuning = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
@@ -193,7 +192,7 @@ public class NfsOperationController extends BaseController {
             tuning.put(COMPRESSION_ENABLED_FIELD, requestParams.get("compressionEnabled"));
             tuning.put(DEDUPLICATION_ENABLED_FIELD, requestParams.get("deduplicationEnabled"));
 
-            String capacitymode = Boolean.parseBoolean((String) requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD))
+            String capacitymode = (Boolean) requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD)
                 ? CapacityAutonegotiation.CAPACITY_MODE_AUTO
                 : CapacityAutonegotiation.CAPACITY_MODE_OFF;
             capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
