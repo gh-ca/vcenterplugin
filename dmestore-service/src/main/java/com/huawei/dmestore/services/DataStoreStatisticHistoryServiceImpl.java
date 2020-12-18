@@ -1010,7 +1010,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
     // 将性能数据结果中的instanceId转换为参数传递的id
     private String replace(String source, Map<String, String> idInstanceIdMap) {
         String result = source;
-        if (!StringUtils.isEmpty(source) && null != idInstanceIdMap && idInstanceIdMap.size() > 0) {
+        if (!StringUtils.isEmpty(result) && null != idInstanceIdMap && idInstanceIdMap.size() > 0) {
             for (Map.Entry<String, String> entry : idInstanceIdMap.entrySet()) {
                 String id = entry.getKey();
                 String instanceId = entry.getValue();
@@ -1019,7 +1019,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
                 }
             }
         }
-        return source;
+        return result;
     }
 
     private List<List<String>> groupObjIds(Map<String, Object> params) {
