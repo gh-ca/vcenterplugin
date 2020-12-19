@@ -243,8 +243,10 @@ public class VCSDKUtils {
                         }
                         if (StringUtils.isEmpty(storeType)) {
                             lists.add(dsmap);
+                            logger.info("存储扫描量：{}",lists.size());
                         } else if (ds1.getSummary().getType().equals(storeType)) {
                             lists.add(dsmap);
+                            logger.info("存储扫描量：{}",lists.size());
                         }
                     }
                     if (lists.size() > 0) {
