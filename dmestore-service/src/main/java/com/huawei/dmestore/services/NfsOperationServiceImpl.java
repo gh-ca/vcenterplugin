@@ -272,6 +272,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 throw new VcenterRuntimeException(CODE_403, "create nfs datastore error!");
             }
             saveNfsInfoToDmeVmwareRelation(result, currentPortId, logicPortName, fsId, shareName, shareId, fsName);
+            LOG.info("nfs入库成功!{}",nfsName);
         } catch (DmeException e) {
             LOG.error("create nfs datastore error!", e);
             throw new DmeException(CODE_403, e.getMessage());
