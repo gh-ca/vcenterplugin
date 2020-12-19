@@ -588,8 +588,9 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     }
 
     @Override
-    public void scanDatastore(String storageType) throws DmeException {
-        if (!StringUtils.isEmpty(storageType)) {
+    public void scanDatastore(String storageTypeRe) throws DmeException {
+        if (!StringUtils.isEmpty(storageTypeRe)) {
+            String storageType = storageTypeRe.toUpperCase();
             if (storageType.equals(DmeConstants.STORE_TYPE_VMFS)) {
                 LOG.info("scan VMFS Datastore start");
                 vmfsAccessService.scanVmfs();
