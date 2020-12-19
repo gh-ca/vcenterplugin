@@ -97,6 +97,10 @@ public class ToolUtils {
         return re;
     }
 
+    public static String normalizeWwn(long wwn) {
+        return  (Long.toHexString(wwn));
+    }
+
     public static String jsonToStr(JsonElement obj) {
         String re = "";
         try {
