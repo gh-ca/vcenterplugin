@@ -211,7 +211,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
     }
 
     public void update(List<DmeVmwareRelation> list, String storeType) {
-        if (storeType != null && storeType.equals(DmeConstants.STORE_TYPE_VMFS)) {
+        if (storeType != null && storeType.equalsIgnoreCase(DmeConstants.STORE_TYPE_VMFS)) {
             updateVmfs(list);
         }
     }
