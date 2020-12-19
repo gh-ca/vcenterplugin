@@ -183,24 +183,22 @@ public class HostDatastoreSystemMO extends BaseMO {
         spec.setRemoteHost(host);
         spec.setRemotePath(exportPath);
         if (StringUtils.isEmpty(type)) {
-            spec.setType("NFS");
+            spec.setType(type);
         }
         if (!StringUtils.isEmpty(securityType)) {
-            spec.setSecurityType(securityType);
+            if (HostNasVolumeSecurityType.AUTH_SYS.value().equalsIgnoreCase(accessMode)) {
+                spec.setSecurityType(HostNasVolumeSecurityType.AUTH_SYS.value());
+            } else if (HostNasVolumeSecurityType.SEC_KRB_5.value().equalsIgnoreCase(accessMode)) {
+                spec.setSecurityType(HostNasVolumeSecurityType.SEC_KRB_5.value());
+            } else {
+                spec.setSecurityType(HostNasVolumeSecurityType.SEC_KRB_5_I.value());
+            }
         }
-        spec.setType(type);
-
         // 需要设置datastore名称
         spec.setLocalPath(uuid);
         // readOnly/readWrite
         if (!StringUtils.isEmpty(accessMode)) {
-            if (HostNasVolumeSecurityType.AUTH_SYS.value().equalsIgnoreCase(accessMode)) {
-                spec.setAccessMode(HostNasVolumeSecurityType.AUTH_SYS.value());
-            } else if (HostNasVolumeSecurityType.SEC_KRB_5.value().equalsIgnoreCase(accessMode)) {
-                spec.setAccessMode(HostNasVolumeSecurityType.SEC_KRB_5.value());
-            } else {
-                spec.setAccessMode(HostNasVolumeSecurityType.SEC_KRB_5_I.value());
-            }
+            spec.setAccessMode("readOnly");
         } else {
             spec.setAccessMode("readWrite");
         }
