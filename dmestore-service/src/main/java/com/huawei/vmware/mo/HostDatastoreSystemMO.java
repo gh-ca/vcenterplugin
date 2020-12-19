@@ -186,9 +186,9 @@ public class HostDatastoreSystemMO extends BaseMO {
             spec.setType(type);
         }
         if (!StringUtils.isEmpty(securityType)) {
-            if (HostNasVolumeSecurityType.AUTH_SYS.value().equalsIgnoreCase(accessMode)) {
+            if (HostNasVolumeSecurityType.AUTH_SYS.value().equalsIgnoreCase(securityType)) {
                 spec.setSecurityType(HostNasVolumeSecurityType.AUTH_SYS.value());
-            } else if (HostNasVolumeSecurityType.SEC_KRB_5.value().equalsIgnoreCase(accessMode)) {
+            } else if (HostNasVolumeSecurityType.SEC_KRB_5.value().equalsIgnoreCase(securityType)) {
                 spec.setSecurityType(HostNasVolumeSecurityType.SEC_KRB_5.value());
             } else {
                 spec.setSecurityType(HostNasVolumeSecurityType.SEC_KRB_5_I.value());
