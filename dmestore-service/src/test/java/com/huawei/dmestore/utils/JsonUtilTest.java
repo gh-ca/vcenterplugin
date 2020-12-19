@@ -66,4 +66,11 @@ public class JsonUtilTest {
         jsonUtil.readAsMap(data);
 
     }
+
+
+    @Test
+   public void test(){
+        String s = "VMFS";
+        System.out.println(s.toUpperCase());
+    }
 }
