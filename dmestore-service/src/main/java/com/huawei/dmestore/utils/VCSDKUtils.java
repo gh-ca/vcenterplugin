@@ -1996,7 +1996,7 @@ public class VCSDKUtils {
                     nasdsinfo.getNas().getSecurityType());
             logger.info("mount nfs success:{}:", hostMo.getName(), datastoreMo.getName());
         } catch (Exception e) {
-            logger.error("mount nfs error:", e);
+            logger.error("vmware mount nfs error:{}", e.getMessage());
         }
     }
 
@@ -2555,21 +2555,16 @@ public class VCSDKUtils {
         }
     }
 
-    public void deleteNfs(DatastoreMO dsmo, HostMO hostMo, String nfsId) {
+    public void deleteNfs(DatastoreMO dsmo, HostMO hostMo, String nfsId) throws Exception {
         String hostName = null;
-        try {
-            // 删除前重新扫描datastore
-            hostMo.getHostStorageSystemMo().rescanVmfs();
-            logger.info("Rescan datastore before mounting");
+        // 删除前重新扫描datastore
+        hostMo.getHostStorageSystemMo().rescanVmfs();
+        logger.info("Rescan datastore before mounting");
 
-            // 删除NFS
-            NasDatastoreInfo nasdsinfo = (NasDatastoreInfo) dsmo.getInfo();
-            hostMo.getHostDatastoreSystemMo().deleteDatastore(nasdsinfo.getName());
-            hostName = hostMo.getName();
-            logger.info("mount nfs success!host name={}, datastore name={}", hostMo.getName(), dsmo.getName());
-        } catch (Exception e) {
-            logger.error("delete nfs error from host, hostName={},error:{}", hostName, e.getMessage());
-        }
+        // 删除NFS
+        NasDatastoreInfo nasdsinfo = (NasDatastoreInfo) dsmo.getInfo();
+        hostMo.getHostDatastoreSystemMo().deleteDatastore(nasdsinfo.getName());
+        logger.info("mount nfs success!host name={}, datastore name={}", hostMo.getName(), dsmo.getName());
     }
 
     /**

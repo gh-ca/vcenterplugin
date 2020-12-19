@@ -13,6 +13,7 @@ import com.huawei.dmestore.model.NfsDataStoreFsAttr;
 import com.huawei.dmestore.model.NfsDataStoreLogicPortAttr;
 import com.huawei.dmestore.model.NfsDataStoreShareAttr;
 import com.huawei.dmestore.model.Storage;
+import com.huawei.dmestore.model.TaskDetailInfo;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 
@@ -265,25 +266,30 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     @Override
     public boolean scanNfs() throws DmeException {
+        LOG.error("===scanNfs begin====");
         String storeType = ToolUtils.STORE_TYPE_NFS;
         String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(storeType);
         if (StringUtils.isEmpty(listStr)) {
+            LOG.error("vmware get nfs error!listStr={}", listStr == null ? "" : listStr);
             return false;
         }
+        LOG.error("vmware list nfs success!");
 
         // 将DME的存储设备集合转换为map key:ip value:Storage
         List<Storage> storages = dmeStorageService.getStorages();
         Map<String, Storage> storageMap = converStorage(storages);
-        if (storageMap == null || 0 == storageMap.size()) {
+        if (storageMap == null || storageMap.size() == 0) {
+            LOG.error("get dme storage failed!storages is null!");
             return false;
         }
+        LOG.info("get dme storage success!storages size={}", storages.size());
         JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
         List<DmeVmwareRelation> relationList = new ArrayList<>();
         for (int index = 0; index < jsonArray.size(); index++) {
             JsonObject nfsDatastore = jsonArray.get(index).getAsJsonObject();
             relationList.addAll(parseNfsDatastore(storeType, storageMap, nfsDatastore));
         }
-
+        LOG.info("scanNfs end!relationList size={}", relationList.size());
         if (relationList.size() > 0) {
             return dmeVmWareRelationDbProcess(relationList, storeType);
         }
@@ -377,16 +383,19 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         // 更新
         if (!upList.isEmpty()) {
             dmeVmwareRalationDao.update(upList);
+            LOG.info("update nfs relation success!");
         }
 
         // 新增
         if (!newList.isEmpty()) {
             dmeVmwareRalationDao.save(newList);
+            LOG.info("add nfs relation success!");
         }
 
         // 删除
         if (!storageIds.isEmpty()) {
             dmeVmwareRalationDao.deleteByStorageId(storageIds);
+            LOG.info("delete nfs relation success!");
         }
         return true;
     }
@@ -500,8 +509,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private ResponseEntity listLogicPortByStorageId(String storageId) throws DmeException {
         String url = DmeConstants.API_LOGICPORTS_LIST;
         JsonObject param = new JsonObject();
-        param.addProperty("storage_id",storageId);
-        ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.POST, null);
+        param.addProperty("storage_id", storageId);
+        ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(param));
         return responseEntity;
     }
 
@@ -690,7 +699,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 vcsdkUtils.mountNfs(dataStoreObjectId, hostObjectId, logicPortIp,
                     ToolUtils.getStr(params.get("mountType")));
             } else {
-                throw new DmeException("DME mount nfs error(task status)!");
+                TaskDetailInfo taskDetailInfo = taskService.queryTaskById(taskId);
+                LOG.error("mountnfs error!{}", taskDetailInfo.getDetail());
+                throw new DmeException(taskDetailInfo.getDetail());
             }
         } else {
             throw new DmeException("DME mount nfs error(task is null)!");
@@ -744,6 +755,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         vcsdkUtils.hasVmOnDatastore(dataStoreObjectId);
         DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStoreObjectId);
         if (dvr == null) {
+            LOG.error("unmountNfs get relation error!dataStoreObjectId={}", dataStoreObjectId);
             return;
         }
         String dsName = dvr.getStoreName();
@@ -771,6 +783,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 taskIds.add(taskId);
                 boolean isUnmounted = taskService.checkTaskStatus(taskIds);
                 if (!isUnmounted) {
+                    LOG.error("unmountNfs mountnfs error!taskId={}", taskId);
                     throw new DmeException("DME mount nfs error(task status)!");
                 }
             } else {
