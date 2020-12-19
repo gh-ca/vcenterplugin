@@ -13,6 +13,7 @@ import com.huawei.dmestore.model.TaskDetailInfo;
 import com.huawei.dmestore.model.VmfsDataInfo;
 import com.huawei.dmestore.model.VmfsDatastoreVolumeDetail;
 import com.huawei.dmestore.utils.RestUtils;
+import com.huawei.dmestore.utils.StringUtil;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 
@@ -1200,6 +1201,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
             for (int dex = 0; dex < wwnArray.size(); dex++) {
                 String wwn = wwnArray.get(dex).getAsString();
+                if(StringUtil.isBlank(wwn)){
+                    continue;
+                }
 
                 // 根据wwn从DME中查询卷信息
                 String volumeUrlByName = DmeConstants.DME_VOLUME_BASE_URL + "?volume_wwn=" + wwn;
