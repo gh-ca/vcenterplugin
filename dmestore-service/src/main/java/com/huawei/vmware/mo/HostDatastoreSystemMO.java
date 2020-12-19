@@ -4,6 +4,7 @@ import com.huawei.vmware.util.VmwareContext;
 import com.vmware.vim25.CustomFieldStringValue;
 import com.vmware.vim25.DatastoreInfo;
 import com.vmware.vim25.DynamicProperty;
+import com.vmware.vim25.HostNasVolumeSecurityType;
 import com.vmware.vim25.HostNasVolumeSpec;
 import com.vmware.vim25.HostScsiDisk;
 import com.vmware.vim25.ManagedObjectReference;
@@ -191,10 +192,15 @@ public class HostDatastoreSystemMO extends BaseMO {
 
         // 需要设置datastore名称
         spec.setLocalPath(uuid);
-
         // readOnly/readWrite
         if (!StringUtils.isEmpty(accessMode)) {
-            spec.setAccessMode(accessMode);
+            if (HostNasVolumeSecurityType.AUTH_SYS.value().equalsIgnoreCase(accessMode)) {
+                spec.setAccessMode(HostNasVolumeSecurityType.AUTH_SYS.value());
+            } else if (HostNasVolumeSecurityType.SEC_KRB_5.value().equalsIgnoreCase(accessMode)) {
+                spec.setAccessMode(HostNasVolumeSecurityType.SEC_KRB_5.value());
+            } else {
+                spec.setAccessMode(HostNasVolumeSecurityType.SEC_KRB_5_I.value());
+            }
         } else {
             spec.setAccessMode("readWrite");
         }
