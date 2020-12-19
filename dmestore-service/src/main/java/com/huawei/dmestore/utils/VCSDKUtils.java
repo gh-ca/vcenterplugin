@@ -2601,8 +2601,8 @@ public class VCSDKUtils {
                     HostFibreChannelHba fcHba = (HostFibreChannelHba) hba;
                     map.put(TYPE, FC_TYPE);
                     //map.put(NAME, fcHba.getNodeWorldWideName());
-                    logger.info("host = {},fc hba long = {}", hostObjectId, fcHba.getPortWorldWideName());
-                    map.put(NAME, fcHba.getPortWorldWideName());
+                    logger.info("host = {},fc hba long = {}", hostObjectId, ToolUtils.normalizeWwn(fcHba.getPortWorldWideName()));
+                    map.put(NAME, ToolUtils.normalizeWwn(fcHba.getPortWorldWideName()));
                 }
             }
         } catch (Exception e) {
@@ -2647,8 +2647,8 @@ public class VCSDKUtils {
                     HostFibreChannelHba fcHba = (HostFibreChannelHba) hba;
                     map.put(TYPE, FC_TYPE);
                     //map.put(NAME, fcHba.getNodeWorldWideName());
-                    logger.info("host = {},fc hba long = {}", hostObjectId, fcHba.getPortWorldWideName());
-                    map.put(NAME, fcHba.getPortWorldWideName());
+                    logger.info("host = {},fc hba long = {}", hostObjectId, ToolUtils.normalizeWwn(fcHba.getPortWorldWideName()));
+                    map.put(NAME, ToolUtils.normalizeWwn(fcHba.getPortWorldWideName()));
                     hbalist.add(map);
                 }
             }
@@ -2700,8 +2700,8 @@ public class VCSDKUtils {
                             map.put(TYPE, FC_TYPE);
                             //map.put(NAME, fcHba.getNodeWorldWideName());
                             logger.info("hostname = {},fc hba long = {}", hostmo.getName(),
-                                fcHba.getPortWorldWideName());
-                            map.put(NAME, fcHba.getPortWorldWideName());
+                                    ToolUtils.normalizeWwn(fcHba.getPortWorldWideName()));
+                            map.put(NAME, ToolUtils.normalizeWwn(fcHba.getPortWorldWideName()));
                             subhbalist.add(map);
                         }
                     }
