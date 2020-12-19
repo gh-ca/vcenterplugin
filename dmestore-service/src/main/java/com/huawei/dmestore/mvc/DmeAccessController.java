@@ -95,7 +95,9 @@ public class DmeAccessController extends BaseController {
     @RequestMapping(value = "/scandatastore", method = RequestMethod.GET)
     public ResponseBodyBean scanDatastore(@RequestParam("storageType") String storageType) {
         try {
+            LOG.info("DmeAccessController scanDatastore begin!storageType={}", storageType);
             dmeAccessService.scanDatastore(storageType);
+            LOG.info("DmeAccessController scanDatastore end!storageType={}", storageType);
             return success(null, "scan datastore complete!");
         } catch (DmeException e) {
             return failure("scan datastore failure:" + e.toString());

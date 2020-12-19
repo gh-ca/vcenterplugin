@@ -589,16 +589,17 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     @Override
     public void scanDatastore(String storageType) throws DmeException {
+        LOG.info("scanDatastore storageType={}", storageType);
         if (!StringUtils.isEmpty(storageType)) {
-            if (storageType.equals(DmeConstants.STORE_TYPE_VMFS)) {
+            if (storageType.equalsIgnoreCase(DmeConstants.STORE_TYPE_VMFS)) {
                 LOG.info("scan VMFS Datastore start");
                 vmfsAccessService.scanVmfs();
                 LOG.info("scan VMFS Datastore end");
-            } else if (storageType.equals(ToolUtils.STORE_TYPE_NFS)) {
+            } else if (storageType.equalsIgnoreCase(ToolUtils.STORE_TYPE_NFS)) {
                 LOG.info("scan NFS Datastore start");
                 dmeNfsAccessService.scanNfs();
                 LOG.info("scan NFS Datastore end");
-            } else if (storageType.equals(ToolUtils.STORE_TYPE_ALL)) {
+            } else if (storageType.equalsIgnoreCase(ToolUtils.STORE_TYPE_ALL)) {
                 try {
                     // 扫描vmfs
                     LOG.info("scan VMFS Datastore start");

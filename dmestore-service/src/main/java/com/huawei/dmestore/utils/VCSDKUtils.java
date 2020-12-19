@@ -219,17 +219,17 @@ public class VCSDKUtils {
                         String objectid = vcConnectionHelpers.mor2ObjectId(ds1.getMor(),
                             vmwareContext.getServerAddress());
                         dsmap.put(OBJECT_ID, objectid);
-                        if (storeType.equals(ToolUtils.STORE_TYPE_NFS) && ds1.getSummary()
+                        if (storeType.equalsIgnoreCase(ToolUtils.STORE_TYPE_NFS) && ds1.getSummary()
                             .getType()
-                            .equals(ToolUtils.STORE_TYPE_NFS)) {
+                            .equalsIgnoreCase(ToolUtils.STORE_TYPE_NFS)) {
                             NasDatastoreInfo nasinfo = (NasDatastoreInfo) ds1.getInfo();
 
                             dsmap.put("remoteHost", nasinfo.getNas().getRemoteHost());
                             dsmap.put("remotePath", nasinfo.getNas().getRemotePath());
                             dsmap.put("nfsStorageId", ds1.getMor().getValue());
-                        } else if (storeType.equals(DmeConstants.STORE_TYPE_VMFS) && ds1.getSummary()
+                        } else if (storeType.equalsIgnoreCase(DmeConstants.STORE_TYPE_VMFS) && ds1.getSummary()
                             .getType()
-                            .equals(DmeConstants.STORE_TYPE_VMFS)) {
+                            .equalsIgnoreCase(DmeConstants.STORE_TYPE_VMFS)) {
                             VmfsDatastoreInfo vmfsDatastoreInfo = ds1.getVmfsDatastoreInfo();
                             List<HostScsiDiskPartition> extent = vmfsDatastoreInfo.getVmfs().getExtent();
                             List<String> wwnList = new ArrayList<>();
@@ -1944,7 +1944,7 @@ public class VCSDKUtils {
                 DatastoreMO datastoreMo = datastoreVmwareMoFactory.build(vmwareContext, dsMor);
                 String objectId = vcConnectionHelpers.mor2ObjectId(dsMor, vmwareContext.getServerAddress());
                 DatastoreSummary summary = datastoreMo.getSummary();
-                if (summary.getType().equals(DmeConstants.STORE_TYPE_VMFS)) {
+                if (summary.getType().equalsIgnoreCase(DmeConstants.STORE_TYPE_VMFS)) {
                     JsonObject jsonObject = gson.fromJson(gson.toJson(summary), JsonObject.class);
                     jsonObject.addProperty(OBJECT_ID, objectId);
                     list.add(jsonObject);
