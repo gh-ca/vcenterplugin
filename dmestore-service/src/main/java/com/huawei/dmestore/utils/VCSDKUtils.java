@@ -243,10 +243,10 @@ public class VCSDKUtils {
                         }
                         if (StringUtils.isEmpty(storeType)) {
                             lists.add(dsmap);
-                            logger.info("存储扫描量：{}",lists.size());
+                            logger.info("存储扫描量：{}", lists.size());
                         } else if (ds1.getSummary().getType().equals(storeType)) {
                             lists.add(dsmap);
-                            logger.info("存储扫描量：{}",lists.size());
+                            logger.info("存储扫描量：{}", lists.size());
                         }
                     }
                     if (lists.size() > 0) {
@@ -2600,7 +2600,9 @@ public class VCSDKUtils {
                 } else if (hba instanceof HostFibreChannelHba) {
                     HostFibreChannelHba fcHba = (HostFibreChannelHba) hba;
                     map.put(TYPE, FC_TYPE);
-                    map.put(NAME, fcHba.getNodeWorldWideName());
+                    //map.put(NAME, fcHba.getNodeWorldWideName());
+                    logger.info("host = {},fc hba long = {}", hostObjectId, fcHba.getPortWorldWideName());
+                    map.put(NAME, fcHba.getPortWorldWideName());
                 }
             }
         } catch (Exception e) {
@@ -2644,7 +2646,9 @@ public class VCSDKUtils {
                     Map<String, Object> map = new HashMap<>();
                     HostFibreChannelHba fcHba = (HostFibreChannelHba) hba;
                     map.put(TYPE, FC_TYPE);
-                    map.put(NAME, fcHba.getNodeWorldWideName());
+                    //map.put(NAME, fcHba.getNodeWorldWideName());
+                    logger.info("host = {},fc hba long = {}", hostObjectId, fcHba.getPortWorldWideName());
+                    map.put(NAME, fcHba.getPortWorldWideName());
                     hbalist.add(map);
                 }
             }
@@ -2694,7 +2698,10 @@ public class VCSDKUtils {
                             Map<String, Object> map = new HashMap<>();
                             HostFibreChannelHba fcHba = (HostFibreChannelHba) hba;
                             map.put(TYPE, FC_TYPE);
-                            map.put(NAME, fcHba.getNodeWorldWideName());
+                            //map.put(NAME, fcHba.getNodeWorldWideName());
+                            logger.info("hostname = {},fc hba long = {}", hostmo.getName(),
+                                fcHba.getPortWorldWideName());
+                            map.put(NAME, fcHba.getPortWorldWideName());
                             subhbalist.add(map);
                         }
                     }
