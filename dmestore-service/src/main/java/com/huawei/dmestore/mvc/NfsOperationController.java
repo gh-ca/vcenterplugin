@@ -225,7 +225,7 @@ public class NfsOperationController extends BaseController {
         Object autoSizeEnable = params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD);
         if (autoSizeEnable != null) {
             capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
-            String capacitymode = Boolean.parseBoolean((String) params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD))
+            String capacitymode = (Boolean)params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD)
                 ? CapacityAutonegotiation.CAPACITY_MODE_AUTO
                 : CapacityAutonegotiation.CAPACITY_MODE_OFF;
             capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);

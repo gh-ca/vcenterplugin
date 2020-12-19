@@ -552,7 +552,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     public List<NfsDataInfo> listNfs() throws DmeException {
         // 从关系表中取得DME卷与vcenter存储的对应关系
         List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_NFS);
-        if (dvrlist == null) {
+        if (dvrlist == null || dvrlist.size() > 0) {
             throw new DmeException("get ralation failed!");
         }
         Map<String, DmeVmwareRelation> dvrMap = getDvrMap(dvrlist);
