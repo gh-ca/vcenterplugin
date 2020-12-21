@@ -212,6 +212,8 @@ export class NfsComponent implements OnInit {
       if (result.code === '200'){
         // 打开成功提示窗口
         this.addSuccessShow = true;
+        // 添加成功后刷新数据
+        this.scanDataStore();
       }else{
         this.errorMsg = '1';
         console.log("Delete failed:",result.description)
