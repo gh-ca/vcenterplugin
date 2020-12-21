@@ -4,6 +4,7 @@ import com.huawei.dmestore.utils.VCSDKUtils;
 import com.huawei.vmware.mo.HostMO;
 import com.huawei.vmware.mo.HostNetworkSystemMO;
 import com.huawei.vmware.util.VmwareContext;
+
 import com.vmware.vim25.HostConfigChangeMode;
 import com.vmware.vim25.HostNetworkConfig;
 import com.vmware.vim25.HostNetworkInfo;

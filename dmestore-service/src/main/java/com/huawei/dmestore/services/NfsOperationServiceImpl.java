@@ -381,7 +381,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         } else if (!isExpand) {
             // 缩容
             if (!StringUtils.isEmpty(allocType) && THIN_FIELD.equals(allocType)) {
-                //  该文件系统总容量-可用容量-文件系统能缩容的最小空间=实际可用缩小容量    与变化量进行比较
+                //  该文件系统总容量-可用容量-文件系统能缩容的最小空间=实际可用缩小容量与变化量进行比较
                 if (currentCapacity - changeCapacity >= minSizeFsCapacity) {
                     if (Double.compare(changeCapacity, availableCapacity) > 1) {
                         exchangedCapacity = currentCapacity - availableCapacity;
@@ -463,7 +463,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             gson.toJson(params));
         int code = responseEntity.getStatusCodeValue();
         if (code != HttpStatus.ACCEPTED.value()) {
-            throw new DmeException(CODE_503, "create file system error!\n" + responseEntity.getBody());
+            throw new DmeException(CODE_503, "create file system error!" + responseEntity.getBody());
         }
         String object = responseEntity.getBody();
         JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();

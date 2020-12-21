@@ -215,6 +215,11 @@
     <bean name="QuartzConfig" class="com.huawei.dmestore.task.QuartzConfig" destroy-method="destory">
     </bean>
 
+    <bean name="datastoreCustomPropertey" class="com.huawei.dmestore.utils.DatastoreCustomProperter" autowire="constructor">
+        <!--   <property name="vimObjectReferenceService" ref="vimObjectReferenceService"/>-->
+        <!--<constructor-arg index="0" ref="dataServiceExtensionRegistry"></constructor-arg>-->
+    </bean>
+
 
     <bean class="com.huawei.dmestore.task.ApplicationContextHelper"/>
    <!--开启这个配置，spring才能识别@Scheduled注解-->

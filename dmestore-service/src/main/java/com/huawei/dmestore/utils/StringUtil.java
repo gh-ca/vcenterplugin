@@ -44,5 +44,4 @@ public class StringUtil {
     public static boolean isNotBlank(String str) {
         return !isBlank(str);
     }
-
 }

@@ -403,11 +403,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         JsonObject param = new JsonObject();
         param.addProperty("storage_id", storageId);
         try {
+            LOG.info("{}, getLogic begin!storageId={}", url, storageId);
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(param));
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
-                throw new DmeException(CODE_503, "list Logic Ports error!");
+                LOG.error("getLogic failed!response = {}", gson.toJson(responseEntity));
+                throw new DmeException(CODE_503, responseEntity.getBody());
             }
+            LOG.info("{}, getLogic end!storageId={} success!", url, storageId);
             String object = responseEntity.getBody();
             if (!StringUtils.isEmpty(object)) {
                 JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
@@ -1587,5 +1590,15 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
         }
         return retdiskPool;
+    }
+
+    /**
+     * 判断数据存储中是否有注册的虚拟机，有则返回true，没有返回false
+     *
+     * @param objectid 数据存储的objectid
+     * @return 是否存在vm
+     */
+    public boolean hasVmOnDatastore(String objectid) {
+        return vcsdkUtils.hasVmOnDatastore(objectid);
     }
 }
