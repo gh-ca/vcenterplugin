@@ -3,6 +3,7 @@ package com.huawei.vmware.mo;
 import com.huawei.vmware.util.Pair;
 import com.huawei.vmware.util.VmwareContext;
 import com.huawei.vmware.util.VmwareHelper;
+
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.VirtualDevice;
 import com.vmware.vim25.VirtualDeviceConfigSpec;
@@ -25,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-
 /**
  * VirtualMachineMO
  *
@@ -34,15 +34,18 @@ import java.util.List;
  **/
 public class VirtualMachineMO extends BaseMO {
     private static final Logger logger = LoggerFactory.getLogger(VirtualMachineMO.class);
+
     private final String configDeviceStr = "config.hardware.device";
+
     private final int unit = 1024;
+
     private final int failResult = -1;
 
     /**
      * VirtualMachineMO
      *
      * @param context context
-     * @param morVm   morVm
+     * @param morVm morVm
      */
     public VirtualMachineMO(VmwareContext context, ManagedObjectReference morVm) {
         super(context, morVm);
@@ -98,17 +101,16 @@ public class VirtualMachineMO extends BaseMO {
      * createDisk
      *
      * @param vmdkDatastorePath vmdkDatastorePath
-     * @param diskType          diskType
-     * @param diskMode          diskMode
-     * @param rdmDeviceName     rdmDeviceName
-     * @param sizeInMb          sizeInMb
-     * @param morDs             morDs
-     * @param controllerKey     controllerKey
+     * @param diskType diskType
+     * @param diskMode diskMode
+     * @param rdmDeviceName rdmDeviceName
+     * @param sizeInMb sizeInMb
+     * @param morDs morDs
+     * @param controllerKey controllerKey
      * @throws Exception Exception
      */
     public void createDisk(String vmdkDatastorePath, VirtualDiskType diskType, VirtualDiskMode diskMode,
-                           String rdmDeviceName, long sizeInMb, ManagedObjectReference morDs, int controllerKey)
-        throws Exception {
+        String rdmDeviceName, long sizeInMb, ManagedObjectReference morDs, int controllerKey) throws Exception {
         assert vmdkDatastorePath != null;
         assert morDs != null;
 
@@ -208,8 +210,8 @@ public class VirtualMachineMO extends BaseMO {
 
         if (devices != null && devices.size() > 0) {
             for (VirtualDevice device : devices) {
-                if (device instanceof VirtualSCSIController
-                    && isValidScsiDiskController((VirtualSCSIController) device)) {
+                if (device instanceof VirtualSCSIController && isValidScsiDiskController(
+                    (VirtualSCSIController) device)) {
                     return device.getKey();
                 }
             }

@@ -50,8 +50,8 @@ public class HostVmwareFactory {
      *
      * @param context  context
      * @param hostName hostName
-     * @return HostMO
-     * @throws Exception
+     * @return HostMO HostMO
+     * @throws Exception Exception
      */
     public HostMO build(VmwareContext context, String hostName) throws Exception {
         return new HostMO(context, hostName);

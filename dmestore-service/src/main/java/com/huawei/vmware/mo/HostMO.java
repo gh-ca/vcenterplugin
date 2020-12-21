@@ -3,6 +3,7 @@ package com.huawei.vmware.mo;
 import com.huawei.vmware.util.ClusterVmwareMoFactory;
 import com.huawei.vmware.util.Pair;
 import com.huawei.vmware.util.VmwareContext;
+
 import com.vmware.vim25.AboutInfo;
 import com.vmware.vim25.AlreadyExistsFaultMsg;
 import com.vmware.vim25.ClusterDasConfigInfo;
@@ -62,8 +63,8 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     /**
      * HostMO
      *
-     * @param context  context
-     * @param morType  morType
+     * @param context context
+     * @param morType morType
      * @param morValue morValue
      */
     public HostMO(VmwareContext context, String morType, String morValue) {
@@ -73,7 +74,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     /**
      * HostMO
      *
-     * @param context  context
+     * @param context context
      * @param hostName hostName
      * @throws Exception Exception
      */
@@ -310,32 +311,33 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         vmCache.clear();
         int key = getCustomFieldKey("VirtualMachine", CustomFieldConstants.CLOUD_VM_INTERNAL_NAME);
         if (key == 0) {
-            logger.warn("Custom field " + CustomFieldConstants.CLOUD_VM_INTERNAL_NAME + " is not registered ?!");
+            logger.warn("Custom field {} is not registered!", CustomFieldConstants.CLOUD_VM_INTERNAL_NAME);
         }
         ObjectContent[] ocs = getVmPropertiesOnHyperHost(new String[] {strName, "value[" + key + "]"});
         if (ocs != null && ocs.length > 0) {
             for (ObjectContent oc : ocs) {
                 List<DynamicProperty> props = oc.getPropSet();
-                if (props != null) {
-                    String vmVcenterName = null;
-                    String vmInternalCsName = null;
-                    for (DynamicProperty prop : props) {
-                        if (strName.equals(prop.getName())) {
-                            vmVcenterName = prop.getVal().toString();
-                        } else if (prop.getName().startsWith("value[")) {
-                            if (prop.getVal() != null) {
-                                vmInternalCsName = ((CustomFieldStringValue) prop.getVal()).getValue();
-                            }
+                if (props == null) {
+                    continue;
+                }
+                String vmVcenterName = null;
+                String vmInternalCsName = null;
+                for (DynamicProperty prop : props) {
+                    if (strName.equals(prop.getName())) {
+                        vmVcenterName = prop.getVal().toString();
+                    } else if (prop.getName().startsWith("value[")) {
+                        if (prop.getVal() != null) {
+                            vmInternalCsName = ((CustomFieldStringValue) prop.getVal()).getValue();
                         }
                     }
-                    String vmName;
-                    if (vmInternalCsName != null && isUserVmInternalCsName(vmInternalCsName)) {
-                        vmName = vmInternalCsName;
-                    } else {
-                        vmName = vmVcenterName;
-                    }
-                    vmCache.put(vmName, new VirtualMachineMO(context, oc.getObj()));
                 }
+                String vmName;
+                if (vmInternalCsName != null && isUserVmInternalCsName(vmInternalCsName)) {
+                    vmName = vmInternalCsName;
+                } else {
+                    vmName = vmVcenterName;
+                }
+                vmCache.put(vmName, new VirtualMachineMO(context, oc.getObj()));
             }
         }
     }
@@ -409,13 +411,13 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
     /**
      * getExistingDataStoreOnHost
      *
-     * @param hostAddress           hostAddress
-     * @param path                  path
+     * @param hostAddress hostAddress
+     * @param path path
      * @param hostDatastoreSystemMo hostDatastoreSystemMo
-     * @return
+     * @return ManagedObjectReference ManagedObjectReference
      */
     public ManagedObjectReference getExistingDataStoreOnHost(String hostAddress, String path,
-                                                             HostDatastoreSystemMO hostDatastoreSystemMo) {
+        HostDatastoreSystemMO hostDatastoreSystemMo) {
         List<ManagedObjectReference> morArray;
         try {
             morArray = hostDatastoreSystemMo.getDatastores();
@@ -443,7 +445,7 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
 
     @Override
     public ManagedObjectReference mountDatastore(boolean vmfsDatastore, String poolHostAddress, int poolHostPort,
-                                                 String poolPath, String poolUuid) throws Exception {
+        String poolPath, String poolUuid) throws Exception {
         HostDatastoreSystemMO hostDatastoreSystemMo = getHostDatastoreSystemMo();
         ManagedObjectReference morDatastore = hostDatastoreSystemMo.findDatastore(poolUuid);
         if (morDatastore == null) {
