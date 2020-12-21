@@ -34,8 +34,6 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
 
     private static final String HOST_ID = "HOST_ID";
 
-    private static final String ACCENT_SIGN = "'";
-
     private static final int MINUS_ONE = -1;
 
     private static final int COLLECTIONS_DEFAULT_LEN = 16;
@@ -141,7 +139,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             String sql = "SELECT HOST_ID,HOST_NAME from DP_DME_BEST_PRACTICE_CHECK where 1=1 AND HOST_ID in(%s)";
             StringBuilder stringBuilder = new StringBuilder();
             for (int index = 0; index < ids.size(); index++) {
-                stringBuilder.append(ACCENT_SIGN).append(ids.get(index)).append(ACCENT_SIGN);
+                stringBuilder.append("'").append(ids.get(index)).append("'");
                 if (index < ids.size() - 1) {
                     stringBuilder.append(",");
                 }
@@ -173,7 +171,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
                 "SELECT HOST_ID,HOST_NAME,HOST_SETTING,RECOMMEND_VALUE,ACTUAL_VALUE,HINT_LEVEL,NEED_REBOOT,AUTO_REPAIR "
                     + " from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
             if (!StringUtils.isEmpty(hostSetting)) {
-                sql = sql + " and HOST_SETTING='" + hostSetting + ACCENT_SIGN;
+                sql = sql + " and HOST_SETTING='" + hostSetting + "'";
             }
 
             sql = sql + " OFFSET " + offset + " ROWS FETCH FIRST " + pageSize + " ROWS ONLY";
@@ -202,7 +200,7 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
             String sql = "SELECT HOST_ID,HOST_NAME,HOST_SETTING,RECOMMEND_VALUE,ACTUAL_VALUE,HINT_LEVEL,NEED_REBOOT,"
                 + "AUTO_REPAIR from DP_DME_BEST_PRACTICE_CHECK where 1=1 ";
             if (!StringUtils.isEmpty(hostSetting)) {
-                sql = sql + " and HOST_SETTING='" + hostSetting + ACCENT_SIGN;
+                sql = sql + " and HOST_SETTING='" + hostSetting + "'";
             }
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
