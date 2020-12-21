@@ -1,6 +1,7 @@
 package com.huawei.vmware.mo;
 
 import com.huawei.vmware.util.VmwareContext;
+
 import com.vmware.vim25.CustomFieldStringValue;
 import com.vmware.vim25.DatastoreInfo;
 import com.vmware.vim25.DynamicProperty;
@@ -25,7 +26,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 /**
  * HostDatastoreSystemMO
  *
@@ -36,7 +36,7 @@ public class HostDatastoreSystemMO extends BaseMO {
     /**
      * HostDatastoreSystemMO
      *
-     * @param context          context
+     * @param context context
      * @param morHostDatastore morHostDatastore
      */
     public HostDatastoreSystemMO(VmwareContext context, ManagedObjectReference morHostDatastore) {
@@ -67,14 +67,15 @@ public class HostDatastoreSystemMO extends BaseMO {
                 return oc.getObj();
             }
 
-            if (oc.getPropSet().size() > 1) {
-                DynamicProperty prop = oc.getPropSet().get(1);
-                if (prop != null && prop.getVal() != null) {
-                    if (prop.getVal() instanceof CustomFieldStringValue) {
-                        String val = ((CustomFieldStringValue) prop.getVal()).getValue();
-                        if (val.equalsIgnoreCase(name)) {
-                            return oc.getObj();
-                        }
+            if (oc.getPropSet().size() == 0) {
+                continue;
+            }
+            DynamicProperty prop = oc.getPropSet().get(1);
+            if (prop != null && prop.getVal() != null) {
+                if (prop.getVal() instanceof CustomFieldStringValue) {
+                    String val = ((CustomFieldStringValue) prop.getVal()).getValue();
+                    if (val.equalsIgnoreCase(name)) {
+                        return oc.getObj();
                     }
                 }
             }
@@ -96,7 +97,7 @@ public class HostDatastoreSystemMO extends BaseMO {
     /**
      * expandVmfsDatastore
      *
-     * @param datastoreMo             datastoreMo
+     * @param datastoreMo datastoreMo
      * @param vmfsDatastoreExpandSpec vmfsDatastoreExpandSpec
      * @throws Exception Exception
      */
@@ -118,19 +119,18 @@ public class HostDatastoreSystemMO extends BaseMO {
     /**
      * createVmfsDatastore
      *
-     * @param datastoreName    datastoreName
-     * @param hostScsiDisk     hostScsiDisk
+     * @param datastoreName datastoreName
+     * @param hostScsiDisk hostScsiDisk
      * @param vmfsMajorVersion vmfsMajorVersion
-     * @param blockSize        blockSize
-     * @param totalSectors     totalSectors
+     * @param blockSize blockSize
+     * @param totalSectors totalSectors
      * @param unmapGranularity unmapGranularity
-     * @param unmapPriority    unmapPriority
+     * @param unmapPriority unmapPriority
      * @return ManagedObjectReference
      * @throws Exception Exception
      */
     public ManagedObjectReference createVmfsDatastore(String datastoreName, HostScsiDisk hostScsiDisk,
-                                                      int vmfsMajorVersion, int blockSize, long totalSectors,
-                                                      int unmapGranularity, String unmapPriority)
+        int vmfsMajorVersion, int blockSize, long totalSectors, int unmapGranularity, String unmapPriority)
         throws Exception {
         VmfsDatastoreOption vmfsDatastoreOption = context.getService()
             .queryVmfsDatastoreCreateOptions(mor, hostScsiDisk.getDevicePath(), vmfsMajorVersion)
@@ -166,19 +166,18 @@ public class HostDatastoreSystemMO extends BaseMO {
     /**
      * createNfsDatastore
      *
-     * @param host         host
-     * @param port         port
-     * @param exportPath   exportPath
-     * @param uuid         uuid
-     * @param accessMode   accessMode
-     * @param type         type
+     * @param host host
+     * @param port port
+     * @param exportPath exportPath
+     * @param uuid uuid
+     * @param accessMode accessMode
+     * @param type type
      * @param securityType securityType
      * @return ManagedObjectReference
      * @throws Exception Exception
      */
     public ManagedObjectReference createNfsDatastore(String host, int port, String exportPath, String uuid,
-                                                     String accessMode, String type, String securityType)
-        throws Exception {
+        String accessMode, String type, String securityType) throws Exception {
         HostNasVolumeSpec spec = new HostNasVolumeSpec();
         spec.setRemoteHost(host);
         spec.setRemotePath(exportPath);
@@ -194,8 +193,10 @@ public class HostDatastoreSystemMO extends BaseMO {
                 spec.setSecurityType(HostNasVolumeSecurityType.SEC_KRB_5_I.value());
             }
         }
+
         // 需要设置datastore名称
         spec.setLocalPath(uuid);
+
         // readOnly/readWrite
         if (!StringUtils.isEmpty(accessMode)) {
             spec.setAccessMode("readOnly");

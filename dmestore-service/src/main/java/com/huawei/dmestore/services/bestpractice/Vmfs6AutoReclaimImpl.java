@@ -1,12 +1,12 @@
 package com.huawei.dmestore.services.bestpractice;
 
 import com.huawei.dmestore.constant.DmeConstants;
-import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 import com.huawei.vmware.mo.DatastoreMO;
 import com.huawei.vmware.mo.HostMO;
 import com.huawei.vmware.util.Pair;
 import com.huawei.vmware.util.VmwareContext;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.vmware.vim25.DatastoreSummary;

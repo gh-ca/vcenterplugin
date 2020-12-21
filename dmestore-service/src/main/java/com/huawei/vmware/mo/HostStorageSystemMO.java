@@ -1,6 +1,7 @@
 package com.huawei.vmware.mo;
 
 import com.huawei.vmware.util.VmwareContext;
+
 import com.vmware.vim25.HostConfigFaultFaultMsg;
 import com.vmware.vim25.HostFileSystemVolumeInfo;
 import com.vmware.vim25.HostInternetScsiHbaSendTarget;
@@ -22,7 +23,7 @@ public class HostStorageSystemMO extends BaseMO {
     /**
      * HostStorageSystemMO
      *
-     * @param context          context
+     * @param context context
      * @param morHostDatastore morHostDatastore
      */
     public HostStorageSystemMO(VmwareContext context, ManagedObjectReference morHostDatastore) {
@@ -100,13 +101,12 @@ public class HostStorageSystemMO extends BaseMO {
     /**
      * setMultipathLunPolicy
      *
-     * @param lunId                              lunId
+     * @param lunId lunId
      * @param hostMultipathInfoLogicalUnitPolicy hostMultipathInfoLogicalUnitPolicy
      * @throws Exception Exception
      */
     public void setMultipathLunPolicy(String lunId,
-                                      HostMultipathInfoLogicalUnitPolicy hostMultipathInfoLogicalUnitPolicy)
-        throws Exception {
+        HostMultipathInfoLogicalUnitPolicy hostMultipathInfoLogicalUnitPolicy) throws Exception {
         context.getService().setMultipathLunPolicy(mor, lunId, hostMultipathInfoLogicalUnitPolicy);
     }
 
@@ -114,13 +114,12 @@ public class HostStorageSystemMO extends BaseMO {
      * addInternetScsiSendTargets
      *
      * @param iscsiHbaDevice iscsiHbaDevice
-     * @param targets        targets
+     * @param targets targets
      * @throws HostConfigFaultFaultMsg HostConfigFaultFaultMsg
-     * @throws NotFoundFaultMsg        NotFoundFaultMsg
-     * @throws RuntimeFaultFaultMsg    RuntimeFaultFaultMsg
+     * @throws NotFoundFaultMsg NotFoundFaultMsg
+     * @throws RuntimeFaultFaultMsg RuntimeFaultFaultMsg
      */
-    public void addInternetScsiSendTargets(String iscsiHbaDevice,
-                                           List<HostInternetScsiHbaSendTarget> targets)
+    public void addInternetScsiSendTargets(String iscsiHbaDevice, List<HostInternetScsiHbaSendTarget> targets)
         throws HostConfigFaultFaultMsg, NotFoundFaultMsg, RuntimeFaultFaultMsg {
         context.getService().addInternetScsiSendTargets(mor, iscsiHbaDevice, targets);
     }

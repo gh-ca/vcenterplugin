@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 public class FileUtils {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(FileUtils.class);
 
     private static final String OS = System.getProperty("os.name").toLowerCase(Locale.US);

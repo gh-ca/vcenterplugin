@@ -20,11 +20,10 @@ import java.security.cert.X509Certificate;
 import javax.net.ssl.SSLContext;
 
 /**
- * @Description: TODO
- * @ClassName: RestUtils
- * @Company: GH-CA
- * @author: yy
- * @create: 2020-09-02
+ * RestUtils
+ *
+ * @author yy
+ * @since 2020-09-02
  **/
 public class RestUtils {
     public static final int RES_STATE_I_200 = 200;
