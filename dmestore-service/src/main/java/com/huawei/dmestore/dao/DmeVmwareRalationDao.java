@@ -120,7 +120,8 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             if (!StringUtils.isEmpty(storeId)) {
                 sql = sql + " and STORE_ID='" + storeId + "'";
             }
-            LOGGER.info("getDmeVmwareRelationByDsId!sql={}, connection is not null:{}", sql, con == null ? false : true);
+            LOGGER.info("getDmeVmwareRelationByDsId!sql={}, connection is not null:{}", sql,
+                con == null ? false : true);
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             while (rs.next()) {
@@ -290,7 +291,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 pstm.addBatch();
             }
             pstm.executeBatch();
-            
+
             con.commit();
         } catch (SQLException ex) {
             try {
