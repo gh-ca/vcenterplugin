@@ -115,7 +115,8 @@ public class VirtualMachineMO extends BaseMO {
         assert morDs != null;
 
         // 2020-11-06 wangxiangyong 修改为SCSI
-        int ideControllerKey = getLsiLogicControllerKey();
+        int ideControllerKey = getIDEDeviceControllerKey();
+        //int ideControllerKey = getLsiLogicControllerKey();
         if (controllerKey < 0) {
             controllerKey = ideControllerKey;
         }
@@ -252,7 +253,6 @@ public class VirtualMachineMO extends BaseMO {
      */
     public int getLsiLogicControllerKey() throws Exception {
         List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, configDeviceStr);
-
         if (devices != null && devices.size() > 0) {
             for (VirtualDevice device : devices) {
                 if (device instanceof VirtualLsiLogicController) {
@@ -262,6 +262,20 @@ public class VirtualMachineMO extends BaseMO {
         }
 
         assert false;
+        throw new Exception("IDE Controller Not Found");
+    }
+
+    public int getIDEDeviceControllerKey() throws Exception {
+        List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, configDeviceStr);
+        if (devices != null && devices.size() > 0) {
+            for (VirtualDevice device : devices) {
+                if (device instanceof VirtualLsiLogicController) {
+                    return device.getKey();
+                }
+            }
+        }
+
+        assert (false);
         throw new Exception("IDE Controller Not Found");
     }
 
