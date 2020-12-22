@@ -469,58 +469,36 @@
          <children>
             <Array>
                <com.vmware.actionsfw.ActionMenuItemSpec>
-                  <label>#{create.label}</label>
-                  <uid>com.huawei.dmestore.createhostMenu</uid>
-                  <children>
-                     <Array>
-                        <com.vmware.actionsfw.ActionMenuItemSpec>
-                           <type>action</type>
-                           <uid>com.huawei.dmestore.datastore.hostcreatenfsaction</uid>
-                        </com.vmware.actionsfw.ActionMenuItemSpec>
-                        <com.vmware.actionsfw.ActionMenuItemSpec>
-                           <type>action</type>
-                           <uid>com.huawei.dmestore.datastore.hostcreatevmfsaction</uid>
-                        </com.vmware.actionsfw.ActionMenuItemSpec>
-                     </Array>
-                  </children>
+                  <type>action</type>
+                  <uid>com.huawei.dmestore.datastore.hostcreatenfsaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
-                  <label>#{mount.label}</label>
-                  <uid>com.huawei.dmestore.mounthostMenu</uid>
-                  <children>
-                     <Array>
-                        <com.vmware.actionsfw.ActionMenuItemSpec>
-                           <type>action</type>
-                           <uid>com.huawei.dmestore.datastore.hostvmfsmountaction</uid>
-                        </com.vmware.actionsfw.ActionMenuItemSpec>
-                        <com.vmware.actionsfw.ActionMenuItemSpec>
-                           <type>action</type>
-                           <uid>com.huawei.dmestore.datastore.hostnfsmountaction</uid>
-                        </com.vmware.actionsfw.ActionMenuItemSpec>
-                     </Array>
-                  </children>
+                  <type>action</type>
+                  <uid>com.huawei.dmestore.datastore.hostnfsmountaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
-                  <label>#{unmount.label}</label>
-                  <uid>com.huawei.dmestore.unmounthostMenu</uid>
-                  <children>
-                     <Array>
-                        <com.vmware.actionsfw.ActionMenuItemSpec>
-                           <type>action</type>
-                           <uid>com.huawei.dmestore.datastore.hostvmfsumountaction</uid>
-                        </com.vmware.actionsfw.ActionMenuItemSpec>
-                        <com.vmware.actionsfw.ActionMenuItemSpec>
-                           <type>action</type>
-                           <uid>com.huawei.dmestore.datastore.hostnfsumountaction</uid>
-                        </com.vmware.actionsfw.ActionMenuItemSpec>
-                     </Array>
-                  </children>
+                  <type>action</type>
+                  <uid>com.huawei.dmestore.datastore.hostnfsumountaction</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
+
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <type>action</type>
+                  <uid>com.huawei.dmestore.datastore.hostcreatevmfsaction</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <type>action</type>
+                  <uid>com.huawei.dmestore.datastore.hostvmfsmountaction</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <type>action</type>
+                  <uid>com.huawei.dmestore.datastore.hostvmfsumountaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
 
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
                   <uid>com.huawei.dmestore.host.iscsi</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
+
                <com.vmware.actionsfw.ActionMenuItemSpec>
                   <type>action</type>
                   <uid>com.huawei.dmestore.hostbestpractice.apply</uid>
@@ -1002,7 +980,7 @@
       </metadata>
    </extension>
 
-
+   <!-- 集群菜单 -->
    <extension id="com.huawei.dmestore.clusterMenu">
       <extendedPoint>vsphere.core.menus.solutionMenus</extendedPoint>
       <object>
@@ -1013,52 +991,29 @@
          <children>
             <Array>
                <com.vmware.actionsfw.ActionMenuItemSpec>
-                  <label>#{create.label}</label>
-                  <uid>com.huawei.dmestore.createclusterMenu</uid>
-                  <children>
-                     <Array>
-                        <com.vmware.actionsfw.ActionMenuItemSpec>
-                           <type>action</type>
-                           <uid>com.huawei.dmestore.datastore.clustercreatenfsaction</uid>
-                        </com.vmware.actionsfw.ActionMenuItemSpec>
-                        <com.vmware.actionsfw.ActionMenuItemSpec>
-                           <type>action</type>
-                           <uid>com.huawei.dmestore.datastore.clustercreatevmfsaction</uid>
-                        </com.vmware.actionsfw.ActionMenuItemSpec>
-                     </Array>
-                  </children>
+                  <type>action</type>
+                  <uid>com.huawei.dmestore.datastore.clustercreatenfsaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
-                  <label>#{mount.label}</label>
-                  <uid>com.huawei.dmestore.mountclusterMenu</uid>
-                  <children>
-                     <Array>
-                        <com.vmware.actionsfw.ActionMenuItemSpec>
-                           <type>action</type>
-                           <uid>com.huawei.dmestore.datastore.clustervmfsmountaction</uid>
-                        </com.vmware.actionsfw.ActionMenuItemSpec>
-                        <com.vmware.actionsfw.ActionMenuItemSpec>
-                           <type>action</type>
-                           <uid>com.huawei.dmestore.datastore.clusternfsmountaction</uid>
-                        </com.vmware.actionsfw.ActionMenuItemSpec>
-                     </Array>
-                  </children>
+                  <type>action</type>
+                  <uid>com.huawei.dmestore.datastore.clusternfsmountaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
                <com.vmware.actionsfw.ActionMenuItemSpec>
-                  <label>#{unmount.label}</label>
-                  <uid>com.huawei.dmestore.unmountclusterMenu</uid>
-                  <children>
-                     <Array>
-                        <com.vmware.actionsfw.ActionMenuItemSpec>
-                           <type>action</type>
-                           <uid>com.huawei.dmestore.datastore.clustervmfsumountaction</uid>
-                        </com.vmware.actionsfw.ActionMenuItemSpec>
-                        <com.vmware.actionsfw.ActionMenuItemSpec>
-                           <type>action</type>
-                           <uid>com.huawei.dmestore.datastore.clusternfsumountaction</uid>
-                        </com.vmware.actionsfw.ActionMenuItemSpec>
-                     </Array>
-                  </children>
+                  <type>action</type>
+                  <uid>com.huawei.dmestore.datastore.clusternfsumountaction</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
+
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <type>action</type>
+                  <uid>com.huawei.dmestore.datastore.clustercreatevmfsaction</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <type>action</type>
+                  <uid>com.huawei.dmestore.datastore.clustervmfsmountaction</uid>
+               </com.vmware.actionsfw.ActionMenuItemSpec>
+               <com.vmware.actionsfw.ActionMenuItemSpec>
+                  <type>action</type>
+                  <uid>com.huawei.dmestore.datastore.clustervmfsumountaction</uid>
                </com.vmware.actionsfw.ActionMenuItemSpec>
 
                <com.vmware.actionsfw.ActionMenuItemSpec>
