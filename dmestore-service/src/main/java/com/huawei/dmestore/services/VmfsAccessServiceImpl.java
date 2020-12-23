@@ -950,7 +950,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     @Override
     public void mountVmfs(Map<String, Object> params) throws DmeException {
-        if (params != null) {
+        if (params == null || params.size() == 0) {
             throw new DmeException("mount vmfs error, params is null");
         }
         String hostObjId = ToolUtils.getStr(params.get(HOSTID));
