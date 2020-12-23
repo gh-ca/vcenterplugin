@@ -14,6 +14,7 @@ import com.vmware.vim25.VirtualDiskFlatVer2BackingInfo;
 import com.vmware.vim25.VirtualDiskMode;
 import com.vmware.vim25.VirtualDiskRawDiskMappingVer1BackingInfo;
 import com.vmware.vim25.VirtualDiskType;
+import com.vmware.vim25.VirtualIDEController;
 import com.vmware.vim25.VirtualLsiLogicController;
 import com.vmware.vim25.VirtualMachineConfigSpec;
 import com.vmware.vim25.VirtualMachineFileInfo;
@@ -269,7 +270,7 @@ public class VirtualMachineMO extends BaseMO {
         List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, configDeviceStr);
         if (devices != null && devices.size() > 0) {
             for (VirtualDevice device : devices) {
-                if (device instanceof VirtualLsiLogicController) {
+                if (device instanceof VirtualIDEController) {
                     return device.getKey();
                 }
             }
