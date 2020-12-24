@@ -724,28 +724,38 @@ export class VmfsListComponent implements OnInit {
       const objectIds = [];
       objectIds.push(this.rowSelected[0].objectid);
       this.mountForm.dataStoreObjectIds = objectIds;
+      console.log('this.mountForm', this.mountForm);
 
-      // 初始化主机
-      this.mountHostData = false;
-      this.hostList = [];
-      this.chooseHost = undefined;
-      this.initMountHost().then(res => {
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      });
-
-      // 初始化集群
-      this.mountClusterData = false;
-      this.clusterList = [];
-      this.chooseCluster = undefined;
-      this.initMountCluster().then(res => {
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-      });
+      // 加载主机与集群数据
+      this.mountDeviceLoad();
 
       // // 打开挂载页面
       this.mountShow = true;
       // this.jumpPage(this.rowSelected[0].objectid,"vmfs/dataStore/mount");
     }
   }
+
+  /**
+   * 挂载页面 主机集群数据加载
+   */
+  mountDeviceLoad() {
+    // 初始化主机
+    this.mountHostData = false;
+    this.hostList = [];
+    this.chooseHost = undefined;
+    this.initMountHost().then(res => {
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    });
+
+    // 初始化集群
+    this.mountClusterData = false;
+    this.clusterList = [];
+    this.chooseCluster = undefined;
+    this.initMountCluster().then(res => {
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    });
+  }
+
   jumpPage(objectId:string,url:string){
     const resource = 'list';
     this.router.navigate([url],{
@@ -766,7 +776,7 @@ export class VmfsListComponent implements OnInit {
         }
         this.mountClusterData = true;
         this.modalLoading = false;
-        resolve(this.deviceList);
+        resolve(this.clusterList);
         this.cdr.detectChanges();
       });
     });
@@ -782,7 +792,7 @@ export class VmfsListComponent implements OnInit {
           });
         }
         this.mountHostData = true;
-        resolve(this.deviceList);
+        resolve(this.hostList);
         this.cdr.detectChanges();
       });
     });
