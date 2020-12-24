@@ -181,7 +181,7 @@ public class HostDatastoreSystemMO extends BaseMO {
         HostNasVolumeSpec spec = new HostNasVolumeSpec();
         spec.setRemoteHost(host);
         spec.setRemotePath(exportPath);
-        if (StringUtils.isEmpty(type)) {
+        if (!StringUtils.isEmpty(type)) {
             spec.setType(type);
         }
         if (!StringUtils.isEmpty(securityType)) {
