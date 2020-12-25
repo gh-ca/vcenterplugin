@@ -681,7 +681,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         }
         String dataStoreObjectId = ToolUtils.getStr(params.get(DATASTOREOBJECTID));
         DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStoreObjectId);
-        if (dvr == null || dvr.getShareId() != null) {
+        if (dvr == null || dvr.getShareId() == null) {
             throw new DmeException("DME dataStore ObjectId is null!");
         }
         params.put(SHAREID, dvr.getShareId());
