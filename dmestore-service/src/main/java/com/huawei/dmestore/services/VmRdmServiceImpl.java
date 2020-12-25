@@ -306,9 +306,11 @@ public class VmRdmServiceImpl implements VmRdmService {
         // 判断该集群下有多少主机，如果主机在DME不存在就需要创建
         Map<String, Object> requestbody = new HashMap<>(MAP_DEFAULT_CAPACITY);
         CustomizeVolumes customizeVolumes = customizeVolumesRequest.getCustomizeVolumes();
-        putNotNull(requestbody, "initial_distribute_policy", customizeVolumes.getInitialDistributePolicy());
+        putNotNull(requestbody, "initial_distribute_policy",
+            DmeConstants.INITIAL_DISTRIBUTE_POLICY.get(customizeVolumes.getInitialDistributePolicy()));
         putNotNull(requestbody, "prefetch_value", customizeVolumes.getPrefetchValue());
-        putNotNull(requestbody, "prefetch_policy", customizeVolumes.getPrefetchPolicy());
+        putNotNull(requestbody, "prefetch_policy",
+            DmeConstants.PREFETCH_POLICY.get(customizeVolumes.getPrefetchPolicy()));
         putNotNull(requestbody, "owner_controller", customizeVolumes.getOwnerController());
         putNotNull(requestbody, "pool_id", customizeVolumes.getPoolRawId());
         putNotNull(requestbody, "storage_id", customizeVolumes.getStorageId());
@@ -347,8 +349,8 @@ public class VmRdmServiceImpl implements VmRdmService {
 
     private Map<String, Object> tuningParse(CustomizeVolumeTuningForCreate tuningBean) {
         Map<String, Object> tuning = new HashMap<>();
-        putNotNull(tuning, "alloctype", tuningBean.getAlloctype());
-        putNotNull(tuning, "smarttier", tuningBean.getSmarttier());
+        putNotNull(tuning, "alloction_type", tuningBean.getAlloctype());
+        putNotNull(tuning, "smart_tier", DmeConstants.SMART_TIER.get(tuningBean.getSmarttier()));
         putNotNull(tuning, "workload_type_raw_id", tuningBean.getWorkloadTypeId());
         putNotNull(tuning, "compression_enabled", tuningBean.getCompressionEnabled());
         putNotNull(tuning, "deduplication_enabled", tuningBean.getDedupeEnabled());
@@ -356,13 +358,11 @@ public class VmRdmServiceImpl implements VmRdmService {
         SmartQosForRdmCreate smartqosBean = tuningBean.getSmartqos();
         if (smartqosBean != null) {
             Map<String, Object> smartqos = new HashMap<>(MAP_DEFAULT_CAPACITY);
-            putNotNull(smartqos, "control_policy", smartqosBean.getControlPolicy());
             putNotNull(smartqos, "latency", smartqosBean.getLatency());
-            putNotNull(smartqos, "maxbandwidth", smartqosBean.getMaxbandwidth());
-            putNotNull(smartqos, "maxiops", smartqosBean.getMaxiops());
-            putNotNull(smartqos, "minbandwidth", smartqosBean.getMinbandwidth());
-            putNotNull(smartqos, "miniops", smartqosBean.getMiniops());
-            putNotNull(smartqos, NAME_FIELD, smartqosBean.getName());
+            putNotNull(smartqos, "max_bandwidth", smartqosBean.getMaxbandwidth());
+            putNotNull(smartqos, "max_iops", smartqosBean.getMaxiops());
+            putNotNull(smartqos, "min_bandwidth", smartqosBean.getMinbandwidth());
+            putNotNull(smartqos, "min_iops", smartqosBean.getMiniops());
             tuning.put("smart_qos", smartqos);
         }
 

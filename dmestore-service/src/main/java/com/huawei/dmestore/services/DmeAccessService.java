@@ -29,9 +29,8 @@ public interface DmeAccessService {
      *
      * @author wangxy
      * @return Map
-     * @throws DmeException 异常
      */
-    Map<String, Object> refreshDme() throws DmeException;
+    Map<String, Object> refreshDme();
 
     /**
      * Public method access

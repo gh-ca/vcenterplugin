@@ -1,5 +1,8 @@
 package com.huawei.dmestore.constant;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * DmeConstants
  *
@@ -411,6 +414,47 @@ public class DmeConstants {
      * VMFS type
      **/
     public static final String STORE_TYPE_VMFS = "VMFS";
+
+    /**
+     * 容量初始分配策略。仅支持华为V3/V5设备，Dorado系列不支持该参数。
+     * 取值范围：automatic：自动，highest_performance：高性能层，performance：性能层，capacity：容量层。默认值：automatic
+     **/
+    public static final Map<String, String> INITIAL_DISTRIBUTE_POLICY = new HashMap(){
+        {
+            put("0", "automatic");
+            put("1", "highest_performance");
+            put("2", "performance");
+            put("3", "capacity");
+        }
+    };
+
+    /**
+     * 预取策略，影响磁盘读取。
+     * 取值范围：no_prefetch: 不预取，constant_prefetch：固定预取，variable_prefetch：可变预取，intelligent_prefetch：智能预取。
+     * 默认值：intelligent_prefetch
+     **/
+    public static final Map<String, String> PREFETCH_POLICY = new HashMap(){
+        {
+            put("0", "no_prefetch");
+            put("1", "constant_prefetch");
+            put("2", "variable_prefetch");
+            put("3", "intelligent_prefetch");
+        }
+    };
+
+    /**
+     * 数据迁移策略。
+     * no_migration：不迁移，automatic_migration：自动迁移，migration_to_higher：向高性能层迁移，migration_to_lower：向低性能层迁移
+     * 默认值：no_migration。
+     **/
+    public static final Map<String, String> SMART_TIER = new HashMap(){
+        {
+            put("0", "no_migration");
+            put("1", "automatic_migration");
+            put("2", "migration_to_higher");
+            put("3", "migration_to_lower");
+        }
+    };
 
     private DmeConstants() {
     }
