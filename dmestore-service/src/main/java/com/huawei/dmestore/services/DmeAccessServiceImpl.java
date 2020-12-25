@@ -138,21 +138,27 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     }
 
     @Override
-    public Map<String, Object> refreshDme() throws DmeException {
+    public Map<String, Object> refreshDme() {
+        LOG.info("====refreshDme begin=====");
+        Map<String, Object> params = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+        params.put(HOST_IP, dmeHostIp);
+        params.put(HOST_PORT, dmeHostPort);
         try {
             // 判断与服务器的连接
             ResponseEntity responseEntity = access(DmeConstants.REFRES_STATE_URL, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() != RestUtils.RES_STATE_I_200) {
-                throw new DmeException(DmeConstants.ERROR_CODE_503, "更新连接状态失败:" + responseEntity.toString());
+                params.put("code", DmeConstants.ERROR_CODE_503);
+                params.put("message", "更新连接状态失败:" + responseEntity.toString());
             }
         } catch (DmeException e) {
-            throw new DmeException(DmeConstants.ERROR_CODE_503, "failed to update connection status:" + e.toString());
+            params.put("code", DmeConstants.ERROR_CODE_503);
+            params.put("message", "更新连接状态失败:" + e.getMessage());
         }
 
-        Map<String, Object> params = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
-        params.put(HOST_IP, dmeHostIp);
-        params.put(HOST_PORT, dmeHostPort);
-
+        // 成功返回200
+        params.put("code", 200);
+        params.put("message", "");
+        LOG.info("====refreshDme end=====response:{}", gson.toJson(params));
         return params;
     }
 
