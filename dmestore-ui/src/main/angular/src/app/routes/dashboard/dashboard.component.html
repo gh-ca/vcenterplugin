@@ -25,12 +25,18 @@
                 <span class="gh-info-lable">{{'overview.status' | translate}}</span>
                 <span class="gh-info-value">
                 </span>
-                <span class="gh-info-value" *ngIf="hostModel.hostIp != ''">
+                <span class="gh-info-value" *ngIf="hostModel.hostIp != '' && hostModel.code == '200'">
                   <clr-icon shape="success-standard" class="is-solid" style="color: #59A220;margin-right: 5px;"></clr-icon>
                   {{'overview.connected' | translate}}</span>
-                <span class="gh-info-value" *ngIf="hostModel.hostIp == ''">
+                <span class="gh-info-value" *ngIf="hostModel.hostIp != '' && hostModel.code != '200'">
+                  <span class="gh-info-value" style="color: red">连接出错</span>
+                </span>
+                <span class="gh-info-value" *ngIf="hostModel.hostIp == '' && hostModel.code != ''">
                   <button type="button" (click)="showPop()" class="btn btn-icon" aria-label="home"><clr-icon shape="add"></clr-icon>
                   </button>
+                </span>
+                <span class="gh-info-value" *ngIf="hostModel.hostIp == '' && hostModel.code == ''">
+                  <span class="gh-info-value">--</span>
                 </span>
               </div>
             </div>
