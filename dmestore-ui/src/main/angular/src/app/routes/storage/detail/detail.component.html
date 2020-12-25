@@ -70,19 +70,19 @@
                       <div class="gh-btngroup-left"></div>
                       <!-- 基本视图、性能视图、刷新 -->
                       <div class="btn-group btn-icon">
-                        <div class="radio btn">
+                        <div class="radio btn" title="{{'menu.conventional' | translate}}">
                           <input (click)="poolRadio = 'table1'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-1" checked>
                           <label for="btn-demo-radio-1"><clr-icon shape="list" size="20"></clr-icon></label>
                         </div>
-                        <div class="radio btn">
+                        <div class="radio btn"  title="{{'menu.capacity' | translate}}">
                           <input (click)="poolRadio = 'table2'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-2">
                           <label for="btn-demo-radio-2"><clr-icon shape="dashboard" size="20"></clr-icon></label>
                         </div>
-                        <div class="radio btn">
+                        <div class="radio btn" title="{{'menu.performance' | translate}}">
                           <input (click)="poolRadio = 'table3'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3">
                           <label for="btn-demo-radio-3"><clr-icon shape="radar" size="20"></clr-icon></label>
                         </div>
-                        <div class="radio btn merginLeft">
+                        <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
                           <label><clr-icon shape="refresh" size="20" (click)="getStoragePoolList(true)"></clr-icon></label>
                         </div>
                       </div>
@@ -181,16 +181,16 @@
                       <div class="gh-btngroup-left"></div>
                       <!-- 基本视图、性能视图、刷新 -->
                       <div class="btn-group btn-icon">
-                        <div class="radio btn">
+                        <div class="radio btn" title="{{'menu.conventional' | translate}}">
                           <input (click)="volumeRadio = 'table1'" type="radio" name="btn-group-volume-radios" id="btn-demo-radio-4" checked>
                           <label for="btn-demo-radio-4"><clr-icon shape="list" size="20"></clr-icon></label>
                         </div>
-                        <div class="radio btn">
-                          <input (click)="volumeRadio = 'table2'" type="radio" name="btn-group-volume-radios" id="btn-demo-radio-5">
+                        <div class="radio btn" title="{{'menu.performance' | translate}}">
+                          <input (click)="volumeRadio = 'table2';listVolumesperformance();" type="radio" name="btn-group-volume-radios" id="btn-demo-radio-5">
                           <label for="btn-demo-radio-5"><clr-icon shape="dashboard" size="20"></clr-icon></label>
                         </div>
-                        <div class="radio btn merginLeft">
-                          <label><clr-icon shape="refresh" size="20" (click)="getStorageVolumeList(true)"></clr-icon></label>
+                        <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
+                          <label><clr-icon shape="refresh" size="20" (click)="getStorageVolumeList(true, undefined)"></clr-icon></label>
                         </div>
                       </div>
                     </div>
@@ -269,14 +269,60 @@
                         <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.iops}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.bandwith}}</clr-dg-cell>
                       </clr-dg-row>
-                      <clr-dg-footer>
-                        <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="volumeTotal">
-                          <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
-                          {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-                          of {{pagination.totalItems}}
-                        </clr-dg-pagination>
-                      </clr-dg-footer>
+<!--                      <clr-dg-footer>-->
+<!--                        <clr-dg-pagination  #paginationVolume [clrDgPageSize]="10" [clrDgTotalItems]="volumeTotal">-->
+<!--                          <clr-dg-page-size (page)="pageEvent = testFunc($event)"  (change)="testFunc(paginationVolume);" [clrPageSizeOptions]="[10,20]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>-->
+<!--                          {{paginationVolume.firstItem + 1}} - {{paginationVolume.lastItem + 1}}-->
+<!--                          of {{volumeTotal}}-->
+<!--                        </clr-dg-pagination>-->
+<!--                      </clr-dg-footer>-->
                     </clr-datagrid>
+                    <div style="position: relative">
+<!--                      <mat-paginator class="pageSet" #matPaginator [showFirstLastButtons]="true" [hidePageSize]="false"-->
+<!--                                     [length]="volumeTotal"-->
+<!--                                     [pageSize]="10"-->
+<!--                                     [pageSizeOptions]="[10,20]"-->
+<!--                                     (page)="pageEvent = getVolDataByPage($event)">-->
+<!--                        <MatPaginatorIntl></MatPaginatorIntl>-->
+<!--                      </mat-paginator>-->
+<!--                      <input type="number" (blur)="jumpPage($event, matPaginator);" value="{{matPaginator.pageIndex + 1}}" (keydown)="jumpPage($event, matPaginator);"-->
+<!--                             class="jumpPageClass">-->
+<!--                      <input class="totalPageClass" [value]="totalPageNum" disabled>-->
+                      <div class="datagrid-footer">
+                        <div class="pagination-size ng-star-inserted">
+                          <div class="datagrid-footer-select" _ngcontent-ohg-c584="" ng-reflect-page-size-options="10,20">
+                            每页
+                            <div class="clr-select-wrapper">
+                              <select class="clr-page-size-select ng-untouched ng-pristine ng-valid" ng-reflect-model="10" [(ngModel)]="volumePageSize" (change)="pageSizeChange($event.target);">
+                                <option value="10" ng-reflect-ng-value="10" class="ng-star-inserted">10</option>
+                                <option value="20" ng-reflect-ng-value="20" class="ng-star-inserted">20</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="pagination-description ng-star-inserted"> {{volumeFooter}} {{'page.all' | translate}} {{volumeTotal}} </div>
+                        <div class="pagination">
+                          <div class="pagination-description ng-star-inserted"></div>
+                          <div class="pagination-list ng-star-inserted" *ngIf="volumeTotalPage > 1">
+                            <button type="button" (click)="volmeFirstPage();" class="pagination-first" aria-label="First Page" [disabled]="volumeCurrentPage == 1">
+                              <clr-icon shape="step-forward-2 down"></clr-icon>
+                            </button>
+                            <button type="button" (click)="volumePreviousPage();" class="pagination-previous" aria-label="Previous Page" [disabled]="volumeCurrentPage == 1">
+                              <clr-icon shape="angle left"></clr-icon>
+                            </button>
+                            <input type="text" (blur)="jumpPage($event);" [value]="volumeCurrentPage" class="pagination-current clr-input ng-star-inserted" size="2" aria-label="Current Page">
+                            &nbsp;/&nbsp;
+                            <span aria-label="Total Pages">{{volumeTotalPage}}</span>
+                            <button type="button" (click)="volumeNextPage();" class="pagination-next" aria-label="Next Page" [disabled]="volumeCurrentPage == volumeTotalPage">
+                              <clr-icon shape="angle right"></clr-icon>
+                            </button>
+                            <button type="button" (click)="volmeLastPage();" class="pagination-last" aria-label="Last Page" [disabled]="volumeCurrentPage == volumeTotalPage">
+                              <clr-icon shape="step-forward-2 up"></clr-icon>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </clr-tab-content>
               </clr-tab>
@@ -289,7 +335,7 @@
                       <div class="gh-btngroup-left"></div>
                       <!--刷新 -->
                       <div class="btn-group btn-icon">
-                        <div class="radio btn merginLeft">
+                        <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
                           <label><clr-icon shape="refresh" (click)="getFileSystemList(true)" size="20"></clr-icon></label>
                         </div>
                       </div>
@@ -359,7 +405,7 @@
                           <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">
                             {{'storage.detail.perPage' | translate}}
                           </clr-dg-page-size>
-                          {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{pagination.totalItems}}
+                          {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}} of {{volumeTotal}}
                         </clr-dg-pagination>
                       </clr-dg-footer>
                     </clr-datagrid>
@@ -375,7 +421,7 @@
                       <div class="gh-btngroup-left"></div>
                       <!--刷新 -->
                       <div class="btn-group btn-icon">
-                        <div class="radio btn merginLeft">
+                        <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
                           <label><clr-icon shape="refresh" size="20" (click)="getDtreeList(true)"></clr-icon></label>
                         </div>
                       </div>
@@ -426,7 +472,7 @@
                         <div class="gh-btngroup-left"></div>
                         <!--刷新 -->
                         <div class="btn-group btn-icon">
-                          <div class="radio btn merginLeft">
+                          <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
                             <label><clr-icon shape="refresh" size="20" (click)="getShareList(true)"></clr-icon></label>
                           </div>
                         </div>

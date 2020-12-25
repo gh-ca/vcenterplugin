@@ -11,8 +11,8 @@ export class VmfsListService {
     return this.http.get('accessvmfs/listvmfs');
   }
   // 附列表数据
-  getChartData(volumeIds: string[] ) {
-    return this.http.get('accessvmfs/listvmfsperformance', {params: {volumeIds}});
+  getChartData(wwns: string[] ) {
+    return this.http.get('accessvmfs/listvmfsperformance', {params: {wwns}});
   }
   // 获取存储
   getStorages() {
@@ -106,6 +106,21 @@ export class VmfsListService {
     return  this.http.get('accessdme/getworkloads', {params: {storageId}});
   }
 
+  /**
+   * 校验vmfs名称
+   * @param name
+   */
+  checkVmfsName(name: string) {
+    return this.http.get('accessvmfs/querydatastorebyname', {params: {name}});
+  }
+
+  /**
+   * 校验卷名称
+   * @param volName
+   */
+  checkVolName(volName: string) {
+    return this.http.get('dmestorage/queryvolumebyname', {params: {name:volName}});
+  }
 }
 // vmfs列表
 export interface VmfsInfo {

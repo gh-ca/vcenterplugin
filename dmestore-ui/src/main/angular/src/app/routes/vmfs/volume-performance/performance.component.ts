@@ -3,15 +3,15 @@ import { EChartOption } from 'echarts';
 import { VmfsPerformanceService } from './performance.service';
 import {NfsService, MakePerformance} from "../../nfs/nfs.service";
 import {VolumeInfo} from "../volume-attribute/attribute.service";
-import {MAT_DATE_LOCALE} from "@angular/material/core";
 import {FormControl, FormGroup} from "@angular/forms";
 import {GlobalsService} from "@shared/globals.service";
+import {TranslatePipe} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-performance',
   templateUrl: './performance.component.html',
   styleUrls: ['./performance.component.scss'],
-  providers: [VmfsPerformanceService, MakePerformance, NfsService, {provide: MAT_DATE_LOCALE, useValue: 'en-GB'}],
+  providers: [VmfsPerformanceService, MakePerformance, NfsService, TranslatePipe],
 })
 export class PerformanceComponent implements OnInit{
 
@@ -71,14 +71,14 @@ export class PerformanceComponent implements OnInit{
 
   constructor(private nfsService: NfsService, private makePerformance: MakePerformance,
               private perService: VmfsPerformanceService, private ngZone: NgZone,
-              private cdr: ChangeDetectorRef, private gs: GlobalsService) {
+              private cdr: ChangeDetectorRef, private gs: GlobalsService, private translatePipe:TranslatePipe) {
   }
 
 
   ngOnInit(): void {
     // 初始化卷信息
     const ctx = this.gs.getClientSdk().app.getContextObjects();
-    // const objectId = 'urn:vmomi:Datastore:datastore-1126:674908e5-ab21-4079-9cb1-596358ee5dd1';
+    // const objectId = 'urn:vmomi:Datastore:datastore-1212:674908e5-ab21-4079-9cb1-596358ee5dd1';
     const objectId=ctx[0].id;
     this.getVolumeInfoByVolID(objectId);
     this.selectRange = 'LAST_1_DAY';
@@ -88,22 +88,21 @@ export class PerformanceComponent implements OnInit{
 
     console.log('this.rang', this.range)
     const volIds:string[] = [];
-    // 后续需注释掉此代码
     volIds.push(this.selectVolume.wwn);
     // volIds.push('1282FFE20AA03E4EAC9A814C687B780A');
     // IOPS
-    this.makePerformance.setChart(300,'IOPS', 'IO/s', NfsService.vmfsIOPS, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
+    this.makePerformance.setChart(300,this.translatePipe.transform('vmfs.iops'), 'IO/s', NfsService.vmfsIOPS, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
       this.iopsChart = res;
       this.cdr.detectChanges();
     });
 
     // 带宽
-    this.makePerformance.setChart(300,'Bandwidth', 'MB/s', NfsService.vmfsBDWT, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
+    this.makePerformance.setChart(300,this.translatePipe.transform('vmfs.bandwidth'), 'MB/s', NfsService.vmfsBDWT, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
       this.bandwidthChart = res;
       this.cdr.detectChanges();
     });
     // 响应时间
-    this.makePerformance.setChart(300,'Latency', 'ms', NfsService.vmfsLatency, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
+    this.makePerformance.setChart(300,this.translatePipe.transform('vmfs.latency'), 'ms', NfsService.vmfsLatency, volIds, this.selectRange, NfsService.vmfsUrl, this.startTime, this.endTime).then(res => {
       this.latencyChart = res;
       this.cdr.detectChanges();
     });

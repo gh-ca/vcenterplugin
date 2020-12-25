@@ -26,6 +26,9 @@ export class DetailService {
   getVolumeListList(storageId: string){
     return this.http.get('dmestorage/volumes', {params: {storageId}});
   }
+  getVolumeListListByPage(params:any){
+    return this.http.get('dmestorage/volumes/byPage?storageId='+params.storageId+'&pageSize='+params.pageSize+'&pageNo='+params.pageNo);
+  }
   getFileSystemList(storageId: string){
     return this.http.get('dmestorage/filesystems', {params: {storageId}});
   }
@@ -116,6 +119,7 @@ export class StoragePool{
   subscribedCapacity: number; //订阅容量
   physicalType: string;//硬盘类型
   diskPoolId:string;//存储池所处硬盘id
+  poolId:string;
   maxBandwidth: number;
   maxIops: number;
   maxLatency: number;

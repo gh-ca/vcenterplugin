@@ -16,7 +16,7 @@
         <label style="color: #9F9F9F;">{{'vmfs.expandSize' | translate}}</label>
         <div clrInput style="float: left;position: relative;">
           <input clrInput style="width: 70%;border-bottom: none" type="number" [(ngModel)]="expandForm.vo_add_capacity" name="vo_add_capacity" #number="ngModel"
-                 (blur)="expandOnblur();" required/>
+                 (blur)="expandOnblur();" min="0" required/>
           <select class="capacity" (change)="expandForm.vo_add_capacity=null" [(ngModel)]="expandForm.capacityUnit" clrInput style="width: 30%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;"  name="capacityUnit" >
             <option value="TB">TB</option>
             <option value="GB">GB</option>

@@ -10,7 +10,7 @@
       <!--扩容-->
       <button class="btn btn-primary" (click)="expandBtnFunc();" [disabled]="rowSelected.length !== 1">{{'menu.expand' | translate}}</button>
       <!-- 更多操作 -->
-      <clr-dropdown [clrCloseMenuOnItemClick]="false">
+      <clr-dropdown [clrCloseMenuOnItemClick]="true">
         <button clrDropdownTrigger class="btn btn-primary" aria-label="Dropdown demo button">
           {{'menu.more' | translate}}
           <clr-icon shape="caret down"></clr-icon>
@@ -34,15 +34,15 @@
     </div>
     <!-- 基本视图、性能视图、刷新 -->
     <div class="btn-group btn-icon">
-      <div class="radio btn">
+      <div class="radio btn" title="{{'menu.conventional' | translate}}">
         <input (click)="radioCheck = 'list'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-1" checked>
         <label for="btn-demo-radio-1"><clr-icon shape="list" size="20"></clr-icon></label>
       </div>
-      <div class="radio btn">
-        <input (click)="radioCheck = 'chart'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-2">
+      <div class="radio btn" title="{{'menu.performance' | translate}}">
+        <input (click)="radioCheck = 'chart';charBtnClickFunc();" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-2">
         <label for="btn-demo-radio-2"><clr-icon shape="dashboard" size="20"></clr-icon></label>
       </div>
-      <div class="radio btn merginLeft">
+      <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
         <!--<input type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3">-->
         <label><clr-icon shape="refresh" size="20" (click)="scanDataStore();"></clr-icon></label>
       </div>
@@ -185,20 +185,50 @@
           <!--名称 -->
           <clr-input-container>
             <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
-            <input clrInput class="inputWidth100Percent"  [(ngModel)]="form.name" name="name" #name="ngModel" required/>
-            <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+            <input clrInput class="inputWidth100Percent"  [(ngModel)]="form.name" name="name" #name="ngModel" (blur)="nameCheck(true)" required/>
+            <clr-control-helper *ngIf="matchErr">
+              <div class="errorTips" readonly >
+                <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+                {{'validations.nameRequired' | translate}}
+              </div>
+            </clr-control-helper>
+            <clr-control-helper *ngIf="vmfsNameRepeatErr">
+              <div class="errorTips" readonly >
+                <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+                {{'errorMsg.vmfsNameRepeat' | translate}}
+              </div>
+            </clr-control-helper>
+            <clr-control-helper *ngIf="volNameRepeatErr">
+              <div class="errorTips" readonly >
+                <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+                {{'errorMsg.volNameRepeat' | translate}}
+              </div>
+            </clr-control-helper>
+            <clr-control-error>{{'validations.nameRequired' | translate}}</clr-control-error>
           </clr-input-container>
           <clr-checkbox-container>
             <label></label>
             <clr-checkbox-wrapper>
               <input type="checkbox" clrCheckbox name="isSameName" [(ngModel)]="form.isSameName" />
-              <label>{{'vmfs.vmfsAddNameDesc' | translate}}</label>
+              <label style="width: 190px;">{{'vmfs.vmfsAddNameDesc' | translate}}</label>
             </clr-checkbox-wrapper>
           </clr-checkbox-container>
           <clr-input-container *ngIf="!form.isSameName">
             <label style="color: #9F9F9F;">{{'vmfs.volumeName' | translate}}</label>
-            <input clrInput class="inputWidth100Percent"  [(ngModel)]="form.volumeName" name="volumeName" required/>
-            <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+            <input clrInput class="inputWidth100Percent"  [(ngModel)]="form.volumeName" name="volumeName" (blur)="nameCheck(false);" required/>
+            <clr-control-helper *ngIf="matchErr">
+              <div class="errorTips" readonly >
+                <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+                {{'validations.nameRequired' | translate}}
+              </div>
+            </clr-control-helper>
+            <clr-control-helper *ngIf="volNameRepeatErr">
+              <div class="errorTips" readonly >
+                <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+                {{'errorMsg.volNameRepeat' | translate}}
+              </div>
+            </clr-control-helper>
+            <clr-control-error>{{'validations.nameRequired' | translate}}</clr-control-error>
           </clr-input-container>
 
 
@@ -217,20 +247,21 @@
             <label style="color: #9F9F9F;">{{'vmfs.capacity' | translate}}</label>
               <div clrInput style="float: left;width: 54%;position: relative;">
                 <!-- V5时最小值1.3G V6时最小值2G-->
-                <input clrInput (blur)="capacityOnblur();" style="width: 60%;border-bottom: none" type="number" [(ngModel)]="form.capacity" name="capacity" #number="ngModel" required/>
+                <input clrInput (blur)="capacityOnblur();" min="0" style="width: 60%;border-bottom: none" type="number" [(ngModel)]="form.capacity" name="capacity" #number="ngModel"
+                       required/>
                 <select class="capacity" (change)="form.capacity = null;" clrInput style="width: 40%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;" [(ngModel)]="form.capacityUnit" name="capacityUnit" >
                   <option value="TB">TB</option>
                   <option value="GB">GB</option>
                 </select>
               </div>
               <input clrInput style="width: 19%;text-align: center;" readonly value="{{'vmfs.multiply' | translate}}">
-              <input clrInput (blur)="countBlur();" style="width: 27%;" type="number" [(ngModel)]="form.count" name="count" #number="ngModel" required/>
+              <input clrInput (blur)="countBlur();" min="0" style="width: 27%;" type="number" [(ngModel)]="form.count" name="count" #number="ngModel" required/>
               <clr-control-helper *ngIf="!capacityErr"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.capacityTips' | translate}}</clr-control-helper>
               <clr-control-helper *ngIf="capacityErr">
-            <div class="errorTips" readonly >
-              <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.capacityTips' | translate}}
-            </div>
-          </clr-control-helper>
+                <div class="errorTips" readonly >
+                  <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.capacityTips' | translate}}
+                </div>
+              </clr-control-helper>
               <clr-control-error>{{'validations.required' | translate}}：{{'vmfs.capacityTips' | translate}}</clr-control-error>
           </clr-input-container>
           <!-- 块大小 -->
@@ -408,9 +439,9 @@
               <label style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
               <clr-checkbox-wrapper>
                 <input type="checkbox" [(ngModel)]="form.maxbandwidthChoose" name="maxbandwidthChoose" clrCheckbox/>
-                <label>
+                <label style="width: 190px;">
                   {{'vmfs.bandwidthLimitUpper' | translate}}
-                  <input type="number" [(readOnly)]="!form.maxbandwidthChoose" class="inputOneLine" name="maxbandwidth" [(ngModel)]="form.maxbandwidth" (blur)="qosBlur('add', 'maxbandwidth');"/>{{'vmfs.unitM' | translate}}
+                  <input type="number" [(readOnly)]="!form.maxbandwidthChoose" class="inputOneLine" name="maxbandwidth" [(ngModel)]="form.maxbandwidth" min="0" (blur)="qosBlur('add', 'maxbandwidth');"/>{{'vmfs.unitM' | translate}}
                 </label>
               </clr-checkbox-wrapper>
             </clr-checkbox-container>
@@ -419,9 +450,9 @@
               <label></label>
               <clr-checkbox-wrapper>
                 <input type="checkbox" [(ngModel)]="form.maxiopsChoose" name="maxiopsChoose" clrCheckbox/>
-                <label>
+                <label style="width: 190px;">
                   {{'vmfs.IOPSLimitUpper' | translate}}
-                  <input type="number" [(readOnly)]="!form.maxiopsChoose" class="inputOneLine" name="maxiops" [(ngModel)]="form.maxiops" (blur)="qosBlur('add', 'maxiops');"/>
+                  <input type="number" [(readOnly)]="!form.maxiopsChoose" class="inputOneLine" name="maxiops" [(ngModel)]="form.maxiops" min="0" (blur)="qosBlur('add', 'maxiops');"/>
                 </label>
               </clr-checkbox-wrapper>
             </clr-checkbox-container>
@@ -431,9 +462,9 @@
               <label style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
               <clr-checkbox-wrapper>
                 <input type="checkbox" [(ngModel)]="form.minbandwidthChoose" name="minbandwidthChoose" clrCheckbox/>
-                <label>
+                <label style="width: 190px;">
                   {{'vmfs.bandwidthLimitLower' | translate}}
-                  <input type="number" [(readOnly)]="!form.minbandwidthChoose" class="inputOneLine" name="minbandwidth" [(ngModel)]="form.minbandwidth" (blur)="qosBlur('add', 'minbandwidth');"/>{{'vmfs.unitM' | translate}}
+                  <input type="number" [(readOnly)]="!form.minbandwidthChoose" min="0" class="inputOneLine" name="minbandwidth" [(ngModel)]="form.minbandwidth" (blur)="qosBlur('add', 'minbandwidth');"/>{{'vmfs.unitM' | translate}}
                 </label>
               </clr-checkbox-wrapper>
             </clr-checkbox-container>
@@ -442,9 +473,9 @@
               <label></label>
               <clr-checkbox-wrapper>
                 <input type="checkbox" [(ngModel)]="form.miniopsChoose" name="minbandwidthChoose" clrCheckbox/>
-                <label>
+                <label style="width: 190px;">
                   {{'vmfs.IOPSLimitLower' | translate}}
-                  <input type="number" [(readOnly)]="!form.miniopsChoose" class="inputOneLine" name="miniops" [(ngModel)]="form.miniops" (blur)="qosBlur('add', 'miniops');"/>
+                  <input type="number" [(readOnly)]="!form.miniopsChoose" min="0" class="inputOneLine" name="miniops" [(ngModel)]="form.miniops" (blur)="qosBlur('add', 'miniops');"/>
                 </label>
               </clr-checkbox-wrapper>
             </clr-checkbox-container>
@@ -453,9 +484,9 @@
               <label></label>
               <clr-checkbox-wrapper>
                 <input type="checkbox" [(ngModel)]="form.latencyChoose" name="latencyChoose" clrCheckbox/>
-                <label>
+                <label style="width: 190px;">
                   {{'vmfs.latencyMax' | translate}}
-                  <input type="number" [(readOnly)]="!form.latencyChoose" class="inputOneLine" name="latency" [(ngModel)]="form.latency" (blur)="qosBlur('add', 'latency');"/>{{'vmfs.latencyUnit' | translate}}
+                  <input type="number" [(readOnly)]="!form.latencyChoose" min="0" class="inputOneLine" name="latency" [(ngModel)]="form.latency" (blur)="qosBlur('add', 'latency');"/>{{'vmfs.latencyUnit' | translate}}
                 </label>
               </clr-checkbox-wrapper>
             </clr-checkbox-container>
@@ -497,8 +528,26 @@
         <!-- 名称 -->
         <clr-input-container>
           <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
-          <input clrInput  [(ngModel)]="modifyForm.name" name="name" #name="ngModel" required/><br>
-          <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+          <input clrInput  [(ngModel)]="modifyForm.name" name="name" #name="ngModel" (blur)="modifyNameCheck();" required/><br>
+          <clr-control-error>{{'validations.nameRequired' | translate}}</clr-control-error>
+          <clr-control-helper *ngIf="matchErr">
+            <div class="errorTips" readonly >
+              <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+              {{'validations.nameRequired' | translate}}
+            </div>
+          </clr-control-helper>
+          <clr-control-helper *ngIf="vmfsNameRepeatErr">
+            <div class="errorTips" readonly >
+              <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+              {{'errorMsg.vmfsNameRepeat' | translate}}
+            </div>
+          </clr-control-helper>
+          <clr-control-helper *ngIf="volNameRepeatErr">
+            <div class="errorTips" readonly >
+              <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+              {{'errorMsg.volNameRepeat' | translate}}
+            </div>
+          </clr-control-helper>
         </clr-input-container>
         <clr-checkbox-container>
           <label></label>
@@ -528,7 +577,7 @@
             <label>
               {{'vmfs.bandwidthLimitUpper' | translate}}
               <input type="number" [(readOnly)]="!modifyForm.maxbandwidthChoose" (blur)="qosBlur('modify', 'max_bandwidth');"
-                     class="inputOneLine" name="max_bandwidth" [(ngModel)]="modifyForm.max_bandwidth"/>{{'vmfs.unitM' | translate}}
+                     class="inputOneLine" min="0" name="max_bandwidth" [(ngModel)]="modifyForm.max_bandwidth"/>{{'vmfs.unitM' | translate}}
             </label>
           </clr-checkbox-wrapper>
         </clr-checkbox-container>
@@ -539,7 +588,7 @@
             <input type="checkbox" [(ngModel)]="modifyForm.maxiopsChoose" name="maxiopsChoose" clrCheckbox/>
             <label>
               {{'vmfs.IOPSLimitUpper' | translate}}
-              <input type="number" [(readOnly)]="!modifyForm.maxiopsChoose" class="inputOneLine" name="max_iops"
+              <input type="number" [(readOnly)]="!modifyForm.maxiopsChoose" class="inputOneLine" name="max_iops" min="0"
                      [(ngModel)]="modifyForm.max_iops" (blur)="qosBlur('modify', 'max_iops');" />
             </label>
           </clr-checkbox-wrapper>
@@ -552,7 +601,7 @@
             <input type="checkbox" [(ngModel)]="modifyForm.minbandwidthChoose" name="minbandwidthChoose" clrCheckbox/>
             <label>
               {{'vmfs.bandwidthLimitLower' | translate}}
-              <input type="number" [(readOnly)]="!modifyForm.minbandwidthChoose" class="inputOneLine" name="min_bandwidth"
+              <input type="number" [(readOnly)]="!modifyForm.minbandwidthChoose" class="inputOneLine" name="min_bandwidth" min="0"
                      [(ngModel)]="modifyForm.min_bandwidth" (blur)="qosBlur('modify', 'min_bandwidth');" />{{'vmfs.unitM' | translate}}
             </label>
           </clr-checkbox-wrapper>
@@ -564,7 +613,7 @@
             <input type="checkbox" [(ngModel)]="modifyForm.miniopsChoose" name="miniopsChoose" clrCheckbox/>
             <label>
               {{'vmfs.IOPSLimitLower' | translate}}
-              <input type="number" [(readOnly)]="!modifyForm.miniopsChoose" class="inputOneLine" name="min_iops"
+              <input type="number" [(readOnly)]="!modifyForm.miniopsChoose" class="inputOneLine" name="min_iops" min="0"
                      [(ngModel)]="modifyForm.min_iops" (blur)="qosBlur('modify', 'min_iops');"/>
             </label>
           </clr-checkbox-wrapper>
@@ -576,7 +625,7 @@
             <input type="checkbox" [(ngModel)]="modifyForm.latencyChoose" name="latencyChoose" clrCheckbox/>
             <label>
               {{'vmfs.latencyMax' | translate}}
-              <input type="number" [(readOnly)]="!modifyForm.latencyChoose" class="inputOneLine" name="latency"
+              <input type="number" [(readOnly)]="!modifyForm.latencyChoose" class="inputOneLine" name="latency" min="0"
                      [(ngModel)]="modifyForm.latency" (blur)="qosBlur('modify', 'latency');"/>{{'vmfs.latencyUnit' | translate}}
             </label>
           </clr-checkbox-wrapper>
@@ -620,10 +669,10 @@
 
 
 
-        <clr-combobox-container *ngIf="mountForm.mountType==='1'">
+        <clr-combobox-container *ngIf="mountForm.mountType==='1' && mountHostData">
           <label style="color: #9F9F9F;">{{'vmfs.mount.host' | translate}}</label>
           <clr-combobox [(ngModel)]="chooseHost" name="chooseHost" required>
-            <clr-options *ngIf="mountHostData">
+            <clr-options>
               <clr-option *clrOptionItems="let state of hostList; field:'hostName'" [clrValue]="state">
                 <clr-icon *ngIf="state.hostName !== ''" shape="host" role="img" aria-label="World is turning"></clr-icon>{{state.hostName}}
               </clr-option>
@@ -633,10 +682,10 @@
           <clr-control-error>{{'validations.required' | translate}}：{{'vmfs.mount.mountErr' | translate}}</clr-control-error>
         </clr-combobox-container>
 
-        <clr-combobox-container *ngIf="mountForm.mountType==='2'">
+        <clr-combobox-container *ngIf="mountForm.mountType==='2' && mountClusterData">
           <label style="color: #9F9F9F;">{{'vmfs.mount.cluster' | translate}}</label>
           <clr-combobox [(ngModel)]="chooseCluster" name="chooseCluster" required>
-            <clr-options *ngIf="mountClusterData">
+            <clr-options>
               <clr-option *clrOptionItems="let state of clusterList; field:'clusterName'" [clrValue]="state">
                 <clr-icon *ngIf="state.clusterName !== ''" shape="host-group" role="img" aria-label="World is turning"></clr-icon>{{state.clusterName}}
               </clr-option>
@@ -865,7 +914,7 @@
         <clr-input-container style="height: 4rem;">
           <label style="color: #9F9F9F;">{{'vmfs.expandSize' | translate}}</label>
           <div clrInput style="float: left;position: relative;">
-            <input clrInput style="width: 70%;border-bottom: none" type="number" [(ngModel)]="expandForm.vo_add_capacity" name="vo_add_capacity" #number="ngModel"
+            <input clrInput min="0" style="width: 70%;border-bottom: none" type="number" [(ngModel)]="expandForm.vo_add_capacity" name="vo_add_capacity" #number="ngModel"
                    (blur)="expandOnblur();" required/>
             <select class="capacity" (change)="expandForm.vo_add_capacity = null;" [(ngModel)]="expandForm.capacityUnit" clrInput style="width: 30%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;"  name="capacityUnit" >
               <option value="TB">TB</option>
