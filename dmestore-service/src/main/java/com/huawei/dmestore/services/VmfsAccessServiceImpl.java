@@ -509,17 +509,15 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         requestbody.put(STORAGE_ID, ToolUtils.getStr(params.get(STORAGE_ID)));
 
         Map<String, Object> tuning = new HashMap<>();
-        tuning.put(ALLOCTYPE, ToolUtils.getStr(params.get(ALLOCTYPE)));
+        tuning.put("alloction_type", ToolUtils.getStr(params.get(ALLOCTYPE)));
         tuning.put("workload_type_raw_id", ToolUtils.getInt(params.get(WORKLOAD_TYPE_ID), null));
 
         Map<String, Object> smartqos = new HashMap<>();
-        smartqos.put(CONTROL_POLICY, ToolUtils.getStr(params.get(CONTROL_POLICY)));
         smartqos.put(LATENCY, ToolUtils.getInt(params.get(LATENCY), null));
-        smartqos.put(MAXBANDWIDTH, ToolUtils.getInt(params.get(MAXBANDWIDTH), null));
-        smartqos.put(MAXIOPS, ToolUtils.getInt(params.get(MAXIOPS), null));
-        smartqos.put(MINBANDWIDTH, ToolUtils.getInt(params.get(MINBANDWIDTH), null));
-        smartqos.put(MINIOPS, ToolUtils.getInt(params.get(MINIOPS), null));
-        smartqos.put(NAME_FIELD, ToolUtils.getStr(params.get("qosname")));
+        smartqos.put("max_bandwidth", ToolUtils.getInt(params.get(MAXBANDWIDTH), null));
+        smartqos.put("max_iops", ToolUtils.getInt(params.get(MAXIOPS), null));
+        smartqos.put("min_bandwidth", ToolUtils.getInt(params.get(MINBANDWIDTH), null));
+        smartqos.put("min_iops", ToolUtils.getInt(params.get(MINIOPS), null));
 
         if (!StringUtils.isEmpty(params.get(DmeConstants.CONTROLPOLICY))) {
             tuning.put("smart_qos", smartqos);
