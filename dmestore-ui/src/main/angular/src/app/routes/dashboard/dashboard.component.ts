@@ -65,8 +65,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   connectModel = { hostIp: '', hostPort: '', userName: '', password: ''};
   hostModel = { hostIp: '', hostPort: '', code: ''};
 
-  bestShowLoading = true;
-  top5ShowLoading = true;
+  bestShowLoading = false;
+  top5ShowLoading = false;
 
   connectForm = new FormGroup({
     port: new FormControl('', [
@@ -107,16 +107,15 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   refresh(){
     this.gs.loading = true;
     this.http.get('accessdme/refreshaccess', {}).subscribe((result: any) => {
-      if (result.code == '200'){
+      this.hostModel = result.data;
+      if (this.hostModel.code == '200'){
         this.gs.loading = false  // 设置全局loading 为 FALSE
-        this.hostModel = result.data;
         this.loadStorageNum();
         this.loadstorageCapacity('0', 'overview.allDataStore');
         this.loadBestPracticeViolations();
         this.loadTop5DataStore('0', 'overview.allDataStore');
       } else{
         this.gs.loading = false;
-        this.hostModel = result.data;
       }
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     }, err => {
