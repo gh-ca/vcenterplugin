@@ -67,7 +67,7 @@ public class HostDatastoreSystemMO extends BaseMO {
                 return oc.getObj();
             }
 
-            if (oc.getPropSet().size() == 0) {
+            if (oc.getPropSet().size() <= 1) {
                 continue;
             }
             DynamicProperty prop = oc.getPropSet().get(1);
@@ -199,9 +199,11 @@ public class HostDatastoreSystemMO extends BaseMO {
 
         // readOnly/readWrite
         if (!StringUtils.isEmpty(accessMode)) {
-            spec.setAccessMode("readOnly");
-        } else {
-            spec.setAccessMode("readWrite");
+            if ("readOnly".equalsIgnoreCase(accessMode)){
+                spec.setAccessMode("readOnly");
+            }else {
+                spec.setAccessMode("readWrite");
+            }
         }
         return context.getService().createNasDatastore(mor, spec);
     }

@@ -1057,35 +1057,51 @@ public class VCSDKUtils {
         try {
             ManagedObjectReference mor = null;
             VmwareContext[] vmwareContexts = vcConnectionHelpers.getAllContext();
+            logger.info("===vmwareContexts{}:===",vmwareContexts);
             for (VmwareContext vmwareContext : vmwareContexts) {
                 RootFsMO rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
+                logger.info("===rootFsMo{}:===",rootFsMo);
                 List<Pair<ManagedObjectReference, String>> hosts = rootFsMo.getAllHostOnRootFs();
+                logger.info("===rootFsMo{}:===",rootFsMo);
                 if (hosts != null && hosts.size() > 0) {
                     HostMO host1 = null;
                     HostDatastoreSystemMO hdsMo = null;
                     for (Pair<ManagedObjectReference, String> host : hosts) {
+                        logger.info("===hosts{}:===",hosts);
                         host1 = hostVmwareFactory.build(vmwareContext, host.first());
+                        logger.info("===host1{}:===",host1);
                         hdsMo = host1.getHostDatastoreSystemMo();
+                        logger.info("===hdsMo{}:===",hdsMo);
                         if (hdsMo.findDatastore(dsname) != null) {
                             mor = hdsMo.findDatastore(dsname);
+                            logger.info("===mor{}:===",mor);
                             break;
                         }
                     }
                     if (mor != null && host1 != null && hdsMo != null) {
                         DatastoreMO dsMo = datastoreVmwareMoFactory.build(vmwareContext, mor);
+                        logger.info("===dsMo{}:===",dsMo);
                         List<VmfsDatastoreOption> vmfsDatastoreOptions = hdsMo.queryVmfsDatastoreExpandOptions(dsMo);
                         VmfsDatastoreInfo datastoreInfo = (VmfsDatastoreInfo) hdsMo.getDatastoreInfo(mor);
+                        logger.info("===datastoreInfo{}:===",datastoreInfo);
                         if (vmfsDatastoreOptions != null && vmfsDatastoreOptions.size() > 0) {
                             VmfsDatastoreOption vmfsDatastoreOption = vmfsDatastoreOptions.get(0);
+                            logger.info("===vmfsDatastoreOption{}:===",vmfsDatastoreOption);
                             VmfsDatastoreExpandSpec spec = (VmfsDatastoreExpandSpec) vmfsDatastoreOption.getSpec();
+                            logger.info("===spec{}:===",spec);
                             HostVmfsVolume vmfs = datastoreInfo.getVmfs();
+                            logger.info("===vmfs{}:===",vmfs);
                             Long totalSectors = addCapacity * ToolUtils.GI * 1L / vmfs.getBlockSize();
+                            logger.info("===totalSectors{}:===",totalSectors);
                             spec.getPartition().setTotalSectors(totalSectors);
+                            logger.info("==设置扩容结束==");
+
 
                             // 刷新vmfs存储，需等待2秒
                             List<DatastoreHostMount> hostMountInfos = dsMo.getHostMounts();
                             for (DatastoreHostMount datastoreHostMount : hostMountInfos) {
                                 HostMO hostmo = hostVmwareFactory.build(vmwareContext, datastoreHostMount.getKey());
+                                logger.info("===hostmo{}:===",hostmo);
                                 hostmo.getHostStorageSystemMo().refreshStorageSystem();
                             }
                             Thread.sleep(THREAD_SLEEP_2_SECENDS);
@@ -1115,26 +1131,35 @@ public class VCSDKUtils {
         try {
             ManagedObjectReference mor = null;
             VmwareContext[] vmwareContexts = vcConnectionHelpers.getAllContext();
+            logger.info("recycleVmfsCapacity:vmwareContexts{}",vmwareContexts);
             for (VmwareContext vmwareContext : vmwareContexts) {
                 RootFsMO rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
+                logger.info("recycleVmfsCapacity:rootFsMo{}",rootFsMo);
                 List<Pair<ManagedObjectReference, String>> hosts = rootFsMo.getAllHostOnRootFs();
+                logger.info("recycleVmfsCapacity:hosts{}",hosts);
                 if (hosts != null && hosts.size() > 0) {
                     HostMO host1;
                     HostDatastoreSystemMO hdsMo = null;
                     for (Pair<ManagedObjectReference, String> host : hosts) {
+                        logger.info("recycleVmfsCapacity:rootFsMo{}",host);
                         host1 = hostVmwareFactory.build(vmwareContext, host.first());
+                        logger.info("recycleVmfsCapacity:host1{}",host1);
                         hdsMo = host1.getHostDatastoreSystemMo();
+                        logger.info("recycleVmfsCapacity:hdsMo{}",hdsMo);
                         if (hdsMo.findDatastore(dsname) != null) {
                             mor = hdsMo.findDatastore(dsname);
+                            logger.info("recycleVmfsCapacity:mor{}",mor);
                             break;
                         }
                     }
                     if (hdsMo != null) {
                         VmfsDatastoreInfo datastoreInfo = (VmfsDatastoreInfo) hdsMo.getDatastoreInfo(mor);
+                        logger.info("recycleVmfsCapacity:mor{}",mor);
                         String uuid = datastoreInfo.getVmfs().getUuid();
                         uuids.add(uuid);
                         if (uuids.size() != 0 && uuid != null) {
                             hdsMo.unmapVmfsVolumeExTask(uuids);
+                            logger.info("recycleVmfsCapacity:uuids{}",uuids);
                         }
                     }
                 }

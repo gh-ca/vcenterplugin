@@ -62,12 +62,7 @@ public class DmeAccessController extends BaseController {
      */
     @RequestMapping(value = "/refreshaccess", method = RequestMethod.GET)
     public ResponseBodyBean refreshDme() {
-        LOG.info("accessdme/refreshaccess==");
-        try {
-            return success(dmeAccessService.refreshDme());
-        } catch (DmeException e) {
-            return failure(e.getMessage());
-        }
+        return success(dmeAccessService.refreshDme());
     }
 
     /**
