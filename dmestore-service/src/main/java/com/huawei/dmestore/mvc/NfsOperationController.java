@@ -117,7 +117,14 @@ public class NfsOperationController extends BaseController {
         targetParams.put("storage_pool_id", requestParams.get("storagePoolId"));
         targetParams.put("pool_raw_id", requestParams.get("poolRawId"));
         targetParams.put("current_port_id", requestParams.get("currentPortId"));
+        String accessModeDme = (String)requestParams.get("accessMode");
+        if("readWrite".equals(accessModeDme)){
+            accessModeDme = "read/write";
+        }else {
+            accessModeDme = "read-only";
+        }
         targetParams.put("accessMode", requestParams.get("accessMode"));
+        targetParams.put("accessModeDme", accessModeDme);
         Object nfsName = requestParams.get(NFS_NAME_FIELD);
         targetParams.put(NFS_NAME_FIELD, nfsName);
         targetParams.put("type", requestParams.get("type"));
