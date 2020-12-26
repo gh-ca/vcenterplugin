@@ -459,6 +459,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             filesystemSpecsLists.add(filesystemSpecsMap);
         }
         params.put(FILESYSTEM_SPECS, filesystemSpecsLists);
+       String s =  gson.toJson(params);
         ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.API_FS_CREATE, HttpMethod.POST,
             gson.toJson(params));
         int code = responseEntity.getStatusCodeValue();

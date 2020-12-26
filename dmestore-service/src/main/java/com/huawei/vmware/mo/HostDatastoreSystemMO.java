@@ -199,9 +199,11 @@ public class HostDatastoreSystemMO extends BaseMO {
 
         // readOnly/readWrite
         if (!StringUtils.isEmpty(accessMode)) {
-            spec.setAccessMode("readOnly");
-        } else {
-            spec.setAccessMode("readWrite");
+            if ("readOnly".equalsIgnoreCase(accessMode)){
+                spec.setAccessMode("readOnly");
+            }else {
+                spec.setAccessMode("readWrite");
+            }
         }
         return context.getService().createNasDatastore(mor, spec);
     }
