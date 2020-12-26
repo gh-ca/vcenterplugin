@@ -67,7 +67,7 @@ public class HostDatastoreSystemMO extends BaseMO {
                 return oc.getObj();
             }
 
-            if (oc.getPropSet().size() == 0) {
+            if (oc.getPropSet().size() <= 1) {
                 continue;
             }
             DynamicProperty prop = oc.getPropSet().get(1);
