@@ -178,14 +178,14 @@
       </span>
     </div>
     <!--Page1 -->
-    <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="name.pristine || !formPageOne.valid">
+    <clr-wizard-page #addPageOne [clrWizardPageNextDisabled]="!formPageOne.valid">
         <ng-template clrPageTitle>{{'vmfs.datastoreSetting' | translate}}</ng-template> <!-- mandatory -->
 
-        <form clrForm #formPageOne="ngForm">
+        <form clrForm [formGroup]="addForm" #formPageOne="ngForm">
           <!--名称 -->
           <clr-input-container>
             <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
-            <input clrInput class="inputWidth100Percent"  [(ngModel)]="form.name" name="name" #name="ngModel" (blur)="nameCheck(true)" required/>
+            <input clrInput class="inputWidth100Percent"   [(ngModel)]="form.name" formControlName="name" name="name"  (blur)="nameCheck(true)" required/>
             <clr-control-helper *ngIf="matchErr">
               <div class="errorTips" readonly >
                 <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
@@ -209,13 +209,13 @@
           <clr-checkbox-container>
             <label></label>
             <clr-checkbox-wrapper>
-              <input type="checkbox" clrCheckbox name="isSameName" [(ngModel)]="form.isSameName" />
+              <input type="checkbox" clrCheckbox name="isSameName" formControlName="isSameName" [(ngModel)]="form.isSameName" />
               <label style="width: 190px;">{{'vmfs.vmfsAddNameDesc' | translate}}</label>
             </clr-checkbox-wrapper>
           </clr-checkbox-container>
           <clr-input-container *ngIf="!form.isSameName">
             <label style="color: #9F9F9F;">{{'vmfs.volumeName' | translate}}</label>
-            <input clrInput class="inputWidth100Percent"  [(ngModel)]="form.volumeName" name="volumeName" (blur)="nameCheck(false);" required/>
+            <input clrInput class="inputWidth100Percent"  [(ngModel)]="form.volumeName" formControlName="volumeName" name="volumeName" (blur)="nameCheck(false);" required/>
             <clr-control-helper *ngIf="matchErr">
               <div class="errorTips" readonly >
                 <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
@@ -235,7 +235,7 @@
           <!--版本 -->
           <clr-select-container class="selectClass">
             <label style="color: #9F9F9F;">{{'vmfs.version' | translate}}</label>
-            <select (change)="setBlockSizeOptions();"  [(ngModel)]="form.version" clrSelect name="version" required>
+            <select (change)="setBlockSizeOptions();"  [(ngModel)]="form.version" formControlName="version" clrSelect name="version" required>
               <option value='5'>VMFS 5</option>
               <option value='6'>VMFS 6</option>
             </select>
@@ -247,15 +247,15 @@
             <label style="color: #9F9F9F;">{{'vmfs.capacity' | translate}}</label>
               <div clrInput style="float: left;width: 54%;position: relative;">
                 <!-- V5时最小值1.3G V6时最小值2G-->
-                <input clrInput (blur)="capacityOnblur();" min="0" style="width: 60%;border-bottom: none" type="number" [(ngModel)]="form.capacity" name="capacity" #number="ngModel"
+                <input clrInput (blur)="capacityOnblur();" min="0" style="width: 60%;border-bottom: none" type="number" [(ngModel)]="form.capacity" formControlName="capacity" name="capacity"
                        required/>
-                <select class="capacity" (change)="form.capacity = null;" clrInput style="width: 40%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;" [(ngModel)]="form.capacityUnit" name="capacityUnit" >
+                <select class="capacity" (change)="form.capacity = null;" clrInput style="width: 40%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;" [(ngModel)]="form.capacityUnit" formControlName="capacityUnit"  name="capacityUnit" >
                   <option value="TB">TB</option>
                   <option value="GB">GB</option>
                 </select>
               </div>
               <input clrInput style="width: 19%;text-align: center;" readonly value="{{'vmfs.multiply' | translate}}">
-              <input clrInput (blur)="countBlur();" min="0" style="width: 27%;" type="number" [(ngModel)]="form.count" name="count" #number="ngModel" required/>
+              <input clrInput (blur)="countBlur();" min="0" style="width: 27%;" type="number" [(ngModel)]="form.count" formControlName="count" name="count"  required/>
               <clr-control-helper *ngIf="!capacityErr"><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.capacityTips' | translate}}</clr-control-helper>
               <clr-control-helper *ngIf="capacityErr">
                 <div class="errorTips" readonly >
@@ -267,7 +267,7 @@
           <!-- 块大小 -->
           <clr-select-container class="selectClass">
             <label style="color: #9F9F9F;">{{'vmfs.blockSize' | translate}}</label>
-              <select  clrSelect [(ngModel)]="form.blockSize" name="blockSize" (change)="setSrgOptions();" required>
+              <select  clrSelect [(ngModel)]="form.blockSize" name="blockSize" formControlName="blockSize" (change)="setSrgOptions();"  required>
                 <option *ngFor="let item of blockSizeOptions" value="{{item.key}}">{{item.value}}</option>
             </select>
             <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
@@ -276,7 +276,7 @@
           <!-- 空间回收粒度 -->
           <clr-select-container class="selectClass">
             <label style="color: #9F9F9F;">{{'vmfs.spaceReclamationGranularity' | translate}}</label>
-            <select  clrSelect (ngModelOptions)="srgOptions"  [(ngModel)]="form.spaceReclamationGranularity" name="spaceReclamationGranularity" required>
+            <select  clrSelect (ngModelOptions)="srgOptions"  [(ngModel)]="form.spaceReclamationGranularity" formControlName="spaceReclamationGranularity"  name="spaceReclamationGranularity" required>
               <option *ngFor="let item of srgOptions" value="{{item.key}}">{{item.value}}</option>
             </select>
             <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
@@ -285,7 +285,7 @@
           <!-- 空间回收优先级 -->
           <clr-select-container class="selectClass">
             <label style="color: #9F9F9F;">{{'vmfs.spaceReclamationPriority' | translate}}</label>
-            <select  clrSelect [(ngModel)]="form.spaceReclamationPriority" name="spaceReclamationPriority" required>
+            <select  clrSelect [(ngModel)]="form.spaceReclamationPriority" name="spaceReclamationPriority" formControlName="spaceReclamationPriority" required>
               <option value="low">{{'vmfs.low' | translate}}</option>
               <option value="none">{{'vmfs.none' | translate}}</option>
             </select>
@@ -295,7 +295,7 @@
           <!-- 主机/集群 -->
           <clr-combobox-container>
             <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
-            <clr-combobox *ngIf="form.hostDataloadSuccess && form.culDataloadSuccess" [(ngModel)]="chooseDevice" name="chooseDevice" required>
+            <clr-combobox *ngIf="form.hostDataloadSuccess && form.culDataloadSuccess" [(ngModel)]="chooseDevice" name="chooseDevice" formControlName="chooseDevice" required>
               <clr-options>
                 <clr-option *clrOptionItems="let device of deviceList; field:'deviceName'" [clrValue]="device">
                   <clr-icon *ngIf="device.deviceName !== '' && device.deviceType === 'host'" shape="host" role="img" aria-label="World is turning"></clr-icon>
@@ -314,7 +314,7 @@
       </ng-template>
     </clr-wizard-page>
     <!--Page2 储存库设置-->
-    <clr-wizard-page #addPageTwo [clrWizardPageNextDisabled]="number.pristine || !formPageTwo.valid">
+    <clr-wizard-page #addPageTwo [clrWizardPageNextDisabled]="!formPageTwo.valid">
         <ng-template clrPageNavTitle>
           {{'vmfs.storageSetting' | translate}}
         </ng-template>
@@ -914,7 +914,7 @@
         <clr-input-container style="height: 4rem;">
           <label style="color: #9F9F9F;">{{'vmfs.expandSize' | translate}}</label>
           <div clrInput style="float: left;position: relative;">
-            <input clrInput min="0" style="width: 70%;border-bottom: none" type="number" [(ngModel)]="expandForm.vo_add_capacity" name="vo_add_capacity" #number="ngModel"
+            <input clrInput min="0" style="width: 70%;border-bottom: none" type="number" [(ngModel)]="expandForm.vo_add_capacity" name="vo_add_capacity" 
                    (blur)="expandOnblur();" required/>
             <select class="capacity" (change)="expandForm.vo_add_capacity = null;" [(ngModel)]="expandForm.capacityUnit" clrInput style="width: 30%;border: 1px solid #DDDDDD;position: absolute;bottom: 3px;"  name="capacityUnit" >
               <option value="TB">TB</option>
