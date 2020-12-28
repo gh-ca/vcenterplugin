@@ -192,7 +192,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                     if (shareClientHostMap != null && shareClientHostMap.size() > 0
                         && shareClientHostMap.get("objectId") != null) {
                         reqNfsShareClientArrayAddition.put(NAME_FIELD, shareClientHostMap.get(NAME_FIELD));
-                        reqNfsShareClientArrayAddition.put("permission", "read-only");
+                        reqNfsShareClientArrayAddition.put("permission", params.get("accessModeDme"));
                         reqNfsShareClientArrayAddition.put("write_mode", "synchronization");
                         reqNfsShareClientArrayAddition.put("permission_constraint", "all_squash");
                         reqNfsShareClientArrayAddition.put("root_permission_constraint", "root_squash");
@@ -232,6 +232,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 if (!"".equals(fsId)) {
                     //nfsShareMap.put("fs_id", fsId);
                     createNfsShareParams.put("fs_id", fsId);
+                    LOG.info("DME nfs share 创建请求参数报文:{}", gson.toJson(nfsShareMap));
                     String nfsShareTaskId = createNfsShare(nfsShareMap);
                     List<String> shareIds = new ArrayList<>();
                     shareIds.add(nfsShareTaskId);
