@@ -7,6 +7,10 @@ import com.huawei.dmestore.exception.VcenterRuntimeException;
 import com.huawei.dmestore.model.ResponseBodyBean;
 import com.huawei.dmestore.services.DMEOpenApiService;
 
+import com.google.gson.Gson;
+
+import springfox.documentation.spring.web.json.Json;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -70,7 +74,7 @@ public class BaseController {
     @ExceptionHandler(NoDmeException.class)
     @ResponseStatus(HttpStatus.OK)
     protected Map<String, Object> handleException(final NoDmeException exception) {
-        LOGGER.debug("No eSight configuration!{}", exception.getMessage());
+        LOGGER.debug("No eSight configuration!{}", new Gson().toJson(exception));
         return generateError(generateCode(exception.getCode()), exception.getMessage(), Collections.emptyList());
     }
 
@@ -85,7 +89,7 @@ public class BaseController {
     @ResponseStatus(HttpStatus.OK)
     protected Map<String, Object> handleException(final RestClientException exception,
         final HttpServletRequest request) {
-        LOGGER.error("Rest client Exception!{}", exception.getMessage());
+        LOGGER.error("Rest client Exception!{}", new Gson().toJson(exception));
         Throwable rootCause = exception.getRootCause();
         if (rootCause instanceof CertificateException) {
             return generateError(request, CODE_CERT_EXCEPTION, exception.getMessage(), null);
@@ -104,7 +108,7 @@ public class BaseController {
     @ResponseStatus(HttpStatus.OK)
     protected Map<String, Object> handleException(final VcenterRuntimeException exception,
         final HttpServletRequest request) {
-        LOGGER.error("vCenter plugin exception!{}", exception.getMessage());
+        LOGGER.error("vCenter plugin exception!{}", new Gson().toJson(exception));
         return generateError(request, generateCode(exception.getCode()), exception.getMessage(), null);
     }
 
@@ -118,7 +122,7 @@ public class BaseController {
     @ExceptionHandler(DmeException.class)
     @ResponseStatus(HttpStatus.OK)
     protected Map<String, Object> handleException(final DmeException exception, final HttpServletRequest request) {
-        LOGGER.error("eSight Exception!{}", exception.getMessage());
+        LOGGER.error("eSight Exception!{}", new Gson().toJson(exception));
         if (CODE_NO_ESIGHT_EXCEPTION.equals(exception.getCode())) {
             return generateError(request, exception.getCode(), exception.getMessage(), null);
         }
@@ -135,7 +139,7 @@ public class BaseController {
     @ExceptionHandler(SQLException.class)
     @ResponseStatus(HttpStatus.OK)
     protected Map<String, Object> handleException(final SQLException exception, final HttpServletRequest request) {
-        LOGGER.error("DB Exception!{}", exception.getMessage());
+        LOGGER.error("DB Exception!{}", new Gson().toJson(exception));
         Map<String, Object> errorMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         errorMap.put(FIELD_CODE, CODE_DB_EXCEPTION);
         errorMap.put(FIELD_DESCRIPTION, exception.getMessage());
@@ -153,7 +157,7 @@ public class BaseController {
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.OK)
     protected Map<String, Object> handleException(final Exception exception, final HttpServletRequest request) {
-        LOGGER.error("System Exception!{}", exception.getMessage());
+        LOGGER.error("System Exception!{}", new Gson().toJson(exception));
         return generateError(request, CODE_FAILURE, exception.getMessage(), null);
     }
 

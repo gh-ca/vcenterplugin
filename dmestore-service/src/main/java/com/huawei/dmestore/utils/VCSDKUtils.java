@@ -2568,6 +2568,9 @@ public class VCSDKUtils {
 
                 // 主机删除存储
                 deleteNfs(dsmo, hostmo, dataStoreObjectId);
+
+                // 删除成功后不再重复删除
+                break;
             }
         } catch (Exception e) {
             throw new VcenterException(e.getMessage());
@@ -2577,12 +2580,12 @@ public class VCSDKUtils {
     public void deleteNfs(DatastoreMO dsmo, HostMO hostMo, String nfsId) throws Exception {
         // 删除前重新扫描datastore
         hostMo.getHostStorageSystemMo().rescanVmfs();
-        logger.info("Rescan datastore before mounting");
+        logger.info("Rescan datastore before delete!");
 
         // 删除NFS
         NasDatastoreInfo nasdsinfo = (NasDatastoreInfo) dsmo.getInfo();
         hostMo.getHostDatastoreSystemMo().deleteDatastore(nasdsinfo.getName());
-        logger.info("mount nfs success!host name={}, datastore name={}", hostMo.getName(), dsmo.getName());
+        logger.info("delete nfs success!host name={}, datastore name={}", hostMo.getName(), dsmo.getName());
     }
 
     /**

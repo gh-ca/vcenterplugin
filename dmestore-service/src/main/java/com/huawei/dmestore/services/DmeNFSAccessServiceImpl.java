@@ -797,6 +797,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     public void deleteNfs(Map<String, Object> params) throws DmeException {
         String dataStorageId = ToolUtils.getStr(params.get(DATASTOREOBJECTID));
         List<Map<String, Object>> hosts = getHostsMountDataStoreByDsObjectId(dataStorageId);
+        LOG.info("get hosts success!hosts={}", gson.toJson(hosts));
         List<String> hostIds = new ArrayList<>();
         if (hosts != null && hosts.size() > 0) {
             for (Map<String, Object> hostMap : hosts) {
@@ -805,7 +806,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             }
         }
         if (hostIds.size() > 0) {
+            LOG.info("vmware deleteNfs begin!hostIds={}", gson.toJson(hostIds));
             vcsdkUtils.deleteNfs(dataStorageId, hostIds);
+            LOG.info("vmware deleteNfs end!");
         }
         DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStorageId);
         if (dvr != null) {
@@ -867,6 +870,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     private String deleteNfsShare(List<String> shareIds) {
+        LOG.info("DME delete NFS share begin!shareIds={}", gson.toJson(shareIds));
         String taskId = "";
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("nfs_share_ids", shareIds);
@@ -880,12 +884,14 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 }
             }
         } catch (DmeException e) {
-            LOG.error("delete nfs share error:", e);
+            LOG.error("DME delete nfs share error:", e);
         }
+        LOG.info("DME delete NFS share end!taskId={}", taskId);
         return taskId;
     }
 
     private String deleteNfsFs(List<String> fsIds) {
+        LOG.info("DME delete NFS filesystem begin!fsIds={}", gson.toJson(fsIds));
         String taskId = "";
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put("file_system_ids", fsIds);
@@ -901,6 +907,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         } catch (DmeException e) {
             LOG.error("delete nfs fs error:", e);
         }
+        LOG.info("DME delete NFS filesystem end!taskId={}", taskId);
         return taskId;
     }
 
