@@ -2568,6 +2568,9 @@ public class VCSDKUtils {
 
                 // 主机删除存储
                 deleteNfs(dsmo, hostmo, dataStoreObjectId);
+
+                // 删除成功后不再重复删除
+                break;
             }
         } catch (Exception e) {
             throw new VcenterException(e.getMessage());
