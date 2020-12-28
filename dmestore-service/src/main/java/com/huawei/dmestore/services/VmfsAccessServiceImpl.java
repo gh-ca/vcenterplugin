@@ -1095,21 +1095,22 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     public List<VmfsDatastoreVolumeDetail> volumeDetail(String storageObjectId) throws DmeException {
         List<VmfsDatastoreVolumeDetail> list = new ArrayList<>();
         List<String> volumeIds = dmeVmwareRalationDao.getVolumeIdsByStorageId(storageObjectId);
+        LOG.error("get volume detail! volumeIds={}", gson.toJson(volumeIds));
         for (String volumeId : volumeIds) {
             // 调用DME接口获取卷详情
             String url = DmeConstants.DME_VOLUME_BASE_URL + FIEL_SEPARATOR + volumeId;
-            ResponseEntity<String> responseEntity;
-            responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            LOG.info("get volume detail! url={}", url);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() / DIVISOR_100 != HTTP_SUCCESS) {
+                LOG.info("get volume detail failed! response={}", gson.toJson(responseEntity));
                 throw new DmeException(responseEntity.getBody());
             }
-
             String responseBody = responseEntity.getBody();
             JsonObject volume = gson.fromJson(responseBody, JsonObject.class).getAsJsonObject(VOLUME_FIELD);
             if (volume.isJsonNull()) {
                 continue;
             }
-
+            LOG.info("volume detail! dme response={}", volume.toString());
             VmfsDatastoreVolumeDetail volumeDetail = new VmfsDatastoreVolumeDetail();
             volumeDetail.setWwn(volume.get(VOLUME_WWN).getAsString());
             volumeDetail.setName(volume.get(NAME_FIELD).getAsString());
@@ -1199,7 +1200,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
             for (int dex = 0; dex < wwnArray.size(); dex++) {
                 String wwn = wwnArray.get(dex).getAsString();
-                if(StringUtil.isBlank(wwn)){
+                if (StringUtil.isBlank(wwn)) {
                     continue;
                 }
 
