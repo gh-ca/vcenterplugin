@@ -298,6 +298,9 @@ export class AddComponent implements OnInit{
   // 获取存储池数据
   getStoragePoolsByStorId() {
     this.form.pool_raw_id = undefined;
+    this.form.workload_type_id = undefined;
+    this.storagePoolList = [];
+    this.workloads = [];
     console.log('selectSotrageId' + this.form.storage_id);
     if (null !== this.form.storage_id && '' !== this.form.storage_id) {
       // 获取存储池数据

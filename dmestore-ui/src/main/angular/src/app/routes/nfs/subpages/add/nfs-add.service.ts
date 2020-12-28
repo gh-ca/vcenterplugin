@@ -56,6 +56,7 @@ export class AddNfs{
   hostObjectId:string;//  挂载主机的Objectid
   accessMode:string;//  挂载方式 分 只读 和读写
   securityType:string;//安全类型
+  unit:string;// 单位
   constructor(){
     this.sameName = true;
     this.advance = false;
@@ -64,6 +65,7 @@ export class AddNfs{
     this.compressionEnabled = false;
     this.autoSizeEnable = false;
     this.thin = true;
+    this.unit = 'GB';
   }
 }
 export class StoragePool{
