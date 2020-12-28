@@ -25,7 +25,7 @@
       <!--名称 -->
       <clr-input-container>
         <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
-        <input clrInput class="inputWidth100Percent"  [(ngModel)]="form.name" name="name" #name="ngModel" (blur)="nameCheck(true);" required/>
+        <input clrInput class="inputWidth100Percent" maxlength="256"  [(ngModel)]="form.name" name="name" #name="ngModel" (blur)="nameCheck(true);" required/>
         <clr-control-helper *ngIf="matchErr">
           <div class="errorTips" readonly >
             <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
@@ -55,7 +55,7 @@
       </clr-checkbox-container>
       <clr-input-container *ngIf="!form.isSameName">
         <label style="color: #9F9F9F;">{{'vmfs.volumeName' | translate}}</label>
-        <input clrInput class="inputWidth100Percent"  [(ngModel)]="form.volumeName" name="volumeName" (blur)="nameCheck(false);" required/>
+        <input clrInput class="inputWidth100Percent" maxlength="256"  [(ngModel)]="form.volumeName" name="volumeName" (blur)="nameCheck(false);" required/>
         <clr-control-helper *ngIf="matchErr">
           <div class="errorTips" readonly >
             <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>

@@ -15,7 +15,7 @@
       <!-- 名称 -->
       <clr-input-container>
         <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
-        <input clrInput  [(ngModel)]="modifyForm.name" name="name" #name="ngModel" (blur)="modifyNameCheck();" required/><br>
+        <input clrInput  [(ngModel)]="modifyForm.name" maxlength="256" name="name" #name="ngModel" (blur)="modifyNameCheck();" required/><br>
         <clr-control-helper *ngIf="matchErr">
           <div class="errorTips" readonly >
             <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
