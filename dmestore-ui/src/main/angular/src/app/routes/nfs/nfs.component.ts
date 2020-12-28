@@ -7,6 +7,7 @@ import {ClrDatagridSortOrder, ClrWizard, ClrWizardPage} from "@clr/angular";
 import {VmfsListService} from "../vmfs/list/list.service";
 import {Router} from "@angular/router";
 import {AddNfs, NfsAddService, Vmkernel} from "./subpages/add/nfs-add.service";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
 
 @Component({
   selector: 'app-nfs',
@@ -30,6 +31,36 @@ export class NfsComponent implements OnInit {
   unit='GB';
   hostList: Host[] = [];
   addForm = new AddNfs();
+  addFormGroup = new FormGroup({
+    storagId: new FormControl('',
+      Validators.required),
+    storagePoolId: new FormControl(true,
+      Validators.required),
+    currentPortId: new FormControl('',Validators.required
+    ),
+    nfsName: new FormControl('',
+      Validators.required),
+    size: new FormControl('',
+      Validators.required),
+    hostObjectId: new FormControl('',
+      Validators.required),
+    vkernelIp: new FormControl('',
+      Validators.required),
+    accessMode: new FormControl('',
+      Validators.required),
+    sameName: new FormControl(true,
+      Validators.required),
+    fsName: new FormControl('',
+      ),
+    shareName: new FormControl('',
+      ),
+    type: new FormControl('',
+      ),
+    securityType: new FormControl(false,
+      ),
+    unit: new FormControl('GB',
+      Validators.required),
+  });
   storageList: StorageList[] = [];
   storagePools: StoragePool[] = [];
   updateNfs: UpdateNfs = new UpdateNfs();
@@ -131,11 +162,13 @@ export class NfsComponent implements OnInit {
     // });
     this.addModelShow = true;
     this.storageList = null;
+
     this.storageService.getData().subscribe((s: any) => {
       this.modalLoading=false;
       if (s.code === '200'){
         this.storageList = s.data;
         this.modalLoading=false;
+
       }
     });
     this.hostList = null;
@@ -147,6 +180,8 @@ export class NfsComponent implements OnInit {
       }
     });
     this.addForm = new AddNfs();
+    // 初始化form
+    this.addFormGroup.reset(this.addForm);
     this.checkedPool= null;
     this.errorMsg='';
     // 获取存储列表
@@ -223,7 +258,8 @@ export class NfsComponent implements OnInit {
   }
   selectStoragePool(){
     this.modalLoading=true;
-    // this.storagePools = [];
+    this.storagePools = [];
+    this.addForm.storagePoolId = undefined;
     this.logicPorts = null;
     // 选择存储后获取存储池
     this.storageService.getStoragePoolListByStorageId("file",this.addForm.storagId)
@@ -431,14 +467,16 @@ export class NfsComponent implements OnInit {
   }
   checkHost(){
     this.modalLoading=true;
-
+    this.addForm.vkernelIp = undefined;
     //选择主机后获取虚拟网卡
     this.addService.getVmkernelListByObjectId(this.addForm.hostObjectId)
       .subscribe((r: any) => {
         this.modalLoading=false;
         if (r.code === '200'){
           this.vmkernelList = r.data;
-          this.addForm.vkernelIp=this.vmkernelList[0].ipAddress;
+          if (this.vmkernelList && this.vmkernelList.length > 0) {
+            this.addForm.vkernelIp=this.vmkernelList[0].ipAddress;
+          }
         }
         this.cdr.detectChanges();
       });
