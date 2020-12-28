@@ -17,6 +17,7 @@ import {ClrWizard, ClrWizardPage} from '@clr/angular';
 import {GlobalsService} from '../../../shared/globals.service';
 import {Router} from "@angular/router";
 import {DeviceFilter, ProtectionStatusFilter, ServiceLevelFilter, StatusFilter} from "./filter.component";
+import {FormControl, FormGroup, Validators} from "@angular/forms";
 
 
 @Component({
@@ -67,6 +68,30 @@ export class VmfsListComponent implements OnInit {
   addSuccessShow = false; // 添加成功弹窗
   // 添加表单数据
   form = new GetForm().getAddForm();
+  addForm = new FormGroup({
+    name: new FormControl('',
+      Validators.required),
+    isSameName: new FormControl(true,
+      Validators.required),
+    volumeName: new FormControl('',
+      ),
+    version: new FormControl('5',
+      Validators.required),
+    capacity: new FormControl('',
+      Validators.required),
+    capacityUnit: new FormControl('GB',
+      Validators.required),
+    count: new FormControl('',
+      Validators.required),
+    blockSize: new FormControl('',
+      Validators.required),
+    spaceReclamationGranularity: new FormControl('',
+      Validators.required),
+    spaceReclamationPriority: new FormControl('',
+      Validators.required),
+    chooseDevice: new FormControl('',
+      Validators.required)
+  });
   // 编辑form提交数据
   modifyForm = new GetForm().getEditForm();
   // 扩容form
@@ -324,6 +349,10 @@ export class VmfsListComponent implements OnInit {
   getStoragePoolsByStorId() {
     this.form.pool_raw_id = undefined;
     console.log('selectSotrageId' + this.form.storage_id);
+    this.storagePoolList = [];
+    this.workloads = [];
+    this.form.pool_raw_id = undefined;
+    this.form.workload_type_id = undefined;
     if (null !== this.form.storage_id && '' !== this.form.storage_id) {
       // 存储池
       this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, 'block').subscribe((result: any) => {
@@ -363,6 +392,7 @@ export class VmfsListComponent implements OnInit {
       options.push(option1);
     }
     // 设置blockSize 可选值
+    this.blockSizeOptions = [];
     this.blockSizeOptions = options;
     this.form.blockSize = this.blockSizeOptions[0].key;
     // 重置空间回收粒度
@@ -384,6 +414,7 @@ export class VmfsListComponent implements OnInit {
       options.push(option2);
     }
 
+    this.srgOptions = [];
     this.srgOptions = options;
     this.form.spaceReclamationGranularity = this.srgOptions[0].key;
     console.log('this.form.blockSize:' + this.form.blockSize);
@@ -480,8 +511,12 @@ export class VmfsListComponent implements OnInit {
     this.volNameRepeatErr = false;
     this.matchErr = false;
 
+
     // 初始化表单
     this.form = new GetForm().getAddForm();
+    // 初始化form
+    this.addForm.reset(this.form);
+    // this.addForm.markAsTouched();
     // 添加页面显示
     this.popListShow = true;
     // 添加页面默认打开首页
@@ -701,7 +736,7 @@ export class VmfsListComponent implements OnInit {
         // 重新请求数据
         this.scanDataStore();
         // 打开成功提示窗口
-        this.delShow = true;
+        this.delSuccessShow = true;
       } else {
         console.log('DEL faild: ' + result.description);
         this.isOperationErr = true;
@@ -1393,7 +1428,9 @@ export class VmfsListComponent implements OnInit {
         if (reg5.test(this.form.name)) {
           // 校验VMFS名称重复
           this.checkVmfsName(this.form.name);
-
+          if (this.form.isSameName) {
+            this.form.volumeName = this.form.name;
+          }
         } else {
           this.matchErr = true;
           this.form.name = null;
