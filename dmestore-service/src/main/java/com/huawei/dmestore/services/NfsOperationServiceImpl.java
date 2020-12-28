@@ -138,6 +138,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
     @Override
     public void createNfsDatastore(Map<String, Object> params) throws DmeException {
+        LOG.info("createNfsDatastore params={}", gson.toJson(params));
         if (params == null || params.size() == 0) {
             throw new DmeException(CODE_403, "params error , please check your params !");
         }
