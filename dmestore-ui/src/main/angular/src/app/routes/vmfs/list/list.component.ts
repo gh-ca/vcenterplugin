@@ -402,16 +402,21 @@ export class VmfsListComponent implements OnInit {
   setSrgOptions() {
     const options = [];
     const blockValue = this.form.blockSize + '';
+    const versionVal = this.form.version + '';
     if (blockValue === '1024') {
       const option1 = {key: 1024, value : '1MB'};
       options.push(option1);
-      const option2 = {key: 8, value : '8KB'};
-      options.push(option2);
+      if(versionVal === '5') {
+        const option2 = {key: 8, value : '8KB'};
+        options.push(option2);
+      }
     } else if (blockValue === '64') {
       const option1 = {key: 64, value : '64KB'};
       options.push(option1);
-      const option2 = {key: 8, value : '8KB'};
-      options.push(option2);
+      if (versionVal === '5') {
+        const option2 = {key: 8, value : '8KB'};
+        options.push(option2);
+      }
     }
 
     this.srgOptions = [];
@@ -695,6 +700,8 @@ export class VmfsListComponent implements OnInit {
     this.serviceLevelIsNull = false;
     this.storageList = null;
     this.storagePoolList = null;
+    // 切换服务等级与自定义隐藏错误信息
+    this.isOperationErr = false;
 
     // loading
     this.modalLoading = true;
@@ -705,6 +712,8 @@ export class VmfsListComponent implements OnInit {
   serviceLevelBtnFunc() {
     this.levelCheck = 'level';
     this.serviceLevelIsNull = false;
+    // 切换服务等级与自定义隐藏错误信息
+    this.isOperationErr = false;
 
     this.setServiceLevelList();
   }
@@ -969,14 +978,11 @@ export class VmfsListComponent implements OnInit {
   }
   // 回收空间 处理
   reclaimHandleFunc() {
-    const name = this.rowSelected[0].name;
-    console.log('reclaim:' + name);
-    const vmfsNames = this.rowSelected.map(item => item.name);
+    const vmfsObjectIds = this.rowSelected.map(item => item.objectid);
     this.modalHandleLoading = true;
-    this.remoteSrv.reclaimVmfs(vmfsNames).subscribe((result: any) => {
+    this.remoteSrv.reclaimVmfs(vmfsObjectIds).subscribe((result: any) => {
       this.modalHandleLoading = false;
       if (result.code === '200'){
-        console.log('Reclaim ' + name + ' success');
         // 关闭回收空间页面
         this.reclaimShow = false;
         // 空间回收完成重新请求数据
@@ -984,7 +990,6 @@ export class VmfsListComponent implements OnInit {
         // 打开成功提示窗口
         this.reclaimSuccessShow = true;
       } else {
-        console.log('Reclaim ' + name + ' fail：' + result.description);
         this.isOperationErr = true;
       }
       this.cdr.detectChanges();

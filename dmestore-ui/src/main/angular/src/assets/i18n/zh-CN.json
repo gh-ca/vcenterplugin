@@ -161,7 +161,7 @@
       "tips":"若NFS所挂载的主机全部被卸载，则会自动删除此NFS设备！"
     },
     "reduce": {
-      "success": "添加成功！"
+      "success": "缩容成功！"
     }
   },
   "vmfs": {
@@ -296,6 +296,7 @@
     },
     "filter": {
       "all": "所有",
+      "empty": "空",
       "status": {
         "normal": "正常"
       },
