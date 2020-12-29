@@ -413,7 +413,7 @@
         "unknown":"Unknown"
       },
       "volumes":{
-        "volumes":"Volumes",
+        "volumes":"LUN",
         "name":"Name",
         "status":"Status",
         "dataStore":"Data Store",

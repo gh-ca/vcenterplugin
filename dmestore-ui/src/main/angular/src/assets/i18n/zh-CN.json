@@ -416,7 +416,7 @@
         "unknown":"未知"
       },
       "volumes":{
-        "volumes":"卷",
+        "volumes":"LUN",
         "name":"名称",
         "status":"状态",
         "dataStore":"所属数据存储",
