@@ -46,7 +46,6 @@ public class NfsAccessController extends BaseController {
      * @return ResponseBodyBean
      */
     @RequestMapping(value = "/listnfs", method = RequestMethod.GET)
-    @ResponseBody
     public ResponseBodyBean listNfs() {
         String failureStr;
         try {
@@ -66,7 +65,6 @@ public class NfsAccessController extends BaseController {
      * @return ResponseBodyBean
      */
     @RequestMapping(value = "/listnfsperformance", method = RequestMethod.GET)
-    @ResponseBody
     public ResponseBodyBean listNfsPerformance(@RequestParam("fsIds") List<String> fsIds) {
         String failureStr;
         try {
@@ -86,7 +84,6 @@ public class NfsAccessController extends BaseController {
      * @return ResponseBodyBean
      */
     @RequestMapping(value = "/mountnfs", method = RequestMethod.POST)
-    @ResponseBody
     public ResponseBodyBean mountNfs(@RequestBody Map<String, Object> params) {
         LOG.info("accessnfs/mountnfs=={}", gson.toJson(params));
         String failureStr;
@@ -107,7 +104,6 @@ public class NfsAccessController extends BaseController {
      * @return ResponseBodyBean
      */
     @RequestMapping(value = "/unmountnfs", method = RequestMethod.POST)
-    @ResponseBody
     public ResponseBodyBean unmountNfs(@RequestBody Map<String, Object> params) {
         LOG.info("accessnfs/unmountnfs=={}", gson.toJson(params));
         String failureStr;
@@ -128,7 +124,6 @@ public class NfsAccessController extends BaseController {
      * @return ResponseBodyBean
      */
     @RequestMapping(value = "/deletenfs", method = RequestMethod.POST)
-    @ResponseBody
     public ResponseBodyBean deleteNfs(@RequestBody Map<String, Object> params) {
         LOG.info("accessnfs/deletenfs=={}", gson.toJson(params));
         String failureStr;

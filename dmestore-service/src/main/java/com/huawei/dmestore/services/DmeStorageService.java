@@ -257,4 +257,13 @@ public interface DmeStorageService {
      * @throws DmeException when error
      */
     Boolean queryShareByName(String name, String storageId) throws DmeException;
+
+    /**
+     * list Volume Performance
+     *
+     * @param poolRawId poolRawId
+     * @return String
+     * @throws DmeException when error
+     */
+    String getStorageByPoolRawId(String poolRawId) throws DmeException;
 }

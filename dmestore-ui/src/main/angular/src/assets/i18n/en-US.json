@@ -185,6 +185,7 @@
     "spaceReclamationPriority": "Space Reclamation Priority",
     "hostOrCluster": "Host/Cluster",
     "name": "Name",
+    "nameChecking": "Name verification...",
     "id": "ID",
     "description": "Description",
     "status": "status",
@@ -296,6 +297,7 @@
     },
     "filter": {
       "all": "All",
+      "empty": "Empty",
       "status": {
         "normal": "Normal"
       },
@@ -412,7 +414,7 @@
         "unknown":"Unknown"
       },
       "volumes":{
-        "volumes":"Volumes",
+        "volumes":"LUN",
         "name":"Name",
         "status":"Status",
         "dataStore":"Data Store",

@@ -230,7 +230,7 @@ public class ClusterMOTest {
         String poolPath = "/123";
         String poolUuid = "123214";
         try {
-            clusterMO.mountDatastore(vmfsDatastore, poolHostAddress, poolHostPort, poolPath, poolUuid);
+            //clusterMO.mountDatastore(vmfsDatastore, poolHostAddress, poolHostPort, poolPath, poolUuid);
         } catch (Exception ex) {
 
         }
@@ -240,7 +240,7 @@ public class ClusterMOTest {
     public void unmountDatastore() {
         String poolUuid = "2312";
         try {
-            clusterMO.unmountDatastore(poolUuid);
+            //clusterMO.unmountDatastore(poolUuid);
         } catch (Exception ex) {
 
         }

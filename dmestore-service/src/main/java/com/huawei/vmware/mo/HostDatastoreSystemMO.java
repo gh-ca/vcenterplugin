@@ -43,45 +43,7 @@ public class HostDatastoreSystemMO extends BaseMO {
         super(context, morHostDatastore);
     }
 
-    /**
-     * findDatastore
-     *
-     * @param name name
-     * @return ManagedObjectReference
-     * @throws Exception Exception
-     */
-    public ManagedObjectReference findDatastore(String name) throws Exception {
-        ServiceContent serviceContent = context.getServiceContent();
-        ManagedObjectReference customFieldsManager = serviceContent.getCustomFieldsManager();
-        CustomFieldsManagerMO cfmMo = new CustomFieldsManagerMO(context, customFieldsManager);
-        int key = cfmMo.getCustomFieldKey("Datastore", CustomFieldConstants.CLOUD_UUID);
-        assert key != 0;
 
-        List<ObjectContent> ocs = getDatastorePropertiesOnHostDatastoreSystem(
-            new String[] {"name", String.format("value[%d]", key)});
-        if (ocs == null) {
-            return null;
-        }
-        for (ObjectContent oc : ocs) {
-            if (oc.getPropSet().get(0).getVal().equals(name)) {
-                return oc.getObj();
-            }
-
-            if (oc.getPropSet().size() <= 1) {
-                continue;
-            }
-            DynamicProperty prop = oc.getPropSet().get(1);
-            if (prop != null && prop.getVal() != null) {
-                if (prop.getVal() instanceof CustomFieldStringValue) {
-                    String val = ((CustomFieldStringValue) prop.getVal()).getValue();
-                    if (val.equalsIgnoreCase(name)) {
-                        return oc.getObj();
-                    }
-                }
-            }
-        }
-        return null;
-    }
 
     /**
      * queryVmfsDatastoreExpandOptions
@@ -147,21 +109,23 @@ public class HostDatastoreSystemMO extends BaseMO {
         return context.getService().createVmfsDatastore(mor, vmfsDatastoreCreateSpec);
     }
 
+
+
     /**
      * deleteDatastore
      *
-     * @param name name
+     * @param datastoreMor datastoreMor
      * @return boolean
      * @throws Exception Exception
      */
-    public boolean deleteDatastore(String name) throws Exception {
-        ManagedObjectReference morDatastore = findDatastore(name);
-        if (morDatastore != null) {
-            context.getService().removeDatastore(mor, morDatastore);
+    public boolean deleteDatastore(ManagedObjectReference datastoreMor) throws Exception {
+        if (datastoreMor != null) {
+            context.getService().removeDatastore(mor, datastoreMor);
             return true;
         }
         return false;
     }
+
 
     /**
      * createNfsDatastore

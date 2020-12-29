@@ -759,13 +759,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             LOG.error("unmountNfs get relation error!dataStoreObjectId={}", dataStoreObjectId);
             return;
         }
-        String dsName = dvr.getStoreName();
-        if (!StringUtils.isEmpty(dsName)) {
-            Map<String, Object> dsmap = new HashMap<>();
-            dsmap.put(NAME_FIELD, dsName);
-            if (!StringUtils.isEmpty(hostObjId)) {
-                unmountNfsFromHost(dataStoreObjectId, hostObjId);
-            }
+        if (!StringUtils.isEmpty(hostObjId)) {
+            unmountNfsFromHost(dataStoreObjectId, hostObjId);
         }
         String shareId = dvr.getShareId();
         List<AuthClient> authClientList = getNfsDatastoreShareAuthClients(shareId);

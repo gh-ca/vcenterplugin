@@ -11,7 +11,7 @@ import {
   StoragePoolList,
   HostList,
   ClusterList,
-  ServiceLevelList, HostOrCluster, GetForm, Workload,
+  ServiceLevelList, HostOrCluster, GetForm, Workload, StoragePoolMap,
 } from './list.service';
 import {ClrWizard, ClrWizardPage} from '@clr/angular';
 import {GlobalsService} from '../../../shared/globals.service';
@@ -100,6 +100,8 @@ export class VmfsListComponent implements OnInit {
   changeServiceLevelForm = new GetForm().getChangeLevelForm();
   storageList: StorageList[] = []; // 存储数据
   storagePoolList: StoragePoolList[] = []; // 存储池ID
+  storagePoolMap:StoragePoolMap[] = [];
+
   workloads:Workload[] = []; // Workload
   blockSizeOptions = []; // 块大小选择
   srgOptions = []; // 空间回收粒度初始化
@@ -143,6 +145,7 @@ export class VmfsListComponent implements OnInit {
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
   isOperationErr = false; // 错误信息
+  nameChecking = false; // 名称校验
   capacityErr = false; // 容量错误信息
   expandErr = false; // 扩容容量错误信息
   mountErr = false; // 扩容容量错误信息
@@ -338,6 +341,19 @@ export class VmfsListComponent implements OnInit {
       console.log(result);
       if (result.code === '200' && result.data !== null) {
         this.storageList = result.data;
+        const allPoolMap:StoragePoolMap[] = []
+
+        result.data.forEach(item  => {
+          const poolMap:StoragePoolMap = {
+            storageId:item.id,
+            storagePoolList:null,
+            workloadList:null
+          }
+          allPoolMap.push(poolMap);
+        });
+
+        this.storagePoolMap = allPoolMap;
+
         this.getStoragePoolsByStorId();
       }
       this.modalLoading = false;
@@ -354,26 +370,41 @@ export class VmfsListComponent implements OnInit {
     this.form.pool_raw_id = undefined;
     this.form.workload_type_id = undefined;
     if (null !== this.form.storage_id && '' !== this.form.storage_id) {
+
+      const storagePoolMap = this.storagePoolMap.filter(item => item.storageId == this.form.storage_id);
+
+      const storagePoolList = storagePoolMap[0].storagePoolList;
+      const workloads = storagePoolMap[0].workloadList;
       // 存储池
-      this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, 'block').subscribe((result: any) => {
-        console.log('storagePools', result);
-        if (result.code === '200' && result.data !== null) {
-          this.storagePoolList = result.data;
-          console.log('this.storagePoolList', this.storagePoolList);
+      if (!storagePoolList) {
+        this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, 'block').subscribe((result: any) => {
+          console.log('storagePools', result);
+          if (result.code === '200' && result.data !== null) {
+            this.storagePoolList = result.data;
 
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        }
-      });
+            this.storagePoolMap.filter(item => item.storageId == this.form.storage_id)[0].storagePoolList = result.data;
+
+            this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+          }
+        });
+      } else {
+        this.storagePoolList = storagePoolList;
+      }
       // 获取workLoad
-      this.remoteSrv.getWorkLoads(this.form.storage_id).subscribe((result: any) => {
-        console.log('storagePools', result);
-        if (result.code === '200' && result.data !== null) {
-          this.workloads = result.data;
-          console.log('this.workloads', this.workloads);
+      if (!workloads) {
+        this.remoteSrv.getWorkLoads(this.form.storage_id).subscribe((result: any) => {
+          console.log('workloads', result);
+          if (result.code === '200' && result.data !== null) {
+            this.workloads = result.data;
 
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        }
-      });
+            this.storagePoolMap.filter(item => item.storageId == this.form.storage_id)[0].workloadList = result.data;
+
+            this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+          }
+        });
+      } else {
+        this.workloads = workloads;
+      }
     }
   }
 
@@ -402,16 +433,21 @@ export class VmfsListComponent implements OnInit {
   setSrgOptions() {
     const options = [];
     const blockValue = this.form.blockSize + '';
+    const versionVal = this.form.version + '';
     if (blockValue === '1024') {
       const option1 = {key: 1024, value : '1MB'};
       options.push(option1);
-      const option2 = {key: 8, value : '8KB'};
-      options.push(option2);
+      if(versionVal === '5') {
+        const option2 = {key: 8, value : '8KB'};
+        options.push(option2);
+      }
     } else if (blockValue === '64') {
       const option1 = {key: 64, value : '64KB'};
       options.push(option1);
-      const option2 = {key: 8, value : '8KB'};
-      options.push(option2);
+      if (versionVal === '5') {
+        const option2 = {key: 8, value : '8KB'};
+        options.push(option2);
+      }
     }
 
     this.srgOptions = [];
@@ -535,6 +571,8 @@ export class VmfsListComponent implements OnInit {
 
     // 初始化存储池
     this.storagePoolList = [];
+
+    this.storagePoolMap = [];
 
   }
   // 页面跳转
@@ -695,9 +733,13 @@ export class VmfsListComponent implements OnInit {
     this.serviceLevelIsNull = false;
     this.storageList = null;
     this.storagePoolList = null;
+    // 切换服务等级与自定义隐藏错误信息
+    this.isOperationErr = false;
 
     // loading
     this.modalLoading = true;
+
+    this.storagePoolMap = [];
 
     this.getStorageList();
   }
@@ -705,6 +747,8 @@ export class VmfsListComponent implements OnInit {
   serviceLevelBtnFunc() {
     this.levelCheck = 'level';
     this.serviceLevelIsNull = false;
+    // 切换服务等级与自定义隐藏错误信息
+    this.isOperationErr = false;
 
     this.setServiceLevelList();
   }
@@ -969,14 +1013,11 @@ export class VmfsListComponent implements OnInit {
   }
   // 回收空间 处理
   reclaimHandleFunc() {
-    const name = this.rowSelected[0].name;
-    console.log('reclaim:' + name);
-    const vmfsNames = this.rowSelected.map(item => item.name);
+    const vmfsObjectIds = this.rowSelected.map(item => item.objectid);
     this.modalHandleLoading = true;
-    this.remoteSrv.reclaimVmfs(vmfsNames).subscribe((result: any) => {
+    this.remoteSrv.reclaimVmfs(vmfsObjectIds).subscribe((result: any) => {
       this.modalHandleLoading = false;
       if (result.code === '200'){
-        console.log('Reclaim ' + name + ' success');
         // 关闭回收空间页面
         this.reclaimShow = false;
         // 空间回收完成重新请求数据
@@ -984,7 +1025,6 @@ export class VmfsListComponent implements OnInit {
         // 打开成功提示窗口
         this.reclaimSuccessShow = true;
       } else {
-        console.log('Reclaim ' + name + ' fail：' + result.description);
         this.isOperationErr = true;
       }
       this.cdr.detectChanges();
@@ -1507,27 +1547,28 @@ export class VmfsListComponent implements OnInit {
     this.vmfsNameRepeatErr = false;
     this.volNameRepeatErr = false;
     this.matchErr = false;
-
+    this.nameChecking = true;
     let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
 
     if (this.modifyForm.name) {
       if (reg5.test(this.modifyForm.name)) {
         // 校验VMFS名称重复
-        this.modalHandleLoading = true;
+        // this.modalHandleLoading = true;
         this.remoteSrv.checkVmfsName(this.modifyForm.name).subscribe((result: any) => {
-          this.modalHandleLoading = false;
+          // this.modalHandleLoading = false;
           if (result.code === '200') { // result.data true 不重复 false 重复
             this.vmfsNameRepeatErr = !result.data;
             if (this.vmfsNameRepeatErr) { // 名称重复
               this.modifyForm.name = null;
               this.volNameRepeatErr = false;
               this.matchErr = false;
+              this.nameChecking = false;
             } else {
               if (this.modifyForm.isSameName) {
-                this.modalHandleLoading = true;
+                // this.modalHandleLoading = true;
                 // 校验VMFS名称重复
                 this.remoteSrv.checkVolName(this.modifyForm.name).subscribe((result: any) => {
-                  this.modalHandleLoading = false;
+                  // this.modalHandleLoading = false;
                   if (result.code === '200') { // result.data true 不重复 false 重复
                     this.volNameRepeatErr = !result.data;
                     if (!this.vmfsNameRepeatErr && this.volNameRepeatErr) {
@@ -1537,10 +1578,17 @@ export class VmfsListComponent implements OnInit {
                       this.modifyForm.name = null;
                       this.vmfsNameRepeatErr = false;
                       this.matchErr = false;
+                    } else {
+                      // 数据提交
+                      this.modifyHandleFunc();
                     }
                   }
+                  this.nameChecking = false;
                   this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
                 });
+              } else {
+                // 数据提交
+                this.modifyHandleFunc();
               }
             }
           }
