@@ -1150,21 +1150,14 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     private void parseStoragePool(String poolId, VmfsDatastoreVolumeDetail volumeDetail) throws DmeException {
-        ResponseEntity<String> responseEntity;
-        String url1 = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, "SYS_StoragePool");
-
-        // 构造查询body
-        String constraint = String.format("{\"constraint\": [{\"simple\": {\"name\": \"poolId\",\"value\": \"%s\"}}]}",
-            poolId);
-        url1 = url1 + "?condition={json}";
-        responseEntity = dmeAccessService.accessByJson(url1, HttpMethod.GET, constraint);
-        if (responseEntity.getStatusCodeValue() / DIVISOR_100 == HTTP_SUCCESS) {
-            JsonObject object = gson.fromJson(responseEntity.getBody(), JsonObject.class);
-            if (object.get("totalNum").getAsInt() > 0) {
-                JsonArray objList = object.getAsJsonArray("objList");
-                volumeDetail.setStoragePool(objList.get(0).getAsJsonObject().get(NAME_FIELD).getAsString());
-            }
+        String poolName = "";
+        try {
+            poolName = dmeStorageService.getStorageByPoolRawId(poolId);
+        }catch (DmeException ex){
+            LOG.info("query datastore pool failed!{}", ex.getMessage());
         }
+        LOG.info("query datastore pool success!poolName{}", poolName);
+        volumeDetail.setStoragePool(poolName);
     }
 
     private void parseVolumeTuning(VmfsDatastoreVolumeDetail volumeDetail, JsonObject tuning) {
