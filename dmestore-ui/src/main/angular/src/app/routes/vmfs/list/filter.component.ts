@@ -139,8 +139,12 @@ export class DeviceFilter implements ClrDatagridFilterInterface<VmfsInfo>, OnIni
   template: `
       <clr-radio-container>
         <clr-radio-wrapper>
-          <input type="radio" clrRadio name="serviceLevel" (change)="changeFunc($event)" [(ngModel)]="serviceLevel" value="" />
+          <input type="radio" clrRadio name="serviceLevel" (change)="changeFunc($event)" [(ngModel)]="serviceLevel" value="all" />
           <label>{{'vmfs.filter.all' | translate}}</label>
+        </clr-radio-wrapper>
+        <clr-radio-wrapper>
+          <input type="radio" clrRadio name="serviceLevel" (change)="changeFunc($event)" [(ngModel)]="serviceLevel" value="" />
+          <label>{{'vmfs.filter.empty' | translate}}</label>
         </clr-radio-wrapper>
         <clr-radio-wrapper *ngFor="let item of serviceLevelList">
           <input type="radio" clrRadio name="serviceLevel" (change)="changeFunc($event)" [(ngModel)]="serviceLevel" value="{{item.name}}"/>
@@ -173,15 +177,14 @@ export class ServiceLevelFilter implements ClrDatagridFilterInterface<VmfsInfo>,
   }
 
   accepts(item: VmfsInfo): boolean {
-    if (!this.serviceLevel) {
+    if (this.serviceLevel == undefined) {
       return true;
     }
     const  capital  = item.serviceLevelName;
-    console.log("capital", capital);
-    if (this.serviceLevel === '' || this.serviceLevel === 'all') {
+    if (this.serviceLevel == 'all') {
       return true;
     } else {
-      return this.serviceLevel === capital;
+      return this.serviceLevel == capital;
     }
   }
 

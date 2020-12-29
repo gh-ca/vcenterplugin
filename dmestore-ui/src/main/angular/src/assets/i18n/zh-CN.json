@@ -296,6 +296,7 @@
     },
     "filter": {
       "all": "所有",
+      "empty": "空",
       "status": {
         "normal": "正常"
       },
