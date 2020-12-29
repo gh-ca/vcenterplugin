@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {CapacityChart} from "../storage.service";
+import {CapacityChart, LogicPort} from "../storage.service";
 
 @Injectable()
 export class DetailService {
@@ -125,6 +125,13 @@ export class StoragePool{
   maxLatency: number;
   serviceLevelName: string;//服务等级
 }
+
+export interface StoragePoolMap {
+  storageId:string;
+  storagePoolList:StoragePool[];
+  logicPort:LogicPort[];
+}
+
 export class Volume{
   id: string; //卷的唯一标识
   name: string; //名称
