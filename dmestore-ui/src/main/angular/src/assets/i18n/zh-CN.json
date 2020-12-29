@@ -185,6 +185,7 @@
     "spaceReclamationPriority": "空间回收优先级",
     "hostOrCluster": "主机/集群",
     "name": "名称",
+    "nameChecking": "名称校验中...",
     "id": "编号",
     "description": "描述",
     "status": "状态",

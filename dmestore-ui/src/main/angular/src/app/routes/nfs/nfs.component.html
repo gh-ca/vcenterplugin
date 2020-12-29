@@ -139,7 +139,7 @@
           <label>{{'nfs.storagePool' | translate}}</label>
           <select class="inputWidth100Percent" clrSelect (ngModelOptions)="storagePools" [(ngModel)]="addForm.storagePoolId"
                   name="storagePoolId" class="clr-select" formControlName="storagePoolId" required>
-            <option *ngFor="let item of storagePools" value="{{item.id}}">{{item.name}}</option>
+            <option *ngFor="let item of storagePools" value="{{item.poolId}}">{{item.name}}</option>
           </select>
           <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
         </clr-select-container>

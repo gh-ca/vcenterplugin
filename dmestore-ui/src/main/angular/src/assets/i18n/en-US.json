@@ -185,6 +185,7 @@
     "spaceReclamationPriority": "Space Reclamation Priority",
     "hostOrCluster": "Host/Cluster",
     "name": "Name",
+    "nameChecking": "Name verification...",
     "id": "ID",
     "description": "Description",
     "status": "status",
