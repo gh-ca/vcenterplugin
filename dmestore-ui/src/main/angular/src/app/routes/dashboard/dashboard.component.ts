@@ -63,7 +63,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   popShow = false;
   connectAlertSuccess = false;
   connectAlertFail = false;
-  connectModel = { hostIp: '', hostPort: '', userName: '', password: ''};
+  connectModel = { hostIp: '', hostPort: '26335', userName: '', password: ''};
   hostModel = { hostIp: '', hostPort: '', code: ''};
 
   bestShowLoading = false;
@@ -245,7 +245,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   resetForm() {
-    this.connectForm.reset();
+    this.connectForm.reset(this.connectModel);
   }
 
   showPop(){
