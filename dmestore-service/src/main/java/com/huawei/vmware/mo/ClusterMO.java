@@ -307,40 +307,12 @@ public class ClusterMO extends BaseMO implements VmwareHypervisorHost {
         return properties.toArray(new ObjectContent[properties.size()]);
     }
 
-    @Override
-    public ManagedObjectReference mountDatastore(boolean vmfsDatastore, String poolHostAddress, int poolHostPort,
-                                                 String poolPath, String poolUuid) throws Exception {
-        ManagedObjectReference morDs = null;
-        ManagedObjectReference morDsFirst = null;
+    public void unmountDatastore(ManagedObjectReference datastoremo) throws Exception {
         List<ManagedObjectReference> hosts = context.getVimClient().getDynamicProperty(mor, HOST_PROPERTY);
         if (hosts != null && hosts.size() > 0) {
             for (ManagedObjectReference morHost : hosts) {
                 HostMO hostMo = new HostMO(context, morHost);
-                morDs = hostMo.mountDatastore(vmfsDatastore, poolHostAddress, poolHostPort, poolPath, poolUuid);
-                if (morDsFirst == null) {
-                    morDsFirst = morDs;
-                }
-
-                assert morDsFirst.getValue().equals(morDs.getValue());
-            }
-        }
-
-        if (morDs == null) {
-            String msg = "Failed to mount datastore in all hosts within the cluster";
-            LOGGER.error(msg);
-            throw new Exception(msg);
-        }
-
-        return morDs;
-    }
-
-    @Override
-    public void unmountDatastore(String poolUuid) throws Exception {
-        List<ManagedObjectReference> hosts = context.getVimClient().getDynamicProperty(mor, HOST_PROPERTY);
-        if (hosts != null && hosts.size() > 0) {
-            for (ManagedObjectReference morHost : hosts) {
-                HostMO hostMo = new HostMO(context, morHost);
-                hostMo.unmountDatastore(poolUuid);
+                hostMo.unmountDatastore(datastoremo);
             }
         }
     }

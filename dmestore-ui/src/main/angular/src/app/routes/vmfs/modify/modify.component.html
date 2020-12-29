@@ -5,6 +5,11 @@
         {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
       </span>
     </div>
+    <div *ngIf="nameChecking" class="loadingDiv">
+      <span>
+        {{'vmfs.nameChecking' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+      </span>
+    </div>
     <div *ngIf="modalHandleLoading" class="loadingDiv">
         <span>
           {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
@@ -15,7 +20,7 @@
       <!-- 名称 -->
       <clr-input-container>
         <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
-        <input clrInput  [(ngModel)]="modifyForm.name" maxlength="256" name="name" #name="ngModel" (blur)="modifyNameCheck();" required/><br>
+        <input clrInput  [(ngModel)]="modifyForm.name" maxlength="256" name="name" #name="ngModel" required/><br>
         <clr-control-helper *ngIf="matchErr">
           <div class="errorTips" readonly >
             <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
@@ -121,7 +126,7 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline" (click)="cancel();">{{'menu.cancel' | translate}}</button>
-    <button type="submit" class="btn btn-primary" (click)="modifyHandleFunc()">{{'menu.ok' | translate}}</button>
+    <button type="submit" class="btn btn-primary" (click)="modifyNameCheck()">{{'menu.ok' | translate}}</button>
   </div>
 </clr-modal>
 <!--操作成功提示-->

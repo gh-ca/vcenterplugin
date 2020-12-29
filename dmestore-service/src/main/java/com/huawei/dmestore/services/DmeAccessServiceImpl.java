@@ -25,6 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.SQLException;
@@ -141,9 +142,18 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     public Map<String, Object> refreshDme() {
         LOG.info("====refreshDme begin=====");
         Map<String, Object> params = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
-        params.put(HOST_IP, dmeHostIp);
-        params.put(HOST_PORT, dmeHostPort);
+        params.put("code", DmeConstants.HTTPS_STATUS_SUCCESS_200);
         try {
+            DmeInfo dmeInfo = dmeInfoDao.getDmeInfo();
+            if (dmeInfo != null && dmeInfo.getHostIp() != null) {
+                params.put(HOST_IP, dmeInfo.getHostIp());
+                params.put(HOST_PORT, dmeInfo.getHostPort());
+            } else {
+                params.put("code", DmeConstants.HTTPS_STATUS_SUCCESS_200);
+                params.put("message", "DME未接入");
+                return params;
+            }
+
             // 判断与服务器的连接
             ResponseEntity responseEntity = access(DmeConstants.REFRES_STATE_URL, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() != RestUtils.RES_STATE_I_200) {
@@ -153,11 +163,12 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         } catch (DmeException e) {
             params.put("code", DmeConstants.ERROR_CODE_503);
             params.put("message", "更新连接状态失败:" + e.getMessage());
+        } catch (RestClientException e) {
+            params.put("code", DmeConstants.ERROR_CODE_503);
+            params.put("message", "连接失败:" + e.getMessage());
         }
 
         // 成功返回200
-        params.put("code", 200);
-        params.put("message", "");
         LOG.info("====refreshDme end=====response:{}", gson.toJson(params));
         return params;
     }
