@@ -161,6 +161,12 @@ export interface StoragePoolList {
   storage_id: string;
   storage_name: string;
 }
+export interface StoragePoolMap {
+  storageId:string;
+  storagePoolList:StoragePoolList[];
+  workloadList:Workload[];
+}
+
 // 主机列表
 export interface HostList {
   hostId: string;

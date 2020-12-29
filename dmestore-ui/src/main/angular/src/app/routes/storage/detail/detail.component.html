@@ -254,8 +254,8 @@
                         </clr-dg-cell>
 
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">
-                          <span *ngIf="item.attached">{{'enum.status.unmapped' | translate}}</span>
-                          <span *ngIf="!item.attached">{{'enum.status.mapped' | translate}}</span>
+                          <span *ngIf="!item.attached">{{'enum.status.unmapped' | translate}}</span>
+                          <span *ngIf="item.attached">{{'enum.status.mapped' | translate}}</span>
                         </clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.storagePoolName}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.serviceLevelName}}</clr-dg-cell>
@@ -291,7 +291,7 @@
                       <div class="datagrid-footer">
                         <div class="pagination-size ng-star-inserted">
                           <div class="datagrid-footer-select" _ngcontent-ohg-c584="" ng-reflect-page-size-options="10,20">
-                            每页
+                            {{'page.perPage' | translate}}
                             <div class="clr-select-wrapper">
                               <select class="clr-page-size-select ng-untouched ng-pristine ng-valid" ng-reflect-model="10" [(ngModel)]="volumePageSize" (change)="pageSizeChange($event.target);">
                                 <option value="10" ng-reflect-ng-value="10" class="ng-star-inserted">10</option>
