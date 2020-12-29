@@ -40,7 +40,7 @@
           </div>
         </div>
         <!-- 列表页 -->
-        <clr-datagrid [(clrDgSelected)]="rowSelected" [clrDgLoading]="isLoading">
+        <clr-datagrid [clrDgLoading]="isLoading">
           <clr-dg-column [clrDgField]="'name'" style="color: red">{{'storage.list.name' | translate}}</clr-dg-column>
           <clr-dg-column [clrDgSortBy]="'stars'">{{'storage.list.ipAddress' | translate}}</clr-dg-column>
 
@@ -138,9 +138,9 @@
           </clr-dg-row>
           <clr-dg-footer>
             <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="total">
-              <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">per page</clr-dg-page-size>
+              <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">{{'page.perPage' | translate}}</clr-dg-page-size>
               {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-              of {{pagination.totalItems}}
+              {{'page.all' | translate}} {{pagination.totalItems}}
             </clr-dg-pagination>
           </clr-dg-footer>
         </clr-datagrid>

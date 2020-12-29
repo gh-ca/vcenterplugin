@@ -969,14 +969,11 @@ export class VmfsListComponent implements OnInit {
   }
   // 回收空间 处理
   reclaimHandleFunc() {
-    const name = this.rowSelected[0].name;
-    console.log('reclaim:' + name);
-    const vmfsNames = this.rowSelected.map(item => item.name);
+    const vmfsObjectIds = this.rowSelected.map(item => item.objectid);
     this.modalHandleLoading = true;
-    this.remoteSrv.reclaimVmfs(vmfsNames).subscribe((result: any) => {
+    this.remoteSrv.reclaimVmfs(vmfsObjectIds).subscribe((result: any) => {
       this.modalHandleLoading = false;
       if (result.code === '200'){
-        console.log('Reclaim ' + name + ' success');
         // 关闭回收空间页面
         this.reclaimShow = false;
         // 空间回收完成重新请求数据
@@ -984,7 +981,6 @@ export class VmfsListComponent implements OnInit {
         // 打开成功提示窗口
         this.reclaimSuccessShow = true;
       } else {
-        console.log('Reclaim ' + name + ' fail：' + result.description);
         this.isOperationErr = true;
       }
       this.cdr.detectChanges();

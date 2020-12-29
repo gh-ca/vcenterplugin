@@ -296,6 +296,7 @@
     },
     "filter": {
       "all": "All",
+      "empty": "Empty",
       "status": {
         "normal": "Normal"
       },

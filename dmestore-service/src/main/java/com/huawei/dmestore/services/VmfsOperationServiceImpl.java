@@ -86,6 +86,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         Object serviceLevelName = params.get("service_level_name");
         if (StringUtils.isEmpty(serviceLevelName)) {
             CustomizeVolumeTuning customizeVolumeTuning = getCustomizeVolumeTuning(params);
+            LOG.info("自定义方式创建vmfs{},服务等级：", serviceLevelName);
             volume.setTuning(customizeVolumeTuning);
         }
         Object newVoName = params.get("newVoName");
@@ -110,6 +111,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             }
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, reqBody);
             int code = responseEntity.getStatusCodeValue();
+            LOG.info("自定义方式创建vmfs{},请dme求参数：：", code+":"+reqBody);
             if (code != HttpStatus.ACCEPTED.value() || StringUtils.isEmpty(result) || "failed".equals(result)) {
                 throw new DmeException(CODE_503, "update VmfsDatastore failed");
             }
