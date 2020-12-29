@@ -12,8 +12,9 @@ import {FormControl, FormGroup, Validators} from '@angular/forms';
 import {ClrForm} from '@clr/angular';
 import {HttpClient} from '@angular/common/http';
 import {Router} from "@angular/router";
-import { TranslateService } from "@ngx-translate/core";
+import {TranslatePipe, TranslateService} from "@ngx-translate/core";
 import { GlobalsService }     from "../../shared/globals.service";
+import {NfsService} from "../nfs/nfs.service";
 
 @Component({
   selector: 'app-dashboard',
@@ -28,7 +29,7 @@ import { GlobalsService }     from "../../shared/globals.service";
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./dashboard.component.scss'],
-  providers: [DashboardService, TranslateService],
+  providers: [DashboardService, TranslateService, TranslatePipe],
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -91,7 +92,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
     private router:Router,
-    public gs: GlobalsService
+    public gs: GlobalsService,
+    private translatePipe:TranslatePipe
   ) {}
 
   ngOnInit() {}
@@ -160,11 +162,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         this.storageCapacity = result.data;
         const os = [
           {
-            name: 'Used',
+            name: this.translatePipe.transform('overview.used'),
             value: result.data.usedCapacity
           },
           {
-            name: 'Free',
+            name: this.translatePipe.transform('overview.free'),
             value: result.data.freeCapacity
           }
         ];
@@ -190,11 +192,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
         this.storageNum = result.data;
         const os = [
           {
-            name: 'normal',
+            name: this.translatePipe.transform('overview.normal'),
             value: result.data.normal
           },
           {
-            name: 'abnormal',
+            name: this.translatePipe.transform('overview.abnormal'),
             value: result.data.abnormal
           }
         ];
