@@ -59,7 +59,7 @@ export class ReclaimComponent implements OnInit{
         this.reclaimShow = true;
         this.modalLoading = false;
         this.objectIds = objIds;
-        console.log('del vmfs objectIds:' + objIds);
+        console.log('reclaim vmfs objectIds:' + objIds);
       });
     });
 

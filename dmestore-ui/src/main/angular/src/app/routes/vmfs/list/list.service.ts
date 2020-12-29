@@ -84,7 +84,7 @@ export class VmfsListService {
   }
   // 空间回收
   reclaimVmfs(params = {}) { // vmfs空间回收
-    return  this.http.post('operatevmfs/recyclevmfs', params);
+    return  this.http.post('operatevmfs/recyclevmfsbydatastoreids', params);
   }
 
   // 修改服务等级
@@ -156,11 +156,18 @@ export interface StorageList {
 }
 // 存储池
 export interface StoragePoolList {
+  id:string;
   name: string;
   poolId: string;
   storage_id: string;
   storage_name: string;
 }
+export interface StoragePoolMap {
+  storageId:string;
+  storagePoolList:StoragePoolList[];
+  workloadList:Workload[];
+}
+
 // 主机列表
 export interface HostList {
   hostId: string;

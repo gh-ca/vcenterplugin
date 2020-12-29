@@ -161,7 +161,7 @@
       "tips":"若NFS所挂载的主机全部被卸载，则会自动删除此NFS设备！"
     },
     "reduce": {
-      "success": "添加成功！"
+      "success": "缩容成功！"
     }
   },
   "vmfs": {
@@ -185,6 +185,7 @@
     "spaceReclamationPriority": "空间回收优先级",
     "hostOrCluster": "主机/集群",
     "name": "名称",
+    "nameChecking": "名称校验中...",
     "id": "编号",
     "description": "描述",
     "status": "状态",
@@ -296,6 +297,7 @@
     },
     "filter": {
       "all": "所有",
+      "empty": "空",
       "status": {
         "normal": "正常"
       },
@@ -415,7 +417,7 @@
         "unknown":"未知"
       },
       "volumes":{
-        "volumes":"卷",
+        "volumes":"LUN",
         "name":"名称",
         "status":"状态",
         "dataStore":"所属数据存储",

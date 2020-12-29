@@ -384,7 +384,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     private void parseStoragePoolBaseInfo(JsonObject element, StoragePool storagePool) {
         storagePool.setName(ToolUtils.jsonToStr(element.get(NAME_FIELD)));
-        storagePool.setId(ToolUtils.jsonToStr(element.get(POOL_ID)));
+        storagePool.setId(ToolUtils.jsonToStr(element.get(ID_FILED)));
         storagePool.setHealthStatus(ToolUtils.jsonToStr(element.get(STATUS)));
         storagePool.setRunningStatus(ToolUtils.jsonToStr(element.get("runningStatus")));
         storagePool.setStoragePoolId(ToolUtils.jsonToStr(element.get(STORAGE_DEVICE_ID)));
@@ -1530,7 +1530,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return map;
     }
 
-    private String getStorageByPoolRawId(String poolRawId) throws DmeException {
+    @Override
+    public String getStorageByPoolRawId(String poolRawId) throws DmeException {
         String className = "SYS_StoragePool";
         String poolName = "";
         String url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + CONDITION;

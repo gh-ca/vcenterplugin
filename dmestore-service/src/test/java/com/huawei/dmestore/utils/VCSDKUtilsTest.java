@@ -1,5 +1,6 @@
 package com.huawei.dmestore.utils;
 
+import static org.mockito.Matchers.anyObject;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -545,7 +546,6 @@ public class VCSDKUtilsTest {
         when(rootFsMo.getAllHostOnRootFs()).thenReturn(list);
         when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getHostDatastoreSystemMo()).thenReturn(hostDatastoreSystemMO);
-        when(hostDatastoreSystemMO.findDatastore("321")).thenReturn(managedObjectReference);
         when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
         when(hostDatastoreSystemMO.queryVmfsDatastoreExpandOptions(datastoreMO)).thenReturn(vmfsDatastoreOptions);
         when(hostDatastoreSystemMO.getDatastoreInfo(managedObjectReference)).thenReturn(vmfsDatastoreInfo);
@@ -565,7 +565,6 @@ public class VCSDKUtilsTest {
         when(rootFsMo.getAllHostOnRootFs()).thenReturn(list);
         when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getHostDatastoreSystemMo()).thenReturn(hostDatastoreSystemMO);
-        when(hostDatastoreSystemMO.findDatastore("321")).thenReturn(managedObjectReference);
         when(hostDatastoreSystemMO.getDatastoreInfo(managedObjectReference)).thenReturn(vmfsDatastoreInfo);
 
         vcsdkUtils.recycleVmfsCapacity("321");
@@ -734,15 +733,13 @@ public class VCSDKUtilsTest {
 
     @Test
     public void deleteVmfsDataStore() throws Exception {
-
         VmwareContext[] vmodlContexts = {vmwareContext};
         when(vcConnectionHelpers.getAllContext()).thenReturn(vmodlContexts);
         when(rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder())).thenReturn(rootFsMo);
         when(rootFsMo.getAllHostOnRootFs()).thenReturn(list);
         when(hostVmwareFactory.build(vmwareContext, managedObjectReference)).thenReturn(hostMO);
         when(hostMO.getHostDatastoreSystemMo()).thenReturn(hostDatastoreSystemMO);
-        when(hostDatastoreSystemMO.findDatastore("321")).thenReturn(managedObjectReference);
-        when(hostDatastoreSystemMO.deleteDatastore("321")).thenReturn(true);
+        when(hostDatastoreSystemMO.deleteDatastore(anyObject())).thenReturn(true);
         vcsdkUtils.deleteVmfsDataStore("321");
 
     }

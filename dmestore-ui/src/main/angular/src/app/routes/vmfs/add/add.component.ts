@@ -7,7 +7,7 @@ import {
   HostList,
   HostOrCluster,
   ServiceLevelList, StorageList,
-  StoragePoolList,
+  StoragePoolList, StoragePoolMap,
   VmfsListService, Workload
 } from '../list/list.service';
 import {ClrWizard, ClrWizardPage} from "@clr/angular";
@@ -48,6 +48,7 @@ export class AddComponent implements OnInit{
   // 存储池ID
   storagePoolList: StoragePoolList[] = [];
   storageList: StorageList[] = []; // 存储数据
+  storagePoolMap:StoragePoolMap[] = [];
 
   // 操作来源 list:列表页面、dataStore：在DataStore菜单页面操作
   resource;
@@ -109,6 +110,8 @@ export class AddComponent implements OnInit{
     // 初始化存储池
     this.storagePoolList = [];
 
+    this.storagePoolMap = [];
+
     // 添加页面默认打开首页
     this.jumpTo(this.addPageOne);
 
@@ -155,16 +158,21 @@ export class AddComponent implements OnInit{
   setSrgOptions() {
     const options = [];
     const blockValue = this.form.blockSize + '';
+    const versionVal = this.form.version + '';
     if (blockValue === '1024') {
       const option1 = {key: 1024, value : '1MB'};
       options.push(option1);
-      const option2 = {key: 8, value : '8KB'};
-      options.push(option2);
+      if(versionVal === '5') {
+        const option2 = {key: 8, value : '8KB'};
+        options.push(option2);
+      }
     } else if (blockValue === '64') {
       const option1 = {key: 64, value : '64KB'};
       options.push(option1);
-      const option2 = {key: 8, value : '8KB'};
-      options.push(option2);
+      if (versionVal === '5') {
+        const option2 = {key: 8, value : '8KB'};
+        options.push(option2);
+      }
     }
     this.srgOptions = options;
     this.form.spaceReclamationGranularity = this.srgOptions[0].key;;
@@ -268,6 +276,9 @@ export class AddComponent implements OnInit{
   serviceLevelBtnFunc() {
     this.levelCheck = 'level';
     this.serviceLevelIsNull = false;
+
+    // 切换服务等级与自定义隐藏错误信息
+    this.isOperationErr = false;
     this.setServiceLevelList();
   }
   // 未选择服务等级 时调用方法
@@ -277,7 +288,8 @@ export class AddComponent implements OnInit{
 
     this.storageList = null;
     this.storagePoolList = null;
-
+    // 切换服务等级与自定义隐藏错误信息
+    this.isOperationErr = false;
     // loading
     this.modalLoading = true;
 
@@ -289,6 +301,19 @@ export class AddComponent implements OnInit{
       console.log(result);
       if (result.code === '200' && result.data !== null) {
         this.storageList = result.data;
+
+        const allPoolMap:StoragePoolMap[] = []
+
+        result.data.forEach(item  => {
+          const poolMap:StoragePoolMap = {
+            storageId:item.id,
+            storagePoolList:null,
+            workloadList:null
+          }
+          allPoolMap.push(poolMap);
+        });
+
+        this.storagePoolMap = allPoolMap;
         this.getStoragePoolsByStorId();
       }
       this.modalLoading = false;
@@ -303,27 +328,39 @@ export class AddComponent implements OnInit{
     this.workloads = [];
     console.log('selectSotrageId' + this.form.storage_id);
     if (null !== this.form.storage_id && '' !== this.form.storage_id) {
+      const storagePoolMap = this.storagePoolMap.filter(item => item.storageId == this.form.storage_id);
+
+      const storagePoolList = storagePoolMap[0].storagePoolList;
+      const workloads = storagePoolMap[0].workloadList;
       // 获取存储池数据
-      this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, 'block').subscribe((result: any) => {
-        console.log('storagePools', result);
-        console.log('result.code === \'200\' && result.data !== null', result.code === '200' && result.data !== null);
-        if (result.code === '200' && result.data !== null) {
-          this.storagePoolList = result.data;
-          console.log('this.storagePoolList', this.storagePoolList);
+      if (!storagePoolList) {
+        this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, 'block').subscribe((result: any) => {
+          console.log('storagePools', result);
+          console.log('result.code === \'200\' && result.data !== null', result.code === '200' && result.data !== null);
+          if (result.code === '200' && result.data !== null) {
+            this.storagePoolList = result.data;
+            this.storagePoolMap.filter(item => item.storageId == this.form.storage_id)[0].storagePoolList = result.data;
 
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        }
-      });
+            this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+          }
+        });
+      } else {
+        this.storagePoolList = storagePoolList;
+      }
       // 获取workLoad
-      this.remoteSrv.getWorkLoads(this.form.storage_id).subscribe((result: any) => {
-        console.log('storagePools', result);
-        if (result.code === '200' && result.data !== null) {
-          this.workloads = result.data;
-          console.log('this.workloads', this.workloads);
+      if (!workloads) {
+        this.remoteSrv.getWorkLoads(this.form.storage_id).subscribe((result: any) => {
+          console.log('storagePools', result);
+          if (result.code === '200' && result.data !== null) {
+            this.workloads = result.data;
+            this.storagePoolMap.filter(item => item.storageId == this.form.storage_id)[0].workloadList = result.data;
 
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        }
-      });
+            this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+          }
+        });
+      } else {
+        this.workloads = workloads;
+      }
     }
   }
 

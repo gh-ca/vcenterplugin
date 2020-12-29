@@ -65,13 +65,6 @@ public class HostDatastoreSystemMOTest {
         when(context.getService()).thenReturn(service);
     }
 
-    @Test
-    public void findDatastore() throws Exception {
-        findStoreInit();
-        String name = "13";
-        hostDatastoreSystemMO.findDatastore(name);
-    }
-
     private void findStoreInit() throws Exception {
         String name = "13";
         ServiceContent serviceContent = mock(ServiceContent.class);
@@ -167,7 +160,7 @@ public class HostDatastoreSystemMOTest {
         findStoreInit();
         String name = "13";
         doNothing().when(service).removeDatastore(anyObject(), anyObject());
-        hostDatastoreSystemMO.deleteDatastore(name);
+        hostDatastoreSystemMO.deleteDatastore(null);
     }
 
     @Test
