@@ -671,6 +671,7 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             requestbody.put(BEGIN_TIME, beginTime);
             requestbody.put(END_TIME, endTime);
         }
+        log.info("query history performance params={}", gson.toJson(requestbody));
         ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.STATISTIC_QUERY, HttpMethod.POST,
             gson.toJson(requestbody));
         return responseEntity;
