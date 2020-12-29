@@ -1156,13 +1156,13 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }catch (DmeException ex){
             LOG.info("query datastore pool failed!{}", ex.getMessage());
         }
-        LOG.info("query datastore pool success!poolName{}", poolName);
+        LOG.info("query datastore pool success!poolName={}", poolName);
         volumeDetail.setStoragePool(poolName);
     }
 
     private void parseVolumeTuning(VmfsDatastoreVolumeDetail volumeDetail, JsonObject tuning) {
         // SmartTier
-        volumeDetail.setSmartTier(tuning.get("smarttier").getAsString());
+        volumeDetail.setSmartTier(ToolUtils.jsonToStr(tuning.get("smarttier")));
 
         // Tunning
         volumeDetail.setDudeplication(ToolUtils.jsonToBoo(tuning.get("dedupe_enabled")));
