@@ -155,16 +155,21 @@ export class AddComponent implements OnInit{
   setSrgOptions() {
     const options = [];
     const blockValue = this.form.blockSize + '';
+    const versionVal = this.form.version + '';
     if (blockValue === '1024') {
       const option1 = {key: 1024, value : '1MB'};
       options.push(option1);
-      const option2 = {key: 8, value : '8KB'};
-      options.push(option2);
+      if(versionVal === '5') {
+        const option2 = {key: 8, value : '8KB'};
+        options.push(option2);
+      }
     } else if (blockValue === '64') {
       const option1 = {key: 64, value : '64KB'};
       options.push(option1);
-      const option2 = {key: 8, value : '8KB'};
-      options.push(option2);
+      if (versionVal === '5') {
+        const option2 = {key: 8, value : '8KB'};
+        options.push(option2);
+      }
     }
     this.srgOptions = options;
     this.form.spaceReclamationGranularity = this.srgOptions[0].key;;
