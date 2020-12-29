@@ -11,7 +11,7 @@ import {
   StoragePoolList,
   HostList,
   ClusterList,
-  ServiceLevelList, HostOrCluster, GetForm, Workload,
+  ServiceLevelList, HostOrCluster, GetForm, Workload, StoragePoolMap,
 } from './list.service';
 import {ClrWizard, ClrWizardPage} from '@clr/angular';
 import {GlobalsService} from '../../../shared/globals.service';
@@ -100,6 +100,8 @@ export class VmfsListComponent implements OnInit {
   changeServiceLevelForm = new GetForm().getChangeLevelForm();
   storageList: StorageList[] = []; // 存储数据
   storagePoolList: StoragePoolList[] = []; // 存储池ID
+  storagePoolMap:StoragePoolMap[] = [];
+
   workloads:Workload[] = []; // Workload
   blockSizeOptions = []; // 块大小选择
   srgOptions = []; // 空间回收粒度初始化
@@ -338,6 +340,19 @@ export class VmfsListComponent implements OnInit {
       console.log(result);
       if (result.code === '200' && result.data !== null) {
         this.storageList = result.data;
+        const allPoolMap:StoragePoolMap[] = []
+
+        result.data.forEach(item  => {
+          const poolMap:StoragePoolMap = {
+            storageId:item.id,
+            storagePoolList:null,
+            workloadList:null
+          }
+          allPoolMap.push(poolMap);
+        });
+
+        this.storagePoolMap = allPoolMap;
+
         this.getStoragePoolsByStorId();
       }
       this.modalLoading = false;
@@ -354,26 +369,41 @@ export class VmfsListComponent implements OnInit {
     this.form.pool_raw_id = undefined;
     this.form.workload_type_id = undefined;
     if (null !== this.form.storage_id && '' !== this.form.storage_id) {
+
+      const storagePoolMap = this.storagePoolMap.filter(item => item.storageId == this.form.storage_id);
+
+      const storagePoolList = storagePoolMap[0].storagePoolList;
+      const workloads = storagePoolMap[0].workloadList;
       // 存储池
-      this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, 'block').subscribe((result: any) => {
-        console.log('storagePools', result);
-        if (result.code === '200' && result.data !== null) {
-          this.storagePoolList = result.data;
-          console.log('this.storagePoolList', this.storagePoolList);
+      if (!storagePoolList) {
+        this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, 'block').subscribe((result: any) => {
+          console.log('storagePools', result);
+          if (result.code === '200' && result.data !== null) {
+            this.storagePoolList = result.data;
 
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        }
-      });
+            this.storagePoolMap.filter(item => item.storageId == this.form.storage_id)[0].storagePoolList = result.data;
+
+            this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+          }
+        });
+      } else {
+        this.storagePoolList = storagePoolList;
+      }
       // 获取workLoad
-      this.remoteSrv.getWorkLoads(this.form.storage_id).subscribe((result: any) => {
-        console.log('storagePools', result);
-        if (result.code === '200' && result.data !== null) {
-          this.workloads = result.data;
-          console.log('this.workloads', this.workloads);
+      if (!workloads) {
+        this.remoteSrv.getWorkLoads(this.form.storage_id).subscribe((result: any) => {
+          console.log('workloads', result);
+          if (result.code === '200' && result.data !== null) {
+            this.workloads = result.data;
 
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
-        }
-      });
+            this.storagePoolMap.filter(item => item.storageId == this.form.storage_id)[0].workloadList = result.data;
+
+            this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+          }
+        });
+      } else {
+        this.workloads = workloads;
+      }
     }
   }
 
@@ -541,6 +571,8 @@ export class VmfsListComponent implements OnInit {
     // 初始化存储池
     this.storagePoolList = [];
 
+    this.storagePoolMap = [];
+
   }
   // 页面跳转
   jumpTo(page: ClrWizardPage) {
@@ -705,6 +737,8 @@ export class VmfsListComponent implements OnInit {
 
     // loading
     this.modalLoading = true;
+
+    this.storagePoolMap = [];
 
     this.getStorageList();
   }

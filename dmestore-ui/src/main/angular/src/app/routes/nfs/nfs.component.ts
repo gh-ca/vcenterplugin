@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild
 import {Host, List, NfsService,UpdateNfs} from './nfs.service';
 import {GlobalsService} from '../../shared/globals.service';
 import {LogicPort, StorageList, StorageService} from '../storage/storage.service';
-import {StoragePool} from "../storage/detail/detail.service";
+import {StoragePool, StoragePoolMap} from "../storage/detail/detail.service";
 import {ClrDatagridSortOrder, ClrWizard, ClrWizardPage} from "@clr/angular";
 import {VmfsListService} from "../vmfs/list/list.service";
 import {Router} from "@angular/router";
@@ -63,6 +63,8 @@ export class NfsComponent implements OnInit {
   });
   storageList: StorageList[] = [];
   storagePools: StoragePool[] = [];
+  storagePoolMap:StoragePoolMap[] = [];
+
   updateNfs: UpdateNfs = new UpdateNfs();
   addModelShow = false; // 添加窗口
   errorMsg: string;
@@ -162,6 +164,7 @@ export class NfsComponent implements OnInit {
     // });
     this.addModelShow = true;
     this.storageList = null;
+    this.storagePoolMap = [];
 
     this.storageService.getData().subscribe((s: any) => {
       this.modalLoading=false;
@@ -169,6 +172,18 @@ export class NfsComponent implements OnInit {
         this.storageList = s.data;
         this.modalLoading=false;
 
+        const allPoolMap:StoragePoolMap[] = []
+
+        s.data.forEach(item  => {
+          const poolMap:StoragePoolMap = {
+            storageId:item.id,
+            storagePoolList:null,
+            logicPort:null
+          }
+          allPoolMap.push(poolMap);
+        });
+
+        this.storagePoolMap = allPoolMap;
       }
     });
     this.hostList = null;
@@ -260,16 +275,38 @@ export class NfsComponent implements OnInit {
     this.modalLoading=true;
     this.storagePools = [];
     this.addForm.storagePoolId = undefined;
-    this.logicPorts = null;
-    // 选择存储后获取存储池
-    this.storageService.getStoragePoolListByStorageId("file",this.addForm.storagId)
-      .subscribe((r: any) => {
-        if (r.code === '200'){
-          this.storagePools = r.data;
-        }
-        this.cdr.detectChanges();
-      });
-    this.selectLogicPort();
+    this.logicPorts = [];
+    this.addForm.currentPortId = undefined;
+    if (this.addForm.storagId) {
+
+      const storagePoolMap = this.storagePoolMap.filter(item => item.storageId == this.addForm.storagId);
+
+      const storagePoolList = storagePoolMap[0].storagePoolList;
+      const logicPorts = storagePoolMap[0].logicPort;
+      // 选择存储后获取存储池
+      if (!storagePoolList) {
+        this.storageService.getStoragePoolListByStorageId("file",this.addForm.storagId)
+          .subscribe((r: any) => {
+            if (r.code === '200'){
+              this.storagePools = r.data;
+
+              this.storagePoolMap.filter(item => item.storageId == this.addForm.storagId)[0].storagePoolList = r.data;
+            }
+            this.cdr.detectChanges();
+          });
+      } else {
+        console.log("storagePoolList exists")
+        this.storagePools = storagePoolList;
+      }
+      if (!logicPorts) {
+        this.selectLogicPort();
+      } else {
+        console.log("logicPorts exists")
+        this.logicPorts = logicPorts;
+        this.modalLoading=false;
+      }
+
+    }
   }
   selectLogicPort(){
     // 选择存储后逻辑端口
@@ -278,6 +315,8 @@ export class NfsComponent implements OnInit {
         this.modalLoading=false;
         if (r.code === '200'){
           this.logicPorts = r.data;
+
+          this.storagePoolMap.filter(item => item.storageId == this.addForm.storagId)[0].logicPort = r.data;
         }
         this.cdr.detectChanges();
       });
