@@ -43,7 +43,9 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     private static final int DEFAULT_CAPACITY = 16;
 
     private static final String CODE_403 = "403";
+
     private static final String CODE_503 = "503";
+
     private static final String TASK_ID = "task_id";
 
     private DmeAccessService dmeAccessService;
@@ -196,6 +198,9 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             if ("failed".equals(result)) {
                 throw new DmeException(CODE_403, "expand vmfsDatastore failed !");
             }
+
+            // 刷新vCenter存储
+            vcsdkUtils.refreshDatastore(datastoreobjid);
         } catch (DmeException e) {
             LOG.error("expand vmfsDatastore error !", e);
             throw new DmeException(CODE_503, e.getMessage());
@@ -203,12 +208,12 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     }
 
     @Override
-    public void recycleVmfsCapacity(List<String> dsname) throws DmeException {
+    public void recycleVmfsCapacity(List<String> dsObjectIds) throws DmeException {
         try {
             String result = null;
-            if (dsname != null && dsname.size() > 0) {
-                for (int index = 0; index < dsname.size(); index++) {
-                    result = vcsdkUtils.recycleVmfsCapacity(dsname.get(index));
+            if (dsObjectIds != null && dsObjectIds.size() > 0) {
+                for (int index = 0; index < dsObjectIds.size(); index++) {
+                    result = vcsdkUtils.recycleVmfsCapacity(dsObjectIds.get(index));
                 }
             }
             if (result == null || "error".equals(result)) {
@@ -226,8 +231,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             String result = null;
             if (dsIds != null && dsIds.size() > 0) {
                 for (int index = 0; index < dsIds.size(); index++) {
-                    String dsName = vcsdkUtils.getDataStoreName(dsIds.get(index));
-                    result = vcsdkUtils.recycleVmfsCapacity(dsName);
+                    result = vcsdkUtils.recycleVmfsCapacity(dsIds.get(index));
                 }
             }
             if (result == null || "error".equals(result)) {

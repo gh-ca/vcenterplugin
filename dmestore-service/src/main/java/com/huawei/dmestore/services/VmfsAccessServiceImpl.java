@@ -610,7 +610,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             // 通过主机的objectid查到主机上所有的hba的wwn或者iqn
             List<Map<String, Object>> hbas = vcsdkUtils.getHbasByHostObjectId(hostId);
             if (hbas == null || hbas.size() == 0) {
-                throw new DmeException("The host did not find a valid HbA");
+                throw new DmeException("The host did not find a valid Hba");
             }
             List<String> wwniqns = new ArrayList<>();
             for (Map<String, Object> hba : hbas) {
@@ -966,6 +966,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         // 判断主机或主机组在DME中是否存在, 如果主机或主机不存在就创建并得到主机或主机组ID
         String objhostid = checkOrCreateToHostorHostGroup(params);
         if (StringUtils.isEmpty(objhostid)) {
+            LOG.info("objhostid is null! mountVmfs failed!");
             return;
         }
 
@@ -979,10 +980,14 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         String taskId = "";
         if (params.get(DmeConstants.HOST) != null) {
             // 将卷挂载到主机DME
+            LOG.info("mount Vmfs to host begin!");
             taskId = mountVmfsToHost(params, objhostid);
+            LOG.info("mount Vmfs to host end!taskId={}", taskId);
         } else {
             // 将卷挂载到集群DME
+            LOG.info("mount Vmfs to host group begin!");
             taskId = mountVmfsToHostGroup(params, objhostid);
+            LOG.info("mount Vmfs to host group end!taskId={}", taskId);
         }
         if (StringUtils.isEmpty(taskId)) {
             throw new DmeException("DME mount vmfs volume error(task is null)!");
@@ -991,8 +996,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         taskIds.add(taskId);
         boolean isMounted = taskService.checkTaskStatus(taskIds);
         if (isMounted) {
+            LOG.info("vmware mount Vmfs begin!params={}", gson.toJson(params));
             mountVmfsOnVmware(params);
+            LOG.info("vmware mount Vmfs end!");
         } else {
+            LOG.info("DME mount Vmfs failed!taskId={}", taskId);
             throw new DmeException("DME mount vmfs volume error(task status)!");
         }
     }

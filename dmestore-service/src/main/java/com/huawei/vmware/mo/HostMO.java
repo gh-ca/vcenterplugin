@@ -443,43 +443,10 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
         return null;
     }
 
-    @Override
-    public ManagedObjectReference mountDatastore(boolean vmfsDatastore, String poolHostAddress, int poolHostPort,
-        String poolPath, String poolUuid) throws Exception {
+    public void unmountDatastore(ManagedObjectReference mor) throws Exception {
         HostDatastoreSystemMO hostDatastoreSystemMo = getHostDatastoreSystemMo();
-        ManagedObjectReference morDatastore = hostDatastoreSystemMo.findDatastore(poolUuid);
-        if (morDatastore == null) {
-            if (!vmfsDatastore) {
-                try {
-                    morDatastore = hostDatastoreSystemMo.createNfsDatastore(poolHostAddress, poolHostPort, poolPath,
-                        poolUuid, null, null, null);
-                } catch (AlreadyExistsFaultMsg e) {
-                    return getExistingDataStoreOnHost(poolHostAddress, poolPath, hostDatastoreSystemMo);
-                } catch (Exception e) {
-                    throw new Exception("Creation of NFS datastore on vCenter failed.");
-                }
-                if (morDatastore == null) {
-                    String msg = "Unable to create NFS datastore. host: " + poolHostAddress + ", port: " + poolHostPort
-                        + ", path: " + poolPath + ", uuid: " + poolUuid;
-                    throw new Exception(msg);
-                }
-            } else {
-                morDatastore = context.getDatastoreMorByPath(poolPath);
-                if (morDatastore == null) {
-                    throw new Exception("Unable to create VMFS datastore.");
-                }
-                DatastoreMO dsMo = new DatastoreMO(context, morDatastore);
-                dsMo.setCustomFieldValue(CustomFieldConstants.CLOUD_UUID, poolUuid);
-            }
-        }
-        return morDatastore;
-    }
-
-    @Override
-    public void unmountDatastore(String uuid) throws Exception {
-        HostDatastoreSystemMO hostDatastoreSystemMo = getHostDatastoreSystemMo();
-        if (!hostDatastoreSystemMo.deleteDatastore(uuid)) {
-            throw new Exception("Unable to unmount datastore. uuid: " + uuid);
+        if (!hostDatastoreSystemMo.deleteDatastore(mor)) {
+            throw new Exception("Unable to unmount datastore. uuid: " + mor.getValue());
         }
     }
 

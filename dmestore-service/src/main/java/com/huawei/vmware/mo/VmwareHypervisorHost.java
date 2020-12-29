@@ -145,31 +145,7 @@ public interface VmwareHypervisorHost {
     ObjectContent[] getDatastorePropertiesOnHyperHost(String[] propertyPaths)
         throws Exception;
 
-    /**
-     * mountDatastore.
-     *
-     * @param vmfsDatastore   .
-     * @param poolHostAddress .
-     * @param poolHostPort    .
-     * @param poolPath        .
-     * @param poolUuid        .
-     * @return ManagedObjectReference .
-     * @throws Exception .
-     */
-    ManagedObjectReference mountDatastore(boolean vmfsDatastore,
-                                          String poolHostAddress,
-                                          int poolHostPort,
-                                          String poolPath,
-                                          String poolUuid)
-        throws Exception;
 
-    /**
-     * unmountDatastore.
-     *
-     * @param poolUuid .
-     * @throws Exception .
-     */
-    void unmountDatastore(String poolUuid) throws Exception;
 
     /**
      * unmountDatastore.
