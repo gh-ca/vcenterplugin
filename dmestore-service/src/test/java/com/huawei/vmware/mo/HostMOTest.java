@@ -361,52 +361,6 @@ public class HostMOTest {
         hostMo.getExistingDataStoreOnHost(hostAddress, path, hostDatastoreSystemMo);
     }
 
-    @Test
-    public void mountDatastore() throws Exception {
-        String poolHostAddress = "10.143.132.11";
-        int poolHostPort = 22;
-        String poolPath = "123";
-        String uuid = "123";
-        ManagedObjectReference datastoreSystemMo = mock(ManagedObjectReference.class);
-        when(vmwareClient.getDynamicProperty(anyObject(), eq("configManager.datastoreSystem"))).thenReturn(
-            datastoreSystemMo);
-        ServiceContent serviceContent = mock(ServiceContent.class);
-        when(context.getServiceContent()).thenReturn(serviceContent);
-        ManagedObjectReference customFieldsManager = mock(ManagedObjectReference.class);
-        when(serviceContent.getCustomFieldsManager()).thenReturn(customFieldsManager);
-
-        List<CustomFieldDef> fields = new ArrayList<>();
-        CustomFieldDef field = mock(CustomFieldDef.class);
-        fields.add(field);
-        when(vmwareClient.getDynamicProperty(anyObject(), eq("field"))).thenReturn(fields);
-        when(field.getName()).thenReturn("cloud.uuid");
-        when(field.getManagedObjectType()).thenReturn("Datastore");
-        when(field.getKey()).thenReturn(10);
-
-        List<ObjectContent> ocs = new ArrayList<>();
-        ObjectContent oc = mock(ObjectContent.class);
-        ocs.add(oc);
-        when(service.retrieveProperties(anyObject(), anyObject())).thenReturn(ocs);
-        List<DynamicProperty> dynamicPropertyList = new ArrayList<>();
-        DynamicProperty dynamicProperty = mock(DynamicProperty.class);
-        dynamicPropertyList.add(dynamicProperty);
-        when(oc.getPropSet()).thenReturn(dynamicPropertyList);
-        when(dynamicProperty.getVal()).thenReturn("11");
-        ManagedObjectReference morDatastore = mock(ManagedObjectReference.class);
-        when(oc.getObj()).thenReturn(morDatastore);
-        ManagedObjectReference nfsStore = mock(ManagedObjectReference.class);
-        when(service.createNasDatastore(anyObject(), anyObject())).thenReturn(nfsStore);
-        hostMo.mountDatastore(false, poolHostAddress, poolHostPort, poolPath, uuid);
-
-        ManagedObjectReference vmfsDatastore = mock(ManagedObjectReference.class);
-        when(context.getDatastoreMorByPath(poolPath)).thenReturn(vmfsDatastore);
-        CustomFieldDef field1 = mock(CustomFieldDef.class);
-        when(service.addCustomFieldDef(anyObject(), anyString(), anyString(), anyObject(), anyObject())).thenReturn(
-            field1);
-        when(field1.getKey()).thenReturn(201);
-        doNothing().when(service).setField(anyObject(), anyObject(), anyInt(), anyString());
-        hostMo.mountDatastore(true, poolHostAddress, poolHostPort, poolPath, uuid);
-    }
 
     @Test
     public void unmountDatastore() throws Exception {
@@ -439,7 +393,7 @@ public class HostMOTest {
         ManagedObjectReference morDatastore = mock(ManagedObjectReference.class);
         when(oc.getObj()).thenReturn(morDatastore);
         doNothing().when(service).removeDatastore(anyObject(), anyObject());
-        hostMo.unmountDatastore(uuid);
+        hostMo.unmountDatastore(morDatastore);
 
     }
 
