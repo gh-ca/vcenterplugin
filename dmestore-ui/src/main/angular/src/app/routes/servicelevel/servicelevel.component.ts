@@ -350,6 +350,12 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
       if (val2 === undefined) {
         val2 = '';
       }
+      if(parseFloat(val1).toString() != "NaN"){
+        val1 = parseFloat(val1);
+      }
+      if(parseFloat(val2).toString() != "NaN"){
+        val2 = parseFloat(val2);
+      }
       if (val1 < val2) {
         if (sort === 'asc'){
           return -1;

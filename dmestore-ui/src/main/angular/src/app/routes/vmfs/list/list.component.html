@@ -407,7 +407,7 @@
             <clr-select-container class="selectClass">
               <label style="color: #9F9F9F;">{{'vmfs.storagePool' | translate}}</label>
               <select clrSelect [(ngModel)]="form.pool_raw_id" name="pool_raw_id" required>
-                <option *ngFor="let item of storagePoolList" value="{{item.poolId}}">{{item.name}}</option>
+                <option *ngFor="let item of storagePoolList" value="{{item.id}}">{{item.name}}</option>
               </select>
               <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
             </clr-select-container>
@@ -523,12 +523,16 @@
           </span>
         </div>
         <div *ngIf="isOperationErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.modifyError' | translate}}</div>
-
+        <div *ngIf="nameChecking" class="loadingDiv">
+          <span>
+            {{'vmfs.nameChecking' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+          </span>
+        </div>
 
         <!-- 名称 -->
         <clr-input-container>
           <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
-          <input clrInput  [(ngModel)]="modifyForm.name" maxlength="256" name="name" #name="ngModel" (blur)="modifyNameCheck();" required/><br>
+          <input clrInput  [(ngModel)]="modifyForm.name" maxlength="256" name="name" #name="ngModel" required/><br>
           <clr-control-error>{{'validations.nameRequired' | translate}}</clr-control-error>
           <clr-control-helper *ngIf="matchErr">
             <div class="errorTips" readonly >
@@ -634,7 +638,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="modifyShow = false">{{'menu.cancel' | translate}}</button>
-      <button type="submit" class="btn btn-primary" (click)="modifyHandleFunc()">{{'menu.ok' | translate}}</button>
+      <button type="submit" class="btn btn-primary" (click)="modifyNameCheck()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
   <!--挂载弹窗-->

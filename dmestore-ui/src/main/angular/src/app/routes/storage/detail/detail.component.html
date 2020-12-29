@@ -909,48 +909,48 @@
                             </clr-datagrid>
                           </clr-accordion-content>
                         </clr-accordion-panel>
-                        <clr-accordion-panel>
-                          <clr-accordion-title>{{'storage.detail.hardware.ports.bond' | translate}}({{bonds==null?0:bonds.length}})</clr-accordion-title>
-                          <clr-accordion-content *clrIfExpanded>
-                            <clr-datagrid>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.healthStatus' | translate}}</clr-dg-column>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.runningStatus' | translate}}</clr-dg-column>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.mtu' | translate}}</clr-dg-column>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.totalIops' | translate}}</clr-dg-column>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.avg' | translate}}</clr-dg-column>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.totalBandwidth' | translate}}</clr-dg-column>
-                              <clr-dg-row  *clrDgItems="let item of bonds" [clrDgItem]="item">
-                                <clr-dg-cell>{{item.name}}</clr-dg-cell>
-                                <clr-dg-cell>
-                                  <span *ngIf="item.healthStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
-                                  <span *ngIf="item.healthStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
-                                  <span *ngIf="item.healthStatus == 'fail'">{{'enum.status.fail' | translate}}</span>
-                                  <span *ngIf="!item.healthStatus">--</span>
-                                </clr-dg-cell>
-                                <clr-dg-cell>
-                                  <span *ngIf="item.runningStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'running'">{{'enum.status.running' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'connected'">{{'enum.status.connected' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'disconnected'">{{'enum.status.disconnected' | translate}}</span>
-                                  <span *ngIf="!item.runningStatus">--</span>
-                                </clr-dg-cell>
-                                <clr-dg-cell>{{item.mtu}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.latency!=null?item.latency:'--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.bandwidth!=null?item.bandwidth:'--'}}</clr-dg-cell>
-                              </clr-dg-row>
-                              <clr-dg-footer>
-                                <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="bondTotal">
-                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
-                                  {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-                                  of {{pagination.totalItems}}
-                                </clr-dg-pagination>
-                              </clr-dg-footer>
-                            </clr-datagrid>
-                          </clr-accordion-content>
-                        </clr-accordion-panel>
+<!--                        <clr-accordion-panel>-->
+<!--                          <clr-accordion-title>{{'storage.detail.hardware.ports.bond' | translate}}({{bonds==null?0:bonds.length}})</clr-accordion-title>-->
+<!--                          <clr-accordion-content *clrIfExpanded>-->
+<!--                            <clr-datagrid>-->
+<!--                              <clr-dg-column >{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>-->
+<!--                              <clr-dg-column >{{'storage.detail.hardware.ports.healthStatus' | translate}}</clr-dg-column>-->
+<!--                              <clr-dg-column >{{'storage.detail.hardware.ports.runningStatus' | translate}}</clr-dg-column>-->
+<!--                              <clr-dg-column >{{'storage.detail.hardware.ports.mtu' | translate}}</clr-dg-column>-->
+<!--                              <clr-dg-column >{{'storage.detail.hardware.ports.totalIops' | translate}}</clr-dg-column>-->
+<!--                              <clr-dg-column >{{'storage.detail.hardware.ports.avg' | translate}}</clr-dg-column>-->
+<!--                              <clr-dg-column >{{'storage.detail.hardware.ports.totalBandwidth' | translate}}</clr-dg-column>-->
+<!--                              <clr-dg-row  *clrDgItems="let item of bonds" [clrDgItem]="item">-->
+<!--                                <clr-dg-cell>{{item.name}}</clr-dg-cell>-->
+<!--                                <clr-dg-cell>-->
+<!--                                  <span *ngIf="item.healthStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>-->
+<!--                                  <span *ngIf="item.healthStatus == 'normal'">{{'enum.status.normal' | translate}}</span>-->
+<!--                                  <span *ngIf="item.healthStatus == 'fail'">{{'enum.status.fail' | translate}}</span>-->
+<!--                                  <span *ngIf="!item.healthStatus">&#45;&#45;</span>-->
+<!--                                </clr-dg-cell>-->
+<!--                                <clr-dg-cell>-->
+<!--                                  <span *ngIf="item.runningStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>-->
+<!--                                  <span *ngIf="item.runningStatus == 'normal'">{{'enum.status.normal' | translate}}</span>-->
+<!--                                  <span *ngIf="item.runningStatus == 'running'">{{'enum.status.running' | translate}}</span>-->
+<!--                                  <span *ngIf="item.runningStatus == 'connected'">{{'enum.status.connected' | translate}}</span>-->
+<!--                                  <span *ngIf="item.runningStatus == 'disconnected'">{{'enum.status.disconnected' | translate}}</span>-->
+<!--                                  <span *ngIf="!item.runningStatus">&#45;&#45;</span>-->
+<!--                                </clr-dg-cell>-->
+<!--                                <clr-dg-cell>{{item.mtu}}</clr-dg-cell>-->
+<!--                                <clr-dg-cell>{{item.iops!=null?item.iops:'&#45;&#45;'}}</clr-dg-cell>-->
+<!--                                <clr-dg-cell>{{item.latency!=null?item.latency:'&#45;&#45;'}}</clr-dg-cell>-->
+<!--                                <clr-dg-cell>{{item.bandwidth!=null?item.bandwidth:'&#45;&#45;'}}</clr-dg-cell>-->
+<!--                              </clr-dg-row>-->
+<!--                              <clr-dg-footer>-->
+<!--                                <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="bondTotal">-->
+<!--                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>-->
+<!--                                  {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}-->
+<!--                                  of {{pagination.totalItems}}-->
+<!--                                </clr-dg-pagination>-->
+<!--                              </clr-dg-footer>-->
+<!--                            </clr-datagrid>-->
+<!--                          </clr-accordion-content>-->
+<!--                        </clr-accordion-panel>-->
                         <clr-accordion-panel>
                           <clr-accordion-title>{{'storage.detail.hardware.ports.logic' | translate}}({{logicports==null?0:logicports.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
@@ -998,26 +998,26 @@
                             </clr-datagrid>
                           </clr-accordion-content>
                         </clr-accordion-panel>
-                        <clr-accordion-panel>
-                          <clr-accordion-title>{{'storage.detail.hardware.ports.fail' | translate}}({{fgs==null?0:fgs.length}})</clr-accordion-title>
-                          <clr-accordion-content *clrIfExpanded>
-                            <clr-datagrid>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.type' | translate}}</clr-dg-column>
-                              <clr-dg-row  *clrDgItems="let item of fgs" [clrDgItem]="item">
-                                <clr-dg-cell>{{item.name}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.failoverGroupType}}</clr-dg-cell>
-                              </clr-dg-row>
-                              <clr-dg-footer>
-                                <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="failTotal">
-                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
-                                  {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-                                  of {{pagination.totalItems}}
-                                </clr-dg-pagination>
-                              </clr-dg-footer>
-                            </clr-datagrid>
-                          </clr-accordion-content>
-                        </clr-accordion-panel>
+<!--                        <clr-accordion-panel>-->
+<!--                          <clr-accordion-title>{{'storage.detail.hardware.ports.fail' | translate}}({{fgs==null?0:fgs.length}})</clr-accordion-title>-->
+<!--                          <clr-accordion-content *clrIfExpanded>-->
+<!--                            <clr-datagrid>-->
+<!--                              <clr-dg-column >{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>-->
+<!--                              <clr-dg-column >{{'storage.detail.hardware.ports.type' | translate}}</clr-dg-column>-->
+<!--                              <clr-dg-row  *clrDgItems="let item of fgs" [clrDgItem]="item">-->
+<!--                                <clr-dg-cell>{{item.name}}</clr-dg-cell>-->
+<!--                                <clr-dg-cell>{{item.failoverGroupType}}</clr-dg-cell>-->
+<!--                              </clr-dg-row>-->
+<!--                              <clr-dg-footer>-->
+<!--                                <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="failTotal">-->
+<!--                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>-->
+<!--                                  {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}-->
+<!--                                  of {{pagination.totalItems}}-->
+<!--                                </clr-dg-pagination>-->
+<!--                              </clr-dg-footer>-->
+<!--                            </clr-datagrid>-->
+<!--                          </clr-accordion-content>-->
+<!--                        </clr-accordion-panel>-->
                       </clr-accordion>
                     </div>
                   </clr-tab-content>

@@ -156,6 +156,7 @@ export interface StorageList {
 }
 // 存储池
 export interface StoragePoolList {
+  id:string;
   name: string;
   poolId: string;
   storage_id: string;
