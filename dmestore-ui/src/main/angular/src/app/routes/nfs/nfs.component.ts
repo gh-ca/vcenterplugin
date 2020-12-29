@@ -155,6 +155,15 @@ export class NfsComponent implements OnInit {
     });
   }
 
+  // 页面跳转
+  jumpTo(page: ClrWizardPage) {
+    if (page && page.completed) {
+      this.wizard.navService.currentPage = page;
+    } else {
+      this.wizard.navService.setLastEnabledPageCurrent();
+    }
+    this.wizard.open();
+  }
   addView(){
     // const flag = 'plugin';
     // this.router.navigate(['nfs/add'],{
@@ -165,6 +174,8 @@ export class NfsComponent implements OnInit {
     this.addModelShow = true;
     this.storageList = null;
     this.storagePoolMap = [];
+    // 添加页面默认打开首页
+    this.jumpTo(this.addPageOne);
 
     this.storageService.getData().subscribe((s: any) => {
       this.modalLoading=false;
