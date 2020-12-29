@@ -145,6 +145,7 @@ export class VmfsListComponent implements OnInit {
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
   isOperationErr = false; // 错误信息
+  nameChecking = false; // 名称校验
   capacityErr = false; // 容量错误信息
   expandErr = false; // 扩容容量错误信息
   mountErr = false; // 扩容容量错误信息
@@ -1546,27 +1547,28 @@ export class VmfsListComponent implements OnInit {
     this.vmfsNameRepeatErr = false;
     this.volNameRepeatErr = false;
     this.matchErr = false;
-
+    this.nameChecking = true;
     let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
 
     if (this.modifyForm.name) {
       if (reg5.test(this.modifyForm.name)) {
         // 校验VMFS名称重复
-        this.modalHandleLoading = true;
+        // this.modalHandleLoading = true;
         this.remoteSrv.checkVmfsName(this.modifyForm.name).subscribe((result: any) => {
-          this.modalHandleLoading = false;
+          // this.modalHandleLoading = false;
           if (result.code === '200') { // result.data true 不重复 false 重复
             this.vmfsNameRepeatErr = !result.data;
             if (this.vmfsNameRepeatErr) { // 名称重复
               this.modifyForm.name = null;
               this.volNameRepeatErr = false;
               this.matchErr = false;
+              this.nameChecking = false;
             } else {
               if (this.modifyForm.isSameName) {
-                this.modalHandleLoading = true;
+                // this.modalHandleLoading = true;
                 // 校验VMFS名称重复
                 this.remoteSrv.checkVolName(this.modifyForm.name).subscribe((result: any) => {
-                  this.modalHandleLoading = false;
+                  // this.modalHandleLoading = false;
                   if (result.code === '200') { // result.data true 不重复 false 重复
                     this.volNameRepeatErr = !result.data;
                     if (!this.vmfsNameRepeatErr && this.volNameRepeatErr) {
@@ -1576,10 +1578,17 @@ export class VmfsListComponent implements OnInit {
                       this.modifyForm.name = null;
                       this.vmfsNameRepeatErr = false;
                       this.matchErr = false;
+                    } else {
+                      // 数据提交
+                      this.modifyHandleFunc();
                     }
                   }
+                  this.nameChecking = false;
                   this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
                 });
+              } else {
+                // 数据提交
+                this.modifyHandleFunc();
               }
             }
           }
