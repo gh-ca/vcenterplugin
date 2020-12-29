@@ -117,7 +117,14 @@ public class NfsOperationController extends BaseController {
         targetParams.put("storage_pool_id", requestParams.get("storagePoolId"));
         targetParams.put("pool_raw_id", requestParams.get("poolRawId"));
         targetParams.put("current_port_id", requestParams.get("currentPortId"));
+        String accessModeDme = (String)requestParams.get("accessMode");
+        if("readWrite".equals(accessModeDme)){
+            accessModeDme = "read/write";
+        }else {
+            accessModeDme = "read-only";
+        }
         targetParams.put("accessMode", requestParams.get("accessMode"));
+        targetParams.put("accessModeDme", accessModeDme);
         Object nfsName = requestParams.get(NFS_NAME_FIELD);
         targetParams.put(NFS_NAME_FIELD, nfsName);
         targetParams.put("type", requestParams.get("type"));
@@ -174,12 +181,12 @@ public class NfsOperationController extends BaseController {
                 Map<String, Object> qosPolicy = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
                 String contolPolicy = (String) requestParams.get("contolPolicy");
                 if (CONTROL_UP.equals(contolPolicy)) {
-                    qosPolicy.put("max_bandwidth", requestParams.get("maxBandwidth"));
-                    qosPolicy.put("max_iops", requestParams.get("maxIops"));
+                    qosPolicy.put("max_bandwidth", Integer.parseInt((String) requestParams.get("maxBandwidth")));
+                    qosPolicy.put("max_iops", Integer.parseInt((String) requestParams.get("maxIops")));
                 } else if (CONTROL_LOW.equals(contolPolicy)) {
-                    qosPolicy.put("min_bandwidth", requestParams.get("minBandwidth"));
-                    qosPolicy.put("min_iops", requestParams.get("minIops"));
-                    qosPolicy.put(LATENCY_FIELD, requestParams.get(LATENCY_FIELD));
+                    qosPolicy.put("min_bandwidth", Integer.parseInt((String) requestParams.get("minBandwidth")));
+                    qosPolicy.put("min_iops", Integer.parseInt((String) requestParams.get("minIops")));
+                    qosPolicy.put(LATENCY_FIELD, Integer.parseInt((String) requestParams.get(LATENCY_FIELD)));
                 }
                 targetParams.put("qos_policy", qosPolicy);
             }
@@ -189,8 +196,10 @@ public class NfsOperationController extends BaseController {
             } else {
                 tuning.put(ALLOCATION_TYPE_FIELD, "thick");
             }
-            tuning.put(COMPRESSION_ENABLED_FIELD, requestParams.get("compressionEnabled"));
-            tuning.put(DEDUPLICATION_ENABLED_FIELD, requestParams.get("deduplicationEnabled"));
+            tuning.put(COMPRESSION_ENABLED_FIELD,
+                Boolean.parseBoolean((String)requestParams.get("compressionEnabled")));
+            tuning.put(DEDUPLICATION_ENABLED_FIELD,
+                Boolean.parseBoolean((String)requestParams.get("deduplicationEnabled")));
 
             String capacitymode = (Boolean) requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD)
                 ? CapacityAutonegotiation.CAPACITY_MODE_AUTO
@@ -225,7 +234,7 @@ public class NfsOperationController extends BaseController {
         Object autoSizeEnable = params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD);
         if (autoSizeEnable != null) {
             capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
-            String capacitymode = (Boolean)params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD)
+            String capacitymode = (Boolean) params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD)
                 ? CapacityAutonegotiation.CAPACITY_MODE_AUTO
                 : CapacityAutonegotiation.CAPACITY_MODE_OFF;
             capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
@@ -249,12 +258,12 @@ public class NfsOperationController extends BaseController {
             Map<String, Object> qosPolicy = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
             String contolPolicy = (String) params.get("contolPolicy");
             if (CONTROL_LOW.equals(contolPolicy)) {
-                qosPolicy.put("min_bandwidth", params.get("minBandwidth"));
-                qosPolicy.put("min_iops", params.get("minIops"));
-                qosPolicy.put(LATENCY_FIELD, params.get(LATENCY_FIELD));
+                qosPolicy.put("min_bandwidth", Integer.parseInt((String) params.get("minBandwidth")));
+                qosPolicy.put("min_iops", Integer.parseInt((String) params.get("minIops")));
+                qosPolicy.put(LATENCY_FIELD, Integer.parseInt((String) params.get(LATENCY_FIELD)));
             } else if (CONTROL_UP.equals(contolPolicy)) {
-                qosPolicy.put("max_bandwidth", params.get("maxBandwidth"));
-                qosPolicy.put("max_iops", params.get("maxIops"));
+                qosPolicy.put("max_bandwidth", Integer.parseInt((String) params.get("maxBandwidth")));
+                qosPolicy.put("max_iops", Integer.parseInt((String) params.get("maxIops")));
             }
             param.put("qos_policy", qosPolicy);
         }

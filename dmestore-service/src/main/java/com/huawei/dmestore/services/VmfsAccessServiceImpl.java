@@ -509,17 +509,15 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         requestbody.put(STORAGE_ID, ToolUtils.getStr(params.get(STORAGE_ID)));
 
         Map<String, Object> tuning = new HashMap<>();
-        tuning.put(ALLOCTYPE, ToolUtils.getStr(params.get(ALLOCTYPE)));
+        tuning.put("alloction_type", ToolUtils.getStr(params.get(ALLOCTYPE)));
         tuning.put("workload_type_raw_id", ToolUtils.getInt(params.get(WORKLOAD_TYPE_ID), null));
 
         Map<String, Object> smartqos = new HashMap<>();
-        smartqos.put(CONTROL_POLICY, ToolUtils.getStr(params.get(CONTROL_POLICY)));
         smartqos.put(LATENCY, ToolUtils.getInt(params.get(LATENCY), null));
-        smartqos.put(MAXBANDWIDTH, ToolUtils.getInt(params.get(MAXBANDWIDTH), null));
-        smartqos.put(MAXIOPS, ToolUtils.getInt(params.get(MAXIOPS), null));
-        smartqos.put(MINBANDWIDTH, ToolUtils.getInt(params.get(MINBANDWIDTH), null));
-        smartqos.put(MINIOPS, ToolUtils.getInt(params.get(MINIOPS), null));
-        smartqos.put(NAME_FIELD, ToolUtils.getStr(params.get("qosname")));
+        smartqos.put("max_bandwidth", ToolUtils.getInt(params.get(MAXBANDWIDTH), null));
+        smartqos.put("max_iops", ToolUtils.getInt(params.get(MAXIOPS), null));
+        smartqos.put("min_bandwidth", ToolUtils.getInt(params.get(MINBANDWIDTH), null));
+        smartqos.put("min_iops", ToolUtils.getInt(params.get(MINIOPS), null));
 
         if (!StringUtils.isEmpty(params.get(DmeConstants.CONTROLPOLICY))) {
             tuning.put("smart_qos", smartqos);
@@ -1097,21 +1095,22 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     public List<VmfsDatastoreVolumeDetail> volumeDetail(String storageObjectId) throws DmeException {
         List<VmfsDatastoreVolumeDetail> list = new ArrayList<>();
         List<String> volumeIds = dmeVmwareRalationDao.getVolumeIdsByStorageId(storageObjectId);
+        LOG.error("get volume detail! volumeIds={}", gson.toJson(volumeIds));
         for (String volumeId : volumeIds) {
             // 调用DME接口获取卷详情
             String url = DmeConstants.DME_VOLUME_BASE_URL + FIEL_SEPARATOR + volumeId;
-            ResponseEntity<String> responseEntity;
-            responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            LOG.info("get volume detail! url={}", url);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() / DIVISOR_100 != HTTP_SUCCESS) {
+                LOG.info("get volume detail failed! response={}", gson.toJson(responseEntity));
                 throw new DmeException(responseEntity.getBody());
             }
-
             String responseBody = responseEntity.getBody();
             JsonObject volume = gson.fromJson(responseBody, JsonObject.class).getAsJsonObject(VOLUME_FIELD);
             if (volume.isJsonNull()) {
                 continue;
             }
-
+            LOG.info("volume detail! dme response={}", volume.toString());
             VmfsDatastoreVolumeDetail volumeDetail = new VmfsDatastoreVolumeDetail();
             volumeDetail.setWwn(volume.get(VOLUME_WWN).getAsString());
             volumeDetail.setName(volume.get(NAME_FIELD).getAsString());
@@ -1201,7 +1200,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
             for (int dex = 0; dex < wwnArray.size(); dex++) {
                 String wwn = wwnArray.get(dex).getAsString();
-                if(StringUtil.isBlank(wwn)){
+                if (StringUtil.isBlank(wwn)) {
                     continue;
                 }
 

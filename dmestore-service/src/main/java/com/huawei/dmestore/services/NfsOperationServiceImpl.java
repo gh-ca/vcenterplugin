@@ -138,6 +138,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
     @Override
     public void createNfsDatastore(Map<String, Object> params) throws DmeException {
+        LOG.info("createNfsDatastore params={}", gson.toJson(params));
         if (params == null || params.size() == 0) {
             throw new DmeException(CODE_403, "params error , please check your params !");
         }
@@ -192,14 +193,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                     if (shareClientHostMap != null && shareClientHostMap.size() > 0
                         && shareClientHostMap.get("objectId") != null) {
                         reqNfsShareClientArrayAddition.put(NAME_FIELD, shareClientHostMap.get(NAME_FIELD));
-
-                        /* reqNfsShareClientArrayAddition.put("accessval", "read-only");
-                        reqNfsShareClientArrayAddition.put("sync", "synchronization");
-                        reqNfsShareClientArrayAddition.put("all_squash", "all_squash");
-                        reqNfsShareClientArrayAddition.put("root_squash", "root_squash");
-                        reqNfsShareClientArrayAddition.put("secure", "insecure"); */
-
-                        reqNfsShareClientArrayAddition.put("permission", "read-only");
+                        reqNfsShareClientArrayAddition.put("permission", params.get("accessModeDme"));
                         reqNfsShareClientArrayAddition.put("write_mode", "synchronization");
                         reqNfsShareClientArrayAddition.put("permission_constraint", "all_squash");
                         reqNfsShareClientArrayAddition.put("root_permission_constraint", "root_squash");
@@ -239,6 +233,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 if (!"".equals(fsId)) {
                     //nfsShareMap.put("fs_id", fsId);
                     createNfsShareParams.put("fs_id", fsId);
+                    LOG.info("DME nfs share 创建请求参数报文:{}", gson.toJson(nfsShareMap));
                     String nfsShareTaskId = createNfsShare(nfsShareMap);
                     List<String> shareIds = new ArrayList<>();
                     shareIds.add(nfsShareTaskId);
@@ -459,6 +454,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             filesystemSpecsLists.add(filesystemSpecsMap);
         }
         params.put(FILESYSTEM_SPECS, filesystemSpecsLists);
+
+        LOG.info("DME 创建NFS报文：{}", gson.toJson(params));
         ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.API_FS_CREATE, HttpMethod.POST,
             gson.toJson(params));
         int code = responseEntity.getStatusCodeValue();
@@ -552,6 +549,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
     private String updateFileSystem(Map<String, Object> params, String fileSystemId) throws DmeException {
         String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace(FILE_SYSTEM_ID, fileSystemId);
+        LOG.info("DME 修改NFS请求报文:{}", gson.toJson(params));
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(params));
         int code = responseEntity.getStatusCodeValue();
         if (code != HttpStatus.ACCEPTED.value()) {
