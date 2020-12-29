@@ -700,6 +700,8 @@ export class VmfsListComponent implements OnInit {
     this.serviceLevelIsNull = false;
     this.storageList = null;
     this.storagePoolList = null;
+    // 切换服务等级与自定义隐藏错误信息
+    this.isOperationErr = false;
 
     // loading
     this.modalLoading = true;
@@ -710,6 +712,8 @@ export class VmfsListComponent implements OnInit {
   serviceLevelBtnFunc() {
     this.levelCheck = 'level';
     this.serviceLevelIsNull = false;
+    // 切换服务等级与自定义隐藏错误信息
+    this.isOperationErr = false;
 
     this.setServiceLevelList();
   }

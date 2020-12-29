@@ -273,6 +273,9 @@ export class AddComponent implements OnInit{
   serviceLevelBtnFunc() {
     this.levelCheck = 'level';
     this.serviceLevelIsNull = false;
+
+    // 切换服务等级与自定义隐藏错误信息
+    this.isOperationErr = false;
     this.setServiceLevelList();
   }
   // 未选择服务等级 时调用方法
@@ -282,7 +285,8 @@ export class AddComponent implements OnInit{
 
     this.storageList = null;
     this.storagePoolList = null;
-
+    // 切换服务等级与自定义隐藏错误信息
+    this.isOperationErr = false;
     // loading
     this.modalLoading = true;
 
