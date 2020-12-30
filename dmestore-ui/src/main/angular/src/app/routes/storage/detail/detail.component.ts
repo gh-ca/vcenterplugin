@@ -406,10 +406,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
               }
             });
           });
-          this.gs.loading=false;
-          this.cdr.detectChanges();
         }
       }
+      this.gs.loading=false;
+      this.cdr.detectChanges();
     });
   }
   getFileSystemList(fresh: boolean){
@@ -420,8 +420,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
         if (r.code === '200'){
           this.fsList = r.data;
           this.fsTotal=this.fsList==null?0:this.fsList.length;
-          this.cdr.detectChanges();
         }
+        this.cdr.detectChanges();
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
@@ -432,8 +432,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
           if (r.code === '200'){
             this.fsList = r.data;
             this.fsTotal=this.fsList==null?0:this.fsList.length;
-            this.cdr.detectChanges();
           }
+          this.cdr.detectChanges();
         });
       }
     }
@@ -446,20 +446,20 @@ export class DetailComponent implements OnInit, AfterViewInit {
         if (r.code === '200'){
           this.dtrees = r.data;
           this.dtreeTotal=this.dtrees==null?0:this.dtrees.length;
-          this.cdr.detectChanges();
         }
+        this.cdr.detectChanges();
       });
     }else {
-      // 此处防止重复切换tab每次都去后台请求数据
-      this.gs.loading=true;
       if (this.dtrees == null){
+        // 此处防止重复切换tab每次都去后台请求数据
+        this.gs.loading=true;
         this.detailService.getDtreeList(this.storageId).subscribe((r: any) => {
           this.gs.loading=false;
           if (r.code === '200'){
             this.dtrees = r.data;
             this.dtreeTotal=this.dtrees==null?0:this.dtrees.length;
-            this.cdr.detectChanges();
           }
+          this.cdr.detectChanges();
         });
       }
     }
@@ -475,8 +475,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
         if (r.code === '200'){
           this.shares = r.data;
           this.shareTotal=this.shares==null?0:this.shares.length;
-          this.cdr.detectChanges();
         }
+        this.cdr.detectChanges();
       });
     }else {
       console.log(44)
@@ -490,8 +490,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
           if (r.code === '200'){
             this.shares = r.data;
             this.shareTotal=this.shares==null?0:this.shares.length;
-            this.cdr.detectChanges();
           }
+          this.cdr.detectChanges();
         });
       }
     }
