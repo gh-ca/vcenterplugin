@@ -26,6 +26,7 @@ import com.google.gson.reflect.TypeToken;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -107,6 +108,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private TaskService taskService;
 
     private VCSDKUtils vcsdkUtils;
+
+    @Value("${dmestore.service.dme.old:false}")
+    private boolean isOldDme;
 
     public VCSDKUtils getVcsdkUtils() {
         return vcsdkUtils;
@@ -508,9 +512,16 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     private ResponseEntity listLogicPortByStorageId(String storageId) throws DmeException {
         String url = DmeConstants.API_LOGICPORTS_LIST;
-        JsonObject param = new JsonObject();
-        param.addProperty("storage_id", storageId);
-        ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(param));
+        JsonObject param = null;
+        HttpMethod method = HttpMethod.POST;
+        if (isOldDme) {
+            url = DmeConstants.API_LOGICPORTS_LIST_OLD + "?storage_id=" + storageId;
+            method = HttpMethod.GET;
+        } else {
+            param = new JsonObject();
+            param.addProperty("storage_id", storageId);
+        }
+        ResponseEntity responseEntity = dmeAccessService.access(url, method, gson.toJson(param));
         return responseEntity;
     }
 
