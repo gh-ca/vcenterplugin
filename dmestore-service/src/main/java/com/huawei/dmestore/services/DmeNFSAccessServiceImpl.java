@@ -26,6 +26,7 @@ import com.google.gson.reflect.TypeToken;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -48,7 +49,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     private static final int DIGIT_100 = 100;
 
-    private static final int PAGE_SIZE_100 = 1000;
+    private static final int PAGE_SIZE_1000 = 1000;
 
     private static final int DIGIT_2 = 2;
 
@@ -107,6 +108,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private TaskService taskService;
 
     private VCSDKUtils vcsdkUtils;
+
+    @Value("${dmestore.service.dme.old:false}")
+    private boolean isOldDme;
 
     public VCSDKUtils getVcsdkUtils() {
         return vcsdkUtils;
@@ -179,7 +183,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         Map<String, Object> body = new HashMap<>();
         body.put("nfs_share_id", shareId);
         body.put("page_no", 1);
-        body.put("page_size", PAGE_SIZE_100);
+        body.put("page_size", PAGE_SIZE_1000);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(body));
         if (responseEntity.getStatusCodeValue() / DIGIT_100 == DIGIT_2) {
             String resBody = responseEntity.getBody();
@@ -508,9 +512,16 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     private ResponseEntity listLogicPortByStorageId(String storageId) throws DmeException {
         String url = DmeConstants.API_LOGICPORTS_LIST;
-        JsonObject param = new JsonObject();
-        param.addProperty("storage_id", storageId);
-        ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(param));
+        JsonObject param = null;
+        HttpMethod method = HttpMethod.POST;
+        if (isOldDme) {
+            url = DmeConstants.API_LOGICPORTS_LIST_OLD + "?storage_id=" + storageId;
+            method = HttpMethod.GET;
+        } else {
+            param = new JsonObject();
+            param.addProperty("storage_id", storageId);
+        }
+        ResponseEntity responseEntity = dmeAccessService.access(url, method, gson.toJson(param));
         return responseEntity;
     }
 
@@ -791,6 +802,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     @Override
     public void deleteNfs(Map<String, Object> params) throws DmeException {
         String dataStorageId = ToolUtils.getStr(params.get(DATASTOREOBJECTID));
+
+        // DME侧删除nfs
+        dmeDeleteNfs(dataStorageId);
+
         List<Map<String, Object>> hosts = getHostsMountDataStoreByDsObjectId(dataStorageId);
         LOG.info("get hosts success!hosts={}", gson.toJson(hosts));
         List<String> hostIds = new ArrayList<>();
@@ -805,6 +820,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             vcsdkUtils.deleteNfs(dataStorageId, hostIds);
             LOG.info("vmware deleteNfs end!");
         }
+    }
+
+    private void dmeDeleteNfs(String dataStorageId) throws DmeException {
+        LOG.info("dme delete nfs begin!dataStorageId={}", dataStorageId);
         DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStorageId);
         if (dvr != null) {
             String shareId = dvr.getShareId();
@@ -815,22 +834,29 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 if (!StringUtils.isEmpty(deleteShareTaskId)) {
                     taskIds.add(deleteShareTaskId);
                 }
+                LOG.info("dme delete share end,taskId={}", deleteShareTaskId);
             }
             if (!StringUtils.isEmpty(fsId)) {
                 String deletefsTaskId = deleteNfsFs(Arrays.asList(fsId));
                 if (!StringUtils.isEmpty(deletefsTaskId)) {
                     taskIds.add(deletefsTaskId);
                 }
+                LOG.info("dme delete nfs filesystem end,taskId={}", deletefsTaskId);
             }
             if (taskIds.size() > 0) {
                 boolean isDeleted = taskService.checkTaskStatus(taskIds);
                 if (isDeleted) {
-                    LOG.info("Nfs delete share fs success!");
+                    // 关系解除
+                    dmeVmwareRalationDao.deleteByStorageId(Arrays.asList(dataStorageId));
+                    LOG.info("nfs delete share fs success!");
                 } else {
-                    throw new DmeException("DME delete nfs error(task status)!");
+                    throw new DmeException("DME delete nfs error!");
                 }
             }
+        } else {
+            LOG.info("nfs delete!dme nfs relation is null!");
         }
+        LOG.info("dme delete nfs end!");
     }
 
     private void unmountNfsFromHost(String dataStoreObjectId, String hostId) throws VcenterException {
