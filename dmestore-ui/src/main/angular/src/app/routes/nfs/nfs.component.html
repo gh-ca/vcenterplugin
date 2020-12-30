@@ -46,10 +46,12 @@
           <status-filter #statusFilter></status-filter>
         </clr-dg-filter>
       </clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacity'" [clrDgSortOrder]="descSort">{{'nfs.totalCapacity' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" >{{'nfs.freeCapacity' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacityUsage'" [clrDgSortOrder]="descSort">{{'nfs.capacityUsage' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" >{{'nfs.provisioningCapacity' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacity'">{{'nfs.totalCapacity' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'"  [clrDgField]="'freeSpace'">
+        {{'nfs.freeCapacity' | translate}}
+      </clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacityUsage'">{{'nfs.capacityUsage' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'reserveCapacity'">{{'nfs.provisioningCapacity' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='list'" >
         {{'nfs.device' | translate}}
         <clr-dg-filter [clrDgFilter]="deviceFilter">
