@@ -16,6 +16,7 @@ import com.huawei.dmestore.utils.VCSDKUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -95,6 +96,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     private VCSDKUtils vcsdkUtils;
 
     private DmeVmwareRalationDao dmeVmwareRalationDao;
+
+    @Value("${dmestore.service.dme.old:false}")
+    private boolean isOldDme;
 
     public DmeVmwareRalationDao getDmeVmwareRalationDao() {
         return dmeVmwareRalationDao;
@@ -267,7 +271,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 throw new VcenterRuntimeException(CODE_403, "create nfs datastore error!");
             }
             saveNfsInfoToDmeVmwareRelation(result, currentPortId, logicPortName, fsId, shareName, shareId, fsName);
-            LOG.info("nfs入库成功!{}",nfsName);
+            LOG.info("nfs入库成功!{}", nfsName);
         } catch (DmeException e) {
             LOG.error("create nfs datastore error!", e);
             throw new DmeException(CODE_403, e.getMessage());
@@ -456,8 +460,11 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         params.put(FILESYSTEM_SPECS, filesystemSpecsLists);
 
         LOG.info("DME 创建NFS报文：{}", gson.toJson(params));
-        ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.API_FS_CREATE, HttpMethod.POST,
-            gson.toJson(params));
+        String url = DmeConstants.API_FS_CREATE;
+        if(isOldDme){
+            url = DmeConstants.API_FS_CREATE_OLD;
+        }
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(params));
         int code = responseEntity.getStatusCodeValue();
         if (code != HttpStatus.ACCEPTED.value()) {
             throw new DmeException(CODE_503, "create file system error!" + responseEntity.getBody());
@@ -590,8 +597,11 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         if (!StringUtils.isEmpty(shareName) && !StringUtils.isEmpty(fsname)) {
             reqMap.put(NAME_FIELD, shareName);
             reqMap.put("fs_name", fsname);
-            ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL,
-                HttpMethod.POST, gson.toJson(reqMap));
+            String url = DmeConstants.DME_NFS_SHARE_URL;
+            if (isOldDme) {
+                url = DmeConstants.DME_NFS_SHARE_URL_OLD;
+            }
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(reqMap));
             if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 String object = responseEntity.getBody();
                 JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();

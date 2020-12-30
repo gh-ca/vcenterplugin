@@ -404,7 +404,7 @@ export class NfsComponent implements OnInit {
     this.vmfsListService.scanVMFS('nfs').subscribe((res: any) => {
       this.isLoading = false;
       if (res.code === '200') {
-        //this.getNfsList();
+        this.getNfsList();
         console.log('Scan success');
         this.router.navigate(['nfs'], {
           queryParams: {t: new Date().getTime()}
