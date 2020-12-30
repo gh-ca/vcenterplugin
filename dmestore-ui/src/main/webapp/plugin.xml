@@ -1034,13 +1034,27 @@
       <object>
          <actions>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.huawei.dmestore.datastore.clustervmfsmountaction</uid>
+               <uid>com.huawei.dmestore.datastore.hostvmfsmountaction</uid>
                <label>#{vmfsmount.label}</label>
                <delegate>
                   <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
                   <object>
                      <root>
                         <actionUrl>/ui/dmestore/index.html?view=vmfs/host/mount?resource=others</actionUrl>
+                        <dialogTitle>VMFS</dialogTitle>
+                        <dialogSize>1800,600</dialogSize>
+                     </root>
+                  </object>
+               </delegate>
+            </com.vmware.actionsfw.ActionSpec>
+            <com.vmware.actionsfw.ActionSpec>
+               <uid>com.huawei.dmestore.datastore.clustervmfsmountaction</uid>
+               <label>#{vmfsmount.label}</label>
+               <delegate>
+                  <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
+                  <object>
+                     <root>
+                        <actionUrl>/ui/dmestore/index.html?view=vmfs/cluster/mount?resource=others</actionUrl>
                         <dialogTitle>VMFS</dialogTitle>
                         <dialogSize>1800,600</dialogSize>
                      </root>
