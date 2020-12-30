@@ -51,7 +51,7 @@ export class MountService {
   }
   // 获取已挂载集群
   getMountCluster(objectId) {
-    return  this.http.get('accessvmfs/gethostgroupsbystorageid/'+objectId);
+    return  this.http.get('accessvmfs/getdatastoresbyclusterobjectid/'+objectId);
   }
 
   /**
