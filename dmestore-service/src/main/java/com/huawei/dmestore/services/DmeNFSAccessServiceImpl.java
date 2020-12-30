@@ -814,7 +814,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         dmeDeleteNfs(dataStorageId);
 
         List<Map<String, Object>> hosts = getHostsMountDataStoreByDsObjectId(dataStorageId);
-        LOG.info("get hosts success!hosts={}", gson.toJson(hosts));
+        LOG.info("get vmware hosts success!hosts={}", gson.toJson(hosts));
         List<String> hostIds = new ArrayList<>();
         if (hosts != null && hosts.size() > 0) {
             for (Map<String, Object> hostMap : hosts) {
@@ -832,37 +832,45 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private void dmeDeleteNfs(String dataStorageId) throws DmeException {
         LOG.info("dme delete nfs begin!dataStorageId={}", dataStorageId);
         DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStorageId);
-        if (dvr != null) {
-            String shareId = dvr.getShareId();
-            String fsId = dvr.getFsId();
-            List<String> taskIds = new ArrayList<>();
-            if (!StringUtils.isEmpty(shareId)) {
-                String deleteShareTaskId = deleteNfsShare(Arrays.asList(shareId));
-                if (!StringUtils.isEmpty(deleteShareTaskId)) {
-                    taskIds.add(deleteShareTaskId);
-                }
-                LOG.info("dme delete share end,taskId={}", deleteShareTaskId);
-            }
-            if (!StringUtils.isEmpty(fsId)) {
-                String deletefsTaskId = deleteNfsFs(Arrays.asList(fsId));
-                if (!StringUtils.isEmpty(deletefsTaskId)) {
-                    taskIds.add(deletefsTaskId);
-                }
-                LOG.info("dme delete nfs filesystem end,taskId={}", deletefsTaskId);
-            }
-            if (taskIds.size() > 0) {
-                boolean isDeleted = taskService.checkTaskStatus(taskIds);
-                if (isDeleted) {
-                    // 关系解除
-                    dmeVmwareRalationDao.deleteByStorageId(Arrays.asList(dataStorageId));
-                    LOG.info("nfs delete share fs success!");
-                } else {
-                    throw new DmeException("DME delete nfs error!");
-                }
-            }
-        } else {
+        if (dvr == null) {
             LOG.info("nfs delete!dme nfs relation is null!");
+            return;
         }
+        String shareId = dvr.getShareId();
+        String fsId = dvr.getFsId();
+        List<String> taskIds = new ArrayList<>();
+        String taskId = "";
+        if (!StringUtils.isEmpty(shareId)) {
+            taskId = deleteNfsShare(Arrays.asList(shareId));
+            if (!StringUtils.isEmpty(taskId)) {
+                taskIds.add(taskId);
+            }
+            LOG.info("dme delete share end,taskId={}", taskId);
+        }
+        boolean isShareDelete = taskService.checkTaskStatus(taskIds);
+        if (!isShareDelete) {
+            LOG.info("dme delete share failed!,taskId={}", taskId);
+            throw new DmeException("DME delete share failed!taskId=" + taskId);
+        }
+        taskIds.clear();
+        if (!StringUtils.isEmpty(fsId)) {
+            taskId = deleteNfsFs(Arrays.asList(fsId));
+            if (!StringUtils.isEmpty(taskId)) {
+                taskIds.add(taskId);
+            }
+            LOG.info("dme delete nfs filesystem end,taskId={}", taskId);
+        }
+        if (taskIds.size() > 0) {
+            boolean isDeleted = taskService.checkTaskStatus(taskIds);
+            if (isDeleted) {
+                // 关系解除
+                dmeVmwareRalationDao.deleteByStorageId(Arrays.asList(dataStorageId));
+                LOG.info("dme nfs delete filesystem success!");
+            } else {
+                throw new DmeException("DME delete nfs filesystem error!");
+            }
+        }
+
         LOG.info("dme delete nfs end!");
     }
 
