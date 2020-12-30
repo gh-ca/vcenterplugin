@@ -65,10 +65,10 @@
       </clr-dg-filter>
     </clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacity'">{{'vmfs.capacity' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'">{{'vmfs.usedCapacity' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'usedCapacity'">{{'vmfs.usedCapacity' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacityUsage'">{{'vmfs.capacityUsage' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'">{{'vmfs.freeSpace' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'">{{'vmfs.reserveCapacity' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'freeSpace'">{{'vmfs.freeSpace' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'reserveCapacity'">{{'vmfs.reserveCapacity' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'device'">
       {{'vmfs.device' | translate}}
       <clr-dg-filter [clrDgFilter]="deviceFilter">

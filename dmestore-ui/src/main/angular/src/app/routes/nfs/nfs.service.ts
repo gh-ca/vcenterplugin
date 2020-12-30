@@ -160,6 +160,10 @@ export class FileSystem{
   healthStatus: string;
   count: number;
   dtreeCount: number;
+  type:string;
+  capacityUsageRatio:number;
+  storagePoolName:string;
+  nfsCount:number;
 }
 export class Autonegotiation{
   auto_size_enable: boolean;
