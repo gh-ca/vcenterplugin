@@ -179,11 +179,15 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     private List<AuthClient> getNfsDatastoreShareAuthClients(String shareId) throws DmeException {
         List<AuthClient> clientList = new ArrayList<>();
-        String url = DmeConstants.DME_NFS_SHARE_AUTH_CLIENTS_URL.replace(NFS_SHARE_ID, shareId);
+        String url = DmeConstants.DME_NFS_SHARE_AUTH_CLIENTS_URL;
         Map<String, Object> body = new HashMap<>();
         body.put("nfs_share_id", shareId);
         body.put("page_no", 1);
         body.put("page_size", PAGE_SIZE_1000);
+        if (isOldDme) {
+            body.remove("nfs_share_id");
+            url = DmeConstants.DME_NFS_SHARE_AUTH_CLIENTS_URL_OLD.replace(NFS_SHARE_ID, shareId);
+        }
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(body));
         if (responseEntity.getStatusCodeValue() / DIGIT_100 == DIGIT_2) {
             String resBody = responseEntity.getBody();
@@ -419,8 +423,11 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private ResponseEntity listShareBySharePath(String sharePath) throws DmeException {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put(SHARE_PATH, sharePath);
-        ResponseEntity responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL, HttpMethod.POST,
-            gson.toJson(requestbody));
+        String url = DmeConstants.DME_NFS_SHARE_URL;
+        if (isOldDme) {
+            url = DmeConstants.DME_NFS_SHARE_URL_OLD;
+        }
+        ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(requestbody));
         return responseEntity;
     }
 
