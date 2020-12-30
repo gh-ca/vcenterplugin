@@ -20,7 +20,7 @@ export class MountService {
    * @param dataStoreType
    */
   getDataStoreByClusterId(clusterObjectId:string, dataStoreType:string) {
-    return this.http.get('accessvmware/getdatastoresbyhostobjectid?clusterObjectId=' + clusterObjectId + '&dataStoreType=' + dataStoreType);
+    return this.http.get('accessvmware/getdatastoresbyclusterobjectid?clusterObjectId=' + clusterObjectId + '&dataStoreType=' + dataStoreType);
   }
 
   /**
@@ -51,7 +51,7 @@ export class MountService {
   }
   // 获取已挂载集群
   getMountCluster(objectId) {
-    return  this.http.get('accessvmfs/getdatastoresbyclusterobjectid/'+objectId);
+    return  this.http.get('accessvmfs/gethostgroupsbystorageid/'+objectId);
   }
 
   /**
