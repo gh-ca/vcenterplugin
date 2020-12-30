@@ -21,9 +21,20 @@ public class DmeConstants {
     public static final String DME_NFS_SHARE_AUTH_CLIENTS_URL = "/rest/fileservice/v1/nfs-auth-clients/query";
 
     /**
+     * 旧URL ："/rest/fileservice/v1/nfs-shares/{nfs_share_id}/auth_clients" old dme
+     **/
+    public static final String DME_NFS_SHARE_AUTH_CLIENTS_URL_OLD
+        = "/rest/fileservice/v1/nfs-shares/{nfs_share_id}/auth_clients";
+
+    /**
      * 旧URL ："/rest/fileservice/v1/nfs-shares/summary"
      **/
     public static final String DME_NFS_SHARE_URL = "/rest/fileservice/v1/nfs-shares/query";
+
+    /**
+     * 旧URL ："/rest/fileservice/v1/nfs-shares/summary"
+     **/
+    public static final String DME_NFS_SHARE_URL_OLD = "/rest/fileservice/v1/nfs-shares/summary";
 
     /**
      * nfs share delete
@@ -55,6 +66,12 @@ public class DmeConstants {
      * old url:/rest/fileservice/v1/filesystems/customize
      **/
     public static final String API_FS_CREATE = "/rest/fileservice/v1/filesystems/customize-filesystems";
+
+    /**
+     * create fs with custom. old DME
+     * old url:/rest/fileservice/v1/filesystems/customize
+     **/
+    public static final String API_FS_CREATE_OLD = "/rest/fileservice/v1/filesystems/customize";
 
     /**
      * logic port detail
@@ -424,7 +441,7 @@ public class DmeConstants {
      * 容量初始分配策略。仅支持华为V3/V5设备，Dorado系列不支持该参数。
      * 取值范围：automatic：自动，highest_performance：高性能层，performance：性能层，capacity：容量层。默认值：automatic
      **/
-    public static final Map<String, String> INITIAL_DISTRIBUTE_POLICY = new HashMap(){
+    public static final Map<String, String> INITIAL_DISTRIBUTE_POLICY = new HashMap() {
         {
             put("0", "automatic");
             put("1", "highest_performance");
@@ -438,7 +455,7 @@ public class DmeConstants {
      * 取值范围：no_prefetch: 不预取，constant_prefetch：固定预取，variable_prefetch：可变预取，intelligent_prefetch：智能预取。
      * 默认值：intelligent_prefetch
      **/
-    public static final Map<String, String> PREFETCH_POLICY = new HashMap(){
+    public static final Map<String, String> PREFETCH_POLICY = new HashMap() {
         {
             put("0", "no_prefetch");
             put("1", "constant_prefetch");
@@ -452,7 +469,7 @@ public class DmeConstants {
      * no_migration：不迁移，automatic_migration：自动迁移，migration_to_higher：向高性能层迁移，migration_to_lower：向低性能层迁移
      * 默认值：no_migration。
      **/
-    public static final Map<String, String> SMART_TIER = new HashMap(){
+    public static final Map<String, String> SMART_TIER = new HashMap() {
         {
             put("0", "no_migration");
             put("1", "automatic_migration");

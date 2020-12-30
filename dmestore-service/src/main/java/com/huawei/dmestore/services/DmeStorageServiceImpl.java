@@ -416,7 +416,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         try {
             LOG.info("{}, getLogic begin!storageId={}", url, storageId);
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, method,
-                                                                             param == null ? null : gson.toJson(param));
+                param == null ? null : gson.toJson(param));
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
                 LOG.error("getLogic failed!response = {}", gson.toJson(responseEntity));
@@ -450,6 +450,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     logicPorts.setManagementAccess(ToolUtils.jsonToStr(element.get("management_access")));
                     logicPorts.setVstoreId(ToolUtils.jsonToStr(element.get("vstore_id")));
                     logicPorts.setVstoreName(ToolUtils.jsonToStr(element.get("vstore_name")));
+
+                    if (isOldDme){
+                        logicPorts.setHomePortId(ToolUtils.jsonToStr(element.get("home_port_id")));
+                        logicPorts.setCurrentPortId(ToolUtils.jsonToStr(element.get("current_port_id")));
+                    }
                     resList.add(logicPorts);
                 }
             }
@@ -615,8 +620,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         Map<String, String> params = new HashMap<>();
         params.put(STORAGE_ID, storageId);
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_URL,
-                HttpMethod.POST, gson.toJson(params));
+            String url = DmeConstants.DME_NFS_SHARE_URL;
+            if (isOldDme) {
+                url = DmeConstants.DME_NFS_SHARE_URL_OLD;
+            }
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(params));
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
                 throw new DmeException(CODE_503, "list nfsshares error!");
