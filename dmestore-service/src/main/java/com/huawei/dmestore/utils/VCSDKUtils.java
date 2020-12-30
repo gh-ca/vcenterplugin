@@ -2528,7 +2528,6 @@ public class VCSDKUtils {
         try {
             VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
 
-            // 存储下的所有主机
             ManagedObjectReference dsmor = vcConnectionHelpers.objectId2Mor(dataStoreObjectId);
             DatastoreMO dsmo = datastoreVmwareMoFactory.build(vmwareContext, dsmor);
             for (String hostObjId : hostObjIds) {
@@ -2551,14 +2550,15 @@ public class VCSDKUtils {
     }
 
     public void deleteNfs(DatastoreMO dsmo, HostMO hostMo, String datastoreobjectid) throws Exception {
-        // 删除前重新扫描datastore
-        hostMo.getHostStorageSystemMo().rescanVmfs();
-        logger.info("Rescan datastore before delete!");
-
         // 删除NFS
-        //NasDatastoreInfo nasdsinfo = (NasDatastoreInfo) dsmo.getInfo();
+        logger.info("=========vmware delete nfs process begin=========");
         hostMo.getHostDatastoreSystemMo().deleteDatastore(vcConnectionHelpers.objectId2Mor(datastoreobjectid));
-        logger.info("delete nfs success!host name={}, datastore name={}", hostMo.getName(), dsmo.getName());
+        logger.info("=========vmware delete nfs process end=========");
+
+        // 删除后重新扫描datastore
+        logger.info("=========rescanVmfs after vmware delete nfs process=======", hostMo.getName(), dsmo.getName());
+        hostMo.getHostStorageSystemMo().rescanVmfs();
+        logger.info("=====vmware delete nfs success!host name={}, datastore name={}", hostMo.getName(), dsmo.getName());
     }
 
     /**
