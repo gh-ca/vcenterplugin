@@ -72,6 +72,11 @@ public class DmeConstants {
     public static final String API_LOGICPORTS_LIST = "/rest/storagemgmt/v1/logic-ports/query";
 
     /**
+     * logic ports query.old dme
+     **/
+    public static final String API_LOGICPORTS_LIST_OLD = "/rest/storagemgmt/v1/storage-port/logic-ports";
+
+    /**
      * bond ports query
      **/
     public static final String API_BANDPORTS_LIST = "/rest/storagemgmt/v1/storage-port/bond-ports?storage_id=";

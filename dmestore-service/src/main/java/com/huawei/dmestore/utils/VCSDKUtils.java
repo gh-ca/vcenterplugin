@@ -2757,7 +2757,7 @@ public class VCSDKUtils {
 
             logger.info("vcenter info=={}", gson.toJson(vcenterinfo));
             vmomiClient = Client.Factory.createClient(
-                new URI("https:// " + vcenterinfo.getHostIp() + ":" + vcenterinfo.getHostPort() + "/sdk"), VERSION,
+                new URI("https://" + vcenterinfo.getHostIp() + ":" + vcenterinfo.getHostPort() + "/sdk"), VERSION,
                 context, clientConfig);
             com.vmware.vim.binding.vmodl.ManagedObjectReference svcRef
                 = new com.vmware.vim.binding.vmodl.ManagedObjectReference();
