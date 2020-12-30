@@ -36,6 +36,7 @@ import com.google.gson.JsonParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -126,6 +127,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     private VCSDKUtils vcsdkUtils;
 
     private DataStoreStatisticHistoryService dataStoreStatisticHistoryService;
+
+    @Value("${dmestore.service.dme.old:false}")
+    private boolean isOldDme;
 
     public void setDataStoreStatisticHistoryService(DataStoreStatisticHistoryService dataStoreStatisticHistoryService) {
         this.dataStoreStatisticHistoryService = dataStoreStatisticHistoryService;
@@ -400,11 +404,19 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     public List<LogicPorts> getLogicPorts(String storageId) throws DmeException {
         List<LogicPorts> resList = new ArrayList<>();
         String url = DmeConstants.API_LOGICPORTS_LIST;
-        JsonObject param = new JsonObject();
-        param.addProperty("storage_id", storageId);
+        JsonObject param = null;
+        HttpMethod method = HttpMethod.POST;
+        if (isOldDme) {
+            url = DmeConstants.API_LOGICPORTS_LIST_OLD + "?storage_id=" + storageId;
+            method = HttpMethod.GET;
+        } else {
+            param = new JsonObject();
+            param.addProperty("storage_id", storageId);
+        }
         try {
             LOG.info("{}, getLogic begin!storageId={}", url, storageId);
-            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(param));
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, method,
+                                                                             param == null ? null : gson.toJson(param));
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
                 LOG.error("getLogic failed!response = {}", gson.toJson(responseEntity));
