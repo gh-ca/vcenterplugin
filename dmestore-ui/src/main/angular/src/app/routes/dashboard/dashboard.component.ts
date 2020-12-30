@@ -63,7 +63,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   popShow = false;
   connectAlertSuccess = false;
   connectAlertFail = false;
-  connectModel = { hostIp: '', port: '26335', userName: '', password: ''};
+  connectModel = { hostIp: '', port: '26335', userName: '', password: '', hostPort: ''};
   hostModel = { hostIp: '', hostPort: '', code: ''};
 
   bestShowLoading = false;
@@ -231,6 +231,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.clrForm.markAsTouched();
     } else {
       this.gs.loading = true;
+      this.connectModel.hostPort = this.connectModel.port;
       this.http.post('accessdme/access', this.connectModel).subscribe((result: any) => {
         this.gs.loading = false;
         if (result.code == '200'){

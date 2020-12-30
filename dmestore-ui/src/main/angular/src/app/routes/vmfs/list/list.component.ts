@@ -272,6 +272,7 @@ export class VmfsListComponent implements OnInit {
   // 点刷新那个功能是分两步，一步是刷新，然后等我们这边的扫描任务，任务完成后返回你状态，任务成功后，你再刷新列表页面。
   scanDataStore() {
     // 初始化筛选
+    this.isLoading = true;
     this.statusFilter.initStatus();
     this.deviceFilter.initDevice();
     this.serviceLevelFilter.initServiceLevel();
@@ -285,6 +286,7 @@ export class VmfsListComponent implements OnInit {
       } else {
         console.log('Scan faild');
       }
+      this.isLoading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
