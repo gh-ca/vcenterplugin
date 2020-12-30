@@ -14,6 +14,11 @@ public class CapacityAutonegotiation {
     public static final String CAPACITY_MODE_OFF = "grow_off";
 
     /**
+     * capacitymodeoff . old dme
+     */
+    public static final String CAPACITY_MODE_OFF_OLD = "off";
+
+    /**
      * capacitymodeauto .
      */
     public static final String CAPACITY_MODE_AUTO = "grow_shrink";

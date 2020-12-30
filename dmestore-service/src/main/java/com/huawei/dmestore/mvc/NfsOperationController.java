@@ -7,6 +7,7 @@ import com.huawei.dmestore.model.ResponseBodyBean;
 import com.huawei.dmestore.services.NfsOperationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -99,6 +100,9 @@ public class NfsOperationController extends BaseController {
      */
     private static final String FILE_SEPARATOR = "/";
 
+    @Value("${dmestore.service.dme.old:false}")
+    private boolean isOldDme;
+
     @Autowired
     private NfsOperationService nfsOperationService;
 
@@ -117,10 +121,10 @@ public class NfsOperationController extends BaseController {
         targetParams.put("storage_pool_id", requestParams.get("storagePoolId"));
         targetParams.put("pool_raw_id", requestParams.get("poolRawId"));
         targetParams.put("current_port_id", requestParams.get("currentPortId"));
-        String accessModeDme = (String)requestParams.get("accessMode");
-        if("readWrite".equals(accessModeDme)){
+        String accessModeDme = (String) requestParams.get("accessMode");
+        if ("readWrite".equals(accessModeDme)) {
             accessModeDme = "read/write";
-        }else {
+        } else {
             accessModeDme = "read-only";
         }
         targetParams.put("accessMode", requestParams.get("accessMode"));
@@ -199,9 +203,12 @@ public class NfsOperationController extends BaseController {
             tuning.put(COMPRESSION_ENABLED_FIELD, requestParams.get("compressionEnabled"));
             tuning.put(DEDUPLICATION_ENABLED_FIELD, requestParams.get("deduplicationEnabled"));
 
+            String defaultCapacitymode = CapacityAutonegotiation.CAPACITY_MODE_OFF;
+            if (isOldDme) {
+                defaultCapacitymode = CapacityAutonegotiation.CAPACITY_MODE_OFF_OLD;
+            }
             String capacitymode = (Boolean) requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD)
-                ? CapacityAutonegotiation.CAPACITY_MODE_AUTO
-                : CapacityAutonegotiation.CAPACITY_MODE_OFF;
+                ? CapacityAutonegotiation.CAPACITY_MODE_AUTO : defaultCapacitymode;
             capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
             capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
         } else {
