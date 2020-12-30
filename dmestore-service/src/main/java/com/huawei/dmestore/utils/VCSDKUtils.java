@@ -2513,14 +2513,16 @@ public class VCSDKUtils {
      * @param hostObjIds hostObjIds
      * @throws VcenterException VcenterException
      **/
-    public void deleteNfs(String dataStoreObjectId, List<String> hostObjIds) throws VcenterException {
+    public boolean deleteNfs(String dataStoreObjectId, List<String> hostObjIds) throws VcenterException {
+        boolean reValue = false;
+        logger.info("vmware delete nfs begin!");
         if (StringUtils.isEmpty(dataStoreObjectId)) {
             logger.info("delete dataStore error! datasotreObject id is null");
-            return;
+            return reValue;
         }
         if (hostObjIds == null || hostObjIds.size() == 0) {
             logger.info("delete datasotre error!param hostObjIds is null");
-            return;
+            return reValue;
         }
         String serverguid = vcConnectionHelpers.objectId2Serverguid(dataStoreObjectId);
         try {
@@ -2536,13 +2538,16 @@ public class VCSDKUtils {
 
                 // 主机删除存储
                 deleteNfs(dsmo, hostmo, dataStoreObjectId);
+                reValue = true;
 
                 // 删除成功后不再重复删除
                 break;
             }
         } catch (Exception e) {
-            throw new VcenterException(e.getMessage());
+            logger.error("vmware delete nfs error!{}", gson.toJson(e));
         }
+        logger.info("vmware delete nfs end!reValue={}", reValue);
+        return reValue;
     }
 
     public void deleteNfs(DatastoreMO dsmo, HostMO hostMo, String datastoreobjectid) throws Exception {
