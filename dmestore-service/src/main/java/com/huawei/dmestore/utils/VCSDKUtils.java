@@ -1052,7 +1052,7 @@ public class VCSDKUtils {
      * @param datastoreobjid datastoreobjid
      * @return String
      */
-    public String expandVmfsDatastore(String dsname, Integer addCapacity, String dataStoreObjectId) throws Exception {
+    public String expandVmfsDatastore(String dsname, Integer addCapacity, String dataStoreObjectId) {
         String result = SUCCESS_RESULT;
         logger.info("==start expand DataStore==");
         try {
