@@ -248,7 +248,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   resetForm() {
-    this.connectForm.reset(this.connectModel);
+    const connectModel = { hostIp: '', port: '26335', userName: '', password: '', hostPort: ''}
+    this.connectForm.reset(connectModel);
   }
 
   showPop(){
