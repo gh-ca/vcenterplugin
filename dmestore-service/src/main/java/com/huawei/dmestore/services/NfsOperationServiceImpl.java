@@ -567,6 +567,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     }
 
     private String updateFileSystem(Map<String, Object> params, String fileSystemId) throws DmeException {
+        if (StringUtils.isEmpty(fileSystemId)) {
+            throw new DmeException(CODE_503, "updateFileSystem fileSystemId is null");
+        }
         String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace(FILE_SYSTEM_ID, fileSystemId);
         LOG.info("DME 修改NFS请求报文:{}", gson.toJson(params));
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(params));
@@ -653,14 +656,17 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     }
 
     private Map<String, String> getOrientedFs(String fileSystemId) throws DmeException {
+        if(StringUtils.isEmpty(fileSystemId)){
+            throw new DmeException("query filesyste param fileSystemId is null");
+        }
         Map<String, String> resMap = new HashMap<>();
         resMap.put("code", "200");
-        resMap.put("msg", "list filesystem success!");
+        resMap.put("msg", "query filesystem success!");
         String url = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace(FILE_SYSTEM_ID, fileSystemId);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         int code = responseEntity.getStatusCodeValue();
         if (code != HttpStatus.OK.value()) {
-            throw new DmeException(String.valueOf(code), "list filesystem error!");
+            throw new DmeException(String.valueOf(code), "query filesystem error!");
         }
         String object = responseEntity.getBody();
         JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
