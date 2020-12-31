@@ -1516,7 +1516,7 @@ public class VCSDKUtils {
                             .createVmfsDatastore(datastoreName, objhsd, vmfsMajorVersion, blockSize, totalSectors,
                                 unmapGranularity, unmapPriority);
 
-                        logger.info("rescanVmfs after createVmfsDatastore");
+                        logger.info("rescanVmfs after createVmfsDatastore!datastore={}", datastore);
                         hostMo.getHostStorageSystemMo().rescanVmfs();
                     } catch (Exception e) {
                         throw new VcenterException(e.getMessage());
