@@ -197,8 +197,6 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             LOG.error("HttpClientErrorException:{}", e.toString());
             responseEntity = new ResponseEntity(e.getStatusCode());
         }
-        LOG.info("{},==responseEntity==return:{}", url,
-            responseEntity == null ? NULL_STRING : responseEntity.getStatusCodeValue());
         if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_401
             || responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_403) {
             LOG.info("token invalid, login again!");
@@ -210,9 +208,9 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             responseEntity = restTemplate.exchange(url, method, entity, String.class);
         }
 
+        LOG.info("{},retutn code={}", url, responseEntity.getStatusCodeValue());
         if (!String.valueOf(responseEntity.getStatusCodeValue()).startsWith("2")) {
-            LOG.info("{} {}==failed!，response={}, requestBody={}", url, method.name(), gson.toJson(responseEntity),
-                gson.toJson(requestBody));
+            LOG.info("{},{}==failed!，response={}", url, method.name(), gson.toJson(responseEntity));
         }
         return responseEntity;
     }
