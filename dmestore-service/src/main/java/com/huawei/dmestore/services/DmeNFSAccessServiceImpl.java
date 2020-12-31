@@ -153,6 +153,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         // 根据存储ID 获取逻nfs_share_id
         String nfsShareId = dmeVmwareRalationDao.getShareIdByStorageId(storageObjectId);
         String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace(NFS_SHARE_ID, nfsShareId);
+        LOG.error("getNfsDatastoreShareAttr!method=get, nfsShareId={},url={}, body=null", nfsShareId, url);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         if (responseEntity.getStatusCodeValue() / DIGIT_100 != DIGIT_2) {
             LOG.error("get NFS Share failed！response：{}", responseEntity.getBody());
@@ -179,11 +180,11 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     private List<AuthClient> getNfsDatastoreShareAuthClients(String shareId) throws DmeException {
         List<AuthClient> clientList = new ArrayList<>();
-        String url = DmeConstants.DME_NFS_SHARE_AUTH_CLIENTS_URL;
         Map<String, Object> body = new HashMap<>();
         body.put("nfs_share_id", shareId);
         body.put("page_no", 1);
         body.put("page_size", PAGE_SIZE_1000);
+        String url = DmeConstants.DME_NFS_SHARE_AUTH_CLIENTS_URL;
         if (isOldDme) {
             body.remove("nfs_share_id");
             url = DmeConstants.DME_NFS_SHARE_AUTH_CLIENTS_URL_OLD.replace(NFS_SHARE_ID, shareId);
@@ -740,23 +741,33 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 throw new DmeException("mount nfs To Host fail: vkernelIp is null");
             }
             Map<String, Object> requestbody = new HashMap<>();
-            requestbody.put(ID_FIELD, ToolUtils.getStr(params.get(SHAREID)));
             String vkernelIp = ToolUtils.getStr(params.get(HOSTVKERNELIP));
             Map<String, Object> addition = new HashMap<>();
             addition.put(NAME_FIELD, vkernelIp);
             String accessval = ("readOnly".equalsIgnoreCase(ToolUtils.getStr(params.get("mountType"))))
                 ? "read-only"
                 : "read/write";
-            addition.put("accessval", accessval);
-            addition.put("all_squash", "no_all_squash");
-            addition.put("root_squash", "root_squash");
-            addition.put("sync", "synchronization");
-            addition.put("secure", "insecure");
+            if (isOldDme) {
+                requestbody.put(ID_FIELD, ToolUtils.getStr(params.get(SHAREID)));
+                addition.put("accessval", accessval);
+                addition.put("all_squash", "no_all_squash");
+                addition.put("root_squash", "root_squash");
+                addition.put("sync", "synchronization");
+                addition.put("secure", "insecure");
+            } else {
+                addition.put("permission", accessval);
+                addition.put("permission_constraint", "no_all_squash");
+                addition.put("root_permission_constraint", "root_squash");
+                addition.put("write_mode", "synchronization");
+                addition.put("source_port_verification", "insecure");
+            }
+
             List<Map<String, Object>> listAddition = new ArrayList<>();
             listAddition.add(addition);
             requestbody.put("nfs_share_client_addition", listAddition);
-            String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace(NFS_SHARE_ID,
-                ToolUtils.getStr(params.get(SHAREID)));
+            String nfsShareId = ToolUtils.getStr(params.get(SHAREID));
+            String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace(NFS_SHARE_ID, nfsShareId);
+            LOG.error("mountnfsToHost!method=put, nfsShareId={},url={}, body={}", nfsShareId, url, gson.toJson(requestbody));
             ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(requestbody));
             if (responseEntity.getStatusCodeValue() == DIGIT_202) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -849,11 +860,11 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 taskIds.add(taskId);
             }
             LOG.info("dme delete share end,taskId={}", taskId);
-        }
-        boolean isShareDelete = taskService.checkTaskStatus(taskIds);
-        if (!isShareDelete) {
-            LOG.info("dme delete share failed!,taskId={}", taskId);
-            throw new DmeException("DME delete share failed!taskId=" + taskId);
+            boolean isShareDelete = taskService.checkTaskStatus(taskIds);
+            if (!isShareDelete) {
+                LOG.info("dme delete share failed!,taskId={}", taskId);
+                throw new DmeException("DME delete share failed!taskId=" + taskId);
+            }
         }
         taskIds.clear();
         if (!StringUtils.isEmpty(fsId)) {
@@ -862,15 +873,15 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 taskIds.add(taskId);
             }
             LOG.info("dme delete nfs filesystem end,taskId={}", taskId);
-        }
-        if (taskIds.size() > 0) {
-            boolean isDeleted = taskService.checkTaskStatus(taskIds);
-            if (isDeleted) {
-                // 关系解除
-                dmeVmwareRalationDao.deleteByStorageId(Arrays.asList(dataStorageId));
-                LOG.info("dme nfs delete filesystem success!");
-            } else {
-                throw new DmeException("DME delete nfs filesystem error!");
+            if (taskIds.size() > 0) {
+                boolean isDeleted = taskService.checkTaskStatus(taskIds);
+                if (isDeleted) {
+                    // 关系解除
+                    dmeVmwareRalationDao.deleteByStorageId(Arrays.asList(dataStorageId));
+                    LOG.info("dme nfs delete filesystem success!");
+                } else {
+                    throw new DmeException("DME delete nfs filesystem error!");
+                }
             }
         }
 
@@ -895,6 +906,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         requestbody.put("nfs_share_client_deletion", listAddition);
         try {
             String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace(NFS_SHARE_ID, shareId);
+            LOG.error("deleteAuthClient!method=put, nfsShareId={},url={}, body={}", shareId, url, gson.toJson(requestbody));
             ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(requestbody));
             if (responseEntity.getStatusCodeValue() == DIGIT_202) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();

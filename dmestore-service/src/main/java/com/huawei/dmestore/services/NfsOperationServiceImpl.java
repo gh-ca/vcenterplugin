@@ -656,7 +656,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     }
 
     private Map<String, String> getOrientedFs(String fileSystemId) throws DmeException {
-        if(StringUtils.isEmpty(fileSystemId)){
+        if (StringUtils.isEmpty(fileSystemId)) {
             throw new DmeException("query filesyste param fileSystemId is null");
         }
         Map<String, String> resMap = new HashMap<>();
@@ -729,6 +729,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             throw new DmeException("没有对应的共享");
         }
         String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace("{nfs_share_id}", nfsShareId);
+        LOG.error("deleteAuthClient!method=get, nfsShareId={},url={}, body=null", nfsShareId, url);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         if (responseEntity.getStatusCodeValue() != HttpStatus.OK.value()) {
             LOG.error("get NFS Share error！response：{}", responseEntity.getBody());
