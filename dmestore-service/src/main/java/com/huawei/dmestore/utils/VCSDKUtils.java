@@ -1036,6 +1036,10 @@ public class VCSDKUtils {
             ManagedObjectReference dsmor = vcConnectionHelpers.objectId2Mor(dataStoreObjectId);
             DatastoreMO dsMo = datastoreVmwareMoFactory.build(serverContext, dsmor);
             dsMo.renameDatastore(newName);
+
+            // 刷新
+            logger.info("==refreshDatastore afterend rename DataStore==");
+            dsMo.refreshDatastore();
             logger.info("==end rename DataStore==");
         } catch (Exception e) {
             result = FAILED_RESULT;
@@ -1049,7 +1053,7 @@ public class VCSDKUtils {
      *
      * @param dsname dsname
      * @param addCapacity addCapacity
-     * @param datastoreobjid datastoreobjid
+     * @param dataStoreObjectId dataStoreObjectId
      * @return String
      */
     public String expandVmfsDatastore(String dsname, Integer addCapacity, String dataStoreObjectId) {
@@ -1091,7 +1095,7 @@ public class VCSDKUtils {
                     HostVmfsVolume vmfs = datastoreInfo.getVmfs();
                     Long totalSectors = addCapacity * ToolUtils.GI * 1L / vmfs.getBlockSize();
                     spec.getPartition().setTotalSectors(totalSectors);
-                    logger.info("===设置扩容结束===");
+                    logger.info("===set expand params end===");
 
                     // 刷新vmfs存储，需等待2秒
                     List<DatastoreHostMount> hostMountInfos = dsMo.getHostMounts();
@@ -1102,6 +1106,9 @@ public class VCSDKUtils {
                     }
                     Thread.sleep(THREAD_SLEEP_2_SECENDS);
                     hdsMo.expandVmfsDatastore(dsMo, spec);
+
+                    logger.info("==refreshDatastore after expandVmfsDatastore==");
+                    dsMo.refreshDatastore();
                 } else {
                     logger.info("==queryVmfsDatastoreExpandOptions return null==");
                 }
@@ -1120,7 +1127,7 @@ public class VCSDKUtils {
     /**
      * recycle vmfs datastore capacity
      *
-     * @param dsname dsname
+     * @param datastoreObjectId datastoreObjectId
      * @return String
      * @throws VcenterException VcenterException
      */
@@ -1505,6 +1512,9 @@ public class VCSDKUtils {
                         datastore = hostMo.getHostDatastoreSystemMo()
                             .createVmfsDatastore(datastoreName, objhsd, vmfsMajorVersion, blockSize, totalSectors,
                                 unmapGranularity, unmapPriority);
+
+                        logger.info("rescanVmfs after createVmfsDatastore");
+                        hostMo.getHostStorageSystemMo().rescanVmfs();
                     } catch (Exception e) {
                         throw new VcenterException(e.getMessage());
                     }
@@ -1791,6 +1801,7 @@ public class VCSDKUtils {
             }
 
             // 挂载前重新扫描datastore
+            logger.info("refreshStorageSystem before mount Vmfs!");
             hostMo.getHostStorageSystemMo().refreshStorageSystem();
 
             // 查询目前未挂载的卷
@@ -1805,6 +1816,10 @@ public class VCSDKUtils {
                     logger.info("mount Vmfs success!");
                 }
             }
+
+            // 挂载后重新扫描datastore
+            logger.info("refreshStorageSystem after mount Vmfs!");
+            hostMo.getHostStorageSystemMo().refreshStorageSystem();
         } catch (Exception e) {
             logger.error(" mount vmfs volume error!datastoreName={},error:{}", datastoreName, e.getMessage());
         }
@@ -1817,16 +1832,16 @@ public class VCSDKUtils {
      * @param hostMo hostMo
      **/
     public void unmountVmfs(String datastoreName, HostMO hostMo) {
-        try {
-            if (StringUtils.isEmpty(datastoreName)) {
-                logger.info("unmountVmfs datastore Name is null");
-                return;
-            }
-            if (hostMo == null) {
-                logger.info("unmountVmfs host is null");
-                return;
-            }
 
+        if (StringUtils.isEmpty(datastoreName)) {
+            logger.info("unmountVmfs datastore Name is null");
+            return;
+        }
+        if (hostMo == null) {
+            logger.info("unmountVmfs host is null");
+            return;
+        }
+        try {
             // 卸载前重新扫描datastore  20201019 暂时屏蔽此方法。DME侧卸载后，vcenter侧调用重新扫描接口，会直接删除此vmfs 原因不详
             hostMo.getHostStorageSystemMo().rescanVmfs();
             for (HostFileSystemMountInfo mount : hostMo.getHostStorageSystemMo()
@@ -1838,6 +1853,10 @@ public class VCSDKUtils {
                     logger.info("unmount Vmfs success,volume name={},host name={}", volume.getName(), hostMo.getName());
                 }
             }
+
+            // 重新扫描
+            logger.info("==refreshStorageSystem after unmountVmfs==");
+            hostMo.getHostStorageSystemMo().refreshStorageSystem();
         } catch (Exception e) {
             logger.error("unmount Vmfs Volume:{},error:{}", datastoreName, e.getMessage());
         }
@@ -1985,6 +2004,10 @@ public class VCSDKUtils {
                     datastoreMo.getName(), mountType, nasdsinfo.getNas().getType(),
                     nasdsinfo.getNas().getSecurityType());
             logger.info("mount nfs success:{}:", hostMo.getName(), datastoreMo.getName());
+
+            // 挂载后重新扫描datastore
+            hostMo.getHostStorageSystemMo().refreshStorageSystem();
+            logger.info("Rescan datastore after mounting");
         } catch (Exception e) {
             logger.error("vmware mount nfs error:{}", e.getMessage());
         }
@@ -1995,7 +2018,7 @@ public class VCSDKUtils {
      *
      * @param dsmo dsmo
      * @param hostMo hostMo
-     * @param nfsId nfsId
+     * @param datastoreobjectid datastoreobjectid
      */
     public void unmountNfsOnHost(DatastoreMO dsmo, HostMO hostMo, String datastoreobjectid) {
         try {
@@ -2015,6 +2038,10 @@ public class VCSDKUtils {
             // 从主机卸载datastore
             hostMo.getHostDatastoreSystemMo().deleteDatastore(vcConnectionHelpers.objectId2Mor(datastoreobjectid));
             logger.info("unmount nfs success:hostName={},datastore name={}", hostMo.getName(), dsmo.getName());
+
+            // 卸载后重新扫描datastore
+            hostMo.getHostStorageSystemMo().refreshStorageSystem();
+            logger.info("Rescan datastore after unmounting");
         } catch (Exception e) {
             logger.error("unmount nfs error:{}", e.getMessage());
         }
