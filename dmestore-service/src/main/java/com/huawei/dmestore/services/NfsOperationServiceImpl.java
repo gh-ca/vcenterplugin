@@ -197,11 +197,19 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                     if (shareClientHostMap != null && shareClientHostMap.size() > 0
                         && shareClientHostMap.get("objectId") != null) {
                         reqNfsShareClientArrayAddition.put(NAME_FIELD, shareClientHostMap.get(NAME_FIELD));
-                        reqNfsShareClientArrayAddition.put("permission", params.get("accessModeDme"));
-                        reqNfsShareClientArrayAddition.put("write_mode", "synchronization");
-                        reqNfsShareClientArrayAddition.put("permission_constraint", "all_squash");
-                        reqNfsShareClientArrayAddition.put("root_permission_constraint", "root_squash");
-                        reqNfsShareClientArrayAddition.put("source_port_verification", "insecure");
+                        if (isOldDme) {
+                            reqNfsShareClientArrayAddition.put("accessval", params.get("accessModeDme"));
+                            reqNfsShareClientArrayAddition.put("sync", "synchronization");
+                            reqNfsShareClientArrayAddition.put("all_squash", "all_squash");
+                            reqNfsShareClientArrayAddition.put("root_squash", "root_squash");
+                            reqNfsShareClientArrayAddition.put("secure", "insecure");
+                        } else {
+                            reqNfsShareClientArrayAddition.put("permission", params.get("accessModeDme"));
+                            reqNfsShareClientArrayAddition.put("write_mode", "synchronization");
+                            reqNfsShareClientArrayAddition.put("permission_constraint", "all_squash");
+                            reqNfsShareClientArrayAddition.put("root_permission_constraint", "root_squash");
+                            reqNfsShareClientArrayAddition.put("source_port_verification", "insecure");
+                        }
                         mount.put((String) shareClientHostMap.get("objectId"),
                             (String) shareClientHostMap.get(NAME_FIELD));
                     }
@@ -275,7 +283,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 throw new VcenterRuntimeException(CODE_403, "create nfs datastore error!");
             }
             saveNfsInfoToDmeVmwareRelation(result, currentPortId, logicPortName, fsId, shareName, shareId, fsName);
-            LOG.info("nfs入库成功!{}", nfsName);
+            LOG.info("create nfs save relation success!nfsName={}", nfsName);
         } catch (DmeException e) {
             LOG.error("create nfs datastore error!", e);
             throw new DmeException(CODE_403, e.getMessage());
