@@ -451,7 +451,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     logicPorts.setVstoreId(ToolUtils.jsonToStr(element.get("vstore_id")));
                     logicPorts.setVstoreName(ToolUtils.jsonToStr(element.get("vstore_name")));
 
-                    if (isOldDme){
+                    if (isOldDme) {
                         logicPorts.setHomePortId(ToolUtils.jsonToStr(element.get("home_port_id")));
                         logicPorts.setCurrentPortId(ToolUtils.jsonToStr(element.get("current_port_id")));
                     }
@@ -584,8 +584,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         Map<String, String> params = new HashMap<>();
         params.put(STORAGE_ID, storageId);
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.API_DTREES_LIST,
-                HttpMethod.POST, gson.toJson(params));
+            String url = DmeConstants.API_DTREES_LIST;
+            if (isOldDme) {
+                url = DmeConstants.API_DTREES_LIST_OLD;
+            }
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(params));
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
                 throw new DmeException(CODE_503, "list dtree error!");

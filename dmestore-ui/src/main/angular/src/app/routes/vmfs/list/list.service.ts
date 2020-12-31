@@ -259,7 +259,8 @@ export class GetForm {
       pool_raw_id: null, // 卷所属存储池在存储设备上的id
       workload_type_id: null, // 应用类型id
       alloctype: null, // 卷分配类型，取值范围 thin，thick
-      control_policy: '1', // 控制策略
+      control_policy: null, // 控制策略
+      qosFlag: false, // 控制策略
       latencyChoose: false, // 时延 选中
       latency: null, // 时延，单位ms
       maxbandwidth: null, // 最大带宽
@@ -283,7 +284,7 @@ export class GetForm {
       name: null,
       isSameName: true, // 卷名称与vmfs名称是否相同
       volumeId: null, // 卷ID
-      control_policy: '1', // 控制策略,
+      control_policy: null, // 控制策略,
       max_iops: null,
       maxiopsChoose: false, // 最大iops 选中
       max_bandwidth: null,
@@ -299,6 +300,7 @@ export class GetForm {
       service_level_name: null, // 服务等级名称
       latency: null,
       latencyChoose: false, // 时延 选中
+      qosFlag: true
     };
     return editForm;
   }

@@ -109,14 +109,17 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             if (dataStoreObjectId != null) {
                 result = vcsdkUtils.renameDataStore(newDsName.toString(), dataStoreObjectId.toString());
             }
+            if (StringUtils.isEmpty(result) || "failed".equals(result)) {
+                throw new DmeException(CODE_503, "vmware update VmfsDatastore failed!");
+            }
+
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, reqBody);
             int code = responseEntity.getStatusCodeValue();
-            LOG.info("自定义方式创建vmfs{},请dme求参数：：", code+":"+reqBody);
-            if (code != HttpStatus.ACCEPTED.value() || StringUtils.isEmpty(result) || "failed".equals(result)) {
-                throw new DmeException(CODE_503, "update VmfsDatastore failed");
+            LOG.info("dme update vmfs,response:code={},response body={}", code, responseEntity.getBody());
+            if (code != HttpStatus.ACCEPTED.value()) {
+                throw new DmeException(CODE_503, "dme update VmfsDatastore failed!");
             }
-            String object = responseEntity.getBody();
-            JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
+            JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody()).getAsJsonObject();
             String taskId = ToolUtils.jsonToStr(jsonObject.get(TASK_ID));
             List<String> taskIds = new ArrayList<>();
             taskIds.add(taskId);

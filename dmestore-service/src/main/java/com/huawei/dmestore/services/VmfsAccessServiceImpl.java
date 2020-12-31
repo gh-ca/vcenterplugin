@@ -1562,9 +1562,13 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
         // DME侧卸载卷
         String taskId = volumeDeleteGetTaskId(params);
-        boolean isDmeDelete = false;
         if (!StringUtils.isEmpty(taskId)) {
-            isDmeDelete = taskService.checkTaskStatus(Arrays.asList(taskId));
+            boolean isDmeDelete = taskService.checkTaskStatus(Arrays.asList(taskId));
+            if (!isDmeDelete) {
+                throw new DmeException(taskService.queryTaskById(taskId).getDetail());
+            }
+        }else {
+            throw new DmeException("dme delete vmfs failed,task id is null!");
         }
 
         // vcenter侧 扫描
@@ -1591,9 +1595,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     }
                 }
             }
-        }
-        if (!isDmeDelete) {
-            throw new DmeException("delete volume precondition unmount host and hostGroup error(task status)!");
         }
 
         // 重新扫描关联关系 更新数据库
