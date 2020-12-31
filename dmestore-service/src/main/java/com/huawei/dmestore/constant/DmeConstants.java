@@ -263,6 +263,11 @@ public class DmeConstants {
     public static final String API_DTREES_LIST = "/rest/fileservice/v1/dtrees/query";
 
     /**
+     * 旧版本url : /rest/fileservice/v1/dtrees/summary
+     */
+    public static final String API_DTREES_LIST_OLD = "/rest/fileservice/v1/dtrees/summary";
+
+    /**
      * service level query
      **/
     public static final String LIST_SERVICE_LEVEL_URL = "/rest/service-policy/v1/service-levels";

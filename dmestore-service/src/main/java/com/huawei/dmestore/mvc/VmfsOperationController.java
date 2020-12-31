@@ -77,14 +77,14 @@ public class VmfsOperationController extends BaseController {
     /**
      * recycleVmfs
      *
-     * @param datastoreName datastoreName
+     * @param dsObjectIds dsObjectIds
      * @return ResponseBodyBean
      */
     @PostMapping("/recyclevmfs")
-    public ResponseBodyBean recycleVmfs(final @RequestBody List<String> datastoreName) {
-        LOG.info("recyclevmfs=={}", gson.toJson(datastoreName));
+    public ResponseBodyBean recycleVmfs(final @RequestBody List<String> dsObjectIds) {
+        LOG.info("recyclevmfs=={}", gson.toJson(dsObjectIds));
         try {
-            vmfsOperationService.recycleVmfsCapacity(datastoreName);
+            vmfsOperationService.recycleVmfsCapacity(dsObjectIds);
             return success();
         } catch (DmeException e) {
             return failure(e.getMessage());

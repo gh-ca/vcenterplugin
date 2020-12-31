@@ -179,6 +179,10 @@ public class NfsOperationController extends BaseController {
     private void advanceExcute(Map<String, Object> requestParams, Map<String, Object> targetParams, boolean isAdvance) {
         Map<String, Object> tuning = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         Map<String, Object> capacityAutonegotiation = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+        String defaultCapacitymode = CapacityAutonegotiation.CAPACITY_MODE_OFF;
+        if (isOldDme) {
+            defaultCapacitymode = CapacityAutonegotiation.CAPACITY_MODE_OFF_OLD;
+        }
         if (isAdvance) {
             boolean qosFlag = (Boolean) requestParams.get("qosFlag");
             if (qosFlag) {
@@ -203,10 +207,6 @@ public class NfsOperationController extends BaseController {
             tuning.put(COMPRESSION_ENABLED_FIELD, requestParams.get("compressionEnabled"));
             tuning.put(DEDUPLICATION_ENABLED_FIELD, requestParams.get("deduplicationEnabled"));
 
-            String defaultCapacitymode = CapacityAutonegotiation.CAPACITY_MODE_OFF;
-            if (isOldDme) {
-                defaultCapacitymode = CapacityAutonegotiation.CAPACITY_MODE_OFF_OLD;
-            }
             String capacitymode = (Boolean) requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD)
                 ? CapacityAutonegotiation.CAPACITY_MODE_AUTO : defaultCapacitymode;
             capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
@@ -216,7 +216,7 @@ public class NfsOperationController extends BaseController {
             tuning.put(COMPRESSION_ENABLED_FIELD, false);
             tuning.put(DEDUPLICATION_ENABLED_FIELD, false);
             capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, false);
-            capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, CapacityAutonegotiation.CAPACITY_MODE_OFF);
+            capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, defaultCapacitymode);
         }
         targetParams.put("tuning", tuning);
         targetParams.put("capacity_autonegotiation", capacityAutonegotiation);
