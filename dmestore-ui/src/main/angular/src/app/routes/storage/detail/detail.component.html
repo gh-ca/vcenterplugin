@@ -405,7 +405,7 @@
                           <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">
                             {{'storage.detail.perPage' | translate}}
                           </clr-dg-page-size>
-                          {{paginationFs.firstItem + 1}} - {{paginationFs.lastItem + 1}} of {{volumeTotal}}
+                          {{paginationFs.firstItem + 1}} - {{paginationFs.lastItem + 1}} of {{paginationFs.totalItems}}
                         </clr-dg-pagination>
                       </clr-dg-footer>
                     </clr-datagrid>
@@ -712,10 +712,10 @@
                           <clr-dg-cell>{{item.bandwith!=null?item.bandwith:'--'}}</clr-dg-cell>
                         </clr-dg-row>
                         <clr-dg-footer>
-                          <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="conTotal">
+                          <clr-dg-pagination #paginationController [clrDgPageSize]="10" [clrDgTotalItems]="conTotal">
                             <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
-                            {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-                            of {{pagination.totalItems}}
+                            {{paginationController.firstItem + 1}} - {{paginationController.lastItem + 1}}
+                            of {{paginationController.totalItems}}
                           </clr-dg-pagination>
                         </clr-dg-footer>
                       </clr-datagrid>
@@ -772,10 +772,10 @@
                           <clr-dg-cell>{{item.useage}}</clr-dg-cell>
                         </clr-dg-row>
                         <clr-dg-footer>
-                          <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="diskTotal">
+                          <clr-dg-pagination #paginationDisk [clrDgPageSize]="10" [clrDgTotalItems]="diskTotal">
                             <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
-                            {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-                            of {{pagination.totalItems}}
+                            {{paginationDisk.firstItem + 1}} - {{paginationDisk.lastItem + 1}}
+                            of {{paginationDisk.totalItems}}
                           </clr-dg-pagination>
                         </clr-dg-footer>
                       </clr-datagrid>
@@ -817,10 +817,10 @@
                                 <clr-dg-cell>{{item.useage}}</clr-dg-cell>
                               </clr-dg-row>
                               <clr-dg-footer>
-                                <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="fcTotal">
+                                <clr-dg-pagination #paginationPort [clrDgPageSize]="10" [clrDgTotalItems]="fcTotal">
                                   <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
-                                  {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-                                  of {{pagination.totalItems}}
+                                  {{paginationPort.firstItem + 1}} - {{paginationPort.lastItem + 1}}
+                                  of {{paginationPort.totalItems}}
                                 </clr-dg-pagination>
                               </clr-dg-footer>
                             </clr-datagrid>
@@ -861,10 +861,10 @@
                                 <clr-dg-cell>{{item.useage!=null?item.useage:'--'}}</clr-dg-cell>
                               </clr-dg-row>
                               <clr-dg-footer>
-                                <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="ethTotal">
+                                <clr-dg-pagination #paginationEth [clrDgPageSize]="10" [clrDgTotalItems]="ethTotal">
                                   <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
-                                  {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-                                  of {{pagination.totalItems}}
+                                  {{paginationEth.firstItem + 1}} - {{paginationEth.lastItem + 1}}
+                                  of {{paginationEth.totalItems}}
                                 </clr-dg-pagination>
                               </clr-dg-footer>
                             </clr-datagrid>
@@ -900,10 +900,10 @@
                                 <clr-dg-cell>{{item.usage!=null?item.usage:'--'}}</clr-dg-cell>
                               </clr-dg-row>
                               <clr-dg-footer>
-                                <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="fcoeTotal">
+                                <clr-dg-pagination #paginationFcoe [clrDgPageSize]="10" [clrDgTotalItems]="fcoeTotal">
                                   <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
-                                  {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-                                  of {{pagination.totalItems}}
+                                  {{paginationFcoe.firstItem + 1}} - {{paginationFcoe.lastItem + 1}}
+                                  of {{paginationFcoe.totalItems}}
                                 </clr-dg-pagination>
                               </clr-dg-footer>
                             </clr-datagrid>
@@ -942,10 +942,10 @@
 <!--                                <clr-dg-cell>{{item.bandwidth!=null?item.bandwidth:'&#45;&#45;'}}</clr-dg-cell>-->
 <!--                              </clr-dg-row>-->
 <!--                              <clr-dg-footer>-->
-<!--                                <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="bondTotal">-->
+<!--                                <clr-dg-pagination #paginationBond [clrDgPageSize]="10" [clrDgTotalItems]="bondTotal">-->
 <!--                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>-->
-<!--                                  {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}-->
-<!--                                  of {{pagination.totalItems}}-->
+<!--                                  {{paginationBond.firstItem + 1}} - {{paginationBond.lastItem + 1}}-->
+<!--                                  of {{paginationBond.totalItems}}-->
 <!--                                </clr-dg-pagination>-->
 <!--                              </clr-dg-footer>-->
 <!--                            </clr-datagrid>-->
@@ -989,10 +989,10 @@
                                 <clr-dg-cell>{{item.vstoreName!=null?item.vstoreName!=''?item.vstoreName:'--':'--'}}</clr-dg-cell>
                               </clr-dg-row>
                               <clr-dg-footer>
-                                <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="logicTotal">
+                                <clr-dg-pagination #paginationLogic [clrDgPageSize]="10" [clrDgTotalItems]="logicTotal">
                                   <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
-                                  {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
-                                  of {{pagination.totalItems}}
+                                  {{paginationLogic.firstItem + 1}} - {{paginationLogic.lastItem + 1}}
+                                  of {{paginationLogic.totalItems}}
                                 </clr-dg-pagination>
                               </clr-dg-footer>
                             </clr-datagrid>
@@ -1009,10 +1009,10 @@
 <!--                                <clr-dg-cell>{{item.failoverGroupType}}</clr-dg-cell>-->
 <!--                              </clr-dg-row>-->
 <!--                              <clr-dg-footer>-->
-<!--                                <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="failTotal">-->
+<!--                                <clr-dg-pagination #paginationFgs [clrDgPageSize]="10" [clrDgTotalItems]="failTotal">-->
 <!--                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>-->
-<!--                                  {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}-->
-<!--                                  of {{pagination.totalItems}}-->
+<!--                                  {{paginationFgs.firstItem + 1}} - {{paginationFgs.lastItem + 1}}-->
+<!--                                  of {{paginationFgs.totalItems}}-->
 <!--                                </clr-dg-pagination>-->
 <!--                              </clr-dg-footer>-->
 <!--                            </clr-datagrid>-->
