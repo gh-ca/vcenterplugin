@@ -420,6 +420,8 @@ export class AddComponent implements OnInit{
         && this.form.minbandwidth === null && this.form.miniops === null && this.form.latency === null) {
         this.form.control_policy = null;
       }
+      // 控制策略若未选清空数据
+      this.qosFunc(this.form);
       console.log('addFrom', this.form);
       // 打开 loading
       // this.globalsService.loading = true;
@@ -776,5 +778,22 @@ export class AddComponent implements OnInit{
       console.log("this.modalHandleLoading", this.modalHandleLoading)
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
+  }
+  qosFunc(form) {
+    console.log("form.qosFlag", form.qosFlag);
+    if (!form.qosFlag) {// 关闭状态
+      form.control_policy = '';
+      form.maxbandwidthChoose = false;
+      form.maxbandwidth = null;
+      form.maxiopsChoose = false;
+      form.maxiops = null;
+      form.minbandwidthChoose = false;
+      form.minbandwidth = null;
+      form.miniopsChoose = false;
+      form.miniops = null;
+      form.latencyChoose = false;
+      form.latency = null;
+    }
+
   }
 }

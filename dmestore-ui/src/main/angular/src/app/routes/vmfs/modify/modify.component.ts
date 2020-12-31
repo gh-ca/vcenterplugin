@@ -42,6 +42,7 @@ export class ModifyComponent implements OnInit{
   matchErr = false; // 名称校验 是否只由字母与数字组成 true：是 false 否
   vmfsNameRepeatErr = false; // vmfs名称是否重复 true：是 false 否
   volNameRepeatErr = false; // Vol名称是否重复 true：是 false 否
+  modifyNameChanged = false;
 
   ngOnInit(): void {
     this.initData();
@@ -280,5 +281,17 @@ export class ModifyComponent implements OnInit{
       }
     }
     console.log("this.vmfsNameRepeatErr, this.volNameRepeatErr", this.vmfsNameRepeatErr, this.volNameRepeatErr)
+  }
+  /**
+   * 编辑页面  名称变化Func
+   */
+  modifyNameChange() {
+    const oldName = this.vmfsInfo.volumeName;
+    if (oldName !== this.modifyForm.name) {
+      this.modifyNameChanged = true;
+    } else {
+      this.modifyNameChanged = false;
+    }
+    console.log("this.modifyForm.name", this.modifyForm.name);
   }
 }
