@@ -222,29 +222,33 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             }
             String storagePoolId = (String) params.get("storage_pool_id");
             String taskId = createFileSystem(fsMap, storagePoolId);
+            if (StringUtils.isEmpty(taskId)) {
+                throw new DmeException(CODE_403, "dme create FileSystem failed, task id is null");
+            }
             String fsId = "";
             String shareId = "";
             List<String> taskIds = new ArrayList<>();
-            if (!StringUtils.isEmpty(taskId)) {
-                taskIds.add(taskId);
-                if (taskService.checkTaskStatus(taskIds)) {
-                    fsId = getFsIdByName(fsName);
+            taskIds.add(taskId);
+            if (taskService.checkTaskStatus(taskIds)) {
+                fsId = getFsIdByName(fsName);
+            } else {
+                // 查询任务详细信息，获取报错信息
+                TaskDetailInfo taskDetailInfo = taskService.queryTaskById(taskId);
+                throw new DmeException(CODE_403, "create FileSystem fail!" + taskDetailInfo.getDetail());
+            }
+            if (!"".equals(fsId)) {
+                if (isOldDme) {
+                    nfsShareMap.put("fs_id", fsId);
                 } else {
-                    // 查询任务详细信息，获取报错信息
-                    TaskDetailInfo taskDetailInfo = taskService.queryTaskById(taskId);
-                    throw new DmeException(CODE_403, "create FileSystem fail!" + taskDetailInfo.getDetail());
-                }
-                if (!"".equals(fsId)) {
-                    //nfsShareMap.put("fs_id", fsId);
                     createNfsShareParams.put("fs_id", fsId);
-                    LOG.info("DME nfs share 创建请求参数报文:{}", gson.toJson(nfsShareMap));
-                    String nfsShareTaskId = createNfsShare(nfsShareMap);
-                    List<String> shareIds = new ArrayList<>();
-                    shareIds.add(nfsShareTaskId);
-                    if (taskService.checkTaskStatus(shareIds)) {
-                        // 查询shareId
-                        shareId = getShareIdByName(shareName, fsName);
-                    }
+                }
+                LOG.info("DME create nfs share request params:{}", gson.toJson(nfsShareMap));
+                String nfsShareTaskId = createNfsShare(nfsShareMap);
+                List<String> shareIds = new ArrayList<>();
+                shareIds.add(nfsShareTaskId);
+                if (taskService.checkTaskStatus(shareIds)) {
+                    // 查询shareId
+                    shareId = getShareIdByName(shareName, fsName);
                 }
             }
             String serverHost = "";
@@ -461,7 +465,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
         LOG.info("DME 创建NFS报文：{}", gson.toJson(params));
         String url = DmeConstants.API_FS_CREATE;
-        if(isOldDme){
+        if (isOldDme) {
             url = DmeConstants.API_FS_CREATE_OLD;
         }
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(params));
