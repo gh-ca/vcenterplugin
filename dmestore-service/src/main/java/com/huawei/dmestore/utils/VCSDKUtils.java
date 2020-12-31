@@ -1140,7 +1140,10 @@ public class VCSDKUtils {
             HostDatastoreSystemMO hostDatastoreSystemMo = new HostDatastoreSystemMO(serverContext, dataStoreMor);
             List<String> datastoreObjectIds = new ArrayList<>();
             datastoreObjectIds.add(datastoreObjectId);
+            logger.error("recycleVmfsCapacity begin!datastoreObjectId={},name={},serverAddress={}", datastoreObjectId,
+                hostDatastoreSystemMo.getName(), serverContext.getServerAddress());
             hostDatastoreSystemMo.unmapVmfsVolumeExTask(datastoreObjectIds);
+            logger.error("recycleVmfsCapacity end!");
         } catch (Exception e) {
             logger.error("recycleVmfsCapacity error:{}", e.getMessage());
             throw new VcenterException(e.getMessage());
@@ -2541,7 +2544,7 @@ public class VCSDKUtils {
      * @throws VcenterException VcenterException
      **/
     public boolean deleteNfs(String dataStoreObjectId, List<String> hostObjIds) throws VcenterException {
-        boolean reValue = false;
+        boolean reValue = true;
         logger.info("vmware delete nfs begin!");
         if (StringUtils.isEmpty(dataStoreObjectId)) {
             logger.info("delete dataStore error! datasotreObject id is null");
@@ -2564,12 +2567,9 @@ public class VCSDKUtils {
 
                 // 主机删除存储
                 deleteNfs(dsmo, hostmo, dataStoreObjectId);
-                reValue = true;
-
-                // 删除成功后不再重复删除
-                break;
             }
         } catch (Exception e) {
+            reValue = false;
             logger.error("vmware delete nfs error!{}", gson.toJson(e));
         }
         logger.info("vmware delete nfs end!reValue={}", reValue);

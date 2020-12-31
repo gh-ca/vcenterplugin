@@ -2,6 +2,7 @@ package com.huawei.vmware.mo;
 
 import com.huawei.vmware.util.VmwareContext;
 
+import com.google.gson.Gson;
 import com.vmware.vim25.CustomFieldStringValue;
 import com.vmware.vim25.DatastoreInfo;
 import com.vmware.vim25.DynamicProperty;
@@ -20,6 +21,8 @@ import com.vmware.vim25.VmfsDatastoreCreateSpec;
 import com.vmware.vim25.VmfsDatastoreExpandSpec;
 import com.vmware.vim25.VmfsDatastoreOption;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
@@ -33,6 +36,8 @@ import java.util.List;
  * @since 2020-12-11
  */
 public class HostDatastoreSystemMO extends BaseMO {
+    private static final Logger LOG = LoggerFactory.getLogger(HostDatastoreSystemMO.class);
+
     /**
      * HostDatastoreSystemMO
      *
@@ -42,8 +47,6 @@ public class HostDatastoreSystemMO extends BaseMO {
     public HostDatastoreSystemMO(VmwareContext context, ManagedObjectReference morHostDatastore) {
         super(context, morHostDatastore);
     }
-
-
 
     /**
      * queryVmfsDatastoreExpandOptions
@@ -106,10 +109,11 @@ public class HostDatastoreSystemMO extends BaseMO {
         vmfsDatastoreCreateSpec.getVmfs().setUnmapPriority(unmapPriority);
         vmfsDatastoreCreateSpec.getPartition().setTotalSectors(totalSectors);
 
+        LOG.info("==vmware createVmfsDatastore params==datastoreName{},request params={}", datastoreName,
+            new Gson().toJson(vmfsDatastoreCreateSpec));
+
         return context.getService().createVmfsDatastore(mor, vmfsDatastoreCreateSpec);
     }
-
-
 
     /**
      * deleteDatastore
@@ -125,7 +129,6 @@ public class HostDatastoreSystemMO extends BaseMO {
         }
         return false;
     }
-
 
     /**
      * createNfsDatastore
@@ -163,9 +166,9 @@ public class HostDatastoreSystemMO extends BaseMO {
 
         // readOnly/readWrite
         if (!StringUtils.isEmpty(accessMode)) {
-            if ("readOnly".equalsIgnoreCase(accessMode)){
+            if ("readOnly".equalsIgnoreCase(accessMode)) {
                 spec.setAccessMode("readOnly");
-            }else {
+            } else {
                 spec.setAccessMode("readWrite");
             }
         }

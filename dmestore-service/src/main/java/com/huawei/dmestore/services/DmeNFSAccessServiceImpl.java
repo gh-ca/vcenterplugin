@@ -617,6 +617,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     private void getFsDetailInfo(NfsDataInfo nfsDataInfo, String fsId) {
         try {
+            if (StringUtils.isEmpty(fsId)) {
+                return;
+            }
             String fsUrl = DmeConstants.DME_NFS_FILESERVICE_DETAIL_URL.replace("{file_system_id}", fsId);
             ResponseEntity<String> responseTuning = dmeAccessService.access(fsUrl, HttpMethod.GET, null);
             if (responseTuning.getStatusCodeValue() / DIGIT_100 == DIGIT_2) {
