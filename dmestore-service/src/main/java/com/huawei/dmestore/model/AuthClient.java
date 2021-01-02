@@ -39,6 +39,16 @@ public class AuthClient {
      */
     private String type;
 
+    private String clientIdInStorage;
+
+    public String getClientIdInStorage() {
+        return clientIdInStorage;
+    }
+
+    public void setClientIdInStorage(String clientIdInStorage) {
+        this.clientIdInStorage = clientIdInStorage;
+    }
+
     /**
      * getAccessval .
      *
