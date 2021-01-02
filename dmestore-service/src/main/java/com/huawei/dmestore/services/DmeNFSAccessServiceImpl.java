@@ -95,6 +95,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     private static final String OBJECTID = "objectId";
 
+    private static final String NFS_SHARE_ID_FIELD = "nfs_share_id";
+
     private Gson gson = new Gson();
 
     private DmeVmwareRalationDao dmeVmwareRalationDao;
@@ -181,12 +183,14 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     private List<AuthClient> getNfsDatastoreShareAuthClients(String shareId) throws DmeException {
         List<AuthClient> clientList = new ArrayList<>();
         Map<String, Object> body = new HashMap<>();
-        body.put("nfs_share_id", shareId);
+        body.put(NFS_SHARE_ID_FIELD, shareId);
         body.put("page_no", 1);
         body.put("page_size", PAGE_SIZE_1000);
         String url = DmeConstants.DME_NFS_SHARE_AUTH_CLIENTS_URL;
+        String shareIdKey = NFS_SHARE_ID_FIELD;
         if (isOldDme) {
             body.remove("nfs_share_id");
+            shareIdKey = ID_FIELD;
             url = DmeConstants.DME_NFS_SHARE_AUTH_CLIENTS_URL_OLD.replace(NFS_SHARE_ID, shareId);
         }
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(body));
@@ -202,11 +206,12 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                     authClient.setName(ToolUtils.jsonToStr(client.get(NAME_FIELD)));
                     authClient.setType(ToolUtils.jsonToStr(client.get("type")));
                     authClient.setAccessval(ToolUtils.jsonToStr(client.get("permission")));
-                    authClient.setId(ToolUtils.jsonToStr(client.get(ID_FIELD)));
+                    authClient.setId(ToolUtils.jsonToStr(client.get(shareIdKey)));
                     clientList.add(authClient);
                 }
             }
         }
+        LOG.info("query share authclient response:{}", gson.toJson(clientList));
         return clientList;
     }
 
@@ -410,9 +415,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     private Map<String, Object> queryShareInfo(String sharePath) throws DmeException {
-        ResponseEntity responseEntity = listShareBySharePath(sharePath);
+        ResponseEntity<String> responseEntity = listShareBySharePath(sharePath);
         if (responseEntity.getStatusCodeValue() / DIGIT_100 == DIGIT_2) {
-            Object object = responseEntity.getBody();
+            String object = responseEntity.getBody();
             List<Map<String, Object>> list = converShare(object);
             if (list.size() > 0) {
                 return list.get(0);
@@ -421,39 +426,34 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return Collections.EMPTY_MAP;
     }
 
-    private ResponseEntity listShareBySharePath(String sharePath) throws DmeException {
+    private ResponseEntity<String> listShareBySharePath(String sharePath) throws DmeException {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put(SHARE_PATH, sharePath);
         String url = DmeConstants.DME_NFS_SHARE_URL;
         if (isOldDme) {
             url = DmeConstants.DME_NFS_SHARE_URL_OLD;
         }
-        ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(requestbody));
-        return responseEntity;
+        return dmeAccessService.access(url, HttpMethod.POST, gson.toJson(requestbody));
     }
 
-    private List<Map<String, Object>> converShare(Object object) {
+    private List<Map<String, Object>> converShare(String object) {
         List<Map<String, Object>> shareList = new ArrayList<>();
-        JsonArray jsonArray;
-        String strObject = gson.toJson(object);
-        if (strObject.contains(TOTAL) && strObject.contains("nfs_share_info_list")) {
-            JsonObject temp = new JsonParser().parse(object.toString()).getAsJsonObject();
-            jsonArray = temp.get("nfs_share_info_list").getAsJsonArray();
-        } else {
-            jsonArray = new JsonParser().parse(object.toString()).getAsJsonArray();
-        }
-        for (JsonElement jsonElement : jsonArray) {
-            Map<String, Object> shareMap = new HashMap<>();
-            JsonObject jsonObject = jsonElement.getAsJsonObject();
-            shareMap.put(ID_FIELD, ToolUtils.jsonToStr(jsonObject.get(ID_FIELD)));
-            shareMap.put(NAME_FIELD, ToolUtils.jsonToStr(jsonObject.get(NAME_FIELD)));
-            shareMap.put(SHARE_PATH, ToolUtils.jsonToStr(jsonObject.get(SHARE_PATH)));
-            shareMap.put(STORAGE_ID, ToolUtils.jsonToStr(jsonObject.get(STORAGE_ID)));
-            shareMap.put(DEVICE_NAME, ToolUtils.jsonToStr(jsonObject.get(DEVICE_NAME)));
-            shareMap.put(OWNING_DTREE_ID, ToolUtils.jsonToStr(jsonObject.get(OWNING_DTREE_ID)));
-            shareMap.put(OWNING_DTREE_NAME, ToolUtils.jsonToStr(jsonObject.get(OWNING_DTREE_NAME)));
-            shareMap.put(FS_NAME, ToolUtils.jsonToStr(jsonObject.get(FS_NAME)));
-            shareList.add(shareMap);
+        if (object.contains(TOTAL) && object.contains("nfs_share_info_list")) {
+            JsonObject temp = new JsonParser().parse(object).getAsJsonObject();
+            JsonArray jsonArray = temp.get("nfs_share_info_list").getAsJsonArray();
+            for (int index = 0; index < jsonArray.size(); index++) {
+                Map<String, Object> shareMap = new HashMap<>();
+                JsonObject jsonObject = jsonArray.get(index).getAsJsonObject();
+                shareMap.put(ID_FIELD, ToolUtils.jsonToStr(jsonObject.get(ID_FIELD)));
+                shareMap.put(NAME_FIELD, ToolUtils.jsonToStr(jsonObject.get(NAME_FIELD)));
+                shareMap.put(SHARE_PATH, ToolUtils.jsonToStr(jsonObject.get(SHARE_PATH)));
+                shareMap.put(STORAGE_ID, ToolUtils.jsonToStr(jsonObject.get(STORAGE_ID)));
+                shareMap.put(DEVICE_NAME, ToolUtils.jsonToStr(jsonObject.get(DEVICE_NAME)));
+                shareMap.put(OWNING_DTREE_ID, ToolUtils.jsonToStr(jsonObject.get(OWNING_DTREE_ID)));
+                shareMap.put(OWNING_DTREE_NAME, ToolUtils.jsonToStr(jsonObject.get(OWNING_DTREE_NAME)));
+                shareMap.put(FS_NAME, ToolUtils.jsonToStr(jsonObject.get(FS_NAME)));
+                shareList.add(shareMap);
+            }
         }
         return shareList;
     }
@@ -767,7 +767,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             requestbody.put("nfs_share_client_addition", listAddition);
             String nfsShareId = ToolUtils.getStr(params.get(SHAREID));
             String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace(NFS_SHARE_ID, nfsShareId);
-            LOG.error("mountnfsToHost!method=put, nfsShareId={},url={}, body={}", nfsShareId, url, gson.toJson(requestbody));
+            LOG.error("mountnfsToHost!method=put, nfsShareId={},url={}, body={}", nfsShareId, url,
+                gson.toJson(requestbody));
             ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(requestbody));
             if (responseEntity.getStatusCodeValue() == DIGIT_202) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
@@ -785,7 +786,6 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     public void unmountNfs(Map<String, Object> params) throws DmeException {
         String dataStoreObjectId = ToolUtils.getStr(params.get(DATASTOREOBJECTID));
         String hostObjId = ToolUtils.getStr(params.get("hostId"));
-        vcsdkUtils.hasVmOnDatastore(dataStoreObjectId);
         DmeVmwareRelation dvr = dmeVmwareRalationDao.getDmeVmwareRelationByDsId(dataStoreObjectId);
         if (dvr == null) {
             LOG.error("unmountNfs get relation error!dataStoreObjectId={}", dataStoreObjectId);
@@ -814,8 +814,6 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                     LOG.error("unmountNfs mountnfs error!taskId={}", taskId);
                     throw new DmeException("DME mount nfs error(task status)!");
                 }
-            } else {
-                throw new DmeException("DME mount nfs error(task is null)!");
             }
         }
     }
@@ -906,7 +904,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         requestbody.put("nfs_share_client_deletion", listAddition);
         try {
             String url = DmeConstants.DME_NFS_SHARE_DETAIL_URL.replace(NFS_SHARE_ID, shareId);
-            LOG.error("deleteAuthClient!method=put, nfsShareId={},url={}, body={}", shareId, url, gson.toJson(requestbody));
+            LOG.error("deleteAuthClient!method=put, nfsShareId={},url={}, body={}", shareId, url,
+                gson.toJson(requestbody));
             ResponseEntity responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(requestbody));
             if (responseEntity.getStatusCodeValue() == DIGIT_202) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
