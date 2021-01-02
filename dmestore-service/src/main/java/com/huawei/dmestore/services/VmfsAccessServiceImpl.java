@@ -389,6 +389,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private String createVmfsOnVmware(Map<String, Object> params) throws DmeException {
         // 在vmware创建存储
         String dataStoreStr = "";
+        LOG.info("create vmfs on vmware begin !");
         try {
             if (params != null) {
                 // 创建vmware中的vmfs存储。 cluster host
