@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import springfox.documentation.spring.web.json.Json;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -321,6 +322,30 @@ public class ToolUtils {
         consObj1.add("simple", simple1);
         consObj1.addProperty("logOp", "and");
         constraint.add(consObj1);
+        JsonObject condition = new JsonObject();
+        condition.add("constraint", constraint);
+        return condition.toString();
+    }
+
+    public static String getRequsetParams(Map<String,String> map) {
+        JsonArray constraint = new JsonArray();
+        for (Map.Entry<String,String> entry : map.entrySet()) {
+            JsonObject simple = new JsonObject();
+            simple.addProperty("name", "dataStatus");
+            simple.addProperty("operator", "equal");
+            simple.addProperty("value", "normal");
+            JsonObject consObj = new JsonObject();
+            consObj.add("simple", simple);
+            JsonObject simple1 = new JsonObject();
+            simple1.addProperty("name", entry.getKey());
+            simple1.addProperty("operator", "equal");
+            simple1.addProperty("value", entry.getValue());
+            JsonObject consObj1 = new JsonObject();
+            consObj1.add("simple", simple1);
+            consObj1.addProperty("logOp", "and");
+            constraint.add(consObj);
+            constraint.add(consObj1);
+        }
         JsonObject condition = new JsonObject();
         condition.add("constraint", constraint);
         return condition.toString();
