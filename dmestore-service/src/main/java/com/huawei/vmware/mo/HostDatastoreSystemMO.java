@@ -97,6 +97,7 @@ public class HostDatastoreSystemMO extends BaseMO {
     public ManagedObjectReference createVmfsDatastore(String datastoreName, HostScsiDisk hostScsiDisk,
         int vmfsMajorVersion, int blockSize, long totalSectors, int unmapGranularity, String unmapPriority)
         throws Exception {
+        LOG.info("creating vmfs on vcenter!");
         VmfsDatastoreOption vmfsDatastoreOption = context.getService()
             .queryVmfsDatastoreCreateOptions(mor, hostScsiDisk.getDevicePath(), vmfsMajorVersion)
             .get(0);
