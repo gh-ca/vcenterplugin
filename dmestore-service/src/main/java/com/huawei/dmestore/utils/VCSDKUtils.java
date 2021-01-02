@@ -242,10 +242,8 @@ public class VCSDKUtils {
                         }
                         if (StringUtils.isEmpty(storeType)) {
                             lists.add(dsmap);
-                            logger.info("datastore {} get success!size = {}", ds1.getName(), lists.size());
                         } else if (ds1.getSummary().getType().equals(storeType)) {
                             lists.add(dsmap);
-                            logger.info("{} datastore {} get success! size = ", storeType, ds1.getName(), lists.size());
                         }
                     }
                     if (lists.size() > 0) {
@@ -1503,6 +1501,7 @@ public class VCSDKUtils {
     public String createVmfsDataStore(Map<String, Object> hsdmap, int capacity, String datastoreName,
         int vmfsMajorVersion, int blockSize, int unmapGranularity, String unmapPriority) throws VcenterException {
         String dataStoreStr = "";
+        logger.info("begin create vmfs datastore!");
         try {
             if (hsdmap != null && hsdmap.get(DmeConstants.HOST) != null) {
                 HostScsiDisk objhsd = (HostScsiDisk) hsdmap.get(HOST_SCSI_DISK);
