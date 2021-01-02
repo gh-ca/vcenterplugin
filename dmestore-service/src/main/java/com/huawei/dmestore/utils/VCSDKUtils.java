@@ -2034,12 +2034,11 @@ public class VCSDKUtils {
             }
 
             // 卸载前重新扫描datastore
-            hostMo.getHostStorageSystemMo().refreshStorageSystem();
-            logger.info("Rescan datastore before unmounting");
+            //hostMo.getHostStorageSystemMo().refreshStorageSystem();
+            //logger.info("Rescan datastore before unmounting");
 
             // 从主机卸载datastore
             hostMo.getHostDatastoreSystemMo().deleteDatastore(vcConnectionHelpers.objectId2Mor(datastoreobjectid));
-            logger.info("unmount nfs success:hostName={},datastore name={}", hostMo.getName(), dsmo.getName());
 
             // 卸载后重新扫描datastore
             hostMo.getHostStorageSystemMo().refreshStorageSystem();
@@ -2566,6 +2565,7 @@ public class VCSDKUtils {
 
                 // 主机删除存储
                 deleteNfs(dsmo, hostmo, dataStoreObjectId);
+                break;
             }
         } catch (Exception e) {
             reValue = false;
@@ -2582,9 +2582,7 @@ public class VCSDKUtils {
         logger.info("=========vmware delete nfs process end=========");
 
         // 删除后重新扫描datastore
-        logger.info("=========rescanVmfs after vmware delete nfs process=======", hostMo.getName(), dsmo.getName());
         hostMo.getHostStorageSystemMo().rescanVmfs();
-        logger.info("=====vmware delete nfs success!host name={}, datastore name={}", hostMo.getName(), dsmo.getName());
     }
 
     /**
