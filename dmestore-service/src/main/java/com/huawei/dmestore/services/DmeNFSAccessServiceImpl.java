@@ -207,6 +207,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                     authClient.setType(ToolUtils.jsonToStr(client.get("type")));
                     authClient.setAccessval(ToolUtils.jsonToStr(client.get("permission")));
                     authClient.setId(ToolUtils.jsonToStr(client.get(shareIdKey)));
+                    authClient.setClientIdInStorage(ToolUtils.jsonToStr(client.get("client_id_in_storage")));
                     clientList.add(authClient);
                 }
             }
@@ -802,7 +803,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
                 String authId = authClient.getId();
                 String ip = authClient.getName();
                 if (!StringUtils.isEmpty(ip) && !StringUtils.isEmpty(authId)) {
-                    authIdIpMap.put(authId, ip);
+                    authIdIpMap.put(authClient.getClientIdInStorage(), ip);
                 }
             }
             String taskId = deleteAuthClient(shareId, authIdIpMap);
