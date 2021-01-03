@@ -30,7 +30,7 @@
           <label></label>
           <clr-checkbox-wrapper>
             <input type="checkbox" clrCheckbox [(ngModel)]="updateNfs.sameName" name="sameName" />
-            <label>{{'nfs.sameName' | translate}}</label>
+            <label>{{'nfs.modifySameName' | translate}}</label>
           </clr-checkbox-wrapper>
         </clr-checkbox-container>
         <clr-input-container *ngIf="!updateNfs.sameName">
@@ -42,15 +42,15 @@
             <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
           </clr-control-error>
         </clr-input-container>
-        <clr-input-container *ngIf="!updateNfs.sameName">
-          <label>{{'nfs.shareName' | translate}}</label>
-          <input clrInput [(ngModel)]="updateNfs.shareName" maxlength="256" name="shareName" (blur)="checkShareName();" />
-          <clr-control-error>
-            <p *ngIf="!oldShareName" style="color: red">{{'errorMsg.require' | translate}}</p>
-            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
-            <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
-          </clr-control-error>
-        </clr-input-container>
+<!--        <clr-input-container *ngIf="!updateNfs.sameName">-->
+<!--          <label>{{'nfs.shareName' | translate}}</label>-->
+<!--          <input clrInput [(ngModel)]="updateNfs.shareName" maxlength="256" name="shareName" (blur)="checkShareName();" />-->
+<!--          <clr-control-error>-->
+<!--            <p *ngIf="!oldShareName" style="color: red">{{'errorMsg.require' | translate}}</p>-->
+<!--            <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>-->
+<!--            <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>-->
+<!--          </clr-control-error>-->
+<!--        </clr-input-container>-->
         <!--qos-->
         <clr-toggle-wrapper>
           <label>{{'nfs.qosPolicy' | translate}}</label>
