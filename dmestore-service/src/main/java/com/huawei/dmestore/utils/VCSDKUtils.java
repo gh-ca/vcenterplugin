@@ -1139,14 +1139,33 @@ public class VCSDKUtils {
         try {
             VmwareContext serverContext = vcConnectionHelpers.getServerContext(serverguid);
             ManagedObjectReference dataStoreMor = vcConnectionHelpers.objectId2Mor(datastoreObjectId);
-            HostDatastoreSystemMO hostDatastoreSystemMo = new HostDatastoreSystemMO(serverContext, dataStoreMor);
-            VmfsDatastoreInfo datastoreInfo = (VmfsDatastoreInfo)hostDatastoreSystemMo.getDatastoreInfo(dataStoreMor);
-            HostVmfsVolume vmfs = datastoreInfo.getVmfs();
-            List<String> datastoreObjectIds = new ArrayList<>();
-            datastoreObjectIds.add(vmfs.getUuid());
-            logger.info("recycleVmfsCapacity begin!datastoreObjectId={},name={},serverAddress={}", datastoreObjectId,
-                hostDatastoreSystemMo.getName(), serverContext.getServerAddress());
-            hostDatastoreSystemMo.unmapVmfsVolumeExTask(datastoreObjectIds);
+            DatastoreMO datastoreMo = new DatastoreMO(serverContext, dataStoreMor);
+            DatastoreSummary summary = datastoreMo.getSummary();
+            if (!summary.getType().equalsIgnoreCase(DmeConstants.STORE_TYPE_VMFS)) {
+                logger.info("datastore is not VMFS!datastoreObjectId={}", datastoreObjectId);
+                return FAILED_RESULT;
+            }
+            VmfsDatastoreInfo vmfsDatastoreInfo = datastoreMo.getVmfsDatastoreInfo();
+            HostVmfsVolume hostVmfsVolume = vmfsDatastoreInfo.getVmfs();
+            List<String> vmfsUuids = new ArrayList<>();
+            vmfsUuids.add(hostVmfsVolume.getUuid());
+            String hostStr = getMountHostsByDsObjectId(datastoreObjectId);
+            if (StringUtils.isEmpty(hostStr)) {
+                logger.info("get mount hosts return null!datastoreObjectId={}", datastoreObjectId);
+                return FAILED_RESULT;
+            }
+            List<Map<String, String>> hostMapList = gson.fromJson(hostStr,
+                new TypeToken<List<Map<String, String>>>() { }.getType());
+            HostDatastoreSystemMO hdsMo = null;
+            for (Map<String, String> hostMap : hostMapList) {
+                ManagedObjectReference hostMor = vcConnectionHelpers.objectId2Mor(hostMap.get(HOST_ID));
+                HostMO host1 = hostVmwareFactory.build(serverContext, hostMor);
+                if (null != host1) {
+                    hdsMo = host1.getHostDatastoreSystemMo();
+                    break;
+                }
+            }
+            hdsMo.unmapVmfsVolumeExTask(vmfsUuids);
             logger.error("recycleVmfsCapacity end!");
         } catch (Exception e) {
             logger.error("recycleVmfsCapacity error:{}", e.getMessage());
