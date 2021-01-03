@@ -62,7 +62,6 @@ export class NfsModifyComponent implements OnInit{
     this.modalHandleLoading=true;
     console.log(this.updateNfs);
     if (this.updateNfs.sameName){
-      this.updateNfs.shareName=this.updateNfs.nfsName;
       this.updateNfs.fsName=this.updateNfs.nfsName;
     }
     this.modifyService.updateNfs(this.updateNfs).subscribe((result: any) => {

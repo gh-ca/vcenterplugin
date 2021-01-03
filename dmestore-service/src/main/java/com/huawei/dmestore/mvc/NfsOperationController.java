@@ -209,6 +209,14 @@ public class NfsOperationController extends BaseController {
 
             String capacitymode = (Boolean) requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD)
                 ? CapacityAutonegotiation.CAPACITY_MODE_AUTO : defaultCapacitymode;
+           /* if ("grow".equalsIgnoreCase(capacitymode)){
+                capacityAutonegotiation.put("capacity_recycle_mode","expand_capacity");
+                capacityAutonegotiation.put("auto_grow_threshold_percent",true);
+                capacityAutonegotiation.put("auto_shrink_threshold_percent",50);
+                capacityAutonegotiation.put("max_auto_size", 16777216);
+                capacityAutonegotiation.put("min_auto_size",16777216);
+                capacityAutonegotiation.put("auto_size_increment",1);
+            }*/
             capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
             capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
         } else {
@@ -239,9 +247,17 @@ public class NfsOperationController extends BaseController {
         Object autoSizeEnable = params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD);
         if (autoSizeEnable != null) {
             capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
-            String capacitymode = (Boolean) params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD)
+            String capacitymode = (Boolean)autoSizeEnable
                 ? CapacityAutonegotiation.CAPACITY_MODE_AUTO
                 : CapacityAutonegotiation.CAPACITY_MODE_OFF;
+           /* if ("grow".equalsIgnoreCase(capacitymode)){
+                capacityAutonegotiation.put("capacity_recycle_mode","expand_capacity");
+                capacityAutonegotiation.put("auto_grow_threshold_percent",true);
+                capacityAutonegotiation.put("auto_shrink_threshold_percent",50);
+                capacityAutonegotiation.put("max_auto_size", 16777216);
+                capacityAutonegotiation.put("min_auto_size",16777216);
+                capacityAutonegotiation.put("auto_size_increment",1);
+            }*/
             capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
             param.put("capacity_autonegotiation", capacityAutonegotiation);
         }
