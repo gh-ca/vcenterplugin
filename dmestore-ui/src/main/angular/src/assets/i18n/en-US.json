@@ -340,7 +340,9 @@
       "notMgr": "Not Manage",
       "notSync": "Not Sync",
       "inSync": "in Sync",
-      "synced": "Synchronized"
+      "synced": "Synchronized",
+      "status": "Running Status",
+      "synStatus": "Synchronized State"
     },
     "chart":{
       "total":" Total",
