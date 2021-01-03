@@ -64,6 +64,7 @@ import com.vmware.vim.vmomi.client.http.impl.AllowAllThumbprintVerifier;
 import com.vmware.vim.vmomi.client.http.impl.HttpConfigurationImpl;
 import com.vmware.vim.vmomi.core.types.VmodlContext;
 import com.vmware.vim25.DatastoreHostMount;
+import com.vmware.vim25.DatastoreInfo;
 import com.vmware.vim25.DatastoreSummary;
 import com.vmware.vim25.HostFibreChannelHba;
 import com.vmware.vim25.HostFileSystemMountInfo;
@@ -1077,6 +1078,8 @@ public class VCSDKUtils {
                 host1 = hostVmwareFactory.build(vmwareContext, hostMor);
                 if (null != host1) {
                     hdsMo = host1.getHostDatastoreSystemMo();
+                    HostStorageSystemMO hostStorageSystemMo = host1.getHostStorageSystemMo();
+                    hostStorageSystemMo.rescanVmfs();
                     break;
                 }
                 logger.info("===hostMo hostName:{}===", host1.getName());
@@ -1091,8 +1094,10 @@ public class VCSDKUtils {
                     VmfsDatastoreOption vmfsDatastoreOption = vmfsDatastoreOptions.get(0);
                     VmfsDatastoreExpandSpec spec = (VmfsDatastoreExpandSpec) vmfsDatastoreOption.getSpec();
                     HostVmfsVolume vmfs = datastoreInfo.getVmfs();
-                    Long totalSectors = addCapacity * ToolUtils.GI * 1L / vmfs.getBlockSize();
-                    spec.getPartition().setTotalSectors(totalSectors);
+                    String uuid = vmfs.getUuid();
+                    Long totalSectors = addCapacity * 1l * ToolUtils.GI / vmfs.getBlockSize();
+                    long originSectors = spec.getPartition().getTotalSectors();
+                    spec.getPartition().setTotalSectors(totalSectors + originSectors);
                     logger.info("===set expand params end===");
 
                     // 刷新vmfs存储，需等待2秒
@@ -1104,7 +1109,6 @@ public class VCSDKUtils {
                     }
                     Thread.sleep(THREAD_SLEEP_2_SECENDS);
                     hdsMo.expandVmfsDatastore(dsMo, spec);
-
                     logger.info("==refreshDatastore after expandVmfsDatastore==");
                     dsMo.refreshDatastore();
                 } else {
@@ -1136,9 +1140,11 @@ public class VCSDKUtils {
             VmwareContext serverContext = vcConnectionHelpers.getServerContext(serverguid);
             ManagedObjectReference dataStoreMor = vcConnectionHelpers.objectId2Mor(datastoreObjectId);
             HostDatastoreSystemMO hostDatastoreSystemMo = new HostDatastoreSystemMO(serverContext, dataStoreMor);
+            VmfsDatastoreInfo datastoreInfo = (VmfsDatastoreInfo)hostDatastoreSystemMo.getDatastoreInfo(dataStoreMor);
+            HostVmfsVolume vmfs = datastoreInfo.getVmfs();
             List<String> datastoreObjectIds = new ArrayList<>();
-            datastoreObjectIds.add(datastoreObjectId);
-            logger.error("recycleVmfsCapacity begin!datastoreObjectId={},name={},serverAddress={}", datastoreObjectId,
+            datastoreObjectIds.add(vmfs.getUuid());
+            logger.info("recycleVmfsCapacity begin!datastoreObjectId={},name={},serverAddress={}", datastoreObjectId,
                 hostDatastoreSystemMo.getName(), serverContext.getServerAddress());
             hostDatastoreSystemMo.unmapVmfsVolumeExTask(datastoreObjectIds);
             logger.error("recycleVmfsCapacity end!");

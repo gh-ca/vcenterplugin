@@ -90,6 +90,11 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             volumeMap.put("tuning", customizeVolumeTuning);
         }
 
+        Object newVoName = params.get("newVoName");
+        if (!StringUtils.isEmpty(newVoName)) {
+            volumeMap.put("name", newVoName.toString());
+        }
+
         Map<String, Object> reqMap = new HashMap<>(DEFAULT_CAPACITY);
         reqMap.put("volume", volumeMap);
         String reqBody = gson.toJson(reqMap);
@@ -153,9 +158,10 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         if (!StringUtils.isEmpty(minBandwidth)) {
             map.put("minbandwidth", Integer.valueOf(minBandwidth.toString()));
         }
-        Object newVoName = params.get("newVoName");
-        if (!StringUtils.isEmpty(newVoName)) {
-            map.put("name", newVoName.toString());
+
+        Object latency = params.get("latency");
+        if (!StringUtils.isEmpty(latency)) {
+            map.put("latency", Integer.valueOf(latency.toString()));
         }
         map.put("enabled", true);
         Map<String, Object> customizeVolumeTuning = new HashMap<>();
