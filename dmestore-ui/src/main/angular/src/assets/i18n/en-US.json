@@ -92,6 +92,7 @@
     "enable":"Enable",
     "capAuto":"Capacity Autonegotiation",
     "sameName":"The Filesystem/share name is the same as the datastore name.",
+    "modifySameName":"The Filesystem is the same as the datastore name.",
     "mountType":"Mount Type",
     "readWrite":"Read Write",
     "readOnly":"Read Only",

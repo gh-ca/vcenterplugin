@@ -91,6 +91,7 @@
     "dataCompre":"压缩",
     "capAuto":"自动扩容",
     "sameName":"文件系统/共享名称与数据存储名称相同。",
+    "modifySameName":"文件系统与数据存储名称相同。",
     "mountType":"挂载类型",
     "readWrite":"读写",
     "readOnly":"只读",
