@@ -3,10 +3,11 @@ import {
   OnInit,
   AfterViewInit,
   ChangeDetectionStrategy,
-  ChangeDetectorRef, NgZone
+  ChangeDetectorRef, NgZone, ViewChild
 } from '@angular/core';
 import {StorageService, StorageList} from './storage.service';
 import { Router} from "@angular/router";
+import { StorageStatusFilter} from "./filter.component";
 @Component({
   selector: 'app-storage',
   templateUrl: './storage.component.html',
@@ -23,22 +24,30 @@ export class StorageComponent implements OnInit, AfterViewInit {
   radioCheck = 'table1'; // 切换列表页显示
   buttonTrigger ='list'; // 切换列表页显示
   obj_ids=[];
+  @ViewChild('storageStatusFilter') storageStatusFilter:StorageStatusFilter;
   constructor(private remoteSrv: StorageService, private cdr: ChangeDetectorRef, private ngZone: NgZone,private router:Router) {}
   // 生命周期： 初始化数据
   ngOnInit() {
-   this.refresh();
+    this.refresh();
   }
 
   ngAfterViewInit() {
 
   }
+
+  scanData() {
+    console.log("this.storageStatusFilter", this.storageStatusFilter);
+    this.storageStatusFilter.initStatus();
+    this.refresh();
+  }
   // table数据处理
   refresh() {
     this.isLoading = true;
+
     this.remoteSrv.getData()
         .subscribe((result: any) => {
           this.list = result.data;
-          // this.total = result.total_count;
+          this.total = result.total_count;
           this.isLoading = false;
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
           //this.getStrageCharts();
