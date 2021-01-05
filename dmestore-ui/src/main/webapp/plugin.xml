@@ -392,28 +392,28 @@
       </object>
    </extension>
    <!--bestpractiselist   bestpractice-->
-   <extension id="com.huawei.dmestore.bestpractiselist">
-      <extendedPoint>vise.navigator.nodespecs</extendedPoint>
-      <object>
-         <title>#{bestpractiselist}</title>
-         <icon>#{bestpractice-icons}</icon>
-         <parentUid>com.huawei.dmestore.entryPoint</parentUid>
-         <navigationTargetUid>com.huawei.dmestore.bestpractiseView</navigationTargetUid>
-      </object>
-   </extension>
-   <extension id="com.huawei.dmestore.bestpractiseView">
-      <extendedPoint>vise.global.views</extendedPoint>
-      <object>
-         <name>#{bestpractiselist}</name>
-         <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">
-            <object>
-               <root>
-                  <url>/ui/dmestore/index.html?view=bestpractice</url>
-               </root>
-            </object>
-         </componentClass>
-      </object>
-   </extension>
+<!--   <extension id="com.huawei.dmestore.bestpractiselist">-->
+<!--      <extendedPoint>vise.navigator.nodespecs</extendedPoint>-->
+<!--      <object>-->
+<!--         <title>#{bestpractiselist}</title>-->
+<!--         <icon>#{bestpractice-icons}</icon>-->
+<!--         <parentUid>com.huawei.dmestore.entryPoint</parentUid>-->
+<!--         <navigationTargetUid>com.huawei.dmestore.bestpractiseView</navigationTargetUid>-->
+<!--      </object>-->
+<!--   </extension>-->
+<!--   <extension id="com.huawei.dmestore.bestpractiseView">-->
+<!--      <extendedPoint>vise.global.views</extendedPoint>-->
+<!--      <object>-->
+<!--         <name>#{bestpractiselist}</name>-->
+<!--         <componentClass className="com.vmware.vsphere.client.htmlbridge.HtmlView">-->
+<!--            <object>-->
+<!--               <root>-->
+<!--                  <url>/ui/dmestore/index.html?view=bestpractice</url>-->
+<!--               </root>-->
+<!--            </object>-->
+<!--         </componentClass>-->
+<!--      </object>-->
+<!--   </extension>-->
 
 
    <!-- Sample Actions on Hosts -->

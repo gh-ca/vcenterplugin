@@ -489,7 +489,7 @@
           "bandwidth":"带宽(MB/s)"
         },
         "disks":{
-          "disks":"磁盘",
+          "disks":"硬盘",
           "location":"位置",
           "status":"状态",
           "type":"类型",
