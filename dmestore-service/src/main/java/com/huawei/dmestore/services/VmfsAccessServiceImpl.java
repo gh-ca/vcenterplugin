@@ -53,7 +53,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
     private static final String HOST_GROUP_ID = "hostGroupId";
 
-    private static final String HOST_GROUP_ID1 = "hostGroup_id";
+    private static final String HOST_GROUP_ID1 = "hostgroup_id";
 
     private static final int DIVISOR_100 = 100;
 

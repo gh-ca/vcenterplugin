@@ -99,6 +99,16 @@ public class HostStorageSystemMO extends BaseMO {
     }
 
     /**
+     * unmapVmfsVolumeExTask
+     *
+     * @param vmfsUuids vmfsUuids
+     * @throws Exception Exception
+     */
+    public void unmapVmfsVolumeExTask(List<String> vmfsUuids) throws Exception {
+        context.getService().unmapVmfsVolumeExTask(mor, vmfsUuids);
+    }
+
+    /**
      * setMultipathLunPolicy
      *
      * @param lunId lunId

@@ -7,7 +7,8 @@ import com.huawei.vmware.util.VmwareContext;
 
 import com.vmware.vim25.HostConfigChangeMode;
 import com.vmware.vim25.HostNetworkConfig;
-import com.vmware.vim25.HostNetworkInfo;
+import com.vmware.vim25.HostVirtualNicConfig;
+import com.vmware.vim25.HostVirtualNicSpec;
 import com.vmware.vim25.HostVirtualSwitch;
 import com.vmware.vim25.HostVirtualSwitchConfig;
 import com.vmware.vim25.HostVirtualSwitchSpec;
@@ -87,20 +88,10 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = this.getHostMoFactory().build(context, mor);
-        HostNetworkInfo networkInfo = hostMo.getHostNetworkInfo();
-        List<HostVirtualSwitch> virtualSwitches = networkInfo.getVswitch();
-        for (HostVirtualSwitch virtualSwitch : virtualSwitches) {
-            HostVirtualSwitchSpec spec = virtualSwitch.getSpec();
-            Integer mtu = spec.getMtu();
-            if (null == mtu || (mtu.intValue() != ((Integer) recommendValue).intValue())) {
-                return false;
-            }
-        }
-
         HostNetworkConfig networkConfig = hostMo.getHostNetworkSystemMo().getNetworkConfig();
-        List<HostVirtualSwitchConfig> list = networkConfig.getVswitch();
-        for (HostVirtualSwitchConfig config : list) {
-            HostVirtualSwitchSpec spec = config.getSpec();
+        List<HostVirtualNicConfig> list = networkConfig.getVnic();
+        for (HostVirtualNicConfig config : list) {
+            HostVirtualNicSpec spec = config.getSpec();
             Integer mtu = spec.getMtu();
             if (null == mtu || (mtu.intValue() != ((Integer) recommendValue).intValue())) {
                 return false;
@@ -122,28 +113,17 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
             return;
         }
         HostMO hostMo = this.getHostMoFactory().build(context, mor);
-        HostNetworkInfo networkInfo = hostMo.getHostNetworkInfo();
         HostNetworkSystemMO hostNetworkSystemMo = hostMo.getHostNetworkSystemMo();
-        List<HostVirtualSwitch> virtualSwitches = networkInfo.getVswitch();
-        for (HostVirtualSwitch virtualSwitch : virtualSwitches) {
-            String name = virtualSwitch.getName();
-            HostVirtualSwitchSpec spec = virtualSwitch.getSpec();
-            Integer mtu = spec.getMtu();
-            if (null == mtu || (mtu.intValue() != ((Integer) recommendValue).intValue())) {
-                spec.setMtu((Integer) recommendValue);
-                hostNetworkSystemMo.updateVirtualSwitch(name, spec);
-            }
-        }
-
         HostNetworkConfig networkConfig = hostNetworkSystemMo.getNetworkConfig();
-        List<HostVirtualSwitchConfig> list = networkConfig.getVswitch();
-        for (HostVirtualSwitchConfig config : list) {
-            HostVirtualSwitchSpec spec = config.getSpec();
+        List<HostVirtualNicConfig> list = networkConfig.getVnic();
+        for (HostVirtualNicConfig config : list) {
+            HostVirtualNicSpec spec = config.getSpec();
             Integer mtu = spec.getMtu();
             if (null == mtu || (mtu.intValue() != ((Integer) recommendValue).intValue())) {
                 spec.setMtu((Integer) recommendValue);
             }
         }
         hostNetworkSystemMo.updateNetworkConfig(networkConfig, HostConfigChangeMode.MODIFY.value());
+        hostMo.getHostStorageSystemMo().refreshStorageSystem();
     }
 }
