@@ -230,7 +230,7 @@ export class VmfsListComponent implements OnInit {
         // 关闭编辑窗口
         this.modifyShow = false;
         // 重新请求数据
-        this.scanDataStore();
+        // this.scanDataStore();
         // 打开成功提示窗口
         this.modifySuccessShow = true;
       } else {
@@ -644,7 +644,7 @@ export class VmfsListComponent implements OnInit {
           // 关闭窗口;
           this.wizard.close();
           // 重新请求数据
-          this.scanDataStore();
+          // this.scanDataStore();
           // 打开成功提示窗口
           this.addSuccessShow = true;
         } else {
@@ -760,7 +760,7 @@ export class VmfsListComponent implements OnInit {
         // 关闭删除页面
         this.delShow = false;
         // 重新请求数据
-        this.scanDataStore();
+        // this.scanDataStore();
         // 打开成功提示窗口
         this.delSuccessShow = true;
       } else {
@@ -881,7 +881,7 @@ export class VmfsListComponent implements OnInit {
           // 关闭挂载页面
           this.mountShow = false;
           // 刷新数据
-          this.scanDataStore();
+          // this.scanDataStore();
           // 打开成功提示窗口
           this.mountSuccessShow = true;
         } else {
@@ -982,7 +982,7 @@ export class VmfsListComponent implements OnInit {
           // 关闭卸载页面
           this.unmountShow = false;
           // 重新请求数据
-          this.scanDataStore();
+          // this.scanDataStore();
           // 打开成功提示窗口
           this.unmountSuccessShow = true;
         } else {
@@ -1003,7 +1003,7 @@ export class VmfsListComponent implements OnInit {
         // 关闭回收空间页面
         this.reclaimShow = false;
         // 空间回收完成重新请求数据
-        this.scanDataStore();
+        // this.scanDataStore();
         // 打开成功提示窗口
         this.reclaimSuccessShow = true;
       } else {
@@ -1056,7 +1056,7 @@ export class VmfsListComponent implements OnInit {
           // 关闭修改服务等级页面
           this.changeServiceLevelShow = false;
           // 重新请求数据
-          this.scanDataStore();
+          // this.scanDataStore();
           // 打开成功提示窗口
           this.changeServiceLevelSuccessShow = true;
         } else {
@@ -1114,7 +1114,7 @@ export class VmfsListComponent implements OnInit {
           // 隐藏扩容页面
           this.expandShow = false;
           // 重新请求数据
-          this.scanDataStore();
+          // this.scanDataStore();
           // 打开成功提示窗口
           this.expandSuccessShow = true;
         }else {
@@ -1432,6 +1432,7 @@ export class VmfsListComponent implements OnInit {
     this.mountSuccessShow = false;
     this.unmountSuccessShow = false;
     this.delSuccessShow = false;
+    this.backToListPage();
   }
 
   /**
@@ -1660,5 +1661,13 @@ export class VmfsListComponent implements OnInit {
       this.modifyNameChanged = false;
     }
     console.log("this.modifyForm.name", this.modifyForm.name);
+  }
+
+  /**
+   * 刷新vmfs列表页面（table自适应，PS：编辑之后table只会加载数据而不自适应样式）
+   */
+  backToListPage(){
+    console.log("back to Vmfs list")
+    location.reload();
   }
 }
