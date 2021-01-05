@@ -100,9 +100,6 @@ public class NfsOperationController extends BaseController {
      */
     private static final String FILE_SEPARATOR = "/";
 
-    @Value("${dmestore.service.dme.old:false}")
-    private boolean isOldDme;
-
     @Autowired
     private NfsOperationService nfsOperationService;
 
@@ -180,9 +177,6 @@ public class NfsOperationController extends BaseController {
         Map<String, Object> tuning = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         Map<String, Object> capacityAutonegotiation = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         String defaultCapacitymode = CapacityAutonegotiation.CAPACITY_MODE_OFF;
-        if (isOldDme) {
-            defaultCapacitymode = CapacityAutonegotiation.CAPACITY_MODE_OFF_OLD;
-        }
         if (isAdvance) {
             boolean qosFlag = (Boolean) requestParams.get("qosFlag");
             if (qosFlag) {
