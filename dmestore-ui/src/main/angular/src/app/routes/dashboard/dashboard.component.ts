@@ -141,8 +141,8 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           item.utilization = item.utilization.toFixed(2);
         });
         this.storeageTopN = result.data;
-        this.cdr.detectChanges();
       }
+      this.cdr.detectChanges();
     }, err => {
       console.error('ERROR', err);
     });
@@ -156,13 +156,14 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.capadataStoreName = this.translateService.instant(name);
     this.storageCapacityChart.showLoading();
     this.http.get('overview/getdatastoreoverview', { params: {type: type}}).subscribe((result: any) => {
+      let os;
       if (result.code === '200'){
         result.data.totalCapacity = result.data.totalCapacity.toFixed(2);
         result.data.usedCapacity = result.data.usedCapacity.toFixed(2);
         result.data.freeCapacity = result.data.freeCapacity.toFixed(2);
         result.data.utilization = result.data.utilization.toFixed(2);
         this.storageCapacity = result.data;
-        const os = [
+        os = [
           {
             name: this.translatePipe.transform('overview.used'),
             value: result.data.usedCapacity
@@ -172,12 +173,24 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             value: result.data.freeCapacity
           }
         ];
-        this.dashboardSrv.storageCapacityOption.series[0].data = os;
-        this.dashboardSrv.storageCapacityOption.title.text = this.storageCapacity.utilization + ' %';
-        this.storageCapacityChart.setOption(this.dashboardSrv.storageCapacityOption, true);
-        this.storageCapacityChart.hideLoading();
-        this.cdr.detectChanges();
+      } else {
+        os = [
+          {
+            name: this.translatePipe.transform('overview.used'),
+            value: 0
+          },
+          {
+            name: this.translatePipe.transform('overview.free'),
+            value: 0
+          }
+        ];
       }
+
+      this.dashboardSrv.storageCapacityOption.series[0].data = os;
+      this.dashboardSrv.storageCapacityOption.title.text = this.storageCapacity.utilization + ' %';
+      this.storageCapacityChart.setOption(this.dashboardSrv.storageCapacityOption, true);
+      this.storageCapacityChart.hideLoading();
+      this.cdr.detectChanges();
     }, err => {
       console.error('ERROR', err);
     });
@@ -190,9 +203,10 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   loadStorageNum(){
     this.storageNumChart.showLoading();
     this.http.get('overview/getstoragenum', {}).subscribe((result: any) => {
+      let os;
       if (result.code === '200'){
         this.storageNum = result.data;
-        const os = [
+        os = [
           {
             name: this.translatePipe.transform('overview.normal'),
             value: result.data.normal
@@ -202,11 +216,22 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
             value: result.data.abnormal
           }
         ];
-        this.dashboardSrv.storageNumOption.series[0].data = os;
-        this.storageNumChart.setOption(this.dashboardSrv.storageNumOption, true);
-        this.storageNumChart.hideLoading();
-        this.cdr.detectChanges();
+      } else {
+        os = [
+          {
+            name: this.translatePipe.transform('overview.normal'),
+            value: 0
+          },
+          {
+            name: this.translatePipe.transform('overview.abnormal'),
+            value: 0
+          }
+        ];
       }
+      this.dashboardSrv.storageNumOption.series[0].data = os;
+      this.storageNumChart.setOption(this.dashboardSrv.storageNumOption, true);
+      this.storageNumChart.hideLoading();
+      this.cdr.detectChanges();
     }, err => {
       console.error('ERROR', err);
     });
