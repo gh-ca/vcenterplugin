@@ -389,6 +389,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private String createVmfsOnVmware(Map<String, Object> params) throws DmeException {
         // 在vmware创建存储
         String dataStoreStr = "";
+        LOG.info("create vmfs on vmware begin !");
         try {
             if (params != null) {
                 // 创建vmware中的vmfs存储。 cluster host
@@ -897,8 +898,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         if (!StringUtils.isEmpty(storageId)) {
             listVolumeUrl = listVolumeUrl + "&storage_id=" + storageId;
         }
+        // todo 按照这个参数去查询存储池可用查到，如果按照这个参数的返回的结果去查询就查不到
         if (!StringUtils.isEmpty(poolRawId)) {
-            listVolumeUrl = listVolumeUrl + "&pool_raw_id=" + poolRawId;
+            listVolumeUrl = listVolumeUrl + "&id=" + poolRawId;
         }
         try {
             ResponseEntity responseEntity = dmeAccessService.access(listVolumeUrl, HttpMethod.GET, null);

@@ -91,6 +91,7 @@
     "dataCompre":"压缩",
     "capAuto":"自动扩容",
     "sameName":"文件系统/共享名称与数据存储名称相同。",
+    "modifySameName":"文件系统与数据存储名称相同。",
     "mountType":"挂载类型",
     "readWrite":"读写",
     "readOnly":"只读",
@@ -177,7 +178,7 @@
     "unitM": "MB/s",
     "addTitle": "创建华为DME数据存储",
     "datastoreSetting": "数据存储设置",
-    "storageSetting": "储存设置",
+    "storageSetting": "存储设置",
     "vmfsAddNameDesc": "卷名称与数据存储名称相同.",
     "version": "版本",
     "blockSize": "块大小",
@@ -340,7 +341,9 @@
       "notMgr": "未管理",
       "notSync": "未同步",
       "inSync": "同步中",
-      "synced": "已同步"
+      "synced": "已同步",
+      "status": "运行状态",
+      "synStatus": "同步状态"
     },
     "chart":{
       "total":" 总计",

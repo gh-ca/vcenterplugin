@@ -35,18 +35,25 @@
               <label for="btn-demo-radio-3"><clr-icon shape="radar" size="15"></clr-icon></label>
             </div>
             <div class="radio btn merginLeft" title="{{'menu.refresh' | translate}}">
-              <label><clr-icon shape="refresh" size="20" (click)="refresh()"></clr-icon></label>
+              <label><clr-icon shape="refresh" size="20" (click)="scanData()"></clr-icon></label>
             </div>
           </div>
         </div>
         <!-- 列表页 -->
         <clr-datagrid [clrDgLoading]="isLoading">
           <clr-dg-column [clrDgField]="'name'" style="color: red">{{'storage.list.name' | translate}}</clr-dg-column>
-          <clr-dg-column [clrDgSortBy]="'stars'">{{'storage.list.ipAddress' | translate}}</clr-dg-column>
+          <clr-dg-column [clrDgField]="'ip'">{{'storage.list.ipAddress' | translate}}</clr-dg-column>
 
-          <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.status' | translate}}</clr-dg-column>
+          <clr-dg-column [hidden]="radioCheck!=='table1'">
+            {{'storage.list.status' | translate}}
+            <clr-dg-filter [clrDgFilter]="storageStatusFilter">
+              <storage-status-filter #storageStatusFilter></storage-status-filter>
+            </clr-dg-filter>
+          </clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.vendor' | translate}}</clr-dg-column>
-          <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.model' | translate}}</clr-dg-column>
+          <clr-dg-column [hidden]="radioCheck!=='table1'" [clrDgField]="'model'">
+            {{'storage.list.model' | translate}}
+          </clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.version' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.patchVersion' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.location' | translate}}</clr-dg-column>

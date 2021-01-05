@@ -82,19 +82,21 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
     @Override
     public void updateVmfs(String volumeId, Map<String, Object> params) throws DmeException {
-        VolumeUpdate volume = new VolumeUpdate();
+        Map<String, Object> volumeMap = new HashMap<>();
         Object serviceLevelName = params.get("service_level_name");
         if (StringUtils.isEmpty(serviceLevelName)) {
-            CustomizeVolumeTuning customizeVolumeTuning = getCustomizeVolumeTuning(params);
+            Map<String, Object> customizeVolumeTuning = getCustomizeVolumeTuning(params);
             LOG.info("自定义方式创建vmfs{},服务等级：", serviceLevelName);
-            volume.setTuning(customizeVolumeTuning);
+            volumeMap.put("tuning", customizeVolumeTuning);
         }
+
         Object newVoName = params.get("newVoName");
         if (!StringUtils.isEmpty(newVoName)) {
-            volume.setName(newVoName.toString());
+            volumeMap.put("name", newVoName.toString());
         }
+
         Map<String, Object> reqMap = new HashMap<>(DEFAULT_CAPACITY);
-        reqMap.put("volume", volume);
+        reqMap.put("volume", volumeMap);
         String reqBody = gson.toJson(reqMap);
 
         String url = DmeConstants.DME_VOLUME_BASE_URL + "/" + volumeId;
@@ -134,30 +136,36 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         }
     }
 
-    private CustomizeVolumeTuning getCustomizeVolumeTuning(Map<String, Object> params) {
-        SmartQos smartQos = new SmartQos();
+    private Map<String, Object> getCustomizeVolumeTuning(Map<String, Object> params) {
+        Map<String, Object> map = new HashMap<>();
         Object controlPolicy = params.get("control_policy");
         if (!StringUtils.isEmpty(controlPolicy)) {
-            smartQos.setControlPolicy(controlPolicy.toString());
+            map.put("control_policy", Integer.valueOf(controlPolicy.toString()));
         }
         Object maxIops = params.get("max_iops");
         if (!StringUtils.isEmpty(maxIops)) {
-            smartQos.setMaxiops(Integer.valueOf(maxIops.toString()));
+            map.put("maxiops", Integer.valueOf(maxIops.toString()));
         }
         Object minIops = params.get("min_iops");
         if (!StringUtils.isEmpty(minIops)) {
-            smartQos.setMiniops(Integer.valueOf(minIops.toString()));
+            map.put("miniops", Integer.valueOf(minIops.toString()));
         }
         Object maxBandwidth = params.get("max_bandwidth");
         if (!StringUtils.isEmpty(maxBandwidth)) {
-            smartQos.setMaxbandwidth(Integer.valueOf(maxBandwidth.toString()));
+            map.put("maxbandwidth", Integer.valueOf(maxBandwidth.toString()));
         }
         Object minBandwidth = params.get("min_bandwidth");
         if (!StringUtils.isEmpty(minBandwidth)) {
-            smartQos.setMinbandwidth(Integer.valueOf(minBandwidth.toString()));
+            map.put("minbandwidth", Integer.valueOf(minBandwidth.toString()));
         }
-        CustomizeVolumeTuning customizeVolumeTuning = new CustomizeVolumeTuning();
-        customizeVolumeTuning.setSmartQos(smartQos);
+
+        Object latency = params.get("latency");
+        if (!StringUtils.isEmpty(latency)) {
+            map.put("latency", Integer.valueOf(latency.toString()));
+        }
+        map.put("enabled", true);
+        Map<String, Object> customizeVolumeTuning = new HashMap<>();
+        customizeVolumeTuning.put("smartqos",map);
         return customizeVolumeTuning;
     }
 

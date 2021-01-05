@@ -64,6 +64,7 @@ import com.vmware.vim.vmomi.client.http.impl.AllowAllThumbprintVerifier;
 import com.vmware.vim.vmomi.client.http.impl.HttpConfigurationImpl;
 import com.vmware.vim.vmomi.core.types.VmodlContext;
 import com.vmware.vim25.DatastoreHostMount;
+import com.vmware.vim25.DatastoreInfo;
 import com.vmware.vim25.DatastoreSummary;
 import com.vmware.vim25.HostFibreChannelHba;
 import com.vmware.vim25.HostFileSystemMountInfo;
@@ -242,10 +243,8 @@ public class VCSDKUtils {
                         }
                         if (StringUtils.isEmpty(storeType)) {
                             lists.add(dsmap);
-                            logger.info("datastore {} get success!size = {}", ds1.getName(), lists.size());
                         } else if (ds1.getSummary().getType().equals(storeType)) {
                             lists.add(dsmap);
-                            logger.info("{} datastore {} get success! size = ", storeType, ds1.getName(), lists.size());
                         }
                     }
                     if (lists.size() > 0) {
@@ -1079,6 +1078,8 @@ public class VCSDKUtils {
                 host1 = hostVmwareFactory.build(vmwareContext, hostMor);
                 if (null != host1) {
                     hdsMo = host1.getHostDatastoreSystemMo();
+                    HostStorageSystemMO hostStorageSystemMo = host1.getHostStorageSystemMo();
+                    hostStorageSystemMo.rescanVmfs();
                     break;
                 }
                 logger.info("===hostMo hostName:{}===", host1.getName());
@@ -1093,8 +1094,10 @@ public class VCSDKUtils {
                     VmfsDatastoreOption vmfsDatastoreOption = vmfsDatastoreOptions.get(0);
                     VmfsDatastoreExpandSpec spec = (VmfsDatastoreExpandSpec) vmfsDatastoreOption.getSpec();
                     HostVmfsVolume vmfs = datastoreInfo.getVmfs();
-                    Long totalSectors = addCapacity * ToolUtils.GI * 1L / vmfs.getBlockSize();
-                    spec.getPartition().setTotalSectors(totalSectors);
+                    String uuid = vmfs.getUuid();
+                    Long totalSectors = addCapacity * 1l * ToolUtils.GI / vmfs.getBlockSize();
+                    long originSectors = spec.getPartition().getTotalSectors();
+                    spec.getPartition().setTotalSectors(totalSectors + originSectors);
                     logger.info("===set expand params end===");
 
                     // 刷新vmfs存储，需等待2秒
@@ -1106,7 +1109,6 @@ public class VCSDKUtils {
                     }
                     Thread.sleep(THREAD_SLEEP_2_SECENDS);
                     hdsMo.expandVmfsDatastore(dsMo, spec);
-
                     logger.info("==refreshDatastore after expandVmfsDatastore==");
                     dsMo.refreshDatastore();
                 } else {
@@ -1137,12 +1139,33 @@ public class VCSDKUtils {
         try {
             VmwareContext serverContext = vcConnectionHelpers.getServerContext(serverguid);
             ManagedObjectReference dataStoreMor = vcConnectionHelpers.objectId2Mor(datastoreObjectId);
-            HostDatastoreSystemMO hostDatastoreSystemMo = new HostDatastoreSystemMO(serverContext, dataStoreMor);
-            List<String> datastoreObjectIds = new ArrayList<>();
-            datastoreObjectIds.add(datastoreObjectId);
-            logger.error("recycleVmfsCapacity begin!datastoreObjectId={},name={},serverAddress={}", datastoreObjectId,
-                hostDatastoreSystemMo.getName(), serverContext.getServerAddress());
-            hostDatastoreSystemMo.unmapVmfsVolumeExTask(datastoreObjectIds);
+            DatastoreMO datastoreMo = new DatastoreMO(serverContext, dataStoreMor);
+            DatastoreSummary summary = datastoreMo.getSummary();
+            if (!summary.getType().equalsIgnoreCase(DmeConstants.STORE_TYPE_VMFS)) {
+                logger.info("datastore is not VMFS!datastoreObjectId={}", datastoreObjectId);
+                return FAILED_RESULT;
+            }
+            VmfsDatastoreInfo vmfsDatastoreInfo = datastoreMo.getVmfsDatastoreInfo();
+            HostVmfsVolume hostVmfsVolume = vmfsDatastoreInfo.getVmfs();
+            List<String> vmfsUuids = new ArrayList<>();
+            vmfsUuids.add(hostVmfsVolume.getUuid());
+            String hostStr = getMountHostsByDsObjectId(datastoreObjectId);
+            if (StringUtils.isEmpty(hostStr)) {
+                logger.info("get mount hosts return null!datastoreObjectId={}", datastoreObjectId);
+                return FAILED_RESULT;
+            }
+            List<Map<String, String>> hostMapList = gson.fromJson(hostStr,
+                new TypeToken<List<Map<String, String>>>() { }.getType());
+            HostDatastoreSystemMO hdsMo = null;
+            for (Map<String, String> hostMap : hostMapList) {
+                ManagedObjectReference hostMor = vcConnectionHelpers.objectId2Mor(hostMap.get(HOST_ID));
+                HostMO host1 = hostVmwareFactory.build(serverContext, hostMor);
+                if (null != host1) {
+                    hdsMo = host1.getHostDatastoreSystemMo();
+                    break;
+                }
+            }
+            hdsMo.unmapVmfsVolumeExTask(vmfsUuids);
             logger.error("recycleVmfsCapacity end!");
         } catch (Exception e) {
             logger.error("recycleVmfsCapacity error:{}", e.getMessage());
@@ -1503,6 +1526,7 @@ public class VCSDKUtils {
     public String createVmfsDataStore(Map<String, Object> hsdmap, int capacity, String datastoreName,
         int vmfsMajorVersion, int blockSize, int unmapGranularity, String unmapPriority) throws VcenterException {
         String dataStoreStr = "";
+        logger.info("begin create vmfs datastore!");
         try {
             if (hsdmap != null && hsdmap.get(DmeConstants.HOST) != null) {
                 HostScsiDisk objhsd = (HostScsiDisk) hsdmap.get(HOST_SCSI_DISK);
@@ -2035,12 +2059,11 @@ public class VCSDKUtils {
             }
 
             // 卸载前重新扫描datastore
-            hostMo.getHostStorageSystemMo().refreshStorageSystem();
-            logger.info("Rescan datastore before unmounting");
+            //hostMo.getHostStorageSystemMo().refreshStorageSystem();
+            //logger.info("Rescan datastore before unmounting");
 
             // 从主机卸载datastore
             hostMo.getHostDatastoreSystemMo().deleteDatastore(vcConnectionHelpers.objectId2Mor(datastoreobjectid));
-            logger.info("unmount nfs success:hostName={},datastore name={}", hostMo.getName(), dsmo.getName());
 
             // 卸载后重新扫描datastore
             hostMo.getHostStorageSystemMo().refreshStorageSystem();
@@ -2567,6 +2590,7 @@ public class VCSDKUtils {
 
                 // 主机删除存储
                 deleteNfs(dsmo, hostmo, dataStoreObjectId);
+                break;
             }
         } catch (Exception e) {
             reValue = false;
@@ -2583,9 +2607,7 @@ public class VCSDKUtils {
         logger.info("=========vmware delete nfs process end=========");
 
         // 删除后重新扫描datastore
-        logger.info("=========rescanVmfs after vmware delete nfs process=======", hostMo.getName(), dsmo.getName());
         hostMo.getHostStorageSystemMo().rescanVmfs();
-        logger.info("=====vmware delete nfs success!host name={}, datastore name={}", hostMo.getName(), dsmo.getName());
     }
 
     /**
