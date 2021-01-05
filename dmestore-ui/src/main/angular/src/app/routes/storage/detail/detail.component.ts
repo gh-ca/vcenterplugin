@@ -346,35 +346,35 @@ export class DetailComponent implements OnInit, AfterViewInit {
   storageListInitHandle() {
     if(this.storagePool) {
       this.storagePool.forEach(item => {
-        switch (item.tier1RaidLv) {
-          case "1":
-            item.tier1RaidLvDesc = "RAID10";
-            break;
-          case "2":
-            item.tier1RaidLvDesc = "RAID5";
-            break;
-          case "3":
-            item.tier1RaidLvDesc = "RAID0";
-            break;
-          case "4":
-            item.tier1RaidLvDesc = "RAID1";
-            break;
-          case "5":
-            item.tier1RaidLvDesc = "RAID6";
-            break;
-          case "6":
-            item.tier1RaidLvDesc = "RAID50";
-            break;
-          case "7":
-            item.tier1RaidLvDesc = "RAID3";
-            break;
-          case "11":
-            item.tier1RaidLvDesc = "RAIDTP";
-            break;
-          default:
-            item.tier1RaidLvDesc = item.tier1RaidLv;
-            break;
-        }
+        // switch (item.tier1RaidLv) {
+        //   case "1":
+        //     item.tier1RaidLvDesc = "RAID10";
+        //     break;
+        //   case "2":
+        //     item.tier1RaidLvDesc = "RAID5";
+        //     break;
+        //   case "3":
+        //     item.tier1RaidLvDesc = "RAID0";
+        //     break;
+        //   case "4":
+        //     item.tier1RaidLvDesc = "RAID1";
+        //     break;
+        //   case "5":
+        //     item.tier1RaidLvDesc = "RAID6";
+        //     break;
+        //   case "6":
+        //     item.tier1RaidLvDesc = "RAID50";
+        //     break;
+        //   case "7":
+        //     item.tier1RaidLvDesc = "RAID3";
+        //     break;
+        //   case "11":
+        //     item.tier1RaidLvDesc = "RAIDTP";
+        //     break;
+        //   default:
+        //     item.tier1RaidLvDesc = item.tier1RaidLv;
+        //     break;
+        // }
         // switch (item.physicalType) {
         //   case "sata":
         //     item.physicalTypeDesc = "SATA";
