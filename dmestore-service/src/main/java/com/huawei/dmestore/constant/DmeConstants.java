@@ -483,6 +483,22 @@ public class DmeConstants {
         }
     };
 
+    /**
+     * RAID级别。
+     **/
+    public static final Map<String, String> RAID_LEVEL_MAP = new HashMap() {
+        {
+            put("1", "RAID10");
+            put("2", "RAID5");
+            put("3", "RAID0");
+            put("4", "RAID1");
+            put("5", "RAID6");
+            put("6", "RAID50");
+            put("7", "RAID3");
+            put("11", "RAIDTP");
+        }
+    };
+
     private DmeConstants() {
     }
 }
