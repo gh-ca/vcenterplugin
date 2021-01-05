@@ -554,11 +554,13 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     @Override
     public List<NfsDataInfo> listNfs() throws DmeException {
+
+        List<NfsDataInfo> relists = new ArrayList<>();
         // 从关系表中取得DME卷与vcenter存储的对应关系
         List<DmeVmwareRelation> dvrlist = dmeVmwareRalationDao.getDmeVmwareRelation(ToolUtils.STORE_TYPE_NFS);
         LOG.info("listNfs dvrlist={}", dvrlist == null ? null : dvrlist.size());
         if (dvrlist == null || dvrlist.size() == 0) {
-            throw new DmeException("get ralation failed!");
+            return relists;
         }
         Map<String, DmeVmwareRelation> dvrMap = getDvrMap(dvrlist);
         String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(ToolUtils.STORE_TYPE_NFS);
@@ -566,7 +568,6 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             throw new DmeException("list NFS from vcenter failed!");
         }
         JsonArray jsonArray = new JsonParser().parse(listStr).getAsJsonArray();
-        List<NfsDataInfo> relists = new ArrayList<>();
         for (int index = 0; index < jsonArray.size(); index++) {
             JsonObject jo = jsonArray.get(index).getAsJsonObject();
             String vmwareObjectId = ToolUtils.jsonToStr(jo.get(OBJECTID));

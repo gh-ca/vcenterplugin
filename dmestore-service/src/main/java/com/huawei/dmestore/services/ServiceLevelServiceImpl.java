@@ -17,6 +17,7 @@ import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 import com.huawei.vmware.autosdk.SessionHelper;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -62,6 +63,8 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     private VCenterInfoService vcenterinfoservice;
 
     private VCSDKUtils vcsdkUtils;
+
+    private Gson gson = new Gson();
 
     public DmeAccessService getDmeAccessService() {
         return dmeAccessService;
@@ -394,6 +397,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
     private List<StoragePool> getStoragePoolInfosByStorageIdStoragePoolIds(String storageDeviceId,
         List<String> storagePoolIds) throws DmeException {
         List<StoragePool> sps = new ArrayList<>();
+
         List<StoragePool> storagePools = dmeStorageService.getStoragePools(storageDeviceId, "all");
 
         for (StoragePool sp : storagePools) {

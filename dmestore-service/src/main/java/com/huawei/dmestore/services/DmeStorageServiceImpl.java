@@ -307,11 +307,19 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     @Override
     public List<StoragePool> getStoragePools(String storageId, String mediaType) throws DmeException {
-        String replace = storageId.replace(SPLIT_CHAR, "");
+        String replace = storageId.replace(SPLIT_CHAR, "").toUpperCase();
         String className = "SYS_StoragePool";
         List<StoragePool> resList = new ArrayList<>();
         String url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + CONDITION;
         String params = ToolUtils.getRequsetParams(STORAGE_DEVICE_ID, replace);
+        List<Storage> storages = getStorages();
+        Map<String, String> ids = new HashMap<>();
+        if (storages != null && storages.size() > 0) {
+            for (Storage storage : storages) {
+                String id = storage.getId().replace(SPLIT_CHAR, "").toUpperCase();
+                ids.put(id, storage.getName());
+            }
+        }
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
             int code = responseEntity.getStatusCodeValue();
@@ -336,6 +344,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     String resId = ToolUtils.jsonToStr(element.get(RES_ID));
                     if (djofspMap != null && djofspMap.get(resId) != null) {
                         storagePool.setServiceLevelName(gson.toJson(djofspMap.get(resId)));
+                    }
+                    if (ids.get(replace) != null) {
+                        storagePool.setStorageName(ids.get(replace));
                     }
                     String type = ToolUtils.jsonToStr(element.get("type"));
                     storagePool.setMediaType(type);
