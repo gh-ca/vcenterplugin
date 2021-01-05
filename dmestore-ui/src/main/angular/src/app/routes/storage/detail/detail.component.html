@@ -578,11 +578,13 @@
                       <div class="capacity-wrap">
                         <span class="capacity-label">{{'storage.detail.cap.useFree' | translate}}</span>
                         <div class="num-bar_outer">
-                          <div class="num-bar_inner used" [ngStyle]="{'width':(detail.usedCapacity/detail.totalCapacity * 100)+'%'}"></div>
-                          <div class="num-bar_inner free" [ngStyle]="{'width':((detail.totalEffectiveCapacity-detail.usedCapacity)/detail.totalCapacity * 100)+'%'}"></div>
+                          <clr-progress-bar id="usedCapacityId" clrValue="{{detail.usedCapacity/detail.totalCapacity * 100}}"></clr-progress-bar>
+<!--                          <div class="num-bar_inner total progress" [ngStyle]="{'width':(detail.usedCapacity/detail.totalCapacity * 100)+'%'}"></div>-->
+<!--                          <div class="num-bar_inner free" [ngStyle]="{'width':((detail.totalEffectiveCapacity-detail.usedCapacity)/detail.totalCapacity * 100)+'%'}"></div>-->
                         </div>
-                        <span class="capacity-span2">{{formatCapacity(detail.usedCapacity)}} / {{getFreeCapacity(detail.totalEffectiveCapacity,detail.usedCapacity)}}</span>
+                        <span class="capacity-span">{{formatCapacity(detail.usedCapacity)}} / {{getFreeCapacity(detail.totalEffectiveCapacity,detail.usedCapacity)}}</span>
                       </div>
+
                       <div class="capacity-wrap">
                         <span class="capacity-label">{{'storage.detail.cap.subscribe' | translate}}</span>
                         <div class="num-bar_outer">
@@ -641,13 +643,17 @@
                       </div>
                       <div class="capacity-line">
                         <div class="unit-tips">{{'storage.detail.cap.dedupe' | translate}}</div>
-                        <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.dedupe/capSave.max * 100)+'%'}"></div>
-                        <span class="num">{{capSave.dedupe==0?'':capSave.dedupe}}</span>
+                        <div class="unit-outer">
+                          <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.dedupe/capSave.max * 100)+'%'}"></div>
+                          <span class="num">{{capSave.dedupe==0?'':capSave.dedupe}}</span>
+                        </div>
                       </div>
                       <div class="capacity-line">
                         <div class="unit-tips">{{'storage.detail.cap.compression' | translate}}</div>
-                        <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.compression/capSave.max * 100)+'%'}"></div>
-                        <span class="num">{{capSave.compression==0?'':capSave.compression}}</span>
+                        <div class="unit-outer">
+                          <div class="unit-inner_bar" [ngStyle]="{'width':(capSave.compression/capSave.max * 100)+'%'}"></div>
+                          <span class="num">{{capSave.compression==0?'':capSave.compression}}</span>
+                        </div>
                       </div>
                       <div class="capacity-line">
                         <div class="unit-label">{{'storage.detail.cap.afterSave' | translate}}</div>
