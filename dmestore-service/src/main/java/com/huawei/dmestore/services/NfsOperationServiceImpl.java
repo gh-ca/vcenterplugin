@@ -286,18 +286,31 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             LOG.error("params error , please check it! dataStoreObjectId={}, nfsName={}", dataStoreObjectId, nfsName);
             throw new DmeException(CODE_403, "params dataStoreObjectId or nfsName is null, please check it!");
         }
+
+        /**
+         *  Object tuning = params.get(TUNING);
+         *             if (!StringUtils.isEmpty(tuning)) {
+         *                 Map<String, Object> tuningMap = gson.fromJson(tuning.toString(), Map.class);
+         *                 Object qoPolicy = params.get(QOS_POLICY);
+         *                 if (qoPolicy != null) {
+         *                     tuningMap.put(QOS_POLICY, qoPolicy);
+         *                 }
+         *                 fsMap.put(TUNING, tuningMap);
+         *             }
+         */
         Map<String, Object> fsReqBody = new HashMap<>();
-        Map<String, Object> tuning = gson.fromJson(gson.toJson(params.get(TUNING)), Map.class);
-        Map<String, Object> qosPolicy = gson.fromJson(gson.toJson(params.get(QOS_POLICY)), Map.class);
+        Object tuning = params.get(TUNING);
         String name = (String) params.get(NAME_FIELD);
         if (!StringUtils.isEmpty(name)) {
             fsReqBody.put(NAME_FIELD, name);
         }
-        if (tuning != null && tuning.size() != 0) {
-            if (qosPolicy != null && qosPolicy.size() != 0) {
-                tuning.put(QOS_POLICY, qosPolicy);
+        if (tuning != null) {
+            Map<String, Object> tuningMap = gson.fromJson(tuning.toString(), Map.class);
+            Object qosPolicy = params.get(QOS_POLICY);
+            if (qosPolicy != null) {
+                tuningMap.put(QOS_POLICY, qosPolicy);
             }
-            fsReqBody.put(TUNING, tuning);
+            fsReqBody.put(TUNING, tuningMap);
         }
         String fileSystemId = (String) params.get("file_system_id");
         Object capacityAutonegotiation = params.get(CAPACITY_AUTONEGOTIATION);
