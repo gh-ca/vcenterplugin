@@ -111,13 +111,17 @@ export class StoragePool{
   subscriptionRate: number; //订阅率
   //补充字段
   mediaType: string;//类型（块）
+  mediaTypeDesc: string;//类型（块）
   tier0RaidLv: string; // RAID级别
   tier1RaidLv: string; // RAID级别
+  tier1RaidLvDesc: string; // RAID级别描述
   tier2RaidLv: string; // RAID级别
+  tier2RaidLvDesc: string; // RAID级别描述
   storageId: string; // 存储设备id
   dataSpace: number; // 存储池上创建LUN或者文件系统时的可用容量 单位MB
   subscribedCapacity: number; //订阅容量
   physicalType: string;//硬盘类型
+  physicalTypeDesc: string;//硬盘类型
   diskPoolId:string;//存储池所处硬盘id
   poolId:string;
   maxBandwidth: number;

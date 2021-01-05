@@ -32,6 +32,16 @@ import {FormControl, FormGroup} from "@angular/forms";
 import {GlobalsService} from "../../../shared/globals.service";
 import {ClrDatagridPagination} from "@clr/angular";
 import {TranslatePipe} from "@ngx-translate/core";
+import {DeviceFilter} from "../../vmfs/list/filter.component";
+import {
+  DtreeQuotaFilter, DtreeSecModFilter,
+  FsStatusFilter, FsTypeFilter,
+  MapStatusFilter,
+  ProTypeFilter,
+  StoragePoolStatusFilter,
+  StoragePoolTypeFilter, VolProtectionStatusFilter, VolServiceLevelFilter,
+  VolStatusFilter, VolStoragePoolFilter
+} from "../filter.component";
 @Component({
   selector: 'app-detail',
   templateUrl: './detail.component.html',
@@ -177,6 +187,19 @@ export class DetailComponent implements OnInit, AfterViewInit {
   volumeCurrentPage = 1;// 卷信息当前页
   volumePageSize = 10; // 当前页数据数
 
+  @ViewChild('storagePoolTypeFilter') storagePoolTypeFilter:StoragePoolTypeFilter;
+  @ViewChild('storagePoolStatusFilter') storagePoolStatusFilter:StoragePoolStatusFilter;
+  @ViewChild('volStatusFilter') volStatusFilter:VolStatusFilter;
+  @ViewChild('portTypeFilter') portTypeFilter:ProTypeFilter;
+  @ViewChild('mapStatusFilter') mapStatusFilter:MapStatusFilter;
+  @ViewChild('volStoragePoolFilter') volStoragePoolFilter:VolStoragePoolFilter;
+  @ViewChild('volServiceLevelFilter') volServiceLevelFilter:VolServiceLevelFilter;
+  @ViewChild('volProtectionStatusFilter') volProtectionStatusFilter:VolProtectionStatusFilter;
+  @ViewChild('fsStatusFilter') fsStatusFilter:FsStatusFilter;
+  @ViewChild('fsTypeFilter') fsTypeFilter:FsTypeFilter;
+  @ViewChild('dtreeQuotaFilter') dtreeQuotaFilter:DtreeQuotaFilter;
+  @ViewChild('dtreeQuotaFilter') dtreeSecModFilter:DtreeSecModFilter;
+
   //portList:
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(queryParam => {
@@ -277,6 +300,11 @@ export class DetailComponent implements OnInit, AfterViewInit {
       }
     }
   }
+  refreshStoragePool() {
+    this.storagePoolStatusFilter.initStatus();
+    this.storagePoolTypeFilter.initType();
+    this.getStoragePoolList(true);
+  }
   getStoragePoolList(fresh: boolean){
     if (fresh){
       this.gs.loading=true;
@@ -284,7 +312,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
         this.gs.loading=false;
         if (r.code === '200'){
           this.storagePool = r.data;
+          const allName = this.storagePool.map(item => item.name);
+          this.volStoragePoolFilter.initAllName(allName);
           this.poolTotal=this.storagePool.length==null?0:this.storagePool.length;
+          this.storageListInitHandle();
           this.cdr.detectChanges();
           this.liststoragepoolperformance();
         }
@@ -297,12 +328,85 @@ export class DetailComponent implements OnInit, AfterViewInit {
           this.gs.loading=false;
           if (r.code === '200'){
             this.storagePool = r.data;
+            const allName = this.storagePool.map(item => item.name);
+            this.volStoragePoolFilter.initAllName(allName);
             this.poolTotal=this.storagePool.length==null?0:this.storagePool.length;
+            this.storageListInitHandle();
             this.cdr.detectChanges();
             this.liststoragepoolperformance();
           }
         });
       }
+    }
+  }
+
+  /**
+   * 存储池数据初始化
+   */
+  storageListInitHandle() {
+    if(this.storagePool) {
+      this.storagePool.forEach(item => {
+        switch (item.tier1RaidLv) {
+          case "1":
+            item.tier1RaidLvDesc = "RAID10";
+            break;
+          case "2":
+            item.tier1RaidLvDesc = "RAID5";
+            break;
+          case "3":
+            item.tier1RaidLvDesc = "RAID0";
+            break;
+          case "4":
+            item.tier1RaidLvDesc = "RAID1";
+            break;
+          case "5":
+            item.tier1RaidLvDesc = "RAID6";
+            break;
+          case "6":
+            item.tier1RaidLvDesc = "RAID50";
+            break;
+          case "7":
+            item.tier1RaidLvDesc = "RAID3";
+            break;
+          case "11":
+            item.tier1RaidLvDesc = "RAIDTP";
+            break;
+          default:
+            item.tier1RaidLvDesc = "";
+            break;
+        }
+        switch (item.physicalType) {
+          case "sata":
+            item.physicalTypeDesc = "SATA";
+            break;
+          case "sas":
+            item.physicalTypeDesc = "SAS";
+            break;
+          case "ssd":
+            item.physicalTypeDesc = "SSD";
+            break;
+          case "nl-sas":
+            item.physicalTypeDesc = "NL-SAS";
+            break;
+          case "unknown":
+            item.physicalTypeDesc = this.translatePipe.transform('storage.detail.storagePool.unknown');
+            break;
+          default:
+            item.physicalTypeDesc = "";
+            break;
+        }
+        switch (item.mediaType) {
+          case "file":
+            item.mediaTypeDesc = this.translatePipe.transform('enum.type.file');
+            break;
+          case "block":
+            item.mediaTypeDesc = this.translatePipe.transform('enum.type.block');
+            break;
+          default:
+            item.mediaTypeDesc = "";
+            break;
+        }
+      });
     }
   }
   liststoragepoolperformance(){
@@ -329,6 +433,15 @@ export class DetailComponent implements OnInit, AfterViewInit {
         }
       }
     });
+  }
+  refreshVolList() {
+    this.volStatusFilter.initStatus();
+    this.portTypeFilter.initType();
+    this.mapStatusFilter.initStatus();
+    this.volStoragePoolFilter.initPoolNameStatus();
+    this.volServiceLevelFilter.initServiceLevel();
+    this.volProtectionStatusFilter.initProtectionStatus();
+    this.getStorageVolumeList(true);
   }
   getStorageVolumeList(fresh: boolean){
     console.log('paginationVolume');
@@ -412,6 +525,11 @@ export class DetailComponent implements OnInit, AfterViewInit {
       this.cdr.detectChanges();
     });
   }
+  refreshFileSystem() {
+    this.fsStatusFilter.initStatus();
+    this.fsTypeFilter.initType();
+    this.getFileSystemList(true);
+  }
   getFileSystemList(fresh: boolean){
     if (fresh){
       this.gs.loading=true;
@@ -437,6 +555,11 @@ export class DetailComponent implements OnInit, AfterViewInit {
         });
       }
     }
+  }
+  refreshDtree() {
+    this.dtreeSecModFilter.initSecMod();
+    this.dtreeQuotaFilter.initQuota();
+    this.getDtreeList(true);
   }
   getDtreeList(fresh: boolean){
     if (fresh){
