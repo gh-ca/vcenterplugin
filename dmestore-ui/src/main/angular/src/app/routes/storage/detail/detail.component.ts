@@ -372,29 +372,29 @@ export class DetailComponent implements OnInit, AfterViewInit {
             item.tier1RaidLvDesc = "RAIDTP";
             break;
           default:
-            item.tier1RaidLvDesc = "--";
+            item.tier1RaidLvDesc = item.tier1RaidLv;
             break;
         }
-        switch (item.physicalType) {
-          case "sata":
-            item.physicalTypeDesc = "SATA";
-            break;
-          case "sas":
-            item.physicalTypeDesc = "SAS";
-            break;
-          case "ssd":
-            item.physicalTypeDesc = "SSD";
-            break;
-          case "nl-sas":
-            item.physicalTypeDesc = "NL-SAS";
-            break;
-          case "unknown":
-            item.physicalTypeDesc = this.translatePipe.transform('storage.detail.storagePool.unknown');
-            break;
-          default:
-            item.physicalTypeDesc = "--";
-            break;
-        }
+        // switch (item.physicalType) {
+        //   case "sata":
+        //     item.physicalTypeDesc = "SATA";
+        //     break;
+        //   case "sas":
+        //     item.physicalTypeDesc = "SAS";
+        //     break;
+        //   case "ssd":
+        //     item.physicalTypeDesc = "SSD";
+        //     break;
+        //   case "nl-sas":
+        //     item.physicalTypeDesc = "NL-SAS";
+        //     break;
+        //   case "unknown":
+        //     item.physicalTypeDesc = this.translatePipe.transform('storage.detail.storagePool.unknown');
+        //     break;
+        //   default:
+        //     item.physicalTypeDesc = item.physicalType;
+        //     break;
+        // }
         switch (item.mediaType) {
           case "file":
             item.mediaTypeDesc = this.translatePipe.transform('enum.type.file');
@@ -403,7 +403,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
             item.mediaTypeDesc = this.translatePipe.transform('enum.type.block');
             break;
           default:
-            item.mediaTypeDesc = "--";
+            item.mediaTypeDesc = item.mediaType;
             break;
         }
       });
