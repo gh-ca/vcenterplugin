@@ -111,9 +111,6 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     private VCSDKUtils vcsdkUtils;
 
-    @Value("${dmestore.service.dme.old:false}")
-    private boolean isOldDme;
-
     public VCSDKUtils getVcsdkUtils() {
         return vcsdkUtils;
     }
@@ -188,11 +185,6 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         body.put("page_size", PAGE_SIZE_1000);
         String url = DmeConstants.DME_NFS_SHARE_AUTH_CLIENTS_URL;
         String shareIdKey = NFS_SHARE_ID_FIELD;
-        if (isOldDme) {
-            body.remove("nfs_share_id");
-            shareIdKey = ID_FIELD;
-            url = DmeConstants.DME_NFS_SHARE_AUTH_CLIENTS_URL_OLD.replace(NFS_SHARE_ID, shareId);
-        }
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(body));
         if (responseEntity.getStatusCodeValue() / DIGIT_100 == DIGIT_2) {
             String resBody = responseEntity.getBody();
@@ -431,9 +423,6 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         Map<String, Object> requestbody = new HashMap<>();
         requestbody.put(SHARE_PATH, sharePath);
         String url = DmeConstants.DME_NFS_SHARE_URL;
-        if (isOldDme) {
-            url = DmeConstants.DME_NFS_SHARE_URL_OLD;
-        }
         return dmeAccessService.access(url, HttpMethod.POST, gson.toJson(requestbody));
     }
 
@@ -523,13 +512,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         String url = DmeConstants.API_LOGICPORTS_LIST;
         JsonObject param = null;
         HttpMethod method = HttpMethod.POST;
-        if (isOldDme) {
-            url = DmeConstants.API_LOGICPORTS_LIST_OLD + "?storage_id=" + storageId;
-            method = HttpMethod.GET;
-        } else {
-            param = new JsonObject();
-            param.addProperty("storage_id", storageId);
-        }
+        param = new JsonObject();
+        param.addProperty("storage_id", storageId);
         ResponseEntity responseEntity = dmeAccessService.access(url, method, gson.toJson(param));
         return responseEntity;
     }
@@ -748,20 +732,11 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             String accessval = ("readOnly".equalsIgnoreCase(ToolUtils.getStr(params.get("mountType"))))
                 ? "read-only"
                 : "read/write";
-            if (isOldDme) {
-                requestbody.put(ID_FIELD, ToolUtils.getStr(params.get(SHAREID)));
-                addition.put("accessval", accessval);
-                addition.put("all_squash", "no_all_squash");
-                addition.put("root_squash", "root_squash");
-                addition.put("sync", "synchronization");
-                addition.put("secure", "insecure");
-            } else {
-                addition.put("permission", accessval);
-                addition.put("permission_constraint", "no_all_squash");
-                addition.put("root_permission_constraint", "root_squash");
-                addition.put("write_mode", "synchronization");
-                addition.put("source_port_verification", "insecure");
-            }
+            addition.put("permission", accessval);
+            addition.put("permission_constraint", "no_all_squash");
+            addition.put("root_permission_constraint", "root_squash");
+            addition.put("write_mode", "synchronization");
+            addition.put("source_port_verification", "insecure");
 
             List<Map<String, Object>> listAddition = new ArrayList<>();
             listAddition.add(addition);
