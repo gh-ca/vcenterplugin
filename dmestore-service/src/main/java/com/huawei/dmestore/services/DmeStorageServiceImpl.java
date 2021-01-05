@@ -332,7 +332,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     String diskPoolId = ToolUtils.jsonToStr(element.get("diskPoolId"));
                     storagePool.setDiskPoolId(diskPoolId);
                     String diskType = getDiskType(storageId, diskPoolId);
-                    storagePool.setPhysicalType(diskType);
+                    storagePool.setPhysicalType(diskType.toUpperCase());
                     String resId = ToolUtils.jsonToStr(element.get(RES_ID));
                     if (djofspMap != null && djofspMap.get(resId) != null) {
                         storagePool.setServiceLevelName(gson.toJson(djofspMap.get(resId)));
