@@ -117,6 +117,7 @@ export class StoragePool{
   tier1RaidLvDesc: string; // RAID级别描述
   tier2RaidLv: string; // RAID级别
   tier2RaidLvDesc: string; // RAID级别描述
+  raidLevel: string; // RAID级别描述
   storageId: string; // 存储设备id
   dataSpace: number; // 存储池上创建LUN或者文件系统时的可用容量 单位MB
   subscribedCapacity: number; //订阅容量

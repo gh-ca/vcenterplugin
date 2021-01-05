@@ -106,7 +106,7 @@
                         </clr-dg-filter>
                       </clr-dg-column>
                       <clr-dg-column [hidden]="poolRadio!=='table1'" [clrDgField]="'serviceLevelName'">{{'storage.detail.storagePool.serviceLevel' | translate}}</clr-dg-column>
-                      <clr-dg-column [hidden]="poolRadio!=='table1'" [clrDgField]="'tier1RaidLvDesc'">{{'storage.detail.storagePool.raidLevel' | translate}}</clr-dg-column>
+                      <clr-dg-column [hidden]="poolRadio!=='table1'" [clrDgField]="'raidLevel'">{{'storage.detail.storagePool.raidLevel' | translate}}</clr-dg-column>
 
                       <clr-dg-column [hidden]="poolRadio!=='table2'">{{'storage.detail.storagePool.totalCap' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="poolRadio!=='table2'">{{'storage.detail.storagePool.usedCap' | translate}}</clr-dg-column>
@@ -145,7 +145,7 @@
                         </clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">{{formatArry(item.serviceLevelName)}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">
-                          {{item.tier1RaidLvDesc}}
+                          {{item.raidLevel}}
                         </clr-dg-cell>
 
                         <clr-dg-cell [hidden]="poolRadio!=='table2'">{{formatCapacity(item.totalCapacity)}}</clr-dg-cell>
