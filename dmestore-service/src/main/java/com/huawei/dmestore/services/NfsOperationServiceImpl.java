@@ -97,9 +97,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
     private DmeVmwareRalationDao dmeVmwareRalationDao;
 
-    @Value("${dmestore.service.dme.old:false}")
-    private boolean isOldDme;
-
     public DmeVmwareRalationDao getDmeVmwareRalationDao() {
         return dmeVmwareRalationDao;
     }
@@ -197,19 +194,11 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                     if (shareClientHostMap != null && shareClientHostMap.size() > 0
                         && shareClientHostMap.get("objectId") != null) {
                         reqNfsShareClientArrayAddition.put(NAME_FIELD, shareClientHostMap.get(NAME_FIELD));
-                        if (isOldDme) {
-                            reqNfsShareClientArrayAddition.put("accessval", params.get("accessModeDme"));
-                            reqNfsShareClientArrayAddition.put("sync", "synchronization");
-                            reqNfsShareClientArrayAddition.put("all_squash", "all_squash");
-                            reqNfsShareClientArrayAddition.put("root_squash", "root_squash");
-                            reqNfsShareClientArrayAddition.put("secure", "insecure");
-                        } else {
-                            reqNfsShareClientArrayAddition.put("permission", params.get("accessModeDme"));
-                            reqNfsShareClientArrayAddition.put("write_mode", "synchronization");
-                            reqNfsShareClientArrayAddition.put("permission_constraint", "all_squash");
-                            reqNfsShareClientArrayAddition.put("root_permission_constraint", "root_squash");
-                            reqNfsShareClientArrayAddition.put("source_port_verification", "insecure");
-                        }
+                        reqNfsShareClientArrayAddition.put("permission", params.get("accessModeDme"));
+                        reqNfsShareClientArrayAddition.put("write_mode", "synchronization");
+                        reqNfsShareClientArrayAddition.put("permission_constraint", "all_squash");
+                        reqNfsShareClientArrayAddition.put("root_permission_constraint", "root_squash");
+                        reqNfsShareClientArrayAddition.put("source_port_verification", "insecure");
                         mount.put((String) shareClientHostMap.get("objectId"),
                             (String) shareClientHostMap.get(NAME_FIELD));
                     }
@@ -245,11 +234,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 throw new DmeException(CODE_403, "create FileSystem fail!" + taskDetailInfo.getDetail());
             }
             if (!"".equals(fsId)) {
-                if (isOldDme) {
-                    nfsShareMap.put("fs_id", fsId);
-                } else {
-                    createNfsShareParams.put("fs_id", fsId);
-                }
+                createNfsShareParams.put("fs_id", fsId);
                 LOG.info("DME create nfs share request params:{}", gson.toJson(nfsShareMap));
                 String nfsShareTaskId = createNfsShare(nfsShareMap);
                 List<String> shareIds = new ArrayList<>();
@@ -473,9 +458,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
         LOG.info("DME 创建NFS报文：{}", gson.toJson(params));
         String url = DmeConstants.API_FS_CREATE;
-        if (isOldDme) {
-            url = DmeConstants.API_FS_CREATE_OLD;
-        }
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(params));
         int code = responseEntity.getStatusCodeValue();
         if (code != HttpStatus.ACCEPTED.value()) {
@@ -613,9 +595,6 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             reqMap.put(NAME_FIELD, shareName);
             reqMap.put("fs_name", fsname);
             String url = DmeConstants.DME_NFS_SHARE_URL;
-            if (isOldDme) {
-                url = DmeConstants.DME_NFS_SHARE_URL_OLD;
-            }
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(reqMap));
             if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
                 String object = responseEntity.getBody();

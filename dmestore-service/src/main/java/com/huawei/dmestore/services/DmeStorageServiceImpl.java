@@ -128,9 +128,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     private DataStoreStatisticHistoryService dataStoreStatisticHistoryService;
 
-    @Value("${dmestore.service.dme.old:false}")
-    private boolean isOldDme;
-
     public void setDataStoreStatisticHistoryService(DataStoreStatisticHistoryService dataStoreStatisticHistoryService) {
         this.dataStoreStatisticHistoryService = dataStoreStatisticHistoryService;
     }
@@ -406,13 +403,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         String url = DmeConstants.API_LOGICPORTS_LIST;
         JsonObject param = null;
         HttpMethod method = HttpMethod.POST;
-        if (isOldDme) {
-            url = DmeConstants.API_LOGICPORTS_LIST_OLD + "?storage_id=" + storageId;
-            method = HttpMethod.GET;
-        } else {
-            param = new JsonObject();
-            param.addProperty("storage_id", storageId);
-        }
+        param = new JsonObject();
+        param.addProperty("storage_id", storageId);
         try {
             LOG.info("{}, getLogic begin!storageId={}", url, storageId);
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, method,
@@ -451,10 +443,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     logicPorts.setVstoreId(ToolUtils.jsonToStr(element.get("vstore_id")));
                     logicPorts.setVstoreName(ToolUtils.jsonToStr(element.get("vstore_name")));
 
-                    if (isOldDme) {
-                        logicPorts.setHomePortId(ToolUtils.jsonToStr(element.get("home_port_id")));
-                        logicPorts.setCurrentPortId(ToolUtils.jsonToStr(element.get("current_port_id")));
-                    }
                     resList.add(logicPorts);
                 }
             }
@@ -585,9 +573,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         params.put(STORAGE_ID, storageId);
         try {
             String url = DmeConstants.API_DTREES_LIST;
-            if (isOldDme) {
-                url = DmeConstants.API_DTREES_LIST_OLD;
-            }
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(params));
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
@@ -624,9 +609,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         params.put(STORAGE_ID, storageId);
         try {
             String url = DmeConstants.DME_NFS_SHARE_URL;
-            if (isOldDme) {
-                url = DmeConstants.DME_NFS_SHARE_URL_OLD;
-            }
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(params));
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
