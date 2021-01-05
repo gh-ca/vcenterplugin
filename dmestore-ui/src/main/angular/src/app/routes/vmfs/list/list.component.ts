@@ -1604,6 +1604,47 @@ export class VmfsListComponent implements OnInit {
       form.miniops = null;
       form.latencyChoose = false;
       form.latency = null;
+    }else {
+      if (this.form.control_policy == '1') {
+        form.minbandwidthChoose = false;
+        form.minbandwidth = null;
+        form.miniopsChoose = false;
+        form.miniops = null;
+        form.latencyChoose = false;
+        form.latency = null;
+        if (!form.maxbandwidthChoose) {
+          form.maxbandwidth = null;
+        }
+        if (!form.maxiopsChoose) {
+          form.maxiops = null;
+        }
+      } else if (this.form.control_policy == '0') {
+        form.maxbandwidthChoose = false;
+        form.maxbandwidth = null;
+        form.maxiopsChoose = false;
+        form.maxiops = null;
+        if (!form.minbandwidthChoose) {
+          form.minbandwidth = null;
+        }
+        if (!form.miniopsChoose) {
+          form.miniops = null;
+        }
+        if (!form.latencyChoose) {
+          form.latency = null;
+        }
+      } else {
+        form.control_policy = '';
+        form.maxbandwidthChoose = false;
+        form.maxbandwidth = null;
+        form.maxiopsChoose = false;
+        form.maxiops = null;
+        form.minbandwidthChoose = false;
+        form.minbandwidth = null;
+        form.miniopsChoose = false;
+        form.miniops = null;
+        form.latencyChoose = false;
+        form.latency = null;
+      }
     }
 
   }
