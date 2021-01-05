@@ -372,7 +372,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
             item.tier1RaidLvDesc = "RAIDTP";
             break;
           default:
-            item.tier1RaidLvDesc = "";
+            item.tier1RaidLvDesc = "--";
             break;
         }
         switch (item.physicalType) {
@@ -392,7 +392,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
             item.physicalTypeDesc = this.translatePipe.transform('storage.detail.storagePool.unknown');
             break;
           default:
-            item.physicalTypeDesc = "";
+            item.physicalTypeDesc = "--";
             break;
         }
         switch (item.mediaType) {
@@ -403,7 +403,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
             item.mediaTypeDesc = this.translatePipe.transform('enum.type.block');
             break;
           default:
-            item.mediaTypeDesc = "";
+            item.mediaTypeDesc = "--";
             break;
         }
       });
