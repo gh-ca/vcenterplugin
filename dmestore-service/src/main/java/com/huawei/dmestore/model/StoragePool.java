@@ -139,6 +139,11 @@ public class StoragePool {
     private Float maxLatency;
 
     /**
+     * RAID级别--转化后的值.
+     **/
+    private String raidLevel;
+
+    /**
      * getStorageName .
      *
      * @return String.
@@ -676,5 +681,13 @@ public class StoragePool {
      */
     public void setProtectionCapacity(final Double param) {
         this.protectionCapacity = param;
+    }
+
+    public String getRaidLevel() {
+        return raidLevel;
+    }
+
+    public void setRaidLevel(String raidLevel) {
+        this.raidLevel = raidLevel;
     }
 }

@@ -340,7 +340,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     String diskPoolId = ToolUtils.jsonToStr(element.get("diskPoolId"));
                     storagePool.setDiskPoolId(diskPoolId);
                     String diskType = getDiskType(storageId, diskPoolId);
-                    storagePool.setPhysicalType(diskType);
+                    storagePool.setPhysicalType(diskType.toUpperCase());
                     String resId = ToolUtils.jsonToStr(element.get(RES_ID));
                     if (djofspMap != null && djofspMap.get(resId) != null) {
                         storagePool.setServiceLevelName(gson.toJson(djofspMap.get(resId)));
@@ -401,11 +401,24 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         storagePool.setRunningStatus(ToolUtils.jsonToStr(element.get("runningStatus")));
         storagePool.setStoragePoolId(ToolUtils.jsonToStr(element.get(STORAGE_DEVICE_ID)));
         storagePool.setStorageId(ToolUtils.jsonToStr(element.get(STORAGE_DEVICE_ID)));
-        storagePool.setTier0RaidLv(ToolUtils.jsonToStr(element.get("tier0RaidLv")));
-        storagePool.setTier1RaidLv(ToolUtils.jsonToStr(element.get("tier1RaidLv")));
-        storagePool.setTier2RaidLv(ToolUtils.jsonToStr(element.get("tier2RaidLv")));
+        String tier0RaidLv = ToolUtils.jsonToStr(element.get("tier0RaidLv"));
+        String tier1RaidLv = ToolUtils.jsonToStr(element.get("tier1RaidLv"));
+        String tier2RaidLv = ToolUtils.jsonToStr(element.get("tier2RaidLv"));
+        storagePool.setTier0RaidLv(tier0RaidLv);
+        storagePool.setTier1RaidLv(tier1RaidLv);
+        storagePool.setTier2RaidLv(tier2RaidLv);
+        String raidLevel = parseRaidLv(tier0RaidLv) + parseRaidLv(tier1RaidLv) + parseRaidLv(tier2RaidLv);
+        storagePool.setRaidLevel(raidLevel.substring(0, raidLevel.lastIndexOf("/")));
         storagePool.setPoolId(ToolUtils.jsonToStr(element.get(POOL_ID)));
         storagePool.setStorageInstanceId(ToolUtils.jsonToStr(element.get(RES_ID)));
+    }
+
+    private String parseRaidLv(String raidLv){
+        String raidLvValue = DmeConstants.RAID_LEVEL_MAP.get(raidLv);
+        if(!StringUtils.isEmpty(raidLvValue)){
+            return raidLvValue + "/";
+        }
+        return "";
     }
 
     @Override

@@ -346,55 +346,55 @@ export class DetailComponent implements OnInit, AfterViewInit {
   storageListInitHandle() {
     if(this.storagePool) {
       this.storagePool.forEach(item => {
-        switch (item.tier1RaidLv) {
-          case "1":
-            item.tier1RaidLvDesc = "RAID10";
-            break;
-          case "2":
-            item.tier1RaidLvDesc = "RAID5";
-            break;
-          case "3":
-            item.tier1RaidLvDesc = "RAID0";
-            break;
-          case "4":
-            item.tier1RaidLvDesc = "RAID1";
-            break;
-          case "5":
-            item.tier1RaidLvDesc = "RAID6";
-            break;
-          case "6":
-            item.tier1RaidLvDesc = "RAID50";
-            break;
-          case "7":
-            item.tier1RaidLvDesc = "RAID3";
-            break;
-          case "11":
-            item.tier1RaidLvDesc = "RAIDTP";
-            break;
-          default:
-            item.tier1RaidLvDesc = "";
-            break;
-        }
-        switch (item.physicalType) {
-          case "sata":
-            item.physicalTypeDesc = "SATA";
-            break;
-          case "sas":
-            item.physicalTypeDesc = "SAS";
-            break;
-          case "ssd":
-            item.physicalTypeDesc = "SSD";
-            break;
-          case "nl-sas":
-            item.physicalTypeDesc = "NL-SAS";
-            break;
-          case "unknown":
-            item.physicalTypeDesc = this.translatePipe.transform('storage.detail.storagePool.unknown');
-            break;
-          default:
-            item.physicalTypeDesc = "";
-            break;
-        }
+        // switch (item.tier1RaidLv) {
+        //   case "1":
+        //     item.tier1RaidLvDesc = "RAID10";
+        //     break;
+        //   case "2":
+        //     item.tier1RaidLvDesc = "RAID5";
+        //     break;
+        //   case "3":
+        //     item.tier1RaidLvDesc = "RAID0";
+        //     break;
+        //   case "4":
+        //     item.tier1RaidLvDesc = "RAID1";
+        //     break;
+        //   case "5":
+        //     item.tier1RaidLvDesc = "RAID6";
+        //     break;
+        //   case "6":
+        //     item.tier1RaidLvDesc = "RAID50";
+        //     break;
+        //   case "7":
+        //     item.tier1RaidLvDesc = "RAID3";
+        //     break;
+        //   case "11":
+        //     item.tier1RaidLvDesc = "RAIDTP";
+        //     break;
+        //   default:
+        //     item.tier1RaidLvDesc = item.tier1RaidLv;
+        //     break;
+        // }
+        // switch (item.physicalType) {
+        //   case "sata":
+        //     item.physicalTypeDesc = "SATA";
+        //     break;
+        //   case "sas":
+        //     item.physicalTypeDesc = "SAS";
+        //     break;
+        //   case "ssd":
+        //     item.physicalTypeDesc = "SSD";
+        //     break;
+        //   case "nl-sas":
+        //     item.physicalTypeDesc = "NL-SAS";
+        //     break;
+        //   case "unknown":
+        //     item.physicalTypeDesc = this.translatePipe.transform('storage.detail.storagePool.unknown');
+        //     break;
+        //   default:
+        //     item.physicalTypeDesc = item.physicalType;
+        //     break;
+        // }
         switch (item.mediaType) {
           case "file":
             item.mediaTypeDesc = this.translatePipe.transform('enum.type.file');
@@ -403,7 +403,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
             item.mediaTypeDesc = this.translatePipe.transform('enum.type.block');
             break;
           default:
-            item.mediaTypeDesc = "";
+            item.mediaTypeDesc = item.mediaType;
             break;
         }
       });

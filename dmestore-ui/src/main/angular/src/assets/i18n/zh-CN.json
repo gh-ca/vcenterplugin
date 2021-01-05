@@ -384,7 +384,7 @@
         "capacityUsage":"容量利用率",
         "bareCapacity":"裸容量",
         "totalCapacity":"总容量",
-        "useFree":"已使用/空闲",
+        "useFree":"已使用|空闲",
         "subscribe":"已订阅",
         "storagePool":"存储池列表",
         "used":"已用:",

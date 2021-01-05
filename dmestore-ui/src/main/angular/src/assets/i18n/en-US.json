@@ -381,7 +381,7 @@
         "capacityUsage":"Capacity Usage",
         "bareCapacity":"Bare Capacity",
         "totalCapacity":"Total Capacity",
-        "useFree":"Use/Free",
+        "useFree":"Use|Free",
         "subscribe":"Subscribed",
         "storagePool":"Storage Pool List",
         "used":"Used:",
