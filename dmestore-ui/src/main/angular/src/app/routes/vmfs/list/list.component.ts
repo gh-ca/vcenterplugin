@@ -215,10 +215,9 @@ export class VmfsListComponent implements OnInit {
       // 若不修改卷名称则将旧的卷名称设置为newVol
       this.modifyForm.newVoName = this.rowSelected[0].volumeName;
     }
-    if (this.isServiceLevelData) {
-      if (!this.modifyForm.qosFlag) {
-        this.modifyForm.control_policy = null;
-      }
+    if (!this.isServiceLevelData) {
+      // 控制策略若未选清空数据
+      this.qosEditFunc(this.modifyForm);
     }
 
     this.modifyForm.newDsName = this.modifyForm.name;
@@ -1606,7 +1605,7 @@ export class VmfsListComponent implements OnInit {
       form.latencyChoose = false;
       form.latency = null;
     }else {
-      if (this.form.control_policy == '1') {
+      if (form.control_policy == '1') {
         form.minbandwidthChoose = false;
         form.minbandwidth = null;
         form.miniopsChoose = false;
@@ -1619,7 +1618,7 @@ export class VmfsListComponent implements OnInit {
         if (!form.maxiopsChoose) {
           form.maxiops = null;
         }
-      } else if (this.form.control_policy == '0') {
+      } else if (form.control_policy == '0') {
         form.maxbandwidthChoose = false;
         form.maxbandwidth = null;
         form.maxiopsChoose = false;
@@ -1647,7 +1646,64 @@ export class VmfsListComponent implements OnInit {
         form.latency = null;
       }
     }
+  }
 
+  qosEditFunc(form) {
+    console.log("form.qosFlag", form.qosFlag);
+    if (!form.qosFlag) {// 关闭状态
+      form.control_policy = '';
+      form.maxiopsChoose = false;
+      form.max_iops = null;
+      form.maxbandwidthChoose = false;
+      form.max_bandwidth = null;
+      form.minbandwidthChoose = false;
+      form.min_bandwidth = null;
+      form.miniopsChoose = false;
+      form.min_iops = null;
+      form.latencyChoose = false;
+      form.latency = null;
+    }else {
+      if (form.control_policy == '1') {
+        form.minbandwidthChoose = false;
+        form.min_bandwidth = null;
+        form.miniopsChoose = false;
+        form.min_iops = null;
+        form.latencyChoose = false;
+        form.latency = null;
+        if (!form.maxbandwidthChoose) {
+          form.max_bandwidth = null;
+        }
+        if (!form.maxiopsChoose) {
+          form.max_iops = null;
+        }
+      } else if (form.control_policy == '0') {
+        form.maxbandwidthChoose = false;
+        form.max_bandwidth = null;
+        form.maxiopsChoose = false;
+        form.max_iops = null;
+        if (!form.minbandwidthChoose) {
+          form.min_bandwidth = null;
+        }
+        if (!form.miniopsChoose) {
+          form.min_iops = null;
+        }
+        if (!form.latencyChoose) {
+          form.latency = null;
+        }
+      } else {
+        form.control_policy = '';
+        form.maxiopsChoose = false;
+        form.max_iops = null;
+        form.maxbandwidthChoose = false;
+        form.max_bandwidth = null;
+        form.minbandwidthChoose = false;
+        form.min_bandwidth = null;
+        form.miniopsChoose = false;
+        form.min_iops = null;
+        form.latencyChoose = false;
+        form.latency = null;
+      }
+    }
   }
 
   /**
