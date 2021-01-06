@@ -1829,7 +1829,7 @@ public class VCSDKUtils {
             logger.info("refreshStorageSystem before mount Vmfs!");
             hostMo.getHostStorageSystemMo().refreshStorageSystem();
 
-            // 查询目前未挂载的卷
+           /* // 查询目前未挂载的卷
             for (HostFileSystemMountInfo mount : hostMo.getHostStorageSystemMo()
                 .getHostFileSystemVolumeInfo()
                 .getMountInfo()) {
@@ -1844,7 +1844,7 @@ public class VCSDKUtils {
 
             // 挂载后重新扫描datastore
             logger.info("refreshStorageSystem after mount Vmfs!");
-            hostMo.getHostStorageSystemMo().refreshStorageSystem();
+            hostMo.getHostStorageSystemMo().refreshStorageSystem();*/
         } catch (Exception e) {
             logger.error(" mount vmfs volume error!datastoreName={},error:{}", datastoreName, e.getMessage());
         }
@@ -3066,7 +3066,7 @@ public class VCSDKUtils {
                 map = new HashMap<>();
                 HostMO hostMo = virtualMachineMo.getRunningHost();
                 String objectId = vcConnectionHelpers.mor2ObjectId(hostMo.getMor(), vmwareContext.getServerAddress());
-                map.put("hostObjectId", objectId);
+                map.put(HOST_ID, objectId);
                 map.put(HOST_NAME, hostMo.getName());
             }
         } catch (Exception e) {

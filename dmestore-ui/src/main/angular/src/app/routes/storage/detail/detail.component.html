@@ -1052,7 +1052,12 @@
                               <clr-dg-column [clrDgField]="'mgmtIpv6'">{{'storage.detail.hardware.ports.ipv6' | translate}}</clr-dg-column>
                               <clr-dg-column [clrDgField]="'currentPortName'">{{'storage.detail.hardware.ports.currentPort' | translate}}</clr-dg-column>
                               <clr-dg-column [clrDgField]="'role'">{{'storage.detail.hardware.ports.role' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'ddnsStatus'">{{'storage.detail.hardware.ports.dynamicDns' | translate}}</clr-dg-column>
+                              <clr-dg-column [clrDgField]="'ddnsStatus'">
+                                {{'storage.detail.hardware.ports.dynamicDns' | translate}}
+                                <clr-dg-filter [clrDgFilter]="logicDdnsStatusFilter">
+                                  <logic-ddns-status-filter #logicDdnsStatusFilter></logic-ddns-status-filter>
+                                </clr-dg-filter>
+                              </clr-dg-column>
                               <clr-dg-column [clrDgField]="'supportProtocol'">{{'storage.detail.hardware.ports.dataProtocol' | translate}}</clr-dg-column>
                               <clr-dg-column [clrDgField]="'managementAccess'">{{'storage.detail.hardware.ports.manageAccess' | translate}}</clr-dg-column>
                               <clr-dg-column [clrDgField]="'vstoreName'">{{'storage.detail.hardware.ports.vStoreName' | translate}}</clr-dg-column>
@@ -1064,8 +1069,8 @@
                                   <span *ngIf="!item.runningStatus">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell>
-                                  <span *ngIf="item.operationalStatus == 'activated'">{{'enum.status.activated' | translate}}</span>
-                                  <span *ngIf="item.operationalStatus != 'activated'">{{'enum.status.unActivated' | translate}}</span>
+                                  <span *ngIf="item.operationalStatus == 'ACTIVATED'">{{'enum.status.activated' | translate}}</span>
+                                  <span *ngIf="item.operationalStatus != 'ACTIVATED'">{{'enum.status.unActivated' | translate}}</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell>{{item.mgmtIp!=null?item.mgmtIp!=''?item.mgmtIp:'--':'--'}}</clr-dg-cell>
                                 <clr-dg-cell  class="over_flow">
@@ -1073,7 +1078,11 @@
                                 </clr-dg-cell>
                                 <clr-dg-cell>{{item.currentPortName!=null?item.currentPortName:'--'}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.role!=null?item.role:'--'}}</clr-dg-cell>
-                                <clr-dg-cell>{{item.ddnsStatus!=null?item.ddnsStatus:'--'}}</clr-dg-cell>
+                                <clr-dg-cell>
+                                  <span *ngIf="item.ddnsStatus == 'INVALID'">{{'enum.status.invalid' | translate}}</span>
+                                  <span *ngIf="item.ddnsStatus == 'ENABLE'">{{'enum.status.enable' | translate}}</span>
+                                  <span *ngIf="item.ddnsStatus != 'ENABLE' && item.ddnsStatus != 'INVALID'">{{'enum.status.notActivated' | translate}}</span>
+                                </clr-dg-cell>
                                 <clr-dg-cell>{{item.supportProtocol!=null?item.supportProtocol:'--'}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.managementAccess!=null?item.managementAccess:'--'}}</clr-dg-cell>
                                 <clr-dg-cell>{{item.vstoreName!=null?item.vstoreName!=''?item.vstoreName:'--':'--'}}</clr-dg-cell>

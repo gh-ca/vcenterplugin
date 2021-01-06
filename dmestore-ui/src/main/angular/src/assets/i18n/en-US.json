@@ -771,7 +771,10 @@
        "linkUp":"Link Up",
        "activated":"Activated",
        "unActivated":"unActivated",
-       "all":"ALL"
+       "all":"ALL",
+       "invalid":"INVALID",
+       "enable":"ENABLE",
+       "notActivated":"NOTACTIVATED"
      },
      "type":{
       "block":"Block",

@@ -107,11 +107,16 @@ export class UpdateNfs{
   contolPolicy :string;//  上下线选择标记  枚举值 up low
 // up 取值如下
   maxBandwidth: number; //
+  maxBandwidthChoose: false; //
   maxIops: number; //
+  maxIopsChoose: false; //
 //low取值
   minBandwidth: number; //
+  minBandwidthChoose: false; //
   minIops: number; //
+  minIopsChoose: false; //
   latency: number; //
+  latencyChoose: false; //
   thin:boolean;// true  代表thin false代表thick
   deduplicationEnabled:boolean;// 重删 true false
   compressionEnabled:boolean;// 压缩 true false
