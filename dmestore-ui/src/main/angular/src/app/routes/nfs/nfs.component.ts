@@ -268,6 +268,8 @@ export class NfsComponent implements OnInit {
       default: // 默认GB 不变
         break;
     }
+    //  控制策略若未选清空数据
+    this.qosFunc(this.addForm);
     this.addService.addNfs(this.addForm).subscribe((result: any) => {
       this.modalHandleLoading=false;
       if (result.code === '200'){
@@ -586,5 +588,66 @@ export class NfsComponent implements OnInit {
    */
   confirmActResult() {
     this.addModelShow = false;
+  }
+
+  qosFunc(form) {
+    console.log("form.qosFlag", form.qosFlag);
+    console.log("form.contolPolicy", form.contolPolicy == 'up');
+    console.log("form.contolPolicy2", form.contolPolicy == 'low');
+    console.log("form.contolPolicy2", form);
+    if (!form.qosFlag) {// 关闭状态
+      form.contolPolicy = '';
+      form.maxBandwidthChoose = false;
+      form.maxBandwidth = null;
+      form.maxIopsChoose = false;
+      form.maxIops = null;
+      form.minBandwidthChoose = false;
+      form.minBandwidth = null;
+      form.minIopsChoose = false;
+      form.minIops = null;
+      form.latencyChoose = false;
+      form.latency = null;
+    }else {
+      if (form.contolPolicy == 'up') {
+        form.minBandwidthChoose = false;
+        form.minBandwidth = null;
+        form.minIopsChoose = false;
+        form.minIops = null;
+        form.latencyChoose = false;
+        form.latency = null;
+        if (!form.maxBandwidthChoose) {
+          form.maxBandwidth = null;
+        }
+        if (!form.maxIopsChoose) {
+          form.maxIops = null;
+        }
+      } else if (form.contolPolicy == 'low') {
+        form.maxBandwidthChoose = false;
+        form.maxBandwidth = null;
+        form.maxIopsChoose = false;
+        form.maxIops = null;
+        if (!form.minBandwidthChoose) {
+          form.minBandwidth = null;
+        }
+        if (!form.minIopsChoose) {
+          form.minIops = null;
+        }
+        if (!form.latencyChoose) {
+          form.latency = null;
+        }
+      } else {
+        form.contolPolicy = '';
+        form.maxBandwidthChoose = false;
+        form.maxBandwidth = null;
+        form.maxIopsChoose = false;
+        form.maxIops = null;
+        form.minBandwidthChoose = false;
+        form.minBandwidth = null;
+        form.minIopsChoose = false;
+        form.minIops = null;
+        form.latencyChoose = false;
+        form.latency = null;
+      }
+    }
   }
 }
