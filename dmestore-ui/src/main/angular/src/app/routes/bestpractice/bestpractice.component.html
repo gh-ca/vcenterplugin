@@ -9,7 +9,7 @@
 
     <clr-dg-column [clrDgField]="'hostSetting'">{{'bestPractice.hostSetting'|translate}}</clr-dg-column>
     <clr-dg-column [clrDgField]="'recommendValue'">{{'bestPractice.recommend'|translate}}</clr-dg-column>
-    <clr-dg-column [clrDgField]="'level'">{{'bestPractice.level'|translate}}</clr-dg-column>
+    <clr-dg-column [clrDgField]="'levelDesc'">{{'bestPractice.level'|translate}}</clr-dg-column>
     <clr-dg-column [clrDgField]="'violation'" [clrDgSortOrder]="'violation'">{{'bestPractice.violation'|translate}}</clr-dg-column>
 
     <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
@@ -17,16 +17,16 @@
       <clr-dg-cell>{{item.recommendValue}}</clr-dg-cell>
       <clr-dg-cell>
         <span [hidden]="item.level != 'Critical'">
-          <span class="color-square" style="background-color: #CA2200; margin-right: 10px"></span>{{'bestPractice.critical'|translate}}
+          <span class="color-square" style="background-color: #CA2200; margin-right: 10px"></span>{{item.levelDesc}}
         </span>
         <span [hidden]="item.level != 'Major'">
-          <span class="color-square" style="background-color: #F0C004; margin-right: 10px"></span>{{'bestPractice.major'|translate}}
+          <span class="color-square" style="background-color: #F0C004; margin-right: 10px"></span>{{item.levelDesc}}
         </span>
         <span [hidden]="item.level != 'Warning'">
-          <span class="color-square" style="background-color: #FEE273; margin-right: 10px"></span>{{'bestPractice.warning'|translate}}
+          <span class="color-square" style="background-color: #FEE273; margin-right: 10px"></span>{{item.levelDesc}}
         </span>
         <span [hidden]="item.level != 'Info'">
-          <span class="color-square" style="background-color: #79C6E6; margin-right: 10px"></span>{{'bestPractice.info'|translate}}
+          <span class="color-square" style="background-color: #79C6E6; margin-right: 10px"></span>{{item.levelDesc}}
         </span>
       </clr-dg-cell>
       <clr-dg-cell><span (click)="openHostList(item)" style="color:#00F;cursor:pointer">{{item.count}}</span></clr-dg-cell>
