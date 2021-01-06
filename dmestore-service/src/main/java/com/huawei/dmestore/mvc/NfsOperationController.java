@@ -203,14 +203,14 @@ public class NfsOperationController extends BaseController {
 
             String capacitymode = (Boolean) requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD)
                 ? CapacityAutonegotiation.CAPACITY_MODE_AUTO : defaultCapacitymode;
-           /* if ("grow".equalsIgnoreCase(capacitymode)){
+           if (!"grow-off".equalsIgnoreCase(capacitymode)){
                 capacityAutonegotiation.put("capacity_recycle_mode","expand_capacity");
-                capacityAutonegotiation.put("auto_grow_threshold_percent",true);
+                capacityAutonegotiation.put("auto_grow_threshold_percent",85);
                 capacityAutonegotiation.put("auto_shrink_threshold_percent",50);
                 capacityAutonegotiation.put("max_auto_size", 16777216);
                 capacityAutonegotiation.put("min_auto_size",16777216);
-                capacityAutonegotiation.put("auto_size_increment",1);
-            }*/
+                capacityAutonegotiation.put("auto_size_increment",1024);
+            }
             capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
             capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
         } else {
@@ -244,14 +244,14 @@ public class NfsOperationController extends BaseController {
             String capacitymode = (Boolean)autoSizeEnable
                 ? CapacityAutonegotiation.CAPACITY_MODE_AUTO
                 : CapacityAutonegotiation.CAPACITY_MODE_OFF;
-           /* if ("grow".equalsIgnoreCase(capacitymode)){
+           if (!"grow-off".equalsIgnoreCase(capacitymode)){
                 capacityAutonegotiation.put("capacity_recycle_mode","expand_capacity");
-                capacityAutonegotiation.put("auto_grow_threshold_percent",true);
+                capacityAutonegotiation.put("auto_grow_threshold_percent",85);
                 capacityAutonegotiation.put("auto_shrink_threshold_percent",50);
-                capacityAutonegotiation.put("max_auto_size", 16777216);
-                capacityAutonegotiation.put("min_auto_size",16777216);
-                capacityAutonegotiation.put("auto_size_increment",1);
-            }*/
+                capacityAutonegotiation.put("max_auto_size", 3.6);
+                capacityAutonegotiation.put("min_auto_size",3.0);
+                capacityAutonegotiation.put("auto_size_increment",1024);
+            }
             capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
             param.put("capacity_autonegotiation", capacityAutonegotiation);
         }
@@ -280,6 +280,7 @@ public class NfsOperationController extends BaseController {
                 qosPolicy.put("max_bandwidth", Integer.parseInt((String) params.get("maxBandwidth")));
                 qosPolicy.put("max_iops", Integer.parseInt((String) params.get("maxIops")));
             }
+            qosPolicy.put("enabled", true);
             param.put("qos_policy", qosPolicy);
         }
         try {
