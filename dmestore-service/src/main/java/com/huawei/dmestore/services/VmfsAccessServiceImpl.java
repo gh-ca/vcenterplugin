@@ -708,7 +708,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
             // 如果主机组不存在就需要创建,创建前要检查集群下的所有主机是否在DME中存在
             if (StringUtils.isEmpty(objId)) {
-                objId = gerOrCreateHostGroupId(clusterObjectId);
+                objId = getOrCreateHostGroupId(clusterObjectId);
             }
         } catch (DmeException e) {
             LOG.error("checkOrCreateToHostGroup error:", e);
@@ -717,7 +717,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return objId;
     }
 
-    private String gerOrCreateHostGroupId(String clusterObjectId) throws DmeException {
+    private String getOrCreateHostGroupId(String clusterObjectId) throws DmeException {
         String objId = "";
 
         // 取得集群下的所有主机
@@ -748,6 +748,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     objId = ToolUtils.getStr(hostmap.get(ID_FIELD));
                 }
             }
+        }else {
+            new DmeException("the cluster has no host");
         }
         return objId;
     }
