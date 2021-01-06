@@ -774,7 +774,11 @@
       "linkUp":"已连接",
       "activated":"已激活",
       "unActivated":"未激活",
-      "all":"所有"
+      "all":"所有",
+      "invalid":"无效",
+      "enable":"启用",
+      "notActivated":"未启用"
+
     },
     "type":{
       "block":"块",

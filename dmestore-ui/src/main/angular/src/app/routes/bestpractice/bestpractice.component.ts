@@ -6,13 +6,14 @@ import {
 import {HttpClient} from '@angular/common/http';
 import { CommonService } from '../common.service';
 import { GlobalsService }     from "../../shared/globals.service";
+import {TranslatePipe} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-bestpractice',
   templateUrl: './bestpractice.component.html',
   styleUrls: ['./bestpractice.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [CommonService]
+  providers: [CommonService, TranslatePipe]
 })
 export class BestpracticeComponent implements OnInit {
 
@@ -48,7 +49,8 @@ export class BestpracticeComponent implements OnInit {
   constructor(private cdr: ChangeDetectorRef,
               public gs: GlobalsService,
               private http: HttpClient,
-              private commonService: CommonService) { }
+              private commonService: CommonService,
+              private translatePipe:TranslatePipe) { }
 
   ngOnInit(): void {
     this.practiceRefresh();
@@ -173,6 +175,30 @@ export class BestpracticeComponent implements OnInit {
     this.http.get('v1/bestpractice/records/all', {}).subscribe((result: any) => {
           if (result.code === '200'){
             this.list = result.data;
+            // bug修改：列表页面级别过滤 中英文问题
+            if (this.list) {
+              this.list.forEach(item => {
+                let levelDesc;
+                switch (item.level) {
+                  case "Critical":
+                    levelDesc = this.translatePipe.transform("bestPractice.critical");
+                    break;
+                  case "Major":
+                    levelDesc = this.translatePipe.transform("bestPractice.major");
+                    break;
+                  case "Warning":
+                    levelDesc = this.translatePipe.transform("bestPractice.warning");
+                    break;
+                  case "Info":
+                    levelDesc = this.translatePipe.transform("bestPractice.info");
+                    break;
+                  default:
+                    levelDesc = "--";
+                    break;
+                }
+                item.levelDesc = levelDesc;
+              });
+            }
             this.total = result.data.length;
             this.isLoading = false;
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
@@ -203,6 +229,7 @@ class Bestpractice {
   hostSetting: string;
   recommendValue: number;
   level: string;
+  levelDesc: string;
   count: number;
   hostList: Host[];
 }
