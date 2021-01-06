@@ -326,7 +326,7 @@
       <!--名称-->
       <clr-input-container>
         <label>{{'nfs.datastoreName' | translate}}</label>
-        <input clrInput class="inputWidth100Percent" [(ngModel)]="addForm.nfsName" name="nfsName" required (blur)="checkNfsName();"/>
+        <input clrInput class="inputWidth100Percent" [(ngModel)]="addForm.nfsName" maxlength="256" name="nfsName" required (blur)="checkNfsName();"/>
         <clr-control-error>
           <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
           <p *ngIf="matchErr" style="color: red">{{'validations.nameRequired' | translate}}</p>
@@ -345,7 +345,7 @@
 
       <clr-input-container *ngIf="!addForm.sameName">
         <label>{{'nfs.fsName' | translate}}</label>
-        <input class="inputWidth100Percent" clrInput [(ngModel)]="addForm.fsName" name="fsName" (blur)="checkFsName();" />
+        <input class="inputWidth100Percent" clrInput [(ngModel)]="addForm.fsName" maxlength="256" name="fsName" (blur)="checkFsName();" />
         <clr-control-error>
           <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
           <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
@@ -353,7 +353,7 @@
       </clr-input-container>
       <clr-input-container *ngIf="!addForm.sameName">
         <label>{{'nfs.shareName' | translate}}</label>
-        <input class="inputWidth100Percent" clrInput [(ngModel)]="addForm.shareName" name="shareName" (blur)="checkShareName();" />
+        <input class="inputWidth100Percent" clrInput [(ngModel)]="addForm.shareName" maxlength="256" name="shareName" (blur)="checkShareName();" />
         <clr-control-error>
           <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
           <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
