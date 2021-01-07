@@ -260,7 +260,12 @@
 
               <clr-dg-column [clrDgField]="'name'">{{'tier.name'|translate}}</clr-dg-column>
 
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='basic'" [clrDgField]="'runningStatus'">{{'tier.status'|translate}}</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='basic'">
+                {{'tier.status'|translate}}
+                <clr-dg-filter [clrDgFilter]="slspStatusFilter">
+                  <sl-sp-status-filter #slspStatusFilter></sl-sp-status-filter>
+                </clr-dg-filter>
+              </clr-dg-column>
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='basic'" [clrDgField]="'physicalType'">{{'tier.diskType'|translate}}</clr-dg-column>
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='basic'" [clrDgField]="'storageName'">{{'tier.storage'|translate}}</clr-dg-column>
 

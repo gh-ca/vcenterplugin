@@ -734,7 +734,8 @@
     "offLine": "Offline",
     "normal": "Normal",
     "abnormal": "Abnormal",
-    "unknown": "Unknown"
+    "unknown": "Unknown",
+    "faulty": "Faulty"
   },
   "applybp": {
     "ing": "Best Practice is Executing",

@@ -4,7 +4,7 @@ import {
   AfterViewInit,
   ChangeDetectorRef,
   OnDestroy,
-  NgZone
+  NgZone, ViewChild
 } from '@angular/core';
 
 import {HttpClient} from '@angular/common/http';
@@ -12,12 +12,15 @@ import { CommonService } from '../common.service';
 import {MakePerformance, NfsService} from "../nfs/nfs.service";
 import { GlobalsService }     from "../../shared/globals.service";
 import {TranslatePipe} from "@ngx-translate/core";
+import {ServicelevelService, SLStoragePool} from "./servicelevel.service";
+import {ServiceLevelFilter} from "../vmfs/list/filter.component";
+import {SLSPStatusFilter} from "./filter.component";
 
 @Component({
   selector: 'app-servicelevel',
   templateUrl: './servicelevel.component.html',
   styleUrls: ['./servicelevel.component.scss'],
-  providers: [ CommonService, TranslatePipe,MakePerformance, NfsService ]
+  providers: [ CommonService, TranslatePipe,MakePerformance, NfsService, ServicelevelService]
 })
 export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
 
@@ -128,7 +131,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   // 表格loading标志
   storeagePoolIsloading = false;
   // 数据列表
-  storagePoolList: StoragePool[] = [];
+  storagePoolList: SLStoragePool[] = [];
   storagePoolTotal = 0;
   // ===============storage pool end==============
 
@@ -157,6 +160,9 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   tierLoading = false;
   syncLoading = false;
+
+  @ViewChild('sLSPStatusFilter') sLSPStatusFilter: SLSPStatusFilter;
+
   constructor(private ngZone: NgZone,
               private cdr: ChangeDetectorRef,
               private http: HttpClient,
@@ -581,24 +587,6 @@ class Servicelevel {
       };
     };
   };
-}
-
-interface StoragePool {
-  id: string;
-  name: string;
-  running_status: string;
-  physicalType: string;
-  storage_name: string;
-  storage_instance_id: string;
-
-  total_capacity: number;
-  consumed_capacity: number;
-  consumed_capacity_percentage: number;
-  free_capacity: number;
-
-  latency: string;
-  iops: string;
-  bandwidth: string;
 }
 
 interface Volume {

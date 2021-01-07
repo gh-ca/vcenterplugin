@@ -737,7 +737,8 @@
     "offLine": "离线",
     "normal": "正常",
     "abnormal": "异常",
-    "unknown": "未知"
+    "unknown": "未知",
+    "faulty": "故障"
   },
   "applybp": {
     "ing": "最佳实践实施中",
