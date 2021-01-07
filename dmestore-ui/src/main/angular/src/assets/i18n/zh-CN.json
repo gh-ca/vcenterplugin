@@ -778,7 +778,10 @@
       "all":"所有",
       "invalid":"无效",
       "enable":"启用",
-      "notActivated":"未启用"
+      "notActivated":"未启用",
+      "service":"管理",
+      "management":"数据",
+      "managementAndService":"管理+数据"
 
     },
     "type":{

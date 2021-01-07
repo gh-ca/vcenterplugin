@@ -775,7 +775,10 @@
        "all":"ALL",
        "invalid":"INVALID",
        "enable":"ENABLE",
-       "notActivated":"NOTACTIVATED"
+       "notActivated":"NOTACTIVATED",
+       "service":"Service",
+       "management":"Management",
+       "managementAndService":"Management+Service"
      },
      "type":{
       "block":"Block",

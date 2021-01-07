@@ -1051,7 +1051,12 @@
                               <clr-dg-column [clrDgField]="'mgmtIp'">{{'storage.detail.hardware.ports.ipv4' | translate}}</clr-dg-column>
                               <clr-dg-column [clrDgField]="'mgmtIpv6'">{{'storage.detail.hardware.ports.ipv6' | translate}}</clr-dg-column>
                               <clr-dg-column [clrDgField]="'currentPortName'">{{'storage.detail.hardware.ports.currentPort' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'role'">{{'storage.detail.hardware.ports.role' | translate}}</clr-dg-column>
+                              <clr-dg-column>
+                                {{'storage.detail.hardware.ports.role' | translate}}
+                                <clr-dg-filter [clrDgFilter]="logicRoleFilter">
+                                  <logic-role-filter #logicRoleFilter></logic-role-filter>
+                                </clr-dg-filter>
+                              </clr-dg-column>
                               <clr-dg-column [clrDgField]="'ddnsStatus'">
                                 {{'storage.detail.hardware.ports.dynamicDns' | translate}}
                                 <clr-dg-filter [clrDgFilter]="logicDdnsStatusFilter">
@@ -1077,7 +1082,12 @@
                                   {{item.mgmtIpv6!=null?item.mgmtIpv6!=''?item.mgmtIpv6:'--':'--'}}
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.currentPortName!=null?item.currentPortName:'--'}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.role!=null?item.role:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">
+                                  <span *ngIf="item.role == '1'">{{'enum.status.service' | translate}}</span>
+                                  <span *ngIf="item.role == '2'">{{'enum.status.management' | translate}}</span>
+                                  <span *ngIf="item.role == '3'">{{'enum.status.managementAndService' | translate}}</span>
+                                  <span *ngIf="item.role != '1' && item.role != '2' && item.role != '3'">--</span>
+                                </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
                                   <span *ngIf="item.ddnsStatus == 'INVALID'">{{'enum.status.invalid' | translate}}</span>
                                   <span *ngIf="item.ddnsStatus == 'ENABLE'">{{'enum.status.enable' | translate}}</span>
