@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import sun.rmi.runtime.Log;
 
 /**
  * VmfsAccessServiceImpl
@@ -832,7 +833,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             for (Map<String, Object> hba : hbas) {
                 wwniqns.add(ToolUtils.getStr(hba.get(NAME_FIELD)));
             }
+            LOG.info("==wwn of host group==",gson.toJson(wwniqns)+"wwn size:"+wwniqns.size());
             List<Map<String, Object>> dmehosts = dmeAccessService.getDmeHostInHostGroup(dmeHostGroupId);
+            LOG.info("==wwn of dme hosts==",gson.toJson(dmehosts)+"host size:"+dmehosts.size());
             if (dmehosts != null && dmehosts.size() > 0) {
                 List<Map<String, Object>> initiators = new ArrayList<>();
                 for (Map<String, Object> dmehost : dmehosts) {
@@ -845,6 +848,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         }
                     }
                 }
+                LOG.info("==initiators of host==",gson.toJson(initiators)+"host size:"+initiators.size());
                 if (initiators.size() > 0) {
                     List<String> initiatorName = new ArrayList<>();
                     for (Map<String, Object> inimap : initiators) {

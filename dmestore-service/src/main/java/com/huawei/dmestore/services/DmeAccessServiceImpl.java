@@ -449,8 +449,10 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
                 requestbody.put(NAME_FIELD, hostGroupName);
             }
+            LOG.info("== search oriented host group requestBody{}!",gson.toJson(requestbody));
             ResponseEntity responseEntity = access(getHostGroupsUrl, HttpMethod.POST,
                 requestbody == null ? null : gson.toJson(requestbody));
+            LOG.info("== search oriented host group responseBody{}!",gson.toJson(responseEntity));
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.getAsJsonArray(DmeConstants.HOSTGROUPS);
