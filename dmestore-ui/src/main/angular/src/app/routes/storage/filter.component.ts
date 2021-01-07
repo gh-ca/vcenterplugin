@@ -1222,3 +1222,54 @@ export class LogicDdnsStatusFilter implements ClrDatagridFilterInterface<LogicPo
     this.ddnsStatus = undefined;
   }
 }
+
+@Component({
+  selector: "logic-role-filter",
+  template: `
+    <clr-radio-container>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="role" (change)="changeFunc($event)" [(ngModel)]="role" value="all" />
+        <label>{{'vmfs.filter.all' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="role" (change)="changeFunc($event)" [(ngModel)]="role" value="1"/>
+        <label>{{'enum.status.service' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="role" (change)="changeFunc($event)" [(ngModel)]="role" value="2"/>
+        <label>{{'enum.status.management' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="role" (change)="changeFunc($event)" [(ngModel)]="role" value="3"/>
+        <label>{{'enum.status.managementAndService' | translate}}</label>
+      </clr-radio-wrapper>
+    </clr-radio-container>
+  `,
+})
+export class LogicRoleFilter implements ClrDatagridFilterInterface<LogicPort>{
+
+  changes = new Subject<any>();
+  role;
+  readonly state: any;
+
+  accepts(item: LogicPort): boolean {
+    if (!this.role || this.role == 'all') {
+      return true;
+    } else {
+      const  ddnsStatus = item.role;
+      return this.role == ddnsStatus;
+    }
+  }
+
+  changeFunc(value: any) {
+    this.changes.next();
+  }
+
+  isActive(): boolean {
+    return true;
+  }
+
+  initStatus() {
+    this.role = undefined;
+  }
+}
