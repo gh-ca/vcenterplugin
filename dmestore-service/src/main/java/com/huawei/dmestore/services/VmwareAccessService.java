@@ -1,6 +1,8 @@
 package com.huawei.dmestore.services;
 
+import com.huawei.dmestore.entity.DmeVmwareRelation;
 import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.exception.DmeSqlException;
 
 import java.util.List;
 import java.util.Map;
@@ -98,4 +100,13 @@ public interface VmwareAccessService {
      */
     List<Map<String, String>> getMountDataStoresByClusterObjectId(String clusterObjectId, String dataStoreType)
         throws DmeException;
+
+    /**
+     * getDmeVmwareRelationByDsId
+     *
+     * @param storeId storeId
+     * @return DmeVmwareRelation
+     * @throws DmeSqlException DmeSqlException
+     */
+    DmeVmwareRelation getDmeVmwareRelationByDsId(String storeId) throws DmeSqlException;
 }
