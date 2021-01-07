@@ -737,7 +737,8 @@
     "offLine": "离线",
     "normal": "正常",
     "abnormal": "异常",
-    "unknown": "未知"
+    "unknown": "未知",
+    "faulty": "故障"
   },
   "applybp": {
     "ing": "最佳实践实施中",
@@ -777,7 +778,10 @@
       "all":"所有",
       "invalid":"无效",
       "enable":"启用",
-      "notActivated":"未启用"
+      "notActivated":"未启用",
+      "service":"管理",
+      "management":"数据",
+      "managementAndService":"管理+数据"
 
     },
     "type":{
