@@ -249,19 +249,27 @@ public class ToolUtils {
         return re;
     }
 
+    /**
+     * 判断逻辑，只要vcenter中扫描的主机启动器包含dme主机中的启动器，符合主机一致性
+     *
+     * @param a vcenter 中扫描的主机中的启动器
+     * @param b DME 中扫描的主机启动器
+     * @param <T> 参数类型
+     * @return boolean 包含或者不包含
+     */
     public static <T extends Comparable<T>> boolean compare(List<T> a, List<T> b) {
-        if (a.size() != b.size()) {
-            return false;
-        }
-        Collections.sort(a);
-        Collections.sort(b);
-        for (int index = 0; index < a.size(); index++) {
-            if (!a.get(index).equals(b.get(index))) {
-                return false;
+        int count = 0;
+        for (int index = 0; index < b.size(); index++) {
+            if (a.contains(b.get(index))) {
+                count++;
+                if (count == b.size()) {
+                    return true;
+                }
             }
         }
-        return true;
+        return false;
     }
+
 
     public static boolean jsonIsNull(JsonElement obj) {
         boolean re = false;

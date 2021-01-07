@@ -241,6 +241,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             JsonObject element = new JsonParser().parse(object).getAsJsonObject();
             storageObj = new StorageDetail();
             parseStorageDetail(storageObj, element);
+            if (!StringUtils.isEmpty(storageObj.getModel())){
+                StorageTypeShow storageTypeShow = ToolUtils.getStorageTypeShow(storageObj.getModel());
+                storageObj.setStorageTypeShow(storageTypeShow);
+            }
             parseStoragePoolDetail(storageId, storageObj);
             JsonArray ids = element.get("az_ids").getAsJsonArray();
             if (ids.size() != 0) {
