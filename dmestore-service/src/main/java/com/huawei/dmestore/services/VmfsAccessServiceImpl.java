@@ -686,6 +686,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
             // 检查集群对应的主机组在DME中是否存在
             List<Map<String, Object>> hostgrouplist = dmeAccessService.getDmeHostGroups(clustername);
+            LOG.info("==query host group of dme ==", hostgrouplist);
             if (hostgrouplist != null && hostgrouplist.size() > 0) {
                 for (Map<String, Object> hostgroupmap : hostgrouplist) {
                     if (hostgroupmap != null && hostgroupmap.get(NAME_FIELD) != null) {
