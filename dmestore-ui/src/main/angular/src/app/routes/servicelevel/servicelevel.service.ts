@@ -27,4 +27,5 @@ export interface SLStoragePool {
   consumedCapacity: number;
   consumedCapacityPercentage: string;
   freeCapacity: number;
+  storageInstanceId: string;
 }

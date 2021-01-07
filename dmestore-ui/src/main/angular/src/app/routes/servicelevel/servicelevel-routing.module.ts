@@ -5,7 +5,9 @@ import { ServicelevelComponent } from './servicelevel.component';
 import {VmfsListComponent} from "../vmfs/list/list.component";
 
 const routes: Routes = [
-  { path: 'serviceLevel', component: ServicelevelComponent, data: { title: 'ServiceLevel' }}];
+  { path: '',
+    component: ServicelevelComponent,
+    data: { title: 'ServiceLevel' }}];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],

@@ -421,8 +421,8 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   lastStorePool24HPeak(){
     let obj_ids = [];
     this.storagePoolList.forEach((item)=>{
-      if(item.storage_instance_id){
-        obj_ids.push(item.storage_instance_id);
+      if(item.storageInstanceId){
+        obj_ids.push(item.storageInstanceId);
       }
     });
     const p = {
