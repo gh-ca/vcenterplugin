@@ -205,6 +205,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
         } else{
           this.storagePoolList = [];
         }
+        this.storagePoolList.forEach(item => item.usedCapacity = Number(((item.consumedCapacity)/item.totalCapacity * 100).toFixed(2)));
         this.storagePoolTotal = this.storagePoolList.length;
         this.storeagePoolIsloading = false;
         this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
