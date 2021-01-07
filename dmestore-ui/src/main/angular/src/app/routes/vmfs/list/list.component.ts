@@ -1431,7 +1431,9 @@ export class VmfsListComponent implements OnInit {
     this.mountSuccessShow = false;
     this.unmountSuccessShow = false;
     this.delSuccessShow = false;
-    this.backToListPage();
+    // this.backToListPage();
+    // 重新请求数据
+    this.scanDataStore();
   }
 
   /**
