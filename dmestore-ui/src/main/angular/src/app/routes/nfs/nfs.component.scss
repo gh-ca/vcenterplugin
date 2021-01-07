@@ -380,3 +380,9 @@ input[type=number] {
   color: white;
   font-weight: bolder;
 }
+.over_flow{
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-break: break-all;
+  white-space: nowrap;
+}
