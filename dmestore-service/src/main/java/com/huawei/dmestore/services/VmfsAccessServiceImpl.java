@@ -558,6 +558,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         try {
             // 通过主机的objectid查到主机上所有的hba的wwn或者iqn
             List<Map<String, Object>> hbas = vcsdkUtils.getHbasByHostObjectId(hostId);
+            LOG.info("==hbas 0f host on vcenter==",gson.toJson(hbas));
             if (hbas == null || hbas.size() == 0) {
                 throw new DmeException(hostId + " The host did not find a valid Hba");
             }
@@ -565,7 +566,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             for (Map<String, Object> hba : hbas) {
                 wwniqns.add(ToolUtils.getStr(hba.get(NAME_FIELD)));
             }
-
+            LOG.info("==hostlist on vcenter==",gson.toJson(wwniqns));
             // 取出DME所有主机
             List<Map<String, Object>> hostlist = dmeAccessService.getDmeHosts(null);
             if (hostlist == null || hostlist.size() == 0) {
@@ -577,6 +578,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
                     // 得到主机的启动器
                     List<Map<String, Object>> initiators = dmeAccessService.getDmeHostInitiators(demHostId);
+                    LOG.info("==initiators 0f host on vcenter==",gson.toJson(initiators));
                     if (initiators != null && initiators.size() > 0) {
                         for (Map<String, Object> inimap : initiators) {
                             String portName = ToolUtils.getStr(inimap.get(PORT_NAME));
@@ -686,6 +688,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
             // 检查集群对应的主机组在DME中是否存在
             List<Map<String, Object>> hostgrouplist = dmeAccessService.getDmeHostGroups(clustername);
+            LOG.info("==query host group of dme ==", gson.toJson(hostgrouplist));
             if (hostgrouplist != null && hostgrouplist.size() > 0) {
                 for (Map<String, Object> hostgroupmap : hostgrouplist) {
                     if (hostgroupmap != null && hostgroupmap.get(NAME_FIELD) != null) {
@@ -825,6 +828,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
             // 得到集群下所有的主机的hba
             List<Map<String, Object>> hbas = vcsdkUtils.getHbasByClusterObjectId(vmwareClusterObjectId);
+            LOG.info("==host hba info on vcenter==",gson.toJson(hbas));
             if (hbas == null || hbas.size() == 0) {
                 LOG.error("vmware Cluster hbas is null");
                 return objId;
@@ -833,7 +837,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             for (Map<String, Object> hba : hbas) {
                 wwniqns.add(ToolUtils.getStr(hba.get(NAME_FIELD)));
             }
-            LOG.info("==wwn of host group==",gson.toJson(wwniqns)+"wwn size:"+wwniqns.size());
+            LOG.info("==wwn of host group==",wwniqns.toString()+"wwn size:"+wwniqns.size());
             List<Map<String, Object>> dmehosts = dmeAccessService.getDmeHostInHostGroup(dmeHostGroupId);
             LOG.info("==wwn of dme hosts==",gson.toJson(dmehosts)+"host size:"+dmehosts.size());
             if (dmehosts != null && dmehosts.size() > 0) {
@@ -843,12 +847,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     if (dmehost != null && dmehost.get(ID_FIELD) != null) {
                         String demHostId = ToolUtils.getStr(dmehost.get(ID_FIELD));
                         List<Map<String, Object>> subinitiators = dmeAccessService.getDmeHostInitiators(demHostId);
+                        LOG.info("==initiators of host==",gson.toJson(initiators)+"host size:"+initiators.size());
                         if (subinitiators != null && subinitiators.size() > 0) {
                             initiators.addAll(subinitiators);
                         }
                     }
                 }
-                LOG.info("==initiators of host==",gson.toJson(initiators)+"host size:"+initiators.size());
                 if (initiators.size() > 0) {
                     List<String> initiatorName = new ArrayList<>();
                     for (Map<String, Object> inimap : initiators) {
@@ -858,6 +862,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         }
                     }
                     boolean isCheckHbaInHostGroup = ToolUtils.compare(wwniqns, initiatorName);
+                    LOG.info("==result of dme/vcenter wwn compare==",isCheckHbaInHostGroup);
                     if (isCheckHbaInHostGroup) {
                         objId = dmeHostGroupId;
                     }
