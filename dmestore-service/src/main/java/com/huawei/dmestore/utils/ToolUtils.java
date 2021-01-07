@@ -1,5 +1,8 @@
 package com.huawei.dmestore.utils;
 
+import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.model.StorageTypeShow;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -350,4 +353,41 @@ public class ToolUtils {
         condition.add("constraint", constraint);
         return condition.toString();
     }
+
+    /*private static StorageTypeShow getStorageTypeShow(String storageModel) throws DmeException {
+        StorageTypeShow storageTypeShow = new StorageTypeShow();
+        if (StringUtils.isEmpty(storageModel)) {
+            throw new DmeException("storage model param error.");
+        }
+        switch (storageModel.trim()){
+            case "OceanStorDorado5500V6":
+                storageTypeShow.setQosTag(1);
+                storageTypeShow.setWorkLoadShow(1);
+                storageTypeShow.setAllocationTypeShow(2);
+                storageTypeShow.setOwnershipController(false);
+                storageTypeShow.setStorageDetailTag(2);
+                storageTypeShow.setDeduplicationShow(false);
+                storageTypeShow.setCompressionShow(false);
+                storageTypeShow.setCapacityInitialAllocation(false);
+                storageTypeShow.setSmartTierShow(false);
+                storageTypeShow.setPrefetchStrategyShow(false);
+                break;
+            case "Dorado6000V3":
+                storageTypeShow.setQosTag(3);
+                storageTypeShow.setWorkLoadShow(1);
+                storageTypeShow.setAllocationTypeShow(2);
+                storageTypeShow.setOwnershipController(true);
+                storageTypeShow.setStorageDetailTag(2);
+                storageTypeShow.setDeduplicationShow(false);
+                storageTypeShow.setCompressionShow(false);
+                storageTypeShow.setCapacityInitialAllocation(false);
+                storageTypeShow.setSmartTierShow(false);
+                storageTypeShow.setPrefetchStrategyShow(false);
+                break;
+            case "5500V5":
+                break;
+            default:
+                break;
+        }
+    }*/
 }
