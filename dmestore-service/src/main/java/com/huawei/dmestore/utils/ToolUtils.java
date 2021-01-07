@@ -354,7 +354,7 @@ public class ToolUtils {
         return condition.toString();
     }
 
-    /*private static StorageTypeShow getStorageTypeShow(String storageModel) throws DmeException {
+    public static StorageTypeShow getStorageTypeShow(String storageModel) throws DmeException {
         StorageTypeShow storageTypeShow = new StorageTypeShow();
         if (StringUtils.isEmpty(storageModel)) {
             throw new DmeException("storage model param error.");
@@ -377,7 +377,7 @@ public class ToolUtils {
                 storageTypeShow.setWorkLoadShow(1);
                 storageTypeShow.setAllocationTypeShow(2);
                 storageTypeShow.setOwnershipController(true);
-                storageTypeShow.setStorageDetailTag(2);
+                storageTypeShow.setStorageDetailTag(1);
                 storageTypeShow.setDeduplicationShow(false);
                 storageTypeShow.setCompressionShow(false);
                 storageTypeShow.setCapacityInitialAllocation(false);
@@ -385,9 +385,30 @@ public class ToolUtils {
                 storageTypeShow.setPrefetchStrategyShow(false);
                 break;
             case "5500V5":
+                storageTypeShow.setQosTag(2);
+                storageTypeShow.setWorkLoadShow(2);
+                storageTypeShow.setAllocationTypeShow(1);
+                storageTypeShow.setOwnershipController(true);
+                storageTypeShow.setStorageDetailTag(1);
+                storageTypeShow.setDeduplicationShow(true);
+                storageTypeShow.setCompressionShow(true);
+                storageTypeShow.setCapacityInitialAllocation(true);
+                storageTypeShow.setSmartTierShow(true);
+                storageTypeShow.setPrefetchStrategyShow(true);
                 break;
             default:
+                storageTypeShow.setQosTag(2);
+                storageTypeShow.setWorkLoadShow(2);
+                storageTypeShow.setAllocationTypeShow(1);
+                storageTypeShow.setOwnershipController(true);
+                storageTypeShow.setStorageDetailTag(1);
+                storageTypeShow.setDeduplicationShow(true);
+                storageTypeShow.setCompressionShow(true);
+                storageTypeShow.setCapacityInitialAllocation(true);
+                storageTypeShow.setSmartTierShow(true);
+                storageTypeShow.setPrefetchStrategyShow(true);
                 break;
         }
-    }*/
+        return storageTypeShow;
+    }
 }

@@ -23,6 +23,7 @@ import com.huawei.dmestore.model.StorageDetail;
 import com.huawei.dmestore.model.StorageDisk;
 import com.huawei.dmestore.model.StoragePool;
 import com.huawei.dmestore.model.StoragePort;
+import com.huawei.dmestore.model.StorageTypeShow;
 import com.huawei.dmestore.model.Volume;
 import com.huawei.dmestore.model.VolumeListRestponse;
 import com.huawei.dmestore.utils.ToolUtils;
@@ -174,6 +175,10 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     JsonObject jsonObj = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
                     Storage storageObj = new Storage();
                     parseStorageBaseInfo(jsonObj, storageObj);
+                    if (!StringUtils.isEmpty(storageObj.getModel())){
+                        StorageTypeShow storageTypeShow = ToolUtils.getStorageTypeShow(storageObj.getModel());
+                        storageObj.setStorageTypeShow(storageTypeShow);
+                    }
                     storageObj.setSubscriptionCapacity(ToolUtils.jsonToDou(jsonObj.get("subscription_capacity")));
                     storageObj.setUsedCapacity(ToolUtils.jsonToDou(jsonObj.get("used_capacity"), 0.0));
                     storageObj.setTotalCapacity(ToolUtils.jsonToDou(jsonObj.get("total_capacity"), 0.0));
