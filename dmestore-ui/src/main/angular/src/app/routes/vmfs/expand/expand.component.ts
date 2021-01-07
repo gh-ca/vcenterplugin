@@ -62,13 +62,12 @@ export class ExpandComponent implements OnInit{
           const ctx = this.globalsService.getClientSdk().app.getContextObjects();
           this.objectId = ctx[0].id;
         }
-        this.remoteSrv.getVmfsById(this.objectId).subscribe((result: any) => {
+        this.remoteSrv.getStorageById(this.objectId).subscribe((result: any) => {
           console.log('VmfsInfo:', result);
           if (result.code === '200' && null != result.data) {
-            this.vmfsInfo = result.data[0];
             // form表单数据初始化
-            this.expandForm.volume_id = this.vmfsInfo.volumeId;
-            this.expandForm.ds_name = this.vmfsInfo.name;
+            this.expandForm.volume_id = result.data.volumeId;
+            this.expandForm.ds_name = result.data.storeName;
           }
           this.modalLoading = false;
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法

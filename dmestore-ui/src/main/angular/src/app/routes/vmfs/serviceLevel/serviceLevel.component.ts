@@ -64,15 +64,13 @@ export class ServiceLevelComponent implements OnInit{
         }
 
         // todo 获取vmfs数据
-        this.remoteSrv.getVmfsById(this.objectId).subscribe((result: any) => {
+        this.remoteSrv.getStorageById(this.objectId).subscribe((result: any) => {
           if (result.code === '200' && null != result.data) {
-            this.vmfsInfo = result.data.filter(item => item.objectid === this.objectId)[0];
-
             // 表单数据初始化
             const volumeIds = [];
-            volumeIds.push(this.vmfsInfo.volumeId);
+            volumeIds.push(result.data.volumeId);
             this.changeServiceLevelForm.volume_ids = volumeIds;
-            this.changeServiceLevelForm.ds_name = this.vmfsInfo.name;
+            this.changeServiceLevelForm.ds_name = result.data.storeName;
           }
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
         });
