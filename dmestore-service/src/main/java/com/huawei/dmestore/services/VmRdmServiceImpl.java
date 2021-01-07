@@ -157,7 +157,10 @@ public class VmRdmServiceImpl implements VmRdmService {
                 }
             }
             if (failedVolumeIds.size() > 0) {
-                deleteVolumes(hostId, failedVolumeIds);
+                for(String dmeHostId : dmeMapingHostIds){
+                    unMapping(dmeHostId, failedVolumeIds);
+                }
+                deleteVolumes(failedVolumeIds);
                 if (failedVolumeIds.size() == lunSize) {
                     throw new DmeException(errorMsg);
                 }
