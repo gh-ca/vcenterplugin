@@ -121,6 +121,18 @@ public class Storage {
      * 维保结束时间.
      **/
     private String maintenanceOvertime;
+    /**
+     * 存储类型不同导致页面及属性差异对象
+     */
+    private StorageTypeShow storageTypeShow;
+
+    public StorageTypeShow getStorageTypeShow() {
+        return storageTypeShow;
+    }
+
+    public void setStorageTypeShow(StorageTypeShow storageTypeShow) {
+        this.storageTypeShow = storageTypeShow;
+    }
 
     /**
      * getLocation .

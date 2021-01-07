@@ -839,7 +839,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
             LOG.info("==wwn of host group==",wwniqns.toString()+"wwn size:"+wwniqns.size());
             List<Map<String, Object>> dmehosts = dmeAccessService.getDmeHostInHostGroup(dmeHostGroupId);
-            LOG.info("==wwn of dme hosts==",gson.toJson(dmehosts)+"host size:"+dmehosts.size());
+            LOG.info("==wwn of dme hosts==",dmehosts.toString()+"host size:"+dmehosts.size());
             if (dmehosts != null && dmehosts.size() > 0) {
                 List<Map<String, Object>> initiators = new ArrayList<>();
                 for (Map<String, Object> dmehost : dmehosts) {
