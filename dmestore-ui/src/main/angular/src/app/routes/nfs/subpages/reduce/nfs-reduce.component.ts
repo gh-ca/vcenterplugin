@@ -44,7 +44,6 @@ export class NfsReduceComponent implements OnInit{
         this.modalLoading = false;
         if (result.code === '200'){
           this.fsId = result.data.fsId;
-        }else{
         }
         this.cdr.detectChanges();
       });
