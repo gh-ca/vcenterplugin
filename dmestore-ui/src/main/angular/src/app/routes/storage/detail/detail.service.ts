@@ -95,7 +95,22 @@ export class StorageDetail{
   vendor: string;
   volume: string;
   warning: number;
+  storageTypeShow:StorageTypeShow;
 }
+
+export interface StorageTypeShow {
+  qosTag:number;// qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
+  workLoadShow:number;// 1 支持应用类型 2不支持应用类型
+  ownershipController:boolean;// 归属控制器 true 支持 false 不支持
+  allocationTypeShow:number;// 资源分配类型  1 可选thin/thick 2 可选thin
+  deduplicationShow:boolean;// 重复数据删除 true 支持 false 不支持
+  compressionShow:boolean; // 数据压缩 true 支持 false 不支持
+  capacityInitialAllocation:boolean;// 容量初始分配策略 true 支持 false 不支持
+  smartTierShow:boolean;// SmartTier策略 true 支持 false 不支持
+  prefetchStrategyShow:boolean;// 预取策略 true 支持 false 不支持
+  storageDetailTag:number;// 存储详情下展示情况 1 仅展示存储池和lun 2 展示存储池/lun/文件系统/共享/dtree
+}
+
 export class StoragePool{
   freeCapacity: number;// 空闲容量
   name: string;// 名称

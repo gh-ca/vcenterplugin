@@ -356,7 +356,7 @@
                 </clr-tab-content>
               </clr-tab>
               <!--fileSystems-->
-              <clr-tab>
+              <clr-tab *ngIf="storageDetailTag && storageDetailTag == 2">
                 <button clrTabLink id="fs" (click)="changeTab('fs')">{{'storage.detail.fileSystems.fileSystems' | translate}}</button>
                 <clr-tab-content id="fileSystems">
                   <div class="detail-margin-top">
@@ -452,7 +452,7 @@
                 </clr-tab-content>
               </clr-tab>
               <!--dtrees-->
-              <clr-tab>
+              <clr-tab *ngIf="storageDetailTag && storageDetailTag == 2">
                 <button clrTabLink id="dt" (click)="changeTab('dtrees')">{{'storage.detail.dtrees.dtrees' | translate}}</button>
                 <clr-tab-content id="dtrees">
                   <div class="detail-margin-top">
@@ -513,7 +513,7 @@
                 </clr-tab-content>
               </clr-tab>
               <!--shares-->
-              <clr-tab>
+              <clr-tab *ngIf="storageDetailTag && storageDetailTag == 2">
                 <button clrTabLink id="sh" (click)="changeTab('shares')">{{'storage.detail.shares.shares' | translate}}</button>
                 <clr-tab-content id="shares" >
                   <div class="detail-margin-top">
