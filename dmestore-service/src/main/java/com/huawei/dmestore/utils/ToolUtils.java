@@ -9,6 +9,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -364,23 +366,23 @@ public class ToolUtils {
 
     public static StorageTypeShow getStorageTypeShow(String storageModel) throws DmeException {
         StorageTypeShow storageTypeShow = new StorageTypeShow();
-        if (StringUtils.isEmpty(storageModel)) {
-            throw new DmeException("storage model param error.");
-        }
-        switch (storageModel.trim()){
-            case "OceanStorDorado5500V6":
-                storageTypeShow.setQosTag(1);
-                storageTypeShow.setWorkLoadShow(1);
-                storageTypeShow.setAllocationTypeShow(2);
-                storageTypeShow.setOwnershipController(false);
-                storageTypeShow.setStorageDetailTag(2);
-                storageTypeShow.setDeduplicationShow(false);
-                storageTypeShow.setCompressionShow(false);
-                storageTypeShow.setCapacityInitialAllocation(false);
-                storageTypeShow.setSmartTierShow(false);
-                storageTypeShow.setPrefetchStrategyShow(false);
-                break;
-            case "Dorado6000V3":
+        String[] model = storageModel.split(" ");
+        List<String> list = Arrays.asList(model);
+        if (list.contains("OceanStor")){
+            // OceanStor Dorado 3000 V6
+            storageTypeShow.setQosTag(1);
+            storageTypeShow.setWorkLoadShow(1);
+            storageTypeShow.setAllocationTypeShow(2);
+            storageTypeShow.setOwnershipController(false);
+            storageTypeShow.setStorageDetailTag(2);
+            storageTypeShow.setDeduplicationShow(false);
+            storageTypeShow.setCompressionShow(false);
+            storageTypeShow.setCapacityInitialAllocation(false);
+            storageTypeShow.setSmartTierShow(false);
+            storageTypeShow.setPrefetchStrategyShow(false);
+        }else {
+            if (list.contains("V3") && list.get(0).contains("Dorado")){
+                // Dorado v3
                 storageTypeShow.setQosTag(3);
                 storageTypeShow.setWorkLoadShow(1);
                 storageTypeShow.setAllocationTypeShow(2);
@@ -391,8 +393,8 @@ public class ToolUtils {
                 storageTypeShow.setCapacityInitialAllocation(false);
                 storageTypeShow.setSmartTierShow(false);
                 storageTypeShow.setPrefetchStrategyShow(false);
-                break;
-            case "5500V5":
+            }else{
+                // v3/v5
                 storageTypeShow.setQosTag(2);
                 storageTypeShow.setWorkLoadShow(2);
                 storageTypeShow.setAllocationTypeShow(1);
@@ -403,19 +405,7 @@ public class ToolUtils {
                 storageTypeShow.setCapacityInitialAllocation(true);
                 storageTypeShow.setSmartTierShow(true);
                 storageTypeShow.setPrefetchStrategyShow(true);
-                break;
-            default:
-                storageTypeShow.setQosTag(2);
-                storageTypeShow.setWorkLoadShow(2);
-                storageTypeShow.setAllocationTypeShow(1);
-                storageTypeShow.setOwnershipController(true);
-                storageTypeShow.setStorageDetailTag(1);
-                storageTypeShow.setDeduplicationShow(true);
-                storageTypeShow.setCompressionShow(true);
-                storageTypeShow.setCapacityInitialAllocation(true);
-                storageTypeShow.setSmartTierShow(true);
-                storageTypeShow.setPrefetchStrategyShow(true);
-                break;
+            }
         }
         return storageTypeShow;
     }
