@@ -70,6 +70,11 @@ export class AddComponent implements OnInit{
   @ViewChild('addPageOne') addPageOne: ClrWizardPage;
   @ViewChild('addPageTwo') addPageTwo: ClrWizardPage;
 
+  showLowerFlag = false;
+  showSmartTierFlag = false;
+  showAlloctypeThick = false; // 资源调优option全部展示
+  showWorkLoadFlag = false; // 应用类型展示
+
   ngOnInit(): void {
     this.initData();
     // 初始化添加数据
@@ -284,14 +289,25 @@ export class AddComponent implements OnInit{
   // 未选择服务等级 时调用方法
   customerClickFunc() {
     this.levelCheck = 'customer';
-    this.serviceLevelIsNull = false;
-
-    this.storageList = null;
-    this.storagePoolList = null;
     // 切换服务等级与自定义隐藏错误信息
     this.isOperationErr = false;
+    this.serviceLevelIsNull = false;
+    this.storageList = null;
+    this.storagePoolList = null;
+    this.showSmartTierFlag = false;
+    this.showAlloctypeThick = false;
+    this.form.alloctype = null;
+    this.showWorkLoadFlag = false;
+    this.form.workload_type_id = null;
+
     // loading
     this.modalLoading = true;
+
+    this.form.storage_id = null;
+    this.form.pool_raw_id = null;
+    this.form.qosFlag = false;
+
+    this.storagePoolMap = [];
 
     this.getStorageList();
   }
@@ -328,6 +344,13 @@ export class AddComponent implements OnInit{
     this.workloads = [];
     console.log('selectSotrageId' + this.form.storage_id);
     if (null !== this.form.storage_id && '' !== this.form.storage_id) {
+
+      // qos上下限
+      this.addQosUpperAndLower();
+      this.addSmartTierInit();
+      this.addAllocationTypeShowInit();
+      this.addWorkLoadShowInit();
+
       const storagePoolMap = this.storagePoolMap.filter(item => item.storageId == this.form.storage_id);
 
       const storagePoolList = storagePoolMap[0].storagePoolList;
@@ -348,7 +371,7 @@ export class AddComponent implements OnInit{
         this.storagePoolList = storagePoolList;
       }
       // 获取workLoad
-      if (!workloads) {
+      if (!workloads && this.showWorkLoadFlag) {
         this.remoteSrv.getWorkLoads(this.form.storage_id).subscribe((result: any) => {
           console.log('storagePools', result);
           if (result.code === '200' && result.data !== null) {
@@ -422,6 +445,12 @@ export class AddComponent implements OnInit{
       }
       // 控制策略若未选清空数据
       this.qosFunc(this.form);
+
+      // smartTiger
+      if (!this.showSmartTierFlag || !this.form.smartTierFlag) {
+        this.form.smartTier = null;
+      }
+
       console.log('addFrom', this.form);
       // 打开 loading
       // this.globalsService.loading = true;
@@ -781,58 +810,194 @@ export class AddComponent implements OnInit{
   }
   qosFunc(form) {
     console.log("form.qosFlag", form.qosFlag);
+    // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
+    const qosTag = this.getStorageQosTag(form.storage_id);
     if (!form.qosFlag) {// 关闭状态
-      form.control_policy = '';
-      form.maxbandwidthChoose = false;
-      form.maxbandwidth = null;
-      form.maxiopsChoose = false;
-      form.maxiops = null;
-      form.minbandwidthChoose = false;
-      form.minbandwidth = null;
-      form.miniopsChoose = false;
-      form.miniops = null;
-      form.latencyChoose = false;
-      form.latency = null;
+      this.initAddMinInfo(form);
+      this.initAddMaxInfo(form);
     }else {
-      if (form.control_policy == '1') {
-        form.minbandwidthChoose = false;
-        form.minbandwidth = null;
-        form.miniopsChoose = false;
-        form.miniops = null;
-        form.latencyChoose = false;
-        form.latency = null;
+      if (form.control_policyUpper == '1') {
         if (!form.maxbandwidthChoose) {
           form.maxbandwidth = null;
         }
         if (!form.maxiopsChoose) {
           form.maxiops = null;
         }
-      } else if (form.control_policy == '0') {
-        form.maxbandwidthChoose = false;
-        form.maxbandwidth = null;
-        form.maxiopsChoose = false;
-        form.maxiops = null;
-        if (!form.minbandwidthChoose) {
-          form.minbandwidth = null;
+        if (qosTag == 2 || qosTag == 3) {
+          this.initAddMinInfo(form);
         }
-        if (!form.miniopsChoose) {
-          form.miniops = null;
+      }
+      if (form.control_policyLower == '0') {
+        if(qosTag == 2){
+          this.initAddMaxInfo(form);
+        }else if (qosTag == 3) {
+          this.initAddMinInfo(form);
+        } else {
+          if (!form.minbandwidthChoose) {
+            form.minbandwidth = null;
+          }
+          if (!form.miniopsChoose) {
+            form.miniops = null;
+          }
+          if (!form.latencyChoose) {
+            form.latency = null;
+          }
         }
-        if (!form.latencyChoose) {
-          form.latency = null;
-        }
-      } else {
-        form.control_policy = '';
-        form.maxbandwidthChoose = false;
-        form.maxbandwidth = null;
-        form.maxiopsChoose = false;
-        form.maxiops = null;
-        form.minbandwidthChoose = false;
-        form.minbandwidth = null;
-        form.miniopsChoose = false;
-        form.miniops = null;
-        form.latencyChoose = false;
-        form.latency = null;
+      }
+    }
+  }
+  initAddMinInfo(form) {
+    form.control_policyUpper = undefined;
+    form.minbandwidthChoose = false;
+    form.minbandwidth = null;
+    form.miniopsChoose = false;
+    form.miniops = null;
+    form.latencyChoose = false;
+    form.latency = null;
+  }
+  initAddMaxInfo(form) {
+    form.control_policyLower = undefined;
+    form.maxbandwidthChoose = false;
+    form.maxbandwidth = null;
+    form.maxiopsChoose = false;
+    form.maxiops = null;
+  }
+
+  /**
+   * 添加页面 qos 上下限 单选、多选、隐藏
+   * smartTiger 初始化
+   */
+  addQosUpperAndLower() {
+    // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
+    const qosTag = this.getStorageQosTag(this.form.storage_id);
+    this.form.control_policyLower = undefined;
+    this.form.control_policyUpper = undefined;
+    const upperObj = document.getElementById("control_policyUpper") as HTMLInputElement;
+    const lowerObj = document.getElementById("control_policyLower") as HTMLInputElement;
+    if (upperObj && upperObj.checked) {
+      upperObj.checked = false;
+    }
+    if (lowerObj && lowerObj.checked) {
+      lowerObj.checked = false;
+    }
+    if (qosTag == 3) {
+      this.showLowerFlag = true;
+    } else {
+      this.showLowerFlag = false;
+    }
+  }
+
+  /**
+   * 添加页面 smartTier
+   */
+  addSmartTierInit() {
+    this.form.smartTier = null;
+    this.form.smartTierFlag = false;
+    this.showSmartTierFlag = this.getStroageSmartTierShow(this.form.storage_id);
+  }
+
+  /**
+   * 获取选中的存储的 SmartTier
+   * @param storageId
+   */
+  getStroageSmartTierShow(storageId){
+    const storageTypeShow = this.storageList.filter(item => item.id == storageId);
+    // SmartTier策略 true 支持 false 不支持
+    const smartTierShow = storageTypeShow[0].storageTypeShow.smartTierShow;
+    return smartTierShow;
+  }
+
+  /**
+   * 获取选中的存储的 allocationTypeShow
+   * @param storageId
+   */
+  getAllocationTypeShow(storageId) {
+    const storageTypeShow = this.storageList.filter(item => item.id == storageId);
+    // 资源分配类型  1 可选thin/thick 2 可选thin
+    const allocationTypeShow = storageTypeShow[0].storageTypeShow.allocationTypeShow;
+    return allocationTypeShow;
+  }
+
+  /**
+   * 添加页面 资源调优thick展示与隐藏
+   */
+  addAllocationTypeShowInit() {
+    this.form.alloctype = null;
+    const allocationTypeShow = this.getAllocationTypeShow(this.form.storage_id);
+    this.showAlloctypeThick = allocationTypeShow == 1;
+  }
+
+  /**
+   * 获取应用类型 展示与隐藏
+   * @param storageId
+   */
+  getWorkLoadShow(storageId) {
+    const storageTypeShow = this.storageList.filter(item => item.id == storageId);
+    // 1 支持应用类型 2不支持应用类型
+    const workLoadShow = storageTypeShow[0].storageTypeShow.workLoadShow;
+    return workLoadShow;
+  }
+
+  /**
+   * 添加页应用类型展示与隐藏 初始化
+   */
+  addWorkLoadShowInit() {
+    this.form.workload_type_id = null;
+    const workLoadShow = this.getWorkLoadShow(this.form.storage_id);
+    this.showWorkLoadFlag = workLoadShow == 1;
+  }
+
+  /**
+   * 获取选中的存储的 QosTag
+   */
+  getStorageQosTag(storageId) {
+    const storageTypeShow = this.storageList.filter(item => item.id == storageId);
+    // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
+    const qosTag = storageTypeShow[0].storageTypeShow.qosTag;
+    return qosTag;
+  }
+
+  /**
+   * 控制策略变更
+   * @param upperObj
+   * @param lowerObj
+   * @param isUpper true:upper、false:lower
+   */
+  controlPolicyChangeFunc(isUpper) {
+    const upperObj = document.getElementById("control_policyUpper") as HTMLInputElement;
+    const lowerObj = document.getElementById("control_policyLower") as HTMLInputElement;
+    // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
+    const qosTag = this.getStorageQosTag(this.form.storage_id);
+
+    let upperChecked;
+    if(upperObj) {
+      upperChecked =  upperObj.checked;
+    }
+    let lowerChecked;
+    if (lowerObj) {
+      lowerChecked = lowerObj.checked;
+    }
+    if (isUpper) {
+      if(upperChecked) {
+        this.form.control_policyUpper = '1';
+      }else {
+        this.form.control_policyUpper = undefined;
+      }
+      if(qosTag == 2 && upperChecked) { // 单选
+        console.log("单选1", qosTag)
+        this.form.control_policyLower = undefined;
+        lowerObj.checked = false;
+      }
+    } else {
+      if(lowerChecked) {
+        this.form.control_policyLower = '0';
+      }else {
+        this.form.control_policyLower = undefined;
+      }
+      if (lowerChecked && qosTag == 2) {
+        console.log("单选2", qosTag)
+        this.form.control_policyUpper = undefined;
+        upperObj.checked = false;
       }
     }
   }
