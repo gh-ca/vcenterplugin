@@ -159,6 +159,7 @@ export class VmfsListComponent implements OnInit {
   showSmartTierFlag = false;
   showAlloctypeThick = false; // 资源调优option全部展示
   showWorkLoadFlag = false; // 应用类型展示
+  latencyIsSelect = false; // 时延为下拉框
 
   isFirstLoadChartData = true;
 
@@ -371,6 +372,7 @@ export class VmfsListComponent implements OnInit {
       this.addSmartTierInit();
       this.addAllocationTypeShowInit();
       this.addWorkLoadShowInit();
+      this.addLatencyChoose();
 
       const storagePoolMap = this.storagePoolMap.filter(item => item.storageId == this.form.storage_id);
 
@@ -542,6 +544,7 @@ export class VmfsListComponent implements OnInit {
     this.showSmartTierFlag = false;
     this.showAlloctypeThick = false;
     this.showWorkLoadFlag = false;
+    this.latencyIsSelect = false;
 
     // 初始化表单
     this.form = new GetForm().getAddForm();
@@ -734,6 +737,7 @@ export class VmfsListComponent implements OnInit {
     this.showAlloctypeThick = false;
     this.form.alloctype = null;
     this.showWorkLoadFlag = false;
+    this.latencyIsSelect = false;
     this.form.workload_type_id = null;
 
     // loading
@@ -1822,6 +1826,15 @@ export class VmfsListComponent implements OnInit {
     this.form.workload_type_id = null;
     const workLoadShow = this.getWorkLoadShow(this.form.storage_id);
     this.showWorkLoadFlag = workLoadShow == 1;
+  }
+
+  /**
+   * 添加页面 时延为下拉框
+   */
+  addLatencyChoose() {
+    this.form.latency = null;
+    const qosTag = this.getStorageQosTag(this.form.storage_id);
+    this.latencyIsSelect = qosTag == 1;
   }
 
   /**

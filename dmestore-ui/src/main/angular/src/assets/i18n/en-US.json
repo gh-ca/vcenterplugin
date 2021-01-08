@@ -208,6 +208,7 @@
     "latency": "Latency",
     "latency": "Latency <= ",
     "latencyUnit": "ms",
+    "latencyUnitUs": "us",
     "latencyQoSTarget": "Latency QoS Target",
     "upper": "Upper",
     "lower": "Lower",
