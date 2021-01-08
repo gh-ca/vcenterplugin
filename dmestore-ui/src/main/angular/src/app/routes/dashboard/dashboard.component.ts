@@ -63,7 +63,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   popShow = false;
   connectAlertSuccess = false;
   connectAlertFail = false;
-  connectModel = { hostIp: '', hostPort: '', userName: '', password: ''};
+  connectModel = { hostIp: '', port: '26335', userName: '', password: ''};
   hostModel = { hostIp: '', hostPort: '', code: ''};
 
   bestShowLoading = false;
@@ -110,7 +110,9 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     this.gs.loading = true;
     this.http.get('accessdme/refreshaccess', {}).subscribe((result: any) => {
       this.hostModel = result.data;
-      if (this.hostModel.code == '200'){
+      console.log('this.hostModel', this.hostModel);
+      console.log('this.hostModel.code', result.code== '200');
+      if (result.code == '200'){
         this.gs.loading = false  // 设置全局loading 为 FALSE
         this.loadStorageNum();
         this.loadstorageCapacity('0', 'overview.allDataStore');
@@ -245,7 +247,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   resetForm() {
-    this.connectForm.reset();
+    this.connectForm.reset(this.connectModel);
   }
 
   showPop(){

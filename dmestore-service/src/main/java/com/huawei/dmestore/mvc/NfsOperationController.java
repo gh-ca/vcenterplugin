@@ -196,10 +196,8 @@ public class NfsOperationController extends BaseController {
             } else {
                 tuning.put(ALLOCATION_TYPE_FIELD, "thick");
             }
-            tuning.put(COMPRESSION_ENABLED_FIELD,
-                Boolean.parseBoolean((String)requestParams.get("compressionEnabled")));
-            tuning.put(DEDUPLICATION_ENABLED_FIELD,
-                Boolean.parseBoolean((String)requestParams.get("deduplicationEnabled")));
+            tuning.put(COMPRESSION_ENABLED_FIELD, requestParams.get("compressionEnabled"));
+            tuning.put(DEDUPLICATION_ENABLED_FIELD, requestParams.get("deduplicationEnabled"));
 
             String capacitymode = (Boolean) requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD)
                 ? CapacityAutonegotiation.CAPACITY_MODE_AUTO
