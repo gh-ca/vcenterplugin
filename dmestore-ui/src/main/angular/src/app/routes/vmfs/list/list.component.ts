@@ -642,10 +642,12 @@ export class VmfsListComponent implements OnInit {
         this.form.control_policy = null;
       }
       // 控制策略若未选清空数据
-      this.qosFunc(this.form);
-      // smartTiger
-      if (!this.showSmartTierFlag || !this.form.smartTierFlag) {
-        this.form.smartTier = null;
+      if( this.levelCheck == 'customer') {
+        this.qosFunc(this.form);
+        // smartTiger
+        if (!this.showSmartTierFlag || !this.form.smartTierFlag) {
+          this.form.smartTier = null;
+        }
       }
 
       // 打开 loading
