@@ -348,11 +348,23 @@
             <!-- 交通管制对象 latency 时延-->
             <clr-checkbox-container *ngIf="form.control_policyLower === '0'">
               <label></label>
-              <clr-checkbox-wrapper>
+              <clr-checkbox-wrapper *ngIf="!latencyIsSelect">
                 <input type="checkbox" [(ngModel)]="form.latencyChoose" name="latencyChoose" clrCheckbox/>
                 <label style="width: 190px;">
                   {{'vmfs.latencyMax' | translate}}
-                  <input type="number" [(readOnly)]="!form.latencyChoose" min="0" class="inputOneLine" name="latency" [(ngModel)]="form.latency" (blur)="qosBlur('add', 'latency');"/>{{'vmfs.latencyUnit' | translate}}
+                  <input  *ngIf="!latencyIsSelect" type="number" [(readOnly)]="!form.latencyChoose" min="0" class="inputOneLine" name="latency" [(ngModel)]="form.latency" (blur)="qosBlur('add', 'latency');"/>
+                  {{'vmfs.latencyUnit' | translate}}
+                </label>
+              </clr-checkbox-wrapper>
+              <clr-checkbox-wrapper *ngIf="latencyIsSelect">
+                <input type="checkbox" [(ngModel)]="form.latencyChoose" name="latencyChoose" clrCheckbox/>
+                <label style="width: 190px;">
+                  {{'vmfs.latencyMax' | translate}}
+                  <select [(disabled)]="!form.latencyChoose" [(ngModel)]="form.latency" name="latency" style="height: 1.2rem;width: 54%;border: none;border-bottom: 1px solid;border-bottom-color: var(--clr-forms-border-color, #b3b3b3);">
+                    <option value="500">500</option>
+                    <option value="1500">1500</option>
+                  </select>
+                  {{'vmfs.latencyUnitUs' | translate}}
                 </label>
               </clr-checkbox-wrapper>
             </clr-checkbox-container>
