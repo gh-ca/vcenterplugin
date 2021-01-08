@@ -74,6 +74,7 @@ export class AddComponent implements OnInit{
   showSmartTierFlag = false;
   showAlloctypeThick = false; // 资源调优option全部展示
   showWorkLoadFlag = false; // 应用类型展示
+  latencyIsSelect = false; // 时延为下拉框
 
   ngOnInit(): void {
     this.initData();
@@ -299,6 +300,7 @@ export class AddComponent implements OnInit{
     this.form.alloctype = null;
     this.showWorkLoadFlag = false;
     this.form.workload_type_id = null;
+    this.latencyIsSelect = false;
 
     // loading
     this.modalLoading = true;
@@ -350,6 +352,7 @@ export class AddComponent implements OnInit{
       this.addSmartTierInit();
       this.addAllocationTypeShowInit();
       this.addWorkLoadShowInit();
+      this.addLatencyChoose();
 
       const storagePoolMap = this.storagePoolMap.filter(item => item.storageId == this.form.storage_id);
 
@@ -444,11 +447,12 @@ export class AddComponent implements OnInit{
         this.form.control_policy = null;
       }
       // 控制策略若未选清空数据
-      this.qosFunc(this.form);
-
-      // smartTiger
-      if (!this.showSmartTierFlag || !this.form.smartTierFlag) {
-        this.form.smartTier = null;
+      if( this.levelCheck == 'customer') {
+        this.qosFunc(this.form);
+        // smartTiger
+        if (!this.showSmartTierFlag || !this.form.smartTierFlag) {
+          this.form.smartTier = null;
+        }
       }
 
       console.log('addFrom', this.form);
@@ -956,6 +960,15 @@ export class AddComponent implements OnInit{
     const qosTag = storageTypeShow[0].storageTypeShow.qosTag;
     return qosTag;
   }
+  /**
+   * 添加页面 时延为下拉框
+   */
+  addLatencyChoose() {
+    this.form.latency = null;
+    const qosTag = this.getStorageQosTag(this.form.storage_id);
+    this.latencyIsSelect = qosTag == 1;
+  }
+
 
   /**
    * 控制策略变更
