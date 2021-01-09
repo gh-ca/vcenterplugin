@@ -526,11 +526,13 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         smartqos.put("max_iops", ToolUtils.getInt(params.get(MAXIOPS), null));
         smartqos.put("min_bandwidth", ToolUtils.getInt(params.get(MINBANDWIDTH), null));
         smartqos.put("min_iops", ToolUtils.getInt(params.get(MINIOPS), null));
-
-        if (!StringUtils.isEmpty(params.get(DmeConstants.CONTROLPOLICY))) {
-            tuning.put("smart_qos", smartqos);
+        if (params.get("qosFlag")!=null && (Boolean) params.get("qosFlag")==true){
+            smartqos.put("enabled", true);
         }
-
+        if (!StringUtils.isEmpty(params.get(DmeConstants.CONTROLPOLICY))) {
+            smartqos.put(DmeConstants.CONTROLPOLICY, params.get(DmeConstants.CONTROLPOLICY));
+        }
+        tuning.put("smart_qos", smartqos);
         if (!StringUtils.isEmpty(params.get(DmeConstants.ALLOCTYPE)) || !StringUtils.isEmpty(
             params.get(WORKLOAD_TYPE_ID)) || !StringUtils.isEmpty(params.get(CONTROL_POLICY))) {
             requestbody.put(TUNING, tuning);

@@ -1,5 +1,6 @@
 package com.huawei.dmestore.utils;
 
+import com.huawei.dmestore.model.VmfsDatastoreVolumeDetail;
 import com.huawei.dmestore.services.DmeNFSAccessServiceImpl;
 import com.huawei.dmestore.services.DmeStorageServiceImpl;
 import com.huawei.dmestore.services.VmfsAccessServiceImpl;
@@ -47,7 +48,7 @@ public class DatastoreCustomProperter implements PropertyProviderAdapter {
     public DatastoreCustomProperter(DataServiceExtensionRegistry extensionRegistry) {
         TypeInfo vmTypeInfo = new TypeInfo();
         vmTypeInfo.type = "Datastore";
-        vmTypeInfo.properties = new String[] {"isVmfs", "isNfs", "hasVm"};
+        vmTypeInfo.properties = new String[] {"isVmfs", "isNfs", "hasVm","isThin"};
         TypeInfo[] providerTypes = new TypeInfo[] {vmTypeInfo};
 
         extensionRegistry.registerDataAdapter(this, providerTypes);
@@ -83,6 +84,13 @@ public class DatastoreCustomProperter implements PropertyProviderAdapter {
 
                 hasVmDatastore.propertyName = "hasVm";
 
+                PropertyValue isThinVmDatastore = new PropertyValue();
+
+                isThinVmDatastore.resourceObject = objRef;
+
+                isThinVmDatastore.propertyName = "isThin";
+                isThinVmDatastore.value = false;
+
                 String entityType = vimObjectReferenceService.getResourceObjectType(objRef);
                 String entityName = vimObjectReferenceService.getValue(objRef);
                 String serverGuid = vimObjectReferenceService.getServerGuid(objRef);
@@ -94,6 +102,17 @@ public class DatastoreCustomProperter implements PropertyProviderAdapter {
                 boolean isVmfs = vmfsAccessService.isVmfs(objectid);
                 isVmfsDataStore.value = isVmfs;
 
+                if (isVmfs) {
+                    List<VmfsDatastoreVolumeDetail> detaillists = vmfsAccessService.volumeDetail(objectid);
+                    for (VmfsDatastoreVolumeDetail vmfsDatastoreVolumeDetail:detaillists)
+                    {
+                        if ("thin".equalsIgnoreCase(vmfsDatastoreVolumeDetail.getProvisionType()))  {
+                            isThinVmDatastore.value = true;
+                            break;
+                        }
+                    }
+                }
+
                 boolean isNfs = dmeNFSAccessService.isNfs(objectid);
                 isNfsDataStore.value = isNfs;
 
@@ -101,7 +120,7 @@ public class DatastoreCustomProperter implements PropertyProviderAdapter {
                 hasVmDatastore.value = hasVm;
 
                 resultItem.resourceObject = objRef;
-                resultItem.properties = new PropertyValue[] {isVmfsDataStore, isNfsDataStore, hasVmDatastore};
+                resultItem.properties = new PropertyValue[] {isVmfsDataStore, isNfsDataStore, hasVmDatastore, isThinVmDatastore };
                 resultItems.add(resultItem);
             }
             resultSet.items = resultItems.toArray(new ResultItem[] {});
