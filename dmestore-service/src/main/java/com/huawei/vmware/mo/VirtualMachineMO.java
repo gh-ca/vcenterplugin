@@ -270,7 +270,7 @@ public class VirtualMachineMO extends BaseMO {
         List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, configDeviceStr);
         if (devices != null && devices.size() > 0) {
             for (VirtualDevice device : devices) {
-                if (device instanceof VirtualIDEController) {
+                if (device instanceof VirtualLsiLogicController) {
                     return device.getKey();
                 }
             }
@@ -289,25 +289,20 @@ public class VirtualMachineMO extends BaseMO {
      */
     public int getNextDeviceNumber(int controllerKey) throws Exception {
         List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, configDeviceStr);
+        int unitNumber = 0;
+        for (VirtualDevice vdisk : devices) {
+            if (vdisk instanceof VirtualLsiLogicController) {
+                int ctrlKey = vdisk.getControllerKey();
+                if (ctrlKey == controllerKey) {
+                    int unitNum = vdisk.getUnitNumber();
+                    if (unitNum > unitNumber) {
+                        unitNumber = unitNum;
+                    }
+                }
+            }
+        }
+        unitNumber++;
 
-        List<Integer> existingUnitNumbers = new ArrayList<Integer>();
-        int deviceNumber = 0;
-        int scsiControllerKey = getScsiDeviceControllerKeyNoException();
-        if (devices != null && devices.size() > 0) {
-            for (VirtualDevice device : devices) {
-                if (device.getControllerKey() != null && device.getControllerKey().intValue() == controllerKey) {
-                    existingUnitNumbers.add(device.getUnitNumber());
-                }
-            }
-        }
-        while (true) {
-            if (!existingUnitNumbers.contains(Integer.valueOf(deviceNumber))) {
-                if (controllerKey != scsiControllerKey || !VmwareHelper.isReservedScsiDeviceNumber(deviceNumber)) {
-                    break;
-                }
-            }
-            ++deviceNumber;
-        }
-        return deviceNumber;
+        return unitNumber;
     }
 }

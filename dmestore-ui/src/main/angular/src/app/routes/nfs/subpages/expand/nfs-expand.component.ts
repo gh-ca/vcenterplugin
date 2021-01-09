@@ -35,7 +35,15 @@ export class NfsExpandComponent implements OnInit{
         //入口来至Vcenter
         const ctx = this.gs.getClientSdk().app.getContextObjects();
         this.storeObjectId=ctx[0].id;
-        this.viewPage='expand_vcenter'
+        this.viewPage='expand_vcenter';
+        this.modalLoading = true;
+        this.expandService.getStorageById(this.storeObjectId).subscribe((result: any) => {
+          this.modalLoading = false;
+          if (result.code === '200'){
+            this.fsId = result.data.fsId;
+          }
+          this.cdr.detectChanges();
+        });
       }
   }
   expandData(){

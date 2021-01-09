@@ -602,8 +602,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     @Override
     public List<Dtrees> getDtrees(String storageId) throws DmeException {
         List<Dtrees> resList = new ArrayList<>();
-        Map<String, String> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put(STORAGE_ID, storageId);
+        params.put("page_size", DmeConstants.DEFAULT_PAGE_SIZE);
         try {
             String url = DmeConstants.API_DTREES_LIST;
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(params));
@@ -638,8 +639,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     @Override
     public List<NfsShares> getNfsShares(String storageId) throws DmeException {
         List<NfsShares> resList = new ArrayList<>();
-        Map<String, String> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put(STORAGE_ID, storageId);
+        params.put("page_size", DmeConstants.DEFAULT_PAGE_SIZE);
         try {
             String url = DmeConstants.DME_NFS_SHARE_URL;
             ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(params));
@@ -1520,7 +1522,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     private Map<String, Object> getDjtier() throws DmeException {
         Map<String, Object> map = new HashMap<>();
-        String getDjtierUrl = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, "SYS_DjTier");
+        String getDjtierUrl = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST + "?pageSize=1000", "SYS_DjTier");
         try {
             ResponseEntity responseEntity = dmeAccessService.access(getDjtierUrl, HttpMethod.GET, null);
             if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {

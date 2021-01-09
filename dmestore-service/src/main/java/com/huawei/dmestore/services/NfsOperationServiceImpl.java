@@ -499,7 +499,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         JsonObject condition = new JsonObject();
         condition.add("constraint", constraint);
         String className = "SYS_StoragePool";
-        String url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + "?condition={json}";
+        String url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + "?pageSize=1000&condition={json}";
         ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET,
             gson.toJson(condition));
         int code = responseEntity.getStatusCodeValue();

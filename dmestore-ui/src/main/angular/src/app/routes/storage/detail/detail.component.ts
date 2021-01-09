@@ -200,6 +200,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
   @ViewChild('dtreeQuotaFilter') dtreeQuotaFilter:DtreeQuotaFilter;
   @ViewChild('dtreeQuotaFilter') dtreeSecModFilter:DtreeSecModFilter;
 
+
+  storageDetailTag:number;
   //portList:
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(queryParam => {
@@ -279,6 +281,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
         this.gs.loading=false;
         if (r.code === '200'){
           this.detail = r.data;
+          this.storageDetailTag = this.detail.storageTypeShow.storageDetailTag;
           this.initCapacity();
           this.cdr.detectChanges();
         }else{

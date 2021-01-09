@@ -443,6 +443,11 @@ public class DmeConstants {
     public static final String STORE_TYPE_VMFS = "VMFS";
 
     /**
+     * default_page_size
+     **/
+    public static final int DEFAULT_PAGE_SIZE = 1000;
+
+    /**
      * 容量初始分配策略。仅支持华为V3/V5设备，Dorado系列不支持该参数。
      * 取值范围：automatic：自动，highest_performance：高性能层，performance：性能层，capacity：容量层。默认值：automatic
      **/

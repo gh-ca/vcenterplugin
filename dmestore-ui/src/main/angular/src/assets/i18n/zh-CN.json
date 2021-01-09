@@ -207,6 +207,7 @@
     "latency": "时延(ms)",
     "latencyMax": "时延 <= ",
     "latencyUnit": "ms",
+    "latencyUnitUs": "us",
     "latencyQoSTarget": "时延QoS下限",
     "upper": "Upper",
     "lower": "Lower",
