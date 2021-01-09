@@ -901,7 +901,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="reclaimShow=false">{{'menu.cancel' | translate}}</button>
-      <button type="submit" class="btn btn-primary" (click)="reclaimHandleFunc()">{{'menu.ok' | translate}}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="isReclaimErr" (click)="reclaimHandleFunc()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 

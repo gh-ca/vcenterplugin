@@ -53,10 +53,20 @@ export class ReclaimComponent implements OnInit{
           this.reclaimId = queryParam.objectId;
         } else { // dataStore入口
           const ctx = this.globalsService.getClientSdk().app.getContextObjects();
-          this.objectId = ctx[0].id;
-          // this.objectId = "urn:vmomi:Datastore:datastore-4022:674908e5-ab21-4079-9cb1-596358ee5dd1";
+          // this.objectId = ctx[0].id;
+          this.objectId = "urn:vmomi:Datastore:datastore-4022:674908e5-ab21-4079-9cb1-596358ee5dd1";
           this.reclaimId = this.objectId;
         }
+        this.modalHandleLoading = true;
+        this.remoteSrv.reclaimVmfsJudge(this.reclaimId).subscribe((result:any) => {
+          this.modalHandleLoading = false;
+          if (result.code == '200') {
+            if (!result.data) {
+              this.isReclaimErr = true;
+            }
+          }
+          this.cdr.detectChanges();
+        });
         this.reclaimShow = true;
         this.modalLoading = false;
         console.log('reclaim vmfs objectIds:' + this.reclaimId);
@@ -80,21 +90,24 @@ export class ReclaimComponent implements OnInit{
   // 回收空间 处理
   reclaimHandleFunc() {
     this.modalHandleLoading = true;
-    this.remoteSrv.reclaimVmfs(this.reclaimId).subscribe((result: any) => {
+
+    const reclaimIds = [];
+    reclaimIds.push(this.reclaimId)
+    this.remoteSrv.reclaimVmfs(reclaimIds).subscribe((result: any) => {
       this.modalHandleLoading = false;
       if (result.code === '200'){
         console.log('Reclaim success');
-
+        // 关闭回收空间页面
+        this.reclaimShow = false;
         this.reclaimSuccessShow = true;
-      } else if (result.code === '20883') {
-        this.isReclaimErr = true;
-      }else {
+      } else {
         console.log('Reclaim fail：' + result.description);
         this.isOperationErr = true;
       }
-      // 关闭回收空间页面
       this.cdr.detectChanges();
     });
+
+
   }
   /**
    * 确认操作结果并关闭窗口
