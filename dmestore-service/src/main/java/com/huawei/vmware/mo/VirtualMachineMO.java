@@ -5,6 +5,9 @@ import com.huawei.vmware.util.VmwareContext;
 import com.huawei.vmware.util.VmwareHelper;
 
 import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.ParaVirtualSCSIController;
+import com.vmware.vim25.VirtualAHCIController;
+import com.vmware.vim25.VirtualController;
 import com.vmware.vim25.VirtualDevice;
 import com.vmware.vim25.VirtualDeviceConfigSpec;
 import com.vmware.vim25.VirtualDeviceConfigSpecFileOperation;
@@ -19,6 +22,7 @@ import com.vmware.vim25.VirtualLsiLogicController;
 import com.vmware.vim25.VirtualMachineConfigSpec;
 import com.vmware.vim25.VirtualMachineFileInfo;
 import com.vmware.vim25.VirtualMachineRuntimeInfo;
+import com.vmware.vim25.VirtualSATAController;
 import com.vmware.vim25.VirtualSCSIController;
 
 import org.slf4j.Logger;
@@ -270,8 +274,17 @@ public class VirtualMachineMO extends BaseMO {
         List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, configDeviceStr);
         if (devices != null && devices.size() > 0) {
             for (VirtualDevice device : devices) {
-                if (device instanceof VirtualLsiLogicController) {
-                    return device.getKey();
+                if (device instanceof ParaVirtualSCSIController || device instanceof VirtualLsiLogicController
+                    || device instanceof VirtualAHCIController || device instanceof VirtualSATAController) {
+                    int key = device.getKey();
+                    return key;
+                }
+            }
+
+            for (VirtualDevice device : devices) {
+                if (device instanceof VirtualIDEController) {
+                    int key = device.getKey();
+                    return key;
                 }
             }
         }
@@ -291,10 +304,21 @@ public class VirtualMachineMO extends BaseMO {
         List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, configDeviceStr);
         int unitNumber = 0;
         for (VirtualDevice vdisk : devices) {
-            if (vdisk instanceof VirtualLsiLogicController) {
-                int ctrlKey = vdisk.getControllerKey();
+            if (vdisk instanceof ParaVirtualSCSIController || vdisk instanceof VirtualLsiLogicController
+                || vdisk instanceof VirtualSATAController || vdisk instanceof VirtualAHCIController) {
+                Integer ctrlKey = vdisk.getKey();
                 if (ctrlKey == controllerKey) {
-                    int unitNum = vdisk.getUnitNumber();
+                    Integer unitNum = vdisk.getUnitNumber();
+                    if (unitNum > unitNumber) {
+                        unitNumber = unitNum;
+                    }
+                }
+            }
+        }
+        if (unitNumber == 0) {
+            for (VirtualDevice vdisk : devices) {
+                if (vdisk instanceof VirtualIDEController) {
+                    Integer unitNum = ((VirtualIDEController) vdisk).getBusNumber();
                     if (unitNum > unitNumber) {
                         unitNumber = unitNum;
                     }
