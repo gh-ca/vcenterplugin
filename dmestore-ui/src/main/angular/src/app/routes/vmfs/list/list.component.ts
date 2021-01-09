@@ -147,6 +147,7 @@ export class VmfsListComponent implements OnInit {
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
   isOperationErr = false; // 错误信息
+  isReclaimErr = false; // 错误信息
   nameChecking = false; // 名称校验
   capacityErr = false; // 容量错误信息
   expandErr = false; // 扩容容量错误信息
@@ -1078,7 +1079,7 @@ export class VmfsListComponent implements OnInit {
   }
   // 回收空间 处理
   reclaimHandleFunc() {
-    const vmfsObjectIds = this.rowSelected.map(item => item.objectid);
+    const vmfsObjectIds = this.rowSelected[0].objectid;
     this.modalHandleLoading = true;
     this.remoteSrv.reclaimVmfs(vmfsObjectIds).subscribe((result: any) => {
       this.modalHandleLoading = false;
@@ -1089,6 +1090,8 @@ export class VmfsListComponent implements OnInit {
         // this.scanDataStore();
         // 打开成功提示窗口
         this.reclaimSuccessShow = true;
+      } else if (result.code === '20883') {
+        this.isReclaimErr = true;
       } else {
         this.isOperationErr = true;
       }
@@ -1252,6 +1255,8 @@ export class VmfsListComponent implements OnInit {
   reclaimBtnClick() {
     if (this.rowSelected.length >= 1) {
       this.reclaimShow = true;
+
+      this.isReclaimErr = false;
 
       this.isOperationErr = false;
       this.modalHandleLoading = false;

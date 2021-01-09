@@ -89,7 +89,7 @@ export class VmfsListService {
   }
   // 空间回收
   reclaimVmfs(params = {}) { // vmfs空间回收
-    return  this.http.post('operatevmfs/recyclevmfsbydatastoreids', params);
+    return  this.http.post('operatevmfs/canrecyclevmfsbydatastoreid', params);
   }
 
   // 修改服务等级
