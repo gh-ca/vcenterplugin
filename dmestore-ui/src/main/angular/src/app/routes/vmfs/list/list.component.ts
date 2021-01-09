@@ -644,6 +644,13 @@ export class VmfsListComponent implements OnInit {
       // 控制策略若未选清空数据
       if( this.levelCheck == 'customer') {
         this.qosFunc(this.form);
+        if (this.form.control_policyUpper == '1') { // 上限+全选（上下限）
+            this.form.control_policy = '1';
+        } else if(this.form.control_policyLower == '0') {// 下限
+          this.form.control_policy = '0';
+        } else {
+          this.form.control_policy = '';
+        }
         // smartTiger
         if (!this.showSmartTierFlag || !this.form.smartTierFlag) {
           this.form.smartTier = null;
@@ -1660,7 +1667,7 @@ export class VmfsListComponent implements OnInit {
     }
   }
   initAddMinInfo(form) {
-    form.control_policyUpper = undefined;
+    form.control_policyLower = undefined;
     form.minbandwidthChoose = false;
     form.minbandwidth = null;
     form.miniopsChoose = false;
@@ -1669,7 +1676,7 @@ export class VmfsListComponent implements OnInit {
     form.latency = null;
   }
   initAddMaxInfo(form) {
-    form.control_policyLower = undefined;
+    form.control_policyUpper = undefined;
     form.maxbandwidthChoose = false;
     form.maxbandwidth = null;
     form.maxiopsChoose = false;
