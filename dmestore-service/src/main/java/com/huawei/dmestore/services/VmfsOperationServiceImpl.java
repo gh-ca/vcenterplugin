@@ -246,24 +246,23 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
     }
 
     @Override
-    public void canRecycleVmfsCapacity(List<String> dsObjectIds) throws DmeException {
+    public boolean canRecycleVmfsCapacity(List<String> dsObjectIds) throws DmeException {
 
-        boolean isThickVmDatastore = false;
+        boolean isThinVmdatastore = false;
         if (dsObjectIds != null && dsObjectIds.size() > 0) {
             for (int index = 0; index < dsObjectIds.size(); index++) {
                 List<VmfsDatastoreVolumeDetail> detaillists = vmfsAccessService.volumeDetail(dsObjectIds.get(index));
                 for (VmfsDatastoreVolumeDetail vmfsDatastoreVolumeDetail:detaillists)
                 {
-                    if ("thick".equalsIgnoreCase(vmfsDatastoreVolumeDetail.getProvisionType()))  {
-                        isThickVmDatastore = true;
+                    if ("thin".equalsIgnoreCase(vmfsDatastoreVolumeDetail.getProvisionType()))  {
+                        isThinVmdatastore = true;
                         break;
                     }
                 }
             }
         }
-        if (isThickVmDatastore) {
-            throw new DmeException(CODE_20883, "not support recycle thick vmfsDatastore ");
-        }
+        return isThinVmdatastore;
+
 
     }
 
