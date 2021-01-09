@@ -244,6 +244,7 @@
     "capacityTips": "If the version is VMFS5, the minimum capacity is 1G, if the version is VMFS6, the minimum capacity is 2G, and the capacity must be a positive integer in G, and the quantity must be a positive integer!",
     "serviceLevelCantBeNull": "The service level is a must, and you can only choose the service level whose capacity is not 0!",
     "expandTips": "Expansion capacity can only be a positive integer of GB",
+    "expandTipsMax": "After expansion, the total capacity cannot exceed 256TB.",
     "loadingTips": "Data loading, please wait",
     "dataHandleLoadingTips": "Data processing, please wait",
     "listNullTips": "We couldn't find any users",
@@ -295,7 +296,8 @@
     "reclaim": {
       "title":"Tips",
       "content":"Are you sure to reclaim?",
-      "success": "Successfully reclaimed space!"
+      "success": "Successfully reclaimed space!",
+      "error": "Cannot recycle thick vmfs storage"
     },
     "filter": {
       "all": "All",

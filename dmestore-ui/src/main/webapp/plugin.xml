@@ -695,20 +695,6 @@
                </delegate>
             </com.vmware.actionsfw.ActionSpec>
             <com.vmware.actionsfw.ActionSpec>
-               <uid>com.huawei.dmestore.datastore.vmfsreclaimaction</uid>
-               <label>#{reclaim.label}</label>
-               <delegate>
-                  <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
-                  <object>
-                     <root>
-                        <actionUrl>/ui/dmestore/index.html?view=vmfs/reclaim?resource=dataStore</actionUrl>
-                        <dialogTitle>VMFS</dialogTitle>
-                        <dialogSize>400,200</dialogSize>
-                     </root>
-                  </object>
-               </delegate>
-            </com.vmware.actionsfw.ActionSpec>
-            <com.vmware.actionsfw.ActionSpec>
                <uid>com.huawei.dmestore.datastore.vmfsservicelevelaction</uid>
                <label>#{changeservicelevel.label}</label>
                <delegate>
@@ -773,6 +759,52 @@
                <nestedConstraints>
                   <com.vmware.data.query.PropertyConstraint>
                      <propertyName>isVmfs</propertyName>
+                     <comparator>EQUALS</comparator>
+                     <comparableValue>
+                        <Boolean>true</Boolean>
+                     </comparableValue>
+                  </com.vmware.data.query.PropertyConstraint>
+               </nestedConstraints>
+               <conjoiner>AND</conjoiner>
+            </com.vmware.data.query.CompositeConstraint>
+         </propertyConditions>
+      </metadata>
+   </extension>
+
+   <extension id="com.huawei.dmestore.datastore.vmfsreclaimactionSet">
+      <extendedPoint>vise.actions.sets</extendedPoint>
+      <object>
+         <actions>
+            <com.vmware.actionsfw.ActionSpec>
+               <uid>com.huawei.dmestore.datastore.vmfsreclaimaction</uid>
+               <label>#{reclaim.label}</label>
+               <delegate>
+                  <className>com.vmware.vsphere.client.HtmlPluginModalAction</className>
+                  <object>
+                     <root>
+                        <actionUrl>/ui/dmestore/index.html?view=vmfs/reclaim?resource=dataStore</actionUrl>
+                        <dialogTitle>VMFS</dialogTitle>
+                        <dialogSize>400,200</dialogSize>
+                     </root>
+                  </object>
+               </delegate>
+            </com.vmware.actionsfw.ActionSpec>
+         </actions>
+      </object>
+      <metadata>
+         <objectType>Datastore</objectType>
+         <propertyConditions>
+            <com.vmware.data.query.CompositeConstraint>
+               <nestedConstraints>
+                  <com.vmware.data.query.PropertyConstraint>
+                     <propertyName>isVmfs</propertyName>
+                     <comparator>EQUALS</comparator>
+                     <comparableValue>
+                        <Boolean>true</Boolean>
+                     </comparableValue>
+                  </com.vmware.data.query.PropertyConstraint>
+                  <com.vmware.data.query.PropertyConstraint>
+                     <propertyName>isThin</propertyName>
                      <comparator>EQUALS</comparator>
                      <comparableValue>
                         <Boolean>true</Boolean>

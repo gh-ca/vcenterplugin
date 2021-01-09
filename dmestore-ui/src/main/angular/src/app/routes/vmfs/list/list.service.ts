@@ -18,6 +18,11 @@ export class VmfsListService {
   getStorages() {
     return this.http.get('dmestorage/storages');
   }
+
+  getStorageDetail(storageId: string){
+    return this.http.get('dmestorage/storage', {params: {storageId}});
+  }
+
   // 通过存储ID获取存储池数据 (vmfs添加mediaType为block)
   getStoragePoolsByStorId(storageId: string, mediaType: string) {
     return this.http.get('dmestorage/storagepools?storageId='+ storageId + '&mediaType=' + mediaType);
@@ -87,6 +92,11 @@ export class VmfsListService {
     return  this.http.post('operatevmfs/recyclevmfsbydatastoreids', params);
   }
 
+  // 空间回收判断 true 可以回收 false 不可以回收
+  reclaimVmfsJudge(params = {}) { // vmfs空间回收
+    return  this.http.post('operatevmfs/canrecyclevmfsbydatastoreid', params);
+  }
+
   // 修改服务等级
   changeServiceLevel(params = {}) {
     return  this.http.post('operatevmfs/updatevmfsservicelevel', params);
@@ -120,6 +130,14 @@ export class VmfsListService {
    */
   checkVolName(volName: string) {
     return this.http.get('dmestorage/queryvolumebyname', {params: {name:volName}});
+  }
+
+  /**
+   * 通过objectId 获取vmfs存储数据
+   * @param objectId
+   */
+  getStorageById(objectId:string) {
+    return this.http.get('accessvmware/relation?datastoreObjectId='+objectId);
   }
 }
 // vmfs列表
@@ -302,6 +320,8 @@ export class GetForm {
       isSameName: true, // 卷名称与vmfs名称是否相同
       volumeId: null, // 卷ID
       control_policy: undefined, // 控制策略,
+      control_policyUpper: undefined, // 控制策略上限
+      control_policyLower: undefined, // 控制策略下限
       max_iops: null,
       maxiopsChoose: false, // 最大iops 选中
       max_bandwidth: null,
@@ -317,7 +337,9 @@ export class GetForm {
       service_level_name: null, // 服务等级名称
       latency: null,
       latencyChoose: false, // 时延 选中
-      qosFlag: true
+      qosFlag: false,
+      smartTier: null, // SmartTier
+      smartTierFlag: false, // SmartTier
     };
     return editForm;
   }
