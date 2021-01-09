@@ -147,6 +147,7 @@ export class VmfsListComponent implements OnInit {
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
   isOperationErr = false; // 错误信息
+  isReclaimErr = false; // 错误信息
   nameChecking = false; // 名称校验
   capacityErr = false; // 容量错误信息
   expandErr = false; // 扩容容量错误信息
@@ -1078,9 +1079,11 @@ export class VmfsListComponent implements OnInit {
   }
   // 回收空间 处理
   reclaimHandleFunc() {
-    const vmfsObjectIds = this.rowSelected.map(item => item.objectid);
+    const vmfsObjectIds = this.rowSelected[0].objectid;
     this.modalHandleLoading = true;
-    this.remoteSrv.reclaimVmfs(vmfsObjectIds).subscribe((result: any) => {
+    const reclaimIds = [];
+    reclaimIds.push(vmfsObjectIds)
+    this.remoteSrv.reclaimVmfs(reclaimIds).subscribe((result: any) => {
       this.modalHandleLoading = false;
       if (result.code === '200'){
         // 关闭回收空间页面
@@ -1089,11 +1092,12 @@ export class VmfsListComponent implements OnInit {
         // this.scanDataStore();
         // 打开成功提示窗口
         this.reclaimSuccessShow = true;
-      } else {
+      }else {
         this.isOperationErr = true;
       }
       this.cdr.detectChanges();
     });
+
   }
   // 变更服务等级 按钮点击事件
   changeServiceLevelBtnFunc() {
@@ -1253,8 +1257,23 @@ export class VmfsListComponent implements OnInit {
     if (this.rowSelected.length >= 1) {
       this.reclaimShow = true;
 
+      this.isReclaimErr = false;
+
       this.isOperationErr = false;
       this.modalHandleLoading = false;
+      const vmfsObjectIds = this.rowSelected[0].objectid;
+
+      this.modalHandleLoading = true;
+      this.remoteSrv.reclaimVmfsJudge(vmfsObjectIds).subscribe((result:any) => {
+        this.modalHandleLoading = false;
+        if (result.code == '200') {
+          if (!result.data) {
+            this.isReclaimErr = true;
+          }
+        }
+        this.cdr.detectChanges();
+      });
+
     }
   }
 

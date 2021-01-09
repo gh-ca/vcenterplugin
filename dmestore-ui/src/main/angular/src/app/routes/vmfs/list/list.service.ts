@@ -92,6 +92,11 @@ export class VmfsListService {
     return  this.http.post('operatevmfs/recyclevmfsbydatastoreids', params);
   }
 
+  // 空间回收判断 true 可以回收 false 不可以回收
+  reclaimVmfsJudge(params = {}) { // vmfs空间回收
+    return  this.http.post('operatevmfs/canrecyclevmfsbydatastoreid', params);
+  }
+
   // 修改服务等级
   changeServiceLevel(params = {}) {
     return  this.http.post('operatevmfs/updatevmfsservicelevel', params);

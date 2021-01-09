@@ -17,7 +17,7 @@
         </button>
         <clr-dropdown-menu *clrIfOpen>
           <!--空间回收-->
-          <div aria-label="Dropdown header Action 1" [disabled]="rowSelected.length < 1" (click)="reclaimBtnClick();"  clrDropdownItem>{{'menu.reclaim' | translate}}</div>
+          <div aria-label="Dropdown header Action 1" [disabled]="rowSelected.length !== 1" (click)="reclaimBtnClick();"  clrDropdownItem>{{'menu.reclaim' | translate}}</div>
           <div class="dropdown-divider" role="separator" aria-hidden="true"></div>
           <!--修改服务等级  按钮展示条件：Datastore所在卷属于服务等级时（选中的单条数据），才呈现“变更服务等级”按钮或菜单-->
           <div aria-label="Dropdown header Action 2" (click)="changeServiceLevelBtnFunc();" *ngIf="rowSelected.length === 1 && rowSelected[0].serviceLevelName !== '' && rowSelected[0].serviceLevelName !== null" clrDropdownItem>{{'menu.changeServiceLevel' | translate}}</div>
@@ -891,6 +891,7 @@
     <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
     <div class="modal-body">
       <div *ngIf="isOperationErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.reclaimError' | translate}}</div>
+      <div *ngIf="isReclaimErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.reclaim.error' | translate}}</div>
       <div *ngIf="modalHandleLoading" class="loadingDiv">
         <span>
           {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
@@ -900,7 +901,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="reclaimShow=false">{{'menu.cancel' | translate}}</button>
-      <button type="submit" class="btn btn-primary" (click)="reclaimHandleFunc()">{{'menu.ok' | translate}}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="isReclaimErr" (click)="reclaimHandleFunc()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 
