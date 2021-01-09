@@ -84,6 +84,7 @@ public class VmfsOperationController extends BaseController {
     public ResponseBodyBean recycleVmfs(final @RequestBody List<String> dsObjectIds) {
         LOG.info("recyclevmfs=={}", gson.toJson(dsObjectIds));
         try {
+            vmfsOperationService.canRecycleVmfsCapacity(dsObjectIds);
             vmfsOperationService.recycleVmfsCapacity(dsObjectIds);
             return success();
         } catch (DmeException e) {
