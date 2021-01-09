@@ -45,7 +45,7 @@ public interface VmfsOperationService {
      * @param vmfsUuids vmfsUuids
      * @throws DmeException DmeException
      */
-    void canRecycleVmfsCapacity(List<String> vmfsUuids) throws DmeException;
+    boolean canRecycleVmfsCapacity(List<String> vmfsUuids) throws DmeException;
 
 
     /**
