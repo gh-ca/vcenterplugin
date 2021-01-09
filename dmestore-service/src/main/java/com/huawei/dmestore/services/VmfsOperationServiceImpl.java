@@ -3,13 +3,7 @@ package com.huawei.dmestore.services;
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.VcenterException;
-import com.huawei.dmestore.model.CapabilitiesQos;
-import com.huawei.dmestore.model.CapabilitiesSmarttier;
-import com.huawei.dmestore.model.CustomizeVolumeTuning;
-import com.huawei.dmestore.model.SimpleCapabilities;
-import com.huawei.dmestore.model.SimpleServiceLevel;
-import com.huawei.dmestore.model.SmartQos;
-import com.huawei.dmestore.model.VolumeUpdate;
+import com.huawei.dmestore.model.*;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 
@@ -21,6 +15,7 @@ import com.google.gson.JsonParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,11 +39,15 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
     private static final String CODE_403 = "403";
 
+    private static final String CODE_20883 = "20883";
+
     private static final String CODE_503 = "503";
 
     private static final String TASK_ID = "task_id";
 
     private DmeAccessService dmeAccessService;
+
+    private VmfsAccessServiceImpl vmfsAccessService;
 
     private Gson gson = new Gson();
 
@@ -78,6 +77,14 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
     public void setVcsdkUtils(VCSDKUtils vcsdkUtils) {
         this.vcsdkUtils = vcsdkUtils;
+    }
+
+    public VmfsAccessServiceImpl getVmfsAccessService() {
+        return vmfsAccessService;
+    }
+
+    public void setVmfsAccessService(VmfsAccessServiceImpl vmfsAccessService) {
+        this.vmfsAccessService = vmfsAccessService;
     }
 
     @Override
@@ -236,6 +243,28 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             LOG.error("recycle vmfsDatastore error !", e);
             throw new DmeException(CODE_503, e.getMessage());
         }
+    }
+
+    @Override
+    public void canRecycleVmfsCapacity(List<String> dsObjectIds) throws DmeException {
+
+        boolean isThickVmDatastore = false;
+        if (dsObjectIds != null && dsObjectIds.size() > 0) {
+            for (int index = 0; index < dsObjectIds.size(); index++) {
+                List<VmfsDatastoreVolumeDetail> detaillists = vmfsAccessService.volumeDetail(dsObjectIds.get(index));
+                for (VmfsDatastoreVolumeDetail vmfsDatastoreVolumeDetail:detaillists)
+                {
+                    if ("thick".equalsIgnoreCase(vmfsDatastoreVolumeDetail.getProvisionType()))  {
+                        isThickVmDatastore = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if (isThickVmDatastore) {
+            throw new DmeException(CODE_20883, "not support recycle thick vmfsDatastore ");
+        }
+
     }
 
     @Override
