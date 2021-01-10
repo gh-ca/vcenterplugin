@@ -284,7 +284,8 @@ public class VirtualMachineMO extends BaseMO {
         List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, configDeviceStr);
         if (devices != null && devices.size() > 0) {
             for (VirtualDevice device : devices) {
-                if (device instanceof VirtualLsiLogicController) {
+                if (device instanceof ParaVirtualSCSIController || device instanceof VirtualLsiLogicController
+                    || device instanceof VirtualSATAController || device instanceof VirtualAHCIController) {
                     int key = device.getKey();
                     return key;
                 }
