@@ -454,7 +454,7 @@ export class AddComponent implements OnInit{
         } else if(this.form.control_policyLower == '0') {// 下限
           this.form.control_policy = '0';
         } else {
-          this.form.control_policy = '';
+          this.form.control_policy = null;
         }
         // smartTiger
         if (!this.showSmartTierFlag || !this.form.smartTierFlag) {
@@ -859,6 +859,11 @@ export class AddComponent implements OnInit{
       }else {
         this.initAddMinInfo(form);
       }
+    }
+    if (form.control_policyUpper != '1' && form.control_policyLower != '0') {
+      this.initAddMaxInfo(form);
+      this.initAddMinInfo(form);
+      form.control_policy = null;
     }
   }
   initAddMinInfo(form) {
