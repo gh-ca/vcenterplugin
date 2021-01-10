@@ -860,6 +860,11 @@ export class AddComponent implements OnInit{
         this.initAddMinInfo(form);
       }
     }
+    if (form.control_policyUpper != '1' && form.control_policyLower != '0') {
+      this.initAddMaxInfo(form);
+      this.initAddMinInfo(form);
+      form.control_policy = null;
+    }
   }
   initAddMinInfo(form) {
     form.control_policyLower = undefined;

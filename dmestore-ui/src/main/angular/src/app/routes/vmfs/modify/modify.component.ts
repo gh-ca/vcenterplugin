@@ -355,6 +355,7 @@ export class ModifyComponent implements OnInit{
       if (form.control_policyUpper != '1' && form.control_policyLower != '0') {
         this.initEditMinInfo(form);
         this.initEditMaxInfo(form);
+        form.control_policy = null;
       }
     }
   }
