@@ -837,6 +837,8 @@ export class AddComponent implements OnInit{
         if (qosTag == 2 || qosTag == 3) {
           this.initAddMinInfo(form);
         }
+      }else {
+        this.initAddMaxInfo(form);
       }
       if (form.control_policyLower == '0') {
         if(qosTag == 2){
@@ -854,6 +856,8 @@ export class AddComponent implements OnInit{
             form.latency = null;
           }
         }
+      }else {
+        this.initAddMinInfo(form);
       }
     }
   }
