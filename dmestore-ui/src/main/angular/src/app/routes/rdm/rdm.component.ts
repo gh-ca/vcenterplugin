@@ -170,6 +170,9 @@ export class RdmComponent implements OnInit {
   }
 
   submit(): void {
+    if (!this.ownershipController) {
+      this.configModel.ownerController = null;
+    }
     let b = JSON.parse(JSON.stringify(this.configModel));
     let body = {};
     if (this.configModel.storageType == '2'){
