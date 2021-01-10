@@ -157,7 +157,7 @@ export class ModifyComponent implements OnInit{
       } else if(this.modifyForm.control_policyLower == '0') {// 下限
         this.modifyForm.control_policy = '0';
       } else {
-        this.modifyForm.control_policy = '';
+        this.modifyForm.control_policy = null;
       }
     }
     this.modifyForm.newDsName = this.modifyForm.name;

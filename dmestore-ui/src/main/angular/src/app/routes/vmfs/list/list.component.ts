@@ -273,7 +273,7 @@ export class VmfsListComponent implements OnInit {
       } else if(this.modifyForm.control_policyLower == '0') {// 下限
         this.modifyForm.control_policy = '0';
       } else {
-        this.modifyForm.control_policy = '';
+        this.modifyForm.control_policy = null;
       }
     }
 
@@ -698,7 +698,7 @@ export class VmfsListComponent implements OnInit {
         } else if(this.form.control_policyLower == '0') {// 下限
           this.form.control_policy = '0';
         } else {
-          this.form.control_policy = '';
+          this.form.control_policy = null;
         }
         // smartTiger
         if (!this.showSmartTierFlag || !this.form.smartTierFlag) {
