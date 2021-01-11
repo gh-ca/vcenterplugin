@@ -1,6 +1,7 @@
 package com.huawei.dmestore.services;
 
 import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.model.DmeDatasetsQueryResponse;
 import com.huawei.dmestore.model.SimpleServiceLevel;
 import com.huawei.dmestore.model.StoragePool;
 import com.huawei.dmestore.model.Volume;
@@ -22,4 +23,13 @@ public interface ServiceLevelService {
     List<Volume> getVolumeInfosByServiceLevelId(String serviceLevelId) throws DmeException;
 
     void updateVmwarePolicy() throws DmeException;
+
+    DmeDatasetsQueryResponse statLunDatasetsQuery(String serviceLevelId, String interval) throws DmeException;
+
+    DmeDatasetsQueryResponse statStoragePoolDatasetsQuery(String serviceLevelId, String interval) throws DmeException;
+
+    DmeDatasetsQueryResponse lunPerformanceDatasetsQuery(String serviceLevelId, String interval) throws DmeException;
+
+    DmeDatasetsQueryResponse storagePoolPerformanceDatasetsQuery(String serviceLevelId, String interval)
+        throws DmeException;
 }

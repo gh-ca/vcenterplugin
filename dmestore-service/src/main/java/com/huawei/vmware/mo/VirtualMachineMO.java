@@ -281,14 +281,12 @@ public class VirtualMachineMO extends BaseMO {
     }
 
     public int getIDEDeviceControllerKey() throws Exception {
-        List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, configDeviceStr);
-        if (devices != null && devices.size() > 0) {
-            for (VirtualDevice device : devices) {
-                if (device instanceof ParaVirtualSCSIController || device instanceof VirtualLsiLogicController
-                    || device instanceof VirtualSATAController || device instanceof VirtualAHCIController) {
-                    int key = device.getKey();
-                    return key;
-                }
+        List<VirtualDisk> devices = context.getVimClient().getDynamicProperty(mor, "config.hardware.device");
+        for (VirtualDevice device : devices) {
+            if (device instanceof ParaVirtualSCSIController || device instanceof VirtualLsiLogicController
+                || device instanceof VirtualSATAController || device instanceof VirtualAHCIController) {
+                int key = device.getKey();
+                return key;
             }
         }
 
@@ -303,32 +301,18 @@ public class VirtualMachineMO extends BaseMO {
      * @throws Exception Exception
      */
     public int getNextDeviceNumber(int controllerKey) throws Exception {
-        List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, configDeviceStr);
+        List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, "config.hardware.device");
         int unitNumber = 0;
-        for (VirtualDevice vdisk : devices) {
-            if (vdisk instanceof ParaVirtualSCSIController || vdisk instanceof VirtualLsiLogicController
-                || vdisk instanceof VirtualSATAController || vdisk instanceof VirtualAHCIController) {
-                Integer ctrlKey = vdisk.getKey();
-                if (ctrlKey == controllerKey) {
-                    Integer unitNum = vdisk.getUnitNumber();
-                    if (unitNum > unitNumber) {
-                        unitNumber = unitNum;
-                    }
-                }
-            }
-        }
-        if (unitNumber == 0) {
-            for (VirtualDevice vdisk : devices) {
-                if (vdisk instanceof VirtualIDEController) {
-                    Integer unitNum = ((VirtualIDEController) vdisk).getBusNumber();
-                    if (unitNum > unitNumber) {
-                        unitNumber = unitNum;
-                    }
+        for (VirtualDevice device : devices) {
+            Integer ctrlKey = device.getControllerKey();
+            if (ctrlKey != null && ctrlKey == controllerKey) {
+                Integer unitNum = device.getUnitNumber();
+                if (unitNum > unitNumber) {
+                    unitNumber = unitNum;
                 }
             }
         }
         unitNumber++;
-
         return unitNumber;
     }
 }

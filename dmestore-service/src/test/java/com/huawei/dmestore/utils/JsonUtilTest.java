@@ -1,11 +1,15 @@
 package com.huawei.dmestore.utils;
 
-import java.io.IOException;
+import com.huawei.dmestore.services.ServiceLevelServiceImpl;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.MockitoAnnotations;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
  * @author lianq
@@ -67,10 +71,27 @@ public class JsonUtilTest {
 
     }
 
+    @Test
+    public void javaTest() {
+        long nowTime = System.currentTimeMillis();
+        System.out.println(nowTime);
+        // 开始结束时间计算
+        Calendar rightNow = Calendar.getInstance();
+        rightNow.setTimeInMillis(System.currentTimeMillis());
+        // 日期减1年
+        //rightNow.add(Calendar.YEAR,-1);
+        // 日期加3个月
+        rightNow.add(Calendar. DAY_OF_MONTH,-7);
+        String format = "yyyy-MM-dd HH:mm:ss";
+        SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+        System.out.println(dateFormat.format(rightNow.getTimeInMillis()));
+    }
+
 
     @Test
    public void test(){
-        String s = "VMFS";
-        System.out.println(s.toUpperCase());
+        ServiceLevelServiceImpl serviceLevelService = new ServiceLevelServiceImpl();
+        System.out.println(serviceLevelService.getDatasetsQueryBody("ace09660-de46-4b24-adc6-18a2618e3f6e",
+            "LAST_1_DAY", "perf-stat-storage-pool-details").toString());
     }
 }
