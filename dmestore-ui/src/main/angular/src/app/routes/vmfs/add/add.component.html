@@ -377,10 +377,11 @@
         </clr-input-container>
         <clr-select-container class="selectClass">
           <label style="color: #9F9F9F;">{{'vmfs.provisioningType' | translate}}</label>
-          <select clrSelect [(ngModel)]="form.alloctype" name="alloctype" >
+          <select clrSelect [(ngModel)]="form.alloctype" name="alloctype" required>
             <option value="thin">thin</option>
             <option [hidden]="!showAlloctypeThick" value="thick">thick</option>
           </select>
+          <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-select-container>
       </ng-container>
 
