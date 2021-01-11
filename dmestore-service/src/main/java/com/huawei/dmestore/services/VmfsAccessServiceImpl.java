@@ -250,17 +250,27 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
     }
 
-    private void parseTuning(VmfsDataInfo vmfsDataInfo, JsonObject vjson2) {
+    private void parseTuning(VmfsDataInfo vmfsDataInfo, JsonObject vjson2) throws DmeSqlException {
         if (vjson2 != null && !ToolUtils.jsonIsNull(vjson2.get(TUNING))) {
             JsonObject tuning = vjson2.getAsJsonObject(TUNING);
             if (tuning != null && !ToolUtils.jsonIsNull(tuning.get(SMARTQOS))) {
                 JsonObject smartqos = tuning.getAsJsonObject(SMARTQOS);
+                boolean dorado = false;
                 if (smartqos != null) {
                     vmfsDataInfo.setMaxIops(ToolUtils.jsonToInt(smartqos.get(MAXIOPS), null));
                     vmfsDataInfo.setMinIops(ToolUtils.jsonToInt(smartqos.get(MINIOPS), null));
                     vmfsDataInfo.setMaxBandwidth(ToolUtils.jsonToInt(smartqos.get(MAXBANDWIDTH), null));
                     vmfsDataInfo.setMinBandwidth(ToolUtils.jsonToInt(smartqos.get(MINBANDWIDTH), null));
-                    vmfsDataInfo.setLatency(ToolUtils.jsonToFloat(smartqos.get(LATENCY), null));
+                    String storageModel = getStorageModelByWwn(vmfsDataInfo.getWwn());
+                    Float latency = ToolUtils.jsonToFloat(smartqos.get(LATENCY), null);
+                    if (!StringUtils.isEmpty(storageModel)) {
+                        dorado = ToolUtils.isDorado(storageModel);
+                        if (dorado && latency != null) {
+                            vmfsDataInfo.setLatency(latency / 1000);
+                        }else{
+                            vmfsDataInfo.setLatency(latency);
+                        }
+                    }
                 }
             }
         }
@@ -276,14 +286,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 Map<String, Object> remap = dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params);
                 if (remap != null && remap.size() > 0) {
                     JsonObject dataJson = new JsonParser().parse(remap.toString()).getAsJsonObject();
-                    boolean dorado = false;
                     if (dataJson != null) {
                         relists = new ArrayList<>();
                         for (String wwn : wwns) {
-                            String storageModel = getStorageModelByWwn(wwn);
-                            if (!StringUtils.isEmpty(storageModel)) {
-                                dorado = ToolUtils.isDorado(getStorageModelByWwn(wwn));
-                            }
                             JsonObject statisticObject = dataJson.getAsJsonObject(wwn);
                             VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
                             vmfsDataInfo.setVolumeId(wwn);
@@ -298,15 +303,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(
                                 ToolUtils.getStatistcValue(statisticObject,
                                     DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITERESPONSETIME, MAX), null));
-                            Float latency = ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject,
-                                DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME, MAX), null);
-                            if (dorado) {
-                                if (latency != null) {
-                                    vmfsDataInfo.setLatency(latency / 1000);
-                                }
-                            } else {
-                                vmfsDataInfo.setLatency(latency);
-                            }
+                            vmfsDataInfo.setLatency(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject,
+                                    DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME, MAX), null));
                             relists.add(vmfsDataInfo);
                         }
                     }
