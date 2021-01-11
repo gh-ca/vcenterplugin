@@ -409,4 +409,13 @@ public class ToolUtils {
         }
         return storageTypeShow;
     }
+
+    public static boolean isDorado(String storageModel) {
+        String[] model = storageModel.split(" ");
+        List<String> list = Arrays.asList(model);
+        if (list.contains("OceanStor")){
+            return true;
+        }
+        return false;
+    }
 }

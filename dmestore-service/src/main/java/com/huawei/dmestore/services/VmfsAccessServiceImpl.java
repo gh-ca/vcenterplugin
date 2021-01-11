@@ -276,9 +276,14 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 Map<String, Object> remap = dataStoreStatisticHistoryService.queryVmfsStatisticCurrent(params);
                 if (remap != null && remap.size() > 0) {
                     JsonObject dataJson = new JsonParser().parse(remap.toString()).getAsJsonObject();
+                    boolean dorado = false;
                     if (dataJson != null) {
                         relists = new ArrayList<>();
                         for (String wwn : wwns) {
+                            String storageModel = getStorageModelByWwn(wwn);
+                            if (!StringUtils.isEmpty(storageModel)) {
+                                dorado = ToolUtils.isDorado(getStorageModelByWwn(wwn));
+                            }
                             JsonObject statisticObject = dataJson.getAsJsonObject(wwn);
                             VmfsDataInfo vmfsDataInfo = new VmfsDataInfo();
                             vmfsDataInfo.setVolumeId(wwn);
@@ -293,8 +298,15 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             vmfsDataInfo.setWriteResponseTime(ToolUtils.jsonToFloat(
                                 ToolUtils.getStatistcValue(statisticObject,
                                     DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITERESPONSETIME, MAX), null));
-                            vmfsDataInfo.setLatency(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject,
-                                DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME, MAX), null));
+                            Float latency = ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject,
+                                DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME, MAX), null);
+                            if (dorado) {
+                                if (latency != null) {
+                                    vmfsDataInfo.setLatency(latency / 1000);
+                                }
+                            } else {
+                                vmfsDataInfo.setLatency(latency);
+                            }
                             relists.add(vmfsDataInfo);
                         }
                     }
@@ -933,6 +945,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     JsonObject vjson = jsonArray.get(index).getAsJsonObject();
                     if (vjson != null) {
                         Map<String, Object> remap = new HashMap<>();
+                        remap.put("storage_id", storageId);
                         remap.put("volume_id", ToolUtils.jsonToStr(vjson.get(ID_FIELD)));
                         remap.put(VOLUME_NAME, ToolUtils.jsonToStr(vjson.get(NAME_FIELD)));
                         remap.put(VOLUME_WWN, ToolUtils.jsonToStr(vjson.get(VOLUME_WWN)));
@@ -946,7 +959,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return volumelist;
     }
 
-    private void saveDmeVmwareRalation(Map<String, Object> volumeMap, Map<String, Object> dataStoreMap) {
+    private void saveDmeVmwareRalation(Map<String, Object> volumeMap, Map<String, Object> dataStoreMap)
+        throws DmeException {
         // 保存卷与vmfs的关联关系
         if (volumeMap == null || volumeMap.get(DmeConstants.VOLUMEID) == null) {
             LOG.error("save Dme and Vmware's vmfs Ralation error: volume data is null");
@@ -963,6 +977,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         dvr.setVolumeName(ToolUtils.getStr(volumeMap.get(VOLUME_NAME)));
         dvr.setVolumeWwn(ToolUtils.getStr(volumeMap.get(VOLUME_WWN)));
         dvr.setStoreType(DmeConstants.STORE_TYPE_VMFS);
+        dvr.setStorageType(getStorageModel(ToolUtils.getStr(volumeMap.get("storage_id"))));
         List<DmeVmwareRelation> rallist = new ArrayList<>();
         rallist.add(dvr);
         dmeVmwareRalationDao.save(rallist);
@@ -2042,5 +2057,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         // 1 查询datastore上的vm
         // 2 vm是否关联了hostObjId 或 clusterObjId (objId转id?)
         return false;
+    }
+    private String getStorageModel(String storageId) throws DmeException {
+        return dmeStorageService.getStorageDetail(storageId).getModel();
+    }
+
+    private String getStorageModelByWwn(String wwn) throws DmeSqlException {
+        return dmeVmwareRalationDao.getStorageModelByWwn(wwn);
     }
 }

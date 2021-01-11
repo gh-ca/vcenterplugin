@@ -10,6 +10,7 @@ import com.huawei.dmestore.exception.VcenterException;
 import com.huawei.dmestore.exception.VcenterRuntimeException;
 import com.huawei.dmestore.model.FileSystem;
 import com.huawei.dmestore.model.LogicPorts;
+import com.huawei.dmestore.model.StorageDetail;
 import com.huawei.dmestore.model.TaskDetailInfo;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
@@ -267,7 +268,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             if (RESULT_FAIL.equals(result)) {
                 throw new VcenterRuntimeException(CODE_403, "create nfs datastore error!");
             }
-            saveNfsInfoToDmeVmwareRelation(result, currentPortId, logicPortName, fsId, shareName, shareId, fsName);
+            // 判断存储类型
+            String storageModel = getStorageModel(ToolUtils.getStr(params.get("storage_id")));
+            saveNfsInfoToDmeVmwareRelation(result, currentPortId, logicPortName, fsId, shareName, shareId, fsName,storageModel);
             LOG.info("create nfs save relation success!nfsName={}", nfsName);
         } catch (DmeException e) {
             LOG.error("create nfs datastore error!", e);
@@ -675,7 +678,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     }
 
     private void saveNfsInfoToDmeVmwareRelation(String params, String currentPortId, String logicPortName, String fsId,
-        String shareName, String shareId, String fsName) throws DmeException {
+        String shareName, String shareId, String fsName,String storageModel) throws DmeException {
         if (!StringUtils.isEmpty(params)) {
             DmeVmwareRelation datastoreInfo = gson.fromJson(params, DmeVmwareRelation.class);
             datastoreInfo.setLogicPortId(currentPortId);
@@ -684,6 +687,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             datastoreInfo.setFsName(fsName);
             datastoreInfo.setShareName(shareName);
             datastoreInfo.setShareId(shareId);
+            datastoreInfo.setStorageType(storageModel);
             List<DmeVmwareRelation> dmeVmwareRelations = new ArrayList<>();
             dmeVmwareRelations.add(datastoreInfo);
             dmeVmwareRalationDao.save(dmeVmwareRelations);
@@ -770,5 +774,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         resultMap.put("latency", ToolUtils.jsonToInt(qosPolicy.get("latency")));
         resultMap.put("minBandwidth", ToolUtils.jsonToInt(qosPolicy.get("min_bandwidth")));
         resultMap.put("minIops", ToolUtils.jsonToInt(qosPolicy.get("min_iops")));
+    }
+
+    private String getStorageModel(String storageId) throws DmeException {
+        return dmeStorageService.getStorageDetail(storageId).getModel();
     }
 }
