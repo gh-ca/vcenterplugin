@@ -551,7 +551,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                 break;
         }
         long beginTime = rightNow.getTimeInMillis();
-        Map timeMap = new HashMap();
+        Map<String, Long> timeMap = new HashMap();
         timeMap.put("beginTime", beginTime);
         timeMap.put("endTime", endTime);
 
