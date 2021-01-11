@@ -264,8 +264,8 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
         try {
             con = getConnection();
             String sql = "insert into DP_DME_VMWARE_RELATION(STORE_ID,STORE_NAME,VOLUME_ID,VOLUME_NAME,VOLUME_WWN,"
-                + "VOLUME_SHARE,VOLUME_FS,STORE_TYPE,SHARE_ID,SHARE_NAME,FS_ID,FS_NAME,LOGICPORT_ID,"
-                + "LOGICPORT_NAME,STORAGE_DEVICE_ID) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                + "VOLUME_SHARE,VOLUME_FS,STORE_TYPE,STORAGE_TYPE,SHARE_ID,SHARE_NAME,FS_ID,FS_NAME,LOGICPORT_ID,"
+                + "LOGICPORT_NAME,STORAGE_DEVICE_ID) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
             pstm = con.prepareStatement(sql);
             LOGGER.info("save relation!sql={}, connection is not null:{}", sql, con == null ? false : true);
 
@@ -280,13 +280,14 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 pstm.setString(DpSqlFileConstants.DIGIT_6, relation.getVolumeShare());
                 pstm.setString(DpSqlFileConstants.DIGIT_7, relation.getVolumeFs());
                 pstm.setString(DpSqlFileConstants.DIGIT_8, relation.getStoreType());
-                pstm.setString(DpSqlFileConstants.DIGIT_9, relation.getShareId());
-                pstm.setString(DpSqlFileConstants.DIGIT_10, relation.getShareName());
-                pstm.setString(DpSqlFileConstants.DIGIT_11, relation.getFsId());
-                pstm.setString(DpSqlFileConstants.DIGIT_12, relation.getFsName());
-                pstm.setString(DpSqlFileConstants.DIGIT_13, relation.getLogicPortId());
-                pstm.setString(DpSqlFileConstants.DIGIT_14, relation.getLogicPortName());
-                pstm.setString(DpSqlFileConstants.DIGIT_15, relation.getStorageDeviceId());
+                pstm.setString(DpSqlFileConstants.DIGIT_9, relation.getStorageType());
+                pstm.setString(DpSqlFileConstants.DIGIT_10, relation.getShareId());
+                pstm.setString(DpSqlFileConstants.DIGIT_11, relation.getShareName());
+                pstm.setString(DpSqlFileConstants.DIGIT_12, relation.getFsId());
+                pstm.setString(DpSqlFileConstants.DIGIT_13, relation.getFsName());
+                pstm.setString(DpSqlFileConstants.DIGIT_14, relation.getLogicPortId());
+                pstm.setString(DpSqlFileConstants.DIGIT_15, relation.getLogicPortName());
+                pstm.setString(DpSqlFileConstants.DIGIT_16, relation.getStorageDeviceId());
                 LOGGER.info("pstm.addBatch StoreType={}", sql, relation.getStoreType());
                 pstm.addBatch();
             }

@@ -933,6 +933,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     JsonObject vjson = jsonArray.get(index).getAsJsonObject();
                     if (vjson != null) {
                         Map<String, Object> remap = new HashMap<>();
+                        remap.put("storage_id", storageId);
                         remap.put("volume_id", ToolUtils.jsonToStr(vjson.get(ID_FIELD)));
                         remap.put(VOLUME_NAME, ToolUtils.jsonToStr(vjson.get(NAME_FIELD)));
                         remap.put(VOLUME_WWN, ToolUtils.jsonToStr(vjson.get(VOLUME_WWN)));
@@ -946,7 +947,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return volumelist;
     }
 
-    private void saveDmeVmwareRalation(Map<String, Object> volumeMap, Map<String, Object> dataStoreMap) {
+    private void saveDmeVmwareRalation(Map<String, Object> volumeMap, Map<String, Object> dataStoreMap)
+        throws DmeException {
         // 保存卷与vmfs的关联关系
         if (volumeMap == null || volumeMap.get(DmeConstants.VOLUMEID) == null) {
             LOG.error("save Dme and Vmware's vmfs Ralation error: volume data is null");
@@ -963,6 +965,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         dvr.setVolumeName(ToolUtils.getStr(volumeMap.get(VOLUME_NAME)));
         dvr.setVolumeWwn(ToolUtils.getStr(volumeMap.get(VOLUME_WWN)));
         dvr.setStoreType(DmeConstants.STORE_TYPE_VMFS);
+        dvr.setStorageType(getStorageModel(ToolUtils.getStr(volumeMap.get("storage_id"))));
         List<DmeVmwareRelation> rallist = new ArrayList<>();
         rallist.add(dvr);
         dmeVmwareRalationDao.save(rallist);
@@ -2042,5 +2045,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         // 1 查询datastore上的vm
         // 2 vm是否关联了hostObjId 或 clusterObjId (objId转id?)
         return false;
+    }
+    private String getStorageModel(String storageId) throws DmeException {
+        return dmeStorageService.getStorageDetail(storageId).getModel();
     }
 }
