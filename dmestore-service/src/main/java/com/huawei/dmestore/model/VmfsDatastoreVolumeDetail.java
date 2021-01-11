@@ -66,6 +66,19 @@ public class VmfsDatastoreVolumeDetail {
     private String trafficControl;
 
     /**
+     * smartQos vmfs高级选项qos相关数据.
+     **/
+    private SmartQos smartQos;
+
+    public SmartQos getSmartQos() {
+        return smartQos;
+    }
+
+    public void setSmartQos(SmartQos smartQos) {
+        this.smartQos = smartQos;
+    }
+
+    /**
      * getCompression .
      *
      * @return boolean .
