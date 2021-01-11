@@ -273,6 +273,11 @@ public class DmeConstants {
     public static final String LIST_SERVICE_LEVEL_URL = "/rest/service-policy/v1/service-levels";
 
     /**
+     * datasets query
+     **/
+    public static final String DATASETS_QUERY_URL = "/rest/metrics/v1/datasets/{dataSet}?pageSize=5000";
+
+    /**
      * Constant definition
      */
     public static final int MAXLEN = 255;
