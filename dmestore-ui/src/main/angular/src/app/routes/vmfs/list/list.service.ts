@@ -289,7 +289,7 @@ export class GetForm {
       storage_id: null, // 存储设备id
       pool_raw_id: null, // 卷所属存储池在存储设备上的id
       workload_type_id: null, // 应用类型id
-      alloctype: null, // 卷分配类型，取值范围 thin，thick
+      alloctype: 'thin', // 卷分配类型，取值范围 thin，thick
       control_policy: null, // 控制策略
       control_policyUpper: undefined, // 控制策略上限
       control_policyLower: undefined, // 控制策略下限

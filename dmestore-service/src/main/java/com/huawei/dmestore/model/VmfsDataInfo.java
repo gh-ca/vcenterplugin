@@ -311,7 +311,7 @@ public class VmfsDataInfo {
      * @param param .
      */
     public void setMinIops(final Integer param) {
-        this.minIops = minIops;
+        this.minIops = param;
     }
 
     /**
