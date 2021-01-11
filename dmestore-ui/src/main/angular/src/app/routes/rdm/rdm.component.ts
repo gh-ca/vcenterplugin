@@ -28,6 +28,7 @@ export class RdmComponent implements OnInit {
   configModel = new customizeVolumes();
   storageDevices:Storages[] = [];
   storagePools = [];
+  ownerControllers:StorageController[] = [];
   hostList = [];
   dataStoreObjectId = '';
   levelCheck = 'level';
@@ -170,6 +171,9 @@ export class RdmComponent implements OnInit {
   }
 
   submit(): void {
+    if (!this.ownershipController) {
+      this.configModel.ownerController = null;
+    }
     let b = JSON.parse(JSON.stringify(this.configModel));
     let body = {};
     if (this.configModel.storageType == '2'){
@@ -275,6 +279,18 @@ export class RdmComponent implements OnInit {
     this.slLoading = true;
     const chooseStorage = this.storageDevices.filter(item => item.id == storageId);
     this.ownershipController = chooseStorage[0].storageTypeShow.ownershipController;
+    // 查询卷对应归属控制器
+    if (this.ownershipController) {
+      this.ownerControllers = [];
+      if (storageId) {
+        this.http.get('dmestorage/storagecontrollers?storageDeviceId='+storageId).subscribe((result:any) => {
+          if (result.code == '200') {
+            this.ownerControllers = result.data;
+          }
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        });
+      }
+    }
     console.log("this.ownershipController", this.ownershipController);
     this.http.get('dmestorage/storagepools', {params: {storageId, media_type: "all"}}).subscribe((result: any) => {
       this.slLoading = false;
@@ -413,4 +429,15 @@ export interface StorageTypeShow {
   smartTierShow:boolean;// SmartTier策略 true 支持 false 不支持
   prefetchStrategyShow:boolean;// 预取策略 true 支持 false 不支持
   storageDetailTag:number;// 存储详情下展示情况 1 仅展示存储池和lun 2 展示存储池/lun/文件系统/共享/dtree
+}
+export class StorageController{
+  name:string;
+  status:string;
+  softVer:string;
+  cpuInfo:string;
+  cpuUsage:number;
+  iops:number;
+  ops:number;
+  bandwith:number;
+  lantency:number;
 }

@@ -24,6 +24,7 @@ import com.vmware.vim25.VirtualMachineFileInfo;
 import com.vmware.vim25.VirtualMachineRuntimeInfo;
 import com.vmware.vim25.VirtualSATAController;
 import com.vmware.vim25.VirtualSCSIController;
+import com.vmware.vim25.VirtualSCSISharing;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -162,7 +163,6 @@ public class VirtualMachineMO extends BaseMO {
         }
 
         int deviceNumber = getNextDeviceNumber(controllerKey);
-
         newDisk.setControllerKey(controllerKey);
         newDisk.setKey(-deviceNumber);
         newDisk.setUnitNumber(deviceNumber);
@@ -175,6 +175,16 @@ public class VirtualMachineMO extends BaseMO {
 
         VirtualMachineConfigSpec reConfigSpec = new VirtualMachineConfigSpec();
         reConfigSpec.getDeviceChange().add(deviceConfigSpec);
+        if (ideControllerKey == 0) {
+            VirtualDeviceConfigSpec controllerspec = new VirtualDeviceConfigSpec();
+            VirtualLsiLogicController lsiLogicController = new VirtualLsiLogicController();
+            lsiLogicController.setKey(999);
+            lsiLogicController.setBusNumber(0);
+            lsiLogicController.setSharedBus(VirtualSCSISharing.NO_SHARING);
+            controllerspec.setDevice(lsiLogicController);
+            controllerspec.setOperation(VirtualDeviceConfigSpecOperation.ADD);
+            reConfigSpec.getDeviceChange().add(controllerspec);
+        }
 
         ManagedObjectReference morTask = context.getService().reconfigVMTask(mor, reConfigSpec);
         boolean result = context.getVimClient().waitForTask(morTask);
@@ -275,22 +285,14 @@ public class VirtualMachineMO extends BaseMO {
         if (devices != null && devices.size() > 0) {
             for (VirtualDevice device : devices) {
                 if (device instanceof ParaVirtualSCSIController || device instanceof VirtualLsiLogicController
-                    || device instanceof VirtualAHCIController || device instanceof VirtualSATAController) {
-                    int key = device.getKey();
-                    return key;
-                }
-            }
-
-            for (VirtualDevice device : devices) {
-                if (device instanceof VirtualIDEController) {
+                    || device instanceof VirtualSATAController || device instanceof VirtualAHCIController) {
                     int key = device.getKey();
                     return key;
                 }
             }
         }
 
-        assert (false);
-        throw new Exception("IDE Controller Not Found");
+        return 0;
     }
 
     /**
