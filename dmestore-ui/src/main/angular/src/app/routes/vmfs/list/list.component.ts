@@ -793,7 +793,6 @@ export class VmfsListComponent implements OnInit {
     this.storagePoolList = null;
     this.showSmartTierFlag = false;
     this.showAlloctypeThick = false;
-    this.form.alloctype = null;
     this.showWorkLoadFlag = false;
     this.latencyIsSelect = false;
     this.form.workload_type_id = null;
@@ -1892,7 +1891,7 @@ export class VmfsListComponent implements OnInit {
    * 添加页面 资源调优thick展示与隐藏
    */
   addAllocationTypeShowInit() {
-    this.form.alloctype = null;
+    this.form.alloctype = 'thin';
     const allocationTypeShow = this.getAllocationTypeShow(this.form.storage_id);
     this.showAlloctypeThick = allocationTypeShow == 1;
   }
