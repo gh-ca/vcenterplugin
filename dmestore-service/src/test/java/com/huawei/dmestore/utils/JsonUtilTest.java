@@ -1,5 +1,6 @@
 package com.huawei.dmestore.utils;
 
+import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.services.ServiceLevelServiceImpl;
 
 import org.junit.Before;
@@ -89,9 +90,9 @@ public class JsonUtilTest {
 
 
     @Test
-   public void test(){
+   public void test() throws DmeException {
         ServiceLevelServiceImpl serviceLevelService = new ServiceLevelServiceImpl();
-        System.out.println(serviceLevelService.getDatasetsQueryBody("ace09660-de46-4b24-adc6-18a2618e3f6e",
-            "LAST_1_DAY", "perf-stat-storage-pool-details").toString());
+        System.out.println(serviceLevelService.statLunDatasetsQuery("ace09660-de46-4b24-adc6-18a2618e3f6e",
+            "LAST_1_DAY").toString());
     }
 }
