@@ -8,6 +8,7 @@ import com.huawei.dmestore.entity.VCenterInfo;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.DmeSqlException;
 import com.huawei.dmestore.exception.VcenterException;
+import com.huawei.dmestore.model.SmartQos;
 import com.huawei.dmestore.model.Storage;
 import com.huawei.dmestore.model.TaskDetailInfo;
 import com.huawei.dmestore.model.VmfsDataInfo;
@@ -1191,13 +1192,28 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         volumeDetail.setProvisionType(ToolUtils.jsonToStr(tuning.get(ALLOCTYPE), null));
         volumeDetail.setCompression(ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
 
+
         // 应用类型
         volumeDetail.setApplicationType(ToolUtils.jsonToStr(tuning.get(WORKLOAD_TYPE_ID), null));
 
         // Qos Policy
         if (!tuning.get(SMARTQOS).isJsonNull()) {
             JsonObject smartqos = tuning.getAsJsonObject(SMARTQOS);
-            volumeDetail.setControlPolicy(ToolUtils.jsonToStr(smartqos.get(CONTROL_POLICY), null));
+            SmartQos smartQos = new SmartQos();
+            Integer maxbandwidth = ToolUtils.jsonToInt(smartqos.get("maxbandwidth"));
+            Integer minbandwidth = ToolUtils.jsonToInt(smartqos.get("minbandwidth"));
+            if (maxbandwidth != 0 && minbandwidth != 0) {
+                // 2表示保护上限 和  保护下线
+                smartQos.setControlPolicy("2");
+            }else {
+                smartQos.setControlPolicy(ToolUtils.jsonToStr(smartqos.get(CONTROL_POLICY), null));
+            }
+            smartQos.setMaxbandwidth(maxbandwidth);
+            smartQos.setMinbandwidth(minbandwidth);
+            smartQos.setMaxiops(ToolUtils.jsonToInt(smartqos.get("maxiops")));
+            smartQos.setMiniops(ToolUtils.jsonToInt(smartqos.get("miniops")));
+            smartQos.setLatency(ToolUtils.jsonToInt(smartqos.get("latency")));
+            volumeDetail.setSmartQos(smartQos);
             volumeDetail.setTrafficControl("--");
         }
     }
