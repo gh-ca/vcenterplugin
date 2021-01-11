@@ -77,6 +77,10 @@ public class DmeVmwareRelation implements Serializable {
      */
     private String storeType;
     /**
+     * 存储设备类型
+     */
+    private String storageType;
+    /**
      * createTime .
      */
     private Date createTime;
@@ -429,5 +433,13 @@ public class DmeVmwareRelation implements Serializable {
      */
     public void setStorageDeviceId(final String param) {
         this.storageDeviceId = param;
+    }
+
+    public String getStorageType() {
+        return storageType;
+    }
+
+    public void setStorageType(String storageType) {
+        this.storageType = storageType;
     }
 }
