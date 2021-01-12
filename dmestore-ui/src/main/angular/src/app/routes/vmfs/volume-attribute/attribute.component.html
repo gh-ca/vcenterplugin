@@ -68,45 +68,69 @@
       </td>
       <td class="left">{{'vmfs.trafficControlObject' | translate}}</td>
       <td class="left">
-        <span *ngIf="selectVolume.smartQos == null || selectVolume.controlPolicy == null">
+        <span *ngIf="selectVolume.smartQos == null || selectVolume.controlPolicy == null
+        || (selectVolume.smartQos.minbandwidth == 0 && selectVolume.smartQos.miniops ==0
+        && selectVolume.smartQos.latency==0 && selectVolume.smartQos.maxbandwidth ==0 && selectVolume.smartQos.maxiops==0)">
           --
         </span>
         <!--下限-->
         <span *ngIf="selectVolume.smartQos != null && selectVolume.controlPolicy == '0'">
-          {{'vmfs.bandwidthLimitLower' | translate}}
-          {{selectVolume.smartQos.minbandwidth}}
-          {{'vmfs.unitM' | translate}},
-          {{'vmfs.IOPSLimitLower' | translate}}
-          {{selectVolume.smartQos.miniops}}
-          {{'vmfs.iopsUnit' | translate}},
-          {{'vmfs.latencyMax' | translate}}
-          {{selectVolume.smartQos.latency}}
-          {{selectVolume.smartQos.latencyUnit}}
+          <span *ngIf="selectVolume.smartQos.minbandwidth != 0">
+            {{'vmfs.bandwidthLimitLower' | translate}}
+            {{selectVolume.smartQos.minbandwidth}}
+            {{'vmfs.unitM' | translate}},
+          </span>
+          <span *ngIf="selectVolume.smartQos.miniops != 0">
+            {{'vmfs.IOPSLimitLower' | translate}}
+            {{selectVolume.smartQos.miniops}}
+            {{'vmfs.iopsUnit' | translate}},
+          </span>
+          <span *ngIf="selectVolume.smartQos.latency != 0">
+            {{'vmfs.latencyMax' | translate}}
+            {{selectVolume.smartQos.latency}}
+            {{selectVolume.smartQos.latencyUnit}}
+          </span>
         </span>
         <!--上限-->
         <span *ngIf="selectVolume.smartQos != null && selectVolume.controlPolicy == '1'">
-          {{'vmfs.bandwidthLimitUpper' | translate}}
-          {{selectVolume.smartQos.maxbandwidth}}
-          {{'vmfs.unitM' | translate}},
-          {{'vmfs.IOPSLimitUpper' | translate}}
-          {{selectVolume.smartQos.maxiops}}
-          {{'vmfs.iopsUnit' | translate}}
+          <span *ngIf="selectVolume.smartQos.maxbandwidth != 0">
+            {{'vmfs.bandwidthLimitUpper' | translate}}
+            {{selectVolume.smartQos.maxbandwidth}}
+            {{'vmfs.unitM' | translate}},
+          </span>
+          <span *ngIf="selectVolume.smartQos.maxiops != 0">
+             {{'vmfs.IOPSLimitUpper' | translate}}
+            {{selectVolume.smartQos.maxiops}}
+            {{'vmfs.iopsUnit' | translate}}
+          </span>
         </span>
         <!--上限&下限-->
         <span *ngIf="selectVolume.smartQos != null && selectVolume.controlPolicy == '2'">
-          {{selectVolume.smartQos.minbandwidth}}
-          {{'vmfs.unitM' | translate}} <=
-          {{'vmfs.bandwidthLimitUpper' | translate}}
-          {{selectVolume.smartQos.maxbandwidth}}
-          {{'vmfs.unitM' | translate}},
-          {{selectVolume.smartQos.miniops}}
-          {{'vmfs.iopsUnit' | translate}} <=
-          {{'vmfs.IOPSLimitUpper' | translate}}
-          {{selectVolume.smartQos.maxiops}}
-          {{'vmfs.iopsUnit' | translate}},
-          {{'vmfs.latencyMax' | translate}}
-          {{selectVolume.smartQos.latency/1000}}
-          ms
+          <span *ngIf="selectVolume.smartQos.minbandwidth != 0">
+            {{selectVolume.smartQos.minbandwidth}}
+            {{'vmfs.unitM' | translate}} <=
+          </span>
+          <span *ngIf="selectVolume.smartQos.minbandwidth != 0 || selectVolume.smartQos.maxbandwidth != 0">
+            {{'vmfs.bandwidthLimitUpper' | translate}}
+          </span>
+          <span *ngIf="selectVolume.smartQos.maxbandwidth != 0 || selectVolume.smartQos.maxbandwidth != 0">
+            {{selectVolume.smartQos.maxbandwidth}}
+            {{'vmfs.unitM' | translate}},
+          </span>
+          <span *ngIf="selectVolume.smartQos.miniops != 0">
+            {{selectVolume.smartQos.miniops}}
+            {{'vmfs.iopsUnit' | translate}} <=
+          </span>
+          <span *ngIf="selectVolume.smartQos.maxiops != 0">
+            {{'vmfs.IOPSLimitUpper' | translate}}
+            {{selectVolume.smartQos.maxiops}}
+            {{'vmfs.iopsUnit' | translate}},
+          </span>
+
+          <span *ngIf="selectVolume.smartQos.latency != 0">
+            {{'vmfs.latencyMax' | translate}}
+            {{selectVolume.smartQos.latency/1000}} ms
+          </span>
         </span>
       </td>
     </tr>
