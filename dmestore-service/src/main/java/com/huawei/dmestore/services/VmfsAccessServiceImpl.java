@@ -1217,21 +1217,22 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         if (!tuning.get(SMARTQOS).isJsonNull()) {
             JsonObject smartqos = tuning.getAsJsonObject(SMARTQOS);
             SmartQos smartQos = new SmartQos();
-            Integer maxbandwidth = ToolUtils.jsonToInt(smartqos.get("maxbandwidth"));
-            Integer minbandwidth = ToolUtils.jsonToInt(smartqos.get("minbandwidth"));
+            Integer maxbandwidth = ToolUtils.jsonToInt(smartqos.get("maxbandwidth"),0);
+            Integer minbandwidth = ToolUtils.jsonToInt(smartqos.get("minbandwidth"),0);
             if (maxbandwidth != 0 && minbandwidth != 0) {
                 // 2表示保护上限 和  保护下线
                 smartQos.setControlPolicy("2");
+                volumeDetail.setControlPolicy("2");
             }else {
                 smartQos.setControlPolicy(ToolUtils.jsonToStr(smartqos.get(CONTROL_POLICY), null));
+                volumeDetail.setControlPolicy(ToolUtils.jsonToStr(smartqos.get(CONTROL_POLICY), null));
             }
             smartQos.setMaxbandwidth(maxbandwidth);
             smartQos.setMinbandwidth(minbandwidth);
-            smartQos.setMaxiops(ToolUtils.jsonToInt(smartqos.get("maxiops")));
-            smartQos.setMiniops(ToolUtils.jsonToInt(smartqos.get("miniops")));
-            smartQos.setLatency(ToolUtils.jsonToInt(smartqos.get("latency")));
+            smartQos.setMaxiops(ToolUtils.jsonToInt(smartqos.get("maxiops"),0));
+            smartQos.setMiniops(ToolUtils.jsonToInt(smartqos.get("miniops"),0));
+            smartQos.setLatency(ToolUtils.jsonToInt(smartqos.get("latency"),0));
             volumeDetail.setSmartQos(smartQos);
-            volumeDetail.setTrafficControl("--");
         }
     }
 
