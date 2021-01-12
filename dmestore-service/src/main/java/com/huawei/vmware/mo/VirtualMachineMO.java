@@ -188,7 +188,7 @@ public class VirtualMachineMO extends BaseMO {
             controllerspec.setDevice(scsiController);
             controllerspec.setOperation(VirtualDeviceConfigSpecOperation.ADD);
             reConfigSpec.getDeviceChange().add(controllerspec);
-            logger.info("create new SCSIController!controllerKey={},busNumber=", newControllerKey,
+            logger.info("create new SCSIController!controllerKey={},busNumber={}", newControllerKey,
                 scsiController.getBusNumber());
             newDisk.setControllerKey(newControllerKey);
             newDisk.setKey(0);
@@ -410,7 +410,7 @@ public class VirtualMachineMO extends BaseMO {
         }
         Collections.sort(unitNums);
         int tempUnitNumber = 0;
-        for (int i = 0; i < unitNums.size(); i++) {
+        for (int i = 0; i < unitNums.size() - 1; i++) {
             if (unitNums.get(i + 1) - unitNums.get(i) > 1) {
                 tempUnitNumber = unitNums.get(i) + 1;
                 if (tempUnitNumber != 7) {
