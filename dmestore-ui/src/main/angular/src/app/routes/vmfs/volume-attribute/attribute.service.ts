@@ -57,7 +57,7 @@ export class SmartQos {
   /**
    * for update.0 下限 1 上限 2上限&下限
    */
-  control_policy:string;
+  controlPolicy:string;
   /**
    * latencyUnit.
    */

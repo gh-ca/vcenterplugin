@@ -50,29 +50,29 @@
       <th hidden></th>
       <td class="left">{{'vmfs.controlPolicy' | translate}}</td>
       <td class="left">
-        <span *ngIf="selectVolume.smartQos == null || selectVolume.smartQos.control_policy == null">
+        <span *ngIf="selectVolume.smartQos == null || selectVolume.controlPolicy == null">
           --
         </span>
         <!--下限-->
-        <span *ngIf="selectVolume.smartQos != null && selectVolume.smartQos.control_policy == '0'">
+        <span *ngIf="selectVolume.smartQos != null && selectVolume.controlPolicy == '0'">
           {{'vmfs.lowerProtectionLimit' | translate}}
         </span>
         <!--上限-->
-        <span *ngIf="selectVolume.smartQos != null && selectVolume.smartQos.control_policy == '1'">
+        <span *ngIf="selectVolume.smartQos != null && selectVolume.controlPolicy == '1'">
           {{'vmfs.upperControlLimit' | translate}}
         </span>
         <!--上限&下限-->
-        <span *ngIf="selectVolume.smartQos != null && selectVolume.smartQos.control_policy == '2'">
+        <span *ngIf="selectVolume.smartQos != null && selectVolume.controlPolicy == '2'">
            {{'vmfs.upperControlLimit' | translate}} & {{'vmfs.lowerProtectionLimit' | translate}}
         </span>
       </td>
       <td class="left">{{'vmfs.trafficControlObject' | translate}}</td>
       <td class="left">
-        <span *ngIf="selectVolume.smartQos == null || selectVolume.smartQos.control_policy == null">
+        <span *ngIf="selectVolume.smartQos == null || selectVolume.controlPolicy == null">
           --
         </span>
         <!--下限-->
-        <span *ngIf="selectVolume.smartQos != null && selectVolume.smartQos.control_policy == '0'">
+        <span *ngIf="selectVolume.smartQos != null && selectVolume.controlPolicy == '0'">
           {{'vmfs.bandwidthLimitLower' | translate}}
           {{selectVolume.smartQos.minbandwidth}}
           {{'vmfs.unitM' | translate}},
@@ -84,7 +84,7 @@
           {{selectVolume.smartQos.latencyUnit}}
         </span>
         <!--上限-->
-        <span *ngIf="selectVolume.smartQos != null && selectVolume.smartQos.control_policy == '1'">
+        <span *ngIf="selectVolume.smartQos != null && selectVolume.controlPolicy == '1'">
           {{'vmfs.bandwidthLimitUpper' | translate}}
           {{selectVolume.smartQos.maxbandwidth}}
           {{'vmfs.unitM' | translate}},
@@ -93,7 +93,7 @@
           {{'vmfs.iopsUnit' | translate}}
         </span>
         <!--上限&下限-->
-        <span *ngIf="selectVolume.smartQos != null && selectVolume.smartQos.control_policy == '2'">
+        <span *ngIf="selectVolume.smartQos != null && selectVolume.controlPolicy == '2'">
           {{selectVolume.smartQos.minbandwidth}}
           {{'vmfs.unitM' | translate}} <=
           {{'vmfs.bandwidthLimitUpper' | translate}}
