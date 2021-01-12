@@ -111,19 +111,21 @@
             {{'vmfs.unitM' | translate}} <=
           </span>
           <span *ngIf="selectVolume.smartQos.minbandwidth != 0 || selectVolume.smartQos.maxbandwidth != 0">
-            {{'vmfs.bandwidthLimitUpper' | translate}}
+            {{'vmfs.bandwidth' | translate}}
           </span>
           <span *ngIf="selectVolume.smartQos.maxbandwidth != 0 || selectVolume.smartQos.maxbandwidth != 0">
-            {{selectVolume.smartQos.maxbandwidth}}
+            <={{selectVolume.smartQos.maxbandwidth}}
             {{'vmfs.unitM' | translate}},
           </span>
           <span *ngIf="selectVolume.smartQos.miniops != 0">
             {{selectVolume.smartQos.miniops}}
             {{'vmfs.iopsUnit' | translate}} <=
           </span>
+          <span *ngIf="selectVolume.smartQos.maxiops != 0 || selectVolume.smartQos.miniops != 0">
+            {{'vmfs.iops' | translate}}
+          </span>
           <span *ngIf="selectVolume.smartQos.maxiops != 0">
-            {{'vmfs.IOPSLimitUpper' | translate}}
-            {{selectVolume.smartQos.maxiops}}
+            <={{selectVolume.smartQos.maxiops}}
             {{'vmfs.iopsUnit' | translate}},
           </span>
 
