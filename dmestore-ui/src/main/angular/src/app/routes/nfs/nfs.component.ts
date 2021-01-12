@@ -276,7 +276,7 @@ export class NfsComponent implements OnInit {
         // 打开成功提示窗口
         this.addSuccessShow = true;
         // 添加成功后刷新数据
-        this.scanDataStore();
+        this.getNfsList();
       }else{
         this.errorMsg = '1';
         console.log("Delete failed:",result.description)
