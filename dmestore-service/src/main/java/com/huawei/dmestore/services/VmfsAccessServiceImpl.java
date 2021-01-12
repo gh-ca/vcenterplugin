@@ -975,7 +975,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         dvr.setVolumeName(ToolUtils.getStr(volumeMap.get(VOLUME_NAME)));
         dvr.setVolumeWwn(ToolUtils.getStr(volumeMap.get(VOLUME_WWN)));
         dvr.setStoreType(DmeConstants.STORE_TYPE_VMFS);
-        dvr.setStorageType(getStorageModel(ToolUtils.getStr(volumeMap.get("storage_id"))));
+        // 服务等级方式创建vmfs 不需要判断存储类型
+        String storageId = ToolUtils.getStr(volumeMap.get("storage_id"));
+        if (!StringUtils.isEmpty(storageId)){
+            dvr.setStorageType(getStorageModel(storageId));
+        }
         List<DmeVmwareRelation> rallist = new ArrayList<>();
         rallist.add(dvr);
         dmeVmwareRalationDao.save(rallist);
