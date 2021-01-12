@@ -127,7 +127,7 @@ public class SystemDao extends H2DataBaseDao {
                     ps1.close();
                     ps1 = null;
                 } catch (SQLException e) {
-                    LOGGER.error("Cannot drop data from {}", table);
+                    LOGGER.error("Cannot drop data from {}" + e.getMessage(), table);
                 }
             }
         } finally {
