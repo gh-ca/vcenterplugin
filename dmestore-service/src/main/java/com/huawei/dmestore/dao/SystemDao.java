@@ -115,4 +115,23 @@ public class SystemDao extends H2DataBaseDao {
             closeConnection(con, ps1, null);
         }
     }
+    public void dropAllTable() {
+        Connection con = null;
+        PreparedStatement ps1 = null;
+        try {
+            con = getConnection();
+            for (String table : DpSqlFileConstants.ALL_TABLES) {
+                try {
+                    ps1 = con.prepareStatement("DROP TABLE" + table);
+                    ps1.execute();
+                    ps1.close();
+                    ps1 = null;
+                } catch (SQLException e) {
+                    LOGGER.error("Cannot drop data from {}", table);
+                }
+            }
+        } finally {
+            closeConnection(con, ps1, null);
+        }
+    }
 }
