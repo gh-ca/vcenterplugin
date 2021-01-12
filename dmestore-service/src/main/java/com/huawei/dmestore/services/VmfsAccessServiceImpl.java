@@ -1246,6 +1246,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             String vmfsDatastoreId = vmfsDatastore.get(OBJECTID).getAsString();
             String vmfsDatastoreName = vmfsDatastore.get(NAME_FIELD).getAsString();
             JsonArray wwnArray = vmfsDatastore.getAsJsonArray("vmfsWwnList");
+            Map<String, String> storageIds = new HashMap<>();
             if (wwnArray == null || wwnArray.size() == 0) {
                 continue;
             }
@@ -1255,7 +1256,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 if (StringUtil.isBlank(wwn)) {
                     continue;
                 }
-
                 // 根据wwn从DME中查询卷信息
                 String volumeUrlByName = DmeConstants.DME_VOLUME_BASE_URL + "?volume_wwn=" + wwn;
                 ResponseEntity<String> responseEntity = dmeAccessService.access(volumeUrlByName, HttpMethod.GET, null);
@@ -1269,9 +1269,17 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     JsonArray volumeArray = volumesElement.getAsJsonArray();
                     if (volumeArray.size() > 0) {
                         JsonObject volumeObject = volumeArray.get(0).getAsJsonObject();
+                        String storageId = ToolUtils.jsonToOriginalStr(volumeObject.get("storage_id"));
+                        //根据存储Id 获取存储型号
+                        String storageModel = "";
+                        if (storageIds.get(storageId) == null) {
+                            storageModel = getStorageModel(storageId);
+                            storageIds.put(storageId, storageModel);
+                        }else {
+                            storageModel = storageIds.get(storageId);
+                        }
                         DmeVmwareRelation relation = getDmeVmwareRelation(storeType, vmfsDatastoreId, vmfsDatastoreName,
-                            volumeObject);
-
+                            volumeObject,storageModel);
                         relationList.add(relation);
                     }
                 }
@@ -1286,7 +1294,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     private DmeVmwareRelation getDmeVmwareRelation(String storeType, String vmfsDatastoreId, String vmfsDatastoreName,
-        JsonObject volumeObject) {
+                                                   JsonObject volumeObject, String storageModel) {
         String volumeId = ToolUtils.jsonToOriginalStr(volumeObject.get(ID_FIELD));
         String volumeName = ToolUtils.jsonToOriginalStr(volumeObject.get(NAME_FIELD));
         String volumeWwn = ToolUtils.jsonToOriginalStr(volumeObject.get(VOLUME_WWN));
@@ -1298,6 +1306,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         relation.setVolumeName(volumeName);
         relation.setVolumeWwn(volumeWwn);
         relation.setStoreType(storeType);
+        relation.setStorageType(storageModel);
         relation.setState(1);
         return relation;
     }
