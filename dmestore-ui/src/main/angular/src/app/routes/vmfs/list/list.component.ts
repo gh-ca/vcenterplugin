@@ -299,6 +299,7 @@ export class VmfsListComponent implements OnInit {
   // table数据处理
   refresh() {
     this.isLoading = true;
+    this.list = [];
     // 进行数据加载
     this.remoteSrv.getData()
         .subscribe((result: any) => {
@@ -333,6 +334,8 @@ export class VmfsListComponent implements OnInit {
     this.deviceFilter.initDevice();
     this.serviceLevelFilter.initServiceLevel();
     this.protectionStatusFilter.initProtectionStatus();
+    this.isFirstLoadChartData = true;
+    this.list = [];
     this.remoteSrv.scanVMFS(this.storageType).subscribe((res: any) => {
       if (res.code === '200') {
         this.refresh();
@@ -340,7 +343,7 @@ export class VmfsListComponent implements OnInit {
       } else {
         console.log('Scan faild');
       }
-      this.isLoading = false;
+      // this.isLoading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
   }
