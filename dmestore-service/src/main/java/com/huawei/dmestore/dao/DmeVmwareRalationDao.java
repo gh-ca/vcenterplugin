@@ -238,6 +238,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
                 pstm.setString(DpSqlFileConstants.DIGIT_4, relation.getVolumeName());
                 pstm.setDate(DpSqlFileConstants.DIGIT_5, new Date(System.currentTimeMillis()));
                 pstm.setString(DpSqlFileConstants.DIGIT_6, relation.getVolumeWwn());
+                pstm.setString(DpSqlFileConstants.DIGIT_7, relation.getStorageType());
                 pstm.addBatch();
             }
             pstm.executeBatch();
@@ -301,7 +302,7 @@ public class DmeVmwareRalationDao extends H2DataBaseDao {
             } catch (SQLException e) {
                 LOGGER.error(ex.getMessage());
             }
-            LOGGER.error("Failed to svae datastorage dme relation: {}", ex.getMessage());
+            LOGGER.error("Failed to save datastorage dme relation: {}", ex.getMessage());
         } finally {
             closeConnection(con, pstm, null);
         }
