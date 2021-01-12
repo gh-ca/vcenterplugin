@@ -1538,7 +1538,7 @@ export class VmfsListComponent implements OnInit {
     this.delSuccessShow = false;
     // this.backToListPage();
     // 重新请求数据
-    this.scanDataStore();
+    this.refresh();
   }
 
   /**
