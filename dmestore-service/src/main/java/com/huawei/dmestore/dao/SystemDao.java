@@ -122,12 +122,12 @@ public class SystemDao extends H2DataBaseDao {
             con = getConnection();
             for (String table : DpSqlFileConstants.ALL_TABLES) {
                 try {
-                    ps1 = con.prepareStatement("DROP TABLE" + table);
+                    ps1 = con.prepareStatement("DROP TABLE " + table);
                     ps1.execute();
                     ps1.close();
                     ps1 = null;
                 } catch (SQLException e) {
-                    LOGGER.error("Cannot drop data from {}", table);
+                    LOGGER.error("Cannot drop data from {}" + e.getMessage(), table);
                 }
             }
         } finally {

@@ -310,6 +310,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         String nfsDataStoreSharePath = ToolUtils.jsonToStr(nfsDatastore.get("remotePath"));
         String nfsDataStorageName = ToolUtils.jsonToStr(nfsDatastore.get(NAME_FIELD));
         List<DmeVmwareRelation> relationList = new ArrayList<>();
+        Map<String, String> storageIds = new HashMap<>();
         for (Map.Entry<String, Storage> entry : storageMap.entrySet()) {
             Storage storageInfo = entry.getValue();
             String storageId = storageInfo.getId();
@@ -318,6 +319,16 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             relation.setStorageDeviceId(storageId);
             relation.setStoreName(nfsDataStorageName);
             relation.setStoreType(storeType);
+
+            //获取存储池型号
+            if (storageIds.get("storageId") == null) {
+                String storageModel = getStorageModel(storageId);
+                storageIds.put(storageId, storageModel);
+                relation.setStorageType(storageModel);
+            }else {
+                relation.setStorageType(storageIds.get("storageId"));
+            }
+
 
             // 获取logicPort信息
             boolean withLogicPort = getLogicPort(nfsDatastoreIp, storageId, relation);
@@ -979,5 +990,9 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             }
         }
         return false;
+    }
+
+    private String getStorageModel(String storageId) throws DmeException {
+        return dmeStorageService.getStorageDetail(storageId).getModel();
     }
 }
