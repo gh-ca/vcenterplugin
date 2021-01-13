@@ -358,7 +358,7 @@ export class AddComponent implements OnInit{
       const storagePoolList = storagePoolMap[0].storagePoolList;
       const workloads = storagePoolMap[0].workloadList;
       // 获取存储池数据
-      if (!storagePoolList) {
+      // if (!storagePoolList) {
         this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, 'block').subscribe((result: any) => {
           console.log('storagePools', result);
           console.log('result.code === \'200\' && result.data !== null', result.code === '200' && result.data !== null);
@@ -369,11 +369,11 @@ export class AddComponent implements OnInit{
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
           }
         });
-      } else {
-        this.storagePoolList = storagePoolList;
-      }
+      // } else {
+      //   this.storagePoolList = storagePoolList;
+      // }
       // 获取workLoad
-      if (!workloads && this.showWorkLoadFlag) {
+      if (this.showWorkLoadFlag) {
         this.remoteSrv.getWorkLoads(this.form.storage_id).subscribe((result: any) => {
           console.log('storagePools', result);
           if (result.code === '200' && result.data !== null) {
@@ -383,8 +383,8 @@ export class AddComponent implements OnInit{
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
           }
         });
-      } else {
-        this.workloads = workloads;
+      // } else {
+      //   this.workloads = workloads;
       }
     }
   }
