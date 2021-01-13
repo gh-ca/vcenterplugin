@@ -399,7 +399,7 @@ public class ToolUtils {
                 storageTypeShow.setWorkLoadShow(2);
                 storageTypeShow.setAllocationTypeShow(1);
                 storageTypeShow.setOwnershipController(true);
-                storageTypeShow.setStorageDetailTag(1);
+                storageTypeShow.setStorageDetailTag(2);
                 storageTypeShow.setDeduplicationShow(true);
                 storageTypeShow.setCompressionShow(true);
                 storageTypeShow.setCapacityInitialAllocation(true);
