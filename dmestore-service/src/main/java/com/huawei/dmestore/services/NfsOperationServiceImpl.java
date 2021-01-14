@@ -337,7 +337,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     @Override
     public void changeNfsCapacity(Map<String, Object> params) throws DmeException {
         if (params == null || params.size() == 0) {
-            throw new DmeException(CODE_503, "change nfs storage capacity error,params error!");
+            throw new DmeException(CODE_503, "change nfs storage capacity error,params is null!");
         }
         String storeObjectId = (String) params.get("storeObjectId");
         String fileSystemId = (String) params.get("fileSystemId");
@@ -387,7 +387,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             if (!StringUtils.isEmpty(allocType) && THIN_FIELD.equals(allocType)) {
                 //  该文件系统总容量-可用容量-文件系统能缩容的最小空间=实际可用缩小容量与变化量进行比较
                 if (currentCapacity - changeCapacity >= minSizeFsCapacity) {
-                    if (Double.compare(changeCapacity, availableCapacity) > 1) {
+                    if (Double.compare(changeCapacity, availableCapacity) == 1) {
                         exchangedCapacity = currentCapacity - availableCapacity;
                     } else {
                         exchangedCapacity = currentCapacity - changeCapacity;
@@ -398,7 +398,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                         "The reduced capacity shall not be less than:" + minSizeFsCapacity + "GB");
                 }
             } else {
-                if (Double.compare(availableCapacity, changeCapacity) > 1) {
+                if (Double.compare(availableCapacity, changeCapacity) == 1) {
                     exchangedCapacity = currentCapacity - changeCapacity;
                 } else {
                     exchangedCapacity = currentCapacity - availableCapacity;

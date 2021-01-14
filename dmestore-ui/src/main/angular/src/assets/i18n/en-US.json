@@ -820,5 +820,8 @@
     "totalVolumeThroughput": "Total volume throughput(IOPS)",
     "volumeTotalBandwidth": "Volume total bandwidth(MB/s)",
     "storagePoolIODensity": "Storage pool I/O density(IOPS/TB)"
+  },
+  "tips": {
+    "select": "Please select"
   }
 }

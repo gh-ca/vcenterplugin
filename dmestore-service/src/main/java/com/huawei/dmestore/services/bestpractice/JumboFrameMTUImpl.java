@@ -42,19 +42,10 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = this.getHostMoFactory().build(context, mor);
-        List<HostVirtualSwitch> virtualSwitches = hostMo.getHostNetworkInfo().getVswitch();
-        for (HostVirtualSwitch virtualSwitch : virtualSwitches) {
-            HostVirtualSwitchSpec spec = virtualSwitch.getSpec();
-            Integer mtu = spec.getMtu();
-            if (null == mtu || (mtu.intValue() != getRecommendValue().intValue())) {
-                return null == mtu ? MTU_NULL : mtu.intValue();
-            }
-        }
-
         HostNetworkConfig networkConfig = hostMo.getHostNetworkSystemMo().getNetworkConfig();
-        List<HostVirtualSwitchConfig> list = networkConfig.getVswitch();
-        for (HostVirtualSwitchConfig config : list) {
-            HostVirtualSwitchSpec spec = config.getSpec();
+        List<HostVirtualNicConfig> list = networkConfig.getVnic();
+        for (HostVirtualNicConfig config : list) {
+            HostVirtualNicSpec spec = config.getSpec();
             Integer mtu = spec.getMtu();
             if (null == mtu || (mtu.intValue() != getRecommendValue().intValue())) {
                 return null == mtu ? MTU_NULL : mtu.intValue();
@@ -89,6 +80,9 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = this.getHostMoFactory().build(context, mor);
         HostNetworkConfig networkConfig = hostMo.getHostNetworkSystemMo().getNetworkConfig();
+        if (networkConfig == null) {
+            return true;
+        }
         List<HostVirtualNicConfig> list = networkConfig.getVnic();
         for (HostVirtualNicConfig config : list) {
             HostVirtualNicSpec spec = config.getSpec();

@@ -435,7 +435,7 @@ export class VmfsListComponent implements OnInit {
       const storagePoolList = storagePoolMap[0].storagePoolList;
       const workloads = storagePoolMap[0].workloadList;
       // 存储池
-      if (!storagePoolList) {
+      // if (!storagePoolList) {
         this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, 'block').subscribe((result: any) => {
           if (result.code === '200' && result.data !== null) {
             this.storagePoolList = result.data;
@@ -445,11 +445,11 @@ export class VmfsListComponent implements OnInit {
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
           }
         });
-      } else {
-        this.storagePoolList = storagePoolList;
-      }
+      // } else {
+      //   this.storagePoolList = storagePoolList;
+      // }
       // 获取workLoad
-      if (!workloads && this.showWorkLoadFlag) {
+      if (this.showWorkLoadFlag) {
         this.remoteSrv.getWorkLoads(this.form.storage_id).subscribe((result: any) => {
           if (result.code === '200' && result.data !== null) {
             this.workloads = result.data;
@@ -459,8 +459,8 @@ export class VmfsListComponent implements OnInit {
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
           }
         });
-      } else {
-        this.workloads = workloads;
+      // } else {
+      //   this.workloads = workloads;
       }
     }
   }
@@ -1579,6 +1579,9 @@ export class VmfsListComponent implements OnInit {
         this.matchErr = true;
       }
     }
+    console.log("this.vmfsNameRepeatErr", this.vmfsNameRepeatErr)
+    console.log("this.volNameRepeatErr", this.volNameRepeatErr)
+    console.log("this.matchErr", this.matchErr)
   }
 
   /**
@@ -1591,7 +1594,6 @@ export class VmfsListComponent implements OnInit {
       if (result.code === '200') { // result.data true 不重复 false 重复
         this.vmfsNameRepeatErr = !result.data;
         if (this.vmfsNameRepeatErr) { // 名称重复
-          this.form.name = null;
           this.volNameRepeatErr = false;
           this.matchErr = false;
         } else {
@@ -1614,11 +1616,11 @@ export class VmfsListComponent implements OnInit {
       this.modalHandleLoading = false;
       if (result.code === '200') { // result.data true 不重复 false 重复
         this.volNameRepeatErr = !result.data;
-        if (!this.vmfsNameRepeatErr && this.volNameRepeatErr) {
-          this.form.name = null;
-        }
+        // if (!this.vmfsNameRepeatErr && this.volNameRepeatErr) {
+        //   this.form.name = null;
+        // }
         if (this.volNameRepeatErr) {
-          this.form.volumeName = null;
+          // this.form.volumeName = null;
           this.vmfsNameRepeatErr = false;
           this.matchErr = false;
         }
@@ -1893,7 +1895,7 @@ export class VmfsListComponent implements OnInit {
    * 添加页面 资源调优thick展示与隐藏
    */
   addAllocationTypeShowInit() {
-    this.form.alloctype = 'thin';
+    this.form.alloctype = '';
     const allocationTypeShow = this.getAllocationTypeShow(this.form.storage_id);
     this.showAlloctypeThick = allocationTypeShow == 1;
   }
@@ -1992,5 +1994,15 @@ export class VmfsListComponent implements OnInit {
       this.form = form;
     }
     console.log("lowerChecked", this.form)
+  }
+
+  /**
+   *
+   * 添加页面名称相同按钮点击事件
+   */
+  addSameBtnChangeFunc(obj) {
+    if (this.form.isSameName) {
+      this.form.volumeName = this.form.name
+    }
   }
 }
