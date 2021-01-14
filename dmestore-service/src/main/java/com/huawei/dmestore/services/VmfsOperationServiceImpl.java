@@ -94,7 +94,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         if (StringUtils.isEmpty(serviceLevelName)) {
             Map<String, Object> customizeVolumeTuning = getCustomizeVolumeTuning(params);
             LOG.info("自定义方式创建vmfs{},服务等级：", serviceLevelName);
-            if (customizeVolumeTuning.size()!=0 && customizeVolumeTuning!= null) {
+            if (customizeVolumeTuning.size() != 0 && customizeVolumeTuning != null) {
                 volumeMap.put("tuning", customizeVolumeTuning);
             }
         }
@@ -152,7 +152,7 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         if (qosFlag) {
             Object controlPolicy = params.get("control_policy");
             if (!StringUtils.isEmpty(controlPolicy)) {
-                map.put("control_policy", Integer.valueOf(controlPolicy.toString()));
+                map.put("control_policy", controlPolicy.toString());
             }
             Object maxIops = params.get("max_iops");
             if (!StringUtils.isEmpty(maxIops)) {
