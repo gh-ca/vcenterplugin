@@ -322,6 +322,7 @@
         <select clrSelect (ngModelOptions)="logicPorts" [(ngModel)]="addForm.currentPortId" name="currentPortId" class="clr-select" required>
           <option *ngFor="let item of logicPorts" value="{{item.currentPortId}}">{{item.name+'_'+item.currentPortName+'('+item.mgmtIp+')'}}</option>
         </select>
+        <clr-control-error>{{'errorMsg.require' | translate}}</clr-control-error>
       </clr-select-container>
       <!--名称-->
       <clr-input-container>

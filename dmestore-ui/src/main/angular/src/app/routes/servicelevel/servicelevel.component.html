@@ -28,9 +28,9 @@
   </div>
   <div class="clr-row">
     <div class="clr-col-4" *ngFor="let item of serviceLevels" [clrDgItem]="item">
-      <div class="info-card" style="margin-left: 10px;margin-top: 30px; height: 260px">
+      <div class="info-card" style="margin-left: 10px;margin-top: 30px; height: 260px; overflow: auto">
         <div class="info-card-header">
-          <div class="info-card-title" style="cursor:pointer" (click)="clickName(item)">{{item.name}}</div>
+          <div class="info-card-title" style="cursor:pointer;overflow: hidden" title="{{item.name}}" (click)="clickName(item)">{{item.name}}</div>
           <!--<clr-dropdown [clrCloseMenuOnItemClick]="false">
             <button clrDropdownTrigger class="dropdown-toggle btn btn-link">
               Operation
@@ -303,15 +303,15 @@
                 <clr-dg-cell [hidden]="storagePoolRadioCheck!=='basic'">{{item.physicalType}}</clr-dg-cell>
                 <clr-dg-cell [hidden]="storagePoolRadioCheck!=='basic'">{{item.storageName}}</clr-dg-cell>
 
-                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">{{item.totalCapacity}} GB</clr-dg-cell>
-                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">{{item.consumedCapacity}} GB</clr-dg-cell>
+                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">{{formatCapacity(item.totalCapacity)}} </clr-dg-cell>
+                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">{{formatCapacity(item.consumedCapacity)}} </clr-dg-cell>
                 <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">
                   <div class="progress-block">
                     <clr-progress-bar clrValue="{{item.usedCapacity}}" clrSuccess></clr-progress-bar>
                     <span>{{item.usedCapacity}}%</span>
                   </div>
                 </clr-dg-cell>
-                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">{{item.freeCapacity}} GB</clr-dg-cell>
+                <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">{{formatCapacity(item.freeCapacity)}} </clr-dg-cell>
 
                 <clr-dg-cell [hidden]="storagePoolRadioCheck!=='performance'">
                   <span *ngIf="item.runningStatus == 'offline'">
