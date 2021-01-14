@@ -237,6 +237,7 @@ public class NfsOperationController extends BaseController {
         param.put(NFS_NAME_FIELD, params.get(NFS_NAME_FIELD));
         param.put("file_system_id", params.get("fileSystemId"));
         param.put("nfs_share_id", params.get("shareId"));
+        param.put("name", params.get("fsName"));
         Map<String, Object> capacityAutonegotiation = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         Object autoSizeEnable = params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD);
         if (autoSizeEnable != null) {
@@ -258,7 +259,6 @@ public class NfsOperationController extends BaseController {
         Map<String, Object> tuning = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         tuning.put(DEDUPLICATION_ENABLED_FIELD, params.get("deduplicationEnabled"));
         tuning.put(COMPRESSION_ENABLED_FIELD, params.get("compressionEnabled"));
-        param.put(NAME_FIELD, params.get(NAME_FIELD));
         Object thin = params.get(THIN_FIELD);
         if (thin != null) {
             if ((Boolean) thin) {
