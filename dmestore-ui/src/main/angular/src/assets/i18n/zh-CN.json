@@ -826,5 +826,8 @@
     "totalVolumeThroughput": "卷总吞吐量(IOPS)",
     "volumeTotalBandwidth": "卷总带宽(MB/s)",
     "storagePoolIODensity": "存储池I/O密度(IOPS/TB)"
+  },
+  "tips": {
+    "select": "请选择"
   }
 }

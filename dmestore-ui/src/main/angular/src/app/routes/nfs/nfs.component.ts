@@ -292,14 +292,15 @@ export class NfsComponent implements OnInit {
     this.addForm.currentPortId = undefined;
     if (this.addForm.storagId) {
 
-      const storagePoolMap = this.storagePoolMap.filter(item => item.storageId == this.addForm.storagId);
+      // const storagePoolMap = this.storagePoolMap.filter(item => item.storageId == this.addForm.storagId);
 
-      const storagePoolList = storagePoolMap[0].storagePoolList;
-      const logicPorts = storagePoolMap[0].logicPort;
+      // const storagePoolList = storagePoolMap[0].storagePoolList;
+      // const logicPorts = storagePoolMap[0].logicPort;
       // 选择存储后获取存储池
-      if (!storagePoolList) {
+      // if (!storagePoolList) {
         this.storageService.getStoragePoolListByStorageId("file",this.addForm.storagId)
           .subscribe((r: any) => {
+            this.modalLoading=false;
             if (r.code === '200'){
               this.storagePools = r.data;
 
@@ -307,22 +308,23 @@ export class NfsComponent implements OnInit {
             }
             this.cdr.detectChanges();
           });
-      } else {
-        console.log("storagePoolList exists")
-        this.storagePools = storagePoolList;
-      }
-      if (!logicPorts) {
+      // } else {
+      //   console.log("storagePoolList exists")
+      //   this.storagePools = storagePoolList;
+      // }
+      // if (!logicPorts) {
         this.selectLogicPort();
-      } else {
-        console.log("logicPorts exists")
-        this.logicPorts = logicPorts;
-        this.modalLoading=false;
-      }
+      // } else {
+      //   console.log("logicPorts exists")
+      //   this.logicPorts = logicPorts;
+      //   this.modalLoading=false;
+      // }
 
     }
   }
   selectLogicPort(){
     // 选择存储后逻辑端口
+    this.modalLoading=true;
     this.storageService.getLogicPortListByStorageId(this.addForm.storagId)
       .subscribe((r: any) => {
         this.modalLoading=false;

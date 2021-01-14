@@ -163,7 +163,7 @@ export class NfsAddComponent implements OnInit{
       const logicPorts = storagePoolMap[0].logicPort;
 
       // 选择存储后获取存储池
-      if (!storagePoolList) {
+      // if (!storagePoolList) {
         this.storageService.getStoragePoolListByStorageId("file",this.addForm.storagId)
           .subscribe((r: any) => {
             if (r.code === '200'){
@@ -171,15 +171,15 @@ export class NfsAddComponent implements OnInit{
             }
             this.cdr.detectChanges();
           });
-      } else {
-        this.storagePools = storagePoolList;
-      }
-      if (!logicPorts) {
+      // } else {
+      //   this.storagePools = storagePoolList;
+      // }
+      // if (!logicPorts) {
         this.selectLogicPort();
-      } else {
-        this.logicPorts = logicPorts;
-        this.modalLoading=false;
-      }
+      // } else {
+      //   this.logicPorts = logicPorts;
+      //   this.modalLoading=false;
+      // }
     }
   }
   selectLogicPort(){
