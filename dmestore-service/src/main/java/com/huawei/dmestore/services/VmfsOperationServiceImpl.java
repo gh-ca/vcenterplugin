@@ -94,7 +94,9 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         if (StringUtils.isEmpty(serviceLevelName)) {
             Map<String, Object> customizeVolumeTuning = getCustomizeVolumeTuning(params);
             LOG.info("自定义方式创建vmfs{},服务等级：", serviceLevelName);
-            volumeMap.put("tuning", customizeVolumeTuning);
+            if (customizeVolumeTuning.size()!=0 && customizeVolumeTuning!= null) {
+                volumeMap.put("tuning", customizeVolumeTuning);
+            }
         }
 
         Object newVoName = params.get("newVoName");
@@ -145,34 +147,41 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
     private Map<String, Object> getCustomizeVolumeTuning(Map<String, Object> params) {
         Map<String, Object> map = new HashMap<>();
-        Object controlPolicy = params.get("control_policy");
-        if (!StringUtils.isEmpty(controlPolicy)) {
-            map.put("control_policy", Integer.valueOf(controlPolicy.toString()));
-        }
-        Object maxIops = params.get("max_iops");
-        if (!StringUtils.isEmpty(maxIops)) {
-            map.put("maxiops", Integer.valueOf(maxIops.toString()));
-        }
-        Object minIops = params.get("min_iops");
-        if (!StringUtils.isEmpty(minIops)) {
-            map.put("miniops", Integer.valueOf(minIops.toString()));
-        }
-        Object maxBandwidth = params.get("max_bandwidth");
-        if (!StringUtils.isEmpty(maxBandwidth)) {
-            map.put("maxbandwidth", Integer.valueOf(maxBandwidth.toString()));
-        }
-        Object minBandwidth = params.get("min_bandwidth");
-        if (!StringUtils.isEmpty(minBandwidth)) {
-            map.put("minbandwidth", Integer.valueOf(minBandwidth.toString()));
-        }
-
-        Object latency = params.get("latency");
-        if (!StringUtils.isEmpty(latency)) {
-            map.put("latency", Integer.valueOf(latency.toString()));
-        }
-        map.put("enabled", true);
         Map<String, Object> customizeVolumeTuning = new HashMap<>();
-        customizeVolumeTuning.put("smartqos",map);
+        Boolean qosFlag = (Boolean)params.get("qosFlag");
+        if (qosFlag) {
+            Object controlPolicy = params.get("control_policy");
+            if (!StringUtils.isEmpty(controlPolicy)) {
+                map.put("control_policy", Integer.valueOf(controlPolicy.toString()));
+            }
+            Object maxIops = params.get("max_iops");
+            if (!StringUtils.isEmpty(maxIops)) {
+                map.put("maxiops", Integer.valueOf(maxIops.toString()));
+            }
+            Object minIops = params.get("min_iops");
+            if (!StringUtils.isEmpty(minIops)) {
+                map.put("miniops", Integer.valueOf(minIops.toString()));
+            }
+            Object maxBandwidth = params.get("max_bandwidth");
+            if (!StringUtils.isEmpty(maxBandwidth)) {
+                map.put("maxbandwidth", Integer.valueOf(maxBandwidth.toString()));
+            }
+            Object minBandwidth = params.get("min_bandwidth");
+            if (!StringUtils.isEmpty(minBandwidth)) {
+                map.put("minbandwidth", Integer.valueOf(minBandwidth.toString()));
+            }
+
+            Object latency = params.get("latency");
+            if (!StringUtils.isEmpty(latency)) {
+                map.put("latency", Integer.valueOf(latency.toString()));
+            }
+            map.put("enabled", true);
+            customizeVolumeTuning.put("smartqos",map);
+        }
+        Boolean smartTierFlag = (Boolean)params.get("smartTierFlag");
+        if (smartTierFlag) {
+            customizeVolumeTuning.put("smarttier", ToolUtils.getStr(params.get("smartTier")));
+        }
         return customizeVolumeTuning;
     }
 
