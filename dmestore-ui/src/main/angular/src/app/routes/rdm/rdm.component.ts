@@ -26,8 +26,9 @@ export class RdmComponent implements OnInit {
   };
 
   configModel = new customizeVolumes();
-  storageDevices = [];
+  storageDevices:Storages[] = [];
   storagePools = [];
+  ownerControllers:StorageController[] = [];
   hostList = [];
   dataStoreObjectId = '';
   levelCheck = 'level';
@@ -59,6 +60,10 @@ export class RdmComponent implements OnInit {
   submitLoading = false;
   rdmSuccess = false;
   rdmError = false;
+
+  // 归属控制器 true 支持 false 不支持
+  ownershipController = true;
+
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
               private commonService: CommonService,
@@ -75,6 +80,7 @@ export class RdmComponent implements OnInit {
     } else{
       this.vmObjectId = 'urn:vmomi:VirtualMachine:vm-1046:674908e5-ab21-4079-9cb1-596358ee5dd1';
     }
+    this.ownershipController = true;
     this.loadDataStore();
   }
 
@@ -165,6 +171,9 @@ export class RdmComponent implements OnInit {
   }
 
   submit(): void {
+    if (!this.ownershipController) {
+      this.configModel.ownerController = null;
+    }
     let b = JSON.parse(JSON.stringify(this.configModel));
     let body = {};
     if (this.configModel.storageType == '2'){
@@ -268,6 +277,21 @@ export class RdmComponent implements OnInit {
 
   loadStoragePool(storageId: string){
     this.slLoading = true;
+    const chooseStorage = this.storageDevices.filter(item => item.id == storageId);
+    this.ownershipController = chooseStorage[0].storageTypeShow.ownershipController;
+    // 查询卷对应归属控制器
+    if (this.ownershipController) {
+      this.ownerControllers = [];
+      if (storageId) {
+        this.http.get('dmestorage/storagecontrollers?storageDeviceId='+storageId).subscribe((result:any) => {
+          if (result.code == '200') {
+            this.ownerControllers = result.data;
+          }
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+        });
+      }
+    }
+    console.log("this.ownershipController", this.ownershipController);
     this.http.get('dmestorage/storagepools', {params: {storageId, media_type: "all"}}).subscribe((result: any) => {
       this.slLoading = false;
       if (result.code === '200'){
@@ -387,4 +411,33 @@ class smartqos{
   constructor(){
     this.controlPolicy = '1'
   }
+}
+// 存储
+export interface Storages {
+  name: string;
+  id: string;
+  storageTypeShow:StorageTypeShow;
+}
+export interface StorageTypeShow {
+  qosTag:number;// qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
+  workLoadShow:number;// 1 支持应用类型 2不支持应用类型
+  ownershipController:boolean;// 归属控制器 true 支持 false 不支持
+  allocationTypeShow:number;// 资源分配类型  1 可选thin/thick 2 可选thin
+  deduplicationShow:boolean;// 重复数据删除 true 支持 false 不支持
+  compressionShow:boolean; // 数据压缩 true 支持 false 不支持
+  capacityInitialAllocation:boolean;// 容量初始分配策略 true 支持 false 不支持
+  smartTierShow:boolean;// SmartTier策略 true 支持 false 不支持
+  prefetchStrategyShow:boolean;// 预取策略 true 支持 false 不支持
+  storageDetailTag:number;// 存储详情下展示情况 1 仅展示存储池和lun 2 展示存储池/lun/文件系统/共享/dtree
+}
+export class StorageController{
+  name:string;
+  status:string;
+  softVer:string;
+  cpuInfo:string;
+  cpuUsage:number;
+  iops:number;
+  ops:number;
+  bandwith:number;
+  lantency:number;
 }

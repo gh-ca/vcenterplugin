@@ -3,9 +3,7 @@ package com.huawei.vmware.mo;
 import com.huawei.vmware.util.VmwareContext;
 
 import com.google.gson.Gson;
-import com.vmware.vim25.CustomFieldStringValue;
 import com.vmware.vim25.DatastoreInfo;
-import com.vmware.vim25.DynamicProperty;
 import com.vmware.vim25.HostNasVolumeSecurityType;
 import com.vmware.vim25.HostNasVolumeSpec;
 import com.vmware.vim25.HostScsiDisk;
@@ -15,7 +13,6 @@ import com.vmware.vim25.ObjectContent;
 import com.vmware.vim25.ObjectSpec;
 import com.vmware.vim25.PropertyFilterSpec;
 import com.vmware.vim25.PropertySpec;
-import com.vmware.vim25.ServiceContent;
 import com.vmware.vim25.TraversalSpec;
 import com.vmware.vim25.VmfsDatastoreCreateSpec;
 import com.vmware.vim25.VmfsDatastoreExpandSpec;
@@ -241,15 +238,5 @@ public class HostDatastoreSystemMO extends BaseMO {
         pfSpecArr.add(pfSpec);
 
         return context.getService().retrieveProperties(context.getPropertyCollector(), pfSpecArr);
-    }
-
-    /**
-     * unmapVmfsVolumeExTask
-     *
-     * @param vmfsUuids vmfsUuids
-     * @throws Exception Exception
-     */
-    public void unmapVmfsVolumeExTask(List<String> vmfsUuids) throws Exception {
-        context.getService().unmapVmfsVolumeExTask(mor, vmfsUuids);
     }
 }

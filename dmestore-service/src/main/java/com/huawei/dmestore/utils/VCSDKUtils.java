@@ -26,7 +26,6 @@ import com.huawei.vmware.util.VirtualMachineMoFactorys;
 import com.huawei.vmware.util.VmwareContext;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.vmware.cis.tagging.CategoryModel;
@@ -64,7 +63,6 @@ import com.vmware.vim.vmomi.client.http.impl.AllowAllThumbprintVerifier;
 import com.vmware.vim.vmomi.client.http.impl.HttpConfigurationImpl;
 import com.vmware.vim.vmomi.core.types.VmodlContext;
 import com.vmware.vim25.DatastoreHostMount;
-import com.vmware.vim25.DatastoreInfo;
 import com.vmware.vim25.DatastoreSummary;
 import com.vmware.vim25.HostFibreChannelHba;
 import com.vmware.vim25.HostFileSystemMountInfo;
@@ -86,6 +84,15 @@ import com.vmware.vim25.VmfsDatastoreExpandSpec;
 import com.vmware.vim25.VmfsDatastoreInfo;
 import com.vmware.vim25.VmfsDatastoreOption;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
@@ -98,15 +105,6 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -1156,17 +1154,17 @@ public class VCSDKUtils {
             }
             List<Map<String, String>> hostMapList = gson.fromJson(hostStr,
                 new TypeToken<List<Map<String, String>>>() { }.getType());
-            HostDatastoreSystemMO hdsMo = null;
+            HostStorageSystemMO hdsMo = null;
             for (Map<String, String> hostMap : hostMapList) {
                 ManagedObjectReference hostMor = vcConnectionHelpers.objectId2Mor(hostMap.get(HOST_ID));
                 HostMO host1 = hostVmwareFactory.build(serverContext, hostMor);
                 if (null != host1) {
-                    hdsMo = host1.getHostDatastoreSystemMo();
+                    hdsMo = host1.getHostStorageSystemMo();
                     break;
                 }
             }
             hdsMo.unmapVmfsVolumeExTask(vmfsUuids);
-            logger.error("recycleVmfsCapacity end!");
+            logger.info("recycleVmfsCapacity end!");
         } catch (Exception e) {
             logger.error("recycleVmfsCapacity error:{}", e.getMessage());
             throw new VcenterException(e.getMessage());
@@ -1831,7 +1829,7 @@ public class VCSDKUtils {
             logger.info("refreshStorageSystem before mount Vmfs!");
             hostMo.getHostStorageSystemMo().refreshStorageSystem();
 
-            // 查询目前未挂载的卷
+           /* // 查询目前未挂载的卷
             for (HostFileSystemMountInfo mount : hostMo.getHostStorageSystemMo()
                 .getHostFileSystemVolumeInfo()
                 .getMountInfo()) {
@@ -1846,7 +1844,7 @@ public class VCSDKUtils {
 
             // 挂载后重新扫描datastore
             logger.info("refreshStorageSystem after mount Vmfs!");
-            hostMo.getHostStorageSystemMo().refreshStorageSystem();
+            hostMo.getHostStorageSystemMo().refreshStorageSystem();*/
         } catch (Exception e) {
             logger.error(" mount vmfs volume error!datastoreName={},error:{}", datastoreName, e.getMessage());
         }
@@ -3068,7 +3066,7 @@ public class VCSDKUtils {
                 map = new HashMap<>();
                 HostMO hostMo = virtualMachineMo.getRunningHost();
                 String objectId = vcConnectionHelpers.mor2ObjectId(hostMo.getMor(), vmwareContext.getServerAddress());
-                map.put("hostObjectId", objectId);
+                map.put(HOST_ID, objectId);
                 map.put(HOST_NAME, hostMo.getName());
             }
         } catch (Exception e) {

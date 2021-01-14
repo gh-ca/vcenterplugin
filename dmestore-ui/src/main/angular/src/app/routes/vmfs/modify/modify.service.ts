@@ -42,4 +42,14 @@ export class ModifyService {
   checkVolName(volName: string) {
     return this.http.get('dmestorage/queryvolumebyname', {params: {name:volName}});
   }
+  getStorageDetail(storageId: string){
+    return this.http.get('dmestorage/storage', {params: {storageId}});
+  }
+  /**
+   * 通过objectId 获取vmfs存储数据
+   * @param objectId
+   */
+  getStorageById(objectId:string) {
+    return this.http.get('accessvmware/relation?datastoreObjectId='+objectId);
+  }
 }

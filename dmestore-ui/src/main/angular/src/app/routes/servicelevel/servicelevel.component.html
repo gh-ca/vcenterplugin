@@ -260,13 +260,18 @@
 
               <clr-dg-column [clrDgField]="'name'">{{'tier.name'|translate}}</clr-dg-column>
 
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='basic'" [clrDgField]="'runningStatus'">{{'tier.status'|translate}}</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='basic'">
+                {{'tier.status'|translate}}
+                <clr-dg-filter [clrDgFilter]="slspStatusFilter">
+                  <sl-sp-status-filter #slspStatusFilter></sl-sp-status-filter>
+                </clr-dg-filter>
+              </clr-dg-column>
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='basic'" [clrDgField]="'physicalType'">{{'tier.diskType'|translate}}</clr-dg-column>
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='basic'" [clrDgField]="'storageName'">{{'tier.storage'|translate}}</clr-dg-column>
 
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'totalCapacity'">{{'tier.total'|translate}}</clr-dg-column>
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'consumedCapacity'">{{'tier.used'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'consumedCapacityPercentage'">{{'tier.usage'|translate}}</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'usedCapacity'">{{'tier.usage'|translate}}</clr-dg-column>
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'freeCapacity'">{{'tier.free'|translate}}</clr-dg-column>
 
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'runningStatus'">{{'tier.status'|translate}}</clr-dg-column>
@@ -301,7 +306,10 @@
                 <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">{{item.totalCapacity}} GB</clr-dg-cell>
                 <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">{{item.consumedCapacity}} GB</clr-dg-cell>
                 <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">
-                  <clr-progress-bar clrValue="{{item.consumedCapacityPercentage}}" clrSuccess clrLabeled></clr-progress-bar>
+                  <div class="progress-block">
+                    <clr-progress-bar clrValue="{{item.usedCapacity}}" clrSuccess></clr-progress-bar>
+                    <span>{{item.usedCapacity}}%</span>
+                  </div>
                 </clr-dg-cell>
                 <clr-dg-cell [hidden]="storagePoolRadioCheck!=='capacity'">{{item.freeCapacity}} GB</clr-dg-cell>
 

@@ -273,6 +273,11 @@ public class DmeConstants {
     public static final String LIST_SERVICE_LEVEL_URL = "/rest/service-policy/v1/service-levels";
 
     /**
+     * datasets query
+     **/
+    public static final String DATASETS_QUERY_URL = "/rest/metrics/v1/datasets/{dataSet}?pageSize=5000";
+
+    /**
      * Constant definition
      */
     public static final int MAXLEN = 255;
@@ -443,6 +448,11 @@ public class DmeConstants {
     public static final String STORE_TYPE_VMFS = "VMFS";
 
     /**
+     * default_page_size
+     **/
+    public static final int DEFAULT_PAGE_SIZE = 1000;
+
+    /**
      * 容量初始分配策略。仅支持华为V3/V5设备，Dorado系列不支持该参数。
      * 取值范围：automatic：自动，highest_performance：高性能层，performance：性能层，capacity：容量层。默认值：automatic
      **/
@@ -480,6 +490,22 @@ public class DmeConstants {
             put("1", "automatic_migration");
             put("2", "migration_to_higher");
             put("3", "migration_to_lower");
+        }
+    };
+
+    /**
+     * RAID级别。
+     **/
+    public static final Map<String, String> RAID_LEVEL_MAP = new HashMap() {
+        {
+            put("1", "RAID10");
+            put("2", "RAID5");
+            put("3", "RAID0");
+            put("4", "RAID1");
+            put("5", "RAID6");
+            put("6", "RAID50");
+            put("7", "RAID3");
+            put("11", "RAIDTP");
         }
     };
 

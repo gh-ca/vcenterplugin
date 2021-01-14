@@ -36,8 +36,17 @@ export class NfsReduceComponent implements OnInit{
       const ctx = this.gs.getClientSdk().app.getContextObjects();
       if(ctx!=null){
         this.storeObjectId=ctx[0].id;
+        // this.storeObjectId="urn:vmomi:Datastore:datastore-2057:674908e5-ab21-4079-9cb1-596358ee5dd1";
       }
       this.viewPage='reduce_vcenter'
+      this.modalLoading = true;
+      this.reduceService.getStorageById(this.storeObjectId).subscribe((result: any) => {
+        this.modalLoading = false;
+        if (result.code === '200'){
+          this.fsId = result.data.fsId;
+        }
+        this.cdr.detectChanges();
+      });
     }
   }
   backToNfsList(){

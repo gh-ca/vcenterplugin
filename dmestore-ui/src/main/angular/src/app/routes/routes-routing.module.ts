@@ -8,6 +8,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { StorageComponent } from './storage/storage.component';
 import { AuthGuard } from '@core';
 import {DetailComponent} from './storage/detail/detail.component';
+import {ServicelevelComponent} from "./servicelevel/servicelevel.component";
 
 const routes: Routes = [
   {

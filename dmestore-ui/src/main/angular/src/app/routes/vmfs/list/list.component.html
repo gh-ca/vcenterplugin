@@ -17,7 +17,7 @@
         </button>
         <clr-dropdown-menu *clrIfOpen>
           <!--空间回收-->
-          <div aria-label="Dropdown header Action 1" [disabled]="rowSelected.length < 1" (click)="reclaimBtnClick();"  clrDropdownItem>{{'menu.reclaim' | translate}}</div>
+          <div aria-label="Dropdown header Action 1" [disabled]="rowSelected.length !== 1" (click)="reclaimBtnClick();"  clrDropdownItem>{{'menu.reclaim' | translate}}</div>
           <div class="dropdown-divider" role="separator" aria-hidden="true"></div>
           <!--修改服务等级  按钮展示条件：Datastore所在卷属于服务等级时（选中的单条数据），才呈现“变更服务等级”按钮或菜单-->
           <div aria-label="Dropdown header Action 2" (click)="changeServiceLevelBtnFunc();" *ngIf="rowSelected.length === 1 && rowSelected[0].serviceLevelName !== '' && rowSelected[0].serviceLevelName !== null" clrDropdownItem>{{'menu.changeServiceLevel' | translate}}</div>
@@ -99,12 +99,12 @@
     <clr-dg-placeholder>{{'vmfs.listNullTips' | translate}}</clr-dg-placeholder>
 
     <clr-dg-row [clrDgSelectable]="false" *clrDgItems="let item of list" [clrDgItem]="item">
-      <clr-dg-cell (click)="navigateTo(item.objectid);">{{item.name}}</clr-dg-cell>
+      <clr-dg-cell class="over_flow" (click)="navigateTo(item.objectid);">{{item.name}}</clr-dg-cell>
       <clr-dg-cell hidden>{{item.volumeId}}</clr-dg-cell>
-      <clr-dg-cell hidden>{{item.wwn}}</clr-dg-cell>
-      <clr-dg-cell hidden>{{item.volumeName}}</clr-dg-cell>
-      <clr-dg-cell hidden>{{item.objectid}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='list'">
+      <clr-dg-cell  hidden>{{item.wwn}}</clr-dg-cell>
+      <clr-dg-cell  hidden>{{item.volumeName}}</clr-dg-cell>
+      <clr-dg-cell  hidden>{{item.objectid}}</clr-dg-cell>
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">
                           <span *ngIf="item.status == 'creating'">
                             <span class="color-square" style="background-color: green; margin-right: 10px"></span>{{'enum.status.creating' | translate}}
                           </span>
@@ -130,19 +130,19 @@
                             --
                           </span>
       </clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='list'">{{formatCapacity(item.capacity, true)}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='list'">{{formatCapacity(item.capacity - item.freeSpace, true)}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='list'">
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{formatCapacity(item.capacity, true)}}</clr-dg-cell>
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{formatCapacity(item.capacity - item.freeSpace, true)}}</clr-dg-cell>
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">
         <div class="progress-block">
           <clr-progress-bar clrValue="{{((item.capacity - item.freeSpace)/item.capacity * 100).toFixed(2)}}" clrSuccess></clr-progress-bar>
           <span>{{((item.capacity - item.freeSpace)/item.capacity * 100).toFixed(2)}}%</span>
         </div>
       </clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='list'">{{formatCapacity(item.freeSpace, true)}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='list'">{{formatCapacity(item.reserveCapacity, true)}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.device}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='list'">{{item.serviceLevelName}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='list'">
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{formatCapacity(item.freeSpace, true)}}</clr-dg-cell>
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{formatCapacity(item.reserveCapacity, true)}}</clr-dg-cell>
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.device}}</clr-dg-cell>
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.serviceLevelName}}</clr-dg-cell>
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">
         <span *ngIf="item.vmfsProtected">
           <img src="./assets/images/icon-unprotected.svg">{{'vmfs.protectionStatus.protected' | translate}}
         </span>
@@ -150,14 +150,14 @@
           {{'vmfs.protectionStatus.unprotected' | translate}}
         </span>
       </clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.iops}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='chart'">{{('vmfs.upper' | translate)+' '+ (item.maxIops || "--")+' | '+('vmfs.lower' | translate)+' '+(item.minIops || "--")}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.bandwidth}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='chart'">{{('vmfs.upper' | translate)+' '+(item.maxBandwidth|| "--")+' | '+('vmfs.lower' | translate)+' '+(item.minBandwidth || "--")}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.readResponseTime}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.writeResponseTime}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='chart'">{{item.latency}}</clr-dg-cell>
-      <clr-dg-cell [hidden]="radioCheck!=='chart'" >{{('vmfs.lower' | translate)+' '+(item.latency || "--")}}</clr-dg-cell>
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">{{item.iops}}</clr-dg-cell>
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">{{('vmfs.upper' | translate)+' '+ (item.maxIops || "--")+' | '+('vmfs.lower' | translate)+' '+(item.minIops || "--")}}</clr-dg-cell>
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">{{item.bandwidth}}</clr-dg-cell>
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">{{('vmfs.upper' | translate)+' '+(item.maxBandwidth|| "--")+' | '+('vmfs.lower' | translate)+' '+(item.minBandwidth || "--")}}</clr-dg-cell>
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">{{item.readResponseTime}}</clr-dg-cell>
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">{{item.writeResponseTime}}</clr-dg-cell>
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'">{{item.latency}}</clr-dg-cell>
+      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='chart'" >{{('vmfs.lower' | translate)+' '+(item.latency || "--")}}</clr-dg-cell>
     </clr-dg-row>
     <clr-dg-footer>
       <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="total">
@@ -416,33 +416,53 @@
               </select>
               <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
             </clr-select-container>
-            <clr-select-container class="selectClass">
+            <clr-select-container class="selectClass" *ngIf="showWorkLoadFlag">
               <label style="color: #9F9F9F;">{{'vmfs.workload' | translate}}</label>
               <select clrSelect [(ngModel)]="form.workload_type_id" name="workload_type_id">
                 <option *ngFor="let item of workloads" value="{{item.id}}">{{item.name}}</option>
               </select>
               <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
             </clr-select-container>
+            <!--a.SmartTie 设置 -->
+            <clr-toggle-wrapper  style="margin-top: 1.2rem;width: 6rem;" class="selectClass" *ngIf="form.storage_id && showSmartTierFlag">
+              <label>{{'vmfs.smartTier' | translate}}</label>
+              <input type="checkbox" clrToggle name="smartTierFlag" [(ngModel)]="form.smartTierFlag"/>
+            </clr-toggle-wrapper>
+            <div *ngIf="form.smartTierFlag">
+              <clr-select-container class="selectClass">
+                <label style="color: #9F9F9F;">{{'vmfs.smartTierPolicy' | translate}}</label>
+                <select clrSelect [(ngModel)]="form.smartTier" name="smartTier">
+                  <option value="0">{{'rdm.notMove' | translate}}</option>
+                  <option value="1">{{'rdm.autoMove' | translate}}</option>
+                  <option value="2">{{'rdm.highPMove' | translate}}</option>
+                  <option value="3">{{'rdm.lowPMove' | translate}}</option>
+                </select>
+                <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+              </clr-select-container>
+            </div>
             <!--b.QoS 设置 -->
-            <clr-toggle-wrapper  style="margin-top: 1.2rem;width: 6rem;" class="selectClass">
+            <clr-toggle-wrapper  style="margin-top: 1.2rem;width: 6rem;" class="selectClass" *ngIf="form.storage_id">
               <label>{{'nfs.qosPolicy' | translate}}</label>
               <input type="checkbox" clrToggle name="qosFlag" [(ngModel)]="form.qosFlag"/>
             </clr-toggle-wrapper>
             <!-- 控制策略 -->
             <div *ngIf="form.qosFlag">
-              <clr-radio-container clrInline>
+                <!-- 控制策略 -->
+              <clr-checkbox-container clrInline>
                 <label style="color: #9F9F9F;">{{'vmfs.controlPolicy' | translate}}</label>
-                <clr-radio-wrapper>
-                  <input type="radio" clrRadio name="control_policy" value="1" [(ngModel)]="form.control_policy"/>
+                <!--上限-->
+                <clr-checkbox-wrapper>
+                  <input type="checkbox" id="control_policyUpper" clrCheckbox (change)="controlPolicyChangeFunc('control_policyUpper', 'control_policyLower', false, form, true);" name="control_policyUpper" />
                   <label>{{'vmfs.upperLimitControl' | translate}}</label>
-                </clr-radio-wrapper>
-                <clr-radio-wrapper>
-                  <input type="radio" clrRadio name="control_policy" value="0" [(ngModel)]="form.control_policy" />
+                </clr-checkbox-wrapper>
+                <!--下限-->
+                <clr-checkbox-wrapper *ngIf="!showLowerFlag">
+                  <input type="checkbox" id="control_policyLower" clrCheckbox (change)="controlPolicyChangeFunc('control_policyUpper', 'control_policyLower', false, form, false);" name="control_policyLower" />
                   <label>{{'vmfs.lowerLimitControl' | translate}}</label>
-                </clr-radio-wrapper>
-              </clr-radio-container>
+                </clr-checkbox-wrapper>
+              </clr-checkbox-container>
               <!-- 交通管制对象 带宽 上限-->
-              <clr-checkbox-container *ngIf="form.control_policy === '1'">
+              <clr-checkbox-container *ngIf="form.control_policyUpper === '1'">
                 <label style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
                 <clr-checkbox-wrapper>
                   <input type="checkbox" [(ngModel)]="form.maxbandwidthChoose" name="maxbandwidthChoose" clrCheckbox/>
@@ -453,7 +473,7 @@
                 </clr-checkbox-wrapper>
               </clr-checkbox-container>
               <!-- 交通管制对象 IOPS 上限-->
-              <clr-checkbox-container *ngIf="form.control_policy === '1'">
+              <clr-checkbox-container *ngIf="form.control_policyUpper === '1'">
                 <label></label>
                 <clr-checkbox-wrapper>
                   <input type="checkbox" [(ngModel)]="form.maxiopsChoose" name="maxiopsChoose" clrCheckbox/>
@@ -463,40 +483,54 @@
                   </label>
                 </clr-checkbox-wrapper>
               </clr-checkbox-container>
-
-              <!-- 交通管制对象 带宽 下限-->
-              <clr-checkbox-container *ngIf="form.control_policy === '0'">
-                <label style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
-                <clr-checkbox-wrapper>
-                  <input type="checkbox" [(ngModel)]="form.minbandwidthChoose" name="minbandwidthChoose" clrCheckbox/>
-                  <label style="width: 190px;">
-                    {{'vmfs.bandwidthLimitLower' | translate}}
-                    <input type="number" [(readOnly)]="!form.minbandwidthChoose" min="0" class="inputOneLine" name="minbandwidth" [(ngModel)]="form.minbandwidth" (blur)="qosBlur('add', 'minbandwidth');"/>{{'vmfs.unitM' | translate}}
-                  </label>
-                </clr-checkbox-wrapper>
-              </clr-checkbox-container>
-              <!-- 交通管制对象 IOPS 下限-->
-              <clr-checkbox-container *ngIf="form.control_policy === '0'">
-                <label></label>
-                <clr-checkbox-wrapper>
-                  <input type="checkbox" [(ngModel)]="form.miniopsChoose" name="minbandwidthChoose" clrCheckbox/>
-                  <label style="width: 190px;">
-                    {{'vmfs.IOPSLimitLower' | translate}}
-                    <input type="number" [(readOnly)]="!form.miniopsChoose" min="0" class="inputOneLine" name="miniops" [(ngModel)]="form.miniops" (blur)="qosBlur('add', 'miniops');"/>
-                  </label>
-                </clr-checkbox-wrapper>
-              </clr-checkbox-container>
-              <!-- 交通管制对象 latency 时延-->
-              <clr-checkbox-container *ngIf="form.control_policy === '0'">
-                <label></label>
-                <clr-checkbox-wrapper>
-                  <input type="checkbox" [(ngModel)]="form.latencyChoose" name="latencyChoose" clrCheckbox/>
-                  <label style="width: 190px;">
-                    {{'vmfs.latencyMax' | translate}}
-                    <input type="number" [(readOnly)]="!form.latencyChoose" min="0" class="inputOneLine" name="latency" [(ngModel)]="form.latency" (blur)="qosBlur('add', 'latency');"/>{{'vmfs.latencyUnit' | translate}}
-                  </label>
-                </clr-checkbox-wrapper>
-              </clr-checkbox-container>
+              <div *ngIf="!showLowerFlag">
+                <!-- 交通管制对象 带宽 下限-->
+                <clr-checkbox-container >
+                  <label *ngIf="form.control_policyLower == '0' && form.control_policyUpper != '1'" style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
+                  <label *ngIf="form.control_policyLower == '0' && form.control_policyUpper == '1'" style="color: #9F9F9F;"></label>
+                  <clr-checkbox-wrapper *ngIf="form.control_policyLower == '0'">
+                    <input type="checkbox" [(ngModel)]="form.minbandwidthChoose" name="minbandwidthChoose" clrCheckbox/>
+                    <label style="width: 190px;">
+                      {{'vmfs.bandwidthLimitLower' | translate}}
+                      <input type="number" [(readOnly)]="!form.minbandwidthChoose" min="0" class="inputOneLine" name="minbandwidth" [(ngModel)]="form.minbandwidth" (blur)="qosBlur('add', 'minbandwidth');"/>{{'vmfs.unitM' | translate}}
+                    </label>
+                  </clr-checkbox-wrapper>
+                </clr-checkbox-container>
+                <!-- 交通管制对象 IOPS 下限-->
+                <clr-checkbox-container *ngIf="form.control_policyLower === '0'">
+                  <label></label>
+                  <clr-checkbox-wrapper>
+                    <input type="checkbox" [(ngModel)]="form.miniopsChoose" name="minbandwidthChoose" clrCheckbox/>
+                    <label style="width: 190px;">
+                      {{'vmfs.IOPSLimitLower' | translate}}
+                      <input type="number" [(readOnly)]="!form.miniopsChoose" min="0" class="inputOneLine" name="miniops" [(ngModel)]="form.miniops" (blur)="qosBlur('add', 'miniops');"/>
+                    </label>
+                  </clr-checkbox-wrapper>
+                </clr-checkbox-container>
+                <!-- 交通管制对象 latency 时延-->
+                <clr-checkbox-container *ngIf="form.control_policyLower === '0'">
+                  <label></label>
+                  <clr-checkbox-wrapper *ngIf="!latencyIsSelect">
+                    <input type="checkbox" [(ngModel)]="form.latencyChoose" name="latencyChoose" clrCheckbox/>
+                    <label style="width: 190px;">
+                      {{'vmfs.latencyMax' | translate}}
+                      <input  *ngIf="!latencyIsSelect" type="number" [(readOnly)]="!form.latencyChoose" min="0" class="inputOneLine" name="latency" [(ngModel)]="form.latency" (blur)="qosBlur('add', 'latency');"/>
+                      {{'vmfs.latencyUnit' | translate}}
+                    </label>
+                  </clr-checkbox-wrapper>
+                  <clr-checkbox-wrapper *ngIf="latencyIsSelect">
+                    <input type="checkbox" [(ngModel)]="form.latencyChoose" name="latencyChoose" clrCheckbox/>
+                    <label style="width: 190px;">
+                      {{'vmfs.latencyMax' | translate}}
+                      <select [(disabled)]="!form.latencyChoose" [(ngModel)]="form.latency" name="latency" style="height: 1.2rem;width: 54%;border: none;border-bottom: 1px solid;border-bottom-color: var(--clr-forms-border-color, #b3b3b3);">
+                        <option value="500">500</option>
+                        <option value="1500">1500</option>
+                      </select>
+                      {{'vmfs.latencyUnitUs' | translate}}
+                    </label>
+                  </clr-checkbox-wrapper>
+                </clr-checkbox-container>
+              </div>
             </div>
 
             <!--c.QoS 资源调优 -->
@@ -505,11 +539,13 @@
             </clr-input-container>
             <clr-select-container class="selectClass">
               <label style="color: #9F9F9F;">{{'vmfs.provisioningType' | translate}}</label>
-              <select clrSelect [(ngModel)]="form.alloctype" name="alloctype" >
+              <select clrSelect [(ngModel)]="form.alloctype" name="alloctype" required>
                 <option value="thin">thin</option>
-                <option value="thick">thick</option>
+                <option [hidden]="!showAlloctypeThick" value="thick">thick</option>
               </select>
+              <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
             </clr-select-container>
+
           </ng-container>
 
         </form>
@@ -569,6 +605,24 @@
           </clr-checkbox-wrapper>
         </clr-checkbox-container>
         <div *ngIf="!isServiceLevelData">
+          <!--a.SmartTie 设置 -->
+          <clr-toggle-wrapper  style="margin-top: 1.2rem;width: 6rem;" class="selectClass" *ngIf="showSmartTierFlag">
+            <label>{{'vmfs.smartTier' | translate}}</label>
+            <input type="checkbox" clrToggle name="smartTierFlag" [(ngModel)]="modifyForm.smartTierFlag"/>
+          </clr-toggle-wrapper>
+          <div *ngIf="modifyForm.smartTierFlag">
+            <clr-select-container class="selectClass">
+              <label style="color: #9F9F9F;">{{'vmfs.smartTierPolicy' | translate}}</label>
+              <select clrSelect [(ngModel)]="modifyForm.smartTier" name="smartTier">
+                <option value="0">{{'rdm.notMove' | translate}}</option>
+                <option value="1">{{'rdm.autoMove' | translate}}</option>
+                <option value="2">{{'rdm.highPMove' | translate}}</option>
+                <option value="3">{{'rdm.lowPMove' | translate}}</option>
+              </select>
+              <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+            </clr-select-container>
+          </div>
+
           <!--b.QoS 设置 -->
           <clr-toggle-wrapper  style="margin-top: 1.2rem;width: 6rem;" class="selectClass">
             <label>{{'nfs.qosPolicy' | translate}}</label>
@@ -576,19 +630,21 @@
           </clr-toggle-wrapper>
           <div *ngIf="modifyForm.qosFlag">
             <!-- 控制策略 -->
-            <clr-radio-container clrInline>
+            <clr-checkbox-container clrInline>
               <label style="color: #9F9F9F;">{{'vmfs.controlPolicy' | translate}}</label>
-              <clr-radio-wrapper>
-                <input type="radio" clrRadio name="control_policy" value="1" [(ngModel)]="modifyForm.control_policy" />
+              <!--上限-->
+              <clr-checkbox-wrapper>
+                <input type="checkbox" id="editControl_policyUpper" clrCheckbox (change)="controlPolicyChangeFunc('editControl_policyUpper', 'editControl_policyLower', true, modifyForm, true);" />
                 <label>{{'vmfs.upperLimitControl' | translate}}</label>
-              </clr-radio-wrapper>
-              <clr-radio-wrapper>
-                <input type="radio" clrRadio name="control_policy" value="0" [(ngModel)]="modifyForm.control_policy" />
+              </clr-checkbox-wrapper>
+              <!--下限-->
+              <clr-checkbox-wrapper *ngIf="!showLowerFlag">
+                <input type="checkbox" id="editControl_policyLower" clrCheckbox (change)="controlPolicyChangeFunc('editControl_policyUpper', 'editControl_policyLower', true, modifyForm, false);"/>
                 <label>{{'vmfs.lowerLimitControl' | translate}}</label>
-              </clr-radio-wrapper>
-            </clr-radio-container>
+              </clr-checkbox-wrapper>
+            </clr-checkbox-container>
             <!-- 交通管制对象 带宽 上限-->
-            <clr-checkbox-container *ngIf="modifyForm.control_policy === '1'">
+            <clr-checkbox-container *ngIf="modifyForm.control_policyUpper === '1'">
               <label style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
               <clr-checkbox-wrapper>
                 <input type="checkbox" [(ngModel)]="modifyForm.maxbandwidthChoose" name="maxbandwidthChoose" clrCheckbox/>
@@ -600,7 +656,7 @@
               </clr-checkbox-wrapper>
             </clr-checkbox-container>
             <!-- 交通管制对象 IOPS 上限-->
-            <clr-checkbox-container *ngIf="modifyForm.control_policy === '1'">
+            <clr-checkbox-container *ngIf="modifyForm.control_policyUpper === '1'">
               <label></label>
               <clr-checkbox-wrapper>
                 <input type="checkbox" [(ngModel)]="modifyForm.maxiopsChoose" name="maxiopsChoose" clrCheckbox/>
@@ -613,7 +669,7 @@
             </clr-checkbox-container>
 
             <!-- 交通管制对象 带宽 下限-->
-            <clr-checkbox-container *ngIf="modifyForm.control_policy === '0'">
+            <clr-checkbox-container *ngIf="modifyForm.control_policyLower === '0'">
               <label style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
               <clr-checkbox-wrapper>
                 <input type="checkbox" [(ngModel)]="modifyForm.minbandwidthChoose" name="minbandwidthChoose" clrCheckbox/>
@@ -625,26 +681,36 @@
               </clr-checkbox-wrapper>
             </clr-checkbox-container>
             <!-- 交通管制对象 IOPS 下限-->
-            <clr-checkbox-container *ngIf="modifyForm.control_policy === '0'">
+            <clr-checkbox-container *ngIf="modifyForm.control_policyLower === '0'">
               <label></label>
               <clr-checkbox-wrapper>
-                <input type="checkbox" [(ngModel)]="modifyForm.miniopsChoose" name="miniopsChoose" clrCheckbox/>
-                <label>
+                <input type="checkbox" [(ngModel)]="modifyForm.miniopsChoose" name="minbandwidthChoose" clrCheckbox/>
+                <label style="width: 190px;">
                   {{'vmfs.IOPSLimitLower' | translate}}
-                  <input type="number" [(readOnly)]="!modifyForm.miniopsChoose" class="inputOneLine" name="min_iops" min="0"
-                         [(ngModel)]="modifyForm.min_iops" (blur)="qosBlur('modify', 'min_iops');"/>
+                  <input type="number" [(readOnly)]="!modifyForm.miniopsChoose" min="0" class="inputOneLine" name="min_iops" [(ngModel)]="modifyForm.min_iops" (blur)="qosBlur('add', 'min_iops');"/>
                 </label>
               </clr-checkbox-wrapper>
             </clr-checkbox-container>
             <!-- 交通管制对象 latency 时延-->
-            <clr-checkbox-container *ngIf="modifyForm.control_policy === '0'">
+            <clr-checkbox-container *ngIf="modifyForm.control_policyLower === '0'">
               <label></label>
-              <clr-checkbox-wrapper>
+              <clr-checkbox-wrapper *ngIf="!latencyIsSelect">
                 <input type="checkbox" [(ngModel)]="modifyForm.latencyChoose" name="latencyChoose" clrCheckbox/>
-                <label>
+                <label style="width: 190px;">
                   {{'vmfs.latencyMax' | translate}}
-                  <input type="number" [(readOnly)]="!modifyForm.latencyChoose" class="inputOneLine" name="latency" min="0"
-                         [(ngModel)]="modifyForm.latency" (blur)="qosBlur('modify', 'latency');"/>{{'vmfs.latencyUnit' | translate}}
+                  <input  *ngIf="!latencyIsSelect" type="number" [(readOnly)]="!modifyForm.latencyChoose" min="0" class="inputOneLine" name="latency" [(ngModel)]="modifyForm.latency" (blur)="qosBlur('add', 'latency');"/>
+                  {{'vmfs.latencyUnit' | translate}}
+                </label>
+              </clr-checkbox-wrapper>
+              <clr-checkbox-wrapper *ngIf="latencyIsSelect">
+                <input type="checkbox" [(ngModel)]="modifyForm.latencyChoose" name="latencyChoose" clrCheckbox/>
+                <label style="width: 190px;">
+                  {{'vmfs.latencyMax' | translate}}
+                  <select [(disabled)]="!modifyForm.latencyChoose" [(ngModel)]="modifyForm.latency" name="latency" style="height: 1.2rem;width: 54%;border: none;border-bottom: 1px solid;border-bottom-color: var(--clr-forms-border-color, #b3b3b3);">
+                    <option value="500">500</option>
+                    <option value="1500">1500</option>
+                  </select>
+                  {{'vmfs.latencyUnitUs' | translate}}
                 </label>
               </clr-checkbox-wrapper>
             </clr-checkbox-container>
@@ -826,6 +892,7 @@
     <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
     <div class="modal-body">
       <div *ngIf="isOperationErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.reclaimError' | translate}}</div>
+      <div *ngIf="isReclaimErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.reclaim.error' | translate}}</div>
       <div *ngIf="modalHandleLoading" class="loadingDiv">
         <span>
           {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
@@ -835,7 +902,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="reclaimShow=false">{{'menu.cancel' | translate}}</button>
-      <button type="submit" class="btn btn-primary" (click)="reclaimHandleFunc()">{{'menu.ok' | translate}}</button>
+      <button type="submit" class="btn btn-primary" [disabled]="isReclaimErr" (click)="reclaimHandleFunc()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 

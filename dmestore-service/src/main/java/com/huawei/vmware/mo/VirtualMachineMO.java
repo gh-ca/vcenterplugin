@@ -5,27 +5,35 @@ import com.huawei.vmware.util.VmwareContext;
 import com.huawei.vmware.util.VmwareHelper;
 
 import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.ParaVirtualSCSIController;
 import com.vmware.vim25.VirtualDevice;
 import com.vmware.vim25.VirtualDeviceConfigSpec;
 import com.vmware.vim25.VirtualDeviceConfigSpecFileOperation;
 import com.vmware.vim25.VirtualDeviceConfigSpecOperation;
+import com.vmware.vim25.VirtualDeviceOption;
 import com.vmware.vim25.VirtualDisk;
 import com.vmware.vim25.VirtualDiskFlatVer2BackingInfo;
 import com.vmware.vim25.VirtualDiskMode;
 import com.vmware.vim25.VirtualDiskRawDiskMappingVer1BackingInfo;
 import com.vmware.vim25.VirtualDiskType;
-import com.vmware.vim25.VirtualIDEController;
+import com.vmware.vim25.VirtualHardwareOption;
 import com.vmware.vim25.VirtualLsiLogicController;
+import com.vmware.vim25.VirtualMachineConfigOption;
 import com.vmware.vim25.VirtualMachineConfigSpec;
 import com.vmware.vim25.VirtualMachineFileInfo;
 import com.vmware.vim25.VirtualMachineRuntimeInfo;
 import com.vmware.vim25.VirtualSCSIController;
+import com.vmware.vim25.VirtualSCSIControllerOption;
+import com.vmware.vim25.VirtualSCSISharing;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * VirtualMachineMO
@@ -41,6 +49,8 @@ public class VirtualMachineMO extends BaseMO {
     private final int unit = 1024;
 
     private final int failResult = -1;
+
+    private ManagedObjectReference _vmEnvironmentBrowser = null;
 
     /**
      * VirtualMachineMO
@@ -112,12 +122,10 @@ public class VirtualMachineMO extends BaseMO {
      */
     public void createDisk(String vmdkDatastorePath, VirtualDiskType diskType, VirtualDiskMode diskMode,
         String rdmDeviceName, long sizeInMb, ManagedObjectReference morDs, int controllerKey) throws Exception {
-        assert vmdkDatastorePath != null;
-        assert morDs != null;
-
-        // 2020-11-06 wangxiangyong 修改为SCSI
-        int ideControllerKey = getIDEDeviceControllerKey();
-        //int ideControllerKey = getLsiLogicControllerKey();
+        assert (vmdkDatastorePath != null);
+        assert (morDs != null);
+        Map<String, Integer> controllerKeyAndUnitNumMap = getControllerKeyAndUnitNum();
+        int ideControllerKey = controllerKeyAndUnitNumMap.get("controllerKey");
         if (controllerKey < 0) {
             controllerKey = ideControllerKey;
         }
@@ -125,6 +133,7 @@ public class VirtualMachineMO extends BaseMO {
         VirtualDisk newDisk = new VirtualDisk();
         if (diskType == VirtualDiskType.THIN || diskType == VirtualDiskType.PREALLOCATED
             || diskType == VirtualDiskType.EAGER_ZEROED_THICK) {
+
             VirtualDiskFlatVer2BackingInfo backingInfo = new VirtualDiskFlatVer2BackingInfo();
             backingInfo.setDiskMode(VirtualDiskMode.PERSISTENT.value());
             if (diskType == VirtualDiskType.THIN) {
@@ -132,11 +141,13 @@ public class VirtualMachineMO extends BaseMO {
             } else {
                 backingInfo.setThinProvisioned(false);
             }
+
             if (diskType == VirtualDiskType.EAGER_ZEROED_THICK) {
                 backingInfo.setEagerlyScrub(true);
             } else {
                 backingInfo.setEagerlyScrub(false);
             }
+
             backingInfo.setDatastore(morDs);
             backingInfo.setFileName(vmdkDatastorePath);
             newDisk.setBacking(backingInfo);
@@ -151,35 +162,129 @@ public class VirtualMachineMO extends BaseMO {
             if (diskType == VirtualDiskType.RDM) {
                 backingInfo.setDiskMode(diskMode.value());
             }
-
             backingInfo.setDatastore(morDs);
             backingInfo.setFileName(vmdkDatastorePath);
             newDisk.setBacking(backingInfo);
         }
-
-        int deviceNumber = getNextDeviceNumber(controllerKey);
-
+        int deviceNumber = controllerKeyAndUnitNumMap.get("unitNum");
+        VirtualMachineConfigSpec reConfigSpec = new VirtualMachineConfigSpec();
+        VirtualDeviceConfigSpec deviceConfigSpec = new VirtualDeviceConfigSpec();
         newDisk.setControllerKey(controllerKey);
         newDisk.setKey(-deviceNumber);
         newDisk.setUnitNumber(deviceNumber);
-        newDisk.setCapacityInKB(sizeInMb * unit);
-
-        VirtualDeviceConfigSpec deviceConfigSpec = new VirtualDeviceConfigSpec();
+        newDisk.setCapacityInKB(sizeInMb * 1024);
         deviceConfigSpec.setDevice(newDisk);
         deviceConfigSpec.setFileOperation(VirtualDeviceConfigSpecFileOperation.CREATE);
         deviceConfigSpec.setOperation(VirtualDeviceConfigSpecOperation.ADD);
-
-        VirtualMachineConfigSpec reConfigSpec = new VirtualMachineConfigSpec();
+        boolean isFindScsiController = controllerKeyAndUnitNumMap.get("isFindScsi") == 0;
+        boolean findControllerButCanNotUse = (isFindScsiController && ideControllerKey == 0);
+        if (!isFindScsiController || findControllerButCanNotUse) {
+            VirtualDeviceConfigSpec controllerspec = new VirtualDeviceConfigSpec();
+            VirtualLsiLogicController scsiController = new VirtualLsiLogicController();
+            int newControllerKey = isFindScsiController ? getIDEDeviceControllerKey() : 1000;
+            scsiController.setKey(newControllerKey);
+            scsiController.setBusNumber(isFindScsiController ? getSCSIControllerNextBusNum() : 0);
+            scsiController.setSharedBus(VirtualSCSISharing.NO_SHARING);
+            controllerspec.setDevice(scsiController);
+            controllerspec.setOperation(VirtualDeviceConfigSpecOperation.ADD);
+            reConfigSpec.getDeviceChange().add(controllerspec);
+            logger.info("create new SCSIController!controllerKey={},busNumber={}", newControllerKey,
+                scsiController.getBusNumber());
+            newDisk.setControllerKey(newControllerKey);
+            newDisk.setKey(0);
+            newDisk.setUnitNumber(0);
+        }
         reConfigSpec.getDeviceChange().add(deviceConfigSpec);
-
         ManagedObjectReference morTask = context.getService().reconfigVMTask(mor, reConfigSpec);
         boolean result = context.getVimClient().waitForTask(morTask);
+
         if (!result) {
             throw new Exception(
                 "Unable to create disk " + vmdkDatastorePath + " due to " + TaskMO.getTaskFailureInfo(context,
                     morTask));
         }
+
         context.waitForTaskProgressDone(morTask);
+        logger.info("vCenter API trace - createDisk() done(successfully)");
+    }
+
+    private int getSCSIControllerNextBusNum() throws Exception {
+        List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, "config.hardware.device");
+        int busNumber = 0;
+        for (VirtualDevice device : devices) {
+            if (device instanceof VirtualSCSIController) {
+                int tempBusNum = ((VirtualSCSIController) device).getBusNumber();
+                if (tempBusNum > busNumber) {
+                    busNumber = tempBusNum;
+                }
+            }
+        }
+
+        return ++busNumber;
+    }
+
+    public Map<String, Integer> getControllerKeyAndUnitNum() throws Exception {
+        List<VirtualDisk> devices = context.getVimClient().getDynamicProperty(mor, "config.hardware.device");
+        int controllerKey = 0;
+        int unitNum = 0;
+        boolean isFindScsiController = false;
+        for (VirtualDevice device : devices) {
+            if (device instanceof VirtualSCSIController) {
+                isFindScsiController = true;
+                int key = device.getKey();
+                int nextUnitNum = getNextDeviceNumber(key);
+                String className = device.getClass().getName();
+                int maxSlot = getMaxSlot(className.substring(className.lastIndexOf(".") + 1));
+                if (maxSlot > nextUnitNum) {
+                    controllerKey = key;
+                    unitNum = nextUnitNum;
+                    break;
+                }
+            }
+        }
+        Map<String, Integer> map = new HashMap();
+        map.put("controllerKey", controllerKey);
+        map.put("unitNum", unitNum);
+        map.put("isFindScsi", isFindScsiController ? 0 : -1);
+
+        return map;
+    }
+
+    public int getMaxSlot(String type) throws Exception {
+        VirtualHardwareOption vmwareoptio = getVirtualHardwareOption();
+        List<VirtualDeviceOption> virtualDeviceOptionList = vmwareoptio.getVirtualDeviceOption();
+        for (VirtualDeviceOption virtualDeviceOption : virtualDeviceOptionList) {
+            if (virtualDeviceOption.getType().equals(type)) {
+                return ((VirtualSCSIControllerOption) virtualDeviceOption).getNumSCSIDisks().getMax();
+            }
+        }
+        return 16;
+    }
+
+    private ManagedObjectReference getEnvironmentBrowser() throws Exception {
+        if (_vmEnvironmentBrowser == null) {
+            _vmEnvironmentBrowser = context.getVimClient().getMoRefProp(mor, "environmentBrowser");
+        }
+        return _vmEnvironmentBrowser;
+    }
+
+    public VirtualHardwareOption getVirtualHardwareOption() throws Exception {
+        VirtualMachineConfigOption vmConfigOption = context.getService()
+            .queryConfigOption(getEnvironmentBrowser(), null, null);
+        return vmConfigOption.getHardwareOptions();
+    }
+
+    private int getNextMaxKey() throws Exception {
+        List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, "config.hardware.device");
+        int maxKey = 0;
+        for (VirtualDevice device : devices) {
+            Integer key = device.getKey();
+            if (key != null && key.intValue() > maxKey) {
+                maxKey = key.intValue();
+            }
+        }
+
+        return maxKey++;
     }
 
     /**
@@ -267,17 +372,15 @@ public class VirtualMachineMO extends BaseMO {
     }
 
     public int getIDEDeviceControllerKey() throws Exception {
-        List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, configDeviceStr);
-        if (devices != null && devices.size() > 0) {
-            for (VirtualDevice device : devices) {
-                if (device instanceof VirtualIDEController) {
-                    return device.getKey();
-                }
+        List<VirtualDisk> devices = context.getVimClient().getDynamicProperty(mor, "config.hardware.device");
+        for (VirtualDevice device : devices) {
+            if (device instanceof VirtualLsiLogicController || device instanceof ParaVirtualSCSIController) {
+                int key = device.getKey();
+                return key;
             }
         }
 
-        assert (false);
-        throw new Exception("IDE Controller Not Found");
+        return 0;
     }
 
     /**
@@ -288,26 +391,33 @@ public class VirtualMachineMO extends BaseMO {
      * @throws Exception Exception
      */
     public int getNextDeviceNumber(int controllerKey) throws Exception {
-        List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, configDeviceStr);
-
-        List<Integer> existingUnitNumbers = new ArrayList<Integer>();
-        int deviceNumber = 0;
-        int scsiControllerKey = getScsiDeviceControllerKeyNoException();
-        if (devices != null && devices.size() > 0) {
-            for (VirtualDevice device : devices) {
-                if (device.getControllerKey() != null && device.getControllerKey().intValue() == controllerKey) {
-                    existingUnitNumbers.add(device.getUnitNumber());
+        List<VirtualDevice> devices = context.getVimClient().getDynamicProperty(mor, "config.hardware.device");
+        int unitNumber = 0;
+        List<Integer> unitNums = new ArrayList<>();
+        for (VirtualDevice device : devices) {
+            Integer ctrlKey = device.getControllerKey();
+            if (ctrlKey != null && ctrlKey == controllerKey) {
+                Integer unitNum = device.getUnitNumber();
+                unitNums.add(unitNum);
+                if (unitNum > unitNumber) {
+                    unitNumber = unitNum;
                 }
             }
         }
-        while (true) {
-            if (!existingUnitNumbers.contains(Integer.valueOf(deviceNumber))) {
-                if (controllerKey != scsiControllerKey || !VmwareHelper.isReservedScsiDeviceNumber(deviceNumber)) {
-                    break;
+        unitNumber++;
+        if (unitNumber == 7) {
+            unitNumber++;
+        }
+        Collections.sort(unitNums);
+        int tempUnitNumber = 0;
+        for (int i = 0; i < unitNums.size() - 1; i++) {
+            if (unitNums.get(i + 1) - unitNums.get(i) > 1) {
+                tempUnitNumber = unitNums.get(i) + 1;
+                if (tempUnitNumber != 7) {
+                    return tempUnitNumber;
                 }
             }
-            ++deviceNumber;
         }
-        return deviceNumber;
+        return unitNumber;
     }
 }

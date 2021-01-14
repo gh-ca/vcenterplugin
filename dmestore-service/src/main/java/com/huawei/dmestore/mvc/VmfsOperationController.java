@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -84,10 +85,11 @@ public class VmfsOperationController extends BaseController {
     public ResponseBodyBean recycleVmfs(final @RequestBody List<String> dsObjectIds) {
         LOG.info("recyclevmfs=={}", gson.toJson(dsObjectIds));
         try {
+            vmfsOperationService.canRecycleVmfsCapacity(dsObjectIds);
             vmfsOperationService.recycleVmfsCapacity(dsObjectIds);
             return success();
         } catch (DmeException e) {
-            return failure(e.getMessage());
+            return failure(e.getCode(),e.getMessage());
         }
     }
 
@@ -101,10 +103,32 @@ public class VmfsOperationController extends BaseController {
     public ResponseBodyBean recycleVmfsByDatastoreIds(final @RequestBody List<String> datastoreIds) {
         LOG.info("recyclevmfsbydatastoreids=={}", gson.toJson(datastoreIds));
         try {
+            boolean canrecycle=vmfsOperationService.canRecycleVmfsCapacity(datastoreIds);
+            if (!canrecycle) {
+                return failure("20883", "not support recycle thick vmfsDatastore ");
+            }
             vmfsOperationService.recycleVmfsCapacityByDataStoreIds(datastoreIds);
             return success();
         } catch (DmeException e) {
-            return failure(e.getMessage());
+            return failure(e.getCode(),e.getMessage());
+        }
+    }
+
+    /**
+     * canrecyclevmfsbydatastoreid
+     *
+     * @param datastoreId datastoreId
+     * @return ResponseBodyBean
+     */
+    @PostMapping("/canrecyclevmfsbydatastoreid")
+    public ResponseBodyBean canRecycleVmfsbyDatastoreid(final @RequestBody String datastoreId) {
+        LOG.info("canrecyclevmfsbydatastoreid=={}", gson.toJson(datastoreId));
+        try {
+            List<String> datastoreids = new ArrayList<>();
+            datastoreids.add(datastoreId);
+            return success(vmfsOperationService.canRecycleVmfsCapacity(datastoreids));
+        } catch (DmeException e) {
+            return failure(e.getCode(),e.getMessage());
         }
     }
 

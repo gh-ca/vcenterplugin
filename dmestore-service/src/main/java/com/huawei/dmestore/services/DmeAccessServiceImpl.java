@@ -441,6 +441,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     @Override
     public List<Map<String, Object>> getDmeHostGroups(String hostGroupName) throws DmeException {
+        LOG.info("== search oriented host begin ==");
         List<Map<String, Object>> relists = null;
         String getHostGroupsUrl = DmeConstants.GET_DME_HOSTGROUPS_URL;
         try {
@@ -449,8 +450,10 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
                 requestbody.put(NAME_FIELD, hostGroupName);
             }
+            LOG.info("== search oriented host group requestBody{}!",gson.toJson(requestbody));
             ResponseEntity responseEntity = access(getHostGroupsUrl, HttpMethod.POST,
                 requestbody == null ? null : gson.toJson(requestbody));
+            LOG.info("== search oriented host group responseBody{}!",gson.toJson(responseEntity));
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.getAsJsonArray(DmeConstants.HOSTGROUPS);
@@ -472,7 +475,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             LOG.error("url:{},error:{}", getHostGroupsUrl, e.toString());
             throw new DmeException(e.getMessage());
         }
-        LOG.info("getDmeHostgroups relists==={}", relists == null ? NULL_STRING : relists.size());
+        LOG.info("getDmeHostgroups relists==={}", relists == null ? NULL_STRING : relists.toString());
         return relists;
     }
 
@@ -657,6 +660,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         String getHostGroupUrl = DmeConstants.GET_DME_HOSTGROUP_URL.replace("{hostgroup_id}", hostGroupId);
         try {
             ResponseEntity responseEntity = access(getHostGroupUrl, HttpMethod.GET, null);
+            LOG.info("==get oriented host group responseBody==",gson.toJson(responseEntity));
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject vjson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 if (vjson != null) {

@@ -1,11 +1,16 @@
 package com.huawei.dmestore.utils;
 
+import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.model.StorageTypeShow;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -246,19 +251,27 @@ public class ToolUtils {
         return re;
     }
 
+    /**
+     * 判断逻辑，只要vcenter中扫描的主机启动器包含dme主机中的启动器，符合主机一致性
+     *
+     * @param a vcenter 中扫描的主机中的启动器
+     * @param b DME 中扫描的主机启动器
+     * @param <T> 参数类型
+     * @return boolean 包含或者不包含
+     */
     public static <T extends Comparable<T>> boolean compare(List<T> a, List<T> b) {
-        if (a.size() != b.size()) {
-            return false;
-        }
-        Collections.sort(a);
-        Collections.sort(b);
-        for (int index = 0; index < a.size(); index++) {
-            if (!a.get(index).equals(b.get(index))) {
-                return false;
+        int count = 0;
+        for (int index = 0; index < b.size(); index++) {
+            if (a.contains(b.get(index))) {
+                count++;
+                if (count == b.size()) {
+                    return true;
+                }
             }
         }
-        return true;
+        return false;
     }
+
 
     public static boolean jsonIsNull(JsonElement obj) {
         boolean re = false;
@@ -349,5 +362,60 @@ public class ToolUtils {
         JsonObject condition = new JsonObject();
         condition.add("constraint", constraint);
         return condition.toString();
+    }
+
+    public static StorageTypeShow getStorageTypeShow(String storageModel) throws DmeException {
+        StorageTypeShow storageTypeShow = new StorageTypeShow();
+        String[] model = storageModel.split(" ");
+        List<String> list = Arrays.asList(model);
+        if (list.contains("OceanStor")){
+            // OceanStor Dorado 3000 V6
+            storageTypeShow.setQosTag(1);
+            storageTypeShow.setWorkLoadShow(1);
+            storageTypeShow.setAllocationTypeShow(2);
+            storageTypeShow.setOwnershipController(false);
+            storageTypeShow.setStorageDetailTag(2);
+            storageTypeShow.setDeduplicationShow(false);
+            storageTypeShow.setCompressionShow(false);
+            storageTypeShow.setCapacityInitialAllocation(false);
+            storageTypeShow.setSmartTierShow(false);
+            storageTypeShow.setPrefetchStrategyShow(false);
+        }else {
+            if (list.contains("V3") && list.get(0).contains("Dorado")){
+                // Dorado v3
+                storageTypeShow.setQosTag(3);
+                storageTypeShow.setWorkLoadShow(1);
+                storageTypeShow.setAllocationTypeShow(2);
+                storageTypeShow.setOwnershipController(true);
+                storageTypeShow.setStorageDetailTag(1);
+                storageTypeShow.setDeduplicationShow(false);
+                storageTypeShow.setCompressionShow(false);
+                storageTypeShow.setCapacityInitialAllocation(false);
+                storageTypeShow.setSmartTierShow(false);
+                storageTypeShow.setPrefetchStrategyShow(false);
+            }else{
+                // v3/v5
+                storageTypeShow.setQosTag(2);
+                storageTypeShow.setWorkLoadShow(2);
+                storageTypeShow.setAllocationTypeShow(1);
+                storageTypeShow.setOwnershipController(true);
+                storageTypeShow.setStorageDetailTag(2);
+                storageTypeShow.setDeduplicationShow(true);
+                storageTypeShow.setCompressionShow(true);
+                storageTypeShow.setCapacityInitialAllocation(true);
+                storageTypeShow.setSmartTierShow(true);
+                storageTypeShow.setPrefetchStrategyShow(true);
+            }
+        }
+        return storageTypeShow;
+    }
+
+    public static boolean isDorado(String storageModel) {
+        String[] model = storageModel.split(" ");
+        List<String> list = Arrays.asList(model);
+        if (list.contains("OceanStor")){
+            return true;
+        }
+        return false;
     }
 }

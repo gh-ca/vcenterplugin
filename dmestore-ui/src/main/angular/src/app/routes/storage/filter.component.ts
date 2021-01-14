@@ -1126,7 +1126,7 @@ export class LogicRunningStatusFilter implements ClrDatagridFilterInterface<Logi
         <label>{{'vmfs.filter.all' | translate}}</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="activated"/>
+        <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="ACTIVATED"/>
         <label>{{'enum.status.activated' | translate}}</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
@@ -1146,9 +1146,9 @@ export class LogicStatusFilter implements ClrDatagridFilterInterface<LogicPort>{
     if (!this.status || this.status == 'all') {
       return true;
     } else {
-      const  connectStatus = item.runningStatus;
+      const  connectStatus = item.operationalStatus;
       if (this.status == 'others') {
-        return connectStatus != 'activated';
+        return connectStatus != 'ACTIVATED';
       } else {
         return this.status == connectStatus;
       }
@@ -1165,5 +1165,111 @@ export class LogicStatusFilter implements ClrDatagridFilterInterface<LogicPort>{
 
   initStatus() {
     this.status = undefined;
+  }
+}
+
+@Component({
+  selector: "logic-ddns-status-filter",
+  template: `
+    <clr-radio-container>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="ddnsStatus" (change)="changeFunc($event)" [(ngModel)]="ddnsStatus" value="all" />
+        <label>{{'vmfs.filter.all' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="ddnsStatus" (change)="changeFunc($event)" [(ngModel)]="ddnsStatus" value="ENABLE"/>
+        <label>{{'enum.status.enable' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="ddnsStatus" (change)="changeFunc($event)" [(ngModel)]="ddnsStatus" value="INVALID"/>
+        <label>{{'enum.status.invalid' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="ddnsStatus" (change)="changeFunc($event)" [(ngModel)]="ddnsStatus" value="notActivated"/>
+        <label>{{'enum.status.notActivated' | translate}}</label>
+      </clr-radio-wrapper>
+    </clr-radio-container>
+  `,
+})
+export class LogicDdnsStatusFilter implements ClrDatagridFilterInterface<LogicPort>{
+
+  changes = new Subject<any>();
+  ddnsStatus;
+  readonly state: any;
+
+  accepts(item: LogicPort): boolean {
+    if (!this.ddnsStatus || this.ddnsStatus == 'all') {
+      return true;
+    } else {
+      const  ddnsStatus = item.ddnsStatus;
+      if (this.ddnsStatus == 'notActivated') {
+        return ddnsStatus != 'ENABLE' && ddnsStatus != 'INVALID';
+      } else {
+        return this.ddnsStatus == ddnsStatus;
+      }
+    }
+  }
+
+  changeFunc(value: any) {
+    this.changes.next();
+  }
+
+  isActive(): boolean {
+    return true;
+  }
+
+  initStatus() {
+    this.ddnsStatus = undefined;
+  }
+}
+
+@Component({
+  selector: "logic-role-filter",
+  template: `
+    <clr-radio-container>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="role" (change)="changeFunc($event)" [(ngModel)]="role" value="all" />
+        <label>{{'vmfs.filter.all' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="role" (change)="changeFunc($event)" [(ngModel)]="role" value="1"/>
+        <label>{{'enum.status.service' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="role" (change)="changeFunc($event)" [(ngModel)]="role" value="2"/>
+        <label>{{'enum.status.management' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="role" (change)="changeFunc($event)" [(ngModel)]="role" value="3"/>
+        <label>{{'enum.status.managementAndService' | translate}}</label>
+      </clr-radio-wrapper>
+    </clr-radio-container>
+  `,
+})
+export class LogicRoleFilter implements ClrDatagridFilterInterface<LogicPort>{
+
+  changes = new Subject<any>();
+  role;
+  readonly state: any;
+
+  accepts(item: LogicPort): boolean {
+    if (!this.role || this.role == 'all') {
+      return true;
+    } else {
+      const  ddnsStatus = item.role;
+      return this.role == ddnsStatus;
+    }
+  }
+
+  changeFunc(value: any) {
+    this.changes.next();
+  }
+
+  isActive(): boolean {
+    return true;
+  }
+
+  initStatus() {
+    this.role = undefined;
   }
 }

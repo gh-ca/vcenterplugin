@@ -135,8 +135,8 @@ public final class DpSqlFileConstants {
         + "  volume_fs VARCHAR(255), " + "  storage_device_id VARCHAR(255), " + "  share_id VARCHAR(255), "
         + "  share_name VARCHAR(255), " + "  fs_id VARCHAR(255), " + "  fs_name VARCHAR(255), "
         + "  logicport_id VARCHAR(255), " + "  logicport_name VARCHAR(255), " + "  store_type VARCHAR(255), "
-        + "  createTime datetime DEFAULT NOW(), " + "  updateTime datetime DEFAULT NOW(), " + "  STATE int DEFAULT 1 "
-        + "  );";
+        + "  storage_type VARCHAR(255), " + "  createTime datetime DEFAULT NOW(), " + "  updateTime datetime DEFAULT NOW(), "
+        + "  STATE int DEFAULT 1 " + "  );";
 
     /**
      * DP_DME_TASK_INFO_SQL.

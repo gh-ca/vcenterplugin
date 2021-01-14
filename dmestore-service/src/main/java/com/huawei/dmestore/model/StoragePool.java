@@ -11,6 +11,10 @@ package com.huawei.dmestore.model;
  */
 public class StoragePool {
     /**
+     * 存储名称.
+     **/
+    private String storageName;
+    /**
      * 空闲容量.
      **/
     private Double freeCapacity;
@@ -133,6 +137,29 @@ public class StoragePool {
      * 时延.
      **/
     private Float maxLatency;
+
+    /**
+     * RAID级别--转化后的值.
+     **/
+    private String raidLevel;
+
+    /**
+     * getStorageName .
+     *
+     * @return String.
+     */
+    public String getStorageName() {
+        return storageName;
+    }
+
+    /**
+     * setStorageName
+     *
+     * @param param
+     */
+    public void setStorageName(final String param) {
+        this.storageName = param;
+    }
 
     /**
      * getFreeCapacity .
@@ -654,5 +681,13 @@ public class StoragePool {
      */
     public void setProtectionCapacity(final Double param) {
         this.protectionCapacity = param;
+    }
+
+    public String getRaidLevel() {
+        return raidLevel;
+    }
+
+    public void setRaidLevel(String raidLevel) {
+        this.raidLevel = raidLevel;
     }
 }

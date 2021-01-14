@@ -20,4 +20,12 @@ export class ExpandService {
   getVmfsById(objectId) {
     return this.http.get('accessvmfs/listvmfs?objectId='+objectId);
   }
+
+  /**
+   * 通过objectId 获取vmfs存储数据
+   * @param objectId
+   */
+  getStorageById(objectId) {
+    return this.http.get('accessvmware/relation?datastoreObjectId='+objectId);
+  }
 }

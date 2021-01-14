@@ -206,11 +206,4 @@ public class HostDatastoreSystemMOTest {
         when(service.retrieveProperties(anyObject(), anyObject())).thenReturn(list);
         hostDatastoreSystemMO.getDatastorePropertiesOnHostDatastoreSystem(propertyPaths);
     }
-
-    @Test
-    public void unmapVmfsVolumeExTask() throws Exception {
-        List<String> vmfsUuids = new ArrayList<>();
-        when(service.unmapVmfsVolumeExTask(anyObject(), anyObject())).thenReturn(mock(ManagedObjectReference.class));
-        hostDatastoreSystemMO.unmapVmfsVolumeExTask(vmfsUuids);
-    }
 }

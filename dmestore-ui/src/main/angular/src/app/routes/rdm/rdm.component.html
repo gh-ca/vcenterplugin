@@ -156,12 +156,11 @@
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-select-container>
 
-        <clr-select-container class="selectClass">
+        <clr-select-container class="selectClass" *ngIf="ownershipController">
           <label style="color: #9F9F9F;">{{'rdm.ownerC' | translate}}<span style="color: red">*</span></label>:
           <select clrSelect [(ngModel)]="configModel.ownerController" name="ownerController" required>
             <option value="0">{{'rdm.autoSelect' | translate}}</option>
-            <option value="1">0A</option>
-            <option value="2">0B</option>
+            <option *ngFor="let item of ownerControllers" value="{{item.name}}">{{item.name}}</option>
           </select>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-select-container>
