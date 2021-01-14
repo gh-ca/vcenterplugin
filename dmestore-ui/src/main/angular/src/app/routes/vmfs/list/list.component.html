@@ -190,8 +190,8 @@
           <!--名称 -->
           <clr-input-container>
             <label style="color: #9F9F9F;">{{'vmfs.name' | translate}}</label>
-            <input clrInput class="inputWidth100Percent" maxlength="256"  [(ngModel)]="form.name" formControlName="name" name="name"  (blur)="nameCheck(true)" required/>
-            <clr-control-helper *ngIf="matchErr">
+            <input clrInput class="inputWidth100Percent" maxlength="256"  [(ngModel)]="form.name" formControlName="name" name="name"  (change)="nameCheck(true)" required/>
+            <clr-control-helper *ngIf="matchErr && form.name == null">
               <div class="errorTips" readonly >
                 <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
                 {{'validations.nameRequired' | translate}}
@@ -203,7 +203,7 @@
                 {{'errorMsg.vmfsNameRepeat' | translate}}
               </div>
             </clr-control-helper>
-            <clr-control-helper *ngIf="volNameRepeatErr">
+            <clr-control-helper *ngIf="volNameRepeatErr && form.isSameName">
               <div class="errorTips" readonly >
                 <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
                 {{'errorMsg.volNameRepeat' | translate}}
@@ -214,7 +214,7 @@
           <clr-checkbox-container>
             <label></label>
             <clr-checkbox-wrapper>
-              <input type="checkbox" clrCheckbox name="isSameName" formControlName="isSameName" [(ngModel)]="form.isSameName" />
+              <input type="checkbox" clrCheckbox name="isSameName" formControlName="isSameName" (change)="addSameBtnChangeFunc($event);" [(ngModel)]="form.isSameName" />
               <label style="width: 190px;">{{'vmfs.vmfsAddNameDesc' | translate}}</label>
             </clr-checkbox-wrapper>
           </clr-checkbox-container>
@@ -315,7 +315,7 @@
         </form>
       <ng-template clrPageButtons>
         <clr-wizard-button [type]="'cancel'">{{'menu.cancel' | translate}}</clr-wizard-button>
-        <clr-wizard-button (click)="addNextPage();" [type]="'custom-next'">{{'menu.next' | translate}}</clr-wizard-button>
+        <clr-wizard-button [clrWizardButtonDisabled]="matchErr || vmfsNameRepeatErr || volNameRepeatErr" (click)="addNextPage();" [type]="'custom-next'">{{'menu.next' | translate}}</clr-wizard-button>
       </ng-template>
     </clr-wizard-page>
     <!--Page2 储存库设置-->
@@ -539,11 +539,11 @@
             </clr-input-container>
             <clr-select-container class="selectClass">
               <label style="color: #9F9F9F;">{{'vmfs.provisioningType' | translate}}</label>
-              <select clrSelect [(ngModel)]="form.alloctype" name="alloctype" required>
+              <select clrSelect [(ngModel)]="form.alloctype" name="alloctype">
+                <option value="">{{'tips.select' | translate}}</option>
                 <option value="thin">thin</option>
                 <option [hidden]="!showAlloctypeThick" value="thick">thick</option>
               </select>
-              <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
             </clr-select-container>
 
           </ng-container>

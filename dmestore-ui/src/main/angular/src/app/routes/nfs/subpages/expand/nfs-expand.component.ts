@@ -35,12 +35,15 @@ export class NfsExpandComponent implements OnInit{
         //入口来至Vcenter
         const ctx = this.gs.getClientSdk().app.getContextObjects();
         this.storeObjectId=ctx[0].id;
+        // this.storeObjectId="urn:vmomi:Datastore:datastore-4060:674908e5-ab21-4079-9cb1-596358ee5dd1";
         this.viewPage='expand_vcenter';
         this.modalLoading = true;
         this.expandService.getStorageById(this.storeObjectId).subscribe((result: any) => {
           this.modalLoading = false;
           if (result.code === '200'){
             this.fsId = result.data.fsId;
+            // console.log("this.fsId", this.fsId);
+            // console.log("result.data", result.data);
           }
           this.cdr.detectChanges();
         });
@@ -74,6 +77,7 @@ export class NfsExpandComponent implements OnInit{
       params={
         "storeObjectId": this.storeObjectId,
         "expand":true,
+        "fileSystemId": this.fsId,
         "capacity": this.newCapacity
       }
     }

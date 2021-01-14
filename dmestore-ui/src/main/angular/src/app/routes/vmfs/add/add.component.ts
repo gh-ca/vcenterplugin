@@ -749,7 +749,9 @@ export class AddComponent implements OnInit{
         if (reg5.test(this.form.name)) {
           // 校验VMFS名称重复
           this.checkVmfsName(this.form.name);
-
+          if (this.form.isSameName) {
+            this.form.volumeName = this.form.name;
+          }
         } else {
           this.matchErr = true;
           this.form.name = null;
@@ -782,7 +784,7 @@ export class AddComponent implements OnInit{
       if (result.code === '200') { // result.data true 不重复 false 重复
         this.vmfsNameRepeatErr = !result.data;
         if (this.vmfsNameRepeatErr) { // 名称重复
-          this.form.name = null;
+          // this.form.name = null;
           this.volNameRepeatErr = false;
           this.matchErr = false;
         } else {
@@ -805,11 +807,11 @@ export class AddComponent implements OnInit{
       this.modalHandleLoading = false;
       if (result.code === '200') { // result.data true 不重复 false 重复
         this.volNameRepeatErr = !result.data;
-        if (!this.vmfsNameRepeatErr && this.volNameRepeatErr) {
-          this.form.name = null;
-        }
+        // if (!this.vmfsNameRepeatErr && this.volNameRepeatErr) {
+        //   this.form.name = null;
+        // }
         if (this.volNameRepeatErr) {
-          this.form.volumeName = null;
+          // this.form.volumeName = null;
           this.vmfsNameRepeatErr = false;
           this.matchErr = false;
         }
@@ -941,7 +943,7 @@ export class AddComponent implements OnInit{
    * 添加页面 资源调优thick展示与隐藏
    */
   addAllocationTypeShowInit() {
-    this.form.alloctype = 'thin';
+    this.form.alloctype = '';
     const allocationTypeShow = this.getAllocationTypeShow(this.form.storage_id);
     this.showAlloctypeThick = allocationTypeShow == 1;
   }
@@ -1027,6 +1029,16 @@ export class AddComponent implements OnInit{
         this.form.control_policyUpper = undefined;
         upperObj.checked = false;
       }
+    }
+  }
+
+  /**
+   *
+   * 添加页面名称相同按钮点击事件
+   */
+  addSameBtnChangeFunc(obj) {
+    if (this.form.isSameName) {
+      this.form.volumeName = this.form.name
     }
   }
 }

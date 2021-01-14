@@ -87,6 +87,7 @@ export class NfsReduceComponent implements OnInit{
       params={
         "storeObjectId": this.storeObjectId,
         "expand":false,
+        "fileSystemId": this.fsId,
         "capacity": this.newCapacity
       }
     }
