@@ -122,22 +122,24 @@ export class NfsAddComponent implements OnInit{
 
     this.addForm.poolRawId=this.checkedPool.poolId;
     this.addForm.storagePoolId= this.checkedPool.id;
+    const addSubmitForm = new AddNfs();
+    Object.assign(addSubmitForm, this.addForm);
     // 单位换算
     switch (this.unit) {
       case 'TB':
-        this.addForm.size = this.addForm.size * 1024;
+        addSubmitForm.size = addSubmitForm.size * 1024;
         break;
       case 'MB':
-        this.addForm.size = this.addForm.size / 1024;
+        addSubmitForm.size = addSubmitForm.size / 1024;
         break;
       case 'KB':
-        this.addForm.size = this.addForm.size / (1024 * 1024);
+        addSubmitForm.size = addSubmitForm.size / (1024 * 1024);
         break;
       default: // 默认GB 不变
         break;
     }
-    this.qosFunc(this.addForm);
-    this.addService.addNfs(this.addForm).subscribe((result: any) => {
+    this.qosFunc(addSubmitForm);
+    this.addService.addNfs(addSubmitForm).subscribe((result: any) => {
       this.modalHandleLoading=false;
       if (result.code === '200'){
         // 打开成功提示窗口
