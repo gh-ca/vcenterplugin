@@ -535,8 +535,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
         JsonObject simple2 = new JsonObject();
         simple2.addProperty(NAME_FIELD, "storageDeviceId");
-        simple2.addProperty(OPERATOR, "storageDeviceId");
-        simple2.addProperty(VALUE_FIELD, storageId);
+        simple2.addProperty(OPERATOR, EQUAL_FIELD);
+        simple2.addProperty(VALUE_FIELD, storageId.replace("-", "").toUpperCase());
         JsonObject consObj2 = new JsonObject();
         consObj2.add(SIMPLE, simple2);
         consObj2.addProperty(LOGOP, AND_FIELD);
@@ -552,7 +552,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             constraint.add(consObj1);
         }
         if (!StringUtils.isEmpty(storagePoolName)) {
-            simple1.addProperty(NAME_FIELD, "storage_pool_name");
+            simple1.addProperty(NAME_FIELD, "name");
             simple1.addProperty(OPERATOR, EQUAL_FIELD);
             simple1.addProperty(VALUE_FIELD, storagePoolName);
             consObj1.add(SIMPLE, simple1);
