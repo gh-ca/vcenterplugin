@@ -270,7 +270,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             }
             // 判断存储类型
             String storageModel = getStorageModel(ToolUtils.getStr(params.get("storage_id")));
-            saveNfsInfoToDmeVmwareRelation(result, currentPortId, logicPortName, fsId, shareName, shareId, fsName,storageModel);
+            saveNfsInfoToDmeVmwareRelation(result, currentPortId, logicPortName, fsId, shareName, shareId, fsName,
+                storageModel);
             LOG.info("create nfs save relation success!nfsName={}", nfsName);
         } catch (Exception e) {
             //创建失败，解除共享客户端并删除共享
@@ -377,7 +378,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         Double changeCapacity = capacity;
         if (isExpand) {
             // 扩容
-            if (dataSpace != null && Double.compare(changeCapacity, dataSpace) > 1) {
+            if (dataSpace != null && Double.compare(changeCapacity, dataSpace) == 1) {
                 LOG.info("The expansion exceeds the available storage pool capacity!");
                 changeCapacity = dataSpace;
             }
@@ -422,7 +423,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         taskIds.add(taskId);
         Boolean flag = taskService.checkTaskStatus(taskIds);
         if (!flag) {
-            throw new DmeException(CODE_503, "expand or recycle nfs storage capacity failed!");
+            LOG.info("changeNfsCapacity DME return wrong status!task_id={}", taskId);
+            String errorMsg = taskService.queryTaskById(taskId).getDetail();
+            throw new DmeException(CODE_503, errorMsg);
         }
 
         // 刷新datastore容量
@@ -496,7 +499,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         JsonObject condition = new JsonObject();
         condition.add("constraint", constraint);
         String className = "SYS_StoragePool";
-        String url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + "?pageSize=1000&condition={json}";
+        String url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className)
+            + "?pageSize=1000&condition={json}";
         ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET,
             gson.toJson(condition));
         int code = responseEntity.getStatusCodeValue();
@@ -531,8 +535,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
         JsonObject simple2 = new JsonObject();
         simple2.addProperty(NAME_FIELD, "storageDeviceId");
-        simple2.addProperty(OPERATOR, "storageDeviceId");
-        simple2.addProperty(VALUE_FIELD, storageId);
+        simple2.addProperty(OPERATOR, EQUAL_FIELD);
+        simple2.addProperty(VALUE_FIELD, storageId.replace("-", "").toUpperCase());
         JsonObject consObj2 = new JsonObject();
         consObj2.add(SIMPLE, simple2);
         consObj2.addProperty(LOGOP, AND_FIELD);
@@ -548,7 +552,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             constraint.add(consObj1);
         }
         if (!StringUtils.isEmpty(storagePoolName)) {
-            simple1.addProperty(NAME_FIELD, "storage_pool_name");
+            simple1.addProperty(NAME_FIELD, "name");
             simple1.addProperty(OPERATOR, EQUAL_FIELD);
             simple1.addProperty(VALUE_FIELD, storagePoolName);
             consObj1.add(SIMPLE, simple1);
@@ -674,7 +678,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     }
 
     private void saveNfsInfoToDmeVmwareRelation(String params, String currentPortId, String logicPortName, String fsId,
-        String shareName, String shareId, String fsName,String storageModel) throws DmeException {
+        String shareName, String shareId, String fsName, String storageModel) throws DmeException {
         if (!StringUtils.isEmpty(params)) {
             DmeVmwareRelation datastoreInfo = gson.fromJson(params, DmeVmwareRelation.class);
             datastoreInfo.setLogicPortId(currentPortId);
@@ -824,8 +828,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         reqList.add(shareId);
         Map<String, List<String>> reqMap = new HashMap<>();
         reqMap.put("nfs_share_ids", reqList);
-        ResponseEntity<String> responseEntity =
-            dmeAccessService.access(DmeConstants.DME_NFS_SHARE_DELETE_URL, HttpMethod.POST, gson.toJson(reqMap));
+        ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_SHARE_DELETE_URL,
+            HttpMethod.POST, gson.toJson(reqMap));
         if (responseEntity.getStatusCodeValue() == HttpStatus.ACCEPTED.value()) {
             String body = responseEntity.getBody();
             JsonObject object = new JsonParser().parse(body).getAsJsonObject();
@@ -846,8 +850,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         reqList.add(fsId);
         Map<String, List<String>> reqMap = new HashMap<>();
         reqMap.put("file_system_ids", reqList);
-        ResponseEntity<String> responseEntity =
-            dmeAccessService.access(DmeConstants.DME_NFS_FS_DELETE_URL, HttpMethod.POST, gson.toJson(reqMap));
+        ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_FS_DELETE_URL,
+            HttpMethod.POST, gson.toJson(reqMap));
         if (responseEntity.getStatusCodeValue() == HttpStatus.ACCEPTED.value()) {
             String body = responseEntity.getBody();
             JsonObject object = new JsonParser().parse(body).getAsJsonObject();
