@@ -847,23 +847,23 @@ export class DiskStatusFilter implements ClrDatagridFilterInterface<StorageDisk>
         <label>{{'vmfs.filter.all' | translate}}</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="type" (change)="changeFunc($event)" [(ngModel)]="type" value="sata"/>
+        <input type="radio" clrRadio name="type" (change)="changeFunc($event)" [(ngModel)]="type" value="SATA"/>
         <label>SATA</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="type" (change)="changeFunc($event)" [(ngModel)]="type" value="sas"/>
+        <input type="radio" clrRadio name="type" (change)="changeFunc($event)" [(ngModel)]="type" value="SAS"/>
         <label>SAS</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="type" (change)="changeFunc($event)" [(ngModel)]="type" value="ssd"/>
+        <input type="radio" clrRadio name="type" (change)="changeFunc($event)" [(ngModel)]="type" value="SSD"/>
         <label>SSD</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="type" (change)="changeFunc($event)" [(ngModel)]="type" value="nl-sas"/>
+        <input type="radio" clrRadio name="type" (change)="changeFunc($event)" [(ngModel)]="type" value="NL-SAS"/>
         <label>NL-SAS</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="type" (change)="changeFunc($event)" [(ngModel)]="type" value="unknown"/>
+        <input type="radio" clrRadio name="type" (change)="changeFunc($event)" [(ngModel)]="type" value="UNKNOWN"/>
         <label>{{'storage.detail.storagePool.unknown' | translate}}</label>
       </clr-radio-wrapper>
     </clr-radio-container>
