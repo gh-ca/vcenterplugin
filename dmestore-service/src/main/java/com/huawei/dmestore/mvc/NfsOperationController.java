@@ -4,7 +4,11 @@ import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.model.CapacityAutonegotiation;
 import com.huawei.dmestore.model.ResponseBodyBean;
+import com.huawei.dmestore.model.StorageDetail;
+import com.huawei.dmestore.model.StorageTypeShow;
+import com.huawei.dmestore.services.DmeStorageService;
 import com.huawei.dmestore.services.NfsOperationService;
+import com.huawei.dmestore.utils.ToolUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -103,6 +107,9 @@ public class NfsOperationController extends BaseController {
     @Autowired
     private NfsOperationService nfsOperationService;
 
+    @Autowired
+    private DmeStorageService dmeStorageService;
+
     /**
      * createNfsDatastore
      *
@@ -114,7 +121,8 @@ public class NfsOperationController extends BaseController {
         // 入参调整
         Map<String, Object> targetParams = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         Map<String, Object> createNfsShareParam = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
-        targetParams.put("storage_id", requestParams.get("storagId"));
+        String storagId = (String)requestParams.get("storagId");
+        targetParams.put("storage_id", storagId);
         targetParams.put("storage_pool_id", requestParams.get("storagePoolId"));
         targetParams.put("pool_raw_id", requestParams.get("poolRawId"));
         targetParams.put("current_port_id", requestParams.get("currentPortId"));
@@ -157,8 +165,9 @@ public class NfsOperationController extends BaseController {
         List<Map<String, Object>> nfsShareClientAdditions = new ArrayList<>(DmeConstants.COLLECTION_CAPACITY_16);
         nfsShareClientAdditions.add(nfsShareClientAddition);
         targetParams.put("nfs_share_client_addition", nfsShareClientAdditions);
-        advanceExcute(requestParams, targetParams, advance);
         try {
+            StorageTypeShow storageTypeShow = isDorado(storagId);
+            advanceExcute(requestParams, targetParams, advance,storageTypeShow);
             nfsOperationService.createNfsDatastore(targetParams);
             return success();
         } catch (DmeException e) {
@@ -173,7 +182,7 @@ public class NfsOperationController extends BaseController {
      * @param targetParams targetParams
      * @param isAdvance isAdvance
      */
-    private void advanceExcute(Map<String, Object> requestParams, Map<String, Object> targetParams, boolean isAdvance) {
+    private void advanceExcute(Map<String, Object> requestParams, Map<String, Object> targetParams, boolean isAdvance,StorageTypeShow storageTypeShow) {
         Map<String, Object> tuning = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         Map<String, Object> capacityAutonegotiation = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         String defaultCapacitymode = CapacityAutonegotiation.CAPACITY_MODE_OFF;
@@ -198,26 +207,31 @@ public class NfsOperationController extends BaseController {
             } else {
                 tuning.put(ALLOCATION_TYPE_FIELD, "thick");
             }
-            tuning.put(COMPRESSION_ENABLED_FIELD, requestParams.get("compressionEnabled"));
-            tuning.put(DEDUPLICATION_ENABLED_FIELD, requestParams.get("deduplicationEnabled"));
+
+            if (storageTypeShow.getDeduplicationShow() || storageTypeShow.getCompressionShow()) {
+                tuning.put(COMPRESSION_ENABLED_FIELD, requestParams.get("compressionEnabled"));
+                tuning.put(DEDUPLICATION_ENABLED_FIELD, requestParams.get("deduplicationEnabled"));
+            }
 
             String capacitymode = (Boolean) requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD)
                 ? CapacityAutonegotiation.CAPACITY_MODE_AUTO : defaultCapacitymode;
-           if (!"grow-off".equalsIgnoreCase(capacitymode)){
+            if (!"grow_off".equalsIgnoreCase(capacitymode)){
                 capacityAutonegotiation.put("capacity_recycle_mode","expand_capacity");
                 capacityAutonegotiation.put("auto_grow_threshold_percent",85);
                 capacityAutonegotiation.put("auto_shrink_threshold_percent",50);
                 capacityAutonegotiation.put("max_auto_size", 16777216);
                 capacityAutonegotiation.put("min_auto_size",16777216);
                 capacityAutonegotiation.put("auto_size_increment",1024);
-            }
+                capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
+           }
             capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, capacitymode);
-            capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, requestParams.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
         } else {
             tuning.put(ALLOCATION_TYPE_FIELD, THIN_FIELD);
-            tuning.put(COMPRESSION_ENABLED_FIELD, false);
-            tuning.put(DEDUPLICATION_ENABLED_FIELD, false);
-            capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, false);
+            if (storageTypeShow.getDeduplicationShow() || storageTypeShow.getCompressionShow()) {
+                tuning.put(COMPRESSION_ENABLED_FIELD, false);
+                tuning.put(DEDUPLICATION_ENABLED_FIELD, false);
+            }
+            //capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, false);
             capacityAutonegotiation.put(ADJUSTING_MODE_FIELD, defaultCapacitymode);
         }
         targetParams.put("tuning", tuning);
@@ -231,7 +245,7 @@ public class NfsOperationController extends BaseController {
      * @return ResponseBodyBean
      */
     @PostMapping("/updatenfsdatastore")
-    public ResponseBodyBean updateNfsDatastore(final @RequestBody Map<String, Object> params) {
+    public ResponseBodyBean updateNfsDatastore(final @RequestBody Map<String, Object> params) throws DmeException {
         Map<String, Object> param = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         param.put("dataStoreObjectId", params.get("dataStoreObjectId"));
         param.put(NFS_NAME_FIELD, params.get(NFS_NAME_FIELD));
@@ -241,11 +255,11 @@ public class NfsOperationController extends BaseController {
         Map<String, Object> capacityAutonegotiation = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         Object autoSizeEnable = params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD);
         if (autoSizeEnable != null) {
-            capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
             String capacitymode = (Boolean)autoSizeEnable
                 ? CapacityAutonegotiation.CAPACITY_MODE_AUTO
                 : CapacityAutonegotiation.CAPACITY_MODE_OFF;
-           if (!"grow-off".equalsIgnoreCase(capacitymode)){
+            if (!"grow-off".equalsIgnoreCase(capacitymode)){
+                capacityAutonegotiation.put(AUTO_SIZE_ENABLE_FIELD, params.get(AUTO_SIZE_ENABLE_REQUEST_FIELD));
                 capacityAutonegotiation.put("capacity_recycle_mode","expand_capacity");
                 capacityAutonegotiation.put("auto_grow_threshold_percent",85);
                 capacityAutonegotiation.put("auto_shrink_threshold_percent",50);
@@ -257,6 +271,11 @@ public class NfsOperationController extends BaseController {
             param.put("capacity_autonegotiation", capacityAutonegotiation);
         }
         Map<String, Object> tuning = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+        StorageTypeShow storageTypeShow = isDorado(ToolUtils.getStr(params.get("deviceId")));
+//        if (storageTypeShow.getDeduplicationShow()||storageTypeShow.getCompressionShow()) {
+//            tuning.put(DEDUPLICATION_ENABLED_FIELD, params.get("deduplicationEnabled"));
+//            tuning.put(COMPRESSION_ENABLED_FIELD, params.get("compressionEnabled"));
+//        }
         tuning.put(DEDUPLICATION_ENABLED_FIELD, params.get("deduplicationEnabled"));
         tuning.put(COMPRESSION_ENABLED_FIELD, params.get("compressionEnabled"));
         Object thin = params.get(THIN_FIELD);
@@ -320,5 +339,14 @@ public class NfsOperationController extends BaseController {
         } catch (DmeException e) {
             return failure(e.getMessage());
         }
+    }
+
+    public StorageTypeShow isDorado(String storageId) throws DmeException {
+        StorageTypeShow storageTypeShow = new StorageTypeShow();
+        StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
+        if (storageDetail != null) {
+            storageTypeShow = ToolUtils.getStorageTypeShow(storageDetail.getModel());
+        }
+        return storageTypeShow;
     }
 }
