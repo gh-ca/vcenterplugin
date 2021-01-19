@@ -150,7 +150,8 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                     }
                 } catch (Exception ex) {
                     // 报错，跳过当前项检查
-                    log.error("{} check failed! hostSetting={}", hostName, bestPracticeService.getHostSetting());
+                    log.error("{} check failed! hostSetting={}, errorMsg={}", hostName,
+                        bestPracticeService.getHostSetting(), ex.getMessage());
                 }
             }
         }

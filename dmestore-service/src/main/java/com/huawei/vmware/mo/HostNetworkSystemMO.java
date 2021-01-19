@@ -30,7 +30,7 @@ public class HostNetworkSystemMO extends BaseMO {
      * @throws Exception Exception
      */
     public HostNetworkConfig getNetworkConfig() throws Exception {
-        return (HostNetworkConfig) context.getVimClient().getDynamicProperty(mor, "networkConfig");
+        return context.getVimClient().getDynamicProperty(mor, "networkConfig");
     }
 
     /**

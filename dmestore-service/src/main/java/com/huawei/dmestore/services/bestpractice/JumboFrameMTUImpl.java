@@ -7,6 +7,7 @@ import com.huawei.vmware.util.VmwareContext;
 
 import com.vmware.vim25.HostConfigChangeMode;
 import com.vmware.vim25.HostNetworkConfig;
+import com.vmware.vim25.HostPortGroupConfig;
 import com.vmware.vim25.HostVirtualNicConfig;
 import com.vmware.vim25.HostVirtualNicSpec;
 import com.vmware.vim25.HostVirtualSwitch;
@@ -83,6 +84,8 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
         if (networkConfig == null) {
             return true;
         }
+        List<HostPortGroupConfig> portGroupConfigs = networkConfig.getPortgroup();
+        HostPortGroupConfig portGroupConfig = portGroupConfigs.get(0);
         List<HostVirtualNicConfig> list = networkConfig.getVnic();
         for (HostVirtualNicConfig config : list) {
             HostVirtualNicSpec spec = config.getSpec();

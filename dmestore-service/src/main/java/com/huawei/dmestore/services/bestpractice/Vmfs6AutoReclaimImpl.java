@@ -42,10 +42,12 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
             for (VmfsDatastoreInfo vmfsDatastoreInfo : list) {
                 HostVmfsVolume hostVmfsVolume = vmfsDatastoreInfo.getVmfs();
                 String unmapPriority = hostVmfsVolume.getUnmapPriority();
-                JsonObject object = new JsonObject();
-                object.addProperty("dataStoreName", vmfsDatastoreInfo.getName());
-                object.addProperty("unmapPriority", unmapPriority);
-                array.add(object);
+                if(unmapPriority == null || !unmapPriority.equals(getRecommendValue())){
+                    JsonObject object = new JsonObject();
+                    object.addProperty("dataStoreName", vmfsDatastoreInfo.getName());
+                    object.addProperty("unmapPriority", unmapPriority);
+                    array.add(object);
+                }
             }
             JsonObject reObject = new JsonObject();
             reObject.add("dataStores", array);
