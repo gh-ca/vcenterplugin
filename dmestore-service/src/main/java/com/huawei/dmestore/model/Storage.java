@@ -533,9 +533,9 @@ public class Storage {
     /**
      * getAzIds .
      *
-     * @return Object .
+     * @return String[] .
      */
-    public Object getAzIds() {
+    public String[] getAzIds() {
         return azIds;
     }
 

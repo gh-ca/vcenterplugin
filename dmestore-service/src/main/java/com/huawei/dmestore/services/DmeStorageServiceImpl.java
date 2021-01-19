@@ -34,6 +34,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.vmware.vim25.ID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +46,7 @@ import org.springframework.util.StringUtils;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -229,31 +231,17 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     @Override
     public StorageDetail getStorageDetail(String storageId) throws DmeException {
-        StorageDetail storageObj;
-        String url = DmeConstants.API_STORAGES + "/" + storageId + "/detail";
+        StorageDetail storageObj = new StorageDetail();
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
-            int code = responseEntity.getStatusCodeValue();
-            if (code != HttpStatus.OK.value()) {
-                throw new DmeException(CODE_503, "search oriented storage error");
+            Storage storage = getStorage(storageId);
+            if (storage != null) {
+                parseStorageDetail(storageObj, storage);
             }
-            String object = responseEntity.getBody();
-            JsonObject element = new JsonParser().parse(object).getAsJsonObject();
-            storageObj = new StorageDetail();
-            parseStorageDetail(storageObj, element);
             if (!StringUtils.isEmpty(storageObj.getModel())){
                 StorageTypeShow storageTypeShow = ToolUtils.getStorageTypeShow(storageObj.getModel());
                 storageObj.setStorageTypeShow(storageTypeShow);
             }
             parseStoragePoolDetail(storageId, storageObj);
-            JsonArray ids = element.get("az_ids").getAsJsonArray();
-            if (ids.size() != 0) {
-                String[] azIdsArr = {ToolUtils.jsonToStr(ids)};
-                storageObj.setAzIds(azIdsArr);
-            } else {
-                String[] azIdsArr = {};
-                storageObj.setAzIds(azIdsArr);
-            }
         } catch (DmeException e) {
             LOG.error("search oriented storage error!", e);
             throw new DmeException(CODE_503, e.getMessage());
@@ -264,7 +252,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     private void parseStoragePoolDetail(String storageId, StorageDetail storageObj) throws DmeException {
         List<StoragePool> storagePools = getStoragePools(storageId, "all");
         Double totalPoolCapicity = 0.0;
-        Double subscriptionCapacity = 0.0;
+        //Double subscriptionCapacity = 0.0;
         Double protectionCapacity = 0.0;
         Double fileCapacity = 0.0;
         Double blockCapacity = 0.0;
@@ -272,7 +260,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         Double compressedCapacity = 0.0;
         for (StoragePool storagePool : storagePools) {
             totalPoolCapicity += storagePool.getTotalCapacity();
-            subscriptionCapacity += storagePool.getSubscribedCapacity();
+            //subscriptionCapacity += storagePool.getSubscribedCapacity();
             protectionCapacity += storagePool.getProtectionCapacity();
             if ("file".equalsIgnoreCase(storagePool.getMediaType())) {
                 fileCapacity += storagePool.getConsumedCapacity();
@@ -285,7 +273,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         }
         storageObj.setTotalEffectiveCapacity(totalPoolCapicity);
         storageObj.setFreeEffectiveCapacity(totalPoolCapicity - fileCapacity - blockCapacity - protectionCapacity);
-        storageObj.setSubscriptionCapacity(subscriptionCapacity);
+        //storageObj.setSubscriptionCapacity(subscriptionCapacity);
         storageObj.setProtectionCapacity(protectionCapacity);
         storageObj.setFileCapacity(fileCapacity);
         storageObj.setBlockCapacity(blockCapacity);
@@ -815,7 +803,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         storageDisk.setCapacity(ToolUtils.jsonToDou(element.get(CAPACITY_FILED), 0.0));
         storageDisk.setSpeed(ToolUtils.jsonToLon(element.get(SPEED), 0L));
         storageDisk.setLogicalType(ToolUtils.jsonToStr(element.get(LOGICAL_TYPE)));
-        storageDisk.setPhysicalType(ToolUtils.jsonToStr(element.get("physicalType")));
+        storageDisk.setPhysicalType(ToolUtils.jsonToStr(element.get("physicalType")).toUpperCase());
         String poolId = ToolUtils.jsonToStr(element.get(POOL_ID));
         storageDisk.setPoolId(poolId);
         storageDisk.setStorageDeviceId(ToolUtils.jsonToStr(element.get(STORAGE_DEVICE_ID)));
@@ -1641,5 +1629,41 @@ public class DmeStorageServiceImpl implements DmeStorageService {
      */
     public boolean hasVmOnDatastore(String objectid) {
         return vcsdkUtils.hasVmOnDatastore(objectid);
+    }
+
+    private Storage getStorage(String storageId) throws DmeException {
+        List<Storage> storages = getStorages();
+        if (storages != null && storages.size() > 0) {
+            for (Storage storage : storages) {
+                if (storageId.equalsIgnoreCase(storage.getId())) {
+                    return storage;
+                }
+            }
+        }
+        return new Storage();
+    }
+
+    private void parseStorageDetail(StorageDetail storageObj, Storage storage) {
+        storageObj.setId(ToolUtils.getStr(storage.getId()));
+        storageObj.setName(ToolUtils.getStr(storage.getName()));
+        storageObj.setIp(ToolUtils.getStr(storage.getIp()));
+        storageObj.setStatus(ToolUtils.getStr(storage.getStatus()));
+        storageObj.setSynStatus(ToolUtils.getStr(storage.getSynStatus()));
+        storageObj.setVendor(ToolUtils.getStr(storage.getVendor()));
+        storageObj.setModel(ToolUtils.getStr(storage.getModel()));
+        storageObj.setUsedCapacity(ToolUtils.getDouble(storage.getUsedCapacity()) / ONE_KB);
+        storageObj.setTotalCapacity(ToolUtils.getDouble(storage.getTotalCapacity()) / ONE_KB);
+        double subCapacity = ToolUtils.getDouble(storage.getSubscriptionCapacity()) / ONE_KB;
+        DecimalFormat df = new DecimalFormat("#.000");
+        storageObj.setSubscriptionCapacity(Double.valueOf(df.format(subCapacity)));
+        storageObj.setTotalEffectiveCapacity(ToolUtils.getDouble(storage.getTotalEffectiveCapacity()));
+        storageObj.setFreeEffectiveCapacity(ToolUtils.getDouble(storage.getFreeEffectiveCapacity()));
+        storageObj.setLocation(ToolUtils.getStr(storage.getLocation()));
+        storageObj.setPatchVersion(ToolUtils.getStr(storage.getPatchVersion()));
+        storageObj.setMaintenanceStart(ToolUtils.getStr(storage.getMaintenanceStart()));
+        storageObj.setMaintenanceOvertime(ToolUtils.getStr(storage.getMaintenanceOvertime()));
+        storageObj.setProductVersion(ToolUtils.getStr(storage.getVersion()));
+        storageObj.setSn(ToolUtils.getStr(storage.getSn()));
+        storageObj.setAzIds(storage.getAzIds());
     }
 }
