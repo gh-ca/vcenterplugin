@@ -110,7 +110,7 @@
 
                       <clr-dg-column [hidden]="poolRadio!=='table2'">{{'storage.detail.storagePool.totalCap' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="poolRadio!=='table2'">{{'storage.detail.storagePool.usedCap' | translate}}</clr-dg-column>
-                      <clr-dg-column [hidden]="poolRadio!=='table2'">{{'storage.detail.storagePool.capUsage' | translate}}</clr-dg-column>
+                      <clr-dg-column [hidden]="poolRadio!=='table2'" style="width: 11rem;">{{'storage.detail.storagePool.capUsage' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="poolRadio!=='table2'">{{'storage.detail.storagePool.freeCap' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="poolRadio!=='table2'">{{'storage.detail.storagePool.supRate' | translate}}</clr-dg-column>
 
@@ -151,10 +151,15 @@
                         <clr-dg-cell [hidden]="poolRadio!=='table2'">{{formatCapacity(item.totalCapacity)}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table2'">{{formatCapacity(item.consumedCapacity)}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table2'">
-                          <clr-progress-bar clrValue="{{((item.consumedCapacity/item.totalCapacity) * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar>
+                          <div class="progress-block">
+                            <clr-progress-bar clrValue="{{((item.consumedCapacity)/item.totalCapacity * 100).toFixed(2)}}" clrSuccess></clr-progress-bar>
+                            <span>{{((item.consumedCapacity)/item.totalCapacity * 100).toFixed(2)}}%</span>
+                          </div>
                         </clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table2'">{{formatCapacity(item.freeCapacity)}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table2'">{{(item.subscribedCapacity/item.totalCapacity*100).toFixed(2)}}%</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table2'">
+                          {{(item.subscribedCapacity/item.totalCapacity*100).toFixed(2)}}%
+                        </clr-dg-cell>
 
                         <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxLatency?item.maxLatency.toFixed(2):0.00}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxIops?item.maxIops.toFixed(1):0.0}}</clr-dg-cell>
@@ -209,7 +214,7 @@
                           <por-type-filter #portTypeFilter></por-type-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
-                      <clr-dg-column [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.capUsage' | translate}}</clr-dg-column>
+                      <clr-dg-column [hidden]="volumeRadio!=='table1'" style="width: 11rem;">{{'storage.detail.volumes.capUsage' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">
                         {{'storage.detail.volumes.mapStatus' | translate}}
                         <clr-dg-filter [clrDgFilter]="mapStatusFilter">
@@ -279,7 +284,10 @@
                           --
                         </clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'"*ngIf="item.capacityUsage">
-                          <clr-progress-bar clrValue="{{parseUsage(item.capacityUsage)}}" clrSuccess clrLabeled></clr-progress-bar>
+                          <div class="progress-block">
+                            <clr-progress-bar clrValue="{{parseUsage(item.capacityUsage)}}" clrSuccess></clr-progress-bar>
+                            <span>{{parseUsage(item.capacityUsage)}}%</span>
+                          </div>
                         </clr-dg-cell>
 
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">
@@ -386,7 +394,7 @@
                       <clr-dg-column>{{'storage.detail.fileSystems.fileType' | translate}}</clr-dg-column>
                       <clr-dg-column [clrDgField]="'capacity'">{{'storage.detail.fileSystems.totalCap' | translate}}</clr-dg-column>
                       <clr-dg-column [clrDgField]="'availableCapacity'">{{'storage.detail.fileSystems.freeCap' | translate}}</clr-dg-column>
-                      <clr-dg-column [clrDgField]="'capacityUsageRatio'">{{'storage.detail.fileSystems.capacityUsage' | translate}}</clr-dg-column>
+                      <clr-dg-column [clrDgField]="'capacityUsageRatio'" style="width: 11rem;">{{'storage.detail.fileSystems.capacityUsage' | translate}}</clr-dg-column>
                       <clr-dg-column [clrDgField]="'storagePoolName'">{{'storage.detail.fileSystems.ownSto' | translate}}</clr-dg-column>
                       <clr-dg-column [clrDgField]="'nfsCount'">{{'storage.detail.fileSystems.nfs' | translate}}</clr-dg-column>
                       <!--<clr-dg-column>{{'storage.detail.fileSystems.cifs' | translate}}</clr-dg-column>-->
@@ -431,7 +439,10 @@
                         <clr-dg-cell class="over_flow">{{formatCapacity(item.capacity)}}</clr-dg-cell>
                         <clr-dg-cell class="over_flow">{{formatCapacity(item.availableCapacity)}}</clr-dg-cell>
                         <clr-dg-cell class="over_flow">
-                          <clr-progress-bar clrValue="{{item.capacityUsageRatio.toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar>
+                          <div class="progress-block">
+                            <clr-progress-bar clrValue="{{item.capacityUsageRatio.toFixed(2)}}" clrSuccess></clr-progress-bar>
+                            <span>{{item.capacityUsageRatio.toFixed(2)}}%</span>
+                          </div>
                         </clr-dg-cell>
                         <clr-dg-cell class="over_flow">{{item.storagePoolName}}</clr-dg-cell>
                         <clr-dg-cell class="over_flow">{{item.nfsCount}}</clr-dg-cell>
@@ -673,7 +684,7 @@
                 <clr-datagrid>
                   <clr-dg-column>{{'storage.detail.capacity.pool.name' | translate}}</clr-dg-column>
                   <clr-dg-column>{{'storage.detail.capacity.pool.status' | translate}}</clr-dg-column>
-                  <clr-dg-column>{{'storage.detail.capacity.pool.capacity' | translate}}</clr-dg-column>
+                  <clr-dg-column style="width: 11rem;">{{'storage.detail.capacity.pool.capacity' | translate}}</clr-dg-column>
                   <clr-dg-row *clrDgItems="let item of storagePool" [clrDgItem]="item">
                     <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
                     <clr-dg-cell class="over_flow">
@@ -691,7 +702,10 @@
                           </span>
                     </clr-dg-cell>
                     <clr-dg-cell class="over_flow">
-                      <clr-progress-bar clrValue="{{((item.consumedCapacity/item.totalCapacity) * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar>
+                      <div class="progress-block">
+                        <clr-progress-bar clrValue="{{((item.consumedCapacity/item.totalCapacity) * 100).toFixed(2)}}" clrSuccess></clr-progress-bar>
+                        <span>{{((item.consumedCapacity/item.totalCapacity) * 100).toFixed(2)}}%</span>
+                      </div>
                       <span>{{'storage.detail.cap.used' | translate}}{{formatCapacity(item.consumedCapacity)}}/{{formatCapacity(item.totalCapacity)}}</span>
                     </clr-dg-cell>
                   </clr-dg-row>
@@ -823,13 +837,12 @@
                             <span *ngIf="!item.status">--</span>
                           </clr-dg-cell>
                           <clr-dg-cell class="over_flow">
-                            <span *ngIf="item.physicalType == 'sata'">SATA</span>
-                            <span *ngIf="item.physicalType == 'sas'">SAS</span>
-                            <span *ngIf="item.physicalType == 'ssd'">SSD</span>
-                            <span *ngIf="item.physicalType == 'nl-sas'">NL-SAS</span>
-                            <span *ngIf="item.physicalType == 'unknown'">{{'storage.detail.storagePool.unknown' | translate}}</span>
+                            <span *ngIf="item.physicalType == null || item.physicalType == ''">--</span>
+                            <span *ngIf="item.physicalType == 'unknown' || item.physicalType == 'UNKNOWN'">{{'storage.detail.storagePool.unknown' | translate}}</span>
+                            <span *ngIf="item.physicalType != null && item.physicalType != ''
+                            && item.physicalType != 'unknown' && item.physicalType != 'UNKNOWN'">{{item.physicalType}}</span>
                           </clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{formatCapacity(item.capacity)}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flo w">{{formatCapacity(item.capacity)}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">
                             <span *ngIf="item.logicalType == 'member'">{{'enum.status.member' | translate}}</span>
                             <span *ngIf="!item.logicalType">--</span>
