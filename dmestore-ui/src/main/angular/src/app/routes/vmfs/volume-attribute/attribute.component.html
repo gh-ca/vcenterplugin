@@ -13,21 +13,26 @@
     <tr>
       <th hidden></th>
       <td class="left">{{'vmfs.name' | translate}}</td>
-      <td class="left">{{selectVolume.name}}</td>
+      <td class="left" *ngIf="selectVolume.name != null && selectVolume.name != ''">{{selectVolume.name}}</td>
+      <td class="left" *ngIf="selectVolume.name == null || selectVolume.name == ''">--</td>
       <td class="left">{{'vmfs.wwn' | translate}}</td>
-      <td class="left">{{selectVolume.wwn}}</td>
+      <td class="left" *ngIf="selectVolume.wwn != null && selectVolume.wwn != ''">{{selectVolume.wwn}}</td>
+      <td class="left" *ngIf="selectVolume.wwn == null || selectVolume.wwn == ''">--</td>
     </tr>
     <tr>
       <th hidden></th>
       <td class="left">{{'vmfs.storage' | translate}}</td>
-      <td class="left">{{selectVolume.storage}}</td>
+      <td class="left" *ngIf="selectVolume.storage != null && selectVolume.storage != ''">{{selectVolume.storage}}</td>
+      <td class="left" *ngIf="selectVolume.storage == null && selectVolume.storage == ''">--</td>
       <td class="left">{{'vmfs.storagePool' | translate}}</td>
-      <td class="left">{{selectVolume.storagePool}}</td>
+      <td class="left" *ngIf="selectVolume.storagePool != null && selectVolume.storagePool != ''">{{selectVolume.storagePool}}</td>
+      <td class="left" *ngIf="selectVolume.storagePool == null || selectVolume.storagePool == ''">--</td>
     </tr>
     <tr>
       <th hidden></th>
       <td class="left">{{'vmfs.serviceLevelName' | translate}}</td>
-      <td class="left">{{selectVolume.serviceLevel}}</td>
+      <td class="left" *ngIf="selectVolume.serviceLevel != null && selectVolume.serviceLevel != ''">{{selectVolume.serviceLevel}}</td>
+      <td class="left" *ngIf="selectVolume.serviceLevel == null || selectVolume.serviceLevel == ''">--</td>
     </tr>
     <!-- Qos SmartTier -->
     <tr>
@@ -143,9 +148,11 @@
     <tr>
       <th hidden></th>
       <td class="left">{{'vmfs.applicationType' | translate}}</td>
-      <td class="left">{{selectVolume.applicationType}}</td>
+      <td class="left" *ngIf="selectVolume.applicationType != null && selectVolume.applicationType != ''">{{selectVolume.applicationType}}</td>
+      <td class="left" *ngIf="selectVolume.applicationType == null || selectVolume.applicationType == ''">--</td>
       <td class="left">{{'vmfs.provisioningType' | translate}}</td>
-      <td class="left">{{selectVolume.provisionType}}</td>
+      <td class="left" *ngIf="selectVolume.provisionType != null && selectVolume.provisionType != ''">{{selectVolume.provisionType}}</td>
+      <td class="left" *ngIf="selectVolume.provisionType == null || selectVolume.provisionType == ''">--</td>
     </tr>
     <tr>
       <th hidden></th>
