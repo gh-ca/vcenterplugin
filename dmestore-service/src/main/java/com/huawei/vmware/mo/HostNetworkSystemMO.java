@@ -3,6 +3,7 @@ package com.huawei.vmware.mo;
 import com.huawei.vmware.util.VmwareContext;
 import com.vmware.vim25.HostNetworkConfig;
 import com.vmware.vim25.HostNetworkConfigResult;
+import com.vmware.vim25.HostVirtualNicSpec;
 import com.vmware.vim25.HostVirtualSwitchSpec;
 import com.vmware.vim25.ManagedObjectReference;
 
@@ -42,6 +43,17 @@ public class HostNetworkSystemMO extends BaseMO {
      */
     public void updateVirtualSwitch(String switchName, HostVirtualSwitchSpec spec) throws Exception {
         context.getService().updateVirtualSwitch(mor, switchName, spec);
+    }
+
+    /**
+     * updateVirtualNic
+     *
+     * @param device device
+     * @param spec spec
+     * @throws Exception Exception
+     */
+    public void updateVirtualNic(String device, HostVirtualNicSpec spec) throws Exception {
+        context.getService().updateVirtualNic(mor, device, spec);
     }
 
     /**

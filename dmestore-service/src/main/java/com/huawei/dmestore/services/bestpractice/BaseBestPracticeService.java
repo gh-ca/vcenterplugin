@@ -10,6 +10,9 @@ import com.huawei.vmware.util.VmwareContext;
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.OptionValue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 
 /**
@@ -19,6 +22,8 @@ import java.util.List;
  * @since 2020-11-30
  **/
 public class BaseBestPracticeService {
+    protected final Logger LOGGER = LoggerFactory.getLogger(BaseBestPracticeService.class);
+
     protected boolean check(final VCSDKUtils vcsdkUtils, final String objectId, final String hostSetting,
         final Object recommendValue) throws Exception {
         Object currentValue = getCurrentValue(vcsdkUtils, objectId, hostSetting);
