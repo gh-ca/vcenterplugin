@@ -16,6 +16,8 @@ import com.vmware.vim25.HostVirtualSwitchSpec;
 import com.vmware.vim25.ManagedObjectReference;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * JumboFrameMTUImpl
@@ -84,9 +86,10 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
         if (networkConfig == null) {
             return true;
         }
-        List<HostPortGroupConfig> portGroupConfigs = networkConfig.getPortgroup();
-        HostPortGroupConfig portGroupConfig = portGroupConfigs.get(0);
         List<HostVirtualNicConfig> list = networkConfig.getVnic();
+        if (list == null || list.size() == 0) {
+            return true;
+        }
         for (HostVirtualNicConfig config : list) {
             HostVirtualNicSpec spec = config.getSpec();
             Integer mtu = spec.getMtu();
@@ -113,14 +116,22 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
         HostNetworkSystemMO hostNetworkSystemMo = hostMo.getHostNetworkSystemMo();
         HostNetworkConfig networkConfig = hostNetworkSystemMo.getNetworkConfig();
         List<HostVirtualNicConfig> list = networkConfig.getVnic();
+        ExecutorService singleThreadExecutor = Executors.newFixedThreadPool(list.size());
         for (HostVirtualNicConfig config : list) {
             HostVirtualNicSpec spec = config.getSpec();
+            String device = config.getDevice();
             Integer mtu = spec.getMtu();
             if (null == mtu || (mtu.intValue() != ((Integer) recommendValue).intValue())) {
-                spec.setMtu((Integer) recommendValue);
+                singleThreadExecutor.execute(() -> {
+                    spec.setMtu((Integer) recommendValue);
+                    try {
+                        hostNetworkSystemMo.updateVirtualNic(device, spec);
+                    } catch (Exception exception) {
+                        LOGGER.error("updateVirtualNic error!hostObjectId={},device={}", objectId, device);
+                        exception.printStackTrace();
+                    }
+                });
             }
         }
-        hostNetworkSystemMo.updateNetworkConfig(networkConfig, HostConfigChangeMode.MODIFY.value());
-        hostMo.getHostStorageSystemMo().refreshStorageSystem();
     }
 }
