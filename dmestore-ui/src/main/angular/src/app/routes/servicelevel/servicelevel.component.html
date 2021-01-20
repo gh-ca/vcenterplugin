@@ -239,19 +239,19 @@
 
             <div class="btn-group btn-icon">
               <div class="radio btn">
-                <input (click)="storagePoolRadioCheck = 'basic'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-1" checked>
+                <input (click)="storagePoolRadioCheck = 'basic';initStoragePoolListFilter()" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-1" checked>
                 <label for="btn-demo-radio-1"><clr-icon shape="list" size="20"></clr-icon></label>
               </div>
               <div class="radio btn">
-                <input (click)="storagePoolRadioCheck = 'capacity'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-2">
+                <input (click)="storagePoolRadioCheck = 'capacity';initStoragePoolListFilter()" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-2">
                 <label for="btn-demo-radio-2"><clr-icon shape="dashboard" size="20"></clr-icon></label>
               </div>
               <div class="radio btn">
-                <input (click)="storagePoolRadioCheck = 'performance'" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3">
+                <input (click)="storagePoolRadioCheck = 'performance';initStoragePoolListFilter();" type="radio" name="btn-group-demo-radios" id="btn-demo-radio-3">
                 <label for="btn-demo-radio-3"><clr-icon shape="radar" size="20"></clr-icon></label>
               </div>
               <div class="radio btn merginLeft">
-                <label><clr-icon shape="refresh" size="20" (click)="storagePoolRefresh()"></clr-icon></label>
+                <label><clr-icon shape="refresh" size="20" (click)="storagePoolRefresh();initStoragePoolListFilter()"></clr-icon></label>
               </div>
             </div>
 
@@ -266,15 +266,30 @@
                   <sl-sp-status-filter #slspStatusFilter></sl-sp-status-filter>
                 </clr-dg-filter>
               </clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='basic'" [clrDgField]="'physicalType'">{{'tier.diskType'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='basic'" [clrDgField]="'storageName'">{{'tier.storage'|translate}}</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='basic'" [clrDgField]="'physicalType'">
+                {{'tier.diskType'|translate}}
+                <clr-dg-filter [clrDgFilter]="slspDiskTypeFilter">
+                  <sl-sp-disk-type-filter #slspDiskTypeFilter></sl-sp-disk-type-filter>
+                </clr-dg-filter>
+              </clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='basic'" [clrDgField]="'storageName'">
+                {{'tier.storage'|translate}}
+                <clr-dg-filter [clrDgFilter]="sLSPStorageNameFilter">
+                  <sl-sp-storage-name-filter #sLSPStorageNameFilter></sl-sp-storage-name-filter>
+                </clr-dg-filter>
+              </clr-dg-column>
 
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'totalCapacity'">{{'tier.total'|translate}}</clr-dg-column>
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'consumedCapacity'">{{'tier.used'|translate}}</clr-dg-column>
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'usedCapacity'">{{'tier.usage'|translate}}</clr-dg-column>
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'freeCapacity'">{{'tier.free'|translate}}</clr-dg-column>
 
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'runningStatus'">{{'tier.status'|translate}}</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'runningStatus'">
+                {{'tier.status'|translate}}
+                <clr-dg-filter [clrDgFilter]="runningStatusFilter">
+                  <sl-sp-status-filter #runningStatusFilter></sl-sp-status-filter>
+                </clr-dg-filter>
+              </clr-dg-column>
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'latency'">{{'tier.latencyms'|translate}}</clr-dg-column>
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'iops'">IOPS</clr-dg-column>
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'bandwidth'">{{'tier.bandwidthm'|translate}}</clr-dg-column>

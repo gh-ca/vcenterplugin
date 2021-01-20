@@ -56,4 +56,8 @@ export class DeviceFilter implements ClrDatagridFilterInterface<List>,OnInit {
   changeFunc(value: any) {
     this.changes.next();
   }
+  initOptions() {
+    this.options = undefined;
+    this.changeFunc(this.options);
+  }
 }
