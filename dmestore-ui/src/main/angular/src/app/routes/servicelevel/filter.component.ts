@@ -58,6 +58,7 @@ export class SLSPStatusFilter implements ClrDatagridFilterInterface<SLStoragePoo
 
   initStatus() {
     this.status = undefined;
+    this.changeFunc(this.status);
   }
 }
 
@@ -154,6 +155,7 @@ export class SLSPDiskTypeFilter implements ClrDatagridFilterInterface<SLStorageP
 
   initType() {
     this.type = undefined;
+    this.changeFunc(this.type);
   }
 }
 
@@ -202,5 +204,6 @@ export class SLSPStorageNameFilter implements ClrDatagridFilterInterface<SLStora
 
   initName() {
     this.name = undefined;
+    this.changeFunc(this.name);
   }
 }
