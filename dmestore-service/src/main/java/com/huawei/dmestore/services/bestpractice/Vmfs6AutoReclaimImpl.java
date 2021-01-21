@@ -11,6 +11,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.vmware.vim25.DatastoreSummary;
 import com.vmware.vim25.HostVmfsVolume;
+import com.vmware.vim25.HostVmfsVolumeUnmapPriority;
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.VmfsDatastoreInfo;
 
@@ -33,7 +34,7 @@ public class Vmfs6AutoReclaimImpl extends BaseBestPracticeService implements Bes
 
     @Override
     public Object getRecommendValue() {
-        return "low";
+        return HostVmfsVolumeUnmapPriority.LOW.value();
     }
 
     @Override
