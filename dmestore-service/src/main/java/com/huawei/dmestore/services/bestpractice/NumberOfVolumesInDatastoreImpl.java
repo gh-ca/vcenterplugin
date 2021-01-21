@@ -70,7 +70,7 @@ public class NumberOfVolumesInDatastoreImpl extends BaseBestPracticeService impl
 
     @Override
     public boolean autoRepair() {
-        return true;
+        return false;
     }
 
     @Override
