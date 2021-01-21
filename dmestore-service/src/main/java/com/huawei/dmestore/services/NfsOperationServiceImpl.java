@@ -313,6 +313,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 tuningMap.put(QOS_POLICY, qosPolicy);
             }
             fsReqBody.put(TUNING, tuningMap);
+            fsReqBody.put("capacity_threshold", 90);
+            fsReqBody.put("capacity", params.get("capacity"));
         }
         String fileSystemId = (String) params.get("file_system_id");
         Object capacityAutonegotiation = params.get(CAPACITY_AUTONEGOTIATION);
@@ -699,9 +701,11 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     @Override
     public Map<String, Object> getEditNfsStore(String storeObjectId) throws DmeException {
         List<String> fsIds = dmeVmwareRalationDao.getFsIdsByStorageId(storeObjectId);
+        String deviceId = dmeVmwareRalationDao.getStorageIdlByObjectId(storeObjectId);
         Map<String, Object> summaryMap = vcsdkUtils.getDataStoreSummaryByObjectId(storeObjectId);
         Map<String, Object> resultMap = new HashMap<>();
         resultMap.put(NFS_NAME, String.valueOf(summaryMap.get(NAME_FIELD)));
+        resultMap.put("deviceId", deviceId);
         String fsname = "";
         if (fsIds.size() <= 0) {
             throw new DmeException("there is no corresponding file system!storeObjectId={}", storeObjectId);
