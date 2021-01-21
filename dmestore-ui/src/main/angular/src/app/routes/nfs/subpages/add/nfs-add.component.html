@@ -180,7 +180,7 @@
           <div *ngIf="addForm.qosFlag">
             <!-- 交通管制对象 带宽 上限-->
             <clr-checkbox-container *ngIf="addForm.control_policyUpper == '1'">
-              <label>{{'vmfs.trafficControlObject' | translate}}</label>
+              <label style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
               <clr-checkbox-wrapper>
                 <input type="checkbox" [(ngModel)]="addForm.maxBandwidthChoose" name="maxbandwidthChoose" clrCheckbox/>
                 <label>
@@ -473,7 +473,7 @@
           <div *ngIf="addForm.qosFlag">
             <!-- 交通管制对象 带宽 上限-->
             <clr-checkbox-container *ngIf="addForm.control_policyUpper == '1'">
-              <label>{{'vmfs.trafficControlObject' | translate}}</label>
+              <label style="color: #9F9F9F;">{{'vmfs.trafficControlObject' | translate}}</label>
               <clr-checkbox-wrapper>
                 <input type="checkbox" [(ngModel)]="addForm.maxBandwidthChoose" name="maxbandwidthChoose" clrCheckbox/>
                 <label>
