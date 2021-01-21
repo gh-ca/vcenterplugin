@@ -133,4 +133,17 @@ public class HostStorageSystemMO extends BaseMO {
         throws HostConfigFaultFaultMsg, NotFoundFaultMsg, RuntimeFaultFaultMsg {
         context.getService().addInternetScsiSendTargets(mor, iscsiHbaDevice, targets);
     }
+
+    /**
+     * updateVmfsUnmapPriority
+     *
+     * @param vmfsUuid vmfsUuid
+     * @param unmapPriority unmapPriority
+     * @throws HostConfigFaultFaultMsg HostConfigFaultFaultMsg
+     * @throws NotFoundFaultMsg NotFoundFaultMsg
+     * @throws RuntimeFaultFaultMsg RuntimeFaultFaultMsg
+     */
+    public void updateVmfsUnmapPriority(String vmfsUuid, String unmapPriority) throws RuntimeFaultFaultMsg {
+        context.getService().updateVmfsUnmapPriority(mor, vmfsUuid, unmapPriority);
+    }
 }
