@@ -98,6 +98,7 @@ export class NfsComponent implements OnInit {
   hiddenLowerFlag = false; // 不支持下限 true是 false否
   deduplicationShow = false; // 重复数据删除 true 支持 false 不支持
   compressionShow = false; // 数据压缩 true 支持 false 不支持
+  latencyIsSelect = false; // 时延为下拉框
 
   errMessage = '';
   constructor(private addService: NfsAddService, private remoteSrv: NfsService, private cdr: ChangeDetectorRef, public gs: GlobalsService ,
@@ -304,6 +305,7 @@ export class NfsComponent implements OnInit {
       this.addQosUpperAndLower();
       this.addCompressionShow();
       this.addDeduplicationShow();
+      this.addLatencyChoose();
       // const storagePoolMap = this.storagePoolMap.filter(item => item.storageId == this.addForm.storagId);
 
       // const storagePoolList = storagePoolMap[0].storagePoolList;
@@ -382,6 +384,15 @@ export class NfsComponent implements OnInit {
   addCompressionShow() {
     this.addForm.compressionEnabled = null;
     this.compressionShow = this.getCompressionShow(this.addForm.storagId);
+  }
+
+  /**
+   * 添加页面 时延为下拉框
+   */
+  addLatencyChoose(){
+    this.addForm.latency = null;
+    const qosTag = this.getStorageQosTag(this.addForm.storagId);
+    this.latencyIsSelect = qosTag == 1;
   }
 
   /**
