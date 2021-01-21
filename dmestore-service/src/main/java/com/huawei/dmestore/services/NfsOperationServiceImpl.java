@@ -147,6 +147,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         String fsId = "";
         String shareId = "";
         String shareClientName = "";
+        String storageId = "";
         try {
             // 创建fs
             Map<String, Object> fsMap = new HashMap<>();
@@ -164,7 +165,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             }
             fsMap.put(FILESYSTEM_SPECS, gson.toJson(filesystemSpecs));
             String poolRawId = (String) params.get("pool_raw_id");
-            String storageId = (String) params.get(STORAGE_ID);
+            storageId = (String) params.get(STORAGE_ID);
             if (StringUtils.isEmpty(poolRawId) || StringUtils.isEmpty(storageId)) {
                 throw new DmeException(CODE_403, "pool_raw_id or storage_id is null!");
             }
@@ -271,7 +272,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             // 判断存储类型
             String storageModel = getStorageModel(ToolUtils.getStr(params.get("storage_id")));
             saveNfsInfoToDmeVmwareRelation(result, currentPortId, logicPortName, fsId, shareName, shareId, fsName,
-                storageModel);
+                storageModel,storageId);
             LOG.info("create nfs save relation success!nfsName={}", nfsName);
         } catch (Exception e) {
             //创建失败，解除共享客户端并删除共享
@@ -680,7 +681,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     }
 
     private void saveNfsInfoToDmeVmwareRelation(String params, String currentPortId, String logicPortName, String fsId,
-        String shareName, String shareId, String fsName, String storageModel) throws DmeException {
+        String shareName, String shareId, String fsName, String storageModel,String storageId) throws DmeException {
         if (!StringUtils.isEmpty(params)) {
             DmeVmwareRelation datastoreInfo = gson.fromJson(params, DmeVmwareRelation.class);
             datastoreInfo.setLogicPortId(currentPortId);
@@ -690,6 +691,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             datastoreInfo.setShareName(shareName);
             datastoreInfo.setShareId(shareId);
             datastoreInfo.setStorageType(storageModel);
+            datastoreInfo.setStorageDeviceId(storageId);
             List<DmeVmwareRelation> dmeVmwareRelations = new ArrayList<>();
             dmeVmwareRelations.add(datastoreInfo);
             dmeVmwareRalationDao.save(dmeVmwareRelations);
