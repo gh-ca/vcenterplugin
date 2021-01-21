@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import {StorageTypeShow} from "../vmfs/list/list.service";
 
 @Injectable()
 export class StorageService {
@@ -44,6 +45,7 @@ export interface StorageList {
    maintenanceOvertime: string;
    location: string;
    patchVersion: string;
+   storageTypeShow:StorageTypeShow;
 }
 export class LogicPort{
   id: string;

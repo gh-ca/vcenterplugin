@@ -40,7 +40,9 @@ export class AddNfs{
   type:string;//  nfs协议版本
   advance :boolean;//false true  true 是有高级选项
   qosFlag:boolean;// qos策略开关 false true false关闭
-  contolPolicy :string;//  上下线选择标记  枚举值 up low
+  contolPolicy :string;//  上下线选择标记  枚举值 up(上限) low(下) all(上下限都有)
+  control_policyUpper:string; // 上限控制flag
+  control_policyLower:string; // 下限
 // up 取值如下
   maxBandwidth: number; //
   maxBandwidthChoose: false; //
