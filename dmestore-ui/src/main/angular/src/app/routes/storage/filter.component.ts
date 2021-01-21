@@ -91,6 +91,8 @@ export class StorageStatusFilter implements ClrDatagridFilterInterface<StorageLi
   initStatus() {
     this.status = undefined;
     this.synStatus = undefined;
+    this.changeFunc(this.status);
+    this.changeFunc(this.synStatus);
   }
 }
 
@@ -136,7 +138,8 @@ export class StoragePoolTypeFilter implements ClrDatagridFilterInterface<Storage
     return true;
   }
   initType() {
-    this.mediaType = '';
+    this.mediaType = undefined;
+    this.changeFunc(this.mediaType);
   }
 }
 @Component({
@@ -186,7 +189,8 @@ export class StoragePoolStatusFilter implements ClrDatagridFilterInterface<Stora
   }
 
   initStatus() {
-    this.status = '';
+    this.status = undefined;
+    this.changeFunc(this.status);
   }
 }
 
@@ -253,7 +257,8 @@ export class VolStatusFilter implements ClrDatagridFilterInterface<Volume>{
   }
 
   initStatus() {
-    this.status = '';
+    this.status = undefined;
+    this.changeFunc(this.status);
   }
 }
 
@@ -300,7 +305,8 @@ export class ProTypeFilter implements ClrDatagridFilterInterface<Volume>{
   }
 
   initType() {
-    this.type = '';
+    this.type = undefined;
+    this.changeFunc(this.type);
   }
 }
 
@@ -347,7 +353,8 @@ export class MapStatusFilter implements ClrDatagridFilterInterface<Volume>{
   }
 
   initStatus() {
-    this.status = '';
+    this.status = undefined;
+    this.changeFunc(this.status);
   }
 }
 @Component({
@@ -394,7 +401,8 @@ export class VolStoragePoolFilter implements ClrDatagridFilterInterface<Volume>{
   }
 
   initPoolNameStatus() {
-    this.storagePoolName = '';
+    this.storagePoolName = undefined;
+    this.changeFunc(this.storagePoolName);
   }
 }
 
@@ -458,6 +466,7 @@ export class VolServiceLevelFilter implements ClrDatagridFilterInterface<Volume>
 
   initServiceLevel() {
     this.serviceLevel = undefined;
+    this.changeFunc(this.serviceLevel);
   }
 
 }
@@ -507,6 +516,7 @@ export class VolProtectionStatusFilter implements ClrDatagridFilterInterface<Vol
 
   initProtectionStatus() {
     this.protectionStatus = undefined;
+    this.changeFunc(this.protectionStatus);
   }
 }
 @Component({
@@ -577,6 +587,7 @@ export class FsStatusFilter implements ClrDatagridFilterInterface<FileSystem> {
 
   initStatus() {
     this.fsStatus = undefined;
+    this.changeFunc(this.fsStatus);
   }
 }
 
@@ -623,6 +634,7 @@ export class FsTypeFilter implements ClrDatagridFilterInterface<FileSystem>{
 
   initType() {
     this.type = undefined;
+    this.changeFunc(this.type);
   }
 }
 
@@ -679,6 +691,7 @@ export class DtreeSecModFilter implements ClrDatagridFilterInterface<Dtrees>{
 
   initSecMod() {
     this.secMod = undefined;
+    this.changeFunc(this.secMod);
   }
 }
 
@@ -726,6 +739,7 @@ export class DtreeQuotaFilter implements ClrDatagridFilterInterface<Dtrees>{
 
   initQuota() {
     this.quota = undefined;
+    this.changeFunc(this.quota);
   }
 }
 
@@ -785,6 +799,7 @@ export class HardwareStatusFilter implements ClrDatagridFilterInterface<StorageC
 
   initStatus() {
     this.status = undefined;
+    this.changeFunc(this.status);
   }
 }
 
@@ -836,6 +851,7 @@ export class DiskStatusFilter implements ClrDatagridFilterInterface<StorageDisk>
 
   initStatus() {
     this.status = undefined;
+    this.changeFunc(this.status);
   }
 }
 @Component({
@@ -894,6 +910,7 @@ export class DiskTypeFilter implements ClrDatagridFilterInterface<StorageDisk>{
 
   initStatus() {
     this.type = undefined;
+    this.changeFunc(this.type);
   }
 }
 @Component({
@@ -952,6 +969,7 @@ export class FcStatusFilter implements ClrDatagridFilterInterface<FCPort>{
 
   initStatus() {
     this.status = undefined;
+    this.changeFunc(this.status);
   }
 }
 @Component({
@@ -1010,6 +1028,7 @@ export class EthStatusFilter implements ClrDatagridFilterInterface<EthernetPort>
 
   initStatus() {
     this.status = undefined;
+    this.changeFunc(this.status);
   }
 }
 
@@ -1069,6 +1088,7 @@ export class FcoeStatusFilter implements ClrDatagridFilterInterface<FCoEPort>{
 
   initStatus() {
     this.status = undefined;
+    this.changeFunc(this.status);
   }
 }
 @Component({
@@ -1115,6 +1135,7 @@ export class LogicRunningStatusFilter implements ClrDatagridFilterInterface<Logi
 
   initStatus() {
     this.status = undefined;
+    this.changeFunc(this.status);
   }
 }
 @Component({
@@ -1165,6 +1186,7 @@ export class LogicStatusFilter implements ClrDatagridFilterInterface<LogicPort>{
 
   initStatus() {
     this.status = undefined;
+    this.changeFunc(this.status);
   }
 }
 
@@ -1220,6 +1242,7 @@ export class LogicDdnsStatusFilter implements ClrDatagridFilterInterface<LogicPo
 
   initStatus() {
     this.ddnsStatus = undefined;
+    this.changeFunc(this.ddnsStatus);
   }
 }
 
@@ -1271,5 +1294,6 @@ export class LogicRoleFilter implements ClrDatagridFilterInterface<LogicPort>{
 
   initStatus() {
     this.role = undefined;
+    this.changeFunc(this.role);
   }
 }

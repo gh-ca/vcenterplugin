@@ -72,6 +72,7 @@ export class StatusFilter implements ClrDatagridFilterInterface<VmfsInfo> {
   }
   initStatus() {
     this.options = undefined;
+    this.changeFunc(this.options);
   }
 }
 
@@ -130,6 +131,7 @@ export class DeviceFilter implements ClrDatagridFilterInterface<VmfsInfo>, OnIni
 
   initDevice() {
     this.device = undefined;
+    this.changeFunc(this.device);
   }
 
 }
@@ -198,6 +200,7 @@ export class ServiceLevelFilter implements ClrDatagridFilterInterface<VmfsInfo>,
 
   initServiceLevel() {
     this.serviceLevel = undefined;
+    this.changeFunc(this.serviceLevel);
   }
 
 }
@@ -251,6 +254,7 @@ export class ProtectionStatusFilter implements ClrDatagridFilterInterface<VmfsIn
 
   initProtectionStatus() {
     this.protectionStatus = undefined;
+    this.changeFunc(this.protectionStatus);
   }
 }
 

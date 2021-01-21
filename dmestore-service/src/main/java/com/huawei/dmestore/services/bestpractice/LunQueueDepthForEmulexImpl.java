@@ -41,15 +41,19 @@ public class LunQueueDepthForEmulexImpl extends BaseBestPracticeService implemen
 
     @Override
     public boolean check(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
-        return super.checkModuleOption(vcsdkUtils, objectId, getOptionName(), getRecommendValue());
+        return super.checkModuleOption(vcsdkUtils, objectId, getModuleName(), getRecommendValue());
     }
 
     @Override
     public void update(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
-        super.updateModuleOption(vcsdkUtils, objectId, getOptionName(), getRecommendValue());
+        super.updateModuleOption(vcsdkUtils, objectId, getModuleName(), getOptionName(), getRecommendValue());
     }
 
     private String getOptionName() {
         return "lpfc0_lun_queue_depth";
+    }
+
+    private String getModuleName() {
+        return "lpfc";
     }
 }

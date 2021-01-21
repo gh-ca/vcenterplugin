@@ -338,16 +338,15 @@ export class ModifyComponent implements OnInit{
           this.initEditMaxInfo(form);
         } else if (qosTag == 3) {
           this.initEditMinInfo(form);
-        } else {
-          if (!form.minbandwidthChoose) {
-            form.min_bandwidth = null;
-          }
-          if (!form.miniopsChoose) {
-            form.min_iops = null;
-          }
-          if (!form.latencyChoose) {
-            form.latency = null;
-          }
+        }
+        if (!form.minbandwidthChoose) {
+          form.min_bandwidth = null;
+        }
+        if (!form.miniopsChoose) {
+          form.min_iops = null;
+        }
+        if (!form.latencyChoose) {
+          form.latency = null;
         }
       } else {
         this.initEditMinInfo(form);

@@ -52,4 +52,8 @@ export class StatusFilter implements ClrDatagridFilterInterface<List>,OnInit {
   changeFunc(value: any) {
     this.changes.next();
   }
+  initStatus() {
+    this.options = undefined;
+    this.changeFunc(this.options);
+  }
 }

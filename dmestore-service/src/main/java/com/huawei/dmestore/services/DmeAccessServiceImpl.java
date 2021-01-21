@@ -235,7 +235,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             LOG.error("HttpClientErrorException:{}", e.toString());
             responseEntity = new ResponseEntity<String>(e.getStatusCode());
         }
-        LOG.info("{},==accessByJson responseEntity=={}", url,
+        LOG.info("{},==accessByJson responseEntity=={}", url.replace("{json}", jsonBody),
             responseEntity == null ? NULL_STRING : responseEntity.getStatusCodeValue());
         if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_401
             || responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_403) {
@@ -450,10 +450,10 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
                 requestbody.put(NAME_FIELD, hostGroupName);
             }
-            LOG.info("== search oriented host group requestBody{}!",gson.toJson(requestbody));
+            LOG.info("== search oriented host group requestBody{}!", gson.toJson(requestbody));
             ResponseEntity responseEntity = access(getHostGroupsUrl, HttpMethod.POST,
                 requestbody == null ? null : gson.toJson(requestbody));
-            LOG.info("== search oriented host group responseBody{}!",gson.toJson(responseEntity));
+            LOG.info("== search oriented host group responseBody{}!", gson.toJson(responseEntity));
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.getAsJsonArray(DmeConstants.HOSTGROUPS);
@@ -660,7 +660,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         String getHostGroupUrl = DmeConstants.GET_DME_HOSTGROUP_URL.replace("{hostgroup_id}", hostGroupId);
         try {
             ResponseEntity responseEntity = access(getHostGroupUrl, HttpMethod.GET, null);
-            LOG.info("==get oriented host group responseBody==",gson.toJson(responseEntity));
+            LOG.info("==get oriented host group responseBody==", gson.toJson(responseEntity));
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject vjson = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 if (vjson != null) {
