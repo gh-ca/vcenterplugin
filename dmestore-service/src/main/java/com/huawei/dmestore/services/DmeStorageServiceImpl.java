@@ -1129,7 +1129,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public FileSystemDetail getFileSystemDetail(String fileSystemId) throws DmeException {
+    public Map<String,Object> getFileSystemDetail(String fileSystemId) throws DmeException {
+        Map<String, Object> responseFileSystemDetail = new HashMap<>();
         if (StringUtils.isEmpty(fileSystemId)) {
             throw new DmeException(CODE_403, "param error!");
         }
@@ -1141,38 +1142,47 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             if (code != HttpStatus.OK.value()) {
                 throw new DmeException(CODE_503, "get file system detail error!");
             }
-
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
-            fileSystemDetail.setId(ToolUtils.jsonToStr(jsonObject.get(ID_FILED)));
-            fileSystemDetail.setName(ToolUtils.jsonToStr(jsonObject.get(NAME_FIELD)));
-            CapacityAutonegotiation capacityAutonegotiation = new CapacityAutonegotiation();
-            JsonObject json = jsonObject.get("capacity_auto_negotiation").getAsJsonObject();
-            capacityAutonegotiation.setAutoSizeEnable(ToolUtils.jsonToBoo(json.get("auto_size_enable")));
-            fileSystemDetail.setCapacityAutonegotiation(capacityAutonegotiation);
-            JsonObject tuning = jsonObject.get("tuning").getAsJsonObject();
-            FileSystemTurning fileSystemTurning = new FileSystemTurning();
-            fileSystemTurning.setAllocationType(ToolUtils.jsonToStr(jsonObject.get("alloc_type")));
-            fileSystemTurning.setCompressionEnabled(ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
-            fileSystemTurning.setDeduplicationEnabled(ToolUtils.jsonToBoo(tuning.get("deduplication_enabled")));
-            SmartQos smartQos = new SmartQos();
-            JsonObject jsonSmartQos = tuning.get("smart_qos").getAsJsonObject();
-            String smartQosStr = gson.toJson(jsonSmartQos);
-            if (!StringUtils.isEmpty(smartQosStr)) {
-                JsonObject qosPolicy = new JsonParser().parse(smartQosStr).getAsJsonObject();
-                smartQos.setMaxbandwidth(ToolUtils.jsonToInt(qosPolicy.get("max_bandwidth")));
-                smartQos.setMaxiops(ToolUtils.jsonToInt(qosPolicy.get("max_iops")));
-                smartQos.setLatency(ToolUtils.jsonToInt(qosPolicy.get("latency")));
-                smartQos.setMinbandwidth(ToolUtils.jsonToInt(qosPolicy.get("min_bandwidth")));
-                smartQos.setMiniops(ToolUtils.jsonToInt(qosPolicy.get("min_iops")));
+            responseFileSystemDetail.put("id", ToolUtils.jsonToStr(jsonObject.get("id")));
+            responseFileSystemDetail.put("capacity", ToolUtils.jsonToDou(jsonObject.get("capacity"),0.0));
+            responseFileSystemDetail.put("storage_id", ToolUtils.jsonToStr(jsonObject.get("storage_id")));
+            responseFileSystemDetail.put("capacity_threshold", ToolUtils.jsonToInt(jsonObject.get("capacity_threshold"),80));
+            JsonObject capacityAutoNegotiation = jsonObject.get("capacity_auto_negotiation").getAsJsonObject();
+            if (capacityAutoNegotiation != null) {
+                Map<String, Object> capacityAutoNegotiationMap = new HashMap<>();
+                    capacityAutoNegotiationMap.put("capacity_self_adjusting_mode",
+                        ToolUtils.jsonToStr(capacityAutoNegotiation.get("capacity_self_adjusting_mode")));
+                capacityAutoNegotiationMap
+                    .put("capacity_recycle_mode",
+                        ToolUtils.jsonToStr(capacityAutoNegotiation.get("capacity_recycle_mode")));
+                capacityAutoNegotiationMap
+                    .put("auto_size_enable", ToolUtils.jsonToBoo(capacityAutoNegotiation.get("auto_size_enable")));
+                capacityAutoNegotiationMap
+                    .put("auto_grow_threshold_percent",
+                        ToolUtils.jsonToInt(capacityAutoNegotiation.get("auto_grow_threshold_percent"), 85));
+                capacityAutoNegotiationMap
+                    .put("auto_shrink_threshold_percent",
+                        ToolUtils.jsonToInt(capacityAutoNegotiation.get("auto_shrink_threshold_percent"), 50));
+                capacityAutoNegotiationMap
+                    .put("max_auto_size",
+                        ToolUtils.jsonToDou(capacityAutoNegotiation.get("max_auto_size")));
+                capacityAutoNegotiationMap
+                    .put("min_auto_size",
+                        ToolUtils.jsonToDou(capacityAutoNegotiation.get("min_auto_size"),
+                            ToolUtils.jsonToDou(jsonObject.get("capacity"), 0.0)));
+                capacityAutoNegotiationMap
+                    .put("auto_size_increment",
+                        ToolUtils.jsonToInt(capacityAutoNegotiation.get("auto_size_increment"), 1024));
+                responseFileSystemDetail.put("capacity_auto_negotiation", capacityAutoNegotiationMap);
+
             }
-            fileSystemTurning.setSmartQos(smartQos);
-            fileSystemDetail.setFileSystemTurning(fileSystemTurning);
+
         } catch (DmeException e) {
             LOG.error("get file system detail error");
             throw new DmeException(CODE_503, e.getMessage());
         }
-        return fileSystemDetail;
+        return responseFileSystemDetail;
     }
 
     private String getDataStoreOnVolume(String volumeId) throws DmeSqlException {
