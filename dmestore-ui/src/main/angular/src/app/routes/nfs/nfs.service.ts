@@ -105,6 +105,8 @@ export class UpdateNfs{
   fileSystemId: string;
   qosFlag:boolean;// qos策略开关 false true false关闭
   contolPolicy :string;//  上下线选择标记  枚举值 up low
+  control_policyUpper:string; // 上限控制flag
+  control_policyLower:string; // 下限
 // up 取值如下
   maxBandwidth: number; //
   maxBandwidthChoose: false; //
@@ -123,6 +125,7 @@ export class UpdateNfs{
   autoSizeEnable:boolean;// 自动扩容 true false
   shareId: string;
   name: string;
+  deviceId: string;
   constructor(){
     this.sameName=true;
   }
