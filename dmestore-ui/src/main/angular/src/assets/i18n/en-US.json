@@ -797,17 +797,18 @@
     "expandError":"Expand failed!Please contact management!",
     "reduceError":"Reduce failed!Please contact management!",
     "deleteError":"Delete failed!Please contact management!",
-    "addError":"Delete failed!Please contact management!",
-    "modifyError":"Delete failed!Please contact management!",
+    "addError":"Add failed!Please contact management!",
+    "modifyError":"Modification failed!Please contact management!",
     "reclaimError":"Space reclamation failed! Please contact the administrator!",
-    "serviceLevelError":"Service level change failed! Please contact the administrator!",
+    "serviceLevelError":"ServiceLevel change failed! Please contact the administrator!",
     "require":"This field is required!",
     "nfsrepeat":"NFS name already exists!",
     "sharerepeat":"Share name already exists!",
     "fsrepeat":"FileSystem name already exists!",
     "vmfsNameRepeat":"VMFS name already exists!",
     "volNameRepeat":"volume name already exists!",
-    "numberAndLetter":"Only numbers and letters can be entered!"
+    "numberAndLetter":"Only numbers and letters can be entered!",
+    "cantFindData":"Sorry, no relevant data is found!"
   },
   "page": {
     "perPage": "Per Page",
@@ -823,5 +824,18 @@
   },
   "tips": {
     "select": "Please select"
+  },
+  "chart": {
+    "select": {
+      "last5Minute": "Last 5 minutes",
+      "last1Hour": "Last 1 hour",
+      "last1Day": "Last day",
+      "last1Week": "Last week",
+      "last1Month": "Last month",
+      "last1Quarter": "Last quarter",
+      "half1Year": "Last half year",
+      "last1Year": "Last year",
+      "invalid": "invalid"
+    }
   }
 }
