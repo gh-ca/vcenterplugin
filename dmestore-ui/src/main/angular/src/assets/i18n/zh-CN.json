@@ -813,7 +813,8 @@
     "fsrepeat":"文件系统名称已经存在！",
     "vmfsNameRepeat":"VMFS名称已经存在！",
     "volNameRepeat":"卷名称已经存在！",
-    "numberAndLetter":"只能输入数字和字母!"
+    "numberAndLetter":"只能输入数字和字母!",
+    "cantFindData": "抱歉未查询到相关数据！"
   },
   "page": {
     "perPage": "每页",
@@ -829,5 +830,18 @@
   },
   "tips": {
     "select": "请选择"
+  },
+  "chart": {
+    "select": {
+      "last5Minute": "最近5分钟",
+      "last1Hour": "最近1小时",
+      "last1Day": "最近1天",
+      "last1Week": "最近1周",
+      "last1Month": "最近1个月",
+      "last1Quarter": "最近1个季度",
+      "half1Year": "最近半年",
+      "last1Year": "最近1年",
+      "invalid": "无效"
+    }
   }
 }

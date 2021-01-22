@@ -170,14 +170,14 @@ export class DetailComponent implements OnInit, AfterViewInit {
   });
   // ranges
   ranges =  [
-    {key: 'LAST_5_MINUTE', value: '最近5分钟'},
-    {key: 'LAST_1_HOUR', value: '最近1小时'},
-    {key: 'LAST_1_DAY', value: '最近1天'},
-    {key: 'LAST_1_WEEK', value: '最近1周'},
-    {key: 'LAST_1_MONTH', value: '最近1个月'},
-    {key: 'LAST_1_QUARTER', value: '最近1个季度'},
-    {key: 'HALF_1_YEAR', value: '最近半年'},
-    {key: 'LAST_1_YEAR', value: '最近1年'},
+    {key: 'LAST_5_MINUTE', value: this.translatePipe.transform('chart.select.last5Minute')},
+    {key: 'LAST_1_HOUR', value: this.translatePipe.transform('chart.select.last1Hour')},
+    {key: 'LAST_1_DAY', value: this.translatePipe.transform('chart.select.last1Day')},
+    {key: 'LAST_1_WEEK', value: this.translatePipe.transform('chart.select.last1Week')},
+    {key: 'LAST_1_MONTH', value: this.translatePipe.transform('chart.select.last1Month')},
+    {key: 'LAST_1_QUARTER', value: this.translatePipe.transform('chart.select.last1Quarter')},
+    {key: 'HALF_1_YEAR', value: this.translatePipe.transform('chart.select.half1Year')},
+    {key: 'LAST_1_YEAR', value: this.translatePipe.transform('chart.select.last1Year')},
   ];
   isLoading = false;
   @ViewChild('paginationVolume')pagination:ClrDatagridPagination;
