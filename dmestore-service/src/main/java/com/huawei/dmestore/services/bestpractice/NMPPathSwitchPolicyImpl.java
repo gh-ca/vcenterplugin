@@ -4,11 +4,16 @@ import com.huawei.dmestore.utils.VCSDKUtils;
 import com.huawei.vmware.mo.HostMO;
 import com.huawei.vmware.mo.HostStorageSystemMO;
 import com.huawei.vmware.util.VmwareContext;
+
+import com.vmware.vim25.HostMultipathInfo;
 import com.vmware.vim25.HostMultipathInfoLogicalUnit;
 import com.vmware.vim25.HostMultipathInfoLogicalUnitPolicy;
+import com.vmware.vim25.HostStorageDeviceInfo;
 import com.vmware.vim25.ManagedObjectReference;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * NMPPathSwitchPolicyImpl
@@ -39,7 +44,9 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
         for (HostMultipathInfoLogicalUnit lun : lunList) {
             HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
             String policyStr = policy.getPolicy();
-            return policyStr;
+            if (!policyStr.equals(getRecommendValue())) {
+                return policyStr;
+            }
         }
 
         return "--";
@@ -66,20 +73,16 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = this.getHostMoFactory().build(context, mor);
         HostStorageSystemMO hostStorageSystemMo = hostMo.getHostStorageSystemMo();
-        List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo()
-            .getMultipathInfo()
-            .getLun();
+        HostStorageDeviceInfo deviceInfo = hostStorageSystemMo.getStorageDeviceInfo();
+        HostMultipathInfo hostMultipathInfo = deviceInfo.getMultipathInfo();
+        List<HostMultipathInfoLogicalUnit> lunList = hostMultipathInfo.getLun();
         for (HostMultipathInfoLogicalUnit lun : lunList) {
-            HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
-            String policyStr = policy.getPolicy();
-            //多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
-            //TODO
-            if (policyStr.contains("_PSP_") && !"VMW_PSP_RR".equals(policy)) {
-                //return false;
-            }
+            HostMultipathInfoLogicalUnitPolicy psp = lun.getPolicy();
+            String pspPolicy = psp.getPolicy();
 
-            if (policyStr.contains("_SATP_") && !"VMW_SATP_ALUA".equals(policy)) {
-                //return false;
+            // 多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
+            if (!pspPolicy.equals(getRecommendValue())) {
+                return false;
             }
         }
 
@@ -91,7 +94,6 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
         if (check(vcsdkUtils, objectId)) {
             return;
         }
-
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = this.getHostMoFactory().build(context, mor);
@@ -99,14 +101,24 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
         List<HostMultipathInfoLogicalUnit> lunList = hostStorageSystemMo.getStorageDeviceInfo()
             .getMultipathInfo()
             .getLun();
-        for (HostMultipathInfoLogicalUnit lun : lunList) {
-            HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
-            String policyStr = policy.getPolicy();
-            //TODO
-            //多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
-            if ("".equals(policyStr)) {
+        if (lunList != null && lunList.size() > 0) {
+            ExecutorService executor = Executors.newFixedThreadPool(lunList.size());
+            for (HostMultipathInfoLogicalUnit lun : lunList) {
+                executor.execute(() -> {
+                    HostMultipathInfoLogicalUnitPolicy policy = lun.getPolicy();
+                    String pspPolicy = policy.getPolicy();
+
+                    // 多路径选路策略，集中式存储选择VMW_SATP_ALUA, VMW_PSP_RR
+                    if (!pspPolicy.equals(getRecommendValue())) {
+                        policy.setPolicy((String) getRecommendValue());
+                        try {
+                            hostStorageSystemMo.setMultipathLunPolicy(lun.getId(), policy);
+                        } catch (Exception exception) {
+                            exception.printStackTrace();
+                        }
+                    }
+                });
             }
-            hostStorageSystemMo.setMultipathLunPolicy(lun.getId(), policy);
         }
     }
 }
