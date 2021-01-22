@@ -32,7 +32,17 @@ export class NfsPerformanceComponent implements OnInit, AfterViewInit {
   // 响应时间+QoS下限
   latencyChart: EChartOption = {};
   // ranges
-  ranges = NfsService.perRanges;
+  ranges = [
+    {key: 'LAST_5_MINUTE', value: this.translatePipe.transform('chart.select.last5Minute')},
+    {key: 'LAST_1_HOUR', value: this.translatePipe.transform('chart.select.last1Hour')},
+    {key: 'LAST_1_DAY', value: this.translatePipe.transform('chart.select.last1Day')},
+    {key: 'LAST_1_WEEK', value: this.translatePipe.transform('chart.select.last1Week')},
+    {key: 'LAST_1_MONTH', value: this.translatePipe.transform('chart.select.last1Month')},
+    {key: 'LAST_1_QUARTER', value: this.translatePipe.transform('chart.select.last1Quarter')},
+    {key: 'HALF_1_YEAR', value: this.translatePipe.transform('chart.select.half1Year')},
+    {key: 'LAST_1_YEAR', value: this.translatePipe.transform('chart.select.last1Year')},
+    {key: 'INVALID', value: this.translatePipe.transform('chart.select.invalid')},
+  ];
   selectRange = 'LAST_1_DAY';
   startTime = null;
   // endTime
