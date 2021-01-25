@@ -866,7 +866,7 @@ public class VCSDKUtilsTest {
         when(datastoreVmwareMoFactory.build(vmwareContext, managedObjectReference)).thenReturn(datastoreMO);
         when(vcConnectionHelpers.objectId2Mor("321")).thenReturn(managedObjectReference);
         when(virtualMachineMoFactorys.build(vmwareContext, managedObjectReference)).thenReturn(virtualMachineMo);
-        vcsdkUtils.createDisk("321", "321", "321", 21);
+        vcsdkUtils.createDisk("321", "321", "321", 21, null);
     }
 
     @Test

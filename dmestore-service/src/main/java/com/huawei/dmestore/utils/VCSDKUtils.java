@@ -1945,8 +1945,8 @@ public class VCSDKUtils {
      * @param size size
      * @throws VcenterException VcenterException
      **/
-    public void createDisk(String dataStoreObjectId, String vmObjectId, String rdmDeviceName, int size)
-        throws VcenterException {
+    public void createDisk(String dataStoreObjectId, String vmObjectId, String rdmDeviceName, int size,
+        String compatibilityMode) throws VcenterException {
         String serverguid = vcConnectionHelpers.objectId2Serverguid(vmObjectId);
         try {
             VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
@@ -1956,7 +1956,7 @@ public class VCSDKUtils {
             VirtualMachineMO virtualMachineMo = virtualMachineMoFactorys.build(vmwareContext,
                 vcConnectionHelpers.objectId2Mor(vmObjectId));
             virtualMachineMo.createDisk(vmdkDatastorePath, VirtualDiskType.RDM, VirtualDiskMode.PERSISTENT,
-                rdmDeviceName, size * DIGIT_1024, datastoreMo.getMor(), DEFAULT_CONTROLLER_KEY);
+                rdmDeviceName, size * DIGIT_1024, datastoreMo.getMor(), DEFAULT_CONTROLLER_KEY, compatibilityMode);
         } catch (Exception e) {
             throw new VcenterException(e.getMessage());
         }

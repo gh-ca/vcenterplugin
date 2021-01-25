@@ -121,7 +121,8 @@ public class VirtualMachineMO extends BaseMO {
      * @throws Exception Exception
      */
     public void createDisk(String vmdkDatastorePath, VirtualDiskType diskType, VirtualDiskMode diskMode,
-        String rdmDeviceName, long sizeInMb, ManagedObjectReference morDs, int controllerKey) throws Exception {
+        String rdmDeviceName, long sizeInMb, ManagedObjectReference morDs, int controllerKey, String compatibilityMode)
+        throws Exception {
         assert (vmdkDatastorePath != null);
         assert (morDs != null);
         Map<String, Integer> controllerKeyAndUnitNumMap = getControllerKeyAndUnitNum();
@@ -154,7 +155,7 @@ public class VirtualMachineMO extends BaseMO {
         } else if (diskType == VirtualDiskType.RDM || diskType == VirtualDiskType.RDMP) {
             VirtualDiskRawDiskMappingVer1BackingInfo backingInfo = new VirtualDiskRawDiskMappingVer1BackingInfo();
             if (diskType == VirtualDiskType.RDM) {
-                backingInfo.setCompatibilityMode("virtualMode");
+                backingInfo.setCompatibilityMode(compatibilityMode == null ? "virtualMode" : compatibilityMode);
             } else {
                 backingInfo.setCompatibilityMode("physicalMode");
             }
