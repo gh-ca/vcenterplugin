@@ -110,6 +110,7 @@
     "nfsStore":"NFS DataStore",
     "respRt":"Response Time-Read(ms)",
     "respWt":"Response Time-Write(ms)",
+    "characterEncoding":"Character Encoding",
     "logic":{
       "logic":"Logic Port",
       "name":"Name",
