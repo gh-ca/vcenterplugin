@@ -173,7 +173,7 @@ public interface DmeStorageService {
      * @return FileSystemDetail
      * @throws DmeException when error
      */
-    FileSystemDetail getFileSystemDetail(String fileSystemId) throws DmeException;
+    Map<String,Object> getFileSystemDetail(String fileSystemId) throws DmeException;
 
     /**
      * list StoragePer formance

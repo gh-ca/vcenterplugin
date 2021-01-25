@@ -358,7 +358,7 @@ export class AddComponent implements OnInit{
       const storagePoolList = storagePoolMap[0].storagePoolList;
       const workloads = storagePoolMap[0].workloadList;
       // 获取存储池数据
-      if (!storagePoolList) {
+      // if (!storagePoolList) {
         this.remoteSrv.getStoragePoolsByStorId(this.form.storage_id, 'block').subscribe((result: any) => {
           console.log('storagePools', result);
           console.log('result.code === \'200\' && result.data !== null', result.code === '200' && result.data !== null);
@@ -369,11 +369,11 @@ export class AddComponent implements OnInit{
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
           }
         });
-      } else {
-        this.storagePoolList = storagePoolList;
-      }
+      // } else {
+      //   this.storagePoolList = storagePoolList;
+      // }
       // 获取workLoad
-      if (!workloads && this.showWorkLoadFlag) {
+      if (this.showWorkLoadFlag) {
         this.remoteSrv.getWorkLoads(this.form.storage_id).subscribe((result: any) => {
           console.log('storagePools', result);
           if (result.code === '200' && result.data !== null) {
@@ -383,8 +383,8 @@ export class AddComponent implements OnInit{
             this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
           }
         });
-      } else {
-        this.workloads = workloads;
+      // } else {
+      //   this.workloads = workloads;
       }
     }
   }
@@ -414,58 +414,61 @@ export class AddComponent implements OnInit{
       if (this.form.isSameName) { // 卷名称与vmfs名称相同（PS：不同时为必填）
         this.form.volumeName = this.form.name;
       }
+      const addSubmitForm = new GetForm().getAddForm();
+      Object.assign(addSubmitForm, this.form);
       // 数据预处----容量 （后端默认单位为GB）
       switch (this.form.capacityUnit) {
         case 'TB':
-          this.form.capacity = this.form.capacity * 1024;
+          addSubmitForm.capacity = addSubmitForm.capacity * 1024;
           break;
         case 'MB':
-          this.form.capacity = this.form.capacity / 1024;
+          addSubmitForm.capacity = addSubmitForm.capacity / 1024;
           break;
         case 'KB':
-          this.form.capacity = this.form.capacity / (1024 * 1024);
+          addSubmitForm.capacity = addSubmitForm.capacity / (1024 * 1024);
           break;
         default: // 默认GB 不变
           break;
       }
       // 主机/集群数据处理
       if (this.chooseDevice.deviceType === 'host') {
-        this.form.host = this.chooseDevice.deviceName;
-        this.form.hostId = this.chooseDevice.deviceId;
+        addSubmitForm.host = this.chooseDevice.deviceName;
+        addSubmitForm.hostId = this.chooseDevice.deviceId;
       } else {
-        this.form.cluster = this.chooseDevice.deviceName;
-        this.form.clusterId = this.chooseDevice.deviceId;
+        addSubmitForm.cluster = this.chooseDevice.deviceName;
+        addSubmitForm.clusterId = this.chooseDevice.deviceId;
       }
       if (this.levelCheck === 'customer') { // 未选择 服务等级 需要将服务等级数据设置为空
-        this.form.service_level_id = null;
-        this.form.service_level_name = null;
+        addSubmitForm.service_level_id = null;
+        addSubmitForm.service_level_name = null;
       }
       // 若控制策略数据为空，则将控制策略变量置为空
-      if (this.form.maxbandwidth === null && this.form.maxiops === null
-        && this.form.minbandwidth === null && this.form.miniops === null && this.form.latency === null) {
-        this.form.control_policy = null;
+      if (addSubmitForm.maxbandwidth === null && addSubmitForm.maxiops === null
+        && addSubmitForm.minbandwidth === null && addSubmitForm.miniops === null && addSubmitForm.latency === null) {
+        addSubmitForm.control_policy = null;
       }
       // 控制策略若未选清空数据
       if( this.levelCheck == 'customer') {
-        this.qosFunc(this.form);
-        if (this.form.control_policyUpper == '1') { // 上限+全选（上下限）
-          this.form.control_policy = '1';
-        } else if(this.form.control_policyLower == '0') {// 下限
-          this.form.control_policy = '0';
+        this.qosFunc(addSubmitForm);
+        if (addSubmitForm.control_policyUpper == '1') { // 上限+全选（上下限）
+          addSubmitForm.control_policy = '1';
+        } else if(addSubmitForm.control_policyLower == '0') {// 下限
+          addSubmitForm.control_policy = '0';
         } else {
-          this.form.control_policy = null;
+          addSubmitForm.control_policy = null;
         }
         // smartTiger
         if (!this.showSmartTierFlag || !this.form.smartTierFlag) {
-          this.form.smartTier = null;
+          addSubmitForm.smartTier = null;
         }
       }
 
       console.log('addFrom', this.form);
+      console.log('addSubmitForm', addSubmitForm);
       // 打开 loading
       // this.globalsService.loading = true;
       this.modalHandleLoading = true;
-      this.remoteSrv.createVmfs(this.form).subscribe((result: any) => {
+      this.remoteSrv.createVmfs(addSubmitForm).subscribe((result: any) => {
         this.modalHandleLoading = false;
         if (result.code === '200') {
           console.log('创建成功');
@@ -749,7 +752,9 @@ export class AddComponent implements OnInit{
         if (reg5.test(this.form.name)) {
           // 校验VMFS名称重复
           this.checkVmfsName(this.form.name);
-
+          if (this.form.isSameName) {
+            this.form.volumeName = this.form.name;
+          }
         } else {
           this.matchErr = true;
           this.form.name = null;
@@ -782,7 +787,7 @@ export class AddComponent implements OnInit{
       if (result.code === '200') { // result.data true 不重复 false 重复
         this.vmfsNameRepeatErr = !result.data;
         if (this.vmfsNameRepeatErr) { // 名称重复
-          this.form.name = null;
+          // this.form.name = null;
           this.volNameRepeatErr = false;
           this.matchErr = false;
         } else {
@@ -805,11 +810,11 @@ export class AddComponent implements OnInit{
       this.modalHandleLoading = false;
       if (result.code === '200') { // result.data true 不重复 false 重复
         this.volNameRepeatErr = !result.data;
-        if (!this.vmfsNameRepeatErr && this.volNameRepeatErr) {
-          this.form.name = null;
-        }
+        // if (!this.vmfsNameRepeatErr && this.volNameRepeatErr) {
+        //   this.form.name = null;
+        // }
         if (this.volNameRepeatErr) {
-          this.form.volumeName = null;
+          // this.form.volumeName = null;
           this.vmfsNameRepeatErr = false;
           this.matchErr = false;
         }
@@ -844,16 +849,15 @@ export class AddComponent implements OnInit{
           this.initAddMaxInfo(form);
         }else if (qosTag == 3) {
           this.initAddMinInfo(form);
-        } else {
-          if (!form.minbandwidthChoose) {
-            form.minbandwidth = null;
-          }
-          if (!form.miniopsChoose) {
-            form.miniops = null;
-          }
-          if (!form.latencyChoose) {
-            form.latency = null;
-          }
+        }
+        if (!form.minbandwidthChoose) {
+          form.minbandwidth = null;
+        }
+        if (!form.miniopsChoose) {
+          form.miniops = null;
+        }
+        if (!form.latencyChoose) {
+          form.latency = null;
         }
       }else {
         this.initAddMinInfo(form);
@@ -941,7 +945,7 @@ export class AddComponent implements OnInit{
    * 添加页面 资源调优thick展示与隐藏
    */
   addAllocationTypeShowInit() {
-    this.form.alloctype = 'thin';
+    this.form.alloctype = '';
     const allocationTypeShow = this.getAllocationTypeShow(this.form.storage_id);
     this.showAlloctypeThick = allocationTypeShow == 1;
   }
@@ -1027,6 +1031,16 @@ export class AddComponent implements OnInit{
         this.form.control_policyUpper = undefined;
         upperObj.checked = false;
       }
+    }
+  }
+
+  /**
+   *
+   * 添加页面名称相同按钮点击事件
+   */
+  addSameBtnChangeFunc(obj) {
+    if (this.form.isSameName) {
+      this.form.volumeName = this.form.name
     }
   }
 }

@@ -7,6 +7,7 @@ import com.huawei.vmware.util.VmwareContext;
 
 import com.vmware.vim25.HostConfigChangeMode;
 import com.vmware.vim25.HostNetworkConfig;
+import com.vmware.vim25.HostPortGroupConfig;
 import com.vmware.vim25.HostVirtualNicConfig;
 import com.vmware.vim25.HostVirtualNicSpec;
 import com.vmware.vim25.HostVirtualSwitch;
@@ -15,6 +16,8 @@ import com.vmware.vim25.HostVirtualSwitchSpec;
 import com.vmware.vim25.ManagedObjectReference;
 
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * JumboFrameMTUImpl
@@ -42,19 +45,10 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
         ManagedObjectReference mor = vcsdkUtils.getVcConnectionHelper().objectId2Mor(objectId);
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = this.getHostMoFactory().build(context, mor);
-        List<HostVirtualSwitch> virtualSwitches = hostMo.getHostNetworkInfo().getVswitch();
-        for (HostVirtualSwitch virtualSwitch : virtualSwitches) {
-            HostVirtualSwitchSpec spec = virtualSwitch.getSpec();
-            Integer mtu = spec.getMtu();
-            if (null == mtu || (mtu.intValue() != getRecommendValue().intValue())) {
-                return null == mtu ? MTU_NULL : mtu.intValue();
-            }
-        }
-
         HostNetworkConfig networkConfig = hostMo.getHostNetworkSystemMo().getNetworkConfig();
-        List<HostVirtualSwitchConfig> list = networkConfig.getVswitch();
-        for (HostVirtualSwitchConfig config : list) {
-            HostVirtualSwitchSpec spec = config.getSpec();
+        List<HostVirtualNicConfig> list = networkConfig.getVnic();
+        for (HostVirtualNicConfig config : list) {
+            HostVirtualNicSpec spec = config.getSpec();
             Integer mtu = spec.getMtu();
             if (null == mtu || (mtu.intValue() != getRecommendValue().intValue())) {
                 return null == mtu ? MTU_NULL : mtu.intValue();
@@ -89,7 +83,13 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
         VmwareContext context = vcsdkUtils.getVcConnectionHelper().getServerContext(objectId);
         HostMO hostMo = this.getHostMoFactory().build(context, mor);
         HostNetworkConfig networkConfig = hostMo.getHostNetworkSystemMo().getNetworkConfig();
+        if (networkConfig == null) {
+            return true;
+        }
         List<HostVirtualNicConfig> list = networkConfig.getVnic();
+        if (list == null || list.size() == 0) {
+            return true;
+        }
         for (HostVirtualNicConfig config : list) {
             HostVirtualNicSpec spec = config.getSpec();
             Integer mtu = spec.getMtu();
@@ -116,14 +116,22 @@ public class JumboFrameMTUImpl extends BaseBestPracticeService implements BestPr
         HostNetworkSystemMO hostNetworkSystemMo = hostMo.getHostNetworkSystemMo();
         HostNetworkConfig networkConfig = hostNetworkSystemMo.getNetworkConfig();
         List<HostVirtualNicConfig> list = networkConfig.getVnic();
+        ExecutorService singleThreadExecutor = Executors.newFixedThreadPool(list.size());
         for (HostVirtualNicConfig config : list) {
             HostVirtualNicSpec spec = config.getSpec();
+            String device = config.getDevice();
             Integer mtu = spec.getMtu();
             if (null == mtu || (mtu.intValue() != ((Integer) recommendValue).intValue())) {
-                spec.setMtu((Integer) recommendValue);
+                singleThreadExecutor.execute(() -> {
+                    spec.setMtu((Integer) recommendValue);
+                    try {
+                        hostNetworkSystemMo.updateVirtualNic(device, spec);
+                    } catch (Exception exception) {
+                        LOGGER.error("updateVirtualNic error!hostObjectId={},device={}", objectId, device);
+                        exception.printStackTrace();
+                    }
+                });
             }
         }
-        hostNetworkSystemMo.updateNetworkConfig(networkConfig, HostConfigChangeMode.MODIFY.value());
-        hostMo.getHostStorageSystemMo().refreshStorageSystem();
     }
 }
