@@ -129,10 +129,10 @@ public class VirtualMachineMOTest {
         when(vmwareClient.waitForTask(morTask)).thenReturn(true);
         doNothing().when(context).waitForTaskProgressDone(morTask);
         virtualMachineMO.createDisk(vmdkDatastorePath, diskType, diskMode, rdmDeviceName, sizeInMb, morDs,
-            controllerKey);
+            controllerKey, null);
 
         virtualMachineMO.createDisk(vmdkDatastorePath, VirtualDiskType.THIN, diskMode, rdmDeviceName, sizeInMb, morDs,
-            controllerKey);
+            controllerKey, null);
     }
 
     @Test
