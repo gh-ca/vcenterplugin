@@ -60,6 +60,8 @@ export class NfsComponent implements OnInit {
       ),
     unit: new FormControl('GB',
       Validators.required),
+    characterEncoding: new FormControl('utf-8',
+      Validators.required),
   });
   storageList: StorageList[] = [];
   storagePools: StoragePool[] = [];

@@ -64,6 +64,8 @@ export class RdmComponent implements OnInit {
   // 归属控制器 true 支持 false 不支持
   ownershipController = true;
 
+  compatibilityMode = 'virtualMode';// 兼容模式
+
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
               private commonService: CommonService,
@@ -211,7 +213,8 @@ export class RdmComponent implements OnInit {
       body = {
         customizeVolumesRequest: {
           customizeVolumes: b
-        }
+        },
+        compatibilityMode: this.compatibilityMode
       };
     }
     if (this.configModel.storageType == '1'){
@@ -223,7 +226,8 @@ export class RdmComponent implements OnInit {
         createVolumesRequest: {
           serviceLevelId: this.serviceLevelId,
           volumes: this.configModel.volumeSpecs
-        }
+        },
+        compatibilityMode: this.compatibilityMode
       };
     }
     console.log(b);
@@ -292,7 +296,7 @@ export class RdmComponent implements OnInit {
       }
     }
     console.log("this.ownershipController", this.ownershipController);
-    this.http.get('dmestorage/storagepools', {params: {storageId, media_type: "all"}}).subscribe((result: any) => {
+    this.http.get('dmestorage/storagepools', {params: {storageId, mediaType: "block"}}).subscribe((result: any) => {
       this.slLoading = false;
       if (result.code === '200'){
         this.storagePools = result.data;

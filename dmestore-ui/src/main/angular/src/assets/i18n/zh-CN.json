@@ -110,6 +110,7 @@
     "nfsStore":"NFS存储",
     "respRt":"读响应时间(毫秒)",
     "respWt":"写响应时间(毫秒)",
+    "characterEncoding":"字符编码",
     "logic":{
       "logic":"逻辑端口",
       "name":"名称",
@@ -672,7 +673,12 @@
 
     "createRdmError": "创建RDM出错!",
     "selectOneSer": "服务等级不能为空！",
-    "rdmSuccessMsg": "创建RDM成功!"
+    "rdmSuccessMsg": "创建RDM成功!",
+    "compatibilityMode": {
+      "name": "兼容模式",
+      "virtualMode": "虚拟",
+      "physicalMode": "物理"
+    }
   },
   "tier": {
     "name": "名称",

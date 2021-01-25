@@ -346,7 +346,7 @@ export class GetForm {
   // 扩容form（初始化的添加表单）
   getExpandForm() {
     const expandForm = {
-      vo_add_capacity: null, // 扩容大小默认GB
+      vo_add_capacity: 1, // 扩容大小默认GB
       capacityUnit: 'GB', // 容量单位 （最后需转换为GB）
       volume_id: '', // 卷ID
       ds_name: '', // vmfsName

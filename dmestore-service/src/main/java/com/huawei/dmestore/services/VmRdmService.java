@@ -19,9 +19,11 @@ public interface VmRdmService {
      * @param dataStoreObjectId vCenter存储名称对象ID
      * @param vmObjectId vCenter虚拟机ID
      * @param createBean DME卷创建基础信息
+     * @param compatibilityMode 兼容模式
      * @throws DmeException DmeException
      **/
-    void createRdm(String dataStoreObjectId, String vmObjectId, VmRdmCreateBean createBean) throws DmeException;
+    void createRdm(String dataStoreObjectId, String vmObjectId, VmRdmCreateBean createBean, String compatibilityMode)
+        throws DmeException;
 
     /**
      * 获取DME主机信息

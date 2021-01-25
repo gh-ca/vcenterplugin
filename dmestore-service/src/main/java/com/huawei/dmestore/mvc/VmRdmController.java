@@ -45,7 +45,7 @@ public class VmRdmController extends BaseController {
                                       @RequestBody VmRdmCreateBean createBean,
                                       @RequestParam("dataStoreObjectId") String dataStoreObjectId) {
         try {
-            vmRdmService.createRdm(dataStoreObjectId, vmObjectId, createBean);
+            vmRdmService.createRdm(dataStoreObjectId, vmObjectId, createBean, createBean.getCompatibilityMode());
             return success();
         } catch (DmeException e) {
             LOG.error(e.getMessage());

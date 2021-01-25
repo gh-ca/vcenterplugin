@@ -214,6 +214,26 @@
             <option value="GB">GB</option>
           </select>
         </clr-input-container>
+        <!--字符编码-->
+        <clr-select-container class="selectClass">
+          <label>{{'nfs.characterEncoding' | translate}}</label>
+          <select clrSelect [(ngModel)]="addForm.characterEncoding" formControlName="characterEncoding" name="characterEncoding" required>
+            <option value="utf-8">UTF-8</option>
+            <option value="zh">ZH</option>
+            <option value="gbk">GBK</option>
+            <option value="euc-tw">EUC-TW</option>
+            <option value="big5">BIG5</option>
+            <option value="euc-jp">EUC-JP</option>
+            <option value="jis">JIS</option>
+            <option value="s-jis">S-JIS</option>
+            <option value="de">DE</option>
+            <option value="pt">PT</option>
+            <option value="es">ES</option>
+            <option value="fr">FR</option>
+            <option value="it">IT</option>
+            <option value="ko">KO</option>
+          </select>
+        </clr-select-container>
         <clr-select-container class="selectClass">
           <label>{{'nfs.nfsProtocol' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.type" formControlName="type" name="type">
@@ -250,6 +270,7 @@
             <option *ngFor="let item of vmkernelList" value="{{item.ipAddress}}">{{item.ipAddress}}</option>
           </select>
         </clr-select-container>
+        <!--挂载类型-->
         <clr-select-container class="selectClass">
           <label>{{'nfs.mountType' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.accessMode" required name="accessMode" formControlName="accessMode">
