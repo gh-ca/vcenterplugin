@@ -9,7 +9,7 @@ import {ActivatedRoute, Router} from "@angular/router";
   providers: [NfsExpandService]
 })
 export class NfsExpandComponent implements OnInit{
-  newCapacity = 0;
+  newCapacity = 1;
   viewPage: string;
   pluginFlag: string;//来至插件的标记
   unit='GB';

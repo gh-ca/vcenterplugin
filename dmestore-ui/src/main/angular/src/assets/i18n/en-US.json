@@ -668,7 +668,12 @@
 
     "createRdmError": "Create RDM Error!",
     "selectOneSer": "Service Level is not be Null！",
-    "rdmSuccessMsg": "Create RDM Success!"
+    "rdmSuccessMsg": "Create RDM Success!",
+    "compatibilityMode": {
+      "name": "Compatibility Mode",
+      "virtualMode": "Virtual Mode",
+      "physicalMode": "Physical Mode"
+    }
   },
   "tier": {
     "name": "Name",
