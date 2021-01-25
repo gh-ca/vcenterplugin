@@ -7,7 +7,7 @@ import {StorageList, StorageService} from "../../storage/storage.service";
 @Component({
   selector: "vmfs-filter",
   template: `
-      <clr-radio-container>
+      <clr-radio-container style="max-height: 6.25rem;overflow-y: auto">
         <clr-radio-wrapper>
           <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="options" value="" />
           <label>{{'vmfs.filter.all' | translate}}</label>
@@ -72,6 +72,7 @@ export class StatusFilter implements ClrDatagridFilterInterface<VmfsInfo> {
   }
   initStatus() {
     this.options = undefined;
+    this.changeFunc(this.options);
   }
 }
 
@@ -79,7 +80,7 @@ export class StatusFilter implements ClrDatagridFilterInterface<VmfsInfo> {
 @Component({
   selector: "device-filter",
   template: `
-    <clr-radio-container>
+    <clr-radio-container style="max-height: 6.25rem;overflow-y: auto">
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="device" (change)="changeFunc($event)" [(ngModel)]="device" value="" />
         <label>{{'vmfs.filter.all' | translate}}</label>
@@ -130,6 +131,7 @@ export class DeviceFilter implements ClrDatagridFilterInterface<VmfsInfo>, OnIni
 
   initDevice() {
     this.device = undefined;
+    this.changeFunc(this.device);
   }
 
 }
@@ -137,7 +139,7 @@ export class DeviceFilter implements ClrDatagridFilterInterface<VmfsInfo>, OnIni
 @Component({
   selector: "serviceLevel-filter",
   template: `
-      <clr-radio-container>
+      <clr-radio-container style="max-height: 6.25rem;overflow-y: auto">
         <clr-radio-wrapper>
           <input type="radio" clrRadio name="serviceLevel" (change)="changeFunc($event)" [(ngModel)]="serviceLevel" value="all" />
           <label>{{'vmfs.filter.all' | translate}}</label>
@@ -198,6 +200,7 @@ export class ServiceLevelFilter implements ClrDatagridFilterInterface<VmfsInfo>,
 
   initServiceLevel() {
     this.serviceLevel = undefined;
+    this.changeFunc(this.serviceLevel);
   }
 
 }
@@ -251,6 +254,7 @@ export class ProtectionStatusFilter implements ClrDatagridFilterInterface<VmfsIn
 
   initProtectionStatus() {
     this.protectionStatus = undefined;
+    this.changeFunc(this.protectionStatus);
   }
 }
 

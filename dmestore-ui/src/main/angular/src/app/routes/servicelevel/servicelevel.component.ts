@@ -14,7 +14,7 @@ import { GlobalsService }     from "../../shared/globals.service";
 import {TranslatePipe} from "@ngx-translate/core";
 import {ServicelevelService, SLStoragePool} from "./servicelevel.service";
 import {ServiceLevelFilter} from "../vmfs/list/filter.component";
-import {SLSPStatusFilter} from "./filter.component";
+import {SLSPDiskTypeFilter, SLSPStatusFilter, SLSPStorageNameFilter} from "./filter.component";
 
 @Component({
   selector: 'app-servicelevel',
@@ -161,7 +161,10 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   tierLoading = false;
   syncLoading = false;
 
-  @ViewChild('sLSPStatusFilter') sLSPStatusFilter: SLSPStatusFilter;
+  @ViewChild('slspStatusFilter') slspStatusFilter: SLSPStatusFilter;
+  @ViewChild('runningStatusFilter') runningStatusFilter: SLSPStatusFilter;
+  @ViewChild('slspDiskTypeFilter') slspDiskTypeFilter: SLSPDiskTypeFilter;
+  @ViewChild('sLSPStorageNameFilter') sLSPStorageNameFilter: SLSPStorageNameFilter;
 
   constructor(private ngZone: NgZone,
               private cdr: ChangeDetectorRef,
@@ -205,6 +208,9 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
         } else{
           this.storagePoolList = [];
         }
+        const allName = this.storagePoolList.map(item => item.storageName);
+        // 设置设备名称过滤相关
+        this.sLSPStorageNameFilter.setStorageNameFilter(allName)
         this.storagePoolList.forEach(item => item.usedCapacity = Number(((item.consumedCapacity)/item.totalCapacity * 100).toFixed(2)));
         this.storagePoolTotal = this.storagePoolList.length;
         this.storeagePoolIsloading = false;
@@ -551,6 +557,25 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
       console.error('ERROR', err);
       alert("同步失败");
     });
+  }
+  formatCapacity(c: number){
+    if (c < 1024){
+      return c.toFixed(3)+" GB";
+    }else if(c >= 1024 && c< 1048576){
+      return (c/1024).toFixed(3) +" TB";
+    }else if(c>= 1048576){
+      return (c/1024/1024).toFixed(3)+" PB"
+    }
+  }
+
+  /**
+   * 初始化过滤器
+   */
+  initStoragePoolListFilter(){
+    this.slspStatusFilter.initStatus();
+    this.runningStatusFilter.initStatus();
+    this.slspDiskTypeFilter.initType();
+    this.sLSPStorageNameFilter.initName();
   }
 }
 

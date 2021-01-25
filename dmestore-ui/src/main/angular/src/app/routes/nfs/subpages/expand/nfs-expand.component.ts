@@ -35,12 +35,15 @@ export class NfsExpandComponent implements OnInit{
         //入口来至Vcenter
         const ctx = this.gs.getClientSdk().app.getContextObjects();
         this.storeObjectId=ctx[0].id;
+        // this.storeObjectId="urn:vmomi:Datastore:datastore-4072:674908e5-ab21-4079-9cb1-596358ee5dd1";
         this.viewPage='expand_vcenter';
         this.modalLoading = true;
         this.expandService.getStorageById(this.storeObjectId).subscribe((result: any) => {
           this.modalLoading = false;
           if (result.code === '200'){
             this.fsId = result.data.fsId;
+            // console.log("this.fsId", this.fsId);
+            // console.log("result.data", result.data);
           }
           this.cdr.detectChanges();
         });
@@ -48,17 +51,19 @@ export class NfsExpandComponent implements OnInit{
   }
   expandData(){
     this.modalHandleLoading=true;
+    let capacity;
     switch (this.unit) {
       case 'TB':
-        this.newCapacity = this.newCapacity * 1024;
+        capacity = this.newCapacity * 1024;
         break;
       case 'MB':
-        this.newCapacity = this.newCapacity / 1024;
+        capacity = this.newCapacity / 1024;
         break;
       case 'KB':
-        this.newCapacity = this.newCapacity / (1024 * 1024);
+        capacity = this.newCapacity / (1024 * 1024);
         break;
       default: // 默认GB 不变
+        capacity = this.newCapacity;
         break;
     }
     var params;
@@ -67,14 +72,15 @@ export class NfsExpandComponent implements OnInit{
         "fileSystemId": this.fsId,
         "storeObjectId": this.storeObjectId,
         "expand":true,
-        "capacity": this.newCapacity
+        "capacity": capacity
       }
     }
     if(this.pluginFlag==null){
       params={
         "storeObjectId": this.storeObjectId,
         "expand":true,
-        "capacity": this.newCapacity
+        "fileSystemId": this.fsId,
+        "capacity": capacity
       }
     }
     this.expandService.changeCapacity(params).subscribe((result: any) => {

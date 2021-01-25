@@ -36,8 +36,10 @@ export class NfsReduceComponent implements OnInit{
       const ctx = this.gs.getClientSdk().app.getContextObjects();
       if(ctx!=null){
         this.storeObjectId=ctx[0].id;
-        // this.storeObjectId="urn:vmomi:Datastore:datastore-2057:674908e5-ab21-4079-9cb1-596358ee5dd1";
       }
+      // this.storeObjectId="urn:vmomi:Datastore:datastore-4072:674908e5-ab21-4079-9cb1-596358ee5dd1";
+      console.log("this.storeObjectId", this.storeObjectId);
+      console.log("ctx!=null", ctx!=null);
       this.viewPage='reduce_vcenter'
       this.modalLoading = true;
       this.reduceService.getStorageById(this.storeObjectId).subscribe((result: any) => {
@@ -61,17 +63,19 @@ export class NfsReduceComponent implements OnInit{
   }
   reduceCommit(){
     this.modalHandleLoading=true;
+    let capacity;
     switch (this.unit) {
       case 'TB':
-        this.newCapacity = this.newCapacity * 1024;
+        capacity = this.newCapacity * 1024;
         break;
       case 'MB':
-        this.newCapacity = this.newCapacity / 1024;
+        capacity = this.newCapacity / 1024;
         break;
       case 'KB':
-        this.newCapacity = this.newCapacity / (1024 * 1024);
+        capacity = this.newCapacity / (1024 * 1024);
         break;
       default: // 默认GB 不变
+        capacity = this.newCapacity;
         break;
     }
     var params;
@@ -80,14 +84,15 @@ export class NfsReduceComponent implements OnInit{
         "fileSystemId": this.fsId,
         "storeObjectId": this.storeObjectId,
         "expand":false,
-        "capacity": this.newCapacity
+        "capacity": capacity
       }
     }
     if(this.pluginFlag==null){
       params={
         "storeObjectId": this.storeObjectId,
         "expand":false,
-        "capacity": this.newCapacity
+        "fileSystemId": this.fsId,
+        "capacity": capacity
       }
     }
     this.reduceService.changeCapacity(params).subscribe((result: any) => {

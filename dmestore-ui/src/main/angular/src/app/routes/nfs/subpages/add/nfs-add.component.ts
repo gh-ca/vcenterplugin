@@ -38,6 +38,11 @@ export class NfsAddComponent implements OnInit{
   latencyChoose=false; // 时延 选中
   addSuccessShow = false; // 添加成功提示
 
+  hiddenLowerFlag = false; // 不支持下限 true是 false否
+  deduplicationShow = false; // 重复数据删除 true 支持 false 不支持
+  compressionShow = false; // 数据压缩 true 支持 false 不支持
+  latencyIsSelect = false; // 时延为下拉框
+
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
   @ViewChild('addPageOne') addPageOne: ClrWizardPage;
@@ -122,22 +127,24 @@ export class NfsAddComponent implements OnInit{
 
     this.addForm.poolRawId=this.checkedPool.poolId;
     this.addForm.storagePoolId= this.checkedPool.id;
+    const addSubmitForm = new AddNfs();
+    Object.assign(addSubmitForm, this.addForm);
     // 单位换算
     switch (this.unit) {
       case 'TB':
-        this.addForm.size = this.addForm.size * 1024;
+        addSubmitForm.size = addSubmitForm.size * 1024;
         break;
       case 'MB':
-        this.addForm.size = this.addForm.size / 1024;
+        addSubmitForm.size = addSubmitForm.size / 1024;
         break;
       case 'KB':
-        this.addForm.size = this.addForm.size / (1024 * 1024);
+        addSubmitForm.size = addSubmitForm.size / (1024 * 1024);
         break;
       default: // 默认GB 不变
         break;
     }
-    this.qosFunc(this.addForm);
-    this.addService.addNfs(this.addForm).subscribe((result: any) => {
+    this.qosFunc(addSubmitForm);
+    this.addService.addNfs(addSubmitForm).subscribe((result: any) => {
       this.modalHandleLoading=false;
       if (result.code === '200'){
         // 打开成功提示窗口
@@ -157,13 +164,18 @@ export class NfsAddComponent implements OnInit{
     this.addForm.currentPortId = undefined;
     if (this.addForm.storagId) {
 
+      this.addQosUpperAndLower();
+      this.addCompressionShow();
+      this.addDeduplicationShow();
+      this.addLatencyChoose();
+
       const storagePoolMap = this.storagePoolMap.filter(item => item.storageId == this.addForm.storagId);
 
       const storagePoolList = storagePoolMap[0].storagePoolList;
       const logicPorts = storagePoolMap[0].logicPort;
 
       // 选择存储后获取存储池
-      if (!storagePoolList) {
+      // if (!storagePoolList) {
         this.storageService.getStoragePoolListByStorageId("file",this.addForm.storagId)
           .subscribe((r: any) => {
             if (r.code === '200'){
@@ -171,15 +183,15 @@ export class NfsAddComponent implements OnInit{
             }
             this.cdr.detectChanges();
           });
-      } else {
-        this.storagePools = storagePoolList;
-      }
-      if (!logicPorts) {
+      // } else {
+      //   this.storagePools = storagePoolList;
+      // }
+      // if (!logicPorts) {
         this.selectLogicPort();
-      } else {
-        this.logicPorts = logicPorts;
-        this.modalLoading=false;
-      }
+      // } else {
+      //   this.logicPorts = logicPorts;
+      //   this.modalLoading=false;
+      // }
     }
   }
   selectLogicPort(){
@@ -376,40 +388,29 @@ export class NfsAddComponent implements OnInit{
   }
   qosFunc(form) {
     console.log("form.qosFlag", form.qosFlag);
-    console.log("form.contolPolicy", form.contolPolicy == 'up');
-    console.log("form.contolPolicy2", form.contolPolicy == 'low');
-    console.log("form.contolPolicy2", form);
+    const qosTag = this.getStorageQosTag(form.storagId);
     if (!form.qosFlag) {// 关闭状态
-      form.contolPolicy = '';
-      form.maxBandwidthChoose = false;
-      form.maxBandwidth = null;
-      form.maxIopsChoose = false;
-      form.maxIops = null;
-      form.minBandwidthChoose = false;
-      form.minBandwidth = null;
-      form.minIopsChoose = false;
-      form.minIops = null;
-      form.latencyChoose = false;
-      form.latency = null;
+      form.contolPolicy = null;
+      this.initAddMinInfo(form);
+      this.initAddMaxInfo(form);
     }else {
-      if (form.contolPolicy == 'up') {
-        form.minBandwidthChoose = false;
-        form.minBandwidth = null;
-        form.minIopsChoose = false;
-        form.minIops = null;
-        form.latencyChoose = false;
-        form.latency = null;
+      if (form.control_policyUpper == '1') {
         if (!form.maxBandwidthChoose) {
           form.maxBandwidth = null;
         }
         if (!form.maxIopsChoose) {
           form.maxIops = null;
         }
-      } else if (form.contolPolicy == 'low') {
-        form.maxBandwidthChoose = false;
-        form.maxBandwidth = null;
-        form.maxIopsChoose = false;
-        form.maxIops = null;
+        if (qosTag == 2 || qosTag == 3) {
+          this.initAddMinInfo(form);
+        }
+      }
+      if (form.control_policyLower == '0') {
+        if(qosTag == 2){
+          this.initAddMaxInfo(form);
+        }else if (qosTag == 3) {
+          this.initAddMinInfo(form);
+        }
         if (!form.minBandwidthChoose) {
           form.minBandwidth = null;
         }
@@ -420,19 +421,164 @@ export class NfsAddComponent implements OnInit{
           form.latency = null;
         }
       } else {
-        form.contolPolicy = '';
-        form.maxBandwidthChoose = false;
-        form.maxBandwidth = null;
-        form.maxIopsChoose = false;
-        form.maxIops = null;
-        form.minBandwidthChoose = false;
-        form.minBandwidth = null;
-        form.minIopsChoose = false;
-        form.minIops = null;
-        form.latencyChoose = false;
-        form.latency = null;
+        this.initAddMinInfo(form);
+      }
+      if (form.control_policyUpper != '1' && form.control_policyLower != '0') {
+        this.initAddMinInfo(form);
+        this.initAddMaxInfo(form);
+        form.contolPolicy = null;
+      } else if (form.control_policyUpper == '1' && form.control_policyLower != '0') {
+        this.initAddMinInfo(form);
+        form.contolPolicy = 'up';
+      } else if (form.control_policyUpper != '1' && form.control_policyLower == '0') {
+        this.initAddMaxInfo(form);
+        form.contolPolicy = 'low';
+      } else { // all
+        form.contolPolicy = 'all';
       }
     }
+  }
+  initAddMinInfo(form) {
+    form.control_policyLower = undefined;
+    form.minBandwidthChoose = false;
+    form.minBandwidth = null;
+    form.minIopsChoose = false;
+    form.minIops = null;
+    form.latencyChoose = false;
+    form.latency = null;
+  }
+  initAddMaxInfo(form){
+    form.control_policyUpper = undefined;
+    form.maxBandwidthChoose = false;
+    form.maxBandwidth = null;
+    form.maxIopsChoose = false;
+    form.maxIops = null;
+  }
+  /**
+   * 控制策略变更
+   * @param upperObj
+   * @param lowerObj
+   * @param isUpper true:upper、false:lower
+   */
+  controlPolicyChangeFunc(upperId, lowerId, isEdit, form, isUpper) {
+    const upperObj = document.getElementById(upperId) as HTMLInputElement;
+    const lowerObj = document.getElementById(lowerId) as HTMLInputElement;
+    // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
+    let qosTag;
+    if (isEdit) {
+      // qosTag = this.storage.storageTypeShow.qosTag;
+    } else {
+      qosTag = this.getStorageQosTag(form.storagId);
+    }
+
+
+    let upperChecked;
+    if(upperObj) {
+      upperChecked =  upperObj.checked;
+    }
+    let lowerChecked;
+    if (lowerObj) {
+      lowerChecked = lowerObj.checked;
+    }
+    if (isUpper) {
+      if(upperChecked) {
+        form.control_policyUpper = '1';
+      }else {
+        form.control_policyUpper = undefined;
+      }
+      if(qosTag == 2 && upperChecked) { // 单选
+        console.log("单选1", qosTag)
+        form.control_policyLower = undefined;
+        lowerObj.checked = false;
+      }
+    } else {
+      if(lowerChecked) {
+        form.control_policyLower = '0';
+      }else {
+        form.control_policyLower = undefined;
+      }
+      if (lowerChecked && qosTag == 2) {
+        console.log("单选2", qosTag)
+        form.control_policyUpper = undefined;
+        upperObj.checked = false;
+      }
+    }
+    console.log("lowerChecked", form)
+  }
+
+  /**
+   * 获取选中的存储的 QosTag
+   */
+  getStorageQosTag(storageId) {
+    const storageTypeShow = this.storageList.filter(item => item.id == storageId);
+    // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
+    const qosTag = storageTypeShow[0].storageTypeShow.qosTag;
+    return qosTag;
+  }
+  /**
+   * 添加页面 qos 上下限 单选、多选、隐藏
+   * smartTiger 初始化
+   */
+  addQosUpperAndLower() {
+    // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
+    const qosTag = this.getStorageQosTag(this.addForm.storagId);
+    this.addForm.control_policyLower = undefined;
+    this.addForm.control_policyUpper = undefined;
+    const upperObj = document.getElementById("control_policyUpper") as HTMLInputElement;
+    const lowerObj = document.getElementById("control_policyLower") as HTMLInputElement;
+    if (upperObj && upperObj.checked) {
+      upperObj.checked = false;
+    }
+    if (lowerObj && lowerObj.checked) {
+      lowerObj.checked = false;
+    }
+    if (qosTag == 3) {
+      this.hiddenLowerFlag = true;
+    } else {
+      this.hiddenLowerFlag = false;
+    }
+  }
+
+  /**
+   * 添加页面 重复数据删除
+   */
+  addDeduplicationShow() {
+    this.addForm.deduplicationEnabled = null;
+    this.deduplicationShow = this.getDeduplicationShow(this.addForm.storagId);
+  }
+
+  /**
+   * 添加页面 获取 重复数据删除
+   * @param storageId
+   */
+  getDeduplicationShow(storageId) {
+    const deduplicationShow = this.storageList.filter(item => item.id == storageId);
+    return deduplicationShow[0].storageTypeShow.deduplicationShow;
+  }
+
+  /**
+   * 添加页面数据压缩
+   */
+  addCompressionShow() {
+    this.addForm.compressionEnabled = null;
+    this.compressionShow = this.getCompressionShow(this.addForm.storagId);
+  }
+
+  /**
+   * 添加页面 获取数据压缩
+   * @param storageId
+   */
+  getCompressionShow(storageId) {
+    const compressionshow = this.storageList.filter(item => item.id == storageId);
+    return compressionshow[0].storageTypeShow.compressionShow;
+  }
+  /**
+   * 添加页面 时延为下拉框
+   */
+  addLatencyChoose(){
+    this.addForm.latency = null;
+    const qosTag = this.getStorageQosTag(this.addForm.storagId);
+    this.latencyIsSelect = qosTag == 1;
   }
 }
 

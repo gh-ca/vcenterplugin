@@ -3,7 +3,12 @@ package com.huawei.dmestore.services;
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.VcenterException;
-import com.huawei.dmestore.model.*;
+import com.huawei.dmestore.model.CapabilitiesQos;
+import com.huawei.dmestore.model.CapabilitiesSmarttier;
+import com.huawei.dmestore.model.SimpleCapabilities;
+import com.huawei.dmestore.model.SimpleServiceLevel;
+import com.huawei.dmestore.model.SmartQos;
+import com.huawei.dmestore.model.VmfsDatastoreVolumeDetail;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
 
@@ -15,7 +20,6 @@ import com.google.gson.JsonParser;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -94,7 +98,9 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         if (StringUtils.isEmpty(serviceLevelName)) {
             Map<String, Object> customizeVolumeTuning = getCustomizeVolumeTuning(params);
             LOG.info("自定义方式创建vmfs{},服务等级：", serviceLevelName);
-            volumeMap.put("tuning", customizeVolumeTuning);
+            if (customizeVolumeTuning.size() != 0 && customizeVolumeTuning != null) {
+                volumeMap.put("tuning", customizeVolumeTuning);
+            }
         }
 
         Object newVoName = params.get("newVoName");
@@ -145,34 +151,41 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
 
     private Map<String, Object> getCustomizeVolumeTuning(Map<String, Object> params) {
         Map<String, Object> map = new HashMap<>();
-        Object controlPolicy = params.get("control_policy");
-        if (!StringUtils.isEmpty(controlPolicy)) {
-            map.put("control_policy", Integer.valueOf(controlPolicy.toString()));
-        }
-        Object maxIops = params.get("max_iops");
-        if (!StringUtils.isEmpty(maxIops)) {
-            map.put("maxiops", Integer.valueOf(maxIops.toString()));
-        }
-        Object minIops = params.get("min_iops");
-        if (!StringUtils.isEmpty(minIops)) {
-            map.put("miniops", Integer.valueOf(minIops.toString()));
-        }
-        Object maxBandwidth = params.get("max_bandwidth");
-        if (!StringUtils.isEmpty(maxBandwidth)) {
-            map.put("maxbandwidth", Integer.valueOf(maxBandwidth.toString()));
-        }
-        Object minBandwidth = params.get("min_bandwidth");
-        if (!StringUtils.isEmpty(minBandwidth)) {
-            map.put("minbandwidth", Integer.valueOf(minBandwidth.toString()));
-        }
-
-        Object latency = params.get("latency");
-        if (!StringUtils.isEmpty(latency)) {
-            map.put("latency", Integer.valueOf(latency.toString()));
-        }
-        map.put("enabled", true);
         Map<String, Object> customizeVolumeTuning = new HashMap<>();
-        customizeVolumeTuning.put("smartqos",map);
+        Boolean qosFlag = (Boolean) params.get("qosFlag");
+        if (qosFlag) {
+            Object controlPolicy = params.get("control_policy");
+            if (!StringUtils.isEmpty(controlPolicy)) {
+                map.put("control_policy", controlPolicy.toString());
+            }
+            Object maxIops = params.get("max_iops");
+            if (!StringUtils.isEmpty(maxIops)) {
+                map.put("maxiops", Integer.valueOf(maxIops.toString()));
+            }
+            Object minIops = params.get("min_iops");
+            if (!StringUtils.isEmpty(minIops)) {
+                map.put("miniops", Integer.valueOf(minIops.toString()));
+            }
+            Object maxBandwidth = params.get("max_bandwidth");
+            if (!StringUtils.isEmpty(maxBandwidth)) {
+                map.put("maxbandwidth", Integer.valueOf(maxBandwidth.toString()));
+            }
+            Object minBandwidth = params.get("min_bandwidth");
+            if (!StringUtils.isEmpty(minBandwidth)) {
+                map.put("minbandwidth", Integer.valueOf(minBandwidth.toString()));
+            }
+
+            Object latency = params.get("latency");
+            if (!StringUtils.isEmpty(latency)) {
+                map.put("latency", Integer.valueOf(latency.toString()));
+            }
+            map.put("enabled", true);
+            customizeVolumeTuning.put("smartqos", map);
+        }
+        Boolean smartTierFlag = (Boolean) params.get("smartTierFlag");
+        if (smartTierFlag) {
+            customizeVolumeTuning.put("smarttier", ToolUtils.getStr(params.get("smartTier")));
+        }
         return customizeVolumeTuning;
     }
 
@@ -252,9 +265,8 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
         if (dsObjectIds != null && dsObjectIds.size() > 0) {
             for (int index = 0; index < dsObjectIds.size(); index++) {
                 List<VmfsDatastoreVolumeDetail> detaillists = vmfsAccessService.volumeDetail(dsObjectIds.get(index));
-                for (VmfsDatastoreVolumeDetail vmfsDatastoreVolumeDetail:detaillists)
-                {
-                    if ("thin".equalsIgnoreCase(vmfsDatastoreVolumeDetail.getProvisionType()))  {
+                for (VmfsDatastoreVolumeDetail vmfsDatastoreVolumeDetail : detaillists) {
+                    if ("thin".equalsIgnoreCase(vmfsDatastoreVolumeDetail.getProvisionType())) {
                         isThinVmdatastore = true;
                         break;
                     }
@@ -262,7 +274,6 @@ public class VmfsOperationServiceImpl implements VmfsOperationService {
             }
         }
         return isThinVmdatastore;
-
 
     }
 

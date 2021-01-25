@@ -276,7 +276,9 @@ public class ToolUtils {
     public static boolean jsonIsNull(JsonElement obj) {
         boolean re = false;
         try {
-            if (StringUtils.isEmpty(obj) || obj.isJsonNull() || "{}".equals(GSON.toJson(obj))) {
+            if (StringUtils.isEmpty(obj) || obj.isJsonNull()
+                || "{}".equals(GSON.toJson(obj))
+                || "[]".equals(GSON.toJson(obj))) {
                 re = true;
             }
         } catch (IllegalStateException e) {

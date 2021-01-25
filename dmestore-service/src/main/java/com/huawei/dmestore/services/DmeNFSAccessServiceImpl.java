@@ -319,7 +319,6 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             relation.setStorageDeviceId(storageId);
             relation.setStoreName(nfsDataStorageName);
             relation.setStoreType(storeType);
-
             //获取存储池型号
             if (storageIds.get("storageId") == null) {
                 String storageModel = getStorageModel(storageId);
@@ -328,8 +327,6 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             }else {
                 relation.setStorageType(storageIds.get("storageId"));
             }
-
-
             // 获取logicPort信息
             boolean withLogicPort = getLogicPort(nfsDatastoreIp, storageId, relation);
             String fsName = "";

@@ -117,9 +117,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
         } else {
             hostsStr = vcsdkUtils.getAllHosts();
         }
-
         JsonArray hostArray = gson.fromJson(hostsStr, JsonArray.class);
-
         Map<String, List<BestPracticeBean>> checkMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         for (int index = 0; index < hostArray.size(); index++) {
             // 对每一项进行检查
@@ -132,7 +130,6 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                     if (!checkMap.containsKey(hostSetting)) {
                         checkMap.put(hostSetting, new ArrayList<>());
                     }
-
                     boolean isCheck = bestPracticeService.check(vcsdkUtils, hostObjectId);
                     if (!isCheck) {
                         BestPracticeBean bean = new BestPracticeBean();
@@ -150,7 +147,8 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                     }
                 } catch (Exception ex) {
                     // 报错，跳过当前项检查
-                    log.error("{} check failed! hostSetting={}", hostName, bestPracticeService.getHostSetting());
+                    log.error("{} check failed! hostSetting={}, errorMsg={}", hostName,
+                        bestPracticeService.getHostSetting(), ex.getMessage());
                 }
             }
         }
@@ -163,11 +161,11 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     }
 
     private void bachDbProcess(Map<String, List<BestPracticeBean>> map) {
-        map.forEach((k, bestPracticeBeans) -> {
+        map.forEach((hostSetting, bestPracticeBeans) -> {
             // 本地全量查询
             List<String> localHostNames = null;
             try {
-                localHostNames = bestPracticeCheckDao.getHostNameByHostsetting(k);
+                localHostNames = bestPracticeCheckDao.getHostNameByHostsetting(hostSetting);
             } catch (SQLException e) {
                 log.error(e.getMessage());
             }
@@ -198,7 +196,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
 
             // 删除
             if (!localHostNames.isEmpty()) {
-                bestPracticeCheckDao.deleteByHostNameAndHostsetting(localHostNames, k);
+                bestPracticeCheckDao.deleteByHostNameAndHostsetting(localHostNames, hostSetting);
             }
         });
     }
@@ -224,9 +222,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                 break;
             }
         }
-
         Map<String, String> hostMap = getHostMap(objectIds);
-
         List<BestPracticeUpResultResponse> responses = new ArrayList<>();
         List<String> successList = new ArrayList<>();
         for (Map.Entry<String, String> entry : hostMap.entrySet()) {
@@ -238,6 +234,10 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             response.setHostName(hostName);
             boolean isNeedReboot = false;
             for (BestPracticeService service : services) {
+                // 能自动修复的才进行实施操作
+                if(!service.autoRepair()){
+                    continue;
+                }
                 BestPracticeUpResultBase base = new BestPracticeUpResultBase();
                 base.setHostObjectId(objectId);
                 base.setHostSetting(service.getHostSetting());

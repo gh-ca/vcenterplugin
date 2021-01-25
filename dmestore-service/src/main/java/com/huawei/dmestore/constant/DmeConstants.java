@@ -446,6 +446,10 @@ public class DmeConstants {
      * VMFS type
      **/
     public static final String STORE_TYPE_VMFS = "VMFS";
+    /**
+     * NFS type
+     **/
+    public static final String STORE_TYPE_NFS = "NFS";
 
     /**
      * default_page_size
