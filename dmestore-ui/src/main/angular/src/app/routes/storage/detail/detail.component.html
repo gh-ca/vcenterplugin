@@ -57,7 +57,7 @@
               </tr>
             </table>
             <div *ngIf="!detail" style="height: 50%">
-              抱歉未查询到相关数据
+              {{'errorMsg.cantFindData' | translate}}
             </div>
             <clr-tabs>
               <!--Storage Pools-->
