@@ -35,9 +35,16 @@
         </clr-control-helper>-->
         <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
       </clr-input-container>
-
+      <!--兼容模式-->
+      <clr-select-container class="selectClass">
+        <label  style="color: #9F9F9F;">{{'rdm.compatibilityMode.name' | translate}}<span style="color: red">*</span></label>
+        <select clrSelect required [(ngModel)]="compatibilityMode" name="compatibilityMode" class="clr-select">
+          <option value="virtualMode">{{'rdm.compatibilityMode.virtualMode' | translate}}</option>
+          <option value="physicalMode">{{'rdm.compatibilityMode.physicalMode' | translate}}</option>
+        </select>
+      </clr-select-container>
       <!--存储-->
-      <clr-select-container class="selectClass">>
+      <clr-select-container class="selectClass">
         <label  style="color: #9F9F9F;">{{'rdm.dataStore' | translate}}<span style="color: red">*</span></label>
         <select clrSelect (ngModelOptions)="dataStores" required [(ngModel)]="dataStoreObjectId" name="dataStoreObjectId" class="clr-select">
           <option *ngFor="let item of dataStores" value="{{item.objectId}}">{{item.name}}</option>
@@ -141,6 +148,7 @@
       </ng-container>
       <!-- 2、未选择 服务等级-->
       <ng-container *ngIf="levelCheck==='storage'">
+        <!--存储设备-->
         <clr-select-container class="selectClass">
           <label style="color: #9F9F9F;">{{'rdm.storage' | translate}}<span style="color: red">*</span></label>:
           <select clrSelect  [(ngModel)]="configModel.storageId" name="storageId" required (ngModelChange)="loadStoragePool(configModel.storageId);">
@@ -148,6 +156,7 @@
           </select>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-select-container>
+        <!--存储池-->
         <clr-select-container class="selectClass">
           <label style="color: #9F9F9F;">{{'rdm.sPool' | translate}}<span style="color: red">*</span></label>:
           <select clrSelect [(ngModel)]="configModel.poolRawId" name="poolRawId" required>
@@ -155,7 +164,7 @@
           </select>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-select-container>
-
+        <!--归属控制器-->
         <clr-select-container class="selectClass" *ngIf="ownershipController">
           <label style="color: #9F9F9F;">{{'rdm.ownerC' | translate}}<span style="color: red">*</span></label>:
           <select clrSelect [(ngModel)]="configModel.ownerController" name="ownerController" required>
@@ -164,7 +173,7 @@
           </select>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-select-container>
-
+        <!--容量初始分配策略-->
         <clr-select-container class="selectClass">
           <label style="color: #9F9F9F;">{{'rdm.idp' | translate}}<span style="color: red">*</span></label>:
           <select clrSelect [(ngModel)]="configModel.initialDistributePolicy" name="initialDistributePolicy" required>
@@ -175,7 +184,7 @@
           </select>
           <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
         </clr-select-container>
-
+        <!--预取策略-->
         <clr-select-container class="selectClass">
           <label style="color: #9F9F9F;">{{'rdm.fetchP' | translate}}<span style="color: red">*</span></label>:
           <select clrSelect [(ngModel)]="configModel.prefetchPolicy" name="prefetchPolicy" required>
@@ -191,26 +200,27 @@
           <label style="color: #9F9F9F;">{{'rdm.tuning' | translate}}</label>
         </clr-input-container>
 
+        <!--SmartTier-->
+        <div>
+          <clr-toggle-container>
+            <clr-toggle-wrapper>
+              <label style="color: #9F9F9F;">{{'rdm.smartTier' | translate}}</label>
+              <input type="checkbox" clrToggle [(ngModel)]="policyEnable.smartTier" name="smartTierE" />
+            </clr-toggle-wrapper>
+          </clr-toggle-container>
 
+          <clr-select-container class="selectClass" *ngIf="policyEnable.smartTier">
+            <label style="color: #9F9F9F;">{{'rdm.smartTierP' | translate}}<span style="color: red">*</span></label>:
+            <select clrSelect [(ngModel)]="configModel.tuning.smarttier" name="smarttier">
+              <option value="0">{{'rdm.notMove' | translate}}</option>
+              <option value="1">{{'rdm.autoMove' | translate}}</option>
+              <option value="2">{{'rdm.highPMove' | translate}}</option>
+              <option value="3">{{'rdm.lowPMove' | translate}}</option>
+            </select>
+          </clr-select-container>
+        </div>
 
-        <clr-toggle-container>
-          <clr-toggle-wrapper>
-            <label style="color: #9F9F9F;">{{'rdm.smartTier' | translate}}</label>
-            <input type="checkbox" clrToggle [(ngModel)]="policyEnable.smartTier" name="smartTierE" />
-          </clr-toggle-wrapper>
-        </clr-toggle-container>
-
-        <clr-select-container class="selectClass" *ngIf="policyEnable.smartTier">
-          <label style="color: #9F9F9F;">{{'rdm.smartTierP' | translate}}<span style="color: red">*</span></label>:
-          <select clrSelect [(ngModel)]="configModel.tuning.smarttier" name="smarttier">
-            <option value="0">{{'rdm.notMove' | translate}}</option>
-            <option value="1">{{'rdm.autoMove' | translate}}</option>
-            <option value="2">{{'rdm.highPMove' | translate}}</option>
-            <option value="3">{{'rdm.lowPMove' | translate}}</option>
-          </select>
-        </clr-select-container>
-
-
+        <!--Qos-->
         <clr-toggle-container>
           <clr-toggle-wrapper>
             <label style="color: #9F9F9F;">{{'rdm.qosP' | translate}}</label>
@@ -284,7 +294,7 @@
             <div [hidden]="!qos4Show"><span style="color: #C7381F;">{{'rdm.latencyNotNull'| translate}}</span></div>
           </div>
         </div>
-
+        <!--资源调优-->
         <clr-toggle-container>
           <clr-toggle-wrapper>
             <label style="color: #9F9F9F;">{{'rdm.rtuning' | translate}}</label>
