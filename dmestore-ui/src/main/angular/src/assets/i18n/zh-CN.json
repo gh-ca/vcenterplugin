@@ -110,6 +110,7 @@
     "nfsStore":"NFS存储",
     "respRt":"读响应时间(毫秒)",
     "respWt":"写响应时间(毫秒)",
+    "characterEncoding":"字符编码",
     "logic":{
       "logic":"逻辑端口",
       "name":"名称",
