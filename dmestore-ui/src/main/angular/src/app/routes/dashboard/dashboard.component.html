@@ -77,40 +77,40 @@
       </div>
     </div>
   </div>
-<!--  <div class="clr-col-5">-->
-<!--    <div class="info-card loading">-->
-<!--      <div class="info-card-header">-->
-<!--        <div class="info-header-left">-->
-<!--          <span class="card-title">{{'overview.violations' | translate}}</span>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      <div class="info-card-content bestprac" [hidden]="bestShowLoading">-->
-<!--        <div class="count-wrap clr-row">-->
-<!--          <div class="count-item clr-col-3">-->
-<!--            <div (click)="toBestParcticeViewSdk('critical')"  style="cursor:pointer" class="num">{{bestPracticeViolations.critical || 0}}</div>-->
-<!--            <div class="color-divide critical"></div>-->
-<!--            <div class="text">{{'overview.critical' | translate}}</div>-->
-<!--          </div>-->
-<!--          <div class="count-item clr-col-3">-->
-<!--            <div (click)="toBestParcticeViewSdk('major')" style="cursor:pointer" class="num">{{bestPracticeViolations.major || 0}}</div>-->
-<!--            <div class="color-divide major"></div>-->
-<!--            <div class="text">{{'overview.major' | translate}}</div>-->
-<!--          </div>-->
-<!--          <div class="count-item clr-col-3">-->
-<!--            <div (click)="toBestParcticeViewSdk('warning')" style="cursor:pointer" class="num">{{bestPracticeViolations.warning || 0}}</div>-->
-<!--            <div class="color-divide warning"></div>-->
-<!--            <div class="text">{{'overview.warning' | translate}}</div>-->
-<!--          </div>-->
-<!--          <div class="count-item clr-col-3">-->
-<!--            <div (click)="toBestParcticeViewSdk('info')" style="cursor:pointer" class="num">{{bestPracticeViolations.info || 0}}</div>-->
-<!--            <div class="color-divide info"></div>-->
-<!--            <div class="text">{{'overview.info' | translate}}</div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      <img [hidden]="!bestShowLoading" src="./assets/images/loading.gif" >-->
-<!--    </div>-->
-<!--  </div>-->
+  <div class="clr-col-5">
+    <div class="info-card loading">
+      <div class="info-card-header">
+        <div class="info-header-left">
+          <span class="card-title">{{'overview.violations' | translate}}</span>
+        </div>
+      </div>
+      <div class="info-card-content bestprac" [hidden]="bestShowLoading">
+        <div class="count-wrap clr-row">
+          <div class="count-item clr-col-3">
+            <div (click)="toBestParcticeViewSdk('critical')"  style="cursor:pointer" class="num">{{bestPracticeViolations.critical || 0}}</div>
+            <div class="color-divide critical"></div>
+            <div class="text">{{'overview.critical' | translate}}</div>
+          </div>
+          <div class="count-item clr-col-3">
+            <div (click)="toBestParcticeViewSdk('major')" style="cursor:pointer" class="num">{{bestPracticeViolations.major || 0}}</div>
+            <div class="color-divide major"></div>
+            <div class="text">{{'overview.major' | translate}}</div>
+          </div>
+          <div class="count-item clr-col-3">
+            <div (click)="toBestParcticeViewSdk('warning')" style="cursor:pointer" class="num">{{bestPracticeViolations.warning || 0}}</div>
+            <div class="color-divide warning"></div>
+            <div class="text">{{'overview.warning' | translate}}</div>
+          </div>
+          <div class="count-item clr-col-3">
+            <div (click)="toBestParcticeViewSdk('info')" style="cursor:pointer" class="num">{{bestPracticeViolations.info || 0}}</div>
+            <div class="color-divide info"></div>
+            <div class="text">{{'overview.info' | translate}}</div>
+          </div>
+        </div>
+      </div>
+      <img [hidden]="!bestShowLoading" src="./assets/images/loading.gif" >
+    </div>
+  </div>
 </div>
 
 <div class="clr-row ds-wrap">

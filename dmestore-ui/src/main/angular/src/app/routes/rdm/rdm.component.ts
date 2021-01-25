@@ -292,7 +292,7 @@ export class RdmComponent implements OnInit {
       }
     }
     console.log("this.ownershipController", this.ownershipController);
-    this.http.get('dmestorage/storagepools', {params: {storageId, media_type: "all"}}).subscribe((result: any) => {
+    this.http.get('dmestorage/storagepools', {params: {storageId, mediaType: "block"}}).subscribe((result: any) => {
       this.slLoading = false;
       if (result.code === '200'){
         this.storagePools = result.data;
