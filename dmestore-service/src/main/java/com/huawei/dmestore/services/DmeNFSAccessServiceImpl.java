@@ -273,14 +273,14 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
     @Override
     public boolean scanNfs() throws DmeException {
-        LOG.error("===scanNfs begin====");
+        LOG.info("scanNfs begin !");
         String storeType = ToolUtils.STORE_TYPE_NFS;
         String listStr = vcsdkUtils.getAllVmfsDataStoreInfos(storeType);
         if (StringUtils.isEmpty(listStr)) {
             LOG.error("vmware get nfs error!listStr={}", listStr == null ? "" : listStr);
             return false;
         }
-        LOG.error("vmware list nfs success!");
+        LOG.info("vmware list nfs success!");
 
         // 将DME的存储设备集合转换为map key:ip value:Storage
         List<Storage> storages = dmeStorageService.getStorages();
@@ -307,7 +307,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         JsonObject nfsDatastore) throws DmeException {
         String nfsStorageId = ToolUtils.jsonToStr(nfsDatastore.get(OBJECTID));
         String nfsDatastoreIp = ToolUtils.jsonToStr(nfsDatastore.get("remoteHost"));
-        String nfsDataStoreSharePath = ToolUtils.jsonToStr(nfsDatastore.get("remotePath"));
+        String nfsDataStoreShareName = ToolUtils.jsonToStr(nfsDatastore.get("remotePath"));
         String nfsDataStorageName = ToolUtils.jsonToStr(nfsDatastore.get(NAME_FIELD));
         List<DmeVmwareRelation> relationList = new ArrayList<>();
         Map<String, String> storageIds = new HashMap<>();
@@ -331,7 +331,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             boolean withLogicPort = getLogicPort(nfsDatastoreIp, storageId, relation);
             String fsName = "";
             boolean withShare = false;
-            Map<String, Object> shareInfo = queryShareInfo(nfsDataStoreSharePath);
+            Map<String, Object> shareInfo = queryShareInfo(storageId,nfsDataStoreShareName);
             if (null != shareInfo && shareInfo.size() > 0) {
                 fsName = ToolUtils.getStr(shareInfo.get(FS_NAME));
                 String id = ToolUtils.getStr(shareInfo.get(ID_FIELD));
@@ -397,7 +397,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
 
         // 更新
         if (!upList.isEmpty()) {
-            dmeVmwareRalationDao.update(upList);
+            dmeVmwareRalationDao.update(upList,ToolUtils.STORE_TYPE_NFS);
             LOG.info("update nfs relation success!");
         }
 
@@ -415,8 +415,8 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return true;
     }
 
-    private Map<String, Object> queryShareInfo(String sharePath) throws DmeException {
-        ResponseEntity<String> responseEntity = listShareBySharePath(sharePath);
+    private Map<String, Object> queryShareInfo(String storageId,String shareName) throws DmeException {
+        ResponseEntity<String> responseEntity = listShareBySharePath(storageId,shareName);
         if (responseEntity.getStatusCodeValue() / DIGIT_100 == DIGIT_2) {
             String object = responseEntity.getBody();
             List<Map<String, Object>> list = converShare(object);
@@ -427,9 +427,10 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
         return Collections.EMPTY_MAP;
     }
 
-    private ResponseEntity<String> listShareBySharePath(String sharePath) throws DmeException {
+    private ResponseEntity<String> listShareBySharePath(String storageId,String shareName) throws DmeException {
         Map<String, Object> requestbody = new HashMap<>();
-        requestbody.put(SHARE_PATH, sharePath);
+        requestbody.put("name", shareName);
+        requestbody.put(STORAGE_ID, storageId);
         String url = DmeConstants.DME_NFS_SHARE_URL;
         return dmeAccessService.access(url, HttpMethod.POST, gson.toJson(requestbody));
     }
