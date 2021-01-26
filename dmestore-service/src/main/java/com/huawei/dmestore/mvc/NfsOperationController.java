@@ -352,7 +352,7 @@ public class NfsOperationController extends BaseController {
         Map<String, Object> nfsShareClientAddition = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         nfsShareClientAddition.put(NAME_FIELD, requestParams.get("vkernelIp"));
         nfsShareClientAddition.put("objectId", requestParams.get("hostObjectId"));
-        createNfsShareParam.put("character_encoding", "utf-8");
+        createNfsShareParam.put("character_encoding", requestParams.get("characterEncoding"));
         targetParams.put("create_nfs_share_param", createNfsShareParam);
         boolean advance = (Boolean) requestParams.get("advance");
         List<Map<String, Object>> nfsShareClientAdditions = new ArrayList<>(DmeConstants.COLLECTION_CAPACITY_16);
