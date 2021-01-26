@@ -59,9 +59,9 @@
         <clr-dg-column [clrDgField]="'recommendValue'">{{'bestPractice.recommend'|translate}}</clr-dg-column>
 
         <clr-dg-row *clrDgItems="let item of hostList" [clrDgItem]="item">
-          <clr-dg-cell>{{item.hostName}}</clr-dg-cell>
-          <clr-dg-cell>{{item.actualValue}}</clr-dg-cell>
-          <clr-dg-cell>{{item.recommendValue}}</clr-dg-cell>
+          <clr-dg-cell class="over_flow" title="{{item.hostName}}">{{item.hostName}}</clr-dg-cell>
+          <clr-dg-cell class="over_flow" title="{{item.actualValue}}">{{item.actualValue}}</clr-dg-cell>
+          <clr-dg-cell class="over_flow" title="{{item.recommendValue}}">{{item.recommendValue}}</clr-dg-cell>
         </clr-dg-row>
 
         <clr-dg-footer>
