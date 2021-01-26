@@ -41,18 +41,6 @@ export class RdmComponent implements OnInit {
 
   vmObjectId = '';
 
-  //qos 框控制
-  options1 = null;
-  options2 = null;
-  options3 = null;
-  options4 = null;
-  options5= null;
-
-  qos1Show = false;
-  qos2Show = false;
-  qos3Show = false;
-  qos4Show = false;
-
   dsLoading = false;
   dsDeviceLoading = false;
   slLoading = false;
@@ -62,9 +50,19 @@ export class RdmComponent implements OnInit {
   rdmError = false;
 
   // 归属控制器 true 支持 false 不支持
-  ownershipController = true;
+  ownershipController = false;
+  capacityInitShow=false;// 容量初始分配策略 true 支持 false 不支持
+  prefetchStrategyShow=false;// 预取策略 true 支持 false 不支持
+  smartTierShow=false;// SmartTier策略 true 支持 false 不支持
+  allocationTypeShow = false; // 资源分配类型  true 可选thin/thick false 可选thin
+  deduplicationShow = false; // 重复数据删除 true 支持 false 不支持
+  compressionShow = false; // 数据压缩 true 支持 false 不支持
 
   compatibilityMode = 'virtualMode';// 兼容模式
+
+  hiddenLowerFlag;// 隐藏qos下限 true隐藏、false展示
+  latencyIsSelect = false; // 时延为下拉框
+
 
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
@@ -82,7 +80,6 @@ export class RdmComponent implements OnInit {
     } else{
       this.vmObjectId = 'urn:vmomi:VirtualMachine:vm-1046:674908e5-ab21-4079-9cb1-596358ee5dd1';
     }
-    this.ownershipController = true;
     this.loadDataStore();
   }
 
@@ -129,95 +126,38 @@ export class RdmComponent implements OnInit {
     }
   }
 
-  changeQosRedio(){
-    this.qos1Show = false;
-    this.qos2Show = false;
-    this.qos3Show = false;
-    this.qos4Show = false;
-  }
-
-  changeQosInput(type: string){
-    const c = this.configModel.tuning.smartqos;
-    if(c.controlPolicy == '1'){
-      if(type == 'box'){
-        this.qos1Show = (!this.options1 && !this.options2);
-        return this.qos1Show;
-      }
-      if(type == 'band'){
-        this.qos2Show = this.options1 && (c.maxbandwidth == '' || c.maxbandwidth == null);
-        return this.qos2Show;
-      }
-      if(type == 'iops'){
-        this.qos3Show = this.options2 && (c.maxiops == '' || c.maxiops == null);
-        return this.qos3Show;
-      }
-    }
-    if(this.configModel.tuning.smartqos.controlPolicy == '0'){
-      if(type == 'box'){
-        this.qos1Show = (!this.options3 && !this.options4 && !this.options5);
-        return this.qos1Show;
-      }
-      if(type == 'band') {
-        this.qos2Show = this.options3 && (c.minbandwidth == '' || c.minbandwidth == null);
-        return this.qos2Show;
-      }
-      if(type == 'iops'){
-        this.qos3Show = this.options4 && (c.miniops == '' || c.miniops == null);
-        return this.qos3Show;
-      }
-      if(type == 'latency'){
-        this.qos4Show = this.options5 && (c.latency == '' || c.latency == null);
-        return this.qos4Show;
-      }
-    }
-  }
-
   submit(): void {
     if (!this.ownershipController) {
-      this.configModel.ownerController = null;
+      this.configModel.ownerController = '0';
     }
-    let b = JSON.parse(JSON.stringify(this.configModel));
+    const submitForm = new customizeVolumes();
+    Object.assign(submitForm, this.configModel);
+    // qos上下限参数处理
+    this.qosFunc(submitForm);
+
     let body = {};
-    if (this.configModel.storageType == '2'){
+
+    if (submitForm.storageType == '2'){
       if(!this.policyEnable.smartTier){
-        b.tuning.smarttier = null;
-      }
-      if(!this.policyEnable.qosPolicy){
-        b.tuning.smartqos = null;
-      } else{
-        let box = this.changeQosInput('box');
-        let band = this.changeQosInput('band');
-        let iops = this.changeQosInput('iops');
-        let latency = this.changeQosInput('latency');
-        if(box || band || iops || latency){
-          return;
-        }
-        if(this.configModel.tuning.smartqos.controlPolicy == '1'){
-          b.tuning.smartqos.minbandwidth = null;
-          b.tuning.smartqos.miniops = null;
-          b.tuning.smartqos.latency = null;
-        } else{
-          b.tuning.smartqos.maxbandwidth = null;
-          b.tuning.smartqos.maxiops = null;
-        }
+        submitForm.tuning.smarttier = null;
       }
       if(!this.policyEnable.resourceTuning){
-        b.tuning.alloctype = null;
-        b.tuning.dedupeEnabled = null;
-        b.tuning.compressionEnabled = null;
+        submitForm.tuning.alloctype = null;
+        submitForm.tuning.dedupeEnabled = null;
+        submitForm.tuning.compressionEnabled = null;
       }
       if(!this.policyEnable.smartTier && !this.policyEnable.qosPolicy && !this.policyEnable.resourceTuning){
-        b.tuning = null;
+        submitForm.tuning = null;
       }
 
       body = {
         customizeVolumesRequest: {
-          customizeVolumes: b
+          customizeVolumes: submitForm
         },
         compatibilityMode: this.compatibilityMode
       };
     }
-    if (this.configModel.storageType == '1'){
+    if (submitForm.storageType == '1'){
       if(this.serviceLevelId == '' || this.serviceLevelId == null){
         this.serviceLevelIsNull = true;
         return;
@@ -225,12 +165,11 @@ export class RdmComponent implements OnInit {
       body = {
         createVolumesRequest: {
           serviceLevelId: this.serviceLevelId,
-          volumes: this.configModel.volumeSpecs
+          volumes: submitForm.volumeSpecs
         },
         compatibilityMode: this.compatibilityMode
       };
     }
-    console.log(b);
     this.submitLoading = true;
     this.http.post('v1/vmrdm/createRdm?vmObjectId='+this.vmObjectId+'&dataStoreObjectId='+this.dataStoreObjectId
       , body).subscribe((result: any) => {
@@ -282,7 +221,25 @@ export class RdmComponent implements OnInit {
   loadStoragePool(storageId: string){
     this.slLoading = true;
     const chooseStorage = this.storageDevices.filter(item => item.id == storageId);
+    // 归属控制器
     this.ownershipController = chooseStorage[0].storageTypeShow.ownershipController;
+    // qos上下限
+    this.addQosUpperAndLower();
+    // 时延选择
+    this.addLatencyChoose();
+    // 容量初始分配策略
+    this.capacityInitFunc();
+    // 预取策略
+    this.prefetchStrategyShowInit();
+    // SmartTier策略
+    this.smartTierShowInit();
+    // 资源分配类型
+    this.allocationTypeShowInit();
+    // 重复数据删除
+    this.deduplicationShowInit();
+    // 数据压缩
+    this.compressionShowInit();
+
     // 查询卷对应归属控制器
     if (this.ownershipController) {
       this.ownerControllers = [];
@@ -296,6 +253,8 @@ export class RdmComponent implements OnInit {
       }
     }
     console.log("this.ownershipController", this.ownershipController);
+    this.storagePools = null;
+    this.configModel.poolRawId = null;
     this.http.get('dmestorage/storagepools', {params: {storageId, mediaType: "block"}}).subscribe((result: any) => {
       this.slLoading = false;
       if (result.code === '200'){
@@ -350,6 +309,221 @@ export class RdmComponent implements OnInit {
     this.gs.getClientSdk().modal.close();
   }
 
+  /**
+   * qos开关change时间
+   */
+  qosChange(form){
+    if(!this.policyEnable.qosPolicy) {
+      form.flagInfo.control_policyLower = undefined;
+      form.flagInfo.control_policyUpper = undefined;
+      form.flagInfo.maxBandwidthChoose = false;
+      form.flagInfo.maxIopsChoose = false;
+      form.flagInfo.minBandwidthChoose = false;
+      form.flagInfo.minIopsChoose = false;
+      form.flagInfo.latencyChoose = false;
+    }
+  }
+
+  controlPolicyChangeFunc(upperId, lowerId, form, isUpper){
+    const upperObj = document.getElementById(upperId) as HTMLInputElement;
+    const lowerObj = document.getElementById(lowerId) as HTMLInputElement;
+    // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
+    let qosTag = this.getStorageQosTag(form.storageId);
+
+    let upperChecked;
+    if(upperObj) {
+      upperChecked =  upperObj.checked;
+    }
+    let lowerChecked;
+    if (lowerObj) {
+      lowerChecked = lowerObj.checked;
+    }
+    if (isUpper) {
+      if(upperChecked) {
+        form.flagInfo.control_policyUpper = '1';
+      }else {
+        form.flagInfo.control_policyUpper = undefined;
+      }
+      if(qosTag == 2 && upperChecked) { // 单选
+        form.flagInfo.control_policyLower = undefined;
+        lowerObj.checked = false;
+      }
+    } else {
+      if(lowerChecked) {
+        form.flagInfo.control_policyLower = '0';
+      }else {
+        form.flagInfo.control_policyLower = undefined;
+      }
+      if (lowerChecked && qosTag == 2) {
+        form.flagInfo.control_policyUpper = undefined;
+        upperObj.checked = false;
+      }
+    }
+  }
+  /**
+   * 获取选中的存储的 QosTag
+   */
+  getStorageQosTag(storageId) {
+    const storageTypeShow = this.storageDevices.filter(item => item.id == storageId);
+    // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
+    const qosTag = storageTypeShow[0].storageTypeShow.qosTag;
+    return qosTag;
+  }
+
+  qosFunc(form) {
+    console.log("form.qosFlag", form);
+    if (!this.policyEnable.qosPolicy || form.storageType == '1') {// 关闭状态
+      form.tuning.smartqos.controlPolicy = null;
+      this.initAddMinInfo(form);
+      this.initAddMaxInfo(form);
+    }else {
+      const qosTag = this.getStorageQosTag(form.storageId);
+      if (form.flagInfo.control_policyUpper == '1') {
+        if (!form.flagInfo.maxBandwidthChoose) {
+          form.tuning.smartqos.maxbandwidth = null;
+        }
+        if (!form.flagInfo.maxIopsChoose) {
+          form.tuning.smartqos.maxiops = null;
+        }
+        if (qosTag == 2 || qosTag == 3) {
+          this.initAddMinInfo(form);
+        }
+      }
+      if (form.flagInfo.control_policyLower == '0') {
+        if(qosTag == 2){
+          this.initAddMaxInfo(form);
+        }else if (qosTag == 3) {
+          this.initAddMinInfo(form);
+        }
+        if (!form.flagInfo.minBandwidthChoose) {
+          form.tuning.smartqos.minbandwidth = null;
+        }
+        if (!form.flagInfo.minIopsChoose) {
+          form.tuning.smartqos.miniops = null;
+        }
+        if (!form.flagInfo.latencyChoose) {
+          form.tuning.smartqos.latency = null;
+        }
+      } else {
+        this.initAddMinInfo(form);
+      }
+      if (form.flagInfo.control_policyUpper != '1' && form.flagInfo.control_policyLower != '0') {
+        this.initAddMinInfo(form);
+        this.initAddMaxInfo(form);
+        form.tuning.smartqos.controlPolicy = null;
+      } else if (form.flagInfo.control_policyUpper == '1' && form.flagInfo.control_policyLower != '0') {
+        this.initAddMinInfo(form);
+        form.tuning.smartqos.controlPolicy = '1';
+      } else if (form.flagInfo.control_policyUpper != '1' && form.flagInfo.control_policyLower == '0') {
+        this.initAddMaxInfo(form);
+        form.tuning.smartqos.controlPolicy = '0';
+      } else { // all
+        form.tuning.smartqos.controlPolicy = '1';
+      }
+    }
+  }
+  initAddMinInfo(form) {
+    form.flagInfo.control_policyLower = undefined;
+    form.flagInfo.minBandwidthChoose = false;
+    form.tuning.smartqos.minbandwidth = null;
+    form.flagInfo.minIopsChoose = false;
+    form.tuning.smartqos.miniops = null;
+    form.flagInfo.latencyChoose = false;
+    form.tuning.smartqos.latency = null;
+  }
+  initAddMaxInfo(form){
+    form.flagInfo.control_policyUpper = undefined;
+    form.flagInfo.maxBandwidthChoose = false;
+    form.tuning.smartqos.maxbandwidth = null;
+    form.flagInfo.maxIopsChoose = false;
+    form.tuning.smartqos.maxiops = null;
+  }
+
+  /**
+   * 添加页面 qos 上下限 单选、多选、隐藏
+   * smartTiger 初始化
+   */
+  addQosUpperAndLower() {
+    // qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
+    const qosTag = this.getStorageQosTag(this.configModel.storageId);
+    this.configModel.flagInfo.control_policyLower = undefined;
+    this.configModel.flagInfo.control_policyUpper = undefined;
+    const upperObj = document.getElementById("control_policyUpper") as HTMLInputElement;
+    const lowerObj = document.getElementById("control_policyLower") as HTMLInputElement;
+    if (upperObj && upperObj.checked) {
+      upperObj.checked = false;
+    }
+    if (lowerObj && lowerObj.checked) {
+      lowerObj.checked = false;
+    }
+    if (qosTag == 3) {
+      this.hiddenLowerFlag = true;
+    } else {
+      this.hiddenLowerFlag = false;
+    }
+  }
+  /**
+   * 添加页面 时延为下拉框
+   */
+  addLatencyChoose(){
+    this.configModel.tuning.smartqos.latency = null;
+    const qosTag = this.getStorageQosTag(this.configModel.storageId);
+    this.latencyIsSelect = qosTag == 1;
+  }
+
+  /**
+   * 切换存储：容量初始分配策略初始化
+   */
+  capacityInitFunc(){
+    this.configModel.initialDistributePolicy = '0';
+    const storageTypeShow = this.storageDevices.filter(item => item.id == this.configModel.storageId);
+    this.capacityInitShow = storageTypeShow[0].storageTypeShow.capacityInitialAllocation;
+  }
+
+  /**
+   * 切换存储：预取策略初始化
+   */
+  prefetchStrategyShowInit() {
+    this.configModel.prefetchPolicy = '0';
+    const storageTypeShow = this.storageDevices.filter(item => item.id == this.configModel.storageId);
+    this.prefetchStrategyShow = storageTypeShow[0].storageTypeShow.prefetchStrategyShow;
+  }
+
+  /**
+   * 切换存储：SmartTier策略初始化
+   */
+  smartTierShowInit() {
+    this.configModel.tuning.smarttier = '0';
+    const storageTypeShow = this.storageDevices.filter(item => item.id == this.configModel.storageId);
+    this.smartTierShow =  storageTypeShow[0].storageTypeShow.smartTierShow;
+  }
+
+  /**
+   * 切换存储：资源分配类型初始化
+   */
+  allocationTypeShowInit() {
+    this.configModel.tuning.alloctype = null;
+    const storageTypeShow = this.storageDevices.filter(item => item.id == this.configModel.storageId);
+    this.allocationTypeShow =  storageTypeShow[0].storageTypeShow.allocationTypeShow == 1;
+  }
+
+  /**
+   * 切换存储：重复数据删除初始化
+   */
+  deduplicationShowInit(){
+    this.configModel.tuning.dedupeEnabled = null;
+    const storageTypeShow = this.storageDevices.filter(item => item.id == this.configModel.storageId);
+    this.deduplicationShow =  storageTypeShow[0].storageTypeShow.deduplicationShow;
+  }
+
+  /**
+   * 切换存储：数据压缩初始化
+   */
+  compressionShowInit() {
+    this.configModel.tuning.compressionEnabled = null;
+    const storageTypeShow = this.storageDevices.filter(item => item.id == this.configModel.storageId);
+    this.compressionShow = storageTypeShow[0].storageTypeShow.compressionShow;
+  }
 }
 
 
@@ -362,7 +536,8 @@ class customizeVolumes{
   prefetchPolicy: string;
   prefetchValue: string;
   storageId: string;
-  tuning: any;
+  tuning: tuning;
+  flagInfo:FlagInfo; // 复选框标志
   volumeSpecs: volumeSpecs[];
   constructor(){
     this.storageType = '1';
@@ -371,6 +546,27 @@ class customizeVolumes{
     this.initialDistributePolicy = '0';
     this.ownerController = '0';
     this.prefetchPolicy = '3';
+    this.flagInfo = new FlagInfo();
+  }
+}
+class FlagInfo {
+  control_policyLower:string;
+  minBandwidthChoose:boolean;
+  minIopsChoose:boolean;
+  latencyChoose:boolean;
+
+  control_policyUpper:string;
+  maxBandwidthChoose:boolean;
+  maxIopsChoose:boolean;
+
+  constructor(){
+    this.control_policyUpper = undefined;
+    this.control_policyLower = undefined;
+    this.maxBandwidthChoose = false;
+    this.maxIopsChoose = false;
+    this.minBandwidthChoose = false;
+    this.minIopsChoose = false;
+    this.latencyChoose = false;
   }
 }
 
