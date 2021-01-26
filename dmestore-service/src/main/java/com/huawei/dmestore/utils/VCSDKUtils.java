@@ -69,8 +69,10 @@ import com.vmware.vim25.HostFileSystemMountInfo;
 import com.vmware.vim25.HostHostBusAdapter;
 import com.vmware.vim25.HostInternetScsiHba;
 import com.vmware.vim25.HostInternetScsiHbaSendTarget;
+import com.vmware.vim25.HostRuntimeInfo;
 import com.vmware.vim25.HostScsiDisk;
 import com.vmware.vim25.HostScsiDiskPartition;
+import com.vmware.vim25.HostSystemConnectionState;
 import com.vmware.vim25.HostVirtualNic;
 import com.vmware.vim25.HostVmfsVolume;
 import com.vmware.vim25.InvalidArgumentFaultMsg;
@@ -291,18 +293,15 @@ public class VCSDKUtils {
         String listStr = "";
         try {
             VmwareContext[] vmwareContexts = vcConnectionHelpers.getAllContext();
-            for (VmwareContext vmwareContext : vmwareContexts) {
-                RootFsMO rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
-                logger.info("rootFsMo:{}", rootFsMo);
+            for (VmwareContext context : vmwareContexts) {
+                RootFsMO rootFsMo = rootVmwareMoFactory.build(context, context.getRootFolder());
                 List<Pair<ManagedObjectReference, String>> hosts = rootFsMo.getAllHostOnRootFs();
-                logger.info("hosts:{}", hosts);
                 if (hosts != null && hosts.size() > 0) {
                     List<Map<String, String>> lists = new ArrayList<>();
                     for (Pair<ManagedObjectReference, String> host : hosts) {
-                        HostMO host1 = hostVmwareFactory.build(vmwareContext, host.first());
+                        HostMO host1 = hostVmwareFactory.build(context, host.first());
                         Map<String, String> map = new HashMap<>();
-                        String objectId = vcConnectionHelpers.mor2ObjectId(host1.getMor(),
-                            vmwareContext.getServerAddress());
+                        String objectId = vcConnectionHelpers.mor2ObjectId(host1.getMor(), context.getServerAddress());
                         map.put(HOST_ID, objectId);
                         map.put(OBJECT_ID, objectId);
                         map.put(HOST_NAME, host1.getName());
@@ -904,17 +903,16 @@ public class VCSDKUtils {
         try {
             // 得到当前的context
             String serverguid = vcConnectionHelpers.objectId2Serverguid(clusterObjectId);
-            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            VmwareContext context = vcConnectionHelpers.getServerContext(serverguid);
             ManagedObjectReference clmor = vcConnectionHelpers.objectId2Mor(clusterObjectId);
-            ClusterMO cl1 = clusterVmwareMoFactory.build(vmwareContext, clmor);
+            ClusterMO cl1 = clusterVmwareMoFactory.build(context, clmor);
             List<Pair<ManagedObjectReference, String>> hosts = cl1.getClusterHosts();
             if (hosts != null && hosts.size() > 0) {
                 List<Map<String, String>> lists = new ArrayList<>();
                 for (Pair<ManagedObjectReference, String> host : hosts) {
-                    HostMO host1 = hostVmwareFactory.build(vmwareContext, host.first());
+                    HostMO host1 = hostVmwareFactory.build(context, host.first());
                     Map<String, String> map = new HashMap<>();
-                    String objectId = vcConnectionHelpers.mor2ObjectId(host1.getMor(),
-                        vmwareContext.getServerAddress());
+                    String objectId = vcConnectionHelpers.mor2ObjectId(host1.getMor(), context.getServerAddress());
                     map.put(HOST_ID, objectId);
                     map.put(HOST_NAME, host1.getName());
                     lists.add(map);
@@ -3074,4 +3072,29 @@ public class VCSDKUtils {
         }
         return map;
     }
+
+    /**
+     * 主机是否正常连通
+     *
+     * @param hostObjectId 主机objectid
+     * @return boolean boolean
+     */
+    public boolean isHostConnected(String hostObjectId) {
+        try {
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(hostObjectId);
+            VmwareContext context = vcConnectionHelpers.getServerContext(serverguid);
+            ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
+            HostMO hostMo = hostVmwareFactory.build(context, objmor);
+            HostRuntimeInfo hostRuntimeInfo = hostMo.getRuntimeInfo();
+            HostSystemConnectionState connectionState = hostRuntimeInfo.getConnectionState();
+            if (HostSystemConnectionState.CONNECTED.value().equals(connectionState.value())) {
+                return true;
+            }
+        } catch (Exception e) {
+            logger.error("query host connection state by objectid error!hostObjectId={}, error:{}", hostObjectId,
+                e.getMessage());
+        }
+        return false;
+    }
+
 }
