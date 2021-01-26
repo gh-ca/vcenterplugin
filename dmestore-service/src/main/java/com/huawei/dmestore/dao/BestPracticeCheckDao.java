@@ -284,6 +284,36 @@ public class BestPracticeCheckDao extends H2DataBaseDao {
         }
     }
 
+    public void deleteByHostIds(List<String> ids) {
+        if (ids == null || ids.size() == 0) {
+            return;
+        }
+
+        Connection con = null;
+        Statement stm = null;
+        try {
+            con = getConnection();
+            String sql = "delete from DP_DME_BEST_PRACTICE_CHECK where host_id='%s'";
+            stm = con.createStatement();
+            con.setAutoCommit(false);
+            for (String id : ids) {
+                String sqlTemp = String.format(sql, id);
+                stm.addBatch(sqlTemp);
+            }
+            stm.executeBatch();
+            con.commit();
+        } catch (SQLException ex) {
+            try {
+                // 回滚
+                con.rollback();
+            } catch (SQLException e) {
+                LOGGER.error(e.getMessage());
+            }
+        } finally {
+            closeConnection(con, stm, null);
+        }
+    }
+
     public void deleteByHostNameAndHostsetting(List<String> list, String hostSetting) {
         if (list == null || list.size() == 0) {
             return;
