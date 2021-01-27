@@ -374,6 +374,7 @@ public class ToolUtils {
             Double productVersion = Double.valueOf(substring);
             if (productVersion >= 6.1) {
                 // OceanStor Dorado 3000 V6 6.1+ 版本
+                storageTypeShow.setDorado(true);
                 storageTypeShow.setQosTag(1);
                 storageTypeShow.setWorkLoadShow(1);
                 storageTypeShow.setAllocationTypeShow(2);
@@ -386,6 +387,7 @@ public class ToolUtils {
                 storageTypeShow.setPrefetchStrategyShow(false);
             } else {
                 // OceanStor Dorado 3000 V6 6.1- 版本
+                storageTypeShow.setDorado(false);
                 storageTypeShow.setQosTag(3);
                 storageTypeShow.setWorkLoadShow(1);
                 storageTypeShow.setAllocationTypeShow(2);
@@ -401,6 +403,7 @@ public class ToolUtils {
         }else {
             if (list.contains("V3") && list.get(0).contains("Dorado")){
                 // Dorado v3
+                storageTypeShow.setDorado(false);
                 storageTypeShow.setQosTag(3);
                 storageTypeShow.setWorkLoadShow(1);
                 storageTypeShow.setAllocationTypeShow(2);
@@ -413,6 +416,7 @@ public class ToolUtils {
                 storageTypeShow.setPrefetchStrategyShow(false);
             }else{
                 // v3/v5
+                storageTypeShow.setDorado(false);
                 storageTypeShow.setQosTag(2);
                 storageTypeShow.setWorkLoadShow(2);
                 storageTypeShow.setAllocationTypeShow(1);
@@ -426,18 +430,5 @@ public class ToolUtils {
             }
         }
         return storageTypeShow;
-    }
-
-    public static boolean isDorado(String storageModel) {
-        String[] model = storageModel.split(" ");
-        List<String> list = Arrays.asList(model);
-        if (list.contains("OceanStor") && list.contains("Dorado") && list.contains("V6")){
-            String substring = list.get(list.size() - 1).substring(0, 3);
-            Double productVersion = Double.valueOf(substring);
-            if (productVersion >= 6.1) {
-                return true;
-            }
-        }
-        return false;
     }
 }
