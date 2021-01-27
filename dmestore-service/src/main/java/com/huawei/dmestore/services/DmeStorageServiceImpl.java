@@ -239,11 +239,12 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 parseStorageDetail(storageObj, storage);
             }
             String storageType = storageObj.getModel() + " " + storageObj.getProductVersion();
+            StorageTypeShow storageTypeShow = new StorageTypeShow();
             if (!StringUtils.isEmpty(storageType)){
-                StorageTypeShow storageTypeShow = ToolUtils.getStorageTypeShow(storageType);
+                storageTypeShow = ToolUtils.getStorageTypeShow(storageType);
                 storageObj.setStorageTypeShow(storageTypeShow);
             }
-            parseStoragePoolDetail(storageId, storageObj);
+            parseStoragePoolDetail(storageId, storageObj,ToolUtils.isDorado(storageType));
         } catch (DmeException e) {
             LOG.error("search oriented storage error!", e);
             throw new DmeException(CODE_503, e.getMessage());
@@ -251,7 +252,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return storageObj;
     }
 
-    private void parseStoragePoolDetail(String storageId, StorageDetail storageObj) throws DmeException {
+    private void parseStoragePoolDetail(String storageId, StorageDetail storageObj,boolean isDorado) throws DmeException {
         List<StoragePool> storagePools = getStoragePools(storageId, "all");
         Double totalPoolCapicity = 0.0;
         //Double subscriptionCapacity = 0.0;
@@ -273,8 +274,13 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             dedupedCapacity += storagePool.getDedupedCapacity();
             compressedCapacity += storagePool.getCompressedCapacity();
         }
-        storageObj.setTotalEffectiveCapacity(totalPoolCapicity);
-        storageObj.setFreeEffectiveCapacity(totalPoolCapicity - fileCapacity - blockCapacity - protectionCapacity);
+        if (isDorado) {
+            storageObj.setFreeEffectiveCapacity(
+                storageObj.getTotalEffectiveCapacity() - fileCapacity - blockCapacity - protectionCapacity);
+        } else {
+            storageObj.setTotalEffectiveCapacity(totalPoolCapicity);
+            storageObj.setFreeEffectiveCapacity(totalPoolCapicity - fileCapacity - blockCapacity - protectionCapacity);
+        }
         //storageObj.setSubscriptionCapacity(subscriptionCapacity);
         storageObj.setProtectionCapacity(protectionCapacity);
         storageObj.setFileCapacity(fileCapacity);
@@ -282,26 +288,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         storageObj.setDedupedCapacity(dedupedCapacity);
         storageObj.setCompressedCapacity(compressedCapacity);
         storageObj.setOptimizeCapacity(storageObj.getUsedCapacity() - dedupedCapacity - compressedCapacity);
-    }
-
-    private void parseStorageDetail(StorageDetail storageObj, JsonObject element) {
-        storageObj.setId(ToolUtils.jsonToStr(element.get(ID_FILED)));
-        storageObj.setName(ToolUtils.jsonToStr(element.get(NAME_FIELD)));
-        storageObj.setIp(ToolUtils.jsonToStr(element.get("ip")));
-        storageObj.setStatus(ToolUtils.jsonToStr(element.get(STATUS)));
-        storageObj.setSynStatus(ToolUtils.jsonToStr(element.get("syn_status")));
-        storageObj.setVendor(ToolUtils.jsonToStr(element.get("vendor")));
-        storageObj.setModel(ToolUtils.jsonToStr(element.get("model")));
-        storageObj.setUsedCapacity(ToolUtils.jsonToDou(element.get("used_capacity"), 0.0) / ONE_KB);
-        storageObj.setTotalCapacity(ToolUtils.jsonToDou(element.get("total_capacity"), 0.0) / ONE_KB);
-        storageObj.setTotalEffectiveCapacity(ToolUtils.jsonToDou(element.get("total_effective_capacity"), 0.0));
-        storageObj.setFreeEffectiveCapacity(ToolUtils.jsonToDou(element.get("free_effective_capacity"), 0.0));
-        storageObj.setLocation(ToolUtils.jsonToStr(element.get(LOCATION), null));
-        storageObj.setPatchVersion(ToolUtils.jsonToStr(element.get("patch_version"), null));
-        storageObj.setMaintenanceStart(ToolUtils.jsonToDateStr(element.get("maintenance_start"), null));
-        storageObj.setMaintenanceOvertime(ToolUtils.jsonToDateStr(element.get("maintenance_overtime"), null));
-        storageObj.setProductVersion(ToolUtils.jsonToStr(element.get("product_version")));
-        storageObj.setSn(ToolUtils.jsonToStr(element.get(SN_FIELD), null));
     }
 
     @Override

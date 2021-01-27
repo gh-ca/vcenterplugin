@@ -46,7 +46,7 @@ public class Storage {
      **/
     private Double totalCapacity;
     /**
-     * totalEffectiveCapacity.
+     * 可得容量.
      **/
     private Double totalEffectiveCapacity;
     /**
