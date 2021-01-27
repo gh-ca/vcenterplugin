@@ -177,8 +177,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     JsonObject jsonObj = new JsonParser().parse(jsonElement.toString()).getAsJsonObject();
                     Storage storageObj = new Storage();
                     parseStorageBaseInfo(jsonObj, storageObj);
-                    if (!StringUtils.isEmpty(storageObj.getModel())){
-                        StorageTypeShow storageTypeShow = ToolUtils.getStorageTypeShow(storageObj.getModel());
+                    String storageType = storageObj.getModel() + " " + storageObj.getProductVersion();
+                    if (!StringUtils.isEmpty(storageType)){
+                        StorageTypeShow storageTypeShow = ToolUtils.getStorageTypeShow(storageType);
                         storageObj.setStorageTypeShow(storageTypeShow);
                     }
                     storageObj.setSubscriptionCapacity(ToolUtils.jsonToDou(jsonObj.get("subscription_capacity")));
@@ -237,8 +238,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             if (storage != null) {
                 parseStorageDetail(storageObj, storage);
             }
-            if (!StringUtils.isEmpty(storageObj.getModel())){
-                StorageTypeShow storageTypeShow = ToolUtils.getStorageTypeShow(storageObj.getModel());
+            String storageType = storageObj.getModel() + " " + storageObj.getProductVersion();
+            if (!StringUtils.isEmpty(storageType)){
+                StorageTypeShow storageTypeShow = ToolUtils.getStorageTypeShow(storageType);
                 storageObj.setStorageTypeShow(storageTypeShow);
             }
             parseStoragePoolDetail(storageId, storageObj);
