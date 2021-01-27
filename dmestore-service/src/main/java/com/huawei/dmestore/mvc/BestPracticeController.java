@@ -9,6 +9,7 @@ import com.huawei.dmestore.model.ResponseBodyBean;
 import com.huawei.dmestore.services.BestPracticeProcessService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -166,6 +167,20 @@ public class BestPracticeController extends BaseController {
         try {
             return success(bestPracticeProcessService.update(null, null));
         } catch (DmeSqlException e) {
+            return failure(e.getMessage());
+        }
+    }
+
+    /**
+     * upByCluster
+     *
+     * @return ResponseBodyBean
+     */
+    @RequestMapping(value = "/update/byCluster/{clusterObjectId}", method = RequestMethod.POST)
+    public ResponseBodyBean upByClusterId(@PathVariable("clusterObjectId") String clusterObjectId) {
+        try {
+            return success(bestPracticeProcessService.updateByCluster(clusterObjectId));
+        } catch (DmeException e) {
             return failure(e.getMessage());
         }
     }

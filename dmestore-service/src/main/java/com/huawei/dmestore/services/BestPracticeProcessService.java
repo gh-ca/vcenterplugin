@@ -42,4 +42,14 @@ public interface BestPracticeProcessService {
      * @throws DmeSqlException 异常
      */
     List<BestPracticeUpResultResponse> update(List<String> objectIds, String hostSetting) throws DmeSqlException;
+
+    /**
+     * 根据集群ID实施最佳实践
+     *
+     * @author wangxy
+     * @param clusterObjectId 集群对象ID
+     * @return List
+     * @throws DmeException 异常
+     */
+    List<BestPracticeUpResultResponse> updateByCluster(String clusterObjectId) throws DmeException;
 }
