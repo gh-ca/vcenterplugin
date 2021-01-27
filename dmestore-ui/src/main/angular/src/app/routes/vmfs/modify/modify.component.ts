@@ -374,7 +374,22 @@ export class ModifyComponent implements OnInit{
     form.maxbandwidthChoose = false;
     form.max_bandwidth = null;
   }
+  /**
+   * edit qos开关
+   * @param form
+   */
+  qoSEditFlagChange(form){
+    if(form.qosFlag) {
+      form.control_policyUpper = undefined;
+      form.maxbandwidthChoose = false;
+      form.maxiopsChoose = false;
 
+      form.control_policyLower = undefined;
+      form.minbandwidthChoose = false;
+      form.miniopsChoose = false;
+      form.latencyChoose = false;
+    }
+  }
   /**
    * 修改页面获取存储数据
    * @param objectId

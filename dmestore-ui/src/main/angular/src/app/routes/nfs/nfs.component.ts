@@ -745,6 +745,22 @@ export class NfsComponent implements OnInit {
     form.maxIops = null;
   }
   /**
+   * qos开关
+   * @param form
+   */
+  qoSFlagChange(form){
+    if(form.qosFlag) {
+      form.control_policyUpper = undefined;
+      form.maxBandwidthChoose = false;
+      form.maxIopsChoose = false;
+
+      form.control_policyLower = undefined;
+      form.minBandwidthChoose = false;
+      form.minIopsChoose = false;
+      form.latencyChoose = false;
+    }
+  }
+  /**
    * 控制策略变更
    * @param upperObj
    * @param lowerObj

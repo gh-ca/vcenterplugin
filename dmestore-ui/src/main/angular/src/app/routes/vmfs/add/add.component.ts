@@ -887,6 +887,23 @@ export class AddComponent implements OnInit{
   }
 
   /**
+   * qos开关
+   * @param form
+   */
+  qoSFlagChange(form){
+    if(form.qosFlag) {
+      form.control_policyUpper = undefined;
+      form.maxbandwidthChoose = false;
+      form.maxiopsChoose = false;
+
+      form.control_policyLower = undefined;
+      form.minbandwidthChoose = false;
+      form.miniopsChoose = false;
+      form.latencyChoose = false;
+    }
+  }
+
+  /**
    * 添加页面 qos 上下限 单选、多选、隐藏
    * smartTiger 初始化
    */

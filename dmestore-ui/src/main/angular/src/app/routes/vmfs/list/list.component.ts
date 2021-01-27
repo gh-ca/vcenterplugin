@@ -1763,6 +1763,23 @@ export class VmfsListComponent implements OnInit {
     form.maxiopsChoose = false;
     form.maxiops = null;
   }
+
+  /**
+   * add qos开关
+   * @param form
+   */
+  qoSAddFlagChange(form){
+    if(form.qosFlag) {
+      form.control_policyUpper = undefined;
+      form.maxbandwidthChoose = false;
+      form.maxiopsChoose = false;
+
+      form.control_policyLower = undefined;
+      form.minbandwidthChoose = false;
+      form.miniopsChoose = false;
+      form.latencyChoose = false;
+    }
+  }
   qosEditFunc(form) {
     console.log("editform.qosFlag", form.qosFlag);
     const qosTag = this.storage.storageTypeShow.qosTag;
@@ -1825,6 +1842,22 @@ export class VmfsListComponent implements OnInit {
     form.max_bandwidth = null;
   }
 
+  /**
+   * edit qos开关
+   * @param form
+   */
+  qoSEditFlagChange(form){
+    if(form.qosFlag) {
+      form.control_policyUpper = undefined;
+      form.maxbandwidthChoose = false;
+      form.maxiopsChoose = false;
+
+      form.control_policyLower = undefined;
+      form.minbandwidthChoose = false;
+      form.miniopsChoose = false;
+      form.latencyChoose = false;
+    }
+  }
   /**
    * 编辑页面  名称变化Func
    */
