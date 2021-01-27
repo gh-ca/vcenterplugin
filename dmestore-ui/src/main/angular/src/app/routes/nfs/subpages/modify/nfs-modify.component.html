@@ -54,7 +54,7 @@
         <!--qos-->
         <clr-toggle-wrapper>
           <label>{{'nfs.qosPolicy' | translate}}</label>
-          <input type="checkbox" clrToggle name="qosFlag" [(ngModel)]="updateNfs.qosFlag"/>
+          <input type="checkbox" clrToggle name="qosFlag" (change)="qoSFlagChange(updateNfs);" [(ngModel)]="updateNfs.qosFlag"/>
         </clr-toggle-wrapper>
         <div *ngIf="updateNfs.qosFlag">
 
@@ -241,7 +241,7 @@
         <!--qos-->
         <clr-toggle-wrapper>
           <label>{{'nfs.qosPolicy' | translate}}</label>
-          <input type="checkbox" clrToggle name="qosFlag" [(ngModel)]="updateNfs.qosFlag"/>
+          <input type="checkbox" clrToggle name="qosFlag" (change)="qoSFlagChange(updateNfs);" [(ngModel)]="updateNfs.qosFlag"/>
         </clr-toggle-wrapper>
         <div *ngIf="updateNfs.qosFlag">
           <!-- 控制策略 -->
