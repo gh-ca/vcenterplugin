@@ -10,6 +10,7 @@ import com.huawei.dmestore.exception.DmeSqlException;
 import com.huawei.dmestore.exception.VcenterException;
 import com.huawei.dmestore.model.SmartQos;
 import com.huawei.dmestore.model.Storage;
+import com.huawei.dmestore.model.StorageDetail;
 import com.huawei.dmestore.model.TaskDetailInfo;
 import com.huawei.dmestore.model.VmfsDataInfo;
 import com.huawei.dmestore.model.VmfsDatastoreVolumeDetail;
@@ -2071,7 +2072,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return false;
     }
     private String getStorageModel(String storageId) throws DmeException {
-        return dmeStorageService.getStorageDetail(storageId).getModel();
+        StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
+        return storageDetail.getModel() +" "+ storageDetail.getProductVersion();
     }
 
     private String getStorageModelByWwn(String wwn) throws DmeSqlException {
