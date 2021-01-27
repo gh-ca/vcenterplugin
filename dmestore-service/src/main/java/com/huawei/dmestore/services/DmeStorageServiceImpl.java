@@ -244,7 +244,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                 storageTypeShow = ToolUtils.getStorageTypeShow(storageType);
                 storageObj.setStorageTypeShow(storageTypeShow);
             }
-            parseStoragePoolDetail(storageId, storageObj,ToolUtils.isDorado(storageType));
+            parseStoragePoolDetail(storageId, storageObj,storageTypeShow.getDorado());
         } catch (DmeException e) {
             LOG.error("search oriented storage error!", e);
             throw new DmeException(CODE_503, e.getMessage());
