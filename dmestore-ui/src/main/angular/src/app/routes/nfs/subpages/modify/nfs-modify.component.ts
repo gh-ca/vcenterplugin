@@ -51,7 +51,7 @@ export class NfsModifyComponent implements OnInit{
       //入口来至Vcenter
       const ctx = this.gs.getClientSdk().app.getContextObjects();
       this.objectId=ctx[0].id;
-      // this.objectId="urn:vmomi:Datastore:datastore-4060:674908e5-ab21-4079-9cb1-596358ee5dd1";
+      // this.objectId="urn:vmomi:Datastore:datastore-5028:674908e5-ab21-4079-9cb1-596358ee5dd1";
     }
     this.modifyService.getNfsDetailById(this.objectId).subscribe((result: any) => {
       if (this.pluginFlag){
@@ -353,6 +353,23 @@ export class NfsModifyComponent implements OnInit{
     form.minIops = null;
     form.latencyChoose = false;
     form.latency = null;
+  }
+
+  /**
+   * qos开关
+   * @param form
+   */
+  qoSFlagChange(form){
+    if(form.qosFlag) {
+      form.control_policyUpper = undefined;
+      form.maxBandwidthChoose = false;
+      form.maxIopsChoose = false;
+
+      form.control_policyLower = undefined;
+      form.minBandwidthChoose = false;
+      form.minIopsChoose = false;
+      form.latencyChoose = false;
+    }
   }
   /**
    * 控制策略变更
