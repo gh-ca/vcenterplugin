@@ -6,6 +6,7 @@
     "del": "删除",
     "expand": "扩容",
     "more": "更多",
+    "otherOperations": "其它操作",
     "mount": "挂载",
     "unmount": "卸载",
     "reclaim": "回收空间",
@@ -576,7 +577,8 @@
     "connectT": "DME连接",
     "connectFail": "连接失败！",
     "connectSuccess": "连接成功！",
-    "portholder": "端口默认26335"
+    "portholder": "端口默认26335",
+    "disconnect": "断开连接"
   },
   "bestPractice": {
     "apply": "实施最佳实践",
@@ -837,7 +839,10 @@
     "storagePoolIODensity": "存储池I/O密度(IOPS/TB)"
   },
   "tips": {
-    "select": "请选择"
+    "select": "请选择",
+    "disconnected": "是否断开DME连接 ？",
+    "operationSuccessful": "操作成功!",
+    "operationFailed": "操作失败!"
   },
   "chart": {
     "select": {
