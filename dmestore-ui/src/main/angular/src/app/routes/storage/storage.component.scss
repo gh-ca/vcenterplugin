@@ -14,4 +14,9 @@
   border-radius: 2rem;
   margin-bottom: 0.1rem;
 }
-
+.over_flow{
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-break: break-all;
+  white-space: nowrap;
+}
