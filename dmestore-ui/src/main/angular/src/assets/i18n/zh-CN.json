@@ -358,7 +358,8 @@
       "total":" 总计",
       "protection":"保护",
       "fileSystem":"文件系统",
-      "volume":"卷",
+      "file":"文件",
+      "volume":"LUN",
       "freeCapacity":"空闲容量",
       "used":" 已用",
       "free":" 空闲",
@@ -368,7 +369,8 @@
       "bandwidth":"带宽(MS/s)",
       "capacity":"容量",
       "health":"健康",
-      "performance":"性能 - 过去24小时"
+      "performance":"性能 - 过去24小时",
+      "blockFile":"块/文件"
     },
     "detail":{
       "conf":{

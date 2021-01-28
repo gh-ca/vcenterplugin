@@ -798,16 +798,25 @@ export class DetailComponent implements OnInit, AfterViewInit {
     const p= 0;
     this.detail.protectionCapacity
     this.cd.protection = this.formatCapacity(this.detail.protectionCapacity);
-    this.cd.fileSystem =this.formatCapacity(this.detail.fileCapacity);
-    this.cd.volume =this.formatCapacity(this.detail.blockCapacity);
+    let storagePoolAllUsedCap;
+    if (this.detail.storageTypeShow.dorado) { // dorado v6.1版本及高版本
+      storagePoolAllUsedCap = this.storagePool.map(item => item.consumedCapacity).reduce(this.getSum, 0).toFixed(3);
+      this.cd.blockFile = this.formatCapacity(storagePoolAllUsedCap);
+    } else { // dorado v 6.0版本及更低版本
+      this.cd.fileSystem =this.formatCapacity(this.detail.fileCapacity);
+      this.cd.volume =this.formatCapacity(this.detail.blockCapacity);
+    }
      this.cd.freeCapacity= this.getFreeCapacity(this.detail.totalEffectiveCapacity,this.detail.usedCapacity);
-
+    const freeCapacity = (this.detail.totalEffectiveCapacity-this.detail.usedCapacity).toFixed(3);
     const cc = new CapacityChart(this.formatCapacity(this.detail.totalEffectiveCapacity));
-    const cs = new CapacitySerie(this.detail.protectionCapacity
-      ,this.detail.fileCapacity,this.detail.blockCapacity,
-      this.detail.totalEffectiveCapacity-this.detail.usedCapacity);
+    let cs = new CapacitySerie(this.detail.protectionCapacity
+        ,this.detail.fileCapacity,this.detail.blockCapacity,
+      Number(freeCapacity), Number(storagePoolAllUsedCap), this.detail.storageTypeShow.dorado, this.translatePipe);
     cc.series.push(cs);
     this.cd.chart = cc;
+  }
+  getSum(total, num) {
+    return total + Math.round(num);
   }
   backToList(){
     this.router.navigate(['storage']);
