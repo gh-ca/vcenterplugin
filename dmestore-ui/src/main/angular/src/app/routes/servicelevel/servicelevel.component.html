@@ -460,8 +460,8 @@
             <clr-select-container style="margin-right: 50px">
               <select clrSelect (change)="initCapacityChart(capacityRange)" [(ngModel)]="capacityRange.range">
                 <option value="LAST_1_MONTH">{{'tier.last1M'|translate}}</option>
-                <option value="LAST_1_QUARTER">{{'tier.last3M'|translate}}</option>
-                <option value="HALF_1_YEAR">{{'tier.last6M'|translate}}</option>
+                <option value="LAST_3_MONTH">{{'tier.last3M'|translate}}</option>
+                <option value="LAST_6_MONTH">{{'tier.last6M'|translate}}</option>
                 <option value="LAST_1_YEAR">{{'tier.last1Y'|translate}}</option>
               </select>
             </clr-select-container>
