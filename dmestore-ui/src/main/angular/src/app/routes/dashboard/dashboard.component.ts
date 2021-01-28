@@ -69,6 +69,13 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   bestShowLoading = false;
   top5ShowLoading = false;
 
+  disconnectFlag = false; // 断开连接提示框
+  disconnectResult = false; // 断开连接结果：true 弹窗展示 false 隐藏
+  disconnectSuccessFlag = false; // 断开连接成功
+  disconnectFailedFlag = false; // 断开连接失败
+  disconnectHandleLoading = false;// 断开连接处理提示
+
+
   connectForm = new FormGroup({
     port: new FormControl('', [
         Validators.required,
@@ -308,6 +315,24 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   toDatastoreDeviceViewSdk(){
     this.gs.getClientSdk().app.navigateTo({
       targetViewId: 'com.huawei.dmestore.storageView'
+    });
+  }
+
+  /**
+   * 断开连接
+   */
+  disconnectedDMEFunc() {
+    this.disconnectHandleLoading = true;
+    this.http.get('/accessdme/access/disconnect').subscribe((result: any) => {
+      this.disconnectHandleLoading = false;
+      this.disconnectResult=true;
+      this.disconnectFlag=false;
+      if (result.code == '200'){
+        this.disconnectSuccessFlag = true;
+      } else{
+        this.disconnectFailedFlag = true;
+      }
+      this.cdr.detectChanges();
     });
   }
 }

@@ -6,6 +6,7 @@
     "del": "Delete",
     "expand": "Expand",
     "more": "More",
+    "otherOperations": "Other operations",
     "mount": "Mount",
     "unmount": "Unmount",
     "reclaim": "Reclaim",
@@ -571,7 +572,8 @@
     "connectT": "DME Connect",
     "connectFail": "Connect Failed!",
     "connectSuccess": "Connect Success!",
-    "portholder": "Port Default 26335"
+    "portholder": "Port Default 26335",
+    "disconnect": "Disconnect"
   },
   "bestPractice": {
     "apply": "Apply Best Practice",
@@ -831,7 +833,10 @@
     "storagePoolIODensity": "Storage pool I/O density(IOPS/TB)"
   },
   "tips": {
-    "select": "Please select"
+    "select": "Please select",
+    "disconnected": "Whether to disconnect DME ?",
+    "operationSuccessful": "Operation successful!",
+    "operationFailed": "Operation failed!"
   },
   "chart": {
     "select": {
