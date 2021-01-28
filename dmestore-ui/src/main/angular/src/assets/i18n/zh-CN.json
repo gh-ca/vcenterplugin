@@ -824,7 +824,9 @@
     "vmfsNameRepeat":"VMFS名称已经存在！",
     "volNameRepeat":"卷名称已经存在！",
     "numberAndLetter":"只能输入数字和字母!",
-    "cantFindData": "抱歉未查询到相关数据！"
+    "cantFindData": "抱歉未查询到相关数据！",
+    "getDataFailed": "获取数据失败！",
+    "cantChangeServiceLevel": "该设备为自定义类型，不支持服务等级变更操作！"
   },
   "page": {
     "perPage": "每页",

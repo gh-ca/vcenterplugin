@@ -301,7 +301,7 @@
           <clr-combobox-container>
             <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
             <clr-combobox *ngIf="form.hostDataloadSuccess && form.culDataloadSuccess" [(ngModel)]="chooseDevice" name="chooseDevice" formControlName="chooseDevice" required>
-              <clr-options>
+              <clr-options style="max-height: 6.5rem;overflow: auto">
                 <clr-option *clrOptionItems="let device of deviceList; field:'deviceName'" [clrValue]="device">
                   <clr-icon *ngIf="device.deviceName !== '' && device.deviceType === 'host'" shape="host" role="img" aria-label="World is turning"></clr-icon>
                   <clr-icon *ngIf="device.deviceName !== '' && device.deviceType !== 'host'" shape="host-group" role="img" aria-label="World is turning"></clr-icon>
@@ -758,7 +758,7 @@
         <clr-combobox-container *ngIf="mountForm.mountType==='1' && mountHostData">
           <label style="color: #9F9F9F;">{{'vmfs.mount.host' | translate}}</label>
           <clr-combobox [(ngModel)]="chooseHost" name="chooseHost" required>
-            <clr-options>
+            <clr-options style="max-height: 6.5rem;overflow: auto">
               <clr-option *clrOptionItems="let state of hostList; field:'hostName'" [clrValue]="state">
                 <clr-icon *ngIf="state.hostName !== ''" shape="host" role="img" aria-label="World is turning"></clr-icon>{{state.hostName}}
               </clr-option>
@@ -771,7 +771,7 @@
         <clr-combobox-container *ngIf="mountForm.mountType==='2' && mountClusterData">
           <label style="color: #9F9F9F;">{{'vmfs.mount.cluster' | translate}}</label>
           <clr-combobox [(ngModel)]="chooseCluster" name="chooseCluster" required>
-            <clr-options>
+            <clr-options style="max-height: 6.5rem;overflow: auto">
               <clr-option *clrOptionItems="let state of clusterList; field:'clusterName'" [clrValue]="state">
                 <clr-icon *ngIf="state.clusterName !== ''" shape="host-group" role="img" aria-label="World is turning"></clr-icon>{{state.clusterName}}
               </clr-option>

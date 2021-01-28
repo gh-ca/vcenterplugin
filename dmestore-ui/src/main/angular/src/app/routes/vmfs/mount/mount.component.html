@@ -79,7 +79,7 @@
         <clr-combobox-container *ngIf="mountForm.mountType==='1'">
           <label style="color: #9F9F9F;">{{'vmfs.mount.host' | translate}}</label>
           <clr-combobox [(ngModel)]="chooseHost" name="chooseHost" required>
-            <clr-options *ngIf="mountHostData">
+            <clr-options style="max-height: 6.5rem;overflow: auto" *ngIf="mountHostData">
               <clr-option *clrOptionItems="let state of hostList; field:'hostName'" [clrValue]="state">
                 <clr-icon *ngIf="state.hostName !== ''" shape="host" role="img" aria-label="World is turning"></clr-icon>{{state.hostName}}
               </clr-option>
@@ -92,7 +92,7 @@
         <clr-combobox-container *ngIf="mountForm.mountType==='2'">
           <label style="color: #9F9F9F;">{{'vmfs.mount.cluster' | translate}}</label>
           <clr-combobox [(ngModel)]="chooseCluster" name="chooseCluster" required>
-            <clr-options *ngIf="mountClusterData">
+            <clr-options style="max-height: 6.5rem;overflow: auto" *ngIf="mountClusterData">
               <clr-option *clrOptionItems="let state of clusterList; field:'clusterName'" [clrValue]="state">
                 <clr-icon *ngIf="state.clusterName !== ''" shape="host-group" role="img" aria-label="World is turning"></clr-icon>{{state.clusterName}}
               </clr-option>

@@ -137,7 +137,7 @@
       <clr-combobox-container>
         <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
         <clr-combobox *ngIf="form.hostDataloadSuccess && form.culDataloadSuccess" [(ngModel)]="chooseDevice" name="chooseDevice" required>
-          <clr-options>
+          <clr-options style="max-height: 6.5rem;overflow: auto">
             <clr-option *clrOptionItems="let device of deviceList; field:'deviceName'" [clrValue]="device">
               <clr-icon *ngIf="device.deviceName !== '' && device.deviceType === 'host'" shape="host" role="img" aria-label="World is turning"></clr-icon>
               <clr-icon *ngIf="device.deviceName !== '' && device.deviceType !== 'host'" shape="host-group" role="img" aria-label="World is turning"></clr-icon>

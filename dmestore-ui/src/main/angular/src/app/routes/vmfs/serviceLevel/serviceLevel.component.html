@@ -3,12 +3,14 @@
     <form clrForm>
 
       <div *ngIf="isOperationErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.serviceLevelError' | translate}}</div>
+      <div *ngIf="isStorageVmfs" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.cantChangeServiceLevel' | translate}}</div>
+      <div *ngIf="getDataFailed" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.getDataFailed' | translate}}</div>
       <div *ngIf="modalHandleLoading" class="loadingDiv">
           <span>
             {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
           </span>
       </div>
-      <div *ngIf="modalLoading" class="loadingDiv">
+      <div *ngIf="modalLoading || loadingData" class="loadingDiv">
           <span>
             {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
           </span>
@@ -74,7 +76,7 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-outline" (click)="cancel()">{{'menu.cancel' | translate}}</button>
-    <button type="button" class="btn btn-primary" (click)="changeSLHandleFunc()">{{'menu.ok' | translate}}</button>
+    <button type="button" class="btn btn-primary" [disabled]="getDataFailed || isStorageVmfs" (click)="changeSLHandleFunc()">{{'menu.ok' | translate}}</button>
   </div>
 </clr-modal>
 <!--操作成功提示-->
