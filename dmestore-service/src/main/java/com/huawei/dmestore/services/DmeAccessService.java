@@ -1,7 +1,7 @@
 package com.huawei.dmestore.services;
 
 import com.huawei.dmestore.exception.DmeException;
-
+import com.huawei.dmestore.exception.DmeSqlException;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
@@ -18,25 +18,33 @@ public interface DmeAccessService {
     /**
      * Access DME
      *
-     * @author yy
      * @param params key required: obj_ids, indicator_ids, range
      * @throws DmeException 异常
+     * @author yy
      */
     void accessDme(Map<String, Object> params) throws DmeException;
 
     /**
      * refreshDme
      *
-     * @author wangxy
      * @return Map
+     * @author wangxy
      */
     Map<String, Object> refreshDme();
 
     /**
+     * disconnectDme
+     *
+     * @throws DmeSqlException sql异常
+     * @author wangxy
+     */
+    void disconnectDme() throws DmeSqlException;
+
+    /**
      * Public method access
      *
-     * @param url url
-     * @param method Http Method
+     * @param url         url
+     * @param method      Http Method
      * @param requestBody request Body
      * @return ResponseBodyBean
      * @throws DmeException when error
@@ -46,8 +54,8 @@ public interface DmeAccessService {
     /**
      * Public method access
      *
-     * @param url url
-     * @param method Http Method
+     * @param url      url
+     * @param method   Http Method
      * @param jsonBody request Body
      * @return ResponseBodyBean
      * @throws DmeException when error
@@ -129,7 +137,7 @@ public interface DmeAccessService {
      * unMap Host
      *
      * @param hostId host id
-     * @param ids datastore ids
+     * @param ids    datastore ids
      * @throws DmeException when error
      */
     void unMapHost(String hostId, List<String> ids) throws DmeException;
@@ -145,11 +153,11 @@ public interface DmeAccessService {
     /**
      * Configure task time
      *
-     * @param taskId task Id
+     * @param taskId   task Id
      * @param taskCron task cron
      * @throws DmeException when error
      */
-    void configureTaskTime(Integer taskId,String taskCron) throws DmeException;
+    void configureTaskTime(Integer taskId, String taskCron) throws DmeException;
 
     /**
      * get hostGroup's detail
@@ -158,7 +166,7 @@ public interface DmeAccessService {
      * @return Map
      * @throws DmeException when error
      */
-    Map<String,Object> getDmeHostGroup(String hsotGroupId) throws DmeException;
+    Map<String, Object> getDmeHostGroup(String hsotGroupId) throws DmeException;
 
     /**
      * get hostGroup's host
@@ -167,12 +175,12 @@ public interface DmeAccessService {
      * @return List
      * @throws DmeException when error
      */
-    List<Map<String,Object>> getDmeHostInHostGroup(String hostGroupId) throws DmeException;
+    List<Map<String, Object>> getDmeHostInHostGroup(String hostGroupId) throws DmeException;
 
     /**
      * Configure task time
      *
-     * @param hostId host Id
+     * @param hostId    host Id
      * @param volumeIds task cron
      * @throws DmeException when error
      */

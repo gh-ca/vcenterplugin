@@ -21,6 +21,7 @@
     <bean name="DmeAccessServiceImpl" class="com.huawei.dmestore.services.DmeAccessServiceImpl">
         <property name="dmeInfoDao" ref="dmeInfoDao"/>
         <property name="scheduleDao" ref="scheduleDao"/>
+        <property name="systemDao" ref="systemDao"/>
         <property name="vmfsAccessService" ref="VmfsAccessServiceImpl"/>
         <property name="dmeNfsAccessService" ref="DmeNFSAccessServiceImpl"/>
         <property name="vcsdkUtils" ref="vCSDKUtils"/>
