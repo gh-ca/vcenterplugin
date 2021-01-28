@@ -13,6 +13,7 @@ import com.huawei.dmestore.model.NfsDataStoreFsAttr;
 import com.huawei.dmestore.model.NfsDataStoreLogicPortAttr;
 import com.huawei.dmestore.model.NfsDataStoreShareAttr;
 import com.huawei.dmestore.model.Storage;
+import com.huawei.dmestore.model.StorageDetail;
 import com.huawei.dmestore.model.TaskDetailInfo;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
@@ -991,6 +992,7 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
     }
 
     private String getStorageModel(String storageId) throws DmeException {
-        return dmeStorageService.getStorageDetail(storageId).getModel();
+        StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
+        return storageDetail.getModel() +" "+ storageDetail.getProductVersion();
     }
 }

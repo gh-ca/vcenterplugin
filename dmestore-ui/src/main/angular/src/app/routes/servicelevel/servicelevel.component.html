@@ -453,43 +453,43 @@
 
         </clr-tab-content>
       </clr-tab>
-<!--      <clr-tab>-->
-<!--        <button clrTabLink>{{'tier.capacity'|translate}}</button>-->
-<!--        <clr-tab-content *clrIfActive>-->
-<!--          <div style="float:right; height: 50px;">-->
-<!--            <clr-select-container style="margin-right: 50px">-->
-<!--              <select clrSelect>-->
-<!--                <option value="1">{{'tier.last1M'|translate}}</option>-->
-<!--                <option value="2">{{'tier.last3M'|translate}}</option>-->
-<!--                <option value="3">{{'tier.last6M'|translate}}</option>-->
-<!--                <option value="4">{{'tier.last1Y'|translate}}</option>-->
-<!--              </select>-->
-<!--            </clr-select-container>-->
-<!--          </div>-->
-<!--          <div style="margin-top: 50px" echarts [options]="volumeCapacity"></div>-->
-<!--          <div style="margin-top: 30px" echarts [options]="storagePoolCapacity"></div>-->
-<!--        </clr-tab-content>-->
-<!--      </clr-tab>-->
-<!--      <clr-tab>-->
-<!--        <button clrTabLink>{{'tier.performance'|translate}}</button>-->
-<!--        <clr-tab-content *clrIfActive>-->
-<!--          <div style="float:right; height: 50px;">-->
-<!--            <clr-select-container style="margin-right: 50px">-->
-<!--              <select clrSelect (change)="initChart(range)"  [(ngModel)]="range.range">-->
-<!--                <option value="LAST_1_DAY">{{'tier.last1D'|translate}}</option>-->
-<!--                <option value="LAST_1_WEEK">{{'tier.last1W'|translate}}</option>-->
-<!--                <option value="LAST_1_MONTH">{{'tier.last1M'|translate}}</option>-->
-<!--                <option value="LAST_1_YEAR">{{'tier.last1Y'|translate}}</option>-->
-<!--              </select>-->
-<!--            </clr-select-container>-->
-<!--          </div>-->
-<!--          <div style="margin-top: 50px" echarts [options]="volumeMaxResponseTime"></div>-->
-<!--          <div style="margin-top: 30px" echarts [options]="volumeDensity"></div>-->
-<!--          <div style="margin-top: 30px" echarts [options]="volumeThroughput"></div>-->
-<!--          <div style="margin-top: 30px" echarts [options]="volumeBandwidth"></div>-->
-<!--          <div style="margin-top: 30px" echarts [options]="storagePoolDensity"></div>-->
-<!--        </clr-tab-content>-->
-<!--      </clr-tab>-->
+      <clr-tab>
+        <button clrTabLink>{{'tier.capacity'|translate}}</button>
+        <clr-tab-content *clrIfActive>
+          <div style="float:right; height: 50px;">
+            <clr-select-container style="margin-right: 50px">
+              <select clrSelect (change)="initCapacityChart(capacityRange)" [(ngModel)]="capacityRange.range">
+                <option value="LAST_1_MONTH">{{'tier.last1M'|translate}}</option>
+                <option value="LAST_1_QUARTER">{{'tier.last3M'|translate}}</option>
+                <option value="HALF_1_YEAR">{{'tier.last6M'|translate}}</option>
+                <option value="LAST_1_YEAR">{{'tier.last1Y'|translate}}</option>
+              </select>
+            </clr-select-container>
+          </div>
+          <div style="margin-top: 50px" echarts [options]="volumeCapacity"></div>
+          <div style="margin-top: 30px" echarts [options]="storagePoolCapacity"></div>
+        </clr-tab-content>
+      </clr-tab>
+      <clr-tab>
+        <button clrTabLink>{{'tier.performance'|translate}}</button>
+        <clr-tab-content *clrIfActive>
+          <div style="float:right; height: 50px;">
+            <clr-select-container style="margin-right: 50px">
+              <select clrSelect (change)="initChart(range)"  [(ngModel)]="range.range">
+                <option value="LAST_1_DAY">{{'tier.last1D'|translate}}</option>
+                <option value="LAST_1_WEEK">{{'tier.last1W'|translate}}</option>
+                <option value="LAST_1_MONTH">{{'tier.last1M'|translate}}</option>
+                <option value="LAST_1_YEAR">{{'tier.last1Y'|translate}}</option>
+              </select>
+            </clr-select-container>
+          </div>
+          <div style="margin-top: 50px" echarts [options]="volumeMaxResponseTime"></div>
+          <div style="margin-top: 30px" echarts [options]="volumeDensity"></div>
+          <div style="margin-top: 30px" echarts [options]="volumeThroughput"></div>
+          <div style="margin-top: 30px" echarts [options]="volumeBandwidth"></div>
+          <div style="margin-top: 30px" echarts [options]="storagePoolDensity"></div>
+        </clr-tab-content>
+      </clr-tab>
       <clr-tab>
         <button clrTabLink>{{'tier.appType'|translate}}</button>
         <clr-tab-content *clrIfActive>

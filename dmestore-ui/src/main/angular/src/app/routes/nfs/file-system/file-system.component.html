@@ -26,10 +26,14 @@
     </tr>
     <tr>
       <td class="left">{{'nfs.fs.dataDed' | translate}}</td>
-      <td class="left">{{fsDetail.dataDeduplication}}</td>
+      <td class="left" *ngIf="fsDetail.dataDeduplication != null && fsDetail.dataDeduplication">{{'nfs.enable' | translate}}</td>
+      <td class="left" *ngIf="fsDetail.dataDeduplication != null && !fsDetail.dataDeduplication">{{'nfs.disable' | translate}}</td>
+      <td class="left" *ngIf="fsDetail.dataDeduplication == null">{{'rdm.default' | translate}}</td>
 
       <td class="left">{{'nfs.fs.dataCom' | translate}}</td>
-      <td class="left">{{fsDetail.dateCompression}}</td>
+      <td class="left" *ngIf="fsDetail.dateCompression != null && fsDetail.dateCompression">{{'nfs.enable' | translate}}</td>
+      <td class="left" *ngIf="fsDetail.dateCompression != null && !fsDetail.dateCompression">{{'nfs.disable' | translate}}</td>
+      <td class="left" *ngIf="fsDetail.dateCompression == null">{{'rdm.default' | translate}}</td>
     </tr>
   </table>
 </div>

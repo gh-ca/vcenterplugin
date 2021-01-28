@@ -179,7 +179,7 @@
         <!--qos-->
         <clr-toggle-wrapper>
           <label>{{'nfs.qosPolicy' | translate}}</label>
-          <input type="checkbox" clrToggle name="qosFlag" [(ngModel)]="addForm.qosFlag"/>
+          <input type="checkbox" clrToggle name="qosFlag" (change)="qoSFlagChange(addForm);" [(ngModel)]="addForm.qosFlag"/>
         </clr-toggle-wrapper>
         <div *ngIf="addForm.qosFlag">
           <!-- 控制策略 -->
@@ -285,6 +285,7 @@
         <clr-select-container class="selectClass" *ngIf="deduplicationShow">
           <label>{{'nfs.dataDedu' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.deduplicationEnabled" name="deduplicationEnabled">
+            <option value="null">{{'rdm.default' | translate}}</option>
             <option value="false">{{'nfs.disable' | translate}}</option>
             <option value="true">{{'nfs.enable' | translate}}</option>
           </select>
@@ -293,6 +294,7 @@
         <clr-select-container class="selectClass" *ngIf="compressionShow">
           <label>{{'nfs.dataCompre' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.compressionEnabled" name="compressionEnabled">
+            <option value="null">{{'rdm.default' | translate}}</option>
             <option value="false">{{'nfs.disable' | translate}}</option>
             <option value="true">{{'nfs.enable' | translate}}</option>
           </select>
@@ -491,7 +493,7 @@
         <!--qos-->
         <clr-toggle-wrapper>
           <label>{{'nfs.qosPolicy' | translate}}</label>
-          <input type="checkbox" clrToggle name="qosFlag" [(ngModel)]="addForm.qosFlag"/>
+          <input type="checkbox" clrToggle name="qosFlag" (change)="qoSFlagChange(addForm);" [(ngModel)]="addForm.qosFlag"/>
         </clr-toggle-wrapper>
         <div *ngIf="addForm.qosFlag">
           <!-- 控制策略 -->
@@ -597,6 +599,7 @@
         <clr-select-container class="selectClass" *ngIf="deduplicationShow">
           <label>{{'nfs.dataDedu' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.deduplicationEnabled" name="deduplicationEnabled">
+            <option value="null">{{'rdm.default' | translate}}</option>
             <option value="false">{{'nfs.disable' | translate}}</option>
             <option value="true">{{'nfs.enable' | translate}}</option>
           </select>
@@ -605,6 +608,7 @@
         <clr-select-container class="selectClass" *ngIf="compressionShow">
           <label>{{'nfs.dataCompre' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.compressionEnabled" name="compressionEnabled">
+            <option value="null">{{'rdm.default' | translate}}</option>
             <option value="false">{{'nfs.disable' | translate}}</option>
             <option value="true">{{'nfs.enable' | translate}}</option>
           </select>

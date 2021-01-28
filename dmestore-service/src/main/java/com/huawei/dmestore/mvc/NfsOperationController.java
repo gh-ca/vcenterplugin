@@ -229,7 +229,8 @@ public class NfsOperationController extends BaseController {
         StorageTypeShow storageTypeShow = new StorageTypeShow();
         StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
         if (storageDetail != null) {
-            storageTypeShow = ToolUtils.getStorageTypeShow(storageDetail.getModel());
+            String storageType = storageDetail.getModel() +" "+ storageDetail.getProductVersion();
+            storageTypeShow = ToolUtils.getStorageTypeShow(storageType);
         }
         return storageTypeShow;
     }

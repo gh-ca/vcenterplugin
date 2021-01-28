@@ -8,6 +8,7 @@ import com.huawei.dmestore.exception.VcenterException;
 import com.huawei.dmestore.exception.VcenterRuntimeException;
 import com.huawei.dmestore.model.FileSystem;
 import com.huawei.dmestore.model.LogicPorts;
+import com.huawei.dmestore.model.StorageDetail;
 import com.huawei.dmestore.model.TaskDetailInfo;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
@@ -803,7 +804,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
     }
 
     private String getStorageModel(String storageId) throws DmeException {
-        return dmeStorageService.getStorageDetail(storageId).getModel();
+        StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
+        return storageDetail.getModel() +" "+ storageDetail.getProductVersion();
     }
 
     // 查询指定share,获取共享在存储设备上的id

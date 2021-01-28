@@ -52,11 +52,11 @@ public class StorageDetail {
      */
     private Double totalCapacity;
     /**
-     * 可得容量 .
+     * 可得容量 . 当前使用情况 非dorado设备，当总容量使用，dorado设备 当可得容量使用
      */
     private Double totalEffectiveCapacity;
     /**
-     * 空闲容量 .
+     * 空闲可得容量 .
      */
     private Double freeEffectiveCapacity;
     /**

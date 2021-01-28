@@ -9,6 +9,10 @@ package com.huawei.dmestore.model;
  */
 public class StorageTypeShow {
     /**
+     * true 是dorado v6.1版本及高版本 false 是dorado v 6.0版本及更低版本
+     */
+    private Boolean isDorado;
+    /**
      * qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只显示和支持上限
      */
     private Integer qosTag;
@@ -54,6 +58,14 @@ public class StorageTypeShow {
      * 存储详情下展示情况 1 仅展示存储池和lun 2 展示存储池/lun/文件系统/共享/dtree
      */
     private Integer storageDetailTag;
+
+    public Boolean getDorado() {
+        return isDorado;
+    }
+
+    public void setDorado(Boolean dorado) {
+        isDorado = dorado;
+    }
 
     public Integer getQosTag() {
         return qosTag;

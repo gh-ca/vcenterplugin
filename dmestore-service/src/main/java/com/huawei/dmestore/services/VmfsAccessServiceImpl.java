@@ -10,6 +10,8 @@ import com.huawei.dmestore.exception.DmeSqlException;
 import com.huawei.dmestore.exception.VcenterException;
 import com.huawei.dmestore.model.SmartQos;
 import com.huawei.dmestore.model.Storage;
+import com.huawei.dmestore.model.StorageDetail;
+import com.huawei.dmestore.model.StorageTypeShow;
 import com.huawei.dmestore.model.TaskDetailInfo;
 import com.huawei.dmestore.model.VmfsDataInfo;
 import com.huawei.dmestore.model.VmfsDatastoreVolumeDetail;
@@ -250,7 +252,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
     }
 
-    private void parseTuning(VmfsDataInfo vmfsDataInfo, JsonObject vjson2) throws DmeSqlException {
+    private void parseTuning(VmfsDataInfo vmfsDataInfo, JsonObject vjson2) throws DmeException {
         if (vjson2 != null && !ToolUtils.jsonIsNull(vjson2.get(TUNING))) {
             JsonObject tuning = vjson2.getAsJsonObject(TUNING);
             if (tuning != null && !ToolUtils.jsonIsNull(tuning.get(SMARTQOS))) {
@@ -264,8 +266,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     String storageModel = getStorageModelByWwn(vmfsDataInfo.getWwn());
                     Float latency = ToolUtils.jsonToFloat(smartqos.get(LATENCY), null);
                     if (!StringUtils.isEmpty(storageModel)) {
-                        dorado = ToolUtils.isDorado(storageModel);
-                        if (dorado && latency != null) {
+                        StorageTypeShow storageTypeShow = ToolUtils.getStorageTypeShow(storageModel);
+                        if (storageTypeShow.getDorado() && latency != null) {
                             vmfsDataInfo.setLatency(latency / 1000);
                         }else{
                             vmfsDataInfo.setLatency(latency);
@@ -2071,7 +2073,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return false;
     }
     private String getStorageModel(String storageId) throws DmeException {
-        return dmeStorageService.getStorageDetail(storageId).getModel();
+        StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
+        return storageDetail.getModel() +" "+ storageDetail.getProductVersion();
     }
 
     private String getStorageModelByWwn(String wwn) throws DmeSqlException {
