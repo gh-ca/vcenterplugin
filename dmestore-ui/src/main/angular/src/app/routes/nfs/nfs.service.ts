@@ -70,6 +70,16 @@ export class NfsService {
   getLineChartData(url:string, params = {}) {
     return this.http.post(url, params);
   }
+
+  /**
+   * 数据集的统计：数据获取
+   * @param url
+   * @param params
+   */
+  getDataSetsData(url:string) {
+    return this.http.get(url);
+  }
+
 }
 export interface List {
   name: string;    // 名称
@@ -768,15 +778,6 @@ export class MakePerformance {
    * @param range
    * @param url
    * @param serviceLevelId
-   */
-  /**
-   * 数据集的统计: 设置折线图
-   * @param height
-   * @param title
-   * @param subtext
-   * @param range
-   * @param url
-   * @param serviceLevelId
    * @param chartType 类型 可选
    * @param dataNames 指标名称
    * @param dataValues 指标变量名 可选
@@ -786,11 +787,8 @@ export class MakePerformance {
     const chart:ChartOptions = this.getDataSetsCharts(height, title, subtext, dataNames);
     // 查询数据并设置echart
     return new Promise((resolve, reject) => {
-      const params = {
-        serviceLevelId: serviceLevelId,
-        interval: range,
-      }
-      this.remoteSrv.getLineChartData(url, params).subscribe((result: any) => {
+      url += '?serviceLevelId=' + serviceLevelId + '&interval=' + range;
+      this.remoteSrv.getDataSetsData(url).subscribe((result: any) => {
         console.log('chartData: ', title, result);
         // 设置标题
         chart.title.text = title;

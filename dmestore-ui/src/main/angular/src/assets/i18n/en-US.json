@@ -356,7 +356,8 @@
       "total":" Total",
       "protection":" Protection",
       "fileSystem":" File System",
-      "volume":" Volume",
+      "file":" File",
+      "volume":" LUN",
       "freeCapacity":" Free Capacity",
       "used":" Used",
       "free":" Free",
@@ -366,7 +367,8 @@
       "bandwidth":"Bandwidth(MS/s)",
       "capacity":"Capacity",
       "health":"Health",
-      "performance":"Performance - Last 24 Hours"
+      "performance":"Performance - Last 24 Hours",
+      "blockFile":"Block/File"
     },
     "detail":{
       "conf":{
@@ -386,7 +388,7 @@
       "cap":{
         "capacity":"Capacity",
         "capacityUsage":"Capacity Usage",
-        "bareCapacity":"Bare Capacity",
+        "bareCapacity":"Raw Capacity",
         "totalCapacity":"Total Capacity",
         "useFree":"Use|Free",
         "subscribe":"Subscribed",

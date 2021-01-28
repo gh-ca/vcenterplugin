@@ -570,22 +570,34 @@
             <div class="detail-margin-top">
               <div *ngIf="detail" class="clr-row" >
                   <div class="clr-col-4">
+                    <!--容量利用率-->
                     <div class="info-content-title" style="margin-bottom: 2%">{{'storage.detail.cap.capacityUsage' | translate}}</div>
                     <div style=".data">
-                      <div class="capacity-wrap">
+                      <!--可得容量-->
+                      <div class="capacity-wrap" *ngIf="detail.storageTypeShow.dorado">
+                        <span class="capacity-label">{{'storage.list.tec' | translate}}</span>
+                        <div class="num-bar_outer">
+                          <div class="num-bar_inner"></div>
+                        </div>
+                        <span class="capacity-span">{{formatCapacity(detail.totalEffectiveCapacity)}}</span>
+                      </div>
+                      <!--裸容量-->
+                      <div class="capacity-wrap" *ngIf="!detail.storageTypeShow.dorado">
                         <span class="capacity-label">{{'storage.detail.cap.bareCapacity' | translate}}</span>
                         <div class="num-bar_outer">
                           <div class="num-bar_inner"></div>
                         </div>
                         <span class="capacity-span">{{formatCapacity(detail.totalCapacity)}}</span>
                       </div>
-                      <div class="capacity-wrap">
+                      <!--总容量-->
+                      <div class="capacity-wrap" *ngIf="!detail.storageTypeShow.dorado">
                         <span class="capacity-label">{{'storage.detail.cap.totalCapacity' | translate}}</span>
                         <div class="num-bar_outer">
                           <div class="num-bar_inner total" [ngStyle]="{'width':(detail.totalEffectiveCapacity/detail.totalCapacity * 100)+'%'}"></div>
                         </div>
                         <span class="capacity-span">{{formatCapacity(detail.totalEffectiveCapacity)}}</span>
                       </div>
+                      <!--已使用|空闲-->
                       <div class="capacity-wrap">
                         <span class="capacity-label">{{'storage.detail.cap.useFree' | translate}}</span>
                         <div class="num-bar_outer">
@@ -595,7 +607,7 @@
                         </div>
                         <span class="capacity-span">{{formatCapacity(detail.usedCapacity)}} / {{getFreeCapacity(detail.totalEffectiveCapacity,detail.usedCapacity)}}</span>
                       </div>
-
+                      <!--已订阅-->
                       <div class="capacity-wrap">
                         <span class="capacity-label">{{'storage.detail.cap.subscribe' | translate}}</span>
                         <div class="num-bar_outer">
@@ -605,26 +617,37 @@
                       </div>
                     </div>
                   </div>
+                  <!--容量-->
                   <div class="clr-col-4">
                     <div class=" d-info-content-title">{{'storage.chart.capacity' | translate}}</div>
                     <div *ngIf="cd" class="d-info-charts-wrap" style=".data">
                       <div echarts [options]="cd.chart" id="chart3" style="width: 30%;height: 120px;"></div>
                       <div class="d-info-content">
+                        <!--保护-->
                         <div class="d-info-content-text">
                           <span>{{'storage.chart.protection' | translate}}</span>
                           <span>{{cd.protection}}</span>
                           <span class="squre protection"></span>
                         </div>
-                        <div class="d-info-content-text">
+                        <!--块/文件-->
+                        <div class="d-info-content-text" *ngIf="detail.storageTypeShow.dorado">
+                          <span>{{'storage.chart.blockFile' | translate}}</span>
+                          <span>{{cd.blockFile}}</span>
+                          <span class="squre fs"></span>
+                        </div>
+                        <!--文件系统-->
+                        <div class="d-info-content-text" *ngIf="!detail.storageTypeShow.dorado">
                           <span>{{'storage.chart.fileSystem' | translate}}</span>
                           <span>{{cd.fileSystem}}</span>
                           <span class="squre fs"></span>
                         </div>
-                        <div class="d-info-content-text">
+                        <!--LUN-->
+                        <div class="d-info-content-text" *ngIf="!detail.storageTypeShow.dorado">
                           <span>{{'storage.chart.volume' | translate}}</span>
                           <span>{{cd.volume}}</span>
                           <span class="squre volume"></span>
                         </div>
+                        <!--空闲容量-->
                         <div class="d-info-content-text">
                           <span>{{'storage.chart.freeCapacity' | translate}}</span>
                           <span>{{cd.freeCapacity}}</span>
@@ -633,7 +656,8 @@
                       </div>
                     </div>
                   </div>
-                  <div class="clr-col-4">
+                  <!--容量节省率-->
+                  <div class="clr-col-4" *ngIf="!detail.storageTypeShow.dorado">
                     <div class="info-content-title">{{'storage.detail.cap.capacitySavings' | translate}}</div>
                     <div *ngIf="capSave" class="availability-box"  style=".data">
                       <div class="unit-banner">
