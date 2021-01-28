@@ -90,7 +90,7 @@ export class StorageDetail{
   subscriptionCapacity: number;
   synStatus: string;
   totalCapacity: number;
-  totalEffectiveCapacity: number;
+  totalEffectiveCapacity: number; // Dorado设备当可得容量用、非Dorado设备当总容量用
   usedCapacity: number;
   vendor: string;
   volume: string;

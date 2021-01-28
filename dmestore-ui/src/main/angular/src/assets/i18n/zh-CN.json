@@ -828,10 +828,10 @@
     "all": "共"
   },
   "performance": {
-    "volumeMaximumIORespTime": "卷最大I/O响应时间(ms)",
-    "volumeIODensity": "卷I/O密度(IOPS/TB)",
-    "totalVolumeThroughput": "卷总吞吐量(IOPS)",
-    "volumeTotalBandwidth": "卷总带宽(MB/s)",
+    "volumeMaximumIORespTime": "LUN 最大I/O响应时间(ms)",
+    "volumeIODensity": "LUN I/O密度(IOPS/TB)",
+    "totalVolumeThroughput": "LUN 总吞吐量(IOPS)",
+    "volumeTotalBandwidth": "LUN 总带宽(MB/s)",
     "storagePoolIODensity": "存储池I/O密度(IOPS/TB)"
   },
   "tips": {
@@ -848,6 +848,13 @@
       "half1Year": "最近半年",
       "last1Year": "最近1年",
       "invalid": "无效"
+    },
+    "title": {
+      "allocatedCapacity": "已分配容量(GB)",
+      "totalCapacity": "总容量(GB)",
+      "usedCapacity": "已用容量(GB)",
+      "lunCapacityTrends": "LUN 容量趋势",
+      "storagePoolCapacityTrends": "存储池容量趋势"
     }
   }
 }
