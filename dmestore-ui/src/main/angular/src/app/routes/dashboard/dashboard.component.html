@@ -39,6 +39,14 @@
                   <span class="gh-info-value">--</span>
                 </span>
               </div>
+              <div class="gh-info-item" *ngIf="hostModel.hostIp != '' && hostModel.hostIp != null && hostModel.code != '200'">
+                <span class="gh-info-lable">{{'menu.otherOperations' | translate}}</span>
+                <span class="gh-info-value">
+                   <button type="button" (click)="disconnectFlag=true;" class="btn btn-icon" aria-label="home">
+                     {{'overview.disconnect' | translate}}
+                    </button>
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -241,5 +249,39 @@
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-danger" (click)="connectAlertFail=false">{{'menu.ok'|translate}}</button>
+  </div>
+</clr-modal>
+<clr-modal [(clrModalOpen)]="disconnectFlag" [clrModalSize]="'sm'">
+  <h3 class="modal-title">{{'menu.tip'|translate}}</h3>
+  <div class="modal-body">
+    <div *ngIf="disconnectHandleLoading" class="loadingDiv">
+        <span>
+          {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
+        </span>
+    </div>
+    {{'tips.disconnected'|translate}}
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="disconnectedDMEFunc();">{{'menu.ok'|translate}}</button>
+    <button type="button" class="btn btn-outline" (click)="disconnectFlag=false;">{{'menu.cancel'|translate}}</button>
+  </div>
+</clr-modal>
+<clr-modal [(clrModalOpen)]="disconnectResult" [clrModalSize]="'sm'">
+  <h3 class="modal-title">{{'menu.tip'|translate}}</h3>
+  <div class="modal-body">
+    <div *ngIf="disconnectSuccessFlag">
+        <span>
+          {{'tips.operationSuccessful' | translate}}
+        </span>
+    </div>
+    <div *ngIf="disconnectFailedFlag" class="errorTips">
+        <span>
+          <clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>
+          {{'tips.operationFailed' | translate}}
+        </span>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" (click)="disconnectResult=false;disconnectSuccessFlag=false;disconnectFailedFlag=false;refresh();">{{'menu.ok'|translate}}</button>
   </div>
 </clr-modal>

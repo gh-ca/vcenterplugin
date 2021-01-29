@@ -458,11 +458,11 @@
         <clr-tab-content *clrIfActive>
           <div style="float:right; height: 50px;">
             <clr-select-container style="margin-right: 50px">
-              <select clrSelect>
-                <option value="1">{{'tier.last1M'|translate}}</option>
-                <option value="2">{{'tier.last3M'|translate}}</option>
-                <option value="3">{{'tier.last6M'|translate}}</option>
-                <option value="4">{{'tier.last1Y'|translate}}</option>
+              <select clrSelect (change)="initCapacityChart(capacityRange)" [(ngModel)]="capacityRange.range">
+                <option value="LAST_1_MONTH">{{'tier.last1M'|translate}}</option>
+                <option value="LAST_3_MONTH">{{'tier.last3M'|translate}}</option>
+                <option value="LAST_6_MONTH">{{'tier.last6M'|translate}}</option>
+                <option value="LAST_1_YEAR">{{'tier.last1Y'|translate}}</option>
               </select>
             </clr-select-container>
           </div>

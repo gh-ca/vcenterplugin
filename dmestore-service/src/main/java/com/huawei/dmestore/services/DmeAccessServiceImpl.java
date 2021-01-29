@@ -1,39 +1,31 @@
 package com.huawei.dmestore.services;
 
-import com.huawei.dmestore.constant.DmeConstants;
-import com.huawei.dmestore.dao.DmeInfoDao;
-import com.huawei.dmestore.dao.ScheduleDao;
-import com.huawei.dmestore.entity.DmeInfo;
-import com.huawei.dmestore.exception.DmeException;
-import com.huawei.dmestore.task.ScheduleSetting;
-import com.huawei.dmestore.utils.RestUtils;
-import com.huawei.dmestore.utils.ToolUtils;
-import com.huawei.dmestore.utils.VCSDKUtils;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-
+import com.huawei.dmestore.constant.DmeConstants;
+import com.huawei.dmestore.dao.DmeInfoDao;
+import com.huawei.dmestore.dao.ScheduleDao;
+import com.huawei.dmestore.dao.SystemDao;
+import com.huawei.dmestore.entity.DmeInfo;
+import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.exception.DmeSqlException;
+import com.huawei.dmestore.task.ScheduleSetting;
+import com.huawei.dmestore.utils.RestUtils;
+import com.huawei.dmestore.utils.ToolUtils;
+import com.huawei.dmestore.utils.VCSDKUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * DmeAccessServiceImpl
@@ -101,6 +93,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
     private static int dmeHostPort;
 
     private DmeInfoDao dmeInfoDao;
+
+    private SystemDao systemDao;
 
     private ScheduleDao scheduleDao;
 
@@ -171,6 +165,11 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         // 成功返回200
         LOG.info("====refreshDme end=====response:{}", gson.toJson(params));
         return params;
+    }
+
+    @Override
+    public void disconnectDme() throws DmeSqlException {
+        systemDao.cleanAllData();
     }
 
     @Override
@@ -548,6 +547,14 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         }
         LOG.info("createHostGroup hostmap==={}", hostgroupmap == null ? NULL_STRING : (hostgroupmap.size()));
         return hostgroupmap;
+    }
+
+    public SystemDao getSystemDao() {
+        return systemDao;
+    }
+
+    public void setSystemDao(SystemDao systemDao) {
+        this.systemDao = systemDao;
     }
 
     public void setDmeInfoDao(DmeInfoDao dmeInfoDao) {
