@@ -1150,17 +1150,17 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     private String getDiskType(JsonObject poolObject) throws DmeException {
         String diskType = "";
-        float tier0Capacity = poolObject.get("tier0Capacity").getAsFloat();
+        float tier0Capacity = ToolUtils.jsonToFloat(poolObject.get("tier0Capacity"));
         if (tier0Capacity > 0) {
             diskType = "SSD/";
         }
 
-        float tier1Capacity = poolObject.get("tier1Capacity").getAsFloat();
+        float tier1Capacity = ToolUtils.jsonToFloat(poolObject.get("tier1Capacity"));
         if (tier1Capacity > 0) {
             diskType += "SAS/";
         }
 
-        float tier2Capacity = poolObject.get("tier2Capacity").getAsFloat();
+        float tier2Capacity = ToolUtils.jsonToFloat(poolObject.get("tier2Capacity"));
         if (tier2Capacity > 0) {
             diskType += "NL-SAS/";
         }
