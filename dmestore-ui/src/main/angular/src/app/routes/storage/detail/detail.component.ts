@@ -281,6 +281,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
         this.gs.loading=false;
         if (r.code === '200'){
           this.detail = r.data;
+
+          this.detail.location = this.HTMLDecode(this.detail.location);
+
           this.storageDetailTag = this.detail.storageTypeShow.storageDetailTag;
           this.initCapacity();
           this.cdr.detectChanges();
@@ -296,12 +299,36 @@ export class DetailComponent implements OnInit, AfterViewInit {
           this.gs.loading=false;
           if (r.code === '200'){
             this.detail = r.data;
+            this.detail.location = this.HTMLDecode(this.detail.location);
             this.initCapacity();
             this.cdr.detectChanges();
           }
         });
       }
     }
+  }
+
+  /**
+   * location处理
+   * @param strParam
+   * @constructor
+   */
+  HTMLDecode(strParam) {
+    if (!strParam) return strParam;
+
+    // 避免嵌套转义的情况, e.g.&amp;#39
+    let str = strParam;
+    while (str.indexOf('&amp;') > -1) {
+      str = str.replace(/&amp;/g, '&');
+    }
+
+    // 判断是否存在HTML字符实体
+    if (/&[a-zA-Z]{2,5};/.test(str) || /&#\d{2,5};/.test(str)) {
+      const div = document.createElement('div');
+      div.innerHTML = str;
+      str = div.innerText;
+    }
+    return  str;
   }
   refreshStoragePool() {
     this.storagePoolStatusFilter.initStatus();

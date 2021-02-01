@@ -279,10 +279,10 @@
                 </clr-dg-filter>
               </clr-dg-column>
 
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'totalCapacity'">{{'tier.total'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'consumedCapacity'">{{'tier.used'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'usedCapacity'">{{'tier.usage'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" [clrDgField]="'freeCapacity'">{{'tier.free'|translate}}</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'totalCapacity'">{{'tier.total'|translate}}</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'consumedCapacity'">{{'tier.used'|translate}}</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'usedCapacity'">{{'tier.usage'|translate}}</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='capacity'" class="hideFilter" [clrDgField]="'freeCapacity'">{{'tier.free'|translate}}</clr-dg-column>
 
               <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'runningStatus'">
                 {{'tier.status'|translate}}
@@ -290,9 +290,9 @@
                   <sl-sp-status-filter #runningStatusFilter></sl-sp-status-filter>
                 </clr-dg-filter>
               </clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'latency'">{{'tier.latencyms'|translate}}</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'iops'">IOPS</clr-dg-column>
-              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" [clrDgField]="'bandwidth'">{{'tier.bandwidthm'|translate}}</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'latency'">{{'tier.latencyms'|translate}}</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'iops'">IOPS</clr-dg-column>
+              <clr-dg-column [hidden]="storagePoolRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'bandwidth'">{{'tier.bandwidthm'|translate}}</clr-dg-column>
 
               <clr-dg-row *clrDgItems="let item of storagePoolList" [clrDgItem]="item">
 
@@ -396,13 +396,13 @@
           <clr-datagrid [clrDgLoading]="volumeIsloading">
             <clr-dg-column [clrDgField]="'name'">{{'tier.name'|translate}}</clr-dg-column>
             <clr-dg-column [clrDgField]="'status'">{{'tier.status'|translate}}</clr-dg-column>
-            <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" [clrDgField]="'capacity'">{{'tier.total'|translate}}</clr-dg-column>
+            <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" class="hideFilter" [clrDgField]="'capacity'">{{'tier.total'|translate}}</clr-dg-column>
             <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" [clrDgField]="'alloctype'">{{'tier.alloctype'|translate}}</clr-dg-column>
-            <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" [clrDgField]="'capacityUsage'">{{'tier.used'|translate}}</clr-dg-column>
+            <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" class="hideFilter" [clrDgField]="'capacityUsage'">{{'tier.used'|translate}}</clr-dg-column>
 
-            <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" [clrDgField]="'latency'">{{'tier.latencyms'|translate}}</clr-dg-column>
-            <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" [clrDgField]="'iops'">IOPS</clr-dg-column>
-            <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" [clrDgField]="'bandwidth'">{{'tier.bandwidthm'|translate}}</clr-dg-column>
+            <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'latency'">{{'tier.latencyms'|translate}}</clr-dg-column>
+            <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'iops'">IOPS</clr-dg-column>
+            <clr-dg-column [hidden]="volumeRadioCheck!=='performance'" class="hideFilter" [clrDgField]="'bandwidth'">{{'tier.bandwidthm'|translate}}</clr-dg-column>
 
             <clr-dg-row *clrDgItems="let item of volumeList" [clrDgItem]="item">
 

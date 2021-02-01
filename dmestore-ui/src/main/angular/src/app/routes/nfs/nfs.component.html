@@ -46,12 +46,12 @@
           <status-filter #statusFilter></status-filter>
         </clr-dg-filter>
       </clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacity'">{{'nfs.totalCapacity' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'"  [clrDgField]="'freeSpace'">
+      <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'capacity'">{{'nfs.totalCapacity' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'freeSpace'">
         {{'nfs.freeCapacity' | translate}}
       </clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" style="width: 11rem;" [clrDgField]="'capacityUsage'">{{'nfs.capacityUsage' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'reserveCapacity'">{{'nfs.provisioningCapacity' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" style="width: 11rem;" [clrDgField]="'capacityUsage'">{{'nfs.capacityUsage' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'reserveCapacity'">{{'nfs.provisioningCapacity' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='list'" >
         {{'nfs.device' | translate}}
         <clr-dg-filter [clrDgFilter]="deviceFilter">
@@ -63,10 +63,10 @@
       <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'sharePath'">{{'nfs.sharePath' | translate}}</clr-dg-column>
       <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'fs'">{{'nfs.fileSystem' | translate}}</clr-dg-column>
 
-      <clr-dg-column [hidden]="radioCheck!=='chart'">{{'nfs.ops' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='chart'">{{'nfs.bandwidth' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='chart'">{{'nfs.respRt' | translate}}</clr-dg-column>
-      <clr-dg-column [hidden]="radioCheck!=='chart'">{{'nfs.respWt' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'ops'">{{'nfs.ops' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'bandwidth'">{{'nfs.bandwidth' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'readResponseTime'">{{'nfs.respRt' | translate}}</clr-dg-column>
+      <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'writeResponseTime'">{{'nfs.respWt' | translate}}</clr-dg-column>
 
       <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
         <clr-dg-cell class="over_flow" (click)="navigateTo(item.objectid)" style="color:#829DE6;cursor:pointer">{{item.name}}</clr-dg-cell>

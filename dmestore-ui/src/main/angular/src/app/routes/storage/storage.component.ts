@@ -50,6 +50,7 @@ export class StorageComponent implements OnInit, AfterViewInit {
           // 对存储的location做特殊处理
           this.list.forEach(item => {
             item.location = this.HTMLDecode(item.location);
+            item.freeCap = item.totalPoolCapacity-item.usedCapacity;
           })
           this.total = result.total_count;
           this.isLoading = false;
