@@ -10,7 +10,7 @@
     <clr-dg-column [clrDgField]="'hostSetting'">{{'bestPractice.hostSetting'|translate}}</clr-dg-column>
     <clr-dg-column [clrDgField]="'recommendValue'">{{'bestPractice.recommend'|translate}}</clr-dg-column>
     <clr-dg-column [clrDgField]="'levelDesc'">{{'bestPractice.level'|translate}}</clr-dg-column>
-    <clr-dg-column [clrDgField]="'count'" [clrDgSortOrder]="'count'">{{'bestPractice.violation'|translate}}</clr-dg-column>
+    <clr-dg-column class="hideFilter" [clrDgField]="'count'" [clrDgSortOrder]="'count'">{{'bestPractice.violation'|translate}}</clr-dg-column>
 
     <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
       <clr-dg-cell>{{item.hostSetting}}</clr-dg-cell>

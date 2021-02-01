@@ -1,56 +1,24 @@
 package com.huawei.dmestore.services;
 
+import com.google.gson.*;
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.constant.DmeIndicatorConstants;
 import com.huawei.dmestore.dao.DmeVmwareRalationDao;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.DmeSqlException;
-import com.huawei.dmestore.model.BandPorts;
-import com.huawei.dmestore.model.CapacityAutonegotiation;
-import com.huawei.dmestore.model.DiskPool;
-import com.huawei.dmestore.model.Dtrees;
-import com.huawei.dmestore.model.EthPortInfo;
-import com.huawei.dmestore.model.FailoverGroup;
-import com.huawei.dmestore.model.FileSystem;
-import com.huawei.dmestore.model.FileSystemDetail;
-import com.huawei.dmestore.model.FileSystemTurning;
-import com.huawei.dmestore.model.LogicPorts;
-import com.huawei.dmestore.model.NfsShares;
-import com.huawei.dmestore.model.SmartQos;
-import com.huawei.dmestore.model.Storage;
-import com.huawei.dmestore.model.StorageControllers;
-import com.huawei.dmestore.model.StorageDetail;
-import com.huawei.dmestore.model.StorageDisk;
-import com.huawei.dmestore.model.StoragePool;
-import com.huawei.dmestore.model.StoragePort;
-import com.huawei.dmestore.model.StorageTypeShow;
-import com.huawei.dmestore.model.Volume;
-import com.huawei.dmestore.model.VolumeListRestponse;
+import com.huawei.dmestore.model.*;
+import com.huawei.dmestore.utils.StringUtil;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
-
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.vmware.vim25.ID;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * DmeStorageServiceImpl
@@ -178,7 +146,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     Storage storageObj = new Storage();
                     parseStorageBaseInfo(jsonObj, storageObj);
                     String storageType = storageObj.getModel() + " " + storageObj.getProductVersion();
-                    if (!StringUtils.isEmpty(storageType)){
+                    if (!StringUtils.isEmpty(storageType)) {
                         StorageTypeShow storageTypeShow = ToolUtils.getStorageTypeShow(storageType);
                         storageObj.setStorageTypeShow(storageTypeShow);
                     }
@@ -240,11 +208,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             }
             String storageType = storageObj.getModel() + " " + storageObj.getProductVersion();
             StorageTypeShow storageTypeShow = new StorageTypeShow();
-            if (!StringUtils.isEmpty(storageType)){
+            if (!StringUtils.isEmpty(storageType)) {
                 storageTypeShow = ToolUtils.getStorageTypeShow(storageType);
                 storageObj.setStorageTypeShow(storageTypeShow);
             }
-            parseStoragePoolDetail(storageId, storageObj,storageTypeShow.getDorado());
+            parseStoragePoolDetail(storageId, storageObj, storageTypeShow.getDorado());
         } catch (DmeException e) {
             LOG.error("search oriented storage error!", e);
             throw new DmeException(CODE_503, e.getMessage());
@@ -252,7 +220,8 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return storageObj;
     }
 
-    private void parseStoragePoolDetail(String storageId, StorageDetail storageObj,boolean isDorado) throws DmeException {
+    private void parseStoragePoolDetail(String storageId, StorageDetail storageObj, boolean isDorado)
+        throws DmeException {
         List<StoragePool> storagePools = getStoragePools(storageId, "all");
         Double totalPoolCapicity = 0.0;
         //Double subscriptionCapacity = 0.0;
@@ -324,8 +293,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     parseStoragePoolCapacity(element, storagePool);
                     String diskPoolId = ToolUtils.jsonToStr(element.get("diskPoolId"));
                     storagePool.setDiskPoolId(diskPoolId);
-                    String diskType = getDiskType(storageId, diskPoolId);
+
+                    // 获取磁盘类型
+                    String diskType = getDiskType(element);
                     storagePool.setPhysicalType(diskType.toUpperCase());
+
                     String resId = ToolUtils.jsonToStr(element.get(RES_ID));
                     if (djofspMap != null && djofspMap.get(resId) != null) {
                         storagePool.setServiceLevelName(gson.toJson(djofspMap.get(resId)));
@@ -335,7 +307,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     }
                     String type = ToolUtils.jsonToStr(element.get("type"));
                     storagePool.setMediaType(type);
-                    if (mediaType.equals(type)) {
+
+                    // 查询"block"类型的则返回全部类型不是"file"的。查询"file"类型的返回不是"block"类型的
+                    if (mediaType.equals("block") && !type.equals("file")) {
+                        resList.add(storagePool);
+                    } else if (mediaType.equals("file") && !type.equals("block")) {
                         resList.add(storagePool);
                     } else if ("all".equals(mediaType)) {
                         resList.add(storagePool);
@@ -398,9 +374,9 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         storagePool.setStorageInstanceId(ToolUtils.jsonToStr(element.get(RES_ID)));
     }
 
-    private String parseRaidLv(String raidLv){
+    private String parseRaidLv(String raidLv) {
         String raidLvValue = DmeConstants.RAID_LEVEL_MAP.get(raidLv);
-        if(!StringUtils.isEmpty(raidLvValue)){
+        if (!StringUtils.isEmpty(raidLvValue)) {
             return raidLvValue + "/";
         }
         return "";
@@ -1117,7 +1093,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public Map<String,Object> getFileSystemDetail(String fileSystemId) throws DmeException {
+    public Map<String, Object> getFileSystemDetail(String fileSystemId) throws DmeException {
         Map<String, Object> responseFileSystemDetail = new HashMap<>();
         if (StringUtils.isEmpty(fileSystemId)) {
             throw new DmeException(CODE_403, "param error!");
@@ -1133,35 +1109,30 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             String object = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(object).getAsJsonObject();
             responseFileSystemDetail.put("id", ToolUtils.jsonToStr(jsonObject.get("id")));
-            responseFileSystemDetail.put("capacity", ToolUtils.jsonToDou(jsonObject.get("capacity"),0.0));
+            responseFileSystemDetail.put("capacity", ToolUtils.jsonToDou(jsonObject.get("capacity"), 0.0));
             responseFileSystemDetail.put("storage_id", ToolUtils.jsonToStr(jsonObject.get("storage_id")));
-            responseFileSystemDetail.put("capacity_threshold", ToolUtils.jsonToInt(jsonObject.get("capacity_threshold"),80));
+            responseFileSystemDetail.put("capacity_threshold",
+                ToolUtils.jsonToInt(jsonObject.get("capacity_threshold"), 80));
             JsonObject capacityAutoNegotiation = jsonObject.get("capacity_auto_negotiation").getAsJsonObject();
             if (capacityAutoNegotiation != null) {
                 Map<String, Object> capacityAutoNegotiationMap = new HashMap<>();
-                    capacityAutoNegotiationMap.put("capacity_self_adjusting_mode",
-                        ToolUtils.jsonToStr(capacityAutoNegotiation.get("capacity_self_adjusting_mode")));
-                capacityAutoNegotiationMap
-                    .put("capacity_recycle_mode",
-                        ToolUtils.jsonToStr(capacityAutoNegotiation.get("capacity_recycle_mode")));
-                capacityAutoNegotiationMap
-                    .put("auto_size_enable", ToolUtils.jsonToBoo(capacityAutoNegotiation.get("auto_size_enable")));
-                capacityAutoNegotiationMap
-                    .put("auto_grow_threshold_percent",
-                        ToolUtils.jsonToInt(capacityAutoNegotiation.get("auto_grow_threshold_percent"), 85));
-                capacityAutoNegotiationMap
-                    .put("auto_shrink_threshold_percent",
-                        ToolUtils.jsonToInt(capacityAutoNegotiation.get("auto_shrink_threshold_percent"), 50));
-                capacityAutoNegotiationMap
-                    .put("max_auto_size",
-                        ToolUtils.jsonToDou(capacityAutoNegotiation.get("max_auto_size")));
-                capacityAutoNegotiationMap
-                    .put("min_auto_size",
-                        ToolUtils.jsonToDou(capacityAutoNegotiation.get("min_auto_size"),
-                            ToolUtils.jsonToDou(jsonObject.get("capacity"), 0.0)));
-                capacityAutoNegotiationMap
-                    .put("auto_size_increment",
-                        ToolUtils.jsonToInt(capacityAutoNegotiation.get("auto_size_increment"), 1024));
+                capacityAutoNegotiationMap.put("capacity_self_adjusting_mode",
+                    ToolUtils.jsonToStr(capacityAutoNegotiation.get("capacity_self_adjusting_mode")));
+                capacityAutoNegotiationMap.put("capacity_recycle_mode",
+                    ToolUtils.jsonToStr(capacityAutoNegotiation.get("capacity_recycle_mode")));
+                capacityAutoNegotiationMap.put("auto_size_enable",
+                    ToolUtils.jsonToBoo(capacityAutoNegotiation.get("auto_size_enable")));
+                capacityAutoNegotiationMap.put("auto_grow_threshold_percent",
+                    ToolUtils.jsonToInt(capacityAutoNegotiation.get("auto_grow_threshold_percent"), 85));
+                capacityAutoNegotiationMap.put("auto_shrink_threshold_percent",
+                    ToolUtils.jsonToInt(capacityAutoNegotiation.get("auto_shrink_threshold_percent"), 50));
+                capacityAutoNegotiationMap.put("max_auto_size",
+                    ToolUtils.jsonToDou(capacityAutoNegotiation.get("max_auto_size")));
+                capacityAutoNegotiationMap.put("min_auto_size",
+                    ToolUtils.jsonToDou(capacityAutoNegotiation.get("min_auto_size"),
+                        ToolUtils.jsonToDou(jsonObject.get("capacity"), 0.0)));
+                capacityAutoNegotiationMap.put("auto_size_increment",
+                    ToolUtils.jsonToInt(capacityAutoNegotiation.get("auto_size_increment"), 1024));
                 responseFileSystemDetail.put("capacity_auto_negotiation", capacityAutoNegotiationMap);
 
             }
@@ -1175,6 +1146,30 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     private String getDataStoreOnVolume(String volumeId) throws DmeSqlException {
         return dmeVmwareRalationDao.getVmfsNameByVolumeId(volumeId);
+    }
+
+    private String getDiskType(JsonObject poolObject) throws DmeException {
+        String diskType = "";
+        float tier0Capacity = ToolUtils.jsonToFloat(poolObject.get("tier0Capacity"));
+        if (tier0Capacity > 0) {
+            diskType = "SSD/";
+        }
+
+        float tier1Capacity = ToolUtils.jsonToFloat(poolObject.get("tier1Capacity"));
+        if (tier1Capacity > 0) {
+            diskType += "SAS/";
+        }
+
+        float tier2Capacity = ToolUtils.jsonToFloat(poolObject.get("tier2Capacity"));
+        if (tier2Capacity > 0) {
+            diskType += "NL-SAS/";
+        }
+
+        if (StringUtil.isNotBlank(diskType)) {
+            diskType = diskType.substring(0, diskType.lastIndexOf("/"));
+        }
+
+        return diskType;
     }
 
     private String getDiskType(String storageDeviceId, String diskPoolId) throws DmeException {

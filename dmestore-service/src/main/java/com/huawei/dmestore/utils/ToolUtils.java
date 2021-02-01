@@ -1,26 +1,17 @@
 package com.huawei.dmestore.utils;
 
-import com.huawei.dmestore.exception.DmeException;
-import com.huawei.dmestore.model.StorageTypeShow;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import springfox.documentation.spring.web.json.Json;
-
+import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.model.StorageTypeShow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * ToolUtils
@@ -104,7 +95,7 @@ public class ToolUtils {
     }
 
     public static String normalizeWwn(long wwn) {
-        return  (Long.toHexString(wwn));
+        return (Long.toHexString(wwn));
     }
 
     public static String jsonToStr(JsonElement obj) {
@@ -218,7 +209,7 @@ public class ToolUtils {
     public static Float jsonToFloat(JsonElement obj) {
         Float re = 0.0F;
         try {
-            if (!StringUtils.isEmpty(obj)) {
+            if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsFloat();
             }
         } catch (IllegalStateException e) {
@@ -254,8 +245,8 @@ public class ToolUtils {
     /**
      * 判断逻辑，只要vcenter中扫描的主机启动器包含dme主机中的启动器，符合主机一致性
      *
-     * @param a vcenter 中扫描的主机中的启动器
-     * @param b DME 中扫描的主机启动器
+     * @param a   vcenter 中扫描的主机中的启动器
+     * @param b   DME 中扫描的主机启动器
      * @param <T> 参数类型
      * @return boolean 包含或者不包含
      */
@@ -272,13 +263,11 @@ public class ToolUtils {
         return false;
     }
 
-
     public static boolean jsonIsNull(JsonElement obj) {
         boolean re = false;
         try {
-            if (StringUtils.isEmpty(obj) || obj.isJsonNull()
-                || "{}".equals(GSON.toJson(obj))
-                || "[]".equals(GSON.toJson(obj))) {
+            if (StringUtils.isEmpty(obj) || obj.isJsonNull() || "{}".equals(GSON.toJson(obj)) || "[]".equals(
+                GSON.toJson(obj))) {
                 re = true;
             }
         } catch (IllegalStateException e) {
@@ -321,36 +310,21 @@ public class ToolUtils {
     }
 
     public static String getRequsetParams(String paramName, String paramValue) {
+        Map<String, String> map = new HashMap<>();
+        map.put(paramName, paramValue);
+        return getRequsetParams(map);
+    }
+
+    public static String getRequsetParams(Map<String, String> map) {
+        JsonArray constraint = new JsonArray();
         JsonObject simple = new JsonObject();
         simple.addProperty("name", "dataStatus");
         simple.addProperty("operator", "equal");
         simple.addProperty("value", "normal");
         JsonObject consObj = new JsonObject();
         consObj.add("simple", simple);
-        JsonArray constraint = new JsonArray();
         constraint.add(consObj);
-        JsonObject simple1 = new JsonObject();
-        simple1.addProperty("name", paramName);
-        simple1.addProperty("operator", "equal");
-        simple1.addProperty("value", paramValue);
-        JsonObject consObj1 = new JsonObject();
-        consObj1.add("simple", simple1);
-        consObj1.addProperty("logOp", "and");
-        constraint.add(consObj1);
-        JsonObject condition = new JsonObject();
-        condition.add("constraint", constraint);
-        return condition.toString();
-    }
-
-    public static String getRequsetParams(Map<String,String> map) {
-        JsonArray constraint = new JsonArray();
-        for (Map.Entry<String,String> entry : map.entrySet()) {
-            JsonObject simple = new JsonObject();
-            simple.addProperty("name", "dataStatus");
-            simple.addProperty("operator", "equal");
-            simple.addProperty("value", "normal");
-            JsonObject consObj = new JsonObject();
-            consObj.add("simple", simple);
+        for (Map.Entry<String, String> entry : map.entrySet()) {
             JsonObject simple1 = new JsonObject();
             simple1.addProperty("name", entry.getKey());
             simple1.addProperty("operator", "equal");
@@ -358,7 +332,6 @@ public class ToolUtils {
             JsonObject consObj1 = new JsonObject();
             consObj1.add("simple", simple1);
             consObj1.addProperty("logOp", "and");
-            constraint.add(consObj);
             constraint.add(consObj1);
         }
         JsonObject condition = new JsonObject();
@@ -366,10 +339,17 @@ public class ToolUtils {
         return condition.toString();
     }
 
+    public static void main(String[] args) {
+        Map<String, String> map = new HashMap<>();
+        map.put("id", "112321");
+        map.put("type", "aa");
+        System.out.println(getRequsetParams(map));
+    }
+
     public static StorageTypeShow getStorageTypeShow(String storageModel) throws DmeException {
         StorageTypeShow storageTypeShow = new StorageTypeShow();
         List<String> list = Arrays.asList(storageModel.split(" "));
-        if (list.contains("OceanStor") && list.contains("Dorado") && list.contains("V6")){
+        if (list.contains("OceanStor") && list.contains("Dorado") && list.contains("V6")) {
             String substring = list.get(list.size() - 1).substring(0, 3);
             Double productVersion = Double.valueOf(substring);
             if (productVersion >= 6.1) {
@@ -400,8 +380,8 @@ public class ToolUtils {
                 storageTypeShow.setPrefetchStrategyShow(false);
             }
 
-        }else {
-            if (list.contains("V3") && list.get(0).contains("Dorado")){
+        } else {
+            if (list.contains("V3") && list.get(0).contains("Dorado")) {
                 // Dorado v3
                 storageTypeShow.setDorado(false);
                 storageTypeShow.setQosTag(3);
@@ -414,7 +394,7 @@ public class ToolUtils {
                 storageTypeShow.setCapacityInitialAllocation(false);
                 storageTypeShow.setSmartTierShow(false);
                 storageTypeShow.setPrefetchStrategyShow(false);
-            }else{
+            } else {
                 // v3/v5
                 storageTypeShow.setDorado(false);
                 storageTypeShow.setQosTag(2);
