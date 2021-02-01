@@ -32,6 +32,7 @@ export interface StorageList {
    productVersion: string;
    usedCapacity: number;
    totalCapacity: number;
+   freeCap: number;
    totalEffectiveCapacity: number;
    freeEffectiveCapacity: number;
    maxCpuUtilization: number;

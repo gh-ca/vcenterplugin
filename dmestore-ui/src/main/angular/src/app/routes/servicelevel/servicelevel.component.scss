@@ -48,3 +48,6 @@
   border: .05rem solid #000;
   border-radius: 2rem;
 }
+.hideFilter ::ng-deep clr-dg-string-filter{
+  display: none;
+}

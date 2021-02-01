@@ -319,4 +319,6 @@ input[type=number] {
   height: 16px;
   max-height: none;
 }
-
+.hideFilter ::ng-deep clr-dg-string-filter{
+  display: none;
+}
