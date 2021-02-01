@@ -4,6 +4,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.vmware.vim.binding.vmodl.list;
+import com.vmware.vim.binding.vmodl.map;
+
 import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.dao.DmeInfoDao;
 import com.huawei.dmestore.dao.ScheduleDao;
@@ -440,7 +443,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     @Override
     public List<Map<String, Object>> getDmeHostGroups(String hostGroupName) throws DmeException {
-        LOG.info("== search oriented host begin ==");
+        LOG.info("search oriented host begin ！");
         List<Map<String, Object>> relists = null;
         String getHostGroupsUrl = DmeConstants.GET_DME_HOSTGROUPS_URL;
         try {
@@ -449,10 +452,10 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                 requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
                 requestbody.put(NAME_FIELD, hostGroupName);
             }
-            LOG.info("== search oriented host group requestBody{}!", gson.toJson(requestbody));
+            LOG.info("search oriented host group requestBody{}!", gson.toJson(requestbody));
             ResponseEntity responseEntity = access(getHostGroupsUrl, HttpMethod.POST,
                 requestbody == null ? null : gson.toJson(requestbody));
-            LOG.info("== search oriented host group responseBody{}!", gson.toJson(responseEntity));
+            LOG.info("search oriented host group responseBody{}!", gson.toJson(responseEntity));
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 JsonArray jsonArray = jsonObject.getAsJsonArray(DmeConstants.HOSTGROUPS);
@@ -461,6 +464,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                     JsonObject object = jsonArray.get(index).getAsJsonObject();
                     Map<String, Object> map = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
                     map.put(ID_FIELD, ToolUtils.jsonToStr(object.get(ID_FIELD)));
+                    // 主机名称
                     map.put(NAME_FIELD, ToolUtils.jsonToStr(object.get(NAME_FIELD)));
                     map.put(HOST_COUNT, ToolUtils.jsonToInt(object.get(IP_FIELD), 0));
                     map.put("source_type", ToolUtils.jsonToStr(object.get("source_type")));
@@ -690,6 +694,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             hostGroupId);
         try {
             Map<String, Object> requestbody = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+            // 查询指定主机组
             ResponseEntity responseEntity = access(getHostInHostGroupUrl, HttpMethod.POST, gson.toJson(requestbody));
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 list = new ArrayList<>();
@@ -702,6 +707,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                         hostmap.put(ID_FIELD, ToolUtils.jsonToStr(hostjs.get(ID_FIELD)));
                         hostmap.put(NAME_FIELD, ToolUtils.jsonToStr(hostjs.get(NAME_FIELD)));
                         hostmap.put(HOST_COUNT, ToolUtils.jsonToStr(hostjs.get(IP_FIELD)));
+                        // list.size 可以代表主机组中主机的数量
                         list.add(hostmap);
                     }
                 }
