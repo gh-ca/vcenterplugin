@@ -293,13 +293,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     parseStoragePoolCapacity(element, storagePool);
                     String diskPoolId = ToolUtils.jsonToStr(element.get("diskPoolId"));
                     storagePool.setDiskPoolId(diskPoolId);
-                    if (StringUtil.isNotBlank(diskPoolId)) {
-                        String diskType = getDiskType(storageId, diskPoolId);
-                        storagePool.setPhysicalType(diskType.toUpperCase());
-                    } else {
-                        LOG.info("diskPoolId is null,get disk type failed!");
-                        storagePool.setPhysicalType("");
-                    }
+
+                    // 获取磁盘类型
+                    String diskType = getDiskType(element);
+                    storagePool.setPhysicalType(diskType.toUpperCase());
+
                     String resId = ToolUtils.jsonToStr(element.get(RES_ID));
                     if (djofspMap != null && djofspMap.get(resId) != null) {
                         storagePool.setServiceLevelName(gson.toJson(djofspMap.get(resId)));
@@ -309,7 +307,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                     }
                     String type = ToolUtils.jsonToStr(element.get("type"));
                     storagePool.setMediaType(type);
-                    if (mediaType.equals(type)) {
+
+                    // 查询"block"类型的则返回全部类型不是"file"的。查询"file"类型的返回不是"block"类型的
+                    if (mediaType.equals("block") && !type.equals("file")) {
+                        resList.add(storagePool);
+                    } else if (mediaType.equals("file") && !type.equals("block")) {
                         resList.add(storagePool);
                     } else if ("all".equals(mediaType)) {
                         resList.add(storagePool);
@@ -1144,6 +1146,30 @@ public class DmeStorageServiceImpl implements DmeStorageService {
 
     private String getDataStoreOnVolume(String volumeId) throws DmeSqlException {
         return dmeVmwareRalationDao.getVmfsNameByVolumeId(volumeId);
+    }
+
+    private String getDiskType(JsonObject poolObject) throws DmeException {
+        String diskType = "";
+        float tier0Capacity = poolObject.get("tier0Capacity").getAsFloat();
+        if (tier0Capacity > 0) {
+            diskType = "SSD/";
+        }
+
+        float tier1Capacity = poolObject.get("tier1Capacity").getAsFloat();
+        if (tier1Capacity > 0) {
+            diskType += "SAS/";
+        }
+
+        float tier2Capacity = poolObject.get("tier2Capacity").getAsFloat();
+        if (tier2Capacity > 0) {
+            diskType += "NL-SAS/";
+        }
+
+        if (StringUtil.isNotBlank(diskType)) {
+            diskType = diskType.substring(0, diskType.lastIndexOf("/"));
+        }
+
+        return diskType;
     }
 
     private String getDiskType(String storageDeviceId, String diskPoolId) throws DmeException {
