@@ -245,6 +245,10 @@ public class DmeConstants {
      **/
     public static final String GET_DME_HOSTS_IN_HOSTGROUP_URL
         = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}/hosts/list";
+    /**
+     * add host to hosts
+     **/
+    public static final String PUT_ADD_HOST_TO_HOSTS = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}/hosts/add";
 
     /**
      * instance relation query

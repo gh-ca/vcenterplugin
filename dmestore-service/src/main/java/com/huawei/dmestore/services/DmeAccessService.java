@@ -2,6 +2,9 @@ package com.huawei.dmestore.services;
 
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.DmeSqlException;
+
+import com.vmware.vim.binding.vmodl.list;
+
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
