@@ -209,7 +209,7 @@ public class ToolUtils {
     public static Float jsonToFloat(JsonElement obj) {
         Float re = 0.0F;
         try {
-            if (!StringUtils.isEmpty(obj)) {
+            if (!StringUtils.isEmpty(obj) && !obj.isJsonNull()) {
                 re = obj.getAsFloat();
             }
         } catch (IllegalStateException e) {
