@@ -686,7 +686,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return objId;
     }
 
-    private String checkOrAddHostToHosts(List<String> initiatorList,String hostGroupId) throws DmeException {
+    private String checkOrAddHostToHosts(List<String> initiatorList,String hostGroupId,String hostName) throws DmeException {
         // 判断主机在DME中是否存在 如果主机不存在就创建并得到主机ID
         String objId = "";
         try {
@@ -713,7 +713,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                             }
                         }
                     }
-
                     // 如果已经找到的主机就不再循环
                     if (!StringUtils.isEmpty(objId)) {
                         break;
@@ -722,14 +721,16 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
             // 将主机添加到对应的主机组中
             if (!StringUtils.isEmpty(objId)) {
-                List<String> reqbody = new ArrayList<>();
-                reqbody.add(objId);
-                Boolean isAdd = addHostToHosts(hostGroupId, reqbody);
+                addHostToHosts(hostGroupId, objId);
             }
-          /*  // 如果主机或主机不存在就创建并得到主机或主机组ID
+            // 如果主机不存在就创建并得到主机
+            Map<String, String> map = getOrientedHostInfo(hostName);
             if (StringUtils.isEmpty(objId)) {
-                objId = createHostOnDme(hostIp, hostId);
-            }*/
+                // dme中创建主机
+                objId = createHostOnDme(hostName, map.get(HOSTID));
+                // 将创建好的主机加入到对应的主机组中
+                addHostToHosts(hostGroupId, objId);
+            }
         } catch (DmeException ex) {
             LOG.error("checkOrCreateToHost error:", ex);
             throw new DmeException(ex.getMessage());
@@ -737,16 +738,33 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return objId;
     }
 
-    private Boolean addHostToHosts(String hostGroupId,List<String> hostIds) throws DmeException {
-        Boolean flag = false;
+    private Map<String, String> getOrientedHostInfo(String hostName) throws VcenterException {
+        Map<String, String> remap = new HashMap<>();
+        String hosts = vcsdkUtils.getAllHosts();
+        List<Map<String, String>> list = gson.fromJson(hosts, List.class);
+        for (Map<String, String> map : list) {
+            if (map.get(hostName) != null) {
+                remap.put(HOSTID, map.get(HOSTID));
+                break;
+            }
+        }
+        return remap;
+    }
+
+
+    private void addHostToHosts(String hostGroupId,String hostId) throws DmeException {
+
         Map<String, List<String>> reqMap = new HashMap<>();
         String url = DmeConstants.PUT_ADD_HOST_TO_HOSTS.replace("{hostgroup_id}", hostGroupId);
-        reqMap.put("host_ids", hostIds);
+        List<String> reqbody = new ArrayList<>();
+        reqbody.add(hostId);
+        reqMap.put("host_ids", reqbody);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(reqMap));
         if (responseEntity.getStatusCodeValue()==HttpStatus.OK.value()) {
-            flag = true;
+            throw new DmeException("add host to host group success !");
+        } else {
+            throw new DmeException("add host to host group fail !");
         }
-        return flag;
 
     }
 
@@ -920,6 +938,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 LOG.error("vmware Cluster hbas is null");
                 return objId;
             }
+            // 参数整理
             Map<String, List<String>> hbaListMap = paramsHandle(hbasMap, NAME_FIELD);
 
             // 获取指定主机组中主机启动器
@@ -928,7 +947,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             if (dmehosts != null && dmehosts.size() > 0) {
                 List<Map<String, Object>> initiators = new ArrayList<>();
                 for (Map<String, Object> dmehost : dmehosts) {
-                    // 得到主机的启动器
+                    // 得到dme主机的启动器
                     if (dmehost != null && dmehost.get(ID_FIELD) != null) {
                         String demHostId = ToolUtils.getStr(dmehost.get(ID_FIELD));
                         List<Map<String, Object>> subinitiators = dmeAccessService.getDmeHostInitiators(demHostId);
@@ -939,17 +958,17 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     }
                     dmeHostMap.put(ToolUtils.getStr(dmehost.get(ID_FIELD)), initiators);
                 }
+                // 参数整理
                 Map<String, List<String>> dmeListMap = paramsHandle(dmeHostMap, PORT_NAME);
                 if (dmeHostMap.size() > 0) {
+                    objId = dmeHostGroupId;
+                    // 主机组一致性比较
                     Map<String, List<String>> compareResult = initiatorCompare(hbaListMap, dmeListMap);
                     if (compareResult.size() > 0) {
                         //向主机组中添加主机
                         for (Map.Entry<String, List<String>> entry : compareResult.entrySet()) {
-                            checkOrAddHostToHosts(entry.getValue(), dmeHostGroupId);
+                            checkOrAddHostToHosts(entry.getValue(), dmeHostGroupId, entry.getKey());
                         }
-                        objId = dmeHostGroupId;
-                    } else {
-                        objId = dmeHostGroupId;
                     }
                 }
             }
