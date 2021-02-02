@@ -26,6 +26,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import com.sun.org.apache.bcel.internal.generic.NEW;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -684,6 +686,88 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return objId;
     }
 
+    private String checkOrAddHostToHosts(List<String> initiatorList,String hostGroupId,String hostName) throws DmeException {
+        // 判断主机在DME中是否存在 如果主机不存在就创建并得到主机ID
+        String objId = "";
+        try {
+            if (StringUtils.isEmpty(initiatorList)) {
+                return "";
+            }
+            // 取出所有主机
+            List<Map<String, Object>> hostlist = dmeAccessService.getDmeHosts(null);
+            if (hostlist != null && hostlist.size() > 0) {
+                for (Map<String, Object> hostmap : hostlist) {
+                    if (hostmap == null || hostmap.get(ID_FIELD) == null) {
+                        continue;
+                    }
+                    // 通过主机ID查到对应的主机的启动器
+                    String demHostId = ToolUtils.getStr(hostmap.get(ID_FIELD));
+                    // 得到主机的启动器
+                    List<Map<String, Object>> initiators = dmeAccessService.getDmeHostInitiators(demHostId);
+                    if (initiators != null && initiators.size() > 0) {
+                        for (Map<String, Object> inimap : initiators) {
+                            String portName = ToolUtils.getStr(inimap.get(PORT_NAME));
+                            if (initiatorList.contains(portName)) {
+                                objId = demHostId;
+                                break;
+                            }
+                        }
+                    }
+                    // 如果已经找到的主机就不再循环
+                    if (!StringUtils.isEmpty(objId)) {
+                        break;
+                    }
+                }
+            }
+            // 将主机添加到对应的主机组中
+            if (!StringUtils.isEmpty(objId)) {
+                addHostToHosts(hostGroupId, objId);
+            }
+            // 如果主机不存在就创建并得到主机
+            Map<String, String> map = getOrientedHostInfo(hostName);
+            if (StringUtils.isEmpty(objId)) {
+                // dme中创建主机
+                objId = createHostOnDme(hostName, map.get(HOSTID));
+                // 将创建好的主机加入到对应的主机组中
+                addHostToHosts(hostGroupId, objId);
+            }
+        } catch (DmeException ex) {
+            LOG.error("checkOrCreateToHost error:", ex);
+            throw new DmeException(ex.getMessage());
+        }
+        return objId;
+    }
+
+    private Map<String, String> getOrientedHostInfo(String hostName) throws VcenterException {
+        Map<String, String> remap = new HashMap<>();
+        String hosts = vcsdkUtils.getAllHosts();
+        List<Map<String, String>> list = gson.fromJson(hosts, List.class);
+        for (Map<String, String> map : list) {
+            if (map.get(hostName) != null) {
+                remap.put(HOSTID, map.get(HOSTID));
+                break;
+            }
+        }
+        return remap;
+    }
+
+
+    private void addHostToHosts(String hostGroupId,String hostId) throws DmeException {
+
+        Map<String, List<String>> reqMap = new HashMap<>();
+        String url = DmeConstants.PUT_ADD_HOST_TO_HOSTS.replace("{hostgroup_id}", hostGroupId);
+        List<String> reqbody = new ArrayList<>();
+        reqbody.add(hostId);
+        reqMap.put("host_ids", reqbody);
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(reqMap));
+        if (responseEntity.getStatusCodeValue()==HttpStatus.OK.value()) {
+            throw new DmeException("add host to host group success !");
+        } else {
+            throw new DmeException("add host to host group fail !");
+        }
+
+    }
+
     private String createHostOnDme(String hostIp, String hostId) throws DmeException {
         String hostObjId = "";
         Map<String, Object> params = new HashMap<>();
@@ -695,22 +779,21 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return hostObjId;
     }
-
     private String checkOrCreateToHostGroup(String clusterObjectId) throws DmeException {
         // 如果主机组不存在就创建并得到主机组ID 创建前要检查集群下的所有主机是否在DME中存在，只能通过id来创建主机组，如果集群有中文，dme中会创建失败
         String objId = "";
         try {
-            // param str host: 主机  param str cluster: 集群
-            // 如果主机或主机不存在就创建并得到主机或主机组ID 如果主机组不存在就需要创建,创建前要检查集群下的所有主机是否在DME中存在
-            String clustername = vcsdkUtils.getVcConnectionHelper().objectId2Mor(clusterObjectId).getValue();
             if (StringUtils.isEmpty(clusterObjectId)) {
                 return "";
             }
+            // param str host: 主机  param str cluster: 集群
+            // 如果主机或主机不存在就创建并得到主机或主机组ID 如果主机组不存在就需要创建,创建前要检查集群下的所有主机是否在DME中存在
+            String clustername = vcsdkUtils.getVcConnectionHelper().objectId2Mor(clusterObjectId).getValue();
             List<String> objIds = new ArrayList<>();
 
             // 检查集群对应的主机组在DME中是否存在
             List<Map<String, Object>> hostgrouplist = dmeAccessService.getDmeHostGroups(clustername);
-            LOG.info("==query host group of dme ==", gson.toJson(hostgrouplist));
+            LOG.info("query host group of dme", hostgrouplist.toString());
             if (hostgrouplist != null && hostgrouplist.size() > 0) {
                 for (Map<String, Object> hostgroupmap : hostgrouplist) {
                     if (hostgroupmap != null && hostgroupmap.get(NAME_FIELD) != null) {
@@ -723,6 +806,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
 
             // 如果主机组id存在，就判断该主机组下的所有主机与集群下的主机是否一到处，如果不一致，不管是多还是少都算不一致，都需要重新创建主机组
+            // todo 此处判断无法判断dme中主机组中主机数量少于vcenter中主机数量的情况  如果主机组存在 数量少于vcenter中集群主机数量 需要在主机组中添加主机
             if (objIds != null && objIds.size() > 0) {
                 for (String tmpObjId : objIds) {
                     objId = checkHostInHostGroup(clusterObjectId, tmpObjId);
@@ -839,7 +923,109 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return objId;
     }
+    private String checkHostInHostGroup2(String vmwareClusterObjectId, String dmeHostGroupId) {
+        // 主机组存在的前提下 判断主机组一致性。
+        String objId = "";
+        try {
+            if (StringUtils.isEmpty(vmwareClusterObjectId)) {
+                LOG.error("vmware Cluster Object Id is null");
+                return objId;
+            }
+            // 获取集群下所有主机的HBA
+            Map<String, List<Map<String, Object>>> hbasMap =
+                vcsdkUtils.getHbasByClusterObjectId2(vmwareClusterObjectId);
+            if (hbasMap == null || hbasMap.size() == 0) {
+                LOG.error("vmware Cluster hbas is null");
+                return objId;
+            }
+            // 参数整理
+            Map<String, List<String>> hbaListMap = paramsHandle(hbasMap, NAME_FIELD);
 
+            // 获取指定主机组中主机启动器
+            Map<String, List<Map<String, Object>>> dmeHostMap = new HashMap<>();
+            List<Map<String,Object>> dmehosts = dmeAccessService.getDmeHostInHostGroup(dmeHostGroupId);
+            if (dmehosts != null && dmehosts.size() > 0) {
+                List<Map<String, Object>> initiators = new ArrayList<>();
+                for (Map<String, Object> dmehost : dmehosts) {
+                    // 得到dme主机的启动器
+                    if (dmehost != null && dmehost.get(ID_FIELD) != null) {
+                        String demHostId = ToolUtils.getStr(dmehost.get(ID_FIELD));
+                        List<Map<String, Object>> subinitiators = dmeAccessService.getDmeHostInitiators(demHostId);
+                        LOG.info("initiators of host on dme！", gson.toJson(initiators) + "host size:" + initiators.size());
+                        if (subinitiators != null && subinitiators.size() > 0) {
+                            initiators.addAll(subinitiators);
+                        }
+                    }
+                    dmeHostMap.put(ToolUtils.getStr(dmehost.get(ID_FIELD)), initiators);
+                }
+                // 参数整理
+                Map<String, List<String>> dmeListMap = paramsHandle(dmeHostMap, PORT_NAME);
+                if (dmeHostMap.size() > 0) {
+                    objId = dmeHostGroupId;
+                    // 主机组一致性比较
+                    Map<String, List<String>> compareResult = initiatorCompare(hbaListMap, dmeListMap);
+                    if (compareResult.size() > 0) {
+                        //向主机组中添加主机
+                        for (Map.Entry<String, List<String>> entry : compareResult.entrySet()) {
+                            checkOrAddHostToHosts(entry.getValue(), dmeHostGroupId, entry.getKey());
+                        }
+                    }
+                }
+            }
+
+        } catch (DmeException e) {
+            e.printStackTrace();
+        }
+        return objId;
+    }
+    private void addHostToHosts(){
+        // 查询该主机dme中是否拥有 有 直接加入 没有 创建后加入
+
+    }
+    private Map<String, List<String>> initiatorCompare(Map<String, List<String>> hbasMap,
+                                                Map<String, List<String>> dmeHostMap){
+        Map<String, List<String>> resultMap = new HashMap<>();
+
+        outter:for (Map.Entry<String, List<String>> entry : hbasMap.entrySet()) {
+            // 取出dme主机组中主机的启动器和vcenter集群中的主机启动器比较
+            List<String> hbalist = entry.getValue();
+            if (dmeHostMap.size() != 0) {
+                inner:
+                for (Map.Entry<String, List<String>> entry1 : dmeHostMap.entrySet()) {
+                    List<String> dmehosts = entry1.getValue();
+                    for (String dmehost : dmehosts) {
+                        if (hbalist.contains(dmehost)) {
+                            hbasMap.remove(entry.getKey());
+                            dmeHostMap.remove(entry1.getKey());
+                            break outter;
+                        }
+                    }
+                }
+            } else {
+                break;
+            }
+        }
+        // vcenter中主机数量多于dme
+        if (hbasMap.size() != 0) {
+            resultMap = hbasMap;
+        }
+
+        return resultMap;
+    }
+    private Map<String, List<String>> paramsHandle(Map<String, List<Map<String, Object>>> map,String targatValue){
+        // 将主机和其对应的一个或多个启动器封装
+        Map<String, List<String>> resultmap = new HashMap<>();
+        for (Map.Entry<String, List<Map<String, Object>>> entry : map.entrySet()) {
+            List<Map<String, Object>> hbasList = entry.getValue();
+            List<String> list = new ArrayList<>();
+            for (Map<String, Object> hbamap : hbasList) {
+                String name = ToolUtils.getStr(hbamap.get(targatValue));
+                list.add(name);
+            }
+            resultmap.put(entry.getKey(), list);
+        }
+        return resultmap;
+    }
     private String checkHostInHostGroup(String vmwareClusterObjectId, String dmeHostGroupId) throws DmeException {
         String objId = "";
         try {
@@ -850,7 +1036,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
             // 得到集群下所有的主机的hba
             List<Map<String, Object>> hbas = vcsdkUtils.getHbasByClusterObjectId(vmwareClusterObjectId);
-            LOG.info("==host hba info on vcenter==", gson.toJson(hbas));
+            LOG.info("host hbas info on vcenter !", hbas.toString());
             if (hbas == null || hbas.size() == 0) {
                 LOG.error("vmware Cluster hbas is null");
                 return objId;
@@ -859,9 +1045,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             for (Map<String, Object> hba : hbas) {
                 wwniqns.add(ToolUtils.getStr(hba.get(NAME_FIELD)));
             }
-            LOG.info("==wwn of host group==", wwniqns.toString() + "wwn size:" + wwniqns.size());
+            LOG.info("wwn of host group !", wwniqns.toString() + "wwn size:" + wwniqns.size());
+            // 查询dme中指定主机组
             List<Map<String, Object>> dmehosts = dmeAccessService.getDmeHostInHostGroup(dmeHostGroupId);
-            LOG.info("==wwn of dme hosts==", dmehosts.toString() + "host size:" + dmehosts.size());
+            LOG.info("wwn of dme hosts ！", dmehosts.toString() + "host size:" + dmehosts.size());
             if (dmehosts != null && dmehosts.size() > 0) {
                 List<Map<String, Object>> initiators = new ArrayList<>();
                 for (Map<String, Object> dmehost : dmehosts) {
@@ -869,11 +1056,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     if (dmehost != null && dmehost.get(ID_FIELD) != null) {
                         String demHostId = ToolUtils.getStr(dmehost.get(ID_FIELD));
                         List<Map<String, Object>> subinitiators = dmeAccessService.getDmeHostInitiators(demHostId);
-                        LOG.info("==initiators of host==", gson.toJson(initiators) + "host size:" + initiators.size());
+                        LOG.info("initiators of host on dme！", gson.toJson(initiators) + "host size:" + initiators.size());
                         if (subinitiators != null && subinitiators.size() > 0) {
                             initiators.addAll(subinitiators);
                         }
                     }
+                    // 添加带有主机信息色彩的字段，模型 map<"name"list<map<string,list>>>
                 }
                 if (initiators.size() > 0) {
                     List<String> initiatorName = new ArrayList<>();
@@ -903,8 +1091,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         try {
             // param str host: 主机  param str cluster: 集群
             if (params != null && params.get(DmeConstants.HOST) != null) {
+                // todo 检查主机需要增加主机连通性检查
                 objId = checkOrCreateToHost(ToolUtils.getStr(params.get(HOST)), ToolUtils.getStr(params.get(HOSTID)));
             } else if (params != null && params.get(DmeConstants.CLUSTER) != null) {
+                // todo 检查集群 检查集群下主机连通性 检查集群与dme主机组一致性
                 objId = checkOrCreateToHostGroup(ToolUtils.getStr(params.get(CLUSTER_ID)));
             }
         } catch (DmeException e) {

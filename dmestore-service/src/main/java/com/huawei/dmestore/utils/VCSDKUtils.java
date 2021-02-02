@@ -2742,6 +2742,7 @@ public class VCSDKUtils {
                         }
                     }
                     if (subhbalist.size() > 0) {
+                        //换方法，加入对应的主机信息
                         hbalist.addAll(subhbalist);
                     }
                 }
@@ -2752,6 +2753,63 @@ public class VCSDKUtils {
         }
         return hbalist;
     }
+    /**
+     * 通过集群ID得到主机的hba
+     *
+     * @param clusterObjectId clusterObjectId
+     * @return List
+     * @throws VcenterException VcenterException
+     */
+    public Map<String, List<Map<String, Object>>> getHbasByClusterObjectId2(String clusterObjectId) throws VcenterException {
+        Map<String, List<Map<String, Object>>> hbamaps = new HashMap<>();
+        try {
+            if (StringUtils.isEmpty(clusterObjectId)) {
+                logger.error("get Hba error:cluster ObjectId is null.");
+                throw new Exception("get Hba error:cluster ObjectId is null.");
+            }
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(clusterObjectId);
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+
+            // 取得该存储下所有已经挂载的主机ID
+            ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(clusterObjectId);
+            ClusterMO objmo = clusterVmwareMoFactory.build(vmwareContext, objmor);
+            List<Pair<ManagedObjectReference, String>> hosts = objmo.getClusterHosts();
+            if (hosts != null && hosts.size() > 0) {
+                for (Pair<ManagedObjectReference, String> host : hosts) {
+                    List<Map<String, Object>> subhbalist = new ArrayList<>();
+                    HostMO hostmo = hostVmwareFactory.build(vmwareContext, host.first());
+                    List<HostHostBusAdapter> hbas = hostmo.getHostStorageSystemMo()
+                        .getStorageDeviceInfo()
+                        .getHostBusAdapter();
+                    for (HostHostBusAdapter hba : hbas) {
+                        if (hba instanceof HostInternetScsiHba) {
+                            Map<String, Object> map = new HashMap<>();
+                            HostInternetScsiHba iscsiHba = (HostInternetScsiHba) hba;
+                            map.put(TYPE, ISCSI_TYPE);
+                            map.put(NAME, iscsiHba.getIScsiName());
+                            subhbalist.add(map);
+                        } else if (hba instanceof HostFibreChannelHba) {
+                            Map<String, Object> map = new HashMap<>();
+                            HostFibreChannelHba fcHba = (HostFibreChannelHba) hba;
+                            map.put(TYPE, FC_TYPE);
+                            logger.info("hostname = {},fc hba long = {}", hostmo.getName(),
+                                ToolUtils.normalizeWwn(fcHba.getPortWorldWideName()));
+                            map.put(NAME, ToolUtils.normalizeWwn(fcHba.getPortWorldWideName()));
+                            subhbalist.add(map);
+                        }
+                    }
+                    if (subhbalist.size() > 0) {
+                        hbamaps.put(host.second(), subhbalist);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw new VcenterException(e.getMessage());
+        }
+        return hbamaps;
+    }
+
 
     /**
      * 使用主机测试目标机的连通性
