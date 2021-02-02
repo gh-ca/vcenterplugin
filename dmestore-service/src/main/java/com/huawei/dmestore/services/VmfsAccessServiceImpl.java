@@ -40,9 +40,11 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import java.util.Set;
 import sun.rmi.runtime.Log;
 
 /**
@@ -721,6 +723,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
             // 将主机添加到对应的主机组中
             if (!StringUtils.isEmpty(objId)) {
+                //已经隐射lun的主机能不添加的主机组中
+                // The host (name: 10.143.133.17) to which a LUN has been mapped cannot be added to a host group to which a LUN has been mapped.
                 addHostToHosts(hostGroupId, objId);
             }
             // 如果主机不存在就创建并得到主机
@@ -760,10 +764,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         reqbody.add(hostId);
         reqMap.put("host_ids", reqbody);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.PUT, gson.toJson(reqMap));
-        if (responseEntity.getStatusCodeValue()==HttpStatus.OK.value()) {
-            throw new DmeException("add host to host group success !");
+        if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
+            LOG.info("add host to host group success !");
         } else {
-            throw new DmeException("add host to host group fail !");
+            LOG.error("add host to host group fail !");
         }
 
     }
@@ -806,7 +810,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             }
 
             // 如果主机组id存在，就判断该主机组下的所有主机与集群下的主机是否一到处，如果不一致，不管是多还是少都算不一致，都需要重新创建主机组
-            // todo 此处判断无法判断dme中主机组中主机数量少于vcenter中主机数量的情况  如果主机组存在 数量少于vcenter中集群主机数量 需要在主机组中添加主机
             if (objIds != null && objIds.size() > 0) {
                 for (String tmpObjId : objIds) {
                     objId = checkHostInHostGroup(clusterObjectId, tmpObjId);
@@ -945,18 +948,15 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             Map<String, List<Map<String, Object>>> dmeHostMap = new HashMap<>();
             List<Map<String,Object>> dmehosts = dmeAccessService.getDmeHostInHostGroup(dmeHostGroupId);
             if (dmehosts != null && dmehosts.size() > 0) {
-                List<Map<String, Object>> initiators = new ArrayList<>();
                 for (Map<String, Object> dmehost : dmehosts) {
                     // 得到dme主机的启动器
                     if (dmehost != null && dmehost.get(ID_FIELD) != null) {
                         String demHostId = ToolUtils.getStr(dmehost.get(ID_FIELD));
                         List<Map<String, Object>> subinitiators = dmeAccessService.getDmeHostInitiators(demHostId);
-                        LOG.info("initiators of host on dme！", gson.toJson(initiators) + "host size:" + initiators.size());
                         if (subinitiators != null && subinitiators.size() > 0) {
-                            initiators.addAll(subinitiators);
+                            dmeHostMap.put(ToolUtils.getStr(dmehost.get(ID_FIELD)), subinitiators);
                         }
                     }
-                    dmeHostMap.put(ToolUtils.getStr(dmehost.get(ID_FIELD)), initiators);
                 }
                 // 参数整理
                 Map<String, List<String>> dmeListMap = paramsHandle(dmeHostMap, PORT_NAME);
@@ -978,39 +978,36 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return objId;
     }
-    private void addHostToHosts(){
-        // 查询该主机dme中是否拥有 有 直接加入 没有 创建后加入
-
-    }
     private Map<String, List<String>> initiatorCompare(Map<String, List<String>> hbasMap,
                                                 Map<String, List<String>> dmeHostMap){
-        Map<String, List<String>> resultMap = new HashMap<>();
-
-        outter:for (Map.Entry<String, List<String>> entry : hbasMap.entrySet()) {
+        Map<String, List<String>> temp = new HashMap<>();
+        for (Map.Entry<String, List<String>> entry : hbasMap.entrySet()) {
             // 取出dme主机组中主机的启动器和vcenter集群中的主机启动器比较
             List<String> hbalist = entry.getValue();
-            if (dmeHostMap.size() != 0) {
-                inner:
-                for (Map.Entry<String, List<String>> entry1 : dmeHostMap.entrySet()) {
-                    List<String> dmehosts = entry1.getValue();
-                    for (String dmehost : dmehosts) {
-                        if (hbalist.contains(dmehost)) {
-                            hbasMap.remove(entry.getKey());
-                            dmeHostMap.remove(entry1.getKey());
-                            break outter;
-                        }
+            inner:for (Map.Entry<String, List<String>> entry1 : dmeHostMap.entrySet()) {
+                List<String> dmehosts = entry1.getValue();
+                for (String dmehost : dmehosts) {
+                    if (hbalist.contains(dmehost)) {
+                        temp.put(entry.getKey(), hbalist);
+                        break inner;
                     }
                 }
-            } else {
-                break;
             }
         }
-        // vcenter中主机数量多于dme
-        if (hbasMap.size() != 0) {
-            resultMap = hbasMap;
+
+        // dme组机组中主机数量和vcenter集群中主机数量相同
+        if (temp.size() == hbasMap.size()) {
+            temp.clear();
+        }else {
+            // vcenter中主机数量多于dme
+            for (Map.Entry<String, List<String>> entry : temp.entrySet()) {
+                hbasMap.remove(entry.getKey());
+            }
+            temp.clear();
+            temp = hbasMap;
         }
 
-        return resultMap;
+        return temp;
     }
     private Map<String, List<String>> paramsHandle(Map<String, List<Map<String, Object>>> map,String targatValue){
         // 将主机和其对应的一个或多个启动器封装
