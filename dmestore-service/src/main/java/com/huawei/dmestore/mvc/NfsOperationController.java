@@ -374,8 +374,14 @@ public class NfsOperationController extends BaseController {
         if (!StringUtils.isEmpty(deviceId)) {
             StorageTypeShow storageTypeShow = isDorado(deviceId);
             if (storageTypeShow.getDeduplicationShow() || storageTypeShow.getCompressionShow()) {
-                tuning.put(DEDUPLICATION_ENABLED_FIELD, params.get("deduplicationEnabled"));
-                tuning.put(COMPRESSION_ENABLED_FIELD, params.get("compressionEnabled"));
+                Object deduplicationEnabled = params.get("deduplicationEnabled");
+                Object compressionEnabled = params.get("compressionEnabled");
+                if (deduplicationEnabled!=null) {
+                    tuning.put(DEDUPLICATION_ENABLED_FIELD, deduplicationEnabled);
+                }
+                if (compressionEnabled!=null) {
+                    tuning.put(COMPRESSION_ENABLED_FIELD, compressionEnabled);
+                }
             }
         }
         Object thin = params.get(THIN_FIELD);
