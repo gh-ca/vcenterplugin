@@ -373,7 +373,7 @@ public class VirtualMachineMO extends BaseMO {
     }
 
     public int getIDEDeviceControllerKey() throws Exception {
-        int controllerKey = 0;
+        int controllerKey = 999;
         List<VirtualDisk> devices = context.getVimClient().getDynamicProperty(mor, "config.hardware.device");
         for (VirtualDevice device : devices) {
             if (device instanceof VirtualSCSIController) {
