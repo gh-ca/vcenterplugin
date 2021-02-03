@@ -628,11 +628,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     @Override
     public List<BandPorts> getBandPorts(String storageId) throws DmeException {
         List<BandPorts> resList = new ArrayList<>();
-        String url = DmeConstants.API_BANDPORTS_LIST + storageId;
+        String url = DmeConstants.API_BANDPORTS_LIST;
+        JsonObject reBody = new JsonObject();
+        reBody.addProperty(STORAGE_ID, storageId);
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, reBody.toString());
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
+                LOG.error("getBandPorts failed!responseEntity={}", gson.toJson(responseEntity));
                 throw new DmeException(CODE_503, "list bandports error!");
             }
             String object = responseEntity.getBody();
@@ -1066,11 +1069,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             throw new DmeException(CODE_403, "request param storage_id error!");
         }
         List<FailoverGroup> failoverGroups = new ArrayList<>();
-        String url = DmeConstants.API_FAILOVERGROUPS + storageId;
+        String url = DmeConstants.API_FAILOVERGROUPS;
+        JsonObject reBody = new JsonObject();
+        reBody.addProperty("storage_id", storageId);
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, reBody.toString());
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
+                LOG.error("getFailoverGroups failed!responseEntity={}", gson.toJson(responseEntity));
                 throw new DmeException(CODE_503, "list failover group failed!");
             }
             String body = responseEntity.getBody();
