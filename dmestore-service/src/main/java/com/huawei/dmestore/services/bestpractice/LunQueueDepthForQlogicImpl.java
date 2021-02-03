@@ -21,7 +21,7 @@ public class LunQueueDepthForQlogicImpl extends BaseBestPracticeService implemen
 
     @Override
     public Object getCurrentValue(VCSDKUtils vcsdkUtils, String objectId) throws Exception {
-        return super.getCurrentModuleOption(vcsdkUtils, objectId, getOptionName());
+        return super.getCurrentModuleOption(vcsdkUtils, objectId, getModuleName());
     }
 
     @Override
