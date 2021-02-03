@@ -56,7 +56,7 @@ public class VirtualMachineMO extends BaseMO {
      * VirtualMachineMO
      *
      * @param context context
-     * @param morVm morVm
+     * @param morVm   morVm
      */
     public VirtualMachineMO(VmwareContext context, ManagedObjectReference morVm) {
         super(context, morVm);
@@ -112,12 +112,12 @@ public class VirtualMachineMO extends BaseMO {
      * createDisk
      *
      * @param vmdkDatastorePath vmdkDatastorePath
-     * @param diskType diskType
-     * @param diskMode diskMode
-     * @param rdmDeviceName rdmDeviceName
-     * @param sizeInMb sizeInMb
-     * @param morDs morDs
-     * @param controllerKey controllerKey
+     * @param diskType          diskType
+     * @param diskMode          diskMode
+     * @param rdmDeviceName     rdmDeviceName
+     * @param sizeInMb          sizeInMb
+     * @param morDs             morDs
+     * @param controllerKey     controllerKey
      * @throws Exception Exception
      */
     public void createDisk(String vmdkDatastorePath, VirtualDiskType diskType, VirtualDiskMode diskMode,
@@ -373,15 +373,18 @@ public class VirtualMachineMO extends BaseMO {
     }
 
     public int getIDEDeviceControllerKey() throws Exception {
+        int controllerKey = 0;
         List<VirtualDisk> devices = context.getVimClient().getDynamicProperty(mor, "config.hardware.device");
         for (VirtualDevice device : devices) {
-            if (device instanceof VirtualLsiLogicController || device instanceof ParaVirtualSCSIController) {
+            if (device instanceof VirtualSCSIController) {
                 int key = device.getKey();
-                return key;
+                if (key > controllerKey) {
+                    controllerKey = key;
+                }
             }
         }
 
-        return 0;
+        return ++controllerKey;
     }
 
     /**
