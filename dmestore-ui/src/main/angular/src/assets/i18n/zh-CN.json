@@ -799,8 +799,12 @@
       "notActivated":"未启用",
       "service":"管理",
       "management":"数据",
-      "managementAndService":"管理+数据"
-
+      "managementAndService":"管理+数据",
+      "aboutToFail": "即将故障",
+      "partiallyDamaged": "部分损坏",
+      "system": "系统",
+      "vlan": "VLAN",
+      "customized": "自定义"
     },
     "type":{
       "block":"块",
