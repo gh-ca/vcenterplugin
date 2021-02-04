@@ -534,7 +534,7 @@
           "dataProtocol":"Data Protocol",
           "manageAccess":"Manage Access",
           "vStoreName":"VStore Name",
-          "type":"类型",
+          "type":"Type",
           "fc":"FC Ports",
           "eth":"Ethernet Port",
           "fcoe":"FCoE Port",
