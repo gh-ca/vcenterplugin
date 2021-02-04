@@ -282,7 +282,7 @@
           <input type="checkbox" name="thin" clrToggle [(ngModel)]="addForm.thin"/>
         </clr-toggle-wrapper>
         <!--重删-->
-        <clr-select-container class="selectClass" *ngIf="deduplicationShow">
+        <clr-select-container class="selectClass" *ngIf="deduplicationShow && addForm.thin">
           <label>{{'nfs.dataDedu' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.deduplicationEnabled" name="deduplicationEnabled">
             <option value="">{{'rdm.default' | translate}}</option>
@@ -291,7 +291,7 @@
           </select>
         </clr-select-container>
         <!--压缩-->
-        <clr-select-container class="selectClass" *ngIf="compressionShow">
+        <clr-select-container class="selectClass" *ngIf="compressionShow && addForm.thin">
           <label>{{'nfs.dataCompre' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.compressionEnabled" name="compressionEnabled">
             <option value="">{{'rdm.default' | translate}}</option>
@@ -596,7 +596,7 @@
           <input type="checkbox" name="thin" clrToggle [(ngModel)]="addForm.thin"/>
         </clr-toggle-wrapper>
         <!--重删-->
-        <clr-select-container class="selectClass" *ngIf="deduplicationShow">
+        <clr-select-container class="selectClass" *ngIf="deduplicationShow && addForm.thin">
           <label>{{'nfs.dataDedu' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.deduplicationEnabled" name="deduplicationEnabled">
             <option value="">{{'rdm.default' | translate}}</option>
@@ -605,7 +605,7 @@
           </select>
         </clr-select-container>
         <!--压缩-->
-        <clr-select-container class="selectClass" *ngIf="compressionShow">
+        <clr-select-container class="selectClass" *ngIf="compressionShow && addForm.thin">
           <label>{{'nfs.dataCompre' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.compressionEnabled" name="compressionEnabled">
             <option value="">{{'rdm.default' | translate}}</option>

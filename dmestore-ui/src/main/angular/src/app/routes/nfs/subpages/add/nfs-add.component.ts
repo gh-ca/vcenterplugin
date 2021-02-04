@@ -144,6 +144,14 @@ export class NfsAddComponent implements OnInit{
         break;
     }
     this.qosFunc(addSubmitForm);
+    // 重删压缩处理
+    if (!addSubmitForm.thin) {
+      addSubmitForm.deduplicationEnabled = null;
+      addSubmitForm.compressionEnabled = null;
+    } else {
+      addSubmitForm.deduplicationEnabled = addSubmitForm.deduplicationEnabled.toString() == 'true';
+      addSubmitForm.compressionEnabled = addSubmitForm.compressionEnabled.toString() == 'true';
+    }
     this.addService.addNfs(addSubmitForm).subscribe((result: any) => {
       this.modalHandleLoading=false;
       if (result.code === '200'){

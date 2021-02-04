@@ -35,6 +35,8 @@ export class NfsModifyComponent implements OnInit{
   compressionShow = false; // 数据压缩 true 支持 false 不支持
   latencyIsSelect = false; // 时延为下拉框
 
+  isThin = false; // true 展示重删压缩、false隐藏重删压缩
+
 
 
   constructor(private modifyService: NfsModifyService, private cdr: ChangeDetectorRef,
@@ -66,6 +68,8 @@ export class NfsModifyComponent implements OnInit{
         this.oldNfsName=this.updateNfs.nfsName;
         this.oldFsName=this.updateNfs.fsName;
         this.oldShareName=this.updateNfs.shareName
+
+        this.isThin = this.updateNfs.thin;
 
         // this.updateNfs.deviceId = "c45cc2a4-4ce4-11eb-8b84-a28808fbcdbd";
         if (this.updateNfs.deviceId) {
@@ -111,6 +115,14 @@ export class NfsModifyComponent implements OnInit{
     }
     if (!this.compressionShow) {
       editNfsSubmitForm.compressionEnabled = null;
+    }
+    // 重删压缩处理
+    if (!editNfsSubmitForm.thin) {
+      editNfsSubmitForm.deduplicationEnabled = null;
+      editNfsSubmitForm.compressionEnabled = null;
+    } else {
+      editNfsSubmitForm.deduplicationEnabled = editNfsSubmitForm.deduplicationEnabled.toString() == 'true';
+      editNfsSubmitForm.compressionEnabled = editNfsSubmitForm.compressionEnabled.toString() == 'true';
     }
     this.modifyService.updateNfs(editNfsSubmitForm).subscribe((result: any) => {
       this.modalHandleLoading=false;
