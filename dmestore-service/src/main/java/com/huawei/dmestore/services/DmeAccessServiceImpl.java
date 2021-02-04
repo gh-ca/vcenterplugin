@@ -267,9 +267,9 @@ public class DmeAccessServiceImpl implements DmeAccessService {
             String hostUrl = "https://" + params.get(HOST_IP) + ":" + params.get(HOST_PORT);
             HttpEntity<String> entity = new HttpEntity<>(gson.toJson(requestbody), headers);
             RestTemplate restTemplate = restUtils.getRestTemplate();
-            responseEntity = restTemplate.exchange(hostUrl + DmeConstants.LOGIN_DME_URL, HttpMethod.PUT, entity,
-                String.class);
-
+            String url = hostUrl + DmeConstants.LOGIN_DME_URL;
+            responseEntity = restTemplate.exchange(url, HttpMethod.PUT, entity, String.class);
+            LOG.info("login end!url={},return={}", url, gson.toJson(responseEntity));
             if (responseEntity.getStatusCodeValue() == RestUtils.RES_STATE_I_200) {
                 JsonObject jsonObject = new JsonParser().parse(responseEntity.getBody().toString()).getAsJsonObject();
                 if (jsonObject != null && jsonObject.get(DmeConstants.ACCESSSESSION) != null) {
@@ -279,7 +279,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
                     dmeHostPort = Integer.parseInt(params.get(HOST_PORT).toString());
                 }
             } else {
-                LOG.info("hostUrl:{},userName={},password={},authentication failed！", hostUrl, params.get(USER_NAME),
+                LOG.info("url:{},userName={},password={},authentication failed！", url, params.get(USER_NAME),
                     params.get(PASSWORD));
             }
         }
