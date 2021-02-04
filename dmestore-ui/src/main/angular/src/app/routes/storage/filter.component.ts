@@ -1312,7 +1312,7 @@ export class LogicRoleFilter implements ClrDatagridFilterInterface<LogicPort>{
         <label>{{'enum.status.system' | translate}}</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="failoverGroupType" (change)="changeFunc($event)" [(ngModel)]="failoverGroupType" value="vlan"/>
+        <input type="radio" clrRadio name="failoverGroupType" (change)="changeFunc($event)" [(ngModel)]="failoverGroupType" value="VLAN"/>
         <label>{{'enum.status.vlan' | translate}}</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>

@@ -1170,9 +1170,9 @@
                               </clr-dg-column>
                               <clr-dg-row  *clrDgItems="let item of fgs" [clrDgItem]="item">
                                 <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType != 'system'">{{'enum.status.system' | translate}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType != 'vlan'">{{'enum.status.vlan' | translate}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType != 'customized'">{{'enum.status.customized' | translate}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType == 'system'">{{'enum.status.system' | translate}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType == 'VLAN'">{{'enum.status.vlan' | translate}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType == 'customized'">{{'enum.status.customized' | translate}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow" *ngIf="!item.failoverGroupType">--</clr-dg-cell>
 
                               </clr-dg-row>
