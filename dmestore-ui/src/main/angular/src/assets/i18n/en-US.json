@@ -794,7 +794,12 @@
        "notActivated":"NOTACTIVATED",
        "service":"Service",
        "management":"Management",
-       "managementAndService":"Management+Service"
+       "managementAndService":"Management+Service",
+       "aboutToFail": "About To Fail",
+       "partiallyDamaged": "Partially Damaged",
+       "system": "System",
+       "vlan": "VLAN",
+       "customized": "Customized"
      },
      "type":{
       "block":"Block",
