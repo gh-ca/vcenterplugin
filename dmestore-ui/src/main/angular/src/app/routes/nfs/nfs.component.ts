@@ -283,6 +283,22 @@ export class NfsComponent implements OnInit {
     }
     //  控制策略若未选清空数据
     this.qosFunc(addSubmitForm);
+    // 重删压缩处理
+    if (!addSubmitForm.thin) {
+      addSubmitForm.deduplicationEnabled = null;
+      addSubmitForm.compressionEnabled = null;
+    } else {
+      if (addSubmitForm.deduplicationEnabled != null && addSubmitForm.deduplicationEnabled.toString()) {
+        addSubmitForm.deduplicationEnabled = addSubmitForm.deduplicationEnabled.toString() == 'true';
+      } else {
+        addSubmitForm.deduplicationEnabled = null;
+      }
+      if (addSubmitForm.compressionEnabled != null && addSubmitForm.compressionEnabled.toString()) {
+        addSubmitForm.compressionEnabled = addSubmitForm.compressionEnabled.toString() == 'true';
+      } else {
+        addSubmitForm.compressionEnabled = null;
+      }
+    }
     this.addService.addNfs(addSubmitForm).subscribe((result: any) => {
       this.modalHandleLoading=false;
       if (result.code === '200'){

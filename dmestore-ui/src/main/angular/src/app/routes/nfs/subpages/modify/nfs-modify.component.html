@@ -158,19 +158,19 @@
           <input type="checkbox" name="thin" clrToggle [(ngModel)]="updateNfs.thin"/>
         </clr-toggle-wrapper>
         <!--重删-->
-        <clr-select-container class="selectClass" *ngIf="deduplicationShow">
+        <clr-select-container class="selectClass" *ngIf="deduplicationShow && isThin && updateNfs.thin">
           <label>{{'nfs.dataDedu' | translate}}</label>
           <select clrSelect [(ngModel)]="updateNfs.deduplicationEnabled" name="deduplicationEnabled">
-            <option value="null">{{'rdm.default' | translate}}</option>
+            <option value="">{{'rdm.default' | translate}}</option>
             <option value="false">{{'nfs.disable' | translate}}</option>
             <option value="true">{{'nfs.enable' | translate}}</option>
           </select>
         </clr-select-container>
         <!--压缩-->
-        <clr-select-container class="selectClass" *ngIf="compressionShow">
+        <clr-select-container class="selectClass" *ngIf="compressionShow && isThin && updateNfs.thin">
           <label>{{'nfs.dataCompre' | translate}}</label>
           <select clrSelect [(ngModel)]="updateNfs.compressionEnabled" name="compressionEnabled">
-            <option value="null">{{'rdm.default' | translate}}</option>
+            <option value="">{{'rdm.default' | translate}}</option>
             <option value="false">{{'nfs.disable' | translate}}</option>
             <option value="true">{{'nfs.enable' | translate}}</option>
           </select>
@@ -344,19 +344,19 @@
           <input type="checkbox" name="thin" clrToggle [(ngModel)]="updateNfs.thin"/>
         </clr-toggle-wrapper>
         <!--重删-->
-        <clr-select-container class="selectClass" *ngIf="deduplicationShow">
+        <clr-select-container class="selectClass" *ngIf="deduplicationShow && isThin && updateNfs.thin">
           <label>{{'nfs.dataDedu' | translate}}</label>
           <select clrSelect [(ngModel)]="updateNfs.deduplicationEnabled" name="deduplicationEnabled">
-            <option value="null">{{'rdm.default' | translate}}</option>
+            <option value="">{{'rdm.default' | translate}}</option>
             <option value="false">{{'nfs.disable' | translate}}</option>
             <option value="true">{{'nfs.enable' | translate}}</option>
           </select>
         </clr-select-container>
         <!--压缩-->
-        <clr-select-container class="selectClass" *ngIf="compressionShow">
+        <clr-select-container class="selectClass" *ngIf="compressionShow && isThin && updateNfs.thin">
           <label>{{'nfs.dataCompre' | translate}}</label>
           <select clrSelect [(ngModel)]="updateNfs.compressionEnabled" name="compressionEnabled">
-            <option value="null">{{'rdm.default' | translate}}</option>
+            <option value="">{{'rdm.default' | translate}}</option>
             <option value="false">{{'nfs.disable' | translate}}</option>
             <option value="true">{{'nfs.enable' | translate}}</option>
           </select>

@@ -179,24 +179,31 @@ export class BestpracticeComponent implements OnInit {
             if (this.list) {
               this.list.forEach(item => {
                 let levelDesc;
+                let levelNum;
                 switch (item.level) {
                   case "Critical":
+                    levelNum = 4;
                     levelDesc = this.translatePipe.transform("bestPractice.critical");
                     break;
                   case "Major":
+                    levelNum = 3;
                     levelDesc = this.translatePipe.transform("bestPractice.major");
                     break;
                   case "Warning":
+                    levelNum = 2;
                     levelDesc = this.translatePipe.transform("bestPractice.warning");
                     break;
                   case "Info":
+                    levelNum = 1;
                     levelDesc = this.translatePipe.transform("bestPractice.info");
                     break;
                   default:
+                    levelNum = 0;
                     levelDesc = "--";
                     break;
                 }
                 item.levelDesc = levelDesc;
+                item.levelNum = levelNum;
               });
             }
             this.total = result.data.length;
@@ -229,6 +236,7 @@ class Bestpractice {
   hostSetting: string;
   recommendValue: number;
   level: string;
+  levelNum: number;
   levelDesc: string;
   count: number;
   hostList: Host[];
