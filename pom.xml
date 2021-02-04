@@ -17,51 +17,6 @@
 		<module>dmestore-deployer</module>
 	</modules>
 
-
-	<repositories>
-		<repository>
-
-			<snapshots>
-
-				<enabled>true</enabled>
-
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-
-			<id>public</id>
-
-			<name>Public Repositories</name>
-
-			<url>http://10.143.132.59:8081/repository/maven-public/</url>
-
-		</repository>
-
-
-	</repositories>
-	<pluginRepositories>
-
-		<pluginRepository>
-			<snapshots>
-
-				<enabled>true</enabled>
-
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<id>public</id>
-
-			<name>Public Repositories</name>
-
-			<url>http://10.143.132.59:8081/repository/maven-public/</url>
-
-		</pluginRepository>
-
-	</pluginRepositories>
-
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jdk.version>1.8</jdk.version>
@@ -70,13 +25,6 @@
 		<sevntu.checkstyle.plugin.version>1.24.2</sevntu.checkstyle.plugin.version>
 		<!--<maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>-->
 	</properties>
-
-
-	<!-- 单元测试 -->
-	<dependencies>
-
-
-	</dependencies>
 
 	<build>
 		<!-- 插件 -->
@@ -280,7 +228,6 @@
 				<configuration>
 					<archive>
 						<!--<manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>-->
-
 						<addMavenDescriptor>false</addMavenDescriptor>
 					</archive>
 				</configuration>
