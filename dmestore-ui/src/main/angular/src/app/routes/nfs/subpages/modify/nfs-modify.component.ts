@@ -70,6 +70,10 @@ export class NfsModifyComponent implements OnInit{
         this.oldShareName=this.updateNfs.shareName
 
         this.isThin = this.updateNfs.thin;
+        if (!this.isThin) {
+          this.updateNfs.deduplicationEnabled = null;
+          this.updateNfs.compressionEnabled = null;
+        }
 
         // this.updateNfs.deviceId = "c45cc2a4-4ce4-11eb-8b84-a28808fbcdbd";
         if (this.updateNfs.deviceId) {
@@ -121,8 +125,16 @@ export class NfsModifyComponent implements OnInit{
       editNfsSubmitForm.deduplicationEnabled = null;
       editNfsSubmitForm.compressionEnabled = null;
     } else {
-      editNfsSubmitForm.deduplicationEnabled = editNfsSubmitForm.deduplicationEnabled.toString() == 'true';
-      editNfsSubmitForm.compressionEnabled = editNfsSubmitForm.compressionEnabled.toString() == 'true';
+      if (editNfsSubmitForm.deduplicationEnabled != null && editNfsSubmitForm.deduplicationEnabled.toString()) { // 不为空
+        editNfsSubmitForm.deduplicationEnabled = editNfsSubmitForm.deduplicationEnabled.toString() == 'true';
+      } else {
+        editNfsSubmitForm.deduplicationEnabled = null;
+      }
+      if (editNfsSubmitForm.compressionEnabled != null && editNfsSubmitForm.compressionEnabled.toString()) {
+        editNfsSubmitForm.compressionEnabled = editNfsSubmitForm.compressionEnabled.toString() == 'true';
+      } else {
+        editNfsSubmitForm.compressionEnabled = null;
+      }
     }
     this.modifyService.updateNfs(editNfsSubmitForm).subscribe((result: any) => {
       this.modalHandleLoading=false;

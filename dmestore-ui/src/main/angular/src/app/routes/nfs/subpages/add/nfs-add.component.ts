@@ -149,8 +149,16 @@ export class NfsAddComponent implements OnInit{
       addSubmitForm.deduplicationEnabled = null;
       addSubmitForm.compressionEnabled = null;
     } else {
-      addSubmitForm.deduplicationEnabled = addSubmitForm.deduplicationEnabled.toString() == 'true';
-      addSubmitForm.compressionEnabled = addSubmitForm.compressionEnabled.toString() == 'true';
+      if (addSubmitForm.deduplicationEnabled != null && addSubmitForm.deduplicationEnabled.toString()) {
+        addSubmitForm.deduplicationEnabled = addSubmitForm.deduplicationEnabled.toString() == 'true';
+      } else {
+        addSubmitForm.deduplicationEnabled = null;
+      }
+      if (addSubmitForm.compressionEnabled != null && addSubmitForm.compressionEnabled.toString()) {
+        addSubmitForm.compressionEnabled = addSubmitForm.compressionEnabled.toString() == 'true';
+      } else {
+        addSubmitForm.compressionEnabled = null;
+      }
     }
     this.addService.addNfs(addSubmitForm).subscribe((result: any) => {
       this.modalHandleLoading=false;
