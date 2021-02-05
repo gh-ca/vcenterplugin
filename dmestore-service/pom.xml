@@ -73,15 +73,24 @@
             <systemPath>${project.basedir}/extlib/pbm.jar</systemPath>
         </dependency>
         <dependency>
-            <groupId>org.quartz-scheduler</groupId>
+            <groupId>com.quartz-scheduler</groupId>
             <artifactId>quartz</artifactId>
+            <scope>system</scope>
             <version>2.3.2</version>
+            <systemPath>${project.basedir}/extlib/quartz-2.3.2.jar</systemPath>
             <exclusions>
                 <exclusion>
                     <artifactId>slf4j-api</artifactId>
                     <groupId>org.slf4j</groupId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>system</scope>
+            <version>1.4.199</version>
+            <systemPath>${project.basedir}/extlib/h2-1.4.199.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>com.vmware</groupId>
@@ -101,11 +110,6 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.4.199</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
