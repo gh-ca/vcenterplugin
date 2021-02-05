@@ -101,6 +101,8 @@ export class NfsModifyComponent implements OnInit{
         } else {
           this.modalLoading=false;
         }
+      } else {
+        this.modalLoading=false;
       }
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });

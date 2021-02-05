@@ -9,8 +9,10 @@
       <!--名称 -->
       <clr-input-container>
         <label  style="color: #9F9F9F;">{{'rdm.name' | translate}}<span style="color: red">*</span></label>
-        <input clrInput class="inputWidth100Percent"  [(ngModel)]="configModel.volumeSpecs[0].name" name="name" #name="ngModel" required/>
-        <clr-control-error>{{'validations.required' | translate}}</clr-control-error>
+        <input clrInput class="inputWidth100Percent" maxlength="256"  [(ngModel)]="configModel.volumeSpecs[0].name" (blur)="nameCheck();" name="name" #name="ngModel" required/>
+        <clr-control-error>
+          <p style="color: red">{{'validations.nameRequired' | translate}}</p>
+        </clr-control-error>
       </clr-input-container>
 
       <!-- 容量 -->

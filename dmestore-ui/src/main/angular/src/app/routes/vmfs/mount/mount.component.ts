@@ -73,6 +73,7 @@ export class MountComponent implements OnInit{
   mountedCluster: HostOrCluster[] = []; // 已挂载的集群
   mountSuccessShow = false; // 挂载成功窗口
   unmountSuccessShow = false; // 卸载窗口
+  unmountTipsShow = false; // 卸载删除提示
   // vmfs数据
   vmfsInfo = {
     name: ''
@@ -111,6 +112,7 @@ export class MountComponent implements OnInit{
             this.objectId = queryParam.objectId;
           } else { // 以dataStore为入口
             this.objectId = ctx[0].id;
+            // this.objectId = "urn:vmomi:Datastore:datastore-2037:674908e5-ab21-4079-9cb1-596358ee5dd1";
           }
           if (this.operationType === 'mount') {
             this.mountShow = true;
@@ -132,6 +134,7 @@ export class MountComponent implements OnInit{
 
         } else { // 以集群为入口
           this.hostOrClusterId = ctx[0].id;
+          // this.hostOrClusterId = "urn:vmomi:HostSystem:host-1034:674908e5-ab21-4079-9cb1-596358ee5dd1";
           this.hostMountShow = true;
           console.log("this.hostMountShow", this.hostMountShow)
         }
