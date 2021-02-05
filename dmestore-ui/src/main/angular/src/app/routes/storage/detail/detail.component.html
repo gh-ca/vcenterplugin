@@ -702,7 +702,7 @@
                   </div>
               </div>
               <div *ngIf="!detail">
-                无
+                {{'vmfs.none' | translate}}
               </div>
               <div style="width: 75%">
                 <div class="info-content-title">{{'storage.detail.cap.storagePool' | translate}}</div>
@@ -1031,10 +1031,20 @@
                           <clr-accordion-title>{{'storage.detail.hardware.ports.bond' | translate}}({{bonds==null?0:bonds.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.healthStatus' | translate}}</clr-dg-column>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.runningStatus' | translate}}</clr-dg-column>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.mtu' | translate}}</clr-dg-column>
+                              <clr-dg-column [clrDgField]="'name'">{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
+                              <clr-dg-column >
+                                {{'storage.detail.hardware.ports.healthStatus' | translate}}
+                                <clr-dg-filter [clrDgFilter]="healthStatusFilter">
+                                  <health-status-filter #healthStatusFilter></health-status-filter>
+                                </clr-dg-filter>
+                              </clr-dg-column>
+                              <clr-dg-column >
+                                {{'storage.detail.hardware.ports.runningStatus' | translate}}
+                                <clr-dg-filter [clrDgFilter]="portsRunningStatusFilter">
+                                  <ports-running-status-filter #portsRunningStatusFilter></ports-running-status-filter>
+                                </clr-dg-filter>
+                              </clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'mtu'">{{'storage.detail.hardware.ports.mtu' | translate}}</clr-dg-column>
                               <clr-dg-column class="hideFilter" [clrDgField]="'iops'">{{'storage.detail.hardware.ports.totalIops' | translate}}</clr-dg-column>
                               <clr-dg-column class="hideFilter" [clrDgField]="'latency'">{{'storage.detail.hardware.ports.avg' | translate}}</clr-dg-column>
                               <clr-dg-column class="hideFilter" [clrDgField]="'bandwidth'" >{{'storage.detail.hardware.ports.totalBandwidth' | translate}}</clr-dg-column>
@@ -1043,15 +1053,17 @@
                                 <clr-dg-cell class="over_flow">
                                   <span *ngIf="item.healthStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
                                   <span *ngIf="item.healthStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
-                                  <span *ngIf="item.healthStatus == 'fail'">{{'enum.status.fail' | translate}}</span>
+                                  <span *ngIf="item.healthStatus == 'faulty'">{{'enum.status.faulty' | translate}}</span>
+                                  <span *ngIf="item.healthStatus == 'about to fail'">{{'enum.status.aboutToFail' | translate}}</span>
+                                  <span *ngIf="item.healthStatus == 'partially damaged'">{{'enum.status.partiallyDamaged' | translate}}</span>
                                   <span *ngIf="!item.healthStatus">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
                                   <span *ngIf="item.runningStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
                                   <span *ngIf="item.runningStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
                                   <span *ngIf="item.runningStatus == 'running'">{{'enum.status.running' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'connected'">{{'enum.status.connected' | translate}}</span>
-                                  <span *ngIf="item.runningStatus == 'disconnected'">{{'enum.status.disconnected' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'link up'">{{'enum.status.linkUp' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'link down'">{{'enum.status.linkDown' | translate}}</span>
                                   <span *ngIf="!item.runningStatus">--</span>
                                 </clr-dg-cell>
                                 <clr-dg-cell class="over_flow">{{item.mtu}}</clr-dg-cell>
@@ -1149,11 +1161,20 @@
                           <clr-accordion-title>{{'storage.detail.hardware.ports.fail' | translate}}({{fgs==null?0:fgs.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
                             <clr-datagrid>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
-                              <clr-dg-column >{{'storage.detail.hardware.ports.type' | translate}}</clr-dg-column>
+                              <clr-dg-column [clrDgField]="'name'">{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
+                              <clr-dg-column >
+                                {{'storage.detail.hardware.ports.type' | translate}}
+                                <clr-dg-filter [clrDgFilter]="failoverGroupTypeFilter">
+                                  <failover-group-type-filter #failoverGroupTypeFilter></failover-group-type-filter>
+                                </clr-dg-filter>
+                              </clr-dg-column>
                               <clr-dg-row  *clrDgItems="let item of fgs" [clrDgItem]="item">
                                 <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
-                                <clr-dg-cell class="over_flow">{{item.failoverGroupType}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType == 'system'">{{'enum.status.system' | translate}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType == 'VLAN'">{{'enum.status.vlan' | translate}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType == 'customized'">{{'enum.status.customized' | translate}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" *ngIf="!item.failoverGroupType">--</clr-dg-cell>
+
                               </clr-dg-row>
                               <clr-dg-footer>
                                 <clr-dg-pagination #paginationFgs [clrDgPageSize]="10" [clrDgTotalItems]="failTotal">
