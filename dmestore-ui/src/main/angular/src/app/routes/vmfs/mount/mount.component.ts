@@ -81,7 +81,8 @@ export class MountComponent implements OnInit{
 
   modalLoading = false; // 数据加载loading
   modalHandleLoading = false; // 数据处理loading
-  isOperationErr = false; // 错误信息
+  isOperationErr = false; // 挂载错误信息
+  isUnmountOperationErr = false; // 卸载错误信息
 
   ngOnInit(): void {
     // 初始化隐藏窗口
@@ -112,7 +113,7 @@ export class MountComponent implements OnInit{
             this.objectId = queryParam.objectId;
           } else { // 以dataStore为入口
             this.objectId = ctx[0].id;
-            // this.objectId = "urn:vmomi:Datastore:datastore-2037:674908e5-ab21-4079-9cb1-596358ee5dd1";
+            // this.objectId = "urn:vmomi:Datastore:datastore-5036:674908e5-ab21-4079-9cb1-596358ee5dd1";
           }
           if (this.operationType === 'mount') {
             this.mountShow = true;
@@ -419,7 +420,7 @@ export class MountComponent implements OnInit{
           this.unmountSuccessShow = true;
         } else {
           console.log('unmount  fail：' + result.description);
-          this.isOperationErr = true;
+          this.isUnmountOperationErr = true;
         }
         this.cdr.detectChanges();
       });
@@ -520,7 +521,7 @@ export class MountComponent implements OnInit{
           this.unmountSuccessShow = true;
         } else {
           console.log('unmount  fail：' + result.description);
-          this.isOperationErr = true;
+          this.isUnmountOperationErr = true;
         }
         this.cdr.detectChanges();
       });
