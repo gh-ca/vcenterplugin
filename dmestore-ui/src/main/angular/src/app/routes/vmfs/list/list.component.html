@@ -64,11 +64,11 @@
         <vmfs-filter #statusFilter></vmfs-filter>
       </clr-dg-filter>
     </clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacity'">{{'vmfs.capacity' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'usedCapacity'">{{'vmfs.usedCapacity' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'capacityUsage'" style="width: 11rem;">{{'vmfs.capacityUsage' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'freeSpace'">{{'vmfs.freeSpace' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'reserveCapacity'">{{'vmfs.reserveCapacity' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'capacity'">{{'vmfs.capacity' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'usedCapacity'">{{'vmfs.usedCapacity' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'capacityUsage'" style="width: 11rem;">{{'vmfs.capacityUsage' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'freeSpace'">{{'vmfs.freeSpace' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='list'" class="hideFilter" [clrDgField]="'reserveCapacity'">{{'vmfs.reserveCapacity' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'device'">
       {{'vmfs.device' | translate}}
       <clr-dg-filter [clrDgFilter]="deviceFilter">
@@ -87,13 +87,13 @@
         <protection-status-filter #protectionStatusFilter></protection-status-filter>
       </clr-dg-filter>
     </clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.iops' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'iops'">{{'vmfs.iops' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.iopsQoSTarget' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.bandwidth' | translate}}(MB/s)</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'bandwidth'">{{'vmfs.bandwidth' | translate}}(MB/s)</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.bandwidthQoSTarget' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.readResponseTime' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.writeResponseTime' | translate}}</clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.latency' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'readResponseTime'">{{'vmfs.readResponseTime' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'writeResponseTime'">{{'vmfs.writeResponseTime' | translate}}</clr-dg-column>
+    <clr-dg-column [hidden]="radioCheck!=='chart'" class="hideFilter" [clrDgField]="'latency'">{{'vmfs.latency' | translate}}</clr-dg-column>
     <clr-dg-column [hidden]="radioCheck!=='chart'">{{'vmfs.latencyQoSTarget' | translate}}</clr-dg-column>
 
     <clr-dg-placeholder>{{'vmfs.listNullTips' | translate}}</clr-dg-placeholder>
@@ -301,7 +301,7 @@
           <clr-combobox-container>
             <label style="color: #9F9F9F;">{{'vmfs.hostOrCluster' | translate}}</label>
             <clr-combobox *ngIf="form.hostDataloadSuccess && form.culDataloadSuccess" [(ngModel)]="chooseDevice" name="chooseDevice" formControlName="chooseDevice" required>
-              <clr-options>
+              <clr-options style="max-height: 6.5rem;overflow: auto">
                 <clr-option *clrOptionItems="let device of deviceList; field:'deviceName'" [clrValue]="device">
                   <clr-icon *ngIf="device.deviceName !== '' && device.deviceType === 'host'" shape="host" role="img" aria-label="World is turning"></clr-icon>
                   <clr-icon *ngIf="device.deviceName !== '' && device.deviceType !== 'host'" shape="host-group" role="img" aria-label="World is turning"></clr-icon>
@@ -443,7 +443,7 @@
             <!--b.QoS 设置 -->
             <clr-toggle-wrapper  style="margin-top: 1.2rem;width: 6rem;" class="selectClass" *ngIf="form.storage_id">
               <label>{{'nfs.qosPolicy' | translate}}</label>
-              <input type="checkbox" clrToggle name="qosFlag" [(ngModel)]="form.qosFlag"/>
+              <input type="checkbox" clrToggle name="qosFlag" (change)="qoSAddFlagChange(form);" [(ngModel)]="form.qosFlag"/>
             </clr-toggle-wrapper>
             <!-- 控制策略 -->
             <div *ngIf="form.qosFlag">
@@ -626,7 +626,7 @@
           <!--b.QoS 设置 -->
           <clr-toggle-wrapper  style="margin-top: 1.2rem;width: 6rem;" class="selectClass">
             <label>{{'nfs.qosPolicy' | translate}}</label>
-            <input type="checkbox" clrToggle name="qosFlag" [(ngModel)]="modifyForm.qosFlag"/>
+            <input type="checkbox" clrToggle name="qosFlag" (change)="qoSEditFlagChange(modifyForm);" [(ngModel)]="modifyForm.qosFlag"/>
           </clr-toggle-wrapper>
           <div *ngIf="modifyForm.qosFlag">
             <!-- 控制策略 -->
@@ -758,7 +758,7 @@
         <clr-combobox-container *ngIf="mountForm.mountType==='1' && mountHostData">
           <label style="color: #9F9F9F;">{{'vmfs.mount.host' | translate}}</label>
           <clr-combobox [(ngModel)]="chooseHost" name="chooseHost" required>
-            <clr-options>
+            <clr-options style="max-height: 6.5rem;overflow: auto">
               <clr-option *clrOptionItems="let state of hostList; field:'hostName'" [clrValue]="state">
                 <clr-icon *ngIf="state.hostName !== ''" shape="host" role="img" aria-label="World is turning"></clr-icon>{{state.hostName}}
               </clr-option>
@@ -771,7 +771,7 @@
         <clr-combobox-container *ngIf="mountForm.mountType==='2' && mountClusterData">
           <label style="color: #9F9F9F;">{{'vmfs.mount.cluster' | translate}}</label>
           <clr-combobox [(ngModel)]="chooseCluster" name="chooseCluster" required>
-            <clr-options>
+            <clr-options style="max-height: 6.5rem;overflow: auto">
               <clr-option *clrOptionItems="let state of clusterList; field:'clusterName'" [clrValue]="state">
                 <clr-icon *ngIf="state.clusterName !== ''" shape="host-group" role="img" aria-label="World is turning"></clr-icon>{{state.clusterName}}
               </clr-option>

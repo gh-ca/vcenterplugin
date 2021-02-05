@@ -56,7 +56,7 @@ public class VirtualMachineMO extends BaseMO {
      * VirtualMachineMO
      *
      * @param context context
-     * @param morVm morVm
+     * @param morVm   morVm
      */
     public VirtualMachineMO(VmwareContext context, ManagedObjectReference morVm) {
         super(context, morVm);
@@ -112,16 +112,17 @@ public class VirtualMachineMO extends BaseMO {
      * createDisk
      *
      * @param vmdkDatastorePath vmdkDatastorePath
-     * @param diskType diskType
-     * @param diskMode diskMode
-     * @param rdmDeviceName rdmDeviceName
-     * @param sizeInMb sizeInMb
-     * @param morDs morDs
-     * @param controllerKey controllerKey
+     * @param diskType          diskType
+     * @param diskMode          diskMode
+     * @param rdmDeviceName     rdmDeviceName
+     * @param sizeInMb          sizeInMb
+     * @param morDs             morDs
+     * @param controllerKey     controllerKey
      * @throws Exception Exception
      */
     public void createDisk(String vmdkDatastorePath, VirtualDiskType diskType, VirtualDiskMode diskMode,
-        String rdmDeviceName, long sizeInMb, ManagedObjectReference morDs, int controllerKey) throws Exception {
+        String rdmDeviceName, long sizeInMb, ManagedObjectReference morDs, int controllerKey, String compatibilityMode)
+        throws Exception {
         assert (vmdkDatastorePath != null);
         assert (morDs != null);
         Map<String, Integer> controllerKeyAndUnitNumMap = getControllerKeyAndUnitNum();
@@ -154,7 +155,7 @@ public class VirtualMachineMO extends BaseMO {
         } else if (diskType == VirtualDiskType.RDM || diskType == VirtualDiskType.RDMP) {
             VirtualDiskRawDiskMappingVer1BackingInfo backingInfo = new VirtualDiskRawDiskMappingVer1BackingInfo();
             if (diskType == VirtualDiskType.RDM) {
-                backingInfo.setCompatibilityMode("virtualMode");
+                backingInfo.setCompatibilityMode(compatibilityMode == null ? "virtualMode" : compatibilityMode);
             } else {
                 backingInfo.setCompatibilityMode("physicalMode");
             }
@@ -372,15 +373,18 @@ public class VirtualMachineMO extends BaseMO {
     }
 
     public int getIDEDeviceControllerKey() throws Exception {
+        int controllerKey = 999;
         List<VirtualDisk> devices = context.getVimClient().getDynamicProperty(mor, "config.hardware.device");
         for (VirtualDevice device : devices) {
-            if (device instanceof VirtualLsiLogicController || device instanceof ParaVirtualSCSIController) {
+            if (device instanceof VirtualSCSIController) {
                 int key = device.getKey();
-                return key;
+                if (key > controllerKey) {
+                    controllerKey = key;
+                }
             }
         }
 
-        return 0;
+        return ++controllerKey;
     }
 
     /**

@@ -6,3 +6,12 @@
   border: .05rem solid #000;
   border-radius: 2rem;
 }
+.over_flow{
+  text-overflow: ellipsis;
+  overflow: hidden;
+  word-break: break-all;
+  white-space: nowrap;
+}
+.hideFilter ::ng-deep clr-dg-string-filter{
+  display: none;
+}

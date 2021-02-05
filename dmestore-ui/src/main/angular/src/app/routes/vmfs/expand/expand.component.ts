@@ -139,13 +139,13 @@ export class ExpandComponent implements OnInit{
   expandOnblur() {
     let expand = this.expandForm.vo_add_capacity;
     console.log('expand', expand);
-    if (expand && expand !== null && expand !== '') {
+    if (expand && expand !== null && expand !== undefined) {
       if (expand > 0) {
         switch (this.expandForm.capacityUnit) {
           case 'TB':
             if ((expand*1024).toString().indexOf(".")!==-1) { // 小数
               this.expandErr = true;
-              expand = '';
+              expand = null;
             } else {
               this.expandErr = false;
             }
@@ -153,7 +153,7 @@ export class ExpandComponent implements OnInit{
           default: // 默认GB 不变
             if (expand.toString().indexOf(".")!==-1) { // 小数
               this.expandErr = true;
-              expand = '';
+              expand = null;
             } else {
               this.expandErr = false;
             }
@@ -161,10 +161,10 @@ export class ExpandComponent implements OnInit{
         }
       } else {
         this.expandErr = true;
-        expand = '';
+        expand = null;
       }
     } else {
-      expand = '';
+      expand = null;
     }
     console.log('expand2', expand);
     console.log('this.expandErr', this.expandErr);

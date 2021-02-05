@@ -6,6 +6,7 @@
     "del": "Delete",
     "expand": "Expand",
     "more": "More",
+    "otherOperations": "Other operations",
     "mount": "Mount",
     "unmount": "Unmount",
     "reclaim": "Reclaim",
@@ -110,6 +111,7 @@
     "nfsStore":"NFS DataStore",
     "respRt":"Response Time-Read(ms)",
     "respWt":"Response Time-Write(ms)",
+    "characterEncoding":"Character Encoding",
     "logic":{
       "logic":"Logic Port",
       "name":"Name",
@@ -355,7 +357,8 @@
       "total":" Total",
       "protection":" Protection",
       "fileSystem":" File System",
-      "volume":" Volume",
+      "file":" File",
+      "volume":" LUN",
       "freeCapacity":" Free Capacity",
       "used":" Used",
       "free":" Free",
@@ -365,7 +368,8 @@
       "bandwidth":"Bandwidth(MS/s)",
       "capacity":"Capacity",
       "health":"Health",
-      "performance":"Performance - Last 24 Hours"
+      "performance":"Performance - Last 24 Hours",
+      "blockFile":"Block/File"
     },
     "detail":{
       "conf":{
@@ -385,7 +389,7 @@
       "cap":{
         "capacity":"Capacity",
         "capacityUsage":"Capacity Usage",
-        "bareCapacity":"Bare Capacity",
+        "bareCapacity":"Raw Capacity",
         "totalCapacity":"Total Capacity",
         "useFree":"Use|Free",
         "subscribe":"Subscribed",
@@ -530,7 +534,7 @@
           "dataProtocol":"Data Protocol",
           "manageAccess":"Manage Access",
           "vStoreName":"VStore Name",
-          "type":"类型",
+          "type":"Type",
           "fc":"FC Ports",
           "eth":"Ethernet Port",
           "fcoe":"FCoE Port",
@@ -568,7 +572,8 @@
     "connectT": "DME Connect",
     "connectFail": "Connect Failed!",
     "connectSuccess": "Connect Success!",
-    "portholder": "Port Default 26335"
+    "portholder": "Port Default 26335",
+    "disconnect": "Disconnect"
   },
   "bestPractice": {
     "apply": "Apply Best Practice",
@@ -667,7 +672,12 @@
 
     "createRdmError": "Create RDM Error!",
     "selectOneSer": "Service Level is not be Null！",
-    "rdmSuccessMsg": "Create RDM Success!"
+    "rdmSuccessMsg": "Create RDM Success!",
+    "compatibilityMode": {
+      "name": "Compatibility Mode",
+      "virtualMode": "Virtual Mode",
+      "physicalMode": "Physical Mode"
+    }
   },
   "tier": {
     "name": "Name",
@@ -784,7 +794,12 @@
        "notActivated":"NOTACTIVATED",
        "service":"Service",
        "management":"Management",
-       "managementAndService":"Management+Service"
+       "managementAndService":"Management+Service",
+       "aboutToFail": "About To Fail",
+       "partiallyDamaged": "Partially Damaged",
+       "system": "System",
+       "vlan": "VLAN",
+       "customized": "Customized"
      },
      "type":{
       "block":"Block",
@@ -808,7 +823,9 @@
     "vmfsNameRepeat":"VMFS name already exists!",
     "volNameRepeat":"volume name already exists!",
     "numberAndLetter":"Only numbers and letters can be entered!",
-    "cantFindData":"Sorry, no relevant data is found!"
+    "cantFindData":"Sorry, no relevant data is found!",
+    "getDataFailed": "Failed to get data!",
+    "cantChangeServiceLevel": "This device is a Custom type and does not support service level change operation!"
   },
   "page": {
     "perPage": "Per Page",
@@ -816,14 +833,17 @@
     "all": "Total"
   },
   "performance": {
-    "volumeMaximumIORespTime": "Volume maximum I/O response time (ms)",
-    "volumeIODensity": "Volume I/O density (IOPS/TB)",
-    "totalVolumeThroughput": "Total volume throughput(IOPS)",
-    "volumeTotalBandwidth": "Volume total bandwidth(MB/s)",
+    "volumeMaximumIORespTime": "LUN maximum I/O response time (ms)",
+    "volumeIODensity": "LUN I/O density (IOPS/TB)",
+    "totalVolumeThroughput": "Total LUN throughput(IOPS)",
+    "volumeTotalBandwidth": "LUN total bandwidth(MB/s)",
     "storagePoolIODensity": "Storage pool I/O density(IOPS/TB)"
   },
   "tips": {
-    "select": "Please select"
+    "select": "Please select",
+    "disconnected": "Whether to disconnect DME ?",
+    "operationSuccessful": "Operation successful!",
+    "operationFailed": "Operation failed!"
   },
   "chart": {
     "select": {
@@ -836,6 +856,13 @@
       "half1Year": "Last half year",
       "last1Year": "Last year",
       "invalid": "invalid"
+    },
+    "title": {
+      "allocatedCapacity": "Allocated Capacity(GB)",
+      "totalCapacity": "Total Capacity(GB)",
+      "usedCapacity": "Used Capacity(GB)",
+      "lunCapacityTrends": "LUN Capacity Trends",
+      "storagePoolCapacityTrends": "Storage Pool Capacity Trends"
     }
   }
 }

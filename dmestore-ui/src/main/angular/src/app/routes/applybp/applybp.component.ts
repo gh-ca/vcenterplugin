@@ -26,7 +26,12 @@ export class ApplybpComponent implements OnInit, AfterViewInit {
     // /update/byCluster
     console.log(this.gs.getClientSdk().app.getClientInfo());
     console.log(this.gs.getClientSdk().app.getNavigationData());
-    this.http.post('v1/bestpractice/update/all', {}).subscribe((result: any) => {
+    const ctx = this.gs.getClientSdk().app.getContextObjects();
+    const objectId = ctx[0].id;
+    // const objectId = 'urn:vmomi:ClusterComputeResource:domain-c2038:674908e5-ab21-4079-9cb1-596358ee5dd1';
+    console.log("objectId", objectId)
+    // this.http.post('v1/bestpractice/update/all', {}).subscribe((result: any) => {
+    this.http.post('v1/bestpractice/update/byCluster/' + objectId, {}).subscribe((result: any) => {
       if (result.code == '200'){
         this.status = 2;
         if(result.data){

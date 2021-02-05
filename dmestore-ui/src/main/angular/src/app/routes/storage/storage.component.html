@@ -60,13 +60,13 @@
           <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.zone' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.wp' | translate}}</clr-dg-column>
 
-          <clr-dg-column [hidden]="radioCheck!=='table2'">{{'storage.list.rawCap' | translate}}</clr-dg-column>
-          <clr-dg-column [hidden]="radioCheck!=='table2'">{{'storage.list.tec' | translate}}</clr-dg-column>
-          <clr-dg-column [hidden]="radioCheck!=='table2'">{{'storage.list.totalCap' | translate}}</clr-dg-column>
-          <clr-dg-column [hidden]="radioCheck!=='table2'">{{'storage.list.usedCap' | translate}}</clr-dg-column>
-          <clr-dg-column [hidden]="radioCheck!=='table2'">{{'storage.list.capUsage' | translate}}</clr-dg-column>
-          <clr-dg-column [hidden]="radioCheck!=='table2'">{{'storage.list.freeCap' | translate}}</clr-dg-column>
-          <clr-dg-column [hidden]="radioCheck!=='table2'">{{'storage.list.supRate' | translate}}</clr-dg-column>
+          <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'totalCapacity'">{{'storage.list.rawCap' | translate}}</clr-dg-column>
+          <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'totalEffectiveCapacity'">{{'storage.list.tec' | translate}}</clr-dg-column>
+          <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'totalPoolCapacity'">{{'storage.list.totalCap' | translate}}</clr-dg-column>
+          <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'usedCapacity'">{{'storage.list.usedCap' | translate}}</clr-dg-column>
+          <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'usedCapacity'" style="width: 11rem;">{{'storage.list.capUsage' | translate}}</clr-dg-column>
+          <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'freeCap'">{{'storage.list.freeCap' | translate}}</clr-dg-column>
+          <clr-dg-column [hidden]="radioCheck!=='table2'" class="hideFilter" [clrDgField]="'subscriptionCapacity'">{{'storage.list.supRate' | translate}}</clr-dg-column>
 
           <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.cpuUtilization' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.latency' | translate}}</clr-dg-column>
@@ -131,8 +131,11 @@
             <clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.totalEffectiveCapacity)}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.totalPoolCapacity)}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.usedCapacity)}}</clr-dg-cell>
-            <clr-dg-cell [hidden]="radioCheck!=='table2'">
-              <clr-progress-bar clrValue="{{(item.usedCapacity/item.totalPoolCapacity * 100).toFixed(2)}}" clrSuccess clrLabeled></clr-progress-bar>
+            <clr-dg-cell [hidden]="radioCheck!=='table2'" class="over_flow">
+              <div class="progress-block">
+                <clr-progress-bar clrValue="{{(item.usedCapacity/item.totalPoolCapacity * 100).toFixed(2)}}" clrSuccess></clr-progress-bar>
+                <span>{{(item.usedCapacity/item.totalPoolCapacity * 100).toFixed(2)}}%</span>
+              </div>
             </clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table2'">{{formatCapacity(item.totalPoolCapacity-item.usedCapacity)}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table2'">{{(item.subscriptionCapacity/item.totalPoolCapacity * 100).toFixed(3)}} %</clr-dg-cell>

@@ -6,6 +6,7 @@
     "del": "删除",
     "expand": "扩容",
     "more": "更多",
+    "otherOperations": "其它操作",
     "mount": "挂载",
     "unmount": "卸载",
     "reclaim": "回收空间",
@@ -110,6 +111,7 @@
     "nfsStore":"NFS存储",
     "respRt":"读响应时间(毫秒)",
     "respWt":"写响应时间(毫秒)",
+    "characterEncoding":"字符编码",
     "logic":{
       "logic":"逻辑端口",
       "name":"名称",
@@ -338,7 +340,7 @@
       "freeCap":"空闲容量",
       "supRate":"订阅率",
       "totalCap":"总容量",
-      "cpuUtilization":"CUP使用率",
+      "cpuUtilization":"CPU使用率",
       "latency":"时延(毫秒)",
       "iops":"IOPS",
       "ops":"OPS",
@@ -357,7 +359,8 @@
       "total":" 总计",
       "protection":"保护",
       "fileSystem":"文件系统",
-      "volume":"卷",
+      "file":"文件",
+      "volume":"LUN",
       "freeCapacity":"空闲容量",
       "used":" 已用",
       "free":" 空闲",
@@ -367,7 +370,8 @@
       "bandwidth":"带宽(MS/s)",
       "capacity":"容量",
       "health":"健康",
-      "performance":"性能 - 过去24小时"
+      "performance":"性能 - 过去24小时",
+      "blockFile":"块/文件"
     },
     "detail":{
       "conf":{
@@ -573,7 +577,8 @@
     "connectT": "DME连接",
     "connectFail": "连接失败！",
     "connectSuccess": "连接成功！",
-    "portholder": "端口默认26335"
+    "portholder": "端口默认26335",
+    "disconnect": "断开连接"
   },
   "bestPractice": {
     "apply": "实施最佳实践",
@@ -672,7 +677,12 @@
 
     "createRdmError": "创建RDM出错!",
     "selectOneSer": "服务等级不能为空！",
-    "rdmSuccessMsg": "创建RDM成功!"
+    "rdmSuccessMsg": "创建RDM成功!",
+    "compatibilityMode": {
+      "name": "兼容模式",
+      "virtualMode": "虚拟",
+      "physicalMode": "物理"
+    }
   },
   "tier": {
     "name": "名称",
@@ -789,8 +799,12 @@
       "notActivated":"未启用",
       "service":"管理",
       "management":"数据",
-      "managementAndService":"管理+数据"
-
+      "managementAndService":"管理+数据",
+      "aboutToFail": "即将故障",
+      "partiallyDamaged": "部分损坏",
+      "system": "系统",
+      "vlan": "VLAN",
+      "customized": "自定义"
     },
     "type":{
       "block":"块",
@@ -814,7 +828,9 @@
     "vmfsNameRepeat":"VMFS名称已经存在！",
     "volNameRepeat":"卷名称已经存在！",
     "numberAndLetter":"只能输入数字和字母!",
-    "cantFindData": "抱歉未查询到相关数据！"
+    "cantFindData": "抱歉未查询到相关数据！",
+    "getDataFailed": "获取数据失败！",
+    "cantChangeServiceLevel": "该设备为自定义类型，不支持服务等级变更操作！"
   },
   "page": {
     "perPage": "每页",
@@ -822,14 +838,17 @@
     "all": "共"
   },
   "performance": {
-    "volumeMaximumIORespTime": "卷最大I/O响应时间(ms)",
-    "volumeIODensity": "卷I/O密度(IOPS/TB)",
-    "totalVolumeThroughput": "卷总吞吐量(IOPS)",
-    "volumeTotalBandwidth": "卷总带宽(MB/s)",
+    "volumeMaximumIORespTime": "LUN 最大I/O响应时间(ms)",
+    "volumeIODensity": "LUN I/O密度(IOPS/TB)",
+    "totalVolumeThroughput": "LUN 总吞吐量(IOPS)",
+    "volumeTotalBandwidth": "LUN 总带宽(MB/s)",
     "storagePoolIODensity": "存储池I/O密度(IOPS/TB)"
   },
   "tips": {
-    "select": "请选择"
+    "select": "请选择",
+    "disconnected": "是否断开DME连接 ？",
+    "operationSuccessful": "操作成功!",
+    "operationFailed": "操作失败!"
   },
   "chart": {
     "select": {
@@ -842,6 +861,13 @@
       "half1Year": "最近半年",
       "last1Year": "最近1年",
       "invalid": "无效"
+    },
+    "title": {
+      "allocatedCapacity": "已分配容量(GB)",
+      "totalCapacity": "总容量(GB)",
+      "usedCapacity": "已用容量(GB)",
+      "lunCapacityTrends": "LUN 容量趋势",
+      "storagePoolCapacityTrends": "存储池容量趋势"
     }
   }
 }

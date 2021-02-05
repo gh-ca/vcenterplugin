@@ -164,7 +164,7 @@ public class VmRdmServiceImplTest {
         map3.put("blockSize", "321");
         lunlist.add(map3);
         when(vcsdkUtils.getLunsOnHost("321")).thenReturn(gson.toJson(lunlist));
-        vmRdmService.createRdm("321", "321", vmRdmCreateBean);
+        vmRdmService.createRdm("321", "321", vmRdmCreateBean, null);
 
     }
 
@@ -310,7 +310,7 @@ public class VmRdmServiceImplTest {
         map3.put("blockSize", "321");
         lunlist.add(map3);
         when(vcsdkUtils.getLunsOnHost("321")).thenReturn(gson.toJson(lunlist));
-        vmRdmService.createRdm("321", "321", vmRdmCreateBean);
+        vmRdmService.createRdm("321", "321", vmRdmCreateBean, null);
     }
 
     @Test

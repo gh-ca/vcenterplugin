@@ -11,6 +11,7 @@ import com.vmware.vim25.CustomFieldStringValue;
 import com.vmware.vim25.DynamicProperty;
 import com.vmware.vim25.HostConfigManager;
 import com.vmware.vim25.HostNetworkInfo;
+import com.vmware.vim25.HostRuntimeInfo;
 import com.vmware.vim25.HostVirtualNic;
 import com.vmware.vim25.ManagedObjectReference;
 import com.vmware.vim25.NasDatastoreInfo;
@@ -532,5 +533,15 @@ public class HostMO extends BaseMO implements VmwareHypervisorHost {
             }
         }
         return networkName;
+    }
+
+    /**
+     * getRuntimeInfo
+     *
+     * @return HostRuntimeInfo
+     * @throws Exception Exception
+     */
+    public HostRuntimeInfo getRuntimeInfo() throws Exception {
+        return context.getVimClient().getDynamicProperty(mor, "runtime");
     }
 }

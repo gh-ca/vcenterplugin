@@ -60,6 +60,8 @@ export class NfsComponent implements OnInit {
       ),
     unit: new FormControl('GB',
       Validators.required),
+    characterEncoding: new FormControl('utf-8',
+      Validators.required),
   });
   storageList: StorageList[] = [];
   storagePools: StoragePool[] = [];
@@ -281,6 +283,22 @@ export class NfsComponent implements OnInit {
     }
     //  控制策略若未选清空数据
     this.qosFunc(addSubmitForm);
+    // 重删压缩处理
+    if (!addSubmitForm.thin) {
+      addSubmitForm.deduplicationEnabled = null;
+      addSubmitForm.compressionEnabled = null;
+    } else {
+      if (addSubmitForm.deduplicationEnabled != null && addSubmitForm.deduplicationEnabled.toString()) {
+        addSubmitForm.deduplicationEnabled = addSubmitForm.deduplicationEnabled.toString() == 'true';
+      } else {
+        addSubmitForm.deduplicationEnabled = null;
+      }
+      if (addSubmitForm.compressionEnabled != null && addSubmitForm.compressionEnabled.toString()) {
+        addSubmitForm.compressionEnabled = addSubmitForm.compressionEnabled.toString() == 'true';
+      } else {
+        addSubmitForm.compressionEnabled = null;
+      }
+    }
     this.addService.addNfs(addSubmitForm).subscribe((result: any) => {
       this.modalHandleLoading=false;
       if (result.code === '200'){
@@ -741,6 +759,22 @@ export class NfsComponent implements OnInit {
     form.maxBandwidth = null;
     form.maxIopsChoose = false;
     form.maxIops = null;
+  }
+  /**
+   * qos开关
+   * @param form
+   */
+  qoSFlagChange(form){
+    if(form.qosFlag) {
+      form.control_policyUpper = undefined;
+      form.maxBandwidthChoose = false;
+      form.maxIopsChoose = false;
+
+      form.control_policyLower = undefined;
+      form.minBandwidthChoose = false;
+      form.minIopsChoose = false;
+      form.latencyChoose = false;
+    }
   }
   /**
    * 控制策略变更

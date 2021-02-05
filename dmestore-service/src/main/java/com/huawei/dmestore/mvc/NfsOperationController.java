@@ -229,7 +229,8 @@ public class NfsOperationController extends BaseController {
         StorageTypeShow storageTypeShow = new StorageTypeShow();
         StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
         if (storageDetail != null) {
-            storageTypeShow = ToolUtils.getStorageTypeShow(storageDetail.getModel());
+            String storageType = storageDetail.getModel() +" "+ storageDetail.getProductVersion();
+            storageTypeShow = ToolUtils.getStorageTypeShow(storageType);
         }
         return storageTypeShow;
     }
@@ -352,7 +353,7 @@ public class NfsOperationController extends BaseController {
         Map<String, Object> nfsShareClientAddition = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
         nfsShareClientAddition.put(NAME_FIELD, requestParams.get("vkernelIp"));
         nfsShareClientAddition.put("objectId", requestParams.get("hostObjectId"));
-        createNfsShareParam.put("character_encoding", "utf-8");
+        createNfsShareParam.put("character_encoding", requestParams.get("characterEncoding"));
         targetParams.put("create_nfs_share_param", createNfsShareParam);
         boolean advance = (Boolean) requestParams.get("advance");
         List<Map<String, Object>> nfsShareClientAdditions = new ArrayList<>(DmeConstants.COLLECTION_CAPACITY_16);
@@ -373,8 +374,14 @@ public class NfsOperationController extends BaseController {
         if (!StringUtils.isEmpty(deviceId)) {
             StorageTypeShow storageTypeShow = isDorado(deviceId);
             if (storageTypeShow.getDeduplicationShow() || storageTypeShow.getCompressionShow()) {
-                tuning.put(DEDUPLICATION_ENABLED_FIELD, params.get("deduplicationEnabled"));
-                tuning.put(COMPRESSION_ENABLED_FIELD, params.get("compressionEnabled"));
+                Object deduplicationEnabled = params.get("deduplicationEnabled");
+                Object compressionEnabled = params.get("compressionEnabled");
+                if (deduplicationEnabled!=null) {
+                    tuning.put(DEDUPLICATION_ENABLED_FIELD, deduplicationEnabled);
+                }
+                if (compressionEnabled!=null) {
+                    tuning.put(COMPRESSION_ENABLED_FIELD, compressionEnabled);
+                }
             }
         }
         Object thin = params.get(THIN_FIELD);

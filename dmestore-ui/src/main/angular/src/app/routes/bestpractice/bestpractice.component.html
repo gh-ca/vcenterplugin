@@ -9,8 +9,8 @@
 
     <clr-dg-column [clrDgField]="'hostSetting'">{{'bestPractice.hostSetting'|translate}}</clr-dg-column>
     <clr-dg-column [clrDgField]="'recommendValue'">{{'bestPractice.recommend'|translate}}</clr-dg-column>
-    <clr-dg-column [clrDgField]="'levelDesc'">{{'bestPractice.level'|translate}}</clr-dg-column>
-    <clr-dg-column [clrDgField]="'violation'" [clrDgSortOrder]="'violation'">{{'bestPractice.violation'|translate}}</clr-dg-column>
+    <clr-dg-column [clrDgField]="'levelDesc'" [clrDgSortBy]="'levelNum'">{{'bestPractice.level'|translate}}</clr-dg-column>
+    <clr-dg-column class="hideFilter" [clrDgField]="'count'" [clrDgSortOrder]="'count'">{{'bestPractice.violation'|translate}}</clr-dg-column>
 
     <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
       <clr-dg-cell>{{item.hostSetting}}</clr-dg-cell>
@@ -59,17 +59,17 @@
         <clr-dg-column [clrDgField]="'recommendValue'">{{'bestPractice.recommend'|translate}}</clr-dg-column>
 
         <clr-dg-row *clrDgItems="let item of hostList" [clrDgItem]="item">
-          <clr-dg-cell>{{item.hostName}}</clr-dg-cell>
-          <clr-dg-cell>{{item.actualValue}}</clr-dg-cell>
-          <clr-dg-cell>{{item.recommendValue}}</clr-dg-cell>
+          <clr-dg-cell class="over_flow" title="{{item.hostName}}">{{item.hostName}}</clr-dg-cell>
+          <clr-dg-cell class="over_flow" title="{{item.actualValue}}">{{item.actualValue}}</clr-dg-cell>
+          <clr-dg-cell class="over_flow" title="{{item.recommendValue}}">{{item.recommendValue}}</clr-dg-cell>
         </clr-dg-row>
 
         <clr-dg-footer>
-          <clr-dg-pagination #pagination [clrDgPageSize]="5" [clrDgTotalItems]="hostTotal">
+          <clr-dg-pagination #hostModalPagination [clrDgPageSize]="5" [clrDgTotalItems]="hostTotal">
             <clr-dg-page-size [clrPageSizeOptions]="[5,10,50,100]">{{'page.perPage' | translate}}</clr-dg-page-size>
-            {{pagination.firstItem + 1}} - {{pagination.lastItem + 1}}
+            {{hostModalPagination.firstItem + 1}} - {{hostModalPagination.lastItem + 1}}
             {{'page.all' | translate}}
-            {{pagination.totalItems}}
+            {{hostModalPagination.totalItems}}
           </clr-dg-pagination>
         </clr-dg-footer>
 

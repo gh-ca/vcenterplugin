@@ -97,6 +97,26 @@
           <option value="GB">GB</option>
         </select>
       </clr-input-container>
+      <!--字符编码-->
+      <clr-select-container class="selectClass">
+        <label>{{'nfs.characterEncoding' | translate}}</label>
+        <select clrSelect [(ngModel)]="addForm.characterEncoding" name="characterEncoding" required>
+          <option value="utf-8">UTF-8</option>
+          <option value="zh">ZH</option>
+          <option value="gbk">GBK</option>
+          <option value="euc-tw">EUC-TW</option>
+          <option value="big5">BIG5</option>
+          <option value="euc-jp">EUC-JP</option>
+          <option value="jis">JIS</option>
+          <option value="s-jis">S-JIS</option>
+          <option value="de">DE</option>
+          <option value="pt">PT</option>
+          <option value="es">ES</option>
+          <option value="fr">FR</option>
+          <option value="it">IT</option>
+          <option value="ko">KO</option>
+        </select>
+      </clr-select-container>
       <clr-select-container class="selectClass">
         <label>{{'nfs.nfsProtocol' | translate}}</label>
         <select clrSelect [(ngModel)]="addForm.type" name="type">
@@ -159,7 +179,7 @@
         <!--qos-->
         <clr-toggle-wrapper>
           <label>{{'nfs.qosPolicy' | translate}}</label>
-          <input type="checkbox" clrToggle name="qosFlag" [(ngModel)]="addForm.qosFlag"/>
+          <input type="checkbox" clrToggle name="qosFlag" (change)="qoSFlagChange(addForm);" [(ngModel)]="addForm.qosFlag"/>
         </clr-toggle-wrapper>
         <div *ngIf="addForm.qosFlag">
           <!-- 控制策略 -->
@@ -262,17 +282,19 @@
           <input type="checkbox" name="thin" clrToggle [(ngModel)]="addForm.thin"/>
         </clr-toggle-wrapper>
         <!--重删-->
-        <clr-select-container class="selectClass" *ngIf="deduplicationShow">
+        <clr-select-container class="selectClass" *ngIf="deduplicationShow && addForm.thin">
           <label>{{'nfs.dataDedu' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.deduplicationEnabled" name="deduplicationEnabled">
+            <option value="">{{'rdm.default' | translate}}</option>
             <option value="false">{{'nfs.disable' | translate}}</option>
             <option value="true">{{'nfs.enable' | translate}}</option>
           </select>
         </clr-select-container>
         <!--压缩-->
-        <clr-select-container class="selectClass" *ngIf="compressionShow">
+        <clr-select-container class="selectClass" *ngIf="compressionShow && addForm.thin">
           <label>{{'nfs.dataCompre' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.compressionEnabled" name="compressionEnabled">
+            <option value="">{{'rdm.default' | translate}}</option>
             <option value="false">{{'nfs.disable' | translate}}</option>
             <option value="true">{{'nfs.enable' | translate}}</option>
           </select>
@@ -389,7 +411,26 @@
           <!--<option value="KB">KB</option>-->
         </select>
       </clr-input-container>
-
+      <!--字符编码-->
+      <clr-select-container class="selectClass">
+        <label>{{'nfs.characterEncoding' | translate}}</label>
+        <select clrSelect [(ngModel)]="addForm.characterEncoding" name="characterEncoding" required>
+          <option value="utf-8">UTF-8</option>
+          <option value="zh">ZH</option>
+          <option value="gbk">GBK</option>
+          <option value="euc-tw">EUC-TW</option>
+          <option value="big5">BIG5</option>
+          <option value="euc-jp">EUC-JP</option>
+          <option value="jis">JIS</option>
+          <option value="s-jis">S-JIS</option>
+          <option value="de">DE</option>
+          <option value="pt">PT</option>
+          <option value="es">ES</option>
+          <option value="fr">FR</option>
+          <option value="it">IT</option>
+          <option value="ko">KO</option>
+        </select>
+      </clr-select-container>
       <clr-select-container class="selectClass">
         <label>{{'nfs.nfsProtocol' | translate}}</label>
         <select clrSelect [(ngModel)]="addForm.type" name="type">
@@ -452,7 +493,7 @@
         <!--qos-->
         <clr-toggle-wrapper>
           <label>{{'nfs.qosPolicy' | translate}}</label>
-          <input type="checkbox" clrToggle name="qosFlag" [(ngModel)]="addForm.qosFlag"/>
+          <input type="checkbox" clrToggle name="qosFlag" (change)="qoSFlagChange(addForm);" [(ngModel)]="addForm.qosFlag"/>
         </clr-toggle-wrapper>
         <div *ngIf="addForm.qosFlag">
           <!-- 控制策略 -->
@@ -555,17 +596,19 @@
           <input type="checkbox" name="thin" clrToggle [(ngModel)]="addForm.thin"/>
         </clr-toggle-wrapper>
         <!--重删-->
-        <clr-select-container class="selectClass" *ngIf="deduplicationShow">
+        <clr-select-container class="selectClass" *ngIf="deduplicationShow && addForm.thin">
           <label>{{'nfs.dataDedu' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.deduplicationEnabled" name="deduplicationEnabled">
+            <option value="">{{'rdm.default' | translate}}</option>
             <option value="false">{{'nfs.disable' | translate}}</option>
             <option value="true">{{'nfs.enable' | translate}}</option>
           </select>
         </clr-select-container>
         <!--压缩-->
-        <clr-select-container class="selectClass" *ngIf="compressionShow">
+        <clr-select-container class="selectClass" *ngIf="compressionShow && addForm.thin">
           <label>{{'nfs.dataCompre' | translate}}</label>
           <select clrSelect [(ngModel)]="addForm.compressionEnabled" name="compressionEnabled">
+            <option value="">{{'rdm.default' | translate}}</option>
             <option value="false">{{'nfs.disable' | translate}}</option>
             <option value="true">{{'nfs.enable' | translate}}</option>
           </select>

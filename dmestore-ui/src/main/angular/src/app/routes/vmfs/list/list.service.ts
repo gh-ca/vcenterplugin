@@ -174,6 +174,7 @@ export interface StorageList {
   storageTypeShow:StorageTypeShow;
 }
 export interface StorageTypeShow {
+  dorado:boolean; // true 是dorado v6.1版本及高版本 false 是dorado v 6.0版本及更低版本
   qosTag:number;// qos策略 1 支持复选(上限、下限) 2支持单选（上限或下限） 3只支持上限
   workLoadShow:number;// 1 支持应用类型 2不支持应用类型
   ownershipController:boolean;// 归属控制器 true 支持 false 不支持
@@ -346,7 +347,7 @@ export class GetForm {
   // 扩容form（初始化的添加表单）
   getExpandForm() {
     const expandForm = {
-      vo_add_capacity: null, // 扩容大小默认GB
+      vo_add_capacity: 1, // 扩容大小默认GB
       capacityUnit: 'GB', // 容量单位 （最后需转换为GB）
       volume_id: '', // 卷ID
       ds_name: '', // vmfsName

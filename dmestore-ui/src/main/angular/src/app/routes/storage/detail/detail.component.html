@@ -47,7 +47,8 @@
                 <td class="left">{{'storage.detail.conf.model' | translate}}</td>
                 <td class="left">{{detail.model}}</td>
                 <td class="left">{{'storage.detail.conf.az' | translate}}</td>
-                <td class="left">{{detail.azIds.length>0?detail.azIds:'--'}}</td>
+                <td class="left" *ngIf="detail.azIds">{{detail.azIds.length>0?detail.azIds:'--'}}</td>
+                <td class="left" *ngIf="detail.azIds != null">--</td>
               </tr>
               <tr>
                 <td class="left">{{'storage.detail.conf.wp' | translate}}</td>
@@ -108,15 +109,15 @@
                       <clr-dg-column [hidden]="poolRadio!=='table1'" [clrDgField]="'serviceLevelName'">{{'storage.detail.storagePool.serviceLevel' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="poolRadio!=='table1'" [clrDgField]="'raidLevel'">{{'storage.detail.storagePool.raidLevel' | translate}}</clr-dg-column>
 
-                      <clr-dg-column [hidden]="poolRadio!=='table2'">{{'storage.detail.storagePool.totalCap' | translate}}</clr-dg-column>
-                      <clr-dg-column [hidden]="poolRadio!=='table2'">{{'storage.detail.storagePool.usedCap' | translate}}</clr-dg-column>
-                      <clr-dg-column [hidden]="poolRadio!=='table2'" style="width: 11rem;">{{'storage.detail.storagePool.capUsage' | translate}}</clr-dg-column>
-                      <clr-dg-column [hidden]="poolRadio!=='table2'">{{'storage.detail.storagePool.freeCap' | translate}}</clr-dg-column>
-                      <clr-dg-column [hidden]="poolRadio!=='table2'">{{'storage.detail.storagePool.supRate' | translate}}</clr-dg-column>
+                      <clr-dg-column [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'totalCapacity'">{{'storage.detail.storagePool.totalCap' | translate}}</clr-dg-column>
+                      <clr-dg-column [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'consumedCapacity'">{{'storage.detail.storagePool.usedCap' | translate}}</clr-dg-column>
+                      <clr-dg-column [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'consumedCapacity'" style="width: 11rem;">{{'storage.detail.storagePool.capUsage' | translate}}</clr-dg-column>
+                      <clr-dg-column [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'freeCapacity'">{{'storage.detail.storagePool.freeCap' | translate}}</clr-dg-column>
+                      <clr-dg-column [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'subscribedCapacity'">{{'storage.detail.storagePool.supRate' | translate}}</clr-dg-column>
 
-                      <clr-dg-column [hidden]="poolRadio!=='table3'">{{'storage.detail.storagePool.latency' | translate}}</clr-dg-column>
-                      <clr-dg-column [hidden]="poolRadio!=='table3'">{{'storage.detail.storagePool.iops' | translate}}</clr-dg-column>
-                      <clr-dg-column [hidden]="poolRadio!=='table3'">{{'storage.detail.storagePool.bandwidth' | translate}}</clr-dg-column>
+                      <clr-dg-column class="hideFilter" [clrDgField]="'maxLatency'" [hidden]="poolRadio!=='table3'">{{'storage.detail.storagePool.latency' | translate}}</clr-dg-column>
+                      <clr-dg-column class="hideFilter" [clrDgField]="'maxIops'" [hidden]="poolRadio!=='table3'">{{'storage.detail.storagePool.iops' | translate}}</clr-dg-column>
+                      <clr-dg-column class="hideFilter" [clrDgField]="'maxBandwidth'" [hidden]="poolRadio!=='table3'">{{'storage.detail.storagePool.bandwidth' | translate}}</clr-dg-column>
 
                       <clr-dg-row *clrDgItems="let item of storagePool" [clrDgItem]="item">
                         <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
@@ -207,14 +208,14 @@
                         </clr-dg-filter>
                       </clr-dg-column>
 
-                      <clr-dg-column [clrDgField]="'capacity'" [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.totalCap' | translate}}</clr-dg-column>
+                      <clr-dg-column class="hideFilter" [clrDgField]="'capacity'" [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.totalCap' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">
                         {{'storage.detail.volumes.proType' | translate}}
                         <clr-dg-filter [clrDgFilter]="portTypeFilter">
                           <por-type-filter #portTypeFilter></por-type-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
-                      <clr-dg-column [hidden]="volumeRadio!=='table1'" style="width: 11rem;">{{'storage.detail.volumes.capUsage' | translate}}</clr-dg-column>
+                      <clr-dg-column class="hideFilter" [clrDgField]="'capacityUsage'" [hidden]="volumeRadio!=='table1'" style="width: 11rem;">{{'storage.detail.volumes.capUsage' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">
                         {{'storage.detail.volumes.mapStatus' | translate}}
                         <clr-dg-filter [clrDgFilter]="mapStatusFilter">
@@ -241,9 +242,9 @@
                       </clr-dg-column>
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.dataStore' | translate}}</clr-dg-column>
 
-                      <clr-dg-column [hidden]="volumeRadio!=='table2'">{{'storage.detail.volumes.latency' | translate}}</clr-dg-column>
-                      <clr-dg-column [hidden]="volumeRadio!=='table2'">{{'storage.detail.volumes.iops' | translate}}</clr-dg-column>
-                      <clr-dg-column [hidden]="volumeRadio!=='table2'">{{'storage.detail.volumes.bandwidth' | translate}}</clr-dg-column>
+                      <clr-dg-column class="hideFilter" [clrDgField]="'lantency'" [hidden]="volumeRadio!=='table2'">{{'storage.detail.volumes.latency' | translate}}</clr-dg-column>
+                      <clr-dg-column class="hideFilter" [clrDgField]="'iops'" [hidden]="volumeRadio!=='table2'">{{'storage.detail.volumes.iops' | translate}}</clr-dg-column>
+                      <clr-dg-column class="hideFilter" [clrDgField]="'bandwith'" [hidden]="volumeRadio!=='table2'">{{'storage.detail.volumes.bandwidth' | translate}}</clr-dg-column>
 
                       <clr-dg-row *clrDgItems="let item of volumes" [clrDgItem]="item">
                         <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
@@ -392,13 +393,13 @@
                         </clr-dg-filter>
                       </clr-dg-column>
                       <clr-dg-column>{{'storage.detail.fileSystems.fileType' | translate}}</clr-dg-column>
-                      <clr-dg-column [clrDgField]="'capacity'">{{'storage.detail.fileSystems.totalCap' | translate}}</clr-dg-column>
-                      <clr-dg-column [clrDgField]="'availableCapacity'">{{'storage.detail.fileSystems.freeCap' | translate}}</clr-dg-column>
-                      <clr-dg-column [clrDgField]="'capacityUsageRatio'" style="width: 11rem;">{{'storage.detail.fileSystems.capacityUsage' | translate}}</clr-dg-column>
+                      <clr-dg-column class="hideFilter" [clrDgField]="'capacity'">{{'storage.detail.fileSystems.totalCap' | translate}}</clr-dg-column>
+                      <clr-dg-column class="hideFilter" [clrDgField]="'availableCapacity'">{{'storage.detail.fileSystems.freeCap' | translate}}</clr-dg-column>
+                      <clr-dg-column class="hideFilter" [clrDgField]="'capacityUsageRatio'" style="width: 11rem;">{{'storage.detail.fileSystems.capacityUsage' | translate}}</clr-dg-column>
                       <clr-dg-column [clrDgField]="'storagePoolName'">{{'storage.detail.fileSystems.ownSto' | translate}}</clr-dg-column>
-                      <clr-dg-column [clrDgField]="'nfsCount'">{{'storage.detail.fileSystems.nfs' | translate}}</clr-dg-column>
+                      <clr-dg-column class="hideFilter" [clrDgField]="'nfsCount'">{{'storage.detail.fileSystems.nfs' | translate}}</clr-dg-column>
                       <!--<clr-dg-column>{{'storage.detail.fileSystems.cifs' | translate}}</clr-dg-column>-->
-                      <clr-dg-column [clrDgField]="'dtreeCount'">{{'storage.detail.fileSystems.dtree' | translate}}</clr-dg-column>
+                      <clr-dg-column class="hideFilter" [clrDgField]="'dtreeCount'">{{'storage.detail.fileSystems.dtree' | translate}}</clr-dg-column>
 
                       <clr-dg-row *clrDgItems="let item of fsList" [clrDgItem]="item">
                         <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
@@ -486,7 +487,7 @@
                           <dtree-secMod-filter #dtreeSecModFilter></dtree-secMod-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
-                      <clr-dg-column [clrDgField]="'nfsCount'">{{'storage.detail.dtrees.nfs' | translate}}</clr-dg-column>
+                      <clr-dg-column class="hideFilter" [clrDgField]="'nfsCount'">{{'storage.detail.dtrees.nfs' | translate}}</clr-dg-column>
                       <!--<clr-dg-column>{{'storage.detail.dtrees.cifs' | translate}}</clr-dg-column>-->
                       <clr-dg-column>
                         {{'storage.detail.dtrees.quota' | translate}}
@@ -570,22 +571,34 @@
             <div class="detail-margin-top">
               <div *ngIf="detail" class="clr-row" >
                   <div class="clr-col-4">
+                    <!--容量利用率-->
                     <div class="info-content-title" style="margin-bottom: 2%">{{'storage.detail.cap.capacityUsage' | translate}}</div>
                     <div style=".data">
-                      <div class="capacity-wrap">
+                      <!--可得容量-->
+                      <div class="capacity-wrap" *ngIf="detail.storageTypeShow.dorado">
+                        <span class="capacity-label">{{'storage.list.tec' | translate}}</span>
+                        <div class="num-bar_outer">
+                          <div class="num-bar_inner"></div>
+                        </div>
+                        <span class="capacity-span">{{formatCapacity(detail.totalEffectiveCapacity)}}</span>
+                      </div>
+                      <!--裸容量-->
+                      <div class="capacity-wrap" *ngIf="!detail.storageTypeShow.dorado">
                         <span class="capacity-label">{{'storage.detail.cap.bareCapacity' | translate}}</span>
                         <div class="num-bar_outer">
                           <div class="num-bar_inner"></div>
                         </div>
                         <span class="capacity-span">{{formatCapacity(detail.totalCapacity)}}</span>
                       </div>
-                      <div class="capacity-wrap">
+                      <!--总容量-->
+                      <div class="capacity-wrap" *ngIf="!detail.storageTypeShow.dorado">
                         <span class="capacity-label">{{'storage.detail.cap.totalCapacity' | translate}}</span>
                         <div class="num-bar_outer">
                           <div class="num-bar_inner total" [ngStyle]="{'width':(detail.totalEffectiveCapacity/detail.totalCapacity * 100)+'%'}"></div>
                         </div>
                         <span class="capacity-span">{{formatCapacity(detail.totalEffectiveCapacity)}}</span>
                       </div>
+                      <!--已使用|空闲-->
                       <div class="capacity-wrap">
                         <span class="capacity-label">{{'storage.detail.cap.useFree' | translate}}</span>
                         <div class="num-bar_outer">
@@ -595,7 +608,7 @@
                         </div>
                         <span class="capacity-span">{{formatCapacity(detail.usedCapacity)}} / {{getFreeCapacity(detail.totalEffectiveCapacity,detail.usedCapacity)}}</span>
                       </div>
-
+                      <!--已订阅-->
                       <div class="capacity-wrap">
                         <span class="capacity-label">{{'storage.detail.cap.subscribe' | translate}}</span>
                         <div class="num-bar_outer">
@@ -605,26 +618,37 @@
                       </div>
                     </div>
                   </div>
+                  <!--容量-->
                   <div class="clr-col-4">
                     <div class=" d-info-content-title">{{'storage.chart.capacity' | translate}}</div>
                     <div *ngIf="cd" class="d-info-charts-wrap" style=".data">
                       <div echarts [options]="cd.chart" id="chart3" style="width: 30%;height: 120px;"></div>
                       <div class="d-info-content">
+                        <!--保护-->
                         <div class="d-info-content-text">
                           <span>{{'storage.chart.protection' | translate}}</span>
                           <span>{{cd.protection}}</span>
                           <span class="squre protection"></span>
                         </div>
-                        <div class="d-info-content-text">
+                        <!--块/文件-->
+                        <div class="d-info-content-text" *ngIf="detail.storageTypeShow.dorado">
+                          <span>{{'storage.chart.blockFile' | translate}}</span>
+                          <span>{{cd.blockFile}}</span>
+                          <span class="squre fs"></span>
+                        </div>
+                        <!--文件系统-->
+                        <div class="d-info-content-text" *ngIf="!detail.storageTypeShow.dorado">
                           <span>{{'storage.chart.fileSystem' | translate}}</span>
                           <span>{{cd.fileSystem}}</span>
                           <span class="squre fs"></span>
                         </div>
-                        <div class="d-info-content-text">
+                        <!--LUN-->
+                        <div class="d-info-content-text" *ngIf="!detail.storageTypeShow.dorado">
                           <span>{{'storage.chart.volume' | translate}}</span>
                           <span>{{cd.volume}}</span>
                           <span class="squre volume"></span>
                         </div>
+                        <!--空闲容量-->
                         <div class="d-info-content-text">
                           <span>{{'storage.chart.freeCapacity' | translate}}</span>
                           <span>{{cd.freeCapacity}}</span>
@@ -633,7 +657,8 @@
                       </div>
                     </div>
                   </div>
-                  <div class="clr-col-4">
+                  <!--容量节省率-->
+                  <div class="clr-col-4" *ngIf="!detail.storageTypeShow.dorado">
                     <div class="info-content-title">{{'storage.detail.cap.capacitySavings' | translate}}</div>
                     <div *ngIf="capSave" class="availability-box"  style=".data">
                       <div class="unit-banner">
@@ -677,14 +702,14 @@
                   </div>
               </div>
               <div *ngIf="!detail">
-                无
+                {{'vmfs.none' | translate}}
               </div>
               <div style="width: 75%">
                 <div class="info-content-title">{{'storage.detail.cap.storagePool' | translate}}</div>
                 <clr-datagrid>
                   <clr-dg-column>{{'storage.detail.capacity.pool.name' | translate}}</clr-dg-column>
                   <clr-dg-column>{{'storage.detail.capacity.pool.status' | translate}}</clr-dg-column>
-                  <clr-dg-column style="width: 11rem;">{{'storage.detail.capacity.pool.capacity' | translate}}</clr-dg-column>
+                  <clr-dg-column class="hideFilter" [clrDgField]="'consumedCapacity'"  style="width: 11rem;">{{'storage.detail.capacity.pool.capacity' | translate}}</clr-dg-column>
                   <clr-dg-row *clrDgItems="let item of storagePool" [clrDgItem]="item">
                     <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
                     <clr-dg-cell class="over_flow">
@@ -753,11 +778,11 @@
                           </clr-dg-filter>
                         </clr-dg-column>
                         <clr-dg-column [clrDgField]="'softVer'">{{'storage.detail.hardware.controllers.version' | translate}}</clr-dg-column>
-                        <clr-dg-column [clrDgField]="'cpuUsage'">{{'storage.detail.hardware.controllers.cpuUsage' | translate}}</clr-dg-column>
-                        <clr-dg-column [clrDgField]="'iops'">{{'storage.detail.hardware.controllers.iops' | translate}}</clr-dg-column>
-                        <clr-dg-column [clrDgField]="'ops'">{{'storage.detail.hardware.controllers.ops' | translate}}</clr-dg-column>
-                        <clr-dg-column [clrDgField]="'lantency'">{{'storage.detail.hardware.controllers.latency' | translate}}</clr-dg-column>
-                        <clr-dg-column [clrDgField]="'bandwith'">{{'storage.detail.hardware.controllers.bandwidth' | translate}}</clr-dg-column>
+                        <clr-dg-column class="hideFilter"  [clrDgField]="'cpuUsage'">{{'storage.detail.hardware.controllers.cpuUsage' | translate}}</clr-dg-column>
+                        <clr-dg-column class="hideFilter"  [clrDgField]="'iops'">{{'storage.detail.hardware.controllers.iops' | translate}}</clr-dg-column>
+                        <clr-dg-column class="hideFilter"  [clrDgField]="'ops'">{{'storage.detail.hardware.controllers.ops' | translate}}</clr-dg-column>
+                        <clr-dg-column class="hideFilter"  [clrDgField]="'lantency'">{{'storage.detail.hardware.controllers.latency' | translate}}</clr-dg-column>
+                        <clr-dg-column class="hideFilter"  [clrDgField]="'bandwith'">{{'storage.detail.hardware.controllers.bandwidth' | translate}}</clr-dg-column>
                         <clr-dg-row  *clrDgItems="let item of controllers" [clrDgItem]="item">
                           <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">
@@ -814,14 +839,14 @@
                             <disk-type-filter #diskTypeFilter></disk-type-filter>
                           </clr-dg-filter>
                         </clr-dg-column>
-                        <clr-dg-column [clrDgField]="'capacity'">{{'storage.detail.hardware.disks.capacity' | translate}}</clr-dg-column>
+                        <clr-dg-column class="hideFilter" [clrDgField]="'capacity'">{{'storage.detail.hardware.disks.capacity' | translate}}</clr-dg-column>
                         <clr-dg-column [clrDgField]="'member'">{{'storage.detail.hardware.disks.role' | translate}}</clr-dg-column>
                         <clr-dg-column [clrDgField]="'diskDomain'">{{'storage.detail.hardware.disks.diskDomain' | translate}}</clr-dg-column>
-                        <clr-dg-column [clrDgField]="'speed'">{{'storage.detail.hardware.disks.rotationalSpeed' | translate}}</clr-dg-column>
-                        <clr-dg-column [clrDgField]="'iops'">{{'storage.detail.hardware.disks.iops' | translate}}</clr-dg-column>
-                        <clr-dg-column [clrDgField]="'lantency'">{{'storage.detail.hardware.disks.latency' | translate}}</clr-dg-column>
-                        <clr-dg-column [clrDgField]="'bandwith'">{{'storage.detail.hardware.disks.bandwidth' | translate}}</clr-dg-column>
-                        <clr-dg-column [clrDgField]="'useage'">{{'storage.detail.hardware.disks.usage' | translate}}</clr-dg-column>
+                        <clr-dg-column class="hideFilter" [clrDgField]="'speed'">{{'storage.detail.hardware.disks.rotationalSpeed' | translate}}</clr-dg-column>
+                        <clr-dg-column class="hideFilter"  [clrDgField]="'iops'">{{'storage.detail.hardware.disks.iops' | translate}}</clr-dg-column>
+                        <clr-dg-column class="hideFilter"  [clrDgField]="'lantency'">{{'storage.detail.hardware.disks.latency' | translate}}</clr-dg-column>
+                        <clr-dg-column class="hideFilter"  [clrDgField]="'bandwith'">{{'storage.detail.hardware.disks.bandwidth' | translate}}</clr-dg-column>
+                        <clr-dg-column class="hideFilter"  [clrDgField]="'useage'">{{'storage.detail.hardware.disks.usage' | translate}}</clr-dg-column>
                         <clr-dg-row  *clrDgItems="let item of disks" [clrDgItem]="item">
                           <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">
@@ -882,11 +907,11 @@
                                 </clr-dg-filter>
                               </clr-dg-column>
                               <clr-dg-column [clrDgField]="'wwn'">{{'storage.detail.hardware.ports.wwn' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'speed'">{{'storage.detail.hardware.ports.workingRate' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'iops'">{{'storage.detail.hardware.ports.iops' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'lantency'">{{'storage.detail.hardware.ports.latency' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'bandwith'">{{'storage.detail.hardware.ports.bandwidth' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'useage'">{{'storage.detail.hardware.ports.usage' | translate}}</clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'speed'">{{'storage.detail.hardware.ports.workingRate' | translate}}</clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'iops'">{{'storage.detail.hardware.ports.iops' | translate}}</clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'lantency'">{{'storage.detail.hardware.ports.latency' | translate}}</clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'bandwith'">{{'storage.detail.hardware.ports.bandwidth' | translate}}</clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'useage'">{{'storage.detail.hardware.ports.usage' | translate}}</clr-dg-column>
                               <clr-dg-row  *clrDgItems="let item of fcs" [clrDgItem]="item">
                                 <clr-dg-cell class="over_flow">{{item.location}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
@@ -927,11 +952,11 @@
                               </clr-dg-column>
                               <clr-dg-column [clrDgField]="'mgmtIp'">{{'storage.detail.hardware.ports.ipv4' | translate}}</clr-dg-column>
                               <clr-dg-column [clrDgField]="'mgmtIpv6'">{{'storage.detail.hardware.ports.ipv6' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'speed'">{{'storage.detail.hardware.ports.workingRate' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'iops'">{{'storage.detail.hardware.ports.iops' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'lantency'">{{'storage.detail.hardware.ports.latency' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'bandwith'">{{'storage.detail.hardware.ports.bandwidth' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'useage'">{{'storage.detail.hardware.ports.usage' | translate}}</clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'speed'">{{'storage.detail.hardware.ports.workingRate' | translate}}</clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'iops'">{{'storage.detail.hardware.ports.iops' | translate}}</clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'lantency'">{{'storage.detail.hardware.ports.latency' | translate}}</clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'bandwith'">{{'storage.detail.hardware.ports.bandwidth' | translate}}</clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'useage'">{{'storage.detail.hardware.ports.usage' | translate}}</clr-dg-column>
                               <clr-dg-row  *clrDgItems="let item of eths" [clrDgItem]="item">
                                 <clr-dg-cell class="over_flow">{{item.location}}</clr-dg-cell>
 
@@ -970,11 +995,11 @@
                               <clr-dg-column [clrDgField]="'status'">{{'storage.detail.hardware.ports.location' | translate}}</clr-dg-column>
                               <clr-dg-column >{{'storage.detail.hardware.ports.status' | translate}}</clr-dg-column>
                               <clr-dg-column [clrDgField]="'status'">{{'storage.detail.hardware.ports.wwn' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'status'">{{'storage.detail.hardware.ports.workingRate' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'status'">{{'storage.detail.hardware.ports.iops' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'status'">{{'storage.detail.hardware.ports.latency' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'status'">{{'storage.detail.hardware.ports.bandwidth' | translate}}</clr-dg-column>
-                              <clr-dg-column [clrDgField]="'status'">{{'storage.detail.hardware.ports.usage' | translate}}</clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'speed'">{{'storage.detail.hardware.ports.workingRate' | translate}}</clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'iops'">{{'storage.detail.hardware.ports.iops' | translate}}</clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'latency'">{{'storage.detail.hardware.ports.latency' | translate}}</clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'bandwidth'">{{'storage.detail.hardware.ports.bandwidth' | translate}}</clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'usage'">{{'storage.detail.hardware.ports.usage' | translate}}</clr-dg-column>
                               <clr-dg-row  *clrDgItems="let item of fcoes" [clrDgItem]="item">
                                 <clr-dg-cell class="over_flow">{{item.location}}</clr-dg-cell>
                                 <clr-dg-cell class="over_flow">
@@ -1002,48 +1027,60 @@
                             </clr-datagrid>
                           </clr-accordion-content>
                         </clr-accordion-panel>
-<!--                        <clr-accordion-panel>-->
-<!--                          <clr-accordion-title>{{'storage.detail.hardware.ports.bond' | translate}}({{bonds==null?0:bonds.length}})</clr-accordion-title>-->
-<!--                          <clr-accordion-content *clrIfExpanded>-->
-<!--                            <clr-datagrid>-->
-<!--                              <clr-dg-column >{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>-->
-<!--                              <clr-dg-column >{{'storage.detail.hardware.ports.healthStatus' | translate}}</clr-dg-column>-->
-<!--                              <clr-dg-column >{{'storage.detail.hardware.ports.runningStatus' | translate}}</clr-dg-column>-->
-<!--                              <clr-dg-column >{{'storage.detail.hardware.ports.mtu' | translate}}</clr-dg-column>-->
-<!--                              <clr-dg-column >{{'storage.detail.hardware.ports.totalIops' | translate}}</clr-dg-column>-->
-<!--                              <clr-dg-column >{{'storage.detail.hardware.ports.avg' | translate}}</clr-dg-column>-->
-<!--                              <clr-dg-column >{{'storage.detail.hardware.ports.totalBandwidth' | translate}}</clr-dg-column>-->
-<!--                              <clr-dg-row  *clrDgItems="let item of bonds" [clrDgItem]="item">-->
-<!--                                <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>-->
-<!--                                <clr-dg-cell class="over_flow">-->
-<!--                                  <span *ngIf="item.healthStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>-->
-<!--                                  <span *ngIf="item.healthStatus == 'normal'">{{'enum.status.normal' | translate}}</span>-->
-<!--                                  <span *ngIf="item.healthStatus == 'fail'">{{'enum.status.fail' | translate}}</span>-->
-<!--                                  <span *ngIf="!item.healthStatus">&#45;&#45;</span>-->
-<!--                                </clr-dg-cell>-->
-<!--                                <clr-dg-cell class="over_flow">-->
-<!--                                  <span *ngIf="item.runningStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>-->
-<!--                                  <span *ngIf="item.runningStatus == 'normal'">{{'enum.status.normal' | translate}}</span>-->
-<!--                                  <span *ngIf="item.runningStatus == 'running'">{{'enum.status.running' | translate}}</span>-->
-<!--                                  <span *ngIf="item.runningStatus == 'connected'">{{'enum.status.connected' | translate}}</span>-->
-<!--                                  <span *ngIf="item.runningStatus == 'disconnected'">{{'enum.status.disconnected' | translate}}</span>-->
-<!--                                  <span *ngIf="!item.runningStatus">&#45;&#45;</span>-->
-<!--                                </clr-dg-cell>-->
-<!--                                <clr-dg-cell class="over_flow">{{item.mtu}}</clr-dg-cell>-->
-<!--                                <clr-dg-cell class="over_flow">{{item.iops!=null?item.iops:'&#45;&#45;'}}</clr-dg-cell>-->
-<!--                                <clr-dg-cell class="over_flow">{{item.latency!=null?item.latency:'&#45;&#45;'}}</clr-dg-cell>-->
-<!--                                <clr-dg-cell class="over_flow">{{item.bandwidth!=null?item.bandwidth:'&#45;&#45;'}}</clr-dg-cell>-->
-<!--                              </clr-dg-row>-->
-<!--                              <clr-dg-footer>-->
-<!--                                <clr-dg-pagination #paginationBond [clrDgPageSize]="10" [clrDgTotalItems]="bondTotal">-->
-<!--                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>-->
-<!--                                  {{paginationBond.firstItem + 1}} - {{paginationBond.lastItem + 1}}-->
-<!--                                  of {{paginationBond.totalItems}}-->
-<!--                                </clr-dg-pagination>-->
-<!--                              </clr-dg-footer>-->
-<!--                            </clr-datagrid>-->
-<!--                          </clr-accordion-content>-->
-<!--                        </clr-accordion-panel>-->
+                        <clr-accordion-panel>
+                          <clr-accordion-title>{{'storage.detail.hardware.ports.bond' | translate}}({{bonds==null?0:bonds.length}})</clr-accordion-title>
+                          <clr-accordion-content *clrIfExpanded>
+                            <clr-datagrid>
+                              <clr-dg-column [clrDgField]="'name'">{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
+                              <clr-dg-column >
+                                {{'storage.detail.hardware.ports.healthStatus' | translate}}
+                                <clr-dg-filter [clrDgFilter]="healthStatusFilter">
+                                  <health-status-filter #healthStatusFilter></health-status-filter>
+                                </clr-dg-filter>
+                              </clr-dg-column>
+                              <clr-dg-column >
+                                {{'storage.detail.hardware.ports.runningStatus' | translate}}
+                                <clr-dg-filter [clrDgFilter]="portsRunningStatusFilter">
+                                  <ports-running-status-filter #portsRunningStatusFilter></ports-running-status-filter>
+                                </clr-dg-filter>
+                              </clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'mtu'">{{'storage.detail.hardware.ports.mtu' | translate}}</clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'iops'">{{'storage.detail.hardware.ports.totalIops' | translate}}</clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'latency'">{{'storage.detail.hardware.ports.avg' | translate}}</clr-dg-column>
+                              <clr-dg-column class="hideFilter" [clrDgField]="'bandwidth'" >{{'storage.detail.hardware.ports.totalBandwidth' | translate}}</clr-dg-column>
+                              <clr-dg-row  *clrDgItems="let item of bonds" [clrDgItem]="item">
+                                <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">
+                                  <span *ngIf="item.healthStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
+                                  <span *ngIf="item.healthStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
+                                  <span *ngIf="item.healthStatus == 'faulty'">{{'enum.status.faulty' | translate}}</span>
+                                  <span *ngIf="item.healthStatus == 'about to fail'">{{'enum.status.aboutToFail' | translate}}</span>
+                                  <span *ngIf="item.healthStatus == 'partially damaged'">{{'enum.status.partiallyDamaged' | translate}}</span>
+                                  <span *ngIf="!item.healthStatus">--</span>
+                                </clr-dg-cell>
+                                <clr-dg-cell class="over_flow">
+                                  <span *ngIf="item.runningStatus == 'unknown'">{{'enum.status.unknown' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'normal'">{{'enum.status.normal' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'running'">{{'enum.status.running' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'link up'">{{'enum.status.linkUp' | translate}}</span>
+                                  <span *ngIf="item.runningStatus == 'link down'">{{'enum.status.linkDown' | translate}}</span>
+                                  <span *ngIf="!item.runningStatus">--</span>
+                                </clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.mtu}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.iops!=null?item.iops:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.latency!=null?item.latency:'--'}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow">{{item.bandwidth!=null?item.bandwidth:'--'}}</clr-dg-cell>
+                              </clr-dg-row>
+                              <clr-dg-footer>
+                                <clr-dg-pagination #paginationBond [clrDgPageSize]="10" [clrDgTotalItems]="bondTotal">
+                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                                  {{paginationBond.firstItem + 1}} - {{paginationBond.lastItem + 1}}
+                                  of {{paginationBond.totalItems}}
+                                </clr-dg-pagination>
+                              </clr-dg-footer>
+                            </clr-datagrid>
+                          </clr-accordion-content>
+                        </clr-accordion-panel>
                         <clr-accordion-panel>
                           <clr-accordion-title>{{'storage.detail.hardware.ports.logic' | translate}}({{logicports==null?0:logicports.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
@@ -1120,26 +1157,35 @@
                             </clr-datagrid>
                           </clr-accordion-content>
                         </clr-accordion-panel>
-<!--                        <clr-accordion-panel>-->
-<!--                          <clr-accordion-title>{{'storage.detail.hardware.ports.fail' | translate}}({{fgs==null?0:fgs.length}})</clr-accordion-title>-->
-<!--                          <clr-accordion-content *clrIfExpanded>-->
-<!--                            <clr-datagrid>-->
-<!--                              <clr-dg-column >{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>-->
-<!--                              <clr-dg-column >{{'storage.detail.hardware.ports.type' | translate}}</clr-dg-column>-->
-<!--                              <clr-dg-row  *clrDgItems="let item of fgs" [clrDgItem]="item">-->
-<!--                                <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>-->
-<!--                                <clr-dg-cell class="over_flow">{{item.failoverGroupType}}</clr-dg-cell>-->
-<!--                              </clr-dg-row>-->
-<!--                              <clr-dg-footer>-->
-<!--                                <clr-dg-pagination #paginationFgs [clrDgPageSize]="10" [clrDgTotalItems]="failTotal">-->
-<!--                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>-->
-<!--                                  {{paginationFgs.firstItem + 1}} - {{paginationFgs.lastItem + 1}}-->
-<!--                                  of {{paginationFgs.totalItems}}-->
-<!--                                </clr-dg-pagination>-->
-<!--                              </clr-dg-footer>-->
-<!--                            </clr-datagrid>-->
-<!--                          </clr-accordion-content>-->
-<!--                        </clr-accordion-panel>-->
+                        <clr-accordion-panel>
+                          <clr-accordion-title>{{'storage.detail.hardware.ports.fail' | translate}}({{fgs==null?0:fgs.length}})</clr-accordion-title>
+                          <clr-accordion-content *clrIfExpanded>
+                            <clr-datagrid>
+                              <clr-dg-column [clrDgField]="'name'">{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
+                              <clr-dg-column >
+                                {{'storage.detail.hardware.ports.type' | translate}}
+                                <clr-dg-filter [clrDgFilter]="failoverGroupTypeFilter">
+                                  <failover-group-type-filter #failoverGroupTypeFilter></failover-group-type-filter>
+                                </clr-dg-filter>
+                              </clr-dg-column>
+                              <clr-dg-row  *clrDgItems="let item of fgs" [clrDgItem]="item">
+                                <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType == 'system'">{{'enum.status.system' | translate}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType == 'VLAN'">{{'enum.status.vlan' | translate}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" *ngIf="item.failoverGroupType == 'customized'">{{'enum.status.customized' | translate}}</clr-dg-cell>
+                                <clr-dg-cell class="over_flow" *ngIf="!item.failoverGroupType">--</clr-dg-cell>
+
+                              </clr-dg-row>
+                              <clr-dg-footer>
+                                <clr-dg-pagination #paginationFgs [clrDgPageSize]="10" [clrDgTotalItems]="failTotal">
+                                  <clr-dg-page-size [clrPageSizeOptions]="[10,20,50,100]">{{'storage.detail.perPage' | translate}}</clr-dg-page-size>
+                                  {{paginationFgs.firstItem + 1}} - {{paginationFgs.lastItem + 1}}
+                                  of {{paginationFgs.totalItems}}
+                                </clr-dg-pagination>
+                              </clr-dg-footer>
+                            </clr-datagrid>
+                          </clr-accordion-content>
+                        </clr-accordion-panel>
                       </clr-accordion>
                     </div>
                   </clr-tab-content>

@@ -81,7 +81,7 @@ public class DmeConstants {
     /**
      * failover groups query
      **/
-    public static final String API_FAILOVERGROUPS = "/rest/storagemgmt/v1/storage-port/failover-groups?storage_id=";
+    public static final String API_FAILOVERGROUPS = "/rest/storagemgmt/v1/failover-groups/query";
 
     /**
      * logic ports query
@@ -96,7 +96,7 @@ public class DmeConstants {
     /**
      * bond ports query
      **/
-    public static final String API_BANDPORTS_LIST = "/rest/storagemgmt/v1/storage-port/bond-ports?storage_id=";
+    public static final String API_BANDPORTS_LIST = "/rest/storagemgmt/v1/bond-ports/query";
 
     /**
      * volume base url
@@ -245,6 +245,11 @@ public class DmeConstants {
      **/
     public static final String GET_DME_HOSTS_IN_HOSTGROUP_URL
         = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}/hosts/list";
+
+    /**
+     * add host to hosts
+     **/
+    public static final String PUT_ADD_HOST_TO_HOSTS = "/rest/hostmgmt/v1/hostgroups/{hostgroup_id}/hosts/add";
 
     /**
      * instance relation query
@@ -446,6 +451,7 @@ public class DmeConstants {
      * VMFS type
      **/
     public static final String STORE_TYPE_VMFS = "VMFS";
+
     /**
      * NFS type
      **/

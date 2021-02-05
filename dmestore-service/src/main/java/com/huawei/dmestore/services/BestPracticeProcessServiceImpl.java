@@ -10,11 +10,13 @@ import com.huawei.dmestore.model.BestPracticeCheckRecordBean;
 import com.huawei.dmestore.model.BestPracticeUpResultBase;
 import com.huawei.dmestore.model.BestPracticeUpResultResponse;
 import com.huawei.dmestore.services.bestpractice.BestPracticeService;
+import com.huawei.dmestore.utils.StringUtil;
 import com.huawei.dmestore.utils.VCSDKUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,7 +112,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
 
     @Override
     public void check(String objectId) throws VcenterException {
-        log.info("checkstart ");
+        log.info("====best practice check start====");
         String hostsStr;
         if (objectId != null) {
             hostsStr = vcsdkUtils.findHostById(objectId);
@@ -119,11 +121,18 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
         }
         JsonArray hostArray = gson.fromJson(hostsStr, JsonArray.class);
         Map<String, List<BestPracticeBean>> checkMap = new HashMap<>(DmeConstants.COLLECTION_CAPACITY_16);
+        List<String> unConnectedIds = new ArrayList<>();
         for (int index = 0; index < hostArray.size(); index++) {
             // 对每一项进行检查
             JsonObject hostObject = hostArray.get(index).getAsJsonObject();
             String hostName = hostObject.get("hostName").getAsString();
             String hostObjectId = hostObject.get("objectId").getAsString();
+
+            // 连接断开的主机跳过
+            if (!vcsdkUtils.isHostConnected(hostObjectId)) {
+                unConnectedIds.add(hostObjectId);
+                continue;
+            }
             for (BestPracticeService bestPracticeService : bestPracticeServices) {
                 try {
                     String hostSetting = bestPracticeService.getHostSetting();
@@ -157,7 +166,9 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             // 保存到数据库
             bachDbProcess(checkMap);
         }
-        log.info("check end ");
+
+        bestPracticeCheckDao.deleteByHostIds(unConnectedIds);
+        log.info("====best practice check end====");
     }
 
     private void bachDbProcess(Map<String, List<BestPracticeBean>> map) {
@@ -202,6 +213,22 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     }
 
     @Override
+    public List<BestPracticeUpResultResponse> updateByCluster(String clusterObjectId) throws DmeException {
+        // 查询集群下的所有主机信息
+        String hostsOnCluster = vcsdkUtils.getHostsOnCluster(clusterObjectId);
+        if (StringUtil.isNotBlank(hostsOnCluster)) {
+            List<Map<String, String>> hostList = gson.fromJson(hostsOnCluster,
+                new TypeToken<List<Map<String, String>>>() { }.getType());
+            List<String> objectIds = new ArrayList<>();
+            for (int index = 0; index < hostList.size(); index++) {
+                objectIds.add(hostList.get(index).get("hostId"));
+            }
+            return update(objectIds);
+        }
+        return null;
+    }
+
+    @Override
     public List<BestPracticeUpResultResponse> update(List<String> objectIds) throws DmeSqlException {
         return update(objectIds, null);
     }
@@ -222,11 +249,19 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                 break;
             }
         }
+
+        // 从本地数据库查询需要实施最佳实践的主机信息
         Map<String, String> hostMap = getHostMap(objectIds);
         List<BestPracticeUpResultResponse> responses = new ArrayList<>();
         List<String> successList = new ArrayList<>();
+        List<String> disconnectedIds = new ArrayList<>();
         for (Map.Entry<String, String> entry : hostMap.entrySet()) {
             String objectId = entry.getKey();
+            // 连接断开的主机跳过
+            if (!vcsdkUtils.isHostConnected(objectId)) {
+                disconnectedIds.add(objectId);
+                continue;
+            }
             String hostName = entry.getValue();
             BestPracticeUpResultResponse response = new BestPracticeUpResultResponse();
             List<BestPracticeUpResultBase> baseList = new ArrayList();
@@ -235,7 +270,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             boolean isNeedReboot = false;
             for (BestPracticeService service : services) {
                 // 能自动修复的才进行实施操作
-                if(!service.autoRepair()){
+                if (!service.autoRepair()) {
                     continue;
                 }
                 BestPracticeUpResultBase base = new BestPracticeUpResultBase();
@@ -265,6 +300,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
 
         // 将成功修改了最佳实践值的记录从表中删除
         bestPracticeCheckDao.deleteBy(responses);
+        bestPracticeCheckDao.deleteByHostIds(disconnectedIds);
 
         return responses;
     }

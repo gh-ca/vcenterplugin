@@ -548,6 +548,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
                 rightNow.add(Calendar.YEAR, -1);
                 break;
             default:
+                rightNow.add(Calendar.MONTH, -1);
                 break;
         }
         long beginTime = rightNow.getTimeInMillis();
@@ -560,6 +561,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
 
     public JsonObject getDatasetsQueryBody(String serviceLevelId, String interval, String dataSetType) {
         Map<String, Long> timeMap = parseTime(interval);
+
         // timeRange
         JsonObject timeRange = new JsonObject();
         timeRange.addProperty("beginTime", timeMap.get("beginTime"));

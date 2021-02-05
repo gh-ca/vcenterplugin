@@ -1180,7 +1180,7 @@ export class VmfsListComponent implements OnInit {
   expandHandleFunc() {
     const expandSubmitForm = new GetForm().getExpandForm();
     Object.assign(expandSubmitForm, this.expandForm);
-    if (this.expandForm.vo_add_capacity) {
+    if (this.expandForm.vo_add_capacity != null && this.expandForm.vo_add_capacity != undefined) {
       // 容量单位转换
       switch (this.expandForm.capacityUnit) {
         case 'TB':
@@ -1225,13 +1225,13 @@ export class VmfsListComponent implements OnInit {
   expandOnblur() {
     let expand = this.expandForm.vo_add_capacity;
     console.log('expand', expand);
-    if (expand && expand !== null && expand !== '') {
+    if (expand && expand !== null && expand !== undefined) {
       if (expand > 0) {
         switch (this.expandForm.capacityUnit) {
           case 'TB':
             if ((expand*1024).toString().indexOf(".")!==-1) { // 小数
               this.expandErr = true;
-              expand = '';
+              expand = null;
             } else {
               this.expandErr = false;
             }
@@ -1239,7 +1239,7 @@ export class VmfsListComponent implements OnInit {
           default: // 默认GB 不变
             if (expand.toString().indexOf(".")!==-1) { // 小数
               this.expandErr = true;
-              expand = '';
+              expand = null;
             } else {
               this.expandErr = false;
             }
@@ -1247,10 +1247,10 @@ export class VmfsListComponent implements OnInit {
         }
       } else {
         this.expandErr = true;
-        expand = '';
+        expand = null;
       }
     } else {
-      expand = '';
+      expand = null;
     }
     console.log('expand2', expand);
     console.log('this.expandErr', this.expandErr);
@@ -1763,6 +1763,23 @@ export class VmfsListComponent implements OnInit {
     form.maxiopsChoose = false;
     form.maxiops = null;
   }
+
+  /**
+   * add qos开关
+   * @param form
+   */
+  qoSAddFlagChange(form){
+    if(form.qosFlag) {
+      form.control_policyUpper = undefined;
+      form.maxbandwidthChoose = false;
+      form.maxiopsChoose = false;
+
+      form.control_policyLower = undefined;
+      form.minbandwidthChoose = false;
+      form.miniopsChoose = false;
+      form.latencyChoose = false;
+    }
+  }
   qosEditFunc(form) {
     console.log("editform.qosFlag", form.qosFlag);
     const qosTag = this.storage.storageTypeShow.qosTag;
@@ -1825,6 +1842,22 @@ export class VmfsListComponent implements OnInit {
     form.max_bandwidth = null;
   }
 
+  /**
+   * edit qos开关
+   * @param form
+   */
+  qoSEditFlagChange(form){
+    if(form.qosFlag) {
+      form.control_policyUpper = undefined;
+      form.maxbandwidthChoose = false;
+      form.maxiopsChoose = false;
+
+      form.control_policyLower = undefined;
+      form.minbandwidthChoose = false;
+      form.miniopsChoose = false;
+      form.latencyChoose = false;
+    }
+  }
   /**
    * 编辑页面  名称变化Func
    */

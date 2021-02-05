@@ -281,6 +281,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
         this.gs.loading=false;
         if (r.code === '200'){
           this.detail = r.data;
+
+          this.detail.location = this.HTMLDecode(this.detail.location);
+
           this.storageDetailTag = this.detail.storageTypeShow.storageDetailTag;
           this.initCapacity();
           this.cdr.detectChanges();
@@ -296,12 +299,36 @@ export class DetailComponent implements OnInit, AfterViewInit {
           this.gs.loading=false;
           if (r.code === '200'){
             this.detail = r.data;
+            this.detail.location = this.HTMLDecode(this.detail.location);
             this.initCapacity();
             this.cdr.detectChanges();
           }
         });
       }
     }
+  }
+
+  /**
+   * location处理
+   * @param strParam
+   * @constructor
+   */
+  HTMLDecode(strParam) {
+    if (!strParam) return strParam;
+
+    // 避免嵌套转义的情况, e.g.&amp;#39
+    let str = strParam;
+    while (str.indexOf('&amp;') > -1) {
+      str = str.replace(/&amp;/g, '&');
+    }
+
+    // 判断是否存在HTML字符实体
+    if (/&[a-zA-Z]{2,5};/.test(str) || /&#\d{2,5};/.test(str)) {
+      const div = document.createElement('div');
+      div.innerHTML = str;
+      str = div.innerText;
+    }
+    return  str;
   }
   refreshStoragePool() {
     this.storagePoolStatusFilter.initStatus();
@@ -798,16 +825,25 @@ export class DetailComponent implements OnInit, AfterViewInit {
     const p= 0;
     this.detail.protectionCapacity
     this.cd.protection = this.formatCapacity(this.detail.protectionCapacity);
-    this.cd.fileSystem =this.formatCapacity(this.detail.fileCapacity);
-    this.cd.volume =this.formatCapacity(this.detail.blockCapacity);
+    let storagePoolAllUsedCap;
+    if (this.detail.storageTypeShow.dorado) { // dorado v6.1版本及高版本
+      storagePoolAllUsedCap = this.storagePool.map(item => item.consumedCapacity).reduce(this.getSum, 0).toFixed(3);
+      this.cd.blockFile = this.formatCapacity(storagePoolAllUsedCap);
+    } else { // dorado v 6.0版本及更低版本
+      this.cd.fileSystem =this.formatCapacity(this.detail.fileCapacity);
+      this.cd.volume =this.formatCapacity(this.detail.blockCapacity);
+    }
      this.cd.freeCapacity= this.getFreeCapacity(this.detail.totalEffectiveCapacity,this.detail.usedCapacity);
-
+    const freeCapacity = (this.detail.totalEffectiveCapacity-this.detail.usedCapacity).toFixed(3);
     const cc = new CapacityChart(this.formatCapacity(this.detail.totalEffectiveCapacity));
-    const cs = new CapacitySerie(this.detail.protectionCapacity
-      ,this.detail.fileCapacity,this.detail.blockCapacity,
-      this.detail.totalEffectiveCapacity-this.detail.usedCapacity);
+    let cs = new CapacitySerie(this.detail.protectionCapacity
+        ,this.detail.fileCapacity,this.detail.blockCapacity,
+      Number(freeCapacity), Number(storagePoolAllUsedCap), this.detail.storageTypeShow.dorado, this.translatePipe);
     cc.series.push(cs);
     this.cd.chart = cc;
+  }
+  getSum(total, num) {
+    return total + Math.round(num);
   }
   backToList(){
     this.router.navigate(['storage']);

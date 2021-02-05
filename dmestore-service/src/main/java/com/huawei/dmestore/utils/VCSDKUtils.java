@@ -69,8 +69,10 @@ import com.vmware.vim25.HostFileSystemMountInfo;
 import com.vmware.vim25.HostHostBusAdapter;
 import com.vmware.vim25.HostInternetScsiHba;
 import com.vmware.vim25.HostInternetScsiHbaSendTarget;
+import com.vmware.vim25.HostRuntimeInfo;
 import com.vmware.vim25.HostScsiDisk;
 import com.vmware.vim25.HostScsiDiskPartition;
+import com.vmware.vim25.HostSystemConnectionState;
 import com.vmware.vim25.HostVirtualNic;
 import com.vmware.vim25.HostVmfsVolume;
 import com.vmware.vim25.InvalidArgumentFaultMsg;
@@ -291,18 +293,15 @@ public class VCSDKUtils {
         String listStr = "";
         try {
             VmwareContext[] vmwareContexts = vcConnectionHelpers.getAllContext();
-            for (VmwareContext vmwareContext : vmwareContexts) {
-                RootFsMO rootFsMo = rootVmwareMoFactory.build(vmwareContext, vmwareContext.getRootFolder());
-                logger.info("rootFsMo:{}", rootFsMo);
+            for (VmwareContext context : vmwareContexts) {
+                RootFsMO rootFsMo = rootVmwareMoFactory.build(context, context.getRootFolder());
                 List<Pair<ManagedObjectReference, String>> hosts = rootFsMo.getAllHostOnRootFs();
-                logger.info("hosts:{}", hosts);
                 if (hosts != null && hosts.size() > 0) {
                     List<Map<String, String>> lists = new ArrayList<>();
                     for (Pair<ManagedObjectReference, String> host : hosts) {
-                        HostMO host1 = hostVmwareFactory.build(vmwareContext, host.first());
+                        HostMO host1 = hostVmwareFactory.build(context, host.first());
                         Map<String, String> map = new HashMap<>();
-                        String objectId = vcConnectionHelpers.mor2ObjectId(host1.getMor(),
-                            vmwareContext.getServerAddress());
+                        String objectId = vcConnectionHelpers.mor2ObjectId(host1.getMor(), context.getServerAddress());
                         map.put(HOST_ID, objectId);
                         map.put(OBJECT_ID, objectId);
                         map.put(HOST_NAME, host1.getName());
@@ -904,17 +903,16 @@ public class VCSDKUtils {
         try {
             // 得到当前的context
             String serverguid = vcConnectionHelpers.objectId2Serverguid(clusterObjectId);
-            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            VmwareContext context = vcConnectionHelpers.getServerContext(serverguid);
             ManagedObjectReference clmor = vcConnectionHelpers.objectId2Mor(clusterObjectId);
-            ClusterMO cl1 = clusterVmwareMoFactory.build(vmwareContext, clmor);
+            ClusterMO cl1 = clusterVmwareMoFactory.build(context, clmor);
             List<Pair<ManagedObjectReference, String>> hosts = cl1.getClusterHosts();
             if (hosts != null && hosts.size() > 0) {
                 List<Map<String, String>> lists = new ArrayList<>();
                 for (Pair<ManagedObjectReference, String> host : hosts) {
-                    HostMO host1 = hostVmwareFactory.build(vmwareContext, host.first());
+                    HostMO host1 = hostVmwareFactory.build(context, host.first());
                     Map<String, String> map = new HashMap<>();
-                    String objectId = vcConnectionHelpers.mor2ObjectId(host1.getMor(),
-                        vmwareContext.getServerAddress());
+                    String objectId = vcConnectionHelpers.mor2ObjectId(host1.getMor(), context.getServerAddress());
                     map.put(HOST_ID, objectId);
                     map.put(HOST_NAME, host1.getName());
                     lists.add(map);
@@ -1945,8 +1943,8 @@ public class VCSDKUtils {
      * @param size size
      * @throws VcenterException VcenterException
      **/
-    public void createDisk(String dataStoreObjectId, String vmObjectId, String rdmDeviceName, int size)
-        throws VcenterException {
+    public void createDisk(String dataStoreObjectId, String vmObjectId, String rdmDeviceName, int size,
+        String compatibilityMode) throws VcenterException {
         String serverguid = vcConnectionHelpers.objectId2Serverguid(vmObjectId);
         try {
             VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
@@ -1956,7 +1954,7 @@ public class VCSDKUtils {
             VirtualMachineMO virtualMachineMo = virtualMachineMoFactorys.build(vmwareContext,
                 vcConnectionHelpers.objectId2Mor(vmObjectId));
             virtualMachineMo.createDisk(vmdkDatastorePath, VirtualDiskType.RDM, VirtualDiskMode.PERSISTENT,
-                rdmDeviceName, size * DIGIT_1024, datastoreMo.getMor(), DEFAULT_CONTROLLER_KEY);
+                rdmDeviceName, size * DIGIT_1024, datastoreMo.getMor(), DEFAULT_CONTROLLER_KEY, compatibilityMode);
         } catch (Exception e) {
             throw new VcenterException(e.getMessage());
         }
@@ -2744,6 +2742,7 @@ public class VCSDKUtils {
                         }
                     }
                     if (subhbalist.size() > 0) {
+                        //换方法，加入对应的主机信息
                         hbalist.addAll(subhbalist);
                     }
                 }
@@ -2754,6 +2753,63 @@ public class VCSDKUtils {
         }
         return hbalist;
     }
+    /**
+     * 通过集群ID得到主机的hba
+     *
+     * @param clusterObjectId clusterObjectId
+     * @return List
+     * @throws VcenterException VcenterException
+     */
+    public Map<String, List<Map<String, Object>>> getHbasByClusterObjectId2(String clusterObjectId) throws VcenterException {
+        Map<String, List<Map<String, Object>>> hbamaps = new HashMap<>();
+        try {
+            if (StringUtils.isEmpty(clusterObjectId)) {
+                logger.error("get Hba error:cluster ObjectId is null.");
+                throw new Exception("get Hba error:cluster ObjectId is null.");
+            }
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(clusterObjectId);
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+
+            // 取得该存储下所有已经挂载的主机ID
+            ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(clusterObjectId);
+            ClusterMO objmo = clusterVmwareMoFactory.build(vmwareContext, objmor);
+            List<Pair<ManagedObjectReference, String>> hosts = objmo.getClusterHosts();
+            if (hosts != null && hosts.size() > 0) {
+                for (Pair<ManagedObjectReference, String> host : hosts) {
+                    List<Map<String, Object>> subhbalist = new ArrayList<>();
+                    HostMO hostmo = hostVmwareFactory.build(vmwareContext, host.first());
+                    List<HostHostBusAdapter> hbas = hostmo.getHostStorageSystemMo()
+                        .getStorageDeviceInfo()
+                        .getHostBusAdapter();
+                    for (HostHostBusAdapter hba : hbas) {
+                        if (hba instanceof HostInternetScsiHba) {
+                            Map<String, Object> map = new HashMap<>();
+                            HostInternetScsiHba iscsiHba = (HostInternetScsiHba) hba;
+                            map.put(TYPE, ISCSI_TYPE);
+                            map.put(NAME, iscsiHba.getIScsiName());
+                            subhbalist.add(map);
+                        } else if (hba instanceof HostFibreChannelHba) {
+                            Map<String, Object> map = new HashMap<>();
+                            HostFibreChannelHba fcHba = (HostFibreChannelHba) hba;
+                            map.put(TYPE, FC_TYPE);
+                            logger.info("hostname = {},fc hba long = {}", hostmo.getName(),
+                                ToolUtils.normalizeWwn(fcHba.getPortWorldWideName()));
+                            map.put(NAME, ToolUtils.normalizeWwn(fcHba.getPortWorldWideName()));
+                            subhbalist.add(map);
+                        }
+                    }
+                    if (subhbalist.size() > 0) {
+                        hbamaps.put(host.second(), subhbalist);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw new VcenterException(e.getMessage());
+        }
+        return hbamaps;
+    }
+
 
     /**
      * 使用主机测试目标机的连通性
@@ -3074,4 +3130,29 @@ public class VCSDKUtils {
         }
         return map;
     }
+
+    /**
+     * 主机是否正常连通
+     *
+     * @param hostObjectId 主机objectid
+     * @return boolean boolean
+     */
+    public boolean isHostConnected(String hostObjectId) {
+        try {
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(hostObjectId);
+            VmwareContext context = vcConnectionHelpers.getServerContext(serverguid);
+            ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
+            HostMO hostMo = hostVmwareFactory.build(context, objmor);
+            HostRuntimeInfo hostRuntimeInfo = hostMo.getRuntimeInfo();
+            HostSystemConnectionState connectionState = hostRuntimeInfo.getConnectionState();
+            if (HostSystemConnectionState.CONNECTED.value().equals(connectionState.value())) {
+                return true;
+            }
+        } catch (Exception e) {
+            logger.error("query host connection state by objectid error!hostObjectId={}, error:{}", hostObjectId,
+                e.getMessage());
+        }
+        return false;
+    }
+
 }
