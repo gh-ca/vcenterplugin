@@ -140,20 +140,21 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                         checkMap.put(hostSetting, new ArrayList<>());
                     }
                     boolean isCheck = bestPracticeService.check(vcsdkUtils, hostObjectId);
+                    BestPracticeBean bean = new BestPracticeBean();
+                    bean.setHostSetting(hostSetting);
+                    bean.setRecommendValue(String.valueOf(bestPracticeService.getRecommendValue()));
+                    bean.setLevel(bestPracticeService.getLevel());
+                    bean.setNeedReboot(String.valueOf(bestPracticeService.needReboot()));
+                    String actualValue = String.valueOf(bestPracticeService.getRecommendValue());
                     if (!isCheck) {
-                        BestPracticeBean bean = new BestPracticeBean();
-                        bean.setHostSetting(hostSetting);
-                        bean.setRecommendValue(String.valueOf(bestPracticeService.getRecommendValue()));
-                        bean.setLevel(bestPracticeService.getLevel());
-                        bean.setNeedReboot(String.valueOf(bestPracticeService.needReboot()));
-                        bean.setActualValue(
-                            String.valueOf(bestPracticeService.getCurrentValue(vcsdkUtils, hostObjectId)));
-                        bean.setHostObjectId(hostObjectId);
-                        bean.setHostName(hostName);
-                        bean.setAutoRepair(String.valueOf(bestPracticeService.autoRepair()));
-
-                        checkMap.get(hostSetting).add(bean);
+                        actualValue = String.valueOf(bestPracticeService.getCurrentValue(vcsdkUtils, hostObjectId));
                     }
+                    bean.setActualValue(actualValue);
+                    bean.setHostObjectId(hostObjectId);
+                    bean.setHostName(hostName);
+                    bean.setAutoRepair(String.valueOf(bestPracticeService.autoRepair()));
+
+                    checkMap.get(hostSetting).add(bean);
                 } catch (Exception ex) {
                     // 报错，跳过当前项检查
                     log.error("{} check failed! hostSetting={}, errorMsg={}", hostName,
