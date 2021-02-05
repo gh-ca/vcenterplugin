@@ -37,6 +37,8 @@ export class NfsModifyComponent implements OnInit{
 
   isThin = false; // true 展示重删压缩、false隐藏重删压缩
 
+  getDataFaild = false; // 获取nfs数据异常
+
 
 
   constructor(private modifyService: NfsModifyService, private cdr: ChangeDetectorRef,
@@ -101,6 +103,9 @@ export class NfsModifyComponent implements OnInit{
         } else {
           this.modalLoading=false;
         }
+      } else {
+        this.modalLoading=false;
+        this.getDataFaild = true;
       }
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });

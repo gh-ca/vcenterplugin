@@ -63,6 +63,8 @@ export class RdmComponent implements OnInit {
   hiddenLowerFlag;// 隐藏qos下限 true隐藏、false展示
   latencyIsSelect = false; // 时延为下拉框
 
+  // matchErr = false; // 名称校验
+
 
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
@@ -523,6 +525,22 @@ export class RdmComponent implements OnInit {
     this.configModel.tuning.compressionEnabled = null;
     const storageTypeShow = this.storageDevices.filter(item => item.id == this.configModel.storageId);
     this.compressionShow = storageTypeShow[0].storageTypeShow.compressionShow;
+  }
+
+  /**
+   * 名称校验
+   */
+  nameCheck() {
+    const name = this.configModel.volumeSpecs[0].name;
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    if(reg5.test(name)){
+      //验证重复
+      // this.matchErr=false;
+    } else {
+      //验证重复
+      // this.matchErr=true;
+      this.configModel.volumeSpecs[0].name = null;
+    }
   }
 }
 

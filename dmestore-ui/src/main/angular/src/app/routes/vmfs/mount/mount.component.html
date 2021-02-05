@@ -14,6 +14,7 @@
           </span>
         </div>
         <div *ngIf="isOperationErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.mountError' | translate}}</div>
+        <div *ngIf="isUnmountOperationErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.unMountError' | translate}}</div>
 
         <div *ngIf="notChooseMountDevice" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.mount.notChooseDataStoreTips' | translate}}</div>
         <div *ngIf="notChooseUnmountDevice" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.unmount.notChooseDataStoreTips' | translate}}</div>
@@ -37,7 +38,8 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel();">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="mountOrUnmountFunc();">{{'menu.ok' | translate}}</button>
+      <button type="button" class="btn btn-primary" *ngIf="operationType != 'unmount'" (click)="mountOrUnmountFunc();">{{'menu.ok' | translate}}</button>
+      <button type="button" class="btn btn-primary" *ngIf="operationType == 'unmount'" (click)="unmountTipsShow = true;">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 
@@ -126,7 +128,7 @@
             {{'vmfs.dataHandleLoadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
           </span>
         </div>
-        <div *ngIf="isOperationErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.mountError' | translate}}</div>
+        <div *ngIf="isUnmountOperationErr" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'errorMsg.unMountError' | translate}}</div>
 
         <div *ngIf="notChooseUnmountDevice" class="errorTips" readonly ><clr-icon shape="exclamation-circle" class="is-solid"></clr-icon>{{'vmfs.unmount.notChooseDeviceTips' | translate}}</div>
         <clr-input-container>
@@ -170,10 +172,21 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="cancel();">{{'menu.cancel' | translate}}</button>
-      <button type="submit" class="btn btn-primary" (click)="mountOrUnmountFunc();">{{'menu.ok' | translate}}</button>
+      <button type="submit" class="btn btn-primary" (click)="unmountTipsShow = true;">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 </div>
+<!--卸载提示-->
+<clr-modal [(clrModalOpen)]="unmountTipsShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
+  <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>
+  <div class="modal-body">
+    <p>{{'vmfs.unmount.tips' | translate}}</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline" (click)="unmountTipsShow = false;cancel();">{{'menu.cancel' | translate}}</button>
+    <button type="submit" class="btn btn-primary" (click)="unmountTipsShow = false;mountOrUnmountFunc()">{{'menu.ok' | translate}}</button>
+  </div>
+</clr-modal>
 <!--操作成功提示-->
 <clr-modal [(clrModalOpen)]="mountSuccessShow || unmountSuccessShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
   <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>

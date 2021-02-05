@@ -340,7 +340,7 @@
       "freeCap":"空闲容量",
       "supRate":"订阅率",
       "totalCap":"总容量",
-      "cpuUtilization":"CUP使用率",
+      "cpuUtilization":"CPU使用率",
       "latency":"时延(毫秒)",
       "iops":"IOPS",
       "ops":"OPS",
