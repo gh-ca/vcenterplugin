@@ -53,8 +53,8 @@ export class ReclaimComponent implements OnInit{
           this.reclaimId = queryParam.objectId;
         } else { // dataStore入口
           const ctx = this.globalsService.getClientSdk().app.getContextObjects();
-          // this.objectId = ctx[0].id;
-          this.objectId = "urn:vmomi:Datastore:datastore-4022:674908e5-ab21-4079-9cb1-596358ee5dd1";
+          this.objectId = ctx[0].id;
+          // this.objectId = "urn:vmomi:Datastore:datastore-4022:674908e5-ab21-4079-9cb1-596358ee5dd1";
           this.reclaimId = this.objectId;
         }
         this.modalHandleLoading = true;

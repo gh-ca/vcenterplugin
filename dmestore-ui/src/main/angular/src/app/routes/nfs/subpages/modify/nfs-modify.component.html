@@ -3,6 +3,7 @@
     <h3 class="modal-title">{{'menu.modify' | translate}}</h3>
     <div class="modal-body">
       <p *ngIf="errorMsg" style="color: red">{{'errorMsg.modifyError' | translate}}</p>
+      <p *ngIf="getDataFaild" style="color: red">{{'errorMsg.getDataFailed' | translate}}</p>
       <div *ngIf="modalLoading" class="loadingDiv">
       <span>
         {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
@@ -183,13 +184,14 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="backToNfsList()">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="modifyCommit()">{{'menu.ok' | translate}}</button>
+      <button type="button" class="btn btn-primary" [disabled]="getDataFaild" (click)="modifyCommit()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
   <clr-modal class="add-wizard-wrap" [clrModalOpen]="viewPage=='modify_vcenter'" [clrModalClosable]="false">
     <h3 class="modal-title">{{'menu.modify' | translate}}</h3>
     <div class="modal-body">
       <p *ngIf="errorMsg" style="color: red">{{'errorMsg.modifyError' | translate}}</p>
+      <p *ngIf="getDataFaild" style="color: red">{{'errorMsg.getDataFailed' | translate}}</p>
       <div *ngIf="modalLoading" class="loadingDiv">
       <span>
         {{'vmfs.loadingTips' | translate}}<img src="./assets/images/loading.gif"  width="20px" height="20px" style="margin-left: 20px;">
@@ -369,7 +371,7 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-outline" (click)="closeModel()">{{'menu.cancel' | translate}}</button>
-      <button type="button" class="btn btn-primary" (click)="modifyCommit()">{{'menu.ok' | translate}}</button>
+      <button type="button" class="btn btn-primary" [disabled]="getDataFaild" (click)="modifyCommit()">{{'menu.ok' | translate}}</button>
     </div>
   </clr-modal>
 
