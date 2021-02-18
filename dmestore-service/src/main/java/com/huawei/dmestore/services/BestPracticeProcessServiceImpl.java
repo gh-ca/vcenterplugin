@@ -86,9 +86,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             } catch (SQLException ex) {
                 continue;
             }
-            if (bean.getCount() > 0) {
-                list.add(bean);
-            }
+            list.add(bean);
         }
         return list;
     }
@@ -146,12 +144,12 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                         bean.setRecommendValue(String.valueOf(bestPracticeService.getRecommendValue()));
                         bean.setLevel(bestPracticeService.getLevel());
                         bean.setNeedReboot(String.valueOf(bestPracticeService.needReboot()));
-                        bean.setActualValue(
-                            String.valueOf(bestPracticeService.getCurrentValue(vcsdkUtils, hostObjectId)));
+                        Object currentValue = bestPracticeService.getCurrentValue(vcsdkUtils, hostObjectId);
+                        String actualValue = String.valueOf(currentValue);
+                        bean.setActualValue(actualValue);
                         bean.setHostObjectId(hostObjectId);
                         bean.setHostName(hostName);
                         bean.setAutoRepair(String.valueOf(bestPracticeService.autoRepair()));
-
                         checkMap.get(hostSetting).add(bean);
                     }
                 } catch (Exception ex) {
