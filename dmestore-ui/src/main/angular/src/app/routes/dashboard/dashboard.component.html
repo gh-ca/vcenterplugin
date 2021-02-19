@@ -39,7 +39,7 @@
                   <span class="gh-info-value">--</span>
                 </span>
               </div>
-              <div class="gh-info-item" *ngIf="hostModel.hostIp != '' && hostModel.hostIp != null && hostModel.code != '200'">
+              <div class="gh-info-item" *ngIf="hostModel.hostIp != '' && hostModel.hostIp != null">
                 <span class="gh-info-lable">{{'menu.otherOperations' | translate}}</span>
                 <span class="gh-info-value">
                    <button type="button" (click)="disconnectFlag=true;" class="btn btn-icon" aria-label="home">
