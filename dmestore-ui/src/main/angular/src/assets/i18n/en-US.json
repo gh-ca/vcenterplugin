@@ -10,7 +10,7 @@
     "mount": "Mount",
     "unmount": "Unmount",
     "reclaim": "Reclaim",
-    "changeServiceLevel": "Change Service Level",
+    "changeServiceLevel": "Change DME Storage Strategy",
     "save": "OK",
     "cancel": "Cancel",
     "next": "Next",
@@ -30,7 +30,7 @@
   },
   "validations": {
     "required": "This field is required!",
-    "nameRequired": "This field is required! And can only contain half-width letters, half-width numbers, “_”、“-”、“.”、, Chinese characters.",
+    "nameRequired": "This field is required! And can only contain half-width letters, half-width numbers, “_”、“-”、“.”、and Chinese characters.",
     "minlength": "Should have atleast {{number}} characters",
     "maxlength": "This value should be less than {{number}} characters",
     "min": "This value should be more than {{number}}",
@@ -169,6 +169,8 @@
   },
   "vmfs": {
     "controlPolicy": "Control Policy",
+    "controlPolicyDescOne": "Control Policy",
+    "controlPolicyDescZero": "Control Policy",
     "trafficControlObject": "Traffic Control Object",
     "modifyNameDesc": "Automatically Changing a Volume Name",
     "upperLimitControl": "Upper Limit Control",
@@ -201,8 +203,7 @@
     "freeSpace": "FreeSpace",
     "reserveCapacity": "Reserve Capacity",
     "device": "Device",
-    "serviceLevelName": "ServiceLevel Name",
-    "protectionStatus": "Protection Status",
+    "serviceLevelName": "DME Storage Strategy",
     "multiply": "X",
     "IOPS": "IOPS",
     "IOPSQoSTarget": "IOPS QoS Target",
@@ -224,7 +225,7 @@
     "resourceTuning": "Resource Tuning",
     "provisioningType": "Provision Type",
     "basicInformation": "Basic Information",
-    "byServiceLevel": "By Service Level",
+    "byServiceLevel": "By DME Storage Strategy",
     "custom": "Custom",
     "wwn": "WWN",
     "storage": "Storage",
@@ -238,7 +239,7 @@
     "volumeName": "Volume Name",
     "low": "Low",
     "none": "None",
-    "changeServiceLevel": "Change Service Level",
+    "changeServiceLevel": "Change DME Storage Strategy",
     "expandSize":"Expand Size",
     "host": "host",
     "cluster": "cluster",
@@ -247,7 +248,7 @@
     "endTime": "End Time",
     "timeInputTips": "Please enter start-end time！",
     "capacityTips": "If the version is VMFS5, the minimum capacity is 1G, if the version is VMFS6, the minimum capacity is 2G, and the capacity must be a positive integer in G, and the quantity must be a positive integer!",
-    "serviceLevelCantBeNull": "The service level is a must, and you can only choose the service level whose capacity is not 0!",
+    "serviceLevelCantBeNull": "The DME Storage Strategy is a must, and you can only choose the DME Storage Strategy whose capacity is not 0!",
     "expandTips": "Expansion capacity can only be a positive integer of GB",
     "expandTipsMax": "After expansion, the total capacity cannot exceed 256TB.",
     "loadingTips": "Data loading, please wait",
@@ -264,9 +265,10 @@
       "success": "Successfully expansion!"
     },
     "serviceLevel": {
-      "success": "The service level changed successfully!"
+      "success": "The DME Storage Strategy changed successfully!"
     },
     "protectionStatus": {
+      "name": "Protection Status",
       "protected": "Protected",
       "unprotected": "Unprotected"
     },
@@ -384,7 +386,10 @@
         "model":"Model",
         "az":"AZ",
         "wp":"Warranty Period",
-        "location":"Location"
+        "location":"Location",
+        "latency": "Latency(ms)",
+        "iops": "IOPS",
+        "bandwidth": "Bandwidth(MB/s)"
       },
       "cap":{
         "capacity":"Capacity",
@@ -411,7 +416,7 @@
         "status":"Status",
         "diskType":"disk Type",
         "type":"Type",
-        "serviceLevel":"Service Level",
+        "serviceLevel":"DME Storage Strategy",
         "raidLevel":"RAID Level",
         "totalCap":"Total Capacity",
         "usedCap":"Used Capacity",
@@ -436,7 +441,7 @@
         "capUsage":"Capacity Usage",
         "mapStatus":"Mapping Status",
         "stoPool":"Storage Pool",
-        "serviceLevel":"Service Level",
+        "serviceLevel":"DME Storage Strategy",
         "protStatus":"Protection Status",
         "latency": "Latency(ms)",
         "iops": "IOPS",
@@ -461,7 +466,7 @@
         "dtrees":"DTrees",
         "name":"Name",
         "ofs":"Owning File System",
-        "osl":"Owning Service Level",
+        "osl":"Owning DME Storage Strategy",
         "secMod":"Security Mode",
         "nfs":"NFS",
         "cifs":"CIFS",
@@ -473,7 +478,7 @@
         "sharePath":"Share Path",
         "ofs":"Owning File System",
         "od":"Owning Dtree",
-        "osl":"Owning Service Level"
+        "osl":"Owning DME Storage Strategy"
       },
       "capacity":{
         "pool":{
@@ -621,7 +626,7 @@
     "operation": "Operation",
     "add": "Add",
     "storageType": "Storage Type",
-    "tier": "Tier",
+    "tier": "DME Storage Strategy",
     "storage1": "Storage/Storage Pool",
     "storage": "Storage Device",
     "sPool": "Storage Pool",
@@ -675,7 +680,7 @@
     "storeSet": "Storage Setting",
 
     "createRdmError": "Create RDM Error!",
-    "selectOneSer": "Service Level is not be Null！",
+    "selectOneSer": "DME Storage Strategy is not be Null！",
     "rdmSuccessMsg": "Create RDM Success!",
     "compatibilityMode": {
       "name": "Compatibility Mode",
@@ -819,7 +824,7 @@
     "addError":"Add failed!Please contact management!",
     "modifyError":"Modification failed!Please contact management!",
     "reclaimError":"Space reclamation failed! Please contact the administrator!",
-    "serviceLevelError":"ServiceLevel change failed! Please contact the administrator!",
+    "serviceLevelError":"DME Storage Strategy change failed! Please contact the administrator!",
     "require":"This field is required!",
     "nfsrepeat":"NFS name already exists!",
     "sharerepeat":"Share name already exists!",
@@ -829,7 +834,7 @@
     "numberAndLetter":"Only numbers and letters can be entered!",
     "cantFindData":"Sorry, no relevant data is found!",
     "getDataFailed": "Failed to get data!",
-    "cantChangeServiceLevel": "This device is a Custom type and does not support service level change operation!"
+    "cantChangeServiceLevel": "This device is a Custom type and does not support DME Storage Strategy change operation!"
   },
   "page": {
     "perPage": "Per Page",
