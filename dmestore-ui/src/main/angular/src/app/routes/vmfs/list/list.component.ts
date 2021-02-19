@@ -43,7 +43,7 @@ export class VmfsListComponent implements OnInit {
   @ViewChild('statusFilter') statusFilter:StatusFilter;
   @ViewChild('deviceFilter') deviceFilter:DeviceFilter;
   @ViewChild('serviceLevelFilter') serviceLevelFilter: ServiceLevelFilter;
-  @ViewChild('protectionStatusFilter') protectionStatusFilter:ProtectionStatusFilter;
+  // @ViewChild('protectionStatusFilter') protectionStatusFilter:ProtectionStatusFilter;
 
   expendActive = false; // 示例
   list: VmfsInfo[] = []; // 数据列表
@@ -332,7 +332,7 @@ export class VmfsListComponent implements OnInit {
     this.statusFilter.initStatus();
     this.deviceFilter.initDevice();
     this.serviceLevelFilter.initServiceLevel();
-    this.protectionStatusFilter.initProtectionStatus();
+    // this.protectionStatusFilter.initProtectionStatus();
     this.isFirstLoadChartData = true;
     this.remoteSrv.scanVMFS(this.storageType).subscribe((res: any) => {
       if (res.code === '200') {
@@ -1554,7 +1554,7 @@ export class VmfsListComponent implements OnInit {
     this.volNameRepeatErr = false;
     this.matchErr = false;
 
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if (isVmfs) {
       if (this.form.name) {
         if (reg5.test(this.form.name)) {
@@ -1641,7 +1641,7 @@ export class VmfsListComponent implements OnInit {
     this.vmfsNameRepeatErr = false;
     this.volNameRepeatErr = false;
     this.matchErr = false;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
 
     if (this.modifyForm.name) {
       if (reg5.test(this.modifyForm.name)) {
