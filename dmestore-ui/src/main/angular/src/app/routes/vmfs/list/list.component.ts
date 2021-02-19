@@ -43,7 +43,7 @@ export class VmfsListComponent implements OnInit {
   @ViewChild('statusFilter') statusFilter:StatusFilter;
   @ViewChild('deviceFilter') deviceFilter:DeviceFilter;
   @ViewChild('serviceLevelFilter') serviceLevelFilter: ServiceLevelFilter;
-  @ViewChild('protectionStatusFilter') protectionStatusFilter:ProtectionStatusFilter;
+  // @ViewChild('protectionStatusFilter') protectionStatusFilter:ProtectionStatusFilter;
 
   expendActive = false; // 示例
   list: VmfsInfo[] = []; // 数据列表
@@ -332,7 +332,7 @@ export class VmfsListComponent implements OnInit {
     this.statusFilter.initStatus();
     this.deviceFilter.initDevice();
     this.serviceLevelFilter.initServiceLevel();
-    this.protectionStatusFilter.initProtectionStatus();
+    // this.protectionStatusFilter.initProtectionStatus();
     this.isFirstLoadChartData = true;
     this.remoteSrv.scanVMFS(this.storageType).subscribe((res: any) => {
       if (res.code === '200') {
