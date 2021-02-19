@@ -46,8 +46,8 @@ public class NumberOfVolumesInDatastoreImpl extends BaseBestPracticeService impl
                 JsonObject object = new JsonObject();
                 int volumeSize = datastoreMo.getVmfsDatastoreInfo().getVmfs().getExtent().size();
                 if (volumeSize > Integer.parseInt(getRecommendValue().toString())) {
-                    object.addProperty("dataStoreName", summary.getName());
-                    object.addProperty("volumeSize", volumeSize);
+                    object.addProperty("name", summary.getName());
+                    object.addProperty("value", volumeSize);
                 }
                 array.add(object);
             }
