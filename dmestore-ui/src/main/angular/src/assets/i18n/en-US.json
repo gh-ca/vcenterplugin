@@ -593,7 +593,11 @@
     "syncSuccess": "Sync Success",
     "syncFail": "Sync Failed",
     "exeSuccess": "Execute Success",
-    "exeFail": "Execute Failed"
+    "exeFail": "Execute Failed",
+    "operation": "Operation",
+    "implementation": "Apply",
+    "description": "Description",
+    "applyBestPracticeTips": "There are data with 0 violations in the selected data, please select again!"
   },
   "iscsi": {
     "hostIp": "Host VmKernel IP",

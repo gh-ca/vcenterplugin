@@ -598,7 +598,11 @@
     "syncSuccess": "同步成功",
     "syncFail": "同步失败",
     "exeSuccess": "执行成功",
-    "exeFail": "执行失败"
+    "exeFail": "执行失败",
+    "operation": "操作",
+    "implementation": "实施",
+    "description": "描述",
+    "applyBestPracticeTips": "所选数据中有违规数为0的数据，请重新选择!"
   },
   "iscsi": {
     "hostIp": "主机VmKernel IP",
