@@ -532,7 +532,7 @@ export class RdmComponent implements OnInit {
    */
   nameCheck() {
     const name = this.configModel.volumeSpecs[0].name;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if(reg5.test(name)){
       //验证重复
       // this.matchErr=false;

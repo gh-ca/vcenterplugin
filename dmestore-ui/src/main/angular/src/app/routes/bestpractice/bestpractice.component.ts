@@ -46,6 +46,9 @@ export class BestpracticeComponent implements OnInit {
 
   applyLoading = false;
   checkLoading = false;
+
+  applyTips = false;// 实施最佳实践提示（违规数为0时提示）
+
   constructor(private cdr: ChangeDetectorRef,
               public gs: GlobalsService,
               private http: HttpClient,
@@ -129,6 +132,17 @@ export class BestpracticeComponent implements OnInit {
   }
 
   applyClick(type: string){
+    if (type == '1') {
+      this.rowSelected.forEach((item) => {
+        if (item.count == 0) {
+          this.applyTips = true;
+          return;
+        }
+      });
+      if (this.applyTips) {
+        return;
+      }
+    }
     this.applyType = type;
     let params;
     if(this.applyType == '1'){
@@ -204,6 +218,10 @@ export class BestpracticeComponent implements OnInit {
                 }
                 item.levelDesc = levelDesc;
                 item.levelNum = levelNum;
+                // 违规主机实际值修改
+                item.hostList.forEach(hostInfo => {
+                  hostInfo.actualObjValue = this.getTypeOf(hostInfo.actualValue);
+                });
               });
             }
             this.total = result.data.length;
@@ -230,6 +248,59 @@ export class BestpracticeComponent implements OnInit {
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     }
   }
+
+  /**
+   * 单行实施
+   * @param item
+   */
+  applyOperation(item:Bestpractice){
+    const params = [];
+    this.ips = '';
+    const i = {hostSetting:'', hostObjectIds: []};
+    i.hostSetting = item.hostSetting;
+    item.hostList.forEach((s) => {
+      i.hostObjectIds.push(s.hostObjectId);
+      if (s.needReboot == "true"){
+        this.ips += s.hostName+",";
+      }
+    });
+    params.push(i);
+    this.applyPractice(params);
+  }
+
+  /**
+   * 将字符串转JSON数组
+   * @param obj
+   */
+  getTypeOf(obj) {
+    let object:object;
+    if (typeof obj == 'string' && obj.indexOf("[{") != -1) {
+      object = JSON.parse(obj);
+    } else {
+      object = obj;
+    }
+    return object;
+  }
+
+  /**
+   * 实际值 是否为数组 true 数组 false 字符串
+   * @param obj
+   */
+  isObjectValue(obj) {
+    return (typeof obj) == 'object';
+  }
+
+  /**
+   * 获取实际值文本值
+   * @param obj
+   */
+  getObjectTitle(obj) {
+    let title = '';
+    obj.forEach(item => {
+      title += item.name + " | " + item.value + '\n';
+    });
+    return title;
+  }
 }
 
 class Bestpractice {
@@ -248,6 +319,7 @@ class Host {
   hostName: string;
   recommendValue: number;
   actualValue: number;
+  actualObjValue:any;
   hostObjectId: string;
   needReboot: string;
   hostId: string;
