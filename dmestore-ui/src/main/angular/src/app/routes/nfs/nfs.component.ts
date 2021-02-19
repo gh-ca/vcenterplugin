@@ -526,7 +526,7 @@ export class NfsComponent implements OnInit {
     if(this.addForm.nfsName==null) return false;
     if(this.oldNfsName==this.addForm.nfsName) return false;
     this.oldNfsName=this.addForm.nfsName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if(reg5.test(this.addForm.nfsName)){
       //验证重复
       this.matchErr=false;
@@ -551,7 +551,7 @@ export class NfsComponent implements OnInit {
     if(this.oldShareName=this.addForm.shareName) return false;
 
     this.oldShareName=this.addForm.shareName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if(reg5.test(this.addForm.shareName)){
       //验证重复
       this.matchErr=false;
@@ -567,7 +567,7 @@ export class NfsComponent implements OnInit {
     if(this.oldFsName=this.addForm.fsName) return false;
 
     this.oldFsName=this.addForm.fsName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if(reg5.test(this.addForm.fsName)){
       //验证重复
       this.matchErr=false;
