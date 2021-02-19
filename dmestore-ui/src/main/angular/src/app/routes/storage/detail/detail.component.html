@@ -54,7 +54,7 @@
                 <td class="left">{{'storage.detail.conf.wp' | translate}}</td>
                 <td class="left">{{detail.maintenanceStart}}--{{detail.maintenanceOvertime}}</td>
                 <td class="left">{{'storage.detail.conf.location' | translate}}</td>
-                <td class="left">{{detail.location !=null?detail.location:'--'}}</td>
+                <td class="left over_flow" title="{{detail.location !=null?detail.location:'--'}}" style="width: 11rem;display: inline-block;">{{detail.location !=null?detail.location:'--'}}</td>
               </tr>
             </table>
             <div *ngIf="!detail" style="height: 50%">
