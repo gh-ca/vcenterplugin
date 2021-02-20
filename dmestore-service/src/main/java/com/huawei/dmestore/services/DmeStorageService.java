@@ -70,10 +70,20 @@ public interface DmeStorageService {
      * @param storageId storage id
      * @param pageSize pageSize
      * @param pageNo pageNo
+     * @param name  name
+     * @param status  status
+     * @param allocateType  allocateType
+     * @param attached  attached
+     * @param servicelevelId  servicelevelId
+     * @param sortDir  sortDir
+     * @param sortKey  sortKey
      * @return VolumeListRestponse
      * @throws DmeException when error
      */
-    VolumeListRestponse getVolumesByPage(String storageId, String pageSize, String pageNo) throws DmeException;
+    VolumeListRestponse getVolumesByPage(String storageId, String pageSize, String pageNo,
+                                         String name,String status,String allocateType,
+                                         String attached,String servicelevelId,String sortDir,
+                                         String sortKey) throws DmeException;
 
     /**
      * list FileSystem

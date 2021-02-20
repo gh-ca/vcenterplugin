@@ -198,7 +198,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             Object nfsShareClientAddition = params.get("nfs_share_client_addition");
             List<Map<String, Object>> nfsShareClientArrayAddition = (List<Map<String, Object>>) nfsShareClientAddition;
             String shareName = "";
-            Map<String, Object> createNfsShareParams = null;
+            Map<String, Object> createNfsShareParams = new HashMap<>();
             if (nfsShareClientAddition != null) {
                 Map<String, Object> reqNfsShareClientArrayAddition = new HashMap<>();
                 for (int index = 0; index < nfsShareClientArrayAddition.size(); index++) {
@@ -379,7 +379,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 fileSystemId = fsIds.get(0);
             }
         }
-        FileSystem fileSystem = null;
+        FileSystem fileSystem = new FileSystem();
         Map<String, String> orientedFileSystem = getOrientedFs(fileSystemId);
         if ("200".equals(orientedFileSystem.get("code"))) {
             String fs = orientedFileSystem.get(DATA);
