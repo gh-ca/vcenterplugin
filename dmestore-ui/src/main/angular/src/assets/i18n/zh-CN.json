@@ -617,7 +617,8 @@
     "hStatus": "健康状态",
     "cStatus": "连接状态",
     "ports": "请选择存储设备的以太网端口",
-    "portNullMessage": "端口不能为空！"
+    "portNullMessage": "端口不能为空！",
+    "establishConnect": "建立iSCSI连接"
   },
   "rdm": {
     "name": "名称",
