@@ -102,7 +102,14 @@ public class DmeStorageController extends BaseController {
      *
      * @param storageId storageId
      * @param pageSize  pageSize
-     * @param pageNo    pageNo
+     * @param pageNo  pageNo
+     * @param name  name
+     * @param status  status
+     * @param allocateType  allocateType
+     * @param attached  attached
+     * @param servicelevelId  servicelevelId
+     * @param sortDir  sortDir
+     * @param sortKey  sortKey
      * @return ResponseBodyBean
      */
     @GetMapping("/volumes/byPage")
@@ -110,9 +117,18 @@ public class DmeStorageController extends BaseController {
     public ResponseBodyBean getVolumesByPage(
         @RequestParam(name = "storageId", required = false, defaultValue = "") String storageId,
         @RequestParam(name = "pageSize", required = false, defaultValue = "20") String pageSize,
-        @RequestParam(name = "pageNo", required = false, defaultValue = "0") String pageNo) {
+        @RequestParam(name = "pageNo", required = false, defaultValue = "0") String pageNo,
+        @RequestParam(name = "name", required = false, defaultValue = "") String name,
+        @RequestParam(name = "status", required = false, defaultValue = "") String status,
+        @RequestParam(name = "allocateType", required = false, defaultValue = "") String allocateType,
+        @RequestParam(name = "attached", required = false, defaultValue = "") String attached,
+        @RequestParam(name = "servicelevelId", required = false, defaultValue = "") String servicelevelId,
+        @RequestParam(name = "sortDir", required = false, defaultValue = "") String sortDir,
+        @RequestParam(name = "sortKey", required = false, defaultValue = "") String sortKey) {
         try {
-            return success(dmeStorageService.getVolumesByPage(storageId, pageSize, pageNo));
+            return success(dmeStorageService
+                .getVolumesByPage(storageId, pageSize, pageNo, name, status, allocateType, attached, servicelevelId,
+                    sortDir, sortKey));
         } catch (DmeException e) {
             return failure(e.getMessage());
         }
