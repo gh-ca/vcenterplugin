@@ -617,7 +617,8 @@
     "hStatus": "Health Status",
     "cStatus": "Connect Status",
     "ports": "Please Select Storage Device Ports",
-    "portNullMessage": "Port is not be Empty!"
+    "portNullMessage": "Port is not be Empty!",
+    "establishConnect": "Establish an iSCSI connection"
   },
   "rdm": {
     "name": "Name",

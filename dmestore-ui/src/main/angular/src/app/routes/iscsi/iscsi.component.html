@@ -83,7 +83,7 @@
       <p><span [hidden]="configModel.ethPorts.length != 0 || !isSubmit" style="color: #c61d00;">{{'iscsi.portNullMessage'|translate}}</span></p>
     </div>
     <div style="margin-top: 20px;margin-bottom: 40px">
-      <button type="button" style="display:block;margin:0 auto" class="btn btn-primary" (click)="submit()">{{'menu.ok' | translate}}</button>
+      <button type="button" style="display:block;margin:0 auto" class="btn btn-primary" (click)="submit()">{{'iscsi.establishConnect' | translate}}</button>
     </div>
   </div>
   <div class="loadingDiv" [hidden]="!ipLoading"><clr-spinner class="spinner spinner-md">Loading</clr-spinner></div>
