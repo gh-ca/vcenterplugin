@@ -804,11 +804,16 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             }
         }
     }
-
     @Override
-    public void deleteNfs(Map<String, Object> params) throws DmeException {
-        String dataStorageId = ToolUtils.getStr(params.get(DATASTOREOBJECTID));
-
+    public void bulkDeletionNfs(List<String> storeObjectIds) throws DmeException{
+        if (storeObjectIds != null && storeObjectIds.size() != 0) {
+            for (String dataStorageId : storeObjectIds) {
+                deleteNfs(dataStorageId);
+            }
+        }
+    }
+    @Override
+    public void deleteNfs(String dataStorageId) throws DmeException {
         // DME侧删除nfs
         dmeDeleteNfs(dataStorageId);
 

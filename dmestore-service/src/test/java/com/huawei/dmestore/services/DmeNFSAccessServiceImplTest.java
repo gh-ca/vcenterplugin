@@ -615,7 +615,7 @@ public class DmeNFSAccessServiceImplTest {
         list.add("321");
         list.add("321");
         when(taskService.checkTaskStatus(list)).thenReturn(true);
-        dmeNFSAccessService.deleteNfs(params);
+        dmeNFSAccessService.deleteNfs("321");
 
     }
 
