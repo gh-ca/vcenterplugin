@@ -854,7 +854,8 @@
     "select": "Please select",
     "disconnected": "Whether to disconnect DME ?",
     "operationSuccessful": "Operation successful!",
-    "operationFailed": "Operation failed!"
+    "operationFailed": "Operation failed!",
+    "noData": "No data"
   },
   "chart": {
     "select": {

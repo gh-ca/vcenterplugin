@@ -854,7 +854,8 @@
     "select": "请选择",
     "disconnected": "是否断开DME连接 ？",
     "operationSuccessful": "操作成功!",
-    "operationFailed": "操作失败!"
+    "operationFailed": "操作失败!",
+    "noData": "暂无数据"
   },
   "chart": {
     "select": {
