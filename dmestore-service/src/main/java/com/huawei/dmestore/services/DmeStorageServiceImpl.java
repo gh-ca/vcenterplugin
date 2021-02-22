@@ -446,11 +446,11 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         VolumeListRestponse volumeListRestponse = new VolumeListRestponse();
         List<Volume> volumes = new ArrayList<>();
         String url = DmeConstants.DME_VOLUME_BASE_URL + "?";
-        concatUrl(sortKey, storageId, pageSize, pageNo,
-            name, status, allocateType, attached,
-            servicelevelId, sortDir, sortKey);
+        String path =
+            concatUrl(url, storageId, pageSize, pageNo, name, status, allocateType, attached, servicelevelId, sortDir,
+                sortKey);
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(path, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
                 throw new DmeException(CODE_503, "list volumes error!");
@@ -482,7 +482,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         return volumeListRestponse;
     }
 
-    private void concatUrl(String url,String storageId, String pageSize, String pageNo,
+    private String concatUrl(String url,String storageId, String pageSize, String pageNo,
                              String name,String status,String allocateType,
                              String attached,String servicelevelId,String sortDir,
                              String sortKey) {
@@ -519,6 +519,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         if (!StringUtils.isEmpty(sortKey)) {
             url = url + "sort_key=" + sortKey + "&";
         }
+        return url;
     }
     private Volume parseVolume(JsonObject element) throws DmeException {
         Volume volume = new Volume();

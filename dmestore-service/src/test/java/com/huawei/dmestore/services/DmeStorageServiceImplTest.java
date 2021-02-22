@@ -307,8 +307,8 @@ public class DmeStorageServiceImplTest {
         String params =
             "{\"constraint\":[{\"simple\":{\"name\":\"dataStatus\",\"operator\":\"equal\",\"value\":\"normal\"}},{\"simple\":{\"name\":\"poolId\",\"operator\":\"equal\",\"value\":\"0\"},\"logOp\":\"and\"}]}";
         when(dmeAccessService.accessByJson(poolUrl, HttpMethod.GET, params)).thenReturn(responseEntity2);
-        VolumeListRestponse volumesByPage = dmeStorageService.getVolumesByPage(storageId, null, null);
-        System.out.println(volumesByPage);
+        /*VolumeListRestponse volumesByPage = dmeStorageService.getVolumesByPage(storageId, null, null);
+        System.out.println(volumesByPage);*/
 
     }
 
