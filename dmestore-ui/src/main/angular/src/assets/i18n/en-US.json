@@ -43,7 +43,8 @@
   "table": {
     "name": "Name",
     "id": "ID",
-    "description": "Description"
+    "description": "Description",
+    "createDmeStorage": "Create DME data store"
   },
   "nfs":{
     "name":"Name",
@@ -853,7 +854,8 @@
     "select": "Please select",
     "disconnected": "Whether to disconnect DME ?",
     "operationSuccessful": "Operation successful!",
-    "operationFailed": "Operation failed!"
+    "operationFailed": "Operation failed!",
+    "noData": "No data"
   },
   "chart": {
     "select": {

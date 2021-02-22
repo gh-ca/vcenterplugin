@@ -43,7 +43,8 @@
   "table": {
     "name": "名称",
     "id": "编号",
-    "description": "描述"
+    "description": "描述",
+    "createDmeStorage": "创建DME数据存储"
   },
   "nfs":{
     "name":"名称",
@@ -853,7 +854,8 @@
     "select": "请选择",
     "disconnected": "是否断开DME连接 ？",
     "operationSuccessful": "操作成功!",
-    "operationFailed": "操作失败!"
+    "operationFailed": "操作失败!",
+    "noData": "暂无数据"
   },
   "chart": {
     "select": {

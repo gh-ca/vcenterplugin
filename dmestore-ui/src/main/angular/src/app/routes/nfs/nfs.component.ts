@@ -476,7 +476,7 @@ export class NfsComponent implements OnInit {
   // 删除按钮点击事件
   delBtnFunc() {
     const flag = 'plugin';
-    const objectid=this.rowSelected[0].objectid;
+    const objectid = this.rowSelected.map(item => item.objectid);
     this.router.navigate(['nfs/delete'],{
       queryParams:{
         objectid,flag

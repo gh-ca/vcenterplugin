@@ -200,46 +200,48 @@
                       </div>
                     </div>
                     <clr-datagrid [clrDgLoading]="isLoading">
-                      <clr-dg-column [clrDgField]="'name'">{{'storage.detail.volumes.name' | translate}}</clr-dg-column>
+                      <clr-dg-column [clrDgField]="'name'" (clrFilterValueChange)="volQueryChange($event, null,null);">
+                        {{'storage.detail.volumes.name' | translate}}
+                      </clr-dg-column>
                       <clr-dg-column>
                         {{'storage.detail.volumes.status' | translate}}
                         <clr-dg-filter [clrDgFilter]="volStatusFilter">
-                          <vol-status-filter #volStatusFilter></vol-status-filter>
+                          <vol-status-filter #volStatusFilter (change)="volQueryChange(null, null, null);"></vol-status-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
 
-                      <clr-dg-column class="hideFilter" [clrDgField]="'capacity'" [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.totalCap' | translate}}</clr-dg-column>
+                      <clr-dg-column class="hideFilter" [clrDgField]="'capacity'" (clrDgSortOrderChange)="volQueryChange(null, $event, null)" [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.totalCap' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">
                         {{'storage.detail.volumes.proType' | translate}}
                         <clr-dg-filter [clrDgFilter]="portTypeFilter">
-                          <por-type-filter #portTypeFilter></por-type-filter>
+                          <por-type-filter #portTypeFilter (change)="volQueryChange(null, null, null);"></por-type-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
-                      <clr-dg-column class="hideFilter" [clrDgField]="'capacityUsage'" [hidden]="volumeRadio!=='table1'" style="width: 11rem;">{{'storage.detail.volumes.capUsage' | translate}}</clr-dg-column>
+                      <clr-dg-column class="hideFilter" [clrDgField]="'capacityUsageNum'" [hidden]="volumeRadio!=='table1'" style="width: 11rem;">{{'storage.detail.volumes.capUsage' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">
                         {{'storage.detail.volumes.mapStatus' | translate}}
                         <clr-dg-filter [clrDgFilter]="mapStatusFilter">
-                          <map-status-filter #mapStatusFilter></map-status-filter>
+                          <map-status-filter #mapStatusFilter (change)="volQueryChange(null, null, null);"></map-status-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">
                         {{'storage.detail.volumes.stoPool' | translate}}
                         <clr-dg-filter [clrDgFilter]="volStoragePoolFilter">
-                          <vol-pool-filter #volStoragePoolFilter></vol-pool-filter>
+                          <vol-pool-filter #volStoragePoolFilter (change)="volQueryChange(null, null, null);"></vol-pool-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">
                         {{'storage.detail.volumes.serviceLevel' | translate}}
                         <clr-dg-filter [clrDgFilter]="volServiceLevelFilter">
-                          <vol-serviceLevel-filter #volServiceLevelFilter></vol-serviceLevel-filter>
+                          <vol-serviceLevel-filter #volServiceLevelFilter (change)="volQueryChange(null, null, null);"></vol-serviceLevel-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
-                      <clr-dg-column [hidden]="volumeRadio!=='table1'">
-                        {{'storage.detail.volumes.protStatus' | translate}}
-                        <clr-dg-filter [clrDgFilter]="volProtectionStatusFilter">
-                          <vol-protection-status-filter #volProtectionStatusFilter></vol-protection-status-filter>
-                        </clr-dg-filter>
-                      </clr-dg-column>
+<!--                      <clr-dg-column [hidden]="volumeRadio!=='table1'">-->
+<!--                        {{'storage.detail.volumes.protStatus' | translate}}-->
+<!--                        <clr-dg-filter [clrDgFilter]="volProtectionStatusFilter">-->
+<!--                          <vol-protection-status-filter #volProtectionStatusFilter></vol-protection-status-filter>-->
+<!--                        </clr-dg-filter>-->
+<!--                      </clr-dg-column>-->
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">{{'storage.detail.volumes.dataStore' | translate}}</clr-dg-column>
 
                       <clr-dg-column class="hideFilter" [clrDgField]="'lantency'" [hidden]="volumeRadio!=='table2'">{{'storage.detail.volumes.latency' | translate}}</clr-dg-column>
@@ -297,10 +299,10 @@
                         </clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.storagePoolName}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.serviceLevelName}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">
-                          <span *ngIf="item.protectionStatus">{{'enum.status.protected' | translate}}</span>
-                          <span *ngIf="!item.protectionStatus">{{'enum.status.unprotected' | translate}}</span>
-                        </clr-dg-cell>
+<!--                        <clr-dg-cell [hidden]="volumeRadio!=='table1'">-->
+<!--                          <span *ngIf="item.protectionStatus">{{'enum.status.protected' | translate}}</span>-->
+<!--                          <span *ngIf="!item.protectionStatus">{{'enum.status.unprotected' | translate}}</span>-->
+<!--                        </clr-dg-cell>-->
                         <clr-dg-cell [hidden]="volumeRadio!=='table1'">{{item.datastores}}</clr-dg-cell>
 
                         <clr-dg-cell [hidden]="volumeRadio!=='table2'">{{item.lantency}}</clr-dg-cell>

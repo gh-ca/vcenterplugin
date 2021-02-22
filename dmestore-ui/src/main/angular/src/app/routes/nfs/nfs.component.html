@@ -16,7 +16,7 @@
           <div aria-label="Dropdown header Action 2" [disabled]="rowSelected.length !== 1" clrDropdownItem (click)="mount();"> {{'menu.mount' | translate}}</div>
           <div aria-label="Dropdown header Action 2" [disabled]="rowSelected.length !== 1" clrDropdownItem (click)="unmountBtnFunc();">{{'menu.unmount' | translate}}</div>
           <div class="dropdown-divider" role="separator" aria-hidden="true"></div>
-          <div aria-label="Dropdown header Action 2" [disabled]="rowSelected.length !== 1" clrDropdownItem (click)="delBtnFunc();">{{'menu.del' | translate}}</div>
+          <div aria-label="Dropdown header Action 2" [disabled]="rowSelected.length == 0" clrDropdownItem (click)="delBtnFunc();">{{'menu.del' | translate}}</div>
         </clr-dropdown-menu>
       </clr-dropdown>
     </div>
@@ -116,7 +116,7 @@
   </div>
   <!--添加弹框-->
   <clr-wizard #wizard [clrWizardOpen]="addModelShow" [clrWizardClosable]="false">
-    <clr-wizard-title>{{'nfs.add_title' | translate}}</clr-wizard-title>
+    <clr-wizard-title>{{'table.createDmeStorage' | translate}}</clr-wizard-title>
     <p *ngIf="errorMsg" style="color: red">{{'errorMsg.addError' | translate}}</p>
     <div *ngIf="modalLoading" class="loadingDiv">
       <span>

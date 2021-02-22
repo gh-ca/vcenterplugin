@@ -42,12 +42,13 @@ import {
   StoragePoolTypeFilter, VolProtectionStatusFilter, VolServiceLevelFilter,
   VolStatusFilter, VolStoragePoolFilter
 } from "../filter.component";
+import {ServiceLevelList, VmfsListService} from "../../vmfs/list/list.service";
 @Component({
   selector: 'app-detail',
   templateUrl: './detail.component.html',
   styleUrls: ['./detail.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [DetailService, TranslatePipe, MakePerformance, NfsService],
+  providers: [DetailService, TranslatePipe, MakePerformance, NfsService, VmfsListService],
 })
 export class DetailComponent implements OnInit, AfterViewInit {
 
@@ -124,7 +125,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   constructor(private nfsService:NfsService, private makePerformance: MakePerformance,
               private detailService: DetailService, private cdr: ChangeDetectorRef, private ngZone: NgZone,
               private gs: GlobalsService,private activatedRoute: ActivatedRoute,private router:Router,
-              private translatePipe:TranslatePipe) { }
+              private translatePipe:TranslatePipe, private vmfsListService: VmfsListService) { }
   detail: StorageDetail;
   storagePool: StoragePool[];
   volumes: Volume[];
@@ -200,6 +201,11 @@ export class DetailComponent implements OnInit, AfterViewInit {
   @ViewChild('dtreeQuotaFilter') dtreeQuotaFilter:DtreeQuotaFilter;
   @ViewChild('dtreeQuotaFilter') dtreeSecModFilter:DtreeSecModFilter;
 
+  serviceLevelList: ServiceLevelList[] = []; // 服务等级列表
+  volName:string; // 卷名称 筛选
+  volSortDir:any;// 卷 排序方式-1 降序 1 升序
+  volSortKey:string; //卷 排序字段名称 capacity_usage/capacity
+  volReqParam; // 卷请求参数
 
   storageDetailTag:number;
   //portList:
@@ -210,7 +216,24 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
     this.getStorageDetail(true);
     this.getStoragePoolList(true);
+    // 初始化服务等级数据
+    this.setServiceLevelList();
 
+  }
+  // 获取服务等级数据
+  setServiceLevelList() {
+    // 初始化服务等级选择参数
+    this.gs.loading=true;
+    // 获取服务等级数据
+    this.vmfsListService.getServiceLevelList().subscribe((result: any) => {
+      if (result.code === '200' && result.data !== null) {
+        this.serviceLevelList = result.data.filter(item => item.totalCapacity !== 0);
+      }
+      // 隐藏loading
+      this.gs.loading=false;
+      // this.gs.loading = false;
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
+    });
   }
   ngAfterViewInit() {
     this.ngZone.runOutsideAngular(() => this.initChart());
@@ -470,32 +493,39 @@ export class DetailComponent implements OnInit, AfterViewInit {
     this.mapStatusFilter.initStatus();
     this.volStoragePoolFilter.initPoolNameStatus();
     this.volServiceLevelFilter.initServiceLevel();
-    this.volProtectionStatusFilter.initProtectionStatus();
+    // this.volProtectionStatusFilter.initProtectionStatus();
+    // 清空查询条件
+    this.clearVolSearchInfo();
     this.getStorageVolumeList(true);
   }
   getStorageVolumeList(fresh: boolean){
-    console.log('paginationVolume');
-    const reqParams = {
-      storageId: this.storageId,
-      pageSize: this.volumePageSize,
-      pageNo: (this.volumeCurrentPage - 1) * this.volumePageSize,
+    let reqParams;
+    if (this.volReqParam != null) {
+      reqParams = this.volReqParam;
+      this.volReqParam.pageSize = this.volumePageSize;
+      this.volReqParam.pageNo = (this.volumeCurrentPage - 1) * this.volumePageSize;
+    } else {
+      reqParams = {
+        storageId: this.storageId,
+        pageSize: this.volumePageSize,
+        pageNo: (this.volumeCurrentPage - 1) * this.volumePageSize,
+      }
     }
-    console.log('reqParams', reqParams)
     if (fresh){
       this.gs.loading=true;
       this.detailService.getVolumeListListByPage(reqParams).subscribe((r: any) => {
         this.gs.loading=false;
-        console.log("result", r);
         if (r.code === '200'){
 
           this.volumes = r.data.volumeList;
           this.volumeTotal=r.data.count;
-
+          this.volumes.forEach(vol => {
+            vol.capacityUsageNum = vol.capacityUsage ? Number.parseFloat(vol.capacityUsage):0;
+          });
           // 设置总页数、footer
           this.setVolumeTotalAndFooter();
 
           // this.totalPageNum = '/' + ' ' + Math.ceil(this.volumeTotal/(query ? query.pageSize:10));
-          console.log('this.totalPageNum', this.totalPageNum);
           if (this.volumeRadio === 'table2') {
             this.listVolumesperformance();
           }
@@ -508,15 +538,15 @@ export class DetailComponent implements OnInit, AfterViewInit {
         this.gs.loading=true;
         this.detailService.getVolumeListListByPage(reqParams).subscribe((r: any) => {
           this.gs.loading=false;
-          console.log("result", r);
           if (r.code === '200'){
             this.volumes = r.data.volumeList;
             this.volumeTotal=r.data.count;
-
+            this.volumes.forEach(vol => {
+              vol.capacityUsageNum = vol.capacityUsage ? Number.parseFloat(vol.capacityUsage):0;
+            });
             // 设置总页数、footer
             this.setVolumeTotalAndFooter();
             // this.totalPageNum = '/' + ' ' + Math.ceil(this.volumeTotal/(query ? query.pageSize:10));
-            console.log('this.totalPageNum', this.totalPageNum);
 
             if (this.volumeRadio === 'table2') {
               this.listVolumesperformance();
@@ -618,13 +648,10 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }
   }
   getShareList(fresh: boolean){
-    console.log(11)
     if (fresh){
-      console.log(22)
       this.gs.loading=true;
       this.detailService.getShareList(this.storageId).subscribe((r: any) => {
         this.gs.loading=false;
-        console.log(33)
         if (r.code === '200'){
           this.shares = r.data;
           this.shareTotal=this.shares==null?0:this.shares.length;
@@ -632,14 +659,11 @@ export class DetailComponent implements OnInit, AfterViewInit {
         this.cdr.detectChanges();
       });
     }else {
-      console.log(44)
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.shares == null){
-        console.log(55)
         this.gs.loading=true;
         this.detailService.getShareList(this.storageId).subscribe((r: any) => {
           this.gs.loading=false;
-          console.log(66)
           if (r.code === '200'){
             this.shares = r.data;
             this.shareTotal=this.shares==null?0:this.shares.length;
@@ -817,7 +841,6 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }
     this.capSave.bars=bars;
     this.capSave.rate=(this.capSave.beforeSave/this.capSave.afterSave).toFixed(0) +": 1";
-    console.log('capSave',this.capSave);
 
   }
   initCapacityDistribution(){
@@ -896,7 +919,6 @@ export class DetailComponent implements OnInit, AfterViewInit {
         end_time: endTime,
       }
       this.nfsService.getLineChartData(url, params).subscribe((result: any) => {
-        console.log('chartData: ', title, result);
         if (result.code === '200' && result.data !== null && result.data !== null) {
           const resData = result.data;
           // 设置标题
@@ -918,8 +940,6 @@ export class DetailComponent implements OnInit, AfterViewInit {
           this.makePerformance.setXAxisData(uppers, chart);
           // 设置y轴最大值
           chart.yAxis.max = (pmaxData > lmaxData ? pmaxData : lmaxData);
-          console.log('chart.yAxis.pmaxData', pmaxData);
-          console.log('chart.yAxis.lmaxData', lmaxData);
           // 设置Read 折线图数据
           uppers.forEach(item => {
             for (const key of Object.keys(item)) {
@@ -1031,8 +1051,6 @@ export class DetailComponent implements OnInit, AfterViewInit {
       && this.rangeTime.controls.start.value !== null && this.rangeTime.controls.end.value !== null) { // 需满足输入规范且不为空
       this.startTime = this.rangeTime.controls.start.value._d.getTime();
       this.endTime = this.rangeTime.controls.end.value._d.getTime();
-      console.log('startTime', this.startTime);
-      console.log('endTime', this.endTime);
       this.changeFunc();
     } else {
       return;
@@ -1041,7 +1059,6 @@ export class DetailComponent implements OnInit, AfterViewInit {
 
   // 切换卷函数
   changeFunc() {
-    console.log(this.selectRange);
     if (this.selectRange === 'BEGIN_END_TIME') {
       if (this.startTime === null || this.endTime === null) {
         console.log('开始结束时间不能为空');
@@ -1151,5 +1168,61 @@ export class DetailComponent implements OnInit, AfterViewInit {
       this.volumeTotal:this.volumeCurrentPage*this.volumePageSize;
     const first = (this.volumeCurrentPage - 1)*this.volumePageSize + 1;
     this.volumeFooter = first + ' - ' + last;
+  }
+
+  /**
+   * vol 条件查询
+   */
+  volQueryChange(name, caObject, caUObject) {
+    let serviceLevelId;
+    if (this.volServiceLevelFilter.serviceLevel) {
+      serviceLevelId = this.serviceLevelList.filter(item => item.name == this.volServiceLevelFilter.serviceLevel)[0].id;
+    }
+    if (name != null) {
+      this.volName = name;
+    }
+    if (caObject != null || caUObject != null) {
+      if (caObject != null) {
+        this.volSortKey = 'size';
+      } else if (caUObject != null) {
+        // this.volSortKey = 'capacity_usage';
+      }
+      if (caObject == 1 || caUObject == 1) {
+        this.volSortDir = "asc";
+      } else if (caObject == -1 || caUObject == -1) {
+        this.volSortDir = "desc";
+      } else {
+        this.volSortDir = null;
+        return;
+      }
+    }
+    // this.volumeCurrentPage = 1;
+    const requestParams = {
+      name:this.volName ? this.volName:"", //名称
+      status:this.volStatusFilter.status ? this.volStatusFilter.status:"", //状态
+      allocateType:this.portTypeFilter.type ? this.portTypeFilter.type:"", //分配类型
+      attached:this.mapStatusFilter.status ? this.mapStatusFilter.status:"", // 映射状态
+      servicelevelId:serviceLevelId ? serviceLevelId:"", //服务等级ID
+      sortDir:this.volSortDir ? this.volSortDir:"", // 排序方式 desc 降序 asc 升序
+      sortKey:this.volSortKey ? this.volSortKey:"", // 排序字段名称
+      storageId: this.storageId,
+      pageSize: this.volumePageSize,
+      pageNo: (this.volumeCurrentPage - 1) * this.volumePageSize,
+    }
+    this.volReqParam = requestParams;
+    this.getStorageVolumeList(true);
+  }
+
+  /**
+   * vol 查询条件清空
+   */
+  clearVolSearchInfo() {
+    this.volName = null;
+    this.volStatusFilter.initStatus();
+    this.portTypeFilter.initType();
+    this.mapStatusFilter.initStatus();
+    this.volSortDir = null;
+    this.volSortKey = null;
+    this.volReqParam = null;
   }
 }

@@ -1,5 +1,5 @@
 <clr-wizard #wizard [clrWizardOpen]="viewPage=='add_plugin'" [clrWizardClosable]="false">
-  <clr-wizard-title>{{'nfs.add_title' | translate}}</clr-wizard-title>
+  <clr-wizard-title>{{'table.createDmeStorage' | translate}}</clr-wizard-title>
   <p *ngIf="errorMsg" style="color: red">{{'errorMsg.addError' | translate}}</p>
   <div *ngIf="modalLoading" class="loadingDiv">
     <span>
@@ -313,7 +313,7 @@
   </clr-wizard-page>
 </clr-wizard>
 <clr-wizard class="add-wizard-wrap" #wizard [clrWizardOpen]="viewPage=='add_vcenter'" [clrWizardClosable]="false">
-  <clr-wizard-title>{{'nfs.add_title' | translate}}</clr-wizard-title>
+  <clr-wizard-title>{{'table.createDmeStorage' | translate}}</clr-wizard-title>
   <p *ngIf="errorMsg" style="color: red">{{'errorMsg.addError' | translate}}</p>
   <div *ngIf="modalLoading" class="loadingDiv">
     <span>
