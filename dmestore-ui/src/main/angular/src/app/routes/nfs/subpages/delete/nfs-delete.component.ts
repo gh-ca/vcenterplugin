@@ -40,9 +40,16 @@ export class NfsDeleteComponent implements OnInit{
   }
   delNfs(){
     this.modalHandleLoading=true;
-    var params={
-      "dataStoreObjectId": this.dataStoreObjectId
-    };
+    let params;
+    if (typeof this.dataStoreObjectId != 'object') {
+      params={
+        "storeObjectId": this.dataStoreObjectId
+      };
+    } else {
+      params={
+        "storeObjectIds": this.dataStoreObjectId
+      };
+    }
     this.deleteService.delNfs(params).subscribe((result: any) => {
       this.modalHandleLoading=false;
       if (result.code === '200'){
