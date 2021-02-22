@@ -11,6 +11,11 @@ import java.util.Map;
  **/
 public class DmeConstants {
     /**
+     *  POST
+     *  estimate connectivity of host or hostgroup on dme
+     */
+    public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/vmmgmt/v1/connectivity/host-storage";
+    /**
      * nfs share detail
      **/
     public static final String DME_NFS_SHARE_DETAIL_URL = "/rest/fileservice/v1/nfs-shares/{nfs_share_id}";

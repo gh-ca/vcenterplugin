@@ -53,6 +53,8 @@ public class BaseController {
 
     private static final String CODE_CERT_EXCEPTION = "-80002";
 
+    private static final String CODE_CONNECTIVITY_FAILURE = "-60001";
+
     private static final String PREFIX = "-50";
 
     private static final String FIELD_CODE = "code";

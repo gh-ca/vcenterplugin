@@ -8,6 +8,7 @@ import com.huawei.dmestore.entity.VCenterInfo;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.exception.DmeSqlException;
 import com.huawei.dmestore.exception.VcenterException;
+import com.huawei.dmestore.model.ResponseBodyBean;
 import com.huawei.dmestore.model.SmartQos;
 import com.huawei.dmestore.model.Storage;
 import com.huawei.dmestore.model.StorageDetail;
@@ -686,6 +687,24 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             throw new DmeException(ex.getMessage());
         }
         return objId;
+    }
+
+    @Override
+    public ResponseBodyBean estimateConnectivityOfHostOrHostgroup(String storageId, String hostId, String hostgroupId)
+        throws DmeException {
+
+        if (!StringUtils.isEmpty(storageId)) {
+            LOG.error("estimate connectivity of host or hostgroup storageid param error!",storageId);
+            throw new DmeException("estimate connectivity of host or hostgroup storageid param error!");
+        }
+        if (!StringUtils.isEmpty(hostId)) {
+            //检查主机连通性
+        }
+        if (!StringUtils.isEmpty(hostgroupId)) {
+            //检查主机组连通性
+        }
+
+        return null;
     }
 
     private String checkOrAddHostToHosts(List<String> initiatorList,String hostGroupId,String hostName) throws DmeException {
@@ -2267,4 +2286,5 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     private String getStorageModelByWwn(String wwn) throws DmeSqlException {
         return dmeVmwareRalationDao.getStorageModelByWwn(wwn);
     }
+
 }

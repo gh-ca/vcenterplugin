@@ -1,6 +1,7 @@
 package com.huawei.dmestore.services;
 
 import com.huawei.dmestore.exception.DmeException;
+import com.huawei.dmestore.model.ResponseBodyBean;
 import com.huawei.dmestore.model.VmfsDataInfo;
 import com.huawei.dmestore.model.VmfsDatastoreVolumeDetail;
 
@@ -156,4 +157,16 @@ public interface VmfsAccessService {
      * @throws DmeException DmeException
      **/
     String checkOrCreateToHost(String hostIp, String hostId) throws DmeException;
+
+    /**
+     * 判断dme主机或者主机组的连通性
+     *
+     * @param storageId   存储设备Id
+     * @param hostId      dme主机id
+     * @param hostgroupId dme主机组Id
+     * @return 连通性结果提示
+     * @throws DmeException error
+     */
+    ResponseBodyBean estimateConnectivityOfHostOrHostgroup(String storageId, String hostId, String hostgroupId)
+        throws DmeException;
 }
