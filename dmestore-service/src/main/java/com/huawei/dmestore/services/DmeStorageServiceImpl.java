@@ -507,9 +507,6 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         if (!StringUtils.isEmpty(attached)) {
             url = url + "attached=" + attached + "&";
         }
-        if (!StringUtils.isEmpty(attached)) {
-            url = url + "attached=" + attached + "&";
-        }
         if (!StringUtils.isEmpty(servicelevelId)) {
             url = url + "service_level_id=" + servicelevelId + "&";
         }
