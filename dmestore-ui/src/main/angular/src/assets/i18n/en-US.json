@@ -43,7 +43,8 @@
   "table": {
     "name": "Name",
     "id": "ID",
-    "description": "Description"
+    "description": "Description",
+    "createDmeStorage": "Create DME data store"
   },
   "nfs":{
     "name":"Name",

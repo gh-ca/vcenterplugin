@@ -43,7 +43,8 @@
   "table": {
     "name": "名称",
     "id": "编号",
-    "description": "描述"
+    "description": "描述",
+    "createDmeStorage": "创建DME数据存储"
   },
   "nfs":{
     "name":"名称",

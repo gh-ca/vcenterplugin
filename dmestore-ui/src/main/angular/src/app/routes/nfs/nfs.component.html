@@ -116,7 +116,7 @@
   </div>
   <!--添加弹框-->
   <clr-wizard #wizard [clrWizardOpen]="addModelShow" [clrWizardClosable]="false">
-    <clr-wizard-title>{{'nfs.add_title' | translate}}</clr-wizard-title>
+    <clr-wizard-title>{{'table.createDmeStorage' | translate}}</clr-wizard-title>
     <p *ngIf="errorMsg" style="color: red">{{'errorMsg.addError' | translate}}</p>
     <div *ngIf="modalLoading" class="loadingDiv">
       <span>
