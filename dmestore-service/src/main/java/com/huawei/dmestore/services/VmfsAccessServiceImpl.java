@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 
 import java.util.Set;
+import jdk.nashorn.internal.parser.Parser;
 import sun.rmi.runtime.Log;
 
 /**
@@ -693,18 +694,50 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     public ResponseBodyBean estimateConnectivityOfHostOrHostgroup(String storageId, String hostId, String hostgroupId)
         throws DmeException {
 
+        ResponseBodyBean responseBodyBean = new ResponseBodyBean();
+        Map<String, String> requestBody = new HashMap<>();
         if (!StringUtils.isEmpty(storageId)) {
             LOG.error("estimate connectivity of host or hostgroup storageid param error!",storageId);
-            throw new DmeException("estimate connectivity of host or hostgroup storageid param error!");
+            throw new DmeException("estimate connectivity of host or hostgroup , storageid param error!");
         }
+        requestBody.put("storage_id", storageId);
         if (!StringUtils.isEmpty(hostId)) {
-            //检查主机连通性
+            //检查主机连通性参数
+            requestBody.put("host_id", hostId);
         }
         if (!StringUtils.isEmpty(hostgroupId)) {
-            //检查主机组连通性
+            //检查主机组连通性参数
+            requestBody.put("hostgroup_id", hostgroupId);
         }
 
-        return null;
+        String url = DmeConstants.DME_ESTIMATE_CONNECTIVITY;
+        Map<String, Object> param = new HashMap<>();
+        param.put("connectivity_query_param", requestBody);
+        ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(param));
+
+        if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
+            String body = responseEntity.getBody();
+            JsonArray jsonArray = new JsonParser().parse(body).getAsJsonArray();
+            List<Map<String, Object>> results = new ArrayList<>();
+            for (JsonElement jsonElement : jsonArray) {
+                JsonObject element = jsonElement.getAsJsonObject();
+                String id = ToolUtils.jsonToStr(element.get("host_id"));
+                String status = ToolUtils.jsonToStr(element.get("status"));
+                String resultMessage = ToolUtils.jsonToStr(element.get("result_message"));
+                // 连通性异常主机结果统计
+                Map<String, Object> result = new HashMap<>();
+                if (status.equalsIgnoreCase("FAILED")) {
+                    result.put(id, resultMessage);
+                }
+                results.add(result);
+            }
+            if (results.size() != 0) {
+                responseBodyBean.setData(results);
+                responseBodyBean.setCode(DmeConstants.CODE_CONNECTIVITY_FAILURE);
+            }
+        }
+
+        return responseBodyBean;
     }
 
     private String checkOrAddHostToHosts(List<String> initiatorList,String hostGroupId,String hostName) throws DmeException {
