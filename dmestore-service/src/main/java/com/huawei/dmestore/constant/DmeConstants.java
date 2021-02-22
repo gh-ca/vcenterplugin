@@ -466,6 +466,10 @@ public class DmeConstants {
      * default_page_size
      **/
     public static final int DEFAULT_PAGE_SIZE = 1000;
+    /**
+     * dme主机连通性检测错误代码
+     */
+    public static final String CODE_CONNECTIVITY_FAILURE = "-60001";
 
     /**
      * 容量初始分配策略。仅支持华为V3/V5设备，Dorado系列不支持该参数。
