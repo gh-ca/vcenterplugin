@@ -494,9 +494,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     this.volStoragePoolFilter.initPoolNameStatus();
     this.volServiceLevelFilter.initServiceLevel();
     // this.volProtectionStatusFilter.initProtectionStatus();
-    this.getStorageVolumeList(true);
     // 清空查询条件
     this.clearVolSearchInfo();
+    this.getStorageVolumeList(true);
   }
   getStorageVolumeList(fresh: boolean){
     let reqParams;
@@ -1183,9 +1183,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }
     if (caObject != null || caUObject != null) {
       if (caObject != null) {
-        this.volSortKey = 'capacity';
+        this.volSortKey = 'size';
       } else if (caUObject != null) {
-        this.volSortKey = 'capacity_usage';
+        // this.volSortKey = 'capacity_usage';
       }
       if (caObject == 1 || caUObject == 1) {
         this.volSortDir = "asc";

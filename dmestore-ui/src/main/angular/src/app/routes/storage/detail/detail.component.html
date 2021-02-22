@@ -217,7 +217,7 @@
                           <por-type-filter #portTypeFilter (change)="volQueryChange(null, null, null);"></por-type-filter>
                         </clr-dg-filter>
                       </clr-dg-column>
-                      <clr-dg-column class="hideFilter" (clrDgSortOrderChange)="volQueryChange(null, null, $event)" [clrDgField]="'capacityUsageNum'" [hidden]="volumeRadio!=='table1'" style="width: 11rem;">{{'storage.detail.volumes.capUsage' | translate}}</clr-dg-column>
+                      <clr-dg-column class="hideFilter" [clrDgField]="'capacityUsageNum'" [hidden]="volumeRadio!=='table1'" style="width: 11rem;">{{'storage.detail.volumes.capUsage' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="volumeRadio!=='table1'">
                         {{'storage.detail.volumes.mapStatus' | translate}}
                         <clr-dg-filter [clrDgFilter]="mapStatusFilter">
