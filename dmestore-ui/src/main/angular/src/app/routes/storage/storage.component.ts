@@ -46,14 +46,17 @@ export class StorageComponent implements OnInit, AfterViewInit {
 
     this.remoteSrv.getData()
         .subscribe((result: any) => {
-          this.list = result.data;
-          // 对存储的location做特殊处理
-          this.list.forEach(item => {
-            item.location = this.HTMLDecode(item.location);
-            item.freeCap = item.totalPoolCapacity-item.usedCapacity;
-          })
-          this.total = result.total_count;
           this.isLoading = false;
+          if (result.code == '200') {
+
+            this.list = result.data;
+            // 对存储的location做特殊处理
+            this.list.forEach(item => {
+              item.location = this.HTMLDecode(item.location);
+              item.freeCap = item.totalPoolCapacity-item.usedCapacity;
+            })
+            this.total = result.total_count;
+          }
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
           //this.getStrageCharts();
           this.listperformance();
