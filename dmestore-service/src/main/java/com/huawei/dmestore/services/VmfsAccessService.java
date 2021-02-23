@@ -65,7 +65,7 @@ public interface VmfsAccessService {
      * @param params include Parameters above
      * @throws DmeException when error
      */
-    void createVmfs(Map<String, Object> params) throws DmeException;
+    List<Map<String, String>> createVmfs(Map<String, Object> params) throws DmeException;
 
     /**
      * Mount vmfs include
@@ -167,6 +167,6 @@ public interface VmfsAccessService {
      * @return 连通性结果提示
      * @throws DmeException error
      */
-    ResponseBodyBean estimateConnectivityOfHostOrHostgroup(String storageId, String hostId, String hostgroupId)
+    List<Map<String, String>> estimateConnectivityOfHostOrHostgroup(String storageId, String hostId, String hostgroupId)
         throws DmeException;
 }
