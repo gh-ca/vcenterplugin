@@ -227,7 +227,7 @@ export class NfsComponent implements OnInit {
   modifyData() {
     const flag="plugin";
     const objectid=this.rowSelected[0].objectid;
-    this.router.navigate(['nfs/modify'],{
+    this.router.navigate(['/nfs/modify'],{
       queryParams:{
         objectid,flag
       }
@@ -250,7 +250,7 @@ export class NfsComponent implements OnInit {
     const flag = 'plugin';
     const fsId=this.rowSelected[0].fsId;
     const objectId=this.rowSelected[0].objectid;
-    this.router.navigate(['nfs/expand'],{
+    this.router.navigate(['/nfs/expand'],{
       queryParams:{
         objectId,fsId,flag
       }
@@ -441,7 +441,7 @@ export class NfsComponent implements OnInit {
     const flag = 'plugin';
     const fsId=this.rowSelected[0].fsId;
     const objectId=this.rowSelected[0].objectid;
-    this.router.navigate(['nfs/reduce'],{
+    this.router.navigate(['/nfs/reduce'],{
       queryParams:{
         objectId,fsId,flag
       }
@@ -449,11 +449,11 @@ export class NfsComponent implements OnInit {
   }
   // 挂载
   mount(){
-    this.jumpPage(this.rowSelected[0].objectid,"nfs/dataStore/mount");
+    this.jumpPage(this.rowSelected[0].objectid,"/nfs/dataStore/mount");
     const flag = 'plugin';
     const objectId=this.rowSelected[0].objectid;
     const dsName=this.rowSelected[0].name;
-    this.router.navigate(["nfs/dataStore/mount"],{
+    this.router.navigate(["/nfs/dataStore/mount"],{
       queryParams:{
         objectId,flag,dsName
       }
@@ -477,7 +477,7 @@ export class NfsComponent implements OnInit {
   delBtnFunc() {
     const flag = 'plugin';
     const objectid = this.rowSelected.map(item => item.objectid);
-    this.router.navigate(['nfs/delete'],{
+    this.router.navigate(['/nfs/delete'],{
       queryParams:{
         objectid,flag
       }
