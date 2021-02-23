@@ -73,7 +73,7 @@
           <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.iops' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.ops' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.bandwidth' | translate}}</clr-dg-column>
-
+          <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
           <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
             <clr-dg-cell><span (click)="toDetailView(item.id,item.name)" style="color:#829DE6;cursor:pointer">{{item.name}}</span></clr-dg-cell>
             <clr-dg-cell>{{item.ip}}</clr-dg-cell>

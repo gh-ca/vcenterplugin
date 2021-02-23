@@ -1196,7 +1196,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
         return;
       }
     }
-    // this.volumeCurrentPage = 1;
+    this.volumeCurrentPage = 1;
     const requestParams = {
       name:this.volName ? this.volName:"", //名称
       status:this.volStatusFilter.status ? this.volStatusFilter.status:"", //状态
