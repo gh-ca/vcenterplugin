@@ -114,7 +114,7 @@ export class StorageComponent implements OnInit, AfterViewInit {
   }
   //跳转详情页面的方法
   toDetailView(id,name){
-    this.router.navigate(['/storage/detail'],{
+    this.router.navigate(['storage/detail'],{
       queryParams:{
         id,name
       }
