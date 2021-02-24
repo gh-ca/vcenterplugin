@@ -857,6 +857,7 @@
     "operationFailed": "Operation failed!",
     "noData": "No data",
     "addVmfsConnFail": "Create vmfs failure,connectivity of host or hostgroup on dme error!",
+    "mountVmfsConnFail": "Mount failure,connectivity of host or hostgroup on dme error!",
     "details": "Details"
   },
   "chart": {

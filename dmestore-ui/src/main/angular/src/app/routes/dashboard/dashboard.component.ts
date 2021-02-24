@@ -14,7 +14,6 @@ import {HttpClient} from '@angular/common/http';
 import {Router} from "@angular/router";
 import {TranslatePipe, TranslateService} from "@ngx-translate/core";
 import { GlobalsService }     from "../../shared/globals.service";
-import {NfsService} from "../nfs/nfs.service";
 
 @Component({
   selector: 'app-dashboard',
@@ -224,6 +223,11 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         ];
       } else {
+        this.storageNum = {
+          total: 0,
+          normal: 0,
+          abnormal: 0
+        };
         os = [
           {
             name: this.translatePipe.transform('overview.normal'),
