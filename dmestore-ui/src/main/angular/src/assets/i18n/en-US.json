@@ -855,7 +855,9 @@
     "disconnected": "Whether to disconnect DME ?",
     "operationSuccessful": "Operation successful!",
     "operationFailed": "Operation failed!",
-    "noData": "No data"
+    "noData": "No data",
+    "addVmfsConnFail": "Create vmfs failure,connectivity of host or hostgroup on dme error!",
+    "details": "Details"
   },
   "chart": {
     "select": {
