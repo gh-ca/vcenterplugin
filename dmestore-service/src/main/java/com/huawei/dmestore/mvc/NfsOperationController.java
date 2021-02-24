@@ -345,7 +345,7 @@ public class NfsOperationController extends BaseController {
             createNfsShareParam
                 .put("share_path", FILE_SEPARATOR + requestParams.get(FSNAME_FIELD) + FILE_SEPARATOR);
             filesystemSpec.put(NAME_FIELD, requestParams.get(FSNAME_FIELD));
-            targetParams.put("exportPath", FILE_SEPARATOR + requestParams.get(FSNAME_FIELD));
+            targetParams.put("exportPath", FILE_SEPARATOR + requestParams.get("shareName"));
         }
         List<Map<String, Object>> filesystemSpecs = new ArrayList<>(DmeConstants.COLLECTION_CAPACITY_16);
         filesystemSpecs.add(filesystemSpec);
