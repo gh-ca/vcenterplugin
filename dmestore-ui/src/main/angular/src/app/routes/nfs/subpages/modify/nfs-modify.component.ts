@@ -220,7 +220,7 @@ export class NfsModifyComponent implements OnInit{
     if(this.updateNfs.nfsName==null) return false;
     if(this.oldNfsName==this.updateNfs.nfsName) return false;
     this.oldNfsName=this.updateNfs.nfsName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if(reg5.test(this.updateNfs.nfsName)){
       //验证重复
       this.matchErr=false;
@@ -244,7 +244,7 @@ export class NfsModifyComponent implements OnInit{
     if(this.oldShareName=this.updateNfs.shareName) return false;
 
     this.oldShareName=this.updateNfs.shareName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if(reg5.test(this.updateNfs.shareName)){
       //验证重复
       this.matchErr=false;
@@ -259,7 +259,7 @@ export class NfsModifyComponent implements OnInit{
     if(this.oldFsName=this.updateNfs.fsName) return false;
 
     this.oldFsName=this.updateNfs.fsName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if(reg5.test(this.updateNfs.fsName)){
       //验证重复
       this.matchErr=false;

@@ -56,7 +56,7 @@
           </clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.version' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.patchVersion' | translate}}</clr-dg-column>
-          <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.location' | translate}}</clr-dg-column>
+          <clr-dg-column [hidden]="radioCheck!=='table1'" style="width: 11rem;">{{'storage.list.location' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.zone' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table1'">{{'storage.list.wp' | translate}}</clr-dg-column>
 
@@ -73,7 +73,7 @@
           <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.iops' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.ops' | translate}}</clr-dg-column>
           <clr-dg-column [hidden]="radioCheck!=='table3'">{{'storage.list.bandwidth' | translate}}</clr-dg-column>
-
+          <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
           <clr-dg-row *clrDgItems="let item of list" [clrDgItem]="item">
             <clr-dg-cell><span (click)="toDetailView(item.id,item.name)" style="color:#829DE6;cursor:pointer">{{item.name}}</span></clr-dg-cell>
             <clr-dg-cell>{{item.ip}}</clr-dg-cell>
@@ -123,7 +123,7 @@
             <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.model}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.version}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.patchVersion}}</clr-dg-cell>
-            <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.location}}</clr-dg-cell>
+            <clr-dg-cell class="over_flow" title="{{item.location}}" [hidden]="radioCheck!=='table1'">{{item.location}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.azIds || '--'}}</clr-dg-cell>
             <clr-dg-cell [hidden]="radioCheck!=='table1'">{{item.maintenanceStart}}-{{item.maintenanceOvertime}}</clr-dg-cell>
 

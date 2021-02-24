@@ -746,7 +746,7 @@ export class AddComponent implements OnInit{
     this.volNameRepeatErr = false;
     this.matchErr = false;
 
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if (isVmfs) {
       if (this.form.name) {
         if (reg5.test(this.form.name)) {

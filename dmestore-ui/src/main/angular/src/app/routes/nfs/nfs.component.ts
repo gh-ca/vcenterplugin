@@ -227,7 +227,7 @@ export class NfsComponent implements OnInit {
   modifyData() {
     const flag="plugin";
     const objectid=this.rowSelected[0].objectid;
-    this.router.navigate(['nfs/modify'],{
+    this.router.navigate(['/nfs/modify'],{
       queryParams:{
         objectid,flag
       }
@@ -250,7 +250,7 @@ export class NfsComponent implements OnInit {
     const flag = 'plugin';
     const fsId=this.rowSelected[0].fsId;
     const objectId=this.rowSelected[0].objectid;
-    this.router.navigate(['nfs/expand'],{
+    this.router.navigate(['/nfs/expand'],{
       queryParams:{
         objectId,fsId,flag
       }
@@ -441,7 +441,7 @@ export class NfsComponent implements OnInit {
     const flag = 'plugin';
     const fsId=this.rowSelected[0].fsId;
     const objectId=this.rowSelected[0].objectid;
-    this.router.navigate(['nfs/reduce'],{
+    this.router.navigate(['/nfs/reduce'],{
       queryParams:{
         objectId,fsId,flag
       }
@@ -449,11 +449,11 @@ export class NfsComponent implements OnInit {
   }
   // 挂载
   mount(){
-    this.jumpPage(this.rowSelected[0].objectid,"nfs/dataStore/mount");
+    this.jumpPage(this.rowSelected[0].objectid,"/nfs/dataStore/mount");
     const flag = 'plugin';
     const objectId=this.rowSelected[0].objectid;
     const dsName=this.rowSelected[0].name;
-    this.router.navigate(["nfs/dataStore/mount"],{
+    this.router.navigate(["/nfs/dataStore/mount"],{
       queryParams:{
         objectId,flag,dsName
       }
@@ -476,8 +476,8 @@ export class NfsComponent implements OnInit {
   // 删除按钮点击事件
   delBtnFunc() {
     const flag = 'plugin';
-    const objectid=this.rowSelected[0].objectid;
-    this.router.navigate(['nfs/delete'],{
+    const objectid = this.rowSelected.map(item => item.objectid);
+    this.router.navigate(['/nfs/delete'],{
       queryParams:{
         objectid,flag
       }
@@ -526,7 +526,7 @@ export class NfsComponent implements OnInit {
     if(this.addForm.nfsName==null) return false;
     if(this.oldNfsName==this.addForm.nfsName) return false;
     this.oldNfsName=this.addForm.nfsName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if(reg5.test(this.addForm.nfsName)){
       //验证重复
       this.matchErr=false;
@@ -551,7 +551,7 @@ export class NfsComponent implements OnInit {
     if(this.oldShareName=this.addForm.shareName) return false;
 
     this.oldShareName=this.addForm.shareName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if(reg5.test(this.addForm.shareName)){
       //验证重复
       this.matchErr=false;
@@ -567,7 +567,7 @@ export class NfsComponent implements OnInit {
     if(this.oldFsName=this.addForm.fsName) return false;
 
     this.oldFsName=this.addForm.fsName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if(reg5.test(this.addForm.fsName)){
       //验证重复
       this.matchErr=false;

@@ -172,7 +172,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     private void bachDbProcess(Map<String, List<BestPracticeBean>> map) {
         map.forEach((hostSetting, bestPracticeBeans) -> {
             // 本地全量查询
-            List<String> localHostNames = null;
+            List<String> localHostNames = new ArrayList<>();
             try {
                 localHostNames = bestPracticeCheckDao.getHostNameByHostsetting(hostSetting);
             } catch (SQLException e) {
@@ -213,6 +213,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     @Override
     public List<BestPracticeUpResultResponse> updateByCluster(String clusterObjectId) throws DmeException {
         // 查询集群下的所有主机信息
+        List<BestPracticeUpResultResponse> bestPracticeUpResultResponses = new ArrayList<>();
         String hostsOnCluster = vcsdkUtils.getHostsOnCluster(clusterObjectId);
         if (StringUtil.isNotBlank(hostsOnCluster)) {
             List<Map<String, String>> hostList = gson.fromJson(hostsOnCluster,
@@ -223,7 +224,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             }
             return update(objectIds);
         }
-        return null;
+        return bestPracticeUpResultResponses;
     }
 
     @Override
