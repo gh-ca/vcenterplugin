@@ -174,6 +174,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     @Override
     public void disconnectDme() throws DmeSqlException {
+        dmeToken = null;
+        dmeHostUrl = null;
         systemDao.cleanAllData();
     }
 

@@ -855,7 +855,10 @@
     "disconnected": "是否断开DME连接 ？",
     "operationSuccessful": "操作成功!",
     "operationFailed": "操作失败!",
-    "noData": "暂无数据"
+    "noData": "暂无数据",
+    "addVmfsConnFail": "创建VMFS失败，主机或集群连通性异常！",
+    "mountVmfsConnFail": "挂载失败，主机或集群连通性异常！",
+    "details": "详情"
   },
   "chart": {
     "select": {

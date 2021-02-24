@@ -310,12 +310,16 @@ public class ToolUtils {
     }
 
     public static String getRequsetParams(String paramName, String paramValue) {
-        Map<String, String> map = new HashMap<>();
-        map.put(paramName, paramValue);
-        return getRequsetParams(map);
+        return getRequsetParams(paramName, paramValue, true, true);
     }
 
-    public static String getRequsetParams(Map<String, String> map) {
+    public static String getRequsetParams(String paramName, String paramValue, boolean flag, boolean returnFlag) {
+        Map<String, String> map = new HashMap<>();
+        map.put(paramName, paramValue);
+        return getRequsetParams(map, flag, returnFlag);
+    }
+
+    public static String getRequsetParams(Map<String, String> map, boolean flag, boolean returnFlag) {
         JsonArray constraint = new JsonArray();
         JsonObject simple = new JsonObject();
         simple.addProperty("name", "dataStatus");
@@ -323,7 +327,9 @@ public class ToolUtils {
         simple.addProperty("value", "normal");
         JsonObject consObj = new JsonObject();
         consObj.add("simple", simple);
-        constraint.add(consObj);
+        if(flag){
+            constraint.add(consObj);
+        }
         for (Map.Entry<String, String> entry : map.entrySet()) {
             JsonObject simple1 = new JsonObject();
             simple1.addProperty("name", entry.getKey());
@@ -334,6 +340,11 @@ public class ToolUtils {
             consObj1.addProperty("logOp", "and");
             constraint.add(consObj1);
         }
+
+        if(!returnFlag){
+            return constraint.toString();
+        }
+
         JsonObject condition = new JsonObject();
         condition.add("constraint", constraint);
         return condition.toString();
@@ -343,7 +354,7 @@ public class ToolUtils {
         Map<String, String> map = new HashMap<>();
         map.put("id", "112321");
         map.put("type", "aa");
-        System.out.println(getRequsetParams(map));
+        System.out.println(getRequsetParams(map, false, false));
     }
 
     public static StorageTypeShow getStorageTypeShow(String storageModel) throws DmeException {

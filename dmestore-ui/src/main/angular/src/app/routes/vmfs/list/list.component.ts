@@ -11,7 +11,7 @@ import {
   StoragePoolList,
   HostList,
   ClusterList,
-  ServiceLevelList, HostOrCluster, GetForm, Workload, StoragePoolMap,
+  ServiceLevelList, HostOrCluster, GetForm, Workload, StoragePoolMap, ConnFaildData,
 } from './list.service';
 import {ClrWizard, ClrWizardPage} from '@clr/angular';
 import {GlobalsService} from '../../../shared/globals.service';
@@ -66,6 +66,10 @@ export class VmfsListComponent implements OnInit {
 
   popListShow = false; // 添加弹出层显示
   addSuccessShow = false; // 添加成功弹窗
+  connectivityFailure = false; // 主机联通性测试失败
+  connFailData:ConnFaildData[]; //  主机联通性测试失败数据
+  showDetail = false; // 展示主机联通异常数据
+  isAddPage = false; // true 添加页面 false 挂载页面
   // 添加表单数据
   form = new GetForm().getAddForm();
   addForm = new FormGroup({
@@ -601,6 +605,10 @@ export class VmfsListComponent implements OnInit {
     this.showAlloctypeThick = false;
     this.showWorkLoadFlag = false;
     this.latencyIsSelect = false;
+    // 连通性测试相关
+    this.connectivityFailure = false;
+    this.connFailData = [];
+    this.showDetail = false;
 
     // 初始化表单
     this.form = new GetForm().getAddForm();
@@ -724,6 +732,23 @@ export class VmfsListComponent implements OnInit {
           // this.scanDataStore();
           // 打开成功提示窗口
           this.addSuccessShow = true;
+        } else if (result.code === '-60001'){
+            this.connectivityFailure = true;
+            this.showDetail = false;
+            this.isAddPage = true;
+            const connFailDatas:ConnFaildData[] = [];
+            if (result.data) {
+              result.data.forEach(item => {
+                for (let key in item) {
+                  const conFailData = {
+                    hostName: key,
+                    description: item[key]
+                  };
+                  connFailDatas.push(conFailData);
+                }
+              });
+              this.connFailData = connFailDatas;
+            }
         } else {
           console.log('创建失败：' + result.description);
           // 失败信息
@@ -873,6 +898,11 @@ export class VmfsListComponent implements OnInit {
       this.mountForm.dataStoreObjectIds = objectIds;
       console.log('this.mountForm', this.mountForm);
 
+      // 连通性测试相关
+      this.connectivityFailure = false;
+      this.connFailData = [];
+      this.showDetail = false;
+
       // 加载主机与集群数据
       this.mountDeviceLoad();
 
@@ -970,6 +1000,23 @@ export class VmfsListComponent implements OnInit {
           // this.scanDataStore();
           // 打开成功提示窗口
           this.mountSuccessShow = true;
+        } else if(result.code === '-60001') {
+          this.connectivityFailure = true;
+          this.showDetail = false;
+          this.isAddPage = false;
+          const connFailDatas:ConnFaildData[] = [];
+          if (result.data) {
+            result.data.forEach(item => {
+              for (let key in item) {
+                const conFailData = {
+                  hostName: key,
+                  description: item[key]
+                };
+                connFailDatas.push(conFailData);
+              }
+            });
+            this.connFailData = connFailDatas;
+          }
         } else {
           console.log('挂载异常：' + result.description);
           this.isOperationErr = true;

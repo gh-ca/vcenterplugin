@@ -267,6 +267,10 @@ export interface Workload{
     enable_compress: string;
     enable_dedup: string;
 }
+export interface ConnFaildData {
+  hostName: string;
+  description: string
+}
 export class GetForm {
   // 获取添加form表单（初始化的添加表单）
   getAddForm() {

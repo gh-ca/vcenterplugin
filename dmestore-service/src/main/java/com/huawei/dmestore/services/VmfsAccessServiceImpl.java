@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 
 import java.util.Set;
+
 import jdk.nashorn.internal.parser.Parser;
 import sun.rmi.runtime.Log;
 
@@ -279,7 +280,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         StorageTypeShow storageTypeShow = ToolUtils.getStorageTypeShow(storageModel);
                         if (storageTypeShow.getDorado() && latency != null) {
                             vmfsDataInfo.setLatency(latency / 1000);
-                        }else{
+                        } else {
                             vmfsDataInfo.setLatency(latency);
                         }
                     }
@@ -316,7 +317,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                                 ToolUtils.getStatistcValue(statisticObject,
                                     DmeIndicatorConstants.COUNTER_ID_VOLUME_WRITERESPONSETIME, MAX), null));
                             vmfsDataInfo.setLatency(ToolUtils.jsonToFloat(ToolUtils.getStatistcValue(statisticObject,
-                                    DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME, MAX), null));
+                                DmeIndicatorConstants.COUNTER_ID_VOLUME_RESPONSETIME, MAX), null));
                             relists.add(vmfsDataInfo);
                         }
                     }
@@ -337,8 +338,14 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         //String objHostId = checkOrCreateToHostorHostGroup(params);
         // todo 带有主机连通性功能的检查
         String objHostId = "";
+        // 根据服务等级ID获取对应的存储设备ID
+        Object storageId = params.get(STORAGE_ID);
+        if (storageId == null && params.get(DmeConstants.SERVICELEVELID) != null) {
+            storageId = dmeStorageService.getStorageByServiceLevelId(String.valueOf(params.get(DmeConstants.SERVICELEVELID)));
+            params.put(STORAGE_ID, storageId);
+        }
         List<Map<String, String>> maps = checkOrCreateToHostorHostGroup2(params);
-        if (maps.size()!=0) {
+        if (maps.size() != 0) {
             for (Map<String, String> map : maps) {
                 objHostId = map.get(CONNECTIVITY_NORMAL);
                 if (StringUtils.isEmpty(objHostId)) {
@@ -348,9 +355,9 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 }
             }
         }
-//        if (StringUtils.isEmpty(objHostId)) {
-//            throw new DmeException("DME find or create host error!");
-//        }
+        //        if (StringUtils.isEmpty(objHostId)) {
+        //            throw new DmeException("DME find or create host error!");
+        //        }
         String taskId = "";
         if (params.get(DmeConstants.SERVICELEVELID) != null) {
             taskId = createVmfsByServiceLevel(params, objHostId);
@@ -566,10 +573,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         tuning.put("alloction_type", ToolUtils.getStr(params.get(ALLOCTYPE)));
         tuning.put("workload_type_raw_id", ToolUtils.getInt(params.get(WORKLOAD_TYPE_ID), null));
         String smartTier = ToolUtils.getStr(params.get(SMARTTIER));
-        if(!StringUtils.isEmpty(smartTier)){
-            tuning.put("smart_tier",  DmeConstants.SMART_TIER.get(smartTier));
+        if (!StringUtils.isEmpty(smartTier)) {
+            tuning.put("smart_tier", DmeConstants.SMART_TIER.get(smartTier));
         }
-        if (params.get("qosFlag")!=null && (Boolean) params.get("qosFlag")==true){
+        if (params.get("qosFlag") != null && (Boolean) params.get("qosFlag") == true) {
             Map<String, Object> smartqos = new HashMap<>();
             smartqos.put(LATENCY, ToolUtils.getInt(params.get(LATENCY), null));
             smartqos.put("max_bandwidth", ToolUtils.getInt(params.get(MAXBANDWIDTH), null));
@@ -720,12 +727,12 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     @Override
-    public List<Map<String, String>> estimateConnectivityOfHostOrHostgroup(String storageId, String hostId, String hostgroupId)
-        throws DmeException {
+    public List<Map<String, String>> estimateConnectivityOfHostOrHostgroup(String storageId, String hostId,
+        String hostgroupId) throws DmeException {
 
         Map<String, String> requestBody = new HashMap<>();
         if (StringUtils.isEmpty(storageId)) {
-            LOG.error("estimate connectivity of host or hostgroup storageid param error!",storageId);
+            LOG.error("estimate connectivity of host or hostgroup storageid param error!", storageId);
             throw new DmeException("estimate connectivity of host or hostgroup , storageid param error!");
         }
         requestBody.put("storage_id", storageId);
@@ -740,7 +747,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
         String url = DmeConstants.DME_ESTIMATE_CONNECTIVITY;
         Map<String, Object> param = new HashMap<>();
-        LOG.info("check connectivity of host or horstgroup on dme ! {"+gson.toJson(requestBody)+"}");
+        LOG.info("check connectivity of host or horstgroup on dme ! {" + gson.toJson(requestBody) + "}");
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, gson.toJson(requestBody));
         List<Map<String, String>> results = new ArrayList<>();
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
@@ -758,7 +765,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     String hostName = getDmeHostNameById(id);
                     result.put(hostName, resultMessage);
                 }
-                if (result.size()!=0) {
+                if (result.size() != 0) {
                     results.add(result);
                 }
             }
@@ -766,7 +773,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return results;
     }
 
-    private String checkOrAddHostToHosts(List<String> initiatorList,String hostGroupId,String hostName) throws DmeException {
+    private String checkOrAddHostToHosts(List<String> initiatorList, String hostGroupId, String hostName)
+        throws DmeException {
         // 判断主机在DME中是否存在 如果主机不存在就创建并得到主机ID
         String objId = "";
         try {
@@ -833,8 +841,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return remap;
     }
 
-
-    private void addHostToHosts(String hostGroupId,String hostId) throws DmeException {
+    private void addHostToHosts(String hostGroupId, String hostId) throws DmeException {
 
         Map<String, List<String>> reqMap = new HashMap<>();
         String url = DmeConstants.PUT_ADD_HOST_TO_HOSTS.replace("{hostgroup_id}", hostGroupId);
@@ -861,6 +868,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return hostObjId;
     }
+
     private String checkOrCreateToHostGroup(String clusterObjectId) throws DmeException {
         // 如果主机组不存在就创建并得到主机组ID 创建前要检查集群下的所有主机是否在DME中存在，只能通过id来创建主机组，如果集群有中文，dme中会创建失败
         String objId = "";
@@ -1004,6 +1012,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return objId;
     }
+
     private String checkHostInHostGroup2(String vmwareClusterObjectId, String dmeHostGroupId) {
         // 主机组存在的前提下 判断主机组一致性。
         String objId = "";
@@ -1013,8 +1022,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                 return objId;
             }
             // 获取集群下所有主机的HBA
-            Map<String, List<Map<String, Object>>> hbasMap =
-                vcsdkUtils.getHbasByClusterObjectId2(vmwareClusterObjectId);
+            Map<String, List<Map<String, Object>>> hbasMap = vcsdkUtils.getHbasByClusterObjectId2(
+                vmwareClusterObjectId);
             if (hbasMap == null || hbasMap.size() == 0) {
                 LOG.error("vmware Cluster hbas is null");
                 return objId;
@@ -1024,7 +1033,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
             // 获取指定主机组中主机启动器
             Map<String, List<Map<String, Object>>> dmeHostMap = new HashMap<>();
-            List<Map<String,Object>> dmehosts = dmeAccessService.getDmeHostInHostGroup(dmeHostGroupId);
+            List<Map<String, Object>> dmehosts = dmeAccessService.getDmeHostInHostGroup(dmeHostGroupId);
             if (dmehosts != null && dmehosts.size() > 0) {
                 for (Map<String, Object> dmehost : dmehosts) {
                     // 得到dme主机的启动器
@@ -1056,13 +1065,15 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return objId;
     }
+
     private Map<String, List<String>> initiatorCompare(Map<String, List<String>> hbasMap,
-                                                Map<String, List<String>> dmeHostMap){
+        Map<String, List<String>> dmeHostMap) {
         Map<String, List<String>> temp = new HashMap<>();
         for (Map.Entry<String, List<String>> entry : hbasMap.entrySet()) {
             // 取出dme主机组中主机的启动器和vcenter集群中的主机启动器比较
             List<String> hbalist = entry.getValue();
-            inner:for (Map.Entry<String, List<String>> entry1 : dmeHostMap.entrySet()) {
+            inner:
+            for (Map.Entry<String, List<String>> entry1 : dmeHostMap.entrySet()) {
                 List<String> dmehosts = entry1.getValue();
                 for (String dmehost : dmehosts) {
                     if (hbalist.contains(dmehost)) {
@@ -1076,7 +1087,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         // dme组机组中主机数量和vcenter集群中主机数量相同
         if (temp.size() == hbasMap.size()) {
             temp.clear();
-        }else {
+        } else {
             // vcenter中主机数量多于dme
             for (Map.Entry<String, List<String>> entry : temp.entrySet()) {
                 hbasMap.remove(entry.getKey());
@@ -1087,7 +1098,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
 
         return temp;
     }
-    private Map<String, List<String>> paramsHandle(Map<String, List<Map<String, Object>>> map,String targatValue){
+
+    private Map<String, List<String>> paramsHandle(Map<String, List<Map<String, Object>>> map, String targatValue) {
         // 将主机和其对应的一个或多个启动器封装
         Map<String, List<String>> resultmap = new HashMap<>();
         for (Map.Entry<String, List<Map<String, Object>>> entry : map.entrySet()) {
@@ -1101,6 +1113,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         }
         return resultmap;
     }
+
     private String checkHostInHostGroup(String vmwareClusterObjectId, String dmeHostGroupId) throws DmeException {
         String objId = "";
         try {
@@ -1131,7 +1144,8 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                     if (dmehost != null && dmehost.get(ID_FIELD) != null) {
                         String demHostId = ToolUtils.getStr(dmehost.get(ID_FIELD));
                         List<Map<String, Object>> subinitiators = dmeAccessService.getDmeHostInitiators(demHostId);
-                        LOG.info("initiators of host on dme！", gson.toJson(initiators) + "host size:" + initiators.size());
+                        LOG.info("initiators of host on dme！",
+                            gson.toJson(initiators) + "host size:" + initiators.size());
                         if (subinitiators != null && subinitiators.size() > 0) {
                             initiators.addAll(subinitiators);
                         }
@@ -1190,7 +1204,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             } else if (params != null && params.get(DmeConstants.CLUSTER) != null) {
                 objId = checkOrCreateToHostGroup(ToolUtils.getStr(params.get(CLUSTER_ID)));
                 // 检查主机组连通性
-                hostIds= estimateConnectivityOfHostOrHostgroup(ToolUtils.getStr(params.get(STORAGE_ID)), null, objId);
+                hostIds = estimateConnectivityOfHostOrHostgroup(ToolUtils.getStr(params.get(STORAGE_ID)), null, objId);
             }
 
             // 连通性正常的主机或者主机组id
@@ -1299,7 +1313,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         dvr.setStoreType(DmeConstants.STORE_TYPE_VMFS);
         // 服务等级方式创建vmfs 不需要判断存储类型
         String storageId = ToolUtils.getStr(volumeMap.get("storage_id"));
-        if (!StringUtils.isEmpty(storageId)){
+        if (!StringUtils.isEmpty(storageId)) {
             dvr.setStorageType(getStorageModel(storageId));
         }
         List<DmeVmwareRelation> rallist = new ArrayList<>();
@@ -1562,7 +1576,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         volumeDetail.setProvisionType(ToolUtils.jsonToStr(tuning.get(ALLOCTYPE), null));
         volumeDetail.setCompression(ToolUtils.jsonToBoo(tuning.get("compression_enabled")));
 
-
         // 应用类型
         volumeDetail.setApplicationType(ToolUtils.jsonToStr(tuning.get(WORKLOAD_TYPE_ID), null));
 
@@ -1570,21 +1583,21 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         if (!tuning.get(SMARTQOS).isJsonNull()) {
             JsonObject smartqos = tuning.getAsJsonObject(SMARTQOS);
             SmartQos smartQos = new SmartQos();
-            Integer maxbandwidth = ToolUtils.jsonToInt(smartqos.get("maxbandwidth"),0);
-            Integer minbandwidth = ToolUtils.jsonToInt(smartqos.get("minbandwidth"),0);
+            Integer maxbandwidth = ToolUtils.jsonToInt(smartqos.get("maxbandwidth"), 0);
+            Integer minbandwidth = ToolUtils.jsonToInt(smartqos.get("minbandwidth"), 0);
             if (maxbandwidth != 0 && minbandwidth != 0) {
                 // 2表示保护上限 和  保护下线
                 smartQos.setControlPolicy("2");
                 volumeDetail.setControlPolicy("2");
-            }else {
+            } else {
                 smartQos.setControlPolicy(ToolUtils.jsonToStr(smartqos.get(CONTROL_POLICY), null));
                 volumeDetail.setControlPolicy(ToolUtils.jsonToStr(smartqos.get(CONTROL_POLICY), null));
             }
             smartQos.setMaxbandwidth(maxbandwidth);
             smartQos.setMinbandwidth(minbandwidth);
-            smartQos.setMaxiops(ToolUtils.jsonToInt(smartqos.get("maxiops"),0));
-            smartQos.setMiniops(ToolUtils.jsonToInt(smartqos.get("miniops"),0));
-            smartQos.setLatency(ToolUtils.jsonToInt(smartqos.get("latency"),0));
+            smartQos.setMaxiops(ToolUtils.jsonToInt(smartqos.get("maxiops"), 0));
+            smartQos.setMiniops(ToolUtils.jsonToInt(smartqos.get("miniops"), 0));
+            smartQos.setLatency(ToolUtils.jsonToInt(smartqos.get("latency"), 0));
             volumeDetail.setSmartQos(smartQos);
         }
     }
@@ -1633,11 +1646,11 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
                         if (storageIds.get(storageId) == null) {
                             storageModel = getStorageModel(storageId);
                             storageIds.put(storageId, storageModel);
-                        }else {
+                        } else {
                             storageModel = storageIds.get(storageId);
                         }
                         DmeVmwareRelation relation = getDmeVmwareRelation(storeType, vmfsDatastoreId, vmfsDatastoreName,
-                            volumeObject,storageModel);
+                            volumeObject, storageModel);
                         relationList.add(relation);
                     }
                 }
@@ -1652,7 +1665,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
     }
 
     private DmeVmwareRelation getDmeVmwareRelation(String storeType, String vmfsDatastoreId, String vmfsDatastoreName,
-                                                   JsonObject volumeObject, String storageModel) {
+        JsonObject volumeObject, String storageModel) {
         String volumeId = ToolUtils.jsonToOriginalStr(volumeObject.get(ID_FIELD));
         String volumeName = ToolUtils.jsonToOriginalStr(volumeObject.get(NAME_FIELD));
         String volumeWwn = ToolUtils.jsonToOriginalStr(volumeObject.get(VOLUME_WWN));
@@ -2423,9 +2436,10 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         // 2 vm是否关联了hostObjId 或 clusterObjId (objId转id?)
         return false;
     }
+
     private String getStorageModel(String storageId) throws DmeException {
         StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
-        return storageDetail.getModel() +" "+ storageDetail.getProductVersion();
+        return storageDetail.getModel() + " " + storageDetail.getProductVersion();
     }
 
     private String getStorageModelByWwn(String wwn) throws DmeSqlException {

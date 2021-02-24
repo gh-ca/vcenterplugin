@@ -7,12 +7,7 @@ import com.huawei.dmestore.services.DmeStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -45,6 +40,20 @@ public class DmeStorageController extends BaseController {
             return success(dmeStorageService.getStorages());
         } catch (DmeException e) {
             return failure(e.getMessage());
+        }
+    }
+
+    /**
+     * getStorageByServiceLevelId
+     *
+     * @return String
+     */
+    @GetMapping("/storages/serviceLevel/{serviceLevelId}")
+    public String getStorageByServiceLevelId(@PathVariable String serviceLevelId) {
+        try {
+            return dmeStorageService.getStorageByServiceLevelId(serviceLevelId);
+        } catch (DmeException e) {
+            return null;
         }
     }
 

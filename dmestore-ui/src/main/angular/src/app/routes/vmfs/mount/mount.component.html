@@ -176,6 +176,31 @@
     </div>
   </clr-modal>
 </div>
+<!--主机连接失败提示窗口-->
+<clr-modal [(clrModalOpen)]="connectivityFailure" [clrModalClosable]="false">
+  <h3 class="modal-title modelTile">{{'tips.operationFailed' | translate}}</h3>
+  <div class="modal-body">
+    <p>{{'tips.mountVmfsConnFail' | translate}}
+      <button class="btn btn-link" (click)="showDetail = !showDetail;">
+        {{'tips.details' | translate}}
+        <clr-icon *ngIf="!showDetail" style="width: 0.6rem" shape="caret down"></clr-icon>
+        <clr-icon *ngIf="showDetail" style="width: 0.6rem" shape="caret up"></clr-icon>
+      </button>
+    </p>
+    <clr-datagrid *ngIf="showDetail">
+      <clr-dg-column>{{'nfs.hostName' | translate}}</clr-dg-column>
+      <clr-dg-column style="width: 14rem;">{{'table.description' | translate}}</clr-dg-column>
+      <clr-dg-placeholder>{{'tips.noData' | translate}}</clr-dg-placeholder>
+      <clr-dg-row [clrDgSelectable]="false" *clrDgItems="let item of connFailData" [clrDgItem]="item">
+        <clr-dg-cell title="{{item.hostName}}">{{item.hostName}}</clr-dg-cell>
+        <clr-dg-cell title="{{item.description}}" class="over_flow">{{item.description}}</clr-dg-cell>
+      </clr-dg-row>
+    </clr-datagrid>
+  </div>
+  <div class="modal-footer">
+    <button type="submit" class="btn btn-primary" (click)="connectivityFailure = false;">{{'menu.ok' | translate}}</button>
+  </div>
+</clr-modal>
 <!--卸载提示-->
 <clr-modal [(clrModalOpen)]="unmountTipsShow" [clrModalSize]="'sm'" [clrModalClosable]="false">
   <h3 class="modal-title modelTile">{{'vmfs.reclaim.title' | translate}}</h3>

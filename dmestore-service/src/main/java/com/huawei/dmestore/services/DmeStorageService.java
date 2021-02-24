@@ -276,4 +276,13 @@ public interface DmeStorageService {
      * @throws DmeException when error
      */
     String getStorageByPoolRawId(String poolRawId) throws DmeException;
+
+    /**
+     * list Volume Performance
+     *
+     * @param serviceLevelId serviceLevelId
+     * @return String
+     * @throws DmeException when error
+     */
+    String getStorageByServiceLevelId(String serviceLevelId) throws DmeException;
 }
