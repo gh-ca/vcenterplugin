@@ -158,6 +158,9 @@ public class OverviewServiceImpl implements OverviewService {
             int info = 0;
             List<BestPracticeCheckRecordBean> rs = bestPracticeProcessService.getCheckRecord();
             for (BestPracticeCheckRecordBean recordBean : rs) {
+                if(recordBean.getCount() == 0){
+                    continue;
+                }
                 if (CRITICAL.equals(recordBean.getLevel())) {
                     critical++;
                 } else if (MAJOR.equals(recordBean.getLevel())) {
