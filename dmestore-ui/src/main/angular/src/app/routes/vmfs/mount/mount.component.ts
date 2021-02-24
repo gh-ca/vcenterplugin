@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {
-  ClusterList,
+  ClusterList, ConnFaildData,
   GetForm,
   HostList,
   HostOrCluster,
@@ -83,6 +83,10 @@ export class MountComponent implements OnInit{
   modalHandleLoading = false; // 数据处理loading
   isOperationErr = false; // 挂载错误信息
   isUnmountOperationErr = false; // 卸载错误信息
+
+  connectivityFailure = false; // 主机联通性测试失败
+  connFailData:ConnFaildData[]; //  主机联通性测试失败数据
+  showDetail = false; // 展示主机联通异常数据
 
   ngOnInit(): void {
     // 初始化隐藏窗口
@@ -387,6 +391,22 @@ export class MountComponent implements OnInit{
         if (result.code  ===  '200'){
           console.log('挂载成功');
           this.mountSuccessShow = true;
+        } else if(result.code === '-60001') {
+          this.connectivityFailure = true;
+          this.showDetail = false;
+          const connFailDatas:ConnFaildData[] = [];
+          if (result.data) {
+            result.data.forEach(item => {
+              for (let key in item) {
+                const conFailData = {
+                  hostName: key,
+                  description: item[key]
+                };
+                connFailDatas.push(conFailData);
+              }
+            });
+            this.connFailData = connFailDatas;
+          }
         } else {
           console.log('挂载异常：' + result.description);
           this.isOperationErr = true;
@@ -488,6 +508,22 @@ export class MountComponent implements OnInit{
       if (result.code  ===  '200'){
         console.log('挂载成功');
         this.mountSuccessShow = true;
+      } else if(result.code === '-60001') {
+        this.connectivityFailure = true;
+        this.showDetail = false;
+        const connFailDatas:ConnFaildData[] = [];
+        if (result.data) {
+          result.data.forEach(item => {
+            for (let key in item) {
+              const conFailData = {
+                hostName: key,
+                description: item[key]
+              };
+              connFailDatas.push(conFailData);
+            }
+          });
+          this.connFailData = connFailDatas;
+        }
       } else {
         console.log('挂载异常：' + result.description);
         this.isOperationErr = true;
