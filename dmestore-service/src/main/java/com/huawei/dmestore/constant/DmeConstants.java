@@ -188,7 +188,7 @@ public class DmeConstants {
     /**
      * storage base url
      **/
-    public static final String API_STORAGES = "/rest/storagemgmt/v1/storages";
+    public static final String API_STORAGES = "/rest/storagemgmt/v1/storages?start=1&limit=1000";
 
     /**
      * storage detail query
