@@ -58,10 +58,10 @@ const routes: Routes = [
         loadChildren: () => import('./rdm/rdm.module').then(m => m.RdmModule),
         data: { title: 'rdm', titleI18n: 'rdm' }
       },
-      { path: 'applybp',
+      { path: 'best',
         loadChildren: () => import('./applybp/applybp.module').then(m => m.ApplybpModule),
         data: { title: 'applybp', titleI18n: 'applybp' }
-      }
+      },
     ],
   },
   {
