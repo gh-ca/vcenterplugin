@@ -335,8 +335,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         if (params == null) {
             throw new DmeException("create vmfs params is null");
         }
-        //String objHostId = checkOrCreateToHostorHostGroup(params);
-        // todo 带有主机连通性功能的检查
         String objHostId = "";
         // 根据服务等级ID获取对应的存储设备ID
         Object storageId = params.get(STORAGE_ID);
@@ -344,7 +342,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
             storageId = dmeStorageService.getStorageByServiceLevelId(String.valueOf(params.get(DmeConstants.SERVICELEVELID)));
             params.put(STORAGE_ID, storageId);
         }
-        List<Map<String, String>> maps = checkOrCreateToHostorHostGroup2(params);
+        List<Map<String, String>> maps = checkOrCreateToHostorHostGroup(params);
         if (maps.size() != 0) {
             for (Map<String, String> map : maps) {
                 objHostId = map.get(CONNECTIVITY_NORMAL);
@@ -1174,24 +1172,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         return objId;
     }
 
-    private String checkOrCreateToHostorHostGroup(Map<String, Object> params) throws DmeException {
-        // 根据参数选择检查主机或主机组的方法
-        String objId = "";
-        try {
-            // param str host: 主机  param str cluster: 集群
-            if (params != null && params.get(DmeConstants.HOST) != null) {
-                objId = checkOrCreateToHost(ToolUtils.getStr(params.get(HOST)), ToolUtils.getStr(params.get(HOSTID)));
-            } else if (params != null && params.get(DmeConstants.CLUSTER) != null) {
-                objId = checkOrCreateToHostGroup(ToolUtils.getStr(params.get(CLUSTER_ID)));
-            }
-        } catch (DmeException e) {
-            LOG.error("checkOrcreateToHostorHostGroup error:", e);
-            throw new DmeException(e.getMessage());
-        }
-        return objId;
-    }
-
-    private List<Map<String, String>> checkOrCreateToHostorHostGroup2(Map<String, Object> params) throws DmeException {
+    private List<Map<String, String>> checkOrCreateToHostorHostGroup(Map<String, Object> params) throws DmeException {
         // 根据参数选择检查主机或主机组的方法
         String objId = "";
         List<Map<String, String>> hostIds = new ArrayList<>();
@@ -1341,7 +1322,6 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         List<String>  storeIds = (List<String>)params.get("dataStoreObjectIds");
         // param str host: 主机  param str cluster: 集群  dataStoreObjectIds
         // 判断主机或主机组在DME中是否存在, 如果主机或主机不存在就创建并得到主机或主机组ID
-        //String objhostid = checkOrCreateToHostorHostGroup(params);
         // 接入主机连通性检查
         String objhostid = "";
         // 获取存储id
@@ -1349,7 +1329,7 @@ public class VmfsAccessServiceImpl implements VmfsAccessService {
         if (strageIds.size() != 0) {
             for (String storageId : strageIds) {
                 params.put(STORAGE_ID, storageId);
-                maps = checkOrCreateToHostorHostGroup2(params);
+                maps = checkOrCreateToHostorHostGroup(params);
                 if (maps.size() != 0) {
                     for (Map<String, String> map : maps) {
                         objhostid = map.get(CONNECTIVITY_NORMAL);
