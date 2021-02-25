@@ -150,7 +150,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                         StorageTypeShow storageTypeShow = ToolUtils.getStorageTypeShow(storageType);
                         storageObj.setStorageTypeShow(storageTypeShow);
                     }
-                    storageObj.setSubscriptionCapacity(ToolUtils.jsonToDou(jsonObj.get("subscription_capacity")));
+                    storageObj.setSubscriptionCapacity(ToolUtils.jsonToDou(jsonObj.get("subscription_capacity"),0.0));
                     storageObj.setUsedCapacity(ToolUtils.jsonToDou(jsonObj.get("used_capacity"), 0.0));
                     storageObj.setTotalCapacity(ToolUtils.jsonToDou(jsonObj.get("total_capacity"), 0.0));
                     storageObj.setTotalEffectiveCapacity(
