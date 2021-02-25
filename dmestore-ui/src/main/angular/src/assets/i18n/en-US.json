@@ -31,7 +31,8 @@
   "validations": {
     "required": "This field is required!",
     "nameRequired": "This field is required! And can only contain half-width letters, half-width numbers, “_”、“-”、“.”、and Chinese characters.",
-    "shareNameRequired": "This field is required! And can only contain half-width letters, half-width numbers, “_”、“-”、“.”、.",
+    "nameRequiredTwo": "This field is required! And can only contain half-width letters, half-width numbers, “_”、and Chinese characters.",
+    "shareNameRequired": "This field is required! And can only contain half-width letters, half-width numbers, “_”.",
     "minlength": "Should have atleast {{number}} characters",
     "maxlength": "This value should be less than {{number}} characters",
     "min": "This value should be more than {{number}}",
