@@ -285,7 +285,7 @@ public class DmeConstants {
     /**
      * datasets query
      **/
-    public static final String DATASETS_QUERY_URL = "/rest/metrics/v1/datasets/{dataSet}?pageSize=5000";
+    public static final String DATASETS_QUERY_URL = "/rest/metrics/v1/datasets/{dataSet}?pageSize=1000";
 
     /**
      * Constant definition
