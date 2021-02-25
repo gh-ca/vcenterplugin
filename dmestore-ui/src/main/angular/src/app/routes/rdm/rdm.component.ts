@@ -542,6 +542,26 @@ export class RdmComponent implements OnInit {
       this.configModel.volumeSpecs[0].name = null;
     }
   }
+
+  lengthVerification(obj, maxLength) {
+    var value = obj.target.value;
+    var len = 0;
+    var result = "";
+    for (var i = 0; i < value.length; i++) {
+      if (value.charCodeAt(i) > 127 || value.charCodeAt(i) == 94) {
+        len += 2;
+        result += value.charAt(i);
+      } else {
+        len++;
+        result += value.charAt(i);
+      }
+      if (len >= maxLength) {
+        obj.target.value = result;
+        this.configModel.volumeSpecs[0].name = obj.target.value;
+        return;
+      }
+    }
+  }
 }
 
 
