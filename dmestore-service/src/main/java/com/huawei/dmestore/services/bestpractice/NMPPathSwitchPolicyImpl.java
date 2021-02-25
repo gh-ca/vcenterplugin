@@ -6,12 +6,7 @@ import com.huawei.dmestore.utils.VCSDKUtils;
 import com.huawei.vmware.mo.HostMO;
 import com.huawei.vmware.mo.HostStorageSystemMO;
 import com.huawei.vmware.util.VmwareContext;
-
-import com.vmware.vim25.HostMultipathInfo;
-import com.vmware.vim25.HostMultipathInfoLogicalUnit;
-import com.vmware.vim25.HostMultipathInfoLogicalUnitPolicy;
-import com.vmware.vim25.HostStorageDeviceInfo;
-import com.vmware.vim25.ManagedObjectReference;
+import com.vmware.vim25.*;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -43,7 +38,7 @@ public class NMPPathSwitchPolicyImpl extends BaseBestPracticeService implements 
             String policyStr = policy.getPolicy();
             if (!policyStr.equals(getRecommendValue())) {
                 JsonObject object = new JsonObject();
-                object.addProperty("name", lun.getKey());
+                object.addProperty("name", "naa." + lun.getId().substring(10, 42));
                 object.addProperty("value", policyStr);
                 array.add(object);
             }
