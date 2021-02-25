@@ -1,6 +1,7 @@
 import {ChangeDetectorRef, Component, OnInit, AfterViewInit} from '@angular/core';
 import {GlobalsService} from "../../shared/globals.service";
 import {HttpClient} from "@angular/common/http";
+import {ActivatedRoute} from "@angular/router";
 
 @Component({
   selector: 'app-applybp',
@@ -17,7 +18,7 @@ export class ApplybpComponent implements OnInit, AfterViewInit {
   ips = '';
   constructor(private cdr: ChangeDetectorRef,
               private http: HttpClient,
-              private gs: GlobalsService) { }
+              private gs: GlobalsService, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit(): void {
   }
@@ -28,31 +29,63 @@ export class ApplybpComponent implements OnInit, AfterViewInit {
     console.log(this.gs.getClientSdk().app.getNavigationData());
     const ctx = this.gs.getClientSdk().app.getContextObjects();
     const objectId = ctx[0].id;
+
+    let type;
+    this.activatedRoute.url.subscribe(url => {
+      type = url[0].path;
+    });
     // const objectId = 'urn:vmomi:ClusterComputeResource:domain-c2038:674908e5-ab21-4079-9cb1-596358ee5dd1';
     console.log("objectId", objectId)
     // this.http.post('v1/bestpractice/update/all', {}).subscribe((result: any) => {
-    this.http.post('v1/bestpractice/update/byCluster/' + objectId, {}).subscribe((result: any) => {
-      if (result.code == '200'){
-        this.status = 2;
-        if(result.data){
-          result.data.forEach((item)=>{
+    if (type == 'cluster') {
+      this.http.post('v1/bestpractice/update/byCluster/' + objectId, {}).subscribe((result: any) => {
+        if (result.code == '200'){
+          this.status = 2;
+          if(result.data){
+            result.data.forEach((item)=>{
               if(item.needReboot){
                 this.ips = item.hostName + ",";
               }
-          });
-        }
-        if(this.ips != ''){
-           this.hiddenTip = false;
+            });
+          }
+          if(this.ips != ''){
+            this.hiddenTip = false;
+          } else{
+            this.hiddenTip = true;
+          }
         } else{
-           this.hiddenTip = true;
+          this.status = 3;
         }
-      } else{
+      }, err => {
         this.status = 3;
-      }
-    }, err => {
-      this.status = 3;
-      console.error('ERROR', err);
-    });
+        console.error('ERROR', err);
+      });
+    } else {
+      let hostObjectIds = [];
+      hostObjectIds.push(objectId);
+      this.http.post('v1/bestpractice/update/byhosts', hostObjectIds).subscribe((result: any) => {
+        if (result.code == '200'){
+          this.status = 2;
+          if(result.data){
+            result.data.forEach((item)=>{
+              if(item.needReboot){
+                this.ips = item.hostName + ",";
+              }
+            });
+          }
+          if(this.ips != ''){
+            this.hiddenTip = false;
+          } else{
+            this.hiddenTip = true;
+          }
+        } else{
+          this.status = 3;
+        }
+      }, err => {
+        this.status = 3;
+        console.error('ERROR', err);
+      });
+    }
   }
 
   okClick(){
