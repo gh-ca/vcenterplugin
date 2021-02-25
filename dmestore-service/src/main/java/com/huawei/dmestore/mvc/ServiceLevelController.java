@@ -113,8 +113,7 @@ public class ServiceLevelController extends BaseController {
     @RequestMapping(value = "/capacity/stat-lun", method = RequestMethod.GET)
     public ResponseBodyBean statLun(@RequestParam String serviceLevelId, @RequestParam String interval) {
         try {
-            serviceLevelService.statLunDatasetsQuery(serviceLevelId, interval);
-            return success();
+            return success(serviceLevelService.statLunDatasetsQuery(serviceLevelId, interval));
         } catch (DmeException e) {
             return failure(e.getMessage());
         }
@@ -128,8 +127,7 @@ public class ServiceLevelController extends BaseController {
     @RequestMapping(value = "/capacity/stat-storage-pool", method = RequestMethod.GET)
     public ResponseBodyBean statStoragePool(@RequestParam String serviceLevelId, @RequestParam String interval) {
         try {
-            serviceLevelService.statStoragePoolDatasetsQuery(serviceLevelId, interval);
-            return success();
+            return success(serviceLevelService.statStoragePoolDatasetsQuery(serviceLevelId, interval));
         } catch (DmeException e) {
             return failure(e.getMessage());
         }
@@ -144,8 +142,7 @@ public class ServiceLevelController extends BaseController {
     public ResponseBodyBean lunPerformanceDatasetsQuery(@RequestParam String serviceLevelId,
         @RequestParam String interval) {
         try {
-            serviceLevelService.lunPerformanceDatasetsQuery(serviceLevelId, interval);
-            return success();
+            return success(serviceLevelService.lunPerformanceDatasetsQuery(serviceLevelId, interval));
         } catch (DmeException e) {
             return failure(e.getMessage());
         }
@@ -160,8 +157,7 @@ public class ServiceLevelController extends BaseController {
     public ResponseBodyBean storagePoolPerformanceDatasetsQuery(@RequestParam String serviceLevelId,
         @RequestParam String interval) {
         try {
-            serviceLevelService.storagePoolPerformanceDatasetsQuery(serviceLevelId, interval);
-            return success();
+            return success(serviceLevelService.storagePoolPerformanceDatasetsQuery(serviceLevelId, interval));
         } catch (DmeException e) {
             return failure(e.getMessage());
         }
