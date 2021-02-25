@@ -31,7 +31,8 @@
   "validations": {
     "required": "该字段必填!",
     "nameRequired": "该字段必填！且只能包含半角字母、半角数字、“_”、“-”、“.”和中文字符。",
-    "shareNameRequired": "该字段必填！且只能包含半角字母、半角数字、“_”、“-”、“.”",
+    "nameRequiredTwo": "该字段必填！且只能包含半角字母、半角数字、“_”和中文字符。",
+    "shareNameRequired": "该字段必填！且只能包含半角字母、半角数字、“_”",
     "minlength": "必须大于 {{number}} 个字符",
     "maxlength": "必须小于 {{number}} 个字符",
     "min": "值必须大于 {{number}}",
