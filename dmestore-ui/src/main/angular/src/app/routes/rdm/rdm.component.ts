@@ -549,7 +549,7 @@ export class RdmComponent implements OnInit {
     var result = "";
     for (var i = 0; i < value.length; i++) {
       if (value.charCodeAt(i) > 127 || value.charCodeAt(i) == 94) {
-        len += 2;
+        len += 3;
         result += value.charAt(i);
       } else {
         len++;
