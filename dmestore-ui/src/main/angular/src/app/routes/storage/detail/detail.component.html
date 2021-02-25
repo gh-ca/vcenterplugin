@@ -199,7 +199,7 @@
                         </div>
                       </div>
                     </div>
-                    <clr-datagrid [clrDgLoading]="isLoading">
+                    <clr-datagrid [clrDgLoading]="volIsLoading">
                       <clr-dg-column [clrDgField]="'name'" (clrFilterValueChange)="volQueryChange($event, null,null);">
                         {{'storage.detail.volumes.name' | translate}}
                       </clr-dg-column>
@@ -380,7 +380,7 @@
                         </div>
                       </div>
                     </div>
-                    <clr-datagrid>
+                    <clr-datagrid [clrDgLoading]="fsIsLoading">
                       <clr-dg-column [clrDgField]="'name'">{{'storage.detail.fileSystems.name' | translate}}</clr-dg-column>
                       <clr-dg-column>
                         {{'storage.detail.fileSystems.status' | translate}}
@@ -479,7 +479,7 @@
                         </div>
                       </div>
                     </div>
-                    <clr-datagrid>
+                    <clr-datagrid [clrDgLoading]="dtreeIsLoading">
                       <clr-dg-column [clrDgField]="'name'">{{'storage.detail.dtrees.name' | translate}}</clr-dg-column>
                       <clr-dg-column [clrDgField]="'fsName'">{{'storage.detail.dtrees.ofs' | translate}}</clr-dg-column>
                       <clr-dg-column [clrDgField]="'tierName'">{{'storage.detail.dtrees.osl' | translate}}</clr-dg-column>
@@ -540,7 +540,7 @@
                           </div>
                         </div>
                       </div>
-                      <clr-datagrid [clrDgLoading]="isLoading">
+                      <clr-datagrid [clrDgLoading]="shareIsLoading">
                         <clr-dg-column [clrDgField]="'name'">{{'storage.detail.shares.name' | translate}}</clr-dg-column>
                         <clr-dg-column [clrDgField]="'sharePath'">{{'storage.detail.shares.sharePath' | translate}}</clr-dg-column>
                         <clr-dg-column [clrDgField]="'fsName'">{{'storage.detail.shares.ofs' | translate}}</clr-dg-column>
@@ -771,7 +771,7 @@
                   <button clrTabLink (click)="changeTab('controller')">{{'storage.detail.hardware.controllers.controllers' | translate}}</button>
                   <clr-tab-content >
                     <div class="detail-margin-top">
-                      <clr-datagrid>
+                      <clr-datagrid [clrDgLoading]="controIsLoading">
                         <clr-dg-column [clrDgField]="'name'">{{'storage.detail.hardware.controllers.controller' | translate}}</clr-dg-column>
                         <clr-dg-column>
                           {{'storage.detail.hardware.controllers.status' | translate}}
@@ -827,7 +827,7 @@
                   <button clrTabLink (click)="changeTab('disk')">{{'storage.detail.hardware.disks.disks' | translate}}</button>
                   <clr-tab-content >
                     <div class="detail-margin-top">
-                      <clr-datagrid>
+                      <clr-datagrid [clrDgLoading]="diskIsLoading">
                         <clr-dg-column [clrDgField]="'name'">{{'storage.detail.hardware.disks.location' | translate}}</clr-dg-column>
                         <clr-dg-column >
                           {{'storage.detail.hardware.disks.status' | translate}}
@@ -900,7 +900,7 @@
                         <clr-accordion-panel>
                           <clr-accordion-title>{{'storage.detail.hardware.ports.fc' | translate}}({{fcs==null?0:fcs.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
-                            <clr-datagrid>
+                            <clr-datagrid [clrDgLoading]="fcportIsLoading">
                               <clr-dg-column [clrDgField]="'location'">{{'storage.detail.hardware.ports.location' | translate}}</clr-dg-column>
                               <clr-dg-column >
                                 {{'storage.detail.hardware.ports.status' | translate}}
@@ -944,7 +944,7 @@
                         <clr-accordion-panel>
                           <clr-accordion-title>{{'storage.detail.hardware.ports.eth' | translate}}({{eths==null?0:eths.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
-                            <clr-datagrid>
+                            <clr-datagrid [clrDgLoading]="ethsIsLoading">
                               <clr-dg-column [clrDgField]="'location'">{{'storage.detail.hardware.ports.location' | translate}}</clr-dg-column>
                               <clr-dg-column >
                                 {{'storage.detail.hardware.ports.status' | translate}}
@@ -993,7 +993,7 @@
                         <clr-accordion-panel>
                           <clr-accordion-title>{{'storage.detail.hardware.ports.fcoe' | translate}}({{fcoes==null?0:fcoes.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
-                            <clr-datagrid>
+                            <clr-datagrid [clrDgLoading]="fcoeportIsLoading">
                               <clr-dg-column [clrDgField]="'status'">{{'storage.detail.hardware.ports.location' | translate}}</clr-dg-column>
                               <clr-dg-column >{{'storage.detail.hardware.ports.status' | translate}}</clr-dg-column>
                               <clr-dg-column [clrDgField]="'status'">{{'storage.detail.hardware.ports.wwn' | translate}}</clr-dg-column>
@@ -1032,7 +1032,7 @@
                         <clr-accordion-panel>
                           <clr-accordion-title>{{'storage.detail.hardware.ports.bond' | translate}}({{bonds==null?0:bonds.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
-                            <clr-datagrid>
+                            <clr-datagrid [clrDgLoading]="bondIsLoading">
                               <clr-dg-column [clrDgField]="'name'">{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
                               <clr-dg-column >
                                 {{'storage.detail.hardware.ports.healthStatus' | translate}}
@@ -1086,7 +1086,7 @@
                         <clr-accordion-panel>
                           <clr-accordion-title>{{'storage.detail.hardware.ports.logic' | translate}}({{logicports==null?0:logicports.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
-                            <clr-datagrid>
+                            <clr-datagrid [clrDgLoading]="logicPortIsLoading">
                               <clr-dg-column >{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
                               <clr-dg-column >
                                 {{'storage.detail.hardware.ports.runningStatus' | translate}}
@@ -1162,7 +1162,7 @@
                         <clr-accordion-panel>
                           <clr-accordion-title>{{'storage.detail.hardware.ports.fail' | translate}}({{fgs==null?0:fgs.length}})</clr-accordion-title>
                           <clr-accordion-content *clrIfExpanded>
-                            <clr-datagrid>
+                            <clr-datagrid [clrDgLoading]="fgsIsLoading">
                               <clr-dg-column [clrDgField]="'name'">{{'storage.detail.hardware.ports.name' | translate}}</clr-dg-column>
                               <clr-dg-column >
                                 {{'storage.detail.hardware.ports.type' | translate}}
