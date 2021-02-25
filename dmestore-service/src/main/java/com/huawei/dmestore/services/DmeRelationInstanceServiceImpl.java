@@ -210,9 +210,6 @@ public class DmeRelationInstanceServiceImpl implements DmeRelationInstanceServic
                 LUN_INSTANCE.clear();
                 LUN_INSTANCE.putAll(map);
             }
-        } else {
-            LOG.error("listInstanceLun error!query instance error!className={}", instanceName);
-            throw new DmeException("500", "No instance information was found!className=" + instanceName);
         }
     }
 
