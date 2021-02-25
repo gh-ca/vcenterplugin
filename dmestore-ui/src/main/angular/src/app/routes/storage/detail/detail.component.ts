@@ -181,6 +181,18 @@ export class DetailComponent implements OnInit, AfterViewInit {
     {key: 'LAST_1_YEAR', value: this.translatePipe.transform('chart.select.last1Year')},
   ];
   isLoading = false;
+  volIsLoading = false;
+  fsIsLoading = false;
+  dtreeIsLoading = false;
+  shareIsLoading = false;
+  controIsLoading = false;
+  diskIsLoading = false;
+  fcportIsLoading = false;
+  fcoeportIsLoading = false;
+  ethsIsLoading = false;
+  bondIsLoading = false;
+  logicPortIsLoading = false;
+  fgsIsLoading = false;
   @ViewChild('paginationVolume')pagination:ClrDatagridPagination;
 
   volumeFooter = '1 - 10'; // 卷信息当前页数据
@@ -512,9 +524,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
       }
     }
     if (fresh){
-      this.gs.loading=true;
+      this.volIsLoading = true;
       this.detailService.getVolumeListListByPage(reqParams).subscribe((r: any) => {
-        this.gs.loading=false;
+        this.volIsLoading = false;
         if (r.code === '200'){
 
           this.volumes = r.data.volumeList;
@@ -535,9 +547,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.volumes == null){
-        this.gs.loading=true;
+        this.volIsLoading = true;
         this.detailService.getVolumeListListByPage(reqParams).subscribe((r: any) => {
-          this.gs.loading=false;
+          this.volIsLoading = false;
           if (r.code === '200'){
             this.volumes = r.data.volumeList;
             this.volumeTotal=r.data.count;
@@ -565,7 +577,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       volumeIds.push(item.wwn);
     });
     this.volumeIds = volumeIds;
-    this.gs.loading=true;
+    this.volIsLoading=true;
     this.detailService.listVolumesperformance(this.volumeIds).subscribe((result: any) => {
       if (result.code === '200'){
         const chartList: Volume [] = result.data;
@@ -581,7 +593,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
           });
         }
       }
-      this.gs.loading=false;
+      this.volIsLoading=false;
       this.cdr.detectChanges();
     });
   }
@@ -592,9 +604,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   getFileSystemList(fresh: boolean){
     if (fresh){
-      this.gs.loading=true;
+      this.fsIsLoading=true;
       this.detailService.getFileSystemList(this.storageId).subscribe((r: any) => {
-        this.gs.loading=false;
+        this.fsIsLoading=false;
         if (r.code === '200'){
           this.fsList = r.data;
           this.fsTotal=this.fsList==null?0:this.fsList.length;
@@ -604,9 +616,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.fsList == null){
-        this.gs.loading=true;
+        this.fsIsLoading=true;
         this.detailService.getFileSystemList(this.storageId).subscribe((r: any) => {
-          this.gs.loading=false;
+          this.fsIsLoading=false;
           if (r.code === '200'){
             this.fsList = r.data;
             this.fsTotal=this.fsList==null?0:this.fsList.length;
@@ -623,9 +635,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   getDtreeList(fresh: boolean){
     if (fresh){
-      this.gs.loading=true;
+      this.dtreeIsLoading=true;
       this.detailService.getDtreeList(this.storageId).subscribe((r: any) => {
-        this.gs.loading=false;
+        this.dtreeIsLoading=false;
         if (r.code === '200'){
           this.dtrees = r.data;
           this.dtreeTotal=this.dtrees==null?0:this.dtrees.length;
@@ -635,9 +647,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }else {
       if (this.dtrees == null){
         // 此处防止重复切换tab每次都去后台请求数据
-        this.gs.loading=true;
+        this.dtreeIsLoading=true;
         this.detailService.getDtreeList(this.storageId).subscribe((r: any) => {
-          this.gs.loading=false;
+          this.dtreeIsLoading=false;
           if (r.code === '200'){
             this.dtrees = r.data;
             this.dtreeTotal=this.dtrees==null?0:this.dtrees.length;
@@ -649,9 +661,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   getShareList(fresh: boolean){
     if (fresh){
-      this.gs.loading=true;
+      this.shareIsLoading=true;
       this.detailService.getShareList(this.storageId).subscribe((r: any) => {
-        this.gs.loading=false;
+        this.shareIsLoading=false;
         if (r.code === '200'){
           this.shares = r.data;
           this.shareTotal=this.shares==null?0:this.shares.length;
@@ -661,9 +673,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.shares == null){
-        this.gs.loading=true;
+        this.shareIsLoading=true;
         this.detailService.getShareList(this.storageId).subscribe((r: any) => {
-          this.gs.loading=false;
+          this.shareIsLoading=false;
           if (r.code === '200'){
             this.shares = r.data;
             this.shareTotal=this.shares==null?0:this.shares.length;
@@ -675,9 +687,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   getControllerList(fresh: boolean){
     if (fresh){
-      this.gs.loading=true;
+      this.controIsLoading=true;
       this.detailService.getControllerList(this.storageId).subscribe((r: any) => {
-        this.gs.loading=false;
+        this.controIsLoading=false;
         if (r.code === '200'){
           this.controllers = r.data;
           this.conTotal=this.controllers==null?0:this.controllers.length;
@@ -687,9 +699,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.controllers == null){
-        this.gs.loading=true;
+        this.controIsLoading=true;
         this.detailService.getControllerList(this.storageId).subscribe((r: any) => {
-          this.gs.loading=false;
+          this.controIsLoading=false;
           if (r.code === '200'){
             this.controllers = r.data;
             this.conTotal=this.controllers==null?0:this.controllers.length;
@@ -701,9 +713,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   getDisksList(fresh: boolean){
     if (fresh){
-      this.gs.loading=true;
+      this.diskIsLoading=true;
       this.detailService.getDiskList(this.storageId).subscribe((r: any) => {
-        this.gs.loading=false;
+        this.diskIsLoading=false;
         if (r.code === '200'){
           this.disks = r.data;
           this.diskTotal=this.disks==null?0:this.disks.length;
@@ -713,9 +725,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.disks == null){
-        this.gs.loading=true;
+        this.diskIsLoading=true;
         this.detailService.getDiskList(this.storageId).subscribe((r: any) => {
-          this.gs.loading=false;
+          this.diskIsLoading=false;
           if (r.code === '200'){
             this.disks = r.data;
             this.diskTotal=this.disks==null?0:this.disks.length;
@@ -734,9 +746,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     this.getFailoverGroups();
   }
   getFCPortList(){
-    this.gs.loading=true;
+    this.fcportIsLoading=true;
       this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"FC"}).subscribe((r: any) => {
-        this.gs.loading=false;
+        this.fcportIsLoading=false;
         if (r.code === '200'){
           this.fcs = r.data;
           this.fcTotal=this.fcs==null?0:this.fcs.length;
@@ -745,9 +757,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
       });
   }
   getFCoEPortList(){
-    this.gs.loading=true;
+    this.fcoeportIsLoading=true;
     this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"FCoE"}).subscribe((r: any) => {
-      this.gs.loading=false;
+      this.fcoeportIsLoading=false;
       if (r.code === '200'){
         this.fcoes = r.data;
         this.fcoeTotal=this.fcoes==null?0:this.fcoes.length;
@@ -756,9 +768,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
   }
   getEthernetPortList(){
-    this.gs.loading=true;
+    this.ethsIsLoading=true;
     this.detailService.getFCPortList({"storageDeviceId":this.storageId,"portType":"ETH"}).subscribe((r: any) => {
-      this.gs.loading=false;
+      this.ethsIsLoading=false;
       if (r.code === '200'){
         this.eths = r.data;
         this.ethTotal=this.eths==null?0:this.eths.length;
@@ -767,9 +779,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
   }
   getBondPortList(){
-    this.gs.loading=true;
+    this.bondIsLoading=true;
     this.detailService.getBondPortList(this.storageId).subscribe((r: any) => {
-      this.gs.loading=false;
+      this.bondIsLoading=false;
       if (r.code === '200'){
         this.bonds = r.data;
         this.bondTotal=this.bonds==null?0:this.bonds.length;
@@ -778,9 +790,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
   }
   getLogicPortsList(){
-    this.gs.loading=true;
+    this.logicPortIsLoading=true;
     this.detailService.getLogicPortList(this.storageId).subscribe((r: any) => {
-      this.gs.loading=false;
+      this.logicPortIsLoading=false;
       if (r.code === '200'){
         this.logicports = r.data;
         this.logicTotal=this.logicports==null?0:this.logicports.length;
@@ -789,9 +801,9 @@ export class DetailComponent implements OnInit, AfterViewInit {
     });
   }
   getFailoverGroups(){
-    this.gs.loading=true;
+    this.fgsIsLoading=true;
     this.detailService.getFailoverGroups(this.storageId).subscribe((r: any) => {
-      this.gs.loading=false;
+      this.fgsIsLoading=false;
       if (r.code === '200'){
         this.fgs = r.data;
         this.failTotal=this.fgs==null?0:this.fgs.length;

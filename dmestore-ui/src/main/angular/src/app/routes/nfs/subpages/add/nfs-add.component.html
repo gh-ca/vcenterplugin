@@ -55,7 +55,7 @@
         <input clrInput class="inputWidth100Percent" maxlength="256" [(ngModel)]="addForm.nfsName" name="nfsName" (blur)="checkNfsName();" required/>
         <clr-control-error>
           <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
-          <p *ngIf="matchErr" style="color: red">{{'validations.nameRequired' | translate}}</p>
+          <p *ngIf="matchErr" style="color: red">{{'validations.nameRequiredTwo' | translate}}</p>
           <p *ngIf="nfsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
           <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
           <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
@@ -74,6 +74,9 @@
       <clr-input-container *ngIf="!addForm.sameName">
         <label>{{'nfs.fsName' | translate}}</label>
         <input class="inputWidth100Percent" maxlength="256" clrInput [(ngModel)]="addForm.fsName" name="fsName" (blur)="checkFsName();" />
+        <clr-control-helper *ngIf="matchErr">
+          <p style="color: red">{{'validations.nameRequiredTwo' | translate}}</p>
+        </clr-control-helper>
         <clr-control-error>
           <p *ngIf="!oldFsName" style="color: red">{{'errorMsg.require' | translate}}</p>
           <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
@@ -374,7 +377,7 @@
         <input clrInput class="inputWidth100Percent" [(ngModel)]="addForm.nfsName" maxlength="256" name="nfsName" required (blur)="checkNfsName();"/>
         <clr-control-error>
           <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
-          <p *ngIf="matchErr" style="color: red">{{'validations.nameRequired' | translate}}</p>
+          <p *ngIf="matchErr" style="color: red">{{'validations.nameRequiredTwo' | translate}}</p>
 
           <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
           <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
@@ -392,6 +395,9 @@
       <clr-input-container *ngIf="!addForm.sameName">
         <label>{{'nfs.fsName' | translate}}</label>
         <input class="inputWidth100Percent" clrInput [(ngModel)]="addForm.fsName" maxlength="256" name="fsName" (blur)="checkFsName();" />
+        <clr-control-helper *ngIf="matchErr">
+          <p style="color: red">{{'validations.nameRequiredTwo' | translate}}</p>
+        </clr-control-helper>
         <clr-control-error>
           <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
           <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
