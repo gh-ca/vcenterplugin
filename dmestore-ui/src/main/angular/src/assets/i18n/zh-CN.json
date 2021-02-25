@@ -31,6 +31,7 @@
   "validations": {
     "required": "该字段必填!",
     "nameRequired": "该字段必填！且只能包含半角字母、半角数字、“_”、“-”、“.”和中文字符。",
+    "shareNameRequired": "该字段必填！且只能包含半角字母、半角数字、“_”、“-”、“.”",
     "minlength": "必须大于 {{number}} 个字符",
     "maxlength": "必须小于 {{number}} 个字符",
     "min": "值必须大于 {{number}}",
@@ -857,6 +858,7 @@
     "operationFailed": "操作失败!",
     "noData": "暂无数据",
     "addVmfsConnFail": "创建VMFS失败，主机或集群连通性异常！",
+    "mountVmfsConnFail": "挂载失败，主机或集群连通性异常！",
     "details": "详情"
   },
   "chart": {

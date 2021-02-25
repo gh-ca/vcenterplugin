@@ -67,16 +67,16 @@
             <div class="info-content" style="cursor:pointer" (click)="toDatastoreDeviceViewSdk()">
               <div class="info-content-text">
                 <span>{{'overview.total' | translate}}</span>
-                <span>{{storageNum.total}}</span>
+                <span style="color:#829DE6;">{{storageNum.total}}</span>
               </div>
               <div class="info-content-text">
                 <span>{{'overview.normal' | translate}}</span>
-                <span>{{storageNum.normal}}</span>
+                <span style="color:#829DE6;">{{storageNum.normal}}</span>
                 <span class="squre normal"></span>
               </div>
               <div class="info-content-text">
                 <span>{{'overview.abnormal' | translate}}</span>
-                <span>{{storageNum.abnormal}}</span>
+                <span style="color:#829DE6;">{{storageNum.abnormal}}</span>
                 <span class="squre abnormal"></span>
               </div>
             </div>
@@ -95,22 +95,22 @@
       <div class="info-card-content bestprac" [hidden]="bestShowLoading">
         <div class="count-wrap clr-row">
           <div class="count-item clr-col-3">
-            <div (click)="toBestParcticeViewSdk('critical')"  style="cursor:pointer" class="num">{{bestPracticeViolations.critical || 0}}</div>
+            <div (click)="toBestParcticeViewSdk('critical')"  style="color:#829DE6;cursor:pointer" class="num">{{bestPracticeViolations.critical || 0}}</div>
             <div class="color-divide critical"></div>
             <div class="text">{{'overview.critical' | translate}}</div>
           </div>
           <div class="count-item clr-col-3">
-            <div (click)="toBestParcticeViewSdk('major')" style="cursor:pointer" class="num">{{bestPracticeViolations.major || 0}}</div>
+            <div (click)="toBestParcticeViewSdk('major')" style="color:#829DE6;cursor:pointer" class="num">{{bestPracticeViolations.major || 0}}</div>
             <div class="color-divide major"></div>
             <div class="text">{{'overview.major' | translate}}</div>
           </div>
           <div class="count-item clr-col-3">
-            <div (click)="toBestParcticeViewSdk('warning')" style="cursor:pointer" class="num">{{bestPracticeViolations.warning || 0}}</div>
+            <div (click)="toBestParcticeViewSdk('warning')" style="color:#829DE6;cursor:pointer" class="num">{{bestPracticeViolations.warning || 0}}</div>
             <div class="color-divide warning"></div>
             <div class="text">{{'overview.warning' | translate}}</div>
           </div>
           <div class="count-item clr-col-3">
-            <div (click)="toBestParcticeViewSdk('info')" style="cursor:pointer" class="num">{{bestPracticeViolations.info || 0}}</div>
+            <div (click)="toBestParcticeViewSdk('info')" style="color:#829DE6;cursor:pointer" class="num">{{bestPracticeViolations.info || 0}}</div>
             <div class="color-divide info"></div>
             <div class="text">{{'overview.info' | translate}}</div>
           </div>

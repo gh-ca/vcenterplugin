@@ -32,12 +32,12 @@
         </span>
       </clr-dg-cell>
       <clr-dg-cell>
-        <span *ngIf="item.count > 0" (click)="openHostList(item)" style="color:#00F;cursor:pointer">{{item.count}}</span>
-        <span *ngIf="item.count == 0" style="color:#00F;">{{item.count}}</span>
+<!--        <span *ngIf="item.count > 0" (click)="openHostList(item)" style="color:#00F;cursor:pointer">{{item.count}}</span>-->
+        <span>{{item.count}}</span>
       </clr-dg-cell>
       <clr-dg-cell></clr-dg-cell>
       <clr-dg-cell>
-        <span *ngIf="item.count > 0" (click)="applyOperation(item)" style="color:#00F;cursor:pointer">{{'bestPractice.implementation'|translate}}</span>
+        <span *ngIf="item.count > 0" (click)="openHostList(item)" style="color:#00F;cursor:pointer">{{'bestPractice.implementation'|translate}}</span>
         <span *ngIf="item.count == 0" style="color:#9F9F9F;">{{'bestPractice.implementation'|translate}}</span>
       </clr-dg-cell>
     </clr-dg-row>

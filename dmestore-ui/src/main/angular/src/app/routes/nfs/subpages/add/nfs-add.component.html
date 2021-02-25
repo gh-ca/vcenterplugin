@@ -66,7 +66,8 @@
       <clr-checkbox-container>
         <label></label>
         <clr-checkbox-wrapper>
-          <input type="checkbox" clrCheckbox [(ngModel)]="addForm.sameName" name="sameName" />
+          <input type="checkbox" clrCheckbox *ngIf="isCheckSameName();"  [(ngModel)]="addForm.sameName" (change)="setSameName();" name="sameName" />
+          <input type="checkbox" clrCheckbox *ngIf="!isCheckSameName();"  [(ngModel)]="addForm.sameName" name="sameName" disabled/>
           <label>{{'nfs.sameName' | translate}}</label>
         </clr-checkbox-wrapper>
       </clr-checkbox-container>
@@ -82,6 +83,9 @@
       <clr-input-container *ngIf="!addForm.sameName">
         <label>{{'nfs.shareName' | translate}}</label>
         <input class="inputWidth100Percent" maxlength="256" clrInput [(ngModel)]="addForm.shareName" name="shareName" (blur)="checkShareName();"/>
+        <clr-control-helper *ngIf="shareNameContainsCN">
+          <p style="color: red">{{'validations.shareNameRequired' | translate}}</p>
+        </clr-control-helper>
         <clr-control-error>
           <p *ngIf="!oldShareName" style="color: red">{{'errorMsg.require' | translate}}</p>
           <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
@@ -379,7 +383,8 @@
       <clr-checkbox-container>
         <label></label>
         <clr-checkbox-wrapper>
-          <input type="checkbox" clrCheckbox [(ngModel)]="addForm.sameName" name="sameName" />
+          <input type="checkbox" clrCheckbox *ngIf="isCheckSameName();"  [(ngModel)]="addForm.sameName" (change)="setSameName();" name="sameName"  />
+          <input type="checkbox" clrCheckbox *ngIf="!isCheckSameName();"  [(ngModel)]="addForm.sameName" name="sameName"  disabled/>
           <label>{{'nfs.sameName' | translate}}</label>
         </clr-checkbox-wrapper>
       </clr-checkbox-container>
@@ -395,6 +400,9 @@
       <clr-input-container *ngIf="!addForm.sameName">
         <label>{{'nfs.shareName' | translate}}</label>
         <input class="inputWidth100Percent" clrInput [(ngModel)]="addForm.shareName" maxlength="256" name="shareName" (blur)="checkShareName();" />
+        <clr-control-helper *ngIf="shareNameContainsCN">
+          <p style="color: red">{{'validations.shareNameRequired' | translate}}</p>
+        </clr-control-helper>
         <clr-control-error>
           <p *ngIf="!oldNfsName" style="color: red">{{'errorMsg.require' | translate}}</p>
           <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>
