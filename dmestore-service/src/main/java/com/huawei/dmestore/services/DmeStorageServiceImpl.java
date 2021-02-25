@@ -150,7 +150,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
                         StorageTypeShow storageTypeShow = ToolUtils.getStorageTypeShow(storageType);
                         storageObj.setStorageTypeShow(storageTypeShow);
                     }
-                    storageObj.setSubscriptionCapacity(ToolUtils.jsonToDou(jsonObj.get("subscription_capacity")));
+                    storageObj.setSubscriptionCapacity(ToolUtils.jsonToDou(jsonObj.get("subscription_capacity"),0.0));
                     storageObj.setUsedCapacity(ToolUtils.jsonToDou(jsonObj.get("used_capacity"), 0.0));
                     storageObj.setTotalCapacity(ToolUtils.jsonToDou(jsonObj.get("total_capacity"), 0.0));
                     storageObj.setTotalEffectiveCapacity(
@@ -257,6 +257,58 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         storageObj.setDedupedCapacity(dedupedCapacity);
         storageObj.setCompressedCapacity(compressedCapacity);
         storageObj.setOptimizeCapacity(storageObj.getUsedCapacity() - dedupedCapacity - compressedCapacity);
+    }
+
+    @Override
+    public String getStorageByServiceLevelId(String serviceLevelId) throws DmeException {
+        String className = "SYS_DjTier";
+        String url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + CONDITION;
+        String params = ToolUtils.getRequsetParams("nativeId", serviceLevelId, false, true);
+        ResponseEntity<String> responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
+        int code = responseEntity.getStatusCodeValue();
+        if (code != HttpStatus.OK.value()) {
+            return null;
+        }
+        JsonArray objList = gson.fromJson(responseEntity.getBody(), JsonObject.class).getAsJsonArray(OBJ_LIST);
+        String resId = objList.get(0).getAsJsonObject().get(RES_ID).getAsString();
+        String relationName = "M_DjTierContainsStoragePool";
+        url = DmeConstants.LIST_RELATION_URL.replace("{relationName}", relationName) + CONDITION;
+        params = ToolUtils.getRequsetParams("source_Instance_Id", resId, false, false);
+        responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
+        code = responseEntity.getStatusCodeValue();
+        if (code != HttpStatus.OK.value()) {
+            return null;
+        }
+        objList = gson.fromJson(responseEntity.getBody(), JsonObject.class).getAsJsonArray(OBJ_LIST);
+        String poolId = objList.get(0).getAsJsonObject().get("target_Instance_Id").getAsString();
+        className = "SYS_StoragePool";
+        url = String.format(DmeConstants.DME_RESOURCE_INSTANCE_LIST, className) + CONDITION;
+        params = ToolUtils.getRequsetParams("resId", poolId, true, true);
+        responseEntity = dmeAccessService.accessByJson(url, HttpMethod.GET, params);
+        code = responseEntity.getStatusCodeValue();
+        if (code != HttpStatus.OK.value()) {
+            return null;
+        }
+        objList = gson.fromJson(responseEntity.getBody(), JsonObject.class).getAsJsonArray(OBJ_LIST);
+        String storageDeviceId = objList.get(0).getAsJsonObject().get("storageDeviceId").getAsString();
+        url = DmeConstants.API_STORAGES;
+        responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+        code = responseEntity.getStatusCodeValue();
+        if (code != HttpStatus.OK.value()) {
+            return null;
+        }
+        JsonObject storageObject = gson.fromJson(responseEntity.getBody(), JsonObject.class);
+        if(storageObject.get("total").getAsInt() > 0){
+            JsonArray datas = storageObject.getAsJsonArray("datas");
+            for(int i = 0; i<datas.size();i++){
+                JsonObject data = datas.get(i).getAsJsonObject();
+                String id = data.get("id").getAsString();
+                if(id.replace(SPLIT_CHAR, "").toUpperCase().equals(storageDeviceId)){
+                    return id;
+                }
+            }
+        }
+        return null;
     }
 
     @Override
@@ -439,24 +491,16 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public VolumeListRestponse getVolumesByPage(String storageId, String pageSize, String pageNo) throws DmeException {
+    public VolumeListRestponse getVolumesByPage(String storageId, String pageSize, String pageNo, String name,
+        String status, String allocateType, String attached, String servicelevelId, String sortDir, String sortKey)
+        throws DmeException {
         VolumeListRestponse volumeListRestponse = new VolumeListRestponse();
         List<Volume> volumes = new ArrayList<>();
         String url = DmeConstants.DME_VOLUME_BASE_URL + "?";
-        if (!"".equals(storageId)) {
-            url = url + "storage_id=" + storageId + "&";
-        }
-
-        if (!StringUtils.isEmpty(pageSize)) {
-            url = url + "limit=" + pageSize + "&";
-        }
-
-        if (!StringUtils.isEmpty(pageNo)) {
-            url = url + "offset=" + pageNo;
-        }
-
+        String path = concatUrl(url, storageId, pageSize, pageNo, name, status, allocateType, attached, servicelevelId,
+            sortDir, sortKey);
         try {
-            ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
+            ResponseEntity<String> responseEntity = dmeAccessService.access(path, HttpMethod.GET, null);
             int code = responseEntity.getStatusCodeValue();
             if (code != HttpStatus.OK.value()) {
                 throw new DmeException(CODE_503, "list volumes error!");
@@ -486,6 +530,41 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             throw new DmeException(CODE_503, e.getMessage());
         }
         return volumeListRestponse;
+    }
+
+    private String concatUrl(String url, String storageId, String pageSize, String pageNo, String name, String status,
+        String allocateType, String attached, String servicelevelId, String sortDir, String sortKey) {
+        if (!"".equals(storageId)) {
+            url = url + "storage_id=" + storageId + "&";
+        }
+        if (!StringUtils.isEmpty(pageSize)) {
+            url = url + "limit=" + pageSize + "&";
+        }
+        if (!StringUtils.isEmpty(pageNo)) {
+            url = url + "offset=" + pageNo + "&";
+        }
+        if (!StringUtils.isEmpty(name)) {
+            url = url + "name=" + name + "&";
+        }
+        if (!StringUtils.isEmpty(status)) {
+            url = url + "status=" + status + "&";
+        }
+        if (!StringUtils.isEmpty(allocateType)) {
+            url = url + "allocate_type=" + allocateType + "&";
+        }
+        if (!StringUtils.isEmpty(attached)) {
+            url = url + "attached=" + attached + "&";
+        }
+        if (!StringUtils.isEmpty(servicelevelId)) {
+            url = url + "service_level_id=" + servicelevelId + "&";
+        }
+        if (!StringUtils.isEmpty(sortDir)) {
+            url = url + "sort_dir=" + sortDir + "&";
+        }
+        if (!StringUtils.isEmpty(sortKey)) {
+            url = url + "sort_key=" + sortKey + "&";
+        }
+        return url;
     }
 
     private Volume parseVolume(JsonObject element) throws DmeException {

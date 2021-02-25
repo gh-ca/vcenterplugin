@@ -11,6 +11,11 @@ import java.util.Map;
  **/
 public class DmeConstants {
     /**
+     *  POST
+     *  estimate connectivity of host or hostgroup on dme
+     */
+    public static final String DME_ESTIMATE_CONNECTIVITY = "/rest/vmmgmt/v1/connectivity/host-storage";
+    /**
      * nfs share detail
      **/
     public static final String DME_NFS_SHARE_DETAIL_URL = "/rest/fileservice/v1/nfs-shares/{nfs_share_id}";
@@ -183,7 +188,7 @@ public class DmeConstants {
     /**
      * storage base url
      **/
-    public static final String API_STORAGES = "/rest/storagemgmt/v1/storages";
+    public static final String API_STORAGES = "/rest/storagemgmt/v1/storages?start=1&limit=1000";
 
     /**
      * storage detail query
@@ -280,7 +285,7 @@ public class DmeConstants {
     /**
      * datasets query
      **/
-    public static final String DATASETS_QUERY_URL = "/rest/metrics/v1/datasets/{dataSet}?pageSize=5000";
+    public static final String DATASETS_QUERY_URL = "/rest/metrics/v1/datasets/{dataSet}?pageSize=1000";
 
     /**
      * Constant definition
@@ -461,6 +466,10 @@ public class DmeConstants {
      * default_page_size
      **/
     public static final int DEFAULT_PAGE_SIZE = 1000;
+    /**
+     * dme主机连通性检测错误代码
+     */
+    public static final String CODE_CONNECTIVITY_FAILURE = "-60001";
 
     /**
      * 容量初始分配策略。仅支持华为V3/V5设备，Dorado系列不支持该参数。

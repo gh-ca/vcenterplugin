@@ -1,5 +1,6 @@
 package com.huawei.dmestore.mvc;
 
+import com.huawei.dmestore.constant.DmeConstants;
 import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.model.ResponseBodyBean;
 import com.huawei.dmestore.model.VmfsDataInfo;
@@ -91,7 +92,11 @@ public class VmfsAccessController extends BaseController {
         LOG.info("accessvmfs/createvmfs=={}", gson.toJson(params));
         String failureStr = "";
         try {
-            vmfsAccessService.createVmfs(params);
+            List<Map<String, String>> vmfs = vmfsAccessService.createVmfs(params);
+            if (vmfs.size() != 0) {
+                return failure(DmeConstants.CODE_CONNECTIVITY_FAILURE,
+                    "create vmfs failure,connectivity of host or hostgroup on dme error!", vmfs);
+            }
             return success(null, "Create vmfs success");
         } catch (DmeException e) {
             failureStr = "create vmfs failure:" + e.getMessage();
@@ -111,7 +116,11 @@ public class VmfsAccessController extends BaseController {
         LOG.info("accessvmfs/mountvmfs=={}", gson.toJson(params));
         String failureStr = "";
         try {
-            vmfsAccessService.mountVmfs(params);
+            List<Map<String, String>> list = vmfsAccessService.mountVmfs(params);
+            if (list.size() != 0) {
+                return failure(DmeConstants.CODE_CONNECTIVITY_FAILURE,
+                    "mount vmfs failure,connectivity of host or hostgroup on dme error!", list);
+            }
             return success(null, "Mount vmfs success");
         } catch (DmeException e) {
             LOG.error("mount vmfs failure:", e);

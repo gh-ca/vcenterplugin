@@ -2,7 +2,7 @@ import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit, ViewChild
 import {AddService} from './add.service';
 import {ActivatedRoute, Router} from '@angular/router';
 import {
-  ClusterList,
+  ClusterList, ConnFaildData,
   GetForm,
   HostList,
   HostOrCluster,
@@ -65,6 +65,10 @@ export class AddComponent implements OnInit{
   volNameRepeatErr = false; // 卷名称是否重复 true：是 false 否
 
 
+  connectivityFailure = false; // 主机联通性测试失败
+  connFailData:ConnFaildData[]; //  主机联通性测试失败数据
+  showDetail = false; // 展示主机联通异常数据
+
   // 添加页面窗口
   @ViewChild('wizard') wizard: ClrWizard;
   @ViewChild('addPageOne') addPageOne: ClrWizardPage;
@@ -93,6 +97,10 @@ export class AddComponent implements OnInit{
     this.vmfsNameRepeatErr = false;
     this.volNameRepeatErr = false;
     this.matchErr = false;
+    // 连通性测试相关
+    this.connectivityFailure = false;
+    this.connFailData = [];
+    this.showDetail = false;
 
     // this.globalsService.loading = true;
     // 设备类型 操作类型初始化
@@ -475,6 +483,22 @@ export class AddComponent implements OnInit{
           // 打开成功提示窗口
           this.addSuccessShow = true;
 
+        } else if (result.code === '-60001'){
+          this.connectivityFailure = true;
+          this.showDetail = false;
+          const connFailDatas:ConnFaildData[] = [];
+          if (result.data) {
+            result.data.forEach(item => {
+              for (let key in item) {
+                const conFailData = {
+                  hostName: key,
+                  description: item[key]
+                };
+                connFailDatas.push(conFailData);
+              }
+            });
+            this.connFailData = connFailDatas;
+          }
         } else {
           console.log('创建失败：' + result.description);
           // 失败信息
@@ -746,7 +770,7 @@ export class AddComponent implements OnInit{
     this.volNameRepeatErr = false;
     this.matchErr = false;
 
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-"_""."]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if (isVmfs) {
       if (this.form.name) {
         if (reg5.test(this.form.name)) {

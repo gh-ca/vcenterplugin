@@ -514,9 +514,14 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         // 封装查询body
         JsonObject queryBody = getDatasetsQueryBody(serviceLevelId, interval, dataSetType);
         String url = DmeConstants.DATASETS_QUERY_URL.replace("{dataSet}", dataSetType);
+        log.info("数据集统计信息查询开始，url={}, post body={}", url, queryBody);
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.POST, queryBody.toString());
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
-            return responseEntity.getBody();
+            String responseBody = responseEntity.getBody();
+            log.info("数据集统计信息查询成功！返回信息:{}", responseBody);
+            return responseBody;
+        }else {
+            log.info("数据集统计信息查询失败！url={}", url);
         }
 
         return null;

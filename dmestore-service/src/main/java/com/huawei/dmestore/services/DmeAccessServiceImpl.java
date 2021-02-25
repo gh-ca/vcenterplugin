@@ -18,6 +18,8 @@ import com.huawei.dmestore.task.ScheduleSetting;
 import com.huawei.dmestore.utils.RestUtils;
 import com.huawei.dmestore.utils.ToolUtils;
 import com.huawei.dmestore.utils.VCSDKUtils;
+
+import org.apache.http.entity.StringEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -172,6 +174,8 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     @Override
     public void disconnectDme() throws DmeSqlException {
+        dmeToken = null;
+        dmeHostUrl = null;
         systemDao.cleanAllData();
     }
 
@@ -189,6 +193,7 @@ public class DmeAccessServiceImpl implements DmeAccessService {
         HttpHeaders headers = getHeaders();
 
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
+
         if (url.indexOf(DmeConstants.HTTP) < 0) {
             url = dmeHostUrl + url;
         }
@@ -289,8 +294,9 @@ public class DmeAccessServiceImpl implements DmeAccessService {
 
     private HttpHeaders getHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        // 调整传递参数header 解决传递中文乱码问题
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON_UTF8));
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
 
         if (!StringUtils.isEmpty(dmeToken)) {
             headers.set("X-Auth-Token", dmeToken);

@@ -3,11 +3,13 @@ import {
   OnInit,
   AfterViewInit,
   ChangeDetectionStrategy,
-  ChangeDetectorRef, NgZone, ViewChild
+  ChangeDetectorRef, NgZone, ViewChild, Optional, Inject
 } from '@angular/core';
 import {StorageService, StorageList} from './storage.service';
 import { Router} from "@angular/router";
 import { StorageStatusFilter} from "./filter.component";
+import {TokenService} from "@core";
+import {DOCUMENT} from "@angular/common";
 @Component({
   selector: 'app-storage',
   templateUrl: './storage.component.html',
@@ -25,9 +27,11 @@ export class StorageComponent implements OnInit, AfterViewInit {
   buttonTrigger ='list'; // 切换列表页显示
   obj_ids=[];
   @ViewChild('storageStatusFilter') storageStatusFilter:StorageStatusFilter;
-  constructor(private remoteSrv: StorageService, private cdr: ChangeDetectorRef, private ngZone: NgZone,private router:Router) {}
+  constructor(private remoteSrv: StorageService, private cdr: ChangeDetectorRef, private ngZone: NgZone,private router:Router, private token: TokenService,
+              @Optional() @Inject(DOCUMENT) private document: any) {}
   // 生命周期： 初始化数据
   ngOnInit() {
+    this.process();
     this.refresh();
   }
 
@@ -46,14 +50,17 @@ export class StorageComponent implements OnInit, AfterViewInit {
 
     this.remoteSrv.getData()
         .subscribe((result: any) => {
-          this.list = result.data;
-          // 对存储的location做特殊处理
-          this.list.forEach(item => {
-            item.location = this.HTMLDecode(item.location);
-            item.freeCap = item.totalPoolCapacity-item.usedCapacity;
-          })
-          this.total = result.total_count;
           this.isLoading = false;
+          if (result.code == '200') {
+
+            this.list = result.data;
+            // 对存储的location做特殊处理
+            this.list.forEach(item => {
+              item.location = this.HTMLDecode(item.location);
+              item.freeCap = item.totalPoolCapacity-item.usedCapacity;
+            })
+            this.total = result.total_count;
+          }
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
           //this.getStrageCharts();
           this.listperformance();
@@ -116,6 +123,38 @@ export class StorageComponent implements OnInit, AfterViewInit {
         id,name
       }
     });
+  }
+  private process(): boolean {
+    const tourl = this.getQueryString('view')
+    let res = this.checkJWT(this.token.get<any>(), 1000);
+    res = true
+    if (tourl) { // 如果带有?view=storage则跳转到当前页面
+      var newURL = location.href.split("?")[0];
+      console.log("newURL=", newURL);
+      window.history.pushState('object', document.title, newURL); // 去除多余参数  避免二次内部跳转失败
+      this.gotoUrl('/' + tourl);
+    }
+    return res;
+  }
+  private gotoUrl(url?: string) {
+    setTimeout(() => {
+      if (/^https?:\/\//g.test(url!)) {
+        this.document.location.href = url as string;
+      } else {
+        this.router.navigateByUrl(url);
+      }
+    });
+  }
+  private checkJWT(model: any, offset?: number): boolean {
+    return !!model?.token;
+  }
+  getQueryString(name) {
+    var reg = new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i');
+    var r = window.location.search.substr(1).match(reg);
+    if (r != null) {
+      return unescape(r[2]);
+    }
+    return null;
   }
   // //组装存储列表的表格数据
   // getStrageCharts(){

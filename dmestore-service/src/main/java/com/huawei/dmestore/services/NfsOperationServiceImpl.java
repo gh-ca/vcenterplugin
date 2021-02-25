@@ -198,7 +198,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             Object nfsShareClientAddition = params.get("nfs_share_client_addition");
             List<Map<String, Object>> nfsShareClientArrayAddition = (List<Map<String, Object>>) nfsShareClientAddition;
             String shareName = "";
-            Map<String, Object> createNfsShareParams = null;
+            Map<String, Object> createNfsShareParams = new HashMap<>();
             if (nfsShareClientAddition != null) {
                 Map<String, Object> reqNfsShareClientArrayAddition = new HashMap<>();
                 for (int index = 0; index < nfsShareClientArrayAddition.size(); index++) {
@@ -379,7 +379,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
                 fileSystemId = fsIds.get(0);
             }
         }
-        FileSystem fileSystem = null;
+        FileSystem fileSystem = new FileSystem();
         Map<String, String> orientedFileSystem = getOrientedFs(fileSystemId);
         if ("200".equals(orientedFileSystem.get("code"))) {
             String fs = orientedFileSystem.get(DATA);
@@ -655,15 +655,12 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         Map<String, String> respMap = new HashMap<>();
         String mgmt = "";
         String logicName = "";
-        List<LogicPorts> logicPort = dmeStorageService.getLogicPorts(storageId);
-        if (logicPort != null) {
-            JsonArray jsonArray = new JsonParser().parse(gson.toJson(logicPort)).getAsJsonArray();
-            for (JsonElement jsonElement : jsonArray) {
-                JsonObject element = jsonElement.getAsJsonObject();
-                String currentPortId1 = element.get("homePortId").getAsString();
-                if (!StringUtils.isEmpty(currentPortId) && currentPortId1.equals(currentPortId)) {
-                    mgmt = ToolUtils.jsonToStr(element.get("mgmtIp"));
-                    logicName = ToolUtils.jsonToStr(element.get(NAME_FIELD));
+        List<LogicPorts> logicPorts = dmeStorageService.getLogicPorts(storageId);
+        if (logicPorts != null) {
+            for (LogicPorts logicPort : logicPorts) {
+                if (logicPort!=null && !StringUtils.isEmpty(currentPortId)&& logicPort.getId().equalsIgnoreCase(currentPortId)) {
+                    mgmt = logicPort.getMgmtIp();
+                    logicName = logicPort.getName();
                     break;
                 }
             }

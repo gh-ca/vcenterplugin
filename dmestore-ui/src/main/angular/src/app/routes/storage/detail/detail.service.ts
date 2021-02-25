@@ -27,7 +27,7 @@ export class DetailService {
     return this.http.get('dmestorage/volumes', {params: {storageId}});
   }
   getVolumeListListByPage(params:any){
-    return this.http.get('dmestorage/volumes/byPage?storageId='+params.storageId+'&pageSize='+params.pageSize+'&pageNo='+params.pageNo);
+    return this.http.get('dmestorage/volumes/byPage', {params: params});
   }
   getFileSystemList(storageId: string){
     return this.http.get('dmestorage/filesystems', {params: {storageId}});
@@ -163,6 +163,7 @@ export class Volume{
   storageId: string;//存储设备id
   poolRawId: string;//存储池id
   capacityUsage: string;//容量利用率
+  capacityUsageNum: number;//容量利用率
   protectionStatus: boolean;//保护状态
   hostIds: string[];
   hostGroupIds: string;

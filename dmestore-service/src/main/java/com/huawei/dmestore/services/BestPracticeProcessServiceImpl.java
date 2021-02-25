@@ -86,9 +86,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             } catch (SQLException ex) {
                 continue;
             }
-            if (bean.getCount() > 0) {
-                list.add(bean);
-            }
+            list.add(bean);
         }
         return list;
     }
@@ -146,12 +144,12 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                         bean.setRecommendValue(String.valueOf(bestPracticeService.getRecommendValue()));
                         bean.setLevel(bestPracticeService.getLevel());
                         bean.setNeedReboot(String.valueOf(bestPracticeService.needReboot()));
-                        bean.setActualValue(
-                            String.valueOf(bestPracticeService.getCurrentValue(vcsdkUtils, hostObjectId)));
+                        Object currentValue = bestPracticeService.getCurrentValue(vcsdkUtils, hostObjectId);
+                        String actualValue = String.valueOf(currentValue);
+                        bean.setActualValue(actualValue);
                         bean.setHostObjectId(hostObjectId);
                         bean.setHostName(hostName);
                         bean.setAutoRepair(String.valueOf(bestPracticeService.autoRepair()));
-
                         checkMap.get(hostSetting).add(bean);
                     }
                 } catch (Exception ex) {
@@ -174,7 +172,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     private void bachDbProcess(Map<String, List<BestPracticeBean>> map) {
         map.forEach((hostSetting, bestPracticeBeans) -> {
             // 本地全量查询
-            List<String> localHostNames = null;
+            List<String> localHostNames = new ArrayList<>();
             try {
                 localHostNames = bestPracticeCheckDao.getHostNameByHostsetting(hostSetting);
             } catch (SQLException e) {
@@ -215,6 +213,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
     @Override
     public List<BestPracticeUpResultResponse> updateByCluster(String clusterObjectId) throws DmeException {
         // 查询集群下的所有主机信息
+        List<BestPracticeUpResultResponse> bestPracticeUpResultResponses = new ArrayList<>();
         String hostsOnCluster = vcsdkUtils.getHostsOnCluster(clusterObjectId);
         if (StringUtil.isNotBlank(hostsOnCluster)) {
             List<Map<String, String>> hostList = gson.fromJson(hostsOnCluster,
@@ -225,7 +224,7 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
             }
             return update(objectIds);
         }
-        return null;
+        return bestPracticeUpResultResponses;
     }
 
     @Override

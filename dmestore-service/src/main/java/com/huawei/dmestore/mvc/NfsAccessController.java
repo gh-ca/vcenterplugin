@@ -4,11 +4,14 @@ import com.huawei.dmestore.exception.DmeException;
 import com.huawei.dmestore.model.NfsDataInfo;
 import com.huawei.dmestore.model.ResponseBodyBean;
 import com.huawei.dmestore.services.DmeNFSAccessService;
+import com.huawei.dmestore.utils.ToolUtils;
+
 import com.google.gson.Gson;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -128,7 +131,18 @@ public class NfsAccessController extends BaseController {
         LOG.info("accessnfs/deletenfs=={}", gson.toJson(params));
         String failureStr;
         try {
-            dmeNfsAccessService.deleteNfs(params);
+            if (params != null && params.size() != 0) {
+                String storeObjectId = ToolUtils.getStr(params.get("storeObjectId"));
+                if (!StringUtils.isEmpty(storeObjectId)) {
+                    // 单个删除
+                    dmeNfsAccessService.deleteNfs(storeObjectId);
+                } else {
+                    // 批量删除
+                    Object jsonObj = params.get("storeObjectIds");
+                    List<String> storeObjectIds = gson.fromJson(gson.toJson(jsonObj), List.class);
+                    dmeNfsAccessService.bulkDeletionNfs(storeObjectIds);
+                }
+            }
             return success(null, "delete nfs success");
         } catch (DmeException e) {
             LOG.error("delte nfs failure:", e);
