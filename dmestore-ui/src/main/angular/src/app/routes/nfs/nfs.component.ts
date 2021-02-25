@@ -464,7 +464,7 @@ export class NfsComponent implements OnInit {
   }
   // 挂载
   mount(){
-    this.jumpPage(this.rowSelected[0].objectid,"nfs/dataStore/mount");
+    // this.jumpPage(this.rowSelected[0].objectid,"nfs/dataStore/mount");
     const flag = 'plugin';
     const objectId=this.rowSelected[0].objectid;
     const dsName=this.rowSelected[0].name;
