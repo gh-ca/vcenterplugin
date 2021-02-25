@@ -176,14 +176,13 @@
             <p *ngIf="nfsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
             <p *ngIf="fsNameRepeatErr" style="color: red">{{'errorMsg.fsrepeat' | translate}}</p>
             <p *ngIf="shareNameRepeatErr" style="color: red">{{'errorMsg.sharerepeat' | translate}}</p>
-
-
           </clr-control-error>
         </clr-input-container>
         <clr-checkbox-container>
           <label></label>
           <clr-checkbox-wrapper>
-            <input type="checkbox" clrCheckbox [(ngModel)]="addForm.sameName" name="sameName" formControlName="sameName" />
+            <input type="checkbox" clrCheckbox *ngIf="isCheckSameName();"  [(ngModel)]="addForm.sameName" (change)="setSameName();" name="sameName" formControlName="sameName" />
+            <input type="checkbox" clrCheckbox *ngIf="!isCheckSameName();"  [(ngModel)]="addForm.sameName" name="sameName" formControlName="sameName" disabled/>
             <label>{{'nfs.sameName' | translate}}</label>
           </clr-checkbox-wrapper>
         </clr-checkbox-container>
@@ -199,6 +198,9 @@
         <clr-input-container *ngIf="!addForm.sameName">
           <label>{{'nfs.shareName' | translate}}</label>
           <input class="inputWidth100Percent" maxlength="256" clrInput [(ngModel)]="addForm.shareName" name="shareName" formControlName="shareName" (blur)="checkShareName();"/>
+          <clr-control-helper *ngIf="shareNameContainsCN">
+            <p style="color: red">{{'validations.shareNameRequired' | translate}}</p>
+          </clr-control-helper>
           <clr-control-error>
             <p *ngIf="!oldShareName" style="color: red">{{'errorMsg.require' | translate}}</p>
             <p *ngIf="matchErr" style="color: red">{{'errorMsg.numberAndLetter' | translate}}</p>

@@ -112,6 +112,8 @@ export class NfsComponent implements OnInit {
   compressionShow = false; // 数据压缩 true 支持 false 不支持
   latencyIsSelect = false; // 时延为下拉框
 
+  shareNameContainsCN = false; // 共享名称包含中文
+
   errMessage = '';
   constructor(private addService: NfsAddService, private remoteSrv: NfsService, private cdr: ChangeDetectorRef, public gs: GlobalsService ,
               private storageService: StorageService,private vmfsListService: VmfsListService,private router:Router, private token: TokenService,
@@ -193,6 +195,7 @@ export class NfsComponent implements OnInit {
     this.addModelShow = true;
     this.storageList = null;
     this.storagePoolMap = [];
+    this.shareNameContainsCN = false;
     // 添加页面默认打开首页
     this.jumpTo(this.addPageOne);
 
@@ -540,11 +543,22 @@ export class NfsComponent implements OnInit {
     this.oldNfsName=this.addForm.nfsName;
     let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if(reg5.test(this.addForm.nfsName)){
+      // 共享名称不能包含中文
+      let reg5Two:RegExp = new RegExp('[\u4e00-\u9fa5]');
       //验证重复
       this.matchErr=false;
       if (this.addForm.sameName){
+        this.addForm.shareName = this.addForm.nfsName;
+        this.addForm.fsName = this.addForm.nfsName;
+        if (reg5Two.test(this.addForm.nfsName)) {
+          this.addForm.sameName = false;
+          this.addForm.shareName = '';
+          this.shareNameContainsCN = true;
+        } else {
+          this.shareNameContainsCN = false;
+          this.checkShareNameExist(this.addForm.nfsName);
+        }
         this.checkNfsNameExist(this.addForm.nfsName);
-        this.checkShareNameExist(this.addForm.nfsName);
         this.checkFsNameExist(this.addForm.nfsName);
       }else{
         this.checkNfsNameExist(this.addForm.nfsName);
@@ -560,17 +574,42 @@ export class NfsComponent implements OnInit {
 
   checkShareName(){
     if(this.addForm.shareName==null) return false;
-    if(this.oldShareName=this.addForm.shareName) return false;
-
+    if(this.oldShareName==this.addForm.shareName) return false;
     this.oldShareName=this.addForm.shareName;
     let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
     if(reg5.test(this.addForm.shareName)){
-      //验证重复
-      this.matchErr=false;
-      this.checkShareNameExist(this.addForm.shareName);
+      // 共享名称不能包含中文
+      let reg5Two:RegExp = new RegExp('[\u4e00-\u9fa5]');
+      if (reg5Two.test(this.addForm.shareName)) {
+        this.addForm.shareName = '';
+        this.shareNameContainsCN = true;
+      } else {
+        this.shareNameContainsCN = false;
+        //验证重复
+        this.matchErr=false;
+        this.checkShareNameExist(this.addForm.shareName);
+      }
     }else{
       this.matchErr=true;
       this.addForm.shareName=null;
+    }
+  }
+
+  /**
+   * 添加页面可点击 true 可点击 false 不可点击
+   */
+  isCheckSameName() {
+    let reg5:RegExp = new RegExp('[\u4e00-\u9fa5]');
+    if (reg5.test(this.addForm.nfsName)) { // 名称有中文
+      return false;
+    } else { // 无中文
+      return true;
+    }
+  }
+  setSameName(){
+    if (this.addForm.sameName) {
+      this.addForm.shareName = this.addForm.nfsName;
+      this.addForm.fsName = this.addForm.nfsName;
     }
   }
 
