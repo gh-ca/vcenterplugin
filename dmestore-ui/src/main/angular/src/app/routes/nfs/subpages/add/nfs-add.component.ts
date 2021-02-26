@@ -306,7 +306,7 @@ export class NfsAddComponent implements OnInit{
     if(this.addForm.nfsName==null) return false;
     if(this.oldNfsName==this.addForm.nfsName) return false;
     this.oldNfsName=this.addForm.nfsName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
     if(reg5.test(this.addForm.nfsName)){
       // 共享名称不能包含中文
       let reg5Two:RegExp = new RegExp('[\u4e00-\u9fa5]');
@@ -341,7 +341,7 @@ export class NfsAddComponent implements OnInit{
     if(this.oldShareName==this.addForm.shareName) return false;
 
     this.oldShareName=this.addForm.shareName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
     if(reg5.test(this.addForm.shareName)){
       // 共享名称不能包含中文
       let reg5Two:RegExp = new RegExp('[\u4e00-\u9fa5]');
@@ -378,10 +378,10 @@ export class NfsAddComponent implements OnInit{
   }
   checkFsName(){
     if(this.addForm.fsName==null) return false;
-    if(this.oldFsName=this.addForm.fsName) return false;
+    if(this.oldFsName==this.addForm.fsName) return false;
 
     this.oldFsName=this.addForm.fsName;
-    let reg5:RegExp = new RegExp('^[0-9a-zA-Z-\u4e00-\u9fa5a"_""."]*$');
+    let reg5:RegExp = new RegExp('^[0-9a-zA-Z\u4e00-\u9fa5a"_"]*$');
     if(reg5.test(this.addForm.fsName)){
       //验证重复
       this.matchErr=false;
