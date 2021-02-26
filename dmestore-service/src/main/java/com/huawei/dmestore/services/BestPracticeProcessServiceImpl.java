@@ -277,12 +277,15 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                 base.setHostSetting(service.getHostSetting());
                 base.setNeedReboot(service.needReboot());
                 try {
-                    // 更新成功后，只要有一项是需要重启的则该主机需要重启后生效
-                    service.update(vcsdkUtils, objectId);
-                    base.setUpdateResult(true);
-                    if (service.needReboot()) {
-                        isNeedReboot = true;
+                    boolean checkFlag = service.check(vcsdkUtils, objectId);
+                    if(!checkFlag){
+                        service.update(vcsdkUtils, objectId);
+                        // 更新成功后，只要有一项是需要重启的则该主机需要重启后生效
+                        if (service.needReboot()) {
+                            isNeedReboot = true;
+                        }
                     }
+                    base.setUpdateResult(true);
                     successList.add(objectId);
                 } catch (Exception ex) {
                     base.setUpdateResult(false);
@@ -291,9 +294,8 @@ public class BestPracticeProcessServiceImpl implements BestPracticeProcessServic
                 }
                 baseList.add(base);
             }
-            response.setNeedReboot(isNeedReboot);
             response.setResult(baseList);
-
+            response.setNeedReboot(isNeedReboot);
             responses.add(response);
         }
 
