@@ -4,7 +4,7 @@ package com.huawei.dmestore.model;
 import java.util.List;
 
 /**
- * Volume
+ * Volume.
  *
  * @author lianq
  * @ClassName: Volume

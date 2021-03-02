@@ -1523,7 +1523,14 @@ public class DmeStorageServiceImpl implements DmeStorageService {
             String body = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();
             if (ToolUtils.jsonToInt(jsonObject.get("count")) != 0) {
-                isExist = false;
+                JsonArray jsonArray = jsonObject.get("volumes").getAsJsonArray();
+                for (JsonElement jsonElement : jsonArray) {
+                    String volumeName = ToolUtils.jsonToStr(jsonElement.getAsJsonObject().get("name"));
+                    if (name.equalsIgnoreCase(volumeName)) {
+                        isExist = false;
+                        break;
+                    }
+                }
             }
         }
         return isExist;
@@ -1534,7 +1541,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         boolean isExist = true;
         List<FileSystem> fileSystems = getFileSystems(storageId);
         for (FileSystem fileSystem : fileSystems) {
-            if (name.equals(fileSystem.getName())) {
+            if (name.equalsIgnoreCase(fileSystem.getName())) {
                 isExist = false;
                 break;
             }
@@ -1547,7 +1554,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         boolean isExist = true;
         List<NfsShares> nfsShares = getNfsShares(storageId);
         for (NfsShares nfsShare : nfsShares) {
-            if (name.equals(nfsShare.getName())) {
+            if (name.equalsIgnoreCase(nfsShare.getName())) {
                 isExist = false;
                 break;
             }
