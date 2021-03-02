@@ -1515,9 +1515,15 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public Boolean queryVolumeByName(String name) throws DmeException {
+    public Boolean queryVolumeByName(String name,String storageId, String serviceLevelId) throws DmeException {
         boolean isExist = true;
+        if (StringUtils.isEmpty(storageId) && !StringUtils.isEmpty(serviceLevelId)) {
+            storageId = getStorageByServiceLevelId(serviceLevelId);
+        }
         String url = DmeConstants.DME_VOLUME_BASE_URL + "?name=" + name;
+        if (!StringUtils.isEmpty(storageId)) {
+            url = url + "&storage_id" + storageId;
+        }
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
             String body = responseEntity.getBody();
@@ -1541,7 +1547,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         boolean isExist = true;
         List<FileSystem> fileSystems = getFileSystems(storageId);
         for (FileSystem fileSystem : fileSystems) {
-            if (name.equalsIgnoreCase(fileSystem.getName())) {
+            if (name.equals(fileSystem.getName())) {
                 isExist = false;
                 break;
             }
@@ -1554,7 +1560,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
         boolean isExist = true;
         List<NfsShares> nfsShares = getNfsShares(storageId);
         for (NfsShares nfsShare : nfsShares) {
-            if (name.equalsIgnoreCase(nfsShare.getName())) {
+            if (name.equals(nfsShare.getName())) {
                 isExist = false;
                 break;
             }
