@@ -123,9 +123,9 @@ export class IscsiComponent implements OnInit, AfterViewInit {
       this.http.get(this.portGetUrl, this.portGetUrlParams).subscribe((result: any) => {
         this.portLoading = false;
         if (result.code === '200'){
-          result.data.forEach((item) => {
-            item.connectStatus = '';
-          });
+          // result.data.forEach((item) => {
+          //   item.connectStatus = '';
+          // });
           this.portList = result.data;
           this.portTotal = result.data.length;
           this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
