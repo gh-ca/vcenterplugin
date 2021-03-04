@@ -21,6 +21,8 @@ import com.huawei.dmestore.model.VolumeListRestponse;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.web.bind.annotation.RequestParam;
+
 /**
  * DmeStorageService
  *
@@ -243,10 +245,12 @@ public interface DmeStorageService {
      * get volume by name
      *
      * @param name volume name
+     * @param storageId storageId
+     * @param serviceLevelId serviceLevelId
      * @return Boolean
      * @throws DmeException when error
      */
-    Boolean queryVolumeByName(String name) throws DmeException;
+    Boolean queryVolumeByName(String name, String storageId, String serviceLevelId) throws DmeException;
 
     /**
      * list Volume Performance

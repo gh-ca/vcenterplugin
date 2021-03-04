@@ -868,7 +868,7 @@ public class DmeStorageServiceImplTest {
         jsonObject.addProperty("count", 1);
         ResponseEntity<String> responseEntity = new ResponseEntity(gson.toJson(jsonObject), null, HttpStatus.OK);
         when(dmeAccessService.access(url, HttpMethod.GET, null)).thenReturn(responseEntity);
-        System.out.println(dmeStorageService.queryVolumeByName(name));
+        //System.out.println(dmeStorageService.queryVolumeByName(name));
     }
 
     @Test

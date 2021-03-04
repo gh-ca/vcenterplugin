@@ -1515,15 +1515,28 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public Boolean queryVolumeByName(String name) throws DmeException {
+    public Boolean queryVolumeByName(String name,String storageId, String serviceLevelId) throws DmeException {
         boolean isExist = true;
+        if (StringUtils.isEmpty(storageId) && !StringUtils.isEmpty(serviceLevelId)) {
+            storageId = getStorageByServiceLevelId(serviceLevelId);
+        }
         String url = DmeConstants.DME_VOLUME_BASE_URL + "?name=" + name;
+        if (!StringUtils.isEmpty(storageId)) {
+            url = url + "&storage_id" + storageId;
+        }
         ResponseEntity<String> responseEntity = dmeAccessService.access(url, HttpMethod.GET, null);
         if (responseEntity.getStatusCodeValue() == HttpStatus.OK.value()) {
             String body = responseEntity.getBody();
             JsonObject jsonObject = new JsonParser().parse(body).getAsJsonObject();
             if (ToolUtils.jsonToInt(jsonObject.get("count")) != 0) {
-                isExist = false;
+                JsonArray jsonArray = jsonObject.get("volumes").getAsJsonArray();
+                for (JsonElement jsonElement : jsonArray) {
+                    String volumeName = ToolUtils.jsonToStr(jsonElement.getAsJsonObject().get("name"));
+                    if (name.equalsIgnoreCase(volumeName)) {
+                        isExist = false;
+                        break;
+                    }
+                }
             }
         }
         return isExist;
