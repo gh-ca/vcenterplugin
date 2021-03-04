@@ -114,6 +114,10 @@ export class StorageStatusFilter implements ClrDatagridFilterInterface<StorageLi
         <input type="radio" clrRadio name="mediaType" (change)="changeFunc($event)" [(ngModel)]="mediaType" value="block"/>
         <label>{{'enum.type.block' | translate}}</label>
       </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="mediaType" (change)="changeFunc($event)" [(ngModel)]="mediaType" value="block/file"/>
+        <label>{{'enum.type.blockAndFile' | translate}}</label>
+      </clr-radio-wrapper>
     </clr-radio-container>
   `,
 })
