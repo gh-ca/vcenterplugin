@@ -816,7 +816,8 @@
     },
     "type":{
       "block":"块",
-      "file":"文件"
+      "file":"文件",
+      "blockAndFile": "块/文件"
     }
   },
   "errorMsg":{

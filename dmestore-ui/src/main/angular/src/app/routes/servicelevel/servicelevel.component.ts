@@ -446,7 +446,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     this.http.post('datastorestatistichistrory/servicelevelStoragePool', p).subscribe((response: any) => {
       if (response.code == '200'){
         this.storagePoolList.forEach((item)=>{
-          let i = response.data[item.storage_instance_id];
+          let i = response.data[item.storageInstanceId];
           if (i != undefined){
             let iops = i['1125912791810049'].max;
             let latency = i['1125912791810050'].max;
