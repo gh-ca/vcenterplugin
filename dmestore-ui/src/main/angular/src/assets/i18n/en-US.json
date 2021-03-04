@@ -816,7 +816,8 @@
      },
      "type":{
       "block":"Block",
-      "file":"File"
+      "file":"File",
+      "blockAndFile": "Block/File"
      }
   },
   "errorMsg":{
