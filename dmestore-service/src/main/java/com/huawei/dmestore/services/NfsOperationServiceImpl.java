@@ -658,7 +658,8 @@ public class NfsOperationServiceImpl implements NfsOperationService {
         List<LogicPorts> logicPorts = dmeStorageService.getLogicPorts(storageId);
         if (logicPorts != null) {
             for (LogicPorts logicPort : logicPorts) {
-                if (logicPort!=null && !StringUtils.isEmpty(currentPortId)&& logicPort.getId().equalsIgnoreCase(currentPortId)) {
+                if (logicPort != null && !StringUtils.isEmpty(currentPortId) &&
+                    logicPort.getId().equalsIgnoreCase(currentPortId)) {
                     mgmt = logicPort.getMgmtIp();
                     logicName = logicPort.getName();
                     break;
@@ -802,7 +803,7 @@ public class NfsOperationServiceImpl implements NfsOperationService {
 
     private String getStorageModel(String storageId) throws DmeException {
         StorageDetail storageDetail = dmeStorageService.getStorageDetail(storageId);
-        return storageDetail.getModel() +" "+ storageDetail.getProductVersion();
+        return storageDetail.getModel() + " " + storageDetail.getProductVersion();
     }
 
     // 查询指定share,获取共享在存储设备上的id

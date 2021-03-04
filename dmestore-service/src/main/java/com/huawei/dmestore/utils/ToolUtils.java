@@ -354,7 +354,7 @@ public class ToolUtils {
         Map<String, String> map = new HashMap<>();
         map.put("id", "112321");
         map.put("type", "aa");
-        System.out.println(getRequsetParams(map, false, false));
+        System.out.println(getRequsetParams(map, true, true));
     }
 
     public static StorageTypeShow getStorageTypeShow(String storageModel) throws DmeException {

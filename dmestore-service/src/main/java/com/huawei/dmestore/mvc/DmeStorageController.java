@@ -151,9 +151,13 @@ public class DmeStorageController extends BaseController {
      */
     @GetMapping("/filesystems")
     @ResponseBody
-    public ResponseBodyBean getFileSystems(@RequestParam(name = "storageId") String storageId) {
+    public ResponseBodyBean getFileSystems(@RequestParam(name = "storageId") String storageId,
+                                           @RequestParam(name = "pageNo", required = false, defaultValue = "1")
+                                               Integer pageNo,
+                                           @RequestParam(name = "pageSize", required = false, defaultValue = "1000")
+                                               Integer pageSize) {
         try {
-            return success(dmeStorageService.getFileSystems(storageId));
+            return success(dmeStorageService.getFileSystems(storageId,pageNo,pageSize));
         } catch (DmeException e) {
             return failure(e.getMessage());
         }
