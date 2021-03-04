@@ -8,7 +8,7 @@
         <clr-tab>
           <button clrTabLink id="conf" (click)="changeTab('conf')">{{'storage.detail.conf.configuration' | translate}}</button>
           <clr-tab-content id="configuration" *clrIfActive="true">
-            <table class="table table-noborder" *ngIf="detail">
+            <table class="table table-noborder" *ngIf="detail" [clrLoading]="detailLoading">
               <tr>
                 <td class="left">{{'storage.detail.conf.name' | translate}}</td>
                 <td class="left">{{detail.name}}</td>
@@ -58,7 +58,11 @@
               </tr>
             </table>
             <div *ngIf="!detail" style="height: 50%">
-              {{'errorMsg.cantFindData' | translate}}
+
+              <cds-alert-group type="light" size="sm">
+                <cds-alert *ngIf="!detailLoading" status="warning">{{'errorMsg.cantFindData' | translate}}</cds-alert>
+                <cds-alert *ngIf="detailLoading" status="loading">{{'vmfs.loadingTips' | translate}}</cds-alert>
+              </cds-alert-group>
             </div>
             <clr-tabs>
               <!--Storage Pools-->
@@ -143,6 +147,7 @@
                           <span *ngIf="!item.mediaType">--</span>
                           <span *ngIf="item.mediaType == 'file'">{{'enum.type.file' | translate}}</span>
                           <span *ngIf="item.mediaType == 'block'">{{'enum.type.block' | translate}}</span>
+                          <span *ngIf="item.mediaType == 'block/file'">{{'enum.type.blockAndFile' | translate}}</span>
                         </clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">{{formatArry(item.serviceLevelName)}}</clr-dg-cell>
                         <clr-dg-cell [hidden]="poolRadio!=='table1'">

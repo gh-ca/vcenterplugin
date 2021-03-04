@@ -124,7 +124,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   storageName= "";
   constructor(private nfsService:NfsService, private makePerformance: MakePerformance,
               private detailService: DetailService, private cdr: ChangeDetectorRef, private ngZone: NgZone,
-              private gs: GlobalsService,private activatedRoute: ActivatedRoute,private router:Router,
+              /*private gs: GlobalsService,*/private activatedRoute: ActivatedRoute,private router:Router,
               private translatePipe:TranslatePipe, private vmfsListService: VmfsListService) { }
   detail: StorageDetail;
   storagePool: StoragePool[];
@@ -220,6 +220,8 @@ export class DetailComponent implements OnInit, AfterViewInit {
   volReqParam; // 卷请求参数
 
   storageDetailTag:number;
+
+  detailLoading = false;
   //portList:
   ngOnInit(): void {
     this.activatedRoute.queryParams.subscribe(queryParam => {
@@ -227,7 +229,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
       this.storageName = queryParam.name;
     });
     this.getStorageDetail(true);
-    this.getStoragePoolList(true);
+
     // 初始化服务等级数据
     this.setServiceLevelList();
 
@@ -235,14 +237,14 @@ export class DetailComponent implements OnInit, AfterViewInit {
   // 获取服务等级数据
   setServiceLevelList() {
     // 初始化服务等级选择参数
-    this.gs.loading=true;
+    // this.gs.loading=true;
     // 获取服务等级数据
     this.vmfsListService.getServiceLevelList().subscribe((result: any) => {
       if (result.code === '200' && result.data !== null) {
         this.serviceLevelList = result.data.filter(item => item.totalCapacity !== 0);
       }
       // 隐藏loading
-      this.gs.loading=false;
+      // this.gs.loading=false;
       // this.gs.loading = false;
       this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     });
@@ -252,13 +254,13 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   // 初始化表格对象
   async initChart() {
-    this.gs.loading=true;
+    // this.gs.loading = false;=true;
     const fsNames:string[] = [];
     fsNames.push(this.storageId);
      // IOPS
     this.setChart(150,this.translatePipe.transform('vmfs.iops'),"IO/s",
      NfsService.storageIOPS,fsNames,this.selectRange,NfsService.storageUrl, this.startTime, this.endTime).then(res=>{
-      this.gs.loading=false;
+     // this.gs.loading = false;
       this.iopsChart = res;
       this.cdr.detectChanges();
     });
@@ -266,14 +268,14 @@ export class DetailComponent implements OnInit, AfterViewInit {
     // 带宽
     this.setChart(150, this.translatePipe.transform('nfs.qos_bandwidth'), 'MB/s',
       NfsService.storageBDWT, fsNames, this.selectRange, NfsService.storageUrl, this.startTime, this.endTime).then(res => {
-      this.gs.loading=false;
+     // this.gs.loading = false;
       this.bandwidthChart = res;
       this.cdr.detectChanges();
     });
   }
 
   changeTab(page: string){
-    this.gs.loading=false;
+   // this.gs.loading = false;
     if (page === 'conf'){
       this.getStorageDetail(false);
     }
@@ -311,31 +313,32 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   getStorageDetail(fresh: boolean){
     if (fresh){
-      this.gs.loading=true;
+      // this.gs.loading=true;
+      this.detailLoading = true;
       this.detailService.getStorageDetail(this.storageId).subscribe((r: any) => {
-        this.gs.loading=false;
+       // this.gs.loading = false; = false;
         if (r.code === '200'){
           this.detail = r.data;
 
           this.detail.location = this.HTMLDecode(this.detail.location);
 
           this.storageDetailTag = this.detail.storageTypeShow.storageDetailTag;
-          this.initCapacity();
-          this.cdr.detectChanges();
         }else{
-
         }
+        this.detailLoading = false;
+        this.getStoragePoolList(true);
+        this.cdr.detectChanges();
       });
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.detail === null){
-        this.gs.loading=true;
+        // this.gs.loading = false;=true;
         this.detailService.getStorageDetail(this.storageId).subscribe((r: any) => {
-          this.gs.loading=false;
+         // this.gs.loading = false;
           if (r.code === '200'){
             this.detail = r.data;
             this.detail.location = this.HTMLDecode(this.detail.location);
-            this.initCapacity();
+            this.getStoragePoolList(true);
             this.cdr.detectChanges();
           }
         });
@@ -372,15 +375,22 @@ export class DetailComponent implements OnInit, AfterViewInit {
   }
   getStoragePoolList(fresh: boolean){
     if (fresh){
-      this.gs.loading=true;
+      // this.gs.loading = false;=true;
+      this.isLoading = true;
       this.detailService.getStoragePoolList(this.storageId).subscribe((r: any) =>{
-        this.gs.loading=false;
+       // this.gs.loading = false; = false;
+        this.isLoading = false;
         if (r.code === '200'){
           this.storagePool = r.data;
+          // 如果是v6设备存储池的类型为Block/File
+          if (this.detail.storageTypeShow.dorado){
+            this.storagePool.forEach(item => item.mediaType = "block/file");
+          }
           const allName = this.storagePool.map(item => item.name);
           this.volStoragePoolFilter.initAllName(allName);
           this.poolTotal=this.storagePool.length==null?0:this.storagePool.length;
           this.storageListInitHandle();
+          this.initCapacity();
           this.cdr.detectChanges();
           this.liststoragepoolperformance();
         }
@@ -388,15 +398,16 @@ export class DetailComponent implements OnInit, AfterViewInit {
     }else {
       // 此处防止重复切换tab每次都去后台请求数据
       if (this.storagePool === null){
-        this.gs.loading=true;
+        // this.gs.loading = false;=true;
         this.detailService.getStoragePoolList(this.storageId).subscribe((r: any) =>{
-          this.gs.loading=false;
+         // this.gs.loading = false;
           if (r.code === '200'){
             this.storagePool = r.data;
             const allName = this.storagePool.map(item => item.name);
             this.volStoragePoolFilter.initAllName(allName);
             this.poolTotal=this.storagePool.length==null?0:this.storagePool.length;
             this.storageListInitHandle();
+            this.initCapacity();
             this.cdr.detectChanges();
             this.liststoragepoolperformance();
           }
