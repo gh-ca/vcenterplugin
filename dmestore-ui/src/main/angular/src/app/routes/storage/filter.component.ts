@@ -843,7 +843,7 @@ export class DiskStatusFilter implements ClrDatagridFilterInterface<StorageDisk>
       return true;
     } else {
       const  quota = item.status.toString();
-      return this.status == quota;
+      return quota.toLowerCase().indexOf(this.status.toLowerCase()) >= 0;
     }
   }
 

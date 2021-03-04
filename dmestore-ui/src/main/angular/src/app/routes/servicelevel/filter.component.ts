@@ -142,7 +142,7 @@ export class SLSPDiskTypeFilter implements ClrDatagridFilterInterface<SLStorageP
       return true;
     } else {
       const  physicalType = item.physicalType;
-      return this.type == physicalType;
+      return physicalType.toLowerCase().indexOf(this.type.toLowerCase()) >= 0;
     }
   }
 
