@@ -122,10 +122,10 @@ public class HostAccessServiceImpl implements HostAccessService {
         for (Map<String, Object> ethPort : ethPorts) {
             String mgmtIp = ToolUtils.getStr(ethPort.get("mgmtIp"));
             String connectStatus = ToolUtils.getStr(ethPort.get("connectStatus"));
-            if (StringUtils.isEmpty(mgmtIp)) {
-                ethPort.put("connectStatusType", 2);
-            } else if (!StringUtils.isEmpty(connectStatus) && "disconnected".equalsIgnoreCase(connectStatus)) {
+            if (!StringUtils.isEmpty(connectStatus) && "disconnected".equalsIgnoreCase(connectStatus)) {
                 ethPort.put("connectStatusType", 1);
+            } else if (StringUtils.isEmpty(mgmtIp)) {
+                ethPort.put("connectStatusType", 2);
             }
             ethPortList.add(ethPort);
         }

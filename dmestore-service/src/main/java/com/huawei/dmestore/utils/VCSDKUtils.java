@@ -1438,7 +1438,7 @@ public class VCSDKUtils {
                         if (configuredSendTargets != null && configuredSendTargets.size() != 0) {
                             for (HostInternetScsiHbaSendTarget hostInternetScsiHbaSendTarget : configuredSendTargets) {
                                 String address = hostInternetScsiHbaSendTarget.getAddress();
-                                if (StringUtils.isEmpty(address)) {
+                                if (!StringUtils.isEmpty(address)) {
                                     addressList.add(address);
                                 }
                             }
@@ -2952,6 +2952,10 @@ public class VCSDKUtils {
                                     configuredSendTargetOfIscsiHbaByHost.contains(mgmtIp)) {
 
                                     ethPort.put("connectStatusType", 3);
+                                    reEthPorts.add(ethPort);
+                                    return;
+                                }
+                                if (!StringUtils.isEmpty(ToolUtils.getStr(ethPort.get("connectStatusType")))) {
                                     reEthPorts.add(ethPort);
                                     return;
                                 }
