@@ -14,7 +14,7 @@ import { GlobalsService }     from "../../shared/globals.service";
 import {TranslatePipe} from "@ngx-translate/core";
 import {ServicelevelService, SLStoragePool} from "./servicelevel.service";
 import {ServiceLevelFilter} from "../vmfs/list/filter.component";
-import {SLSPDiskTypeFilter, SLSPStatusFilter, SLSPStorageNameFilter} from "./filter.component";
+import {LUNStatusFilter, SLSPDiskTypeFilter, SLSPStatusFilter, SLSPStorageNameFilter} from "./filter.component";
 
 @Component({
   selector: 'app-servicelevel',
@@ -167,6 +167,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('runningStatusFilter') runningStatusFilter: SLSPStatusFilter;
   @ViewChild('slspDiskTypeFilter') slspDiskTypeFilter: SLSPDiskTypeFilter;
   @ViewChild('sLSPStorageNameFilter') sLSPStorageNameFilter: SLSPStorageNameFilter;
+  @ViewChild('lunStatusFilter') lunStatusFilter: LUNStatusFilter;
 
   constructor(private ngZone: NgZone,
               private cdr: ChangeDetectorRef,
@@ -622,6 +623,7 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
     this.runningStatusFilter.initStatus();
     this.slspDiskTypeFilter.initType();
     this.sLSPStorageNameFilter.initName();
+    this.lunStatusFilter.initName();
   }
 
   setDataSetsChart(height: number, title: string, subtext: string,){
