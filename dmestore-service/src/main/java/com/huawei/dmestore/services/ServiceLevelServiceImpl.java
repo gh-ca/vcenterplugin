@@ -527,7 +527,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return null;
     }
 
-    private Map<String, Long> parseTime(String interval) {
+    private static Map<String, Long> parseTime(String interval) {
         long endTime = System.currentTimeMillis();
         Calendar rightNow = Calendar.getInstance();
         rightNow.setTimeInMillis(endTime);
@@ -564,7 +564,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return timeMap;
     }
 
-    public JsonObject getDatasetsQueryBody(String serviceLevelId, String interval, String dataSetType) {
+    public static JsonObject getDatasetsQueryBody(String serviceLevelId, String interval, String dataSetType) {
         Map<String, Long> timeMap = parseTime(interval);
 
         // timeRange
@@ -582,7 +582,11 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         JsonObject filters = new JsonObject();
         JsonArray filtersDimensions = new JsonArray();
         JsonObject filtersDimension = new JsonObject();
-        filtersDimension.addProperty("field", "dimensions.lun.tierNativeId");
+        String field = "dimensions.lun.tierNativeId";
+        if("stat-storage-pool".equals(dataSetType) || "perf-stat-storage-pool-details".equals(dataSetType)){
+            field = "dimensions.pool.tierNativeId";
+        }
+        filtersDimension.addProperty("field", field);
         JsonArray values = new JsonArray();
         values.add(new JsonPrimitive(serviceLevelId));
         filtersDimension.add("values", values);
@@ -592,7 +596,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         // dimensions
         JsonArray dimensions = new JsonArray();
         JsonObject dimension1 = new JsonObject();
-        dimension1.addProperty("field", "dimensions.lun.tierNativeId");
+        dimension1.addProperty("field", field);
         dimension1.addProperty("index", 1);
         JsonObject dimension2 = new JsonObject();
         dimension2.addProperty("field", "timestamp");
@@ -647,6 +651,11 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         returnBody.add("metrics", metrics);
 
         return returnBody;
+    }
+
+    public static void main(String[] args) {
+        String body = getDatasetsQueryBody("ea8b7fbd-8dab-42b3-8683-adaa019013ad", "LAST_1_MONTH", "perf-stat-lun-details").toString();
+        System.out.println(body);
     }
 
 }
