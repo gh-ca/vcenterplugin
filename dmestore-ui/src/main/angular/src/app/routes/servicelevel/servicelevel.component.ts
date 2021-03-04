@@ -619,11 +619,21 @@ export class ServicelevelComponent implements OnInit, AfterViewInit, OnDestroy {
    * 初始化过滤器
    */
   initStoragePoolListFilter(){
-    this.slspStatusFilter.initStatus();
-    this.runningStatusFilter.initStatus();
-    this.slspDiskTypeFilter.initType();
-    this.sLSPStorageNameFilter.initName();
-    this.lunStatusFilter.initName();
+    if (this.slspStatusFilter){
+      this.slspStatusFilter.initStatus();
+    }
+    if (this.runningStatusFilter) {
+      this.runningStatusFilter.initStatus();
+    }
+    if (this.slspDiskTypeFilter) {
+      this.slspDiskTypeFilter.initType();
+    }
+    if (this.sLSPStorageNameFilter) {
+      this.sLSPStorageNameFilter.initName();
+    }
+    if (this.lunStatusFilter) {
+      this.lunStatusFilter.initName();
+    }
   }
 
   setDataSetsChart(height: number, title: string, subtext: string,){
