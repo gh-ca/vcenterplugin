@@ -1412,6 +1412,49 @@ public class VCSDKUtils {
     }
 
     /**
+     * 获取vcenter主机已存在的动态发现
+     *
+     * @param hostObjectId vcenter主机id
+     * @return
+     */
+    public List<String> getConfiguredSendTargetOfIscsiHbaByHost(String hostObjectId) {
+        List<String> addressList = new ArrayList<>();
+        try {
+            if (StringUtils.isEmpty(hostObjectId)) {
+                return addressList;
+            }
+
+            String serverguid = vcConnectionHelpers.objectId2Serverguid(hostObjectId);
+            VmwareContext vmwareContext = vcConnectionHelpers.getServerContext(serverguid);
+            ManagedObjectReference objmor = vcConnectionHelpers.objectId2Mor(hostObjectId);
+            HostMO hostMo = hostVmwareFactory.build(vmwareContext, objmor);
+
+            List<HostHostBusAdapter> hbas = hostMo.getHostStorageSystemMo().getStorageDeviceInfo().getHostBusAdapter();
+            if (hbas != null && hbas.size() > 0) {
+                for (HostHostBusAdapter hba : hbas) {
+                    if (hba instanceof HostInternetScsiHba) {
+                        HostInternetScsiHba iscsiHba = (HostInternetScsiHba) hba;
+                        List<HostInternetScsiHbaSendTarget> configuredSendTargets = iscsiHba.getConfiguredSendTarget();
+                        if (configuredSendTargets != null && configuredSendTargets.size() != 0) {
+                            for (HostInternetScsiHbaSendTarget hostInternetScsiHbaSendTarget : configuredSendTargets) {
+                                String address = hostInternetScsiHbaSendTarget.getAddress();
+                                if (StringUtils.isEmpty(address)) {
+                                    addressList.add(address);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.error("get Hba Device By Host error:", e);
+        }
+        return addressList;
+    }
+
+
+
+    /**
      * 得到集群下所有主机对应的可用LUN 20200918objectId
      *
      * @param clusterObjectId clusterObjectId
@@ -2839,6 +2882,11 @@ public class VCSDKUtils {
         Client vmomiClient = null;
         SessionManager sessionManager = null;
         try {
+
+            //获取该设备已经建立的ISCSI服务器连接信息
+            List<String> configuredSendTargetOfIscsiHbaByHost = getConfiguredSendTargetOfIscsiHbaByHost(hostObjectId);
+            logger.info("获取该设备已经建立的ISCSI服务器连接信息:{}", configuredSendTargetOfIscsiHbaByHost);
+
             HttpConfiguration httpConfig = new HttpConfigurationImpl();
             httpConfig.setTimeoutMs(TEST_CONNECTIVITY_TIMEOUT);
             httpConfig.setThumbprintVerifier(new AllowAllThumbprintVerifier());
@@ -2900,6 +2948,13 @@ public class VCSDKUtils {
                         public void run() {
                             try {
                                 String mgmtIp = ToolUtils.getStr(ethPort.get("mgmtIp"));
+                                if (configuredSendTargetOfIscsiHbaByHost.size() != 0 &&
+                                    configuredSendTargetOfIscsiHbaByHost.contains(mgmtIp)) {
+
+                                    ethPort.put("connectStatusType", 3);
+                                    reEthPorts.add(ethPort);
+                                    return;
+                                }
                                 if (!StringUtils.isEmpty(mgmtIp)) {
                                     try {
                                         ManagedMethodExecuter.SoapArgument soapArgument0
@@ -2931,13 +2986,14 @@ public class VCSDKUtils {
                                             "UTF-8");
                                         logger.info("mgmtIp={},re={}", mgmtIp, re);
                                         String packetLost = xmlFormat(re);
+
                                         if (!StringUtils.isEmpty(packetLost) && !"100".equals(packetLost)) {
-                                            ethPort.put(CONNECT_STATUS, "true");
+                                            ethPort.put("connectStatusType", 4);
                                         } else {
-                                            ethPort.put(CONNECT_STATUS, "false");
+                                            ethPort.put("connectStatusType", 2);
                                         }
                                     } catch (Exception e) {
-                                        ethPort.put(CONNECT_STATUS, "false");
+                                        ethPort.put("connectStatusType", 2);
                                         logger.error("testConnectivity error!mgmtIp={},errMsg={}", mgmtIp,
                                             e.getMessage());
                                     }
