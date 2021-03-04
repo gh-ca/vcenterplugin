@@ -527,7 +527,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return null;
     }
 
-    private static Map<String, Long> parseTime(String interval) {
+    private  Map<String, Long> parseTime(String interval) {
         long endTime = System.currentTimeMillis();
         Calendar rightNow = Calendar.getInstance();
         rightNow.setTimeInMillis(endTime);
@@ -564,7 +564,7 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         return timeMap;
     }
 
-    public static JsonObject getDatasetsQueryBody(String serviceLevelId, String interval, String dataSetType) {
+    public JsonObject getDatasetsQueryBody(String serviceLevelId, String interval, String dataSetType) {
         Map<String, Long> timeMap = parseTime(interval);
 
         // timeRange
@@ -651,11 +651,6 @@ public class ServiceLevelServiceImpl implements ServiceLevelService {
         returnBody.add("metrics", metrics);
 
         return returnBody;
-    }
-
-    public static void main(String[] args) {
-        String body = getDatasetsQueryBody("ea8b7fbd-8dab-42b3-8683-adaa019013ad", "LAST_1_MONTH", "perf-stat-lun-details").toString();
-        System.out.println(body);
     }
 
 }
