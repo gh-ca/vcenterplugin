@@ -588,12 +588,15 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     }
 
     @Override
-    public List<FileSystem> getFileSystems(String storageId) throws DmeException {
+    public List<FileSystem> getFileSystems(String storageId,Integer pageNo, Integer pageSize) throws DmeException {
         List<FileSystem> fileSystems = new ArrayList<>();
 
-        Map<String, String> params = new HashMap<>();
+        Map<String, Object> params = new HashMap<>();
         params.put(STORAGE_ID, storageId);
+        params.put("page_no", pageNo);
+        params.put("page_size", pageSize);
         String jsonParams = gson.toJson(params);
+
         try {
             ResponseEntity<String> responseEntity = dmeAccessService.access(DmeConstants.DME_NFS_FILESERVICE_QUERY_URL,
                 HttpMethod.POST, jsonParams);
@@ -1545,7 +1548,7 @@ public class DmeStorageServiceImpl implements DmeStorageService {
     @Override
     public Boolean queryFsByName(String name, String storageId) throws DmeException {
         boolean isExist = true;
-        List<FileSystem> fileSystems = getFileSystems(storageId);
+        List<FileSystem> fileSystems = getFileSystems(storageId,null,null);
         for (FileSystem fileSystem : fileSystems) {
             if (name.equals(fileSystem.getName())) {
                 isExist = false;
