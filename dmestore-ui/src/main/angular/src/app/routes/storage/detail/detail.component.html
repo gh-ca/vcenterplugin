@@ -5,17 +5,17 @@
   <div class="detail-content">
     <div>
       <clr-tabs>
-        <clr-tab>
+        <clr-tab >
           <button clrTabLink id="conf" (click)="changeTab('conf')">{{'storage.detail.conf.configuration' | translate}}</button>
-          <clr-tab-content id="configuration" *clrIfActive="true">
+          <clr-tab-content id="configuration" *clrIfActive="true" >
             <table class="table table-noborder" *ngIf="detail" [clrLoading]="detailLoading">
               <tr>
                 <td class="left">{{'storage.detail.conf.name' | translate}}</td>
-                <td class="left">{{detail.name}}</td>
+                <td class="left">{{detail.name?detail.name:'--'}}</td>
                 <td class="left">{{'storage.detail.conf.ip' | translate}}</td>
-                <td class="left">{{detail.ip}}</td>
+                <td class="left">{{detail.ip?detail.ip:'--'}}</td>
                 <td class="left">{{'storage.detail.conf.sn' | translate}}</td>
-                <td class="left">{{detail.sn}}</td>
+                <td class="left">{{detail.sn?detail.sn:'--'}}</td>
               </tr>
               <tr>
                 <td class="left">{{'storage.detail.conf.status' | translate}}</td>
@@ -37,18 +37,18 @@
               </span>
                 </td>
                 <td class="left">{{'storage.detail.conf.fv' | translate}}</td>
-                <td class="left">{{detail.productVersion}}</td>
+                <td class="left">{{detail.productVersion?detail.productVersion:'--'}}</td>
                 <td class="left">{{'storage.detail.conf.pv' | translate}}</td>
-                <td class="left">{{detail.patchVersion}}</td>
+                <td class="left">{{detail.patchVersion?detail.patchVersion:'--'}}</td>
               </tr>
               <tr>
                 <td class="left">{{'storage.detail.conf.vendor' | translate}}</td>
-                <td class="left">{{detail.vendor}}</td>
+                <td class="left">{{detail.vendor?detail.vendor:'--'}}</td>
                 <td class="left">{{'storage.detail.conf.model' | translate}}</td>
-                <td class="left">{{detail.model}}</td>
+                <td class="left">{{detail.model?detail.model:'--'}}</td>
                 <td class="left">{{'storage.detail.conf.az' | translate}}</td>
                 <td class="left" *ngIf="detail.azIds">{{detail.azIds.length>0?detail.azIds:'--'}}</td>
-                <td class="left" *ngIf="detail.azIds != null">--</td>
+                <!--<td class="left" *ngIf="detail.azIds != null">&#45;&#45;</td>-->
               </tr>
               <tr>
                 <td class="left">{{'storage.detail.conf.wp' | translate}}</td>
@@ -57,14 +57,14 @@
                 <td class="left over_flow" title="{{detail.location !=null?detail.location:'--'}}" style="width: 11rem;display: inline-block;">{{detail.location !=null?detail.location:'--'}}</td>
               </tr>
             </table>
-            <div *ngIf="!detail" style="height: 50%">
-
-              <cds-alert-group type="light" size="sm">
-                <cds-alert *ngIf="!detailLoading" status="warning">{{'errorMsg.cantFindData' | translate}}</cds-alert>
-                <cds-alert *ngIf="detailLoading" status="loading">{{'vmfs.loadingTips' | translate}}</cds-alert>
-              </cds-alert-group>
+              <div *ngIf="!detail">
+                <cds-alert-group type="light" size="lg">
+                  <cds-alert *ngIf="!detailLoading" status="warning">{{'errorMsg.cantFindData' | translate}}</cds-alert>
+                  <img [hidden]="!detailLoading" src="./assets/images/loading.gif" style="width: 20px;height: 20px">
+                  <cds-alert *ngIf="detailLoading" status="loading">{{'vmfs.loadingTips' | translate}}</cds-alert>
+                </cds-alert-group>
             </div>
-            <clr-tabs>
+            <clr-tabs *ngIf="detail">
               <!--Storage Pools-->
               <clr-tab>
                 <button clrTabLink id="storage" (click)="changeTab('pool')">{{'storage.detail.storagePool.storagePool' | translate}}</button>
@@ -167,9 +167,9 @@
                           {{(item.subscribedCapacity/item.totalCapacity*100).toFixed(2)}}%
                         </clr-dg-cell>
 
-                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxLatency?item.maxLatency.toFixed(2):0.00}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxIops?item.maxIops.toFixed(1):0.0}}</clr-dg-cell>
-                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxBandwidth?item.maxBandwidth.toFixed(1):0.0}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxLatency!=null?item.maxLatency.toFixed(2):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxIops!=null?item.maxIops.toFixed(1):'--'}}</clr-dg-cell>
+                        <clr-dg-cell [hidden]="poolRadio!=='table3'">{{item.maxBandwidth!=null?item.maxBandwidth.toFixed(1):'--'}}</clr-dg-cell>
                       </clr-dg-row>
                       <clr-dg-footer>
                         <clr-dg-pagination #pagination [clrDgPageSize]="10" [clrDgTotalItems]="poolTotal">
@@ -555,8 +555,8 @@
                           <clr-dg-cell class="over_flow">{{item.name}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.sharePath}}</clr-dg-cell>
                           <clr-dg-cell class="over_flow">{{item.fsName}}</clr-dg-cell>
-                          <clr-dg-cell class="over_flow">{{item.owningDtreeName!=null?item.owningDtreeName:'--'}}</clr-dg-cell>
-                          <clr-dg-cell title="{{item.tierName!=null?item.tierName:'--'}}" class="over_flow">{{item.tierName!=null?item.tierName:'--'}}</clr-dg-cell>
+                          <clr-dg-cell class="over_flow">{{item.owningDtreeName!=null?item.owningDtreeName!=''?item.owningDtreeName:'--':'--'}}</clr-dg-cell>
+                          <clr-dg-cell title="{{item.tierName!=null?item.tierName:'--'}}" class="over_flow">{{item.tierName!=null?item.tierName!=''?item.tierName:'--':'--'}}</clr-dg-cell>
                         </clr-dg-row>
                         <clr-dg-footer>
                           <clr-dg-pagination #paginationST [clrDgPageSize]="10" [clrDgTotalItems]="shareTotal">

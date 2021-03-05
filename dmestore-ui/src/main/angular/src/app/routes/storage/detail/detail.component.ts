@@ -277,6 +277,7 @@ export class DetailComponent implements OnInit, AfterViewInit {
   changeTab(page: string){
    // this.gs.loading = false;
     if (page === 'conf'){
+      this.poolRadio='table1';
       this.getStorageDetail(false);
     }
     if (page === 'pool'){
