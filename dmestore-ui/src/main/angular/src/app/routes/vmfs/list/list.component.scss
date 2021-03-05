@@ -41,7 +41,7 @@
   .tabs-btn{
     padding: 5px 20px;
     border-radius: 20px;
-    
+
     display: inline-block;
     /* box-sizing: border-box; */
     position: relative;
@@ -197,4 +197,7 @@ input[type=number] {
 }
 .hideFilter ::ng-deep clr-dg-string-filter{
   display: none;
+}
+#deviceSelect{
+  min-width: 10rem!important;
 }
