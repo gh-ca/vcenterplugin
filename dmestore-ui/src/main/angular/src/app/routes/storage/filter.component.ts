@@ -626,7 +626,8 @@ export class FsTypeFilter implements ClrDatagridFilterInterface<FileSystem>{
     if (!this.type || this.type == 'all') {
       return true;
     } else {
-      return this.type == status;
+      const type = item.allocType;
+      return type.toLowerCase().indexOf(this.type.toLowerCase()) >= 0;
     }
   }
 
