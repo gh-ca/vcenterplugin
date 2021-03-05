@@ -619,6 +619,11 @@
     "speed": "Working Rate(Mbps)",
     "hStatus": "Health Status",
     "cStatus": "Connect Status",
+    "cStatusType": "Connection status type",
+    "phyPortNotConn": "The physical port is not connected",
+    "ipUnreachable": "IP unreachable",
+    "connected": "Connected",
+    "toBeConnected": "To be connected",
     "ports": "Please Select Storage Device Ports",
     "portNullMessage": "Port is not be Empty!",
     "establishConnect": "Establish an iSCSI connection"

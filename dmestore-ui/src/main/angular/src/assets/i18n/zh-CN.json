@@ -619,6 +619,11 @@
     "speed": "工作速率(Mbps)",
     "hStatus": "健康状态",
     "cStatus": "连接状态",
+    "cStatusType": "连接状态类型",
+    "phyPortNotConn": "物理端口未连接",
+    "ipUnreachable": "IP无法到达",
+    "connected": "已连接",
+    "toBeConnected": "待连接",
     "ports": "请选择存储设备的以太网端口",
     "portNullMessage": "端口不能为空！",
     "establishConnect": "建立iSCSI连接"
