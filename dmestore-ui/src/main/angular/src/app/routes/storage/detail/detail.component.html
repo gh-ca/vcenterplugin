@@ -115,9 +115,9 @@
 
                       <clr-dg-column [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'totalCapacity'">{{'storage.detail.storagePool.totalCap' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'consumedCapacity'">{{'storage.detail.storagePool.usedCap' | translate}}</clr-dg-column>
-                      <clr-dg-column [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'consumedCapacity'" style="width: 11rem;">{{'storage.detail.storagePool.capUsage' | translate}}</clr-dg-column>
+                      <clr-dg-column [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'capUsage'" style="width: 11rem;">{{'storage.detail.storagePool.capUsage' | translate}}</clr-dg-column>
                       <clr-dg-column [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'freeCapacity'">{{'storage.detail.storagePool.freeCap' | translate}}</clr-dg-column>
-                      <clr-dg-column [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'subscribedCapacity'">{{'storage.detail.storagePool.supRate' | translate}}</clr-dg-column>
+                      <clr-dg-column [hidden]="poolRadio!=='table2'" class="hideFilter" [clrDgField]="'supRate'">{{'storage.detail.storagePool.supRate' | translate}}</clr-dg-column>
 
                       <clr-dg-column class="hideFilter" [clrDgField]="'maxLatency'" [hidden]="poolRadio!=='table3'">{{'storage.detail.storagePool.latency' | translate}}</clr-dg-column>
                       <clr-dg-column class="hideFilter" [clrDgField]="'maxIops'" [hidden]="poolRadio!=='table3'">{{'storage.detail.storagePool.iops' | translate}}</clr-dg-column>

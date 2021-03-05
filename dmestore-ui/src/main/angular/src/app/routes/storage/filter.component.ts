@@ -114,6 +114,10 @@ export class StorageStatusFilter implements ClrDatagridFilterInterface<StorageLi
         <input type="radio" clrRadio name="mediaType" (change)="changeFunc($event)" [(ngModel)]="mediaType" value="block"/>
         <label>{{'enum.type.block' | translate}}</label>
       </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="mediaType" (change)="changeFunc($event)" [(ngModel)]="mediaType" value="block/file"/>
+        <label>{{'enum.type.blockAndFile' | translate}}</label>
+      </clr-radio-wrapper>
     </clr-radio-container>
   `,
 })
@@ -622,7 +626,8 @@ export class FsTypeFilter implements ClrDatagridFilterInterface<FileSystem>{
     if (!this.type || this.type == 'all') {
       return true;
     } else {
-      return this.type == status;
+      const type = item.allocType;
+      return type.toLowerCase().indexOf(this.type.toLowerCase()) >= 0;
     }
   }
 
@@ -649,20 +654,20 @@ export class FsTypeFilter implements ClrDatagridFilterInterface<FileSystem>{
         <label>{{'vmfs.filter.all' | translate}}</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="secMod" (change)="changeFunc($event)" [(ngModel)]="secMod" value="mixed"/>
+        <input type="radio" clrRadio name="secMod" (change)="changeFunc($event)" [(ngModel)]="secMod" value="Mixed"/>
         <label>Mixed</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
-        <input type="radio" clrRadio name="secMod" (change)="changeFunc($event)" [(ngModel)]="secMod" value="native"/>
+        <input type="radio" clrRadio name="secMod" (change)="changeFunc($event)" [(ngModel)]="secMod" value="Native"/>
         <label>Native</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="secMod" (change)="changeFunc($event)" [(ngModel)]="secMod" value="NTFS"/>
-        <label>ntfs</label>
+        <label>NTFS</label>
       </clr-radio-wrapper>
       <clr-radio-wrapper>
         <input type="radio" clrRadio name="secMod" (change)="changeFunc($event)" [(ngModel)]="secMod" value="UNIX"/>
-        <label>unix</label>
+        <label>UNIX</label>
       </clr-radio-wrapper>
     </clr-radio-container>
   `,
@@ -679,7 +684,7 @@ export class DtreeSecModFilter implements ClrDatagridFilterInterface<Dtrees>{
       return true;
     } else {
       const  secMod = item.securityStyle.toString();
-      return this.secMod == secMod;
+      return secMod.toLowerCase().indexOf(this.secMod.toLowerCase()) >= 0;
     }
   }
 
@@ -839,7 +844,7 @@ export class DiskStatusFilter implements ClrDatagridFilterInterface<StorageDisk>
       return true;
     } else {
       const  quota = item.status.toString();
-      return this.status == quota;
+      return quota.toLowerCase().indexOf(this.status.toLowerCase()) >= 0;
     }
   }
 
