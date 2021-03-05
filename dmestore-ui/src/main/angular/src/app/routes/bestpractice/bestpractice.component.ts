@@ -197,19 +197,19 @@ export class BestpracticeComponent implements OnInit {
                 switch (item.level) {
                   case "Critical":
                     levelNum = 4;
-                    levelDesc = this.translatePipe.transform("bestPractice.critical");
+                    levelDesc = this.translatePipe.transform("overview.critical");
                     break;
                   case "Major":
                     levelNum = 3;
-                    levelDesc = this.translatePipe.transform("bestPractice.major");
+                    levelDesc = this.translatePipe.transform("overview.major");
                     break;
                   case "Warning":
                     levelNum = 2;
-                    levelDesc = this.translatePipe.transform("bestPractice.warning");
+                    levelDesc = this.translatePipe.transform("overview.warning");
                     break;
                   case "Info":
                     levelNum = 1;
-                    levelDesc = this.translatePipe.transform("bestPractice.info");
+                    levelDesc = this.translatePipe.transform("overview.info");
                     break;
                   default:
                     levelNum = 0;

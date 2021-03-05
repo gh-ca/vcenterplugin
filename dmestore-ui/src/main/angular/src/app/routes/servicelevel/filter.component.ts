@@ -4,6 +4,7 @@ import {Subject} from "rxjs";
 import {SLStoragePool} from "./servicelevel.service";
 import {ServicelevelService} from "./servicelevel.service";
 import {HttpClient} from "@angular/common/http";
+import {Volume} from "../storage/detail/detail.service";
 
 @Component({
   selector: "sl-sp-status-filter",
@@ -141,7 +142,7 @@ export class SLSPDiskTypeFilter implements ClrDatagridFilterInterface<SLStorageP
       return true;
     } else {
       const  physicalType = item.physicalType;
-      return this.type == physicalType;
+      return physicalType.toLowerCase().indexOf(this.type.toLowerCase()) >= 0;
     }
   }
 
@@ -205,5 +206,75 @@ export class SLSPStorageNameFilter implements ClrDatagridFilterInterface<SLStora
   initName() {
     this.name = undefined;
     this.changeFunc(this.name);
+  }
+}
+
+@Component({
+  selector: "lun-status-filter",
+  template: `
+    <clr-radio-container style="max-height: 6.25rem;overflow-y: auto">
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="" />
+        <label>{{'vmfs.filter.all' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="normal" />
+        <label>{{'enum.status.normal' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="creating"/>
+        <label>{{'enum.status.creating' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="mapping" />
+        <label>{{'enum.status.mapping' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="unmapping" />
+        <label>{{'enum.status.unmapping' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="deleting" />
+        <label>{{'enum.status.deleting' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="error" />
+        <label>{{'enum.status.error' | translate}}</label>
+      </clr-radio-wrapper>
+      <clr-radio-wrapper>
+        <input type="radio" clrRadio name="status" (change)="changeFunc($event)" [(ngModel)]="status" value="expanding" />
+        <label>{{'enum.status.expanding' | translate}}</label>
+      </clr-radio-wrapper>
+    </clr-radio-container>
+  `,
+  providers: [ServicelevelService, HttpClient],
+})
+export class LUNStatusFilter implements ClrDatagridFilterInterface<Volume>{
+
+  changes = new Subject<any>();
+  status;
+  storageNames:string[];
+  readonly state: any;
+  constructor() {}
+  accepts(item: Volume): boolean {
+    if (!this.status || this.status == 'all') {
+      return true;
+    } else {
+      const  status = item.status;
+      return this.status == status;
+    }
+  }
+
+  changeFunc(value: any) {
+    this.changes.next();
+  }
+
+  isActive(): boolean {
+    return true;
+  }
+
+  initName() {
+    this.status = undefined;
+    this.changeFunc(this.status);
   }
 }

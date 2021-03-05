@@ -395,7 +395,12 @@
 
           <clr-datagrid [clrDgLoading]="volumeIsloading">
             <clr-dg-column [clrDgField]="'name'">{{'tier.name'|translate}}</clr-dg-column>
-            <clr-dg-column [clrDgField]="'status'">{{'tier.status'|translate}}</clr-dg-column>
+            <clr-dg-column>
+              {{'tier.status'|translate}}
+              <clr-dg-filter [clrDgFilter]="lunStatusFilter">
+                <lun-status-filter #lunStatusFilter></lun-status-filter>
+              </clr-dg-filter>
+            </clr-dg-column>
             <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" class="hideFilter" [clrDgField]="'capacity'">{{'tier.total'|translate}}</clr-dg-column>
             <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" [clrDgField]="'alloctype'">{{'tier.alloctype'|translate}}</clr-dg-column>
             <clr-dg-column [hidden]="volumeRadioCheck!=='basic'" class="hideFilter" [clrDgField]="'capacityUsage'">{{'tier.used'|translate}}</clr-dg-column>
@@ -407,16 +412,31 @@
             <clr-dg-row *clrDgItems="let item of volumeList" [clrDgItem]="item">
 
                 <clr-dg-cell>{{item.name}}</clr-dg-cell>
-                <clr-dg-cell>
-                  <span *ngIf="item.status == 'deleted'">
-                    <span class="color-square" style="background-color: #A9A9A9; margin-right: 10px"></span>{{'tier.offLine' | translate}}
-                  </span>
+                <clr-dg-cell class="over_flow">
+                 <span *ngIf="item.status == 'creating'">
+                            <span class="color-square" style="background-color: green; margin-right: 10px"></span>{{'enum.status.creating' | translate}}
+                          </span>
                   <span *ngIf="item.status == 'normal'">
-                    <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px;"></span>{{'tier.normal' | translate}}
-                  </span>
-                  <span *ngIf="item.status == 'na'">
-                    --
-                  </span>
+                            <span class="color-square" style="background-color: #7CDFA0; margin-right: 10px"></span>{{'enum.status.normal' | translate}}
+                          </span>
+                  <span *ngIf="item.status == 'mapping'">
+                            <span class="color-square" style="background-color: gold; margin-right: 10px"></span>{{'enum.status.mapping' | translate}}
+                          </span>
+                  <span *ngIf="item.status == 'unmapping'">
+                            <span class="color-square" style="background-color: blueviolet; margin-right: 10px"></span>{{'enum.status.unmapping' | translate}}
+                          </span>
+                  <span *ngIf="item.status == 'deleting'">
+                            <span class="color-square" style="background-color: bisque; margin-right: 10px"></span>{{'enum.status.deleting' | translate}}
+                          </span>
+                  <span *ngIf="item.status == 'error'">
+                            <span class="color-square" style="background-color: red; margin-right: 10px"></span>{{'enum.status.error' | translate}}
+                          </span>
+                  <span *ngIf="item.status == 'expanding'">
+                            <span class="color-square" style="background-color: darkmagenta; margin-right: 10px"></span>{{'enum.status.expanding' | translate}}
+                          </span>
+                  <span *ngIf="!item.status">
+                            --
+                          </span>
                 </clr-dg-cell>
 
                 <clr-dg-cell [hidden]="volumeRadioCheck!=='basic'">{{item.capacity}} GB</clr-dg-cell>

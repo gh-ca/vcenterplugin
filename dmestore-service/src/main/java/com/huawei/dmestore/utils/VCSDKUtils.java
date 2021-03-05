@@ -2318,7 +2318,7 @@ public class VCSDKUtils {
             createSpec.setDescription(CATEGORY_NAME);
             createSpec.setCardinality(CategoryModel.Cardinality.SINGLE);
             Set<String> associableTypes = new HashSet<>();
-            associableTypes.add("Datastore");
+            //associableTypes.add("Datastore");
             createSpec.setAssociableTypes(associableTypes);
             categoryid = taggingWorkflow.createTagCategory(createSpec);
         }
@@ -2406,7 +2406,7 @@ public class VCSDKUtils {
     public void createTag(String tagName, SessionHelper sessionHelper) {
         TaggingWorkflow taggingWorkflow = taggingWorkflowFactory.build(sessionHelper);
         taggingWorkflow.createTag(tagName, "", getCategoryId(sessionHelper));
-        sessionHelper.logout();
+        //sessionHelper.logout();
     }
 
     private void removePbmProfile(VmwareContext vmwareContext, List<PbmProfile> pbmProfiles)

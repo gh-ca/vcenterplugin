@@ -126,10 +126,11 @@ export class IscsiComponent implements OnInit, AfterViewInit {
           // result.data.forEach((item) => {
           //   item.connectStatus = '';
           // });
-          this.portList = result.data;
+          // 端口列表中不展示名称为MGMT和MAINTENANCE的端口
+          this.portList = result.data.filter(item => item.portName.toLowerCase() != 'mgmt' && item.portName.toLowerCase() != 'maintenance');
           this.portTotal = result.data.length;
-          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
           // 连通状态
+          this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
           this.testPortConnected();
         }
       }, err => {
@@ -143,9 +144,9 @@ export class IscsiComponent implements OnInit, AfterViewInit {
     const p = new testConnectParams();
     const testPortList = [];
     this.portList.forEach((item)=>{
-       if (item.mgmtIp && item.mgmtIp != ""){
+       // if (item.mgmtIp && item.mgmtIp != ""){
          testPortList.push(item);
-       }
+       // }
     });
     p.ethPorts = testPortList;
     p.hostObjectId = this.configModel.hostObjectId;
@@ -156,13 +157,14 @@ export class IscsiComponent implements OnInit, AfterViewInit {
             this.portList.forEach((j)=>{
                if(i.id == j.id){
                  j.connectStatus = i.connectStatus;
+                 j.connectStatusType = i.connectStatusType;
                }
             });
         });
-        this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
       } else{
         alert("测试连通性出错");
       }
+      this.cdr.detectChanges(); // 此方法变化检测，异步处理数据都要添加此方法
     }, err => {
       console.error('ERROR', err);
     });

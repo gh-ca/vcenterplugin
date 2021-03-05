@@ -64,8 +64,8 @@ export class ServiceLevelComponent implements OnInit{
         } else { // 以dataStore为入口
           const ctx = this.globalsService.getClientSdk().app.getContextObjects();
           console.log('ctx', ctx);
-          // this.objectId = ctx[0].id;
-          this.objectId = "urn:vmomi:Datastore:datastore-4006:674908e5-ab21-4079-9cb1-596358ee5dd1";
+          this.objectId = ctx[0].id;
+          // this.objectId = "urn:vmomi:Datastore:datastore-4006:674908e5-ab21-4079-9cb1-596358ee5dd1";
 
         }
 
