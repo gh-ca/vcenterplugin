@@ -24,6 +24,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -251,11 +252,16 @@ public class DmeNFSAccessServiceImpl implements DmeNFSAccessService {
             if (responseTuning.getStatusCodeValue() / DIGIT_100 == DIGIT_2) {
                 fsAttr.setFileSystemId(fileSystemId);
                 JsonObject fsDetail = gson.fromJson(responseTuning.getBody(), JsonObject.class);
-                fsAttr.setName(fsDetail.get(NAME_FIELD).getAsString());
-                fsAttr.setProvisionType(fsDetail.get("alloc_type").getAsString());
-                fsAttr.setDevice(fsDetail.get(STORAGE_NAME).getAsString());
-                fsAttr.setStoragePoolName(fsDetail.get(STORAGE_POOL_NAME).getAsString());
-                fsAttr.setController(fsDetail.get("owning_controller").getAsString());
+                fsAttr.setName(ToolUtils.jsonToStr(fsDetail.get(NAME_FIELD)));
+                fsAttr.setProvisionType(ToolUtils.jsonToStr(fsDetail.get("alloc_type")));
+                fsAttr.setStorageId(ToolUtils.jsonToStr(fsDetail.get("storage_id")));
+                //获取指定存储设备详情
+                StorageDetail storageDetail = dmeStorageService.getStorageDetail(fsAttr.getStorageId());
+                Boolean dorado = storageDetail.getStorageTypeShow().getDorado();
+                fsAttr.setDorado(dorado);
+                fsAttr.setDevice(ToolUtils.jsonToStr(fsDetail.get(STORAGE_NAME)));
+                fsAttr.setStoragePoolName(ToolUtils.jsonToStr(fsDetail.get(STORAGE_POOL_NAME)));
+                fsAttr.setController(ToolUtils.jsonToStr(fsDetail.get("owning_controller")));
                 JsonObject tuning = fsDetail.getAsJsonObject("tuning");
                 if (!tuning.isJsonNull()) {
                     fsAttr.setApplicationScenario(ToolUtils.jsonToStr(tuning.get("application_scenario"), null));
