@@ -513,10 +513,12 @@ public class DataStoreStatisticHistoryServiceImpl implements DataStoreStatisticH
             // ids若为wwn的集合则转换为对应的instanceId集合,也有可能ids直接就是volume的instanceId集合
             Map<String, Map<String, Object>> sysLunMap = dmeRelationInstanceService.getLunInstance();
             for (String id : ids) {
-                String instanceId = sysLunMap.get(id).get(RESID_FIELD).toString();
-                if (!StringUtils.isEmpty(instanceId)) {
-                    idInstancdIdMap.put(id, instanceId);
-                    instanceIds.add(instanceId);
+                if (sysLunMap.size() != 0) {
+                    String instanceId = ToolUtils.getStr(sysLunMap.get(id));
+                    if (!StringUtils.isEmpty(instanceId)) {
+                        idInstancdIdMap.put(id, instanceId);
+                        instanceIds.add(instanceId);
+                    }
                 }
             }
             if (instanceIds.size() > 0) {
