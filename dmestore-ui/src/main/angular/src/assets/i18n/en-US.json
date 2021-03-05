@@ -457,7 +457,7 @@
         "proType":"Provisioning Type",
         "totalCap":"Total Capacity",
         "capUsage":"Capacity Usage",
-        "ownSto":"Owning Storage",
+        "ownSto":"Owning Storage Pool",
         "nfs":"NFS",
         "cifs":"CIFS",
         "dtree":"Dtree",

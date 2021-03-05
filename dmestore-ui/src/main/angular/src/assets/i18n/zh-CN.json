@@ -457,7 +457,7 @@
         "totalCap":"总容量",
         "proType":"分配类型",
         "capUsage":"已使用容量",
-        "ownSto":"所属存储",
+        "ownSto":"所属存储池",
         "nfs":"NFS",
         "cifs":"CIFS",
         "dtree":"Dtree",
