@@ -403,7 +403,9 @@ public class NfsOperationServiceImpl implements NfsOperationService {
             // 扩容
             if (dataSpace != null && Double.compare(changeCapacity, dataSpace) == 1) {
                 LOG.info("The expansion exceeds the available storage pool capacity!");
-                changeCapacity = dataSpace;
+                //所阔容量不受存储池容量大小限制
+                //changeCapacity = dataSpace;
+                changeCapacity = changeCapacity;
             }
             exchangedCapacity = changeCapacity + currentCapacity;
         } else if (!isExpand) {
