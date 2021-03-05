@@ -382,6 +382,11 @@ export class DetailComponent implements OnInit, AfterViewInit {
         this.isLoading = false;
         if (r.code === '200'){
           this.storagePool = r.data;
+          // 设置容量个利用率
+          this.storagePool.forEach(item => {
+            item.capUsage = item.consumedCapacity/item.totalCapacity * 100;
+            item.supRate = item.subscribedCapacity/item.totalCapacity*100
+          });
           // 如果是v6设备存储池的类型为Block/File
           if (this.detail.storageTypeShow.dorado){
             this.storagePool.forEach(item => item.mediaType = "block/file");

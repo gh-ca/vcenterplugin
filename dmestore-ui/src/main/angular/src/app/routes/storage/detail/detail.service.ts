@@ -120,6 +120,8 @@ export class StoragePool{
   healthStatus: string;// 健康状态
   totalCapacity: number;// 总容量
   consumedCapacity: number;//已用容量
+  capUsage: number;// 利用率
+  supRate: number; // 订阅率
   consumedCapacityPercentage: string;// 已用容量百分比(容量利用率)
   storagePoolId: string;
   storageInstanceId: string;
