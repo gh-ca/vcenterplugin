@@ -60,6 +60,16 @@ public class NfsDataStoreFsAttr implements Serializable {
     private String fileSystemId;
 
     /**
+     * storageId .
+     */
+    private String storageId;
+
+    /**
+     * isDorado 是否为V6版本存储池 .
+     */
+    private Boolean isDorado;
+
+    /**
      * getController .
      *
      * @return String .
@@ -237,6 +247,38 @@ public class NfsDataStoreFsAttr implements Serializable {
      */
     public void setFileSystemId(final String param) {
         this.fileSystemId = param;
+    }
+    /**
+     * getStorageId .
+     *
+     * @return String .
+     */
+    public String getStorageId() {
+        return storageId;
+    }
+    /**
+     * setStorageId .
+     *
+     * @param param .
+     */
+    public void setStorageId(String param) {
+        this.storageId = param;
+    }
+    /**
+     * getDorado .
+     *
+     * @return Boolean .
+     */
+    public Boolean getDorado() {
+        return isDorado;
+    }
+    /**
+     * setDorado .
+     *
+     * @param param .
+     */
+    public void setDorado(Boolean param) {
+        isDorado = param;
     }
 
     @Override
