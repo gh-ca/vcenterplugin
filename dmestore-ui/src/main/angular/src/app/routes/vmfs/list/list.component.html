@@ -75,7 +75,7 @@
         <device-filter #deviceFilter></device-filter>
       </clr-dg-filter>
     </clr-dg-column>
-    <clr-dg-column [hidden]="radioCheck!=='list'" [clrDgField]="'serviceLevelName'">
+    <clr-dg-column style="width: 250px;" [hidden]="radioCheck!=='list'" [clrDgField]="'serviceLevelName'">
       {{'vmfs.serviceLevelName' | translate}}
       <clr-dg-filter [clrDgFilter]="serviceLevelFilter">
         <serviceLevel-filter #serviceLevelFilter></serviceLevel-filter>
@@ -141,7 +141,7 @@
       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{formatCapacity(item.freeSpace, true)}}</clr-dg-cell>
       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{formatCapacity(item.reserveCapacity, true)}}</clr-dg-cell>
       <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.device}}</clr-dg-cell>
-      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">{{item.serviceLevelName}}</clr-dg-cell>
+      <clr-dg-cell title="{{item.serviceLevelName}}" class="over_flow" [hidden]="radioCheck!=='list'">{{item.serviceLevelName}}</clr-dg-cell>
 <!--      <clr-dg-cell class="over_flow" [hidden]="radioCheck!=='list'">-->
 <!--        <span *ngIf="item.vmfsProtected">-->
 <!--          <img src="./assets/images/icon-unprotected.svg">{{'vmfs.protectionStatus.protected' | translate}}-->
